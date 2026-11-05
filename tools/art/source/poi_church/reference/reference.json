@@ -1,0 +1,10 @@
+{
+  "task": "SGODOT-423",
+  "source": "Director approved concept v1, 2026-11-05",
+  "files": {
+    "c_church.png": "bb5abc0cbc49e8c83c4c0c7bfe92deeb29cccc34ca75a430d1d37abe434d097e",
+    "church_concept_v1.jpg": "1439e9ba32a05ebf3021eb1d60eb71d6059bc46f1b704acdc8f0163691e2b7e9"
+  },
+  "ui_icons_commit": "64f5c7a3",
+  "art_base": "93befb18cd5af7e30a966d2c112279287b71b3e2"
+}

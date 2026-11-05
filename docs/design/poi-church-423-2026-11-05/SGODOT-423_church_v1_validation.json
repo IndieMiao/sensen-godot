@@ -1,0 +1,2392 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "foundation one external atlas",
+        "passed": true
+      },
+      {
+        "check": "foundation mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "foundation one surface/material",
+        "passed": true
+      },
+      {
+        "check": "foundation finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "foundation UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "foundation nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "foundation Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "outer_steps one external atlas",
+        "passed": true
+      },
+      {
+        "check": "outer_steps mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "outer_steps one surface/material",
+        "passed": true
+      },
+      {
+        "check": "outer_steps finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "outer_steps UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "outer_steps nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "outer_steps Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "grass_surround one external atlas",
+        "passed": true
+      },
+      {
+        "check": "grass_surround mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "grass_surround one surface/material",
+        "passed": true
+      },
+      {
+        "check": "grass_surround finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "grass_surround UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "grass_surround nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "grass_surround Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "entry_landing one external atlas",
+        "passed": true
+      },
+      {
+        "check": "entry_landing mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "entry_landing one surface/material",
+        "passed": true
+      },
+      {
+        "check": "entry_landing finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "entry_landing UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "entry_landing nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "entry_landing Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "labyrinth one external atlas",
+        "passed": true
+      },
+      {
+        "check": "labyrinth mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "labyrinth one surface/material",
+        "passed": true
+      },
+      {
+        "check": "labyrinth finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "labyrinth UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "labyrinth nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "labyrinth Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "west_wall one external atlas",
+        "passed": true
+      },
+      {
+        "check": "west_wall mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "west_wall one surface/material",
+        "passed": true
+      },
+      {
+        "check": "west_wall finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "west_wall UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "west_wall nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "west_wall Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "north_wall one external atlas",
+        "passed": true
+      },
+      {
+        "check": "north_wall mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "north_wall one surface/material",
+        "passed": true
+      },
+      {
+        "check": "north_wall finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "north_wall UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "north_wall nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "north_wall Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "pointed_window one external atlas",
+        "passed": true
+      },
+      {
+        "check": "pointed_window mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "pointed_window one surface/material",
+        "passed": true
+      },
+      {
+        "check": "pointed_window finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "pointed_window UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "pointed_window nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "pointed_window Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_surround one external atlas",
+        "passed": true
+      },
+      {
+        "check": "window_surround mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "window_surround one surface/material",
+        "passed": true
+      },
+      {
+        "check": "window_surround finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "window_surround UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "window_surround nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "window_surround Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps one external atlas",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps one surface/material",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "altar_table one external atlas",
+        "passed": true
+      },
+      {
+        "check": "altar_table mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "altar_table one surface/material",
+        "passed": true
+      },
+      {
+        "check": "altar_table finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "altar_table UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "altar_table nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "altar_table Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "apse one external atlas",
+        "passed": true
+      },
+      {
+        "check": "apse mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "apse one surface/material",
+        "passed": true
+      },
+      {
+        "check": "apse finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "apse UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "apse nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "apse Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "rose_window one external atlas",
+        "passed": true
+      },
+      {
+        "check": "rose_window mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "rose_window one surface/material",
+        "passed": true
+      },
+      {
+        "check": "rose_window finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "rose_window UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "rose_window nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "rose_window Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wood_pew one external atlas",
+        "passed": true
+      },
+      {
+        "check": "wood_pew mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wood_pew one surface/material",
+        "passed": true
+      },
+      {
+        "check": "wood_pew finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "wood_pew UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "wood_pew nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wood_pew Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ one external atlas",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ one surface/material",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner one external atlas",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner one surface/material",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier one external atlas",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier one surface/material",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal one external atlas",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal one surface/material",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter one external atlas",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter one surface/material",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "stained_light one external atlas",
+        "passed": true
+      },
+      {
+        "check": "stained_light mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "stained_light one surface/material",
+        "passed": true
+      },
+      {
+        "check": "stained_light finite vertices/UV",
+        "passed": true
+      },
+      {
+        "check": "stained_light UV in atlas",
+        "passed": true
+      },
+      {
+        "check": "stained_light nondegenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "stained_light Godot UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "Placed triangles match / <=200k",
+        "passed": true
+      },
+      {
+        "check": "Placed surfaces match / <=60",
+        "passed": true
+      },
+      {
+        "check": "Plants match / <=100k",
+        "passed": true
+      },
+      {
+        "check": "2048 square shared atlas",
+        "passed": true
+      },
+      {
+        "check": "Required anchors",
+        "passed": true
+      },
+      {
+        "check": "Seat count 4–8",
+        "passed": true
+      },
+      {
+        "check": "seat_left_1 measured seat top / module",
+        "passed": true
+      },
+      {
+        "check": "seat_left_2 measured seat top / module",
+        "passed": true
+      },
+      {
+        "check": "seat_left_3 measured seat top / module",
+        "passed": true
+      },
+      {
+        "check": "seat_left_4 measured seat top / module",
+        "passed": true
+      },
+      {
+        "check": "seat_right_1 measured seat top / module",
+        "passed": true
+      },
+      {
+        "check": "seat_right_2 measured seat top / module",
+        "passed": true
+      },
+      {
+        "check": "seat_right_3 measured seat top / module",
+        "passed": true
+      },
+      {
+        "check": "seat_right_4 measured seat top / module",
+        "passed": true
+      },
+      {
+        "check": "Fixed camera same 6.72m width as tea/farm",
+        "passed": true
+      },
+      {
+        "check": "Ground light patch alpha limit",
+        "passed": true
+      }
+    ],
+    "assets": [
+      {
+        "name": "foundation",
+        "triangles": 17156,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -5.400000095367432,
+            -0.3400000035762787,
+            -5.400000095367432
+          ],
+          [
+            5.400000095367432,
+            0.07999999821186066,
+            5.400000095367432
+          ]
+        ],
+        "sha256": "cb7b7d2e0758e9d43e3ed8fe21dd13af8e2becf33f70ca3572fdad31710b2710"
+      },
+      {
+        "name": "outer_steps",
+        "triangles": 1296,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -6.399999618530273,
+            -0.6699999570846558,
+            -6.400000095367432
+          ],
+          [
+            6.399999618530273,
+            -0.1900000125169754,
+            6.400000095367432
+          ]
+        ],
+        "sha256": "2cf534c56269ae65cb6f26512bf7f4332a3e330e27d0f308d5b949ee24e95fd5"
+      },
+      {
+        "name": "grass_surround",
+        "triangles": 188,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -13.5,
+            -0.8500000238418579,
+            -13.5
+          ],
+          [
+            13.5,
+            -0.6699999570846558,
+            13.5
+          ]
+        ],
+        "sha256": "9ef86fbedf807ee58f5db36170217b842f1570b37034d451fb91a94c1b2abfe4"
+      },
+      {
+        "name": "entry_landing",
+        "triangles": 108,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.75,
+            -0.20000000298023224,
+            -0.7750000953674316
+          ],
+          [
+            0.75,
+            0.07999999821186066,
+            0.7750000953674316
+          ]
+        ],
+        "sha256": "e3d55f0c0356adf19c2282bf1c50d874d13eb45e282d0d921e5dd327b354ce8c"
+      },
+      {
+        "name": "labyrinth",
+        "triangles": 1964,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.3400001525878906,
+            -0.0020000040531158447,
+            -1.3400001525878906
+          ],
+          [
+            1.3400001525878906,
+            0.016999997198581696,
+            1.3400001525878906
+          ]
+        ],
+        "sha256": "00a7dea63451916c1d66538b5edc6a197dff93e9ea78b2198f64408bf8890023"
+      },
+      {
+        "name": "west_wall",
+        "triangles": 5916,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -5.449999809265137,
+            -7.450580596923828e-08,
+            -0.16499972343444824
+          ],
+          [
+            5.449999809265137,
+            7.979999542236328,
+            0.4800001382827759
+          ]
+        ],
+        "sha256": "8ca0a7e59924e38e394f85caa15fdbad9f879bfa76bbca56de3f83ea5f48950b"
+      },
+      {
+        "name": "north_wall",
+        "triangles": 5916,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -5.449999809265137,
+            -7.450580596923828e-08,
+            -0.16499996185302734
+          ],
+          [
+            5.449999809265137,
+            7.979999542236328,
+            0.48000001907348633
+          ]
+        ],
+        "sha256": "e496decbfbb2324395badea7ce8289bf75d485daa22565303f67dcc270327202"
+      },
+      {
+        "name": "pointed_window",
+        "triangles": 5368,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6700000762939453,
+            1.1410000324249268,
+            -0.014999999664723873
+          ],
+          [
+            0.6700000762939453,
+            4.440000057220459,
+            0.09200000017881393
+          ]
+        ],
+        "sha256": "6e995fad85e2b1f852a6e1dfd283321f5d952bb41fd9be58eb8ac6fc1566b87b"
+      },
+      {
+        "name": "window_surround",
+        "triangles": 1220,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.8150005340576172,
+            0.9900000691413879,
+            -0.0949999988079071
+          ],
+          [
+            0.8150005340576172,
+            4.610000133514404,
+            0.375
+          ]
+        ],
+        "sha256": "ef1fde4135f18f40dc02f2456259b7622a27d61dee520bd89b6b39eea1e41358"
+      },
+      {
+        "name": "sanctuary_steps",
+        "triangles": 60,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -2.4000003337860107,
+            0.0,
+            -1.549999713897705
+          ],
+          [
+            2.4000003337860107,
+            0.5400000214576721,
+            1.5500006675720215
+          ]
+        ],
+        "sha256": "67b18f9162d28a724853a6d58840df5f2c9996b8e6471b5416173e8260bf198f"
+      },
+      {
+        "name": "altar_table",
+        "triangles": 1412,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.0100001096725464,
+            -1.1920928955078125e-07,
+            -0.44999992847442627
+          ],
+          [
+            1.0100001096725464,
+            1.715000033378601,
+            0.4930002689361572
+          ]
+        ],
+        "sha256": "8f2c422b6611ff7598b7e2d2e98a171679f11a7cdc4178373c57a91ad3caeb83"
+      },
+      {
+        "name": "apse",
+        "triangles": 1776,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.9000000953674316,
+            -8.195638656616211e-08,
+            -0.12999963760375977
+          ],
+          [
+            1.9000000953674316,
+            4.900000095367432,
+            0.17500019073486328
+          ]
+        ],
+        "sha256": "3cd7c7dc1e7232d9a6d97f4bdaf8853f2a0e9b456e12fb90614bb82aca2fa65d"
+      },
+      {
+        "name": "rose_window",
+        "triangles": 4356,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.0255954265594482,
+            -1.0255956649780273,
+            -0.05500006675720215
+          ],
+          [
+            1.0254919528961182,
+            1.025594711303711,
+            0.1250004768371582
+          ]
+        ],
+        "sha256": "65d3b83b6bdc4ee94a40595b5530fdaf1633028d0e6d9c52973acc2568855f10"
+      },
+      {
+        "name": "wood_pew",
+        "triangles": 1692,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.3435001373291016,
+            0.0,
+            -0.32499998807907104
+          ],
+          [
+            1.3435001373291016,
+            1.3299999237060547,
+            0.3449999988079071
+          ]
+        ],
+        "sha256": "5aec0c736b8b72a326867af4a7108699c0c36ced61c58a05ce58171db9d9b630"
+      },
+      {
+        "name": "pipe_organ",
+        "triangles": 5256,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.800000011920929,
+            -1.4901161193847656e-08,
+            -0.30000030994415283
+          ],
+          [
+            0.7999999523162842,
+            3.1500000953674316,
+            0.5949997305870056
+          ]
+        ],
+        "sha256": "9eb55729d23748906a8f5929f3785378d7d6338bd5c64aea6f2021a06293b023"
+      },
+      {
+        "name": "hanging_banner",
+        "triangles": 311,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.43000030517578125,
+            -1.5499999523162842,
+            -0.03500000014901161
+          ],
+          [
+            0.43000030517578125,
+            0.0949999988079071,
+            0.03500000014901161
+          ]
+        ],
+        "sha256": "52d4de663bbf84d558821a3204239a6b0b261b02247a91d3aab2c59f1d0c43f5"
+      },
+      {
+        "name": "iron_chandelier",
+        "triangles": 1004,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6070003509521484,
+            -0.03500000014901161,
+            -0.5330460071563721
+          ],
+          [
+            0.6070003509521484,
+            1.7999999523162842,
+            0.5330460071563721
+          ]
+        ],
+        "sha256": "5205a285c9bcaafceaad82d6f7de29dfcadb5f26c40d978a57c61cfd4777c0d8"
+      },
+      {
+        "name": "flower_pedestal",
+        "triangles": 7040,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.36699867248535156,
+            0.0,
+            -0.35805463790893555
+          ],
+          [
+            0.3405647277832031,
+            1.8836712837219238,
+            0.31441447138786316
+          ]
+        ],
+        "sha256": "94a74a5c1a9091cc5720fc57c84c5ea2bf4d3025ff5dedb1aaaf21d9ce873245"
+      },
+      {
+        "name": "leaf_planter",
+        "triangles": 1452,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.45900917053222656,
+            0.0,
+            -0.5487181544303894
+          ],
+          [
+            0.4641265869140625,
+            1.3399999141693115,
+            0.5385197997093201
+          ]
+        ],
+        "sha256": "0a075be37e639e3f0121736266d48ac321707edc2b9303acbfb42e77e527ae4a"
+      },
+      {
+        "name": "stained_light",
+        "triangles": 32,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -4.497199058532715,
+            0.08699999749660492,
+            -4.589122772216797
+          ],
+          [
+            2.453660488128662,
+            0.08699999749660492,
+            2.538513422012329
+          ]
+        ],
+        "sha256": "3d446ba68c4019d0c561dea6c9098f1384e331d37e7d26f0b9090c8cc63aff9e"
+      }
+    ],
+    "placed": {
+      "triangles": 104938,
+      "surfaces": 37,
+      "plant_triangles": 16984
+    },
+    "passed": true
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "scale": 1.01551556587219
+    },
+    "captures": [
+      {
+        "name": "default_360",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "labyrinth_readability",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "default_clean",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "coverage_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "overview",
+        "pitch": 42.9999961853027,
+        "size": [
+          1400,
+          1200
+        ],
+        "width_m": 19.0
+      },
+      {
+        "name": "topdown",
+        "pitch": 90.0,
+        "size": [
+          1400,
+          1400
+        ],
+        "width_m": 14.8000001907349
+      },
+      {
+        "name": "tea_same_scale",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      }
+    ],
+    "checks": [
+      {
+        "check": "Placed triangle budget and manifest match",
+        "passed": true
+      },
+      {
+        "check": "Placed surface budget and manifest match",
+        "passed": true
+      },
+      {
+        "check": "Plant budget",
+        "passed": true
+      },
+      {
+        "check": "One 2048 atlas",
+        "passed": true
+      },
+      {
+        "check": "Coloured ground light alpha <= .35",
+        "passed": true
+      },
+      {
+        "check": "Eight seats",
+        "passed": true
+      },
+      {
+        "check": "seat_left_1 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_left_2 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_left_3 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_left_4 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_right_1 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_right_2 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_right_3 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_right_4 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "foundation import",
+        "passed": true
+      },
+      {
+        "check": "foundation Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "foundation texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "outer_steps import",
+        "passed": true
+      },
+      {
+        "check": "outer_steps Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "outer_steps texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "grass_surround import",
+        "passed": true
+      },
+      {
+        "check": "grass_surround Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "grass_surround texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "entry_landing import",
+        "passed": true
+      },
+      {
+        "check": "entry_landing Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "entry_landing texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "labyrinth import",
+        "passed": true
+      },
+      {
+        "check": "labyrinth Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "labyrinth texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "west_wall import",
+        "passed": true
+      },
+      {
+        "check": "west_wall Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "west_wall texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "north_wall import",
+        "passed": true
+      },
+      {
+        "check": "north_wall Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "north_wall texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "pointed_window import",
+        "passed": true
+      },
+      {
+        "check": "pointed_window Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "pointed_window texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "window_surround import",
+        "passed": true
+      },
+      {
+        "check": "window_surround Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "window_surround texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps import",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "altar_table import",
+        "passed": true
+      },
+      {
+        "check": "altar_table Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "altar_table texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "apse import",
+        "passed": true
+      },
+      {
+        "check": "apse Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "apse texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "rose_window import",
+        "passed": true
+      },
+      {
+        "check": "rose_window Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "rose_window texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wood_pew import",
+        "passed": true
+      },
+      {
+        "check": "wood_pew Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "wood_pew texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ import",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner import",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier import",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal import",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter import",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "stained_light import",
+        "passed": true
+      },
+      {
+        "check": "stained_light Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "stained_light texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "Default avatar assembled",
+        "passed": true
+      },
+      {
+        "check": "Actual low sanctuary step blocks at shin height",
+        "passed": true
+      },
+      {
+        "check": "entry_to_aisle capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_left_1 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_left_2 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_left_3 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_left_4 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_right_1 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_right_2 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_right_3 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_right_4 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "entry_to_aisle capsule radius 0.39",
+        "passed": true
+      },
+      {
+        "check": "Map button/name strip inside safe visible region",
+        "passed": true
+      },
+      {
+        "check": "Nearest left pew does not cover exit button/nameplate",
+        "passed": true
+      },
+      {
+        "check": "Lower-right action zone contains floor only: []",
+        "passed": true
+      },
+      {
+        "check": "capture default_360",
+        "passed": true
+      },
+      {
+        "check": "Map button/name strip inside safe visible region",
+        "passed": true
+      },
+      {
+        "check": "Nearest left pew does not cover exit button/nameplate",
+        "passed": true
+      },
+      {
+        "check": "Lower-right action zone contains floor only: []",
+        "passed": true
+      },
+      {
+        "check": "capture labyrinth_readability",
+        "passed": true
+      },
+      {
+        "check": "Map button/name strip inside safe visible region",
+        "passed": true
+      },
+      {
+        "check": "Nearest left pew does not cover exit button/nameplate",
+        "passed": true
+      },
+      {
+        "check": "Lower-right action zone contains floor only: []",
+        "passed": true
+      },
+      {
+        "check": "capture default_clean",
+        "passed": true
+      },
+      {
+        "check": "capture coverage_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture overview",
+        "passed": true
+      },
+      {
+        "check": "capture topdown",
+        "passed": true
+      },
+      {
+        "check": "capture tea_same_scale",
+        "passed": true
+      }
+    ],
+    "exit_ui": {
+      "button_and_label_rect": [
+        11.1592102050781,
+        591.771850585938,
+        46,
+        62
+      ],
+      "centre": [
+        34.1592102050781,
+        613.771850585938
+      ]
+    },
+    "geometry": {
+      "plant_triangles": 16984.0,
+      "surfaces": 37,
+      "triangles": 104938
+    },
+    "lower_right": {
+      "intersecting_tall_modules": [],
+      "rect": [
+        264,
+        650,
+        96,
+        150
+      ]
+    },
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "routes": [
+      {
+        "failed_segments": [],
+        "name": "entry_to_aisle",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_left_1",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_left_2",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_left_3",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_left_4",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_right_1",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_right_2",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_right_3",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_right_4",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "entry_to_aisle",
+        "radius": 0.39
+      }
+    ]
+  },
+  "coverage": {
+    "method": "Only environment clear colour changed from DDE8E7 to FF00FF; geometry/camera/light fixed",
+    "changed_pixels": 0,
+    "total_pixels": 288000,
+    "corner_pixels": {
+      "top_left": 0,
+      "top_right": 0,
+      "bottom_left": 0,
+      "bottom_right": 0
+    },
+    "edge_pixels_changed": 0
+  },
+  "scene_bench": {
+    "adapter": "NVIDIA GeForce RTX 2060",
+    "checks": [
+      {
+        "details": null,
+        "name": "Default Avatar fixture assembles",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Bench route/probe schema",
+        "passed": true
+      },
+      {
+        "details": 0.0799999982118607,
+        "name": "Spawn stands on authored floor",
+        "passed": true
+      },
+      {
+        "details": "(1.661701, 0.08, 4.207285)",
+        "name": "Spawn capsule clear",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            1.661700963974,
+            0.0799999982118607,
+            4.20728540420532
+          ],
+          "from": [
+            1.661700963974,
+            0.0799999982118607,
+            4.20728540420532
+          ],
+          "name": "spawn",
+          "reached": true,
+          "remaining_m": 0.0,
+          "seconds": 0.0,
+          "target": [
+            1.661700963974,
+            0.0799999982118607,
+            4.20728540420532
+          ]
+        },
+        "name": "Route: spawn",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            1.95502531528473,
+            0.0899361744523048,
+            4.67784929275513
+          ],
+          "from": [
+            1.661700963974,
+            0.0799999982118607,
+            4.20728540420532
+          ],
+          "name": "entry_inside",
+          "reached": true,
+          "remaining_m": 0.0855989158153534,
+          "seconds": 0.116,
+          "target": [
+            2.0,
+            0.0799999982118607,
+            4.75
+          ]
+        },
+        "name": "Route: entry_inside",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            2.89728426933289,
+            0.0899265334010124,
+            3.0007209777832
+          ],
+          "from": [
+            1.95502531528473,
+            0.0899361744523048,
+            4.67784929275513
+          ],
+          "name": "labyrinth",
+          "reached": true,
+          "remaining_m": 0.0766104906797409,
+          "seconds": 0.483,
+          "target": [
+            2.93449306488037,
+            0.0799999982118607,
+            2.93449306488037
+          ]
+        },
+        "name": "Route: labyrinth",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            1.81289005279541,
+            0.0899307876825333,
+            1.81702244281769
+          ],
+          "from": [
+            2.89728426933289,
+            0.0899265334010124,
+            3.0007209777832
+          ],
+          "name": "aisle_front",
+          "reached": true,
+          "remaining_m": 0.067533828318119,
+          "seconds": 0.45,
+          "target": [
+            1.76776695251465,
+            0.0799999982118607,
+            1.76776695251465
+          ]
+        },
+        "name": "Route: aisle_front",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            0.490625470876694,
+            0.0898959636688232,
+            0.490822941064835
+          ],
+          "from": [
+            1.81289005279541,
+            0.0899307876825333,
+            1.81702244281769
+          ],
+          "name": "aisle_mid",
+          "reached": true,
+          "remaining_m": 0.0945084542036057,
+          "seconds": 0.517,
+          "target": [
+            0.424264073371887,
+            0.0799999982118607,
+            0.424264073371887
+          ]
+        },
+        "name": "Route: aisle_mid",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -1.79259419441223,
+            0.0899176150560379,
+            -1.79259037971497
+          ],
+          "from": [
+            0.490625470876694,
+            0.0898959636688232,
+            0.490822941064835
+          ],
+          "name": "aisle_rear",
+          "reached": true,
+          "remaining_m": 0.0656451508402824,
+          "seconds": 0.834,
+          "target": [
+            -1.83847761154175,
+            0.0799999982118607,
+            -1.83847761154175
+          ]
+        },
+        "name": "Route: aisle_rear",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -2.61254811286926,
+            0.0899339392781258,
+            -0.952572882175446
+          ],
+          "from": [
+            -1.79259419441223,
+            0.0899176150560379,
+            -1.79259037971497
+          ],
+          "name": "left_seat_approach",
+          "reached": true,
+          "remaining_m": 0.076870322227478,
+          "seconds": 0.333,
+          "target": [
+            -2.66579246520996,
+            0.0799999982118607,
+            -0.898025631904602
+          ]
+        },
+        "name": "Route: left_seat_approach",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -1.82989704608917,
+            0.0899309664964676,
+            -1.73399639129639
+          ],
+          "from": [
+            -2.61254811286926,
+            0.0899339392781258,
+            -0.952572882175446
+          ],
+          "name": "return_aisle",
+          "reached": true,
+          "remaining_m": 0.0685353502631187,
+          "seconds": 0.317,
+          "target": [
+            -1.78190910816193,
+            0.0799999982118607,
+            -1.78190910816193
+          ]
+        },
+        "name": "Route: return_aisle",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/PoiChurchArt/pew_left_4/ArtCollider"
+          ],
+          "final": [
+            1.34350275993347,
+            0.0760933086276054,
+            3.18198037147522
+          ],
+          "from": [
+            1.52027952671051,
+            0.0799999982118607,
+            3.35875725746155
+          ],
+          "reached": false,
+          "remaining_m": 0.550013720989227,
+          "seconds": 0.883,
+          "target": [
+            0.954594135284424,
+            0.0799999982118607,
+            2.79307174682617
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/PoiChurchArt/pew_left_4/ArtCollider"
+        },
+        "name": "Blocked: pew_left",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -2.02972459793091,
+            0.0801096484065056,
+            -2.02972459793091
+          ],
+          "from": [
+            -1.83847761154175,
+            0.0799999982118607,
+            -1.83847761154175
+          ],
+          "reached": false,
+          "remaining_m": 1.62953615188599,
+          "seconds": 0.883,
+          "target": [
+            -3.1819806098938,
+            0.0799999982118607,
+            -3.1819806098938
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/PoiChurchArt/altar_table/ArtCollider"
+        },
+        "name": "Blocked: altar_table",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/PoiChurchArt/west_wall/@StaticBody3D@8"
+          ],
+          "final": [
+            -4.88750028610229,
+            0.0836448445916176,
+            0.0
+          ],
+          "from": [
+            -4.69999980926514,
+            0.0799999982118607,
+            0.0
+          ],
+          "reached": false,
+          "remaining_m": 0.912507176399231,
+          "seconds": 0.867,
+          "target": [
+            -5.80000019073486,
+            0.0799999982118607,
+            0.0
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/PoiChurchArt/west_wall/@StaticBody3D@8"
+        },
+        "name": "Blocked: west_wall",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/PoiChurchArt/EastBoundary"
+          ],
+          "final": [
+            4.91250038146973,
+            0.0729607343673706,
+            1.0
+          ],
+          "from": [
+            4.59999990463257,
+            0.0799999982118607,
+            1.0
+          ],
+          "reached": false,
+          "remaining_m": 0.887527704238892,
+          "seconds": 0.883,
+          "target": [
+            5.80000019073486,
+            0.0799999982118607,
+            1.0
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/PoiChurchArt/EastBoundary"
+        },
+        "name": "Blocked: east_boundary",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -1.0,
+            0.0725106745958328,
+            4.90772390365601
+          ],
+          "from": [
+            -1.0,
+            0.0799999982118607,
+            4.69999980926514
+          ],
+          "reached": false,
+          "remaining_m": 0.992304444313049,
+          "seconds": 0.883,
+          "target": [
+            -1.0,
+            0.0799999982118607,
+            5.90000009536743
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/PoiChurchArt/FrontLeftBoundary"
+        },
+        "name": "Blocked: front_edge",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/PoiChurchArt/entry_landing/LandingEnd"
+          ],
+          "final": [
+            2.0,
+            0.0899319425225258,
+            6.15000057220459
+          ],
+          "from": [
+            2.0,
+            0.0799999982118607,
+            5.90000009536743
+          ],
+          "reached": false,
+          "remaining_m": 0.850057423114777,
+          "seconds": 0.883,
+          "target": [
+            2.0,
+            0.0799999982118607,
+            7.0
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/PoiChurchArt/entry_landing/LandingEnd"
+        },
+        "name": "Blocked: landing_end",
+        "passed": true
+      },
+      {
+        "details": {
+          "authored_width": 1.4,
+          "measured_m": 1.40000009536743,
+          "minimum_m": 1.2
+        },
+        "name": "Gap width: entry",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            2.0,
+            0.089917927980423,
+            5.86660432815552
+          ],
+          "from": [
+            2.0,
+            0.0799999982118607,
+            4.75
+          ],
+          "reached": true,
+          "remaining_m": 0.0839831605553627,
+          "seconds": 0.333,
+          "target": [
+            2.0,
+            0.0799999982118607,
+            5.94999980926514
+          ]
+        },
+        "name": "Traverse: entry",
+        "passed": true
+      },
+      {
+        "details": {
+          "authored_width": 1.6,
+          "measured_m": 1.60000026226044,
+          "minimum_m": 0.8
+        },
+        "name": "Gap width: central_aisle",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -1.76776683330536,
+            0.0899386778473854,
+            -1.76776683330536
+          ],
+          "from": [
+            1.76776695251465,
+            0.0799999982118607,
+            1.76776695251465
+          ],
+          "reached": true,
+          "remaining_m": 0.100492812693119,
+          "seconds": 1.367,
+          "target": [
+            -1.83847761154175,
+            0.0799999982118607,
+            -1.83847761154175
+          ]
+        },
+        "name": "Traverse: central_aisle",
+        "passed": true
+      },
+      {
+        "details": {
+          "authored_width": 0.85,
+          "measured_m": 0.850000113248825,
+          "minimum_m": 0.8
+        },
+        "name": "Gap width: between_rows",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -1.13137137889862,
+            0.0899386927485466,
+            1.69705677032471
+          ],
+          "from": [
+            0.282842725515366,
+            0.0799999982118607,
+            0.282842725515366
+          ],
+          "reached": true,
+          "remaining_m": 0.100491978228092,
+          "seconds": 0.566,
+          "target": [
+            -1.20208156108856,
+            0.0799999982118607,
+            1.76776695251465
+          ]
+        },
+        "name": "Traverse: between_rows",
+        "passed": true
+      },
+      {
+        "details": {
+          "entry": {
+            "collisions": [],
+            "final": [
+              2.0,
+              0.0902345478534698,
+              4.82123327255249
+            ],
+            "from": [
+              2.0,
+              0.089917927980423,
+              5.86660432815552
+            ],
+            "reached": true,
+            "remaining_m": 0.0719647482037544,
+            "seconds": 0.3,
+            "target": [
+              2.0,
+              0.0799999982118607,
+              4.75
+            ]
+          },
+          "exit": {
+            "collisions": [],
+            "final": [
+              2.0,
+              0.089917927980423,
+              5.86660432815552
+            ],
+            "from": [
+              2.0,
+              0.0799999982118607,
+              4.75
+            ],
+            "reached": true,
+            "remaining_m": 0.0839831605553627,
+            "seconds": 0.333,
+            "target": [
+              2.0,
+              0.0799999982118607,
+              5.94999980926514
+            ]
+          }
+        },
+        "name": "Entrance gap allows exit and reentry",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "delta": [
+            0.0584931373596191,
+            0.00979802757501602,
+            1.63518595695496
+          ],
+          "wall_torso_ray": {
+            "collider": "/root/SceneBenchmark/PoiChurchArt/EastBoundary",
+            "distance_m": 0.231506824493408
+          }
+        },
+        "name": "Diagonal collision preserves wall sliding",
+        "passed": true
+      },
+      {
+        "details": [
+          "run",
+          0.149987,
+          0.316647333333333
+        ],
+        "name": "Run animation advances in rendered viewport",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Input release stops horizontal motion",
+        "passed": true
+      },
+      {
+        "details": "idle",
+        "name": "Release returns to idle",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Focus loss cancels movement",
+        "passed": true
+      },
+      {
+        "details": 1.74549425393343,
+        "name": "Fixture head-top height measurable",
+        "passed": true
+      },
+      {
+        "details": {
+          "applicable": false,
+          "reason": "Open cutaway entrance, no functional door leaf; width measured by collision rays."
+        },
+        "name": "Scale category absent: door",
+        "passed": true
+      },
+      {
+        "details": {
+          "applicable": false,
+          "reason": "No service counter or NPC transaction position in this decorative interior."
+        },
+        "name": "Scale category absent: counter",
+        "passed": true
+      },
+      {
+        "details": {
+          "baseline_ratio": 0.392438988817276,
+          "difference": 0.0437956204379562,
+          "height": 0.715,
+          "ratio_to_H": 0.409626097816572,
+          "reason": ""
+        },
+        "name": "Scale ±15%: chair",
+        "passed": true
+      },
+      {
+        "details": {
+          "baseline_ratio": 0.650245623806727,
+          "difference": 0.0132158590308369,
+          "height": 1.12,
+          "ratio_to_H": 0.641652069307078,
+          "reason": ""
+        },
+        "name": "Scale ±15%: table",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "pid": 2602809,
+    "renderer": "mobile",
+    "route": [
+      {
+        "collisions": [],
+        "final": [
+          1.661700963974,
+          0.0799999982118607,
+          4.20728540420532
+        ],
+        "from": [
+          1.661700963974,
+          0.0799999982118607,
+          4.20728540420532
+        ],
+        "name": "spawn",
+        "reached": true,
+        "remaining_m": 0.0,
+        "seconds": 0.0,
+        "target": [
+          1.661700963974,
+          0.0799999982118607,
+          4.20728540420532
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          1.95502531528473,
+          0.0899361744523048,
+          4.67784929275513
+        ],
+        "from": [
+          1.661700963974,
+          0.0799999982118607,
+          4.20728540420532
+        ],
+        "name": "entry_inside",
+        "reached": true,
+        "remaining_m": 0.0855989158153534,
+        "seconds": 0.116,
+        "target": [
+          2.0,
+          0.0799999982118607,
+          4.75
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          2.89728426933289,
+          0.0899265334010124,
+          3.0007209777832
+        ],
+        "from": [
+          1.95502531528473,
+          0.0899361744523048,
+          4.67784929275513
+        ],
+        "name": "labyrinth",
+        "reached": true,
+        "remaining_m": 0.0766104906797409,
+        "seconds": 0.483,
+        "target": [
+          2.93449306488037,
+          0.0799999982118607,
+          2.93449306488037
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          1.81289005279541,
+          0.0899307876825333,
+          1.81702244281769
+        ],
+        "from": [
+          2.89728426933289,
+          0.0899265334010124,
+          3.0007209777832
+        ],
+        "name": "aisle_front",
+        "reached": true,
+        "remaining_m": 0.067533828318119,
+        "seconds": 0.45,
+        "target": [
+          1.76776695251465,
+          0.0799999982118607,
+          1.76776695251465
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          0.490625470876694,
+          0.0898959636688232,
+          0.490822941064835
+        ],
+        "from": [
+          1.81289005279541,
+          0.0899307876825333,
+          1.81702244281769
+        ],
+        "name": "aisle_mid",
+        "reached": true,
+        "remaining_m": 0.0945084542036057,
+        "seconds": 0.517,
+        "target": [
+          0.424264073371887,
+          0.0799999982118607,
+          0.424264073371887
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          -1.79259419441223,
+          0.0899176150560379,
+          -1.79259037971497
+        ],
+        "from": [
+          0.490625470876694,
+          0.0898959636688232,
+          0.490822941064835
+        ],
+        "name": "aisle_rear",
+        "reached": true,
+        "remaining_m": 0.0656451508402824,
+        "seconds": 0.834,
+        "target": [
+          -1.83847761154175,
+          0.0799999982118607,
+          -1.83847761154175
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          -2.61254811286926,
+          0.0899339392781258,
+          -0.952572882175446
+        ],
+        "from": [
+          -1.79259419441223,
+          0.0899176150560379,
+          -1.79259037971497
+        ],
+        "name": "left_seat_approach",
+        "reached": true,
+        "remaining_m": 0.076870322227478,
+        "seconds": 0.333,
+        "target": [
+          -2.66579246520996,
+          0.0799999982118607,
+          -0.898025631904602
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          -1.82989704608917,
+          0.0899309664964676,
+          -1.73399639129639
+        ],
+        "from": [
+          -2.61254811286926,
+          0.0899339392781258,
+          -0.952572882175446
+        ],
+        "name": "return_aisle",
+        "reached": true,
+        "remaining_m": 0.0685353502631187,
+        "seconds": 0.317,
+        "target": [
+          -1.78190910816193,
+          0.0799999982118607,
+          -1.78190910816193
+        ]
+      }
+    ],
+    "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+    "slug": "poi_church"
+  },
+  "passed": true
+}
