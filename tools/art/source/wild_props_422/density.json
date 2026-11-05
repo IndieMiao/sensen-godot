@@ -1,0 +1,32 @@
+{
+  "author": "赵云",
+  "task": "SGODOT-422",
+  "version": 1,
+  "units": "metres; pond scene x/z, Y up",
+  "purpose": "程序撒点建议；装饰没有交互、采集、碰撞或资源标记",
+  "seed": 422,
+  "resource_slots_reference": "reference/pond_slots_v2.json",
+  "resource_clearance_m": 1.5,
+  "clearance_measure": "每个实际启用槽位的中心到装饰水平包围圆边缘 >= 1.5 m；不是只比两个中心。先分配资源，再撒装饰。所有花色也遵守此规则，亚麻没有例外。",
+  "navigation": "保留原可走范围、钓鱼带与 stand；装饰不建碰撞。槽位 stand 周围再留 0.45 m，不用装饰挡住人物采集站位。",
+  "foreground_scenery": "设定图左下倒木组放在原地面平面上的前景（允许在可走范围外，z最高约4.65m）；不修改nav、MEADOW、相机或路径范围。仅装饰填前景，路径仍在可走边界前淡掉。",
+  "zones": {
+    "bank": {"dry_offset_from_water_m": [0.45, 1.15], "density_clusters_per_m2": 0.7, "assets": ["wild_flower_white", "wild_flower_yellow", "wild_flower_lilac", "wild_clover"], "note": "沿塘边断续成簇，留出落脚/抛竿缺口，不排连续一圈；避让槽位优先于密度"},
+    "sides": {"density_clusters_per_m2": 0.38, "assets": ["wild_bush_dark", "wild_bush_olive", "wild_clover", "wild_flower_white", "wild_flower_yellow", "wild_flower_lilac", "wild_pebbles_a", "wild_pebbles_b"], "note": "两侧比中央密；灌木在外侧，花和苜蓿在近侧；离 meadow 外缘 0.35 m 开始减密"},
+    "open_meadow_and_path_edges": {"density_multiplier": 0.15, "assets": ["wild_clover", "wild_pebbles_a", "wild_pebbles_b"], "note": "中央和小路两侧只留少量低件；路径中线两侧 0.55 m 不放装饰；入口到岸边的直线保持通畅"},
+    "corners": {"groups_per_pond": [2, 3], "group": [{"asset": "wild_log_moss", "count": 1}, {"asset": "wild_mushrooms", "count": 1}, {"asset": "wild_fern", "count": 2}], "group_spacing_min_m": 4.0, "note": "整组检测槽位距离与屏幕范围，不把蘑菇随机撒成可采集点；左下组完全显示于 y<=720（360×800逻辑像素）"},
+    "shallow_water": {"clusters_per_pond": [4, 7], "inset_from_water_edge_m": [0.27, 0.48], "min_cluster_spacing_m": 2.2, "asset": "wild_cattail_water", "root_y_m": -0.06, "note": "模型整丛的水平轮廓必须在水域内；根部低于水面 0.055 m；只有两根细香蒲，无泥底。只放近岸浅水，不占抛竿目标"}
+  },
+  "suggested_caps_per_pond": {
+    "flowers_all_colors": 36,
+    "clover": 24,
+    "pebble_patches": 14,
+    "bushes_both_colors": 10,
+    "corner_groups": 3,
+    "water_cattails": 7
+  },
+  "variation": {"scale": [0.85, 1.1], "yaw_degrees": [0, 360], "note": "组内使用相近缩放；散石放大后仍须高<=0.15 m；审核并排图全部1.0倍"},
+  "screen_constraints_360x800": {"main_key_column": [278, 420, 82, 300], "main_key_allowed": ["wild_clover"], "main_key_height_max_m": 0.08, "corner_group_max_y": 720, "quickbar_rule": "倒木、蘑菇、蕨类整组的投影都在快捷栏上方；主键实际矩形另加6px保护，不能只检查根节点"},
+  "ground_handoff_to_liubei": "地表草地/裸土/小路由刘备交付。小路在真实可走区边界前至少0.5m渐隐结束，不延到画面外。此建议只管装饰，实拍先保留b1原草地，不冒充已整合地面。",
+  "implementation": "独立RNG按塘seed加422生成，按资产类型用MultiMesh批次；小花/苜蓿/石子可关闭投影阴影，倒木与小灌木留阴影。拒绝不合法候选，不为凑数量侵入净空；记录最终数量。"
+}

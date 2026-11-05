@@ -2932,6 +2932,594 @@
         "stone": "New five-pebble base from approved concept A",
         "medallion": "New C63 A model; four blank vertex-colour variants"
       }
+    },
+    "wild_flower_white": {
+      "triangles": 264,
+      "surfaces": 1,
+      "bytes": 10256,
+      "bounds_blender": [
+        [
+          -0.227318,
+          -0.195367,
+          -0.0
+        ],
+        [
+          0.227318,
+          0.195367,
+          0.332026
+        ]
+      ],
+      "bounds": [
+        [
+          -0.227318,
+          -0.0,
+          -0.195367
+        ],
+        [
+          0.227318,
+          0.332026,
+          0.195367
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "7b8cfea5871956316b4f5d85d27e14a5392762cea7bcd2a0f5e2673a93e1c46d",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_flower_yellow": {
+      "triangles": 246,
+      "surfaces": 1,
+      "bytes": 9608,
+      "bounds_blender": [
+        [
+          -0.221823,
+          -0.194176,
+          -0.0
+        ],
+        [
+          0.221823,
+          0.194176,
+          0.332026
+        ]
+      ],
+      "bounds": [
+        [
+          -0.221823,
+          -0.0,
+          -0.194176
+        ],
+        [
+          0.221823,
+          0.332026,
+          0.194176
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "1370ada54c43f4953de701b1f8013627f1259c5782e0a52e97a79e2c9033128f",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_flower_lilac": {
+      "triangles": 228,
+      "surfaces": 1,
+      "bytes": 8960,
+      "bounds_blender": [
+        [
+          -0.224516,
+          -0.189003,
+          -0.0
+        ],
+        [
+          0.224517,
+          0.189003,
+          0.332026
+        ]
+      ],
+      "bounds": [
+        [
+          -0.224516,
+          -0.0,
+          -0.189003
+        ],
+        [
+          0.224517,
+          0.332026,
+          0.189003
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "e9467672e8db3b44736dc939d6336e9ca176fb648c2979bc6be17896bd0fdd19",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_clover": {
+      "triangles": 240,
+      "surfaces": 1,
+      "bytes": 8128,
+      "bounds_blender": [
+        [
+          -0.316501,
+          -0.241631,
+          0.0
+        ],
+        [
+          0.316501,
+          0.241631,
+          0.044
+        ]
+      ],
+      "bounds": [
+        [
+          -0.316501,
+          0.0,
+          -0.241631
+        ],
+        [
+          0.316501,
+          0.044,
+          0.241631
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "fd2f73b23a1dace876d93b960f0889e9ecc4dece49ff7bf746ec5f2afc6405b6",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_pebbles_a": {
+      "triangles": 80,
+      "surfaces": 1,
+      "bytes": 3500,
+      "bounds_blender": [
+        [
+          -0.293138,
+          -0.196469,
+          0.0
+        ],
+        [
+          0.293138,
+          0.196469,
+          0.09
+        ]
+      ],
+      "bounds": [
+        [
+          -0.293138,
+          0.0,
+          -0.196469
+        ],
+        [
+          0.293138,
+          0.09,
+          0.196469
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "a9a06856365428a773f14d7b5338ff76292badbe8a98911d87e1997060b6b98c",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_pebbles_b": {
+      "triangles": 60,
+      "surfaces": 1,
+      "bytes": 2944,
+      "bounds_blender": [
+        [
+          -0.310374,
+          -0.194228,
+          0.0
+        ],
+        [
+          0.310374,
+          0.194228,
+          0.108
+        ]
+      ],
+      "bounds": [
+        [
+          -0.310374,
+          0.0,
+          -0.194228
+        ],
+        [
+          0.310374,
+          0.108,
+          0.194228
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "5540adfa48f5128c1b01f2ea05c101e6d2fd0cd5cc8025f6cf2f4fed017077fe",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_mushrooms": {
+      "triangles": 228,
+      "surfaces": 1,
+      "bytes": 9796,
+      "bounds_blender": [
+        [
+          -0.2,
+          -0.1625,
+          0.0
+        ],
+        [
+          0.2,
+          0.1625,
+          0.27
+        ]
+      ],
+      "bounds": [
+        [
+          -0.2,
+          0.0,
+          -0.1625
+        ],
+        [
+          0.2,
+          0.27,
+          0.1625
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "a8005c18783b478b3597ce47689ebed3ffd0caa84f27eb94d5ef181f1b66a2a5",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_log_moss": {
+      "triangles": 157,
+      "surfaces": 1,
+      "bytes": 7928,
+      "bounds_blender": [
+        [
+          -0.481,
+          -0.135,
+          0.0
+        ],
+        [
+          0.481,
+          0.135,
+          0.281393
+        ]
+      ],
+      "bounds": [
+        [
+          -0.481,
+          0.0,
+          -0.135
+        ],
+        [
+          0.481,
+          0.281393,
+          0.135
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "3724ae49e92650d9772c5bbe2a40797b3659684b2efe7a80eeb17bfa394cb415",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_fern": {
+      "triangles": 216,
+      "surfaces": 1,
+      "bytes": 8436,
+      "bounds_blender": [
+        [
+          -0.246367,
+          -0.247347,
+          0.0
+        ],
+        [
+          0.246367,
+          0.247347,
+          0.423126
+        ]
+      ],
+      "bounds": [
+        [
+          -0.246367,
+          0.0,
+          -0.247347
+        ],
+        [
+          0.246367,
+          0.423126,
+          0.247347
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "37bb0a56350167fe3e3606d0eafb4881617b9f85008bab3ed097813d3634b11f",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_bush_dark": {
+      "triangles": 240,
+      "surfaces": 1,
+      "bytes": 7296,
+      "bounds_blender": [
+        [
+          -0.340212,
+          -0.2602,
+          -0.0
+        ],
+        [
+          0.340212,
+          0.2602,
+          0.4415
+        ]
+      ],
+      "bounds": [
+        [
+          -0.340212,
+          -0.0,
+          -0.2602
+        ],
+        [
+          0.340212,
+          0.4415,
+          0.2602
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "74db7d33cd75b4c25fca9fe0de3e6638a998bd0764a8f81c5a9c98aa67254a84",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_bush_olive": {
+      "triangles": 240,
+      "surfaces": 1,
+      "bytes": 7300,
+      "bounds_blender": [
+        [
+          -0.340212,
+          -0.2602,
+          -0.0
+        ],
+        [
+          0.340212,
+          0.2602,
+          0.4415
+        ]
+      ],
+      "bounds": [
+        [
+          -0.340212,
+          -0.0,
+          -0.2602
+        ],
+        [
+          0.340212,
+          0.4415,
+          0.2602
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "6944294117681bb655609d815abcee9858a486f7e4db945538aa687604938bbc",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "wild_cattail_water": {
+      "triangles": 96,
+      "surfaces": 1,
+      "bytes": 4180,
+      "bounds_blender": [
+        [
+          -0.192798,
+          -0.11571,
+          0.0
+        ],
+        [
+          0.192798,
+          0.11571,
+          0.72058
+        ]
+      ],
+      "bounds": [
+        [
+          -0.192798,
+          0.0,
+          -0.11571
+        ],
+        [
+          0.192798,
+          0.72058,
+          0.11571
+        ]
+      ],
+      "generator": "tools/art/build_wild_props_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "non-interactive decorative scenery",
+      "collision": "none",
+      "sha256": "d91d4b10943fde59e79605de019e329c2bc8a9e05d16e6941d1da02c2a548c64",
+      "source": "tools/art/source/wild_props_422/wild_props.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
     }
   }
 }
