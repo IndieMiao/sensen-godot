@@ -175,6 +175,20 @@ func test_first_dig_today_is_tappable_with_its_once_only_pip_dot() -> void:
 	v.first_dig = null
 	assert_bool(P0Logic.today_rows(v).any(func(r): return bool(r.get("first_dig", false)))).is_false()
 
+## The user on preview B, Lv3 and never down a mine, could not find one: the row's Show goes to the nearest free quarry
+## (near3_sites, nearest first — where HOME-1's Copper Ore points), and none while down a mine.
+func test_first_dig_today_shows_the_nearest_free_quarry() -> void:
+	var v := _view()
+	v.wild = {near3_sites = [{id = "wd-254-115", type = "vein", main = "quartz"}, {id = "wd-255-116", type = "quarry", main = null},
+		{id = "wd-256-116", type = "vein", main = "iron_ore"}]}
+	v.mine = {hp_max = 120, at = null}
+	assert_str(str(Gear.first_dig_row(v).go)).is_equal("mine:wd-255-116")
+	v.mine.at = {mine = "wd-255-116", floor = 1}
+	assert_str(str(Gear.first_dig_row(v).go)).is_empty()   # down a mine: nothing to show
+	v.mine.at = null
+	v.wild.near3_sites = [{id = "wd-254-115", type = "vein", main = "quartz"}]
+	assert_str(str(Gear.first_dig_row(v).go)).is_empty()   # no free quarry read
+
 func test_first_dig_reward_only_says_equipped_when_server_view_equipped_it() -> void:
 	var v := _view()
 	var events := [{kind = "first_dig", done = true}]
