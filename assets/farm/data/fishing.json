@@ -37,11 +37,11 @@
     },
     "4": {
       "name": "Legendary fish",
-      "bar_size": 0.2,
-      "fish_speed": 0.56,
-      "turn_steps": 16,
+      "bar_size": 0.22,
+      "fish_speed": 0.47,
+      "turn_steps": 20,
       "gain": 0.12,
-      "loss": 0.14
+      "loss": 0.13
     }
   },
   "fish": {

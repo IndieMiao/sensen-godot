@@ -81,6 +81,9 @@ static func tab_of(view: Dictionary, item_id: String) -> StringName:
 	if tab != null: return tab
 	return &"materials" if P0Logic.content().get("materials", {}).has(item_id) else &""
 
+## The Spinner Lure (q(282)): more Rare fish on the line, and a Rare or Legendary one swims slower (P0FishingPanel.reel_tier).
+const LURE := "bait_lure"
+
 static func spec(view: Dictionary, item_id: String, context: StringName, opts := {}) -> Dictionary:
 	assert(context in CONTEXTS, "P0ItemInfo: unknown context %s" % context)
 	var kind := kind_of(view, item_id)
@@ -367,8 +370,11 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		xp_hint = "",
 		fert_use = fert_use(item_id) if kind == "fert" else "",   # the bag card's line 1 (NPC-2)
 		# A buy row's line 2 (FARM-6 482:46): what the item does, in a few words.
-		use = {"seed": _seed_use(crop), "bait": "Bites come faster",
+		use = {"seed": _seed_use(crop), "bait": "More Rare fish" if item_id == LURE else "Bites come faster",
 			"fert": fert_use(item_id)}.get(kind, _offer_use(view, offer)),
+		# q(282) fb4d6991 (不知火舞, row 132 426:190515): the lure's bag card says both its effects; a worm's one
+		bait_fact = "More Rare fish" if item_id == LURE else "Faster bites",
+		bait_slower = "Rare and Legendary swim slower" if item_id == LURE else "",
 		region_line = "",
 		pin_verb = "Unpin" if opts.get("pinned", false) else "Pin",
 		dex = _dex(view),
