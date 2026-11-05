@@ -1,4 +1,3 @@
-class_name P0CookTimer
 extends Control
 ## The pot's countdown and progress bar in the middle of the watch (SGODOT-419, q(288); 不知火舞's spec v1 419 cd072712
 ## §2): on one line down the screen with the pot and its heat ring, so the eye stays there — `m:ss` in Quantity XB32 on a

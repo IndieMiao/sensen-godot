@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const P0CookTimer := preload("res://scenes/p0/kitchen/p0_cook_timer.gd")
 ## SGODOT-419 (q(288); 不知火舞's spec v1 419 cd072712 §2): the watch's countdown in the middle — `m:ss` on its plate, a
 ## 200 × 8 bar 8 px under it filling with the time gone, a dot at each heat ring's time in the ring's result colours.
 
