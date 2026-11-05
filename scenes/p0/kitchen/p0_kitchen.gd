@@ -34,6 +34,9 @@ const CARD_TOP := 0.425           # RewardMoment top at 340 of 800 (COOK-4)
 const FLOAT_AT := 0.205           # result floats (XP) rise from just above the plate: COOK-4 chip at y 150–176 of 800
 const PLATE := preload("res://assets/p0/kitchen/reveal/plate.svg")
 const CookAgainSheet := preload("res://scenes/p0/kitchen/p0_cook_again_sheet.gd")
+## No class_name on these two (亚瑟 on #764: a machine never imported runs the tests): preloaded where they are used.
+const P0CookTimer := preload("res://scenes/p0/kitchen/p0_cook_timer.gd")   # the countdown and its bar (419)
+const P0WaitPot := preload("res://scenes/p0/kitchen/p0_wait_pot.gd")   # the pot in the middle (419)
 const SPARKLE := preload("res://assets/p0/kitchen/reveal/sparkle.svg")
 ## COOK-4 reveal over the card, in 360 × 800 design px: [x, y, side_x, side_y]. The glow is the blurred ellipse
 ## (200 × 140 + its blur), the plate keeps its shadow margin, the dish icon is 96.

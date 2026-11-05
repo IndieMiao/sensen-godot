@@ -1,4 +1,3 @@
-class_name P0WaitPot
 extends Control
 ## The pot in the middle of the watch (SGODOT-419, q(288); 不知火舞 419 bd102c55, choice (b)): a 3D layer over the
 ## kitchen, its own small world drawn with a transparent background into the box x 80–280, y 150–330, the pot's mouth
