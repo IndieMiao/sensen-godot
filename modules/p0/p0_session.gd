@@ -48,6 +48,9 @@ var src_of := Callable()
 var busy := false
 var _queue: Array = []        # {cmd, key} sent while a request was in flight (reel / collect must never be dropped)
 var _inflight := {}           # the {cmd, key} on the wire; {} for state refreshes and dev calls
+## When the request on the wire left: each reply logs `P0 net: <type> seq <n> <ms> ms <result>` (preview B, 421: the
+## per-command time on the US-west line, read from logcat before and after the keep-alive line).
+var _sent_ms := 0
 ## Tests replace the HTTP call: transport.call(method, path, body, cmd), then answer with _finish().
 var transport := Callable()
 ## Development only (SGODOT-351): the Blackjack's bj_* commands answered locally until the server has them, its table
@@ -210,6 +213,7 @@ func dev_skip(minutes: int) -> void:
 
 func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> void:
 	busy = true
+	_sent_ms = Time.get_ticks_msec()
 	if bj_mock != null and method == HTTPClient.METHOD_POST and str(cmd.get("type", "")).begins_with("bj_"):
 		var raw := JSON.stringify(bj_mock.command(cmd, view)).to_utf8_buffer()
 		if is_inside_tree(): get_tree().create_timer(_BJ_MOCK_MS / 1000.0).timeout.connect(_finish.bind(HTTPRequest.RESULT_SUCCESS, 200, raw, cmd))
@@ -235,10 +239,17 @@ func _on_done(result: int, code: int, _h: PackedStringArray, raw: PackedByteArra
 func _finish(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> void:
 	var entry := _inflight
 	_inflight = {}
+	var ms := Time.get_ticks_msec() - _sent_ms   # the line's time, not the handlers' below
 	var outcome := _handle(result, code, raw, cmd)
+	print("P0 net: %s seq %d %d ms %s" % [str(cmd.get("type", "state")), int(view.get("seq", -1)), ms,
+		str(outcome.code) if str(outcome.code) != "" else "ok"])
 	busy = false
 	if outcome.network:
-		_refresh_queued = false   # the runtime's own retry reads again; a queued read would only fail the same way
+		# A command whose reply was lost may still have done its work (preview B ②, 奕星 11-05: the floor reached and
+		# paid on the server, the player kept on the floor until a tap 20 s later): read once what the server did, now,
+		# after any world actions still waiting. A failed read is not read again: the runtime's own retry does (it
+		# would only fail the same way).
+		_refresh_queued = outcome.code == "network" and not entry.is_empty()
 		# Later UI commands were based on what the player saw before the failure: drop them.
 		for q in _queue.filter(func(q): return q.key != ""): command_settled.emit(q.key, false, "network")
 		_queue = _queue.filter(func(q): return q.key == "")
