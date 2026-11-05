@@ -28,7 +28,9 @@ const SPLASH := preload("res://assets/p0/ui/splash.jpg")
 const SPLASH_BLUR := preload("res://assets/p0/ui/splash_blur.png")
 const SPLASH_SKY := Color("61bbfa")   # the art's sky at its top: the system splash and the engine's first frames too
 const SPLASH_SIZE := Vector2(375, 812)
-const SPLASH_MARK_TOP := 79.0    # the Gen Sen wordmark's top (its spark too), in the art's rows
+## The Gen Sen wordmark's top (its spark too), in the 375-wide rows: measured on the v2 art (79 on v1; 周瑜 / 不知火舞 on
+## #767) — measure again with a new art.
+const SPLASH_MARK_TOP := 85.0
 const SPLASH_MARK_GAP := 8.0     # … kept this far under the status bar
 const SPLASH_LOGO_TOP := 752.0   # the small Gensen mark at the bottom: the slow card ends 16 above it
 const SPLASH_CARD_GAP := 16.0
@@ -249,7 +251,7 @@ func taking_longer() -> void:
 
 ## q(290)'s one formula: the art's bottom on the screen's, centred. Covering (s = the larger of the two fits) while the
 ## wordmark's top still sits SPLASH_MARK_GAP under the status bar — only the sky and the sides are cut (20:9, 19.5:9,
-## 21:9); else (a wider screen: 18:9, 16:9, an iPad) s = (h − status − gap) ÷ (812 − 79), the wordmark right there and
+## 21:9); else (a wider screen: 18:9, 16:9, an iPad) s = (h − status − gap) ÷ (812 − mark top), the wordmark right there and
 ## the sides showing the blurred copy. {scale, origin (the art's top-left on screen), fit}.
 static func splash_layout(screen: Vector2, status := 0.0) -> Dictionary:
 	var s := maxf(screen.x / SPLASH_SIZE.x, screen.y / SPLASH_SIZE.y)
