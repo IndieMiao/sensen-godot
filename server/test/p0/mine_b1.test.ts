@@ -20,6 +20,12 @@ function scenario() {
     if (!r.ok) throw new Error(JSON.stringify(r));
     s = r.state; return r;
   };
+  /** At this same moment, as a command queued behind a held-up reply reaches the server right after the one before. */
+  const again = (cmd: Record<string, unknown>) => {
+    const r = applyP0(c, s, { space: 'mine', day: dayKey(c, s, now), ...cmd } as P0Command, now);
+    if (!r.ok) throw new Error(JSON.stringify(r));
+    s = r.state; return r;
+  };
   const fail = (cmd: Record<string, unknown>) => {
     const before = structuredClone(s);
     const r = applyP0(c, s, { space: 'mine', day: dayKey(c, s, now), ...cmd } as P0Command, now);
@@ -40,7 +46,7 @@ function scenario() {
       send({ type: 'mine_attack', floor: s.mine.day!.at!.floor, targets: [index] });
     }
   };
-  return { c, send, fail, start, state, kill, get s() { return s; }, get now() { return now; } };
+  return { c, send, again, fail, start, state, kill, get s() { return s; }, get now() { return now; } };
 }
 
 describe('355 E deterministic content (cases 1-3,5)', () => {
@@ -276,7 +282,9 @@ describe('355 E reset and pickups (cases 12-14)', () => {
     x.send({ type: 'mine_rock', floor: 1, rock: 0, expect_seq: seq });
     expect(count(x.s.bag, 'stone')).toBe(x.c.mine.picks.pick_copper.stone + (expected === 'stone' ? 1 : 0));
     expect(x.fail({ type: 'mine_rock', floor: 1, rock: 0, expect_seq: seq })).toMatchObject({ code: 'stale_state' });
-    expect(x.fail({ type: 'mine_rock', floor: 1, rock: 1 })).toMatchObject({ code: 'tempo' });
+    // tempo_burst 2: two more at once, then the next waits a whole 0.9 s
+    x.again({ type: 'mine_rock', floor: 1, rock: 1 }); x.again({ type: 'mine_rock', floor: 1, rock: 2 });
+    expect(x.fail({ type: 'mine_rock', floor: 1, rock: 3 })).toMatchObject({ code: 'tempo', detail: { ready_in: 900 } });
     x.s.bag = [{ id: 'stone', qty: 99 }]; x.s.bag_cap = 1;
     expect(bagFitsFloor(x.c, x.s, site, 1, x.s.mine.day!.key)).toBe(false);
   });
@@ -302,12 +310,13 @@ describe('355 E combat settlement needed for clear-to-descend (F cases 10-11)', 
     expect(x.state().mobs[5]).toBe(hp[5] - dmg);
   });
   it('rejects duplicate/invalid/dead targets, enforces swing tempo and independent hurt invulnerability', () => {
-    const x = scenario(); x.start();
+    const x = scenario(); x.c.mine.monsters.mob_slime.hp = 99; x.start();
     expect(x.fail({ type: 'mine_attack', floor: 1, targets: [0, 0] })).toMatchObject({ code: 'bad_target' });
     expect(x.fail({ type: 'mine_attack', floor: 1, targets: [-1] })).toMatchObject({ code: 'bad_target' });
     expect(x.fail({ type: 'mine_attack', floor: 2, targets: [0] })).toMatchObject({ code: 'bad_floor' });
     x.send({ type: 'mine_attack', floor: 1, targets: [0], hurt_by: 0 });
     const hp = x.s.mine.day!.hp;
+    x.again({ type: 'mine_attack', floor: 1, targets: [0] }); x.again({ type: 'mine_attack', floor: 1, targets: [0] });
     expect(x.fail({ type: 'mine_attack', floor: 1, targets: [0] })).toMatchObject({ code: 'tempo' });
     const noHurt = applyP0(x.c, x.s, { type: 'mine_attack', day: x.s.mine.day!.key, floor: 1, hurt_by: 0, space: 'mine' }, x.now);
     expect(noHurt.ok).toBe(true); if (noHurt.ok) expect(noHurt.state.mine.day!.hp).toBe(hp);
@@ -437,5 +446,57 @@ describe('view.mine.records: each record says its mine\'s type and main (v4q(9) 
     expect(records[V]).toEqual({ deepest: 12, guards: [10], type: 'vein', main: 'iron_ore' });
     expect(records['wd-gone']).toEqual({ deepest: 5, guards: [], type: null, main: null });
     expect(Object.keys(x.s.mine.records[V]).sort()).toEqual(['deepest', 'first_at', 'guards']);
+  });
+});
+
+describe('preview B on a slow line (奕星 11-05: swings that hit took no HP)', () => {
+  const swing = (targets: number[], extra: Record<string, unknown> = {}) => ({ type: 'mine_attack', floor: 1, targets, ...extra });
+  it('a swing passes over a monster already down and hits the rest; one naming only the fallen is mob_gone', () => {
+    const x = scenario(); x.c.mine.types.quarry.bands[0].mobs = [['mob_slime', 2, 2]]; x.c.mine.monsters.mob_slime.hp = 99;
+    x.start(); x.kill(0);
+    const dmg = x.c.mine.combat.weapons[x.s.gear.weapon].attack, before = x.state().mobs[1];
+    const r = x.send(swing([0, 1]));
+    expect(x.state().mobs[1]).toBe(before - dmg);
+    expect(r.events.filter(e => e.kind === 'mine' && e.action === 'hit')).toEqual([expect.objectContaining({ mob: 1, damage: dmg })]);
+    // its hurt_by gone too: the swing still lands, no HP lost to the fallen one
+    const hp = x.s.mine.day!.hp;
+    x.send(swing([1], { hurt_by: 0 }));
+    expect([x.state().mobs[1], x.s.mine.day!.hp]).toEqual([before - 2 * dmg, hp]);
+    expect(x.fail(swing([0]))).toMatchObject({ code: 'mob_gone' });
+    expect(x.fail({ type: 'mine_attack', floor: 1, hurt_by: 0 })).toMatchObject({ code: 'mob_gone' });
+  });
+  it('tempo_burst swings may come ahead of their slot, then a whole interval; never faster on average', () => {
+    const x = scenario(); x.c.mine.monsters.mob_slime.hp = 9999; x.start();
+    const w = x.c.mine.combat.weapons[x.s.gear.weapon], interval = 1000 / w.speed * x.c.mine.rules.attack_tempo_factor;
+    expect(x.c.mine.rules.tempo_burst).toBe(2);
+    x.send(swing([0])); x.again(swing([0])); x.again(swing([0]));
+    expect(x.fail(swing([0]))).toMatchObject({ code: 'tempo', detail: { ready_in: Math.ceil(interval) } });
+    // hammered every 100 ms for 30 s: one per interval, the burst once
+    const c = x.c, start = x.now + 5000;
+    let s = x.s, ok = 0;
+    for (let t = start; t < start + 30_000; t += 100) {
+      const r = applyP0(c, s, { space: 'mine', day: dayKey(c, s, t), ...swing([0]) } as P0Command, t);
+      if (r.ok) { ok++; s = r.state; } else expect(r.code).toBe('tempo');
+    }
+    expect(ok).toBe(Math.floor(30_000 / interval) + 3);
+  });
+  it('swings spaced at the client cooldown over a 100–800 ms round trip with stalls: every one lands (none did before)', () => {
+    // P0Session posts one command at a time, the next when the last reply is back; the line's two legs each 50–400 ms,
+    // every seventh uplink held 1.2 s more (a lost packet's resend).
+    const run = (burst: number | undefined) => {
+      const x = scenario(); x.c.mine.monsters.mob_slime.hp = 9999; x.c.mine.rules.tempo_burst = burst; x.start();
+      const c = x.c, cooldown = 1000 / c.mine.combat.weapons[x.s.gear.weapon].speed, t0 = x.now + 5000;
+      let s = x.s, seed = 7, back = t0, refused = 0;
+      const leg = () => { seed = (seed * 1103515245 + 12345) % 2 ** 31; return 50 + seed % 351; };
+      for (let k = 0; k < 120; k++) {
+        const press = t0 + k * cooldown, arrive = Math.max(press, back) + leg() + (k % 7 === 3 ? 1200 : 0);
+        const r = applyP0(c, s, { space: 'mine', day: dayKey(c, s, arrive), ...swing([0]) } as P0Command, arrive);
+        if (r.ok) s = r.state; else { expect(r.code).toBe('tempo'); refused++; }
+        back = arrive + leg();
+      }
+      return refused;
+    };
+    expect(run(undefined)).toBeGreaterThan(5);   // the strict tempo: swings the client spaced right, refused
+    expect(run(2)).toBe(0);
   });
 });
