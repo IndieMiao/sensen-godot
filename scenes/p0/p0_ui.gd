@@ -1596,17 +1596,22 @@ func show_screen(kind: P0SysScreen.Kind, detail := {}) -> void:
 		_screen.primary_pressed.connect(func(k: P0SysScreen.Kind): screen_action.emit(k))
 		_screen.secondary_pressed.connect(func(k: P0SysScreen.Kind): screen_back.emit(k))
 		_screen_layer.add_child(_screen)
+	_screen.status_top = safe_top()   # q(290): the fitted splash keeps its wordmark under the status bar
 	_screen.show_kind(kind, detail)
 	if test_accounts.is_test() and kind == P0SysScreen.Kind.FAIL:
 		_screen.set_return_main(func(): test_account_requested.emit("main"))
 	else: _screen.set_return_main(Callable())
 
-## Takes the screen down when it is one of `kinds` (any when empty).
+## Takes the screen down when it is one of `kinds` (any when empty). Down at once for everything that asks; the launch
+## splash (q(290): LAUNCH, Can't connect over it) still fades into the scene under it, at least 0.8 s after it showed.
 func hide_screen(kinds: Array = []) -> void:
 	if _screen == null or (not kinds.is_empty() and not kinds.has(_screen.kind)): return
-	_screen_layer.queue_free()
+	var layer := _screen_layer
+	var was := _screen
 	_screen_layer = null
 	_screen = null
+	if was.kind in [P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL]: was.leave(layer)
+	else: layer.queue_free()
 
 ## The state on screen, -1 for none.
 func screen_kind() -> int: return _screen.kind if _screen != null else -1
