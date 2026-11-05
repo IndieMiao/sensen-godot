@@ -8,6 +8,8 @@ import { dayKey } from '../../src/p0/rules.js';
 import { freshState } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 import { catalogue, wildById } from '../../src/p0/wild.js';
+import { setDevSites } from '../../src/p0/mine.js';
+setDevSites(true);   // wd-dev-quarry / wd-dev-vein: tests only (P0_DEV_SITES)
 
 const T = Date.UTC(2026, 10, 2, 2), DAY = 86400000, Q = 'wd-dev-quarry', V = 'wd-dev-vein';
 function scenario() {

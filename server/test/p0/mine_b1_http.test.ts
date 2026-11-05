@@ -10,6 +10,8 @@ import { registerP0Routes } from '../../src/p0/routes.js';
 import { freshState } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 import { wildById, wildNear3 } from '../../src/p0/wild.js';
+import { setDevSites } from '../../src/p0/mine.js';
+setDevSites(true);   // wd-dev-quarry / wd-dev-vein: tests only (P0_DEV_SITES)
 
 describe('355 E day-token HTTP and persisted mine state', () => {
   it('uses C travel settlement for mine commands and state reads, and preserves here when place is omitted', async () => {

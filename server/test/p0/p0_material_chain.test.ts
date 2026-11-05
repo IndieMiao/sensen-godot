@@ -6,6 +6,8 @@ import { notePresence } from '../../src/p0/presence.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { setDevSites } from '../../src/p0/mine.js';
+setDevSites(true);   // wd-dev-quarry / wd-dev-vein: tests only (P0_DEV_SITES)
 
 const content = loadP0Content();
 // The 04:00 instants in these tests are Shanghai's (UTC+8), whatever the home city is; p0_city_switch checks the city's zone.

@@ -20,10 +20,18 @@ export type MineCommand =
 const TYPES = new Set(['mine_enter', 'mine_floor', 'mine_rock', 'mine_torch', 'mine_attack', 'mine_pick', 'mine_drink']);
 export const isMineCommand = (cmd: { type: string }): cmd is MineCommand => TYPES.has(cmd.type);
 
-// Catalogue first; development fixtures never replace an authored wild site.
+/** The development mines (content.mine.dev_sites: no city, no here check, contract-efg §11) exist only where
+ * P0_DEV_SITES=1 says so (亚瑟 / 奕星, 11-06): tests turn them on; the live and preview servers never set it, so there
+ * no command or read can reach them. */
+let devSites = false;
+export function setDevSites(on: boolean): void { devSites = on; }
+export const devSitesFromEnv = (env: Record<string, string | undefined>): boolean => env.P0_DEV_SITES === '1';
+
+// Catalogue first; development fixtures never replace an authored wild site, and are there only when switched on.
 export function mineSite(c: P0Content, id: string): MineSite | undefined {
   const site = wildById(c, id);
-  return site?.mine ? { ...site, mine: site.mine } : c.mine.dev_sites?.find(dev => dev.id === id);
+  if (site?.mine) return { ...site, mine: site.mine };
+  return devSites ? c.mine.dev_sites?.find(dev => dev.id === id) : undefined;
 }
 const cap = (site: MineSite) => Math.min(site.mine.floors, site.mine.open_to ?? site.mine.floors);
 const floorKey = (mine: string, floor: number) => `${mine}:${floor}`;

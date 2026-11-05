@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { freshMineB1DailyFields, freshMineB1Fields, freshMineB1Weapons, type MineB1Day, type MineB1Notice } from '../../src/p0/state.js';
+import { setDevSites } from '../../src/p0/mine.js';
+setDevSites(true);   // wd-dev-quarry / wd-dev-vein: tests only (P0_DEV_SITES)
 
 describe('355 E/F/G v7 field initializers (contract v0.1 section 3)', () => {
   it('starts outside every mine with no records, kill counts, notices or legacy run fields', () => {
