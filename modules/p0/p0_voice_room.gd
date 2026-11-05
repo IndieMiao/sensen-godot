@@ -80,19 +80,28 @@ func answer_age(ok: bool) -> void:
 func leave() -> void:
 	if voice and bool(voice.call("active")): voice.call("leave")
 
-## The people drawer's rows: everyone else in the room, with their voice state. {peer, handle, name, speaking, muted,
-## blocked}; `name` as their name tag writes it.
+## The people drawer's rows: the player first (q(289), SGODOT-415: `self` true; their own speaking from the voice's local
+## participant), then everyone else in the room, with their voice state. {peer, handle, name, speaking, muted, blocked,
+## self}; `name` as their name tag writes it. The HUD's count is all of them, the player too.
 func people() -> Array:
 	var speaking := {}
+	var me_speaking := false
 	if voice:
-		for p in voice.get("participants"): if p is Dictionary and bool(p.get("speaking", false)): speaking[str(p.get("id", ""))] = true
+		for p in voice.get("participants"):
+			if not (p is Dictionary and bool(p.get("speaking", false))): continue
+			speaking[str(p.get("id", ""))] = true
+			if bool(p.get("local", false)): me_speaking = true
 	var blocked: Array = voice.get("blocked") if voice else []
 	var out := []
+	if online.members.has(online.self_id):
+		var mine := str(online.members[online.self_id].get("player", ""))
+		out.append({"peer": online.self_id, "handle": mine, "name": "Traveller %s" % mine.substr(0, 4), "self": true,
+			"speaking": me_speaking or speaking.has(str(online.self_id)), "muted": false, "blocked": false})
 	for id in online.members:
 		if int(id) == online.self_id: continue
 		var handle := str(online.members[id].get("player", ""))
 		out.append({"peer": int(id), "handle": handle, "name": "Traveller %s" % handle.substr(0, 4), "speaking": speaking.has(str(id)),
-			"muted": _mutes.has(handle), "blocked": blocked.has(str(id))})
+			"muted": _mutes.has(handle), "blocked": blocked.has(str(id)), "self": false})
 	return out
 
 ## Mute: one person silent on this phone, kept across layers and launches by their handle.

@@ -4724,7 +4724,7 @@ func _voice_refresh() -> void:
 	var crowd = voice_room.get("online").get("crowd") if voice_room.get("online") else null
 	if crowd != null and "speaking" in crowd:   # §3: a speaker's name tag goes green (not a muted or blocked one)
 		var now := {}
-		for r in rows: if bool(r.speaking) and not bool(r.muted) and not bool(r.blocked): now[int(r.peer)] = true
+		for r in rows: if bool(r.speaking) and not bool(r.muted) and not bool(r.blocked) and not bool(r.get("self", false)): now[int(r.peer)] = true
 		crowd.set("speaking", now)
 	_voice_keys.place(root.size.x - VOICE_KEYS_RIGHT, _creel.position.y)   # on the Creel pill's line, in a room too (383 V1 / V6)
 	if on and not _mic_was_on and not _mic_toast_said:
@@ -4752,7 +4752,7 @@ func open_people() -> void:
 	d.close_requested.connect(close_layer)
 	d.connect(&"mute_pressed", func(peer: int, on: bool): voice_room.call("set_muted", peer, on))
 	d.connect(&"mute_all_pressed", func(on: bool):
-		for r in voice_room.call("people"): if not bool(r.blocked): voice_room.call("set_muted", int(r.peer), on))
+		for r in voice_room.call("people"): if not bool(r.blocked) and not bool(r.get("self", false)): voice_room.call("set_muted", int(r.peer), on))
 	d.connect(&"block_pressed", func(peer: int, on: bool):
 		if on: _confirm_block(peer)
 		else: voice_room.call("set_blocked", peer, false))   # Unblock at once, no card (§5)

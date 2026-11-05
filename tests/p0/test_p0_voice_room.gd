@@ -95,8 +95,9 @@ func test_mute_is_kept_by_handle_and_put_on_the_new_peer_in_another_layer() -> v
 	assert_array(f[1].calls[-1]).is_equal(["muted", "4", true])
 	assert_array(JSON.parse_string(FileAccess.get_file_as_string(P0VoiceRoom.MUTES))).is_equal(["bbbb2222bbbb2222"])
 	var rows: Array = room.people()
-	assert_int(rows.size()).is_equal(1)
-	assert_dict(rows[0]).contains_key_value("peer", 4).contains_key_value("muted", true).contains_key_value("name", "Traveller bbbb")
+	assert_int(rows.size()).is_equal(2)   # the player first (q(289)), then the others
+	assert_dict(rows[0]).contains_key_value("self", true).contains_key_value("name", "Traveller aaaa").contains_key_value("muted", false)
+	assert_dict(rows[1]).contains_key_value("peer", 4).contains_key_value("muted", true).contains_key_value("name", "Traveller bbbb")
 	# Layer 2: the same person is peer 2 now
 	online._message(JSON.stringify({"t": "joined", "outpost": "sh_tea_1", "room": 2, "capacity": 12, "rejoined": false, "self": 3, "epoch": 3}))
 	online._message(JSON.stringify({"t": "roster", "count": 2, "members": [{"id": 3, "player": "aaaa1111aaaa1111"}, {"id": 2, "player": "bbbb2222bbbb2222"}]}))
