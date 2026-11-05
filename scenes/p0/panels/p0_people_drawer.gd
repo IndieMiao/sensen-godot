@@ -11,6 +11,8 @@ extends UiDrawer
 ## q(286) (Market Square's voice, SGODOT-415; 不知火舞's M1-b 476:195818, 302 3085a574): a title too long for its row
 ## breaks at its ` · ` into two lines (`Mission Market Square` / `Layer 1`), `Mute all` at the first; the rows scroll as
 ## Today's do — a 16 px fade at an edge with rows past it, a 3 px bar at the right while they overflow.
+## q(289) (SGODOT-415; 不知火舞 415 89764920): the player's own row first, scrolling with the rest — their name as their
+## name tag writes it and a grey `You` at the keys' right edge, no keys, not tappable; alone, `No one else here` under it.
 
 signal mute_pressed(peer: int, on: bool)
 signal mute_all_pressed(on: bool)
@@ -41,7 +43,7 @@ var _raw_title := ""
 var _two := false           # the title in two lines
 
 func _init(title_: String = "", rows_: Array = []) -> void:
-	super(height_for(rows_.size()))
+	super(height_for(rows_.size() + (0 if rows_.any(func(r): return not bool(r.get("self", false))) else 1)))
 	pad = UiTokens.SPACE_PAGE
 	var head := HBoxContainer.new()
 	head.name = "Head"
@@ -103,23 +105,31 @@ func refresh(rows_: Array) -> void:
 	for c in list.get_children():
 		list.remove_child(c)
 		c.queue_free()
-	if rows.is_empty():
+	for r in rows:
+		if list.get_child_count() > 0: list.add_child(_line())
+		list.add_child(_self_row(r) if bool(r.get("self", false)) else _row(r))
+	if _others().is_empty():
+		if list.get_child_count() > 0: list.add_child(_line())
 		var none := UiKit.label(EMPTY, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 		none.name = "Empty"
 		none.custom_minimum_size.y = ROW_H
 		none.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		list.add_child(none)
-	for r in rows:
-		if list.get_child_count() > 0: list.add_child(_line())
-		list.add_child(_row(r))
-	all_key.visible = not rows.is_empty()
+	all_key.visible = not _others().is_empty()
 	all_key.label = "Unmute all" if _all_muted() else "Mute all"
 	_size_rows()
 
-## The drawer and its rows as tall as the rows need, under the title as it is broken now.
+## The drawer and its rows as tall as the rows need, under the title as it is broken now: the others and the player's
+## own row, `No one else here` a row when alone (q(289): 2 then).
 func _size_rows() -> void:
-	height = height_for(rows.size(), _two)
-	_held.custom_minimum_size.y = minf(HEIGHT - (_CHROME_2 if _two else _CHROME), maxi(1, rows.size()) * (ROW_H + 1.0) - 1.0)
+	var n := _lines()
+	height = height_for(n, _two)
+	_held.custom_minimum_size.y = minf(HEIGHT - (_CHROME_2 if _two else _CHROME), maxi(1, n) * (ROW_H + 1.0) - 1.0)
+
+func _others() -> Array: return rows.filter(func(r): return not bool(r.get("self", false)))
+
+## The list's lines: every row, and `No one else here` when nobody else is in.
+func _lines() -> int: return rows.size() + (1 if _others().is_empty() else 0)
 
 ## The title in one line when it fits the room left of `Mute all`, else in two at a ` · ` (UiKit.break_at_dot, its dot
 ## dropped); the drawer follows (_CHROME_2).
@@ -169,9 +179,9 @@ func _fade(top: bool) -> TextureRect:
 	_held.add_child(r)
 	return r
 
-## Everyone not blocked is muted (Unmute all then); with nobody to mute it stays Mute all.
+## Everyone else not blocked is muted (Unmute all then); with nobody to mute it stays Mute all. Never the player.
 func _all_muted() -> bool:
-	var open := rows.filter(func(r): return not bool(r.get("blocked", false)))
+	var open := _others().filter(func(r): return not bool(r.get("blocked", false)))
 	return not open.is_empty() and open.all(func(r): return bool(r.get("muted", false)))
 
 func _row(r: Dictionary) -> HBoxContainer:
@@ -208,6 +218,34 @@ func _row(r: Dictionary) -> HBoxContainer:
 	report.name = "Report"
 	report.pressed.connect(func(): report_pressed.emit(peer))
 	row.add_child(report)
+	return row
+
+## The player's own row (q(289)): the dot while they speak, their name, a grey `You` at the right where the keys end.
+## Nothing to tap.
+func _self_row(r: Dictionary) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = "Self"
+	row.custom_minimum_size.y = ROW_H
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override(&"separation", UiTokens.SPACE_WITHIN)
+	var dot := Panel.new()
+	dot.name = "Speaking"
+	dot.custom_minimum_size = Vector2(DOT, DOT)
+	dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY, DOT * 0.5))
+	dot.modulate.a = 1.0 if bool(r.get("speaking", false)) else 0.0
+	row.add_child(dot)
+	var name_l := UiKit.label(str(r.get("name", "")), UiTokens.STYLE_ROW_TITLE_XB15)
+	name_l.name = "Name"
+	name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_l.clip_text = true
+	name_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(name_l)
+	var you := UiKit.label("You", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	you.name = "You"
+	you.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	you.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(you)
 	return row
 
 ## A text key (V3): the compact navigation look without its chevron.
