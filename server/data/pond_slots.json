@@ -1,0 +1,650 @@
+{
+ "_doc": {
+  "coords": "pond scene world metres (x right, z toward camera +), same as PondScenery / goto dev step; spawn (6.125,-1.625) unchanged",
+  "fields": {
+   "x,z": "slot centre; footprint about 1.5 x 1.5 m",
+   "zone": "entry / left_bank / right_bank / far_bank",
+   "opening_visible": "whole prop on the default opening screen (spawn, default camera) — pick 1 to 3 of these",
+   "spawn_m": "distance to spawn; within 3 m counts as the entry area (max 2)",
+   "low_only": "only low kinds here: stone, clay, reed, flax (no wood / Timber Grove, hardwood or herb: they are tall and the slot sits just above the main-key column)",
+   "blocks": "a TALL piece (Timber Grove, hardwood) here hides these slots behind it; do not put a tall piece here if any of them is used",
+   "near": "slots that count as next to each other (< 3.2 m or same bank neighbours): no two of the same resource on near slots",
+   "stand": "a walkable point to gather from (nearest nav cell); the prop itself is outside the nav or off the cast band",
+   "solid": "trees and rock piles block their cells only where inside the nav (most slots are outside it)",
+   "pieces": "if present, the only kinds this slot takes (gather kind ids, as gather_points' kind: wood / stone / reed / clay / herb / hardwood / flax); it narrows low_only further. F2: flax, stone, clay — not reed (the reed bank's leaves reach the swap button)"
+  },
+  "rules": "不知火舞 408 8af5a54c",
+  "cast_band_note": "F2 (7.6, -1.4) clips the back corner of the cast band: flax footprint 0.13 m (crescent, gourd) / 0 (meander); a full 1.5 m footprint 0.35 / 0.46 / 0.13 m. Everything else is off it",
+  "changes": "11-04 F2 moved (7.9,-1.1) -> (7.6,-1.4): 3.4 px -> 20.4 px from the swap button outline at 360x800 (不知火舞 408 828f9119); stand unchanged; 11-04 F2 stand (8.38,-1.62) -> (6.88,-1.38): left of the piece on the spawn side, so the gatherer does not stand under the swap button / main key (不知火舞 408)",
+  "scenery_clearance": "decor scenery (trees, bushes, flowers scattered by seed) keeps about 1.5 m clear round every resource slot used in that pond, and no tree canopy may cover a slot on the default 43° camera — e.g. the tree at (0.1, -4) hides L1 (-0.3, -6.6) and must move when L1 is used (不知火舞 416, 11-04: move the tree, do not restrict L1)"
+ },
+ "shapes": {
+  "crescent": {
+   "B1": {
+    "x": 4.6,
+    "z": -16.0,
+    "zone": "far_bank",
+    "opening_visible": false,
+    "spawn_m": 14.5,
+    "low_only": false,
+    "stand": [
+     4.62,
+     -15.12
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "B2"
+    ]
+   },
+   "B2": {
+    "x": 7.4,
+    "z": -16.0,
+    "zone": "far_bank",
+    "opening_visible": false,
+    "spawn_m": 14.4,
+    "low_only": false,
+    "stand": [
+     7.38,
+     -15.12
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "B1"
+    ]
+   },
+   "C1": {
+    "x": 4.0,
+    "z": -2.4,
+    "zone": "entry",
+    "opening_visible": true,
+    "spawn_m": 2.3,
+    "low_only": false,
+    "stand": [
+     3.88,
+     -3.12
+    ],
+    "stand_m": 0.74,
+    "blocks": [],
+    "near": []
+   },
+   "F2": {
+    "x": 7.6,
+    "z": -1.4,
+    "zone": "entry",
+    "opening_visible": true,
+    "spawn_m": 1.5,
+    "low_only": true,
+    "stand": [
+     6.88,
+     -1.38
+    ],
+    "stand_m": 0.72,
+    "blocks": [],
+    "near": [],
+    "pieces": [
+     "flax",
+     "stone",
+     "clay"
+    ]
+   },
+   "K1": {
+    "x": 1.6,
+    "z": -14.1,
+    "zone": "far_bank",
+    "opening_visible": false,
+    "spawn_m": 13.3,
+    "low_only": false,
+    "stand": [
+     2.12,
+     -13.62
+    ],
+    "stand_m": 0.71,
+    "blocks": [],
+    "near": [
+     "L3"
+    ]
+   },
+   "L1": {
+    "x": -0.3,
+    "z": -6.6,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 8.1,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -6.62
+    ],
+    "stand_m": 1.18,
+    "blocks": [
+     "L2"
+    ],
+    "near": [
+     "L2"
+    ]
+   },
+   "L2": {
+    "x": -0.3,
+    "z": -9.0,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 9.8,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -8.88
+    ],
+    "stand_m": 1.18,
+    "blocks": [],
+    "near": [
+     "L1"
+    ]
+   },
+   "L3": {
+    "x": -0.3,
+    "z": -13.8,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 13.8,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -13.88
+    ],
+    "stand_m": 1.18,
+    "blocks": [],
+    "near": [
+     "K1"
+    ]
+   },
+   "R1": {
+    "x": 12.0,
+    "z": -3.4,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 6.1,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -3.38
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": []
+   },
+   "R2": {
+    "x": 12.0,
+    "z": -7.6,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 8.4,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -7.62
+    ],
+    "stand_m": 0.88,
+    "blocks": [
+     "R3"
+    ],
+    "near": [
+     "R3"
+    ]
+   },
+   "R3": {
+    "x": 12.0,
+    "z": -9.9,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 10.1,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -9.88
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "R2"
+    ]
+   },
+   "R4": {
+    "x": 12.0,
+    "z": -14.0,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 13.7,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -13.88
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": []
+   }
+  },
+  "gourd": {
+   "B1": {
+    "x": 4.6,
+    "z": -16.0,
+    "zone": "far_bank",
+    "opening_visible": false,
+    "spawn_m": 14.5,
+    "low_only": false,
+    "stand": [
+     4.62,
+     -15.12
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "B2"
+    ]
+   },
+   "B2": {
+    "x": 7.4,
+    "z": -16.0,
+    "zone": "far_bank",
+    "opening_visible": false,
+    "spawn_m": 14.4,
+    "low_only": false,
+    "stand": [
+     7.38,
+     -15.12
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "B1"
+    ]
+   },
+   "C2": {
+    "x": 9.9,
+    "z": -2.1,
+    "zone": "entry",
+    "opening_visible": false,
+    "spawn_m": 3.8,
+    "low_only": false,
+    "stand": [
+     10.38,
+     -2.62
+    ],
+    "stand_m": 0.71,
+    "blocks": [],
+    "near": [
+     "F2",
+     "R1"
+    ]
+   },
+   "F1": {
+    "x": 4.25,
+    "z": 0.15,
+    "zone": "entry",
+    "opening_visible": true,
+    "spawn_m": 2.6,
+    "low_only": false,
+    "stand": [
+     4.12,
+     -0.88
+    ],
+    "stand_m": 1.03,
+    "blocks": [],
+    "near": []
+   },
+   "F2": {
+    "x": 7.6,
+    "z": -1.4,
+    "zone": "entry",
+    "opening_visible": true,
+    "spawn_m": 1.5,
+    "low_only": true,
+    "stand": [
+     6.88,
+     -1.38
+    ],
+    "stand_m": 0.72,
+    "blocks": [],
+    "near": [
+     "C2"
+    ],
+    "pieces": [
+     "flax",
+     "stone",
+     "clay"
+    ]
+   },
+   "L1": {
+    "x": -0.3,
+    "z": -6.6,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 8.1,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -6.62
+    ],
+    "stand_m": 1.18,
+    "blocks": [
+     "L2"
+    ],
+    "near": [
+     "L2"
+    ]
+   },
+   "L2": {
+    "x": -0.3,
+    "z": -9.0,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 9.8,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -8.88
+    ],
+    "stand_m": 1.18,
+    "blocks": [],
+    "near": [
+     "L1"
+    ]
+   },
+   "L3": {
+    "x": -0.3,
+    "z": -13.8,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 13.8,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -13.88
+    ],
+    "stand_m": 1.18,
+    "blocks": [],
+    "near": []
+   },
+   "R1": {
+    "x": 12.0,
+    "z": -3.4,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 6.1,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -3.38
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "C2"
+    ]
+   },
+   "R2": {
+    "x": 12.0,
+    "z": -7.6,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 8.4,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -7.62
+    ],
+    "stand_m": 0.88,
+    "blocks": [
+     "R3"
+    ],
+    "near": [
+     "R3"
+    ]
+   },
+   "R3": {
+    "x": 12.0,
+    "z": -9.9,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 10.1,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -9.88
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "R2"
+    ]
+   },
+   "R4": {
+    "x": 12.0,
+    "z": -14.0,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 13.7,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -13.88
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": []
+   }
+  },
+  "meander": {
+   "B1": {
+    "x": 4.6,
+    "z": -16.0,
+    "zone": "far_bank",
+    "opening_visible": false,
+    "spawn_m": 14.5,
+    "low_only": false,
+    "stand": [
+     4.62,
+     -15.12
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "B2"
+    ]
+   },
+   "B2": {
+    "x": 7.4,
+    "z": -16.0,
+    "zone": "far_bank",
+    "opening_visible": false,
+    "spawn_m": 14.4,
+    "low_only": false,
+    "stand": [
+     7.38,
+     -15.12
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "B1"
+    ]
+   },
+   "C2": {
+    "x": 9.7,
+    "z": -1.9,
+    "zone": "entry",
+    "opening_visible": false,
+    "spawn_m": 3.6,
+    "low_only": false,
+    "stand": [
+     10.38,
+     -2.12
+    ],
+    "stand_m": 0.71,
+    "blocks": [],
+    "near": [
+     "F2",
+     "R1"
+    ]
+   },
+   "F1": {
+    "x": 4.25,
+    "z": 0.15,
+    "zone": "entry",
+    "opening_visible": true,
+    "spawn_m": 2.6,
+    "low_only": false,
+    "stand": [
+     4.12,
+     -0.88
+    ],
+    "stand_m": 1.03,
+    "blocks": [],
+    "near": []
+   },
+   "F2": {
+    "x": 7.6,
+    "z": -1.4,
+    "zone": "entry",
+    "opening_visible": true,
+    "spawn_m": 1.5,
+    "low_only": true,
+    "stand": [
+     6.88,
+     -1.38
+    ],
+    "stand_m": 0.72,
+    "blocks": [],
+    "near": [
+     "C2"
+    ],
+    "pieces": [
+     "flax",
+     "stone",
+     "clay"
+    ]
+   },
+   "L1": {
+    "x": -0.3,
+    "z": -6.6,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 8.1,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -6.62
+    ],
+    "stand_m": 1.18,
+    "blocks": [
+     "L2"
+    ],
+    "near": [
+     "L2"
+    ]
+   },
+   "L2": {
+    "x": -0.3,
+    "z": -9.0,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 9.8,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -8.88
+    ],
+    "stand_m": 1.18,
+    "blocks": [],
+    "near": [
+     "L1"
+    ]
+   },
+   "L3": {
+    "x": -0.3,
+    "z": -13.8,
+    "zone": "left_bank",
+    "opening_visible": false,
+    "spawn_m": 13.8,
+    "low_only": false,
+    "stand": [
+     0.88,
+     -13.88
+    ],
+    "stand_m": 1.18,
+    "blocks": [],
+    "near": []
+   },
+   "R1": {
+    "x": 12.0,
+    "z": -3.4,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 6.1,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -3.38
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "C2"
+    ]
+   },
+   "R2": {
+    "x": 12.0,
+    "z": -7.6,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 8.4,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -7.62
+    ],
+    "stand_m": 0.88,
+    "blocks": [
+     "R3"
+    ],
+    "near": [
+     "R3"
+    ]
+   },
+   "R3": {
+    "x": 12.0,
+    "z": -9.9,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 10.1,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -9.88
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": [
+     "R2"
+    ]
+   },
+   "R4": {
+    "x": 12.0,
+    "z": -14.0,
+    "zone": "right_bank",
+    "opening_visible": false,
+    "spawn_m": 13.7,
+    "low_only": false,
+    "stand": [
+     11.12,
+     -13.88
+    ],
+    "stand_m": 0.88,
+    "blocks": [],
+    "near": []
+   }
+  }
+ }
+}

@@ -32,7 +32,7 @@ describe('the farm has no gathering spots (v4q(4) ①; the user, 11-02)', () => 
       expect(refuse(fresh(), { type: 'gather', spot, space: 'home' }).code).toBe('bad_spot');
     }
     expect('spots' in c.gather).toBe(false);
-    expect(viewOf(c, fresh(), T0).gather).toEqual({ city_ready: {} });
+    expect(viewOf(c, fresh(), T0).gather).toMatchObject({ city_ready: {}, pond: null });   // 409: no pond, no pond points
     expect(c.homestead.levels.flatMap(l => l.unlocks).filter(u => u === 'clay_bank' || u === 'old_tree')).toEqual([]);
   });
 });
