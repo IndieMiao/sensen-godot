@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cmuvt4e05b50j"]
+
+[ext_resource type="Shader" path="res://assets/props/cooking_pot_wait/steam_clear_lid.gdshader" id="1"]
+
+[resource]
+resource_name = "WarmWhiteSteam_ClearLid"
+shader = ExtResource("1")
+shader_parameter/steam_colour = Color(1, 0.97254902, 0.94117647, 1)
+shader_parameter/lid_top_uv = 0.0
