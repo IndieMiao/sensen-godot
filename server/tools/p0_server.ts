@@ -18,6 +18,7 @@ import { generatedOutpostSpec, loadOutposts, pondOfRoom, pondRoomSpec } from '..
 import { placeOf, roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
+import { registerP0LineSwitch } from '../src/p0/line_switch.js';
 import { P0Store } from '../src/p0/store.js';
 import { SAVE_VERSION } from '../src/p0/state.js';
 import { requirePass } from '../src/p0/travel.js';
@@ -39,6 +40,7 @@ if (store.migrated) console.log(JSON.stringify({ cleared: store.migrated, to: SA
 // P0_TRUST_PROXY=1 behind Caddy) and hourly save snapshots (P0_SNAPSHOT_DIR, 48 kept). A deployed server runs with
 // P0_DEV=0 so no dev route is registered.
 const app = Fastify({ logger: false, bodyLimit: 32 * 1024, ...trustProxyFromEnv() });
+registerP0LineSwitch(app);   // 421: P0_LINE=close sends every client back to a request each (P0Line)
 const guard = guardOptionsFromEnv();
 // SYS-UPDATE / SYS-MAINT (gate.ts): P0_MIN_VERSION / P0_UPDATE_URL / P0_MAINT / P0_MAINT_UNTIL, changed at run time by
 // the admin routes and kept in the save's folder (the data volume), so a restart keeps maintenance on.

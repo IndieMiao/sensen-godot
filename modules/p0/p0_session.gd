@@ -48,9 +48,12 @@ var src_of := Callable()
 var busy := false
 var _queue: Array = []        # {cmd, key} sent while a request was in flight (reel / collect must never be dropped)
 var _inflight := {}           # the {cmd, key} on the wire; {} for state refreshes and dev calls
-## When the request on the wire left: each reply logs `P0 net: <type> seq <n> <ms> ms <result>` (preview B, 421: the
-## per-command time on the US-west line, read from logcat before and after the keep-alive line).
+## When the request on the wire left: each reply logs `P0 net: <type> seq <n> <ms> ms <result> <via>` (preview B, 421:
+## the per-command time on the US-west line, read from logcat): via `new` / `kept` on P0Line, `http` a request each.
 var _sent_ms := 0
+var _via := ""
+## 421: commands and reads on one connection kept open (P0Line); a request each (P0HttpRequest) when it is off or out.
+var line: P0Line
 ## Tests replace the HTTP call: transport.call(method, path, body, cmd), then answer with _finish().
 var transport := Callable()
 ## Development only (SGODOT-351): the Blackjack's bj_* commands answered locally until the server has them, its table
@@ -222,10 +225,19 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 	if transport.is_valid():
 		transport.call(method, path, body, cmd)
 		return
+	var payload := "" if method == HTTPClient.METHOD_GET else JSON.stringify(body)
+	if line == null and is_inside_tree():
+		line = P0Line.new()
+		add_child(line)
+	if line != null and line.send(base_url + path, _headers(), method, payload, func(r: int, c: int, _h, raw: PackedByteArray):
+			_via = line.last_via if r == HTTPRequest.RESULT_SUCCESS else "line"
+			_finish(r, c, raw, cmd)) == OK:
+		return
+	_via = "http"
 	var http := P0HttpRequest.new()   # SGODOT-370: 8 s of live time, a world loading is not the server being slow
 	add_child(http)
 	http.request_completed.connect(_on_done.bind(http, cmd))
-	var err := http.send(base_url + path, _headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
+	var err := http.send(base_url + path, _headers(), method, payload)
 	if err != OK:
 		http.queue_free()
 		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd)
@@ -241,8 +253,8 @@ func _finish(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> v
 	_inflight = {}
 	var ms := Time.get_ticks_msec() - _sent_ms   # the line's time, not the handlers' below
 	var outcome := _handle(result, code, raw, cmd)
-	print("P0 net: %s seq %d %d ms %s" % [str(cmd.get("type", "state")), int(view.get("seq", -1)), ms,
-		str(outcome.code) if str(outcome.code) != "" else "ok"])
+	print("P0 net: %s seq %d %d ms %s %s" % [str(cmd.get("type", "state")), int(view.get("seq", -1)), ms,
+		str(outcome.code) if str(outcome.code) != "" else "ok", _via])
 	busy = false
 	if outcome.network:
 		# A command whose reply was lost may still have done its work (preview B ②, 奕星 11-05: the floor reached and
