@@ -9,8 +9,8 @@ import ast
 from PIL import Image, ImageDraw, ImageFont
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3]
-REVIEW=ROOT/'output/alcatraz-424/review'
-DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05'
+REVIEW=ROOT/'output/alcatraz-424/v2/review'
+DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v2'
 ASSETS=ROOT/'assets/landmarks/alcatraz_island'
 QA=ROOT/'output/alcatraz-424/project'
 verification=json.loads((REVIEW/'verification.json').read_text())
@@ -23,36 +23,43 @@ manifest=json.loads((ASSETS/'manifest.json').read_text())
 font='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 f=ImageFont.truetype(font,18);small=ImageFont.truetype(font,15)
 im=Image.open(REVIEW/'04-top-layout.png').convert('RGB');d=ImageDraw.Draw(im)
-def point(v):return (500+v[0]*1000/27,600+(v[2]-1)*1000/27)
-route=[point(v) for v in layout['route']]
+def point(v):return (500+v[0]*1000/74,600+v[2]*1000/74)
+route=[point(v) for v in layout['walk_goals']]
 walk_path=[]
-for i in range(1,len(layout['route'])):
+for i in range(1,len(layout['walk_goals'])):
     walk_path.extend(point(v) for v in ast.literal_eval(verification['route_%d_path'%i]['evidence']))
-d.line(walk_path,fill='#306581',width=4)
-for i in [0,4,8]:
-    x,y=route[i];d.ellipse((x-8,y-8,x+8,y+8),fill='#306581',outline='white',width=2)
+d.line(walk_path,fill='#285b80',width=4)
+for x,y in route:d.ellipse((x-6,y-6,x+6,y+6),fill='#285b80',outline='white',width=2)
 def label(text,xy,target=None):
     if target:d.line([xy,target],fill='#263b44',width=2)
     b=d.textbbox(xy,text,font=f)
     d.rounded_rectangle((b[0]-5,b[1]-4,b[2]+5,b[3]+4),radius=4,fill='#f4f3ec')
     d.text(xy,text,font=f,fill='#263b44')
-label('ALCATRAZ / B / BLOCKOUT 01',(22,18))
-d.text((22,48),'Rendered top view + annotation layer. Metres; north is up.',font=small,fill='#263b44')
-label('Visitor centre',(420,118),point([0,5.6,-10.2]))
-label('Lighthouse',(22,180),point([-7,5.6,-9]))
-label('Water tower',(800,180),point([7,5.6,-10.5]))
-label('03  Summit +5.6 m',(22,305),route[8])
-label('02  Mid-hill +2.4 m',(22,720),route[4])
-label('Garden / no navigation',(20,550),point([-5,2.4,2]))
-label('Ruins',(800,620),point([2.2,2.4,3.5]))
-label('Scenic bridge',(800,790),point([8,.1,4.8]))
-label('01  Dock +0.8 m',(800,1050),route[0])
-label('Ferry / decorative',(22,1060),point([3.3,.2,13.9]))
-label('Map exit',(660,1145),point(layout['exit']))
-d.text((22,1163),'Nav extent 17.5 x 22.5 m | 3 flights x 1.6 m | edge clearance 0.25 m',font=small,fill='#263b44')
+label('ALCATRAZ / V2 / REAL-SCALE BLOCKOUT',(22,18))
+d.text((22,48),'Rendered top view + actual navigation path. North is up.',font=small,fill='#263b44')
+label('Island / dock footprint: 60 x 40 m',(310,170))
+d.line([(point([-30,0,0])[0],210),(point([30,0,0])[0],210)],fill='#263b44',width=2)
+for x in [-30,30]:
+    px=point([x,0,0])[0];d.line([(px,203),(px,217)],fill='#263b44',width=2)
+label('15 m lighthouse',(20,250),point([-25,10,-11.5]))
+label('40 m museum / 9 m high',(370,280),point([0,10,-13]))
+label('12 m water tower',(780,250),point([25,10,-14]))
+label('SummitZone / +10 m',(760,545),route[-1])
+label('TerraceZone / 4 flights',(735,645),point([10,5.5,3]))
+label('Mid-hill / +5.5 m',(730,690),route[1])
+label('Ruins',(780,750),point([16,3.25,5]))
+label('DockZone / +1 m',(20,920),route[0])
+label('25 m ferry / decoration',(580,930),point([-7,0,19]))
+label('Map exit',(250,990),point(layout['exit']))
+length=verification['route_about_120m']['evidence']
+d.text((22,1040),f'Actual walk via mid-hill: {length:.1f} m | four flights: 15 x 0.15 m each',font=f,fill='#263b44')
+d.text((22,1070),'Camera width 6.72 m / farm avatar unchanged (nominal 1.75 m)',font=f,fill='#263b44')
+d.text((22,1100),'Bridge and skyline belong to a separate distant layer: see opening view.',font=small,fill='#263b44')
+d.line([(22,1160),(22+1000/74*10,1160)],fill='#263b44',width=4)
+d.text((22,1170),'10 m',font=small,fill='#263b44')
 im.save(DOC/'04-top-layout.png')
 
-checks=[];hashes={}
+checks=[];hashes={};dimensions={}
 for name in manifest['assets']:
     p=ASSETS/(name+'.glb');b=p.read_bytes()
     size,kind=struct.unpack_from('<II',b,12);g=json.loads(b[20:20+size])
@@ -62,16 +69,28 @@ for name in manifest['assets']:
     assert re.search(r'uid="uid://[a-y0-8]+"',(ASSETS/(name+'.glb.import')).read_text()),name
     assert b==(QA/'assets/landmarks/alcatraz_island'/p.name).read_bytes(),name
     hashes[p.name]=hashlib.sha256(b).hexdigest()
+    acc=g['accessors'][primitives[0]['attributes']['POSITION']]
+    dimensions[name]={'min':acc['min'],'max':acc['max'],'size':[b-a for a,b in zip(acc['min'],acc['max'])]}
     checks.append(name)
+for name in ['layout.json','manifest.json','sea_backdrop.gdshader']:
+    assert (ASSETS/name).read_bytes()==(QA/'assets/landmarks/alcatraz_island'/name).read_bytes(),name
+assert re.fullmatch(r'uid://[a-y0-8]+\s*',(ASSETS/'sea_backdrop.gdshader.uid').read_text())
 for name in ['alcatraz_island.gd','alcatraz_island.tscn']:
     assert (ROOT/'scenes/landmark'/name).read_bytes()==(QA/'scenes/landmark'/name).read_bytes(),name
 assert sum(1 for p in layout['placements'] if p['asset']=='gull')==3
-evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout 1',
+for asset,axis,expected in [('visitor_center',0,40),('visitor_center',1,9),('lighthouse',1,15),('water_tower',1,12),('ferry',0,25),('bench',0,1.5),('lamp',1,3.5)]:
+    assert abs(dimensions[asset]['size'][axis]-expected)<.02,(asset,dimensions[asset])
+assert sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements'])<=300000
+assert verification['live_surface_budget_including_avatar_and_scenery']['evidence']<=80
+evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v2 real scale',
     'unique_glbs':len(checks),'unique_triangles':sum(x['triangles'] for x in manifest['assets'].values()),
     'placed_triangles':sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements']),
     'placed_mesh_instances':len(layout['placements']),'unique_surfaces':len(checks),
-    'glb_bytes':sum(x['bytes'] for x in manifest['assets'].values()),'navigation_cells':layout['nav_connected_cells'],
-    'runtime_source_and_assets_equal':True,'vertex_color_normals_single_surface_uid_checks':checks,'asset_sha256':hashes,
+    'glb_bytes':sum(x['bytes'] for x in manifest['assets'].values()),'navigation_cells':layout['nav_connected_cells'],'zones':layout['zones'],'dimensions_m':layout['dimensions_m'],
+    'actual_walk_m':verification['route_about_120m']['evidence'],'direct_walk_m':verification['direct_route_about_120m']['evidence'],
+    'live_surfaces_including_avatar_and_distant_layer':verification['live_surface_budget_including_avatar_and_scenery']['evidence'],
+    'live_triangles_including_avatar_and_distant_layer':verification['live_triangle_budget_including_avatar_and_scenery']['evidence'],
+    'runtime_source_and_assets_equal':True,'vertex_color_normals_single_surface_uid_checks':checks,'asset_sha256':hashes,'exported_module_bounds_m':dimensions,
     'reference':'tools/art/source/alcatraz_island/reference/provenance.json',
     'captures':{p.name:{'pixels':list(Image.open(p).size),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in DOC.glob('0*.png')},
     'top_layout_annotation':'Labels and route over actual rendered top view; raw screenshot remains in output.',

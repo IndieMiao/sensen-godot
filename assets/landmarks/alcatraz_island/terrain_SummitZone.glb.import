@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bxtrey6wl6qf1"
-path="res://.godot/imported/island_lower.glb-a6e9e134c495348c2b933a68e32240d8.scn"
+uid="uid://b6k1wel7r42ag"
+path="res://.godot/imported/terrain_SummitZone.glb-77d590b0b203239290ad1f2e02f4345a.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/island_lower.glb"
-dest_files=["res://.godot/imported/island_lower.glb-a6e9e134c495348c2b933a68e32240d8.scn"]
+source_file="res://assets/landmarks/alcatraz_island/terrain_SummitZone.glb"
+dest_files=["res://.godot/imported/terrain_SummitZone.glb-77d590b0b203239290ad1f2e02f4345a.scn"]
 
 [params]
 

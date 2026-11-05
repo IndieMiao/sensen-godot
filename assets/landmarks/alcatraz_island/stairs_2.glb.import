@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://d42ptuqb01yv"
-path="res://.godot/imported/path_edges.glb-f59aa5a572e5e031402d85349b49b401.scn"
+uid="uid://cpclv5bhrj43h"
+path="res://.godot/imported/stairs_2.glb-3d8bdc93f39ad780311b110b5310fc57.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/path_edges.glb"
-dest_files=["res://.godot/imported/path_edges.glb-f59aa5a572e5e031402d85349b49b401.scn"]
+source_file="res://assets/landmarks/alcatraz_island/stairs_2.glb"
+dest_files=["res://.godot/imported/stairs_2.glb-3d8bdc93f39ad780311b110b5310fc57.scn"]
 
 [params]
 

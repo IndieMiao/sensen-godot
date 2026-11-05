@@ -36,25 +36,52 @@ func _ready() -> void:
 	for i in 80: await get_tree().process_frame
 	check("renderer", RenderingServer.get_current_rendering_method() == "mobile", RenderingServer.get_video_adapter_name())
 	check("no_network_autoload", get_node_or_null("/root/Net") == null)
-	check("farm_scale",is_equal_approx(scene._camera.size,7.0),scene._camera.size)
+	check("farm_pitch",absf(scene._camera.rotation_degrees.x+43)<.01,scene._camera.rotation_degrees)
+	check("farm_scale",is_equal_approx(scene._camera.size,6.72),scene._camera.size)
 	check("spawn_on_navigation",NavigationServer3D.map_get_closest_point(scene._nav_map,scene._player.position).distance_to(scene._player.position)<.05)
 	check("separate_navigation_map",scene._nav_map != scene.get_world_3d().navigation_map)
 	print("ALCATRAZ_PHASE opening")
 	await photograph("01-opening")
-	var bridge_points: Array[Vector2] = []
-	for p in [Vector3(7.065,.35,4.8),Vector3(7.4775,1.04,4.8),Vector3(8.5225,1.04,4.8),Vector3(8.935,.35,4.8)]:
-		bridge_points.append(scene._camera.unproject_position(p))
-	check("bridge_projection_opening",bridge_points.all(func(p): return Rect2(0,0,360,800).has_point(p)),str(bridge_points))
+	check("three_loading_zones",scene.zones.size()==3 and ["DockZone","TerraceZone","SummitZone"].all(func(z): return scene.zones.has(z)))
+	for zone in scene.zones.values():
+		check("zone_navigation_"+zone.name,zone.get_node_or_null("Navigation") is NavigationRegion3D)
+	check("avatar_farm_scale_unchanged",scene._rig.scale.is_equal_approx(Vector3.ONE))
+	var avatar_box := AABB()
+	var first := true
+	for mesh_node in scene._rig.find_children("*","MeshInstance3D",true,false):
+		if mesh_node.mesh == null or mesh_node.name.to_lower().contains("shadow"): continue
+		var box_: AABB = mesh_node.get_aabb()
+		var transform_: Transform3D = scene._rig.global_transform.affine_inverse() * mesh_node.global_transform
+		for k in 8:
+			var point_: Vector3 = transform_ * box_.get_endpoint(k)
+			if first:
+				avatar_box = AABB(point_,Vector3.ZERO)
+				first=false
+			else: avatar_box=avatar_box.expand(point_)
+	check("avatar_175cm",absf(avatar_box.size.y-1.75)<.08,str(avatar_box))
+	results["avatar_projected_nominal_height_px"] = 1.75*cos(deg_to_rad(43))*360/6.72
+	var live_surfaces := 0
+	var live_triangles := 0
+	for node in scene.find_children("*","MeshInstance3D",true,false):
+		if node.mesh == null:continue
+		live_surfaces += node.mesh.get_surface_count()
+		for surface_index in node.mesh.get_surface_count():
+			var arrays: Array = node.mesh.surface_get_arrays(surface_index)
+			var indices = arrays[Mesh.ARRAY_INDEX]
+			live_triangles += (indices.size() if indices != null and not indices.is_empty() else arrays[Mesh.ARRAY_VERTEX].size()) / 3
+	check("live_surface_budget_including_avatar_and_scenery",live_surfaces<=80,live_surfaces)
+	check("live_triangle_budget_including_avatar_and_scenery",live_triangles<=300000,live_triangles)
+	check("false_perspective_separate_world",scene._backdrop_view.own_world_3d and scene._backdrop_view.get_world_3d()!=scene.get_world_3d())
 	var corners_ok := true
 	for p in [Vector2(0,0),Vector2(359,0),Vector2(0,799),Vector2(359,799)]:
 		var hit = Plane(Vector3.UP,-.15).intersects_ray(scene._camera.project_ray_origin(p),scene._camera.project_ray_normal(p))
 		corners_ok = corners_ok and hit != null and absf(hit.x)<256 and absf(hit.z)<256
 	check("opening_sea_covers_corners",corners_ok)
-	check("map_exit_visible",scene._exit_button.visible,scene._exit_button.position)
+	check("map_exit_visible",scene._exit_marker.visible,scene._exit_marker.position)
 	# Walk the whole route through NavigationServer paths rather than teleporting for images.
 	var path_lengths: Array[float] = []
-	for i in range(1,scene.layout.route.size()):
-		var goal := AlcatrazIsland._vec(scene.layout.route[i])
+	for i in range(1,scene.layout.walk_goals.size()):
+		var goal := AlcatrazIsland._vec(scene.layout.walk_goals[i])
 		scene.walk_to(goal)
 		var length := 0.0
 		for j in range(1,scene._path.size()):length += scene._path[j-1].distance_to(scene._path[j])
@@ -62,16 +89,26 @@ func _ready() -> void:
 		check("route_%d_path"%i,scene._path.size()>1 and scene._path[-1].distance_to(goal)<.15,str(scene._path))
 		# Fixed simulation steps accelerate QA only; these still call the actual walk/follow code.
 		scene.set_process(false)
-		for frame in 1800:
+		for frame in 3600:
 			scene._process(1.0/60.0)
 			if scene._path_i>=scene._path.size(): break
 		for frame in 90:scene._process(1.0/60.0)
 		check("route_%d_arrived"%i,scene._player.position.distance_to(goal)<.15,str(scene._player.position))
-		check("route_%d_follow"%i,scene._focus.distance_to(scene._player.position)<.05,str(scene._focus))
-		if i==4:await photograph("02-mid-hill")
-		if i==scene.layout.route.size()-1:await photograph("03-visitor-center")
+		check("route_%d_follow"%i,scene._focus.distance_to(scene._follow_target())<.05,str(scene._focus))
+		if i==1:await photograph("02-mid-hill")
+		if i==scene.layout.walk_goals.size()-1:await photograph("03-visitor-center")
 	results["walk_lengths_m"] = path_lengths
-	check("summit_height",absf(scene._player.position.y-5.6)<.05,scene._player.position.y)
+	var route_length := 0.0
+	for length in path_lengths:route_length+=length
+	check("route_about_120m",route_length>=110 and route_length<=130,route_length)
+	var direct_path := scene.find_path(AlcatrazIsland._vec(scene.layout.spawn),AlcatrazIsland._vec(scene.layout.walk_goals[-1]))
+	var direct_length := 0.0
+	for k in range(1,direct_path.size()): direct_length+=direct_path[k-1].distance_to(direct_path[k])
+	results["direct_spawn_to_museum_path_m"] = direct_length
+	check("direct_route_reaches_museum",not direct_path.is_empty() and direct_path[-1].distance_to(AlcatrazIsland._vec(scene.layout.walk_goals[-1]))<.05)
+	check("direct_route_about_120m",direct_length>=110 and direct_length<=130,direct_length)
+
+	check("summit_height",absf(scene._player.position.y-10.0)<.05,scene._player.position.y)
 	# Geometry collision exists at all three resting viewpoints; decorative assets have none.
 	for key in scene.layout.review_points:
 		var point := AlcatrazIsland._vec(scene.layout.review_points[key])
@@ -92,9 +129,9 @@ func _ready() -> void:
 			bad_floor.append([str(centre),str(hit.get("position"))])
 	check("all_nav_cells_physical_floor",bad_floor.is_empty(),bad_floor)
 	# Outside sea taps terminate at nav, not on water; museum interior has no nav.
-	var sea_nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,Vector3(18,0,10))
-	check("sea_not_walkable",sea_nearest.x<8,str(sea_nearest))
-	var museum_nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,Vector3(0,5.6,-10))
+	var sea_nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,Vector3(40,0,10))
+	check("sea_not_walkable",sea_nearest.x<30,str(sea_nearest))
+	var museum_nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,Vector3(0,10,-13))
 	check("museum_not_enterable",museum_nearest.z>=-8.01,str(museum_nearest))
 	# Exercise the inherited gesture handlers on the actual scene.
 	var before := scene._player.position
@@ -118,7 +155,7 @@ func _ready() -> void:
 	scene.walk_to(before)
 	check("walking_keeps_zoom",is_equal_approx(retained_zoom,scene.camera_pan.zoom))
 	scene.camera_pan.reset()
-	scene._focus = scene._player.position
+	scene._focus = scene._follow_target()
 	scene._update_camera()
 	var prior_camera := scene._camera.position
 	scene.suspend()
@@ -130,14 +167,17 @@ func _ready() -> void:
 	check("map_exit_emits_request",exited[0])
 	# Imported geometry is actually shown in a top-down rendered layout.
 	scene._hud.visible = false
+	scene._overview = true
+	scene._set_backdrop_visible(false)
 	viewport.size = Vector2i(1000,1200)
-	scene._camera.size = 27
-	scene._camera.position = Vector3(0,55,1)
+	scene._camera.size = 74
+	scene._camera.position = Vector3(0,85,0)
+	scene._camera.far = 200
 	scene._camera.rotation_degrees = Vector3(-90,0,0)
 	scene._camera.near = .1
 	await photograph("04-top-layout")
 	scene._overview = true
-	scene._focus = Vector3(0,2.5,1)
+	scene._focus = Vector3(0,6,0)
 	scene._update_camera()
 	await photograph("05-whole-island")
 	results["status"] = "pass" if failures.is_empty() else "fail"
@@ -160,6 +200,13 @@ func photograph(name_: String) -> void:
 			var c := image.get_pixel(x,y)
 			if c.r>.6 and c.b>.6 and c.g<.12:exposed+=1
 	check(name_+"_no_background",exposed==0,exposed)
+	if name_=="01-opening":
+		var orange := 0
+		for y in range(40,160):
+			for x in range(0,140):
+				var c := image.get_pixel(x,y)
+				if c.r>c.g*1.3 and c.g>c.b*1.1 and c.r>.35:orange+=1
+		check("bridge_visible_upper_left_pixels",orange>40,orange)
 	image.save_png(destination.path_join(name_+".png"))
 
 func touch(point: Vector2, pressed: bool, id: int) -> void:

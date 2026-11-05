@@ -7,8 +7,9 @@ extends Node3D
 signal exit_requested
 const ROOT := "res://assets/landmarks/alcatraz_island/"
 const ScenePan := preload("res://modules/farm/scene_pan.gd")
-const PHONE_WIDTH := 7.0
-const PITCH := 45.0
+const FarmCamera := preload("res://modules/farm/farm_camera.gd")
+const PHONE_WIDTH := 6.72
+const PITCH := 43.0
 const WALK_SPEED := 2.3
 var layout: Dictionary
 var camera_pan := ScenePan.new()
@@ -30,13 +31,20 @@ var _exit_marker: VBoxContainer
 var _camera_recenter: Tween
 var mesh_nodes: Array[MeshInstance3D] = []
 var _mesh_cache := {}
+var zones := {}
+var _backdrop_layer: CanvasLayer
+var _backdrop_view: SubViewport
+var _backdrop_camera: Camera3D
+var _sea_material: ShaderMaterial
+
 
 func _ready() -> void:
 	get_viewport().transparent_bg = false
 	layout = JSON.parse_string(FileAccess.get_file_as_string(ROOT + "layout.json"))
 	_environment = WorldEnvironment.new()
 	_environment.environment = Environment.new()
-	_environment.environment.background_mode = Environment.BG_COLOR
+	_environment.environment.background_mode = Environment.BG_CANVAS
+	_environment.environment.background_canvas_max_layer = -1
 	# Diagnostic magenta: no review pixel should expose this behind the ocean.
 	_environment.environment.background_color = Color("d000d0")
 	_environment.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
@@ -49,7 +57,7 @@ func _ready() -> void:
 	sun.light_energy = 0.98
 	sun.shadow_enabled = true
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
-	sun.directional_shadow_max_distance = 60.0
+	sun.directional_shadow_max_distance = 120.0
 	sun.shadow_opacity = 0.48
 	sun.shadow_bias = 0.035
 	sun.shadow_normal_bias = 0.28
@@ -58,22 +66,23 @@ func _ready() -> void:
 	paint.vertex_color_use_as_albedo = true
 	paint.roughness = 0.94
 	paint.metallic_specular = 0.15
+	for zone_name in layout.zones:
+		var zone := Node3D.new()
+		zone.name = str(zone_name)
+		add_child(zone)
+		zones[zone_name] = zone
+	_build_backdrop()
 	for p in layout.placements:
+		if str(p.zone) == "DistantScenery": continue
 		var asset := str(p.asset)
 		var node := MeshInstance3D.new()
 		node.name = asset.to_pascal_case() + str(mesh_nodes.size())
-		if not _mesh_cache.has(asset):
-			var source := (load(ROOT + asset + ".glb") as PackedScene).instantiate()
-			var found := source.find_children("*", "MeshInstance3D", true, false)
-			if source is MeshInstance3D: found.push_front(source)
-			_mesh_cache[asset] = (found[0] as MeshInstance3D).mesh
-			source.free()
-		node.mesh = _mesh_cache[asset]
+		node.mesh = _mesh(asset)
 		node.material_override = paint
 		node.position = _vec(p.position)
 		node.rotation.y = float(p.yaw)
 		node.scale = Vector3.ONE * float(p.scale)
-		add_child(node)
+		zones[p.zone].add_child(node)
 		mesh_nodes.append(node)
 		if bool(p.collision): node.create_trimesh_collision()
 		if asset.ends_with("backdrop"):
@@ -84,18 +93,16 @@ func _ready() -> void:
 	plane.size = Vector2.ONE * float(layout.sea_size)
 	sea.mesh = plane
 	sea.position.y = -0.15
-	var water := StandardMaterial3D.new()
-	water.albedo_color = Color("8fa8af")
-	water.roughness = 0.93
-	water.metallic_specular = 0.12
-	sea.material_override = water
+	_sea_material = ShaderMaterial.new()
+	_sea_material.shader = preload("res://assets/landmarks/alcatraz_island/sea_backdrop.gdshader")
+	sea.material_override = _sea_material
 	sea.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(sea)
 	for key in ["spawn", "exit", "cam0"]:
 		var anchor := Marker3D.new()
 		anchor.name = key
 		anchor.position = _vec(layout[key])
-		add_child(anchor)
+		zones["DockZone"].add_child(anchor)
 	_build_navigation()
 	_camera = Camera3D.new()
 	_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -112,22 +119,99 @@ func _ready() -> void:
 static func _vec(a: Array) -> Vector3:
 	return Vector3(float(a[0]), float(a[1]), float(a[2]))
 
+func _mesh(asset: String) -> Mesh:
+	if not _mesh_cache.has(asset):
+		var source := (load(ROOT + asset + ".glb") as PackedScene).instantiate()
+		var found := source.find_children("*", "MeshInstance3D", true, false)
+		if source is MeshInstance3D: found.push_front(source)
+		_mesh_cache[asset] = (found[0] as MeshInstance3D).mesh
+		source.free()
+	return _mesh_cache[asset]
+
+func _build_backdrop() -> void:
+	_backdrop_layer = CanvasLayer.new()
+	_backdrop_layer.name = "DistantScenery"
+	_backdrop_layer.layer = -100
+	add_child(_backdrop_layer)
+	_backdrop_view = SubViewport.new()
+	_backdrop_view.name = "FalsePerspectiveWorld"
+	_backdrop_view.size = Vector2i(360,800)
+	_backdrop_view.own_world_3d = true
+	_backdrop_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	_backdrop_layer.add_child(_backdrop_view)
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.background_mode = Environment.BG_COLOR
+	env.environment.background_color = Color("d000d0")
+	_backdrop_view.add_child(env)
+	var sea := MeshInstance3D.new()
+	sea.name = "FarBay"
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(256,256)
+	sea.mesh = plane
+	sea.position.y = -.2
+	var water := StandardMaterial3D.new()
+	water.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	water.albedo_color = Color("a0b9bd")
+	sea.material_override = water
+	_backdrop_view.add_child(sea)
+	var paint := StandardMaterial3D.new()
+	paint.vertex_color_use_as_albedo = true
+	paint.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	for p in layout.placements:
+		if str(p.zone) != "DistantScenery": continue
+		var node := MeshInstance3D.new()
+		node.name = str(p.asset).to_pascal_case()
+		node.mesh = _mesh(str(p.asset))
+		node.material_override = paint
+		node.position = _vec(p.position)
+		node.scale = Vector3.ONE * float(p.scale)
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_backdrop_view.add_child(node)
+	_backdrop_camera = Camera3D.new()
+	_backdrop_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+	_backdrop_camera.keep_aspect = Camera3D.KEEP_WIDTH
+	_backdrop_camera.size = 20
+	_backdrop_camera.position = Vector3(0,30,30)
+	_backdrop_camera.look_at_from_position(Vector3(0,30,30),Vector3.ZERO,Vector3.UP)
+	_backdrop_camera.far = 150
+	_backdrop_view.add_child(_backdrop_camera)
+	_backdrop_camera.make_current()
+	var canvas := TextureRect.new()
+	canvas.texture = _backdrop_view.get_texture()
+	canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	canvas.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_backdrop_layer.add_child(canvas)
+
+func _set_backdrop_visible(enabled: bool) -> void:
+	_backdrop_layer.visible = enabled
+	_backdrop_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS if enabled else SubViewport.UPDATE_DISABLED
+	_environment.environment.background_mode = Environment.BG_CANVAS if enabled else Environment.BG_COLOR
+	_sea_material.set_shader_parameter("false_horizon",enabled)
+
 func _build_navigation() -> void:
-	var nav := NavigationMesh.new()
-	var vertices := PackedVector3Array()
-	for v in layout.navigation.vertices: vertices.append(_vec(v))
-	nav.vertices = vertices
-	for p in layout.navigation.polygons: nav.add_polygon(PackedInt32Array(p))
-	nav.cell_size = 0.25
-	nav.cell_height = 0.1
-	var region := NavigationRegion3D.new()
-	region.navigation_mesh = nav
 	_nav_map = NavigationServer3D.map_create()
 	NavigationServer3D.map_set_active(_nav_map, true)
 	NavigationServer3D.map_set_cell_size(_nav_map, 0.25)
 	NavigationServer3D.map_set_cell_height(_nav_map, 0.1)
-	add_child(region)
-	region.set_navigation_map(_nav_map)
+	var vertices := PackedVector3Array()
+	for v in layout.navigation.vertices: vertices.append(_vec(v))
+	for zone_name in layout.zones:
+		var nav := NavigationMesh.new()
+		nav.vertices = vertices
+		for p in layout.navigation.zone_polygons[zone_name]: nav.add_polygon(PackedInt32Array(p))
+		nav.cell_size = 0.25
+		nav.cell_height = 0.1
+		var region := NavigationRegion3D.new()
+		region.name = "Navigation"
+		region.navigation_mesh = nav
+		zones[zone_name].add_child(region)
+		region.set_navigation_map(_nav_map)
+
+func _follow_target() -> Vector3:
+	var yaw := deg_to_rad(FarmCamera.YAW_DEG)
+	return _player.position + Vector3.UP * .7 - Vector3(sin(yaw),0,cos(yaw)) * 2.8
 
 func _spawn_player() -> void:
 	_player = Node3D.new()
@@ -144,7 +228,7 @@ func _spawn_player() -> void:
 	_player.add_child(_rig)
 	_rig.config_applied.connect(func(_c): _animation("idle"))
 	_rig.apply_config(Avatar.load_outfit())
-	_focus = _player.position
+	_focus = _follow_target()
 
 func _animation(motion: String) -> void:
 	_rig.play_motion(motion)
@@ -169,9 +253,20 @@ func walk_to_screen(point: Vector2) -> void:
 		goal = NavigationServer3D.map_get_closest_point(_nav_map, hit.position)
 	walk_to(goal)
 
+func find_path(start: Vector3, goal: Vector3) -> PackedVector3Array:
+	var query := NavigationPathQueryParameters3D.new()
+	query.map = _nav_map
+	query.start_position = start
+	query.target_position = goal
+	# Godot defaults to 4096 searched polygons, which truncates this 3-zone island.
+	query.path_search_max_polygons = maxi(4096, layout.navigation.polygons.size() + 64)
+	var result := NavigationPathQueryResult3D.new()
+	NavigationServer3D.query_path(query,result)
+	return result.get_path()
+
 func walk_to(goal: Vector3) -> void:
 	if not navigation_ready(): return
-	_path = NavigationServer3D.map_get_path(_nav_map, _player.position, goal, true)
+	_path = find_path(_player.position, goal)
 	_path_i = 0
 	_following = true
 	_overview = false
@@ -202,27 +297,30 @@ func _process(delta: float) -> void:
 	_step_walk(delta)
 	camera_pan.step(delta, _camera)
 	if _following and not _overview and not camera_pan.active() and not _camera_recenter:
-		_focus = _focus.lerp(_player.position, 1.0 - exp(-8.0 * delta))
+		_focus = _focus.lerp(_follow_target(), 1.0 - exp(-8.0 * delta))
 	_update_camera()
 
 func _update_camera() -> void:
 	var size := get_viewport().get_visible_rect().size
 	var aspect := size.y / maxf(1.0, size.x)
-	var width := (32.0 if _overview else PHONE_WIDTH) / camera_pan.zoom
+	var width := (78.0 if _overview else PHONE_WIDTH) / camera_pan.zoom
 	_camera.size = width
 	if not camera_pan.active():
 		_focus += camera_pan.offset
 		camera_pan.offset = Vector3.ZERO
 		camera_pan._raw_offset = Vector3.ZERO
 	# Bound manual exploration well inside the 512 m ocean backdrop.
-	_focus.x = clampf(_focus.x, -25, 25)
-	_focus.z = clampf(_focus.z, -30, 30)
+	_focus.x = clampf(_focus.x, -50, 50)
+	_focus.z = clampf(_focus.z, -40, 40)
 	var target := _focus + camera_pan.offset
-	var dir := Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH)))
-	_camera.position = target + dir * 40.0
-	_camera.look_at(target, Vector3.UP)
-	_camera.near = maxf(0.1, 40.0 - width * aspect * 0.9 - 12.0)
-	_camera.far = 160.0
+	FarmCamera.place(_camera,target)
+	FarmCamera.fit_ground_depth(_camera,-.2,28.0)
+	_set_backdrop_visible(not _overview)
+	if not _overview:
+		_backdrop_view.size = Vector2i(size)
+		# Very small far-field parallax; the close camera and avatar scale are unchanged.
+		var parallax := (_player.position - _vec(layout.spawn)) * .012
+		_backdrop_camera.position = Vector3(0,30,30) + Vector3(parallax.x,0,parallax.z)
 	if _exit_button:
 		var point := _camera.unproject_position(_vec(layout.exit) + Vector3.UP * .45)
 		_exit_marker.visible = not _overview and not _camera.is_position_behind(_vec(layout.exit)) \
@@ -302,7 +400,7 @@ func recenter_on_player() -> void:
 	var start := _focus
 	_camera_recenter = create_tween()
 	_camera_recenter.tween_method(func(w: float):
-		_focus = start.lerp(_player.position, w)
+		_focus = start.lerp(_follow_target(), w)
 		_update_camera(), 0.0, 1.0, 0.34).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_camera_recenter.finished.connect(func(): _camera_recenter = null)
 
@@ -311,7 +409,7 @@ func toggle_overview() -> void:
 	camera_pan.reset()
 	_overview = not _overview
 	_following = not _overview
-	_focus = Vector3(0,2,0) if _overview else _player.position
+	_focus = Vector3(0,6,0) if _overview else _follow_target()
 	_update_camera()
 
 func _leave() -> void:
@@ -330,6 +428,8 @@ func suspend() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
 	_hud.visible = false
+	_backdrop_layer.visible = false
+	_backdrop_view.render_target_update_mode = SubViewport.UPDATE_DISABLED
 	_camera.current = false
 	_saved_environment = _environment.environment
 	_environment.environment = null

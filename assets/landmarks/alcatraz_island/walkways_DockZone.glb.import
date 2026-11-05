@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c8ij0p0s6la2i"
-path="res://.godot/imported/island_summit.glb-09b404150059b9c5f9ed1bdf13649930.scn"
+uid="uid://ehbnieivi3ma"
+path="res://.godot/imported/walkways_DockZone.glb-acb7731f041e8e5d0a1ad36669a430f9.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/island_summit.glb"
-dest_files=["res://.godot/imported/island_summit.glb-09b404150059b9c5f9ed1bdf13649930.scn"]
+source_file="res://assets/landmarks/alcatraz_island/walkways_DockZone.glb"
+dest_files=["res://.godot/imported/walkways_DockZone.glb-acb7731f041e8e5d0a1ad36669a430f9.scn"]
 
 [params]
 

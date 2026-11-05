@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cgiu2nrwkyqdf"
-path="res://.godot/imported/island_upper.glb-08e5ae2fc6865a95978a8a6eaa841b52.scn"
+uid="uid://c7j6rug2cyvd6"
+path="res://.godot/imported/rails_DockZone.glb-ae13dca2b32b935461266e310f7a1524.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/island_upper.glb"
-dest_files=["res://.godot/imported/island_upper.glb-08e5ae2fc6865a95978a8a6eaa841b52.scn"]
+source_file="res://assets/landmarks/alcatraz_island/rails_DockZone.glb"
+dest_files=["res://.godot/imported/rails_DockZone.glb-ae13dca2b32b935461266e310f7a1524.scn"]
 
 [params]
 

@@ -1,0 +1,547 @@
+{
+  "author": "马可波罗",
+  "issue": "SGODOT-424",
+  "stage": "B blockout v2 real scale",
+  "unique_glbs": 24,
+  "unique_triangles": 30450,
+  "placed_triangles": 34138,
+  "placed_mesh_instances": 38,
+  "unique_surfaces": 24,
+  "glb_bytes": 2618372,
+  "navigation_cells": 6907,
+  "zones": [
+    "DockZone",
+    "TerraceZone",
+    "SummitZone"
+  ],
+  "dimensions_m": {
+    "island": [
+      60,
+      40
+    ],
+    "museum": [
+      40,
+      9,
+      10
+    ],
+    "lighthouse_height": 15,
+    "water_tower_height": 12,
+    "ferry_length": 25,
+    "bench_length": 1.5,
+    "bench_seat_height": 0.45,
+    "railing_height": 1,
+    "lamp_height": 3.5,
+    "avatar_nominal_height": 1.75
+  },
+  "actual_walk_m": 119.240599483252,
+  "direct_walk_m": 119.642162501812,
+  "live_surfaces_including_avatar_and_distant_layer": 46,
+  "live_triangles_including_avatar_and_distant_layer": 42502,
+  "runtime_source_and_assets_equal": true,
+  "vertex_color_normals_single_surface_uid_checks": [
+    "terrain_DockZone",
+    "terrain_TerraceZone",
+    "terrain_SummitZone",
+    "walkways_DockZone",
+    "walkways_TerraceZone",
+    "walkways_SummitZone",
+    "stairs_1",
+    "stairs_2",
+    "stairs_3",
+    "stairs_4",
+    "dock",
+    "visitor_center",
+    "lighthouse",
+    "water_tower",
+    "ruins",
+    "ferry",
+    "bench",
+    "lamp",
+    "gull",
+    "golden_gate_backdrop",
+    "city_backdrop",
+    "rails_DockZone",
+    "rails_TerraceZone",
+    "rails_SummitZone"
+  ],
+  "asset_sha256": {
+    "terrain_DockZone.glb": "79525751adf1ca0ad1b1b5ffaab0a292dc8cff87205c70d17e4f683cee35d19a",
+    "terrain_TerraceZone.glb": "59a0c47d8dfa0f66505f53785f0f4019edcae529dc3bc235b8a574599ed3cdb7",
+    "terrain_SummitZone.glb": "5654d7ba241bd9a0a045c2f0ca66d624175c0d2c007e82918dff8549d42f4633",
+    "walkways_DockZone.glb": "4c2f60ede50882a96e2f1aa713770ea00f7d9f9fb6503f7f034d86cd37ba6772",
+    "walkways_TerraceZone.glb": "6d0865079c3311aceba86fca03de3130c32f48fe5c6cd6d93d90f6098a9c1a2e",
+    "walkways_SummitZone.glb": "507ffc5a8d4034f2a6f322dc56b3668c876119f868d656c8cb17379e26fc2645",
+    "stairs_1.glb": "2948b359991c1f98bc754a021af7ffdbc734ac85afee66e1a8fdd99dabf3a52c",
+    "stairs_2.glb": "f3898f2952903cc968852e6a8647911363090586fc81451621122638dc7be6cc",
+    "stairs_3.glb": "921e6d24e00f04ed046880fa39cf6be867994ca127947be5bc95b68658c1a9fe",
+    "stairs_4.glb": "8fd0d88b5e3a089bafd7bca39e4dcc02429136e1c220c5f4db19e7742698a1cd",
+    "dock.glb": "60569317ccb068423c51165a4c1f7b3c2614f77178cb40343330fefb3c19978a",
+    "visitor_center.glb": "936f93f9844afd806384ae4cfd8dc31fd94005e3413b29f927036beafd1b933c",
+    "lighthouse.glb": "dc8faab5e340a372540fa3bd7fb60e6e02584aedf3432092b5adbe02cb29bfb0",
+    "water_tower.glb": "4534fe624de02fabe3850ea6708f36bde741b50d7749d1a389d1b6cf52b62e52",
+    "ruins.glb": "52592b497abacbb1740cd4e19b9572fb957ab211bdfa0aa764568acf811b2daf",
+    "ferry.glb": "1c30fa5ee406ebf8b208d80e643f810fa0a06ade772f56931df46d7d9cf04be4",
+    "bench.glb": "135a7e4079e8a319e5639f88cb8c0af63fa0369ddeae587264a05deced15e306",
+    "lamp.glb": "4d4c94697e62a0715e4244409c4894d9046c3a4ebab0b8ee37401a145dda0631",
+    "gull.glb": "c6e48eafc4ee4e48742adf8183b4f87b6e824102b54a899963ad0ffcf8fe7c9a",
+    "golden_gate_backdrop.glb": "cca60ccf1ac3d3473b0bb2488c25eb83efb113f4134bec5f2d44f6310e478f71",
+    "city_backdrop.glb": "5d2c8630fdfcf1ec50c01135fdd5fb99e7006a7e321ed085e1dc4d4d3196f404",
+    "rails_DockZone.glb": "acd723ac2c0b856be012c79c51cd4a1974cf23702fad1f171696d6fcaf29bb4c",
+    "rails_TerraceZone.glb": "47b346a3aaa5f30a356c11c24d50a8722031aff290c66e2864bff2b38912e79e",
+    "rails_SummitZone.glb": "10bbdcce7bcb29a8ef6b636b061e0c440554d43196de0485664d867c65b5313f"
+  },
+  "exported_module_bounds_m": {
+    "terrain_DockZone": {
+      "min": [
+        -25,
+        -0.6000000238418579,
+        7.5
+      ],
+      "max": [
+        24,
+        1,
+        14
+      ],
+      "size": [
+        49,
+        1.600000023841858,
+        6.5
+      ]
+    },
+    "terrain_TerraceZone": {
+      "min": [
+        -30,
+        -0.6000000238418579,
+        -6
+      ],
+      "max": [
+        30,
+        7.75,
+        7.5
+      ],
+      "size": [
+        60,
+        8.350000023841858,
+        13.5
+      ]
+    },
+    "terrain_SummitZone": {
+      "min": [
+        -30,
+        -0.6000000238418579,
+        -20
+      ],
+      "max": [
+        30,
+        10,
+        -6
+      ],
+      "size": [
+        60,
+        10.600000023841858,
+        14
+      ]
+    },
+    "walkways_DockZone": {
+      "min": [
+        -24,
+        0.7699999809265137,
+        10.5
+      ],
+      "max": [
+        -18,
+        1.0199999809265137,
+        14
+      ],
+      "size": [
+        6,
+        0.25,
+        3.5
+      ]
+    },
+    "walkways_TerraceZone": {
+      "min": [
+        -23.5,
+        0.869999885559082,
+        -3
+      ],
+      "max": [
+        9.5,
+        7.769999980926514,
+        9
+      ],
+      "size": [
+        33.0,
+        6.900000095367432,
+        12
+      ]
+    },
+    "walkways_SummitZone": {
+      "min": [
+        -28,
+        7.619999885559082,
+        -8
+      ],
+      "max": [
+        28,
+        10.020000457763672,
+        -4.5
+      ],
+      "size": [
+        56,
+        2.40000057220459,
+        3.5
+      ]
+    },
+    "stairs_1": {
+      "min": [
+        -23.5,
+        0.7999999523162842,
+        7.498499870300293
+      ],
+      "max": [
+        -20.5,
+        3.2699999809265137,
+        12.001501083374023
+      ],
+      "size": [
+        3.0,
+        2.4700000286102295,
+        4.5030012130737305
+      ]
+    },
+    "stairs_2": {
+      "min": [
+        6.5,
+        3.049999713897705,
+        2.998500108718872
+      ],
+      "max": [
+        9.5,
+        5.519999980926514,
+        7.501500129699707
+      ],
+      "size": [
+        3.0,
+        2.4700002670288086,
+        4.503000020980835
+      ]
+    },
+    "stairs_3": {
+      "min": [
+        -23.5,
+        5.299999713897705,
+        -1.5015000104904175
+      ],
+      "max": [
+        -20.5,
+        7.769999980926514,
+        3.001500129699707
+      ],
+      "size": [
+        3.0,
+        2.4700002670288086,
+        4.5030001401901245
+      ]
+    },
+    "stairs_4": {
+      "min": [
+        6.5,
+        7.549999713897705,
+        -6.001500129699707
+      ],
+      "max": [
+        9.5,
+        10.019999504089355,
+        -1.498499870300293
+      ],
+      "size": [
+        3.0,
+        2.4699997901916504,
+        4.503000259399414
+      ]
+    },
+    "dock": {
+      "min": [
+        -1.7100000381469727,
+        -1.899999976158142,
+        -3.25
+      ],
+      "max": [
+        1.7100000381469727,
+        1.0000001192092896,
+        3.25
+      ],
+      "size": [
+        3.4200000762939453,
+        2.9000000953674316,
+        6.5
+      ]
+    },
+    "visitor_center": {
+      "min": [
+        -20,
+        0,
+        -5
+      ],
+      "max": [
+        20,
+        9,
+        5.239999771118164
+      ],
+      "size": [
+        40,
+        9,
+        10.239999771118164
+      ]
+    },
+    "lighthouse": {
+      "min": [
+        -1.850000023841858,
+        0,
+        -1.850000023841858
+      ],
+      "max": [
+        1.850000023841858,
+        15,
+        1.850000023841858
+      ],
+      "size": [
+        3.700000047683716,
+        15,
+        3.700000047683716
+      ]
+    },
+    "water_tower": {
+      "min": [
+        -2.700000286102295,
+        -0.0059261322021484375,
+        -2.6999998092651367
+      ],
+      "max": [
+        2.6999998092651367,
+        12,
+        2.700000286102295
+      ],
+      "size": [
+        5.400000095367432,
+        12.005926132202148,
+        5.400000095367432
+      ]
+    },
+    "ruins": {
+      "min": [
+        -4.5,
+        0,
+        -4
+      ],
+      "max": [
+        4.25,
+        4.5,
+        0.22499999403953552
+      ],
+      "size": [
+        8.75,
+        4.5,
+        4.2249999940395355
+      ]
+    },
+    "ferry": {
+      "min": [
+        -12.5,
+        -1,
+        -3.0999999046325684
+      ],
+      "max": [
+        12.5,
+        6.5,
+        3.0999999046325684
+      ],
+      "size": [
+        25.0,
+        7.5,
+        6.199999809265137
+      ]
+    },
+    "bench": {
+      "min": [
+        -0.75,
+        0,
+        -0.25999999046325684
+      ],
+      "max": [
+        0.75,
+        1.0099999904632568,
+        0.23999999463558197
+      ],
+      "size": [
+        1.5,
+        1.0099999904632568,
+        0.4999999850988388
+      ]
+    },
+    "lamp": {
+      "min": [
+        -0.1426585167646408,
+        0,
+        -0.15000000596046448
+      ],
+      "max": [
+        0.14265850186347961,
+        3.5,
+        0.15000002086162567
+      ],
+      "size": [
+        0.2853170186281204,
+        3.5,
+        0.30000002682209015
+      ]
+    },
+    "gull": {
+      "min": [
+        -0.15216907858848572,
+        0,
+        -0.35499995946884155
+      ],
+      "max": [
+        0.15216904878616333,
+        0.38499996066093445,
+        0.2250000238418579
+      ],
+      "size": [
+        0.30433812737464905,
+        0.38499996066093445,
+        0.5799999833106995
+      ]
+    },
+    "golden_gate_backdrop": {
+      "min": [
+        -1.7097609043121338,
+        0,
+        -0.18000000715255737
+      ],
+      "max": [
+        1.7097609043121338,
+        1.7000000476837158,
+        0.18000000715255737
+      ],
+      "size": [
+        3.4195218086242676,
+        1.7000000476837158,
+        0.36000001430511475
+      ]
+    },
+    "city_backdrop": {
+      "min": [
+        -35.6512336730957,
+        0,
+        -1.6237024068832397
+      ],
+      "max": [
+        32.013084411621094,
+        6.800000190734863,
+        1.4452755451202393
+      ],
+      "size": [
+        67.6643180847168,
+        6.800000190734863,
+        3.068977952003479
+      ]
+    },
+    "rails_DockZone": {
+      "min": [
+        -24.059999465942383,
+        1,
+        10.4399995803833
+      ],
+      "max": [
+        -17.940000534057617,
+        2,
+        19.560001373291016
+      ],
+      "size": [
+        6.119998931884766,
+        1,
+        9.120001792907715
+      ]
+    },
+    "rails_TerraceZone": {
+      "min": [
+        -23.559999465942383,
+        1.1875,
+        -5.809999942779541
+      ],
+      "max": [
+        9.560001373291016,
+        10.8125,
+        11.8100004196167
+      ],
+      "size": [
+        33.1200008392334,
+        9.625,
+        17.62000036239624
+      ]
+    },
+    "rails_SummitZone": {
+      "min": [
+        -28.059999465942383,
+        10,
+        -8.059999465942383
+      ],
+      "max": [
+        28.060001373291016,
+        11,
+        -4.440000057220459
+      ],
+      "size": [
+        56.1200008392334,
+        1,
+        3.619999408721924
+      ]
+    }
+  },
+  "reference": "tools/art/source/alcatraz_island/reference/provenance.json",
+  "captures": {
+    "01-opening.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "12507b31c98313bcd1d1d2983e3bbc7d37a24a5a054e574d88e10c88e6c23e0a"
+    },
+    "05-whole-island.png": {
+      "pixels": [
+        1000,
+        1200
+      ],
+      "sha256": "042ca9c55c6b4bd3b2cdd92a33b817abeb3bb45266c014bb9fcfc5c1eca1ccd6"
+    },
+    "02-mid-hill.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "d2ad2148416e0107629bddc4f63a8e1a2a5df1777247ec77cd7c58bb7901d234"
+    },
+    "04-top-layout.png": {
+      "pixels": [
+        1000,
+        1200
+      ],
+      "sha256": "c105d498ddba9863eb5c47fbf15f2f8969be811afb1a4a29392ca5cd581036e5"
+    },
+    "03-visitor-center.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "52dc005b784a34c8de4552d79fa0caa9a18a99ea0c026099cb9d085143e90ec2"
+    }
+  },
+  "top_layout_annotation": "Labels and route over actual rendered top view; raw screenshot remains in output.",
+  "limits": [
+    "Desktop Vulkan Mobile / RTX 2060 only.",
+    "Programmatic walk and gesture regression, no Android input claim.",
+    "No physical phone performance, map-entry integration, release, or whitebox approval is claimed."
+  ]
+}

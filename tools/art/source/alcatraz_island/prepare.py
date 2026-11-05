@@ -22,13 +22,16 @@ QA.mkdir(parents=True,exist_ok=True)
 def copy(rel):
     src=ROOT/rel;dst=QA/rel
     if src.is_dir():
+        if rel=='assets/landmarks/alcatraz_island' and dst.exists():
+            for old in dst.glob('*.glb*'):
+                if not (src/old.name).exists(): old.unlink()
         shutil.copytree(src,dst,dirs_exist_ok=True,ignore=shutil.ignore_patterns('*.blend','__pycache__'))
     else:
         dst.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(src,dst)
 
 for p in json.loads((ROOT/'tools/dev/scene_bench/fixtures/avatar-dependencies.json').read_text()):copy(p.removeprefix('res://'))
-for p in ['modules/avatar','modules/farm/scene_pan.gd','modules/farm/scene_pan.gd.uid',
+for p in ['modules/avatar','modules/farm/farm_camera.gd','modules/farm/scene_pan.gd','modules/farm/scene_pan.gd.uid',
     'assets/avatar/demo_denylist.json','assets/ui/icons/game/door-open.svg',
     'assets/landmarks/alcatraz_island','scenes/landmark/alcatraz_island.gd',
     'scenes/landmark/alcatraz_island.tscn']:copy(p)

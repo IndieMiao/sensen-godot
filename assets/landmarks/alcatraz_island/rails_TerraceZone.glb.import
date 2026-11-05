@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://b3six7n7oa5rv"
-path="res://.godot/imported/walkways.glb-4db1543755692b3052c6d4eb06096ad4.scn"
+uid="uid://dt1srpxrvs7oe"
+path="res://.godot/imported/rails_TerraceZone.glb-715c82e18b340d2eda871b56d97fcdf2.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/walkways.glb"
-dest_files=["res://.godot/imported/walkways.glb-4db1543755692b3052c6d4eb06096ad4.scn"]
+source_file="res://assets/landmarks/alcatraz_island/rails_TerraceZone.glb"
+dest_files=["res://.godot/imported/rails_TerraceZone.glb-715c82e18b340d2eda871b56d97fcdf2.scn"]
 
 [params]
 

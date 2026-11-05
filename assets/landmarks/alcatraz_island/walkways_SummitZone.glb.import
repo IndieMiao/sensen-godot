@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dmbm576vy3qyt"
-path="res://.godot/imported/stairs.glb-d6d1e46be77a0137d6c62dc1fa8e1c62.scn"
+uid="uid://wxpilayeryms"
+path="res://.godot/imported/walkways_SummitZone.glb-183cd0afc9f94d8e3cdbd9e637a5a85b.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/stairs.glb"
-dest_files=["res://.godot/imported/stairs.glb-d6d1e46be77a0137d6c62dc1fa8e1c62.scn"]
+source_file="res://assets/landmarks/alcatraz_island/walkways_SummitZone.glb"
+dest_files=["res://.godot/imported/walkways_SummitZone.glb-183cd0afc9f94d8e3cdbd9e637a5a85b.scn"]
 
 [params]
 
