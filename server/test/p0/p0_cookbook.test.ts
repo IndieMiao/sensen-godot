@@ -6,6 +6,13 @@ import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 
 const c = loadP0Content();
+
+/** q(288) (SGODOT-419) draws each ring's width ×0.8–1.2; the gold-arc bonuses are read with that draw held at ×1. */
+function steadyWidths<T>(fn: () => T): T {
+  const was = c.cooking.heat_vary;
+  c.cooking.heat_vary = was && { ...was, width_mul: [1, 1] };
+  try { return fn(); } finally { c.cooking.heat_vary = was; }
+}
 const T0 = Date.UTC(2026, 9, 8, 2);   // 10:00 Shanghai
 const S = 1000, H = 3_600_000;
 const fresh = () => freshState(c, 'cookbook-player', T0, 7);
@@ -38,7 +45,7 @@ describe('Cookbook pages (§7.5.1, q(39))', () => {
     expect(v.cookbook.find(p => p.id === 'dish_fisher_stew')).toMatchObject({ slots: 3, lock: { level: 4, xp_to_go: 220 } });
   });
 
-  it('cooking a page discovers it; ten pots master it and widen its gold arc by 10 points', () => {
+  it('cooking a page discovers it; ten pots master it and widen its gold arc by 10 points', () => steadyWidths(() => {
     let s = veteran();
     s.bag.push({ id: 'fish_crucian', qty: 10 });
     s.fires = 1;   // past the teaching ring
@@ -48,7 +55,7 @@ describe('Cookbook pages (§7.5.1, q(39))', () => {
     s.bag.push({ id: 'fish_crucian', qty: 1 });
     const pot = step(s, { type: 'cook', items: ['fish_crucian'] }, T0 + 200 * S).s.stove!;
     expect(pot.heats[0].width).toBe(0.45);   // Common 0.35 + Mastered 0.10
-  });
+  }));
 
   it('shows "You might have what it takes" on a Hidden page whose families the stove can fill', () => {
     const s = fresh();
@@ -126,7 +133,7 @@ describe('Kitchen Mishaps and clues (§7.5.2)', () => {
 });
 
 describe('Cooking Lv1–6 conveniences (q(38))', () => {
-  it('lists what the level gives and applies Hearty Mishap, Steady Hand I and Quick Fire', () => {
+  it('lists what the level gives and applies Hearty Mishap, Steady Hand I and Quick Fire', () => steadyWidths(() => {
     const at = (xp: number) => { const s = veteran(); s.skills.cooking = xp; s.fires = 1; return s; };
     expect(viewOf(c, at(30), T0).cooking.conveniences).toEqual(['cook_again']);
     expect(viewOf(c, at(100), T0).cooking.conveniences).toEqual(['cook_again', 'clue_double', 'hearty_mishap']);
@@ -142,7 +149,7 @@ describe('Cooking Lv1–6 conveniences (q(38))', () => {
     expect(step(lv5, { type: 'cook', items: ['fish_crucian'] }).s.stove!).toMatchObject({ ms: 5000, heats: [{ at: 2500, width: 0.4 }] });
     const lv6 = at(650); lv6.bag.push({ id: 'fish_crucian', qty: 1 });
     expect(step(lv6, { type: 'cook', items: ['fish_crucian'] }).s.stove!).toMatchObject({ ms: 4000, heats: [{ at: 2000, width: 0.4 }] });
-  });
+  }));
 
   it('the 3-slot lock lifts at Cooking Lv4', () => {
     const s = veteran(); s.skills.cooking = 220;

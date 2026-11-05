@@ -305,6 +305,11 @@ export interface P0Content {
     food_cap: number;
     conveniences: Partial<Record<Convenience, number>>;   // the Cooking level each convenience comes at (q(38)); absent = not in this build
     gold_cap: number; steady_hand_gold: number;  // gold arc share: bonuses stop at gold_cap; Steady Hand I adds steady_hand_gold
+    // q(288) (SGODOT-419): every ring differs. width_mul: each ring's width is the pot's × a draw in it, at most gold_cap;
+    // drift: the ring turns against the needle, °/s; lead_ms: the gold starts no sooner than this after the needle sets
+    // off; end: it ends by this share of the ring; pair_min_deg / pair_opposite_deg: two rings' gold centres at least
+    // this far apart and not within this of opposite. Absent: rings as before (the teaching pot never has it).
+    heat_vary?: { width_mul: [number, number]; drift: number; lead_ms: number; end: number; pair_min_deg: number; pair_opposite_deg: number };
     mastered: { cooked: number; gold: number; fast?: number };  // Mastered at `cooked` pots (`fast` with Fast Mastery, Lv7); its gold arc is wider (§7.5.1)
     lucky_double?: number;                        // Lucky Double (Lv10): chance of one more Plain portion (not Legendary, not with Double)
     // Cookbook milestones past Home Cook (§7.6.1, SGODOT-282): titles at Discovered / Mastered counts, once each;
