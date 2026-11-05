@@ -63,8 +63,12 @@ var slow := false
 var card: UiSystemCard
 var spinner: UiSpinner
 
-## The status bar's height (P0Ui.safe_top): the fitted splash keeps the wordmark under it.
-var status_top := 0.0
+## The status bar's height (P0Ui.safe_top): the fitted splash keeps the wordmark under it. Laid out again when it
+## changes (a cold start reads it only once the screen is in the tree).
+var status_top := 0.0:
+	set(v):
+		status_top = v
+		_layout()
 
 var _bg: ColorRect
 var _art: TextureRect

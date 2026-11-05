@@ -401,3 +401,20 @@ func test_the_splash_fades_into_the_scene_after_its_least_time() -> void:
 	assert_bool(is_instance_valid(layer)).is_true()   # under its 0.8 s
 	await get_tree().create_timer(0.9).timeout
 	assert_bool(is_instance_valid(layer)).is_false()
+
+## iOS 0.2.25 crashed at launch (蒙恬's stack: Viewport::get_visible_rect on a null viewport): the launch cover comes from
+## a deferred call before the UI is in the tree, and safe_top() read its viewport. Out of the tree it is 0 and nothing is
+## read; the screen takes the real status bar once it is in the tree.
+func test_the_launch_cover_before_the_ui_is_in_the_tree_reads_no_viewport() -> void:
+	OS.set_environment("P0_DEV_SAFE_TOP", "24")
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	assert_float(ui.safe_top()).is_equal(0.0)   # out of the tree: no viewport read
+	assert_float(ui.safe_bottom()).is_equal(0.0)
+	ui.show_screen(K.LAUNCH)
+	assert_float(ui.screen().status_top).is_equal(0.0)
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	assert_float(ui.safe_top()).is_equal(24.0)
+	assert_float(ui.screen().status_top).is_equal(24.0)   # read again once the screen is in the tree
+	OS.unset_environment("P0_DEV_SAFE_TOP")
