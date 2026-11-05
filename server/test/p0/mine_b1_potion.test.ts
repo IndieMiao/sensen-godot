@@ -9,6 +9,8 @@ import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { dayKey } from '../../src/p0/rules.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { setDevSites } from '../../src/p0/mine.js';
+setDevSites(true);   // wd-dev-quarry / wd-dev-vein: tests only (P0_DEV_SITES)
 
 const T = Date.UTC(2026, 10, 4, 2), DAY = 86400000, Q = 'wd-dev-quarry', ID = 'potion_heal';
 const c = loadP0Content(); c.profile.timezone = 'Asia/Shanghai';

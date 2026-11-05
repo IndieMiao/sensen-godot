@@ -27,6 +27,7 @@ import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv 
 import { openIpNear, type IpNear } from '../src/p0/ip_city.js';
 import { registerP0Admin } from '../src/p0/admin.js';
 import { P0Gate } from '../src/p0/gate.js';
+import { devSitesFromEnv, setDevSites } from '../src/p0/mine.js';
 import { P0EventLog } from '../src/p0/telemetry.js';
 import { bjTableFromEnv, bjTableOn, setBlackjackSecret, setBlackjackTable } from '../src/p0/blackjack.js';
 
@@ -55,6 +56,8 @@ if (gate.loadError) console.log(JSON.stringify({ warn: 'gate_json_unreadable', e
 }
 await registerP0Guard(app, guard, gate);
 const dev = process.env.P0_DEV !== '0';
+// The development mines (wd-dev-quarry / wd-dev-vein, no here check): only with P0_DEV_SITES=1, never on the live or preview server.
+setDevSites(devSitesFromEnv(process.env));
 // SGODOT-351: the blackjack shoe's key. A release server (P0_DEV=0) without one makes a random key for this process and
 // warns (亚瑟 / 奕星 on #523: the card room stays open, a hand in play keeps its stored shoe); dev keeps a fixed key.
 if (process.env.P0_BJ_SECRET) setBlackjackSecret(process.env.P0_BJ_SECRET);
@@ -113,7 +116,7 @@ const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFil
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config, dev_sites: devSitesFromEnv(process.env) }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;
