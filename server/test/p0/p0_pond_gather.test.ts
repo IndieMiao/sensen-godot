@@ -46,6 +46,10 @@ describe('pond gathering points (409)', () => {
       }
     }
     expect(pondPoints(c, 'gn-1850147~pond2')).toEqual(pondPoints(c, 'gn-1850147~pond2'));
+    // every planned point placed (周瑜 on #785): a home city's 16, the fallback city's 5 and one Timber for its sixth pond
+    const total = (cl: string) => [...cityPondPoints(c, cl).values()].reduce((n, pts) => n + pts.length, 0);
+    for (const cl of [SF, TOKYO, 'gn-2643743', 'gn-5128581', 'gn-3530597']) expect(total(cl), cl).toBe(16);
+    expect(total('gn-1790437')).toBe(6);
   });
 
   it('gathered in that pond only: Reeds into the bag with 2 worms, 3 Energy, ready again in 4 h; another pond says not_here', () => {

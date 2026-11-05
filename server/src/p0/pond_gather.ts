@@ -75,8 +75,10 @@ function kindsOf(c: P0Content, cluster: string, ponds: number): string[] {
   return out.sort((a, b) => order.indexOf(a) - order.indexOf(b));
 }
 
-/** Slots for these kinds on this shape, or null when none fit: tall pieces first, each slot tried in the pond's order. */
-function place(pond: string, shape: Record<string, Slot>, kinds: string[]): [string, string][] | null {
+/** Slots for these kinds on this shape, or null when none fit: tall pieces first, each slot tried in the pond's order.
+ * `strict` false keeps only what a slot can hold (one piece, low_only, pieces): the fallback when the layout rules
+ * can't all be kept, so no point is ever dropped (周瑜 on #785; none of 513 cities needs it). */
+function place(pond: string, shape: Record<string, Slot>, kinds: string[], strict = true): [string, string][] | null {
   const names = Object.keys(shape).sort((a, b) => hash32('pond-slot', pond, a) - hash32('pond-slot', pond, b) || (a < b ? -1 : 1));
   const todo = [...kinds].sort((a, b) => Number(TALL.has(b)) - Number(TALL.has(a)));
   const chosen: [string, string][] = [];
@@ -84,7 +86,9 @@ function place(pond: string, shape: Record<string, Slot>, kinds: string[]): [str
     const s = shape[slot];
     if (chosen.some(([x]) => x === slot)) return false;
     if (s.pieces && !s.pieces.includes(kind)) return false;
-    if (TALL.has(kind) && (s.low_only || s.blocks.some(b => chosen.some(([x]) => x === b)))) return false;
+    if (TALL.has(kind) && s.low_only) return false;
+    if (!strict) return true;
+    if (TALL.has(kind) && s.blocks.some(b => chosen.some(([x]) => x === b))) return false;
     if (chosen.some(([x, k]) => TALL.has(k) && shape[x].blocks.includes(slot))) return false;
     if (chosen.some(([x, k]) => k === kind && (s.near.includes(x) || shape[x].near.includes(slot)))) return false;
     if (s.spawn_m <= 3 && chosen.filter(([x]) => shape[x].spawn_m <= 3).length >= 2) return false;
@@ -92,7 +96,7 @@ function place(pond: string, shape: Record<string, Slot>, kinds: string[]): [str
     return true;
   };
   const go = (i: number): boolean => {
-    if (i === todo.length) return chosen.some(([x]) => shape[x].opening_visible);
+    if (i === todo.length) return !strict || chosen.some(([x]) => shape[x].opening_visible);
     for (const slot of names) {
       if (!ok(slot, todo[i])) continue;
       chosen.push([slot, todo[i]]);
@@ -120,7 +124,8 @@ function cityPoints(c: P0Content, cluster: string): Map<string, PondPoint[]> {
   const beginner = homesOf(c).includes(cluster) ? ponds.find(p => p.beginner) : undefined;
   if (beginner) {
     const fixed = BEGINNER(beginner.shape);
-    for (const [, kind] of fixed) kinds.splice(kinds.indexOf(kind), 1);
+    // a home city's table has all of them (16 points); one short of a kind loses nothing else (周瑜 on #785)
+    for (const [, kind] of fixed) { const i = kinds.indexOf(kind); if (i >= 0) kinds.splice(i, 1); }
     plan.set(beginner.id, fixed);
     rest = ponds.filter(p => p !== beginner);
   }
@@ -130,7 +135,7 @@ function cityPoints(c: P0Content, cluster: string): Map<string, PondPoint[]> {
   for (const p of ponds) {
     const shape = shapes()[p.shape] ?? shapes().crescent;
     const want = plan.get(p.id)!;
-    const slots = p === beginner ? want as [string, string][] : place(p.id, shape, want as string[]) ?? [];
+    const slots = p === beginner ? want as [string, string][] : place(p.id, shape, want as string[]) ?? place(p.id, shape, want as string[], false) ?? [];
     for (const [slot, kind] of slots) {
       const r = rules.kinds[kind], s = shape[slot];
       all.push({ id: `${p.id}#${slot}`, pond: p.id, slot, kind, name: r.word, yield: r.yield, energy: rules.energy, cooldown_h: rules.cooldown_h,
