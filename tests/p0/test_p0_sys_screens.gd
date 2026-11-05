@@ -52,14 +52,31 @@ func test_eight_seconds_add_the_spinner_and_twenty_say_cant_connect() -> void:
 	rt.ui.screen().card.primary.pressed.emit()   # Retry reads the state now
 	assert_array(asked).contains(["/p0/state"])
 
-func test_a_failed_first_read_is_cant_connect_not_a_banner() -> void:
+## q(290) (李元芳 on 0.2.25: a read given up at its 8 s took the screen to Can't connect, the slow card never came): a
+## failed first read is no banner and not Can't connect yet — it goes again a second on, the slow card comes at 8 s and
+## Can't connect at 20 with nothing read; then it is checked again on its own.
+func test_a_failed_first_read_goes_again_and_cant_connect_waits_for_twenty_seconds() -> void:
 	rt.cover_launch()
 	rt.session.connection_failed.emit("Can't reach the farm server", {})
-	assert_int(rt.ui.screen_kind()).is_equal(K.FAIL)
+	assert_int(rt.ui.screen_kind()).is_equal(K.LAUNCH)
 	assert_str(rt.ui.sys_text()).is_empty()
 	assert_bool(rt.ui.offline).is_false()
+	asked.clear()
+	rt._tick_screens(P0Runtime.LAUNCH_RETRY_S + 0.05)   # read again
+	assert_array(asked).contains(["/p0/state"])
+	rt.session.busy = false
+	rt.session.connection_failed.emit("Can't reach the farm server", {})   # and failed again
+	rt._tick_screens(P0Runtime.LAUNCH_SLOW_S)
+	assert_int(rt.ui.screen_kind()).is_equal(K.LAUNCH)
+	assert_bool(rt.ui.screen().slow).is_true()   # the slow card, not Can't connect
+	rt._tick_screens(P0Runtime.LAUNCH_FAIL_S - P0Runtime.LAUNCH_SLOW_S)
+	assert_int(rt.ui.screen_kind()).is_equal(K.FAIL)
+	asked.clear()
+	rt.session.busy = false
 	rt._tick_screens(P0Runtime.PROBE_S + 0.1)   # checked again on its own
 	assert_array(asked).contains(["/p0/state"])
+	rt.session.connection_failed.emit("Can't reach the farm server", {})   # a failure past 20 s stays Can't connect
+	assert_int(rt.ui.screen_kind()).is_equal(K.FAIL)
 
 func test_back_does_not_close_a_system_screen() -> void:
 	rt.cover_launch()

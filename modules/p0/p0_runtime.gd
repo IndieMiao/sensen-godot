@@ -1341,7 +1341,11 @@ func _net_failed(msg: String, cmd := {}) -> void:
 	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	_end_resume()
 	if _launch_s >= 0.0 and session.view.is_empty():
-		_launch_failed()   # nothing to browse yet: Can't connect takes the screen, no banner (SYS-LOADING-FAIL)
+		# nothing to browse yet. A read given up (its 8 s) or refused at once is not Can't connect before LAUNCH_FAIL_S
+		# (q(290); 李元芳 on 0.2.25: it took the screen at 8 s, the very time the slow card was due): the read goes again
+		# LAUNCH_RETRY_S on, the slow card comes at 8 s, Can't connect at 20 (SYS-LOADING-FAIL, no banner)
+		if _launch_s < LAUNCH_FAIL_S and ui.screen_kind() == P0SysScreen.Kind.LAUNCH: _launch_retry_left = LAUNCH_RETRY_S
+		else: _launch_failed()
 		return
 	if _arrive_s >= 0.0:
 		_arrival_failed()   # getting there failed: Couldn't get there, over the Offline banner (q(78))
@@ -1377,6 +1381,8 @@ func _probe() -> void:
 # ---------------------------------------------------------------- whole-screen system states (SGODOT-233)
 const LAUNCH_SLOW_S := 8.0    # SYS-LOADING-2: `Taking longer than usual…`
 const LAUNCH_FAIL_S := 20.0   # no answer by then: SYS-LOADING-FAIL `Can't connect` · Retry
+const LAUNCH_RETRY_S := 1.0   # a failed launch read goes again this soon, until LAUNCH_FAIL_S
+var _launch_retry_left := -1.0
 const MAINT_CHECK_S := 60.0   # SYS-MAINT checks again on its own (q(74))
 var _launch_s := -1.0         # how long the launch cover has been up; -1 when it is not
 var _blocked := ""            # "maintenance" / "update_required" while the server turns every request away
@@ -1390,10 +1396,12 @@ var _arrive := {}
 var _arrive_s := -1.0
 
 ## The first session's launch cover (SYS-LOADING, from p0_boot): the wordmark over the farm backdrop until the first
-## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer —
-## or a failed read with nothing yet to browse — `Can't connect` · Retry, checked again every PROBE_S.
+## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer
+## (a failed read before then goes again, LAUNCH_RETRY_S on: q(290)) — `Can't connect` · Retry, checked again every
+## PROBE_S.
 func cover_launch() -> void:
 	_launch_s = 0.0
+	_launch_retry_left = -1.0
 	ui.show_screen(P0SysScreen.Kind.LAUNCH)
 
 func _tick_screens(dt: float) -> void:
@@ -1402,6 +1410,11 @@ func _tick_screens(dt: float) -> void:
 		match ui.screen_kind():
 			P0SysScreen.Kind.LAUNCH:
 				if _launch_s >= LAUNCH_SLOW_S and not ui.screen().slow: ui.screen().taking_longer()
+				if _launch_retry_left >= 0.0:
+					_launch_retry_left -= dt
+					if _launch_retry_left <= 0.0 and not session.busy:
+						_launch_retry_left = -1.0
+						session.refresh()
 				if _launch_s >= LAUNCH_FAIL_S and session.view.is_empty(): _launch_failed()
 			P0SysScreen.Kind.FAIL:
 				_probe_left -= dt
@@ -1424,6 +1437,7 @@ func _tick_screens(dt: float) -> void:
 		ui.show_screen(P0SysScreen.Kind.SCENE, {place = ui.place_text(), shot = P0SysScreen.blurred_screen(get_viewport())})
 
 func _launch_failed() -> void:
+	_launch_retry_left = -1.0
 	_probe_left = PROBE_S
 	ui.show_screen(P0SysScreen.Kind.FAIL)
 
