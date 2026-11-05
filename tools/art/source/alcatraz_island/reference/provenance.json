@@ -1,0 +1,10 @@
+{
+  "landmark_concept_v1.jpg": {
+    "source": "/home/zhangshaoji/incoming/landmark/landmark_concept_v1.jpg",
+    "sha256": "aba5cf341b6bdc5c76273053f06004a75f3416b43b6b820c67d2cc7a92735b87"
+  },
+  "c_alc.png": {
+    "source": "/home/zhangshaoji/incoming/landmark/c_alc.png",
+    "sha256": "a432aacdf5a1b5aa523a043ac356c14c8f1c90c82422343d92b64bf3f8351f47"
+  }
+}

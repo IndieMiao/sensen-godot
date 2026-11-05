@@ -1,0 +1,255 @@
+{
+	"01-opening_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"01-opening_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"02-mid-hill_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"02-mid-hill_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"03-visitor-center_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"03-visitor-center_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"04-top-layout_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"04-top-layout_size": {
+		"evidence": "(1000, 1200)",
+		"passed": true
+	},
+	"05-whole-island_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"05-whole-island_size": {
+		"evidence": "(1000, 1200)",
+		"passed": true
+	},
+	"all_nav_cells_physical_floor": {
+		"evidence": [],
+		"passed": true
+	},
+	"bridge_projection_opening": {
+		"evidence": "[(234.7714, 96.34812), (255.9857, 71.25583), (309.7286, 71.25583), (330.9429, 96.34812)]",
+		"passed": true
+	},
+	"decorative_Ferry12": {
+		"evidence": null,
+		"passed": true
+	},
+	"decorative_Gull20": {
+		"evidence": null,
+		"passed": true
+	},
+	"decorative_Gull21": {
+		"evidence": null,
+		"passed": true
+	},
+	"decorative_Gull22": {
+		"evidence": null,
+		"passed": true
+	},
+	"drag_moves_camera_without_walking": {
+		"evidence": null,
+		"passed": true
+	},
+	"failures": [],
+	"farm_scale": {
+		"evidence": 7.0,
+		"passed": true
+	},
+	"floor_collision_mid_hill": {
+		"evidence": "(-2.75, 2.43, 4.5)",
+		"passed": true
+	},
+	"floor_collision_opening": {
+		"evidence": "(6.0, 0.8, 13.6)",
+		"passed": true
+	},
+	"floor_collision_visitor_center": {
+		"evidence": "(0.0, 5.63, -5.8)",
+		"passed": true
+	},
+	"limits": [
+		"Desktop Vulkan Mobile on gs66; not Android or physical-phone performance.",
+		"Walk simulation validates runtime paths; it is not a claim of real touch input.",
+		"Blockout only, awaiting layout review."
+	],
+	"map_exit_emits_request": {
+		"evidence": null,
+		"passed": true
+	},
+	"map_exit_visible": {
+		"evidence": "(0.0, 0.0)",
+		"passed": true
+	},
+	"museum_not_enterable": {
+		"evidence": "(0.0, 5.6, -7.75)",
+		"passed": true
+	},
+	"navigation_ready": {
+		"evidence": null,
+		"passed": true
+	},
+	"no_network_autoload": {
+		"evidence": null,
+		"passed": true
+	},
+	"opening_sea_covers_corners": {
+		"evidence": null,
+		"passed": true
+	},
+	"pinch_changes_scale_without_walking": {
+		"evidence": 1.4,
+		"passed": true
+	},
+	"renderer": {
+		"evidence": "NVIDIA GeForce RTX 2060",
+		"passed": true
+	},
+	"resume_preserves_view": {
+		"evidence": null,
+		"passed": true
+	},
+	"route_1_arrived": {
+		"evidence": "(6.0, 0.8, 10.0)",
+		"passed": true
+	},
+	"route_1_follow": {
+		"evidence": "(6.0, 0.8, 10.0)",
+		"passed": true
+	},
+	"route_1_path": {
+		"evidence": "[(6.0, 0.8, 13.6), (6.0, 0.8, 13.5), (6.0, 0.8, 13.25), (6.0, 0.8, 13.0), (6.0, 0.8, 12.75), (6.0, 0.8, 12.5), (6.0, 0.8, 12.25), (6.0, 0.8, 12.0), (6.0, 0.8, 11.75), (6.0, 0.8, 11.5), (6.0, 0.8, 11.25), (6.0, 0.8, 11.0), (6.0, 0.8, 10.75), (6.0, 0.8, 10.5), (6.0, 0.8, 10.25), (6.0, 0.8, 10.0)]",
+		"passed": true
+	},
+	"route_2_arrived": {
+		"evidence": "(1.5, 0.8, 9.0)",
+		"passed": true
+	},
+	"route_2_follow": {
+		"evidence": "(1.5, 0.8, 9.000004)",
+		"passed": true
+	},
+	"route_2_path": {
+		"evidence": "[(6.0, 0.8, 10.0), (5.75, 0.8, 10.0), (5.5, 0.8, 10.0), (5.25, 0.8, 10.0), (5.0, 0.8, 10.0), (4.75, 0.8, 10.0), (4.5, 0.8, 10.0), (4.25, 0.8, 10.0), (4.0, 0.8, 10.0), (3.75, 0.8, 10.0), (3.5, 0.8, 10.0), (3.25, 0.8, 10.0), (3.0, 0.8, 10.0), (2.75, 0.8, 10.0), (2.5, 0.8, 10.0), (2.25, 0.8, 10.0), (2.25, 0.8, 9.75), (2.25, 0.8, 9.5), (2.0, 0.8, 9.5), (2.0, 0.8, 9.25), (1.75, 0.8, 9.25), (1.5, 0.8, 9.25), (1.5, 0.8, 9.0)]",
+		"passed": true
+	},
+	"route_3_arrived": {
+		"evidence": "(1.5, 2.275434, 5.733567)",
+		"passed": true
+	},
+	"route_3_follow": {
+		"evidence": "(1.5, 2.275433, 5.733569)",
+		"passed": true
+	},
+	"route_3_path": {
+		"evidence": "[(1.5, 0.8, 9.0), (1.5, 0.8, 8.75), (1.5, 0.8, 8.5), (1.5, 0.93333, 8.25), (1.5, 1.06667, 8.0), (1.5, 1.2, 7.75), (1.5, 1.33333, 7.5), (1.5, 1.46667, 7.25), (1.5, 1.6, 7.0), (1.5, 1.73333, 6.75), (1.5, 1.86667, 6.5), (1.5, 2.0, 6.25), (1.5, 2.13333, 6.0), (1.5, 2.26667, 5.75), (1.5, 2.275434, 5.733567)]",
+		"passed": true
+	},
+	"route_4_arrived": {
+		"evidence": "(-2.75, 2.4, 4.5)",
+		"passed": true
+	},
+	"route_4_follow": {
+		"evidence": "(-2.749999, 2.399999, 4.500002)",
+		"passed": true
+	},
+	"route_4_path": {
+		"evidence": "[(1.5, 2.275434, 5.733567), (1.25, 2.273243, 5.737675), (1.0, 2.271052, 5.741784), (0.75, 2.268861, 5.745892), (0.5, 2.26667, 5.75), (0.5, 2.4, 5.5), (0.25, 2.4, 5.5), (0.0, 2.4, 5.5), (-0.25, 2.4, 5.5), (-0.5, 2.4, 5.5), (-0.75, 2.4, 5.5), (-1.0, 2.4, 5.5), (-1.25, 2.4, 5.5), (-1.5, 2.4, 5.5), (-1.75, 2.4, 5.5), (-2.0, 2.4, 5.5), (-2.0, 2.4, 5.25), (-2.25, 2.4, 5.25), (-2.25, 2.4, 5.0), (-2.25, 2.4, 4.75), (-2.5, 2.4, 4.75), (-2.75, 2.4, 4.75), (-2.75, 2.4, 4.5)]",
+		"passed": true
+	},
+	"route_5_arrived": {
+		"evidence": "(-2.75, 3.875434, 0.733567)",
+		"passed": true
+	},
+	"route_5_follow": {
+		"evidence": "(-2.749999, 3.875433, 0.733568)",
+		"passed": true
+	},
+	"route_5_path": {
+		"evidence": "[(-2.75, 2.4, 4.5), (-2.75, 2.4, 4.25), (-2.75, 2.4, 4.0), (-2.75, 2.4, 3.75), (-2.75, 2.4, 3.5), (-2.75, 2.53333, 3.25), (-2.75, 2.66667, 3.0), (-2.75, 2.8, 2.75), (-2.75, 2.93333, 2.5), (-2.75, 3.06667, 2.25), (-2.75, 3.2, 2.0), (-2.75, 3.33333, 1.75), (-2.75, 3.46667, 1.5), (-2.75, 3.6, 1.25), (-2.75, 3.73333, 1.0), (-2.75, 3.86667, 0.75), (-2.75, 3.875434, 0.733567)]",
+		"passed": true
+	},
+	"route_6_arrived": {
+		"evidence": "(1.75, 4.0, -1.0)",
+		"passed": true
+	},
+	"route_6_follow": {
+		"evidence": "(1.749999, 3.999999, -0.999999)",
+		"passed": true
+	},
+	"route_6_path": {
+		"evidence": "[(-2.75, 3.875434, 0.733567), (-2.5, 3.900347, 0.686853), (-2.25, 3.925261, 0.64014), (-2.0, 3.950174, 0.593427), (-1.75, 3.975087, 0.546713), (-1.5, 4.0, 0.5), (-1.25, 4.0, 0.464286), (-1.0, 4.0, 0.428571), (-0.75, 4.0, 0.392857), (-0.5, 4.0, 0.357143), (-0.25, 4.0, 0.321429), (0.0, 4.0, 0.285714), (0.25, 4.0, 0.25), (0.5, 4.0, 0.041667), (0.55, 4.0, 0.0), (0.75, 4.0, -0.166667), (0.85, 4.0, -0.25), (1.0, 4.0, -0.375), (1.15, 4.0, -0.5), (1.25, 4.0, -0.583333), (1.45, 4.0, -0.75), (1.5, 4.0, -0.791667), (1.75, 4.0, -1.0)]",
+		"passed": true
+	},
+	"route_7_arrived": {
+		"evidence": "(1.75, 5.6, -4.6)",
+		"passed": true
+	},
+	"route_7_follow": {
+		"evidence": "(1.75, 5.599998, -4.599998)",
+		"passed": true
+	},
+	"route_7_path": {
+		"evidence": "[(1.75, 4.0, -1.0), (1.75, 4.0, -1.25), (1.75, 4.0, -1.5), (1.75, 4.13333, -1.75), (1.75, 4.26667, -2.0), (1.75, 4.4, -2.25), (1.75, 4.53333, -2.5), (1.75, 4.66667, -2.75), (1.75, 4.8, -3.0), (1.75, 4.93333, -3.25), (1.75, 5.06667, -3.5), (1.75, 5.2, -3.75), (1.75, 5.33333, -4.0), (1.75, 5.46667, -4.25), (1.75, 5.6, -4.5), (1.75, 5.6, -4.6)]",
+		"passed": true
+	},
+	"route_8_arrived": {
+		"evidence": "(0.0, 5.6, -5.8)",
+		"passed": true
+	},
+	"route_8_follow": {
+		"evidence": "(0.000001, 5.599998, -5.799998)",
+		"passed": true
+	},
+	"route_8_path": {
+		"evidence": "[(1.75, 5.6, -4.6), (1.5, 5.6, -4.733334), (1.46875, 5.6, -4.75), (1.25, 5.6, -4.866666), (1.0, 5.6, -5.0), (0.75, 5.6, -5.2), (0.6875, 5.6, -5.25), (0.5, 5.6, -5.4), (0.375, 5.6, -5.5), (0.25, 5.6, -5.6), (0.0625, 5.6, -5.75), (0.0, 5.6, -5.8)]",
+		"passed": true
+	},
+	"sea_not_walkable": {
+		"evidence": "(7.0, 0.8, 10.0)",
+		"passed": true
+	},
+	"separate_navigation_map": {
+		"evidence": null,
+		"passed": true
+	},
+	"spawn_on_navigation": {
+		"evidence": null,
+		"passed": true
+	},
+	"status": "pass",
+	"summit_height": {
+		"evidence": 5.59999990463257,
+		"passed": true
+	},
+	"walk_lengths_m": [
+		3.60000038146973,
+		5.5,
+		3.63529250212014,
+		5.53350514173508,
+		4.1352925337851,
+		4.99805007129908,
+		3.99999976158142,
+		2.13062505424023
+	],
+	"walking_keeps_zoom": {
+		"evidence": null,
+		"passed": true
+	}
+}

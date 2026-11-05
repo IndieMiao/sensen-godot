@@ -1,0 +1,99 @@
+{
+  "author": "马可波罗",
+  "issue": "SGODOT-424",
+  "stage": "B blockout 1",
+  "unique_glbs": 19,
+  "unique_triangles": 60890,
+  "placed_triangles": 62714,
+  "placed_mesh_instances": 26,
+  "unique_surfaces": 19,
+  "glb_bytes": 5496004,
+  "navigation_cells": 1752,
+  "runtime_source_and_assets_equal": true,
+  "vertex_color_normals_single_surface_uid_checks": [
+    "island_shore",
+    "island_lower",
+    "island_middle",
+    "island_upper",
+    "island_summit",
+    "walkways",
+    "stairs",
+    "dock",
+    "visitor_center",
+    "lighthouse",
+    "water_tower",
+    "ruins",
+    "ferry",
+    "bench",
+    "lamp",
+    "gull",
+    "golden_gate_backdrop",
+    "city_backdrop",
+    "path_edges"
+  ],
+  "asset_sha256": {
+    "island_shore.glb": "e646eb3caf285977b3f2dc0cdeb0a7f027fa24d4bea818c469cbb74f805b0536",
+    "island_lower.glb": "9a464b8ec4b7192e178a18453bdc60937ab3df94157d06908a22b906c180b00a",
+    "island_middle.glb": "b37b9ef59f983bfed3d0f73d3b71d9be8223149a0055cac15682a5738af72628",
+    "island_upper.glb": "6a313d2f72c1256cb538649ee0127a36032371c15254a5db40b5ed1779bb187f",
+    "island_summit.glb": "1f0359eb3df9126b4cfb4ad6f591757cf1a7b4b4ecb8b4e04da0f2e99835a480",
+    "walkways.glb": "8f643b3dfcdeed6e2d98bf5adbbf6dd68f32676515f8bae170c7a73f144af8d5",
+    "stairs.glb": "b3beac458895ac87a78bb01e17f04f7624f23caf1fd8bb555f078a0db3994830",
+    "dock.glb": "6856e844dcc746f00409347a2f75dddf19b5838519d5a49633a904bef13cffe6",
+    "visitor_center.glb": "23792d099d184c94f81aa7577141f14c7c080a1f271df2afb2889fc53ad9cbd1",
+    "lighthouse.glb": "c6c070ff82017ce3e59b850a6ca4a726cb2496630891d62fc1c40485bd68d027",
+    "water_tower.glb": "74c6c5b9879b2be8d8064b065ce40fc80cb413b0b9875cdfa470d91a0de1aed2",
+    "ruins.glb": "f6af6e5cddb10478a2983482a735199db8d52d625e1b92b6ec9c3b6bf0c4b933",
+    "ferry.glb": "c7a74c9a49441aebd31dcd168dbffc7407c3c61a675a53fca91b04b2661d852a",
+    "bench.glb": "f65744f7ddb3170d9ab338874e6da8beacba1c2ee8817033938c8c2e0a8acdab",
+    "lamp.glb": "a8f3f3d8310d9f6e84eba94ebae90438375694bd76c814d4d4d70b4dc581e251",
+    "gull.glb": "c74c67767e0b55c68e07bd2d2fa1e2699cf604ef0aa79c47c362d8344df8416f",
+    "golden_gate_backdrop.glb": "74835e0586a74c6b3f3182d640b6fe8df1a9f5733137f2de1a7b79788800d1e7",
+    "city_backdrop.glb": "4313b39d031447ff4632dd1f188ca197ee8e905abb7e57003c9e51468b8fccda",
+    "path_edges.glb": "1716599571dc41a8cdacc0b761c325e1f9446bb77ea75d0b4cde25d5400eb268"
+  },
+  "reference": "tools/art/source/alcatraz_island/reference/provenance.json",
+  "captures": {
+    "01-opening.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "165a615bc4a736ee447edd81ae2ff857ded9cd1dd971809e21a20e27a6f00518"
+    },
+    "05-whole-island.png": {
+      "pixels": [
+        1000,
+        1200
+      ],
+      "sha256": "ab0c87a75b82460b1492fadba57fafb2babd881dcacdee0782f45ff5b29af437"
+    },
+    "02-mid-hill.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "10706d7657b9d6c1be0c5f78bf80e7146ec24490075677fe0d1932ae0ed5d983"
+    },
+    "04-top-layout.png": {
+      "pixels": [
+        1000,
+        1200
+      ],
+      "sha256": "8cddbf3b080439dce287cbbfda2fa6c1d273950004968e7b7d85e62c9388fd46"
+    },
+    "03-visitor-center.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "1f03402cb1d93b7a2a7af6743a4f590bae6f7795ba7ca893603260e6257a595e"
+    }
+  },
+  "top_layout_annotation": "Labels and route over actual rendered top view; raw screenshot remains in output.",
+  "limits": [
+    "Desktop Vulkan Mobile / RTX 2060 only.",
+    "Programmatic walk and gesture regression, no Android input claim.",
+    "No physical phone performance, map-entry integration, release, or whitebox approval is claimed."
+  ]
+}

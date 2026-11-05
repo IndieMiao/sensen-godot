@@ -1,0 +1,83 @@
+{
+  "generator": "tools/art/source/alcatraz_island/build.py",
+  "reference": "c_alc.png supplied 2026-11-05",
+  "phase": "whitebox only",
+  "assets": {
+    "island_shore": {
+      "triangles": 72,
+      "bytes": 5436
+    },
+    "island_lower": {
+      "triangles": 72,
+      "bytes": 5448
+    },
+    "island_middle": {
+      "triangles": 72,
+      "bytes": 5452
+    },
+    "island_upper": {
+      "triangles": 56,
+      "bytes": 4568
+    },
+    "island_summit": {
+      "triangles": 40,
+      "bytes": 3652
+    },
+    "walkways": {
+      "triangles": 972,
+      "bytes": 84868
+    },
+    "stairs": {
+      "triangles": 3888,
+      "bytes": 335708
+    },
+    "dock": {
+      "triangles": 2592,
+      "bytes": 224256
+    },
+    "visitor_center": {
+      "triangles": 1848,
+      "bytes": 160240
+    },
+    "lighthouse": {
+      "triangles": 194,
+      "bytes": 11064
+    },
+    "water_tower": {
+      "triangles": 954,
+      "bytes": 81376
+    },
+    "ruins": {
+      "triangles": 648,
+      "bytes": 57004
+    },
+    "ferry": {
+      "triangles": 1036,
+      "bytes": 88704
+    },
+    "bench": {
+      "triangles": 432,
+      "bytes": 38428
+    },
+    "lamp": {
+      "triangles": 128,
+      "bytes": 6436
+    },
+    "gull": {
+      "triangles": 288,
+      "bytes": 17124
+    },
+    "golden_gate_backdrop": {
+      "triangles": 2316,
+      "bytes": 200520
+    },
+    "city_backdrop": {
+      "triangles": 462,
+      "bytes": 40932
+    },
+    "path_edges": {
+      "triangles": 44820,
+      "bytes": 4124788
+    }
+  }
+}
