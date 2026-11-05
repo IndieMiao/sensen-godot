@@ -247,7 +247,7 @@ func _go_cast(point: Vector3) -> void:
 func _at(origin: Vector3) -> bool:
 	return Vector2(actor.position.x - origin.x, actor.position.z - origin.z).length() < ARRIVE_M
 
-func p0_energy_verb() -> String: return "Cast"
+func p0_energy_verb() -> String: return str(rt.ui.fab_state().get("verb", "Cast"))   # Gather at a point (410), else Cast
 
 ## 410: the nearest point's name bar (within TAG_M; the item's name, cooling dimmed with `Ready in …`), the previous one
 ## folded; the guide's `!` on the point its target names (view.guide.target.spot), whichever point is nearest.

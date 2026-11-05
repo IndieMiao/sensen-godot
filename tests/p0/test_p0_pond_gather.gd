@@ -90,3 +90,22 @@ func test_the_new_kinds_are_782s_pieces() -> void:
 		assert_int(piece.get_child_count()).is_equal(1)
 		assert_object((piece.get_child(0) as MeshInstance3D).mesh).is_same(Art.mesh_for(str(PondGather.PIECES[k])))
 		assert_object(Art.mesh_for(str(PondGather.PIECES[k]))).is_not_null()
+
+## The Energy card the amber key opens says what was pressed — `Gather needs 3 Energy` at a point, `Cast` elsewhere
+## (周瑜 on #788: the pond's p0_energy_verb said Cast always).
+func test_the_energy_card_says_gather_at_a_point() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	rt.ui.quick_store = "user://test_p0_pond_gather.json"
+	rt.session.transport = func(_m, _p, _b, _c): pass   # no server
+	add_child(rt)
+	var stub := GDScript.new()
+	stub.source_code = "extends \"res://scenes/p0/p0_pond.gd\"\nfunc _ready() -> void: pass\n"
+	stub.reload()
+	var pond: Node3D = auto_free(Node3D.new())
+	pond.set_script(stub)
+	pond.rt = rt
+	rt.ui.set_action(PondGather.key(_view(2), _point(), POND))
+	assert_str(pond.p0_energy_verb()).is_equal("Gather")
+	rt.ui.set_action({"icon": "", "verb": "Cast", "sub": "5 Energy", "enabled": true, "amber": false})
+	assert_str(pond.p0_energy_verb()).is_equal("Cast")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_p0_pond_gather.json"))
