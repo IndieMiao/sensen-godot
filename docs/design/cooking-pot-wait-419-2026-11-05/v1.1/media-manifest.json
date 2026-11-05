@@ -1,0 +1,92 @@
+[
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_closed.png",
+    "bytes": 80659,
+    "sha256": "6d10dd68e4f56b3be695ce7df087ca0f186c70e96fd7204d39daeb2f7691deae",
+    "size": [
+      720,
+      720
+    ]
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_idle.png",
+    "bytes": 81846,
+    "sha256": "7accf30000ffc57d7a5fb00959ca701c8be96c45eec06fa26346a7e93ff8de8e",
+    "size": [
+      720,
+      720
+    ]
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_layer_rgba.png",
+    "bytes": 17132,
+    "sha256": "7a2c3df13c31b4e1029ebf03a1439666b488d5e23514c4bfa849368c20984efc",
+    "size": [
+      200,
+      180
+    ]
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_lifted.png",
+    "bytes": 88112,
+    "sha256": "68032209428f6026acbd7783c9ed4ed238e23c94aa1d2ded7c2eb8a2eb8db1a3",
+    "size": [
+      720,
+      720
+    ]
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_overlay_detail.png",
+    "bytes": 49418,
+    "sha256": "b887123b38b92598a40ac653be73f5adecab57d672bdbe5b310a598717306f00",
+    "size": [
+      840,
+      840
+    ]
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_overlay_motion.mp4",
+    "bytes": 50585,
+    "sha256": "30f5ef64c3f4415da0deca7907255d3d097a0a985e54ecfe82387ec13fda3140",
+    "size": [
+      360,
+      800
+    ],
+    "frames": 90,
+    "duration": 3.0
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_overlay_ring.png",
+    "bytes": 45825,
+    "sha256": "e8de1a91f78eedbe526eabe66169a64eed6e4db1b8700e7eb4b13052dfc9980e",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_settled.png",
+    "bytes": 83722,
+    "sha256": "cf62cb4dcec17d922233cebbea892c405ea0af7bf930876981ed81db8b7bb375",
+    "size": [
+      720,
+      720
+    ]
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_tumble.mp4",
+    "bytes": 128969,
+    "sha256": "a41ddfb52edb00b51071cdef009b399294e4a802670437a589b17608d787d1b3",
+    "size": [
+      720,
+      720
+    ],
+    "frames": 108,
+    "duration": 3.6
+  },
+  {
+    "file": "SGODOT-419_cooking_pot_v1.1_validation.json",
+    "bytes": 27810,
+    "sha256": "a17475dfcd52423c42f93a08fcabbdbf1ae98132bd3dab8b110a97a56d3d1842"
+  }
+]

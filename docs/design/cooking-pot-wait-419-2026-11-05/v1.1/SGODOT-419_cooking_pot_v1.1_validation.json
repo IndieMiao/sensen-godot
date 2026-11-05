@@ -1,0 +1,1336 @@
+{
+  "added_render_materials": 2,
+  "bounds_rest": {
+    "position": [
+      -0.140000000596046,
+      0.0,
+      -0.10700000077486
+    ],
+    "size": [
+      0.280000001192093,
+      0.241999998688698,
+      0.21399998664856
+    ]
+  },
+  "check_count": 312,
+  "checks": [
+    {
+      "check": "Root identity / bottom-centre contract",
+      "passed": true
+    },
+    {
+      "check": "Exactly idle and tumble",
+      "passed": true
+    },
+    {
+      "check": "No autoplay",
+      "passed": true
+    },
+    {
+      "check": "Normal pot hidden in saved scene",
+      "passed": true
+    },
+    {
+      "check": "Original GLB remains instanced",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: .",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_big",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_big/big_body",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_big/lid",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_big/lid/lid_mesh",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_big/lid/Steam",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_big/mouth",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_big/vent",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_normal",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_normal/mouth",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/StovePot/pot_normal/normal_body",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/Soup",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/Soup/Surface",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/Soup/Bubble1",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/Soup/Bubble2",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/Soup/Bubble3",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: PotRig/Soup/RimFoam",
+      "passed": true
+    },
+    {
+      "check": "No forbidden payload: AnimationPlayer",
+      "passed": true
+    },
+    {
+      "check": "Geometry below 15000 triangles",
+      "passed": true
+    },
+    {
+      "check": "One shared opaque material; plus steam = two total",
+      "passed": true
+    },
+    {
+      "check": "Source surfaces retained pot_big/big_body",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/big_body / 0 / 0",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/big_body / 0 / 12",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/big_body / 0 / 4",
+      "passed": true
+    },
+    {
+      "check": "Source surfaces retained pot_big/lid/lid_mesh",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/lid/lid_mesh / 0 / 0",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/lid/lid_mesh / 0 / 12",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/lid/lid_mesh / 0 / 4",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/lid/lid_mesh / 1 / 0",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/lid/lid_mesh / 1 / 12",
+      "passed": true
+    },
+    {
+      "check": "Source geometry/UV exact pot_big/lid/lid_mesh / 1 / 4",
+      "passed": true
+    },
+    {
+      "check": "Normal repacking numerical error < 0.0002: 0.00012647129188",
+      "passed": true
+    },
+    {
+      "check": "Original pot scale retained",
+      "passed": true
+    },
+    {
+      "check": "Steam: GPU particles / local coordinates / 5 particles",
+      "passed": true
+    },
+    {
+      "check": "Steam follows lid vent",
+      "passed": true
+    },
+    {
+      "check": "Steam matches original vent at rest",
+      "passed": true
+    },
+    {
+      "check": "idle loops",
+      "passed": true
+    },
+    {
+      "check": "idle track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "idle seamless endpoint 0",
+      "passed": true
+    },
+    {
+      "check": "idle track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "idle seamless endpoint 1",
+      "passed": true
+    },
+    {
+      "check": "idle track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "idle seamless endpoint 2",
+      "passed": true
+    },
+    {
+      "check": "idle track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "idle seamless endpoint 3",
+      "passed": true
+    },
+    {
+      "check": "idle track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "idle seamless endpoint 4",
+      "passed": true
+    },
+    {
+      "check": "idle track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "idle seamless endpoint 5",
+      "passed": true
+    },
+    {
+      "check": "idle track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "idle seamless endpoint 6",
+      "passed": true
+    },
+    {
+      "check": "tumble loops",
+      "passed": true
+    },
+    {
+      "check": "tumble track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "tumble seamless endpoint 0",
+      "passed": true
+    },
+    {
+      "check": "tumble track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "tumble seamless endpoint 1",
+      "passed": true
+    },
+    {
+      "check": "tumble track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "tumble seamless endpoint 2",
+      "passed": true
+    },
+    {
+      "check": "tumble track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "tumble seamless endpoint 3",
+      "passed": true
+    },
+    {
+      "check": "tumble track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "tumble seamless endpoint 4",
+      "passed": true
+    },
+    {
+      "check": "tumble track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "tumble seamless endpoint 5",
+      "passed": true
+    },
+    {
+      "check": "tumble track does not target scene root",
+      "passed": true
+    },
+    {
+      "check": "tumble seamless endpoint 6",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 0",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 0",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 1",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 2",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 3",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 4",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 5",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 6",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 7",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 8",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 9",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 10",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 11",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 12",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 13",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 14",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 15",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 16",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 17",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 17",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 18",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 19",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 20",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 21",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 22",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 23",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 24",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 25",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 26",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 27",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 28",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 29",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 30",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 31",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 32",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 33",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 34",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 34",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 35",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 36",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 37",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 38",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 39",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 40",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 41",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 42",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 43",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 44",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 45",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 46",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 47",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 48",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 49",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 50",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 51",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 51",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 52",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 53",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 54",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 55",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 56",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 57",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 58",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 59",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 60",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 61",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 62",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 63",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 64",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 65",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 66",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 67",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 68",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 68",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 69",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 70",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 71",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 72",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 73",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 74",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 75",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 76",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 77",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 78",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 79",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 80",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 81",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 82",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 83",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 84",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 85",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 85",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 86",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 87",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 88",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 89",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 90",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 91",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 92",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 93",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 94",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 95",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 96",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 97",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 98",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 99",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 100",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 101",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 102",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 102",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 103",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 104",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 105",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 106",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 107",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 108",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 109",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 110",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 111",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 112",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 113",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 114",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 115",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 116",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 117",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 118",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 119",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 119",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 120",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 121",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 122",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 123",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 124",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 125",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 126",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 127",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 128",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 129",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 130",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 131",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 132",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 133",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 134",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 135",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 136",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 136",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 137",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 138",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 139",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 140",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 141",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 142",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 143",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 144",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 145",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 146",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 147",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 148",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 149",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 150",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 151",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 152",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 153",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 153",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 154",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 155",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 156",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 157",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 158",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 159",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 160",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 161",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 162",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 163",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 164",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 165",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 166",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 167",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 168",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 169",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 170",
+      "passed": true
+    },
+    {
+      "check": "Idle restores pose from tumble sample 170",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble1",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble2",
+      "passed": true
+    },
+    {
+      "check": "Idle hides Bubble3",
+      "passed": true
+    },
+    {
+      "check": "Idle hides RimFoam",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 171",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 172",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 173",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 174",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 175",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 176",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 177",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 178",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 179",
+      "passed": true
+    },
+    {
+      "check": "Root fixed at sample 180",
+      "passed": true
+    },
+    {
+      "check": "Lid maximum lift including tilt <= 1.8 cm",
+      "passed": true
+    },
+    {
+      "check": "Body bounce at most 2 mm",
+      "passed": true
+    },
+    {
+      "check": "Steam theoretical alpha with all five overlapping below 0.5",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "max_body_bounce_m": 0.00200000032782555,
+  "max_lid_front_lift_m": 0.0172247233390808,
+  "max_lid_pivot_lift_m": 0.0143999996185303,
+  "opaque_materials": [
+    "SoupAndFoam_MatteVertexColour"
+  ],
+  "steam_all_five_overlap_bound": 0.469262783931599,
+  "steam_peak_single_particle_alpha": 0.119,
+  "steam_triangles": 10,
+  "surfaces_excluding_steam": 8,
+  "triangles_excluding_steam": 2028,
+  "overlay": {
+    "camera_horizontal_fov_degrees": 39.9252510070801,
+    "camera_pitch_degrees": 62,
+    "camera_position_m": [
+      0.0,
+      0.529768526554108,
+      0.194202929735184
+    ],
+    "camera_projection": "perspective",
+    "fixture": "Isolated transparent 200x180 SubViewport; warm upper-left fixture light; no kitchen/cooking UI or runtime integration",
+    "layer_position": [
+      80,
+      150
+    ],
+    "layer_size": [
+      200,
+      180
+    ],
+    "max_body_vertex_screen_displacement_px": 0.814380824565887,
+    "max_lid_vertex_screen_displacement_px": 8.19104671478271,
+    "mouth_px": [
+      180.0,
+      235.000015258789
+    ],
+    "pot_width_px": 180.0,
+    "ring_radius_px": 60,
+    "transparent": true,
+    "viewport": [
+      360,
+      800
+    ],
+    "whole_with_conservative_steam_envelope_px": [
+      89.6273498535156,
+      169.2919921875,
+      180.745300292969,
+      153.992584228516
+    ]
+  },
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "unchanged_from_v1_sha256": {
+    "assets/props/stove_pot/stove_pot.glb": "04f6faee84c5f25629ce57d4bb884763ca3897dc87df9ac58b04bfc70a5d78ab",
+    "assets/props/cooking_pot_wait/soup_surface.res": "1e7ae4cab1fd78b56a014e655ca9256de7c5e91b394a94ee81cec7d94fbc406d",
+    "assets/props/cooking_pot_wait/resource_uids.json": "4c8b8160c114b93c77c540f3f732d70d6486aca5cf18045985faa84a4843169d",
+    "assets/props/cooking_pot_wait/rim_foam.res": "9a3fb5df000eaa270ca4343d8eb74f640f324803d2edd51024eb13e748158e12",
+    "assets/props/cooking_pot_wait/soup_matte.tres": "2686f7d7cc3b7510e3a035d4a955e23962cab1cc6050c5691291ede6b04d9243",
+    "assets/props/cooking_pot_wait/steam.tres": "a51f3c0e98400151aac28767787e45b3df8030da9ee0ec541ced7a96bd64138f",
+    "assets/props/cooking_pot_wait/pot_body_colours.res": "c112bf040a3f55640949979eb5fff64a58b3989f068d8db89b3678df59cbc428",
+    "assets/props/cooking_pot_wait/pot_lid_colours.res": "2c3c688ec0f79af01d586d39edceb3e111d39a4ba53d69f97768e082a2d1eb70",
+    "assets/props/cooking_pot_wait/soup_bubble.res": "6670c5a2a51072e82ba215e48160f13db8871753e960c9904f19b61ef3f37e69"
+  },
+  "native_layer_rgba": {
+    "size": [
+      200,
+      180
+    ],
+    "corner_alpha": 0
+  }
+}

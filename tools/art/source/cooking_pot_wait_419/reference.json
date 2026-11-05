@@ -1,0 +1,19 @@
+{
+  "task": "SGODOT-419 item 5 / A 炖锅翻滚",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "references": {
+    "concept_A.png": "e5b09d0c48f3789212a2ebd052dd34c52eb102b0586ad550626826563de53fb2",
+    "ref_pot.png": "abb41b86c5a9500459c492198318378009edad68d7c3a497c77b87b297ce4a42",
+    "ref_pot_open.png": "aa612d09e8310823fb9f3078d24863abf5d2df5b41d086e5f32754d04aec0668",
+    "ref_kitchen.png": "4a26b8a9a5aa69d77713a7735e517623d6c5f6ff0149d95d746f6438be5a6b15"
+  },
+  "original_glb_sha256": "04f6faee84c5f25629ce57d4bb884763ca3897dc87df9ac58b04bfc70a5d78ab",
+  "art_base": "431fb75944f227958cedece5e95c535870f12114",
+  "b1": "67116c6df4f69062ce658c50581e72ab1779a1b4",
+  "spec_comments": [
+    "aef379d1-1d84-4639-aa96-d7c70e0d861a",
+    "dcc23862-4f77-4a03-a20e-7a24b1fa0d89",
+    "cd072712-d186-475b-9019-b808912ce11e"
+  ]
+}
