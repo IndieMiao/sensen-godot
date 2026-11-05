@@ -472,12 +472,12 @@ static func quota_text(view: Dictionary, role: String, selected := "") -> String
 	return str(q.get("text", "")) + ("\n" + str(q.note) if str(q.get("note", "")) != "" else "")
 
 ## The keeper's 44 px head (assets/p0/art/keepers/<name>_head.jpg), null for a name without art.
-## A keeper's portrait: the painted art for the four P0 keepers (Ama, Finn, Mei, Sigrid), else one drawn from the
+## A keeper's portrait: the painted art for the five P0 keepers (Ama, Finn, Mei, Sigrid, Lou), else one drawn from the
 ## keeper's look preset (SGODOT-300: a generated city's Ezra, Hugo …), filled in a few frames after it is asked for.
 static func keeper_portrait(name: String, card := false, look := "") -> Texture2D:
 	var path := "res://assets/p0/art/keepers/%s_%s.jpg" % [name.to_lower(), "card" if card else "head"]
 	if ResourceLoader.exists(path): return load(path)
-	# no painted art and no look preset: a written keeper is drawn in their outpost_npcs.json outfit (Lou, SGODOT-351)
+	# No painted art and no look preset: a written keeper is drawn in their outpost_npcs.json outfit.
 	return P0KeeperPortraits.texture(look if look != "" else P0KeeperPortraits.NPC + name.to_lower(), card)
 
 static func _gap(parent: Control, h: float) -> Control:

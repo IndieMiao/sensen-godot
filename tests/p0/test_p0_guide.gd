@@ -303,9 +303,9 @@ func test_two_kinds_short_no_line_and_of_two_waiting_the_first_ripe() -> void:
 		"can_cook": false, "in": ["W1", "crop_lettuce"]})   # first in the book, but its lettuce is ripe later
 	assert_str(str(P0KitchenLogic.waiting_on_crops(v).name)).is_equal("Fresh Fish Soup")
 
-## q(98): q(58)'s plurals everywhere (Lettuce, Chamomile, Corn stay; Chili → Chilies).
+## q(98): q(58)'s plurals everywhere (Lettuce, Chamomile, Corn stay; Chili → Chilies) and `is` for a crop that stays.
 ## The materials stay too (奕星 11-04: `7 Claies` on the Stall Board); a y takes -ies after a consonant only.
-func test_q58_plurals() -> void:
+func test_q58_plurals_and_an_uncountable_crop_is_ready() -> void:
 	for pair in [["Lettuce", "Lettuce"], ["Chamomile", "Chamomile"], ["Corn", "Corn"], ["Chili", "Chilies"], ["Radish", "Radishes"],
 			["Carrot", "Carrots"], ["Tomato", "Tomatoes"], ["Strawberry", "Strawberries"], ["Bok Choy", "Bok Choy"], ["Day", "Days"],
 			["Timber", "Timber"], ["Stone", "Stone"], ["Clay", "Clay"], ["Flax", "Flax"], ["Hardwood", "Hardwood"], ["Coal", "Coal"],

@@ -434,6 +434,8 @@ func _place_controls() -> void:
 static func dev_tools_on(debug_build: bool, demo_build: bool) -> bool:
 	return debug_build and not demo_build
 
+var dev_legendary := false   # the test builds' Legend toggle (_build_dev): every reel the Legendary tier
+
 func _build_dev() -> void:
 	var box := HBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
@@ -449,6 +451,15 @@ func _build_dev() -> void:
 		b.theme_type_variation = UiTokens.BUTTON_CMD_SECONDARY_COMPACT
 		b.pressed.connect(func(): dev_skip.emit(m))
 		box.add_child(b)
+	# q(282)'s reel recordings (SGODOT-389): while on, every bite reels as a Legendary fish (P0FishingPanel.on_cast). The
+	# reel only: the server's fish is what lands. Test builds only, as the clock buttons.
+	var legend := Button.new()
+	legend.name = "DevLegendary"
+	legend.text = "Legend"
+	legend.toggle_mode = true
+	legend.theme_type_variation = UiTokens.BUTTON_CMD_SECONDARY_COMPACT
+	legend.toggled.connect(func(on: bool): dev_legendary = on)
+	box.add_child(legend)
 	root.add_child(box)
 	_dev_box = box
 

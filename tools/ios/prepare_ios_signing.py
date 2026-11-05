@@ -13,6 +13,12 @@ import re
 import subprocess
 
 LOCATION_USAGE = (
+    "Your location helps Gensen select a nearby city and center the map "
+    "when you use location features."
+)
+# The sentence before the app was Gensen (0.2.23 and earlier still carried it): an Xcode project copied from then has it
+# in its Info.plist, so it is replaced like an empty one. Any other wording someone wrote there is kept.
+RETIRED_LOCATION_USAGE = (
     "Your location helps Journey select a nearby city and center the map "
     "when you use location features."
 )
@@ -72,21 +78,23 @@ def main():
 
     removed_usage_keys = []
     added_usage_keys = []
+    replaced_usage_keys = []
     for plist in project.parent.glob("*/*-Info.plist"):
         content = plistlib.loads(plist.read_bytes())
         # Mapbox references foreground CoreLocation APIs. Apple requires this
         # purpose string even while the Godot iOS location bridge is inactive.
         location_key = "NSLocationWhenInUseUsageDescription"
         location_added = not str(content.get(location_key, "")).strip()
-        if location_added:
+        location_replaced = content.get(location_key) == RETIRED_LOCATION_USAGE
+        if location_added or location_replaced:
             content[location_key] = LOCATION_USAGE
-            added_usage_keys.append(location_key)
+            (added_usage_keys if location_added else replaced_usage_keys).append(location_key)
         unused = [key for key, value in content.items()
                   if key.startswith("NS") and key.endswith("UsageDescription") and value == ""]
         for key in unused:
             del content[key]
             removed_usage_keys.append(key)
-        if unused or location_added:
+        if unused or location_added or location_replaced:
             plist.write_bytes(plistlib.dumps(content, sort_keys=False))
 
     options_path = project.parent / "ExportOptions-AppStore.plist"
@@ -106,7 +114,7 @@ def main():
     print(json.dumps({"project": str(project), "team": args.team,
                       "bundle_id": args.bundle_id, "version": args.version,
                       "build": args.build, "removed_empty_usage_keys": removed_usage_keys,
-                      "added_usage_keys": added_usage_keys,
+                      "added_usage_keys": added_usage_keys, "replaced_usage_keys": replaced_usage_keys,
                       "export_options": str(options_path),
                       "upload_options": str(upload_options_path)}, ensure_ascii=False))
 
