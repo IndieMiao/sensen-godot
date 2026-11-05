@@ -339,8 +339,10 @@ export interface P0Content {
     potions: Record<string, { name: string; price: number; stock: number; sold_at: string; gate: { homestead: number };
       heal: number | 'full'; floors: 'any' | number[]; cooldown_ms: number }>;
     /** tempo_burst (preview B, 奕星 11-05): how many swings or rocks may come ahead of their tempo (mine.ts tempoWait);
-     * absent = none, each one its full interval after the last. */
-    rules: { rock_tempo_ms: number; attack_tempo_factor: number; max_targets: number; guard_fast_factor: number; tempo_burst?: number };
+     * absent = none, each one its full interval after the last. rock_cards (q(292)): the floor's cards each rock deals
+     * (each a draw from the floor's table); absent = 1. */
+    rules: { rock_tempo_ms: number; attack_tempo_factor: number; max_targets: number; guard_fast_factor: number; tempo_burst?: number;
+      rock_cards?: number };
     /** 355 G (contract-efg §9.2): Pip's First Dig, its own slot beside the request line; lines.pip_vein is Pip's one
      * line toward the iron vein (v4q(9) ②), `%s` the vein's name filled in by the client. Absent = not in this build. */
     first_dig?: { giver: string; floor: number; gate: { homestead: number }; reward: { weapon?: string; affinity?: number };

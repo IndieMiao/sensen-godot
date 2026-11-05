@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { count } from '../../src/p0/bag.js';
+import { count, room } from '../../src/p0/bag.js';
 import { loadP0Content } from '../../src/p0/content.js';
-import { bagFitsFloor, floorSpec, mineSite, mineView, rockDrop, stations } from '../../src/p0/mine.js';
+import { bagFitsFloor, floorSpec, mineSite, mineView, rockDrops, stations } from '../../src/p0/mine.js';
 import { notePresence } from '../../src/p0/presence.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { dayKey } from '../../src/p0/rules.js';
@@ -277,10 +277,10 @@ describe('355 E reset and pickups (cases 12-14)', () => {
     expect(x.c.mine.monsters.mob_elite_slime.loot!.every(([id]) => id !== 'quartz')).toBe(true);
   });
   it('rocks honor next-card bag space, sequence retries and swing tempo', () => {
-    const x = scenario(); x.start(); x.s.gear.pick = 'pick_copper';
-    const site = mineSite(x.c, Q)!, expected = rockDrop(x.c, x.s, site, 1, 0), seq = x.s.seq;
+    const x = scenario(); x.c.mine.types.quarry.bands[0].rocks = [6, 6]; x.start(); x.s.gear.pick = 'pick_copper';
+    const site = mineSite(x.c, Q)!, expected = rockDrops(x.c, x.s, site, 1, 0), seq = x.s.seq;
     x.send({ type: 'mine_rock', floor: 1, rock: 0, expect_seq: seq });
-    expect(count(x.s.bag, 'stone')).toBe(x.c.mine.picks.pick_copper.stone + (expected === 'stone' ? 1 : 0));
+    expect(count(x.s.bag, 'stone')).toBe(x.c.mine.picks.pick_copper.stone + expected.filter(id => id === 'stone').length);
     expect(x.fail({ type: 'mine_rock', floor: 1, rock: 0, expect_seq: seq })).toMatchObject({ code: 'stale_state' });
     // tempo_burst 2: two more at once, then the next waits a whole 0.9 s
     x.again({ type: 'mine_rock', floor: 1, rock: 1 }); x.again({ type: 'mine_rock', floor: 1, rock: 2 });
@@ -353,9 +353,10 @@ describe('355 E v0.5 rock deck, ground and first acquisitions (cases 5,14,15a,15
       const a = x.send({ type: 'mine_rock', floor: 1, rock: k });
       const b = y.send({ type: 'mine_rock', floor: 1, rock: spec.rocks - k - 1 });
       expect(a.events.filter(e => e.kind === 'item')).toEqual(b.events.filter(e => e.kind === 'item'));
-      expect(a.events).toContainEqual(expect.objectContaining({ kind: 'mine', action: 'rock', drop: spec.deck[k] }));
+      // q(292): the k-th rock broken deals cards 2k and 2k + 1
+      expect(a.events).toContainEqual(expect.objectContaining({ kind: 'mine', action: 'rock', drops: spec.deck.slice(2 * k, 2 * k + 2) }));
       const counts = new Map<string, number>();
-      for (const id of spec.deck.slice(k + 1)) if (id) counts.set(id, (counts.get(id) ?? 0) + 1);
+      for (const id of spec.deck.slice(2 * k + 2)) if (id) counts.set(id, (counts.get(id) ?? 0) + 1);
       expect(viewOf(x.c, x.s, x.now).mine.at!.floor_state.deck).toEqual([...counts]);
     }
     expect(x.s.firsts.filter(id => id === 'loot:stone')).toHaveLength(1);
@@ -498,5 +499,65 @@ describe('preview B on a slow line (奕星 11-05: swings that hit took no HP)', 
     };
     expect(run(undefined)).toBeGreaterThan(5);   // the strict tempo: swings the client spaced right, refused
     expect(run(2)).toBe(0);
+  });
+});
+
+describe('q(292) fewer, bigger rocks (SGODOT-421)', () => {
+  it('every ordinary band of both kinds has 2–3 rocks, a guard floor none; each rock deals two cards', () => {
+    const c = loadP0Content();
+    expect(c.mine.rules.rock_cards).toBe(2);
+    for (const [kind, type] of Object.entries(c.mine.types)) {
+      for (const band of type.bands) expect([kind, band.from, band.rocks]).toEqual([kind, band.from, [2, 3]]);
+      const site = mineSite(c, kind === 'quarry' ? Q : V)!, seen = new Set<number>();
+      let cards = 0, floors = 0;
+      for (let n = 1; n <= Math.min(site.mine.floors, site.mine.open_to ?? site.mine.floors); n++) for (let p = 0; p < 40; p++) {
+        const spec = floorSpec(c, site, n, `rocks-${p}`, '2026-11-05');
+        if (type.floors[String(n)]?.guard) { expect([spec.rocks, spec.deck.length]).toEqual([0, 0]); continue; }
+        expect(spec.deck.length).toBe(spec.rocks * 2);
+        seen.add(spec.rocks); cards += spec.deck.length; floors++;
+      }
+      expect([...seen].sort()).toEqual([2, 3]);
+      expect(cards / floors).toBeGreaterThan(4.6); expect(cards / floors).toBeLessThan(5.4);   // a floor's cards as before: 4–6, 5 on average
+    }
+  });
+  it("a rock gives the pick's stone once and its own two cards; the torch shows the cards still in the rocks", () => {
+    const x = scenario(); x.c.mine.types.quarry.bands[0].mobs = [['mob_slime', 1, 1]]; x.start(); x.s.gear.pick = 'pick_copper';
+    const site = mineSite(x.c, Q)!, spec = floorSpec(x.c, site, 1, x.s.player, x.s.mine.day!.key);
+    x.s.bag = []; x.s.bag_cap = 25; x.s.bag.push({ id: 'torch', qty: 1 });
+    x.send({ type: 'mine_torch', floor: 1 });
+    const r = x.send({ type: 'mine_rock', floor: 1, rock: 1 });
+    const rock = r.events.find(e => e.kind === 'mine' && e.action === 'rock')!;
+    expect(rock).toMatchObject({ drops: spec.deck.slice(0, 2), drop: spec.deck[0] });
+    const gained = (id: string) => r.events.filter(e => e.kind === 'item' && e.id === id).reduce((n, e) => n + (e.kind === 'item' ? e.delta : 0), 0);
+    expect(gained('stone')).toBe(x.c.mine.picks.pick_copper.stone + spec.deck.slice(0, 2).filter(id => id === 'stone').length);
+    for (const id of new Set(spec.deck.slice(0, 2).filter(id => id && id !== 'stone') as string[]))
+      expect(gained(id)).toBe(spec.deck.slice(0, 2).filter(d => d === id).length);
+    // the second rock broken deals cards 2 and 3, whichever rock it is
+    expect(rockDrops(x.c, x.s, site, 1, 1)).toEqual(spec.deck.slice(2, 4));
+    const left = new Map<string, number>();
+    for (const id of spec.deck.slice(2)) if (id) left.set(id, (left.get(id) ?? 0) + 1);
+    expect(new Map(mineView(x.c, x.s, x.now).at!.floor_state.deck!)).toEqual(left);
+  });
+  it('a full bag stops a rock when either of its two cards has no room', () => {
+    // a player whose first rock deals two different cards, neither of them stone
+    let x = scenario(), spec = floorSpec(x.c, mineSite(x.c, Q)!, 1, 'p', '2026-11-02');
+    for (let p = 0; ; p++) {
+      x = scenario(); x.s.player = `q292-bag-${p}`; x.start();
+      spec = floorSpec(x.c, mineSite(x.c, Q)!, 1, x.s.player, x.s.mine.day!.key);
+      const [a, b] = spec.deck;
+      if (a && b && a !== b && a !== 'stone' && b !== 'stone') break;
+      if (p > 500) throw new Error('no such player');
+    }
+    const site = mineSite(x.c, Q)!, [a, b] = spec.deck as string[], fits = () => bagFitsFloor(x.c, x.s, site, 1, x.s.mine.day!.key);
+    const stack = (id: string) => room(x.c, { bag: [], bag_cap: 1, skills: x.s.skills }, id);
+    // three slots, each with room for exactly what the rock gives: it fits
+    const full = (qa: number, qb: number) => {
+      x.s.bag_cap = 3;
+      x.s.bag = [{ id: 'stone', qty: stack('stone') - x.c.mine.picks[x.s.gear.pick].stone }, { id: a, qty: qa }, { id: b, qty: qb }];
+    };
+    full(stack(a) - 1, stack(b) - 1); expect(fits()).toBe(true);
+    full(stack(a), stack(b) - 1); expect(fits()).toBe(false);   // the first card has no room
+    full(stack(a) - 1, stack(b)); expect(fits()).toBe(false);   // the second card has no room
+    expect(x.fail({ type: 'mine_rock', floor: 1, rock: 0 })).toMatchObject({ code: 'bag_full' });
   });
 });

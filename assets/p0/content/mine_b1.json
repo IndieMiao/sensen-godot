@@ -171,8 +171,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -213,8 +213,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -255,8 +255,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -297,8 +297,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -375,8 +375,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -414,8 +414,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -449,8 +449,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -559,7 +559,8 @@
       "attack_tempo_factor": 0.9,
       "max_targets": 4,
       "guard_fast_factor": 0.8,
-      "tempo_burst": 2
+      "tempo_burst": 2,
+      "rock_cards": 2
     },
     "fee_per_day": true
   },

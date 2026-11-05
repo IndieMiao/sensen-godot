@@ -60,7 +60,7 @@ export function floorSpec(c: P0Content, site: MineSite, floor: number, player: s
     if (existing) existing[1] += weight; else drops.push([site.mine.main, weight]);
   }
   const total = drops.reduce((n, [, weight]) => n + weight, 0);
-  const deck = Array.from({ length: rocks }, () => {
+  const deck = Array.from({ length: rocks * rockCards(c) }, () => {
     let pick = draw() * total;
     for (const [id, weight] of drops) { if (pick < weight) return id; pick -= weight; }
     return null;
@@ -120,19 +120,27 @@ export function leaveMine(c: P0Content, s: P0State, now: number): void {
 }
 export const stonePerRock = (c: P0Content, s: P0State) => c.mine.picks[s.gear.pick]?.stone ?? 1;
 export function weapon(c: P0Content, s: P0State) { return c.mine.combat.weapons[s.gear.weapon]; }
-/** Card number is the count already broken, never the selected rock's identity. */
-export function rockDrop(c: P0Content, s: P0State, site: MineSite, floor: number, card: number): string | null {
-  return floorSpec(c, site, floor, s.player, s.mine.day!.key).deck[card] ?? null;
+/** q(292): the cards each rock deals (rules.rock_cards, 1 when absent). */
+const rockCards = (c: P0Content) => c.mine.rules.rock_cards ?? 1;
+/** The cards the next rock deals: `broken` is the count already broken here, never the selected rock's identity —
+ * the n-th rock takes the deck's cards n·k … n·k + k − 1 (q(292): k = 2, each a draw from the floor's table). */
+export function rockDrops(c: P0Content, s: P0State, site: MineSite, floor: number, broken: number): (string | null)[] {
+  const k = rockCards(c);
+  return floorSpec(c, site, floor, s.player, s.mine.day!.key).deck.slice(broken * k, broken * k + k);
 }
 export function bagFitsFloor(c: P0Content, s: P0State, site: MineSite, floor: number, key: string): boolean {
   const spec = floorSpec(c, site, floor, s.player, key);
   const dealt = s.mine.day?.floors[floorKey(site.id, floor)]?.broken.length ?? 0;
   if (dealt >= spec.rocks) return true;
-  const extra = spec.deck[dealt], trial: BagHolder = { bag: structuredClone(s.bag), bag_cap: s.bag_cap, skills: s.skills };
+  const k = rockCards(c), trial: BagHolder = { bag: structuredClone(s.bag), bag_cap: s.bag_cap, skills: s.skills };
   const stone = stonePerRock(c, s);
   if (room(c, trial, 'stone') < stone) return false;
   add(c, trial, 'stone', stone);
-  if (extra && room(c, trial, extra) < 1) return false;
+  for (const extra of spec.deck.slice(dealt * k, dealt * k + k)) {
+    if (!extra) continue;
+    if (room(c, trial, extra) < 1) return false;
+    add(c, trial, extra, 1);
+  }
   return true;
 }
 function canPay(c: P0Content, s: P0State, site: MineSite, floor: number, now: number): Refusal | null {
@@ -217,11 +225,13 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
   if (ready > 0) return { code: 'tempo', detail: { ready_in: Math.ceil(ready) } };
   if (!bagFitsFloor(c, s, site, at.floor, day.key)) return { code: 'bag_full', detail: { floor: at.floor } };
   if (s.energy.value < c.mine.rock_energy) return { code: 'need_energy', detail: energyDetail(c, s, now, c.mine.rock_energy) };
-  const drop = rockDrop(c, s, site, at.floor, state.broken.length);
+  const drops = rockDrops(c, s, site, at.floor, state.broken.length);
   spendEnergy(c, s, now, c.mine.rock_energy, events, 'mine_rock');
-  giveLoot(c, s, 'stone', stonePerRock(c, s), events); if (drop) giveLoot(c, s, drop, 1, events);
+  giveLoot(c, s, 'stone', stonePerRock(c, s), events);
+  for (const drop of drops) if (drop) giveLoot(c, s, drop, 1, events);
   state.broken.push(rock); day.swing_at = booked(day.swing_at, c.mine.rules.rock_tempo_ms, now);
-  events.push({ kind: 'mine', action: 'rock', mine: site.id, floor: at.floor, rock, drop, cost: c.mine.rock_energy });
+  // drop: the first card (the event's field before q(292)); drops: every card this rock dealt
+  events.push({ kind: 'mine', action: 'rock', mine: site.id, floor: at.floor, rock, drop: drops[0] ?? null, drops, cost: c.mine.rock_energy });
   return null;
 }
 
@@ -371,7 +381,7 @@ export function mineView(c: P0Content, s: P0State, now: number) {
       stations: stops.map(floor => ({ floor, paid: day.floors[floorKey(site.id, floor)]?.paid ?? false })),
       floor_state: { floor: at.floor, paid: state.paid, cleared, rocks: spec.rocks, left: spec.rocks - state.broken.length,
         broken: Array.from({ length: spec.rocks }, (_, i) => state.broken.includes(i)), lit: state.lit,
-        deck: state.lit ? deckCounts(spec.deck.slice(state.broken.length)) : null,
+        deck: state.lit ? deckCounts(spec.deck.slice(state.broken.length * rockCards(c))) : null,
         ground: state.ground.map(g => ({ ...g })),
         bag_ok: bagFitsFloor(c, s, site, at.floor, day.key), station: stops.includes(at.floor), guard: spec.guard,
         mobs: spec.mobs.map((kind, i) => ({ kind, hp: state.mobs[i], max: maxHp(c, kind, spec.hpMult), elite: !!c.mine.monsters[kind].elite,

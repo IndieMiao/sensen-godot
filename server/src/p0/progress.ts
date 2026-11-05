@@ -63,7 +63,7 @@ export type P0Event =
   | { kind: 'gear'; item: string; equipped: boolean }
   | { kind: 'heal'; hp: number; item: string }   // 355 G §9.4: a potion drunk in the mine, hp after it
   | { kind: 'mine'; action: 'torch' | 'rock' | 'hit' | 'hurt'; mine: string; floor: number; cost: number;
-      rock?: number; drop?: string | null;
+      rock?: number; drop?: string | null; drops?: (string | null)[];
       mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
   | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'weapon' }
