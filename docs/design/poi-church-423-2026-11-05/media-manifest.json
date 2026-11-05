@@ -1,0 +1,88 @@
+[
+  {
+    "file": "SGODOT-423_church_v1_corner_bottom_left.png",
+    "bytes": 10557,
+    "sha256": "41a971b2f3922a6b23011fbab6fbc0510e43ad2c5555ccaa86ccceda4e30c602",
+    "size": [
+      400,
+      420
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_corner_bottom_right.png",
+    "bytes": 10111,
+    "sha256": "a790812ff687a371536e77a42bf42fc3cf1efe1bea890aab1362f5cfefb42b52",
+    "size": [
+      400,
+      420
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_corner_top_left.png",
+    "bytes": 12818,
+    "sha256": "e4a90b0f4fc2c2313d6c8fc06d6dfbe96cf311af75b5a3d5a2ee8d04e332474b",
+    "size": [
+      400,
+      420
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_corner_top_right.png",
+    "bytes": 19831,
+    "sha256": "862fffeeaba864f83114dc0237e64700ca77d791fcb38bc8e610b95cfc4e1072",
+    "size": [
+      400,
+      420
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_default_360x800.png",
+    "bytes": 267824,
+    "sha256": "a818736759c16c1243e9756ec292db5883992b86438639f70f757801a4893e55",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_labyrinth_readability.png",
+    "bytes": 266566,
+    "sha256": "ccc948b90a75218a4bdf02159eea7fc1a9e9514784d9514c9d2da0ddade610a2",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_overview.png",
+    "bytes": 1040839,
+    "sha256": "8a8c1700ddc5deeca20f67e6d6f314ae2b0872e374168d8a8bd0039047e16d9d",
+    "size": [
+      1400,
+      1200
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_tea_same_scale.png",
+    "bytes": 501799,
+    "sha256": "98f1e3ec8aecefd95a036cc4f7a0f16dfebdf25d4c958bf323982497830416f4",
+    "size": [
+      780,
+      890
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_topdown_routes_seats.png",
+    "bytes": 993053,
+    "sha256": "2fa9841c5240d3445417174d76b186acc38f51ff0b8160fd2680f4bf11132b74",
+    "size": [
+      1400,
+      1400
+    ]
+  },
+  {
+    "file": "SGODOT-423_church_v1_validation.json",
+    "bytes": 56758,
+    "sha256": "56afaf816f9af3d1a8f28487d2c390330b817bbd5ecf9f5858db783adc17ce71"
+  }
+]
