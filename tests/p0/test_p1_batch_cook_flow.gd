@@ -405,11 +405,13 @@ func test_the_watched_pot_is_a_layer_in_the_middle() -> void:
 	assert_bool(layer.visible).is_true()
 	assert_bool(pot.visible).is_false()
 	_land(k)
+	assert_int(layer.view.render_target_update_mode).is_equal(SubViewport.UPDATE_ALWAYS)   # drawn every frame: it tumbles
 	assert_vector(layer.mouth_screen()).is_equal_approx(P0WaitPot.MOUTH, Vector2.ONE * 0.5)
 	assert_vector(k.call("_ring_center")).is_equal_approx(P0WaitPot.MOUTH, Vector2.ONE * 0.5)
 	k.stop_watching()
 	_land(k)
 	assert_bool(layer.visible).is_false()
+	assert_int(layer.view.render_target_update_mode).is_equal(SubViewport.UPDATE_DISABLED)   # hidden: not drawn (周瑜)
 	assert_bool(pot.visible).is_true()
 
 ## The pot layer's flight (in or back, P0WaitPot.FLY_S) run to its end at once: the tests never race its clock.
