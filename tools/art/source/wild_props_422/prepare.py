@@ -11,11 +11,14 @@ if not (QA/'stage.json').exists():
  (PROJECT/'docs/.gdignore').touch();(PROJECT/'tools/art/source/.gdignore').touch()
  (QA/'stage.json').write_text(json.dumps(dict(runtime_head=BASE,art_base='93befb18cd5af7e30a966d2c112279287b71b3e2',scope='Private P0Pond fixture, native lighting/player/HUD/camera. No runtime gameplay files committed.'),indent=2)+'\n')
 stats=json.loads((HERE/'asset_stats.json').read_text())
-for name in list(stats['assets'])+['flax_patch','reed_bank']:
+for name in list(stats['assets'])+['flax_patch','reed_bank','hardwood_grove']:
  for suffix in ['.glb','.glb.import']:
   path=ROOT/'assets/farm/art'/(name+suffix)
   if path.exists():shutil.copy2(path,PROJECT/'assets/farm/art'/path.name)
-for name in ['review.gd','review_pond.gd','configure.gd','scatter.gd','density.json']:
+for name in ['hardwood_grove_import.gd','hardwood_grove_import.gd.uid']:
+ path=ROOT/'assets/farm/art'/name
+ if path.exists():shutil.copy2(path,PROJECT/'assets/farm/art'/name)
+for name in ['review.gd','review_pond.gd','configure.gd','scatter.gd','perimeter_trees.gd','density.json']:
  if (HERE/name).exists():shutil.copy2(HERE/name,PROJECT/name)
 shutil.copy2(HERE/'reference/pond_slots_v2.json',PROJECT/'pond_slots_v2.json')
 shutil.copy2(ROOT/'tools/art/source/reed_clay_416/reference/zz_spot_art_old.gd',PROJECT/'zz_spot_art_old.gd')

@@ -3520,6 +3520,122 @@
         "specular": 0.18,
         "vertex_color_is_srgb": false
       }
+    },
+    "wild_tree_pine": {
+      "triangles": 238,
+      "surfaces": 1,
+      "bytes": 7296,
+      "bounds_blender": [
+        [
+          -0.58,
+          -0.58,
+          0.0
+        ],
+        [
+          0.58,
+          0.58,
+          2.62
+        ]
+      ],
+      "bounds": [
+        [
+          -0.58,
+          0.0,
+          -0.58
+        ],
+        [
+          0.58,
+          2.62,
+          0.58
+        ]
+      ],
+      "generator": "tools/art/build_wild_trees_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "single non-interactive decorative tree",
+      "collision": "none",
+      "sha256": "eefc29387ff6141238cc8e30030fef053fc35fb1558380c13ab578bdd971dec6",
+      "source": "tools/art/source/wild_props_422/wild_trees.blend",
+      "palette_srgb": {
+        "pine_bark": "AD9879",
+        "pine_bark_light": "C3AE8D",
+        "pine_lower": "496940",
+        "pine_mid": "57784A",
+        "pine_top": "6A8855"
+      },
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      },
+      "silhouette": "single trunk, three pointed foliage tiers",
+      "replacement": "pond perimeter decoration only; never substitute Timber/Hardwood resource GLBs"
+    },
+    "wild_tree_round": {
+      "triangles": 228,
+      "surfaces": 1,
+      "bytes": 7920,
+      "bounds_blender": [
+        [
+          -0.67,
+          -0.61,
+          0.0
+        ],
+        [
+          0.67,
+          0.61,
+          2.285
+        ]
+      ],
+      "bounds": [
+        [
+          -0.67,
+          0.0,
+          -0.61
+        ],
+        [
+          0.67,
+          2.285,
+          0.61
+        ]
+      ],
+      "generator": "tools/art/build_wild_trees_422.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "purpose": "single non-interactive decorative tree",
+      "collision": "none",
+      "sha256": "aeeff8052f6a9ceed669705ea8e6d02f0080575a67b90e797fc18b365034b2ca",
+      "source": "tools/art/source/wild_props_422/wild_trees.blend",
+      "palette_srgb": {
+        "round_bark": "C3AB84",
+        "round_bark_light": "D4BF99",
+        "round_lower": "89973F",
+        "round_mid": "A0AD4A",
+        "round_top": "B4BC62"
+      },
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      },
+      "silhouette": "single pale trunk, one broad rounded crown",
+      "replacement": "pond perimeter decoration only; never substitute Timber/Hardwood resource GLBs"
     }
   }
 }

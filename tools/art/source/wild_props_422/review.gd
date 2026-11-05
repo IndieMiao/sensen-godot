@@ -70,6 +70,9 @@ func run() -> void:
 		pond.add_child(item);resources.append(item)
 	await capture("opening_before")
 	var scatter=load("res://scatter.gd").new(pond,active)
+	report.perimeter_trees=load("res://perimeter_trees.gd").new().build(pond,scatter,resources)
+	check(report.perimeter_trees.replacements.size()==6 and report.perimeter_trees.original_hidden,"six native decoration trees replaced in preview")
+	check(report.perimeter_trees.all_clear,"tree crowns clear active slots and default resource projections; trunks remain outside walkable area")
 	report.scatter=scatter.build()
 	check(report.scatter.foreground_group_placed,"left foreground log/mushroom/fern group fully inside screen above y720")
 	check(report.scatter.corner_groups>=2 and report.scatter.corner_groups<=3,"2-3 corner groups")
@@ -93,14 +96,27 @@ func run() -> void:
 		var at:=Vector3(2.4+i*2.4,0,7.2)
 		var item: Node3D=Old.build(id,at) if id.begins_with("spot_") else Art.instance(id,at)
 		pond.add_child(item);report.gallery.append({"asset":id,"resource":true,"screen_rect":screen_rect(item),"label_at":pond.cam.unproject_position(at+Vector3(0,0,.7))})
-	var names: Array=JSON.parse_string(FileAccess.get_file_as_string("res://wild_asset_stats.json")).assets.keys()
+	var names: Array=JSON.parse_string(FileAccess.get_file_as_string("res://wild_asset_stats.json")).assets.keys().filter(func(n):return not str(n).begins_with("wild_tree_"))
+	var gallery_nodes: Array=[]
 	for i in names.size():
 		var at:=Vector3(1.5+(i%6)*1.8,0,10.7+(i/6)*2.5)
-		var item:=Art.instance(names[i],at);pond.add_child(item)
+		var item:=Art.instance(names[i],at);pond.add_child(item);gallery_nodes.append(item)
 		if names[i]=="wild_log_moss":item.rotation.y=.45
 		validate(item,names[i])
 		report.gallery.append({"asset":names[i],"resource":false,"screen_rect":screen_rect(item),"label_at":pond.cam.unproject_position(at+Vector3(0,0,.62))})
 	await capture("all_props_resources")
+	for item in gallery_nodes:item.visible=false
+	# Two single decorative silhouettes versus the two harvestable wood resources, unit scale.
+	vp.size=Vector2i(1500,900);pond.cam.size=8.4;pond.cam.position=Vector3(6,1.12,20)+pond.cam.basis.z*40
+	report.tree_gallery=[]
+	for i in 4:
+		var id: String=["wild_tree_pine","wild_tree_round","spot_grove","hardwood_grove"][i]
+		var at:=Vector3(2.85+i*2.1,0,20)
+		var item: Node3D=Old.build(id,at) if id=="spot_grove" else Art.instance(id,at)
+		pond.add_child(item)
+		if id.begins_with("wild_tree_"):validate(item,id)
+		report.tree_gallery.append({"asset":id,"resource":not id.begins_with("wild_tree_"),"screen_rect":screen_rect(item),"label_at":pond.cam.unproject_position(at+Vector3(0,0,.75))})
+	await capture("tree_comparison")
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
 	check(report.renderer.method=="mobile","Mobile renderer")
 	report.passed=report.checks.all(func(c):return c.passed)
