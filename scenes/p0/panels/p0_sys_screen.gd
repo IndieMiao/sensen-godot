@@ -2,9 +2,11 @@ class_name P0SysScreen
 extends Control
 ## Whole-screen system states (WP6 E-03, §10.7.1; SGODOT-233). Each takes the whole screen and every touch; no HUD,
 ## no ✕. Laid out on the 360 × 800 frame of page 14:
-##   LAUNCH      SYS-LOADING 1243:108594 — the farm backdrop, its fade, the wordmark at y 330; after 8 s the spinner
-##               and `Taking longer than usual…` under it (SYS-LOADING-2 1243:108614)
-##   FAIL        SYS-LOADING-FAIL 1243:108638 — wordmark at y 84, SystemCard `Can't connect` · Retry
+##   LAUNCH      the splash art (q(290), 不知火舞's spec v1, 302 c9986a33): its bottom on the screen's, cut only from the sky
+##               at the top, or on a wider screen fitted under the status bar over its own blurred copy (splash_layout);
+##               no wordmark over it (the art has one). It fades in from the sky colour; after 8 s the spinner and
+##               `Taking longer than usual…` on a small card above the art's Gensen mark (SYS-LOADING-2)
+##   FAIL        the same art under the modal scrim, SystemCard `Can't connect` · Retry (SYS-LOADING-FAIL, no wordmark)
 ##   MAINT       SYS-MAINT 1245:87657 — `Down for maintenance` · `We'll be back around 14:30.` · Check again
 ##   UPDATE      SYS-UPDATE 1245:87698 — `Update to keep playing` · `This version is out of date.` · Update
 ##   SCENE       SYS-LOADING-SCENE 1245:87648 — the screen behind, blurred, under the modal scrim; the spinner and
@@ -20,6 +22,24 @@ signal secondary_pressed(kind: Kind)
 enum Kind { LAUNCH, FAIL, MAINT, UPDATE, SCENE, PLACE_FAIL }
 
 const BACKDROP := preload("res://assets/p0/ui/sys_backdrop_farm.jpg")
+## q(290): the splash art (the user's v2, 747 × 1618; the formula reads it as 375 × 812) and its pre-rendered
+## blurred copy (radius about 20 px, 6 % darker, half size) for the sides a wide screen shows.
+const SPLASH := preload("res://assets/p0/ui/splash.jpg")
+const SPLASH_BLUR := preload("res://assets/p0/ui/splash_blur.png")
+const SPLASH_SKY := Color("61bbfa")   # the art's sky at its top: the system splash and the engine's first frames too
+const SPLASH_SIZE := Vector2(375, 812)
+## The Gen Sen wordmark's top (its spark too), in the 375-wide rows: measured on the v2 art (79 on v1; 周瑜 / 不知火舞 on
+## #767) — measure again with a new art.
+const SPLASH_MARK_TOP := 85.0
+const SPLASH_MARK_GAP := 8.0     # … kept this far under the status bar
+const SPLASH_LOGO_TOP := 752.0   # the small Gensen mark at the bottom: the slow card ends 16 above it
+const SPLASH_CARD_GAP := 16.0
+const SPLASH_CARD_PAD := Vector2(16, 12)
+const SPLASH_CARD_ALPHA := 0.9
+const SPLASH_CARD_RADIUS := 16
+const SPLASH_FADE_IN := 0.2      # from the sky colour, the first time it shows
+const SPLASH_FADE_OUT := 0.3     # into the first scene
+const SPLASH_MIN_S := 0.8        # shown at least this long, the fade-in in it: a quick launch does not flash it
 const CLOCK := preload("res://assets/p0/icons/clock.svg")
 const WIFI_OFF := preload("res://assets/ui/kit_icons/wifi_off.svg")
 const SLOW_TEXT := "Taking longer than usual…"
@@ -43,8 +63,16 @@ var slow := false
 var card: UiSystemCard
 var spinner: UiSpinner
 
+## The status bar's height (P0Ui.safe_top): the fitted splash keeps the wordmark under it.
+var status_top := 0.0
+
+var _bg: ColorRect
 var _art: TextureRect
 var _fade: TextureRect
+var _splash: TextureRect
+var _splash_blur: TextureRect
+var _slow_card: Panel
+var _splash_since := -1   # msec the splash first showed, -1 before
 var _shot: TextureRect
 var _scrim: ColorRect
 var _mark: UiWordmark
@@ -55,11 +83,26 @@ var _return_main: UiDismissButton
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP   # a system state takes every touch
 	theme = UiKit.theme()
-	var bg := ColorRect.new()
-	bg.color = UiTokens.COLOR_SURFACE
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
+	_bg = ColorRect.new()
+	_bg.color = UiTokens.COLOR_SURFACE
+	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_bg)
+	_splash_blur = TextureRect.new()
+	_splash_blur.name = "SplashBlur"
+	_splash_blur.texture = SPLASH_BLUR
+	_splash_blur.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_splash_blur.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_splash_blur.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_splash_blur.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_splash_blur)
+	_splash = TextureRect.new()
+	_splash.name = "Splash"
+	_splash.texture = SPLASH
+	_splash.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_splash.stretch_mode = TextureRect.STRETCH_SCALE
+	_splash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_splash)
 	_art = TextureRect.new()
 	_art.texture = BACKDROP
 	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -93,6 +136,11 @@ func _init() -> void:
 	add_child(_scrim)
 	_mark = UiWordmark.new()
 	add_child(_mark)
+	_slow_card = Panel.new()
+	_slow_card.name = "SlowCard"
+	_slow_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_slow_card.add_theme_stylebox_override(&"panel", UiStyleBox.make(Color(UiTokens.COLOR_SURFACE, SPLASH_CARD_ALPHA), SPLASH_CARD_RADIUS))
+	add_child(_slow_card)
 	spinner = UiSpinner.new()
 	add_child(spinner)
 	_caption = UiKit.label(SLOW_TEXT, UiTokens.STYLE_C13_B, UiTokens.COLOR_SECONDARY)
@@ -138,11 +186,23 @@ func show_kind(k: Kind, d := {}) -> void:
 	# The scene cover and its failure stay on the blurred screen being left: the player is still in the game, so no
 	# launch backdrop or wordmark (不知火舞 233 walkthrough).
 	var scene := k in [Kind.SCENE, Kind.PLACE_FAIL]
-	_art.visible = not scene
-	_fade.visible = not scene
+	var splash := k in [Kind.LAUNCH, Kind.FAIL]   # q(290): the splash art in place of the farm backdrop and wordmark
+	_bg.color = SPLASH_SKY if splash else UiTokens.COLOR_SURFACE
+	_splash.visible = splash
+	if splash and _splash_since < 0:   # the first time: in from the sky colour
+		_splash_since = Time.get_ticks_msec()
+		for t in [_splash, _splash_blur]: (t as CanvasItem).modulate.a = 0.0
+		if is_inside_tree():
+			var tw := create_tween().set_parallel()
+			for t in [_splash, _splash_blur]: tw.tween_property(t, ^"modulate:a", 1.0, SPLASH_FADE_IN)
+		else:
+			for t in [_splash, _splash_blur]: (t as CanvasItem).modulate.a = 1.0
+	_art.visible = not scene and not splash
+	_fade.visible = not scene and not splash
 	_shot.visible = scene
-	_scrim.visible = scene
-	_mark.visible = not scene
+	_scrim.visible = scene or k == Kind.FAIL
+	_mark.visible = not scene and not splash
+	_slow_card.visible = false
 	_place.visible = k == Kind.SCENE
 	_place.text = str(d.get("place", ""))
 	_shot.texture = d.get("shot", null)
@@ -178,19 +238,49 @@ static func card_spec(k: Kind, d := {}) -> Dictionary:
 				body = "Check your connection and try again.", primary = "Retry", secondary = "Go back"}
 	return {}
 
-## 8 s in: the spinner and `Taking longer than usual…` (LOADING-2); white on the scene's scrim.
+## 8 s in: the spinner and `Taking longer than usual…` (LOADING-2); white on the scene's scrim, on a small surface card
+## over the launch's splash (q(290)).
 func taking_longer() -> void:
 	if not kind in [Kind.LAUNCH, Kind.SCENE]: return
 	slow = true
 	spinner.visible = true
 	_caption.visible = true
+	_slow_card.visible = kind == Kind.LAUNCH
 	_caption.add_theme_color_override(&"font_color", UiTokens.COLOR_SURFACE_RAISED if kind == Kind.SCENE else UiTokens.COLOR_SECONDARY)
 	_layout()
+
+## q(290)'s one formula: the art's bottom on the screen's, centred. Covering (s = the larger of the two fits) while the
+## wordmark's top still sits SPLASH_MARK_GAP under the status bar — only the sky and the sides are cut (20:9, 19.5:9,
+## 21:9); else (a wider screen: 18:9, 16:9, an iPad) s = (h − status − gap) ÷ (812 − mark top), the wordmark right there and
+## the sides showing the blurred copy. {scale, origin (the art's top-left on screen), fit}.
+static func splash_layout(screen: Vector2, status := 0.0) -> Dictionary:
+	var s := maxf(screen.x / SPLASH_SIZE.x, screen.y / SPLASH_SIZE.y)
+	var fit := screen.y - SPLASH_SIZE.y * s + SPLASH_MARK_TOP * s < status + SPLASH_MARK_GAP
+	if fit: s = (screen.y - status - SPLASH_MARK_GAP) / (SPLASH_SIZE.y - SPLASH_MARK_TOP)
+	return {"scale": s, "origin": Vector2((screen.x - SPLASH_SIZE.x * s) * 0.5, screen.y - SPLASH_SIZE.y * s), "fit": fit}
+
+## Takes a launch splash down into the scene under it: at least SPLASH_MIN_S after it first showed, then a 300 ms fade;
+## the layer it is on goes with it. It takes no more touches from now (the caller has already let go of it).
+func leave(layer: Node) -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for c in find_children("*", "Control", true, false): (c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not is_inside_tree():
+		layer.queue_free()
+		return
+	var shown := (Time.get_ticks_msec() - _splash_since) / 1000.0 if _splash_since >= 0 else SPLASH_MIN_S
+	var tw := create_tween()
+	if shown < SPLASH_MIN_S: tw.tween_interval(SPLASH_MIN_S - shown)
+	tw.tween_property(self, ^"modulate:a", 0.0, SPLASH_FADE_OUT)
+	tw.tween_callback(layer.queue_free)
 
 func _layout() -> void:
 	var w := size.x
 	var h := size.y if size.y > 0.0 else _FRAME_H
 	var k := h / _FRAME_H   # the frame's heights on a taller or shorter screen
+	var sl := splash_layout(Vector2(w, h), status_top)
+	_splash.position = (sl.origin as Vector2).round()
+	_splash.size = (SPLASH_SIZE * float(sl.scale)).round()
+	_splash_blur.visible = _splash.visible and bool(sl.fit)
 	_art.position = Vector2(0, roundf(_ART_TOP * k))
 	_art.size = Vector2(w, h)
 	var mark_size := _mark.get_combined_minimum_size()
@@ -205,6 +295,15 @@ func _layout() -> void:
 	var caption_top := (mark_top + _CAPTION_BELOW) if kind == Kind.LAUNCH else _place.position.y + _place.get_combined_minimum_size().y + 4.0
 	_caption.position = Vector2(0, caption_top)
 	_caption.size = Vector2(w, 0)
+	if kind == Kind.LAUNCH:   # q(290): spinner over caption on the slow card, its bottom 16 above the art's Gensen mark
+		var cap := _caption.get_combined_minimum_size()
+		var inner := Vector2(maxf(cap.x, UiSpinner.SIDE), UiSpinner.SIDE + 8.0 + cap.y)
+		var box := inner + SPLASH_CARD_PAD * 2.0
+		var bottom := float((sl.origin as Vector2).y) + SPLASH_LOGO_TOP * float(sl.scale) - SPLASH_CARD_GAP
+		_slow_card.size = box.round()
+		_slow_card.position = Vector2(roundf((w - box.x) * 0.5), roundf(bottom - box.y))
+		spinner.position = Vector2(roundf((w - UiSpinner.SIDE) * 0.5), _slow_card.position.y + SPLASH_CARD_PAD.y)
+		_caption.position = Vector2(0, spinner.position.y + UiSpinner.SIDE + 8.0)
 	var card_size := card.get_combined_minimum_size()
 	card.position = Vector2(roundf((w - card_size.x) * 0.5), roundf((h - card_size.y) * 0.5))
 	card.size = card_size
