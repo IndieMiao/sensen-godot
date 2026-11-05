@@ -168,10 +168,13 @@ func _load_with_feedback(scene_path: String, args := {}) -> PackedScene:
 	var error := ResourceLoader.load_threaded_request(scene_path, "PackedScene")
 	if error == OK:
 		var started := Time.get_ticks_msec()
-		while ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		var done := []   # the threaded load's own progress, for an overlay with a bar (P0LoadingLayer.progress)
+		while ResourceLoader.load_threaded_get_status(scene_path, done) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			if _loading.has_method(&"progress") and not done.is_empty(): _loading.call(&"progress", float(done[0]))
 			if Time.get_ticks_msec() - started > 30000: break
 			await get_tree().process_frame
 		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
+			if _loading.has_method(&"progress"): _loading.call(&"progress", 1.0)
 			return ResourceLoader.load_threaded_get(scene_path) as PackedScene
 	_loading.failed()
 	_loading.close_button.pressed.connect(_clear_transition, CONNECT_ONE_SHOT)
@@ -190,7 +193,11 @@ func _end_transition() -> void:
 
 
 func _clear_transition() -> void:
-	if is_instance_valid(_loading):
+	# An overlay with finish() (P0LoadingLayer) fills its bar and fades itself out, taking no touch meanwhile; any
+	# other goes at once. Either way the navigation is over now.
+	if is_instance_valid(_loading) and _loading.has_method(&"finish") and not _loading.close_button.visible:
+		_loading.call(&"finish")
+	elif is_instance_valid(_loading):
 		remove_child(_loading)
 		_loading.queue_free()
 	_loading = null

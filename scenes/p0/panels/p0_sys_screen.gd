@@ -9,10 +9,12 @@ extends Control
 ##   FAIL        the same art under the modal scrim, SystemCard `Can't connect` · Retry (SYS-LOADING-FAIL, no wordmark)
 ##   MAINT       SYS-MAINT 1245:87657 — `Down for maintenance` · `We'll be back around 14:30.` · Check again
 ##   UPDATE      SYS-UPDATE 1245:87698 — `Update to keep playing` · `This version is out of date.` · Update
-##   SCENE       SYS-LOADING-SCENE 1245:87648 — the screen behind, blurred, under the modal scrim; the spinner and
-##               the destination (`San Francisco · Reed Pond`) in white; after 8 s `Taking longer than usual…`
-##   PLACE_FAIL  SYS-LOADING-SCENE-FAIL 1780:103778 (q(78)): getting to a place failed, over the same blurred screen;
-##               `Couldn't get there` · Retry (the same place again) · Go back (where the player came from; Back too)
+##   SCENE       SYS-LOADING-SCENE, the town map (不知火舞's spec v1 + 425 120c7163, frame L123v2; the user 11-06 00:40):
+##               the illustrated town under a 15 % surface haze; on the centre line the destination's pin, the place
+##               (`San Francisco · Reed Pond`) on a white pill and a 200 × 8 progress bar; after 8 s `Taking longer than
+##               usual…` on its own pill under the bar. No spinner.
+##   PLACE_FAIL  SYS-LOADING-SCENE-FAIL 1780:103778 (q(78)): getting to a place failed, over the same map under the modal
+##               scrim; `Couldn't get there` · Retry (the same place again) · Go back (where the player came from; Back too)
 ## show_kind(kind, detail) draws one; `primary_pressed(kind)` is its card's button.
 
 signal primary_pressed(kind: Kind)
@@ -43,6 +45,29 @@ const SPLASH_MIN_S := 0.8        # shown at least this long, the fade-in in it: 
 const CLOCK := preload("res://assets/p0/icons/clock.svg")
 const WIFI_OFF := preload("res://assets/ui/kit_icons/wifi_off.svg")
 const SLOW_TEXT := "Taking longer than usual…"
+## The scene cover's town map (上官婉儿, Sensenjoy, 1080 × 2340, the centre left plain; 不知火舞 425), covering the screen.
+## Loaded when a scene cover shows, not with the script (the launch screen is this script too): about 10 MB once decoded,
+## held only while a cover is up.
+const SCENE_MAP := "res://assets/ui/loading/loading_town_map.jpg"
+const SCENE_HAZE := 0.15         # a surface haze over the map: the pin and the pills read on it
+## On the 360 × 800 frame's centre line, kept on the screen's centre (y − 400 from it): the pin's disc ends at 360 (it
+## drops 20 into place with a little bounce), the place pill's centre at 410, the bar 444–452, the slow pill's centre 472.
+const SCENE_PIN_BOTTOM := 360.0
+const SCENE_PIN_SIDE := 40.0
+const SCENE_PIN_ICON := 24.0
+const SCENE_PIN_DROP := 20.0
+const SCENE_PIN_DROP_S := 0.25
+const SCENE_PILL_MID := 410.0
+const SCENE_PILL_H := 36.0
+const SCENE_PILL_PAD := 16.0
+const SCENE_PILL_MAX := 328.0
+const SCENE_BAR_TOP := 444.0
+const SCENE_BAR := Vector2(200, 8)
+const SCENE_SLOW_MID := 472.0
+const SCENE_SLOW_H := 24.0
+const SCENE_SLOW_PAD := 12.0
+## The pills and the pin's disc: solid surface, a 1 px border edge and a soft shadow (0, 2, 8, black 12 %; 425 120c7163).
+const SCENE_SHADOW := Color(0, 0, 0, 0.12)
 
 const _FRAME_H := 800.0
 const _ART_TOP := 330.0          # Scene art · farm (backdrop) at y 330, 360 × 800, cropped by the screen
@@ -50,10 +75,7 @@ const _MARK_TOP_LAUNCH := 330.0  # the wordmark alone, a little above the middle
 const _MARK_TOP := 84.0          # over a SystemCard
 const _SPINNER_BELOW := 66.0     # spinner at y 396 under the launch wordmark at 330
 const _CAPTION_BELOW := 104.0    # caption at y 434
-const _SCENE_SPINNER := 370.0
-const _SCENE_TEXT := 410.0
-const _SCENE_TEXT_SIZE := 18     # Destination ExtraBold 18 white, 0 2 6 shadow
-const _SCENE_SHADOW_Y := 2
+const _SCENE_TEXT_SIZE := 18     # Destination ExtraBold 18, text colour, on its pill
 const _BLUR_LOD := 3.5           # SYS-LOADING-SCENE's layer blur 10: the screen behind read from a low mip
 const _BLUR_SHADER := "shader_type canvas_item;\nuniform float lod = 3.5;\nvoid fragment() { COLOR = textureLod(TEXTURE, UV, lod); }\n"
 
@@ -62,6 +84,11 @@ var detail := {}
 var slow := false
 var card: UiSystemCard
 var spinner: UiSpinner
+## The scene cover's bar, 0–1 as drawn (P0LoadingLayer eases it toward the load's progress).
+var progress := 0.0:
+	set(v):
+		progress = clampf(v, 0.0, 1.0)
+		if _bar_fill: _bar_fill.size.x = roundf(SCENE_BAR.x * progress)
 
 ## The status bar's height (P0Ui.safe_top): the fitted splash keeps the wordmark under it. Laid out again when it
 ## changes (a cold start reads it only once the screen is in the tree).
@@ -83,6 +110,15 @@ var _mark: UiWordmark
 var _caption: Label
 var _place: Label
 var _return_main: UiDismissButton
+var _map: TextureRect
+var _haze: ColorRect
+var _pin: Panel
+var _pin_icon: TextureRect
+var _place_pill: Panel
+var _bar_track: Panel
+var _bar_fill: Panel
+var _slow_pill: Panel
+var _pin_drop := 0.0   # the pin's drop still to fall (SCENE_PIN_DROP → 0 as it lands)
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP   # a system state takes every touch
@@ -120,6 +156,18 @@ func _init() -> void:
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_fade)
+	_map = TextureRect.new()
+	_map.name = "SceneMap"
+	_map.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_map.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_map.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_map.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_map)
+	_haze = ColorRect.new()
+	_haze.color = Color(UiTokens.COLOR_SURFACE, SCENE_HAZE)
+	_haze.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_haze.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_haze)
 	_shot = TextureRect.new()
 	_shot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_shot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -151,14 +199,33 @@ func _init() -> void:
 	_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_caption)
-	_place = UiKit.label("", UiTokens.STYLE_TITLE_XB20, UiTokens.COLOR_SURFACE_RAISED)
+	_pin = _scene_panel("ScenePin", SCENE_PIN_SIDE * 0.5, UiTokens.COLOR_PRIMARY, 2.0)
+	_pin_icon = TextureRect.new()
+	_pin_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_pin_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_pin_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_pin_icon.position = Vector2.ONE * (SCENE_PIN_SIDE - SCENE_PIN_ICON) * 0.5
+	_pin_icon.size = Vector2.ONE * SCENE_PIN_ICON
+	_pin.add_child(_pin_icon)
+	_place_pill = _scene_panel("PlacePill", SCENE_PILL_H * 0.5)
+	_bar_track = Panel.new()
+	_bar_track.name = "SceneBar"
+	_bar_track.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bar_track.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_BORDER, SCENE_BAR.y * 0.5))
+	add_child(_bar_track)
+	_bar_fill = Panel.new()
+	_bar_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bar_fill.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY, SCENE_BAR.y * 0.5))
+	_bar_fill.size = Vector2(0, SCENE_BAR.y)
+	_bar_track.add_child(_bar_fill)
+	_slow_pill = _scene_panel("SlowPill", SCENE_SLOW_H * 0.5)
+	_place = UiKit.label("", UiTokens.STYLE_TITLE_XB20, UiTokens.COLOR_TEXT)
 	_place.add_theme_font_size_override(&"font_size", _SCENE_TEXT_SIZE)
-	_place.add_theme_color_override(&"font_shadow_color", UiTokens.COLOR_SHADOW_CARD)
-	_place.add_theme_constant_override(&"shadow_offset_y", _SCENE_SHADOW_Y)
-	_place.add_theme_constant_override(&"shadow_offset_x", 0)
 	_place.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_place.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_place.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_place)
+	move_child(_caption, -1)   # over the slow pill
 	card = UiSystemCard.new()
 	card.primary_pressed.connect(func(): primary_pressed.emit(kind))
 	card.secondary_pressed.connect(func(): secondary_pressed.emit(kind))
@@ -166,6 +233,19 @@ func _init() -> void:
 	add_child(card)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	resized.connect(_layout)
+
+## A scene-cover pill or the pin's disc: solid surface, 1 px edge (border, or the pin's primary ring), soft shadow.
+func _scene_panel(id: String, radius: float, edge := UiTokens.COLOR_BORDER, width := 1.0) -> Panel:
+	var p := Panel.new()
+	p.name = id
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, edge, width)
+	box.shadow_color = SCENE_SHADOW
+	box.shadow_size = 8.0
+	box.shadow_offset = Vector2(0, 2)
+	p.add_theme_stylebox_override(&"panel", box)
+	add_child(p)
+	return p
 
 ## Surface at the top fading out toward the art at the bottom (Backdrop fade: 100 % to the middle, 35 % at 72 %, 0).
 static func _fade_texture() -> GradientTexture2D:
@@ -181,13 +261,13 @@ static func _fade_texture() -> GradientTexture2D:
 	t.height = 256
 	return t
 
-## kind: the state; detail: {back_at (MAINT, "HH:MM" local or ""), place (SCENE), shot (SCENE: the screen behind,
-## a Texture2D), card ({…} for PLACE_FAIL)}.
+## kind: the state; detail: {back_at (MAINT, "HH:MM" local or ""), place (SCENE), icon (SCENE: the destination pin's
+## Texture2D), progress (SCENE, 0–1), card ({…} for PLACE_FAIL)}.
 func show_kind(k: Kind, d := {}) -> void:
 	kind = k
 	detail = d
 	slow = false
-	# The scene cover and its failure stay on the blurred screen being left: the player is still in the game, so no
+	# The scene cover and its failure are on the town map (the user 11-06): the player is still in the game, so no
 	# launch backdrop or wordmark (不知火舞 233 walkthrough).
 	var scene := k in [Kind.SCENE, Kind.PLACE_FAIL]
 	var splash := k in [Kind.LAUNCH, Kind.FAIL]   # q(290): the splash art in place of the farm backdrop and wordmark
@@ -203,14 +283,20 @@ func show_kind(k: Kind, d := {}) -> void:
 			for t in [_splash, _splash_blur]: (t as CanvasItem).modulate.a = 1.0
 	_art.visible = not scene and not splash
 	_fade.visible = not scene and not splash
-	_shot.visible = scene
-	_scrim.visible = scene or k == Kind.FAIL
+	_map.visible = scene
+	if scene and _map.texture == null: _map.texture = load(SCENE_MAP)
+	_haze.visible = scene
+	_shot.visible = false   # the town map stands in for the screen behind (no read back from the GPU either)
+	_scrim.visible = k in [Kind.PLACE_FAIL, Kind.FAIL]
 	_mark.visible = not scene and not splash
 	_slow_card.visible = false
-	_place.visible = k == Kind.SCENE
+	var on_map := k == Kind.SCENE
+	for n in [_place, _place_pill, _pin, _bar_track]: (n as CanvasItem).visible = on_map
+	_slow_pill.visible = false
 	_place.text = str(d.get("place", ""))
-	_shot.texture = d.get("shot", null)
-	spinner.visible = k == Kind.SCENE
+	_pin_icon.texture = d.get("icon", null)
+	progress = float(d.get("progress", 0.0))
+	spinner.visible = false
 	_caption.visible = false
 	card.visible = k in [Kind.FAIL, Kind.MAINT, Kind.UPDATE, Kind.PLACE_FAIL]
 	if card.visible: card.show_card(card_spec(k, d))
@@ -242,16 +328,26 @@ static func card_spec(k: Kind, d := {}) -> Dictionary:
 				body = "Check your connection and try again.", primary = "Retry", secondary = "Go back"}
 	return {}
 
-## 8 s in: the spinner and `Taking longer than usual…` (LOADING-2); white on the scene's scrim, on a small surface card
-## over the launch's splash (q(290)).
+## 8 s in: `Taking longer than usual…` (LOADING-2) — with the spinner on a small surface card over the launch's splash
+## (q(290)); on the scene cover on its own pill under the bar, the bar going on (no spinner).
 func taking_longer() -> void:
 	if not kind in [Kind.LAUNCH, Kind.SCENE]: return
 	slow = true
-	spinner.visible = true
+	spinner.visible = kind == Kind.LAUNCH
 	_caption.visible = true
 	_slow_card.visible = kind == Kind.LAUNCH
-	_caption.add_theme_color_override(&"font_color", UiTokens.COLOR_SURFACE_RAISED if kind == Kind.SCENE else UiTokens.COLOR_SECONDARY)
+	_slow_pill.visible = kind == Kind.SCENE
+	_caption.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY)
+	_caption.theme_type_variation = UiTokens.STYLE_CAPTION_B12 if kind == Kind.SCENE else UiTokens.STYLE_C13_B
 	_layout()
+
+## The scene cover's pin lands: it drops SCENE_PIN_DROP into place with a little bounce, once, when the cover shows.
+func drop_pin() -> void:
+	if kind != Kind.SCENE or not is_inside_tree(): return
+	_pin_drop = SCENE_PIN_DROP
+	_layout()
+	var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_method(func(v: float): _pin_drop = v; _layout(), SCENE_PIN_DROP, 0.0, SCENE_PIN_DROP_S)
 
 ## q(290)'s one formula: the art's bottom on the screen's, centred. Covering (s = the larger of the two fits) while the
 ## wordmark's top still sits SPLASH_MARK_GAP under the status bar — only the sky and the sides are cut (20:9, 19.5:9,
@@ -291,14 +387,11 @@ func _layout() -> void:
 	var mark_top := roundf(_MARK_TOP_LAUNCH * k) if kind == Kind.LAUNCH else _MARK_TOP
 	_mark.position = Vector2(roundf((w - mark_size.x) * 0.5), mark_top)
 	_mark.size = mark_size
-	var spin_top := (mark_top + _SPINNER_BELOW) if kind == Kind.LAUNCH else roundf(_SCENE_SPINNER * k)
-	spinner.position = Vector2(roundf((w - UiSpinner.SIDE) * 0.5), spin_top)
+	spinner.position = Vector2(roundf((w - UiSpinner.SIDE) * 0.5), mark_top + _SPINNER_BELOW)
 	spinner.size = Vector2(UiSpinner.SIDE, UiSpinner.SIDE)
-	_place.position = Vector2(0, roundf(_SCENE_TEXT * k))
-	_place.size = Vector2(w, 0)
-	var caption_top := (mark_top + _CAPTION_BELOW) if kind == Kind.LAUNCH else _place.position.y + _place.get_combined_minimum_size().y + 4.0
-	_caption.position = Vector2(0, caption_top)
+	_caption.position = Vector2(0, mark_top + _CAPTION_BELOW)
 	_caption.size = Vector2(w, 0)
+	if kind == Kind.SCENE: _layout_scene(w, h)
 	if kind == Kind.LAUNCH:   # q(290): spinner over caption on the slow card, its bottom 16 above the art's Gensen mark
 		var cap := _caption.get_combined_minimum_size()
 		var inner := Vector2(maxf(cap.x, UiSpinner.SIDE), UiSpinner.SIDE + 8.0 + cap.y)
@@ -311,6 +404,32 @@ func _layout() -> void:
 	var card_size := card.get_combined_minimum_size()
 	card.position = Vector2(roundf((w - card_size.x) * 0.5), roundf((h - card_size.y) * 0.5))
 	card.size = card_size
+
+## The scene cover on the frame's centre line, kept on the screen's centre (y − 400 from it): the pin, the place on its
+## pill (wrapped at a ` · ` past SCENE_PILL_MAX), the bar, and the slow line on its pill.
+func _layout_scene(w: float, h: float) -> void:
+	var at := func(y: float) -> float: return roundf(h * 0.5 + y - _FRAME_H * 0.5)
+	var cx := w * 0.5
+	_pin.size = Vector2.ONE * SCENE_PIN_SIDE
+	_pin.position = Vector2(roundf(cx - SCENE_PIN_SIDE * 0.5), at.call(SCENE_PIN_BOTTOM) - SCENE_PIN_SIDE - roundf(_pin_drop))
+	var font := _place.get_theme_font(&"font")
+	var inner := minf(SCENE_PILL_MAX, w - 32.0) - SCENE_PILL_PAD * 2.0
+	_place.text = UiKit.break_at_dot(str(detail.get("place", "")), font, _SCENE_TEXT_SIZE, inner)
+	var text := _place.get_combined_minimum_size()
+	var pill := Vector2(minf(text.x, inner) + SCENE_PILL_PAD * 2.0, maxf(SCENE_PILL_H, text.y + 8.0)).round()
+	_place_pill.size = pill
+	_place_pill.position = Vector2(roundf(cx - pill.x * 0.5), at.call(SCENE_PILL_MID) - roundf(pill.y * 0.5))
+	_place.position = _place_pill.position
+	_place.size = pill
+	_bar_track.size = SCENE_BAR
+	_bar_track.position = Vector2(roundf(cx - SCENE_BAR.x * 0.5), at.call(SCENE_BAR_TOP) + maxf(0.0, pill.y - SCENE_PILL_H) * 0.5)
+	_bar_fill.size = Vector2(roundf(SCENE_BAR.x * progress), SCENE_BAR.y)
+	var cap := _caption.get_combined_minimum_size()
+	var slow_box := Vector2(cap.x + SCENE_SLOW_PAD * 2.0, SCENE_SLOW_H).round()
+	_slow_pill.size = slow_box
+	_slow_pill.position = Vector2(roundf(cx - slow_box.x * 0.5), _bar_track.position.y + (SCENE_SLOW_MID - SCENE_BAR_TOP) - roundf(slow_box.y * 0.5))
+	_caption.position = Vector2(0, _slow_pill.position.y + roundf((slow_box.y - cap.y) * 0.5))
+	_caption.size = Vector2(w, 0)
 
 ## The screen as it is now, halved and with mipmaps: the scene cover reads it from a low mip (blurred). Null where
 ## nothing has been drawn (headless runs).
