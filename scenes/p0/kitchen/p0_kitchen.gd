@@ -761,7 +761,8 @@ func _hide_ring() -> void:
 ## The watched pot in the middle (419): the stove's held out of sight, the layer flying in from where it stood on the
 ## screen and at its size. Already there (back from the queue drawer, the next pot): it stays.
 func _show_wait_pot() -> void:
-	if not room.has_method("hold_pot"): return
+	# a farmhouse on its way out (the queue drawer closing as the room goes) has no screen to put it on
+	if not room.has_method("hold_pot") or not room.is_inside_tree() or rt == null: return
 	if _wait_pot == null:
 		_wait_pot = P0WaitPot.new()
 		_wait_pot.theme = UiKit.theme()
