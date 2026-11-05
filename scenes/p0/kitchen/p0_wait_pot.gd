@@ -32,7 +32,9 @@ func _init() -> void:
 	view.own_world_3d = true
 	view.transparent_bg = true
 	view.msaa_3d = Viewport.MSAA_4X
-	view.render_target_update_mode = SubViewport.UPDATE_WHEN_PARENT_VISIBLE   # hidden on the stove: not drawn (周瑜 on #764)
+	# drawn every frame while it shows (its tumble, its steam), not at all while it is hidden on the stove (周瑜 on #764);
+	# UPDATE_WHEN_PARENT_VISIBLE froze it on its first frame: its parent is no SubViewportContainer
+	view.render_target_update_mode = SubViewport.UPDATE_DISABLED
 	add_child(view)
 	_tex = TextureRect.new()
 	_tex.name = "Pot"
@@ -106,12 +108,14 @@ func mouth_screen() -> Vector2:
 ## In from the stove pot's place (`from` its mouth on the screen, `from_scale` its size ÷ the box pot's) to the box.
 func fly_in(from: Vector2, from_scale: float) -> void:
 	visible = true
+	view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	_go(from, from_scale, MOUTH, 1.0, Callable())
 
 ## Back to the stove pot's place and size; `done` then (the host shows the stove's pot again).
 func fly_out(to: Vector2, to_scale: float, done: Callable) -> void:
 	_go(mouth_screen(), scale.x, to, to_scale, func():
 		visible = false
+		view.render_target_update_mode = SubViewport.UPDATE_DISABLED
 		if done.is_valid(): done.call())
 
 func _go(from: Vector2, from_scale: float, to: Vector2, to_scale: float, done: Callable) -> void:
