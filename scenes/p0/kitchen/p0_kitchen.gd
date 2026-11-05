@@ -256,6 +256,7 @@ func _cycle_stove() -> void:
 func open_queue() -> void:
 	if phase != "watch" or not P0KitchenLogic.can_queue(rt.session.current(), stove_index): return
 	_hide_sheet()
+	_hide_wait_pot()   # 419 (1): back onto the stove, which drops as before (#142), the ring over it; out again after
 	phase = "idle"
 	_queue_mode = true
 	open("cookbook")
@@ -263,8 +264,7 @@ func open_queue() -> void:
 	_band = _heat_band()
 	_wrap.add_child(_band)
 	_wrap.move_child(_band, 0)   # under the drawer, the slot bar and the preview: they keep their own taps
-	if _wait_pot: rt.ui.root.move_child(_wait_pot, -1)   # the pot and its ring over the drawer's layer (419 bd102c55)
-	if _ring: rt.ui.root.move_child(_ring, -1)
+	if _ring: rt.ui.root.move_child(_ring, -1)   # over the drawer's layer
 
 ## The pot band's heat taps while the queue drawer is open: in a ring's window a tap judges it; while a ring shows
 ## (growing 1 s before its turn, the 350 ms it stays after) a tap outside the window does nothing, as tap() swallows it
@@ -766,8 +766,8 @@ func _show_wait_pot() -> void:
 		_wait_pot = P0WaitPot.new()
 		_wait_pot.theme = UiKit.theme()
 		_wait_pot.visible = false
+		_wait_pot.z_index = -1   # a backdrop: the ring, its tick and its dot always over it, the HUD too (不知火舞 on 419)
 		rt.ui.root.add_child(_wait_pot)
-		rt.ui.root.move_child(_wait_pot, _ring.get_index() if _ring and _ring.get_parent() == rt.ui.root else -1)   # under the ring
 	if _wait_pot.visible: return
 	var pot: Node3D = room.call("stove_pot", stove_index)
 	var screen_k := room.get_viewport().get_screen_transform().get_scale().x
@@ -888,7 +888,7 @@ func _process(_dt: float) -> void:
 			_ring.mark_turn = float(_judged_turn.get(active, -1.0))
 			_ring.position = _ring_center() - _ring.size * 0.5
 	if _timer:
-		_timer.visible = phase == "watch"   # the queue drawer: the pot and its ring stay, the countdown goes (419 bd102c55)
+		_timer.visible = phase == "watch"   # the queue drawer: the ring on the stove's pot again, no countdown (419)
 		_timer.total_ms = total
 		_timer.elapsed_ms = minf(e, total)
 		_timer.heat_at = heats.map(func(h): return float(h.at))
