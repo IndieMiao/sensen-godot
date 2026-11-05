@@ -246,11 +246,12 @@ describe('355 E reset and pickups (cases 12-14)', () => {
     expect(v.at!.floor_state).toMatchObject({ guard: null, mobs: [], cleared: true, paid: true });
     expect(v.at!.floor).toBe(10); expect(v.records[Q].guards).toEqual([10]);
   });
-  it('day reset keeps floor/HP, rebuilds it paid and refuses stale commands without acting', () => {
+  it('day reset keeps the floor, refills HP (q(291)), rebuilds it paid and refuses stale commands without acting', () => {
     const x = scenario(); x.start(Q, 10); x.send({ type: 'mine_attack', floor: 10, targets: [0], hurt_by: 0 });
+    expect(x.s.mine.day!.hp).toBeLessThan(x.c.mine.combat.hp);
     const input = structuredClone(x.s), now = x.now + DAY, v = viewOf(x.c, input, now).mine;
     expect(input).toEqual(x.s);
-    expect(v.at).toMatchObject({ floor: 10, hp: x.s.mine.day!.hp, day: dayKey(x.c, x.s, now) });
+    expect(v.at).toMatchObject({ floor: 10, hp: x.c.mine.combat.hp, day: dayKey(x.c, x.s, now) });
     expect(v.at!.floor_state.paid).toBe(true); expect(v.at!.floor_state.mobs[0].hp).toBe(x.c.mine.monsters.boss_slime_king.hp);
     expect(v.notice).toMatchObject({ kind: 'reset', floor: 10 });
     const r = applyP0(x.c, input, { type: 'mine_attack', day: x.s.mine.day!.key, floor: 10, targets: [0], space: 'mine' }, now);
@@ -266,7 +267,7 @@ describe('355 E reset and pickups (cases 12-14)', () => {
     x.s.mine.day!.picked = [['coal', 5], ['iron_ore', 7]]; x.send({ type: 'mine_attack', floor, hurt_by: 0 });
     const n = floor >= x.c.mine.combat.ko_keep_from ? Math.floor(5 * x.c.mine.combat.ko_lose) : 0;
     expect(count(x.s.bag, 'coal')).toBe(9 - n); expect(count(x.s.bag, 'wood')).toBe(20);
-    expect(x.s.mine.day!.at).toBeNull(); expect(x.s.mine.day!.hp).toBe(x.c.mine.combat.hp);
+    expect(x.s.mine.day!.at).toBeNull(); expect(x.s.mine.day!.hp).toBe(x.c.mine.combat.ko_hp);   // q(291): 30, not full
     expect(x.s.mine.notice).toMatchObject({ kind: 'ko', floor }); expect(x.s.mine.day!.picked).toEqual([]);
     expect(x.s.mine.day!.floors[`${Q}:${floor}`].paid).toBe(true);
   });

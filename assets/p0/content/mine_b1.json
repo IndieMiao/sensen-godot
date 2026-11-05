@@ -10,7 +10,9 @@
     "combat": {
       "ko_keep_from": 11,
       "ko_lose": 0.5,
-      "under_tier": 0.5
+      "under_tier": 0.5,
+      "ko_hp": 30,
+      "regen_full_ms": 3600000
     },
     "monsters": {
       "mob_cave_bat": {

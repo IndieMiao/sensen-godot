@@ -120,6 +120,8 @@ export interface MineB1Day {
   floors: Record<string, MineB1FloorState>;
   picked: [string, number][];
   attack_at?: number; hurt_at?: number; drink_at?: number; swing_at?: number;
+  /** q(291): out of the mine (left it, knocked out), `hp` refills from this time on (mine.ts mineHp); none inside. */
+  hp_at?: number;
 }
 export type MineB1Notice = { kind: 'reset'; at: number; floor: number }
   | { kind: 'ko'; at: number; floor: number; lost: [string, number][] };
