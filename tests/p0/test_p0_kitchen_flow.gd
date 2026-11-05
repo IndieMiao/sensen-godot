@@ -7,12 +7,19 @@ const FARMHOUSE := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
 
 var rt: P0Runtime
 
+## These answer through session.transport, set a frame after the runtime's first read: that read must fail the old way
+## (P0HttpRequest, a few frames on, dropping the read the room's attach queued) as when they were written; on P0Line
+## (421) it fails in its first frame, and the attach's read lands on the transport, never answered.
 func before_test() -> void:
+	OS.set_environment("P0_LINE", "0")
 	rt = auto_free(P0Runtime.new())
 	add_child(rt)
 	await get_tree().process_frame
 	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, _cmd: Dictionary): pass   # nothing goes out
 	rt.session.view = _view()
+
+func after_test() -> void:
+	OS.unset_environment("P0_LINE")
 
 func _view() -> Dictionary:
 	return {
