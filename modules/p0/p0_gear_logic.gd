@@ -111,8 +111,13 @@ static func pip_line(view: Dictionary, resident: String) -> String:
 static func first_dig_row(view: Dictionary) -> Dictionary:
 	var d := first_dig(view)
 	if d.is_empty(): return {}
+	# Show on map to the nearest free quarry (view.wild.near3_sites, nearest first: HOME-1's Copper Ore points there too),
+	# none while down a mine — the user on preview B could not find a mine at Lv3, 55 km out of town
+	var quarry := P0Logic.near3_site(view, "quarry")
+	var down = view.get("mine", {}).get("at", null) if view.get("mine", null) is Dictionary else null
 	return {line = "Pip's First Dig · Floor %d/%d" % [int(d.get("have", 0)), int(d.floor)],
-		icon = "ladder", go = "", dot = P0Logic.PIP_DOT + "first_dig", first_dig = true}
+		icon = "ladder", go = "mine:" + quarry if quarry != "" and not (down is Dictionary) else "", dot = P0Logic.PIP_DOT + "first_dig",
+		first_dig = true}
 
 static func first_dig_card(view: Dictionary) -> Dictionary:
 	var d := first_dig(view)
