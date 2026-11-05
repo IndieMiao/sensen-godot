@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "task": "SGODOT-422",
   "seed": 422,
   "world_origin_xz": [
@@ -279,10 +279,26 @@
       "scattered_dirt_pebble_resource_clear_m": 1.5
     }
   },
+  "dry_ground_mask": {
+    "file": "dry_ground_mask.png",
+    "channels": [
+      "crescent",
+      "gourd",
+      "meander"
+    ],
+    "unchanged_shore_band_m": 0.8,
+    "fully_dry_after_m": 1.2,
+    "sample_lod": 0,
+    "outside_layout": "original ground"
+  },
   "files": {
     "crescent_layout.png": {
       "sha256": "48a9fa40ab4d8fc56a82dedda345e153aecb4ee5b79f2c90fc98ffe1892d83e5",
       "bytes": 402111
+    },
+    "dry_ground_mask.png": {
+      "sha256": "33ab4928adc44eecb1df2f7f9913cf7215886a77b83b31b45c5076adb5bcb176",
+      "bytes": 49421
     },
     "gourd_layout.png": {
       "sha256": "1f475522c4dcb08412acabf6239378acc92752d56f61414cd8e478b977ee9023",

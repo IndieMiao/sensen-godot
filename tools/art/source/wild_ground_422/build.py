@@ -92,7 +92,8 @@ def build():
     domain = smooth(0,1.2,np.minimum.reduce([x-ORIGIN[0],ORIGIN[0]+EXTENT[0]-x,
                                            z-ORIGIN[1],ORIGIN[1]+EXTENT[1]-z]))
     deep*=domain;sun*=domain
-    manifest={'version':1,'task':'SGODOT-422','seed':422,'world_origin_xz':ORIGIN,
+    protection=[]
+    manifest={'version':2,'task':'SGODOT-422','seed':422,'world_origin_xz':ORIGIN,
         'world_extent_xz':EXTENT,'map_size':[SIZE,SIZE],
         'uv':'(world.xz - vec2(-4,-20)) / vec2(20,24); top PNG row is z=-20',
         'channels':{'r':'deep grass weight','g':'sunlit grass weight',
@@ -115,6 +116,9 @@ def build():
         water=np.array(water_image)>0
         shore_dist=distance_transform_edt(~water,sampling=(EXTENT[1]/SIZE,EXTENT[0]/SIZE))
         shore_safe=smooth(.43,.78,shore_dist)
+        # Separate ground-only permission mask. Preserve the entire water polygon
+        # and 0.8m shore band; blend into the study over the next 0.4m.
+        protection.append(smooth(.8,1.2,shore_dist)*domain)
         slot_safe=np.ones_like(x); decor_safe=np.ones_like(x); stand_safe=np.ones_like(x)
         for s in slots[shape].values():
             # A 1.5m square footprint plus a .15m buffer; path also avoids the
@@ -161,6 +165,10 @@ def build():
             'soil_pixels':int((soil>.1).sum()),'path_ends_before_boundary_m':.20,
             'resource_footprint_half_m':.90,'gather_stand_clear_m':.30,
             'scattered_dirt_pebble_resource_clear_m':1.5}
+    Image.fromarray(np.uint8(np.round(np.stack(protection,axis=-1)*255))).save(DEST/'dry_ground_mask.png')
+    manifest['dry_ground_mask']={'file':'dry_ground_mask.png','channels':list(templates),
+        'unchanged_shore_band_m':.8,'fully_dry_after_m':1.2,'sample_lod':0,
+        'outside_layout':'original ground'}
     manifest['files']={p.name:{'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
                              'bytes':p.stat().st_size} for p in sorted(DEST.glob('*.png'))}
     (DEST/'ground_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

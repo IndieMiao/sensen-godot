@@ -1,7 +1,7 @@
 extends SceneTree
 ## Run after the editor generated UIDs. Keep packed alpha from rewriting RGB.
 func _initialize() -> void:
-	for filename in ["meadow_color.png", "crescent_layout.png", "gourd_layout.png", "meander_layout.png"]:
+	for filename in ["dry_ground_mask.png", "meadow_color.png", "crescent_layout.png", "gourd_layout.png", "meander_layout.png"]:
 		var path: String = "res://assets/ponds/ground/" + filename + ".import"
 		var cfg := ConfigFile.new()
 		assert(cfg.load(path) == OK)

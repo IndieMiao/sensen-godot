@@ -96,5 +96,6 @@
       "sha256": "9a462f41d52a1b873efcdc999771046bd15f78a51c265860a889385aa99d2276",
       "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
     }
-  ]
+  ],
+  "revision_scope": "Initial b75bc30d delivery; images and handoff superseded by water-preservation revision."
 }

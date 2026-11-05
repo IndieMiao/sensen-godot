@@ -1,363 +1,474 @@
 {
-	"captures": [
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
-			"draw_calls": 22,
-			"name": "crescent_before_360x800",
-			"pitch_degrees": -42.9999961853027,
-			"pixels": [
-				360,
-				800
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_03",
-			"width_m": 6.71999979019165
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
-			"draw_calls": 22,
-			"name": "crescent_after_360x800",
-			"pitch_degrees": -42.9999961853027,
-			"pixels": [
-				360,
-				800
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_03",
-			"width_m": 6.71999979019165
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
-			"draw_calls": 22,
-			"name": "crescent_overhead",
-			"pitch_degrees": -90.0,
-			"pixels": [
-				1000,
-				1100
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_03",
-			"width_m": 20.7999992370605
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
-			"draw_calls": 22,
-			"name": "crescent_overhead_before",
-			"pitch_degrees": -90.0,
-			"pixels": [
-				1000,
-				1100
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_03",
-			"width_m": 20.7999992370605
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
-			"draw_calls": 22,
-			"name": "gourd_before_360x800",
-			"pitch_degrees": -42.9999961853027,
-			"pixels": [
-				360,
-				800
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_01",
-			"width_m": 6.71999979019165
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
-			"draw_calls": 22,
-			"name": "gourd_after_360x800",
-			"pitch_degrees": -42.9999961853027,
-			"pixels": [
-				360,
-				800
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_01",
-			"width_m": 6.71999979019165
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
-			"draw_calls": 22,
-			"name": "gourd_overhead",
-			"pitch_degrees": -90.0,
-			"pixels": [
-				1000,
-				1100
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_01",
-			"width_m": 20.7999992370605
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
-			"draw_calls": 22,
-			"name": "gourd_overhead_before",
-			"pitch_degrees": -90.0,
-			"pixels": [
-				1000,
-				1100
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_01",
-			"width_m": 20.7999992370605
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
-			"draw_calls": 22,
-			"name": "meander_before_360x800",
-			"pitch_degrees": -42.9999961853027,
-			"pixels": [
-				360,
-				800
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_02",
-			"width_m": 6.71999979019165
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
-			"draw_calls": 22,
-			"name": "meander_after_360x800",
-			"pitch_degrees": -42.9999961853027,
-			"pixels": [
-				360,
-				800
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_02",
-			"width_m": 6.71999979019165
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
-			"draw_calls": 22,
-			"name": "meander_overhead",
-			"pitch_degrees": -90.0,
-			"pixels": [
-				1000,
-				1100
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_02",
-			"width_m": 20.7999992370605
-		},
-		{
-			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
-			"draw_calls": 22,
-			"name": "meander_overhead_before",
-			"pitch_degrees": -90.0,
-			"pixels": [
-				1000,
-				1100
-			],
-			"player": [
-				6.125,
-				0.0,
-				-1.625
-			],
-			"pond": "pond_los_angeles_02",
-			"width_m": 20.7999992370605
-		}
-	],
-	"checks": [
-		{
-			"check": "crescent: native player assembled",
-			"passed": true
-		},
-		{
-			"check": "crescent: native default opening",
-			"passed": true
-		},
-		{
-			"check": "crescent: unchanged spawn",
-			"passed": true
-		},
-		{
-			"check": "crescent_before_360x800: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved crescent_before_360x800",
-			"passed": true
-		},
-		{
-			"check": "crescent_after_360x800: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved crescent_after_360x800",
-			"passed": true
-		},
-		{
-			"check": "crescent_overhead: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved crescent_overhead",
-			"passed": true
-		},
-		{
-			"check": "crescent_overhead_before: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved crescent_overhead_before",
-			"passed": true
-		},
-		{
-			"check": "gourd: native player assembled",
-			"passed": true
-		},
-		{
-			"check": "gourd: native default opening",
-			"passed": true
-		},
-		{
-			"check": "gourd: unchanged spawn",
-			"passed": true
-		},
-		{
-			"check": "gourd_before_360x800: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved gourd_before_360x800",
-			"passed": true
-		},
-		{
-			"check": "gourd_after_360x800: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved gourd_after_360x800",
-			"passed": true
-		},
-		{
-			"check": "gourd_overhead: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved gourd_overhead",
-			"passed": true
-		},
-		{
-			"check": "gourd_overhead_before: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved gourd_overhead_before",
-			"passed": true
-		},
-		{
-			"check": "meander: native player assembled",
-			"passed": true
-		},
-		{
-			"check": "meander: native default opening",
-			"passed": true
-		},
-		{
-			"check": "meander: unchanged spawn",
-			"passed": true
-		},
-		{
-			"check": "meander_before_360x800: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved meander_before_360x800",
-			"passed": true
-		},
-		{
-			"check": "meander_after_360x800: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved meander_after_360x800",
-			"passed": true
-		},
-		{
-			"check": "meander_overhead: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved meander_overhead",
-			"passed": true
-		},
-		{
-			"check": "meander_overhead_before: exact dimensions",
-			"passed": true
-		},
-		{
-			"check": "saved meander_overhead_before",
-			"passed": true
-		},
-		{
-			"check": "Godot Mobile renderer",
-			"passed": true
-		},
-		{
-			"check": "only intercepted startup queries; no game mutations",
-			"passed": true
-		}
-	],
-	"intercepted_requests": [
-		{
-			"method": 0,
-			"path": "/p0/state?space=pond&place=pond_los_angeles_03",
-			"type": ""
-		}
-	],
-	"passed": true,
-	"renderer": {
-		"engine": "4.7.2-stable (official)",
-		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
-		"method": "mobile"
-	}
+  "captures": [
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+      "draw_calls": 22,
+      "name": "crescent_before_360x800",
+      "pitch_degrees": -42.9999961853027,
+      "pixels": [
+        360,
+        800
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_03",
+      "same_frame": 26,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+      "draw_calls": 22,
+      "name": "crescent_after_360x800",
+      "pitch_degrees": -42.9999961853027,
+      "pixels": [
+        360,
+        800
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_03",
+      "same_frame": 26,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
+      "draw_calls": 22,
+      "name": "crescent_overhead_before",
+      "pitch_degrees": -90.0,
+      "pixels": [
+        1000,
+        1100
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_03",
+      "same_frame": 34,
+      "width_m": 20.7999992370605
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
+      "draw_calls": 22,
+      "name": "crescent_overhead",
+      "pitch_degrees": -90.0,
+      "pixels": [
+        1000,
+        1100
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_03",
+      "same_frame": 34,
+      "width_m": 20.7999992370605
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+      "draw_calls": 22,
+      "name": "gourd_before_360x800",
+      "pitch_degrees": -42.9999961853027,
+      "pixels": [
+        360,
+        800
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_01",
+      "same_frame": 64,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+      "draw_calls": 22,
+      "name": "gourd_after_360x800",
+      "pitch_degrees": -42.9999961853027,
+      "pixels": [
+        360,
+        800
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_01",
+      "same_frame": 64,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
+      "draw_calls": 22,
+      "name": "gourd_overhead_before",
+      "pitch_degrees": -90.0,
+      "pixels": [
+        1000,
+        1100
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_01",
+      "same_frame": 72,
+      "width_m": 20.7999992370605
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
+      "draw_calls": 22,
+      "name": "gourd_overhead",
+      "pitch_degrees": -90.0,
+      "pixels": [
+        1000,
+        1100
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_01",
+      "same_frame": 72,
+      "width_m": 20.7999992370605
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+      "draw_calls": 22,
+      "name": "meander_before_360x800",
+      "pitch_degrees": -42.9999961853027,
+      "pixels": [
+        360,
+        800
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_02",
+      "same_frame": 102,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+      "draw_calls": 22,
+      "name": "meander_after_360x800",
+      "pitch_degrees": -42.9999961853027,
+      "pixels": [
+        360,
+        800
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_02",
+      "same_frame": 102,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
+      "draw_calls": 22,
+      "name": "meander_overhead_before",
+      "pitch_degrees": -90.0,
+      "pixels": [
+        1000,
+        1100
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_02",
+      "same_frame": 110,
+      "width_m": 20.7999992370605
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (6.0, 30.0, -8.0)]",
+      "draw_calls": 22,
+      "name": "meander_overhead",
+      "pitch_degrees": -90.0,
+      "pixels": [
+        1000,
+        1100
+      ],
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "pond": "pond_los_angeles_02",
+      "same_frame": 110,
+      "width_m": 20.7999992370605
+    }
+  ],
+  "checks": [
+    {
+      "check": "crescent: native player assembled",
+      "passed": true
+    },
+    {
+      "check": "crescent: native default opening",
+      "passed": true
+    },
+    {
+      "check": "crescent: unchanged spawn",
+      "passed": true
+    },
+    {
+      "check": "crescent: retained grass_detail texture binding",
+      "passed": true
+    },
+    {
+      "check": "crescent: retained surface_flow texture binding",
+      "passed": true
+    },
+    {
+      "check": "crescent_before_360x800: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "crescent_before_360x800: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved crescent_before_360x800",
+      "passed": true
+    },
+    {
+      "check": "crescent_after_360x800: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "crescent_after_360x800: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved crescent_after_360x800",
+      "passed": true
+    },
+    {
+      "check": "crescent_overhead_before: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "crescent_overhead_before: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved crescent_overhead_before",
+      "passed": true
+    },
+    {
+      "check": "crescent_overhead: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "crescent_overhead: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved crescent_overhead",
+      "passed": true
+    },
+    {
+      "check": "gourd: native player assembled",
+      "passed": true
+    },
+    {
+      "check": "gourd: native default opening",
+      "passed": true
+    },
+    {
+      "check": "gourd: unchanged spawn",
+      "passed": true
+    },
+    {
+      "check": "gourd: retained grass_detail texture binding",
+      "passed": true
+    },
+    {
+      "check": "gourd: retained surface_flow texture binding",
+      "passed": true
+    },
+    {
+      "check": "gourd_before_360x800: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "gourd_before_360x800: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved gourd_before_360x800",
+      "passed": true
+    },
+    {
+      "check": "gourd_after_360x800: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "gourd_after_360x800: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved gourd_after_360x800",
+      "passed": true
+    },
+    {
+      "check": "gourd_overhead_before: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "gourd_overhead_before: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved gourd_overhead_before",
+      "passed": true
+    },
+    {
+      "check": "gourd_overhead: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "gourd_overhead: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved gourd_overhead",
+      "passed": true
+    },
+    {
+      "check": "meander: native player assembled",
+      "passed": true
+    },
+    {
+      "check": "meander: native default opening",
+      "passed": true
+    },
+    {
+      "check": "meander: unchanged spawn",
+      "passed": true
+    },
+    {
+      "check": "meander: retained grass_detail texture binding",
+      "passed": true
+    },
+    {
+      "check": "meander: retained surface_flow texture binding",
+      "passed": true
+    },
+    {
+      "check": "meander_before_360x800: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "meander_before_360x800: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved meander_before_360x800",
+      "passed": true
+    },
+    {
+      "check": "meander_after_360x800: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "meander_after_360x800: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved meander_after_360x800",
+      "passed": true
+    },
+    {
+      "check": "meander_overhead_before: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "meander_overhead_before: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved meander_overhead_before",
+      "passed": true
+    },
+    {
+      "check": "meander_overhead: visible 3D scene",
+      "passed": true
+    },
+    {
+      "check": "meander_overhead: exact dimensions",
+      "passed": true
+    },
+    {
+      "check": "saved meander_overhead",
+      "passed": true
+    },
+    {
+      "check": "Godot Mobile renderer",
+      "passed": true
+    },
+    {
+      "check": "only intercepted startup queries; no game mutations",
+      "passed": true
+    }
+  ],
+  "intercepted_requests": [
+    {
+      "method": 0,
+      "path": "/p0/state?space=pond&place=pond_los_angeles_03",
+      "type": ""
+    }
+  ],
+  "passed": true,
+  "renderer": {
+    "engine": "4.7.2-stable (official)",
+    "gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "method": "mobile"
+  },
+  "water_pixels": [
+    {
+      "shape": "crescent",
+      "same_frame": 34,
+      "water_and_065m_shore_pixels": 217412,
+      "max_rgb_255": 0,
+      "changed_protected_pixels": 0,
+      "changed_dry_ground_pixels": 764843
+    },
+    {
+      "shape": "gourd",
+      "same_frame": 72,
+      "water_and_065m_shore_pixels": 238581,
+      "max_rgb_255": 0,
+      "changed_protected_pixels": 0,
+      "changed_dry_ground_pixels": 743498
+    },
+    {
+      "shape": "meander",
+      "same_frame": 110,
+      "water_and_065m_shore_pixels": 241631,
+      "max_rgb_255": 0,
+      "changed_protected_pixels": 0,
+      "changed_dry_ground_pixels": 743138
+    }
+  ],
+  "water_pixels_method": "Independent orthographic pixel-centre projection, analytic polygon plus 0.65m shore buffer; exact RGB byte comparison."
 }

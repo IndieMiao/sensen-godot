@@ -1,7 +1,6 @@
 """Stage a pinned, offline game copy; never edits a runtime branch or player save."""
 from pathlib import Path
 import json
-import re
 import shutil
 import subprocess
 import tarfile
@@ -34,7 +33,7 @@ def main():
     for authoring in (PROJECT / 'assets/avatar/source').rglob('*.fbx'):
         authoring.unlink()
     for name in ['review.gd', 'review_pond.gd', 'pond_ground.sample.gdshader', 'configure_imports.gd',
-                 'verify_maps.gd', 'android_review.gd', 'prepare_android.gd']:
+                 'verify_maps.gd', 'android_review.gd', 'prepare_android.gd', 'ground_study.gd']:
         if (SRC / name).exists():
             shutil.copy2(SRC / name, PROJECT / name)
     shutil.copy2(SRC / 'reference/pond_slots_v2.json', PROJECT / 'pond_slots_v2.json')
@@ -59,12 +58,12 @@ def main():
 \tscene.add_child(flax)
 ''' + mock[b:]
     (PROJECT / 'modules/ponds/pond_scenery.gd').write_text(mock)
-    # Same fixed visual time for both captures; only the isolated shader copies
-    # change. This keeps animated water out of the material comparison.
+    # Restore exact originals, including previous staging runs with frozen TIME.
+    # Animation stays live; paired views now render the same world in one frame.
     for relative in ['modules/ponds/pond_water.gdshader', 'modules/ponds/pond_turf.gdshader',
                      'modules/ponds/pond_tree.gdshader', 'modules/ponds/pond_lily.gdshader']:
-        payload = subprocess.check_output(['git', 'show', BASE + ':' + relative], cwd=ROOT, text=True)
-        (PROJECT / relative).write_text(re.sub(r'\bTIME\b', '12.0', payload))
+        payload = subprocess.check_output(['git', 'show', BASE + ':' + relative], cwd=ROOT)
+        (PROJECT / relative).write_bytes(payload)
     (PROJECT / 'review.tscn').write_text('[gd_scene load_steps=2 format=3]\n'
         '[ext_resource type="Script" path="res://review.gd" id="1"]\n'
         '[node name="WildGroundReview" type="Node"]\nscript=ExtResource("1")\n')

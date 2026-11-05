@@ -4,7 +4,7 @@
 `reference/` 保存上官婉儿提供的两张图、槽位 v2、原审阅 mock；`p0_pond_templates.json` 是固定游戏快照 `67116c6df4f69062ce658c50581e72ab1779a1b4` 的原数据。
 草地贴图是确定性原创栅格绘制，未使用照片或 AI 图片生成；参考图只作为画面方向，不当地面纹理采样。
 
-`build.py` 保留大色块域、草叶笔触、路径曲线、土斑位置、边界留白、石子点位及 palette。重新运行会覆盖本任务四张贴图和 manifest。输入坐标是 Godot 米制 XZ，无 Blender 坐标变换。仅平面贴图，无需要提交的 Blender 模型。
+`build.py` 保留大色块域、草叶笔触、路径曲线、土斑位置、边界留白、石子点位及 palette。重新运行会覆盖本任务五张贴图和 manifest。输入坐标是 Godot 米制 XZ，无 Blender 坐标变换。仅平面贴图，无需要提交的 Blender 模型。
 
 工具：Python 3.13、Pillow 11.3.0、NumPy 2.3.3、SciPy 1.16.2、Godot 4.7.2。复用已有环境或新建隔离 venv；本机是 `output/wild-ground-422/venv/bin/python`。
 
@@ -17,12 +17,14 @@ SENSEN_OFFLINE=1 godot --headless --path output/wild-ground-422/project --script
 SENSEN_OFFLINE=1 godot --headless --path output/wild-ground-422/project --editor --import
 SENSEN_OFFLINE=1 godot --headless --path output/wild-ground-422/project --script res://verify_maps.gd
 SENSEN_OFFLINE=1 godot --path output/wild-ground-422/project --rendering-method mobile --rendering-driver vulkan
+output/wild-ground-422/venv/bin/python tools/art/source/wild_ground_422/verify_preservation.py
+output/wild-ground-422/venv/bin/python tools/art/source/wild_ground_422/verify_render_preservation.py
 output/wild-ground-422/venv/bin/python tools/art/source/wild_ground_422/package_review.py
 ```
 
-第一次生成 .import 后将输出工程的四份 sidecar 复制回 `assets/ponds/ground/`；后续复现保留现有 UID，不重新编造。
+第一次生成 .import 后将输出工程的五份 sidecar 复制回 `assets/ponds/ground/`；后续复现保留现有 UID，不重新编造。
 运行实渲时需要本机有效 DISPLAY / XAUTHORITY；截图由 SubViewport 以精确 360×800 生成，不受 Steam Deck 窗口高度限制。审阅脚本会自行拍完退出。
-`prepare_review.py` 只改 `output/` 内副本；原生开场/灯光/HUD/资源摆位在前后保持一致，只替换地面材质。水/树/草动态时刻固定用于 A/B，原版运行时 shader 不改。
+`prepare_review.py` 只改 `output/` 内副本；原生开场/灯光/HUD/资源摆位在前后保持一致，只替换地面材质。水/树/草 shader 从固定快照逐字恢复，动画正常运行；双视口共用世界和同一渲染帧拍 A/B，不改 shader 时间。`ground_study.gd` 保留两项旧纹理绑定，`dry_ground_mask.png` 将新草色限制在干地。
 
 Android 可选复现（仍须先完成上述 staging/import）：
 

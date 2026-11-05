@@ -101,5 +101,6 @@
     "emulator_retained": true
   },
   "passed": true,
-  "limits": "Art/input smoke on software Vulkan only. No phone performance, full gameplay or production installation. Initial incorrect entry export was discarded; final APK materializes isolated project settings."
+  "limits": "Art/input smoke on software Vulkan only. No phone performance, full gameplay or production installation. Initial incorrect entry export was discarded; final APK materializes isolated project settings.",
+  "revision_scope": "Historical initial study b75bc30d, before water-preservation correction; not evidence for revised shader."
 }

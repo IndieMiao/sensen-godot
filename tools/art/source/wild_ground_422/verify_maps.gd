@@ -8,7 +8,7 @@ func check(ok: bool, label: String) -> void:
 func _initialize() -> void:
 	var slots: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://pond_slots_v2.json"))
 	var uids: Array = []
-	for name in ["meadow_color", "crescent_layout", "gourd_layout", "meander_layout"]:
+	for name in ["dry_ground_mask", "meadow_color", "crescent_layout", "gourd_layout", "meander_layout"]:
 		var path: String = "res://assets/ponds/ground/" + name + ".png"
 		var texture: Texture2D = load(path)
 		var imported: Image = texture.get_image()
@@ -24,7 +24,7 @@ func _initialize() -> void:
 		var uid: String = cfg.get_value("remap", "uid", "")
 		check(uid.begins_with("uid://") and uid not in uids, name+": unique Godot UID")
 		uids.append(uid)
-		if name == "meadow_color": continue
+		if name in ["meadow_color", "dry_ground_mask"]: continue
 		var shape: String = name.trim_suffix("_layout")
 		var entry: Dictionary = SystemPonds.data().locations.filter(func(e): return e.template_id == shape)[0]
 		var bp := SystemPonds.blueprint(entry)

@@ -1,6 +1,26 @@
 {
 	"checks": [
 		{
+			"check": "dry_ground_mask: imported mip chain",
+			"passed": true
+		},
+		{
+			"check": "dry_ground_mask: imported RGBA bytes equal PNG; no alpha-border corruption",
+			"passed": true
+		},
+		{
+			"check": "dry_ground_mask: <=2048",
+			"passed": true
+		},
+		{
+			"check": "dry_ground_mask: import sidecar",
+			"passed": true
+		},
+		{
+			"check": "dry_ground_mask: unique Godot UID",
+			"passed": true
+		},
+		{
 			"check": "meadow_color: imported mip chain",
 			"passed": true
 		},

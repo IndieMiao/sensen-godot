@@ -2,13 +2,16 @@
 from pathlib import Path
 import json
 import shutil
-from PIL import Image,ImageDraw,ImageFont
+from PIL import Image,ImageDraw,ImageFont,ImageChops
 
 SRC=Path(__file__).resolve().parent
 ROOT=SRC.parents[3]
 OUT=ROOT/'output/wild-ground-422'
 DOC=ROOT/'docs/design/wild-ground-422'
 DOC.mkdir(parents=True,exist_ok=True)
+validation=json.loads((OUT/'captures/godot-validation.json').read_text())
+assert validation['passed'] and len(validation['water_pixels'])==3
+assert all(r['changed_protected_pixels']==0 for r in validation['water_pixels'])
 font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',20)
 small=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',15)
 for shape in ['crescent','gourd','meander']:
@@ -53,6 +56,8 @@ for i,shape in enumerate(slots):
                 draw.rectangle([xy(x,z-.25),xy(x+.25,z)],fill='#a6bc78')
     draw.polygon([xy(*p) for p in t['polygon']],fill='#81bcd1')
     mask=Image.open(ROOT/f'assets/ponds/ground/{shape}_layout.png').getchannel('B')
+    dry=Image.open(ROOT/'assets/ponds/ground/dry_ground_mask.png').getchannel(manifest['dry_ground_mask']['channels'].index(shape))
+    mask=ImageChops.multiply(mask,dry)
     tint=Image.new('RGBA',mask.size,'#dfbc83');tint.putalpha(mask)
     tint=tint.resize((int(20*scale),int(24*scale)))
     # Restrict overlays to this shape's column, retaining the original X/Z map.
