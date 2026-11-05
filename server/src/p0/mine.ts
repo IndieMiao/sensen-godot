@@ -92,7 +92,7 @@ export function settleMine(c: P0Content, s: P0State, now: number): void {
   if (!old.at) return;
   const site = mineSite(c, old.at.mine);
   if (!site || !c.mine.types[site.type] || old.at.floor > cap(site)) return;
-  const day = emptyDay(key, old.hp);
+  const day = emptyDay(key, c.mine.combat.hp);   // q(291): 04:00 refills HP, in the mine too (v4q(5) ⑥ kept it)
   day.at = { ...old.at }; s.mine.day = day;
   floorState(c, s, site, day.at.floor).paid = true;
   s.mine.notice = { kind: 'reset', at: rolloverAfter(c, s, old.key), floor: day.at.floor };
@@ -116,7 +116,24 @@ export function leaveMine(c: P0Content, s: P0State, now: number): void {
   settleMine(c, s, now);
   if (!s.mine.day?.at) return;
   restoreBosses(c, s);
-  s.mine.day.at = null; s.mine.day.hp = c.mine.combat.hp; s.mine.day.picked = [];
+  // q(291): HP goes out with the player, refilling from now (it used to be full again here)
+  s.mine.day.at = null; s.mine.day.hp_at = now; s.mine.day.picked = [];
+}
+
+/** q(291) (SGODOT-421): the player's mine HP now. In the mine it is what the fight left; out of it, it refills from
+ * day.hp_at, 0 to full in combat.regen_full_ms (+1 every 36 s at 100), whole points; no day today: full (04:00). */
+export function mineHp(c: P0Content, day: MineB1Day | null, now: number): number {
+  const max = c.mine.combat.hp;
+  if (!day) return max;
+  if (day.at || day.hp_at === undefined) return day.hp;
+  return Math.min(max, day.hp + Math.floor((now - day.hp_at) / (c.mine.combat.regen_full_ms / max)));
+}
+
+/** Milliseconds until mineHp is full again out of the mine; 0 when full or in the mine. */
+export function mineHpFullIn(c: P0Content, day: MineB1Day | null, now: number): number {
+  if (!day || day.at || day.hp_at === undefined || mineHp(c, day, now) >= c.mine.combat.hp) return 0;
+  const max = c.mine.combat.hp;
+  return Math.max(0, day.hp_at + (max - day.hp) * (c.mine.combat.regen_full_ms / max) - now);
 }
 export const stonePerRock = (c: P0Content, s: P0State) => c.mine.picks[s.gear.pick]?.stone ?? 1;
 export function weapon(c: P0Content, s: P0State) { return c.mine.combat.weapons[s.gear.weapon]; }
@@ -175,7 +192,8 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
     if (s.mine.day?.at) return { code: 'not_here' };
     const refusal = canPay(c, s, site, n, now); if (refusal) return refusal;
     s.mine.day ??= emptyDay(dayKey(c, s, now), c.mine.combat.hp);
-    s.mine.day.hp = c.mine.combat.hp; s.mine.notice = null;
+    // q(291): in with the HP brought (what refilled since leaving), no longer full again
+    s.mine.day.hp = mineHp(c, s.mine.day, now); delete s.mine.day.hp_at; s.mine.notice = null;
     arrive(c, s, site, n, now, events); return null;
   }
   if (cmd.day !== dayKey(c, s, now)) return { code: 'new_day' };
@@ -326,7 +344,8 @@ function attack(c: P0Content, s: P0State, site: MineSite, saved: MineB1FloorStat
         const n = Math.min(count(s.bag, id), Math.floor(qty * c.mine.combat.ko_lose));
         if (n) { take(s.bag, id, n); lost.push([id, n]); events.push({ kind: 'item', id, delta: -n }); }
       }
-      restoreBosses(c, s); day.at = null; day.hp = c.mine.combat.hp; day.picked = [];
+      // q(291): a knock-out leaves ko_hp (30), refilling outside from now — not full again
+      restoreBosses(c, s); day.at = null; day.hp = c.mine.combat.ko_hp; day.hp_at = now; day.picked = [];
       s.mine.notice = { kind: 'ko', at: now, floor: at.floor, lost };
       events.push({ kind: 'mine_ko', floor: at.floor, lost });
     }
@@ -392,7 +411,9 @@ export function mineView(c: P0Content, s: P0State, now: number) {
         fee: day.floors[floorKey(site.id, next)]?.paid ? 0 : c.mine.floor_energy, open: cleared, locked: next > cap(site) ? 'not_open' : null },
     };
   }
+  // hp / hp_full_in (q(291)): the player's HP wherever they are, and out of the mine the ms until it is full (0 full)
   return { floor_energy: c.mine.floor_energy, rock_energy: c.mine.rock_energy, hp_max: c.mine.combat.hp,
+    hp: mineHp(c, day ?? null, now), hp_full_in: mineHpFullIn(c, day ?? null, now),
     rank, weapon: { id: s.gear.weapon, ...weapon(c, s) }, notice: s.mine.notice, at: here, records, paid_today: paidToday(s) };
 }
 

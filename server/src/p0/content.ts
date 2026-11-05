@@ -331,8 +331,9 @@ export interface P0Content {
   mine: {
     floor_energy: number; rock_energy: number; fee_per_day: boolean; picks: Record<string, { stone: number }>;
     monsters: Record<string, MineMonster>;
+    /** q(291): ko_hp — HP a knock-out leaves; regen_full_ms — outside the mine, 0 to full in this long (whole points). */
     combat: { hp: number; invulnerability_ms: number; ko_keep_from: number; ko_lose: number; under_tier: number;
-      weapons: Record<string, MineWeapon> };
+      ko_hp: number; regen_full_ms: number; weapons: Record<string, MineWeapon> };
     types: Record<string, { bands: MineBand[]; floors: Record<string, MineFloorOverride>;
       main_weight?: [number, number][]; gate?: { homestead: number } }>;
     dev_sites?: MineSite[];

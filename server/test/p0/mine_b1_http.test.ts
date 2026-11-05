@@ -101,7 +101,8 @@ describe('355 E day-token HTTP and persisted mine state', () => {
       const before = structuredClone(store.peek(player)!);
       now += 86400000;
       const viewed = await read();
-      expect(viewed.state.mine.at).toMatchObject({ mine, floor: 1, hp: hit.state.mine.at.hp });
+      expect(hit.state.mine.at.hp).toBeLessThan(viewed.state.mine.hp_max);
+      expect(viewed.state.mine.at).toMatchObject({ mine, floor: 1, hp: viewed.state.mine.hp_max });   // q(291): 04:00 refills
       expect(viewed.state.mine.at.day).not.toBe(day);
       expect(store.peek(player)!.mine).toEqual(before.mine); // lazy view remains a copy
       const refused = await send({ type: 'mine_rock', space: 'mine', floor: 1, rock: 0, day, expect_seq: before.seq });
