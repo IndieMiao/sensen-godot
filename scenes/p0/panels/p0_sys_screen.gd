@@ -22,9 +22,9 @@ signal secondary_pressed(kind: Kind)
 enum Kind { LAUNCH, FAIL, MAINT, UPDATE, SCENE, PLACE_FAIL }
 
 const BACKDROP := preload("res://assets/p0/ui/sys_backdrop_farm.jpg")
-## q(290): the splash art (the user's, 375 × 812 until the large one comes) and its pre-rendered blurred copy (radius
-## about 20 px, 6 % darker, half size) for the sides a wide screen shows.
-const SPLASH := preload("res://assets/p0/ui/splash.png")
+## q(290): the splash art (the user's v2, 747 × 1618; the formula reads it as 375 × 812) and its pre-rendered
+## blurred copy (radius about 20 px, 6 % darker, half size) for the sides a wide screen shows.
+const SPLASH := preload("res://assets/p0/ui/splash.jpg")
 const SPLASH_BLUR := preload("res://assets/p0/ui/splash_blur.png")
 const SPLASH_SKY := Color("61bbfa")   # the art's sky at its top: the system splash and the engine's first frames too
 const SPLASH_SIZE := Vector2(375, 812)
