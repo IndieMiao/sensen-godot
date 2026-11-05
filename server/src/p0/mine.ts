@@ -213,17 +213,28 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
   const rock = cmd.rock;
   if (!Number.isInteger(rock) || rock < 0 || rock >= spec.rocks) return { code: 'bad_rock' };
   if (state.broken.includes(rock)) return { code: 'rock_gone' };
-  const ready = c.mine.rules.rock_tempo_ms - (now - (day.swing_at ?? -Infinity));
-  if (ready > 0) return { code: 'tempo', detail: { ready_in: ready } };
+  const ready = tempoWait(c, day.swing_at, c.mine.rules.rock_tempo_ms, now);
+  if (ready > 0) return { code: 'tempo', detail: { ready_in: Math.ceil(ready) } };
   if (!bagFitsFloor(c, s, site, at.floor, day.key)) return { code: 'bag_full', detail: { floor: at.floor } };
   if (s.energy.value < c.mine.rock_energy) return { code: 'need_energy', detail: energyDetail(c, s, now, c.mine.rock_energy) };
   const drop = rockDrop(c, s, site, at.floor, state.broken.length);
   spendEnergy(c, s, now, c.mine.rock_energy, events, 'mine_rock');
   giveLoot(c, s, 'stone', stonePerRock(c, s), events); if (drop) giveLoot(c, s, drop, 1, events);
-  state.broken.push(rock); day.swing_at = now;
+  state.broken.push(rock); day.swing_at = booked(day.swing_at, c.mine.rules.rock_tempo_ms, now);
   events.push({ kind: 'mine', action: 'rock', mine: site.id, floor: at.floor, rock, drop, cost: c.mine.rock_energy });
   return null;
 }
+
+/** A rock's or a swing's tempo, timed by when the command reaches the server (preview B, 奕星 11-05). A reply held up
+ * on a slow line sends the commands queued behind it back to back (P0Session posts one at a time), and the line's
+ * jitter moves two taps closer than the client spaced them: the strict tempo refused those, and the swing that hit
+ * took no HP. So each accepted one books its slot an interval after the last slot (or now, if later), and one may
+ * come up to `tempo_burst` intervals before its slot; never faster on average (a GCRA). `last` is the slot booked
+ * last (day.swing_at / attack_at): at most `tempo_burst` intervals ahead of now. Milliseconds still to wait, ≤ 0 = go. */
+function tempoWait(c: P0Content, last: number | undefined, interval: number, now: number): number {
+  return (last ?? -Infinity) + interval * (1 - (c.mine.rules.tempo_burst ?? 0)) - now;
+}
+const booked = (last: number | undefined, interval: number, now: number) => Math.max(now, (last ?? -Infinity) + interval);
 
 function giveLoot(c: P0Content, s: P0State, id: string, qty: number, events: P0Event[], from?: number): void {
   const n = Math.min(qty, room(c, s, id));
@@ -255,12 +266,15 @@ function attack(c: P0Content, s: P0State, site: MineSite, saved: MineB1FloorStat
   const raw = cmd.targets ?? [];
   if (!Array.isArray(raw) || !raw.every(valid) || new Set(raw).size !== raw.length
     || (cmd.hurt_by !== undefined && !valid(cmd.hurt_by))) return { code: 'bad_target' };
-  const targets = raw.slice(0, c.mine.rules.max_targets), hurt = cmd.hurt_by;
-  if (!targets.length && hurt === undefined) return { code: 'bad_target' };
-  if (targets.some(i => saved.mobs[i] <= 0) || (hurt !== undefined && saved.mobs[hurt] <= 0)) return { code: 'mob_gone' };
-  const wait = 1000 / w.speed * c.mine.rules.attack_tempo_factor - (now - (day.attack_at ?? -Infinity));
+  if (!raw.length && cmd.hurt_by === undefined) return { code: 'bad_target' };
+  // One already down here is passed over, not the swing (preview B: on a slow line the client still shows a monster
+  // its last swing killed, and the one beside it took no HP); down every one it names, the swing is mob_gone.
+  const targets = raw.filter(i => saved.mobs[i] > 0).slice(0, c.mine.rules.max_targets);
+  const hurt = cmd.hurt_by !== undefined && saved.mobs[cmd.hurt_by] > 0 ? cmd.hurt_by : undefined;
+  if (!targets.length && hurt === undefined) return { code: 'mob_gone' };
+  const interval = 1000 / w.speed * c.mine.rules.attack_tempo_factor, wait = tempoWait(c, day.attack_at, interval, now);
   if (targets.length && wait > 0) return { code: 'tempo', detail: { ready_in: Math.ceil(wait) } };
-  if (targets.length) day.attack_at = now;
+  if (targets.length) day.attack_at = booked(day.attack_at, interval, now);
   for (const i of targets) {
     const kind = spec.mobs[i], def = c.mine.monsters[kind];
     let damage = w.attack;
