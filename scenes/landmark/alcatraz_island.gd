@@ -32,9 +32,11 @@ var _camera_recenter: Tween
 var mesh_nodes: Array[MeshInstance3D] = []
 var _mesh_cache := {}
 var zones := {}
-var _backdrop_layer: CanvasLayer
-var _backdrop_view: SubViewport
-var _backdrop_camera: Camera3D
+var batch_nodes: Array[MultiMeshInstance3D] = []
+var _far_zone: Node3D
+var _zoom_buttons := {}
+var _prototype_shapes := {}
+var _backdrop_enabled := true
 var _sea_material: ShaderMaterial
 
 
@@ -43,8 +45,7 @@ func _ready() -> void:
 	layout = JSON.parse_string(FileAccess.get_file_as_string(ROOT + "layout.json"))
 	_environment = WorldEnvironment.new()
 	_environment.environment = Environment.new()
-	_environment.environment.background_mode = Environment.BG_CANVAS
-	_environment.environment.background_canvas_max_layer = -1
+	_environment.environment.background_mode = Environment.BG_COLOR
 	# Diagnostic magenta: no review pixel should expose this behind the ocean.
 	_environment.environment.background_color = Color("d000d0")
 	_environment.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
@@ -66,27 +67,24 @@ func _ready() -> void:
 	paint.vertex_color_use_as_albedo = true
 	paint.roughness = 0.94
 	paint.metallic_specular = 0.15
-	for zone_name in layout.zones:
-		var zone := Node3D.new()
-		zone.name = str(zone_name)
-		add_child(zone)
+	for zone_name in layout.zones + ["FarZone"]:
+		var zone := get_node_or_null(str(zone_name)) as Node3D
+		if zone == null:
+			zone = Node3D.new()
+			zone.name = str(zone_name)
+			add_child(zone)
 		zones[zone_name] = zone
-	_build_backdrop()
+	_far_zone = zones["FarZone"]
+	var batches := {}
 	for p in layout.placements:
-		if str(p.zone) == "DistantScenery": continue
-		var asset := str(p.asset)
-		var node := MeshInstance3D.new()
-		node.name = asset.to_pascal_case() + str(mesh_nodes.size())
-		node.mesh = _mesh(asset)
-		node.material_override = paint
-		node.position = _vec(p.position)
-		node.rotation.y = float(p.yaw)
-		node.scale = Vector3.ONE * float(p.scale)
-		zones[p.zone].add_child(node)
-		mesh_nodes.append(node)
-		if bool(p.collision): node.create_trimesh_collision()
-		if asset.ends_with("backdrop"):
-			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if bool(p.get("multimesh",false)):
+			var key := str(p.zone)+"/"+str(p.asset)
+			if not batches.has(key): batches[key]=[]
+			batches[key].append(p)
+		else:
+			_add_asset(p,paint)
+	for key in batches:_add_batch(batches[key],paint)
+	_build_backdrop()
 	var sea := MeshInstance3D.new()
 	sea.name = "Sea"
 	var plane := PlaneMesh.new()
@@ -98,11 +96,22 @@ func _ready() -> void:
 	sea.material_override = _sea_material
 	sea.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(sea)
-	for key in ["spawn", "exit", "cam0"]:
+	for specification in layout.anchors:
 		var anchor := Marker3D.new()
-		anchor.name = key
-		anchor.position = _vec(layout[key])
-		zones["DockZone"].add_child(anchor)
+		anchor.name = str(specification.name)
+		anchor.position = _vec(specification.position)
+		anchor.rotation.y = deg_to_rad(float(specification.get("yaw_degrees",0)))
+		add_child(anchor)
+	for boundary in layout.boundaries:
+		var body := StaticBody3D.new()
+		body.name = str(boundary.name)
+		body.position = _vec(boundary.at)
+		var collision := CollisionShape3D.new()
+		var shape := BoxShape3D.new()
+		shape.size = _vec(boundary.size)
+		collision.shape = shape
+		body.add_child(collision)
+		add_child(body)
 	_build_navigation()
 	_camera = Camera3D.new()
 	_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -110,6 +119,9 @@ func _ready() -> void:
 	add_child(_camera)
 	_camera.make_current()
 	_spawn_player()
+	camera_pan.min_zoom = 1.0/3.0
+	camera_pan.max_zoom = 1.4
+	camera_pan.reset(1.0)
 	camera_pan.free_pan = true
 	camera_pan.hold_enabled = false
 	camera_pan.tapped.connect(walk_to_screen)
@@ -128,66 +140,121 @@ func _mesh(asset: String) -> Mesh:
 		source.free()
 	return _mesh_cache[asset]
 
-func _build_backdrop() -> void:
-	_backdrop_layer = CanvasLayer.new()
-	_backdrop_layer.name = "DistantScenery"
-	_backdrop_layer.layer = -100
-	add_child(_backdrop_layer)
-	_backdrop_view = SubViewport.new()
-	_backdrop_view.name = "FalsePerspectiveWorld"
-	_backdrop_view.size = Vector2i(360,800)
-	_backdrop_view.own_world_3d = true
-	_backdrop_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	_backdrop_layer.add_child(_backdrop_view)
-	var env := WorldEnvironment.new()
-	env.environment = Environment.new()
-	env.environment.background_mode = Environment.BG_COLOR
-	env.environment.background_color = Color("d000d0")
-	_backdrop_view.add_child(env)
-	var sea := MeshInstance3D.new()
-	sea.name = "FarBay"
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(256,256)
-	sea.mesh = plane
-	sea.position.y = -.2
-	var water := StandardMaterial3D.new()
-	water.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	water.albedo_color = Color("a0b9bd")
-	sea.material_override = water
-	_backdrop_view.add_child(sea)
-	var paint := StandardMaterial3D.new()
-	paint.vertex_color_use_as_albedo = true
-	paint.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	for p in layout.placements:
-		if str(p.zone) != "DistantScenery": continue
+static func _scale_vec(value) -> Vector3:
+	return _vec(value) if value is Array else Vector3.ONE*float(value)
+
+func _transform_of(p: Dictionary) -> Transform3D:
+	var degrees := _vec(p.get("rotation_degrees",[0,rad_to_deg(float(p.get("yaw",0))),0]))
+	var basis := Basis.from_euler(degrees*PI/180.0).scaled(_scale_vec(p.scale))
+	if p.has("basis_columns"):
+		basis = Basis(_vec(p.basis_columns[0]),_vec(p.basis_columns[1]),_vec(p.basis_columns[2]))
+	return Transform3D(basis,_vec(p.position))
+
+func _far_material(asset: String) -> ShaderMaterial:
+	var material := ShaderMaterial.new()
+	material.shader = preload("res://assets/landmarks/alcatraz_island/far_card.gdshader")
+	var depth := .94 if asset.contains("bridge") else .96 if asset.contains("city") else .98
+	material.set_shader_parameter("depth_fraction",depth)
+	var authored := _mesh(asset).surface_get_material(0) if _mesh_cache.has(asset) else null
+	if authored is BaseMaterial3D and authored.albedo_texture:
+		material.set_shader_parameter("card_texture",authored.albedo_texture)
+		material.set_shader_parameter("use_texture",true)
+	material.render_priority = -97 if asset.contains("bridge") else -98 if asset.contains("city") else -99
+	return material
+
+func _add_asset(p: Dictionary, paint: Material) -> void:
+	var variants := [str(p.asset)]
+	if p.has("lod_group"):variants.append(str(p.asset)+"_far")
+	for variant in variants:
 		var node := MeshInstance3D.new()
-		node.name = str(p.asset).to_pascal_case()
-		node.mesh = _mesh(str(p.asset))
-		node.material_override = paint
-		node.position = _vec(p.position)
-		node.scale = Vector3.ONE * float(p.scale)
-		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		_backdrop_view.add_child(node)
-	_backdrop_camera = Camera3D.new()
-	_backdrop_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	_backdrop_camera.keep_aspect = Camera3D.KEEP_WIDTH
-	_backdrop_camera.size = 20
-	_backdrop_camera.position = Vector3(0,30,30)
-	_backdrop_camera.look_at_from_position(Vector3(0,30,30),Vector3.ZERO,Vector3.UP)
-	_backdrop_camera.far = 150
-	_backdrop_view.add_child(_backdrop_camera)
-	_backdrop_camera.make_current()
-	var canvas := TextureRect.new()
-	canvas.texture = _backdrop_view.get_texture()
-	canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	canvas.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_backdrop_layer.add_child(canvas)
+		node.name = variant.to_pascal_case()+str(mesh_nodes.size())
+		node.mesh = _mesh(variant)
+		node.material_override = _far_material(variant) if str(p.zone)=="FarZone" else paint
+		node.transform = _transform_of(p)
+		zones[p.zone].add_child(node)
+		mesh_nodes.append(node)
+		if variant.ends_with("_far"):
+			node.visibility_range_begin = 55
+			node.visibility_range_begin_margin = 0
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		else:
+			if p.has("lod_group"):
+				node.visibility_range_end = 55
+				node.visibility_range_end_margin = 0
+			if bool(p.collision):node.create_trimesh_collision()
+		if str(p.asset) in ["ferry","gull"]:node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if str(p.zone)=="FarZone":
+			node.extra_cull_margin = 100
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+func _add_batch(items: Array, paint: Material) -> void:
+	var asset := str(items[0].asset)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = _mesh(asset)
+	mm.instance_count = items.size()
+	for i in items.size():mm.set_instance_transform(i,_transform_of(items[i]))
+	var node := MultiMeshInstance3D.new()
+	node.name = asset.to_pascal_case()+"Batch"
+	node.multimesh = mm
+	node.material_override = paint
+	if asset in ["alc_curb","alc_lamp","alc_bin","alc_sign","alc_rail_corner","alc_flowerbed"]:node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	zones[items[0].zone].add_child(node)
+	batch_nodes.append(node)
+	for p in items:
+		if bool(p.collision):_add_prop_collision(p)
+
+func _add_prop_collision(p: Dictionary) -> void:
+	var definitions := {
+		"alc_bench":[Vector3(1.5,.9,.5),Vector3(0,.45,0)],
+		"alc_lamp":[Vector3(.14,3.5,.14),Vector3(0,1.75,0)],
+		"alc_rail_straight":[Vector3(2,1,.12),Vector3(0,.5,0)],
+		"alc_rail_corner":[Vector3(.5,1,.5),Vector3(.2,.5,.2)],
+		"alc_tree_a":[Vector3(.3,1.4,.3),Vector3(0,.7,0)],
+		"alc_tree_b":[Vector3(.3,1.4,.3),Vector3(0,.7,0)],
+		"alc_flowerbed":[Vector3(1.4,.55,.7),Vector3(0,.275,0)],
+		"alc_bin":[Vector3(.45,.75,.45),Vector3(0,.375,0)],
+		"alc_sign":[Vector3(.12,1.3,.12),Vector3(0,.65,0)]}
+	if not definitions.has(p.asset):return
+	if not _prototype_shapes.has(p.asset):
+		var box := BoxShape3D.new()
+		box.size = definitions[p.asset][0]
+		_prototype_shapes[p.asset]=box
+	var body := StaticBody3D.new()
+	body.name = str(p.name)+"Collision"
+	body.transform = _transform_of(p)
+	if p.has("basis_columns"):
+		body.transform = Transform3D(Basis(Vector3.UP,float(p.get("yaw",0))),_vec(p.position))
+	var collision := CollisionShape3D.new()
+	collision.shape = _prototype_shapes[p.asset]
+	if p.has("basis_columns"):
+		var conservative := BoxShape3D.new()
+		conservative.size = Vector3(float(p.scale[0])*2,1+absf(float(p.slope_rise_m)),.12)
+		collision.shape = conservative
+	collision.position = definitions[p.asset][1]
+	body.add_child(collision)
+	zones[p.zone].add_child(body)
+
+func _build_backdrop() -> void:
+	# All scenery is in this independently loadable Node3D; no second viewport/pass.
+	var bay := MeshInstance3D.new()
+	bay.name = "FarBayFill"
+	var quad := QuadMesh.new()
+	quad.size = Vector2(512,512)
+	bay.mesh = quad
+	var material := _far_material("background")
+	material.set_shader_parameter("depth_fraction",.995)
+	material.set_shader_parameter("tint",Color("a0b9bd"))
+	material.render_priority = -100
+	bay.material_override = material
+	bay.extra_cull_margin = 100
+	bay.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_far_zone.add_child(bay)
 
 func _set_backdrop_visible(enabled: bool) -> void:
-	_backdrop_layer.visible = enabled
-	_backdrop_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS if enabled else SubViewport.UPDATE_DISABLED
-	_environment.environment.background_mode = Environment.BG_CANVAS if enabled else Environment.BG_COLOR
+	if enabled == _backdrop_enabled:return
+	_backdrop_enabled = enabled
+	_far_zone.visible = enabled
 	_sea_material.set_shader_parameter("false_horizon",enabled)
 
 func _build_navigation() -> void:
@@ -303,7 +370,8 @@ func _process(delta: float) -> void:
 func _update_camera() -> void:
 	var size := get_viewport().get_visible_rect().size
 	var aspect := size.y / maxf(1.0, size.x)
-	var width := (78.0 if _overview else PHONE_WIDTH) / camera_pan.zoom
+	var zoom_for_view := clampf(camera_pan.zoom,1.0/3.0,1.4)
+	var width := (78.0 if _overview else PHONE_WIDTH) / zoom_for_view
 	_camera.size = width
 	if not camera_pan.active():
 		_focus += camera_pan.offset
@@ -313,14 +381,16 @@ func _update_camera() -> void:
 	_focus.x = clampf(_focus.x, -50, 50)
 	_focus.z = clampf(_focus.z, -40, 40)
 	var target := _focus + camera_pan.offset
-	FarmCamera.place(_camera,target)
+	var wide := clampf((1.0/zoom_for_view-1.0)/2.0,0.0,1.0) if not _overview else 0.0
+	var yaw := deg_to_rad(lerpf(FarmCamera.YAW_DEG,60.0,wide))
+	var pitch := deg_to_rad(43.0)
+	# Approved oblique framing only at the wide end; default camera is unchanged.
+	var close_bias := Vector3.UP*.7-Vector3(sin(deg_to_rad(14.5)),0,cos(deg_to_rad(14.5)))*2.8
+	target += (Vector3(-5,7.75,-2)-close_bias)*wide
+	_camera.position = target+Vector3(sin(yaw)*cos(pitch),sin(pitch),cos(yaw)*cos(pitch))*11
+	_camera.look_at(target,Vector3.UP)
 	FarmCamera.fit_ground_depth(_camera,-.2,28.0)
 	_set_backdrop_visible(not _overview)
-	if not _overview:
-		_backdrop_view.size = Vector2i(size)
-		# Very small far-field parallax; the close camera and avatar scale are unchanged.
-		var parallax := (_player.position - _vec(layout.spawn)) * .012
-		_backdrop_camera.position = Vector3(0,30,30) + Vector3(parallax.x,0,parallax.z)
 	if _exit_button:
 		var point := _camera.unproject_position(_vec(layout.exit) + Vector3.UP * .45)
 		_exit_marker.visible = not _overview and not _camera.is_position_behind(_vec(layout.exit)) \
@@ -364,12 +434,30 @@ func _build_controls() -> void:
 	controls.offset_left = 12
 	controls.offset_right = -12
 	_hud.add_child(controls)
-	for caption in ["Follow", "Overview"]:
+	for caption in ["Follow"]:
 		var button := Button.new()
 		button.text = caption
 		button.custom_minimum_size = Vector2(88,44)
 		controls.add_child(button)
 		button.pressed.connect(recenter_on_player if caption == "Follow" else toggle_overview)
+	var zoom_row := VBoxContainer.new()
+	zoom_row.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
+	zoom_row.position = Vector2(-60,-48)
+	_hud.add_child(zoom_row)
+	for spec in [["ZoomIn","+",1.15],["ZoomOut","−",1.0/1.15]]:
+		var button := Button.new()
+		button.name = spec[0]
+		button.text = spec[1]
+		button.custom_minimum_size = Vector2(44,44)
+		zoom_row.add_child(button)
+		_zoom_buttons[spec[0]]=button
+		button.pressed.connect(func(): _zoom_by(float(spec[2])))
+
+func _zoom_by(factor: float) -> void:
+	_stop_camera_recenter()
+	camera_pan.reset(clampf(camera_pan.zoom*factor,1.0/3.0,1.4))
+	_overview = false
+	_update_camera()
 
 func _input(event: InputEvent) -> void:
 	_handle_camera_input(event, false)
@@ -428,8 +516,7 @@ func suspend() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
 	_hud.visible = false
-	_backdrop_layer.visible = false
-	_backdrop_view.render_target_update_mode = SubViewport.UPDATE_DISABLED
+	_set_backdrop_visible(false)
 	_camera.current = false
 	_saved_environment = _environment.environment
 	_environment.environment = null

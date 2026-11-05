@@ -1,0 +1,9566 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, +X east, +Z south/dock; Blender (x,-z,y)",
+  "instances": [
+    {
+      "name": "alc_flowerbed_000",
+      "asset": "alc_flowerbed",
+      "zone": "TerraceZone",
+      "position": [
+        -21,
+        3.25,
+        5.4
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_sign_000",
+      "asset": "alc_sign",
+      "zone": "TerraceZone",
+      "position": [
+        -15,
+        3.25,
+        6.6
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_tree_a_000",
+      "asset": "alc_tree_a",
+      "zone": "TerraceZone",
+      "position": [
+        -9,
+        3.25,
+        5.4
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bench_000",
+      "asset": "alc_bench",
+      "zone": "TerraceZone",
+      "position": [
+        -3,
+        3.25,
+        6.6
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bin_000",
+      "asset": "alc_bin",
+      "zone": "TerraceZone",
+      "position": [
+        3,
+        3.25,
+        6.6
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_lamp_000",
+      "asset": "alc_lamp",
+      "zone": "TerraceZone",
+      "position": [
+        7,
+        3.25,
+        6.6
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_lamp_001",
+      "asset": "alc_lamp",
+      "zone": "TerraceZone",
+      "position": [
+        -21,
+        5.5,
+        2.1
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_flowerbed_001",
+      "asset": "alc_flowerbed",
+      "zone": "TerraceZone",
+      "position": [
+        -15,
+        5.5,
+        0.8999999999999999
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_tree_b_000",
+      "asset": "alc_tree_b",
+      "zone": "TerraceZone",
+      "position": [
+        -9,
+        5.5,
+        0.8999999999999999
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_sign_001",
+      "asset": "alc_sign",
+      "zone": "TerraceZone",
+      "position": [
+        -3,
+        5.5,
+        2.1
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bench_001",
+      "asset": "alc_bench",
+      "zone": "TerraceZone",
+      "position": [
+        3,
+        5.5,
+        2.1
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_flowerbed_002",
+      "asset": "alc_flowerbed",
+      "zone": "TerraceZone",
+      "position": [
+        7,
+        5.5,
+        0.8999999999999999
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_tree_a_001",
+      "asset": "alc_tree_a",
+      "zone": "TerraceZone",
+      "position": [
+        -21,
+        7.75,
+        -3.6
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bin_001",
+      "asset": "alc_bin",
+      "zone": "TerraceZone",
+      "position": [
+        -15,
+        7.75,
+        -2.4
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_flowerbed_003",
+      "asset": "alc_flowerbed",
+      "zone": "TerraceZone",
+      "position": [
+        -9,
+        7.75,
+        -3.6
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bench_002",
+      "asset": "alc_bench",
+      "zone": "TerraceZone",
+      "position": [
+        -3,
+        7.75,
+        -2.4
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_sign_002",
+      "asset": "alc_sign",
+      "zone": "TerraceZone",
+      "position": [
+        3,
+        7.75,
+        -2.4
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_lamp_002",
+      "asset": "alc_lamp",
+      "zone": "TerraceZone",
+      "position": [
+        7,
+        7.75,
+        -2.4
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_sign_003",
+      "asset": "alc_sign",
+      "zone": "DockZone",
+      "position": [
+        -18.4,
+        1,
+        11.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bench_003",
+      "asset": "alc_bench",
+      "zone": "DockZone",
+      "position": [
+        -19,
+        1,
+        13.4
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_flowerbed_004",
+      "asset": "alc_flowerbed",
+      "zone": "DockZone",
+      "position": [
+        -18.7,
+        1,
+        10.3
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_flowerbed_005",
+      "asset": "alc_flowerbed",
+      "zone": "SummitZone",
+      "position": [
+        -24,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bench_004",
+      "asset": "alc_bench",
+      "zone": "SummitZone",
+      "position": [
+        -18,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_lamp_003",
+      "asset": "alc_lamp",
+      "zone": "SummitZone",
+      "position": [
+        -12,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_flowerbed_006",
+      "asset": "alc_flowerbed",
+      "zone": "SummitZone",
+      "position": [
+        -6,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bench_005",
+      "asset": "alc_bench",
+      "zone": "SummitZone",
+      "position": [
+        0,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_lamp_004",
+      "asset": "alc_lamp",
+      "zone": "SummitZone",
+      "position": [
+        6,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_flowerbed_007",
+      "asset": "alc_flowerbed",
+      "zone": "SummitZone",
+      "position": [
+        12,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_bench_006",
+      "asset": "alc_bench",
+      "zone": "SummitZone",
+      "position": [
+        18,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_lamp_005",
+      "asset": "alc_lamp",
+      "zone": "SummitZone",
+      "position": [
+        24,
+        10,
+        -5.05
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_corner_000",
+      "asset": "alc_rail_corner",
+      "zone": "DockZone",
+      "position": [
+        -23.5,
+        1,
+        14
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_corner_001",
+      "asset": "alc_rail_corner",
+      "zone": "DockZone",
+      "position": [
+        -23.5,
+        1,
+        19.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_corner_002",
+      "asset": "alc_rail_corner",
+      "zone": "SummitZone",
+      "position": [
+        -27.8,
+        10,
+        -4.7
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_corner_003",
+      "asset": "alc_rail_corner",
+      "zone": "SummitZone",
+      "position": [
+        27.8,
+        10,
+        -4.7
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_000",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -28.0,
+        10.0,
+        -7.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_000",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -28.0,
+        10.0,
+        -7.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_001",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -28.0,
+        10.0,
+        -5.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_001",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -28.0,
+        10.0,
+        -5.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_002",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -27.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_002",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -27.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_003",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -25.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_003",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -25.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_004",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -23.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_004",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -23.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_005",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -21.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_005",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -21.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_006",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -19.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_006",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -19.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_007",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -17.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_007",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -17.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_008",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -15.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_008",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -15.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_009",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -13.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_009",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -13.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_010",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -11.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_010",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -11.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_011",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -9.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_011",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -9.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_012",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -7.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_012",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -7.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_013",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -5.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_013",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -5.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_014",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -3.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_014",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -3.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_015",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -1.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_015",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -1.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_016",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        1.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_016",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        1.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_017",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        3.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_017",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        3.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_018",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        5.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_018",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        5.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_019",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        7.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_019",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        7.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_020",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        9.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_020",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        9.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_021",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        11.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_021",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        11.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_022",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        13.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_022",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        13.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_023",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        15.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_023",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        15.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_024",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        17.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_024",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        17.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_025",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        19.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_025",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        19.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_026",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        21.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_026",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        21.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_027",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        23.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_027",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        23.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_028",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        25.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_028",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        25.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_029",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        27.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_029",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        27.0,
+        10.0,
+        -8.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_030",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -27.25,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_030",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -27.25,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_031",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -25.75,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_031",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -25.75,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_032",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -22.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_032",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -22.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_033",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -20.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_033",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -20.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_034",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -16.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_034",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -16.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_035",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -14.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_035",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -14.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_036",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -12.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_036",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -12.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_037",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -10.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_037",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -10.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_038",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -8.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_038",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -8.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_039",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -4.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_039",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -4.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_040",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        -2.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_040",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        -2.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_041",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        1.875,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_041",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        1.875,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_042",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        3.625,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_042",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        3.625,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_043",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        5.375,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_043",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        5.375,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_044",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        10.375,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_044",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        10.375,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_045",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        14.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_045",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        14.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_046",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        16.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_046",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        16.0,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_047",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        19.9,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_047",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        19.9,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_048",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        21.7,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_048",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        21.7,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_049",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        23.5,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_049",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        23.5,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_050",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        25.3,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_050",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        25.3,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_051",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        27.1,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_051",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        27.1,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_052",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -23.75,
+        1.0,
+        11.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_052",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -23.75,
+        1.0,
+        11.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_053",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -24.0,
+        1.0,
+        11.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_053",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -24.0,
+        1.0,
+        11.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_054",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -24.0,
+        1.0,
+        13.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_054",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -24.0,
+        1.0,
+        13.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_055",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -23.875,
+        1.0,
+        10.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_055",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -23.875,
+        1.0,
+        10.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_056",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -20.0,
+        1.0,
+        10.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.25,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_056",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -20.0,
+        1.0,
+        10.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.25,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_057",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -23.75,
+        1.0,
+        14.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.25,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_057",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -23.75,
+        1.0,
+        14.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.25,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_058",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -20.25,
+        1.0,
+        14.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.25,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_058",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -20.25,
+        1.0,
+        14.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.25,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_059",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -23.625,
+        1.0,
+        11.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_059",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -23.625,
+        1.0,
+        11.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_060",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -20.375,
+        1.0,
+        11.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_060",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -20.375,
+        1.0,
+        11.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_061",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        7.75,
+        -2.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_061",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        7.75,
+        -2.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_062",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        7.375,
+        -0.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_curb_062",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        7.375,
+        -0.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_rail_straight_063",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        6.625,
+        0.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_curb_063",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        6.625,
+        0.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_rail_straight_064",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        5.875,
+        2.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_curb_064",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        5.875,
+        2.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_rail_straight_065",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        5.5,
+        3.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_065",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        5.5,
+        3.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_066",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        3.25,
+        6.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_066",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        3.25,
+        6.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_067",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        2.895833333333333,
+        8.208333333333334
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_curb_067",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        2.895833333333333,
+        8.208333333333334
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_rail_straight_068",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        2.1875,
+        9.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_curb_068",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        2.1875,
+        9.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_rail_straight_069",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        1.479166666666666,
+        11.041666666666668
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_curb_069",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -23.5,
+        1.479166666666666,
+        11.041666666666668
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_rail_straight_070",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -22.5,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_070",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -22.5,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_071",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_071",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_072",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -18.5,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_072",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -18.5,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_073",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -16.5,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_073",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -16.5,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_074",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -13.625,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_074",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -13.625,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_075",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -11.875,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_075",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -11.875,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_076",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -10.125,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_076",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -10.125,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_077",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -8.375,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_077",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -8.375,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_078",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -6.625,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_078",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -6.625,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_079",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -4.875,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_079",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -4.875,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_080",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.175,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_080",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.175,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_081",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.47499999999999964,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_081",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.47499999999999964,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_082",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        2.125,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_082",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        2.125,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_083",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        3.7749999999999995,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_083",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        3.7749999999999995,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_084",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        5.425,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_084",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        5.425,
+        7.75,
+        -3.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.825,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_085",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -22.508333333333333,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_085",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -22.508333333333333,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_086",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.525,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_086",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.525,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_087",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -18.541666666666664,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_087",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -18.541666666666664,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_088",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -16.558333333333334,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_088",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -16.558333333333334,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_089",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -14.575,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_089",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -14.575,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_090",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -12.591666666666667,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_090",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -12.591666666666667,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_091",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -10.608333333333333,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_091",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -10.608333333333333,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_092",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -8.625,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_092",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -8.625,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_093",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -6.641666666666666,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_093",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -6.641666666666666,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_094",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -4.658333333333331,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_094",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -4.658333333333331,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_095",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -2.6750000000000007,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_095",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -2.6750000000000007,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_096",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -0.6916666666666664,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_096",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -0.6916666666666664,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_097",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        1.2916666666666679,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_097",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        1.2916666666666679,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_098",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        3.275000000000002,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_098",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        3.275000000000002,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_099",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        5.258333333333333,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_099",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        5.258333333333333,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_100",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -22.525,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_100",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -22.525,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_101",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.575,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_101",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.575,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_102",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -18.625,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_102",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -18.625,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_103",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -16.675,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_103",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -16.675,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_104",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -14.725,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_104",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -14.725,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_105",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -12.775,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_105",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -12.775,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_106",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -10.825000000000001,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_106",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -10.825000000000001,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_107",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -8.875,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_107",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -8.875,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_108",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -6.925000000000001,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_108",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -6.925000000000001,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_109",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -4.975000000000001,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_109",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -4.975000000000001,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.975,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_110",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_110",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_111",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_111",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_112",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        1.75,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_112",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        1.75,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_113",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        4.1875,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.6875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_113",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        4.1875,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.6875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_114",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        5.5625,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.6875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_114",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        5.5625,
+        3.25,
+        6.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.6875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_115",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -23.5,
+        1.0,
+        14.916666666666666
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_115",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -23.5,
+        1.0,
+        14.916666666666666
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_116",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -23.5,
+        1.0,
+        16.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_116",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -23.5,
+        1.0,
+        16.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_117",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -23.5,
+        1.0,
+        18.583333333333332
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_117",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -23.5,
+        1.0,
+        18.583333333333332
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_118",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        7.125,
+        -0.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_curb_118",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        7.125,
+        -0.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_rail_straight_119",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        6.125,
+        1.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_curb_119",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        6.125,
+        1.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_rail_straight_120",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        2.625,
+        8.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_curb_120",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        2.625,
+        8.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_rail_straight_121",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        1.625,
+        10.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_curb_121",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.5,
+        1.625,
+        10.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_rail_straight_122",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -20.5,
+        1.0,
+        14.916666666666666
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_122",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -20.5,
+        1.0,
+        14.916666666666666
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_123",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -20.5,
+        1.0,
+        16.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_123",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -20.5,
+        1.0,
+        16.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_124",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -20.5,
+        1.0,
+        18.583333333333332
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_124",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -20.5,
+        1.0,
+        18.583333333333332
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_125",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.375,
+        7.75,
+        -1.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_125",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.375,
+        7.75,
+        -1.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_126",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.375,
+        5.5,
+        2.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_126",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.375,
+        5.5,
+        2.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_127",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.375,
+        3.25,
+        7.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_127",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.375,
+        3.25,
+        7.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_128",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.25,
+        7.75,
+        -0.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_128",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.25,
+        7.75,
+        -0.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_129",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.25,
+        5.5,
+        2.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_129",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.25,
+        5.5,
+        2.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_130",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -20.25,
+        3.25,
+        8.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_130",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -20.25,
+        3.25,
+        8.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_131",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -19.258333333333333,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_131",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -19.258333333333333,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_132",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -17.275,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_132",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -17.275,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_133",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -15.291666666666666,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_133",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -15.291666666666666,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_134",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -13.308333333333334,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_134",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -13.308333333333334,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_135",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -11.325,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_135",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -11.325,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_136",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -9.341666666666667,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_136",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -9.341666666666667,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_137",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -7.3583333333333325,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_137",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -7.3583333333333325,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_138",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -5.375,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_138",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -5.375,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_139",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -3.3916666666666657,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_139",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -3.3916666666666657,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_140",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.4083333333333314,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_140",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.4083333333333314,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_141",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.5749999999999993,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_141",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.5749999999999993,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_142",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        2.5583333333333336,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_142",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        2.5583333333333336,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_143",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        4.541666666666668,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_143",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        4.541666666666668,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_144",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.525000000000002,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_144",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.525000000000002,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_145",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        8.508333333333333,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_145",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        8.508333333333333,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_146",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -19.322916666666668,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_146",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -19.322916666666668,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_147",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -17.46875,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_147",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -17.46875,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_148",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -15.614583333333332,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_148",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -15.614583333333332,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_149",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -13.760416666666666,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_149",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -13.760416666666666,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_150",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -11.90625,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_150",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -11.90625,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_151",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -10.052083333333332,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_151",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -10.052083333333332,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_152",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -8.197916666666666,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_152",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -8.197916666666666,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_153",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -6.34375,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_153",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -6.34375,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_154",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -4.489583333333332,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_154",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -4.489583333333332,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_155",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -2.6354166666666643,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_155",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -2.6354166666666643,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_156",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -0.78125,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_156",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -0.78125,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_157",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        1.0729166666666679,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_157",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        1.0729166666666679,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9270833333333334,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_158",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        4.916666666666667,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_158",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        4.916666666666667,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_159",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.75,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_159",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.75,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_160",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        8.583333333333332,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_160",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        8.583333333333332,
+        5.5,
+        1.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9166666666666666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_161",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -19.258333333333333,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_161",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -19.258333333333333,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_162",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -17.275,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_162",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -17.275,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_163",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -15.291666666666666,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_163",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -15.291666666666666,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_164",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -13.308333333333334,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_164",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -13.308333333333334,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_165",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -11.325,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_165",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -11.325,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_166",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -9.341666666666667,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_166",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -9.341666666666667,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_167",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -7.3583333333333325,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_167",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -7.3583333333333325,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_168",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -5.375,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_168",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -5.375,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_169",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -3.3916666666666657,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_169",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -3.3916666666666657,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_170",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.4083333333333314,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_170",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.4083333333333314,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_171",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.5749999999999993,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_171",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.5749999999999993,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_172",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        2.5583333333333336,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_172",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        2.5583333333333336,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_173",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        4.541666666666668,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_173",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        4.541666666666668,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_174",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.525000000000002,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_174",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.525000000000002,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_175",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        8.508333333333333,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_175",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        8.508333333333333,
+        3.25,
+        9.0
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9916666666666667,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_176",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -20.25,
+        1.0,
+        11.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_176",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -20.25,
+        1.0,
+        11.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_177",
+      "asset": "alc_rail_straight",
+      "zone": "DockZone",
+      "position": [
+        -18.0,
+        1.0,
+        12.0
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_177",
+      "asset": "alc_curb",
+      "zone": "DockZone",
+      "position": [
+        -18.0,
+        1.0,
+        12.0
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_178",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        6.25,
+        10.0,
+        -5.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_178",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        6.25,
+        10.0,
+        -5.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_179",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        6.25,
+        10.0,
+        -4.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_179",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        6.25,
+        10.0,
+        -4.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_180",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.25,
+        7.75,
+        -2.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_180",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.25,
+        7.75,
+        -2.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_181",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.25,
+        5.5,
+        3.875
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_181",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.25,
+        5.5,
+        3.875
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_182",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.25,
+        3.25,
+        6.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_182",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.25,
+        3.25,
+        6.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_183",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        6.375,
+        10.0,
+        -5.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_183",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        6.375,
+        10.0,
+        -5.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_184",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        9.625,
+        10.0,
+        -5.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_184",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        9.625,
+        10.0,
+        -5.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_185",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.375,
+        7.75,
+        -1.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_185",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.375,
+        7.75,
+        -1.75
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_186",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.375,
+        5.5,
+        3.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_186",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.375,
+        5.5,
+        3.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_187",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.375,
+        3.25,
+        7.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_187",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.375,
+        3.25,
+        7.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.125,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_188",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.5,
+        9.375,
+        -4.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_curb_188",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.5,
+        9.375,
+        -4.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_rail_straight_189",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.5,
+        8.375,
+        -2.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_curb_189",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.5,
+        8.375,
+        -2.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_rail_straight_190",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.5,
+        4.875,
+        4.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_curb_190",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.5,
+        4.875,
+        4.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_rail_straight_191",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        6.5,
+        3.875,
+        6.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_curb_191",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        6.5,
+        3.875,
+        6.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.5,
+          1.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -1.0
+    },
+    {
+      "name": "alc_rail_straight_192",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        9.520833333333334,
+        -5.041666666666667
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_curb_192",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        9.520833333333334,
+        -5.041666666666667
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_rail_straight_193",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        8.8125,
+        -3.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_curb_193",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        8.8125,
+        -3.625
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_rail_straight_194",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        8.104166666666666,
+        -2.208333333333333
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_curb_194",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        8.104166666666666,
+        -2.208333333333333
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.7083333333333334,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.3541666666666667,
+          0.7083333333333334
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.7083333333333334
+    },
+    {
+      "name": "alc_rail_straight_195",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        7.75,
+        -0.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_195",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        7.75,
+        -0.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_196",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        5.5,
+        2.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_196",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        5.5,
+        2.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_197",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        5.125,
+        3.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_curb_197",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        5.125,
+        3.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_rail_straight_198",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        4.375,
+        5.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_curb_198",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        4.375,
+        5.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_rail_straight_199",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        3.625,
+        6.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_curb_199",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        3.625,
+        6.75
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0,
+          -0.375,
+          0.75
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "slope_rise_m": -0.75
+    },
+    {
+      "name": "alc_rail_straight_200",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        3.25,
+        8.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_200",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        9.5,
+        3.25,
+        8.25
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_201",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        9.75,
+        10.0,
+        -5.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_201",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        9.75,
+        10.0,
+        -5.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_202",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        28.0,
+        10.0,
+        -7.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_202",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        28.0,
+        10.0,
+        -7.125
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_rail_straight_203",
+      "asset": "alc_rail_straight",
+      "zone": "SummitZone",
+      "position": [
+        28.0,
+        10.0,
+        -5.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_curb_203",
+      "asset": "alc_curb",
+      "zone": "SummitZone",
+      "position": [
+        28.0,
+        10.0,
+        -5.375
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    }
+  ]
+}

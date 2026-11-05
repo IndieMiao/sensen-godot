@@ -8,6 +8,8 @@ import bpy
 HERE=Path(__file__).resolve().parent; ROOT=HERE.parents[3]
 sys.path.insert(0,str(ROOT/'tools/art'))
 from landmark_kit import Kit,reset_scene
+sys.path.insert(0,str(HERE))
+import placeholders
 OUT=ROOT/'assets/landmarks/alcatraz_island'
 reset_scene(); random.seed(424)
 kit=Kit(OUT,{'stone':'b5b6b3','garden':'8d9690','road':'e5e3db','building':'dbdcd7',
@@ -15,7 +17,9 @@ kit=Kit(OUT,{'stone':'b5b6b3','garden':'8d9690','road':'e5e3db','building':'dbdc
 placements=[]
 ZONES=['DockZone','TerraceZone','SummitZone']
 def place(asset,pos=(0,0,0),zone='TerraceZone',yaw=0,scale=1,collision=True):
- placements.append(dict(asset=asset,position=list(pos),zone=zone,yaw=yaw,scale=scale,collision=collision))
+ p=dict(asset=asset,position=list(pos),zone=zone,yaw=yaw,scale=scale,collision=collision)
+ placements.append(p)
+ return p
 def box(n,p,s,c='building',bevel=.02):return kit.box(n,p,s,c,bevel)
 def prism(n,poly,lo,hi,c):
  if sum(a[0]*b[1]-b[0]*a[1] for a,b in zip(poly,poly[1:]+poly[:1]))>0:poly=list(reversed(poly))
@@ -77,7 +81,7 @@ for x in [-1.6,1.6]:
  for z in [-1.5,1.5,3.1]:box('pile',(x,-.45,z),(.22,2.9,.22),'wood',.01)
 place('dock',(-22,1,16.75),'DockZone')
 # Accurate public-building envelope: x=40, z=10, y=9, no prison detailing.
-kit.begin('visitor_center',ao=False)
+kit.begin('alc_museum',ao=False)
 box('museum_two_storeys',(0,4.4,0),(40,8.8,10),'building',.05)
 box('roof',(0,8.9,0),(40,.2,10),'roof',.02)
 box('public_door_frame',(0,1.8,5.1),(2.6,3.6,.2))
@@ -87,22 +91,7 @@ for x in range(-18,19,3):
   if x==0 and y<3:continue
   box('unbarred_window',(x,y,5.03),(1.25,2.15,.04),'glass',.04)
 for x in [-19.6,19.6]:box('corner_trim',(x,4.4,5.06),(.4,8.8,.12))
-place('visitor_center',(0,10,-13),'SummitZone')
-kit.begin('lighthouse',ao=False)
-kit.cylinder('tower',(0,6.1,0),1.55,12.2,'building',top=1.0,seg=20)
-kit.cylinder('gallery',(0,12.35,0),1.85,.3,'road',seg=20)
-kit.cylinder('lantern',(0,13.3,0),1.05,1.6,'glass',seg=16)
-kit.cylinder('cap',(0,14.55,0),1.4,.9,'building',top=0,seg=20)
-place('lighthouse',(-25,10,-11.5),'SummitZone')
-kit.begin('water_tower',ao=False)
-for x in [-1.7,1.7]:
- for z in [-1.7,1.7]:kit.beam('leg',(x*1.3,0,z*1.3),(x,8,z),.22,'wood')
-for z in [-1.7,1.7]:
- kit.beam('brace',(-1.7,.4,z),(1.7,7.8,z),.15,'wood')
- kit.beam('brace',(1.7,.4,z),(-1.7,7.8,z),.15,'wood')
-kit.cylinder('tank',(0,9.5,0),2.5,3,'wood',seg=20)
-kit.cylinder('tank_cap',(0,11.5,0),2.7,1,'roof',top=0,seg=20)
-place('water_tower',(25,10,-14),'SummitZone')
+place('alc_museum',(0,10,-13),'SummitZone')
 kit.begin('ruins',ao=False)
 for x,h in [(-4,3),(-2,4),(0,4.5),(2,3.5),(4,2.5)]:box('remaining_pier',(x,h/2,0),(.5,h,.45),'stone')
 box('lintel',(-1,3.2,0),(7,.4,.45),'stone');box('side_wall',(4,1,-2),(.45,2,4),'stone')
@@ -116,45 +105,23 @@ for z in [-2.27,2.27]:
  for x in range(-4,10,2):box('ferry_window',(x,3.5,z),(1.15,1.3,.04),'glass',.03)
 kit.cylinder('funnel',(6,5.7,0),.6,1.6,'dark',seg=12)
 place('ferry',(-7,0,19),'DockZone',collision=False)
-kit.begin('bench',ao=False)
-box('seat',(0,.395,0),(1.5,.11,.48),'wood',.015)
-box('back',(0,.73,-.21),(1.5,.56,.10),'wood',.015)
-for x in [-.55,.55]:box('leg',(x,.17,0),(.10,.34,.40),'dark',.01)
-for pos,zone in [((-19,1,13),'DockZone'),((-7,3.25,8.5),'TerraceZone'),((-7,5.5,4),'TerraceZone'),
- ((-7,7.75,-2.5),'TerraceZone'),((-10,10,-7),'SummitZone'),((15,10,-7),'SummitZone')]:place('bench',pos,zone)
-kit.begin('lamp',ao=False)
-kit.cylinder('post',(0,1.6,0),.07,3.2,'dark',seg=10)
-kit.ellipsoid('globe',(0,3.35,0),(.30,.30,.30),'bird',seg=10,rings=6)
-for p,z in [((-18.5,1,11),'DockZone'),((-18,3.25,6.3),'TerraceZone'),((7,3.25,8.7),'TerraceZone'),
- ((-18,5.5,1.8),'TerraceZone'),((7,5.5,4.2),'TerraceZone'),((-18,7.75,-2.7),'TerraceZone'),
- ((-6,10,-7),'SummitZone'),((18,10,-7),'SummitZone')]:place('lamp',p,z)
+placeholders.build(kit,box,prism,place)
+placeholders.scatter(place)
 kit.begin('gull',ao=False)
 kit.ellipsoid('body',(0,.12,0),(.32,.24,.45),'bird',seg=10,rings=6)
 kit.ellipsoid('head',(0,.29,-.18),(.19,.19,.19),'bird',seg=8,rings=6)
 box('beak',(0,.28,-.29),(.08,.06,.13),'wood',.01)
 for p,z in [((-23.6,2,18.2),'DockZone'),((10,4.25,8.7),'TerraceZone'),((-24,11,-7),'SummitZone')]:place('gull',p,z,collision=False)
-# Scenery is authored separately, rendered by a distant-scene viewport, not placed in the walkable world.
-kit.begin('golden_gate_backdrop',ao=False)
-box('deck',(0,.45,0),(3.4,.08,.22),'bridge',.01)
-for x in [-.95,.95]:
- for z in [-.11,.11]:box('tower',(x,.85,z),(.11,1.7,.10),'bridge',.01)
- for y in [.6,1.2,1.6]:box('crossbeam',(x,y,0),(.14,.08,.36),'bridge',.01)
-for z in [-.16,.16]:
- pts=[]
- for i in range(33):
-  x=-1.7+i*3.4/32;y=.65+.95*(abs(x)/.95)**2 if abs(x)<.95 else 1.6-(abs(x)-.95)*1.25
-  pts.append((x,y,z))
- for a,b in zip(pts,pts[1:]):kit.beam('cable',a,b,.025,'bridge')
- for i in range(15):
-  x=-1.6+i*3.2/14;y=.65+.95*(abs(x)/.95)**2 if abs(x)<.95 else 1.6-(abs(x)-.95)*1.25
-  kit.beam('hanger',(x,.49,z),(x,y,z),.018,'bridge')
-place('golden_gate_backdrop',(-6.7,0,-23),'DistantScenery',scale=1.5,collision=False)
-kit.begin('city_backdrop',ao=False)
-for i in range(38):
- x=-35+i*1.8;h=random.uniform(1,3.3)
- box('skyline_%02d'%i,(x,h/2,random.uniform(-1,1)),(random.uniform(.8,1.5),h,1.3),'far',0)
-kit.cylinder('transamerica',(2,3.4,0),.65,6.8,'far',top=0,seg=4)
-place('city_backdrop',(12,0,-24),'DistantScenery',scale=.4,collision=False)
+# World installation: 20 m seaward of the dock spawn. Fake elevation keeps cards in the opening's top edge.
+far_anchor=[-22,-.15,39]
+yaw=math.radians(14.5);pitch=math.radians(43)
+target=[-22-math.sin(yaw)*2.8,1.7,19-math.cos(yaw)*2.8]
+def card_mount(screen_x,screen_y):
+    z=far_anchor[2];dx=(screen_x+math.sin(yaw)*(z-target[2]))/math.cos(yaw)
+    y=target[1]+(screen_y+math.sin(yaw)*math.sin(pitch)*dx+math.cos(yaw)*math.sin(pitch)*(z-target[2]))/math.cos(pitch)
+    return [target[0]+dx,y,z]
+for asset,sx,sy in [('alc_far_bridge',-2.15,5.2),('alc_far_city',1.1,5.15),('alc_far_hills',0,5.0)]:
+    place(asset,card_mount(sx,sy),'FarZone',collision=False)
 
 def surface(x,z):
  for x0,x1,z0,z1,hi,lo in stairs:
@@ -166,8 +133,13 @@ def zone_for(x,z,y):return 'DockZone' if y<1.01 else 'SummitZone' if y>=9.99 els
 def blocked(x,z):
  for p in placements:
   px,py,pz=p['position']
-  if p['asset']=='bench' and abs(x-px)<1 and abs(z-pz)<.6:return True
-  if p['asset']=='lamp' and math.hypot(x-px,z-pz)<.35:return True
+  floor=surface(x,z)
+  if floor is None or abs(floor-py)>.3:continue
+  if p['asset']=='alc_bench' and abs(x-px)<1 and abs(z-pz)<.6:return True
+  if p['asset']=='alc_lamp' and math.hypot(x-px,z-pz)<.35:return True
+  if p['asset']=='alc_sign' and math.hypot(x-px,z-pz)<.35:return True
+  if p['asset']=='alc_bin' and abs(x-px)<.5 and abs(z-pz)<.5:return True
+  if p['asset']=='alc_flowerbed' and abs(x-px)<.95 and abs(z-pz)<.6:return True
  return False
 verts=[];polys=[];cells={};index={};step=.25
 for ix in range(-120,120):
@@ -197,22 +169,19 @@ for ix,iz in walk_cells:
   if dx:
    edges[(zone,'z',round(x+dx*step/2,4),round(y,4))].append((z-step/2,z+step/2))
   else:edges[(zone,'x',round(z+dz*step/2,4),round(y,4))].append((x-step/2,x+step/2))
-for zone in ZONES:
- kit.begin('rails_'+zone,ao=False)
- for (ez,axis,fixed,y),spans in edges.items():
-  if ez!=zone:continue
-  spans.sort();runs=[]
-  for a,b in spans:
-   if runs and abs(runs[-1][1]-a)<.001:runs[-1]=(runs[-1][0],b)
-   else:runs.append((a,b))
-  for a,b in runs:
-   p=((a+b)/2,y+.95,fixed) if axis=='x' else (fixed,y+.95,(a+b)/2)
-   size=(b-a,.10,.10) if axis=='x' else (.10,.10,b-a)
-   box('handrail_1m',p,size,'stone',0)
-   for k in range(max(1,math.ceil((b-a)/2))+1):
-    v=a+(b-a)*k/max(1,math.ceil((b-a)/2))
-    box('rail_post',(v,y+.5,fixed) if axis=='x' else (fixed,y+.5,v),(.12,1,.12),'stone',0)
- place('rails_'+zone,zone=zone)
+placeholders.rail_instances(edges,place)
+# Static ground is one surface per loading zone; reusable props remain separate prototypes.
+for zone,new_name in [('DockZone','alc_ground_dock'),('TerraceZone','alc_ground_terraces'),('SummitZone','alc_ground_summit')]:
+    old_names=[p['asset'] for p in placements if p['zone']==zone and p['asset'].startswith(('terrain_','walkways_','stairs_'))]
+    kit.begin(new_name,ao=False);combined=kit.current
+    for old in old_names:
+        collection=kit.assets.pop(old)
+        for obj in list(collection.objects):
+            collection.objects.unlink(obj);combined.objects.link(obj)
+        kit.no_ao.discard(old)
+        bpy.data.collections.remove(collection)
+    placements[:]=[p for p in placements if p['asset'] not in old_names]
+    place(new_name,zone=zone)
 seen=set();todo=[next(iter(cells))]
 while todo:
  p=todo.pop()
@@ -225,30 +194,71 @@ for poly in polys:
  c=[sum(verts[i][k] for i in poly)/4 for k in range(3)];navzones[zone_for(c[0],c[2],c[1])].append(poly)
 route=[[-22,1,19],[-22,1,12],[-22,3.25,7.5],[8,3.25,7.5],[8,5.5,3],[-22,5.5,3],[-22,7.75,-1.5],[8,7.75,-1.5],[8,10,-6],[0,10,-6]]
 route_length=sum(math.dist(a,b) for a,b in zip(route,route[1:]))
-layout={'revision':'B blockout v2 real scale','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
+layout={'revision':'B blockout v3 integration contract','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
  'spawn':route[0],'exit':[-23,1,19.4],'cam0':route[0],'review_points':{'opening':route[0],'mid_hill':route[4],'visitor_center':route[-1]},
  'navigation':{'vertices':verts,'polygons':polys,'zone_polygons':navzones,'cell':step},'route':route,'walk_goals':[route[0],route[4],route[-1]],'route_centerline_m':route_length,
  'stairs':[{'flight':i+1,'lower':s[5],'upper':s[4],'width':3,'run':4.5,'risers':15,'riser_m':.15} for i,s in enumerate(stairs)],
- 'camera':{'pitch':43,'yaw':14.5,'width':6.72,'zoom_min':.8,'zoom_max':1.4,'forward_bias_m':2.8},
+ 'camera':{'pitch':43,'yaw':14.5,'width':6.72,'zoom_min':1/3,'zoom_max':1.4,'forward_bias_m':2.8},
  'dimensions_m':{'island':[60,40],'museum':[40,9,10],'lighthouse_height':15,'water_tower_height':12,'ferry_length':25,'bench_length':1.5,'bench_seat_height':.45,'railing_height':1,'lamp_height':3.5,'avatar_nominal_height':1.75},
  'sea_size':512,'nav_connected_cells':len(cells),'clearance_m':.25,
- 'notes':['v2 real-scale whitebox; colors and detail pending review.','DistantScenery uses a separate viewport with false perspective, not island coordinates.']}
+ 'notes':['v3 placeholders for delegated pieces; final art pending Nov 8/9.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
+# Public integration contract follows tea_house's camera/spawn/anchors/boundaries fields.
+lod_groups=[]
+for asset in ['alc_museum','alc_lighthouse','alc_watertower','alc_far_bridge','alc_far_city','alc_far_hills']:
+    lod_groups.append({'name':asset,'near':asset,'far':asset+'_far','switch_distance_m':55,'margin_m':0,'far_placeholder':True})
+asset_instance_counts=defaultdict(int)
+for i,p in enumerate(placements):
+    p['name']='%s_%03d'%(p['asset'],asset_instance_counts[p['asset']])
+    asset_instance_counts[p['asset']]+=1
+    p['rotation_degrees']=[0,math.degrees(p['yaw']),0]
+    p['scale']=p['scale'] if isinstance(p['scale'],list) else [p['scale']]*3
+    p['multimesh']=p['asset'] in placeholders.REPEATED
+    p['placeholder']=p['asset'] in placeholders.OWNERS
+    p['owner']=placeholders.OWNERS.get(p['asset'],'马可波罗')
+    if p['asset'] in [g['near'] for g in lod_groups]:p['lod_group']=p['asset']
+used={i for p in polys for i in p};navpoints=[verts[i] for i in used]
+layout['walk_bounds']={'min':[min(p[k] for p in navpoints) for k in range(3)],'max':[max(p[k] for p in navpoints) for k in range(3)],'note':'Outer bounds only; walkability comes from navigation polygons.'}
+layout['axes']='Godot Y-up, +X east, +Z south/dock; Blender (x,-z,y)'
+layout['floor_y']=1.0;layout['footprint_m']=[60,40]
+layout['anchors']=[{'name':name,'position':pos,'yaw_degrees':0 if name=='spawn' else 180} for name,pos in [('spawn',layout['spawn']),('exit',layout['exit'])]]
+layout['anchors']+=[{'name':'badge_exit','position':[-23,1.45,19.4],'yaw_degrees':180},{'name':'cam_default','position':target,'yaw_degrees':14.5,'pitch_degrees':43,'width_m':6.72},{'name':'far_offshore','position':far_anchor,'yaw_degrees':0}]
+direction=[math.sin(yaw)*math.cos(pitch),math.sin(pitch),math.cos(yaw)*math.cos(pitch)]
+campos=[target[k]+direction[k]*11 for k in range(3)]
+back=max(0,1-(campos[1]-6.72*(800/360)/2*math.cos(pitch)-28)/math.sin(pitch))
+layout['camera'].update({'position':[campos[k]+direction[k]*back for k in range(3)],'target':target,'size':6.72,'default_zoom':1,'max_view_width_m':20.16,'zoom_out_factor':3,'pan_bounds':[-50,50,-40,40],
+ 'wide_view':{'yaw_degrees':60,'target':[-5,17.75,-8],'target_offset_from_player':[-5,7.75,-2],'size':20.16}})
+layout['boundaries']=[{'name':'WestBoundary','size':[.2,36,40],'at':[-30.1,17.85,0]},{'name':'EastBoundary','size':[.2,36,40],'at':[30.1,17.85,0]},
+ {'name':'NorthBoundary','size':[60,36,.2],'at':[0,17.85,-20.1]},{'name':'SouthBoundary','size':[60,36,.2],'at':[0,17.85,20.1]}]
+layout['lod_groups']=lod_groups
+layout['far_anchor']=far_anchor
+layout['far_zone']={'node':'FarZone','anchor':far_anchor,'projection':'camera-facing XY cards, fake elevation, depth behind opaque island; local front +Z','render_depth_fraction':.92}
+layout['instances']=[{k:p[k] for k in ['name','asset','zone','position','rotation_degrees','scale','basis_columns','slope_rise_m'] if k in p} for p in placements if p['multimesh']]
+layout['interest_points']=[{'name':p['name'],'asset':p['asset'],'position':p['position'],'zone':p['zone']} for p in placements if p['asset'] in placeholders.REPEATED and p['asset'] not in ['alc_rail_straight','alc_rail_corner','alc_curb']]
+layout['assets']=[{'name':name,'file':name+'.glb','placeholder':name in placeholders.OWNERS,'owner':placeholders.OWNERS.get(name,'马可波罗'),'pivot':'ground centre; +Z front','cast_shadow':name not in ['alc_curb','alc_lamp','alc_bin','alc_sign','alc_rail_corner','alc_flowerbed','ferry','gull'] and not name.startswith('alc_far_') and not name.endswith('_far'),'material':'vertex_color_placeholder' if name in placeholders.OWNERS else 'vertex_color'} for name in kit.assets]
+(OUT/'placement_points.json').write_text(json.dumps({'units':'metres','axes':layout['axes'],'instances':layout['instances']},ensure_ascii=False,indent=2)+'\n')
 (OUT/'layout.json').write_text(json.dumps(layout,separators=(',',':'))+'\n')
-manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v2 whitebox','assets':{}}
+manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v3 whitebox integration','assets':{}}
 for name in kit.assets:
  manifest['assets'][name]=kit.export(name,ao_radius=.18)
  print('ALCATRAZ_ASSET',name,manifest['assets'][name],flush=True)
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in placements)<=300000
-assert len(placements)+1<=80
+assert len(kit.assets)<=80
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-assembly=bpy.data.collections.new('Alcatraz_v2_Assembly');bpy.context.scene.collection.children.link(assembly)
+assembly=bpy.data.collections.new('Alcatraz_v3_Assembly');bpy.context.scene.collection.children.link(assembly)
 zone_collections={}
-for z in ZONES+['DistantScenery']:
+for z in ZONES+['FarZone']:
  col=bpy.data.collections.new(z);assembly.children.link(col);zone_collections[z]=col
 for i,p in enumerate(placements):
  obj=bpy.data.objects.new('%02d_%s'%(i,p['asset']),None);obj.instance_type='COLLECTION';obj.instance_collection=kit.assets[p['asset']]
- obj.location=kit.v(p['position']);obj.rotation_euler.z=p['yaw'];obj.scale=(p['scale'],)*3;zone_collections[p['zone']].objects.link(obj)
-for col in kit.assets.values():bpy.context.scene.collection.children.unlink(col)
+ obj.location=kit.v(p['position']);obj.rotation_euler.z=p['yaw'];obj.scale=(p['scale'][0],p['scale'][2],p['scale'][1]);zone_collections[p['zone']].objects.link(obj)
+ if 'basis_columns' in p:
+  from mathutils import Matrix
+  c=Matrix(((1,0,0),(0,0,-1),(0,1,0)));b=Matrix(p['basis_columns']).transposed()
+  obj.matrix_world=(c@b@c.inverted()).to_4x4();obj.location=kit.v(p['position'])
+library=bpy.data.scenes.new('Alcatraz_Module_Library')
+for col in kit.assets.values():
+ library.collection.children.link(col)
+ bpy.context.scene.collection.children.unlink(col)
 bpy.ops.wm.save_as_mainfile(filepath=str(HERE/'alcatraz_blockout.blend'))
 # Retire only former generated GLBs and their imports; do not leave stale assets in the kit.
 for file in OUT.glob('*.glb'):

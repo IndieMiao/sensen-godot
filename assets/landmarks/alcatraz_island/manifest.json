@@ -1,63 +1,15 @@
 {
   "generator": "tools/art/source/alcatraz_island/build.py",
   "reference": "landmark_alcatraz_v2.jpg + c_alc2.png",
-  "phase": "v2 whitebox",
+  "phase": "v3 whitebox integration",
   "assets": {
-    "terrain_DockZone": {
-      "triangles": 24,
-      "bytes": 2792
-    },
-    "terrain_TerraceZone": {
-      "triangles": 72,
-      "bytes": 6168
-    },
-    "terrain_SummitZone": {
-      "triangles": 40,
-      "bytes": 3660
-    },
-    "walkways_DockZone": {
-      "triangles": 108,
-      "bytes": 10564
-    },
-    "walkways_TerraceZone": {
-      "triangles": 720,
-      "bytes": 63212
-    },
-    "walkways_SummitZone": {
-      "triangles": 360,
-      "bytes": 32244
-    },
-    "stairs_1": {
-      "triangles": 1620,
-      "bytes": 140640
-    },
-    "stairs_2": {
-      "triangles": 1620,
-      "bytes": 140632
-    },
-    "stairs_3": {
-      "triangles": 1620,
-      "bytes": 140636
-    },
-    "stairs_4": {
-      "triangles": 1620,
-      "bytes": 140636
-    },
     "dock": {
       "triangles": 3468,
-      "bytes": 299568
+      "bytes": 299564
     },
-    "visitor_center": {
+    "alc_museum": {
       "triangles": 3252,
-      "bytes": 280944
-    },
-    "lighthouse": {
-      "triangles": 250,
-      "bytes": 13636
-    },
-    "water_tower": {
-      "triangles": 978,
-      "bytes": 82800
+      "bytes": 280940
     },
     "ruins": {
       "triangles": 756,
@@ -67,37 +19,105 @@
       "triangles": 1896,
       "bytes": 162740
     },
-    "bench": {
-      "triangles": 432,
-      "bytes": 38444
+    "alc_museum_far": {
+      "triangles": 12,
+      "bytes": 2252
     },
-    "lamp": {
-      "triangles": 136,
-      "bytes": 6788
+    "alc_lighthouse": {
+      "triangles": 12,
+      "bytes": 2316
+    },
+    "alc_lighthouse_far": {
+      "triangles": 12,
+      "bytes": 2320
+    },
+    "alc_watertower": {
+      "triangles": 12,
+      "bytes": 2316
+    },
+    "alc_watertower_far": {
+      "triangles": 12,
+      "bytes": 2320
+    },
+    "alc_bench": {
+      "triangles": 48,
+      "bytes": 5408
+    },
+    "alc_lamp": {
+      "triangles": 24,
+      "bytes": 3356
+    },
+    "alc_rail_straight": {
+      "triangles": 36,
+      "bytes": 4360
+    },
+    "alc_rail_corner": {
+      "triangles": 36,
+      "bytes": 4360
+    },
+    "alc_curb": {
+      "triangles": 12,
+      "bytes": 2296
+    },
+    "alc_tree_a": {
+      "triangles": 120,
+      "bytes": 11636
+    },
+    "alc_tree_b": {
+      "triangles": 120,
+      "bytes": 11612
+    },
+    "alc_flowerbed": {
+      "triangles": 24,
+      "bytes": 3368
+    },
+    "alc_bin": {
+      "triangles": 12,
+      "bytes": 2320
+    },
+    "alc_sign": {
+      "triangles": 24,
+      "bytes": 3368
+    },
+    "alc_far_bridge": {
+      "triangles": 70,
+      "bytes": 6004
+    },
+    "alc_far_city": {
+      "triangles": 24,
+      "bytes": 2812
+    },
+    "alc_far_hills": {
+      "triangles": 13,
+      "bytes": 1652
+    },
+    "alc_far_bridge_far": {
+      "triangles": 38,
+      "bytes": 3764
+    },
+    "alc_far_city_far": {
+      "triangles": 12,
+      "bytes": 1972
+    },
+    "alc_far_hills_far": {
+      "triangles": 7,
+      "bytes": 1424
     },
     "gull": {
       "triangles": 288,
       "bytes": 17124
     },
-    "golden_gate_backdrop": {
-      "triangles": 2316,
-      "bytes": 200524
+    "alc_ground_dock": {
+      "triangles": 132,
+      "bytes": 12636
     },
-    "city_backdrop": {
-      "triangles": 462,
-      "bytes": 40936
+    "alc_ground_terraces": {
+      "triangles": 7272,
+      "bytes": 626736
     },
-    "rails_DockZone": {
-      "triangles": 552,
-      "bytes": 48784
-    },
-    "rails_TerraceZone": {
-      "triangles": 6876,
-      "bytes": 592676
-    },
-    "rails_SummitZone": {
-      "triangles": 984,
-      "bytes": 85944
+    "alc_ground_summit": {
+      "triangles": 400,
+      "bytes": 35372
     }
   }
 }
