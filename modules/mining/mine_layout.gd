@@ -15,11 +15,11 @@ const POSITION_ATTEMPTS := 80
 const CACHE_LIMIT := 32
 const LEGACY_POSITIONS := [Vector3(2.0, 0, -2.15), Vector3(4.5, 0, -2.4),
 	Vector3(7.0, 0, -2.0), Vector3(2.5, 0, -4.55), Vector3(4.8, 0, -5.6), Vector3(7.35, 0, -4.5)]
-## q(292), 421 827bc52e v2: N1–3, E1–2, S1–2, W1–2. Counts and rock indices still come from the server.
-const FALLBACK_POSITIONS := [Vector3(2.9, 0, -1.9), Vector3(6.8, 0, -1.9), Vector3(8.1, 0, -1.9),
-	Vector3(8.1, 0, -3.5), Vector3(8.1, 0, -4.8), Vector3(3.5, 0, -6.6), Vector3(6.0, 0, -6.6),
+## q(292), #775 6659631244: N1–2, S1–2, W1–2; remove the cropped right column, leaving that side for monsters.
+## Counts and rock indices still come from the server; no candidate names or combinations cross the wire.
+const FALLBACK_POSITIONS := [Vector3(2.9, 0, -1.9), Vector3(6.8, 0, -1.9), Vector3(3.5, 0, -6.6), Vector3(6.0, 0, -6.6),
 	Vector3(1.9, 0, -2.6), Vector3(1.9, 0, -4.6)]
-const ROCK_SIDES := [0, 0, 0, 1, 1, 2, 2, 3, 3]
+const ROCK_SIDES := [0, 0, 2, 2, 3, 3]
 const ROCK_SCALE := 1.3
 const ROCK_RADIUS := 0.85
 
@@ -27,7 +27,7 @@ static var _layouts: Dictionary = {}
 
 ## q(292): shuffle by mine:floor:day, then take the first valid combination in that order. Looking ahead avoids a
 ## greedy first pair stranding the third rock. Never reorder after breaking one: view rock i stays position i.
-## Existing 4–6-rock day snapshots keep their old indexed layout until the server generates the new day's 2–3.
+## A server before #772 (including rollback) gives 4–6 rocks: keep its old indexed layout and size.
 static func p0_rocks(count: int, key: String) -> Array:
 	if count <= 0: return []
 	if count > 3:

@@ -4,6 +4,9 @@ const L = preload("res://modules/mining/mine_layout.gd")
 const Art = preload("res://modules/mining/mine_art.gd")
 const Combat = preload("res://modules/mining/p0_mine_combat.gd")
 const Fx = preload("res://tests/p0/fixtures/mine_b1_view.gd")
+const NAMES := ["N1", "N2", "S1", "S2", "W1", "W2"]
+const PAIRS := ["N1-S1", "N1-S2", "N2-S1", "N2-S2", "N2-W1", "N2-W2", "S2-W1", "S2-W2"]
+const TRIPLES := ["N2-S1-W1", "N2-S2-W1", "N2-S2-W2"]
 
 func _nodes(points: Array) -> Array:
 	var nodes := []
@@ -18,10 +21,10 @@ func _fits(ids: Array, distance: float) -> bool:
 
 func _combinations() -> Array:
 	var out := []
-	for a in 9:
-		for b in range(a + 1, 9):
+	for a in L.FALLBACK_POSITIONS.size():
+		for b in range(a + 1, L.FALLBACK_POSITIONS.size()):
 			if _fits([a, b], 4.5): out.append([a, b])
-			for c in range(b + 1, 9):
+			for c in range(b + 1, L.FALLBACK_POSITIONS.size()):
 				if _fits([a, b, c], 3.5): out.append([a, b, c])
 	return out
 
@@ -35,15 +38,19 @@ func test_new_counts_keep_indices_and_spread_over_distinct_edges_by_day() -> voi
 			assert_array(L.p0_rocks(count, key)).is_equal(points)
 			var ids := points.map(func(p): return L.FALLBACK_POSITIONS.find(p))
 			assert_bool(_fits(ids, 4.5 if count == 2 else 3.5)).is_true()
+			ids.sort()   # count physical layouts, not permutations of the same indexed rocks.
 			layouts[str(ids)] = true
 			L._navigation(_nodes(points), ["0"], L.ROCK_RADIUS)
 			assert_array(L.p0_rocks(count, key)).is_equal(points)
-	assert_int(layouts.size()).is_greater(15)
+	assert_int(layouts.size()).is_equal(11)
 	assert_array(L.p0_rocks(0, "guard")).is_empty()
 
 func test_every_allowed_full_layout_has_no_dead_cells_and_all_approaches_are_walkable() -> void:
 	var combinations := _combinations()
-	assert_int(combinations.size()).is_equal(33)   # v2 has 20 pairs and 13 triples.
+	assert_int(combinations.size()).is_equal(11)
+	var names := func(ids): return "-".join(ids.map(func(i): return NAMES[i]))
+	assert_array(combinations.filter(func(ids): return ids.size() == 2).map(names)).is_equal(PAIRS)
+	assert_array(combinations.filter(func(ids): return ids.size() == 3).map(names)).is_equal(TRIPLES)
 	for ids in combinations:
 		var points: Array = ids.map(func(i): return L.FALLBACK_POSITIONS[i])
 		var nodes := _nodes(points)
