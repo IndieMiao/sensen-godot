@@ -1,0 +1,11 @@
+{
+  "author": "黄忠",
+  "kind": "new authored geometry using shared Basic Room modelling primitives",
+  "reference": "church_concept_v1.jpg / c_church.png approved SGODOT-423",
+  "reference_sha256": "bb5abc0cbc49e8c83c4c0c7bfe92deeb29cccc34ca75a430d1d37abe434d097e",
+  "script": "tools/art/build_poi_church.py",
+  "module": "stained_light",
+  "material": "light_patch",
+  "units": "metres, Y-up, front +Z",
+  "changes": "New geometry authored for approved church concept; shared modelling primitives only, no legacy asset geometry copied."
+}

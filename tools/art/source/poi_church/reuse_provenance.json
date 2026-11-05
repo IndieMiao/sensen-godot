@@ -1,0 +1,29 @@
+{
+  "author": "黄忠",
+  "kind": "new authored geometry using shared Basic Room modelling primitives",
+  "reference": "church_concept_v1.jpg / c_church.png approved SGODOT-423",
+  "reference_sha256": "bb5abc0cbc49e8c83c4c0c7bfe92deeb29cccc34ca75a430d1d37abe434d097e",
+  "modules": [
+    "foundation",
+    "outer_steps",
+    "grass_surround",
+    "entry_landing",
+    "labyrinth",
+    "west_wall",
+    "north_wall",
+    "pointed_window",
+    "window_surround",
+    "sanctuary_steps",
+    "altar_table",
+    "apse",
+    "rose_window",
+    "wood_pew",
+    "pipe_organ",
+    "hanging_banner",
+    "iron_chandelier",
+    "flower_pedestal",
+    "leaf_planter",
+    "stained_light"
+  ],
+  "script": "tools/art/build_poi_church.py"
+}
