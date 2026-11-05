@@ -538,6 +538,13 @@ describe('q(292) fewer, bigger rocks (SGODOT-421)', () => {
     for (const id of spec.deck.slice(2)) if (id) left.set(id, (left.get(id) ?? 0) + 1);
     expect(new Map(mineView(x.c, x.s, x.now).at!.floor_state.deck!)).toEqual(left);
   });
+  it('a floor broken further today, before q(292), reads none left, not below 0 (亚瑟 on #772)', () => {
+    const x = scenario(); x.start(); const site = mineSite(x.c, Q)!, spec = floorSpec(x.c, site, 1, x.s.player, x.s.mine.day!.key);
+    x.state().broken = [0, 1, 2, 3, 4];   // five broken under the old 4–6
+    expect(mineView(x.c, x.s, x.now).at!.floor_state).toMatchObject({ rocks: spec.rocks, left: 0 });
+    expect(bagFitsFloor(x.c, x.s, site, 1, x.s.mine.day!.key)).toBe(true);
+    expect(x.fail({ type: 'mine_rock', floor: 1, rock: spec.rocks })).toMatchObject({ code: 'bad_rock' });
+  });
   it('a full bag stops a rock when either of its two cards has no room', () => {
     // a player whose first rock deals two different cards, neither of them stone
     let x = scenario(), spec = floorSpec(x.c, mineSite(x.c, Q)!, 1, 'p', '2026-11-02');
