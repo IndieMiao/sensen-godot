@@ -15,6 +15,7 @@ dest_files=["res://.godot/imported/alc_tree_c_far.glb-8c6d1f2387bd5daf2f5074ea4b
 
 nodes/root_type=""
 nodes/root_name=""
+nodes/root_script=null
 mesh_library/use_node_names_as_mesh_names=false
 array_mesh/deduplicate_surfaces=true
 nodes/apply_root_scale=true
