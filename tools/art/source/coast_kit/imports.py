@@ -13,6 +13,9 @@ if args.action=='stage':
         for suffix in ['.glb','.glb.import']:
             p=ROOT/KIT/(name+suffix)
             if p.exists():shutil.copy2(p,QA/KIT/p.name)
+    for p in (ROOT/KIT).iterdir():
+        if p.suffix in ['.gd','.gdshader','.tres','.uid','.json']:shutil.copy2(p,QA/KIT/p.name)
+    if (HERE/'material_probe.gd').exists():shutil.copy2(HERE/'material_probe.gd',QA/'material_probe.gd')
     (QA/'project.godot').write_text('config_version=5\n[application]\nconfig/name="ZhaoyunCoastKit426Import"\nconfig/features=PackedStringArray("4.7", "Mobile")\n[rendering]\nrenderer/rendering_method="mobile"\n')
 elif args.action=='configure':
     settings={'gltf/texture_map_mode':'1','meshes/light_baking':'1','meshes/generate_lods':'false','meshes/ensure_tangents':'false','meshes/create_shadow_meshes':'false','animation/import':'false'}
@@ -21,6 +24,8 @@ elif args.action=='configure':
         assert re.search(r'^uid="uid://[^"]+"$',text,re.M) and 'nodes/root_script=null' in text
         for key,value in settings.items():
             text,n=re.subn('^'+re.escape(key)+r'=.*$',key+'='+value,text,flags=re.M);assert n==1,key
+        script='"res://assets/landmarks/_shared/coast_kit/coast_kit_import.gd"' if names[name].get('material') else '""'
+        text,n=re.subn(r'^import_script/path=.*$','import_script/path='+script,text,flags=re.M);assert n==1
         p.write_text(text)
 elif args.action=='sync':
     # Run only AFTER the final Godot --import. Never serialize away null defaults.
@@ -29,6 +34,8 @@ elif args.action=='sync':
         assert re.search(r'^uid="uid://[^"]+"$',text,re.M) and 'nodes/root_script=null' in text
         assert 'gltf/texture_map_mode=1' in text and 'meshes/light_baking=1' in text
         shutil.copy2(p,ROOT/KIT/p.name)
+    for p in (QA/KIT).glob('*.uid'):
+        if (ROOT/KIT/p.name.removesuffix('.uid')).exists():shutil.copy2(p,ROOT/KIT/p.name)
 else:
     # Only this throw-away importer cache, never other agents' caches or processes.
     if (QA/'.godot').exists():shutil.rmtree(QA/'.godot')

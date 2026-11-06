@@ -1,0 +1,124 @@
+{
+	"captures": [
+		{
+			"draws": 1,
+			"name": "sand",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "grey",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "v3_reference",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "dry",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "wet",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "raised_water",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "moved_dry",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "moved_wet",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "multimesh_dry",
+			"triangles": 2
+		},
+		{
+			"draws": 1,
+			"name": "multimesh_wet",
+			"triangles": 2
+		}
+	],
+	"checks": [
+		{
+			"check": "palette switches one uniform on the same mesh and material",
+			"passed": true
+		},
+		{
+			"check": "two palettes are visibly distinct",
+			"passed": true
+		},
+		{
+			"check": "cool palette matches #801 v3 colour under native lighting",
+			"passed": true
+		},
+		{
+			"check": "single material pass",
+			"passed": true
+		},
+		{
+			"check": "wet band leaves surfaces above water + 0.25m unchanged",
+			"passed": true
+		},
+		{
+			"check": "waterline region visibly darkens",
+			"passed": true
+		},
+		{
+			"check": "wet fade starts at water + 0.25m",
+			"passed": true
+		},
+		{
+			"check": "wetness fades smoothly instead of adding a hard stripe",
+			"passed": true
+		},
+		{
+			"check": "raising water 0.20m moves the wet band by 20 pixels",
+			"passed": true
+		},
+		{
+			"check": "translated mesh stays aligned to world water height",
+			"passed": true
+		},
+		{
+			"check": "MultiMesh instance transforms preserve the world wet band",
+			"passed": true
+		},
+		{
+			"check": "palette / wetness / MultiMesh add no draw or geometry pass",
+			"passed": true
+		},
+		{
+			"check": "Mobile GPU probe",
+			"passed": true
+		}
+	],
+	"metrics": {
+		"raised_water_start_pixel_row": 53,
+		"v3_base_max_rgb_error_255": 0.0,
+		"wet_start_pixel_row": 73
+	},
+	"passed": true,
+	"renderer": {
+		"gpu": "NVIDIA GeForce RTX 2060",
+		"method": "mobile"
+	},
+	"source_sha256": {
+		"coast_cool_gray.tres": "7d95dedf4de8b1cf16166b5c8f41332c7ea960769fb8b44b76e0ea48d970cbd6",
+		"coast_kit_import.gd": "7308dca1e6ec9189df6a206fced6a1d32a35a496a776048a578fe207f851b5fb",
+		"coast_surface.gdshader": "1abd0e2538b69250ed45977e209f21306b90d97958b6e8db04a70f68c28a6bee",
+		"coast_warm_sand.tres": "daef501123e51365b1049ccbadaf6cbbe3e0a10b1a24bcbb7eacc6d75da63f88"
+	}
+}

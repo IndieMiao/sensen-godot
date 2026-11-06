@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://assets/landmarks/_shared/coast_kit/coast_surface.gdshader" id="1"]
+
+[resource]
+resource_name = "Coast cool grey-brown / Alcatraz v3 / single opaque pass"
+shader = ExtResource("1")
+shader_parameter/rock_palette = 1
+shader_parameter/water_level = 0.15
+shader_parameter/wet_height = 0.25
+shader_parameter/wet_strength = 0.38

@@ -1,12 +1,15 @@
 """Audit exported geometry and every ordered out->in mating combination."""
 from pathlib import Path
-import argparse,hashlib,json,math,re,subprocess,sys
+import argparse,colorsys,hashlib,json,math,re,subprocess,sys
 import numpy as np
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3];KIT=ROOT/'assets/landmarks/_shared/coast_kit';QA=ROOT/'output/coast-kit'
 sys.path.insert(0,str(ROOT/'tools/art'))
 from verify_chef_sign import load_glb,accessor
 parser=argparse.ArgumentParser();parser.add_argument('--geometry-only',action='store_true');args=parser.parse_args()
 manifest=json.loads((KIT/'manifest.json').read_text());report={'author':'赵云','checks':[],'assets':{},'mates':[]};geometry={};uids=[]
+BASE='d72d74f4'
+reference=QA/'v1.1/reference';reference.mkdir(parents=True,exist_ok=True)
+base_manifest=json.loads(subprocess.check_output(['git','show',BASE+':assets/landmarks/_shared/coast_kit/manifest.json'],cwd=ROOT))
 def check(ok,label):
     report['checks'].append({'check':label,'passed':bool(ok)})
     if not ok:print('FAIL',label)
@@ -33,10 +36,53 @@ for name,e in manifest['assets'].items():
         if 'profile' not in port:continue
         at=np.array(port['position']);normal=np.array(port['outward']);points=xyz[np.abs((xyz-at)@normal)<1e-6]
         check(signature(points)==signature(port['profile']),name+'/'+port['name']+': full exported seam matches declared profile')
+    check(e['ports']==base_manifest['assets'][name]['ports'],name+': accepted v1 port contract unchanged')
+    base_path=reference/(name+'.glb')
+    if not base_path.exists():base_path.write_bytes(subprocess.check_output(['git','show',BASE+':assets/landmarks/_shared/coast_kit/'+name+'.glb'],cwd=ROOT))
+    if e['family'] in ['shore_rock','scatter']:
+        old,old_blob=load_glb(base_path);old_p=old['meshes'][0]['primitives'][0]
+        for attribute in ['POSITION','NORMAL']:
+            previous=np.array(accessor(old,old_blob,old_p['attributes'][attribute]))
+            current=xyz if attribute=='POSITION' else normals
+            check(previous.shape==current.shape and np.allclose(previous,current,atol=2e-6),name+': existing '+attribute+' unchanged')
+        check(np.array_equal(np.array(accessor(old,old_blob,old_p['indices'])).reshape(-1,3),ids),name+': existing topology unchanged')
+        check(colors.shape[1]==4 and set(np.rint(colors[:,3]*8).astype(int))<=set([1,2,3,4]),name+': four palette roles in opaque colour channel')
+    elif e['family'] in ['dock','seawall']:
+        check(colors.shape[1]==4 and np.allclose(colors[:,3],.75),name+': wettable solid surface code')
+    else:check(path.read_bytes()==base_path.read_bytes(),name+': already accepted GLB byte-identical')
+    if e['family']=='dock':
+        check(e['planks']==11 and .15<=min(e['plank_width_range_m'])<=max(e['plank_width_range_m'])<=.20,name+': eleven 15–20cm boards')
+        check(e['pile_count']==4 and len(e['pile_centres'])==4,name+': four corner piles')
+        top=np.isclose(xyz[:,1],1.2,atol=1e-6)&np.isclose(np.abs(xyz[:,2]),1,atol=1e-6)
+        edges=np.unique(np.round(xyz[top,0],6));widths=edges[1::2]-edges[::2];gaps=edges[2::2]-edges[1:-1:2]
+        check(len(edges)==22 and (widths>=.15).all() and (widths<=.20).all() and np.allclose(gaps,.01,atol=2e-6),name+': actual top geometry has 11 narrow boards and visible 1cm joints')
+        for centre in e['pile_centres']:
+            expected=[np.array([centre[0]+dx,y,centre[2]+dz]) for dx in [-.08,.08] for dz in [-.08,.08] for y in [0,.98]]
+            check(all(np.linalg.norm(xyz-p,axis=1).min()<1e-6 for p in expected),name+': actual pile corners at '+str(centre))
+        def saturation(values):
+            srgb=np.where(values<=.0031308,values*12.92,1.055*np.power(values,1/2.4)-.055)
+            return float(np.mean([colorsys.rgb_to_hsv(*c)[1] for c in srgb]))
+        old,old_blob=load_glb(base_path);old_p=old['meshes'][0]['primitives'][0]
+        old_xyz=np.array(accessor(old,old_blob,old_p['attributes']['POSITION']));old_colors=np.array(accessor(old,old_blob,old_p['attributes']['COLOR_0']))
+        old_top=np.isclose(old_xyz[:,1],1.2,atol=1e-6)&np.isclose(np.abs(old_xyz[:,2]),1,atol=1e-6)
+        old_s,new_s=saturation(old_colors[old_top,:3]),saturation(colors[top,:3])
+        check(new_s<old_s-.1,name+': plank colour is measurably less saturated than v1')
+        report.setdefault('plank_saturation',{})[name]={'v1':old_s,'v1.1':new_s}
+    if e['family']=='seawall':
+        cap=xyz[np.isclose(xyz[:,1],1.2,atol=1e-6)]
+        check(np.isclose(cap[:,2].max()-cap[:,2].min(),.84,atol=1e-6),name+': actual overhanging coping width')
+        for height in [.3,.6,.9]:
+            recess=np.array([.90,height-.01,.38-.10*(height-.01)/1.05-.018])
+            check(np.linalg.norm(xyz-recess,axis=1).min()<1e-6,name+': actual recessed horizontal joint '+str(height))
+        joint_rgb=np.array([int(manifest['palette_srgb']['stone_joint'][i:i+2],16)/255 for i in [0,2,4]])
+        joint_rgb=np.where(joint_rgb<=.04045,joint_rgb/12.92,((joint_rgb+.055)/1.055)**2.4)
+        joint_vertices=xyz[np.linalg.norm(colors[:,:3]-joint_rgb,axis=1)<1e-6]
+        check(len(joint_vertices)>0 and np.abs(joint_vertices[:,0]).max()<=.900001,name+': joint paint stays horizontal and off the end collars')
     uid=None
     if not args.geometry_only:
         text=(KIT/(name+'.glb.import')).read_text();match=re.search(r'^uid="(uid://[^"]+)"$',text,re.M);uid=match.group(1) if match else None
         check(uid is not None and all(s in text.splitlines() for s in ['nodes/root_script=null','gltf/texture_map_mode=1','meshes/light_baking=1','meshes/generate_lods=false']),name+': Godot UID / complete stable import defaults')
+        if e.get('material'):check('import_script/path="res://assets/landmarks/_shared/coast_kit/coast_kit_import.gd"' in text,name+': palette/wet material assigned by Godot importer')
         uids.append(uid)
     report['assets'][name]={'triangles':tri,'surfaces':1,'sha256':digest,'uid':uid,'bounds':[lo.tolist(),hi.tolist()]}
 
@@ -48,7 +94,9 @@ for an,ae in manifest['assets'].items():
                 if bp['name']!='in' or 'profile' not in bp or bp['family']!=ap['family']:continue
                 na,nb=np.array(ap['outward']),np.array(bp['outward'])
                 angle=math.atan2(nb[2],nb[0])-math.atan2(-na[2],-na[0]);r=yaw(angle);t=np.array(ap['position'])-r@np.array(bp['position'])
-                a=np.array(ap['profile']);b=np.array(bp['profile'])@r.T+t
+                apoints=geometry[an];bpoints=geometry[bn]
+                a=apoints[np.abs((apoints-np.array(ap['position']))@na)<1e-6]
+                b=bpoints[np.abs((bpoints-np.array(bp['position']))@nb)<1e-6]@r.T+t
                 # Symmetric maximum closest-vertex gap of the actual profile sets.
                 distance=np.linalg.norm(a[:,None]-b[None,:],axis=2)
                 gap=max(float(distance.min(0).max()),float(distance.min(1).max()))
@@ -63,6 +111,10 @@ for name in ['coast_dock_straight','coast_dock_bollard']:
     check(exists and signature(edge)==signature(transformed),name+' -> stairs: 2m walking edge at identical height')
 check(len(manifest['assets'])==15 and not manifest['example_layout_included'],'15 independent prototypes; no delivered example layout')
 check(not any(KIT.glob('*layout*')),'no runtime example layout file')
+check(len(list(KIT.glob('*.glb')))==15,'no duplicated GLBs for the second palette')
+shader=(KIT/'coast_surface.gdshader').read_text()
+check('sampler2D' not in shader and not re.search(r'^\s*ALPHA\s*=',shader,re.M),'palette and wet band use no textures or transparency pass')
+check('MODEL_MATRIX' in shader and 'world_height' in shader and 'smoothstep' in shader,'wet band uses a continuous world-water-level gradient')
 if not args.geometry_only:check(len(set(uids))==15,'15 distinct Godot-generated UIDs')
 check(json.loads((HERE/'asset_stats.json').read_text())==manifest,'runtime and source manifests agree')
 unchanged=subprocess.check_output(['git','diff','HEAD','--name-only','--','assets/landmarks/alcatraz_island'],cwd=ROOT,text=True)

@@ -1,6 +1,6 @@
-# Coast Kit · SGODOT-426
+# Coast Kit · SGODOT-426 · v1.1
 
-赵云制作的可复用海岸套件，适用于后续海边地标。15 个独立 GLB，单件 28–344 三角面，每件一个 `_mobile` 网格、一个 surface，哑光顶点色，无贴图 / 骨架 / 动画。可编辑源和生成器见文末。整套不包含示例 layout 或游戏接入场景。
+赵云制作的可复用海岸套件，适用于后续海边地标。15 个独立 GLB，单件 96–384 三角面，每件一个 `_mobile` 网格、一个 surface，哑光顶点色，无贴图 / 骨架 / 动画。可编辑源和生成器见文末。整套不包含示例 layout 或游戏接入场景。
 
 ## 模数、方向与原点
 
@@ -20,14 +20,14 @@
 | coast_scatter_a | 196 | 1.00 × 0.55 × 0.85 m |
 | coast_scatter_b | 196 | 1.40 × 0.85 × 1.10 m |
 | coast_scatter_c | 196 | 1.90 × 0.95 × 1.40 m |
-| coast_seawall | 28 | 长 2 m，高 1.2 m，略收坡的混凝土墙与压顶 |
-| coast_dock_straight | 172 | 2 × 2 m 甲板，顶高 1.2 m |
-| coast_dock_end | 272 | 2 × 2 m 尽头，端部封边 / 低木挡块 |
-| coast_dock_bollard | 344 | 2 × 2 m 甲板、系缆桩和一圈绳 |
+| coast_seawall | 156 | 长 2 m，高 1.2 m；0.84 m 出挑压顶，三道水平分块缝，原端面保留 |
+| coast_dock_straight | 240 | 2 × 2 m 甲板，11 块约 0.18 m 窄板，四角细桩 |
+| coast_dock_end | 340 | 2 × 2 m 尽头，端部封边 / 低木挡块 |
+| coast_dock_bollard | 384 | 2 × 2 m 甲板、系缆桩和一圈绳 |
 | coast_buoy | 224 | 约 Ø0.56 × 1.23 m，水线在局部 Y=0.30 |
 | coast_water_steps | 96 | 宽 2 m、水平长 2 m，8 级，踏步 0.25 m / 级高 0.15 m |
 
-合计 **2,348 面 / 15 个独立 surface**。GLB 不内置碰撞，接入场景自行配置。
+合计 **2,652 面 / 15 个独立 surface**。GLB 不内置碰撞，接入场景自行配置。
 
 ## 首尾拼法
 
@@ -52,7 +52,7 @@
 ( 0.10, 0.64), ( 0.45, 0.33), ( 0.60, 0.00)
 ```
 
-断面、峰值和浅裂缝都在模块内部变化，连接截面不受影响。只验证带方向的 out→in 配对：36 组岸石、1 组墙、6 组码头，端口顶点最大错位小于 0.000001 m。甲板木板自身没有透空缝，板间差异由顶点色区分；支柱位于段中，不会在接头重复叠桩。
+断面、峰值和浅裂缝都在模块内部变化，连接截面不受影响。只验证带方向的 out→in 配对：36 组岸石、1 组墙、6 组码头，实际导出端口顶点最大错位小于 0.000001 m。11 块木板实宽约 0.172–0.177 m，板间有 0.010 m 凹缝，下面有内收的深色垫板；模块外端仍闭合。四根细桩位于段内 (X=±0.66, Z=±0.72)，不会在接头重复叠桩。
 
 ## 码头、下水台阶与浮标高度
 
@@ -61,16 +61,37 @@
 - 下水台阶以岸上步行高度设根部 Y=H-1.20；水位决定实际露出的级数。末端是下水端，不是跨层楼梯的通用接口。
 - 浮标水线局部 Y=0.30，水面为 W 时放 **Y=W-0.30**。当前为静态件。
 
-## 色板与导入
+## 双色板、湿带与导入
 
-配色来自马可波罗恶魔岛色板 `b81605af`，岸石使用 `rock / rock_light / rock_shadow / rock_warm`，墙和台阶用 `stone*`，码头用 `wood*`。浮标使用同表的奶油底和暖橙；系缆桩为哑光深青。散石保留已有恶魔岛碎岩几何，缩放、换色后导入本目录，来源路径 / SHA 记录在 manifest，不回写原件。
+九种岸石 / 散石共用既有网格，通过一个 `rock_palette` 材质参数切换两套颜色，未复制 GLB、未增加 surface / pass，也没有新增纹理：
 
-顶点颜色已转为线性值。若接入方覆盖材质，设 `vertex_color_use_as_albedo=true`、`vertex_color_is_srgb=false`、`roughness=0.94`、`metallic=0`、`metallic_specular=0.15`。
+| 参数 | 值 | 含义 |
+|---|---|---|
+| rock_palette | 0 | 暖沙色，保留 v1 的岩石 RGB 色板 |
+| rock_palette | 1 | 冷灰褐，默认；#801 v3 的 #777A75 / #93958B / #515B59 基准 |
+| water_level | 默认 0.15 | 世界坐标水面 Y，按使用场景设置 |
+| wet_height | 默认 0.25 | 水面以上渐淡湿带的高度，米 |
+| wet_strength | 默认 0.38 | 线性颜色压暗幅度；0 关闭湿带 |
 
-全部 `.import` 保留 Godot 生成的 UID、`nodes/root_script=null`、`gltf/texture_map_mode=1`、`meshes/light_baking=1`；自动 LOD、切线生成、shadow mesh 和动画导入关闭。**最终导入完成后再同步 `.import`，提交后冷导入 / 同步应保持 git status 干净。**
+[coast_cool_gray.tres](coast_cool_gray.tres) 和 [coast_warm_sand.tres](coast_warm_sand.tres) 使用同一个无纹理着色器。木板改为低饱和暖木褐，小幅深浅变化；护岸墙和码头不受岸石色板选择影响。
+
+湿带按实际世界水位计算，移动模块、缩放或使用 MultiMesh 时仍对齐水面；岸石、散石、护岸墙和码头在水面以下及其上方 0.25 m 渐暗。材质保持不透明并写深度，未增加湿带几何或透明 pass。#824 浪花仍保留其原透明材质，在水面上方约 0.018 m 单独叠放、关闭投影；本包不依赖或修改 #824 文件。
+
+13 个需要换色 / 湿带的模型在 Godot 导入时由 [coast_kit_import.gd](coast_kit_import.gd) 将材质写到 Mesh surface，提取 Mesh 给 MultiMesh 也能保留。浮标、台阶 GLB 沿用已通过的原字节。**保留导入材质**；如需按水域或实例调整，使用本目录材质，例如：
+
+```gdscript
+var material := preload("res://assets/landmarks/_shared/coast_kit/coast_cool_gray.tres").duplicate() as ShaderMaterial
+material.set_shader_parameter("rock_palette", 0) # 0 暖沙，1 冷灰褐
+material.set_shader_parameter("water_level", sea_y)
+mesh_instance.material_override = material # 也适用于 MultiMeshInstance3D
+```
+
+同一条岸线共享同一套色板、水位和湿带设置。顶点 RGB 是线性颜色；13 个着色器模型的 `COLOR.a` 是面类型标签（1/8、2/8、3/8、4/8 为岩石面色，6/8 为可湿固体），不是透明度。着色器不写 `ALPHA`。材质 roughness=0.94、metallic=0、specular=0.15。导入后不要用通用顶点色材质覆盖这些 shader 材质，否则换色和湿带不会生效。
+
+全部 `.import` 保留原 Godot UID、`nodes/root_script=null`、`gltf/texture_map_mode=1`、`meshes/light_baking=1`；自动 LOD、切线生成、shadow mesh 和动画导入关闭。最终导入完成后再同步 `.import`，提交后冷导入 / 同步应保持 git status 干净。Shader / 导入脚本的 `.uid` 同样由 Godot 生成并保留。
 
 ## 源文件与审阅
 
 - [coast_kit.blend](../../../../tools/art/source/coast_kit/coast_kit.blend)：15 个可编辑 collection，保留命名部件；在各自构造原点重叠保存，可单独隐藏查看。
 - [生成器](../../../../tools/art/build_coast_kit.py)、[导入工具](../../../../tools/art/source/coast_kit/imports.py)、[独立验证](../../../../tools/art/source/coast_kit/verify.py)。
-- [审阅图与验证说明](../../../../docs/design/coast-kit-2026-11-06/README.md)。约 20 m 示例只保留审阅图片；示例地表、水面、场景和 layout 均不在套件交付中。
+- [审阅图与验证说明](../../../../docs/design/coast-kit-2026-11-06/v1.1/README.md)。约 20 m 示例只保留审阅图片；示例地表、水面、场景和 layout 均不在套件交付中。

@@ -10,6 +10,9 @@ import build_decor_assets as K
 from verify_chef_sign import load_glb,accessor
 OUT=ROOT/'assets/landmarks/_shared/coast_kit';SRC=ROOT/'tools/art/source/coast_kit'
 PALETTE=json.loads((SRC/'reference/palette.json').read_text())['colors']
+PALETTE.update({'wood':'9F8063','wood_light':'AA8E72','wood_dark':'675139','wood_seam':'665443',
+                'plank_a':'9F8165','plank_b':'A7896B','plank_c':'A18468','plank_d':'AA8C6E',
+                'rope':'B7A68D','stone_joint':'8B8476'})
 ACTOR='8ea32e40-c0ba-4a31-864f-374a6bcbc554'
 # z (land - / sea +), y: the SAME six-vertex end profile for all six rocks.
 ROCK_PROFILE=[[-.60,0],[-.60,.65],[-.15,.75],[.10,.64],[.45,.33],[.60,0]]
@@ -82,30 +85,65 @@ def scatter(index):
             'reuse':{'source_file':source.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'changes':'resized to kit scale, recoloured to island palette; source geometry and source file untouched'}}
 
 def seawall():
-    n=len(WALL_PROFILE);pts=[(x,y,z) for x in [-1,1] for z,y in WALL_PROFILE]
-    faces=[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(j,(j+1)%n,(j+1)%n+n,j+n) for j in range(n)]
-    o=K.mesh('Battered concrete wall / continuous coping',pts,faces,'stone');face_roles(o,['stone','stone_light','stone_shade'])
-    return {'family':'seawall','nominal_module_m':2,'top_y':1.2,'ports':[port('in',[-1,0,0],[-1,0,0],pts[:n],'seawall'),port('out',[1,0,0],[1,0,0],pts[n:],'seawall')]}
+    # Leave both accepted eight-vertex end profiles untouched. Interior cap
+    # projects 14 cm beyond the upper body; grooves taper into the end collars.
+    inside=[[-.32,0],[-.28,1.05],[-.42,1.08],[-.42,1.20],[.42,1.20],[.42,1.08],[.28,1.05],[.38,0]]
+    edges=[];offsets=[];outline=[]
+    for j in range(8):
+        edge=[inside[j]]
+        if j in [0,6]:
+            levels=[.3,.6,.9] if j==0 else [.9,.6,.3]
+            for y in levels:
+                bands=[(y-.02,0),(y-.01,.018),(y+.01,.018),(y+.02,0)]
+                if j==6:bands.reverse()
+                for height,inset in bands:
+                    depth=(-.32+.04*height/1.05+inset) if j==0 else (.38-.10*height/1.05-inset)
+                    edge.append([depth,height])
+        edge.append(inside[(j+1)%8]);offsets.append(len(outline));outline.extend(edge[:-1]);edges.append(edge)
+    n=len(outline);left=[(-1,y,z) for z,y in WALL_PROFILE];right=[(1,y,z) for z,y in WALL_PROFILE]
+    pts=left+[(-.90,y,z) for z,y in outline]+[(.90,y,z) for z,y in outline]+right
+    right_start=8+2*n
+    faces=[tuple(reversed(range(8))),tuple(range(right_start,right_start+8))]
+    for j,edge in enumerate(edges):
+        ids=[(offsets[j]+k)%n for k in range(len(edge))]
+        for a,b in zip(ids,ids[1:]):
+            faces.append((j,8+a,8+b))
+            faces.append((right_start+j,8+n+b,8+n+a))
+        faces.append((j,8+ids[-1],(j+1)%8))
+        faces.append((right_start+j,right_start+(j+1)%8,8+n+ids[-1]))
+    for j in range(n):faces.append((8+j,8+(j+1)%n,8+n+(j+1)%n,8+n+j))
+    o=K.mesh('Concrete wall / overhanging coping and three recessed courses',pts,faces,'stone')
+    face_roles(o,['stone','stone_light','stone_shade']);o.data.materials.append(K.MATS['stone_joint'])
+    for face in o.data.polygons:
+        if abs(face.center.x)<.90 and abs(face.normal.z)<.2 and any(abs(face.center.z-y)<.012 for y in [.3,.6,.9]):face.material_index=3
+    return {'family':'seawall','nominal_module_m':2,'top_y':1.2,'coping_width_m':.84,'horizontal_joint_levels_m':[.3,.6,.9],
+            'ports':[port('in',[-1,0,0],[-1,0,0],left,'seawall'),port('out',[1,0,0],[1,0,0],right,'seawall')]}
 
 def dock(end=False,bollard=False):
-    # Eight full-width planks meet without open slots. Alternating paint is the seam.
-    for i in range(8):
-        color=['wood','wood_light','wood','wood','wood_light','wood','wood_dark','wood'][i]
-        K.box('Deck plank %02d'%i,(-.875+.25*i,1.14,0),(.25,.12,2),color,0)
+    # Eleven 17–18 cm boards, shallow visible joints over a solid dark backer.
+    # The end boards still reach X +/-1, preserving the exact old seam profile.
+    pitch=2/11;gap=.010;plank_widths=[]
+    shades=['plank_b','plank_a','plank_c','plank_b','plank_d','plank_c','plank_a','plank_b','plank_c','plank_d','plank_b']
+    for i in range(11):
+        left=-1+i*pitch+(gap/2 if i else 0);right=-1+(i+1)*pitch-(gap/2 if i<10 else 0)
+        plank_widths.append(right-left)
+        K.box('Deck plank %02d'%i,((left+right)/2,1.14,0),(right-left,.12,2),shades[i],0)
+    # Recess on all sides: no coplanar overlap with exposed board edges/undersides.
+    K.box('Dark continuous backing beneath joints',(0,1.115,0),(1.92,.05,1.98),'wood_seam',0)
     for z in [-.72,.72]:
         K.box('Continuous longitudinal beam',(0,1.015,z),(2,.13,.14),'wood_dark',0)
-        K.cylinder('Round timber pile',(0,.49,z),.11,.98,'wood_dark',top=.095,segments=6)
-    K.box('Central cross support',(0,.90,0),(.18,.12,1.62),'wood',0)
+        for x in [-.66,.66]:K.box('Corner timber pile', (x,.49,z),(.16,.98,.16),'wood_dark',0)
+    for x in [-.66,.66]:K.box('Cross support over corner pile row',(x,.90,0),(.18,.12,1.62),'wood',0)
     if end:
         # End fascia stays INSIDE the 2 m tile; no accidental longer final segment.
         K.box('Terminal end fascia',(.96,1.025,0),(.08,.11,2),'wood_dark',0)
         for z in [-.82,.82]:K.box('Low terminal bumper',(.87,1.27,z),(.18,.14,.18),'wood',.015)
     if bollard:
-        K.cylinder('Mooring bollard foot',(0,1.235,.73),.19,.07,'dark',segments=8)
-        K.cylinder('Mooring bollard stem',(0,1.49,.73),.10,.44,'dark',top=.12,segments=8)
+        K.cylinder('Mooring bollard foot',(0,1.235,.73),.19,.07,'dark',segments=6)
+        K.cylinder('Mooring bollard stem',(0,1.49,.73),.10,.44,'dark',top=.12,segments=6)
         K.box('Mooring bollard transverse head',(0,1.72,.73),(.48,.11,.15),'dark',.015)
-        bpy.ops.mesh.primitive_torus_add(major_radius=.21,minor_radius=.025,major_segments=12,minor_segments=3,location=K.v((.50,1.23,.55)))
-        K.finish(bpy.context.object,'Single quiet rope coil','wood_light',True)
+        bpy.ops.mesh.primitive_torus_add(major_radius=.21,minor_radius=.025,major_segments=10,minor_segments=3,location=K.v((.50,1.23,.55)))
+        K.finish(bpy.context.object,'Single quiet rope coil','rope',True)
     # Explicit profiles of every beam/plank end, not support piles between seams.
     profile=[]
     for x in [-1,1]:
@@ -114,7 +152,10 @@ def dock(end=False,bollard=False):
         profile.append(points)
     ports=[port('in',[-1,1.2,0],[-1,0,0],profile[0],'dock')]
     if not end:ports.append(port('out',[1,1.2,0],[1,0,0],profile[1],'dock'))
-    return {'family':'dock','nominal_module_m':2,'deck_size_m':[2,2],'deck_y':1.2,'ports':ports,'terminal':end,'mooring_bollard':bollard,'placement_y':'desired walking height minus 1.2 m; piles may extend underwater'}
+    return {'family':'dock','nominal_module_m':2,'deck_size_m':[2,2],'deck_y':1.2,'ports':ports,'terminal':end,'mooring_bollard':bollard,
+            'planks':11,'plank_width_range_m':[min(plank_widths),max(plank_widths)],'joint_width_m':gap,
+            'pile_count':4,'pile_centres':[[x,0,z] for z in [-.72,.72] for x in [-.66,.66]],'pile_width_m':.16,
+            'placement_y':'desired walking height minus 1.2 m; piles may extend underwater'}
 
 def buoy():
     profile=[(.09,0),(.22,.13),(.28,.30),(.28,.45),(.22,.67),(.09,.78)]
@@ -139,7 +180,28 @@ def rename_mesh(path,name):
     doc['meshes'][0]['name']=name+'_mobile';encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*(-len(encoded)%4)
     path.write_bytes(struct.pack('<III',0x46546c67,2,20+len(encoded)+len(tail))+struct.pack('<II',len(encoded),0x4e4f534a)+encoded+tail)
 
+def encode_surface_codes(path,rock):
+    # Keep positions, normals, indices and the warm RGB paint byte-identical.
+    # Repack only COLOR_0 from VEC3 to VEC4; alpha is a shader tag, not opacity.
+    doc,old=load_glb(path);primitive=doc['meshes'][0]['primitives'][0];index=primitive['attributes']['COLOR_0'];access=doc['accessors'][index]
+    colors=accessor(doc,old,index);view_index=access['bufferView'];payload=bytearray()
+    palette=[K.rgb(PALETTE[k]) for k in ['rock','rock_light','rock_shadow','rock_warm']]
+    for c in colors:
+        code=(min(range(4),key=lambda j:sum((c[k]-palette[j][k])**2 for k in range(3)))+1)/8 if rock else .75
+        payload.extend(struct.pack('<4f',*c[:3],code))
+    binary=bytearray()
+    for i,view in enumerate(doc['bufferViews']):
+        part=bytes(payload) if i==view_index else old[view.get('byteOffset',0):view.get('byteOffset',0)+view['byteLength']]
+        binary.extend(b'\0'*(-len(binary)%4));view['byteOffset']=len(binary);view['byteLength']=len(part)
+        if i==view_index:view.pop('byteStride',None)
+        binary.extend(part)
+    access['type']='VEC4';access['componentType']=5126;access.pop('normalized',None);access['byteOffset']=0
+    binary.extend(b'\0'*(-len(binary)%4));doc['buffers'][0]['byteLength']=len(binary)
+    encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*(-len(encoded)%4)
+    path.write_bytes(struct.pack('<III',0x46546c67,2,28+len(encoded)+len(binary))+struct.pack('<II',len(encoded),0x4e4f534a)+encoded+struct.pack('<II',len(binary),0x004e4942)+binary)
+
 def main():
+    retained=json.loads((OUT/'manifest.json').read_text())['assets']
     bpy.ops.wm.read_factory_settings(use_empty=True);bpy.context.preferences.filepaths.save_version=0;K.OUT=OUT
     for role,value in PALETTE.items():
         m=bpy.data.materials.new(role);m.diffuse_color=(*K.rgb(value),1);m.use_nodes=True
@@ -155,10 +217,15 @@ def main():
     for name,build in builders:
         K.begin(name,[1,1],400,generator='tools/art/build_coast_kit.py',author='赵云',virtual_user_id=ACTOR,pivot='module construction origin, Y=0 base',collision='none; consuming scene owns physics')
         meta=build();bpy.context.view_layer.update()
-        entry=K.export_asset(name,K.CURRENT,material);path=OUT/(name+'.glb');rename_mesh(path,name)
-        entry.update(meta);entry.update(file=name+'.glb',sha256=hashlib.sha256(path.read_bytes()).hexdigest(),bytes=path.stat().st_size,source='tools/art/source/coast_kit/coast_kit.blend')
+        path=OUT/(name+'.glb')
+        if name in ['coast_buoy','coast_water_steps']:
+            entry=retained[name];assert hashlib.sha256(path.read_bytes()).hexdigest()==entry['sha256']
+        else:
+            entry=K.export_asset(name,K.CURRENT,material);rename_mesh(path,name)
+            rock=meta['family'] in ['shore_rock','scatter'];encode_surface_codes(path,rock)
+            entry.update(meta);entry.update(file=name+'.glb',sha256=hashlib.sha256(path.read_bytes()).hexdigest(),bytes=path.stat().st_size,source='tools/art/source/coast_kit/coast_kit.blend',material='coast_cool_gray.tres' if rock else 'coast_warm_sand.tres')
         records[name]=entry;print('COAST_KIT',name,entry['triangles'],entry['bounds'],flush=True)
-    manifest={'author':'赵云','virtual_user_id':ACTOR,'module_grid_m':2,'axes':'metres, Y up; straight coast +X tangent, +Z water / -Z land','material_contract':{'vertex_color_is_srgb':False,'roughness':.94,'specular':.15,'metallic':0,'textures':False},'palette_srgb':PALETTE,'reference':json.loads((SRC/'reference/provenance.json').read_text()),'assets':records,'example_layout_included':False}
+    manifest={'author':'赵云','virtual_user_id':ACTOR,'revision':'v1.1','module_grid_m':2,'axes':'metres, Y up; straight coast +X tangent, +Z water / -Z land','material_contract':{'vertex_color_is_srgb':False,'roughness':.94,'specular':.15,'metallic':0,'textures':False,'passes':1,'keep_imported_material':True,'vertex_alpha':'opaque surface tag: 1/8 rock base, 2/8 light, 3/8 shadow, 4/8 warm, 6/8 wettable solid'},'rock_palettes':{'selector':'rock_palette','warm_sand':0,'cool_gray_brown':1,'cool_reference':'SGODOT-424 #801 v3 af319757: #777A75 / #93958B / #515B59'},'wet_band':{'water_level_default':.15,'height_above_water_m':.25,'strength':.38,'space':'world; follows translated/scaled instances','foam_compatibility':'opaque underlying surface; existing #824 foam remains an independent transparent layer at water + 0.018m'},'palette_srgb':PALETTE,'reference':json.loads((SRC/'reference/provenance.json').read_text()),'assets':records,'example_layout_included':False}
     for path in [OUT/'manifest.json',SRC/'asset_stats.json']:path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     bpy.context.scene.unit_settings.system='METRIC';bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'coast_kit.blend'),compress=True)
 

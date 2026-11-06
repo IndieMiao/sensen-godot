@@ -1,6 +1,7 @@
 {
   "author": "赵云",
   "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "revision": "v1.1",
   "module_grid_m": 2,
   "axes": "metres, Y up; straight coast +X tangent, +Z water / -Z land",
   "material_contract": {
@@ -8,7 +9,23 @@
     "roughness": 0.94,
     "specular": 0.15,
     "metallic": 0,
-    "textures": false
+    "textures": false,
+    "passes": 1,
+    "keep_imported_material": true,
+    "vertex_alpha": "opaque surface tag: 1/8 rock base, 2/8 light, 3/8 shadow, 4/8 warm, 6/8 wettable solid"
+  },
+  "rock_palettes": {
+    "selector": "rock_palette",
+    "warm_sand": 0,
+    "cool_gray_brown": 1,
+    "cool_reference": "SGODOT-424 #801 v3 af319757: #777A75 / #93958B / #515B59"
+  },
+  "wet_band": {
+    "water_level_default": 0.15,
+    "height_above_water_m": 0.25,
+    "strength": 0.38,
+    "space": "world; follows translated/scaled instances",
+    "foam_compatibility": "opaque underlying surface; existing #824 foam remains an independent transparent layer at water + 0.018m"
   },
   "palette_srgb": {
     "stone": "CBB48F",
@@ -27,10 +44,10 @@
     "roof": "A4A08F",
     "glass": "608F99",
     "glass_light": "86B0B3",
-    "wood": "BB8B52",
-    "wood_light": "D0A56C",
-    "wood_dark": "9A7046",
-    "wood_seam": "795B43",
+    "wood": "9F8063",
+    "wood_light": "AA8E72",
+    "wood_dark": "675139",
+    "wood_seam": "665443",
     "dark": "4E6769",
     "bird": "EEEDE6",
     "bridge": "C76845",
@@ -38,7 +55,13 @@
     "sign_teal": "35696A",
     "sign_cream": "FFF0CA",
     "flower_yellow": "DFC570",
-    "soil": "897A53"
+    "soil": "897A53",
+    "plank_a": "9F8165",
+    "plank_b": "A7896B",
+    "plank_c": "A18468",
+    "plank_d": "AA8C6E",
+    "rope": "B7A68D",
+    "stone_joint": "8B8476"
   },
   "reference": {
     "source_commit": "b81605af5b9aaa2e9bdcd3af81a0b2f385ce7bc3",
@@ -51,7 +74,7 @@
     "coast_rock_straight_low": {
       "triangles": 104,
       "surfaces": 1,
-      "bytes": 10672,
+      "bytes": 11664,
       "bounds_blender": [
         [
           -1.0,
@@ -198,13 +221,14 @@
       ],
       "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
       "file": "coast_rock_straight_low.glb",
-      "sha256": "06dfa8cd155f6330b6dc6995e22bd20a39f269ac4a0f9d6579951864caa1b8f5",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "468ca175db81da1f6d8ee145db723d19a9c40c5a65e55024a45f2a8b3b3a0cc1",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_rock_straight_high": {
       "triangles": 104,
       "surfaces": 1,
-      "bytes": 10676,
+      "bytes": 11668,
       "bounds_blender": [
         [
           -1.0,
@@ -351,13 +375,14 @@
       ],
       "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
       "file": "coast_rock_straight_high.glb",
-      "sha256": "dc6065c7dc0a48a8c7eb4c8fdb20fef56300857b77a2ae363aa3b2059f43e8d0",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "522cd7560dd3c6f036c03841434de535a147fc77e4ccb40793f7270e5d551551",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_rock_outer_low": {
       "triangles": 104,
       "surfaces": 1,
-      "bytes": 11028,
+      "bytes": 12060,
       "bounds_blender": [
         [
           -1.0,
@@ -504,13 +529,14 @@
       ],
       "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
       "file": "coast_rock_outer_low.glb",
-      "sha256": "3719e41470f8d9dd01ff2241bd7bd004d7344739b67e6c72ff20eda18c75c3d9",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "36db8c8def91094093e7af2946ec1da37c23b9d7f710ab006d5a9334fb773296",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_rock_outer_high": {
       "triangles": 104,
       "surfaces": 1,
-      "bytes": 11032,
+      "bytes": 12064,
       "bounds_blender": [
         [
           -1.0,
@@ -657,13 +683,14 @@
       ],
       "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
       "file": "coast_rock_outer_high.glb",
-      "sha256": "e5d2e31d9723c4db222e9d1f28f14c1b8e75e0334de985d271750ab8b948974c",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "28e24e3645858773be89d25a856f7e0ae142d450cc15ae7876bd72823f50c303",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_rock_inner_low": {
       "triangles": 104,
       "surfaces": 1,
-      "bytes": 11028,
+      "bytes": 12060,
       "bounds_blender": [
         [
           -1.0,
@@ -810,13 +837,14 @@
       ],
       "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
       "file": "coast_rock_inner_low.glb",
-      "sha256": "381038db74c3f5384ade0dc60defcb97309cdffabfd3576514090342b3ecd73a",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "9e25f2433416b03c7d54d2bb73c81417a4b738fba56867e572b894258108ea58",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_rock_inner_high": {
       "triangles": 104,
       "surfaces": 1,
-      "bytes": 11032,
+      "bytes": 12064,
       "bounds_blender": [
         [
           -1.0,
@@ -963,13 +991,14 @@
       ],
       "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
       "file": "coast_rock_inner_high.glb",
-      "sha256": "63320682b74ac925297782c2441e6a4fc2fd13f6dabd4f41e7d9004acac39f6b",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "46ff09bac9504d012a67b0b6a5501e78dd178174b2648bae59747cbfb370c0be",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_scatter_a": {
       "triangles": 196,
       "surfaces": 1,
-      "bytes": 23604,
+      "bytes": 25972,
       "bounds_blender": [
         [
           -0.5,
@@ -1018,13 +1047,14 @@
         "changes": "resized to kit scale, recoloured to island palette; source geometry and source file untouched"
       },
       "file": "coast_scatter_a.glb",
-      "sha256": "323541bd3f21063477f020f520108a0215d3ac3ba3e35afa70b3ecb04481498d",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "4628af6437bad3215496ab819910e74776adebacc0c023b4298104435e90d40d",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_scatter_b": {
       "triangles": 196,
       "surfaces": 1,
-      "bytes": 23628,
+      "bytes": 25996,
       "bounds_blender": [
         [
           -0.7,
@@ -1073,13 +1103,14 @@
         "changes": "resized to kit scale, recoloured to island palette; source geometry and source file untouched"
       },
       "file": "coast_scatter_b.glb",
-      "sha256": "7174663a953d7ad0b9f741996978a3be65df36d9dc264a5e691b4df9de378814",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "47f7dd657a43d6118bdb85b9d5ff68102ba07b45a8f022067ab822006c6daf71",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_scatter_c": {
       "triangles": 196,
       "surfaces": 1,
-      "bytes": 23628,
+      "bytes": 25996,
       "bounds_blender": [
         [
           -0.95,
@@ -1128,22 +1159,23 @@
         "changes": "resized to kit scale, recoloured to island palette; source geometry and source file untouched"
       },
       "file": "coast_scatter_c.glb",
-      "sha256": "a634ec77079715f120785fc905e70bcf46de14fb3094c9262cfac17f1addd511",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "78fc63f63f768c8b17a04157270a603df2c679aa1c10b74425fc9caeb6545f2e",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
     },
     "coast_seawall": {
-      "triangles": 28,
+      "triangles": 156,
       "surfaces": 1,
-      "bytes": 3136,
+      "bytes": 14040,
       "bounds_blender": [
         [
           -1.0,
-          -0.38,
+          -0.42,
           0.0
         ],
         [
           1.0,
-          0.32,
+          0.42,
           1.2
         ]
       ],
@@ -1151,12 +1183,12 @@
         [
           -1.0,
           0.0,
-          -0.32
+          -0.42
         ],
         [
           1.0,
           1.2,
-          0.38
+          0.42
         ]
       ],
       "generator": "tools/art/build_coast_kit.py",
@@ -1173,6 +1205,12 @@
       "family": "seawall",
       "nominal_module_m": 2,
       "top_y": 1.2,
+      "coping_width_m": 0.84,
+      "horizontal_joint_levels_m": [
+        0.3,
+        0.6,
+        0.9
+      ],
       "ports": [
         {
           "name": "in",
@@ -1298,13 +1336,14 @@
         }
       ],
       "file": "coast_seawall.glb",
-      "sha256": "c5a48fe6cc6633d2db75132955e3c885fa475be2999692cdac8a6015ed4a4417",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "3c0795c96af36f4006562221ab3bece9fd71f2105f9e656cb7a724395a11d60d",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_warm_sand.tres"
     },
     "coast_dock_straight": {
-      "triangles": 172,
+      "triangles": 240,
       "surfaces": 1,
-      "bytes": 12628,
+      "bytes": 21884,
       "bounds_blender": [
         [
           -1.0,
@@ -1513,15 +1552,46 @@
       ],
       "terminal": false,
       "mooring_bollard": false,
+      "planks": 11,
+      "plank_width_range_m": [
+        0.17181818181818165,
+        0.17681818181818187
+      ],
+      "joint_width_m": 0.01,
+      "pile_count": 4,
+      "pile_centres": [
+        [
+          -0.66,
+          0,
+          -0.72
+        ],
+        [
+          0.66,
+          0,
+          -0.72
+        ],
+        [
+          -0.66,
+          0,
+          0.72
+        ],
+        [
+          0.66,
+          0,
+          0.72
+        ]
+      ],
+      "pile_width_m": 0.16,
       "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
       "file": "coast_dock_straight.glb",
-      "sha256": "78004c2396fbaf02dbf4063956e97379d72ea67daea8dce894f4257b15da89a0",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "a2c52c9f5ce5d9081973988de1f81fa2db1d8c3d1ea4a839639fd2e9791429fb",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_warm_sand.tres"
     },
     "coast_dock_end": {
-      "triangles": 272,
+      "triangles": 340,
       "surfaces": 1,
-      "bytes": 20996,
+      "bytes": 31116,
       "bounds_blender": [
         [
           -1.0,
@@ -1649,15 +1719,46 @@
       ],
       "terminal": true,
       "mooring_bollard": false,
+      "planks": 11,
+      "plank_width_range_m": [
+        0.17181818181818165,
+        0.17681818181818187
+      ],
+      "joint_width_m": 0.01,
+      "pile_count": 4,
+      "pile_centres": [
+        [
+          -0.66,
+          0,
+          -0.72
+        ],
+        [
+          0.66,
+          0,
+          -0.72
+        ],
+        [
+          -0.66,
+          0,
+          0.72
+        ],
+        [
+          0.66,
+          0,
+          0.72
+        ]
+      ],
+      "pile_width_m": 0.16,
       "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
       "file": "coast_dock_end.glb",
-      "sha256": "25a7860a5e71d3cbe9706e9ba851874781dbb82b064b6a71c9880ed50993c8c5",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "2e70856fe1c152bbd91c2602a9eae9ef006d20c034df0ef347bfe58c1a46a541",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_warm_sand.tres"
     },
     "coast_dock_bollard": {
-      "triangles": 344,
+      "triangles": 384,
       "surfaces": 1,
-      "bytes": 19564,
+      "bytes": 28748,
       "bounds_blender": [
         [
           -1.0,
@@ -1866,10 +1967,41 @@
       ],
       "terminal": false,
       "mooring_bollard": true,
+      "planks": 11,
+      "plank_width_range_m": [
+        0.17181818181818165,
+        0.17681818181818187
+      ],
+      "joint_width_m": 0.01,
+      "pile_count": 4,
+      "pile_centres": [
+        [
+          -0.66,
+          0,
+          -0.72
+        ],
+        [
+          0.66,
+          0,
+          -0.72
+        ],
+        [
+          -0.66,
+          0,
+          0.72
+        ],
+        [
+          0.66,
+          0,
+          0.72
+        ]
+      ],
+      "pile_width_m": 0.16,
       "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
       "file": "coast_dock_bollard.glb",
-      "sha256": "b6759e9cdb2d422082d7861b87a6e187df7d308e70d01eda062f618dfa9f852f",
-      "source": "tools/art/source/coast_kit/coast_kit.blend"
+      "sha256": "c448e04876c043102e271da0cf3bff3f742352c044a37f0f54e8df64567f2fd4",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_warm_sand.tres"
     },
     "coast_buoy": {
       "triangles": 224,
