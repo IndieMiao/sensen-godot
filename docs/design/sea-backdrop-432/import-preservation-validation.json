@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "fresh_cache": true,
+  "resource_hashes_unchanged": {
+    "lake.tres": "8f43eb9eea0089b81dba80939746d711e164bf38a2e59a36f872c5b9e948dbd0",
+    "sea_backdrop.gdshader": "a3c67ad6e282e4c668dc0b3faa94a30b1385c9f4c0a721612410d0add8c60915",
+    "sea_backdrop.gdshader.uid": "fcf5c01c6244645bef779d720c03b2c52f99113784d20b722aa0d1d7b761c313",
+    "README.md": "9b8035f13e49a51477289259c44a16ec4d2aaf1ce8356496c6f6b017e72b1113",
+    "bay.tres": "d2af4d604d1beb381e3595d6bf312afb4fba8d8afd4eff29d8af2f92dc106a9e"
+  },
+  "native_resource_note": "No new GLB or texture: .import / nodes/root_script / imported_formats not applicable. Godot-generated shader UID retained.",
+  "protected_paths_unchanged_from": "05a2c032f88cc0d39caebca05bd79df98845fbbe",
+  "protected_paths": [
+    "assets/landmarks/alcatraz_island",
+    "assets/landmarks/_shared/water_edge",
+    "assets/ponds",
+    "modules/ponds"
+  ],
+  "cold_import_log_error_count": 0,
+  "cold_resource_check": "SEA_BACKDROP_RESOURCES true 41"
+}

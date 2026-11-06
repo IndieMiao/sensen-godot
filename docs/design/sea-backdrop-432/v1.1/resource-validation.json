@@ -1,0 +1,187 @@
+{
+	"checks": [
+		{
+			"check": "same five sine evaluations",
+			"passed": true
+		},
+		{
+			"check": "zero texture reads retained",
+			"passed": true
+		},
+		{
+			"check": "no texture / scene-depth / screen resources",
+			"passed": true
+		},
+		{
+			"check": "same render modes / depth / culling / blend",
+			"passed": true
+		},
+		{
+			"check": "bay: native ShaderMaterial",
+			"passed": true
+		},
+		{
+			"check": "bay: shared shader",
+			"passed": true
+		},
+		{
+			"check": "bay: one pass before foam priority 1",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter shallow_color",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter deep_color",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter far_color",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter ripple_wavelength_m",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter color_patch_scale",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter motion_speed",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter ripple_strength",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter far_fade_screen_y",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter far_color_amount",
+			"passed": true
+		},
+		{
+			"check": "bay: parameter reveal_far_background",
+			"passed": true
+		},
+		{
+			"check": "bay: opaque default horizon",
+			"passed": true
+		},
+		{
+			"check": "bay: nonzero ripple wavelength",
+			"passed": true
+		},
+		{
+			"check": "bay: ordered fade range",
+			"passed": true
+		},
+		{
+			"check": "bay: one standard plane surface",
+			"passed": true
+		},
+		{
+			"check": "lake: native ShaderMaterial",
+			"passed": true
+		},
+		{
+			"check": "lake: shared shader",
+			"passed": true
+		},
+		{
+			"check": "lake: one pass before foam priority 1",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter shallow_color",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter deep_color",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter far_color",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter ripple_wavelength_m",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter color_patch_scale",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter motion_speed",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter ripple_strength",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter far_fade_screen_y",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter far_color_amount",
+			"passed": true
+		},
+		{
+			"check": "lake: parameter reveal_far_background",
+			"passed": true
+		},
+		{
+			"check": "lake: opaque default horizon",
+			"passed": true
+		},
+		{
+			"check": "lake: nonzero ripple wavelength",
+			"passed": true
+		},
+		{
+			"check": "lake: ordered fade range",
+			"passed": true
+		},
+		{
+			"check": "lake: one standard plane surface",
+			"passed": true
+		},
+		{
+			"check": "distinct bay / lake palette",
+			"passed": true
+		},
+		{
+			"check": "lake wider slower ripples",
+			"passed": true
+		},
+		{
+			"check": "generated shader uid",
+			"passed": true
+		}
+	],
+	"import_note": "Native .gdshader/.tres only; no new GLB or texture, so no .import or root_script entry is applicable.",
+	"passed": true,
+	"presets": {
+		"bay": {
+			"deep": "31849fff",
+			"far": "67afc2ff",
+			"ripple_wavelength_m": 3.64,
+			"shallow": "439bb0ff",
+			"speed": 1.0
+		},
+		"lake": {
+			"deep": "147da1ff",
+			"far": "147da1ff",
+			"ripple_wavelength_m": 5.8,
+			"shallow": "54d5cdff",
+			"speed": 0.55
+		}
+	},
+	"shader_uid": "uid://bpu3s76wjii8t"
+}

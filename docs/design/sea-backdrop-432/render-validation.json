@@ -1,0 +1,270 @@
+{
+	"budget": {
+		"new_passes": 1,
+		"new_sines": 5,
+		"new_texture_reads": 0,
+		"old_passes": 1,
+		"old_sines": 5,
+		"old_texture_reads": 0
+	},
+	"captures": [
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "bay-default-review",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "bay-no-foam",
+			"triangles": 8748,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "bay-sea-time-0",
+			"triangles": 8748,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "bay-sea-time-4",
+			"triangles": 8748,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "lake-default-review",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "lake-no-foam",
+			"triangles": 8748,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "lake-sea-time-0",
+			"triangles": 8748,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "lake-sea-time-4",
+			"triangles": 8748,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "original-0.0",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "compatible-0.0",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "original-3.5",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "compatible-3.5",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		}
+	],
+	"checks": [
+		{
+			"check": "avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "bay-default-review: size",
+			"passed": true
+		},
+		{
+			"check": "bay-default-review: save",
+			"passed": true
+		},
+		{
+			"check": "bay-no-foam: size",
+			"passed": true
+		},
+		{
+			"check": "bay-no-foam: save",
+			"passed": true
+		},
+		{
+			"check": "bay-sea-time-0: size",
+			"passed": true
+		},
+		{
+			"check": "bay-sea-time-0: save",
+			"passed": true
+		},
+		{
+			"check": "bay-sea-time-4: size",
+			"passed": true
+		},
+		{
+			"check": "bay-sea-time-4: save",
+			"passed": true
+		},
+		{
+			"check": "lake-default-review: size",
+			"passed": true
+		},
+		{
+			"check": "lake-default-review: save",
+			"passed": true
+		},
+		{
+			"check": "lake-no-foam: size",
+			"passed": true
+		},
+		{
+			"check": "lake-no-foam: save",
+			"passed": true
+		},
+		{
+			"check": "lake-sea-time-0: size",
+			"passed": true
+		},
+		{
+			"check": "lake-sea-time-0: save",
+			"passed": true
+		},
+		{
+			"check": "lake-sea-time-4: size",
+			"passed": true
+		},
+		{
+			"check": "lake-sea-time-4: save",
+			"passed": true
+		},
+		{
+			"check": "original-0.0: size",
+			"passed": true
+		},
+		{
+			"check": "original-0.0: save",
+			"passed": true
+		},
+		{
+			"check": "compatible-0.0: size",
+			"passed": true
+		},
+		{
+			"check": "compatible-0.0: save",
+			"passed": true
+		},
+		{
+			"check": "original shader parity at 0.0",
+			"passed": true
+		},
+		{
+			"check": "original-3.5: size",
+			"passed": true
+		},
+		{
+			"check": "original-3.5: save",
+			"passed": true
+		},
+		{
+			"check": "compatible-3.5: size",
+			"passed": true
+		},
+		{
+			"check": "compatible-3.5: save",
+			"passed": true
+		},
+		{
+			"check": "original shader parity at 3.5",
+			"passed": true
+		}
+	],
+	"coast_commit": "85967444d6024fbe85cf2af997a7478ee4aab034",
+	"foam_commit": "ac5809c46b3e96a111ada24513b44afc4779c631",
+	"motion": {
+		"clock": "uniform substituted for TIME in QA; original 430 foam period retained at 5.5s; 4s real-speed excerpt",
+		"duration_s": 4,
+		"fps": 20,
+		"frames": 80
+	},
+	"original_parity": [
+		{
+			"maximum_rgb_255": 0.999999940395355,
+			"mean_rgb_255": 0.00000347222201526165,
+			"pixels_over_one": 0,
+			"time_s": 0.0
+		},
+		{
+			"maximum_rgb_255": 0.0,
+			"mean_rgb_255": 0.0,
+			"pixels_over_one": 0,
+			"time_s": 3.5
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	}
+}
