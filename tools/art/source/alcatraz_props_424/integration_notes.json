@@ -1,0 +1,34 @@
+{
+  "author": "赵云",
+  "layout_reference": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
+  "units": "metres; Godot Y up, front +Z",
+  "runtime_folder": "assets/landmarks/alcatraz_island/",
+  "owner_boundary": "赵云只交十种重复件；白模 layout / placements / instances / 场景 / 导航继续由马可波罗维护。",
+  "axis_contract": {
+    "alc_rail_straight": "local X -1..+1, Y 0..1; 2 m standard length, local Z width .18",
+    "alc_curb": "local X -1..+1, Y 0...25; same end planes as rail; local Z width .18",
+    "alc_rail_corner": "corner post foot is origin; arms terminate at local +X=.50 and +Z=.50; do not centre its bounding box",
+    "alc_bench": "width X=1.50, front +Z, seat surface Y=.45; installation centre at ground",
+    "alc_tree_a": "root foot at XZ 0; canopy intentionally swept toward local +X; do not re-centre by canopy bounds",
+    "alc_tree_b": "root foot at XZ 0; round canopy centred over trunk"
+  },
+  "instance_transform": "Use basis_columns whenever present (20 sloped rail + 20 curb placements); it shears X along slope, keeps local +Y vertical. Otherwise use normal yaw and scale. instances and placements duplicate the same repeated pieces: use one table only.",
+  "size_updates_from_current_dispatch": {
+    "alc_curb": {"placeholder_height": 0.16, "final_height": 0.25},
+    "alc_tree_a": {"placeholder_height": 3.4, "final_height": 6.424321, "root_radius": 0.24},
+    "alc_tree_b": {"placeholder_height": 4.0, "final_height": 6.275, "root_radius": 0.22},
+    "alc_flowerbed": {"placeholder_footprint": [1.4, 0.7], "final_footprint": [1.7, 1.7], "collision_box_size": [1.7, 0.66, 1.7], "collision_box_at": [0, 0.33, 0]},
+    "alc_bin": {"final_size": [0.47, 0.80, 0.47]},
+    "alc_sign": {"final_height": 1.50, "interaction": "none; blank panel, no floating badge, outline or prompt"}
+  },
+  "placement_checks_required_by_scene_owner": [
+    "原 204 段栏杆/石沿标准长度正确；179 对端点完全重合。10 处平/斜过渡存在原始 layout 的 0.125m 高差，列表见 seam-audit.json。不要通过把全模型拉长来补这类Y高差。",
+    "花坛由 1.4x0.7 改成 1.7x1.7；靠栏原点会使边缘伸入栏杆。请同步碰撞、导航障碍并将相应摆位向花园侧收，具体建议见 placement-review.json。",
+    "树增高到真实5-7m，根部原点不变；树冠为不对称风吹冠或圆冠，增加至20-30棵后重查可玩镜头遮挡与总预算。",
+    "原4个转角全部 yaw=0，此包保持约定的+X/+Z臂；装配方需按实际路口决定旋转，不能从名字猜方向。",
+    "交付默认开场图使用34df9c0b原layout，未悄悄移动主体或替代场景方的导航验收。"
+  ],
+  "collision_policy": "GLB无碰撞。现有场景集中建碰撞，程序应按最终尺寸更新，仅干体阻挡，树冠不建整盒。",
+  "material": {"vertex_color_is_srgb": false, "roughness": 0.9, "metallic": 0, "specular": 0.18},
+  "surface_policy": "one mesh / one surface each; suitable for MultiMesh by asset and zone, keep original shadow policy"
+}

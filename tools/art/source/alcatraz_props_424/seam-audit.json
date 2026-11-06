@@ -1,0 +1,57 @@
+{
+  "layout_commit": "34df9c0b",
+  "exact_join_pairs": 179,
+  "existing_height_transitions": [
+    {
+      "a": "alc_rail_straight_059",
+      "b": "alc_rail_straight_069",
+      "height_gap_m": 0.12499999999999933
+    },
+    {
+      "a": "alc_rail_straight_060",
+      "b": "alc_rail_straight_121",
+      "height_gap_m": 0.125
+    },
+    {
+      "a": "alc_rail_straight_118",
+      "b": "alc_rail_straight_125",
+      "height_gap_m": 0.125
+    },
+    {
+      "a": "alc_rail_straight_119",
+      "b": "alc_rail_straight_126",
+      "height_gap_m": 0.125
+    },
+    {
+      "a": "alc_rail_straight_120",
+      "b": "alc_rail_straight_127",
+      "height_gap_m": 0.125
+    },
+    {
+      "a": "alc_rail_straight_183",
+      "b": "alc_rail_straight_188",
+      "height_gap_m": 0.125
+    },
+    {
+      "a": "alc_rail_straight_184",
+      "b": "alc_rail_straight_192",
+      "height_gap_m": 0.125
+    },
+    {
+      "a": "alc_rail_straight_185",
+      "b": "alc_rail_straight_189",
+      "height_gap_m": 0.125
+    },
+    {
+      "a": "alc_rail_straight_186",
+      "b": "alc_rail_straight_190",
+      "height_gap_m": 0.125
+    },
+    {
+      "a": "alc_rail_straight_187",
+      "b": "alc_rail_straight_191",
+      "height_gap_m": 0.125
+    }
+  ],
+  "note": "These gaps come from the reference placements, unchanged by the final 2m modules."
+}
