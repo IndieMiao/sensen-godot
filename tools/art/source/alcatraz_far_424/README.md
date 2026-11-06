@@ -24,3 +24,6 @@ v1.1 已按马可波罗 34df9c0b 布局确认。`prepare_island.py` 仅在 outpu
 替换本包七件并去掉三卡 LOD；原宿主脚本逐文件哈希核对不变。`review_island.gd` 检查真实开场、
 两塔55 m切档和四个视角预算，通过实际桥开 / 关像素比较确认桥在画面上缘可见。
 `build.py -- --cards-only` 只重建三张卡片，不动四个塔 GLB。命名已改为 city / bridge，旧 skyline / goldengate 不再交付。
+
+v1.2 双塔配色：四塔按bf0c31b1正式整岛校色，源材质及本生成器PAL已同步。
+精确RGB字节更新与对照复现见 ../alcatraz_tower_color_424/；几何、UID、三卡均不变。

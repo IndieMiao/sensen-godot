@@ -1,21 +1,21 @@
 {
   "task": "SGODOT-424",
-  "revision": "v1",
+  "revision": "v1.1_pictogram",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "near_source": {
-    "near_file": "reference/alc_museum_d7b57574.glb",
-    "git_ref": "d7b57574d359952858319d17b43722651a0fcbcb",
+    "near_file": "reference/alc_museum_bf0c31b1.glb",
+    "git_ref": "bf0c31b1c871011008b455434d167224d14de59c",
     "path": "assets/landmarks/alcatraz_island/alc_museum.glb",
-    "revision": "v1",
-    "colour_status": "Formal near colours and geometry from Marco Polo d7b57574 / Plane7726588c; palette traced from actual COLOR_0, no inferred recolour."
+    "revision": "v1.1_pictogram",
+    "colour_status": "Near sign synchronized to bf0c31b1 / Plane4aa1b62e: same teal board, cream lighthouse pictogram, no lettering."
   },
-  "near_sha256": "ccee1b238a407ae7f22268290cd9a3a9f52e9c7a8c205d3086b9a15f10e98b7a",
+  "near_sha256": "63e46cbcbe2949df8aba9e371ebb27308bb3315ae962a6e775e52cadcc3fd732",
   "file": "alc_museum_far.glb",
-  "sha256": "a16b32b48624acb45ce70aa8953f5e9ef93ff57b702d7cd36cff9ae8ad3b4500",
-  "near_triangles": 8778,
-  "triangles": 2417,
-  "ratio": 0.2753474595579859,
+  "sha256": "425290e75f9cc544f6f47ab6f23443227d6c9aee4dc7cad380623dcf1d65a6c8",
+  "near_triangles": 7869,
+  "triangles": 2205,
+  "ratio": 0.28021349599695006,
   "surfaces": 1,
   "bounds": [
     [
@@ -3066,218 +3066,218 @@
       ]
     },
     {
-      "name": "Sign_glyph_131",
-      "source_triangles": 56,
-      "far_triangles": 13,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          1.1149201393127441,
-          4.01200008392334,
-          5.189000129699707
-        ],
-        [
-          1.343880295753479,
-          4.257519721984863,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_132",
-      "source_triangles": 116,
-      "far_triangles": 28,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          0.8557201623916626,
-          4.00875997543335,
-          5.189000129699707
-        ],
-        [
-          1.0670400857925415,
-          4.257519721984863,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_133",
-      "source_triangles": 44,
-      "far_triangles": 10,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          0.6807601451873779,
-          4.01200008392334,
-          5.189000129699707
-        ],
-        [
-          0.8233200907707214,
-          4.257519721984863,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_134",
-      "source_triangles": 164,
-      "far_triangles": 40,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          0.5032800436019897,
-          4.00875997543335,
-          5.189000129699707
-        ],
-        [
-          0.642240047454834,
-          4.2607598304748535,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_135",
-      "source_triangles": 116,
-      "far_triangles": 28,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          0.25595995783805847,
-          4.00875997543335,
-          5.189000129699707
-        ],
-        [
-          0.46727997064590454,
-          4.257519721984863,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_136",
-      "source_triangles": 56,
-      "far_triangles": 13,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          -0.02088009938597679,
-          4.01200008392334,
-          5.189000129699707
-        ],
-        [
-          0.20807991921901703,
-          4.257519721984863,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_137",
-      "source_triangles": 88,
-      "far_triangles": 22,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          -0.3898801803588867,
-          4.01200008392334,
-          5.189000129699707
-        ],
-        [
-          -0.16380013525485992,
-          4.257519721984863,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_138",
-      "source_triangles": 36,
-      "far_triangles": 8,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          -0.6717602014541626,
-          4.01200008392334,
-          5.189000129699707
-        ],
-        [
-          -0.44424018263816833,
-          4.257519721984863,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_139",
-      "source_triangles": 44,
-      "far_triangles": 11,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          -0.9385201930999756,
-          4.01200008392334,
-          5.189000129699707
-        ],
-        [
-          -0.6984001398086548,
-          4.258959770202637,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_140",
-      "source_triangles": 20,
-      "far_triangles": 4,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          -1.0882803201675415,
-          4.01200008392334,
-          5.189000129699707
-        ],
-        [
-          -0.9421202540397644,
-          4.257519721984863,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_141",
-      "source_triangles": 164,
-      "far_triangles": 40,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
-      "source_bounds": [
-        [
-          -1.2654002904891968,
-          4.00875997543335,
-          5.189000129699707
-        ],
-        [
-          -1.126440167427063,
-          4.2607598304748535,
-          5.190999984741211
-        ]
-      ]
-    },
-    {
-      "name": "Sign_glyph_142",
-      "source_triangles": 12,
+      "name": "Part_131",
+      "source_triangles": 2,
       "far_triangles": 2,
-      "method": "retain original front glyph, remove hidden 2mm extrusion/back",
+      "method": "retain exact source vertices/normals/colours",
       "source_bounds": [
         [
-          -1.3424402475357056,
-          4.01200008392334,
-          5.189000129699707
+          -0.12999999523162842,
+          3.940000057220459,
+          5.195000171661377
         ],
         [
-          -1.3071602582931519,
-          4.257519721984863,
-          5.190999984741211
+          0.12999999523162842,
+          4.190000057220459,
+          5.195000171661377
+        ]
+      ]
+    },
+    {
+      "name": "Part_132",
+      "source_triangles": 2,
+      "far_triangles": 2,
+      "method": "retain exact source vertices/normals/colours",
+      "source_bounds": [
+        [
+          -0.11999999731779099,
+          4.210000038146973,
+          5.195000171661377
+        ],
+        [
+          0.11999999731779099,
+          4.300000190734863,
+          5.195000171661377
+        ]
+      ]
+    },
+    {
+      "name": "Part_133",
+      "source_triangles": 1,
+      "far_triangles": 1,
+      "method": "retain exact source vertices/normals/colours",
+      "source_bounds": [
+        [
+          -0.17000000178813934,
+          4.320000171661377,
+          5.195000171661377
+        ],
+        [
+          0.17000000178813934,
+          4.400000095367432,
+          5.195000171661377
+        ]
+      ]
+    },
+    {
+      "name": "Part_134",
+      "source_triangles": 2,
+      "far_triangles": 2,
+      "method": "retain exact source vertices/normals/colours",
+      "source_bounds": [
+        [
+          -0.36000001430511475,
+          3.869999885559082,
+          5.195000171661377
+        ],
+        [
+          0.36000001430511475,
+          3.9100000858306885,
+          5.195000171661377
+        ]
+      ]
+    },
+    {
+      "name": "Simplified_bevel_part_135",
+      "source_triangles": 108,
+      "far_triangles": 12,
+      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "source_bounds": [
+        [
+          -19.94999885559082,
+          1.0799999237060547,
+          -3.8500001430511475
+        ],
+        [
+          -19.850000381469727,
+          3.3600001335144043,
+          -2.450000047683716
+        ]
+      ]
+    },
+    {
+      "name": "Part_136",
+      "source_triangles": 12,
+      "far_triangles": 12,
+      "method": "retain exact source vertices/normals/colours",
+      "source_bounds": [
+        [
+          -19.973501205444336,
+          1.2300000190734863,
+          -3.700000047683716
+        ],
+        [
+          -19.94849967956543,
+          3.2100000381469727,
+          -2.6000001430511475
+        ]
+      ]
+    },
+    {
+      "name": "Simplified_bevel_part_137",
+      "source_triangles": 108,
+      "far_triangles": 12,
+      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "source_bounds": [
+        [
+          -19.94999885559082,
+          5.079999923706055,
+          -3.8500001430511475
+        ],
+        [
+          -19.850000381469727,
+          7.359999656677246,
+          -2.450000047683716
+        ]
+      ]
+    },
+    {
+      "name": "Part_138",
+      "source_triangles": 12,
+      "far_triangles": 12,
+      "method": "retain exact source vertices/normals/colours",
+      "source_bounds": [
+        [
+          -19.973501205444336,
+          5.229999542236328,
+          -3.700000047683716
+        ],
+        [
+          -19.94849967956543,
+          7.210000038146973,
+          -2.6000001430511475
+        ]
+      ]
+    },
+    {
+      "name": "Simplified_bevel_part_139",
+      "source_triangles": 108,
+      "far_triangles": 12,
+      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "source_bounds": [
+        [
+          -19.94999885559082,
+          1.0799999237060547,
+          -0.699999988079071
+        ],
+        [
+          -19.850000381469727,
+          3.3600001335144043,
+          0.699999988079071
+        ]
+      ]
+    },
+    {
+      "name": "Part_140",
+      "source_triangles": 12,
+      "far_triangles": 12,
+      "method": "retain exact source vertices/normals/colours",
+      "source_bounds": [
+        [
+          -19.973501205444336,
+          1.2300000190734863,
+          -0.550000011920929
+        ],
+        [
+          -19.94849967956543,
+          3.2100000381469727,
+          0.550000011920929
+        ]
+      ]
+    },
+    {
+      "name": "Simplified_bevel_part_141",
+      "source_triangles": 108,
+      "far_triangles": 12,
+      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "source_bounds": [
+        [
+          -19.94999885559082,
+          5.079999923706055,
+          -0.699999988079071
+        ],
+        [
+          -19.850000381469727,
+          7.359999656677246,
+          0.699999988079071
+        ]
+      ]
+    },
+    {
+      "name": "Part_142",
+      "source_triangles": 12,
+      "far_triangles": 12,
+      "method": "retain exact source vertices/normals/colours",
+      "source_bounds": [
+        [
+          -19.973501205444336,
+          5.229999542236328,
+          -0.550000011920929
+        ],
+        [
+          -19.94849967956543,
+          7.210000038146973,
+          0.550000011920929
         ]
       ]
     },
@@ -3290,12 +3290,12 @@
         [
           -19.94999885559082,
           1.0799999237060547,
-          -3.8500001430511475
+          2.450000047683716
         ],
         [
           -19.850000381469727,
           3.3600001335144043,
-          -2.450000047683716
+          3.8500001430511475
         ]
       ]
     },
@@ -3308,12 +3308,12 @@
         [
           -19.973501205444336,
           1.2300000190734863,
-          -3.700000047683716
+          2.6000001430511475
         ],
         [
           -19.94849967956543,
           3.2100000381469727,
-          -2.6000001430511475
+          3.700000047683716
         ]
       ]
     },
@@ -3326,12 +3326,12 @@
         [
           -19.94999885559082,
           5.079999923706055,
-          -3.8500001430511475
+          2.450000047683716
         ],
         [
           -19.850000381469727,
           7.359999656677246,
-          -2.450000047683716
+          3.8500001430511475
         ]
       ]
     },
@@ -3344,12 +3344,12 @@
         [
           -19.973501205444336,
           5.229999542236328,
-          -3.700000047683716
+          2.6000001430511475
         ],
         [
           -19.94849967956543,
           7.210000038146973,
-          -2.6000001430511475
+          3.700000047683716
         ]
       ]
     },
@@ -3360,14 +3360,14 @@
       "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
       "source_bounds": [
         [
-          -19.94999885559082,
+          19.850000381469727,
           1.0799999237060547,
-          -0.699999988079071
+          -3.8500001430511475
         ],
         [
-          -19.850000381469727,
+          19.94999885559082,
           3.3600001335144043,
-          0.699999988079071
+          -2.450000047683716
         ]
       ]
     },
@@ -3378,14 +3378,14 @@
       "method": "retain exact source vertices/normals/colours",
       "source_bounds": [
         [
-          -19.973501205444336,
+          19.94849967956543,
           1.2300000190734863,
-          -0.550000011920929
+          -3.700000047683716
         ],
         [
-          -19.94849967956543,
+          19.973501205444336,
           3.2100000381469727,
-          0.550000011920929
+          -2.6000001430511475
         ]
       ]
     },
@@ -3396,14 +3396,14 @@
       "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
       "source_bounds": [
         [
-          -19.94999885559082,
+          19.850000381469727,
           5.079999923706055,
-          -0.699999988079071
+          -3.8500001430511475
         ],
         [
-          -19.850000381469727,
+          19.94999885559082,
           7.359999656677246,
-          0.699999988079071
+          -2.450000047683716
         ]
       ]
     },
@@ -3414,14 +3414,14 @@
       "method": "retain exact source vertices/normals/colours",
       "source_bounds": [
         [
-          -19.973501205444336,
+          19.94849967956543,
           5.229999542236328,
-          -0.550000011920929
+          -3.700000047683716
         ],
         [
-          -19.94849967956543,
+          19.973501205444336,
           7.210000038146973,
-          0.550000011920929
+          -2.6000001430511475
         ]
       ]
     },
@@ -3432,14 +3432,14 @@
       "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
       "source_bounds": [
         [
-          -19.94999885559082,
+          19.850000381469727,
           1.0799999237060547,
-          2.450000047683716
+          -0.699999988079071
         ],
         [
-          -19.850000381469727,
+          19.94999885559082,
           3.3600001335144043,
-          3.8500001430511475
+          0.699999988079071
         ]
       ]
     },
@@ -3450,14 +3450,14 @@
       "method": "retain exact source vertices/normals/colours",
       "source_bounds": [
         [
-          -19.973501205444336,
+          19.94849967956543,
           1.2300000190734863,
-          2.6000001430511475
+          -0.550000011920929
         ],
         [
-          -19.94849967956543,
+          19.973501205444336,
           3.2100000381469727,
-          3.700000047683716
+          0.550000011920929
         ]
       ]
     },
@@ -3468,14 +3468,14 @@
       "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
       "source_bounds": [
         [
-          -19.94999885559082,
+          19.850000381469727,
           5.079999923706055,
-          2.450000047683716
+          -0.699999988079071
         ],
         [
-          -19.850000381469727,
+          19.94999885559082,
           7.359999656677246,
-          3.8500001430511475
+          0.699999988079071
         ]
       ]
     },
@@ -3486,14 +3486,14 @@
       "method": "retain exact source vertices/normals/colours",
       "source_bounds": [
         [
-          -19.973501205444336,
+          19.94849967956543,
           5.229999542236328,
-          2.6000001430511475
+          -0.550000011920929
         ],
         [
-          -19.94849967956543,
+          19.973501205444336,
           7.210000038146973,
-          3.700000047683716
+          0.550000011920929
         ]
       ]
     },
@@ -3506,150 +3506,6 @@
         [
           19.850000381469727,
           1.0799999237060547,
-          -3.8500001430511475
-        ],
-        [
-          19.94999885559082,
-          3.3600001335144043,
-          -2.450000047683716
-        ]
-      ]
-    },
-    {
-      "name": "Part_156",
-      "source_triangles": 12,
-      "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          19.94849967956543,
-          1.2300000190734863,
-          -3.700000047683716
-        ],
-        [
-          19.973501205444336,
-          3.2100000381469727,
-          -2.6000001430511475
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_157",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          19.850000381469727,
-          5.079999923706055,
-          -3.8500001430511475
-        ],
-        [
-          19.94999885559082,
-          7.359999656677246,
-          -2.450000047683716
-        ]
-      ]
-    },
-    {
-      "name": "Part_158",
-      "source_triangles": 12,
-      "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          19.94849967956543,
-          5.229999542236328,
-          -3.700000047683716
-        ],
-        [
-          19.973501205444336,
-          7.210000038146973,
-          -2.6000001430511475
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_159",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          19.850000381469727,
-          1.0799999237060547,
-          -0.699999988079071
-        ],
-        [
-          19.94999885559082,
-          3.3600001335144043,
-          0.699999988079071
-        ]
-      ]
-    },
-    {
-      "name": "Part_160",
-      "source_triangles": 12,
-      "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          19.94849967956543,
-          1.2300000190734863,
-          -0.550000011920929
-        ],
-        [
-          19.973501205444336,
-          3.2100000381469727,
-          0.550000011920929
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_161",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          19.850000381469727,
-          5.079999923706055,
-          -0.699999988079071
-        ],
-        [
-          19.94999885559082,
-          7.359999656677246,
-          0.699999988079071
-        ]
-      ]
-    },
-    {
-      "name": "Part_162",
-      "source_triangles": 12,
-      "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          19.94849967956543,
-          5.229999542236328,
-          -0.550000011920929
-        ],
-        [
-          19.973501205444336,
-          7.210000038146973,
-          0.550000011920929
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_163",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          19.850000381469727,
-          1.0799999237060547,
           2.450000047683716
         ],
         [
@@ -3660,7 +3516,7 @@
       ]
     },
     {
-      "name": "Part_164",
+      "name": "Part_156",
       "source_triangles": 12,
       "far_triangles": 12,
       "method": "retain exact source vertices/normals/colours",
@@ -3678,7 +3534,7 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_165",
+      "name": "Simplified_bevel_part_157",
       "source_triangles": 108,
       "far_triangles": 12,
       "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
@@ -3696,7 +3552,7 @@
       ]
     },
     {
-      "name": "Part_166",
+      "name": "Part_158",
       "source_triangles": 12,
       "far_triangles": 12,
       "method": "retain exact source vertices/normals/colours",
@@ -3733,5 +3589,5 @@
     "switch_distance_m": 55,
     "margin_m": 0
   },
-  "colour_status": "Formal near colours and geometry from Marco Polo d7b57574 / Plane7726588c; palette traced from actual COLOR_0, no inferred recolour."
+  "colour_status": "Near sign synchronized to bf0c31b1 / Plane4aa1b62e: same teal board, cream lighthouse pictogram, no lettering."
 }

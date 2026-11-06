@@ -1,5 +1,5 @@
 """Measured near->far reduction. Run Blender through flock ~/gs66-render.lock.
-Retain formal arched windows and silhouette; simplify small box bevels and hidden glyph faces.
+Retain formal arched windows and silhouette; simplify small box bevels; retain the text-free lighthouse pictogram.
 All vertex colours come from the selected near GLB, never a guessed palette.
 """
 from pathlib import Path
@@ -39,14 +39,9 @@ def main():
   pane=abs(dims[0]-1.25)<1e-4 and abs(dims[1]-2.10)<1e-4 and dims[2]<1e-5
   is_box=len(triangles)==108 and min(dims)>1e-5
   major=bool(dims[0]>39 and dims[2]>9.5)
-  glyph=dims[1]<.30 and dims[2]<.003 and lo[2]>5.18 and hi[2]<5.20
   method='retain exact source vertices/normals/colours'
   name='Part_%03d'%len(parts)
   selected=triangles
-  if glyph:
-   selected=[t for t in triangles if all(abs(vs[i][2]-hi[2])<1e-6 for i in t) and sum(ns[i][2] for i in t)>2.9]
-   assert selected,('Missing front glyph',lo,hi)
-   name='Sign_glyph_%03d'%len(parts);method='retain original front glyph, remove hidden 2mm extrusion/back'
   if is_box and not major:
    name='Simplified_bevel_part_%03d'%len(parts);method='replace subpixel small-box bevels with same-envelope closed cuboid'
    x0,y0,z0=lo;x1,y1,z1=hi

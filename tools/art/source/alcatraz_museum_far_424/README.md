@@ -1,15 +1,9 @@
-# SGODOT-424 主楼远档 v1
+# SGODOT-424 主楼远档 v1.1
 
-黄忠制作。正式源近档固定为马可波罗d7b57574 / Plane7726588c；
-reference/source.json记录近档GLB和提交，palette-d7b57574.json为追溯用色板。
-旧b16c3198参考与docs/v0留作历史，不作为本版生成输入。
-
-build.py直接解码正式近档顶点、法线、COLOR_0和连通件，不依赖可能继续变化的主体生成器：
-96个组件的1490面原样保留（包含25组拱窗、反光、主体/基座/屋顶轮廓等）；
-59个小倒角方件由6372面简化为同包围708面；12个字由916面保留原正面219面。
-合计2417面，是近档8778面的27.53%。原点不重新居中，所有原窗位和10种颜色不变。
-结构和文字保留面的原法线在导出后按源恢复，避免Blender自定义法线内部量化造成差异。
-Blender源保留独立组件、顶点色和自定义法线；每个组件的原包围/处理方式见manifest.parts。
+黄忠。当前固定近档bf0c31b1 / Plane4aa1b62e，source.json和reference GLB为生成输入。
+此头已把旧文字改成4个灯塔图形平面，总7面。v1.1远档2205面，近档7869面的28.02%。
+同一生成管线保留25组拱窗、反光、主轮廓，59个小倒角件化为同包围方体；新的7面图形原样保留。
+验证证明与已验v1远档除219面字换7面图形外，其余三角的位置/法线/颜色完全不变。
 
 ```bash
 source ~/.codex-huangzhong/env.sh
@@ -21,7 +15,6 @@ output/art-setup/venv/bin/python tools/art/source/alcatraz_museum_far_424/verify
 output/art-setup/venv/bin/python tools/art/source/alcatraz_museum_far_424/package_review.py
 ```
 
-共享材质导入脚本不改，.import保留原占位UID及nodes/root_script=null。
-54/56m距离按实际AABB中心计算，符合Godot visibility_range；相机只沿视线移动2m，
-正交方向/宽度不变。另有完全同一相机位置的强制切档控制。实际提交面数验证只显示一档，
-不会因叠画遮住差异。图片对比记录全幅、对象均差、最大值及差异像素数，不只给平均数。
+继承原UID和导入方式，55m按Godot AABB中心测距；相机只沿视线移动、正交大小不变。
+历史b16c3198白模和d7b57574配色/带字版本仅为追溯，新审阅写入docs/v1.1，不覆盖历史图。
+与旧远档/图形的精确差分由../alcatraz_tower_color_424/verify.py补核。
