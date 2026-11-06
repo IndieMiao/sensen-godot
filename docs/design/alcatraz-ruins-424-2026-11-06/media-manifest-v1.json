@@ -1,0 +1,46 @@
+[
+  {
+    "name": "SGODOT-424_ALC_RUINS_v1_five_details_avatar.png",
+    "path": "docs/design/alcatraz-ruins-424-2026-11-06/SGODOT-424_ALC_RUINS_v1_five_details_avatar.png",
+    "sha256": "89e1fa6b88f1d86119f30e4f5911d77ad53142505790d7eef8d33f0c8fe35c57",
+    "bytes": 224285,
+    "mime": "image/png",
+    "size": [
+      1500,
+      1080
+    ]
+  },
+  {
+    "name": "SGODOT-424_ALC_RUINS_v1_ruins_area_43.png",
+    "path": "docs/design/alcatraz-ruins-424-2026-11-06/SGODOT-424_ALC_RUINS_v1_ruins_area_43.png",
+    "sha256": "f723496a72a7eac45fdb751a6b9964bbca2f7a01e7dca7bcdcea7252bc956d00",
+    "bytes": 968200,
+    "mime": "image/png",
+    "size": [
+      1500,
+      1140
+    ]
+  },
+  {
+    "name": "SGODOT-424_ALC_RUINS_v1_ruins_details_close.png",
+    "path": "docs/design/alcatraz-ruins-424-2026-11-06/SGODOT-424_ALC_RUINS_v1_ruins_details_close.png",
+    "sha256": "6bdb99493304beea2005cd7fc7c064e122c4d5e98c1090dcdfae1e4aad881314",
+    "bytes": 727422,
+    "mime": "image/png",
+    "size": [
+      1200,
+      990
+    ]
+  },
+  {
+    "name": "SGODOT-424_ALC_RUINS_v1_native_route_43.png",
+    "path": "docs/design/alcatraz-ruins-424-2026-11-06/SGODOT-424_ALC_RUINS_v1_native_route_43.png",
+    "sha256": "0b5c5eaf67bb888877b0f36c321e470c048664190c7e28793c8ac6cd52a64f02",
+    "bytes": 192974,
+    "mime": "image/png",
+    "size": [
+      360,
+      902
+    ]
+  }
+]
