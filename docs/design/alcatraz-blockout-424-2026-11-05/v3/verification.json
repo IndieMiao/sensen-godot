@@ -1,0 +1,3842 @@
+{
+	"01-opening_draw_budget": {
+		"evidence": 36,
+		"passed": true
+	},
+	"01-opening_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"01-opening_presentation_draw_budget": {
+		"evidence": 37,
+		"passed": true
+	},
+	"01-opening_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"01-opening_triangle_budget": {
+		"evidence": 28429,
+		"passed": true
+	},
+	"02-mid-hill_draw_budget": {
+		"evidence": 43,
+		"passed": true
+	},
+	"02-mid-hill_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"02-mid-hill_presentation_draw_budget": {
+		"evidence": 44,
+		"passed": true
+	},
+	"02-mid-hill_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"02-mid-hill_triangle_budget": {
+		"evidence": 29209,
+		"passed": true
+	},
+	"03-visitor-center_draw_budget": {
+		"evidence": 39,
+		"passed": true
+	},
+	"03-visitor-center_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"03-visitor-center_presentation_draw_budget": {
+		"evidence": 40,
+		"passed": true
+	},
+	"03-visitor-center_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"03-visitor-center_triangle_budget": {
+		"evidence": 28033,
+		"passed": true
+	},
+	"04-top-layout_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"04-top-layout_size": {
+		"evidence": "(1000, 1200)",
+		"passed": true
+	},
+	"05-whole-island_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"05-whole-island_size": {
+		"evidence": "(1000, 1200)",
+		"passed": true
+	},
+	"06-summit-zoom-out_draw_budget": {
+		"evidence": 48,
+		"passed": true
+	},
+	"06-summit-zoom-out_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"06-summit-zoom-out_presentation_draw_budget": {
+		"evidence": 49,
+		"passed": true
+	},
+	"06-summit-zoom-out_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"06-summit-zoom-out_triangle_budget": {
+		"evidence": 29213,
+		"passed": true
+	},
+	"all_nav_cells_physical_floor": {
+		"evidence": [],
+		"passed": true
+	},
+	"avatar_175cm": {
+		"evidence": "[P: (-0.631477, -0.0, -0.298333), S: (1.262954, 1.745226, 0.503865)]",
+		"passed": true
+	},
+	"avatar_farm_scale_unchanged": {
+		"evidence": null,
+		"passed": true
+	},
+	"avatar_projected_nominal_height_px": 68.5644095267972,
+	"bridge_visible_upper_left_pixels": {
+		"evidence": 868,
+		"passed": true
+	},
+	"camera_contract": {
+		"evidence": null,
+		"passed": true
+	},
+	"decorative_Ferry4": {
+		"evidence": null,
+		"passed": true
+	},
+	"decorative_Gull10": {
+		"evidence": null,
+		"passed": true
+	},
+	"decorative_Gull11": {
+		"evidence": null,
+		"passed": true
+	},
+	"decorative_Gull9": {
+		"evidence": null,
+		"passed": true
+	},
+	"direct_route_about_120m": {
+		"evidence": 118.273956507444,
+		"passed": true
+	},
+	"direct_route_reaches_museum": {
+		"evidence": null,
+		"passed": true
+	},
+	"direct_spawn_to_museum_path_m": 118.273956507444,
+	"drag_moves_camera_without_walking": {
+		"evidence": null,
+		"passed": true
+	},
+	"failures": [],
+	"far_loading_zone": {
+		"evidence": null,
+		"passed": true
+	},
+	"farm_pitch": {
+		"evidence": "(-43.0, 14.5, 0.0)",
+		"passed": true
+	},
+	"farm_scale": {
+		"evidence": 6.71999979019165,
+		"passed": true
+	},
+	"floor_collision_mid_hill": {
+		"evidence": "(8.0, 5.5175, 3.0)",
+		"passed": true
+	},
+	"floor_collision_opening": {
+		"evidence": "(-22.0, 0.9, 19.0)",
+		"passed": true
+	},
+	"floor_collision_visitor_center": {
+		"evidence": "(0.0, 10.02, -6.0)",
+		"passed": true
+	},
+	"limits": [
+		"Desktop Vulkan Mobile on gs66; not Android or physical-phone performance.",
+		"Walk simulation validates runtime paths; it is not a claim of real touch input.",
+		"Blockout only, awaiting layout review."
+	],
+	"live_surface_budget_including_avatar_and_scenery": {
+		"evidence": 29,
+		"passed": true
+	},
+	"live_triangle_budget_including_avatar_and_scenery": {
+		"evidence": 26628,
+		"passed": true
+	},
+	"map_exit_emits_request": {
+		"evidence": null,
+		"passed": true
+	},
+	"map_exit_visible": {
+		"evidence": "(98.76958, 497.0955)",
+		"passed": true
+	},
+	"museum_not_enterable": {
+		"evidence": "(0.0, 10.0, -7.75)",
+		"passed": true
+	},
+	"navigation_ready": {
+		"evidence": null,
+		"passed": true
+	},
+	"no_network_autoload": {
+		"evidence": null,
+		"passed": true
+	},
+	"offshore_anchor_20m": {
+		"evidence": [
+			-22.0,
+			-0.15,
+			39.0
+		],
+		"passed": true
+	},
+	"opening_sea_covers_corners": {
+		"evidence": null,
+		"passed": true
+	},
+	"pinch_changes_scale_without_walking": {
+		"evidence": 1.4,
+		"passed": true
+	},
+	"renderer": {
+		"evidence": "NVIDIA GeForce RTX 2060",
+		"passed": true
+	},
+	"repeat_instancing": {
+		"evidence": 21,
+		"passed": true
+	},
+	"resume_preserves_view": {
+		"evidence": null,
+		"passed": true
+	},
+	"route/step-00-000m_draw_budget": {
+		"evidence": 36,
+		"passed": true
+	},
+	"route/step-00-000m_interest": {
+		"evidence": [
+			"gull_000"
+		],
+		"passed": true
+	},
+	"route/step-00-000m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-00-000m_presentation_draw_budget": {
+		"evidence": 37,
+		"passed": true
+	},
+	"route/step-00-000m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-00-000m_triangle_budget": {
+		"evidence": 28429,
+		"passed": true
+	},
+	"route/step-01-007m_draw_budget": {
+		"evidence": 42,
+		"passed": true
+	},
+	"route/step-01-007m_interest": {
+		"evidence": [
+			"alc_flowerbed_000",
+			"alc_sign_003",
+			"alc_bench_003",
+			"alc_flowerbed_004"
+		],
+		"passed": true
+	},
+	"route/step-01-007m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-01-007m_presentation_draw_budget": {
+		"evidence": 43,
+		"passed": true
+	},
+	"route/step-01-007m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-01-007m_triangle_budget": {
+		"evidence": 31225,
+		"passed": true
+	},
+	"route/step-02-013m_draw_budget": {
+		"evidence": 43,
+		"passed": true
+	},
+	"route/step-02-013m_interest": {
+		"evidence": [
+			"alc_flowerbed_000",
+			"alc_lamp_001",
+			"alc_flowerbed_004"
+		],
+		"passed": true
+	},
+	"route/step-02-013m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-02-013m_presentation_draw_budget": {
+		"evidence": 44,
+		"passed": true
+	},
+	"route/step-02-013m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-02-013m_triangle_budget": {
+		"evidence": 31261,
+		"passed": true
+	},
+	"route/step-03-020m_draw_budget": {
+		"evidence": 40,
+		"passed": true
+	},
+	"route/step-03-020m_interest": {
+		"evidence": [
+			"alc_sign_000",
+			"alc_flowerbed_001"
+		],
+		"passed": true
+	},
+	"route/step-03-020m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-03-020m_presentation_draw_budget": {
+		"evidence": 41,
+		"passed": true
+	},
+	"route/step-03-020m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-03-020m_triangle_budget": {
+		"evidence": 30229,
+		"passed": true
+	},
+	"route/step-04-026m_draw_budget": {
+		"evidence": 42,
+		"passed": true
+	},
+	"route/step-04-026m_interest": {
+		"evidence": [
+			"alc_tree_a_000",
+			"alc_tree_b_000"
+		],
+		"passed": true
+	},
+	"route/step-04-026m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-04-026m_presentation_draw_budget": {
+		"evidence": 43,
+		"passed": true
+	},
+	"route/step-04-026m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-04-026m_triangle_budget": {
+		"evidence": 27121,
+		"passed": true
+	},
+	"route/step-05-033m_draw_budget": {
+		"evidence": 41,
+		"passed": true
+	},
+	"route/step-05-033m_interest": {
+		"evidence": [
+			"alc_bench_000",
+			"alc_sign_001"
+		],
+		"passed": true
+	},
+	"route/step-05-033m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-05-033m_presentation_draw_budget": {
+		"evidence": 42,
+		"passed": true
+	},
+	"route/step-05-033m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-05-033m_triangle_budget": {
+		"evidence": 26737,
+		"passed": true
+	},
+	"route/step-06-039m_draw_budget": {
+		"evidence": 37,
+		"passed": true
+	},
+	"route/step-06-039m_interest": {
+		"evidence": [
+			"alc_bin_000",
+			"alc_lamp_000",
+			"alc_bench_001",
+			"alc_flowerbed_002"
+		],
+		"passed": true
+	},
+	"route/step-06-039m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-06-039m_presentation_draw_budget": {
+		"evidence": 38,
+		"passed": true
+	},
+	"route/step-06-039m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-06-039m_triangle_budget": {
+		"evidence": 26665,
+		"passed": true
+	},
+	"route/step-07-046m_draw_budget": {
+		"evidence": 43,
+		"passed": true
+	},
+	"route/step-07-046m_interest": {
+		"evidence": [
+			"alc_lamp_000",
+			"alc_flowerbed_002",
+			"alc_lamp_002"
+		],
+		"passed": true
+	},
+	"route/step-07-046m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-07-046m_presentation_draw_budget": {
+		"evidence": 44,
+		"passed": true
+	},
+	"route/step-07-046m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-07-046m_triangle_budget": {
+		"evidence": 29209,
+		"passed": true
+	},
+	"route/step-08-052m_draw_budget": {
+		"evidence": 43,
+		"passed": true
+	},
+	"route/step-08-052m_interest": {
+		"evidence": [
+			"alc_bench_001",
+			"alc_sign_002"
+		],
+		"passed": true
+	},
+	"route/step-08-052m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-08-052m_presentation_draw_budget": {
+		"evidence": 44,
+		"passed": true
+	},
+	"route/step-08-052m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-08-052m_triangle_budget": {
+		"evidence": 30061,
+		"passed": true
+	},
+	"route/step-09-059m_draw_budget": {
+		"evidence": 44,
+		"passed": true
+	},
+	"route/step-09-059m_interest": {
+		"evidence": [
+			"alc_sign_001",
+			"alc_flowerbed_003",
+			"alc_bench_002"
+		],
+		"passed": true
+	},
+	"route/step-09-059m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-09-059m_presentation_draw_budget": {
+		"evidence": 45,
+		"passed": true
+	},
+	"route/step-09-059m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-09-059m_triangle_budget": {
+		"evidence": 28525,
+		"passed": true
+	},
+	"route/step-10-065m_draw_budget": {
+		"evidence": 43,
+		"passed": true
+	},
+	"route/step-10-065m_interest": {
+		"evidence": [
+			"alc_tree_a_000",
+			"alc_flowerbed_001",
+			"alc_tree_b_000",
+			"alc_bin_001"
+		],
+		"passed": true
+	},
+	"route/step-10-065m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-10-065m_presentation_draw_budget": {
+		"evidence": 44,
+		"passed": true
+	},
+	"route/step-10-065m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-10-065m_triangle_budget": {
+		"evidence": 28477,
+		"passed": true
+	},
+	"route/step-11-072m_draw_budget": {
+		"evidence": 40,
+		"passed": true
+	},
+	"route/step-11-072m_interest": {
+		"evidence": [
+			"alc_lamp_001",
+			"alc_flowerbed_001",
+			"alc_tree_a_001"
+		],
+		"passed": true
+	},
+	"route/step-11-072m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-11-072m_presentation_draw_budget": {
+		"evidence": 41,
+		"passed": true
+	},
+	"route/step-11-072m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-11-072m_triangle_budget": {
+		"evidence": 28333,
+		"passed": true
+	},
+	"route/step-12-079m_draw_budget": {
+		"evidence": 38,
+		"passed": true
+	},
+	"route/step-12-079m_interest": {
+		"evidence": [
+			"alc_lamp_001",
+			"alc_tree_a_001",
+			"alc_flowerbed_005",
+			"gull_002"
+		],
+		"passed": true
+	},
+	"route/step-12-079m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-12-079m_presentation_draw_budget": {
+		"evidence": 39,
+		"passed": true
+	},
+	"route/step-12-079m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-12-079m_triangle_budget": {
+		"evidence": 28453,
+		"passed": true
+	},
+	"route/step-13-085m_draw_budget": {
+		"evidence": 38,
+		"passed": true
+	},
+	"route/step-13-085m_interest": {
+		"evidence": [
+			"alc_flowerbed_001",
+			"alc_bin_001",
+			"alc_bench_004"
+		],
+		"passed": true
+	},
+	"route/step-13-085m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-13-085m_presentation_draw_budget": {
+		"evidence": 39,
+		"passed": true
+	},
+	"route/step-13-085m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-13-085m_triangle_budget": {
+		"evidence": 28201,
+		"passed": true
+	},
+	"route/step-14-092m_draw_budget": {
+		"evidence": 43,
+		"passed": true
+	},
+	"route/step-14-092m_interest": {
+		"evidence": [
+			"alc_tree_b_000",
+			"alc_flowerbed_003",
+			"alc_lamp_003"
+		],
+		"passed": true
+	},
+	"route/step-14-092m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-14-092m_presentation_draw_budget": {
+		"evidence": 44,
+		"passed": true
+	},
+	"route/step-14-092m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-14-092m_triangle_budget": {
+		"evidence": 28393,
+		"passed": true
+	},
+	"route/step-15-098m_draw_budget": {
+		"evidence": 40,
+		"passed": true
+	},
+	"route/step-15-098m_interest": {
+		"evidence": [
+			"alc_sign_001",
+			"alc_bench_002",
+			"alc_flowerbed_006"
+		],
+		"passed": true
+	},
+	"route/step-15-098m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-15-098m_presentation_draw_budget": {
+		"evidence": 41,
+		"passed": true
+	},
+	"route/step-15-098m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-15-098m_triangle_budget": {
+		"evidence": 28033,
+		"passed": true
+	},
+	"route/step-16-105m_draw_budget": {
+		"evidence": 40,
+		"passed": true
+	},
+	"route/step-16-105m_interest": {
+		"evidence": [
+			"alc_bench_001",
+			"alc_flowerbed_002",
+			"alc_sign_002",
+			"alc_lamp_002",
+			"alc_bench_005",
+			"alc_lamp_004"
+		],
+		"passed": true
+	},
+	"route/step-16-105m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-16-105m_presentation_draw_budget": {
+		"evidence": 41,
+		"passed": true
+	},
+	"route/step-16-105m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-16-105m_triangle_budget": {
+		"evidence": 28033,
+		"passed": true
+	},
+	"route/step-17-111m_draw_budget": {
+		"evidence": 35,
+		"passed": true
+	},
+	"route/step-17-111m_interest": {
+		"evidence": [
+			"alc_lamp_002",
+			"alc_lamp_004"
+		],
+		"passed": true
+	},
+	"route/step-17-111m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-17-111m_presentation_draw_budget": {
+		"evidence": 36,
+		"passed": true
+	},
+	"route/step-17-111m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-17-111m_triangle_budget": {
+		"evidence": 27937,
+		"passed": true
+	},
+	"route/step-18-118m_draw_budget": {
+		"evidence": 39,
+		"passed": true
+	},
+	"route/step-18-118m_interest": {
+		"evidence": [
+			"alc_bench_005",
+			"alc_museum_000"
+		],
+		"passed": true
+	},
+	"route/step-18-118m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-18-118m_presentation_draw_budget": {
+		"evidence": 40,
+		"passed": true
+	},
+	"route/step-18-118m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-18-118m_triangle_budget": {
+		"evidence": 28033,
+		"passed": true
+	},
+	"route/step-19-119m_draw_budget": {
+		"evidence": 39,
+		"passed": true
+	},
+	"route/step-19-119m_interest": {
+		"evidence": [
+			"alc_bench_005",
+			"alc_museum_000"
+		],
+		"passed": true
+	},
+	"route/step-19-119m_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"route/step-19-119m_presentation_draw_budget": {
+		"evidence": 40,
+		"passed": true
+	},
+	"route/step-19-119m_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"route/step-19-119m_triangle_budget": {
+		"evidence": 28033,
+		"passed": true
+	},
+	"route_1_arrived": {
+		"evidence": "(8.0, 5.5, 3.0)",
+		"passed": true
+	},
+	"route_1_follow": {
+		"evidence": "(7.298936, 6.2, 0.289187)",
+		"passed": true
+	},
+	"route_1_path": {
+		"evidence": "[(-22.0, 1.0, 19.0), (-21.75, 1.0, 18.9375), (-21.5, 1.0, 18.875), (-21.25, 1.0, 18.8125), (-21.0, 1.0, 18.75), (-20.99432, 1.0, 18.5), (-20.98864, 1.0, 18.25), (-20.98296, 1.0, 18.0), (-20.97727, 1.0, 17.75), (-20.97159, 1.0, 17.5), (-20.96591, 1.0, 17.25), (-20.96023, 1.0, 17.0), (-20.95455, 1.0, 16.75), (-20.94886, 1.0, 16.5), (-20.94318, 1.0, 16.25), (-20.9375, 1.0, 16.0), (-20.93182, 1.0, 15.75), (-20.92614, 1.0, 15.5), (-20.92046, 1.0, 15.25), (-20.91477, 1.0, 15.0), (-20.90909, 1.0, 14.75), (-20.90341, 1.0, 14.5), (-20.89773, 1.0, 14.25), (-20.89205, 1.0, 14.0), (-20.88637, 1.0, 13.75), (-20.88068, 1.0, 13.5), (-20.875, 1.0, 13.25), (-20.86932, 1.0, 13.0), (-20.86364, 1.0, 12.75), (-20.85796, 1.0, 12.5), (-20.85227, 1.0, 12.25), (-20.84659, 1.0, 12.0), (-20.84091, 1.125, 11.75), (-20.83523, 1.25, 11.5), (-20.82955, 1.375, 11.25), (-20.82386, 1.5, 11.0), (-20.81818, 1.625, 10.75), (-20.8125, 1.75, 10.5), (-20.80682, 1.875, 10.25), (-20.80114, 2.0, 10.0), (-20.79545, 2.125, 9.75), (-20.78977, 2.25, 9.5), (-20.78409, 2.375, 9.25), (-20.77841, 2.5, 9.0), (-20.77273, 2.625, 8.75), (-20.76705, 2.75, 8.5), (-20.76137, 2.875, 8.25), (-20.75568, 3.0, 8.0), (-20.75, 3.125, 7.75), (-20.5, 3.25, 7.499999), (-20.25, 3.25, 7.25), (-20.25, 3.25, 7.5), (-20.0, 3.25, 7.5), (-19.75, 3.25, 7.5), (-19.5, 3.25, 7.5), (-19.25, 3.25, 7.5), (-19.0, 3.25, 7.5), (-18.75, 3.25, 7.5), (-18.5, 3.25, 7.5), (-18.25, 3.25, 7.5), (-18.0, 3.25, 7.5), (-17.75, 3.25, 7.5), (-17.5, 3.25, 7.5), (-17.25, 3.25, 7.5), (-17.0, 3.25, 7.5), (-16.75, 3.25, 7.5), (-16.5, 3.25, 7.5), (-16.25, 3.25, 7.5), (-16.0, 3.25, 7.5), (-15.75, 3.25, 7.5), (-15.5, 3.25, 7.5), (-15.25, 3.25, 7.5), (-15.0, 3.25, 7.5), (-14.75, 3.25, 7.5), (-14.5, 3.25, 7.5), (-14.25, 3.25, 7.5), (-14.0, 3.25, 7.5), (-13.75, 3.25, 7.5), (-13.5, 3.25, 7.5), (-13.25, 3.25, 7.5), (-13.0, 3.25, 7.5), (-12.75, 3.25, 7.5), (-12.5, 3.25, 7.5), (-12.25, 3.25, 7.5), (-12.0, 3.25, 7.5), (-11.75, 3.25, 7.5), (-11.5, 3.25, 7.5), (-11.25, 3.25, 7.5), (-11.0, 3.25, 7.5), (-10.75, 3.25, 7.5), (-10.5, 3.25, 7.5), (-10.25, 3.25, 7.5), (-10.0, 3.25, 7.5), (-9.75, 3.25, 7.5), (-9.5, 3.25, 7.5), (-9.25, 3.25, 7.5), (-9.0, 3.25, 7.5), (-8.75, 3.25, 7.5), (-8.5, 3.25, 7.5), (-8.25, 3.25, 7.5), (-8.0, 3.25, 7.5), (-7.75, 3.25, 7.5), (-7.5, 3.25, 7.5), (-7.25, 3.25, 7.5), (-7.0, 3.25, 7.5), (-6.75, 3.25, 7.5), (-6.5, 3.25, 7.5), (-6.25, 3.25, 7.5), (-6.0, 3.25, 7.5), (-5.75, 3.25, 7.5), (-5.5, 3.25, 7.5), (-5.25, 3.25, 7.5), (-5.0, 3.25, 7.5), (-4.75, 3.25, 7.5), (-4.5, 3.25, 7.5), (-4.25, 3.25, 7.5), (-4.0, 3.25, 7.5), (-3.75, 3.25, 7.5), (-3.5, 3.25, 7.5), (-3.25, 3.25, 7.5), (-3.0, 3.25, 7.5), (-2.75, 3.25, 7.5), (-2.5, 3.25, 7.5), (-2.25, 3.25, 7.5), (-2.0, 3.25, 7.5), (-1.75, 3.25, 7.5), (-1.5, 3.25, 7.5), (-1.25, 3.25, 7.5), (-1.0, 3.25, 7.5), (-0.75, 3.25, 7.5), (-0.5, 3.25, 7.5), (-0.25, 3.25, 7.5), (0.0, 3.25, 7.5), (0.25, 3.25, 7.5), (0.5, 3.25, 7.5), (0.75, 3.25, 7.5), (1.0, 3.25, 7.5), (1.25, 3.25, 7.5), (1.5, 3.25, 7.5), (1.75, 3.25, 7.5), (2.0, 3.25, 7.5), (2.25, 3.25, 7.5), (2.5, 3.25, 7.5), (2.75, 3.25, 7.5), (3.0, 3.25, 7.5), (3.25, 3.25, 7.5), (3.5, 3.25, 7.5), (3.75, 3.25, 7.5), (4.0, 3.25, 7.5), (4.25, 3.25, 7.5), (4.5, 3.25, 7.5), (4.75, 3.25, 7.5), (5.0, 3.25, 7.5), (5.25, 3.25, 7.5), (5.5, 3.25, 7.5), (5.75, 3.25, 7.5), (6.0, 3.25, 7.5), (6.25, 3.25, 7.5), (6.5, 3.25, 7.5), (6.75, 3.375, 7.25), (6.769231, 3.5, 7.0), (6.788462, 3.625, 6.75), (6.807693, 3.75, 6.5), (6.826923, 3.875, 6.25), (6.846154, 4.0, 6.0), (6.865385, 4.125, 5.75), (6.884616, 4.25, 5.5), (6.903846, 4.375, 5.25), (6.923077, 4.5, 5.0), (6.942308, 4.625, 4.75), (6.961539, 4.75, 4.5), (6.980769, 4.875, 4.25), (7.0, 5.0, 4.0), (7.25, 5.125, 3.75), (7.5, 5.25, 3.5), (7.75, 5.375, 3.25), (8.0, 5.5, 3.0)]",
+		"passed": true
+	},
+	"route_2_arrived": {
+		"evidence": "(0.0, 10.0, -6.0)",
+		"passed": true
+	},
+	"route_2_follow": {
+		"evidence": "(-0.701064, 10.7, -8.710814)",
+		"passed": true
+	},
+	"route_2_path": {
+		"evidence": "[(8.0, 5.5, 3.0), (7.75, 5.5, 2.964286), (7.5, 5.5, 2.928571), (7.25, 5.5, 2.892857), (7.0, 5.5, 2.857143), (6.75, 5.5, 2.821429), (6.5, 5.5, 2.785714), (6.25, 5.5, 2.75), (6.25, 5.5, 3.0), (6.0, 5.5, 3.0), (5.75, 5.5, 3.0), (5.5, 5.5, 3.0), (5.25, 5.5, 3.0), (5.0, 5.5, 3.0), (4.75, 5.5, 3.0), (4.5, 5.5, 3.0), (4.25, 5.5, 3.0), (4.0, 5.5, 3.0), (3.75, 5.5, 3.0), (3.5, 5.5, 3.0), (3.25, 5.5, 3.0), (3.0, 5.5, 3.0), (2.75, 5.5, 3.0), (2.5, 5.5, 3.0), (2.25, 5.5, 3.0), (2.0, 5.5, 3.0), (1.75, 5.5, 3.0), (1.5, 5.5, 3.0), (1.25, 5.5, 3.0), (1.0, 5.5, 3.0), (0.75, 5.5, 3.0), (0.5, 5.5, 3.0), (0.25, 5.5, 3.0), (0.0, 5.5, 3.0), (-0.25, 5.5, 3.0), (-0.5, 5.5, 3.0), (-0.75, 5.5, 3.0), (-1.0, 5.5, 3.0), (-1.25, 5.5, 3.0), (-1.5, 5.5, 3.0), (-1.75, 5.5, 3.0), (-2.0, 5.5, 3.0), (-2.25, 5.5, 3.0), (-2.5, 5.5, 3.0), (-2.75, 5.5, 3.0), (-3.0, 5.5, 3.0), (-3.25, 5.5, 3.0), (-3.5, 5.5, 3.0), (-3.75, 5.5, 3.0), (-4.0, 5.5, 3.0), (-4.25, 5.5, 3.0), (-4.5, 5.5, 3.0), (-4.75, 5.5, 3.0), (-5.0, 5.5, 3.0), (-5.25, 5.5, 3.0), (-5.5, 5.5, 3.0), (-5.75, 5.5, 3.0), (-6.0, 5.5, 3.0), (-6.25, 5.5, 3.0), (-6.5, 5.5, 3.0), (-6.75, 5.5, 3.0), (-7.0, 5.5, 3.0), (-7.25, 5.5, 3.0), (-7.5, 5.5, 3.0), (-7.75, 5.5, 3.0), (-8.0, 5.5, 3.0), (-8.25, 5.5, 3.0), (-8.5, 5.5, 3.0), (-8.75, 5.5, 3.0), (-9.0, 5.5, 3.0), (-9.25, 5.5, 3.0), (-9.5, 5.5, 3.0), (-9.75, 5.5, 3.0), (-10.0, 5.5, 3.0), (-10.25, 5.5, 3.0), (-10.5, 5.5, 3.0), (-10.75, 5.5, 3.0), (-11.0, 5.5, 3.0), (-11.25, 5.5, 3.0), (-11.5, 5.5, 3.0), (-11.75, 5.5, 3.0), (-12.0, 5.5, 3.0), (-12.25, 5.5, 3.0), (-12.5, 5.5, 3.0), (-12.75, 5.5, 3.0), (-13.0, 5.5, 3.0), (-13.25, 5.5, 3.0), (-13.5, 5.5, 3.0), (-13.75, 5.5, 3.0), (-14.0, 5.5, 3.0), (-14.25, 5.5, 3.0), (-14.5, 5.5, 3.0), (-14.75, 5.5, 3.0), (-15.0, 5.5, 3.0), (-15.25, 5.5, 3.0), (-15.5, 5.5, 3.0), (-15.75, 5.5, 3.0), (-16.0, 5.5, 3.0), (-16.25, 5.5, 3.0), (-16.5, 5.5, 3.0), (-16.75, 5.5, 3.0), (-17.0, 5.5, 3.0), (-17.25, 5.5, 3.0), (-17.5, 5.5, 3.0), (-17.75, 5.5, 3.0), (-18.0, 5.5, 3.0), (-18.25, 5.5, 3.0), (-18.5, 5.5, 3.0), (-18.75, 5.5, 3.0), (-19.0, 5.5, 3.0), (-19.25, 5.5, 3.0), (-19.5, 5.5, 3.0), (-19.75, 5.5, 3.0), (-20.0, 5.5, 3.0), (-20.25, 5.5, 3.0), (-20.5, 5.5, 3.0), (-20.75, 5.625, 2.75), (-20.76563, 5.75, 2.5), (-20.78125, 5.875, 2.25), (-20.79688, 6.0, 2.0), (-20.8125, 6.125, 1.75), (-20.82813, 6.25, 1.5), (-20.84375, 6.375, 1.25), (-20.85938, 6.5, 1.0), (-20.875, 6.625, 0.75), (-20.89062, 6.75, 0.5), (-20.90625, 6.875, 0.25), (-20.92188, 7.0, 0.0), (-20.9375, 7.125, -0.25), (-20.95312, 7.25, -0.5), (-20.96875, 7.375, -0.75), (-20.98438, 7.5, -1.0), (-21.0, 7.625, -1.25), (-20.75, 7.625, -1.25), (-20.75, 7.75, -1.5), (-20.5, 7.75, -1.5), (-20.25, 7.75, -1.5), (-20.0, 7.75, -1.497663), (-19.75, 7.75, -1.495327), (-19.5, 7.75, -1.49299), (-19.25, 7.75, -1.490654), (-19.0, 7.75, -1.488318), (-18.75, 7.75, -1.485981), (-18.5, 7.75, -1.483645), (-18.25, 7.75, -1.481308), (-18.0, 7.75, -1.478972), (-17.75, 7.75, -1.476635), (-17.5, 7.75, -1.474299), (-17.25, 7.75, -1.471963), (-17.0, 7.75, -1.469626), (-16.75, 7.75, -1.46729), (-16.5, 7.75, -1.464953), (-16.25, 7.75, -1.462617), (-16.0, 7.75, -1.46028), (-15.75, 7.75, -1.457944), (-15.5, 7.75, -1.455607), (-15.25, 7.75, -1.453271), (-15.0, 7.75, -1.450935), (-14.75, 7.75, -1.448598), (-14.5, 7.75, -1.446262), (-14.25, 7.75, -1.443925), (-14.0, 7.75, -1.441589), (-13.75, 7.75, -1.439252), (-13.5, 7.75, -1.436916), (-13.25, 7.75, -1.434579), (-13.0, 7.75, -1.432243), (-12.75, 7.75, -1.429906), (-12.5, 7.75, -1.42757), (-12.25, 7.75, -1.425234), (-12.0, 7.75, -1.422897), (-11.75, 7.75, -1.420561), (-11.5, 7.75, -1.418224), (-11.25, 7.75, -1.415888), (-11.0, 7.75, -1.413551), (-10.75, 7.75, -1.411215), (-10.5, 7.75, -1.408878), (-10.25, 7.75, -1.406542), (-10.0, 7.75, -1.404206), (-9.75, 7.75, -1.401869), (-9.5, 7.75, -1.399533), (-9.25, 7.75, -1.397196), (-9.0, 7.75, -1.39486), (-8.75, 7.75, -1.392523), (-8.5, 7.75, -1.390187), (-8.25, 7.75, -1.38785), (-8.0, 7.75, -1.385514), (-7.75, 7.75, -1.383178), (-7.5, 7.75, -1.380841), (-7.25, 7.75, -1.378505), (-7.0, 7.75, -1.376168), (-6.75, 7.75, -1.373832), (-6.5, 7.75, -1.371495), (-6.25, 7.75, -1.369159), (-6.0, 7.75, -1.366822), (-5.75, 7.75, -1.364486), (-5.5, 7.75, -1.362149), (-5.25, 7.75, -1.359813), (-5.0, 7.75, -1.357477), (-4.75, 7.75, -1.35514), (-4.5, 7.75, -1.352804), (-4.25, 7.75, -1.350467), (-4.0, 7.75, -1.348131), (-3.75, 7.75, -1.345794), (-3.5, 7.75, -1.343458), (-3.25, 7.75, -1.341121), (-3.0, 7.75, -1.338785), (-2.75, 7.75, -1.336449), (-2.5, 7.75, -1.334112), (-2.25, 7.75, -1.331776), (-2.0, 7.75, -1.329439), (-1.75, 7.75, -1.327103), (-1.5, 7.75, -1.324766), (-1.25, 7.75, -1.32243), (-1.0, 7.75, -1.320093), (-0.75, 7.75, -1.317757), (-0.5, 7.75, -1.31542), (-0.25, 7.75, -1.313084), (0.0, 7.75, -1.310748), (0.25, 7.75, -1.308411), (0.5, 7.75, -1.306075), (0.75, 7.75, -1.303738), (1.0, 7.75, -1.301402), (1.25, 7.75, -1.299065), (1.5, 7.75, -1.296729), (1.75, 7.75, -1.294392), (2.0, 7.75, -1.292056), (2.25, 7.75, -1.28972), (2.5, 7.75, -1.287383), (2.75, 7.75, -1.285047), (3.0, 7.75, -1.28271), (3.25, 7.75, -1.280374), (3.5, 7.75, -1.278037), (3.75, 7.75, -1.275701), (4.0, 7.75, -1.273364), (4.25, 7.75, -1.271028), (4.5, 7.75, -1.268691), (4.75, 7.75, -1.266355), (5.0, 7.75, -1.264019), (5.25, 7.75, -1.261682), (5.5, 7.75, -1.259346), (5.75, 7.75, -1.257009), (6.0, 7.75, -1.254673), (6.25, 7.75, -1.252336), (6.5, 7.75, -1.25), (6.5, 7.75, -1.5), (6.75, 7.75, -1.5), (6.75, 7.875, -1.75), (6.75, 8.0, -2.0), (6.75, 8.125, -2.25), (6.75, 8.25, -2.5), (6.75, 8.375, -2.75), (6.75, 8.5, -3.0), (6.75, 8.625, -3.25), (6.75, 8.75, -3.5), (6.75, 8.875, -3.75), (6.75, 9.0, -4.0), (6.75, 9.125, -4.25), (6.75, 9.25, -4.5), (6.75, 9.375, -4.75), (6.75, 9.5, -5.0), (6.75, 9.625, -5.25), (6.75, 9.75, -5.5), (6.75, 9.875, -5.75), (6.5, 10.0, -6.0), (6.25, 10.0, -6.0), (6.0, 10.0, -6.0), (5.75, 10.0, -6.0), (5.5, 10.0, -6.0), (5.25, 10.0, -6.0), (5.0, 10.0, -6.0), (4.75, 10.0, -6.0), (4.5, 10.0, -6.0), (4.25, 10.0, -6.0), (4.0, 10.0, -6.0), (3.75, 10.0, -6.0), (3.5, 10.0, -6.0), (3.25, 10.0, -6.0), (3.0, 10.0, -6.0), (2.75, 10.0, -6.0), (2.5, 10.0, -6.0), (2.25, 10.0, -6.0), (2.0, 10.0, -6.0), (1.75, 10.0, -6.0), (1.5, 10.0, -6.0), (1.25, 10.0, -6.0), (1.0, 10.0, -6.0), (0.75, 10.0, -6.0), (0.5, 10.0, -6.0), (0.25, 10.0, -6.0), (0.0, 10.0, -6.0)]",
+		"passed": true
+	},
+	"route_about_120m": {
+		"evidence": 119.310104489326,
+		"passed": true
+	},
+	"route_screens": 20,
+	"sea_not_walkable": {
+		"evidence": "(27.75, 10.0, -4.75)",
+		"passed": true
+	},
+	"separate_navigation_map": {
+		"evidence": null,
+		"passed": true
+	},
+	"spawn_on_navigation": {
+		"evidence": null,
+		"passed": true
+	},
+	"status": "pass",
+	"summit_height": {
+		"evidence": 10.0,
+		"passed": true
+	},
+	"tea_layout_contract": {
+		"evidence": null,
+		"passed": true
+	},
+	"three_loading_zones": {
+		"evidence": null,
+		"passed": true
+	},
+	"total_surface_budget_with_multimesh": {
+		"evidence": 50,
+		"passed": true
+	},
+	"total_triangle_budget_with_multimesh": {
+		"evidence": 37716,
+		"passed": true
+	},
+	"view_metrics": {
+		"01-opening": {
+			"canvas_draw_calls": 11,
+			"capture_ms": 13025,
+			"global_draw_calls": 37,
+			"player_position": [
+				-22.0,
+				1.0,
+				19.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				}
+			],
+			"shadow_draw_calls": 5,
+			"total_draw_calls": 36,
+			"visible_draw_calls": 20,
+			"visible_triangles": 28429,
+			"zoom": 1.0
+		},
+		"02-mid-hill": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11949,
+			"global_draw_calls": 44,
+			"player_position": [
+				8.0,
+				5.5,
+				3.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				}
+			],
+			"shadow_draw_calls": 9,
+			"total_draw_calls": 43,
+			"visible_draw_calls": 27,
+			"visible_triangles": 29209,
+			"zoom": 1.0
+		},
+		"03-visitor-center": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11924,
+			"global_draw_calls": 40,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 39,
+			"visible_draw_calls": 24,
+			"visible_triangles": 28033,
+			"zoom": 1.0
+		},
+		"04-top-layout": {
+			"canvas_draw_calls": 0,
+			"capture_ms": 13020,
+			"global_draw_calls": 51,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				}
+			],
+			"shadow_draw_calls": 13,
+			"total_draw_calls": 50,
+			"visible_draw_calls": 37,
+			"visible_triangles": 32332,
+			"zoom": 1.0
+		},
+		"05-whole-island": {
+			"canvas_draw_calls": 0,
+			"capture_ms": 11961,
+			"global_draw_calls": 51,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 51,
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 37,
+					"visible_triangles": 32332
+				}
+			],
+			"shadow_draw_calls": 13,
+			"total_draw_calls": 50,
+			"visible_draw_calls": 37,
+			"visible_triangles": 32332,
+			"zoom": 1.0
+		},
+		"06-summit-zoom-out": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11914,
+			"global_draw_calls": 49,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 49,
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 29213
+				}
+			],
+			"shadow_draw_calls": 11,
+			"total_draw_calls": 48,
+			"visible_draw_calls": 30,
+			"visible_triangles": 29213,
+			"zoom": 0.333333333333333
+		},
+		"route/step-00-000m": {
+			"canvas_draw_calls": 11,
+			"capture_ms": 11939,
+			"global_draw_calls": 37,
+			"player_position": [
+				-22.0,
+				1.0,
+				19.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 37,
+					"shadow_draw_calls": 5,
+					"total_draw_calls": 36,
+					"visible_draw_calls": 20,
+					"visible_triangles": 28429
+				}
+			],
+			"shadow_draw_calls": 5,
+			"total_draw_calls": 36,
+			"visible_draw_calls": 20,
+			"visible_triangles": 28429,
+			"zoom": 1.0
+		},
+		"route/step-01-007m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11985,
+			"global_draw_calls": 43,
+			"player_position": [
+				-20.8754558563232,
+				1.0,
+				13.2700595855713
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31225
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 42,
+			"visible_draw_calls": 27,
+			"visible_triangles": 31225,
+			"zoom": 1.0
+		},
+		"route/step-02-013m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11956,
+			"global_draw_calls": 44,
+			"player_position": [
+				-20.3373641967773,
+				3.25,
+				7.3373646736145
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 31261
+				}
+			],
+			"shadow_draw_calls": 9,
+			"total_draw_calls": 43,
+			"visible_draw_calls": 27,
+			"visible_triangles": 31261,
+			"zoom": 1.0
+		},
+		"route/step-03-020m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11946,
+			"global_draw_calls": 41,
+			"player_position": [
+				-14.0200004577637,
+				3.25,
+				7.5
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 25,
+					"visible_triangles": 30229
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 40,
+			"visible_draw_calls": 25,
+			"visible_triangles": 30229,
+			"zoom": 1.0
+		},
+		"route/step-04-026m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11949,
+			"global_draw_calls": 43,
+			"player_position": [
+				-7.51999998092651,
+				3.25,
+				7.5
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 43,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 42,
+					"visible_draw_calls": 26,
+					"visible_triangles": 27121
+				}
+			],
+			"shadow_draw_calls": 9,
+			"total_draw_calls": 42,
+			"visible_draw_calls": 26,
+			"visible_triangles": 27121,
+			"zoom": 1.0
+		},
+		"route/step-05-033m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11986,
+			"global_draw_calls": 42,
+			"player_position": [
+				-1.01999998092651,
+				3.25,
+				7.5
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 42,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 41,
+					"visible_draw_calls": 24,
+					"visible_triangles": 26737
+				}
+			],
+			"shadow_draw_calls": 10,
+			"total_draw_calls": 41,
+			"visible_draw_calls": 24,
+			"visible_triangles": 26737,
+			"zoom": 1.0
+		},
+		"route/step-06-039m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11984,
+			"global_draw_calls": 38,
+			"player_position": [
+				5.48000001907349,
+				3.25,
+				7.5
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 38,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 37,
+					"visible_draw_calls": 22,
+					"visible_triangles": 26665
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 37,
+			"visible_draw_calls": 22,
+			"visible_triangles": 26665,
+			"zoom": 1.0
+		},
+		"route/step-07-046m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11983,
+			"global_draw_calls": 44,
+			"player_position": [
+				8.0,
+				5.5,
+				3.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 27,
+					"visible_triangles": 29209
+				}
+			],
+			"shadow_draw_calls": 9,
+			"total_draw_calls": 43,
+			"visible_draw_calls": 27,
+			"visible_triangles": 29209,
+			"zoom": 1.0
+		},
+		"route/step-08-052m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11978,
+			"global_draw_calls": 44,
+			"player_position": [
+				1.75,
+				5.5,
+				3.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 30061
+				}
+			],
+			"shadow_draw_calls": 10,
+			"total_draw_calls": 43,
+			"visible_draw_calls": 26,
+			"visible_triangles": 30061,
+			"zoom": 1.0
+		},
+		"route/step-09-059m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11976,
+			"global_draw_calls": 45,
+			"player_position": [
+				-4.75,
+				5.5,
+				3.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 45,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 44,
+					"visible_draw_calls": 27,
+					"visible_triangles": 28525
+				}
+			],
+			"shadow_draw_calls": 10,
+			"total_draw_calls": 44,
+			"visible_draw_calls": 27,
+			"visible_triangles": 28525,
+			"zoom": 1.0
+		},
+		"route/step-10-065m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11973,
+			"global_draw_calls": 44,
+			"player_position": [
+				-11.25,
+				5.5,
+				3.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28477
+				}
+			],
+			"shadow_draw_calls": 10,
+			"total_draw_calls": 43,
+			"visible_draw_calls": 26,
+			"visible_triangles": 28477,
+			"zoom": 1.0
+		},
+		"route/step-11-072m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11975,
+			"global_draw_calls": 41,
+			"player_position": [
+				-17.75,
+				5.5,
+				3.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28333
+				}
+			],
+			"shadow_draw_calls": 9,
+			"total_draw_calls": 40,
+			"visible_draw_calls": 24,
+			"visible_triangles": 28333,
+			"zoom": 1.0
+		},
+		"route/step-12-079m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11946,
+			"global_draw_calls": 39,
+			"player_position": [
+				-20.9503364562988,
+				7.227698802948,
+				-0.455397576093674
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28453
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 38,
+			"visible_draw_calls": 23,
+			"visible_triangles": 28453,
+			"zoom": 1.0
+		},
+		"route/step-13-085m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11981,
+			"global_draw_calls": 39,
+			"player_position": [
+				-15.5200099945068,
+				7.75,
+				-1.45579445362091
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 39,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 38,
+					"visible_draw_calls": 23,
+					"visible_triangles": 28201
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 38,
+			"visible_draw_calls": 23,
+			"visible_triangles": 28201,
+			"zoom": 1.0
+		},
+		"route/step-14-092m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11972,
+			"global_draw_calls": 44,
+			"player_position": [
+				-9.02000999450684,
+				7.75,
+				-1.39504683017731
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 44,
+					"shadow_draw_calls": 10,
+					"total_draw_calls": 43,
+					"visible_draw_calls": 26,
+					"visible_triangles": 28393
+				}
+			],
+			"shadow_draw_calls": 10,
+			"total_draw_calls": 43,
+			"visible_draw_calls": 26,
+			"visible_triangles": 28393,
+			"zoom": 1.0
+		},
+		"route/step-15-098m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11973,
+			"global_draw_calls": 41,
+			"player_position": [
+				-2.52000999450684,
+				7.75,
+				-1.33429908752441
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				}
+			],
+			"shadow_draw_calls": 9,
+			"total_draw_calls": 40,
+			"visible_draw_calls": 24,
+			"visible_triangles": 28033,
+			"zoom": 1.0
+		},
+		"route/step-16-105m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11966,
+			"global_draw_calls": 41,
+			"player_position": [
+				3.97999000549316,
+				7.75,
+				-1.27355146408081
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 41,
+					"shadow_draw_calls": 9,
+					"total_draw_calls": 40,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				}
+			],
+			"shadow_draw_calls": 9,
+			"total_draw_calls": 40,
+			"visible_draw_calls": 24,
+			"visible_triangles": 28033,
+			"zoom": 1.0
+		},
+		"route/step-17-111m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11974,
+			"global_draw_calls": 36,
+			"player_position": [
+				6.75,
+				9.35285949707031,
+				-4.70571804046631
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 36,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 35,
+					"visible_draw_calls": 21,
+					"visible_triangles": 27937
+				}
+			],
+			"shadow_draw_calls": 7,
+			"total_draw_calls": 35,
+			"visible_draw_calls": 21,
+			"visible_triangles": 27937,
+			"zoom": 1.0
+		},
+		"route/step-18-118m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11962,
+			"global_draw_calls": 40,
+			"player_position": [
+				1.51999998092651,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 39,
+			"visible_draw_calls": 24,
+			"visible_triangles": 28033,
+			"zoom": 1.0
+		},
+		"route/step-19-119m": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 11958,
+			"global_draw_calls": 40,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 24,
+					"visible_triangles": 28033
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 39,
+			"visible_draw_calls": 24,
+			"visible_triangles": 28033,
+			"zoom": 1.0
+		}
+	},
+	"walk_lengths_m": [
+		45.7808991074562,
+		73.5292053818703
+	],
+	"walking_keeps_zoom": {
+		"evidence": null,
+		"passed": true
+	},
+	"wide_entire_tower_in_frame": {
+		"evidence": null,
+		"passed": true
+	},
+	"wide_lighthouse_rendered_pixels": {
+		"evidence": 16787,
+		"passed": true
+	},
+	"wide_lighthouse_visible": {
+		"evidence": "(55.55519, 171.0139)",
+		"passed": true
+	},
+	"wide_museum_majority": {
+		"evidence": 0.853658536585366,
+		"passed": true
+	},
+	"wide_oblique_angle": {
+		"evidence": "(-43.0, 60.0, 0.0)",
+		"passed": true
+	},
+	"zone_navigation_DockZone": {
+		"evidence": null,
+		"passed": true
+	},
+	"zone_navigation_SummitZone": {
+		"evidence": null,
+		"passed": true
+	},
+	"zone_navigation_TerraceZone": {
+		"evidence": null,
+		"passed": true
+	},
+	"zoom_in_limit": {
+		"evidence": 1.4,
+		"passed": true
+	},
+	"zoom_out_limit": {
+		"evidence": 20.1599998474121,
+		"passed": true
+	}
+}

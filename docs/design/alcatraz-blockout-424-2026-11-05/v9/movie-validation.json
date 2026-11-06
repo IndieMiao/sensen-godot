@@ -1,0 +1,30 @@
+{
+  "arrived": true,
+  "budget_passed": true,
+  "final_position": "(0.0, 10.0, -6.0)",
+  "fixed_fps": 30,
+  "limits": "Offline fixed-step art movie; not real touch or physical-device FPS.",
+  "normal_speed_walk_frames": 1857,
+  "ready_frame": 96,
+  "render_peak": {
+    "global_draw_calls": 59,
+    "total_draw_calls": 58,
+    "visible_triangles": 62227
+  },
+  "file": "SGODOT-424-v9-walk.mp4",
+  "sha256": "66378a4500e5638327fcee25f364aeca741bc74a1ff32d4bffa4633afffd7159",
+  "bytes": 3556038,
+  "duration_s": 68.9,
+  "dimensions": [
+    360,
+    800
+  ],
+  "frame_rate": "30/1",
+  "codec": "h264",
+  "inspected_seconds": [
+    1.5,
+    34,
+    65
+  ],
+  "full_decode_checked": true
+}

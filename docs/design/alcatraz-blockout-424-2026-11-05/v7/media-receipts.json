@@ -1,0 +1,258 @@
+[
+  {
+    "name": "SGODOT-424-colour-v7-01-opening.png",
+    "id": "0570b749-8841-45c5-ae0c-41f0ad8a37b0",
+    "sha256": "da49fe20241ec981da80b6d7a0bb9ddb82454d7c116d64940fa08d2bc2954ee5",
+    "bytes": 85080,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-02-mid-hill.png",
+    "id": "d328d96f-94d3-48b5-8ff4-3d69a1df2a9a",
+    "sha256": "da80e835edf87f504769a6e8cc983a2fa5a032f49496b2a4c978874a537cd4ef",
+    "bytes": 203009,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-03-visitor-center.png",
+    "id": "03512468-45b2-4f29-96aa-8886e319f11f",
+    "sha256": "1129e8ca34abb97a622de2463e43614753cefb580305a1f5953da171e6ce8191",
+    "bytes": 210023,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-05-whole-island.png",
+    "id": "f67eb072-0f14-42e3-a61d-0293d8fd94d0",
+    "sha256": "c06f6c647cbb63336ada09fbc438557c843cc9dcaa8a7fbfc9d92be6ff012b10",
+    "bytes": 423774,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-06-summit-zoom-out.png",
+    "id": "a43b23f1-56ee-44da-81fa-d5a3f0336c4b",
+    "sha256": "0d7b1033fa3c86427816793261c2dc98e6364a21824c0cd35c31d40b63ac2d09",
+    "bytes": 207019,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-07-route-contact-sheet.png",
+    "id": "fd231fa5-17ef-4a7a-a110-1e1f5130a51f",
+    "sha256": "48c5668e26484fcf803ba250b5f37de3e24fc6d00b57f138f136432092c9b48f",
+    "bytes": 1375492,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-08-mid-hill-hud-comparison.png",
+    "id": "ceae1615-4d90-4ab3-9e8a-a8b8f294f6be",
+    "sha256": "711c6a99df0b73a156677927bc04c30bd338e9ed6f762cab70971df22fbebe8a",
+    "bytes": 340132,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-09-hud-route-contact-sheet.png",
+    "id": "08b4689f-cdcf-4351-ac78-b1773e7e2e8d",
+    "sha256": "fdd074fe6ac00e73f81b604b765e5bfb4d7769a832e3d9d1bb32c82c7fb871ad",
+    "bytes": 1398169,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-10-reference-colour-comparison.png",
+    "id": "0a4e6e15-89cb-4c6c-a146-56fc69a87e37",
+    "sha256": "2ab36f74232a6252ba95d6b2e87ae08c83b503d7d64c558ca67f57597454cf91",
+    "bytes": 1088502,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-11-museum-before-after.png",
+    "id": "b9d508e8-e72f-4b04-82b6-ce2b1c15f45f",
+    "sha256": "e6a16ffe3044e8b4a848c4d1c762104ada8420fb45af2a4784464cc97575974f",
+    "bytes": 409266,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-00-000m.png",
+    "id": "e9abe5da-0759-4670-968c-6c274f3c3427",
+    "sha256": "50dd3b6a0924a9e6accf55a7f2d65680d96fa137925bfdabfa828e271e17ca8b",
+    "bytes": 85082,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-01-007m.png",
+    "id": "bd17f557-63c5-48e2-8151-898bfac020bf",
+    "sha256": "805cc1533931824f5ed23a81898d4930af3a18781aa111d68d76833213a27cfd",
+    "bytes": 171820,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-02-013m.png",
+    "id": "37bd2309-53c3-4f09-a77a-cc8b3aab9053",
+    "sha256": "4d0caef0284f64f3e8ead3132c02ab70959396c7bebd13f5390fab725f843ac8",
+    "bytes": 200959,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-03-020m.png",
+    "id": "ce73f542-cf8b-4558-9795-f458f7b2b69d",
+    "sha256": "bdd99d17a2eee820a7f2e83073729e4355b4b7952905f0e0be52cc6db68ee052",
+    "bytes": 186019,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-04-026m.png",
+    "id": "4e562834-6514-430c-80cf-4b052a44489d",
+    "sha256": "602d2fd1b530ed080a46c2cd0c11817557aab819843e294e539b4f2d163a7a87",
+    "bytes": 184714,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-05-033m.png",
+    "id": "d9fb746f-6273-45c1-b839-8b9ba91caaf8",
+    "sha256": "f5990aeb652738e7abec1d33aa077c39472484174fa81ec20d0c5a1ce3b3ee87",
+    "bytes": 182730,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-06-039m.png",
+    "id": "e2f90ba7-e782-4bf4-b01e-e599451672f6",
+    "sha256": "35d75eb5d652f9187b4c8990e321b2b9a79e8e08a727b518f3b979edaa327526",
+    "bytes": 193837,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-07-046m.png",
+    "id": "43d9f99d-db73-499b-b6ee-75c459b10a8b",
+    "sha256": "c76634df6b10685502a8a45709b0ed78b401058c6befcad65314545b07d2470f",
+    "bytes": 203255,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-08-052m.png",
+    "id": "e63c5afb-93a0-4e12-91be-97fae920bd6c",
+    "sha256": "b3a46bc7c0def1a6f3a4b10871d90368a195242ef0b89b6733e705bcd6bcb686",
+    "bytes": 201984,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-09-059m.png",
+    "id": "01dee065-0179-4ef2-b40f-e69ec0d180b0",
+    "sha256": "e71369eb43cfd55cded5e4d688422ac8138c6dfd5b1297d1d7c79f71e69957db",
+    "bytes": 209013,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-10-065m.png",
+    "id": "45a5e04a-818a-4866-a0ed-1d06aac3ce0b",
+    "sha256": "e64701982f6d4fe994d69d4bd8dfa02d8a616539d7951399c627bea51e93cd34",
+    "bytes": 199123,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-11-072m.png",
+    "id": "fcc188d3-b3c0-4a20-9dde-65abe3421cd6",
+    "sha256": "43b5b4aa79f7176e9f2da47b4a7aaa5243c7ddaec7b37191de032fa36c2903eb",
+    "bytes": 209791,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-12-079m.png",
+    "id": "d4a8b9ea-2c28-4b06-864f-51ad1f88ae46",
+    "sha256": "6a508e779184cbe51b2efc84f876204692cbd52a69ef068efec42b180475b3be",
+    "bytes": 192159,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-13-085m.png",
+    "id": "a09d1c35-6ff5-4bad-b4d7-0b293d25fd16",
+    "sha256": "3e36f3fefdecffcd6303c1a5d227a39aeb21cc59ca4fe4c33c350624536eeb22",
+    "bytes": 216334,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-14-092m.png",
+    "id": "46aedaaf-aea4-4de9-9873-afb16fcd6952",
+    "sha256": "1e2fa51600135ead1ccae76e6564263e463d079de32f75c5e9450bb502bcc1e5",
+    "bytes": 216264,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-15-098m.png",
+    "id": "d3321c58-aaa8-4f49-8440-6574e32d3cc6",
+    "sha256": "3339dd0bd0fa99867b22d949a8491fbd613ceb0539e8ef41e198edf52c2018d9",
+    "bytes": 217712,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-16-105m.png",
+    "id": "0173dcfb-134e-45c7-b820-d251a3c1d0f4",
+    "sha256": "4f5012619fa661c7dbfbb9a5efb52f1375c1fa795f97dd6b87afb4b3232a3c30",
+    "bytes": 226069,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-17-111m.png",
+    "id": "9672cf38-c38a-4ace-ad98-c32b6bb23c9e",
+    "sha256": "bf4ea110191bba9b2fb852f0786bcc628650fb124ba2e1814c036f6c27a4567a",
+    "bytes": 234637,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-18-118m.png",
+    "id": "3880b293-fcd8-478a-aa3d-96c2e7e5f895",
+    "sha256": "f947bf49c8fc647d7b4b8b62522fc2ec1d0ce676f7a52c66bca6c4c152677480",
+    "bytes": 210470,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-route-step-19-119m.png",
+    "id": "fa826149-443f-4563-a5cf-7aeda33ff806",
+    "sha256": "082178edaba21d2da698e8d9f6b1c7bb3ae6897d3982704cbb6883bd9e3469f1",
+    "bytes": 210007,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-04-top-layout.png",
+    "id": "7c7b632e-91af-4681-8ad8-1d889333dde2",
+    "sha256": "90a8d529261d02db3d114b348b517146b24ac3d7231a25050ca23c10a7cf8ce0",
+    "bytes": 390899,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-colour-v7-walk.mp4",
+    "id": "2e5df4a4-1b00-41ba-ad24-de5b4c6d116b",
+    "sha256": "e6c67608ffa72242ce76e08ae73e2975c9dba7b1fb123dcc0ae67fb15bb04912",
+    "bytes": 3534000,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  }
+]

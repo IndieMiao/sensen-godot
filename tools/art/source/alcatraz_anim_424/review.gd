@@ -1,4 +1,5 @@
 extends Node
+const AlcatrazIsland = preload("res://scenes/landmark/alcatraz_island.gd")
 const KIT="res://assets/landmarks/alcatraz_island/"
 var scene:AlcatrazIsland
 var vp:SubViewport

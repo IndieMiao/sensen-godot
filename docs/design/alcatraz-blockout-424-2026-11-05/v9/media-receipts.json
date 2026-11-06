@@ -1,0 +1,274 @@
+[
+  {
+    "name": "SGODOT-424-v9-01-opening.png",
+    "id": "d373149c-910e-4274-b868-b79d211860d2",
+    "sha256": "13598e72f725701c3cfae0518de7c09eb642ddb195bcb717faaf8be588dd094a",
+    "bytes": 134776,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-02-mid-hill.png",
+    "id": "1c62aebd-f12f-42f7-8684-959793540f5f",
+    "sha256": "7723e064a95941b277aeb475094e2b48ec4a6a13354a61a3d96bf0f8c13dd86e",
+    "bytes": 272099,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-03-visitor-center.png",
+    "id": "28ba1658-282a-474c-aa43-00647c778965",
+    "sha256": "e4aa83d4a83dabe4930ac79f12f11bbb96165b212d20aed52a2c9c1871f65977",
+    "bytes": 241359,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-04-top-layout.png",
+    "id": "e1a99e5c-c87e-4758-945b-12e0eeda37eb",
+    "sha256": "56762cd9bdce951397a5cee7ab53bd955150a06be0e4b28015c142d0e0201afa",
+    "bytes": 510638,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-05-whole-island.png",
+    "id": "2e955dcd-9481-464d-91b4-780187ef91ca",
+    "sha256": "e0e6681f05ce9c5ef8693e31ecec020ed564849b42fdaceb8cc934db2a708349",
+    "bytes": 501928,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-06-summit-zoom-out.png",
+    "id": "3a2dcf16-46d5-48e1-b2d5-071df67d9f70",
+    "sha256": "004535eaf57d799837ae596d9682335648ceaced5efeb6de9e929b6c1d1bd47b",
+    "bytes": 244261,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-07-route-contact-sheet.png",
+    "id": "cf11e059-f133-40b3-920b-11bfb62e7f53",
+    "sha256": "bf7b6c4c80c776fe5adc735242f46d3478d5b1e4de22c01066e72f6c8526a6b8",
+    "bytes": 1705127,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-08-mid-hill-hud-comparison.png",
+    "id": "3d0442fe-5e0f-4098-adf2-8af46e389f01",
+    "sha256": "0d1001283b94c3dd2886adc429ab2b0aa4dcd4705589f2bb532aeaea4a07de5c",
+    "bytes": 410207,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-09-hud-route-contact-sheet.png",
+    "id": "d622c9aa-fa19-4138-83b3-b0669e9ed048",
+    "sha256": "496f2cdcbf383c7d3b5a9913353a25ac0e872ab9c010f1c5e1f8910944bc8ac8",
+    "bytes": 1728545,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-10-reference-colour-comparison.png",
+    "id": "91ac853e-4ff9-42ce-8746-ab0409443fa9",
+    "sha256": "10c4735b6298a88f367fe7bf0659270185cddb5f7d6f3ecc23d47941c1e4c049",
+    "bytes": 1172834,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-11-opening-comparison.png",
+    "id": "e6cf9783-99f2-47ff-b5bf-3cfbe439b1e5",
+    "sha256": "d8a3ef8c831a49687ccc242ba5aad64c8c4e6ad85cb6d4c8b8bc9dd622fefde8",
+    "bytes": 179714,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-12-mid-hill-comparison.png",
+    "id": "6065b726-318b-4a4e-8066-4bc950da7be6",
+    "sha256": "80037b120b593a7de5f9cadd8adbd6fdb2169acae0ca89c0ff4b2cccc4e82856",
+    "bytes": 359894,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-13-summit-comparison.png",
+    "id": "aaae659f-7263-4281-9782-4fa5a73175c4",
+    "sha256": "5aad609c83f7d342b30a1f7ccc71c61c0af7b10bc44c9400e112bee0cc71e4d1",
+    "bytes": 284432,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-00-000m.png",
+    "id": "8ad33fe5-a067-4c76-92f7-28c464b4595c",
+    "sha256": "e44c7fe9518137529985f57ad4318a9c74c5a5d97c88a85e64963e51f123a084",
+    "bytes": 134782,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-01-007m.png",
+    "id": "03265bc7-e6d0-4bc9-b99a-28766398bb76",
+    "sha256": "3340b986c4b0048a623d47a40bf479a69f0667e61e749af233086ca591aa4f82",
+    "bytes": 242492,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-02-013m.png",
+    "id": "f8254f66-a24a-4259-adb2-6f853210c932",
+    "sha256": "b6e6f0793af962f331737b1809bd9f0fd639c79938638ae76cba59e4f7e466e4",
+    "bytes": 269718,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-03-020m.png",
+    "id": "d041ee9c-e64d-41e4-9a6c-b0a027d19fa0",
+    "sha256": "e3fb0100408efbadf15e7dc0d602729ae6ea91f4e0e077a6875f037574d37180",
+    "bytes": 262201,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-04-026m.png",
+    "id": "690ad0fb-7176-499b-9dec-67f7cde078a7",
+    "sha256": "876a1be8682cddea9cd6bae945db0d02f9e4fb159fae5f930b5e516c9351a1af",
+    "bytes": 261895,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-05-033m.png",
+    "id": "69863771-d253-4234-8f21-eb9ea3d1d0a3",
+    "sha256": "2dbcc6134417369509d9c30a9227129ba6ad471c5da7a5ef45abb8ff41f815bf",
+    "bytes": 264699,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-06-039m.png",
+    "id": "0d7a3c24-71f5-41ce-bcab-65a11204515f",
+    "sha256": "8452f6f0ff3d710ce45159ed453994c367653654b8c666c377743bdf229b3f62",
+    "bytes": 271468,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-07-046m.png",
+    "id": "8da9e94c-b955-4052-b6f4-a01faa684105",
+    "sha256": "4272961a874b2346082cfc938eb012e967f9cd0702577a879b6a9cb7e29776ec",
+    "bytes": 272286,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-08-052m.png",
+    "id": "491fa8b6-b485-4257-b72a-5c3077fdce63",
+    "sha256": "fb5d2d7467a2fa6210c1df2452a7667a6ff8bbe63b61e67d2ff8a35e9ab9d9c7",
+    "bytes": 263660,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-09-059m.png",
+    "id": "4fd35c98-1078-4147-8d2f-f2a162896e98",
+    "sha256": "3bea3feaf6e71061fd9264723dde13bd7aefd85b0e4dffe0c368fd4bf2628e2c",
+    "bytes": 264876,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-10-065m.png",
+    "id": "83347dfd-9be2-4562-b538-16c80373c583",
+    "sha256": "4355ae917fb6913fbe61c374736aac63f500d0a9534ebfa6f22a4a1e4d12ed7d",
+    "bytes": 258940,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-11-072m.png",
+    "id": "3ad80c7f-ef05-4c32-ae76-7bf2f70cc807",
+    "sha256": "246c28fb0cd18f37aa05be8ab070b7f2849a26cd4164065e9aa5568ef9b509fd",
+    "bytes": 266002,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-12-079m.png",
+    "id": "21b149b4-36b4-4210-aa55-169b372430d7",
+    "sha256": "9d1463f3f502b35eccdc4a7ab87e510634efe23ab0595a22a8807d5135a849dc",
+    "bytes": 260762,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-13-085m.png",
+    "id": "8d76ea58-dc4b-409e-b385-ed5f2981455d",
+    "sha256": "a4faf8aeb8c4b32e2b7970476d83127ad6d07ff8229e2f70a46a0acdb57efd43",
+    "bytes": 272822,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-14-092m.png",
+    "id": "d5e920d4-f399-44a8-ab32-127dd63ef6f6",
+    "sha256": "1d32139547b9485002d842c893424434643459764102e058eed0e62876cf8d8f",
+    "bytes": 266165,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-15-098m.png",
+    "id": "d39c30bf-924f-41cd-8eee-c0f81305adf6",
+    "sha256": "f2c5a9a59d1c68a8fb73494859c41964243768f8c7047ce20379ed4920f32e13",
+    "bytes": 270279,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-16-105m.png",
+    "id": "80e0ff79-1b64-4a36-9161-30fe02676888",
+    "sha256": "bdc46e7ee29ecdabd12d8e3959a7faa5b249ed77ab34f20cfebd7a9cd8507a5f",
+    "bytes": 273876,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-17-111m.png",
+    "id": "a25358c5-5dfc-4b89-aaa7-44e367f8c7ba",
+    "sha256": "4f849ce00ecd1beecfc8a8f2132015273cde521b4039fe7c810da7bbb89b0dca",
+    "bytes": 272000,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-18-118m.png",
+    "id": "1e94b668-c4e8-47c0-9358-59666604e29b",
+    "sha256": "1c7e37de12b8ffb58728daab48a98eae7e244f374c4cf885be6ce7f5ed05c164",
+    "bytes": 241279,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-route-step-19-119m.png",
+    "id": "3c0090ae-b6a3-4688-b5fc-d6cef2a4fd82",
+    "sha256": "aa730699a808b3044f1965294b4495aa8eac23c89aac8efdc1fc695a0f222581",
+    "bytes": 241390,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v9-walk.mp4",
+    "id": "bfe9d221-d615-46b9-b1d7-3ad31135af57",
+    "sha256": "66378a4500e5638327fcee25f364aeca741bc74a1ff32d4bffa4633afffd7159",
+    "bytes": 3556038,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  }
+]

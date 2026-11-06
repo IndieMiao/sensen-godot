@@ -1,0 +1,25 @@
+{
+  "landmark_concept_v1.jpg": {
+    "source": "/home/zhangshaoji/incoming/landmark/landmark_concept_v1.jpg",
+    "sha256": "aba5cf341b6bdc5c76273053f06004a75f3416b43b6b820c67d2cc7a92735b87"
+  },
+  "c_alc.png": {
+    "source": "/home/zhangshaoji/incoming/landmark/c_alc.png",
+    "sha256": "a432aacdf5a1b5aa523a043ac356c14c8f1c90c82422343d92b64bf3f8351f47"
+  },
+  "landmark_alcatraz_v2.jpg": {
+    "source": "/home/zhangshaoji/incoming/landmark/landmark_alcatraz_v2.jpg",
+    "sha256": "e25388b6e3be3af6e0815e269cd29090c00f1aae9e1f46707b7b10f026255932",
+    "revision": "v2 2026-11-05"
+  },
+  "c_alc2.png": {
+    "source": "/home/zhangshaoji/incoming/landmark/c_alc2.png",
+    "sha256": "408027a23724ebaa5a0388f493c198b89f5a7c157f363d34b5470b032ef455d1",
+    "revision": "v2 2026-11-05"
+  },
+  "alc2_phone.png": {
+    "source": "/home/zhangshaoji/incoming/landmark/alc2_phone.png",
+    "sha256": "23a6c7df6db1a7d3338489955d9a0cf838b03b8dd12d7dc70d4d47867ee718aa",
+    "revision": "v2 2026-11-05"
+  }
+}

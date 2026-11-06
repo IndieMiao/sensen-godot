@@ -1,0 +1,44 @@
+{
+  "duration_frames": 270,
+  "fixed_fps": 30,
+  "ready_frame": 20,
+  "resolution": [
+    840,
+    800
+  ],
+  "root_positions": [
+    {
+      "name": "ferry_000",
+      "phase_s": 0.0,
+      "position": "(-3.0, 0.0, 25.0)"
+    },
+    {
+      "name": "gull_000",
+      "phase_s": 0.286029124011596,
+      "position": "(-23.6, 2.03, 18.25)"
+    },
+    {
+      "name": "gull_001",
+      "phase_s": 5.20969541867574,
+      "position": "(9.5, 4.25, 8.94)"
+    },
+    {
+      "name": "gull_002",
+      "phase_s": 6.98803976674875,
+      "position": "(-24.0, 10.02, -7.0)"
+    }
+  ],
+  "scope": "Simultaneous real scene cameras, current supported placements, normal animation speed; offline desktop capture.",
+  "file": "SGODOT-424-v8-effects.mp4",
+  "sha256": "bc3566b6e91395b6efbdef4af38b30f7ac066d637c639040e6a8ea7399eda146",
+  "bytes": 428161,
+  "duration_s": 9.0,
+  "codec": "h264",
+  "frame_rate": "30/1",
+  "inspected_seconds": [
+    0.25,
+    4.5,
+    8.5
+  ],
+  "full_decode_checked": true
+}

@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/landmark/alcatraz_island.gd" id="1"]
+
+[node name="AlcatrazIsland" type="Node3D"]
+script = ExtResource("1")
+
+[node name="DockZone" type="Node3D" parent="."]
+
+[node name="TerraceZone" type="Node3D" parent="."]
+
+[node name="SummitZone" type="Node3D" parent="."]
+
+[node name="FarZone" type="Node3D" parent="."]

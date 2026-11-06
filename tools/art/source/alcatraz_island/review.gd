@@ -1,0 +1,817 @@
+extends Node
+const AlcatrazIsland = preload("res://scenes/landmark/alcatraz_island.gd")
+## Real Mobile-rendered scene, deterministic art review and navigation checks.
+var scene: AlcatrazIsland
+var viewport: SubViewport
+var results := {}
+var destination: String
+var failures: Array[String] = []
+var metrics := {}
+var route_distance := 0.0
+var route_capture_at := 0.0
+var route_capture_index := 0
+var hud_boxes: Array = []
+var hud_regions := {}
+var hud_samples := 0
+var hud_next_distance := 0.0
+var hud_failures: Array = []
+
+func check(key: String, passed: bool, evidence = null) -> void:
+	results[key] = {"passed":passed, "evidence":evidence}
+	if not passed:
+		failures.append(key)
+		push_error("ALCATRAZ_CHECK " + key + " " + str(evidence))
+
+func _ready() -> void:
+	print("ALCATRAZ_PHASE ready")
+	destination = OS.get_environment("ALCATRAZ_REVIEW")
+	if destination.is_empty():
+		scene = load("res://scenes/landmark/alcatraz_island.tscn").instantiate()
+		add_child(scene)
+		return
+	DirAccess.make_dir_recursive_absolute(destination)
+	viewport = SubViewport.new()
+	viewport.size = Vector2i(360,800)
+	viewport.own_world_3d = true
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(viewport)
+	var display := TextureRect.new()
+	display.texture = viewport.get_texture()
+	display.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	display.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	display.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(display)
+	scene = load("res://scenes/landmark/alcatraz_island.tscn").instantiate()
+	viewport.add_child(scene)
+	print("ALCATRAZ_PHASE scene added")
+	for i in 240:
+		await get_tree().physics_frame
+		if scene.navigation_ready(): break
+	print("ALCATRAZ_PHASE nav ready ",scene.navigation_ready())
+	check("navigation_ready",scene.navigation_ready())
+	prepare_hud_audit()
+	for i in 120:
+		await get_tree().process_frame
+		if not scene._rig.is_busy():break
+	for i in 4:await get_tree().process_frame
+	if OS.get_environment("ALCATRAZ_TOP_ONLY")=="1":
+		scene.set_process(false)
+		await top_layout_photo()
+		var baseline: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(destination.path_join("verification.json")))
+		baseline.view_metrics["04-top-layout"]=metrics["04-top-layout"]
+		for key in results:
+			if str(key).begins_with("04-top-layout"):baseline[key]=results[key]
+		FileAccess.open(destination.path_join("verification.json"),FileAccess.WRITE).store_string(JSON.stringify(baseline,"\t")+"\n")
+		get_tree().quit(0 if failures.is_empty() else 1)
+		return
+	if OS.get_environment("ALCATRAZ_EFFECTS_MOVIE")=="1":
+		await integrated_effects_movie()
+		return
+	if OS.get_environment("ALCATRAZ_MOVIE")=="1":
+		await colour_walk_movie()
+		return
+	if OS.get_environment("ALCATRAZ_SWEEP")=="1":
+		await budget_sweep()
+		return
+	await audit_tree_material_integration()
+	await audit_museum_lod()
+	await audit_integrated_effects()
+	check("renderer", RenderingServer.get_current_rendering_method() == "mobile", RenderingServer.get_video_adapter_name())
+	check("no_network_autoload", get_node_or_null("/root/Net") == null)
+	check("farm_pitch",absf(scene._camera.rotation_degrees.x+43)<.01,scene._camera.rotation_degrees)
+	check("farm_scale",is_equal_approx(scene._camera.size,6.72),scene._camera.size)
+	check("spawn_on_navigation",NavigationServer3D.map_get_closest_point(scene._nav_map,scene._player.position).distance_to(scene._player.position)<.05)
+	check("separate_navigation_map",scene._nav_map != scene.get_world_3d().navigation_map)
+	print("ALCATRAZ_PHASE opening")
+	await photograph("01-opening")
+	check("three_loading_zones",scene.zones.size()==4 and ["DockZone","TerraceZone","SummitZone"].all(func(z): return scene.zones.has(z)))
+	for zone_name in scene.layout.zones:
+		check("zone_navigation_"+str(zone_name),scene.zones[zone_name].get_node_or_null("Navigation") is NavigationRegion3D)
+	check("far_loading_zone",scene.zones.has("FarZone"))
+	check("avatar_farm_scale_unchanged",scene._rig.scale.is_equal_approx(Vector3.ONE))
+	var avatar_box := AABB()
+	var first := true
+	for mesh_node in scene._rig.find_children("*","MeshInstance3D",true,false):
+		if mesh_node.mesh == null or mesh_node.name.to_lower().contains("shadow"): continue
+		var box_: AABB = mesh_node.get_aabb()
+		var transform_: Transform3D = scene._rig.global_transform.affine_inverse() * mesh_node.global_transform
+		for k in 8:
+			var point_: Vector3 = transform_ * box_.get_endpoint(k)
+			if first:
+				avatar_box = AABB(point_,Vector3.ZERO)
+				first=false
+			else: avatar_box=avatar_box.expand(point_)
+	check("avatar_175cm",absf(avatar_box.size.y-1.75)<.08,str(avatar_box))
+	results["avatar_projected_nominal_height_px"] = 1.75*cos(deg_to_rad(43))*360/6.72
+	var live_surfaces := 0
+	var live_triangles := 0
+	for node in scene.find_children("*","MeshInstance3D",true,false):
+		if node.mesh == null:continue
+		live_surfaces += node.mesh.get_surface_count()
+		for surface_index in node.mesh.get_surface_count():
+			var arrays: Array = node.mesh.surface_get_arrays(surface_index)
+			var indices = arrays[Mesh.ARRAY_INDEX]
+			live_triangles += (indices.size() if indices != null and not indices.is_empty() else arrays[Mesh.ARRAY_VERTEX].size()) / 3
+	check("live_surface_budget_including_avatar_and_scenery",live_surfaces<=80,live_surfaces)
+	check("live_triangle_budget_including_avatar_and_scenery",live_triangles<=300000,live_triangles)
+	for node in scene.batch_nodes:
+		live_surfaces += node.multimesh.mesh.get_surface_count()
+		for surface_index in node.multimesh.mesh.get_surface_count():
+			var arrays: Array = node.multimesh.mesh.surface_get_arrays(surface_index)
+			var indices = arrays[Mesh.ARRAY_INDEX]
+			live_triangles += ((indices.size() if indices != null and not indices.is_empty() else arrays[Mesh.ARRAY_VERTEX].size()) / 3) * node.multimesh.instance_count
+	check("total_surface_budget_with_multimesh",live_surfaces<=80,live_surfaces)
+	check("total_triangle_budget_with_multimesh",live_triangles<=300000,live_triangles)
+	check("repeat_instancing",scene.batch_nodes.size()>0,scene.batch_nodes.size())
+	check("offshore_anchor_20m",absf(float(scene.layout.far_anchor[2])-float(scene.layout.spawn[2])-20)<.01,scene.layout.far_anchor)
+	check("tea_layout_contract",["camera","spawn","anchors","boundaries","walk_bounds","instances","lod_groups"].all(func(k):return scene.layout.has(k)))
+	check("camera_contract",["position","target","size"].all(func(k):return scene.layout.camera.has(k)))
+	var tree_count := 0
+	var nature_counts := {}
+	var unsupported: Array = []
+	var encroaching: Array = []
+	var wrong_owner: Array = []
+	for p in scene.layout.instances:
+		var is_tree: bool = str(p.asset).begins_with("alc_tree_")
+		var is_liu: bool = p.asset in ["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_shrub_b","alc_grass_tuft"]
+		if not is_tree and not is_liu:continue
+		if is_tree:tree_count+=1
+		nature_counts[p.asset]=int(nature_counts.get(p.asset,0))+1
+		if p.get("owner","") != ("刘备" if is_liu else "赵云"):wrong_owner.append(p.name)
+		var root := AlcatrazIsland._vec(p.position)
+		var nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,root)
+		var clearance := 1.1 if is_tree else .65 if p.asset in ["alc_shrub","alc_shrub_b"] else .35
+		if absf(nearest.y-root.y)<.25 and Vector2(nearest.x-root.x,nearest.z-root.z).length()<clearance:
+			encroaching.append(p.name)
+		if str(p.asset).begins_with("alc_rock_"):continue
+		var ray := PhysicsRayQueryParameters3D.create(root+Vector3.UP*.08,root-Vector3.UP*.3)
+		var support := scene.get_world_3d().direct_space_state.intersect_ray(ray)
+		if support.is_empty() or absf(support.position.y-root.y)>.06:unsupported.append(p.name)
+	check("twenty_to_thirty_instanced_trees",tree_count>=20 and tree_count<=30,tree_count)
+	check("nature_owner_handoff",wrong_owner.is_empty(),wrong_owner)
+	check("all_liu_prototypes_placed",["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_shrub_b","alc_grass_tuft"].all(func(k):return int(nature_counts.get(k,0))>0),nature_counts)
+	check("vegetation_roots_on_terrain",unsupported.is_empty(),unsupported)
+	check("vegetation_navigation_clearance",encroaching.is_empty(),encroaching)
+	check("buildings_and_ferry_have_two_lods",scene.layout.lod_groups.filter(func(g):return g.get("kind","")!="tree").size()==4)
+
+	audit_garden_support()
+	var corners_ok := true
+	for p in [Vector2(0,0),Vector2(359,0),Vector2(0,799),Vector2(359,799)]:
+		var hit = Plane(Vector3.UP,-.15).intersects_ray(scene._camera.project_ray_origin(p),scene._camera.project_ray_normal(p))
+		corners_ok = corners_ok and hit != null and absf(hit.x)<256 and absf(hit.z)<256
+	check("opening_sea_covers_corners",corners_ok)
+	check("map_exit_visible",scene._exit_marker.visible,scene._exit_marker.position)
+	# Walk and stop every 6.5 m for one default-camera screen, without teleporting.
+	scene.set_process(false)
+	await route_photo()
+	# Walk the whole route through NavigationServer paths rather than teleporting for images.
+	var path_lengths: Array[float] = []
+	for i in range(1,scene.layout.walk_goals.size()):
+		var goal := AlcatrazIsland._vec(scene.layout.walk_goals[i])
+		scene.walk_to(goal)
+		var length := 0.0
+		for j in range(1,scene._path.size()):length += scene._path[j-1].distance_to(scene._path[j])
+		path_lengths.append(length)
+		check("route_%d_path"%i,scene._path.size()>1 and scene._path[-1].distance_to(goal)<.15,str(scene._path))
+		# Fixed simulation steps accelerate QA only; these still call the actual walk/follow code.
+		scene.set_process(false)
+		for frame in 3600:
+			var previous_position := scene._player.position
+			scene._process(0.1)
+			route_distance += previous_position.distance_to(scene._player.position)
+			if route_distance>=hud_next_distance:
+				var intrusion := hud_intrusions()
+				hud_samples+=1
+				if not intrusion.is_empty():hud_failures.append({"distance_m":route_distance,"intrusions":intrusion})
+				hud_next_distance=route_distance+.5
+			if route_distance>=route_capture_at:
+				await route_photo()
+			if scene._path_i>=scene._path.size(): break
+		for frame in 90:scene._process(1.0/60.0)
+		check("route_%d_arrived"%i,scene._player.position.distance_to(goal)<.15,str(scene._player.position))
+		check("route_%d_follow"%i,scene._focus.distance_to(scene._follow_target())<.05,str(scene._focus))
+		if i==1:
+			await photograph("02-mid-hill")
+			await audit_garden_batch_parity()
+		if i==scene.layout.walk_goals.size()-1:await photograph("03-visitor-center")
+	results["walk_lengths_m"] = path_lengths
+	var route_length := 0.0
+	for length in path_lengths:route_length+=length
+	check("route_about_120m",route_length>=110 and route_length<=130,route_length)
+	var direct_path := scene.find_path(AlcatrazIsland._vec(scene.layout.spawn),AlcatrazIsland._vec(scene.layout.walk_goals[-1]))
+	var direct_length := 0.0
+	for k in range(1,direct_path.size()): direct_length+=direct_path[k-1].distance_to(direct_path[k])
+	results["direct_spawn_to_museum_path_m"] = direct_length
+	check("direct_route_reaches_museum",not direct_path.is_empty() and direct_path[-1].distance_to(AlcatrazIsland._vec(scene.layout.walk_goals[-1]))<.05)
+	check("direct_route_about_120m",direct_length>=110 and direct_length<=130,direct_length)
+	check("continuous_default_hud_clearance",hud_failures.is_empty(),{"samples":hud_samples,"failures":hud_failures})
+
+	await route_photo(true)
+	check("summit_height",absf(scene._player.position.y-10.0)<.05,scene._player.position.y)
+	# Geometry collision exists at all three resting viewpoints; decorative assets have none.
+	for key in scene.layout.review_points:
+		var point := AlcatrazIsland._vec(scene.layout.review_points[key])
+		var query := PhysicsRayQueryParameters3D.create(point+Vector3.UP*.3,point-Vector3.UP*.5)
+		var hit := scene.get_world_3d().direct_space_state.intersect_ray(query)
+		check("floor_collision_"+key,not hit.is_empty(),str(hit.get("position")))
+	for node in scene.mesh_nodes:
+		if node.name.begins_with("Ferry") or node.name.begins_with("Gull"):
+			check("decorative_"+node.name,node.find_children("*","CollisionObject3D",true,false).is_empty())
+	var bad_floor: Array = []
+	for polygon in scene.layout.navigation.polygons:
+		var centre := Vector3.ZERO
+		for index in polygon: centre += AlcatrazIsland._vec(scene.layout.navigation.vertices[index])
+		centre /= float(polygon.size())
+		var ray := PhysicsRayQueryParameters3D.create(centre+Vector3.UP*.5,centre-Vector3.UP*.5)
+		var hit := scene.get_world_3d().direct_space_state.intersect_ray(ray)
+		if hit.is_empty() or absf(hit.position.y-centre.y)>.20:
+			bad_floor.append([str(centre),str(hit.get("position"))])
+	check("all_nav_cells_physical_floor",bad_floor.is_empty(),bad_floor)
+	# Outside sea taps terminate at nav, not on water; museum interior has no nav.
+	var sea_nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,Vector3(40,0,10))
+	check("sea_not_walkable",sea_nearest.x<30,str(sea_nearest))
+	var museum_nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,Vector3(0,10,-13))
+	check("museum_not_enterable",museum_nearest.z>=-8.01,str(museum_nearest))
+	# Exercise the inherited gesture handlers on the actual scene.
+	var before := scene._player.position
+	var camera_before := scene._camera.position
+	touch(Vector2(160,400),true,0)
+	for i in 10:
+		drag(Vector2(160+i*6,400+i*2),0)
+		scene._process(1.0/60.0)
+	touch(Vector2(214,418),false,0)
+	for i in 60:scene._process(1.0/60.0)
+	check("drag_moves_camera_without_walking",scene._camera.position.distance_to(camera_before)>.1 and scene._player.position.is_equal_approx(before))
+	touch(Vector2(130,400),true,0)
+	touch(Vector2(230,400),true,1)
+	drag(Vector2(100,400),0)
+	drag(Vector2(260,400),1)
+	touch(Vector2(100,400),false,0)
+	touch(Vector2(260,400),false,1)
+	for i in 120:scene._process(1.0/60.0)
+	check("pinch_changes_scale_without_walking",scene.camera_pan.zoom>1.01 and scene._player.position.is_equal_approx(before),scene.camera_pan.zoom)
+	var retained_zoom := scene.camera_pan.zoom
+	scene.walk_to(before)
+	check("walking_keeps_zoom",is_equal_approx(retained_zoom,scene.camera_pan.zoom))
+	scene.camera_pan.reset()
+	scene._focus = scene._follow_target()
+	scene._update_camera()
+	var prior_camera := scene._camera.position
+	scene.suspend()
+	scene.resume()
+	check("resume_preserves_view",scene._camera.position.is_equal_approx(prior_camera))
+	var exited := [false]
+	scene.exit_requested.connect(func():exited[0]=true)
+	scene._exit_button.pressed.emit()
+	check("map_exit_emits_request",exited[0])
+	# Griffith-style +/- controls reach a strict 3x zoom-out limit.
+	scene._player.position = AlcatrazIsland._vec(scene.layout.review_points.visitor_center)
+	scene._focus = scene._follow_target()
+	for i in 20:scene._zoom_buttons["ZoomOut"].pressed.emit()
+	check("zoom_out_limit",absf(scene._camera.size-20.16)<.02,scene._camera.size)
+	check("wide_oblique_angle",absf(scene._camera.rotation_degrees.y-60)<.01,scene._camera.rotation_degrees)
+	await photograph("06-summit-zoom-out")
+	# Pixel control catches visibility-range holes that projection-only checks miss.
+	var with_tower := viewport.get_texture().get_image()
+	var tower_nodes: Array[MeshInstance3D] = []
+	for node in scene.mesh_nodes:
+		if node.name.begins_with("AlcLighthouse"):
+			tower_nodes.append(node)
+			node.visible=false
+	for i in 4:await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	var without_tower := viewport.get_texture().get_image()
+	var changed := 0
+	for y in range(0,340):
+		for x in range(0,130):
+			var a := with_tower.get_pixel(x,y)
+			var b := without_tower.get_pixel(x,y)
+			if absf(a.r-b.r)+absf(a.g-b.g)+absf(a.b-b.b)>.05:changed+=1
+	check("wide_lighthouse_rendered_pixels",changed>100,changed)
+	for node in tower_nodes:node.visible=true
+	for i in 4:await get_tree().process_frame
+	var front_visible := 0
+	for x in range(-20,21):
+		var point := scene._camera.unproject_position(Vector3(x,14.5,-7.76))
+		if Rect2(8,45,344,690).has_point(point):front_visible+=1
+	check("wide_museum_majority",front_visible>=25,front_visible/41.0)
+	var tower := scene._camera.unproject_position(Vector3(-25,17.5,-11.5))
+	check("wide_lighthouse_visible",Rect2(8,45,344,690).has_point(tower),tower)
+	var tower_inside := true
+	var tower_pose: Dictionary = scene.layout.placements.filter(func(p):return p.asset=="alc_lighthouse")[0]
+	var tower_bounds: AABB = scene._transform_of(tower_pose)*scene._mesh("alc_lighthouse").get_aabb()
+	for corner in 8:
+		tower_inside = tower_inside and Rect2(0,0,360,800).has_point(scene._camera.unproject_position(tower_bounds.get_endpoint(corner)))
+	check("wide_entire_tower_in_frame",tower_inside)
+	for i in 20:scene._zoom_buttons["ZoomIn"].pressed.emit()
+	check("zoom_in_limit",scene.camera_pan.zoom<=1.4001,scene.camera_pan.zoom)
+	scene.camera_pan.reset(1.0)
+	scene._update_camera()
+	await top_layout_photo()
+	scene._overview = true
+	scene._focus = Vector3(0,6,0)
+	scene._update_camera()
+	await photograph("05-whole-island")
+	results["view_metrics"] = metrics
+	results["route_screens"] = route_capture_index
+	results["status"] = "pass" if failures.is_empty() else "fail"
+	results["failures"] = failures
+	results["limits"] = ["Desktop Vulkan Mobile on gs66; not Android or physical-phone performance.","Walk simulation validates runtime paths; it is not a claim of real touch input.","Formal colour for owned modules; delegated meshes marked placeholder remain pending."]
+	var file := FileAccess.open(destination.path_join("verification.json"),FileAccess.WRITE)
+	file.store_string(JSON.stringify(results,"\t")+"\n")
+	print("ALCATRAZ_REVIEW ",results.status," checks=",results.size()," failures=",failures)
+	get_tree().quit(0 if failures.is_empty() else 1)
+
+func photograph(name_: String) -> void:
+	var capture_started := Time.get_ticks_msec()
+	var samples: Array = []
+	for frame in 12:
+		await get_tree().process_frame
+		await RenderingServer.frame_post_draw
+		samples.append(render_sample())
+	print("ALCATRAZ_PHASE capture ",name_)
+	var peak: Dictionary = samples[-1].duplicate()
+	for sample in samples:
+		for key in sample:peak[key]=maxi(int(peak[key]),int(sample[key]))
+	metrics[name_] = peak
+	metrics[name_]["samples"]=samples
+	metrics[name_]["player_position"]=[scene._player.position.x,scene._player.position.y,scene._player.position.z]
+	metrics[name_]["zoom"]=scene.camera_pan.zoom
+	metrics[name_]["capture_ms"]=Time.get_ticks_msec()-capture_started
+	if viewport.size==Vector2i(360,800):
+		check(name_+"_triangle_budget",int(peak.visible_triangles)<=80000,peak.visible_triangles)
+		check(name_+"_draw_budget",int(peak.total_draw_calls)<=60,peak.total_draw_calls)
+		check(name_+"_presentation_draw_budget",int(peak.global_draw_calls)<=60,peak.global_draw_calls)
+		if is_equal_approx(scene.camera_pan.zoom,1.0):
+			check(name_+"_hud_tall_clearance",hud_intrusions().is_empty(),hud_intrusions())
+	var image := viewport.get_texture().get_image()
+	check(name_+"_size",image.get_size()==viewport.size,str(image.get_size()))
+	var exposed := 0
+	for y in range(0,image.get_height(),4):
+		for x in range(0,image.get_width(),4):
+			var c := image.get_pixel(x,y)
+			if c.r>.6 and c.b>.6 and c.g<.12:exposed+=1
+	check(name_+"_no_background",exposed==0,exposed)
+	if name_=="01-opening":
+		var orange := 0
+		for y in range(40,160):
+			for x in range(0,140):
+				var c := image.get_pixel(x,y)
+				if c.r>c.g*1.3 and c.g>c.b*1.1 and c.r>.35:orange+=1
+		check("bridge_visible_upper_left_pixels",orange>40,orange)
+	DirAccess.make_dir_recursive_absolute(destination.path_join(name_).get_base_dir())
+	image.save_png(destination.path_join(name_+".png"))
+	var progress := FileAccess.open(destination.path_join("progress.tmp"),FileAccess.WRITE)
+	progress.store_string(JSON.stringify({"view_metrics":metrics,"failures":failures},"\t"))
+	progress.close()
+	DirAccess.rename_absolute(destination.path_join("progress.tmp"),destination.path_join("progress.json"))
+
+func render_sample() -> Dictionary:
+	var visible_triangles := viewport.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_PRIMITIVES_IN_FRAME)
+	var visible_calls := viewport.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)
+	var shadow_calls := viewport.get_render_info(Viewport.RENDER_INFO_TYPE_SHADOW,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)
+	var canvas_calls := viewport.get_render_info(Viewport.RENDER_INFO_TYPE_CANVAS,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)
+	return {"visible_triangles":visible_triangles,"visible_draw_calls":visible_calls,"shadow_draw_calls":shadow_calls,"canvas_draw_calls":canvas_calls,"total_draw_calls":visible_calls+shadow_calls+canvas_calls,"global_draw_calls":RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)}
+
+func route_photo(force := false) -> void:
+	if not force and route_distance+.001<route_capture_at:return
+	# Freeze actual walking at the sample and settle only the follow target.
+	scene._focus = scene._follow_target()
+	scene._update_camera()
+	var name_ := "route/step-%02d-%03dm"%[route_capture_index,roundi(route_distance)]
+	# Conservative imported tree bounds catch foreground crowns hiding the avatar
+	# on the next terrace; ground/navigation clearance alone cannot catch this.
+	var tree_occluders: Array = []
+	for p in scene.layout.placements:
+		if not str(p.asset).begins_with("alc_tree_"):continue
+		var tree_bounds: AABB = scene._transform_of(p)*scene._mesh(p.asset).get_aabb()
+		for height in [.5,.95,1.4]:
+			var body_point: Vector3 = scene._player.position+Vector3.UP*float(height)
+			var screen_point := scene._camera.unproject_position(body_point)
+			var origin := scene._camera.project_ray_origin(screen_point)
+			if tree_bounds.intersects_segment(origin,body_point)!=null:
+				tree_occluders.append(p.name)
+				break
+	check(name_+"_avatar_clear_of_trees",tree_occluders.is_empty(),tree_occluders)
+	var visible_interests: Array = []
+	for point in scene.layout.interest_points:
+		var world := AlcatrazIsland._vec(point.position)+Vector3.UP*.5
+		var screen := scene._camera.unproject_position(world)
+		if not scene._camera.is_position_behind(world) and Rect2(8,52,344,680).has_point(screen):visible_interests.append(point.name)
+	# Architecture/ruins/gulls also count; rail and blank retaining walls do not.
+	for p in scene.layout.placements:
+		if p.asset not in ["alc_museum","alc_lighthouse","alc_watertower","ruins","gull","ferry"]:continue
+		var world := AlcatrazIsland._vec(p.position)+Vector3.UP
+		if Rect2(8,52,344,680).has_point(scene._camera.unproject_position(world)):visible_interests.append(p.name)
+	check(name_+"_interest",not visible_interests.is_empty(),visible_interests)
+	await photograph(name_)
+	route_capture_index+=1
+	route_capture_at=route_distance+6.5
+
+func prepare_hud_audit() -> void:
+	# Frozen b1 360x800 control geometry plus 12 px art clearance. No game UI is added.
+	var contract: Dictionary = scene.layout.hud_clearance
+	for key in contract.reserved_rects:
+		var r: Array = contract.reserved_rects[key]
+		hud_regions[key]=PackedVector2Array([Vector2(r[0],r[1]),Vector2(r[0]+r[2],r[1]),Vector2(r[0]+r[2],r[1]+r[3]),Vector2(r[0],r[1]+r[3])])
+	for p in scene.layout.placements:
+		if p.asset not in contract.tall_assets:continue
+		var box: AABB = scene._mesh(p.asset).get_aabb()
+		var upper_triangles := PackedVector3Array()
+		if p.asset=="ferry":
+			# The low bow may sit below HUD. Audit the cabin/funnel, without inventing
+			# a 6 m tall wall over the entire 25 m hull's bounding box.
+			var first := true
+			for vertex in scene._mesh(p.asset).surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
+				if vertex.y<1.7:continue
+				if first:box=AABB(vertex,Vector3.ZERO);first=false
+				else:box=box.expand(vertex)
+			box=box.expand(Vector3(box.position.x,1.6,box.position.z))
+			var mesh_arrays: Array = scene._mesh(p.asset).surface_get_arrays(0)
+			var vertices: PackedVector3Array = mesh_arrays[Mesh.ARRAY_VERTEX]
+			var indices: PackedInt32Array = mesh_arrays[Mesh.ARRAY_INDEX]
+			for i in range(0,indices.size(),3):
+				var a := vertices[indices[i]]
+				var b := vertices[indices[i+1]]
+				var c := vertices[indices[i+2]]
+				if maxf(a.y,maxf(b.y,c.y))<1.7:continue
+				for point in [a,b,c]:upper_triangles.append(scene._transform_of(p)*point)
+		hud_boxes.append({"name":p.name,"transform":scene._transform_of(p),"box":box,"contract":"current","triangles":upper_triangles})
+		if contract.future_props.assets.has(p.asset):
+			var future: Dictionary = contract.future_props.assets[p.asset]
+			var lo := AlcatrazIsland._vec(future.min)
+			var hi := AlcatrazIsland._vec(future.max)
+			hud_boxes.append({"name":p.name,"transform":scene._transform_of(p),"box":AABB(lo,hi-lo),"contract":"props_802_bounds"})
+
+func hud_intrusions() -> Array:
+	var intrusions: Array = []
+	for entry in hud_boxes:
+		var points := PackedVector2Array()
+		var box: AABB = entry.box
+		var transform_: Transform3D = entry.transform
+		for k in 8:points.append(scene._camera.unproject_position(transform_*box.get_endpoint(k)))
+		var outline := Geometry2D.convex_hull(points)
+		for region in hud_regions:
+			if not Geometry2D.intersect_polygons(outline,hud_regions[region]).is_empty():
+				# A whole-ship box would fill empty space above the low bow. Check
+				# actual imported cabin/funnel triangles before reporting an overlap.
+				var triangles: PackedVector3Array = entry.get("triangles",PackedVector3Array())
+				if not triangles.is_empty():
+					var actual := false
+					for i in range(0,triangles.size(),3):
+						var tri := PackedVector2Array([scene._camera.unproject_position(triangles[i]),scene._camera.unproject_position(triangles[i+1]),scene._camera.unproject_position(triangles[i+2])])
+						if not Geometry2D.intersect_polygons(tri,hud_regions[region]).is_empty():actual=true;break
+					if not actual:continue
+				intrusions.append({"name":entry.name,"region":region,"contract":entry.contract})
+	return intrusions
+
+func touch(point: Vector2, pressed: bool, id: int) -> void:
+	var event := InputEventScreenTouch.new()
+	event.position = point
+	event.pressed = pressed
+	event.index = id
+	scene._handle_camera_input(event,pressed)
+
+func drag(point: Vector2, id: int) -> void:
+	var event := InputEventScreenDrag.new()
+	event.position = point
+	event.index = id
+	scene._handle_camera_input(event,false)
+
+func budget_sweep() -> void:
+	var baseline: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(destination.path_join("verification.json")))
+	var rows: Array = []
+	scene.set_process(false)
+	for key in baseline.view_metrics:
+		if not str(key).begins_with("route/"):continue
+		scene._player.position = AlcatrazIsland._vec(baseline.view_metrics[key].player_position)
+		var zooms: Array = [1.4,1.15,1.0,.9,.85,.8,.68,.6,.5,.4,1.0/3.0]
+		for press in range(1,8):zooms.append(pow(1.15,-press))
+		for zoom in zooms:
+			scene.camera_pan.reset(zoom)
+			scene._focus = scene._follow_target()
+			scene._update_camera()
+			var peak := {"visible_triangles":0,"total_draw_calls":0,"global_draw_calls":0}
+			for frame in 2:
+				await get_tree().process_frame
+				await RenderingServer.frame_post_draw
+				var sample := render_sample()
+				for metric in peak:peak[metric]=maxi(int(peak[metric]),int(sample[metric]))
+			rows.append({"point":key,"zoom":zoom,"metrics":peak})
+			if int(peak.visible_triangles)>80000 or int(peak.global_draw_calls)>60:
+				failures.append(str(key)+" zoom "+str(zoom)+" "+str(peak))
+	var report := {"status":"pass" if failures.is_empty() else "fail","rows":rows,"failures":failures}
+	var file := FileAccess.open(destination.path_join("wide-sweep.json"),FileAccess.WRITE)
+	file.store_string(JSON.stringify(report,"\t"))
+	print("WIDE_SWEEP ",report.status," ",failures)
+	get_tree().quit(0 if failures.is_empty() else 1)
+
+func colour_walk_movie() -> void:
+	# MovieWriter uses fixed 30 Hz simulation. Playback retains the normal walk
+	# speed; the offline capture rate is not a device performance measurement.
+	scene.set_process(false)
+	for frame in 90:await get_tree().process_frame
+	var ready_frame := Engine.get_frames_drawn()
+	for frame in 60:await get_tree().process_frame
+	var goal := AlcatrazIsland._vec(scene.layout.walk_goals[-1])
+	scene.walk_to(goal)
+	scene.set_process(true)
+	var walk_frames := 0
+	var render_peak := {"visible_triangles":0,"total_draw_calls":0,"global_draw_calls":0}
+	for frame in 2700:
+		await get_tree().process_frame
+		walk_frames+=1
+		var sample: Dictionary=render_sample()
+		for metric in render_peak:render_peak[metric]=maxi(int(render_peak[metric]),int(sample[metric]))
+		if scene._path_i>=scene._path.size():break
+	scene.set_process(false)
+	var arrived := scene._player.position.distance_to(goal)<.15
+	for frame in 60:await get_tree().process_frame
+	scene.camera_pan.reset(1.0/3.0)
+	scene._focus=scene._follow_target()
+	scene._update_camera()
+	for frame in 90:await get_tree().process_frame
+	var report := {"ready_frame":ready_frame,"fixed_fps":30,"normal_speed_walk_frames":walk_frames,"render_peak":render_peak,"budget_passed":int(render_peak.visible_triangles)<=80000 and int(render_peak.global_draw_calls)<=60,"arrived":arrived,"final_position":str(scene._player.position),"limits":"Offline fixed-step art movie; not real touch or physical-device FPS."}
+	FileAccess.open(destination.path_join("movie.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
+	print("COLOUR_MOVIE ",report)
+	get_tree().quit(0 if arrived and report.budget_passed else 1)
+
+func audit_garden_support() -> void:
+	var unsupported: Array = []
+	for p in scene.layout.placements:
+		if p.asset not in ["alc_flowerbed","alc_planter","alc_flowers_poppy","alc_flowers_lavender","alc_flowers_daisy","alc_hedge"]:continue
+		var root := AlcatrazIsland._vec(p.position)
+		var offsets := [Vector3.ZERO]
+		if p.asset=="alc_flowerbed":
+			for x in [-.82,.82]:
+				for z in [-.82,.82]:offsets.append(Vector3(x,0,z))
+		for offset: Vector3 in offsets:
+			var ray := PhysicsRayQueryParameters3D.create(root+offset+Vector3.UP*.06,root+offset-Vector3.UP*.12)
+			var hit := scene.get_world_3d().direct_space_state.intersect_ray(ray)
+			if hit.is_empty():unsupported.append({"name":p.name,"point":str(root+offset)})
+	check("garden_roots_and_flowerbed_corners_supported",unsupported.is_empty(),unsupported)
+	check("three_dense_bands_per_terrace",scene.layout.garden_design.flower_bands.size()==9 and scene.layout.garden_design.flower_bands.all(func(b):return b.clusters>=4 and b.clusters<=6))
+
+func top_layout_photo() -> void:
+	# Imported geometry is actually shown in a top-down rendered layout.
+	scene._hud.visible = false
+	scene._overview = true
+	scene._set_backdrop_visible(false)
+	viewport.size = Vector2i(1000,1200)
+	scene._camera.size = 74
+	scene._camera.position = Vector3(0,85,0)
+	scene._camera.far = 200
+	scene._camera.rotation_degrees = Vector3(-90,0,0)
+	scene._camera.near = .1
+	scene._update_tree_lods(scene._camera.global_position)
+	for node in scene._detail_batches:node.visible=true
+	for node in scene._detail_groups:node.visible=true
+	for node in scene._unshadowed_batches:
+		var transforms: Array = node.get_meta("instance_transforms")
+		for i in transforms.size():node.multimesh.set_instance_transform(i,transforms[i])
+		node.multimesh.visible_instance_count=-1
+		node.visible=true
+	await photograph("04-top-layout")
+
+func audit_integrated_effects() -> void:
+	check("four_independent_animation_roots",scene.animated_roots.size()==4,scene.animated_roots.size())
+	var phases: Array = []
+	for root in scene.animated_roots:
+		var placement: Dictionary = root.get_meta("placement")
+		var animator := root.get_node("AnimationPlayer") as AnimationPlayer
+		check(str(root.name)+"_idle_running",animator.is_playing() and animator.current_animation=="idle")
+		check(str(root.name)+"_decorative_only",root.find_children("*","CollisionObject3D",true,false).is_empty())
+		var initial := root.transform
+		var resume_time := animator.current_animation_position
+		var length := animator.get_animation("idle").length
+		animator.pause()
+		var quiet := 0
+		var active := 0
+		var min_bob := INF
+		var max_bob := -INF
+		var root_drift := 0.0
+		for i in 256:
+			animator.seek(float(i)*length/256.0,true)
+			root_drift=maxf(root_drift,root.position.distance_to(initial.origin))
+			if placement.asset=="gull":
+				var mi := root.find_children("*","MeshInstance3D",true,false)[0] as MeshInstance3D
+				var largest := 0.0
+				for k in mi.mesh.get_blend_shape_count():largest=maxf(largest,absf(mi.get_blend_shape_value(k)))
+				quiet+=int(largest<.001)
+				active+=int(largest>.1)
+			else:
+				var bob := (root.get_node("BodyRig") as Node3D).position.y
+				min_bob=minf(min_bob,bob);max_bob=maxf(max_bob,bob)
+		check(str(root.name)+"_root_fixed",root_drift<.00001 and root.transform.basis.is_equal_approx(initial.basis),root_drift)
+		if placement.asset=="gull":
+			phases.append(root.get_meta("initial_phase_s"))
+			var support_ray := PhysicsRayQueryParameters3D.create(root.position+Vector3.UP*.04,root.position-Vector3.UP*.12)
+			var support := scene.get_world_3d().direct_space_state.intersect_ray(support_ray)
+			check(str(root.name)+"_feet_supported",not support.is_empty() and absf(support.position.y-root.position.y)<.045,str(support.get("position")))
+			check(str(root.name)+"_mostly_still_small_actions",quiet>=160 and active>=20,{"quiet_of_256":quiet,"active_of_256":active})
+		else:
+			check("ferry_two_cm_bob",min_bob>=-.02001 and max_bob<=.02001 and max_bob-min_bob>.039,{"min":min_bob,"max":max_bob})
+			check("ferry_near_far_flag_once",root.find_children("*","MeshInstance3D",true,false).size()==3)
+		animator.play("idle");animator.seek(resume_time,true)
+	check("gull_start_phases_differ",phases.size()==3 and absf(phases[0]-phases[1])>.3 and absf(phases[1]-phases[2])>.3,phases)
+	var foam := scene.zones.DockZone.get_node("ShoreFoam") as MeshInstance3D
+	var material := foam.mesh.surface_get_material(0) as StandardMaterial3D
+	check("foam_transparent_imported_material",material!=null and material.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA and material.depth_draw_mode==BaseMaterial3D.DEPTH_DRAW_DISABLED and material.albedo_texture!=null)
+	check("foam_shared_surface",foam.mesh.get_surface_count()==1 and foam.material_override==null)
+	var shoreline_count := 0
+	for p in scene.layout.placements:
+		if p.asset.begins_with("alc_foam_") or p.asset in ["alc_buoy","alc_driftwood"]:shoreline_count+=1
+	check("shoreline_107_points_installed",shoreline_count==107,shoreline_count)
+	# Compare the shared-surface overlay against independent accepted prototypes.
+	# Freeze the QA clock only; shipped sea material and motion stay untouched.
+	var previous_scale := Engine.time_scale
+	Engine.time_scale=0
+	for i in 3:await RenderingServer.frame_post_draw
+	var merged := viewport.get_texture().get_image()
+	foam.visible=false
+	var controls: Array[MeshInstance3D] = []
+	for p in scene.layout.placements:
+		if p.get("surface_group","")!="shore_foam":continue
+		var node := MeshInstance3D.new();node.mesh=scene._mesh(str(p.asset));node.transform=scene._transform_of(p)
+		node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		scene.zones.DockZone.add_child(node);controls.append(node)
+	for i in 3:await RenderingServer.frame_post_draw
+	var independent := viewport.get_texture().get_image()
+	var maximum := 0.0
+	var total := 0.0
+	for y in 800:
+		for x in 360:
+			var a := merged.get_pixel(x,y);var b := independent.get_pixel(x,y)
+			var delta := maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b)))
+			maximum=maxf(maximum,delta);total+=delta
+	check("merged_foam_matches_prototypes",maximum<3.1/255.0 and total/(360*800)<.02/255.0,{"max_255":maximum*255,"mean_255":total*255/(360*800)})
+	for node in controls:node.free()
+	for i in 3:await RenderingServer.frame_post_draw
+	var without_foam := viewport.get_texture().get_image()
+	var bridge_change := 0.0
+	for y in range(45,159):
+		for x in 180:
+			var a := merged.get_pixel(x,y);var b := without_foam.get_pixel(x,y)
+			bridge_change=maxf(bridge_change,maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b))))
+	check("foam_keeps_opening_bridge_pixels",bridge_change<.5/255.0,bridge_change*255)
+	foam.visible=true
+	for i in 3:await RenderingServer.frame_post_draw
+	var dock := scene.zones.DockZone.get_node("DockFurnishings") as MeshInstance3D
+	var dock_reference := viewport.get_texture().get_image()
+	dock.visible=false
+	controls.clear()
+	for p in scene.layout.placements:
+		if p.get("surface_group","")!="dock_furnishings":continue
+		var node := MeshInstance3D.new();node.mesh=scene._mesh(str(p.asset));node.transform=scene._transform_of(p)
+		node.material_override=dock.mesh.surface_get_material(0)
+		node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		scene.zones.DockZone.add_child(node);controls.append(node)
+	for i in 3:await RenderingServer.frame_post_draw
+	var dock_independent := viewport.get_texture().get_image()
+	var edge_differences: Array = []
+	dock_reference.save_png(destination.path_join("dock-merged-control.png"))
+	dock_independent.save_png(destination.path_join("dock-independent-control.png"))
+	maximum=0;total=0
+	for y in 800:
+		for x in 360:
+			var a := dock_reference.get_pixel(x,y);var b := dock_independent.get_pixel(x,y)
+			var delta := maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b)))
+			maximum=maxf(maximum,delta);total+=delta
+			if delta>3.1/255:edge_differences.append([x,y,delta*255])
+	# CPU-baked transforms versus GPU instance transforms can cross an MSAA
+	# sample at a sharp crate edge. Review found one such pixel (24/255), with
+	# mean 0.000167/255. Allow only isolated edge samples, never a broad change.
+	check("dock_batch_visual_parity",maximum<32.1/255.0 and edge_differences.size()<=2 and total/(360*800)<.001/255.0,{"max_255":maximum*255,"mean_255":total*255/(360*800),"edge_differences":edge_differences})
+	for node in controls:node.free()
+	dock.visible=true
+	Engine.time_scale=previous_scale
+	for i in 3:await RenderingServer.frame_post_draw
+
+func effects_close_view(size: Vector2i, focus: Vector3, width: float, pitch: float, yaw: float, at: Vector2) -> void:
+	var view := SubViewport.new();view.size=size;view.world_3d=viewport.find_world_3d()
+	view.msaa_3d=Viewport.MSAA_4X;view.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(view)
+	var camera := Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL
+	camera.keep_aspect=Camera3D.KEEP_WIDTH;camera.current=true;camera.size=width;camera.near=.05;camera.far=220
+	view.add_child(camera);camera.rotation_degrees=Vector3(-pitch,yaw,0);camera.position=focus+camera.basis.z*maxf(5,width*1.5)
+	var display := TextureRect.new();display.texture=view.get_texture();display.position=at;display.size=Vector2(size)
+	display.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;add_child(display)
+
+func integrated_effects_movie() -> void:
+	scene.set_process(false)
+	scene._rig.process_mode=Node.PROCESS_MODE_DISABLED
+	for child in get_children():
+		if child is TextureRect:
+			child.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT);child.position=Vector2.ZERO;child.size=Vector2(360,800)
+	var background := ColorRect.new();background.position=Vector2(360,0);background.size=Vector2(480,800);background.color=Color("efeada");add_child(background)
+	var index := 0
+	for root in scene.animated_roots:
+		var placement: Dictionary = root.get_meta("placement")
+		if placement.asset=="ferry":effects_close_view(Vector2i(480,400),root.position+Vector3(0,3.0,0),30,43,-35,Vector2(360,0))
+		else:
+			effects_close_view(Vector2i(160,210),root.position+Vector3(0,.29,0),1.7,43,-90 if index==2 else -25 if index==0 else 155,Vector2(360+160*index,420));index+=1
+	var label := Label.new();label.position=Vector2(374,644);label.text="V9 / live island assembly\nLeft: opening 360 x 800\nRight: close views at current world positions\nGulls stay planted; ferry body bobs +/-2 cm\nStatic soft foam; no click targets\n9 s / 30 Hz art capture, desktop only"
+	label.add_theme_color_override("font_color",Color("263b44"));label.add_theme_font_size_override("font_size",15);add_child(label)
+	for i in 15:await RenderingServer.frame_post_draw
+	var ready_frame := Engine.get_frames_drawn()
+	for i in 270:await RenderingServer.frame_post_draw
+	var report := {"ready_frame":ready_frame,"fixed_fps":30,"duration_frames":270,"resolution":[840,800],"root_positions":[],"scope":"Simultaneous real scene cameras, current supported placements, normal animation speed; offline desktop capture."}
+	for root in scene.animated_roots:report.root_positions.append({"name":str(root.name),"position":str(root.position),"phase_s":root.get_meta("initial_phase_s")})
+	FileAccess.open(destination.path_join("effects-movie.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
+	get_tree().quit()
+
+func audit_museum_lod() -> void:
+	# Use the exact meshes/ranges installed by the island, with an isolated
+	# render counter so hidden near/far duplicates cannot masquerade as a pass.
+	var view := SubViewport.new();view.size=Vector2i(360,800);view.own_world_3d=true
+	view.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(view)
+	var near: MeshInstance3D
+	var far: MeshInstance3D
+	for node in scene.mesh_nodes:
+		if node.name.begins_with("AlcMuseumFar"):far=node
+		elif node.name.begins_with("AlcMuseum"):near=node
+	check("museum_pictogram_lod_ready",near!=null and far!=null and not bool(scene.layout.lod_groups[0].get("sign_sync_pending",true)))
+	for source in [near,far]:
+		var instance := MeshInstance3D.new();instance.mesh=source.mesh;instance.material_override=source.material_override
+		instance.visibility_range_begin=source.visibility_range_begin;instance.visibility_range_end=source.visibility_range_end
+		instance.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;view.add_child(instance)
+	var camera := Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.keep_aspect=Camera3D.KEEP_WIDTH
+	camera.size=6.72;camera.near=.05;camera.far=200;view.add_child(camera);camera.current=true
+	camera.rotation_degrees=Vector3(-43,14.5,0)
+	var center := near.mesh.get_aabb().get_center()
+	for spec in [[54,near.mesh],[56,far.mesh]]:
+		camera.position=center+camera.basis.z*float(spec[0])
+		for i in 6:await RenderingServer.frame_post_draw
+		var visible := view.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_PRIMITIVES_IN_FRAME)
+		var mesh: Mesh = spec[1]
+		var expected: int = mesh.surface_get_arrays(0)[Mesh.ARRAY_INDEX].size()/3
+		check("museum_lod_"+str(spec[0])+"m_only_expected_mesh",visible==expected,{"visible_triangles":visible,"expected_triangles":expected})
+	view.free()
+	for i in 2:await RenderingServer.frame_post_draw
+
+func audit_tree_material_integration() -> void:
+	var bound := 0
+	for node in scene.mesh_nodes:
+		var asset := str(node.get_meta("asset",""))
+		if not scene.layout.ground_materials.has(asset):continue
+		bound+=1
+		check(asset+"_approved_material",node.material_override!=null and node.material_override.resource_path==AlcatrazIsland.ROOT+str(scene.layout.ground_materials[asset]),node.material_override.resource_path)
+	check("four_material_bindings_only",bound==4,bound)
+	var counts := {}
+	for p in scene.layout.instances:
+		if str(p.asset).begins_with("alc_tree_"):counts[p.asset]=int(counts.get(p.asset,0))+1
+	check("four_tree_species_counts",counts=={"alc_tree_a":8,"alc_tree_b":6,"alc_tree_c":4,"alc_tree_d":8},counts)
+	var was_processing := scene.is_processing()
+	scene.set_process(false)
+	var view := SubViewport.new();view.size=Vector2i(360,800);view.own_world_3d=true
+	view.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(view)
+	var zone := Node3D.new();view.add_child(zone);scene.zones["LodProbe"]=zone
+	var camera := Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL
+	camera.keep_aspect=Camera3D.KEEP_WIDTH;camera.size=6.72;camera.near=.05;camera.far=200
+	view.add_child(camera);camera.current=true;camera.rotation_degrees=Vector3(-43,14.5,0)
+	var paint := StandardMaterial3D.new();paint.vertex_color_use_as_albedo=true
+	for asset in ["alc_tree_a","alc_tree_b","alc_tree_c","alc_tree_d"]:
+		var near_box: AABB=scene._mesh(asset).get_aabb();var far_box: AABB=scene._mesh(asset+"_far").get_aabb()
+		check(asset+"_lod_bounds_match",near_box.position.is_equal_approx(far_box.position) and near_box.size.is_equal_approx(far_box.size))
+		scene._add_tree_batches([{"asset":asset,"name":"LodProbeTree","position":[0,0,0],"yaw":0,"scale":[1,1,1],"zone":"LodProbe","collision":false}],paint)
+		var group: Dictionary=scene.tree_batches[-1]
+		for distance in [39.95,40.05]:
+			camera.position=near_box.get_center()+camera.basis.z*float(distance)
+			scene._update_tree_lods(camera.global_position)
+			for i in 6:await RenderingServer.frame_post_draw
+			var visible:=view.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_PRIMITIVES_IN_FRAME)
+			var mesh: Mesh=scene._mesh(asset if distance<40 else asset+"_far")
+			var expected: int=mesh.surface_get_arrays(0)[Mesh.ARRAY_INDEX].size()/3
+			check(asset+"_actual_lod_"+str(distance),visible==expected and group.near.multimesh.visible_instance_count+group.far.multimesh.visible_instance_count==1,{"visible":visible,"expected":expected})
+		for node in [group.near,group.far]:scene.batch_nodes.erase(node);node.free()
+		scene.tree_batches.pop_back()
+	scene.zones.erase("LodProbe");view.free()
+	scene._update_camera();scene.set_process(was_processing)
+	for group in scene.tree_batches:
+		var total: int=group.near.multimesh.visible_instance_count+group.far.multimesh.visible_instance_count
+		check(str(group.near.get_parent().name)+"_"+str(group.asset)+"_no_duplicate_lod_instances",total==group.items.size(),total)
+	for i in 2:await RenderingServer.frame_post_draw
+
+func audit_garden_batch_parity() -> void:
+	var group := scene.zones.TerraceZone.get_node("GardenFlowers") as MeshInstance3D
+	var old_time := Engine.time_scale;Engine.time_scale=0
+	for i in 3:await RenderingServer.frame_post_draw
+	var a := viewport.get_texture().get_image()
+	group.visible=false
+	var nodes: Array[MeshInstance3D] = []
+	for p in scene.layout.placements:
+		if p.get("surface_group","")!="garden_flowers":continue
+		var node := MeshInstance3D.new();node.mesh=scene._mesh(str(p.asset));node.transform=scene._transform_of(p)
+		node.material_override=group.mesh.surface_get_material(0);node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		scene.zones.TerraceZone.add_child(node);nodes.append(node)
+	for i in 3:await RenderingServer.frame_post_draw
+	var b := viewport.get_texture().get_image()
+	var maximum:=0.0;var total:=0.0;var edge_count:=0
+	for y in 800:
+		for x in 360:
+			var ca:=a.get_pixel(x,y);var cb:=b.get_pixel(x,y)
+			var delta:=maxf(absf(ca.r-cb.r),maxf(absf(ca.g-cb.g),absf(ca.b-cb.b)))
+			maximum=maxf(maximum,delta);total+=delta;edge_count+=int(delta>3.1/255.0)
+	check("garden_batch_visual_parity",maximum<32.1/255 and edge_count<=2 and total/(360*800)<.001/255,{"max_255":maximum*255,"mean_255":total*255/(360*800),"edge_pixels":edge_count})
+	for node in nodes:node.free()
+	group.visible=true;Engine.time_scale=old_time
+	for i in 3:await RenderingServer.frame_post_draw

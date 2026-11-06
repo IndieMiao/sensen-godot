@@ -1,0 +1,11 @@
+{
+  "fixed_source_head": "d7b57574",
+  "byte_equal_decoded_attributes": {
+    "position": true,
+    "normal": true,
+    "vertex_color": true,
+    "indices": true
+  },
+  "differences": "export-generated mesh name and unused untextured UV float rounding only",
+  "current_glb_sha256": "94502e41417e880224147c32a5e28d017fea863810494080756ea8b44b8f59ed"
+}

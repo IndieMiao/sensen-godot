@@ -1,0 +1,94 @@
+{
+  "state": "v9 complete: ground v1.1, calibrated towers, four tree species and per-instance LODs",
+  "integrated_base": "a5ff682d",
+  "accepted_packs": [
+    {
+      "pr": 794,
+      "head": "ec1e0bb4"
+    },
+    {
+      "pr": 802,
+      "head": "f8577ade"
+    },
+    {
+      "pr": 815,
+      "head": "996528d3"
+    },
+    {
+      "pr": 816,
+      "head": "100cc17f"
+    },
+    {
+      "pr": 820,
+      "head": "6499f259"
+    },
+    {
+      "pr": 821,
+      "head": "cc59ef9f"
+    },
+    {
+      "pr": 801,
+      "head": "af319757"
+    },
+    {
+      "pr": 819,
+      "head": "7738a2e7"
+    },
+    {
+      "pr": 823,
+      "head": "4aac9b05"
+    },
+    {
+      "pr": 824,
+      "head": "1442acaf"
+    },
+    {
+      "pr": 825,
+      "head": "3a61327c0b5ed20d83a524dc02050f5f26ed363e"
+    },
+    {
+      "pr": 826,
+      "head": "4d8cdab5af1fd89a972af2ecd9c990eb1371f5cf"
+    },
+    {
+      "pr": 827,
+      "head": "25923b8e9a9e18bb8cb6e856dc89bf86e73fe771"
+    },
+    {
+      "pr": 828,
+      "head": "fbf5463a4ba975ad732712afe8aa5e329e6a562d"
+    }
+  ],
+  "layout_fixes": {
+    "rail_transitions": 10,
+    "single_post_corner_connectors": 10,
+    "flowerbeds_repositioned": 11,
+    "nature_replacements": 114,
+    "trees": 26,
+    "garden_bands": 9,
+    "clusters_per_band": 6,
+    "continuous_hedges": 3,
+    "corner_decision": "east low paired flowers, west paired terracotta planters",
+    "ferry_clearance_position": [
+      -3,
+      0,
+      25
+    ]
+  },
+  "pending": [],
+  "render_groups": {
+    "shore_foam": "102 static alpha pieces, one shared material surface",
+    "dock_furnishings": "7 approved dock pieces plus original dock sign, one matte surface",
+    "alc_ground_terraces": "includes static original ruins geometry",
+    "shore_props": "five floats share one imported material/surface",
+    "garden_flowers": "terrace clusters share one material/surface; prototypes/points retained"
+  },
+  "sign_increment": {
+    "pr": 828,
+    "commit": "fbf5463a4ba975ad732712afe8aa5e329e6a562d",
+    "scope": "museum pictogram commit only; requested synchronization to bf0c31b1",
+    "assembly_review": "integrated and verified in v8/v9"
+  },
+  "material_application": "four material_override bindings; no owned model/UV edits",
+  "tree_replacement": "12 replacements, 8a + 6b + 4c + 8d; roots/TRS/collision preserved"
+}

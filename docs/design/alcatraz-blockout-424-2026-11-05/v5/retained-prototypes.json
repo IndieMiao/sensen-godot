@@ -1,0 +1,97 @@
+[
+  {
+    "asset": "alc_bench.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "d391ae07a20bcd6c5290a418373acc998058d1c81f00022c4a562b18c92a62e6"
+  },
+  {
+    "asset": "alc_bin.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "2510fbc1eff8db181a75e01877c8ec36158e884cfa1ff8cf8760e81a82f4f1f8"
+  },
+  {
+    "asset": "alc_curb.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "c9af8627af399e3fb03458ddc2cc63b9967d67b86f994291dc7e74f3cd2377cd"
+  },
+  {
+    "asset": "alc_flowerbed.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "b75e7da8e89d7f35b27ac03c1149852eacb386a7787364b7ffab1970ca7b2d33"
+  },
+  {
+    "asset": "alc_ground_dock.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "283adaa11ff43efb51f70c2925947823864b3fb3679188b9edd4734da2b2f618"
+  },
+  {
+    "asset": "alc_ground_summit.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "a5728cb63af5caf65f8506b2b6741ef2f852c5550e31a1fd9044160f450e056f"
+  },
+  {
+    "asset": "alc_ground_terraces.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "1c921fd35c41aa95ea4a0577e4511529b64c303667c48aa0afe15f26dc83c45c"
+  },
+  {
+    "asset": "alc_lamp.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "57f64e55ac1407cb90c2e2f55ba9ab7a72c17548ce3afeca04fc3b82be5d613a"
+  },
+  {
+    "asset": "alc_museum.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "0dc5911caa3f53bf6c1ac3bb0a492788ec5720f2b5a2620440574ac2c2b4a190"
+  },
+  {
+    "asset": "alc_museum_far.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "6fcc628e63d5cca710a1c3ab33c0272fe397a46d220726a9a6ebf1f653cde911"
+  },
+  {
+    "asset": "alc_rail_corner.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "590a89d99079f9e6049a23d8a1a872266235c429163abcc3a360378076adcd97"
+  },
+  {
+    "asset": "alc_rail_straight.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "328256fe95cc0001247afa71b9aadc0a0bae37a237bfc0519f3d937619a1e16f"
+  },
+  {
+    "asset": "alc_sign.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "3d5fcc5bd2e59cecd7a544818c76fb64e8038554f1b1a4917b36b35ef8e86a00"
+  },
+  {
+    "asset": "alc_tree_a.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "7861c08bc8cf7d91902c12115868c93e008f0051b17110607607e45c97f8788f"
+  },
+  {
+    "asset": "alc_tree_b.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "98e214172b584383ae23e1dc4d8ba6ff3b66efe7bd19e966d5b7d39033413e52"
+  },
+  {
+    "asset": "dock.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "0015e57c340197080c94d2a3af627ef53ebb473d8ce7ae7129d7279150548f96"
+  },
+  {
+    "asset": "ferry.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "1f767b988d8d69eb3bb2193cc0d9786c840c2f471f821ed2af94d21b1debae26"
+  },
+  {
+    "asset": "gull.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "4432129d0776bcc35837838d088c942ab3c1170a92ad6d414deed2606b0a6ad7"
+  },
+  {
+    "asset": "ruins.glb",
+    "render_triangles_equal_1e_6": true,
+    "kept_sha256": "41af900abad004f38cc8d9aac7227394794e3cc58420604c406c35e08a3d253d"
+  }
+]
