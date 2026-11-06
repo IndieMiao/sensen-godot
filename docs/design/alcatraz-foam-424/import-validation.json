@@ -1,0 +1,389 @@
+{
+	"assets": {
+		"alc_buoy": {
+			"aabb": "[P: (-0.27, -0.18, -0.27), S: (0.54, 0.964, 0.54)]",
+			"alpha": 1.0,
+			"depth_draw_mode": 0,
+			"material_class": "StandardMaterial3D",
+			"material_path": "res://assets/landmarks/alcatraz_island/alc_shore_props_material.tres",
+			"mesh_arrays_sha256": "34d3941d331e1e058b6f38fbcfe3763dbeaffa2239d8b6182a5fd6ad8ea62aed",
+			"render_priority": 0,
+			"transparency": 0,
+			"triangles": 184,
+			"uid": "uid://d13i1rsky5qhr",
+			"unshaded": false
+		},
+		"alc_driftwood": {
+			"aabb": "[P: (-0.75, -0.10921, -0.376537), S: (1.5, 0.263093, 0.753074)]",
+			"alpha": 1.0,
+			"depth_draw_mode": 0,
+			"material_class": "StandardMaterial3D",
+			"material_path": "res://assets/landmarks/alcatraz_island/alc_shore_props_material.tres",
+			"mesh_arrays_sha256": "e92dce9816cf7d009e316378af603fcfd36b691d5c222f867fd9fb4f23213383",
+			"render_priority": 0,
+			"transparency": 0,
+			"triangles": 130,
+			"uid": "uid://cj54ycijajlph",
+			"unshaded": false
+		},
+		"alc_foam_ring": {
+			"aabb": "[P: (-1.15, 0.0, -1.15), S: (2.3, 0.00001, 2.3)]",
+			"alpha": 0.800000011920929,
+			"depth_draw_mode": 2,
+			"material_class": "StandardMaterial3D",
+			"material_path": "res://assets/landmarks/alcatraz_island/alc_foam_material.tres",
+			"mesh_arrays_sha256": "6b4f2117597be29970fce9cb20b36c14411b22226aec5b19a6abc6ce4c3b3fea",
+			"render_priority": 1,
+			"transparency": 1,
+			"triangles": 64,
+			"uid": "uid://ucwrafri6poh",
+			"unshaded": true
+		},
+		"alc_foam_strip_a": {
+			"aabb": "[P: (-1.420869, 0.0, -0.335932), S: (2.841739, 0.00001, 0.671864)]",
+			"alpha": 0.800000011920929,
+			"depth_draw_mode": 2,
+			"material_class": "StandardMaterial3D",
+			"material_path": "res://assets/landmarks/alcatraz_island/alc_foam_material.tres",
+			"mesh_arrays_sha256": "0924c2e13dea7a322d0a6b92ef33b5c1501895e8b1049ac472073934626df5f7",
+			"render_priority": 1,
+			"transparency": 1,
+			"triangles": 24,
+			"uid": "uid://bk8ttnhaysbln",
+			"unshaded": true
+		},
+		"alc_foam_strip_b": {
+			"aabb": "[P: (-2.479795, 0.0, -0.505973), S: (4.95959, 0.00001, 1.011947)]",
+			"alpha": 0.800000011920929,
+			"depth_draw_mode": 2,
+			"material_class": "StandardMaterial3D",
+			"material_path": "res://assets/landmarks/alcatraz_island/alc_foam_material.tres",
+			"mesh_arrays_sha256": "851e2d882430c19db3606301ec2f700d28ca4ab38e04abe540d40f7e3ba98b89",
+			"render_priority": 1,
+			"transparency": 1,
+			"triangles": 32,
+			"uid": "uid://cpiyp6pdktty8",
+			"unshaded": true
+		},
+		"alc_foam_strip_c": {
+			"aabb": "[P: (-0.443287, 0.0, -1.032657), S: (0.886574, 0.00001, 2.065314)]",
+			"alpha": 0.800000011920929,
+			"depth_draw_mode": 2,
+			"material_class": "StandardMaterial3D",
+			"material_path": "res://assets/landmarks/alcatraz_island/alc_foam_material.tres",
+			"mesh_arrays_sha256": "1fdb9468b04912011ae898fe464079368cd8f83b4ed62fb137bb349178240af8",
+			"render_priority": 1,
+			"transparency": 1,
+			"triangles": 24,
+			"uid": "uid://n0uxl0vq1rnc",
+			"unshaded": true
+		}
+	},
+	"checks": [
+		{
+			"check": "alc_foam_strip_a: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: horizontal pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: imported standard material",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: water-plane pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: alpha blend without depth writes",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: static unshaded overlay after sea",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: shared original foam texture",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: mipmapped soft edges",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: up-facing normals",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_a: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: horizontal pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: imported standard material",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: water-plane pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: alpha blend without depth writes",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: static unshaded overlay after sea",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: shared original foam texture",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: mipmapped soft edges",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: up-facing normals",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_b: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: horizontal pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: imported standard material",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: water-plane pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: alpha blend without depth writes",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: static unshaded overlay after sea",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: shared original foam texture",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: mipmapped soft edges",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: up-facing normals",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_strip_c: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: horizontal pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: imported standard material",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: water-plane pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: alpha blend without depth writes",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: static unshaded overlay after sea",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: shared original foam texture",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: mipmapped soft edges",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: up-facing normals",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_foam_ring: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: horizontal pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: imported standard material",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: opaque matte vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: floating waterline pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_buoy: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: horizontal pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: imported standard material",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: opaque matte vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: floating waterline pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_driftwood: unique UID",
+			"passed": true
+		}
+	],
+	"passed": true
+}

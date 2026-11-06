@@ -1,0 +1,193 @@
+{
+  "task": "SGODOT-424",
+  "author": "刘备",
+  "revision": "v1",
+  "assets": {
+    "alc_foam_strip_a": {
+      "triangle_limit": 80,
+      "owner": "刘备",
+      "placeholder": false,
+      "kind": "static foam alpha sheet",
+      "pivot": "local water plane Y=0; footprint centre",
+      "material": "alc_foam_material.tres",
+      "file": "alc_foam_strip_a.glb",
+      "triangles": 24,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.4208693504333496,
+          0.0,
+          -0.33593177795410156
+        ],
+        [
+          1.4208693504333496,
+          0.0,
+          0.33593177795410156
+        ]
+      ],
+      "dimensions_m": [
+        2.841738700866699,
+        0.0,
+        0.6718635559082031
+      ],
+      "bytes": 2340,
+      "sha256": "8c9cbe342d71f49a6d39d35377f24c7a2958201c3752f6760a694001e4b96b44"
+    },
+    "alc_foam_strip_b": {
+      "triangle_limit": 80,
+      "owner": "刘备",
+      "placeholder": false,
+      "kind": "static foam alpha sheet",
+      "pivot": "local water plane Y=0; footprint centre",
+      "material": "alc_foam_material.tres",
+      "file": "alc_foam_strip_b.glb",
+      "triangles": 32,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.479795217514038,
+          0.0,
+          -0.5059734582901001
+        ],
+        [
+          2.479795217514038,
+          0.0,
+          0.5059734582901001
+        ]
+      ],
+      "dimensions_m": [
+        4.959590435028076,
+        0.0,
+        1.0119469165802002
+      ],
+      "bytes": 2628,
+      "sha256": "78f57717eeee8e322f19b0860559af084beea672d9aa3f32837809c471cd7262"
+    },
+    "alc_foam_strip_c": {
+      "triangle_limit": 80,
+      "owner": "刘备",
+      "placeholder": false,
+      "kind": "static foam alpha sheet",
+      "pivot": "local water plane Y=0; footprint centre",
+      "material": "alc_foam_material.tres",
+      "file": "alc_foam_strip_c.glb",
+      "triangles": 24,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.4432868957519531,
+          0.0,
+          -1.0326569080352783
+        ],
+        [
+          0.4432868957519531,
+          0.0,
+          1.0326569080352783
+        ]
+      ],
+      "dimensions_m": [
+        0.8865737915039062,
+        0.0,
+        2.0653138160705566
+      ],
+      "bytes": 2340,
+      "sha256": "e9c42be25c6b0660a8cb1d7fd4894a5f8a812dae0c1fe27c61d112563ed3a941"
+    },
+    "alc_foam_ring": {
+      "triangle_limit": 80,
+      "owner": "刘备",
+      "placeholder": false,
+      "kind": "static foam alpha sheet",
+      "pivot": "local water plane Y=0; footprint centre",
+      "material": "alc_foam_material.tres",
+      "file": "alc_foam_ring.glb",
+      "triangles": 64,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.149999976158142,
+          0.0,
+          -1.149999976158142
+        ],
+        [
+          1.149999976158142,
+          0.0,
+          1.149999976158142
+        ]
+      ],
+      "dimensions_m": [
+        2.299999952316284,
+        0.0,
+        2.299999952316284
+      ],
+      "bytes": 3772,
+      "sha256": "0fc8c4bd8c48edb775c325f54e6695dd37643e8c5710343659eab7da9cbc9046"
+    },
+    "alc_buoy": {
+      "triangle_limit": 200,
+      "owner": "刘备",
+      "placeholder": false,
+      "kind": "decorative floating marker, no light or interaction",
+      "pivot": "waterline Y=0",
+      "material": "alc_shore_props_material.tres",
+      "file": "alc_buoy.glb",
+      "triangles": 184,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.27000001072883606,
+          -0.18000000715255737,
+          -0.27000001072883606
+        ],
+        [
+          0.27000001072883606,
+          0.7839999794960022,
+          0.27000001072883606
+        ]
+      ],
+      "dimensions_m": [
+        0.5400000214576721,
+        0.9639999866485596,
+        0.5400000214576721
+      ],
+      "bytes": 5504,
+      "sha256": "03a4ab3f1a1eb44c1811721a13f5d09722b368393270e320f9b2448ab364a7c4"
+    },
+    "alc_driftwood": {
+      "triangle_limit": 200,
+      "owner": "刘备",
+      "placeholder": false,
+      "kind": "single bleached floating branch with three kelp ribbons",
+      "pivot": "waterline Y=0; footprint centre",
+      "material": "alc_shore_props_material.tres",
+      "file": "alc_driftwood.glb",
+      "triangles": 130,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.75,
+          -0.10920993238687515,
+          -0.376537024974823
+        ],
+        [
+          0.75,
+          0.1538834124803543,
+          0.376537024974823
+        ]
+      ],
+      "dimensions_m": [
+        1.5,
+        0.26309334486722946,
+        0.753074049949646
+      ],
+      "bytes": 4644,
+      "sha256": "9c80c9823a4d67e705ba10633a9301c0562bb74dcc3c867126329bd083ba5dd1"
+    }
+  },
+  "unique_triangles": 458,
+  "sea_y": -0.15,
+  "foam_world_y": -0.132,
+  "foam_texture": "alc_foam_soft.png",
+  "material_contract": "Four static alpha-blended unshaded foam sheets, no animation, no depth writes, no shadow; two opaque matte vertex-colour floats. Bind external .tres through generated .import.",
+  "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend"
+}
