@@ -340,9 +340,27 @@ static func wild_mine_rows(view: Dictionary, site: Dictionary) -> Array:
 		if g != "" and f <= last: guards[g] = guards.get(g, []) + ["F%d" % f]
 	if not guards.is_empty():
 		rows.append(["Boss", "\n".join(guards.keys().map(func(g): return "%s · %s" % [monster_name(g), ", ".join(guards[g])]))])
+	# the viewport's best_floor is kept from the box read the session made (P0WildSites reads a box once); the view's
+	# record is this command's (李元芳 on preview B: back up from F2, the card still said F1)
 	var best := int(site.get("best_floor", 0))
+	var records = view.get("mine", {}).get("records", {}) if view.get("mine", null) is Dictionary else {}
+	if records is Dictionary and records.get(str(site.get("id", ""))) is Dictionary:
+		best = maxi(best, int(records[str(site.id)].get("deepest", 0)))
 	rows.append(["You", "Best here F%d" % best if best > 0 else "Not visited"])
+	var hp := mine_hp_line(view)
+	if hp != "": rows.append(["HP", hp])
 	return rows
+
+## q(291) (不知火舞 421 3f328435): out of the mine and not full, the mine card's line under `You` — `40% · Full in 36m`
+## (view.mine.hp / hp_max / hp_full_in, refilling 0 to full in 60 minutes); "" when full, in the mine, or from a server
+## before q(291). No toast on leaving: the card opens anyway with this on it.
+static func mine_hp_line(view: Dictionary) -> String:
+	var mine = view.get("mine", null)
+	if not (mine is Dictionary) or mine.get("at", null) != null or not mine.has("hp_full_in"): return ""
+	var hp := int(mine.get("hp", 0))
+	var top := int(mine.get("hp_max", 100))
+	if top <= 0 or hp >= top: return ""
+	return "%d%% · Full in %s" % [roundi(100.0 * hp / top), P0Logic.span(float(mine.hp_full_in))]
 
 ## A wild site's type word as its name ends (v4q(3) ④): the mouth card's type line says `<word> mine`.
 const WILD_TYPE_WORDS := {"quarry": "Quarry", "vein": "Vein", "geode": "Geode", "abyss": "Abyss", "ruin": "Ruins"}
@@ -555,19 +573,21 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 	var out: Array = []
 	for r in view.get("workbench", {}).get("recipes", []):
 		if str(r.get("tab", "")) != tab: continue
+		if str(r.get("to", "")) == "weapon" and not P0Logic.GearLogic.weapon_actions_enabled: continue
 		var item := str(r.get("item", ""))
 		var card := {
 			"id": str(r.get("id", "")), "item": item, "name": str(r.get("name", "")), "effect": str(EFFECTS.get(item, "")),
 			"cost": r.get("cost", []).map(func(c): return {"id": str(c.id), "name": str(c.name), "have": int(c.have), "need": int(c.need)}),
 			"yield": "", "have": "", "button": {},
 		}
+		if str(r.get("to", "")) == "weapon": card.effect = P0Logic.GearLogic.weapon_effect(item)
 		if str(r.get("to", "")) == "bag":
 			card.yield = "You get %d" % int(r.get("qty", 1))
 			card.have = "You have %d" % int(r.get("have", 0))   # bag + Farm Storage (server, B2-06)
 		if r.get("owned", false): card.cost = []   # an owned tool turns its materials row off (BlueprintCard main)
 		# a facility paid in coins too (the greenhouse's 300): a Coins tile after the materials, the 40 floor in its
 		# denominator so the tile and the button agree (q(10): `Coins 230/340`)
-		elif r.get("coins_need", null) != null:
+		elif r.get("coins_need", null) != null and str(r.get("to", "")) != "weapon":
 			card.cost.append({"id": "coin", "name": "Coins", "have": int(r.get("coins_have", 0)), "need": int(r.coins_need)})
 		card.button = _craft_button(r)
 		# a facility that can be built says how many stand of how many may, left of Build (FARM-5-FAC: `Sprinklers 2/6`;
@@ -583,7 +603,7 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 	return out
 
 static func _craft_button(r: Dictionary) -> Dictionary:
-	if r.get("owned", false) and str(r.get("to", "")) == "gear":   # the Gather Gloves' `Owned · always on` left with 丁11
+	if r.get("owned", false) and str(r.get("to", "")) in ["gear", "weapon"]:   # no Gather Gloves after 丁11
 		if r.get("equipped", false): return {"label": "Equipped", "kind": "done", "cmd": {}}
 		return {"label": "Equip", "kind": "secondary", "cmd": {"type": "equip", "item": str(r.get("item", ""))}}
 	var block = r.get("block", null)
@@ -592,9 +612,14 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 	var field := str(r.get("to", "")) == "field"
 	if block == null:
 		if field: return {"label": "Build", "kind": "primary", "cmd": {"type": "place_start", "recipe": str(r.get("id", ""))}}
+		if str(r.get("to", "")) == "weapon":
+			var coins := int(r.get("coins", P0Logic.GearLogic.weapon_recipe(str(r.get("item", ""))).get("coins", 0)))
+			return {"label": "Craft · %d coins" % coins if coins > 0 else "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
 		return {"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
 	var d: Dictionary = block.get("detail", {})
 	match str(block.get("code", "")):
+		"homestead_level":
+			return {"label": "Homestead Lv%d" % int(d.get("need", d.get("level", 1))), "kind": "unavailable", "cmd": {}}
 		"locked":
 			return {"label": "%s Lv%d" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
 		"skill_level_required":   # q(59) §5: `Farming Lv6 needed`

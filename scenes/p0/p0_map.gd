@@ -352,7 +352,9 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 	match str(entry.get("kind", "")):
 		"pond":
 			var beginner := str(entry.get("id", "")) == NEAREST_POND or bool(entry.get("beginner", false))
-			style = {"icon": P0Logic.icon("pond"), "label": short_name(name), "rank": PIN_RANK.beginner if beginner else PIN_RANK.pond}
+			# its site's icon (SGODOT-406): pond, river or coast; the city panel's Ponds / Local pond rows keep the pond's
+			style = {"icon": P0Logic.icon(PondCard.pin_icon(str(entry.get("id", "")))), "label": short_name(name),
+				"rank": PIN_RANK.beginner if beginner else PIN_RANK.pond}
 		"place":
 			# The homestead keeps its plate and its whole name (q(137) leaves it as it was), first after the always-in pins.
 			if str(entry.get("id", "")) == HOME_PIN: return {"icon": P0Logic.icon("home"), "plate": true, "label": "Homestead",

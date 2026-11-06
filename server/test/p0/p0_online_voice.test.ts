@@ -60,10 +60,19 @@ describe('P0 voice (SGODOT-383)', () => {
     await expect(voice.join('player-aaaa')).resolves.toMatchObject({ code: 'AGE_GATE', status: 403 });
     voice.setAge('player-aaaa', true);
     await expect(voice.join('player-aaaa')).resolves.toMatchObject({ code: 'NOT_IN_ROOM' });
-    expect(NO_VOICE_ROLES.has('market')).toBe(true);
-    expect(NO_VOICE_ROLES.has('poi')).toBe(true);   // POI rooms off until the user says yes (#699)
+    enter('player-aaaa', 'sh_tea_1');
+    NO_VOICE_ROLES.add('tea');   // a role without voice (none on b1 since q(286); poi-rooms keeps 'poi', q(279) ⑧)
+    try { await expect(voice.join('player-aaaa')).resolves.toMatchObject({ code: 'VOICE_NOT_HERE' }); }
+    finally { NO_VOICE_ROLES.delete('tea'); }
+  });
+
+  it("Market Square's layer has voice since q(286): the whole layer of 30 (the user, 11-04)", async () => {
+    expect(NO_VOICE_ROLES.has('market')).toBe(false);
+    expect(NO_VOICE_ROLES.has('poi')).toBe(true);   // POI rooms stay off (q(279) ⑧ B)
+    const { voice, enter } = setup();
+    voice.setAge('player-aaaa', true);
     enter('player-aaaa', 'sh_market_1');
-    await expect(voice.join('player-aaaa')).resolves.toMatchObject({ code: 'VOICE_NOT_HERE' });
+    await expect(voice.join('player-aaaa')).resolves.toMatchObject({ ok: true, capacity: 30 });
   });
 
   it('a 13+ no stays a no; the answer is kept beside the save, and no birthday', () => {

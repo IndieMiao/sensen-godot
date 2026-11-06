@@ -157,6 +157,17 @@ func test_p0_table_translates_lines_templates_parts_and_leaves_the_rest() -> voi
 	assert_str(String(t.get_message("270/270"))).is_equal("")   # no letters: nothing to translate
 	assert_str(String(t.get_message("_note"))).is_equal("")   # notes are no lines
 
+## A material's plural is its own name (奕星 11-04: `7 Claies` on the Stall Board), so the real table finds it: every
+## material's `Need %d more %s` reads in Chinese, `Clay` 黏土, never a stray `Claies`.
+func test_p0_table_finds_every_materials_plural() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	for name in ["Timber", "Stone", "Clay", "Flax", "Hardwood", "Coal", "Rock Salt", "Copper Ore", "Iron Ore", "Quartz", "Reeds"]:
+		var zh := String(t.get_message(name))
+		assert_str(zh).override_failure_message("%s has no Chinese" % name).is_not_empty()
+		# 398 第三批（李白）: the name first, `木材还差 7` (`{2}还差 {1}`)
+		assert_str(String(t.get_message("Need 7 more %s" % P0Logic.plural(name)))).is_equal("%s还差 7" % zh)
+
 ## B 档 shots (SGODOT-385, 11-03): a link's ` ›` and a list of known items are read around; a list with one unknown
 ## item stays English whole (a sentence with a comma is no list).
 func test_p0_table_reads_a_links_arrow_and_a_list_of_known_items() -> void:

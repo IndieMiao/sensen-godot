@@ -19,6 +19,7 @@ import { loadPoiTemplates, poiPassPlace, poiRoomSpec } from '../src/p0/online/po
 import { placeOf, roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
+import { registerP0LineSwitch } from '../src/p0/line_switch.js';
 import { P0Store } from '../src/p0/store.js';
 import { SAVE_VERSION } from '../src/p0/state.js';
 import { clusterById, requirePass } from '../src/p0/travel.js';
@@ -27,6 +28,7 @@ import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv 
 import { openIpNear, type IpNear } from '../src/p0/ip_city.js';
 import { registerP0Admin } from '../src/p0/admin.js';
 import { P0Gate } from '../src/p0/gate.js';
+import { devSitesFromEnv, setDevSites } from '../src/p0/mine.js';
 import { P0EventLog } from '../src/p0/telemetry.js';
 import { bjTableFromEnv, bjTableOn, setBlackjackSecret, setBlackjackTable } from '../src/p0/blackjack.js';
 
@@ -40,6 +42,7 @@ if (store.migrated) console.log(JSON.stringify({ cleared: store.migrated, to: SA
 // P0_TRUST_PROXY=1 behind Caddy) and hourly save snapshots (P0_SNAPSHOT_DIR, 48 kept). A deployed server runs with
 // P0_DEV=0 so no dev route is registered.
 const app = Fastify({ logger: false, bodyLimit: 32 * 1024, ...trustProxyFromEnv() });
+registerP0LineSwitch(app);   // 421: P0_LINE=close sends every client back to a request each (P0Line)
 const guard = guardOptionsFromEnv();
 // SYS-UPDATE / SYS-MAINT (gate.ts): P0_MIN_VERSION / P0_UPDATE_URL / P0_MAINT / P0_MAINT_UNTIL, changed at run time by
 // the admin routes and kept in the save's folder (the data volume), so a restart keeps maintenance on.
@@ -49,9 +52,13 @@ if (gate.loadError) console.log(JSON.stringify({ warn: 'gate_json_unreadable', e
   const g = gate.state();
   // A minimum without a download url is not enforced (gate.ts): say so loudly at start rather than strand players.
   if (g.min_version > 0 && !g.update_on) console.log(JSON.stringify({ warn: 'min_version_without_update_url', min_version: g.min_version }));
+  // 396 ①: the wipe's second guard likewise, not enforced without one
+  if (g.features.length && !g.features_on) console.log(JSON.stringify({ warn: 'require_features_without_update_url', features: g.features }));
 }
 await registerP0Guard(app, guard, gate);
 const dev = process.env.P0_DEV !== '0';
+// The development mines (wd-dev-quarry / wd-dev-vein, no here check): only with P0_DEV_SITES=1, never on the live or preview server.
+setDevSites(devSitesFromEnv(process.env));
 // SGODOT-351: the blackjack shoe's key. A release server (P0_DEV=0) without one makes a random key for this process and
 // warns (亚瑟 / 奕星 on #523: the card room stays open, a hand in play keeps its stored shoe); dev keeps a fixed key.
 if (process.env.P0_BJ_SECRET) setBlackjackSecret(process.env.P0_BJ_SECRET);
@@ -108,13 +115,13 @@ const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
   return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000),
-    maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0 };
+    maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0, require_features: g.features_on ? g.features : [] };
 });
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config, dev_sites: devSitesFromEnv(process.env) }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;

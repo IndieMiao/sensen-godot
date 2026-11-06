@@ -15,6 +15,8 @@ import { freshState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 import { viewOf } from '../../src/p0/view.js';
 import { nearestFreeVein } from '../../src/p0/wild.js';
+import { setDevSites } from '../../src/p0/mine.js';
+setDevSites(true);   // wd-dev-quarry / wd-dev-vein: tests only (P0_DEV_SITES)
 
 const T = Date.UTC(2026, 10, 3, 2), DAY = 86400000, Q = 'wd-dev-quarry';
 const c = loadP0Content(); c.profile.timezone = 'Asia/Shanghai';

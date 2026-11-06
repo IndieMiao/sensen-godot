@@ -1,7 +1,7 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
 import { add, room } from './bag.js';
-import { fireSpeed, giveClue, goldWidth, hasConvenience, noteMilestones, noteMishap, triedBefore, trialRefundsLeft } from './cookbook.js';
+import { fireSpeed, giveClue, goldCap, goldWidth, hasConvenience, noteMilestones, noteMishap, triedBefore, trialRefundsLeft } from './cookbook.js';
 import { isSeasoning } from './gathering.js';
 import { bigPot, stoveCount } from './homestead.js';
 import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, rackOn, routeDish, takeIngredient } from './kitchen_storage.js';
@@ -296,10 +296,14 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   const tier: CookTier = c.cooking.tiers[String(rarity)];
   const teach = s.fires === 0;
   // The first fire is the wide teaching ring; later pots get Steady Hand I / Mastered widths and Quick Fire timing.
+  // q(288) (SGODOT-419): past it, each ring its own width, place and angle around this width (varyHeats).
+  const vary = teach ? undefined : c.cooking.heat_vary;
   const width = teach ? c.cooking.first_fire.gold : goldWidth(c, s, recipe?.id ?? null, tier.gold);
   const spin = teach ? c.cooking.first_fire.spin_ms : tier.spin_ms;
   const speed = fireSpeed(c, s), ms = Math.round(tier.ms * speed);
-  const heats: Heat[] = tier.heats.map(at => ({ at: Math.round(at * speed), spin, width, gold: round3(0.1 + draw(s) * (0.85 - width)) }));
+  const ats = tier.heats.map(at => Math.round(at * speed));
+  const heats: Heat[] = vary ? varyHeats(c, s, vary, ats, spin, width)
+    : ats.map(at => ({ at, spin, width, gold: round3(0.1 + draw(s) * (0.85 - width)) }));
   s.fires += 1;
   const pot: Pot = {
     dish: recipe?.id ?? c.cooking.mystery.id, rarity, started_at: now, ms, heats,
@@ -362,14 +366,53 @@ export function batchCook(c: P0Content, s: P0State, cmd: { recipe?: unknown; pot
   return run(s, events);
 }
 
-/** First tap inside each ring's lifetime is judged; gold arc ± tolerance is a hit (§7.2.4). */
+/** How much faster the needle passes the gold than it turns (q(288)): the ring drifting against it at `drift` °/s
+ * adds drift ÷ its speed (360° a spin). The client's P0Logic.heat_k is the same. 1 with no drift. */
+export function heatK(spin: number, drift = 0): number {
+  return Math.max(0.05, 1 + drift * spin / 360_000);
+}
+
+/** q(288)'s rings (SGODOT-419; q row 1cea65e7, 不知火舞's spec 419 cd072712), each its own:
+ * - width: the pot's (Mastered, Steady Hand and Chef's Sign in it) × a draw in `width_mul`, at most goldCap (Chef's Sign
+ *   still above gold_cap);
+ * - gold: no sooner than `lead_ms` after the needle sets off (at its speed past the drifting ring), ending by `end` of
+ *   the ring;
+ * - from: the needle's start on screen, whole degrees, shown only; a second ring's gold centre (when its needle sets off,
+ *   no drift yet) at least `pair_min_deg` from the one before and not within `pair_opposite_deg` of opposite (1° inside
+ *   each edge for the rounding). */
+export function varyHeats(c: P0Content, s: P0State, vary: NonNullable<P0Content['cooking']['heat_vary']>, ats: number[], spin: number,
+  base: number): Heat[] {
+  const k = heatK(spin, vary.drift), cap = goldCap(c, s);
+  const near = vary.pair_min_deg + 1, far = 180 - vary.pair_opposite_deg - 1, span = far - near;   // 46°–159°, then 201°–314°
+  const out: Heat[] = [];
+  for (const at of ats) {
+    const width = Math.min(cap, round3(base * (vary.width_mul[0] + draw(s) * (vary.width_mul[1] - vary.width_mul[0]))));
+    const lo = vary.lead_ms * k / spin, hi = Math.max(lo, vary.end - width);
+    const gold = round3(lo + draw(s) * (hi - lo));
+    const centre = (gold + width / 2) * 360;
+    let from: number;
+    const prev = out[out.length - 1];
+    if (!prev) from = Math.floor(draw(s) * 360);
+    else {
+      const u = draw(s) * 2 * span;
+      const gap = u < span ? near + u : 360 - far + (u - span);
+      from = ((Math.round(prev.from! + (prev.gold + prev.width / 2) * 360 + gap - centre) % 360) + 360) % 360;
+    }
+    out.push({ at, spin, width, gold, from, drift: vary.drift });
+  }
+  return out;
+}
+
+/** First tap inside each ring's lifetime is judged; gold arc ± tolerance is a hit (§7.2.4). A drifting ring (q(288))
+ * brings its gold to the needle sooner: the arc's times divide by heatK. */
 export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
   let hits = 0;
   for (const h of heats) {
     const tap = taps.find(t => t >= h.at && t <= h.at + h.spin);
     if (tap === undefined) continue;
-    const from = h.at + h.gold * h.spin - c.cooking.tolerance_ms;
-    const to = h.at + (h.gold + h.width) * h.spin + c.cooking.tolerance_ms;
+    const k = heatK(h.spin, h.drift);
+    const from = h.at + h.gold * h.spin / k - c.cooking.tolerance_ms;
+    const to = h.at + (h.gold + h.width) * h.spin / k + c.cooking.tolerance_ms;
     if (tap >= from && tap <= to) hits += 1;
   }
   return hits;
@@ -492,7 +535,8 @@ function finishPot(c: P0Content, s: P0State, b: Burner, pot: Pot, taps: number[]
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
-  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: portions.length, first, mystery: pot.mystery, hits, ...(lucky ? { lucky: true as const } : {}),
+  // rarity / heats (q(288)): the week after 11-13 reads hits and Perfects by tier from the event log
+  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: portions.length, first, mystery: pot.mystery, hits, rarity: pot.rarity, heats: pot.heats.length, ...(lucky ? { lucky: true as const } : {}),
     ...(none ? { none: true as const, trial_left: Math.max(0, (trialRefundsLeft(c, s, now) ?? 0) - 1) } : {}), ...(auto ? { auto: true as const } : {}) });
   if (eat && !none) eatMeal(c, s, main, now, events);
   if (pot.mystery) { failedPot(c, s, pot.items ?? [], pot.started_at, now, events); return; }

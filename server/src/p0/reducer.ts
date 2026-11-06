@@ -15,7 +15,7 @@ import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './prog
 import { notePresence } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { notePipLine, settleFirstDig } from './first_dig.js';
-import { gather, storeMaterials } from './gathering.js';
+import { gather, pruneGather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
 import { addPlots, compost, cropGrowH, facilityAt, fieldCap, fieldsUsed, moveFacility, place, ripenMs, seedSaver, wateredPlots } from './garden.js';
 import { chopTree, feedTree, pickTree, plantTree, treeOf } from './orchard.js';
@@ -473,6 +473,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
   }
   settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in
+  pruneGather(s, now);   // 396 ④: a cooldown gone by goes from the save
   noteProgress(c, s, counted, events);   // q(134): `Fresh Greens 3/5`, the one that fills it `done`
   settleGuide(c, s, guideKeys(c, input, s, cmd, events), now, events);   // SGODOT-341: what this command did, against the guide's steps
   s.seq += 1;

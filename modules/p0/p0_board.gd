@@ -72,7 +72,8 @@ static func card(view: Dictionary, r: Dictionary, slot := 0) -> Dictionary:
 				break
 	else:
 		d.command = "Track"
-		d.cmd = {"type": "accept", "request": d.id}
+		d.reason = P0Logic.track_full_reason(view, d.command)   # spec ③: tracking 25 already, `Track · Requests 25/25`
+		if d.reason == "": d.cmd = {"type": "accept", "request": d.id}
 	if qty <= 0: d.command = ""
 	return d
 

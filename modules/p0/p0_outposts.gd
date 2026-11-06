@@ -11,6 +11,8 @@ const PIN_ART := {
 	"tea": "res://assets/map/poi/icons/cafe_1.webp",
 	"post": "res://assets/map/poi/icons/information_1.webp",
 	"market": "res://assets/map/poi/icons/grocery_1.webp",
+	# 11-08's cathedral (role church, no keeper): in from 0.3.0, so that build shows it right, not as a tackle shop
+	"church": "res://assets/map/poi/icons/religious-christian_3_nocross.webp",
 }
 ## SGODOT-351: the card room, San Francisco's fifth outpost — its pin and table wear i-cards (安其拉, Figma 176:165934;
 ## the recipe card if the file is missing), never the bar POI's; the pin only once the table is open to this player (q(238)).

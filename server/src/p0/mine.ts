@@ -20,10 +20,18 @@ export type MineCommand =
 const TYPES = new Set(['mine_enter', 'mine_floor', 'mine_rock', 'mine_torch', 'mine_attack', 'mine_pick', 'mine_drink']);
 export const isMineCommand = (cmd: { type: string }): cmd is MineCommand => TYPES.has(cmd.type);
 
-// Catalogue first; development fixtures never replace an authored wild site.
+/** The development mines (content.mine.dev_sites: no city, no here check, contract-efg §11) exist only where
+ * P0_DEV_SITES=1 says so (亚瑟 / 奕星, 11-06): tests turn them on; the live and preview servers never set it, so there
+ * no command or read can reach them. */
+let devSites = false;
+export function setDevSites(on: boolean): void { devSites = on; }
+export const devSitesFromEnv = (env: Record<string, string | undefined>): boolean => env.P0_DEV_SITES === '1';
+
+// Catalogue first; development fixtures never replace an authored wild site, and are there only when switched on.
 export function mineSite(c: P0Content, id: string): MineSite | undefined {
   const site = wildById(c, id);
-  return site?.mine ? { ...site, mine: site.mine } : c.mine.dev_sites?.find(dev => dev.id === id);
+  if (site?.mine) return { ...site, mine: site.mine };
+  return devSites ? c.mine.dev_sites?.find(dev => dev.id === id) : undefined;
 }
 const cap = (site: MineSite) => Math.min(site.mine.floors, site.mine.open_to ?? site.mine.floors);
 const floorKey = (mine: string, floor: number) => `${mine}:${floor}`;
@@ -60,7 +68,7 @@ export function floorSpec(c: P0Content, site: MineSite, floor: number, player: s
     if (existing) existing[1] += weight; else drops.push([site.mine.main, weight]);
   }
   const total = drops.reduce((n, [, weight]) => n + weight, 0);
-  const deck = Array.from({ length: rocks }, () => {
+  const deck = Array.from({ length: rocks * rockCards(c) }, () => {
     let pick = draw() * total;
     for (const [id, weight] of drops) { if (pick < weight) return id; pick -= weight; }
     return null;
@@ -92,7 +100,7 @@ export function settleMine(c: P0Content, s: P0State, now: number): void {
   if (!old.at) return;
   const site = mineSite(c, old.at.mine);
   if (!site || !c.mine.types[site.type] || old.at.floor > cap(site)) return;
-  const day = emptyDay(key, old.hp);
+  const day = emptyDay(key, c.mine.combat.hp);   // q(291): 04:00 refills HP, in the mine too (v4q(5) ⑥ kept it)
   day.at = { ...old.at }; s.mine.day = day;
   floorState(c, s, site, day.at.floor).paid = true;
   s.mine.notice = { kind: 'reset', at: rolloverAfter(c, s, old.key), floor: day.at.floor };
@@ -116,23 +124,48 @@ export function leaveMine(c: P0Content, s: P0State, now: number): void {
   settleMine(c, s, now);
   if (!s.mine.day?.at) return;
   restoreBosses(c, s);
-  s.mine.day.at = null; s.mine.day.hp = c.mine.combat.hp; s.mine.day.picked = [];
+  // q(291): HP goes out with the player, refilling from now (it used to be full again here)
+  s.mine.day.at = null; s.mine.day.hp_at = now; s.mine.day.picked = [];
+}
+
+/** q(291) (SGODOT-421): the player's mine HP now. In the mine it is what the fight left; out of it, it refills from
+ * day.hp_at, 0 to full in combat.regen_full_ms (+1 every 36 s at 100), whole points; no day today: full (04:00). */
+export function mineHp(c: P0Content, day: MineB1Day | null, now: number): number {
+  const max = c.mine.combat.hp;
+  if (!day) return max;
+  if (day.at || day.hp_at === undefined) return day.hp;
+  return Math.min(max, day.hp + Math.floor((now - day.hp_at) / (c.mine.combat.regen_full_ms / max)));
+}
+
+/** Milliseconds until mineHp is full again out of the mine; 0 when full or in the mine. */
+export function mineHpFullIn(c: P0Content, day: MineB1Day | null, now: number): number {
+  if (!day || day.at || day.hp_at === undefined || mineHp(c, day, now) >= c.mine.combat.hp) return 0;
+  const max = c.mine.combat.hp;
+  return Math.max(0, day.hp_at + (max - day.hp) * (c.mine.combat.regen_full_ms / max) - now);
 }
 export const stonePerRock = (c: P0Content, s: P0State) => c.mine.picks[s.gear.pick]?.stone ?? 1;
 export function weapon(c: P0Content, s: P0State) { return c.mine.combat.weapons[s.gear.weapon]; }
-/** Card number is the count already broken, never the selected rock's identity. */
-export function rockDrop(c: P0Content, s: P0State, site: MineSite, floor: number, card: number): string | null {
-  return floorSpec(c, site, floor, s.player, s.mine.day!.key).deck[card] ?? null;
+/** q(292): the cards each rock deals (rules.rock_cards, 1 when absent). */
+const rockCards = (c: P0Content) => c.mine.rules.rock_cards ?? 1;
+/** The cards the next rock deals: `broken` is the count already broken here, never the selected rock's identity —
+ * the n-th rock takes the deck's cards n·k … n·k + k − 1 (q(292): k = 2, each a draw from the floor's table). */
+export function rockDrops(c: P0Content, s: P0State, site: MineSite, floor: number, broken: number): (string | null)[] {
+  const k = rockCards(c);
+  return floorSpec(c, site, floor, s.player, s.mine.day!.key).deck.slice(broken * k, broken * k + k);
 }
 export function bagFitsFloor(c: P0Content, s: P0State, site: MineSite, floor: number, key: string): boolean {
   const spec = floorSpec(c, site, floor, s.player, key);
   const dealt = s.mine.day?.floors[floorKey(site.id, floor)]?.broken.length ?? 0;
   if (dealt >= spec.rocks) return true;
-  const extra = spec.deck[dealt], trial: BagHolder = { bag: structuredClone(s.bag), bag_cap: s.bag_cap, skills: s.skills };
+  const k = rockCards(c), trial: BagHolder = { bag: structuredClone(s.bag), bag_cap: s.bag_cap, skills: s.skills };
   const stone = stonePerRock(c, s);
   if (room(c, trial, 'stone') < stone) return false;
   add(c, trial, 'stone', stone);
-  if (extra && room(c, trial, extra) < 1) return false;
+  for (const extra of spec.deck.slice(dealt * k, dealt * k + k)) {
+    if (!extra) continue;
+    if (room(c, trial, extra) < 1) return false;
+    add(c, trial, extra, 1);
+  }
   return true;
 }
 function canPay(c: P0Content, s: P0State, site: MineSite, floor: number, now: number): Refusal | null {
@@ -167,7 +200,8 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
     if (s.mine.day?.at) return { code: 'not_here' };
     const refusal = canPay(c, s, site, n, now); if (refusal) return refusal;
     s.mine.day ??= emptyDay(dayKey(c, s, now), c.mine.combat.hp);
-    s.mine.day.hp = c.mine.combat.hp; s.mine.notice = null;
+    // q(291): in with the HP brought (what refilled since leaving), no longer full again
+    s.mine.day.hp = mineHp(c, s.mine.day, now); delete s.mine.day.hp_at; s.mine.notice = null;
     arrive(c, s, site, n, now, events); return null;
   }
   if (cmd.day !== dayKey(c, s, now)) return { code: 'new_day' };
@@ -213,17 +247,30 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
   const rock = cmd.rock;
   if (!Number.isInteger(rock) || rock < 0 || rock >= spec.rocks) return { code: 'bad_rock' };
   if (state.broken.includes(rock)) return { code: 'rock_gone' };
-  const ready = c.mine.rules.rock_tempo_ms - (now - (day.swing_at ?? -Infinity));
-  if (ready > 0) return { code: 'tempo', detail: { ready_in: ready } };
+  const ready = tempoWait(c, day.swing_at, c.mine.rules.rock_tempo_ms, now);
+  if (ready > 0) return { code: 'tempo', detail: { ready_in: Math.ceil(ready) } };
   if (!bagFitsFloor(c, s, site, at.floor, day.key)) return { code: 'bag_full', detail: { floor: at.floor } };
   if (s.energy.value < c.mine.rock_energy) return { code: 'need_energy', detail: energyDetail(c, s, now, c.mine.rock_energy) };
-  const drop = rockDrop(c, s, site, at.floor, state.broken.length);
+  const drops = rockDrops(c, s, site, at.floor, state.broken.length);
   spendEnergy(c, s, now, c.mine.rock_energy, events, 'mine_rock');
-  giveLoot(c, s, 'stone', stonePerRock(c, s), events); if (drop) giveLoot(c, s, drop, 1, events);
-  state.broken.push(rock); day.swing_at = now;
-  events.push({ kind: 'mine', action: 'rock', mine: site.id, floor: at.floor, rock, drop, cost: c.mine.rock_energy });
+  giveLoot(c, s, 'stone', stonePerRock(c, s), events);
+  for (const drop of drops) if (drop) giveLoot(c, s, drop, 1, events);
+  state.broken.push(rock); day.swing_at = booked(day.swing_at, c.mine.rules.rock_tempo_ms, now);
+  // drop: the first card (the event's field before q(292)); drops: every card this rock dealt
+  events.push({ kind: 'mine', action: 'rock', mine: site.id, floor: at.floor, rock, drop: drops[0] ?? null, drops, cost: c.mine.rock_energy });
   return null;
 }
+
+/** A rock's or a swing's tempo, timed by when the command reaches the server (preview B, 奕星 11-05). A reply held up
+ * on a slow line sends the commands queued behind it back to back (P0Session posts one at a time), and the line's
+ * jitter moves two taps closer than the client spaced them: the strict tempo refused those, and the swing that hit
+ * took no HP. So each accepted one books its slot an interval after the last slot (or now, if later), and one may
+ * come up to `tempo_burst` intervals before its slot; never faster on average (a GCRA). `last` is the slot booked
+ * last (day.swing_at / attack_at): at most `tempo_burst` intervals ahead of now. Milliseconds still to wait, ≤ 0 = go. */
+function tempoWait(c: P0Content, last: number | undefined, interval: number, now: number): number {
+  return (last ?? -Infinity) + interval * (1 - (c.mine.rules.tempo_burst ?? 0)) - now;
+}
+const booked = (last: number | undefined, interval: number, now: number) => Math.max(now, (last ?? -Infinity) + interval);
 
 function giveLoot(c: P0Content, s: P0State, id: string, qty: number, events: P0Event[], from?: number): void {
   const n = Math.min(qty, room(c, s, id));
@@ -255,12 +302,15 @@ function attack(c: P0Content, s: P0State, site: MineSite, saved: MineB1FloorStat
   const raw = cmd.targets ?? [];
   if (!Array.isArray(raw) || !raw.every(valid) || new Set(raw).size !== raw.length
     || (cmd.hurt_by !== undefined && !valid(cmd.hurt_by))) return { code: 'bad_target' };
-  const targets = raw.slice(0, c.mine.rules.max_targets), hurt = cmd.hurt_by;
-  if (!targets.length && hurt === undefined) return { code: 'bad_target' };
-  if (targets.some(i => saved.mobs[i] <= 0) || (hurt !== undefined && saved.mobs[hurt] <= 0)) return { code: 'mob_gone' };
-  const wait = 1000 / w.speed * c.mine.rules.attack_tempo_factor - (now - (day.attack_at ?? -Infinity));
+  if (!raw.length && cmd.hurt_by === undefined) return { code: 'bad_target' };
+  // One already down here is passed over, not the swing (preview B: on a slow line the client still shows a monster
+  // its last swing killed, and the one beside it took no HP); down every one it names, the swing is mob_gone.
+  const targets = raw.filter(i => saved.mobs[i] > 0).slice(0, c.mine.rules.max_targets);
+  const hurt = cmd.hurt_by !== undefined && saved.mobs[cmd.hurt_by] > 0 ? cmd.hurt_by : undefined;
+  if (!targets.length && hurt === undefined) return { code: 'mob_gone' };
+  const interval = 1000 / w.speed * c.mine.rules.attack_tempo_factor, wait = tempoWait(c, day.attack_at, interval, now);
   if (targets.length && wait > 0) return { code: 'tempo', detail: { ready_in: Math.ceil(wait) } };
-  if (targets.length) day.attack_at = now;
+  if (targets.length) day.attack_at = booked(day.attack_at, interval, now);
   for (const i of targets) {
     const kind = spec.mobs[i], def = c.mine.monsters[kind];
     let damage = w.attack;
@@ -302,7 +352,8 @@ function attack(c: P0Content, s: P0State, site: MineSite, saved: MineB1FloorStat
         const n = Math.min(count(s.bag, id), Math.floor(qty * c.mine.combat.ko_lose));
         if (n) { take(s.bag, id, n); lost.push([id, n]); events.push({ kind: 'item', id, delta: -n }); }
       }
-      restoreBosses(c, s); day.at = null; day.hp = c.mine.combat.hp; day.picked = [];
+      // q(291): a knock-out leaves ko_hp (30), refilling outside from now — not full again
+      restoreBosses(c, s); day.at = null; day.hp = c.mine.combat.ko_hp; day.hp_at = now; day.picked = [];
       s.mine.notice = { kind: 'ko', at: now, floor: at.floor, lost };
       events.push({ kind: 'mine_ko', floor: at.floor, lost });
     }
@@ -355,9 +406,9 @@ export function mineView(c: P0Content, s: P0State, now: number) {
       mine: site.id, type: site.type, name: site.name, max: cap(site), floor: at.floor, hp: day.hp, day: day.key,
       potion_ready_in: potionReadyIn(c, day, now),   // 355 G: what #636's set_potion_cooldown reads
       stations: stops.map(floor => ({ floor, paid: day.floors[floorKey(site.id, floor)]?.paid ?? false })),
-      floor_state: { floor: at.floor, paid: state.paid, cleared, rocks: spec.rocks, left: spec.rocks - state.broken.length,
+      floor_state: { floor: at.floor, paid: state.paid, cleared, rocks: spec.rocks, left: Math.max(0, spec.rocks - state.broken.length),
         broken: Array.from({ length: spec.rocks }, (_, i) => state.broken.includes(i)), lit: state.lit,
-        deck: state.lit ? deckCounts(spec.deck.slice(state.broken.length)) : null,
+        deck: state.lit ? deckCounts(spec.deck.slice(state.broken.length * rockCards(c))) : null,
         ground: state.ground.map(g => ({ ...g })),
         bag_ok: bagFitsFloor(c, s, site, at.floor, day.key), station: stops.includes(at.floor), guard: spec.guard,
         mobs: spec.mobs.map((kind, i) => ({ kind, hp: state.mobs[i], max: maxHp(c, kind, spec.hpMult), elite: !!c.mine.monsters[kind].elite,
@@ -368,7 +419,9 @@ export function mineView(c: P0Content, s: P0State, now: number) {
         fee: day.floors[floorKey(site.id, next)]?.paid ? 0 : c.mine.floor_energy, open: cleared, locked: next > cap(site) ? 'not_open' : null },
     };
   }
+  // hp / hp_full_in (q(291)): the player's HP wherever they are, and out of the mine the ms until it is full (0 full)
   return { floor_energy: c.mine.floor_energy, rock_energy: c.mine.rock_energy, hp_max: c.mine.combat.hp,
+    hp: mineHp(c, day ?? null, now), hp_full_in: mineHpFullIn(c, day ?? null, now),
     rank, weapon: { id: s.gear.weapon, ...weapon(c, s) }, notice: s.mine.notice, at: here, records, paid_today: paidToday(s) };
 }
 

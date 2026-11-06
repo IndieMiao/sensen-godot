@@ -13,6 +13,7 @@ extends PanelContainer
 ## `Shanghai`, as q(270)).
 
 signal action_pressed
+signal unavailable_pressed(reason: String)   # the key greyed with its reason (LOCK-10), tapped
 signal dismissed
 signal link_pressed(index: int)
 
@@ -69,12 +70,14 @@ func _init(data_: Dictionary = {}) -> void:
 	if not needs.is_empty():
 		var req := HBoxContainer.new()
 		req.add_theme_constant_override(&"separation", int(UiTokens.SPACE_ROW))
-		var bring := UiKit.label("Bring", UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
-		bring.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		req.add_child(bring)
+		if str(data.get("needs_label", "Bring")) == "": req.alignment = BoxContainer.ALIGNMENT_CENTER
+		if str(data.get("needs_label", "Bring")) != "":
+			var bring := UiKit.label(str(data.get("needs_label", "Bring")), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
+			bring.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			req.add_child(bring)
 		var tiles := []
 		for n in needs:
-			tiles.append(UiNeedTile.new(str(n.get("name", "")), int(n.get("have", 0)), int(n.get("need", 1)), UiNeedTile.Size.M, n.get("icon", null)))
+			tiles.append(UiNeedTile.new(str(n.get("name", "")), int(n.get("have", 0)), int(n.get("need", 1)), UiNeedTile.Size.M, n.get("icon", null), bool(n.get("counting", false))))
 		req.add_child(UiNeedTile.group(tiles))
 		col.add_child(req)
 	for row in [["Reward", "reward"], ["Deliver to", "deliver_to"]]:
@@ -104,6 +107,12 @@ func _init(data_: Dictionary = {}) -> void:
 		else:
 			h.add_child(v)
 		col.add_child(h)
+	if data.get("close_only", false):
+		var close := UiDismissButton.new("Close")
+		close.pressed.connect(func(): dismissed.emit())
+		col.add_child(close)
+		minimum_size_changed.connect(func(): _fit_height.call_deferred())
+		return
 	var links: Array = data.get("links", [])
 	for i in links.size():
 		var link := UiNavButton.new(str(links[i]))
@@ -115,6 +124,7 @@ func _init(data_: Dictionary = {}) -> void:
 	_action.sends = bool(data.get("sends", false))   # Accept / Deliver to the server (§10.7.1 Offline)
 	_action.fit_text = true
 	_action.activated.connect(func(): action_pressed.emit())
+	_action.unavailable_pressed.connect(func(r: String): unavailable_pressed.emit(r))
 	col.add_child(_action)
 	var later := UiDismissButton.new("Not now")
 	later.pressed.connect(func(): dismissed.emit())

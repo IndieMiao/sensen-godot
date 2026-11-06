@@ -169,14 +169,18 @@ describe('q(272) local requests', () => {
     expect(ids).toHaveLength(1 + c.requests.local!.per_day);
   });
 
-  it('track ≤ 3 counts them with the boards and the residents', () => {
-    let s = player();
-    settleBoards(c, s, T);
-    settleLocals(c, s, T);
-    for (const { req, place } of locals(s)) s = step(s, { type: 'accept', request: req.id, ...at(place) });
-    expect(tracked(c, s)).toBe(3);
-    const board = s.markets[HAYWARD].find(sl => sl.req)!.req!;
-    expect(run(s, { type: 'accept', request: board.id, ...at(`${HAYWARD}~market0`) })).toMatchObject({ ok: false, code: 'track_limit' });
+  it('track ≤ track_max (3 here) counts them with the boards and the residents', () => {
+    const was = c.requests.track_max;
+    c.requests.track_max = 3;   // the mechanism at a small number: the content's is 25 (A 包反馈 3)
+    try {
+      let s = player();
+      settleBoards(c, s, T);
+      settleLocals(c, s, T);
+      for (const { req, place } of locals(s)) s = step(s, { type: 'accept', request: req.id, ...at(place) });
+      expect(tracked(c, s)).toBe(3);
+      const board = s.markets[HAYWARD].find(sl => sl.req)!.req!;
+      expect(run(s, { type: 'accept', request: board.id, ...at(`${HAYWARD}~market0`) })).toMatchObject({ ok: false, code: 'track_limit' });
+    } finally { c.requests.track_max = was; }
   });
 
   it('the map: a ! on the keeper for one offered while in the city, none from home; a ✓ for one ready wherever, today\'s 6 or not', () => {

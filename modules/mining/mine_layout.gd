@@ -13,16 +13,43 @@ const ROCK_BOUNDS := Rect2(1.4, -6.05, 7.0, 4.5)
 const LAYOUT_ATTEMPTS := 16
 const POSITION_ATTEMPTS := 80
 const CACHE_LIMIT := 32
-const FALLBACK_POSITIONS := [Vector3(2.0, 0, -2.15), Vector3(4.5, 0, -2.4),
+const LEGACY_POSITIONS := [Vector3(2.0, 0, -2.15), Vector3(4.5, 0, -2.4),
 	Vector3(7.0, 0, -2.0), Vector3(2.5, 0, -4.55), Vector3(4.8, 0, -5.6), Vector3(7.35, 0, -4.5)]
+## q(292), #775 6659631244: N1–2, S1–2, W1–2; remove the cropped right column, leaving that side for monsters.
+## Counts and rock indices still come from the server; no candidate names or combinations cross the wire.
+const FALLBACK_POSITIONS := [Vector3(2.9, 0, -1.9), Vector3(6.8, 0, -1.9), Vector3(3.5, 0, -6.6), Vector3(6.0, 0, -6.6),
+	Vector3(1.9, 0, -2.6), Vector3(1.9, 0, -4.6)]
+const ROCK_SIDES := [0, 0, 2, 2, 3, 3]
+const ROCK_SCALE := 1.3
+const ROCK_RADIUS := 0.85
 
 static var _layouts: Dictionary = {}
 
-## The P0 mine's rock spots (355 b1, contract-efg §4: the server says how many, the client places them): `count` of the
-## six fixed spots — reachable and framed on every chamber — in an order drawn from `key` (mine, floor and day), so a
-## floor keeps its look all day and the next day's is new. Rock i of the view stands at the i-th.
+## q(292): shuffle by mine:floor:day, then take the first valid combination in that order. Looking ahead avoids a
+## greedy first pair stranding the third rock. Never reorder after breaking one: view rock i stays position i.
+## A server before #772 (including rollback) gives 4–6 rocks: keep its old indexed layout and size.
 static func p0_rocks(count: int, key: String) -> Array:
-	var order := range(FALLBACK_POSITIONS.size())
+	if count <= 0: return []
+	if count > 3:
+		return _shuffled(LEGACY_POSITIONS.size(), key).slice(0, mini(count, LEGACY_POSITIONS.size())).map(func(i): return LEGACY_POSITIONS[i])
+	var order := _shuffled(FALLBACK_POSITIONS.size(), key)
+	if count == 1: return [FALLBACK_POSITIONS[order[0]]]
+	var spacing := 4.5 if count == 2 else 3.5
+	for a in order.size():
+		for b in range(a + 1, order.size()):
+			if not _separate(order[a], order[b], spacing): continue
+			if count == 2: return [FALLBACK_POSITIONS[order[a]], FALLBACK_POSITIONS[order[b]]]
+			for c in range(b + 1, order.size()):
+				if _separate(order[a], order[c], spacing) and _separate(order[b], order[c], spacing):
+					return [FALLBACK_POSITIONS[order[a]], FALLBACK_POSITIONS[order[b]], FALLBACK_POSITIONS[order[c]]]
+	push_error("Mine rock candidates have no valid separated combination")
+	return []
+
+static func _separate(a: int, b: int, spacing: float) -> bool:
+	return ROCK_SIDES[a] != ROCK_SIDES[b] and FALLBACK_POSITIONS[a].distance_to(FALLBACK_POSITIONS[b]) >= spacing
+
+static func _shuffled(count: int, key: String) -> Array:
+	var order := range(count)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = key.sha256_text().substr(0, 15).hex_to_int()
 	for i in range(order.size() - 1, 0, -1):
@@ -30,7 +57,7 @@ static func p0_rocks(count: int, key: String) -> Array:
 		var t: int = order[i]
 		order[i] = order[j]
 		order[j] = t
-	return order.slice(0, clampi(count, 0, order.size())).map(func(i): return FALLBACK_POSITIONS[i])
+	return order
 
 static func data() -> Dictionary:
 	return JSON.parse_string(FileAccess.get_file_as_string(DATA_PATH))
@@ -65,7 +92,7 @@ static func _generate_rocks(rng: RandomNumberGenerator, sources: Array) -> Array
 		if result.size() == sources.size() and _layout_is_reachable(result): return result
 	var fallback: Array = []
 	for index in sources.size():
-		fallback.append({"id": str(sources[index].id), "position": FALLBACK_POSITIONS[index]})
+		fallback.append({"id": str(sources[index].id), "position": LEGACY_POSITIONS[index]})
 	return fallback
 
 static func _position_is_clear(point: Vector3, nodes: Array) -> bool:
@@ -102,7 +129,7 @@ static func _layout_is_reachable(nodes: Array) -> bool:
 static func navigation(floor_number: int, broken: Array, run: int = 0, farm_id: String = "") -> FarmBlueprint:
 	return _navigation(rocks(floor_number, run, farm_id), broken)
 
-static func _navigation(nodes: Array, broken: Array) -> FarmBlueprint:
+static func _navigation(nodes: Array, broken: Array, rock_radius := 0.65) -> FarmBlueprint:
 	var bp := FarmBlueprint.new()
 	bp.grid = SIZE
 	bp.cell_m = 0.5
@@ -114,7 +141,7 @@ static func _navigation(nodes: Array, broken: Array) -> FarmBlueprint:
 			var point := bp.cell_to_world(Vector2i(x, y))
 			var blocked := x < 1 or x > 18 or y < 1 or y > 15
 			for rock in nodes:
-				if not broken.has(rock.id) and point.distance_to(rock.position) < 0.65: blocked = true
+				if not broken.has(rock.id) and point.distance_to(rock.position) < rock_radius: blocked = true
 			if point.distance_to(ELEVATOR) < 0.85: blocked = true
 			row += "0" if blocked else "1"
 		bp.masks.walkable.append(row)

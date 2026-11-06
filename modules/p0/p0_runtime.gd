@@ -166,7 +166,8 @@ func _init() -> void:
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
 	ui.action_pressed.connect(_on_action)
-	ui.command.connect(func(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
+	ui.command.connect(func(cmd):
+		if P0Logic.GearLogic.command_allowed(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
 	# Observation log (S7): only the commands the farm's hold-to-repeat sends are holds; every press is a tap.
 	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
@@ -461,6 +462,7 @@ func _watch_day_pass(v: Dictionary) -> void:
 	ui.toast_in_city("Day Pass ended · Re-entry\n%s" % P0Travel.fare_text(P0Travel.fare(v, here)), here)
 
 func _on_action(cmd: Dictionary) -> void:
+	if not P0Logic.GearLogic.command_allowed(cmd): return
 	if str(cmd.get("type", "")) == "energy_card":
 		var verb = _call("p0_energy_verb", [])
 		energy_card(int(ui.fab_state().get("need", 0)), str(verb) if verb != null else str(ui.fab_state().get("verb", "")))
@@ -663,6 +665,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		at = ui.inbox_float_at()
 		ui.inbox_claim_done()
 	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
+	var dig_reward := P0Logic.GearLogic.first_dig_reward(v, events)
+	if dig_reward != "": floats.append({kind = "first_dig", key = "first_dig", text = dig_reward})
 	if not guide_feedback.fish.is_empty(): floats.append(guide_feedback.fish)
 	# q(218) A Fresh Radish (不知火舞 on 344, 812e77be): handed in on the resident's open bar, the reply floats one group over
 	# the bar — `+20 coins`, `+5 Friendship`, `New recipe · Fresh Fish Soup` — and the resident says the thanks line after.
@@ -1149,6 +1153,16 @@ static func wrong_city_line(view: Dictionary, request: String, city: String) -> 
 	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")) == "mine_drink":
+		if code == "potion_cooldown":
+			ui.set_potion_cooldown(float(detail.get("ready_in", -1)))
+			return
+		if code == "hp_full":
+			ui.toast("HP full")
+			return
+		if code == "no_potion":
+			ui.toast("Buy at Homestead Stall")
+			return
 	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
 		ui.blackjack_refused(code, detail)
 		return
@@ -1166,6 +1180,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		if not r.is_empty():
 			ui.toast_error("%s · %s" % [str(r.title), str(r.deliver)])
 			return
+	if code == "track_limit":   # A 包 spec ③: tracking 25 already (a key greyed too late, another device)
+		ui.toast_error(P0Logic.TRACK_FULL_TOAST)
+		return
 	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
 		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
 		return
@@ -1324,7 +1341,11 @@ func _net_failed(msg: String, cmd := {}) -> void:
 	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	_end_resume()
 	if _launch_s >= 0.0 and session.view.is_empty():
-		_launch_failed()   # nothing to browse yet: Can't connect takes the screen, no banner (SYS-LOADING-FAIL)
+		# nothing to browse yet. A read given up (its 8 s) or refused at once is not Can't connect before LAUNCH_FAIL_S
+		# (q(290); 李元芳 on 0.2.25: it took the screen at 8 s, the very time the slow card was due): the read goes again
+		# LAUNCH_RETRY_S on, the slow card comes at 8 s, Can't connect at 20 (SYS-LOADING-FAIL, no banner)
+		if _launch_s < LAUNCH_FAIL_S and ui.screen_kind() == P0SysScreen.Kind.LAUNCH: _launch_retry_left = LAUNCH_RETRY_S
+		else: _launch_failed()
 		return
 	if _arrive_s >= 0.0:
 		_arrival_failed()   # getting there failed: Couldn't get there, over the Offline banner (q(78))
@@ -1360,6 +1381,8 @@ func _probe() -> void:
 # ---------------------------------------------------------------- whole-screen system states (SGODOT-233)
 const LAUNCH_SLOW_S := 8.0    # SYS-LOADING-2: `Taking longer than usual…`
 const LAUNCH_FAIL_S := 20.0   # no answer by then: SYS-LOADING-FAIL `Can't connect` · Retry
+const LAUNCH_RETRY_S := 1.0   # a failed launch read goes again this soon, until LAUNCH_FAIL_S
+var _launch_retry_left := -1.0
 const MAINT_CHECK_S := 60.0   # SYS-MAINT checks again on its own (q(74))
 var _launch_s := -1.0         # how long the launch cover has been up; -1 when it is not
 var _blocked := ""            # "maintenance" / "update_required" while the server turns every request away
@@ -1367,16 +1390,18 @@ var _block_url := ""
 var _maint_left := 0.0
 var _resume_ms := -1          # a state read on return to the foreground is in flight since then; -1 none
 ## Getting to a place (q(78)): the scene cover AppRouter showed for a P0 world stays until that world's first read
-## answers. {path, place, shot, t0} of the cover; `_arrive_s` counts while its read is out (-1 none).
+## answers. {path, place, icon, progress, t0} of the cover; `_arrive_s` counts while its read is out (-1 none).
 const ARRIVE_FAIL_S := 20.0
 var _arrive := {}
 var _arrive_s := -1.0
 
 ## The first session's launch cover (SYS-LOADING, from p0_boot): the wordmark over the farm backdrop until the first
-## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer —
-## or a failed read with nothing yet to browse — `Can't connect` · Retry, checked again every PROBE_S.
+## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer
+## (a failed read before then goes again, LAUNCH_RETRY_S on: q(290)) — `Can't connect` · Retry, checked again every
+## PROBE_S.
 func cover_launch() -> void:
 	_launch_s = 0.0
+	_launch_retry_left = -1.0
 	ui.show_screen(P0SysScreen.Kind.LAUNCH)
 
 func _tick_screens(dt: float) -> void:
@@ -1385,6 +1410,11 @@ func _tick_screens(dt: float) -> void:
 		match ui.screen_kind():
 			P0SysScreen.Kind.LAUNCH:
 				if _launch_s >= LAUNCH_SLOW_S and not ui.screen().slow: ui.screen().taking_longer()
+				if _launch_retry_left >= 0.0:
+					_launch_retry_left -= dt
+					if _launch_retry_left <= 0.0 and not session.busy:
+						_launch_retry_left = -1.0
+						session.refresh()
 				if _launch_s >= LAUNCH_FAIL_S and session.view.is_empty(): _launch_failed()
 			P0SysScreen.Kind.FAIL:
 				_probe_left -= dt
@@ -1407,6 +1437,7 @@ func _tick_screens(dt: float) -> void:
 		ui.show_screen(P0SysScreen.Kind.SCENE, {place = ui.place_text(), shot = P0SysScreen.blurred_screen(get_viewport())})
 
 func _launch_failed() -> void:
+	_launch_retry_left = -1.0
 	_probe_left = PROBE_S
 	ui.show_screen(P0SysScreen.Kind.FAIL)
 
@@ -1699,10 +1730,14 @@ func _dev_screen(which: String) -> void:
 			var at := Time.get_datetime_string_from_unix_time(int(Time.get_unix_time_from_system()) + 5400) + "Z"
 			_on_blocked("maintenance", {"back_at": at})
 		"update": _on_blocked("update_required", {"url": "https://example.test/p0demo.apk"})
-		"scene", "placefail":
-			var layer := _scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": P0City.beginner_pond()}) as P0LoadingLayer
+		"scene", "sceneslow", "placefail":   # the town map: a pond at 40 %, a mine slow at 70 % (L123v2 L1 / L2 / L3)
+			var slow := which == "sceneslow"
+			var path := "res://scenes/p0/p0_mine.tscn" if slow else "res://scenes/p0/p0_pond.tscn"
+			var layer := _scene_overlay(path, {"mine": "wd-dev-vein", "floor": 3} if slow else {"pond_id": P0City.beginner_pond()}) as P0LoadingLayer
 			add_child(layer)
 			layer.screen.modulate.a = 1.0
+			layer.screen.progress = 0.7 if slow else 0.4
+			if slow: layer.screen.taking_longer()
 			if which == "placefail": layer.failed()
 
 ## AppRouter.open_instance into a P0 world: SYS-LOADING-SCENE over the screen being left; anything else keeps
@@ -1710,9 +1745,9 @@ func _dev_screen(which: String) -> void:
 func _scene_overlay(path: String, args: Dictionary) -> CanvasLayer:
 	var place := P0LoadingLayer.destination(path, args)
 	if place == "": return null
-	var shot := P0SysScreen.blurred_screen(get_viewport())
-	_arrive = {path = path, place = place, shot = shot, t0 = Time.get_ticks_msec()}
-	return P0LoadingLayer.new(place, shot, path, args)
+	# The town map stands in for the screen being left (the user 11-06): no read back of the screen from the GPU.
+	_arrive = {path = path, place = place, icon = P0LoadingLayer.icon_for(path, args), progress = 1.0, t0 = Time.get_ticks_msec()}
+	return P0LoadingLayer.new(place, null, path, args)
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
@@ -2117,7 +2152,7 @@ func _dev_shot(dt: float) -> void:
 					world.actor.teleport(m.global_position)
 					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
-			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
+			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|sceneslow|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
 				var wb := ui.workbench()
 				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()

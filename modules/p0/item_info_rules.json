@@ -374,7 +374,8 @@
   },
   "bait/bag": {
     "facts": [
-      "Faster bites"
+      "{bait_fact}",
+      "{bait_slower}"
     ],
     "buttons": [
       {
@@ -421,6 +422,26 @@
           }
         ]
       }
+    ]
+  },
+  "weapon/gear": {
+    "facts": ["{weapon_effect}", "{weapon_source}", "{weapon_tier}"],
+    "buttons": [
+      {"id": "equipped", "label": "Equipped", "kind": "unavailable", "when": "owned & equipped"},
+      {"id": "equip", "label": "Equip", "kind": "primary", "when": "owned & !equipped"},
+      {"id": "weapon_gate", "label": "{weapon_gate}", "kind": "unavailable", "when": "!owned & craftable_weapon"}
+    ]
+  },
+  "weapon/workbench": {
+    "facts": ["{weapon_effect}", "{weapon_tier}"],
+    "buttons": []
+  },
+  "potion/bag": {
+    "facts": ["{potion_effect}"],
+    "lock": true,
+    "buttons": [
+      {"id": "pin", "label": "{pin_verb}", "kind": "secondary", "unless": [{"when": "!pinned & bar_full", "label": "Bar full · Unpin one first"}]},
+      {"id": "store", "label": "Store", "kind": "secondary", "when": "can_store", "unless": [{"when": "!at_home", "label": "At home only"}]}
     ]
   },
   "rod/gear": {

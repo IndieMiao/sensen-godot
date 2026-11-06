@@ -333,6 +333,36 @@ func test_a_quarrys_rows_have_no_main_ore() -> void:
 		["You", "Best here F7"]])
 	assert_str(P0MaterialLogic.wild_mine_floors(_site("quarry", QUARRY))).is_equal("Floors 1–26")
 
+## The viewport's best_floor is from the box read the session made once; down to F2 since, the view's record says so
+## (李元芳 on preview B: Jackdaw's card still read Best here F1). The higher of the two; a record under it changes nothing.
+func test_the_best_floor_follows_the_views_record() -> void:
+	var v := _view()
+	v["mine"] = {"records": {"wd-254-114": {"deepest": 2, "guards": []}}}
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY, 1)).back()).is_equal(["You", "Best here F2"])
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY)).back()).is_equal(["You", "Best here F2"])   # read before the first visit
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY, 7)).back()).is_equal(["You", "Best here F7"])
+	v["mine"] = {"records": {"wd-1-1": {"deepest": 9}}}   # another mine's record
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY, 1)).back()).is_equal(["You", "Best here F1"])
+
+## q(291) (不知火舞 421 3f328435, H1 / H2): out of the mine and not full, `HP` under `You` — `40% · Full in 36m`; none when
+## full, none in the mine, none from a server before q(291) (no hp_full_in). The same on the card at the mouth and away.
+func test_hp_under_you_while_it_refills() -> void:
+	var v := _view()
+	v.mine.merge({"hp": 40, "hp_max": 100, "hp_full_in": 36 * 60000})
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY, 7)).slice(-2)).is_equal([
+		["You", "Best here F7"], ["HP", "40% · Full in 36m"]])
+	v.mine.merge({"hp": 30, "hp_full_in": 42 * 60000}, true)   # after a knock-out
+	assert_str(P0MaterialLogic.mine_hp_line(v)).is_equal("30% · Full in 42m")
+	v.mine.merge({"hp": 99, "hp_full_in": 36000}, true)   # the last point: a minute, not 0m
+	assert_str(P0MaterialLogic.mine_hp_line(v)).is_equal("99% · Full in 1m")
+	v.mine.merge({"hp": 100, "hp_full_in": 0}, true)
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY, 7)).back()).is_equal(["You", "Best here F7"])
+	v.mine.merge({"hp": 56, "hp_full_in": 0, "at": {"floor": 3, "hp": 56}}, true)   # in the mine: its own bar
+	assert_str(P0MaterialLogic.mine_hp_line(v)).is_equal("")
+	var old := _view()   # a server before q(291)
+	old.mine.merge({"hp_max": 100})
+	assert_str(P0MaterialLogic.mine_hp_line(old)).is_equal("")
+
 ## A grey pin (a mine type not open yet, E4 329:182456) has no rows: the card says Not open yet itself.
 func test_a_mine_not_open_yet_has_no_rows() -> void:
 	var grey := _site("geode", {"floors": 60, "main": "gem", "main_from": 10, "side": null, "open_to": 0}, 0, false)

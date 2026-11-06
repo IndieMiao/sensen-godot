@@ -1,0 +1,18 @@
+{
+  "_note": "Code Slime body, recolored guards share it. Actual HP/damage/tier/loot come from the server view/content.",
+  "radius": 0.85,
+  "hit_point": [0, 0.9, 0],
+  "durations": {"idle": 1.1, "move": 0.6, "windup": 0.9, "attack": 0.5, "recover": 1.2, "hit": 0.18, "die": 0.75},
+  "hit_at": 0.35,
+  "contact_range": 1.22,
+  "move": {"speed": 1.4, "aggro": 8.0, "reach": 2.6, "dash_speed": 5.0},
+  "stun_resistant": true,
+  "knockback_resistance": 0.8,
+  "visual": {
+    "variants": {
+      "boss_slime_king": {"color": "92c9a1", "ornament_color": "f3cf73", "ornament": "res://assets/monsters/slime_king/crown.glb"},
+      "boss_slime_king_iron": {"color": "7c9bab", "ornament_color": "b9c8cb", "ornament": "res://assets/monsters/slime_king/ironback_plates.glb"},
+      "boss_slime_king_quartz": {"color": "b3a1d1", "ornament_color": "ecdaff", "ornament": "res://assets/monsters/slime_king/quartz_cluster.glb"}
+    }
+  }
+}

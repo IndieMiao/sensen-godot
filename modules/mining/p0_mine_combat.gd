@@ -63,7 +63,7 @@ func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 			spec.hp = int(mobs[i].get("max", mobs[i].get("hp", 1)))
 			var hp := int(mobs[i].get("hp", spec.hp))
 			if hp <= 0: continue
-			var point := _spawn_point(player_mover, SPAWNS[i % SPAWNS.size()])
+			var point := _spawn_point(player_mover, SPAWNS[i % SPAWNS.size()])   # its own spot: no floor has more monsters than spots (test_p0_mine_deep)
 			var movement := PlayerMover.new(player_mover.bp, player_mover.grid)
 			movement.position = point
 			movement.speed = float(spec.move_speed)

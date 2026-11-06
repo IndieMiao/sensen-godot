@@ -162,6 +162,9 @@ func on_cast(ev: Dictionary) -> void:
 	_hook_until = _bite_at + hook_ms
 	_rarity = int(ev.get("rarity", 1))
 	_breaks = ev.get("breaks", null) != null
+	if rt.ui != null and bool(rt.ui.get("dev_legendary")):   # test builds' Legend toggle (q(282) recordings): the reel only
+		_rarity = 4
+		_breaks = false
 	_sure = cast is Dictionary and bool(cast.get("sure", false)) and not _breaks
 	phase = "waiting"
 	_gauge.model = {}
@@ -175,12 +178,25 @@ func on_refused() -> void:
 	_show_notice("Cast when you are ready.")
 	_refresh_button()
 
-func _p0_hook() -> void:
-	var tier: Dictionary = (FishingModel.data().tiers[str(_rarity)] as Dictionary).duplicate()
-	var fishing: Dictionary = rt.session.current().get("fishing", {})
+## B (q(282), SGODOT-389; 用户「传奇鱼 AB」, 奕星's assessment legendary-fish-difficulty-2026-11-03): a Spinner Lure on the hook slows a Rare or Legendary fish on the line (×0.8: Legendary about 69 %, Rare with the
+## Carbon Rod 93 %; the simulation in the PR).
+const LURE := "bait_lure"
+const LURE_SLOW := 0.8
+
+## The reel's tier for a bite of `rarity`: the content's (fishing.json; its Legendary eased by q(282)'s A′), the lure's
+## slowing, then the rod (Reed
+## +3 / Carbon +5 points of band, Carbon −10 % loss, §6.5.2) and the sure bite (q(219)). `fishing`: view.fishing.
+static func reel_tier(rarity: int, fishing: Dictionary, sure: bool) -> Dictionary:
+	var tier: Dictionary = (FishingModel.data().tiers[str(rarity)] as Dictionary).duplicate()
+	var cast = fishing.get("cast", null)
+	if rarity >= 3 and cast is Dictionary and str(cast.get("bait", "")) == LURE: tier["fish_speed"] = float(tier.fish_speed) * LURE_SLOW
 	tier["bar_size"] = minf(0.45, float(tier.bar_size) + float(fishing.get("band_bonus", 0.0)))   # Reed +3 / Carbon +5 points (§6.5.2)
 	tier["loss"] = maxf(0.04, float(tier.loss) * float(fishing.get("loss_mult", 1.0)))   # Carbon Rod −10%, floor 4 % / s
-	tier["sure"] = _sure   # q(219): progress never drops to zero, no 30 s timeout
+	tier["sure"] = sure   # q(219): progress never drops to zero, no 30 s timeout
+	return tier
+
+func _p0_hook() -> void:
+	var tier := reel_tier(_rarity, rt.session.current().get("fishing", {}), _sure)
 	set_meta("tier", tier)
 	model = FishingModel.initial(randi())
 	inputs = ""

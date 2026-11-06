@@ -326,3 +326,13 @@ func test_a_fogged_citys_places_are_silhouettes_until_explored() -> void:
 	assert_bool(m._travel_first(tokyo_market)).is_true()   # still no pass here: a tap opens its card
 	rt.ui.close_modal()
 	rt.session.view = saved
+
+## 11-08's cathedral is an outpost of role church (no keeper): 0.3.0 already gives its pin the church icon, not the
+## tackle shop's (哪吒: PIN_ART fell back to tackle), so the server can add it without a forced update.
+func test_a_church_outpost_wears_the_church_icon() -> void:
+	var o := {"id": "gn-test~church0", "role": "church", "name": "Grace Cathedral", "category": "Cathedral", "lat": 37.79, "lng": -122.41}
+	assert_str(str(P0Outposts.place_entry(o).art_path)).is_equal("res://assets/map/poi/icons/religious-christian_3_nocross.webp")
+	assert_bool(ResourceLoader.exists(str(P0Outposts.place_entry(o).art_path))).is_true()
+	assert_object(CityMapData.art_texture(P0Outposts.place_entry(o))).is_not_null()   # the card draws it
+	assert_str(str(P0Outposts.place_entry({"id": "x", "role": "tackle", "name": "T", "category": "", "lat": 0.0, "lng": 0.0}).art_path)) \
+		.is_equal(P0Outposts.PIN_ART.tackle)

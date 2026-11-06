@@ -224,7 +224,7 @@ func _build_floor(n: int) -> void:
 	var ore := P0MaterialLogic.rock_ore(v)
 	for i in _positions.size():
 		if broken[i]: continue
-		var rock := Art.rock(_positions[i], i, Art.variant_of(n), ore, floor_seed)
+		var rock := Art.rock(_positions[i], i, Art.variant_of(n), ore, floor_seed, Layout.ROCK_SCALE if _positions.size() <= 3 else 1.0)
 		rock.name = "Rock%d" % i
 		objects.add_child(rock)
 		_rocks[i] = rock
@@ -251,7 +251,7 @@ func _rebuild_nav(broken: Array) -> void:
 	for i in _positions.size():
 		nodes.append({"id": str(i), "position": _positions[i]})
 		if broken[i]: gone.append(str(i))
-	bp = Layout._navigation(nodes, gone)
+	bp = Layout._navigation(nodes, gone, Layout.ROCK_RADIUS if _positions.size() <= 3 else 0.65)
 	grid = BlueprintGrid.new(bp)
 	if actor and actor.mover:
 		var at := actor.mover.position
@@ -392,8 +392,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 func _fight(v: Dictionary, dt: float) -> void:
 	if combat == null: return
 	combat.sync_p0(v, floor_n, actor.mover)
-	# Knocked out: the fight holds still until the player is out (the server has already refilled HP, so the bar keeps 0 %
-	# for the moment instead of jumping to 100 % — 不知火舞 on 288 78d0f863)
+	# Knocked out: the fight holds still until the player is out (the server has the player out already, with 30 HP since
+	# q(291), so the bar keeps 0 % for the moment instead of jumping — 不知火舞 on 288 78d0f863)
 	combat.step(dt, actor.mover, rt.ui.has_modal() or _ko)
 	_slash_t += dt
 	_hold_sword(str(v.get("mine", {}).get("weapon", {}).get("id", "")))

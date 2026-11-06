@@ -4,6 +4,7 @@ extends GdUnitTestSuite
 ## after another, the pot card's ×N and servings tag, the filter row's six chips (B7 ⑨).
 
 const FARMHOUSE := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
+const P0WaitPot := preload("res://scenes/p0/kitchen/p0_wait_pot.gd")
 
 var rt: P0Runtime
 var sent: Array = []
@@ -11,6 +12,9 @@ var sent: Array = []
 func before_test() -> void:
 	sent = []
 	rt = auto_free(P0Runtime.new())
+	# their transport goes in after the runtime's first read: written for its failing a few frames on (a request
+	# each), not in its first frame as on the line (421) — the read the room's attach queues would land on it
+	rt.session.use_line = false
 	add_child(rt)
 	await get_tree().process_frame
 	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, cmd: Dictionary): sent.append(cmd)
@@ -270,6 +274,11 @@ func test_the_big_pots_lid_follows_the_cook() -> void:
 	v.cooking.stoves = [{"id": 7, "dish": "dish_grilled_crucian", "ms": 60000, "elapsed": 1000, "ready_in": 59000, "heats": []}, {}, {}]
 	_set_view(v)
 	k.on_pot(v.cooking.stoves[0])
+	# 419 (不知火舞 bd102c55): watching, the pot shows in the middle — the stove's hidden, its steam waiting; walked away
+	# from the watch, the stove's pot and its steam come back, the lid as below
+	assert_bool(pot.visible).override_failure_message("one pot on the screen: the layer's").is_false()
+	k.stop_watching()
+	_land(k)   # the layer back on the stove now, not on the clock (亚瑟: its 0.25 s raced the waits below)
 	frame.call()
 	k.stage.call("_process", 0.0)
 	var steam: CPUParticles3D = k.stage.get("_steam")
@@ -379,3 +388,33 @@ func test_a_common_cook_asks_nothing() -> void:
 	assert_object(k.confirm_sheet).is_null()
 	assert_array(sent.map(func(c): return c.type)).is_equal(["cook"])
 	await _close()
+
+## 419 (不知火舞 bd102c55, (b)): watching, the pot is a layer in the middle — its mouth at (180, 235) with the ring on it,
+## the stove's pot hidden (one pot on the screen); it flies in from the stove pot and, walked away, back to it, the
+## stove's pot then showing again.
+func test_the_watched_pot_is_a_layer_in_the_middle() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	var pot := r.art.get_node("stove_pots/stove_pot_1") as Node3D
+	var v := _view()
+	v.cooking.stoves = [{"id": 9, "dish": "dish_grilled_crucian", "ms": 60000, "elapsed": 1000, "ready_in": 59000,
+		"heats": [{"at": 3000, "spin": 1600, "gold": 0.4, "width": 0.3, "from": 90, "drift": 12}]}, {}, {}]
+	_set_view(v)
+	k.watch(v.cooking.stoves[0])
+	var layer: P0WaitPot = k.get("_wait_pot")
+	assert_bool(layer.visible).is_true()
+	assert_bool(pot.visible).is_false()
+	_land(k)
+	assert_int(layer.view.render_target_update_mode).is_equal(SubViewport.UPDATE_ALWAYS)   # drawn every frame: it tumbles
+	assert_vector(layer.mouth_screen()).is_equal_approx(P0WaitPot.MOUTH, Vector2.ONE * 0.5)
+	assert_vector(k.call("_ring_center")).is_equal_approx(P0WaitPot.MOUTH, Vector2.ONE * 0.5)
+	k.stop_watching()
+	_land(k)
+	assert_bool(layer.visible).is_false()
+	assert_int(layer.view.render_target_update_mode).is_equal(SubViewport.UPDATE_DISABLED)   # hidden: not drawn (周瑜)
+	assert_bool(pot.visible).is_true()
+
+## The pot layer's flight (in or back, P0WaitPot.FLY_S) run to its end at once: the tests never race its clock.
+func _land(k: P0Kitchen) -> void:
+	var layer: P0WaitPot = k.get("_wait_pot")
+	if layer and layer._tween and layer._tween.is_valid(): layer._tween.custom_step(P0WaitPot.FLY_S * 2.0)

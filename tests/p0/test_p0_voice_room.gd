@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## P0VoiceRoom (SGODOT-383; the user, 11-02 via 奕星, q(274)): the online room's voice. Nothing goes to the server before
 ## the player wants voice; the 13+ gate comes first; the mic starts off and toggles; Mute is this phone's own, by the
 ## person's public handle, put back on their peer id in every layer; Block and Report go to the server; Market Square
-## has none.
+## has it too since q(286) (SGODOT-415).
 
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
 
@@ -74,7 +74,7 @@ func test_nothing_goes_out_before_the_player_wants_voice_and_the_gate_comes_firs
 	room.toggle_mic()
 	assert_array(f[1].calls[-1]).is_equal(["mic", false])   # the key again: off, still in the room's voice
 
-func test_a_no_hides_voice_and_market_square_has_none() -> void:
+func test_a_no_hides_voice_and_market_square_has_it_since_q286() -> void:
 	var f := _room()
 	var room: P0VoiceRoom = f[0]
 	await room.fetch_status()
@@ -82,8 +82,9 @@ func test_a_no_hides_voice_and_market_square_has_none() -> void:
 	await room.answer_age(false)
 	assert_bool(room.offered()).is_false()
 	var m := _room("market")
+	answers["status"] = {"ok": true, "available": true, "age": "ok"}
 	await m[0].fetch_status()
-	assert_bool(m[0].offered()).is_false()
+	assert_bool(m[0].offered()).is_true()   # q(286): Market Square's whole layer has voice (SGODOT-415)
 
 func test_mute_is_kept_by_handle_and_put_on_the_new_peer_in_another_layer() -> void:
 	var f := _room()
@@ -94,8 +95,9 @@ func test_mute_is_kept_by_handle_and_put_on_the_new_peer_in_another_layer() -> v
 	assert_array(f[1].calls[-1]).is_equal(["muted", "4", true])
 	assert_array(JSON.parse_string(FileAccess.get_file_as_string(P0VoiceRoom.MUTES))).is_equal(["bbbb2222bbbb2222"])
 	var rows: Array = room.people()
-	assert_int(rows.size()).is_equal(1)
-	assert_dict(rows[0]).contains_key_value("peer", 4).contains_key_value("muted", true).contains_key_value("name", "Traveller bbbb")
+	assert_int(rows.size()).is_equal(2)   # the player first (q(289)), then the others
+	assert_dict(rows[0]).contains_key_value("self", true).contains_key_value("name", "Traveller aaaa").contains_key_value("muted", false)
+	assert_dict(rows[1]).contains_key_value("peer", 4).contains_key_value("muted", true).contains_key_value("name", "Traveller bbbb")
 	# Layer 2: the same person is peer 2 now
 	online._message(JSON.stringify({"t": "joined", "outpost": "sh_tea_1", "room": 2, "capacity": 12, "rejoined": false, "self": 3, "epoch": 3}))
 	online._message(JSON.stringify({"t": "roster", "count": 2, "members": [{"id": 3, "player": "aaaa1111aaaa1111"}, {"id": 2, "player": "bbbb2222bbbb2222"}]}))
@@ -141,3 +143,16 @@ func test_a_new_layer_with_voice_on_asks_again() -> void:
 	f[1].is_active = true
 	f[2]._message(JSON.stringify({"t": "joined", "outpost": "sh_tea_1", "room": 2, "capacity": 12, "rejoined": false, "self": 1, "epoch": 3}))
 	assert_bool(f[1].calls.has(["invalidate"])).is_true()
+
+## 李元芳 on 415 (232 f8ecefed): the first in a layer sees the count go up when the next comes in, and down when they go —
+## the room's `changed` on every roster change, not only on the voice's own.
+func test_the_room_says_changed_when_someone_comes_in_or_goes() -> void:
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	var online: P0Online = f[2]
+	var said := []
+	room.changed.connect(func(): said.append(room.people().size()))
+	online._message(JSON.stringify({"t": "peer", "member": {"id": 4, "player": "bbbb2222bbbb2222"}}))
+	assert_array(said).is_equal([1])
+	online._message(JSON.stringify({"t": "left", "id": 4}))
+	assert_array(said).is_equal([1, 0])

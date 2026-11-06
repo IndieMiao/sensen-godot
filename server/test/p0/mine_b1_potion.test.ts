@@ -4,10 +4,13 @@
 import { describe, expect, it } from 'vitest';
 import { add, count, room, stackLimit } from '../../src/p0/bag.js';
 import { itemKind, loadP0Content } from '../../src/p0/content.js';
+import { settleMine } from '../../src/p0/mine.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { dayKey } from '../../src/p0/rules.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { setDevSites } from '../../src/p0/mine.js';
+setDevSites(true);   // wd-dev-quarry / wd-dev-vein: tests only (P0_DEV_SITES)
 
 const T = Date.UTC(2026, 10, 4, 2), DAY = 86400000, Q = 'wd-dev-quarry', ID = 'potion_heal';
 const c = loadP0Content(); c.profile.timezone = 'Asia/Shanghai';
@@ -171,7 +174,9 @@ describe('355 G mine_drink (§9.4)', () => {
       t.hurt(10); t.ok(t.drink);
       t.hurt(10);
       expect(t.refused(t.drink)).toMatchObject({ code: 'potion_cooldown' });
-      const next = t.now + DAY;   // still on this floor after the rollover (丁15), HP kept
+      const next = t.now + DAY;   // still on this floor after the rollover (丁15); HP refilled then (q(291)), so hurt again
+      expect(t.refused(t.drink, next)).toMatchObject({ code: 'hp_full' });
+      settleMine(c, t.s, next); t.hurt(10);
       t.ok(t.drink, next);
       expect(t.s.mine.day!.drink_at).toBe(next);
       expect(t.s.mine.day!.hp).toBe(MAX);

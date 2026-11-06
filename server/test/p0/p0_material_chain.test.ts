@@ -6,6 +6,8 @@ import { notePresence } from '../../src/p0/presence.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { setDevSites } from '../../src/p0/mine.js';
+setDevSites(true);   // wd-dev-quarry / wd-dev-vein: tests only (P0_DEV_SITES)
 
 const content = loadP0Content();
 // The 04:00 instants in these tests are Shanghai's (UTC+8), whatever the home city is; p0_city_switch checks the city's zone.
@@ -32,7 +34,7 @@ describe('the farm has no gathering spots (v4q(4) ①; the user, 11-02)', () => 
       expect(refuse(fresh(), { type: 'gather', spot, space: 'home' }).code).toBe('bad_spot');
     }
     expect('spots' in c.gather).toBe(false);
-    expect(viewOf(c, fresh(), T0).gather).toEqual({ city_ready: {} });
+    expect(viewOf(c, fresh(), T0).gather).toMatchObject({ city_ready: {}, pond: null });   // 409: no pond, no pond points
     expect(c.homestead.levels.flatMap(l => l.unlocks).filter(u => u === 'clay_bank' || u === 'old_tree')).toEqual([]);
   });
 });

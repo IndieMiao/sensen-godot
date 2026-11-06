@@ -48,6 +48,16 @@ var src_of := Callable()
 var busy := false
 var _queue: Array = []        # {cmd, key} sent while a request was in flight (reel / collect must never be dropped)
 var _inflight := {}           # the {cmd, key} on the wire; {} for state refreshes and dev calls
+## When the request on the wire left: each reply logs `P0 net: <type> seq <n> <ms> ms <result> <via>` (preview B, 421:
+## the per-command time on the US-west line, read from logcat): via `new` / `kept` on P0Line, `http` a request each.
+var _sent_ms := 0
+var _via := ""
+## 421: commands and reads on one connection kept open (P0Line); a request each (P0HttpRequest) when it is off or out.
+const P0Line := preload("res://modules/p0/p0_line.gd")
+var line: P0Line
+## false: never the line, every request a new one (tests that put in their transport after the runtime's first read
+## went out: they were written for its failing a few frames on, as P0HttpRequest's does).
+var use_line := true
 ## Tests replace the HTTP call: transport.call(method, path, body, cmd), then answer with _finish().
 var transport := Callable()
 ## Development only (SGODOT-351): the Blackjack's bj_* commands answered locally until the server has them, its table
@@ -210,6 +220,7 @@ func dev_skip(minutes: int) -> void:
 
 func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> void:
 	busy = true
+	_sent_ms = Time.get_ticks_msec()
 	if bj_mock != null and method == HTTPClient.METHOD_POST and str(cmd.get("type", "")).begins_with("bj_"):
 		var raw := JSON.stringify(bj_mock.command(cmd, view)).to_utf8_buffer()
 		if is_inside_tree(): get_tree().create_timer(_BJ_MOCK_MS / 1000.0).timeout.connect(_finish.bind(HTTPRequest.RESULT_SUCCESS, 200, raw, cmd))
@@ -218,16 +229,27 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 	if transport.is_valid():
 		transport.call(method, path, body, cmd)
 		return
+	var payload := "" if method == HTTPClient.METHOD_GET else JSON.stringify(body)
+	if use_line and line == null and is_inside_tree():
+		line = P0Line.new()
+		add_child(line)
+	if use_line and line != null and line.send(base_url + path, _headers(), method, payload, func(r: int, c: int, _h, raw: PackedByteArray):
+			_via = line.last_via if r == HTTPRequest.RESULT_SUCCESS else "line"
+			_finish(r, c, raw, cmd)) == OK:
+		return
+	_via = "http"
 	var http := P0HttpRequest.new()   # SGODOT-370: 8 s of live time, a world loading is not the server being slow
 	add_child(http)
 	http.request_completed.connect(_on_done.bind(http, cmd))
-	var err := http.send(base_url + path, _headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
+	var err := http.send(base_url + path, _headers(), method, payload)
 	if err != OK:
 		http.queue_free()
 		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd)
 
-func _on_done(result: int, code: int, _h: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary) -> void:
+func _on_done(result: int, code: int, headers: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary) -> void:
 	http.queue_free()
+	# an answer the old way: the line, off after failures, may come back (P0Line.old_way_answered)
+	if line != null and result == HTTPRequest.RESULT_SUCCESS and code > 0: line.old_way_answered(headers)
 	_finish(result, code, raw, cmd)
 
 ## One response, in order: handle it while still busy (so commands sent from signal handlers queue behind
@@ -235,10 +257,17 @@ func _on_done(result: int, code: int, _h: PackedStringArray, raw: PackedByteArra
 func _finish(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> void:
 	var entry := _inflight
 	_inflight = {}
+	var ms := Time.get_ticks_msec() - _sent_ms   # the line's time, not the handlers' below
 	var outcome := _handle(result, code, raw, cmd)
+	print("P0 net: %s seq %d %d ms %s %s" % [str(cmd.get("type", "state")), int(view.get("seq", -1)), ms,
+		str(outcome.code) if str(outcome.code) != "" else "ok", _via])
 	busy = false
 	if outcome.network:
-		_refresh_queued = false   # the runtime's own retry reads again; a queued read would only fail the same way
+		# A command whose reply was lost may still have done its work (preview B ②, 奕星 11-05: the floor reached and
+		# paid on the server, the player kept on the floor until a tap 20 s later): read once what the server did, now,
+		# after any world actions still waiting. A failed read is not read again: the runtime's own retry does (it
+		# would only fail the same way).
+		_refresh_queued = outcome.code == "network" and not entry.is_empty()
 		# Later UI commands were based on what the player saw before the failure: drop them.
 		for q in _queue.filter(func(q): return q.key != ""): command_settled.emit(q.key, false, "network")
 		_queue = _queue.filter(func(q): return q.key == "")

@@ -627,6 +627,17 @@
       "spin_ms": 2000
     },
     "tolerance_ms": 150,
+    "heat_vary": {
+      "width_mul": [
+        0.8,
+        1.2
+      ],
+      "drift": 12,
+      "lead_ms": 400,
+      "end": 0.95,
+      "pair_min_deg": 45,
+      "pair_opposite_deg": 20
+    },
     "quality_xp": [
       1,
       1.25,
@@ -1855,7 +1866,7 @@
     "done_refill_h": 0,
     "drop_refill_h": 8,
     "expire_h": 72,
-    "track_max": 3,
+    "track_max": 25,
     "qty": [
       [
         1,

@@ -41,7 +41,9 @@ export interface Cast {
   breaks: 'level' | 'rod' | null;       // gate failure decided up front, shown after the reel starts
   pin?: string;                         // a teaching pin this cast used (handed back if the line comes in before the bite)
 }
-export interface Heat { at: number; spin: number; gold: number; width: number }
+/** One heat ring (§7.2.4). q(288) (SGODOT-419): `from` is where the needle sets off on screen (degrees clockwise from 12,
+ * shown only), `drift` how fast the ring turns against the needle (°/s); both absent on the teaching pot and older pots. */
+export interface Heat { at: number; spin: number; gold: number; width: number; from?: number; drift?: number }
 /** One pot on the stove (§7.2.3–7.2.4): ingredients are already gone, quality is judged at collect. */
 export interface Pot {
   dish: string; rarity: number; started_at: number; ms: number; heats: Heat[];
@@ -118,6 +120,8 @@ export interface MineB1Day {
   floors: Record<string, MineB1FloorState>;
   picked: [string, number][];
   attack_at?: number; hurt_at?: number; drink_at?: number; swing_at?: number;
+  /** q(291): out of the mine (left it, knocked out), `hp` refills from this time on (mine.ts mineHp); none inside. */
+  hp_at?: number;
 }
 export type MineB1Notice = { kind: 'reset'; at: number; floor: number }
   | { kind: 'ko'; at: number; floor: number; lost: [string, number][] };

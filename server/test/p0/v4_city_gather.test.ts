@@ -55,6 +55,21 @@ describe('city gathering (v4q(4) ③–⑤)', () => {
     expect(hard.ok && hard.state.storage.hardwood).toBe(3);
   });
 
+  it('a cooldown gone by leaves the save at the next command; one still running stays (396 ④)', () => {
+    const { c, s } = setup();
+    const a = run(c, s, { type: 'gather', spot: WOOD, space: 'home' } as P0Command, T);
+    if (!a.ok) throw new Error(a.code);
+    const b = run(c, a.state, { type: 'gather', spot: REED, space: 'home' } as P0Command, T + 2 * H);
+    if (!b.ok) throw new Error(b.code);
+    expect(Object.keys(b.state.gather.ready_at).sort()).toEqual([REED, WOOD].sort());   // both cooling down
+    const c2 = run(c, b.state, { type: 'gather', spot: HERB, space: 'home' } as P0Command, T + 5 * H);
+    if (!c2.ok) throw new Error(c2.code);
+    expect(Object.keys(c2.state.gather.ready_at).sort()).toEqual([HERB, REED].sort());   // Timber's 4 h are over: gone
+    expect(viewOf(c, c2.state, T + 5 * H).gather.city_ready).toEqual({ [REED]: H, [HERB]: 4 * H });
+    const again = run(c, c2.state, { type: 'gather', spot: WOOD, space: 'home' } as P0Command, T + 5 * H + H);
+    expect(again.ok).toBe(true);   // gone means ready, as it always read
+  });
+
   it('taps faster than 0.9 s are refused as tempo (tempo_ms, the farm\'s spots gone: v4q(4) ①)', () => {
     const { c, s } = setup();
     const r = run(c, s, { type: 'gather', spot: WOOD, space: 'home' } as P0Command, T);

@@ -10,7 +10,9 @@
     "combat": {
       "ko_keep_from": 11,
       "ko_lose": 0.5,
-      "under_tier": 0.5
+      "under_tier": 0.5,
+      "ko_hp": 30,
+      "regen_full_ms": 3600000
     },
     "monsters": {
       "mob_cave_bat": {
@@ -171,8 +173,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -213,8 +215,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -255,8 +257,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -297,8 +299,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -375,8 +377,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -414,8 +416,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -449,8 +451,8 @@
               ]
             ],
             "rocks": [
-              4,
-              6
+              2,
+              3
             ],
             "drops": [
               [
@@ -558,7 +560,9 @@
       "rock_tempo_ms": 900,
       "attack_tempo_factor": 0.9,
       "max_targets": 4,
-      "guard_fast_factor": 0.8
+      "guard_fast_factor": 0.8,
+      "tempo_burst": 2,
+      "rock_cards": 2
     },
     "fee_per_day": true
   },

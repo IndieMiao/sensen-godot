@@ -69,6 +69,18 @@ func test_heat_preview_matches_the_server_window() -> void:
 	assert_bool(P0Logic.heat_hit(h, 2500 + 0.5 * 1600 - 140)).is_true()
 	assert_bool(P0Logic.heat_hit(h, 2500 + 0.5 * 1600 - 200)).is_false()
 
+## q(288) (SGODOT-419): a drifting ring (`drift` °/s against the needle). The needle meets the gold k = 1 + drift ÷ its
+## speed laps a lap, so the gold's window in time is its share ÷ k; without `drift` the window is as before (k = 1).
+func test_a_drifting_rings_window_is_its_gold_over_k() -> void:
+	var h := {"at": 2500, "spin": 1600, "gold": 0.4, "width": 0.2, "from": 90, "drift": 45}   # k 1.2: gold 533–800 ms in
+	assert_float(P0Logic.heat_k(h)).is_equal_approx(1.2, 0.0001)
+	assert_bool(P0Logic.heat_hit(h, 2500 + 540, 0.0)).is_true()
+	assert_bool(P0Logic.heat_hit(h, 2500 + 0.4 * 1600 + 170, 0.0)).is_false()   # a still ring's gold end, not this one's
+	assert_bool(P0Logic.heat_hit(h, 2500 + 525, 0.0)).is_false()
+	assert_bool(P0Logic.heat_hit(h, 2500 + 799, 0.0)).is_true()
+	h.erase("drift")
+	assert_float(P0Logic.heat_k(h)).is_equal(1.0)
+
 func test_quick_bar_holds_bait_at_the_pond() -> void:
 	var v := _view()
 	assert_that(P0Logic.quick_bar(v, [], "fish")).is_equal(["bait_worm"])

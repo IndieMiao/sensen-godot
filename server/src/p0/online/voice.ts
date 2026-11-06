@@ -29,9 +29,10 @@ export interface P0VoiceMedia {
 export const RELEASE_TRIES = 3, RELEASE_RETRY_MS = 2_000;
 
 export const VOICE_LEASE_MS = 20_000;
-/** Roles whose rooms have no voice (the user, 11-02: Market Square's 30 not this time). POI rooms, strangers' rooms of 16,
- * stay off until the user says yes (亚瑟 on #699: a product call, and LiveKit bills by who held a mic open). */
-export const NO_VOICE_ROLES = new Set(['market', 'poi']);
+/** Roles whose rooms have no voice. Market Square's layers of 30 have it since q(286) (the user, 11-04: "286 Y", the
+ * whole layer, no fall-off with distance; it had none since 11-02). POI rooms, strangers' rooms of 16, have none
+ * (q(279) ⑧ B, the user 11-03: off for now; 亚瑟 on #699: LiveKit bills by who held a mic open). */
+export const NO_VOICE_ROLES = new Set<string>(['poi']);
 const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
 /** P0_VOICE=on with LIVEKIT_URL / LIVEKIT_API_KEY / LIVEKIT_API_SECRET (P0_VOICE_NAMESPACE, default p0-dev); else off. */
