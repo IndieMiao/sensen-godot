@@ -1,0 +1,101 @@
+{
+  "verified_at_utc": "2026-11-05T15:19:53.475560+00:00",
+  "project": "SGODOT",
+  "work_item": "SGODOT-422",
+  "work_item_id": "1589379c-919f-43dc-95d5-71a84c649214",
+  "pull_request": "https://github.com/IndieMiao/sensen-godot/pull/791",
+  "art_commit": "b75bc30d",
+  "all_readbacks_equal": true,
+  "all_visible_authors_verified": true,
+  "attachments": [
+    {
+      "source_name": "three_openings.png",
+      "attachment_id": "370229e3-a181-45bd-a735-70425271c703",
+      "name": "liubei-422-three_openings.png",
+      "bytes": 713363,
+      "sha256": "fd45ba0e3471164941284ffc7609eeba24cda49fd4903fb18d016846670b3614",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "crescent_comparison.png",
+      "attachment_id": "985666b7-463c-45e9-b8ef-23475cafb0ed",
+      "name": "liubei-422-crescent_comparison.png",
+      "bytes": 502275,
+      "sha256": "34a2de62dd2d497b9a81c04649812c09d560dfbb84e3d2e033cba18630e860ad",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "gourd_comparison.png",
+      "attachment_id": "e22712de-5d36-48ee-a540-8e5efcd33cce",
+      "name": "liubei-422-gourd_comparison.png",
+      "bytes": 490717,
+      "sha256": "d88a587efa9607cf90a4feb2b62e93f6bae3227d5c2fdbea7e17dbaff59362d7",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "meander_comparison.png",
+      "attachment_id": "636ecef7-929c-42c1-8601-5e0d8a7b4fcd",
+      "name": "liubei-422-meander_comparison.png",
+      "bytes": 480480,
+      "sha256": "fd6a4b68385f2ce66206a126c666071a10dd6c0a5a13c263349aaefe093d260e",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "crescent_after_360x800.png",
+      "attachment_id": "250267a7-ebba-4437-aa5b-c8d6a2718a11",
+      "name": "liubei-422-crescent_after_360x800.png",
+      "bytes": 315685,
+      "sha256": "22e37a86032c1b54182888651b0306d6127f7336d2f207304b204846324279aa",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "gourd_after_360x800.png",
+      "attachment_id": "703a961d-b207-470a-9a42-a434ae6407de",
+      "name": "liubei-422-gourd_after_360x800.png",
+      "bytes": 318440,
+      "sha256": "467726a4061ac5824b65704c87795458385dd826cb94b0a612a33fededf62353",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "meander_after_360x800.png",
+      "attachment_id": "8d786dbd-813a-4c03-ae0d-eb4ce693f496",
+      "name": "liubei-422-meander_after_360x800.png",
+      "bytes": 315513,
+      "sha256": "4f571380e249de025b8dd3b0a77453055f19709dbc4bc24a7294aadb9dbed3f2",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "gourd_overhead.png",
+      "attachment_id": "818c2f47-ffaa-4741-bc28-521bb893624b",
+      "name": "liubei-422-gourd_overhead.png",
+      "bytes": 1352414,
+      "sha256": "b97d2a3bdb1bfbc3a405bde429817bb6f125eaa9cf76663d78093465f52086e8",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "layout_constraints.png",
+      "attachment_id": "4bf8f875-9d1d-426e-91fc-ce0402a052f1",
+      "name": "liubei-422-layout_constraints.png",
+      "bytes": 55147,
+      "sha256": "ce7eaa6621ff6c9c1b89e62785afe190c6ee4f0106637efc2e209bfec9e078df",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "android_smoke.png",
+      "attachment_id": "c9b4d9cd-22f6-4b37-ab0c-c5675a440347",
+      "name": "liubei-422-android_smoke.png",
+      "bytes": 933373,
+      "sha256": "671f364ef22943de8cda3c2d644abea01510547e5329714dbd0f9450f851b378",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "README.md",
+      "attachment_id": "13b7b5f8-3e58-419e-b08d-1d8bee6fee6d",
+      "name": "liubei-422-ground-handoff.md",
+      "bytes": 7846,
+      "sha256": "9a462f41d52a1b873efcdc999771046bd15f78a51c265860a889385aa99d2276",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    }
+  ],
+  "revision_scope": "Initial b75bc30d delivery; images and handoff superseded by water-preservation revision."
+}

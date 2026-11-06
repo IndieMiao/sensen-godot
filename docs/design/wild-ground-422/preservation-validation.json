@@ -1,0 +1,400 @@
+{
+  "passed": true,
+  "runtime_commit": "67116c6df4f69062ce658c50581e72ab1779a1b4",
+  "art_base": "93befb18",
+  "production_protected_paths_unchanged": true,
+  "original_ground_fragment_verbatim": true,
+  "original_texture_uniforms_retained": true,
+  "preview_source_hashes": [
+    {
+      "path": "assets/farm/art/water/bank_grass.png",
+      "sha256": "2059acb14773b79d64e5e7f5fdceb5dcef553bc7380803efcec086ebab86b460"
+    },
+    {
+      "path": "assets/farm/art/water/caustic_light.png",
+      "sha256": "f3c0321de4dce0d79909b86b03b6082eafdbe4d6e8dbcadfa98b046fb91ec704"
+    },
+    {
+      "path": "assets/farm/art/water/caustics.png",
+      "sha256": "c45c28e91d5aca21a391236804d509a7fcff7b633bdd30e596519901fa182196"
+    },
+    {
+      "path": "assets/farm/art/water/pebble_bed.png",
+      "sha256": "0107465d0296dc30517f5a0f0df3283c1e2386274eec3db926113aade98009ec"
+    },
+    {
+      "path": "assets/farm/art/water/sediment.png",
+      "sha256": "13d396e11c6d281f27817242a2fb34bbcd8741d259e3f4dc7f9ac535e73d975f"
+    },
+    {
+      "path": "assets/farm/art/water/shore_stone.png",
+      "sha256": "1b48d476b9cedfc855a8a5f40b54ea977da2af293361332e7b564935d3b3dd8e"
+    },
+    {
+      "path": "assets/farm/art/water/surface_flow.png",
+      "sha256": "e29cdf4573dab94f7c9eaaf54ffd437050952f52ee564f13a1b0a78c2eb98548"
+    },
+    {
+      "path": "assets/ponds/art/caustic_web.png",
+      "sha256": "28bd7f8f6bed89528e334a569daebaa6ae6deff3e2c1ec35d8b42c17b756da31"
+    },
+    {
+      "path": "assets/ponds/art/crescent_bed.png",
+      "sha256": "3745a08f8e1016f746e0f951f24edfc7074aa46c7b17605c2bbc50ef206b186b"
+    },
+    {
+      "path": "assets/ponds/art/foam/foam_pattern.png",
+      "sha256": "e870f6aee1134e4f221f035a13b39fb5b2b9adc6dede712e3a1046357bae487d"
+    },
+    {
+      "path": "assets/ponds/art/foam/manifest.json",
+      "sha256": "87a27ae9037bd07575171bee3c5f03ccea0f66e29563913d0cc9806386b2efb1"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_los_angeles_01.png",
+      "sha256": "7a5405298032f20d80957ca769a3619d2d90f8881bb99bef42abcc1d4843f247"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_los_angeles_02.png",
+      "sha256": "ce08ac58f4202b9eb205298c708d511fad520a163e5aec19470569542c37f0ba"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_los_angeles_03.png",
+      "sha256": "641bc515fa336aedac82762441dfaedcf164f770204c3aba264d83b59a73f1fa"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_los_angeles_04.png",
+      "sha256": "dc88d8e7edfa7bb85a8f619d360f41d71f42efc6fa327c0803f3cc70c38b13c3"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_los_angeles_05.png",
+      "sha256": "e950f4d8c5c3064fa56df02f8211106f9f3691321550c44e0dc16c05baf9d9c2"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_los_angeles_06.png",
+      "sha256": "9dd3f2759779beb18374e30b2bc9eae40ea5cdaccdd5544b6c6ca0f0f97849c6"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_san_francisco_01.png",
+      "sha256": "02aa26f22cb22b707c21ee6fe4e36a7385f28bd176467507349cf667543fa520"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_san_francisco_02.png",
+      "sha256": "e0f0d37293f103c7d8c290c92618513581184e5045b8b3aba32974471dfde2e2"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_san_francisco_03.png",
+      "sha256": "85393c3c2c608a5a0a1305b08a7ee1f924ab056cb29a0edcecedcefac3dd4b71"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_san_francisco_04.png",
+      "sha256": "0a8481c79ef8ed96692fa190765248a6d35fd7c8be6cfb4c038186dbfeeb505d"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_san_francisco_05.png",
+      "sha256": "9202fa42219828f7938eee84f98ba89a112c6018d11e354be1671828483d6dde"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_san_francisco_06.png",
+      "sha256": "75c11de3cea82038ad234f7829873bdf5d0d2a50f4e4329a00a998a24edfafd5"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_shanghai_01.png",
+      "sha256": "d543a7f4b59a6d01b7c9430c13479e3356ddab660406628c444b29608e86fac2"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_shanghai_02.png",
+      "sha256": "c6a425050dd91109709ae577c88b7b7151f406f5116fb11aa5db20c1ede3950e"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_shanghai_03.png",
+      "sha256": "9fc443fb84ef318ff7de4f6d48473eeae76447c8247bf0e6a9164e2e31f68911"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_shanghai_04.png",
+      "sha256": "e42962349ddb3fc56c93158c750b80034f735daa6594230dde122aea0f87b1bd"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_shanghai_05.png",
+      "sha256": "e0dec3738bcba2f97a3adba25beafc328c79dab489e0c7413a0e3e9e6235ee03"
+    },
+    {
+      "path": "assets/ponds/art/foam/pond_shanghai_06.png",
+      "sha256": "92460c1ec6f448073c0da2e4502de0e67cb779879ba7ea0106b3cfc77efbe4bd"
+    },
+    {
+      "path": "assets/ponds/art/gourd_bed.png",
+      "sha256": "d55a0d128d90288fade06acab80969ffd9379b8e4acf737c74f5ed4bc0de93fe"
+    },
+    {
+      "path": "assets/ponds/art/meander_bed.png",
+      "sha256": "fb0a82328fd8e16a644754baab9005b7af8a9b7e51dccf542ad754132195eb3b"
+    },
+    {
+      "path": "assets/ponds/art/pond_daylight.hdr",
+      "sha256": "758dcecde7066d3411a700d7d26793fb2dacd7cf4eec1a2e427d3036b64ea110"
+    },
+    {
+      "path": "assets/ponds/art/pond_daylight_sky.tres",
+      "sha256": "acd4536d9cd785cc2f79944f0a1bce802f794a7bbc67b45d46e6ddb499526f68"
+    },
+    {
+      "path": "assets/ponds/art/pond_ripple_field.png",
+      "sha256": "49fcc18a2c45568ee50442e3d273402b22a699b0f46da154d11cd3b832131890"
+    },
+    {
+      "path": "assets/ponds/catalog.json",
+      "sha256": "2c6e2a2f5f6efa3742912257fa8a0b4844cbf89277e5867ac88157784770a187"
+    },
+    {
+      "path": "assets/ponds/crescent.svg",
+      "sha256": "6d1928a5557905e5c87c92114097b996c581983509029436a557b042155b5bec"
+    },
+    {
+      "path": "assets/ponds/crescent_shore.png",
+      "sha256": "2482fb0c6b411bf8e165b615476a4c4b47b0f0b3cf1845479109753f5f9ef57d"
+    },
+    {
+      "path": "assets/ponds/gourd.svg",
+      "sha256": "21f4640931949828a05d41e8670e69576206a559c72485649372d7cbbd48217c"
+    },
+    {
+      "path": "assets/ponds/gourd_shore.png",
+      "sha256": "5571ab4287ff87c60e6a6ea718f93cbdf5e2a8ca7ff5ea971eb88c305783f643"
+    },
+    {
+      "path": "assets/ponds/meander.svg",
+      "sha256": "1bc2e4629aab7cefa1c5e6fd202f5886baccd1ffe5f125b55ee7c0e4313a65c9"
+    },
+    {
+      "path": "assets/ponds/meander_shore.png",
+      "sha256": "ad476e825ba1f8aecdfadb0185c43a8fa000c28dfbcd0453521008febef8140d"
+    },
+    {
+      "path": "assets/ponds/p0/crescent_bed.png",
+      "sha256": "8012b836671a6bd86077ac52dc4ebc517e3b2c3f962bfc57f69087c18bf5ff2b"
+    },
+    {
+      "path": "assets/ponds/p0/crescent_shore.png",
+      "sha256": "0db66a02f8788f46b1399c2cf295403e48a94943d6c83f2804cf27d105c8b0f2"
+    },
+    {
+      "path": "assets/ponds/p0/foam/manifest.json",
+      "sha256": "83c03b40a6b15df16bd1ff9b54fb65dcca6f1d68ea3119475afaa7220d869a5d"
+    },
+    {
+      "path": "assets/ponds/p0/foam/pond_san_francisco_01.png",
+      "sha256": "9d73be2f21c112ddd5f35706068fe32a3afd1efcd4e960993a1077130357b705"
+    },
+    {
+      "path": "assets/ponds/p0/foam/pond_san_francisco_02.png",
+      "sha256": "9df3763cccd3ef059afb1ac3a8d7bcfdd0e38b169f3b28de289c98ad1d9b494a"
+    },
+    {
+      "path": "assets/ponds/p0/foam/pond_san_francisco_03.png",
+      "sha256": "031763e3fbe1bf6534ea0375cfa70bafaf2803dda13f6e923a6ae06674e398d1"
+    },
+    {
+      "path": "assets/ponds/p0/foam/pond_san_francisco_04.png",
+      "sha256": "67121f8157adb9a9390ceb0f136339f90b692c51d09a435502028c8f8b884eea"
+    },
+    {
+      "path": "assets/ponds/p0/foam/pond_san_francisco_05.png",
+      "sha256": "123a86c9448a7d607d7e9f6e3f635f3e13a617cdcabded6da79760d1056e13d1"
+    },
+    {
+      "path": "assets/ponds/p0/foam/pond_san_francisco_06.png",
+      "sha256": "e7846dfbd8f3bb715043ac7b4efbff3cc3357755154dd3bc17836729caa1a000"
+    },
+    {
+      "path": "assets/ponds/p0/gourd_bed.png",
+      "sha256": "1688d2747d8f4cd6b4028e1fa33779c2a08325f5b41ac6d7390caf672a165be7"
+    },
+    {
+      "path": "assets/ponds/p0/gourd_shore.png",
+      "sha256": "3ae170b337274d9afb99f5c825d28bfb9ae8dbb8a4e87e591b144168968d33ba"
+    },
+    {
+      "path": "assets/ponds/p0/meander_bed.png",
+      "sha256": "dede5a4e33d371b240b8b5315ccd363461a8e567892cb18c71dd027e2dbbb099"
+    },
+    {
+      "path": "assets/ponds/p0/meander_shore.png",
+      "sha256": "3a921d081c63108c4b6af6d69311d5407d3eedb7df473947f72c1a8eb410478e"
+    },
+    {
+      "path": "modules/fishing/bank_plants.gdshader",
+      "sha256": "49779029db8b959270bbf42deeee22d4f45e2ffe5da7e06dd761018823102fb6"
+    },
+    {
+      "path": "modules/fishing/bank_plants.gdshader.uid",
+      "sha256": "f0bb465e36051d4ac3ced3f62969ce46b94b316a3c9d99f9931dc41e0d5cc03e"
+    },
+    {
+      "path": "modules/fishing/fishing_float_ring.gdshader",
+      "sha256": "dbca3efd40700bc8a2b9bbaf6501e1d0c8d1b027e28def707b29367fa03c5346"
+    },
+    {
+      "path": "modules/fishing/fishing_float_ring.gdshader.uid",
+      "sha256": "ed8a65ec93b6e5b408a8155ac13c5e9c1c7b595e1751006894245ced749d2092"
+    },
+    {
+      "path": "modules/fishing/fishing_model.gd",
+      "sha256": "22137c9e88e496c6b093f1de4abe0a854ff6612bfebff2fbe6289dc78c0805ff"
+    },
+    {
+      "path": "modules/fishing/fishing_model.gd.uid",
+      "sha256": "6bd13c4c35e124a5b332ccd3c8f99d41805c3e510e3b9cc854bf19dccdc9ba7d"
+    },
+    {
+      "path": "modules/fishing/fishing_presentation.gd",
+      "sha256": "bcc62508f504502b18b2e1d90ea646db819e7a72e79d7e03b2c2c3aa93db458f"
+    },
+    {
+      "path": "modules/fishing/fishing_presentation.gd.uid",
+      "sha256": "5fba556d27ca5aa4f40aa9899912eecf647daf41fade4b2e49b1514dc59bf344"
+    },
+    {
+      "path": "modules/fishing/fishing_water.gd",
+      "sha256": "6a260e1888767591b9d67c75ffdc91e127208f3f65d2759fefc174df923141b1"
+    },
+    {
+      "path": "modules/fishing/fishing_water.gd.uid",
+      "sha256": "9512230f43a436524ab2277949ed87c1d0bb87ce1f955941409766c591a7e347"
+    },
+    {
+      "path": "modules/fishing/lily_leaf.gdshader",
+      "sha256": "7fa5c34e8c14aa863b6e9fe06e85ad512dafb13e71dfefc3403915276d9663c2"
+    },
+    {
+      "path": "modules/fishing/lily_leaf.gdshader.uid",
+      "sha256": "5a2d922b32e23d242a0795e8e014963c73594dce80eee0a741230884d1abfc3c"
+    },
+    {
+      "path": "modules/fishing/shore_rock.gdshader",
+      "sha256": "40c9a627a74a3032a60b498da18eb0fbfd814a120a2473e9a8d1d9ecb1c5a298"
+    },
+    {
+      "path": "modules/fishing/shore_rock.gdshader.uid",
+      "sha256": "5219efc8b34d65d7851ac7e28a36ed4ce85e9c5c28f30a791dc2308386cdee26"
+    },
+    {
+      "path": "modules/fishing/street_bank.gdshader",
+      "sha256": "4519e5bcc924ae1682fda7b51bf26a4a7d9faba045a8190141293916cf27fbd8"
+    },
+    {
+      "path": "modules/fishing/street_bank.gdshader.uid",
+      "sha256": "bf14ad192b010dde2d5bcdc30b3643cbd5bd54db13bcd77e940b833502984e4f"
+    },
+    {
+      "path": "modules/fishing/water.gdshader",
+      "sha256": "82d2180c26ecc801fa28c195e9f11d2ba94f05bd47db87521f9f1f224152b372"
+    },
+    {
+      "path": "modules/fishing/water.gdshader.uid",
+      "sha256": "7f16853bdfc42fc4a42fff1ba7bdef7cbbe78e94834bfe7d28c26fbf61f69fad"
+    },
+    {
+      "path": "modules/fishing/water_reflection.gd",
+      "sha256": "821633cfe9bf5d359d93cb59080e94efda479bd6bd349a26189f572b6a1a4e21"
+    },
+    {
+      "path": "modules/fishing/water_reflection.gd.uid",
+      "sha256": "f39b96648630b65b3951ab0e4d05d080c1d7a4051adbf7f94498bf74c91c0f4b"
+    },
+    {
+      "path": "modules/fishing/water_shore.gd",
+      "sha256": "6b79dd14610930b6a6b51235d2a32f7ef43a688be5764ec87a3d1e28731cdb63"
+    },
+    {
+      "path": "modules/fishing/water_shore.gd.uid",
+      "sha256": "3de767f2909b98ad92c1b97efd8c9cc35b0d380d094a8d3b2526eddd510fc093"
+    },
+    {
+      "path": "modules/ponds/pond_ground.gdshader",
+      "sha256": "09659c3852a0f5302e006003c5ed14f53b6b2d1cccde3df32efc7fd9dd569e0e"
+    },
+    {
+      "path": "modules/ponds/pond_ground.gdshader.uid",
+      "sha256": "b74d02136bf2a21d573efd5388cdfdd58bd02fa7eaa2c57d28f803f76a5c5476"
+    },
+    {
+      "path": "modules/ponds/pond_lily.gdshader",
+      "sha256": "5b535925ee8bf54ddac3d13f301bfbd0dac9163798f945be6bd31799212526b1"
+    },
+    {
+      "path": "modules/ponds/pond_lily.gdshader.uid",
+      "sha256": "71bb5f705d51ac54b4a97609ae96e4d65390d5b4085b6868925c4ac06e745106"
+    },
+    {
+      "path": "modules/ponds/pond_scenery.gd.uid",
+      "sha256": "dd844837963049301ce126c317afa8c2fdc59de5b3e1b908fb34ee67ce2de7ba"
+    },
+    {
+      "path": "modules/ponds/pond_stone.gdshader",
+      "sha256": "5938f2769bf52c121a1f941e8cfe03189766e81a68bf040b657b6c57f2f04790"
+    },
+    {
+      "path": "modules/ponds/pond_stone.gdshader.uid",
+      "sha256": "334e784acc2063faffa12e047bd61be7d191bb2b22917f604424aadd95ba85fb"
+    },
+    {
+      "path": "modules/ponds/pond_tree.gdshader",
+      "sha256": "344ba56d94cfbf61a93a0a8bae8ffe5c84153b75dac77108878f20dde587fc8d"
+    },
+    {
+      "path": "modules/ponds/pond_tree.gdshader.uid",
+      "sha256": "096c2673c2bf04898ed7ba99a952729676d77869f8fdcbb1179888259b6af2b9"
+    },
+    {
+      "path": "modules/ponds/pond_trees.gd",
+      "sha256": "bc34dee501ec07f68e8ab15c1f472faf31f41a5c3673dea6d00d0480f7506629"
+    },
+    {
+      "path": "modules/ponds/pond_trees.gd.uid",
+      "sha256": "006d202f84306105d8dfb9867dff2fdd1810eac250b42cb2fe4f7aab930aecee"
+    },
+    {
+      "path": "modules/ponds/pond_turf.gdshader",
+      "sha256": "36a74b2f7065f66b19fd7480014d7ae8bc881576bf9eed1a2b67b16548e9bb08"
+    },
+    {
+      "path": "modules/ponds/pond_turf.gdshader.uid",
+      "sha256": "08de3304005c547c9fddbc17ed246ff52db153efc49a2f5242c18d98e28dc734"
+    },
+    {
+      "path": "modules/ponds/pond_water.gdshader",
+      "sha256": "523b4067b2784699ea4189d5656951fd6e454baa7400b2fc688624d799ff94e5"
+    },
+    {
+      "path": "modules/ponds/pond_water.gdshader.uid",
+      "sha256": "9e7abeda9af12894c8febae924126951be56bb6169ef7655511517efd602edd9"
+    },
+    {
+      "path": "modules/ponds/system_ponds.gd",
+      "sha256": "560daf5ef225a11218685fb8c47e528b203b36151f14c3c99a5de58d07d6540f"
+    },
+    {
+      "path": "modules/ponds/system_ponds.gd.uid",
+      "sha256": "360dcfa636da6659f373b40999382926d6b98d8a5ade8fecdae7e6c94faeb6c7"
+    }
+  ],
+  "dry_mask_checks": [
+    {
+      "shape": "crescent",
+      "all_water_and_075m_shore_texels": 213275,
+      "nonzero_permission_texels": 0
+    },
+    {
+      "shape": "gourd",
+      "all_water_and_075m_shore_texels": 233589,
+      "nonzero_permission_texels": 0
+    },
+    {
+      "shape": "meander",
+      "all_water_and_075m_shore_texels": 236500,
+      "nonzero_permission_texels": 0
+    }
+  ],
+  "limits": "0.75m analytic clearance check allows raster/filter margin below the nominal 0.8m bake. Same-frame rendered comparisons are in godot-validation.json."
+}

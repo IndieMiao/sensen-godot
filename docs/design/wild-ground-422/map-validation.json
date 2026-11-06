@@ -1,0 +1,177 @@
+{
+	"checks": [
+		{
+			"check": "dry_ground_mask: imported mip chain",
+			"passed": true
+		},
+		{
+			"check": "dry_ground_mask: imported RGBA bytes equal PNG; no alpha-border corruption",
+			"passed": true
+		},
+		{
+			"check": "dry_ground_mask: <=2048",
+			"passed": true
+		},
+		{
+			"check": "dry_ground_mask: import sidecar",
+			"passed": true
+		},
+		{
+			"check": "dry_ground_mask: unique Godot UID",
+			"passed": true
+		},
+		{
+			"check": "meadow_color: imported mip chain",
+			"passed": true
+		},
+		{
+			"check": "meadow_color: imported RGBA bytes equal PNG; no alpha-border corruption",
+			"passed": true
+		},
+		{
+			"check": "meadow_color: <=2048",
+			"passed": true
+		},
+		{
+			"check": "meadow_color: import sidecar",
+			"passed": true
+		},
+		{
+			"check": "meadow_color: unique Godot UID",
+			"passed": true
+		},
+		{
+			"check": "crescent_layout: imported mip chain",
+			"passed": true
+		},
+		{
+			"check": "crescent_layout: imported RGBA bytes equal PNG; no alpha-border corruption",
+			"passed": true
+		},
+		{
+			"check": "crescent_layout: <=2048",
+			"passed": true
+		},
+		{
+			"check": "crescent_layout: import sidecar",
+			"passed": true
+		},
+		{
+			"check": "crescent_layout: unique Godot UID",
+			"passed": true
+		},
+		{
+			"check": "crescent: nonempty painted path/dirt",
+			"passed": true
+		},
+		{
+			"check": "crescent: zero navigation violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "crescent: zero boundary_buffer violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "crescent: zero footprint violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "crescent: zero stand violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "crescent: zero pebble_clearance violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "gourd_layout: imported mip chain",
+			"passed": true
+		},
+		{
+			"check": "gourd_layout: imported RGBA bytes equal PNG; no alpha-border corruption",
+			"passed": true
+		},
+		{
+			"check": "gourd_layout: <=2048",
+			"passed": true
+		},
+		{
+			"check": "gourd_layout: import sidecar",
+			"passed": true
+		},
+		{
+			"check": "gourd_layout: unique Godot UID",
+			"passed": true
+		},
+		{
+			"check": "gourd: nonempty painted path/dirt",
+			"passed": true
+		},
+		{
+			"check": "gourd: zero navigation violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "gourd: zero boundary_buffer violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "gourd: zero footprint violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "gourd: zero stand violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "gourd: zero pebble_clearance violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "meander_layout: imported mip chain",
+			"passed": true
+		},
+		{
+			"check": "meander_layout: imported RGBA bytes equal PNG; no alpha-border corruption",
+			"passed": true
+		},
+		{
+			"check": "meander_layout: <=2048",
+			"passed": true
+		},
+		{
+			"check": "meander_layout: import sidecar",
+			"passed": true
+		},
+		{
+			"check": "meander_layout: unique Godot UID",
+			"passed": true
+		},
+		{
+			"check": "meander: nonempty painted path/dirt",
+			"passed": true
+		},
+		{
+			"check": "meander: zero navigation violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "meander: zero boundary_buffer violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "meander: zero footprint violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "meander: zero stand violations across every painted texel",
+			"passed": true
+		},
+		{
+			"check": "meander: zero pebble_clearance violations across every painted texel",
+			"passed": true
+		}
+	],
+	"passed": true
+}

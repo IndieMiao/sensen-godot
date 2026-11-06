@@ -1,0 +1,87 @@
+{
+  "apk_sha256": "5af0743caab51a0809fa7a1113b2937f14f6ed51652f505bb7c0d199ff9dda90",
+  "packaged_resources": {
+    "crescent_layout.png.import": {
+      "ctex": ".godot/imported/crescent_layout.png-7201b5e52e237d9abe04536791b52690.ctex",
+      "sha256": "afa0b3ec4bcba51e8b9196a872a815d1f8225354b3c991c3bebf8f2a4ab9416e"
+    },
+    "meadow_color.png.import": {
+      "ctex": ".godot/imported/meadow_color.png-ca5151d732d4cf0f1fd3100d2b6c8235.ctex",
+      "sha256": "f3363117a19a265a1c5eee1b346dd49f825a255e128ac8e4d69bc159016fe63b"
+    },
+    "gourd_layout.png.import": {
+      "ctex": ".godot/imported/gourd_layout.png-f265bcdd7c7fbfe4bcc17c9313c84d34.ctex",
+      "sha256": "1c0bb87841084717bfdf8289550e24c9a81624c96633be4c0e5be8fbc9b58f12"
+    },
+    "dry_ground_mask.png.import": {
+      "ctex": ".godot/imported/dry_ground_mask.png-3a38394717edba1ac406c26e2f9e3e01.ctex",
+      "sha256": "dc4c450301027d7db51366e640e5ce651bc7f74e56beafbab5e1aa0e5932a7c9"
+    },
+    "meander_layout.png.import": {
+      "ctex": ".godot/imported/meander_layout.png-191dc3b6c4948aef903d7c5ee6f0d423.ctex",
+      "sha256": "fba0294dfc724915a226e015b4002b1d77beec1bbda1f7e56549cda3717c2dae"
+    },
+    "modules/ponds/pond_water.gdshader": {
+      "sha256": "523b4067b2784699ea4189d5656951fd6e454baa7400b2fc688624d799ff94e5"
+    },
+    "modules/ponds/pond_ground.gdshader": {
+      "sha256": "09659c3852a0f5302e006003c5ed14f53b6b2d1cccde3df32efc7fd9dd569e0e"
+    },
+    "pond_ground.sample.gdshader": {
+      "sha256": "3358bf711c2bd7ba9fd04e4a266fe980af917d0d37d0600b6f85b6721fdc802a"
+    }
+  },
+  "before": {
+    "actor": [
+      6.125,
+      0.0,
+      -1.625
+    ],
+    "assembled": true,
+    "camera_size": 6.71999979019165,
+    "dry_ground_mask": "res://assets/ponds/ground/dry_ground_mask.png",
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "grass_detail": "res://assets/farm/art/water/bank_grass.png",
+    "renderer": "mobile",
+    "revision": "water-preserved-v2",
+    "shader": "res://pond_ground.sample.gdshader",
+    "surface_flow": "res://assets/farm/art/water/surface_flow.png",
+    "water_shader_sha256": "523b4067b2784699ea4189d5656951fd6e454baa7400b2fc688624d799ff94e5",
+    "zoom": 1.0
+  },
+  "after_pinch": {
+    "actor": [
+      6.125,
+      0.0,
+      -1.625
+    ],
+    "assembled": true,
+    "camera_size": 4.79996681213379,
+    "dry_ground_mask": "res://assets/ponds/ground/dry_ground_mask.png",
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "grass_detail": "res://assets/farm/art/water/bank_grass.png",
+    "renderer": "mobile",
+    "revision": "water-preserved-v2",
+    "shader": "res://pond_ground.sample.gdshader",
+    "surface_flow": "res://assets/farm/art/water/surface_flow.png",
+    "water_shader_sha256": "523b4067b2784699ea4189d5656951fd6e454baa7400b2fc688624d799ff94e5",
+    "zoom": 1.40000970606949
+  },
+  "gesture": "Injected 62 events over 2049ms\n",
+  "passed": true,
+  "revision": "water-preserved-v2",
+  "package": "com.sensen.wildground422qa",
+  "device": "isolated emulator-5592, API 37 x86_64, private ADB 5071",
+  "physical_phone": false,
+  "full_apk_readback_equal": true,
+  "actual_input": "62 MotionEvents pinch, 2049ms; zoom 1.0 to 1.4. Real tap opens Bag.",
+  "cleanup": {
+    "runner_force_stopped": true,
+    "temporary_dex_removed": true,
+    "display_restored": {
+      "size": "Physical size: 1080x2340\nOverride size: 720x1280",
+      "density": "Physical density: 440"
+    }
+  },
+  "limits": "Software Vulkan smoke only; no physical performance or release acceptance."
+}
