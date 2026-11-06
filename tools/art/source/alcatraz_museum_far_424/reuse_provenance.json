@@ -1,0 +1,9 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "kind": "LOD derived from actual Marco Polo near-model vertices",
+  "source": "#792 d7b57574d359952858319d17b43722651a0fcbcb assets/landmarks/alcatraz_island/alc_museum.glb",
+  "changes": "Retain exact25 arch frames/glazing/reflection patches, silhouette geometry, colours and original front lettering. Reduce59 small bevelled boxes to same-envelope cuboids; remove back/extrusion of12 glyphs. 2417 of8778 triangles,27.53%. Original pivot and placement.",
+  "script": "tools/art/source/alcatraz_museum_far_424/build.py",
+  "source_blend": "tools/art/source/alcatraz_museum_far_424/alc_museum_far.blend"
+}

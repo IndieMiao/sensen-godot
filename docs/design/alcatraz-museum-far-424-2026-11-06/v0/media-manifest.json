@@ -1,0 +1,27 @@
+[
+  {
+    "file": "SGODOT-424_museum_far_v0_front_54_56.png",
+    "bytes": 38242,
+    "sha256": "71bc2c5f2d78f7b81d3fcba70684fe69276417fc4ec3872cd6ce740276f9d864"
+  },
+  {
+    "file": "SGODOT-424_museum_far_v0_full_54_56.png",
+    "bytes": 51540,
+    "sha256": "c1c5aef96d8fb35650b2ad7ff0c5c33ffe2fba589b78a6f96ba0e55c41caa91d"
+  },
+  {
+    "file": "SGODOT-424_museum_far_v0_mobile_default_54_56.png",
+    "bytes": 39252,
+    "sha256": "e821289fb776503a936a39182be1408b39015a7683da00aceb84e5c1961415c9"
+  },
+  {
+    "file": "SGODOT-424_museum_far_v0_mobile_wide_54_56.png",
+    "bytes": 59408,
+    "sha256": "dce54eacfa3f34f35030194e838811fe1ba247a5a4edccd917a83e821c018f36"
+  },
+  {
+    "file": "SGODOT-424_museum_far_v0_validation.json",
+    "bytes": 18441,
+    "sha256": "3efced13a99566fbdf8cd1be0c317a78d3dd7b7726603f52cb66ac2449a742b3"
+  }
+]
