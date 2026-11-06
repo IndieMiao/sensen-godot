@@ -484,6 +484,54 @@
       "review_only": false,
       "cast_shadow": false,
       "provenance": "tools/art/source/poi_church/modules/stained_light/reuse_provenance.json"
+    },
+    {
+      "name": "aisle_carpet",
+      "file": "aisle_carpet.glb",
+      "position": [
+        -0.03181980515339464,
+        0.083,
+        -0.03181980515339464
+      ],
+      "yaw_degrees": 45,
+      "colliders": [],
+      "material": "opaque",
+      "vegetation": false,
+      "review_only": false,
+      "cast_shadow": false,
+      "provenance": "assets/rooms/poi_church/_source_v11/reuse_provenance.json"
+    },
+    {
+      "name": "vault_extension",
+      "file": "vault_extension.glb",
+      "position": [
+        0,
+        0.08,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "opaque",
+      "vegetation": false,
+      "review_only": false,
+      "cast_shadow": false,
+      "provenance": "assets/rooms/poi_church/_source_v11/reuse_provenance.json"
+    },
+    {
+      "name": "grass_extension",
+      "file": "grass_extension.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "opaque",
+      "vegetation": false,
+      "review_only": false,
+      "cast_shadow": false,
+      "provenance": "assets/rooms/poi_church/_source_v11/reuse_provenance.json"
     }
   ],
   "instances": [
@@ -1185,7 +1233,7 @@
     "width_m": 6.72,
     "pitch_degrees": 43
   },
-  "revision": "v1",
+  "revision": "v1.1",
   "bench": {
     "floor_y": 0.08,
     "route": [
