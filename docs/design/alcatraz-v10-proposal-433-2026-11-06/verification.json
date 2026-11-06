@@ -1,0 +1,4174 @@
+{
+	"audit": {
+		"after": {
+			"geometry_totals": {
+				"surfaces": 79,
+				"triangles": 132236
+			},
+			"hud_hits_0_5m": [
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.0, 13.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.0, 13.0)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.0, 12.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.0, 12.0)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.204545, 11.59091)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.409091, 11.18182)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.613636, 10.77273)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 2.227273, 9.545454)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 2.431818, 9.136364)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 2.636364, 8.727272)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 2.840909, 8.318182)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 3.045455, 7.909091)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 3.25, 7.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-21.5, 3.25, 7.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 7.75, -1.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 7.954545, -1.909091)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.159091, -2.318182)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.363636, -2.727273)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.568182, -3.136364)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.772727, -3.545455)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.977273, -3.954545)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 9.181818, -4.363636)"
+				}
+			],
+			"metrics": {
+				"01-opening": {
+					"canvas_draw_calls": 11,
+					"capture_ms": 153,
+					"global_draw_calls": 47,
+					"player_position": [
+						-22.0,
+						1.0,
+						19.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 48520
+						}
+					],
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 46,
+					"visible_draw_calls": 27,
+					"visible_triangles": 48520,
+					"zoom": 1.0
+				},
+				"02-entry-lookout": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 170,
+					"global_draw_calls": 55,
+					"player_position": [
+						-21.0,
+						3.25,
+						7.40000009536743
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 34,
+							"visible_triangles": 59580
+						}
+					],
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 54,
+					"visible_draw_calls": 34,
+					"visible_triangles": 59580,
+					"zoom": 0.666666666666667
+				},
+				"step-02-013m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 170,
+					"global_draw_calls": 55,
+					"player_position": [
+						-20.3373641967773,
+						3.25,
+						7.3373646736145
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 55,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 54,
+							"visible_draw_calls": 36,
+							"visible_triangles": 65776
+						}
+					],
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 54,
+					"visible_draw_calls": 36,
+					"visible_triangles": 65776,
+					"zoom": 1.0
+				},
+				"step-03-020m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 169,
+					"global_draw_calls": 49,
+					"player_position": [
+						-14.0200004577637,
+						3.25,
+						7.5
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 67397
+						}
+					],
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 67397,
+					"zoom": 1.0
+				},
+				"step-04-026m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 170,
+					"global_draw_calls": 49,
+					"player_position": [
+						-7.51999998092651,
+						3.25,
+						7.5
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 30,
+							"visible_triangles": 64868
+						}
+					],
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 30,
+					"visible_triangles": 64868,
+					"zoom": 1.0
+				},
+				"step-05-033m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 168,
+					"global_draw_calls": 51,
+					"player_position": [
+						-1.01999998092651,
+						3.25,
+						7.5
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 64810
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 31,
+					"visible_triangles": 64810,
+					"zoom": 1.0
+				},
+				"step-06-039m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 168,
+					"global_draw_calls": 53,
+					"player_position": [
+						5.48000001907349,
+						3.25,
+						7.5
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 64666
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 64666,
+					"zoom": 1.0
+				},
+				"step-07-046m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 168,
+					"global_draw_calls": 54,
+					"player_position": [
+						8.0,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 67081
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 53,
+					"visible_draw_calls": 34,
+					"visible_triangles": 67081,
+					"zoom": 1.0
+				},
+				"step-08-052m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 169,
+					"global_draw_calls": 52,
+					"player_position": [
+						1.75,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 32,
+							"visible_triangles": 66951
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 51,
+					"visible_draw_calls": 32,
+					"visible_triangles": 66951,
+					"zoom": 1.0
+				},
+				"step-09-059m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 169,
+					"global_draw_calls": 54,
+					"player_position": [
+						-4.75,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 34,
+							"visible_triangles": 69297
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 53,
+					"visible_draw_calls": 34,
+					"visible_triangles": 69297,
+					"zoom": 1.0
+				},
+				"step-10-065m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 168,
+					"global_draw_calls": 51,
+					"player_position": [
+						-11.25,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 69675
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 31,
+					"visible_triangles": 69675,
+					"zoom": 1.0
+				},
+				"step-11-072m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 167,
+					"global_draw_calls": 52,
+					"player_position": [
+						-17.75,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 52,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 51,
+							"visible_draw_calls": 31,
+							"visible_triangles": 68497
+						}
+					],
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 51,
+					"visible_draw_calls": 31,
+					"visible_triangles": 68497,
+					"zoom": 1.0
+				}
+			},
+			"projections": {
+				"route/step-02-013m": [
+					{
+						"in_screen": false,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (1299.88, 330.8522), S: (140.2661, 87.47415)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (975.6884, 276.3535), S: (91.33344, 49.00104)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (1535.831, 375.1496), S: (91.33337, 49.00104)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (1051.319, 289.0735), S: (28.24316, 31.17911)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (1611.461, 387.8697), S: (28.24304, 31.17923)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_shelter",
+						"rect": "[P: (-70.53722, 328.3221), S: (99.43761, 179.9327)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_telescope",
+						"rect": "[P: (78.28004, 368.8496), S: (37.43835, 91.64041)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_semicircle",
+						"rect": "[P: (477.4436, 450.599), S: (117.1433, 96.37314)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_left_post",
+						"rect": "[P: (470.9158, 477.2093), S: (13.05566, 51.21771)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_right_post",
+						"rect": "[P: (574.6459, 495.5049), S: (13.05566, 51.21774)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_compass",
+						"rect": "[P: (798.7837, 596.098), S: (104.4453, 71.7995)]"
+					}
+				],
+				"route/step-03-020m": [
+					{
+						"in_screen": false,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (974.4115, 267.3096), S: (140.2661, 87.47415)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (650.2195, 212.8108), S: (91.33344, 49.00105)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (1210.362, 311.607), S: (91.3335, 49.00104)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (725.8499, 225.5308), S: (28.24323, 31.17921)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (1285.992, 324.327), S: (28.24316, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-396.0062, 264.7796), S: (99.43768, 179.9325)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-247.1889, 305.3071), S: (37.43831, 91.64038)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_semicircle",
+						"rect": "[P: (151.9747, 387.0564), S: (117.1433, 96.37326)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_left_post",
+						"rect": "[P: (145.4469, 413.6666), S: (13.05569, 51.21793)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_right_post",
+						"rect": "[P: (249.177, 431.9622), S: (13.05569, 51.21783)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_compass",
+						"rect": "[P: (473.3148, 532.5553), S: (104.4453, 71.7995)]"
+					}
+				],
+				"route/step-04-026m": [
+					{
+						"in_screen": false,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (637.2887, 207.849), S: (140.266, 87.47415)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (313.0966, 153.3502), S: (91.33347, 49.00105)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (873.2391, 252.1463), S: (91.33344, 49.00104)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (388.727, 166.0702), S: (28.24323, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (948.8696, 264.8663), S: (28.24323, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-733.129, 205.3188), S: (99.43762, 179.9326)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-584.3117, 245.8464), S: (37.43829, 91.64049)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_semicircle",
+						"rect": "[P: (-185.1481, 327.5958), S: (117.1433, 96.37314)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_left_post",
+						"rect": "[P: (-191.676, 354.206), S: (13.05566, 51.21783)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_right_post",
+						"rect": "[P: (-87.94585, 372.5015), S: (13.05566, 51.21793)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_compass",
+						"rect": "[P: (136.1919, 473.0946), S: (104.4453, 71.79953)]"
+					}
+				],
+				"route/step-05-033m": [
+					{
+						"in_screen": true,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (300.1659, 148.3884), S: (140.266, 87.47414)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (-24.02618, 93.88957), S: (91.3334, 49.00102)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (536.1164, 192.6857), S: (91.33344, 49.00105)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (51.60419, 106.6096), S: (28.24315, 31.17924)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (611.7467, 205.4057), S: (28.24329, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-1070.252, 145.8582), S: (99.43762, 179.9326)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-921.4346, 186.3857), S: (37.43829, 91.64052)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_semicircle",
+						"rect": "[P: (-522.2709, 268.1352), S: (117.1433, 96.37314)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_left_post",
+						"rect": "[P: (-528.7988, 294.7453), S: (13.05566, 51.21783)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_right_post",
+						"rect": "[P: (-425.0688, 313.0408), S: (13.05566, 51.21796)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_compass",
+						"rect": "[P: (-200.9309, 413.634), S: (104.4453, 71.7995)]"
+					}
+				],
+				"route/step-06-039m": [
+					{
+						"in_screen": true,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (-36.95698, 88.92772), S: (140.266, 87.47415)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (-361.1491, 34.42893), S: (91.33356, 49.00102)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (198.9935, 133.225), S: (91.33342, 49.00105)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (-285.5186, 47.14892), S: (28.24316, 31.17924)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (274.6239, 145.9451), S: (28.24319, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-1407.375, 86.39755), S: (99.43762, 179.9325)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-1258.557, 126.9251), S: (37.43835, 91.6405)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_semicircle",
+						"rect": "[P: (-859.3937, 208.6745), S: (117.1432, 96.37315)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_left_post",
+						"rect": "[P: (-865.9216, 235.2847), S: (13.05566, 51.21782)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_right_post",
+						"rect": "[P: (-762.1915, 253.5802), S: (13.0556, 51.21791)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_compass",
+						"rect": "[P: (-538.0536, 354.1734), S: (104.4451, 71.7995)]"
+					}
+				],
+				"route/step-07-046m": [
+					{
+						"in_screen": false,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (-228.0163, 313.203), S: (140.266, 87.47415)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (-552.2084, 258.7042), S: (91.33331, 49.00116)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (7.934124, 357.5003), S: (91.33345, 49.00113)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (-476.578, 271.4243), S: (28.24319, 31.1792)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (83.56452, 370.2204), S: (28.2432, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-1598.434, 310.6729), S: (99.43738, 179.9326)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-1449.617, 351.2005), S: (37.43848, 91.64041)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_semicircle",
+						"rect": "[P: (-1050.453, 432.9498), S: (117.1434, 96.3732)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_left_post",
+						"rect": "[P: (-1056.981, 459.5601), S: (13.05579, 51.21777)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_right_post",
+						"rect": "[P: (-953.2507, 477.8556), S: (13.0556, 51.2178)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_compass",
+						"rect": "[P: (-729.113, 578.4487), S: (104.4452, 71.79962)]"
+					}
+				],
+				"route/step-08-052m": [
+					{
+						"in_screen": true,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (96.14023, 370.3766), S: (140.266, 87.47415)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (-228.0519, 315.8779), S: (91.33342, 49.00113)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (332.0907, 414.674), S: (91.33344, 49.00116)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (-152.4215, 328.598), S: (28.24323, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (407.7211, 427.3941), S: (28.24323, 31.1792)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-1274.278, 367.8465), S: (99.43774, 179.9326)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-1125.46, 408.3741), S: (37.43835, 91.6405)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_semicircle",
+						"rect": "[P: (-726.2964, 490.1234), S: (117.1432, 96.3732)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_left_post",
+						"rect": "[P: (-732.8245, 516.7336), S: (13.0556, 51.21777)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_right_post",
+						"rect": "[P: (-629.0944, 535.0292), S: (13.05566, 51.2179)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_compass",
+						"rect": "[P: (-404.9565, 635.6224), S: (104.4452, 71.79956)]"
+					}
+				],
+				"route/step-09-059m": [
+					{
+						"in_screen": false,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (433.2631, 429.8373), S: (140.266, 87.47415)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (109.0709, 375.3385), S: (91.33345, 49.00113)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (669.2135, 474.1346), S: (91.3335, 49.00113)]"
+					},
+					{
+						"in_screen": true,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (184.7014, 388.0586), S: (28.24323, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (744.8439, 486.8547), S: (28.24323, 31.1792)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-937.1547, 427.3071), S: (99.4375, 179.9326)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-788.3375, 467.8347), S: (37.43848, 91.64053)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_semicircle",
+						"rect": "[P: (-389.1737, 549.5841), S: (117.1432, 96.37317)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_left_post",
+						"rect": "[P: (-395.7017, 576.1943), S: (13.05566, 51.21777)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_right_post",
+						"rect": "[P: (-291.9715, 594.4899), S: (13.05566, 51.21777)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_compass",
+						"rect": "[P: (-67.83371, 695.0829), S: (104.4453, 71.79962)]"
+					}
+				],
+				"route/step-10-065m": [
+					{
+						"in_screen": false,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (770.3859, 489.2979), S: (140.266, 87.47415)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (446.1938, 434.7991), S: (91.33347, 49.00116)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (1006.336, 533.5953), S: (91.33337, 49.00116)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (521.8242, 447.5192), S: (28.24316, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (1081.967, 546.3154), S: (28.24329, 31.1792)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-600.0317, 486.7679), S: (99.43753, 179.9326)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-451.2144, 527.2954), S: (37.43826, 91.64044)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_semicircle",
+						"rect": "[P: (-52.0509, 609.0447), S: (117.1433, 96.37329)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_left_post",
+						"rect": "[P: (-58.57876, 635.655), S: (13.05568, 51.21783)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_right_post",
+						"rect": "[P: (45.15135, 653.9506), S: (13.05569, 51.21777)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_compass",
+						"rect": "[P: (269.2892, 754.5436), S: (104.4453, 71.79956)]"
+					}
+				],
+				"route/step-11-072m": [
+					{
+						"in_screen": false,
+						"name": "alc_ruin_arch_000",
+						"rect": "[P: (1107.509, 548.7586), S: (140.266, 87.47412)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_000",
+						"rect": "[P: (783.3166, 494.2598), S: (91.33344, 49.00116)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_rubble_001",
+						"rect": "[P: (1343.459, 593.0559), S: (91.3335, 49.0011)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_000",
+						"rect": "[P: (858.947, 506.9799), S: (28.24316, 31.17923)]"
+					},
+					{
+						"in_screen": false,
+						"name": "alc_ruin_flowers_001",
+						"rect": "[P: (1419.09, 605.776), S: (28.24316, 31.17932)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_shelter",
+						"rect": "[P: (-262.909, 546.2284), S: (99.43755, 179.9326)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_telescope",
+						"rect": "[P: (-114.0918, 586.756), S: (37.43829, 91.64038)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_semicircle",
+						"rect": "[P: (285.0718, 668.5054), S: (117.1433, 96.37317)]"
+					},
+					{
+						"in_screen": true,
+						"name": "v10_left_post",
+						"rect": "[P: (278.544, 695.1156), S: (13.05569, 51.21777)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_right_post",
+						"rect": "[P: (382.2741, 713.4111), S: (13.05563, 51.21783)]"
+					},
+					{
+						"in_screen": false,
+						"name": "v10_compass",
+						"rect": "[P: (606.4119, 814.0043), S: (104.4453, 71.79956)]"
+					}
+				]
+			},
+			"rail_visual_replacements": 36,
+			"railing_collision_policy": "All original bodies, shapes and transforms retained. Visual meshes only."
+		},
+		"before": {
+			"geometry_totals": {
+				"surfaces": 78,
+				"triangles": 121010
+			},
+			"hud_hits_0_5m": [
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.0, 13.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.0, 13.0)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.0, 12.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.0, 12.0)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.204545, 11.59091)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.409091, 11.18182)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "actions"
+						}
+					],
+					"point": "(-22.0, 1.613636, 10.77273)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 2.227273, 9.545454)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 2.431818, 9.136364)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 2.636364, 8.727272)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 2.840909, 8.318182)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 3.045455, 7.909091)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-22.0, 3.25, 7.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_dock_planter_001",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(-21.5, 3.25, 7.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 7.75, -1.5)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 7.954545, -1.909091)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.159091, -2.318182)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.363636, -2.727273)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.568182, -3.136364)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.772727, -3.545455)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 8.977273, -3.954545)"
+				},
+				{
+					"hits": [
+						{
+							"contract": "current",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						},
+						{
+							"contract": "props_802_bounds",
+							"name": "alc_tree_a_000",
+							"region": "quick_bar_right"
+						}
+					],
+					"point": "(8.0, 9.181818, -4.363636)"
+				}
+			],
+			"metrics": {
+				"01-opening": {
+					"canvas_draw_calls": 11,
+					"capture_ms": 157,
+					"global_draw_calls": 46,
+					"player_position": [
+						-22.0,
+						1.0,
+						19.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						},
+						{
+							"canvas_draw_calls": 11,
+							"global_draw_calls": 46,
+							"shadow_draw_calls": 8,
+							"total_draw_calls": 45,
+							"visible_draw_calls": 26,
+							"visible_triangles": 34426
+						}
+					],
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426,
+					"zoom": 1.0
+				},
+				"02-entry-lookout": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 167,
+					"global_draw_calls": 54,
+					"player_position": [
+						-21.0,
+						3.25,
+						7.40000009536743
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 33,
+							"visible_triangles": 45486
+						}
+					],
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 53,
+					"visible_draw_calls": 33,
+					"visible_triangles": 45486,
+					"zoom": 0.666666666666667
+				},
+				"step-02-013m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 167,
+					"global_draw_calls": 54,
+					"player_position": [
+						-20.3373641967773,
+						3.25,
+						7.3373646736145
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 54,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 53,
+							"visible_draw_calls": 35,
+							"visible_triangles": 54550
+						}
+					],
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 53,
+					"visible_draw_calls": 35,
+					"visible_triangles": 54550,
+					"zoom": 1.0
+				},
+				"step-03-020m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 168,
+					"global_draw_calls": 48,
+					"player_position": [
+						-14.0200004577637,
+						3.25,
+						7.5
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 48,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 47,
+							"visible_draw_calls": 29,
+							"visible_triangles": 56171
+						}
+					],
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 47,
+					"visible_draw_calls": 29,
+					"visible_triangles": 56171,
+					"zoom": 1.0
+				},
+				"step-04-026m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 168,
+					"global_draw_calls": 47,
+					"player_position": [
+						-7.51999998092651,
+						3.25,
+						7.5
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 11,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 28,
+							"visible_triangles": 53530
+						}
+					],
+					"shadow_draw_calls": 11,
+					"total_draw_calls": 46,
+					"visible_draw_calls": 28,
+					"visible_triangles": 53530,
+					"zoom": 1.0
+				},
+				"step-05-033m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 167,
+					"global_draw_calls": 47,
+					"player_position": [
+						-1.01999998092651,
+						3.25,
+						7.5
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 45,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 44,
+							"visible_draw_calls": 25,
+							"visible_triangles": 52502
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 47,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 46,
+							"visible_draw_calls": 27,
+							"visible_triangles": 52978
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 46,
+					"visible_draw_calls": 27,
+					"visible_triangles": 52978,
+					"zoom": 1.0
+				},
+				"step-06-039m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 167,
+					"global_draw_calls": 49,
+					"player_position": [
+						5.48000001907349,
+						3.25,
+						7.5
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 52834
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 29,
+					"visible_triangles": 52834,
+					"zoom": 1.0
+				},
+				"step-07-046m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 169,
+					"global_draw_calls": 53,
+					"player_position": [
+						8.0,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 53,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 52,
+							"visible_draw_calls": 33,
+							"visible_triangles": 55855
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 55855,
+					"zoom": 1.0
+				},
+				"step-08-052m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 169,
+					"global_draw_calls": 49,
+					"player_position": [
+						1.75,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 49,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 48,
+							"visible_draw_calls": 29,
+							"visible_triangles": 55469
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 48,
+					"visible_draw_calls": 29,
+					"visible_triangles": 55469,
+					"zoom": 1.0
+				},
+				"step-09-059m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 169,
+					"global_draw_calls": 51,
+					"player_position": [
+						-4.75,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 31,
+							"visible_triangles": 57609
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 31,
+					"visible_triangles": 57609,
+					"zoom": 1.0
+				},
+				"step-10-065m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 170,
+					"global_draw_calls": 50,
+					"player_position": [
+						-11.25,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 50,
+							"shadow_draw_calls": 12,
+							"total_draw_calls": 49,
+							"visible_draw_calls": 30,
+							"visible_triangles": 58449
+						}
+					],
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 49,
+					"visible_draw_calls": 30,
+					"visible_triangles": 58449,
+					"zoom": 1.0
+				},
+				"step-11-072m": {
+					"canvas_draw_calls": 7,
+					"capture_ms": 170,
+					"global_draw_calls": 51,
+					"player_position": [
+						-17.75,
+						5.5,
+						3.0
+					],
+					"samples": [
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						},
+						{
+							"canvas_draw_calls": 7,
+							"global_draw_calls": 51,
+							"shadow_draw_calls": 13,
+							"total_draw_calls": 50,
+							"visible_draw_calls": 30,
+							"visible_triangles": 57271
+						}
+					],
+					"shadow_draw_calls": 13,
+					"total_draw_calls": 50,
+					"visible_draw_calls": 30,
+					"visible_triangles": 57271,
+					"zoom": 1.0
+				}
+			}
+		}
+	},
+	"checks": {
+		"01-opening_draw_budget": {
+			"evidence": 46,
+			"passed": true
+		},
+		"01-opening_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"01-opening_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"01-opening_presentation_draw_budget": {
+			"evidence": 47,
+			"passed": true
+		},
+		"01-opening_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"01-opening_triangle_budget": {
+			"evidence": 48520,
+			"passed": true
+		},
+		"02-entry-lookout_draw_budget": {
+			"evidence": 54,
+			"passed": true
+		},
+		"02-entry-lookout_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"02-entry-lookout_presentation_draw_budget": {
+			"evidence": 55,
+			"passed": true
+		},
+		"02-entry-lookout_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"02-entry-lookout_triangle_budget": {
+			"evidence": 59580,
+			"passed": true
+		},
+		"04-top-layout_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"04-top-layout_size": {
+			"evidence": "(1000, 1200)",
+			"passed": true
+		},
+		"after_whole_scene_surface_budget": {
+			"evidence": 79,
+			"passed": true
+		},
+		"after_whole_scene_triangle_budget": {
+			"evidence": 132236,
+			"passed": true
+		},
+		"all_live_collisions_unchanged": {
+			"evidence": 269,
+			"passed": true
+		},
+		"all_proposed_rail_visuals_applied": {
+			"evidence": 36,
+			"passed": true
+		},
+		"before_whole_scene_surface_budget": {
+			"evidence": 78,
+			"passed": true
+		},
+		"before_whole_scene_triangle_budget": {
+			"evidence": 121010,
+			"passed": true
+		},
+		"bridge_visible_upper_left_pixels": {
+			"evidence": 768,
+			"passed": true
+		},
+		"new_tall_props_clear_along_route": {
+			"evidence": [],
+			"passed": true
+		},
+		"no_new_continuous_hud_intrusions": {
+			"evidence": 22,
+			"passed": true
+		},
+		"shelter_clear_of_existing_solids": {
+			"evidence": [],
+			"passed": true
+		},
+		"shelter_four_feet_supported": {
+			"evidence": [
+				3.25,
+				3.25,
+				3.25,
+				3.25
+			],
+			"passed": true
+		},
+		"step-02-013m_draw_budget": {
+			"evidence": 54,
+			"passed": true
+		},
+		"step-02-013m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-02-013m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-02-013m_presentation_draw_budget": {
+			"evidence": 55,
+			"passed": true
+		},
+		"step-02-013m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-02-013m_triangle_budget": {
+			"evidence": 65776,
+			"passed": true
+		},
+		"step-03-020m_draw_budget": {
+			"evidence": 48,
+			"passed": true
+		},
+		"step-03-020m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-03-020m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-03-020m_presentation_draw_budget": {
+			"evidence": 49,
+			"passed": true
+		},
+		"step-03-020m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-03-020m_triangle_budget": {
+			"evidence": 67397,
+			"passed": true
+		},
+		"step-04-026m_draw_budget": {
+			"evidence": 48,
+			"passed": true
+		},
+		"step-04-026m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-04-026m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-04-026m_presentation_draw_budget": {
+			"evidence": 49,
+			"passed": true
+		},
+		"step-04-026m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-04-026m_triangle_budget": {
+			"evidence": 64868,
+			"passed": true
+		},
+		"step-05-033m_draw_budget": {
+			"evidence": 50,
+			"passed": true
+		},
+		"step-05-033m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-05-033m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-05-033m_presentation_draw_budget": {
+			"evidence": 51,
+			"passed": true
+		},
+		"step-05-033m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-05-033m_triangle_budget": {
+			"evidence": 64810,
+			"passed": true
+		},
+		"step-06-039m_draw_budget": {
+			"evidence": 52,
+			"passed": true
+		},
+		"step-06-039m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-06-039m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-06-039m_presentation_draw_budget": {
+			"evidence": 53,
+			"passed": true
+		},
+		"step-06-039m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-06-039m_triangle_budget": {
+			"evidence": 64666,
+			"passed": true
+		},
+		"step-07-046m_draw_budget": {
+			"evidence": 53,
+			"passed": true
+		},
+		"step-07-046m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-07-046m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-07-046m_presentation_draw_budget": {
+			"evidence": 54,
+			"passed": true
+		},
+		"step-07-046m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-07-046m_triangle_budget": {
+			"evidence": 67081,
+			"passed": true
+		},
+		"step-08-052m_draw_budget": {
+			"evidence": 51,
+			"passed": true
+		},
+		"step-08-052m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-08-052m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-08-052m_presentation_draw_budget": {
+			"evidence": 52,
+			"passed": true
+		},
+		"step-08-052m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-08-052m_triangle_budget": {
+			"evidence": 66951,
+			"passed": true
+		},
+		"step-09-059m_draw_budget": {
+			"evidence": 53,
+			"passed": true
+		},
+		"step-09-059m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-09-059m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-09-059m_presentation_draw_budget": {
+			"evidence": 54,
+			"passed": true
+		},
+		"step-09-059m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-09-059m_triangle_budget": {
+			"evidence": 69297,
+			"passed": true
+		},
+		"step-10-065m_draw_budget": {
+			"evidence": 50,
+			"passed": true
+		},
+		"step-10-065m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-10-065m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-10-065m_presentation_draw_budget": {
+			"evidence": 51,
+			"passed": true
+		},
+		"step-10-065m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-10-065m_triangle_budget": {
+			"evidence": 69675,
+			"passed": true
+		},
+		"step-11-072m_draw_budget": {
+			"evidence": 51,
+			"passed": true
+		},
+		"step-11-072m_hud_tall_clearance": {
+			"evidence": [],
+			"passed": true
+		},
+		"step-11-072m_no_background": {
+			"evidence": 0,
+			"passed": true
+		},
+		"step-11-072m_presentation_draw_budget": {
+			"evidence": 52,
+			"passed": true
+		},
+		"step-11-072m_size": {
+			"evidence": "(360, 800)",
+			"passed": true
+		},
+		"step-11-072m_triangle_budget": {
+			"evidence": 68497,
+			"passed": true
+		}
+	},
+	"failures": []
+}

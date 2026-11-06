@@ -1,0 +1,114 @@
+[
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-01-opening.png",
+    "id": "182a1c72-e6a9-4b3b-92d4-7e68e110d602",
+    "sha256": "a398a710503079a96aeaa9c2e95b446f004b60b1f3c435141b6df722a28ca8cd",
+    "bytes": 161031,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-02-entry-lookout.png",
+    "id": "a9f62589-d2ec-405d-b0f2-1f6180967cc1",
+    "sha256": "75f1ef5302ed7d55d3ee1c74258dbd62b5eaf77711fa45ca46b9e8b7e4665f09",
+    "bytes": 323119,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-02-013m.png",
+    "id": "56ec9e1f-8a49-4c5e-8668-30faff4f96eb",
+    "sha256": "17fb7258451154fd0ed9f269400074c36ce51290900042c4e0120c69acdec7ba",
+    "bytes": 321743,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-03-020m.png",
+    "id": "d1ce1222-47bf-4dc3-af47-7cceaf724ae3",
+    "sha256": "fd9b451bd8ac02b1af316627d73e8544080e2c25338e2b91bafa0f8374061acc",
+    "bytes": 317061,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-04-026m.png",
+    "id": "4ebce474-d1c5-43b1-9814-573e9badbfe8",
+    "sha256": "9de8179f903a47b466655e733919b4764dada0de61ff60939029ec9643b3eab9",
+    "bytes": 316728,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-05-033m.png",
+    "id": "245b5061-6de9-4b7b-9cb1-85d86697e9f0",
+    "sha256": "64f06cd25624df57010de45b8120260a37e020616dde60264808cddb90e11f42",
+    "bytes": 322218,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-06-039m.png",
+    "id": "3f061c19-9a5a-4932-bd0e-20ae5d5c96d9",
+    "sha256": "550338f87974cc67cb2b3c547207cdc46e4075fa3d63e86cce694be445a925e7",
+    "bytes": 326720,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-07-046m.png",
+    "id": "b51d815d-ea98-4648-8ee7-a6516894f0f9",
+    "sha256": "ccf6218acb3f5d570842980c77783dde4063f86c844ab3e24fa803aff73c28d0",
+    "bytes": 312807,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-08-052m.png",
+    "id": "fa68699b-28e8-4c1e-b396-0fdcbe230ca9",
+    "sha256": "1f7e649301c4503befe2d5c28fce94763002d3fc80a6d3cd7fced724ec91fbbd",
+    "bytes": 315631,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-09-059m.png",
+    "id": "46efed7b-d2f1-4e5b-8f94-a5cd5c4cf1e7",
+    "sha256": "f14ece873290001b4e6f73fbf6812f582db509bdb3c8e7c273e7bf66ae8f4aac",
+    "bytes": 309754,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-10-065m.png",
+    "id": "b8cf8967-3ca0-405f-8674-40ab70167f83",
+    "sha256": "0c5ae9e2ba64fc2f80c0d47b74800295e798ebc4ba7d3483deb557b61ed3ddee",
+    "bytes": 304834,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-comparisons-step-11-072m.png",
+    "id": "39ad9d86-0237-40c2-9191-175c19bca242",
+    "sha256": "1d3b1521c600eb5e1d6b900ffc4e891441d9c53bbaf9c63b521a14bcb4f27d8a",
+    "bytes": 311145,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-route-contact-sheet.png",
+    "id": "fc1d7412-13c7-4682-aa20-a12263101f33",
+    "sha256": "c38eebfd87a91a517c670fde24935f276371fcb3a92b47cb2f4224265c3417ce",
+    "bytes": 1587613,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v1-top-layout-annotated.png",
+    "id": "b6dd1891-db7e-4f26-808e-43350281c1ac",
+    "sha256": "333c13699b2da68685c2c62022542cda14a9c19ad58cc82ac9d09500fb062d94",
+    "bytes": 494578,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  }
+]

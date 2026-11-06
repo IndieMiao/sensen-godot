@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "base": "05a2c032f88cc0d39caebca05bd79df98845fbbe",
+  "production_files_byte_identical": 176,
+  "live_collision_shapes_identical": 269,
+  "new_tall_hud_probes": "No new overlaps; existing coarse-route candidates preserved exactly.",
+  "proposal_only": true
+}

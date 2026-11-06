@@ -1,0 +1,38 @@
+{
+  "island_base": "05a2c032f88cc0d39caebca05bd79df98845fbbe",
+  "lookout_inputs": [
+    {
+      "asset": "lookout_sheltered_bench",
+      "head": "1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f",
+      "sha256": "38f2ae42b0446e0a01c3ad9a7277fef4d3c0f1a99670d41ead07362110d67a94"
+    },
+    {
+      "asset": "lookout_telescope",
+      "head": "1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f",
+      "sha256": "24da4f8b80326ff4a7e737f04e7fa2760fa80fd11ebaf68baf587a6cb96cf812"
+    },
+    {
+      "asset": "lookout_semicircle_2m",
+      "head": "1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f",
+      "sha256": "4ccda6d6e42c869c4a53f72b7381e7625d24b85f8202b4e385d608258a5a8177"
+    },
+    {
+      "asset": "railing_endpost",
+      "head": "1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f",
+      "sha256": "92946285a8d917fcd02ff671359f18ca46d8a83fac7c6078619af60ae1db42db"
+    },
+    {
+      "asset": "lookout_compass_disc",
+      "head": "1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f",
+      "sha256": "0ab32b487abc2b34cea0d6037f59369e8d18cfca4bd90d716e43b08eca132c57"
+    },
+    {
+      "asset": "lookout_railing_2m",
+      "head": "1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f",
+      "sha256": "38099ce0724cb44daa1fd806e71f89adf3825ee678ef649e53ac6b15f15699be"
+    }
+  ],
+  "collision_placements_identical": true,
+  "navigation_and_camera_identical": true,
+  "limits": "Proposal only. Lookout kit has two upstream visual corrections pending."
+}
