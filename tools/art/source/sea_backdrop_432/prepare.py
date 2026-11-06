@@ -1,9 +1,12 @@
 """Isolated bay/lake review; pinned coast archive is staging-only."""
 from pathlib import Path
-import shutil,json,subprocess,tarfile
+import shutil,json,subprocess,tarfile,sys
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/sea-backdrop-432';QA=OUT/'project'
 REL='assets/landmarks/_shared/sea_backdrop';COAST='assets/landmarks/_shared/coast_kit'
 def main():
+ global OUT, QA
+ if '--lake-revision' in sys.argv:
+  OUT=ROOT/'output/sea-backdrop-432-v11';QA=OUT/'project'
  QA.mkdir(parents=True,exist_ok=True);(OUT.parent/'.gdignore').touch()
  for rel in [REL,'assets/landmarks/_shared/water_edge']:
   shutil.copytree(ROOT/rel,QA/rel,dirs_exist_ok=True)
@@ -18,6 +21,9 @@ def main():
  for name in ['review.gd','verify.gd']:
   if (SRC/name).exists():shutil.copy2(SRC/name,QA/name)
  shutil.copy2(ROOT/'assets/landmarks/alcatraz_island/sea_backdrop.gdshader',QA/'original_sea.gdshader')
+ if '--lake-revision' in sys.argv:
+  for name,filename in [('sea_backdrop.gdshader','previous_sea.gdshader'),('lake.tres','previous_lake.tres')]:
+   (QA/filename).write_bytes(subprocess.check_output(['git','show','15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c:'+REL+'/'+name],cwd=ROOT))
  (QA/'review.tscn').write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://review.gd" id="1"]\n[node name="SeaBackdropReview" type="Node"]\nscript=ExtResource("1")\n')
  (QA/'project.godot').write_text('''config_version=5
 [application]

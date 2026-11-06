@@ -44,3 +44,19 @@ wood materials use water_level=0.20, wet_height=0.25; no simulated wet-band
 shader remains. Two seaward pile rings follow the revised four-pile dock at
 local fixture X=-2±0.72, Z=7.66. Sea is Y=.20; foam is Y=.218. Existing owner
 runtime resources are not edited.
+
+## Lake v1.1 follow-up
+
+`prepare.py --lake-revision` stages into `output/sea-backdrop-432-v11/project`
+and retrieves the accepted v1 shader/lake from `15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c`.
+Run the same locked import/resource check, then the displayed Mobile capture with
+`--fixed-fps 30 --disable-vsync -- --lake-revision`. It records the original lake,
+the revised lake, and same-frame bay pixel parity at t=0 / 3.5. The fixture,
+lighting, camera and foam are shared with v1. `package_lake_revision.py` publishes
+only the new stills/metrics under `docs/design/sea-backdrop-432/v1.1/`.
+
+For the Android follow-up use `prepare_android.py --lake-revision`, export that
+project, and set `SEA_REVIEW_OUTPUT=output/sea-backdrop-432-v11` when running
+`android_smoke.py`. The current runner identifies itself as `432-v1.1`; production
+TIME and the four preset/foam taps remain unchanged. The v1 GIF is historical
+lake colour evidence, not the current lake preview.

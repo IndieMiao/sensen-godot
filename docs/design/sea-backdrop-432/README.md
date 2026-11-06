@@ -1,4 +1,12 @@
-# SGODOT-432 · 通用海面 / 湖面背景 v1
+# SGODOT-432 · 当前湖面 v1.1
+
+湖面已按画面意见改为近岸青绿、向外湖蓝，并移除顶部灰绿雾带。海湾维持已验收版。当前审阅与验证见 **[v1.1 修订说明](v1.1/README.md)**。
+
+![当前湖面](v1.1/lake-default-review.png)
+
+以下是首次交付的历史记录，旧湖面截图 / GIF 不代表当前版本。
+
+# SGODOT-432 · 通用海面 / 湖面背景 v1（历史）
 
 刘备交审。提供一个通用 shader 与海湾、湖面两套 `.tres`；换地标只改浅 / 深水色、远处渐隐色、波纹尺度和速度等参数。海湾沿用恶魔岛蓝色色板，湖面改为更平静的蓝绿色。材质位于 [assets/landmarks/_shared/sea_backdrop](../../../assets/landmarks/_shared/sea_backdrop/README.md)。
 

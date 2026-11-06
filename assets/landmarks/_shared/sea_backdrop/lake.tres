@@ -5,16 +5,21 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1")
-shader_parameter/shallow_color = Color(0.435294118, 0.658823529, 0.631372549, 1)
-shader_parameter/deep_color = Color(0.282352941, 0.478431373, 0.501960784, 1)
-shader_parameter/far_color = Color(0.654901961, 0.760784314, 0.713725490, 1)
+shader_parameter/shallow_color = Color(0.329411765, 0.835294118, 0.803921569, 1)
+shader_parameter/deep_color = Color(0.078431373, 0.490196078, 0.631372549, 1)
+shader_parameter/far_color = Color(0.078431373, 0.490196078, 0.631372549, 1)
 shader_parameter/ripple_wavelength_m = 5.8
 shader_parameter/color_patch_scale = 1.4
 shader_parameter/motion_speed = 0.55
 shader_parameter/ripple_strength = 0.012
-shader_parameter/color_mix_range = Vector2(0.25, 0.8)
+shader_parameter/color_mix_range = Vector2(0.12, 0.27)
 shader_parameter/ripple_threshold = Vector2(0.95, 1.0)
-shader_parameter/far_fade_screen_y = Vector2(0.12, 0.3)
+shader_parameter/far_fade_screen_y = Vector2(0.0, 0.08)
 shader_parameter/pattern_origin = Vector2(0, 0)
-shader_parameter/far_color_amount = 1.0
+shader_parameter/far_color_amount = 0.0
 shader_parameter/reveal_far_background = false
+shader_parameter/shore_shallows_strength = 0.9
+shader_parameter/shore_depth_range_m = Vector2(0.25, 4.0)
+shader_parameter/shore_segment_a = Vector4(2.7260066, 4.8019671, 4.2896942, 1.4486283)
+shader_parameter/shore_segment_b = Vector4(4.2896942, 1.4486283, 0.6644630, -0.2418448)
+shader_parameter/shore_segment_c = Vector4(0.6644630, -0.2418448, 2.6507689, -4.5014914)

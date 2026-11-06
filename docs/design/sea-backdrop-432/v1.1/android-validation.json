@@ -1,0 +1,93 @@
+{
+  "passed": true,
+  "states": [
+    {
+      "button_foam": [
+        268,
+        760
+      ],
+      "button_preset": [
+        92,
+        760
+      ],
+      "draws": 22,
+      "foam": true,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "432-v1.1",
+      "pid": 16639,
+      "preset": "bay",
+      "renderer": "mobile"
+    },
+    {
+      "button_foam": [
+        268,
+        760
+      ],
+      "button_preset": [
+        92,
+        760
+      ],
+      "draws": 22,
+      "foam": true,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "432-v1.1",
+      "pid": 16639,
+      "preset": "lake",
+      "renderer": "mobile"
+    },
+    {
+      "button_foam": [
+        268,
+        760
+      ],
+      "button_preset": [
+        92,
+        760
+      ],
+      "draws": 14,
+      "foam": false,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "432-v1.1",
+      "pid": 16639,
+      "preset": "lake",
+      "renderer": "mobile"
+    },
+    {
+      "button_foam": [
+        268,
+        760
+      ],
+      "button_preset": [
+        92,
+        760
+      ],
+      "draws": 22,
+      "foam": true,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "432-v1.1",
+      "pid": 16639,
+      "preset": "lake",
+      "renderer": "mobile"
+    },
+    {
+      "button_foam": [
+        268,
+        760
+      ],
+      "button_preset": [
+        92,
+        760
+      ],
+      "draws": 22,
+      "foam": true,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "432-v1.1",
+      "pid": 16639,
+      "preset": "bay",
+      "renderer": "mobile"
+    }
+  ],
+  "apk_sha256": "56398c13d214c2fe8b9aff47691eb815fc9ffa341f9c7fc7267f502684df9d73",
+  "installed_apk_readback_equal": true,
+  "scope": "API37 SwiftShader emulator / Mobile / 4 real taps; not physical GPU performance"
+}

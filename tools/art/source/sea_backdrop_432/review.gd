@@ -103,6 +103,8 @@ func run():
  frame(assembly.to_global(Vector3(.2,.2,2.6)),6.72)
  if OS.has_feature("android"):
   await android_start();return
+ if "--lake-revision" in OS.get_cmdline_user_args():
+  await lake_revision();return
  for preset in ["bay","lake"]:
   sea_mat=make_sea(preset);sea.material_override=sea_mat;clock_set(0)
   await capture(preset+"-default-review")
@@ -154,7 +156,7 @@ var android_preset="bay"
 var android_foam=true
 func android_state():
  for i in 4:await RenderingServer.frame_post_draw
- var state={"pid":OS.get_process_id(),"preset":android_preset,"foam":android_foam,"kit":"432-v1","renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"button_preset":[92,760],"button_foam":[268,760],"draws":vp.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)}
+ var state={"pid":OS.get_process_id(),"preset":android_preset,"foam":android_foam,"kit":"432-v1.1","renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"button_preset":[92,760],"button_foam":[268,760],"draws":vp.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)}
  FileAccess.open("user://sea_state.json",FileAccess.WRITE).store_string(JSON.stringify(state))
  vp.get_texture().get_image().save_png("user://sea_%s_%s.png"%[android_preset,str(android_foam)])
 func android_start():
@@ -169,3 +171,27 @@ func android_start():
   for n in foam_nodes:n.visible=android_foam
   android_state())
  await android_state()
+
+# Same fixture and clock for the narrowly scoped lake follow-up.
+func lake_revision():
+ report.bay_parity=[]
+ for t in [0.0,3.5]:
+  sea_mat=make_sea("bay");sea.material_override=sea_mat;clock_set(t)
+  await capture("bay-current-%s"%str(t));var current=vp.get_texture().get_image()
+  sea_mat.shader=clock_shader(load("res://previous_sea.gdshader"));clock_set(t)
+  await capture("bay-accepted-%s"%str(t));var previous=vp.get_texture().get_image()
+  var delta=diff(current,previous);delta.time_s=t;report.bay_parity.append(delta)
+  check(delta.maximum_rgb_255==0.0,"approved bay remains pixel-identical at "+str(t))
+ sea_mat=load("res://previous_lake.tres").duplicate(true)
+ sea_mat.shader=clock_shader(load("res://previous_sea.gdshader"))
+ sea.material_override=sea_mat;clock_set(0);await capture("lake-before-review")
+ sea_mat=make_sea("lake");sea.material_override=sea_mat;clock_set(0)
+ await capture("lake-default-review")
+ for n in foam_nodes:n.hide()
+ await capture("lake-no-foam")
+ clock_set(4);await capture("lake-sea-time-4")
+ report.renderer={"engine":Engine.get_version_info().string,"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
+ report.budget={"texture_reads":0,"passes":1,"sines":5,"shoreline":"three analytic segment distances when enabled; uniform-disabled in bay; no extra layer"}
+ report.passed=report.checks.all(func(c):return c.passed)
+ FileAccess.open(output+"/render-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
+ print("LAKE_REVISION_RENDER ",report.passed);get_tree().quit(0 if report.passed else 1)

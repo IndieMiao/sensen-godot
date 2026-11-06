@@ -3,7 +3,7 @@ from pathlib import Path
 import os, subprocess, time, json, hashlib
 
 ROOT = Path(__file__).resolve().parents[4]
-OUT = ROOT / 'output/sea-backdrop-432/android'
+OUT = ROOT / os.environ.get('SEA_REVIEW_OUTPUT', 'output/sea-backdrop-432') / 'android'
 OUT.mkdir(exist_ok=True)
 PKG = 'com.sensen.seabackdrop432qa'
 ADB = [os.environ['ADB'], '-s', os.environ['JOURNEY_SERIAL']]
@@ -17,7 +17,7 @@ def wait(preset, foam):
         try:
             state = json.loads(call('shell', 'run-as', PKG, 'cat', 'files/sea_state.json'))
             assert str(state['pid']) == call('shell', 'pidof', PKG).decode().strip()
-            if state['preset'] == preset and state['foam'] == foam and state['kit'] == '432-v1':
+            if state['preset'] == preset and state['foam'] == foam and state['kit'] == '432-v1.1':
                 return state
         except (ValueError, AssertionError, subprocess.CalledProcessError):
             pass
