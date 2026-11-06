@@ -1,0 +1,121 @@
+{
+  "passed": true,
+  "scope": "four optional material assignments, three views and two real zoom-button taps; not a full navigation/pinch or physical-phone performance test",
+  "before": {
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 14,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "material_targets": 4,
+    "pid": 12743,
+    "renderer": "mobile",
+    "revision": "alcatraz-ground-424-v1.1",
+    "seq": 0,
+    "view": "opening",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 1.0
+  },
+  "zoomed_out": {
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 34,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "material_targets": 4,
+    "pid": 12743,
+    "renderer": "mobile",
+    "revision": "alcatraz-ground-424-v1.1",
+    "seq": 0,
+    "view": "opening",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 0.869565217391304
+  },
+  "restored": {
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 42,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "material_targets": 4,
+    "pid": 12743,
+    "renderer": "mobile",
+    "revision": "alcatraz-ground-424-v1.1",
+    "seq": 0,
+    "view": "opening",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 1.0
+  },
+  "views": [
+    {
+      "assembled": true,
+      "buttons": {
+        "ZoomIn": [
+          322.0,
+          374.0
+        ],
+        "ZoomOut": [
+          322.0,
+          422.0
+        ]
+      },
+      "frames": 50,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "material_targets": 4,
+      "pid": 12743,
+      "renderer": "mobile",
+      "revision": "alcatraz-ground-424-v1.1",
+      "seq": 1,
+      "view": "mid_hill",
+      "viewport": "(360.0, 800.0)",
+      "zoom": 1.0
+    },
+    {
+      "assembled": true,
+      "buttons": {
+        "ZoomIn": [
+          322.0,
+          374.0
+        ],
+        "ZoomOut": [
+          322.0,
+          422.0
+        ]
+      },
+      "frames": 62,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "material_targets": 4,
+      "pid": 12743,
+      "renderer": "mobile",
+      "revision": "alcatraz-ground-424-v1.1",
+      "seq": 2,
+      "view": "summit",
+      "viewport": "(360.0, 800.0)",
+      "zoom": 1.0
+    }
+  ]
+}

@@ -25,6 +25,11 @@ def periodic_noise(sigma):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     macro = .5 + .105 * periodic_noise(51) + .045 * periodic_noise(19) + .018 * periodic_noise(5)
+    # v1.1: additional small perimeter breakup; independent RNG preserves every
+    # leaf/mineral channel and the approved paving/wood texture byte-for-byte.
+    edge_rng = np.random.default_rng(4241107)
+    edge = gaussian_filter(edge_rng.normal(size=(N, N)), 3, mode='wrap')
+    macro += .025 * edge / edge.std()
     blades = np.full((N, N), .48)
     # Short paired leaf strokes, softly rounded, drawn with toroidal distances.
     for _ in range(650):

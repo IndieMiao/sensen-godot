@@ -7,6 +7,10 @@ func _initialize():
   assert(material!=null and material.shader!=null)
   var expected=0 if name=="alc_terrain_detail" else 1
   assert(material.get_shader_parameter("finish_kind")==expected)
+  if expected==0:
+   assert(material.get_shader_parameter("grass_deep_color").is_equal_approx(Color("527E35")))
+   assert(material.get_shader_parameter("grass_base_color").is_equal_approx(Color("78A044")))
+   assert(material.get_shader_parameter("grass_sun_color").is_equal_approx(Color("A2B95D")))
   var textures={}
   for key in ["fields","surfaces"]:
    var tex=material.get_shader_parameter(key) as Texture2D

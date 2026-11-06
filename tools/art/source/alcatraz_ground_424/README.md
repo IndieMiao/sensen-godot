@@ -1,5 +1,17 @@
 # Alcatraz optional ground detail / SGODOT-424
 
+## Current v1.1 grass revision
+
+The approved paving and wood remain byte-identical to `91c563b16`. Only the fields texture R channel and grass display colours changed. The original `garden*` uniforms still identify the owner's COLOR_0; new `grass_*_color` uniforms control visible grass, including when the owner batches terrain with the stone ruins.
+
+Run `generate.py` to completion before staging. `prepare_v11.py` stages an isolated `output/alcatraz-ground-424-v11/project` with the pinned host and the original #827 v1 material alongside current material. Under the shared flock: import, run `configure_v11.gd` to match baseline texture settings, import again, then run the project in Vulkan Mobile. `review_v11.gd` produces matched v1/current frames plus separate classification, neutral-albedo and occlusion controls. Diagnostic shaders are generated only inside ignored output; they are not runtime kit resources.
+
+`measure_v11.py` computes mean Rec.709-weighted sRGB pixel brightness, erodes class interiors by 1px, excludes shadowed pixels with the equal-albedo control, and evaluates the same masks in both revisions. The class/black-control difference identifies grass visible in MSAA subsamples behind railings; outside that region plus a 1px edge, all pixels must remain exactly unchanged. It writes annotated native 360×800 pairs, raw frames, exact sample masks and metrics to `docs/design/alcatraz-ground-424/v1.1/`.
+
+Run `verify.py` with its module `OUT` set to the v1.1 output directory for the unchanged-host audit. Android uses a copied `android-project`, `prepare_android.gd`, the repository app runner and `android_smoke.py` (v1.1 output by default). `verify_package.gd` checks the three new grass colours in decoded packaged material resources. Keep v1 evidence intact; do not overwrite the original output/document directory with revision results.
+
+## Initial preparation reference
+
 Runtime kit: `assets/landmarks/alcatraz_island/ground/`. No Blender geometry is generated or edited in this task. Editable sources are `generate.py`, the shader, materials and JSON parameters; the owner's fixed palette snapshot is in `reference/palette.json`.
 
 1. Fetch owner #792 to ensure commit `bf0c31b1c871011008b455434d167224d14de59c` is present. The art branch itself is based on `fc19d492eabbbe96105726c5a627c30d98b4e445`.

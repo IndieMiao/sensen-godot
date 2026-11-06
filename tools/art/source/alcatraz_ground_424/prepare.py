@@ -1,4 +1,4 @@
-"""Stage pinned host plus six independent shoreline prototypes in an offline project."""
+"""Stage pinned host plus optional ground materials in an offline project."""
 from pathlib import Path
 import json,shutil,subprocess,tarfile
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/alcatraz-ground-424';QA=OUT/'project'

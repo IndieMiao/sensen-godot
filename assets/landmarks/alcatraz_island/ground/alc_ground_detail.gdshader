@@ -11,6 +11,10 @@ uniform float palette_tolerance : hint_range(0.001, 0.03) = 0.012;
 uniform vec4 garden : source_color = vec4(0.52549, 0.65882, 0.30980, 1.0);
 uniform vec4 garden_dark : source_color = vec4(0.45882, 0.58039, 0.28235, 1.0);
 uniform vec4 garden_light : source_color = vec4(0.60392, 0.70980, 0.36471, 1.0);
+// Grass output colours are independent from the owner's COLOR_0 selection keys.
+uniform vec4 grass_deep_color : source_color = vec4(0.45882, 0.58039, 0.28235, 1.0);
+uniform vec4 grass_base_color : source_color = vec4(0.52549, 0.65882, 0.30980, 1.0);
+uniform vec4 grass_sun_color : source_color = vec4(0.60392, 0.70980, 0.36471, 1.0);
 uniform vec4 road : source_color = vec4(0.87451, 0.79608, 0.65490, 1.0);
 uniform vec4 wood : source_color = vec4(0.73333, 0.54510, 0.32157, 1.0);
 uniform vec4 wood_light : source_color = vec4(0.81569, 0.64706, 0.42353, 1.0);
@@ -52,8 +56,8 @@ void fragment() {
             float broad = texture(fields, world_position.xz / grass_patch_repeat_m).r;
             float second = texture(fields, (world_position.zx + vec2(11.7, -4.3)) / (grass_patch_repeat_m * 1.618)).r;
             float patch = broad * 0.80 + second * 0.20;
-            vec3 grass_color = mix(garden_dark.rgb, garden.rgb, smoothstep(0.41, 0.46, patch));
-            grass_color = mix(grass_color, garden_light.rgb, smoothstep(0.54, 0.60, patch));
+            vec3 grass_color = mix(grass_deep_color.rgb, grass_base_color.rgb, smoothstep(0.41, 0.46, patch));
+            grass_color = mix(grass_color, grass_sun_color.rgb, smoothstep(0.54, 0.60, patch));
             float leaf = texture(fields, world_position.xz / grass_detail_repeat_m).g;
             detailed = grass_color * (1.0 + (leaf - 0.5) * grass_detail_strength * 2.0);
         } else if (path) {

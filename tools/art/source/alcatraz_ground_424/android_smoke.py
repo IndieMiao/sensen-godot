@@ -1,7 +1,7 @@
 """Isolated asset smoke under repository Android session runner; no player saves."""
 from pathlib import Path
 import subprocess,json,time,os,math
-SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/alcatraz-ground-424/android';OUT.mkdir(exist_ok=True)
+SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=Path(os.environ.get('ALCATRAZ_GROUND_QA_OUTPUT',str(ROOT/'output/alcatraz-ground-424-v11')))/'android';OUT.mkdir(exist_ok=True)
 pkg='com.sensen.alcatrazground424qa';adb=[os.environ['ADB'],'-s',os.environ['JOURNEY_SERIAL']]
 def call(*a):return subprocess.check_output(adb+list(map(str,a)),stderr=subprocess.DEVNULL)
 def state():
@@ -18,7 +18,7 @@ def wait(pred,seconds=150):
 def snap(n):(OUT/(n+'.png')).write_bytes(call('exec-out','screencap','-p'))
 def tap(p):call('shell','input','tap',int(p[0]),int(p[1]))
 try:
- before=wait(lambda s:s['revision']=='alcatraz-ground-424-v1' and s['assembled']);time.sleep(3);snap('dock-opening')
+ before=wait(lambda s:s['revision']=='alcatraz-ground-424-v1.1' and s['assembled']);time.sleep(3);snap('dock-opening')
  assert before['material_targets']==4 and before['renderer']=='mobile'
  tap(before['buttons']['ZoomOut']);out=wait(lambda s:s['zoom']<.9,30)
  tap(out['buttons']['ZoomIn']);back=wait(lambda s:abs(s['zoom']-1)<.001,30)

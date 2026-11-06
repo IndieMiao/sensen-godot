@@ -10,3 +10,6 @@ shader = ExtResource("1")
 shader_parameter/finish_kind = 0
 shader_parameter/fields = ExtResource("2")
 shader_parameter/surfaces = ExtResource("3")
+shader_parameter/grass_deep_color = Color(0.321569, 0.494118, 0.207843, 1)
+shader_parameter/grass_base_color = Color(0.470588, 0.627451, 0.266667, 1)
+shader_parameter/grass_sun_color = Color(0.635294, 0.72549, 0.364706, 1)

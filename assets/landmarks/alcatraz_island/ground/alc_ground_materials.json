@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "owner": "刘备",
   "optional": true,
   "host_commit": "bf0c31b1c871011008b455434d167224d14de59c",
@@ -12,7 +12,7 @@
   },
   "texture_channels": {
     "alc_ground_fields.png": {
-      "R": "periodic macro field, world repeat24m and38.832m",
+      "R": "periodic grass macro field + extra perimeter noise (independent seed4241107), repeats24m/38.832m",
       "G": "leaf strokes, world repeat2m",
       "B": "reserved mineral micrograin, unused by v1 shader"
     },
@@ -41,16 +41,10 @@
     ],
     "wood_grain_strength": 0.32,
     "surface_roughness": 0.94,
-    "surface_specular": 0.15
-  },
-  "palette_hex": {
-    "garden": "86A84F",
-    "garden_light": "9AB55D",
-    "garden_dark": "759448",
-    "road": "DFCBA7",
-    "wood": "BB8B52",
-    "wood_light": "D0A56C",
-    "wood_dark": "9A7046"
+    "surface_specular": 0.15,
+    "grass_deep_color": "#527E35",
+    "grass_base_color": "#78A044",
+    "grass_sun_color": "#A2B95D"
   },
   "constraints": [
     "No changes to host GLB, UV, layout, navigation, lighting, cameras, sea or rocks",
@@ -58,7 +52,8 @@
     "Preserve imported linear COLOR_0, bind both packed textures as data (no source_color hint)",
     "World-space grass/paving; dock-local grain. No triplanar cliff detail, no normal/depth/alpha or extra passes",
     "If host vertex palette changes, update classification uniforms or leave optional material off",
-    "Dock selector assumes original top face local Y=0; reused mesh can translate/rotate without losing grain alignment"
+    "Dock selector assumes original top face local Y=0; reused mesh can translate/rotate without losing grain alignment",
+    "garden/garden_dark/garden_light remain original COLOR_0 selection keys; only grass_deep_color/grass_base_color/grass_sun_color control displayed grass hue. Keep source palette unchanged, including merged ruin/terrain surface."
   ],
   "shader_texture_reads": {
     "grass": 3,
@@ -71,5 +66,16 @@
     1024
   ],
   "added_geometry": 0,
-  "automatic_scene_application": false
+  "automatic_scene_application": false,
+  "acceptance": "不知火舞确定套用；v1.1只增强草坡，石板与木纹冻结于91c563b16",
+  "palette_hex": {
+    "garden": "86A84F",
+    "garden_light": "9AB55D",
+    "garden_dark": "759448",
+    "road": "DFCBA7",
+    "wood": "BB8B52",
+    "wood_light": "D0A56C",
+    "wood_dark": "9A7046"
+  },
+  "selection_palette_note": "palette_hex remains original host COLOR_0 selection keys; displayed grass colours are the three grass_*_color parameters."
 }

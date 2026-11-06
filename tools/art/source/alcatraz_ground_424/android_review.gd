@@ -31,7 +31,7 @@ func _process(dt):
  var buttons={}
  for key in island._zoom_buttons:
   var b=island._zoom_buttons[key].get_global_rect().get_center();buttons[key]=[b.x,b.y]
- var data={"revision":"alcatraz-ground-424-v1","pid":OS.get_process_id(),"seq":sequence,"view":view,
+ var data={"revision":"alcatraz-ground-424-v1.1","pid":OS.get_process_id(),"seq":sequence,"view":view,
   "assembled":not island._rig.is_busy(),"material_targets":targets.size(),"zoom":island.camera_pan.zoom,
   "buttons":buttons,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),
   "frames":Engine.get_frames_drawn(),"viewport":str(get_viewport().get_visible_rect().size)}

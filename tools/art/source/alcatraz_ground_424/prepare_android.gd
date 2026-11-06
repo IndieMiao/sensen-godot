@@ -16,7 +16,7 @@ func _initialize():
  for key in {"name":"Android Alcatraz Ground QA","platform":"Android","runnable":true,"export_filter":"all_resources","include_filter":"*.json"}:
   p.set_value("preset.0",key,{"name":"Android Alcatraz Ground QA","platform":"Android","runnable":true,"export_filter":"all_resources","include_filter":"*.json"}[key])
  var opts={"gradle_build/use_gradle_build":false,"architectures/arm64-v8a":false,"architectures/x86_64":true,
-  "version/code":42405,"version/name":"424-ground-art","package/unique_name":"com.sensen.alcatrazground424qa","package/name":"Alcatraz Ground Art QA","package/signed":true}
+  "version/code":42406,"version/name":"424-ground-v1.1","package/unique_name":"com.sensen.alcatrazground424qa","package/name":"Alcatraz Ground Art QA","package/signed":true}
  p.set_value("preset.0","exclude_filter","")
  for key in opts:p.set_value("preset.0.options",key,opts[key])
  assert(p.save("res://export_presets.cfg")==OK)
