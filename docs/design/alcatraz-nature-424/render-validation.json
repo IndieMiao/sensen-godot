@@ -1,0 +1,165 @@
+{
+	"avatar_source_height": 1.72073924541473,
+	"captures": [
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.937862, -0.347009), Z: (0.0, 0.347009, 0.937862), O: (0.0, 8.0, 20.0)]",
+			"name": "01_scale_lineup",
+			"size": [
+				1500,
+				650
+			],
+			"visible_draw_calls": 10,
+			"visible_primitives": 9282,
+			"width_m": 17.0
+		},
+		{
+			"camera": "[X: (0.998969, 0.0, 0.045408), Y: (0.016517, 0.931495, -0.363379), Z: (-0.042297, 0.363754, 0.930534), O: (-4.0, 5.0, 11.0)]",
+			"name": "02_rock_detail",
+			"size": [
+				1500,
+				650
+			],
+			"visible_draw_calls": 4,
+			"visible_primitives": 542,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.926178, -0.377087), Z: (0.0, 0.377087, 0.926178), O: (3.3, 3.2, 7.0)]",
+			"name": "03_foliage_detail",
+			"size": [
+				1500,
+				650
+			],
+			"visible_draw_calls": 4,
+			"visible_primitives": 382,
+			"width_m": 5.59999990463257
+		},
+		{
+			"camera": "[X: (0.752577, 0.0, 0.658505), Y: (0.304048, 0.887024, -0.347483), Z: (-0.584109, 0.461724, 0.667553), O: (-44.0, 18.0, 33.0)]",
+			"name": "04_blockout_shore",
+			"size": [
+				1100,
+				900
+			],
+			"visible_draw_calls": 31,
+			"visible_primitives": 45424,
+			"width_m": 18.0
+		},
+		{
+			"camera": "[X: (0.816968, 0.0, -0.576683), Y: (-0.388849, 0.738471, -0.550869), Z: (0.425864, 0.674285, 0.603307), O: (31.0, 23.0, 20.0)]",
+			"name": "05_blockout_terraces",
+			"size": [
+				1100,
+				900
+			],
+			"visible_draw_calls": 25,
+			"visible_primitives": 36194,
+			"width_m": 20.0
+		},
+		{
+			"camera": "[X: (0.828169, 0.0, -0.560478), Y: (-0.286213, 0.859783, -0.422912), Z: (0.48189, 0.510659, 0.712046), O: (67.0, 75.0, 97.0)]",
+			"name": "06_whole_island",
+			"size": [
+				1300,
+				1100
+			],
+			"visible_draw_calls": 49,
+			"visible_primitives": 55904,
+			"width_m": 77.0
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "07_default_opening",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 25,
+			"visible_primitives": 41149,
+			"width_m": 6.71999979019165
+		}
+	],
+	"checks": [
+		{
+			"check": "complete avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "avatar complete bounds",
+			"passed": true
+		},
+		{
+			"check": "01_scale_lineup: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 01_scale_lineup",
+			"passed": true
+		},
+		{
+			"check": "02_rock_detail: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 02_rock_detail",
+			"passed": true
+		},
+		{
+			"check": "03_foliage_detail: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 03_foliage_detail",
+			"passed": true
+		},
+		{
+			"check": "blockout avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "04_blockout_shore: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 04_blockout_shore",
+			"passed": true
+		},
+		{
+			"check": "05_blockout_terraces: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 05_blockout_terraces",
+			"passed": true
+		},
+		{
+			"check": "06_whole_island: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 06_whole_island",
+			"passed": true
+		},
+		{
+			"check": "07_default_opening: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 07_default_opening",
+			"passed": true
+		},
+		{
+			"check": "Mobile renderer",
+			"passed": true
+		}
+	],
+	"lineup_avatar_height": 1.75,
+	"nature_batches": 12,
+	"nature_instances": 179,
+	"passed": true,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	}
+}

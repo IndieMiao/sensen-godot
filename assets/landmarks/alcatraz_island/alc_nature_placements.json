@@ -1,0 +1,4502 @@
+{
+  "task": "SGODOT-424",
+  "owner": "刘备",
+  "source_layout_commit": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
+  "status": "suggested; merge once with owner placements, never append twice",
+  "axes": "Godot Y-up, +X east, +Z south/dock; Blender (x,-z,y)",
+  "sea_y": -0.15,
+  "points": [
+    {
+      "name": "alc_rock_b_000",
+      "asset": "alc_rock_b",
+      "position": [
+        7.6364,
+        -0.62,
+        14.35
+      ],
+      "rotation_degrees": [
+        0,
+        302.948,
+        0
+      ],
+      "scale": [
+        0.862,
+        0.862,
+        0.862
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_001",
+      "asset": "alc_rock_b",
+      "position": [
+        9.8182,
+        -0.62,
+        14.35
+      ],
+      "rotation_degrees": [
+        0,
+        275.219,
+        0
+      ],
+      "scale": [
+        0.92,
+        0.92,
+        0.92
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_000",
+      "asset": "alc_rock_c",
+      "position": [
+        12.0,
+        -0.62,
+        14.35
+      ],
+      "rotation_degrees": [
+        0,
+        25.896,
+        0
+      ],
+      "scale": [
+        0.949,
+        0.949,
+        0.949
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_000",
+      "asset": "alc_rock_a",
+      "position": [
+        14.1818,
+        -0.62,
+        14.35
+      ],
+      "rotation_degrees": [
+        0,
+        314.694,
+        0
+      ],
+      "scale": [
+        0.868,
+        0.868,
+        0.868
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_002",
+      "asset": "alc_rock_b",
+      "position": [
+        16.3636,
+        -0.62,
+        14.35
+      ],
+      "rotation_degrees": [
+        0,
+        162.423,
+        0
+      ],
+      "scale": [
+        0.894,
+        0.894,
+        0.894
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_001",
+      "asset": "alc_rock_c",
+      "position": [
+        18.5455,
+        -0.62,
+        14.35
+      ],
+      "rotation_degrees": [
+        0,
+        148.003,
+        0
+      ],
+      "scale": [
+        1.045,
+        1.045,
+        1.045
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_002",
+      "asset": "alc_rock_c",
+      "position": [
+        20.7273,
+        -0.62,
+        14.35
+      ],
+      "rotation_degrees": [
+        0,
+        2.232,
+        0
+      ],
+      "scale": [
+        1.001,
+        1.001,
+        1.001
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_003",
+      "asset": "alc_rock_c",
+      "position": [
+        22.9091,
+        -0.62,
+        14.35
+      ],
+      "rotation_degrees": [
+        0,
+        292.513,
+        0
+      ],
+      "scale": [
+        0.869,
+        0.869,
+        0.869
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_001",
+      "asset": "alc_rock_a",
+      "position": [
+        24.5126,
+        -0.62,
+        12.9699
+      ],
+      "rotation_degrees": [
+        0,
+        331.12,
+        0
+      ],
+      "scale": [
+        1.024,
+        1.024,
+        1.024
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_004",
+      "asset": "alc_rock_c",
+      "position": [
+        24.8459,
+        -0.62,
+        10.8032
+      ],
+      "rotation_degrees": [
+        0,
+        274.523,
+        0
+      ],
+      "scale": [
+        0.908,
+        0.908,
+        0.908
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_003",
+      "asset": "alc_rock_b",
+      "position": [
+        25.1793,
+        -0.62,
+        8.6366
+      ],
+      "rotation_degrees": [
+        0,
+        173.537,
+        0
+      ],
+      "scale": [
+        0.916,
+        0.916,
+        0.916
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_002",
+      "asset": "alc_rock_a",
+      "position": [
+        25.8198,
+        -0.62,
+        6.5171
+      ],
+      "rotation_degrees": [
+        0,
+        184.016,
+        0
+      ],
+      "scale": [
+        0.992,
+        0.992,
+        0.992
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_005",
+      "asset": "alc_rock_c",
+      "position": [
+        26.8198,
+        -0.62,
+        4.2671
+      ],
+      "rotation_degrees": [
+        0,
+        284.923,
+        0
+      ],
+      "scale": [
+        1.025,
+        1.025,
+        1.025
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_004",
+      "asset": "alc_rock_b",
+      "position": [
+        27.8198,
+        -0.62,
+        2.0171
+      ],
+      "rotation_degrees": [
+        0,
+        316.649,
+        0
+      ],
+      "scale": [
+        1.043,
+        1.043,
+        1.043
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_003",
+      "asset": "alc_rock_a",
+      "position": [
+        28.8198,
+        -0.62,
+        -0.2329
+      ],
+      "rotation_degrees": [
+        0,
+        104.418,
+        0
+      ],
+      "scale": [
+        0.862,
+        0.862,
+        0.862
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_006",
+      "asset": "alc_rock_c",
+      "position": [
+        29.5917,
+        -0.62,
+        -2.5491
+      ],
+      "rotation_degrees": [
+        0,
+        228.534,
+        0
+      ],
+      "scale": [
+        1.028,
+        1.028,
+        1.028
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_004",
+      "asset": "alc_rock_a",
+      "position": [
+        30.0917,
+        -0.62,
+        -4.7991
+      ],
+      "rotation_degrees": [
+        0,
+        277.115,
+        0
+      ],
+      "scale": [
+        0.933,
+        0.933,
+        0.933
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_007",
+      "asset": "alc_rock_c",
+      "position": [
+        30.35,
+        -0.62,
+        -7.1
+      ],
+      "rotation_degrees": [
+        0,
+        75.697,
+        0
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_008",
+      "asset": "alc_rock_c",
+      "position": [
+        30.35,
+        -0.62,
+        -9.3
+      ],
+      "rotation_degrees": [
+        0,
+        282.37,
+        0
+      ],
+      "scale": [
+        0.962,
+        0.962,
+        0.962
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_009",
+      "asset": "alc_rock_c",
+      "position": [
+        30.35,
+        -0.62,
+        -11.5
+      ],
+      "rotation_degrees": [
+        0,
+        147.349,
+        0
+      ],
+      "scale": [
+        0.917,
+        0.917,
+        0.917
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_005",
+      "asset": "alc_rock_b",
+      "position": [
+        30.35,
+        -0.62,
+        -13.7
+      ],
+      "rotation_degrees": [
+        0,
+        152.715,
+        0
+      ],
+      "scale": [
+        0.97,
+        0.97,
+        0.97
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_006",
+      "asset": "alc_rock_b",
+      "position": [
+        30.35,
+        -0.62,
+        -15.9
+      ],
+      "rotation_degrees": [
+        0,
+        124.197,
+        0
+      ],
+      "scale": [
+        0.903,
+        0.903,
+        0.903
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_010",
+      "asset": "alc_rock_c",
+      "position": [
+        28.7475,
+        -0.62,
+        -18.7475
+      ],
+      "rotation_degrees": [
+        0,
+        98.894,
+        0
+      ],
+      "scale": [
+        1.026,
+        1.026,
+        1.026
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_011",
+      "asset": "alc_rock_c",
+      "position": [
+        25.92,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        175.103,
+        0
+      ],
+      "scale": [
+        1.053,
+        1.053,
+        1.053
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_007",
+      "asset": "alc_rock_b",
+      "position": [
+        23.76,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        80.35,
+        0
+      ],
+      "scale": [
+        0.889,
+        0.889,
+        0.889
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_012",
+      "asset": "alc_rock_c",
+      "position": [
+        21.6,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        81.572,
+        0
+      ],
+      "scale": [
+        0.956,
+        0.956,
+        0.956
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_005",
+      "asset": "alc_rock_a",
+      "position": [
+        19.44,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        127.805,
+        0
+      ],
+      "scale": [
+        0.971,
+        0.971,
+        0.971
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_013",
+      "asset": "alc_rock_c",
+      "position": [
+        17.28,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        38.153,
+        0
+      ],
+      "scale": [
+        0.976,
+        0.976,
+        0.976
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_006",
+      "asset": "alc_rock_a",
+      "position": [
+        15.12,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        81.209,
+        0
+      ],
+      "scale": [
+        1.041,
+        1.041,
+        1.041
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_008",
+      "asset": "alc_rock_b",
+      "position": [
+        12.96,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        290.215,
+        0
+      ],
+      "scale": [
+        1.037,
+        1.037,
+        1.037
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_007",
+      "asset": "alc_rock_a",
+      "position": [
+        10.8,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        105.265,
+        0
+      ],
+      "scale": [
+        1.006,
+        1.006,
+        1.006
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_014",
+      "asset": "alc_rock_c",
+      "position": [
+        8.64,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        295.529,
+        0
+      ],
+      "scale": [
+        0.892,
+        0.892,
+        0.892
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_009",
+      "asset": "alc_rock_b",
+      "position": [
+        6.48,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        193.457,
+        0
+      ],
+      "scale": [
+        0.946,
+        0.946,
+        0.946
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_010",
+      "asset": "alc_rock_b",
+      "position": [
+        4.32,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        57.212,
+        0
+      ],
+      "scale": [
+        0.92,
+        0.92,
+        0.92
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_011",
+      "asset": "alc_rock_b",
+      "position": [
+        2.16,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        90.699,
+        0
+      ],
+      "scale": [
+        0.97,
+        0.97,
+        0.97
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_012",
+      "asset": "alc_rock_b",
+      "position": [
+        0.0,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        114.068,
+        0
+      ],
+      "scale": [
+        1.024,
+        1.024,
+        1.024
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_008",
+      "asset": "alc_rock_a",
+      "position": [
+        -2.16,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        8.05,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_009",
+      "asset": "alc_rock_a",
+      "position": [
+        -4.32,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        109.43,
+        0
+      ],
+      "scale": [
+        0.891,
+        0.891,
+        0.891
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_015",
+      "asset": "alc_rock_c",
+      "position": [
+        -6.48,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        82.751,
+        0
+      ],
+      "scale": [
+        1.06,
+        1.06,
+        1.06
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_010",
+      "asset": "alc_rock_a",
+      "position": [
+        -8.64,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        351.839,
+        0
+      ],
+      "scale": [
+        0.982,
+        0.982,
+        0.982
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_011",
+      "asset": "alc_rock_a",
+      "position": [
+        -10.8,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        154.915,
+        0
+      ],
+      "scale": [
+        0.91,
+        0.91,
+        0.91
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_013",
+      "asset": "alc_rock_b",
+      "position": [
+        -12.96,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        40.595,
+        0
+      ],
+      "scale": [
+        0.879,
+        0.879,
+        0.879
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_014",
+      "asset": "alc_rock_b",
+      "position": [
+        -15.12,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        9.899,
+        0
+      ],
+      "scale": [
+        0.964,
+        0.964,
+        0.964
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_016",
+      "asset": "alc_rock_c",
+      "position": [
+        -17.28,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        57.637,
+        0
+      ],
+      "scale": [
+        0.905,
+        0.905,
+        0.905
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_015",
+      "asset": "alc_rock_b",
+      "position": [
+        -19.44,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        97.433,
+        0
+      ],
+      "scale": [
+        0.952,
+        0.952,
+        0.952
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_017",
+      "asset": "alc_rock_c",
+      "position": [
+        -21.6,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        177.534,
+        0
+      ],
+      "scale": [
+        0.948,
+        0.948,
+        0.948
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_016",
+      "asset": "alc_rock_b",
+      "position": [
+        -23.76,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        256.419,
+        0
+      ],
+      "scale": [
+        0.972,
+        0.972,
+        0.972
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_012",
+      "asset": "alc_rock_a",
+      "position": [
+        -25.92,
+        -0.62,
+        -20.35
+      ],
+      "rotation_degrees": [
+        0,
+        315.569,
+        0
+      ],
+      "scale": [
+        0.903,
+        0.903,
+        0.903
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_018",
+      "asset": "alc_rock_c",
+      "position": [
+        -28.7475,
+        -0.62,
+        -18.7475
+      ],
+      "rotation_degrees": [
+        0,
+        4.622,
+        0
+      ],
+      "scale": [
+        0.975,
+        0.975,
+        0.975
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_017",
+      "asset": "alc_rock_b",
+      "position": [
+        -30.35,
+        -0.62,
+        -15.9
+      ],
+      "rotation_degrees": [
+        0,
+        186.772,
+        0
+      ],
+      "scale": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_018",
+      "asset": "alc_rock_b",
+      "position": [
+        -30.35,
+        -0.62,
+        -13.7
+      ],
+      "rotation_degrees": [
+        0,
+        49.839,
+        0
+      ],
+      "scale": [
+        0.895,
+        0.895,
+        0.895
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_019",
+      "asset": "alc_rock_c",
+      "position": [
+        -30.35,
+        -0.62,
+        -11.5
+      ],
+      "rotation_degrees": [
+        0,
+        324.601,
+        0
+      ],
+      "scale": [
+        0.869,
+        0.869,
+        0.869
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_019",
+      "asset": "alc_rock_b",
+      "position": [
+        -30.35,
+        -0.62,
+        -9.3
+      ],
+      "rotation_degrees": [
+        0,
+        20.403,
+        0
+      ],
+      "scale": [
+        0.933,
+        0.933,
+        0.933
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_020",
+      "asset": "alc_rock_c",
+      "position": [
+        -30.35,
+        -0.62,
+        -7.1
+      ],
+      "rotation_degrees": [
+        0,
+        203.838,
+        0
+      ],
+      "scale": [
+        0.983,
+        0.983,
+        0.983
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_a_013",
+      "asset": "alc_rock_a",
+      "position": [
+        -30.0917,
+        -0.62,
+        -4.7991
+      ],
+      "rotation_degrees": [
+        0,
+        314.402,
+        0
+      ],
+      "scale": [
+        0.891,
+        0.891,
+        0.891
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_020",
+      "asset": "alc_rock_b",
+      "position": [
+        -29.5917,
+        -0.62,
+        -2.5491
+      ],
+      "rotation_degrees": [
+        0,
+        248.957,
+        0
+      ],
+      "scale": [
+        1.023,
+        1.023,
+        1.023
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_021",
+      "asset": "alc_rock_b",
+      "position": [
+        -28.8198,
+        -0.62,
+        -0.2329
+      ],
+      "rotation_degrees": [
+        0,
+        56.826,
+        0
+      ],
+      "scale": [
+        0.944,
+        0.944,
+        0.944
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_021",
+      "asset": "alc_rock_c",
+      "position": [
+        -27.8198,
+        -0.62,
+        2.0171
+      ],
+      "rotation_degrees": [
+        0,
+        292.234,
+        0
+      ],
+      "scale": [
+        0.898,
+        0.898,
+        0.898
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_b_022",
+      "asset": "alc_rock_b",
+      "position": [
+        -26.8198,
+        -0.62,
+        4.2671
+      ],
+      "rotation_degrees": [
+        0,
+        206.947,
+        0
+      ],
+      "scale": [
+        0.928,
+        0.928,
+        0.928
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_rock_c_022",
+      "asset": "alc_rock_c",
+      "position": [
+        -25.8198,
+        -0.62,
+        6.5171
+      ],
+      "rotation_degrees": [
+        0,
+        174.911,
+        0
+      ],
+      "scale": [
+        0.872,
+        0.872,
+        0.872
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_000",
+      "asset": "alc_shrub_b",
+      "position": [
+        -15.3765,
+        0.965,
+        12.0827
+      ],
+      "rotation_degrees": [
+        0,
+        88.99,
+        0
+      ],
+      "scale": [
+        0.868,
+        0.868,
+        0.868
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_000",
+      "asset": "alc_shrub_a",
+      "position": [
+        -12.8929,
+        0.965,
+        10.6163
+      ],
+      "rotation_degrees": [
+        0,
+        235.728,
+        0
+      ],
+      "scale": [
+        0.881,
+        0.881,
+        0.881
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_001",
+      "asset": "alc_shrub_a",
+      "position": [
+        -11.1135,
+        0.965,
+        13.1886
+      ],
+      "rotation_degrees": [
+        0,
+        16.467,
+        0
+      ],
+      "scale": [
+        1.04,
+        1.04,
+        1.04
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_001",
+      "asset": "alc_shrub_b",
+      "position": [
+        -8.5959,
+        0.965,
+        11.8341
+      ],
+      "rotation_degrees": [
+        0,
+        66.027,
+        0
+      ],
+      "scale": [
+        0.988,
+        0.988,
+        0.988
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_002",
+      "asset": "alc_shrub_a",
+      "position": [
+        -6.4736,
+        0.965,
+        9.8584
+      ],
+      "rotation_degrees": [
+        0,
+        291.205,
+        0
+      ],
+      "scale": [
+        0.947,
+        0.947,
+        0.947
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_003",
+      "asset": "alc_shrub_a",
+      "position": [
+        -4.5616,
+        0.965,
+        12.878
+      ],
+      "rotation_degrees": [
+        0,
+        312.815,
+        0
+      ],
+      "scale": [
+        0.962,
+        0.962,
+        0.962
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_002",
+      "asset": "alc_shrub_b",
+      "position": [
+        -2.3075,
+        0.965,
+        11.2748
+      ],
+      "rotation_degrees": [
+        0,
+        314.673,
+        0
+      ],
+      "scale": [
+        0.887,
+        0.887,
+        0.887
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_004",
+      "asset": "alc_shrub_a",
+      "position": [
+        -0.1493,
+        0.965,
+        11.7387
+      ],
+      "rotation_degrees": [
+        0,
+        319.537,
+        0
+      ],
+      "scale": [
+        0.902,
+        0.902,
+        0.902
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_005",
+      "asset": "alc_shrub_a",
+      "position": [
+        2.3759,
+        0.965,
+        12.3485
+      ],
+      "rotation_degrees": [
+        0,
+        136.504,
+        0
+      ],
+      "scale": [
+        0.831,
+        0.831,
+        0.831
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_003",
+      "asset": "alc_shrub_b",
+      "position": [
+        4.5325,
+        0.965,
+        11.8391
+      ],
+      "rotation_degrees": [
+        0,
+        263.561,
+        0
+      ],
+      "scale": [
+        1.004,
+        1.004,
+        1.004
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_006",
+      "asset": "alc_shrub_a",
+      "position": [
+        6.8402,
+        0.965,
+        11.0621
+      ],
+      "rotation_degrees": [
+        0,
+        108.71,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_007",
+      "asset": "alc_shrub_a",
+      "position": [
+        8.6876,
+        0.965,
+        11.4328
+      ],
+      "rotation_degrees": [
+        0,
+        241.874,
+        0
+      ],
+      "scale": [
+        0.855,
+        0.855,
+        0.855
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_004",
+      "asset": "alc_shrub_b",
+      "position": [
+        10.9149,
+        0.965,
+        12.4593
+      ],
+      "rotation_degrees": [
+        0,
+        163.05,
+        0
+      ],
+      "scale": [
+        0.991,
+        0.991,
+        0.991
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_008",
+      "asset": "alc_shrub_a",
+      "position": [
+        13.5909,
+        0.965,
+        11.8908
+      ],
+      "rotation_degrees": [
+        0,
+        337.189,
+        0
+      ],
+      "scale": [
+        0.881,
+        0.881,
+        0.881
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_009",
+      "asset": "alc_shrub_a",
+      "position": [
+        15.5868,
+        0.965,
+        11.3685
+      ],
+      "rotation_degrees": [
+        0,
+        123.911,
+        0
+      ],
+      "scale": [
+        0.917,
+        0.917,
+        0.917
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_005",
+      "asset": "alc_shrub_b",
+      "position": [
+        17.789,
+        0.965,
+        12.8934
+      ],
+      "rotation_degrees": [
+        0,
+        286.671,
+        0
+      ],
+      "scale": [
+        0.989,
+        0.989,
+        0.989
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_010",
+      "asset": "alc_shrub_a",
+      "position": [
+        20.2117,
+        0.965,
+        11.9752
+      ],
+      "rotation_degrees": [
+        0,
+        72.399,
+        0
+      ],
+      "scale": [
+        0.974,
+        0.974,
+        0.974
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_011",
+      "asset": "alc_shrub_a",
+      "position": [
+        12.3724,
+        3.215,
+        4.9073
+      ],
+      "rotation_degrees": [
+        0,
+        279.268,
+        0
+      ],
+      "scale": [
+        0.997,
+        0.997,
+        0.997
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_012",
+      "asset": "alc_shrub_a",
+      "position": [
+        19.0682,
+        3.215,
+        5.6124
+      ],
+      "rotation_degrees": [
+        0,
+        304.013,
+        0
+      ],
+      "scale": [
+        0.807,
+        0.807,
+        0.807
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_013",
+      "asset": "alc_shrub_a",
+      "position": [
+        21.1398,
+        3.215,
+        5.1148
+      ],
+      "rotation_degrees": [
+        0,
+        64.179,
+        0
+      ],
+      "scale": [
+        0.884,
+        0.884,
+        0.884
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_006",
+      "asset": "alc_shrub_b",
+      "position": [
+        -24.7012,
+        5.465,
+        0.4777
+      ],
+      "rotation_degrees": [
+        0,
+        23.903,
+        0
+      ],
+      "scale": [
+        0.931,
+        0.931,
+        0.931
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_014",
+      "asset": "alc_shrub_a",
+      "position": [
+        10.6061,
+        5.465,
+        0.9342
+      ],
+      "rotation_degrees": [
+        0,
+        193.103,
+        0
+      ],
+      "scale": [
+        0.822,
+        0.822,
+        0.822
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_015",
+      "asset": "alc_shrub_a",
+      "position": [
+        12.5265,
+        5.465,
+        0.8538
+      ],
+      "rotation_degrees": [
+        0,
+        265.308,
+        0
+      ],
+      "scale": [
+        0.82,
+        0.82,
+        0.82
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_007",
+      "asset": "alc_shrub_b",
+      "position": [
+        14.627,
+        5.465,
+        1.0405
+      ],
+      "rotation_degrees": [
+        0,
+        17.15,
+        0
+      ],
+      "scale": [
+        0.854,
+        0.854,
+        0.854
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_016",
+      "asset": "alc_shrub_a",
+      "position": [
+        17.2276,
+        5.465,
+        0.6858
+      ],
+      "rotation_degrees": [
+        0,
+        17.201,
+        0
+      ],
+      "scale": [
+        0.962,
+        0.962,
+        0.962
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_017",
+      "asset": "alc_shrub_a",
+      "position": [
+        18.8481,
+        5.465,
+        0.6366
+      ],
+      "rotation_degrees": [
+        0,
+        115.01,
+        0
+      ],
+      "scale": [
+        1.023,
+        1.023,
+        1.023
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_008",
+      "asset": "alc_shrub_b",
+      "position": [
+        20.9965,
+        5.465,
+        0.8313
+      ],
+      "rotation_degrees": [
+        0,
+        59.825,
+        0
+      ],
+      "scale": [
+        0.931,
+        0.931,
+        0.931
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_018",
+      "asset": "alc_shrub_a",
+      "position": [
+        23.6818,
+        5.465,
+        0.832
+      ],
+      "rotation_degrees": [
+        0,
+        126.83,
+        0
+      ],
+      "scale": [
+        0.829,
+        0.829,
+        0.829
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_019",
+      "asset": "alc_shrub_a",
+      "position": [
+        10.6955,
+        7.715,
+        -3.6536
+      ],
+      "rotation_degrees": [
+        0,
+        148.352,
+        0
+      ],
+      "scale": [
+        0.824,
+        0.824,
+        0.824
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_020",
+      "asset": "alc_shrub_a",
+      "position": [
+        15.1193,
+        7.715,
+        -3.6117
+      ],
+      "rotation_degrees": [
+        0,
+        175.905,
+        0
+      ],
+      "scale": [
+        0.856,
+        0.856,
+        0.856
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_021",
+      "asset": "alc_shrub_a",
+      "position": [
+        21.4765,
+        7.715,
+        -3.5509
+      ],
+      "rotation_degrees": [
+        0,
+        256.97,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_009",
+      "asset": "alc_shrub_b",
+      "position": [
+        -26.6377,
+        9.965,
+        -18.9539
+      ],
+      "rotation_degrees": [
+        0,
+        80.016,
+        0
+      ],
+      "scale": [
+        0.806,
+        0.806,
+        0.806
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_022",
+      "asset": "alc_shrub_a",
+      "position": [
+        -24.9638,
+        9.965,
+        -19.0074
+      ],
+      "rotation_degrees": [
+        0,
+        217.153,
+        0
+      ],
+      "scale": [
+        0.813,
+        0.813,
+        0.813
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_023",
+      "asset": "alc_shrub_a",
+      "position": [
+        -22.437,
+        9.965,
+        -18.8589
+      ],
+      "rotation_degrees": [
+        0,
+        24.638,
+        0
+      ],
+      "scale": [
+        0.999,
+        0.999,
+        0.999
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_010",
+      "asset": "alc_shrub_b",
+      "position": [
+        -19.9775,
+        9.965,
+        -18.9631
+      ],
+      "rotation_degrees": [
+        0,
+        190.257,
+        0
+      ],
+      "scale": [
+        0.932,
+        0.932,
+        0.932
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_024",
+      "asset": "alc_shrub_a",
+      "position": [
+        -18.3152,
+        9.965,
+        -19.0151
+      ],
+      "rotation_degrees": [
+        0,
+        29.506,
+        0
+      ],
+      "scale": [
+        1.009,
+        1.009,
+        1.009
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_025",
+      "asset": "alc_shrub_a",
+      "position": [
+        -16.2226,
+        9.965,
+        -18.834
+      ],
+      "rotation_degrees": [
+        0,
+        143.55,
+        0
+      ],
+      "scale": [
+        0.889,
+        0.889,
+        0.889
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_011",
+      "asset": "alc_shrub_b",
+      "position": [
+        -13.3585,
+        9.965,
+        -18.6555
+      ],
+      "rotation_degrees": [
+        0,
+        165.79,
+        0
+      ],
+      "scale": [
+        1.004,
+        1.004,
+        1.004
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_026",
+      "asset": "alc_shrub_a",
+      "position": [
+        -11.7326,
+        9.965,
+        -18.8784
+      ],
+      "rotation_degrees": [
+        0,
+        19.866,
+        0
+      ],
+      "scale": [
+        0.832,
+        0.832,
+        0.832
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_027",
+      "asset": "alc_shrub_a",
+      "position": [
+        -9.5934,
+        9.965,
+        -18.7146
+      ],
+      "rotation_degrees": [
+        0,
+        227.468,
+        0
+      ],
+      "scale": [
+        0.828,
+        0.828,
+        0.828
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_012",
+      "asset": "alc_shrub_b",
+      "position": [
+        -7.3501,
+        9.965,
+        -18.8048
+      ],
+      "rotation_degrees": [
+        0,
+        125.761,
+        0
+      ],
+      "scale": [
+        0.835,
+        0.835,
+        0.835
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_028",
+      "asset": "alc_shrub_a",
+      "position": [
+        -5.1964,
+        9.965,
+        -18.7453
+      ],
+      "rotation_degrees": [
+        0,
+        20.459,
+        0
+      ],
+      "scale": [
+        0.819,
+        0.819,
+        0.819
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_029",
+      "asset": "alc_shrub_a",
+      "position": [
+        -2.7766,
+        9.965,
+        -18.7182
+      ],
+      "rotation_degrees": [
+        0,
+        231.732,
+        0
+      ],
+      "scale": [
+        0.93,
+        0.93,
+        0.93
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_013",
+      "asset": "alc_shrub_b",
+      "position": [
+        -0.745,
+        9.965,
+        -19.0283
+      ],
+      "rotation_degrees": [
+        0,
+        128.699,
+        0
+      ],
+      "scale": [
+        0.828,
+        0.828,
+        0.828
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_030",
+      "asset": "alc_shrub_a",
+      "position": [
+        1.6346,
+        9.965,
+        -18.7881
+      ],
+      "rotation_degrees": [
+        0,
+        144.361,
+        0
+      ],
+      "scale": [
+        0.847,
+        0.847,
+        0.847
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_031",
+      "asset": "alc_shrub_a",
+      "position": [
+        3.7504,
+        9.965,
+        -18.6242
+      ],
+      "rotation_degrees": [
+        0,
+        336.737,
+        0
+      ],
+      "scale": [
+        0.945,
+        0.945,
+        0.945
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_014",
+      "asset": "alc_shrub_b",
+      "position": [
+        6.4343,
+        9.965,
+        -18.9764
+      ],
+      "rotation_degrees": [
+        0,
+        214.989,
+        0
+      ],
+      "scale": [
+        0.932,
+        0.932,
+        0.932
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_032",
+      "asset": "alc_shrub_a",
+      "position": [
+        8.3081,
+        9.965,
+        -18.9469
+      ],
+      "rotation_degrees": [
+        0,
+        14.956,
+        0
+      ],
+      "scale": [
+        0.909,
+        0.909,
+        0.909
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_033",
+      "asset": "alc_shrub_a",
+      "position": [
+        10.4068,
+        9.965,
+        -18.6988
+      ],
+      "rotation_degrees": [
+        0,
+        83.823,
+        0
+      ],
+      "scale": [
+        0.817,
+        0.817,
+        0.817
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_015",
+      "asset": "alc_shrub_b",
+      "position": [
+        12.8134,
+        9.965,
+        -18.8105
+      ],
+      "rotation_degrees": [
+        0,
+        169.35,
+        0
+      ],
+      "scale": [
+        0.984,
+        0.984,
+        0.984
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_034",
+      "asset": "alc_shrub_a",
+      "position": [
+        15.1167,
+        9.965,
+        -18.849
+      ],
+      "rotation_degrees": [
+        0,
+        69.483,
+        0
+      ],
+      "scale": [
+        0.978,
+        0.978,
+        0.978
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_035",
+      "asset": "alc_shrub_a",
+      "position": [
+        16.916,
+        9.965,
+        -19.0022
+      ],
+      "rotation_degrees": [
+        0,
+        244.195,
+        0
+      ],
+      "scale": [
+        0.836,
+        0.836,
+        0.836
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_016",
+      "asset": "alc_shrub_b",
+      "position": [
+        19.2213,
+        9.965,
+        -19.0029
+      ],
+      "rotation_degrees": [
+        0,
+        321.379,
+        0
+      ],
+      "scale": [
+        0.981,
+        0.981,
+        0.981
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_036",
+      "asset": "alc_shrub_a",
+      "position": [
+        21.4527,
+        9.965,
+        -18.8953
+      ],
+      "rotation_degrees": [
+        0,
+        112.559,
+        0
+      ],
+      "scale": [
+        0.933,
+        0.933,
+        0.933
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_a_037",
+      "asset": "alc_shrub_a",
+      "position": [
+        23.7845,
+        9.965,
+        -19.0312
+      ],
+      "rotation_degrees": [
+        0,
+        234.902,
+        0
+      ],
+      "scale": [
+        1.037,
+        1.037,
+        1.037
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_shrub_b_017",
+      "asset": "alc_shrub_b",
+      "position": [
+        25.9393,
+        9.965,
+        -18.9522
+      ],
+      "rotation_degrees": [
+        0,
+        100.565,
+        0
+      ],
+      "scale": [
+        0.991,
+        0.991,
+        0.991
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_000",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -13.3355,
+        0.99,
+        11.9854
+      ],
+      "rotation_degrees": [
+        0,
+        297.031,
+        0
+      ],
+      "scale": [
+        1.015,
+        1.015,
+        1.015
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_001",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -11.9731,
+        0.99,
+        11.0453
+      ],
+      "rotation_degrees": [
+        0,
+        128.83,
+        0
+      ],
+      "scale": [
+        0.962,
+        0.962,
+        0.962
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_002",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -10.689,
+        0.99,
+        11.268
+      ],
+      "rotation_degrees": [
+        0,
+        192.885,
+        0
+      ],
+      "scale": [
+        0.882,
+        0.882,
+        0.882
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_003",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -9.6912,
+        0.99,
+        10.727
+      ],
+      "rotation_degrees": [
+        0,
+        342.315,
+        0
+      ],
+      "scale": [
+        0.901,
+        0.901,
+        0.901
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_004",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -8.6964,
+        0.99,
+        10.6039
+      ],
+      "rotation_degrees": [
+        0,
+        75.297,
+        0
+      ],
+      "scale": [
+        0.883,
+        0.883,
+        0.883
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_005",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -7.2598,
+        0.99,
+        11.8679
+      ],
+      "rotation_degrees": [
+        0,
+        212.03,
+        0
+      ],
+      "scale": [
+        1.056,
+        1.056,
+        1.056
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_006",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -6.5392,
+        0.99,
+        11.4086
+      ],
+      "rotation_degrees": [
+        0,
+        39.635,
+        0
+      ],
+      "scale": [
+        0.857,
+        0.857,
+        0.857
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_007",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -5.275,
+        0.99,
+        10.8801
+      ],
+      "rotation_degrees": [
+        0,
+        37.726,
+        0
+      ],
+      "scale": [
+        0.935,
+        0.935,
+        0.935
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_008",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -3.0121,
+        0.99,
+        10.0626
+      ],
+      "rotation_degrees": [
+        0,
+        84.766,
+        0
+      ],
+      "scale": [
+        1.014,
+        1.014,
+        1.014
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_009",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -1.492,
+        0.99,
+        12.7416
+      ],
+      "rotation_degrees": [
+        0,
+        315.01,
+        0
+      ],
+      "scale": [
+        0.879,
+        0.879,
+        0.879
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_010",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -0.7311,
+        0.99,
+        10.2815
+      ],
+      "rotation_degrees": [
+        0,
+        178.459,
+        0
+      ],
+      "scale": [
+        0.934,
+        0.934,
+        0.934
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_011",
+      "asset": "alc_grass_tuft",
+      "position": [
+        0.7222,
+        0.99,
+        11.9995
+      ],
+      "rotation_degrees": [
+        0,
+        216.399,
+        0
+      ],
+      "scale": [
+        1.087,
+        1.087,
+        1.087
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_012",
+      "asset": "alc_grass_tuft",
+      "position": [
+        1.9594,
+        0.99,
+        10.9275
+      ],
+      "rotation_degrees": [
+        0,
+        274.219,
+        0
+      ],
+      "scale": [
+        1.016,
+        1.016,
+        1.016
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_013",
+      "asset": "alc_grass_tuft",
+      "position": [
+        3.8409,
+        0.99,
+        10.5563
+      ],
+      "rotation_degrees": [
+        0,
+        22.287,
+        0
+      ],
+      "scale": [
+        0.891,
+        0.891,
+        0.891
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_014",
+      "asset": "alc_grass_tuft",
+      "position": [
+        6.5308,
+        0.99,
+        12.0958
+      ],
+      "rotation_degrees": [
+        0,
+        172.207,
+        0
+      ],
+      "scale": [
+        1.036,
+        1.036,
+        1.036
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_015",
+      "asset": "alc_grass_tuft",
+      "position": [
+        8.7221,
+        0.99,
+        13.0122
+      ],
+      "rotation_degrees": [
+        0,
+        104.844,
+        0
+      ],
+      "scale": [
+        1.032,
+        1.032,
+        1.032
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_016",
+      "asset": "alc_grass_tuft",
+      "position": [
+        10.0043,
+        0.99,
+        11.6532
+      ],
+      "rotation_degrees": [
+        0,
+        216.618,
+        0
+      ],
+      "scale": [
+        1.019,
+        1.019,
+        1.019
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_017",
+      "asset": "alc_grass_tuft",
+      "position": [
+        12.0934,
+        0.99,
+        11.7579
+      ],
+      "rotation_degrees": [
+        0,
+        358.006,
+        0
+      ],
+      "scale": [
+        1.027,
+        1.027,
+        1.027
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_018",
+      "asset": "alc_grass_tuft",
+      "position": [
+        14.4498,
+        0.99,
+        13.2943
+      ],
+      "rotation_degrees": [
+        0,
+        39.228,
+        0
+      ],
+      "scale": [
+        0.913,
+        0.913,
+        0.913
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_019",
+      "asset": "alc_grass_tuft",
+      "position": [
+        15.5967,
+        0.99,
+        9.3505
+      ],
+      "rotation_degrees": [
+        0,
+        1.07,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_020",
+      "asset": "alc_grass_tuft",
+      "position": [
+        16.8342,
+        0.99,
+        13.3219
+      ],
+      "rotation_degrees": [
+        0,
+        133.066,
+        0
+      ],
+      "scale": [
+        1.046,
+        1.046,
+        1.046
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_021",
+      "asset": "alc_grass_tuft",
+      "position": [
+        17.705,
+        0.99,
+        11.6646
+      ],
+      "rotation_degrees": [
+        0,
+        2.554,
+        0
+      ],
+      "scale": [
+        1.067,
+        1.067,
+        1.067
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_022",
+      "asset": "alc_grass_tuft",
+      "position": [
+        19.0837,
+        0.99,
+        10.3003
+      ],
+      "rotation_degrees": [
+        0,
+        227.974,
+        0
+      ],
+      "scale": [
+        1.084,
+        1.084,
+        1.084
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_023",
+      "asset": "alc_grass_tuft",
+      "position": [
+        21.4496,
+        0.99,
+        9.4972
+      ],
+      "rotation_degrees": [
+        0,
+        41.67,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_024",
+      "asset": "alc_grass_tuft",
+      "position": [
+        22.414,
+        0.99,
+        10.83
+      ],
+      "rotation_degrees": [
+        0,
+        131.67,
+        0
+      ],
+      "scale": [
+        0.915,
+        0.915,
+        0.915
+      ],
+      "zone": "DockZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_025",
+      "asset": "alc_grass_tuft",
+      "position": [
+        11.2438,
+        3.24,
+        5.4735
+      ],
+      "rotation_degrees": [
+        0,
+        229.506,
+        0
+      ],
+      "scale": [
+        0.855,
+        0.855,
+        0.855
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_026",
+      "asset": "alc_grass_tuft",
+      "position": [
+        13.1597,
+        3.24,
+        5.465
+      ],
+      "rotation_degrees": [
+        0,
+        117.808,
+        0
+      ],
+      "scale": [
+        0.868,
+        0.868,
+        0.868
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_027",
+      "asset": "alc_grass_tuft",
+      "position": [
+        14.4308,
+        3.24,
+        5.1626
+      ],
+      "rotation_degrees": [
+        0,
+        346.851,
+        0
+      ],
+      "scale": [
+        0.894,
+        0.894,
+        0.894
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_028",
+      "asset": "alc_grass_tuft",
+      "position": [
+        17.7416,
+        3.24,
+        4.8391
+      ],
+      "rotation_degrees": [
+        0,
+        132.299,
+        0
+      ],
+      "scale": [
+        1.093,
+        1.093,
+        1.093
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_029",
+      "asset": "alc_grass_tuft",
+      "position": [
+        20.029,
+        3.24,
+        5.4408
+      ],
+      "rotation_degrees": [
+        0,
+        352.493,
+        0
+      ],
+      "scale": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_030",
+      "asset": "alc_grass_tuft",
+      "position": [
+        22.362,
+        3.24,
+        5.4771
+      ],
+      "rotation_degrees": [
+        0,
+        53.641,
+        0
+      ],
+      "scale": [
+        1.046,
+        1.046,
+        1.046
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_031",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -25.6441,
+        5.49,
+        0.5088
+      ],
+      "rotation_degrees": [
+        0,
+        81.752,
+        0
+      ],
+      "scale": [
+        1.001,
+        1.001,
+        1.001
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_032",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -12.6406,
+        5.49,
+        0.7325
+      ],
+      "rotation_degrees": [
+        0,
+        328.047,
+        0
+      ],
+      "scale": [
+        1.093,
+        1.093,
+        1.093
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_033",
+      "asset": "alc_grass_tuft",
+      "position": [
+        13.4779,
+        5.49,
+        0.6457
+      ],
+      "rotation_degrees": [
+        0,
+        33.839,
+        0
+      ],
+      "scale": [
+        1.097,
+        1.097,
+        1.097
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_034",
+      "asset": "alc_grass_tuft",
+      "position": [
+        16.1439,
+        5.49,
+        0.8012
+      ],
+      "rotation_degrees": [
+        0,
+        74.56,
+        0
+      ],
+      "scale": [
+        1.055,
+        1.055,
+        1.055
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_035",
+      "asset": "alc_grass_tuft",
+      "position": [
+        22.7647,
+        5.49,
+        0.5357
+      ],
+      "rotation_degrees": [
+        0,
+        58.953,
+        0
+      ],
+      "scale": [
+        0.915,
+        0.915,
+        0.915
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_036",
+      "asset": "alc_grass_tuft",
+      "position": [
+        25.3975,
+        5.49,
+        0.7541
+      ],
+      "rotation_degrees": [
+        0,
+        47.804,
+        0
+      ],
+      "scale": [
+        1.088,
+        1.088,
+        1.088
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_037",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -27.6695,
+        7.74,
+        -3.6393
+      ],
+      "rotation_degrees": [
+        0,
+        18.281,
+        0
+      ],
+      "scale": [
+        0.953,
+        0.953,
+        0.953
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_038",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -26.2718,
+        7.74,
+        -3.6395
+      ],
+      "rotation_degrees": [
+        0,
+        225.695,
+        0
+      ],
+      "scale": [
+        1.019,
+        1.019,
+        1.019
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_039",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -25.13,
+        7.74,
+        -3.6685
+      ],
+      "rotation_degrees": [
+        0,
+        48.949,
+        0
+      ],
+      "scale": [
+        0.99,
+        0.99,
+        0.99
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_040",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -23.9493,
+        7.74,
+        -3.7769
+      ],
+      "rotation_degrees": [
+        0,
+        63.943,
+        0
+      ],
+      "scale": [
+        1.003,
+        1.003,
+        1.003
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_041",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -17.1944,
+        7.74,
+        -3.8015
+      ],
+      "rotation_degrees": [
+        0,
+        274.544,
+        0
+      ],
+      "scale": [
+        0.958,
+        0.958,
+        0.958
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_042",
+      "asset": "alc_grass_tuft",
+      "position": [
+        13.9647,
+        7.74,
+        -3.5038
+      ],
+      "rotation_degrees": [
+        0,
+        359.064,
+        0
+      ],
+      "scale": [
+        0.877,
+        0.877,
+        0.877
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_043",
+      "asset": "alc_grass_tuft",
+      "position": [
+        16.1779,
+        7.74,
+        -3.8106
+      ],
+      "rotation_degrees": [
+        0,
+        48.33,
+        0
+      ],
+      "scale": [
+        0.882,
+        0.882,
+        0.882
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_044",
+      "asset": "alc_grass_tuft",
+      "position": [
+        19.8964,
+        7.74,
+        -3.5238
+      ],
+      "rotation_degrees": [
+        0,
+        299.938,
+        0
+      ],
+      "scale": [
+        0.887,
+        0.887,
+        0.887
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_045",
+      "asset": "alc_grass_tuft",
+      "position": [
+        23.1178,
+        7.74,
+        -3.7782
+      ],
+      "rotation_degrees": [
+        0,
+        266.834,
+        0
+      ],
+      "scale": [
+        0.931,
+        0.931,
+        0.931
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_046",
+      "asset": "alc_grass_tuft",
+      "position": [
+        24.1954,
+        7.74,
+        -3.7205
+      ],
+      "rotation_degrees": [
+        0,
+        142.928,
+        0
+      ],
+      "scale": [
+        0.977,
+        0.977,
+        0.977
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_047",
+      "asset": "alc_grass_tuft",
+      "position": [
+        25.6319,
+        7.74,
+        -3.7301
+      ],
+      "rotation_degrees": [
+        0,
+        48.556,
+        0
+      ],
+      "scale": [
+        0.98,
+        0.98,
+        0.98
+      ],
+      "zone": "TerraceZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_048",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -23.966,
+        9.99,
+        -18.794
+      ],
+      "rotation_degrees": [
+        0,
+        203.978,
+        0
+      ],
+      "scale": [
+        0.956,
+        0.956,
+        0.956
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_049",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -21.5983,
+        9.99,
+        -18.8177
+      ],
+      "rotation_degrees": [
+        0,
+        242.854,
+        0
+      ],
+      "scale": [
+        0.978,
+        0.978,
+        0.978
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_050",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -20.7432,
+        9.99,
+        -18.6381
+      ],
+      "rotation_degrees": [
+        0,
+        69.083,
+        0
+      ],
+      "scale": [
+        0.902,
+        0.902,
+        0.902
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_051",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -17.2703,
+        9.99,
+        -18.6806
+      ],
+      "rotation_degrees": [
+        0,
+        62.93,
+        0
+      ],
+      "scale": [
+        0.893,
+        0.893,
+        0.893
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_052",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -14.9065,
+        9.99,
+        -18.7605
+      ],
+      "rotation_degrees": [
+        0,
+        56.201,
+        0
+      ],
+      "scale": [
+        0.855,
+        0.855,
+        0.855
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_053",
+      "asset": "alc_grass_tuft",
+      "position": [
+        -6.4929,
+        9.99,
+        -18.8475
+      ],
+      "rotation_degrees": [
+        0,
+        136.533,
+        0
+      ],
+      "scale": [
+        0.862,
+        0.862,
+        0.862
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_054",
+      "asset": "alc_grass_tuft",
+      "position": [
+        0.4079,
+        9.99,
+        -18.699
+      ],
+      "rotation_degrees": [
+        0,
+        137.392,
+        0
+      ],
+      "scale": [
+        0.876,
+        0.876,
+        0.876
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_055",
+      "asset": "alc_grass_tuft",
+      "position": [
+        2.6385,
+        9.99,
+        -18.7499
+      ],
+      "rotation_degrees": [
+        0,
+        117.401,
+        0
+      ],
+      "scale": [
+        0.922,
+        0.922,
+        0.922
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_056",
+      "asset": "alc_grass_tuft",
+      "position": [
+        4.9413,
+        9.99,
+        -18.6427
+      ],
+      "rotation_degrees": [
+        0,
+        81.521,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_057",
+      "asset": "alc_grass_tuft",
+      "position": [
+        7.1868,
+        9.99,
+        -18.6345
+      ],
+      "rotation_degrees": [
+        0,
+        17.102,
+        0
+      ],
+      "scale": [
+        1.09,
+        1.09,
+        1.09
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_058",
+      "asset": "alc_grass_tuft",
+      "position": [
+        9.3423,
+        9.99,
+        -18.7591
+      ],
+      "rotation_degrees": [
+        0,
+        158.732,
+        0
+      ],
+      "scale": [
+        0.952,
+        0.952,
+        0.952
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_059",
+      "asset": "alc_grass_tuft",
+      "position": [
+        11.8976,
+        9.99,
+        -18.8995
+      ],
+      "rotation_degrees": [
+        0,
+        116.593,
+        0
+      ],
+      "scale": [
+        1.033,
+        1.033,
+        1.033
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_060",
+      "asset": "alc_grass_tuft",
+      "position": [
+        14.0137,
+        9.99,
+        -18.989
+      ],
+      "rotation_degrees": [
+        0,
+        156.415,
+        0
+      ],
+      "scale": [
+        0.931,
+        0.931,
+        0.931
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_061",
+      "asset": "alc_grass_tuft",
+      "position": [
+        16.0803,
+        9.99,
+        -18.9689
+      ],
+      "rotation_degrees": [
+        0,
+        297.648,
+        0
+      ],
+      "scale": [
+        0.898,
+        0.898,
+        0.898
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    },
+    {
+      "name": "alc_grass_tuft_062",
+      "asset": "alc_grass_tuft",
+      "position": [
+        24.5455,
+        9.99,
+        -18.6784
+      ],
+      "rotation_degrees": [
+        0,
+        324.757,
+        0
+      ],
+      "scale": [
+        0.879,
+        0.879,
+        0.879
+      ],
+      "zone": "SummitZone",
+      "owner": "刘备",
+      "placeholder": false,
+      "collision": false,
+      "multimesh": true,
+      "cast_shadow": false
+    }
+  ],
+  "navigation_unchanged": true,
+  "notes": [
+    "No collisions or interactions. Keep decorative foliage low.",
+    "Rocks embed into island foot at Y=-0.62. Ground-centre origin remains Y=0 in each GLB.",
+    "Plants sit on v3 flat garden bands; re-seat after owner changes terrain.",
+    "Full island bounds extend slightly at shoreline; existing walking boundaries are untouched.",
+    "Cast shadows disabled in review for small repeated nature; final scene owner controls policy."
+  ],
+  "counts": {
+    "alc_rock_a": 14,
+    "alc_rock_b": 23,
+    "alc_rock_c": 23,
+    "alc_shrub_a": 38,
+    "alc_shrub_b": 18,
+    "alc_grass_tuft": 63
+  },
+  "placed_triangles": 23140
+}

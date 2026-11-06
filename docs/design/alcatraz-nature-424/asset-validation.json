@@ -1,0 +1,1729 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "check": "alc_rock_a: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_000: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_000: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_001: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_001: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_000: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_000: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_000: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_000: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_002: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_002: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_001: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_001: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_002: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_002: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_003: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_003: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_001: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_001: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_004: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_004: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_003: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_003: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_002: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_002: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_005: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_005: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_004: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_004: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_003: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_003: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_006: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_006: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_004: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_004: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_007: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_007: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_008: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_008: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_009: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_009: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_005: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_005: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_006: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_006: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_010: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_010: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_011: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_011: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_007: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_007: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_012: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_012: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_005: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_005: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_013: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_013: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_006: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_006: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_008: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_008: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_007: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_007: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_014: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_014: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_009: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_009: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_010: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_010: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_011: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_011: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_012: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_012: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_008: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_008: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_009: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_009: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_015: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_015: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_010: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_010: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_011: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_011: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_013: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_013: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_014: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_014: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_016: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_016: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_015: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_015: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_017: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_017: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_016: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_016: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_012: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_012: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_018: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_018: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_017: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_017: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_018: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_018: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_019: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_019: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_019: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_019: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_020: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_020: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_013: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_a_013: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_020: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_020: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_021: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_021: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_021: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_021: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_022: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_b_022: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_022: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_rock_c_022: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_000: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_000: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_000: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_000: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_001: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_001: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_001: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_001: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_002: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_002: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_003: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_003: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_002: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_002: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_004: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_004: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_005: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_005: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_003: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_003: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_006: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_006: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_007: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_007: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_004: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_004: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_008: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_008: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_009: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_009: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_005: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_005: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_010: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_010: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_011: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_011: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_012: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_012: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_013: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_013: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_006: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_006: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_014: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_014: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_015: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_015: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_007: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_007: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_016: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_016: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_017: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_017: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_008: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_008: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_018: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_018: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_019: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_019: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_020: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_020: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_021: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_021: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_009: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_009: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_022: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_022: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_023: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_023: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_010: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_010: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_024: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_024: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_025: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_025: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_011: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_011: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_026: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_026: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_027: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_027: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_012: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_012: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_028: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_028: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_029: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_029: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_013: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_013: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_030: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_030: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_031: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_031: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_014: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_014: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_032: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_032: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_033: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_033: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_015: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_015: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_034: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_034: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_035: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_035: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_016: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_016: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_036: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_036: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_037: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_a_037: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_017: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_shrub_b_017: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_000: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_000: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_001: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_001: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_002: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_002: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_003: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_003: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_004: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_004: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_005: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_005: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_006: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_006: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_007: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_007: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_008: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_008: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_009: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_009: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_010: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_010: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_011: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_011: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_012: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_012: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_013: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_013: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_014: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_014: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_015: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_015: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_016: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_016: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_017: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_017: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_018: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_018: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_019: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_019: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_020: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_020: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_021: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_021: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_022: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_022: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_023: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_023: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_024: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_024: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_025: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_025: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_026: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_026: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_027: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_027: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_028: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_028: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_029: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_029: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_030: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_030: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_031: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_031: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_032: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_032: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_033: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_033: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_034: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_034: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_035: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_035: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_036: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_036: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_037: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_037: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_038: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_038: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_039: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_039: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_040: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_040: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_041: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_041: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_042: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_042: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_043: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_043: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_044: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_044: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_045: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_045: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_046: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_046: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_047: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_047: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_048: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_048: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_049: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_049: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_050: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_050: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_051: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_051: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_052: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_052: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_053: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_053: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_054: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_054: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_055: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_055: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_056: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_056: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_057: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_057: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_058: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_058: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_059: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_059: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_060: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_060: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_061: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_061: clear of original walk polygons",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_062: decoration metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_grass_tuft_062: clear of original walk polygons",
+      "passed": true
+    }
+  ],
+  "assets": 6,
+  "unique_triangles": 920,
+  "suggested_instances": 179,
+  "placed_triangles": 23140
+}
