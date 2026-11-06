@@ -104,10 +104,10 @@ func foam(name:String,at:Vector3,yaw=0.0,ends=Vector2.ZERO):
 	for mi in n.find_children("*","MeshInstance3D",true,false):mi.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;mi.gi_mode=GeometryInstance3D.GI_MODE_DISABLED
 	foam_nodes.append(n);return n
 func far_cards():
-	# SGODOT-434's recommended three-card urban composition, at screen upper edge.
+	# SGODOT-434's recommended three-card urban composition, below the HUD title reserved area (y<=128px); baseline y=200px.
 	var view_height=camera.size*vp.size.y/vp.size.x
 	for row in [["far_hills_a",0.0,.84],["far_city_high",1.23,.82],["far_bridge",-2.1,1.0]]:
-		var pos=camera.global_transform*Vector3(row[1],view_height*(.5-.16),-60)
+		var pos=camera.global_transform*Vector3(row[1],view_height*(.5-.25),-60)
 		var n=external("far_backdrop",row[0],pos);n.scale=Vector3.ONE*row[2]
 		for mi in n.find_children("*","MeshInstance3D",true,false):
 			mi.extra_cull_margin=100;mi.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;mi.gi_mode=GeometryInstance3D.GI_MODE_DISABLED
@@ -128,13 +128,12 @@ func landing():
 	# v1.2 piles are at localX=±.66/Z=±.72. Omit the shore-adjacent pair.
 	for x in [1.66,4.74,6.06]:
 		for z in [-.72,.72]:foam("pile_ring",Vector3(x,0,z))
-	piece("ticket_booth",Vector3(-1.0,1.2,-2),-90)
-	piece("waiting_shelter",Vector3(-1.0,1.2,1.8),-90)
-	piece("fishing_net_rack",Vector3(-3.45,1.2,2.0),-90)
+	piece("ticket_booth",Vector3(-.8,1.2,-2.2),-90)
+	piece("fishing_net_rack",Vector3(-3.45,1.2,2.1),-90)
 	piece("wood_crate_closed",Vector3(-3.2,1.2,-2.4),-90)
-	piece("wood_crate_open",Vector3(-3.3,1.2,-1.2),-90)
+	piece("wood_crate_open",Vector3(-2.2,1.2,-1.8),-90)
 	piece("rope_coil_bound",Vector3(-3.2,2.05,-2.4),-90)
-	piece("wood_barrel_closed",Vector3(-2.65,1.2,.75))
+	piece("wood_barrel_closed",Vector3(-2.65,1.2,1.6))
 	piece("wood_barrel_open",Vector3(-2.65,1.2,2.6))
 	piece("lifebuoy_stand",Vector3(5.1,1.2,.60),-90)
 	piece("rope_coil_flat",Vector3(5.7,1.2,0))
@@ -149,7 +148,22 @@ func landing():
 			var key=n.get_meta("dependency");dependencies[key]=dependencies.get(key,0)+1
 	for mi in assembly.find_children("*","MeshInstance3D",true,false):count+=tri(mi.mesh);surfaces+=mi.mesh.get_surface_count()
 	report.example={"main_footprint_m":[10.4,6],"dock_deck_y":1.2,"water_y":.2,"foam_y":.218,"props":props,"dependencies":dependencies,"triangles_including_review_ground":count,"surfaces_including_review_ground":surfaces,"far_cards":3,"bay_priority":-100,"foam_instances":foam_nodes.size(),"layout_exported":false}
-	check(props.size()==12,"All twelve new props used in landing")
+	check(props.size()==11 and not props.has("waiting_shelter"),"One booth only: shelter stays in catalogue")
+	report.example.omitted=["waiting_shelter"]
+	report.example.hud_title_reserved_bottom_px=128
+	report.example.far_band_top_px=200.0-.9*360.0/6.72
+	check(report.example.far_band_top_px>=148,"Distant band below HUD title",report.example.far_band_top_px)
+	# Clear2.20m strip across the entire forecourt, measured from transformed meshes.
+	var left=-1.0;var right=1.2
+	for n in assembly.get_children():
+		if not n.has_meta("kit_id") or n.position.x>=0:continue
+		var low=INF;var high=-INF
+		for mi in n.find_children("*","MeshInstance3D",true,false):
+			for surf in mi.mesh.get_surface_count():
+				for point in mi.mesh.surface_get_arrays(surf)[Mesh.ARRAY_VERTEX]:
+					var z=(mi.global_transform*point).z;low=minf(low,z);high=maxf(high,z)
+		check(high<=left or low>=right,"Forecourt passage clear of "+str(n.get_meta("kit_id")),[low,high])
+	report.example.forecourt_clear_width_m=right-left
 	check(foam_nodes.size()==8,"Two shore ribbons and six separated pile rings")
 	check((Vector3(3.2,1.1,0)+Vector3(-1.2,.1,0)).distance_to(Vector3(2,1.2,0))<.00001,"Gangplank dock connector matches426 terminal")
 	check((Vector3(3.2,1.1,0)+Vector3(1.2,.1,0)).distance_to(Vector3(4.4,1.2,0))<.00001,"Gangplank far connector meets426 landing")

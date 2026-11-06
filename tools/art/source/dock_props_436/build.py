@@ -5,7 +5,7 @@ from mathutils import Vector
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];KIT=ROOT/'assets/landmarks/_shared/dock_props'
 spec=importlib.util.spec_from_file_location('street',SRC.parent/'street_kit_429/build.py');s=importlib.util.module_from_spec(spec);spec.loader.exec_module(s)
 s.SRC=SRC;s.KIT=KIT
-s.PAL={'wood':'A3815D','wood_light':'B89972','wood_dark':'795F47','wood_seam':'69543F','metal':'5D4C38','metal_light':'6D5746','cream':'F0E1C2','stone':'CBB48F','teal':'35696A','glass':'86B0B3','roof':'748B9C','roof_shade':'5E7383','rope':'B7A68D','rope_light':'C9BA9E','rope_dark':'96866F','red':'C76845','lamp':'F2DC9F','dark':'3F463D'}
+s.PAL={'wood':'A3815D','wood_light':'B89972','wood_dark':'795F47','wood_seam':'69543F','metal':'5D4C38','metal_light':'6D5746','cream':'F0E1C2','stone':'CBB48F','teal':'35696A','glass':'86B0B3','roof':'748B9C','roof_shade':'5E7383','rope':'B7A68D','rope_light':'C9BA9E','rope_dark':'96866F','red':'C76845','lamp':'F2DC9F','signal_green':'328B62','signal_highlight':'81C9A1','dark':'3F463D'}
 p=s.p;box=s.box;rod=s.rod;lathe=s.lathe;mesh=s.mesh
 
 def roof(name,w,d,eave,ridge):
@@ -170,10 +170,13 @@ def net_rack():
 def beacon():
  box('Beacon stone mounting foot',(0,.08,0),(.32,.16,.32),'stone',.025)
  lathe('Small dark beacon pole',[(.16,.105),(.25,.085),(1.76,.055),(1.80,.10)],'metal',10)
- lathe('Warm beacon lantern',[(1.78,.13),(1.85,.16),(2.12,.16),(2.17,.12)],'lamp',8)
+ glass=lathe('Green harbour signal glass',[(1.78,.13),(1.85,.16),(2.12,.16),(2.17,.12)],'signal_green',8)
+ glass.data.materials.append(p.mat('signal_highlight'))
+ for face in glass.data.polygons:
+  if face.index in [8,9]:face.material_index=1
  for a in [0,math.pi/2,math.pi,math.pi*1.5]:rod('Lantern corner frame',(.16*math.cos(a),1.84,.16*math.sin(a)),(.16*math.cos(a),2.13,.16*math.sin(a)),.016,'metal',4)
  lathe('Beacon cap',[(2.13,.21),(2.18,.21),(2.28,.08),(2.30,0)],'roof',8)
- return {'content':'Static opaque warm lantern; no light/emission node','front':'+Z'}
+ return {'content':'Green harbour signal glass, vertex-colour highlights; no light/emission node','front':'+Z'}
 
 BUILDERS=[('ticket_booth',ticket_booth),('waiting_shelter',waiting_shelter),('boarding_gangplank',gangplank),('lifebuoy_stand',lifebuoy),('rope_coil_flat',rope_flat),('rope_coil_bound',rope_bound),('wood_crate_closed',crate_closed),('wood_crate_open',crate_open),('wood_barrel_closed',lambda:barrel(False)),('wood_barrel_open',lambda:barrel(True)),('fishing_net_rack',net_rack),('beacon_pole',beacon)]
 
@@ -185,7 +188,7 @@ def main():
   row=s.export(name,builder);row['source']=str((SRC/(name+'.blend')).relative_to(ROOT));rows[name]=row
   folder=SRC/'modules'/name;folder.mkdir(parents=True,exist_ok=True)
   (folder/'reuse_provenance.json').write_text(json.dumps({'author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','task':'SGODOT-436','module':name,'geometry':'New editable geometry; existing assets untouched','palette':'#830 wood / Alcatraz cream and roof / street-kit dark metal','source':row['source'],'generator':'tools/art/source/dock_props_436/build.py'},ensure_ascii=False,indent=2)+'\n')
- m={'task':'SGODOT-436','revision':'v1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','units':'metres; Y up; bottom-centre origin; +Z front except gangplank +X','palette_srgb':s.PAL,'assets':rows,'unique_triangles':sum(r['triangles'] for r in rows.values()),'unique_surfaces':len(rows),'scope':'Dock props only; ferry landing is review-only, no layout/game integration'}
+ m={'task':'SGODOT-436','revision':'v1.1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','units':'metres; Y up; bottom-centre origin; +Z front except gangplank +X','palette_srgb':s.PAL,'assets':rows,'unique_triangles':sum(r['triangles'] for r in rows.values()),'unique_surfaces':len(rows),'scope':'Dock props only; ferry landing is review-only, no layout/game integration'}
  (KIT/'manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
 
 if __name__=='__main__':main()

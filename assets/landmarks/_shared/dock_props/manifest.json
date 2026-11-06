@@ -1,6 +1,6 @@
 {
   "task": "SGODOT-436",
-  "revision": "v1",
+  "revision": "v1.1",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "units": "metres; Y up; bottom-centre origin; +Z front except gangplank +X",
@@ -22,6 +22,8 @@
     "rope_dark": "96866F",
     "red": "C76845",
     "lamp": "F2DC9F",
+    "signal_green": "328B62",
+    "signal_highlight": "81C9A1",
     "dark": "3F463D"
   },
   "assets": {
@@ -387,8 +389,8 @@
       ],
       "pivot": "base centre, Y up, +Z front",
       "source": "tools/art/source/dock_props_436/beacon_pole.blend",
-      "sha256": "e682d5e5e2cb0b2ad0a87ef18a8e7edb7694715c7645efc3c3c6d9dacf642836",
-      "content": "Static opaque warm lantern; no light/emission node",
+      "sha256": "e1f1e435df877a3b8971bef8ac3d8252f2186789899c164cccef7cc5070e733d",
+      "content": "Green harbour signal glass, vertex-colour highlights; no light/emission node",
       "front": "+Z"
     }
   },

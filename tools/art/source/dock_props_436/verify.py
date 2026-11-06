@@ -59,6 +59,15 @@ check(not unexpected,'All pre-existing tracked assets unchanged',{'base':ref['ba
 hashes=json.loads((OUT/'dependency-hashes.json').read_text())
 drift=[path for path,row in hashes.items() if hashlib.sha256((OUT/'project'/path).read_bytes()).hexdigest()!=row['sha256']]
 check(not drift,'Review dependencies identical to pinned426/430/432/434 and ground',{'files':len(hashes),'changed':drift})
+baseline='7c09ca3d898fd825117ea5c4e617336569768717'
+for path in KIT.glob('*.glb'):
+ if path.stem!='beacon_pole':check(path.read_bytes()==subprocess.check_output(['git','show',baseline+':'+str(path.relative_to(ROOT))],cwd=ROOT),path.stem+' unchanged from v1')
+check(all(path.read_bytes()==subprocess.check_output(['git','show',baseline+':'+str(path.relative_to(ROOT))],cwd=ROOT) for path in KIT.glob('*.glb.import')),'All12 imports/UIDs unchanged from v1')
+prior=OUT/'beacon-v1.glb';prior.write_bytes(subprocess.check_output(['git','show',baseline+':'+str((KIT/'beacon_pole.glb').relative_to(ROOT))],cwd=ROOT))
+def shape(path):
+ d,b=load_glb(path);p=d['meshes'][0]['primitives'][0];v=np.array(accessor(d,b,p['attributes']['POSITION']));ids=np.array(accessor(d,b,p['indices'])).reshape(-1,3)
+ return sorted(tuple(sorted(tuple(round(float(x),6) for x in point) for point in v[t])) for t in ids)
+check(shape(prior)==shape(KIT/'beacon_pole.glb'),'Beacon geometry unchanged; only colours revised')
 report={'author':'黄忠','virtual_user_id':m['virtual_user_id'],'checks':checks,'passed':all(c['passed'] for c in checks),'assets':rows,'unique_triangles':sum(r['triangles'] for r in rows.values()),'unique_surfaces':len(rows),'base_commit':ref['base_commit']}
 (OUT/'geometry-validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 for c in checks:

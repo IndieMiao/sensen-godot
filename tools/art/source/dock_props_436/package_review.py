@@ -2,7 +2,7 @@ from pathlib import Path
 import json,hashlib
 from PIL import Image,ImageDraw,ImageFont,PngImagePlugin
 ROOT=Path(__file__).resolve().parents[4];OUT=ROOT/'output/dock-props-436';CAP=OUT/'captures'
-KIT=ROOT/'assets/landmarks/_shared/dock_props';DOC=ROOT/'docs/design/dock-props-436-2026-11-06';DOC.mkdir(parents=True,exist_ok=True)
+KIT=ROOT/'assets/landmarks/_shared/dock_props';DOC=ROOT/'docs/design/dock-props-436-2026-11-06/v1.1';DOC.mkdir(parents=True,exist_ok=True)
 m=json.loads((KIT/'manifest.json').read_text());g=json.loads((OUT/'geometry-validation.json').read_text());r=json.loads((CAP/'godot-validation.json').read_text());cold=json.loads((OUT/'cold-import-validation.json').read_text())
 assert g['passed'] and r['passed'] and cold['passed']
 font=lambda n:ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',n)
@@ -19,7 +19,7 @@ for i,(name,row) in enumerate(m['assets'].items()):
  d.text((x+10,y+302),name,font=font(12),fill='#63705E')
 d.text((15,1055),'宽X × 高Y × 深Z；Y朝上、底面中心原点。售票亭不写字；渡口示例只作审阅，不交游戏layout。',font=font(17),fill='#53604D')
 metadata=PngImagePlugin.PngInfo();metadata.add_text('Author','黄忠 / '+m['virtual_user_id']);metadata.add_text('Scope','SGODOT-436 dock props; review-only ferry landing, no game layout')
-prefix='SGODOT-436_dock_props_v1_';canvas.save(DOC/(prefix+'catalogue.png'),pnginfo=metadata)
+prefix='SGODOT-436_dock_props_v1.1_';canvas.save(DOC/(prefix+'catalogue.png'),pnginfo=metadata)
 for name in ['example_360']:
  Image.open(CAP/(name+'.png')).save(DOC/(prefix+name+'.png'),pnginfo=metadata)
 validation={'revision':m['revision'],'author':'黄忠','virtual_user_id':m['virtual_user_id'],'geometry':g,'godot':r,'cold_import':cold,'dependencies':json.loads((OUT/'dependency-hashes.json').read_text()),'dock_connection':json.loads((ROOT/'tools/art/source/dock_props_436/dock_connection.json').read_text()),'scope':'12 new dock props only. Pinned426/430/432/434 plus ground are isolated review fixtures; no existing-file changes or game integration.'}

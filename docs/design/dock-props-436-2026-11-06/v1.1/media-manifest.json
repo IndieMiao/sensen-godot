@@ -1,0 +1,17 @@
+[
+  {
+    "file": "SGODOT-436_dock_props_v1.1_catalogue.png",
+    "bytes": 324428,
+    "sha256": "2ee0b43d996d4ea57e13927641871e7448ec695aeb09880294ce5f16a4c81eb5"
+  },
+  {
+    "file": "SGODOT-436_dock_props_v1.1_example_360.png",
+    "bytes": 120452,
+    "sha256": "d6da30d8911c3ce8c55312ccd92fb74ce8a1c9c9f674ec4eccd976739a1348f0"
+  },
+  {
+    "file": "SGODOT-436_dock_props_v1.1_validation.json",
+    "bytes": 77927,
+    "sha256": "ed8d4ff558fa734db30494aeae26d7bb0396385e41ed70a25511fdbc69b56041"
+  }
+]
