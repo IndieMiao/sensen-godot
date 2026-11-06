@@ -1,0 +1,11 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "parent_pr": 835,
+  "parent_branch": "wp-3d-scene-makeboluo-museum-roof",
+  "parent_head": "ebce1cec1d508d3b4b2de496a0f9c50b644e88d7",
+  "near_sha256": "ff853c9768ea9a37569f1fe91d9133a8e49396e1e3bd835b9082249431fb1884",
+  "old_far_sha256": "425290e75f9cc544f6f47ab6f23443227d6c9aee4dc7cad380623dcf1d65a6c8",
+  "far_import_sha256": "e717524fe013d6cc329064425cdf94463cac46c4ae455d4732be996c21e68047",
+  "source": "Read exact near/far GLBs from parent commit; roof only; all non-roof far triangles preserved"
+}

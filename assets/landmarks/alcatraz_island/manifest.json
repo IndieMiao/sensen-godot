@@ -405,11 +405,11 @@
       "sha256": "c058ae76a9fead0705cfafc3b0904a5557027fc8a765aa53cb8838d5fb3beacb"
     },
     "alc_museum_far": {
-      "triangles": 2205,
-      "bytes": 128452,
+      "triangles": 2239,
+      "bytes": 130848,
       "author": "\u9ec4\u5fe0",
-      "source": "tools/art/source/alcatraz_museum_far_424/alc_museum_far.blend",
-      "sha256": "425290e75f9cc544f6f47ab6f23443227d6c9aee4dc7cad380623dcf1d65a6c8"
+      "source": "tools/art/source/museum_far_roof_424/alc_museum_far.blend",
+      "sha256": "4cc97a8dd19cc26bd8ad2800a9a4ce6cd41c80010d70d274214cfb2de52af4b2"
     },
     "ferry_flag": {
       "triangles": 52,
