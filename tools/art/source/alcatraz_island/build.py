@@ -200,7 +200,7 @@ for poly in polys:
  c=[sum(verts[i][k] for i in poly)/4 for k in range(3)];navzones[zone_for(c[0],c[2],c[1])].append(poly)
 route=[[-22,1,19],[-22,1,12],[-22,3.25,7.5],[8,3.25,7.5],[8,5.5,3],[-22,5.5,3],[-22,7.75,-1.5],[8,7.75,-1.5],[8,10,-6],[0,10,-6]]
 route_length=sum(math.dist(a,b) for a,b in zip(route,route[1:]))
-layout={'revision':'B v7 formal colour with approved props, garden and ferry','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
+layout={'revision':'B v8 pictogram and accepted effects with approved props, garden and ferry','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
  'spawn':route[0],'exit':[-23,1,19.4],'cam0':route[0],'review_points':{'opening':route[0],'mid_hill':route[4],'visitor_center':route[-1]},
  'navigation':{'vertices':verts,'polygons':polys,'zone_polygons':navzones,'cell':step},'route':route,'walk_goals':[route[0],route[4],route[-1]],'route_centerline_m':route_length,
  'stairs':[{'flight':i+1,'lower':s[5],'upper':s[4],'width':3,'run':4.5,'risers':15,'riser_m':.15} for i,s in enumerate(stairs)],
@@ -252,14 +252,14 @@ for asset in layout['assets']:
         asset['max_view_width_m']=8.0
 (OUT/'placement_points.json').write_text(json.dumps({'units':'metres','axes':layout['axes'],'instances':layout['instances']},ensure_ascii=False,indent=2)+'\n')
 (OUT/'layout.json').write_text(json.dumps(layout,separators=(',',':'))+'\n')
-manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v7 formal colour pass','assets':{}}
+manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v8 pictogram and accepted effects pass','assets':{}}
 for name in kit.assets:
  manifest['assets'][name]=authored.manifest_row(OUT,AUTHORED[name]) if name in AUTHORED else kit.export(name,ao_radius=.18)
  print('ALCATRAZ_ASSET',name,manifest['assets'][name],flush=True)
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in placements)<=300000
 assert len(kit.assets)<=80
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-assembly=bpy.data.collections.new('Alcatraz_v7_Assembly');bpy.context.scene.collection.children.link(assembly)
+assembly=bpy.data.collections.new('Alcatraz_v8_Assembly');bpy.context.scene.collection.children.link(assembly)
 zone_collections={}
 for z in ZONES+['FarZone']:
  col=bpy.data.collections.new(z);assembly.children.link(col);zone_collections[z]=col

@@ -10,8 +10,8 @@ from collections import Counter
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3]
-REVIEW=ROOT/'output/alcatraz-424/v7/review'
-DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v7'
+REVIEW=ROOT/'output/alcatraz-424/v8/review'
+DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v8'
 ASSETS=ROOT/'assets/landmarks/alcatraz_island'
 QA=ROOT/'output/alcatraz-424/project'
 verification=json.loads((REVIEW/'verification.json').read_text())
@@ -44,7 +44,7 @@ def label(text,xy,target=None):
     b=d.textbbox(xy,text,font=f)
     d.rounded_rectangle((b[0]-5,b[1]-4,b[2]+5,b[3]+4),radius=4,fill='#f4f3ec')
     d.text(xy,text,font=f,fill='#263b44')
-label('ALCATRAZ / V7 / MUSEUM AND GARDEN COLOUR',(22,18))
+label('ALCATRAZ / V8 / MUSEUM AND GARDEN COLOUR',(22,18))
 d.text((22,48),'Rendered top view + actual navigation path. North is up.',font=small,fill='#263b44')
 label('Island / dock footprint: 60 x 40 m',(310,170))
 d.line([(point([-30,0,0])[0],210),(point([30,0,0])[0],210)],fill='#263b44',width=2)
@@ -91,7 +91,7 @@ for asset,axis,expected in [('alc_museum',0,40),('alc_museum',1,9),('alc_lightho
     assert abs(dimensions[asset]['size'][axis]-expected)<.02,(asset,dimensions[asset])
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements'])<=300000
 assert verification['total_surface_budget_with_multimesh']['evidence']<=80
-evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v7 formal colour pass',
+evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v8 formal colour pass',
     'unique_glbs':len(checks),'unique_triangles':sum(x['triangles'] for x in manifest['assets'].values()),
     'placed_triangles':sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements']),
     'placed_mesh_instances':len(layout['placements']),'unique_surfaces':len(checks),
@@ -136,7 +136,7 @@ def mark_reserve(path):
     return Image.alpha_composite(im,overlay).convert('RGB')
 comparison=Image.new('RGB',(720,840),'#f5f1e6');pen=ImageDraw.Draw(comparison)
 pen.text((10,10),'Huang Zhong v1.1 / before',font=f,fill='#263b44')
-pen.text((370,10),'v7 / colour + clear action area',font=f,fill='#263b44')
+pen.text((370,10),'v8 / colour + clear action area',font=f,fill='#263b44')
 comparison.paste(mark_reserve(ROOT/'docs/design/alcatraz-far-424-2026-11-06/v1.1/SGODOT-424_far_v1.1_mid_hill.png'),(0,40))
 comparison.paste(mark_reserve(DOC/'02-mid-hill.png'),(360,40))
 comparison.save(DOC/'08-mid-hill-hud-comparison.png')
@@ -156,7 +156,7 @@ for y in range(0,overview.height,3):
 crop=(max(0,min(xs)-18),max(0,min(ys)-18),min(overview.width,max(xs)+19),min(overview.height,max(ys)+19))
 board=Image.new('RGB',(1580,1000),'#f5f1e6');pen=ImageDraw.Draw(board)
 pen.text((20,18),'V2 concept colour reference',font=f,fill='#263b44')
-pen.text((440,18),'V7 game view / complete island, water margin cropped',font=f,fill='#263b44')
+pen.text((440,18),'V8 game view / complete island, water margin cropped',font=f,fill='#263b44')
 pen.text((1180,18),'Museum / 360 x 800',font=f,fill='#263b44')
 board.paste(ImageOps.contain(Image.open(HERE/'reference/c_alc2.png').convert('RGB'),(400,850)),(20,60))
 board.paste(ImageOps.contain(overview.crop(crop),(720,650)),(440,60))
@@ -169,7 +169,7 @@ for i,(label_,key) in enumerate(swatches):
 pen.text((20,955),'Colour review. Concept proportions are illustrative; game dimensions follow the written brief. Approved collaborator packs installed; museum far LOD remains a proxy.',font=small,fill='#263b44')
 board.save(DOC/'10-reference-colour-comparison.png')
 facade=Image.new('RGB',(720,840),'#f5f1e6');pen=ImageDraw.Draw(facade)
-pen.text((10,10),'v6 / blockout',font=f,fill='#263b44');pen.text((370,10),'v7 / public museum',font=f,fill='#263b44')
+pen.text((10,10),'v6 / blockout',font=f,fill='#263b44');pen.text((370,10),'v8 / public museum',font=f,fill='#263b44')
 facade.paste(Image.open(DOC.parent/'v6/03-visitor-center.png').convert('RGB'),(0,40))
 facade.paste(Image.open(DOC/'03-visitor-center.png').convert('RGB'),(360,40))
 facade.save(DOC/'11-museum-before-after.png')

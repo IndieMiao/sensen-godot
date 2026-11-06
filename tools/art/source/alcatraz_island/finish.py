@@ -1,7 +1,6 @@
 """Editable island surfaces and public-museum facade, in Godot metres."""
 import math
 import random
-import bpy
 
 
 def cliff(kit, name, polygon, low, high):
@@ -84,6 +83,17 @@ def _arch(width,height,steps=10):
     return [(-radius,0),(radius,0)]+[(radius*math.cos(i*math.pi/steps),spring+radius*math.sin(i*math.pi/steps)) for i in range(steps+1)]
 
 
+def museum_sign_icon(kit,front=5.195):
+    """Language-neutral lighthouse silhouette; all shapes are editable geometry."""
+    shapes=[('tower',[(-.13,-.18),(.13,-.18),(.09,.07),(-.09,.07)]),
+            ('lantern',[(-.12,.09),(.12,.09),(.12,.18),(-.12,.18)]),
+            ('roof',[(-.17,.20),(.17,.20),(0,.28)]),
+            ('island_base',[(-.36,-.25),(.36,-.25),(.25,-.21),(-.25,-.21)])]
+    for name,points in shapes:
+        kit.mesh('museum_pictogram_'+name,[(x,4.12+y,front) for x,y in points],
+                 [tuple(range(len(points)))],'sign_cream')
+
+
 def museum(kit,box):
     kit.begin('alc_museum',ao=False)
     box('public_museum_wall',(0,4.2,0),(39.84,8.4,9.84),'building',.04)
@@ -108,19 +118,14 @@ def museum(kit,box):
             box('window_sill',(x,bottom+.06,5.08),(1.66,.12,.24),'trim',.015)
             # A broad reflection, not bars or a grid.
             kit.mesh('glass_soft_reflection',[(x-.48,bottom+.32,5.022),(x+.18,bottom+.32,5.022),(x-.48,bottom+1.7,5.022)],[(0,1,2)],'glass_light')
-    # Welcoming double glazing, low stone portal and a legible public-museum sign.
+    # Welcoming double glazing and a language-neutral landmark pictogram.
     for x in [-1.8,1.8]:box('visitor_portal_pier',(x,2.0,5.07),(.55,3.4,.28),'trim',.025)
     box('visitor_portal_lintel',(0,3.75,5.07),(4.45,.30,.28),'trim',.025)
     box('museum_glazed_entry',(0,1.85,5.09),(2.65,3.05,.12),'glass',.01)
     box('entry_door_join',(0,1.85,5.16),(.045,3.05,.025),'dark',0)
     for x in [-.16,.16]:box('entry_pull_handle',(x,1.65,5.20),(.035,.48,.045),'trim',.006)
-    box('museum_name_panel',(0,4.12,5.12),(4.45,.65,.12),'sign_teal',.02)
-    text=bpy.data.curves.new('Editable ISLAND MUSEUM lettering','FONT')
-    text.body='ISLAND MUSEUM';text.align_x='CENTER';text.align_y='CENTER';text.size=.36
-    text.extrude=.001;text.resolution_u=4
-    obj=bpy.data.objects.new('museum_public_identity',text);kit.current.objects.link(obj)
-    obj.location=kit.v((0,4.12,5.19));obj.rotation_euler.x=math.pi/2
-    obj.data.materials.append(kit.mats['sign_cream'])
+    box('museum_blank_sign_panel',(0,4.12,5.12),(4.45,.65,.12),'sign_teal',.02)
+    museum_sign_icon(kit)
     # Side galleries also read as a public building when the view turns oblique.
     for x in [-19.9,19.9]:
         for z in [-3.15,0,3.15]:
@@ -145,3 +150,4 @@ def museum_proxy(kit,box):
             kit.mesh('museum_far_unbarred_window',[(x+px,bottom+py,5.025) for px,py in arch],[tuple(range(len(arch)))],'glass')
     box('museum_far_public_door',(0,1.85,5.06),(2.65,3.05,.08),'glass',0)
     box('museum_far_sign',(0,4.12,5.10),(4.45,.65,.08),'sign_teal',0)
+    museum_sign_icon(kit,front=5.151)

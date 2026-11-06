@@ -40,6 +40,11 @@ Avoid judging the result only through close-ups or a flattering crop. Show the c
 
 ## 3. Keep an editable model and reusable runtime parts
 
+Landmark signage rule adopted on 2026-11-06: do not put written text in landmark
+3D geometry or textures. Use blank plaques or simple pictograms, including
+entrance, welcome and interpretive signs. Place names belong in the app's
+localized title and place-card UI. Apply the same graphic to near and far LODs.
+
 Maintain three complementary deliverables:
 
 | Deliverable | Purpose | Basic Room example |
