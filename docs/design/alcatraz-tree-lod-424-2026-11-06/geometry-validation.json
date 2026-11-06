@@ -1,0 +1,241 @@
+{
+  "author": "赵云",
+  "checks": [
+    {
+      "check": "alc_tree_a_far: one mesh",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: one surface",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: mobile mesh name",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: no skeleton, animation or texture",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: identity root, no pivot translation or scale",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: one material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: matte material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: vertex colour contract",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: valid opaque vertex colours",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: exact near/far bounds",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: bottom on Y=0",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: no degenerate or reversed shading faces",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: current manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: approved near .glb unchanged",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: approved near .glb.import unchanged",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: generated Godot UID",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: gltf/texture_map_mode=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: meshes/light_baking=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: meshes/generate_lods=false",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: one mesh",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: one surface",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: mobile mesh name",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: no skeleton, animation or texture",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: identity root, no pivot translation or scale",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: one material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: matte material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: vertex colour contract",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: valid opaque vertex colours",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: exact near/far bounds",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: bottom on Y=0",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: no degenerate or reversed shading faces",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: current manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: approved near .glb unchanged",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: approved near .glb.import unchanged",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: generated Godot UID",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: gltf/texture_map_mode=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: meshes/light_baking=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: meshes/generate_lods=false",
+      "passed": true
+    },
+    {
+      "check": "native Godot visibility_range checks passed",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_far: current GLB actually rendered",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_far: current GLB actually rendered",
+      "passed": true
+    }
+  ],
+  "assets": {
+    "alc_tree_a_far": {
+      "triangles": 118,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.3283814191818237,
+          0.0,
+          -1.3801499605178833
+        ],
+        [
+          3.3888323307037354,
+          6.424321174621582,
+          1.307702898979187
+        ]
+      ],
+      "sha256": "b5e4349cace99157462b0080c9514490453c0c3c2475c5405e3417f440273c98",
+      "near_sha256": "04b30452d6db9d8b64acfc4e11e70be15bd0372c1ccab99ec79f63d7a9aeb5d2",
+      "uid": "uid://bukcmggyoa3g2",
+      "degenerate_faces": 0,
+      "reversed_faces": 0,
+      "minimum_face_normal_agreement": 0.1859949060562064
+    },
+    "alc_tree_b_far": {
+      "triangles": 118,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.9710865020751953,
+          0.0,
+          -1.392596960067749
+        ],
+        [
+          1.9663119316101074,
+          6.275000095367432,
+          1.460149884223938
+        ]
+      ],
+      "sha256": "814c86334c75ecb5d10a3f34797166e3d3bda1addb0a4017b702dfb10898f11a",
+      "near_sha256": "eb499135039ef55b4c5f0a90c6957510b7939c8580c6e65458e531e891acb3d7",
+      "uid": "uid://diah2mlire5lc",
+      "degenerate_faces": 0,
+      "reversed_faces": 0,
+      "minimum_face_normal_agreement": 0.18628894502609067
+    }
+  },
+  "native_render_checks": 75,
+  "passed": true
+}

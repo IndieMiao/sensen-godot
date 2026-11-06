@@ -1,0 +1,22 @@
+[
+  {
+    "name": "SGODOT-424_TREE_LOD_v1_39m_41m.png",
+    "path": "docs/design/alcatraz-tree-lod-424-2026-11-06/SGODOT-424_TREE_LOD_v1_39m_41m.png",
+    "mime": "image/png",
+    "size": [
+      1440,
+      968
+    ],
+    "sha256": "b45fd760bd20b426e4b05fb45a55758db2a8b6837b015162f62af27c31c537ba"
+  },
+  {
+    "name": "SGODOT-424_TREE_LOD_v1_angles.png",
+    "path": "docs/design/alcatraz-tree-lod-424-2026-11-06/SGODOT-424_TREE_LOD_v1_angles.png",
+    "mime": "image/png",
+    "size": [
+      1600,
+      1510
+    ],
+    "sha256": "7e7c396ccf351f7429e2fe5ec5ae1cca816380f5d5ea0c9a885b303b0b3050f3"
+  }
+]

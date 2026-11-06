@@ -1,0 +1,647 @@
+{
+	"assets": {
+		"alc_tree_a_far": {
+			"common_aabb": "[P: (-1.328381, 0.0, -1.38015), S: (4.717214, 6.424321, 2.687853)]",
+			"near_sha256": "04b30452d6db9d8b64acfc4e11e70be15bd0372c1ccab99ec79f63d7a9aeb5d2",
+			"sha256": "b5e4349cace99157462b0080c9514490453c0c3c2475c5405e3417f440273c98",
+			"triangles": 118,
+			"uid": "uid://bukcmggyoa3g2"
+		},
+		"alc_tree_b_far": {
+			"common_aabb": "[P: (-1.971087, 0.0, -1.392597), S: (3.937398, 6.275, 2.852747)]",
+			"near_sha256": "eb499135039ef55b4c5f0a90c6957510b7939c8580c6e65458e531e891acb3d7",
+			"sha256": "814c86334c75ecb5d10a3f34797166e3d3bda1addb0a4017b702dfb10898f11a",
+			"triangles": 118,
+			"uid": "uid://diah2mlire5lc"
+		}
+	},
+	"captures": [
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (8.171763, 29.8101, 27.57805)]",
+			"camera_to_common_aabb_m": 39.0,
+			"camera_to_pivot_m": 41.4242515563965,
+			"draw_calls": 1,
+			"expected_triangles": 520,
+			"name": "alc_tree_a_39m",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 520,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (8.537995, 31.17409, 28.99417)]",
+			"camera_to_common_aabb_m": 41.0,
+			"camera_to_pivot_m": 43.4209976196289,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_a_41m",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (8.345724, 30.458, 28.25071)]",
+			"camera_to_common_aabb_m": 39.9500007629395,
+			"camera_to_pivot_m": 42.3726692199707,
+			"draw_calls": 1,
+			"expected_triangles": 520,
+			"name": "alc_tree_a_boundary_39.95",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 520,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (8.364035, 30.52619, 28.32151)]",
+			"camera_to_common_aabb_m": 40.0499992370605,
+			"camera_to_pivot_m": 42.4725036621094,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_a_boundary_40.05",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera": "[X: (0.5, 0.0, -0.866025), Y: (-0.590628, 0.731354, -0.340999), Z: (0.633371, 0.681998, 0.365677), O: (25.73169, 29.8101, 14.22517)]",
+			"camera_to_common_aabb_m": 39.0,
+			"camera_to_pivot_m": 41.8702430725098,
+			"draw_calls": 1,
+			"expected_triangles": 520,
+			"name": "alc_tree_a_yaw60_39m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 520,
+			"width_m": 6.71999979019165,
+			"yaw": 60.0
+		},
+		{
+			"camera": "[X: (0.5, 0.0, -0.866025), Y: (-0.590628, 0.731354, -0.340999), Z: (0.633371, 0.681998, 0.365677), O: (26.99843, 31.17409, 14.95653)]",
+			"camera_to_common_aabb_m": 41.0,
+			"camera_to_pivot_m": 43.868408203125,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_a_yaw60_41m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 60.0
+		},
+		{
+			"camera": "[X: (-0.866025, 0.0, -0.5), Y: (-0.340999, 0.731354, 0.590628), Z: (0.365677, 0.681998, -0.633371), O: (15.29162, 29.8101, -24.73769)]",
+			"camera_to_common_aabb_m": 39.0,
+			"camera_to_pivot_m": 41.6464729309082,
+			"draw_calls": 1,
+			"expected_triangles": 520,
+			"name": "alc_tree_a_yaw150_39m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 520,
+			"width_m": 6.71999979019165,
+			"yaw": 149.999984741211
+		},
+		{
+			"camera": "[X: (-0.866025, 0.0, -0.5), Y: (-0.340999, 0.731354, 0.590628), Z: (0.365677, 0.681998, -0.633371), O: (16.02298, 31.17409, -26.00443)]",
+			"camera_to_common_aabb_m": 41.0,
+			"camera_to_pivot_m": 43.6439018249512,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_a_yaw150_41m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 149.999984741211
+		},
+		{
+			"camera": "[X: (-0.5, 0.0, 0.866025), Y: (0.590628, 0.731354, 0.340999), Z: (-0.633371, 0.681998, -0.365677), O: (-23.67124, 29.8101, -14.29762)]",
+			"camera_to_common_aabb_m": 39.0,
+			"camera_to_pivot_m": 40.6619148254395,
+			"draw_calls": 1,
+			"expected_triangles": 520,
+			"name": "alc_tree_a_yaw240_39m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 520,
+			"width_m": 6.71999979019165,
+			"yaw": 240.0
+		},
+		{
+			"camera": "[X: (-0.5, 0.0, 0.866025), Y: (0.590628, 0.731354, 0.340999), Z: (-0.633371, 0.681998, -0.365677), O: (-24.93798, 31.17409, -15.02897)]",
+			"camera_to_common_aabb_m": 41.0,
+			"camera_to_pivot_m": 42.6567344665527,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_a_yaw240_41m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 240.0
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (7.139151, 29.73544, 27.64805)]",
+			"camera_to_common_aabb_m": 39.0,
+			"camera_to_pivot_m": 41.225944519043,
+			"draw_calls": 1,
+			"expected_triangles": 316,
+			"name": "alc_tree_b_39m",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 316,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (7.505383, 31.09943, 29.06417)]",
+			"camera_to_common_aabb_m": 41.0,
+			"camera_to_pivot_m": 43.2230415344238,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_b_41m",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (7.313111, 30.38334, 28.32071)]",
+			"camera_to_common_aabb_m": 39.9500007629395,
+			"camera_to_pivot_m": 42.1745338439941,
+			"draw_calls": 1,
+			"expected_triangles": 316,
+			"name": "alc_tree_b_boundary_39.95",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 316,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (7.331422, 30.45153, 28.39151)]",
+			"camera_to_common_aabb_m": 40.0499992370605,
+			"camera_to_pivot_m": 42.2743873596191,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_b_boundary_40.05",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera": "[X: (0.5, 0.0, -0.866025), Y: (-0.590628, 0.731354, -0.340999), Z: (0.633371, 0.681998, 0.365677), O: (24.69908, 29.73544, 14.29517)]",
+			"camera_to_common_aabb_m": 39.0,
+			"camera_to_pivot_m": 41.2139854431152,
+			"draw_calls": 1,
+			"expected_triangles": 316,
+			"name": "alc_tree_b_yaw60_39m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 316,
+			"width_m": 6.71999979019165,
+			"yaw": 60.0
+		},
+		{
+			"camera": "[X: (0.5, 0.0, -0.866025), Y: (-0.590628, 0.731354, -0.340999), Z: (0.633371, 0.681998, 0.365677), O: (25.96582, 31.09943, 15.02653)]",
+			"camera_to_common_aabb_m": 41.0,
+			"camera_to_pivot_m": 43.2110557556152,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_b_yaw60_41m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 60.0
+		},
+		{
+			"camera": "[X: (-0.866025, 0.0, -0.5), Y: (-0.340999, 0.731354, 0.590628), Z: (0.365677, 0.681998, -0.633371), O: (14.25901, 29.73544, -24.66769)]",
+			"camera_to_common_aabb_m": 39.0,
+			"camera_to_pivot_m": 41.1826477050781,
+			"draw_calls": 1,
+			"expected_triangles": 316,
+			"name": "alc_tree_b_yaw150_39m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 316,
+			"width_m": 6.71999979019165,
+			"yaw": 149.999984741211
+		},
+		{
+			"camera": "[X: (-0.866025, 0.0, -0.5), Y: (-0.340999, 0.731354, 0.590628), Z: (0.365677, 0.681998, -0.633371), O: (14.99037, 31.09943, -25.93443)]",
+			"camera_to_common_aabb_m": 41.0,
+			"camera_to_pivot_m": 43.179630279541,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_b_yaw150_41m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 149.999984741211
+		},
+		{
+			"camera": "[X: (-0.5, 0.0, 0.866025), Y: (0.590628, 0.731354, 0.340999), Z: (-0.633371, 0.681998, -0.365677), O: (-24.70385, 29.73544, -14.22762)]",
+			"camera_to_common_aabb_m": 39.0,
+			"camera_to_pivot_m": 41.1934661865234,
+			"draw_calls": 1,
+			"expected_triangles": 316,
+			"name": "alc_tree_b_yaw240_39m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 316,
+			"width_m": 6.71999979019165,
+			"yaw": 240.0
+		},
+		{
+			"camera": "[X: (-0.5, 0.0, 0.866025), Y: (0.590628, 0.731354, 0.340999), Z: (-0.633371, 0.681998, -0.365677), O: (-25.9706, 31.09943, -14.95897)]",
+			"camera_to_common_aabb_m": 41.0,
+			"camera_to_pivot_m": 43.1904792785645,
+			"draw_calls": 1,
+			"expected_triangles": 118,
+			"name": "alc_tree_b_yaw240_41m",
+			"pitch": -42.9999961853027,
+			"size": [
+				400,
+				600
+			],
+			"triangles": 118,
+			"width_m": 6.71999979019165,
+			"yaw": 240.0
+		}
+	],
+	"checks": [
+		{
+			"check": "alc_tree_a: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_far: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_far: one surface for each LOD",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_far: imported far triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_far: exact matching full bounds and root origin",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_far: Godot UID / import contract",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_far: current imported source",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_39m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_39m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_39m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_41m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_41m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_41m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_boundary_39.95",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_boundary_39.95: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_boundary_39.95: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_boundary_40.05",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_boundary_40.05: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_boundary_40.05: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_yaw60_39m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw60_39m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw60_39m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_yaw60_41m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw60_41m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw60_41m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_yaw150_39m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw150_39m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw150_39m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_yaw150_41m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw150_41m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw150_41m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_yaw240_39m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw240_39m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw240_39m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_a_yaw240_41m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw240_41m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_yaw240_41m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_far: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_far: one surface for each LOD",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_far: imported far triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_far: exact matching full bounds and root origin",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_far: Godot UID / import contract",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_far: current imported source",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_39m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_39m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_39m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_41m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_41m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_41m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_boundary_39.95",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_boundary_39.95: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_boundary_39.95: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_boundary_40.05",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_boundary_40.05: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_boundary_40.05: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_yaw60_39m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw60_39m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw60_39m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_yaw60_41m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw60_41m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw60_41m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_yaw150_39m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw150_39m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw150_39m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_yaw150_41m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw150_41m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw150_41m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_yaw240_39m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw240_39m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw240_39m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "capture alc_tree_b_yaw240_41m",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw240_41m: engine renders only the expected LOD triangles",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_yaw240_41m: actual camera-to-common-AABB distance",
+			"passed": true
+		},
+		{
+			"check": "Godot Mobile renderer",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"gpu": "NVIDIA GeForce RTX 2060",
+		"method": "mobile"
+	}
+}
