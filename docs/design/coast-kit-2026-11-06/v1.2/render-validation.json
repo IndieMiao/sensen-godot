@@ -1,0 +1,1116 @@
+{
+	"assets": {
+		"coast_buoy": {
+			"sha256": "ad728673a128c845d7c364b83d6a8ca8fc2676d1f5cddba0b48a51c1b0ca2def",
+			"triangles": 224,
+			"uid": "uid://bh3iobv5judj5"
+		},
+		"coast_dock_bollard": {
+			"sha256": "e230032aa26f0ae634bb94a9bbeaaeac7431ac1b0ab0838e29bf462501c9907f",
+			"triangles": 368,
+			"uid": "uid://behoyxj7hrt4l"
+		},
+		"coast_dock_end": {
+			"sha256": "3108f00882248efb6d8fc1205f80d8a49c115ac1fc647b6724247111aa1dbf2d",
+			"triangles": 324,
+			"uid": "uid://bt6g2843jg7gw"
+		},
+		"coast_dock_straight": {
+			"sha256": "185461cd83b3af081b09c6f018f9a98f1c79addbb25f1a5a9b871459f883db3b",
+			"triangles": 224,
+			"uid": "uid://crhbg6tiheyxf"
+		},
+		"coast_rock_inner_high": {
+			"sha256": "46ff09bac9504d012a67b0b6a5501e78dd178174b2648bae59747cbfb370c0be",
+			"triangles": 104,
+			"uid": "uid://brhc6gjcjjphc"
+		},
+		"coast_rock_inner_low": {
+			"sha256": "9e25f2433416b03c7d54d2bb73c81417a4b738fba56867e572b894258108ea58",
+			"triangles": 104,
+			"uid": "uid://c4h18xbtsm0k"
+		},
+		"coast_rock_outer_high": {
+			"sha256": "28e24e3645858773be89d25a856f7e0ae142d450cc15ae7876bd72823f50c303",
+			"triangles": 104,
+			"uid": "uid://bsd5k67rvujvx"
+		},
+		"coast_rock_outer_low": {
+			"sha256": "36db8c8def91094093e7af2946ec1da37c23b9d7f710ab006d5a9334fb773296",
+			"triangles": 104,
+			"uid": "uid://d3k8sw5lbck2t"
+		},
+		"coast_rock_straight_high": {
+			"sha256": "522cd7560dd3c6f036c03841434de535a147fc77e4ccb40793f7270e5d551551",
+			"triangles": 104,
+			"uid": "uid://spiednd3hldv"
+		},
+		"coast_rock_straight_low": {
+			"sha256": "468ca175db81da1f6d8ee145db723d19a9c40c5a65e55024a45f2a8b3b3a0cc1",
+			"triangles": 104,
+			"uid": "uid://djupawarq04cu"
+		},
+		"coast_scatter_a": {
+			"sha256": "4628af6437bad3215496ab819910e74776adebacc0c023b4298104435e90d40d",
+			"triangles": 196,
+			"uid": "uid://yvnvxhsdbqry"
+		},
+		"coast_scatter_b": {
+			"sha256": "47f7dd657a43d6118bdb85b9d5ff68102ba07b45a8f022067ab822006c6daf71",
+			"triangles": 196,
+			"uid": "uid://j00ow6sjm3t7"
+		},
+		"coast_scatter_c": {
+			"sha256": "78fc63f63f768c8b17a04157270a603df2c679aa1c10b74425fc9caeb6545f2e",
+			"triangles": 196,
+			"uid": "uid://deq4bltxwqkvx"
+		},
+		"coast_seawall": {
+			"sha256": "3c0795c96af36f4006562221ab3bece9fd71f2105f9e656cb7a724395a11d60d",
+			"triangles": 156,
+			"uid": "uid://vcep2igp4038"
+		},
+		"coast_water_steps": {
+			"sha256": "36e6bbeb5e71d22ca5395657e78d9173e79049378ca5109189bd8c42a3fe41fb",
+			"triangles": 96,
+			"uid": "uid://dcfiwkkl8sa8v"
+		}
+	},
+	"captures": [
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_straight_low_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_straight_low_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_straight_high_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_straight_high_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_outer_low_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_outer_low_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_outer_high_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_outer_high_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_inner_low_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_inner_low_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_inner_high_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_rock_inner_high_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7732,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_scatter_a_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7824,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_scatter_a_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7824,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_scatter_b_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7824,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_scatter_b_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7824,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_scatter_c_sand",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7824,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_scatter_c_gray",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7824,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_seawall",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7784,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 2,
+			"name": "detail_coast_seawall",
+			"pitch": -24.9999980926514,
+			"size": [
+				750,
+				330
+			],
+			"triangles": 158,
+			"width_m": 4.40000009536743,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_dock_straight",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7852,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 2,
+			"name": "wood_close",
+			"pitch": -42.9999961853027,
+			"size": [
+				700,
+				540
+			],
+			"triangles": 226,
+			"width_m": 2.70000004768372,
+			"yaw": 14.4999990463257
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_dock_end",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7952,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_dock_bollard",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7996,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 2,
+			"name": "detail_coast_dock_bollard",
+			"pitch": -24.9999980926514,
+			"size": [
+				750,
+				330
+			],
+			"triangles": 370,
+			"width_m": 5.19999980926514,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_buoy",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7852,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 5,
+			"name": "part_coast_water_steps",
+			"pitch": -42.9999961853027,
+			"size": [
+				250,
+				250
+			],
+			"triangles": 7724,
+			"width_m": 4.80000019073486,
+			"yaw": 27.4999980926514
+		},
+		{
+			"draw_calls": 18,
+			"name": "example_default_without_foam",
+			"pitch": -43.0,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 9816,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"draw_calls": 20,
+			"name": "example_default_360x800",
+			"pitch": -43.0,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 10656,
+			"width_m": 6.71999979019165,
+			"yaw": 14.4999990463257
+		},
+		{
+			"draw_calls": 26,
+			"name": "example_whole_shore",
+			"pitch": -43.0,
+			"size": [
+				1400,
+				1000
+			],
+			"triangles": 12302,
+			"width_m": 17.5,
+			"yaw": 14.4999990463257
+		},
+		{
+			"draw_calls": 14,
+			"name": "example_corner_seam",
+			"pitch": -51.9999961853027,
+			"size": [
+				1200,
+				800
+			],
+			"triangles": 2490,
+			"width_m": 6.0,
+			"yaw": 34.9999961853027
+		}
+	],
+	"checks": [
+		{
+			"check": "real game avatar ready at original 1.75m scale",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_low: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_low: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_low: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_low: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_straight_low_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_low: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_straight_low_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_low: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_low: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_high: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_high: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_high: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_high: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_straight_high_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_high: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_straight_high_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_high: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_straight_high: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_low: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_low: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_low: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_low: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_outer_low_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_low: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_outer_low_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_low: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_low: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_high: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_high: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_high: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_high: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_outer_high_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_high: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_outer_high_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_high: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_outer_high: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_low: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_low: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_low: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_low: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_inner_low_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_low: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_inner_low_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_low: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_low: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_high: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_high: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_high: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_high: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_inner_high_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_high: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_rock_inner_high_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_high: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_rock_inner_high: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_a: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_a: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_a: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_a: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_scatter_a_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_a: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_scatter_a_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_a: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_a: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_b: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_b: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_b: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_b: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_scatter_b_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_b: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_scatter_b_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_b: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_b: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_c: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_c: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_c: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_c: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_scatter_c_sand",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_c: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_scatter_c_gray",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_c: palette switch keeps identical mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_scatter_c: palette adds no surface or draw",
+			"passed": true
+		},
+		{
+			"check": "coast_seawall: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_seawall: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_seawall: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_seawall: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_seawall",
+			"passed": true
+		},
+		{
+			"check": "capture detail_coast_seawall",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_straight: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_straight: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_straight: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_straight: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_dock_straight",
+			"passed": true
+		},
+		{
+			"check": "capture wood_close",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_end: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_end: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_end: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_end: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_dock_end",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_bollard: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_bollard: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_bollard: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "coast_dock_bollard: imported single-pass shader retained on the mesh",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_dock_bollard",
+			"passed": true
+		},
+		{
+			"check": "capture detail_coast_dock_bollard",
+			"passed": true
+		},
+		{
+			"check": "coast_buoy: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_buoy: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_buoy: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_buoy",
+			"passed": true
+		},
+		{
+			"check": "coast_water_steps: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "coast_water_steps: actual imported budget",
+			"passed": true
+		},
+		{
+			"check": "coast_water_steps: UID and root_script default",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_water_steps",
+			"passed": true
+		},
+		{
+			"check": "example seam 1 coincides",
+			"passed": true
+		},
+		{
+			"check": "example seam 2 coincides",
+			"passed": true
+		},
+		{
+			"check": "example seam 3 coincides",
+			"passed": true
+		},
+		{
+			"check": "example seam 4 coincides",
+			"passed": true
+		},
+		{
+			"check": "example seam 5 coincides",
+			"passed": true
+		},
+		{
+			"check": "example seam 6 coincides",
+			"passed": true
+		},
+		{
+			"check": "example seam 7 coincides",
+			"passed": true
+		},
+		{
+			"check": "example seam 8 coincides",
+			"passed": true
+		},
+		{
+			"check": "example seam 9 coincides",
+			"passed": true
+		},
+		{
+			"check": "temporary review ground triangulates",
+			"passed": true
+		},
+		{
+			"check": "default 43deg / 14.5deg / 6.72m camera",
+			"passed": true
+		},
+		{
+			"check": "capture example_default_without_foam",
+			"passed": true
+		},
+		{
+			"check": "#824 alc_foam_strip_a: original transparent/no-depth-write material",
+			"passed": true
+		},
+		{
+			"check": "#824 alc_foam_ring: original transparent/no-depth-write material",
+			"passed": true
+		},
+		{
+			"check": "capture example_default_360x800",
+			"passed": true
+		},
+		{
+			"check": "#824 overlay uses only its two independent batches",
+			"passed": true
+		},
+		{
+			"check": "capture example_whole_shore",
+			"passed": true
+		},
+		{
+			"check": "capture example_corner_seam",
+			"passed": true
+		},
+		{
+			"check": "Godot Mobile renderer",
+			"passed": true
+		}
+	],
+	"example": {
+		"access_openings": 2,
+		"nominal_length_m": 20,
+		"rock_centreline_and_openings_m": 19.1415926535898,
+		"slots": 10
+	},
+	"gallery": [
+		{
+			"asset": "coast_rock_straight_low",
+			"capture": "part_coast_rock_straight_low_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_rock_straight_low",
+			"capture": "part_coast_rock_straight_low_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_rock_straight_high",
+			"capture": "part_coast_rock_straight_high_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_rock_straight_high",
+			"capture": "part_coast_rock_straight_high_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_rock_outer_low",
+			"capture": "part_coast_rock_outer_low_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_rock_outer_low",
+			"capture": "part_coast_rock_outer_low_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_rock_outer_high",
+			"capture": "part_coast_rock_outer_high_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_rock_outer_high",
+			"capture": "part_coast_rock_outer_high_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_rock_inner_low",
+			"capture": "part_coast_rock_inner_low_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_rock_inner_low",
+			"capture": "part_coast_rock_inner_low_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_rock_inner_high",
+			"capture": "part_coast_rock_inner_high_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_rock_inner_high",
+			"capture": "part_coast_rock_inner_high_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_scatter_a",
+			"capture": "part_coast_scatter_a_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_scatter_a",
+			"capture": "part_coast_scatter_a_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_scatter_b",
+			"capture": "part_coast_scatter_b_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_scatter_b",
+			"capture": "part_coast_scatter_b_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_scatter_c",
+			"capture": "part_coast_scatter_c_sand",
+			"palette": 0
+		},
+		{
+			"asset": "coast_scatter_c",
+			"capture": "part_coast_scatter_c_gray",
+			"palette": 1
+		},
+		{
+			"asset": "coast_seawall",
+			"capture": "part_coast_seawall",
+			"palette": -1
+		},
+		{
+			"asset": "coast_dock_straight",
+			"capture": "part_coast_dock_straight",
+			"palette": -1
+		},
+		{
+			"asset": "coast_dock_end",
+			"capture": "part_coast_dock_end",
+			"palette": -1
+		},
+		{
+			"asset": "coast_dock_bollard",
+			"capture": "part_coast_dock_bollard",
+			"palette": -1
+		},
+		{
+			"asset": "coast_buoy",
+			"capture": "part_coast_buoy",
+			"palette": -1
+		},
+		{
+			"asset": "coast_water_steps",
+			"capture": "part_coast_water_steps",
+			"palette": -1
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"gpu": "NVIDIA GeForce RTX 2060",
+		"method": "mobile"
+	}
+}

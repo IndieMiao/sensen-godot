@@ -1,0 +1,32 @@
+[
+  {
+    "name": "SGODOT-426_COAST_v1.2_catalog.png",
+    "path": "docs/design/coast-kit-2026-11-06/v1.2/SGODOT-426_COAST_v1.2_catalog.png",
+    "mime": "image/png",
+    "size": [
+      1500,
+      1530
+    ],
+    "sha256": "a586954d6aaad03e5db5f73a18c56270957f6d4995f64c067a9173876a0de4a6"
+  },
+  {
+    "name": "SGODOT-426_COAST_v1.2_default_360x800.png",
+    "path": "docs/design/coast-kit-2026-11-06/v1.2/SGODOT-426_COAST_v1.2_default_360x800.png",
+    "mime": "image/png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "f0a1b3b24d77cb754d48d9817fa4e9a58f7bba4f6f3b54eb5ae23a28de266cc2"
+  },
+  {
+    "name": "SGODOT-426_COAST_v1.2_wood_match.png",
+    "path": "docs/design/coast-kit-2026-11-06/v1.2/SGODOT-426_COAST_v1.2_wood_match.png",
+    "mime": "image/png",
+    "size": [
+      1400,
+      650
+    ],
+    "sha256": "bb0a945cb3d78c873fe8feb09e82a1269906f44c3e161809b8464897133b1da4"
+  }
+]

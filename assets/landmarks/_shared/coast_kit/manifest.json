@@ -1,0 +1,3024 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "revision": "v1.2",
+  "module_grid_m": 2,
+  "axes": "metres, Y up; straight coast +X tangent, +Z water / -Z land",
+  "material_contract": {
+    "vertex_color_is_srgb": false,
+    "roughness": 0.94,
+    "specular": 0.15,
+    "metallic": 0,
+    "textures": false,
+    "passes": 1,
+    "keep_imported_material": true,
+    "vertex_alpha": "opaque surface tag: 1/8 rock base, 2/8 light, 3/8 shadow, 4/8 warm, 6/8 wettable solid"
+  },
+  "rock_palettes": {
+    "selector": "rock_palette",
+    "warm_sand": 0,
+    "cool_gray_brown": 1,
+    "cool_reference": "SGODOT-424 #801 v3 af319757: #777A75 / #93958B / #515B59"
+  },
+  "wet_band": {
+    "water_level_default": 0.15,
+    "height_above_water_m": 0.25,
+    "strength": 0.38,
+    "space": "world; follows translated/scaled instances",
+    "foam_compatibility": "opaque underlying surface; existing #824 foam remains an independent transparent layer at water + 0.018m"
+  },
+  "palette_srgb": {
+    "stone": "CBB48F",
+    "stone_light": "D9C4A3",
+    "stone_shade": "BCA781",
+    "rock": "AD9D86",
+    "rock_light": "C0B099",
+    "rock_shadow": "948A78",
+    "rock_warm": "B6A189",
+    "garden": "86A84F",
+    "garden_light": "9AB55D",
+    "garden_dark": "759448",
+    "road": "DFCBA7",
+    "building": "DEC59B",
+    "trim": "F0E1C2",
+    "roof": "A4A08F",
+    "glass": "608F99",
+    "glass_light": "86B0B3",
+    "wood": "A3815D",
+    "wood_light": "B89972",
+    "wood_dark": "795F47",
+    "wood_seam": "69543F",
+    "dark": "4E6769",
+    "bird": "EEEDE6",
+    "bridge": "C76845",
+    "far": "B4C2C8",
+    "sign_teal": "35696A",
+    "sign_cream": "FFF0CA",
+    "flower_yellow": "DFC570",
+    "soil": "897A53",
+    "rope": "B7A68D",
+    "stone_joint": "8B8476"
+  },
+  "reference": {
+    "source_commit": "b81605af5b9aaa2e9bdcd3af81a0b2f385ce7bc3",
+    "source_path": "tools/art/source/alcatraz_island/palette.json",
+    "reference_image": "tools/art/source/alcatraz_ruins_424/reference/c_alc2.png",
+    "author": "赵云",
+    "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554"
+  },
+  "assets": {
+    "coast_rock_straight_low": {
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 11664,
+      "bounds_blender": [
+        [
+          -1.0,
+          -0.6,
+          0.0
+        ],
+        [
+          1.0,
+          0.6,
+          0.8
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.6
+        ],
+        [
+          1.0,
+          0.8,
+          0.6
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "shore_rock",
+      "nominal_module_m": 2,
+      "height_variant": "low",
+      "crest_height_m": 0.8,
+      "water_side": "local +Z at inlet; follows turning tangent",
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            0,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1,
+              0.0,
+              -0.6
+            ],
+            [
+              -1,
+              0.65,
+              -0.6
+            ],
+            [
+              -1,
+              0.75,
+              -0.15
+            ],
+            [
+              -1,
+              0.64,
+              0.1
+            ],
+            [
+              -1,
+              0.33,
+              0.45
+            ],
+            [
+              -1,
+              0.0,
+              0.6
+            ]
+          ],
+          "family": "shore_rock"
+        },
+        {
+          "name": "out",
+          "position": [
+            1,
+            0,
+            0
+          ],
+          "outward": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              1,
+              0.0,
+              -0.6
+            ],
+            [
+              1,
+              0.65,
+              -0.6
+            ],
+            [
+              1,
+              0.75,
+              -0.15
+            ],
+            [
+              1,
+              0.64,
+              0.1
+            ],
+            [
+              1,
+              0.33,
+              0.45
+            ],
+            [
+              1,
+              0.0,
+              0.6
+            ]
+          ],
+          "family": "shore_rock"
+        }
+      ],
+      "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
+      "file": "coast_rock_straight_low.glb",
+      "sha256": "468ca175db81da1f6d8ee145db723d19a9c40c5a65e55024a45f2a8b3b3a0cc1",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_rock_straight_high": {
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 11668,
+      "bounds_blender": [
+        [
+          -1.0,
+          -0.6,
+          0.0
+        ],
+        [
+          1.0,
+          0.6,
+          1.2
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.6
+        ],
+        [
+          1.0,
+          1.2,
+          0.6
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "shore_rock",
+      "nominal_module_m": 2,
+      "height_variant": "high",
+      "crest_height_m": 1.2,
+      "water_side": "local +Z at inlet; follows turning tangent",
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            0,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1,
+              0.0,
+              -0.6
+            ],
+            [
+              -1,
+              0.65,
+              -0.6
+            ],
+            [
+              -1,
+              0.75,
+              -0.15
+            ],
+            [
+              -1,
+              0.64,
+              0.1
+            ],
+            [
+              -1,
+              0.33,
+              0.45
+            ],
+            [
+              -1,
+              0.0,
+              0.6
+            ]
+          ],
+          "family": "shore_rock"
+        },
+        {
+          "name": "out",
+          "position": [
+            1,
+            0,
+            0
+          ],
+          "outward": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              1,
+              0.0,
+              -0.6
+            ],
+            [
+              1,
+              0.65,
+              -0.6
+            ],
+            [
+              1,
+              0.75,
+              -0.15
+            ],
+            [
+              1,
+              0.64,
+              0.1
+            ],
+            [
+              1,
+              0.33,
+              0.45
+            ],
+            [
+              1,
+              0.0,
+              0.6
+            ]
+          ],
+          "family": "shore_rock"
+        }
+      ],
+      "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
+      "file": "coast_rock_straight_high.glb",
+      "sha256": "522cd7560dd3c6f036c03841434de535a147fc77e4ccb40793f7270e5d551551",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_rock_outer_low": {
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 12060,
+      "bounds_blender": [
+        [
+          -1.0,
+          -0.6,
+          0.0
+        ],
+        [
+          0.6,
+          1.0,
+          0.8
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          0.6,
+          0.8,
+          0.6
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "shore_rock",
+      "nominal_module_m": 2,
+      "height_variant": "low",
+      "crest_height_m": 0.8,
+      "water_side": "local +Z at inlet; follows turning tangent",
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            0,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1.0,
+              0.0,
+              -0.6
+            ],
+            [
+              -1.0,
+              0.65,
+              -0.6
+            ],
+            [
+              -1.0,
+              0.75,
+              -0.15000000000000002
+            ],
+            [
+              -1.0,
+              0.64,
+              0.10000000000000009
+            ],
+            [
+              -1.0,
+              0.33,
+              0.44999999999999996
+            ],
+            [
+              -1.0,
+              0.0,
+              0.6000000000000001
+            ]
+          ],
+          "family": "shore_rock"
+        },
+        {
+          "name": "out",
+          "position": [
+            0,
+            0,
+            -1
+          ],
+          "outward": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -0.6,
+              0.0,
+              -1.0
+            ],
+            [
+              -0.6,
+              0.65,
+              -1.0
+            ],
+            [
+              -0.15000000000000002,
+              0.75,
+              -1.0
+            ],
+            [
+              0.10000000000000009,
+              0.64,
+              -1.0
+            ],
+            [
+              0.44999999999999996,
+              0.33,
+              -1.0
+            ],
+            [
+              0.6000000000000001,
+              0.0,
+              -1.0
+            ]
+          ],
+          "family": "shore_rock"
+        }
+      ],
+      "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
+      "file": "coast_rock_outer_low.glb",
+      "sha256": "36db8c8def91094093e7af2946ec1da37c23b9d7f710ab006d5a9334fb773296",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_rock_outer_high": {
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 12064,
+      "bounds_blender": [
+        [
+          -1.0,
+          -0.6,
+          0.0
+        ],
+        [
+          0.6,
+          1.0,
+          1.2
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          0.6,
+          1.2,
+          0.6
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "shore_rock",
+      "nominal_module_m": 2,
+      "height_variant": "high",
+      "crest_height_m": 1.2,
+      "water_side": "local +Z at inlet; follows turning tangent",
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            0,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1.0,
+              0.0,
+              -0.6
+            ],
+            [
+              -1.0,
+              0.65,
+              -0.6
+            ],
+            [
+              -1.0,
+              0.75,
+              -0.15000000000000002
+            ],
+            [
+              -1.0,
+              0.64,
+              0.10000000000000009
+            ],
+            [
+              -1.0,
+              0.33,
+              0.44999999999999996
+            ],
+            [
+              -1.0,
+              0.0,
+              0.6000000000000001
+            ]
+          ],
+          "family": "shore_rock"
+        },
+        {
+          "name": "out",
+          "position": [
+            0,
+            0,
+            -1
+          ],
+          "outward": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -0.6,
+              0.0,
+              -1.0
+            ],
+            [
+              -0.6,
+              0.65,
+              -1.0
+            ],
+            [
+              -0.15000000000000002,
+              0.75,
+              -1.0
+            ],
+            [
+              0.10000000000000009,
+              0.64,
+              -1.0
+            ],
+            [
+              0.44999999999999996,
+              0.33,
+              -1.0
+            ],
+            [
+              0.6000000000000001,
+              0.0,
+              -1.0
+            ]
+          ],
+          "family": "shore_rock"
+        }
+      ],
+      "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
+      "file": "coast_rock_outer_high.glb",
+      "sha256": "28e24e3645858773be89d25a856f7e0ae142d450cc15ae7876bd72823f50c303",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_rock_inner_low": {
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 12060,
+      "bounds_blender": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.6,
+          0.6,
+          0.8
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.6
+        ],
+        [
+          0.6,
+          0.8,
+          1.0
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "shore_rock",
+      "nominal_module_m": 2,
+      "height_variant": "low",
+      "crest_height_m": 0.8,
+      "water_side": "local +Z at inlet; follows turning tangent",
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            0,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1.0,
+              0.0,
+              -0.6000000000000001
+            ],
+            [
+              -1.0,
+              0.65,
+              -0.6000000000000001
+            ],
+            [
+              -1.0,
+              0.75,
+              -0.1499999999999999
+            ],
+            [
+              -1.0,
+              0.64,
+              0.09999999999999998
+            ],
+            [
+              -1.0,
+              0.33,
+              0.44999999999999996
+            ],
+            [
+              -1.0,
+              0.0,
+              0.6
+            ]
+          ],
+          "family": "shore_rock"
+        },
+        {
+          "name": "out",
+          "position": [
+            0,
+            0,
+            1
+          ],
+          "outward": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              0.6000000000000001,
+              0.0,
+              1.0
+            ],
+            [
+              0.6000000000000001,
+              0.65,
+              1.0
+            ],
+            [
+              0.1499999999999999,
+              0.75,
+              1.0
+            ],
+            [
+              -0.09999999999999998,
+              0.64,
+              1.0
+            ],
+            [
+              -0.44999999999999996,
+              0.33,
+              1.0
+            ],
+            [
+              -0.6,
+              0.0,
+              1.0
+            ]
+          ],
+          "family": "shore_rock"
+        }
+      ],
+      "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
+      "file": "coast_rock_inner_low.glb",
+      "sha256": "9e25f2433416b03c7d54d2bb73c81417a4b738fba56867e572b894258108ea58",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_rock_inner_high": {
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 12064,
+      "bounds_blender": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.6,
+          0.6,
+          1.2
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.6
+        ],
+        [
+          0.6,
+          1.2,
+          1.0
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "shore_rock",
+      "nominal_module_m": 2,
+      "height_variant": "high",
+      "crest_height_m": 1.2,
+      "water_side": "local +Z at inlet; follows turning tangent",
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            0,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1.0,
+              0.0,
+              -0.6000000000000001
+            ],
+            [
+              -1.0,
+              0.65,
+              -0.6000000000000001
+            ],
+            [
+              -1.0,
+              0.75,
+              -0.1499999999999999
+            ],
+            [
+              -1.0,
+              0.64,
+              0.09999999999999998
+            ],
+            [
+              -1.0,
+              0.33,
+              0.44999999999999996
+            ],
+            [
+              -1.0,
+              0.0,
+              0.6
+            ]
+          ],
+          "family": "shore_rock"
+        },
+        {
+          "name": "out",
+          "position": [
+            0,
+            0,
+            1
+          ],
+          "outward": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              0.6000000000000001,
+              0.0,
+              1.0
+            ],
+            [
+              0.6000000000000001,
+              0.65,
+              1.0
+            ],
+            [
+              0.1499999999999999,
+              0.75,
+              1.0
+            ],
+            [
+              -0.09999999999999998,
+              0.64,
+              1.0
+            ],
+            [
+              -0.44999999999999996,
+              0.33,
+              1.0
+            ],
+            [
+              -0.6,
+              0.0,
+              1.0
+            ]
+          ],
+          "family": "shore_rock"
+        }
+      ],
+      "note": "Both height variants share exactly the same end profiles. Raised mass is internal to each module; no transition piece is required.",
+      "file": "coast_rock_inner_high.glb",
+      "sha256": "46ff09bac9504d012a67b0b6a5501e78dd178174b2648bae59747cbfb370c0be",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_scatter_a": {
+      "triangles": 196,
+      "surfaces": 1,
+      "bytes": 25972,
+      "bounds_blender": [
+        [
+          -0.5,
+          -0.425,
+          0.0
+        ],
+        [
+          0.5,
+          0.425,
+          0.55
+        ]
+      ],
+      "bounds": [
+        [
+          -0.5,
+          0.0,
+          -0.425
+        ],
+        [
+          0.5,
+          0.55,
+          0.425
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "scatter",
+      "intended_dimensions_m": [
+        1.0,
+        0.55,
+        0.85
+      ],
+      "ports": [],
+      "reuse": {
+        "source_file": "assets/landmarks/alcatraz_island/alc_rock_a.glb",
+        "source_sha256": "690c268413ddd2faca95b589c9c9401fa6c1a31bbea61f4ac01eee57744c2d99",
+        "changes": "resized to kit scale, recoloured to island palette; source geometry and source file untouched"
+      },
+      "file": "coast_scatter_a.glb",
+      "sha256": "4628af6437bad3215496ab819910e74776adebacc0c023b4298104435e90d40d",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_scatter_b": {
+      "triangles": 196,
+      "surfaces": 1,
+      "bytes": 25996,
+      "bounds_blender": [
+        [
+          -0.7,
+          -0.55,
+          0.0
+        ],
+        [
+          0.7,
+          0.55,
+          0.85
+        ]
+      ],
+      "bounds": [
+        [
+          -0.7,
+          0.0,
+          -0.55
+        ],
+        [
+          0.7,
+          0.85,
+          0.55
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "scatter",
+      "intended_dimensions_m": [
+        1.4,
+        0.85,
+        1.1
+      ],
+      "ports": [],
+      "reuse": {
+        "source_file": "assets/landmarks/alcatraz_island/alc_rock_b.glb",
+        "source_sha256": "af44d6dba6fa31ba76fad57817f22c7c79499bd548c18263e6f91954d9905e4d",
+        "changes": "resized to kit scale, recoloured to island palette; source geometry and source file untouched"
+      },
+      "file": "coast_scatter_b.glb",
+      "sha256": "47f7dd657a43d6118bdb85b9d5ff68102ba07b45a8f022067ab822006c6daf71",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_scatter_c": {
+      "triangles": 196,
+      "surfaces": 1,
+      "bytes": 25996,
+      "bounds_blender": [
+        [
+          -0.95,
+          -0.7,
+          0.0
+        ],
+        [
+          0.95,
+          0.7,
+          0.95
+        ]
+      ],
+      "bounds": [
+        [
+          -0.95,
+          0.0,
+          -0.7
+        ],
+        [
+          0.95,
+          0.95,
+          0.7
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "scatter",
+      "intended_dimensions_m": [
+        1.9,
+        0.95,
+        1.4
+      ],
+      "ports": [],
+      "reuse": {
+        "source_file": "assets/landmarks/alcatraz_island/alc_rock_c.glb",
+        "source_sha256": "6f14e38b10de8e6fc2fcef681b5c50c6efdc7043921e58a2b2cbca6734f5e919",
+        "changes": "resized to kit scale, recoloured to island palette; source geometry and source file untouched"
+      },
+      "file": "coast_scatter_c.glb",
+      "sha256": "78fc63f63f768c8b17a04157270a603df2c679aa1c10b74425fc9caeb6545f2e",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_cool_gray.tres"
+    },
+    "coast_seawall": {
+      "triangles": 156,
+      "surfaces": 1,
+      "bytes": 14040,
+      "bounds_blender": [
+        [
+          -1.0,
+          -0.42,
+          0.0
+        ],
+        [
+          1.0,
+          0.42,
+          1.2
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.42
+        ],
+        [
+          1.0,
+          1.2,
+          0.42
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "seawall",
+      "nominal_module_m": 2,
+      "top_y": 1.2,
+      "coping_width_m": 0.84,
+      "horizontal_joint_levels_m": [
+        0.3,
+        0.6,
+        0.9
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            0,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1,
+              0,
+              -0.32
+            ],
+            [
+              -1,
+              1.05,
+              -0.28
+            ],
+            [
+              -1,
+              1.12,
+              -0.32
+            ],
+            [
+              -1,
+              1.2,
+              -0.32
+            ],
+            [
+              -1,
+              1.2,
+              0.32
+            ],
+            [
+              -1,
+              1.12,
+              0.32
+            ],
+            [
+              -1,
+              1.05,
+              0.28
+            ],
+            [
+              -1,
+              0,
+              0.38
+            ]
+          ],
+          "family": "seawall"
+        },
+        {
+          "name": "out",
+          "position": [
+            1,
+            0,
+            0
+          ],
+          "outward": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              1,
+              0,
+              -0.32
+            ],
+            [
+              1,
+              1.05,
+              -0.28
+            ],
+            [
+              1,
+              1.12,
+              -0.32
+            ],
+            [
+              1,
+              1.2,
+              -0.32
+            ],
+            [
+              1,
+              1.2,
+              0.32
+            ],
+            [
+              1,
+              1.12,
+              0.32
+            ],
+            [
+              1,
+              1.05,
+              0.28
+            ],
+            [
+              1,
+              0,
+              0.38
+            ]
+          ],
+          "family": "seawall"
+        }
+      ],
+      "file": "coast_seawall.glb",
+      "sha256": "3c0795c96af36f4006562221ab3bece9fd71f2105f9e656cb7a724395a11d60d",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_warm_sand.tres"
+    },
+    "coast_dock_straight": {
+      "triangles": 224,
+      "surfaces": 1,
+      "bytes": 20188,
+      "bounds_blender": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.2
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.2,
+          1.0
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "dock",
+      "nominal_module_m": 2,
+      "deck_size_m": [
+        2,
+        2
+      ],
+      "deck_y": 1.2,
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            1.2,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1,
+              1.08,
+              -1
+            ],
+            [
+              -1,
+              1.2,
+              -1
+            ],
+            [
+              -1,
+              1.2,
+              1
+            ],
+            [
+              -1,
+              1.08,
+              1
+            ],
+            [
+              -1,
+              0.95,
+              -0.79
+            ],
+            [
+              -1,
+              1.08,
+              -0.79
+            ],
+            [
+              -1,
+              1.08,
+              -0.6499999999999999
+            ],
+            [
+              -1,
+              0.95,
+              -0.6499999999999999
+            ],
+            [
+              -1,
+              0.95,
+              0.6499999999999999
+            ],
+            [
+              -1,
+              1.08,
+              0.6499999999999999
+            ],
+            [
+              -1,
+              1.08,
+              0.79
+            ],
+            [
+              -1,
+              0.95,
+              0.79
+            ]
+          ],
+          "family": "dock"
+        },
+        {
+          "name": "out",
+          "position": [
+            1,
+            1.2,
+            0
+          ],
+          "outward": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              1,
+              1.08,
+              -1
+            ],
+            [
+              1,
+              1.2,
+              -1
+            ],
+            [
+              1,
+              1.2,
+              1
+            ],
+            [
+              1,
+              1.08,
+              1
+            ],
+            [
+              1,
+              0.95,
+              -0.79
+            ],
+            [
+              1,
+              1.08,
+              -0.79
+            ],
+            [
+              1,
+              1.08,
+              -0.6499999999999999
+            ],
+            [
+              1,
+              0.95,
+              -0.6499999999999999
+            ],
+            [
+              1,
+              0.95,
+              0.6499999999999999
+            ],
+            [
+              1,
+              1.08,
+              0.6499999999999999
+            ],
+            [
+              1,
+              1.08,
+              0.79
+            ],
+            [
+              1,
+              0.95,
+              0.79
+            ]
+          ],
+          "family": "dock"
+        }
+      ],
+      "terminal": false,
+      "mooring_bollard": false,
+      "planks": 28,
+      "plank_rows": 11,
+      "board_nominal_size_m": [
+        1.8,
+        0.18
+      ],
+      "half_stagger_m": 0.9,
+      "plank_width_range_m": [
+        0.168,
+        0.174
+      ],
+      "joint_width_m": 0.012,
+      "plank_patches": [
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        }
+      ],
+      "wood_reference": {
+        "pr": 830,
+        "head": "5f9b59b8",
+        "tone_strength": 0.14,
+        "base": "#A3815D",
+        "light": "#B89972",
+        "dark": "#795F47",
+        "joint": "#69543F"
+      },
+      "pile_count": 4,
+      "pile_centres": [
+        [
+          -0.66,
+          0,
+          -0.72
+        ],
+        [
+          0.66,
+          0,
+          -0.72
+        ],
+        [
+          -0.66,
+          0,
+          0.72
+        ],
+        [
+          0.66,
+          0,
+          0.72
+        ]
+      ],
+      "pile_width_m": 0.16,
+      "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
+      "file": "coast_dock_straight.glb",
+      "sha256": "185461cd83b3af081b09c6f018f9a98f1c79addbb25f1a5a9b871459f883db3b",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_warm_sand.tres"
+    },
+    "coast_dock_end": {
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 29420,
+      "bounds_blender": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.34
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.34,
+          1.0
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "dock",
+      "nominal_module_m": 2,
+      "deck_size_m": [
+        2,
+        2
+      ],
+      "deck_y": 1.2,
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            1.2,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1,
+              1.08,
+              -1
+            ],
+            [
+              -1,
+              1.2,
+              -1
+            ],
+            [
+              -1,
+              1.2,
+              1
+            ],
+            [
+              -1,
+              1.08,
+              1
+            ],
+            [
+              -1,
+              0.95,
+              -0.79
+            ],
+            [
+              -1,
+              1.08,
+              -0.79
+            ],
+            [
+              -1,
+              1.08,
+              -0.6499999999999999
+            ],
+            [
+              -1,
+              0.95,
+              -0.6499999999999999
+            ],
+            [
+              -1,
+              0.95,
+              0.6499999999999999
+            ],
+            [
+              -1,
+              1.08,
+              0.6499999999999999
+            ],
+            [
+              -1,
+              1.08,
+              0.79
+            ],
+            [
+              -1,
+              0.95,
+              0.79
+            ]
+          ],
+          "family": "dock"
+        }
+      ],
+      "terminal": true,
+      "mooring_bollard": false,
+      "planks": 28,
+      "plank_rows": 11,
+      "board_nominal_size_m": [
+        1.8,
+        0.18
+      ],
+      "half_stagger_m": 0.9,
+      "plank_width_range_m": [
+        0.168,
+        0.174
+      ],
+      "joint_width_m": 0.012,
+      "plank_patches": [
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        }
+      ],
+      "wood_reference": {
+        "pr": 830,
+        "head": "5f9b59b8",
+        "tone_strength": 0.14,
+        "base": "#A3815D",
+        "light": "#B89972",
+        "dark": "#795F47",
+        "joint": "#69543F"
+      },
+      "pile_count": 4,
+      "pile_centres": [
+        [
+          -0.66,
+          0,
+          -0.72
+        ],
+        [
+          0.66,
+          0,
+          -0.72
+        ],
+        [
+          -0.66,
+          0,
+          0.72
+        ],
+        [
+          0.66,
+          0,
+          0.72
+        ]
+      ],
+      "pile_width_m": 0.16,
+      "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
+      "file": "coast_dock_end.glb",
+      "sha256": "3108f00882248efb6d8fc1205f80d8a49c115ac1fc647b6724247111aa1dbf2d",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_warm_sand.tres"
+    },
+    "coast_dock_bollard": {
+      "triangles": 368,
+      "surfaces": 1,
+      "bytes": 27052,
+      "bounds_blender": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.775
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.775,
+          1.0
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "dock",
+      "nominal_module_m": 2,
+      "deck_size_m": [
+        2,
+        2
+      ],
+      "deck_y": 1.2,
+      "ports": [
+        {
+          "name": "in",
+          "position": [
+            -1,
+            1.2,
+            0
+          ],
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              -1,
+              1.08,
+              -1
+            ],
+            [
+              -1,
+              1.2,
+              -1
+            ],
+            [
+              -1,
+              1.2,
+              1
+            ],
+            [
+              -1,
+              1.08,
+              1
+            ],
+            [
+              -1,
+              0.95,
+              -0.79
+            ],
+            [
+              -1,
+              1.08,
+              -0.79
+            ],
+            [
+              -1,
+              1.08,
+              -0.6499999999999999
+            ],
+            [
+              -1,
+              0.95,
+              -0.6499999999999999
+            ],
+            [
+              -1,
+              0.95,
+              0.6499999999999999
+            ],
+            [
+              -1,
+              1.08,
+              0.6499999999999999
+            ],
+            [
+              -1,
+              1.08,
+              0.79
+            ],
+            [
+              -1,
+              0.95,
+              0.79
+            ]
+          ],
+          "family": "dock"
+        },
+        {
+          "name": "out",
+          "position": [
+            1,
+            1.2,
+            0
+          ],
+          "outward": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "profile": [
+            [
+              1,
+              1.08,
+              -1
+            ],
+            [
+              1,
+              1.2,
+              -1
+            ],
+            [
+              1,
+              1.2,
+              1
+            ],
+            [
+              1,
+              1.08,
+              1
+            ],
+            [
+              1,
+              0.95,
+              -0.79
+            ],
+            [
+              1,
+              1.08,
+              -0.79
+            ],
+            [
+              1,
+              1.08,
+              -0.6499999999999999
+            ],
+            [
+              1,
+              0.95,
+              -0.6499999999999999
+            ],
+            [
+              1,
+              0.95,
+              0.6499999999999999
+            ],
+            [
+              1,
+              1.08,
+              0.6499999999999999
+            ],
+            [
+              1,
+              1.08,
+              0.79
+            ],
+            [
+              1,
+              0.95,
+              0.79
+            ]
+          ],
+          "family": "dock"
+        }
+      ],
+      "terminal": false,
+      "mooring_bollard": true,
+      "planks": 28,
+      "plank_rows": 11,
+      "board_nominal_size_m": [
+        1.8,
+        0.18
+      ],
+      "half_stagger_m": 0.9,
+      "plank_width_range_m": [
+        0.168,
+        0.174
+      ],
+      "joint_width_m": 0.012,
+      "plank_patches": [
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        }
+      ],
+      "wood_reference": {
+        "pr": 830,
+        "head": "5f9b59b8",
+        "tone_strength": 0.14,
+        "base": "#A3815D",
+        "light": "#B89972",
+        "dark": "#795F47",
+        "joint": "#69543F"
+      },
+      "pile_count": 4,
+      "pile_centres": [
+        [
+          -0.66,
+          0,
+          -0.72
+        ],
+        [
+          0.66,
+          0,
+          -0.72
+        ],
+        [
+          -0.66,
+          0,
+          0.72
+        ],
+        [
+          0.66,
+          0,
+          0.72
+        ]
+      ],
+      "pile_width_m": 0.16,
+      "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
+      "file": "coast_dock_bollard.glb",
+      "sha256": "e230032aa26f0ae634bb94a9bbeaaeac7431ac1b0ab0838e29bf462501c9907f",
+      "source": "tools/art/source/coast_kit/coast_kit.blend",
+      "material": "coast_warm_sand.tres"
+    },
+    "coast_buoy": {
+      "triangles": 224,
+      "surfaces": 1,
+      "bytes": 7876,
+      "bounds_blender": [
+        [
+          -0.28,
+          -0.266296,
+          0.0
+        ],
+        [
+          0.28,
+          0.266296,
+          1.227469
+        ]
+      ],
+      "bounds": [
+        [
+          -0.28,
+          0.0,
+          -0.266296
+        ],
+        [
+          0.28,
+          1.227469,
+          0.266296
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "buoy",
+      "waterline_y": 0.3,
+      "ports": [],
+      "placement_y": "water height minus 0.30 m; static prototype, no bobbing animation",
+      "file": "coast_buoy.glb",
+      "sha256": "ad728673a128c845d7c364b83d6a8ca8fc2676d1f5cddba0b48a51c1b0ca2def",
+      "source": "tools/art/source/coast_kit/coast_kit.blend"
+    },
+    "coast_water_steps": {
+      "triangles": 96,
+      "surfaces": 1,
+      "bytes": 8708,
+      "bounds_blender": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.2
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.2,
+          1.0
+        ]
+      ],
+      "generator": "tools/art/build_coast_kit.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "module construction origin, Y=0 base",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "collision": "none; consuming scene owns physics",
+      "family": "stairs",
+      "nominal_module_m": 2,
+      "width_m": 2,
+      "run_m": 2,
+      "riser_m": 0.15,
+      "tread_m": 0.25,
+      "steps": 8,
+      "top_y": 1.2,
+      "lowest_tread_y": 0.15,
+      "ports": [
+        {
+          "name": "land",
+          "position": [
+            0,
+            1.2,
+            -1
+          ],
+          "outward": [
+            0,
+            0,
+            -1
+          ],
+          "family": "landing_2m"
+        },
+        {
+          "name": "water",
+          "position": [
+            0,
+            0.15,
+            1
+          ],
+          "outward": [
+            0,
+            0,
+            1
+          ],
+          "family": "water_access"
+        }
+      ],
+      "file": "coast_water_steps.glb",
+      "sha256": "36e6bbeb5e71d22ca5395657e78d9173e79049378ca5109189bd8c42a3fe41fb",
+      "source": "tools/art/source/coast_kit/coast_kit.blend"
+    }
+  },
+  "example_layout_included": false
+}
