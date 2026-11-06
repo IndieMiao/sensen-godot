@@ -1,0 +1,57 @@
+[
+  {
+    "file": "01-opening.png",
+    "sha256": "a8a195ddf6f26e87174a5355d19b478a43f919159794907703797681899b69a4",
+    "bytes": 134662
+  },
+  {
+    "file": "02-mid-hill.png",
+    "sha256": "83962b6f16a6bb93bfb0e2c05c7f9182db06cdbe0abb82d792ccf2aaef606671",
+    "bytes": 272464
+  },
+  {
+    "file": "03-visitor-center.png",
+    "sha256": "061e0fbf26aed0bc0fdc51a5fd69448231347d84818082cecbca65fe5190f020",
+    "bytes": 243587
+  },
+  {
+    "file": "04-summit-wide-after.png",
+    "sha256": "237768162fa5cac5d906d307e65ae1f5b60c6b6e8018caee47bc1df8d1d26c37",
+    "bytes": 248527
+  },
+  {
+    "file": "04-summit-wide-before.png",
+    "sha256": "ef9c077b6d09c19381a202497cde4c97cb7da4d9eac8391aab0cb64f77bc18e6",
+    "bytes": 244339
+  },
+  {
+    "file": "05-whole-island-current-lods.png",
+    "sha256": "ab7ae4a06494c6becc2cfadaff2fd6a0ba9be90b8dd4222ff55c22343eacd7c4",
+    "bytes": 455675
+  },
+  {
+    "file": "06-museum-after.png",
+    "sha256": "122620c0fb80303dc3b2ee40c1451bc19e9466dd6c086a3dcd4daf4184b483d8",
+    "bytes": 224760
+  },
+  {
+    "file": "06-museum-before.png",
+    "sha256": "45dc8008384cdb676298a615eda79a60f84504e343c90d94124d06067d941839",
+    "bytes": 216176
+  },
+  {
+    "file": "07-skylight-detail.png",
+    "sha256": "2968d367d661e46eab3345daffee1429d30ae74310f54b1c9966c307dc7f3fa6",
+    "bytes": 88391
+  },
+  {
+    "file": "08-museum-comparison.png",
+    "sha256": "d5d8a3048f10dace23d4b3d953f1884a388c4055d571741c8b2b0cbc975f1ca3",
+    "bytes": 238557
+  },
+  {
+    "file": "09-farm-camera-comparison.png",
+    "sha256": "57885ecba1a7578a2500246ec705a5d169798ad58e78c43196a3afa8c0de7368",
+    "bytes": 292634
+  }
+]

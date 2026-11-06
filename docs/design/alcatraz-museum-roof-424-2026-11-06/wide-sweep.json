@@ -1,0 +1,2885 @@
+{
+	"failures": [],
+	"rows": [
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 34980
+			},
+			"point": "route/step-00-000m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 34286
+			},
+			"point": "route/step-00-000m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 34426
+			},
+			"point": "route/step-00-000m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 40406
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 43706
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 42530
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 42958
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 39938
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 38668
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 38688
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 38788
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 43706
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 43266
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 40222
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 38508
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 38668
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 38472
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 38532
+			},
+			"point": "route/step-00-000m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 42180
+			},
+			"point": "route/step-01-007m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 41942
+			},
+			"point": "route/step-01-007m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 45082
+			},
+			"point": "route/step-01-007m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 57,
+				"visible_triangles": 45418
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 59,
+				"visible_triangles": 60296
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 44082
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 44670
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 44902
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 43454
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 40502
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 40208
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 58,
+				"visible_triangles": 45882
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 44042
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 44670
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 44478
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 43454
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 40482
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 39676
+			},
+			"point": "route/step-01-007m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 50708
+			},
+			"point": "route/step-02-013m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 51426
+			},
+			"point": "route/step-02-013m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 54550
+			},
+			"point": "route/step-02-013m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 55554
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 59,
+				"visible_triangles": 56806
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 39154
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 45486
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 48888
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 47856
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 44430
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 45770
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 55878
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 39194
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 45486
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 48520
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 47856
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 47956
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 44314
+			},
+			"point": "route/step-02-013m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 42,
+				"visible_triangles": 47682
+			},
+			"point": "route/step-03-020m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 43,
+				"visible_triangles": 47188
+			},
+			"point": "route/step-03-020m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 57059
+			},
+			"point": "route/step-03-020m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 57495
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 63919
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 47571
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 48503
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 49955
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 52685
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 47788
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 48344
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 63399
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 47935
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 48631
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 50055
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 52685
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 55669
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 47888
+			},
+			"point": "route/step-03-020m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 43,
+				"visible_triangles": 47582
+			},
+			"point": "route/step-04-026m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 48086
+			},
+			"point": "route/step-04-026m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 53530
+			},
+			"point": "route/step-04-026m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 63471
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 64571
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 47215
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48063
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 48683
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 50153
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 51901
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 58,
+				"visible_triangles": 55589
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 64119
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 47667
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48083
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 48495
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 50153
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 50865
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 52237
+			},
+			"point": "route/step-04-026m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 47176
+			},
+			"point": "route/step-05-033m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 51846
+			},
+			"point": "route/step-05-033m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 52978
+			},
+			"point": "route/step-05-033m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 62535
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 62835
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 47411
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 47855
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 48283
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 48863
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 52157
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 53413
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 62615
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 47451
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 47671
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 48003
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 49079
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 51465
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 52297
+			},
+			"point": "route/step-05-033m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 49872
+			},
+			"point": "route/step-06-039m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 52714
+			},
+			"point": "route/step-06-039m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 52834
+			},
+			"point": "route/step-06-039m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 53810
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 63331
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 41439
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 41835
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 42455
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 42399
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 43999
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 46577
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 53890
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 41715
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 41935
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 42207
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 42399
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 42935
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 45373
+			},
+			"point": "route/step-06-039m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 39,
+				"visible_triangles": 45152
+			},
+			"point": "route/step-07-046m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 55963
+			},
+			"point": "route/step-07-046m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 56743
+			},
+			"point": "route/step-07-046m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 57713
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 57753
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 43005
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 44151
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 43059
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 43413
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 45585
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 47217
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 57753
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 42829
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 44171
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 43025
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 43433
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 44399
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 45785
+			},
+			"point": "route/step-07-046m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 55973
+			},
+			"point": "route/step-08-052m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 55823
+			},
+			"point": "route/step-08-052m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 56357
+			},
+			"point": "route/step-08-052m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 57795
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 57875
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 42221
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48201
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48989
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48775
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 50841
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 47161
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 57855
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 47621
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48241
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48965
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48775
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 50141
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 46309
+			},
+			"point": "route/step-08-052m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 57485
+			},
+			"point": "route/step-09-059m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 58279
+			},
+			"point": "route/step-09-059m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 58497
+			},
+			"point": "route/step-09-059m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 59415
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 60201
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 42495
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48211
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 48371
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 49301
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 51197
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 52049
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 59877
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 42947
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 48231
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 48083
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 49321
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 50741
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 51749
+			},
+			"point": "route/step-09-059m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 58519
+			},
+			"point": "route/step-10-065m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 59077
+			},
+			"point": "route/step-10-065m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 59337
+			},
+			"point": "route/step-10-065m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 59721
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 60313
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 41955
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 45653
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46873
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 52273
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 53281
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 52421
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 60293
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 41839
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 45673
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 52021
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 52313
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 52749
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 51629
+			},
+			"point": "route/step-10-065m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 43,
+				"visible_triangles": 55915
+			},
+			"point": "route/step-11-072m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 56907
+			},
+			"point": "route/step-11-072m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 58159
+			},
+			"point": "route/step-11-072m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 59667
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 57,
+				"visible_triangles": 60999
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46669
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 47209
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 50241
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 49345
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 58,
+				"visible_triangles": 55917
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 59,
+				"visible_triangles": 58869
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 60643
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46973
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 47465
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 49969
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 49345
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 55021
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 59,
+				"visible_triangles": 58509
+			},
+			"point": "route/step-11-072m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 47830
+			},
+			"point": "route/step-12-079m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 60167
+			},
+			"point": "route/step-12-079m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 56,
+				"visible_triangles": 61313
+			},
+			"point": "route/step-12-079m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 59,
+				"visible_triangles": 62787
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 60,
+				"visible_triangles": 63321
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45811
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 46211
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 46845
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 48597
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 57,
+				"visible_triangles": 50045
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 58,
+				"visible_triangles": 56001
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 60,
+				"visible_triangles": 63127
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45871
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 46741
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 48521
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 48617
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 48857
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 58,
+				"visible_triangles": 55329
+			},
+			"point": "route/step-12-079m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 53931
+			},
+			"point": "route/step-13-085m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 53659
+			},
+			"point": "route/step-13-085m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 54683
+			},
+			"point": "route/step-13-085m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 58987
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 59327
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 43331
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 45093
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 46089
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 46713
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 52177
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 53335
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 59307
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 44393
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 45093
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45801
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 46733
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46737
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 52475
+			},
+			"point": "route/step-13-085m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 60357
+			},
+			"point": "route/step-14-092m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 58657
+			},
+			"point": "route/step-14-092m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 59083
+			},
+			"point": "route/step-14-092m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 58971
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 59363
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 41777
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 42415
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 45541
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45209
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 51257
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 60,
+				"visible_triangles": 55755
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 59297
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 42119
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 42435
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 45489
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45249
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 50899
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 51673
+			},
+			"point": "route/step-14-092m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 55391
+			},
+			"point": "route/step-15-098m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 55111
+			},
+			"point": "route/step-15-098m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 55705
+			},
+			"point": "route/step-15-098m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 56125
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 56545
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 40523
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 40703
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 41147
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 45577
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 53231
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 59,
+				"visible_triangles": 50011
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 56125
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 40583
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 41203
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 40505
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 45597
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 51423
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 48719
+			},
+			"point": "route/step-15-098m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 41,
+				"visible_triangles": 54383
+			},
+			"point": "route/step-16-105m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 41,
+				"visible_triangles": 53949
+			},
+			"point": "route/step-16-105m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 42,
+				"visible_triangles": 54249
+			},
+			"point": "route/step-16-105m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 54909
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 54929
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 39,
+				"visible_triangles": 39689
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 40045
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 42,
+				"visible_triangles": 42629
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45789
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 48123
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 59,
+				"visible_triangles": 48459
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 54909
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 39925
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 41,
+				"visible_triangles": 40065
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 45657
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45809
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46957
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 54,
+				"visible_triangles": 48301
+			},
+			"point": "route/step-16-105m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 38,
+				"visible_triangles": 52847
+			},
+			"point": "route/step-17-111m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 38,
+				"visible_triangles": 52373
+			},
+			"point": "route/step-17-111m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 52633
+			},
+			"point": "route/step-17-111m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 56737
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 48,
+				"visible_triangles": 58161
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 43,
+				"visible_triangles": 44821
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 45301
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 45617
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45489
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 46505
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 55,
+				"visible_triangles": 48229
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 56737
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 45241
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 45,
+				"visible_triangles": 45381
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 47,
+				"visible_triangles": 45553
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45489
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 49,
+				"visible_triangles": 45865
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 47149
+			},
+			"point": "route/step-17-111m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 38,
+				"visible_triangles": 53583
+			},
+			"point": "route/step-18-118m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 39,
+				"visible_triangles": 52989
+			},
+			"point": "route/step-18-118m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 39,
+				"visible_triangles": 53049
+			},
+			"point": "route/step-18-118m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 41,
+				"visible_triangles": 53433
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 41,
+				"visible_triangles": 53493
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 38,
+				"visible_triangles": 39049
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 39345
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 46,
+				"visible_triangles": 42425
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 45429
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46649
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 48339
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 41,
+				"visible_triangles": 53473
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 39265
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 43,
+				"visible_triangles": 39765
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 45297
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 45449
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46293
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 47579
+			},
+			"point": "route/step-18-118m",
+			"zoom": 0.375937039923093
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 38,
+				"visible_triangles": 53651
+			},
+			"point": "route/step-19-119m",
+			"zoom": 1.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 53213
+			},
+			"point": "route/step-19-119m",
+			"zoom": 1.15
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 53273
+			},
+			"point": "route/step-19-119m",
+			"zoom": 1.0
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 53313
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.9
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 42,
+				"visible_triangles": 53589
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.85
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 39,
+				"visible_triangles": 38969
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.8
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 40,
+				"visible_triangles": 39129
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.68
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 39805
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.6
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 45389
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.5
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46689
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.4
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 53,
+				"visible_triangles": 48419
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.333333333333333
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 41,
+				"visible_triangles": 53529
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.869565217391304
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 39,
+				"visible_triangles": 38989
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.756143667296787
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 43,
+				"visible_triangles": 39529
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.657516232431988
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 44,
+				"visible_triangles": 39517
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.571753245593033
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 50,
+				"visible_triangles": 45389
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.49717673529829
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 51,
+				"visible_triangles": 46333
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.432327595911557
+		},
+		{
+			"metrics": {
+				"global_draw_calls": 52,
+				"visible_triangles": 50111
+			},
+			"point": "route/step-19-119m",
+			"zoom": 0.375937039923093
+		}
+	]
+}

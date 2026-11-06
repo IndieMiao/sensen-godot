@@ -1,0 +1,99 @@
+{
+  "scope": "Near museum roof decoration only; far LOD assigned to Huang Zhong after handoff",
+  "baseline": "02d5534768fc1a5557feaecb705b8f445562fd6b",
+  "asset": "alc_museum.glb",
+  "stats": {
+    "triangles": 8757,
+    "bytes": 720696,
+    "sha256": "9f2f28131f630a4162699c06a8620091185852a2c9e8af07233152e176cd3de9"
+  },
+  "units": "metres, Godot Y-up, local ground centre; front +Z",
+  "placement": [
+    0,
+    10,
+    -13
+  ],
+  "envelope": [
+    40,
+    9,
+    10
+  ],
+  "colors_srgb": {
+    "museum_roof_slate": "748B9C",
+    "museum_roof_cream": "F0E1C2",
+    "museum_skylight_blue": "A9D5DF",
+    "museum_skylight_shade": "7FAEBE",
+    "museum_skylight_glint": "D7EDF0",
+    "museum_vent_shadow": "526C7C"
+  },
+  "skylights": [
+    {
+      "centre_xz": [
+        -12,
+        0.6
+      ],
+      "curb_size_xz": [
+        3.8,
+        2.0
+      ],
+      "base_y": 8.62,
+      "top_y": 9.0
+    },
+    {
+      "centre_xz": [
+        0,
+        0.6
+      ],
+      "curb_size_xz": [
+        3.8,
+        2.0
+      ],
+      "base_y": 8.62,
+      "top_y": 9.0
+    },
+    {
+      "centre_xz": [
+        12,
+        0.6
+      ],
+      "curb_size_xz": [
+        3.8,
+        2.0
+      ],
+      "base_y": 8.62,
+      "top_y": 9.0
+    }
+  ],
+  "vents": [
+    {
+      "centre_xz": [
+        -16.3,
+        -2.5
+      ],
+      "cap_size_xz": [
+        0.82,
+        0.82
+      ],
+      "base_y": 8.64,
+      "top_y": 9.0
+    },
+    {
+      "centre_xz": [
+        16.3,
+        -2.5
+      ],
+      "cap_size_xz": [
+        0.82,
+        0.82
+      ],
+      "base_y": 8.64,
+      "top_y": 9.0
+    }
+  ],
+  "coping": {
+    "top_y": 8.96,
+    "height": 0.06,
+    "width": 0.32
+  },
+  "material": "One opaque matte vertex-colour surface; no textures or transparency"
+}

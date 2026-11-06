@@ -1,5 +1,7 @@
 # SGODOT-424 · 恶魔岛源文件
 
+主楼屋顶增量：`build_museum_roof.py` 只替换近档屋顶装饰，保留整岛其余命名对象；`museum_roof.py` 为可复用生成函数，`museum_roof_contract.json` 给黄忠远档配色／尺寸。专用验证和重建见[屋顶交付](../../../../docs/design/alcatraz-museum-roof-424-2026-11-06/README.md)。历史 v9 的六件原样保留断言仅对应 v9；当前 `preserved_geometry.json` 已更新主楼哈希，其他五件不变。
+
 当前v9采用#827草坡v1.1／石板／木纹材质、#828双塔正式色、#826修复.import后的c/d树，以及#825 a/b远档。审阅见[v9](../../../../docs/design/alcatraz-blockout-424-2026-11-05/v9/README.md)，接入见[HANDOFF.md](HANDOFF.md)。
 
 本次只更换地形／码头的材质绑定；六个自制GLB及Blender命名部件的几何、UV、原材质分配与b81605af一致。四个塔只改COLOR_0的RGB；新树按source_name原位替换12棵，树根／旋转／缩放／碰撞及导航保留。草坡显示色由ShaderMaterial控制，palette.json的garden识别键不能改成显示色。

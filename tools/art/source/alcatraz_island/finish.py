@@ -1,6 +1,7 @@
 """Editable island surfaces and public-museum facade, in Godot metres."""
 import math
 import random
+import museum_roof
 
 
 def cliff(kit, name, polygon, low, high):
@@ -98,13 +99,7 @@ def museum(kit,box):
     kit.begin('alc_museum',ao=False)
     box('public_museum_wall',(0,4.2,0),(39.84,8.4,9.84),'building',.04)
     box('limestone_plinth',(0,.18,0),(40,.36,10),'stone',.025)
-    box('roof_slab',(0,8.48,0),(40,.20,10),'trim',.02)
-    box('recessed_roof',(0,8.60,0),(39.1,.06,9.1),'roof',0)
-    for z in [-4.84,4.84]:box('roof_parapet',(0,8.77,z),(40,.26,.32),'trim',.02)
-    for x in [-19.84,19.84]:box('roof_parapet_end',(x,8.77,0),(.32,.26,9.4),'trim',.02)
-    for x in [-15,-7,7,15]:
-        box('roof_air_vent',(x,8.81,-1),(.9,.38,.9),'trim',.02)
-        box('vent_shadow',(x,8.82,-.539),(.44,.12,.016),'stone_shade',0)
+    museum_roof.build(kit,box)
     for y in [.52,4.35,8.15]:box('facade_horizontal_course',(0,y,4.99),(40,.16,.15),'trim',.015)
     for x in [-19.55,-10.2,10.2,19.55]:box('facade_pilaster',(x,4.33,5.0),(.42,7.5,.16),'trim',.025)
     for x in range(-18,19,3):
