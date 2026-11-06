@@ -1,0 +1,917 @@
+{
+  "task": "SGODOT-424",
+  "revision": "v0_geometry",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "near_source": {
+    "near_file": "reference/alc_museum_b16c3198.glb",
+    "git_ref": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+    "path": "assets/landmarks/alcatraz_island/alc_museum.glb",
+    "revision": "v0_geometry",
+    "colour_status": "Whitebox colours inherited exactly from b16c3198; formal near colours pending Marco Polo handoff. Not final colour acceptance."
+  },
+  "near_sha256": "0dc5911caa3f53bf6c1ac3bb0a492788ec5720f2b5a2620440574ac2c2b4a190",
+  "file": "alc_museum_far.glb",
+  "sha256": "335acb2ead0488167a74b95a9bf5ef1980553cc44018d25a02cbc7af1ef9f50b",
+  "near_triangles": 3252,
+  "triangles": 802,
+  "ratio": 0.24661746617466174,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -20.0,
+      0.0,
+      -5.0
+    ],
+    [
+      20.0,
+      9.0,
+      5.239999771118164
+    ]
+  ],
+  "windows": [
+    {
+      "name": "Window_01_x-18_y2.3",
+      "near_bounds": [
+        [
+          -18.625,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          -17.375,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -18.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_02_x-18_y6.3",
+      "near_bounds": [
+        [
+          -18.625,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          -17.375,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -18.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_03_x-15_y2.3",
+      "near_bounds": [
+        [
+          -15.625,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          -14.375,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -15.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_04_x-15_y6.3",
+      "near_bounds": [
+        [
+          -15.625,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          -14.375,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -15.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_05_x-12_y2.3",
+      "near_bounds": [
+        [
+          -12.625,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          -11.375,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -12.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_06_x-12_y6.3",
+      "near_bounds": [
+        [
+          -12.625,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          -11.375,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -12.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_07_x-9_y2.3",
+      "near_bounds": [
+        [
+          -9.625,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          -8.375,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -9.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_08_x-9_y6.3",
+      "near_bounds": [
+        [
+          -9.625,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          -8.375,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -9.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_09_x-6_y2.3",
+      "near_bounds": [
+        [
+          -6.625,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          -5.375,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -6.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_10_x-6_y6.3",
+      "near_bounds": [
+        [
+          -6.625,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          -5.375,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -6.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_11_x-3_y2.3",
+      "near_bounds": [
+        [
+          -3.625,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          -2.375,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -3.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_12_x-3_y6.3",
+      "near_bounds": [
+        [
+          -3.625,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          -2.375,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        -3.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_13_x0_y6.3",
+      "near_bounds": [
+        [
+          -0.625,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          0.625,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        0.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_14_x3_y2.3",
+      "near_bounds": [
+        [
+          2.375,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          3.625,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        3.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_15_x3_y6.3",
+      "near_bounds": [
+        [
+          2.375,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          3.625,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        3.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_16_x6_y2.3",
+      "near_bounds": [
+        [
+          5.375,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          6.625,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        6.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_17_x6_y6.3",
+      "near_bounds": [
+        [
+          5.375,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          6.625,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        6.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_18_x9_y2.3",
+      "near_bounds": [
+        [
+          8.375,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          9.625,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        9.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_19_x9_y6.3",
+      "near_bounds": [
+        [
+          8.375,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          9.625,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        9.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_20_x12_y2.3",
+      "near_bounds": [
+        [
+          11.375,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          12.625,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        12.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_21_x12_y6.3",
+      "near_bounds": [
+        [
+          11.375,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          12.625,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        12.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_22_x15_y2.3",
+      "near_bounds": [
+        [
+          14.375,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          15.625,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        15.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_23_x15_y6.3",
+      "near_bounds": [
+        [
+          14.375,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          15.625,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        15.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_24_x18_y2.3",
+      "near_bounds": [
+        [
+          17.375,
+          1.2249999046325684,
+          5.010000228881836
+        ],
+        [
+          18.625,
+          3.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        18.0,
+        2.299999952316284,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    },
+    {
+      "name": "Window_25_x18_y6.3",
+      "near_bounds": [
+        [
+          17.375,
+          5.225000381469727,
+          5.010000228881836
+        ],
+        [
+          18.625,
+          7.375,
+          5.050000190734863
+        ]
+      ],
+      "center": [
+        18.0,
+        6.300000190734863,
+        5.03000020980835
+      ],
+      "front_z": 5.050000190734863,
+      "colour_linear": [
+        0.18782330052643625,
+        0.2383916990920882,
+        0.2541542687113756,
+        1.0
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "name": "Wall_body_00",
+      "source_triangles": 108,
+      "far_triangles": 108,
+      "method": "retain exact source vertices/normals/colours"
+    },
+    {
+      "name": "Roof_01",
+      "source_triangles": 108,
+      "far_triangles": 108,
+      "method": "retain exact source vertices/normals/colours"
+    },
+    {
+      "name": "Door_frame_02",
+      "source_triangles": 108,
+      "far_triangles": 108,
+      "method": "retain exact source vertices/normals/colours"
+    },
+    {
+      "name": "Public_door_03",
+      "source_triangles": 12,
+      "far_triangles": 12,
+      "method": "retain exact source vertices/normals/colours"
+    },
+    {
+      "name": "Window_01_x-18_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_02_x-18_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_03_x-15_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_04_x-15_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_05_x-12_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_06_x-12_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_07_x-9_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_08_x-9_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_09_x-6_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_10_x-6_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_11_x-3_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_12_x-3_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_13_x0_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_14_x3_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_15_x3_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_16_x6_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_17_x6_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_18_x9_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_19_x9_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_20_x12_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_21_x12_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_22_x15_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_23_x15_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_24_x18_y2.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Window_25_x18_y6.3",
+      "source_triangles": 108,
+      "far_triangles": 10,
+      "method": "replace shallow pane with same-size 12-corner front"
+    },
+    {
+      "name": "Corner_trim_29",
+      "source_triangles": 108,
+      "far_triangles": 108,
+      "method": "retain exact source vertices/normals/colours"
+    },
+    {
+      "name": "Corner_trim_30",
+      "source_triangles": 108,
+      "far_triangles": 108,
+      "method": "retain exact source vertices/normals/colours"
+    }
+  ],
+  "placement": {
+    "position": [
+      0,
+      10,
+      -13
+    ],
+    "yaw_degrees": 0,
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  "lod": {
+    "near": "alc_museum",
+    "far": "alc_museum_far",
+    "switch_distance_m": 55,
+    "margin_m": 0
+  },
+  "colour_status": "Whitebox colours inherited exactly from b16c3198; formal near colours pending Marco Polo handoff. Not final colour acceptance."
+}

@@ -1,0 +1,738 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "status": "Geometry stage only; final near colours pending. Do not merge.",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "revision": "v0_geometry",
+    "checks": [
+      {
+        "check": "pinned near source hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "far manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "actual triangle counts",
+        "passed": true,
+        "evidence": [
+          3252,
+          802
+        ]
+      },
+      {
+        "check": "far around one quarter",
+        "passed": true,
+        "evidence": 0.24661746617466174
+      },
+      {
+        "check": "one mesh / surface / material",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "no textures / bones / animation / cameras",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "identity local pivot/unit scale",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "near/far identical measured envelope",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "finite positions/colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "no degenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "outward normals agree with winding",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "unit normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "exact inherited near colour set",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "every non-pane triangle retains positions/normals/colours",
+        "passed": true,
+        "evidence": {
+          "expected": 552,
+          "missing": 0
+        }
+      },
+      {
+        "check": "retain all 25 window positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_01_x-18_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_02_x-18_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_03_x-15_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_04_x-15_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_05_x-12_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_06_x-12_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_07_x-9_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_08_x-9_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_09_x-6_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_10_x-6_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_11_x-3_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_12_x-3_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_13_x0_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_14_x3_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_15_x3_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_16_x6_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_17_x6_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_18_x9_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_19_x9_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_20_x12_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_21_x12_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_22_x15_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_23_x15_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_24_x18_y2.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Window_25_x18_y6.3 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "preserved placeholder Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "import nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "import gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "import meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "original placement preserved",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "full rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.078622311827957,
+          "object_mean_rgb_255": 0.22943714453814473,
+          "pixels_changed_gt_12": 1293,
+          "total_pixels": 446400,
+          "object_pixels": 152970,
+          "max_channel_255": 65.0
+        }
+      },
+      {
+        "check": "front rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.07487413194444445,
+          "object_mean_rgb_255": 0.14875783628101097,
+          "pixels_changed_gt_12": 251,
+          "total_pixels": 230400,
+          "object_pixels": 115967,
+          "max_channel_255": 31.0
+        }
+      },
+      {
+        "check": "mobile_wide rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.21275462962962963,
+          "object_mean_rgb_255": 0.5084206654109655,
+          "pixels_changed_gt_12": 1604,
+          "total_pixels": 288000,
+          "object_pixels": 120517,
+          "max_channel_255": 92.0
+        }
+      },
+      {
+        "check": "mobile_default rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.15024189814814815,
+          "object_mean_rgb_255": 0.14984689261604844,
+          "pixels_changed_gt_12": 1234,
+          "total_pixels": 288000,
+          "object_pixels": 287380,
+          "max_channel_255": 102.0
+        }
+      },
+      {
+        "check": "fixed rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.07475955794504181,
+          "object_mean_rgb_255": 0.2181647817654878,
+          "pixels_changed_gt_12": 1286,
+          "total_pixels": 446400,
+          "object_pixels": 152970,
+          "max_channel_255": 65.0
+        }
+      }
+    ],
+    "comparisons": {
+      "full": {
+        "mean_rgb_255": 0.078622311827957,
+        "object_mean_rgb_255": 0.22943714453814473,
+        "pixels_changed_gt_12": 1293,
+        "total_pixels": 446400,
+        "object_pixels": 152970,
+        "max_channel_255": 65.0
+      },
+      "front": {
+        "mean_rgb_255": 0.07487413194444445,
+        "object_mean_rgb_255": 0.14875783628101097,
+        "pixels_changed_gt_12": 251,
+        "total_pixels": 230400,
+        "object_pixels": 115967,
+        "max_channel_255": 31.0
+      },
+      "mobile_wide": {
+        "mean_rgb_255": 0.21275462962962963,
+        "object_mean_rgb_255": 0.5084206654109655,
+        "pixels_changed_gt_12": 1604,
+        "total_pixels": 288000,
+        "object_pixels": 120517,
+        "max_channel_255": 92.0
+      },
+      "mobile_default": {
+        "mean_rgb_255": 0.15024189814814815,
+        "object_mean_rgb_255": 0.14984689261604844,
+        "pixels_changed_gt_12": 1234,
+        "total_pixels": 288000,
+        "object_pixels": 287380,
+        "max_channel_255": 102.0
+      },
+      "fixed": {
+        "mean_rgb_255": 0.07475955794504181,
+        "object_mean_rgb_255": 0.2181647817654878,
+        "pixels_changed_gt_12": 1286,
+        "total_pixels": 446400,
+        "object_pixels": 152970,
+        "max_channel_255": 65.0
+      }
+    },
+    "source": {
+      "near_file": "reference/alc_museum_b16c3198.glb",
+      "git_ref": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+      "path": "assets/landmarks/alcatraz_island/alc_museum.glb",
+      "revision": "v0_geometry",
+      "colour_status": "Whitebox colours inherited exactly from b16c3198; formal near colours pending Marco Polo handoff. Not final colour acceptance."
+    },
+    "passed": true
+  },
+  "godot": {
+    "checks": [
+      {
+        "check": "Actual mesh triangles match manifest",
+        "evidence": [
+          3252,
+          802
+        ],
+        "passed": true
+      },
+      {
+        "check": "Far one surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Same imported AABB/pivot",
+        "evidence": [
+          [
+            -20.0,
+            0.0,
+            -5.0
+          ],
+          [
+            -20.0,
+            0.0,
+            -5.0
+          ]
+        ],
+        "passed": true
+      },
+      {
+        "check": "Far about quarter of near",
+        "evidence": 0.246617466174662,
+        "passed": true
+      },
+      {
+        "check": "Import readable",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Godot UID and root_script line",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Texture map mode 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "full_54m engine renders expected LOD only",
+        "evidence": 3252,
+        "passed": true
+      },
+      {
+        "check": "full_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "full_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "full_56m engine renders expected LOD only",
+        "evidence": 802,
+        "passed": true
+      },
+      {
+        "check": "full_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "full_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "front_54m engine renders expected LOD only",
+        "evidence": 3252,
+        "passed": true
+      },
+      {
+        "check": "front_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "front_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "front_56m engine renders expected LOD only",
+        "evidence": 802,
+        "passed": true
+      },
+      {
+        "check": "front_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "front_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m engine renders expected LOD only",
+        "evidence": 3252,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m engine renders expected LOD only",
+        "evidence": 802,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m engine renders expected LOD only",
+        "evidence": 3252,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m engine renders expected LOD only",
+        "evidence": 802,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fixed_near engine renders expected LOD only",
+        "evidence": 3252,
+        "passed": true
+      },
+      {
+        "check": "fixed_near one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "fixed_near capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fixed_far engine renders expected LOD only",
+        "evidence": 802,
+        "passed": true
+      },
+      {
+        "check": "fixed_far one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "fixed_far capture",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "views": {
+      "fixed_far": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.3279113769531,
+          25.3551502227783
+        ],
+        "draws": 1,
+        "pitch": 43,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 802,
+        "width_m": 43,
+        "yaw": 14.5
+      },
+      "fixed_near": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.3279113769531,
+          25.355152130127
+        ],
+        "draws": 1,
+        "pitch": 43,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 3252,
+        "width_m": 43,
+        "yaw": 14.5
+      },
+      "front_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          0.0,
+          22.0153465270996,
+          40.5944747924805
+        ],
+        "draws": 1,
+        "pitch": 8.0,
+        "size": [
+          720,
+          320
+        ],
+        "visible_triangles": 3252,
+        "width_m": 43.0,
+        "yaw": 0.0
+      },
+      "front_56m": {
+        "aabb_center_distance": 55.9999961853027,
+        "camera": [
+          0.0,
+          22.2936935424805,
+          42.575008392334
+        ],
+        "draws": 1,
+        "pitch": 8.0,
+        "size": [
+          720,
+          320
+        ],
+        "visible_triangles": 802,
+        "width_m": 43.0,
+        "yaw": 0.0
+      },
+      "full_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.3279113769531,
+          25.355152130127
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 3252,
+        "width_m": 43.0,
+        "yaw": 14.5
+      },
+      "full_56m": {
+        "aabb_center_distance": 56.0,
+        "camera": [
+          10.2545156478882,
+          52.6919097900391,
+          26.7712669372559
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 802,
+        "width_m": 43.0,
+        "yaw": 14.5
+      },
+      "mobile_default_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.3279113769531,
+          25.355152130127
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 3252,
+        "width_m": 6.72,
+        "yaw": 14.5
+      },
+      "mobile_default_56m": {
+        "aabb_center_distance": 56.0,
+        "camera": [
+          10.2545156478882,
+          52.6919097900391,
+          26.7712669372559
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 802,
+        "width_m": 6.72,
+        "yaw": 14.5
+      },
+      "mobile_wide_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          34.2020301818848,
+          51.3279113769531,
+          6.86654758453369
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 3252,
+        "width_m": 20.16,
+        "yaw": 60.0
+      },
+      "mobile_wide_56m": {
+        "aabb_center_distance": 56.0000038146973,
+        "camera": [
+          35.4687728881836,
+          52.6919097900391,
+          7.59790134429932
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 802,
+        "width_m": 20.16,
+        "yaw": 60.0
+      }
+    }
+  }
+}
