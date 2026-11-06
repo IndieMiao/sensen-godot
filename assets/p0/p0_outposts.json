@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_note": "P0 home set, San Francisco (SGODOT-270, q(106); was Shanghai, SGODOT-227). Names per q(32) / q(106): Mission Tackle Shop (0.25 km from Fern Pond, the beginner pond), Mission Market Square (0.73 km from Fern Pond, 16th St Mission), Union Square Travel Post (city centre), Oak Tea House (temperate word pool, Duboce Triangle); different roles >= 300 m apart (closest 0.48 km), the homestead (37.7558, -122.4345) >= 300 m from all (closest 1.01 km). Ids, keepers (Ama / Finn / Mei / Sigrid) and residents are unchanged: ids are opaque (rooms, saves). All four use the Basic Room placeholder until wp-3d-scene lands (SGODOT-208). role = counter entry id (open_keeper_greeting(role), SGODOT-224). bounds = walkable box in room metres [min_x, max_x, min_z, max_z]; seats must match the seat_* anchors of the anchors file. nearest (tackle) = the pond the keeper names in \"Where are they biting?\" ({name, site}; site keys view.keepers.tackle.next_fish).",
+  "_note": "P0 home set, San Francisco (SGODOT-270, q(106); was Shanghai, SGODOT-227). Names per q(32) / q(106): Mission Tackle Shop (0.25 km from Fern Pond, the beginner pond), Mission Market Square (0.73 km from Fern Pond, 16th St Mission), Union Square Travel Post (city centre), Oak Tea House (temperate word pool, Duboce Triangle); different roles >= 300 m apart (closest 0.48 km), the homestead (37.7558, -122.4345) >= 300 m from all (closest 1.01 km). Ids, keepers (Ama / Finn / Mei / Sigrid) and residents are unchanged: ids are opaque (rooms, saves). All four use the Basic Room placeholder until wp-3d-scene lands (SGODOT-208). role = counter entry id (open_keeper_greeting(role), SGODOT-224). bounds = walkable box in room metres [min_x, max_x, min_z, max_z]; seats must match the seat_* anchors of the anchors file. nearest (tackle) = the pond the keeper names in \"Where are they biting?\" ({name, site}; site keys view.keepers.tackle.next_fish). sf_church_1 Grace Cathedral (role church, the user 11-06: in with v7, a place to see, nothing to do): no keeper ({}), no counter, posts nothing (no board, request or notice), not of the city's set; the room is poi_church (上官婉儿 / 黄忠), its walls 0.4 m in from the layout's and its 8 pews' seats; category and name 不知火舞's.",
   "outposts": [
     {
       "id": "sh_tackle_1", "cluster": "gn-5391959",
@@ -81,6 +81,21 @@
       "anchors": "res://assets/p0/outposts/casino.anchors.json",
       "bounds": [-3.5, 3.7, -3.3, 3.4],
       "seats": []
+    },
+    {
+      "id": "sf_church_1", "cluster": "gn-5391959",
+      "role": "church",
+      "name": "Grace Cathedral",
+      "category": "Church · Stained glass",
+      "lat": 37.7919,
+      "lng": -122.413,
+      "capacity": 12,
+      "keeper": {},
+      "residents": [],
+      "art": "poi_church",
+      "anchors": "res://assets/rooms/poi_church/layout.json",
+      "bounds": [-4.8, 4.8, -4.8, 4.8],
+      "seats": ["seat_left_1", "seat_left_2", "seat_left_3", "seat_left_4", "seat_right_1", "seat_right_2", "seat_right_3", "seat_right_4"]
     }
   ]
 }
