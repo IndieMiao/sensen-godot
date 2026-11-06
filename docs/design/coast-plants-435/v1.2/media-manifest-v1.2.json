@@ -1,0 +1,22 @@
+[
+  {
+    "name": "SGODOT-435_COAST_PLANTS_v1.2_catalog.png",
+    "path": "docs/design/coast-plants-435/v1.2/SGODOT-435_COAST_PLANTS_v1.2_catalog.png",
+    "mime": "image/png",
+    "size": [
+      1400,
+      1510
+    ],
+    "sha256": "553ec27d5e720458e4b90760a90a27f3b38f5218100738994e1ab5f91caa3e4e"
+  },
+  {
+    "name": "SGODOT-435_COAST_PLANTS_v1.2_default_360x800.png",
+    "path": "docs/design/coast-plants-435/v1.2/SGODOT-435_COAST_PLANTS_v1.2_default_360x800.png",
+    "mime": "image/png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "6b9863a6fdb170186748b62c9f03a57520d5504961dc200fedf3c131762d4446"
+  }
+]

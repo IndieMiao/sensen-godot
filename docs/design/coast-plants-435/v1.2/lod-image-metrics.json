@@ -1,0 +1,53 @@
+{
+  "note": "Matched 43 degree screenshot measurements, not art approval or phone timing.",
+  "measurements": [
+    {
+      "tree": "coast_cypress",
+      "view": "default14.5",
+      "silhouette_iou": 0.9221060223584565,
+      "overlap_rgb_mean_error_255": 9.440852271904285
+    },
+    {
+      "tree": "coast_cypress",
+      "view": "_yaw60",
+      "silhouette_iou": 0.9244761145750316,
+      "overlap_rgb_mean_error_255": 9.637001352265044
+    },
+    {
+      "tree": "coast_cypress",
+      "view": "_yaw150",
+      "silhouette_iou": 0.9210489849650108,
+      "overlap_rgb_mean_error_255": 9.214114667569364
+    },
+    {
+      "tree": "coast_cypress",
+      "view": "_yaw240",
+      "silhouette_iou": 0.913982812625492,
+      "overlap_rgb_mean_error_255": 10.445635618043351
+    },
+    {
+      "tree": "coast_palm",
+      "view": "default14.5",
+      "silhouette_iou": 0.8623491399790935,
+      "overlap_rgb_mean_error_255": 17.137491505500762
+    },
+    {
+      "tree": "coast_palm",
+      "view": "_yaw60",
+      "silhouette_iou": 0.8494983277591973,
+      "overlap_rgb_mean_error_255": 17.542689516751583
+    },
+    {
+      "tree": "coast_palm",
+      "view": "_yaw150",
+      "silhouette_iou": 0.8667937567020135,
+      "overlap_rgb_mean_error_255": 18.85508972890416
+    },
+    {
+      "tree": "coast_palm",
+      "view": "_yaw240",
+      "silhouette_iou": 0.8570818118250331,
+      "overlap_rgb_mean_error_255": 18.217014911843357
+    }
+  ]
+}
