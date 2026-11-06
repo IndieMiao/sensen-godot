@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+      <!-- potion_heal (355 v4q(7), Healing Potion): round flask, red potion, cork -->
+      <rect x="27" y="16" width="10" height="10" fill="#DCEBEA"/>
+      <rect x="25" y="10" width="14" height="8" rx="2.5" fill="#B98A5E"/>
+      <circle cx="32" cy="39" r="17" fill="#DCEBEA"/>
+      <path fill="#E0524A" d="M16.1 33H47.9A17 17 0 1 1 16.1 33z"/>
+      <path fill="#F08A7E" d="M16.1 33H47.9a17 17 0 0 1 .6 3H15.5a17 17 0 0 1 .6-3z"/>
+      <path fill="#FFFFFF" fill-opacity=".9" d="M32 50c-1-.8-7-4.6-7-8.6a3.5 3.5 0 0 1 7-1.2 3.5 3.5 0 0 1 7 1.2c0 4-6 7.8-7 8.6z"/>
+      <path fill="#FFFFFF" fill-opacity=".7" d="M20.5 30.5a13 13 0 0 1 6.5-6.8 1.5 1.5 0 0 1 1.3 2.7 10 10 0 0 0-5 5.2 1.5 1.5 0 0 1-2.8-1.1z"/>
+    </svg>

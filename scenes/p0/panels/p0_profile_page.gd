@@ -219,10 +219,13 @@ static func skill_progress(s: Dictionary) -> float:
 	if s.is_empty() or s.get("next", null) == null: return 1.0
 	return clampf(float(int(s.get("xp", 0)) - int(s.get("floor", 0))) / maxf(1.0, float(int(s.next) - int(s.get("floor", 0)))), 0.0, 1.0)
 
-## `Oct 2` (`Oct 2, 2025` when not this year); under 中文 `10 月 2 日` (`2025 年 10 月 2 日`).
-static func since_text(ms: float, now_ms := -1.0) -> String:
-	var d := Time.get_datetime_dict_from_unix_time(int(ms / 1000.0))
-	var now := Time.get_datetime_dict_from_unix_time(int((now_ms if now_ms >= 0.0 else Time.get_unix_time_from_system() * 1000.0) / 1000.0))
+## `Oct 2` (`Oct 2, 2025` when not this year); under 中文 `10 月 2 日` (`2025 年 10 月 2 日`). Both days in the device's
+## time zone, as the plaque's (P0Logic.plaque_lines; SGODOT-414, 不知火舞: an account made before 08:00 in UTC+8 read
+## the day before, and the year was told wrong for those hours at New Year). `bias_min`: minutes east of UTC.
+static func since_text(ms: float, now_ms := -1.0, bias_min := 999999) -> String:
+	var bias := bias_min if bias_min != 999999 else int(Time.get_time_zone_from_system().get("bias", 0))
+	var d := Time.get_datetime_dict_from_unix_time(int(ms / 1000.0) + bias * 60)
+	var now := Time.get_datetime_dict_from_unix_time(int((now_ms if now_ms >= 0.0 else Time.get_unix_time_from_system() * 1000.0) / 1000.0) + bias * 60)
 	if TranslationServer.get_locale() == "zh_CN":   # the language on screen, not the pick for the next start (#649 第二批 ③)
 		var zh := "%d 月 %d 日" % [int(d.month), int(d.day)]
 		return zh if int(d.year) == int(now.year) else "%d 年 %s" % [int(d.year), zh]

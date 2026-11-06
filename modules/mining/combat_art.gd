@@ -2,7 +2,11 @@ extends RefCounted
 
 const Scenery = preload("res://modules/farm/place_scenery.gd")
 
+static func weapon_art_id(id: String) -> String:
+	return {"weapon_wooden_sword": "sword_wooden", "weapon_copper_sword": "copper_sword", "weapon_iron_sword": "iron_sword"}.get(id, id)
+
 static func model(id: String) -> MeshInstance3D:
+	id = weapon_art_id(id)
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 	if id == "trail_boots":
@@ -25,11 +29,11 @@ static func model(id: String) -> MeshInstance3D:
 			Scenery._box(surface, Vector3(0.25 if id == "hand_tools" else 0.45, 0.08, 0.2), Vector3(0, 0.72, 0.07), metal)
 	else:
 		var copper := id in ["copper_sword", "copper_knife"]
-		var blade := Color("c99a70") if copper else Color("a0b9b7")
+		var blade := Color("c99a70") if copper else Color("879caa") if id == "iron_sword" else Color("a0b9b7")
 		Scenery._box(surface, Vector3(0.11, 0.25, 0.10), Vector3(0, 0.17, 0), Color("537969"))
 		Scenery._box(surface, Vector3(0.17, 0.09, 0.14), Vector3(0, 0.04, 0), Color("d8c499"))
 		Scenery._box(surface, Vector3(0.52, 0.09, 0.14), Vector3(0, 0.32, 0), Color("d8c499"))
-		var length := 0.46 if id == "copper_knife" else 0.94 if copper else 0.73
+		var length := 0.46 if id == "copper_knife" else 0.94 if copper or id == "iron_sword" else 0.73
 		Scenery._box(surface, Vector3(0.16, length, 0.065), Vector3(0, 0.35 + length * 0.5, 0), blade)
 		Scenery._box(surface, Vector3(0.035, length, 0.072), Vector3(-0.02, 0.35 + length * 0.5, 0), blade.lightened(0.28))
 		var tip := CylinderMesh.new()

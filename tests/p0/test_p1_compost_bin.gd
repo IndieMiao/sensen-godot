@@ -20,7 +20,7 @@ func test_the_bin_keeps_to_the_yard() -> void:
 	var v := _view()
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(5, 15))).is_empty()
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(5, 5))).is_equal("Outside your yard")
-	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(9, 0))).is_equal("Keep the path clear")
+	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(13, 14))).is_equal("Keep the path clear")   # the stall's path
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(8, 15))).is_equal("Space taken")
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(6, 14))).is_equal("Space taken")   # the planter
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(4, 15))).is_equal("Space taken")   # another bin's cell

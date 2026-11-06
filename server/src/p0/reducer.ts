@@ -2,7 +2,6 @@
 import { cropById, cropBySeed, plotCrop, quickCrop, fastCrop, rodById, type P0Content } from './content.js';
 import { collectTrap, setTrap } from './fish_trap.js';
 import { add, count, room, take } from './bag.js';
-import { barter } from './barter.js';
 import { settleCards } from './cards.js';
 import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
@@ -15,9 +14,10 @@ import { takeFromCabinet } from './kitchen_storage.js';
 import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
-import { gather, storeMaterials } from './gathering.js';
+import { notePipLine, settleFirstDig } from './first_dig.js';
+import { gather, pruneGather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
-import { compost, cropGrowH, facilityAt, moveFacility, place, ripenMs, seedSaver, wateredPlots } from './garden.js';
+import { addPlots, compost, cropGrowH, facilityAt, fieldCap, fieldsUsed, moveFacility, place, ripenMs, seedSaver, wateredPlots } from './garden.js';
 import { chopTree, feedTree, pickTree, plantTree, treeOf } from './orchard.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
@@ -53,7 +53,6 @@ type P0CommandBody =
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string; stove?: number; double?: boolean }   // stove: 0-based (Lv4 / Lv8); double: Big Pot
   | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
-  | { type: 'barter'; item: string; mineral: string; shop?: string }   // Market Square barter (§8.4.5)
   // Batch Cook (Cooking Lv8, q(200)): pots of one known page in a row; stove = the current one (fills first); big = the
   // stoves the player switched to Big Pot (q(201), kept on the device)
   | { type: 'batch_cook'; recipe: string; pots: number; stove?: number; big?: number[] }
@@ -90,7 +89,7 @@ type P0CommandBody =
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
-  | { ok: false; code: string; detail?: Record<string, unknown> };
+  | { ok: false; code: string; detail?: Record<string, unknown>; state?: P0State };
 
 const fail = (code: string, detail?: Record<string, unknown>): P0Result => ({ ok: false, code, detail });
 
@@ -103,6 +102,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   // SGODOT-341: a guide step read before the pick (339's t_city, a client page) is acked then too.
   if (input.travel?.pending && cmd.type !== 'choose_home' && cmd.type !== 'guide') return fail('home_pending');
   const s = structuredClone(input);
+  /** Beds a tree or a sprinkler opened (SGODOT-355 b1: open beds = Plots + trees + sprinklers), told as plots_added. */
+  const openBeds = (events: P0Event[]) => {
+    const added = addPlots(c, s);
+    if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'facility' });
+  };
   const events: P0Event[] = [];
   const counted = takenCounts(c, s);   // q(134): what each taken request counted before this command, settles included
   settleEnergy(c, s, now);
@@ -118,6 +122,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     ? burners(c, s).findIndex(b => b.stove !== null && cmd.pot === (b.stove.id ?? null)) : -1;
   settleStove(c, s, now, events, aimed < 0 ? undefined : aimed);
   settleMine(c, s, now);
+  // The old day's in-flight action is refused, but the deterministic new floor must survive a restart.
+  if (isMineCommand(cmd) && cmd.type !== 'mine_enter' && cmd.day !== dayKey(c, s, now))
+    return { ok: false, code: 'new_day', state: s };
   settleParcels(c, s, now);
   // SGODOT-351: a hand left past its day or 24 h is stood and paid on any command (its result waits for bj_open)
   const bjSettled = settleBlackjack(c, s, now, events, cmd.type);
@@ -128,7 +135,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   if (refused) return fail(refused.code, refused.detail);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   noteEntered(s, cmd.space, cmd.place);
-  settleHere(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now);   // the city the player stands in
+  settleHere(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now);
   noteVisit(c, s, cmd.space, cmd.place, now, events);   // a tracked explore request checks in where the player is (§9.6.3)
   settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
@@ -162,6 +169,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (tree?.perennial) {
         const refusal = plantTree(c, s, ids, tree, now, events);
         if (refusal) return fail(refusal.code, refusal.detail);
+        openBeds(events);   // the tree takes its bed off the Plots: the next one opens (SGODOT-355 b1)
         break;
       }
       const wrong = plots.find(p => p!.state !== 'tilled');
@@ -172,6 +180,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (crop.fast && skillLevel(c, s, 'farming') < crop.gate)
         return fail('skill_level_required', { skill: 'farming', level: crop.gate, xp_to_go: c.skills.farming[crop.gate - 1] - s.skills.farming });
       const n = plots.length, seeds = count(s.bag, crop.seed);
+      // SGODOT-355 b1 (v4 2.5): annuals stand on at most the level's Plots (`Plots 41/41`); trees and sprinklers never count
+      const cap = fieldCap(c, s), used = fieldsUsed(c, s);
+      if (used + n > cap) return fail('plots_full', { used, cap });
       if (seeds < n) return fail('no_seed', { seed: crop.seed, need: n, have: seeds });
       if (s.energy.value < crop.energy * n) return fail('need_energy', energyDetail(c, s, now, crop.energy * n));
       spendEnergy(c, s, now, crop.energy * n, events, 'sow');
@@ -312,6 +323,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (s.gear.rods.includes(id) && rodById(c, id)) s.gear.rod = id;
       else if (s.gear.hoes.includes(id)) s.gear.hoe = id;
       else if (s.gear.picks.includes(id)) s.gear.pick = id;
+      else if (s.gear.weapons.includes(id) && c.mine.combat.weapons[id]) s.gear.weapon = id;   // 355 G §9.1: the weapon slot
       else return fail('not_owned');
       break;
     }
@@ -328,6 +340,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : cmd.type === 'learn' ? learn(c, s, cmd, now, events)
         : giftResident(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      if (cmd.type === 'talk') notePipLine(c, s, cmd.resident);   // v4q(9) ②: Pip's vein line, if due, is said in this talk
       break;
     }
     case 'cabinet_take': {
@@ -348,6 +361,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
+      settleFirstDig(c, s, now, events);   // 355 G: First Dig shows at Lv3, done at once for one who already reached its floor
       break;
     }
     case 'chop': {
@@ -363,6 +377,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'place': case 'move_facility': {
       const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH) : moveFacility(c, s, cmd, now, events, growH);
       if (refusal) return fail(refusal.code, refusal.detail);
+      openBeds(events);   // a sprinkler on a bed opens the next one (SGODOT-355 b1); a greenhouse or a yard bin opens none
       break;
     }
     case 'compost': {
@@ -392,11 +407,6 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
         : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
-      if (refusal) return fail(refusal.code, refusal.detail);
-      break;
-    }
-    case 'barter': {
-      const refusal = barter(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
@@ -459,9 +469,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (!isMineCommand(cmd)) return fail('unknown_command');
       const refusal = mineCommand(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      if (events.some(e => e.kind === 'mine_record')) settleFirstDig(c, s, now, events);   // 355 G: a new deepest may finish First Dig
     }
   }
   settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in
+  pruneGather(s, now);   // 396 ④: a cooldown gone by goes from the save
   noteProgress(c, s, counted, events);   // q(134): `Fresh Greens 3/5`, the one that fills it `done`
   settleGuide(c, s, guideKeys(c, input, s, cmd, events), now, events);   // SGODOT-341: what this command did, against the guide's steps
   s.seq += 1;

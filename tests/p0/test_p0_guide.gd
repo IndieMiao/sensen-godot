@@ -36,8 +36,11 @@ func _lines(rows: Array) -> Array:
 
 # ---------------------------------------------------------------- TipCards
 
-func test_seven_tips_with_toast_timing() -> void:
-	assert_int(Guide.TIPS.size()).is_equal(7)   # Levels unlock… is the first level-up banner's line, not a card
+func test_eight_tips_with_toast_timing() -> void:
+	assert_int(Guide.TIPS.size()).is_equal(8)   # Levels unlock… is the first level-up banner's line, not a card
+	# v4q(4) ⑥ 丁21: the map's card lost its second sentence to its own card, shown on a paid travel card
+	assert_str(Guide.TIPS.map).is_equal("Browse the map for free.")
+	assert_str(Guide.TIPS.travel).is_equal("Travel costs Energy and coins.")
 	assert_str(Guide.TIPS.heat).is_equal("Tap when the needle hits gold!")
 	assert_float(Guide.tip_seconds("Casting uses 5 Energy")).is_equal(2.5)        # 21 characters
 	assert_float(Guide.tip_seconds(Guide.TIPS.sow)).is_equal(3.5)               # 67 characters
@@ -79,6 +82,48 @@ func test_tip_queue_waits_for_moments_and_shows_each_tip_once() -> void:
 	assert_bool(q.did("sow")).is_false()
 	assert_bool(q.did("cast")).is_true()                      # doing what it teaches closes it
 	assert_that(q.seen.keys()).contains_exactly_in_any_order(["sow", "creel", "cast"])
+
+## 不知火舞 355 G01 / G04 (方案 §10.3 ⑥): a tip asked for under a dialog waits for it — the landing's `sow` under Pip's
+## opening line; a Sow meanwhile takes it off the queue, seen (done, it teaches nothing); a surface's own tip still
+## waiting when the player leaves for another world goes unseen (asked for again there), never shown in the next one.
+func test_a_waiting_tip_goes_when_done_or_when_its_surface_is_left() -> void:
+	var q = Guide.TipQueue.new({})
+	assert_bool(q.request("sow")).is_true()                  # under Pip's line: waits
+	assert_bool(q.did("sow")).is_false()                      # nothing on screen closed…
+	assert_str(q.next()).is_equal("")                         # …but the waiting one went
+	assert_bool(q.seen.has("sow")).is_true()
+	assert_bool(q.request("sow")).is_false()
+	assert_bool(q.request("map")).is_true()                   # on the map, a place card up
+	q.leave_surface("map")
+	assert_str(q.next()).is_equal("map")                      # still the map: it comes up as the card closes
+	q.close()
+	var r = Guide.TipQueue.new({})
+	r.request("map")
+	r.request("meal")
+	r.leave_surface("outpost")                                # off to Mission before the card closed
+	assert_str(r.next()).is_equal("meal")                     # an event's tip stays; the map's went
+	assert_bool(r.seen.has("map")).is_false()                 # unseen: the map asks again next time
+	assert_bool(r.request("map")).is_true()
+
+## 不知火舞 355 G19: under a dialog only the tip about it comes up (the paid travel card's `travel`); the others wait.
+func test_under_a_dialog_only_its_own_tip_comes_up() -> void:
+	var q = Guide.TipQueue.new({})
+	q.request("meal")
+	q.request("travel")
+	assert_str(q.next(true)).is_equal("travel")              # over the travel card, ahead of the waiting meal tip
+	q.close()
+	assert_str(q.next(true)).is_equal("")                    # the meal tip waits for the dialog
+	assert_str(q.next()).is_equal("meal")
+	# 哪吒 on #733: a Moment held `travel` until its card had closed — it goes, unseen, never up over nothing
+	var r = Guide.TipQueue.new({})
+	r.moment_opened()
+	r.request("travel")
+	assert_str(r.next(true)).is_equal("")                    # the Moment holds it
+	r.moment_closed()
+	assert_str(r.next()).is_equal("")                         # the card closed meanwhile: gone
+	assert_bool(r.waiting.is_empty()).is_true()
+	assert_bool(r.seen.has("travel")).is_false()             # the next paid card asks again
+	assert_bool(r.request("travel")).is_true()
 
 # ---------------------------------------------------------------- Today rows (§14.2)
 
@@ -203,17 +248,6 @@ func test_stall_hangs_no_mark_while_the_guide_is_on() -> void:   # q(215) ④ �
 	v.guide = {"step": null, "end": "done"}
 	assert_str(Guide.stall_badge(v)).is_equal("request")                # the guide over: the ! is back
 
-func test_free_to_do_now_lists_free_things_in_order_with_the_map_as_fallback() -> void:
-	var v := _view({"stall": {"board": {"requests": []}}})
-	assert_that(_lines(Guide.free_now(v))).is_equal(["Browse the map"])
-	v.plots = _plots(["ready", "ready", "growing"])
-	v.cooking.cookbook[0].can_cook = true
-	v.bag.slots = [{"id": "fish_crucian", "qty": 4}, {"id": "crop_radish", "qty": 12}]
-	assert_that(_lines(Guide.free_now(v))).is_equal(["Harvest 2 ready", "Cook · 4 fish in creel", "Sell 12 at Homestead Stall"])
-	v.cooking.stove = {"dish": "dish_grilled_crucian", "ready_in": 3000}   # the stove is busy
-	v.mine.run = {"id": 1}
-	assert_that(_lines(Guide.free_now(v))).is_equal(["Harvest 2 ready", "Sell 12 at Homestead Stall", "Mine run · Continue"])
-
 func test_new_bag_items_flash_once() -> void:
 	var before := {"bag": {"slots": [{"id": "seed_radish", "qty": 19}]}}
 	var after := {"bag": {"slots": [{"id": "seed_radish", "qty": 19}, {"id": "bait_worm", "qty": 3}, {"id": "wild_herb", "qty": 3}]}}
@@ -227,25 +261,14 @@ func test_today_rows_lead_with_the_guide_and_drop_their_generic_twins() -> void:
 	v.stall.board.requests[0].status = "accepted"
 	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
 	var rows := P0Logic.today_rows(v)
-	# Catch (not "Pond Catch · Pond Crucian 0/2"), Cook it (not "Cook with 1 fish"), then the radishes' timer
-	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Fern Pond", "Cook it: Grilled Crucian", "Radish ready in 3h 54m"])   # one plot (q(227) ②)
-	assert_that(rows.map(func(r): return r.focus)).is_equal([true, false, false])
+	# the tutorial request as Catch (not "Pond Catch · Pond Crucian 0/2"); Cook it and the radishes' timer are not
+	# requests (A 包 spec ①: an account the guide never ran keeps only its requests)
+	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Fern Pond"])
+	assert_that(rows.map(func(r): return r.focus)).is_equal([true])
 
-func test_today_rows_before_the_first_sow_put_sowing_first() -> void:
+func test_today_rows_before_the_first_sow_have_no_sow_row() -> void:
 	var v := _view()
-	assert_that(_lines(P0Logic.today_rows(v))).is_equal(["Sow your first plot", "Catch 2 Pond Crucian · Fern Pond", "Cook it: Grilled Crucian"])
-
-## q(69): the level a harvest brings is its own info row (no button) right after its source row — never a tail on a
-## crop's row, which read as that crop's own level.
-func test_after_the_first_session_the_crop_timer_says_what_the_harvest_does() -> void:
-	var twenty: Array = []
-	for i in 20: twenty.append("growing")
-	var v := _view({"plots": _plots(twenty), "req_done": ["req_pond_catch"]})
-	v.stall.board.requests = []
-	v.cooking.cookbook[0].cooked = true
-	var rows := P0Logic.today_rows(v)
-	assert_that(_lines(rows).slice(0, 2)).is_equal(["Radishes ready in 3h 54m", "Farming Lv2 at your first harvest"])
-	assert_str(str(rows[1].go)).is_equal("")   # an info row: no Show
+	assert_that(_lines(P0Logic.today_rows(v))).is_equal(["Catch 2 Pond Crucian · Fern Pond"])   # no `Sow your first plot`
 
 ## §14.2 end / §14.5 (李白 A3): a known recipe short only of crops in the ground hooks the next session —
 ## `Fresh Fish Soup · when radishes are ready`, the third line, after the radish countdown and its level row (q(69)).
@@ -269,22 +292,6 @@ func _soup(v: Dictionary, fish: int) -> Dictionary:
 	v.bag.slots = [{"id": "fish_crucian", "qty": fish}] if fish > 0 else []
 	return v
 
-func test_the_waiting_recipe_is_the_third_line_and_keeps_its_fish() -> void:
-	# As many crucian as the soup needs (1): they are kept for it, no stove-free line; the soup line is the third.
-	var rows := P0Logic.today_rows(_soup(_session_end(), 1))
-	assert_that(_lines(rows)).is_equal(["Radishes ready in 3h 32m", "Farming Lv2 at your first harvest",
-		"Fresh Fish Soup · when radishes are ready"])
-	assert_str(str(rows[2].go)).is_equal("plots")   # Show: the radishes, its source
-	assert_str(str(rows[2].icon)).is_equal("dish_fish_soup")
-	assert_str(str(P0KitchenLogic.waiting_on_crops(_soup(_session_end(), 1)).crop)).is_equal("crop_radish")   # F1: soonest
-	# More fish than it needs: the stove-free line counts the rest (3 − 1); the soup line falls to the 4th place.
-	var more := _lines(P0Logic.today_rows(_soup(_session_end(), 3)))
-	assert_str(str(more[0])).is_equal("Cook with 2 fish")
-	# Fewer (none): the soup is short of a fish and a crop, two kinds — no waiting line; the lettuce comes back.
-	var none := _lines(P0Logic.today_rows(_soup(_session_end(), 0)))
-	assert_bool(none.any(func(l): return str(l).contains("Fresh Fish Soup"))).is_false()
-	assert_that(none).is_equal(["Radishes ready in 3h 32m", "Farming Lv2 at your first harvest", "Lettuce ready in 7h 46m"])
-
 func test_two_kinds_short_no_line_and_of_two_waiting_the_first_ripe() -> void:
 	var v := _soup(_session_end(), 1)
 	v.cooking.cookbook[-1].known = false   # the soup aside: a salad short of radish and lettuce, both in the ground
@@ -296,18 +303,9 @@ func test_two_kinds_short_no_line_and_of_two_waiting_the_first_ripe() -> void:
 		"can_cook": false, "in": ["W1", "crop_lettuce"]})   # first in the book, but its lettuce is ripe later
 	assert_str(str(P0KitchenLogic.waiting_on_crops(v).name)).is_equal("Fresh Fish Soup")
 
-func test_the_waiting_line_goes_once_its_crop_is_ripe_and_the_stove_line_comes_back() -> void:
-	var lines := _lines(P0Logic.today_rows(_soup(_session_end("ready"), 1)))
-	assert_bool(lines.any(func(l): return str(l).contains("· when "))).is_false()   # Harvest now; the lettuce is not waited on
-	assert_bool(lines.has("Cook with 1 fish")).is_true()   # its fish are free again
-	var v := _soup(_session_end(), 1)
-	v.bag.slots.append({"id": "crop_radish", "qty": 1})
-	v.cooking.cookbook[-1].can_cook = true
-	assert_bool(_lines(P0Logic.today_rows(v)).any(func(l): return str(l).contains("· when "))).is_false()   # it can cook
-
-## q(98): q(58)'s plurals everywhere (Lettuce, Chamomile, Corn stay; Chili → Chilies) and `is` for a crop that stays.
+## q(98): q(58)'s plurals everywhere (Lettuce, Chamomile, Corn stay; Chili → Chilies).
 ## The materials stay too (奕星 11-04: `7 Claies` on the Stall Board); a y takes -ies after a consonant only.
-func test_q58_plurals_and_an_uncountable_crop_is_ready() -> void:
+func test_q58_plurals() -> void:
 	for pair in [["Lettuce", "Lettuce"], ["Chamomile", "Chamomile"], ["Corn", "Corn"], ["Chili", "Chilies"], ["Radish", "Radishes"],
 			["Carrot", "Carrots"], ["Tomato", "Tomatoes"], ["Strawberry", "Strawberries"], ["Bok Choy", "Bok Choy"], ["Day", "Days"],
 			["Timber", "Timber"], ["Stone", "Stone"], ["Clay", "Clay"], ["Flax", "Flax"], ["Hardwood", "Hardwood"], ["Coal", "Coal"],
@@ -315,52 +313,26 @@ func test_q58_plurals_and_an_uncountable_crop_is_ready() -> void:
 		assert_str(P0Logic.plural(pair[0])).is_equal(pair[1])
 	assert_str(P0Logic.crop_plural("Chili", 12)).is_equal("chilies")
 	assert_str(P0Logic.crop_plural("Lettuce", 10)).is_equal("lettuce")
-	var v := _soup(_session_end(), 1)
-	v.cooking.cookbook[-1].known = false
-	v.cooking.cookbook.append({"id": "dish_lettuce_fish", "name": "Lettuce Fish", "known": true, "cooked": false,
-		"can_cook": false, "in": ["W1", "crop_lettuce"]})
-	v.plots = v.plots.filter(func(p): return str(p.crop) == "crop_lettuce")   # only lettuce in the ground
-	var lines := _lines(P0Logic.today_rows(v))
-	assert_bool(lines.has("Lettuce Fish · when lettuce is ready")).is_true()
-	assert_bool(lines.has("Lettuce ready in 7h 46m")).is_true()   # its source row, before it
-
-## RETURN-SESSION (q(69)): ready plots that reach the level — `Harvest 20 Radishes` then `Farming Lv 2 with this harvest`.
-func test_a_ready_harvest_that_levels_is_followed_by_its_info_row() -> void:
-	var twenty: Array = []
-	for i in 20: twenty.append("ready")
-	var v := _view({"plots": _plots(twenty), "req_done": ["req_pond_catch"]})
-	v.stall.board.requests = []
-	v.cooking.cookbook[0].cooked = true
-	var lines := _lines(P0Logic.today_rows(v))
-	var at := lines.find("Harvest 20 Radishes")
-	assert_int(at).is_greater_equal(0)
-	assert_str(str(lines[at + 1])).is_equal("Farming Lv2 with this harvest")
+	# a name already plural (李白 on b1: `harvest 9 grapeses`); Citrus takes -es as English does
+	assert_str(P0Logic.crop_plural("Grapes", 9)).is_equal("grapes")
+	assert_str(P0Logic.crop_plural("Citrus", 2)).is_equal("citruses")
 
 func test_the_today_focus_is_the_first_row_still_to_do_not_a_ticked_one() -> void:
 	# rc0 on 232: after handing in the Pond Catch the chip still read "Deliver 2 Pond Crucian · Stall" (ticked). The chip
 	# is an icon now (q(107)); the focus row still decides its pulse.
 	var v := _view({"plots": _plots(["growing"]), "req_done": ["req_pond_catch"]})
 	v.stall.board.requests = []
-	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
 	var rows := P0Logic.today_rows(v)
 	assert_str(str(rows[0].state)).is_equal("done")                     # the ticked Deliver row still leads the panel
-	assert_that([rows[0].focus, rows[1].line, rows[1].focus]).is_equal([false, "Cook it: Grilled Crucian", true])
-	for sk in v.skills.values(): sk.floor = 0   # hud_state's skill bars read it
-	assert_str(str(P0Logic.hud_state(v).today_key)).is_equal("stove|dish_grilled_crucian")
+	assert_bool(rows[0].focus).is_false()
+	var focused := P0Guide.focus_first([{"line": "Deliver 2 Pond Crucian · Stall", "state": "done"}, {"line": "Crate · Radish 0/2", "state": "default"}])
+	assert_that(focused.map(func(r): return r.focus)).is_equal([false, true])
 	assert_str(P0Logic.today_chip_key([{"line": "Deliver 2 Pond Crucian · Stall", "state": "done"}])).is_equal("")
 
-func test_the_today_chip_key_follows_the_focus_row_not_its_countdown() -> void:
-	var v := _view({"plots": _plots(["growing"]), "req_done": ["req_pond_catch"]})
-	v.stall.board.requests = []
-	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
-	var cook := P0Logic.today_chip_key(P0Logic.today_rows(v))
-	assert_str(cook).is_equal("stove|dish_grilled_crucian")
-	v.bag.slots = []
-	v.cooking.cookbook[0].cooked = true                                 # the first dish is done: the radish timer leads
-	var timer := P0Logic.today_chip_key(P0Logic.today_rows(v))
-	assert_str(timer).is_not_equal(cook)
-	v.plots[0].ready_in = 9000000                                       # the countdown ticks: same row, same key
-	assert_str(P0Logic.today_chip_key(P0Logic.today_rows(v))).is_equal(timer)
+func test_the_today_chip_key_follows_the_focus_row_not_its_text() -> void:
+	var a := P0Logic.today_chip_key([{"line": "Crate · Radish 0/2", "go": "plots", "icon": "board", "state": "default"}])
+	var b := P0Logic.today_chip_key([{"line": "Crate · Radish 1/2", "go": "plots", "icon": "board", "state": "default"}])
+	assert_str(b).is_equal(a)                                           # progress ticks: same row, same key
 
 # ---------------------------------------------------------------- new-player guide (SGODOT-341)
 
@@ -419,9 +391,10 @@ func test_absent_row_does_not_resurrect_a_bundled_step_or_the_previous_row() -> 
 func test_seven_scene_and_event_tips_survive_every_guide_step_and_recover() -> void:
 	var v := _guided("t_soup", "missing_fish")
 	for key in Guide.TIPS:
-		assert_bool(Guide.tip_allowed(v, key)).is_true()
+		assert_bool(Guide.tip_allowed(v, key)).is_equal(key != "travel")   # v4q(4) ⑥ 丁21: travel waits out the guide
 		assert_str(Guide.tip_text(key)).is_equal(str(Guide.TIPS[key]))
 	assert_bool(Guide.tip_allowed(v, "pip_dialogue")).is_false()
+	assert_bool(Guide.tip_allowed({"guide": {"step": null, "end": "done"}}, "travel")).is_true()
 	var q := Guide.TipQueue.new({"sow": true})
 	assert_bool(q.request("sow")).is_false()
 	q.moment_opened()
@@ -475,9 +448,9 @@ func test_pips_seeds_in_the_inbox_row_shows_the_inbox() -> void:
 	for here in ["home", "farm", "map", "pond", "outpost"]:
 		assert_str(P0Ui.show_label("inbox", here, false, "sh_market_1")).is_equal("Show")
 
-## q(218) / q(258) ①: after the guide, Six Radishes says to sow while too few Radishes are in the ground (a Quick Radish
-## grows one), and Today's generic Sow row leaves the Radish to it — another seed in the bag still gets that row; once
-## enough are in, the request is its count again and the generic row comes back.
+## q(218) / q(258) ①: after the guide, Four Radishes (v4q(4) ⑥ 丁20; the id kept) says to sow while too few Radishes are in the
+## ground (a Quick Radish grows one); once enough are in, the request is its count again. No generic Sow row in Today any
+## more (A 包 spec ①).
 func _six(have: int, plots: Array, seeds: Array) -> Dictionary:
 	var v := _view({"plots": plots, "firsts": ["harvest:crop_radish"]})
 	v.stall.board.requests = []
@@ -485,61 +458,53 @@ func _six(have: int, plots: Array, seeds: Array) -> Dictionary:
 	v.names["seed_radish"] = "Radish Seeds"
 	v.bag.slots = seeds
 	v["residents"] = {"res_nadia": {"request": {"id": "req_res_nadia_six_radishes", "kind": "harvest", "item": "crop_radish",
-		"qty": 6, "coins": 20, "have": have, "ready": false}, "request_state": "accepted", "place": "sh_market_1"}}
+		"qty": 4, "coins": 20, "have": have, "ready": false}, "request_state": "accepted", "place": "sh_market_1"}}
 	return v
 
-func test_six_radishes_says_sow_and_the_generic_sow_row_gives_way() -> void:
+func test_four_radishes_says_sow_while_too_few_are_in() -> void:
 	var wild := ["wild", "wild", "wild", "wild", "wild", "wild", "wild", "wild"]
 	var v := _six(0, _plots(wild), [{"id": "seed_radish", "qty": 20}])
 	var rows := P0Logic.today_rows(v)
-	assert_str(str(rows[0].line)).is_equal("Six Radishes · Sow 6 Radishes")
+	assert_str(str(rows[0].line)).is_equal("Four Radishes · Sow 4 Radishes")
 	assert_str(str(rows[0].go)).is_equal("plots")
 	assert_str(str(rows[0].icon)).is_equal("crop_radish")
 	assert_bool(_lines(rows).any(func(l): return str(l).begins_with("Sow "))).is_false()
-	# lettuce seeds too: the generic row sows the lettuce
+	# lettuce seeds too: no generic Sow row in Today any more (A 包 spec ①)
 	v.bag.slots.append({"id": "seed_lettuce", "qty": 10})
-	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Sow 6 Radishes", "Sow 8 Lettuce · 16 Energy"])
-	# three in the ground (one a Quick Radish, one ripe) and one harvested: 2 more, then 1
-	var plots := _plots(["growing", "growing", "ready", "wild", "wild", "wild", "wild", "wild"])
-	plots[1].crop = "crop_quick_radish"
+	assert_array(_lines(P0Logic.today_rows(v))).is_equal(["Four Radishes · Sow 4 Radishes"])
+	# one in the ground (a Quick Radish) and one harvested: 2 more, then 1
+	var plots := _plots(["growing", "wild", "wild", "wild", "wild", "wild", "wild", "wild"])
+	plots[0].crop = "crop_quick_radish"
 	v = _six(1, plots, [{"id": "seed_radish", "qty": 20}])
 	v["quick_seeds"] = [{"id": "crop_quick_radish", "seed": "seed_quick_radish", "energy": 2, "grow_s": 45, "harvest": "crop_radish"}]
 	assert_str(P0Logic.request_sow(v, P0Logic.PinReason.taken(v)[0])).is_equal("Sow 2 more Radishes")
-	v.plots[3] = {"id": 3, "state": "sown", "crop": "crop_radish"}
+	v.plots[1] = {"id": 1, "state": "sown", "crop": "crop_radish"}
 	assert_str(P0Logic.request_sow(v, P0Logic.PinReason.taken(v)[0])).is_equal("Sow 1 more Radish")
-	# enough in: the count, and the generic row again
-	v.plots[4] = {"id": 4, "state": "sown", "crop": "crop_radish"}
+	# enough in: the count
+	v.plots[2] = {"id": 2, "state": "sown", "crop": "crop_radish"}
 	assert_str(P0Logic.request_sow(v, P0Logic.PinReason.taken(v)[0])).is_empty()
-	var lines := _lines(P0Logic.today_rows(v))
-	assert_array(lines).contains(["Six Radishes · Radish 1/6"])
-	assert_bool(lines.any(func(l): return str(l).begins_with("Sow 3 Radishes"))).is_true()
-
-## 不知火舞 on 341 a658c638: the generic Sow row gives way only while Today shows the request's Sow row. Three things to
-## do now and a later request keeping the 3rd row (q(143)) push Six Radishes off: the generic Radish row comes back.
-func test_the_generic_sow_row_comes_back_when_the_request_row_is_not_shown() -> void:
-	var plots := _plots(["ready", "sown", "wild", "wild", "wild", "wild", "wild", "wild"])
-	plots[0].crop = "crop_lettuce"
-	plots[1].crop = "crop_lettuce"
-	var v := _six(0, plots, [{"id": "seed_radish", "qty": 20}, {"id": "fish_crucian", "qty": 1}])
-	v.residents.res_nadia.request["accepted_at"] = 1000
-	v["boards"] = {"stall": {"slots": [{"id": "req_stall_1", "title": "Pond Catch", "kind": "fish", "items": ["fish_crucian"],
-		"qty": 3, "have": 1, "status": "accepted", "accepted_at": 2000}]}}
-	var lines := _lines(P0Logic.today_rows(v))
-	assert_array(lines).is_equal(["Sow 6 Radishes · 12 Energy", "Harvest 1 Lettuce", "Pond Catch · Pond Crucian 1/3"])
-	# Six Radishes the latest: it keeps the 3rd row, and the generic row leaves the Radish to it
-	v.residents.res_nadia.request.accepted_at = 3000
-	lines = _lines(P0Logic.today_rows(v))
-	assert_array(lines).is_equal(["Harvest 1 Lettuce", "Water 1 sown plot", "Six Radishes · Sow 6 Radishes"])
+	assert_array(_lines(P0Logic.today_rows(v))).is_equal(["Four Radishes · Radish 1/4"])
 
 ## 不知火舞 on 341: no free bed, or no seed that grows the crop — it cannot be sown, so the row is its count.
 func test_a_request_that_cannot_be_sown_now_shows_its_count() -> void:
 	var v := _six(0, _plots(["growing", "growing", "sown", "sown"]), [{"id": "seed_radish", "qty": 20}])
 	for p in v.plots: p.crop = "crop_lettuce"
-	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Radish 0/6"])   # beds full
+	assert_array(_lines(P0Logic.today_rows(v))).contains(["Four Radishes · Radish 0/4"])   # beds full
 	v.plots.append({"id": 4, "state": "tilled"})
-	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Sow 6 Radishes"])
+	assert_array(_lines(P0Logic.today_rows(v))).contains(["Four Radishes · Sow 4 Radishes"])
 	v.bag.slots = [{"id": "seed_lettuce", "qty": 10}]                                     # no Radish Seeds
-	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Radish 0/6", "Sow 1 Lettuce · 2 Energy"])
+	assert_array(_lines(P0Logic.today_rows(v))).is_equal(["Four Radishes · Radish 0/4"])
 	v["quick_seeds"] = [{"id": "crop_quick_radish", "seed": "seed_quick_radish", "energy": 2, "grow_s": 45, "harvest": "crop_radish"}]
 	v.bag.slots = [{"id": "seed_quick_radish", "qty": 2}]                                 # quick ones grow a Radish too
-	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Sow 6 Radishes"])
+	assert_array(_lines(P0Logic.today_rows(v))).contains(["Four Radishes · Sow 4 Radishes"])
+
+## v4q(4) ⑥ S7a: while the guide is on, the Homestead sign is lit only by t_upgrade's mark; off the guide, as before (q(255)).
+func test_the_sign_is_lit_in_the_guide_only_by_s7a() -> void:
+	var v := {"homestead": {"level": 1, "next": {"can_upgrade": true}}, "guide": {"step": "t_soup", "marks": []}}
+	assert_int(int(P0WorldPrompts.sign(v).status)).is_equal(-1)
+	v.guide = {"step": "t_upgrade", "marks": [{"place": "home", "object": "sign", "kind": "request"}]}
+	assert_int(int(P0WorldPrompts.sign(v).status)).is_equal(UiStatusBadge.State.READY)
+	v.homestead.next.can_upgrade = false
+	assert_int(int(P0WorldPrompts.sign(v).status)).is_equal(-1)
+	v = {"homestead": {"level": 1, "next": {"can_upgrade": true}}, "guide": {"step": null, "end": "done"}}
+	assert_int(int(P0WorldPrompts.sign(v).status)).is_equal(UiStatusBadge.State.READY)

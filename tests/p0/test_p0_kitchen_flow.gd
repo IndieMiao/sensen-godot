@@ -9,6 +9,9 @@ var rt: P0Runtime
 
 func before_test() -> void:
 	rt = auto_free(P0Runtime.new())
+	# their transport goes in after the runtime's first read: written for its failing a few frames on (a request
+	# each), not in its first frame as on the line (421) — the read the room's attach queues would land on it
+	rt.session.use_line = false
 	add_child(rt)
 	await get_tree().process_frame
 	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, _cmd: Dictionary): pass   # nothing goes out

@@ -132,17 +132,18 @@ describe('fast crops, isolated content and real buy → sow → water → harves
 });
 
 describe('fast crops cannot escape their three allowed paths', () => {
+  // SGODOT-355 b1: on the new grid bed 6 [4, 3] is beside bed 7 [5, 3], both in a new homestead's 8
   it('sprinklers/greenhouses auto-water but never shorten fixed seconds, including when newly placed', () => {
     for (const kind of ['sprinkler', 'greenhouse']) {
-      const plot = kind === 'sprinkler' ? 8 : coverOf(c, 'greenhouse', 4, 30).find(id => fresh().plots[id].state === 'tilled')!;
+      const plot = kind === 'sprinkler' ? 6 : coverOf(c, 'greenhouse', 4, 30).find(id => fresh().plots[id].state === 'tilled')!;
       let s = ready('crop_bok_choy'); s.facilities = [{ id: 1, kind, plot: kind === 'sprinkler' ? 7 : 4 }];
       s = run(s, { type: 'sow', plot, seed: 'seed_bok_choy' }).state;
       expect(s.plots[plot]).toMatchObject({ state: 'growing', ready_at: T + H });
     }
     let s = ready('crop_cress'); s.skills.farming = c.skills.farming[5]; s.storage = { wood: 20, stone: 20, copper_ore: 7 };
-    s = run(s, { type: 'sow', plot: 8, seed: 'seed_cress' }).state;
+    s = run(s, { type: 'sow', plot: 6, seed: 'seed_cress' }).state;
     s = run(s, { type: 'place', recipe: 'craft_sprinkler', plot: 7 }, T + 5000).state;
-    expect(s.plots[8].ready_at).toBe(T + 15000);
+    expect(s.plots[6].ready_at).toBe(T + 15000);
   });
 
   it('rejects Compost before cropById dereference, in sown and growing states without spending it', () => {
@@ -208,12 +209,12 @@ describe('fast crops cannot escape their three allowed paths', () => {
     noteHarvested(cc, s, 'crop_cress', 1); expect(s.residents.res_nadia.req!.progress).toBe(0);
   });
 
-  it('rejects fast harvests for cooking, gifting, compost and regional barter without mutation', () => {
+  it('rejects fast harvests for cooking, gifting and compost without mutation', () => {
     for (const f of c.fast_crops!) {
       const s = ready(f.id); add(c, s, f.id, 10); s.facilities = [{ id: 1, kind: 'compost_bin', plot: -1, cell: [17, 16] }];
       const before = structuredClone(s);
       for (const cmd of [{ type: 'cook', items: [f.id] }, { type: 'gift', resident: 'res_pip', item: f.id },
-        { type: 'compost', item: f.id, qty: 1 }, { type: 'barter', item: f.id, mineral: 'stone', qty: 1 }] as P0Command[]) {
+        { type: 'compost', item: f.id, qty: 1 }] as P0Command[]) {
         expect(applyP0(c, s, cmd, T).ok).toBe(false); expect(s).toEqual(before);
       }
       expect(guidePred(c, s, { common_crop: 1 }, T)).toBe(false);   // not a soup-recovery crop either

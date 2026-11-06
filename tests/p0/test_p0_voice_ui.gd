@@ -47,7 +47,7 @@ func test_the_keys_come_with_voice_and_the_first_mic_asks_the_age_then_says_who_
 	assert_object(ui._voice_keys).is_null()   # the server not asked yet: nothing shown
 	await room.fetch_status()
 	assert_bool(ui._voice_keys.visible).is_true()
-	assert_str(ui._voice_keys.people.text).is_equal("2")   # the others, not the player
+	assert_str(ui._voice_keys.people.text).is_equal("3")   # the player and the others (q(289), SGODOT-415)
 	await await_idle_frame()
 	var keys = ui._voice_keys   # on the Creel pill's line (V1 / V6), its top, shown or not; the mic on the pill's middle
 	assert_float(keys.people.get_global_rect().position.y).is_equal_approx(ui._creel.position.y, 0.5)
@@ -101,7 +101,8 @@ func test_the_people_drawer_mutes_blocks_after_its_card_and_reports() -> void:
 	var d = ui._people
 	assert_str(d.title.text).ends_with("Layer 2")
 	assert_int(d.list.get_children().filter(func(c): return c.name.begins_with("Person_")).size()).is_equal(2)
-	assert_int(d.list.get_child_count()).is_equal(3)   # a line between the rows (V3)
+	assert_int(d.list.get_child_count()).is_equal(5)   # the player's own row first, a line between the rows (V3)
+	assert_str(d.list.get_child(0).name).is_equal("Self")
 	d.mute_pressed.emit(4, true)
 	assert_bool(room.people().filter(func(r): return r.peer == 4)[0].muted).is_true()
 	assert_str((d.list.find_child("Person_4", false, false).find_child("Mute", true, false) as Button).text).is_equal("Unmute")
@@ -182,3 +183,77 @@ func test_no_room_no_keys() -> void:
 	var ui := await _ui()
 	ui.set_voice_room(null)
 	assert_object(ui._voice_keys).is_null()
+
+## q(286) (Market Square's voice, SGODOT-415; 不知火舞's M1-b 476:195818): a long title breaks at its ` · ` into two lines,
+## `Mute all` at the first, the drawer 173 over its rows (447 − 173 = 274 at most); the rows scroll as Today's — a fade
+## at an edge with rows past it, a 3 px bar at the right while they overflow. A short one stays one line (154).
+func test_a_long_title_breaks_at_its_dot_and_the_rows_scroll_as_todays() -> void:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	var rows := []
+	for i in 12: rows.append({"peer": i + 2, "name": "Traveller %02d" % i})
+	var d = load("res://scenes/p0/panels/p0_people_drawer.gd").new("Mission Market Square · Layer 1", rows)
+	d.size = Vector2(360, 447)
+	host.add_child(d)
+	for i in 3: await get_tree().process_frame
+	assert_str(d.title.text).is_equal("Mission Market Square\nLayer 1")
+	assert_int(d.all_key.size_flags_vertical).is_equal(Control.SIZE_SHRINK_BEGIN)
+	assert_float(d.height).is_equal(447.0)
+	assert_float(d._held.custom_minimum_size.y).is_equal(274.0)
+	assert_bool(d._bar.visible).is_true()
+	assert_bool(d._fade_bottom.visible).is_true()
+	assert_bool(d._fade_top.visible).is_false()
+	d._scroll.scroll_vertical = 100
+	for i in 2: await get_tree().process_frame
+	assert_bool(d._fade_top.visible).is_true()
+	var short = load("res://scenes/p0/panels/p0_people_drawer.gd").new("Fern Pond · Layer 1", rows.slice(0, 2))
+	short.size = Vector2(360, 300)
+	host.add_child(short)
+	for i in 3: await get_tree().process_frame
+	assert_str(short.title.text).is_equal("Fern Pond · Layer 1")
+	assert_float(short.height).is_equal(154.0 + 2 * 45.0)
+	assert_bool(short._bar.visible).is_false()
+
+## 李元芳 on 415 (232 f8ecefed): the first in a layer sees the people pill count the next one coming in, and going.
+func test_the_people_pill_counts_someone_coming_in_after() -> void:
+	var ui := await _ui()
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	var online: P0Online = f[2]
+	ui.set_voice_room(room)
+	await room.fetch_status()
+	var before := int(ui._voice_keys.people.text)
+	online._message(JSON.stringify({"t": "peer", "member": {"id": 9, "player": "cccc3333cccc3333"}}))
+	assert_int(int(ui._voice_keys.people.text)).is_equal(before + 1)
+	online._message(JSON.stringify({"t": "left", "id": 9}))
+	assert_int(int(ui._voice_keys.people.text)).is_equal(before)
+
+## q(289) (SGODOT-415; 不知火舞 415 89764920): the player's own row first — their name, a grey `You`, no keys; the count
+## theirs too; alone, `No one else here` under it and the drawer two lines tall; Mute all never mutes the player.
+func test_the_drawer_lists_the_player_first_and_counts_them() -> void:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	var Drawer = load("res://scenes/p0/panels/p0_people_drawer.gd")
+	var me := {"peer": 1, "name": "Traveller me00", "self": true, "speaking": true, "muted": false, "blocked": false}
+	var alone = Drawer.new("Oak Tea House · Layer 1", [me])
+	host.add_child(alone)
+	await await_idle_frame()
+	var row: Control = alone.list.get_child(0)
+	assert_str(row.name).is_equal("Self")
+	assert_str((row.find_child("Name", true, false) as Label).text).is_equal("Traveller me00")
+	assert_str((row.find_child("You", true, false) as Label).text).is_equal("You")
+	assert_int(row.find_children("*", "UiNavButton", true, false).size()).is_equal(0)   # no Mute / Block / Report
+	assert_float((row.find_child("Speaking", true, false) as Control).modulate.a).is_equal(1.0)
+	assert_object(alone.list.find_child("Empty", false, false)).is_not_null()
+	assert_bool(alone.all_key.visible).is_false()
+	assert_float(alone.height).is_equal(Drawer.height_for(2))
+	var two = Drawer.new("Oak Tea House · Layer 1", [me, {"peer": 4, "name": "Traveller ab12", "muted": true, "blocked": false}])
+	host.add_child(two)
+	await await_idle_frame()
+	assert_object(two.list.find_child("Empty", false, false)).is_null()
+	assert_float(two.height).is_equal(Drawer.height_for(2))
+	assert_str(two.all_key.label).is_equal("Unmute all")   # the other one muted: the player does not count

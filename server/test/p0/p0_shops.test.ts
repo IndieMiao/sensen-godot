@@ -133,12 +133,12 @@ describe('Market and Homestead Stall goods (§9.11.1–9.11.5)', () => {
     expect(refuse(s, { type: 'buy', item: 'postcard_san_francisco', qty: 1, shop: 'market' })).toMatchObject({ ok: false, code: 'owned' });
     expect(refuse(s, { type: 'buy', item: 'postcard_san_francisco', qty: 1 })).toMatchObject({ ok: false, code: 'bad_item' });
   });
-  it('Bag Upgrade I: Homestead Lv3, 150 coins + Reeds 10 + Timber 6 from storage, bag 25 → 30', () => {
+  it('Bag Upgrade I: Homestead Lv3, 60 coins (v4q(1) ⑧) + Reeds 10 + Timber 6 from storage, bag 25 → 30', () => {
     let s = fresh();
     s.coins = 300; s.storage = { fiber: 10, wood: 6 };
     expect(refuse(s, { type: 'buy', item: 'bag_upgrade_1', qty: 1 })).toMatchObject({ ok: false, code: 'homestead_level', detail: { need: 3 } });
     s.homestead.level = 3;
-    expect(viewOf(c, s, T0).shops.homestead.buy.find(r => r.id === 'bag_upgrade_1')).toMatchObject({ price: 150, need: 190, homestead_ok: true,
+    expect(viewOf(c, s, T0).shops.homestead.buy.find(r => r.id === 'bag_upgrade_1')).toMatchObject({ price: 60, need: 100, homestead_ok: true,
       materials: [{ id: 'fiber', name: 'Reeds', need: 10, have: 10 }, { id: 'wood', name: 'Timber', need: 6, have: 6 }] });
     s = step(s, { type: 'buy', item: 'bag_upgrade_1', qty: 1 }).s;
     expect(s.bag_cap).toBe(30);

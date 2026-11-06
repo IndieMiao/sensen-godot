@@ -70,25 +70,14 @@ func test_fast_crops_stay_in_produce_and_only_homestead_buys_them() -> void:
 		assert_bool(P0KitchenLogic.can_add(v, [], c.id)).is_false()
 	assert_array(P0KitchenLogic.experiment_items(v, [])).is_empty()
 
-func test_today_last_five_minutes_tick_for_every_crop_and_fast_crops_have_no_action_rows() -> void:
+func test_the_last_five_minutes_tick_for_every_crop() -> void:
 	var v := view()
 	v.names.crop_lettuce = "Lettuce"
 	for ms in [300001, 300000, 299000, 10000, 9999, 1000]:
 		var expected := "6m" if ms > 300000 else P0Logic.duration(ms)
 		for c in ["crop_lettuce", "crop_cress", "crop_quick_radish"]:
 			assert_str(P0Logic.ripe_in(v, c, ms)).is_equal(expected)
-	for c in FAST:
-		v.plots = [{id = 0, state = "growing", crop = c.id, ready_in = 8000}, {id = 1, state = "growing", crop = c.id, ready_in = 9000}]
-		var name := "Scallions" if c.name == "Scallion" else str(c.name)
-		var rows := P0Logic.today_rows(v)
-		assert_array(rows.map(func(r): return r.line)).contains([name + " ready in 0:08"])
-		assert_array(P0Logic.today_rows(P0Logic.project(v, 1000)).map(func(r): return r.line)).contains([name + " ready in 0:07"])
-		v.plots.resize(1)
-		assert_array(P0Logic.today_rows(v).map(func(r): return r.line)).contains([str(c.name) + " ready in 0:08"])
-		v.plots[0].state = "ready"
-		assert_bool(P0Logic.today_rows(v).any(func(r): return str(r.get("dot", "")).begins_with("harvest:") or str(r.line).contains(c.name))).is_false()
-		v.plots[0].state = "sown"
-		assert_bool(P0Logic.today_rows(v).any(func(r): return str(r.line).begins_with("Water "))).is_false()
+	# no crop row in Today any more (A 包 spec ①): the countdown is the key's and the field's
 
 func test_growing_key_uses_seconds_for_fast_crops_last_five_minutes_and_keeps_quick_radish() -> void:
 	var v := view()
@@ -117,7 +106,7 @@ func test_growing_key_and_today_share_five_minute_boundary_for_all_crop_kinds() 
 			assert_bool(a.enabled).is_false()
 			assert_dict(a.cmd).is_empty()
 
-func test_growing_key_ticks_with_today_on_client_projection_and_yields_to_harvest() -> void:
+func test_growing_key_ticks_on_client_projection_and_yields_to_harvest() -> void:
 	for id in ["crop_cress", "crop_lettuce", "crop_apple", "crop_quick_radish"]:
 		var v := view([{id = 0, crop = id, state = "growing", ready_in = 10000, tree = id == "crop_apple"}])
 		v.names[id] = "Test Crop"
@@ -126,7 +115,6 @@ func test_growing_key_ticks_with_today_on_client_projection_and_yields_to_harves
 			var a := P0Logic.main_action(now, now.plots[0], "")
 			var time := "0:%02d" % (10 - second)
 			assert_str(a.sub).is_equal("Ready in " + time)
-			assert_array(P0Logic.today_rows(now).map(func(r): return r.line)).contains(["Test Crop ready in " + time])
 		var ripe := P0Logic.project(v, 10000)
 		assert_str(P0Logic.main_action(ripe, ripe.plots[0], "").verb).is_equal("Pick" if id == "crop_apple" else "Harvest")
 
@@ -171,27 +159,27 @@ func test_fast_crops_render_at_their_fixed_duration_with_distinct_tints_and_cann
 		assert_str(P0Logic.main_action(v, v.plots[i], "fert_compost").sub).is_equal(P0Logic.key_ready(FAST[i].grow_s * 500))
 	assert_bool(cells[P0Garden.cell_id(P0Garden.cell_of(0))].tint != cells[P0Garden.cell_id(P0Garden.cell_of(1))].tint).is_true()
 
-func test_home_banner_shows_actual_energy_and_keeps_full_for_level_five_onward() -> void:
-	for level in [2, 3, 4]:
-		assert_str(P0Logic.home_moment({energy = {max = 220}}, {level = level}).subtitle).is_equal("Max Energy 220 · Energy full")   # legacy field absent, not a reported zero
+func test_home_banner_shows_only_reported_actual_energy_at_every_level() -> void:
+	for level in [2, 3, 4, 5, 10, 15, 16, 17]:
+		assert_str(P0Logic.home_moment({energy = {max = 220}}, {level = level}).subtitle).is_equal("Max Energy 220")
 		for gain in [40, 15, 0]:
 			var banner := P0Logic.home_moment({energy = {max = 220}}, {level = level, energy = gain})
 			assert_str(banner.subtitle).is_equal("Max Energy 220" + (" · +%d Energy" % gain if gain > 0 else ""))
 	for level in [5, 10]:
-		assert_str(P0Logic.home_moment({energy = {max = 240}}, {level = level, energy = 0}).subtitle).is_equal("Max Energy 240 · Energy full")
+		assert_str(P0Logic.home_moment({energy = {max = 240}}, {level = level, energy = 0}).subtitle).is_equal("Max Energy 240")
 
 func test_home_panel_reads_reduced_gates_and_does_not_add_a_one_time_energy_reward_row() -> void:
 	for rule in [[2, 40, 3], [3, 80, 4], [4, 300, 6], [5, 750, 8]]:
 		var level: int = rule[0]
 		var v := view()
 		v.homestead = {level = level - 1, next = {level = level, coins = {need = rule[1] + 40, have = 2000},
-			skills = {need = rule[2], have = 10}, materials = [{id = "wood", name = "Timber", need = 6, have = 6}],
+			skills = [{skill = "fishing", need = rule[2], have = 10}], materials = [{id = "wood", name = "Timber", need = 6, have = 6}],
 			energy = 200 + (level - 1) * 10, meals = 200 + (level - 1) * 10, unlocks = [], can_upgrade = true}}
 		var panel := P0Logic.home_panel(v)
 		assert_int(panel.tiles[1].need).is_equal(rule[1] + 40)   # displayed wallet need includes the retained floor
 		assert_int(panel.tiles[2].need).is_equal(rule[2])
 		assert_bool(panel.changes.any(func(row): return str(row.text).contains("+40"))).is_false()
-		assert_str(panel.footer).is_equal("Upgrading is free of Energy" + (" · fills Energy to the new max" if level >= 5 else ""))
+		assert_str(panel.footer).is_equal("Upgrading is free of Energy")
 
 func test_reused_plant_batches_keep_each_fast_crop_tint_and_the_harvest_copy() -> void:
 	var v := view()

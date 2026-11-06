@@ -32,18 +32,17 @@ export type P0Event =
   // A Mystery Dish (§7.5.2): tried = not new (no clue); refund = ingredients given back; clue = slots turned on a Hidden page.
   | { kind: 'mishap'; items: string[]; tried: boolean; refund: string[]; trial_left: number | null; clue: { page: string; slots: number[] } | null }
   // auto: kept by Queue ×2; none: a failed pot with its ingredients back (Newcomer Blessing) made no Mystery Dish (qty 0)
-  | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; auto?: true; none?: true; trial_left?: number; lucky?: true }
+  | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; rarity?: number; heats?: number; auto?: true; none?: true; trial_left?: number; lucky?: true }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
   | { kind: 'home'; action: 'chosen' | 'changed'; city: string; from: string; spot: number; dropped: string[] }   // SGODOT-303 (home_city.ts); spot -1: a free pin (q(216))
   // paid: the fare taken (q(256)); renewed false: a Day Pass still running was not re-signed and no visit counted (option B)
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number;
-      paid: { energy: number; coins: number }; renewed: boolean }
+      paid: { energy: number; coins: number }; renewed: boolean; wild?: true }   // wild: a wild site (v4q(3)), stamp null and no +10
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // energy: actual gain after the new cap (q247); look: the stage it opens
   | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
-  | { kind: 'barter'; item: string; give: number; mineral: string; left: number }   // q(166): 2 regional items for 1 mineral
   | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string; first?: boolean }
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
   | { kind: 'recipe'; page: string; from: 'taught' | 'request' | 'card'; resident?: string; request?: string }   // a page turned Tasted (§7.5.3; 哪吒's shape, card = Recipe Card)
@@ -54,12 +53,20 @@ export type P0Event =
   | { kind: 'title'; id: string; resident: string }   // a story request's title (§9.4.4 Trusted)
   | { kind: 'kindred'; resident: string; postcard: string; title: string }   // first reached Kindred (q(171))
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
-  | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared' | 'express' | 'express_unlocked'
-      | 'hit' | 'defeat' | 'hurt' | 'knocked_out' | 'complete'; run: number; floor: number; cost: number;
-      rock?: number; drop?: string | null;
+  | { kind: 'mine_floor'; mine: string; floor: number; cleared: boolean; station: boolean }
+  | { kind: 'mine_record'; mine: string; deepest: number }
+  | { kind: 'mob_down'; index: number; mob: string }
+  | { kind: 'guard_down'; mob: string; floor: number; first: boolean }
+  | { kind: 'mine_ko'; floor: number; lost: [string, number][] }
+  // 355 G (contract-efg §9.2): Pip's First Dig done (weapon: its reward, equipped: now in hand), and a weapon into the slot
+  | { kind: 'first_dig'; done: true; weapon: string | null; equipped: boolean }
+  | { kind: 'gear'; item: string; equipped: boolean }
+  | { kind: 'heal'; hp: number; item: string }   // 355 G §9.4: a potion drunk in the mine, hp after it
+  | { kind: 'mine'; action: 'torch' | 'rock' | 'hit' | 'hurt'; mine: string; floor: number; cost: number;
+      rock?: number; drop?: string | null; drops?: (string | null)[];
       mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
-  | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
+  | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'weapon' }
   // SGODOT-351 blackjack (blackjack.ts): a hand dealt (its view), each card drawn after (the hole card turned with
   // hole), a hand paid (the dealer's cards, each hand's result, payout and net, the wallet after)
   | { kind: 'bj_dealt'; n: number; bet: number; hand: ReturnType<typeof import('./blackjack.js').handView> }
@@ -69,7 +76,7 @@ export type P0Event =
   | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[];
       x?: number; y?: number; reason?: 'plots' }   // x, y: a yard facility's cell (the Compost Bin); plot is −1 then; reason plots: moved off Lv7's new beds (q(172))
   | { kind: 'compost'; item: string; qty: number; used: number; cap: number }   // the Compost Bin turned crops into Compost (q(118) ③)
-  | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
+  | { kind: 'plots_added'; plots: number[]; reason: 'homestead' | 'facility' }   // new beds: a Homestead level's, or the one a tree / sprinkler opened (355 b1)
   | { kind: 'seed_saved'; id: string; plot: number }   // Seed Saver gave back a seed on this harvest (Farming Lv10)
   | { kind: 'tree'; action: 'planted' | 'chopped'; plot: number; crop: string; used: number; cap: number }   // the orchard (q(118))
   | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' }

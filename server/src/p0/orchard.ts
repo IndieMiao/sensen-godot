@@ -10,6 +10,7 @@ import type { Crop, P0Content } from './content.js';
 import { cropById } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { greenhousePlots } from './garden.js';
+import { levelCap } from './homestead.js';
 import type { Refusal } from './fishing.js';
 import { energyDetail, firstXp, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { scaledXp, skillLevel, xpPercent } from './rules.js';
@@ -24,8 +25,7 @@ export const treeOf = (c: P0Content, plot: Plot): Crop | undefined => {
 
 /** Trees the Homestead level allows: base + per_level × level, at most max (§5.2.4 q(118): 1 + level, 8 from Lv7). */
 export function orchardCap(c: P0Content, s: P0State, level = s.homestead.level): number {
-  const p = c.homestead.perennial_slots;
-  return p ? Math.min(p.max, p.base + p.per_level * level) : 0;
+  return levelCap(c.homestead.perennial_slots, level);
 }
 
 export const orchardUsed = (c: P0Content, s: P0State): number => s.plots.filter(p => treeOf(c, p)).length;

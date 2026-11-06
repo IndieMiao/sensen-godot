@@ -21,7 +21,7 @@ func before_test() -> void:
 func after_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
 
-func _view() -> Dictionary: return {"seq": 1, "energy": {"value": 100, "max": 200}, "coins": 50, "bag": {"capacity": 25, "slots": []}}
+func _view() -> Dictionary: return {"seq": 1, "save_version": 7, "energy": {"value": 100, "max": 200}, "coins": 50, "bag": {"capacity": 25, "slots": []}}
 
 ## The server's answer to the request on the wire, through the session as an HTTP reply would come.
 func _reply(code: int, body: Dictionary) -> void:
@@ -52,14 +52,31 @@ func test_eight_seconds_add_the_spinner_and_twenty_say_cant_connect() -> void:
 	rt.ui.screen().card.primary.pressed.emit()   # Retry reads the state now
 	assert_array(asked).contains(["/p0/state"])
 
-func test_a_failed_first_read_is_cant_connect_not_a_banner() -> void:
+## q(290) (李元芳 on 0.2.25: a read given up at its 8 s took the screen to Can't connect, the slow card never came): a
+## failed first read is no banner and not Can't connect yet — it goes again a second on, the slow card comes at 8 s and
+## Can't connect at 20 with nothing read; then it is checked again on its own.
+func test_a_failed_first_read_goes_again_and_cant_connect_waits_for_twenty_seconds() -> void:
 	rt.cover_launch()
 	rt.session.connection_failed.emit("Can't reach the farm server", {})
-	assert_int(rt.ui.screen_kind()).is_equal(K.FAIL)
+	assert_int(rt.ui.screen_kind()).is_equal(K.LAUNCH)
 	assert_str(rt.ui.sys_text()).is_empty()
 	assert_bool(rt.ui.offline).is_false()
+	asked.clear()
+	rt._tick_screens(P0Runtime.LAUNCH_RETRY_S + 0.05)   # read again
+	assert_array(asked).contains(["/p0/state"])
+	rt.session.busy = false
+	rt.session.connection_failed.emit("Can't reach the farm server", {})   # and failed again
+	rt._tick_screens(P0Runtime.LAUNCH_SLOW_S)
+	assert_int(rt.ui.screen_kind()).is_equal(K.LAUNCH)
+	assert_bool(rt.ui.screen().slow).is_true()   # the slow card, not Can't connect
+	rt._tick_screens(P0Runtime.LAUNCH_FAIL_S - P0Runtime.LAUNCH_SLOW_S)
+	assert_int(rt.ui.screen_kind()).is_equal(K.FAIL)
+	asked.clear()
+	rt.session.busy = false
 	rt._tick_screens(P0Runtime.PROBE_S + 0.1)   # checked again on its own
 	assert_array(asked).contains(["/p0/state"])
+	rt.session.connection_failed.emit("Can't reach the farm server", {})   # a failure past 20 s stays Can't connect
+	assert_int(rt.ui.screen_kind()).is_equal(K.FAIL)
 
 func test_back_does_not_close_a_system_screen() -> void:
 	rt.cover_launch()
@@ -163,9 +180,13 @@ func test_the_scene_cover_shows_after_the_pending_delay_and_backs_out_only_after
 	assert_float(layer.screen.modulate.a).is_equal(0.0)
 	assert_bool(layer.close_button.visible).is_false()   # AppRouter's Back reads it
 	layer._process(UiTokens.MOTION_PENDING_DELAY_MS / 1000.0)
+	await get_tree().create_timer(P0LoadingLayer.FADE_IN_S + 0.05).timeout   # in over 150 ms (spec v1 §4)
 	assert_float(layer.screen.modulate.a).is_equal(1.0)
 	layer._process(P0LoadingLayer.SLOW_S)
 	assert_bool(layer.screen.slow).is_true()
+	var s := layer.screen
+	# the town map's slow line: on its own pill under the bar, no spinner (L123v2 L2)
+	assert_that([s._slow_pill.visible, s._caption.visible, s.spinner.visible, s._bar_track.visible]).is_equal([true, true, false, true])
 	layer.failed()
 	assert_that([layer.close_button.visible, layer.close_button.text]).is_equal([true, "Go back"])
 
@@ -189,18 +210,30 @@ func test_the_outpost_handshake_carries_the_version() -> void:
 	assert_bool(Array(o.socket.handshake_headers).any(func(h): return str(h).begins_with("x-p0-version"))).is_false()
 	o.stop()
 
+## SGODOT-397 / 396 (后裔): the handshake carries the requests' x-p0-features, save_v7 in it — without it the server
+## turns the join away with 426 like the version gate.
+func test_the_handshake_carries_the_features_with_save_v7() -> void:
+	assert_bool(P0Session.FEATURES.split(",").has("save_v7")).is_true()
+	var o := P0Online.new()
+	add_child(auto_free(o))
+	o.player_id = "p0-test"
+	o.features = P0Session.FEATURES
+	o._connect()
+	assert_array(Array(o.socket.handshake_headers)).contains(["x-p0-features: " + P0Session.FEATURES])
+	o.stop()
+
 ## 不知火舞 233 walkthrough: a place that would not open stays on the blurred screen being left (no launch backdrop,
 ## no wordmark); Can't connect's card plus Go back. Retry opens the same place again; Go back (and Back) stays put.
 func test_a_failed_place_offers_retry_and_the_way_back() -> void:
-	var shot := ImageTexture.create_from_image(Image.create(4, 4, false, Image.FORMAT_RGB8))
-	var layer := P0LoadingLayer.new("SF · Fern Pond", shot, "res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"})
+	var layer := P0LoadingLayer.new("SF · Fern Pond", null, "res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"})
 	var opened := []
 	layer.reopen = func(p, a): opened.append([p, a])
 	add_child(auto_free(layer))
 	layer.failed()
 	var s := layer.screen
-	assert_that([s._shot.visible, s._shot.texture == shot, s._mark.visible, s._art.visible, s._place.visible, s.spinner.visible]).is_equal(
-		[true, true, false, false, false, false])
+	# the same town map under the modal scrim; the pin, the place and the bar folded away (L123v2 L3)
+	assert_that([s._map.visible, s._scrim.visible, s._shot.visible, s._mark.visible, s._art.visible, s._place.visible, s._pin.visible,
+		s._bar_track.visible, s.spinner.visible]).is_equal([true, true, false, false, false, false, false, false, false])
 	assert_that([s.card.title.text, s.card.body.text, s.card.primary.text, s.card.secondary.text]).is_equal(
 		["Couldn't get there", "Check your connection and try again.", "Retry", "Go back"])
 	assert_object(layer.close_button).is_same(s.card.secondary)
@@ -210,6 +243,75 @@ func test_a_failed_place_offers_retry_and_the_way_back() -> void:
 	await get_tree().process_frame
 	assert_int(cleared[0]).is_equal(1)   # AppRouter's transition is cleared first …
 	assert_that(opened).is_equal([["res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"}]])   # … then the same place
+
+## The user 11-06 (00:40; 不知火舞's spec v1 + 425 120c7163, frame L123v2): the scene cover is the town map under a 15 %
+## haze, the destination's pin, the place on a white pill and a 200 × 8 bar on the centre line — no spinner, no screen
+## read back from the GPU.
+func test_the_scene_cover_is_the_town_map_with_the_pin_the_place_and_the_bar() -> void:
+	var layer := P0LoadingLayer.new("San Francisco · Fern Pond", null, "res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"})
+	add_child(auto_free(layer))
+	var s := layer.screen
+	s.size = Vector2(360, 800)
+	s._layout()
+	assert_that([s._map.visible, s._haze.visible, s._shot.visible, s._scrim.visible, s.spinner.visible]).is_equal([true, true, false, false, false])
+	assert_str(s._map.texture.resource_path).is_equal(P0SysScreen.SCENE_MAP)   # loaded with the cover, not the script
+	assert_float(s._haze.color.a).is_equal_approx(0.15, 0.001)
+	assert_object(s._pin_icon.texture).is_not_null()   # the pond's own pin icon
+	assert_float(s._pin.position.y + s._pin.size.y).is_equal(360.0)   # the disc ends at 360
+	assert_float(s._place_pill.position.y + s._place_pill.size.y * 0.5).is_equal(410.0)
+	assert_that([s._bar_track.position, s._bar_track.size]).is_equal([Vector2(80, 444), Vector2(200, 8)])
+	assert_that(s._place.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_TEXT)
+	var pill := s._place_pill.get_theme_stylebox(&"panel") as UiStyleBox
+	assert_that([pill.bg_color, pill.border_color, pill.border_width, pill.shadow_offset]).is_equal(
+		[UiTokens.COLOR_SURFACE, UiTokens.COLOR_BORDER, 1.0, Vector2(0, 2)])
+	assert_that((s._bar_track.get_theme_stylebox(&"panel") as UiStyleBox).bg_color).is_equal(Color("E1DAC8"))
+	# a taller screen keeps them on its centre (y − 400 from it)
+	s.size = Vector2(360, 900)
+	s._layout()
+	assert_float(s._bar_track.position.y).is_equal(494.0)
+
+## The bar: the threaded load's own progress up to 85 %, filled once the scene is in, eased (≤ 0.25 s), never back;
+## then it holds and fades out, taking no touch. A cover never shown (a quick load) goes at once.
+func test_the_scene_cover_bar_follows_the_load_and_the_cover_fades_out_after_it() -> void:
+	var layer := P0LoadingLayer.new("San Francisco · Fern Pond", null, "res://scenes/p0/p0_farm.tscn", {})
+	add_child(layer)
+	layer._process(UiTokens.MOTION_PENDING_DELAY_MS / 1000.0)   # shown
+	layer.progress(0.5)
+	layer._process(0.1)
+	assert_float(layer.screen.progress).is_greater(0.0)
+	layer._process(1.0)
+	assert_float(layer.screen.progress).is_equal_approx(0.425, 0.001)   # 0.5 of the load = 42.5 %
+	layer.progress(0.2)   # never back
+	layer._process(1.0)
+	assert_float(layer.screen.progress).is_equal_approx(0.425, 0.001)
+	layer.progress(1.0)
+	layer._process(1.0)
+	assert_float(layer.screen.progress).is_equal_approx(0.85, 0.001)
+	layer.finish()
+	assert_int(layer.screen.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_bool(layer.is_in_group(GameUi.MODAL_GROUP)).is_false()
+	layer._process(1.0)
+	assert_float(layer.screen.progress).is_equal(1.0)
+	assert_bool(is_instance_valid(layer)).is_true()   # it holds, then fades out …
+	await get_tree().create_timer(P0LoadingLayer.MIN_SHOWN_S + P0LoadingLayer.FADE_OUT_S + 0.3).timeout
+	assert_bool(is_instance_valid(layer)).is_false()   # … and goes
+	var quick := P0LoadingLayer.new("San Francisco · Fern Pond", null, "res://scenes/p0/p0_farm.tscn", {})
+	add_child(quick)
+	quick.finish()   # never shown: no hold, no fade
+	await get_tree().process_frame
+	assert_bool(is_instance_valid(quick)).is_false()
+
+## Each destination's pin wears its map pin's icon: the farm's home, a pond's site, a mine's type; none for others.
+func test_the_launch_screen_does_not_load_the_town_map() -> void:
+	var launch := auto_free(P0SysScreen.new()) as P0SysScreen
+	launch.show_kind(P0SysScreen.Kind.LAUNCH)
+	assert_object(launch._map.texture).is_null()
+
+func test_the_scene_cover_pin_wears_the_destination_icon() -> void:
+	assert_object(P0LoadingLayer.icon_for("res://scenes/p0/p0_farm.tscn", {})).is_same(P0Logic.icon("home"))
+	assert_object(P0LoadingLayer.icon_for("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"})).is_not_null()
+	assert_object(P0LoadingLayer.icon_for("res://scenes/p0/p0_mine.tscn", {"mine": "wd-nowhere", "floor": 1})).is_same(P0Logic.icon("quarry"))
+	assert_object(P0LoadingLayer.icon_for("res://scenes/other.tscn", {})).is_null()
 
 # ---------------------------------------------------------------- getting there (q(78))
 func _arrive_at_pond() -> Node:

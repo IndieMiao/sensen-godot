@@ -140,6 +140,13 @@ func went_away(view: Dictionary, now_ms: float, bias_min: int) -> void:
 func came_back() -> void:
 	if native != null: native.call("cancel_all")
 
+## A new save under the same player (v4q(2) wipe, a reset; SGODOT-397): the soft prompt asks again. The choice stays
+## until the answer replaces it.
+func forget_asked() -> void:
+	if not _saved.has("asked"): return
+	_saved.erase("asked")
+	_save({})
+
 func _save(change: Dictionary) -> void:
 	_saved.merge(change, true)
 	if path == "": return

@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
-import { freshState, upgradeState, type BoardRequest, type P0State } from '../../src/p0/state.js';
+import { freshState, upgradeState, type BoardRequest, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { boardsOf, eligible, handIn, settleBoards, tracked } from '../../src/p0/boards.js';
 import { mapMarkers } from '../../src/p0/markers.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -49,7 +49,7 @@ describe('q(270) Market Board per city', () => {
     v5.v = 5;
     delete (v5 as { markets?: unknown }).markets;
     const up = upgradeState(c, v5 as unknown as P0State, T);
-    expect(up.v).toBe(6);
+    expect(up.v).toBe(SAVE_VERSION);
     expect(Object.keys(up.markets)).toEqual([SF]);
     expect(up.markets[SF]).toBe(up.boards.market);
     expect(up.boards.market).toEqual(held);
@@ -160,16 +160,20 @@ describe('q(270) Market Board per city', () => {
     expect(mapMarkers(c, s, T).find(m => m.place === HAYWARD_MARKET)).toBeUndefined();
   });
 
-  it('Track ≤ 3 counts every city\'s boards together', () => {
-    let s = player(HAYWARD);
-    settleBoards(c, s, T);
-    for (const sl of hayward(s)) s = step(s, { type: 'accept', request: sl.req!.id, ...atMarket(HAYWARD_MARKET) } as P0Command);
-    s.travel.here = SF;
-    settleBoards(c, s, T);
-    const home = boardsOf(c, s).find(b => b.board === 'market' && b.city === SF)!.slots.map(sl => sl.req).filter(Boolean)[0]!;
-    s = step(s, { type: 'accept', request: home.id, ...atMarket('sh_market_1') } as P0Command);
-    expect(tracked(c, s)).toBe(3);
-    const next = boardsOf(c, s).find(b => b.board === 'market' && b.city === SF)!.slots.map(sl => sl.req).find(x => x && x.status === 'open')!;
-    expect(applyP0(c, s, { type: 'accept', request: next.id, ...atMarket('sh_market_1') } as P0Command, T)).toMatchObject({ ok: false, code: 'track_limit' });
+  it('Track ≤ track_max (3 here) counts every city\'s boards together', () => {
+    const was = c.requests.track_max;
+    c.requests.track_max = 3;   // the mechanism at a small number: the content's is 25 (A 包反馈 3)
+    try {
+      let s = player(HAYWARD);
+      settleBoards(c, s, T);
+      for (const sl of hayward(s)) s = step(s, { type: 'accept', request: sl.req!.id, ...atMarket(HAYWARD_MARKET) } as P0Command);
+      s.travel.here = SF;
+      settleBoards(c, s, T);
+      const home = boardsOf(c, s).find(b => b.board === 'market' && b.city === SF)!.slots.map(sl => sl.req).filter(Boolean)[0]!;
+      s = step(s, { type: 'accept', request: home.id, ...atMarket('sh_market_1') } as P0Command);
+      expect(tracked(c, s)).toBe(3);
+      const next = boardsOf(c, s).find(b => b.board === 'market' && b.city === SF)!.slots.map(sl => sl.req).find(x => x && x.status === 'open')!;
+      expect(applyP0(c, s, { type: 'accept', request: next.id, ...atMarket('sh_market_1') } as P0Command, T)).toMatchObject({ ok: false, code: 'track_limit' });
+    } finally { c.requests.track_max = was; }
   });
 });

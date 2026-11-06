@@ -105,13 +105,21 @@ describe('Stall Board (§9.6, §14.1.2)', () => {
     expect(viewOf(c, s, T0 + H).boards.stall.slots[1]).toMatchObject({ status: 'accepted', accepted_at: null });
   });
 
-  it('tracks at most 3 requests at once', () => {
-    let s = fresh();
-    s.homestead.level = 3;
-    s.boards.stall = [{ req: req({ id: 'a' }), refill_at: 0 }, { req: req({ id: 'b' }), refill_at: 0 }, { req: req({ id: 'c' }), refill_at: 0 }];
-    s.boards.market = [{ req: req({ id: 'd', template: 'req_sys_fish_fine', rarity: 2, bonus: 20 }), refill_at: 0 }];
-    for (const id of ['a', 'b', 'c']) s = step(s, { type: 'accept', request: id }).s;
-    expect(refuse(s, { type: 'accept', request: 'd' })).toMatchObject({ ok: false, code: 'track_limit', detail: { max: 3 } });
+  it('the content tracks up to 25 requests (A 包反馈 3, 不知火舞\'s spec ③; was 3)', () => {
+    expect(content.requests.track_max).toBe(25);
+  });
+
+  it('tracks at most track_max requests at once (3 here)', () => {
+    const was = c.requests.track_max;
+    c.requests.track_max = 3;   // the mechanism at a small number: the content's is 25 (A 包反馈 3)
+    try {
+      let s = fresh();
+      s.homestead.level = 3;
+      s.boards.stall = [{ req: req({ id: 'a' }), refill_at: 0 }, { req: req({ id: 'b' }), refill_at: 0 }, { req: req({ id: 'c' }), refill_at: 0 }];
+      s.boards.market = [{ req: req({ id: 'd', template: 'req_sys_fish_fine', rarity: 2, bonus: 20 }), refill_at: 0 }];
+      for (const id of ['a', 'b', 'c']) s = step(s, { type: 'accept', request: id }).s;
+      expect(refuse(s, { type: 'accept', request: 'd' })).toMatchObject({ ok: false, code: 'track_limit', detail: { max: 3 } });
+    } finally { c.requests.track_max = was; }
   });
 
   it('6 system requests a day; completion bonuses share a 100-coin daily cap', () => {

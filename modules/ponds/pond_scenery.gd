@@ -7,7 +7,13 @@ const Art = preload("res://modules/farm/farm_art.gd")
 ## plain. The P0 pond camera keeps the screen on it (不知火舞 on 231).
 const MEADOW := Rect2(-3, -19, 18, 21)
 
-static func build(entry: Dictionary) -> PondScenery:
+## `clear`: world points (a pond's gathering pieces, SGODOT-410) its trees and bushes keep CLEAR_M off — a tree also
+## stays out of the strip in front of one (FRONT_M toward the camera, +z, FRONT_HALF_W a side), where its crown would
+## cover it; the draws are the same either way, so the rest of the bank stays where it was.
+const CLEAR_M := 1.5
+const FRONT_M := 4.0
+const FRONT_HALF_W := 2.0
+static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 	var scene := PondScenery.new()
 	scene.name = "Scenery"
 	scene._rng.seed = int(entry.decoration_seed)
@@ -22,7 +28,8 @@ static func build(entry: Dictionary) -> PondScenery:
 	var trees: Array = []
 	for point in [Vector3(0.1, 0, -4), Vector3(-0.2, 0, -11), Vector3(2.2, 0, -16.1), Vector3(9.5, 0, -16.4), Vector3(12.2, 0, -12), Vector3(12.1, 0, -5.5)]:
 		var scale_value := scene._rng.randf_range(.85, 1.1)
-		trees.append(Transform3D(Basis(Vector3.UP, scene._rng.randf_range(0, TAU)).scaled(Vector3.ONE * scale_value), point))
+		var turn := scene._rng.randf_range(0, TAU)
+		if not _near(point, clear) and not _in_front(point, clear): trees.append(Transform3D(Basis(Vector3.UP, turn).scaled(Vector3.ONE * scale_value), point))
 	scene.add_child(preload("res://modules/ponds/pond_trees.gd").build(trees))
 	var layers := {"grass_clump": [], "daisy": [], "blue_flower": [], "bush": []}
 	var spec := SystemPonds.site(entry)
@@ -32,7 +39,9 @@ static func build(entry: Dictionary) -> PondScenery:
 		var edge := point.x < .7 or point.x > 11.3 or point.z < -15.3
 		var asset := "bush" if edge and i % 4 == 0 else "daisy" if i % 7 == 0 else "blue_flower" if i % 11 == 0 else "grass_clump"
 		var scale_value := scene._rng.randf_range(.55, .90) if asset == "bush" else scene._rng.randf_range(.35, .60)
-		layers[asset].append(Transform3D(Basis(Vector3.UP, scene._rng.randf_range(0, TAU)).scaled(Vector3.ONE * scale_value), point))
+		var turn := scene._rng.randf_range(0, TAU)
+		if asset == "bush" and _near(point, clear): continue
+		layers[asset].append(Transform3D(Basis(Vector3.UP, turn).scaled(Vector3.ONE * scale_value), point))
 	for asset in layers: scene.add_child(Art.batch(asset, layers[asset], asset == "bush"))
 	# Small batched tufts give the meadow a soft pile instead of a flat plane.
 	var turf: Array = []
@@ -67,3 +76,15 @@ func _mesh(mesh: Mesh, at: Vector3, material: Material) -> MeshInstance3D:
 	node.material_override = material
 	add_child(node)
 	return node
+
+static func _near(point: Vector3, clear: Array) -> bool:
+	for c in clear:
+		if Vector2(point.x - (c as Vector3).x, point.z - (c as Vector3).z).length() < CLEAR_M: return true
+	return false
+
+## A tree here would stand between the camera and one of `clear`.
+static func _in_front(point: Vector3, clear: Array) -> bool:
+	for c in clear:
+		var dz := point.z - (c as Vector3).z
+		if dz > 0.0 and dz <= FRONT_M and absf(point.x - (c as Vector3).x) < FRONT_HALF_W: return true
+	return false

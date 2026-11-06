@@ -14,11 +14,11 @@ extends Node
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postcard and title (q(171))
-const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")   # Settings › Blocked players: the account's voice (SGODOT-384)
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const MINE_SCENE := "res://scenes/p0/p0_mine.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
@@ -166,7 +166,8 @@ func _init() -> void:
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
 	ui.action_pressed.connect(_on_action)
-	ui.command.connect(func(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
+	ui.command.connect(func(cmd):
+		if P0Logic.GearLogic.command_allowed(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
 	# Observation log (S7): only the commands the farm's hold-to-repeat sends are holds; every press is a tap.
 	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
@@ -185,6 +186,7 @@ func _init() -> void:
 	ui.go_pond.connect(func(id: String): _leave_then("go:pond:" + id))   # the Bite Board's pond card: Go (SGODOT-283)
 	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
 	session.state_changed.connect(_on_state)
+	session.command_settled.connect(_mine_enter_settled)
 	# U6: doing what the TipCard on screen teaches closes it (sow / cast / cook / heat are command types).
 	session.sent.connect(func(cmd: Dictionary): ui.tip_did(str(cmd.get("type", ""))))
 	session.sent.connect(func(cmd: Dictionary): _guide_feedback.sent(cmd, ui.view))
@@ -338,9 +340,8 @@ func _ask_presence() -> void:
 		add_child(_presence)
 		_presence.request_completed.connect(_on_presence)
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED or session.base_url == "": return
-	var headers := PackedStringArray(["x-p0-player: " + session.player_id])
-	if session.access_key != "": headers.append("x-p0-key: " + session.access_key)   # the demo server's key
-	_presence.send(session.base_url + "/p0/presence", headers)
+	# the requests' own headers: the demo key, the version and the features (save_v7, or 426 once the wipe is on: 397)
+	_presence.send(session.base_url + "/p0/presence", session._headers())
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200: return
@@ -376,24 +377,26 @@ func _root_is_world() -> bool:
 	return root != null and root.has_method("p0_surface")
 
 ## Where the player is while the map is up (MAP-1, §10.6.1): the place chip keeps naming it, and a tap on the chip
-## goes back there. Set by every world but the map: "farm" for the farm, its farmhouse and the mine (they are the
-## homestead), "pond:<id>", "outpost:<id>".
+## goes back there. Set by every world but the map: "farm" for the farm and its farmhouse (the homestead),
+## "pond:<id>", "outpost:<id>", "mine:<id>" (a wild site's mine, 355 b1: the map opens its mouth card).
 var return_to := "farm"
 
 ## The route back to world `w` from the map, as return_to holds it.
 static func route_of(w: Object) -> String:
 	var id := ""
 	match space_of(w):
-		"pond": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""
+		"pond", "mine": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # a mine is a wild site (355 b1)
 		"outpost":
 			var o = w.get("outpost")
 			id = str((o as Dictionary).get("id", "")) if o is Dictionary else ""
 	# A pond or outpost that does not say which one goes back to the farm (刘邦 on #92), never to "pond:".
 	return "%s:%s" % [space_of(w), id] if id != "" else "farm"
 
-## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1).
+## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1). A world with its own
+## way out takes it (p0_leave: the mine back at its mouth, 355 b1).
 func _on_place_pressed() -> void:
 	if is_instance_valid(world) and str(_call("p0_surface", [])) == "map": _call("p0_return", [return_to])
+	elif is_instance_valid(world) and world.has_method("p0_leave"): world.call("p0_leave")
 	else: leave_world()
 
 ## Back to the map, then on to the homestead or Old Kai's pin (the map reads after_leave on resume).
@@ -459,6 +462,7 @@ func _watch_day_pass(v: Dictionary) -> void:
 	ui.toast_in_city("Day Pass ended · Re-entry\n%s" % P0Travel.fare_text(P0Travel.fare(v, here)), here)
 
 func _on_action(cmd: Dictionary) -> void:
+	if not P0Logic.GearLogic.command_allowed(cmd): return
 	if str(cmd.get("type", "")) == "energy_card":
 		var verb = _call("p0_energy_verb", [])
 		energy_card(int(ui.fab_state().get("need", 0)), str(verb) if verb != null else str(ui.fab_state().get("verb", "")))
@@ -594,16 +598,45 @@ func release_travel() -> void:
 ## A tree pick's XP line's key (all its farming XP in one part; see tree_pick).
 const TREE_XP := "tree_xp"
 
-## A generated home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home
-## set (P0Outposts.home: names, Show on map, Today) has them; the written city's are the client's own tables.
+## Home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home set
+## (P0Outposts.home: names, Show on map, Today) has them; the written city's ponds and outposts are the client's own
+## tables, but its gathering spots are the server's (v4q(4)) — the guide's S6a and Today point at them before the map.
 func _read_home_places(v: Dictionary) -> void:
 	var travel = load("res://modules/p0/p0_travel.gd")
 	var home := str(travel.home(v))
 	var places = load("res://modules/p0/p0_city_places.gd")
-	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
+	if home == "" or places.has_city(home) or session == null: return
 	places.fetch(session, home)
 
+## Into a mine (355 b1, contract-efg §5 ①): mine_enter from where the player is — the map's mouth card (`Enter mine`,
+## 亚瑟's P0Map.open_wild_card) or the dev step mine:<id>[:<floor>] — onto Floor 1 or one of its stops. The mine opens
+## over this world on the reply's mine_floor event, on the floor the server landed the player on; a refusal says why
+## (P0MaterialLogic.refusal_text) and nothing opens.
+var _entering_mine := ""
+func enter_mine(id: String, floor := 1) -> void:
+	if id == "" or _entering_mine != "": return
+	_entering_mine = id
+	if not session.send({"type": "mine_enter", "mine": id, "floor": floor}, "mine_enter"): _entering_mine = ""
+
+## A refused or failed mine_enter opens nothing; the next try may go.
+func _mine_enter_settled(key: String, ok: bool, _code: String) -> void:
+	if key == "mine_enter" and not ok: _entering_mine = ""
+
+func _mine_opened(events: Array) -> void:
+	if _entering_mine == "": return
+	for e in events:
+		if str(e.get("kind", "")) == "mine_floor" and str(e.get("mine", "")) == _entering_mine:
+			var id := _entering_mine
+			_entering_mine = ""
+			# in the mine already for the server's reads while the scene loads: a timed read with space=map in those frames
+			# would take the player out again (notePresence; 亚瑟 on #629). The scene's attach sets the same.
+			session.space = "mine"
+			session.place = id
+			AppRouter.open_instance(MINE_SCENE, {"mine": id, "floor": int(e.get("floor", 1))})
+			return
+
 func _on_state(v: Dictionary, events: Array) -> void:
+	_mine_opened(events)
 	var before: Dictionary = ui.view
 	var guide_feedback := _guide_feedback.take(before, v, events)
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
@@ -632,6 +665,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		at = ui.inbox_float_at()
 		ui.inbox_claim_done()
 	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
+	var dig_reward := P0Logic.GearLogic.first_dig_reward(v, events)
+	if dig_reward != "": floats.append({kind = "first_dig", key = "first_dig", text = dig_reward})
 	if not guide_feedback.fish.is_empty(): floats.append(guide_feedback.fish)
 	# q(218) A Fresh Radish (不知火舞 on 344, 812e77be): handed in on the resident's open bar, the reply floats one group over
 	# the bar — `+20 coins`, `+5 Friendship`, `New recipe · Fresh Fish Soup` — and the resident says the thanks line after.
@@ -686,9 +721,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
 	# A craft's output is said by the workbench (`+2 Torch` on its card, the pickaxe's Moment; SGODOT-231 B2-06).
 	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
-	# A barter (q(166) ⑤): one Success toast `+1 Stone · −2 Pumpkin` says both sides, in place of the item floats
-	var barter_toast := P0Barter.toast(v, events)
-	if barter_toast != "": ui.toast_success(barter_toast)
 	for i in events.size():
 		var ev: Dictionary = events[i]
 		if hushed.call(ev): continue
@@ -805,7 +837,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if P0Decor.is_decor(iid) and int(ev.delta) > 0:   # bought at the stall, into Farm Storage (SGODOT-284)
 					ui.toast_decor_bought(iid)
 					continue
-				if barter_toast != "": continue   # a barter says both sides in its toast, below (q(166) ⑤)
 				# where a collected dish went (the kitchen's Keep toast); what a pot took (Cook All floats it, q(124))
 				if iid.begins_with("dish_") or int(ev.delta) < 0: _call("p0_event", [ev, v])
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
@@ -1122,6 +1153,16 @@ static func wrong_city_line(view: Dictionary, request: String, city: String) -> 
 	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")) == "mine_drink":
+		if code == "potion_cooldown":
+			ui.set_potion_cooldown(float(detail.get("ready_in", -1)))
+			return
+		if code == "hp_full":
+			ui.toast("HP full")
+			return
+		if code == "no_potion":
+			ui.toast("Buy at Homestead Stall")
+			return
 	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
 		ui.blackjack_refused(code, detail)
 		return
@@ -1139,6 +1180,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		if not r.is_empty():
 			ui.toast_error("%s · %s" % [str(r.title), str(r.deliver)])
 			return
+	if code == "track_limit":   # A 包 spec ③: tracking 25 already (a key greyed too late, another device)
+		ui.toast_error(P0Logic.TRACK_FULL_TOAST)
+		return
 	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
 		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
 		return
@@ -1204,7 +1248,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_home":
 			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
 			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")
-		"need_material", "skills_short", "max_level":
+		"need_material", "skills_short", "travel_short", "max_level":
 			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap — from where the
 			# player is, and from the server's detail when the fresh view has no gap left to name (后裔 on #150).
 			var gap := _home_gap() if str(cmd.get("type", "")) == "homestead_upgrade" else ""
@@ -1213,7 +1257,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
 			elif code == "skills_short":   # HOME-1's own wording (appendix B), never the code (后裔 on #152)
-				ui.toast_error("Skills total %d needed · now %d" % [int(detail.get("need", 0)), int(detail.get("have", 0))])
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("skill", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
+			elif code == "travel_short":
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("kind", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
 			elif code == "max_level": ui.toast_error("Highest level for now")
 			else: ui.toast_error("Can't do that (%s)" % code)
 		"energy_full":
@@ -1244,6 +1290,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error("Sold out today · %d left" % int(detail.get("left", 0)))
 		"limit_reached":   # a day's allowance used (the Compost Bin, a counter's buy-back): q(121)'s words (哪吒 on #286)
 			ui.toast_error("Limit reached · %s" % P0Logic.span(float(detail.get("resets_in", 0))))
+		"plots_full":   # SGODOT-355 b1: the field's annuals at the level's Plots — the grey Sow key's words (亚瑟 on #624)
+			var cur := session.current()
+			var at := {"homestead": cur.get("homestead", {}),
+				"garden": {"fields": {"used": int(detail.get("used", 0)), "cap": int(detail.get("cap", 0))}}}
+			ui.toast_error(str(P0Logic.fields_full_action(at).toast))   # broken at its « · » as the grey key's (toast_error always does, 11-02)
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state", "guide_not_now":
@@ -1290,7 +1341,11 @@ func _net_failed(msg: String, cmd := {}) -> void:
 	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	_end_resume()
 	if _launch_s >= 0.0 and session.view.is_empty():
-		_launch_failed()   # nothing to browse yet: Can't connect takes the screen, no banner (SYS-LOADING-FAIL)
+		# nothing to browse yet. A read given up (its 8 s) or refused at once is not Can't connect before LAUNCH_FAIL_S
+		# (q(290); 李元芳 on 0.2.25: it took the screen at 8 s, the very time the slow card was due): the read goes again
+		# LAUNCH_RETRY_S on, the slow card comes at 8 s, Can't connect at 20 (SYS-LOADING-FAIL, no banner)
+		if _launch_s < LAUNCH_FAIL_S and ui.screen_kind() == P0SysScreen.Kind.LAUNCH: _launch_retry_left = LAUNCH_RETRY_S
+		else: _launch_failed()
 		return
 	if _arrive_s >= 0.0:
 		_arrival_failed()   # getting there failed: Couldn't get there, over the Offline banner (q(78))
@@ -1326,6 +1381,8 @@ func _probe() -> void:
 # ---------------------------------------------------------------- whole-screen system states (SGODOT-233)
 const LAUNCH_SLOW_S := 8.0    # SYS-LOADING-2: `Taking longer than usual…`
 const LAUNCH_FAIL_S := 20.0   # no answer by then: SYS-LOADING-FAIL `Can't connect` · Retry
+const LAUNCH_RETRY_S := 1.0   # a failed launch read goes again this soon, until LAUNCH_FAIL_S
+var _launch_retry_left := -1.0
 const MAINT_CHECK_S := 60.0   # SYS-MAINT checks again on its own (q(74))
 var _launch_s := -1.0         # how long the launch cover has been up; -1 when it is not
 var _blocked := ""            # "maintenance" / "update_required" while the server turns every request away
@@ -1333,16 +1390,18 @@ var _block_url := ""
 var _maint_left := 0.0
 var _resume_ms := -1          # a state read on return to the foreground is in flight since then; -1 none
 ## Getting to a place (q(78)): the scene cover AppRouter showed for a P0 world stays until that world's first read
-## answers. {path, place, shot, t0} of the cover; `_arrive_s` counts while its read is out (-1 none).
+## answers. {path, place, icon, progress, t0} of the cover; `_arrive_s` counts while its read is out (-1 none).
 const ARRIVE_FAIL_S := 20.0
 var _arrive := {}
 var _arrive_s := -1.0
 
 ## The first session's launch cover (SYS-LOADING, from p0_boot): the wordmark over the farm backdrop until the first
-## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer —
-## or a failed read with nothing yet to browse — `Can't connect` · Retry, checked again every PROBE_S.
+## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer
+## (a failed read before then goes again, LAUNCH_RETRY_S on: q(290)) — `Can't connect` · Retry, checked again every
+## PROBE_S.
 func cover_launch() -> void:
 	_launch_s = 0.0
+	_launch_retry_left = -1.0
 	ui.show_screen(P0SysScreen.Kind.LAUNCH)
 
 func _tick_screens(dt: float) -> void:
@@ -1351,6 +1410,11 @@ func _tick_screens(dt: float) -> void:
 		match ui.screen_kind():
 			P0SysScreen.Kind.LAUNCH:
 				if _launch_s >= LAUNCH_SLOW_S and not ui.screen().slow: ui.screen().taking_longer()
+				if _launch_retry_left >= 0.0:
+					_launch_retry_left -= dt
+					if _launch_retry_left <= 0.0 and not session.busy:
+						_launch_retry_left = -1.0
+						session.refresh()
 				if _launch_s >= LAUNCH_FAIL_S and session.view.is_empty(): _launch_failed()
 			P0SysScreen.Kind.FAIL:
 				_probe_left -= dt
@@ -1373,6 +1437,7 @@ func _tick_screens(dt: float) -> void:
 		ui.show_screen(P0SysScreen.Kind.SCENE, {place = ui.place_text(), shot = P0SysScreen.blurred_screen(get_viewport())})
 
 func _launch_failed() -> void:
+	_launch_retry_left = -1.0
 	_probe_left = PROBE_S
 	ui.show_screen(P0SysScreen.Kind.FAIL)
 
@@ -1665,10 +1730,14 @@ func _dev_screen(which: String) -> void:
 			var at := Time.get_datetime_string_from_unix_time(int(Time.get_unix_time_from_system()) + 5400) + "Z"
 			_on_blocked("maintenance", {"back_at": at})
 		"update": _on_blocked("update_required", {"url": "https://example.test/p0demo.apk"})
-		"scene", "placefail":
-			var layer := _scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": P0City.beginner_pond()}) as P0LoadingLayer
+		"scene", "sceneslow", "placefail":   # the town map: a pond at 40 %, a mine slow at 70 % (L123v2 L1 / L2 / L3)
+			var slow := which == "sceneslow"
+			var path := "res://scenes/p0/p0_mine.tscn" if slow else "res://scenes/p0/p0_pond.tscn"
+			var layer := _scene_overlay(path, {"mine": "wd-dev-vein", "floor": 3} if slow else {"pond_id": P0City.beginner_pond()}) as P0LoadingLayer
 			add_child(layer)
 			layer.screen.modulate.a = 1.0
+			layer.screen.progress = 0.7 if slow else 0.4
+			if slow: layer.screen.taking_longer()
 			if which == "placefail": layer.failed()
 
 ## AppRouter.open_instance into a P0 world: SYS-LOADING-SCENE over the screen being left; anything else keeps
@@ -1676,9 +1745,9 @@ func _dev_screen(which: String) -> void:
 func _scene_overlay(path: String, args: Dictionary) -> CanvasLayer:
 	var place := P0LoadingLayer.destination(path, args)
 	if place == "": return null
-	var shot := P0SysScreen.blurred_screen(get_viewport())
-	_arrive = {path = path, place = place, shot = shot, t0 = Time.get_ticks_msec()}
-	return P0LoadingLayer.new(place, shot, path, args)
+	# The town map stands in for the screen being left (the user 11-06): no read back of the screen from the GPU.
+	_arrive = {path = path, place = place, icon = P0LoadingLayer.icon_for(path, args), progress = 1.0, t0 = Time.get_ticks_msec()}
+	return P0LoadingLayer.new(place, null, path, args)
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
@@ -1949,10 +2018,7 @@ func _dev_shot(dt: float) -> void:
 			"biteboard": ui.open_bite_board(P0Outposts.by_role("tackle"))   # the home tackle shop's Bite Board (its keeper's line)
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
-			"barterpress":   # barterpress:stone — that mineral's Barter key in the open market drawer (q(166) shots)
-				var row := ui.root.find_child("Barter_" + step[1], true, false) as UiShopRow
-				if row and row.buy: row.buy.activated.emit()
-			"scrollto":   # scrollto:Barter — the scroll holding that node brings it to its top (q(166) shots)
+			"scrollto":   # scrollto:<node name> — the scroll holding that node brings it to its top (q(166) shots)
 				var at := ui.root.find_child(step[1], true, false) as Control
 				var sc: Node = at.get_parent() if at else null
 				while sc != null and not (sc is ScrollContainer): sc = sc.get_parent()
@@ -2080,8 +2146,13 @@ func _dev_shot(dt: float) -> void:
 					var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
 					ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
 			"measure": print("P0_MEASURE ", JSON.stringify(measure_actor()))   # the player's height on screen (camera unification)
+			"goto":   # goto:stand_lena — a room's player stood at that anchor, facing its way (SGODOT-216 shots)
+				if is_instance_valid(world) and world.has_method("anchor") and world.call("anchor", step[1]) != null:
+					var m: Marker3D = world.call("anchor", step[1])
+					world.actor.teleport(m.global_position)
+					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
-			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
+			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|sceneslow|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
 				var wb := ui.workbench()
 				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()
@@ -2091,8 +2162,8 @@ func _dev_shot(dt: float) -> void:
 			"showmap":   # showmap:pond:pond_san_francisco_03 — what Today's Show on map does (int9 S1)
 				ui.close_modal()
 				ui.show_on_map.emit(":".join(step.slice(1)))
-			"newrun": P0MaterialCards.open_new_run(ui, session.current(), func(c: Dictionary): session.send(c))   # MINE-P0-7
-			"lockedspot": P0MaterialCards.open_locked_spot(ui, session.current(), step[1] if step.size() > 1 else "spot_clay_bank")   # MAT-3
+			"mine":   # mine:wd-dev-quarry[:20] — into that mine (355 b1, contract-efg §11: the development mines need no Day Pass)
+				enter_mine(step[1], int(step[2]) if step.size() > 2 else 1)
 			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
 				ui.close_modal()
 				ui.show_spot.emit(step[1])

@@ -4,24 +4,13 @@ extends GdUnitTestSuite
 
 func _view() -> Dictionary:
 	return {"energy": {"value": 120, "max": 200}, "rest": {"used": 0, "limit": 1, "amount": 60, "away_ready_in": 0},
-		"stall": {"board": {"requests": []}}, "bag": {"slots": []}, "homestead": {"level": 1},
-		"gather": {"spots": [
-			{"id": "spot_grove", "name": "Timber Grove", "open": true, "ready": true},
-			{"id": "spot_reed_bank", "name": "Reed Bank", "open": true, "ready": false, "ready_in": 7800000},
-			{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2}]}}
-
-func _spot(v: Dictionary, id: String) -> Dictionary:
-	for m in P0MaterialLogic.gather_marks(v):
-		if str(m.id) == id: return P0WorldPrompts.spot(v, m)
-	return {}
+		"stall": {"board": {"requests": []}}, "bag": {"slots": []}, "homestead": {"level": 1}}
 
 func test_the_open_one_strips_the_rest_show_buttons_within_8_m_or_with_a_state() -> void:
 	var plain := P0WorldPrompts.workbench()
 	assert_int(P0WorldPrompts.show("workbench", "workbench", 2.0, plain)).is_equal(P0WorldPrompts.Show.BAR)
 	assert_int(P0WorldPrompts.show("workbench", "stall", 7.9, plain)).is_equal(P0WorldPrompts.Show.ICON)
 	assert_int(P0WorldPrompts.show("workbench", "", 8.1, plain)).is_equal(P0WorldPrompts.Show.NONE)
-	var ready := _spot(_view(), "spot_grove")
-	assert_int(P0WorldPrompts.show("spot_grove", "", 25.0, ready)).is_equal(P0WorldPrompts.Show.ICON)   # LOCK-11 from afar
 	var plaque := P0WorldPrompts.plaque({})
 	assert_int(P0WorldPrompts.show("plaque", "", 1.0, plaque)).is_equal(P0WorldPrompts.Show.NONE)   # no mark, ever
 	assert_int(P0WorldPrompts.show("plaque", "plaque", 1.0, plaque)).is_equal(P0WorldPrompts.Show.BAR)
@@ -93,27 +82,7 @@ func test_the_bench_reads_what_resting_gives_and_dims_when_it_cannot() -> void:
 		p = P0WorldPrompts.bench(v)
 		assert_array([p.text, p.fact, p.status, p.dimmed]).is_equal(["+60 Energy", "", -1, false])
 
-func test_a_spot_names_itself_with_at_most_one_fact() -> void:
+func test_no_prompt_says_tap() -> void:   # the farm's gathering spots left with v4q(4) ①
 	var v := _view()
-	var grove := _spot(v, "spot_grove")
-	assert_array([grove.text, grove.fact, grove.status]).is_equal(["Timber Grove", "", UiStatusBadge.State.READY])
-	assert_object(grove.icon).is_same(P0Logic.icon("wood"))
-	var reeds := _spot(v, "spot_reed_bank")
-	assert_array([reeds.text, reeds.fact, reeds.status]).is_equal(["Reed Bank", "Ready in 2h 10m", -1])
-	var clay := _spot(v, "spot_clay_bank")
-	assert_array([clay.text, clay.fact, clay.status]).is_equal(["Clay Bank", "Homestead Lv2", UiStatusBadge.State.LOCKED])
-	for p in [grove, reeds, clay, P0WorldPrompts.workbench(), P0WorldPrompts.stall(v), P0WorldPrompts.bench(v)]:
+	for p in [P0WorldPrompts.workbench(), P0WorldPrompts.stall(v), P0WorldPrompts.bench(v)]:
 		assert_bool(str(p.text).contains("Tap")).is_false()
-
-## The mine mouth without an unfinished run (231, 不知火舞 on 235): the plain pickaxe button within 8 m, open `The mine` ·
-## `Runs today 0/2` (2/2 once used up); no state, so nothing from afar.
-func test_the_mine_names_itself_with_todays_runs() -> void:
-	var v := {"mine": {"run": null, "runs": {"used": 0, "limit": 2}}}
-	var mine := P0WorldPrompts.mine(v)
-	assert_array([mine.text, mine.fact, mine.status]).is_equal(["The mine", "Runs today 0/2", -1])
-	assert_object(mine.icon).is_same(P0Logic.icon("pickaxe"))
-	assert_int(P0WorldPrompts.show("mine", "", 7.5, mine)).is_equal(P0WorldPrompts.Show.ICON)
-	assert_int(P0WorldPrompts.show("mine", "", 12.0, mine)).is_equal(P0WorldPrompts.Show.NONE)
-	assert_int(P0WorldPrompts.show("mine", "mine", 2.0, mine)).is_equal(P0WorldPrompts.Show.BAR)
-	v.mine.runs.used = 2
-	assert_str(P0WorldPrompts.mine(v).fact).is_equal("Runs today 2/2")

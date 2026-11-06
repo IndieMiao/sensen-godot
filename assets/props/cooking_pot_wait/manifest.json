@@ -1,0 +1,95 @@
+{
+  "added_render_materials": 2,
+  "bounds_rest": {
+    "position": [
+      -0.140000000596046,
+      0.0,
+      -0.10700000077486
+    ],
+    "size": [
+      0.280000001192093,
+      0.241999998688698,
+      0.21399998664856
+    ]
+  },
+  "check_count": 319,
+  "errors": [],
+  "max_body_bounce_m": 0.00200000032782555,
+  "max_lid_front_lift_m": 0.0172247233390808,
+  "max_lid_pivot_lift_m": 0.0143999996185303,
+  "opaque_materials": [
+    "SoupAndFoam_MatteVertexColour"
+  ],
+  "steam_all_five_overlap_bound": 0.454083288447724,
+  "steam_peak_single_particle_alpha": 0.35,
+  "steam_triangles": 10,
+  "surfaces_excluding_steam": 8,
+  "triangles_excluding_steam": 2028,
+  "animations": {
+    "tumble": {
+      "duration_s": 1.8,
+      "loop": true
+    },
+    "idle": {
+      "duration_s": 1.0,
+      "loop": true
+    }
+  },
+  "origin": "bottom centre; Y up; +Z front; metres",
+  "render_materials": 2,
+  "source_glb": "../stove_pot/stove_pot.glb",
+  "source_glb_sha256": "04f6faee84c5f25629ce57d4bb884763ca3897dc87df9ac58b04bfc70a5d78ab",
+  "steam_node": "PotRig/StovePot/pot_big/lid/Steam",
+  "autoplay": "",
+  "revision": "v1.2 / Steam only; invisible on lid, warm white above lid",
+  "steam_lifetime_s": 1.8,
+  "steam_spread_degrees": 0,
+  "steam_initial_velocity_m_s": [
+    0.11,
+    0.11
+  ],
+  "steam_colour_srgb": "#FFF8F0",
+  "steam_fade_start_rise_m": 0.0989999994635582,
+  "steam_screen_mask": "alpha is zero at/below projected lid upper edge",
+  "steam_total_rise_m": 0.197999998927116,
+  "overlay_review_v11_historical": {
+    "camera_horizontal_fov_degrees": 39.9252510070801,
+    "camera_pitch_degrees": 62,
+    "camera_position_m": [
+      0.0,
+      0.529768526554108,
+      0.194202929735184
+    ],
+    "camera_projection": "perspective",
+    "fixture": "Isolated transparent 200x180 SubViewport; warm upper-left fixture light; no kitchen/cooking UI or runtime integration",
+    "layer_position": [
+      80,
+      150
+    ],
+    "layer_size": [
+      200,
+      180
+    ],
+    "max_body_vertex_screen_displacement_px": 0.814380824565887,
+    "max_lid_vertex_screen_displacement_px": 8.19104671478271,
+    "mouth_px": [
+      180.0,
+      235.000015258789
+    ],
+    "pot_width_px": 180.0,
+    "ring_radius_px": 60,
+    "transparent": true,
+    "viewport": [
+      360,
+      800
+    ],
+    "whole_with_conservative_steam_envelope_px": [
+      89.6273498535156,
+      169.2919921875,
+      180.745300292969,
+      153.992584228516
+    ]
+  },
+  "steam_visual_script": "steam_lid_clearance.gd",
+  "steam_material": "steam.tres / steam_clear_lid.gdshader"
+}

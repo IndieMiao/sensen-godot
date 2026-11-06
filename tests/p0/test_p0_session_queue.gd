@@ -13,7 +13,7 @@ func before_test() -> void:
 	session.view = {"seq": 7}
 
 func _reply(state_seq: int, ok := true, code := "") -> void:
-	var data := {"ok": ok, "state": {"seq": state_seq}}
+	var data := {"ok": ok, "state": {"seq": state_seq, "save_version": 7}}
 	if not ok: data["code"] = code
 	session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify(data).to_utf8_buffer(), sent[-1].cmd)
 
@@ -96,6 +96,38 @@ func test_a_space_entered_while_a_read_is_out_reads_again_with_it() -> void:
 	_reply(8)
 	assert_int(sent.size()).is_equal(2)   # once
 
+# preview B ② (奕星 11-05): a ladder's reply lost, the floor reached and paid on the server; the player stayed on the
+# floor until a tap 20 s later. The session reads what the server did as soon as the command has failed.
+func test_a_command_whose_reply_was_lost_reads_what_the_server_did() -> void:
+	var settled := []
+	session.command_settled.connect(func(k, ok, code): settled.append([k, ok, code]))
+	session.send({"type": "mine_floor", "to": 11, "via": "ladder"}, "mine_move")
+	assert_bool(session.send({"type": "mine_floor", "to": 11, "via": "ladder"}, "mine_move")).is_false()   # a tap again
+	_fail()
+	assert_array(settled).contains_exactly([["mine_move", false, "network"]])
+	assert_int(sent.size()).is_equal(2)
+	assert_str(str(sent[1].path)).is_equal("/p0/state")
+	_reply(9)
+	assert_int(int(session.view.seq)).is_equal(9)
+	assert_int(sent.size()).is_equal(2)   # once
+	assert_bool(session.send({"type": "mine_floor", "to": 12, "via": "ladder"}, "mine_move")).is_true()
+
+func test_after_a_lost_reply_waiting_world_actions_go_first_then_the_read_and_a_failed_read_is_not_read_again() -> void:
+	session.send({"type": "sow", "plot": 3, "seed": "seed_radish"})
+	session.send({"type": "collect"})
+	_fail()
+	assert_str(str(sent[1].cmd.type)).is_equal("collect")
+	_reply(8)
+	assert_str(str(sent[2].path)).is_equal("/p0/state")
+	_fail()
+	assert_int(sent.size()).is_equal(3)
+
+func test_a_blocked_reply_reads_nothing_more() -> void:
+	session.send({"type": "sow", "plot": 3, "seed": "seed_radish"})
+	var body := JSON.stringify({"code": "maintenance"}).to_utf8_buffer()
+	session._finish(HTTPRequest.RESULT_SUCCESS, 503, body, sent[-1].cmd)
+	assert_int(sent.size()).is_equal(1)   # the runtime's maintenance screen checks again on its own
+
 func test_a_read_queued_behind_a_failed_one_is_dropped() -> void:
 	session.refresh()
 	session.space = "home"
@@ -156,9 +188,13 @@ func test_ack_failure_discards_the_queued_build_until_an_explicit_retry() -> voi
 	session.guide_ack("t_city")
 	session.send({"type": "choose_home", "city": "gn-1850147", "spot": 0}, "build")
 	_fail()
-	assert_int(sent.size()).is_equal(1)
-	assert_bool(session.guide_ack("t_city")).is_true()
 	assert_int(sent.size()).is_equal(2)
+	assert_str(str(sent[1].path)).is_equal("/p0/state")   # what the lost ack did, not the build
+	var still := _guided({"seq": 7, "save_version": 7})   # the ack had not gone through
+	session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify({"ok": true, "state": still}).to_utf8_buffer(), {})
+	assert_int(sent.size()).is_equal(2)
+	assert_bool(session.guide_ack("t_city")).is_true()
+	assert_int(sent.size()).is_equal(3)
 
 func test_a_resolved_row_deadline_also_queues_one_refresh() -> void:
 	session.view = {"guide": {"step": "t_harvest_quick", "row": {"countdown": "crop_quick_radish", "ready_in": 3000}}}

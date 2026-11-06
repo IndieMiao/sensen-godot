@@ -6,6 +6,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 ## seats walk to the nearest free one, sit, skip seats other players hold, and the joystick stands up.
 
 const OutpostScript := preload("res://scenes/p0/p0_outpost.gd")
+const P0MapScript := preload("res://scenes/p0/p0_map.gd")
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 const ShopArt := preload("res://scenes/coffee_shop/coffee_shop_art.gd")
 
@@ -19,6 +20,10 @@ class Sample extends "res://scenes/p0/p0_outpost.gd":
 		used.append(n)
 		arrived[n] = actor.position
 		super._on_facility(n)
+
+## An outpost's anchors as its room has them: its kit's layout, then its anchors file (same name replaces).
+func _anchors_of(o: Dictionary) -> Array:
+	return P0RoomAnchors.merge(P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % str(o.art)), P0RoomAnchors.read_json(str(o.anchors)))
 
 func _room(id: String, phone := false) -> Sample:
 	var r := Sample.new()
@@ -47,7 +52,7 @@ func _tap(r: P0Room, n: String) -> void:
 func test_the_outpost_table_and_anchor_files_agree() -> void:
 	assert_int(P0Outposts.all().size()).is_equal(5)   # the home set's four and the card room (SGODOT-351)
 	for o in P0Outposts.all():
-		var anchors: Array = P0RoomAnchors.read_json(str(o.anchors)).get("anchors", [])
+		var anchors := _anchors_of(o)
 		var names := anchors.map(func(a): return str(a.name))
 		assert_array(names).override_failure_message(str(o.id) + " spawn / exit").contains(["spawn", "exit"])
 		assert_array(names.filter(func(n): return n.begins_with("seat_"))).override_failure_message(str(o.id) + " seats").is_equal(o.seats)
@@ -171,7 +176,8 @@ func test_seats_other_players_hold_are_skipped() -> void:
 	online.transport = func(m): sent.append(m)
 	r.attach_online(online)
 	online._message(JSON.stringify({"t": "joined", "room": 1, "self": 1, "epoch": 2}))
-	online._message(JSON.stringify({"t": "roster", "members": [{"id": 1, "player": "me-0000001", "seat": ""}, {"id": 2, "player": "them-000002", "seat": "seat_table1_1"}]}))
+	online._message(JSON.stringify({"t": "roster", "members": [{"id": 1, "player": "me-0000001", "seat": ""}, {"id": 2, "player": "them-000002", "seat": "seat_table1_1"},
+		{"id": 3, "player": "them-000003", "seat": "seat_table1_3"}]}))   # the tea house's tables seat three (SGODOT-216)
 	assert_array(r._free_seats("seat_table1_").map(func(m): return str(m.name))).is_equal(["seat_table1_2"])
 	_tap(r, "use_tea_table_1")
 	_walk_until_idle(r)
@@ -318,10 +324,10 @@ func test_room_prompts_are_names_and_icons_only() -> void:
 	assert_bool(ama.has("text")).is_false()
 	assert_float((ama.head as Vector3).y).is_greater(tea.anchor("npc_keeper").global_position.y + 1.5)   # over the head
 	assert_array(tea.npcs.npc_keeper.root.find_children("*", "Label3D", true, false)).is_empty()
-	for table in ["use_tea_table_1", "use_tea_table_2"]:
+	for table in ["use_tea_table_1", "use_tea_table_2", "use_tea_table_3", "use_bench"]:   # the tea house kit's (SGODOT-216)
 		assert_dict(tea._marker(table, {})).override_failure_message(table).contains_keys(["icon"])
 		assert_str(str(tea._marker(table, {}).get("kind", ""))).override_failure_message(table).is_equal("seat")
-	assert_bool(tea._tappable().has("use_bench")).is_false()   # the Coffee Shop has no bench (不知火舞 on 227)
+	assert_bool(tea._tappable().has("use_bench")).is_true()   # its window bench (the Coffee Shop had none, 不知火舞 on 227)
 	var door: Dictionary = tea._marker("exit", {})
 	assert_str(str(door.get("kind", ""))).is_equal("facility")
 	assert_str(str(door.get("name", ""))).is_equal("Map")
@@ -506,19 +512,23 @@ func test_an_open_counter_pushes_in_on_the_keeper_above_the_drawer() -> void:
 ## Scene integration (SGODOT-227, 不知火舞's walkthrough on 227): the tea house opens on the Coffee Shop kit with the
 ## background of its signed render and every anchor of its file. Its view is the player's scale now (用户 2026-10-09),
 ## which supersedes 227's "whole art centred, ≥ 16 px clear": test_every_outpost_opens_on_its_kit checks the framing.
-func test_the_tea_house_opens_on_the_coffee_shop_kit() -> void:
+## SGODOT-216: on its own kit since (上官婉儿 #598): the kit's every anchor (three tea tables of three, the window
+## bench, the name sign), its review background, its camera planes (0.1 / 40, 上官婉儿).
+func test_the_tea_house_opens_on_its_own_kit() -> void:
 	var r := _room("sh_tea_1")
-	assert_str(r.layout_path).is_equal("res://assets/rooms/coffee_shop/layout.json")
-	assert_str((r.art.get_script() as Script).resource_path).is_equal("res://scenes/coffee_shop/coffee_shop_art.gd")
-	var clear := r.environment.background_color.srgb_to_linear()   # the plate's top colour, as it shows on screen
-	assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).is_equal("e6f5f1")
-	for a in P0RoomAnchors.read_json(str(P0Outposts.find("sh_tea_1").anchors)).anchors:
+	assert_str(r.layout_path).is_equal("res://assets/rooms/tea_house/layout.json")
+	assert_str((r.art.get_script() as Script).resource_path).is_equal("res://scenes/tea_house/tea_house_art.gd")
+	var clear := r.environment.background_color.srgb_to_linear()   # its signed render's plate, as it shows on screen (上官婉儿)
+	assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).is_equal("dde8e7")
+	for a in _anchors_of(P0Outposts.find("sh_tea_1")):
 		assert_object(r.anchor(str(a.name))).override_failure_message(str(a.name)).is_not_null()
+	for s in ["seat_table3_3", "seat_bench_3", "sign_name"]: assert_object(r.anchor(s)).override_failure_message(s).is_not_null()
+	assert_vector(Vector2(r.cam.near, r.cam.far)).is_equal(Vector2(0.1, 40.0))
 
 ## Every chair of both tea tables can be walked to from the door: the player arrives on the floor beside it (not
 ## sat there by a failed path) and sits on it.
 func test_every_tea_seat_is_walked_to_from_the_door() -> void:
-	for s in ["seat_table1_1", "seat_table1_2", "seat_table2_1", "seat_table2_2"]:
+	for s in P0Outposts.find("sh_tea_1").seats:   # all twelve, the third table's and the bench's too (SGODOT-216)
 		var r := _room("sh_tea_1")
 		var beside := P0RoomNav.nearest_walkable(r.bp, r.anchor(s).global_position)
 		r.walk_to(s)
@@ -526,12 +536,14 @@ func test_every_tea_seat_is_walked_to_from_the_door() -> void:
 		assert_str(r.seat).override_failure_message(s).is_equal(s)
 		assert_float(P0Room._flat_distance(r.arrived[s], beside)).override_failure_message(s + " walked there").is_less(P0Room.REACH_M + 0.05)
 
-func test_the_second_tea_table_seats_on_its_door_side_chair() -> void:
+func test_a_tea_table_seats_on_its_nearest_free_stool() -> void:
 	var r := _room("sh_tea_1")
 	assert_str(str(r._marker("use_tea_table_2", {}).get("kind", ""))).is_equal("seat")
+	var near := r._free_seats("seat_table2_")
+	near.sort_custom(func(a, b): return P0Room._flat_distance(a.global_position, r.actor.position) < P0Room._flat_distance(b.global_position, r.actor.position))
 	_tap(r, "use_tea_table_2")
 	_walk_until_idle(r, 10.0)
-	assert_str(r.seat).is_equal("seat_table2_1")
+	assert_str(r.seat).is_equal(str(near[0].name))   # three stools a table on the tea house kit (SGODOT-216)
 
 ## The tea house door is at the front steps: walking out there from inside leaves for the map.
 func test_the_tea_house_door_is_at_the_front_and_leaves() -> void:
@@ -545,15 +557,16 @@ func test_the_tea_house_door_is_at_the_front_and_leaves() -> void:
 	_walk_until_idle(r, 10.0)
 	assert_int(left[0]).is_equal(1)
 
-## A front door's prompt (badge_exit) sits on the steps, below the player who comes in, and is picked there: 1.1 m
-## over the threshold it covered the player at the Coffee Shop's spawn (sample shots on 227). Tapping the player is
-## not tapping the door.
+## A front door's prompt (badge_exit) keeps clear of the player who comes in, and is picked there: 1.1 m over the
+## threshold it covered the player at the Coffee Shop's spawn (sample shots on 227). The tea house kit's badge_exit
+## stands by the landing (SGODOT-216): beside the player at spawn, not on them. Tapping the player is not tapping the door.
 func test_the_front_door_prompt_sits_on_the_steps_clear_of_the_player() -> void:
 	var r := _room("sh_tea_1")
 	var feet := r.cam.unproject_position(r.actor.position)
 	var head := r.cam.unproject_position(r.actor.position + Vector3(0, 1.75, 0))
 	var prompt := r.cam.unproject_position(r.pick_point("exit"))
-	assert_float(prompt.y - feet.y).override_failure_message("prompt %s, feet %s" % [prompt, feet]).is_greater(10.0)
+	var on_body := absf(prompt.x - feet.x) < 25.0 and prompt.y > head.y - 12.0 and prompt.y < feet.y + 10.0
+	assert_bool(on_body).override_failure_message("prompt %s, head %s, feet %s" % [prompt, head, feet]).is_false()
 	assert_str(r.pick(prompt)).is_equal("exit")
 	assert_str(r.pick((feet + head) * 0.5)).is_not_equal("exit")
 	assert_object(r.anchor("badge_exit")).is_not_null()
@@ -579,7 +592,7 @@ func test_a_tapped_prompt_goes_to_its_own_anchor() -> void:
 
 ## The tea house lights as the Coffee Shop was signed off (SGODOT-227 美术决定 2b53b84d): review ambient, sun and its
 ## three lamps in scene metres, the kit's angular distance, and the screen-calibrated two-colour backdrop.
-func test_the_tea_house_lights_as_the_coffee_shop_was_signed() -> void:
+func test_the_tea_house_lights_as_its_kit_was_signed() -> void:
 	var r := _room("sh_tea_1")
 	var review: Dictionary = r.layout.review_lighting
 	assert_str(r.environment.ambient_light_color.to_html(false)).is_equal(str(review.ambient_color).to_lower())
@@ -587,31 +600,33 @@ func test_the_tea_house_lights_as_the_coffee_shop_was_signed() -> void:
 	var sun := r.room.get_node("RoomSun") as DirectionalLight3D
 	assert_str(sun.light_color.to_html(false)).is_equal(str(review.sun_color).to_lower())
 	assert_float(sun.light_energy).is_equal_approx(float(review.sun), 0.001)
-	assert_float(sun.light_angular_distance).is_equal_approx(4.5, 0.001)
+	assert_float(sun.light_angular_distance).is_equal_approx(float(r.layout.get("lighting", {}).get("angular_distance", 1.4)), 0.001)   # the kit's
 	var lamps := r.room.find_children("ReviewLamp*", "OmniLight3D", false, false)
 	assert_int(lamps.size()).is_equal((review.points as Array).size())
 	for i in lamps.size():
 		var p: Array = review.points[i].position
 		assert_vector((lamps[i] as OmniLight3D).global_position).is_equal_approx(r.room.position + Vector3(p[0], p[1], p[2]), Vector3.ONE * 0.001)
 	assert_array(r.room.find_children("HearthGlow", "OmniLight3D", false, false)).is_empty()   # no hearth here
-	var mat := (r.cam.get_node("Backdrop") as MeshInstance3D).material_override as ShaderMaterial
+	# the plate sampled from its signed 43° render (上官婉儿: one colour, DDE8E7), inside the 40 m far plane
+	var plate := r.cam.get_node("Backdrop") as MeshInstance3D
+	var mat := plate.material_override as ShaderMaterial
 	assert_object(mat).is_not_null()
-	assert_str(P0Room.aces_screen(mat.get_shader_parameter("top_input")).to_html(false)).is_equal("e6f5f1")
-	assert_str(P0Room.aces_screen(mat.get_shader_parameter("bottom_input")).to_html(false)).is_equal("fffbee")
-	assert_vector(mat.get_shader_parameter("blend")).is_equal(Vector2(0.5, 0.85))
+	assert_str(P0Room.aces_screen(mat.get_shader_parameter("top_input")).to_html(false)).is_equal("dde8e7")
+	assert_str(P0Room.aces_screen(mat.get_shader_parameter("bottom_input")).to_html(false)).is_equal("dde8e7")
+	assert_float(-plate.position.z).is_less(r.cam.far)
 
 ## Scene integration (SGODOT-227): every outpost opens on its own kit with every anchor of its file and the background
 ## sampled from its signed render; its view shows the player at the farm's scale, pans across inside its art and holds
 ## down in the free band (用户 2026-10-09, 不知火舞 on 226; superseding 227's whole-art opening); the door's prompt is
 ## clear of the player who comes in.
 func test_every_outpost_opens_on_its_kit() -> void:
-	var kits := {"sh_tackle_1": "tackle_shop", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
+	var kits := {"sh_tackle_1": "tackle_shop", "sh_tea_1": "tea_house", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
 	for id in kits:
 		var o := P0Outposts.find(id)
 		var r := _room(id, true)
 		assert_str(str(o.art)).is_equal(kits[id])
 		assert_str(r.layout_path).override_failure_message(id).is_equal("res://assets/rooms/%s/layout.json" % kits[id])
-		for a in P0RoomAnchors.read_json(str(o.anchors)).anchors:
+		for a in _anchors_of(o):
 			assert_object(r.anchor(str(a.name))).override_failure_message("%s %s" % [id, a.name]).is_not_null()
 		var clear := r.environment.background_color.srgb_to_linear()
 		assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).override_failure_message(id).is_equal(str(o.backdrop.top).to_lower())
@@ -873,7 +888,7 @@ func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 	# Tomo's, Theo's and Nadia's hair take all three subtropical market sets: the given one stays
 	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo", "res_theo", "res_nadia"])).is_equal("market_subtropical_2")
 	P0CityPlaces.accept("gn-testlena", {"detail": {"outposts": [{"id": "gn-testlena~tea0", "role": "tea", "name": "Test Tea House",
-		"art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
+		"art": "tea_house", "anchors": "res://assets/p0/outposts/tea_house.anchors.json", "category": "Tea house", "lat": 1.0,
 		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": "tea_subtropical_2"},
 		"residents": ["res_hana", "res_lena"]}]}})
 	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_0")
@@ -1010,5 +1025,62 @@ func test_every_placed_resident_has_a_look_and_a_spot_in_its_rooms() -> void:
 		var spot := str(npcs[id].get("anchor", ""))
 		for kind in kinds[id]:
 			var file := str(rooms[kind].get("client_anchors", rooms[kind].anchors))   # this client's own, where it has one (#404)
-			var names: Array = P0RoomAnchors.read_json(file).get("anchors", []).map(func(a): return str(a.name))
+			# as the room has them: its kit's layout, then that file (the tea house kit's are in its layout, SGODOT-216)
+			var kit := P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % str(rooms[kind].get("client_art", rooms[kind].art)))
+			var names: Array = P0RoomAnchors.merge(kit, P0RoomAnchors.read_json(file)).map(func(a): return str(a.name))
 			assert_array(names).override_failure_message("%s has no %s in the %s room" % [id, spot, kind]).contains([spot, spot.replace("npc_", "stand_")])
+
+## SGODOT-216 (上官婉儿): a kit's own camera planes when its layout.camera gives them, else the review ones.
+func test_a_kits_camera_planes_come_from_its_layout() -> void:
+	var review := {"sun": 1.0, "ambient": 0.5}
+	assert_vector(P0Room.camera_clip({"near": 0.1, "far": 40}, review)).is_equal(Vector2(0.1, 40.0))
+	assert_vector(P0Room.camera_clip({"size": 6.72}, review)).is_equal(P0Room.review_clip(review))
+	assert_vector(P0Room.camera_clip({}, {})).is_equal(P0Room.review_clip({}))
+
+## The name sign (SGODOT-216; 不知火舞 216 5759f002, ce290834): the place's own word as its map pin has it, on the kit's
+## sign_name board, walnut ink, no outline, one-sided, alpha cut; the tackle shop's board too (奕星). One line at 55 % of
+## the board's height, shrunk to fit the width less 6 % a side, down to 35 %; then two lines at the middle space.
+func test_the_name_sign_is_written_on_its_board() -> void:
+	var r := _room("sh_tea_1")
+	var label := r.anchor("sign_name").get_node("SignText") as Label3D
+	assert_str(label.text).is_equal("Oak")
+	assert_str(label.modulate.to_html(false)).is_equal("4a3424")
+	assert_int(label.outline_size).is_equal(0)
+	assert_bool(label.double_sided).is_false()
+	assert_int(label.alpha_cut).is_equal(Label3D.ALPHA_CUT_DISCARD)
+	assert_object(_room("sh_tackle_1").anchor("sign_name").get_node_or_null("SignText")).is_not_null()
+	var font: Font = label.font
+	var board := Vector2(1.04, 0.26)
+	assert_float(float(OutpostScript.sign_fit("Oak Tea House", font, board).cap)).is_equal_approx(0.26 * 0.55, 0.0001)   # `Oak`: full size
+	assert_str(str(OutpostScript.sign_fit("Union Square Travel Post", font, board).text)).is_equal("Union Square")   # the pin's
+	for name in ["Lotus Tea House", "Willowbrook Tea House", "Stonebridge Tackle Shop"]:
+		var fit := OutpostScript.sign_fit(name, font, board)
+		var cap := float(fit.cap)
+		assert_float(cap).override_failure_message(name).is_between(0.26 * 0.35 - 0.0001, 0.26 * 0.55 + 0.0001)
+		assert_str(str(fit.text)).override_failure_message(name).is_equal(P0MapScript.short_name(name))
+		var wide := font.get_string_size(str(fit.text), HORIZONTAL_ALIGNMENT_LEFT, -1, OutpostScript.SIGN_FONT_PX).x * cap / (OutpostScript.SIGN_FONT_PX * OutpostScript.CAP_OF_EM)
+		assert_float(wide).override_failure_message(name).is_less_equal(1.04 * 0.88 + 0.0001)
+	var two := OutpostScript.sign_fit("Grand Old Willowbrook Tea House", font, board)   # its own words too long for one line
+	assert_str(str(two.text)).is_equal("Grand Old\nWillowbrook")
+	assert_float(float(two.cap)).is_less_equal(0.26 * 0.35 + 0.0001)
+	var per_cap := 1.0 / (OutpostScript.SIGN_FONT_PX * OutpostScript.CAP_OF_EM)
+	assert_float(2.0 * font.get_height(OutpostScript.SIGN_FONT_PX) * per_cap * float(two.cap)).is_less_equal(0.26 + 0.0001)   # both lines on the board (周瑜 on #692)
+
+## The S-tier trading post keeps the Coffee Shop (不知火舞 216 5759f002), which no hand-written outpost is on any more:
+## its walls, seats and backdrop are world.room.cabin's; a tea house from a server still naming the old kit opens the
+## tea house's room (the server falls back the same way).
+func test_a_trading_post_keeps_the_coffee_shop_and_a_tea_house_its_own_kit() -> void:
+	var cabin := P0CityPlaces.outpost_entry("gn-3925033", {"id": "gn-3925033~cabin0", "role": "post", "cabin": true,
+		"name": "Coral Trading Post", "art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json",
+		"category": "Trading post", "lat": 1.0, "lng": 1.0, "capacity": 12, "residents": []})
+	var room: Dictionary = P0Logic.content().world.room.cabin
+	assert_str(str(cabin.art)).is_equal("coffee_shop")
+	assert_str(str(cabin.anchors)).is_equal("res://assets/p0/outposts/cabin.anchors.json")
+	assert_array(cabin.bounds).is_equal(room.bounds)
+	assert_array(cabin.seats).is_equal(["seat_table1_1", "seat_table1_2", "seat_table2_1", "seat_table2_2"])
+	assert_str(str(cabin.backdrop.top)).is_equal("E6F5F1")
+	var old := P0CityPlaces.outpost_entry("gn-3925033", {"id": "gn-3925033~tea0", "role": "tea", "name": "Coral Tea House",
+		"art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
+		"lng": 1.0, "capacity": 12, "residents": []})
+	assert_str(str(old.art)).is_equal("tea_house")
+

@@ -3,9 +3,21 @@ import type { P0Content, Skill } from './content.js';
 import { homeFacts, type Homed } from './home.js';
 import type { P0State } from './state.js';
 
-/** §8.3.2: 200 + 10 × (Homestead Lv − 1). */
+/** v4q(1) ⑦: what a Homestead level adds to the Energy pool and the daily meal cap — one ladder for both
+ * (homestead.energy_steps, [from level, + a level]: Lv2–10 +10, Lv11 on +5, so Lv10 +90 and Lv17 +125). */
+export function levelEnergy(c: P0Content, level: number): number {
+  let add = 0;
+  for (let l = 2; l <= level; l++) {
+    let per = 0;
+    for (const [from, n] of c.homestead.energy_steps) if (l >= from) per = n;
+    add += per;
+  }
+  return add;
+}
+
+/** The Energy pool (v4q(1) ⑦): 200 + 10 a level to Lv10, then + 5 (Lv17 325). */
 export function maxEnergy(c: P0Content, s: P0State): number {
-  return c.energy.max_base + c.homestead.per_level.energy * (s.homestead.level - 1);
+  return c.energy.max_base + levelEnergy(c, s.homestead.level);
 }
 
 /** §3.4.6 Newcomer Blessing: the first 7 × 24 h after the account is created. */
@@ -18,9 +30,9 @@ export function regenMs(c: P0Content, s: P0State, now: number): number {
   return blessed(c, s, now) ? Math.round(c.energy.regen_ms / c.blessing.regen_mult) : c.energy.regen_ms;
 }
 
-/** §8.3.2: daily meals 200 + 10 × (Homestead Lv − 1), +100 under the Newcomer Blessing. */
+/** Daily meals (v4q(1) ⑦): the Energy pool's formula from cooking.food_cap, +100 under the Newcomer Blessing. */
 export function foodCap(c: P0Content, s: P0State, now: number): number {
-  return c.cooking.food_cap + c.homestead.per_level.meals * (s.homestead.level - 1) + (blessed(c, s, now) ? c.blessing.food_bonus : 0);
+  return c.cooking.food_cap + levelEnergy(c, s.homestead.level) + (blessed(c, s, now) ? c.blessing.food_bonus : 0);
 }
 
 /**

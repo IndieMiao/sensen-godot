@@ -18,44 +18,71 @@ func _plot(v: Dictionary, id: int) -> Dictionary:
 		if int(p.id) == id: return p
 	return {}
 
+## A plot by its [col, row] on the garden grid (content.garden.plots). _view()'s 12 beds (SGODOT-355 b1 order) are row 4,
+## cols 0–7, and row 3, cols 2–5.
+static func _at(col: int, row: int) -> int: return P0Garden.id_of(P0Garden.PLOT_ORIGIN + Vector2i(col, row) * 2)
+
+func _ids(v: Dictionary, front: int, dir: int) -> Array:
+	return P0Logic.row_plots(v, _plot(v, front), 6, dir).map(func(p): return int(p.id))
+
 func test_row_hoe_sows_three_plots_of_the_row_walking_way_first() -> void:
 	var v := _view()
-	var row := P0Logic.row_plots(v, _plot(v, 1), 6, 1)
-	assert_array(row.map(func(p): return int(p.id))).is_equal([1, 2, 3])
-	var a := P0Logic.main_action(v, _plot(v, 1), "seed_radish", row)
+	var row := P0Logic.row_plots(v, _plot(v, _at(2, 4)), 6, 1)
+	var three := [_at(2, 4), _at(3, 4), _at(4, 4)]
+	assert_array(row.map(func(p): return int(p.id))).is_equal(three)
+	var a := P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish", row)
 	assert_str(str(a.verb)).is_equal("Sow ×3")
 	assert_str(str(a.sub)).is_equal("6 Energy")
-	assert_that(a.cmd).is_equal({"type": "sow", "plots": [1, 2, 3], "seed": "seed_radish"})
-	# at the end of a row it turns back; rows never wrap (plot 6 starts the next row)
-	assert_array(P0Logic.row_plots(v, _plot(v, 5), 6, 1).map(func(p): return int(p.id))).is_equal([5, 4, 3])
-	assert_array(P0Logic.row_plots(v, _plot(v, 4), 6, -1).map(func(p): return int(p.id))).is_equal([4, 3, 2])
+	assert_that(a.cmd).is_equal({"type": "sow", "plots": three, "seed": "seed_radish"})
+	# at the end of a row it turns back
+	assert_array(_ids(v, _at(7, 4), 1)).is_equal([_at(7, 4), _at(6, 4), _at(5, 4)])
+	assert_array(_ids(v, _at(4, 4), -1)).is_equal([_at(4, 4), _at(3, 4), _at(2, 4)])
 
-## P1 (q(59) T15): with 40 plots the rows run on into plots 30–39 on the right (plot 5 → 30 → 31), and never past them.
-func test_row_hoe_crosses_into_the_new_columns_without_running_off_the_row() -> void:
+## The row ends where the open beds end (a bed still to open is no bed) and never runs on into the next row.
+func test_row_hoe_stops_at_the_open_beds_and_keeps_to_its_row() -> void:
 	var v := _view()
-	for id in [30, 31, 32]: v.plots.append({"id": id, "state": "tilled"})
-	assert_array(P0Logic.row_plots(v, _plot(v, 4), 6, 1).map(func(p): return int(p.id))).is_equal([4, 5, 30])
-	assert_array(P0Logic.row_plots(v, _plot(v, 31), 6, 1).map(func(p): return int(p.id))).is_equal([31, 30, 5])
-	assert_array(P0Logic.row_plots(v, _plot(v, 30), 6, -1).map(func(p): return int(p.id))).is_equal([30, 5, 4])
-	# row 1 ends at 11 before the new plots: 32 is its neighbour, not 12
-	assert_array(P0Logic.row_plots(v, _plot(v, 11), 6, 1).map(func(p): return int(p.id))).is_equal([11, 32, 10])
+	assert_array(_ids(v, _at(5, 3), 1)).is_equal([_at(5, 3), _at(4, 3), _at(3, 3)])    # (6, 3) is not open yet
+	assert_array(_ids(v, _at(2, 3), -1)).is_equal([_at(2, 3), _at(3, 3), _at(4, 3)])   # nor (1, 3)
+	assert_array(_ids(v, _at(0, 4), -1)).is_equal([_at(0, 4), _at(1, 4), _at(2, 4)])   # nor (−1, 4)
 
 func test_row_hoe_skips_plots_that_are_not_tilled_and_trims_to_seeds_and_energy() -> void:
 	var v := _view()
-	_plot(v, 2).state = "sown"
-	assert_array(P0Logic.row_plots(v, _plot(v, 1), 6, 1).map(func(p): return int(p.id))).is_equal([1, 0])
-	var row := P0Logic.row_plots(v, _plot(v, 3), 6, 1)
+	_plot(v, _at(4, 4)).state = "sown"
+	_plot(v, _at(1, 4)).state = "sown"
+	assert_array(_ids(v, _at(3, 4), 1)).is_equal([_at(3, 4), _at(2, 4)])
+	var row := P0Logic.row_plots(v, _plot(v, _at(5, 4)), 6, 1)
 	v.energy.value = 5   # covers two plots
-	var a := P0Logic.main_action(v, _plot(v, 3), "seed_radish", row)
+	var a := P0Logic.main_action(v, _plot(v, _at(5, 4)), "seed_radish", row)
 	assert_str(str(a.verb)).is_equal("Sow ×2")
-	assert_that(a.cmd).is_equal({"type": "sow", "plots": [3, 4], "seed": "seed_radish"})
+	assert_that(a.cmd).is_equal({"type": "sow", "plots": [_at(5, 4), _at(6, 4)], "seed": "seed_radish"})
 	v.energy.value = 1
-	var short := P0Logic.main_action(v, _plot(v, 3), "seed_radish", row)
+	var short := P0Logic.main_action(v, _plot(v, _at(5, 4)), "seed_radish", row)
 	assert_bool(bool(short.amber)).is_true()
 	assert_str(str(short.sub)).is_equal("Need 6 Energy")
 	v.energy.value = 200
 	v.bag.slots = [{"id": "seed_radish", "qty": 1}]
-	assert_that(P0Logic.main_action(v, _plot(v, 3), "seed_radish", row).cmd).is_equal({"type": "sow", "plot": 3, "seed": "seed_radish"})
+	assert_that(P0Logic.main_action(v, _plot(v, _at(5, 4)), "seed_radish", row).cmd).is_equal({"type": "sow", "plot": _at(5, 4), "seed": "seed_radish"})
+
+## SGODOT-355 b1 (不知火舞 on the grid, as q(130)): annuals stand on at most the level's Plots. A full field greys the key
+## with the count; its toast says what the next level adds (from the content ladder), only the count at the top; a Row
+## Hoe sows only the Plots left.
+func test_a_full_field_greys_sow_with_the_plots_count() -> void:
+	var v := _view()
+	v["homestead"] = {"level": 1}
+	v["garden"] = {"plots": 12, "fields": {"used": 8, "cap": 8}}
+	var a := P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish")
+	assert_that([a.verb, a.sub, a.enabled, a.toast]).is_equal(["Sow", "Plots 8/8", false, "Plots 8/8 · Homestead Lv2 adds 2"])
+	v.homestead.level = 15
+	v.garden.fields = {"used": 36, "cap": 36}
+	assert_str(str(P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish").toast)).is_equal("Plots 36/36 · Homestead Lv16 adds 3")
+	v.homestead.level = 17
+	v.garden.fields = {"used": 41, "cap": 41}
+	var top := P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish")
+	assert_that([top.sub, top.toast]).is_equal(["Plots 41/41", "Plots 41/41"])
+	v.garden.fields = {"used": 39, "cap": 41}   # two left: the Row Hoe's three trims to two
+	var row := P0Logic.row_plots(v, _plot(v, _at(2, 4)), 6, 1)
+	assert_that(P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish", row).cmd).is_equal(
+		{"type": "sow", "plots": [_at(2, 4), _at(3, 4)], "seed": "seed_radish"})
 
 func test_starter_hoe_sows_one() -> void:
 	var v := _view()

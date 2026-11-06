@@ -71,17 +71,20 @@ func test_seed_saver_is_lv10_and_floats_the_seed_it_gives_back() -> void:
 	var mixed := P0Runtime.seed_saver_line(v, [{"kind": "seed_saved", "id": "seed_radish"}, {"kind": "seed_saved", "id": "seed_carrot"}])
 	assert_str(str(mixed.text)).is_equal("Seed Saver · +2 seeds")
 
+## A plot by its [col, row] on the garden grid (content.garden.plots; the server tests' at()).
+static func _at(col: int, row: int) -> int: return P0Garden.id_of(P0Garden.PLOT_ORIGIN + Vector2i(col, row) * 2)
+
 ## Harvest All (Farming Lv9, q(118) ④): the key takes the ripe annuals of the row underfoot, `Harvest ×3`, this plot
 ## first; one ripe plot is still `Harvest`; below Lv9 always one.
 func test_harvest_all_takes_the_row_underfoot_from_lv9() -> void:
 	var v := {"skills": {"farming": {"level": 9}}, "garden": {"plots": 30}, "energy": {"value": 100}, "plots": [
-		{"id": 6, "state": "ready", "crop": "crop_radish"}, {"id": 8, "state": "ready", "crop": "crop_carrot"},
-		{"id": 9, "state": "growing", "crop": "crop_radish"}, {"id": 11, "state": "ready", "crop": "crop_radish"},
-		{"id": 12, "state": "ready", "crop": "crop_radish"}]}   # 6–11 are row 1; 12 is row 2
+		{"id": _at(1, 3), "state": "ready", "crop": "crop_radish"}, {"id": _at(3, 3), "state": "ready", "crop": "crop_carrot"},
+		{"id": _at(4, 3), "state": "growing", "crop": "crop_radish"}, {"id": _at(6, 3), "state": "ready", "crop": "crop_radish"},
+		{"id": _at(3, 2), "state": "ready", "crop": "crop_radish"}]}   # four on row 3; the last is row 2
 	var a := P0Logic.main_action(v, v.plots[1], "")
-	assert_that([a.verb, a.cmd]).is_equal(["Harvest ×3", {"type": "harvest", "plot": 8, "plots": [8, 6, 11]}])
+	assert_that([a.verb, a.cmd]).is_equal(["Harvest ×3", {"type": "harvest", "plot": _at(3, 3), "plots": [_at(3, 3), _at(1, 3), _at(6, 3)]}])
 	var one := P0Logic.main_action(v, v.plots[4], "")
-	assert_that([one.verb, one.cmd]).is_equal(["Harvest", {"type": "harvest", "plot": 12}])
+	assert_that([one.verb, one.cmd]).is_equal(["Harvest", {"type": "harvest", "plot": _at(3, 2)}])
 	v.skills.farming.level = 8
 	assert_str(str(P0Logic.main_action(v, v.plots[1], "").verb)).is_equal("Harvest")
 	assert_array(P0Logic.level_unlocks({"stall": {"buy": []}}, "farming", 9)).contains(["Harvest All"])
@@ -90,10 +93,12 @@ func test_harvest_all_takes_the_row_underfoot_from_lv9() -> void:
 ## both sides, the left one first.
 func test_harvest_all_goes_near_to_far_from_the_plot_in_front() -> void:
 	var v := {"skills": {"farming": {"level": 9}}, "garden": {"plots": 30}, "energy": {"value": 100}, "plots": []}
-	for id in [6, 7, 8, 9, 10, 11]: v.plots.append({"id": id, "state": "ready", "crop": "crop_radish"})
-	assert_array(P0Logic.harvest_row(v, v.plots[5])).is_equal([11, 10, 9, 8, 7, 6])   # from the right end
-	assert_array(P0Logic.harvest_row(v, v.plots[0])).is_equal([6, 7, 8, 9, 10, 11])   # from the left end
-	assert_array(P0Logic.harvest_row(v, v.plots[2])).is_equal([8, 7, 9, 6, 10, 11])   # from the middle: 7 before 9
+	var cols := [0, 1, 2, 3, 4, 5]   # row 3, left to right
+	for col in cols: v.plots.append({"id": _at(col, 3), "state": "ready", "crop": "crop_radish"})
+	var ids := func(order: Array) -> Array: return order.map(func(col): return _at(col, 3))
+	assert_array(P0Logic.harvest_row(v, v.plots[5])).is_equal(ids.call([5, 4, 3, 2, 1, 0]))   # from the right end
+	assert_array(P0Logic.harvest_row(v, v.plots[0])).is_equal(ids.call([0, 1, 2, 3, 4, 5]))   # from the left end
+	assert_array(P0Logic.harvest_row(v, v.plots[2])).is_equal(ids.call([2, 1, 3, 0, 4, 5]))   # from the middle: 1 before 3
 
 ## A fertiliser's bag card and buy row say what it does, NPC-2's words (不知火舞), not just how many.
 func test_fertiliser_cards_say_what_they_do() -> void:

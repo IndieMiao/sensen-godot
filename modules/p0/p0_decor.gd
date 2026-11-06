@@ -11,7 +11,6 @@ const REASONS := {"decor_outside": "Outside your yard", "decor_overlap": "Space 
 const NONE := Vector2i(-1, -1)
 ## "Ignore no piece": the server numbers pieces from 1, and the client's pending ones are negative (#265).
 const NO_PIECE := 0
-const MAX_LEVEL := 10
 
 static func items() -> Dictionary: return P0Logic.content().get("decor", {}).get("items", {})
 static func yard() -> Dictionary: return P0Logic.content().get("decor", {}).get("yard", {})
@@ -75,7 +74,7 @@ static func reason(view: Dictionary, id: String, at: Vector2i, rot := 0, ignore 
 ## The same for any cells against `t` (taken()): what a yard facility (the Compost Bin) is judged by too.
 static func reason_cells(view: Dictionary, cs: Array, t: Dictionary) -> String:
 	var y := yard()
-	var beds := P0Garden.plot_count(view)   # off the beds the homestead has beyond the field too (Lv7's 40–47, q(172))
+	var beds := P0Garden.plot_count(view)   # off the beds the homestead has beyond the field too (q(172))
 	for c in cs:
 		if not _rect(y.get("walk", [0, 0, 0, 0])).has_point(c) or _in_any(c, y.get("field", [])): return REASONS.decor_outside
 		var bed := P0Garden.id_of(c)
@@ -130,14 +129,21 @@ static func line(id: String) -> String:
 static func header_line(view: Dictionary) -> String:
 	return "Decor %d/%d · Goes to Farm Storage" % [used(view), cap(view)]
 
-## The cap reached, said where Decorate is entered (q(113) ①): `Decor 24/24 · Homestead Lv3 adds 4`, at Lv10
-## `Decor 56/56 · Store one to place this`.
-static func cap_line(view: Dictionary) -> String:
+## The cap at a Homestead level by content homestead.decor_max (the server's decorCap): base + per_level × (level − 1),
+## at most its `max` when it has one.
+static func cap_at(level: int, m: Dictionary = {}) -> int:
+	if m.is_empty(): m = P0Logic.content().get("homestead", {}).get("decor_max", {})
+	var n := int(m.get("base", 20)) + int(m.get("per_level", 4)) * maxi(0, level - 1)
+	return mini(n, int(m.max)) if m.has("max") else n
+
+## The cap reached, said where Decorate is entered (q(113) ①): `Decor 24/24 · Homestead Lv3 adds 4`; at the top level, or
+## once the next level adds none (decor_max.max), `Decor 56/56 · Store one to place this`.
+static func cap_line(view: Dictionary, m: Dictionary = {}) -> String:
 	var level := int(view.get("homestead", {}).get("level", 1))
 	var head := "Decor %d/%d" % [used(view), cap(view)]
-	if level >= MAX_LEVEL: return head + " · Store one to place this"
-	var per := int(P0Logic.content().get("homestead", {}).get("decor_max", {}).get("per_level", 4))
-	return head + " · Homestead Lv%d adds %d" % [level + 1, per]
+	var adds := cap_at(level + 1, m) - cap_at(level, m)
+	if level >= P0Logic.homestead_max(view) or adds <= 0: return head + " · Store one to place this"
+	return head + " · Homestead Lv%d adds %d" % [level + 1, adds]
 
 ## Today's free row while pieces wait in Farm Storage (q(111), 29e28d3f): `Place Flower Planter · in storage`, several
 ## kinds `Place 2 decor · in storage`; no red dot (q(107)). {} when nothing waits or the yard is full.

@@ -136,6 +136,9 @@ var pond_action := "Enter pond"
 var landmark_scenes := true
 ## (entry) -> bool: whether a POI is drawn (P0, q(212) ⑤: only in the cities explored, the fog's holes); unset = all.
 var poi_shown := Callable()
+## (entry) -> bool: whether a host place pin is drawn now (P0, SGODOT-355: a city's gathering spots only from a level
+## nearer than its overview, wild sites from the zoom the server sends them); unset = all. Not asked for the selected.
+var place_shown := Callable()
 var bottom_inset := 0.0: set = set_bottom_inset
 var list_panel: PanelContainer
 var list_rows: VBoxContainer
@@ -1124,11 +1127,13 @@ func _update_markers() -> void:
 	# 国家/省级视野只剩城市气泡与自己的头像：细节标记全部让出（带消失动画）。
 	var detail: bool = host.city_detail_visible()
 	var poi_gate := poi_shown.is_valid()
+	var place_gate := place_shown.is_valid()
 	for entry in all:
 		var id := str(entry.id)
 		keep[id] = true
 		if not detail or not _entry_visible(entry): continue
 		var art_key := CityMapData.art_key(entry)
+		if entry.kind == "place" and place_gate and selected.get("id", null) != entry.get("id") and not bool(place_shown.call(entry)): continue
 		if entry.kind == "poi":
 			if poi_gate and not bool(poi_shown.call(entry)): continue
 			# 只有高频 maki 才有图标；其余（含通用 marker）不上图，只留在搜索/列表。
@@ -1366,6 +1371,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		pin.icon = dest.get("icon", null)
 		pin.plate = bool(dest.get("plate", false))
 		pin.silhouette = bool(dest.get("silhouette", false))   # a fogged city's place: the glyph alone (MAP-2)
+		pin.locked = bool(dest.get("locked", false))   # a place not open yet: grey, a lock, its name kept (SGODOT-355)
 		pin.text = _dest_text(entry)
 		# who is in: the top-right count, none at 0 (q(137))
 		pin.online = int(pin_online.call(entry)) if pin_online.is_valid() else int(entry.get("online", 0))
@@ -1459,6 +1465,7 @@ func _ghost_pin(marker: Dictionary) -> Dictionary:
 	disc.theme = UiKit.theme()
 	disc.name_shown = false
 	disc.silhouette = pin.silhouette
+	disc.locked = pin.locked
 	disc.focus = pin.focus
 	node.add_child(disc)
 	disc.position = -disc.anchor_offset()
@@ -1616,7 +1623,9 @@ func _pack_key(c: Dictionary) -> Array:
 	var sel := 0 if selected.get("id", null) == c.entry.get("id") else 1
 	# MapDestinations (P0's places and ponds) pack before every other pin, by a fixed rank and then id (q(137)), so
 	# every pass gives the same answer: the always-in kinds, then the host's rank (beginner pond … silhouette).
-	if not _destination(c.entry).is_empty(): return [sel, 0, _dest_rank(c.entry), c.id]
+	# Within a rank the style's `order` (P0's wild sites: their distance from home, v4q(3) ⑤), then id.
+	var dest := _destination(c.entry)
+	if not dest.is_empty(): return [sel, 0, _dest_rank(c.entry), float(dest.get("order", 0.0)), c.id]
 	# A host place (P0 outpost) goes before everything but the selected pin and a pin wearing a map marker (蒙恬 on
 	# C30): the city level shows every outpost (q(72)). Journey has no place pins, so its order is unchanged.
 	# Outposts among themselves: nearest home first, then id (不知火舞 on C30) — geography, so panning never reorders them.

@@ -125,15 +125,18 @@ func test_projection_ticks_energy_and_ripens_crops() -> void:
 	assert_that(p.energy.next_in).is_null()
 	assert_str(str(p.plots[0].state)).is_equal("ready")
 
-func test_today_panel_orders_now_then_countdown_then_skill() -> void:
+## A 包 spec ①: Today holds requests only. Untaken ones stay on their boards (q(104)); with nothing taken, one grey line
+## (P0Logic.TODAY_EMPTY) — no `Sow your first plot`, watering, countdown or skill row.
+func test_today_holds_taken_requests_only_or_says_there_are_none() -> void:
 	var v := _view()
 	v["stall"] = {"board": {"requests": [{"title": "Pond Catch", "item": "fish_crucian", "qty": 2, "have": 0, "status": "open"}]}}
 	v.names["fish_crucian"] = "Pond Crucian"
-	assert_that(P0Logic.today_lines(v)).is_equal(["Sow your first plot"])   # untaken: on its board, not in Today (q(104))
+	assert_that(P0Logic.today_lines(v)).is_equal([P0Logic.TODAY_EMPTY])   # untaken: on its board, not in Today (q(104))
+	assert_bool(bool(P0Logic.today_rows(v)[0].get("empty", false))).is_true()
 	v.stall.board.requests.clear()
 	v["skills"] = {"farming": {"level": 1, "xp": 20, "next": 50}, "fishing": {"level": 1, "xp": 60, "next": 70}}
 	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 4320000}, {"state": "sown", "crop": "crop_carrot"}]
-	assert_that(P0Logic.today_lines(v)).is_equal(["Water 1 sown plot", "Radish ready in 1h 12m", "Fishing Lv2 · 10 XP to go"])   # q(69); one plot: singular, q(227) ②
+	assert_that(P0Logic.today_lines(v)).is_equal([P0Logic.TODAY_EMPTY])
 
 func test_parcel_countdowns_run_between_responses() -> void:
 	var v := _view()

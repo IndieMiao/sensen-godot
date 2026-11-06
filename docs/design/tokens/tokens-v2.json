@@ -185,6 +185,12 @@
         "lineHeight": 1.35,
         "figma": "Gensen Refactor/quantity/ExtraBold"
       },
+      "QuantityXB32": {
+        "size": 32,
+        "weight": "extrabold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/quantity/ExtraBold 32 (SGODOT-419, 不知火舞 419 cd072712)"
+      },
       "RowTitleB15": {
         "size": 15,
         "weight": "bold",
@@ -247,6 +253,9 @@
     "gold": "#F0D75E",
     "goldDeep": "#D9A521",
     "goldInk": "#806C0C",
+    "heat/burnt": "#8C5A3A",
+    "heat/near": "#F2C97A",
+    "heat/past": "#E39A55",
     "info": "#426A88",
     "joystickRing": "#FBF8F173",
     "joystickThumb": "#3E7D43B2",

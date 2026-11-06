@@ -40,6 +40,7 @@ func _with_travel(rt: P0Runtime, travel: Dictionary) -> Dictionary:
 	var saved: Dictionary = rt.session.view
 	var v := saved.duplicate(true)
 	v["now"] = 1_000_000_000.0
+	v["save_version"] = 7   # a b1 server's (an older one's reply is maintenance, P0Session.save_too_old)
 	v["travel"] = travel
 	rt.session.view = v
 	return saved
@@ -62,7 +63,7 @@ func _hold_wire(rt: P0Runtime) -> void:
 		elif str(cmd.get("type", "")) == "city": P0CityPlaces.fail.call_deferred(str(cmd.cluster))   # never left waiting
 
 func _answer(rt: P0Runtime, view: Dictionary, events: Array) -> void:
-	var body := JSON.stringify({ok = true, state = view, events = events}).to_utf8_buffer()
+	var body := JSON.stringify({ok = true, state = view.merged({"save_version": 7}), events = events}).to_utf8_buffer()   # a b1 server's
 	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, _wire.pop_front())
 
 func _texts(node: Node) -> Array:

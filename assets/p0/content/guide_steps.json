@@ -74,7 +74,7 @@
         "optional": true,
         "done_on": {
           "key": "sow:crop_lettuce",
-          "count": 10
+          "count": 6
         },
         "done_if": {
           "ripe": {
@@ -82,7 +82,7 @@
           }
         },
         "row": {
-          "line": "Sow 10 Lettuce · 20 Energy",
+          "line": "Sow 6 Lettuce · 12 Energy",
           "icon": "seed_lettuce",
           "go": "home"
         },
@@ -92,7 +92,7 @@
             "pulse": true
           }
         ],
-        "pip": "While they grow, plant some lettuce. That one takes a few hours."
+        "pip": "While they grow, fill the rest of your plots with lettuce. That one takes a few hours."
       },
       {
         "id": "t_harvest_quick",
@@ -117,7 +117,7 @@
           "icon": "crop_radish",
           "go": "home"
         },
-        "pip": "They're ready! Nadia at the market loves fresh radishes. Take her one.",
+        "pip": "They're ready! Take one to Nadia at the market, and grab some timber while you're in town.",
         "marks": [
           {
             "plot": "teach"
@@ -203,7 +203,45 @@
             "pulse": true
           }
         ],
-        "pip": "They're ready! Nadia at the market loves fresh radishes. Take her one."
+        "pip": "They're ready! Take one to Nadia at the market, and grab some timber while you're in town."
+      },
+      {
+        "id": "t_gather",
+        "phase": "S6a",
+        "gather": {
+          "wood": 6,
+          "stone": 4,
+          "fiber": 3
+        },
+        "done_if": {
+          "any": [
+            {
+              "have": {
+                "wood": 6,
+                "stone": 4,
+                "fiber": 3
+              }
+            },
+            {
+              "homestead": 2
+            },
+            {
+              "not": {
+                "gather": {
+                  "wood": 6,
+                  "stone": 4,
+                  "fiber": 3
+                }
+              }
+            }
+          ]
+        },
+        "row": {
+          "line": "Gather {gather_item} · {gather_spot}",
+          "icon": "{gather}",
+          "go": "map"
+        },
+        "pip": "Off you go! I'll keep an eye on your plots."
       },
       {
         "id": "t_fish",
@@ -384,6 +422,35 @@
         "pip": "Off you go! I'll keep an eye on your plots."
       },
       {
+        "id": "t_upgrade",
+        "phase": "S7a",
+        "done_if": {
+          "any": [
+            {
+              "homestead": 2
+            },
+            {
+              "not": {
+                "can_upgrade": true
+              }
+            }
+          ]
+        },
+        "row": {
+          "line": "Upgrade to Homestead Lv2",
+          "icon": "level_up",
+          "go": "sign"
+        },
+        "marks": [
+          {
+            "place": "home",
+            "object": "sign",
+            "kind": "request"
+          }
+        ],
+        "pip": "You've got everything! Tap the Homestead sign by the door."
+      },
+      {
         "id": "t_gift",
         "phase": "S10",
         "done_on": {
@@ -478,7 +545,7 @@
           "go": "home",
           "countdown": "crop_quick_radish"
         },
-        "pip": "While they grow, plant some lettuce. That one takes a few hours."
+        "pip": "While they grow, fill the rest of your plots with lettuce. That one takes a few hours."
       },
       {
         "id": "r_quick_ripe",

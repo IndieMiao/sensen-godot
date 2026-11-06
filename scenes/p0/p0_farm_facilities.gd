@@ -354,6 +354,13 @@ static func cover_of(view: Dictionary, plot: int, kind := "sprinkler") -> Array:
 		if id != plot and absi(g.x - at.x) <= 1 and absi(g.y - at.y) <= 1: out.append(id)
 	return out
 
+## Whether the beds open now hold one whole w × h block anywhere (trees and crops in it or not).
+static func has_open_block(view: Dictionary, kind := "greenhouse") -> bool:
+	var size := block_size(kind)
+	for id in P0Garden.plot_count(view):
+		if cover_of(view, id, kind).size() == size.x * size.y: return true
+	return false
+
 ## The plots of a greenhouse's block that are in the way (a crop, a sprinkler, another greenhouse), for the red cells.
 static func blocked_of(view: Dictionary, plot: int, kind: String, moving := -1) -> Array:
 	var block := cover_of(view, plot, kind)
@@ -417,9 +424,12 @@ func _begin(p: Dictionary) -> void:
 	_preview.name = "PlacementPreview"
 	farm.add_child(_preview)
 	rt.ui.begin_placement({"confirm": p.confirm})
-	if int(placing.plot) >= 0: farm.placement_camera_begin(_spot_center(v, int(placing.plot)))
-	else: farm.placement_camera_begin(farm.actor.position)
+	# no spot to take: the camera frames the open beds, not the grass where the player stands (不知火舞 on #624)
+	farm.placement_camera_begin(_spot_center(v, int(placing.plot)) if int(placing.plot) >= 0 else beds_center(v))
 	_show_spot(v, int(placing.plot))
+	# no whole block open on the grid yet (不知火舞 on the grid, SGODOT-355 b1): an Info toast on entering, over the caption;
+	# the cells in the way still go red as q(130) ④ has it
+	if is_block(str(p.kind)) and not has_open_block(v, str(p.kind)): rt.ui.toast("More plots open as your Homestead grows")
 
 ## A yard facility: the preview starts on the free cell nearest the workbench (a moved one: nearest where it stands).
 func _begin_yard(v: Dictionary) -> void:
@@ -447,6 +457,14 @@ func _show_yard(v: Dictionary, cell: Vector2i) -> void:
 	farm.placement_grid(at)
 	_paint_tints([[at, BAD_TINT if reason != "" else OK_TINT]] if cell != P0Decor.NONE else [])
 	rt.ui.set_placement({"caption": caption(v, -1, str(placing.kind)), "reason": reason})   # two keys: the reason on Done
+
+## The middle of the open beds, at their tops (the placement camera when there is no spot to take).
+func beds_center(v: Dictionary) -> Vector3:
+	var n := P0Garden.plot_count(v)
+	if n <= 0: return farm.actor.position
+	var sum := Vector3.ZERO
+	for id in n: sum += _bed_top(id)
+	return sum / float(n)
 
 ## Where a spot's preview stands: the bed top, or the middle of a greenhouse's block.
 func _spot_center(v: Dictionary, plot: int) -> Vector3:
@@ -486,7 +504,7 @@ func _snap(screen: Vector2) -> void:
 		_show_yard(v, cell)
 		return
 	var id := plot_at_screen(v, screen)
-	if is_block(str(placing.kind)) and id >= 0: id = _anchor_for(v, id, str(placing.kind))
+	if is_block(str(placing.kind)) and id >= 0: id = anchor_for(v, id, str(placing.kind))
 	if id == int(placing.plot): return
 	placing.plot = id
 	_show_spot(v, id)
@@ -503,13 +521,18 @@ func plot_at_screen(v: Dictionary, screen: Vector2) -> int:
 	return best
 
 ## A finger on a plot points at the block around it: the anchor one row and one col before it (the finger near the
-## block's middle), kept on the grid; -1 when no plot stands there.
-func _anchor_for(v: Dictionary, finger_plot: int, kind: String) -> int:
+## block's middle), kept on the open beds' cols and rows (the grid starts at col −1, row −2 since SGODOT-355 b1); -1 when
+## no plot stands there.
+static func anchor_for(v: Dictionary, finger_plot: int, kind: String) -> int:
 	var size := block_size(kind)
 	var g := P0Garden.grid_of(finger_plot) - Vector2i((size.x - 1) / 2, (size.y - 1) / 2)
-	var top := Vector2i.ZERO
-	for id in P0Garden.plot_count(v): top = Vector2i(maxi(top.x, P0Garden.grid_of(id).x), maxi(top.y, P0Garden.grid_of(id).y))
-	g = Vector2i(clampi(g.x, 0, maxi(0, top.x - size.x + 1)), clampi(g.y, 0, maxi(0, top.y - size.y + 1)))
+	var lo := P0Garden.grid_of(0)
+	var hi := lo
+	for id in P0Garden.plot_count(v):
+		var at := P0Garden.grid_of(id)
+		lo = Vector2i(mini(lo.x, at.x), mini(lo.y, at.y))
+		hi = Vector2i(maxi(hi.x, at.x), maxi(hi.y, at.y))
+	g = Vector2i(clampi(g.x, lo.x, maxi(lo.x, hi.x - size.x + 1)), clampi(g.y, lo.y, maxi(lo.y, hi.y - size.y + 1)))
 	for id in P0Garden.plot_count(v): if P0Garden.grid_of(id) == g: return id
 	return -1
 

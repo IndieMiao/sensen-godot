@@ -29,7 +29,7 @@
         ],
         "bonus": 10,
         "type": "output",
-        "text": "New pots for the stall. Clay from the creek."
+        "text": "New pots for the stall. Clay from the pit."
       },
       "req_sys_crop_fine": {
         "title": "Fine Produce",
@@ -204,7 +204,7 @@
         ],
         "bonus": 40,
         "type": "output",
-        "text": "The square needs a new stage. Hardwood from the old tree."
+        "text": "The square needs a new stage. Hardwood from the woods."
       },
       "req_sys_material_quartz": {
         "title": "Quartz Glass",

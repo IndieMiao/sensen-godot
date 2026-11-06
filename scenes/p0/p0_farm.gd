@@ -10,7 +10,6 @@ const P0NoticeBoardLogic := preload("res://modules/p0/p0_notice_board.gd")   # t
 const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
-const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const FarmGuide = preload("res://scenes/p0/p0_farm_guide.gd")
@@ -51,9 +50,8 @@ var beds: MultiMeshInstance3D
 var _hi: MeshInstance3D
 var _house := Vector3.ZERO
 var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed box stands in until its model
-var _mine := Vector3.ZERO
 var _bench := Vector3.ZERO   # the rest bench by the farmhouse (FARM-7, q(30)): Basic Room's bench.glb
-var _materials: P0FarmMaterials   # SGODOT-231: mine mouth, gathering spots and the workbench
+var _materials: P0FarmMaterials   # SGODOT-231: gathering spots and the workbench (the mine mouth left in 355 b1)
 var _facilities: P0FarmFacilities   # P1 SGODOT-241: sprinklers, placement mode, Coverage
 var _decor: P0FarmDecor             # P1 SGODOT-284: the yard's decor, Decorate
 var _card := ""   # LOCK-07 v2: the one facility whose name strip is open this frame (P0Garden.pick_card)
@@ -164,8 +162,8 @@ func resume() -> void:
 	cam.make_current()
 	if rt:
 		rt.attach(self)
-		rt.ui.set_mode("farm")   # back from the mine (SGODOT-231): seeds on the bar, the farm's chip
-		rt.ui.set_place(PLACE)   # back from the farmhouse or the mine
+		rt.ui.set_mode("farm")   # back from a layer above (SGODOT-231): seeds on the bar, the farm's chip
+		rt.ui.set_place(PLACE)   # back from the farmhouse
 	if _inside:
 		# Out through the farmhouse door: stand on the doorstep facing the field.
 		_inside = false
@@ -202,12 +200,8 @@ func _build_world() -> void:
 	# The bench is two cells wide: its centre sits half a cell right of its anchor cell, facing the field (+z).
 	_bench = bp.cell_to_world(bp.anchor("bench")) + Vector3(bp.cell_m * 0.5, 0, 0)
 	props.add_child(_bench_prop(_bench))
-	_mine = bp.cell_to_world(bp.anchor("mine")) + Vector3(-0.3, 0, 0.3)
-	var mine := MineArt.entrance()
-	mine.position = _mine
-	mine.rotation.y = PI * 0.15
-	props.add_child(mine)
-	_materials = P0FarmMaterials.new().setup(self, _mine, mine)
+	# No mine mouth on the farm since 355 b1 (v4q(5) ①): the mines are wild sites, entered from the map.
+	_materials = P0FarmMaterials.new().setup(self)
 	add_child(_materials)
 	_scenery = GardenScenery.new()
 	add_child(_scenery)
@@ -254,7 +248,7 @@ func _build_world() -> void:
 		xfs.append(Transform3D(Basis.IDENTITY, bp.cell_to_world(P0Garden.cell_of(id))))
 		tints.append(Color.WHITE)
 	beds = FarmArt.batch("plot", xfs, true, tints)
-	beds.multimesh.visible_instance_count = P0Garden.P0_PLOTS   # all 40 laid out; the view's garden.plots shows them
+	beds.multimesh.visible_instance_count = P0Garden.max_plots()   # all laid out; the view's garden.plots shows them
 	beds.name = "Beds"
 	add_child(beds)
 	crops = CropField.new(bp)
@@ -364,12 +358,45 @@ func _fit_opening() -> void:
 	_place_camera()
 	_focus = opening_focus(cam, _focus, _house + home_mark(), actor.position, area)
 	_place_camera()
-	# 340 S2: only the initial guide framing includes Pip and the two teaching beds. No later step moves the camera.
-	if P0Guide.guide_on(rt.session.view) and bool(P0Guide.pip(rt.session.view).get("here", false)):
-		var points: Array[Vector3] = [actor.position, bp.cell_to_world(FarmGuide.STAND) + Vector3(0, 2.2, 0)]
-		for id in P0Guide.teaching_plots(rt.session.view): points.append(bp.cell_to_world(P0Garden.cell_of(id)))
-		_focus = guide_opening_focus(cam, _focus, points, area)
+	# SGODOT-355 b1 (不知火舞 on the grid shots, 11-02): every open bed, the farmhouse door and the player — Pip too while the
+	# guide has him here (340 S2) — 16 px clear at the left and right, zoomed out as far as that needs, at most the whole
+	# island and a margin (CTRL-1). No later step moves the camera; walking brings the follow camera's own scale back.
+	var guided := P0Guide.guide_on(rt.session.view) and bool(P0Guide.pip(rt.session.view).get("here", false))
+	# a guided player lands by the starting beds and Pip (q(215) 「落地在首畦旁」), not at the yard's way in: here, where
+	# the view is surely in (on _ready it may not be yet)
+	if guided: actor.teleport(bp.cell_to_world(landing_cell(grid, FarmGuide.LAND)))
+	# the farmhouse's prompt too, so the picture sits with the whole farm in the middle of the area between the HUD and
+	# the quick bar, not just the beds (不知火舞 on the Lv17 shot: the field alone framed the farm high)
+	var points: Array[Vector3] = [actor.position, actor.position + Vector3.UP * 1.8, _door, _house + home_mark()]
+	if guided: points.append(bp.cell_to_world(FarmGuide.STAND) + Vector3(0, 2.2, 0))
+	for id in P0Garden.plot_count(rt.session.view):
+		var bed := bp.cell_to_world(P0Garden.cell_of(id))
+		for d in [Vector3(-0.47, 0, -0.47), Vector3(0.47, 0, -0.47), Vector3(-0.47, 0, 0.47), Vector3(0.47, 0, 0.47)]: points.append(bed + d)
+	_frame_opening(points, Rect2(area.position + Vector2(OPEN_SIDE_PX, 0), area.size - Vector2(OPEN_SIDE_PX * 2, 0)))
+
+const OPEN_SIDE_PX := 16.0
+const ISLAND_RECT := Rect2i(0, -3, 21, 23)   # the yard (WALK_RECT) and a cell's margin round it: the farthest the opening zooms out
+var _opening_zoom := false   # the opening zoomed out; walking eases the follow camera back to zoom 1
+
+## Zoom out (never in) until every point fits `inner`, at most to the island and its margin, then centre them in it.
+func _frame_opening(points: Array[Vector3], inner: Rect2) -> void:
+	var span := _screen_bounds(points)
+	var need := maxf(span.size.x / maxf(inner.size.x, 1.0), span.size.y / maxf(inner.size.y, 1.0))
+	var island: Array[Vector3] = []
+	for c in [ISLAND_RECT.position, Vector2i(ISLAND_RECT.end.x, ISLAND_RECT.position.y)]: island.append(bp.cell_to_world(c))
+	var most := maxf(1.0, _screen_bounds(island).size.x / maxf(inner.size.x, 1.0))
+	var k := clampf(need, 1.0, most)
+	if k > 1.0:
+		_zoom = _zoom / k
+		_opening_zoom = true
 		_place_camera()
+	_focus = guide_opening_focus(cam, _focus, points, inner)
+	_place_camera()
+
+func _screen_bounds(points: Array[Vector3]) -> Rect2:
+	var r := Rect2(cam.unproject_position(points[0]), Vector2.ZERO)
+	for p in points: r = r.expand(cam.unproject_position(p))
+	return r
 
 static func guide_opening_focus(camera: Camera3D, focus: Vector3, points: Array[Vector3], area: Rect2) -> Vector3:
 	var bounds := Rect2(camera.unproject_position(points[0]), Vector2.ZERO)
@@ -403,6 +430,9 @@ static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
 
 func _follow(dt: float) -> void:
 	_fit_opening()
+	if _opening_zoom and not _cam_follow.held:   # walking: back to the follow camera's own scale (SGODOT-355 b1)
+		_zoom = move_toward(_zoom, 1.0, dt * 1.5)
+		_opening_zoom = _zoom < 1.0
 	_step_actor_fade(dt)
 	if _top_left > 0.0:   # turning into / out of the top-down view
 		_top_left = maxf(0.0, _top_left - dt)
@@ -665,7 +695,7 @@ func p0_show_spot(where: String) -> void:
 	if where == "stall": at = _stall
 	elif where == "sign": at = _sign   # Upgrade to Homestead LvN (q(255))
 	elif where == "plots": at = _plots_center()
-	elif _materials.spot_at(where) != null: at = _materials.spot_at(where)   # SGODOT-231: spot_*, mine, workbench
+	elif _materials.spot_at(where) != null: at = _materials.spot_at(where)   # SGODOT-231: spot_*, workbench
 	_opening = false
 	_focus = at
 	_cam_follow.hold()
@@ -688,7 +718,6 @@ func p0_show_spot(where: String) -> void:
 # ---------------------------------------------------------------- frame
 func p0_joystick(v: Vector2) -> void:
 	if actor: actor.set_input(v)
-	if v != Vector2.ZERO and _materials: _materials.cancel_walk()   # a tapped walk to the mine mouth stops (266)
 
 var _dev_aim := Vector3.INF   # aimcell (shots): steer the joystick straight at this point, logging the player each frame
 
@@ -722,12 +751,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		if _guide != null: _guide.hide_marks()
 		return
 	_pick_front(v)
-	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
 	_card = P0Garden.pick_card(_card_candidates(), actor.position, _card)
-	# The mouth's EntryCard holds the farm's one card while it is up (LOCK-07: one at a time; 亚瑟 on #190): a gathering
-	# spot or the bench nearby keeps its button, never opens its strip beside it.
-	if _materials.card_wanted(): _card = "mine"
 	_materials.frame(v, _card)
 	_hold_repeat()
 	_prompts(v)
@@ -750,9 +775,9 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
 		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
-	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
+	# the beds open now (the view's garden.plots, in the order they open: SGODOT-355 b1); the rest stay grass
 	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
-	_scenery.show_front_row(P0Garden.plot_count(v) > P0Garden.GRID_PLOTS)   # Lv7's row gets the field's sand (q(172) A)
+	_scenery.fit_sand(bp, P0Garden.plot_count(v))   # the field's sand under the open beds only
 	_sync_trees(v)
 
 ## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
@@ -808,7 +833,7 @@ func _pick_front(v: Dictionary) -> void:
 		for p in v.get("plots", []):
 			if int(p.get("id", -1)) == best: _front = p
 	# Row Hoe: the bed in front and its tilled neighbours in the row, the way the player faces first (plot ids grow along +x).
-	_row = P0Logic.row_plots(v, _front, P0Garden.COLUMNS, 1 if f.x >= 0.0 else -1)
+	_row = P0Logic.row_plots(v, _front, 0, 1 if f.x >= 0.0 else -1)
 	_hi.visible = not _front.is_empty() and not rt.ui.has_modal()
 	if _hi.visible:
 		_front_cell = P0Garden.cell_of(best)
@@ -970,15 +995,11 @@ func _hold_repeat() -> void:
 	rt.holding_repeat = false
 
 ## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)), the farmhouse
-## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37), the mine.
+## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37).
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
 	var card := str(rt.ui.tapped_card)
 	if _guide != null and _guide.tap(screen, card): return
-	# The mine's EntryCard sits over the scene (passive, SGODOT-231): a tap on it is its button's; any other tap folds
-	# it and goes on (SGODOT-266).
-	if card == "" and _materials.tap_entry(screen): return
-	if card != "": _materials.close_card()
 	if _tap_card(card): return
 	if _facilities != null and _facilities.tap(screen): return   # P1: a sprinkler's status card (SGODOT-241)
 	if _sign_hit(screen):
@@ -1007,7 +1028,7 @@ func p0_tap(screen: Vector2) -> void:
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
 		actor.face(_door)
 		enter_farmhouse()
-	elif _materials.tap(screen): pass   # SGODOT-231: mine mouth sheet, gathering spots, workbench (last: smallest targets)
+	elif _materials.tap(screen): pass   # SGODOT-231: gathering spots, workbench (last: smallest targets)
 
 ## A finger card's tap goes to its own facility by id, never through the point test: the point of one facility can
 ## sit under another's mark (the farmhouse card's point under the sign's caption, PR #21 review).
@@ -1118,12 +1139,12 @@ func _screen_rect(n: Node) -> Rect2:
 			first = false
 	return r
 
-## The Chef's Sign up from Homestead Lv10: shown, and its cell solid (a post one walks round) with the path cell under its
+## The Chef's Sign up from Homestead Lv10: shown, and its cell solid (a post one walks round) with the cell under its
 ## board (P0Garden.CHEF_SIGN_BOARD_CELL), back if it ever goes.
 func _show_chef_sign(on: bool) -> void:
 	if _chef_sign_node.visible == on: return
 	_chef_sign_node.visible = on
-	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]:   # its post's cell and the path under its board
+	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]:   # its post's cell and the cell under its board
 		if bp.is_walkable(c): grid.set_solid(c, on)   # a cell the plan blocks stays blocked
 
 ## The Notice Board up from Homestead Lv5 (q(164) ①): shown, and its cell solid, as the Chef's Sign.
@@ -1203,8 +1224,9 @@ func _mailbox_prop(at: Vector3) -> Node3D:
 	root.add_child(model)
 	return root
 
+## The landing's teaching card (q(215): `Pick a seed…`). Asked for even under a dialog (Pip's opening line): the TipQueue
+## holds it until the dialog closes (方案 §10.3 ⑥, 不知火舞 355 G01); a Sow meanwhile takes it off the queue (TipQueue.did).
 func _teaching(v: Dictionary) -> void:
-	if rt.ui.has_modal(): return
 	var firsts: Array = v.get("firsts", [])
 	if not firsts.any(func(f): return str(f).begins_with("harvest:")) and not v.get("plots", []).any(func(p): return str(p.state) in ["sown", "growing", "ready"]):
 		rt.ui.teach("sow")   # copy in P0Guide.TIPS (q(44))
@@ -1220,6 +1242,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"yaw": _dev_yaw = float(step[1])
 		"goto":
+			_dev_aim = Vector3.INF   # a teleport ends any aimed walk (it would walk the player back)
+			p0_joystick(Vector2.ZERO)
 			actor.teleport(Vector3(float(step[1]), 0, float(step[2])))
 			_focus = actor.position
 		"plotface":   # plotface:<id> — stand on the walkway in front of a plot, facing it (P1 tree review shots)
@@ -1228,6 +1252,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 			actor.face(bed)
 			_focus = actor.position
 		"gocell":
+			_dev_aim = Vector3.INF   # a teleport ends any aimed walk (it would walk the player back)
+			p0_joystick(Vector2.ZERO)
 			actor.teleport(bp.cell_to_world(Vector2i(int(step[1]), int(step[2]))))
 			_focus = actor.position
 		"face":
@@ -1256,7 +1282,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var now := Time.get_ticks_msec()
 			for i in codes.size():
 				for stage in 3:
-					var id := stage * P0Garden.COLUMNS + i if i < P0Garden.COLUMNS else (stage + 3) * P0Garden.COLUMNS + i - P0Garden.COLUMNS
+					var id := stage * codes.size() + i
 					if id >= P0Garden.plot_count(): continue
 					var span := 3600000
 					var started := now - int(span * [0.2, 0.55, 1.2][stage])
@@ -1266,6 +1292,13 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_sync_t = 9999.0
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
+		"pip":   # a tap on the guide's Pip where he is now (SGODOT-411 shots: he stops and turns to the player)
+			if _guide != null and _guide.pip_root != null: p0_tap(cam.unproject_position(_guide.pip_root.to_global(Vector3(0, 0.8, 0))))
+		"topip":   # walk straight up to 1.2 m short of where Pip is now (SGODOT-411 shots: near him he stands and turns)
+			if _guide != null and _guide.pip_root != null:
+				var pip: Vector3 = _guide.pip_root.position
+				var back := Vector3(actor.position.x - pip.x, 0, actor.position.z - pip.z)
+				_dev_aim = pip + (back.normalized() * 1.2 if back.length() > 1.2 else back)
 		"chefsign": p0_tap(cam.unproject_position(_chef_sign + CHEF_SIGN_HIT))   # the Chef's Sign's card (282 shots)
 		"noticetap": p0_tap(cam.unproject_position(_notice + NOTICE_HIT))   # the Notice Board through its own tap (q(164) shots)
 		"chefsignprobe":   # where the Chef's Sign and its neighbours are on screen (282 shots: placement by numbers)
@@ -1277,12 +1310,12 @@ func p0_dev(step: PackedStringArray) -> bool:
 				bench_seat = at.call(_bench + Vector3(0, 0.35, 0)), unit_x = at.call(_chef_sign + Vector3.RIGHT) - at.call(_chef_sign),
 				shift = CHEF_SIGN_SHIFT.x, look = _chef_sign_look}))
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
-		"mouth": p0_tap(cam.unproject_position(_mine + Vector3(0, 1.6, 0)))   # the mine mouth's model, high on the arch (int11 ②)
-		"cardtap", "cardnew", "cardexpress":   # a real tap on the mouth's EntryCard: main / New run / Express (SGODOT-266, 288)
-			var e: UiEntryCard = _materials._entry if _materials.card_open() else null
-			var r: Rect2 = (e.main_rect() if step[0] == "cardtap" else e.second_rect() if step[0] == "cardnew" else e.third_rect()) if e != null else Rect2()
-			if e != null: p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		"island":   # the whole island in the picture, as far as the opening may zoom out (#624 walkthrough: a farm end to end)
+			var corners: Array[Vector3] = []
+			for c in [ISLAND_RECT.position, ISLAND_RECT.end, Vector2i(ISLAND_RECT.position.x, ISLAND_RECT.end.y), Vector2i(ISLAND_RECT.end.x, ISLAND_RECT.position.y)]:
+				corners.append(bp.cell_to_world(c))
+			_frame_opening(corners, rt.ui.open_marker_area())
 		"actorhide": _actor_fade_to = 1.0   # the yard's pieces alone, the player faded out (上官婉儿 on #276's shots)
 		# LOOK-PICK (SGODOT-282): lookpick:<stage>[:home] opens the card as after the level-up (or from HOME-1);
 		# lookpick-b / lookpick-a tap a card; lookuse presses Use; lookclose ✕; lookparts prints the stages' parts.
@@ -1357,5 +1390,4 @@ func p0_dev(step: PackedStringArray) -> bool:
 func p0_until(name: String) -> bool:
 	match name:
 		"idle": return not actor.busy()
-		"card": return _materials.card_open()
 	return false

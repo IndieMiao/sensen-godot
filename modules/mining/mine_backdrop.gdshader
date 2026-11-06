@@ -6,7 +6,12 @@ render_mode unshaded, shadows_disabled, fog_disabled;
 
 uniform vec3 floor_tint : source_color = vec3(0.39686275, 0.2027451, 0.1445098);
 uniform vec3 void_tint : source_color = vec3(0.14117647, 0.12941176, 0.14509804);
+// 355 (contract-efg §10.1): a type's own relief (assets/mine/types/<type>/backdrop.glb) marks its ore veins in UV2.y,
+// shown in their vertex colour, not the floor's tint; 1 only for those — the old relief's UV2.y is all 1.0 and would
+// lose its tint everywhere.
+uniform float vein_mask = 0.0;
 
 void fragment() {
-	ALBEDO = mix(COLOR.rgb * floor_tint, void_tint, clamp(UV2.x, 0.0, 1.0));
+	vec3 rock = mix(COLOR.rgb * floor_tint, COLOR.rgb, clamp(UV2.y, 0.0, 1.0) * vein_mask);
+	ALBEDO = mix(rock, void_tint, clamp(UV2.x, 0.0, 1.0));
 }

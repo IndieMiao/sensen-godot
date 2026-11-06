@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+  <!-- ruins (355 v4, mine type not open yet): a broken stone arch over a dark doorway -->
+  <path d="M6 54h52v4H6z" fill="#8A918C"/>
+  <path d="M10 54V26h10v28z" fill="#A9B0AC"/>
+  <path d="M44 54V32h10v22z" fill="#A9B0AC"/>
+  <path d="M10 26c0-10 10-16 22-16 7 0 13 2 17 6l-6 6c-3-2-7-4-11-4-7 0-12 4-12 8z" fill="#C4C2BA"/>
+  <path d="M20 54V30c0-4 5-8 12-8 5 0 9 2 12 5v27z" fill="#3E4642"/>
+  <path d="M46 20l6-2 2 6-6 3z" fill="#A9B0AC"/>
+  <path d="M10 34h10M10 44h10M44 40h10M44 48h10" stroke="#8A918C" stroke-width="2"/>
+  <path d="M26 54l3-6 5 2 2 4z" fill="#8A918C"/>
+</svg>

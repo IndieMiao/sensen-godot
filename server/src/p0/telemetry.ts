@@ -16,7 +16,7 @@ import type { P0Event } from './progress.js';
 /** Command fields worth keeping; anything else (free text, bulky arrays) stays out of the log. */
 const CMD_FIELDS = ['type', 'plot', 'plots', 'seed', 'item', 'qty', 'shop', 'recipe', 'items', 'request', 'resident',
   'bait', 'outcome', 'key', 'keys', 'eat', 'from', 'spot', 'floor', 'rock', 'space', 'place', 'src', 'expect_seq', 'pot', 'facility',
-  'op', 'step', 'bet', 'action'] as const;   // op / step: the guide's ack (SGODOT-341), so the log tells which step was read; bet / action: blackjack (SGODOT-351)
+  'op', 'step', 'bet', 'action', 'mine', 'day', 'to', 'via', 'targets', 'hurt_by', 'stunned', 'ground'] as const;
 const MAX_STR = 64, MAX_LIST = 8;
 
 /** UI moments the client may report, each with the only fields kept beside `kind` (no position, no free text). */

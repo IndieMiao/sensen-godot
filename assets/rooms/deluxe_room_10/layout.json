@@ -1957,6 +1957,15 @@
       "module": "range_cooker"
     },
     {
+      "name": "use_stove_4",
+      "position": [
+        -4.245,
+        1.291,
+        -0.859
+      ],
+      "module": "range_cooker"
+    },
+    {
       "name": "drop_pot_1",
       "position": [
         -3.915,
@@ -1978,6 +1987,15 @@
       "name": "drop_pot_3",
       "position": [
         -3.915,
+        1.615,
+        -0.859
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_4",
+      "position": [
+        -4.245,
         1.615,
         -0.859
       ],

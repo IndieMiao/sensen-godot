@@ -23,7 +23,7 @@ func after_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
 	await get_tree().process_frame
 
-## The mouth's card with a run open, as P0MaterialLogic.mine_mouth_card has it (four rows).
+## A tall card: four rows, as the farm's old mine mouth card had with a run open.
 func _mouth_card() -> UiEntryCard:
 	var e := UiEntryCard.new()
 	e.theme = UiKit.theme()

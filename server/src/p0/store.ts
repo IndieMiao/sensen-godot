@@ -6,17 +6,25 @@ import { settleParcels } from './parcels.js';
 
 export class P0Store {
   private players = new Map<string, P0State>();
-  /** Saves brought up from an older version when the file was loaded (the server logs it at start). */
+  /** Saves older than this version when the file was loaded: since v7 they are cleared, not brought up (the server logs it). */
   readonly migrated: number = 0;
   constructor(private c: P0Content, private file?: string) {
     if (file && existsSync(file)) {
       const saved = JSON.parse(readFileSync(file, 'utf8')) as Record<string, P0State>;
       const older = Object.values(saved).filter(s => (s.v as number) < SAVE_VERSION).length;
-      // The next write replaces the whole file in the new shape: keep the file as it was, once per version step.
-      const keep = `${file}.v${Math.min(...Object.values(saved).map(s => s.v as number))}.bak`;
-      if (older && !existsSync(keep)) copyFileSync(file, keep);
+      // The next write replaces the whole file in the new shape, and since v7 drops what is older: keep the file as it
+      // was first, every time there is something older in it — beside one kept before, under its own time (后裔 on #611).
+      // A copy that fails stops the server rather than clearing saves with nothing kept. (This copy is on the same volume
+      // as the saves: the clear-out takes its own backup elsewhere first, plan 4.2 / v4q(2) B review ①.)
+      if (older) {
+        const base = `${file}.v${Math.min(...Object.values(saved).map(s => s.v as number))}`;
+        const keep = existsSync(`${base}.bak`) ? `${base}.${new Date().toISOString().replace(/[:.]/g, '-')}.bak` : `${base}.bak`;
+        try { copyFileSync(file, keep); } catch (e) { throw new Error(`P0Store: could not keep ${file} as ${keep} before clearing older saves: ${String(e)}`); }
+      }
       this.migrated = older;
-      for (const [id, state] of Object.entries(saved)) this.players.set(id, upgradeState(c, state));
+      // v7 (SGODOT-355 first batch) clears the save (plan v4 conclusion 20, q row B): a save older than v7 is not brought
+      // up — its player starts a new one on the next read. The file as it was stays in the .bak above.
+      for (const [id, state] of Object.entries(saved)) if ((state.v as number) >= SAVE_VERSION) this.players.set(id, upgradeState(c, state));
     }
   }
   /** opts.pending: a new save asks to pick a home (SGODOT-303), when the creating client can offer it; opts.guide: it

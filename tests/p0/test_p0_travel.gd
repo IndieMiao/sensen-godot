@@ -38,7 +38,9 @@ func test_a_running_day_pass_covers_its_city_and_shows_on_the_chip() -> void:
 	# the homestead's own spaces are home whatever `here` still says (李元芳's cold start, SGODOT-278)
 	var farm := {city = "San Francisco", space = "Homestead", kind = UiHud.PlaceKind.HOME, day_pass = ""}
 	assert_dict(P0Travel.place(v, farm, "home")).is_equal(farm)
-	assert_dict(P0Travel.place(v, farm, "mine")).is_equal(farm)
+	# a mine is a wild site (355 b1): its own chip, foreign, no Day Pass (E1 / E2)
+	var mine := {city = "Ironvale Vein", space = "Floor 3", kind = UiHud.PlaceKind.HOME, day_pass = ""}
+	assert_dict(P0Travel.place(v, mine, "mine")).is_equal(mine.merged({kind = UiHud.PlaceKind.FOREIGN}, true))
 	assert_str(str(P0Travel.place(v, farm, "map").space)).is_equal("Arrived")
 
 func test_an_expired_pass_covers_nothing_and_the_home_chip_is_untouched() -> void:

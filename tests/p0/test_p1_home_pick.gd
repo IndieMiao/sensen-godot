@@ -247,7 +247,7 @@ func test_a_pending_save_and_the_feature_header() -> void:
 	assert_bool(P0Runtime.home_taken(false, {"home": {"pending": true}})).is_false()
 	assert_bool(P0Runtime.home_taken(false, {})).is_false()
 	var session := P0Session.new()
-	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home,guide_v3,locals"])   # 0.2.14: the guide is open to new saves (341)
+	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home,guide_v3,locals,save_v7"])   # 0.2.14: the guide is open to new saves (341)
 	session.free()
 
 func _welcome_flow(near: Variant) -> Array:
@@ -583,7 +583,11 @@ func test_pin_confirm_retries_a_lost_city_ack_before_build_and_uses_returned_seq
 	flow.cities.key.activated.emit()
 	P0HomePick.answer("/p0/home/spots/" + SF.id, spot_read(SF.id))
 	assert_int(posts.size()).is_equal(1)
+	# a lost reply is followed by one read of what the server did (preview B ②): here it had not gone through
+	var read_back := func(): session._finish(HTTPRequest.RESULT_SUCCESS, 200,
+		JSON.stringify({"ok": true, "state": {"seq": 4, "save_version": 7, "guide": {"step": "t_city"}}}).to_utf8_buffer(), {})
 	session._finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), posts[-1].cmd)
+	read_back.call()
 	flow.spots.build.activated.emit()
 	assert_int(posts.size()).is_equal(1)   # opening the confirm is not an acknowledgement
 	flow.confirm.move.activated.emit()
@@ -594,9 +598,10 @@ func test_pin_confirm_retries_a_lost_city_ack_before_build_and_uses_returned_seq
 	session._finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), posts[-1].cmd)
 	assert_bool(flow._sending).is_false()
 	assert_array(session._queue).is_empty()
+	read_back.call()
 	flow.confirm.move.activated.emit()
 	assert_str(posts[-1].body.type).is_equal("guide")
-	session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify({"ok": true, "state": {"seq": 5}}).to_utf8_buffer(), posts[-1].cmd)
+	session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify({"ok": true, "state": {"seq": 5, "save_version": 7}}).to_utf8_buffer(), posts[-1].cmd)
 	assert_str(posts[-1].body.type).is_equal("choose_home")
 	assert_int(posts[-1].body.expect_seq).is_equal(5)
 	assert_float(posts[-1].body.lat).is_equal_approx(37.759, 1e-9)

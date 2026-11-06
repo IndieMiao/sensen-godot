@@ -15,7 +15,8 @@ static func _recipe(id: String, tab: String, item: String, name: String, to: Str
 		"have": have if to == "bag" else null, "cost": cost, "gate": null, "owned": owned, "equipped": equipped,
 		"can_craft": block == null and not owned, "block": block}
 
-## TOOLS (1434:126236): the pickaxe 1 Copper Ore short, gloves craftable; SUPPLIES: Torch craftable, Compost Lv3.
+## TOOLS (1434:126236): the pickaxe 1 Copper Ore short (the Gather Gloves left with 丁11); SUPPLIES: Torch craftable,
+## Compost Lv3.
 static func _view(ore := 4, torches := 6) -> Dictionary:
 	var ore_cost := _cost("copper_ore", "Copper Ore", ore, 5)
 	var wood := _cost("wood", "Timber", 17, 4)
@@ -23,19 +24,16 @@ static func _view(ore := 4, torches := 6) -> Dictionary:
 	return {
 		"energy": {"value": 200, "max": 200, "next_in": null, "regen_ms": 240000},
 		"names": {"torch": "Torch", "copper_ore": "Copper Ore", "wood": "Timber", "fiber": "Reeds", "clay": "Clay",
-			"pick_copper": "Copper Pickaxe", "gather_gloves": "Gather Gloves", "rock_salt": "Rock Salt"},
+			"pick_copper": "Copper Pickaxe", "rock_salt": "Rock Salt"},
 		"bag": {"capacity": 25, "free": 20, "slots": []}, "plots": [], "coins": 40, "skills": {},
 		"rest": {"used": 0, "limit": 1, "resets_in": 3600000},
 		"workbench": {"tabs": ["tools", "supplies"], "recipes": [
 			_recipe("craft_copper_pickaxe", "tools", "pick_copper", "Copper Pickaxe", "gear", [ore_cost, wood], pick_block),
-			_recipe("craft_gather_gloves", "tools", "gather_gloves", "Gather Gloves", "owned",
-				[_cost("fiber", "Reeds", 8, 8), wood]),
 			_recipe("craft_torch", "supplies", "torch", "Torch", "bag", [_cost("wood", "Timber", 17, 1), _cost("fiber", "Reeds", 8, 1)],
 				null, false, false, torches),
 			_recipe("craft_compost", "supplies", "fert_compost", "Compost", "bag", [_cost("fiber", "Reeds", 8, 2), _cost("wood", "Timber", 17, 1)],
 				{"code": "locked", "detail": {"skill": "farming", "level": 3}}, false, false, 0),
 		]},
-		"gather": {"spots": [{"id": "spot_grove", "name": "Timber Grove", "open": true, "ready": true, "yield": [["wood", 7]]}]},
 	}
 
 func before_test() -> void:
@@ -56,17 +54,17 @@ func after_test() -> void:
 func _plain(src: Dictionary) -> Dictionary:
 	return {"text": str(src.get("text", "")).replace("\u00a0", " ").replace("\u2060", ""), "go": src.get("go", "")}
 
-func test_material_sources_name_the_spot_or_the_mine_floors() -> void:
+func test_material_sources_name_the_mine_type() -> void:
 	var v := _view()
-	assert_that(_plain(P0MaterialLogic.material_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Mine floors 1–4", "go": "mine"})
-	assert_that(_plain(P0MaterialLogic.material_source(v, "wood"))).is_equal({"text": "Timber · Timber Grove", "go": "spot_grove"})
-	# Clay Bank opens at Homestead Lv2 (this view has no spot states, so the content's gate counts): open sources first (q(65)).
-	assert_that(_plain(P0MaterialLogic.material_source(v, "clay"))).is_equal({"text": "Clay · Mine floor 1 · or Clay Bank from Homestead Lv2", "go": "mine"})
-	assert_that(_plain(P0MaterialLogic.material_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Mine floors 1–4", "go": "mine"})
+	# 355 3b2c6a43: the city's spots and the mines; Show where Today points (none in this view: no free sites read)
+	assert_that(_plain(P0MaterialLogic.material_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Quarries", "go": ""})
+	assert_str(_plain(P0MaterialLogic.material_source(v, "wood")).text).ends_with(" · Groves in town")
+	assert_that(_plain(P0MaterialLogic.material_source(v, "clay"))).is_equal({"text": "Clay · Clay Pits in town · or Quarries", "go": ""})
+	assert_that(_plain(P0MaterialLogic.material_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarries", "go": ""})
 	# Not materials: bait also comes from the tackle shop, seeds from the stall; the other rules say those.
 	assert_that(P0MaterialLogic.material_source(v, "bait_worm")).is_empty()
 	assert_that(P0MaterialLogic.material_source(v, "seed_radish")).is_empty()
-	assert_that(_plain(P0Logic.need_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Mine floors 1–4", "go": "mine"})
+	assert_that(_plain(P0Logic.need_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Quarries", "go": ""})
 
 # --- The drawer ---
 
@@ -103,8 +101,10 @@ func test_drawer_sends_craft_and_toasts_reasons() -> void:
 	var sent: Array = []
 	ui.command.connect(func(cmd): sent.append(cmd))
 	var d: P0WorkbenchDrawer = await _drawer("tools")
-	d.card("craft_gather_gloves").pressed.emit()
-	assert_that(sent).is_equal([{"type": "craft", "recipe": "craft_gather_gloves"}])
+	ui.set_view(_view(5))
+	d.card("craft_copper_pickaxe").pressed.emit()
+	assert_that(sent).is_equal([{"type": "craft", "recipe": "craft_copper_pickaxe"}])
+	ui.set_view(_view())
 	# LOCK-10: the grey button still takes the tap and says why.
 	d.card("craft_copper_pickaxe").button.unavailable_pressed.emit("Need 1 more Copper Ore")
 	assert_str(ui.toast_text()).is_equal("Need 1 more Copper Ore")
@@ -124,14 +124,10 @@ func test_owned_tools_have_no_materials_and_a_done_button() -> void:
 	v.workbench.recipes[0].owned = true
 	v.workbench.recipes[0].equipped = true
 	v.workbench.recipes[0].block = {"code": "owned"}
-	v.workbench.recipes[1].owned = true
-	v.workbench.recipes[1].block = {"code": "owned"}
 	ui.set_view(v)
 	var d: P0WorkbenchDrawer = await _drawer("tools")
 	assert_bool(d.card("craft_copper_pickaxe")._materials.visible).is_false()
 	assert_str(d.card("craft_copper_pickaxe").button.label).is_equal("Equipped")
-	assert_str(d.card("craft_gather_gloves").button.label).is_equal("Owned · always on")
-	assert_str(d.card("craft_gather_gloves").button.reason).is_equal("Owned · always on")
 
 func test_a_supply_floats_on_its_card_and_the_drawer_stays() -> void:
 	var d: P0WorkbenchDrawer = await _drawer("supplies")
@@ -159,18 +155,6 @@ func test_the_pickaxe_moment_offers_only_equip() -> void:
 	assert_that(sent).is_equal([{"type": "equip", "item": "pick_copper"}])
 	assert_bool(ui.has_modal()).is_false()
 
-func test_the_gloves_banner_says_the_next_harvest_and_leaves_the_drawer() -> void:
-	var d: P0WorkbenchDrawer = await _drawer("tools")
-	var banner := P0MaterialCards.gloves_banner(ui, _view())
-	var texts: Array = []
-	var walk := func(n: Node, f: Callable) -> void:
-		if n is Label: texts.append((n as Label).text)
-		for c in n.get_children(): f.call(c, f)
-	walk.call(banner, walk)
-	assert_that(texts).is_equal(["Gather Gloves", "+1 at every gathering spot", "Next Timber harvest: 7", "Passive · no gear slot needed"])
-	assert_object(ui.workbench()).is_same(d)   # GLOVES-DONE: the banner sits over the open drawer
-	banner.queue_free()
-
 # --- The item's InfoSheet (不知火舞 on 231: CRAFT-1/2/4 are the shared InfoSheet) ---
 
 func test_workbench_info_is_read_only_with_what_the_item_does() -> void:
@@ -183,22 +167,20 @@ func test_workbench_info_is_read_only_with_what_the_item_does() -> void:
 	assert_bool(pick.info).is_false()       # no item page behind it in P0: no ›
 	v.workbench.recipes[0].owned = true
 	assert_that(P0ItemInfo.spec(v, "pick_copper", &"workbench").facts).is_equal(["2 Stone per rock", "In Gear"])
-	v.workbench.recipes[1].owned = true
-	assert_that(P0ItemInfo.spec(v, "gather_gloves", &"workbench").facts).is_equal(["+1 at every gathering spot", "Passive · no gear slot needed"])
 	assert_that(P0ItemInfo.spec(v, "torch", &"workbench").facts).is_equal(["See what rocks hold"])
 
 func test_an_icon_opens_the_items_info_and_folds_it_again() -> void:
-	var d: P0WorkbenchDrawer = await _drawer("tools")
+	var d: P0WorkbenchDrawer = await _drawer("supplies")
 	assert_bool(d.sheet.is_open()).is_false()
-	d.card("craft_copper_pickaxe").icon_pressed.emit()
+	d.card("craft_torch").icon_pressed.emit()
 	assert_bool(d.sheet.is_open()).is_true()
-	assert_str(d.sheet.item_id()).is_equal("pick_copper")
+	assert_str(d.sheet.item_id()).is_equal("torch")
 	assert_str(d.sheet.context()).is_equal("workbench")
-	d.card("craft_gather_gloves").icon_pressed.emit()      # another item switches the card
-	assert_str(d.sheet.item_id()).is_equal("gather_gloves")
-	d.card("craft_gather_gloves").icon_pressed.emit()      # the same one folds it
+	d.card("craft_compost").icon_pressed.emit()            # another item switches the card
+	assert_str(d.sheet.item_id()).is_equal("fert_compost")
+	d.card("craft_compost").icon_pressed.emit()            # the same one folds it
 	assert_bool(d.sheet.is_open()).is_false()
-	d.card("craft_copper_pickaxe").icon_pressed.emit()
-	d._tabs.selected = 1
-	d._tabs.changed.emit(1)                                # another tab folds it
+	d.card("craft_torch").icon_pressed.emit()
+	d._tabs.selected = 0
+	d._tabs.changed.emit(0)                                # another tab folds it
 	assert_bool(d.sheet.is_open()).is_false()

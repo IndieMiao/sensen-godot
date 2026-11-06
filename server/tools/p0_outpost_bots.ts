@@ -3,17 +3,20 @@
  *   node --import tsx tools/p0_outpost_bots.ts fill [outpost=sh_tackle_1] [n=12]   idle players: the next one in lands in Room 2
  *   node --import tsx tools/p0_outpost_bots.ts tea                                 one walking a loop, one seated on the bench
  * P0_ONLINE_URL (default ws://127.0.0.1:3110/v1/p0/online) picks the server; P0_BOTS_MINUTES (default 15) when to quit.
+ * The handshake carries x-p0-features: save_v7 (397's): a server with the wipe's second guard on refuses one
+ * without them (SGODOT-396 ①).
  * Stop early with Ctrl+C or by the PID this prints.
  */
 import { WebSocket } from 'ws';
 
 const url = process.env.P0_ONLINE_URL ?? 'ws://127.0.0.1:3110/v1/p0/online';
+const FEATURES = 'save_v7';   // the wipe's required feature (397)
 const [mode = 'fill', ...rest] = process.argv.slice(2);
 
 interface Plan { outpost: string; at: [number, number]; slots?: Record<string, string>; move?: (t: number) => [number, number]; seat?: { node: string; at: [number, number] } }
 
 function bot(player: string, plan: Plan) {
-  const ws = new WebSocket(url, { headers: { 'x-p0-player': player } });
+  const ws = new WebSocket(url, { headers: { 'x-p0-player': player, 'x-p0-features': FEATURES } });
   let epoch = 0;
   let seq = 0;
   let t = 0;

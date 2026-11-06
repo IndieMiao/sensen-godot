@@ -11,7 +11,7 @@
 import { createHash } from 'node:crypto';
 import type { Crop, P0Content, WorkbenchRecipe } from './content.js';
 import type { Refusal } from './fishing.js';
-import { coinsNeeded, stepAt } from './homestead.js';
+import { coinsNeeded, levelCap, stepAt, type LevelCap } from './homestead.js';
 import { homeClimate } from './travel.js';
 import type { P0Event } from './progress.js';
 import { skillLevel, untilRollover } from './rules.js';
@@ -119,10 +119,25 @@ export function ripenMs(c: P0Content, s: P0State, plot: Plot, crop: Crop): numbe
   return crop.quick ? crop.quick.ms : growMs(c, s, plot, cropGrowH(c, s, crop, plot));
 }
 
-/** Plots the current Homestead level has (homestead.plots: Lv1 30, Lv3 40, q(59) §1.1), at most the garden grid's. */
+/** SGODOT-355 b1 (v4 2.5): the Plots an annual may stand on at this Homestead level (homestead.plots: Lv1 8, +2 a level
+ * to Lv15's 36, Lv16 39, Lv17 41). Trees and sprinklers never count against it (`Plots 41/41`, 不知火舞 on the grid). */
+export function fieldCap(c: P0Content, s: P0State): number {
+  return stepAt(c.homestead.plots, s.homestead.level, c.start.tilled_plots + c.start.wild_plots);
+}
+
+/** Annuals on the field now (sown, growing or ripe; a tree is not one). */
+export function fieldsUsed(c: P0Content, s: P0State): number {
+  return s.plots.filter(p => p.crop && p.state !== 'tilled' && p.state !== 'wild' && !cropById(c, p.crop)?.perennial).length;
+}
+
+/** Beds open on the garden grid (content.garden.plots, in the order they open): the Plots, plus one for each tree and
+ * each sprinkler standing — placing one on an empty bed opens the next, so the Plots stay what the level gives (不知火舞
+ * on the grid, 11-02). A bed once open stays open; at most the grid's 63. */
 export function plotCount(c: P0Content, s: P0State): number {
-  const p0 = c.start.tilled_plots + c.start.wild_plots;
-  return Math.min(stepAt(c.homestead.plots, s.homestead.level, p0), c.garden?.plots.length ?? p0);
+  const trees = s.plots.filter(p => p.crop && cropById(c, p.crop)?.perennial).length;
+  const stands = (s.facilities ?? []).filter(f => f.plot >= 0 && c.facilities.kinds[f.kind]?.cover !== 'block').length;
+  const grid = c.garden?.plots.length ?? fieldCap(c, s);
+  return Math.min(Math.max(fieldCap(c, s) + trees + stands, s.plots.length), grid);
 }
 
 /** A plot's cell on the yard grid Decorate uses: content garden.origin + pitch × its [col, row] (P0Garden.PLOT_ORIGIN, beds
@@ -182,12 +197,12 @@ export function nearestYardCell(c: P0Content, s: P0State, from: [number, number]
   return best;
 }
 
-/** Add the plots the Homestead level brings and does not have yet, as wild; the ids added (an upgrade, or a save
- * already past the level when this version arrives, q(59) §1.1). Existing plots never move. */
+/** Open the beds plotCount says and the save does not have yet, tilled (v4: a new bed comes ready to sow); the ids added
+ * (an upgrade, a tree or a sprinkler on an empty bed). Existing plots never move. */
 export function addPlots(c: P0Content, s: P0State): number[] {
   const added: number[] = [];
   for (let id = 0; id < plotCount(c, s); id++) {
-    if (!s.plots.some(p => p.id === id)) { s.plots.push({ id, state: 'wild' }); added.push(id); }
+    if (!s.plots.some(p => p.id === id)) { s.plots.push({ id, state: 'tilled' }); added.push(id); }
   }
   s.plots.sort((a, b) => a.id - b.id);
   return added;
@@ -199,8 +214,7 @@ export function facilityCap(c: P0Content, s: P0State, kind: string, level?: numb
   const def = c.facilities.kinds[kind];
   if (!def) return 0;
   if (def.cap_by_farming) return stepAt(def.cap_by_farming, level ?? skillLevel(c, s, 'farming'), 0);
-  const m = (c.homestead as Record<string, unknown>)[`${kind}_max`] as { base: number; per_level: number; max: number } | undefined;
-  return m ? Math.min(m.max, m.base + m.per_level * (level ?? s.homestead.level)) : 0;
+  return levelCap((c.homestead as Record<string, unknown>)[`${kind}_max`] as LevelCap | undefined, level ?? s.homestead.level);
 }
 
 /** What lets one more stand next: {homestead_next} or {farming_next} (a level), null when the cap no longer grows. */

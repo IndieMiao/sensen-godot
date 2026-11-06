@@ -292,8 +292,8 @@ static func in_category(it: Dictionary, cat: String) -> bool:
 static func gear_slots(view: Dictionary) -> Array:
 	var slots: Dictionary = view.get("gear", {}).get("slots", {})
 	return GEAR_SLOTS.map(func(k: String) -> Dictionary:
-		var id := _slot_item(slots, k)
-		return {key = k, role = k.capitalize(), item = id, icon = P0Logic.icon(id) if id != "" else null,
+		var id := str(view.get("gear", {}).get("weapon", "")) if k == "combat" and view.get("gear", {}).has("weapon") else _slot_item(slots, k)
+		return {key = k, role = "Weapon" if k == "combat" else k.capitalize(), item = id, icon = P0Logic.icon(id) if id != "" else null,
 			name = P0Logic.item_name(view, id) if id != "" else "Empty", empty = id == ""})
 
 ## Candidates for one slot as UiGearRow data. Rods come from the view (owned, equipped, gates); the other P0
@@ -304,6 +304,7 @@ const _SLOT_LISTS := {"fishing": "rods", "mining": "picks"}
 static func gear_rows(view: Dictionary, key: String) -> Array:
 	var out := []
 	var list: Array = view.get("gear", {}).get(_SLOT_LISTS.get(key, ""), []) if _SLOT_LISTS.has(key) else []
+	if key == "combat" and view.get("gear", {}).has("weapons"): list = P0Logic.GearLogic.weapon_rows(view)
 	if not list.is_empty():
 		for r in list:
 			var id := str(r.id)
@@ -402,7 +403,7 @@ func _build_gear() -> void:
 		row.add_child(cell)
 	_gear_box.add_child(row)
 	_gap(_gear_box, _SLOT_LIST_GAP)
-	_gear_box.add_child(UiKit.label("%s slot" % gear_slot.capitalize(), UiTokens.STYLE_C12_XB))
+	_gear_box.add_child(UiKit.label("%s slot" % ("Weapon" if gear_slot == "combat" else gear_slot.capitalize()), UiTokens.STYLE_C12_XB))
 	_gap(_gear_box, _SMALL_GAP)
 	var rows := gear_rows(view, gear_slot)
 	for d in rows:

@@ -1,6 +1,6 @@
 extends RefCounted
 ## HOME-1 upgrade sheet (Figma 482:152) and the HOME-2 moment (482:154 / MomentBanner 1228:108620) for
-## Homestead Lv1–3 (plan §8.1–8.6, SGODOT-228). Data comes from P0Logic.home_panel / home_moment; this file
+## Homestead (SGODOT-228 / 355 A). Data comes from P0Logic.home_panel / home_moment; this file
 ## only lays them out with the kit (UiNeedTile, UiNeedSource, UiCommandButton) on P0Ui's modal base.
 
 const SHEET_TOP := 194.0        # sheet edge on the 360 × 800 frame; scrolling content above the fixed actions
@@ -56,7 +56,7 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		scroll.add_child(body)
 		frame.add_child(_fade(scroll))
 	body.add_child(UiKit.label(str(model.title), UiTokens.STYLE_C14_XB))
-	if str(model.subtitle) != "":   # Lv10: `Max level · Homestead Master` (q(115) ②)
+	if str(model.subtitle) != "":   # the current content cap, independent of the Master title
 		body.add_child(UiKit.label(str(model.subtitle), UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))
 	if str(model.look) != "":
 		body.add_child(UiKit.label(str(model.look), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY))
@@ -64,13 +64,16 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		var needs := VBoxContainer.new()
 		needs.add_theme_constant_override(&"separation", 10)
 		needs.add_child(UiKit.label("Needs", UiTokens.STYLE_C12_XB))
-		var tiles: Array = []
+		var groups := [[], [], []]
 		for t in model.tiles:
-			var tile := UiNeedTile.new(str(t.name), int(t.have), int(t.need), UiNeedTile.Size.L, P0Logic.icon(str(t.icon)))
 			var id := str(t.id)
+			# a skill's name as the Skills page writes it (Cooking@skill 烹饪, not the stove's 烹饪中)
+			var tile_name := Localization.ctx(str(t.name), "skill") if id.begins_with("skill_") else str(t.name)
+			var tile := HomeNeedTile.new(tile_name, int(t.have), int(t.need), UiNeedTile.Size.L, P0Logic.icon(str(t.icon)))
 			tile.pressed.connect(func(): _source(ui, tile, id))
-			tiles.append(tile)
-		needs.add_child(UiNeedTile.group(tiles))
+			groups[1 if id.begins_with("skill_") else 2 if id in ["stamps", "climates"] else 0].append(tile)
+		for tiles in groups:
+			if not tiles.is_empty(): needs.add_child(_needs_grid(tiles))
 		body.add_child(needs)
 	if not model.changes.is_empty():
 		var changes := VBoxContainer.new()
@@ -116,6 +119,39 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	ui._open_modal(panel, 0.3, true)
 	ui.modal_kind = "homestead"
 
+## A1/A2 fix column centres while skills and travel each start a new row.
+static func _needs_grid(tiles: Array) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override(&"h_separation", int(UiTokens.SIZE_NEED_TILE_GAP_X))
+	grid.add_theme_constant_override(&"v_separation", int(UiTokens.SIZE_NEED_TILE_GAP_Y))
+	for tile in tiles: grid.add_child(tile)
+	while grid.get_child_count() % 4 != 0:
+		var spacer := Control.new()
+		spacer.custom_minimum_size.x = UiTokens.SIZE_NEED_TILE_RING_L
+		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		grid.add_child(spacer)
+	return grid
+
+class HomeNeedTile extends UiNeedTile:
+	func _ready() -> void:
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		resized.connect(_fit_label)
+		_fit_label.call_deferred()
+
+	func _get_minimum_size() -> Vector2:
+		return Vector2(ring_side(), super._get_minimum_size().y)
+
+	func _fit_label() -> void:
+		var labels := [_name, _have, _need]
+		var natural := 3.0
+		for label in labels:
+			natural += label.get_theme_font(&"font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
+		var font_size := mini(12, maxi(1, floori(12.0 * maxf(1.0, size.x - 3.0) / maxf(1.0, natural - 3.0))))
+		for label in labels: label.add_theme_font_size_override(&"font_size", font_size)
+		(get_child(0) as Control).size = size
+
 ## FADE_H over the scroll's bottom edge, shown while the scroll can still go down.
 static func _fade(scroll: ScrollContainer) -> Control:
 	var grad := Gradient.new()
@@ -141,7 +177,7 @@ static func _fade(scroll: ScrollContainer) -> Control:
 	fade.visible = false
 	return fade
 
-## The Upgrade button (the first gap on it, LOCK-10); none at Lv10 (q(115) ②).
+## The Upgrade button (the first gap on it, LOCK-10); none at the current Homestead cap.
 static func _add_button(ui: P0Ui, col: Control, panel: Control, model: Dictionary) -> void:
 	var button := UiCommandButton.new(str(model.label))
 	button.reason = str(model.reason)
@@ -189,13 +225,21 @@ static func _look_row(ui: P0Ui, r: Dictionary) -> Control:
 			if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed: P0LookPick.open(ui, id))
 	return row
 
-## A tapped tile: one source line above it; Show only moves the camera (LOCK-10 / LOCK-08).
+## A tapped tile's source: materials point at the world; 355 A's skill gates open Skills, the travel gates have no Show (A3c).
 static func _source(ui: P0Ui, tile: Control, id: String) -> void:
 	var src := P0Logic.home_source(ui.view, id)
-	var go := str(src.go) if ui.spot_reachable() else ""
+	var go := str(src.go)
+	# 355 C2: a city's spot or a wild mine (`gather:` / `mine:`) is a map pin, as Today's rows go (P0Ui.show_label)
+	var pin := go.begins_with("gather:") or go.begins_with("mine:")
+	var label := P0Ui.show_label(go, ui.space_here(), ui.spot_reachable(), ui.place) if pin else ""
+	if not (go == "skills" or (label != "" if pin else ui.spot_reachable())): go = ""
+	var home_back := ui._modal_back
 	var on_show := Callable() if go == "" else func():
-		ui.close_modal()
-		ui.show_spot.emit(go)
+		if go == "skills": ui.open_skills(func(): ui.open_home_panel(home_back))
+		else:
+			ui.close_modal()
+			if pin and label != "Show": ui.show_on_map.emit(go)
+			else: ui.show_spot.emit(go)
 	var layer := UiNeedSource.popup(ui.root, tile.get_global_rect(), str(src.text), on_show)
 	layer.theme = UiKit.theme()
 

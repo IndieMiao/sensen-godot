@@ -13,7 +13,7 @@ const fresh = () => freshState(c, 'player-seq-01', T0, 42);
 describe('P0 state version (expect_seq, SGODOT-211)', () => {
   it('applies a command whose expect_seq matches and advances seq', () => {
     const s = fresh();
-    const r = applyP0(c, s, { type: 'till', plot: c.start.tilled_plots, expect_seq: s.seq }, T0);
+    const r = applyP0(c, s, { type: 'sow', plot: 0, seed: 'seed_radish', expect_seq: s.seq }, T0);
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.state.seq).toBe(s.seq + 1);
   });
@@ -21,13 +21,13 @@ describe('P0 state version (expect_seq, SGODOT-211)', () => {
   it('refuses a stale expect_seq without changing anything', () => {
     const s = fresh();
     const before = structuredClone(s);
-    const r = applyP0(c, s, { type: 'till', plot: c.start.tilled_plots, expect_seq: s.seq + 3 }, T0);
+    const r = applyP0(c, s, { type: 'sow', plot: 0, seed: 'seed_radish', expect_seq: s.seq + 3 }, T0);
     expect(r).toEqual({ ok: false, code: 'stale_state', detail: { seq: s.seq, expected: s.seq + 3 } });
     expect(s).toEqual(before);
   });
 
   it('still accepts commands without expect_seq (older clients)', () => {
-    const r = applyP0(c, fresh(), { type: 'till', plot: c.start.tilled_plots }, T0);
+    const r = applyP0(c, fresh(), { type: 'sow', plot: 0, seed: 'seed_radish' }, T0);
     expect(r.ok).toBe(true);
   });
 

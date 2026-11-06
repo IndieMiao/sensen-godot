@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+      <!-- sword_copper (355 v4q(7)): sword_wooden's shape, copper blade -->
+      <path fill="#C8763F" d="M50 8 20 38l6 6 30-30 2-8z"/>
+      <path fill="#F0A86F" d="M50 8 24 34l3 3L52 12z"/>
+      <rect x="14" y="36" width="22" height="7" rx="3.5" fill="#8A5A36" transform="rotate(45 25 39.5)"/>
+      <rect x="10" y="44" width="8" height="14" rx="4" fill="#6E7B74" transform="rotate(45 14 51)"/>
+    </svg>

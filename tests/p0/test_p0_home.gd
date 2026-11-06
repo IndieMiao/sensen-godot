@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## HOME-1 / HOME-2 models (Figma 482:152 / 482:154, §8.6.1, LOCK-10) from the server's homestead facts.
 
 func _view(level := 2) -> Dictionary:
-	var next := {"level": 3, "coins": {"need": 440, "have": 830}, "skills": {"need": 5, "have": 13, "farming": 7, "fishing": 6},
+	var next := {"level": 3, "coins": {"need": 440, "have": 830}, "skills": [{"skill": "fishing", "need": 5, "have": 13}],
 		"materials": [
 			{"id": "wood", "name": "Timber", "need": 16, "have": 10, "storage": 10, "bag": 0},
 			{"id": "stone", "name": "Stone", "need": 12, "have": 12, "storage": 12, "bag": 0},
@@ -19,10 +19,10 @@ func test_home_panel_matches_the_page_14_sample() -> void:
 	var p := P0Logic.home_panel(_view())
 	assert_str(str(p.title)).is_equal("Homestead Lv2 → Lv3")
 	assert_str(str(p.look)).is_equal("Lv3 look · Fence & Mailbox")   # q(115): the stage's name, never Look A / B
-	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
+	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Fishing"])
 	assert_int(int(p.tiles[5].need)).is_equal(440)   # price + the 40-coin floor (q(10))
 	assert_array(p.changes.map(func(c): return str(c.text))).is_equal(
-		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I · 150 coins", "Stall Board · 3rd slot",
+		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I · 60 coins", "Stall Board · 3rd slot",   # v4q(1) ⑧: 60 (150 before)
 		"Fence & Mailbox · Timber or Stone"])
 	assert_array(p.changes.map(func(c): return str(c.note))).is_equal(["now 210", "keeps 6 dishes by the stove", "Bag 25 → 30", "now 2", "pick one"])
 	assert_str(str(p.reason)).is_equal("Need 6 more Timber")
@@ -34,9 +34,9 @@ func test_the_button_carries_the_first_gap_in_tile_order() -> void:
 	v.homestead.next.coins.have = 400
 	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Need 40 more coins")
 	v.homestead.next.coins.have = 440
-	v.homestead.next.skills.have = 4
-	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Skills total 5 needed · now 4")
-	v.homestead.next.skills.have = 5
+	v.homestead.next.skills[0].have = 4
+	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Need Fishing Lv5")
+	v.homestead.next.skills[0].have = 5
 	var ready := P0Logic.home_panel(v)
 	assert_str(str(ready.reason)).is_equal("")
 	assert_str(str(ready.label)).is_equal("Upgrade")
@@ -56,7 +56,7 @@ func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.title)).is_equal("Homestead Lv5 → Lv6")
 	assert_array(p.changes.slice(1).map(func(c): return [c.text, c.note])).is_equal(
-		[["Big Pot · 2 servings on any stove", ""], ["Bag Upgrade II · 400 coins", "Bag 35 · after Upgrade I"]])   # q(201)
+		[["Big Pot · 2 servings on any stove", ""], ["Bag Upgrade II · 150 coins", "Bag 35 · after Upgrade I"]])   # q(201)
 	assert_str(str(p.changes[1].icon)).is_equal("big_pot")
 	v.homestead.next.unlocks = ["second_stove", "long_haul_ticket"]
 	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return str(c.text))).is_equal(["Second Stove"])
@@ -69,13 +69,13 @@ func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
 func test_lv1_to_lv2_lists_the_spice_rack_and_no_look_line() -> void:
 	var v := _view(1)
 	v.homestead.next.level = 2
-	v.homestead.next.unlocks = ["spice_rack", "clay_bank"]
+	v.homestead.next.unlocks = ["spice_rack", "city_gather"]
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.look)).is_equal("")
 	assert_str(str(p.changes[1].text)).is_equal("Spice Rack")
-	assert_str("%s · %s" % [p.changes[2].text, p.changes[2].note]).is_equal("Clay Bank · Clay next to the Reed Bank")   # q(45)
-	var m := P0Logic.home_moment(v, {"level": 2, "unlocks": ["spice_rack", "clay_bank"]})
-	assert_str(str(m.detail)).is_equal("Spice Rack · seasonings off your bag\nClay Bank opened")
+	assert_int(p.changes.size()).is_equal(2)   # city_gather is taught by the guide, not a HOME row
+	var m := P0Logic.home_moment(v, {"level": 2, "unlocks": ["spice_rack", "city_gather"]})
+	assert_str(str(m.detail)).is_equal("Spice Rack · seasonings off your bag")
 
 func test_p0_stops_at_lv3() -> void:
 	var v := _view(3)
@@ -85,15 +85,16 @@ func test_p0_stops_at_lv3() -> void:
 	assert_str(str(p.title)).is_equal("Homestead Lv3")
 	assert_array(p.tiles).is_empty()
 
-## q(115) ②: Lv10 has no next level: `Max level · Homestead Master` under the title, no Upgrade, and the Looks rows.
-func test_lv10_says_max_level_and_keeps_the_looks() -> void:
-	var v := _view(10)
+## The content cap has no next level: neutral copy under the title, no Upgrade, and the Looks rows.
+## Lv17, the top since v4q(1) (Lv10 before).
+func test_lv17_says_max_level_and_keeps_the_looks() -> void:
+	var v := _view(17)
 	v.homestead.next = null
 	v.homestead["looks"] = [{"id": "fence", "level": 3, "look": "a"}, {"id": "porch", "level": 5, "look": "b"},
-		{"id": "kitchen_extension", "level": 8, "look": "a"}, {"id": "master_farmhouse", "level": 10, "look": "b"}]
+		{"id": "kitchen_extension", "level": 8, "look": "a"}, {"id": "master_farmhouse", "level": 15, "look": "b"}]
 	var p := P0Logic.home_panel(v)
-	assert_str(str(p.title)).is_equal("Homestead Lv10")
-	assert_str(str(p.subtitle)).is_equal("Max level · Homestead Master")
+	assert_str(str(p.title)).is_equal("Homestead Lv17")
+	assert_str(str(p.subtitle)).is_equal("Highest level for now")
 	assert_bool(bool(p.button)).is_false()
 	assert_array(p.looks.map(func(r): return "%s … %s" % [r.name, r.value])).is_equal(
 		["Fence & Mailbox … Timber Fence ›", "Porch … Stone Porch ›", "Kitchen Wing … Timber Kitchen Wing ›", "Master Farmhouse … Stone Manor ›"])
@@ -106,7 +107,7 @@ func test_home_moment_matches_the_page_14_banner() -> void:
 	var m := P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "energy": 40, "unlocks": ["warming_cabinet", "bag_upgrade_1", "board_slot_3", "fence"]})
 	assert_str(str(m.title)).is_equal("Homestead Lv3")
 	assert_str(str(m.subtitle)).is_equal("Max Energy 220 · +40 Energy")
-	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I · 150 coins")
+	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I · 60 coins")
 
 func test_material_icons_exist() -> void:
 	for id in ["wood", "stone", "fiber", "clay", "rock_salt", "coin", "star", "energy", "kitchen", "bag", "board"]:
@@ -130,7 +131,7 @@ func test_home_1_lays_out_tiles_changes_and_the_gap_on_the_button() -> void:
 	HomePanel.open(ui)
 	assert_str(ui.modal_kind).is_equal("homestead")
 	var tiles := ui.find_children("*", "UiNeedTile", true, false)
-	assert_array(tiles.map(func(t): return (t as UiNeedTile).item_name)).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
+	assert_array(tiles.map(func(t): return (t as UiNeedTile).item_name)).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Fishing"])
 	var button: UiCommandButton = ui.find_children("*", "UiCommandButton", true, false)[0]
 	assert_str(button.reason).is_equal("Need 6 more Timber")
 	button.unavailable_pressed.emit(button.reason)
@@ -199,50 +200,29 @@ func test_the_sign_stands_beside_the_door_off_its_path_and_is_solid() -> void:
 	assert_bool(bp.is_walkable(c)).is_false()
 	assert_bool(bp.is_walkable(Vector2i(P0Garden.ANCHORS.house.x, c.y))).is_true()   # the door path stays open
 
-## The source label only breaks before ` · or ` (不知火舞 on 228): no-break spaces inside each part, U+2060 after a range's dash.
+## The source label only breaks before ` · or ` (不知火舞 on 228): no-break spaces inside each part.
 func _plain(src: Dictionary) -> Dictionary:
 	return {"text": str(src.get("text", "")).replace("\u00a0", " ").replace("\u2060", ""), "go": src.get("go", "")}
 
 func test_material_source_breaks_only_before_or() -> void:
 	var v := _view()
-	v.erase("gather")
 	v["names"] = {"clay": "Clay", "rock_salt": "Rock Salt"}
-	v["homestead"] = {"level": 1}
-	var gated := str(P0MaterialLogic.material_source(v, "clay").text)
-	assert_array(Array(gated.split(" "))).is_equal(["Clay\u00a0·\u00a0Mine\u00a0floor\u00a01", "·\u00a0or\u00a0Clay\u00a0Bank\u00a0from\u00a0Homestead\u00a0Lv2"])
-	assert_str(str(P0MaterialLogic.material_source(v, "rock_salt").text)).is_equal("Rock\u00a0Salt\u00a0·\u00a0Mine\u00a0floors\u00a01–\u20604")
+	# every space within a part a no-break one: the card breaks only at a ` · ` (eb1d7c20, UiNeedSource.fit_to)
+	assert_str(str(P0MaterialLogic.material_source(v, "clay").text)).is_equal("Clay · Clay\u00a0Pits\u00a0in\u00a0town · or\u00a0Quarries")
+	assert_str(str(P0MaterialLogic.material_source(v, "rock_salt").text)).is_equal("Rock\u00a0Salt · Quarries")
 
-func test_material_sources_name_the_spots_and_the_mine() -> void:
-	# HOME-1 uses the workbench's line (P0MaterialLogic.material_source, Li Bai q(65)): ` · or `, open sources first,
-	# a spot not open yet last with "from Homestead LvN"; Show goes to the first open source.
+func test_material_sources_name_the_mine() -> void:
+	# HOME-1 uses the workbench's line (P0MaterialLogic.material_source, Li Bai q(65)): the city's spots and the mines
+	# (355 3b2c6a43); Show where Today points (no spots read, no free sites in this view: none)
 	var v := _view()
-	v["gather"] = {"spots": [
-		{"id": "spot_grove", "name": "Timber Grove", "open": true, "homestead": 1, "yield": [["wood", 6]]},
-		{"id": "spot_rock_pile", "name": "Rock Pile", "open": true, "homestead": 1, "yield": [["stone", 4]]},
-		{"id": "spot_reed_bank", "name": "Reed Bank", "open": true, "homestead": 1, "yield": [["fiber", 3], ["bait_worm", 2]]},
-		{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "yield": [["clay", 2]]}]}
 	v["names"] = {"wood": "Timber", "stone": "Stone", "fiber": "Reeds", "clay": "Clay", "rock_salt": "Rock Salt", "bait_worm": "Worm Bait"}
-	assert_that(_plain(P0Logic.home_source(v, "wood"))).is_equal({"text": "Timber · Timber Grove", "go": "spot_grove"})
-	assert_that(_plain(P0Logic.home_source(v, "stone"))).is_equal({"text": "Stone · Rock Pile · or the mine", "go": "spot_rock_pile"})
-	assert_that(_plain(P0Logic.home_source(v, "fiber"))).is_equal({"text": "Reeds · Reed Bank", "go": "spot_reed_bank"})
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Mine floor 1 · or Clay Bank from Homestead Lv2", "go": "mine"})
-	assert_that(_plain(P0Logic.home_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Mine floors 1–4", "go": "mine"})
-	assert_that(_plain(P0Logic.home_source(v, "bait_worm"))).is_equal({"text": "Worm Bait", "go": ""})   # a side yield, not a material
-	# Lv2 opens the Clay Bank: the gate goes, the order stays (Li Bai's example).
-	v.gather.spots[3].open = true
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Mine floor 1 · or Clay Bank", "go": "mine"})
+	assert_that(_plain(P0Logic.home_source(v, "stone"))).is_equal({"text": "Stone · Rocks in town · or any mine", "go": ""})
+	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Clay Pits in town · or Quarries", "go": ""})
+	assert_that(_plain(P0Logic.home_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarries", "go": ""})
+	assert_that(_plain(P0Logic.home_source(v, "wood"))).is_equal({"text": "Timber · Groves in town", "go": ""})
 	# Coins and skills keep their own lines.
 	assert_str(str(P0Logic.home_source(v, "coins").go)).is_equal("stall")
 	assert_str(str(P0Logic.home_source(v, "skills").go)).is_equal("")
-
-func test_material_source_without_spot_states_reads_the_homestead_level() -> void:
-	var v := _view()   # no view.gather (a view from before the spots): the content's gate against the Homestead level
-	v.erase("gather")
-	v["names"] = {"clay": "Clay"}
-	v["homestead"] = {"level": 1}
-	assert_str(str(_plain(P0MaterialLogic.material_source(v, "clay")).text)).is_equal("Clay · Mine floor 1 · or Clay Bank from Homestead Lv2")
-	v.homestead.level = 2
-	assert_str(str(_plain(P0MaterialLogic.material_source(v, "clay")).text)).is_equal("Clay · Mine floor 1 · or Clay Bank")
 
 func test_plaque_lines_date_each_upgrade() -> void:
 	var v := _view(3)
@@ -286,6 +266,23 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
 
+## SGODOT-355 b1 (亚瑟 on #624): a sow the server turns down with plots_full says what the grey Sow key says, never the code.
+func test_a_refused_sow_on_a_full_field_says_the_plots() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var v := _view()
+	v["homestead"] = {"level": 1}
+	rt.session.view = v
+	rt._on_refused("plots_full", {"used": 8, "cap": 8}, {"type": "sow", "plot": 8, "seed": "seed_lettuce"})
+	# a line too long breaks at its « · », the dot dropped as every such break (UiKit.break_at_dot, 不知火舞 on #201 / #624)
+	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8\nHomestead Lv2 adds 2")
+	# the grey Sow key's tap says the same
+	rt.ui.set_action(P0Logic.fields_full_action({"homestead": {"level": 1}, "garden": {"fields": {"used": 8, "cap": 8}}}))
+	rt.ui.clear_toast()
+	rt.ui._fab_pressed()
+	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8\nHomestead Lv2 adds 2")
+
 ## A refused upgrade (后裔 on #150): away from home it says what HOME-1's grey button says; when the fresh view shows no gap
 ## any more (it changed under the tap) the server's detail names it instead of an empty toast.
 func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
@@ -308,8 +305,8 @@ func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
 	rt.session.view = no_gap
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 15}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 1 more Timber")
-	rt._on_refused("skills_short", {"need": 5, "have": 4}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Skills total 5 needed\nnow 4")   # never "Can't do that (skills_short)"; broken at its " · "
+	rt._on_refused("skills_short", {"skill": "fishing", "need": 5, "have": 4}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Need Fishing Lv5")   # never "Can't do that (skills_short)"
 	rt._on_refused("max_level", {"level": 3}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Highest level for now")
 
@@ -402,7 +399,7 @@ func test_bag_upgrade_notes_follow_the_tiers_the_player_has() -> void:
 	v.homestead.next.level = 9
 	v.homestead.next.unlocks = ["bag_upgrade_3"]
 	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
-		["Bag Upgrade III · 1,000 coins · Bag 35 → 40"])
+		["Bag Upgrade III · 300 coins · Bag 35 → 40"])
 
 ## Lv8 promises no stall look until the stall has its model (不知火舞 on 282, 李元芳's c62a6ed9 ③): neither HOME-1 nor the banner.
 func test_lv8_says_nothing_of_the_stall_yet() -> void:

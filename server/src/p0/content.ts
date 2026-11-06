@@ -3,7 +3,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CityClusters } from './clusters.js';
-import { cityPlaces } from './world.js';
+import { cityPlaces, worldOf } from './world.js';
+import type { LevelCap } from './homestead.js';
 
 export type Skill = 'farming' | 'fishing' | 'cooking';
 export const SKILLS: readonly Skill[] = ['farming', 'fishing', 'cooking'];
@@ -131,19 +132,29 @@ export interface ResidentRequest {
   /** q(218): what the resident says on the open bar once it is handed in (the client fills `{pond}`, the home's beginner pond). */
   thanks?: string;
 }
-/** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
-export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
-/** §13.3.3 one mine floor: weighted extra drop per rock (null = nothing extra), its rock count (default mine.rocks; floor 5
- * has none) and its monsters by id (§13.3.4, SGODOT-275). */
-export interface MineFloorDef { floor: number; drops: [string | null, number][]; rocks?: number; mobs?: string[] }
+/** 355 E: per-type floor bands, special floors and the site facts supplied by C. */
+export interface MineBand {
+  from: number; to: number; mobs: [string, number, number][]; rocks: [number, number]; drops: [string | null, number][];
+}
+export interface MineFloorOverride { add?: [string, number, number][]; elite?: string; only?: string[]; guard?: string; hp_mult?: number }
+export interface MineSite {
+  id: string; type: string; name: string; near: string; open?: boolean;
+  mine: { floors: number; main: string | null; main_from: number; side: string | number | null; open_to: number | null };
+}
+export interface MineWeapon { name: string; attack: number; speed: number; tier: number }
 /** §13.3.4 a mine monster: loot as [item, qty, weight]; once_a_day = an item it gives a player at most once a player day. */
-export interface MineMonster { name: string; hp: number; damage: number; loot: [string, number, number][]; once_a_day?: string }
-/** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools). */
+export interface MineMonster {
+  name: string; hp: number; damage: number; loot?: [string | null, number, number][]; once_a_day?: string;
+  elite?: boolean; guard?: boolean; tier?: number; stun_mult?: number; first?: [string, number][]; pack?: [string, number];
+}
+/** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools); 355 G: a weapon
+ * into the weapon slot (contract-efg §9.3, the Iron Sword). */
 export interface WorkbenchRecipe {
-  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field';
+  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field' | 'weapon';
   cost: [string, number][]; gate?: [Skill, number];
+  homestead?: number;  // 355 G: the Homestead level it opens at (Iron Sword Lv8), as a shop offer's; `gate` stays a skill's
   facility?: string;   // to: field (P1, SGODOT-239): the facility it builds in place (place command), never crafted
-  coins?: number;      // coins paid as it is placed, on top of the materials (greenhouse 300, §5.7; the 40 floor kept)
+  coins?: number;      // coins paid as it is placed or crafted, on top of the materials (greenhouse 300, §5.7; Iron Sword 150; the 40 floor kept)
 }
 /** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
 export interface FacilityDef {
@@ -208,7 +219,7 @@ export interface P0Content {
   blessing: { days: number; regen_mult: number; food_bonus: number };
   tackle: { keeper: { role: string; name: string }; buy: string[] };
   tools: {
-    farming: string; fishing: string; mining: string; combat: string; names: Record<string, string>;
+    farming: string; fishing: string; mining: string; names: Record<string, string>;
     row_hoe: { id: string; price: number; skill: Skill; gate: number; sow: number };
   };
   materials: Record<string, { name: string; price: number | null; floor?: number; ingr?: [Family, number] }>;   // ingr: seasonings (§7.3.1); floor: a request's price for one with no buyback (quartz, hardwood)
@@ -225,15 +236,15 @@ export interface P0Content {
     stoves?: [number, number][];              // stoves in the kitchen: Lv1 1, Lv4 2, Lv8 3 (absent = 1)
     warming_cabinet_by_level?: [number, number][];   // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
     chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
-    plots?: [number, number][];               // plots the homestead has: Lv1 30, Lv3 40 (P1 q(59) §1.1; absent = P0's start)
-    perennial_slots?: { base: number; per_level: number; max: number };   // trees that may stand: 1 + level, at most 8
-    sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
-    // Barter (§8.4.5, SGODOT-282): at the Market Square keeper, `give` of this climate's regional crops or fish for 1
-    // mineral; a mineral at most `level_share` of the next level's need by barter; at most `daily` a day.
-    barter?: { give: number; minerals: string[]; level_share: number; daily: number };   // items: the market's climate's regional crops and fish (barter.ts)
-    per_level: { energy: number; meals: number };
+    plots?: [number, number][];               // beds the homestead has by level: Lv1 8 … Lv17 41 (355 grid; absent = P0's start)
+    perennial_slots?: LevelCap;   // trees that may stand: 1 + level, at most 8, 10 from Lv14 (v4q(1) ⑧)
+    sprinkler_max?: LevelCap;     // sprinklers that may stand: 3 + level, at most 10, 12 from Lv14
+    energy_steps: [number, number][];         // v4q(1) ⑦: the Energy pool and meal cap, [from level, + a level]: [[2, 10], [11, 5]]
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
-    levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[]; energy?: number | 'full' }[];
+    // v4q(1): each skill's own gate (farming / fishing / cooking, absent = none), the travel gate from Lv16 (city stamps,
+    // other climate bands), and the Energy a level gives back — a number, always (Lv2–15 50, Lv16 on 0)
+    levels: { level: number; coins: number; skills: Partial<Record<'farming' | 'fishing' | 'cooking', number>>; travel?: { stamps: number; climates: number };
+      materials: [string, number][]; unlocks: string[]; energy: number }[];
     /** Looks (content/homestead_looks.json, §8.3.1, q(112)): a stage per look level, its id the level's unlock id. */
     looks?: HomesteadLook[];
   };
@@ -294,6 +305,11 @@ export interface P0Content {
     food_cap: number;
     conveniences: Partial<Record<Convenience, number>>;   // the Cooking level each convenience comes at (q(38)); absent = not in this build
     gold_cap: number; steady_hand_gold: number;  // gold arc share: bonuses stop at gold_cap; Steady Hand I adds steady_hand_gold
+    // q(288) (SGODOT-419): every ring differs. width_mul: each ring's width is the pot's × a draw in it, at most gold_cap;
+    // drift: the ring turns against the needle, °/s; lead_ms: the gold starts no sooner than this after the needle sets
+    // off; end: it ends by this share of the ring; pair_min_deg / pair_opposite_deg: two rings' gold centres at least
+    // this far apart and not within this of opposite. Absent: rings as before (the teaching pot never has it).
+    heat_vary?: { width_mul: [number, number]; drift: number; lead_ms: number; end: number; pair_min_deg: number; pair_opposite_deg: number };
     mastered: { cooked: number; gold: number; fast?: number };  // Mastered at `cooked` pots (`fast` with Fast Mastery, Lv7); its gold arc is wider (§7.5.1)
     lucky_double?: number;                        // Lucky Double (Lv10): chance of one more Plain portion (not Legendary, not with Double)
     // Cookbook milestones past Home Cook (§7.6.1, SGODOT-282): titles at Discovered / Mastered counts, once each;
@@ -309,16 +325,29 @@ export interface P0Content {
   };
   /** Consumables made at the workbench, with no shop row (Torch). */
   supplies: Record<string, { name: string }>;
-  /** §13.2 (SGODOT-231): spot regrow, anti-script tempo between taps, the gloves and their bonus. */
-  gather: { regen_h: number; tempo_ms: number; gloves: string; gloves_bonus: number; spots: Record<string, GatherSpot> };
-  /** §13.3 floors 1–5 (SGODOT-231, LOCK-21; 3–5 SGODOT-275). picks: Stone per rock by pickaxe; combat: the mine's HP and the
-   * Combat slot's weapons; express_unlock_floor: the floor whose first clear opens Floor 5 · Express for the account. */
+  /** The anti-script tempo between gathering taps (a city's points, v4q(4); the farm's spots left with v4q(4) ①). */
+  gather: { tempo_ms: number };
+  /** 355 E/F: all provisional economy and combat values live in the three non-overlapping mine fragments. */
   mine: {
-    runs_per_day: number; floor_energy: number; rock_energy: number; rocks: number; restart_floor: number; tempo_ms: number;
-    floors: MineFloorDef[]; picks: Record<string, { stone: number }>;
+    floor_energy: number; rock_energy: number; fee_per_day: boolean; picks: Record<string, { stone: number }>;
     monsters: Record<string, MineMonster>;
-    combat: { hp: number; invulnerability_ms: number; weapons: Record<string, { attack: number; speed: number }> };
-    express_unlock_floor: number;
+    /** q(291): ko_hp — HP a knock-out leaves; regen_full_ms — outside the mine, 0 to full in this long (whole points). */
+    combat: { hp: number; invulnerability_ms: number; ko_keep_from: number; ko_lose: number; under_tier: number;
+      ko_hp: number; regen_full_ms: number; weapons: Record<string, MineWeapon> };
+    types: Record<string, { bands: MineBand[]; floors: Record<string, MineFloorOverride>;
+      main_weight?: [number, number][]; gate?: { homestead: number } }>;
+    dev_sites?: MineSite[];
+    potions: Record<string, { name: string; price: number; stock: number; sold_at: string; gate: { homestead: number };
+      heal: number | 'full'; floors: 'any' | number[]; cooldown_ms: number }>;
+    /** tempo_burst (preview B, 奕星 11-05): how many swings or rocks may come ahead of their tempo (mine.ts tempoWait);
+     * absent = none, each one its full interval after the last. rock_cards (q(292)): the floor's cards each rock deals
+     * (each a draw from the floor's table); absent = 1. */
+    rules: { rock_tempo_ms: number; attack_tempo_factor: number; max_targets: number; guard_fast_factor: number; tempo_burst?: number;
+      rock_cards?: number };
+    /** 355 G (contract-efg §9.2): Pip's First Dig, its own slot beside the request line; lines.pip_vein is Pip's one
+     * line toward the iron vein (v4q(9) ②), `%s` the vein's name filled in by the client. Absent = not in this build. */
+    first_dig?: { giver: string; floor: number; gate: { homestead: number }; reward: { weapon?: string; affinity?: number };
+      lines?: Record<string, string> };
   };
   /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
@@ -344,6 +373,16 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const c = JSON.parse(readFileSync(file, 'utf8')) as P0Content;
   const dir = path.dirname(file);
   mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
+  if (c.mine.fee_per_day !== true) throw new Error('p0 content: mine.fee_per_day must be true for batch 1');
+  const mainFrom = (worldOf(c) as { wild?: { mines?: { vein?: { main_from: number } } } } | undefined)?.wild?.mines?.vein?.main_from;
+  if (!Number.isInteger(mainFrom) || c.mine.types.vein.main_weight?.[1]?.[0] !== mainFrom)
+    throw new Error('p0 content: mine.types.vein.main_weight[1].from must equal world.wild.mines.vein.main_from');
+  const dig = c.mine.first_dig;
+  if (dig && (!c.residents[dig.giver] || (dig.reward.weapon !== undefined && !c.mine.combat.weapons[dig.reward.weapon])))
+    throw new Error('p0 content: mine.first_dig names a resident or a weapon the table does not have');
+  for (const r of c.workbench.recipes)
+    if (r.to === 'weapon' && !c.mine.combat.weapons[r.out]) throw new Error(`p0 content: workbench ${r.id} makes ${r.out}, not a weapon of mine.combat`);
+  checkHomestead(c);
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
     c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; name?: string; residents?: string[]; cluster?: string; lat?: number; lng?: number; keeper?: { name?: string; role?: string } }[])
@@ -373,6 +412,16 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
     }
   }
   return c;
+}
+
+/** v4q(1) ⑥ (复核 ③): every level's `energy` is a number — a missing one used to mean a full refill. Wrong content
+ * stops the server here rather than refilling everyone. */
+export function checkHomestead(c: P0Content): void {
+  for (const l of c.homestead.levels) {
+    if (typeof l.energy !== 'number') throw new Error(`homestead.levels Lv${l.level}: energy must be a number (0 for none), got ${JSON.stringify(l.energy)}`);
+    if (typeof l.skills !== 'object' || l.skills === null) throw new Error(`homestead.levels Lv${l.level}: skills must be { farming?, fishing?, cooking? }`);
+  }
+  if (!Array.isArray(c.homestead.energy_steps)) throw new Error('homestead.energy_steps: [[from level, + a level], …] is required');
 }
 
 /**
@@ -468,6 +517,8 @@ export function cityPostcardCluster(c: P0Content, id: string): { id: string; nam
 }
 
 export function itemKind(id: string): string {
+  if (id.startsWith('weapon_')) return 'weapon';
+  if (id.startsWith('potion_')) return 'potion';   // v4q(7) ⑥: its own bag.stack tier (10), never a material's
   const head = id.split('_')[0];
   return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch', 'trap'].includes(head) ? head : 'material';   // trap_fish: P1
 }
@@ -493,6 +544,8 @@ export function ingredient(c: P0Content, id: string): { family: Family; rarity: 
 
 /** Display name for any bag id the P0 content knows. */
 export function itemName(c: P0Content, id: string): string {
+  const mineItem = c.mine.combat.weapons[id] ?? c.mine.potions[id];
+  if (mineItem) return mineItem.name;
   const crop = cropById(c, id) ?? cropBySeed(c, id) ?? quickCrop(c, id) ?? fastCrop(c, id);
   if (crop) return crop.id === id ? crop.name : crop.seed_name;
   const fish = fishById(c, id);

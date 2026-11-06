@@ -75,7 +75,19 @@ const GHOST_FAMILY := {
 	"farm": ["seed_", "seed_radish", "Seeds"],
 	"fish": ["bait_", "bait_worm", "Bait"],
 	"mine": ["torch", "torch", "Torch"],
+	"combat": ["potion_", "potion_heal", "Potion"],
 }
+
+var _potion_until_ms := -1
+var _potion_second := -1
+
+## The projected server view supplies potion_ready_in; a refused drink can resync from ready_in.
+func set_potion_cooldown(remaining_ms: float) -> void:
+	_potion_until_ms = Time.get_ticks_msec() + ceili(remaining_ms) if remaining_ms >= 0 else -1
+	if is_node_ready(): _refresh_bar()
+
+func potion_cooldown() -> float:
+	return maxf(0.0, _potion_until_ms - Time.get_ticks_msec()) if _potion_until_ms >= 0 else -1.0
 
 var view: Dictionary = {}
 var root: Control
@@ -145,6 +157,7 @@ var _teach: UiTipCard
 var _teach_until_ms := 0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
+var _tip_over: Control = null   # the dialog an OVER_DIALOG tip is up over (P0Guide.OVER_DIALOG); it goes with it
 var _toasts: ToastLayer   # Toast R1 (SGODOT-233): one at a time, above the quick bar
 ## The toasts and the system line draw over every card, the ones raised by z too: the move confirm card sits over the
 ## map's pin names (UiMapDestination.NAME_Z + 1), and a refusal or `Didn't go through` said while it is up must not
@@ -188,6 +201,10 @@ func _ready() -> void:
 	_pending.clear()
 
 func _process(dt: float) -> void:
+	var second := ceili(potion_cooldown() / 1000.0)
+	if second != _potion_second:
+		_potion_second = second
+		if bar_mode == "combat": _refresh_bar()
 	guide_pulses.follow()
 	_guide_pulse_wait -= dt
 	if _guide_pulse_wait <= 0.0:
@@ -201,9 +218,17 @@ func _process(dt: float) -> void:
 	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed). A dialog is always over
 	# the TipCard, whichever opened first (不知火舞 on 341): while one is open — a result card (the farmhouse's COOK-4
 	# too), the gate card, a confirm, a page — the tip waits; over a drawer (the stove's, the bag) it comes up.
-	if tips and not dialog_open() and not _tips_held():
-		var key := tips.next()
-		if key != "": _show_tip(P0Guide.tip_text(key), key)
+	# A tip about the dialog it was asked for with (P0Guide.OVER_DIALOG: the travel card's) comes up over it, and goes
+	# with it: the dialog closed (Fly, ✕) or another over it (the Energy card) — 不知火舞 355, G19.
+	if tips and not _tips_held():
+		var up := dialog_open()
+		var key := tips.next(up)
+		if key != "":
+			_show_tip(P0Guide.tip_text(key), key)
+			_tip_over = _modal if up else null
+	if _tip_over != null and (not is_instance_valid(_tip_over) or _modal != _tip_over):
+		_tip_over = null
+		if tip_on_screen(): _hide_tip()
 	if _teach and _teach.visible: _place_tip()
 	_tick_ask(dt)
 	if _notice and _notice.visible: _place_notice()
@@ -332,7 +357,7 @@ func _build_bar() -> void:
 	_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	_kit.add_child(_bar)
 	_bar.slot_tapped.connect(_on_slot_tapped)
-	_bar.ghost_tapped.connect(func(_i: int): open_bag())
+	_bar.ghost_tapped.connect(func(_i: int): open_bag("", "bag", "Materials" if bar_mode == "combat" else "All"))
 	_bar.pin_toggled.connect(_on_pin_toggled)
 	_bar.slots_swapped.connect(_on_slots_swapped)
 	_bar.slot_removed.connect(_on_slot_removed)
@@ -441,6 +466,11 @@ func _build_dev() -> void:
 # ---------------------------------------------------------------- refresh
 func set_view(v: Dictionary) -> void:
 	view = v
+	var mine_at = v.get("mine", {}).get("at", null)
+	set_potion_cooldown(float(mine_at.get("potion_ready_in", -1)) if mine_at is Dictionary else -1.0)
+	if modal_kind == "first_dig" and JSON.stringify(P0Logic.GearLogic.first_dig(v)) != _first_dig_sig:
+		if P0Logic.GearLogic.first_dig(v).is_empty(): close_modal()
+		else: open_first_dig()
 	_check_account(v)
 	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear", "gift"]: _bag.refresh(v)
 	if _counter != null and is_instance_valid(_counter) and modal_kind == "counter":
@@ -551,19 +581,19 @@ func set_place(text: String) -> void:
 	_place_text = text
 	_refresh_hud()
 
-## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
-## today" for its first 3 s). "" hides it; changing action clears it.
-## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot, which then sits to its right
-## (5 clear of the HP card, which is 194 wide with its heart: x 209 of 360); hp < 0 hides it. The elite's card under it
-## while one fights ({} hides it); the status line (`Elite Slime` on Floor 5) hides with it — the card names the elite
-## and would cover half of it (不知火舞 on 288; COMBAT-ELITE 1228:111690 has no such line).
-const _STATUS_RIGHT_OF_HP := 209.0
+## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's `Rocks 2/6 · 3 monsters
+## left`). "" hides it; changing action clears it.
+## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot; hp < 0 hides it. The status
+## line then sits under the HP card, left-aligned with it, in the guard card's place (不知火舞 on #629: to its right it
+## ran into the screen's edge at 360). A guard's card there while it fights ({} hides it); the status line hides with
+## it — the card names the guard (不知火舞 on 288 / 355).
 func set_hp(hp: int, maximum: int, elite := {}) -> void:
 	if not is_node_ready(): return
 	var on := hp >= 0 and surface in ACTION_SURFACES
 	_hp.visible = on
 	if on: _hp.set_hp(hp, maximum)
-	_status.position.x = _STATUS_RIGHT_OF_HP if on else _creel.position.x
+	_status.position.x = _creel.position.x
+	_status.position.y = _creel.position.y + (_hp.get_combined_minimum_size().y + UiTokens.SPACE_WITHIN if on else 0.0)
 	var boss := on and not elite.is_empty()
 	_elite_hp.visible = boss
 	_status.visible = _status_text.text != "" and surface in ACTION_SURFACES and not boss
@@ -608,6 +638,7 @@ func set_status_line(text: String) -> void:
 func set_surface(name: String) -> void:
 	if placing(): end_placement()   # a world change ends placement (nothing was sent)
 	surface = name
+	if tips: tips.leave_surface(name)   # the map's tip waiting under a card never comes up in the next world
 	if not is_node_ready():
 		_pending["surface"] = name
 		return
@@ -660,9 +691,8 @@ func set_mode(mode: String, place := "") -> void:
 func _refresh_bar() -> void:
 	var store := _quick_for(bar_mode)
 	# SGODOT-231: Mining's bar holds only what helps underground (a torch); seeds and bait never show there.
-	# Combat's bar holds Healing Potions (§13.3.8), which P1 does not have yet: empty, and no ghost (GHOST_FAMILY).
 	var ids := P0MaterialLogic.mine_bar(view, _bar_ids, store.pins, store.removed) if bar_mode == "mine" \
-		else ([] as Array) if bar_mode == "combat" \
+		else ([] as Array) if bar_mode == "combat" and surface != "mine" \
 		else P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
@@ -692,7 +722,7 @@ func _refresh_bar() -> void:
 	var counts := ids.map(func(id): return P0Logic.bag_count(view, str(id)) if str(id) != "" else 0)
 	var used := _bag_slots().size()
 	var sig := [bar_mode, ids, counts, store.pins.duplicate(), selected_bait if bar_mode == "fish" else selected_seed,
-		used * 10 >= int(bag.get("capacity", 25)) * 9, modal_kind in ["bag", "gear"]]
+		used * 10 >= int(bag.get("capacity", 25)) * 9, modal_kind in ["bag", "gear"], ceili(potion_cooldown() / 1000.0) if bar_mode == "combat" else 0]
 	if sig == _bar_sig: return
 	_bar_sig = sig
 	var slots := []
@@ -700,12 +730,14 @@ func _refresh_bar() -> void:
 		var id := str(ids[i])
 		if id == "": slots.append({})   # a gap left by a drag-remove (LOCK-05 v1.10): no item, no pin
 		else: slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
+		if id != "" and bar_mode == "combat" and potion_cooldown() > 0:
+			slots.back()["cooldown"] = P0Logic.duration(potion_cooldown())
 	# A-08 ghost (LOCK-04): a bar with nothing of this action in stock shows the action's family in the first empty
 	# slot; a slot pinned at 0 is not stock (int5b hand test 9), Compost alone is. The first gap a drag-remove left
 	# takes it (LOCK-05 v1.10), else the free end; five occupied slots leave no room, so no ghost. A tap opens the Bag
 	# (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle).
 	var family: Array = GHOST_FAMILY.get(bar_mode, GHOST_FAMILY.farm)   # q(44): Seeds / Bait / Torch
-	if not counts.any(func(n): return int(n) > 0) and bar_mode != "combat":
+	if not counts.any(func(n): return int(n) > 0) and (bar_mode != "combat" or (surface == "mine" and P0Logic.GearLogic.potion_actions_enabled)):
 		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
 		var gap := slots.find({})
 		if gap >= 0: slots[gap] = ghost
@@ -716,6 +748,7 @@ func _refresh_bar() -> void:
 	_bar.bag_open = sig[6]
 
 func _on_slot_tapped(id: String) -> void:
+	if id.begins_with("potion_") and not P0Logic.GearLogic.potion_actions_enabled: return
 	# A slot at 0 can't be picked; a light buzz says so (李白 q(44) ③), and a toast too: the release Journey build
 	# has no vibrate permission (PR #12 re-review). The copy is the slot's refill hint (§10.3.3).
 	if P0Logic.bag_count(view, id) <= 0 and id != selected_seed and id != selected_bait:
@@ -930,6 +963,11 @@ func _save_quick() -> void:
 ## TODO(SGODOT-221 → stage 3, F-08 command lifecycle): drive HOLDING (hold_progress) and PENDING from the command
 ## queue; P0 has no source for them yet.
 func set_action(a: Dictionary) -> void:
+	if bar_mode == "combat" and str(a.get("verb", "")) == "Attack" and view.get("gear", {}).has("weapon"):
+		a = a.duplicate()
+		a.tool = str(view.gear.weapon)
+	if P0Logic.GearLogic.potion_actions_enabled and surface == "mine" and bar_mode == "combat" and str(a.get("verb", "")) == "Attack" and selected_seed.begins_with("potion_"):
+		a = P0Logic.GearLogic.drink_action(view, selected_seed, potion_cooldown())
 	# SYS-OFFLINE (WP6, §10.7.1): offline every action key is Unavailable with `Offline` as its second line (`Sow ·
 	# Offline`, the verb follows the action); a tap says nothing more than the banner already does.
 	if offline:
@@ -962,7 +1000,9 @@ func _fab_pressed() -> void:
 	if _modal != null: return
 	if not _fab_state.get("enabled", false):
 		if bool(_fab_state.get("creel_full", false)): toast_creel_full()   # FISH-4 / q(83): the greyed Cast · Creel full
-		elif _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
+		# SGODOT-231: unavailable keys say why (LOCK-10); one marked toast_break breaks a line too long at a « · »
+		# (UiKit.break_at_dot; the full field's `Plots 8/8 · Homestead Lv2 adds 2`, 不知火舞 on #624)
+		elif _fab_state.has("toast"): toast(str(_fab_state.toast), 0.0, bool(_fab_state.get("toast_break", false)))
 		return
 	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
@@ -1718,6 +1758,9 @@ func _aim_toast() -> void:
 		_toasts.anchor_above(_toast_over)
 		if _toasts.get_parent() == root: root.move_child(_toasts, -1)
 		return
+	if placing():   # placement: over its caption pill (or its card), never on it (不知火舞 on #624)
+		_toasts.anchor_above(_place_bar.toast_dock())
+		return
 	if _bar != null and _bar.is_visible_in_tree():   # the scene's quick bar, or the bar docked in the bag (q(16))
 		_toasts.anchor_above(_bar)
 		return
@@ -2395,6 +2438,8 @@ func _bag_unavailable(action: StringName, id: String, _reason: String) -> void:
 
 ## A button on the bag card or a Gear row. The drawer only reports; commands go to the server from here.
 func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
+	if not P0Logic.GearLogic.command_allowed({type = str(action), item = id}): return
+	if id.begins_with("potion_") and action in [&"pin", &"unpin"] and not P0Logic.GearLogic.potion_actions_enabled: return
 	match action:
 		&"bag_room":   # BAG-5: Bag Upgrade I is a homestead matter; Show the house (or the homestead on the map)
 			close_modal()
@@ -2438,10 +2483,14 @@ func _bag_slots() -> Array: return view.get("bag", {}).get("slots", [])
 ## A tapped NEED-TILE: one source line just above it; Show only moves the camera (LOCK-10 / LOCK-08).
 func _show_need_source(tile: Control, id: String) -> void:
 	var src := P0Logic.need_source(view, id)
-	var go := str(src.go) if spot_reachable() else ""
+	var go := str(src.go)
+	# 355 C2: a city's spot or a wild mine is a map pin (Show on map from here, Show on the map), as Today's rows go
+	var label := show_label(go, space_here(), spot_reachable(), place)
+	if label == "": go = ""
 	var on_show := Callable() if go == "" else func():
 		close_modal()
-		show_spot.emit(go)
+		if label == "Show": show_spot.emit(go)
+		else: show_on_map.emit(map_target(go))
 	var layer := UiNeedSource.popup(root, tile.get_global_rect(), str(src.text), on_show)
 	layer.theme = UiKit.theme()
 
@@ -2608,8 +2657,6 @@ func _counter_action(role: String, action: StringName, id: String, payload: Dict
 		# (item_info_rules.json; SGODOT-358: Sell All went unanswered)
 		&"sell", &"sell_all": command.emit({"type": "sell", "item": id, "qty": payload.get("qty", 1), "shop": role})
 		&"drink": command.emit({"type": "drink", "item": id, "shop": role})
-		# q(166): 2 regional items for 1 mineral; the server reads the climate where the player stands
-		&"barter": command.emit({"type": "barter", "item": str(payload.get("item", "")), "mineral": id, "shop": role})
 		&"lock", &"unlock": command.emit({"type": String(action), "item": id})
 		_: push_warning("P0 counter: no command for %s" % action)
 
@@ -2715,7 +2762,9 @@ func _board(d: P0CounterDrawer, facts: Array, cards: Array) -> void:
 		var cmd: Dictionary = c.cmd
 		var id := str(c.id)
 		card.command_pressed.connect(func(): if not cmd.is_empty(): command.emit(cmd))
-		card.unavailable_pressed.connect(func(r: String): toast(r))
+		card.unavailable_pressed.connect(func(r: String):   # spec ③: tracking 25, an Error toast saying what to do
+			if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r))
+			else: toast(r))
 		card.need_pressed.connect(func(item: String, tile: UiNeedTile): _show_need_source(tile, item))
 		card.info_pressed.connect(func(): open_board_request(d.role, id))
 		d.board.add_child(card)
@@ -2728,9 +2777,9 @@ func open_energy_card(need: int, verb: String) -> void:
 	for t in f.tiles: t.icon = P0Logic.icon(str(t.icon))
 	var card := UiEnergyCard.card(f)
 	card.theme = UiKit.theme()
-	card.free_pressed.connect(func():   # §3.7.4: closes the card, then Today lists what costs no Energy now
-		close_modal()
-		open_today(P0Guide.free_now(view)))
+	# LOCK-09: `Free to do now` closes the card — no longer opening Today on the free things (Today holds requests only,
+	# 不知火舞's spec ①; §3.7.4's second half retired)
+	card.free_pressed.connect(close_modal)
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
@@ -2858,7 +2907,7 @@ func open_radial() -> void:
 	_bar.cancel_drag()
 	var options := []
 	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
-			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
+			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Enter the mine"]]:   # every mine floor fights (355 b1)
 		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]),
 			available = it[0] == bar_mode or actions_here.has(it[0]), reason = it[3]})
 	_radial.options = options
@@ -2870,7 +2919,7 @@ func open_radial() -> void:
 var cook_page_from_today := ""
 
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
-## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
+## rows: Today's own (P0Logic.today_rows) unless given.
 ## Show / Show on map by show_label (#37): "pond:<id>", "outpost:<role>" and "map" open the map on that pin.
 var _today_panel: UiTodayPanel
 var _today_rows: Array = []
@@ -2887,6 +2936,9 @@ func open_today(given: Array = []) -> void:
 	panel.show_pressed.connect(_show_today_row)
 	panel.row_pressed.connect(func(i: int):
 		if i < 0 or i >= _today_rows.size(): return
+		if bool(_today_rows[i].get("first_dig", false)):
+			open_first_dig()
+			return
 		var gate := P0Logic.fish_gate(view, str(_today_rows[i].get("gate", "")))
 		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given))
 		# a keeper's local request (q(272)): its card, Drop request › there; Not now / Close come back to Today
@@ -2894,7 +2946,10 @@ func open_today(given: Array = []) -> void:
 			P0LocalRequest.open(self, str(_today_rows[i].local_request), func(): open_today(given))
 		# another city's tracked request (q(270)): its BOARD-1, to drop it from here; Back / Close come back to Today
 		elif str(_today_rows[i].get("board_request", "")) != "":
-			P0BoardRequest.open(self, "market", str(_today_rows[i].board_request), func(): open_today(given)))
+			P0BoardRequest.open(self, "market", str(_today_rows[i].board_request), func(): open_today(given))
+		# Pip's Homestead request (spec ③ v3): HOME-1 is its card; closing it comes back to Today
+		elif bool(_today_rows[i].get("home_request", false)):
+			open_home_panel(func(): open_today(given)))
 	_open_modal(panel, 0.0)
 	_today_panel = panel
 	modal_kind = "today"
@@ -2919,7 +2974,8 @@ func _refresh_today(force := true) -> void:
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or str(r.get("local_request", "")) != ""
+		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or str(r.get("local_request", "")) != "" \
+			or bool(r.get("home_request", false)) or bool(r.get("first_dig", false))
 		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
 			var line := str(r.line)
 			var at := line.find(" · ")
@@ -2953,16 +3009,20 @@ func _show_today_row(i: int) -> void:
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button. In an outpost, a
 ## target at that very outpost (`outpost:<its id>`, a resident's request handed in there; q(204) ⑨: Ivo's in his Mine
 ## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign", "mine"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign"]
 
-## A target on the homestead: the fixed ones, the Homestead sign and the mine mouth (q(255)), and the gathering spots.
-static func home_target(go: String) -> bool: return go in HOME_TARGETS or go.begins_with("spot_")
+## A target on the homestead: the fixed ones and the Homestead sign (q(255)). The mine mouth left the farm in 355 b1,
+## the gathering spots with v4q(4) ①.
+static func home_target(go: String) -> bool: return go in HOME_TARGETS
 
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
 	if go == "inbox": return "Show"   # the Inbox opens anywhere: its Parcels page (q(254) ①, Pip's seeds)
 	if go == "bag": return "Show"     # and the bag: S8's dish to eat (SGODOT-368)
 	if here == "outpost" and here_place != "" and go == "outpost:" + here_place: return "Show" if camera_here else ""
+	# 355 C2: a wild mine (`mine:<site>`) the player is down: nothing to show (the row stays, without a button); a
+	# gathering spot (`gather:<id>`) or another mine is a map pin as any (Show on the map, Show on map elsewhere)
+	if here == "mine" and here_place != "" and go == "mine:" + here_place: return ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
 	if home_target(go) and here in ["home", "farm"]: return "Show" if camera_here else ""
@@ -3136,17 +3196,21 @@ func inbox_claim_done() -> void:
 ## shows the bar from P0Logic.resident_bar (SGODOT-228). Returns false when the view has no such resident.
 var _resident := ""
 var _reply := {}   # {id, line}: the resident's answer shown in the bubble until another resident's bar opens
+var _pip_vein_line := ""   # shown before talk consumes view.pip_line; never a persistent "said" flag
 
 func open_resident(id: String) -> bool:
 	var d := P0Logic.resident_bar(view, id)
 	if d.is_empty(): return false
+	var new_talk := _resident != id or modal_kind != "resident"
+	if new_talk: _pip_vein_line = P0Logic.GearLogic.pip_line(view, id)
 	# C2/C3: keep the confirmed resend answer through this conversation's rebuilds, then let a new talk read
 	# Pip's current server step. His old answer must not cover the next water/harvest instruction forever.
 	if surface == "farm" and id == "res_pip" and modal_kind != "resident": _reply = {}
-	if _resident != id or modal_kind != "resident": command.emit({"type": "talk", "resident": id})
 	if _resident != id: _reply = {}
 	_resident = id
 	_show_resident(d)
+	# Draw first: even a synchronous talk reply may withdraw pip_line and rebuild this same bar.
+	if new_talk: command.emit({"type": "talk", "resident": id})
 	return true
 
 ## Whether the resident bar offers Request here: not on the player's own farm (q(222) ②, Pip as the new-player
@@ -3214,6 +3278,7 @@ func _show_resident(d: Dictionary) -> void:
 		var line = P0Guide.pip(view).get("line")
 		if line is String and line != "": data.line = line
 	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
+	if str(d.id) == "res_pip" and _pip_vein_line != "" and not P0Guide.guide_on(view): data.line = _pip_vein_line
 	var bar := UiResidentBar.new(data)
 	bar.theme = UiKit.theme()
 	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
@@ -3224,6 +3289,7 @@ func _show_resident(d: Dictionary) -> void:
 	var id := str(d.id)
 	bar.gift_pressed.connect(func(): open_gift(id))
 	bar.request_pressed.connect(func(): open_resident_request(id))
+	bar.request_unavailable.connect(func(r: String): if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r)))   # spec ③
 	bar.identity_pressed.connect(func(): open_resident_profile(id))
 	bar.meal_pressed.connect(func(): _open_todays_meal(id))
 	bar.lesson_pressed.connect(func(): command.emit({"type": "learn", "resident": id}))   # §7.5.3: the server picks the page
@@ -3260,7 +3326,7 @@ func open_resident_profile(id: String) -> void:
 ## The workbench drawer (SGODOT-231 B2-06): P0WorkbenchDrawer over the view, Close 44 six above its top and 16 in
 ## (as RES-PIP's sheet). It follows the view while open; Craft / Equip go to the server, a grey button toasts its
 ## reason (LOCK-10) and a cost tile shows where the material comes from (NeedSource, Show only moves the camera,
-## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment, the gloves' banner) belongs to
+## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment) belongs to
 ## the farm's P0FarmMaterials.
 const _WORKBENCH_KIND := "workbench"
 var workbench_tab := "tools"
@@ -3381,6 +3447,24 @@ static func resident_face(key: String) -> Texture2D: return resident_crop(key, "
 ## Request on the bar: an open request shows the card (Accept / Not now); an accepted one that is ready
 ## delivers. The bar's button carries the gap or the wait, so it never dead-ends (LOCK-10 / 18).
 var _request_card: UiRequestCard
+var _first_dig_sig := ""
+
+func open_first_dig() -> void:
+	var data := P0Logic.GearLogic.first_dig_card(view)
+	if data.is_empty(): return
+	data.portrait = _portrait("pip")
+	var card := UiRequestCard.new(data)
+	card.theme = UiKit.theme()
+	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	card.offset_left = UiTokens.SIZE_QUICK_BAR_X
+	card.offset_right = -UiTokens.SIZE_QUICK_BAR_X
+	card.offset_bottom = -bottom_pad()
+	card.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	card.dismissed.connect(func(): open_today())
+	_open_modal(card, 0.0, true)
+	modal_kind = "first_dig"
+	_first_dig_sig = JSON.stringify(P0Logic.GearLogic.first_dig(view))
+	_modal_back = func(): open_today()
 
 func open_resident_request(id: String) -> void:
 	var d := P0Logic.resident_bar(view, id)
@@ -3404,6 +3488,7 @@ func open_resident_request(id: String) -> void:
 	card.action_pressed.connect(func():
 		close_modal()
 		if not cmd.is_empty(): command.emit(cmd))
+	card.unavailable_pressed.connect(func(r: String): if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r)))   # spec ③: only tracking 25
 	card.dismissed.connect(func(): open_resident(id))
 	_open_modal(card, 0.0, true)
 	modal_kind = "resident_request"
@@ -3463,7 +3548,9 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
 		"line": text, "needs": [need] if kind != "" else [],
 		"deliver_to": _deliver_to(view_, id, str(def.get("name", ""))), "action": "Accept",
-		"reason": str(bar.get("request_reason", ""))}
+		# the bar's `Request · Requests 25/25` is the card's `Accept · Requests 25/25` (spec ③, T4)
+		"reason": P0Logic.track_full_reason(view_, "Accept") if P0Logic.is_track_full(str(bar.get("request_reason", ""))) \
+			else str(bar.get("request_reason", ""))}
 	data.merge(_request_rewards(view_, req, q))
 	return data
 
@@ -3967,6 +4054,10 @@ func tip_pending() -> bool:
 func tip_showing(key: String) -> bool:
 	return tips != null and tips.showing == key and _teach != null and _teach.visible
 
+## The TipCard on screen (global rect), an empty one when none: what it must not have under it (the kitchen's countdown, 419).
+func tip_rect() -> Rect2:
+	return _teach.get_global_rect() if _teach != null and _teach.visible else Rect2()
+
 ## Any TipCard is on screen: the pond's fishing status card waits under it (q(49), SGODOT-376).
 func tip_on_screen() -> bool:
 	return _teach != null and _teach.visible
@@ -3992,7 +4083,15 @@ func close_tip() -> void:
 
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
-	if tips and tips.did(action): _hide_tip(false)
+	if tips == null: return
+	var before := tips.seen.size()
+	if tips.did(action): _hide_tip(false)
+	# a tip taken off the queue as done (TipQueue.did) is seen now, not at the next card: kept on disk at once, so an app
+	# closed before another tip comes up never shows it again (哪吒 on #733)
+	if tips.seen.size() != before:
+		for k in tips.seen:
+			if P0Guide.tip_text(k) != "": _taught[k] = true
+		_save_tips()
 
 func _hide_tip(close_queue := true) -> void:
 	_teach_until_ms = 0
@@ -4001,7 +4100,7 @@ func _hide_tip(close_queue := true) -> void:
 	_flush_held_toast.call_deferred()   # a filled request's toast waited for it (q(134) ⑤)
 
 ## Each tip's icon (P0Guide.TIPS keys) from the shared P0 icons, as the TUT-2 specimens (不知火舞 on 232 / 235-B2).
-const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}
+const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map", "travel": "travel"}
 
 ## TipCard (TUT-2, 235-B2): the kit card with the tip's icon; a tap on it closes it (A-03).
 func _show_tip(text: String, key := "") -> void:
@@ -4239,7 +4338,8 @@ func first_time(key: String) -> bool:
 
 ## A server-side reset starts a new account under the same player id (SGODOT-270: Joey's account starts over in San
 ## Francisco). The teaching tips, "seen" lists and quick-bar pins on this device belonged to the old account, so they go
-## and the first session teaches again. The account is known by its creation time (view.profile.since_ms), kept with the
+## and the first session teaches again (with the notification prompt's answer and the Big Pot stoves, SGODOT-397).
+## The account is known by its creation time (view.profile.since_ms), kept with the
 ## tips; a tips file written before this build kept that is judged by its age: last written before the account was made.
 func _check_account(v: Dictionary) -> void:
 	var since := int(v.get("profile", {}).get("since_ms", 0))
@@ -4257,6 +4357,9 @@ func _check_account(v: Dictionary) -> void:
 		_hide_tip()
 		_quick = {}
 		_save_quick()
+		# v4q(2) ⑥ (SGODOT-397): the notification prompt's answer and the Big Pot stoves were the old save's too
+		if notify != null: notify.forget_asked()
+		P0KitchenLogic.forget_big_stoves(str(player_of.call()))
 	_taught["account_since"] = since
 	_save_tips()
 
@@ -4276,7 +4379,10 @@ func _save_tips() -> void:
 const TODAY_SEEN := "today:"
 func _today_unseen(keys: Array) -> bool:
 	_load_tips()
-	var gone := _taught.keys().filter(func(k): return str(k).begins_with(TODAY_SEEN) and not keys.has(str(k).trim_prefix(TODAY_SEEN)))
+	# a row gone is forgotten, so the same thing coming back lights again (q(107)) — but Pip's requests are seen once for
+	# good (P0Logic.PIP_DOT, spec ③ v3)
+	var gone := _taught.keys().filter(func(k): return str(k).begins_with(TODAY_SEEN) and not keys.has(str(k).trim_prefix(TODAY_SEEN)) \
+		and not str(k).trim_prefix(TODAY_SEEN).begins_with(P0Logic.PIP_DOT))
 	for k in gone: _taught.erase(k)
 	if not gone.is_empty(): _save_tips()
 	return keys.any(func(k): return not _taught.has(TODAY_SEEN + str(k)))
@@ -4585,8 +4691,8 @@ func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Call
 	return sheet
 
 # ---------------------------------------------------------------- voice (SGODOT-383, q(274); 不知火舞's spec 383 6d206dfb)
-## The room's voice, from the world (an outpost's or a pond's P0VoiceRoom; null with none — the map, the farm, Market
-## Square still has one with here = false). P0Runtime hands it over every frame; the keys follow its `changed`.
+## The room's voice, from the world (an outpost's or a pond's P0VoiceRoom, Market Square's too since q(286); null with
+## none — the map, the farm, a POI's room). P0Runtime hands it over every frame; the keys follow its `changed`.
 const VoiceKeys := preload("res://scenes/p0/panels/p0_voice_keys.gd")
 const PeopleDrawer := preload("res://scenes/p0/panels/p0_people_drawer.gd")
 const AgeCard := preload("res://scenes/p0/panels/p0_age_card.gd")
@@ -4642,7 +4748,7 @@ func _voice_refresh() -> void:
 	var crowd = voice_room.get("online").get("crowd") if voice_room.get("online") else null
 	if crowd != null and "speaking" in crowd:   # §3: a speaker's name tag goes green (not a muted or blocked one)
 		var now := {}
-		for r in rows: if bool(r.speaking) and not bool(r.muted) and not bool(r.blocked): now[int(r.peer)] = true
+		for r in rows: if bool(r.speaking) and not bool(r.muted) and not bool(r.blocked) and not bool(r.get("self", false)): now[int(r.peer)] = true
 		crowd.set("speaking", now)
 	_voice_keys.place(root.size.x - VOICE_KEYS_RIGHT, _creel.position.y)   # on the Creel pill's line, in a room too (383 V1 / V6)
 	if on and not _mic_was_on and not _mic_toast_said:
@@ -4670,7 +4776,7 @@ func open_people() -> void:
 	d.close_requested.connect(close_layer)
 	d.connect(&"mute_pressed", func(peer: int, on: bool): voice_room.call("set_muted", peer, on))
 	d.connect(&"mute_all_pressed", func(on: bool):
-		for r in voice_room.call("people"): if not bool(r.blocked): voice_room.call("set_muted", int(r.peer), on))
+		for r in voice_room.call("people"): if not bool(r.blocked) and not bool(r.get("self", false)): voice_room.call("set_muted", int(r.peer), on))
 	d.connect(&"block_pressed", func(peer: int, on: bool):
 		if on: _confirm_block(peer)
 		else: voice_room.call("set_blocked", peer, false))   # Unblock at once, no card (§5)

@@ -257,6 +257,25 @@ func test_since_reads_month_day_and_the_year_when_not_this_one() -> void:
 	var later := Time.get_unix_time_from_datetime_dict({year = 2027, month = 1, day = 3, hour = 12}) * 1000.0
 	assert_str(P0ProfilePage.since_text(oct2, later)).is_equal("Oct 2, 2026")
 
+## SGODOT-414 (不知火舞): the day in the device's time zone, as the plaque's — an account made at 23:30 UTC reads the
+## next day in UTC+8 (bias 480), the same day in UTC; and at New Year the year is the device's for both days.
+func test_since_reads_the_day_in_the_devices_time_zone() -> void:
+	var made := Time.get_unix_time_from_datetime_dict({year = 2026, month = 10, day = 1, hour = 23, minute = 30}) * 1000.0
+	var now := Time.get_unix_time_from_datetime_dict({year = 2026, month = 10, day = 8, hour = 12}) * 1000.0
+	assert_str(P0ProfilePage.since_text(made, now, 480)).is_equal("Oct 2")
+	assert_str(P0ProfilePage.since_text(made, now, 0)).is_equal("Oct 1")
+	assert_str(P0ProfilePage.since_text(made, now, -420)).is_equal("Oct 1")   # UTC−7: 16:30 that day
+	# New Year in UTC+8 while UTC is still on Dec 31: made 2027-01-01 04:00 there, seen at 09:00 — this year, no year
+	var ny_made := Time.get_unix_time_from_datetime_dict({year = 2026, month = 12, day = 31, hour = 20}) * 1000.0
+	var ny_now := Time.get_unix_time_from_datetime_dict({year = 2027, month = 1, day = 1, hour = 1}) * 1000.0
+	assert_str(P0ProfilePage.since_text(ny_made, ny_now, 480)).is_equal("Jan 1")
+	assert_str(P0ProfilePage.since_text(ny_made, ny_now, 0)).is_equal("Dec 31, 2026")
+	# a June account seen in those hours: already next year in UTC+8, so the year shows; not yet in UTC
+	var june := Time.get_unix_time_from_datetime_dict({year = 2026, month = 6, day = 1, hour = 12}) * 1000.0
+	var ny_eve := Time.get_unix_time_from_datetime_dict({year = 2026, month = 12, day = 31, hour = 20}) * 1000.0
+	assert_str(P0ProfilePage.since_text(june, ny_eve, 480)).is_equal("Jun 1, 2026")
+	assert_str(P0ProfilePage.since_text(june, ny_eve, 0)).is_equal("Jun 1")
+
 func test_profile_page_emits_back_edit_look_and_skill() -> void:
 	var page := P0ProfilePage.new(_view())
 	var host := Control.new()
@@ -371,21 +390,21 @@ func test_full_bag_shows_where_more_room_comes_from() -> void:
 	v.bag.capacity = 25
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")   # room left: no row
 
-## P1 exit C13: the next tier not yet bought, not only Upgrade I — I owned at 30, II says Lv6 until it is for sale, then
-## III Lv9; nothing once all three are bought, or when the view does not say a tier's state.
+## P1 exit C13: the next tier not yet bought, not only Upgrade I — I owned at 30, II says Lv7 until it is for sale, then
+## III Lv11 (v4q(1) ⑧); nothing once the tiers the view states are bought, or when the view does not say a tier's state.
 func test_full_bag_points_at_the_next_upgrade_after_the_first() -> void:
 	var v := _view()
 	v.bag.capacity = 30
 	v.bag.slots = []
 	for i in 30: v.bag.slots.append({"id": "seed_radish", "qty": 1})
 	v["homestead"] = {"unlocks": {"bag_upgrade_1": "owned", "bag_upgrade_2": "locked", "bag_upgrade_3": "locked"}}
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv6")
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv7")
 	v.homestead.unlocks.bag_upgrade_2 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade II")
 	v.homestead.unlocks.bag_upgrade_2 = "owned"
 	v.bag.capacity = 35
 	for i in 5: v.bag.slots.append({"id": "seed_radish", "qty": 1})
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv9")
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv11")
 	v.homestead.unlocks.bag_upgrade_3 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade III")
 	v.homestead.unlocks.bag_upgrade_3 = "owned"

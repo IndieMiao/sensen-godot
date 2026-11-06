@@ -72,6 +72,31 @@ func test_a_city_read_registers_its_ponds_and_outposts_by_their_ids() -> void:
 	assert_dict(P0Outposts.find("gn-1816670~tea0")).is_empty()
 	assert_str(str(P0Outposts.by_role("market").id)).is_equal("sh_market_1")
 
+## v4q(4) (contract C §9): a city's gathering spots by id, typed; the hand-written city sends them with no `detail`, so
+## its read adds no generated pond or outpost.
+func test_a_city_read_keeps_its_gathering_spots_and_the_written_city_only_those() -> void:
+	var tokyo := CITY.duplicate(true)
+	tokyo["gather"] = [{"id": "gn-1850147~wood0", "cluster": TOKYO, "kind": "wood", "tier": "T1", "name": "Badger Grove", "short": "Badger",
+		"lat": 35.69, "lng": 139.70, "yield": [["wood", 4]], "energy": 3, "cooldown_h": 4},
+		{"id": "gn-1850147~reed0", "cluster": TOKYO, "kind": "reed", "tier": "T1", "name": "Heron Reed Bank", "short": "Heron",
+		"lat": 35.68, "lng": 139.72, "yield": [["fiber", 4], ["worm_bait", 2]], "energy": 3, "cooldown_h": 4},
+		{"name": "no id"}]
+	P0CityPlaces.accept(TOKYO, tokyo)
+	assert_array(P0CityPlaces.gather(TOKYO).map(func(g): return g.id)).is_equal(["gn-1850147~wood0", "gn-1850147~reed0"])
+	var reed := P0CityPlaces.gather_spot("gn-1850147~reed0")
+	assert_str(str(reed.short)).is_equal("Heron")
+	assert_array(reed.yield).is_equal([["fiber", 4], ["worm_bait", 2]])
+	assert_int(reed.energy).is_equal(3)
+	assert_dict(P0CityPlaces.gather_spot("gn-1850147~wood9")).is_empty()
+	P0CityPlaces.accept(SF, {"ponds": ["fern_pond"], "outposts": ["sh_market_1"], "residents": 9, "fish": [],
+		"gather": [{"id": SF + "~stone0", "cluster": SF, "kind": "stone", "tier": "T1", "name": "Otter Rocks", "short": "Otter",
+		"lat": 37.77, "lng": -122.45, "yield": [["stone", 4]], "energy": 3, "cooldown_h": 4}]})
+	assert_array(P0CityPlaces.city(SF).ponds).is_empty()
+	assert_array(P0CityPlaces.city(SF).outposts).is_empty()
+	assert_str(str(P0CityPlaces.gather_spot(SF + "~stone0").name)).is_equal("Otter Rocks")
+	P0CityPlaces.clear()
+	assert_dict(P0CityPlaces.gather_spot(SF + "~stone0")).is_empty()
+
 func test_the_camera_city_reads_its_places_and_pins_them() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -87,8 +112,9 @@ func test_the_camera_city_reads_its_places_and_pins_them() -> void:
 	var ids: Array = m.city_map.extra_places.map(func(e): return str(e.id))
 	assert_array(ids).contains(["gn-1850147~post0", "gn-1850147~market0"])
 	assert_array(ids).contains(["sh_tea_1"])   # home's stay
-	m._switch_city(load("res://modules/p0/p0_clusters.gd").region(SF))   # home: never read, hand-written
-	assert_int(asked.size()).is_equal(1)
+	# home: its ponds and outposts hand-written, read for its gathering spots alone (v4q(4))
+	m._switch_city(load("res://modules/p0/p0_clusters.gd").region(SF))
+	assert_array(asked).is_equal(["/p0/city/gn-1850147", "/p0/city/" + SF])
 
 func test_a_first_visit_lands_on_three_things_to_do() -> void:
 	var m := _map()
@@ -300,3 +326,13 @@ func test_a_fogged_citys_places_are_silhouettes_until_explored() -> void:
 	assert_bool(m._travel_first(tokyo_market)).is_true()   # still no pass here: a tap opens its card
 	rt.ui.close_modal()
 	rt.session.view = saved
+
+## 11-08's cathedral is an outpost of role church (no keeper): 0.3.0 already gives its pin the church icon, not the
+## tackle shop's (哪吒: PIN_ART fell back to tackle), so the server can add it without a forced update.
+func test_a_church_outpost_wears_the_church_icon() -> void:
+	var o := {"id": "gn-test~church0", "role": "church", "name": "Grace Cathedral", "category": "Cathedral", "lat": 37.79, "lng": -122.41}
+	assert_str(str(P0Outposts.place_entry(o).art_path)).is_equal("res://assets/map/poi/icons/religious-christian_3_nocross.webp")
+	assert_bool(ResourceLoader.exists(str(P0Outposts.place_entry(o).art_path))).is_true()
+	assert_object(CityMapData.art_texture(P0Outposts.place_entry(o))).is_not_null()   # the card draws it
+	assert_str(str(P0Outposts.place_entry({"id": "x", "role": "tackle", "name": "T", "category": "", "lat": 0.0, "lng": 0.0}).art_path)) \
+		.is_equal(P0Outposts.PIN_ART.tackle)

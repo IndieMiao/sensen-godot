@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { resendReady, validateGuide } from '../../src/p0/guide.js';
+import { gatherPointsOf } from '../../src/p0/gather_points.js';
 import { homeSetOf } from '../../src/p0/home_city.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { maxEnergy } from '../../src/p0/rules.js';
@@ -14,7 +15,7 @@ const c: P0Content = loadP0Content();
 const T0 = Date.UTC(2026, 9, 26, 17);   // San Francisco 10-26 10:00 PDT
 const S = 1000;
 const SF = 'gn-5391959', SHANGHAI = 'gn-1796236';
-const ONE = 'req_res_nadia_radish', SIX = 'req_res_nadia_six_radishes';
+const ONE = 'req_res_nadia_radish', FOUR = 'req_res_nadia_six_radishes';   // Four Radishes now (v4q(4) ⑥, 丁20); the id kept
 
 /** One player through the guide: a clock that moves on, the state, every event, and the check after each command. */
 class Run {
@@ -50,7 +51,7 @@ class Run {
     for (const plot of plots) this.do({ type: 'water', plot, space: 'home' });
     return plots;
   }
-  lettuce() { for (const plot of this.tilled(10)) this.do({ type: 'sow', plot, seed: 'seed_lettuce', space: 'home' }); return this; }
+  lettuce() { for (const plot of this.tilled(6)) this.do({ type: 'sow', plot, seed: 'seed_lettuce', space: 'home' }); return this; }
   harvest(plots: number[]) { this.now += 46 * S; for (const plot of plots) this.do({ type: 'harvest', plot, space: 'home' }); return this; }
   market() { return { space: 'outpost', place: this.set.market }; }
   nadia1() { return this.do({ type: 'talk', resident: 'res_nadia', ...this.market() }).do({ type: 'accept', request: ONE, ...this.market() })
@@ -67,6 +68,18 @@ class Run {
     this.do({ type: 'cook', items, space: 'home' });
     return this.do({ type: 'collect', ...(eat ? { eat: true } : {}), space: 'home' }, this.s.stove!.ms + S);
   }
+  /** S6a (v4q(4) ⑥): gather at the point view.guide.target names, from the farm (the yield goes to storage), until it passes. */
+  gather() {
+    for (let i = 0; i < 12 && this.step === 't_gather'; i++) {
+      const t = this.view.target;
+      expect(t, `gather ${i}`).toMatchObject({ kind: 'gather' });
+      this.do({ type: 'gather', spot: t.spot, space: 'home' }, 2 * S);
+    }
+    expect(this.step).not.toBe('t_gather');
+    return this;
+  }
+  /** S7a (v4q(4) ⑥): Homestead Lv2 from the farm. */
+  upgrade() { return this.do({ type: 'homestead_upgrade', space: 'home' }); }
   gift(prefix: string) {
     const item = this.s.bag.find(x => x.id.startsWith(prefix))!.id;
     return this.do({ type: 'gift', resident: 'res_nadia', item, ...this.market() });
@@ -77,7 +90,7 @@ describe('the v3 table (339 §14.3)', () => {
   it('is valid, has S0–S11 and no S12, and keeps Pond Catch off a guided save', () => {
     expect(validateGuide(c)).toEqual([]);
     expect(c.guide!.steps.map(s => s.id)).toEqual(['t_city', 't_pin', 't_sow_quick', 't_water', 't_sow_rest', 't_harvest_quick',
-      't_nadia_1', 't_fish', 't_meal', 't_soup', 't_gift', 't_nadia_2']);
+      't_nadia_1', 't_gather', 't_fish', 't_meal', 't_soup', 't_upgrade', 't_gift', 't_nadia_2']);   // v4q(4) ⑥: S6a, S7a
     const r = new Run('director-pond-catch');
     expect(r.s.requests).toEqual([]);
     expect(r.qty('seed_quick_radish')).toBe(2);
@@ -95,7 +108,7 @@ describe('the main line (§14.2)', () => {
     r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
     expect(r.view.pip.bang).toBe(false);
     const quick = r.sowQuick(); note();
-    expect(r.view.row.line).toBe('Sow 10 Lettuce · 20 Energy');
+    expect(r.view.row.line).toBe('Sow 6 Lettuce · 12 Energy');   // SGODOT-355 b1 (v4q(4), 不知火舞 f6b4bdb3): the rest of the 8 starting Plots, 2 being radishes
     r.lettuce(); note();
     expect(r.view).toMatchObject({ step: 't_harvest_quick', recover: 'r_quick_wait',
       row: { line: 'Quick Radishes ready', countdown: 'crop_quick_radish', count: 2, format: 'mss' }, progress: { have: 0, need: 1 } });
@@ -110,6 +123,13 @@ describe('the main line (§14.2)', () => {
     r.nadia1(); note();
     const delivered = r.now;
     expect(r.s.boards.stall[0].refill_at).toBe(delivered + c.requests.done_refill_h * 3_600_000);
+    // S6a (v4q(4) ⑥): Timber first, at a San Francisco point; no marks, the point is view.guide.target
+    expect(r.view).toMatchObject({ step: 't_gather', row: { icon: 'wood', go: 'map' }, target: { kind: 'gather', item: 'wood' }, marks: [] });
+    expect(r.view.row.line).toMatch(/^Gather Timber · \S/);
+    expect(r.view.target.spot.startsWith(`${SF}~wood`)).toBe(true);
+    expect(r.view.target).toEqual(r.view.target);   // the same point on every read
+    r.gather(); note();
+    expect(r.view.target).toBeUndefined();
     expect(r.view.marks[0]).toMatchObject({ place: 'pond_san_francisco_03', why: 'Catch 2 fish · 0/2' });
     expect(r.view.marks[1]).toEqual({ button: 'cast', pulse: true });
     r.fish(1);
@@ -121,18 +141,23 @@ describe('the main line (§14.2)', () => {
     expect(r.view.marks).toEqual([{ place: 'home', object: 'farmhouse', kind: 'request' }, { object: 'stove', pulse: true },
       { page: 'dish_fish_soup', button: 'cook', pulse: true }]);
     r.cook(['fish_crucian', 'crop_radish']); note();
+    // S7a (v4q(4) ⑥): after the soup, before Nadia has it; the sign's !
+    expect(r.view).toMatchObject({ step: 't_upgrade', row: { line: 'Upgrade to Homestead Lv2', icon: 'level_up', go: 'sign' },
+      marks: [{ place: 'home', object: 'sign', kind: 'request' }], pip: { line: "You've got everything! Tap the Homestead sign by the door." } });
+    r.upgrade(); note();
+    expect(r.s.homestead.level).toBe(2);
     expect(r.view.marks.find((m: any) => m.resident)).toEqual({ resident: 'res_nadia', kind: 'gift' });
     expect(r.view.marks.find((m: any) => m.button === 'gift')).toEqual({ button: 'gift', pulse: true });
     expect(r.view.marks.find((m: any) => m.item)).toEqual({ item: 'dish_fish_soup', pulse: true });   // the Gift drawer's soup cell
     r.gift('dish_fish_soup'); note();
     expect(r.view.row.line).toBe("See Nadia's new request");
-    r.do({ type: 'accept', request: SIX, ...r.market() }); note();
-    expect(seen).toEqual(['t_city', 't_sow_quick', 't_sow_rest', 't_harvest_quick', 't_nadia_1', 't_fish', 't_meal',
-      't_soup', 't_gift', 't_nadia_2', 'end']);
+    r.do({ type: 'accept', request: FOUR, ...r.market() }); note();
+    expect(seen).toEqual(['t_city', 't_sow_quick', 't_sow_rest', 't_harvest_quick', 't_nadia_1', 't_gather', 't_fish', 't_meal',
+      't_soup', 't_upgrade', 't_gift', 't_nadia_2', 'end']);
     // the observation log's view (§14.8.1): every step change, in order, from the commands' events
     const moves = r.events.filter(e => e.kind === 'guide' && e.action !== 'resend').map(e => (e as { to: string | null }).to ?? 'end');
-    expect(moves).toEqual(['t_pin', 't_sow_quick', 't_water', 't_sow_rest', 't_harvest_quick', 't_nadia_1', 't_fish', 't_meal', 't_soup',
-      't_gift', 't_nadia_2', 'end']);
+    expect(moves).toEqual(['t_pin', 't_sow_quick', 't_water', 't_sow_rest', 't_harvest_quick', 't_nadia_1', 't_gather', 't_fish', 't_meal',
+      't_soup', 't_upgrade', 't_gift', 't_nadia_2', 'end']);
     expect(r.s.guide).toMatchObject({ step: null, end: 'done' });
     expect(r.view).toMatchObject({ step: null, end: 'done', pip: { here: false } });
     expect(r.events.filter(e => e.kind === 'guide' && e.action === 'end')).toHaveLength(1);
@@ -157,6 +182,8 @@ describe('off the path', () => {
     r.fish(2);
     expect(r.step).toBe('t_nadia_1');
     r.nadia1();
+    expect(r.step).toBe('t_gather');   // S6a still to do
+    r.gather();
     expect(r.step).toBe('t_meal');
   });
   it('both radishes gone twice: Pip gives two seeds each time; the third time Today says sow a Radish', () => {
@@ -178,7 +205,7 @@ describe('off the path', () => {
       r.now += 46 * S;
       r.check();
       expect(r.view).toMatchObject({ recover: 'r_quick_ripe', row: { line: 'Harvest 2 Quick Radishes' },
-        pip: { line: "They're ready! Nadia at the market loves fresh radishes. Take her one." } });   // S6's own (q(260))
+        pip: { line: "They're ready! Take one to Nadia at the market, and grab some timber while you're in town." } });   // S6's own (q(260); v4q(4) ⑥ S5)
       expect(r.view.marks.at(-1)).toEqual({ button: 'harvest', pulse: true });   // as S5
       r.now -= 46 * S;
       r.harvest(plots);
@@ -235,7 +262,7 @@ describe('off the path', () => {
   it('q(254) at S9: the soup still to make, the resent seeds in the Inbox, then in hand', () => {
     const r = new Run('director-soup-inbox').pick();
     r.harvest(r.sowQuick());
-    r.nadia1().fish(2);
+    r.nadia1().gather().fish(2);
     r.s.energy.value = 100;
     r.cook(['fish_crucian'], true);
     expect(r.step).toBe('t_soup');
@@ -252,7 +279,7 @@ describe('off the path', () => {
   it('the soup still to make, no crop held, the resent quick ones growing: their countdown at S9 too (苏烈 on #506)', () => {
     const r = new Run('director-soup-regrow').pick();
     r.harvest(r.sowQuick());
-    r.nadia1().fish(2);
+    r.nadia1().gather().fish(2);
     r.s.energy.value = 100;
     r.cook(['fish_crucian'], true);
     expect(r.step).toBe('t_soup');
@@ -273,12 +300,14 @@ describe('off the path', () => {
   it('a full bar at S8 skips the meal; the soup eaten before Nadia sends Today back to cooking, then to the pond', () => {
     const r = new Run('director-full-bar').pick();
     r.harvest(r.sowQuick());
-    r.nadia1().fish(2);
+    r.nadia1().gather().fish(2);
     expect(r.step).toBe('t_meal');
     r.s.energy.value = maxEnergy(c, r.s);
     r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
     expect(r.step).toBe('t_soup');
     r.cook(['fish_crucian', 'crop_radish']);
+    expect(r.step).toBe('t_upgrade');
+    r.upgrade();
     expect(r.step).toBe('t_gift');
     r.s.energy.value = 100;
     const soup = r.s.bag.find(x => x.id.startsWith('dish_fish_soup'))!.id;
@@ -299,7 +328,7 @@ describe('off the path', () => {
   });
   // SGODOT-368 (不知火舞's spec): a dish cooked and kept, not eaten, used to leave S8 on `Cook it`. The real flow: collect
   // (the dish goes to the cabinet or the bag; the card's Keep sends nothing), then Eat where it lies.
-  const s8 = (player: string) => { const r = new Run(player).pick(); r.harvest(r.sowQuick()); r.nadia1().fish(2); r.s.energy.value = 100; r.check(); return r; };
+  const s8 = (player: string) => { const r = new Run(player).pick(); r.harvest(r.sowQuick()); r.nadia1().gather().fish(2); r.s.energy.value = 100; r.check(); return r; };
   const EAT_PIP = "Eat it while it's warm. A meal brings your Energy back.";
   it('S8, kept to the bag: Eat it with the bag\'s cell and Eat pulsing; eaten from the bag, S8 passes', () => {
     const r = s8('director-s8-bag');
@@ -368,7 +397,7 @@ describe('off the path', () => {
   it('no fish at S8 before the soup: Catch 2 fish, counted 1/2, 2/2', () => {
     const r = new Run('director-two-fish').pick();
     r.harvest(r.sowQuick());
-    r.nadia1().fish(2);
+    r.nadia1().gather().fish(2);
     r.s.energy.value = 100;
     r.s.bag = r.s.bag.filter(x => !x.id.startsWith('fish_'));
     r.check();
@@ -385,7 +414,7 @@ describe('off the path', () => {
   it('a Mystery Dish given to Nadia does not count (S10)', () => {
     const r = new Run('director-mystery').pick();
     r.harvest(r.sowQuick());
-    r.nadia1().fish(2);
+    r.nadia1().gather().fish(2);
     r.s.guide!.step = 't_gift';
     r.s.bag.push({ id: 'dish_mystery', qty: 1 });
     r.check();
@@ -400,9 +429,48 @@ describe('off the path', () => {
     expect(r.view.row.go).toBe(set.market);
     expect(r.view.row.line).not.toContain('Mission');
     r.nadia1();
+    expect(r.view.target.spot.startsWith(`${SHANGHAI}~`)).toBe(true);   // S6a: the home city's own points
+    r.gather();
     expect(r.view.row.go).toBe(set.pond);
     r.fish(2);
     expect(r.step).toBe('t_meal');
+  });
+  it('S6a: a material whose points all cool down gives way to the next; none to gather, the step passes (v4q(4) ⑥)', () => {
+    const r = new Run('director-gather-cooling').pick();
+    r.harvest(r.sowQuick());
+    r.nadia1();
+    expect(r.view.target.item).toBe('wood');
+    const cool = (kind: string) => { for (const p of gatherPointsOf(c, SF).filter(p => p.kind === kind)) r.s.gather.ready_at[p.id] = r.now + 3_600_000; };
+    cool('wood'); r.check();
+    expect(r.view).toMatchObject({ step: 't_gather', target: { item: 'stone' }, row: { icon: 'stone' } });
+    expect(r.view.row.line).toMatch(/^Gather Stone · /);
+    cool('stone'); r.check();
+    expect(r.view.target.item).toBe('fiber');
+    expect(r.view.row.line).toMatch(/^Gather Reeds · /);
+    cool('reed');
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+    expect(r.step).toBe('t_fish');   // nothing to gather now: S6a never holds the player up
+  });
+  it('S6a: what is already held counts, and a full bag away from the farm skips a point that would not fit', () => {
+    const r = new Run('director-gather-held').pick();
+    r.harvest(r.sowQuick());
+    r.s.storage.wood = 6; r.s.storage.stone = 1;
+    r.nadia1();
+    expect(r.view.target.item).toBe('stone');   // Timber done from storage
+    for (const id of [...c.fish.map(f => f.id), ...Object.keys(c.goods)]) if (r.s.bag.length < r.s.bag_cap) r.s.bag.push({ id, qty: 1 });
+    r.do({ type: 'talk', resident: 'res_nadia', ...r.market() });   // in town, the bag full
+    expect(r.step).toBe('t_fish');
+  });
+  it('S7a: after the soup, short of the upgrade (coins), the step passes straight to Nadia\'s soup (v4q(4) ⑥)', () => {
+    const r = new Run('director-upgrade-short').pick();
+    r.harvest(r.sowQuick());
+    r.nadia1().gather().fish(2);
+    r.s.energy.value = 100;
+    r.cook(['fish_crucian'], true);
+    r.s.coins = 10;
+    r.cook(['fish_crucian', 'crop_radish']);
+    expect(r.step).toBe('t_gift');
+    expect(r.s.homestead.level).toBe(1);
   });
   it('left alone: the guide ends at the second home-day rollover, the first stall slot filled, Pip gone', () => {
     const r = new Run('director-left-alone').pick();

@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
+import { addPlots } from '../../src/p0/garden.js';
 import { applyP0, count, type P0Command } from '../../src/p0/reducer.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { dayKey, levelFor, settleEnergy, xpPercent } from '../../src/p0/rules.js';
@@ -61,7 +62,7 @@ describe('P0 farming loop (§5.3 / §5.4.1)', () => {
     let s = fresh();
     s = run(s, { type: 'sow', plot: 3, seed: 'seed_radish' });
     expect(s.energy.value).toBe(198);
-    expect(count(s.bag, 'seed_radish')).toBe(19);
+    expect(count(s.bag, 'seed_radish')).toBe(11);   // the start bag's 12 (q(217) ②, v4q(4) ⑥ 戊1)
     expect(s.plots[3]).toMatchObject({ state: 'sown', crop: 'crop_radish', xp_pct: 100 });
     expect(applyP0(c, s, { type: 'harvest', plot: 3 }, T0).ok).toBe(false);
     s = run(s, { type: 'water', plot: 3 });
@@ -77,8 +78,13 @@ describe('P0 farming loop (§5.3 / §5.4.1)', () => {
     expect(r.events).toContainEqual({ kind: 'first', what: 'harvest:crop_radish', xp: 10 });
   });
 
-  it('first-session bed: 20 radishes reach Farming Lv2 with 5 carrot seeds and no Energy (§4.5, §5.3, q(101))', () => {
+  it('20 radishes reach Farming Lv2 with 5 carrot seeds and no Energy (§4.5, §5.3, q(101))', () => {
+    // SGODOT-355 b1: a new homestead has 8 Plots; Homestead Lv7 has the 20 this ledger counts (the first session's own
+    // ledger is v4's, calibrated by Li Bai)
     let s = fresh();
+    s.homestead.level = 7;
+    addPlots(c, s);
+    s.bag.find(x => x.id === 'seed_radish')!.qty = 20;   // the start bag has 12 now (v4q(4) ⑥ 戊1); this ledger sows 20
     for (let i = 0; i < 20; i++) { s = run(s, { type: 'sow', plot: i, seed: 'seed_radish' }); s = run(s, { type: 'water', plot: i }); }
     expect(s.energy.value).toBe(160);
     let levelEvent: unknown;
@@ -90,7 +96,7 @@ describe('P0 farming loop (§5.3 / §5.4.1)', () => {
     }
     expect(s.skills.farming).toBe(50);
     expect(levelEvent).toMatchObject({ kind: 'level', skill: 'farming', level: 2, energy: 0 });
-    expect(s.energy.value).toBe(200);   // regenerated to full over the 4 h; the level added nothing (q(101))
+    expect(s.energy.value).toBe(160 + 60);   // 4 h of regeneration under Lv7's 260; the level added nothing (q(101))
     expect(count(s.bag, 'seed_carrot')).toBe(5);
     expect(count(s.bag, 'crop_radish')).toBe(20);
   });
@@ -105,11 +111,12 @@ describe('P0 farming loop (§5.3 / §5.4.1)', () => {
     expect(s.plots[0].xp_pct).toBe(25);
   });
 
-  it('tills wild ground for free and refuses sowing on it', () => {
+  it('tills wild ground for free and refuses sowing on it (only a save from before SGODOT-355 b1 has any)', () => {
     let s = fresh();
-    expect(applyP0(c, s, { type: 'sow', plot: 25, seed: 'seed_radish' }, T0)).toMatchObject({ ok: false, code: 'wrong_state' });
-    s = run(s, { type: 'till', plot: 25 });
-    expect(s.plots[25].state).toBe('tilled');
+    s.plots[5] = { id: 5, state: 'wild' };
+    expect(applyP0(c, s, { type: 'sow', plot: 5, seed: 'seed_radish' }, T0)).toMatchObject({ ok: false, code: 'wrong_state' });
+    s = run(s, { type: 'till', plot: 5 });
+    expect(s.plots[5].state).toBe('tilled');
     expect(s.energy.value).toBe(200);
   });
 });
@@ -120,7 +127,7 @@ describe('P0 stall (§9.11.1 / §9.13.1)', () => {
     expect(applyP0(c, s, { type: 'buy', item: 'seed_carrot', qty: 2 }, T0)).toMatchObject({ ok: false, code: 'locked', detail: { level: 2, xp_to_go: 50 } });
     s = run(s, { type: 'buy', item: 'seed_radish', qty: 10 });
     expect(s.coins).toBe(180 - 40);
-    expect(count(s.bag, 'seed_radish')).toBe(30);
+    expect(count(s.bag, 'seed_radish')).toBe(22);   // 12 to start (v4q(4) ⑥ 戊1) + 10
     s.skills.farming = 50;
     s = run(s, { type: 'buy', item: 'seed_carrot', qty: 2 });
     expect(s.coins).toBe(140 - 18);

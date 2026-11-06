@@ -52,7 +52,7 @@ export function marketCards(c: P0Content, climate: string): string[] {
 }
 
 /** Buy a card at the counter that shelves it: the page goes into the Cookbook (Tasted). A Market shelves its own city's
- * climate cards (q(182), as its buy-back and barter): the place's city, else the one the player is in. */
+ * climate cards (q(182), as its buy-back): the place's city, else the one the player is in. */
 export function buyCard(c: P0Content, s: P0State, id: string, shop: string, events: P0Event[], place?: unknown): Refusal | null {
   const page = cardPage(id), price = cardPrice(c, id);
   const shelved = shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, climateAt(c, s, place)) : [];

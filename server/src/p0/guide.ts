@@ -26,11 +26,14 @@
 import type { MapMarker, MarkerKind } from './markers.js';
 import type { P0Content, Skill } from './content.js';
 import { cropById, dishParts, ingredient, itemName, quickCrop, recipeById } from './content.js';
-import { count } from './bag.js';
+import { count, room } from './bag.js';
 import { dayKey, maxEnergy, skillLevel } from './rules.js';
 import { releaseFirstStallSlot } from './boards.js';
 import { grantItems } from './parcels.js';
 import { homeSetOf } from './home_city.js';
+import { homeFacts, homeOf } from './home.js';
+import { gatherPointsOf, type GatherPoint } from './gather_points.js';
+import { upgradeBlock } from './homestead.js';
 import { cityPlaces, placeOf } from './world.js';
 import type { HomeSet } from './travel.js';
 import type { P0Event } from './progress.js';
@@ -50,6 +53,9 @@ export interface GuidePred {
   coins?: number;
   level?: Partial<Record<Skill, number>>;
   energy_full?: boolean;              // Energy at its maximum (q(215) S8: a full bar cannot eat, so the meal step passes)
+  gather?: Record<string, number>;    // S6a (v4q(4) ⑥): a home-city point can be gathered now for one of these still short
+  homestead?: number;                 // Homestead at least this level
+  can_upgrade?: boolean;              // the next Homestead level can be bought now (S7a: else the step passes)
   fish?: number;                      // cookable fish held, any kind (S8–S10: enough fish to cook)
   dish?: number;                      // edible dishes held, any recipe (the Mystery Dish is not one; S10's ♥)
   common_crop?: number;               // Common crops held, any kind (q(217) ③: soup needs one)
@@ -78,6 +84,9 @@ export interface GuideStep extends GuideShow {
   done_if?: GuidePred;
   /** In order: the first whose `if` fails shows a recover entry — the first of `else` whose `when` holds (the last has none). */
   needs?: { if: GuidePred; else: string[] }[];
+  /** S6a (v4q(4) ⑥ t_gather): the materials to gather and how many, in the order Today asks for them; view.guide.target
+   * names the point (gatherTarget) and the row's `{gather_item}` / `{gather_spot}` / icon `{gather}` are filled from it. */
+  gather?: Record<string, number>;
 }
 /** progress.fish: the entry's own count, cookable fish held against `fish` (339 2e08a1a1: `Catch 2 fish · 1/2`). */
 export interface GuideRecover extends GuideShow { id: string; when?: GuidePred; progress?: { fish: number } }
@@ -111,10 +120,10 @@ const HOME_ROLES = ['market', 'tea', 'tackle', 'post', 'pond'] as const;
 type HomeRole = typeof HOME_ROLES[number];
 
 /** Keys a step may count on (validateGuide); `ack:<step>` is the guide command's (§2.2). */
-export const GUIDE_KEY_KINDS = ['sow', 'water', 'harvest', 'buy', 'sell', 'barter', 'enter', 'talk', 'gift', 'learn', 'cast', 'catch',
+export const GUIDE_KEY_KINDS = ['sow', 'water', 'harvest', 'buy', 'sell', 'enter', 'talk', 'gift', 'learn', 'cast', 'catch',
   'cook', 'dish', 'eat', 'accept', 'deliver', 'home_pick', 'travel', 'ack'] as const;
 /** The client's built-in TipCard keys (P0Guide.TIPS) a step may name besides the table's own tips. */
-const BUILT_IN_TIPS = ['sow', 'cast', 'creel', 'cook', 'heat', 'meal', 'map'];
+const BUILT_IN_TIPS = ['sow', 'cast', 'creel', 'cook', 'heat', 'meal', 'map', 'travel'];
 
 const stepsOf = (c: P0Content): GuideStep[] => c.guide?.steps ?? [];
 const recoverOf = (c: P0Content, id: string) => c.guide?.recover?.find(r => r.id === id);
@@ -207,6 +216,27 @@ export function mealPick(c: P0Content, s: P0State, now: number): { dish: string;
 const inboxHolds = (s: P0State, id: string) => [...s.inbox.parcels, ...s.inbox.waiting].some(p => p.id === id);
 const pots = (s: P0State) => [s.stove, s.queue, ...(s.burners ?? []).flatMap(b => [b.stove, b.queue])].filter(p => p !== null);
 
+/**
+ * S6a's point (v4q(4) ⑥; 亚瑟's view.guide.target): the first material of `need` still short (held anywhere, as `have`),
+ * whose home-city point is ready (none cooling down) and, away from the farm, fits the bag (gathering on the farm puts it
+ * in storage); of those, the one nearest the farm, the table's order breaking a tie, so the same save always gets the
+ * same point. A material whose points all cool down (or do not fit) gives way to the next; null: none can be gathered.
+ */
+export function gatherTarget(c: P0Content, s: P0State, need: Record<string, number>, now: number): { spot: GatherPoint; item: string; left: number } | null {
+  const points = gatherPointsOf(c, homeOf(c, s)), farm = homeFacts(c, s).farm;
+  const far = (p: GatherPoint) => (farm ? (p.lat - farm.lat) ** 2 + ((p.lng - farm.lng) * Math.cos(farm.lat * Math.PI / 180)) ** 2 : 0);
+  for (const [item, n] of Object.entries(need)) {
+    const left = n - held(s, item);
+    if (left <= 0) continue;
+    const open = points.filter(p => p.yield[0]?.[0] === item && (s.gather.ready_at[p.id] ?? 0) <= now
+      && (s.presence.space === 'home' || room(c, s, item) >= p.yield[0][1]));
+    if (!open.length) continue;
+    const spot = open.reduce((a, b) => (far(b) < far(a) ? b : a));
+    return { spot, item, left };
+  }
+  return null;
+}
+
 export function guidePred(c: P0Content, s: P0State, p: GuidePred | undefined, now: number): boolean {
   if (!p) return true;
   const g = s.guide;
@@ -226,6 +256,9 @@ export function guidePred(c: P0Content, s: P0State, p: GuidePred | undefined, no
   if (p.dish !== undefined && heldWhere(s, id => isEdibleDish(c, id)) < p.dish) return false;
   if (p.common_crop !== undefined && heldWhere(s, id => isCommonCrop(c, id)) < p.common_crop) return false;
   if (p.parcel !== undefined && !inboxHolds(s, p.parcel)) return false;
+  if (p.gather !== undefined && !gatherTarget(c, s, p.gather, now)) return false;
+  if (p.homestead !== undefined && s.homestead.level < p.homestead) return false;
+  if (p.can_upgrade !== undefined && (upgradeBlock(c, s) === null) !== p.can_upgrade) return false;
   if (p.meal !== undefined) {
     const m = mealPick(c, s, now);
     if (!m || (p.meal !== true && m.where !== p.meal)) return false;
@@ -281,7 +314,6 @@ export function guideKeys(c: P0Content, before: P0State, s: P0State, cmd: { type
         if (type === 'buy' && e.delta > 0) add(`buy:${e.id}`, e.delta);
         break;
       case 'sale': add(`sell:${e.item}`, e.qty); add(`sell:${e.item}:${e.shop}`, e.qty); break;
-      case 'barter': add(`barter:${e.item}`); break;
       case 'cast': add('cast'); break;
       case 'catch': if (e.result === 'landed') { add('catch'); add(`catch:${e.fish}`); } break;
       case 'pot': add('cook'); if (e.dish) add(`cook:${e.dish}`); break;
@@ -481,6 +513,11 @@ export function guideView(c: P0Content, s: P0State, now: number) {
   const meal = rec ? mealPick(c, s, now) : null;   // only a `{dish}` in what is shown takes it (S8's eat entries)
   const dish = (x: string) => (meal ? x.replace(/\{dish\}/g, m => (x === m ? meal.dish : itemName(c, meal.dish))) : x);   // alone: the id
   if (row) for (const k of ['line', 'icon'] as const) if (typeof row[k] === 'string') row[k] = dish(row[k] as string);
+  const target = !rec && st.gather ? gatherTarget(c, s, st.gather, now) : null;
+  if (row && target) {
+    if (typeof row.line === 'string') row.line = row.line.replace('{gather_item}', itemName(c, target.item)).replace('{gather_spot}', target.spot.name);
+    if (row.icon === '{gather}') row.icon = target.item;
+  }
   if (row && typeof row.line === 'string') row.line = fill(c, s, row.line, count);
   if (row && typeof row.go === 'string') row.go = guidePlace(c, s, row.go);
   if (row && typeof row.countdown === 'string') Object.assign(row, countdown(c, s, row.countdown, now));
@@ -489,6 +526,7 @@ export function guideView(c: P0Content, s: P0State, now: number) {
   return {
     step: st.id, phase: st.phase ?? null, recover: rec, at: g.at, progress: count,
     row, tip: shown.tip ?? null,
+    target: target ? { kind: 'gather' as const, spot: target.spot.id, item: target.item } : undefined,   // absent in JSON when none
     marks: resolveMarks(c, s, shown.marks, count).map(m => (meal && typeof m.item === 'string' ? { ...m, item: dish(m.item) } : m)),
     pip: { here: true, bang: (g.n['talk:res_pip'] ?? 0) === 0 || ready, line: pipLine ? fill(c, s, dish(pipLine)) : null,
       resend_left: r ? Math.max(0, r.max - (g.n.resend ?? 0)) : 0 },
@@ -533,7 +571,7 @@ export function validateGuide(c: P0Content): string[] {
   const pred = (where: string, p?: GuidePred) => {
     if (!p) return;
     for (const id of [...Object.keys(p.have ?? {}), ...Object.keys(p.planted ?? {}), ...Object.keys(p.ripe ?? {}),
-      ...(p.pot ? [p.pot] : []), ...(p.known ? [p.known] : []), ...(p.parcel ? [p.parcel] : [])]) if (!known(id)) out.push(`${where}: unknown item ${id}`);
+      ...Object.keys(p.gather ?? {}), ...(p.pot ? [p.pot] : []), ...(p.known ? [p.known] : []), ...(p.parcel ? [p.parcel] : [])]) if (!known(id)) out.push(`${where}: unknown item ${id}`);
     for (const k of Object.keys(p.keys ?? {})) key(where, k);
     p.all?.forEach(q => pred(where, q)); p.any?.forEach(q => pred(where, q)); pred(where, p.not);
   };
@@ -560,6 +598,7 @@ export function validateGuide(c: P0Content): string[] {
     if (st.done_on) key(at, st.done_on.key);
     if (st.done_on?.key.startsWith('ack:') && st.done_on.key !== `ack:${st.id}`) out.push(`${at}: an ack step acks itself`);
     pred(at, st.done_if);
+    for (const id of Object.keys(st.gather ?? {})) if (!known(id)) out.push(`${at}: unknown gather item ${id}`);
     show(at, st);
     for (const n of st.needs ?? []) {
       pred(at, n.if);

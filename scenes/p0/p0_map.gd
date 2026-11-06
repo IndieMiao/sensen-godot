@@ -11,6 +11,7 @@ const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGO
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a city's 2 regional fish (MAP-5's Fish here)
+const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")   # the wild sites read by viewport (SGODOT-355 C)
 const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")   # the fog's holes as the map draws the ground (SGODOT-298)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
@@ -60,7 +61,7 @@ func _ready() -> void:
 	# under their feet) and a POI's shadow is its artwork's silhouette — yet the sun drew four shadow cascades a frame.
 	$Sun.shadow_enabled = false
 	rt.attach(self)
-	_load_city_places(P0Travel.home(_view()))   # a generated home's own places (SGODOT-303); the written city's are in the client
+	_load_city_places(P0Travel.home(_view()))   # home's places (SGODOT-303) and gathering spots (v4q(4))
 	for child in $HUD/SafeArea/Root.get_children():
 		if child.name == "AccountButton" or child is LanguageButton: child.hide()
 
@@ -148,6 +149,7 @@ func _install_city_map() -> void:
 		city_map.kept_pin = _kept_pin   # where the player is keeps its pin; the rest give way (SGODOT-269)
 		city_map.fog_holes = fog_holes   # §11.7: the world greyed but for the cities explored (SGODOT-275)
 		city_map.poi_shown = poi_shown   # q(212) ⑤: no POI in the fog
+		city_map.place_shown = place_shown   # SGODOT-355: gathering spots and wild sites by zoom
 		city_map.landmark_scenes = false   # q(213): a landmark card is its name and kind alone, no Enter scene
 		city_map.bubble_state = city_bubble
 		city_map.bubble_clear_rects = bubble_clear_rects   # no half bubble under the HUD, the keys or the bar (不知火舞 on 279)
@@ -198,6 +200,16 @@ func _pond_info(entry: Dictionary) -> Dictionary:
 
 func _on_entry_selected(entry: Dictionary) -> void:
 	if rt == null: return
+	# SGODOT-355: a wild site opens its mouth card wherever it is (no city's, no fog); a gathering spot its own card in
+	# a city explored (Go on it travels), the city's silhouette card in the fog
+	if bool(entry.get("wild", false)):
+		city_map.info.hide()
+		open_mine_card(str(entry.get("id", "")))
+		return
+	if bool(entry.get("gather", false)) and P0Travel.fog(_view(), cluster_of_entry(entry)) != "unexplored":
+		city_map.info.hide()
+		_open_gather_card(str(entry.get("id", "")))
+		return
 	if _travel_first(entry, false): return
 	if str(entry.get("kind", "")) == "place":
 		var spec := place_card(entry)
@@ -236,7 +248,10 @@ func _open_pond_card(entry: Dictionary, info: Dictionary) -> void:
 func _kept_pin(entry: Dictionary) -> bool:
 	match str(entry.get("kind", "")):
 		"pond": return is_here("pond", str(entry.get("id", "")))
-		"place": return is_here("outpost", str(entry.get("id", "")))
+		"place":
+			var id := str(entry.get("id", ""))
+			if bool(entry.get("wild", false)) or bool(entry.get("gather", false)): return always_shown(_view(), id, _show_target)
+			return is_here("outpost", id)
 	return false
 
 ## Whether the player is at this place now (the place chip's place, P0Runtime.here): q(80)'s Back to <name>.
@@ -272,6 +287,12 @@ func _set_outpost_places() -> void:
 			e["cluster"] = cluster
 			places.append(e)
 	if away(): places.append(home_entry())   # away from home the farm wears its Homestead pin (不知火舞 on 234)
+	var gather_cities: Array = _shown_cities.duplicate()
+	if not gather_cities.has(home): gather_cities.push_front(home)   # home's gathering spots, written city's too (v4q(4))
+	for cluster in gather_cities:
+		for g in P0CityPlaces.gather(cluster): places.append(gather_entry(g))
+	for x in P0WildSites.all(): places.append(wild_entry(x))
+	_wild_count = P0WildSites.count()
 	city_map.set_places(places)
 
 func _on_place_requested(entry: Dictionary) -> void:
@@ -305,6 +326,7 @@ var _styles_explored := ""   # home and the count of cities visited the styles w
 ## Ponds P0 knows, outposts and the homestead open P0PlaceSheet, not the city view's info panel; landmarks and POIs
 ## keep that name card.
 func _own_card(entry: Dictionary) -> bool:
+	if bool(entry.get("gather", false)) or bool(entry.get("wild", false)): return true   # SGODOT-355's cards
 	match str(entry.get("kind", "")):
 		"pond": return not _pond_info(entry).is_empty()
 		"place": return not place_card(entry).is_empty()
@@ -330,7 +352,9 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 	match str(entry.get("kind", "")):
 		"pond":
 			var beginner := str(entry.get("id", "")) == NEAREST_POND or bool(entry.get("beginner", false))
-			style = {"icon": P0Logic.icon("pond"), "label": short_name(name), "rank": PIN_RANK.beginner if beginner else PIN_RANK.pond}
+			# its site's icon (SGODOT-406): pond, river or coast; the city panel's Ponds / Local pond rows keep the pond's
+			style = {"icon": P0Logic.icon(PondCard.pin_icon(str(entry.get("id", "")))), "label": short_name(name),
+				"rank": PIN_RANK.beginner if beginner else PIN_RANK.pond}
 		"place":
 			# The homestead keeps its plate and its whole name (q(137) leaves it as it was), first after the always-in pins.
 			if str(entry.get("id", "")) == HOME_PIN: return {"icon": P0Logic.icon("home"), "plate": true, "label": "Homestead",
@@ -342,6 +366,16 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 				var icon := P0Outposts.cards_icon() if role == "casino" else P0Logic.icon(str(PIN_ICONS.get(role, "travel")))
 				style = {"icon": icon, "label": "" if role == "tackle" else short_name(name),
 					"rank": int(PIN_RANK.get(role, PIN_RANK.post))}
+			if bool(entry.get("gather", false)):
+				var g := P0CityPlaces.gather_spot(str(entry.get("id", "")))
+				style = {"icon": P0Logic.icon(str(GATHER_ICONS.get(str(g.get("kind", "")), "wood"))), "label": str(g.get("short", "")),
+					"rank": PIN_RANK.gather}
+			elif bool(entry.get("wild", false)):
+				# above the fog, never its silhouette (v4q(3) ⑤): a wild site is no city's
+				var x := P0WildSites.site(str(entry.get("id", "")))
+				var open := bool(x.get("open", false))
+				return {"icon": P0Logic.icon(str(WILD_ICONS.get(str(x.get("type", "")), "quarry"))), "label": str(x.get("short", "")),
+					"rank": PIN_RANK.wild if open else PIN_RANK.wild_closed, "locked": not open, "order": float(x.get("km", 0.0))}
 	# A place of a city the fog covers (MAP-2 2107:32861, 不知火舞 on #281): its silhouette until the city is explored
 	if not style.is_empty() and P0Travel.fog(_view(), cluster_of_entry(entry)) == "unexplored":
 		style["silhouette"] = true
@@ -351,8 +385,15 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 
 ## q(137) ⑤: the fixed packing order of the map's pins after the always-in ones (the selected, a marked one, where the
 ## player is): beginner pond, other ponds, market, tea house, travel post, cabin and Mine Hut (q(204) ⑦), tackle shop and
-## card room (an errand you choose, 不知火舞 on 351 0c2082b7), silhouette.
-const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "mine_hut": 5, "tackle": 6, "casino": 6, "silhouette": 7}
+## card room (an errand you choose, 不知火舞 on 351 0c2082b7), then (SGODOT-355, LOCK-24 125a71e4 / 0a2baa5a) a city's
+## gathering spots, the open wild sites (quarry and vein alike, nearest home first: the style's `order`), the wild sites
+## not open yet, and last the silhouette (不知火舞 355 3b2c6a43 ②), before landmarks and POIs.
+const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "mine_hut": 5, "tackle": 6, "casino": 6,
+	"gather": 7, "wild": 8, "wild_closed": 9, "silhouette": 10}
+## A gathering spot's glyph by its kind (v4q(4) ②, f6b4bdb3): the material it gives.
+const GATHER_ICONS := {"wood": "wood", "stone": "stone", "reed": "fiber", "clay": "clay", "herb": "crop_herb", "hardwood": "hardwood", "flax": "flax"}
+## A wild site's glyph by its type (icons batch 1, a817052d / #621).
+const WILD_ICONS := {"quarry": "quarry", "vein": "vein", "geode": "geode", "abyss": "abyss", "ruin": "ruins"}
 ## The type words a place's name ends with (q(137) ①): the generator's (server world.ts, Pond / Creek / Cove) and the
 ## hand-written ones. Longest first, so `Trading Post` is not read as `Post`.
 const TYPE_WORDS := ["Market Square", "Tackle Shop", "Trading Post", "Travel Post", "Tea House", "Card Room", "Mine Hut", "Creek", "Pond", "Cove"]
@@ -363,6 +404,221 @@ static func short_name(name: String) -> String:
 	for w in TYPE_WORDS:
 		if name.ends_with(" " + w): return name.substr(0, name.length() - w.length() - 1).strip_edges()
 	return name
+
+# ---------------------------------------------------------------- gathering spots and wild sites (SGODOT-355 C)
+## The gathering spot's card (D2, P0MaterialLogic.gather_card) or a wild site's mouth card (E1) open now, and the spec
+## it reads: its key follows the view (a gather's reply turns it to `Ready in 4h`, the card staying open; a cooldown
+## counts down; Energy comes back; Floor 1 paid today) — p0_frame.
+var _live_card: Control
+var _live_spec := Callable()
+var _live_sig := ""
+
+func gather_card_spec(id: String) -> Dictionary:
+	var spot := P0CityPlaces.gather_spot(id)
+	if spot.is_empty() or rt == null: return {}
+	var v := rt.session.current()   # its cooldown and Energy counted on since the view came
+	var ready := float((v.get("gather", {}).get("city_ready", {}) as Dictionary).get(id, 0.0)) if v.get("gather") is Dictionary else 0.0
+	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(spot.lat), float(spot.lng)))
+	return P0MaterialLogic.gather_card(v, spot, P0Travel.here(v) == str(spot.cluster), ready, km)
+
+func _open_gather_card(id: String) -> void:
+	var spec := gather_card_spec(id)
+	if spec.is_empty(): return
+	spec["on_blocked"] = func():   # amber: the Energy card (LOCK-02); grey (cooling, no room): the key says why already
+		var now := gather_card_spec(id)
+		if str(now.get("state", "")) == "energy": rt.ui.open_energy_card(int(P0CityPlaces.gather_spot(id).get("energy", 0)), "Gather")
+	_open_live_card(id, spec, gather_card_spec.bind(id), _gather_go.bind(id), "gather_card")
+
+func _open_live_card(id: String, spec: Dictionary, live: Callable, go: Callable, kind: String) -> void:
+	_live_spec = live
+	_live_sig = _card_key_sig(spec)
+	var holder: Array = [null]
+	holder[0] = P0PlaceSheet.open(rt.ui, spec, go, Callable(), func():
+		if _live_card == holder[0]:
+			_live_card = null
+			_live_spec = Callable()
+		if city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(), kind)
+	_live_card = holder[0]
+
+## Gather: `{type: gather, spot}` (the card stays open; the reply's item event floats `+4 Timber`, the key turns to
+## `Ready in 4h` — no toast, no teaching card, D2-GATHERED). Go (not in its city): that city's card, its travel card.
+func _gather_go(id: String) -> void:
+	var spec := gather_card_spec(id)
+	match str(spec.get("state", "")):
+		"ready":
+			var cmd := {"type": "gather", "spot": id}
+			rt.session.send(cmd, P0Session.ui_key(cmd))
+		"go":
+			rt.ui.close_modal()
+			open_city_card(str(P0CityPlaces.gather_spot(id).get("cluster", "")))
+
+## The open gathering card's key as the view has it now (p0_frame): only when what it says changed.
+func _refresh_live_card() -> void:
+	if _live_card == null or not is_instance_valid(_live_card) or not _live_spec.is_valid(): return
+	var spec: Dictionary = _live_spec.call()
+	var sig := _card_key_sig(spec)
+	if sig == _live_sig: return
+	_live_sig = sig
+	var key := _live_card.find_child("Primary", true, false) as UiCommandButton
+	if key == null: return
+	key.label = str(spec.get("primary", ""))
+	key.need_energy = bool(spec.get("blocked_energy", false))
+	key.reason = str(spec.get("blocked", ""))
+
+static func _card_key_sig(spec: Dictionary) -> String:
+	return "%s|%s|%s" % [spec.get("primary", ""), spec.get("blocked", ""), spec.get("blocked_energy", false)]
+
+## A wild site's mouth card (P0MaterialLogic.mine_card) as the view has it now: the site as the viewport read it, the
+## view's own fields for the one the player is at (P0WildSites.remember); {} for a site not read.
+func mine_card_spec(id: String) -> Dictionary:
+	if rt == null or not P0WildSites.has_site(id): return {}
+	var site := P0WildSites.site(id)
+	var v := rt.session.current()
+	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(site.lat), float(site.lng)))
+	return P0MaterialLogic.mine_card(v, site, P0Travel.here(v) == id, km)
+
+## The mouth card (E1 / E4): Go → the wild travel card (C3); at the site Enter mine (P0Runtime.enter_mine), amber short
+## of Energy (the Energy card); not open yet, no key.
+func open_mine_card(id: String) -> void:
+	var spec := mine_card_spec(id)
+	if spec.is_empty(): return
+	spec["on_blocked"] = func(): rt.ui.open_energy_card(int(P0Logic.content().get("mine", {}).get("floor_energy", 2)), "Enter mine")
+	_open_live_card(id, spec, mine_card_spec.bind(id), _mine_go.bind(id), "mine_card")
+
+func _mine_go(id: String) -> void:
+	match str(mine_card_spec(id).get("state", "")):
+		"go":
+			rt.ui.close_modal()
+			open_wild_travel(id)
+		"enter":
+			rt.ui.close_modal()
+			rt.enter_mine(id)
+
+## C3 354:186011 (安其拉 d17dfb13): a wild site's travel card — its name, the mouth card's type line, Distance, Energy and
+## Coins (`Free` for the nearest three; else the fare and what is left, as a city's), Fly (the fare's gap grey or amber,
+## q(257) ③), `Return home is always free`. The fare is the viewport's `cost` (#706: fareOf's, what travel takes).
+static func wild_travel_card(view: Dictionary, site: Dictionary, km: float) -> Dictionary:
+	var cost: Dictionary = site.get("cost", {}) if site.get("cost", null) is Dictionary else {}
+	var f := {"energy": int(cost.get("energy", 0)), "coins": int(cost.get("coins", 0))}
+	f["free"] = int(f.energy) == 0 and int(f.coins) == 0
+	var card := P0MaterialLogic.mine_card(view, site, false)
+	var facts: Array = [["Distance", P0PlaceSheet.distance_text(km)]]
+	facts.append(["Energy", "Free" if int(f.energy) == 0 else _fare_left(int(f.energy), int(view.get("energy", {}).get("value", 0)))])
+	facts.append(["Coins", "Free" if int(f.coins) == 0 else _fare_left(int(f.coins), int(view.get("coins", 0)))])
+	var gap := P0Travel.fare_gap(view, f)
+	return {"title": str(card.title), "subtitle": str(card.subtitle), "facts": facts, "primary": "Fly",
+		"blocked": str(gap.get("text", "")), "gap": gap, "blocked_energy": str(gap.get("short", "")) == "energy",
+		"footer": "Return home is always free", "fare": f}
+
+func open_wild_travel(id: String) -> void:
+	if rt == null or not P0WildSites.has_site(id): return
+	var site := P0WildSites.site(id)
+	var spec := wild_travel_card(rt.session.current(), site, P0PlaceSheet.km_between(_origin(), Vector2(float(site.lat), float(site.lng))))
+	var gap: Dictionary = spec.gap
+	spec["on_blocked"] = func():
+		if str(gap.get("short", "")) == "coins": rt.ui.toast_error("Wallet floor · keep %d coins" % P0Travel.WALLET_FLOOR)
+		else: rt.ui.open_energy_card(int(gap.get("need", 0)), "Fly")
+	P0PlaceSheet.open(rt.ui, spec, func():
+		rt.ui.close_modal()
+		_fly_to_wild(id), Callable(), Callable(), "travel_card")
+	# v4q(4) ⑥ 丁21: a travel card that costs Energy or coins teaches travel once (the guide holds it, P0Guide.tip_allowed)
+	if not bool(spec.fare.free): rt.ui.teach("travel")
+
+## Fly to a wild site: `travel` goes as the camera flies there; once it is taken the player is at the site (its chip,
+## C2 `Ironvale Vein · Day Pass 23h`) and its mouth card opens with Enter mine. A refusal says why as any travel's does
+## (P0Runtime) and the camera stays over the site.
+func _fly_to_wild(id: String) -> void:
+	var site := P0WildSites.site(id)
+	var cmd := {"type": "travel", "to": id}
+	var key := P0Session.ui_key(cmd)
+	var settled := [false, false]   # [taken, landed]
+	var both := func():
+		if settled[0] and settled[1] and rt != null and P0Travel.here(_view()) == id: _select_wild(id)
+	# heard once: let go at its own key's settling (周瑜 on #710: a refused trip flown again within the old wait — the same
+	# key — had the first listener open the card mid-air), else after 30 s (the reply never came)
+	var listener: Array = [Callable()]
+	var let_go := func():
+		if rt != null and rt.session.command_settled.is_connected(listener[0]): rt.session.command_settled.disconnect(listener[0])
+	listener[0] = func(k: String, ok: bool, _code: String):
+		if k != key: return
+		let_go.call()
+		settled[0] = ok
+		if ok: both.call()
+	rt.session.command_settled.connect(listener[0])
+	rt.session.send(cmd, key)
+	_show_target = id
+	_fly("wild:" + id, float(site.lat), float(site.lng), WILD_ZOOM, func():
+		settled[1] = true
+		both.call())
+	get_tree().create_timer(30.0).timeout.connect(let_go)
+const WILD_ZOOM := 12.0   # where a flight to a wild site lands: the site and its surroundings
+
+## A gathering spot's pin entry (contract C §9; P0CityPlaces.gather_spot holds the spot).
+static func gather_entry(g: Dictionary) -> Dictionary:
+	return {"id": str(g.id), "kind": "place", "name": str(g.get("name", "")), "lat": float(g.lat), "lng": float(g.lng),
+		"cluster": str(g.get("cluster", "")), "gather": true}
+
+## A wild site's pin entry (contract C §2; P0WildSites.site holds the site).
+static func wild_entry(x: Dictionary) -> Dictionary:
+	return {"id": str(x.id), "kind": "place", "name": str(x.get("name", "")), "lat": float(x.lat), "lng": float(x.lng),
+		"cluster": "", "wild": true}
+
+## The target a Show on map last flew to among these (`gather:` / `mine:`): its pin stays at every zoom (v4q(4) ②).
+var _show_target := ""
+
+## A gathering spot's or wild site's pin that nothing hides (v4q(3) ⑤, v4q(4) ②): the guide's target spot, the one
+## Show last flew to, the wild site the player is at and the nearest three free ones (view.wild.near3).
+static func always_shown(view: Dictionary, id: String, show_target := "") -> bool:
+	if id == "": return false
+	if id == show_target: return true
+	if P0WildSites.is_wild(id):
+		if P0Travel.here(view) == id: return true
+		var w = view.get("wild", null)
+		return w is Dictionary and (w.get("near3", []) as Array).has(id)
+	var t = view.get("guide", {}).get("target", null) if view.get("guide", null) is Dictionary else null
+	return t is Dictionary and str(t.get("spot", "")) == id
+
+## Whether a place pin is drawn at this zoom (CityMapView.place_shown): a city's gathering spots from one level nearer
+## than its overview (v4q(4) ②: overview.zoom + 1, 不知火舞 355 3b2c6a43 ③), the wild sites from the zoom the server
+## sends them (P0WildSites.MIN_ZOOM); the always-in ones at every zoom. Every other place as ever.
+func place_shown(entry: Dictionary) -> bool:
+	var id := str(entry.get("id", ""))
+	if bool(entry.get("gather", false)):
+		return always_shown(_view(), id, _show_target) or zoom >= gather_zoom(str(entry.get("cluster", "")))
+	if bool(entry.get("wild", false)):
+		return always_shown(_view(), id, _show_target) or zoom >= P0WildSites.MIN_ZOOM
+	return true
+
+## The zoom a city's gathering spots show from: its overview's (CityMapData, 11 without one) plus one.
+static func gather_zoom(cluster: String) -> float:
+	var overview: Dictionary = CityMapData.city(str(P0Clusters.region(cluster).get("id", ""))).get("overview", {})
+	return float(overview.get("zoom", 11.0)) + 1.0
+
+## The wild sites in view, read as the camera settles (P0WildSites keeps every box read; a box read once is not asked
+## again): every WILD_TICK_S at the city and state levels. The pins are set again only when a read brought new sites.
+const WILD_TICK_S := 0.4
+var _wild_s := 0.0
+var _wild_count := 0
+
+func _process(dt: float) -> void:
+	super._process(dt)
+	_wild_s += dt
+	if _wild_s < WILD_TICK_S: return
+	_wild_s = 0.0
+	if city_map == null or rt == null or not city_detail_visible() or zoom < P0WildSites.MIN_ZOOM: return
+	P0WildSites.fetch(rt.session, view_box(center_lat, center_lng, zoom, get_viewport().get_visible_rect().size), zoom, func(_sites):
+		if city_map and P0WildSites.count() != _wild_count: _set_outpost_places())
+
+## The box [south, west, north, east] the screen shows around its centre at a zoom, with half a screen's margin each
+## way (Web Mercator, 512-px tiles as the map draws them), kept under the server's 20° each way with room for
+## P0WildSites.grid_box's growing it out to the 0.5° grid.
+static func view_box(lat: float, lng: float, z: float, screen: Vector2) -> Array:
+	var deg_px := 360.0 / (512.0 * pow(2.0, z))
+	var half_lng := minf(9.0, screen.x * deg_px)
+	var half_lat := minf(9.0, screen.y * deg_px * cos(deg_to_rad(clampf(lat, -85.0, 85.0))))
+	var west := wrapf(lng - half_lng, -180.0, 180.0)
+	var east := wrapf(lng + half_lng, -180.0, 180.0)
+	return [clampf(lat - half_lat, -85.0, 85.0), west, clampf(lat + half_lat, -85.0, 85.0), east]
 
 ## Whether the player is away from the homestead — at a pond or an outpost (the place chip's place). At home, in the
 ## farmhouse or the mine, the avatar is the homestead's mark and no Homestead pin is drawn (不知火舞 on 234).
@@ -463,9 +719,8 @@ func _start_presence() -> void:
 func _poll_presence() -> void:
 	if not is_instance_valid(_presence) or not is_visible_in_tree() or rt == null: return
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED: return
-	var headers := PackedStringArray(["x-p0-player: " + rt.session.player_id])
-	if rt.session.access_key != "": headers.append("x-p0-key: " + rt.session.access_key)   # the demo server's key
-	_presence.send(rt.session.base_url + "/p0/presence", headers)
+	# the requests' own headers: the demo key, the version and the features (save_v7, or 426 once the wipe is on: 397)
+	_presence.send(rt.session.base_url + "/p0/presence", rt.session._headers())
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200 or city_map == null: return
@@ -795,7 +1050,24 @@ func _pan_by(shift: Vector2) -> void:
 func p0_return(route: String) -> void:
 	if route.begins_with("pond:"): _on_city_pond_requested({"id": route.trim_prefix("pond:")})
 	elif route.begins_with("outpost:"): _open_outpost(route.trim_prefix("outpost:"))
+	elif route.begins_with("mine:"): open_wild_card(route.trim_prefix("mine:"))   # a wild site's mine (周瑜's route_of, 355 b1 E)
 	else: _open_my_farm()
+
+## Back at a wild site from its mine (SGODOT-355 b1 C): 周瑜's p0_mine calls it after the pop (the Entrance, a knock-out),
+## the place pill's return (`mine:<id>`) too. The camera flies to the site; its mouth card (contract-efg §7.3 / 7.4) opens
+## on landing once the card is in. A site the map has not read (P0WildSites): the map stays as it is.
+func open_wild_card(site_id: String) -> void:
+	if not P0WildSites.has_site(site_id): return
+	var s := P0WildSites.site(site_id)
+	_show_target = site_id
+	_fly("wild:" + site_id, float(s.get("lat", center_lat)), float(s.get("lng", center_lng)), WILD_ZOOM, _select_wild.bind(site_id))
+
+## A wild site's mouth card opened as a tap on its pin opens it: the pin raised and in front while the card is up
+## (_on_entry_selected → open_mine_card; _open_live_card lets it go on close), as Show's landing does — not the card
+## alone over a pin left at its size (不知火舞 on E6, 周瑜 11-04). No map drawn (a test's): the card alone.
+func _select_wild(site_id: String) -> void:
+	if city_map != null and P0WildSites.has_site(site_id): city_map.select(wild_entry(P0WildSites.site(site_id)))
+	else: open_mine_card(site_id)
 
 ## Without the native map (desktop, tests holding the map in a SubViewport) the map drawn is the viewport: the camera
 ## follows its height as on a phone. map_poc takes the window's, which can be taller — the desktop's 1280 override, a
@@ -971,6 +1243,8 @@ func open_travel(cluster: String, preview := {}) -> void:
 	_travel_card = P0PlaceSheet.open(rt.ui, spec, func():
 		rt.ui.close_modal()
 		_take_off(cluster, int(P0Travel.trip(_view(), cluster).get("km", 0)) if not preview.has("km") else int(preview.km)), Callable(), Callable(), "travel_card")
+	# v4q(4) ⑥ 丁21: a travel card that costs Energy or coins teaches travel once (the guide holds it, P0Guide.tip_allowed)
+	if not bool(P0Travel.fare(rt.session.current(), cluster).free): rt.ui.teach("travel")
 
 var _travel_card: Control   # the travel card open now (its holder)
 
@@ -1386,6 +1660,7 @@ static func cluster_of_entry(entry: Dictionary) -> String:
 ## alone (CityMapView.select), as a city bubble opens the same card with no pin at all (不知火舞 on 327, 11ca174e; it stayed raised after the card closed, q(212) ⑥). True when it opened one.
 func _travel_first(entry: Dictionary, going := true) -> bool:
 	if not str(entry.get("kind", "")) in ["pond", "place"] or str(entry.get("id", "")) == HOME_PIN: return false
+	if bool(entry.get("wild", false)): return false   # no city's: its mouth card says Go (SGODOT-355)
 	var cluster := cluster_of_entry(entry)
 	var open := P0Travel.in_city(_view(), cluster) if going else P0Travel.covers(_view(), cluster)
 	if P0Travel.fog(_view(), cluster) != "unexplored" and open: return false
@@ -1503,12 +1778,13 @@ func _switch_city(r: Dictionary) -> void:
 
 ## Another city's ponds and outposts (SGODOT-280, the server's generator): read once per city when the camera city
 ## becomes it (or the player arrives there), then pinned like the home city's. A pin of a city without a pass still
-## opens its travel card (_travel_first). The home city keeps its hand-written pins.
+## opens its travel card (_travel_first). The home city keeps its hand-written ponds and outposts; it is read for its
+## gathering spots (v4q(4)).
 var _shown_cities: Array = []
 const SHOWN_CITIES := 6   # the cities whose pins stay on the map, the latest last
 
 func _load_city_places(cluster: String) -> void:
-	if cluster == "" or rt == null or cluster == P0Travel.written(): return   # hand-written: in the client already
+	if cluster == "" or rt == null: return   # the hand-written city too: its gathering spots are the server's (v4q(4))
 	P0CityPlaces.fetch(rt.session, cluster, _show_city_places.bind(cluster))
 
 func _show_city_places(_city: Dictionary, cluster: String) -> void:
@@ -1731,18 +2007,19 @@ func _take_after_leave() -> bool:
 			if not next.begins_with("show:"): return false
 			var target := next.trim_prefix("show:")
 			# another city's place not read yet: show_place reads it first (its pin is not known before)
-			if place_for(target).is_empty() and P0CityPlaces.cluster_of(target.trim_prefix("outpost:").trim_prefix("pond:")) == "": return false
+			if place_for(target).is_empty() and P0CityPlaces.cluster_of(_place_id(target)) == "": return false
 			show_place.call_deferred(target)
 	return true
 
 ## Show on map (SGODOT-225; LOCK-08, guidance only, nothing is entered): the camera flies to the target's pin and
 ## selects it — "outpost:<role>" an outpost, "pond:<id>" a catalog pond, "home" the homestead (fly only: its pin
-## would offer Enter). "map" (Browse the map) and unknown targets leave the camera where the player left it.
+## would offer Enter), "gather:<spot>" a city's gathering spot and "mine:<site>" a wild site's mine (SGODOT-355: their
+## pin then shows at every zoom). "map" (Browse the map) and unknown targets leave the camera where the player left it.
 func show_place(target: String) -> void:
 	if city_map == null: return
-	# Another city's place (a cross-city request's `outpost:gn-…~market0`, 苏烈 SGODOT-284): its city is read and pinned
-	# first, then the camera flies there as to any pin.
-	var cluster := P0CityPlaces.cluster_of(target.trim_prefix("outpost:").trim_prefix("pond:"))
+	# Another city's place (a cross-city request's `outpost:gn-…~market0`, 苏烈 SGODOT-284; a gathering spot's): its city
+	# is read and pinned first, then the camera flies there as to any pin.
+	var cluster := P0CityPlaces.cluster_of(_place_id(target))
 	if cluster != "" and not P0CityPlaces.has_city(cluster) and rt != null:
 		P0CityPlaces.fetch(rt.session, cluster, func(city):
 			_show_city_places(city, cluster)
@@ -1751,6 +2028,12 @@ func show_place(target: String) -> void:
 	if cluster != "" and not _shown_cities.has(cluster): _show_city_places(P0CityPlaces.city(cluster), cluster)
 	var entry := place_for(target)
 	if entry.is_empty(): return
+	if target.begins_with("gather:") or target.begins_with("mine:"):
+		_show_target = _place_id(target)
+		# a site the viewport has not read (near3_sites' point): its pin comes with the box read on landing, none to select
+		var pinned := not P0WildSites.is_wild(_show_target) or P0WildSites.has_site(_show_target)
+		_fly("show:" + target, float(entry.lat), float(entry.lng), SHOW_ZOOM, func(): if pinned: city_map.select(entry))
+		return
 	# Flies since SGODOT-267 (_fly sets the city-wide pan bounds, else the homestead's 450 m box pulls the camera back);
 	# the pin is selected on landing.
 	_fly("show:" + target, float(entry.lat), float(entry.lng), SHOW_ZOOM, func(): if target != "home": city_map.select(entry))
@@ -1776,6 +2059,15 @@ func place_for(target: String) -> Dictionary:
 		var o := P0Outposts.find(key)
 		if o.is_empty(): o = P0Outposts.home(_view(), key)
 		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
+	if target.begins_with("gather:"):
+		var g := P0CityPlaces.gather_spot(target.trim_prefix("gather:"))
+		return {} if g.is_empty() else gather_entry(g)
+	if target.begins_with("mine:"):
+		var id := target.trim_prefix("mine:")
+		if P0WildSites.has_site(id): return wild_entry(P0WildSites.site(id))
+		for x in _view().get("wild", {}).get("near3_sites", []) if _view().get("wild", null) is Dictionary else []:   # #706: with lat / lng
+			if x is Dictionary and str(x.get("id", "")) == id and x.has("lat"): return wild_entry(x)
+		return {}
 	if target.begins_with("pond:"):
 		var id := target.trim_prefix("pond:")
 		if id.find("~") > 0:   # another city's pond: its pin entry (P0CityPlaces registered it with SystemPonds)
@@ -1783,6 +2075,12 @@ func place_for(target: String) -> Dictionary:
 			return {} if p.is_empty() else p.merged({"kind": "pond"})
 		return P0Ponds.location(id)
 	return {}
+
+## A Show target's place id: `outpost:` / `pond:` / `gather:` / `mine:` off.
+static func _place_id(target: String) -> String:
+	for prefix in ["outpost:", "pond:", "gather:", "mine:"]:
+		if target.begins_with(prefix): return target.trim_prefix(prefix)
+	return target
 
 func p0_surface() -> String: return "map"
 
@@ -1813,7 +2111,13 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map.recenter.visible != key_shown: city_map.recenter.visible = key_shown
 	if city_map.home_key.visible != key_shown: city_map.home_key.visible = key_shown   # the home key with it
 	_place_nearby_key(key_shown)
+	_refresh_live_card()
+	P0WildSites.remember(view)   # the site the player is at, with the view's own fields (contract C §5)
+	if P0WildSites.count() != _wild_count: _set_outpost_places()
 	var list := _marks_now(view)
+	# S6a (v4q(4) ⑥, D1 331:182793): the guide's target spot wears the Request ! — the server sends no mark for it
+	var spot := guide_spot(view)
+	if spot != "" and not list.any(func(m): return str(m.get("id", "")) == spot): list.append({"id": spot, "state": "request"})
 	var home := home_mark(view)
 	# Away, the homestead's ✓ hangs on its pin (deliverable, the highest mark, so first); at home on the avatar.
 	if away() and home != "": list.push_front({"id": HOME_PIN, "state": home})
@@ -1822,6 +2126,12 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	_marks_sig = sig
 	city_map.set_marks(list)
 	if farm_markers: farm_markers.set_mark("self", CityMapView.status_badge(home) if home != "" and not away() else null)
+
+## The gathering spot the guide sends the player to (view.guide.target, absent when none), "" for none.
+static func guide_spot(view: Dictionary) -> String:
+	var g = view.get("guide", null)
+	var t = g.get("target", null) if g is Dictionary else null
+	return str(t.get("spot", "")) if t is Dictionary and str(t.get("kind", "")) == "gather" else ""
 
 ## The server's kinds → UiStatusBadge states; the event venue's purple ★ (§9.3.3) last.
 const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new", "event": "event"}
@@ -1950,6 +2260,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"fareboard": rt.ui.open_fare_board()   # the Travel Post's Fare Board (q(257) ① shots)
 		"citycard":   # citycard:gn-1850147 — that city's silhouette card (MAP-3-FREE), as a tap on its bubble
 			open_city_card(step[1])
+		"wildcard":   # wildcard:wd-254-115 — back at a wild site (a knock-out's Close, the Entrance): the flight and its mouth card
+			open_wild_card(step[1])
 		"arrivalcard":   # arrivalcard:gn-1850147 — the first visit's card (MAP-7-FREE) for that city
 			open_arrival_card(step[1])
 		"arrivalgo":   # the arrival card's Visit the outpost, as a tap on it
@@ -1959,6 +2271,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 			center_lat = float(step[1])
 			center_lng = float(step[2])
 			_camera_dirty = true
+		"zoom":   # zoom:10.5 — the camera's zoom, for shots (the wild sites from 9, a city's gathering spots, SGODOT-355)
+			zoom = float(step[1])
+			_camera_dirty = true
+		"show":   # show:gather:gn-5391959~wood0 / show:mine:wd-254-115 — Show on map to that target (SGODOT-355 shots)
+			show_place(":".join(step.slice(1)))
 		_: return false
 	return true
 

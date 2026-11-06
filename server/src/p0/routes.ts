@@ -10,8 +10,10 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
-import { cityInfo, clusterById, clusterOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
+import { cityInfo, clusterById, clusterOf, fareOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
+import { gatherPointsOf } from './gather_points.js';
+import { catalogue, parseBbox, viewport } from './wild.js';
 import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus, pinArea } from './home_city.js';
 import type { IpNear } from './ip_city.js';
 import type { OutpostRooms } from './online/rooms.js';
@@ -19,6 +21,7 @@ import { pondOfRoom } from './online/outposts.js';
 import { placeOf } from './world.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 import { guideKeys, settleGuide, setGuide } from './guide.js';
+import { settleFirstDig } from './first_dig.js';
 
 /** rooms: who is in the outpost rooms right now (SGODOT-227 OutpostRooms), for the Tea Host's count by town (q(206));
  * log: the observation log (S7). */
@@ -99,7 +102,26 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = stateOf(player, req.headers);
     // The generator's place details (SGODOT-280: ponds and outposts with their points and art) go out here, per city, and
     // never in the state view; the home city's hand-written places are in the client already.
-    return reply.send({ ok: true, city: { ...cityInfo(c, cluster), preview: preview(c, s, cluster, clock(s.clock_ms)) } });
+    // v4q(4) (contract-c §9): the city's gathering points, the written city's too
+    return reply.send({ ok: true, city: { ...cityInfo(c, cluster), gather: gatherPointsOf(c, cluster), preview: preview(c, s, cluster, clock(s.clock_ms)) } });
+  });
+
+  /** v4q(3) (contract-c §4): the open wild sites in the map's viewport, at most VIEWPORT_CAP, with what they are to the
+   * player (free, visited, Trip, a pass, and `cost` — the fare as travel takes it now, the travel card's own (fareOf),
+   * so the card needs no second read; 亚瑟, C part 2); none below the continent zoom. The catalogue's revision rides along. */
+  app.get('/v1/p0/wild', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const { bbox, zoom } = (req.query ?? {}) as { bbox?: unknown; zoom?: unknown };
+    // below the pins' zoom nothing is drawn: an empty list whatever the box (周瑜 on #616), before the box is read
+    const cat = catalogue(c);
+    if (!(Number(zoom) >= (cat?.minZoom ?? Infinity))) return reply.header('x-wild-revision', String(cat?.revision ?? 0)).send({ ok: true, sites: [], capped: false, total: 0 });
+    const box = parseBbox(bbox);
+    if (!box) return reply.code(400).send({ ok: false, code: 'bad_bbox' });
+    const s = stateOf(player, req.headers);
+    const now = clock(s.clock_ms), got = viewport(c, s, box, Number(zoom), now);
+    const sites = got.sites.map(x => { const f = fareOf(c, s, x.id, now); return { ...x, cost: { energy: f.energy, coins: f.coins } }; });
+    return reply.header('x-wild-revision', String(got.revision)).send({ ok: true, sites, capped: got.capped, total: got.total });
   });
 
   /** The home pick page (SGODOT-303, q(160) ④): the open cities, and with ?q= the cities by name with why one is grey. */
@@ -138,13 +160,14 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const now = clock(s.clock_ms);
     const result = applyP0(c, s, (req.body ?? {}) as P0Command, now);
     if (result.ok) store.put(result.state);   // saved before the log line: the log can never cost a command
+    else if (result.code === 'new_day' && result.state) store.put(result.state);
     // Energy before = the stored value with natural recovery up to now, as the command saw it (a refusal: both the same).
     const before = { ...s, energy: { ...s.energy } };
     settleEnergy(c, before, now);
     deps.log?.write({ kind: 'command', t: deps.now(), clock: now, player, ip: req.ip, seq: s.seq, cmd: commandFields(req.body), ok: result.ok,
       ...(result.ok ? {} : { code: result.code, detail: result.detail ?? {} }),
       energy: [before.energy.value, result.ok ? result.state.energy.value : before.energy.value], events: result.ok ? result.events : [] });
-    if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(s, now, req.headers) });
+    if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(result.state ?? s, now, req.headers) });
     return reply.send({ ok: true, events: result.events, state: view(result.state, now, req.headers) });
   });
 
@@ -233,7 +256,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (level !== undefined && (!Number.isInteger(level) || level < 1 || level > c.homestead.levels.length)) return reply.code(400).send({ ok: false, code: 'bad_level' });
     if (coins !== undefined && (!Number.isInteger(coins) || coins < 0 || coins > 1_000_000)) return reply.code(400).send({ ok: false, code: 'bad_qty' });
     const s = stateOf(player, req.headers);
-    if (level !== undefined) s.homestead.level = level;
+    if (level !== undefined) { s.homestead.level = level; settleFirstDig(c, s, clock(s.clock_ms), []); }   // 355 G: as the upgrade would (后裔 on #697)
     if (coins !== undefined) s.coins = coins;
     store.put(s);
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
