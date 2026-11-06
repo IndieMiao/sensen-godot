@@ -1,5 +1,6 @@
 from pathlib import Path
 import json,hashlib,subprocess
+import numpy as np
 from PIL import Image,ImageDraw,ImageFont,PngImagePlugin
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];O=ROOT/'output/alcatraz-anim-424';C=O/'captures';D=ROOT/'docs/design/alcatraz-anim-424-2026-11-06';D.mkdir(parents=True,exist_ok=True)
 FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc';font=lambda n:ImageFont.truetype(FONT,n)
