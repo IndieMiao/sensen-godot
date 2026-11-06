@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { crossTarget, visitPlaces } from '../../src/p0/boards.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { loadOutposts } from '../../src/p0/online/outposts.js';
+import { NO_VOICE_ROLES } from '../../src/p0/online/voice.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
 import { freshState } from '../../src/p0/state.js';
 import { cityInfo } from '../../src/p0/travel.js';
@@ -26,6 +27,11 @@ describe('Grace Cathedral (role church)', () => {
     const rooms = new OutpostRooms(loadOutposts());
     expect(rooms.join('p0-church-0001', CHURCH)).toMatchObject({ outpost: CHURCH, room: 1, capacity: 12 });
     expect(rooms.spec(CHURCH)?.seats).toContain('seat_left_1');
+  });
+
+  it('has no voice (奕星 11-06: a place to see; LiveKit\'s monthly cap is for all voice)', () => {
+    expect(NO_VOICE_ROLES.has('church')).toBe(true);
+    expect(NO_VOICE_ROLES.has('market')).toBe(false);   // q(286): the square keeps its voice
   });
 
   it("is not of the city's set and never a request's place: Stamp Run, the cross-city visits, the city's counts", () => {

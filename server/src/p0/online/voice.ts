@@ -30,8 +30,9 @@ export const RELEASE_TRIES = 3, RELEASE_RETRY_MS = 2_000;
 
 export const VOICE_LEASE_MS = 20_000;
 /** Roles whose rooms have no voice. Market Square's layers of 30 have it since q(286) (the user, 11-04: "286 Y", the
- * whole layer, no fall-off with distance; it had none since 11-02). */
-export const NO_VOICE_ROLES = new Set<string>([]);
+ * whole layer, no fall-off with distance; it had none since 11-02). Grace Cathedral has none (奕星 11-06: a place to see,
+ * nothing to do there; the live LiveKit plan's 5,000 participant minutes a month are a hard cap for all voice). */
+export const NO_VOICE_ROLES = new Set<string>(['church']);
 const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
 /** P0_VOICE=on with LIVEKIT_URL / LIVEKIT_API_KEY / LIVEKIT_API_SECRET (P0_VOICE_NAMESPACE, default p0-dev); else off. */
