@@ -1,0 +1,29 @@
+[
+  {
+    "file": "SGODOT-438_Pier39_blockout_v0_opening_360.png",
+    "size_px": [
+      360,
+      800
+    ],
+    "sha256": "6f242d594802970011a8456122084a734891cd5819d066e365f85d4f9cffce5d",
+    "bytes": 177772
+  },
+  {
+    "file": "SGODOT-438_Pier39_blockout_v0_route_4screens.png",
+    "size_px": [
+      1500,
+      940
+    ],
+    "sha256": "ebfcd7fff777a38393a147fbb43fbdf8860db024d2e5422329cbf945689c062f",
+    "bytes": 676398
+  },
+  {
+    "file": "SGODOT-438_Pier39_blockout_v0_top_layout.png",
+    "size_px": [
+      1100,
+      1560
+    ],
+    "sha256": "0bff9019435642900cbc9137857a4090df2588133622cebb82249a90950fe16a",
+    "bytes": 522571
+  }
+]
