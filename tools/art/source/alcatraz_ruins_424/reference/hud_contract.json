@@ -1,0 +1,113 @@
+{
+  "viewport": [
+    360,
+    800
+  ],
+  "source": {
+    "ui_ref": "a43500f36c1b5a13729187c686e0f68a2011fbad",
+    "ui_file": "scenes/p0/p0_ui.gd:_place_controls",
+    "main_circle": [
+      300,
+      624,
+      44
+    ],
+    "switch_circle": [
+      300,
+      544,
+      24
+    ],
+    "quick_bar_rect": [
+      12,
+      708,
+      336,
+      68
+    ],
+    "validation_reference": "docs/design/reed-clay-416-2026-11-04/SGODOT-416_reed_clay_v1.1_validation.json"
+  },
+  "reserved_rects": {
+    "actions": [
+      244,
+      508,
+      112,
+      172
+    ],
+    "quick_bar_right": [
+      168,
+      696,
+      192,
+      104
+    ]
+  },
+  "margin_px": 12,
+  "tall_assets": [
+    "alc_lamp",
+    "alc_sign",
+    "alc_tree_a",
+    "alc_tree_b",
+    "ruins",
+    "alc_museum",
+    "alc_lighthouse",
+    "alc_watertower",
+    "ferry"
+  ],
+  "ferry_upper_structure_only": true,
+  "future_props": {
+    "pr": 802,
+    "commit": "f8577ade87c586c2b7c97b842d3e973a6c464b59",
+    "assets": {
+      "alc_tree_a": {
+        "min": [
+          -1.328381,
+          0.0,
+          -1.38015
+        ],
+        "max": [
+          3.388832,
+          6.424321,
+          1.307703
+        ],
+        "sha256": "04b30452d6db9d8b64acfc4e11e70be15bd0372c1ccab99ec79f63d7a9aeb5d2"
+      },
+      "alc_tree_b": {
+        "min": [
+          -1.971087,
+          0.0,
+          -1.392597
+        ],
+        "max": [
+          1.966312,
+          6.275,
+          1.46015
+        ],
+        "sha256": "eb499135039ef55b4c5f0a90c6957510b7939c8580c6e65458e531e891acb3d7"
+      },
+      "alc_lamp": {
+        "min": [
+          -0.218743,
+          0.0,
+          -0.23
+        ],
+        "max": [
+          0.218743,
+          3.5,
+          0.23
+        ],
+        "sha256": "2321473dfaaec218140655b6b00fc4a606a8cca88dc89a6d8c026c5b8911d21e"
+      },
+      "alc_sign": {
+        "min": [
+          -0.38,
+          0.0,
+          -0.09
+        ],
+        "max": [
+          0.38,
+          1.5,
+          0.056
+        ],
+        "sha256": "edab4d31efd5be4ec4519bda5f0455f5bc98312965f8525684e0fff4e7ac469b"
+      }
+    }
+  },
+  "note": "Review masks only, no runtime HUD added. Check default 43deg/6.72m follow along dock-to-museum route; re-evaluate if integration changes UI or asset bounds."
+}

@@ -1,6 +1,29 @@
 """Island assembly adjustments for the approved reusable prop packs."""
 import math
+import json
 from collections import defaultdict
+
+
+def collaborator_points(folder,here,placements,place):
+    # Replace exactly the 114 original nature slots, preserving their source IDs.
+    replacement=json.loads((folder/'alc_nature_placements.json').read_text())['points']
+    table={p['source_name']:p for p in replacement};counts=defaultdict(int);used=[]
+    for p in placements:
+        name='%s_%03d'%(p['asset'],counts[p['asset']]);counts[p['asset']]+=1
+        if name not in table:continue
+        row=table[name];p.update({k:row[k] for k in ['asset','position','zone','yaw','scale','collision']})
+        p['source_name']=name;used.append(name)
+    assert len(used)==len(table)==114,(len(used),len(table))
+    for rows in [json.loads((folder/'alc_dock_placements.json').read_text())['points'],
+                 json.loads((here.parent/'alcatraz_ruins_424/suggested_placements.json').read_text())['instances']]:
+        for row in rows:
+            p=place(row['asset'],row['position'],row['zone'],yaw=math.radians(row['rotation_degrees'][1]),scale=row['scale'],collision=False)
+            p['source_name']=row['name']
+    # Open the ruined arch view: move the two southern crowns behind its pillars.
+    for p in placements:
+        if p['asset'].startswith('alc_tree_') and p['position'][1]==3.25:
+            if p['position'][0:3]==[18,3.25,6.6]:p['position']=[18,3.25,3.65]
+            elif p['position'][0:3]==[21.1,3.25,7]:p['position']=[21.1,3.25,3.65]
 
 
 def gardens(kit, box, place):
@@ -23,9 +46,9 @@ def gardens(kit, box, place):
     for y,z in [(3.25,6.8),(5.5,1.15),(7.75,-2.2),(10,-6.35)]:
         zone='SummitZone' if y==10 else 'TerraceZone'
         for x in [10.25,11.05]:place('alc_flowers_daisy',(x,y,z),zone,collision=False)
-    for zone,y,points in [('DockZone',1,[(-23.85,12.5),(-23.85,13.5)]),
+    for zone,y,points in [('DockZone',1,[(-23.6,12.5),(-23.6,13.5)]),
             ('TerraceZone',3.25,[(-24.2,5.3),(-23.2,5.3)]),
-            ('TerraceZone',5.5,[(-24.2,.95),(-23.2,.95)]),
+            ('TerraceZone',5.5,[(-25.2,.95),(-24.2,.95)]),
             ('TerraceZone',7.75,[(-24.2,-3.55),(-23.2,-3.55)])]:
         for x,z in points:place('alc_planter',(x,y,z),zone,collision=True)
     return {'flower_bands':bands,'corner_markers':'east paired low flowers; west paired terracotta planters','hedge_runs':3}

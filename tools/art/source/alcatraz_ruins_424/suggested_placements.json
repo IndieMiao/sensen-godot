@@ -1,0 +1,477 @@
+{
+  "author": "赵云",
+  "task": "SGODOT-424",
+  "layout_reference": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "ruins_000": {
+    "asset": "ruins",
+    "position": [
+      18.5,
+      3.25,
+      5
+    ],
+    "zone": "TerraceZone",
+    "yaw": 0,
+    "scale": [
+      1,
+      1,
+      1
+    ],
+    "collision": true,
+    "name": "ruins_000",
+    "rotation_degrees": [
+      0,
+      0.0,
+      0
+    ],
+    "multimesh": false,
+    "placeholder": false,
+    "owner": "马可波罗"
+  },
+  "instances": [
+    {
+      "name": "alc_ruin_arch_detail_00",
+      "asset": "alc_ruin_arch",
+      "position": [
+        15.3,
+        3.25,
+        5.95
+      ],
+      "relative_to_ruins_000": [
+        -3.2,
+        0.0,
+        0.95
+      ],
+      "rotation_degrees": [
+        0,
+        -12,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "fallen_arch",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_rubble_detail_01",
+      "asset": "alc_ruin_rubble",
+      "position": [
+        11.2,
+        3.25,
+        5.55
+      ],
+      "relative_to_ruins_000": [
+        -7.3,
+        0.0,
+        0.55
+      ],
+      "rotation_degrees": [
+        0,
+        18,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "approach",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_rubble_detail_02",
+      "asset": "alc_ruin_rubble",
+      "position": [
+        15.6,
+        3.25,
+        6.65
+      ],
+      "relative_to_ruins_000": [
+        -2.9,
+        0.0,
+        1.65
+      ],
+      "rotation_degrees": [
+        0,
+        -20,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "fallen_arch",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_rubble_detail_03",
+      "asset": "alc_ruin_rubble",
+      "position": [
+        21.6,
+        3.25,
+        5.95
+      ],
+      "relative_to_ruins_000": [
+        3.1,
+        0.0,
+        0.95
+      ],
+      "rotation_degrees": [
+        0,
+        8,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "east_wall",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_vine_detail_04",
+      "asset": "alc_ruin_vine",
+      "position": [
+        16.5,
+        3.85,
+        5.245
+      ],
+      "relative_to_ruins_000": [
+        -2.0,
+        0.6,
+        0.245
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "wall_cover",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "wall front; back plane +20mm"
+    },
+    {
+      "name": "alc_ruin_vine_detail_05",
+      "asset": "alc_ruin_vine",
+      "position": [
+        18.5,
+        4.35,
+        5.245
+      ],
+      "relative_to_ruins_000": [
+        0.0,
+        1.1,
+        0.245
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "wall_cover",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "wall front; back plane +20mm"
+    },
+    {
+      "name": "alc_ruin_vine_detail_06",
+      "asset": "alc_ruin_vine",
+      "position": [
+        20.5,
+        3.75,
+        5.245
+      ],
+      "relative_to_ruins_000": [
+        2.0,
+        0.5,
+        0.245
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "wall_cover",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "wall front; back plane +20mm"
+    },
+    {
+      "name": "alc_ruin_flowers_detail_07",
+      "asset": "alc_ruin_flowers",
+      "position": [
+        11.8,
+        3.25,
+        4.95
+      ],
+      "relative_to_ruins_000": [
+        -6.7,
+        0.0,
+        -0.05
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "approach",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_flowers_detail_08",
+      "asset": "alc_ruin_flowers",
+      "position": [
+        13.0,
+        3.25,
+        6.1
+      ],
+      "relative_to_ruins_000": [
+        -5.5,
+        0.0,
+        1.1
+      ],
+      "rotation_degrees": [
+        0,
+        18,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "fallen_arch",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_flowers_detail_09",
+      "asset": "alc_ruin_flowers",
+      "position": [
+        16.45,
+        3.25,
+        6.95
+      ],
+      "relative_to_ruins_000": [
+        -2.05,
+        0.0,
+        1.95
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "fallen_arch",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_flowers_detail_10",
+      "asset": "alc_ruin_flowers",
+      "position": [
+        20.0,
+        3.25,
+        5.8
+      ],
+      "relative_to_ruins_000": [
+        1.5,
+        0.0,
+        0.8
+      ],
+      "rotation_degrees": [
+        0,
+        -15,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "east_wall",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_flowers_detail_11",
+      "asset": "alc_ruin_flowers",
+      "position": [
+        22.9,
+        3.25,
+        5.65
+      ],
+      "relative_to_ruins_000": [
+        4.4,
+        0.0,
+        0.65
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "east_wall",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    },
+    {
+      "name": "alc_ruin_plaque_detail_12",
+      "asset": "alc_ruin_plaque",
+      "position": [
+        13.25,
+        3.25,
+        6.85
+      ],
+      "relative_to_ruins_000": [
+        -5.25,
+        0.0,
+        1.85
+      ],
+      "rotation_degrees": [
+        0,
+        -12,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zone": "TerraceZone",
+      "group": "fallen_arch",
+      "multimesh": true,
+      "collision": false,
+      "placement_mode": "ground support at every bounding corner verified"
+    }
+  ],
+  "counts": {
+    "alc_ruin_arch": 1,
+    "alc_ruin_rubble": 3,
+    "alc_ruin_vine": 3,
+    "alc_ruin_flowers": 5,
+    "alc_ruin_plaque": 1
+  },
+  "placed_triangles": 3270,
+  "route": [
+    [
+      -22,
+      1,
+      19
+    ],
+    [
+      -22,
+      1,
+      12
+    ],
+    [
+      -22,
+      3.25,
+      7.5
+    ],
+    [
+      8,
+      3.25,
+      7.5
+    ],
+    [
+      8,
+      5.5,
+      3
+    ],
+    [
+      -22,
+      5.5,
+      3
+    ],
+    [
+      -22,
+      7.75,
+      -1.5
+    ],
+    [
+      8,
+      7.75,
+      -1.5
+    ],
+    [
+      8,
+      10,
+      -6
+    ],
+    [
+      0,
+      10,
+      -6
+    ]
+  ],
+  "rules": [
+    "保留ruins_000及原layout/导航；此表为场景方整合建议，不是运行时自动覆盖。",
+    "废墟位于主路右侧、不是可走区；低碎石/野花向靠路侧引导，其余围着旧墙摆。此包不单独证明主路每6–7m覆盖。",
+    "藤蔓背平面Z=0，+Z为叶片正面；建议背面在墙前20mm，按主墙形状重新校贴，不要将整片悬空放在草地。",
+    "碎石是最高0.12m的单层砖石碎片，无底座、不堆圆丘，不应被当作采集资源。",
+    "说明牌完全空白、无按钮/标记/描边/文字；不挂交互和碰撞。",
+    "原树冠/主体后续替换时，场景方再核遮挡和整岛预算；禁止铁栏、铁丝网、牢门等监狱元素。"
+  ]
+}

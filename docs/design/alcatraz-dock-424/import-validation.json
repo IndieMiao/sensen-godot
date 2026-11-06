@@ -1,0 +1,272 @@
+{
+	"assets": {
+		"alc_dock_bollard": {
+			"aabb": "[P: (-0.31, 0.0, -0.235), S: (0.62, 0.6, 0.47)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "63ce236640184e601fa1d0b8a0d074c329edbffa585028c02f20cf782665e68a",
+			"triangles": 248,
+			"uid": "uid://d02x7ficqiao6",
+			"vertex_color": true
+		},
+		"alc_dock_crates": {
+			"aabb": "[P: (-0.665205, 0.0, -0.513117), S: (1.330409, 0.86, 1.026234)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "aae9f6a3641cd880c1bd1726a9940da7f5d73c888c32888697fe910087360dae",
+			"triangles": 312,
+			"uid": "uid://df8qp7yw8ulbt",
+			"vertex_color": true
+		},
+		"alc_dock_planter": {
+			"aabb": "[P: (-0.67, 0.0, -0.36508), S: (1.34, 1.09, 0.73016)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "8fc577fb252b2ac2035ceef467fab6f2dd016e8c92dc91ddaf9358a3f2d73a04",
+			"triangles": 358,
+			"uid": "uid://cnw3pkneelw0",
+			"vertex_color": true
+		},
+		"alc_dock_shelter": {
+			"aabb": "[P: (-1.65, 0.0, -0.5), S: (3.3, 2.55, 1.0)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "b8912962baaa8d917997971c7d7ac836489359d76963d08e58993327984d6c9e",
+			"triangles": 384,
+			"uid": "uid://cfemouhql0dw8",
+			"vertex_color": true
+		},
+		"alc_dock_welcome": {
+			"aabb": "[P: (-0.4218, 0.0, -0.15), S: (0.8436, 1.56, 0.3)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "3dadaaefe268c7fdba4dcb517d23c2fbd0a1df9ae922a06369459105ab5ecbab",
+			"triangles": 80,
+			"uid": "uid://b4viudn31via1",
+			"vertex_color": true
+		}
+	},
+	"checks": [
+		{
+			"check": "alc_dock_bollard: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_bollard: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_crates: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_shelter: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_welcome: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_dock_planter: unique UID",
+			"passed": true
+		}
+	],
+	"passed": true
+}

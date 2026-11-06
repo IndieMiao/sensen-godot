@@ -1,12 +1,13 @@
 # SGODOT-424 · 恶魔岛源文件
 
-当前是 v7 正式配色首版（协作模型仍待接件）；v2 画面已通过。最新图、预算、验证见 [v7 审阅](../../../../docs/design/alcatraz-blockout-424-2026-11-05/v7/README.md)，坐标／原点／分工／时间见 [HANDOFF.md](HANDOFF.md)。正式交件硬线 **11-09 08:00**。
+当前是 v7 正式配色首版（已安装七组通过双审的协作模型）；v2 画面已通过。最新图、预算、验证见 [v7 审阅](../../../../docs/design/alcatraz-blockout-424-2026-11-05/v7/README.md)，坐标／原点／分工／时间见 [HANDOFF.md](HANDOFF.md)。正式交件硬线 **11-09 08:00**。
 
 - `palette.json`：v2参考下的暖石墙、浅砂路、黄绿花园、蓝绿海湾配色；用于生成器及海面材质参数。
 - `finish.py`：可编辑的拱窗／玻璃入口／博物馆字体、岸壁切面、砌石表面和封闭台阶。
-- `integration_queue.json`：已收到但待验的协作包，以及旧问题表向当前点位的重核清单；未自动换入#802。
-- `build.py`：马可波罗的地形、四段台阶、道路、码头、渡轮、主楼近档，以及导航／layout／分区／LOD 合同。
-- `authored.py`：校验并保留黄忠已合入的七件GLB／UID；从正式文件导入整岛源预览，命名构件源仍在其独立blend中，生成器不会覆盖已验收件。
+- `integration.py`：已验收件的114点位一对一替换、花园／码头／废墟布局和十处栏杆转角修复。
+- `integration_queue.json`：已整合协作包的固定头、接头／花坛修正和待交主楼远档。
+- `build.py`：马可波罗的地形、四段台阶、道路、码头、主楼近档，以及导航／layout／分区／LOD 合同。
+- `authored.py`：校验并保留七组已合入协作包的GLB／UID；从正式文件导入整岛源预览，命名构件源仍在其独立blend中，生成器不会覆盖已验收件。
 - `placeholders.py`：赵云、黄忠和刘备负责件的临时占位及摆位方法；每种一个 GLB，重复件放置表单独生成，斜栏杆支持保持立柱竖直的 basis。
 - `alcatraz_blockout.blend`：命名可编辑构件与模块实例，四个区块 collection；Alcatraz_Module_Library 场景保留所有近远档原型，包含当前没有实例引用的远档。原点、单位和坐标转换与运行时一致。
 - `prepare.py`：复制最小离线 Godot 项目到 `output/alcatraz-424/project`，仅 Avatar autoload，独立用户目录；回收 Godot 自动生成的 .import／UID。
@@ -36,4 +37,4 @@ flock ~/gs66-render.lock timeout 120s godot --path output/alcatraz-424/project -
 
 未设置 ALCATRAZ_REVIEW 时直接进入可操作场景；不会启动游戏主项目的 Net。检查结束关闭窗口，不留编辑器运行。
 
-完整生成会重建马可波罗白模和剩余临时占位，黄忠已验收七件由authored.py保护原字节。后续替换其他正式协作件时也需登记来源、导入设置与哈希，不能再用占位覆盖。以后的预算必须用替换后的文件重新测量。地图注册、发布导出清单和 vivo 帧率由亚瑟接入验证。
+完整生成会重建马可波罗白模和剩余临时占位，全部已验收协作GLB由authored.py保护原字节。后续替换其他正式协作件时也需登记来源、导入设置与哈希，不能再用占位覆盖。以后的预算必须用替换后的文件重新测量。地图注册、发布导出清单和 vivo 帧率由亚瑟接入验证。

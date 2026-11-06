@@ -1,0 +1,181 @@
+{
+  "task": "SGODOT-424 dock",
+  "author": "刘备",
+  "axes": "metres, Y up, +Z front / south",
+  "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "assets": {
+    "alc_dock_bollard": {
+      "triangle_limit": 400,
+      "owner": "刘备",
+      "placeholder": false,
+      "file": "alc_dock_bollard.glb",
+      "triangles": 248,
+      "surfaces": 1,
+      "dimensions_m": [
+        0.6200000047683716,
+        0.6000000238418579,
+        0.4699999988079071
+      ],
+      "bounds": [
+        [
+          -0.3100000023841858,
+          0.0,
+          -0.23499999940395355
+        ],
+        [
+          0.3100000023841858,
+          0.6000000238418579,
+          0.23499999940395355
+        ]
+      ],
+      "parts": 6,
+      "sha256": "9ae6bc4ab0c004fd953d303210b843b02cc8871c3b4e356ae4732d3888168413",
+      "bytes": 7172,
+      "pivot": "ground / footprint centre",
+      "front": "+Z"
+    },
+    "alc_dock_crates": {
+      "triangle_limit": 400,
+      "owner": "刘备",
+      "placeholder": false,
+      "file": "alc_dock_crates.glb",
+      "triangles": 312,
+      "surfaces": 1,
+      "dimensions_m": [
+        1.330409049987793,
+        0.8600000143051147,
+        1.0262341499328613
+      ],
+      "bounds": [
+        [
+          -0.6652045249938965,
+          0.0,
+          -0.5131170749664307
+        ],
+        [
+          0.6652045249938965,
+          0.8600000143051147,
+          0.5131170749664307
+        ]
+      ],
+      "parts": 40,
+      "sha256": "237ff30b687aae44216ac4ceaac3806b8bc9c3765c52333fb7dfcfcc0b3e63b1",
+      "bytes": 13440,
+      "pivot": "ground / footprint centre",
+      "front": "+Z"
+    },
+    "alc_dock_shelter": {
+      "triangle_limit": 400,
+      "owner": "刘备",
+      "placeholder": false,
+      "file": "alc_dock_shelter.glb",
+      "triangles": 384,
+      "surfaces": 1,
+      "dimensions_m": [
+        3.299999952316284,
+        2.549999952316284,
+        1.0
+      ],
+      "bounds": [
+        [
+          -1.649999976158142,
+          0.0,
+          -0.5
+        ],
+        [
+          1.649999976158142,
+          2.549999952316284,
+          0.5
+        ]
+      ],
+      "parts": 28,
+      "sha256": "6a5c68b71f5945d3e6d01a49471ad02a2733ed6199c88d4a8ab386fb0bc9f5eb",
+      "bytes": 27412,
+      "pivot": "ground / footprint centre",
+      "front": "+Z"
+    },
+    "alc_dock_welcome": {
+      "triangle_limit": 400,
+      "owner": "刘备",
+      "placeholder": false,
+      "file": "alc_dock_welcome.glb",
+      "triangles": 80,
+      "surfaces": 1,
+      "dimensions_m": [
+        0.8435999751091003,
+        1.559999942779541,
+        0.30000001192092896
+      ],
+      "bounds": [
+        [
+          -0.42179998755455017,
+          0.0,
+          -0.15000000596046448
+        ],
+        [
+          0.42179998755455017,
+          1.559999942779541,
+          0.15000000596046448
+        ]
+      ],
+      "parts": 7,
+      "sha256": "46d76ed063494f0526ef5304ca8660e415aa8e8113cdf37497658c2d586f9f08",
+      "bytes": 6672,
+      "pivot": "ground / footprint centre",
+      "front": "+Z"
+    },
+    "alc_dock_planter": {
+      "triangle_limit": 400,
+      "owner": "刘备",
+      "placeholder": false,
+      "file": "alc_dock_planter.glb",
+      "triangles": 358,
+      "surfaces": 1,
+      "dimensions_m": [
+        1.340000033378601,
+        1.090000033378601,
+        0.7301599979400635
+      ],
+      "bounds": [
+        [
+          -0.6700000166893005,
+          0.0,
+          -0.36507999897003174
+        ],
+        [
+          0.6700000166893005,
+          1.090000033378601,
+          0.36507999897003174
+        ]
+      ],
+      "parts": 29,
+      "sha256": "825c0cc23448e660f6742082903094adc9cf151717aaecc736967997c1ac1150",
+      "bytes": 20956,
+      "pivot": "ground / footprint centre",
+      "front": "+Z"
+    }
+  },
+  "palette_srgb": {
+    "iron": "56666A",
+    "iron_top": "708083",
+    "wood": "AB8257",
+    "wood_light": "C5A173",
+    "wood_dark": "795F47",
+    "rope": "C5B592",
+    "canvas": "D9D8BF",
+    "sage": "819889",
+    "frame": "CFD1BE",
+    "sign": "E5DCC2",
+    "terra": "AF7C62",
+    "rim": "C99B79",
+    "soil": "665746",
+    "leaf": "547346",
+    "leaf_light": "7C9656",
+    "white": "EEE6D1",
+    "yellow": "D9BD67",
+    "lilac": "B4A5BF",
+    "pollen": "B69550"
+  },
+  "triangles_total": 1382,
+  "material": "alc_dock_material.tres; opaque vertex colour; roughness .94 / specular .15 / metallic 0; no texture"
+}

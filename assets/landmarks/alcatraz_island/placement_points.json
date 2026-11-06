@@ -779,7 +779,7 @@
       "position": [
         18,
         3.25,
-        6.6
+        3.65
       ],
       "rotation_degrees": [
         0,
@@ -801,7 +801,7 @@
       "position": [
         21.1,
         3.25,
-        7
+        3.65
       ],
       "rotation_degrees": [
         0,
@@ -1235,12 +1235,12 @@
       "placeholder": false
     },
     {
-      "name": "alc_shrub_000",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_000",
+      "asset": "alc_shrub_b",
       "zone": "TerraceZone",
       "position": [
         -25.2,
-        3.25,
+        3.215,
         4.4
       ],
       "rotation_degrees": [
@@ -1254,7 +1254,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_000"
     },
     {
       "name": "alc_grass_tuft_000",
@@ -1262,7 +1263,7 @@
       "zone": "TerraceZone",
       "position": [
         -25.849999999999998,
-        3.25,
+        3.24,
         4.8500000000000005
       ],
       "rotation_degrees": [
@@ -1276,7 +1277,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_000"
     },
     {
       "name": "alc_grass_tuft_001",
@@ -1284,7 +1286,7 @@
       "zone": "TerraceZone",
       "position": [
         -24.5,
-        3.25,
+        3.24,
         4.7
       ],
       "rotation_degrees": [
@@ -1298,15 +1300,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_001"
     },
     {
-      "name": "alc_shrub_001",
+      "name": "alc_shrub_000",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         -16,
-        3.25,
+        3.215,
         4.4
       ],
       "rotation_degrees": [
@@ -1320,7 +1323,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_001"
     },
     {
       "name": "alc_grass_tuft_002",
@@ -1328,7 +1332,7 @@
       "zone": "TerraceZone",
       "position": [
         -16.65,
-        3.25,
+        3.24,
         4.8500000000000005
       ],
       "rotation_degrees": [
@@ -1342,7 +1346,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_002"
     },
     {
       "name": "alc_grass_tuft_003",
@@ -1350,7 +1355,7 @@
       "zone": "TerraceZone",
       "position": [
         -15.3,
-        3.25,
+        3.24,
         4.7
       ],
       "rotation_degrees": [
@@ -1364,15 +1369,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_003"
     },
     {
-      "name": "alc_shrub_002",
+      "name": "alc_shrub_001",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         -12,
-        3.25,
+        3.215,
         4.4
       ],
       "rotation_degrees": [
@@ -1386,7 +1392,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_002"
     },
     {
       "name": "alc_grass_tuft_004",
@@ -1394,7 +1401,7 @@
       "zone": "TerraceZone",
       "position": [
         -12.65,
-        3.25,
+        3.24,
         4.8500000000000005
       ],
       "rotation_degrees": [
@@ -1408,7 +1415,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_004"
     },
     {
       "name": "alc_grass_tuft_005",
@@ -1416,7 +1424,7 @@
       "zone": "TerraceZone",
       "position": [
         -11.3,
-        3.25,
+        3.24,
         4.7
       ],
       "rotation_degrees": [
@@ -1430,15 +1438,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_005"
     },
     {
-      "name": "alc_shrub_003",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_001",
+      "asset": "alc_shrub_b",
       "zone": "TerraceZone",
       "position": [
         -5,
-        3.25,
+        3.215,
         4.4
       ],
       "rotation_degrees": [
@@ -1452,7 +1461,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_003"
     },
     {
       "name": "alc_grass_tuft_006",
@@ -1460,7 +1470,7 @@
       "zone": "TerraceZone",
       "position": [
         -5.65,
-        3.25,
+        3.24,
         4.8500000000000005
       ],
       "rotation_degrees": [
@@ -1474,7 +1484,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_006"
     },
     {
       "name": "alc_grass_tuft_007",
@@ -1482,7 +1493,7 @@
       "zone": "TerraceZone",
       "position": [
         -4.3,
-        3.25,
+        3.24,
         4.7
       ],
       "rotation_degrees": [
@@ -1496,15 +1507,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_007"
     },
     {
-      "name": "alc_shrub_004",
+      "name": "alc_shrub_002",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         1,
-        3.25,
+        3.215,
         4.4
       ],
       "rotation_degrees": [
@@ -1518,7 +1530,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_004"
     },
     {
       "name": "alc_grass_tuft_008",
@@ -1526,7 +1539,7 @@
       "zone": "TerraceZone",
       "position": [
         0.35,
-        3.25,
+        3.24,
         4.8500000000000005
       ],
       "rotation_degrees": [
@@ -1540,7 +1553,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_008"
     },
     {
       "name": "alc_grass_tuft_009",
@@ -1548,7 +1562,7 @@
       "zone": "TerraceZone",
       "position": [
         1.7,
-        3.25,
+        3.24,
         4.7
       ],
       "rotation_degrees": [
@@ -1562,15 +1576,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_009"
     },
     {
-      "name": "alc_shrub_005",
+      "name": "alc_shrub_003",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         23,
-        3.25,
+        3.215,
         4.4
       ],
       "rotation_degrees": [
@@ -1584,7 +1599,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_005"
     },
     {
       "name": "alc_grass_tuft_010",
@@ -1592,7 +1608,7 @@
       "zone": "TerraceZone",
       "position": [
         22.35,
-        3.25,
+        3.24,
         4.8500000000000005
       ],
       "rotation_degrees": [
@@ -1606,7 +1622,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_010"
     },
     {
       "name": "alc_grass_tuft_011",
@@ -1614,7 +1631,7 @@
       "zone": "TerraceZone",
       "position": [
         23.7,
-        3.25,
+        3.24,
         4.7
       ],
       "rotation_degrees": [
@@ -1628,15 +1645,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_011"
     },
     {
-      "name": "alc_shrub_006",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_002",
+      "asset": "alc_shrub_b",
       "zone": "TerraceZone",
       "position": [
         -25.2,
-        5.5,
+        5.465,
         -0.1
       ],
       "rotation_degrees": [
@@ -1650,7 +1668,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_006"
     },
     {
       "name": "alc_grass_tuft_012",
@@ -1658,7 +1677,7 @@
       "zone": "TerraceZone",
       "position": [
         -25.849999999999998,
-        5.5,
+        5.49,
         0.35
       ],
       "rotation_degrees": [
@@ -1672,7 +1691,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_012"
     },
     {
       "name": "alc_grass_tuft_013",
@@ -1680,7 +1700,7 @@
       "zone": "TerraceZone",
       "position": [
         -24.5,
-        5.5,
+        5.49,
         0.19999999999999998
       ],
       "rotation_degrees": [
@@ -1694,15 +1714,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_013"
     },
     {
-      "name": "alc_shrub_007",
+      "name": "alc_shrub_004",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         -16,
-        5.5,
+        5.465,
         -0.1
       ],
       "rotation_degrees": [
@@ -1716,7 +1737,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_007"
     },
     {
       "name": "alc_grass_tuft_014",
@@ -1724,7 +1746,7 @@
       "zone": "TerraceZone",
       "position": [
         -16.65,
-        5.5,
+        5.49,
         0.35
       ],
       "rotation_degrees": [
@@ -1738,7 +1760,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_014"
     },
     {
       "name": "alc_grass_tuft_015",
@@ -1746,7 +1769,7 @@
       "zone": "TerraceZone",
       "position": [
         -15.3,
-        5.5,
+        5.49,
         0.19999999999999998
       ],
       "rotation_degrees": [
@@ -1760,15 +1783,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_015"
     },
     {
-      "name": "alc_shrub_008",
+      "name": "alc_shrub_005",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         -12,
-        5.5,
+        5.465,
         -0.1
       ],
       "rotation_degrees": [
@@ -1782,7 +1806,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_008"
     },
     {
       "name": "alc_grass_tuft_016",
@@ -1790,7 +1815,7 @@
       "zone": "TerraceZone",
       "position": [
         -12.65,
-        5.5,
+        5.49,
         0.35
       ],
       "rotation_degrees": [
@@ -1804,7 +1829,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_016"
     },
     {
       "name": "alc_grass_tuft_017",
@@ -1812,7 +1838,7 @@
       "zone": "TerraceZone",
       "position": [
         -11.3,
-        5.5,
+        5.49,
         0.19999999999999998
       ],
       "rotation_degrees": [
@@ -1826,15 +1852,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_017"
     },
     {
-      "name": "alc_shrub_009",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_003",
+      "asset": "alc_shrub_b",
       "zone": "TerraceZone",
       "position": [
         -5,
-        5.5,
+        5.465,
         -0.1
       ],
       "rotation_degrees": [
@@ -1848,7 +1875,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_009"
     },
     {
       "name": "alc_grass_tuft_018",
@@ -1856,7 +1884,7 @@
       "zone": "TerraceZone",
       "position": [
         -5.65,
-        5.5,
+        5.49,
         0.35
       ],
       "rotation_degrees": [
@@ -1870,7 +1898,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_018"
     },
     {
       "name": "alc_grass_tuft_019",
@@ -1878,7 +1907,7 @@
       "zone": "TerraceZone",
       "position": [
         -4.3,
-        5.5,
+        5.49,
         0.19999999999999998
       ],
       "rotation_degrees": [
@@ -1892,15 +1921,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_019"
     },
     {
-      "name": "alc_shrub_010",
+      "name": "alc_shrub_006",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         1,
-        5.5,
+        5.465,
         -0.1
       ],
       "rotation_degrees": [
@@ -1914,7 +1944,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_010"
     },
     {
       "name": "alc_grass_tuft_020",
@@ -1922,7 +1953,7 @@
       "zone": "TerraceZone",
       "position": [
         0.35,
-        5.5,
+        5.49,
         0.35
       ],
       "rotation_degrees": [
@@ -1936,7 +1967,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_020"
     },
     {
       "name": "alc_grass_tuft_021",
@@ -1944,7 +1976,7 @@
       "zone": "TerraceZone",
       "position": [
         1.7,
-        5.5,
+        5.49,
         0.19999999999999998
       ],
       "rotation_degrees": [
@@ -1958,15 +1990,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_021"
     },
     {
-      "name": "alc_shrub_011",
+      "name": "alc_shrub_007",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         11,
-        5.5,
+        5.465,
         -0.1
       ],
       "rotation_degrees": [
@@ -1980,7 +2013,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_011"
     },
     {
       "name": "alc_grass_tuft_022",
@@ -1988,7 +2022,7 @@
       "zone": "TerraceZone",
       "position": [
         10.35,
-        5.5,
+        5.49,
         0.35
       ],
       "rotation_degrees": [
@@ -2002,7 +2036,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_022"
     },
     {
       "name": "alc_grass_tuft_023",
@@ -2010,7 +2045,7 @@
       "zone": "TerraceZone",
       "position": [
         11.7,
-        5.5,
+        5.49,
         0.19999999999999998
       ],
       "rotation_degrees": [
@@ -2024,15 +2059,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_023"
     },
     {
-      "name": "alc_shrub_012",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_004",
+      "asset": "alc_shrub_b",
       "zone": "TerraceZone",
       "position": [
         23,
-        5.5,
+        5.465,
         -0.1
       ],
       "rotation_degrees": [
@@ -2046,7 +2082,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_012"
     },
     {
       "name": "alc_grass_tuft_024",
@@ -2054,7 +2091,7 @@
       "zone": "TerraceZone",
       "position": [
         22.35,
-        5.5,
+        5.49,
         0.35
       ],
       "rotation_degrees": [
@@ -2068,7 +2105,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_024"
     },
     {
       "name": "alc_grass_tuft_025",
@@ -2076,7 +2114,7 @@
       "zone": "TerraceZone",
       "position": [
         23.7,
-        5.5,
+        5.49,
         0.19999999999999998
       ],
       "rotation_degrees": [
@@ -2090,15 +2128,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_025"
     },
     {
-      "name": "alc_shrub_013",
+      "name": "alc_shrub_008",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         -25.2,
-        7.75,
+        7.715,
         -4.6
       ],
       "rotation_degrees": [
@@ -2112,7 +2151,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_013"
     },
     {
       "name": "alc_grass_tuft_026",
@@ -2120,7 +2160,7 @@
       "zone": "TerraceZone",
       "position": [
         -25.849999999999998,
-        7.75,
+        7.74,
         -4.1499999999999995
       ],
       "rotation_degrees": [
@@ -2134,7 +2174,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_026"
     },
     {
       "name": "alc_grass_tuft_027",
@@ -2142,7 +2183,7 @@
       "zone": "TerraceZone",
       "position": [
         -24.5,
-        7.75,
+        7.74,
         -4.3
       ],
       "rotation_degrees": [
@@ -2156,15 +2197,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_027"
     },
     {
-      "name": "alc_shrub_014",
+      "name": "alc_shrub_009",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         -16,
-        7.75,
+        7.715,
         -4.6
       ],
       "rotation_degrees": [
@@ -2178,7 +2220,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_014"
     },
     {
       "name": "alc_grass_tuft_028",
@@ -2186,7 +2229,7 @@
       "zone": "TerraceZone",
       "position": [
         -16.65,
-        7.75,
+        7.74,
         -4.1499999999999995
       ],
       "rotation_degrees": [
@@ -2200,7 +2243,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_028"
     },
     {
       "name": "alc_grass_tuft_029",
@@ -2208,7 +2252,7 @@
       "zone": "TerraceZone",
       "position": [
         -15.3,
-        7.75,
+        7.74,
         -4.3
       ],
       "rotation_degrees": [
@@ -2222,15 +2266,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_029"
     },
     {
-      "name": "alc_shrub_015",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_005",
+      "asset": "alc_shrub_b",
       "zone": "TerraceZone",
       "position": [
         -12,
-        7.75,
+        7.715,
         -4.6
       ],
       "rotation_degrees": [
@@ -2244,7 +2289,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_015"
     },
     {
       "name": "alc_grass_tuft_030",
@@ -2252,7 +2298,7 @@
       "zone": "TerraceZone",
       "position": [
         -12.65,
-        7.75,
+        7.74,
         -4.1499999999999995
       ],
       "rotation_degrees": [
@@ -2266,7 +2312,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_030"
     },
     {
       "name": "alc_grass_tuft_031",
@@ -2274,7 +2321,7 @@
       "zone": "TerraceZone",
       "position": [
         -11.3,
-        7.75,
+        7.74,
         -4.3
       ],
       "rotation_degrees": [
@@ -2288,15 +2335,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_031"
     },
     {
-      "name": "alc_shrub_016",
+      "name": "alc_shrub_010",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         -5,
-        7.75,
+        7.715,
         -4.6
       ],
       "rotation_degrees": [
@@ -2310,7 +2358,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_016"
     },
     {
       "name": "alc_grass_tuft_032",
@@ -2318,7 +2367,7 @@
       "zone": "TerraceZone",
       "position": [
         -5.65,
-        7.75,
+        7.74,
         -4.1499999999999995
       ],
       "rotation_degrees": [
@@ -2332,7 +2381,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_032"
     },
     {
       "name": "alc_grass_tuft_033",
@@ -2340,7 +2390,7 @@
       "zone": "TerraceZone",
       "position": [
         -4.3,
-        7.75,
+        7.74,
         -4.3
       ],
       "rotation_degrees": [
@@ -2354,15 +2404,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_033"
     },
     {
-      "name": "alc_shrub_017",
+      "name": "alc_shrub_011",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         1,
-        7.75,
+        7.715,
         -4.6
       ],
       "rotation_degrees": [
@@ -2376,7 +2427,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_017"
     },
     {
       "name": "alc_grass_tuft_034",
@@ -2384,7 +2436,7 @@
       "zone": "TerraceZone",
       "position": [
         0.35,
-        7.75,
+        7.74,
         -4.1499999999999995
       ],
       "rotation_degrees": [
@@ -2398,7 +2450,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_034"
     },
     {
       "name": "alc_grass_tuft_035",
@@ -2406,7 +2459,7 @@
       "zone": "TerraceZone",
       "position": [
         1.7,
-        7.75,
+        7.74,
         -4.3
       ],
       "rotation_degrees": [
@@ -2420,15 +2473,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_035"
     },
     {
-      "name": "alc_shrub_018",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_006",
+      "asset": "alc_shrub_b",
       "zone": "TerraceZone",
       "position": [
         11,
-        7.75,
+        7.715,
         -4.6
       ],
       "rotation_degrees": [
@@ -2442,7 +2496,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_018"
     },
     {
       "name": "alc_grass_tuft_036",
@@ -2450,7 +2505,7 @@
       "zone": "TerraceZone",
       "position": [
         10.35,
-        7.75,
+        7.74,
         -4.1499999999999995
       ],
       "rotation_degrees": [
@@ -2464,7 +2519,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_036"
     },
     {
       "name": "alc_grass_tuft_037",
@@ -2472,7 +2528,7 @@
       "zone": "TerraceZone",
       "position": [
         11.7,
-        7.75,
+        7.74,
         -4.3
       ],
       "rotation_degrees": [
@@ -2486,15 +2542,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_037"
     },
     {
-      "name": "alc_shrub_019",
+      "name": "alc_shrub_012",
       "asset": "alc_shrub",
       "zone": "TerraceZone",
       "position": [
         23,
-        7.75,
+        7.715,
         -4.6
       ],
       "rotation_degrees": [
@@ -2508,7 +2565,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_019"
     },
     {
       "name": "alc_grass_tuft_038",
@@ -2516,7 +2574,7 @@
       "zone": "TerraceZone",
       "position": [
         22.35,
-        7.75,
+        7.74,
         -4.1499999999999995
       ],
       "rotation_degrees": [
@@ -2530,7 +2588,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_038"
     },
     {
       "name": "alc_grass_tuft_039",
@@ -2538,7 +2597,7 @@
       "zone": "TerraceZone",
       "position": [
         23.7,
-        7.75,
+        7.74,
         -4.3
       ],
       "rotation_degrees": [
@@ -2552,15 +2611,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_039"
     },
     {
-      "name": "alc_shrub_020",
+      "name": "alc_shrub_013",
       "asset": "alc_shrub",
       "zone": "SummitZone",
       "position": [
         -28,
-        10,
+        9.965,
         -9.0
       ],
       "rotation_degrees": [
@@ -2574,7 +2634,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_020"
     },
     {
       "name": "alc_grass_tuft_040",
@@ -2582,7 +2643,7 @@
       "zone": "SummitZone",
       "position": [
         -28.65,
-        10,
+        9.99,
         -8.55
       ],
       "rotation_degrees": [
@@ -2596,7 +2657,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_040"
     },
     {
       "name": "alc_grass_tuft_041",
@@ -2604,7 +2666,7 @@
       "zone": "SummitZone",
       "position": [
         -27.4,
-        10,
+        9.99,
         -8.7
       ],
       "rotation_degrees": [
@@ -2618,15 +2680,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_041"
     },
     {
-      "name": "alc_shrub_021",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_007",
+      "asset": "alc_shrub_b",
       "zone": "SummitZone",
       "position": [
         -22,
-        10,
+        9.965,
         -15
       ],
       "rotation_degrees": [
@@ -2640,7 +2703,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_021"
     },
     {
       "name": "alc_grass_tuft_042",
@@ -2648,7 +2712,7 @@
       "zone": "SummitZone",
       "position": [
         -22.65,
-        10,
+        9.99,
         -14.55
       ],
       "rotation_degrees": [
@@ -2662,7 +2726,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_042"
     },
     {
       "name": "alc_grass_tuft_043",
@@ -2670,7 +2735,7 @@
       "zone": "SummitZone",
       "position": [
         -21.4,
-        10,
+        9.99,
         -14.7
       ],
       "rotation_degrees": [
@@ -2684,15 +2749,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_043"
     },
     {
-      "name": "alc_shrub_022",
+      "name": "alc_shrub_014",
       "asset": "alc_shrub",
       "zone": "SummitZone",
       "position": [
         -25,
-        10,
+        9.965,
         -18.5
       ],
       "rotation_degrees": [
@@ -2706,7 +2772,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_022"
     },
     {
       "name": "alc_grass_tuft_044",
@@ -2714,7 +2781,7 @@
       "zone": "SummitZone",
       "position": [
         -25.65,
-        10,
+        9.99,
         -18.05
       ],
       "rotation_degrees": [
@@ -2728,7 +2795,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_044"
     },
     {
       "name": "alc_grass_tuft_045",
@@ -2736,7 +2804,7 @@
       "zone": "SummitZone",
       "position": [
         -24.4,
-        10,
+        9.99,
         -18.2
       ],
       "rotation_degrees": [
@@ -2750,15 +2818,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_045"
     },
     {
-      "name": "alc_shrub_023",
+      "name": "alc_shrub_015",
       "asset": "alc_shrub",
       "zone": "SummitZone",
       "position": [
         22,
-        10,
+        9.965,
         -8.8
       ],
       "rotation_degrees": [
@@ -2772,7 +2841,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_023"
     },
     {
       "name": "alc_grass_tuft_046",
@@ -2780,7 +2850,7 @@
       "zone": "SummitZone",
       "position": [
         21.35,
-        10,
+        9.99,
         -8.350000000000001
       ],
       "rotation_degrees": [
@@ -2794,7 +2864,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_046"
     },
     {
       "name": "alc_grass_tuft_047",
@@ -2802,7 +2873,7 @@
       "zone": "SummitZone",
       "position": [
         22.6,
-        10,
+        9.99,
         -8.5
       ],
       "rotation_degrees": [
@@ -2816,15 +2887,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_047"
     },
     {
-      "name": "alc_shrub_024",
-      "asset": "alc_shrub",
+      "name": "alc_shrub_b_008",
+      "asset": "alc_shrub_b",
       "zone": "SummitZone",
       "position": [
         28.5,
-        10,
+        9.965,
         -17
       ],
       "rotation_degrees": [
@@ -2838,7 +2910,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_024"
     },
     {
       "name": "alc_grass_tuft_048",
@@ -2846,7 +2919,7 @@
       "zone": "SummitZone",
       "position": [
         27.85,
-        10,
+        9.99,
         -16.55
       ],
       "rotation_degrees": [
@@ -2860,7 +2933,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_048"
     },
     {
       "name": "alc_grass_tuft_049",
@@ -2868,7 +2942,7 @@
       "zone": "SummitZone",
       "position": [
         29.1,
-        10,
+        9.99,
         -16.7
       ],
       "rotation_degrees": [
@@ -2882,15 +2956,16 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_049"
     },
     {
-      "name": "alc_shrub_025",
+      "name": "alc_shrub_016",
       "asset": "alc_shrub",
       "zone": "SummitZone",
       "position": [
         25,
-        10,
+        9.965,
         -18.5
       ],
       "rotation_degrees": [
@@ -2904,7 +2979,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_shrub_025"
     },
     {
       "name": "alc_grass_tuft_050",
@@ -2912,7 +2988,7 @@
       "zone": "SummitZone",
       "position": [
         24.35,
-        10,
+        9.99,
         -18.05
       ],
       "rotation_degrees": [
@@ -2926,7 +3002,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_050"
     },
     {
       "name": "alc_grass_tuft_051",
@@ -2934,7 +3011,7 @@
       "zone": "SummitZone",
       "position": [
         25.6,
-        10,
+        9.99,
         -18.2
       ],
       "rotation_degrees": [
@@ -2948,7 +3025,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_grass_tuft_051"
     },
     {
       "name": "alc_rock_a_000",
@@ -2970,7 +3048,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_000"
     },
     {
       "name": "alc_rock_b_000",
@@ -2992,7 +3071,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_000"
     },
     {
       "name": "alc_rock_c_000",
@@ -3014,7 +3094,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_000"
     },
     {
       "name": "alc_rock_a_001",
@@ -3036,7 +3117,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_001"
     },
     {
       "name": "alc_rock_b_001",
@@ -3058,7 +3140,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_001"
     },
     {
       "name": "alc_rock_c_001",
@@ -3080,7 +3163,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_001"
     },
     {
       "name": "alc_rock_a_002",
@@ -3102,7 +3186,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_002"
     },
     {
       "name": "alc_rock_b_002",
@@ -3124,7 +3209,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_002"
     },
     {
       "name": "alc_rock_c_002",
@@ -3146,7 +3232,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_002"
     },
     {
       "name": "alc_rock_a_003",
@@ -3168,7 +3255,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_003"
     },
     {
       "name": "alc_rock_b_003",
@@ -3190,14 +3278,15 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_003"
     },
     {
-      "name": "alc_rock_c_003",
-      "asset": "alc_rock_c",
+      "name": "alc_rock_a_004",
+      "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
-        -24.8,
+        -27.0,
         -0.35,
         11.5
       ],
@@ -3212,16 +3301,17 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_003"
     },
     {
-      "name": "alc_rock_a_004",
+      "name": "alc_rock_a_005",
       "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
-        -26.2,
+        -29.2,
         -0.35,
-        7
+        8.5
       ],
       "rotation_degrees": [
         0,
@@ -3234,7 +3324,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_004"
     },
     {
       "name": "alc_rock_b_004",
@@ -3256,10 +3347,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_004"
     },
     {
-      "name": "alc_rock_c_004",
+      "name": "alc_rock_c_003",
       "asset": "alc_rock_c",
       "zone": "DockZone",
       "position": [
@@ -3278,10 +3370,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_004"
     },
     {
-      "name": "alc_rock_a_005",
+      "name": "alc_rock_a_006",
       "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
@@ -3300,7 +3393,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_005"
     },
     {
       "name": "alc_rock_b_005",
@@ -3322,10 +3416,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_005"
     },
     {
-      "name": "alc_rock_c_005",
+      "name": "alc_rock_c_004",
       "asset": "alc_rock_c",
       "zone": "DockZone",
       "position": [
@@ -3344,10 +3439,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_005"
     },
     {
-      "name": "alc_rock_a_006",
+      "name": "alc_rock_a_007",
       "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
@@ -3366,7 +3462,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_006"
     },
     {
       "name": "alc_rock_b_006",
@@ -3388,10 +3485,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_006"
     },
     {
-      "name": "alc_rock_c_006",
+      "name": "alc_rock_c_005",
       "asset": "alc_rock_c",
       "zone": "DockZone",
       "position": [
@@ -3410,10 +3508,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_006"
     },
     {
-      "name": "alc_rock_a_007",
+      "name": "alc_rock_a_008",
       "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
@@ -3432,7 +3531,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_007"
     },
     {
       "name": "alc_rock_b_007",
@@ -3454,10 +3554,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_007"
     },
     {
-      "name": "alc_rock_c_007",
+      "name": "alc_rock_c_006",
       "asset": "alc_rock_c",
       "zone": "DockZone",
       "position": [
@@ -3476,10 +3577,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_007"
     },
     {
-      "name": "alc_rock_a_008",
+      "name": "alc_rock_a_009",
       "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
@@ -3498,7 +3600,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_008"
     },
     {
       "name": "alc_rock_b_008",
@@ -3520,10 +3623,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_008"
     },
     {
-      "name": "alc_rock_c_008",
+      "name": "alc_rock_c_007",
       "asset": "alc_rock_c",
       "zone": "DockZone",
       "position": [
@@ -3542,10 +3646,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_008"
     },
     {
-      "name": "alc_rock_a_009",
+      "name": "alc_rock_a_010",
       "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
@@ -3564,7 +3669,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_009"
     },
     {
       "name": "alc_rock_b_009",
@@ -3586,10 +3692,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_009"
     },
     {
-      "name": "alc_rock_c_009",
+      "name": "alc_rock_c_008",
       "asset": "alc_rock_c",
       "zone": "DockZone",
       "position": [
@@ -3608,10 +3715,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_009"
     },
     {
-      "name": "alc_rock_a_010",
+      "name": "alc_rock_a_011",
       "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
@@ -3630,7 +3738,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_010"
     },
     {
       "name": "alc_rock_b_010",
@@ -3652,10 +3761,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_010"
     },
     {
-      "name": "alc_rock_c_010",
+      "name": "alc_rock_c_009",
       "asset": "alc_rock_c",
       "zone": "DockZone",
       "position": [
@@ -3674,10 +3784,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_010"
     },
     {
-      "name": "alc_rock_a_011",
+      "name": "alc_rock_a_012",
       "asset": "alc_rock_a",
       "zone": "DockZone",
       "position": [
@@ -3696,7 +3807,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_a_011"
     },
     {
       "name": "alc_rock_b_011",
@@ -3718,10 +3830,11 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_b_011"
     },
     {
-      "name": "alc_rock_c_011",
+      "name": "alc_rock_c_010",
       "asset": "alc_rock_c",
       "zone": "DockZone",
       "position": [
@@ -3740,7 +3853,8 @@
         1
       ],
       "owner": "刘备",
-      "placeholder": true
+      "placeholder": false,
+      "source_name": "alc_rock_c_011"
     },
     {
       "name": "alc_flowers_poppy_000",
@@ -3762,7 +3876,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_001",
@@ -3784,7 +3899,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_002",
@@ -3806,7 +3922,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_000",
@@ -3828,7 +3945,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_001",
@@ -3850,7 +3968,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_002",
@@ -3872,7 +3991,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_003",
@@ -3894,7 +4014,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_004",
@@ -3916,7 +4037,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_005",
@@ -3938,7 +4060,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_000",
@@ -3960,7 +4083,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_001",
@@ -3982,7 +4106,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_002",
@@ -4004,7 +4129,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_003",
@@ -4026,7 +4152,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_004",
@@ -4048,7 +4175,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_005",
@@ -4070,7 +4198,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_003",
@@ -4092,7 +4221,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_004",
@@ -4114,7 +4244,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_005",
@@ -4136,7 +4267,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_hedge_000",
@@ -4246,7 +4378,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_007",
@@ -4268,7 +4401,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_008",
@@ -4290,7 +4424,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_006",
@@ -4312,7 +4447,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_007",
@@ -4334,7 +4470,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_008",
@@ -4356,7 +4493,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_009",
@@ -4378,7 +4516,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_010",
@@ -4400,7 +4539,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_011",
@@ -4422,7 +4562,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_006",
@@ -4444,7 +4585,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_007",
@@ -4466,7 +4608,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_008",
@@ -4488,7 +4631,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_009",
@@ -4510,7 +4654,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_010",
@@ -4532,7 +4677,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_011",
@@ -4554,7 +4700,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_009",
@@ -4576,7 +4723,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_010",
@@ -4598,7 +4746,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_011",
@@ -4620,7 +4769,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_hedge_004",
@@ -4730,7 +4880,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_013",
@@ -4752,7 +4903,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_014",
@@ -4774,7 +4926,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_012",
@@ -4796,7 +4949,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_013",
@@ -4818,7 +4972,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_014",
@@ -4840,7 +4995,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_015",
@@ -4862,7 +5018,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_016",
@@ -4884,7 +5041,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_poppy_017",
@@ -4906,7 +5064,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_012",
@@ -4928,7 +5087,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_013",
@@ -4950,7 +5110,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_014",
@@ -4972,7 +5133,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_015",
@@ -4994,7 +5156,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_016",
@@ -5016,7 +5179,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_lavender_017",
@@ -5038,7 +5202,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_015",
@@ -5060,7 +5225,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_016",
@@ -5082,7 +5248,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_flowers_daisy_017",
@@ -5104,7 +5271,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "support_y_offset_m": 0.3
     },
     {
       "name": "alc_hedge_008",
@@ -5375,7 +5543,7 @@
       "asset": "alc_planter",
       "zone": "DockZone",
       "position": [
-        -23.85,
+        -23.6,
         1,
         12.5
       ],
@@ -5397,7 +5565,7 @@
       "asset": "alc_planter",
       "zone": "DockZone",
       "position": [
-        -23.85,
+        -23.6,
         1,
         13.5
       ],
@@ -5463,7 +5631,7 @@
       "asset": "alc_planter",
       "zone": "TerraceZone",
       "position": [
-        -24.2,
+        -25.2,
         5.5,
         0.95
       ],
@@ -5485,7 +5653,7 @@
       "asset": "alc_planter",
       "zone": "TerraceZone",
       "position": [
-        -23.2,
+        -24.2,
         5.5,
         0.95
       ],
@@ -5545,6 +5713,466 @@
       ],
       "owner": "赵云",
       "placeholder": false
+    },
+    {
+      "name": "alc_dock_shelter_000",
+      "asset": "alc_dock_shelter",
+      "zone": "DockZone",
+      "position": [
+        -23.0,
+        1,
+        15.35
+      ],
+      "rotation_degrees": [
+        0,
+        90.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_dock_shelter_000"
+    },
+    {
+      "name": "alc_dock_crates_000",
+      "asset": "alc_dock_crates",
+      "zone": "DockZone",
+      "position": [
+        -21.0,
+        1,
+        18.45
+      ],
+      "rotation_degrees": [
+        0,
+        90.0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_dock_crates_000"
+    },
+    {
+      "name": "alc_dock_welcome_000",
+      "asset": "alc_dock_welcome",
+      "zone": "DockZone",
+      "position": [
+        -23.0,
+        1,
+        17.65
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_dock_welcome_000"
+    },
+    {
+      "name": "alc_dock_planter_000",
+      "asset": "alc_dock_planter",
+      "zone": "DockZone",
+      "position": [
+        -23.6,
+        1,
+        12.8
+      ],
+      "rotation_degrees": [
+        0,
+        90.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_dock_planter_000"
+    },
+    {
+      "name": "alc_dock_planter_001",
+      "asset": "alc_dock_planter",
+      "zone": "DockZone",
+      "position": [
+        -20.94,
+        1,
+        12.55
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_dock_planter_001"
+    },
+    {
+      "name": "alc_dock_bollard_000",
+      "asset": "alc_dock_bollard",
+      "zone": "DockZone",
+      "position": [
+        -20.95,
+        1,
+        19.6
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_dock_bollard_000"
+    },
+    {
+      "name": "alc_dock_bollard_001",
+      "asset": "alc_dock_bollard",
+      "zone": "DockZone",
+      "position": [
+        -20.95,
+        1,
+        15.65
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_dock_bollard_001"
+    },
+    {
+      "name": "alc_ruin_arch_000",
+      "asset": "alc_ruin_arch",
+      "zone": "TerraceZone",
+      "position": [
+        15.3,
+        3.25,
+        5.95
+      ],
+      "rotation_degrees": [
+        0,
+        -12.000000000000002,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_arch_detail_00"
+    },
+    {
+      "name": "alc_ruin_rubble_000",
+      "asset": "alc_ruin_rubble",
+      "zone": "TerraceZone",
+      "position": [
+        11.2,
+        3.25,
+        5.55
+      ],
+      "rotation_degrees": [
+        0,
+        18.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_rubble_detail_01"
+    },
+    {
+      "name": "alc_ruin_rubble_001",
+      "asset": "alc_ruin_rubble",
+      "zone": "TerraceZone",
+      "position": [
+        15.6,
+        3.25,
+        6.65
+      ],
+      "rotation_degrees": [
+        0,
+        -20.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_rubble_detail_02"
+    },
+    {
+      "name": "alc_ruin_rubble_002",
+      "asset": "alc_ruin_rubble",
+      "zone": "TerraceZone",
+      "position": [
+        21.6,
+        3.25,
+        5.95
+      ],
+      "rotation_degrees": [
+        0,
+        8.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_rubble_detail_03"
+    },
+    {
+      "name": "alc_ruin_vine_000",
+      "asset": "alc_ruin_vine",
+      "zone": "TerraceZone",
+      "position": [
+        16.5,
+        3.85,
+        5.245
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_vine_detail_04"
+    },
+    {
+      "name": "alc_ruin_vine_001",
+      "asset": "alc_ruin_vine",
+      "zone": "TerraceZone",
+      "position": [
+        18.5,
+        4.35,
+        5.245
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_vine_detail_05"
+    },
+    {
+      "name": "alc_ruin_vine_002",
+      "asset": "alc_ruin_vine",
+      "zone": "TerraceZone",
+      "position": [
+        20.5,
+        3.75,
+        5.245
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_vine_detail_06"
+    },
+    {
+      "name": "alc_ruin_flowers_000",
+      "asset": "alc_ruin_flowers",
+      "zone": "TerraceZone",
+      "position": [
+        11.8,
+        3.25,
+        4.95
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_flowers_detail_07"
+    },
+    {
+      "name": "alc_ruin_flowers_001",
+      "asset": "alc_ruin_flowers",
+      "zone": "TerraceZone",
+      "position": [
+        13.0,
+        3.25,
+        6.1
+      ],
+      "rotation_degrees": [
+        0,
+        18.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_flowers_detail_08"
+    },
+    {
+      "name": "alc_ruin_flowers_002",
+      "asset": "alc_ruin_flowers",
+      "zone": "TerraceZone",
+      "position": [
+        16.45,
+        3.25,
+        6.95
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_flowers_detail_09"
+    },
+    {
+      "name": "alc_ruin_flowers_003",
+      "asset": "alc_ruin_flowers",
+      "zone": "TerraceZone",
+      "position": [
+        20.0,
+        3.25,
+        5.8
+      ],
+      "rotation_degrees": [
+        0,
+        -14.999999999999998,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_flowers_detail_10"
+    },
+    {
+      "name": "alc_ruin_flowers_004",
+      "asset": "alc_ruin_flowers",
+      "zone": "TerraceZone",
+      "position": [
+        22.9,
+        3.25,
+        5.65
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_flowers_detail_11"
+    },
+    {
+      "name": "alc_ruin_plaque_000",
+      "asset": "alc_ruin_plaque",
+      "zone": "TerraceZone",
+      "position": [
+        13.25,
+        3.25,
+        6.85
+      ],
+      "rotation_degrees": [
+        0,
+        -12.000000000000002,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "赵云",
+      "placeholder": false,
+      "source_name": "alc_ruin_plaque_detail_12"
     },
     {
       "name": "alc_rail_straight_000",

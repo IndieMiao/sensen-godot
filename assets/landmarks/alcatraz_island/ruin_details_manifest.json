@@ -1,0 +1,269 @@
+{
+  "author": "赵云",
+  "assets": {
+    "alc_ruin_arch": {
+      "triangles": 144,
+      "surfaces": 1,
+      "bytes": 9516,
+      "bounds_blender": [
+        [
+          -1.209762,
+          -0.550847,
+          0.0
+        ],
+        [
+          1.209762,
+          0.550847,
+          0.673099
+        ]
+      ],
+      "bounds": [
+        [
+          -1.209762,
+          0.0,
+          -0.550847
+        ],
+        [
+          1.209762,
+          0.673099,
+          0.550847
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_ruins_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive heritage decoration",
+      "sha256": "4a7ed72271e61c6dac6bd8fb093e9d1a5896843aff3a89ed1dfdc26372720352",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "alc_ruin_rubble": {
+      "triangles": 112,
+      "surfaces": 1,
+      "bytes": 9688,
+      "bounds_blender": [
+        [
+          -0.770049,
+          -0.533811,
+          0.0
+        ],
+        [
+          0.770049,
+          0.533811,
+          0.12
+        ]
+      ],
+      "bounds": [
+        [
+          -0.770049,
+          0.0,
+          -0.533811
+        ],
+        [
+          0.770049,
+          0.12,
+          0.533811
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_ruins_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive heritage decoration",
+      "sha256": "e90c9554a244aa251598176b2e7c57bf8e631ca9fe8e71ec5209860fe475e213",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "alc_ruin_vine": {
+      "triangles": 312,
+      "surfaces": 1,
+      "bytes": 10820,
+      "bounds_blender": [
+        [
+          -0.337011,
+          -0.054794,
+          0.0
+        ],
+        [
+          0.337011,
+          0.0,
+          1.652836
+        ]
+      ],
+      "bounds": [
+        [
+          -0.337011,
+          0.0,
+          -0.0
+        ],
+        [
+          0.337011,
+          1.652836,
+          0.054794
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_ruins_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "bottom centre; wall-back plane Z=0",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive heritage decoration",
+      "sha256": "6962d21aa19d89dafacad7b43b483c158bd57991ba515169a77f9c0666b4f156",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "alc_ruin_flowers": {
+      "triangles": 350,
+      "surfaces": 1,
+      "bytes": 13340,
+      "bounds_blender": [
+        [
+          -0.337136,
+          -0.316105,
+          -0.0
+        ],
+        [
+          0.337136,
+          0.316105,
+          0.496117
+        ]
+      ],
+      "bounds": [
+        [
+          -0.337136,
+          -0.0,
+          -0.316105
+        ],
+        [
+          0.337136,
+          0.496117,
+          0.316105
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_ruins_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive heritage decoration",
+      "sha256": "3273f98fecc89779539ae3d6a24a258bfe87a74fb358e4fefba76117c9d6e99b",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "alc_ruin_plaque": {
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 9716,
+      "bounds_blender": [
+        [
+          -0.35,
+          -0.151039,
+          0.0
+        ],
+        [
+          0.35,
+          0.151039,
+          0.911009
+        ]
+      ],
+      "bounds": [
+        [
+          -0.35,
+          0.0,
+          -0.151039
+        ],
+        [
+          0.35,
+          0.911009,
+          0.151039
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_ruins_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 400,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive heritage decoration",
+      "sha256": "c547f6d0c844168ea9644798c925c0fb5586b871ee7b387b4ce91ea7576cd6b2",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    }
+  },
+  "palette_srgb": {
+    "stone": "D4BF9B",
+    "stone_light": "E8D5B2",
+    "stone_edge": "BCA581",
+    "stone_shade": "AF9875",
+    "moss": "829449",
+    "moss_light": "9FAC5C",
+    "stem": "688248",
+    "leaf": "78964C",
+    "leaf_light": "9DB15F",
+    "leaf_dark": "547339",
+    "white": "FFF2D4",
+    "yellow": "E9C765",
+    "pollen": "C9A74B",
+    "plaque_frame": "8F8162",
+    "plaque_face": "C8BEA2",
+    "plaque_leg": "6E7D6B"
+  },
+  "layout_reference": "b16c31982f34a64cdd4f9c6683064edbf20837a0"
+}

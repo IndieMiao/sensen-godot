@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "scope": "five rendered assets, native dock opening and two real zoom-button taps; not a full navigation/pinch or physical-phone performance test",
+  "before": {
+    "assembled": true,
+    "batches": 5,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 14,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "instances": 7,
+    "pid": 9753,
+    "renderer": "mobile",
+    "revision": "alcatraz-dock-424-v1",
+    "seq": 0,
+    "view": "dock",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 1.0
+  },
+  "zoomed_out": {
+    "assembled": true,
+    "batches": 5,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 34,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "instances": 7,
+    "pid": 9753,
+    "renderer": "mobile",
+    "revision": "alcatraz-dock-424-v1",
+    "seq": 0,
+    "view": "dock",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 0.869565217391304
+  },
+  "restored": {
+    "assembled": true,
+    "batches": 5,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 38,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "instances": 7,
+    "pid": 9753,
+    "renderer": "mobile",
+    "revision": "alcatraz-dock-424-v1",
+    "seq": 0,
+    "view": "dock",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 1.0
+  },
+  "assets": {
+    "assembled": true,
+    "batches": 5,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 51,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "instances": 7,
+    "pid": 9753,
+    "renderer": "mobile",
+    "revision": "alcatraz-dock-424-v1",
+    "seq": 1,
+    "view": "assets",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 1.0
+  }
+}

@@ -34,6 +34,7 @@ var _mesh_cache := {}
 var zones := {}
 var batch_nodes: Array[MultiMeshInstance3D] = []
 var _detail_batches: Array[MultiMeshInstance3D] = []
+var _unshadowed_batches: Array[MultiMeshInstance3D] = []
 var _far_zone: Node3D
 var _zoom_buttons := {}
 var _prototype_shapes := {}
@@ -213,6 +214,16 @@ func _add_batch(items: Array, paint: Material) -> void:
 	if asset in ["alc_curb","alc_lamp","alc_bin","alc_sign","alc_rail_corner","alc_flowerbed","alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"]:node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	zones[items[0].zone].add_child(node)
 	batch_nodes.append(node)
+	if node.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_OFF:
+		var bounds: Array[AABB] = []
+		var transforms: Array[Transform3D] = []
+		for p in items:
+			var transform := _transform_of(p)
+			transforms.append(transform)
+			bounds.append(transform*mm.mesh.get_aabb())
+		node.set_meta("instance_bounds",bounds)
+		node.set_meta("instance_transforms",transforms)
+		_unshadowed_batches.append(node)
 	for p in items:
 		if bool(p.collision):_add_prop_collision(p)
 
@@ -406,6 +417,31 @@ func _update_camera() -> void:
 	_camera.position = target+Vector3(sin(yaw)*cos(pitch),sin(pitch),cos(yaw)*cos(pitch))*11
 	_camera.look_at(target,Vector3.UP)
 	FarmCamera.fit_ground_depth(_camera,-.2,28.0)
+	# Compact visible decorations into the existing MultiMesh. Whole-zone bounds
+	# would otherwise submit every flower and rock. Shadow casters stay untouched.
+	var planes := _camera.get_frustum()
+	for node in _unshadowed_batches:
+		var eligible := _overview or width<=float(node.get_meta("max_view_width_m",INF))
+		var visible_count := 0
+		var bounds: Array = node.get_meta("instance_bounds")
+		var transforms: Array = node.get_meta("instance_transforms")
+		if eligible:
+			for i in bounds.size():
+				var box: AABB = bounds[i]
+				var outside := false
+				for plane in planes:
+					var minimum := box.position
+					if plane.normal.x<0:minimum.x+=box.size.x
+					if plane.normal.y<0:minimum.y+=box.size.y
+					if plane.normal.z<0:minimum.z+=box.size.z
+					if plane.distance_to(minimum)>.02:
+						outside=true
+						break
+				if not outside:
+					node.multimesh.set_instance_transform(visible_count,transforms[i])
+					visible_count+=1
+		node.multimesh.visible_instance_count=visible_count
+		node.visible=visible_count>0
 	_set_backdrop_visible(not _overview)
 	if _exit_button:
 		var point := _camera.unproject_position(_vec(layout.exit) + Vector3.UP * .45)

@@ -1,0 +1,4582 @@
+{
+  "task": "SGODOT-424",
+  "owner": "刘备",
+  "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "source_layout_sha256": "2633e8990acd7a428ff5ec0033bc124329ed239aea97a9e01b8bb477f51269e9",
+  "status": "replacement suggestions; match source_name to existing owner points, never append",
+  "supersedes": "179-point proposal in PR801 at 37bbf81de; do not combine both sets",
+  "axes": "Godot Y-up, +X east, +Z south/dock; Blender (x,-z,y)",
+  "sea_y": -0.15,
+  "points": [
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        -25.2,
+        3.215,
+        4.4
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_000",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -25.849999999999998,
+        3.24,
+        4.8500000000000005
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_000",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -24.5,
+        3.24,
+        4.7
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_001",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_001",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -16,
+        3.215,
+        4.4
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.9,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_001",
+      "rotation_degrees": [
+        0,
+        51.56620156177409,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_001",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -16.65,
+        3.24,
+        4.8500000000000005
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_002",
+      "rotation_degrees": [
+        0,
+        34.37746770784939,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_002",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -15.3,
+        3.24,
+        4.7
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_003",
+      "rotation_degrees": [
+        0,
+        34.37746770784939,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_003",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -12,
+        3.215,
+        4.4
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.8,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_002",
+      "rotation_degrees": [
+        0,
+        103.13240312354819,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_002",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -12.65,
+        3.24,
+        4.8500000000000005
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.2,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_004",
+      "rotation_degrees": [
+        0,
+        68.75493541569878,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_004",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -11.3,
+        3.24,
+        4.7
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.2,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_005",
+      "rotation_degrees": [
+        0,
+        68.75493541569878,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_005",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        -5,
+        3.215,
+        4.4
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.7,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_003",
+      "rotation_degrees": [
+        0,
+        154.6986046853223,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_003",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -5.65,
+        3.24,
+        4.8500000000000005
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.7999999999999998,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_006",
+      "rotation_degrees": [
+        0,
+        103.13240312354817,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_006",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -4.3,
+        3.24,
+        4.7
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.7999999999999998,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_007",
+      "rotation_degrees": [
+        0,
+        103.13240312354817,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_007",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        1,
+        3.215,
+        4.4
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_004",
+      "rotation_degrees": [
+        0,
+        206.26480624709637,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_004",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        0.35,
+        3.24,
+        4.8500000000000005
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_008",
+      "rotation_degrees": [
+        0,
+        137.50987083139756,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_008",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        1.7,
+        3.24,
+        4.7
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_009",
+      "rotation_degrees": [
+        0,
+        137.50987083139756,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_009",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        23,
+        3.215,
+        4.4
+      ],
+      "zone": "TerraceZone",
+      "yaw": 5.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_005",
+      "rotation_degrees": [
+        0,
+        309.3972093706446,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_005",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        22.35,
+        3.24,
+        4.8500000000000005
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.5999999999999996,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_010",
+      "rotation_degrees": [
+        0,
+        206.26480624709635,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_010",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        23.7,
+        3.24,
+        4.7
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.5999999999999996,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_011",
+      "rotation_degrees": [
+        0,
+        206.26480624709635,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_011",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        -25.2,
+        5.465,
+        -0.1
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_006",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_006",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -25.849999999999998,
+        5.49,
+        0.35
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_012",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_012",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -24.5,
+        5.49,
+        0.19999999999999998
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_013",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_013",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -16,
+        5.465,
+        -0.1
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.9,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_007",
+      "rotation_degrees": [
+        0,
+        51.56620156177409,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_007",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -16.65,
+        5.49,
+        0.35
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_014",
+      "rotation_degrees": [
+        0,
+        34.37746770784939,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_014",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -15.3,
+        5.49,
+        0.19999999999999998
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_015",
+      "rotation_degrees": [
+        0,
+        34.37746770784939,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_015",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -12,
+        5.465,
+        -0.1
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.8,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_008",
+      "rotation_degrees": [
+        0,
+        103.13240312354819,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_008",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -12.65,
+        5.49,
+        0.35
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.2,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_016",
+      "rotation_degrees": [
+        0,
+        68.75493541569878,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_016",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -11.3,
+        5.49,
+        0.19999999999999998
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.2,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_017",
+      "rotation_degrees": [
+        0,
+        68.75493541569878,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_017",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        -5,
+        5.465,
+        -0.1
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.7,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_009",
+      "rotation_degrees": [
+        0,
+        154.6986046853223,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_009",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -5.65,
+        5.49,
+        0.35
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.7999999999999998,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_018",
+      "rotation_degrees": [
+        0,
+        103.13240312354817,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_018",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -4.3,
+        5.49,
+        0.19999999999999998
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.7999999999999998,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_019",
+      "rotation_degrees": [
+        0,
+        103.13240312354817,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_019",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        1,
+        5.465,
+        -0.1
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_010",
+      "rotation_degrees": [
+        0,
+        206.26480624709637,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_010",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        0.35,
+        5.49,
+        0.35
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_020",
+      "rotation_degrees": [
+        0,
+        137.50987083139756,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_020",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        1.7,
+        5.49,
+        0.19999999999999998
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_021",
+      "rotation_degrees": [
+        0,
+        137.50987083139756,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_021",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        11,
+        5.465,
+        -0.1
+      ],
+      "zone": "TerraceZone",
+      "yaw": 4.5,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_011",
+      "rotation_degrees": [
+        0,
+        257.8310078088705,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_011",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        10.35,
+        5.49,
+        0.35
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_022",
+      "rotation_degrees": [
+        0,
+        171.88733853924697,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_022",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        11.7,
+        5.49,
+        0.19999999999999998
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_023",
+      "rotation_degrees": [
+        0,
+        171.88733853924697,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_023",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        23,
+        5.465,
+        -0.1
+      ],
+      "zone": "TerraceZone",
+      "yaw": 5.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_012",
+      "rotation_degrees": [
+        0,
+        309.3972093706446,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_012",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        22.35,
+        5.49,
+        0.35
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.5999999999999996,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_024",
+      "rotation_degrees": [
+        0,
+        206.26480624709635,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_024",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        23.7,
+        5.49,
+        0.19999999999999998
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.5999999999999996,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_025",
+      "rotation_degrees": [
+        0,
+        206.26480624709635,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_025",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -25.2,
+        7.715,
+        -4.6
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_013",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_013",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -25.849999999999998,
+        7.74,
+        -4.1499999999999995
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_026",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_026",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -24.5,
+        7.74,
+        -4.3
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_027",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_027",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -16,
+        7.715,
+        -4.6
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.9,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_014",
+      "rotation_degrees": [
+        0,
+        51.56620156177409,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_014",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -16.65,
+        7.74,
+        -4.1499999999999995
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_028",
+      "rotation_degrees": [
+        0,
+        34.37746770784939,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_028",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -15.3,
+        7.74,
+        -4.3
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_029",
+      "rotation_degrees": [
+        0,
+        34.37746770784939,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_029",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        -12,
+        7.715,
+        -4.6
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.8,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_015",
+      "rotation_degrees": [
+        0,
+        103.13240312354819,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_015",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -12.65,
+        7.74,
+        -4.1499999999999995
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.2,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_030",
+      "rotation_degrees": [
+        0,
+        68.75493541569878,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_030",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -11.3,
+        7.74,
+        -4.3
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.2,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_031",
+      "rotation_degrees": [
+        0,
+        68.75493541569878,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_031",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -5,
+        7.715,
+        -4.6
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.7,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_016",
+      "rotation_degrees": [
+        0,
+        154.6986046853223,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_016",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -5.65,
+        7.74,
+        -4.1499999999999995
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.7999999999999998,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_032",
+      "rotation_degrees": [
+        0,
+        103.13240312354817,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_032",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -4.3,
+        7.74,
+        -4.3
+      ],
+      "zone": "TerraceZone",
+      "yaw": 1.7999999999999998,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_033",
+      "rotation_degrees": [
+        0,
+        103.13240312354817,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_033",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        1,
+        7.715,
+        -4.6
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_017",
+      "rotation_degrees": [
+        0,
+        206.26480624709637,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_017",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        0.35,
+        7.74,
+        -4.1499999999999995
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_034",
+      "rotation_degrees": [
+        0,
+        137.50987083139756,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_034",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        1.7,
+        7.74,
+        -4.3
+      ],
+      "zone": "TerraceZone",
+      "yaw": 2.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_035",
+      "rotation_degrees": [
+        0,
+        137.50987083139756,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_035",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        11,
+        7.715,
+        -4.6
+      ],
+      "zone": "TerraceZone",
+      "yaw": 4.5,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_018",
+      "rotation_degrees": [
+        0,
+        257.8310078088705,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_018",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        10.35,
+        7.74,
+        -4.1499999999999995
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_036",
+      "rotation_degrees": [
+        0,
+        171.88733853924697,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_036",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        11.7,
+        7.74,
+        -4.3
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_037",
+      "rotation_degrees": [
+        0,
+        171.88733853924697,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_037",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        23,
+        7.715,
+        -4.6
+      ],
+      "zone": "TerraceZone",
+      "yaw": 5.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_019",
+      "rotation_degrees": [
+        0,
+        309.3972093706446,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_019",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        22.35,
+        7.74,
+        -4.1499999999999995
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.5999999999999996,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_038",
+      "rotation_degrees": [
+        0,
+        206.26480624709635,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_038",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        23.7,
+        7.74,
+        -4.3
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.5999999999999996,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_039",
+      "rotation_degrees": [
+        0,
+        206.26480624709635,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_039",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -28,
+        9.965,
+        -9.0
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_020",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_020",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -28.65,
+        9.99,
+        -8.55
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_040",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_040",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -27.4,
+        9.99,
+        -8.7
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_041",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_041",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        -22,
+        9.965,
+        -15
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.5,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_021",
+      "rotation_degrees": [
+        0,
+        28.64788975654116,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_021",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -22.65,
+        9.99,
+        -14.55
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_042",
+      "rotation_degrees": [
+        0,
+        22.918311805232932,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_042",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -21.4,
+        9.99,
+        -14.7
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.4,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_043",
+      "rotation_degrees": [
+        0,
+        22.918311805232932,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_043",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        -25,
+        9.965,
+        -18.5
+      ],
+      "zone": "SummitZone",
+      "yaw": 1.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_022",
+      "rotation_degrees": [
+        0,
+        57.29577951308232,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_022",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -25.65,
+        9.99,
+        -18.05
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.8,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_044",
+      "rotation_degrees": [
+        0,
+        45.836623610465864,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_044",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        -24.4,
+        9.99,
+        -18.2
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.8,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_045",
+      "rotation_degrees": [
+        0,
+        45.836623610465864,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_045",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        22,
+        9.965,
+        -8.8
+      ],
+      "zone": "SummitZone",
+      "yaw": 1.5,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_023",
+      "rotation_degrees": [
+        0,
+        85.94366926962348,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_023",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        21.35,
+        9.99,
+        -8.350000000000001
+      ],
+      "zone": "SummitZone",
+      "yaw": 1.2000000000000002,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_046",
+      "rotation_degrees": [
+        0,
+        68.7549354156988,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_046",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        22.6,
+        9.99,
+        -8.5
+      ],
+      "zone": "SummitZone",
+      "yaw": 1.2000000000000002,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_047",
+      "rotation_degrees": [
+        0,
+        68.7549354156988,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_047",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub_b",
+      "position": [
+        28.5,
+        9.965,
+        -17
+      ],
+      "zone": "SummitZone",
+      "yaw": 2.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_024",
+      "rotation_degrees": [
+        0,
+        114.59155902616465,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_024",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        27.85,
+        9.99,
+        -16.55
+      ],
+      "zone": "SummitZone",
+      "yaw": 1.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_048",
+      "rotation_degrees": [
+        0,
+        91.67324722093173,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_048",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        29.1,
+        9.99,
+        -16.7
+      ],
+      "zone": "SummitZone",
+      "yaw": 1.6,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_049",
+      "rotation_degrees": [
+        0,
+        91.67324722093173,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_049",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_shrub",
+      "position": [
+        25,
+        9.965,
+        -18.5
+      ],
+      "zone": "SummitZone",
+      "yaw": 2.5,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_shrub_025",
+      "rotation_degrees": [
+        0,
+        143.2394487827058,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_shrub_025",
+      "source_asset": "alc_shrub",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        24.35,
+        9.99,
+        -18.05
+      ],
+      "zone": "SummitZone",
+      "yaw": 2.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_050",
+      "rotation_degrees": [
+        0,
+        114.59155902616465,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_050",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "position": [
+        25.6,
+        9.99,
+        -18.2
+      ],
+      "zone": "SummitZone",
+      "yaw": 2.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_grass_tuft_051",
+      "rotation_degrees": [
+        0,
+        114.59155902616465,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_grass_tuft_051",
+      "source_asset": "alc_grass_tuft",
+      "cast_shadow": false,
+      "max_view_width_m": 8.0
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        -18,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 0.0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_000",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        -14,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 1.13,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_000",
+      "rotation_degrees": [
+        0,
+        64.74423084978302,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_000",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        -10,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 2.26,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_000",
+      "rotation_degrees": [
+        0,
+        129.48846169956605,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_000",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        -6,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 3.3899999999999997,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_001",
+      "rotation_degrees": [
+        0,
+        194.23269254934905,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_001",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        -2,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 4.52,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_001",
+      "rotation_degrees": [
+        0,
+        258.9769233991321,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_001",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        2,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 5.6499999999999995,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_001",
+      "rotation_degrees": [
+        0,
+        323.72115424891507,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_001",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        6,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 0.49681469282041313,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_002",
+      "rotation_degrees": [
+        0,
+        28.465385098698114,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_002",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        10,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 1.626814692820413,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_002",
+      "rotation_degrees": [
+        0,
+        93.20961594848113,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_002",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        14,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 2.756814692820413,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_002",
+      "rotation_degrees": [
+        0,
+        157.95384679826415,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_002",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        18,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 3.886814692820412,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_003",
+      "rotation_degrees": [
+        0,
+        222.69807764804713,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_003",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        22,
+        -0.35,
+        14.25
+      ],
+      "zone": "DockZone",
+      "yaw": 5.016814692820413,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_003",
+      "rotation_degrees": [
+        0,
+        287.4423084978302,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_003",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        -27.0,
+        -0.35,
+        11.5
+      ],
+      "zone": "DockZone",
+      "yaw": 6.1468146928204135,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_003",
+      "rotation_degrees": [
+        0,
+        352.18653934761323,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_003",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        -29.2,
+        -0.35,
+        8.5
+      ],
+      "zone": "DockZone",
+      "yaw": 0.9936293856408263,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_004",
+      "rotation_degrees": [
+        0,
+        56.93077019739623,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_004",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        -28.0,
+        -0.35,
+        2
+      ],
+      "zone": "DockZone",
+      "yaw": 2.1236293856408253,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_004",
+      "rotation_degrees": [
+        0,
+        121.6750010471792,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_004",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        -30,
+        -0.35,
+        -3.5
+      ],
+      "zone": "DockZone",
+      "yaw": 3.253629385640826,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_004",
+      "rotation_degrees": [
+        0,
+        186.41923189696226,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_004",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        -30.3,
+        -0.35,
+        -8
+      ],
+      "zone": "DockZone",
+      "yaw": 4.383629385640827,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_005",
+      "rotation_degrees": [
+        0,
+        251.16346274674532,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_005",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        -30.3,
+        -0.35,
+        -13
+      ],
+      "zone": "DockZone",
+      "yaw": 5.513629385640826,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_005",
+      "rotation_degrees": [
+        0,
+        315.9076935965283,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_005",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        -29.2,
+        -0.35,
+        -18
+      ],
+      "zone": "DockZone",
+      "yaw": 0.3604440784612386,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_005",
+      "rotation_degrees": [
+        0,
+        20.651924446311273,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_005",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        25,
+        -0.35,
+        11.5
+      ],
+      "zone": "DockZone",
+      "yaw": 1.4904440784612376,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_006",
+      "rotation_degrees": [
+        0,
+        85.39615529609424,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_006",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        26.5,
+        -0.35,
+        7
+      ],
+      "zone": "DockZone",
+      "yaw": 2.62044407846124,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_006",
+      "rotation_degrees": [
+        0,
+        150.14038614587741,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_006",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        28,
+        -0.35,
+        2
+      ],
+      "zone": "DockZone",
+      "yaw": 3.750444078461239,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_006",
+      "rotation_degrees": [
+        0,
+        214.88461699566037,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_006",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        30,
+        -0.35,
+        -3.5
+      ],
+      "zone": "DockZone",
+      "yaw": 4.880444078461238,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_007",
+      "rotation_degrees": [
+        0,
+        279.6288478454434,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_007",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        30.3,
+        -0.35,
+        -8
+      ],
+      "zone": "DockZone",
+      "yaw": 6.010444078461241,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_007",
+      "rotation_degrees": [
+        0,
+        344.3730786952265,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_007",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        30.3,
+        -0.35,
+        -13
+      ],
+      "zone": "DockZone",
+      "yaw": 0.8572587712816535,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_007",
+      "rotation_degrees": [
+        0,
+        49.11730954500949,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_007",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        29.2,
+        -0.35,
+        -18
+      ],
+      "zone": "DockZone",
+      "yaw": 1.9872587712816525,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_008",
+      "rotation_degrees": [
+        0,
+        113.86154039479246,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_008",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        -25,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 3.1172587712816515,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_008",
+      "rotation_degrees": [
+        0,
+        178.60577124457544,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_008",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        -20,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 4.2472587712816505,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_008",
+      "rotation_degrees": [
+        0,
+        243.3500020943584,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_008",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        -15,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 5.377258771281653,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_009",
+      "rotation_degrees": [
+        0,
+        308.09423294414154,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_009",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        -10,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 0.22407346410206586,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_009",
+      "rotation_degrees": [
+        0,
+        12.838463793924532,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_009",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        -5,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 1.3540734641020649,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_009",
+      "rotation_degrees": [
+        0,
+        77.5826946437075,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_009",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        0,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 2.4840734641020674,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_010",
+      "rotation_degrees": [
+        0,
+        142.32692549349068,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_010",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        5,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 3.614073464102063,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_010",
+      "rotation_degrees": [
+        0,
+        207.07115634327343,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_010",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        10,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 4.744073464102065,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_010",
+      "rotation_degrees": [
+        0,
+        271.8153871930566,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_010",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_a",
+      "position": [
+        15,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 5.874073464102068,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_a_011",
+      "rotation_degrees": [
+        0,
+        336.55961804283976,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_a_011",
+      "source_asset": "alc_rock_a",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_b",
+      "position": [
+        20,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 0.7208881569224772,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_b_011",
+      "rotation_degrees": [
+        0,
+        41.30384889262255,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_b_011",
+      "source_asset": "alc_rock_b",
+      "cast_shadow": false
+    },
+    {
+      "asset": "alc_rock_c",
+      "position": [
+        25,
+        -0.35,
+        -20.25
+      ],
+      "zone": "DockZone",
+      "yaw": 1.8508881569224798,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_rock_c_011",
+      "rotation_degrees": [
+        0,
+        106.04807974240572,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "刘备",
+      "source_name": "alc_rock_c_011",
+      "source_asset": "alc_rock_c",
+      "cast_shadow": false
+    }
+  ],
+  "navigation_unchanged": true,
+  "notes": [
+    "Replace each existing owner=刘备 placement by source_name; leave all other placements intact.",
+    "Primary shrub is alc_shrub; optional warm variant alc_shrub_b has explicit assignments.",
+    "Two dock rocks adjusted: c_003 uses small a at (-27,-.35,11.5); a_004 moves to (-29.2,-.35,8.5). Plant roots embed .035/.01m.",
+    "Rocks keep v6 base Y=-.35. No collisions or interactions; disable cast shadows.",
+    "Keep v6 foliage visibility rule: hide above 8m view width; whole-island art review shows all.",
+    "Re-seat after owner remeshes terrain; retain original navigation."
+  ],
+  "adjustments": [
+    {
+      "source_name": "alc_shrub_000",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        -25.2,
+        3.25,
+        4.4
+      ],
+      "after_position": [
+        -25.2,
+        3.215,
+        4.4
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_000",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -25.849999999999998,
+        3.25,
+        4.8500000000000005
+      ],
+      "after_position": [
+        -25.849999999999998,
+        3.24,
+        4.8500000000000005
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_001",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -24.5,
+        3.25,
+        4.7
+      ],
+      "after_position": [
+        -24.5,
+        3.24,
+        4.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_001",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -16,
+        3.25,
+        4.4
+      ],
+      "after_position": [
+        -16,
+        3.215,
+        4.4
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_002",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -16.65,
+        3.25,
+        4.8500000000000005
+      ],
+      "after_position": [
+        -16.65,
+        3.24,
+        4.8500000000000005
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_003",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -15.3,
+        3.25,
+        4.7
+      ],
+      "after_position": [
+        -15.3,
+        3.24,
+        4.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_002",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -12,
+        3.25,
+        4.4
+      ],
+      "after_position": [
+        -12,
+        3.215,
+        4.4
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_004",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -12.65,
+        3.25,
+        4.8500000000000005
+      ],
+      "after_position": [
+        -12.65,
+        3.24,
+        4.8500000000000005
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_005",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -11.3,
+        3.25,
+        4.7
+      ],
+      "after_position": [
+        -11.3,
+        3.24,
+        4.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_003",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        -5,
+        3.25,
+        4.4
+      ],
+      "after_position": [
+        -5,
+        3.215,
+        4.4
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_006",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -5.65,
+        3.25,
+        4.8500000000000005
+      ],
+      "after_position": [
+        -5.65,
+        3.24,
+        4.8500000000000005
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_007",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -4.3,
+        3.25,
+        4.7
+      ],
+      "after_position": [
+        -4.3,
+        3.24,
+        4.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_004",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        1,
+        3.25,
+        4.4
+      ],
+      "after_position": [
+        1,
+        3.215,
+        4.4
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_008",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        0.35,
+        3.25,
+        4.8500000000000005
+      ],
+      "after_position": [
+        0.35,
+        3.24,
+        4.8500000000000005
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_009",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        1.7,
+        3.25,
+        4.7
+      ],
+      "after_position": [
+        1.7,
+        3.24,
+        4.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_005",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        23,
+        3.25,
+        4.4
+      ],
+      "after_position": [
+        23,
+        3.215,
+        4.4
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_010",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        22.35,
+        3.25,
+        4.8500000000000005
+      ],
+      "after_position": [
+        22.35,
+        3.24,
+        4.8500000000000005
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_011",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        23.7,
+        3.25,
+        4.7
+      ],
+      "after_position": [
+        23.7,
+        3.24,
+        4.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_006",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        -25.2,
+        5.5,
+        -0.1
+      ],
+      "after_position": [
+        -25.2,
+        5.465,
+        -0.1
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_012",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -25.849999999999998,
+        5.5,
+        0.35
+      ],
+      "after_position": [
+        -25.849999999999998,
+        5.49,
+        0.35
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_013",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -24.5,
+        5.5,
+        0.19999999999999998
+      ],
+      "after_position": [
+        -24.5,
+        5.49,
+        0.19999999999999998
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_007",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -16,
+        5.5,
+        -0.1
+      ],
+      "after_position": [
+        -16,
+        5.465,
+        -0.1
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_014",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -16.65,
+        5.5,
+        0.35
+      ],
+      "after_position": [
+        -16.65,
+        5.49,
+        0.35
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_015",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -15.3,
+        5.5,
+        0.19999999999999998
+      ],
+      "after_position": [
+        -15.3,
+        5.49,
+        0.19999999999999998
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_008",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -12,
+        5.5,
+        -0.1
+      ],
+      "after_position": [
+        -12,
+        5.465,
+        -0.1
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_016",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -12.65,
+        5.5,
+        0.35
+      ],
+      "after_position": [
+        -12.65,
+        5.49,
+        0.35
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_017",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -11.3,
+        5.5,
+        0.19999999999999998
+      ],
+      "after_position": [
+        -11.3,
+        5.49,
+        0.19999999999999998
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_009",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        -5,
+        5.5,
+        -0.1
+      ],
+      "after_position": [
+        -5,
+        5.465,
+        -0.1
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_018",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -5.65,
+        5.5,
+        0.35
+      ],
+      "after_position": [
+        -5.65,
+        5.49,
+        0.35
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_019",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -4.3,
+        5.5,
+        0.19999999999999998
+      ],
+      "after_position": [
+        -4.3,
+        5.49,
+        0.19999999999999998
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_010",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        1,
+        5.5,
+        -0.1
+      ],
+      "after_position": [
+        1,
+        5.465,
+        -0.1
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_020",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        0.35,
+        5.5,
+        0.35
+      ],
+      "after_position": [
+        0.35,
+        5.49,
+        0.35
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_021",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        1.7,
+        5.5,
+        0.19999999999999998
+      ],
+      "after_position": [
+        1.7,
+        5.49,
+        0.19999999999999998
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_011",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        11,
+        5.5,
+        -0.1
+      ],
+      "after_position": [
+        11,
+        5.465,
+        -0.1
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_022",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        10.35,
+        5.5,
+        0.35
+      ],
+      "after_position": [
+        10.35,
+        5.49,
+        0.35
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_023",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        11.7,
+        5.5,
+        0.19999999999999998
+      ],
+      "after_position": [
+        11.7,
+        5.49,
+        0.19999999999999998
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_012",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        23,
+        5.5,
+        -0.1
+      ],
+      "after_position": [
+        23,
+        5.465,
+        -0.1
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_024",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        22.35,
+        5.5,
+        0.35
+      ],
+      "after_position": [
+        22.35,
+        5.49,
+        0.35
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_025",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        23.7,
+        5.5,
+        0.19999999999999998
+      ],
+      "after_position": [
+        23.7,
+        5.49,
+        0.19999999999999998
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_013",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -25.2,
+        7.75,
+        -4.6
+      ],
+      "after_position": [
+        -25.2,
+        7.715,
+        -4.6
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_026",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -25.849999999999998,
+        7.75,
+        -4.1499999999999995
+      ],
+      "after_position": [
+        -25.849999999999998,
+        7.74,
+        -4.1499999999999995
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_027",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -24.5,
+        7.75,
+        -4.3
+      ],
+      "after_position": [
+        -24.5,
+        7.74,
+        -4.3
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_014",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -16,
+        7.75,
+        -4.6
+      ],
+      "after_position": [
+        -16,
+        7.715,
+        -4.6
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_028",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -16.65,
+        7.75,
+        -4.1499999999999995
+      ],
+      "after_position": [
+        -16.65,
+        7.74,
+        -4.1499999999999995
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_029",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -15.3,
+        7.75,
+        -4.3
+      ],
+      "after_position": [
+        -15.3,
+        7.74,
+        -4.3
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_015",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        -12,
+        7.75,
+        -4.6
+      ],
+      "after_position": [
+        -12,
+        7.715,
+        -4.6
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_030",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -12.65,
+        7.75,
+        -4.1499999999999995
+      ],
+      "after_position": [
+        -12.65,
+        7.74,
+        -4.1499999999999995
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_031",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -11.3,
+        7.75,
+        -4.3
+      ],
+      "after_position": [
+        -11.3,
+        7.74,
+        -4.3
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_016",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -5,
+        7.75,
+        -4.6
+      ],
+      "after_position": [
+        -5,
+        7.715,
+        -4.6
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_032",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -5.65,
+        7.75,
+        -4.1499999999999995
+      ],
+      "after_position": [
+        -5.65,
+        7.74,
+        -4.1499999999999995
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_033",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -4.3,
+        7.75,
+        -4.3
+      ],
+      "after_position": [
+        -4.3,
+        7.74,
+        -4.3
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_017",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        1,
+        7.75,
+        -4.6
+      ],
+      "after_position": [
+        1,
+        7.715,
+        -4.6
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_034",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        0.35,
+        7.75,
+        -4.1499999999999995
+      ],
+      "after_position": [
+        0.35,
+        7.74,
+        -4.1499999999999995
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_035",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        1.7,
+        7.75,
+        -4.3
+      ],
+      "after_position": [
+        1.7,
+        7.74,
+        -4.3
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_018",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        11,
+        7.75,
+        -4.6
+      ],
+      "after_position": [
+        11,
+        7.715,
+        -4.6
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_036",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        10.35,
+        7.75,
+        -4.1499999999999995
+      ],
+      "after_position": [
+        10.35,
+        7.74,
+        -4.1499999999999995
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_037",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        11.7,
+        7.75,
+        -4.3
+      ],
+      "after_position": [
+        11.7,
+        7.74,
+        -4.3
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_019",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        23,
+        7.75,
+        -4.6
+      ],
+      "after_position": [
+        23,
+        7.715,
+        -4.6
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_038",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        22.35,
+        7.75,
+        -4.1499999999999995
+      ],
+      "after_position": [
+        22.35,
+        7.74,
+        -4.1499999999999995
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_039",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        23.7,
+        7.75,
+        -4.3
+      ],
+      "after_position": [
+        23.7,
+        7.74,
+        -4.3
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_020",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -28,
+        10,
+        -9.0
+      ],
+      "after_position": [
+        -28,
+        9.965,
+        -9.0
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_040",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -28.65,
+        10,
+        -8.55
+      ],
+      "after_position": [
+        -28.65,
+        9.99,
+        -8.55
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_041",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -27.4,
+        10,
+        -8.7
+      ],
+      "after_position": [
+        -27.4,
+        9.99,
+        -8.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_021",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        -22,
+        10,
+        -15
+      ],
+      "after_position": [
+        -22,
+        9.965,
+        -15
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_042",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -22.65,
+        10,
+        -14.55
+      ],
+      "after_position": [
+        -22.65,
+        9.99,
+        -14.55
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_043",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -21.4,
+        10,
+        -14.7
+      ],
+      "after_position": [
+        -21.4,
+        9.99,
+        -14.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_022",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        -25,
+        10,
+        -18.5
+      ],
+      "after_position": [
+        -25,
+        9.965,
+        -18.5
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_044",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -25.65,
+        10,
+        -18.05
+      ],
+      "after_position": [
+        -25.65,
+        9.99,
+        -18.05
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_045",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        -24.4,
+        10,
+        -18.2
+      ],
+      "after_position": [
+        -24.4,
+        9.99,
+        -18.2
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_023",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        22,
+        10,
+        -8.8
+      ],
+      "after_position": [
+        22,
+        9.965,
+        -8.8
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_046",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        21.35,
+        10,
+        -8.350000000000001
+      ],
+      "after_position": [
+        21.35,
+        9.99,
+        -8.350000000000001
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_047",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        22.6,
+        10,
+        -8.5
+      ],
+      "after_position": [
+        22.6,
+        9.99,
+        -8.5
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_024",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub_b",
+      "before_position": [
+        28.5,
+        10,
+        -17
+      ],
+      "after_position": [
+        28.5,
+        9.965,
+        -17
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_048",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        27.85,
+        10,
+        -16.55
+      ],
+      "after_position": [
+        27.85,
+        9.99,
+        -16.55
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_049",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        29.1,
+        10,
+        -16.7
+      ],
+      "after_position": [
+        29.1,
+        9.99,
+        -16.7
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_shrub_025",
+      "before_asset": "alc_shrub",
+      "after_asset": "alc_shrub",
+      "before_position": [
+        25,
+        10,
+        -18.5
+      ],
+      "after_position": [
+        25,
+        9.965,
+        -18.5
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_050",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        24.35,
+        10,
+        -18.05
+      ],
+      "after_position": [
+        24.35,
+        9.99,
+        -18.05
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_grass_tuft_051",
+      "before_asset": "alc_grass_tuft",
+      "after_asset": "alc_grass_tuft",
+      "before_position": [
+        25.6,
+        10,
+        -18.2
+      ],
+      "after_position": [
+        25.6,
+        9.99,
+        -18.2
+      ],
+      "reason": "variant assignment and root seating"
+    },
+    {
+      "source_name": "alc_rock_c_003",
+      "before_asset": "alc_rock_c",
+      "after_asset": "alc_rock_a",
+      "before_position": [
+        -24.8,
+        -0.35,
+        11.5
+      ],
+      "after_position": [
+        -27.0,
+        -0.35,
+        11.5
+      ],
+      "reason": "dock opening: replace foreground large rock with small, move west"
+    },
+    {
+      "source_name": "alc_rock_a_004",
+      "before_asset": "alc_rock_a",
+      "after_asset": "alc_rock_a",
+      "before_position": [
+        -26.2,
+        -0.35,
+        7
+      ],
+      "after_position": [
+        -29.2,
+        -0.35,
+        8.5
+      ],
+      "reason": "dock opening: move west/south clear of bridge and city strip"
+    }
+  ],
+  "counts": {
+    "alc_rock_a": 13,
+    "alc_rock_b": 12,
+    "alc_rock_c": 11,
+    "alc_shrub": 17,
+    "alc_shrub_b": 9,
+    "alc_grass_tuft": 52
+  },
+  "placed_triangles": 14176
+}

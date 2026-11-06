@@ -58,7 +58,7 @@ label('TerraceZone / 4 flights',(735,645),point([10,5.5,3]))
 label('Mid-hill / +5.5 m',(730,690),route[1])
 label('Ruins',(780,750),point(next(p['position'] for p in layout['placements'] if p['asset']=='ruins')))
 label('DockZone / +1 m',(20,920),route[0])
-label('25 m ferry / decoration',(580,930),point([-7,0,19]))
+label('25 m ferry / decoration',(580,930),point(next(p['position'] for p in layout['placements'] if p['asset']=='ferry')))
 label('Map exit',(250,990),point(layout['exit']))
 length=verification['route_about_120m']['evidence']
 d.text((22,1040),f'Actual walk via mid-hill: {length:.1f} m | four flights: 15 x 0.15 m each',font=f,fill='#263b44')
@@ -166,7 +166,7 @@ for i,(label_,key) in enumerate(swatches):
     x=440+(i%3)*230;y=750+(i//3)*85;color=layout['palette']['colors'][key]
     pen.rectangle((x,y,x+210,y+42),fill='#'+color)
     pen.text((x,y+48),label_+' #'+color,font=small,fill='#263b44')
-pen.text((20,955),'Colour review. Concept proportions are illustrative; game dimensions follow the written brief. Small props / nature / ferry / gulls are still previews.',font=small,fill='#263b44')
+pen.text((20,955),'Colour review. Concept proportions are illustrative; game dimensions follow the written brief. Approved collaborator packs installed; museum far LOD remains a proxy.',font=small,fill='#263b44')
 board.save(DOC/'10-reference-colour-comparison.png')
 facade=Image.new('RGB',(720,840),'#f5f1e6');pen=ImageDraw.Draw(facade)
 pen.text((10,10),'v6 / blockout',font=f,fill='#263b44');pen.text((370,10),'v7 / public museum',font=f,fill='#263b44')

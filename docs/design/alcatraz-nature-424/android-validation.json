@@ -1,0 +1,250 @@
+{
+  "passed": false,
+  "asset_render_smoke_passed": true,
+  "checks": [
+    "real tap moves assembled avatar on owner navigation",
+    "real held drag moves camera focus",
+    "symmetric two-pointer pinch: FAIL: no zoom change observed in owner whitebox",
+    "real zoom-out button changes zoom"
+  ],
+  "before": {
+    "actor": [
+      -22.0,
+      1.0,
+      19.0
+    ],
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "focus": [
+      -22.7010631561279,
+      1.70000004768372,
+      16.2891864776611
+    ],
+    "frames": 18,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "nature_batches": 12,
+    "nature_instances": 179,
+    "navigation_ready": true,
+    "pid": 8490,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v1",
+    "running": false,
+    "seq": 0,
+    "viewport": "(360.0, 800.0)",
+    "walk_tap": [
+      206.826354980469,
+      458.981628417969
+    ],
+    "zoom": 1.0
+  },
+  "walked": {
+    "actor": [
+      -21.1883563995361,
+      1.0,
+      19.75
+    ],
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "focus": [
+      -21.8894500732422,
+      1.70000004768372,
+      17.0391578674316
+    ],
+    "frames": 54,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "nature_batches": 12,
+    "nature_instances": 179,
+    "navigation_ready": true,
+    "pid": 8490,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v1",
+    "running": false,
+    "seq": 0,
+    "viewport": "(360.0, 800.0)",
+    "walk_tap": [
+      174.791564941406,
+      425.029449462891
+    ],
+    "zoom": 1.0
+  },
+  "dragged": {
+    "actor": [
+      -21.1883563995361,
+      1.0,
+      19.75
+    ],
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "focus": [
+      -23.1232414245605,
+      1.70000004768372,
+      16.3687915802002
+    ],
+    "frames": 70,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "nature_batches": 12,
+    "nature_instances": 179,
+    "navigation_ready": true,
+    "pid": 8490,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v1",
+    "running": false,
+    "seq": 0,
+    "viewport": "(360.0, 800.0)",
+    "walk_tap": [
+      229.790435791016,
+      460.027740478516
+    ],
+    "zoom": 1.0
+  },
+  "pinched": {
+    "actor": [
+      -21.1883563995361,
+      1.0,
+      19.75
+    ],
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "focus": [
+      -23.1232414245605,
+      1.70000004768372,
+      16.3687915802002
+    ],
+    "frames": 130,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "nature_batches": 12,
+    "nature_instances": 179,
+    "navigation_ready": true,
+    "pid": 8490,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v1",
+    "running": false,
+    "seq": 0,
+    "viewport": "(360.0, 800.0)",
+    "walk_tap": [
+      229.790435791016,
+      460.027740478516
+    ],
+    "zoom": 1.0
+  },
+  "after_button": {
+    "actor": [
+      -21.1883563995361,
+      1.0,
+      19.75
+    ],
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "focus": [
+      -23.1232414245605,
+      1.70000004768372,
+      16.3687915802002
+    ],
+    "frames": 138,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "nature_batches": 12,
+    "nature_instances": 179,
+    "navigation_ready": true,
+    "pid": 8490,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v1",
+    "running": false,
+    "seq": 0,
+    "viewport": "(360.0, 800.0)",
+    "walk_tap": [
+      235.800216674805,
+      473.458526611328
+    ],
+    "zoom": 0.869565217391304
+  },
+  "whole": {
+    "actor": [
+      -21.1883563995361,
+      1.0,
+      19.75
+    ],
+    "assembled": true,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "focus": [
+      0.0,
+      6.0,
+      0.0
+    ],
+    "frames": 146,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "nature_batches": 12,
+    "nature_instances": 179,
+    "navigation_ready": true,
+    "pid": 8490,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v1",
+    "running": false,
+    "seq": 1,
+    "viewport": "(360.0, 800.0)",
+    "walk_tap": [
+      62.0505676269531,
+      451.345001220703
+    ],
+    "zoom": 1.0
+  },
+  "gesture_logs": [
+    "Injected 51 events over 1830ms",
+    "Injected 87 events over 3038ms"
+  ],
+  "device": "API 37 software emulator; not physical phone",
+  "limitation": "Owner whitebox controls were not modified. Two earlier symmetric native pinch spans (100-150 and 120-300) left zoom at 1.0; preserve this integration follow-up."
+}

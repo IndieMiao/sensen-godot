@@ -7,7 +7,8 @@ import bpy
 def load_catalog(folder):
     rows = {}
     # Only packs approved and merged by the project leads are registered here.
-    for filename in ['alc_far_manifest.json','props_manifest.json','ferry_gull_manifest.json','garden_manifest.json']:
+    for filename in ['alc_far_manifest.json','props_manifest.json','ferry_gull_manifest.json','garden_manifest.json',
+                     'ruin_details_manifest.json','alc_dock_manifest.json','alc_nature_manifest.json']:
         manifest = folder / filename
         if not manifest.exists():continue
         catalog = json.loads(manifest.read_text())
@@ -15,6 +16,8 @@ def load_catalog(folder):
             row = dict(original)
             row.setdefault('file',name+'.glb')
             row.setdefault('author',catalog['author'])
+            if 'source' not in row:
+                row['source']=catalog.get('source','tools/art/source/alcatraz_dock_424/alcatraz_dock.blend')
             rows[name]=row
     for name, row in rows.items():
         data = (folder / row['file']).read_bytes()

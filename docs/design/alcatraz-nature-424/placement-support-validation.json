@@ -1,0 +1,412 @@
+{
+  "passed": true,
+  "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "terrain_bytes_unchanged": [
+    {
+      "file": "alc_ground_dock.glb",
+      "sha256": "283adaa11ff43efb51f70c2925947823864b3fb3679188b9edd4734da2b2f618"
+    },
+    {
+      "file": "alc_ground_terraces.glb",
+      "sha256": "1c921fd35c41aa95ea4a0577e4511529b64c303667c48aa0afe15f26dc83c45c"
+    },
+    {
+      "file": "alc_ground_summit.glb",
+      "sha256": "a5728cb63af5caf65f8506b2b6741ef2f852c5550e31a1fd9044160f450e056f"
+    }
+  ],
+  "plant_roots_checked": 78,
+  "roots": [
+    {
+      "name": "alc_shrub_000",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_000",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_001",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_001",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_002",
+      "terrain_y": 3.2499999999999996,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_003",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_002",
+      "terrain_y": 3.2499999999999996,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_004",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_005",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_003",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_006",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_007",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_004",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_008",
+      "terrain_y": 3.2500000000000004,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_009",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_005",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_010",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_011",
+      "terrain_y": 3.25,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_006",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_012",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_013",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_007",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_014",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_015",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_008",
+      "terrain_y": 5.499999999999999,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_016",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_017",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_009",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_018",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_019",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_010",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_020",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_021",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_011",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_022",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_023",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_012",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_024",
+      "terrain_y": 5.499999999999999,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_025",
+      "terrain_y": 5.5,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_013",
+      "terrain_y": 7.749999999999999,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_026",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_027",
+      "terrain_y": 7.749999999999999,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_014",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_028",
+      "terrain_y": 7.749999999999999,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_029",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_015",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_030",
+      "terrain_y": 7.750000000000001,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_031",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_016",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_032",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_033",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_017",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_034",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_035",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_018",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_036",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_037",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_019",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_038",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_039",
+      "terrain_y": 7.75,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_020",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_040",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_041",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_021",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_042",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_043",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_022",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_044",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_045",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_023",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_046",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_047",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_024",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_048",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_049",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_shrub_025",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.035
+    },
+    {
+      "name": "alc_grass_tuft_050",
+      "terrain_y": 9.999999999999998,
+      "root_embed_m": 0.01
+    },
+    {
+      "name": "alc_grass_tuft_051",
+      "terrain_y": 10.0,
+      "root_embed_m": 0.01
+    }
+  ],
+  "scope": "actual terrain triangles under each plant root; shoreline rocks intentionally intersect island foot, not treated as plants"
+}

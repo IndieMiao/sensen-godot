@@ -8,7 +8,13 @@ GARDEN=['alc_flowers_poppy','alc_flowers_lavender','alc_flowers_daisy','alc_hedg
 REPEATED+=GARDEN
 OWNERS.update({name:'赵云' for name in GARDEN})
 NATURAL=['alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft']
+NATURAL+=['alc_shrub_b']
 REPEATED+=NATURAL
+RUINS=['alc_ruin_arch','alc_ruin_rubble','alc_ruin_vine','alc_ruin_flowers','alc_ruin_plaque']
+DOCK=['alc_dock_bollard','alc_dock_crates','alc_dock_shelter','alc_dock_welcome','alc_dock_planter']
+REPEATED+=RUINS+DOCK
+OWNERS.update({n:'赵云' for n in RUINS})
+OWNERS.update({n:'刘备' for n in DOCK})
 OWNERS.update({name:'刘备' for name in NATURAL})
 OWNERS.update({n:'黄忠' for n in ['alc_lighthouse','alc_lighthouse_far','alc_watertower','alc_watertower_far','alc_museum_far',
  'alc_far_bridge','alc_far_city','alc_far_hills','ferry','ferry_far','gull']})

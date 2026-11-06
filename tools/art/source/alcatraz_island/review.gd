@@ -53,6 +53,16 @@ func _ready() -> void:
 		await get_tree().process_frame
 		if not scene._rig.is_busy():break
 	for i in 4:await get_tree().process_frame
+	if OS.get_environment("ALCATRAZ_TOP_ONLY")=="1":
+		scene.set_process(false)
+		await top_layout_photo()
+		var baseline: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(destination.path_join("verification.json")))
+		baseline.view_metrics["04-top-layout"]=metrics["04-top-layout"]
+		for key in results:
+			if str(key).begins_with("04-top-layout"):baseline[key]=results[key]
+		FileAccess.open(destination.path_join("verification.json"),FileAccess.WRITE).store_string(JSON.stringify(baseline,"\t")+"\n")
+		get_tree().quit(0 if failures.is_empty() else 1)
+		return
 	if OS.get_environment("ALCATRAZ_MOVIE")=="1":
 		await colour_walk_movie()
 		return
@@ -116,14 +126,14 @@ func _ready() -> void:
 	var wrong_owner: Array = []
 	for p in scene.layout.instances:
 		var is_tree: bool = str(p.asset).begins_with("alc_tree_")
-		var is_liu: bool = p.asset in ["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"]
+		var is_liu: bool = p.asset in ["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_shrub_b","alc_grass_tuft"]
 		if not is_tree and not is_liu:continue
 		if is_tree:tree_count+=1
 		nature_counts[p.asset]=int(nature_counts.get(p.asset,0))+1
 		if p.get("owner","") != ("刘备" if is_liu else "赵云"):wrong_owner.append(p.name)
 		var root := AlcatrazIsland._vec(p.position)
 		var nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,root)
-		var clearance := 1.1 if is_tree else .65 if p.asset=="alc_shrub" else .35
+		var clearance := 1.1 if is_tree else .65 if p.asset in ["alc_shrub","alc_shrub_b"] else .35
 		if absf(nearest.y-root.y)<.25 and Vector2(nearest.x-root.x,nearest.z-root.z).length()<clearance:
 			encroaching.append(p.name)
 		if str(p.asset).begins_with("alc_rock_"):continue
@@ -132,11 +142,12 @@ func _ready() -> void:
 		if support.is_empty() or absf(support.position.y-root.y)>.06:unsupported.append(p.name)
 	check("twenty_to_thirty_instanced_trees",tree_count>=20 and tree_count<=30,tree_count)
 	check("nature_owner_handoff",wrong_owner.is_empty(),wrong_owner)
-	check("all_liu_prototypes_placed",["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"].all(func(k):return int(nature_counts.get(k,0))>0),nature_counts)
+	check("all_liu_prototypes_placed",["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_shrub_b","alc_grass_tuft"].all(func(k):return int(nature_counts.get(k,0))>0),nature_counts)
 	check("vegetation_roots_on_terrain",unsupported.is_empty(),unsupported)
 	check("vegetation_navigation_clearance",encroaching.is_empty(),encroaching)
 	check("buildings_and_ferry_have_two_lods",scene.layout.lod_groups.size()==4 and scene.layout.lod_groups.all(func(g):return g.name in ["alc_museum","alc_lighthouse","alc_watertower","ferry"]))
 
+	audit_garden_support()
 	var corners_ok := true
 	for p in [Vector2(0,0),Vector2(359,0),Vector2(0,799),Vector2(359,799)]:
 		var hit = Plane(Vector3.UP,-.15).intersects_ray(scene._camera.project_ray_origin(p),scene._camera.project_ray_normal(p))
@@ -287,17 +298,7 @@ func _ready() -> void:
 	check("zoom_in_limit",scene.camera_pan.zoom<=1.4001,scene.camera_pan.zoom)
 	scene.camera_pan.reset(1.0)
 	scene._update_camera()
-	# Imported geometry is actually shown in a top-down rendered layout.
-	scene._hud.visible = false
-	scene._overview = true
-	scene._set_backdrop_visible(false)
-	viewport.size = Vector2i(1000,1200)
-	scene._camera.size = 74
-	scene._camera.position = Vector3(0,85,0)
-	scene._camera.far = 200
-	scene._camera.rotation_degrees = Vector3(-90,0,0)
-	scene._camera.near = .1
-	await photograph("04-top-layout")
+	await top_layout_photo()
 	scene._overview = true
 	scene._focus = Vector3(0,6,0)
 	scene._update_camera()
@@ -520,3 +521,38 @@ func colour_walk_movie() -> void:
 	FileAccess.open(destination.path_join("movie.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("COLOUR_MOVIE ",report)
 	get_tree().quit(0 if arrived else 1)
+
+func audit_garden_support() -> void:
+	var unsupported: Array = []
+	for p in scene.layout.placements:
+		if p.asset not in ["alc_flowerbed","alc_planter","alc_flowers_poppy","alc_flowers_lavender","alc_flowers_daisy","alc_hedge"]:continue
+		var root := AlcatrazIsland._vec(p.position)
+		var offsets := [Vector3.ZERO]
+		if p.asset=="alc_flowerbed":
+			for x in [-.82,.82]:
+				for z in [-.82,.82]:offsets.append(Vector3(x,0,z))
+		for offset: Vector3 in offsets:
+			var ray := PhysicsRayQueryParameters3D.create(root+offset+Vector3.UP*.06,root+offset-Vector3.UP*.12)
+			var hit := scene.get_world_3d().direct_space_state.intersect_ray(ray)
+			if hit.is_empty():unsupported.append({"name":p.name,"point":str(root+offset)})
+	check("garden_roots_and_flowerbed_corners_supported",unsupported.is_empty(),unsupported)
+	check("three_dense_bands_per_terrace",scene.layout.garden_design.flower_bands.size()==9 and scene.layout.garden_design.flower_bands.all(func(b):return b.clusters>=4 and b.clusters<=6))
+
+func top_layout_photo() -> void:
+	# Imported geometry is actually shown in a top-down rendered layout.
+	scene._hud.visible = false
+	scene._overview = true
+	scene._set_backdrop_visible(false)
+	viewport.size = Vector2i(1000,1200)
+	scene._camera.size = 74
+	scene._camera.position = Vector3(0,85,0)
+	scene._camera.far = 200
+	scene._camera.rotation_degrees = Vector3(-90,0,0)
+	scene._camera.near = .1
+	for node in scene._detail_batches:node.visible=true
+	for node in scene._unshadowed_batches:
+		var transforms: Array = node.get_meta("instance_transforms")
+		for i in transforms.size():node.multimesh.set_instance_transform(i,transforms[i])
+		node.multimesh.visible_instance_count=-1
+		node.visible=true
+	await photograph("04-top-layout")

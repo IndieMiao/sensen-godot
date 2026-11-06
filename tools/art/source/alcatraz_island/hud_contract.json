@@ -49,7 +49,12 @@
     "alc_lighthouse",
     "alc_watertower",
     "ferry",
-    "alc_planter"
+    "alc_planter",
+    "alc_dock_shelter",
+    "alc_dock_welcome",
+    "alc_dock_planter",
+    "alc_ruin_plaque",
+    "alc_ruin_vine"
   ],
   "ferry_upper_structure_only": true,
   "future_props": {

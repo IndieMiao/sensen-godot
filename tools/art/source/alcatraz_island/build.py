@@ -106,10 +106,11 @@ box('roof',(2.3,4.8,0),(15.4,.2,4.9),'roof')
 for z in [-2.27,2.27]:
  for x in range(-4,10,2):box('ferry_window',(x,3.5,z),(1.15,1.3,.04),'glass',.03)
 kit.cylinder('funnel',(6,5.7,0),.6,1.6,'dark',seg=12)
-place('ferry',(-7,0,19),'DockZone',collision=False)
+place('ferry',(-3,0,25),'DockZone',collision=False)
 placeholders.build(kit,box,prism,place)
 placeholders.scatter(place)
 garden_design=integration.gardens(kit,box,place)
+integration.collaborator_points(OUT,HERE,placements,place)
 kit.begin('gull',ao=False)
 kit.ellipsoid('body',(0,.12,0),(.32,.24,.45),'bird',seg=10,rings=6)
 kit.ellipsoid('head',(0,.29,-.18),(.19,.19,.19),'bird',seg=8,rings=6)
@@ -206,7 +207,7 @@ layout={'revision':'B v7 formal colour with approved props, garden and ferry','u
  'camera':{'pitch':43,'yaw':14.5,'width':6.72,'zoom_min':1/3,'zoom_max':1.4,'forward_bias_m':2.8},
  'dimensions_m':{'island':[60,40],'museum':[40,9,10],'lighthouse_height':15,'water_tower_height':12,'ferry_length':25,'bench_length':1.5,'bench_seat_height':.45,'railing_height':1,'lamp_height':3.5,'avatar_nominal_height':1.75},
  'sea_size':512,'nav_connected_cells':len(cells),'clearance_m':.25,
- 'notes':['v7 museum/terrain/dock formal colour; approved #794/#802/#815/#816 installed; nature and museum far proxy pending.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
+ 'notes':['v7 museum/terrain/dock formal colour; approved #794/#802/#815/#816/#820/#821/#801 installed; museum far remains a proxy.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
 authored.replace_preview_modules(kit,OUT,AUTHORED)
 # Public integration contract follows tea_house's camera/spawn/anchors/boundaries fields.
 lod_groups=[]
@@ -243,11 +244,11 @@ layout['rail_repairs']=rail_repairs
 layout['hud_clearance']=json.loads((HERE/'hud_contract.json').read_text())
 layout['far_anchor']=far_anchor
 layout['far_zone']={'node':'FarZone','anchor':far_anchor,'projection':'camera-facing XY cards, fake elevation, depth behind opaque island; local front +Z','render_depth_fractions':{'alc_far_bridge':.94,'alc_far_city':.96,'alc_far_hills':.98}}
-layout['instances']=[{k:p[k] for k in ['name','asset','zone','position','rotation_degrees','scale','basis_columns','slope_rise_m','owner','placeholder'] if k in p} for p in placements if p['multimesh']]
+layout['instances']=[{k:p[k] for k in ['name','asset','zone','position','rotation_degrees','scale','basis_columns','slope_rise_m','owner','placeholder','source_name','support_y_offset_m'] if k in p} for p in placements if p['multimesh']]
 layout['interest_points']=[{'name':p['name'],'asset':p['asset'],'position':p['position'],'zone':p['zone']} for p in placements if p['asset'] in placeholders.REPEATED and p['asset'] not in ['alc_rail_straight','alc_rail_corner','alc_curb']]
-layout['assets']=[{'name':name,'file':name+'.glb','placeholder':name in placeholders.OWNERS and name not in AUTHORED,'owner':placeholders.OWNERS.get(name,'马可波罗'),'pivot':'ground centre; +Z front','cast_shadow':name not in ['alc_curb','alc_lamp','alc_bin','alc_sign','alc_rail_corner','alc_flowerbed','alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft','ferry','gull']+placeholders.GARDEN and not name.startswith('alc_far_') and not name.endswith('_far'),'material':'vertex_color_placeholder' if name in placeholders.OWNERS and name not in AUTHORED else 'vertex_color'} for name in kit.assets]
+layout['assets']=[{'name':name,'file':name+'.glb','placeholder':name in placeholders.OWNERS and name not in AUTHORED,'owner':placeholders.OWNERS.get(name,'马可波罗'),'pivot':'ground centre; +Z front','cast_shadow':name not in ['alc_curb','alc_lamp','alc_bin','alc_sign','alc_rail_corner','alc_flowerbed','alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft','ferry','gull']+placeholders.GARDEN+placeholders.RUINS+placeholders.DOCK+['alc_shrub_b'] and not name.startswith('alc_far_') and not name.endswith('_far'),'material':'vertex_color_placeholder' if name in placeholders.OWNERS and name not in AUTHORED else 'vertex_color'} for name in kit.assets]
 for asset in layout['assets']:
-    if asset['name'] in ['alc_grass_tuft','alc_shrub','alc_flowerbed','alc_bin','alc_rail_corner']+placeholders.GARDEN:
+    if asset['name'] in ['alc_grass_tuft','alc_shrub','alc_flowerbed','alc_bin','alc_rail_corner']+placeholders.GARDEN+placeholders.RUINS+['alc_shrub_b']:
         asset['max_view_width_m']=8.0
 (OUT/'placement_points.json').write_text(json.dumps({'units':'metres','axes':layout['axes'],'instances':layout['instances']},ensure_ascii=False,indent=2)+'\n')
 (OUT/'layout.json').write_text(json.dumps(layout,separators=(',',':'))+'\n')

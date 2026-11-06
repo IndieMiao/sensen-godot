@@ -1,0 +1,749 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "assets": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "alc_ruin_arch: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: low fallen arch fragment, not an upright doorway",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: flat single-layer rubble <=0.15m",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: wall-back plane zero and shallow opaque leaves",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "five distinct UIDs",
+        "passed": true
+      },
+      {
+        "check": "runtime and source manifests agree",
+        "passed": true
+      },
+      {
+        "check": "pinned v6 ruins installation unchanged",
+        "passed": true
+      },
+      {
+        "check": "relative and world coordinates agree",
+        "passed": true
+      },
+      {
+        "check": "13 original-scale noninteractive suggestions",
+        "passed": true
+      },
+      {
+        "check": "vine back planes 20mm in front of original wall faces",
+        "passed": true
+      },
+      {
+        "check": "v6 original remains byte-identical: assets/landmarks/alcatraz_island/layout.json",
+        "passed": true
+      },
+      {
+        "check": "v6 original remains byte-identical: scenes/landmark/alcatraz_island.gd",
+        "passed": true
+      },
+      {
+        "check": "v6 original remains byte-identical: scenes/landmark/alcatraz_island.tscn",
+        "passed": true
+      },
+      {
+        "check": "proposal does not overwrite Marco Polo layout",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "alc_ruin_arch": {
+        "triangles": 144,
+        "bounds": [
+          [
+            -1.2097620964050293,
+            0.0,
+            -0.5508469939231873
+          ],
+          [
+            1.2097620964050293,
+            0.6730994582176208,
+            0.5508469939231873
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "4a7ed72271e61c6dac6bd8fb093e9d1a5896843aff3a89ed1dfdc26372720352",
+        "uid": "uid://bx5344ecgcfc5"
+      },
+      "alc_ruin_rubble": {
+        "triangles": 112,
+        "bounds": [
+          [
+            -0.7700490355491638,
+            0.0,
+            -0.5338108539581299
+          ],
+          [
+            0.7700490355491638,
+            0.11999999731779099,
+            0.5338108539581299
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "e90c9554a244aa251598176b2e7c57bf8e631ca9fe8e71ec5209860fe475e213",
+        "uid": "uid://bi4c70ebkm1jb"
+      },
+      "alc_ruin_vine": {
+        "triangles": 312,
+        "bounds": [
+          [
+            -0.33701056241989136,
+            0.0,
+            -4.190951585769653e-09
+          ],
+          [
+            0.33701053261756897,
+            1.6528363227844238,
+            0.054794274270534515
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "6962d21aa19d89dafacad7b43b483c158bd57991ba515169a77f9c0666b4f156",
+        "uid": "uid://cwpowg7075v44"
+      },
+      "alc_ruin_flowers": {
+        "triangles": 350,
+        "bounds": [
+          [
+            -0.3371356725692749,
+            -1.4901161193847656e-08,
+            -0.31610503792762756
+          ],
+          [
+            0.3371357321739197,
+            0.4961167275905609,
+            0.31610509753227234
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "3273f98fecc89779539ae3d6a24a258bfe87a74fb358e4fefba76117c9d6e99b",
+        "uid": "uid://cj4hkm1t0fxvr"
+      },
+      "alc_ruin_plaque": {
+        "triangles": 104,
+        "bounds": [
+          [
+            -0.3499999940395355,
+            0.0,
+            -0.15103866159915924
+          ],
+          [
+            0.3499999940395355,
+            0.9110094308853149,
+            0.15103866159915924
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "c547f6d0c844168ea9644798c925c0fb5586b871ee7b387b4ce91ea7576cd6b2",
+        "uid": "uid://dkxm5vu6q2l3w"
+      }
+    },
+    "unique_triangles": 1022,
+    "instances": 13,
+    "placed_triangles": 3270
+  },
+  "godot": {
+    "assets": {
+      "alc_ruin_arch": {
+        "sha256": "4a7ed72271e61c6dac6bd8fb093e9d1a5896843aff3a89ed1dfdc26372720352",
+        "surfaces": 1,
+        "triangles": 144,
+        "uid": "uid://bx5344ecgcfc5"
+      },
+      "alc_ruin_flowers": {
+        "sha256": "3273f98fecc89779539ae3d6a24a258bfe87a74fb358e4fefba76117c9d6e99b",
+        "surfaces": 1,
+        "triangles": 350,
+        "uid": "uid://cj4hkm1t0fxvr"
+      },
+      "alc_ruin_plaque": {
+        "sha256": "c547f6d0c844168ea9644798c925c0fb5586b871ee7b387b4ce91ea7576cd6b2",
+        "surfaces": 1,
+        "triangles": 104,
+        "uid": "uid://dkxm5vu6q2l3w"
+      },
+      "alc_ruin_rubble": {
+        "sha256": "e90c9554a244aa251598176b2e7c57bf8e631ca9fe8e71ec5209860fe475e213",
+        "surfaces": 1,
+        "triangles": 112,
+        "uid": "uid://bi4c70ebkm1jb"
+      },
+      "alc_ruin_vine": {
+        "sha256": "6962d21aa19d89dafacad7b43b483c158bd57991ba515169a77f9c0666b4f156",
+        "surfaces": 1,
+        "triangles": 312,
+        "uid": "uid://cwpowg7075v44"
+      }
+    },
+    "avatar_label_at": "(1309.661, 690.6716)",
+    "captures": [
+      {
+        "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (15.40568, 34.14277, 36.13566)]",
+        "name": "native_route_43",
+        "player": "(8.0, 3.25, 7.5)",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.819152, 0.0, 0.573576), Y: (0.391178, 0.731354, -0.55866), Z: (-0.419487, 0.681998, 0.59909), O: (0.620508, 32.17994, 28.86359)]",
+        "name": "ruins_area_43",
+        "player": "(8.0, 3.25, 7.5)",
+        "size": [
+          1500,
+          1050
+        ],
+        "width_m": 15.0
+      },
+      {
+        "camera": "[X: (0.819152, 0.0, 0.573576), Y: (0.391178, 0.731354, -0.55866), Z: (-0.419487, 0.681998, 0.59909), O: (-0.179491, 31.47993, 29.61359)]",
+        "name": "ruins_details_close",
+        "player": "(8.0, 3.25, 7.5)",
+        "size": [
+          1200,
+          900
+        ],
+        "width_m": 7.19999980926514
+      },
+      {
+        "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (7.324652, 27.87994, 66.32233)]",
+        "name": "five_details_avatar",
+        "player": "(4.6, 0.0, 38.0)",
+        "size": [
+          1500,
+          950
+        ],
+        "width_m": 11.5
+      }
+    ],
+    "checks": [
+      {
+        "check": "v6 navigation and game avatar ready",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: current mesh one surface / <=400 triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: imported AABB matches",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: cache source hash current",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_arch: Godot UID/import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: current mesh one surface / <=400 triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: imported AABB matches",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: cache source hash current",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_rubble: Godot UID/import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: current mesh one surface / <=400 triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: imported AABB matches",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: cache source hash current",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_vine: Godot UID/import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: current mesh one surface / <=400 triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: imported AABB matches",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: cache source hash current",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_flowers: Godot UID/import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: current mesh one surface / <=400 triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: imported AABB matches",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: cache source hash current",
+        "passed": true
+      },
+      {
+        "check": "alc_ruin_plaque: Godot UID/import contract",
+        "passed": true
+      },
+      {
+        "check": "five MultiMesh batches",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (-22.0, 1.0, 12.0)",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (-22.0, 3.25, 7.5)",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (8.0, 3.25, 7.5)",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (8.0, 5.5, 3.0)",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (-22.0, 5.5, 3.0)",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (-22.0, 7.75, -1.5)",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (8.0, 7.75, -1.5)",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (8.0, 10.0, -6.0)",
+        "passed": true
+      },
+      {
+        "check": "unchanged route reaches (0.0, 10.0, -6.0)",
+        "passed": true
+      },
+      {
+        "check": "new high details clear native action/quickbar masks",
+        "passed": true
+      },
+      {
+        "check": "saved native_route_43",
+        "passed": true
+      },
+      {
+        "check": "saved ruins_area_43",
+        "passed": true
+      },
+      {
+        "check": "saved ruins_details_close",
+        "passed": true
+      },
+      {
+        "check": "saved five_details_avatar",
+        "passed": true
+      },
+      {
+        "check": "Mobile renderer",
+        "passed": true
+      }
+    ],
+    "gallery": [
+      {
+        "asset": "alc_ruin_arch",
+        "label_at": "(217.12, 516.3492)"
+      },
+      {
+        "asset": "alc_ruin_rubble",
+        "label_at": "(503.8632, 612.8655)"
+      },
+      {
+        "asset": "alc_ruin_vine",
+        "label_at": "(766.4386, 613.2361)"
+      },
+      {
+        "asset": "alc_ruin_flowers",
+        "label_at": "(939.5297, 689.7068)"
+      },
+      {
+        "asset": "alc_ruin_plaque",
+        "label_at": "(1126.337, 676.7138)"
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "route_ui_samples": 495,
+    "ui_conflicts": []
+  },
+  "stage": {
+    "blockout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+    "unchanged_files": {
+      "assets/landmarks/alcatraz_island/layout.json": "2633e8990acd7a428ff5ec0033bc124329ed239aea97a9e01b8bb477f51269e9",
+      "scenes/landmark/alcatraz_island.gd": "576629ffdc79da8e515974c991f55955843169d62632585aec35fc63f8e97ca3",
+      "scenes/landmark/alcatraz_island.tscn": "68c859099f2254dd2f83357127178159f8fa9835bc539e726876e4b458f580f5"
+    },
+    "note": "v6 original structure/old-prop placeholders retained. Only ruin_details meshes are new; new placements come from an isolated review script, not production layout edits."
+  },
+  "source_blend_sha256": "bec7ecaf78e9a689fdb5db0d129f998da525991ece4f2cf5d2b54e3a1f887dfd",
+  "placements_sha256": "88f481932b08566d0f2f8d3521e463eae464420e6be7f4a809737ebd75017f15",
+  "images": [
+    {
+      "name": "SGODOT-424_ALC_RUINS_v1_five_details_avatar.png",
+      "path": "docs/design/alcatraz-ruins-424-2026-11-06/SGODOT-424_ALC_RUINS_v1_five_details_avatar.png",
+      "sha256": "89e1fa6b88f1d86119f30e4f5911d77ad53142505790d7eef8d33f0c8fe35c57",
+      "bytes": 224285,
+      "mime": "image/png",
+      "size": [
+        1500,
+        1080
+      ]
+    },
+    {
+      "name": "SGODOT-424_ALC_RUINS_v1_ruins_area_43.png",
+      "path": "docs/design/alcatraz-ruins-424-2026-11-06/SGODOT-424_ALC_RUINS_v1_ruins_area_43.png",
+      "sha256": "f723496a72a7eac45fdb751a6b9964bbca2f7a01e7dca7bcdcea7252bc956d00",
+      "bytes": 968200,
+      "mime": "image/png",
+      "size": [
+        1500,
+        1140
+      ]
+    },
+    {
+      "name": "SGODOT-424_ALC_RUINS_v1_ruins_details_close.png",
+      "path": "docs/design/alcatraz-ruins-424-2026-11-06/SGODOT-424_ALC_RUINS_v1_ruins_details_close.png",
+      "sha256": "6bdb99493304beea2005cd7fc7c064e122c4d5e98c1090dcdfae1e4aad881314",
+      "bytes": 727422,
+      "mime": "image/png",
+      "size": [
+        1200,
+        990
+      ]
+    },
+    {
+      "name": "SGODOT-424_ALC_RUINS_v1_native_route_43.png",
+      "path": "docs/design/alcatraz-ruins-424-2026-11-06/SGODOT-424_ALC_RUINS_v1_native_route_43.png",
+      "sha256": "0b5c5eaf67bb888877b0f36c321e470c048664190c7e28793c8ac6cd52a64f02",
+      "bytes": 192974,
+      "mime": "image/png",
+      "size": [
+        360,
+        902
+      ]
+    }
+  ]
+}

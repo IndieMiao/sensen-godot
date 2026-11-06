@@ -1,277 +1,66 @@
 {
-  "state": "planning only; no pending collaborator meshes replaced",
-  "scene_placement_baseline": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
-  "props_802": {
-    "head": "f8577ade87c586c2b7c97b842d3e973a6c464b59",
-    "gate": "Wait for Shangguan Waner acceptance/notification before replacing the ten pieces.",
-    "review_comment": "1d83c6b0-2313-4bf8-aab8-2d5db8c558cd",
-    "reports_layout_baseline": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
-    "required_checks": [
-      "Remap the ten reported 0.125m rail transitions to the current 206-segment layout; align Y/basis endpoints rather than lengthening entire meshes.",
-      "Recheck all eleven flowerbeds, not only four names in the old report; final collider is 1.7 x 0.66 x 1.7m.",
-      "Dock sign is now at (-23.8,1,11), so the old sign-in-planter overlap has been removed; still check final bed footprint and navigation.",
-      "Recheck four rail corner orientations against actual connected edges.",
-      "Recheck normal camera, future crown bounds, primary-area clearance and render budgets."
-    ],
-    "flowerbed_proposals": [
-      {
-        "current_name": "alc_flowerbed_000",
-        "current_position": [
-          -21,
-          3.25,
-          5.4
-        ],
-        "proposed_position_after_802_acceptance": [
-          -21,
-          3.25,
-          5.0
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_001",
-        "current_position": [
-          -9,
-          3.25,
-          5.4
-        ],
-        "proposed_position_after_802_acceptance": [
-          -9,
-          3.25,
-          5.0
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_002",
-        "current_position": [
-          -15,
-          5.5,
-          0.8999999999999999
-        ],
-        "proposed_position_after_802_acceptance": [
-          -15,
-          5.5,
-          0.4999999999999999
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_003",
-        "current_position": [
-          -9,
-          5.5,
-          0.8999999999999999
-        ],
-        "proposed_position_after_802_acceptance": [
-          -9,
-          5.5,
-          0.4999999999999999
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_004",
-        "current_position": [
-          7,
-          5.5,
-          0.8999999999999999
-        ],
-        "proposed_position_after_802_acceptance": [
-          7,
-          5.5,
-          0.4999999999999999
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_005",
-        "current_position": [
-          -21,
-          7.75,
-          -3.6
-        ],
-        "proposed_position_after_802_acceptance": [
-          -21,
-          7.75,
-          -4.0
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_006",
-        "current_position": [
-          -9,
-          7.75,
-          -3.6
-        ],
-        "proposed_position_after_802_acceptance": [
-          -9,
-          7.75,
-          -4.0
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_007",
-        "current_position": [
-          -18.7,
-          1,
-          10.3
-        ],
-        "proposed_position_after_802_acceptance": [
-          -18.7,
-          1,
-          9.450000000000001
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_008",
-        "current_position": [
-          -24,
-          10,
-          -5.05
-        ],
-        "proposed_position_after_802_acceptance": [
-          -24,
-          10,
-          -5.55
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_009",
-        "current_position": [
-          -6,
-          10,
-          -5.05
-        ],
-        "proposed_position_after_802_acceptance": [
-          -6,
-          10,
-          -5.55
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      },
-      {
-        "current_name": "alc_flowerbed_010",
-        "current_position": [
-          12,
-          10,
-          -5.05
-        ],
-        "proposed_position_after_802_acceptance": [
-          12,
-          10,
-          -5.55
-        ],
-        "reason": "Keep the 1.7m final footprint supported and clear of rails/path; validate actual GLB before applying."
-      }
-    ],
-    "source_integration_notes": {
-      "author": "赵云",
-      "layout_reference": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
-      "units": "metres; Godot Y up, front +Z",
-      "runtime_folder": "assets/landmarks/alcatraz_island/",
-      "owner_boundary": "赵云只交十种重复件；白模 layout / placements / instances / 场景 / 导航继续由马可波罗维护。",
-      "axis_contract": {
-        "alc_rail_straight": "local X -1..+1, Y 0..1; 2 m standard length, local Z width .18",
-        "alc_curb": "local X -1..+1, Y 0...25; same end planes as rail; local Z width .18",
-        "alc_rail_corner": "corner post foot is origin; arms terminate at local +X=.50 and +Z=.50; do not centre its bounding box",
-        "alc_bench": "width X=1.50, front +Z, seat surface Y=.45; installation centre at ground",
-        "alc_tree_a": "root foot at XZ 0; canopy intentionally swept toward local +X; do not re-centre by canopy bounds",
-        "alc_tree_b": "root foot at XZ 0; round canopy centred over trunk"
-      },
-      "instance_transform": "Use basis_columns whenever present (20 sloped rail + 20 curb placements); it shears X along slope, keeps local +Y vertical. Otherwise use normal yaw and scale. instances and placements duplicate the same repeated pieces: use one table only.",
-      "size_updates_from_current_dispatch": {
-        "alc_curb": {
-          "placeholder_height": 0.16,
-          "final_height": 0.25
-        },
-        "alc_tree_a": {
-          "placeholder_height": 3.4,
-          "final_height": 6.424321,
-          "root_radius": 0.24
-        },
-        "alc_tree_b": {
-          "placeholder_height": 4.0,
-          "final_height": 6.275,
-          "root_radius": 0.22
-        },
-        "alc_flowerbed": {
-          "placeholder_footprint": [
-            1.4,
-            0.7
-          ],
-          "final_footprint": [
-            1.7,
-            1.7
-          ],
-          "collision_box_size": [
-            1.7,
-            0.66,
-            1.7
-          ],
-          "collision_box_at": [
-            0,
-            0.33,
-            0
-          ]
-        },
-        "alc_bin": {
-          "final_size": [
-            0.47,
-            0.8,
-            0.47
-          ]
-        },
-        "alc_sign": {
-          "final_height": 1.5,
-          "interaction": "none; blank panel, no floating badge, outline or prompt"
-        }
-      },
-      "placement_checks_required_by_scene_owner": [
-        "原 204 段栏杆/石沿标准长度正确；179 对端点完全重合。10 处平/斜过渡存在原始 layout 的 0.125m 高差，列表见 seam-audit.json。不要通过把全模型拉长来补这类Y高差。",
-        "花坛由 1.4x0.7 改成 1.7x1.7；靠栏原点会使边缘伸入栏杆。请同步碰撞、导航障碍并将相应摆位向花园侧收，具体建议见 placement-review.json。",
-        "树增高到真实5-7m，根部原点不变；树冠为不对称风吹冠或圆冠，增加至20-30棵后重查可玩镜头遮挡与总预算。",
-        "原4个转角全部 yaw=0，此包保持约定的+X/+Z臂；装配方需按实际路口决定旋转，不能从名字猜方向。",
-        "交付默认开场图使用34df9c0b原layout，未悄悄移动主体或替代场景方的导航验收。"
-      ],
-      "collision_policy": "GLB无碰撞。现有场景集中建碰撞，程序应按最终尺寸更新，仅干体阻挡，树冠不建整盒。",
-      "material": {
-        "vertex_color_is_srgb": false,
-        "roughness": 0.9,
-        "metallic": 0,
-        "specular": 0.18
-      },
-      "surface_policy": "one mesh / one surface each; suitable for MultiMesh by asset and zone, keep original shadow policy"
-    }
-  },
-  "other_pending_groups": [
+  "state": "approved packs installed; full assembly reviewed separately",
+  "integrated_base": "6d06c9b0",
+  "accepted_packs": [
     {
-      "pr": 815,
-      "head": "996528d3a273d773e1e2168361ac79a1da9f15c4",
-      "owner": "黄忠",
-      "assets": [
-        "ferry",
-        "ferry_far",
-        "gull"
-      ],
-      "note": "Preserve waterline pivot, current placement, existing UID and material import script; initial gulls remain static/noninteractive."
+      "pr": 794,
+      "head": "ec1e0bb4"
     },
     {
-      "pr": 801,
-      "head": "07326180a86324b3d5835fe65048d0f94ae589db",
-      "owner": "刘备",
-      "note": "Use v2 one-to-one replacement of 114 points, not the old 179-point suggestion. Includes shrub variant and rock_c_003 westward clearance."
+      "pr": 802,
+      "head": "f8577ade"
+    },
+    {
+      "pr": 815,
+      "head": "996528d3"
     },
     {
       "pr": 816,
-      "head": "100cc17f9bfc14791932d29f4a058126df055e1e",
-      "owner": "赵云",
-      "note": "Garden flower/hedge package received as a proposal; await acceptance, then validate the 15 look points against current ground and total budget."
+      "head": "100cc17f"
+    },
+    {
+      "pr": 820,
+      "head": "6499f259"
+    },
+    {
+      "pr": 821,
+      "head": "cc59ef9f"
+    },
+    {
+      "pr": 801,
+      "head": "af319757"
     }
   ],
-  "museum_far": "Temporary matching colour proxy only. Send the new museum near mesh to Huang Zhong after this colour pass is pushed."
+  "layout_fixes": {
+    "rail_transitions": 10,
+    "single_post_corner_connectors": 10,
+    "flowerbeds_repositioned": 11,
+    "nature_replacements": 114,
+    "trees": 26,
+    "garden_bands": 9,
+    "clusters_per_band": 6,
+    "continuous_hedges": 3,
+    "corner_decision": "east low paired flowers, west paired terracotta planters",
+    "ferry_clearance_position": [
+      -3,
+      0,
+      25
+    ]
+  },
+  "pending": [
+    {
+      "asset": "alc_museum_far",
+      "owner": "黄忠",
+      "status": "formal 2417-triangle far mesh received, awaiting technical/visual acceptance before replacement",
+      "pr": 819,
+      "head": "7738a2e78e103de547e6946498a3d05a6ae7fe21"
+    },
+    {
+      "asset": "gull / ferry motion",
+      "owner": "黄忠",
+      "status": "motion pack received, awaiting technical/visual acceptance; this assembly remains static",
+      "pr": 823,
+      "head": "4aac9b05f6ed3fbf72128da4a9427028c1e36ae9"
+    }
+  ]
 }

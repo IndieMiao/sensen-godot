@@ -19,26 +19,6 @@
       "triangles": 343,
       "bytes": 25756
     },
-    "alc_rock_a": {
-      "triangles": 12,
-      "bytes": 2328
-    },
-    "alc_rock_b": {
-      "triangles": 12,
-      "bytes": 2300
-    },
-    "alc_rock_c": {
-      "triangles": 12,
-      "bytes": 2316
-    },
-    "alc_shrub": {
-      "triangles": 12,
-      "bytes": 2300
-    },
-    "alc_grass_tuft": {
-      "triangles": 12,
-      "bytes": 2312
-    },
     "alc_ground_dock": {
       "triangles": 380,
       "bytes": 37808
@@ -225,6 +205,118 @@
       "author": "\u8d75\u4e91",
       "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
       "sha256": "3e6a7cd17fbc2a0e81871791ffeb6603df3749f1a336342e7176cfc29489f367"
+    },
+    "alc_ruin_arch": {
+      "triangles": 144,
+      "bytes": 9516,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "4a7ed72271e61c6dac6bd8fb093e9d1a5896843aff3a89ed1dfdc26372720352"
+    },
+    "alc_ruin_rubble": {
+      "triangles": 112,
+      "bytes": 9688,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "e90c9554a244aa251598176b2e7c57bf8e631ca9fe8e71ec5209860fe475e213"
+    },
+    "alc_ruin_vine": {
+      "triangles": 312,
+      "bytes": 10820,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "6962d21aa19d89dafacad7b43b483c158bd57991ba515169a77f9c0666b4f156"
+    },
+    "alc_ruin_flowers": {
+      "triangles": 350,
+      "bytes": 13340,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "3273f98fecc89779539ae3d6a24a258bfe87a74fb358e4fefba76117c9d6e99b"
+    },
+    "alc_ruin_plaque": {
+      "triangles": 104,
+      "bytes": 9716,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "c547f6d0c844168ea9644798c925c0fb5586b871ee7b387b4ce91ea7576cd6b2"
+    },
+    "alc_dock_bollard": {
+      "triangles": 248,
+      "bytes": 7172,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "9ae6bc4ab0c004fd953d303210b843b02cc8871c3b4e356ae4732d3888168413"
+    },
+    "alc_dock_crates": {
+      "triangles": 312,
+      "bytes": 13440,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "237ff30b687aae44216ac4ceaac3806b8bc9c3765c52333fb7dfcfcc0b3e63b1"
+    },
+    "alc_dock_shelter": {
+      "triangles": 384,
+      "bytes": 27412,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "6a5c68b71f5945d3e6d01a49471ad02a2733ed6199c88d4a8ab386fb0bc9f5eb"
+    },
+    "alc_dock_welcome": {
+      "triangles": 80,
+      "bytes": 6672,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "46d76ed063494f0526ef5304ca8660e415aa8e8113cdf37497658c2d586f9f08"
+    },
+    "alc_dock_planter": {
+      "triangles": 358,
+      "bytes": 20956,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "825c0cc23448e660f6742082903094adc9cf151717aaecc736967997c1ac1150"
+    },
+    "alc_rock_a": {
+      "triangles": 196,
+      "bytes": 21308,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "690c268413ddd2faca95b589c9c9401fa6c1a31bbea61f4ac01eee57744c2d99"
+    },
+    "alc_rock_b": {
+      "triangles": 196,
+      "bytes": 21304,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "af44d6dba6fa31ba76fad57817f22c7c79499bd548c18263e6f91954d9905e4d"
+    },
+    "alc_rock_c": {
+      "triangles": 196,
+      "bytes": 21304,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "6f14e38b10de8e6fc2fcef681b5c50c6efdc7043921e58a2b2cbca6734f5e919"
+    },
+    "alc_shrub": {
+      "triangles": 140,
+      "bytes": 15588,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "7a9cf43c6b0660ef42e26ee2418889c5d0c455f968722325b9cd3ccf2c0c6674"
+    },
+    "alc_shrub_b": {
+      "triangles": 180,
+      "bytes": 19676,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "cfda3d96859135b943bca7a354f9b040a4dcb8be85f9ca5f85a1406cbad4cc78"
+    },
+    "alc_grass_tuft": {
+      "triangles": 60,
+      "bytes": 7444,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "50822f15cfb8ad3b3be39143e89d9a35d63e32350888c03c15c780f8e8c933d4"
     }
   }
 }
