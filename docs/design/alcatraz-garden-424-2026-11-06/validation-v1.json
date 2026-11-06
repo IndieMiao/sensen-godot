@@ -1,0 +1,981 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "assets": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "alc_flowers_poppy: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: exactly 1m on X",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: identical end profiles for gapless MultiMesh runs",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: single mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: no textures, skeletons or animations",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: vertex-painted only",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: normals match winding",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: exported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: measured AABB matches spec",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: local bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: no baked world position or scale",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: matte material",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: bounded vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: Godot UID / import contract",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: source manifest matches final export",
+        "passed": true
+      },
+      {
+        "check": "five distinct UIDs",
+        "passed": true
+      },
+      {
+        "check": "runtime and source manifests agree",
+        "passed": true
+      },
+      {
+        "check": "15 proposed look-points all have flowers/hedge",
+        "passed": true
+      },
+      {
+        "check": "terrace 1: station gaps at most 6.5m",
+        "passed": true
+      },
+      {
+        "check": "terrace 2: station gaps at most 6.5m",
+        "passed": true
+      },
+      {
+        "check": "terrace 3: station gaps at most 6.5m",
+        "passed": true
+      },
+      {
+        "check": "proposal uses only this kit, at original scale, without new collision",
+        "passed": true
+      },
+      {
+        "check": "flower/hedge footprints remain outside the paved path",
+        "passed": true
+      },
+      {
+        "check": "v6 original remains byte-identical: assets/landmarks/alcatraz_island/layout.json",
+        "passed": true
+      },
+      {
+        "check": "v6 original remains byte-identical: scenes/landmark/alcatraz_island.gd",
+        "passed": true
+      },
+      {
+        "check": "v6 original remains byte-identical: scenes/landmark/alcatraz_island.tscn",
+        "passed": true
+      },
+      {
+        "check": "proposal does not overwrite Marco Polo layout",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "alc_flowers_poppy": {
+        "triangles": 244,
+        "bounds": [
+          [
+            -0.37335503101348877,
+            -2.9802322387695312e-08,
+            -0.3462647497653961
+          ],
+          [
+            0.37335506081581116,
+            0.6963702440261841,
+            0.34626471996307373
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "aa3cbc1723f6795b327fd7141ae659a7c5c85b39ff66bef09fd017505140ee31",
+        "uid": "uid://b1wxbfb7mv6qy"
+      },
+      "alc_flowers_lavender": {
+        "triangles": 240,
+        "bounds": [
+          [
+            -0.23799999058246613,
+            0.0,
+            -0.19299998879432678
+          ],
+          [
+            0.23800000548362732,
+            0.7705932855606079,
+            0.19300000369548798
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "7df4094843f78c10af66b02f9aee55d03a35887308affb12f54c3c6f2c9cc110",
+        "uid": "uid://cfwn3cfs8disu"
+      },
+      "alc_flowers_daisy": {
+        "triangles": 228,
+        "bounds": [
+          [
+            -0.30275535583496094,
+            1.4901161193847656e-08,
+            -0.2829923629760742
+          ],
+          [
+            0.3027553856372833,
+            0.4917067885398865,
+            0.2829923629760742
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "2cd433bd6fb7591bca11a27509b8db292ce5684bf356252d551af9e681369d25",
+        "uid": "uid://dh6wbmvqtcv57"
+      },
+      "alc_hedge": {
+        "triangles": 66,
+        "bounds": [
+          [
+            -0.5,
+            0.0,
+            -0.2800000011920929
+          ],
+          [
+            0.5,
+            0.6650000214576721,
+            0.2800000011920929
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "2feb90cdd76a5bad7d3db66e55cc4753bbc87171ce515d0ffead80b891643ed2",
+        "uid": "uid://bg1l2wmat8rcw"
+      },
+      "alc_planter": {
+        "triangles": 194,
+        "bounds": [
+          [
+            -0.3400000035762787,
+            0.0,
+            -0.3400000035762787
+          ],
+          [
+            0.3400000035762787,
+            1.1399999856948853,
+            0.3400000035762787
+          ]
+        ],
+        "surfaces": 1,
+        "sha256": "3e6a7cd17fbc2a0e81871791ffeb6603df3749f1a336342e7176cfc29489f367",
+        "uid": "uid://lux8bepjkurp"
+      }
+    },
+    "unique_triangles": 972,
+    "instances": 64,
+    "placed_triangles": 11766,
+    "group_count": 15
+  },
+  "godot": {
+    "added_batches": 6,
+    "added_instances": 64,
+    "assets": {
+      "alc_flowers_daisy": {
+        "sha256": "2cd433bd6fb7591bca11a27509b8db292ce5684bf356252d551af9e681369d25",
+        "surfaces": 1,
+        "triangles": 228,
+        "uid": "uid://dh6wbmvqtcv57"
+      },
+      "alc_flowers_lavender": {
+        "sha256": "7df4094843f78c10af66b02f9aee55d03a35887308affb12f54c3c6f2c9cc110",
+        "surfaces": 1,
+        "triangles": 240,
+        "uid": "uid://cfwn3cfs8disu"
+      },
+      "alc_flowers_poppy": {
+        "sha256": "aa3cbc1723f6795b327fd7141ae659a7c5c85b39ff66bef09fd017505140ee31",
+        "surfaces": 1,
+        "triangles": 244,
+        "uid": "uid://b1wxbfb7mv6qy"
+      },
+      "alc_hedge": {
+        "sha256": "2feb90cdd76a5bad7d3db66e55cc4753bbc87171ce515d0ffead80b891643ed2",
+        "surfaces": 1,
+        "triangles": 66,
+        "uid": "uid://bg1l2wmat8rcw"
+      },
+      "alc_planter": {
+        "sha256": "3e6a7cd17fbc2a0e81871791ffeb6603df3749f1a336342e7176cfc29489f367",
+        "surfaces": 1,
+        "triangles": 194,
+        "uid": "uid://lux8bepjkurp"
+      }
+    },
+    "avatar_label_at": "(1295.867, 679.6558)",
+    "captures": [
+      {
+        "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+        "name": "opening_43",
+        "player": "(-22.0, 1.0, 19.0)",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-4.594317, 34.14277, 36.13566)]",
+        "name": "terrace_1_43",
+        "player": "(-12.0, 3.25, 7.5)",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (1.30156, 34.14277, 29.29968)]",
+        "name": "terrace_2_43",
+        "player": "(-5.5, 5.5, 3.0)",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (7.197436, 34.14277, 22.46371)]",
+        "name": "terrace_3_43",
+        "player": "(1.0, 7.75, -1.5)",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.902561, 49.3299, 47.02379)]",
+        "name": "terraces_overview",
+        "player": "(1.0, 7.75, -1.5)",
+        "size": [
+          1200,
+          1400
+        ],
+        "width_m": 56.0
+      },
+      {
+        "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (6.409071, 24.36995, 62.78204)]",
+        "name": "five_props_avatar",
+        "player": "(3.1, 0.0, 38.0)",
+        "size": [
+          1500,
+          850
+        ],
+        "width_m": 7.80000019073486
+      }
+    ],
+    "checks": [
+      {
+        "check": "v6 navigation and actual game avatar ready",
+        "passed": true
+      },
+      {
+        "check": "native default 43deg / 6.72m",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: imported one surface / correct triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: current AABB",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: imported cache matches current source",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_poppy: Godot UID and texture map mode",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: imported one surface / correct triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: current AABB",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: imported cache matches current source",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_lavender: Godot UID and texture map mode",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: imported one surface / correct triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: current AABB",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: imported cache matches current source",
+        "passed": true
+      },
+      {
+        "check": "alc_flowers_daisy: Godot UID and texture map mode",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: imported one surface / correct triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: current AABB",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: imported cache matches current source",
+        "passed": true
+      },
+      {
+        "check": "alc_hedge: Godot UID and texture map mode",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: imported one surface / correct triangle budget",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: current AABB",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: imported cache matches current source",
+        "passed": true
+      },
+      {
+        "check": "alc_planter: Godot UID and texture map mode",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_1_focus_1",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_1_focus_2",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_1_focus_3",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_1_focus_4",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_1_focus_5",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_2_focus_1",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_2_focus_2",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_2_focus_3",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_2_focus_4",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_2_focus_5",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_3_focus_1",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_3_focus_2",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_3_focus_3",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_3_focus_4",
+        "passed": true
+      },
+      {
+        "check": "garden colour visible at terrace_3_focus_5",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (-22.0, 1.0, 12.0)",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (-22.0, 3.25, 7.5)",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (8.0, 3.25, 7.5)",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (8.0, 5.5, 3.0)",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (-22.0, 5.5, 3.0)",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (-22.0, 7.75, -1.5)",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (8.0, 7.75, -1.5)",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (8.0, 10.0, -6.0)",
+        "passed": true
+      },
+      {
+        "check": "original route path reaches (0.0, 10.0, -6.0)",
+        "passed": true
+      },
+      {
+        "check": "new planters clear v6 action/quickbar masks along the whole route",
+        "passed": true
+      },
+      {
+        "check": "saved opening_43",
+        "passed": true
+      },
+      {
+        "check": "saved terrace_1_43",
+        "passed": true
+      },
+      {
+        "check": "saved terrace_2_43",
+        "passed": true
+      },
+      {
+        "check": "saved terrace_3_43",
+        "passed": true
+      },
+      {
+        "check": "saved terraces_overview",
+        "passed": true
+      },
+      {
+        "check": "saved five_props_avatar",
+        "passed": true
+      },
+      {
+        "check": "Mobile renderer",
+        "passed": true
+      }
+    ],
+    "focus_views": [
+      {
+        "group": "terrace_1_focus_1",
+        "station": [
+          -18.5,
+          3.25,
+          7.5
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_1_focus_2",
+        "station": [
+          -12.0,
+          3.25,
+          7.5
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_1_focus_3",
+        "station": [
+          -5.5,
+          3.25,
+          7.5
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_1_focus_4",
+        "station": [
+          1.0,
+          3.25,
+          7.5
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_1_focus_5",
+        "station": [
+          5.1,
+          3.25,
+          7.5
+        ],
+        "visible_new_pieces": 2
+      },
+      {
+        "group": "terrace_2_focus_1",
+        "station": [
+          -18.5,
+          5.5,
+          3.0
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_2_focus_2",
+        "station": [
+          -12.0,
+          5.5,
+          3.0
+        ],
+        "visible_new_pieces": 3
+      },
+      {
+        "group": "terrace_2_focus_3",
+        "station": [
+          -5.5,
+          5.5,
+          3.0
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_2_focus_4",
+        "station": [
+          1.0,
+          5.5,
+          3.0
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_2_focus_5",
+        "station": [
+          5.1,
+          5.5,
+          3.0
+        ],
+        "visible_new_pieces": 1
+      },
+      {
+        "group": "terrace_3_focus_1",
+        "station": [
+          -18.5,
+          7.75,
+          -1.5
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_3_focus_2",
+        "station": [
+          -12.0,
+          7.75,
+          -1.5
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_3_focus_3",
+        "station": [
+          -5.5,
+          7.75,
+          -1.5
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_3_focus_4",
+        "station": [
+          1.0,
+          7.75,
+          -1.5
+        ],
+        "visible_new_pieces": 4
+      },
+      {
+        "group": "terrace_3_focus_5",
+        "station": [
+          5.1,
+          7.75,
+          -1.5
+        ],
+        "visible_new_pieces": 2
+      }
+    ],
+    "gallery": [
+      {
+        "asset": "alc_flowers_poppy",
+        "label_at": "(150.8466, 477.7006)"
+      },
+      {
+        "asset": "alc_flowers_lavender",
+        "label_at": "(374.2654, 517.1064)"
+      },
+      {
+        "asset": "alc_flowers_daisy",
+        "label_at": "(597.684, 556.5122)"
+      },
+      {
+        "asset": "alc_hedge",
+        "label_at": "(821.1027, 595.918)"
+      },
+      {
+        "asset": "alc_planter",
+        "label_at": "(1044.521, 635.3239)"
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "route_ui_samples": 495,
+    "ui_conflicts": []
+  },
+  "stage": {
+    "blockout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+    "unchanged_files": {
+      "assets/landmarks/alcatraz_island/layout.json": "2633e8990acd7a428ff5ec0033bc124329ed239aea97a9e01b8bb477f51269e9",
+      "scenes/landmark/alcatraz_island.gd": "576629ffdc79da8e515974c991f55955843169d62632585aec35fc63f8e97ca3",
+      "scenes/landmark/alcatraz_island.tscn": "68c859099f2254dd2f83357127178159f8fa9835bc539e726876e4b458f580f5"
+    },
+    "note": "v6 original structure/old-prop placeholders retained. Only garden meshes are new; new placements come from an isolated review script, not production layout edits."
+  },
+  "source_blend_sha256": "4ef80cfe0eaf694b798055a9f155b5ecf17f130ceca86f1f52933649aed41f17",
+  "placements_sha256": "53ad5341f3ed79157da8e0b27b71c842809eacdbd8fde339a262492fb7a00045",
+  "images": [
+    {
+      "name": "SGODOT-424_ALC_GARDEN_v1_five_props_avatar.png",
+      "path": "docs/design/alcatraz-garden-424-2026-11-06/SGODOT-424_ALC_GARDEN_v1_five_props_avatar.png",
+      "sha256": "cc63f72bb8221dcb752ce5d0207491564eeb1912ef0f7695c441ee675831f999",
+      "bytes": 306997,
+      "mime": "image/png",
+      "size": [
+        1500,
+        980
+      ]
+    },
+    {
+      "name": "SGODOT-424_ALC_GARDEN_v1_three_terraces_43.png",
+      "path": "docs/design/alcatraz-garden-424-2026-11-06/SGODOT-424_ALC_GARDEN_v1_three_terraces_43.png",
+      "sha256": "4429b1ef9c57751de6a070ce5b2e2f40ce24a5e246cce0cd46e7ab1eb0f2ffa5",
+      "bytes": 573457,
+      "mime": "image/png",
+      "size": [
+        1080,
+        914
+      ]
+    },
+    {
+      "name": "SGODOT-424_ALC_GARDEN_v1_terraces_overview.png",
+      "path": "docs/design/alcatraz-garden-424-2026-11-06/SGODOT-424_ALC_GARDEN_v1_terraces_overview.png",
+      "sha256": "268150892d238baa09d086e1de8b71f6376829a9fac48aa0759ddb81faa4c380",
+      "bytes": 520512,
+      "mime": "image/png",
+      "size": [
+        1200,
+        1490
+      ]
+    },
+    {
+      "name": "SGODOT-424_ALC_GARDEN_v1_opening_43.png",
+      "path": "docs/design/alcatraz-garden-424-2026-11-06/SGODOT-424_ALC_GARDEN_v1_opening_43.png",
+      "sha256": "3681b0f2f76daca8aaa4b57567519f7692305ffa0cc9e2a57d5f800e4213582b",
+      "bytes": 104080,
+      "mime": "image/png",
+      "size": [
+        360,
+        878
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+[
+  {
+    "name": "SGODOT-424_ALC_GARDEN_v1_five_props_avatar.png",
+    "path": "docs/design/alcatraz-garden-424-2026-11-06/SGODOT-424_ALC_GARDEN_v1_five_props_avatar.png",
+    "sha256": "cc63f72bb8221dcb752ce5d0207491564eeb1912ef0f7695c441ee675831f999",
+    "bytes": 306997,
+    "mime": "image/png",
+    "size": [
+      1500,
+      980
+    ]
+  },
+  {
+    "name": "SGODOT-424_ALC_GARDEN_v1_three_terraces_43.png",
+    "path": "docs/design/alcatraz-garden-424-2026-11-06/SGODOT-424_ALC_GARDEN_v1_three_terraces_43.png",
+    "sha256": "4429b1ef9c57751de6a070ce5b2e2f40ce24a5e246cce0cd46e7ab1eb0f2ffa5",
+    "bytes": 573457,
+    "mime": "image/png",
+    "size": [
+      1080,
+      914
+    ]
+  },
+  {
+    "name": "SGODOT-424_ALC_GARDEN_v1_terraces_overview.png",
+    "path": "docs/design/alcatraz-garden-424-2026-11-06/SGODOT-424_ALC_GARDEN_v1_terraces_overview.png",
+    "sha256": "268150892d238baa09d086e1de8b71f6376829a9fac48aa0759ddb81faa4c380",
+    "bytes": 520512,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1490
+    ]
+  },
+  {
+    "name": "SGODOT-424_ALC_GARDEN_v1_opening_43.png",
+    "path": "docs/design/alcatraz-garden-424-2026-11-06/SGODOT-424_ALC_GARDEN_v1_opening_43.png",
+    "sha256": "3681b0f2f76daca8aaa4b57567519f7692305ffa0cc9e2a57d5f800e4213582b",
+    "bytes": 104080,
+    "mime": "image/png",
+    "size": [
+      360,
+      878
+    ]
+  }
+]
