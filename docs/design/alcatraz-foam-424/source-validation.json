@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "blender": "5.2.2 LTS",
+  "assets": [
+    {
+      "asset": "alc_foam_strip_a",
+      "editable_parts": [
+        "Soft broken foam ribbon"
+      ],
+      "triangles": 24,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_foam_strip_b",
+      "editable_parts": [
+        "Soft broken foam ribbon.001"
+      ],
+      "triangles": 32,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_foam_strip_c",
+      "editable_parts": [
+        "Soft broken foam ribbon.002"
+      ],
+      "triangles": 24,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_foam_ring",
+      "editable_parts": [
+        "Soft broken foam ribbon.003"
+      ],
+      "triangles": 64,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_buoy",
+      "editable_parts": [
+        "Painted buoy bulb",
+        "Top neck",
+        "Mooring eye"
+      ],
+      "triangles": 184,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_driftwood",
+      "editable_parts": [
+        "Bleached curved branch",
+        "Worn fork 0",
+        "Worn fork 1",
+        "Trailing kelp 0",
+        "Trailing kelp 1",
+        "Trailing kelp 2"
+      ],
+      "triangles": 130,
+      "bounds_match": true
+    }
+  ]
+}
