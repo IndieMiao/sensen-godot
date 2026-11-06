@@ -1,0 +1,433 @@
+{
+	"captures": [
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "opening-before",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 35678,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "opening-zero-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 35678,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "opening-after",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 35678,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (14.80156, 34.14277, 29.29968)]",
+			"name": "mid_hill-before",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 33,
+			"visible_primitives": 50669,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (14.80156, 34.14277, 29.29968)]",
+			"name": "mid_hill-zero-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 33,
+			"visible_primitives": 50669,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (14.80156, 34.14277, 29.29968)]",
+			"name": "mid_hill-after",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 33,
+			"visible_primitives": 50669,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.593312, 34.14277, 15.62773)]",
+			"name": "summit-before",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 27,
+			"visible_primitives": 44363,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.593312, 34.14277, 15.62773)]",
+			"name": "summit-zero-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 27,
+			"visible_primitives": 44363,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.593312, 34.14277, 15.62773)]",
+			"name": "summit-after",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 27,
+			"visible_primitives": 44363,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.850452, 0.0, -0.526053), Y: (-0.278003, 0.848952, -0.449438), Z: (0.446594, 0.528469, 0.721993), O: (60.0, 75.0, 95.0)]",
+			"name": "whole_island-before",
+			"size": [
+				1200,
+				1000
+			],
+			"visible_draw_calls": 34,
+			"visible_primitives": 44240,
+			"width_m": 72.0
+		},
+		{
+			"camera": "[X: (0.850452, 0.0, -0.526053), Y: (-0.278003, 0.848952, -0.449438), Z: (0.446594, 0.528469, 0.721993), O: (60.0, 75.0, 95.0)]",
+			"name": "whole_island-zero-control",
+			"size": [
+				1200,
+				1000
+			],
+			"visible_draw_calls": 34,
+			"visible_primitives": 44240,
+			"width_m": 72.0
+		},
+		{
+			"camera": "[X: (0.850452, 0.0, -0.526053), Y: (-0.278003, 0.848952, -0.449438), Z: (0.446594, 0.528469, 0.721993), O: (60.0, 75.0, 95.0)]",
+			"name": "whole_island-after",
+			"size": [
+				1200,
+				1000
+			],
+			"visible_draw_calls": 34,
+			"visible_primitives": 44240,
+			"width_m": 72.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.571064, -0.820905), Z: (0.0, 0.820905, 0.571064), O: (-12.0, 17.0, 8.0)]",
+			"name": "grass_paving_detail-before",
+			"size": [
+				1100,
+				800
+			],
+			"visible_draw_calls": 6,
+			"visible_primitives": 20164,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.571064, -0.820905), Z: (0.0, 0.820905, 0.571064), O: (-12.0, 17.0, 8.0)]",
+			"name": "grass_paving_detail-zero-control",
+			"size": [
+				1100,
+				800
+			],
+			"visible_draw_calls": 6,
+			"visible_primitives": 20164,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.571064, -0.820905), Z: (0.0, 0.820905, 0.571064), O: (-12.0, 17.0, 8.0)]",
+			"name": "grass_paving_detail-after",
+			"size": [
+				1100,
+				800
+			],
+			"visible_draw_calls": 6,
+			"visible_primitives": 20164,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.536876, -0.843661), Z: (0.0, 0.843661, 0.536876), O: (-22.0, 12.0, 24.0)]",
+			"name": "dock_grain_detail-before",
+			"size": [
+				900,
+				900
+			],
+			"visible_draw_calls": 5,
+			"visible_primitives": 3934,
+			"width_m": 3.59999990463257
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.536876, -0.843661), Z: (0.0, 0.843661, 0.536876), O: (-22.0, 12.0, 24.0)]",
+			"name": "dock_grain_detail-zero-control",
+			"size": [
+				900,
+				900
+			],
+			"visible_draw_calls": 5,
+			"visible_primitives": 3934,
+			"width_m": 3.59999990463257
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.536876, -0.843661), Z: (0.0, 0.843661, 0.536876), O: (-22.0, 12.0, 24.0)]",
+			"name": "dock_grain_detail-after",
+			"size": [
+				900,
+				900
+			],
+			"visible_draw_calls": 5,
+			"visible_primitives": 3934,
+			"width_m": 3.59999990463257
+		}
+	],
+	"checks": [
+		{
+			"check": "full host avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "exactly three terrain meshes and one dock",
+			"passed": true
+		},
+		{
+			"check": "original opening spawn",
+			"passed": true
+		},
+		{
+			"check": "default camera width",
+			"passed": true
+		},
+		{
+			"check": "save opening-before",
+			"passed": true
+		},
+		{
+			"check": "save opening-zero-control",
+			"passed": true
+		},
+		{
+			"check": "opening: original material reproduced at strength zero",
+			"passed": true
+		},
+		{
+			"check": "save opening-after",
+			"passed": true
+		},
+		{
+			"check": "opening: detail visibly applied",
+			"passed": true
+		},
+		{
+			"check": "bridge/city pixels unchanged",
+			"passed": true
+		},
+		{
+			"check": "save mid_hill-before",
+			"passed": true
+		},
+		{
+			"check": "save mid_hill-zero-control",
+			"passed": true
+		},
+		{
+			"check": "mid_hill: original material reproduced at strength zero",
+			"passed": true
+		},
+		{
+			"check": "save mid_hill-after",
+			"passed": true
+		},
+		{
+			"check": "mid_hill: detail visibly applied",
+			"passed": true
+		},
+		{
+			"check": "save summit-before",
+			"passed": true
+		},
+		{
+			"check": "save summit-zero-control",
+			"passed": true
+		},
+		{
+			"check": "summit: original material reproduced at strength zero",
+			"passed": true
+		},
+		{
+			"check": "save summit-after",
+			"passed": true
+		},
+		{
+			"check": "summit: detail visibly applied",
+			"passed": true
+		},
+		{
+			"check": "save whole_island-before",
+			"passed": true
+		},
+		{
+			"check": "save whole_island-zero-control",
+			"passed": true
+		},
+		{
+			"check": "whole_island: original material reproduced at strength zero",
+			"passed": true
+		},
+		{
+			"check": "save whole_island-after",
+			"passed": true
+		},
+		{
+			"check": "whole_island: detail visibly applied",
+			"passed": true
+		},
+		{
+			"check": "save grass_paving_detail-before",
+			"passed": true
+		},
+		{
+			"check": "save grass_paving_detail-zero-control",
+			"passed": true
+		},
+		{
+			"check": "grass_paving_detail: original material reproduced at strength zero",
+			"passed": true
+		},
+		{
+			"check": "save grass_paving_detail-after",
+			"passed": true
+		},
+		{
+			"check": "grass_paving_detail: detail visibly applied",
+			"passed": true
+		},
+		{
+			"check": "save dock_grain_detail-before",
+			"passed": true
+		},
+		{
+			"check": "save dock_grain_detail-zero-control",
+			"passed": true
+		},
+		{
+			"check": "dock_grain_detail: original material reproduced at strength zero",
+			"passed": true
+		},
+		{
+			"check": "save dock_grain_detail-after",
+			"passed": true
+		},
+		{
+			"check": "dock_grain_detail: detail visibly applied",
+			"passed": true
+		},
+		{
+			"check": "static detail at fixed camera / QA clock",
+			"passed": true
+		}
+	],
+	"comparison_clock": "QA Engine.time_scale=0; original host water and all host files unchanged",
+	"controls": {
+		"bridge": {
+			"changed_pixels": 0,
+			"max_rgb_255": 0.0,
+			"mean_max_rgb_255": 0.0
+		},
+		"dock_grain_detail_finish": {
+			"changed_pixels": 489153,
+			"max_rgb_255": 17.9999989271164,
+			"mean_max_rgb_255": 3.65969491529244
+		},
+		"dock_grain_detail_zero": {
+			"changed_pixels": 2,
+			"max_rgb_255": 1.99999988079071,
+			"mean_max_rgb_255": 0.012598764690536
+		},
+		"grass_paving_detail_finish": {
+			"changed_pixels": 431786,
+			"max_rgb_255": 39.9999976158142,
+			"mean_max_rgb_255": 2.81906915062717
+		},
+		"grass_paving_detail_zero": {
+			"changed_pixels": 5,
+			"max_rgb_255": 1.00000753998756,
+			"mean_max_rgb_255": 0.0146363628071479
+		},
+		"legacy_bridge_rectangle": {
+			"changed_pixels": 377,
+			"max_rgb_255": 14.9999991059303,
+			"mean_max_rgb_255": 0.0504830887784129
+		},
+		"mid_hill_finish": {
+			"changed_pixels": 89955,
+			"max_rgb_255": 23.9999985694885,
+			"mean_max_rgb_255": 1.88199299677508
+		},
+		"mid_hill_zero": {
+			"changed_pixels": 12,
+			"max_rgb_255": 1.00000753998756,
+			"mean_max_rgb_255": 0.0101249997131526
+		},
+		"opening_finish": {
+			"changed_pixels": 29802,
+			"max_rgb_255": 22.9999986290932,
+			"mean_max_rgb_255": 0.479628455666825
+		},
+		"opening_zero": {
+			"changed_pixels": 4,
+			"max_rgb_255": 1.99999988079071,
+			"mean_max_rgb_255": 0.0173090267856605
+		},
+		"static": {
+			"changed_pixels": 0,
+			"max_rgb_255": 0.0,
+			"mean_max_rgb_255": 0.0
+		},
+		"summit_finish": {
+			"changed_pixels": 43593,
+			"max_rgb_255": 41.9999974966049,
+			"mean_max_rgb_255": 0.909368003965355
+		},
+		"summit_zero": {
+			"changed_pixels": 0,
+			"max_rgb_255": 0.999999940395355,
+			"mean_max_rgb_255": 0.00486458304338157
+		},
+		"whole_island_finish": {
+			"changed_pixels": 112966,
+			"max_rgb_255": 41.9999974966049,
+			"mean_max_rgb_255": 0.910458283112571
+		},
+		"whole_island_zero": {
+			"changed_pixels": 10,
+			"max_rgb_255": 1.00000753998756,
+			"mean_max_rgb_255": 0.00581499971672893
+		}
+	},
+	"host_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+	"passed": true,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	}
+}
