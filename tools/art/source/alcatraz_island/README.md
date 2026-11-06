@@ -1,7 +1,10 @@
 # SGODOT-424 · 恶魔岛源文件
 
-当前是 v6 右下操作区留白白模；v2 画面已通过。最新图、预算、验证见 [v6 审阅](../../../../docs/design/alcatraz-blockout-424-2026-11-05/v6/README.md)，坐标／原点／分工／时间见 [HANDOFF.md](HANDOFF.md)。正式交件硬线 **11-09 08:00**。
+当前是 v7 正式配色首版（协作模型仍待接件）；v2 画面已通过。最新图、预算、验证见 [v7 审阅](../../../../docs/design/alcatraz-blockout-424-2026-11-05/v7/README.md)，坐标／原点／分工／时间见 [HANDOFF.md](HANDOFF.md)。正式交件硬线 **11-09 08:00**。
 
+- `palette.json`：v2参考下的暖石墙、浅砂路、黄绿花园、蓝绿海湾配色；用于生成器及海面材质参数。
+- `finish.py`：可编辑的拱窗／玻璃入口／博物馆字体、岸壁切面、砌石表面和封闭台阶。
+- `integration_queue.json`：已收到但待验的协作包，以及旧问题表向当前点位的重核清单；未自动换入#802。
 - `build.py`：马可波罗的地形、四段台阶、道路、码头、渡轮、主楼近档，以及导航／layout／分区／LOD 合同。
 - `authored.py`：校验并保留黄忠已合入的七件GLB／UID；从正式文件导入整岛源预览，命名构件源仍在其独立blend中，生成器不会覆盖已验收件。
 - `placeholders.py`：赵云、黄忠和刘备负责件的临时占位及摆位方法；每种一个 GLB，重复件放置表单独生成，斜栏杆支持保持立柱竖直的 basis。
@@ -19,11 +22,11 @@
 ```sh
 flock ~/gs66-render.lock blender --background --factory-startup --threads 3 --python-exit-code 1 --python "$PWD/tools/art/source/alcatraz_island/build.py"
 bash tools/art/source/alcatraz_island/review.sh
-flock ~/gs66-render.lock timeout 220s env ALCATRAZ_SWEEP=1 ALCATRAZ_REVIEW="$PWD/output/alcatraz-424/v6/review" godot --path output/alcatraz-424/project --resolution 360x800 --fixed-fps 60 --disable-vsync --max-fps 60
+flock ~/gs66-render.lock timeout 220s env ALCATRAZ_SWEEP=1 ALCATRAZ_REVIEW="$PWD/output/alcatraz-424/v7/review" godot --path output/alcatraz-424/project --resolution 360x800 --fixed-fps 60 --disable-vsync --max-fps 60
 python3 tools/art/source/alcatraz_island/package_review.py
 ```
 
-先等 Blender 结束再检查。实渲使用当前合法 DISPLAY／XAUTHORITY；共享锁贯穿每次 Godot／Blender 调用。脚本有超时并主动退出。诊断日志、原始图和过程结果在 `output/alcatraz-424/v6/`。截图命令关闭垂直同步并限60帧，避免虚拟桌面的同步等待长期占锁；截图工具使用固定模拟帧步和加速走位，不能把截图间隔当作实际游戏 FPS。
+先等 Blender 结束再检查。实渲使用当前合法 DISPLAY／XAUTHORITY；共享锁贯穿每次 Godot／Blender 调用。脚本有超时并主动退出。诊断日志、原始图和过程结果在 `output/alcatraz-424/v7/`。截图命令关闭垂直同步并限60帧，避免虚拟桌面的同步等待长期占锁；截图工具使用固定模拟帧步和加速走位，不能把截图间隔当作实际游戏 FPS。
 
 需要手动点走时，先运行 `prepare.py` 和隔离导入，再在有效桌面中运行：
 

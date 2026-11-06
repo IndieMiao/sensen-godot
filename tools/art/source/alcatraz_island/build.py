@@ -9,12 +9,13 @@ HERE=Path(__file__).resolve().parent; ROOT=HERE.parents[3]
 sys.path.insert(0,str(ROOT/'tools/art'))
 from landmark_kit import Kit,reset_scene
 sys.path.insert(0,str(HERE))
-import placeholders, authored
+import placeholders, authored, finish
 OUT=ROOT/'assets/landmarks/alcatraz_island'
 AUTHORED=authored.load_catalog(OUT)
+PREVIOUS=json.loads((OUT/'manifest.json').read_text()).get('assets',{}) if (OUT/'manifest.json').exists() else {}
 reset_scene(); random.seed(424)
-kit=Kit(OUT,{'stone':'b5b6b3','garden':'8d9690','road':'e5e3db','building':'dbdcd7',
- 'roof':'acb1b2','glass':'78868a','wood':'b8b3a6','dark':'727d80','bird':'eeede6','bridge':'c76845','far':'b4c2c8'})
+PALETTE=json.loads((HERE/'palette.json').read_text())
+kit=Kit(OUT,PALETTE['colors'])
 placements=[]
 ZONES=['DockZone','TerraceZone','SummitZone']
 def place(asset,pos=(0,0,0),zone='TerraceZone',yaw=0,scale=1,collision=True):
@@ -39,8 +40,13 @@ for zone in ZONES:
  kit.begin('terrain_'+zone,ao=False)
  for i,(z,lo,hi,poly) in enumerate(bands):
   if z!=zone:continue
-  prism('cliff_band_%d'%i,list(reversed(poly)),lo,hi-.15,'stone')
+  finish.cliff(kit,'cliff_band_%d'%i,poly,lo,hi-.15)
   prism('garden_band_%d'%i,list(reversed(poly)),hi-.15,hi,'garden')
+ if zone=='TerraceZone':
+  for row,(height,z) in enumerate([(3.25,4.4),(5.5,-.1),(7.75,-4.6)]):
+   for k,x in enumerate([-18,-11,-4,3,14,22]):finish.garden_patch(kit,'garden_colour_%d_%d'%(row,k),x,height,z,2.2,.75,'garden_light' if (k+row)%3 else 'garden_dark')
+ if zone=='SummitZone':
+  for k,(x,z) in enumerate([(-26,-9.0),(-25,-17.5),(25,-9.0),(25,-18)]):finish.garden_patch(kit,'summit_colour_%d'%k,x,10,z,2.0,.9,'garden_light')
  place('terrain_'+zone,zone=zone)
 # Rectangle surfaces (x0,x1,z0,z1,height,zone). Stair cuts are subtracted before meshing.
 flats=[(-23.5,-20.5,13.5,20,1,'DockZone'),(-24,-18,10.5,14,1,'DockZone'),
@@ -67,40 +73,35 @@ for zone in ZONES:
    if abs(y-hi)<.01:parts=[p for r in parts for p in subtract_rect(r,(a,b,c,d))]
   for a,b,c,d in parts:
    box('paving_%d'%i,((a+b)/2,y-.105,(c+d)/2),(b-a,.25,d-c),'road',.01)
-   if y>1:box('retaining_support_%d'%i,((a+b)/2,(y+max(1,y-2.25))/2-.13,(c+d)/2),(b-a,y-max(1,y-2.25),d-c),'stone',0)
+   if y>1:
+    box('retaining_support_%d'%i,((a+b)/2,(y+max(1,y-2.25))/2-.13,(c+d)/2),(b-a,y-max(1,y-2.25),d-c),'stone_shade',0)
+    finish.masonry(kit,box,'wall_%s_%d_%s'%(zone,i,a),a,b,d,max(1,y-2.25),y-.12)
  place('walkways_'+zone,zone=zone)
 for j,(x0,x1,z0,z1,hi,lo) in enumerate(stairs):
  name='stairs_%d'%(j+1);kit.begin(name,ao=False)
- for i in range(15):
-  y=hi-i*.15
-  box('flight_%d_riser_%02d'%(j+1,i),((x0+x1)/2,(y+lo-.18)/2,z0+(i+.5)*.3),(x1-x0,y-lo+.22,.303),'road',.006)
+ finish.stair_flight(kit,j+1,x0,x1,z0,z1,hi,lo)
  place(name,zone='TerraceZone')
 kit.begin('dock',ao=False)
-box('continuous_deck_subfloor',(0,-.16,0),(3,.12,6.5),'wood',0)
-for i in range(26):box('deck_%02d'%i,(0,-.1,-3.25+(i+.5)*.25),(3,.2,.238),'wood',.008)
+box('continuous_deck_subfloor',(0,-.16,0),(3,.12,6.5),'wood_seam',0)
+for i in range(26):
+ plank=box('deck_%02d'%i,(0,-.1,-3.25+(i+.5)*.25),(3,.2,.238),['wood','wood_light','wood','wood_dark'][i%4],.008)
+ plank.modifiers['bevel'].segments=1
 for x in [-1.6,1.6]:
- for z in [-1.5,1.5,3.1]:box('pile',(x,-.45,z),(.22,2.9,.22),'wood',.01)
+ for z in [-1.5,1.5,3.1]:
+  box('pile',(x,-.45,z),(.22,2.9,.22),'wood_dark',.01)
+  box('painted_pile_cap',(x,1.0,z),(.25,.06,.25),'trim',.01)
 place('dock',(-22,1,16.75),'DockZone')
 # Accurate public-building envelope: x=40, z=10, y=9, no prison detailing.
-kit.begin('alc_museum',ao=False)
-box('museum_two_storeys',(0,4.4,0),(40,8.8,10),'building',.05)
-box('roof',(0,8.9,0),(40,.2,10),'roof',.02)
-box('public_door_frame',(0,1.8,5.1),(2.6,3.6,.2))
-box('public_glazed_door',(0,1.65,5.22),(1.8,3.3,.04),'glass',0)
-for x in range(-18,19,3):
- for y in [2.3,6.3]:
-  if x==0 and y<3:continue
-  box('unbarred_window',(x,y,5.03),(1.25,2.15,.04),'glass',.04)
-for x in [-19.6,19.6]:box('corner_trim',(x,4.4,5.06),(.4,8.8,.12))
+finish.museum(kit,box)
 place('alc_museum',(0,10,-13),'SummitZone')
 kit.begin('ruins',ao=False)
 for x,h in [(-4,3),(-2,4),(0,4.5),(2,3.5),(4,2.5)]:box('remaining_pier',(x,h/2,0),(.5,h,.45),'stone')
 box('lintel',(-1,3.2,0),(7,.4,.45),'stone');box('side_wall',(4,1,-2),(.45,2,4),'stone')
 place('ruins',(18.5,3.25,5),'TerraceZone')
 kit.begin('ferry',ao=False)
-prism('hull',[(-12.5,0),(-10.4,-3.1),(12.5,-3.1),(12.5,3.1),(-10.4,3.1)],-1,1.1,'building')
-box('deck',(1,1.35,0),(20,.5,6))
-box('cabin',(2.3,3.15,0),(15,3.1,4.5))
+prism('hull',[(-12.5,0),(-10.4,-3.1),(12.5,-3.1),(12.5,3.1),(-10.4,3.1)],-1,1.1,'bird')
+box('deck',(1,1.35,0),(20,.5,6),'bird')
+box('cabin',(2.3,3.15,0),(15,3.1,4.5),'bird')
 box('roof',(2.3,4.8,0),(15.4,.2,4.9),'roof')
 for z in [-2.27,2.27]:
  for x in range(-4,10,2):box('ferry_window',(x,3.5,z),(1.15,1.3,.04),'glass',.03)
@@ -195,14 +196,14 @@ for poly in polys:
  c=[sum(verts[i][k] for i in poly)/4 for k in range(3)];navzones[zone_for(c[0],c[2],c[1])].append(poly)
 route=[[-22,1,19],[-22,1,12],[-22,3.25,7.5],[8,3.25,7.5],[8,5.5,3],[-22,5.5,3],[-22,7.75,-1.5],[8,7.75,-1.5],[8,10,-6],[0,10,-6]]
 route_length=sum(math.dist(a,b) for a,b in zip(route,route[1:]))
-layout={'revision':'B blockout v6 integration contract','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
+layout={'revision':'B v7 formal colour pass, delegated assets pending','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
  'spawn':route[0],'exit':[-23,1,19.4],'cam0':route[0],'review_points':{'opening':route[0],'mid_hill':route[4],'visitor_center':route[-1]},
  'navigation':{'vertices':verts,'polygons':polys,'zone_polygons':navzones,'cell':step},'route':route,'walk_goals':[route[0],route[4],route[-1]],'route_centerline_m':route_length,
  'stairs':[{'flight':i+1,'lower':s[5],'upper':s[4],'width':3,'run':4.5,'risers':15,'riser_m':.15} for i,s in enumerate(stairs)],
  'camera':{'pitch':43,'yaw':14.5,'width':6.72,'zoom_min':1/3,'zoom_max':1.4,'forward_bias_m':2.8},
  'dimensions_m':{'island':[60,40],'museum':[40,9,10],'lighthouse_height':15,'water_tower_height':12,'ferry_length':25,'bench_length':1.5,'bench_seat_height':.45,'railing_height':1,'lamp_height':3.5,'avatar_nominal_height':1.75},
  'sea_size':512,'nav_connected_cells':len(cells),'clearance_m':.25,
- 'notes':['v6 placeholders for delegated pieces; final art pending Nov 8/9.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
+ 'notes':['v7 museum/terrain/dock formal colour; delegated props/ferry/gulls/nature remain placeholders until accepted.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
 authored.replace_preview_modules(kit,OUT,AUTHORED)
 # Public integration contract follows tea_house's camera/spawn/anchors/boundaries fields.
 lod_groups=[]
@@ -232,6 +233,7 @@ layout['camera'].update({'position':[campos[k]+direction[k]*back for k in range(
 layout['boundaries']=[{'name':'WestBoundary','size':[.2,36,40],'at':[-30.1,17.85,0]},{'name':'EastBoundary','size':[.2,36,40],'at':[30.1,17.85,0]},
  {'name':'NorthBoundary','size':[60,36,.2],'at':[0,17.85,-20.1]},{'name':'SouthBoundary','size':[60,36,.2],'at':[0,17.85,20.1]}]
 layout['lod_groups']=lod_groups
+layout['palette']=PALETTE
 layout['hud_clearance']=json.loads((HERE/'hud_contract.json').read_text())
 layout['far_anchor']=far_anchor
 layout['far_zone']={'node':'FarZone','anchor':far_anchor,'projection':'camera-facing XY cards, fake elevation, depth behind opaque island; local front +Z','render_depth_fractions':{'alc_far_bridge':.94,'alc_far_city':.96,'alc_far_hills':.98}}
@@ -243,14 +245,14 @@ for asset in layout['assets']:
         asset['max_view_width_m']=8.0
 (OUT/'placement_points.json').write_text(json.dumps({'units':'metres','axes':layout['axes'],'instances':layout['instances']},ensure_ascii=False,indent=2)+'\n')
 (OUT/'layout.json').write_text(json.dumps(layout,separators=(',',':'))+'\n')
-manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v6 whitebox integration','assets':{}}
+manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v7 formal colour pass','assets':{}}
 for name in kit.assets:
  manifest['assets'][name]=authored.manifest_row(OUT,AUTHORED[name]) if name in AUTHORED else kit.export(name,ao_radius=.18)
  print('ALCATRAZ_ASSET',name,manifest['assets'][name],flush=True)
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in placements)<=300000
 assert len(kit.assets)<=80
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-assembly=bpy.data.collections.new('Alcatraz_v6_Assembly');bpy.context.scene.collection.children.link(assembly)
+assembly=bpy.data.collections.new('Alcatraz_v7_Assembly');bpy.context.scene.collection.children.link(assembly)
 zone_collections={}
 for z in ZONES+['FarZone']:
  col=bpy.data.collections.new(z);assembly.children.link(col);zone_collections[z]=col
@@ -266,8 +268,9 @@ for col in kit.assets.values():
  library.collection.children.link(col)
  bpy.context.scene.collection.children.unlink(col)
 bpy.ops.wm.save_as_mainfile(filepath=str(HERE/'alcatraz_blockout.blend'))
-# Retire only former generated GLBs and their imports; do not leave stale assets in the kit.
+# Only retire this generator's former outputs. Other collaborators may have
+# delivered additional files to the folder before their layout integration.
 for file in OUT.glob('*.glb'):
- if file.stem not in kit.assets:
+ if file.stem not in kit.assets and file.stem in PREVIOUS and not PREVIOUS[file.stem].get('author'):
   file.unlink();file.with_suffix('.glb.import').unlink(missing_ok=True)
 print('ALCATRAZ_DONE',len(kit.assets),'assets;',len(cells),'cells; route',route_length,flush=True)

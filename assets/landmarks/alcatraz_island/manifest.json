@@ -1,15 +1,15 @@
 {
   "generator": "tools/art/source/alcatraz_island/build.py",
   "reference": "landmark_alcatraz_v2.jpg + c_alc2.png",
-  "phase": "v6 whitebox integration",
+  "phase": "v7 formal colour pass",
   "assets": {
     "dock": {
-      "triangles": 3468,
-      "bytes": 299564
+      "triangles": 2452,
+      "bytes": 220508
     },
     "alc_museum": {
-      "triangles": 3252,
-      "bytes": 280940
+      "triangles": 8778,
+      "bytes": 689104
     },
     "ruins": {
       "triangles": 756,
@@ -20,8 +20,8 @@
       "bytes": 162740
     },
     "alc_museum_far": {
-      "triangles": 12,
-      "bytes": 2252
+      "triangles": 343,
+      "bytes": 25756
     },
     "alc_bench": {
       "triangles": 48,
@@ -88,16 +88,16 @@
       "bytes": 17124
     },
     "alc_ground_dock": {
-      "triangles": 132,
-      "bytes": 12636
+      "triangles": 380,
+      "bytes": 37808
     },
     "alc_ground_terraces": {
-      "triangles": 7272,
-      "bytes": 626736
+      "triangles": 2828,
+      "bytes": 241952
     },
     "alc_ground_summit": {
-      "triangles": 400,
-      "bytes": 35372
+      "triangles": 1062,
+      "bytes": 96248
     },
     "alc_lighthouse": {
       "triangles": 3262,

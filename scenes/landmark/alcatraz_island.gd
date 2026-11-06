@@ -94,6 +94,8 @@ func _ready() -> void:
 	sea.position.y = -0.15
 	_sea_material = ShaderMaterial.new()
 	_sea_material.shader = preload("res://assets/landmarks/alcatraz_island/sea_backdrop.gdshader")
+	_sea_material.set_shader_parameter("water",Color(str(layout.palette.water.near)))
+	_sea_material.set_shader_parameter("deep_water",Color(str(layout.palette.water.deep)))
 	sea.material_override = _sea_material
 	sea.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(sea)
@@ -249,7 +251,7 @@ func _build_backdrop() -> void:
 	bay.mesh = quad
 	var material := _far_material("background")
 	material.set_shader_parameter("depth_fraction",.995)
-	material.set_shader_parameter("tint",Color("a0b9bd"))
+	material.set_shader_parameter("tint",Color(str(layout.palette.water.far_fill)))
 	material.render_priority = -100
 	bay.material_override = material
 	bay.extra_cull_margin = 100

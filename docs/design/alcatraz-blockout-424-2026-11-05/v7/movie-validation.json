@@ -1,0 +1,20 @@
+{
+  "file": "SGODOT-424-colour-v7-walk.mp4",
+  "sha256": "c561a28e7a9d584bfbd29c7baa7f3b08424a84c9260608fa8f14484f13b03284",
+  "bytes": 18217037,
+  "duration_seconds": 68.9,
+  "width": 360,
+  "height": 800,
+  "fps": 30,
+  "normal_speed": true,
+  "setup_trimmed": true,
+  "arrival": {
+    "arrived": true,
+    "final_position": "(0.0, 10.0, -6.0)",
+    "fixed_fps": 30,
+    "limits": "Offline fixed-step art movie; not real touch or physical-device FPS.",
+    "normal_speed_walk_frames": 1857,
+    "ready_frame": 97
+  },
+  "limits": "Offline fixed-step recording, not physical-device timing."
+}

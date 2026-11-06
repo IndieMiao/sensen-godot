@@ -1,0 +1,172 @@
+{
+  "passed": true,
+  "blender_version": "5.2.2 LTS",
+  "editable_modules": {
+    "dock": {
+      "editable_objects": 39,
+      "named_meshes": 39,
+      "editable_text": []
+    },
+    "alc_museum": {
+      "editable_objects": 156,
+      "named_meshes": 155,
+      "editable_text": [
+        "ISLAND MUSEUM"
+      ]
+    },
+    "ruins": {
+      "editable_objects": 7,
+      "named_meshes": 7,
+      "editable_text": []
+    },
+    "ferry": {
+      "editable_objects": 19,
+      "named_meshes": 19,
+      "editable_text": []
+    },
+    "alc_museum_far": {
+      "editable_objects": 39,
+      "named_meshes": 39,
+      "editable_text": []
+    },
+    "alc_bench": {
+      "editable_objects": 4,
+      "named_meshes": 4,
+      "editable_text": []
+    },
+    "alc_lamp": {
+      "editable_objects": 2,
+      "named_meshes": 2,
+      "editable_text": []
+    },
+    "alc_rail_straight": {
+      "editable_objects": 3,
+      "named_meshes": 3,
+      "editable_text": []
+    },
+    "alc_rail_corner": {
+      "editable_objects": 3,
+      "named_meshes": 3,
+      "editable_text": []
+    },
+    "alc_curb": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_tree_a": {
+      "editable_objects": 2,
+      "named_meshes": 2,
+      "editable_text": []
+    },
+    "alc_tree_b": {
+      "editable_objects": 2,
+      "named_meshes": 2,
+      "editable_text": []
+    },
+    "alc_flowerbed": {
+      "editable_objects": 2,
+      "named_meshes": 2,
+      "editable_text": []
+    },
+    "alc_bin": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_sign": {
+      "editable_objects": 2,
+      "named_meshes": 2,
+      "editable_text": []
+    },
+    "alc_rock_a": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_rock_b": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_rock_c": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_shrub": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_grass_tuft": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "gull": {
+      "editable_objects": 3,
+      "named_meshes": 3,
+      "editable_text": []
+    },
+    "alc_ground_dock": {
+      "editable_objects": 3,
+      "named_meshes": 3,
+      "editable_text": []
+    },
+    "alc_ground_terraces": {
+      "editable_objects": 368,
+      "named_meshes": 368,
+      "editable_text": []
+    },
+    "alc_ground_summit": {
+      "editable_objects": 158,
+      "named_meshes": 158,
+      "editable_text": []
+    },
+    "alc_lighthouse": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_lighthouse_far": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_watertower": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_watertower_far": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_far_bridge": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_far_city": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    },
+    "alc_far_hills": {
+      "editable_objects": 1,
+      "named_meshes": 1,
+      "editable_text": []
+    }
+  },
+  "editable_treads": 60,
+  "checked_instance_positions": 601,
+  "zones": [
+    "DockZone",
+    "TerraceZone",
+    "SummitZone",
+    "FarZone"
+  ],
+  "blend_sha256": "5a908cff5391657a38c2ab5268206a1a08d8f3ea7212fe357fb558062b679261"
+}

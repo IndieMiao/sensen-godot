@@ -1,5 +1,6 @@
 """Temporary modular contracts for Zhao Yun / Huang Zhong / Liu Bei."""
 import math
+from finish import museum_proxy
 
 REPEATED=['alc_bench','alc_lamp','alc_rail_straight','alc_rail_corner','alc_curb','alc_tree_a','alc_tree_b','alc_flowerbed','alc_bin','alc_sign']
 OWNERS={name:'赵云' for name in REPEATED}
@@ -7,12 +8,11 @@ NATURAL=['alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft']
 REPEATED+=NATURAL
 OWNERS.update({name:'刘备' for name in NATURAL})
 OWNERS.update({n:'黄忠' for n in ['alc_lighthouse','alc_lighthouse_far','alc_watertower','alc_watertower_far','alc_museum_far',
- 'alc_far_bridge','alc_far_city','alc_far_hills']})
+ 'alc_far_bridge','alc_far_city','alc_far_hills','ferry','gull']})
 
 
 def build(kit,box,prism,place):
-    kit.begin('alc_museum_far',ao=False)
-    box('museum_far_placeholder',(0,4.5,0),(40,9,10),'building',0)
+    museum_proxy(kit,box)
     for name,size,pos in [('alc_lighthouse',(3.7,15,3.7),(-25,10,-11.5)),('alc_watertower',(5.4,12,5.4),(25,10,-14))]:
         for suffix in ['', '_far']:
             kit.begin(name+suffix,ao=False)
@@ -40,7 +40,7 @@ def build(kit,box,prism,place):
         box('crown',(0,(h+1.4)/2,0),(w,h-1.4,w),'garden',.03)
     kit.begin('alc_flowerbed',ao=False)
     box('planter',(0,.2,0),(1.4,.4,.7),'stone',0)
-    box('flowers_placeholder',(0,.475,0),(1.25,.15,.55),'garden',0)
+    box('flowers_placeholder',(0,.475,0),(1.25,.15,.55),'flower_yellow',0)
     kit.begin('alc_bin',ao=False)
     box('bin',(0,.375,0),(.45,.75,.45),'wood',0)
     kit.begin('alc_sign',ao=False)

@@ -53,6 +53,9 @@ func _ready() -> void:
 		await get_tree().process_frame
 		if not scene._rig.is_busy():break
 	for i in 4:await get_tree().process_frame
+	if OS.get_environment("ALCATRAZ_MOVIE")=="1":
+		await colour_walk_movie()
+		return
 	if OS.get_environment("ALCATRAZ_SWEEP")=="1":
 		await budget_sweep()
 		return
@@ -303,7 +306,7 @@ func _ready() -> void:
 	results["route_screens"] = route_capture_index
 	results["status"] = "pass" if failures.is_empty() else "fail"
 	results["failures"] = failures
-	results["limits"] = ["Desktop Vulkan Mobile on gs66; not Android or physical-phone performance.","Walk simulation validates runtime paths; it is not a claim of real touch input.","Blockout only, awaiting layout review."]
+	results["limits"] = ["Desktop Vulkan Mobile on gs66; not Android or physical-phone performance.","Walk simulation validates runtime paths; it is not a claim of real touch input.","Formal colour for owned modules; delegated meshes marked placeholder remain pending."]
 	var file := FileAccess.open(destination.path_join("verification.json"),FileAccess.WRITE)
 	file.store_string(JSON.stringify(results,"\t")+"\n")
 	print("ALCATRAZ_REVIEW ",results.status," checks=",results.size()," failures=",failures)
@@ -490,3 +493,30 @@ func budget_sweep() -> void:
 	file.store_string(JSON.stringify(report,"\t"))
 	print("WIDE_SWEEP ",report.status," ",failures)
 	get_tree().quit(0 if failures.is_empty() else 1)
+
+func colour_walk_movie() -> void:
+	# MovieWriter uses fixed 30 Hz simulation. Playback retains the normal walk
+	# speed; the offline capture rate is not a device performance measurement.
+	scene.set_process(false)
+	for frame in 90:await get_tree().process_frame
+	var ready_frame := Engine.get_frames_drawn()
+	for frame in 60:await get_tree().process_frame
+	var goal := AlcatrazIsland._vec(scene.layout.walk_goals[-1])
+	scene.walk_to(goal)
+	scene.set_process(true)
+	var walk_frames := 0
+	for frame in 2700:
+		await get_tree().process_frame
+		walk_frames+=1
+		if scene._path_i>=scene._path.size():break
+	scene.set_process(false)
+	var arrived := scene._player.position.distance_to(goal)<.15
+	for frame in 60:await get_tree().process_frame
+	scene.camera_pan.reset(1.0/3.0)
+	scene._focus=scene._follow_target()
+	scene._update_camera()
+	for frame in 90:await get_tree().process_frame
+	var report := {"ready_frame":ready_frame,"fixed_fps":30,"normal_speed_walk_frames":walk_frames,"arrived":arrived,"final_position":str(scene._player.position),"limits":"Offline fixed-step art movie; not real touch or physical-device FPS."}
+	FileAccess.open(destination.path_join("movie.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
+	print("COLOUR_MOVIE ",report)
+	get_tree().quit(0 if arrived else 1)

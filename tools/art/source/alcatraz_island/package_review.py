@@ -7,11 +7,11 @@ import struct
 import re
 import ast
 from collections import Counter
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3]
-REVIEW=ROOT/'output/alcatraz-424/v6/review'
-DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v6'
+REVIEW=ROOT/'output/alcatraz-424/v7/review'
+DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v7'
 ASSETS=ROOT/'assets/landmarks/alcatraz_island'
 QA=ROOT/'output/alcatraz-424/project'
 verification=json.loads((REVIEW/'verification.json').read_text())
@@ -44,7 +44,7 @@ def label(text,xy,target=None):
     b=d.textbbox(xy,text,font=f)
     d.rounded_rectangle((b[0]-5,b[1]-4,b[2]+5,b[3]+4),radius=4,fill='#f4f3ec')
     d.text(xy,text,font=f,fill='#263b44')
-label('ALCATRAZ / V6 / CLEAR ACTION AREA',(22,18))
+label('ALCATRAZ / V7 / MUSEUM AND GARDEN COLOUR',(22,18))
 d.text((22,48),'Rendered top view + actual navigation path. North is up.',font=small,fill='#263b44')
 label('Island / dock footprint: 60 x 40 m',(310,170))
 d.line([(point([-30,0,0])[0],210),(point([30,0,0])[0],210)],fill='#263b44',width=2)
@@ -91,7 +91,7 @@ for asset,axis,expected in [('alc_museum',0,40),('alc_museum',1,9),('alc_lightho
     assert abs(dimensions[asset]['size'][axis]-expected)<.02,(asset,dimensions[asset])
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements'])<=300000
 assert verification['total_surface_budget_with_multimesh']['evidence']<=80
-evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v6 action-area clearance',
+evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v7 formal colour pass',
     'unique_glbs':len(checks),'unique_triangles':sum(x['triangles'] for x in manifest['assets'].values()),
     'placed_triangles':sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements']),
     'placed_mesh_instances':len(layout['placements']),'unique_surfaces':len(checks),
@@ -136,7 +136,7 @@ def mark_reserve(path):
     return Image.alpha_composite(im,overlay).convert('RGB')
 comparison=Image.new('RGB',(720,840),'#f5f1e6');pen=ImageDraw.Draw(comparison)
 pen.text((10,10),'Huang Zhong v1.1 / before',font=f,fill='#263b44')
-pen.text((370,10),'v6 / clear action area',font=f,fill='#263b44')
+pen.text((370,10),'v7 / colour + clear action area',font=f,fill='#263b44')
 comparison.paste(mark_reserve(ROOT/'docs/design/alcatraz-far-424-2026-11-06/v1.1/SGODOT-424_far_v1.1_mid_hill.png'),(0,40))
 comparison.paste(mark_reserve(DOC/'02-mid-hill.png'),(360,40))
 comparison.save(DOC/'08-mid-hill-hud-comparison.png')
@@ -146,6 +146,35 @@ for i,p in enumerate(photos):
     marked.paste(mark_reserve(p).resize((180,400)),(x,y))
     pen.rectangle((x,y,x+180,y+18),fill='#fff8e8');pen.text((x+3,y+2),p.stem,font=font_small,fill='#182833')
 marked.save(DOC/'09-hud-route-contact-sheet.png')
+# Keep the complete reference and identify the water-margin crop on the game view.
+overview=Image.open(DOC/'05-whole-island.png').convert('RGB')
+xs=[];ys=[]
+for y in range(0,overview.height,3):
+    for x in range(0,overview.width,3):
+        red,green,blue=overview.getpixel((x,y))
+        if red>blue*1.02 and green>blue*1.02:xs.append(x);ys.append(y)
+crop=(max(0,min(xs)-18),max(0,min(ys)-18),min(overview.width,max(xs)+19),min(overview.height,max(ys)+19))
+board=Image.new('RGB',(1580,1000),'#f5f1e6');pen=ImageDraw.Draw(board)
+pen.text((20,18),'V2 concept colour reference',font=f,fill='#263b44')
+pen.text((440,18),'V7 game view / complete island, water margin cropped',font=f,fill='#263b44')
+pen.text((1180,18),'Museum / 360 x 800',font=f,fill='#263b44')
+board.paste(ImageOps.contain(Image.open(HERE/'reference/c_alc2.png').convert('RGB'),(400,850)),(20,60))
+board.paste(ImageOps.contain(overview.crop(crop),(720,650)),(440,60))
+board.paste(Image.open(DOC/'03-visitor-center.png').convert('RGB'),(1180,60))
+swatches=[('Path','road'),('Garden','garden'),('Stone','stone'),('Museum','building'),('Wood','wood'),('Glass','glass')]
+for i,(label_,key) in enumerate(swatches):
+    x=440+(i%3)*230;y=750+(i//3)*85;color=layout['palette']['colors'][key]
+    pen.rectangle((x,y,x+210,y+42),fill='#'+color)
+    pen.text((x,y+48),label_+' #'+color,font=small,fill='#263b44')
+pen.text((20,955),'Colour review. Concept proportions are illustrative; game dimensions follow the written brief. Small props / nature / ferry / gulls are still previews.',font=small,fill='#263b44')
+board.save(DOC/'10-reference-colour-comparison.png')
+facade=Image.new('RGB',(720,840),'#f5f1e6');pen=ImageDraw.Draw(facade)
+pen.text((10,10),'v6 / blockout',font=f,fill='#263b44');pen.text((370,10),'v7 / public museum',font=f,fill='#263b44')
+facade.paste(Image.open(DOC.parent/'v6/03-visitor-center.png').convert('RGB'),(0,40))
+facade.paste(Image.open(DOC/'03-visitor-center.png').convert('RGB'),(360,40))
+facade.save(DOC/'11-museum-before-after.png')
+evidence['reference_comparison']={'source':'tools/art/source/alcatraz_island/reference/c_alc2.png','overview_crop':list(crop),'scope':'Colour comparison only; generated concept geometry is not the measurement authority.'}
+evidence['palette']=layout['palette']
 evidence['hud_clearance']=layout['hud_clearance']
 evidence['captures']={str(p.relative_to(DOC)):{'pixels':list(Image.open(p).size),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in DOC.rglob('*.png')}
 for image_info in evidence['captures'].values():assert max(image_info['pixels'])<=1600
