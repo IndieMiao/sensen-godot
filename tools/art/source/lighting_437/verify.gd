@@ -18,7 +18,8 @@ func shadow_values(sun):
 func run():
 	var expected = Environment.new()
 	expected.background_mode = Environment.BG_COLOR
-	expected.background_color = Color("d000d0")
+	# Shared presets use a production background; original landmark stays unchanged.
+	expected.background_color = Color("e3ebe8")
 	expected.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	expected.ambient_light_color = Color("d5e4ee")
 	expected.ambient_light_energy = 0.72
@@ -29,7 +30,7 @@ func run():
 		if not property.usage & PROPERTY_USAGE_STORAGE or key.begins_with("resource_") or key == "script": continue
 		if expected.get(key) != noon.environment.get(key):
 			differences.append({"name":key,"expected":str(expected.get(key)),"actual":str(noon.environment.get(key))})
-	check(differences.is_empty(), "warm noon Environment matches every stored original setting")
+	check(differences.is_empty(), "warm noon Environment matches original lighting with shared production background")
 	var original_sun = DirectionalLight3D.new()
 	original_sun.shadow_enabled = true
 	original_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
@@ -75,6 +76,16 @@ func run():
 		rig.preset = preset
 		check(rig.get_node("Sun").light_color==preset.sun_color, name+": scene preset switch applies sun")
 		summary[name] = {"background":original_color.to_html(),"ambient":preset.environment.ambient_light_color.to_html(),"ambient_energy":preset.environment.ambient_light_energy,"sun":preset.sun_color.to_html(),"sun_energy":preset.sun_energy,"sun_rotation_degrees":str(preset.sun_rotation_degrees)}
+	var previous_preset = rig.preset
+	var previous_environment = rig.get_node("Environment").environment
+	# An inspector can supply any Resource now: reject it without losing valid lighting.
+	rig.preset = Resource.new()
+	check(rig.preset == previous_preset, "unrelated Resource is rejected; valid preset retained")
+	check(rig.get_node("Environment").environment == previous_environment, "invalid assignment leaves applied environment intact")
+	rig.preset = null
+	check(rig.preset == null and rig.get_node("Environment").environment == previous_environment, "clearing preset safely leaves last applied lighting")
+	rig.preset = noon
+	check(rig.preset == noon and rig.get_node("Environment").environment.background_color == Color("e3ebe8"), "valid preset can be reapplied after null")
 	for script_name in ["lighting_preset.gd","lighting_rig.gd"]:
 		var methods = load(KIT+script_name).get_script_method_list().map(func(method):return method.name)
 		check(not "_process" in methods and not "_physics_process" in methods, script_name+": no per-frame callback")

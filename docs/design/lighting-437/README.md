@@ -1,10 +1,10 @@
 # SGODOT-437 · 通用室外光照预设
 
-【刘备】暖午、清晨、黄昏三个 `.tres`，加一个可实例化的 `lighting_rig.tscn`。暖午完整复现恶魔岛当前 Environment 和主光；清晨为偏冷的 24° 长影，黄昏为金橙色 18° 低角度光。对已有 WorldEnvironment / DirectionalLight3D 应用预设时保留宿主阴影设置。运行资源和参数表见 [lighting README](../../../assets/landmarks/_shared/lighting/README.md)。
+【刘备】暖午、清晨、黄昏三个 `.tres`，加一个可实例化的 `lighting_rig.tscn`。暖午沿用恶魔岛当前环境光和主光，背景使用正式色 `#E3EBE8`；清晨为偏冷的 24° 长影，黄昏为金橙色 18° 低角度光。对已有 WorldEnvironment / DirectionalLight3D 应用预设时保留宿主阴影设置。运行资源和参数表见 [lighting README](../../../assets/landmarks/_shared/lighting/README.md)。
 
 | 审阅图 | 主光 / 氛围 |
 |---|---|
-| [暖午](warm-noon-default-review.png) | 原版恶魔岛，俯角 56° |
+| [暖午](warm-noon-default-review.png) | 沿用恶魔岛光照，俯角 56° |
 | [清晨](cool-morning-default-review.png) | 冷光、俯角 24°，长影 |
 | [黄昏](golden-dusk-default-review.png) | 金橙光、俯角 18°，反向长影 |
 
@@ -18,9 +18,15 @@
 
 426 岸石、430 浪花、432 海湾和 434 桥 / 城市 / 丘陵取自分支基线 `4e2c401ac`。六个 435 草 / 灌木 / 冰花件取自赵云 #841 的 `a590b559dd6e776dc1047f858757c932c3a7cf2b`，仅借用到隔离审阅工程，不把未合并件复制进本 PR 的运行目录。小件和地形保留原材质；两个新建的平面草地区块只接收阴影，避免低角度下辅助地块自身的条纹。
 
-暖午保留恶魔岛实际的诊断背景色 `#D000D0`，完整海面覆盖后画面不露此色；已有海面 / 远景是 unshaded，三套灯光不会替它们换色。没有背景覆盖的室外 POI 在复制的预设中设置正式背景色，README 给出了格里菲斯的 `#E3EBE8` 作为现有参考。恶魔岛和格里菲斯本体均未改。
+共享暖午改用正式背景色 `#E3EBE8`；恶魔岛自己的场景保留诊断色 `#D000D0`，共享预设不用。已有海面 / 远景是 unshaded，三套灯光不会替它们换色。恶魔岛和格里菲斯本体均未改。
 
-## 验证与开销
+## v1.1 技术修正
+
+按 437 `b647a695` 移除全局类注册和三个 `.tres` 的脚本类头字段；片段使用显式脚本 preload 与 `Resource` setter 校验。误选普通 Resource 时保留有效预设，清空字段不会清空当前光照。暖午仅将共享背景改成 `#E3EBE8`；清晨、黄昏光照数值不变。
+
+本轮验证见 [v1.1 证据](v11/README.md)。本目录的图片、Android、实渲和耗时记录保留为初版 `592f25a92` 的证据；本轮不重跑 Android 和耗时采样，不把旧记录当作新头测试。
+
+## 初版验证与开销
 
 - **45 项资源检查通过**：暖午 Environment 的全部存储属性、所有原阴影属性匹配；清晨 / 黄昏切换保留格里菲斯的独立阴影距离、淡出、pancake 和 blur；实例 Environment 副本互不污染。
 - **暖午像素差为 0**：同一示例海岸、同帧，把原恶魔岛设置与新预设对照，完整 360×800 RGB 最大 / 平均差均为 0。

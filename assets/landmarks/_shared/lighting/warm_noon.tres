@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="LandmarkLightingPreset" load_steps=3 format=3]
+[gd_resource type="Resource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://assets/landmarks/_shared/lighting/lighting_preset.gd" id="1"]
 
 [sub_resource type="Environment" id="Environment_preset"]
 background_mode = 1
-background_color = Color(0.815686275, 0.000000000, 0.815686275, 1)
+background_color = Color(0.890196078, 0.921568627, 0.909803922, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.835294118, 0.894117647, 0.933333333, 1)
 ambient_light_energy = 0.72

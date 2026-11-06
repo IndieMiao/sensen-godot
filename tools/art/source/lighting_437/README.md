@@ -17,12 +17,16 @@ Android sessions. Existing SDK/JDK and private ADB are reused.
 2. Run `godot --headless --editor --import --path <project>` and then
    `godot --headless --script verify.gd --path <project>`. On the first import,
    copy the generated lighting `.gd.uid` files back to the runtime directory.
-   The verification compares every stored noon Environment setting, every
+   The verification compares every stored noon Environment setting (shared background #E3EBE8;
+   all remaining properties match the original), every
    original sun shadow setting, and preservation of Griffith's distinct shadows
    while switching all three presets. It also checks independent Environment
-   copies and disabled costly effects / per-frame callbacks.
+   copies, rejection of unrelated Resources, null / valid reassignment, and
+   disabled costly effects / per-frame callbacks. A warning from the intentional
+   invalid Resource assignment is expected.
 3. On the actual display, run Mobile with `--fixed-fps 30 --disable-vsync --
-   --benchmark`. The original noon control and new noon must match exactly.
+   --benchmark`. The original noon control and new noon must match exactly in this fully
+   sea-covered view; the background colours intentionally differ.
    Three default views and shadow-off diagnostic controls are captured. Sea and
    foam clocks are frozen only in desktop QA. The timing section measures
    viewport CPU/GPU time: 45 warm-up + 90 sampled frames per block, three
@@ -53,3 +57,9 @@ sun angles, without changing the rig's shadow settings or any source kit.
 The sea copy retains the review render_priority=-100 used by 434. Far cards,
 sea and foam keep their accepted material colours. This scene is QA only;
 there is no production layout or game integration.
+
+For the v1.1 cache regression, copy only the lighting runtime directory and
+`verify.gd` into a minimal project with no autoloads or `.godot` directory. Run
+`--headless --script verify.gd` **before** any editor import, then cold import
+and rerun the same checks. Compare runtime filenames and hashes at each step.
+The explicit preload must work without a generated global-class cache.

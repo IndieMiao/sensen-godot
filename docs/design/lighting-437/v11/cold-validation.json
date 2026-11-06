@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "previous_head": "592f25a927d7e370697178f6c1a6720c2fbbdd6b",
+  "godot": "4.7.2.stable.official.ed1daf0bf",
+  "cache_free_run": {
+    "godot_directory_present_before_run": false,
+    "editor_import_performed_before_run": false,
+    "passed_checks": 49
+  },
+  "minimal_project_after_cold_import_passed_checks": 49,
+  "full_coast_fixture_after_cold_import_passed_checks": 49,
+  "script_or_import_errors": 0,
+  "intentional_warning": "Each verification deliberately assigns a plain Resource; the setter warns and preserves the valid preset.",
+  "removed_global_class_search_matches": 0,
+  "shared_noon_background": "#E3EBE8",
+  "runtime_file_count": 9,
+  "runtime_sha256": {
+    "README.md": "1eab255352cf4b358a78ec7258bb1a2f471e66f5893e5bb81e2321253c89f448",
+    "cool_morning.tres": "40994782c2058ca98de7216e8550cd53e979d6498857799435c8aa7905b0b749",
+    "golden_dusk.tres": "dda9787f4f5157cdb3ce0cc2f0db8db2d51310581ab584c28ac85b58dc49bfc3",
+    "lighting_preset.gd": "c3ce4cdb2c93c223aa099390be6ca3b08a570d62753985ffb7f82dc7c823a440",
+    "lighting_preset.gd.uid": "a2bca255e01b95accb3491a202b0b7d1c951b62b8c4e07bcdcb16df929d156b0",
+    "lighting_rig.gd": "038640bf7849992a9bd5fcd81fe41e2756dcc5ab5659835684d9dfe81d164ebd",
+    "lighting_rig.gd.uid": "fea667ab233568e9279cb9b4e0c3353f60e8bb096d3f662ec066924e3784f2c1",
+    "lighting_rig.tscn": "d732064102bfa1f6913ba8c8127d4eac4691c9f29e63dea846a9284ed10e6544",
+    "warm_noon.tres": "b6062bfb5bcd8a242170c257831ae369d2c0d8bc4cb4164f8856f08174ebf2d3"
+  },
+  "cold_import_unchanged": true,
+  "source_matches_both_tested_copies": true,
+  "morning_and_dusk_parameters_unchanged": true,
+  "protected_paths_byte_identical": [
+    "assets/landmarks/alcatraz_island",
+    "assets/landmarks/griffith_observatory",
+    "scenes/landmark/alcatraz_island.gd",
+    "scenes/landmark/alcatraz_island.tscn",
+    "scenes/landmark/griffith_observatory.gd",
+    "scenes/landmark/griffith_observatory.tscn",
+    "assets/landmarks/_shared/coast_kit",
+    "assets/landmarks/_shared/water_edge",
+    "assets/landmarks/_shared/sea_backdrop",
+    "assets/landmarks/_shared/far_backdrop",
+    "project.godot",
+    ".codex/config.toml"
+  ],
+  "protected_base": "4e2c401acf7940638690362fbe40a5176b623506",
+  "prior_android_and_timing_not_rerun": true
+}

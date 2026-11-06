@@ -1,5 +1,4 @@
 @tool
-class_name LandmarkLightingPreset
 extends Resource
 ## Environment and one sun. Applying a preset never changes host shadow settings.
 
