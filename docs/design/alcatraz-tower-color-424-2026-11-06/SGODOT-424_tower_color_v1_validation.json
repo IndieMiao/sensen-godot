@@ -1,0 +1,970 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "colour_map": {
+    "task": "SGODOT-424",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "base": "fc19d492eabbbe96105726c5a627c30d98b4e445",
+    "host_ref": "bf0c31b1c871011008b455434d167224d14de59c",
+    "old_palette": {
+      "white": "EEE8D6",
+      "white_light": "FFF5E1",
+      "white_shadow": "D6D2C2",
+      "stone": "B4AE9B",
+      "window": "88B1BB",
+      "window_dark": "547981",
+      "lantern": "F5D994",
+      "roof": "B8AB8C",
+      "rust": "A86C48",
+      "rust_light": "C48C5E",
+      "rust_dark": "80513B",
+      "hoop": "765344",
+      "bridge": "C97454",
+      "bridge_light": "DE8A62",
+      "bridge_shade": "AD604A",
+      "hills": "9DAE9B",
+      "hills_light": "B2BA9B",
+      "hill_shadow": "839D9A",
+      "city": "D3CBC0",
+      "city_light": "E8DACA",
+      "city_blue": "AABDC6",
+      "city_mid": "B9BEBB",
+      "city_shadow": "9FB1BD"
+    },
+    "new_palette": {
+      "white": "EFE7D4",
+      "white_light": "F6ECD9",
+      "white_shadow": "D7CAB1",
+      "stone": "CBB48F",
+      "window": "86B0B3",
+      "window_dark": "608F99",
+      "lantern": "F0D69C",
+      "roof": "A4A08F",
+      "rust": "AC7955",
+      "rust_light": "C1946D",
+      "rust_dark": "7F5B44",
+      "hoop": "6D5746",
+      "bridge": "C97454",
+      "bridge_light": "DE8A62",
+      "bridge_shade": "AD604A",
+      "hills": "9DAE9B",
+      "hills_light": "B2BA9B",
+      "hill_shadow": "839D9A",
+      "city": "D3CBC0",
+      "city_light": "E8DACA",
+      "city_blue": "AABDC6",
+      "city_mid": "B9BEBB",
+      "city_shadow": "9FB1BD"
+    },
+    "changes": {
+      "white": {
+        "before": {
+          "hex": "#EEE8D6",
+          "srgb_weighted_value": 0.9097098039215685,
+          "hsv_saturation": 0.10084033613445378
+        },
+        "after": {
+          "hex": "#EFE7D4",
+          "srgb_weighted_value": 0.9071725490196079,
+          "hsv_saturation": 0.11297071129707108
+        }
+      },
+      "white_light": {
+        "before": {
+          "hex": "#FFF5E1",
+          "srgb_weighted_value": 0.9634588235294117,
+          "hsv_saturation": 0.11764705882352944
+        },
+        "after": {
+          "hex": "#F6ECD9",
+          "srgb_weighted_value": 0.9284478431372549,
+          "hsv_saturation": 0.11788617886178866
+        }
+      },
+      "white_shadow": {
+        "before": {
+          "hex": "#D6D2C2",
+          "srgb_weighted_value": 0.8223341176470588,
+          "hsv_saturation": 0.09345794392523371
+        },
+        "after": {
+          "hex": "#D7CAB1",
+          "srgb_weighted_value": 0.795916862745098,
+          "hsv_saturation": 0.17674418604651165
+        }
+      },
+      "stone": {
+        "before": {
+          "hex": "#B4AE9B",
+          "srgb_weighted_value": 0.6819756862745098,
+          "hsv_saturation": 0.138888888888889
+        },
+        "after": {
+          "hex": "#CBB48F",
+          "srgb_weighted_value": 0.7145819607843138,
+          "hsv_saturation": 0.29556650246305416
+        }
+      },
+      "window": {
+        "before": {
+          "hex": "#88B1BB",
+          "srgb_weighted_value": 0.6627662745098039,
+          "hsv_saturation": 0.2727272727272727
+        },
+        "after": {
+          "hex": "#86B0B3",
+          "srgb_weighted_value": 0.6560290196078431,
+          "hsv_saturation": 0.25139664804469264
+        }
+      },
+      "window_dark": {
+        "before": {
+          "hex": "#547981",
+          "srgb_weighted_value": 0.4459270588235294,
+          "hsv_saturation": 0.3488372093023256
+        },
+        "after": {
+          "hex": "#608F99",
+          "srgb_weighted_value": 0.5244305882352941,
+          "hsv_saturation": 0.37254901960784315
+        }
+      },
+      "lantern": {
+        "before": {
+          "hex": "#F5D994",
+          "srgb_weighted_value": 0.8547882352941176,
+          "hsv_saturation": 0.39591836734693875
+        },
+        "after": {
+          "hex": "#F0D69C",
+          "srgb_weighted_value": 0.8444705882352942,
+          "hsv_saturation": 0.3499999999999999
+        }
+      },
+      "roof": {
+        "before": {
+          "hex": "#B8AB8C",
+          "srgb_weighted_value": 0.6726494117647058,
+          "hsv_saturation": 0.23913043478260862
+        },
+        "after": {
+          "hex": "#A4A08F",
+          "srgb_weighted_value": 0.6259725490196077,
+          "hsv_saturation": 0.12804878048780494
+        }
+      },
+      "rust": {
+        "before": {
+          "hex": "#A86C48",
+          "srgb_weighted_value": 0.46336,
+          "hsv_saturation": 0.5714285714285714
+        },
+        "after": {
+          "hex": "#AC7955",
+          "srgb_weighted_value": 0.5068368627450981,
+          "hsv_saturation": 0.5058139534883721
+        }
+      },
+      "rust_light": {
+        "before": {
+          "hex": "#C48C5E",
+          "srgb_weighted_value": 0.5826839215686275,
+          "hsv_saturation": 0.5204081632653061
+        },
+        "after": {
+          "hex": "#C1946D",
+          "srgb_weighted_value": 0.6068674509803922,
+          "hsv_saturation": 0.43523316062176165
+        }
+      },
+      "rust_dark": {
+        "before": {
+          "hex": "#80513B",
+          "srgb_weighted_value": 0.35060313725490194,
+          "hsv_saturation": 0.5390625
+        },
+        "after": {
+          "hex": "#7F5B44",
+          "srgb_weighted_value": 0.38036470588235294,
+          "hsv_saturation": 0.4645669291338583
+        }
+      },
+      "hoop": {
+        "before": {
+          "hex": "#765344",
+          "srgb_weighted_value": 0.3504235294117647,
+          "hsv_saturation": 0.42372881355932207
+        },
+        "after": {
+          "hex": "#6D5746",
+          "srgb_weighted_value": 0.3547050980392157,
+          "hsv_saturation": 0.3577981651376146
+        }
+      }
+    },
+    "assets": {
+      "alc_lighthouse": {
+        "before_sha256": "61cac63d1c1be7b8583e8dfd1692e958ee66a1dbad116cb4375fc6ac95dce9b9",
+        "sha256": "a953a721d7c7b3863aa075252091addc4fa9a38bc9341a9f853e8121ff139b96",
+        "vertices_recoloured": 3585,
+        "roles": {
+          "white": 280,
+          "white_light": 1808,
+          "window_dark": 1288,
+          "lantern": 48,
+          "roof": 161
+        }
+      },
+      "alc_lighthouse_far": {
+        "before_sha256": "bdbd5677a996fc2808a8cb41db5846d6580d0a62d0eb7dd7b2f5df167e36aefb",
+        "sha256": "b3a82c08d041beb6e953835a28a72c14adf7a9c3b13a50355c6416ac27459094",
+        "vertices_recoloured": 705,
+        "roles": {
+          "white": 140,
+          "window_dark": 312,
+          "white_light": 144,
+          "lantern": 48,
+          "roof": 61
+        }
+      },
+      "alc_watertower": {
+        "before_sha256": "92aaf9ffd5facab3c261180cae8dcb05bb46edea0345856acdd4cc9b5815cb11",
+        "sha256": "78e4a965f0e707d3bb8b61d9cacc25e8ca1d4e7cb86097a81d876fef6752da7d",
+        "vertices_recoloured": 3273,
+        "roles": {
+          "stone": 384,
+          "rust_dark": 416,
+          "rust": 480,
+          "rust_light": 601,
+          "hoop": 1392
+        }
+      },
+      "alc_watertower_far": {
+        "before_sha256": "d37fd1ad196f152abb1a2cc754f000f11e82779bd6022cb6c31fddc17536c452",
+        "sha256": "78b4abf332acaf75f4147c77e59c7fe06eafb04dabf524282aa3e2be6e537948",
+        "vertices_recoloured": 597,
+        "roles": {
+          "stone": 96,
+          "rust_dark": 56,
+          "rust": 168,
+          "rust_light": 229,
+          "hoop": 48
+        }
+      }
+    },
+    "reference_palette": "reference/island-palette-bf0c31b1.json"
+  },
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "base": "fc19d492eabbbe96105726c5a627c30d98b4e445",
+    "host": "bf0c31b1c871011008b455434d167224d14de59c",
+    "checks": [
+      {
+        "check": "alc_lighthouse GLB JSON/header unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse positions exactly unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse topology unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse normals unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse valid colour values",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse ALL non-RGB buffer bytes unchanged (incl alpha)",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse colour actually changed",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse import+UID byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far GLB JSON/header unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far positions exactly unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far topology unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far normals unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far valid colour values",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far ALL non-RGB buffer bytes unchanged (incl alpha)",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far colour actually changed",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far import+UID byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse_far manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower GLB JSON/header unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower positions exactly unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower topology unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower normals unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower valid colour values",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower ALL non-RGB buffer bytes unchanged (incl alpha)",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower colour actually changed",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower import+UID byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far GLB JSON/header unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far positions exactly unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far topology unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far normals unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far valid colour values",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far ALL non-RGB buffer bytes unchanged (incl alpha)",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far colour actually changed",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far import+UID byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower_far manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_lighthouse far palette is exact subset of near palette",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_watertower far palette is exact subset of near palette",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_far_bridge.glb unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_far_bridge.glb.import unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_far_city.glb unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_far_city.glb.import unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_far_hills.glb unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "alc_far_hills.glb.import unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Identical world/camera/water outside tower bounding regions",
+        "passed": true,
+        "evidence": 0
+      },
+      {
+        "check": "Rendered colour change is visible",
+        "passed": true,
+        "evidence": 27
+      },
+      {
+        "check": "Museum far outside sign is exactly previous accepted geometry/normal/colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Replace219 front letter triangles with7 pictogram triangles",
+        "passed": true,
+        "evidence": [
+          219,
+          7
+        ]
+      },
+      {
+        "check": "Far pictogram exact match to bf0c31b1 near",
+        "passed": true,
+        "evidence": null
+      }
+    ],
+    "passed": true,
+    "colour_changes": {
+      "white": {
+        "before": {
+          "hex": "#EEE8D6",
+          "srgb_weighted_value": 0.9097098039215685,
+          "hsv_saturation": 0.10084033613445378
+        },
+        "after": {
+          "hex": "#EFE7D4",
+          "srgb_weighted_value": 0.9071725490196079,
+          "hsv_saturation": 0.11297071129707108
+        }
+      },
+      "white_light": {
+        "before": {
+          "hex": "#FFF5E1",
+          "srgb_weighted_value": 0.9634588235294117,
+          "hsv_saturation": 0.11764705882352944
+        },
+        "after": {
+          "hex": "#F6ECD9",
+          "srgb_weighted_value": 0.9284478431372549,
+          "hsv_saturation": 0.11788617886178866
+        }
+      },
+      "white_shadow": {
+        "before": {
+          "hex": "#D6D2C2",
+          "srgb_weighted_value": 0.8223341176470588,
+          "hsv_saturation": 0.09345794392523371
+        },
+        "after": {
+          "hex": "#D7CAB1",
+          "srgb_weighted_value": 0.795916862745098,
+          "hsv_saturation": 0.17674418604651165
+        }
+      },
+      "stone": {
+        "before": {
+          "hex": "#B4AE9B",
+          "srgb_weighted_value": 0.6819756862745098,
+          "hsv_saturation": 0.138888888888889
+        },
+        "after": {
+          "hex": "#CBB48F",
+          "srgb_weighted_value": 0.7145819607843138,
+          "hsv_saturation": 0.29556650246305416
+        }
+      },
+      "window": {
+        "before": {
+          "hex": "#88B1BB",
+          "srgb_weighted_value": 0.6627662745098039,
+          "hsv_saturation": 0.2727272727272727
+        },
+        "after": {
+          "hex": "#86B0B3",
+          "srgb_weighted_value": 0.6560290196078431,
+          "hsv_saturation": 0.25139664804469264
+        }
+      },
+      "window_dark": {
+        "before": {
+          "hex": "#547981",
+          "srgb_weighted_value": 0.4459270588235294,
+          "hsv_saturation": 0.3488372093023256
+        },
+        "after": {
+          "hex": "#608F99",
+          "srgb_weighted_value": 0.5244305882352941,
+          "hsv_saturation": 0.37254901960784315
+        }
+      },
+      "lantern": {
+        "before": {
+          "hex": "#F5D994",
+          "srgb_weighted_value": 0.8547882352941176,
+          "hsv_saturation": 0.39591836734693875
+        },
+        "after": {
+          "hex": "#F0D69C",
+          "srgb_weighted_value": 0.8444705882352942,
+          "hsv_saturation": 0.3499999999999999
+        }
+      },
+      "roof": {
+        "before": {
+          "hex": "#B8AB8C",
+          "srgb_weighted_value": 0.6726494117647058,
+          "hsv_saturation": 0.23913043478260862
+        },
+        "after": {
+          "hex": "#A4A08F",
+          "srgb_weighted_value": 0.6259725490196077,
+          "hsv_saturation": 0.12804878048780494
+        }
+      },
+      "rust": {
+        "before": {
+          "hex": "#A86C48",
+          "srgb_weighted_value": 0.46336,
+          "hsv_saturation": 0.5714285714285714
+        },
+        "after": {
+          "hex": "#AC7955",
+          "srgb_weighted_value": 0.5068368627450981,
+          "hsv_saturation": 0.5058139534883721
+        }
+      },
+      "rust_light": {
+        "before": {
+          "hex": "#C48C5E",
+          "srgb_weighted_value": 0.5826839215686275,
+          "hsv_saturation": 0.5204081632653061
+        },
+        "after": {
+          "hex": "#C1946D",
+          "srgb_weighted_value": 0.6068674509803922,
+          "hsv_saturation": 0.43523316062176165
+        }
+      },
+      "rust_dark": {
+        "before": {
+          "hex": "#80513B",
+          "srgb_weighted_value": 0.35060313725490194,
+          "hsv_saturation": 0.5390625
+        },
+        "after": {
+          "hex": "#7F5B44",
+          "srgb_weighted_value": 0.38036470588235294,
+          "hsv_saturation": 0.4645669291338583
+        }
+      },
+      "hoop": {
+        "before": {
+          "hex": "#765344",
+          "srgb_weighted_value": 0.3504235294117647,
+          "hsv_saturation": 0.42372881355932207
+        },
+        "after": {
+          "hex": "#6D5746",
+          "srgb_weighted_value": 0.3547050980392157,
+          "hsv_saturation": 0.3577981651376146
+        }
+      }
+    },
+    "image_diff": {
+      "outside_tower_max_rgb_255": 0,
+      "changed_pixels": 9259,
+      "max_rgb_255": 27
+    }
+  },
+  "godot": {
+    "captures": {
+      "alc_lighthouse_54m": {
+        "camera": [
+          21.4450874328613,
+          25.969087600708,
+          45.9891395568848
+        ],
+        "draws": 1,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 3262,
+        "width": 8.5
+      },
+      "alc_lighthouse_56m": {
+        "camera": [
+          22.239351272583,
+          26.6531276702881,
+          47.692440032959
+        ],
+        "draws": 1,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 830,
+        "width": 8.5
+      },
+      "alc_watertower_54m": {
+        "camera": [
+          21.4450874328613,
+          24.469087600708,
+          45.9891395568848
+        ],
+        "draws": 1,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 3546,
+        "width": 8.5
+      },
+      "alc_watertower_56m": {
+        "camera": [
+          22.239351272583,
+          25.1531276702881,
+          47.692440032959
+        ],
+        "draws": 1,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 774,
+        "width": 8.5
+      },
+      "native_summit_after": {
+        "camera": [
+          20.366771697998,
+          45.064323425293,
+          6.64551115036011
+        ],
+        "draws": 29,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 48789,
+        "width": 20.1599998474121
+      },
+      "summit_after": {
+        "camera": [
+          18.2702083587646,
+          84.8274917602539,
+          58.2119903564453
+        ],
+        "draws": 41,
+        "size": [
+          720,
+          460
+        ],
+        "visible_triangles": 71041,
+        "width": 60.608341217041
+      },
+      "summit_before": {
+        "camera": [
+          18.2702083587646,
+          84.8274917602539,
+          58.2119903564453
+        ],
+        "draws": 41,
+        "size": [
+          720,
+          460
+        ],
+        "visible_triangles": 71041,
+        "width": 60.608341217041
+      }
+    },
+    "checks": [
+      {
+        "check": "bf0c31b1 scene navigation initialized",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far triangle count unchanged",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far bounds unchanged",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far triangle count unchanged",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far bounds unchanged",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse triangle count unchanged",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse bounds unchanged",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_watertower triangle count unchanged",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_watertower bounds unchanged",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "AlcLighthouse6 whole tower inside review wide view",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "AlcLighthouseFar7 whole tower inside review wide view",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "AlcWatertower8 whole tower inside review wide view",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "AlcWatertowerFar9 whole tower inside review wide view",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture summit_before",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture summit_after",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Native maximum width still20.16m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture native_summit_after",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture alc_lighthouse_54m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse engine LOD selects at 54",
+        "evidence": [
+          3262,
+          3262
+        ],
+        "passed": true
+      },
+      {
+        "check": "Capture alc_lighthouse_56m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse engine LOD selects at 56",
+        "evidence": [
+          830,
+          830
+        ],
+        "passed": true
+      },
+      {
+        "check": "Capture alc_watertower_54m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_watertower engine LOD selects at 54",
+        "evidence": [
+          3546,
+          3546
+        ],
+        "passed": true
+      },
+      {
+        "check": "Capture alc_watertower_56m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_watertower engine LOD selects at 56",
+        "evidence": [
+          774,
+          774
+        ],
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "tower_rects": {
+      "AlcLighthouse6": [
+        38.5714111328125,
+        93.9847793579102,
+        100.816337585449,
+        266.758026123047
+      ],
+      "AlcLighthouseFar7": [
+        38.5714111328125,
+        93.9847793579102,
+        100.816337585449,
+        266.758026123047
+      ],
+      "AlcWatertower8": [
+        622.947265625,
+        203.150054931641,
+        681.428649902344,
+        347.292144775391
+      ],
+      "AlcWatertowerFar9": [
+        622.947265625,
+        203.150054931641,
+        681.428649902344,
+        347.292144775391
+      ]
+    },
+    "wide_view_note": "Supplementary landscape review fit for both towers and museum; original player zoom limits unchanged. All three cannot fit the native20.16m portrait width at original positions."
+  },
+  "fixture": {
+    "host": "bf0c31b1c871011008b455434d167224d14de59c",
+    "host_hashes": {
+      "scenes/landmark/alcatraz_island.gd": "69b3d51c3c7c7a6b15335cc6dc84d94609ba1068eca5ac6e4d1462bc53aeefa1",
+      "assets/landmarks/alcatraz_island/layout.json": "8cafefed37207464b5e735470b50219cc15e38b52a43361e3a1a9841eaa85af9",
+      "assets/landmarks/alcatraz_island/sea_backdrop.gdshader": "ca71f9078c39d625c66b0f1a73b0bbc4b0fe62cbc481d0e9f0cdff0b1006d6d3",
+      "assets/landmarks/alcatraz_island/far_card.gdshader": "39386ef55891571e395cbe7a1880950ba2cd304e8568e6601c893890a16da5eb"
+    },
+    "overlay": "four tower COLOR_0 variants + synchronized museum pictogram far; no host scene/layout/shader edits"
+  },
+  "scope": "Tower RGB-only recolour and separate museum sign update; desktopMobile/Vulkan isolated review, not phone/whole-game acceptance."
+}

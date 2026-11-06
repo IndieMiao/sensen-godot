@@ -1,0 +1,14 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "base": "fc19d492eabbbe96105726c5a627c30d98b4e445",
+  "reference_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+  "source_assets": [
+    "alc_lighthouse",
+    "alc_lighthouse_far",
+    "alc_watertower",
+    "alc_watertower_far"
+  ],
+  "changes": "Only COLOR_0 RGB bytes; named Blender materials and generation palette synced. Geometry, normals, topology, alpha, UIDs and55m LOD unchanged.",
+  "reference": "Island palette andv7 real render frombf0c31b1; target role map incolour-map.json"
+}

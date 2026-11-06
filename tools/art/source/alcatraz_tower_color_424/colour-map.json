@@ -1,0 +1,254 @@
+{
+  "task": "SGODOT-424",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "base": "fc19d492eabbbe96105726c5a627c30d98b4e445",
+  "host_ref": "bf0c31b1c871011008b455434d167224d14de59c",
+  "old_palette": {
+    "white": "EEE8D6",
+    "white_light": "FFF5E1",
+    "white_shadow": "D6D2C2",
+    "stone": "B4AE9B",
+    "window": "88B1BB",
+    "window_dark": "547981",
+    "lantern": "F5D994",
+    "roof": "B8AB8C",
+    "rust": "A86C48",
+    "rust_light": "C48C5E",
+    "rust_dark": "80513B",
+    "hoop": "765344",
+    "bridge": "C97454",
+    "bridge_light": "DE8A62",
+    "bridge_shade": "AD604A",
+    "hills": "9DAE9B",
+    "hills_light": "B2BA9B",
+    "hill_shadow": "839D9A",
+    "city": "D3CBC0",
+    "city_light": "E8DACA",
+    "city_blue": "AABDC6",
+    "city_mid": "B9BEBB",
+    "city_shadow": "9FB1BD"
+  },
+  "new_palette": {
+    "white": "EFE7D4",
+    "white_light": "F6ECD9",
+    "white_shadow": "D7CAB1",
+    "stone": "CBB48F",
+    "window": "86B0B3",
+    "window_dark": "608F99",
+    "lantern": "F0D69C",
+    "roof": "A4A08F",
+    "rust": "AC7955",
+    "rust_light": "C1946D",
+    "rust_dark": "7F5B44",
+    "hoop": "6D5746",
+    "bridge": "C97454",
+    "bridge_light": "DE8A62",
+    "bridge_shade": "AD604A",
+    "hills": "9DAE9B",
+    "hills_light": "B2BA9B",
+    "hill_shadow": "839D9A",
+    "city": "D3CBC0",
+    "city_light": "E8DACA",
+    "city_blue": "AABDC6",
+    "city_mid": "B9BEBB",
+    "city_shadow": "9FB1BD"
+  },
+  "changes": {
+    "white": {
+      "before": {
+        "hex": "#EEE8D6",
+        "srgb_weighted_value": 0.9097098039215685,
+        "hsv_saturation": 0.10084033613445378
+      },
+      "after": {
+        "hex": "#EFE7D4",
+        "srgb_weighted_value": 0.9071725490196079,
+        "hsv_saturation": 0.11297071129707108
+      }
+    },
+    "white_light": {
+      "before": {
+        "hex": "#FFF5E1",
+        "srgb_weighted_value": 0.9634588235294117,
+        "hsv_saturation": 0.11764705882352944
+      },
+      "after": {
+        "hex": "#F6ECD9",
+        "srgb_weighted_value": 0.9284478431372549,
+        "hsv_saturation": 0.11788617886178866
+      }
+    },
+    "white_shadow": {
+      "before": {
+        "hex": "#D6D2C2",
+        "srgb_weighted_value": 0.8223341176470588,
+        "hsv_saturation": 0.09345794392523371
+      },
+      "after": {
+        "hex": "#D7CAB1",
+        "srgb_weighted_value": 0.795916862745098,
+        "hsv_saturation": 0.17674418604651165
+      }
+    },
+    "stone": {
+      "before": {
+        "hex": "#B4AE9B",
+        "srgb_weighted_value": 0.6819756862745098,
+        "hsv_saturation": 0.138888888888889
+      },
+      "after": {
+        "hex": "#CBB48F",
+        "srgb_weighted_value": 0.7145819607843138,
+        "hsv_saturation": 0.29556650246305416
+      }
+    },
+    "window": {
+      "before": {
+        "hex": "#88B1BB",
+        "srgb_weighted_value": 0.6627662745098039,
+        "hsv_saturation": 0.2727272727272727
+      },
+      "after": {
+        "hex": "#86B0B3",
+        "srgb_weighted_value": 0.6560290196078431,
+        "hsv_saturation": 0.25139664804469264
+      }
+    },
+    "window_dark": {
+      "before": {
+        "hex": "#547981",
+        "srgb_weighted_value": 0.4459270588235294,
+        "hsv_saturation": 0.3488372093023256
+      },
+      "after": {
+        "hex": "#608F99",
+        "srgb_weighted_value": 0.5244305882352941,
+        "hsv_saturation": 0.37254901960784315
+      }
+    },
+    "lantern": {
+      "before": {
+        "hex": "#F5D994",
+        "srgb_weighted_value": 0.8547882352941176,
+        "hsv_saturation": 0.39591836734693875
+      },
+      "after": {
+        "hex": "#F0D69C",
+        "srgb_weighted_value": 0.8444705882352942,
+        "hsv_saturation": 0.3499999999999999
+      }
+    },
+    "roof": {
+      "before": {
+        "hex": "#B8AB8C",
+        "srgb_weighted_value": 0.6726494117647058,
+        "hsv_saturation": 0.23913043478260862
+      },
+      "after": {
+        "hex": "#A4A08F",
+        "srgb_weighted_value": 0.6259725490196077,
+        "hsv_saturation": 0.12804878048780494
+      }
+    },
+    "rust": {
+      "before": {
+        "hex": "#A86C48",
+        "srgb_weighted_value": 0.46336,
+        "hsv_saturation": 0.5714285714285714
+      },
+      "after": {
+        "hex": "#AC7955",
+        "srgb_weighted_value": 0.5068368627450981,
+        "hsv_saturation": 0.5058139534883721
+      }
+    },
+    "rust_light": {
+      "before": {
+        "hex": "#C48C5E",
+        "srgb_weighted_value": 0.5826839215686275,
+        "hsv_saturation": 0.5204081632653061
+      },
+      "after": {
+        "hex": "#C1946D",
+        "srgb_weighted_value": 0.6068674509803922,
+        "hsv_saturation": 0.43523316062176165
+      }
+    },
+    "rust_dark": {
+      "before": {
+        "hex": "#80513B",
+        "srgb_weighted_value": 0.35060313725490194,
+        "hsv_saturation": 0.5390625
+      },
+      "after": {
+        "hex": "#7F5B44",
+        "srgb_weighted_value": 0.38036470588235294,
+        "hsv_saturation": 0.4645669291338583
+      }
+    },
+    "hoop": {
+      "before": {
+        "hex": "#765344",
+        "srgb_weighted_value": 0.3504235294117647,
+        "hsv_saturation": 0.42372881355932207
+      },
+      "after": {
+        "hex": "#6D5746",
+        "srgb_weighted_value": 0.3547050980392157,
+        "hsv_saturation": 0.3577981651376146
+      }
+    }
+  },
+  "assets": {
+    "alc_lighthouse": {
+      "before_sha256": "61cac63d1c1be7b8583e8dfd1692e958ee66a1dbad116cb4375fc6ac95dce9b9",
+      "sha256": "a953a721d7c7b3863aa075252091addc4fa9a38bc9341a9f853e8121ff139b96",
+      "vertices_recoloured": 3585,
+      "roles": {
+        "white": 280,
+        "white_light": 1808,
+        "window_dark": 1288,
+        "lantern": 48,
+        "roof": 161
+      }
+    },
+    "alc_lighthouse_far": {
+      "before_sha256": "bdbd5677a996fc2808a8cb41db5846d6580d0a62d0eb7dd7b2f5df167e36aefb",
+      "sha256": "b3a82c08d041beb6e953835a28a72c14adf7a9c3b13a50355c6416ac27459094",
+      "vertices_recoloured": 705,
+      "roles": {
+        "white": 140,
+        "window_dark": 312,
+        "white_light": 144,
+        "lantern": 48,
+        "roof": 61
+      }
+    },
+    "alc_watertower": {
+      "before_sha256": "92aaf9ffd5facab3c261180cae8dcb05bb46edea0345856acdd4cc9b5815cb11",
+      "sha256": "78e4a965f0e707d3bb8b61d9cacc25e8ca1d4e7cb86097a81d876fef6752da7d",
+      "vertices_recoloured": 3273,
+      "roles": {
+        "stone": 384,
+        "rust_dark": 416,
+        "rust": 480,
+        "rust_light": 601,
+        "hoop": 1392
+      }
+    },
+    "alc_watertower_far": {
+      "before_sha256": "d37fd1ad196f152abb1a2cc754f000f11e82779bd6022cb6c31fddc17536c452",
+      "sha256": "78b4abf332acaf75f4147c77e59c7fe06eafb04dabf524282aa3e2be6e537948",
+      "vertices_recoloured": 597,
+      "roles": {
+        "stone": 96,
+        "rust_dark": 56,
+        "rust": 168,
+        "rust_light": 229,
+        "hoop": 48
+      }
+    }
+  },
+  "reference_palette": "reference/island-palette-bf0c31b1.json"
+}

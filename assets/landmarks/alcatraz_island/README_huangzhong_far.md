@@ -38,3 +38,6 @@ layout 注记的深度值为 0.92；该头实际脚本使用桥 0.94 / 城市 0.
 
 生成与源文件在 `tools/art/source/alcatraz_far_424/`。所有 Blender / Godot 调用须使用
 `flock ~/gs66-render.lock`，一次只运行一个，完成后退出。
+
+双塔配色后续已对齐bf0c31b1正式整岛；四塔只改顶点RGB，几何/import/55m及三张远景卡保持。
+当前色值及新审阅见README_tower_colour.md和docs/design/alcatraz-tower-color-424-2026-11-06/。
