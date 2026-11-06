@@ -1,0 +1,258 @@
+{
+  "revision": "1.1",
+  "before_commit": "91c563b16b651c1013d0290e70d611884376ab0f",
+  "metric": "mean Yprime = (0.2126 R + 0.7152 G + 0.0722 B)/255 on rendered sRGB pixels; contrast=(ordinary-deep)/ordinary",
+  "selection": "Pure deep/base shader regions, eroded 1px. Neutral grass control restricts samples to within 0.008 Yprime of the ordinary region 80th percentile; excludes shadows/occluding objects. Before uses identical pixel masks.",
+  "views": {
+    "opening": {
+      "size": [
+        360,
+        800
+      ],
+      "illumination_reference_Yprime": 0.6873411764705882,
+      "regions": {
+        "deep": {
+          "pixels": 130,
+          "bbox_xyxy": [
+            151,
+            1,
+            248,
+            290
+          ],
+          "before_mean_Yprime": 0.6103378883861236,
+          "after_mean_Yprime": 0.4949126334841629,
+          "control_mean_Yprime": 0.683898334841629,
+          "after_mean_RGB255": [
+            93.1,
+            142.738,
+            59.877
+          ]
+        },
+        "ordinary": {
+          "pixels": 1009,
+          "bbox_xyxy": [
+            163,
+            1,
+            244,
+            209
+          ],
+          "before_mean_Yprime": 0.6834083056413846,
+          "after_mean_Yprime": 0.6413039880293049,
+          "control_mean_Yprime": 0.6848437458947899,
+          "after_mean_RGB255": [
+            135.115,
+            180.834,
+            75.821
+          ]
+        },
+        "sun": {
+          "pixels": 41,
+          "bbox_xyxy": [
+            174,
+            1,
+            210,
+            153
+          ],
+          "before_mean_Yprime": 0.7350852606408417,
+          "after_mean_Yprime": 0.7658248684839789,
+          "control_mean_Yprime": 0.6841464562410331,
+          "after_mean_RGB255": [
+            182.098,
+            208.537,
+            102.854
+          ]
+        }
+      },
+      "before_contrast_percent": 10.692058708107705,
+      "after_contrast_percent": 22.827139278362402,
+      "outside_grass_max_RGB255": 0.0,
+      "outside_grass_changed_pixels": 0,
+      "bridge_city_max_RGB255": 0.0
+    },
+    "mid_hill": {
+      "size": [
+        360,
+        800
+      ],
+      "illumination_reference_Yprime": 0.6834196078431374,
+      "regions": {
+        "deep": {
+          "pixels": 5655,
+          "bbox_xyxy": [
+            120,
+            176,
+            359,
+            675
+          ],
+          "before_mean_Yprime": 0.6019213895736898,
+          "after_mean_Yprime": 0.4940967250914512,
+          "control_mean_Yprime": 0.6833875197725423,
+          "after_mean_RGB255": [
+            93.002,
+            142.493,
+            59.718
+          ]
+        },
+        "ordinary": {
+          "pixels": 6522,
+          "bbox_xyxy": [
+            3,
+            164,
+            359,
+            799
+          ],
+          "before_mean_Yprime": 0.6806758478994175,
+          "after_mean_Yprime": 0.638897985701487,
+          "control_mean_Yprime": 0.6833607731298593,
+          "after_mean_RGB255": [
+            134.845,
+            180.121,
+            75.191
+          ]
+        },
+        "sun": {
+          "pixels": 399,
+          "bbox_xyxy": [
+            1,
+            129,
+            252,
+            776
+          ],
+          "before_mean_Yprime": 0.7454989454027225,
+          "after_mean_Yprime": 0.766508997985159,
+          "control_mean_Yprime": 0.6836690019165562,
+          "after_mean_RGB255": [
+            182.168,
+            208.749,
+            102.955
+          ]
+        }
+      },
+      "before_contrast_percent": 11.570038597485999,
+      "after_contrast_percent": 22.664222434673864,
+      "outside_grass_max_RGB255": 0.0,
+      "outside_grass_changed_pixels": 0
+    },
+    "summit": {
+      "size": [
+        360,
+        800
+      ],
+      "illumination_reference_Yprime": 0.6834196078431374,
+      "regions": {
+        "deep": {
+          "pixels": 1975,
+          "bbox_xyxy": [
+            1,
+            646,
+            101,
+            697
+          ],
+          "before_mean_Yprime": 0.6005514464135021,
+          "after_mean_Yprime": 0.4935935181931,
+          "control_mean_Yprime": 0.6833804906428398,
+          "after_mean_RGB255": [
+            92.989,
+            142.322,
+            59.674
+          ]
+        },
+        "ordinary": {
+          "pixels": 962,
+          "bbox_xyxy": [
+            108,
+            665,
+            359,
+            737
+          ],
+          "before_mean_Yprime": 0.6808546076393134,
+          "after_mean_Yprime": 0.6388321136521136,
+          "control_mean_Yprime": 0.6833544119685299,
+          "after_mean_RGB255": [
+            134.828,
+            180.104,
+            75.17
+          ]
+        },
+        "sun": {
+          "pixels": 605,
+          "bbox_xyxy": [
+            184,
+            694,
+            334,
+            730
+          ],
+          "before_mean_Yprime": 0.7399821759844433,
+          "after_mean_Yprime": 0.7641044213255551,
+          "control_mean_Yprime": 0.683376132231405,
+          "after_mean_RGB255": [
+            181.702,
+            208.073,
+            102.536
+          ]
+        }
+      },
+      "before_contrast_percent": 11.79446541519953,
+      "after_contrast_percent": 22.735017910841222,
+      "outside_grass_max_RGB255": 0.0,
+      "outside_grass_changed_pixels": 0
+    },
+    "grass_detail": {
+      "size": [
+        1100,
+        800
+      ],
+      "illumination_reference_Yprime": 0.6834196078431374,
+      "regions": {
+        "deep": {
+          "pixels": 5241,
+          "bbox_xyxy": [
+            197,
+            408,
+            1088,
+            548
+          ],
+          "before_mean_Yprime": 0.6048917111313138,
+          "after_mean_Yprime": 0.4923847466618779,
+          "control_mean_Yprime": 0.6817664739927646,
+          "after_mean_RGB255": [
+            92.671,
+            142.063,
+            58.898
+          ]
+        },
+        "ordinary": {
+          "pixels": 24441,
+          "bbox_xyxy": [
+            1,
+            403,
+            1097,
+            548
+          ],
+          "before_mean_Yprime": 0.6797345953721289,
+          "after_mean_Yprime": 0.6378749433730367,
+          "control_mean_Yprime": 0.6821022554996387,
+          "after_mean_RGB255": [
+            134.472,
+            179.868,
+            75.181
+          ]
+        }
+      },
+      "before_contrast_percent": 11.010603954892344,
+      "after_contrast_percent": 22.80857685705871,
+      "outside_grass_max_RGB255": 0.0,
+      "outside_grass_changed_pixels": 0
+    }
+  },
+  "preserved": {
+    "alc_ground_surfaces.png": "b933f4abe85e380c0e70fe7dab5474b6ba70c13d45a1520ce70ad787cd5bc20d",
+    "alc_ground_surfaces.png.import": "9a2a49fc16036339824636128314bcb4ae6e7f238957e266b1bb16aa506249d1",
+    "alc_dock_detail.tres": "67dc57863d2246bfeff3f1232a3d4134803dd291e482cb7cac9927a11c34dbd0",
+    "alc_ground_fields.png.import": "776f7d06cc546df3f4c5462e22ad3758ed3b618e3237b307fed065cd34e8094c",
+    "alc_ground_detail.gdshader.uid": "bbb164d1347ee5a55825274767b75a2c4ed245de1be42c7658d30e48822f0afd",
+    "fields_GB_exact": true,
+    "paving_dock_and_final_shading_code_exact": true
+  },
+  "passed": true
+}

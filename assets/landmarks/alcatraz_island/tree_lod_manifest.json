@@ -1,0 +1,159 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "assets": {
+    "alc_tree_a_far": {
+      "triangles": 118,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.3283814191818237,
+          0.0,
+          -1.3801499605178833
+        ],
+        [
+          3.3888323307037354,
+          6.424321174621582,
+          1.307702898979187
+        ]
+      ],
+      "near_bounds": [
+        [
+          -1.3283814191818237,
+          0.0,
+          -1.3801499605178833
+        ],
+        [
+          3.3888323307037354,
+          6.424321174621582,
+          1.307702898979187
+        ]
+      ],
+      "near_triangles": 520,
+      "near_sha256": "04b30452d6db9d8b64acfc4e11e70be15bd0372c1ccab99ec79f63d7a9aeb5d2",
+      "sha256": "b5e4349cace99157462b0080c9514490453c0c3c2475c5405e3417f440273c98",
+      "bytes": 5216,
+      "parts": {
+        "alc_tree_a_far / original crown lobe 1": 21,
+        "alc_tree_a_far / original crown lobe 2": 21,
+        "alc_tree_a_far / original crown lobe 3": 24,
+        "alc_tree_a_far / original crown lobe 4": 15,
+        "alc_tree_a_far / original crown lobe 5": 14,
+        "Cypress / continuous bent trunk": 19,
+        "alc_tree_a / main branch 1": 4
+      },
+      "near": "alc_tree_a",
+      "far": "alc_tree_a_far",
+      "switch_distance_m": 40,
+      "margin_m": 0,
+      "minimum_camera_pitch_degrees": 40,
+      "placement_rotation": "yaw only; upright Y",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "source": "tools/art/source/alcatraz_tree_lod_424/tree_lod.blend",
+      "generator": "tools/art/build_alcatraz_tree_lod_424.py"
+    },
+    "alc_tree_b_far": {
+      "triangles": 118,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.9710865020751953,
+          0.0,
+          -1.392596960067749
+        ],
+        [
+          1.9663119316101074,
+          6.275000095367432,
+          1.460149884223938
+        ]
+      ],
+      "near_bounds": [
+        [
+          -1.9710865020751953,
+          0.0,
+          -1.392596960067749
+        ],
+        [
+          1.9663119316101074,
+          6.275000095367432,
+          1.460149884223938
+        ]
+      ],
+      "near_triangles": 316,
+      "near_sha256": "eb499135039ef55b4c5f0a90c6957510b7939c8580c6e65458e531e891acb3d7",
+      "sha256": "814c86334c75ecb5d10a3f34797166e3d3bda1addb0a4017b702dfb10898f11a",
+      "bytes": 5104,
+      "parts": {
+        "alc_tree_b_far / original crown lobe 1": 28,
+        "alc_tree_b_far / original crown lobe 2": 24,
+        "alc_tree_b_far / original crown lobe 3": 30,
+        "Round tree / preserved single trunk": 28,
+        "alc_tree_b / main branch 1": 4,
+        "alc_tree_b / main branch 2": 4
+      },
+      "near": "alc_tree_b",
+      "far": "alc_tree_b_far",
+      "switch_distance_m": 40,
+      "margin_m": 0,
+      "minimum_camera_pitch_degrees": 40,
+      "placement_rotation": "yaw only; upright Y",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "source": "tools/art/source/alcatraz_tree_lod_424/tree_lod.blend",
+      "generator": "tools/art/build_alcatraz_tree_lod_424.py"
+    }
+  },
+  "lod_groups": [
+    {
+      "name": "alc_tree_a",
+      "near": "alc_tree_a",
+      "far": "alc_tree_a_far",
+      "switch_distance_m": 40,
+      "margin_m": 0,
+      "far_placeholder": false,
+      "minimum_camera_pitch_degrees": 40,
+      "common_aabb": [
+        [
+          -1.3283814191818237,
+          0.0,
+          -1.3801499605178833
+        ],
+        [
+          3.3888323307037354,
+          6.424321174621582,
+          1.307702898979187
+        ]
+      ]
+    },
+    {
+      "name": "alc_tree_b",
+      "near": "alc_tree_b",
+      "far": "alc_tree_b_far",
+      "switch_distance_m": 40,
+      "margin_m": 0,
+      "far_placeholder": false,
+      "minimum_camera_pitch_degrees": 40,
+      "common_aabb": [
+        [
+          -1.9710865020751953,
+          0.0,
+          -1.392596960067749
+        ],
+        [
+          1.9663119316101074,
+          6.275000095367432,
+          1.460149884223938
+        ]
+      ]
+    }
+  ]
+}

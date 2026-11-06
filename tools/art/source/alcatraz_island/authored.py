@@ -8,7 +8,7 @@ def load_catalog(folder):
     rows = {}
     # Only packs approved and merged by the project leads are registered here.
     for filename in ['alc_far_manifest.json','props_manifest.json','ferry_gull_manifest.json','garden_manifest.json',
-                     'ruin_details_manifest.json','alc_dock_manifest.json','alc_nature_manifest.json','alc_shore_foam_manifest.json']:
+                     'ruin_details_manifest.json','alc_dock_manifest.json','alc_nature_manifest.json','alc_shore_foam_manifest.json','tree_lod_manifest.json','trees_cd_manifest.json']:
         manifest = folder / filename
         if not manifest.exists():continue
         catalog = json.loads(manifest.read_text())

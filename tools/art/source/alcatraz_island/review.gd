@@ -72,6 +72,7 @@ func _ready() -> void:
 	if OS.get_environment("ALCATRAZ_SWEEP")=="1":
 		await budget_sweep()
 		return
+	await audit_tree_material_integration()
 	await audit_museum_lod()
 	await audit_integrated_effects()
 	check("renderer", RenderingServer.get_current_rendering_method() == "mobile", RenderingServer.get_video_adapter_name())
@@ -150,7 +151,7 @@ func _ready() -> void:
 	check("all_liu_prototypes_placed",["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_shrub_b","alc_grass_tuft"].all(func(k):return int(nature_counts.get(k,0))>0),nature_counts)
 	check("vegetation_roots_on_terrain",unsupported.is_empty(),unsupported)
 	check("vegetation_navigation_clearance",encroaching.is_empty(),encroaching)
-	check("buildings_and_ferry_have_two_lods",scene.layout.lod_groups.size()==4 and scene.layout.lod_groups.all(func(g):return g.name in ["alc_museum","alc_lighthouse","alc_watertower","ferry"]))
+	check("buildings_and_ferry_have_two_lods",scene.layout.lod_groups.filter(func(g):return g.get("kind","")!="tree").size()==4)
 
 	audit_garden_support()
 	var corners_ok := true
@@ -188,7 +189,9 @@ func _ready() -> void:
 		for frame in 90:scene._process(1.0/60.0)
 		check("route_%d_arrived"%i,scene._player.position.distance_to(goal)<.15,str(scene._player.position))
 		check("route_%d_follow"%i,scene._focus.distance_to(scene._follow_target())<.05,str(scene._focus))
-		if i==1:await photograph("02-mid-hill")
+		if i==1:
+			await photograph("02-mid-hill")
+			await audit_garden_batch_parity()
 		if i==scene.layout.walk_goals.size()-1:await photograph("03-visitor-center")
 	results["walk_lengths_m"] = path_lengths
 	var route_length := 0.0
@@ -481,7 +484,9 @@ func budget_sweep() -> void:
 	for key in baseline.view_metrics:
 		if not str(key).begins_with("route/"):continue
 		scene._player.position = AlcatrazIsland._vec(baseline.view_metrics[key].player_position)
-		for zoom in [.85,.68,.5,1.0/3.0]:
+		var zooms: Array = [1.4,1.15,1.0,.9,.85,.8,.68,.6,.5,.4,1.0/3.0]
+		for press in range(1,8):zooms.append(pow(1.15,-press))
+		for zoom in zooms:
 			scene.camera_pan.reset(zoom)
 			scene._focus = scene._follow_target()
 			scene._update_camera()
@@ -511,9 +516,12 @@ func colour_walk_movie() -> void:
 	scene.walk_to(goal)
 	scene.set_process(true)
 	var walk_frames := 0
+	var render_peak := {"visible_triangles":0,"total_draw_calls":0,"global_draw_calls":0}
 	for frame in 2700:
 		await get_tree().process_frame
 		walk_frames+=1
+		var sample: Dictionary=render_sample()
+		for metric in render_peak:render_peak[metric]=maxi(int(render_peak[metric]),int(sample[metric]))
 		if scene._path_i>=scene._path.size():break
 	scene.set_process(false)
 	var arrived := scene._player.position.distance_to(goal)<.15
@@ -522,10 +530,10 @@ func colour_walk_movie() -> void:
 	scene._focus=scene._follow_target()
 	scene._update_camera()
 	for frame in 90:await get_tree().process_frame
-	var report := {"ready_frame":ready_frame,"fixed_fps":30,"normal_speed_walk_frames":walk_frames,"arrived":arrived,"final_position":str(scene._player.position),"limits":"Offline fixed-step art movie; not real touch or physical-device FPS."}
+	var report := {"ready_frame":ready_frame,"fixed_fps":30,"normal_speed_walk_frames":walk_frames,"render_peak":render_peak,"budget_passed":int(render_peak.visible_triangles)<=80000 and int(render_peak.global_draw_calls)<=60,"arrived":arrived,"final_position":str(scene._player.position),"limits":"Offline fixed-step art movie; not real touch or physical-device FPS."}
 	FileAccess.open(destination.path_join("movie.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("COLOUR_MOVIE ",report)
-	get_tree().quit(0 if arrived else 1)
+	get_tree().quit(0 if arrived and report.budget_passed else 1)
 
 func audit_garden_support() -> void:
 	var unsupported: Array = []
@@ -554,7 +562,9 @@ func top_layout_photo() -> void:
 	scene._camera.far = 200
 	scene._camera.rotation_degrees = Vector3(-90,0,0)
 	scene._camera.near = .1
+	scene._update_tree_lods(scene._camera.global_position)
 	for node in scene._detail_batches:node.visible=true
+	for node in scene._detail_groups:node.visible=true
 	for node in scene._unshadowed_batches:
 		var transforms: Array = node.get_meta("instance_transforms")
 		for i in transforms.size():node.multimesh.set_instance_transform(i,transforms[i])
@@ -695,10 +705,10 @@ func integrated_effects_movie() -> void:
 	var index := 0
 	for root in scene.animated_roots:
 		var placement: Dictionary = root.get_meta("placement")
-		if placement.asset=="ferry":effects_close_view(Vector2i(480,400),root.position+Vector3(0,3.0,0),30,30,-35,Vector2(360,0))
+		if placement.asset=="ferry":effects_close_view(Vector2i(480,400),root.position+Vector3(0,3.0,0),30,43,-35,Vector2(360,0))
 		else:
-			effects_close_view(Vector2i(160,210),root.position+Vector3(0,.29,0),1.7,23,-90 if index==2 else -25 if index==0 else 155,Vector2(360+160*index,420));index+=1
-	var label := Label.new();label.position=Vector2(374,644);label.text="V8 / live island assembly\nLeft: opening 360 x 800\nRight: close views at current world positions\nGulls stay planted; ferry body bobs +/-2 cm\nStatic soft foam; no click targets\n9 s / 30 Hz art capture, desktop only"
+			effects_close_view(Vector2i(160,210),root.position+Vector3(0,.29,0),1.7,43,-90 if index==2 else -25 if index==0 else 155,Vector2(360+160*index,420));index+=1
+	var label := Label.new();label.position=Vector2(374,644);label.text="V9 / live island assembly\nLeft: opening 360 x 800\nRight: close views at current world positions\nGulls stay planted; ferry body bobs +/-2 cm\nStatic soft foam; no click targets\n9 s / 30 Hz art capture, desktop only"
 	label.add_theme_color_override("font_color",Color("263b44"));label.add_theme_font_size_override("font_size",15);add_child(label)
 	for i in 15:await RenderingServer.frame_post_draw
 	var ready_frame := Engine.get_frames_drawn()
@@ -736,3 +746,71 @@ func audit_museum_lod() -> void:
 		check("museum_lod_"+str(spec[0])+"m_only_expected_mesh",visible==expected,{"visible_triangles":visible,"expected_triangles":expected})
 	view.free()
 	for i in 2:await RenderingServer.frame_post_draw
+
+func audit_tree_material_integration() -> void:
+	var bound := 0
+	for node in scene.mesh_nodes:
+		var asset := str(node.get_meta("asset",""))
+		if not scene.layout.ground_materials.has(asset):continue
+		bound+=1
+		check(asset+"_approved_material",node.material_override!=null and node.material_override.resource_path==AlcatrazIsland.ROOT+str(scene.layout.ground_materials[asset]),node.material_override.resource_path)
+	check("four_material_bindings_only",bound==4,bound)
+	var counts := {}
+	for p in scene.layout.instances:
+		if str(p.asset).begins_with("alc_tree_"):counts[p.asset]=int(counts.get(p.asset,0))+1
+	check("four_tree_species_counts",counts=={"alc_tree_a":8,"alc_tree_b":6,"alc_tree_c":4,"alc_tree_d":8},counts)
+	var was_processing := scene.is_processing()
+	scene.set_process(false)
+	var view := SubViewport.new();view.size=Vector2i(360,800);view.own_world_3d=true
+	view.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(view)
+	var zone := Node3D.new();view.add_child(zone);scene.zones["LodProbe"]=zone
+	var camera := Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL
+	camera.keep_aspect=Camera3D.KEEP_WIDTH;camera.size=6.72;camera.near=.05;camera.far=200
+	view.add_child(camera);camera.current=true;camera.rotation_degrees=Vector3(-43,14.5,0)
+	var paint := StandardMaterial3D.new();paint.vertex_color_use_as_albedo=true
+	for asset in ["alc_tree_a","alc_tree_b","alc_tree_c","alc_tree_d"]:
+		var near_box: AABB=scene._mesh(asset).get_aabb();var far_box: AABB=scene._mesh(asset+"_far").get_aabb()
+		check(asset+"_lod_bounds_match",near_box.position.is_equal_approx(far_box.position) and near_box.size.is_equal_approx(far_box.size))
+		scene._add_tree_batches([{"asset":asset,"name":"LodProbeTree","position":[0,0,0],"yaw":0,"scale":[1,1,1],"zone":"LodProbe","collision":false}],paint)
+		var group: Dictionary=scene.tree_batches[-1]
+		for distance in [39.95,40.05]:
+			camera.position=near_box.get_center()+camera.basis.z*float(distance)
+			scene._update_tree_lods(camera.global_position)
+			for i in 6:await RenderingServer.frame_post_draw
+			var visible:=view.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_PRIMITIVES_IN_FRAME)
+			var mesh: Mesh=scene._mesh(asset if distance<40 else asset+"_far")
+			var expected: int=mesh.surface_get_arrays(0)[Mesh.ARRAY_INDEX].size()/3
+			check(asset+"_actual_lod_"+str(distance),visible==expected and group.near.multimesh.visible_instance_count+group.far.multimesh.visible_instance_count==1,{"visible":visible,"expected":expected})
+		for node in [group.near,group.far]:scene.batch_nodes.erase(node);node.free()
+		scene.tree_batches.pop_back()
+	scene.zones.erase("LodProbe");view.free()
+	scene._update_camera();scene.set_process(was_processing)
+	for group in scene.tree_batches:
+		var total: int=group.near.multimesh.visible_instance_count+group.far.multimesh.visible_instance_count
+		check(str(group.near.get_parent().name)+"_"+str(group.asset)+"_no_duplicate_lod_instances",total==group.items.size(),total)
+	for i in 2:await RenderingServer.frame_post_draw
+
+func audit_garden_batch_parity() -> void:
+	var group := scene.zones.TerraceZone.get_node("GardenFlowers") as MeshInstance3D
+	var old_time := Engine.time_scale;Engine.time_scale=0
+	for i in 3:await RenderingServer.frame_post_draw
+	var a := viewport.get_texture().get_image()
+	group.visible=false
+	var nodes: Array[MeshInstance3D] = []
+	for p in scene.layout.placements:
+		if p.get("surface_group","")!="garden_flowers":continue
+		var node := MeshInstance3D.new();node.mesh=scene._mesh(str(p.asset));node.transform=scene._transform_of(p)
+		node.material_override=group.mesh.surface_get_material(0);node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		scene.zones.TerraceZone.add_child(node);nodes.append(node)
+	for i in 3:await RenderingServer.frame_post_draw
+	var b := viewport.get_texture().get_image()
+	var maximum:=0.0;var total:=0.0;var edge_count:=0
+	for y in 800:
+		for x in 360:
+			var ca:=a.get_pixel(x,y);var cb:=b.get_pixel(x,y)
+			var delta:=maxf(absf(ca.r-cb.r),maxf(absf(ca.g-cb.g),absf(ca.b-cb.b)))
+			maximum=maxf(maximum,delta);total+=delta;edge_count+=int(delta>3.1/255.0)
+	check("garden_batch_visual_parity",maximum<32.1/255 and edge_count<=2 and total/(360*800)<.001/255,{"max_255":maximum*255,"mean_255":total*255/(360*800),"edge_pixels":edge_count})
+	for node in nodes:node.free()
+	group.visible=true;Engine.time_scale=old_time
+	for i in 3:await RenderingServer.frame_post_draw

@@ -42,6 +42,8 @@ var _backdrop_enabled := true
 var _sea_material: ShaderMaterial
 var animated_roots: Array[Node3D] = []
 var _animation_rng := RandomNumberGenerator.new()
+var tree_batches: Array[Dictionary] = []
+var _detail_groups: Array[MeshInstance3D] = []
 
 
 func _ready() -> void:
@@ -202,6 +204,7 @@ func _add_asset(p: Dictionary, paint: Material) -> void:
 		var node := MeshInstance3D.new()
 		node.name = variant.to_pascal_case()+str(mesh_nodes.size())
 		node.mesh = _mesh(variant)
+		node.set_meta("asset",variant)
 		if variant=="alc_ground_terraces":
 			var surface := SurfaceTool.new()
 			surface.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -211,6 +214,8 @@ func _add_asset(p: Dictionary, paint: Material) -> void:
 					surface.append_from(_mesh(str(source.asset)),0,_transform_of(p).affine_inverse()*_transform_of(source))
 			node.mesh=surface.commit()
 		node.material_override = _far_material(variant) if str(p.zone)=="FarZone" else paint
+		if layout.get("ground_materials",{}).has(variant):
+			node.material_override=load(ROOT+str(layout.ground_materials[variant])) as Material
 		node.transform = _transform_of(p)
 		zones[p.zone].add_child(node)
 		mesh_nodes.append(node)
@@ -236,11 +241,13 @@ func _add_surface_group(items: Array, paint: Material) -> void:
 	# Original GLBs and instance transforms remain in the delivery contract.
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-	surface.set_material(paint if items[0].surface_group=="dock_furnishings" else _mesh(str(items[0].asset)).surface_get_material(0))
+	surface.set_material(paint if items[0].surface_group in ["dock_furnishings","garden_flowers"] else _mesh(str(items[0].asset)).surface_get_material(0))
 	for p in items:surface.append_from(_mesh(str(p.asset)),0,_transform_of(p))
 	var node := MeshInstance3D.new()
 	node.name=str(items[0].surface_group).to_pascal_case()
 	node.mesh=surface.commit()
+	if items[0].surface_group=="garden_flowers":
+		node.set_meta("max_view_width_m",8.0);_detail_groups.append(node)
 	node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	node.gi_mode=GeometryInstance3D.GI_MODE_DISABLED
 	zones[items[0].zone].add_child(node)
@@ -248,6 +255,9 @@ func _add_surface_group(items: Array, paint: Material) -> void:
 
 func _add_batch(items: Array, paint: Material) -> void:
 	var asset := str(items[0].asset)
+	if asset.begins_with("alc_tree_"):
+		_add_tree_batches(items,paint)
+		return
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.mesh = _mesh(asset)
@@ -281,6 +291,44 @@ func _add_batch(items: Array, paint: Material) -> void:
 	for p in items:
 		if bool(p.collision):_add_prop_collision(p)
 
+func _add_tree_batches(items: Array, paint: Material) -> void:
+	# Each zone keeps its own batches. Select per instance using the shared LOD
+	# AABB centre after camera fitting; a whole-island batch cannot use one range.
+	var group := {"asset":str(items[0].asset),"transforms":[],"bounds":[],"centres":[],"distance":40.0,"items":items}
+	var box := _mesh(str(items[0].asset)).get_aabb()
+	for p in items:
+		var transform := _transform_of(p)
+		var world_box := transform*box
+		group.transforms.append(transform);group.bounds.append(world_box)
+		group.centres.append(world_box.get_center())
+		if bool(p.collision):_add_prop_collision(p)
+	for suffix in ["","_far"]:
+		var mm := MultiMesh.new();mm.transform_format=MultiMesh.TRANSFORM_3D
+		mm.mesh=_mesh(str(items[0].asset)+suffix);mm.instance_count=items.size()
+		for i in items.size():mm.set_instance_transform(i,group.transforms[i])
+		var node := MultiMeshInstance3D.new();node.name=(str(items[0].asset)+suffix).to_pascal_case()+"Batch"
+		node.multimesh=mm;node.material_override=paint
+		zones[items[0].zone].add_child(node);batch_nodes.append(node)
+		group["far" if suffix else "near"]=node
+	tree_batches.append(group)
+
+func _update_tree_lods(camera_position: Vector3) -> void:
+	for group in tree_batches:
+		var counts := [0,0]
+		var bounds := [AABB(),AABB()]
+		var nodes := [group.near,group.far]
+		for i in group.transforms.size():
+			var slot := int(camera_position.distance_to(group.centres[i])>=float(group.distance))
+			var node: MultiMeshInstance3D = nodes[slot]
+			node.multimesh.set_instance_transform(counts[slot],group.transforms[i])
+			bounds[slot]=group.bounds[i] if counts[slot]==0 else bounds[slot].merge(group.bounds[i])
+			counts[slot]+=1
+		for slot in 2:
+			var node: MultiMeshInstance3D = nodes[slot]
+			node.multimesh.visible_instance_count=counts[slot]
+			node.visible=counts[slot]>0
+			if counts[slot]>0:node.multimesh.custom_aabb=bounds[slot]
+
 func _add_prop_collision(p: Dictionary) -> void:
 	var definitions := {
 		"alc_bench":[Vector3(1.5,.9,.5),Vector3(0,.45,0)],
@@ -289,6 +337,8 @@ func _add_prop_collision(p: Dictionary) -> void:
 		"alc_rail_corner":[Vector3(.5,1,.5),Vector3(.2,.5,.2)],
 		"alc_tree_a":[Vector3(.3,1.4,.3),Vector3(0,.7,0)],
 		"alc_tree_b":[Vector3(.3,1.4,.3),Vector3(0,.7,0)],
+		"alc_tree_c":[Vector3(.3,1.4,.3),Vector3(0,.7,0)],
+		"alc_tree_d":[Vector3(.3,1.4,.3),Vector3(0,.7,0)],
 		"alc_flowerbed":[Vector3(1.7,.66,1.7),Vector3(0,.33,0)],
 		"alc_bin":[Vector3(.47,.8,.47),Vector3(0,.4,0)],
 		"alc_planter":[Vector3(.68,1.14,.68),Vector3(0,.57,0)],
@@ -452,6 +502,7 @@ func _update_camera() -> void:
 	var width := (78.0 if _overview else PHONE_WIDTH) / zoom_for_view
 	_camera.size = width
 	# Low decorations have a screen-size LOD; tree silhouettes and rails remain.
+	for node in _detail_groups:node.visible=_overview or width<=float(node.get_meta("max_view_width_m"))
 	for node in _detail_batches:
 		node.visible = _overview or width<=float(node.get_meta("max_view_width_m"))
 	if not camera_pan.active():
@@ -471,6 +522,7 @@ func _update_camera() -> void:
 	_camera.position = target+Vector3(sin(yaw)*cos(pitch),sin(pitch),cos(yaw)*cos(pitch))*11
 	_camera.look_at(target,Vector3.UP)
 	FarmCamera.fit_ground_depth(_camera,-.2,28.0)
+	_update_tree_lods(_camera.global_position)
 	# Compact visible decorations into the existing MultiMesh. Whole-zone bounds
 	# would otherwise submit every flower and rock. Shadow casters stay untouched.
 	var planes := _camera.get_frustum()

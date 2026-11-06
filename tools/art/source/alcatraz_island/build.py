@@ -3,7 +3,7 @@ Run Blender through ~/gs66-render.lock. Full rebuild overwrites the editable sou
 """
 from pathlib import Path
 from collections import defaultdict
-import json, math, random, sys
+import json, math, random, sys, hashlib
 import bpy
 HERE=Path(__file__).resolve().parent; ROOT=HERE.parents[3]
 sys.path.insert(0,str(ROOT/'tools/art'))
@@ -13,6 +13,9 @@ import placeholders, authored, finish, integration
 OUT=ROOT/'assets/landmarks/alcatraz_island'
 AUTHORED=authored.load_catalog(OUT)
 PREVIOUS=json.loads((OUT/'manifest.json').read_text()).get('assets',{}) if (OUT/'manifest.json').exists() else {}
+LAYOUT_ONLY='--layout-only' in sys.argv
+PRESERVED=json.loads((HERE/'preserved_geometry.json').read_text())['assets'] if LAYOUT_ONLY else {}
+for name,row in PRESERVED.items():assert hashlib.sha256((OUT/(name+'.glb')).read_bytes()).hexdigest()==row['sha256'],name
 reset_scene(); random.seed(424)
 PALETTE=json.loads((HERE/'palette.json').read_text())
 kit=Kit(OUT,PALETTE['colors'])
@@ -111,6 +114,7 @@ placeholders.build(kit,box,prism,place)
 placeholders.scatter(place)
 garden_design=integration.gardens(kit,box,place)
 integration.collaborator_points(OUT,HERE,placements,place)
+tree_design=integration.tree_replacements(HERE,placements)
 kit.begin('gull',ao=False)
 kit.ellipsoid('body',(0,.12,0),(.32,.24,.45),'bird',seg=10,rings=6)
 kit.ellipsoid('head',(0,.29,-.18),(.19,.19,.19),'bird',seg=8,rings=6)
@@ -200,14 +204,14 @@ for poly in polys:
  c=[sum(verts[i][k] for i in poly)/4 for k in range(3)];navzones[zone_for(c[0],c[2],c[1])].append(poly)
 route=[[-22,1,19],[-22,1,12],[-22,3.25,7.5],[8,3.25,7.5],[8,5.5,3],[-22,5.5,3],[-22,7.75,-1.5],[8,7.75,-1.5],[8,10,-6],[0,10,-6]]
 route_length=sum(math.dist(a,b) for a,b in zip(route,route[1:]))
-layout={'revision':'B v8 pictogram and accepted effects with approved props, garden and ferry','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
+layout={'revision':'B v9 ground materials, calibrated towers and four tree species with approved props, garden and ferry','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
  'spawn':route[0],'exit':[-23,1,19.4],'cam0':route[0],'review_points':{'opening':route[0],'mid_hill':route[4],'visitor_center':route[-1]},
  'navigation':{'vertices':verts,'polygons':polys,'zone_polygons':navzones,'cell':step},'route':route,'walk_goals':[route[0],route[4],route[-1]],'route_centerline_m':route_length,
  'stairs':[{'flight':i+1,'lower':s[5],'upper':s[4],'width':3,'run':4.5,'risers':15,'riser_m':.15} for i,s in enumerate(stairs)],
  'camera':{'pitch':43,'yaw':14.5,'width':6.72,'zoom_min':1/3,'zoom_max':1.4,'forward_bias_m':2.8},
  'dimensions_m':{'island':[60,40],'museum':[40,9,10],'lighthouse_height':15,'water_tower_height':12,'ferry_length':25,'bench_length':1.5,'bench_seat_height':.45,'railing_height':1,'lamp_height':3.5,'avatar_nominal_height':1.75},
  'sea_size':512,'nav_connected_cells':len(cells),'clearance_m':.25,
- 'notes':['v8 blank landmark signs with a lighthouse pictogram; accepted museum LOD, native gull/ferry animation and shoreline overlays installed.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
+ 'notes':['v9: retained owned geometry/UV; ground material v1.1, calibrated towers and four tree species with per-instance 40m LOD.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
 authored.replace_preview_modules(kit,OUT,AUTHORED)
 # Public integration contract follows tea_house's camera/spawn/anchors/boundaries fields.
 lod_groups=[]
@@ -215,6 +219,8 @@ for asset in ['alc_museum','alc_lighthouse','alc_watertower','ferry']:
     lod_groups.append({'name':asset,'near':asset,'far':asset+'_far','switch_distance_m':55,'margin_m':0,'far_placeholder':asset+'_far' not in AUTHORED})
     if asset=='alc_museum':
         lod_groups[-1]['sign_sync_pending']=AUTHORED.get('alc_museum_far',{}).get('near_source',{}).get('git_ref')!='bf0c31b1c871011008b455434d167224d14de59c'
+for asset in placeholders.TREES:
+    lod_groups.append({'name':asset,'near':asset,'far':asset+'_far','switch_distance_m':40,'margin_m':0,'kind':'tree','selection':'per-instance distance to shared mesh AABB centre','far_placeholder':False})
 asset_instance_counts=defaultdict(int)
 for i,p in enumerate(placements):
     p['name']='%s_%03d'%(p['asset'],asset_instance_counts[p['asset']])
@@ -229,6 +235,8 @@ for i,p in enumerate(placements):
         p['animation_phase_group']=asset_instance_counts[p['asset']]-1
     if p['asset']=='ruins':p['render_merge_into']='alc_ground_terraces'
     if p['asset'].startswith('alc_foam_'):p['surface_group']='shore_foam'
+    if p['asset'] in ['alc_buoy','alc_driftwood']:p['surface_group']='shore_props'
+    if p['asset'].startswith('alc_flowers_') and p['zone']=='TerraceZone':p['surface_group']='garden_flowers'
     if p['asset'] in placeholders.DOCK or (p['asset']=='alc_sign' and p['zone']=='DockZone'):p['surface_group']='dock_furnishings'
     if p['asset'] in [g['near'] for g in lod_groups]:p['lod_group']=p['asset']
 used={i for p in polys for i in p};navpoints=[verts[i] for i in used]
@@ -247,6 +255,12 @@ layout['boundaries']=[{'name':'WestBoundary','size':[.2,36,40],'at':[-30.1,17.85
 layout['lod_groups']=lod_groups
 layout['palette']=PALETTE
 layout['render_groups']={'shore_foam':'static shared-material overlay; original prototypes and 102 placements retained','alc_ground_terraces':['ruins_000'],'dock_furnishings':'seven dock kit placements plus existing entrance sign; standalone prototypes retained'}
+layout['integration_sources']={'ground_materials': '25923b8e9a9e18bb8cb6e856dc89bf86e73fe771', 'trees_cd': '4d8cdab5af1fd89a972af2ecd9c990eb1371f5cf', 'trees_ab_far': '3a61327c0b5ed20d83a524dc02050f5f26ed363e', 'tower_colour': 'fbf5463a4ba975ad732712afe8aa5e329e6a562d', 'owned_geometry_baseline': 'b81605af5b9aaa2e9bdcd3af81a0b2f385ce7bc3'}
+layout['tree_design']=tree_design
+layout['tree_design']['minimum_camera_pitch_degrees']=40
+layout['render_groups']['shore_props']='five static floats; original two prototypes and points retained'
+layout['render_groups']['garden_flowers']='same-material static terrace flower clusters; keep standalone prototypes/points, visible to 8m view width'
+layout['ground_materials']={'alc_ground_dock':'ground/alc_terrain_detail.tres','alc_ground_terraces':'ground/alc_terrain_detail.tres','alc_ground_summit':'ground/alc_terrain_detail.tres','dock':'ground/alc_dock_detail.tres'}
 layout['garden_design']=garden_design
 layout['rail_repairs']=rail_repairs
 layout['hud_clearance']=json.loads((HERE/'hud_contract.json').read_text())
@@ -256,19 +270,21 @@ layout['instances']=[{k:p[k] for k in ['name','asset','zone','position','rotatio
 layout['interest_points']=[{'name':p['name'],'asset':p['asset'],'position':p['position'],'zone':p['zone']} for p in placements if p['asset'] in placeholders.REPEATED and p['asset'] not in ['alc_rail_straight','alc_rail_corner','alc_curb']]
 layout['assets']=[{'name':name,'file':name+'.glb','placeholder':name in placeholders.OWNERS and name not in AUTHORED,'owner':placeholders.OWNERS.get(name,'马可波罗'),'pivot':'ground centre; +Z front','cast_shadow':name not in ['alc_curb','alc_lamp','alc_bin','alc_sign','alc_rail_corner','alc_flowerbed','alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft','ferry','gull']+placeholders.GARDEN+placeholders.RUINS+placeholders.DOCK+placeholders.SHORE+['alc_shrub_b','ferry_flag'] and not name.startswith('alc_far_') and not name.endswith('_far'),'material':'vertex_color_placeholder' if name in placeholders.OWNERS and name not in AUTHORED else 'vertex_color'} for name in kit.assets]
 for asset in layout['assets']:
+    if asset['name'] in ['alc_lamp','alc_sign']:asset['max_view_width_m']=12.0
+    if asset['name'].startswith('alc_tree_'):asset['cast_shadow']=True
     if asset['name'] in placeholders.SHORE:asset['material']='imported'
     if asset['name'] in ['alc_grass_tuft','alc_shrub','alc_flowerbed','alc_bin','alc_rail_corner']+placeholders.GARDEN+placeholders.RUINS+['alc_shrub_b']:
         asset['max_view_width_m']=8.0
 (OUT/'placement_points.json').write_text(json.dumps({'units':'metres','axes':layout['axes'],'instances':layout['instances']},ensure_ascii=False,indent=2)+'\n')
 (OUT/'layout.json').write_text(json.dumps(layout,separators=(',',':'))+'\n')
-manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v8 pictogram and accepted effects pass','assets':{}}
+manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v9 ground materials, calibrated towers and four tree species pass','assets':{}}
 for name in kit.assets:
- manifest['assets'][name]=authored.manifest_row(OUT,AUTHORED[name]) if name in AUTHORED else kit.export(name,ao_radius=.18)
+ manifest['assets'][name]=authored.manifest_row(OUT,AUTHORED[name]) if name in AUTHORED else dict(PRESERVED[name]) if name in PRESERVED else kit.export(name,ao_radius=.18)
  print('ALCATRAZ_ASSET',name,manifest['assets'][name],flush=True)
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in placements)<=300000
 assert len(kit.assets)<=80
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-assembly=bpy.data.collections.new('Alcatraz_v8_Assembly');bpy.context.scene.collection.children.link(assembly)
+assembly=bpy.data.collections.new('Alcatraz_v9_Assembly');bpy.context.scene.collection.children.link(assembly)
 zone_collections={}
 for z in ZONES+['FarZone']:
  col=bpy.data.collections.new(z);assembly.children.link(col);zone_collections[z]=col

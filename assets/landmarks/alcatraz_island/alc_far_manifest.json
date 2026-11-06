@@ -1,22 +1,22 @@
 {
   "task": "SGODOT-424",
-  "revision": "v1.1",
+  "revision": "v1.2_tower_palette",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "units": "metres; Y up; +Z front; bottom-centre origin",
   "palette_srgb": {
-    "white": "EEE8D6",
-    "white_light": "FFF5E1",
-    "white_shadow": "D6D2C2",
-    "stone": "B4AE9B",
-    "window": "88B1BB",
-    "window_dark": "547981",
-    "lantern": "F5D994",
-    "roof": "B8AB8C",
-    "rust": "A86C48",
-    "rust_light": "C48C5E",
-    "rust_dark": "80513B",
-    "hoop": "765344",
+    "white": "EFE7D4",
+    "white_light": "F6ECD9",
+    "white_shadow": "D7CAB1",
+    "stone": "CBB48F",
+    "window": "86B0B3",
+    "window_dark": "608F99",
+    "lantern": "F0D69C",
+    "roof": "A4A08F",
+    "rust": "AC7955",
+    "rust_light": "C1946D",
+    "rust_dark": "7F5B44",
+    "hoop": "6D5746",
     "bridge": "C97454",
     "bridge_light": "DE8A62",
     "bridge_shade": "AD604A",
@@ -51,7 +51,7 @@
         15.0,
         4.300000190734863
       ],
-      "sha256": "61cac63d1c1be7b8583e8dfd1692e958ee66a1dbad116cb4375fc6ac95dce9b9",
+      "sha256": "a953a721d7c7b3863aa075252091addc4fa9a38bc9341a9f853e8121ff139b96",
       "source": "tools/art/source/alcatraz_far_424/alc_lighthouse.blend",
       "height_m": 15,
       "style": "White visitor lighthouse, warm lantern, no bars or watchtower details"
@@ -77,7 +77,7 @@
         15.0,
         4.300000190734863
       ],
-      "sha256": "bdbd5677a996fc2808a8cb41db5846d6580d0a62d0eb7dd7b2f5df167e36aefb",
+      "sha256": "b3a82c08d041beb6e953835a28a72c14adf7a9c3b13a50355c6416ac27459094",
       "source": "tools/art/source/alcatraz_far_424/alc_lighthouse_far.blend",
       "height_m": 15,
       "style": "White visitor lighthouse, warm lantern, no bars or watchtower details"
@@ -103,7 +103,7 @@
         12.0,
         4.039999961853027
       ],
-      "sha256": "92aaf9ffd5facab3c261180cae8dcb05bb46edea0345856acdd4cc9b5815cb11",
+      "sha256": "78e4a965f0e707d3bb8b61d9cacc25e8ca1d4e7cb86097a81d876fef6752da7d",
       "source": "tools/art/source/alcatraz_far_424/alc_watertower.blend",
       "height_m": 12,
       "style": "Rust timber and iron support structure; open X bracing retained in far LOD"
@@ -129,7 +129,7 @@
         12.0,
         4.039999961853027
       ],
-      "sha256": "d37fd1ad196f152abb1a2cc754f000f11e82779bd6022cb6c31fddc17536c452",
+      "sha256": "78b4abf332acaf75f4147c77e59c7fe06eafb04dabf524282aa3e2be6e537948",
       "source": "tools/art/source/alcatraz_far_424/alc_watertower_far.blend",
       "height_m": 12,
       "style": "Rust timber and iron support structure; open X bracing retained in far LOD"
@@ -253,5 +253,10 @@
     "alc_far_bridge",
     "alc_far_hills"
   ],
-  "card_lod_count": 1
+  "card_lod_count": 1,
+  "tower_palette_reference": {
+    "host": "bf0c31b1c871011008b455434d167224d14de59c",
+    "palette": "tools/art/source/alcatraz_island/palette.json",
+    "change": "Tower COLOR_0 only; shared roof/glass/stone roles, warm-white lighthouse and desaturated rust tank"
+  }
 }

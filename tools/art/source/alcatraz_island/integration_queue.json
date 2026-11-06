@@ -1,6 +1,6 @@
 {
-  "state": "v8 integrated: matching near/far pictograms, accepted animation and shoreline overlays",
-  "integrated_base": "fc19d492",
+  "state": "v9 complete: ground v1.1, calibrated towers, four tree species and per-instance LODs",
+  "integrated_base": "a5ff682d",
   "accepted_packs": [
     {
       "pr": 794,
@@ -41,6 +41,22 @@
     {
       "pr": 824,
       "head": "1442acaf"
+    },
+    {
+      "pr": 825,
+      "head": "3a61327c0b5ed20d83a524dc02050f5f26ed363e"
+    },
+    {
+      "pr": 826,
+      "head": "4d8cdab5af1fd89a972af2ecd9c990eb1371f5cf"
+    },
+    {
+      "pr": 827,
+      "head": "25923b8e9a9e18bb8cb6e856dc89bf86e73fe771"
+    },
+    {
+      "pr": 828,
+      "head": "fbf5463a4ba975ad732712afe8aa5e329e6a562d"
     }
   ],
   "layout_fixes": {
@@ -63,12 +79,16 @@
   "render_groups": {
     "shore_foam": "102 static alpha pieces, one shared material surface",
     "dock_furnishings": "7 approved dock pieces plus original dock sign, one matte surface",
-    "alc_ground_terraces": "includes static original ruins geometry"
+    "alc_ground_terraces": "includes static original ruins geometry",
+    "shore_props": "five floats share one imported material/surface",
+    "garden_flowers": "terrace clusters share one material/surface; prototypes/points retained"
   },
   "sign_increment": {
     "pr": 828,
     "commit": "fbf5463a4ba975ad732712afe8aa5e329e6a562d",
     "scope": "museum pictogram commit only; requested synchronization to bf0c31b1",
-    "assembly_review": "pending"
-  }
+    "assembly_review": "integrated and verified in v8/v9"
+  },
+  "material_application": "four material_override bindings; no owned model/UV edits",
+  "tree_replacement": "12 replacements, 8a + 6b + 4c + 8d; roots/TRS/collision preserved"
 }

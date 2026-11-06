@@ -12,9 +12,9 @@ parser.add_argument('--sync-imports',action='store_true')
 args=parser.parse_args()
 if args.sync_imports:
     for rel in ['assets/landmarks/alcatraz_island','scenes/landmark']:
-        for p in (QA/rel).iterdir():
+        for p in (QA/rel).rglob("*"):
             if p.name.endswith(('.import','.uid')):
-                shutil.copy2(p,ROOT/rel/p.name)
+                shutil.copy2(p,ROOT/rel/p.relative_to(QA/rel))
     raise SystemExit(0)
 
 QA.mkdir(parents=True,exist_ok=True)

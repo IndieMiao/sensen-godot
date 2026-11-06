@@ -1,0 +1,22 @@
+[
+  {
+    "file": "SGODOT-424_tower_color_v1_lod_54_56.png",
+    "bytes": 225511,
+    "sha256": "5dbe26914d8a00a1fe120ca221d71581e3a7a96c1cdadddf4828524d696901fd"
+  },
+  {
+    "file": "SGODOT-424_tower_color_v1_native_20m_after.png",
+    "bytes": 194216,
+    "sha256": "fb3fcc54895925d33ecb87d4ecdf1fabea7f204699d38f6a38569b5c188a6883"
+  },
+  {
+    "file": "SGODOT-424_tower_color_v1_summit_before_after.png",
+    "bytes": 255932,
+    "sha256": "976b3e0737434a6f960aba412043d64c39305462f9aaf2c48bc9793e7fc38b85"
+  },
+  {
+    "file": "SGODOT-424_tower_color_v1_validation.json",
+    "bytes": 25977,
+    "sha256": "738a05fb65d5c31c4e66f47be768282c0422f517b89239fad87b3b91c721049c"
+  }
+]

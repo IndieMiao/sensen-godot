@@ -1,0 +1,32 @@
+[
+  {
+    "name": "SGODOT-424_TREES_CD_v1_39m_41m.png",
+    "path": "docs/design/alcatraz-trees-cd-424-2026-11-06/SGODOT-424_TREES_CD_v1_39m_41m.png",
+    "mime": "image/png",
+    "size": [
+      1440,
+      968
+    ],
+    "sha256": "94609c55884ce325595fbe6b89fb1cf9fb16f7070d4226279089ebb6d91f3834"
+  },
+  {
+    "name": "SGODOT-424_TREES_CD_v1_lineup.png",
+    "path": "docs/design/alcatraz-trees-cd-424-2026-11-06/SGODOT-424_TREES_CD_v1_lineup.png",
+    "mime": "image/png",
+    "size": [
+      1500,
+      1070
+    ],
+    "sha256": "f3ec664bf35ae499da03e7eeb14614f30db536ef3ae036bc6017c80901250a9a"
+  },
+  {
+    "name": "SGODOT-424_TREES_CD_v1_slope_before_after.png",
+    "path": "docs/design/alcatraz-trees-cd-424-2026-11-06/SGODOT-424_TREES_CD_v1_slope_before_after.png",
+    "mime": "image/png",
+    "size": [
+      1440,
+      1170
+    ],
+    "sha256": "93ed31471f5e37c8fc4e1b745c1b54f44d934060b8ab1c4514b910fb06efdb15"
+  }
+]

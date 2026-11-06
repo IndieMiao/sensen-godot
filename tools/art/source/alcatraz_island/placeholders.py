@@ -15,6 +15,9 @@ DOCK=['alc_dock_bollard','alc_dock_crates','alc_dock_shelter','alc_dock_welcome'
 REPEATED+=RUINS+DOCK
 SHORE=['alc_foam_strip_a','alc_foam_strip_b','alc_foam_strip_c','alc_foam_ring','alc_buoy','alc_driftwood']
 REPEATED+=SHORE
+TREES=['alc_tree_a','alc_tree_b','alc_tree_c','alc_tree_d']
+REPEATED+=['alc_tree_c','alc_tree_d']
+OWNERS.update({n:'赵云' for n in TREES+[t+'_far' for t in TREES]})
 OWNERS.update({n:'刘备' for n in SHORE})
 OWNERS.update({n:'赵云' for n in RUINS})
 OWNERS.update({n:'刘备' for n in DOCK})

@@ -6,12 +6,7 @@ import hashlib,json,math,random,sys
 import bpy,bmesh
 from mathutils import Vector
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];KIT=ROOT/'assets/landmarks/alcatraz_island'
-PAL={'white':'EEE8D6','white_light':'FFF5E1','white_shadow':'D6D2C2','stone':'B4AE9B',
- 'window':'88B1BB','window_dark':'547981','lantern':'F5D994','roof':'B8AB8C',
- 'rust':'A86C48','rust_light':'C48C5E','rust_dark':'80513B','hoop':'765344',
- 'bridge':'C97454','bridge_light':'DE8A62','bridge_shade':'AD604A',
- 'hills':'9DAE9B','hills_light':'B2BA9B','hill_shadow':'839D9A',
- 'city':'D3CBC0','city_light':'E8DACA','city_blue':'AABDC6','city_mid':'B9BEBB','city_shadow':'9FB1BD'}
+PAL={'white': 'EFE7D4', 'white_light': 'F6ECD9', 'white_shadow': 'D7CAB1', 'stone': 'CBB48F', 'window': '86B0B3', 'window_dark': '608F99', 'lantern': 'F0D69C', 'roof': 'A4A08F', 'rust': 'AC7955', 'rust_light': 'C1946D', 'rust_dark': '7F5B44', 'hoop': '6D5746', 'bridge': 'C97454', 'bridge_light': 'DE8A62', 'bridge_shade': 'AD604A', 'hills': '9DAE9B', 'hills_light': 'B2BA9B', 'hill_shadow': '839D9A', 'city': 'D3CBC0', 'city_light': 'E8DACA', 'city_blue': 'AABDC6', 'city_mid': 'B9BEBB', 'city_shadow': '9FB1BD'}
 PARTS=[];MATS={};PIVOT=None
 def v(p):return Vector((p[0],-p[2],p[1]))
 def rgb(h):return tuple(c/12.92 if c<=.04045 else ((c+.055)/1.055)**2.4 for c in [v/255 for v in bytes.fromhex(h)])

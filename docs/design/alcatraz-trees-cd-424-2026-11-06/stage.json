@@ -1,0 +1,9 @@
+{
+  "blockout_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+  "unchanged_files": {
+    "assets/landmarks/alcatraz_island/layout.json": "8cafefed37207464b5e735470b50219cc15e38b52a43361e3a1a9841eaa85af9",
+    "scenes/landmark/alcatraz_island.gd": "69b3d51c3c7c7a6b15335cc6dc84d94609ba1068eca5ac6e4d1462bc53aeefa1",
+    "scenes/landmark/alcatraz_island.tscn": "68c859099f2254dd2f83357127178159f8fa9835bc539e726876e4b458f580f5"
+  },
+  "note": "Published v7 original scene and layout retained; before/after tree replacements happen only inside the review script."
+}

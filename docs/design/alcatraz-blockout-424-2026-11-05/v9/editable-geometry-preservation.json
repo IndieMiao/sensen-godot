@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "baseline": "b81605af",
+  "compared": "editable vertex/face/UV/transform/material assignments",
+  "identical_modules": {
+    "alc_ground_dock": "47ed87f9a8a3400476bfa73596578bc77e0ec1dd500bf0368eb586c51a00584a",
+    "alc_ground_terraces": "4343694c62dd3f0b85d7c2dafd51214518c1c8143f89134b752c5dc011b39d5f",
+    "alc_ground_summit": "6d40c67df3b47285185e0e265e694dd1e71a40c1527fa128268b2cdf0e48884b",
+    "dock": "9c55a512cd3d32ab0c5cdb4615c509be33a31b67092897a810882307a2683c90",
+    "alc_museum": "0f04179d19a33fc8ba831e32380d2c618d1984f75514782fbc10e210e31cf148",
+    "ruins": "3a8dc21b360c2327bb488122393c33c75229061ff90b053029d150105a5be3a6"
+  }
+}

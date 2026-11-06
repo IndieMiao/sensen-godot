@@ -1,0 +1,82 @@
+{
+  "baseline": "b81605af5b9aaa2e9bdcd3af81a0b2f385ce7bc3",
+  "owned_glbs_unchanged": {
+    "alc_ground_dock": "3663f515b56c9fe15d0b46fa07b50224ceef063493e694cca0660fc2b983a993",
+    "alc_ground_terraces": "aab0796e4598b3af1c14d30980af67cd573825fe9b8bc14dfcfced927f666508",
+    "alc_ground_summit": "8913a6a5b11e878fcfeb295fab3649044a18cf510d989d671e84225c29465e8a",
+    "dock": "0fb5c90f4234d551c40ee3aa932ed07b7d420768c83367a49d36f770f69d7cb9",
+    "alc_museum": "c6ce61fdc20955508de56dc1ff5cff75cbc7b4eb00564e14c6f9cf638c439011",
+    "ruins": "72586b1719fd526c5bccb9101997c7b7d59c2f251794e00b6f35dbe9d100fba2"
+  },
+  "tower_colour_only": {
+    "alc_lighthouse": {
+      "json_and_geometry_uv_normals_indices_equal": true,
+      "alpha_equal": true,
+      "rgb_changed": true,
+      "import_and_uid_equal": true
+    },
+    "alc_lighthouse_far": {
+      "json_and_geometry_uv_normals_indices_equal": true,
+      "alpha_equal": true,
+      "rgb_changed": true,
+      "import_and_uid_equal": true
+    },
+    "alc_watertower": {
+      "json_and_geometry_uv_normals_indices_equal": true,
+      "alpha_equal": true,
+      "rgb_changed": true,
+      "import_and_uid_equal": true
+    },
+    "alc_watertower_far": {
+      "json_and_geometry_uv_normals_indices_equal": true,
+      "alpha_equal": true,
+      "rgb_changed": true,
+      "import_and_uid_equal": true
+    }
+  },
+  "tree_import_gate": {
+    "alc_tree_c": "matches Godot-generated 4d8cdab5",
+    "alc_tree_c_far": "matches Godot-generated 4d8cdab5",
+    "alc_tree_d": "matches Godot-generated 4d8cdab5",
+    "alc_tree_d_far": "matches Godot-generated 4d8cdab5"
+  },
+  "tree_roots": [
+    "alc_tree_b_000",
+    "alc_tree_a_000",
+    "alc_tree_a_001",
+    "alc_tree_b_001",
+    "alc_tree_a_002",
+    "alc_tree_a_003",
+    "alc_tree_b_002",
+    "alc_tree_a_004",
+    "alc_tree_a_005",
+    "alc_tree_b_003",
+    "alc_tree_a_006",
+    "alc_tree_a_007",
+    "alc_tree_b_004",
+    "alc_tree_a_008",
+    "alc_tree_a_009",
+    "alc_tree_b_005",
+    "alc_tree_a_010",
+    "alc_tree_a_011",
+    "alc_tree_b_006",
+    "alc_tree_a_012",
+    "alc_tree_a_013",
+    "alc_tree_a_014",
+    "alc_tree_b_007",
+    "alc_tree_a_015",
+    "alc_tree_b_008",
+    "alc_tree_a_016"
+  ],
+  "layout_geometry_camera_navigation_unchanged": true,
+  "tree_counts": {
+    "alc_tree_b": 6,
+    "alc_tree_d": 8,
+    "alc_tree_a": 8,
+    "alc_tree_c": 4
+  },
+  "sea_and_backdrop_shaders_unchanged": true,
+  "ground_material_head": "25923b8e9a9e18bb8cb6e856dc89bf86e73fe771",
+  "paving_and_dock_finish_v1_preserved": true,
+  "passed": true
+}

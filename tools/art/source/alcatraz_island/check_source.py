@@ -24,5 +24,5 @@ for i,p in enumerate(layout['placements']):
 treads=[o for o in bpy.data.collections['alc_ground_terraces'].objects if o.name.startswith('flight_') and '_riser_' in o.name]
 assert len(treads)==60,len(treads)
 report={'passed':True,'blender_version':bpy.app.version_string,'editable_modules':rows,'editable_treads':len(treads),'checked_instance_positions':len(layout['placements']),'zones':['DockZone','TerraceZone','SummitZone','FarZone'],'blend_sha256':hashlib.sha256((root/'tools/art/source/alcatraz_island/alcatraz_blockout.blend').read_bytes()).hexdigest()}
-(root/'docs/design/alcatraz-blockout-424-2026-11-05/v8/source-validation.json').write_text(json.dumps(report,indent=2)+'\n')
+(root/'docs/design/alcatraz-blockout-424-2026-11-05/v9/source-validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print('SOURCE_CHECK',len(rows),'modules,',len(treads),'editable treads; passed')

@@ -112,3 +112,19 @@ def connect_rails(placements,place):
         corners+=1
     placements[:]=[p for p in placements if not any(p is q for q in removed)]
     return {'height_junctions_fixed':corrected,'single_post_connectors':corners}
+
+
+def tree_replacements(here,placements):
+    table=json.loads((here.parent/'alcatraz_trees_cd_424/suggested_replacements.json').read_text())
+    rows={p['source_name']:p for p in table['replacements']};counts=defaultdict(int);applied=[]
+    for p in placements:
+        name='%s_%03d'%(p['asset'],counts[p['asset']]);counts[p['asset']]+=1
+        if not p['asset'].startswith('alc_tree_'):continue
+        p['source_name']=name
+        if name not in rows:continue
+        row=rows[name]
+        assert p['position']==row['position'],(name,p['position'],row['position'])
+        assert abs(p['yaw']-row['yaw'])<1e-6,name
+        p['asset']=row['asset'];applied.append(name)
+    assert len(applied)==12
+    return {'source':'#826 / 4d8cdab5','replaced':applied,'root_positions_preserved':True,'counts':table['after_counts']}

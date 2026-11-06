@@ -683,11 +683,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_000"
     },
     {
-      "name": "alc_tree_a_000",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_d_000",
+      "asset": "alc_tree_d",
       "zone": "TerraceZone",
       "position": [
         -25.0,
@@ -705,10 +706,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_000"
     },
     {
-      "name": "alc_tree_a_001",
+      "name": "alc_tree_a_000",
       "asset": "alc_tree_a",
       "zone": "TerraceZone",
       "position": [
@@ -727,7 +729,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_001"
     },
     {
       "name": "alc_tree_b_001",
@@ -749,11 +752,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_001"
     },
     {
-      "name": "alc_tree_a_002",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_d_001",
+      "asset": "alc_tree_d",
       "zone": "TerraceZone",
       "position": [
         24.5,
@@ -771,11 +775,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_002"
     },
     {
-      "name": "alc_tree_a_003",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_d_002",
+      "asset": "alc_tree_d",
       "zone": "TerraceZone",
       "position": [
         18,
@@ -793,7 +798,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_003"
     },
     {
       "name": "alc_tree_b_002",
@@ -815,10 +821,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_002"
     },
     {
-      "name": "alc_tree_a_004",
+      "name": "alc_tree_a_001",
       "asset": "alc_tree_a",
       "zone": "TerraceZone",
       "position": [
@@ -837,11 +844,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_004"
     },
     {
-      "name": "alc_tree_a_005",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_d_003",
+      "asset": "alc_tree_d",
       "zone": "TerraceZone",
       "position": [
         -26,
@@ -859,7 +867,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_005"
     },
     {
       "name": "alc_tree_b_003",
@@ -881,10 +890,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_003"
     },
     {
-      "name": "alc_tree_a_006",
+      "name": "alc_tree_a_002",
       "asset": "alc_tree_a",
       "zone": "TerraceZone",
       "position": [
@@ -903,10 +913,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_006"
     },
     {
-      "name": "alc_tree_a_007",
+      "name": "alc_tree_a_003",
       "asset": "alc_tree_a",
       "zone": "TerraceZone",
       "position": [
@@ -925,11 +936,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_007"
     },
     {
-      "name": "alc_tree_b_004",
-      "asset": "alc_tree_b",
+      "name": "alc_tree_d_004",
+      "asset": "alc_tree_d",
       "zone": "TerraceZone",
       "position": [
         16.7,
@@ -947,11 +959,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_004"
     },
     {
-      "name": "alc_tree_a_008",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_d_005",
+      "asset": "alc_tree_d",
       "zone": "TerraceZone",
       "position": [
         22,
@@ -969,10 +982,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_008"
     },
     {
-      "name": "alc_tree_a_009",
+      "name": "alc_tree_a_004",
       "asset": "alc_tree_a",
       "zone": "TerraceZone",
       "position": [
@@ -991,10 +1005,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_009"
     },
     {
-      "name": "alc_tree_b_005",
+      "name": "alc_tree_b_004",
       "asset": "alc_tree_b",
       "zone": "TerraceZone",
       "position": [
@@ -1013,10 +1028,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_005"
     },
     {
-      "name": "alc_tree_a_010",
+      "name": "alc_tree_a_005",
       "asset": "alc_tree_a",
       "zone": "TerraceZone",
       "position": [
@@ -1035,10 +1051,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_010"
     },
     {
-      "name": "alc_tree_a_011",
+      "name": "alc_tree_a_006",
       "asset": "alc_tree_a",
       "zone": "TerraceZone",
       "position": [
@@ -1057,10 +1074,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_011"
     },
     {
-      "name": "alc_tree_b_006",
+      "name": "alc_tree_b_005",
       "asset": "alc_tree_b",
       "zone": "TerraceZone",
       "position": [
@@ -1079,11 +1097,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_006"
     },
     {
-      "name": "alc_tree_a_012",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_d_006",
+      "asset": "alc_tree_d",
       "zone": "TerraceZone",
       "position": [
         16.7,
@@ -1101,11 +1120,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_012"
     },
     {
-      "name": "alc_tree_a_013",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_d_007",
+      "asset": "alc_tree_d",
       "zone": "TerraceZone",
       "position": [
         22,
@@ -1123,11 +1143,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_013"
     },
     {
-      "name": "alc_tree_a_014",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_c_000",
+      "asset": "alc_tree_c",
       "zone": "SummitZone",
       "position": [
         -28,
@@ -1145,11 +1166,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_014"
     },
     {
-      "name": "alc_tree_b_007",
-      "asset": "alc_tree_b",
+      "name": "alc_tree_c_001",
+      "asset": "alc_tree_c",
       "zone": "SummitZone",
       "position": [
         -22.2,
@@ -1167,11 +1189,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_007"
     },
     {
-      "name": "alc_tree_a_015",
-      "asset": "alc_tree_a",
+      "name": "alc_tree_c_002",
+      "asset": "alc_tree_c",
       "zone": "SummitZone",
       "position": [
         -28,
@@ -1189,11 +1212,12 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_015"
     },
     {
-      "name": "alc_tree_b_008",
-      "asset": "alc_tree_b",
+      "name": "alc_tree_c_003",
+      "asset": "alc_tree_c",
       "zone": "SummitZone",
       "position": [
         22.2,
@@ -1211,10 +1235,11 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_b_008"
     },
     {
-      "name": "alc_tree_a_016",
+      "name": "alc_tree_a_007",
       "asset": "alc_tree_a",
       "zone": "SummitZone",
       "position": [
@@ -1233,7 +1258,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "source_name": "alc_tree_a_016"
     },
     {
       "name": "alc_shrub_b_000",
@@ -3878,7 +3904,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_001",
@@ -3901,7 +3928,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_002",
@@ -3924,7 +3952,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_000",
@@ -3947,7 +3976,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_001",
@@ -3970,7 +4000,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_002",
@@ -3993,7 +4024,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_003",
@@ -4016,7 +4048,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_004",
@@ -4039,7 +4072,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_005",
@@ -4062,7 +4096,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_000",
@@ -4085,7 +4120,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_001",
@@ -4108,7 +4144,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_002",
@@ -4131,7 +4168,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_003",
@@ -4154,7 +4192,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_004",
@@ -4177,7 +4216,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_005",
@@ -4200,7 +4240,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_003",
@@ -4223,7 +4264,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_004",
@@ -4246,7 +4288,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_005",
@@ -4269,7 +4312,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_hedge_000",
@@ -4380,7 +4424,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_007",
@@ -4403,7 +4448,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_008",
@@ -4426,7 +4472,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_006",
@@ -4449,7 +4496,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_007",
@@ -4472,7 +4520,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_008",
@@ -4495,7 +4544,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_009",
@@ -4518,7 +4568,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_010",
@@ -4541,7 +4592,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_011",
@@ -4564,7 +4616,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_006",
@@ -4587,7 +4640,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_007",
@@ -4610,7 +4664,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_008",
@@ -4633,7 +4688,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_009",
@@ -4656,7 +4712,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_010",
@@ -4679,7 +4736,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_011",
@@ -4702,7 +4760,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_009",
@@ -4725,7 +4784,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_010",
@@ -4748,7 +4808,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_011",
@@ -4771,7 +4832,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_hedge_004",
@@ -4882,7 +4944,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_013",
@@ -4905,7 +4968,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_014",
@@ -4928,7 +4992,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_012",
@@ -4951,7 +5016,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_013",
@@ -4974,7 +5040,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_014",
@@ -4997,7 +5064,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_015",
@@ -5020,7 +5088,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_016",
@@ -5043,7 +5112,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_poppy_017",
@@ -5066,7 +5136,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_012",
@@ -5089,7 +5160,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_013",
@@ -5112,7 +5184,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_014",
@@ -5135,7 +5208,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_015",
@@ -5158,7 +5232,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_016",
@@ -5181,7 +5256,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_lavender_017",
@@ -5204,7 +5280,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_015",
@@ -5227,7 +5304,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_016",
@@ -5250,7 +5328,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_017",
@@ -5273,7 +5352,8 @@
       ],
       "owner": "赵云",
       "placeholder": false,
-      "support_y_offset_m": 0.3
+      "support_y_offset_m": 0.3,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_hedge_008",
@@ -5383,7 +5463,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_019",
@@ -5405,7 +5486,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_020",
@@ -5427,7 +5509,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_021",
@@ -5449,7 +5532,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_022",
@@ -5471,7 +5555,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_023",
@@ -5493,7 +5578,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "surface_group": "garden_flowers"
     },
     {
       "name": "alc_flowers_daisy_024",
@@ -9263,7 +9349,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_buoy_000"
+      "source_name": "alc_buoy_000",
+      "surface_group": "shore_props"
     },
     {
       "name": "alc_buoy_001",
@@ -9286,7 +9373,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_buoy_001"
+      "source_name": "alc_buoy_001",
+      "surface_group": "shore_props"
     },
     {
       "name": "alc_driftwood_000",
@@ -9309,7 +9397,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_driftwood_000"
+      "source_name": "alc_driftwood_000",
+      "surface_group": "shore_props"
     },
     {
       "name": "alc_driftwood_001",
@@ -9332,7 +9421,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_driftwood_001"
+      "source_name": "alc_driftwood_001",
+      "surface_group": "shore_props"
     },
     {
       "name": "alc_driftwood_002",
@@ -9355,7 +9445,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_driftwood_002"
+      "source_name": "alc_driftwood_002",
+      "surface_group": "shore_props"
     },
     {
       "name": "alc_rail_straight_000",

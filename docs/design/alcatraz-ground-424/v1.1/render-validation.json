@@ -1,0 +1,337 @@
+{
+	"before_commit": "91c563b16b651c1013d0290e70d611884376ab0f",
+	"captures": [
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "opening-before",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 35678,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "opening-after",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 35678,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "opening-lighting-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 35678,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "opening-classes",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 35678,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "opening-occlusion-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 35678,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (14.80156, 34.14277, 29.29968)]",
+			"name": "mid_hill-before",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 33,
+			"visible_primitives": 50669,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (14.80156, 34.14277, 29.29968)]",
+			"name": "mid_hill-after",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 33,
+			"visible_primitives": 50669,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (14.80156, 34.14277, 29.29968)]",
+			"name": "mid_hill-lighting-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 33,
+			"visible_primitives": 50669,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (14.80156, 34.14277, 29.29968)]",
+			"name": "mid_hill-classes",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 33,
+			"visible_primitives": 50669,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (14.80156, 34.14277, 29.29968)]",
+			"name": "mid_hill-occlusion-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 33,
+			"visible_primitives": 50669,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.593312, 34.14277, 15.62773)]",
+			"name": "summit-before",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 27,
+			"visible_primitives": 44363,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.593312, 34.14277, 15.62773)]",
+			"name": "summit-after",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 27,
+			"visible_primitives": 44363,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.593312, 34.14277, 15.62773)]",
+			"name": "summit-lighting-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 27,
+			"visible_primitives": 44363,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.593312, 34.14277, 15.62773)]",
+			"name": "summit-classes",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 27,
+			"visible_primitives": 44363,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (5.593312, 34.14277, 15.62773)]",
+			"name": "summit-occlusion-control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 27,
+			"visible_primitives": 44363,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.571064, -0.820905), Z: (0.0, 0.820905, 0.571064), O: (-12.0, 17.0, 8.0)]",
+			"name": "grass_detail-before",
+			"size": [
+				1100,
+				800
+			],
+			"visible_draw_calls": 6,
+			"visible_primitives": 20164,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.571064, -0.820905), Z: (0.0, 0.820905, 0.571064), O: (-12.0, 17.0, 8.0)]",
+			"name": "grass_detail-after",
+			"size": [
+				1100,
+				800
+			],
+			"visible_draw_calls": 6,
+			"visible_primitives": 20164,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.571064, -0.820905), Z: (0.0, 0.820905, 0.571064), O: (-12.0, 17.0, 8.0)]",
+			"name": "grass_detail-lighting-control",
+			"size": [
+				1100,
+				800
+			],
+			"visible_draw_calls": 6,
+			"visible_primitives": 20164,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.571064, -0.820905), Z: (0.0, 0.820905, 0.571064), O: (-12.0, 17.0, 8.0)]",
+			"name": "grass_detail-classes",
+			"size": [
+				1100,
+				800
+			],
+			"visible_draw_calls": 6,
+			"visible_primitives": 20164,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.571064, -0.820905), Z: (0.0, 0.820905, 0.571064), O: (-12.0, 17.0, 8.0)]",
+			"name": "grass_detail-occlusion-control",
+			"size": [
+				1100,
+				800
+			],
+			"visible_draw_calls": 6,
+			"visible_primitives": 20164,
+			"width_m": 9.0
+		}
+	],
+	"checks": [
+		{
+			"check": "host avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "same four host meshes",
+			"passed": true
+		},
+		{
+			"check": "opening: original default camera",
+			"passed": true
+		},
+		{
+			"check": "save opening-before",
+			"passed": true
+		},
+		{
+			"check": "save opening-after",
+			"passed": true
+		},
+		{
+			"check": "save opening-lighting-control",
+			"passed": true
+		},
+		{
+			"check": "save opening-classes",
+			"passed": true
+		},
+		{
+			"check": "save opening-occlusion-control",
+			"passed": true
+		},
+		{
+			"check": "mid_hill: original default camera",
+			"passed": true
+		},
+		{
+			"check": "save mid_hill-before",
+			"passed": true
+		},
+		{
+			"check": "save mid_hill-after",
+			"passed": true
+		},
+		{
+			"check": "save mid_hill-lighting-control",
+			"passed": true
+		},
+		{
+			"check": "save mid_hill-classes",
+			"passed": true
+		},
+		{
+			"check": "save mid_hill-occlusion-control",
+			"passed": true
+		},
+		{
+			"check": "summit: original default camera",
+			"passed": true
+		},
+		{
+			"check": "save summit-before",
+			"passed": true
+		},
+		{
+			"check": "save summit-after",
+			"passed": true
+		},
+		{
+			"check": "save summit-lighting-control",
+			"passed": true
+		},
+		{
+			"check": "save summit-classes",
+			"passed": true
+		},
+		{
+			"check": "save summit-occlusion-control",
+			"passed": true
+		},
+		{
+			"check": "save grass_detail-before",
+			"passed": true
+		},
+		{
+			"check": "save grass_detail-after",
+			"passed": true
+		},
+		{
+			"check": "save grass_detail-lighting-control",
+			"passed": true
+		},
+		{
+			"check": "save grass_detail-classes",
+			"passed": true
+		},
+		{
+			"check": "save grass_detail-occlusion-control",
+			"passed": true
+		}
+	],
+	"comparison_clock": "QA clock frozen only for matched images; original host sea/materials/lighting unchanged",
+	"controls": {},
+	"host_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+	"passed": true,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	},
+	"revision": "1.1"
+}
