@@ -271,6 +271,18 @@ func _tappable() -> PackedStringArray:
 		if DECOR.has(n): continue
 		if P0RoomAnchors.prefix_of(n) == "npc" and not npcs.has(n): continue
 		out.append(n)
+	out.append_array(_lone_seats())
+	return out
+
+## The outpost's seats (its `seats`, the server's) no use_ anchor stands for — Grace Cathedral's eight pew seats
+## (SGODOT-423; 黄忠: an i-seat over each): each its own prompt, a tap walks to that seat. A kit's other seat_ points
+## (the tavern's bar stools under the card room, seats []) stay scenery.
+func _lone_seats() -> PackedStringArray:
+	var grouped := []
+	for g in SEAT_GROUPS: if anchor(g) != null: grouped.append(str(SEAT_GROUPS[g]))
+	var out := PackedStringArray()
+	for n in outpost.get("seats", []):
+		if anchor(str(n)) != null and not grouped.any(func(prefix): return str(n).begins_with(prefix)): out.append(str(n))
 	return out
 
 func p0_tap(screen: Vector2) -> void:
@@ -280,6 +292,7 @@ func p0_tap(screen: Vector2) -> void:
 	if not _standing.is_empty(): return
 	var go := func():
 		if SEAT_GROUPS.has(n): _go_sit(str(SEAT_GROUPS[n]))
+		elif _lone_seats().has(n): _go_sit(n)   # a lone seat: that one, if free
 		else: walk_to(n)
 	if seat != "": _stand_up(go)
 	else: go.call()
@@ -409,7 +422,9 @@ func opening_subjects() -> Array:
 	var host := "npc_keeper" if npcs.has("npc_keeper") else ""
 	if host == "":
 		for n in npcs: if host == "": host = n   # no keeper: the room's first resident
-	if host == "": return []
+	if host == "":   # nobody at all (Grace Cathedral, SGODOT-423): the room's middle, where its kit's camera looks
+		var mid := anchor("cam_default")
+		return [[mid.global_position]] if mid else []
 	var keeper := _npc_points(host)
 	var counter := []
 	for n in COUNTERS:
@@ -448,6 +463,8 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 			badge = mark if mark != "" else P0Guide.resident_badge(view, str(npcs[n].id), str(outpost.get("id", "")))}
 	if SEAT_GROUPS.has(n):
 		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
+	if n.begins_with("seat_") and _lone_seats().has(n):   # a lone seat: its i-seat while it is free and the player stands
+		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(n).is_empty() else {}
 	if n == "use_market_board":
 		var open := int(view.get("keepers", {}).get("market", {}).get("board_open", 0))
 		return {kind = "facility", icon = P0Logic.icon("board"), name = "Market Board", badge = P0Guide.target_badge(view, "button", n, "request" if open > 0 else "")}

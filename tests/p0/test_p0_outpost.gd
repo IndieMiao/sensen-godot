@@ -50,14 +50,16 @@ func _tap(r: P0Room, n: String) -> void:
 	r.p0_tap(r.cam.unproject_position(r.anchor(n).global_position + lift))
 
 func test_the_outpost_table_and_anchor_files_agree() -> void:
-	assert_int(P0Outposts.all().size()).is_equal(5)   # the home set's four and the card room (SGODOT-351)
+	assert_int(P0Outposts.all().size()).is_equal(6)   # the home set's four, the card room (SGODOT-351) and Grace Cathedral (423)
 	for o in P0Outposts.all():
 		var anchors := _anchors_of(o)
 		var names := anchors.map(func(a): return str(a.name))
 		assert_array(names).override_failure_message(str(o.id) + " spawn / exit").contains(["spawn", "exit"])
 		assert_array(names.filter(func(n): return n.begins_with("seat_"))).override_failure_message(str(o.id) + " seats").is_equal(o.seats)
 		assert_int(int(o.capacity)).is_equal(30 if str(o.role) == "market" else 12)
-		# The keeper's finger card has its own badge_ point, clear above the door's card (安其拉's review of #14).
+		# The keeper's finger card has its own badge_ point, clear above the door's card (安其拉's review of #14); Grace
+		# Cathedral has no keeper (SGODOT-423)
+		if (o.keeper as Dictionary).is_empty(): continue
 		var at := {}
 		for a in anchors: at[str(a.name)] = Vector3(a.position[0], a.position[1], a.position[2])
 		assert_bool(at.has("badge_keeper")).override_failure_message(str(o.id) + " badge_keeper").is_true()
@@ -257,6 +259,7 @@ func test_npc_outfits_name_real_parts_and_stay_distinct() -> void:
 func test_handwritten_room_residents_wear_different_clothes_from_their_keeper() -> void:
 	var npcs: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/outpost_npcs.json")).npcs
 	for room in P0Outposts.all():
+		if (room.keeper as Dictionary).is_empty(): continue   # Grace Cathedral: no keeper (SGODOT-423)
 		var keeper := str(room.keeper.name).to_lower()   # the same keeper lookup as P0Outpost._spawn_npcs
 		var keeper_cloth := str(npcs.get(keeper, {}).get("slots", {}).get("cloth", ""))
 		assert_str(keeper_cloth).override_failure_message("%s: keeper %s has no cloth" % [room.id, keeper]).is_not_empty()
@@ -723,6 +726,7 @@ func _assert_player_scale_framing(r: P0Room, label: String) -> void:
 ## head are on screen, the tag's anchor inside the band world marks show in (below the HUD, above the bottom controls).
 func test_the_opening_shot_shows_the_player_and_the_keeper_with_the_whole_name_tag() -> void:
 	for o in P0Outposts.all():
+		if (o.keeper as Dictionary).is_empty(): continue   # Grace Cathedral: no keeper (SGODOT-423), its own test below
 		var r := _room(str(o.id), true)
 		await get_tree().process_frame
 		r.p0_frame({}, 1.0 / 30.0)
@@ -754,7 +758,7 @@ func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> voi
 		r.p0_frame({}, 1.0 / 30.0)
 		var view := r._view()
 		var extras: Array = r.opening_extras()
-		assert_int(extras.size()).override_failure_message(id).is_equal(3 * (r.npcs.size() - 1))
+		assert_int(extras.size()).override_failure_message(id).is_equal(3 * maxi(0, r.npcs.size() - 1))   # Grace Cathedral: nobody
 		# the card room has Lou alone (SGODOT-351, no residents): nothing more to fit; every other room has some
 		assert_bool(extras.is_empty()).override_failure_message(id).is_equal(P0Outposts.find(id).get("residents", []).is_empty())
 		# the band opening_focus fits them in (刘邦 on #465): SIDE_MARGIN across, the HUD's bottom to the bottom controls down

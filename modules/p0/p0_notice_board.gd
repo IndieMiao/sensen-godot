@@ -15,6 +15,8 @@ const Map := preload("res://scenes/p0/p0_map.gd")
 const P0City := preload("res://modules/p0/p0_city.gd")
 
 const ROLE_ORDER := ["market", "tea", "tackle", "post"]   # the home set's four, in this order (不知火舞)
+## Places that post nothing: the card room (SGODOT-351) and Grace Cathedral (SGODOT-423, 后裔's #800: a place to see).
+const QUIET_ROLES := ["casino", "church"]
 
 ## Homestead Lv5 brings the board (view.homestead.unlocks.notice_board).
 static func unlocked(view: Dictionary) -> bool:
@@ -74,7 +76,7 @@ static func home(view: Dictionary) -> Dictionary:
 ## table, a generated city's once read); without a home set, the written city's table.
 static func _home_outposts(h: Dictionary) -> Array:
 	var set_: Dictionary = h.set
-	if set_.is_empty(): return P0Outposts.all().filter(func(o): return str(o.get("role", "")) != "casino")   # the card room posts nothing
+	if set_.is_empty(): return P0Outposts.all().filter(func(o): return not str(o.get("role", "")) in QUIET_ROLES)
 	var out: Array = []
 	var ids := {}
 	for role in ROLE_ORDER:
@@ -83,7 +85,7 @@ static func _home_outposts(h: Dictionary) -> Array:
 		ids[str(o.id)] = true
 		out.append(o)
 	for o in P0Outposts.all():
-		if str(o.get("role", "")) == "casino": continue   # the card room posts nothing (SGODOT-351)
+		if str(o.get("role", "")) in QUIET_ROLES: continue
 		if not ids.has(str(o.get("id", ""))) and (h.city == "" or str(o.get("cluster", "")) == h.city): out.append(o)
 	return out
 
