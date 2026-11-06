@@ -40,15 +40,20 @@ uniform vec4 paving_color : source_color = vec4(0.874510, 0.796078, 0.654902, 1.
 uniform vec2 paving_repeat_m = vec2(4.0, 4.0);
 uniform float paving_joint_strength : hint_range(0.0, 1.0) = 0.16;
 uniform float paving_tone_strength : hint_range(0.0, 1.0) = 0.10;
-uniform vec4 wood_color : source_color = vec4(0.733333, 0.545098, 0.321569, 1.0);
-uniform vec4 wood_light_color : source_color = vec4(0.815686, 0.647059, 0.423529, 1.0);
-uniform vec4 wood_dark_color : source_color = vec4(0.603922, 0.439216, 0.274510, 1.0);
+uniform vec4 wood_color : source_color = vec4(0.639216, 0.505882, 0.364706, 1.0);
+uniform vec4 wood_light_color : source_color = vec4(0.721569, 0.600000, 0.447059, 1.0);
+uniform vec4 wood_dark_color : source_color = vec4(0.474510, 0.372549, 0.278431, 1.0);
 uniform vec2 wood_repeat_m = vec2(3.0, 1.0);
 uniform float wood_grain_strength : hint_range(0.0, 1.0) = 0.32;
+uniform vec2 wood_board_size_m = vec2(1.8, 0.18);
+uniform float wood_board_stagger : hint_range(0.0, 1.0) = 0.5;
+uniform float wood_joint_width_m : hint_range(0.0, 0.05) = 0.012;
+uniform vec4 wood_joint_color : source_color = vec4(0.411765, 0.329412, 0.250980, 1.0);
+uniform float wood_board_tone_strength : hint_range(0.0, 0.5) = 0.14;
 
 uniform vec4 sand_color : source_color = vec4(0.831373, 0.752941, 0.588235, 1.0);
-uniform vec4 wet_sand_color : source_color = vec4(0.607843, 0.560784, 0.439216, 1.0);
-uniform vec4 tide_color : source_color = vec4(0.505882, 0.486275, 0.388235, 1.0);
+uniform vec4 wet_sand_color : source_color = vec4(0.650980, 0.545098, 0.388235, 1.0);
+uniform vec4 tide_color : source_color = vec4(0.521569, 0.423529, 0.290196, 1.0);
 uniform float sand_macro_repeat_m : hint_range(0.1, 100.0) = 12.0;
 uniform float sand_detail_repeat_m : hint_range(0.1, 10.0) = 1.5;
 uniform float sand_macro_strength : hint_range(0.0, 1.0) = 0.10;
@@ -56,11 +61,11 @@ uniform float sand_grain_strength : hint_range(0.0, 1.0) = 0.10;
 uniform bool tide_enabled = true;
 uniform vec2 tide_direction = vec2(0.0, 1.0);
 uniform float tide_position_m = 0.0;
-uniform float tide_transition_m : hint_range(0.01, 4.0) = 0.45;
+uniform float tide_transition_m : hint_range(0.01, 4.0) = 0.65;
 uniform float tide_breakup_m : hint_range(0.0, 4.0) = 0.35;
 uniform float tide_band_offset_m = 0.35;
-uniform float tide_band_width_m : hint_range(0.01, 2.0) = 0.14;
-uniform float tide_band_strength : hint_range(0.0, 1.0) = 0.28;
+uniform float tide_band_width_m : hint_range(0.01, 2.0) = 0.23;
+uniform float tide_band_strength : hint_range(0.0, 1.0) = 0.22;
 uniform float surface_roughness : hint_range(0.0, 1.0) = 0.94;
 uniform float wet_roughness : hint_range(0.0, 1.0) = 0.86;
 uniform float surface_specular : hint_range(0.0, 1.0) = 0.15;
@@ -80,6 +85,13 @@ void vertex() {
 }
 
 bool near_key(vec3 a, vec3 b) { return distance(a, b) < palette_tolerance; }
+
+float board_tone(vec2 id) {
+    // Static arithmetic hash: no additional texture or time-dependent noise.
+    vec3 h = fract(vec3(id.x, id.y, id.x) * 0.1031);
+    h += dot(h, h.yzx + 33.33);
+    return fract((h.x + h.y) * h.z);
+}
 
 void fragment() {
     vec3 base = COLOR.rgb;
@@ -111,6 +123,20 @@ void fragment() {
         else if (near_key(base, wood_dark_key.rgb)) wood = wood_dark_color.rgb;
         float grain = texture(surfaces, p / max(wood_repeat_m, vec2(0.001))).b;
         detailed = wood * (1.0 + (grain - 0.5) * wood_grain_strength * 2.0);
+        // Metric boards run along projected X. Alternate rows shift the end joints.
+        vec2 board_size = max(wood_board_size_m, vec2(0.001));
+        float row = floor(p.y / board_size.y);
+        vec2 board_uv = vec2(p.x / board_size.x + mod(row, 2.0) * wood_board_stagger, p.y / board_size.y);
+        vec2 cell = floor(board_uv);
+        vec2 within = fract(board_uv);
+        vec2 edge_m = min(within, 1.0 - within) * board_size;
+        // Derivatives of continuous position avoid false AA at stagger boundaries.
+        vec2 aa = max(fwidth(p) * 0.5, vec2(0.0001));
+        vec2 joints = 1.0 - smoothstep(vec2(wood_joint_width_m * 0.5) - aa,
+            vec2(wood_joint_width_m * 0.5) + aa, edge_m);
+        float seam = wood_joint_width_m > 0.0 ? max(joints.x, joints.y) : 0.0;
+        detailed *= 1.0 + (board_tone(cell) - 0.5) * wood_board_tone_strength * 2.0;
+        detailed = mix(detailed, wood_joint_color.rgb, seam);
     } else if (kind == 4 || kind == 5) {
         // Two reads, both existing packed channels; no ripple/normal/water sampling.
         float broad = texture(fields, p / max(sand_macro_repeat_m, 0.001)).r;

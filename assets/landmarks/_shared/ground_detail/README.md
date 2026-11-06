@@ -1,5 +1,7 @@
 # 通用地表细节材质 · SGODOT-428 · 刘备
 
+当前 **v1.1** 按428评论 `456c5d0a` / `9a6eb557` 改暖湿沙，并添加0.18m宽、1.8m长的错缝木板。审阅与验证见 [v1.1交接](review/v1.1/README.md)。
+
 从已审 #827 v1.1 整理，独立于恶魔岛。五种哑光地表：三色草坡、浅色铺石、木纹、干沙、湿沙／潮线。运行资源只依赖本目录，模型无需 UV；单位为米，Y 朝上。颜色、识别键、尺度和投影全部通过 ShaderMaterial `.tres` 调整。
 
 ## 套到新地标
@@ -20,7 +22,7 @@
 | `ground_fields.png` | 周期大色块＋碎边 | 短叶细纹 | 沙粒／矿物细纹 |
 | `ground_surfaces.png` | 石板缝 | 石板明暗 | 木纹 |
 
-两张图与 #827 的原图逐字节相同；新增沙材质启用原先预留的 B 通道。草3次采样，铺石1次，木1次，干沙／湿沙各2次，不匹配0次；最大仍3次，2个 sampler，单不透明pass，无额外法线、屏幕、深度、TIME 或水贴图采样。材质切换分支按面保持一致。次级宏观场与细节频率错开，减弱明显平铺。
+两张图与 #827 的原图逐字节相同；新增沙材质启用原先预留的 B 通道。草3次采样，铺石1次，木1次，干沙／湿沙各2次，不匹配0次；最大仍3次，2个 sampler，单不透明pass，无额外法线、屏幕、深度、TIME 或水贴图采样。木板缝、错缝和逐板变化仅用坐标运算，仍只采样一次B通道木纹；像素导数抗锯齿避免细缝闪烁，不加pass。`wood_joint_width_m=0`、`wood_board_tone_strength=0`可关掉板缝与逐板变化。材质切换分支按面保持一致。次级宏观场与细节频率错开，减弱明显平铺。
 
 PNG 导入由 Godot 4.7.2 生成 UID，mipmap + 高质量 VRAM 压缩（桌面BPTC / Android ASTC）。完整 mip 链两张压缩图约2.67MiB纹理块数据；源PNG大小不代表显存。Godot实际格式以目标设备为准。`.gdshader.uid` 同样由编辑器生成。
 
@@ -67,14 +69,19 @@ PNG 导入由 Godot 4.7.2 生成 UID，mipmap + 高质量 VRAM 压缩（桌面BP
 | `paving_repeat_m` | `vec2(4.0, 4.0)` | 整张石纹XZ重复长度，4×4米时每块1×0.5米 |
 | `paving_joint_strength` | `0.16` | 石板缝减暗幅度，沿用#827 |
 | `paving_tone_strength` | `0.10` | 板间明暗幅度，沿用#827 |
-| `wood_color` | `#BB8B52` | 地表输出色 |
-| `wood_light_color` | `#D0A56C` | 地表输出色 |
-| `wood_dark_color` | `#9A7046` | 地表输出色 |
+| `wood_color` | `#A3815D` | 地表输出色 |
+| `wood_light_color` | `#B89972` | 地表输出色 |
+| `wood_dark_color` | `#795F47` | 地表输出色 |
 | `wood_repeat_m` | `vec2(3.0, 1.0)` | 木纹XZ重复长度，沿投影X方向延伸 |
 | `wood_grain_strength` | `0.32` | 木纹明暗幅度，沿用#827 |
+| `wood_board_size_m` | `vec2(1.8, 0.18)` | 每块板投影X方向长度／Z方向宽度（米） |
+| `wood_board_stagger` | `0.5` | 相邻排板头错开比例，默认半块 |
+| `wood_joint_width_m` | `0.012` | 板缝总宽度（米），0关闭；导数抗锯齿 |
+| `wood_joint_color` | `#695440` | 板缝输出色 |
+| `wood_board_tone_strength` | `0.14` | 逐板线性反照率变化最大幅度±14%，静态坐标hash |
 | `sand_color` | `#D4C096` | 地表输出色 |
-| `wet_sand_color` | `#9B8F70` | 地表输出色 |
-| `tide_color` | `#817C63` | 地表输出色 |
+| `wet_sand_color` | `#A68B63` | 地表输出色 |
+| `tide_color` | `#856C4A` | 地表输出色 |
 | `sand_macro_repeat_m` | `12.0` | 沙地缓慢起伏的色场重复长度（米） |
 | `sand_detail_repeat_m` | `1.5` | 沙粒纹重复长度（米） |
 | `sand_macro_strength` | `0.10` | 沙地大范围明暗幅度 |
@@ -82,15 +89,15 @@ PNG 导入由 Godot 4.7.2 生成 UID，mipmap + 高质量 VRAM 压缩（桌面BP
 | `tide_enabled` | `true` | false整片湿沙；true位置控制干湿过渡 |
 | `tide_direction` | `vec2(0.0, 1.0)` | 投影平面中干→湿方向，运行时归一化 |
 | `tide_position_m` | `0.0` | 潮线沿该方向离投影原点的有符号距离（米） |
-| `tide_transition_m` | `0.45` | 干湿柔边总宽度（米） |
+| `tide_transition_m` | `0.65` | 干湿柔边总宽度（米） |
 | `tide_breakup_m` | `0.35` | 用现有宏观采样打碎潮线的偏移幅度（米） |
 | `tide_band_offset_m` | `0.35` | 沉积细带向湿侧偏移（米） |
-| `tide_band_width_m` | `0.14` | 细带半宽（米） |
-| `tide_band_strength` | `0.28` | 沉积色混入幅度 |
+| `tide_band_width_m` | `0.23` | 细带半宽（米） |
+| `tide_band_strength` | `0.22` | 沉积色混入幅度 |
 | `surface_roughness` | `0.94` | 干地面粗糙度 |
 | `wet_roughness` | `0.86` | 完全湿沙粗糙度；维持哑光 |
 | `surface_specular` | `0.15` | 高光权重 |
 
 ## 重建与审阅
 
-源：`tools/art/source/ground_detail_428/`（NumPy / SciPy / Pillow）。`generate.py` 仅重建本目录两张PNG，确定性种子保留。`prepare.py` 把本目录和QA脚本放到 `output/ground-detail-428/project`；后者独立于主游戏。暖光与#827相同；默认相机宽6.72m、俯角43°、偏航14.5°。详见 `docs/design/ground-detail-428/README.md` 的原始截图、测量与冷导入证据。
+源：`tools/art/source/ground_detail_428/`（NumPy / SciPy / Pillow）。`generate.py` 仅重建本目录两张PNG，确定性种子保留。`prepare.py` 把本目录和QA脚本放到 `output/ground-detail-428/project`；后者独立于主游戏。暖光与#827相同；默认相机宽6.72m、俯角43°、偏航14.5°。v1原始证据在 `docs/design/ground-detail-428/README.md`；最新v1.1的复现、截图、测量与冷导入证据在 [review/v1.1](review/v1.1/README.md)。审阅目录有`.gdignore`，不进入运行导入。

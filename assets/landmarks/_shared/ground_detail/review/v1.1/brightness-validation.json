@@ -1,0 +1,97 @@
+{
+  "passed": true,
+  "revision": "1.1",
+  "metric": "Y'=(.2126R+.7152G+.0722B)/255, rendered output sRGB mean; contrast=(dry-wet)/dry",
+  "sampling": "eroded class interiors; same warm-light control +/-0.008; all selected pixels, excluding tide band",
+  "views": [
+    {
+      "view": "default",
+      "dry_wet_contrast_percent": 26.148291602259533,
+      "before_contrast_percent_same_samples": 25.431010420252463,
+      "samples": {
+        "deep": {
+          "pixels": 1029,
+          "mean_Yprime": 0.4976322132662588,
+          "before_mean_Yprime": 0.4976322132662588,
+          "mean_rgb": [
+            93.9757045675413,
+            143.43537414965985,
+            60.0
+          ]
+        },
+        "ordinary": {
+          "pixels": 9104,
+          "mean_Yprime": 0.6441597236293464,
+          "before_mean_Yprime": 0.6441597236293464,
+          "mean_rgb": [
+            135.78789543057997,
+            181.63510544815466,
+            75.99439806678383
+          ]
+        },
+        "sand": {
+          "pixels": 54474,
+          "mean_Yprime": 0.8554888007878555,
+          "before_mean_Yprime": 0.8554888007878555,
+          "mean_rgb": [
+            238.51868781437017,
+            217.452674670485,
+            165.0750449755847
+          ]
+        },
+        "wet": {
+          "pixels": 36061,
+          "mean_Yprime": 0.6317930945331739,
+          "before_mean_Yprime": 0.6379293547154031,
+          "mean_rgb": [
+            187.79337788746847,
+            158.33374005157927,
+            110.00105377000084
+          ]
+        }
+      },
+      "grass_contrast_percent": 22.74707731453891
+    },
+    {
+      "view": "sand_close",
+      "dry_wet_contrast_percent": 26.16312254577845,
+      "before_contrast_percent_same_samples": 25.449446116506415,
+      "samples": {
+        "sand": {
+          "pixels": 394371,
+          "mean_Yprime": 0.8558267416234568,
+          "before_mean_Yprime": 0.8558267416234568,
+          "mean_rgb": [
+            238.66648663314493,
+            217.52204142799548,
+            165.14626075446725
+          ]
+        },
+        "wet": {
+          "pixels": 245419,
+          "mean_Yprime": 0.6319157424329691,
+          "before_mean_Yprime": 0.6380235761633426,
+          "mean_rgb": [
+            187.7721773782796,
+            158.3862537130377,
+            109.97646473989381
+          ]
+        }
+      }
+    }
+  ],
+  "unchanged_region_controls": {
+    "grass": {
+      "pixels": 53513,
+      "max_rgb_difference_255": 0
+    },
+    "paving": {
+      "pixels": 40811,
+      "max_rgb_difference_255": 0
+    },
+    "dry_sand": {
+      "pixels": 54474,
+      "max_rgb_difference_255": 0
+    }
+  }
+}
