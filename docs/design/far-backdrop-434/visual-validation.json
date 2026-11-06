@@ -1,0 +1,29 @@
+{
+  "urban-bay": {
+    "visible_changed_pixels": 6956,
+    "screen_bounds": [
+      0,
+      79,
+      359,
+      127
+    ]
+  },
+  "quiet-bay": {
+    "visible_changed_pixels": 4984,
+    "screen_bounds": [
+      0,
+      104,
+      359,
+      127
+    ]
+  },
+  "bridge-cool": {
+    "changed_pixels_over_2_rgb": 1253,
+    "max_channel_delta_255": 80.0
+  },
+  "heavy-fog": {
+    "changed_pixels_over_2_rgb": 6956,
+    "max_channel_delta_255": 79.0
+  },
+  "passed": true
+}

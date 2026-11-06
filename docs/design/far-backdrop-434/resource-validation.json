@@ -1,0 +1,335 @@
+{
+	"assets": 6,
+	"checks": [
+		{
+			"check": "same unshaded / double-sided / blend / no-depth-write modes",
+			"passed": true
+		},
+		{
+			"check": "zero texture reads and no sampler",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: one surface",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: shared shader stored on mesh for reuse",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: one pass",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: no shadow pass",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: projected geometry culling margin",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: imported triangle count",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: generated import uid",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: root_script=null",
+			"passed": true
+		},
+		{
+			"check": "far_city_high: one static card LOD",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: one surface",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: shared shader stored on mesh for reuse",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: one pass",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: no shadow pass",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: projected geometry culling margin",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: imported triangle count",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: generated import uid",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: root_script=null",
+			"passed": true
+		},
+		{
+			"check": "far_city_medium: one static card LOD",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: one surface",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: shared shader stored on mesh for reuse",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: one pass",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: no shadow pass",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: projected geometry culling margin",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: imported triangle count",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: generated import uid",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: root_script=null",
+			"passed": true
+		},
+		{
+			"check": "far_city_low: one static card LOD",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: one surface",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: shared shader stored on mesh for reuse",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: one pass",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: no shadow pass",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: projected geometry culling margin",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: imported triangle count",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: generated import uid",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: root_script=null",
+			"passed": true
+		},
+		{
+			"check": "far_hills_a: one static card LOD",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: one surface",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: shared shader stored on mesh for reuse",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: one pass",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: no shadow pass",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: projected geometry culling margin",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: imported triangle count",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: generated import uid",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: root_script=null",
+			"passed": true
+		},
+		{
+			"check": "far_hills_b: one static card LOD",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: one imported mesh",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: one surface",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: shared shader stored on mesh for reuse",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: one pass",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: no shadow pass",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: projected geometry culling margin",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: imported triangle count",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: generated import uid",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: root_script=null",
+			"passed": true
+		},
+		{
+			"check": "far_bridge: one static card LOD",
+			"passed": true
+		},
+		{
+			"check": "urban_bay: <= original 826 triangles / 3 surfaces",
+			"passed": true
+		},
+		{
+			"check": "quiet_bay: <= original 826 triangles / 3 surfaces",
+			"passed": true
+		},
+		{
+			"check": "city: configurable base_color",
+			"passed": true
+		},
+		{
+			"check": "city: configurable accent_color",
+			"passed": true
+		},
+		{
+			"check": "city: configurable shadow_color",
+			"passed": true
+		},
+		{
+			"check": "city: configurable fog_color",
+			"passed": true
+		},
+		{
+			"check": "city: configurable fog_amount",
+			"passed": true
+		},
+		{
+			"check": "city: configurable depth_fraction",
+			"passed": true
+		},
+		{
+			"check": "hills: configurable base_color",
+			"passed": true
+		},
+		{
+			"check": "hills: configurable accent_color",
+			"passed": true
+		},
+		{
+			"check": "hills: configurable shadow_color",
+			"passed": true
+		},
+		{
+			"check": "hills: configurable fog_color",
+			"passed": true
+		},
+		{
+			"check": "hills: configurable fog_amount",
+			"passed": true
+		},
+		{
+			"check": "hills: configurable depth_fraction",
+			"passed": true
+		},
+		{
+			"check": "bridge: configurable base_color",
+			"passed": true
+		},
+		{
+			"check": "bridge: configurable accent_color",
+			"passed": true
+		},
+		{
+			"check": "bridge: configurable shadow_color",
+			"passed": true
+		},
+		{
+			"check": "bridge: configurable fog_color",
+			"passed": true
+		},
+		{
+			"check": "bridge: configurable fog_amount",
+			"passed": true
+		},
+		{
+			"check": "bridge: configurable depth_fraction",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"unique_triangles": 1164
+}

@@ -1,0 +1,500 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "passed": true,
+      "check": "far_city_high: one mesh / surface / material"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: no texture / rig / animation"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: actual triangles match manifest"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: flat XY card"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: bottom-centre local pivot"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: finite coordinates / weights"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: linear RGB weights sum to one"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: no translucent vertex layers"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: exported hash"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: local importer and null root script"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: one mesh / surface / material"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: no texture / rig / animation"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: actual triangles match manifest"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: flat XY card"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: bottom-centre local pivot"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: finite coordinates / weights"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: linear RGB weights sum to one"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: no translucent vertex layers"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: exported hash"
+    },
+    {
+      "passed": true,
+      "check": "far_city_medium: local importer and null root script"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: one mesh / surface / material"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: no texture / rig / animation"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: actual triangles match manifest"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: flat XY card"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: bottom-centre local pivot"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: finite coordinates / weights"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: linear RGB weights sum to one"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: no translucent vertex layers"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: exported hash"
+    },
+    {
+      "passed": true,
+      "check": "far_city_low: local importer and null root script"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: one mesh / surface / material"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: no texture / rig / animation"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: actual triangles match manifest"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: flat XY card"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: bottom-centre local pivot"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: finite coordinates / weights"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: linear RGB weights sum to one"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: no translucent vertex layers"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: exported hash"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: local importer and null root script"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: one mesh / surface / material"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: no texture / rig / animation"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: actual triangles match manifest"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: flat XY card"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: bottom-centre local pivot"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: finite coordinates / weights"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: linear RGB weights sum to one"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: no translucent vertex layers"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: exported hash"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_b: local importer and null root script"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: one mesh / surface / material"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: no texture / rig / animation"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: actual triangles match manifest"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: flat XY card"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: bottom-centre local pivot"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: finite coordinates / weights"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: linear RGB weights sum to one"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: no translucent vertex layers"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: exported hash"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: local importer and null root script"
+    },
+    {
+      "passed": true,
+      "check": "six independent Godot UIDs"
+    },
+    {
+      "passed": true,
+      "check": "far_city_high: original triangle positions preserved exactly to 1e-6 m"
+    },
+    {
+      "passed": true,
+      "check": "far_hills_a: original triangle positions preserved exactly to 1e-6 m"
+    },
+    {
+      "passed": true,
+      "check": "far_bridge: original triangle positions preserved exactly to 1e-6 m"
+    },
+    {
+      "passed": true,
+      "check": "three city densities have distinct geometry"
+    },
+    {
+      "passed": true,
+      "check": "low density keeps 17 separated waterfront blocks"
+    },
+    {
+      "passed": true,
+      "check": "two distinct hill silhouettes"
+    },
+    {
+      "passed": true,
+      "check": "both combinations within original triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_bridge.glb: original unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_city.glb: original unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_hills.glb: original unchanged"
+    },
+    {
+      "passed": true,
+      "check": "tools/art/source/alcatraz_far_424/alc_far_bridge.blend: original unchanged"
+    },
+    {
+      "passed": true,
+      "check": "tools/art/source/alcatraz_far_424/alc_far_city.blend: original unchanged"
+    },
+    {
+      "passed": true,
+      "check": "tools/art/source/alcatraz_far_424/alc_far_hills.blend: original unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/far_card.gdshader: original unchanged"
+    }
+  ],
+  "assets": {
+    "far_city_high": {
+      "file": "far_city_high.glb",
+      "triangles": 208,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.4000000953674316,
+          0.0,
+          -0.0
+        ],
+        [
+          2.4000000953674316,
+          0.9100000262260437,
+          -0.0
+        ]
+      ],
+      "dimensions_m": [
+        4.800000190734863,
+        0.9100000262260437,
+        0.0
+      ],
+      "source_parts": 101,
+      "source": "tools/art/source/far_backdrop_434/far_city_high.blend",
+      "derived_from": "alc_far_city",
+      "variant": "original silhouette",
+      "sha256": "5641dbbd141946797d42f26132ec1c752f198dce28e20c999456967409dc9e99"
+    },
+    "far_city_medium": {
+      "file": "far_city_medium.glb",
+      "triangles": 184,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.4000000953674316,
+          0.0,
+          -0.0
+        ],
+        [
+          2.4000000953674316,
+          0.5410810708999634,
+          -0.0
+        ]
+      ],
+      "dimensions_m": [
+        4.800000190734863,
+        0.5410810708999634,
+        0.0
+      ],
+      "source_parts": 92,
+      "source": "tools/art/source/far_backdrop_434/far_city_medium.blend",
+      "derived_from": "alc_far_city",
+      "variant": "medium",
+      "sha256": "4c2f9b559f4d506080ab92c8cd0443d983d668a532d828aa8a9e3a99be4064e9"
+    },
+    "far_city_low": {
+      "file": "far_city_low.glb",
+      "triangles": 34,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.4000000953674316,
+          0.0,
+          -0.0
+        ],
+        [
+          2.4000000953674316,
+          0.24346567690372467,
+          -0.0
+        ]
+      ],
+      "dimensions_m": [
+        4.800000190734863,
+        0.24346567690372467,
+        0.0
+      ],
+      "source_parts": 17,
+      "source": "tools/art/source/far_backdrop_434/far_city_low.blend",
+      "derived_from": "alc_far_city",
+      "variant": "low",
+      "sha256": "a6b314bcde125b450546269c2ec9a1bec11b72a77eaa1229d11307acf4889200"
+    },
+    "far_hills_a": {
+      "file": "far_hills_a.glb",
+      "triangles": 120,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -4.0,
+          0.0,
+          -0.0
+        ],
+        [
+          4.0,
+          0.5199999809265137,
+          -0.0
+        ]
+      ],
+      "dimensions_m": [
+        8.0,
+        0.5199999809265137,
+        0.0
+      ],
+      "source_parts": 3,
+      "source": "tools/art/source/far_backdrop_434/far_hills_a.blend",
+      "derived_from": "alc_far_hills",
+      "variant": "original silhouette",
+      "sha256": "4e6bae5db8d74e21df98509055396e84a7ab644e1c1419ea964907dcc18ee29f"
+    },
+    "far_hills_b": {
+      "file": "far_hills_b.glb",
+      "triangles": 120,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -4.0,
+          0.0,
+          -0.0
+        ],
+        [
+          4.0,
+          0.5199999809265137,
+          -0.0
+        ]
+      ],
+      "dimensions_m": [
+        8.0,
+        0.5199999809265137,
+        0.0
+      ],
+      "source_parts": 3,
+      "source": "tools/art/source/far_backdrop_434/far_hills_b.blend",
+      "derived_from": "alc_far_hills",
+      "variant": "hills_b",
+      "sha256": "68d9e6488cec0c4e73f32eb538be99d2204b1f3c1fdfc3026e15a8548f3de84f"
+    },
+    "far_bridge": {
+      "file": "far_bridge.glb",
+      "triangles": 498,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.0
+        ],
+        [
+          1.0,
+          0.8999999761581421,
+          -0.0
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        0.8999999761581421,
+        0.0
+      ],
+      "source_parts": 87,
+      "source": "tools/art/source/far_backdrop_434/far_bridge.blend",
+      "derived_from": "alc_far_bridge",
+      "variant": "original silhouette",
+      "sha256": "50577f015318fe958c4f91aa24ee24b74f49835926a7b9b8e414b21cd2cc6ebf"
+    }
+  },
+  "combination_triangles": {
+    "urban_bay": 826,
+    "quiet_bay": 338
+  },
+  "uid_count": 6,
+  "new_textures": 0,
+  "source_weights": "RGB sum=1, alpha=1"
+}

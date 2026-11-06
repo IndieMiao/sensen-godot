@@ -1,0 +1,180 @@
+{
+	"captures": [
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 25,
+			"name": "urban-bay",
+			"triangles": 9942,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "urban-no-cards",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 25,
+			"name": "quiet-bay",
+			"triangles": 9454,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "quiet-no-cards",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 25,
+			"name": "bridge-cool",
+			"triangles": 9942,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 25,
+			"name": "heavy-fog",
+			"triangles": 9942,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 25,
+			"name": "projection-current",
+			"triangles": 9942,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 25,
+			"name": "projection-original",
+			"triangles": 9942,
+			"width_m": 6.71999979019165
+		}
+	],
+	"checks": [
+		{
+			"check": "avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "urban-bay: size",
+			"passed": true
+		},
+		{
+			"check": "urban-bay: save",
+			"passed": true
+		},
+		{
+			"check": "urban-no-cards: size",
+			"passed": true
+		},
+		{
+			"check": "urban-no-cards: save",
+			"passed": true
+		},
+		{
+			"check": "quiet-bay: size",
+			"passed": true
+		},
+		{
+			"check": "quiet-bay: save",
+			"passed": true
+		},
+		{
+			"check": "quiet-no-cards: size",
+			"passed": true
+		},
+		{
+			"check": "quiet-no-cards: save",
+			"passed": true
+		},
+		{
+			"check": "bridge-cool: size",
+			"passed": true
+		},
+		{
+			"check": "bridge-cool: save",
+			"passed": true
+		},
+		{
+			"check": "heavy-fog: size",
+			"passed": true
+		},
+		{
+			"check": "heavy-fog: save",
+			"passed": true
+		},
+		{
+			"check": "projection-current: size",
+			"passed": true
+		},
+		{
+			"check": "projection-current: save",
+			"passed": true
+		},
+		{
+			"check": "projection-original: size",
+			"passed": true
+		},
+		{
+			"check": "projection-original: save",
+			"passed": true
+		},
+		{
+			"check": "original far projection / weights parity",
+			"passed": true
+		}
+	],
+	"coast_commit": "85967444d6024fbe85cf2af997a7478ee4aab034",
+	"far_budget": {
+		"baseline_triangles": 826,
+		"cards_per_combination": 3,
+		"depth_write": false,
+		"passes_per_card": 1,
+		"shadow_pass": false,
+		"texture_reads": 0
+	},
+	"foam_commit": "ac5809c46b3e96a111ada24513b44afc4779c631",
+	"passed": true,
+	"projection_parity": {
+		"maximum_rgb_255": 0.0,
+		"mean_rgb_255": 0.0,
+		"pixels_over_one": 0
+	},
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	},
+	"sea_commit": "15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c"
+}
