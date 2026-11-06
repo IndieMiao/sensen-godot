@@ -15,6 +15,13 @@ const LightingPreset = preload("res://assets/landmarks/_shared/lighting/lighting
 			apply_preset()
 
 
+## Bind existing geometry; the rig never creates backdrop meshes or another pass.
+@export var sea_targets: Array[GeometryInstance3D] = []
+@export var city_targets: Array[GeometryInstance3D] = []
+@export var hill_targets: Array[GeometryInstance3D] = []
+@export var bridge_targets: Array[GeometryInstance3D] = []
+
+
 func _ready() -> void:
 	apply_preset()
 
@@ -22,4 +29,4 @@ func _ready() -> void:
 func apply_preset() -> void:
 	var lighting_preset := preset as LightingPreset
 	if lighting_preset != null:
-		lighting_preset.apply_to($Environment, $Sun)
+		lighting_preset.apply_to($Environment, $Sun, sea_targets, city_targets, hill_targets, bridge_targets)

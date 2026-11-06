@@ -127,7 +127,7 @@ func run():
  set_preset(0)
  await capture("warm-noon-default-review");var noon=vp.get_texture().get_image()
  report.noon_parity=diff(original,noon)
- check(report.noon_parity.maximum_rgb_255==0.0,"warm noon equals original lighting pixel-for-pixel")
+ check(report.noon_parity.maximum_rgb_255==0.0,"warm noon equals original lighting pixel-for-pixel in the sea-covered view")
  for i in 3:
   set_preset(i)
   var prefix=["warm-noon","cool-morning","golden-dusk"][i]
@@ -144,12 +144,19 @@ func run():
 func set_preset(index):
  preset_index=index
  lighting.preset=load(LIGHTING+PRESETS[index]+".tres")
+ sea_mat=sea.material_override
+ freeze_review_sea()
 func apply_original(env,sun):
  env.environment=Environment.new();env.environment.background_mode=Environment.BG_COLOR;env.environment.background_color=Color("d000d0")
  env.environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR;env.environment.ambient_light_color=Color("d5e4ee");env.environment.ambient_light_energy=.72
  sun.rotation_degrees=Vector3(-56,-34,0);sun.light_color=Color(1,.965,.88);sun.light_energy=.98
  sun.shadow_enabled=true;sun.directional_shadow_mode=DirectionalLight3D.SHADOW_ORTHOGONAL;sun.directional_shadow_max_distance=120.0
  sun.shadow_opacity=.48;sun.shadow_bias=.035;sun.shadow_normal_bias=.28
+ sea_mat=make_sea("bay");sea_mat.render_priority=-100;sea.material_override=sea_mat
+ for n in far_nodes:
+  var role="bridge" if "bridge" in n.name else ("hills" if "hills" in n.name else "city")
+  n.material_override=load(FAR+role+".tres").duplicate()
+ clock_set(0)
 func benchmark():
  RenderingServer.viewport_set_measure_render_time(vp.get_viewport_rid(),true)
  report.timing=[]
@@ -167,12 +174,17 @@ func benchmark():
     gpu.append(RenderingServer.viewport_get_measured_render_time_gpu(vp.get_viewport_rid()))
    report.timing.append({"cycle":cycle,"preset":"original" if index<0 else PRESETS[index],"cpu_ms":cpu,"gpu_ms":gpu})
 
+func freeze_review_sea():
+ if not OS.has_feature("android"):
+  var shader=Shader.new();shader.code=sea_mat.shader.code.replace("void vertex()", "uniform float review_time=0.0;\nvoid vertex()").replace("TIME", "review_time");sea_mat.shader=shader
+  clock_set(0)
 func make_sea(preset):
  var material=load(SEA+preset+".tres").duplicate(true)
  if not OS.has_feature("android"):
   var shader=Shader.new();shader.code=material.shader.code.replace("void vertex()", "uniform float review_time=0.0;\nvoid vertex()").replace("TIME", "review_time");material.shader=shader
  return material
 func build_combo(index):
+ lighting.city_targets.clear();lighting.hill_targets.clear();lighting.bridge_targets.clear()
  for n in far_nodes:n.free()
  far_nodes.clear();current_combo=index;bridge_cool=false
  var rows=[["far_hills_a",0.0,.84],["far_city_high",1.23,.82],["far_bridge",-2.1,1.0]] if index==0 else [["far_hills_b",0.0,.84],["far_city_medium",-1.56,.64],["far_city_low",1.62,.64]]
@@ -183,6 +195,10 @@ func build_combo(index):
   var view_height=camera.size*vp.size.y/vp.size.x
   node.position=camera.global_transform*Vector3(row[1],view_height*(.5-.16),-60)
   node.scale=Vector3.ONE*row[2];world.add_child(node);far_nodes.append(node)
+  if "city" in row[0]:lighting.city_targets.append(node)
+  elif "hills" in row[0]:lighting.hill_targets.append(node)
+  else:lighting.bridge_targets.append(node)
+ lighting.sea_targets.assign([sea]);lighting.apply_preset();sea_mat=sea.material_override;freeze_review_sea()
 func recolor_bridge(cool):
  bridge_cool=cool
  for n in far_nodes:
@@ -198,7 +214,7 @@ func diff(a,b):
  return {"maximum_rgb_255":peak*255,"mean_rgb_255":total*255/(a.get_width()*a.get_height()),"pixels_over_one":count}
 func android_state():
  for i in 4:await RenderingServer.frame_post_draw
- var state={"pid":OS.get_process_id(),"preset":PRESETS[preset_index],"index":preset_index,"kit":"437-v1","renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"button_next":[180,760],"draws":vp.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)}
+ var state={"pid":OS.get_process_id(),"preset":PRESETS[preset_index],"index":preset_index,"kit":"437-v12","renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"background":lighting.get_node("Environment").environment.background_color.to_html(),"sea_far_color":str(sea_mat.get_shader_parameter("far_color")),"bridge_color":str(lighting.preset.far_materials.bridge.get_shader_parameter("base_color")),"button_next":[180,760],"draws":vp.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)}
  FileAccess.open("user://lighting_state.json",FileAccess.WRITE).store_string(JSON.stringify(state))
  vp.get_texture().get_image().save_png("user://lighting_%s.png"%PRESETS[preset_index])
 func android_start():

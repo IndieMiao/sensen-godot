@@ -1,0 +1,34 @@
+{
+  "android/cool_morning.png": {
+    "bytes": 89088,
+    "sha256": "39bc1a8c74aeb9e50f534479a021442cbf866a2c75415664d05b4db0ef55d320"
+  },
+  "android/golden_dusk.png": {
+    "bytes": 81372,
+    "sha256": "f908e545ffed847bf39377c4f808a1c68950e743fbf2066d56210241a51acb05"
+  },
+  "android/warm_noon.png": {
+    "bytes": 77082,
+    "sha256": "13f1d09768aa5c52e951886482709956858087a79e5205892b8bad2e5547a04a"
+  },
+  "brightness-regions.png": {
+    "bytes": 93853,
+    "sha256": "f97b3dc8f630a5060994a32cb59837f91fc4b7e73fbe80cc0682a9be64754134"
+  },
+  "cool-morning-default-review.png": {
+    "bytes": 114649,
+    "sha256": "4adb633e246b1c471ca7304c9927c7dd63b60b3b14bc2e06b91438ed2fbfacfa"
+  },
+  "golden-dusk-default-review.png": {
+    "bytes": 101158,
+    "sha256": "a9873763ec05055aad8062d1cd746650998b9bafe1d597f6a3570a9ba9c79e52"
+  },
+  "lighting-three-presets.png": {
+    "bytes": 327938,
+    "sha256": "35d0066a9a7ae98f6007bb6a46994290c14170e9dac960a0aa72c805fd3e73d1"
+  },
+  "warm-noon-default-review.png": {
+    "bytes": 94082,
+    "sha256": "9ed5d919caf1b56a73b4d2cd3cf1868fa7ace0b56deed7753cd3a88be043a795"
+  }
+}

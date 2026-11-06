@@ -1,5 +1,7 @@
 # SGODOT-437 · 通用室外光照预设
 
+**当前交审为 [v1.2：三套光照与海天远景联动](v12/README.md)**，含同机位并排图、亮度实测、Android、冷导入及本轮开销记录。下方为初版与 v1.1 的历史资料，原有“背景不随光照切换”的描述已由 v1.2 配套材质替代。
+
 【刘备】暖午、清晨、黄昏三个 `.tres`，加一个可实例化的 `lighting_rig.tscn`。暖午沿用恶魔岛当前环境光和主光，背景使用正式色 `#E3EBE8`；清晨为偏冷的 24° 长影，黄昏为金橙色 18° 低角度光。对已有 WorldEnvironment / DirectionalLight3D 应用预设时保留宿主阴影设置。运行资源和参数表见 [lighting README](../../../assets/landmarks/_shared/lighting/README.md)。
 
 | 审阅图 | 主光 / 氛围 |

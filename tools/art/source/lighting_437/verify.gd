@@ -61,6 +61,14 @@ func run():
 	sun.shadow_blur = 1.8
 	var preserved = shadow_values(sun)
 	var summary = {}
+	var sea_target = MeshInstance3D.new()
+	var city_target = MeshInstance3D.new()
+	var hills_target = MeshInstance3D.new()
+	var bridge_target = MeshInstance3D.new()
+	rig.sea_targets.assign([sea_target])
+	rig.city_targets.assign([city_target])
+	rig.hill_targets.assign([hills_target])
+	rig.bridge_targets.assign([bridge_target])
 	for name in ["warm_noon","cool_morning","golden_dusk"]:
 		var preset = load(KIT+name+".tres")
 		preset.apply_to(host, sun)
@@ -75,6 +83,19 @@ func run():
 		check(preset.environment.background_color == original_color, name+": host edits do not pollute preset")
 		rig.preset = preset
 		check(rig.get_node("Sun").light_color==preset.sun_color, name+": scene preset switch applies sun")
+		check(sea_target.material_override != preset.sea_material and sea_target.material_override.shader == preset.sea_material.shader, name+": host-local sea material shares original shader")
+		check(sea_target.material_override.get_shader_parameter("far_color") == preset.sea_material.get_shader_parameter("far_color"), name+": switch applies sea palette")
+		for role in ["city", "hills", "bridge"]:
+			var target = {"city":city_target, "hills":hills_target, "bridge":bridge_target}[role]
+			var source = preset.far_materials.get(role)
+			check(target.material_override != source and target.material_override.shader == source.shader, name+": "+role+" host-local material uses original shader")
+			check(target.material_override.get_shader_parameter("base_color") == source.get_shader_parameter("base_color"), name+": switch applies "+role+" palette")
+		var original_sea_color = preset.sea_material.get_shader_parameter("far_color")
+		sea_target.material_override.set_shader_parameter("far_color",Color.RED)
+		check(preset.sea_material.get_shader_parameter("far_color") == original_sea_color, name+": host sea edits do not pollute preset")
+		var original_city_color = preset.far_materials.city.get_shader_parameter("base_color")
+		city_target.material_override.set_shader_parameter("base_color",Color.RED)
+		check(preset.far_materials.city.get_shader_parameter("base_color") == original_city_color, name+": host far edits do not pollute preset")
 		summary[name] = {"background":original_color.to_html(),"ambient":preset.environment.ambient_light_color.to_html(),"ambient_energy":preset.environment.ambient_light_energy,"sun":preset.sun_color.to_html(),"sun_energy":preset.sun_energy,"sun_rotation_degrees":str(preset.sun_rotation_degrees)}
 	var previous_preset = rig.preset
 	var previous_environment = rig.get_node("Environment").environment
@@ -92,5 +113,6 @@ func run():
 	var result = {"passed":checks.all(func(c):return c.passed),"checks":checks,"noon_environment_differences":differences,"presets":summary,"alcatraz_shadow_settings":shadow_values(original_sun),"griffith_shadow_settings_preserved":preserved}
 	FileAccess.open("res://../resource-validation.json",FileAccess.WRITE).store_string(JSON.stringify(result,"\t")+"\n")
 	original_sun.free();host.free();sun.free();rig.free()
+	sea_target.free();city_target.free();hills_target.free();bridge_target.free()
 	print("LIGHTING_RESOURCES ",result.passed," ",checks.size())
 	quit(0 if result.passed else 1)

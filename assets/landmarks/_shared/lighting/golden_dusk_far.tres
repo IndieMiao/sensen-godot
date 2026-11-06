@@ -1,0 +1,40 @@
+[gd_resource type="Resource" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://assets/landmarks/_shared/lighting/far_material_set.gd" id="1"]
+[ext_resource type="Shader" path="res://assets/landmarks/_shared/far_backdrop/far_card.gdshader" id="2"]
+
+[sub_resource type="ShaderMaterial" id="city"]
+render_priority = -98
+shader = ExtResource("2")
+shader_parameter/base_color = Color(0.454901961, 0.419607843, 0.564705882, 1)
+shader_parameter/accent_color = Color(0.545098039, 0.490196078, 0.607843137, 1)
+shader_parameter/shadow_color = Color(0.360784314, 0.376470588, 0.509803922, 1)
+shader_parameter/fog_color = Color(0.776470588, 0.603921569, 0.666666667, 1)
+shader_parameter/fog_amount = 0.16
+shader_parameter/depth_fraction = 0.96
+
+[sub_resource type="ShaderMaterial" id="hills"]
+render_priority = -99
+shader = ExtResource("2")
+shader_parameter/base_color = Color(0.439215686, 0.407843137, 0.513725490, 1)
+shader_parameter/accent_color = Color(0.576470588, 0.517647059, 0.611764706, 1)
+shader_parameter/shadow_color = Color(0.333333333, 0.360784314, 0.478431373, 1)
+shader_parameter/fog_color = Color(0.776470588, 0.603921569, 0.666666667, 1)
+shader_parameter/fog_amount = 0.25
+shader_parameter/depth_fraction = 0.98
+
+[sub_resource type="ShaderMaterial" id="bridge"]
+render_priority = -97
+shader = ExtResource("2")
+shader_parameter/base_color = Color(0.650980392, 0.486274510, 0.513725490, 1)
+shader_parameter/accent_color = Color(0.823529412, 0.639215686, 0.596078431, 1)
+shader_parameter/shadow_color = Color(0.443137255, 0.368627451, 0.501960784, 1)
+shader_parameter/fog_color = Color(0.776470588, 0.603921569, 0.666666667, 1)
+shader_parameter/fog_amount = 0.1
+shader_parameter/depth_fraction = 0.94
+
+[resource]
+script = ExtResource("1")
+city = SubResource("city")
+hills = SubResource("hills")
+bridge = SubResource("bridge")

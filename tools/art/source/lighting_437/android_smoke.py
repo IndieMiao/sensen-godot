@@ -7,7 +7,7 @@ import subprocess
 import time
 
 ROOT = Path(__file__).resolve().parents[4]
-OUT = ROOT / 'output/lighting-437/android'
+OUT = ROOT / os.environ.get('LIGHTING_REVIEW_OUT', 'output/lighting-437') / 'android'
 OUT.mkdir(exist_ok=True)
 PKG = 'com.sensen.lighting437qa'
 ADB = [os.environ['ADB'], '-s', os.environ['JOURNEY_SERIAL']]
@@ -23,7 +23,7 @@ def wait(preset):
         try:
             state = json.loads(call('shell', 'run-as', PKG, 'cat', 'files/lighting_state.json'))
             if (str(state['pid']) == call('shell', 'pidof', PKG).decode().strip()
-                    and state['kit'] == '437-v1' and state['preset'] == preset):
+                    and state['kit'] == '437-v12' and state['preset'] == preset):
                 return state
         except (ValueError, subprocess.CalledProcessError):
             pass
@@ -49,6 +49,9 @@ try:
     apk = OUT.parent / 'lighting-qa.apk'
     assert digest(apk) == digest(OUT / 'installed.apk')
     assert len({state['draws'] for state in records}) == 1
+    for field in ['background', 'sea_far_color', 'bridge_color']:
+        assert len({state[field] for state in records[:3]}) == 3, field
+        assert records[0][field] == records[-1][field], field
     (OUT / 'smoke.json').write_text(json.dumps({
         'passed': True, 'states': records, 'apk_sha256': digest(apk),
         'installed_apk_readback_equal': True,

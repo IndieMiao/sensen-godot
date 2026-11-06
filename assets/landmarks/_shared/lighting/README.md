@@ -1,55 +1,72 @@
 # 通用室外光照预设 · SGODOT-437
 
-【刘备】三个 `.tres` 同时携带一个原生 `Environment` 和一盏主光的颜色、角度、强度。`lighting_rig.tscn` 是可实例化的小场景片段；切换其 `preset` 即可切换光照。没有贴图、模型、天空辐照贴图或逐帧脚本。
+【刘备】暖午、清晨、黄昏各一套 `.tres`，同时携带原生 Environment、一盏主光，以及配套海面 / 远景材质。实例化 `lighting_rig.tscn`，切换 `preset` 即可同步换色。无新模型、贴图、第二盏灯或逐帧脚本。
 
 ## 挂接
 
-新场景实例化 `lighting_rig.tscn`，在根节点的 `preset` 中选择 `warm_noon.tres`、`cool_morning.tres` 或 `golden_dusk.tres`。片段含一个 WorldEnvironment 和一个 DirectionalLight3D；保持根变换为单位变换，`top_level=true` 避免宿主旋转改变主光方向。场景中只保留这一套环境和主光。
+1. 实例化 `lighting_rig.tscn`。根节点 `top_level=true`，避免宿主旋转改变主光方向；场景只保留一套 WorldEnvironment 和主光。
+2. 将宿主已有的海面 GeometryInstance3D 填入 `sea_targets`；城市、丘陵、桥分别填入 `city_targets`、`hill_targets`、`bridge_targets`。支持 MeshInstance3D 和 MultiMeshInstance3D，可填写多个实例。使用与 432 海面 / 434 卡片一致的模型和顶点通道。无该类背景时数组留空。
+3. 指定 `warm_noon.tres`、`cool_morning.tres` 或 `golden_dusk.tres`。Inspector 保存的目标在 `_ready()` 应用；若代码在 `_ready()` 后填充目标，填完调用一次 `apply_preset()`。运行时重新赋值 `preset` 会同步切换光照及所有已绑定材质。
 
-已有环境 / 主光的宿主可以直接套预设，保留原有节点和全部阴影设置：
+已有环境和主光的宿主也可直接调用，保留原有阴影设置：
 
 ```gdscript
-const LightingPreset = preload("res://assets/landmarks/_shared/lighting/cool_morning.tres")
+const Morning = preload("res://assets/landmarks/_shared/lighting/cool_morning.tres")
 
 func _ready() -> void:
-    LightingPreset.apply_to($WorldEnvironment, $Sun)
+    Morning.apply_to($WorldEnvironment, $Sun,
+        [$Sea], [$City], [$Hills], [$Bridge])
 ```
 
-`apply_to` 只替换 Environment 的独立副本和主光颜色 / 强度 / 局部欧拉角；不触碰阴影、投影分组、可见性或节点数量。宿主与多个实例不会共用可变的 Environment。自定义地标时复制一份 `.tres`，修改其 Environment 子资源及 sun 字段，无需改脚本。运行时切换片段的 `preset` 会立即应用；直接修改当前资源字段后调用片段的 `apply_preset()`，或重新载入场景。
+不传后四个参数时只应用环境和主光。空数组不创建背景模型。每次切换复制一份 Environment 和每类材质，宿主修改不会污染预设；同一宿主、同角色的所有目标共享该材质副本。保留几何、变换、阴影、可见性与节点数量。切换后直接修改资源字段需调用 `apply_preset()`。
 
-预设脚本使用显式 `preload`，不注册全局类，也不依赖编辑器预先生成的类缓存。片段导出的 `preset` 类型为 `Resource`，setter 只接受绑定 `lighting_preset.gd` 的资源；其他资源会提示警告并保留当前预设。设为 `null` 时保留最后应用的光照，后续仍可重新指定有效预设。
+脚本显式 preload，不注册全局类，不依赖编辑器类缓存。`preset` 为 Resource，setter 检查绑定的 `lighting_preset.gd`；误选其他资源会警告并保留有效预设。清空字段保留最后应用的光照和材质，后续可重新指定预设。
 
-## 参数表
+## 光照参数
 
-颜色为 sRGB；X 为负俯角、Y 为 Godot 绕 Y 角度，单位度。灯光节点沿本地 −Z 照射。
+颜色为 sRGB，角度为 Godot 局部欧拉角。太阳能量是节点参数；低角度照在水平面的贡献较低，不能将 energy 比值当作画面亮度比。实际同区域亮度比较见审阅资料。
 
-| 参数 | 暖午 `warm_noon` | 清晨 `cool_morning` | 黄昏 `golden_dusk` |
+| 参数 | 暖午 | 清晨 | 黄昏 |
 |---|---|---|---|
 | 背景模式 | BG_COLOR | BG_COLOR | BG_COLOR |
-| 背景色 | `#E3EBE8`，正式背景色 | `#D9E6EF` | `#EDCEB3` |
+| 背景色 | `#E3EBE8` | `#C4D6E5` | `#DCA7B5` |
 | 环境光源 | AMBIENT_SOURCE_COLOR | 同左 | 同左 |
-| 环境光色 | `#D5E4EE` | `#B7CDDF` | `#B7B5CA` |
-| 环境光强度 | 0.72 | 0.64 | 0.58 |
-| `sun_color` | RGB (1, 0.965, 0.88)，约 `#FFF6E0` | `#D7E8FF` | `#FFC58A` |
-| `sun_energy` | 0.98 | 0.84 | 1.10 |
-| `sun_rotation_degrees` | (−56, −34, 0) | (−24, 65, 0) | (−18, −115, 0) |
+| 环境光色 / 强度 | `#D5E4EE` / 0.72 | `#D3CFEE` / 0.90 | `#B9CBF0` / 0.92 |
+| 主光色 | RGB (1, 0.965, 0.88) | `#E3EFFF` | `#FFD78C` |
+| 主光强度 | 0.98 | 1.10 | 1.85 |
+| 主光旋转 | (−56, −34, 0) | (−24, 65, 0) | (−18, −115, 0) |
 | 平地影长 / 物高，几何近似 | 0.67 | 2.25 | 3.08 |
-| 普通雾 / 体积雾 | 均关闭 | 均关闭 | 均关闭 |
-| 雾色，关闭时不参与绘制 | Godot 原默认值 | `#B1CADB` | `#D9AE8F` |
+| 普通雾 / 体积雾 | 关闭 | 关闭 | 关闭 |
 | SSAO / SSR / SDFGI / Glow | 全部关闭 | 全部关闭 | 全部关闭 |
 
-暖午的环境光、主光及阴影沿用分支基线 `4e2c401ac` 的恶魔岛设置；共享背景色采用格里菲斯现用的正式背景色 `#E3EBE8`，没有海面背景覆盖的 POI 也可直接使用。恶魔岛自己的场景保留查漏底用的诊断洋红 `#D000D0`，共享预设不用；恶魔岛和格里菲斯原文件均未改。
+暖午光照及配套材质保留已验收海岸画面；共享背景使用正式色 `#E3EBE8`。恶魔岛自己的场景保留查漏底的诊断洋红，共享预设不用。恶魔岛、格里菲斯原文件未改。
 
-雾字段作为 Environment 参数保留，但三套交付预设均保持原场景的关雾状态，以维持原有着色成本。432 海面与 434 远景卡片是 `unshaded`，不会随主光自动换色；本套只改变受光物体，不修改这些已验收材质。
+## 配套材质
+
+每套预设引用本目录的 `<时段>_sea.tres` 与 `<时段>_far.tres`。后者是 `far_material_set.gd` 资源，包含 city / hills / bridge 三个 ShaderMaterial 子资源，保留三个角色各自的配色和远景深度排序。换地标时复制这些 `.tres` 后改参数即可；不需改脚本或原套件。
+
+海面直接引用 432 的 `sea_backdrop.gdshader`，远景直接引用 434 的 `far_card.gdshader`。原 shader 和原 `.tres` 均不修改，无新增 shader。
+
+| 海面参数 | 暖午 | 清晨 | 黄昏 |
+|---|---|---|---|
+| `shallow_color` | `#439BB0` | `#72B8BF` | `#66979F` |
+| `deep_color` | `#31849F` | `#498C9E` | `#3E7C93` |
+| `far_color` | `#67AFC2` | `#D4E4E7` | HDR RGB (1.30, 1.12, 0.30) |
+| `far_fade_screen_y` | (0.12, 0.28) | (0.06, 0.33) | (0.08, 0.43) |
+| `reveal_far_background` | false | true | true |
+| `ripple_strength` | 0.018 | 0.035 | 0.026 |
+| `render_priority` | −100 | −100 | −100 |
+
+海面的现有远处颜色和透明渐隐在同一 pass 中形成背景到海面的过渡。清晨露出淡蓝灰背景与冷白波纹；黄昏露出桃粉背景，HDR 暖金远处颜色经原有渐隐形成一条柔和的横向反光带，再过渡到蓝绿海面。此处为参数控制的风格化色带，不是随太阳位置计算的物理反射。没有 Glow、额外面片或反射 pass；近岸距离分支保持关闭。此渐隐使用 SCREEN_UV，改变构图时在复制的海面 `.tres` 中调范围。
+
+远景三个子材质的 `base_color` / `accent_color` / `shadow_color` / `fog_color` / `fog_amount` 可独立调节。清晨偏淡蓝紫，黄昏为压暗的紫色城市 / 丘陵和暖紫桥。深度保留 city=0.96、hills=0.98、bridge=0.94，优先级分别 −98 / −99 / −97；雾化只混色，不增加雾或透明层。
 
 ## 阴影与预算
 
-场景片段沿用恶魔岛：一盏开启阴影的主光、`SHADOW_ORTHOGONAL` 单级、max_distance=120、opacity=0.48、bias=0.035、normal_bias=0.28；其余属性保持原默认。项目维持现用的 2048 方向光阴影贴图和 filter quality=2，本套不改 ProjectSettings。
+片段沿用恶魔岛：单盏主光、`SHADOW_ORTHOGONAL`、max_distance=120、opacity=0.48、bias=0.035、normal_bias=0.28；其他阴影默认值不变。项目保持 2048 阴影贴图和 filter quality=2。已有格里菲斯的 max_distance=0、fade_start=1、pancake_size=4、blur=1.8 通过 `apply_to` 保留，预设不覆盖这些设置。
 
-格里菲斯与恶魔岛的阴影参数并不完全相同：它使用 max_distance=0、fade_start=1、pancake_size=4、blur=1.8。对已有格里菲斯式节点调用 `apply_to` 时，这些值逐项保留；三个 `.tres` 不携带或覆盖阴影参数。原两处地标文件均未改。
+海面和远景复用已有 shader 及其绘制节点：不增采样、pass 或透明叠层；海面的可选近岸计算仍关闭。预设切换才分配资源副本，无 `_process` / `_physics_process`。帧时间和真实 Android 切换的验证范围见审阅记录，不作实体手机保证。
 
-同一示例海岸比较原设置及三套预设：灯光、环境、绘制数量一致，无新 pass、采样或高开销效果，无 `_process` / `_physics_process`。预设切换时才复制 Environment。Deck / Vulkan Mobile 的交替采样及 Android 切换证据见审阅目录；这不是实体手机帧时间承诺。
+17 个原生运行文件，无新模型或贴图，`.import`、`nodes/root_script`、纹理压缩条目不适用；三个 `.gd.uid` 均由 Godot 生成。
 
-原生 `.gd` / `.tres` / `.tscn` 无新 GLB 或贴图，`.import`、`nodes/root_script`、纹理压缩格式不适用。两个 `.gd.uid` 由 Godot 生成并保留。
-
-[审阅与验证](../../../../docs/design/lighting-437/README.md) · [复现步骤](../../../../tools/art/source/lighting_437/README.md)
+[三套并排与验证](../../../../docs/design/lighting-437/v12/README.md) · [复现步骤](../../../../tools/art/source/lighting_437/README.md)

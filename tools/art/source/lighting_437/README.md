@@ -1,65 +1,61 @@
 # SGODOT-437 lighting review
 
-Runtime source is the three native `.tres` presets, `lighting_preset.gd` and the
-small `lighting_rig.tscn` / script. No Blender source or new texture is required.
-The reference directory retains the actual Alcatraz / Griffith scripts and
-project rendering settings at base `4e2c401acf7940638690362fbe40a5176b623506`;
-`provenance.json` records their SHA-256 hashes.
+Current revision is v1.2: one lighting preset references an Environment, one sun,
+one sea ShaderMaterial and one far-material bundle (city / hills / bridge).
+Runtime stays under `assets/landmarks/_shared/lighting/`. The original 432 / 434
+shaders and materials are read-only dependencies. No global script classes.
 
-Use Godot 4.7.2 and hold `flock /home/deck/gs66-render.lock` for all Godot and
-Android sessions. Existing SDK/JDK and private ADB are reused.
+Reference scripts / project settings are pinned to base
+`4e2c401acf7940638690362fbe40a5176b623506`. 435 plants are staged only from
+`a590b559dd6e776dc1047f858757c932c3a7cf2b` (#841). They are not delivered as new
+lighting assets. `reference/provenance.json` retains original file hashes.
 
-1. `python3 tools/art/source/lighting_437/prepare.py` stages an isolated project
-   under `output/lighting-437/project`. It copies 426 coast, 430 foam, 432 sea and
-   434 cards from the branch base. 435 plants come from the pinned review-only
-   commit `a590b559dd6e776dc1047f858757c932c3a7cf2b` (#841); fetch it if needed.
-   Those kits are neither changed nor added to the lighting runtime directory.
-2. Run `godot --headless --editor --import --path <project>` and then
-   `godot --headless --script verify.gd --path <project>`. On the first import,
-   copy the generated lighting `.gd.uid` files back to the runtime directory.
-   The verification compares every stored noon Environment setting (shared background #E3EBE8;
-   all remaining properties match the original), every
-   original sun shadow setting, and preservation of Griffith's distinct shadows
-   while switching all three presets. It also checks independent Environment
-   copies, rejection of unrelated Resources, null / valid reassignment, and
-   disabled costly effects / per-frame callbacks. A warning from the intentional
-   invalid Resource assignment is expected.
-3. On the actual display, run Mobile with `--fixed-fps 30 --disable-vsync --
-   --benchmark`. The original noon control and new noon must match exactly in this fully
-   sea-covered view; the background colours intentionally differ.
-   Three default views and shadow-off diagnostic controls are captured. Sea and
-   foam clocks are frozen only in desktop QA. The timing section measures
-   viewport CPU/GPU time: 45 warm-up + 90 sampled frames per block, three
-   interleaved cycles with reverse ordering in the middle. It is uncapped
-   rendering with a fixed simulation delta, not phone FPS.
-4. `package_review.py` requires NumPy/Pillow, labels the three 360×800 images,
-   summarizes timing and records PNG hashes under `docs/design/lighting-437/`.
-   Bulk per-frame timings stay under ignored `output/`.
-5. `prepare_android.py` stages a separate Android export project. Import and
-   export its `Android Lighting QA` preset to `../lighting-qa.apk`. Keep
-   `export/android/shutdown_adb_on_exit=false`, and install only
-   `com.sensen.lighting437qa` on the verified emulator. At 360×800 / density 160,
-   run `tools/android/run_test.sh --serial SERIAL com.sensen.lighting437qa --
-   python3 tools/art/source/lighting_437/android_smoke.py` with private `$ADB`.
-   Three actual taps cycle noon → morning → dusk → noon. PID, draws, screenshots
-   and full installed APK readback are checked. The script restores size/density
-   and the runner stops this QA app.
-6. Copy the staged project without `.godot` into a new directory, import and
-   rerun `verify.gd`. Compare runtime filenames and SHA before/after, and verify
-   the original Alcatraz / Griffith paths against the branch base before push.
+Use Godot 4.7.2, and hold `flock /home/deck/gs66-render.lock` for Godot / Android.
+Reuse the verified SDK / JDK / private ADB. Set `LIGHTING_REVIEW_OUT` to
+`output/lighting-437-v12` for the commands below; omitting it uses the original
+output location for preparation and Android tools.
 
-The fixture uses the 434 camera: 360×800, width 6.72 m, pitch 43°, yaw 14.5°,
-assembly rotation 65°. The six 2 m shore slots and frozen 1.75 m avatar stay fixed.
-Six small 435 plants expose shaded surfaces and long shadows without blocking
-the bridge. The two synthetic grass blocks receive shadows but do not cast:
-this avoids self-shadow banding on the fixture's perfectly flat faces at low
-sun angles, without changing the rig's shadow settings or any source kit.
-The sea copy retains the review render_priority=-100 used by 434. Far cards,
-sea and foam keep their accepted material colours. This scene is QA only;
-there is no production layout or game integration.
+1. Run `python3 tools/art/source/lighting_437/prepare.py`. The isolated project
+   is `<output>/project`; output remains excluded from parent Godot class scans.
+2. Import with `godot --headless --editor --import --path <project>`. On first
+   creation, retain generated runtime `.gd.uid` files in the source directory.
+   Then run `godot --headless --path <project> --script verify.gd` (79 checks).
+   One warning is intentional: assigning an unrelated Resource must leave the
+   valid preset and applied lighting intact.
+3. Run on the actual display with `--fixed-fps 30 --disable-vsync -- --benchmark`.
+   It captures the original noon, three presets, and shadow-off controls; then
+   interleaves original / noon / morning / dusk for three timing cycles.
+   45 warm-up + 90 sampled frames per block; reverse the middle cycle.
+   Water / foam TIME is frozen only in desktop QA. Original and shared noon
+   match exactly in this fully sea-covered view; their background colours differ.
+4. Run `prepare_android.py` with the same output environment. Import and export
+   the `Android Lighting QA` preset from `<output>/android-project` to
+   `../lighting-qa.apk`. Keep `export/android/shutdown_adb_on_exit=false`.
+   Install only `com.sensen.lighting437qa` on the verified emulator; use 360×800
+   and density 160. Invoke `tools/android/run_test.sh --serial SERIAL
+   com.sensen.lighting437qa -- python3 tools/art/source/lighting_437/android_smoke.py`
+   with private `$ADB` and the same output environment. Three real taps verify
+   all companion palettes switch and return to noon; full APK readback must
+   match. The script restores screen settings, and the runner stops the QA app.
+5. Run `package_v12.py` using a Python with NumPy / Pillow. It writes the full
+   triptych, unretouched individual captures, fixed sample polygons and metrics,
+   timing / Android records and hashes into `docs/design/lighting-437/v12/`.
+   Brightness is weighted display RGB Y-prime, not physical linear luminance;
+   sampled regions are not a per-pixel bound over the full scene.
+6. For cache-free loading, create a minimal project with only the lighting
+   directory, the unchanged 432 / 434 shader files + UIDs, and `verify.gd`.
+   With no `.godot` or autoloads, run the checks **before** any editor import.
+   Also copy the full staged project excluding `.godot`, cold import, and rerun
+   checks. Compare runtime filenames / SHA at every step; confirm protected
+   original landmark and shared-kit paths have no diff against the base.
 
-For the v1.1 cache regression, copy only the lighting runtime directory and
-`verify.gd` into a minimal project with no autoloads or `.godot` directory. Run
-`--headless --script verify.gd` **before** any editor import, then cold import
-and rerun the same checks. Compare runtime filenames and hashes at each step.
-The explicit preload must work without a generated global-class cache.
+The fixture uses 360×800, orthographic width 6.72 m, pitch 43°, yaw 14.5°,
+assembly yaw 65°, six 2 m shore slots, fixed 1.75 m avatar and six small 435
+plants. The synthetic grass blocks receive but do not cast shadows, avoiding
+low-angle self-shadow striping on flat QA geometry. All presets use this same
+fixture and camera. Backdrop targets are bound to the production rig; captures
+exercise the same runtime switching path rather than QA-only recolouring.
+
+The initial v1 `package_review.py` and root review records are historical.
+The v1.1 `docs/design/lighting-437/v11/` records the class-cache / noon background
+fixes; the current v1.2 includes those fixes plus the visual revision.

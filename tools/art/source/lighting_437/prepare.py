@@ -1,7 +1,7 @@
 """Isolated lighting review; all reference kits are staged only."""
 from pathlib import Path
-import shutil,json,subprocess,tarfile
-SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/lighting-437';QA=OUT/'project'
+import shutil,json,subprocess,tarfile,os
+SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/os.environ.get('LIGHTING_REVIEW_OUT','output/lighting-437');QA=OUT/'project'
 REL='assets/landmarks/_shared/lighting';COAST='assets/landmarks/_shared/coast_kit'
 def main():
  QA.mkdir(parents=True,exist_ok=True);(OUT.parent/'.gdignore').touch()
