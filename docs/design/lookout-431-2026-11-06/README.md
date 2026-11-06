@@ -21,3 +21,5 @@ Godot临时碰撞射线核对三处台面和两侧接缝，交付GLB不带碰撞
 可编辑命名blend、生成/复现/验证脚本和每件来源记录位于tools/art/source/lookout_431/。
 审阅图为Godot4.7.2 Mobile/Vulkan / RTX2060实渲；所有Godot/Blender使用共享flock、完成后退出。
 媒体前缀SGODOT-431_lookout_v1_，哈希见media-manifest.json；图片与validation署名交SGODOT-431。
+
+最新：[v1.1](v1.1/README.md)，投币盒改同柱色竖向小盒，仅留横缝；观景直/弧栏统一铸铁圆管；圆盘未改。

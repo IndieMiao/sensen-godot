@@ -42,19 +42,16 @@ def telescope():
   axial('Two rear eyepieces',[(0,.058),(.08,.048)],'metal',8,(x,1.40,.21),(0,0,1))
   axial('Dark recessed eyepiece',[(0,.035),(.004,.035)],'drain',8,(x,1.40,.293),(0,0,1))
  axial('Side pivot knob',[(0,.06),(.055,.06)],'wood_light',8,(.23,1.34,0),(1,0,0))
- box('Plain coin plate',(0,.91,.104),(.20,.26,.038),'cream',.014)
- axial('Coin pictogram',[(0,.034),(.004,.034)],'wood_light',10,(-.044,.955,.126),(0,0,1))
- box('Coin slot',(0,.857,.126),(.086,.012,.006),'metal')
- # A single downward arrow is a graphic cue, not currency text.
- mesh('Coin insertion arrow',[(.018,.976,.130),(.042,.976,.130),(.042,.944,.130),(.057,.944,.130),(.030,.915,.130),(.003,.944,.130),(.018,.944,.130)],[tuple(reversed(range(7)))],'teal')
- return {'view_direction':'-Z, slightly up','eye_height_m':1.40,'content':'Coin circle, slot and downward arrow only; no letters/numbers','placement_cell_m':[2,2]}
+ box('Narrow vertical coin box',(0,.89,.125),(.14,.32,.08),'metal',.014)
+ box('Single horizontal coin slot',(0,.92,.168),(.10,.018,.006),'drain')
+ return {'view_direction':'-Z, slightly up','eye_height_m':1.40,'content':'Vertical coin box matching pedestal; single horizontal slot, no dots/arrows/letters','coin_box_dimensions_m':[.14,.32,.08],'coin_box_center_m':[0,.89,.125],'coin_box_srgb':'5D4C38','coin_slot_dimensions_m':[.10,.018,.006],'placement_cell_m':[2,2]}
 
 def lookout_railing():
- box('Broad muted wood handrail',(0,.93,0),(2,.08,.12),'wood_light',.015)
+ rod('Cast iron round handrail',(-1,.93,0),(1,.93,0),.032,'metal',6)
  rod('Dark lower railing',(-1,.23,0),(1,.23,0),.032,'metal',6)
- for x in [-.75,-.375,0,.375,.75]:rod('Open vertical bar',(x,.23,0),(x,.89,0),.024,'metal',6)
+ for x in [-.75,-.375,0,.375,.75]:rod('Open vertical bar',(x,.23,0),(x,.93,0),.024,'metal',6)
  for x in [-.75,.75]:rod('Short anchored foot',(x,0,0),(x,.23,0),.024,'metal',6)
- return {'grid_m':2,'connectors':{'left':[-1,0,0],'right':[1,0,0]},'rail_centres_y_m':[.23,.93],'endpost':'Use existing railing_endpost; one per shared seam'}
+ return {'grid_m':2,'connectors':{'left':[-1,0,0],'right':[1,0,0]},'rail_centres_y_m':[.23,.93],'rail_radius_m':.032,'rail_srgb':'5D4C38','endpost':'Use existing railing_endpost; one per shared seam'}
 
 def semi_deck():
  n=12;arc=[(math.cos(i*math.pi/n),-math.sin(i*math.pi/n)) for i in range(n+1)]
@@ -62,23 +59,20 @@ def semi_deck():
  faces=[tuple(reversed(range(count))),tuple(range(count,2*count))]
  faces += [(i,(i+1)%count,(i+1)%count+count,i+count) for i in range(count)]
  mesh('Semicircular limestone deck',verts,faces,['stone_shade','stone_light']+['stone']*count)
- # Annular rail: outer rim exactly1m, inner rim0.90m; standard endpost covers
- # the final5cm from the rail centreline to the nominal2m chord connector.
- def band(name,low,high,inner,outer,role):
-  pts=[(r*math.cos(i*math.pi/n),y,-r*math.sin(i*math.pi/n)) for y,r in [(low,inner),(low,outer),(high,inner),(high,outer)] for i in range(n+1)]
-  fs=[];stride=n+1
-  for i in range(n):
-   for a,b in [(0,1),(1,3),(3,2),(2,0)]:fs.append((a*stride+i,b*stride+i,b*stride+i+1,a*stride+i+1))
-  fs += [(0,stride,3*stride,2*stride),(n,2*stride-1,4*stride-1,3*stride-1)]
-  mesh(name,pts,fs,role)
- band('Curved wood panorama handrail',1.01,1.09,.90,1.0,'wood_light')
- band('Curved dark lower rail',.322,.378,.922,.978,'metal')
+ # Match the existing street railing's radius/colour, with standard endposts
+ # covering the final5cm from the curve centreline to the2m chord endpoints.
+ for y,label in [(1.05,'handrail'),(.35,'lower rail')]:
+  # A fixed vertical/radial frame keeps the horizontal half-circle untwisted.
+  pts=[((.95+.032*math.cos(j*math.tau/6))*x,y+.032*math.sin(j*math.tau/6),(.95+.032*math.cos(j*math.tau/6))*z) for x,z in arc for j in range(6)]
+  fs=[(i*6+j,i*6+(j+1)%6,(i+1)*6+(j+1)%6,(i+1)*6+j) for i in range(n) for j in range(6)]
+  fs += [tuple(reversed(range(6))),tuple(range(n*6,(n+1)*6))]
+  mesh('Curved cast iron '+label,pts,fs,'metal',True)
  for i in range(1,8):
   a=i*math.pi/8;x=.95*math.cos(a);z=-.95*math.sin(a)
-  rod('Curved-deck railing baluster',(x,.35,z),(x,1.01,z),.024,'metal',5)
+  rod('Curved-deck railing baluster',(x,.35,z),(x,1.05,z),.024,'metal',5)
  return {'grid_m':2,'chord_width_m':2,'outward_extent_m':1,'outward':'-Z','deck_top_y_m':.12,
   'pivot':'chord midpoint at underside; floor undersideY0',
-  'connectors':{'left':[-1,.12,0],'right':[1,.12,0]},'rail_centres_y_m':[.35,1.05],
+  'connectors':{'left':[-1,.12,0],'right':[1,.12,0]},'rail_centres_y_m':[.35,1.05],'rail_radius_m':.032,'rail_srgb':'5D4C38',
   'endpost':'Existing railing_endpost at both connector points covers5cm rail-centre offset','collisions':'None; scene owner supplies deck/navigation/collision at integration'}
 
 def compass_disc():
@@ -128,7 +122,7 @@ def main():
   row=s.export(name,builder);row['source']=str((SRC/(name+'.blend')).relative_to(ROOT));row['task']='SGODOT-431';m['assets'][name]=row
   folder=SRC/'modules'/name;folder.mkdir(parents=True,exist_ok=True)
   (folder/'reuse_provenance.json').write_text(json.dumps({'author':'黄忠','virtual_user_id':m['virtual_user_id'],'task':'SGODOT-431','module':name,'geometry':'New geometry; existing street-kit assets unchanged','palette':'street_kit v1.2, muted #830 wood, Alcatraz cream/teal/metal','source':row['source'],'generator':'tools/art/source/lookout_431/build.py'},ensure_ascii=False,indent=2)+'\n')
- m['extension_tasks']={'SGODOT-431':{'revision':'v1','assets':[n for n,b in BUILDERS],'scope':'Lookout kit only; no Alcatraz integration/layout'}}
+ m['extension_tasks']={'SGODOT-431':{'revision':'v1.1','assets':[n for n,b in BUILDERS],'scope':'Lookout kit only; no Alcatraz integration/layout'}}
  m['unique_triangles']=sum(x['triangles'] for x in m['assets'].values());m['unique_surfaces']=len(m['assets'])
  (KIT/'kit_manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
 

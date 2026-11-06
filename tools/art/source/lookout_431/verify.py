@@ -41,9 +41,33 @@ for name in names:
  if name=='lookout_semicircle_2m':
   check(np.allclose(v.min(0)[[0,2]],[-1,-1],atol=1e-6) and np.allclose(v.max(0)[[0,2]],[1,0],atol=1e-6),'Semicircle actual2m chord/1m projection')
   check(abs(row['deck_top_y_m']-.12)<1e-6 and row['connectors']=={'left':[-1,.12,0],'right':[1,.12,0]},'Semicircle mounting contract')
+ if name in ['lookout_railing_2m','lookout_semicircle_2m']:
+  rail=np.ones(len(v),dtype=bool) if name=='lookout_railing_2m' else v[:,1]>.2
+  check((np.linalg.norm(c[rail,:3]-rgb('5D4C38'),axis=1)<.0001).all(),name+' all rail vertices match original cast iron')
+  if name=='lookout_railing_2m':
+   end=v[(abs(abs(v[:,0])-1)<1e-6)&(v[:,1]>.8)]
+   measured=np.sqrt((end[:,1]-.93)**2+end[:,2]**2)
+   check(np.allclose(measured,.032,atol=1e-6),name+' actual original32mm pipe radius')
+  else:
+   upper=v[v[:,1]>.99];radial=np.linalg.norm(upper[:,[0,2]],axis=1)
+   measured=np.sqrt((radial-.95)**2+(upper[:,1]-1.05)**2)
+   check(abs(measured.max()-.032)<1e-6,name+' actual original32mm curved pipe radius')
+ if name=='lookout_telescope':
+  body=(abs(v[:,0])<.071)&(v[:,1]>.725)&(v[:,1]<1.055)&(v[:,2]>.0845)&(v[:,2]<.166)
+  check(np.allclose(np.ptp(v[body],axis=0),[.14,.32,.08],atol=1e-6),'Coin box actual vertical14x32x8cm')
+  area=(abs(v[:,0])<.071)&(v[:,1]>.725)&(v[:,1]<1.055)&(v[:,2]>.0845)
+  valid=(np.linalg.norm(c[area,:3]-rgb('5D4C38'),axis=1)<.0001)|(np.linalg.norm(c[area,:3]-rgb('4E4C43'),axis=1)<.0001)
+  check(valid.all(),'Coin area only pedestal metal and slot colour; no pale plate/dots')
+  slot=(np.linalg.norm(c[:,:3]-rgb('4E4C43'),axis=1)<.0001)&(v[:,1]<1.1)&(v[:,2]>.16)
+  check(np.allclose(np.ptp(v[slot],axis=0),[.10,.018,.006],atol=1e-6),'Single horizontal10cm coin slot')
 for path in KIT.glob('*.glb.import'):
  uid=re.search(r'uid="(uid://[a-y0-8]+)"',path.read_text());uids.append(uid.group(1))
 check(len(set(uids))==len(uids)==21,'All21 GLB UIDs unique')
+v1='1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f'
+for name in ['lookout_compass_disc','lookout_sheltered_bench']:
+ for path in [KIT/(name+'.glb'),SRC/(name+'.blend')]:
+  check(path.read_bytes()==subprocess.check_output(['git','show',v1+':'+str(path.relative_to(ROOT))],cwd=ROOT),path.name+' unchanged from reviewed v1')
+check(all(path.read_bytes()==subprocess.check_output(['git','show',v1+':'+str(path.relative_to(ROOT))],cwd=ROOT) for path in KIT.glob('*.glb.import')),'All21 imports/UIDs unchanged from v1')
 preserved={p:h for p,h in ref['existing_kit_sha256'].items() if Path(p).name not in ['README.md','kit_manifest.json']}
 check(all(hashlib.sha256((ROOT/p).read_bytes()).hexdigest()==h for p,h in preserved.items()),'Every original street-kit asset/material/import/palette preserved',{'files':len(preserved)})
 check(len(m['assets'])==21 and m['unique_triangles']==sum(x['triangles'] for x in m['assets'].values()),'Combined21-piece catalogue totals')

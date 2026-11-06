@@ -1,0 +1,17 @@
+[
+  {
+    "file": "SGODOT-431_lookout_v1.1_catalogue.png",
+    "bytes": 489268,
+    "sha256": "318da00c2f7215055b0e126d0dc757219c6ac1c2c6a3840b1e564ee8e43e0785"
+  },
+  {
+    "file": "SGODOT-431_lookout_v1.1_example_360.png",
+    "bytes": 143690,
+    "sha256": "2f2ecde9afbee0a764eb5dfb106c743661737691a110112ab240e35ee00717e9"
+  },
+  {
+    "file": "SGODOT-431_lookout_v1.1_validation.json",
+    "bytes": 47985,
+    "sha256": "669eccde4a6ee62a7f9afc3a30b51d60eafd63386400259a2fef771a2f249744"
+  }
+]

@@ -567,7 +567,7 @@
     },
     "lookout_telescope": {
       "file": "lookout_telescope.glb",
-      "triangles": 681,
+      "triangles": 640,
       "surfaces": 1,
       "bounds": [
         [
@@ -588,10 +588,26 @@
       ],
       "pivot": "base centre, Y up, +Z front",
       "source": "tools/art/source/lookout_431/lookout_telescope.blend",
-      "sha256": "24da4f8b80326ff4a7e737f04e7fa2760fa80fd11ebaf68baf587a6cb96cf812",
+      "sha256": "331d01482f1c41f4cdfb781006cde166fa819522f5c80c13328bb958adb78321",
       "view_direction": "-Z, slightly up",
       "eye_height_m": 1.4,
-      "content": "Coin circle, slot and downward arrow only; no letters/numbers",
+      "content": "Vertical coin box matching pedestal; single horizontal slot, no dots/arrows/letters",
+      "coin_box_dimensions_m": [
+        0.14,
+        0.32,
+        0.08
+      ],
+      "coin_box_center_m": [
+        0,
+        0.89,
+        0.125
+      ],
+      "coin_box_srgb": "5D4C38",
+      "coin_slot_dimensions_m": [
+        0.1,
+        0.018,
+        0.006
+      ],
       "placement_cell_m": [
         2,
         2
@@ -600,28 +616,28 @@
     },
     "lookout_railing_2m": {
       "file": "lookout_railing_2m.glb",
-      "triangles": 204,
+      "triangles": 180,
       "surfaces": 1,
       "bounds": [
         [
           -1.0,
           0.0,
-          -0.05999999865889549
+          -0.03200000151991844
         ],
         [
           1.0,
-          0.9700000286102295,
-          0.05999999865889549
+          0.9577128291130066,
+          0.03200000151991844
         ]
       ],
       "dimensions_m": [
         2.0,
-        0.9700000286102295,
-        0.11999999731779099
+        0.9577128291130066,
+        0.06400000303983688
       ],
       "pivot": "base centre, Y up, +Z front",
       "source": "tools/art/source/lookout_431/lookout_railing_2m.blend",
-      "sha256": "38099ce0724cb44daa1fd806e71f89adf3825ee678ef649e53ac6b15f15699be",
+      "sha256": "3118a659684087ef2226f3bb2030df3dd3a7c7d18a02315c033199b65ee6491b",
       "grid_m": 2,
       "connectors": {
         "left": [
@@ -639,12 +655,14 @@
         0.23,
         0.93
       ],
+      "rail_radius_m": 0.032,
+      "rail_srgb": "5D4C38",
       "endpost": "Use existing railing_endpost; one per shared seam",
       "task": "SGODOT-431"
     },
     "lookout_semicircle_2m": {
       "file": "lookout_semicircle_2m.glb",
-      "triangles": 360,
+      "triangles": 464,
       "surfaces": 1,
       "bounds": [
         [
@@ -654,18 +672,18 @@
         ],
         [
           1.0,
-          1.090000033378601,
+          1.0777127742767334,
           -0.0
         ]
       ],
       "dimensions_m": [
         2.0,
-        1.090000033378601,
+        1.0777127742767334,
         1.0
       ],
       "pivot": "chord midpoint at underside; floor undersideY0",
       "source": "tools/art/source/lookout_431/lookout_semicircle_2m.blend",
-      "sha256": "4ccda6d6e42c869c4a53f72b7381e7625d24b85f8202b4e385d608258a5a8177",
+      "sha256": "6fa15577073f7beb0ba1b3303a8afcdf4b14aa5d476fba151ecd0880ba96ec32",
       "grid_m": 2,
       "chord_width_m": 2,
       "outward_extent_m": 1,
@@ -687,6 +705,8 @@
         0.35,
         1.05
       ],
+      "rail_radius_m": 0.032,
+      "rail_srgb": "5D4C38",
       "endpost": "Existing railing_endpost at both connector points covers5cm rail-centre offset",
       "collisions": "None; scene owner supplies deck/navigation/collision at integration",
       "task": "SGODOT-431"
@@ -760,12 +780,12 @@
       "task": "SGODOT-431"
     }
   },
-  "unique_triangles": 8246,
+  "unique_triangles": 8285,
   "unique_surfaces": 21,
   "scope": "Reusable furniture only; example is review-only, no game layout or location",
   "extension_tasks": {
     "SGODOT-431": {
-      "revision": "v1",
+      "revision": "v1.1",
       "assets": [
         "lookout_telescope",
         "lookout_railing_2m",
