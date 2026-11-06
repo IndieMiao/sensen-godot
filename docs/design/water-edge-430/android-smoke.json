@@ -13,8 +13,8 @@
       "draws": 22,
       "foam": true,
       "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
-      "kit": "430-v1",
-      "pid": 14528,
+      "kit": "430-v11",
+      "pid": 14934,
       "renderer": "mobile",
       "view": 0
     },
@@ -30,8 +30,8 @@
       "draws": 22,
       "foam": true,
       "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
-      "kit": "430-v1",
-      "pid": 14528,
+      "kit": "430-v11",
+      "pid": 14934,
       "renderer": "mobile",
       "view": 1
     },
@@ -47,8 +47,8 @@
       "draws": 14,
       "foam": false,
       "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
-      "kit": "430-v1",
-      "pid": 14528,
+      "kit": "430-v11",
+      "pid": 14934,
       "renderer": "mobile",
       "view": 1
     },
@@ -64,13 +64,13 @@
       "draws": 22,
       "foam": true,
       "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
-      "kit": "430-v1",
-      "pid": 14528,
+      "kit": "430-v11",
+      "pid": 14934,
       "renderer": "mobile",
       "view": 1
     }
   ],
-  "apk_sha256": "c55b096fe52be85ee44648486bfa885e5d00cf573228f8ed1745e478745b7a25",
+  "apk_sha256": "b35db8efab18a98a809cc7620d43b21582ba2b692567fdb5879a3d79d0096f90",
   "installed_apk_readback_equal": true,
   "scope": "API37 SwiftShader emulator, Mobile; 3 real button taps; not physical GPU performance"
 }

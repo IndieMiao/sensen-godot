@@ -1,12 +1,10 @@
 {
   "passed": true,
+  "revision": "v1.1",
   "loop_end_max_rgb_255": 0.0,
-  "frame_interval_s": 0.06666666666666667,
-  "largest_adjacent_frame_rgb_255": 3.0,
-  "max_frame_mean_rgb_255": 0.01103823731138546,
-  "opening_changed_pixels": 4638,
-  "gif_duration_ms": 4000,
-  "gif_frames": 60,
-  "motion_clock": "60 rendered shader samples at t=i/15 s; TIME replaced by uniform only in QA; not device FPS recording",
-  "no_flash_check": "max adjacent raw RGB delta <12/255; seam t=0 and t=4 identical"
+  "frame_interval_s": 0.05,
+  "gif_duration_ms": 5500,
+  "gif_frames": 110,
+  "motion_clock": "110 actual Mobile-rendered shader samples at t=i/20 s; TIME replaced by uniform in QA only; not device FPS recording",
+  "edge_measurement": "edge-motion-validation.json"
 }

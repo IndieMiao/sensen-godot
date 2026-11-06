@@ -1,30 +1,38 @@
 {
   "default-review.png": {
-    "bytes": 57422,
-    "sha256": "07fd78351f534eb820833031ed49ed7ca03b0dc4caff1b44f78373445a5e8937"
+    "bytes": 54477,
+    "sha256": "1a3573e5110a9b456df9770de5eee47bbbf715caca62d93b59e2e350727adb47"
   },
   "coast-overview.png": {
-    "bytes": 108547,
-    "sha256": "ab25199b9e5a6a3f73be06bee939aaa85c4c44a9032032c912d75e9389351ef1"
+    "bytes": 104752,
+    "sha256": "93d557d496c751f887c1e7e9c2529185a530bf2535e75c4c45edb3ce338d98ef"
   },
   "close-review.png": {
-    "bytes": 100665,
-    "sha256": "71172f34ddfe2ae4eb45b91af07584aa6ea7b66c4469df9155e4acadc2d0f992"
+    "bytes": 93291,
+    "sha256": "b62e79a53715b66fb2576c151b8f7340174453753c9668ecaaeea507acf1b882"
   },
   "steps-review.png": {
-    "bytes": 112409,
-    "sha256": "97ea5c0689f7adebc97210005d95205fd9d06d0486180d800dc8eb63bdc79902"
+    "bytes": 101263,
+    "sha256": "04ea9e915e91ad1ca0f29c6f67d4e880bfbdd3a4d7741f2fa4f4041b7e1690a7"
+  },
+  "pile-review.png": {
+    "bytes": 48487,
+    "sha256": "010d6f2c62459835eb293f3db3d7b00f28049ce1d5de3d469b3ae7883e8b3866"
   },
   "motion-review.gif": {
-    "bytes": 1605900,
-    "sha256": "3706337f54db067d3502ecba1a31ec316322dc9b55d1e5c9ba743f1342544f81"
+    "bytes": 1315616,
+    "sha256": "8632b52ed90098b26abce0fc4e6a153b4db593139a43b9d5710e22db9e9578fb"
   },
   "motion-review.apng": {
-    "bytes": 3662055,
-    "sha256": "9a5a0070d15f0065bd00a675ac1d73849f2dd2d06431dec9c8d02b4b460684c2"
+    "bytes": 2815184,
+    "sha256": "5f1976ced88cbcd1f45779e7122f72a9f091e0fdd7f2685ebd869199b3b0eb97"
+  },
+  "default-comparison.png": {
+    "bytes": 66589,
+    "sha256": "5dac1eccc80a7bc49240c2c14ac3f2eb3ad8b2372d0112b3fa1411caa02d8052"
   },
   "android-default.png": {
-    "bytes": 54908,
-    "sha256": "2eed7ca072113194a8b0868130b176a78eaa38384f821e1c0f23d827e7164346"
+    "bytes": 53467,
+    "sha256": "5c61ffa756dd764c4431fbe8ce5ad1dd00090ce4f0ffd70e05f2c2db334b9a54"
   }
 }

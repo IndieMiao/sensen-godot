@@ -1,5 +1,6 @@
 {
   "passed": true,
+  "revision": "v1.1",
   "packaged_foam_resources": [
     "assets/.godot/imported/water_edge_inner.glb-3d11400aff991d9e5d59647a479410a4.scn",
     "assets/.godot/imported/water_edge_outer.glb-f107f8da5de0443b02cd6a799a8be26c.scn",
@@ -8,6 +9,5 @@
     "assets/.godot/imported/water_edge_steps.glb-1b05c75a14bb7d9ad1a52685880bc643.scn",
     "assets/.godot/imported/water_edge_straight.glb-df9aecd254d7023396a5088995b8b2bf.scn"
   ],
-  "packaged_resource_count": 6,
-  "apk_sha256": "c55b096fe52be85ee44648486bfa885e5d00cf573228f8ed1745e478745b7a25"
+  "apk_sha256": "b35db8efab18a98a809cc7620d43b21582ba2b692567fdb5879a3d79d0096f90"
 }

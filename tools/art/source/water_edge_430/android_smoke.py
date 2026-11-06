@@ -1,6 +1,6 @@
 from pathlib import Path
 import os,subprocess,time,json,hashlib
-SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/water-edge-430/android';OUT.mkdir(exist_ok=True)
+SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/water-edge-430-v11/android';OUT.mkdir(exist_ok=True)
 pkg='com.sensen.wateredge430qa';adb=[os.environ['ADB'],'-s',os.environ['JOURNEY_SERIAL']]
 def call(*a):return subprocess.check_output(adb+list(map(str,a)),stderr=subprocess.DEVNULL)
 def wait(view,foam):
@@ -9,7 +9,7 @@ def wait(view,foam):
   try:
    s=json.loads(call('shell','run-as',pkg,'cat','files/water_edge_state.json'))
    assert str(s['pid'])==call('shell','pidof',pkg).decode().strip()
-   if s['view']==view and s['foam']==foam and s['kit']=='430-v1':return s
+   if s['view']==view and s['foam']==foam and s['kit']=='430-v11':return s
   except (ValueError,AssertionError,subprocess.CalledProcessError):pass
   time.sleep(1)
  raise AssertionError('No fresh water-edge state')

@@ -68,9 +68,9 @@ func run():
   instance(COAST+asset+".glb",p[1],p[2],wet)
   var cap=Vector2(.12,0) if i==0 else Vector2(0,.12) if i==5 else Vector2.ZERO
   # The stair outlet ends at the adjoining rocks; fade its two free short ends.
-  if p[0]=="steps":cap=Vector2(.10,.10)
-  if i==3:cap=Vector2(0,.10)
-  if i==5:cap=Vector2(.10,.12)
+  if p[0]=="steps":cap=Vector2.ZERO
+  if i==3:cap=Vector2.ZERO
+  if i==5:cap=Vector2(0,.12)
   foam(p[0],p[1],p[2],cap)
  box(Vector3(-1.55,.28,1.3),Vector3(1.7,.56,5.4),"8c9e6b")
  box(Vector3(1.45,.28,-1.5),Vector3(7.1,.56,1.8),"8c9e6b")
@@ -104,20 +104,20 @@ func run():
  vp.size=Vector2i(1000,800);frame(assembly.to_global(Vector3(.5,.2,2.1)),10.6);await capture("coast-overview")
  vp.size=Vector2i(900,700);frame(assembly.to_global(Vector3(.25,.2,2.4)),5.2);await capture("close-review")
  vp.size=Vector2i(900,650);frame(assembly.to_global(Vector3(2,.2,.55)),4.2);await capture("steps-review")
- vp.size=Vector2i(700,650);frame(assembly.to_global(Vector3(-1.28,.2,7)),2.1);await capture("pile-review")
- vp.size=Vector2i(540,720);frame(assembly.to_global(Vector3(.2,.2,2.3)),5.6)
+ vp.size=Vector2i(700,650);frame(assembly.to_global(Vector3(-2.72,.2,7)),2.1);await capture("pile-review")
+ vp.size=Vector2i(360,800);frame(assembly.to_global(Vector3(.2,.2,2.6)),6.72)
  DirAccess.make_dir_recursive_absolute(output+"/motion")
- for i in 60:
-  clock_set(i/15.0)
+ for i in 110:
+  clock_set(i/20.0)
   for j in 2:await RenderingServer.frame_post_draw
   vp.get_texture().get_image().save_png(output+"/motion/%03d.png"%i)
- clock_set(4.0)
+ clock_set(5.5)
  for i in 2:await RenderingServer.frame_post_draw
  vp.get_texture().get_image().save_png(output+"/loop-end.png")
  report.renderer={"engine":Engine.get_version_info().string,"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
  report.review_only=true;report.coast_commit="d72d74f4c0ccbcc922c5691cb8b6866eca1ca8f9"
  report.wet_band="QA opaque vertex-colour treatment, y=.20 to .45; not owner revision"
- report.motion={"duration_s":4,"frames":60,"fps":15,"clock":"uniform substituted for TIME only in QA; exact 4s cycle"}
+ report.motion={"duration_s":5.5,"frames":110,"fps":20,"clock":"uniform substituted for TIME only in QA; exact 5.5s cycle"}
  report.passed=report.checks.all(func(c):return c.passed)
  FileAccess.open(output+"/render-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
  print("WATER_EDGE_RENDER ",report.passed);get_tree().quit(0 if report.passed else 1)
@@ -126,7 +126,7 @@ var android_view=0
 var android_foam=true
 func android_state():
  for i in 3:await RenderingServer.frame_post_draw
- var state={"pid":OS.get_process_id(),"view":android_view,"foam":android_foam,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"kit":"430-v1","button_view":[92,760],"button_foam":[268,760],"draws":vp.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)}
+ var state={"pid":OS.get_process_id(),"view":android_view,"foam":android_foam,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"kit":"430-v11","button_view":[92,760],"button_foam":[268,760],"draws":vp.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME)}
  FileAccess.open("user://water_edge_state.json",FileAccess.WRITE).store_string(JSON.stringify(state))
  vp.get_texture().get_image().save_png("user://water_edge_%d_%s.png"%[android_view,str(android_foam)])
 func android_start():

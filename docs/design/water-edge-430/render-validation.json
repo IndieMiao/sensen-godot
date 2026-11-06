@@ -117,10 +117,10 @@
 	],
 	"coast_commit": "d72d74f4c0ccbcc922c5691cb8b6866eca1ca8f9",
 	"motion": {
-		"clock": "uniform substituted for TIME only in QA; exact 4s cycle",
-		"duration_s": 4,
-		"fps": 15,
-		"frames": 60
+		"clock": "uniform substituted for TIME only in QA; exact 5.5s cycle",
+		"duration_s": 5.5,
+		"fps": 20,
+		"frames": 110
 	},
 	"passed": true,
 	"renderer": {

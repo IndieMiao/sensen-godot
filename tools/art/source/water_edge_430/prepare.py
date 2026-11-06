@@ -1,7 +1,7 @@
 """Stage review only. Coast source is pinned; no owner assets enter this branch."""
 from pathlib import Path
 import shutil,json,subprocess,tarfile
-SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/water-edge-430';QA=OUT/'project'
+SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/water-edge-430-v11';QA=OUT/'project'
 REL='assets/landmarks/_shared/water_edge';COAST='assets/landmarks/_shared/coast_kit'
 QA.mkdir(parents=True,exist_ok=True);(OUT.parent/'.gdignore').touch()
 shutil.copytree(ROOT/REL,QA/REL,dirs_exist_ok=True)
@@ -15,7 +15,7 @@ for rel in json.loads((ROOT/'tools/dev/scene_bench/fixtures/avatar-dependencies.
  else:b.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(a,b)
 manifest=json.loads((ROOT/'assets/avatar/parts_manifest.json').read_text());manifest['parts']=[p for p in manifest['parts'] if p['id'] in ['body00','eyes00','hairhat0','cloth0','shoes0']]
 (QA/'assets/avatar/parts_manifest.json').write_text(json.dumps(manifest))
-for name in ['review.gd','configure_imports.gd','verify.gd']:
+for name in ['review.gd','configure_imports.gd','verify.gd','measure_v11.gd']:
  if (SRC/name).exists():shutil.copy2(SRC/name,QA/name)
 (QA/'review.tscn').write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://review.gd" id="1"]\n[node name="WaterEdgeReview" type="Node"]\nscript=ExtResource("1")\n')
 (QA/'project.godot').write_text('''config_version=5
@@ -47,3 +47,5 @@ textures/vram_compression/import_s3tc_bptc=true
 textures/vram_compression/import_etc2_astc=true
 ''')
 print(QA)
+
+(QA/"measure_v11.tscn").write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://measure_v11.gd" id="1"]\n[node name="FoamMeasurement" type="Node"]\nscript=ExtResource("1")\n')
