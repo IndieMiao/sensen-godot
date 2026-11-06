@@ -479,13 +479,85 @@
         7.127636194229126
       ],
       "sha256": "3d446ba68c4019d0c561dea6c9098f1384e331d37e7d26f0b9090c8cc63aff9e"
+    },
+    {
+      "name": "aisle_carpet",
+      "file": "aisle_carpet.glb",
+      "triangles": 12,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.6000000238418579,
+          0.0,
+          -2.7950000762939453
+        ],
+        [
+          0.6000000238418579,
+          0.004000000189989805,
+          2.7950000762939453
+        ]
+      ],
+      "dimensions_m": [
+        1.2000000476837158,
+        0.004000000189989805,
+        5.590000152587891
+      ],
+      "sha256": "32b3efa2467ce0b128f79d0a77dfc15b4e440b393f5f9e07809dca52c021d80b"
+    },
+    {
+      "name": "vault_extension",
+      "file": "vault_extension.glb",
+      "triangles": 2492,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -7.449999809265137,
+          7.958186626434326,
+          -7.449999809265137
+        ],
+        [
+          7.449999809265137,
+          11.531813621520996,
+          7.449999809265137
+        ]
+      ],
+      "dimensions_m": [
+        14.899999618530273,
+        3.57362699508667,
+        14.899999618530273
+      ],
+      "sha256": "4f3319e00f2349fa2cf8603f08c587c3735392d7006b9f51779d3c587a5496be"
+    },
+    {
+      "name": "grass_extension",
+      "file": "grass_extension.glb",
+      "triangles": 12,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -15.0,
+          -0.8799999952316284,
+          -15.0
+        ],
+        [
+          15.0,
+          -0.699999988079071,
+          15.0
+        ]
+      ],
+      "dimensions_m": [
+        30.0,
+        0.18000000715255737,
+        30.0
+      ],
+      "sha256": "93d6e811b6bb2f0d72899646ea57a698b89eff5c38d289ff39221422b3f46006"
     }
   ],
-  "scene_triangles": 104938,
-  "static_draw_surfaces": 37,
+  "scene_triangles": 107454,
+  "static_draw_surfaces": 40,
   "plant_triangles": 16984,
-  "placed_modules": 37,
-  "unique_triangles": 63523,
+  "placed_modules": 40,
+  "unique_triangles": 66039,
   "atlas": {
     "size": [
       2048,

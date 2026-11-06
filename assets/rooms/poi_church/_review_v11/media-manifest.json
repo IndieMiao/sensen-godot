@@ -1,0 +1,42 @@
+[
+  {
+    "file": "SGODOT-423_church_v1.1_corner_checks.png",
+    "bytes": 114339,
+    "sha256": "35ee243973ad15a58fa5a121d579a5ebca1d87f6c414b618c4bb87e6b9d33d8f"
+  },
+  {
+    "file": "SGODOT-423_church_v1.1_corner_ne_360.png",
+    "bytes": 176552,
+    "sha256": "161520fcd93da5dd3379c68f92c4bc62deda5b97c54ea5d9df27a55550ecfac7"
+  },
+  {
+    "file": "SGODOT-423_church_v1.1_corner_nw_360.png",
+    "bytes": 216299,
+    "sha256": "21461a67f5c1ab96c22e6aed0505ec53766c7eb16ac603191eda8805a7cccde6"
+  },
+  {
+    "file": "SGODOT-423_church_v1.1_corner_se_360.png",
+    "bytes": 154188,
+    "sha256": "47d286275180fba8401735f67f57419f4ea59f351f0035236978348689a2b417"
+  },
+  {
+    "file": "SGODOT-423_church_v1.1_corner_sw_360.png",
+    "bytes": 141670,
+    "sha256": "2a924cdc9061d7d15e8f651a6a96245b1c3ab715a6528737639831683914e306"
+  },
+  {
+    "file": "SGODOT-423_church_v1.1_default_360.png",
+    "bytes": 257721,
+    "sha256": "05814fad5b79e5edc79801f8ba968d48d1575efc8ed03fc506e37ba89271b9a4"
+  },
+  {
+    "file": "SGODOT-423_church_v1.1_planter_regression.png",
+    "bytes": 242219,
+    "sha256": "613b8dfe257394ba084874bafb29612fccf9cdea5615d72703a1dc3ae2f59dcb"
+  },
+  {
+    "file": "SGODOT-423_church_v1.1_validation.json",
+    "bytes": 57835,
+    "sha256": "2cf51e8c6d11baf9b41b6f77ca2fee83e516c3b4fa7090ce09e13962f82b9246"
+  }
+]
