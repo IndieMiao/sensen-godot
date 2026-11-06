@@ -1,0 +1,14 @@
+{
+  "lake-default-review.png": {
+    "bytes": 80009,
+    "sha256": "30444eb191808b1cdd6bd08726e777761374e0be7900cda4e3a4a9d325f8bb89"
+  },
+  "lake-fern-pond-comparison.png": {
+    "bytes": 439653,
+    "sha256": "f72b16c967d5b7387658c685bed3bfff3e0b5431907f46622b6a71c85852461f"
+  },
+  "reference/cmp_pond.png": {
+    "bytes": 354127,
+    "sha256": "c6e45a6438ae37692e2c3fb5f6e49be06cad0e9fe5baba01e80f89528bb50401"
+  }
+}

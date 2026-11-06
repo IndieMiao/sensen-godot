@@ -1,6 +1,6 @@
 {
   "baseline": "b81605af5b9aaa2e9bdcd3af81a0b2f385ce7bc3",
-  "reason": "v9 material and placement integration: preserve owned geometry, normals, UVs and vertex colours byte-for-byte",
+  "reason": "Five owned modules retain b81605af; alc_museum uses the roof-only revision documented in museum_roof_contract.json. --layout-only preserves all six current GLBs.",
   "assets": {
     "alc_ground_dock": {
       "triangles": 380,
@@ -23,9 +23,9 @@
       "sha256": "0fb5c90f4234d551c40ee3aa932ed07b7d420768c83367a49d36f770f69d7cb9"
     },
     "alc_museum": {
-      "triangles": 7869,
-      "bytes": 644052,
-      "sha256": "c6ce61fdc20955508de56dc1ff5cff75cbc7b4eb00564e14c6f9cf638c439011"
+      "triangles": 8757,
+      "bytes": 720712,
+      "sha256": "ff853c9768ea9a37569f1fe91d9133a8e49396e1e3bd835b9082249431fb1884"
     },
     "ruins": {
       "triangles": 756,

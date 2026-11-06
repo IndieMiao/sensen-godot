@@ -1,0 +1,83 @@
+{
+  "regions_xyxy": {
+    "near_shore": [
+      295,
+      265,
+      315,
+      285
+    ],
+    "outer_water": [
+      295,
+      680,
+      315,
+      700
+    ],
+    "upper_water": [
+      20,
+      65,
+      40,
+      85
+    ]
+  },
+  "measurements": {
+    "v1": {
+      "near_shore": {
+        "mean_rgb_255": [
+          91.382,
+          144.718,
+          143.91
+        ],
+        "mean_hsv_saturation": 0.366,
+        "mean_srgb_luma": 133.32
+      },
+      "outer_water": {
+        "mean_rgb_255": [
+          103.0,
+          158.0,
+          153.735
+        ],
+        "mean_hsv_saturation": 0.3451,
+        "mean_srgb_luma": 145.999
+      },
+      "upper_water": {
+        "mean_rgb_255": [
+          167.0,
+          194.0,
+          182.0
+        ],
+        "mean_hsv_saturation": 0.1373,
+        "mean_srgb_luma": 187.393
+      }
+    },
+    "v1.1": {
+      "near_shore": {
+        "mean_rgb_255": [
+          78.065,
+          202.732,
+          199.032
+        ],
+        "mean_hsv_saturation": 0.6135,
+        "mean_srgb_luma": 175.961
+      },
+      "outer_water": {
+        "mean_rgb_255": [
+          46.0,
+          154.0,
+          174.0
+        ],
+        "mean_hsv_saturation": 0.7333,
+        "mean_srgb_luma": 132.483
+      },
+      "upper_water": {
+        "mean_rgb_255": [
+          36.0,
+          139.292,
+          167.0
+        ],
+        "mean_hsv_saturation": 0.7843,
+        "mean_srgb_luma": 119.333
+      }
+    }
+  },
+  "scope": "Rendered sRGB patch averages, not physical depth, transparency or perceptual acceptance."
+}

@@ -1,0 +1,1913 @@
+{
+  "author": "赵云",
+  "checks": [
+    {
+      "check": "coast_rock_straight_low: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_a: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_b: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: existing POSITION unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: existing NORMAL unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: existing topology unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: four palette roles in opaque colour channel",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_scatter_c: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: wettable solid surface code",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: actual overhanging coping width",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: actual recessed horizontal joint 0.3",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: actual recessed horizontal joint 0.6",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: actual recessed horizontal joint 0.9",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: joint paint stays horizontal and off the end collars",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: wettable solid surface code",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: eleven 15–20cm boards",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: four corner piles",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: actual top geometry has 11 narrow boards and visible 1cm joints",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: actual pile corners at [-0.66, 0, -0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: actual pile corners at [0.66, 0, -0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: actual pile corners at [-0.66, 0, 0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: actual pile corners at [0.66, 0, 0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: plank colour is measurably less saturated than v1",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: wettable solid surface code",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: eleven 15–20cm boards",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: four corner piles",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: actual top geometry has 11 narrow boards and visible 1cm joints",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: actual pile corners at [-0.66, 0, -0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: actual pile corners at [0.66, 0, -0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: actual pile corners at [-0.66, 0, 0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: actual pile corners at [0.66, 0, 0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: plank colour is measurably less saturated than v1",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_end: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard/in: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard/out: full exported seam matches declared profile",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: wettable solid surface code",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: eleven 15–20cm boards",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: four corner piles",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: actual top geometry has 11 narrow boards and visible 1cm joints",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: actual pile corners at [-0.66, 0, -0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: actual pile corners at [0.66, 0, -0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: actual pile corners at [-0.66, 0, 0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: actual pile corners at [0.66, 0, 0.72]",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: plank colour is measurably less saturated than v1",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard: palette/wet material assigned by Godot importer",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: already accepted GLB byte-identical",
+      "passed": true
+    },
+    {
+      "check": "coast_buoy: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: one mobile mesh / surface",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: identity construction root",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: no textures / skin / animation",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: one vertex-colour material",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: grounded / manifest bounds",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: finite geometry / bounded colours",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: no degenerate or reversed shading triangles",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: matte material",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: manifest matches actual export",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: accepted v1 port contract unchanged",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: already accepted GLB byte-identical",
+      "passed": true
+    },
+    {
+      "check": "coast_water_steps: Godot UID / complete stable import defaults",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low -> coast_rock_straight_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low -> coast_rock_straight_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low -> coast_rock_outer_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low -> coast_rock_outer_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low -> coast_rock_inner_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_low -> coast_rock_inner_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high -> coast_rock_straight_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high -> coast_rock_straight_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high -> coast_rock_outer_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high -> coast_rock_outer_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high -> coast_rock_inner_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_straight_high -> coast_rock_inner_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low -> coast_rock_straight_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low -> coast_rock_straight_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low -> coast_rock_outer_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low -> coast_rock_outer_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low -> coast_rock_inner_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_low -> coast_rock_inner_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high -> coast_rock_straight_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high -> coast_rock_straight_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high -> coast_rock_outer_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high -> coast_rock_outer_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high -> coast_rock_inner_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_outer_high -> coast_rock_inner_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low -> coast_rock_straight_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low -> coast_rock_straight_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low -> coast_rock_outer_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low -> coast_rock_outer_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low -> coast_rock_inner_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_low -> coast_rock_inner_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high -> coast_rock_straight_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high -> coast_rock_straight_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high -> coast_rock_outer_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high -> coast_rock_outer_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high -> coast_rock_inner_low: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_rock_inner_high -> coast_rock_inner_high: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_seawall -> coast_seawall: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight -> coast_dock_straight: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight -> coast_dock_end: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight -> coast_dock_bollard: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard -> coast_dock_straight: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard -> coast_dock_end: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard -> coast_dock_bollard: no positive seam gap",
+      "passed": true
+    },
+    {
+      "check": "36 mixed-height rock, 1 wall and 6 dock mating combinations covered",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_straight -> stairs: 2m walking edge at identical height",
+      "passed": true
+    },
+    {
+      "check": "coast_dock_bollard -> stairs: 2m walking edge at identical height",
+      "passed": true
+    },
+    {
+      "check": "15 independent prototypes; no delivered example layout",
+      "passed": true
+    },
+    {
+      "check": "no runtime example layout file",
+      "passed": true
+    },
+    {
+      "check": "no duplicated GLBs for the second palette",
+      "passed": true
+    },
+    {
+      "check": "palette and wet band use no textures or transparency pass",
+      "passed": true
+    },
+    {
+      "check": "wet band uses a continuous world-water-level gradient",
+      "passed": true
+    },
+    {
+      "check": "15 distinct Godot-generated UIDs",
+      "passed": true
+    },
+    {
+      "check": "runtime and source manifests agree",
+      "passed": true
+    },
+    {
+      "check": "all Alcatraz files unchanged in the worktree",
+      "passed": true
+    },
+    {
+      "check": "reused Alcatraz rock source hash retained",
+      "passed": true
+    },
+    {
+      "check": "reused Alcatraz rock source hash retained",
+      "passed": true
+    },
+    {
+      "check": "reused Alcatraz rock source hash retained",
+      "passed": true
+    }
+  ],
+  "assets": {
+    "coast_rock_straight_low": {
+      "triangles": 104,
+      "surfaces": 1,
+      "sha256": "468ca175db81da1f6d8ee145db723d19a9c40c5a65e55024a45f2a8b3b3a0cc1",
+      "uid": "uid://djupawarq04cu",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.6000000238418579
+        ],
+        [
+          1.0,
+          0.800000011920929,
+          0.6000000238418579
+        ]
+      ]
+    },
+    "coast_rock_straight_high": {
+      "triangles": 104,
+      "surfaces": 1,
+      "sha256": "522cd7560dd3c6f036c03841434de535a147fc77e4ccb40793f7270e5d551551",
+      "uid": "uid://spiednd3hldv",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.6000000238418579
+        ],
+        [
+          1.0,
+          1.2000000476837158,
+          0.6000000238418579
+        ]
+      ]
+    },
+    "coast_rock_outer_low": {
+      "triangles": 104,
+      "surfaces": 1,
+      "sha256": "36db8c8def91094093e7af2946ec1da37c23b9d7f710ab006d5a9334fb773296",
+      "uid": "uid://d3k8sw5lbck2t",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          0.6000000238418579,
+          0.800000011920929,
+          0.6000000238418579
+        ]
+      ]
+    },
+    "coast_rock_outer_high": {
+      "triangles": 104,
+      "surfaces": 1,
+      "sha256": "28e24e3645858773be89d25a856f7e0ae142d450cc15ae7876bd72823f50c303",
+      "uid": "uid://bsd5k67rvujvx",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          0.6000000238418579,
+          1.2000000476837158,
+          0.6000000238418579
+        ]
+      ]
+    },
+    "coast_rock_inner_low": {
+      "triangles": 104,
+      "surfaces": 1,
+      "sha256": "9e25f2433416b03c7d54d2bb73c81417a4b738fba56867e572b894258108ea58",
+      "uid": "uid://c4h18xbtsm0k",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.6000000238418579
+        ],
+        [
+          0.6000000238418579,
+          0.800000011920929,
+          1.0
+        ]
+      ]
+    },
+    "coast_rock_inner_high": {
+      "triangles": 104,
+      "surfaces": 1,
+      "sha256": "46ff09bac9504d012a67b0b6a5501e78dd178174b2648bae59747cbfb370c0be",
+      "uid": "uid://brhc6gjcjjphc",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.6000000238418579
+        ],
+        [
+          0.6000000238418579,
+          1.2000000476837158,
+          1.0
+        ]
+      ]
+    },
+    "coast_scatter_a": {
+      "triangles": 196,
+      "surfaces": 1,
+      "sha256": "4628af6437bad3215496ab819910e74776adebacc0c023b4298104435e90d40d",
+      "uid": "uid://yvnvxhsdbqry",
+      "bounds": [
+        [
+          -0.5,
+          0.0,
+          -0.42500001192092896
+        ],
+        [
+          0.5,
+          0.550000011920929,
+          0.42500001192092896
+        ]
+      ]
+    },
+    "coast_scatter_b": {
+      "triangles": 196,
+      "surfaces": 1,
+      "sha256": "47f7dd657a43d6118bdb85b9d5ff68102ba07b45a8f022067ab822006c6daf71",
+      "uid": "uid://j00ow6sjm3t7",
+      "bounds": [
+        [
+          -0.699999988079071,
+          0.0,
+          -0.550000011920929
+        ],
+        [
+          0.699999988079071,
+          0.8500000238418579,
+          0.550000011920929
+        ]
+      ]
+    },
+    "coast_scatter_c": {
+      "triangles": 196,
+      "surfaces": 1,
+      "sha256": "78fc63f63f768c8b17a04157270a603df2c679aa1c10b74425fc9caeb6545f2e",
+      "uid": "uid://deq4bltxwqkvx",
+      "bounds": [
+        [
+          -0.949999988079071,
+          0.0,
+          -0.699999988079071
+        ],
+        [
+          0.949999988079071,
+          0.949999988079071,
+          0.699999988079071
+        ]
+      ]
+    },
+    "coast_seawall": {
+      "triangles": 156,
+      "surfaces": 1,
+      "sha256": "3c0795c96af36f4006562221ab3bece9fd71f2105f9e656cb7a724395a11d60d",
+      "uid": "uid://vcep2igp4038",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.41999998688697815
+        ],
+        [
+          1.0,
+          1.2000000476837158,
+          0.41999998688697815
+        ]
+      ]
+    },
+    "coast_dock_straight": {
+      "triangles": 240,
+      "surfaces": 1,
+      "sha256": "a2c52c9f5ce5d9081973988de1f81fa2db1d8c3d1ea4a839639fd2e9791429fb",
+      "uid": "uid://crhbg6tiheyxf",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.1999999284744263,
+          1.0
+        ]
+      ]
+    },
+    "coast_dock_end": {
+      "triangles": 340,
+      "surfaces": 1,
+      "sha256": "2e70856fe1c152bbd91c2602a9eae9ef006d20c034df0ef347bfe58c1a46a541",
+      "uid": "uid://bt6g2843jg7gw",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.3399999141693115,
+          1.0
+        ]
+      ]
+    },
+    "coast_dock_bollard": {
+      "triangles": 384,
+      "surfaces": 1,
+      "sha256": "c448e04876c043102e271da0cf3bff3f742352c044a37f0f54e8df64567f2fd4",
+      "uid": "uid://behoyxj7hrt4l",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.7750000953674316,
+          1.0
+        ]
+      ]
+    },
+    "coast_buoy": {
+      "triangles": 224,
+      "surfaces": 1,
+      "sha256": "ad728673a128c845d7c364b83d6a8ca8fc2676d1f5cddba0b48a51c1b0ca2def",
+      "uid": "uid://bh3iobv5judj5",
+      "bounds": [
+        [
+          -0.2800000011920929,
+          0.0,
+          -0.26629582047462463
+        ],
+        [
+          0.2800000011920929,
+          1.2274694442749023,
+          0.26629582047462463
+        ]
+      ]
+    },
+    "coast_water_steps": {
+      "triangles": 96,
+      "surfaces": 1,
+      "sha256": "36e6bbeb5e71d22ca5395657e78d9173e79049378ca5109189bd8c42a3fe41fb",
+      "uid": "uid://dcfiwkkl8sa8v",
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.2000000476837158,
+          1.0
+        ]
+      ]
+    }
+  },
+  "mates": [
+    {
+      "from": "coast_rock_straight_low",
+      "to": "coast_rock_straight_low",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_low",
+      "to": "coast_rock_straight_high",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_low",
+      "to": "coast_rock_outer_low",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_low",
+      "to": "coast_rock_outer_high",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_low",
+      "to": "coast_rock_inner_low",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_low",
+      "to": "coast_rock_inner_high",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_high",
+      "to": "coast_rock_straight_low",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_high",
+      "to": "coast_rock_straight_high",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_high",
+      "to": "coast_rock_outer_low",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_high",
+      "to": "coast_rock_outer_high",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_high",
+      "to": "coast_rock_inner_low",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_straight_high",
+      "to": "coast_rock_inner_high",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_low",
+      "to": "coast_rock_straight_low",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_low",
+      "to": "coast_rock_straight_high",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_low",
+      "to": "coast_rock_outer_low",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_low",
+      "to": "coast_rock_outer_high",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_low",
+      "to": "coast_rock_inner_low",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_low",
+      "to": "coast_rock_inner_high",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_high",
+      "to": "coast_rock_straight_low",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_high",
+      "to": "coast_rock_straight_high",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_high",
+      "to": "coast_rock_outer_low",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_high",
+      "to": "coast_rock_outer_high",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_high",
+      "to": "coast_rock_inner_low",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_outer_high",
+      "to": "coast_rock_inner_high",
+      "yaw_degrees": 90.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_low",
+      "to": "coast_rock_straight_low",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_low",
+      "to": "coast_rock_straight_high",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_low",
+      "to": "coast_rock_outer_low",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_low",
+      "to": "coast_rock_outer_high",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_low",
+      "to": "coast_rock_inner_low",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_low",
+      "to": "coast_rock_inner_high",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_high",
+      "to": "coast_rock_straight_low",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_high",
+      "to": "coast_rock_straight_high",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_high",
+      "to": "coast_rock_outer_low",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_high",
+      "to": "coast_rock_outer_high",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_high",
+      "to": "coast_rock_inner_low",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_rock_inner_high",
+      "to": "coast_rock_inner_high",
+      "yaw_degrees": 270.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_seawall",
+      "to": "coast_seawall",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_dock_straight",
+      "to": "coast_dock_straight",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_dock_straight",
+      "to": "coast_dock_end",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_dock_straight",
+      "to": "coast_dock_bollard",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_dock_bollard",
+      "to": "coast_dock_straight",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_dock_bollard",
+      "to": "coast_dock_end",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    },
+    {
+      "from": "coast_dock_bollard",
+      "to": "coast_dock_bollard",
+      "yaw_degrees": 0.0,
+      "max_profile_gap_m": 0.0
+    }
+  ],
+  "plank_saturation": {
+    "coast_dock_straight": {
+      "v1": 0.5393099603433239,
+      "v1.1": 0.3576981491181665
+    },
+    "coast_dock_end": {
+      "v1": 0.5393099603433239,
+      "v1.1": 0.3576981491181665
+    },
+    "coast_dock_bollard": {
+      "v1": 0.5393099603433239,
+      "v1.1": 0.3576981491181665
+    }
+  },
+  "unique_triangles": 2652,
+  "passed": true
+}

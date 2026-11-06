@@ -1,0 +1,22 @@
+[
+  {
+    "name": "SGODOT-426_COAST_v1.1_catalog.png",
+    "path": "docs/design/coast-kit-2026-11-06/v1.1/SGODOT-426_COAST_v1.1_catalog.png",
+    "mime": "image/png",
+    "size": [
+      1500,
+      1530
+    ],
+    "sha256": "fff4a1222365c6971faf90e07491260c69c0dfa69671bb20e3bfc0e20a04047b"
+  },
+  {
+    "name": "SGODOT-426_COAST_v1.1_default_360x800.png",
+    "path": "docs/design/coast-kit-2026-11-06/v1.1/SGODOT-426_COAST_v1.1_default_360x800.png",
+    "mime": "image/png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "130ea74de2ea2a4110591d47d8829ef20967eb2c0daffff12cb446a73ec83aef"
+  }
+]

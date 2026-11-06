@@ -1,0 +1,58 @@
+{
+  "task": "SGODOT-432",
+  "base_commit": "05a2c032f88cc0d39caebca05bd79df98845fbbe",
+  "sea_source": "assets/landmarks/alcatraz_island/sea_backdrop.gdshader",
+  "sea_source_commit": "d7b57574d",
+  "sea_source_sha256": "ca71f9078c39d625c66b0f1a73b0bbc4b0fe62cbc481d0e9f0cdff0b1006d6d3",
+  "coast_commit": "85967444d6024fbe85cf2af997a7478ee4aab034",
+  "foam_commit": "ac5809c46b3e96a111ada24513b44afc4779c631",
+  "sea_budget": {
+    "texture_reads": 0,
+    "passes": 1,
+    "sine_evaluations": 5
+  },
+  "presets": {
+    "bay": {
+      "shallow": "439BB0",
+      "deep": "31849F",
+      "far": "67AFC2",
+      "wavelength": 3.64,
+      "patch": 1.0,
+      "mix": [
+        0.35,
+        0.75
+      ],
+      "speed": 1.0,
+      "strength": 0.018,
+      "threshold": [
+        0.96,
+        1.0
+      ],
+      "fade": [
+        0.12,
+        0.28
+      ]
+    },
+    "lake": {
+      "shallow": "6FA8A1",
+      "deep": "487A80",
+      "far": "A7C2B6",
+      "wavelength": 5.8,
+      "patch": 1.4,
+      "mix": [
+        0.25,
+        0.8
+      ],
+      "speed": 0.55,
+      "strength": 0.012,
+      "threshold": [
+        0.95,
+        1.0
+      ],
+      "fade": [
+        0.12,
+        0.3
+      ]
+    }
+  }
+}

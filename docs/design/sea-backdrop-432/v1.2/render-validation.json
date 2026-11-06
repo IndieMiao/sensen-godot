@@ -1,0 +1,188 @@
+{
+	"bay_parity": [
+		{
+			"maximum_rgb_255": 0.0,
+			"mean_rgb_255": 0.0,
+			"pixels_over_one": 0,
+			"time_s": 0.0
+		},
+		{
+			"maximum_rgb_255": 0.0,
+			"mean_rgb_255": 0.0,
+			"pixels_over_one": 0,
+			"time_s": 3.5
+		}
+	],
+	"budget": {
+		"passes": 1,
+		"shoreline": "three analytic segment distances when enabled; uniform-disabled in bay; no extra layer",
+		"sines": 5,
+		"texture_reads": 0
+	},
+	"captures": [
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "bay-current-0.0",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "bay-accepted-0.0",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "bay-current-3.5",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "bay-accepted-3.5",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "lake-before-review",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "lake-default-review",
+			"triangles": 9116,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "lake-no-foam",
+			"triangles": 8748,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "lake-sea-time-4",
+			"triangles": 8748,
+			"width_m": 6.71999979019165
+		}
+	],
+	"checks": [
+		{
+			"check": "avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "bay-current-0.0: size",
+			"passed": true
+		},
+		{
+			"check": "bay-current-0.0: save",
+			"passed": true
+		},
+		{
+			"check": "bay-accepted-0.0: size",
+			"passed": true
+		},
+		{
+			"check": "bay-accepted-0.0: save",
+			"passed": true
+		},
+		{
+			"check": "approved bay remains pixel-identical at 0.0",
+			"passed": true
+		},
+		{
+			"check": "bay-current-3.5: size",
+			"passed": true
+		},
+		{
+			"check": "bay-current-3.5: save",
+			"passed": true
+		},
+		{
+			"check": "bay-accepted-3.5: size",
+			"passed": true
+		},
+		{
+			"check": "bay-accepted-3.5: save",
+			"passed": true
+		},
+		{
+			"check": "approved bay remains pixel-identical at 3.5",
+			"passed": true
+		},
+		{
+			"check": "lake-before-review: size",
+			"passed": true
+		},
+		{
+			"check": "lake-before-review: save",
+			"passed": true
+		},
+		{
+			"check": "lake-default-review: size",
+			"passed": true
+		},
+		{
+			"check": "lake-default-review: save",
+			"passed": true
+		},
+		{
+			"check": "lake-no-foam: size",
+			"passed": true
+		},
+		{
+			"check": "lake-no-foam: save",
+			"passed": true
+		},
+		{
+			"check": "lake-sea-time-4: size",
+			"passed": true
+		},
+		{
+			"check": "lake-sea-time-4: save",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	}
+}

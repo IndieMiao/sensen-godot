@@ -1,0 +1,18 @@
+{
+  "urban-bay-default-review.png": {
+    "bytes": 66759,
+    "sha256": "d13facf16901295baaaac000c8918ecfb0b0abff8dae638f25ba0e3ceefcdb0e"
+  },
+  "quiet-bay-default-review.png": {
+    "bytes": 65502,
+    "sha256": "96c2417b09b61c5139079845a4fa387c9daeb5fb134ca0682fea6d9c18cdbcb3"
+  },
+  "android-urban.png": {
+    "bytes": 58377,
+    "sha256": "64da66a28cc725be1bc275096e0b564fbbaa41e1d9fa9433afe2e499afdac5b3"
+  },
+  "android-quiet.png": {
+    "bytes": 56843,
+    "sha256": "2069c24fc76801f8d697d811c7d06527364d3a48bac7af3fb781240d863636a5"
+  }
+}

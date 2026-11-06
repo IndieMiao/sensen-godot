@@ -1,0 +1,93 @@
+{
+  "passed": true,
+  "states": [
+    {
+      "button_color": [
+        268,
+        760
+      ],
+      "button_combo": [
+        92,
+        760
+      ],
+      "combo": 0,
+      "cool": false,
+      "draws": 25,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "434-v1",
+      "pid": 16256,
+      "renderer": "mobile"
+    },
+    {
+      "button_color": [
+        268,
+        760
+      ],
+      "button_combo": [
+        92,
+        760
+      ],
+      "combo": 1,
+      "cool": false,
+      "draws": 25,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "434-v1",
+      "pid": 16256,
+      "renderer": "mobile"
+    },
+    {
+      "button_color": [
+        268,
+        760
+      ],
+      "button_combo": [
+        92,
+        760
+      ],
+      "combo": 0,
+      "cool": false,
+      "draws": 25,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "434-v1",
+      "pid": 16256,
+      "renderer": "mobile"
+    },
+    {
+      "button_color": [
+        268,
+        760
+      ],
+      "button_combo": [
+        92,
+        760
+      ],
+      "combo": 0,
+      "cool": true,
+      "draws": 25,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "434-v1",
+      "pid": 16256,
+      "renderer": "mobile"
+    },
+    {
+      "button_color": [
+        268,
+        760
+      ],
+      "button_combo": [
+        92,
+        760
+      ],
+      "combo": 0,
+      "cool": false,
+      "draws": 25,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "kit": "434-v1",
+      "pid": 16256,
+      "renderer": "mobile"
+    }
+  ],
+  "apk_sha256": "71cac6c0bc299b4c72d9a90a67f80a0a49876c231344eaa14838319f54fa4082",
+  "installed_apk_readback_equal": true,
+  "scope": "API37 SwiftShader emulator / Mobile / 4 real taps; not physical GPU performance"
+}

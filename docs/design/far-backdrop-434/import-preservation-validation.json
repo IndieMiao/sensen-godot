@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "fresh_cache": true,
+  "runtime_file_count": 21,
+  "resource_hashes_unchanged": {
+    "far_hills_a.glb.import": "350f4b850217ec64733e2b65dd4634441f499577c79ac20cf8f3507b6a09d39f",
+    "far_bridge.glb.import": "a48dc045a14e1f29a8d200883fb17e5222cbbbfd48391f513c8a55c3df9cc380",
+    "far_hills_b.glb": "68d9e6488cec0c4e73f32eb538be99d2204b1f3c1fdfc3026e15a8548f3de84f",
+    "far_card_import.gd.uid": "92030944cfb3dbd23ce71fd0ac0f4b7902defe0efeb2514f54c5b8159408e2d8",
+    "far_card_import.gd": "e6ec7fe889c0af667a7d39c5d36dda448132d5f572890c02f86efd97a346ca54",
+    "far_city_low.glb": "a6b314bcde125b450546269c2ec9a1bec11b72a77eaa1229d11307acf4889200",
+    "far_city_medium.glb.import": "b30c71a30ffcafc8046a53e978a7cbf822fcdfcf4e837a01f0a4055530d0525a",
+    "far_city_high.glb.import": "9e003c694e053beb41a519faa9c2de7a73903ec42b208eacd8519a17404122a3",
+    "far_hills_a.glb": "4e6bae5db8d74e21df98509055396e84a7ab644e1c1419ea964907dcc18ee29f",
+    "bridge.tres": "44fa12760df4874f28a14015fe8aa08504b0dc9af1ee914553054652ddcaba8c",
+    "hills.tres": "be36caf8ae7123ecd44223c5c6fbb83224ce55a63dffa71ae6ac529f7910c8df",
+    "far_city_low.glb.import": "39df64284b17b592c9ea07c7f8da882d482495b4c14957ac6d0a7fa15e0dfad8",
+    "far_bridge.glb": "50577f015318fe958c4f91aa24ee24b74f49835926a7b9b8e414b21cd2cc6ebf",
+    "far_city_high.glb": "5641dbbd141946797d42f26132ec1c752f198dce28e20c999456967409dc9e99",
+    "city.tres": "e36bd57572055b12f3a7574377cebbe713009adb0fed3e1b9055e61d063e1ecb",
+    "manifest.json": "f8fe2a17728dec786b4ef576e09f43abaa595173c4fefe1c4c0cedb2b652efe0",
+    "README.md": "021356494204fc600ee6aa2d75191654075118b4c65cb26fe7c993ef6850ccbe",
+    "far_card.gdshader": "f0b935ea4a697c00b51de2b156515e35037ae120a644378d364d655b4b62f22f",
+    "far_hills_b.glb.import": "4e837ec815a3f0c7757a02023113c1c90a866d213d03fe316b9657d3b7a5bf7b",
+    "far_city_medium.glb": "4c2f9b559f4d506080ab92c8cd0443d983d668a532d828aa8a9e3a99be4064e9",
+    "far_card.gdshader.uid": "6c24415eda048ba8a49aca3981d414fea742128058795a686702e853ebc33686"
+  },
+  "protected_paths_unchanged_from": "05a2c032f88cc0d39caebca05bd79df98845fbbe",
+  "protected_paths": [
+    "assets/landmarks/alcatraz_island",
+    "tools/art/source/alcatraz_far_424",
+    "assets/landmarks/_shared/water_edge",
+    "assets/ponds",
+    "modules/ponds"
+  ],
+  "cold_import_log_error_count": 0,
+  "cold_resource_check": "FAR_RESOURCES true 82"
+}

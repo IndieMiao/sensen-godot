@@ -1,0 +1,26 @@
+{
+  "task": "SGODOT-434",
+  "base_commit": "05a2c032f88cc0d39caebca05bd79df98845fbbe",
+  "source_author": "黄忠 / SGODOT-424",
+  "source_hashes": {
+    "assets/landmarks/alcatraz_island/alc_far_bridge.glb": "9cd46d07c4ca491efe7bdcb716723aa87976da4373df5e5e7288f8ee80ad7d37",
+    "assets/landmarks/alcatraz_island/alc_far_city.glb": "ae98acebd72673591318ede1f9b2a9c9832f30a45aa836f9eda0f6de1788c2d8",
+    "assets/landmarks/alcatraz_island/alc_far_hills.glb": "19dc64438b9c8bc7de842e696bcce0c36dd3269e0e13f61d0bd381187ec4f9e4",
+    "tools/art/source/alcatraz_far_424/alc_far_bridge.blend": "f4a76868a4b4f44e4c7d9c1c1d10089d1afe572db81918cfb367723d5f57fb9a",
+    "tools/art/source/alcatraz_far_424/alc_far_city.blend": "f76fdb9b96cf6d0bf3e2cd489e2032b82eec20665e0db269a52ed98508f2d10c",
+    "tools/art/source/alcatraz_far_424/alc_far_hills.blend": "2652c043a252840349a3ce4542f0d1517c518c1feb6d13d0782726d6249c7de8",
+    "assets/landmarks/alcatraz_island/far_card.gdshader": "39386ef55891571e395cbe7a1880950ba2cd304e8568e6601c893890a16da5eb"
+  },
+  "sea_commit": "15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c",
+  "coast_commit": "85967444d6024fbe85cf2af997a7478ee4aab034",
+  "foam_commit": "ac5809c46b3e96a111ada24513b44afc4779c631",
+  "baseline": {
+    "bridge_triangles": 498,
+    "city_triangles": 208,
+    "hills_triangles": 120,
+    "assembly_triangles": 826,
+    "surfaces": 3,
+    "texture_reads": 0,
+    "passes_per_surface": 1
+  }
+}

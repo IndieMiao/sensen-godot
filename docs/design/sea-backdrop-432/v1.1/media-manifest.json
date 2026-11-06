@@ -1,0 +1,14 @@
+{
+  "android-lake.png": {
+    "bytes": 81282,
+    "sha256": "3d9bd458dc743b6c438d8dc87ba38445a00f49c0c6ab832d6fb324584f6f3d02"
+  },
+  "lake-before-after.png": {
+    "bytes": 117789,
+    "sha256": "4392b78d4b00c32c1ca073a5cfd020b364aeeae8bffc4a55a05921125d07b88b"
+  },
+  "lake-default-review.png": {
+    "bytes": 85890,
+    "sha256": "86cccddba50463f799670bac7f7de7628eb63d071d999f8477172e41caf4d866"
+  }
+}

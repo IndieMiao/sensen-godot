@@ -1,0 +1,20 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://assets/landmarks/_shared/sea_backdrop/sea_backdrop.gdshader" id="1"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/shallow_color = Color(0.262745098, 0.607843137, 0.690196078, 1)
+shader_parameter/deep_color = Color(0.192156863, 0.517647059, 0.623529412, 1)
+shader_parameter/far_color = Color(0.403921569, 0.686274510, 0.760784314, 1)
+shader_parameter/ripple_wavelength_m = 3.64
+shader_parameter/color_patch_scale = 1.0
+shader_parameter/motion_speed = 1.0
+shader_parameter/ripple_strength = 0.018
+shader_parameter/color_mix_range = Vector2(0.35, 0.75)
+shader_parameter/ripple_threshold = Vector2(0.96, 1.0)
+shader_parameter/far_fade_screen_y = Vector2(0.12, 0.28)
+shader_parameter/pattern_origin = Vector2(0, 0)
+shader_parameter/far_color_amount = 1.0
+shader_parameter/reveal_far_background = false
