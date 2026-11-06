@@ -10,8 +10,8 @@ from collections import Counter
 from PIL import Image, ImageDraw, ImageFont
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3]
-REVIEW=ROOT/'output/alcatraz-424/v5/review'
-DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v5'
+REVIEW=ROOT/'output/alcatraz-424/v6/review'
+DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v6'
 ASSETS=ROOT/'assets/landmarks/alcatraz_island'
 QA=ROOT/'output/alcatraz-424/project'
 verification=json.loads((REVIEW/'verification.json').read_text())
@@ -44,7 +44,7 @@ def label(text,xy,target=None):
     b=d.textbbox(xy,text,font=f)
     d.rounded_rectangle((b[0]-5,b[1]-4,b[2]+5,b[3]+4),radius=4,fill='#f4f3ec')
     d.text(xy,text,font=f,fill='#263b44')
-label('ALCATRAZ / V5 / ACCEPTED TOWERS + PLACEMENTS',(22,18))
+label('ALCATRAZ / V6 / CLEAR ACTION AREA',(22,18))
 d.text((22,48),'Rendered top view + actual navigation path. North is up.',font=small,fill='#263b44')
 label('Island / dock footprint: 60 x 40 m',(310,170))
 d.line([(point([-30,0,0])[0],210),(point([30,0,0])[0],210)],fill='#263b44',width=2)
@@ -56,7 +56,7 @@ label('12 m water tower',(780,250),point([25,10,-14]))
 label('SummitZone / +10 m',(760,545),route[-1])
 label('TerraceZone / 4 flights',(735,645),point([10,5.5,3]))
 label('Mid-hill / +5.5 m',(730,690),route[1])
-label('Ruins',(780,750),point([16,3.25,5]))
+label('Ruins',(780,750),point(next(p['position'] for p in layout['placements'] if p['asset']=='ruins')))
 label('DockZone / +1 m',(20,920),route[0])
 label('25 m ferry / decoration',(580,930),point([-7,0,19]))
 label('Map exit',(250,990),point(layout['exit']))
@@ -91,7 +91,7 @@ for asset,axis,expected in [('alc_museum',0,40),('alc_museum',1,9),('alc_lightho
     assert abs(dimensions[asset]['size'][axis]-expected)<.02,(asset,dimensions[asset])
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements'])<=300000
 assert verification['total_surface_budget_with_multimesh']['evidence']<=80
-evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v5 accepted towers and vegetation placements',
+evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v6 action-area clearance',
     'unique_glbs':len(checks),'unique_triangles':sum(x['triangles'] for x in manifest['assets'].values()),
     'placed_triangles':sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements']),
     'placed_mesh_instances':len(layout['placements']),'unique_surfaces':len(checks),
@@ -126,6 +126,27 @@ with (DOC/'view-budgets.csv').open('w',newline='') as file:
     for name,row in verification['view_metrics'].items():writer.writerow({'view':name,**{k:row[k] for k in fields[1:]}})
 
 assert len(photos)==verification['route_screens']
+# The outlined masks are review annotations, not controls added to the game.
+def mark_reserve(path):
+    im=Image.open(path).convert('RGBA');overlay=Image.new('RGBA',im.size,(0,0,0,0));pen=ImageDraw.Draw(overlay)
+    for name,r in layout['hud_clearance']['reserved_rects'].items():
+        x,y,w,h=r
+        pen.rectangle((x,y,x+w-1,y+h-1),fill=(222,115,49,20),outline=(174,74,28,220),width=2)
+        pen.text((x+3,y+3),'Action area' if name=='actions' else 'Quick bar',font=font_small,fill=(130,56,22,255))
+    return Image.alpha_composite(im,overlay).convert('RGB')
+comparison=Image.new('RGB',(720,840),'#f5f1e6');pen=ImageDraw.Draw(comparison)
+pen.text((10,10),'Huang Zhong v1.1 / before',font=f,fill='#263b44')
+pen.text((370,10),'v6 / clear action area',font=f,fill='#263b44')
+comparison.paste(mark_reserve(ROOT/'docs/design/alcatraz-far-424-2026-11-06/v1.1/SGODOT-424_far_v1.1_mid_hill.png'),(0,40))
+comparison.paste(mark_reserve(DOC/'02-mid-hill.png'),(360,40))
+comparison.save(DOC/'08-mid-hill-hud-comparison.png')
+marked=Image.new('RGB',(cols*180,1600),'#e6e3d8');pen=ImageDraw.Draw(marked)
+for i,p in enumerate(photos):
+    x=i%cols*180;y=i//cols*400
+    marked.paste(mark_reserve(p).resize((180,400)),(x,y))
+    pen.rectangle((x,y,x+180,y+18),fill='#fff8e8');pen.text((x+3,y+2),p.stem,font=font_small,fill='#182833')
+marked.save(DOC/'09-hud-route-contact-sheet.png')
+evidence['hud_clearance']=layout['hud_clearance']
 evidence['captures']={str(p.relative_to(DOC)):{'pixels':list(Image.open(p).size),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in DOC.rglob('*.png')}
 for image_info in evidence['captures'].values():assert max(image_info['pixels'])<=1600
 (DOC/'asset-validation.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+'\n')

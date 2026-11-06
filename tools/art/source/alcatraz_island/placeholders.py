@@ -88,23 +88,27 @@ def scatter(place):
             asset=patterns[row][i]
             # Trees/planters stand just beyond the upper rail; seats stay on the paving edge.
             pz=z-2.9 if asset.startswith('alc_tree_') else z-2.1 if asset=='alc_flowerbed' else z-.9
+            if asset=='alc_lamp':x,pz=-24,z-2.8
+            elif asset=='alc_sign':x,pz=-24,z-1.5
             place(asset,(x,y,pz),'TerraceZone',collision=True)
-    for asset,p in [('alc_sign',(-18.4,1,11.0)),('alc_bench',(-19,1,13.4)),('alc_flowerbed',(-18.7,1,10.3))]:place(asset,p,'DockZone')
+    for asset,p in [('alc_sign',(-23.8,1,11.0)),('alc_bench',(-19,1,13.4)),('alc_flowerbed',(-18.7,1,10.3))]:place(asset,p,'DockZone')
     for i,x in enumerate([-24,-18,-12,-6,0,6,12,18,24]):
-        place(['alc_flowerbed','alc_bench','alc_lamp'][i%3],(x,10,-5.05),'SummitZone')
+        asset=['alc_flowerbed','alc_bench','alc_lamp'][i%3]
+        place(asset,(-3 if x==6 and asset=='alc_lamp' else x,10,-7.6 if asset=='alc_lamp' else -5.05),'SummitZone')
     for p,z in [((-23.5,1,14),'DockZone'),((-23.5,1,19.5),'DockZone'),((-27.8,10,-4.7),'SummitZone'),((27.8,10,-4.7),'SummitZone')]:
         place('alc_rail_corner',p,z,collision=False)
     # Keep tall crowns on the flanks: lower-terrace trees otherwise obscure the
     # avatar on the next path above under the fixed 43-degree camera.
     for row,(y,points) in enumerate([
-        (3.25,[(-25.2,4.1),(-25.0,6.5),(12.5,6.6),(22,4.1),(24.7,4.3),(22,6.5),(24.3,6.6)]),
-        (5.5,[(-26,-.5),(-26,1.5),(13,-.3),(18,-.3),(24,-.3),(14,1.9),(22,1.9)]),
-        (7.75,[(-27,-5),(-27,-3),(13,-4.8),(18,-4.8),(24,-4.8),(14,-2.8),(22,-2.8)])]):
+        (3.25,[(-25.2,4.1),(-25.0,6.5),(14.2,3.6),(24.5,3.8),(24.5,6.6),(18,6.6),(21.1,7)]),
+        (5.5,[(-26,-.5),(-26,1.5),(16,-.3),(19,-.3),(24,-.3),(16.7,1.9),(22,1.9)]),
+        (7.75,[(-27,-5),(-27,-3),(16,-4.8),(19,-4.8),(24,-4.8),(16.7,-2.8),(22,-2.8)])]):
         for i,(x,z) in enumerate(points):
             # Fixed crown orientation gives collaborators an explicit clearance envelope.
-            place('alc_tree_b' if (i+row)%3==0 else 'alc_tree_a',(x,y,z),'TerraceZone',collision=True)
+            asset='alc_tree_b' if (i+row)%3==0 else 'alc_tree_a'
+            place(asset,(x,y,z),'TerraceZone',yaw=math.pi if asset=='alc_tree_a' and x<0 else 0,collision=True)
     for i,(x,z) in enumerate([(-28,-9),(-22.2,-9.5),(-28,-16),(22.2,-9.5),(27.8,-9.2)]):
-        place('alc_tree_a' if i%2==0 else 'alc_tree_b',(x,10,z),'SummitZone',yaw=i*.8)
+        place('alc_tree_a' if i%2==0 else 'alc_tree_b',(x,10,z),'SummitZone',yaw=(math.pi if x<0 else 0) if i%2==0 else i*.8)
     # Clusters leave the bright walkways clear. Coordinates are terrain-supported roots.
     for row,(y,z) in enumerate([(3.25,4.4),(5.5,-.1),(7.75,-4.6)]):
         for i,x in enumerate([-25.2,-16,-12,-5,1,11,23]):

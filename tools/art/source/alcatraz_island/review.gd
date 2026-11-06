@@ -9,6 +9,11 @@ var metrics := {}
 var route_distance := 0.0
 var route_capture_at := 0.0
 var route_capture_index := 0
+var hud_boxes: Array = []
+var hud_regions := {}
+var hud_samples := 0
+var hud_next_distance := 0.0
+var hud_failures: Array = []
 
 func check(key: String, passed: bool, evidence = null) -> void:
 	results[key] = {"passed":passed, "evidence":evidence}
@@ -43,6 +48,7 @@ func _ready() -> void:
 		if scene.navigation_ready(): break
 	print("ALCATRAZ_PHASE nav ready ",scene.navigation_ready())
 	check("navigation_ready",scene.navigation_ready())
+	prepare_hud_audit()
 	for i in 120:
 		await get_tree().process_frame
 		if not scene._rig.is_busy():break
@@ -152,6 +158,11 @@ func _ready() -> void:
 			var previous_position := scene._player.position
 			scene._process(0.1)
 			route_distance += previous_position.distance_to(scene._player.position)
+			if route_distance>=hud_next_distance:
+				var intrusion := hud_intrusions()
+				hud_samples+=1
+				if not intrusion.is_empty():hud_failures.append({"distance_m":route_distance,"intrusions":intrusion})
+				hud_next_distance=route_distance+.5
 			if route_distance>=route_capture_at:
 				await route_photo()
 			if scene._path_i>=scene._path.size(): break
@@ -170,6 +181,7 @@ func _ready() -> void:
 	results["direct_spawn_to_museum_path_m"] = direct_length
 	check("direct_route_reaches_museum",not direct_path.is_empty() and direct_path[-1].distance_to(AlcatrazIsland._vec(scene.layout.walk_goals[-1]))<.05)
 	check("direct_route_about_120m",direct_length>=110 and direct_length<=130,direct_length)
+	check("continuous_default_hud_clearance",hud_failures.is_empty(),{"samples":hud_samples,"failures":hud_failures})
 
 	await route_photo(true)
 	check("summit_height",absf(scene._player.position.y-10.0)<.05,scene._player.position.y)
@@ -317,6 +329,8 @@ func photograph(name_: String) -> void:
 		check(name_+"_triangle_budget",int(peak.visible_triangles)<=80000,peak.visible_triangles)
 		check(name_+"_draw_budget",int(peak.total_draw_calls)<=60,peak.total_draw_calls)
 		check(name_+"_presentation_draw_budget",int(peak.global_draw_calls)<=60,peak.global_draw_calls)
+		if is_equal_approx(scene.camera_pan.zoom,1.0):
+			check(name_+"_hud_tall_clearance",hud_intrusions().is_empty(),hud_intrusions())
 	var image := viewport.get_texture().get_image()
 	check(name_+"_size",image.get_size()==viewport.size,str(image.get_size()))
 	var exposed := 0
@@ -380,6 +394,63 @@ func route_photo(force := false) -> void:
 	await photograph(name_)
 	route_capture_index+=1
 	route_capture_at=route_distance+6.5
+
+func prepare_hud_audit() -> void:
+	# Frozen b1 360x800 control geometry plus 12 px art clearance. No game UI is added.
+	var contract: Dictionary = scene.layout.hud_clearance
+	for key in contract.reserved_rects:
+		var r: Array = contract.reserved_rects[key]
+		hud_regions[key]=PackedVector2Array([Vector2(r[0],r[1]),Vector2(r[0]+r[2],r[1]),Vector2(r[0]+r[2],r[1]+r[3]),Vector2(r[0],r[1]+r[3])])
+	for p in scene.layout.placements:
+		if p.asset not in contract.tall_assets:continue
+		var box: AABB = scene._mesh(p.asset).get_aabb()
+		var upper_triangles := PackedVector3Array()
+		if p.asset=="ferry":
+			# The low bow may sit below HUD. Audit the cabin/funnel, without inventing
+			# a 6 m tall wall over the entire 25 m hull's bounding box.
+			var first := true
+			for vertex in scene._mesh(p.asset).surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
+				if vertex.y<1.7:continue
+				if first:box=AABB(vertex,Vector3.ZERO);first=false
+				else:box=box.expand(vertex)
+			box=box.expand(Vector3(box.position.x,1.6,box.position.z))
+			var mesh_arrays: Array = scene._mesh(p.asset).surface_get_arrays(0)
+			var vertices: PackedVector3Array = mesh_arrays[Mesh.ARRAY_VERTEX]
+			var indices: PackedInt32Array = mesh_arrays[Mesh.ARRAY_INDEX]
+			for i in range(0,indices.size(),3):
+				var a := vertices[indices[i]]
+				var b := vertices[indices[i+1]]
+				var c := vertices[indices[i+2]]
+				if maxf(a.y,maxf(b.y,c.y))<1.7:continue
+				for point in [a,b,c]:upper_triangles.append(scene._transform_of(p)*point)
+		hud_boxes.append({"name":p.name,"transform":scene._transform_of(p),"box":box,"contract":"current","triangles":upper_triangles})
+		if contract.future_props.assets.has(p.asset):
+			var future: Dictionary = contract.future_props.assets[p.asset]
+			var lo := AlcatrazIsland._vec(future.min)
+			var hi := AlcatrazIsland._vec(future.max)
+			hud_boxes.append({"name":p.name,"transform":scene._transform_of(p),"box":AABB(lo,hi-lo),"contract":"props_802_bounds"})
+
+func hud_intrusions() -> Array:
+	var intrusions: Array = []
+	for entry in hud_boxes:
+		var points := PackedVector2Array()
+		var box: AABB = entry.box
+		var transform_: Transform3D = entry.transform
+		for k in 8:points.append(scene._camera.unproject_position(transform_*box.get_endpoint(k)))
+		var outline := Geometry2D.convex_hull(points)
+		for region in hud_regions:
+			if not Geometry2D.intersect_polygons(outline,hud_regions[region]).is_empty():
+				# A whole-ship box would fill empty space above the low bow. Check
+				# actual imported cabin/funnel triangles before reporting an overlap.
+				var triangles: PackedVector3Array = entry.get("triangles",PackedVector3Array())
+				if not triangles.is_empty():
+					var actual := false
+					for i in range(0,triangles.size(),3):
+						var tri := PackedVector2Array([scene._camera.unproject_position(triangles[i]),scene._camera.unproject_position(triangles[i+1]),scene._camera.unproject_position(triangles[i+2])])
+						if not Geometry2D.intersect_polygons(tri,hud_regions[region]).is_empty():actual=true;break
+					if not actual:continue
+				intrusions.append({"name":entry.name,"region":region,"contract":entry.contract})
+	return intrusions
 
 func touch(point: Vector2, pressed: bool, id: int) -> void:
 	var event := InputEventScreenTouch.new()

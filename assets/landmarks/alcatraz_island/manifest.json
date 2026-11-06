@@ -1,7 +1,7 @@
 {
   "generator": "tools/art/source/alcatraz_island/build.py",
   "reference": "landmark_alcatraz_v2.jpg + c_alc2.png",
-  "phase": "v5 whitebox integration",
+  "phase": "v6 whitebox integration",
   "assets": {
     "dock": {
       "triangles": 3468,

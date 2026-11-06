@@ -96,7 +96,7 @@ place('alc_museum',(0,10,-13),'SummitZone')
 kit.begin('ruins',ao=False)
 for x,h in [(-4,3),(-2,4),(0,4.5),(2,3.5),(4,2.5)]:box('remaining_pier',(x,h/2,0),(.5,h,.45),'stone')
 box('lintel',(-1,3.2,0),(7,.4,.45),'stone');box('side_wall',(4,1,-2),(.45,2,4),'stone')
-place('ruins',(16,3.25,5),'TerraceZone')
+place('ruins',(18.5,3.25,5),'TerraceZone')
 kit.begin('ferry',ao=False)
 prism('hull',[(-12.5,0),(-10.4,-3.1),(12.5,-3.1),(12.5,3.1),(-10.4,3.1)],-1,1.1,'building')
 box('deck',(1,1.35,0),(20,.5,6))
@@ -195,14 +195,14 @@ for poly in polys:
  c=[sum(verts[i][k] for i in poly)/4 for k in range(3)];navzones[zone_for(c[0],c[2],c[1])].append(poly)
 route=[[-22,1,19],[-22,1,12],[-22,3.25,7.5],[8,3.25,7.5],[8,5.5,3],[-22,5.5,3],[-22,7.75,-1.5],[8,7.75,-1.5],[8,10,-6],[0,10,-6]]
 route_length=sum(math.dist(a,b) for a,b in zip(route,route[1:]))
-layout={'revision':'B blockout v5 integration contract','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
+layout={'revision':'B blockout v6 integration contract','units':'metres, Y up, north -Z','placements':placements,'zones':ZONES,
  'spawn':route[0],'exit':[-23,1,19.4],'cam0':route[0],'review_points':{'opening':route[0],'mid_hill':route[4],'visitor_center':route[-1]},
  'navigation':{'vertices':verts,'polygons':polys,'zone_polygons':navzones,'cell':step},'route':route,'walk_goals':[route[0],route[4],route[-1]],'route_centerline_m':route_length,
  'stairs':[{'flight':i+1,'lower':s[5],'upper':s[4],'width':3,'run':4.5,'risers':15,'riser_m':.15} for i,s in enumerate(stairs)],
  'camera':{'pitch':43,'yaw':14.5,'width':6.72,'zoom_min':1/3,'zoom_max':1.4,'forward_bias_m':2.8},
  'dimensions_m':{'island':[60,40],'museum':[40,9,10],'lighthouse_height':15,'water_tower_height':12,'ferry_length':25,'bench_length':1.5,'bench_seat_height':.45,'railing_height':1,'lamp_height':3.5,'avatar_nominal_height':1.75},
  'sea_size':512,'nav_connected_cells':len(cells),'clearance_m':.25,
- 'notes':['v5 placeholders for delegated pieces; final art pending Nov 8/9.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
+ 'notes':['v6 placeholders for delegated pieces; final art pending Nov 8/9.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
 authored.replace_preview_modules(kit,OUT,AUTHORED)
 # Public integration contract follows tea_house's camera/spawn/anchors/boundaries fields.
 lod_groups=[]
@@ -232,6 +232,7 @@ layout['camera'].update({'position':[campos[k]+direction[k]*back for k in range(
 layout['boundaries']=[{'name':'WestBoundary','size':[.2,36,40],'at':[-30.1,17.85,0]},{'name':'EastBoundary','size':[.2,36,40],'at':[30.1,17.85,0]},
  {'name':'NorthBoundary','size':[60,36,.2],'at':[0,17.85,-20.1]},{'name':'SouthBoundary','size':[60,36,.2],'at':[0,17.85,20.1]}]
 layout['lod_groups']=lod_groups
+layout['hud_clearance']=json.loads((HERE/'hud_contract.json').read_text())
 layout['far_anchor']=far_anchor
 layout['far_zone']={'node':'FarZone','anchor':far_anchor,'projection':'camera-facing XY cards, fake elevation, depth behind opaque island; local front +Z','render_depth_fractions':{'alc_far_bridge':.94,'alc_far_city':.96,'alc_far_hills':.98}}
 layout['instances']=[{k:p[k] for k in ['name','asset','zone','position','rotation_degrees','scale','basis_columns','slope_rise_m','owner','placeholder'] if k in p} for p in placements if p['multimesh']]
@@ -242,14 +243,14 @@ for asset in layout['assets']:
         asset['max_view_width_m']=8.0
 (OUT/'placement_points.json').write_text(json.dumps({'units':'metres','axes':layout['axes'],'instances':layout['instances']},ensure_ascii=False,indent=2)+'\n')
 (OUT/'layout.json').write_text(json.dumps(layout,separators=(',',':'))+'\n')
-manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v5 whitebox integration','assets':{}}
+manifest={'generator':'tools/art/source/alcatraz_island/build.py','reference':'landmark_alcatraz_v2.jpg + c_alc2.png','phase':'v6 whitebox integration','assets':{}}
 for name in kit.assets:
  manifest['assets'][name]=authored.manifest_row(OUT,AUTHORED[name]) if name in AUTHORED else kit.export(name,ao_radius=.18)
  print('ALCATRAZ_ASSET',name,manifest['assets'][name],flush=True)
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in placements)<=300000
 assert len(kit.assets)<=80
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-assembly=bpy.data.collections.new('Alcatraz_v5_Assembly');bpy.context.scene.collection.children.link(assembly)
+assembly=bpy.data.collections.new('Alcatraz_v6_Assembly');bpy.context.scene.collection.children.link(assembly)
 zone_collections={}
 for z in ZONES+['FarZone']:
  col=bpy.data.collections.new(z);assembly.children.link(col);zone_collections[z]=col
