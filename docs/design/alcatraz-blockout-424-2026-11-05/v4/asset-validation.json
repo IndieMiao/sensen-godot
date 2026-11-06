@@ -1,0 +1,1295 @@
+{
+  "author": "马可波罗",
+  "issue": "SGODOT-424",
+  "stage": "B blockout v4 vegetation placements",
+  "unique_glbs": 31,
+  "unique_triangles": 18147,
+  "placed_triangles": 33459,
+  "placed_mesh_instances": 597,
+  "unique_surfaces": 31,
+  "glb_bytes": 1587024,
+  "navigation_cells": 6657,
+  "zones": [
+    "DockZone",
+    "TerraceZone",
+    "SummitZone",
+    "FarZone"
+  ],
+  "repeat_instances": 582,
+  "lod_groups": [
+    {
+      "name": "alc_museum",
+      "near": "alc_museum",
+      "far": "alc_museum_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    },
+    {
+      "name": "alc_lighthouse",
+      "near": "alc_lighthouse",
+      "far": "alc_lighthouse_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    },
+    {
+      "name": "alc_watertower",
+      "near": "alc_watertower",
+      "far": "alc_watertower_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    }
+  ],
+  "walk_bounds": {
+    "min": [
+      -27.75,
+      1,
+      -7.75
+    ],
+    "max": [
+      27.75,
+      10,
+      19.75
+    ],
+    "note": "Outer bounds only; walkability comes from navigation polygons."
+  },
+  "dimensions_m": {
+    "island": [
+      60,
+      40
+    ],
+    "museum": [
+      40,
+      9,
+      10
+    ],
+    "lighthouse_height": 15,
+    "water_tower_height": 12,
+    "ferry_length": 25,
+    "bench_length": 1.5,
+    "bench_seat_height": 0.45,
+    "railing_height": 1,
+    "lamp_height": 3.5,
+    "avatar_nominal_height": 1.75
+  },
+  "actual_walk_m": 119.310104489326,
+  "direct_walk_m": 118.273956507444,
+  "live_surfaces_including_avatar_and_distant_layer": 56,
+  "live_triangles_including_avatar_and_distant_layer": 41859,
+  "view_metrics": {
+    "01-opening": {
+      "canvas_draw_calls": 11,
+      "capture_ms": 5,
+      "global_draw_calls": 45,
+      "player_position": [
+        -22.0,
+        1.0,
+        19.0
+      ],
+      "shadow_draw_calls": 7,
+      "total_draw_calls": 44,
+      "visible_draw_calls": 26,
+      "visible_triangles": 31861,
+      "zoom": 1.0
+    },
+    "02-mid-hill": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 59,
+      "player_position": [
+        8.0,
+        5.5,
+        3.0
+      ],
+      "shadow_draw_calls": 13,
+      "total_draw_calls": 58,
+      "visible_draw_calls": 38,
+      "visible_triangles": 33769,
+      "zoom": 1.0
+    },
+    "03-visitor-center": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 54,
+      "player_position": [
+        0.0,
+        10.0,
+        -6.0
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 53,
+      "visible_draw_calls": 35,
+      "visible_triangles": 32593,
+      "zoom": 1.0
+    },
+    "04-top-layout": {
+      "canvas_draw_calls": 0,
+      "capture_ms": 6,
+      "global_draw_calls": 62,
+      "player_position": [
+        0.0,
+        10.0,
+        -6.0
+      ],
+      "shadow_draw_calls": 15,
+      "total_draw_calls": 61,
+      "visible_draw_calls": 46,
+      "visible_triangles": 36532,
+      "zoom": 1.0
+    },
+    "05-whole-island": {
+      "canvas_draw_calls": 0,
+      "capture_ms": 6,
+      "global_draw_calls": 62,
+      "player_position": [
+        0.0,
+        10.0,
+        -6.0
+      ],
+      "shadow_draw_calls": 15,
+      "total_draw_calls": 61,
+      "visible_draw_calls": 46,
+      "visible_triangles": 36532,
+      "zoom": 1.0
+    },
+    "06-summit-zoom-out": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 6,
+      "global_draw_calls": 52,
+      "player_position": [
+        0.0,
+        10.0,
+        -6.0
+      ],
+      "shadow_draw_calls": 13,
+      "total_draw_calls": 51,
+      "visible_draw_calls": 31,
+      "visible_triangles": 32177,
+      "zoom": 0.333333333333333
+    },
+    "route/step-00-000m": {
+      "canvas_draw_calls": 11,
+      "capture_ms": 5,
+      "global_draw_calls": 45,
+      "player_position": [
+        -22.0,
+        1.0,
+        19.0
+      ],
+      "shadow_draw_calls": 7,
+      "total_draw_calls": 44,
+      "visible_draw_calls": 26,
+      "visible_triangles": 31861,
+      "zoom": 1.0
+    },
+    "route/step-01-007m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 50,
+      "player_position": [
+        -20.8754558563232,
+        1.0,
+        13.2700595855713
+      ],
+      "shadow_draw_calls": 9,
+      "total_draw_calls": 49,
+      "visible_draw_calls": 33,
+      "visible_triangles": 34729,
+      "zoom": 1.0
+    },
+    "route/step-02-013m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 55,
+      "player_position": [
+        -20.3373641967773,
+        3.25,
+        7.3373646736145
+      ],
+      "shadow_draw_calls": 10,
+      "total_draw_calls": 54,
+      "visible_draw_calls": 37,
+      "visible_triangles": 35581,
+      "zoom": 1.0
+    },
+    "route/step-03-020m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 54,
+      "player_position": [
+        -14.0200004577637,
+        3.25,
+        7.5
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 53,
+      "visible_draw_calls": 35,
+      "visible_triangles": 34549,
+      "zoom": 1.0
+    },
+    "route/step-04-026m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 54,
+      "player_position": [
+        -7.51999998092651,
+        3.25,
+        7.5
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 53,
+      "visible_draw_calls": 35,
+      "visible_triangles": 31321,
+      "zoom": 1.0
+    },
+    "route/step-05-033m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 51,
+      "player_position": [
+        -1.01999998092651,
+        3.25,
+        7.5
+      ],
+      "shadow_draw_calls": 12,
+      "total_draw_calls": 50,
+      "visible_draw_calls": 31,
+      "visible_triangles": 30481,
+      "zoom": 1.0
+    },
+    "route/step-06-039m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 49,
+      "player_position": [
+        5.48000001907349,
+        3.25,
+        7.5
+      ],
+      "shadow_draw_calls": 12,
+      "total_draw_calls": 48,
+      "visible_draw_calls": 29,
+      "visible_triangles": 30409,
+      "zoom": 1.0
+    },
+    "route/step-07-046m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 59,
+      "player_position": [
+        8.0,
+        5.5,
+        3.0
+      ],
+      "shadow_draw_calls": 13,
+      "total_draw_calls": 58,
+      "visible_draw_calls": 38,
+      "visible_triangles": 33769,
+      "zoom": 1.0
+    },
+    "route/step-08-052m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 57,
+      "player_position": [
+        1.75,
+        5.5,
+        3.0
+      ],
+      "shadow_draw_calls": 12,
+      "total_draw_calls": 56,
+      "visible_draw_calls": 37,
+      "visible_triangles": 34621,
+      "zoom": 1.0
+    },
+    "route/step-09-059m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 56,
+      "player_position": [
+        -4.75,
+        5.5,
+        3.0
+      ],
+      "shadow_draw_calls": 12,
+      "total_draw_calls": 55,
+      "visible_draw_calls": 36,
+      "visible_triangles": 32725,
+      "zoom": 1.0
+    },
+    "route/step-10-065m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 55,
+      "player_position": [
+        -11.25,
+        5.5,
+        3.0
+      ],
+      "shadow_draw_calls": 12,
+      "total_draw_calls": 54,
+      "visible_draw_calls": 35,
+      "visible_triangles": 32677,
+      "zoom": 1.0
+    },
+    "route/step-11-072m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 54,
+      "player_position": [
+        -17.75,
+        5.5,
+        3.0
+      ],
+      "shadow_draw_calls": 12,
+      "total_draw_calls": 53,
+      "visible_draw_calls": 34,
+      "visible_triangles": 32653,
+      "zoom": 1.0
+    },
+    "route/step-12-079m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 6,
+      "global_draw_calls": 52,
+      "player_position": [
+        -20.9503364562988,
+        7.227698802948,
+        -0.455397576093674
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 51,
+      "visible_draw_calls": 33,
+      "visible_triangles": 32773,
+      "zoom": 1.0
+    },
+    "route/step-13-085m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 52,
+      "player_position": [
+        -15.5200099945068,
+        7.75,
+        -1.45579445362091
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 51,
+      "visible_draw_calls": 33,
+      "visible_triangles": 32521,
+      "zoom": 1.0
+    },
+    "route/step-14-092m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 6,
+      "global_draw_calls": 55,
+      "player_position": [
+        -9.02000999450684,
+        7.75,
+        -1.39504683017731
+      ],
+      "shadow_draw_calls": 12,
+      "total_draw_calls": 54,
+      "visible_draw_calls": 35,
+      "visible_triangles": 32593,
+      "zoom": 1.0
+    },
+    "route/step-15-098m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 54,
+      "player_position": [
+        -2.52000999450684,
+        7.75,
+        -1.33429908752441
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 53,
+      "visible_draw_calls": 35,
+      "visible_triangles": 32593,
+      "zoom": 1.0
+    },
+    "route/step-16-105m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 54,
+      "player_position": [
+        3.97999000549316,
+        7.75,
+        -1.27355146408081
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 53,
+      "visible_draw_calls": 35,
+      "visible_triangles": 32593,
+      "zoom": 1.0
+    },
+    "route/step-17-111m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 4,
+      "global_draw_calls": 51,
+      "player_position": [
+        6.75,
+        9.35285949707031,
+        -4.70571804046631
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 50,
+      "visible_draw_calls": 32,
+      "visible_triangles": 32497,
+      "zoom": 1.0
+    },
+    "route/step-18-118m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 54,
+      "player_position": [
+        1.51999998092651,
+        10.0,
+        -6.0
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 53,
+      "visible_draw_calls": 35,
+      "visible_triangles": 32593,
+      "zoom": 1.0
+    },
+    "route/step-19-119m": {
+      "canvas_draw_calls": 7,
+      "capture_ms": 5,
+      "global_draw_calls": 54,
+      "player_position": [
+        0.0,
+        10.0,
+        -6.0
+      ],
+      "shadow_draw_calls": 11,
+      "total_draw_calls": 53,
+      "visible_draw_calls": 35,
+      "visible_triangles": 32593,
+      "zoom": 1.0
+    }
+  },
+  "runtime_source_and_assets_equal": true,
+  "vertex_color_normals_single_surface_uid_checks": [
+    "dock",
+    "alc_museum",
+    "ruins",
+    "ferry",
+    "alc_museum_far",
+    "alc_lighthouse",
+    "alc_lighthouse_far",
+    "alc_watertower",
+    "alc_watertower_far",
+    "alc_bench",
+    "alc_lamp",
+    "alc_rail_straight",
+    "alc_rail_corner",
+    "alc_curb",
+    "alc_tree_a",
+    "alc_tree_b",
+    "alc_flowerbed",
+    "alc_bin",
+    "alc_sign",
+    "alc_rock_a",
+    "alc_rock_b",
+    "alc_rock_c",
+    "alc_shrub",
+    "alc_grass_tuft",
+    "alc_far_bridge",
+    "alc_far_city",
+    "alc_far_hills",
+    "gull",
+    "alc_ground_dock",
+    "alc_ground_terraces",
+    "alc_ground_summit"
+  ],
+  "asset_sha256": {
+    "dock.glb": "0015e57c340197080c94d2a3af627ef53ebb473d8ce7ae7129d7279150548f96",
+    "alc_museum.glb": "0dc5911caa3f53bf6c1ac3bb0a492788ec5720f2b5a2620440574ac2c2b4a190",
+    "ruins.glb": "41af900abad004f38cc8d9aac7227394794e3cc58420604c406c35e08a3d253d",
+    "ferry.glb": "1f767b988d8d69eb3bb2193cc0d9786c840c2f471f821ed2af94d21b1debae26",
+    "alc_museum_far.glb": "6fcc628e63d5cca710a1c3ab33c0272fe397a46d220726a9a6ebf1f653cde911",
+    "alc_lighthouse.glb": "30eca5750c0e66b3626589bf8033adf6b022fa1556920ca4385fda2fc6a378b9",
+    "alc_lighthouse_far.glb": "2ec6db8fe8e662d75a5a9a91a9f9ebd4ef642dfa039d1ad078396ddcaf3f303f",
+    "alc_watertower.glb": "969caa2e1e76a433c047bc98d7472e20176b3b4c4c0ecc4ae96d1e636907932b",
+    "alc_watertower_far.glb": "780833b60e155170efe763a908ebb8fbccd1d71ea470fe332ac54b88ea4636dc",
+    "alc_bench.glb": "d391ae07a20bcd6c5290a418373acc998058d1c81f00022c4a562b18c92a62e6",
+    "alc_lamp.glb": "57f64e55ac1407cb90c2e2f55ba9ab7a72c17548ce3afeca04fc3b82be5d613a",
+    "alc_rail_straight.glb": "328256fe95cc0001247afa71b9aadc0a0bae37a237bfc0519f3d937619a1e16f",
+    "alc_rail_corner.glb": "590a89d99079f9e6049a23d8a1a872266235c429163abcc3a360378076adcd97",
+    "alc_curb.glb": "c9af8627af399e3fb03458ddc2cc63b9967d67b86f994291dc7e74f3cd2377cd",
+    "alc_tree_a.glb": "7861c08bc8cf7d91902c12115868c93e008f0051b17110607607e45c97f8788f",
+    "alc_tree_b.glb": "98e214172b584383ae23e1dc4d8ba6ff3b66efe7bd19e966d5b7d39033413e52",
+    "alc_flowerbed.glb": "b75e7da8e89d7f35b27ac03c1149852eacb386a7787364b7ffab1970ca7b2d33",
+    "alc_bin.glb": "2510fbc1eff8db181a75e01877c8ec36158e884cfa1ff8cf8760e81a82f4f1f8",
+    "alc_sign.glb": "3d5fcc5bd2e59cecd7a544818c76fb64e8038554f1b1a4917b36b35ef8e86a00",
+    "alc_rock_a.glb": "8032bcb7bc927f4d33acd80d869917d76913f41c694c070dc51cbacc25f5e95f",
+    "alc_rock_b.glb": "48b6faf44cf293a2c4d1c62fcd9ba6dca493b78d37afe44e888bdb70388cff3f",
+    "alc_rock_c.glb": "c1b1a62182684a6d8709db8b2c55b655c3d7af46fd43f007d00a4029bb275eea",
+    "alc_shrub.glb": "e888a092d88f155d0ee3666609708d9d9f92111ca8943e9a4d14bf239d629688",
+    "alc_grass_tuft.glb": "cf8b15c4a490255fb40cefb080412dd7fed14785746d67d318faeb128b20f5df",
+    "alc_far_bridge.glb": "c11433133632e8d23d88cd015a1e071d9d2850d7f82e75d0e75e9fe7db81352f",
+    "alc_far_city.glb": "5058308e6e7c922b36e37812fb008d796655761fcb401302ab6a5900b1ecfb9e",
+    "alc_far_hills.glb": "65d6f38e01a4588793885694427d316a1521f52d59d4ae74004824dee9ae9557",
+    "gull.glb": "4432129d0776bcc35837838d088c942ab3c1170a92ad6d414deed2606b0a6ad7",
+    "alc_ground_dock.glb": "283adaa11ff43efb51f70c2925947823864b3fb3679188b9edd4734da2b2f618",
+    "alc_ground_terraces.glb": "1c921fd35c41aa95ea4a0577e4511529b64c303667c48aa0afe15f26dc83c45c",
+    "alc_ground_summit.glb": "a5728cb63af5caf65f8506b2b6741ef2f852c5550e31a1fd9044160f450e056f"
+  },
+  "exported_module_bounds_m": {
+    "dock": {
+      "min": [
+        -1.7100000381469727,
+        -1.899999976158142,
+        -3.25
+      ],
+      "max": [
+        1.7100000381469727,
+        1.0000001192092896,
+        3.25
+      ],
+      "size": [
+        3.4200000762939453,
+        2.9000000953674316,
+        6.5
+      ]
+    },
+    "alc_museum": {
+      "min": [
+        -20,
+        0,
+        -5
+      ],
+      "max": [
+        20,
+        9,
+        5.239999771118164
+      ],
+      "size": [
+        40,
+        9,
+        10.239999771118164
+      ]
+    },
+    "ruins": {
+      "min": [
+        -4.5,
+        0,
+        -4
+      ],
+      "max": [
+        4.25,
+        4.5,
+        0.22499999403953552
+      ],
+      "size": [
+        8.75,
+        4.5,
+        4.2249999940395355
+      ]
+    },
+    "ferry": {
+      "min": [
+        -12.5,
+        -1,
+        -3.0999999046325684
+      ],
+      "max": [
+        12.5,
+        6.5,
+        3.0999999046325684
+      ],
+      "size": [
+        25.0,
+        7.5,
+        6.199999809265137
+      ]
+    },
+    "alc_museum_far": {
+      "min": [
+        -20,
+        0,
+        -5
+      ],
+      "max": [
+        20,
+        9,
+        5
+      ],
+      "size": [
+        40,
+        9,
+        10
+      ]
+    },
+    "alc_lighthouse": {
+      "min": [
+        -1.850000023841858,
+        0,
+        -1.850000023841858
+      ],
+      "max": [
+        1.850000023841858,
+        15,
+        1.850000023841858
+      ],
+      "size": [
+        3.700000047683716,
+        15,
+        3.700000047683716
+      ]
+    },
+    "alc_lighthouse_far": {
+      "min": [
+        -1.850000023841858,
+        0,
+        -1.850000023841858
+      ],
+      "max": [
+        1.850000023841858,
+        15,
+        1.850000023841858
+      ],
+      "size": [
+        3.700000047683716,
+        15,
+        3.700000047683716
+      ]
+    },
+    "alc_watertower": {
+      "min": [
+        -2.700000047683716,
+        0,
+        -2.700000047683716
+      ],
+      "max": [
+        2.700000047683716,
+        12,
+        2.700000047683716
+      ],
+      "size": [
+        5.400000095367432,
+        12,
+        5.400000095367432
+      ]
+    },
+    "alc_watertower_far": {
+      "min": [
+        -2.700000047683716,
+        0,
+        -2.700000047683716
+      ],
+      "max": [
+        2.700000047683716,
+        12,
+        2.700000047683716
+      ],
+      "size": [
+        5.400000095367432,
+        12,
+        5.400000095367432
+      ]
+    },
+    "alc_bench": {
+      "min": [
+        -0.75,
+        0,
+        -0.25999999046325684
+      ],
+      "max": [
+        0.75,
+        1.0099999904632568,
+        0.23999999463558197
+      ],
+      "size": [
+        1.5,
+        1.0099999904632568,
+        0.4999999850988388
+      ]
+    },
+    "alc_lamp": {
+      "min": [
+        -0.15000000596046448,
+        0,
+        -0.15000000596046448
+      ],
+      "max": [
+        0.15000000596046448,
+        3.5,
+        0.15000000596046448
+      ],
+      "size": [
+        0.30000001192092896,
+        3.5,
+        0.30000001192092896
+      ]
+    },
+    "alc_rail_straight": {
+      "min": [
+        -1,
+        0,
+        -0.05000000074505806
+      ],
+      "max": [
+        1,
+        1,
+        0.05000000074505806
+      ],
+      "size": [
+        2,
+        1,
+        0.10000000149011612
+      ]
+    },
+    "alc_rail_corner": {
+      "min": [
+        -0.07000000029802322,
+        0,
+        -0.07000000029802322
+      ],
+      "max": [
+        0.5,
+        1,
+        0.5
+      ],
+      "size": [
+        0.5700000002980232,
+        1,
+        0.5700000002980232
+      ]
+    },
+    "alc_curb": {
+      "min": [
+        -1,
+        0,
+        -0.09000000357627869
+      ],
+      "max": [
+        1,
+        0.1599999964237213,
+        0.09000000357627869
+      ],
+      "size": [
+        2,
+        0.1599999964237213,
+        0.18000000715255737
+      ]
+    },
+    "alc_tree_a": {
+      "min": [
+        -0.8999999761581421,
+        0,
+        -0.8999999761581421
+      ],
+      "max": [
+        0.8999999761581421,
+        3.4000000953674316,
+        0.8999999761581421
+      ],
+      "size": [
+        1.7999999523162842,
+        3.4000000953674316,
+        1.7999999523162842
+      ]
+    },
+    "alc_tree_b": {
+      "min": [
+        -1.100000023841858,
+        0,
+        -1.100000023841858
+      ],
+      "max": [
+        1.100000023841858,
+        4,
+        1.100000023841858
+      ],
+      "size": [
+        2.200000047683716,
+        4,
+        2.200000047683716
+      ]
+    },
+    "alc_flowerbed": {
+      "min": [
+        -0.699999988079071,
+        0,
+        -0.3499999940395355
+      ],
+      "max": [
+        0.699999988079071,
+        0.5499999523162842,
+        0.3499999940395355
+      ],
+      "size": [
+        1.399999976158142,
+        0.5499999523162842,
+        0.699999988079071
+      ]
+    },
+    "alc_bin": {
+      "min": [
+        -0.22499999403953552,
+        0,
+        -0.22499999403953552
+      ],
+      "max": [
+        0.22499999403953552,
+        0.75,
+        0.22499999403953552
+      ],
+      "size": [
+        0.44999998807907104,
+        0.75,
+        0.44999998807907104
+      ]
+    },
+    "alc_sign": {
+      "min": [
+        -0.44999998807907104,
+        0,
+        -0.05999999865889549
+      ],
+      "max": [
+        0.44999998807907104,
+        1.6750000715255737,
+        0.05999999865889549
+      ],
+      "size": [
+        0.8999999761581421,
+        1.6750000715255737,
+        0.11999999731779099
+      ]
+    },
+    "alc_rock_a": {
+      "min": [
+        -0.8999999761581421,
+        0,
+        -0.699999988079071
+      ],
+      "max": [
+        0.8999999761581421,
+        1.2000000476837158,
+        0.699999988079071
+      ],
+      "size": [
+        1.7999999523162842,
+        1.2000000476837158,
+        1.399999976158142
+      ]
+    },
+    "alc_rock_b": {
+      "min": [
+        -0.6000000238418579,
+        0,
+        -0.5
+      ],
+      "max": [
+        0.6000000238418579,
+        0.800000011920929,
+        0.5
+      ],
+      "size": [
+        1.2000000476837158,
+        0.800000011920929,
+        1.0
+      ]
+    },
+    "alc_rock_c": {
+      "min": [
+        -0.4000000059604645,
+        0,
+        -0.3499999940395355
+      ],
+      "max": [
+        0.4000000059604645,
+        0.5,
+        0.3499999940395355
+      ],
+      "size": [
+        0.800000011920929,
+        0.5,
+        0.699999988079071
+      ]
+    },
+    "alc_shrub": {
+      "min": [
+        -0.5,
+        0,
+        -0.4000000059604645
+      ],
+      "max": [
+        0.5,
+        0.6499999761581421,
+        0.4000000059604645
+      ],
+      "size": [
+        1.0,
+        0.6499999761581421,
+        0.800000011920929
+      ]
+    },
+    "alc_grass_tuft": {
+      "min": [
+        -0.25,
+        0,
+        -0.22499999403953552
+      ],
+      "max": [
+        0.25,
+        0.30000001192092896,
+        0.22499999403953552
+      ],
+      "size": [
+        0.5,
+        0.30000001192092896,
+        0.44999998807907104
+      ]
+    },
+    "alc_far_bridge": {
+      "min": [
+        -1,
+        0,
+        0
+      ],
+      "max": [
+        1,
+        0.8999999761581421,
+        0
+      ],
+      "size": [
+        2,
+        0.8999999761581421,
+        0
+      ]
+    },
+    "alc_far_city": {
+      "min": [
+        -2.369999885559082,
+        0,
+        0
+      ],
+      "max": [
+        2.369999885559082,
+        0.9100000262260437,
+        0
+      ],
+      "size": [
+        4.739999771118164,
+        0.9100000262260437,
+        0
+      ]
+    },
+    "alc_far_hills": {
+      "min": [
+        -4,
+        0,
+        0
+      ],
+      "max": [
+        4,
+        0.5181980729103088,
+        0
+      ],
+      "size": [
+        8,
+        0.5181980729103088,
+        0
+      ]
+    },
+    "gull": {
+      "min": [
+        -0.15216907858848572,
+        0,
+        -0.35499995946884155
+      ],
+      "max": [
+        0.15216904878616333,
+        0.38499996066093445,
+        0.2250000238418579
+      ],
+      "size": [
+        0.30433812737464905,
+        0.38499996066093445,
+        0.5799999833106995
+      ]
+    },
+    "alc_ground_dock": {
+      "min": [
+        -25,
+        -0.6000000238418579,
+        7.5
+      ],
+      "max": [
+        24,
+        1.0199999809265137,
+        14
+      ],
+      "size": [
+        49,
+        1.6200000047683716,
+        6.5
+      ]
+    },
+    "alc_ground_terraces": {
+      "min": [
+        -30,
+        -0.6000000238418579,
+        -6.001500129699707
+      ],
+      "max": [
+        30,
+        10.019999504089355,
+        12.001500129699707
+      ],
+      "size": [
+        60,
+        10.619999527931213,
+        18.003000259399414
+      ]
+    },
+    "alc_ground_summit": {
+      "min": [
+        -30,
+        -0.6000000238418579,
+        -20
+      ],
+      "max": [
+        30,
+        10.020000457763672,
+        -4.5
+      ],
+      "size": [
+        60,
+        10.62000048160553,
+        15.5
+      ]
+    }
+  },
+  "reference": "tools/art/source/alcatraz_island/reference/provenance.json",
+  "instance_counts": {
+    "alc_flowerbed": 11,
+    "alc_sign": 4,
+    "alc_bench": 7,
+    "alc_bin": 2,
+    "alc_lamp": 6,
+    "alc_rail_corner": 4,
+    "alc_tree_b": 9,
+    "alc_tree_a": 17,
+    "alc_shrub": 26,
+    "alc_grass_tuft": 52,
+    "alc_rock_a": 12,
+    "alc_rock_b": 12,
+    "alc_rock_c": 12,
+    "alc_rail_straight": 204,
+    "alc_curb": 204
+  },
+  "instance_owners": {
+    "赵云": 468,
+    "刘备": 114
+  },
+  "detail_max_view_width_m": {
+    "alc_rail_corner": 8.0,
+    "alc_flowerbed": 8.0,
+    "alc_bin": 8.0,
+    "alc_shrub": 8.0,
+    "alc_grass_tuft": 8.0
+  },
+  "captures": {
+    "01-opening.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "fd2bf3b6045f9d2b6ca533d1f2a0e97c448d4a12706ccf1788c5ca6cba9b6289"
+    },
+    "07-route-contact-sheet.png": {
+      "pixels": [
+        900,
+        1600
+      ],
+      "sha256": "22423a897d96edae19a46ea45e53f74a7910e31e54bd44b0553d6ad51edf8e70"
+    },
+    "05-whole-island.png": {
+      "pixels": [
+        1000,
+        1200
+      ],
+      "sha256": "cdcadcc62ed07e6f0ad6bae32d5f1cbc7f091f8e24b45751efcdf38a58d3067c"
+    },
+    "06-summit-zoom-out.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "a431b4b667d3167dae9ba249a58a6f8682bbf43148e915e41b7850d9172e32f4"
+    },
+    "02-mid-hill.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "cb4d279655fbbf7be17d107bc9a1660b8283d38bcc5a3e340894e74348565868"
+    },
+    "04-top-layout.png": {
+      "pixels": [
+        1000,
+        1200
+      ],
+      "sha256": "d17072ddcb948316d820036cc62555b6fb6bcad64568f57e7b0471f999529862"
+    },
+    "03-visitor-center.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "a83a8d9821acde24d1a0496746c02b3a73a2ba3ffde3b926264380ca8808873e"
+    },
+    "route/step-02-013m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "c272b0b9752d0d69ae83f240e66cdccab5692d89c8af23b2e533a55dcbc0b61d"
+    },
+    "route/step-18-118m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "358f85a7a6a35a12ba018d21d051bb010276dcbc84452a7cdac019493ea358ad"
+    },
+    "route/step-15-098m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "521b67ff22806e80814b0a9379f3a520e0f749a039dc79796ca0b0ab6612e836"
+    },
+    "route/step-01-007m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "4b3268a7a0dc09c552a23582f371f23f123d5182f166d5aedb86b74bf93a595c"
+    },
+    "route/step-19-119m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "b6f808ba8ae0f20e33b0c13040a7b196fd7c3427d12378a3c762d2b49634c1fe"
+    },
+    "route/step-11-072m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "fa6b8f66c49690d3d6e7b088ba1af529ec3922d2b573ef0b3e80e91f3972de63"
+    },
+    "route/step-14-092m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "d8272a546eefcfd2cc259745cdde4caa4d2c4566f163daa64a104186008fe86c"
+    },
+    "route/step-09-059m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "a41382bfef036ba9f29ce637ff0945537680ed956ace921ea8703281b3299275"
+    },
+    "route/step-17-111m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "413d42e8825f36690fbbc1b01c2ec661e516e57cd02607f1ad316a485d616b2b"
+    },
+    "route/step-03-020m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "895d7b3dcb98d5bfdd9c96e7613b960820b468a55e208037067b9580ab193c95"
+    },
+    "route/step-07-046m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "5674870283b5ad876eef6d0676b6600cff30b7d3eef1cf28130193a1e57dc0af"
+    },
+    "route/step-08-052m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "8129f441ac3457b3645f21d802d59a4e1a3db3e9fd8cc14f0f353afca3b847c3"
+    },
+    "route/step-00-000m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "94aaec38de66ef2f3018e8f2b25fdad6ba2b5f000780eeb0b91ffcd90edccb3b"
+    },
+    "route/step-13-085m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "bb202c1f30ddbc7389a6573fe0002eae1a0f4898cff82f60f359852f1d86c4a1"
+    },
+    "route/step-16-105m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "3592d5184ff8cfe47921abaa6ef054b50ec7aad56030dcf55469d127b855f11b"
+    },
+    "route/step-05-033m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "762049efcbfac7cca1ca66cf4ea8fb6348190f610d41a40aa2b04c51f4803fbc"
+    },
+    "route/step-06-039m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "719bd1f5de92f69a9bb9c7b307ef1ec9ac7e56b48f42590c0ed7e749b73358f6"
+    },
+    "route/step-12-079m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "cac5c5891684780f85f133f071afd9bb8c9eed3d4fc18c99405d4c27f48b7327"
+    },
+    "route/step-04-026m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "f7c0c199e9e33f98cb8f7c83f784aff8874c6a92fc7f4ebd5206d5365ba4f144"
+    },
+    "route/step-10-065m.png": {
+      "pixels": [
+        360,
+        800
+      ],
+      "sha256": "fcb17862078ddc36031eb7ae5104c43950b2280ab1b6c386adb0c2f01e7807bc"
+    }
+  },
+  "top_layout_annotation": "Labels and route over actual rendered top view; raw screenshot remains in output.",
+  "limits": [
+    "Desktop Vulkan Mobile / RTX 2060 only.",
+    "Programmatic walk and gesture regression, no Android input claim.",
+    "No physical phone performance, map-entry integration, release, or whitebox approval is claimed."
+  ]
+}

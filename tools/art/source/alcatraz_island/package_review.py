@@ -6,11 +6,12 @@ import shutil
 import struct
 import re
 import ast
+from collections import Counter
 from PIL import Image, ImageDraw, ImageFont
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3]
-REVIEW=ROOT/'output/alcatraz-424/v3/review'
-DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v3'
+REVIEW=ROOT/'output/alcatraz-424/v4/review'
+DOC=ROOT/'docs/design/alcatraz-blockout-424-2026-11-05/v4'
 ASSETS=ROOT/'assets/landmarks/alcatraz_island'
 QA=ROOT/'output/alcatraz-424/project'
 verification=json.loads((REVIEW/'verification.json').read_text())
@@ -26,6 +27,7 @@ for name in sorted(expected):
 shutil.copy2(REVIEW/'verification.json',DOC/'verification.json')
 shutil.copy2(REVIEW/'wide-sweep.json',DOC/'wide-sweep.json')
 layout=json.loads((ASSETS/'layout.json').read_text())
+assert json.loads((ASSETS/'placement_points.json').read_text())['instances']==layout['instances']
 manifest=json.loads((ASSETS/'manifest.json').read_text())
 font='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 f=ImageFont.truetype(font,18);small=ImageFont.truetype(font,15)
@@ -42,7 +44,7 @@ def label(text,xy,target=None):
     b=d.textbbox(xy,text,font=f)
     d.rounded_rectangle((b[0]-5,b[1]-4,b[2]+5,b[3]+4),radius=4,fill='#f4f3ec')
     d.text(xy,text,font=f,fill='#263b44')
-label('ALCATRAZ / V3 / MODULAR HANDOFF',(22,18))
+label('ALCATRAZ / V4 / VEGETATION PLACEMENTS',(22,18))
 d.text((22,48),'Rendered top view + actual navigation path. North is up.',font=small,fill='#263b44')
 label('Island / dock footprint: 60 x 40 m',(310,170))
 d.line([(point([-30,0,0])[0],210),(point([30,0,0])[0],210)],fill='#263b44',width=2)
@@ -89,7 +91,7 @@ for asset,axis,expected in [('alc_museum',0,40),('alc_museum',1,9),('alc_lightho
     assert abs(dimensions[asset]['size'][axis]-expected)<.02,(asset,dimensions[asset])
 assert sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements'])<=300000
 assert verification['total_surface_budget_with_multimesh']['evidence']<=80
-evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v3 modular handoff',
+evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v4 vegetation placements',
     'unique_glbs':len(checks),'unique_triangles':sum(x['triangles'] for x in manifest['assets'].values()),
     'placed_triangles':sum(manifest['assets'][p['asset']]['triangles'] for p in layout['placements']),
     'placed_mesh_instances':len(layout['placements']),'unique_surfaces':len(checks),
@@ -99,6 +101,9 @@ evidence={'author':'马可波罗','issue':'SGODOT-424','stage':'B blockout v3 mo
     'live_triangles_including_avatar_and_distant_layer':verification['total_triangle_budget_with_multimesh']['evidence'],
     'view_metrics':{name:{k:v for k,v in row.items() if k!='samples'} for name,row in verification['view_metrics'].items()},'runtime_source_and_assets_equal':True,'vertex_color_normals_single_surface_uid_checks':checks,'asset_sha256':hashes,'exported_module_bounds_m':dimensions,
     'reference':'tools/art/source/alcatraz_island/reference/provenance.json',
+    'instance_counts':dict(Counter(p['asset'] for p in layout['instances'])),
+    'instance_owners':dict(Counter(p['owner'] for p in layout['instances'])),
+    'detail_max_view_width_m':{a['name']:a['max_view_width_m'] for a in layout['assets'] if 'max_view_width_m' in a},
     'captures':{str(p.relative_to(DOC)):{'pixels':list(Image.open(p).size),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in DOC.rglob('*.png')},
     'top_layout_annotation':'Labels and route over actual rendered top view; raw screenshot remains in output.',
     'limits':['Desktop Vulkan Mobile / RTX 2060 only.','Programmatic walk and gesture regression, no Android input claim.',

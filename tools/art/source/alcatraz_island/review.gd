@@ -100,6 +100,33 @@ func _ready() -> void:
 	check("offshore_anchor_20m",absf(float(scene.layout.far_anchor[2])-float(scene.layout.spawn[2])-20)<.01,scene.layout.far_anchor)
 	check("tea_layout_contract",["camera","spawn","anchors","boundaries","walk_bounds","instances","lod_groups"].all(func(k):return scene.layout.has(k)))
 	check("camera_contract",["position","target","size"].all(func(k):return scene.layout.camera.has(k)))
+	var tree_count := 0
+	var nature_counts := {}
+	var unsupported: Array = []
+	var encroaching: Array = []
+	var wrong_owner: Array = []
+	for p in scene.layout.instances:
+		var is_tree: bool = str(p.asset).begins_with("alc_tree_")
+		var is_liu: bool = p.asset in ["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"]
+		if not is_tree and not is_liu:continue
+		if is_tree:tree_count+=1
+		nature_counts[p.asset]=int(nature_counts.get(p.asset,0))+1
+		if p.get("owner","") != ("刘备" if is_liu else "赵云"):wrong_owner.append(p.name)
+		var root := AlcatrazIsland._vec(p.position)
+		var nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,root)
+		var clearance := 1.1 if is_tree else .65 if p.asset=="alc_shrub" else .35
+		if absf(nearest.y-root.y)<.25 and Vector2(nearest.x-root.x,nearest.z-root.z).length()<clearance:
+			encroaching.append(p.name)
+		if str(p.asset).begins_with("alc_rock_"):continue
+		var ray := PhysicsRayQueryParameters3D.create(root+Vector3.UP*.08,root-Vector3.UP*.3)
+		var support := scene.get_world_3d().direct_space_state.intersect_ray(ray)
+		if support.is_empty() or absf(support.position.y-root.y)>.06:unsupported.append(p.name)
+	check("twenty_to_thirty_instanced_trees",tree_count>=20 and tree_count<=30,tree_count)
+	check("nature_owner_handoff",wrong_owner.is_empty(),wrong_owner)
+	check("all_liu_prototypes_placed",["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"].all(func(k):return int(nature_counts.get(k,0))>0),nature_counts)
+	check("vegetation_roots_on_terrain",unsupported.is_empty(),unsupported)
+	check("vegetation_navigation_clearance",encroaching.is_empty(),encroaching)
+	check("only_buildings_have_two_lods",scene.layout.lod_groups.size()==3 and scene.layout.lod_groups.all(func(g):return g.name in ["alc_museum","alc_lighthouse","alc_watertower"]))
 
 	var corners_ok := true
 	for p in [Vector2(0,0),Vector2(359,0),Vector2(0,799),Vector2(359,799)]:
@@ -325,6 +352,20 @@ func route_photo(force := false) -> void:
 	scene._focus = scene._follow_target()
 	scene._update_camera()
 	var name_ := "route/step-%02d-%03dm"%[route_capture_index,roundi(route_distance)]
+	# Conservative imported tree bounds catch foreground crowns hiding the avatar
+	# on the next terrace; ground/navigation clearance alone cannot catch this.
+	var tree_occluders: Array = []
+	for p in scene.layout.placements:
+		if not str(p.asset).begins_with("alc_tree_"):continue
+		var tree_bounds: AABB = scene._transform_of(p)*scene._mesh(p.asset).get_aabb()
+		for height in [.5,.95,1.4]:
+			var body_point: Vector3 = scene._player.position+Vector3.UP*float(height)
+			var screen_point := scene._camera.unproject_position(body_point)
+			var origin := scene._camera.project_ray_origin(screen_point)
+			if tree_bounds.intersects_segment(origin,body_point)!=null:
+				tree_occluders.append(p.name)
+				break
+	check(name_+"_avatar_clear_of_trees",tree_occluders.is_empty(),tree_occluders)
 	var visible_interests: Array = []
 	for point in scene.layout.interest_points:
 		var world := AlcatrazIsland._vec(point.position)+Vector3.UP*.5
@@ -360,7 +401,7 @@ func budget_sweep() -> void:
 	for key in baseline.view_metrics:
 		if not str(key).begins_with("route/"):continue
 		scene._player.position = AlcatrazIsland._vec(baseline.view_metrics[key].player_position)
-		for zoom in [.5,1.0/3.0]:
+		for zoom in [.85,.68,.5,1.0/3.0]:
 			scene.camera_pan.reset(zoom)
 			scene._focus = scene._follow_target()
 			scene._update_camera()

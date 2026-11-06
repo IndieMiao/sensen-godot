@@ -1,10 +1,13 @@
-"""Temporary modular contracts for Zhao Yun / Huang Zhong. No final art is claimed."""
+"""Temporary modular contracts for Zhao Yun / Huang Zhong / Liu Bei."""
 import math
 
 REPEATED=['alc_bench','alc_lamp','alc_rail_straight','alc_rail_corner','alc_curb','alc_tree_a','alc_tree_b','alc_flowerbed','alc_bin','alc_sign']
 OWNERS={name:'赵云' for name in REPEATED}
+NATURAL=['alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft']
+REPEATED+=NATURAL
+OWNERS.update({name:'刘备' for name in NATURAL})
 OWNERS.update({n:'黄忠' for n in ['alc_lighthouse','alc_lighthouse_far','alc_watertower','alc_watertower_far','alc_museum_far',
- 'alc_far_bridge','alc_far_bridge_far','alc_far_city','alc_far_city_far','alc_far_hills','alc_far_hills_far']})
+ 'alc_far_bridge','alc_far_city','alc_far_hills']})
 
 
 def build(kit,box,prism,place):
@@ -43,10 +46,17 @@ def build(kit,box,prism,place):
     kit.begin('alc_sign',ao=False)
     box('post',(0,.65,0),(.12,1.3,.12),'wood',0)
     box('board',(0,1.45,0),(.9,.45,.12),'building',0)
+    # Low blocks establish replacement envelopes; Liu Bei supplies the authored silhouettes.
+    for name,(w,h,d),color in [
+        ('alc_rock_a',(1.8,1.2,1.4),'stone'),('alc_rock_b',(1.2,.8,1.0),'stone'),
+        ('alc_rock_c',(.8,.5,.7),'stone'),('alc_shrub',(1.0,.65,.8),'garden'),
+        ('alc_grass_tuft',(.5,.3,.45),'garden')]:
+        kit.begin(name,ao=False)
+        box(name+'_placeholder',(0,h/2,0),(w,h,d),color,0)
     # Flat colored silhouettes, not completed scenery assets. Front +Z, bottom-centre pivot.
     def rect(n,x,y,w,h,c):
         kit.mesh(n,[(x-w/2,y,0),(x+w/2,y,0),(x+w/2,y+h,0),(x-w/2,y+h,0)],[(0,1,2,3)],c)
-    for suffix in ['', '_far']:
+    for suffix in ['']:
         kit.begin('alc_far_bridge'+suffix,ao=False)
         rect('deck',0,.18,2,.06,'bridge')
         for x in [-.55,.55]:rect('tower',x,0,.065,.9,'bridge')
@@ -70,20 +80,50 @@ def build(kit,box,prism,place):
 
 def scatter(place):
     # One easily replaceable focal prop every <= 6 m on each horizontal terrace.
-    patterns=[['alc_flowerbed','alc_sign','alc_tree_a','alc_bench','alc_bin','alc_lamp'],
-              ['alc_lamp','alc_flowerbed','alc_tree_b','alc_sign','alc_bench','alc_flowerbed'],
-              ['alc_tree_a','alc_bin','alc_flowerbed','alc_bench','alc_sign','alc_lamp']]
+    patterns=[['alc_flowerbed','alc_sign','alc_flowerbed','alc_bench','alc_bin','alc_lamp'],
+              ['alc_lamp','alc_flowerbed','alc_flowerbed','alc_sign','alc_bench','alc_flowerbed'],
+              ['alc_flowerbed','alc_bin','alc_flowerbed','alc_bench','alc_sign','alc_lamp']]
     for row,(y,z) in enumerate([(3.25,7.5),(5.5,3),(7.75,-1.5)]):
         for i,x in enumerate([-21,-15,-9,-3,3,7]):
             asset=patterns[row][i]
             # Trees/planters stand just beyond the upper rail; seats stay on the paving edge.
-            pz=z-2.1 if asset in ['alc_tree_a','alc_tree_b','alc_flowerbed'] else z-.9
+            pz=z-2.9 if asset.startswith('alc_tree_') else z-2.1 if asset=='alc_flowerbed' else z-.9
             place(asset,(x,y,pz),'TerraceZone',collision=True)
     for asset,p in [('alc_sign',(-18.4,1,11.0)),('alc_bench',(-19,1,13.4)),('alc_flowerbed',(-18.7,1,10.3))]:place(asset,p,'DockZone')
     for i,x in enumerate([-24,-18,-12,-6,0,6,12,18,24]):
         place(['alc_flowerbed','alc_bench','alc_lamp'][i%3],(x,10,-5.05),'SummitZone')
     for p,z in [((-23.5,1,14),'DockZone'),((-23.5,1,19.5),'DockZone'),((-27.8,10,-4.7),'SummitZone'),((27.8,10,-4.7),'SummitZone')]:
         place('alc_rail_corner',p,z,collision=False)
+    # Keep tall crowns on the flanks: lower-terrace trees otherwise obscure the
+    # avatar on the next path above under the fixed 43-degree camera.
+    for row,(y,points) in enumerate([
+        (3.25,[(-25.2,4.1),(-25.0,6.5),(12.5,6.6),(22,4.1),(24.7,4.3),(22,6.5),(24.3,6.6)]),
+        (5.5,[(-26,-.5),(-26,1.5),(13,-.3),(18,-.3),(24,-.3),(14,1.9),(22,1.9)]),
+        (7.75,[(-27,-5),(-27,-3),(13,-4.8),(18,-4.8),(24,-4.8),(14,-2.8),(22,-2.8)])]):
+        for i,(x,z) in enumerate(points):
+            # Fixed crown orientation gives collaborators an explicit clearance envelope.
+            place('alc_tree_b' if (i+row)%3==0 else 'alc_tree_a',(x,y,z),'TerraceZone',collision=True)
+    for i,(x,z) in enumerate([(-28,-9),(-22.2,-9.5),(-28,-16),(22.2,-9.5),(27.8,-9.2)]):
+        place('alc_tree_a' if i%2==0 else 'alc_tree_b',(x,10,z),'SummitZone',yaw=i*.8)
+    # Clusters leave the bright walkways clear. Coordinates are terrain-supported roots.
+    for row,(y,z) in enumerate([(3.25,4.4),(5.5,-.1),(7.75,-4.6)]):
+        for i,x in enumerate([-25.2,-16,-12,-5,1,11,23]):
+            if row==0 and x==11:continue  # Keep the ruins approach legible.
+            place('alc_shrub',(x,y,z),'TerraceZone',yaw=i*.9,collision=False)
+            for dx,dz in [(-.65,.45),(.7,.3)]:
+                place('alc_grass_tuft',(x+dx,y,z+dz),'TerraceZone',yaw=i*.6,collision=False)
+    for i,(x,z) in enumerate([(-28,-9.0),(-22,-15),(-25,-18.5),(22,-8.8),(28.5,-17),(25,-18.5)]):
+        place('alc_shrub',(x,10,z),'SummitZone',yaw=i*.5,collision=False)
+        for dx,dz in [(-.65,.45),(.6,.3)]:
+            place('alc_grass_tuft',(x+dx,10,z+dz),'SummitZone',yaw=i*.4,collision=False)
+    # The coastal ring belongs to DockZone, including the foot of the higher cliffs.
+    # Roots sit 0.2 m below the sea to avoid floating replacements.
+    coast=[(x,14.25) for x in [-18,-14,-10,-6,-2,2,6,10,14,18,22]]
+    coast += [(-24.8,11.5),(-26.2,7),(-28.0,2),(-30,-3.5),(-30.3,-8),(-30.3,-13),(-29.2,-18)]
+    coast += [(25,11.5),(26.5,7),(28,2),(30,-3.5),(30.3,-8),(30.3,-13),(29.2,-18)]
+    coast += [(x,-20.25) for x in [-25,-20,-15,-10,-5,0,5,10,15,20,25]]
+    for i,(x,z) in enumerate(coast):
+        place(['alc_rock_a','alc_rock_b','alc_rock_c'][i%3],(x,-.35,z),'DockZone',yaw=(i*1.13)%(2*math.pi),collision=False)
 
 
 def rail_instances(edges,place):

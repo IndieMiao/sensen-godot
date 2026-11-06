@@ -1,7 +1,7 @@
 {
   "generator": "tools/art/source/alcatraz_island/build.py",
   "reference": "landmark_alcatraz_v2.jpg + c_alc2.png",
-  "phase": "v3 whitebox integration",
+  "phase": "v4 whitebox integration",
   "assets": {
     "dock": {
       "triangles": 3468,
@@ -79,6 +79,26 @@
       "triangles": 24,
       "bytes": 3368
     },
+    "alc_rock_a": {
+      "triangles": 12,
+      "bytes": 2328
+    },
+    "alc_rock_b": {
+      "triangles": 12,
+      "bytes": 2300
+    },
+    "alc_rock_c": {
+      "triangles": 12,
+      "bytes": 2316
+    },
+    "alc_shrub": {
+      "triangles": 12,
+      "bytes": 2300
+    },
+    "alc_grass_tuft": {
+      "triangles": 12,
+      "bytes": 2312
+    },
     "alc_far_bridge": {
       "triangles": 70,
       "bytes": 6004
@@ -90,18 +110,6 @@
     "alc_far_hills": {
       "triangles": 13,
       "bytes": 1652
-    },
-    "alc_far_bridge_far": {
-      "triangles": 38,
-      "bytes": 3764
-    },
-    "alc_far_city_far": {
-      "triangles": 12,
-      "bytes": 1972
-    },
-    "alc_far_hills_far": {
-      "triangles": 7,
-      "bytes": 1424
     },
     "gull": {
       "triangles": 288,

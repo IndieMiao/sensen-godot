@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://b5gjwbc2wjyjj"
-path="res://.godot/imported/alc_far_bridge_far.glb-8de4b7c5fb48d4d765d5e4a5fb8c4d09.scn"
+uid="uid://3g50kpwrgbp3"
+path="res://.godot/imported/alc_shrub.glb-b95320b9fb238d6ab6d6c007f604a0e9.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/alc_far_bridge_far.glb"
-dest_files=["res://.godot/imported/alc_far_bridge_far.glb-8de4b7c5fb48d4d765d5e4a5fb8c4d09.scn"]
+source_file="res://assets/landmarks/alcatraz_island/alc_shrub.glb"
+dest_files=["res://.godot/imported/alc_shrub.glb-b95320b9fb238d6ab6d6c007f604a0e9.scn"]
 
 [params]
 

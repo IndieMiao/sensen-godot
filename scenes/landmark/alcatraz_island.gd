@@ -33,6 +33,7 @@ var mesh_nodes: Array[MeshInstance3D] = []
 var _mesh_cache := {}
 var zones := {}
 var batch_nodes: Array[MultiMeshInstance3D] = []
+var _detail_batches: Array[MultiMeshInstance3D] = []
 var _far_zone: Node3D
 var _zoom_buttons := {}
 var _prototype_shapes := {}
@@ -198,7 +199,11 @@ func _add_batch(items: Array, paint: Material) -> void:
 	node.name = asset.to_pascal_case()+"Batch"
 	node.multimesh = mm
 	node.material_override = paint
-	if asset in ["alc_curb","alc_lamp","alc_bin","alc_sign","alc_rail_corner","alc_flowerbed"]:node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for definition in layout.assets:
+		if definition.name==asset and definition.has("max_view_width_m"):
+			node.set_meta("max_view_width_m",float(definition.max_view_width_m))
+			_detail_batches.append(node)
+	if asset in ["alc_curb","alc_lamp","alc_bin","alc_sign","alc_rail_corner","alc_flowerbed","alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"]:node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	zones[items[0].zone].add_child(node)
 	batch_nodes.append(node)
 	for p in items:
@@ -373,6 +378,9 @@ func _update_camera() -> void:
 	var zoom_for_view := clampf(camera_pan.zoom,1.0/3.0,1.4)
 	var width := (78.0 if _overview else PHONE_WIDTH) / zoom_for_view
 	_camera.size = width
+	# Low decorations have a screen-size LOD; tree silhouettes and rails remain.
+	for node in _detail_batches:
+		node.visible = _overview or width<=float(node.get_meta("max_view_width_m"))
 	if not camera_pan.active():
 		_focus += camera_pan.offset
 		camera_pan.offset = Vector3.ZERO

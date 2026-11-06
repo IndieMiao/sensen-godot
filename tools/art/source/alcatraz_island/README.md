@@ -1,9 +1,9 @@
 # SGODOT-424 · 恶魔岛源文件
 
-当前是 v3 模块接入白模；v2 画面已通过。最新图、预算、验证见 [v3 审阅](../../../../docs/design/alcatraz-blockout-424-2026-11-05/v3/README.md)，坐标／原点／分工／时间见 [HANDOFF.md](HANDOFF.md)。正式交件硬线 **11-09 08:00**。
+当前是 v4 植被点位增补白模；v2 画面已通过。最新图、预算、验证见 [v4 审阅](../../../../docs/design/alcatraz-blockout-424-2026-11-05/v4/README.md)，坐标／原点／分工／时间见 [HANDOFF.md](HANDOFF.md)。正式交件硬线 **11-09 08:00**。
 
 - `build.py`：马可波罗的地形、四段台阶、道路、码头、渡轮、主楼近档，以及导航／layout／分区／LOD 合同。
-- `placeholders.py`：赵云和黄忠负责件的临时占位及摆位方法；每种一个 GLB，重复件放置表单独生成，斜栏杆支持保持立柱竖直的 basis。
+- `placeholders.py`：赵云、黄忠和刘备负责件的临时占位及摆位方法；每种一个 GLB，重复件放置表单独生成，斜栏杆支持保持立柱竖直的 basis。
 - `alcatraz_blockout.blend`：命名可编辑构件与模块实例，四个区块 collection；Alcatraz_Module_Library 场景保留所有近远档原型，包含当前没有实例引用的远档。原点、单位和坐标转换与运行时一致。
 - `prepare.py`：复制最小离线 Godot 项目到 `output/alcatraz-424/project`，仅 Avatar autoload，独立用户目录；回收 Godot 自动生成的 .import／UID。
 - `review.gd`：程序化沿路线行走、每约一屏拍照、检查导航／镜头／LOD、读取实际可见／阴影／UI 渲染计数。
@@ -17,10 +17,11 @@
 ```sh
 flock ~/gs66-render.lock blender --background --factory-startup --threads 3 --python-exit-code 1 --python "$PWD/tools/art/source/alcatraz_island/build.py"
 bash tools/art/source/alcatraz_island/review.sh
+flock ~/gs66-render.lock timeout 220s env ALCATRAZ_SWEEP=1 ALCATRAZ_REVIEW="$PWD/output/alcatraz-424/v4/review" godot --path output/alcatraz-424/project --resolution 360x800 --fixed-fps 60 --disable-vsync --max-fps 60
 python3 tools/art/source/alcatraz_island/package_review.py
 ```
 
-先等 Blender 结束再检查。实渲使用当前合法 DISPLAY／XAUTHORITY；共享锁贯穿每次 Godot／Blender 调用。脚本有超时并主动退出。诊断日志、原始图和过程结果在 `output/alcatraz-424/v3/`。截图工具使用固定模拟帧步和加速走位，不能把截图间隔当作实际游戏 FPS。
+先等 Blender 结束再检查。实渲使用当前合法 DISPLAY／XAUTHORITY；共享锁贯穿每次 Godot／Blender 调用。脚本有超时并主动退出。诊断日志、原始图和过程结果在 `output/alcatraz-424/v4/`。截图命令关闭垂直同步并限60帧，避免虚拟桌面的同步等待长期占锁；截图工具使用固定模拟帧步和加速走位，不能把截图间隔当作实际游戏 FPS。
 
 需要手动点走时，先运行 `prepare.py` 和隔离导入，再在有效桌面中运行：
 

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://ctl3sojkvupbq"
-path="res://.godot/imported/alc_far_city_far.glb-38518bda4cda12957a53f70d6339f47a.scn"
+uid="uid://bjrooh0bqltvl"
+path="res://.godot/imported/alc_grass_tuft.glb-ef5e9e7cc9a66c2ba59b17dc0274bd3e.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/alc_far_city_far.glb"
-dest_files=["res://.godot/imported/alc_far_city_far.glb-38518bda4cda12957a53f70d6339f47a.scn"]
+source_file="res://assets/landmarks/alcatraz_island/alc_grass_tuft.glb"
+dest_files=["res://.godot/imported/alc_grass_tuft.glb-ef5e9e7cc9a66c2ba59b17dc0274bd3e.scn"]
 
 [params]
 

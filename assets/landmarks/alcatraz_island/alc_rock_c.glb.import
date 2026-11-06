@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cjx8vkn6lk76x"
-path="res://.godot/imported/alc_far_hills_far.glb-6dc837c02f9bba0d2f20698e419aaa02.scn"
+uid="uid://dhhlhxoqavc0j"
+path="res://.godot/imported/alc_rock_c.glb-18b7ab83b07306d6111f5113084fc2aa.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/alc_far_hills_far.glb"
-dest_files=["res://.godot/imported/alc_far_hills_far.glb-6dc837c02f9bba0d2f20698e419aaa02.scn"]
+source_file="res://assets/landmarks/alcatraz_island/alc_rock_c.glb"
+dest_files=["res://.godot/imported/alc_rock_c.glb-18b7ab83b07306d6111f5113084fc2aa.scn"]
 
 [params]
 
