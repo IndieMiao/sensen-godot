@@ -1,21 +1,19 @@
 {
   "task": "SGODOT-424",
-  "revision": "v1.1_pictogram",
+  "revision": "roof_v1",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "near_source": {
-    "near_file": "reference/alc_museum_bf0c31b1.glb",
-    "git_ref": "bf0c31b1c871011008b455434d167224d14de59c",
+    "git_ref": "ebce1cec1d508d3b4b2de496a0f9c50b644e88d7",
     "path": "assets/landmarks/alcatraz_island/alc_museum.glb",
-    "revision": "v1.1_pictogram",
-    "colour_status": "Near sign synchronized to bf0c31b1 / Plane4aa1b62e: same teal board, cream lighthouse pictogram, no lettering."
+    "contract": "tools/art/source/museum_far_roof_424/contract.json"
   },
-  "near_sha256": "63e46cbcbe2949df8aba9e371ebb27308bb3315ae962a6e775e52cadcc3fd732",
+  "near_sha256": "ff853c9768ea9a37569f1fe91d9133a8e49396e1e3bd835b9082249431fb1884",
   "file": "alc_museum_far.glb",
-  "sha256": "425290e75f9cc544f6f47ab6f23443227d6c9aee4dc7cad380623dcf1d65a6c8",
-  "near_triangles": 7869,
-  "triangles": 2205,
-  "ratio": 0.28021349599695006,
+  "sha256": "4cc97a8dd19cc26bd8ad2800a9a4ce6cd41c80010d70d274214cfb2de52af4b2",
+  "near_triangles": 8757,
+  "triangles": 2239,
+  "ratio": 0.2556811693502341,
   "surfaces": 1,
   "bounds": [
     [
@@ -25,7 +23,7 @@
     ],
     [
       20.0,
-      9.0,
+      9.180000305175781,
       5.222499847412109
     ]
   ],
@@ -708,10 +706,9 @@
   ],
   "parts": [
     {
-      "name": "Silhouette_exact_000",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_000",
       "far_triangles": 108,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.920000076293945,
@@ -726,10 +723,9 @@
       ]
     },
     {
-      "name": "Silhouette_exact_001",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_001",
       "far_triangles": 108,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -20.0,
@@ -744,262 +740,9 @@
       ]
     },
     {
-      "name": "Silhouette_exact_002",
-      "source_triangles": 108,
-      "far_triangles": 108,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          -20.0,
-          8.379999160766602,
-          -5.0
-        ],
-        [
-          20.0,
-          8.579999923706055,
-          5.0
-        ]
-      ]
-    },
-    {
-      "name": "Part_003",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_016",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          -19.549999237060547,
-          8.569999694824219,
-          -4.550000190734863
-        ],
-        [
-          19.549999237060547,
-          8.630001068115234,
-          4.550000190734863
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_004",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          -20.0,
-          8.640000343322754,
-          -5.0
-        ],
-        [
-          20.0,
-          8.90000057220459,
-          -4.680000305175781
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_005",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          -20.0,
-          8.640000343322754,
-          4.680000305175781
-        ],
-        [
-          20.0,
-          8.90000057220459,
-          5.0
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_006",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          -20.0,
-          8.640000343322754,
-          -4.699999809265137
-        ],
-        [
-          -19.68000030517578,
-          8.90000057220459,
-          4.699999809265137
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_007",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          19.68000030517578,
-          8.640000343322754,
-          -4.699999809265137
-        ],
-        [
-          20.0,
-          8.90000057220459,
-          4.699999809265137
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_008",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          -15.449999809265137,
-          8.620000839233398,
-          -1.4500000476837158
-        ],
-        [
-          -14.550000190734863,
-          9.0,
-          -0.550000011920929
-        ]
-      ]
-    },
-    {
-      "name": "Part_009",
-      "source_triangles": 12,
-      "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          -15.220000267028809,
-          8.760000228881836,
-          -0.546999990940094
-        ],
-        [
-          -14.779999732971191,
-          8.879999160766602,
-          -0.5309999585151672
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_010",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          -7.449999809265137,
-          8.620000839233398,
-          -1.4500000476837158
-        ],
-        [
-          -6.550000190734863,
-          9.0,
-          -0.550000011920929
-        ]
-      ]
-    },
-    {
-      "name": "Part_011",
-      "source_triangles": 12,
-      "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          -7.21999979019165,
-          8.760000228881836,
-          -0.546999990940094
-        ],
-        [
-          -6.78000020980835,
-          8.879999160766602,
-          -0.5309999585151672
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_012",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          6.550000190734863,
-          8.620000839233398,
-          -1.4500000476837158
-        ],
-        [
-          7.449999809265137,
-          9.0,
-          -0.550000011920929
-        ]
-      ]
-    },
-    {
-      "name": "Part_013",
-      "source_triangles": 12,
-      "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          6.78000020980835,
-          8.760000228881836,
-          -0.546999990940094
-        ],
-        [
-          7.21999979019165,
-          8.879999160766602,
-          -0.5309999585151672
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_014",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
-      "source_bounds": [
-        [
-          14.550000190734863,
-          8.620000839233398,
-          -1.4500000476837158
-        ],
-        [
-          15.449999809265137,
-          9.0,
-          -0.550000011920929
-        ]
-      ]
-    },
-    {
-      "name": "Part_015",
-      "source_triangles": 12,
-      "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
-      "source_bounds": [
-        [
-          14.779999732971191,
-          8.760000228881836,
-          -0.546999990940094
-        ],
-        [
-          15.220000267028809,
-          8.879999160766602,
-          -0.5309999585151672
-        ]
-      ]
-    },
-    {
-      "name": "Simplified_bevel_part_016",
-      "source_triangles": 108,
-      "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -20.0,
@@ -1014,10 +757,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_017",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_017",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -20.0,
@@ -1032,10 +774,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_018",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_018",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -20.0,
@@ -1050,10 +791,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_019",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_019",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.759998321533203,
@@ -1068,10 +808,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_020",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_020",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -10.40999984741211,
@@ -1086,10 +825,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_021",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_021",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           9.989999771118164,
@@ -1104,10 +842,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_022",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_022",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.34000015258789,
@@ -1122,10 +859,9 @@
       ]
     },
     {
-      "name": "Part_023",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_023",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -18.774999618530273,
@@ -1140,10 +876,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_01_x-18_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_024",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -18.625,
@@ -1158,10 +893,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_025",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_025",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -18.829999923706055,
@@ -1176,10 +910,9 @@
       ]
     },
     {
-      "name": "Part_026",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_026",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -18.479999542236328,
@@ -1194,10 +927,9 @@
       ]
     },
     {
-      "name": "Part_027",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_027",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -18.774999618530273,
@@ -1212,10 +944,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_02_x-18_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_028",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -18.625,
@@ -1230,10 +961,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_029",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_029",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -18.829999923706055,
@@ -1248,10 +978,9 @@
       ]
     },
     {
-      "name": "Part_030",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_030",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -18.479999542236328,
@@ -1266,10 +995,9 @@
       ]
     },
     {
-      "name": "Part_031",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_031",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -15.774999618530273,
@@ -1284,10 +1012,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_03_x-15_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_032",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -15.625,
@@ -1302,10 +1029,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_033",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_033",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -15.829999923706055,
@@ -1320,10 +1046,9 @@
       ]
     },
     {
-      "name": "Part_034",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_034",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -15.479999542236328,
@@ -1338,10 +1063,9 @@
       ]
     },
     {
-      "name": "Part_035",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_035",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -15.774999618530273,
@@ -1356,10 +1080,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_04_x-15_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_036",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -15.625,
@@ -1374,10 +1097,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_037",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_037",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -15.829999923706055,
@@ -1392,10 +1114,9 @@
       ]
     },
     {
-      "name": "Part_038",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_038",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -15.479999542236328,
@@ -1410,10 +1131,9 @@
       ]
     },
     {
-      "name": "Part_039",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_039",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -12.774999618530273,
@@ -1428,10 +1148,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_05_x-12_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_040",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -12.625,
@@ -1446,10 +1165,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_041",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_041",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -12.829999923706055,
@@ -1464,10 +1182,9 @@
       ]
     },
     {
-      "name": "Part_042",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_042",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -12.479999542236328,
@@ -1482,10 +1199,9 @@
       ]
     },
     {
-      "name": "Part_043",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_043",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -12.774999618530273,
@@ -1500,10 +1216,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_06_x-12_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_044",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -12.625,
@@ -1518,10 +1233,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_045",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_045",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -12.829999923706055,
@@ -1536,10 +1250,9 @@
       ]
     },
     {
-      "name": "Part_046",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_046",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -12.479999542236328,
@@ -1554,10 +1267,9 @@
       ]
     },
     {
-      "name": "Part_047",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_047",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -9.774999618530273,
@@ -1572,10 +1284,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_07_x-9_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_048",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -9.625,
@@ -1590,10 +1301,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_049",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_049",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -9.829999923706055,
@@ -1608,10 +1318,9 @@
       ]
     },
     {
-      "name": "Part_050",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_050",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -9.479999542236328,
@@ -1626,10 +1335,9 @@
       ]
     },
     {
-      "name": "Part_051",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_051",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -9.774999618530273,
@@ -1644,10 +1352,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_08_x-9_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_052",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -9.625,
@@ -1662,10 +1369,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_053",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_053",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -9.829999923706055,
@@ -1680,10 +1386,9 @@
       ]
     },
     {
-      "name": "Part_054",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_054",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -9.479999542236328,
@@ -1698,10 +1403,9 @@
       ]
     },
     {
-      "name": "Part_055",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_055",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -6.775000095367432,
@@ -1716,10 +1420,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_09_x-6_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_056",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -6.625,
@@ -1734,10 +1437,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_057",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_057",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -6.829999923706055,
@@ -1752,10 +1454,9 @@
       ]
     },
     {
-      "name": "Part_058",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_058",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -6.480000019073486,
@@ -1770,10 +1471,9 @@
       ]
     },
     {
-      "name": "Part_059",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_059",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -6.775000095367432,
@@ -1788,10 +1488,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_10_x-6_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_060",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -6.625,
@@ -1806,10 +1505,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_061",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_061",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -6.829999923706055,
@@ -1824,10 +1522,9 @@
       ]
     },
     {
-      "name": "Part_062",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_062",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -6.480000019073486,
@@ -1842,10 +1539,9 @@
       ]
     },
     {
-      "name": "Part_063",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_063",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -3.7750000953674316,
@@ -1860,10 +1556,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_11_x-3_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_064",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -3.625,
@@ -1878,10 +1573,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_065",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_065",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -3.8299999237060547,
@@ -1896,10 +1590,9 @@
       ]
     },
     {
-      "name": "Part_066",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_066",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -3.4800000190734863,
@@ -1914,10 +1607,9 @@
       ]
     },
     {
-      "name": "Part_067",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_067",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -3.7750000953674316,
@@ -1932,10 +1624,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_12_x-3_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_068",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -3.625,
@@ -1950,10 +1641,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_069",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_069",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -3.8299999237060547,
@@ -1968,10 +1658,9 @@
       ]
     },
     {
-      "name": "Part_070",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_070",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -3.4800000190734863,
@@ -1986,10 +1675,9 @@
       ]
     },
     {
-      "name": "Part_071",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_071",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.7749999761581421,
@@ -2004,10 +1692,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_13_x0_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_072",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.625,
@@ -2022,10 +1709,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_073",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_073",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.8299999833106995,
@@ -2040,10 +1726,9 @@
       ]
     },
     {
-      "name": "Part_074",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_074",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.47999998927116394,
@@ -2058,10 +1743,9 @@
       ]
     },
     {
-      "name": "Part_075",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_075",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           2.2249999046325684,
@@ -2076,10 +1760,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_14_x3_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_076",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           2.375,
@@ -2094,10 +1777,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_077",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_077",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           2.1700000762939453,
@@ -2112,10 +1794,9 @@
       ]
     },
     {
-      "name": "Part_078",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_078",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           2.5199999809265137,
@@ -2130,10 +1811,9 @@
       ]
     },
     {
-      "name": "Part_079",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_079",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           2.2249999046325684,
@@ -2148,10 +1828,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_15_x3_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_080",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           2.375,
@@ -2166,10 +1845,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_081",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_081",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           2.1700000762939453,
@@ -2184,10 +1862,9 @@
       ]
     },
     {
-      "name": "Part_082",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_082",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           2.5199999809265137,
@@ -2202,10 +1879,9 @@
       ]
     },
     {
-      "name": "Part_083",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_083",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           5.224999904632568,
@@ -2220,10 +1896,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_16_x6_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_084",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           5.375,
@@ -2238,10 +1913,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_085",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_085",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           5.170000076293945,
@@ -2256,10 +1930,9 @@
       ]
     },
     {
-      "name": "Part_086",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_086",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           5.519999980926514,
@@ -2274,10 +1947,9 @@
       ]
     },
     {
-      "name": "Part_087",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_087",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           5.224999904632568,
@@ -2292,10 +1964,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_17_x6_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_088",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           5.375,
@@ -2310,10 +1981,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_089",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_089",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           5.170000076293945,
@@ -2328,10 +1998,9 @@
       ]
     },
     {
-      "name": "Part_090",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_090",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           5.519999980926514,
@@ -2346,10 +2015,9 @@
       ]
     },
     {
-      "name": "Part_091",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_091",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           8.225000381469727,
@@ -2364,10 +2032,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_18_x9_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_092",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           8.375,
@@ -2382,10 +2049,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_093",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_093",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           8.170000076293945,
@@ -2400,10 +2066,9 @@
       ]
     },
     {
-      "name": "Part_094",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_094",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           8.520000457763672,
@@ -2418,10 +2083,9 @@
       ]
     },
     {
-      "name": "Part_095",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_095",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           8.225000381469727,
@@ -2436,10 +2100,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_19_x9_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_096",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           8.375,
@@ -2454,10 +2117,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_097",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_097",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           8.170000076293945,
@@ -2472,10 +2134,9 @@
       ]
     },
     {
-      "name": "Part_098",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_098",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           8.520000457763672,
@@ -2490,10 +2151,9 @@
       ]
     },
     {
-      "name": "Part_099",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_099",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           11.225000381469727,
@@ -2508,10 +2168,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_20_x12_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_100",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           11.375,
@@ -2526,10 +2185,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_101",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_101",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           11.170000076293945,
@@ -2544,10 +2202,9 @@
       ]
     },
     {
-      "name": "Part_102",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_102",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           11.520000457763672,
@@ -2562,10 +2219,9 @@
       ]
     },
     {
-      "name": "Part_103",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_103",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           11.225000381469727,
@@ -2580,10 +2236,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_21_x12_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_104",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           11.375,
@@ -2598,10 +2253,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_105",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_105",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           11.170000076293945,
@@ -2616,10 +2270,9 @@
       ]
     },
     {
-      "name": "Part_106",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_106",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           11.520000457763672,
@@ -2634,10 +2287,9 @@
       ]
     },
     {
-      "name": "Part_107",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_107",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           14.225000381469727,
@@ -2652,10 +2304,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_22_x15_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_108",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           14.375,
@@ -2670,10 +2321,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_109",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_109",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           14.170000076293945,
@@ -2688,10 +2338,9 @@
       ]
     },
     {
-      "name": "Part_110",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_110",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           14.520000457763672,
@@ -2706,10 +2355,9 @@
       ]
     },
     {
-      "name": "Part_111",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_111",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           14.225000381469727,
@@ -2724,10 +2372,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_23_x15_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_112",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           14.375,
@@ -2742,10 +2389,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_113",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_113",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           14.170000076293945,
@@ -2760,10 +2406,9 @@
       ]
     },
     {
-      "name": "Part_114",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_114",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           14.520000457763672,
@@ -2778,10 +2423,9 @@
       ]
     },
     {
-      "name": "Part_115",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_115",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           17.225000381469727,
@@ -2796,10 +2440,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_24_x18_y2.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_116",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           17.375,
@@ -2814,10 +2457,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_117",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_117",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           17.170000076293945,
@@ -2832,10 +2474,9 @@
       ]
     },
     {
-      "name": "Part_118",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_118",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           17.520000457763672,
@@ -2850,10 +2491,9 @@
       ]
     },
     {
-      "name": "Part_119",
-      "source_triangles": 26,
+      "name": "Preserved_nonroof_119",
       "far_triangles": 26,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           17.225000381469727,
@@ -2868,10 +2508,9 @@
       ]
     },
     {
-      "name": "Arch_glazing_25_x18_y6.35",
-      "source_triangles": 11,
+      "name": "Preserved_nonroof_120",
       "far_triangles": 11,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           17.375,
@@ -2886,10 +2525,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_121",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_121",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           17.170000076293945,
@@ -2904,10 +2542,9 @@
       ]
     },
     {
-      "name": "Part_122",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_122",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           17.520000457763672,
@@ -2922,10 +2559,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_123",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_123",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -2.075000047683716,
@@ -2940,10 +2576,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_124",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_124",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           1.524999976158142,
@@ -2958,10 +2593,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_125",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_125",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -2.2249999046325684,
@@ -2976,10 +2610,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_126",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_126",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -1.3250000476837158,
@@ -2994,10 +2627,9 @@
       ]
     },
     {
-      "name": "Part_127",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_127",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.02250000089406967,
@@ -3012,10 +2644,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_128",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_128",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.17749999463558197,
@@ -3030,10 +2661,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_129",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_129",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           0.14249999821186066,
@@ -3048,10 +2678,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_130",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_130",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -2.2249999046325684,
@@ -3066,10 +2695,9 @@
       ]
     },
     {
-      "name": "Part_131",
-      "source_triangles": 2,
+      "name": "Preserved_nonroof_131",
       "far_triangles": 2,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.12999999523162842,
@@ -3084,10 +2712,9 @@
       ]
     },
     {
-      "name": "Part_132",
-      "source_triangles": 2,
+      "name": "Preserved_nonroof_132",
       "far_triangles": 2,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.11999999731779099,
@@ -3102,10 +2729,9 @@
       ]
     },
     {
-      "name": "Part_133",
-      "source_triangles": 1,
+      "name": "Preserved_nonroof_133",
       "far_triangles": 1,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.17000000178813934,
@@ -3120,10 +2746,9 @@
       ]
     },
     {
-      "name": "Part_134",
-      "source_triangles": 2,
+      "name": "Preserved_nonroof_134",
       "far_triangles": 2,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -0.36000001430511475,
@@ -3138,10 +2763,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_135",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_135",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.94999885559082,
@@ -3156,10 +2780,9 @@
       ]
     },
     {
-      "name": "Part_136",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_136",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.973501205444336,
@@ -3174,10 +2797,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_137",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_137",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.94999885559082,
@@ -3192,10 +2814,9 @@
       ]
     },
     {
-      "name": "Part_138",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_138",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.973501205444336,
@@ -3210,10 +2831,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_139",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_139",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.94999885559082,
@@ -3228,10 +2848,9 @@
       ]
     },
     {
-      "name": "Part_140",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_140",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.973501205444336,
@@ -3246,10 +2865,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_141",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_141",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.94999885559082,
@@ -3264,10 +2882,9 @@
       ]
     },
     {
-      "name": "Part_142",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_142",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.973501205444336,
@@ -3282,10 +2899,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_143",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_143",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.94999885559082,
@@ -3300,10 +2916,9 @@
       ]
     },
     {
-      "name": "Part_144",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_144",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.973501205444336,
@@ -3318,10 +2933,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_145",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_145",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.94999885559082,
@@ -3336,10 +2950,9 @@
       ]
     },
     {
-      "name": "Part_146",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_146",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           -19.973501205444336,
@@ -3354,10 +2967,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_147",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_147",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.850000381469727,
@@ -3372,10 +2984,9 @@
       ]
     },
     {
-      "name": "Part_148",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_148",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.94849967956543,
@@ -3390,10 +3001,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_149",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_149",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.850000381469727,
@@ -3408,10 +3018,9 @@
       ]
     },
     {
-      "name": "Part_150",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_150",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.94849967956543,
@@ -3426,10 +3035,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_151",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_151",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.850000381469727,
@@ -3444,10 +3052,9 @@
       ]
     },
     {
-      "name": "Part_152",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_152",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.94849967956543,
@@ -3462,10 +3069,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_153",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_153",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.850000381469727,
@@ -3480,10 +3086,9 @@
       ]
     },
     {
-      "name": "Part_154",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_154",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.94849967956543,
@@ -3498,10 +3103,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_155",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_155",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.850000381469727,
@@ -3516,10 +3120,9 @@
       ]
     },
     {
-      "name": "Part_156",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_156",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.94849967956543,
@@ -3534,10 +3137,9 @@
       ]
     },
     {
-      "name": "Simplified_bevel_part_157",
-      "source_triangles": 108,
+      "name": "Preserved_nonroof_157",
       "far_triangles": 12,
-      "method": "replace subpixel small-box bevels with same-envelope closed cuboid",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.850000381469727,
@@ -3552,10 +3154,9 @@
       ]
     },
     {
-      "name": "Part_158",
-      "source_triangles": 12,
+      "name": "Preserved_nonroof_158",
       "far_triangles": 12,
-      "method": "retain exact source vertices/normals/colours",
+      "method": "exact previous far non-roof triangles",
       "source_bounds": [
         [
           19.94849967956543,
@@ -3566,6 +3167,533 @@
           19.973501205444336,
           7.210000038146973,
           3.700000047683716
+        ]
+      ]
+    },
+    {
+      "name": "Roof_slab_exact_near",
+      "far_triangles": 108,
+      "method": "exact near roof slab silhouette/colour",
+      "source_bounds": [
+        [
+          -20.0,
+          8.379999160766602,
+          -5.0
+        ],
+        [
+          20.0,
+          8.579999923706055,
+          5.0
+        ]
+      ]
+    },
+    {
+      "name": "Roof_recessed_slate",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -19.55,
+          8.57,
+          -4.55
+        ],
+        [
+          19.55,
+          8.629999999999999,
+          4.55
+        ]
+      ]
+    },
+    {
+      "name": "Cream_parapet_long_-4.84",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -20.0,
+          8.639999999999999,
+          -5.0
+        ],
+        [
+          20.0,
+          8.9,
+          -4.68
+        ]
+      ]
+    },
+    {
+      "name": "Cream_coping_long_-4.84",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -20.0,
+          8.9,
+          -5.0
+        ],
+        [
+          20.0,
+          8.959999999999999,
+          -4.68
+        ]
+      ]
+    },
+    {
+      "name": "Cream_parapet_long_4.84",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -20.0,
+          8.639999999999999,
+          4.68
+        ],
+        [
+          20.0,
+          8.9,
+          5.0
+        ]
+      ]
+    },
+    {
+      "name": "Cream_coping_long_4.84",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -20.0,
+          8.9,
+          4.68
+        ],
+        [
+          20.0,
+          8.959999999999999,
+          5.0
+        ]
+      ]
+    },
+    {
+      "name": "Cream_parapet_end_-19.84",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -20.0,
+          8.639999999999999,
+          -4.7
+        ],
+        [
+          -19.68,
+          8.9,
+          4.7
+        ]
+      ]
+    },
+    {
+      "name": "Cream_coping_end_-19.84",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -20.0,
+          8.9,
+          -4.68
+        ],
+        [
+          -19.68,
+          8.959999999999999,
+          4.68
+        ]
+      ]
+    },
+    {
+      "name": "Cream_parapet_end_19.84",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          19.68,
+          8.639999999999999,
+          -4.7
+        ],
+        [
+          20.0,
+          8.9,
+          4.7
+        ]
+      ]
+    },
+    {
+      "name": "Cream_coping_end_19.84",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          19.68,
+          8.9,
+          -4.68
+        ],
+        [
+          20.0,
+          8.959999999999999,
+          4.68
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_1_cream_base",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -13.9,
+          8.704,
+          -0.4
+        ],
+        [
+          -10.1,
+          8.704,
+          1.6
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_1_front_blue",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -13.817661919854887,
+          8.708,
+          0.33837076847111996
+        ],
+        [
+          -10.253221996183566,
+          8.708,
+          1.457541465165291
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_1_back_blue",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -13.817661919854887,
+          8.708,
+          -0.282458534834709
+        ],
+        [
+          -10.253221996183566,
+          8.708,
+          0.33837076847111996
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_1_cream_divider",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -13.876587921127031,
+          8.712,
+          0.31502361341602236
+        ],
+        [
+          -10.25658792112703,
+          8.712,
+          0.3700236134160223
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_1_sky_glint",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -13.405477589459561,
+          8.714,
+          0.5354840783632937
+        ],
+        [
+          -11.913258329123181,
+          8.714,
+          1.2687338451629218
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_2_cream_base",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -1.9,
+          8.704,
+          -0.4
+        ],
+        [
+          1.9,
+          8.704,
+          1.6
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_2_front_blue",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -1.817661919854887,
+          8.708,
+          0.33837076847111996
+        ],
+        [
+          1.7467780038164338,
+          8.708,
+          1.457541465165291
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_2_back_blue",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -1.817661919854887,
+          8.708,
+          -0.282458534834709
+        ],
+        [
+          1.7467780038164338,
+          8.708,
+          0.33837076847111996
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_2_cream_divider",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -1.8765879211270318,
+          8.712,
+          0.31502361341602236
+        ],
+        [
+          1.7434120788729683,
+          8.712,
+          0.3700236134160223
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_2_sky_glint",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -1.4054775894595626,
+          8.714,
+          0.5354840783632937
+        ],
+        [
+          0.08674167087681986,
+          8.714,
+          1.2687338451629218
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_3_cream_base",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          10.1,
+          8.704,
+          -0.4
+        ],
+        [
+          13.9,
+          8.704,
+          1.6
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_3_front_blue",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          10.182338080145113,
+          8.708,
+          0.33837076847111996
+        ],
+        [
+          13.746778003816434,
+          8.708,
+          1.457541465165291
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_3_back_blue",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          10.182338080145113,
+          8.708,
+          -0.282458534834709
+        ],
+        [
+          13.746778003816434,
+          8.708,
+          0.33837076847111996
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_3_cream_divider",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          10.123412078872969,
+          8.712,
+          0.31502361341602236
+        ],
+        [
+          13.74341207887297,
+          8.712,
+          0.3700236134160223
+        ]
+      ]
+    },
+    {
+      "name": "Skylight_3_sky_glint",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          10.594522410540439,
+          8.714,
+          0.5354840783632937
+        ],
+        [
+          12.086741670876819,
+          8.714,
+          1.2687338451629218
+        ]
+      ]
+    },
+    {
+      "name": "Vent_1_body",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -16.78,
+          8.64,
+          -2.98
+        ],
+        [
+          -15.82,
+          9.09,
+          -2.02
+        ]
+      ]
+    },
+    {
+      "name": "Vent_1_cap",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          -16.915,
+          9.09,
+          -3.115
+        ],
+        [
+          -15.685,
+          9.18,
+          -1.885
+        ]
+      ]
+    },
+    {
+      "name": "Vent_1_dark_slot",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          -16.585,
+          8.838750000000001,
+          -2.0020000000000002
+        ],
+        [
+          -16.015,
+          8.98125,
+          -2.0020000000000002
+        ]
+      ]
+    },
+    {
+      "name": "Vent_2_body",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          15.82,
+          8.64,
+          -2.98
+        ],
+        [
+          16.78,
+          9.09,
+          -2.02
+        ]
+      ]
+    },
+    {
+      "name": "Vent_2_cap",
+      "far_triangles": 12,
+      "method": "roof cuboid from near contract",
+      "source_bounds": [
+        [
+          15.685,
+          9.09,
+          -3.115
+        ],
+        [
+          16.915,
+          9.18,
+          -1.885
+        ]
+      ]
+    },
+    {
+      "name": "Vent_2_dark_slot",
+      "far_triangles": 2,
+      "method": "flat roof colour patch",
+      "source_bounds": [
+        [
+          16.015,
+          8.838750000000001,
+          -2.0020000000000002
+        ],
+        [
+          16.585,
+          8.98125,
+          -2.0020000000000002
         ]
       ]
     }
@@ -3589,5 +3717,150 @@
     "switch_distance_m": 55,
     "margin_m": 0
   },
-  "colour_status": "Near sign synchronized to bf0c31b1 / Plane4aa1b62e: same teal board, cream lighthouse pictogram, no lettering."
+  "colour_status": "Roof/vents match ebce1cec; skylights are flat patches with near pane lighting normals",
+  "roof_contract": {
+    "scope": "Near museum roof decoration only; far LOD assigned to Huang Zhong after handoff",
+    "baseline": "02d5534768fc1a5557feaecb705b8f445562fd6b",
+    "asset": "alc_museum.glb",
+    "stats": {
+      "triangles": 8757,
+      "bytes": 720712,
+      "sha256": "ff853c9768ea9a37569f1fe91d9133a8e49396e1e3bd835b9082249431fb1884"
+    },
+    "units": "metres, Godot Y-up, local ground centre; front +Z",
+    "placement": [
+      0,
+      10,
+      -13
+    ],
+    "envelope": [
+      40,
+      9.18,
+      10
+    ],
+    "building_envelope_without_vents": [
+      40,
+      9,
+      10
+    ],
+    "vent_revision_baseline": "4a47e6223903e4adb504dfd738bbb0ab2cb63a27",
+    "colors_srgb": {
+      "museum_roof_slate": "748B9C",
+      "museum_roof_cream": "F0E1C2",
+      "museum_skylight_blue": "A9D5DF",
+      "museum_skylight_shade": "7FAEBE",
+      "museum_skylight_glint": "D7EDF0",
+      "museum_vent_body": "5E7383",
+      "museum_vent_shadow": "3F5362"
+    },
+    "skylights": [
+      {
+        "centre_xz": [
+          -12,
+          0.6
+        ],
+        "curb_size_xz": [
+          3.8,
+          2.0
+        ],
+        "base_y": 8.62,
+        "top_y": 9.0
+      },
+      {
+        "centre_xz": [
+          0,
+          0.6
+        ],
+        "curb_size_xz": [
+          3.8,
+          2.0
+        ],
+        "base_y": 8.62,
+        "top_y": 9.0
+      },
+      {
+        "centre_xz": [
+          12,
+          0.6
+        ],
+        "curb_size_xz": [
+          3.8,
+          2.0
+        ],
+        "base_y": 8.62,
+        "top_y": 9.0
+      }
+    ],
+    "vents": [
+      {
+        "centre_xz": [
+          -16.3,
+          -2.5
+        ],
+        "scale_from_v1": 1.5,
+        "body_size_xyz": [
+          0.96,
+          0.45,
+          0.96
+        ],
+        "body_center_y": 8.865,
+        "cap_size_xyz": [
+          1.23,
+          0.09,
+          1.23
+        ],
+        "cap_center_y": 9.135,
+        "inset_size_xyz": [
+          0.57,
+          0.1425,
+          0.018
+        ],
+        "inset_center_y": 8.91,
+        "inset_offset_z": 0.489,
+        "body_bevel_m": 0.03,
+        "cap_bevel_m": 0.018,
+        "base_y": 8.64,
+        "top_y": 9.18
+      },
+      {
+        "centre_xz": [
+          16.3,
+          -2.5
+        ],
+        "scale_from_v1": 1.5,
+        "body_size_xyz": [
+          0.96,
+          0.45,
+          0.96
+        ],
+        "body_center_y": 8.865,
+        "cap_size_xyz": [
+          1.23,
+          0.09,
+          1.23
+        ],
+        "cap_center_y": 9.135,
+        "inset_size_xyz": [
+          0.57,
+          0.1425,
+          0.018
+        ],
+        "inset_center_y": 8.91,
+        "inset_offset_z": 0.489,
+        "body_bevel_m": 0.03,
+        "cap_bevel_m": 0.018,
+        "base_y": 8.64,
+        "top_y": 9.18
+      }
+    ],
+    "coping": {
+      "top_y": 8.96,
+      "height": 0.06,
+      "width": 0.32
+    },
+    "material": "One opaque matte vertex-colour surface; no textures or transparency"
+  },
+  "preserved_nonroof_triangles": 1941,
+  "replaced_old_roof_triangles": 264,
+  "source": "tools/art/source/museum_far_roof_424/alc_museum_far.blend"
 }

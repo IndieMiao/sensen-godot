@@ -1,0 +1,82 @@
+[
+  {
+    "name": "SGODOT-424-roof-v1.1-01-opening.png",
+    "id": "41ed1ab2-8c42-48fa-815a-fe249b5adfba",
+    "sha256": "e330f52c9affc9f3b566e44ea4b40eccace1f0671cae79d966eba44a88f9ebbf",
+    "bytes": 134775,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-02-mid-hill.png",
+    "id": "6bdc2792-7eb3-44cf-b210-26b5cc201a7c",
+    "sha256": "a7a14d5d39ec9fc89a7a76de933cb4521ec9be11ae7e10c9b6a2df3bd38ca859",
+    "bytes": 272474,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-03-visitor-center.png",
+    "id": "72101234-0a25-427b-8907-31116e736aaf",
+    "sha256": "a3aa319ee50631468bcad11bbee5fc7576048349ef98eb33c9ff79315eaad113",
+    "bytes": 243550,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-04-summit-wide-after.png",
+    "id": "6e28df53-66ba-4e9f-bdf5-2a8057e19988",
+    "sha256": "5f67cd60f574e008d6cb8aec6a572881aeff68a7b68f3bc4c833bc78b06e5fa4",
+    "bytes": 248751,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-06-museum-after.png",
+    "id": "05367258-1a76-475f-ac8a-d376021c12ab",
+    "sha256": "43c3d855b2b7b72d9271f12a14ea9a74a4e13e447af4b4d3ea74d02b054edcc2",
+    "bytes": 225533,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-07-vent-after.png",
+    "id": "1b7d2f8c-55b0-4fc4-85fe-29d655f75055",
+    "sha256": "75eeb7345021f965c23862dedaeb8d47c67d024ba11099f30d7281aeab16f0f5",
+    "bytes": 112226,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-07-vent-before.png",
+    "id": "7d05f525-c722-4bbb-96be-f22ecf289b65",
+    "sha256": "30ba014110780df5f2594dbd9286575d4e55e4931e3d87e869c53ad0b48cefa8",
+    "bytes": 105573,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-08-museum-comparison.png",
+    "id": "9ce39925-af9f-4ed6-bc5c-2d4cf9744ded",
+    "sha256": "1132063e2d59f322d4c1cf9d7af657b13560c6bef68265a159fa88e0cfbc0d8f",
+    "bytes": 180161,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-09-farm-camera-comparison.png",
+    "id": "833254c3-edf9-4fe7-94d5-4922618b79eb",
+    "sha256": "42f2adf65ea4b88fe3e7cac5359ccfa747ba8bcd71ced4d9c5a97f868e0ef91d",
+    "bytes": 271298,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-roof-v1.1-10-vent-comparison.png",
+    "id": "249d5cf2-cca3-4a86-b651-2cd4ec8c893a",
+    "sha256": "00f7b288ee983866058fe4882d715c7c55ead34ea8022367dbe06684f6fda74e",
+    "bytes": 172125,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  }
+]

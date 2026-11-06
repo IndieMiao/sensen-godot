@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "baseline": "4a47e6223903e4adb504dfd738bbb0ab2cb63a27",
+  "unchanged_nonvent_objects_and_instances": 1638,
+  "comparison": "Named objects, vertices, faces, UVs, materials, bevels, transforms, collection membership and assembly instances",
+  "previous_vent_parts": [
+    "roof_vent_1_body",
+    "roof_vent_1_cap",
+    "roof_vent_1_inset",
+    "roof_vent_2_body",
+    "roof_vent_2_cap",
+    "roof_vent_2_inset"
+  ],
+  "current_vent_parts": [
+    "roof_vent_1_body",
+    "roof_vent_1_cap",
+    "roof_vent_1_inset",
+    "roof_vent_2_body",
+    "roof_vent_2_cap",
+    "roof_vent_2_inset"
+  ],
+  "skylights": 3,
+  "vents": 2,
+  "blank_sign_and_four_pictogram_parts_preserved": true,
+  "blender": "5.2.2 LTS"
+}

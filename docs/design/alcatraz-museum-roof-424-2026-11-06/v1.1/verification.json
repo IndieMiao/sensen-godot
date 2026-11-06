@@ -1,0 +1,855 @@
+{
+	"01-opening_draw_budget": {
+		"evidence": 45,
+		"passed": true
+	},
+	"01-opening_hud_tall_clearance": {
+		"evidence": [],
+		"passed": true
+	},
+	"01-opening_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"01-opening_presentation_draw_budget": {
+		"evidence": 46,
+		"passed": true
+	},
+	"01-opening_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"01-opening_triangle_budget": {
+		"evidence": 34426,
+		"passed": true
+	},
+	"02-mid-hill_draw_budget": {
+		"evidence": 52,
+		"passed": true
+	},
+	"02-mid-hill_hud_tall_clearance": {
+		"evidence": [],
+		"passed": true
+	},
+	"02-mid-hill_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"02-mid-hill_presentation_draw_budget": {
+		"evidence": 53,
+		"passed": true
+	},
+	"02-mid-hill_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"02-mid-hill_triangle_budget": {
+		"evidence": 56743,
+		"passed": true
+	},
+	"03-visitor-center_draw_budget": {
+		"evidence": 39,
+		"passed": true
+	},
+	"03-visitor-center_hud_tall_clearance": {
+		"evidence": [],
+		"passed": true
+	},
+	"03-visitor-center_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"03-visitor-center_presentation_draw_budget": {
+		"evidence": 40,
+		"passed": true
+	},
+	"03-visitor-center_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"03-visitor-center_triangle_budget": {
+		"evidence": 53273,
+		"passed": true
+	},
+	"04-summit-wide-after_draw_budget": {
+		"evidence": 52,
+		"passed": true
+	},
+	"04-summit-wide-after_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"04-summit-wide-after_presentation_draw_budget": {
+		"evidence": 53,
+		"passed": true
+	},
+	"04-summit-wide-after_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"04-summit-wide-after_triangle_budget": {
+		"evidence": 48419,
+		"passed": true
+	},
+	"04-summit-wide-before_draw_budget": {
+		"evidence": 52,
+		"passed": true
+	},
+	"04-summit-wide-before_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"04-summit-wide-before_presentation_draw_budget": {
+		"evidence": 53,
+		"passed": true
+	},
+	"04-summit-wide-before_size": {
+		"evidence": "(360, 800)",
+		"passed": true
+	},
+	"04-summit-wide-before_triangle_budget": {
+		"evidence": 48419,
+		"passed": true
+	},
+	"05-whole-island-current-lods_no_background": {
+		"evidence": 0,
+		"passed": true
+	},
+	"05-whole-island-current-lods_size": {
+		"evidence": "(1000, 900)",
+		"passed": true
+	},
+	"bridge_visible_upper_left_pixels": {
+		"evidence": 768,
+		"passed": true
+	},
+	"enlarged_vents_top_9_18m": {
+		"evidence": 9.18000030517578,
+		"passed": true
+	},
+	"failures": [],
+	"museum_footprint_and_origin_unchanged": {
+		"evidence": {
+			"after": "[P: (-20.0, 0.0, -5.0), S: (40.0, 9.18, 10.2225)]",
+			"before": "[P: (-20.0, 0.0, -5.0), S: (40.0, 9.0, 10.2225)]"
+		},
+		"passed": true
+	},
+	"museum_lod_54m_only_expected_mesh": {
+		"evidence": {
+			"expected_triangles": 8757,
+			"visible_triangles": 8757
+		},
+		"passed": true
+	},
+	"museum_lod_56m_only_expected_mesh": {
+		"evidence": {
+			"expected_triangles": 2205,
+			"visible_triangles": 2205
+		},
+		"passed": true
+	},
+	"museum_pictogram_lod_ready": {
+		"evidence": null,
+		"passed": true
+	},
+	"navigation_ready": {
+		"evidence": null,
+		"passed": true
+	},
+	"near_triangles": 8757,
+	"one_opaque_surface": {
+		"evidence": null,
+		"passed": true
+	},
+	"placement_unchanged": {
+		"evidence": "(0.0, 10.0, -13.0)",
+		"passed": true
+	},
+	"renderer_mobile": {
+		"evidence": "NVIDIA GeForce RTX 2060",
+		"passed": true
+	},
+	"scope": "Near roof only; actual far LOD retains v9 pending Huang Zhong. Desktop Vulkan Mobile, not physical-phone FPS.",
+	"status": "pass",
+	"view_metrics": {
+		"01-opening": {
+			"canvas_draw_calls": 11,
+			"capture_ms": 199,
+			"global_draw_calls": 46,
+			"player_position": [
+				-22.0,
+				1.0,
+				19.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				},
+				{
+					"canvas_draw_calls": 11,
+					"global_draw_calls": 46,
+					"shadow_draw_calls": 8,
+					"total_draw_calls": 45,
+					"visible_draw_calls": 26,
+					"visible_triangles": 34426
+				}
+			],
+			"shadow_draw_calls": 8,
+			"total_draw_calls": 45,
+			"visible_draw_calls": 26,
+			"visible_triangles": 34426,
+			"zoom": 1.0
+		},
+		"02-mid-hill": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 167,
+			"global_draw_calls": 53,
+			"player_position": [
+				8.0,
+				5.5,
+				3.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 12,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 33,
+					"visible_triangles": 56743
+				}
+			],
+			"shadow_draw_calls": 12,
+			"total_draw_calls": 52,
+			"visible_draw_calls": 33,
+			"visible_triangles": 56743,
+			"zoom": 1.0
+		},
+		"03-visitor-center": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 167,
+			"global_draw_calls": 40,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 40,
+					"shadow_draw_calls": 7,
+					"total_draw_calls": 39,
+					"visible_draw_calls": 25,
+					"visible_triangles": 53273
+				}
+			],
+			"shadow_draw_calls": 7,
+			"total_draw_calls": 39,
+			"visible_draw_calls": 25,
+			"visible_triangles": 53273,
+			"zoom": 1.0
+		},
+		"04-summit-wide-after": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 168,
+			"global_draw_calls": 53,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				}
+			],
+			"shadow_draw_calls": 15,
+			"total_draw_calls": 52,
+			"visible_draw_calls": 30,
+			"visible_triangles": 48419,
+			"zoom": 0.333333333333333
+		},
+		"04-summit-wide-before": {
+			"canvas_draw_calls": 7,
+			"capture_ms": 169,
+			"global_draw_calls": 53,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				},
+				{
+					"canvas_draw_calls": 7,
+					"global_draw_calls": 53,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 52,
+					"visible_draw_calls": 30,
+					"visible_triangles": 48419
+				}
+			],
+			"shadow_draw_calls": 15,
+			"total_draw_calls": 52,
+			"visible_draw_calls": 30,
+			"visible_triangles": 48419,
+			"zoom": 0.333333333333333
+		},
+		"05-whole-island-current-lods": {
+			"canvas_draw_calls": 0,
+			"capture_ms": 184,
+			"global_draw_calls": 78,
+			"player_position": [
+				0.0,
+				10.0,
+				-6.0
+			],
+			"samples": [
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				},
+				{
+					"canvas_draw_calls": 0,
+					"global_draw_calls": 78,
+					"shadow_draw_calls": 15,
+					"total_draw_calls": 77,
+					"visible_draw_calls": 62,
+					"visible_triangles": 89715
+				}
+			],
+			"shadow_draw_calls": 15,
+			"total_draw_calls": 77,
+			"visible_draw_calls": 62,
+			"visible_triangles": 89715,
+			"zoom": 1.0
+		}
+	}
+}
