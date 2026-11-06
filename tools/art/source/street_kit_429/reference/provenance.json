@@ -1,0 +1,13 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "base_commit": "647c8cb584d42714b81e066b6c1eff5681e653fd",
+  "palette_source_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+  "palette_source_path": "tools/art/source/alcatraz_island/palette.json",
+  "ground_review_commit": "54b76f78f78eff3f992365c934586e170bd15fb1",
+  "ground_review_pr": 830,
+  "ground_runtime_path": "assets/landmarks/_shared/ground_detail/ground_paving.tres",
+  "ground_scope": "Read-only review fixture extraction from git; no ground files delivered or modified",
+  "identity_height_m": 1.745,
+  "scope": "16 reusable street furniture assets; 12x6m plaza is review-only, no layout or location registration"
+}

@@ -1,0 +1,9 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "module": "planter_square",
+  "geometry": "New modular geometry; no old GLB edited",
+  "palette": "Alcatraz bf0c31b1 + Grace Cathedral warm iron/cream",
+  "source": "tools/art/source/street_kit_429/planter_square.blend",
+  "generator": "tools/art/source/street_kit_429/build.py"
+}

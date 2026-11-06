@@ -1,0 +1,22 @@
+[
+  {
+    "file": "SGODOT-429_street_kit_v1_catalogue.png",
+    "bytes": 395095,
+    "sha256": "6668dfd99fd6616dc4ebfec90c15beeaf1508768d168bfce3aabcfe90774785c"
+  },
+  {
+    "file": "SGODOT-429_street_kit_v1_example_360.png",
+    "bytes": 250652,
+    "sha256": "c8b58de14eee34280b7c6e3f78a654549636e035bce479a25b90fb1a03f6523d"
+  },
+  {
+    "file": "SGODOT-429_street_kit_v1_example_overview.png",
+    "bytes": 1236075,
+    "sha256": "8a3997f6080b9855228bc2c7a1c07e6e7f4d0d6257749a2525ac90521c8988a3"
+  },
+  {
+    "file": "SGODOT-429_street_kit_v1_validation.json",
+    "bytes": 63309,
+    "sha256": "cee9cba1b7b0b3c2e4eab65e42d1759a8ccc717c7a3ef068958e1fc93a0d3c80"
+  }
+]

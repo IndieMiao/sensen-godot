@@ -1,0 +1,27 @@
+{
+  "colors_srgb": {
+    "stone": "CBB48F",
+    "stone_light": "D9C4A3",
+    "stone_shade": "BCA781",
+    "cream": "F0E1C2",
+    "wood": "BB8B52",
+    "wood_light": "D0A56C",
+    "wood_dark": "9A7046",
+    "wood_seam": "795B43",
+    "metal": "5D4C38",
+    "metal_light": "6D5746",
+    "teal": "35696A",
+    "teal_light": "608F99",
+    "lamp": "F2DC9F",
+    "sage": "8AAFA2",
+    "canvas": "EFE7D4",
+    "leaf": "86A84F",
+    "leaf_light": "9AB55D",
+    "leaf_dark": "759448",
+    "flower": "DFC570",
+    "soil": "897A53",
+    "basin": "A4A08F",
+    "drain": "4E4C43"
+  },
+  "source": "Alcatraz bf0c31b1 palette + Grace Cathedral cream/iron; see source reference/provenance.json"
+}
