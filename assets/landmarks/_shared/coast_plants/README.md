@@ -1,12 +1,12 @@
-# 通用海岸植被 · SGODOT-435 · v1.1
+# 通用海岸植被 · SGODOT-435 · v1.2
 
-【赵云】8 种植物、10 个 GLB，配合 426 海岸套件使用。全部一个 `_mobile` Mesh、一个 surface、哑光顶点色；无贴图、骨架、动画、碰撞或游戏注册。整套 **3,218 三角面**，小件 ≤400、树近档 ≤800、远档 ≤120。
+【赵云】8 种植物、10 个 GLB，配合 426 海岸套件使用。全部一个 `_mobile` Mesh、一个 surface、哑光顶点色；无贴图、骨架、动画、碰撞或游戏注册。整套 **3,146 三角面**，小件 ≤400、树近档 ≤800、远档 ≤120。
 
 ## 件表
 
 | GLB 名称 | 三角面 | 高度 m | 设计 / 用途 |
 |---|---:|---:|---|
-| coast_grass_a | 216 | 0.836 | 直立窄叶、少量浅色细穗，岸后稀疏草簇 |
+| coast_grass_a | 144 | 0.700 | 18 片直立窄叶，无穗头或穗杆，岸后稀疏草簇 |
 | coast_grass_b | 200 | 0.415 | 低矮向外散开的宽叶草，草簇间过渡 |
 | coast_iceplant_a | 394 | 0.181 | 连续小厚垫，26 片短肉叶、7 朵粉紫花，约 1.00 × 0.76 m |
 | coast_iceplant_b | 394 | 0.181 | 连续大厚垫，21 片短肉叶、9 朵粉紫花，约 1.40 × 1.03 m |
@@ -54,6 +54,6 @@ far_node.visibility_range_begin_margin = 0.0
 
 - [Blender 源](../../../../tools/art/source/coast_plants_435/coast_plants.blend)
 - [生成器](../../../../tools/art/build_coast_plants_435.py)、[导入工具](../../../../tools/art/source/coast_plants_435/imports.py)、[几何检查](../../../../tools/art/source/coast_plants_435/verify.py)、[LOD 实渲检查](../../../../tools/art/source/coast_plants_435/lod_verify.gd)
-- [审阅图与记录](../../../../docs/design/coast-plants-435/v1.1/README.md)
+- [审阅图与记录](../../../../docs/design/coast-plants-435/v1.2/README.md)
 
 约 12 m 的示例仅在隔离审阅工程中使用 426 岸石、430 浪花、432 海湾预设。不交示例 layout，不进入游戏，不修改恶魔岛或既有资源。

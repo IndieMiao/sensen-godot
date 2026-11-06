@@ -35,9 +35,27 @@ for name,e in data['assets'].items():
   for v,w in [(a,b),(b,c),(c,a)]:
    key=tuple(sorted([keys[v],keys[w]]));edges[key]=edges.get(key,0)+1
  check(all(n%2==0 for n in edges.values()),name+': no open edges, leaves and canopy have undersides')
- if name in ['coast_grass_a','coast_grass_b','coast_shrub_b']:
-  previous=subprocess.check_output(['git','show','a590b559:assets/landmarks/_shared/coast_plants/'+name+'.glb'],cwd=ROOT)
-  check(path.read_bytes()==previous,name+': approved v1 GLB byte-identical')
+ if name!='coast_grass_a':
+  previous=subprocess.check_output(['git','show','a4565284:assets/landmarks/_shared/coast_plants/'+name+'.glb'],cwd=ROOT)
+  check(path.read_bytes()==previous,name+': v1.1 GLB byte-identical')
+ if name=='coast_grass_a':
+  check(len(ids)==144 and e['leaf_count']==18 and e['seed_heads']==0,name+': eighteen leaf blades only')
+  # The accepted leaf geometry remains an exact subset of the original export.
+  old_path=QA/'v1.2/grass_a_with_heads.glb';old_path.parent.mkdir(parents=True,exist_ok=True)
+  old_path.write_bytes(subprocess.check_output(['git','show','a4565284:assets/landmarks/_shared/coast_plants/coast_grass_a.glb'],cwd=ROOT))
+  old,old_blob=load_glb(old_path);op=old['meshes'][0]['primitives'][0]
+  ox=np.array(accessor(old,old_blob,op['attributes']['POSITION']));on=np.array(accessor(old,old_blob,op['attributes']['NORMAL']));oc=np.array(accessor(old,old_blob,op['attributes']['COLOR_0']));oi=np.array(accessor(old,old_blob,op['indices'])).reshape(-1,3)
+  # Removing the tilted seed-stalk caps changes the minimum Y by 0.42 mm.
+  # Re-ground the leaves as a rigid translation; their shape and paint are retained.
+  nearest=np.linalg.norm(xyz[:,None]-ox[None,:],axis=2).argmin(1)
+  offset=np.median(ox[nearest]-xyz,axis=0)
+  def position_triangles(points,triangles):
+   return {tuple(sorted(tuple(np.round(points[v],6)) for v in tri)) for tri in triangles}
+  check(position_triangles(xyz+offset,ids).issubset(position_triangles(ox,oi)) and np.allclose(offset[[0,2]],0,atol=1e-7),name+': original leaf shapes retained after grounding')
+  check(np.allclose(normal,on[nearest],atol=2e-4) and np.array_equal(colors,oc[nearest]),name+': original leaf shading and paint retained')
+  report['grass_cleanup']={'removed_triangles':len(oi)-len(ids),'leaf_count':18,'seed_heads':0,'grounding_translation_m':(-offset).tolist()}
+  seed=np.array([int('C4B780'[i:i+2],16)/255 for i in [0,2,4]]);seed=np.where(seed<=.04045,seed/12.92,((seed+.055)/1.055)**2.4)
+  check(np.linalg.norm(colors[:,:3]-seed,axis=1).min()>.01,name+': no pale seed-head vertices')
  if name=='coast_shrub_a':
   old_path=QA/'v1.1/shrub_a_v1.glb';old_path.write_bytes(subprocess.check_output(['git','show','a590b559:assets/landmarks/_shared/coast_plants/coast_shrub_a.glb'],cwd=ROOT))
   old,old_blob=load_glb(old_path);old_p=old['meshes'][0]['primitives'][0]

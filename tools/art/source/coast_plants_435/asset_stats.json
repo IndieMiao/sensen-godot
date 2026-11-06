@@ -1,13 +1,12 @@
 {
   "author": "赵云",
   "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
-  "revision": "v1.1",
+  "revision": "v1.2",
   "units": "metres, Y up; wind leans toward +X; root at Y=0",
   "palette_srgb": {
     "grass": "869955",
     "grass_light": "ABB273",
     "grass_dark": "637D43",
-    "dry_tip": "C4B780",
     "ice": "6F8E62",
     "ice_light": "99AE78",
     "ice_shadow": "527553",
@@ -44,7 +43,7 @@
   "assets": {
     "coast_grass_a": {
       "file": "coast_grass_a.glb",
-      "triangles": 216,
+      "triangles": 144,
       "surfaces": 1,
       "bounds": [
         [
@@ -54,13 +53,13 @@
         ],
         [
           0.382847398519516,
-          0.8358205556869507,
+          0.699999988079071,
           0.38519105315208435
         ]
       ],
-      "height_m": 0.8358205556869507,
-      "sha256": "44c0ed36a9606b7500610e389e442a33704451e27689151e450ae7000897a1bd",
-      "bytes": 8204,
+      "height_m": 0.699999988079071,
+      "sha256": "3869acfe1de69c0692330129203a429e4477136be70da078db9b5d239a8da699",
+      "bytes": 6044,
       "pivot": "root centre, Y=0",
       "front": "+Z",
       "material_contract": {
@@ -71,7 +70,9 @@
       },
       "family": "grass",
       "lod": "single",
-      "multimesh": true
+      "multimesh": true,
+      "leaf_count": 18,
+      "seed_heads": 0
     },
     "coast_grass_b": {
       "file": "coast_grass_b.glb",

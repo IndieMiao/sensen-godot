@@ -10,7 +10,7 @@ import build_decor_assets as K
 import build_alcatraz_trees_cd_424 as T
 SRC=ROOT/'tools/art/source/coast_plants_435';OUT=ROOT/'assets/landmarks/_shared/coast_plants'
 ACTOR='8ea32e40-c0ba-4a31-864f-374a6bcbc554'
-COLORS={'grass':'869955','grass_light':'ABB273','grass_dark':'637D43','dry_tip':'C4B780',
+COLORS={'grass':'869955','grass_light':'ABB273','grass_dark':'637D43',
  'ice':'6F8E62','ice_light':'99AE78','ice_shadow':'527553','ice_tip':'B0A67D',
  'pink':'CA74A3','pink_light':'E0A0BD','pink_dark':'AD5D8D','pollen':'E5C476',
  'sage':'75976C','sage_light':'94B18A','sage_dark':'587D50',
@@ -33,11 +33,6 @@ def grass(variant):
         reach=(.14+.055*(i%3)) if variant=='a' else (.26+.045*(i%3))
         tip=root+Vector((reach*math.cos(theta)+.10,h,reach*math.sin(theta)))
         blade('Sea grass / folded blade %02d'%i,root,tip,.038 if variant=='a' else .055,['grass','grass_light','grass_dark'][i%3],.012)
-    if variant=='a':
-        for i in range(3):
-            x=-.10+i*.085;z=.03*math.sin(i*2);h=.66+i*.06
-            K.rod('Grass / slender seed stalk '+str(i),(x,0,z),(x+.07,h,z),.008,'grass_dark',segments=3,top=.004)
-            K.rod('Grass / pale narrow seed '+str(i),(x+.063,h-.095,z),(x+.075,h+.055,z),.022,'dry_tip',segments=5,top=.005)
 
 def carpet_leaf(name,a,b,width,role):
     a,b=Vector(a),Vector(b);axis=(b-a).normalized();side=Vector((-axis.z,0,axis.x))*width/2;mid=a.lerp(b,.5)
@@ -208,6 +203,7 @@ def main():
             for _,o,_ in parts:
                 for v in o.data.vertices:v.co+=offset
             entries[name]=T.export(name,parts,400);entries[name].update(family=family,lod='single',multimesh=True)
+            if name=='coast_grass_a':entries[name].update(leaf_count=18,seed_heads=0)
             if family=='iceplant':entries[name].update(cushion_size_m=[1.0,.75] if variant=='a' else [1.4,1.0],flower_count=7 if variant=='a' else 9,short_leaf_count=26 if variant=='a' else 21,edge_height_range_m=[.030,.046],recommended_pitch_m=[.82,.62] if variant=='a' else [1.18,.84])
     for base,build in [('coast_cypress',cypress),('coast_palm',palm)]:
         near_parts=None
@@ -250,7 +246,7 @@ def main():
             if base=='coast_palm':entries[name].update(frond_count=8,trunk_base_diameter_m=.22,ring_heights_m=[] if far else [.70,1.45,2.20,2.95,3.70,4.45],frond_tip_drop_m=[.95,1.15,1.35,1.55])
             if not far:near_parts=parts
         groups.append({'near':base,'far':base+'_far','switch_distance_m':40,'margin_m':0,'common_aabb':entries[base]['bounds'],'pivot':'trunk base; do not recenter by canopy bounds','far_closed':True})
-    manifest={'author':'赵云','virtual_user_id':ACTOR,'revision':'v1.1','units':'metres, Y up; wind leans toward +X; root at Y=0','palette_srgb':COLORS,'material_contract':{'vertex_color_is_srgb':False,'roughness':.9,'specular':.18,'metallic':0,'opaque':True,'surfaces_per_mesh':1,'textures':False},'assets':entries,'lod_groups':groups,'source':'tools/art/source/coast_plants_435/coast_plants.blend','generator':'tools/art/build_coast_plants_435.py','example_layout_included':False}
+    manifest={'author':'赵云','virtual_user_id':ACTOR,'revision':'v1.2','units':'metres, Y up; wind leans toward +X; root at Y=0','palette_srgb':COLORS,'material_contract':{'vertex_color_is_srgb':False,'roughness':.9,'specular':.18,'metallic':0,'opaque':True,'surfaces_per_mesh':1,'textures':False},'assets':entries,'lod_groups':groups,'source':'tools/art/source/coast_plants_435/coast_plants.blend','generator':'tools/art/build_coast_plants_435.py','example_layout_included':False}
     for path in [OUT/'manifest.json',SRC/'asset_stats.json']:path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     bpy.context.scene.unit_settings.system='METRIC';bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'coast_plants.blend'),compress=True)
 if __name__=='__main__':main()
