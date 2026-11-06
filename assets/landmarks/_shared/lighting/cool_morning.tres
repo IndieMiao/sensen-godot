@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="LandmarkLightingPreset" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://assets/landmarks/_shared/lighting/lighting_preset.gd" id="1"]
+
+[sub_resource type="Environment" id="Environment_preset"]
+background_mode = 1
+background_color = Color(0.850980392, 0.901960784, 0.937254902, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.717647059, 0.803921569, 0.874509804, 1)
+ambient_light_energy = 0.64
+ssao_enabled = false
+ssr_enabled = false
+sdfgi_enabled = false
+volumetric_fog_enabled = false
+fog_enabled = false
+fog_light_color = Color(0.694117647, 0.792156863, 0.858823529, 1)
+glow_enabled = false
+
+[resource]
+resource_name = "cool_morning"
+script = ExtResource("1")
+environment = SubResource("Environment_preset")
+sun_color = Color(0.843137255, 0.909803922, 1.000000000, 1)
+sun_energy = 0.84
+sun_rotation_degrees = Vector3(-24, 65, 0)

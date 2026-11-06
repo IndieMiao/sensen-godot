@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="LandmarkLightingPreset" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://assets/landmarks/_shared/lighting/lighting_preset.gd" id="1"]
+
+[sub_resource type="Environment" id="Environment_preset"]
+background_mode = 1
+background_color = Color(0.929411765, 0.807843137, 0.701960784, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.717647059, 0.709803922, 0.792156863, 1)
+ambient_light_energy = 0.58
+ssao_enabled = false
+ssr_enabled = false
+sdfgi_enabled = false
+volumetric_fog_enabled = false
+fog_enabled = false
+fog_light_color = Color(0.850980392, 0.682352941, 0.560784314, 1)
+glow_enabled = false
+
+[resource]
+resource_name = "golden_dusk"
+script = ExtResource("1")
+environment = SubResource("Environment_preset")
+sun_color = Color(1.000000000, 0.772549020, 0.541176471, 1)
+sun_energy = 1.1
+sun_rotation_degrees = Vector3(-18, -115, 0)
