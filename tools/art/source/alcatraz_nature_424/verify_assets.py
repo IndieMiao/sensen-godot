@@ -40,7 +40,9 @@ def main():
   check(p['owner']=='刘备' and p['collision']==False and p['multimesh'],p['name']+': decoration metadata')
   original=originals[p['source_name']]
   expected=list(original['position']);expected[1]-=.035 if 'shrub' in p['asset'] else .01 if p['asset']=='alc_grass_tuft' else 0
-  if p['name']=='alc_rock_c_003':expected[0]=-26.2
+  if p['name']=='alc_rock_c_003':
+   expected[0]=-27.0;check(p['asset']=='alc_rock_a','foreground rock uses small variant')
+  elif p['name']=='alc_rock_a_004':expected[0]=-29.2;expected[2]=8.5
   check(p['position']==expected and p['rotation_degrees']==original['rotation_degrees'] and p['scale']==original['scale'] and p['zone']==original['zone'],p['name']+': only declared transform adjustments')
   x,y,z=p['position'];size=manifest['assets'][p['asset']]['dimensions_m'];r=math.hypot(size[0],size[2])*.5*p['scale'][0]
   hits=sum(1 for a,b,c,d,ny in rects if y<ny<y+size[1]*p['scale'][1]+.15 and math.hypot(max(a-x,0,x-b),max(c-z,0,z-d))<r+.15)

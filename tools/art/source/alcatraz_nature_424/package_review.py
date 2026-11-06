@@ -17,8 +17,8 @@ canvas.save(DOC/'scale-lineup.png')
 for raw,dest,title,footer in [
  ('04_blockout_shore','blockout-shore.png','刘备 · 岸边岩石与低灌木 / 放入 #792 白模','主体 b16c3198；六件正式原型替换 114 个刘备占位；海面、建筑和地形沿用白模。'),
  ('05_blockout_terraces','blockout-terraces.png','刘备 · 台地低灌木与草丛 / Godot Mobile','点位已避让原导航面；最终山坡改形后由主体重新贴地。'),
- ('06_whole_island','whole-island.png','刘备 · 114 个替换实例 / 白模整岛查看','当前白模不是最终整景美术；本次原型共 920 三角面，放置共 13,600 三角面。'),
- ('02_rock_detail','rock-detail.png','刘备 · 三种浅灰褐圆钝岸石','每件 180 三角面 / 1 surface；共享顶点色哑光材质。'),
+ ('06_whole_island','whole-island.png','刘备 · 114 个替换实例 / 白模整岛查看','当前白模不是最终整景美术；本次原型共 968 三角面，放置共 14,176 三角面。'),
+ ('02_rock_detail','rock-detail.png','刘备 · v3 三种略冷灰褐岸石 / 切面与凹裂带','每件 196 三角面 / 1 surface；共享顶点色哑光材质。'),
  ('03_foliage_detail','foliage-detail.png','刘备 · 深绿、偏黄绿灌木与六片折叶草丛','灌木 140 / 180 三角面，草丛 60 三角面含背面；无透明贴图。')]:
  labeled(OUT/'captures'/f'{raw}.png',dest,title,footer)
 shutil.copy2(OUT/'captures/07_default_opening.png',DOC/'default-opening-360x800.png')

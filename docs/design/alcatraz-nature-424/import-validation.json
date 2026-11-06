@@ -13,8 +13,8 @@
 			"aabb": "[P: (-0.475, 0.0, -0.42), S: (0.95, 0.7, 0.84)]",
 			"material_class": "StandardMaterial3D",
 			"material_roughness": 0.939999997615814,
-			"mesh_arrays_sha256": "f49a4ddc6c7921556eeacb62040a9918e795bf4b5b7bf2c7509ff8c317576b62",
-			"triangles": 180,
+			"mesh_arrays_sha256": "da09750b5e5ed99e9bc461cbb0cca4139463aa19ce9c97f63f8eadc1f77feddd",
+			"triangles": 196,
 			"uid": "uid://bgewesh7n072j",
 			"vertex_color": true
 		},
@@ -22,8 +22,8 @@
 			"aabb": "[P: (-0.925, 0.0, -0.71), S: (1.85, 1.18, 1.42)]",
 			"material_class": "StandardMaterial3D",
 			"material_roughness": 0.939999997615814,
-			"mesh_arrays_sha256": "cee103f9cf3c82324519158403658ce006de84e2ed9d001d9d696170573274c7",
-			"triangles": 180,
+			"mesh_arrays_sha256": "99d713dd86030df5b6baa5c28c5450dd391fcb715dd87b1cce2eba345fba1bdb",
+			"triangles": 196,
 			"uid": "uid://b5lt0ornccq0g",
 			"vertex_color": true
 		},
@@ -31,8 +31,8 @@
 			"aabb": "[P: (-1.4, 0.0, -1.12), S: (2.8, 2.08, 2.24)]",
 			"material_class": "StandardMaterial3D",
 			"material_roughness": 0.939999997615814,
-			"mesh_arrays_sha256": "f7302186639c4c45900001d9699009415916c998ced2f7341673d763a8bd7955",
-			"triangles": 180,
+			"mesh_arrays_sha256": "2639a88078c21d2f76b8733600ce5004057947980ce956bdbc5fa6545194d953",
+			"triangles": 196,
 			"uid": "uid://2wywi7cnooru",
 			"vertex_color": true
 		},

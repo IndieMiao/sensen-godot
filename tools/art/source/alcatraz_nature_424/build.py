@@ -6,7 +6,7 @@ import bpy,bmesh,math,random,json,hashlib
 from mathutils import Vector
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3]
 OUT=ROOT/'assets/landmarks/alcatraz_island'
-PALETTE={'stone':'B7AD98','stone_light':'C6BDAA','stone_shade':'9F998B',
+PALETTE={'stone':'777A75','stone_light':'93958B','stone_shade':'515B59',
          'leaf_deep':'66804A','leaf_mid':'7D9453','leaf_sun':'99A965',
          'grass_root':'758746','grass_tip':'ADB677'}
 def linear(h):
@@ -50,22 +50,41 @@ def rock(name,dims,seed):
  c=collection(name);rng=random.Random(seed)
  bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=3,radius=1)
  obj=bpy.context.object
- # Broad mineral shoulders, blunt top, irregular footprint; no crystalline spikes.
+ # A weathered block, with clipped shoulders and two recessed fracture bands.
+ # Keep broad planes: do not smooth the normals back into a rounded boulder.
+ phase=(seed-4241)*.47
  for vert in obj.data.vertices:
-  p=vert.co.copy();f=1+.08*math.sin(p.x*3.1+seed)+.05*math.cos(p.y*4.4-p.z*2.7)
-  p*=f;p.z=max(-.66,p.z);p.x+=.12*p.z+.06*p.y*p.z
+  p=vert.co.copy()
+  # Rounded-box radial envelope; broad flanks and blunt, angular corners.
+  p/=sum(abs(k)**4.0 for k in p)**.25
+  p.x+=.13*p.z+.05*p.y
+  p.z=min(.83-.13*p.x+.07*p.y,max(-.72,p.z))
+  # Oblique shoulder clipping creates large geological cleavage planes.
+  for normal,limit in [(Vector((1,.35,.60)).normalized(),.99),
+                       (Vector((-.45,-1,.55)).normalized(),1.02)]:
+   excess=p.dot(normal)-limit
+   if excess>0:p-=normal*excess
+  # Two broken bands run across the exposed cap and down the flanks.
+  band=p.x+.34*p.y+.12*math.sin(p.y*4+phase)
+  seam=max(0,1-abs(band-.16)/.19)+.65*max(0,1-abs(band+.53)/.13)
+  p.z-=.19*seam*max(0,min(1,(p.z+.5)*1.3))
+  p.x*=1-.045*seam
+  p.y*=1-.045*seam
+  p.z+=.035*math.sin(p.x*7+p.y*5+phase)
   vert.co=p
- dec=obj.modifiers.new('Broad 180-triangle silhouette','DECIMATE');dec.ratio=.5625
+ dec=obj.modifiers.new('Fractured 196-triangle silhouette','DECIMATE');dec.ratio=.6125
  bpy.context.view_layer.objects.active=obj;bpy.ops.object.modifier_apply(modifier=dec.name)
  coords=[gv(p.co) for p in obj.data.vertices];lo=[min(p[i] for p in coords) for i in range(3)];hi=[max(p[i] for p in coords) for i in range(3)]
  for vert,p in zip(obj.data.vertices,coords):
   q=[(p[i]-lo[i])/(hi[i]-lo[i])*dims[i] for i in range(3)];q[0]-=dims[0]/2;q[2]-=dims[2]/2;vert.co=v(q)
  base=Vector(linear(PALETTE['stone']));light=Vector(linear(PALETTE['stone_light']));dark=Vector(linear(PALETTE['stone_shade']))
  def color(p,face):
-  h=p.y/dims[1];grain=.5+.5*math.sin(p.x*3.6+p.z*2.3+seed)
-  return dark.lerp(base,min(1,h*3+.25)).lerp(light,.13*grain+.12*max(0,h-.25))
- finish(obj,'Rounded mineral mass / '+name,c,color,.50)
- records[name]={'triangle_limit':200,'intended_dimensions_m':dims,'kind':'shore rock','parts':['Rounded mineral mass']}
+  h=p.y/dims[1]
+  # Subtle independent mineral faces, with a cool recessed base.
+  variation=.5+.5*math.sin(face.index*2.399+seed)
+  return dark.lerp(base,min(1,.35+h*1.2)).lerp(light,.07+.24*variation)
+ finish(obj,'Fractured mineral mass / '+name,c,color,.12)
+ records[name]={'triangle_limit':200,'intended_dimensions_m':dims,'kind':'fractured cool grey-brown shore rock','parts':['Fractured mineral mass']}
 
 rock('alc_rock_a',(.95,.70,.84),4241)
 rock('alc_rock_b',(1.85,1.18,1.42),4242)

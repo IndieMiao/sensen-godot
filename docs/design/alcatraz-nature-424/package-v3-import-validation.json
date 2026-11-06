@@ -1,0 +1,325 @@
+{
+	"assets": {
+		"alc_grass_tuft": {
+			"aabb": "[P: (-0.247218, 0.0, -0.242197), S: (0.494437, 0.417636, 0.484393)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "ecf2b35a804daaab813784bedfa0e86c7b0400bad39d1dadeaf6f84080e52eaa",
+			"triangles": 60,
+			"uid": "uid://cvu0to18ry21n",
+			"vertex_color": true
+		},
+		"alc_rock_a": {
+			"aabb": "[P: (-0.475, 0.0, -0.42), S: (0.95, 0.7, 0.84)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "da09750b5e5ed99e9bc461cbb0cca4139463aa19ce9c97f63f8eadc1f77feddd",
+			"triangles": 196,
+			"uid": "uid://bgewesh7n072j",
+			"vertex_color": true
+		},
+		"alc_rock_b": {
+			"aabb": "[P: (-0.925, 0.0, -0.71), S: (1.85, 1.18, 1.42)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "99d713dd86030df5b6baa5c28c5450dd391fcb715dd87b1cce2eba345fba1bdb",
+			"triangles": 196,
+			"uid": "uid://b5lt0ornccq0g",
+			"vertex_color": true
+		},
+		"alc_rock_c": {
+			"aabb": "[P: (-1.4, 0.0, -1.12), S: (2.8, 2.08, 2.24)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "2639a88078c21d2f76b8733600ce5004057947980ce956bdbc5fa6545194d953",
+			"triangles": 196,
+			"uid": "uid://2wywi7cnooru",
+			"vertex_color": true
+		},
+		"alc_shrub": {
+			"aabb": "[P: (-0.456136, 0.0, -0.38654), S: (0.912273, 0.621045, 0.773079)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "10f166314c62188535c426aacdac5c006d65d501a104fd4a87dd60666a297fa2",
+			"triangles": 140,
+			"uid": "uid://jluwkbladwwm",
+			"vertex_color": true
+		},
+		"alc_shrub_b": {
+			"aabb": "[P: (-0.583855, 0.0, -0.510735), S: (1.167709, 0.819996, 1.021471)]",
+			"material_class": "StandardMaterial3D",
+			"material_roughness": 0.939999997615814,
+			"mesh_arrays_sha256": "ce40d4610cff3a9e7f4824c2bc3f7d889b87d20d8a62abd1e51d00111ebc7365",
+			"triangles": 180,
+			"uid": "uid://c2lvgq65r05y4",
+			"vertex_color": true
+		}
+	},
+	"checks": [
+		{
+			"check": "alc_rock_a: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_shrub_b: unique UID",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: one mesh",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: triangle budget",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: identity mesh transform",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: grounded pivot",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: centred footprint",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: imported vertex colour",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: opaque matte material",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: no external texture dependency",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: generated import",
+			"passed": true
+		},
+		{
+			"check": "alc_grass_tuft: unique UID",
+			"passed": true
+		}
+	],
+	"passed": true
+}

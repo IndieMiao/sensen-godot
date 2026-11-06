@@ -2579,9 +2579,9 @@
       "cast_shadow": false
     },
     {
-      "asset": "alc_rock_c",
+      "asset": "alc_rock_a",
       "position": [
-        -26.2,
+        -27.0,
         -0.35,
         11.5
       ],
@@ -2609,9 +2609,9 @@
     {
       "asset": "alc_rock_a",
       "position": [
-        -26.2,
+        -29.2,
         -0.35,
-        7
+        8.5
       ],
       "zone": "DockZone",
       "yaw": 0.9936293856408263,
@@ -3283,7 +3283,7 @@
   "notes": [
     "Replace each existing owner=刘备 placement by source_name; leave all other placements intact.",
     "Primary shrub is alc_shrub; optional warm variant alc_shrub_b has explicit assignments.",
-    "Only alc_rock_c_003 moves in X/Z: -24.8 to -26.2. Plant roots embed .035/.01m.",
+    "Two dock rocks adjusted: c_003 uses small a at (-27,-.35,11.5); a_004 moves to (-29.2,-.35,8.5). Plant roots embed .035/.01m.",
     "Rocks keep v6 base Y=-.35. No collisions or interactions; disable cast shadows.",
     "Keep v6 foliage visibility rule: hide above 8m view width; whole-island art review shows all.",
     "Re-seat after owner remeshes terrain; retain original navigation."
@@ -4540,27 +4540,43 @@
     {
       "source_name": "alc_rock_c_003",
       "before_asset": "alc_rock_c",
-      "after_asset": "alc_rock_c",
+      "after_asset": "alc_rock_a",
       "before_position": [
         -24.8,
         -0.35,
         11.5
       ],
       "after_position": [
-        -26.2,
+        -27.0,
         -0.35,
         11.5
       ],
-      "reason": "large rock moved 1.4m west to clear dock navigation"
+      "reason": "dock opening: replace foreground large rock with small, move west"
+    },
+    {
+      "source_name": "alc_rock_a_004",
+      "before_asset": "alc_rock_a",
+      "after_asset": "alc_rock_a",
+      "before_position": [
+        -26.2,
+        -0.35,
+        7
+      ],
+      "after_position": [
+        -29.2,
+        -0.35,
+        8.5
+      ],
+      "reason": "dock opening: move west/south clear of bridge and city strip"
     }
   ],
   "counts": {
-    "alc_rock_a": 12,
+    "alc_rock_a": 13,
     "alc_rock_b": 12,
-    "alc_rock_c": 12,
+    "alc_rock_c": 11,
     "alc_shrub": 17,
     "alc_shrub_b": 9,
     "alc_grass_tuft": 52
   },
-  "placed_triangles": 13600
+  "placed_triangles": 14176
 }

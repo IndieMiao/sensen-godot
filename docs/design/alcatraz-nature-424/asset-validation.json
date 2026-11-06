@@ -1374,6 +1374,10 @@
       "passed": true
     },
     {
+      "check": "foreground rock uses small variant",
+      "passed": true
+    },
+    {
       "check": "alc_rock_c_003: only declared transform adjustments",
       "passed": true
     },
@@ -1672,7 +1676,7 @@
   ],
   "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
   "assets": 6,
-  "unique_triangles": 920,
+  "unique_triangles": 968,
   "replacement_instances": 114,
-  "placed_triangles": 13600
+  "placed_triangles": 14176
 }

@@ -20,13 +20,15 @@ def main():
    p['position'][1]-=.01
    p['max_view_width_m']=8.0
   if p['name']=='alc_rock_c_003':
-   # 2.8m finished rock is larger than the .8m placeholder. Keep the dock's
-   # walk corridor clear without shrinking the authored model or changing nav.
-   p['position'][0]=-26.2
+   p['asset']='alc_rock_a'
+   p['position'][0]=-27.0
+  elif p['name']=='alc_rock_a_004':
+   p['position'][0]=-29.2
+   p['position'][2]=8.5
   if p['position']!=original['position'] or p['asset']!=original['asset']:
    adjustments.append({'source_name':p['source_name'],'before_asset':original['asset'],'after_asset':p['asset'],
     'before_position':original['position'],'after_position':p['position'],
-    'reason':'large rock moved 1.4m west to clear dock navigation' if p['name']=='alc_rock_c_003' else 'variant assignment and root seating'})
+    'reason':'dock opening: replace foreground large rock with small, move west' if p['name']=='alc_rock_c_003' else 'dock opening: move west/south clear of bridge and city strip' if p['name']=='alc_rock_a_004' else 'variant assignment and root seating'})
   points.append(p)
  assert len(points)==114 and len({p['source_name'] for p in points})==114
  result={'task':'SGODOT-424','owner':'刘备','source_layout_commit':BASE,
@@ -36,7 +38,7 @@ def main():
   'axes':layout['axes'],'sea_y':-.15,'points':points,'navigation_unchanged':True,
   'notes':['Replace each existing owner=刘备 placement by source_name; leave all other placements intact.',
    'Primary shrub is alc_shrub; optional warm variant alc_shrub_b has explicit assignments.',
-   'Only alc_rock_c_003 moves in X/Z: -24.8 to -26.2. Plant roots embed .035/.01m.',
+   'Two dock rocks adjusted: c_003 uses small a at (-27,-.35,11.5); a_004 moves to (-29.2,-.35,8.5). Plant roots embed .035/.01m.',
    'Rocks keep v6 base Y=-.35. No collisions or interactions; disable cast shadows.',
    'Keep v6 foliage visibility rule: hide above 8m view width; whole-island art review shows all.',
    'Re-seat after owner remeshes terrain; retain original navigation.'],

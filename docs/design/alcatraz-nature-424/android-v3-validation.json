@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "scope": "six rendered assets, native dock opening and two real zoom-button taps; not a full navigation/pinch or physical-phone performance test",
+  "before": {
+    "assembled": true,
+    "batches": 9,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 14,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "instances": 114,
+    "pid": 11056,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v3",
+    "seq": 0,
+    "view": "dock",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 1.0
+  },
+  "zoomed_out": {
+    "assembled": true,
+    "batches": 9,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 34,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "instances": 114,
+    "pid": 11056,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v3",
+    "seq": 0,
+    "view": "dock",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 0.869565217391304
+  },
+  "restored": {
+    "assembled": true,
+    "batches": 9,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 42,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "instances": 114,
+    "pid": 11056,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v3",
+    "seq": 0,
+    "view": "dock",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 1.0
+  },
+  "assets": {
+    "assembled": true,
+    "batches": 9,
+    "buttons": {
+      "ZoomIn": [
+        322.0,
+        374.0
+      ],
+      "ZoomOut": [
+        322.0,
+        422.0
+      ]
+    },
+    "frames": 56,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "instances": 114,
+    "pid": 11056,
+    "renderer": "mobile",
+    "revision": "alcatraz-nature-424-v3",
+    "seq": 1,
+    "view": "assets",
+    "viewport": "(360.0, 800.0)",
+    "zoom": 1.0
+  },
+  "fixture_note": "Initial run encountered a stale prior QA command; startup now discards old commands and controller uses monotonic sequence. This report is the successful fresh rerun."
+}

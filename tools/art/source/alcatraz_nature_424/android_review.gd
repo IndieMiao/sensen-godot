@@ -1,14 +1,26 @@
 extends "res://review.gd"
-## Offline Android smoke fixture. Owner scene / controls remain unchanged.
-var elapsed := 0.0
-var ready_for_review := false
-var command_seq := 0
+var ready_for_review=false
+var elapsed=0.0
+var sequence=0
+var view="dock"
 func _ready(): mobile_run.call_deferred()
 func mobile_run():
+ # Commands belong to this QA launch; discard an old fixture request.
+ if FileAccess.file_exists("user://nature_command.json"):DirAccess.remove_absolute("user://nature_command.json")
  island=load("res://scenes/landmark/alcatraz_island.tscn").instantiate();add_child(island)
  for i in 12:await get_tree().process_frame
- add_nature()
- ready_for_review=true
+ add_nature();ready_for_review=true
+func assets_view():
+ island._hud.hide();island.hide();island.set_process(false);island._environment.environment=null
+ world=Node3D.new();add_child(world);light_scene()
+ camera=Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.keep_aspect=Camera3D.KEEP_WIDTH;camera.size=9.2;world.add_child(camera)
+ camera.position=Vector3(0,14,22);camera.look_at(Vector3(0,.7,0));camera.make_current()
+ var places={"alc_rock_a":Vector3(-2.5,0,2),"alc_rock_b":Vector3(0,0,2),"alc_rock_c":Vector3(2.5,0,2),"alc_shrub":Vector3(-2.5,0,-2),"alc_shrub_b":Vector3(0,0,-2),"alc_grass_tuft":Vector3(1.6,0,-2)}
+ for name in places:
+  var n=load(ROOT+name+".glb").instantiate();n.position=places[name];world.add_child(n)
+ actor=Node3D.new();actor.position=Vector3(2.7,0,-2);world.add_child(actor)
+ rig=Avatar.create_rig();rig.assembler=AvatarAssemblerMerged.new();actor.add_child(rig);rig.apply_config(Avatar.load_outfit())
+ view="assets"
 func _process(dt):
  if not ready_for_review:return
  elapsed+=dt
@@ -16,21 +28,14 @@ func _process(dt):
  elapsed=0
  if FileAccess.file_exists("user://nature_command.json"):
   var c=JSON.parse_string(FileAccess.get_file_as_string("user://nature_command.json"))
-  if c is Dictionary and int(c.get("seq",0))>command_seq:
-   command_seq=int(c.seq)
-   if c.get("view","")=="whole":island.toggle_overview()
+  if c is Dictionary and int(c.get("seq",0))>sequence:
+   sequence=int(c.seq)
+   if c.get("view","")=="assets":assets_view()
  var buttons={}
  for key in island._zoom_buttons:
   var b=island._zoom_buttons[key].get_global_rect().get_center();buttons[key]=[b.x,b.y]
- var goal=island._camera.unproject_position(Vector3(-22,1,17))
- var p=island._player.position
- var f=island._focus
- var data={"revision":"alcatraz-nature-424-v2-b16c3198","pid":OS.get_process_id(),"seq":command_seq,
-  "assembled":not island._rig.is_busy(),"navigation_ready":island.navigation_ready(),
-  "actor":[p.x,p.y,p.z],"focus":[f.x,f.y,f.z],"zoom":island.camera_pan.zoom,
-  "buttons":buttons,"walk_tap":[goal.x,goal.y],"running":island._running,
-  "nature_instances":report.nature_instances,"nature_batches":report.nature_batches,
-  "renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),
-  "frames":Engine.get_frames_drawn(),"viewport":str(get_viewport().get_visible_rect().size)}
+ var data={"revision":"alcatraz-nature-424-v3","pid":OS.get_process_id(),"seq":sequence,"view":view,
+  "assembled":not island._rig.is_busy() and (view!="assets" or not rig.is_busy()),"instances":report.nature_instances,"batches":report.nature_batches,
+  "zoom":island.camera_pan.zoom,"buttons":buttons,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"frames":Engine.get_frames_drawn(),"viewport":str(get_viewport().get_visible_rect().size)}
  FileAccess.open("user://nature_state.tmp",FileAccess.WRITE).store_string(JSON.stringify(data))
  DirAccess.rename_absolute("user://nature_state.tmp","user://nature_state.json")

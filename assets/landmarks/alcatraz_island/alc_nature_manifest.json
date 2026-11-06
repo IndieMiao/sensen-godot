@@ -6,9 +6,9 @@
   "generator": "tools/art/source/alcatraz_nature_424/build.py",
   "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
   "palette_srgb": {
-    "stone": "B7AD98",
-    "stone_light": "C6BDAA",
-    "stone_shade": "9F998B",
+    "stone": "777A75",
+    "stone_light": "93958B",
+    "stone_shade": "515B59",
     "leaf_deep": "66804A",
     "leaf_mid": "7D9453",
     "leaf_sun": "99A965",
@@ -25,12 +25,12 @@
         0.7,
         0.84
       ],
-      "kind": "shore rock",
+      "kind": "fractured cool grey-brown shore rock",
       "parts": [
-        "Rounded mineral mass"
+        "Fractured mineral mass"
       ],
       "file": "alc_rock_a.glb",
-      "triangles": 180,
+      "triangles": 196,
       "surfaces": 1,
       "bounds": [
         [
@@ -49,8 +49,8 @@
         0.699999988079071,
         0.8399999737739563
       ],
-      "bytes": 18844,
-      "sha256": "c405707854dd1e6b50c915677a96d6c11c72273f5fc53e65e5064f5c89f51bfb",
+      "bytes": 21308,
+      "sha256": "690c268413ddd2faca95b589c9c9401fa6c1a31bbea61f4ac01eee57744c2d99",
       "pivot": "bottom / footprint centre",
       "owner": "刘备",
       "placeholder": false
@@ -62,12 +62,12 @@
         1.18,
         1.42
       ],
-      "kind": "shore rock",
+      "kind": "fractured cool grey-brown shore rock",
       "parts": [
-        "Rounded mineral mass"
+        "Fractured mineral mass"
       ],
       "file": "alc_rock_b.glb",
-      "triangles": 180,
+      "triangles": 196,
       "surfaces": 1,
       "bounds": [
         [
@@ -86,8 +86,8 @@
         1.1799999475479126,
         1.4199999570846558
       ],
-      "bytes": 18904,
-      "sha256": "580bca121f8298df428ca1e89a2ae1f6e60404733b128b80d8423d2fe4d17805",
+      "bytes": 21304,
+      "sha256": "af44d6dba6fa31ba76fad57817f22c7c79499bd548c18263e6f91954d9905e4d",
       "pivot": "bottom / footprint centre",
       "owner": "刘备",
       "placeholder": false
@@ -99,12 +99,12 @@
         2.08,
         2.24
       ],
-      "kind": "shore rock",
+      "kind": "fractured cool grey-brown shore rock",
       "parts": [
-        "Rounded mineral mass"
+        "Fractured mineral mass"
       ],
       "file": "alc_rock_c.glb",
-      "triangles": 180,
+      "triangles": 196,
       "surfaces": 1,
       "bounds": [
         [
@@ -123,8 +123,8 @@
         2.0799999237060547,
         2.240000009536743
       ],
-      "bytes": 19032,
-      "sha256": "f3a0f8cce057bb50e742080c2d43d5e509e2518847f40e1ef7085cf89971c5c5",
+      "bytes": 21304,
+      "sha256": "6f14e38b10de8e6fc2fcef681b5c50c6efdc7043921e58a2b2cbca6734f5e919",
       "pivot": "bottom / footprint centre",
       "owner": "刘备",
       "placeholder": false
@@ -220,5 +220,5 @@
       "placeholder": false
     }
   },
-  "triangles_total": 920
+  "triangles_total": 968
 }

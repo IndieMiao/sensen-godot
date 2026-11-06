@@ -3,6 +3,16 @@
   "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
   "files": [
     {
+      "file": "scenes/landmark/alcatraz_island.gd",
+      "matches_b16c3198": true,
+      "sha256": "576629ffdc79da8e515974c991f55955843169d62632585aec35fc63f8e97ca3"
+    },
+    {
+      "file": "scenes/landmark/alcatraz_island.tscn",
+      "matches_b16c3198": true,
+      "sha256": "68c859099f2254dd2f83357127178159f8fa9835bc539e726876e4b458f580f5"
+    },
+    {
       "file": "assets/landmarks/alcatraz_island/layout.json",
       "matches_b16c3198": true,
       "sha256": "2633e8990acd7a428ff5ec0033bc124329ed239aea97a9e01b8bb477f51269e9"
@@ -13,16 +23,41 @@
       "sha256": "5d08d18120f05c5f96ce0384aa2778590f3c92231afd60ef11cff8dfa66f079e"
     },
     {
-      "file": "scenes/landmark/alcatraz_island.gd",
-      "matches_b16c3198": true,
-      "sha256": "576629ffdc79da8e515974c991f55955843169d62632585aec35fc63f8e97ca3"
-    },
-    {
       "file": "assets/landmarks/alcatraz_island/sea_backdrop.gdshader",
       "matches_b16c3198": true,
       "sha256": "b2e7b8aa7751ecb2024019057a066c86c0cee353a76d79a79adbd3eee1eb5883"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/far_card.gdshader",
+      "matches_b16c3198": true,
+      "sha256": "39386ef55891571e395cbe7a1880950ba2cd304e8568e6601c893890a16da5eb"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_far_bridge.glb",
+      "matches_b16c3198": true,
+      "sha256": "9cd46d07c4ca491efe7bdcb716723aa87976da4373df5e5e7288f8ee80ad7d37"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_far_city.glb",
+      "matches_b16c3198": true,
+      "sha256": "ae98acebd72673591318ede1f9b2a9c9832f30a45aa836f9eda0f6de1788c2d8"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_ground_summit.glb",
+      "matches_b16c3198": true,
+      "sha256": "a5728cb63af5caf65f8506b2b6741ef2f852c5550e31a1fd9044160f450e056f"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_ground_dock.glb",
+      "matches_b16c3198": true,
+      "sha256": "283adaa11ff43efb51f70c2925947823864b3fb3679188b9edd4734da2b2f618"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_ground_terraces.glb",
+      "matches_b16c3198": true,
+      "sha256": "1c921fd35c41aa95ea4a0577e4511529b64c303667c48aa0afe15f26dc83c45c"
     }
   ],
-  "main_shrub_uid_retained": true,
-  "runtime_changes": "none; independent review replaces nature batches only"
+  "all_six_imports_and_uids_unchanged": true,
+  "runtime_changes": "none; isolated review replaces nature batches only"
 }

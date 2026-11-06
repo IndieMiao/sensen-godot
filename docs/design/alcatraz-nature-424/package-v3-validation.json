@@ -1,0 +1,19 @@
+{
+  "package": "com.sensen.alcatraznature424qa",
+  "apk_sha256": "d64b15b10003a02899443ccf201cbccaeb0c9287bfad94ba36f9113f9dcf9edf",
+  "bytes": 34555587,
+  "installed_apk_readback_equal": true,
+  "passed": true,
+  "decoded_mesh_arrays_bounds_materials_and_uids_equal": true,
+  "actual_export_uid_and_resource_path_equal": true,
+  "placements_and_manifest_bytes_equal": true,
+  "assets": [
+    "alc_grass_tuft",
+    "alc_rock_a",
+    "alc_rock_b",
+    "alc_rock_c",
+    "alc_shrub",
+    "alc_shrub_b"
+  ],
+  "note": "Offline API37/SwiftShader QA only; no physical phone or full navigation/pinch claim."
+}

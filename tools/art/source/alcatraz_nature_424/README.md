@@ -23,8 +23,10 @@ flock /home/deck/gs66-render.lock godot --headless --path output/alcatraz-nature
 flock /home/deck/gs66-render.lock godot --path output/alcatraz-nature-424/project --rendering-method mobile --rendering-driver vulkan
 ```
 
-`build.py` 会覆盖 `.blend` 和六个 GLB；手工改模后先把改动同步到生成脚本或另存源文件。`prepare.py` 只向忽略目录 `output/` 解包已固定的白模版本，不改动主体的 layout、场景和水体。`placements.py` 从固定布局提取 114 个刘备占位，以 `source_name` 一对一替换；仅一块大石向西移1.4m，其余为植物根部贴地及灌木款式分配，不追加旧版179点。`verify_placement_support.py` 需要 NumPy，检查实际地形三角面与78个植物根点。
+`build.py` 会覆盖 `.blend` 和六个 GLB；手工改模后先把改动同步到生成脚本或另存源文件。`prepare.py` 只向忽略目录 `output/` 解包已固定的白模版本，不改动主体的 layout、场景和水体。`placements.py` 从固定布局提取 114 个刘备占位，以 `source_name` 一对一替换；v3 把 c_003 换小号 a、X 改为 -27；a_004 移至 (-29.2,-.35,8.5)，让原开场左上桥与城市带无岩石；其余为植物根部贴地及灌木款式分配，不追加旧版179点。`verify_placement_support.py` 需要 NumPy，检查实际地形三角面与78个植物根点。
 
 实拍输出在 `output/alcatraz-nature-424/captures/`。首次导入后的 `.import` 必须随对应 GLB 交付。
 
-现存 Android 验证文档对应首版34df9c0b，未冒充本轮b16c3198结果。Android 冒烟另用 `prepare_android.gd` 设置临时项目并导出 `Android Alcatraz Nature QA`。安装包名 `com.sensen.alcatraznature424qa`，只在离线模拟器运行。使用仓库 `tools/android/run_test.sh` 启停；`android_smoke.py` 读取当前进程的原子状态文件、注入真实拖拽/双指缩放/按钮/行走点击并验证反馈。`ADB` 应指向专用端口包装脚本，`JOURNEY_SERIAL` 由 runner 设置，`NATURE_TOUCH_DEX` 指向由 `tools/dev/basic_room/RoomTouch.java` 编译的 dex。该次模拟器显示原值为 720×1280，脚本结束恢复此值；换设备时须先记录并相应调整恢复值。
+Android v3 用 `prepare.py` 生成项目后另复制到 `output/alcatraz-nature-424/android-project-v3`，运行 `prepare_android.gd` 并导出 `Android Alcatraz Nature QA`。只安装到离线模拟器的 `com.sensen.alcatraznature424qa`。私有 ADB 包装脚本配合仓库 `tools/android/run_test.sh` 调用 `android_smoke_v3.py`：360×800 / density160，核对当前进程六件、114实例、9批次、完整人物及两次真实缩放按钮。测试后恢复本机已核实的720×1280覆盖/default density并停止QA app。换设备需先记录当前值。首版34df9c0b的双指失败保留在历史记录，v3不声称完成双指或全导航。
+
+2026-11-06 v3：三款岸石为 196 三角面，截肩块状轮廓、两条凹裂带、12% 平滑法线；色板 stone=777A75 / light=93958B / shade=515B59。三件植物 GLB 与 v2 字节一致。`android_review.gd` 已更新为 v3；当前轻量检查用 `android_smoke_v3.py`，旧 `android_smoke.py` 为首版历史失败复现，不用于本轮验收。

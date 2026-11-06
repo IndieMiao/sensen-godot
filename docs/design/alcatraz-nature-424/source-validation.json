@@ -5,25 +5,25 @@
     {
       "asset": "alc_rock_a",
       "editable_parts": [
-        "Rounded mineral mass / alc_rock_a"
+        "Fractured mineral mass / alc_rock_a"
       ],
-      "triangles": 180,
+      "triangles": 196,
       "bounds_match": true
     },
     {
       "asset": "alc_rock_b",
       "editable_parts": [
-        "Rounded mineral mass / alc_rock_b"
+        "Fractured mineral mass / alc_rock_b"
       ],
-      "triangles": 180,
+      "triangles": 196,
       "bounds_match": true
     },
     {
       "asset": "alc_rock_c",
       "editable_parts": [
-        "Rounded mineral mass / alc_rock_c"
+        "Fractured mineral mass / alc_rock_c"
       ],
-      "triangles": 180,
+      "triangles": 196,
       "bounds_match": true
     },
     {

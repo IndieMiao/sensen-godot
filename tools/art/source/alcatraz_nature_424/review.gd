@@ -118,6 +118,33 @@ func run():
  island._player.position=island._vec(island.layout.spawn);vp.size=Vector2i(360,800)
  island._set_backdrop_visible(true);island._focus=island._follow_target();island._update_camera();island._hud.show()
  await capture("07_default_opening")
+ # Audit actual transformed rock bounds against the bridge + city strip.
+ var proposal=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"alc_nature_placements.json"))
+ var protected=Rect2(0,55,170,95)
+ var projections=[]
+ for p in proposal.points:
+  if not str(p.asset).begins_with("alc_rock"):continue
+  var rock_bounds=island._mesh(str(p.asset)).get_aabb()
+  var transform=island._transform_of(p)
+  var screen=Rect2(camera.unproject_position(transform*rock_bounds.get_endpoint(0)),Vector2.ZERO)
+  for i in range(1,8):screen=screen.expand(camera.unproject_position(transform*rock_bounds.get_endpoint(i)))
+  check(not screen.intersects(protected),str(p.name)+": clear of bridge and city strip")
+  projections.append({"name":p.name,"asset":p.asset,"screen_rect":[screen.position.x,screen.position.y,screen.size.x,screen.size.y]})
+ report.rock_screen_bounds=projections
+ var opening=vp.get_texture().get_image()
+ for n in nature:
+  if str(n.name).begins_with("Nature_alc_rock"):n.hide()
+ await capture("08_no_rocks_control")
+ var control=vp.get_texture().get_image()
+ var max_diff=0.0
+ for y in range(55,150):
+  for x in range(0,170):
+   var a=opening.get_pixel(x,y);var b=control.get_pixel(x,y)
+   max_diff=max(max_diff,max(abs(a.r-b.r),max(abs(a.g-b.g),abs(a.b-b.b))))
+ check(max_diff<.005,"bridge/city pixels unchanged with rocks hidden")
+ report.bridge_city_control={"rect":[0,55,170,95],"max_rgb_error_255":max_diff*255.0}
+ for n in nature:
+  if str(n.name).begins_with("Nature_alc_rock"):n.show()
  report.renderer={"engine":Engine.get_version_info().string,"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
  check(report.renderer.method=="mobile","Mobile renderer")
  report.passed=report.checks.all(func(c):return c.passed)
