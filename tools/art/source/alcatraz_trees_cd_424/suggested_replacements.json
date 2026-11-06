@@ -1,0 +1,376 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "reference_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+  "reference_layout": "assets/landmarks/alcatraz_island/layout.json",
+  "operation": "replace existing instances; do not append duplicate trees",
+  "before_counts": {
+    "alc_tree_b": 9,
+    "alc_tree_a": 17
+  },
+  "after_counts": {
+    "alc_tree_b": 6,
+    "alc_tree_a": 8,
+    "alc_tree_d": 8,
+    "alc_tree_c": 4
+  },
+  "tree_count": 26,
+  "replacements": [
+    {
+      "asset": "alc_tree_d",
+      "position": [
+        -25.0,
+        3.25,
+        6.5
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_000_as_d",
+      "rotation_degrees": [
+        0,
+        180.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_000",
+      "old_asset": "alc_tree_a",
+      "reason": "第一层西转角：降低近路冠顶",
+      "lod_group": "alc_tree_d"
+    },
+    {
+      "asset": "alc_tree_d",
+      "position": [
+        24.5,
+        3.25,
+        6.6
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_002_as_d",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_002",
+      "old_asset": "alc_tree_a",
+      "reason": "第一层东边：用低伞冠衔接花园",
+      "lod_group": "alc_tree_d"
+    },
+    {
+      "asset": "alc_tree_d",
+      "position": [
+        18,
+        3.25,
+        3.65
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_003_as_d",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_003",
+      "old_asset": "alc_tree_a",
+      "reason": "废墟前：进一步露出拱券与墙面",
+      "lod_group": "alc_tree_d"
+    },
+    {
+      "asset": "alc_tree_d",
+      "position": [
+        -26,
+        5.5,
+        1.5
+      ],
+      "zone": "TerraceZone",
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_005_as_d",
+      "rotation_degrees": [
+        0,
+        180.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_005",
+      "old_asset": "alc_tree_a",
+      "reason": "第二层西转角：减轻连续高树重复",
+      "lod_group": "alc_tree_d"
+    },
+    {
+      "asset": "alc_tree_d",
+      "position": [
+        16.7,
+        5.5,
+        1.9
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_b_004_as_d",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_b_004",
+      "old_asset": "alc_tree_b",
+      "reason": "第二层东转角：保持转角开阔",
+      "lod_group": "alc_tree_d"
+    },
+    {
+      "asset": "alc_tree_d",
+      "position": [
+        22,
+        5.5,
+        1.9
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_008_as_d",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_008",
+      "old_asset": "alc_tree_a",
+      "reason": "第二层前沿：露出上层花带",
+      "lod_group": "alc_tree_d"
+    },
+    {
+      "asset": "alc_tree_d",
+      "position": [
+        16.7,
+        7.75,
+        -2.8
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_012_as_d",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_012",
+      "old_asset": "alc_tree_a",
+      "reason": "第三层前沿：低冠与后排高冠错落",
+      "lod_group": "alc_tree_d"
+    },
+    {
+      "asset": "alc_tree_d",
+      "position": [
+        22,
+        7.75,
+        -2.8
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_013_as_d",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_013",
+      "old_asset": "alc_tree_a",
+      "reason": "第三层前沿：延续小橄榄树节奏",
+      "lod_group": "alc_tree_d"
+    },
+    {
+      "asset": "alc_tree_c",
+      "position": [
+        -28,
+        10,
+        -9
+      ],
+      "zone": "SummitZone",
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_014_as_c",
+      "rotation_degrees": [
+        0,
+        180.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_014",
+      "old_asset": "alc_tree_a",
+      "reason": "灯塔南侧：窄冠竖向点缀，露出塔身",
+      "lod_group": "alc_tree_c"
+    },
+    {
+      "asset": "alc_tree_c",
+      "position": [
+        -22.2,
+        10,
+        -9.5
+      ],
+      "zone": "SummitZone",
+      "yaw": 0.8,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_b_007_as_c",
+      "rotation_degrees": [
+        0,
+        45.836623610465864,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_b_007",
+      "old_asset": "alc_tree_b",
+      "reason": "主楼西侧：一株竖向标点，避开入口",
+      "lod_group": "alc_tree_c"
+    },
+    {
+      "asset": "alc_tree_c",
+      "position": [
+        -28,
+        10,
+        -16
+      ],
+      "zone": "SummitZone",
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_a_015_as_c",
+      "rotation_degrees": [
+        0,
+        180.0,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_a_015",
+      "old_asset": "alc_tree_a",
+      "reason": "灯塔后侧：保持窄冠，不挤主楼轮廓",
+      "lod_group": "alc_tree_c"
+    },
+    {
+      "asset": "alc_tree_c",
+      "position": [
+        22.2,
+        10,
+        -9.5
+      ],
+      "zone": "SummitZone",
+      "yaw": 2.4000000000000004,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_tree_b_008_as_c",
+      "rotation_degrees": [
+        0,
+        137.5098708313976,
+        0
+      ],
+      "multimesh": true,
+      "placeholder": false,
+      "owner": "赵云",
+      "source_name": "alc_tree_b_008",
+      "old_asset": "alc_tree_b",
+      "reason": "主楼东侧：与西侧呼应，水塔旁仍留风吹树",
+      "lod_group": "alc_tree_c"
+    }
+  ],
+  "preserve": [
+    "position",
+    "rotation_degrees",
+    "scale",
+    "zone",
+    "existing collision/navigation"
+  ],
+  "review_note": "本文件是建议，整岛由马可波罗按 source_name 替换；placements 和 instances 是同一批点位的两份表示，不要重复摆放。"
+}
