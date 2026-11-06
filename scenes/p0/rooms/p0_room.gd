@@ -634,6 +634,7 @@ func _on_floor(right: Vector3, up: Vector3, forward: Vector3, q: Vector2) -> Vec
 ## mostly fit down and pan across, which keeps the small-room look.
 func _clamp_focus(f: Vector3) -> Vector3:
 	if _bounds_lo.x == -INF: return f
+	f = _clamp_to_reach(f)
 	var forward := -_cam_dir
 	var right := forward.cross(Vector3.UP).normalized()
 	var up := right.cross(forward).normalized()
@@ -653,6 +654,20 @@ func _clamp_focus(f: Vector3) -> Vector3:
 		else:
 			q[i] = clampf(q[i], lo, hi)
 	return _on_floor(right, up, forward, q)
+
+## A kit with a camera_contract and a footprint (Grace Cathedral, SGODOT-423 — 10.5 m square, wider than the screen
+## both ways): the camera follows the player, its floor point kept within REACH_INSET_M of the footprint's edges as well.
+## On the 45° screen that room is a diamond and its art's box has empty corners: held off them, no backdrop shows
+## (上官婉儿 / 不知火舞 on 423; the outer steps and grass reach past where it can look).
+const REACH_INSET_M := 3.0
+func _clamp_to_reach(f: Vector3) -> Vector3:
+	var size = layout.get("footprint_m", null)
+	if not layout.has("camera_contract") or not (size is Array) or size.size() < 2: return f
+	var half := Vector2(float(size[0]), float(size[1])) * 0.5 - Vector2.ONE * REACH_INSET_M
+	var local := f - room.position
+	local.x = clampf(local.x, -half.x, half.x)
+	local.z = clampf(local.z, -half.y, half.y)
+	return local + room.position
 
 ## The bottom controls, in px from the screen's bottom: (the art's lowest line, the centring band's bottom). With the
 ## quick bar (or the main key) both are its top. With Bag alone (a room, 不知火舞 on #127) the room centres down to the

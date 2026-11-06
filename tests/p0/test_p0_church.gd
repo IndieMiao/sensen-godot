@@ -102,3 +102,22 @@ func test_each_pew_seat_is_its_own_prompt() -> void:
 	var cards := _room("sf_card_room_1")
 	await get_tree().process_frame
 	assert_bool(Array(cards._tappable()).any(func(n): return str(n).begins_with("seat_"))).is_false()
+
+## The cathedral's camera follows the player (上官婉儿 / 不知火舞 on 423, 李元芳's recording: by the organ the player
+## went out of sight) but never past REACH_INSET_M from its footprint's edges — its art's box on the 45° screen is a
+## diamond with empty corners; the opening is as before. A room without a camera_contract (the tea house) is not held.
+func test_the_cathedral_camera_keeps_to_its_reach() -> void:
+	var r := _room(CHURCH_ID)
+	await get_tree().process_frame
+	r.p0_frame({}, 1.0 / 30.0)
+	var opening: Vector3 = r._focus
+	var half := 10.5 * 0.5 - P0Room.REACH_INSET_M
+	for corner in [Vector3(-5, 0, -5), Vector3(5, 0, -5), Vector3(-5, 0, 5), Vector3(5, 0, 5)]:
+		var f: Vector3 = r._clamp_to_reach(r.room.position + corner) - r.room.position
+		assert_float(absf(f.x)).is_less_equal(half + 0.001)
+		assert_float(absf(f.z)).is_less_equal(half + 0.001)
+	assert_vector(r._clamp_to_reach(opening)).is_equal_approx(opening, Vector3.ONE * 0.001)   # the opening: not moved
+	var tea := _room("sh_tea_1")
+	await get_tree().process_frame
+	var far := tea.room.position + Vector3(9, 0, 9)
+	assert_vector(tea._clamp_to_reach(far)).is_equal(far)
