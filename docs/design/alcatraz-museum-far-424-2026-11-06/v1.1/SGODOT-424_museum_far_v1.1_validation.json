@@ -1,0 +1,1825 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "status": "Text-free lighthouse sign matched exactly to bf0c31b1; draft pending art review.",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "revision": "v1.1_pictogram",
+    "checks": [
+      {
+        "check": "pinned near source hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "far manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "actual triangle counts",
+        "passed": true,
+        "evidence": [
+          7869,
+          2205
+        ]
+      },
+      {
+        "check": "far around one quarter",
+        "passed": true,
+        "evidence": 0.28021349599695006
+      },
+      {
+        "check": "one mesh / surface / material",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "no textures / bones / animation / cameras",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "identity local pivot/unit scale",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "near/far identical measured envelope",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "finite positions/colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "no degenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "outward normals agree with winding",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "unit normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "exact inherited near colour set",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Silhouette_exact_000 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 108,
+          "matching_in_bounds": 108
+        }
+      },
+      {
+        "check": "Silhouette_exact_001 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 108,
+          "matching_in_bounds": 150
+        }
+      },
+      {
+        "check": "Silhouette_exact_002 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 108,
+          "matching_in_bounds": 128
+        }
+      },
+      {
+        "check": "Part_003 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_004 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_005 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_006 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_007 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_008 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_009 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_010 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_011 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_012 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_013 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_014 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_015 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_016 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_017 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_018 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_019 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_020 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_021 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_022 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_023 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_01_x-18_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_025 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_026 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_027 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_02_x-18_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_029 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_030 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_031 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_03_x-15_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_033 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_034 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_035 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_04_x-15_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_037 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_038 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_039 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_05_x-12_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_041 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_042 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_043 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_06_x-12_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_045 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_046 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_047 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_07_x-9_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_049 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_050 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_051 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_08_x-9_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_053 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_054 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_055 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_09_x-6_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_057 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_058 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_059 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_10_x-6_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_061 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_062 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_063 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_11_x-3_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_065 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_066 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_067 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_12_x-3_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_069 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_070 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_071 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_13_x0_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_073 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_074 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_075 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_14_x3_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_077 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_078 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_079 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_15_x3_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_081 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_082 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_083 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_16_x6_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_085 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_086 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_087 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_17_x6_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_089 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_090 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_091 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_18_x9_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_093 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_094 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_095 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_19_x9_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_097 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_098 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_099 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_20_x12_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_101 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_102 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_103 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_21_x12_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_105 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_106 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_107 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_22_x15_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_109 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_110 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_111 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_23_x15_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_113 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_114 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_115 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_24_x18_y2.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_117 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_118 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_119 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 26,
+          "matching_in_bounds": 26
+        }
+      },
+      {
+        "check": "Arch_glazing_25_x18_y6.35 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 11,
+          "matching_in_bounds": 11
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_121 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_122 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_123 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_124 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_125 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_126 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_127 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_128 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_129 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Simplified_bevel_part_130 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_131 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 2,
+          "matching_in_bounds": 2
+        }
+      },
+      {
+        "check": "Part_132 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 2,
+          "matching_in_bounds": 2
+        }
+      },
+      {
+        "check": "Part_133 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 1,
+          "matching_in_bounds": 1
+        }
+      },
+      {
+        "check": "Part_134 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 2,
+          "matching_in_bounds": 2
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_135 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_136 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_137 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_138 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_139 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_140 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_141 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_142 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_143 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_144 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_145 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_146 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_147 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_148 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_149 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_150 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_151 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_152 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_153 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_154 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_155 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_156 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "Simplified_bevel_part_157 same-envelope corner positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Part_158 retained source triangles",
+        "passed": true,
+        "evidence": {
+          "expected": 12,
+          "matching_in_bounds": 12
+        }
+      },
+      {
+        "check": "retain all 25 window positions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_01_x-18_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_02_x-18_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_03_x-15_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_04_x-15_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_05_x-12_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_06_x-12_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_07_x-9_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_08_x-9_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_09_x-6_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_10_x-6_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_11_x-3_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_12_x-3_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_13_x0_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_14_x3_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_15_x3_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_16_x6_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_17_x6_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_18_x9_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_19_x9_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_20_x12_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_21_x12_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_22_x15_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_23_x15_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_24_x18_y2.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Arch_glazing_25_x18_y6.35 actual front placement and dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "preserved placeholder Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "import nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "import gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "import meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "original placement preserved",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "full rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.162924880525687,
+          "object_mean_rgb_255": 0.47899515711921037,
+          "pixels_changed_gt_12": 2010,
+          "total_pixels": 446400,
+          "object_pixels": 151838,
+          "max_channel_255": 97.0
+        }
+      },
+      {
+        "check": "front rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.40357783564814814,
+          "object_mean_rgb_255": 0.8118137344776306,
+          "pixels_changed_gt_12": 2672,
+          "total_pixels": 230400,
+          "object_pixels": 114539,
+          "max_channel_255": 53.0
+        }
+      },
+      {
+        "check": "mobile_wide rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.18192476851851852,
+          "object_mean_rgb_255": 0.4363721668832106,
+          "pixels_changed_gt_12": 1224,
+          "total_pixels": 288000,
+          "object_pixels": 120068,
+          "max_channel_255": 96.0
+        }
+      },
+      {
+        "check": "mobile_default rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.44194560185185183,
+          "object_mean_rgb_255": 0.48685827799708276,
+          "pixels_changed_gt_12": 6300,
+          "total_pixels": 288000,
+          "object_pixels": 261432,
+          "max_channel_255": 147.0
+        }
+      },
+      {
+        "check": "fixed rendered near/far mean RGB difference <1/255",
+        "passed": true,
+        "evidence": {
+          "mean_rgb_255": 0.15982153524492235,
+          "object_mean_rgb_255": 0.46987139802508815,
+          "pixels_changed_gt_12": 2011,
+          "total_pixels": 446400,
+          "object_pixels": 151838,
+          "max_channel_255": 97.0
+        }
+      }
+    ],
+    "comparisons": {
+      "full": {
+        "mean_rgb_255": 0.162924880525687,
+        "object_mean_rgb_255": 0.47899515711921037,
+        "pixels_changed_gt_12": 2010,
+        "total_pixels": 446400,
+        "object_pixels": 151838,
+        "max_channel_255": 97.0
+      },
+      "front": {
+        "mean_rgb_255": 0.40357783564814814,
+        "object_mean_rgb_255": 0.8118137344776306,
+        "pixels_changed_gt_12": 2672,
+        "total_pixels": 230400,
+        "object_pixels": 114539,
+        "max_channel_255": 53.0
+      },
+      "mobile_wide": {
+        "mean_rgb_255": 0.18192476851851852,
+        "object_mean_rgb_255": 0.4363721668832106,
+        "pixels_changed_gt_12": 1224,
+        "total_pixels": 288000,
+        "object_pixels": 120068,
+        "max_channel_255": 96.0
+      },
+      "mobile_default": {
+        "mean_rgb_255": 0.44194560185185183,
+        "object_mean_rgb_255": 0.48685827799708276,
+        "pixels_changed_gt_12": 6300,
+        "total_pixels": 288000,
+        "object_pixels": 261432,
+        "max_channel_255": 147.0
+      },
+      "fixed": {
+        "mean_rgb_255": 0.15982153524492235,
+        "object_mean_rgb_255": 0.46987139802508815,
+        "pixels_changed_gt_12": 2011,
+        "total_pixels": 446400,
+        "object_pixels": 151838,
+        "max_channel_255": 97.0
+      }
+    },
+    "source": {
+      "near_file": "reference/alc_museum_bf0c31b1.glb",
+      "git_ref": "bf0c31b1c871011008b455434d167224d14de59c",
+      "path": "assets/landmarks/alcatraz_island/alc_museum.glb",
+      "revision": "v1.1_pictogram",
+      "colour_status": "Near sign synchronized to bf0c31b1 / Plane4aa1b62e: same teal board, cream lighthouse pictogram, no lettering."
+    },
+    "passed": true
+  },
+  "godot": {
+    "checks": [
+      {
+        "check": "Actual mesh triangles match manifest",
+        "evidence": [
+          7869,
+          2205
+        ],
+        "passed": true
+      },
+      {
+        "check": "Far one surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Same imported AABB/pivot",
+        "evidence": [
+          [
+            -20.0,
+            0.0,
+            -5.0
+          ],
+          [
+            -20.0,
+            0.0,
+            -5.0
+          ]
+        ],
+        "passed": true
+      },
+      {
+        "check": "Far about quarter of near",
+        "evidence": 0.28021349599695,
+        "passed": true
+      },
+      {
+        "check": "Import readable",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Godot UID and root_script line",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Texture map mode 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "full_54m engine renders expected LOD only",
+        "evidence": 7869,
+        "passed": true
+      },
+      {
+        "check": "full_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "full_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "full_56m engine renders expected LOD only",
+        "evidence": 2205,
+        "passed": true
+      },
+      {
+        "check": "full_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "full_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "front_54m engine renders expected LOD only",
+        "evidence": 7869,
+        "passed": true
+      },
+      {
+        "check": "front_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "front_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "front_56m engine renders expected LOD only",
+        "evidence": 2205,
+        "passed": true
+      },
+      {
+        "check": "front_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "front_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m engine renders expected LOD only",
+        "evidence": 7869,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m engine renders expected LOD only",
+        "evidence": 2205,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m engine renders expected LOD only",
+        "evidence": 7869,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m engine renders expected LOD only",
+        "evidence": 2205,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fixed_near engine renders expected LOD only",
+        "evidence": 7869,
+        "passed": true
+      },
+      {
+        "check": "fixed_near one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "fixed_near capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fixed_far engine renders expected LOD only",
+        "evidence": 2205,
+        "passed": true
+      },
+      {
+        "check": "fixed_far one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "fixed_far capture",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "views": {
+      "fixed_far": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.3279113769531,
+          25.3464012145996
+        ],
+        "draws": 1,
+        "pitch": 43,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 2205,
+        "width_m": 43,
+        "yaw": 14.5
+      },
+      "fixed_near": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.3279113769531,
+          25.3464031219482
+        ],
+        "draws": 1,
+        "pitch": 43,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 7869,
+        "width_m": 43,
+        "yaw": 14.5
+      },
+      "front_54m": {
+        "aabb_center_distance": 53.9999961853027,
+        "camera": [
+          0.0,
+          22.0153465270996,
+          40.5857238769531
+        ],
+        "draws": 1,
+        "pitch": 8.0,
+        "size": [
+          720,
+          320
+        ],
+        "visible_triangles": 7869,
+        "width_m": 43.0,
+        "yaw": 0.0
+      },
+      "front_56m": {
+        "aabb_center_distance": 55.9999961853027,
+        "camera": [
+          0.0,
+          22.2936935424805,
+          42.5662612915039
+        ],
+        "draws": 1,
+        "pitch": 8.0,
+        "size": [
+          720,
+          320
+        ],
+        "visible_triangles": 2205,
+        "width_m": 43.0,
+        "yaw": 0.0
+      },
+      "full_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.3279113769531,
+          25.3464031219482
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 7869,
+        "width_m": 43.0,
+        "yaw": 14.5
+      },
+      "full_56m": {
+        "aabb_center_distance": 56.0,
+        "camera": [
+          10.2545156478882,
+          52.6919097900391,
+          26.7625179290771
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 2205,
+        "width_m": 43.0,
+        "yaw": 14.5
+      },
+      "mobile_default_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.3279113769531,
+          25.3464031219482
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 7869,
+        "width_m": 6.72,
+        "yaw": 14.5
+      },
+      "mobile_default_56m": {
+        "aabb_center_distance": 56.0,
+        "camera": [
+          10.2545156478882,
+          52.6919097900391,
+          26.7625179290771
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 2205,
+        "width_m": 6.72,
+        "yaw": 14.5
+      },
+      "mobile_wide_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          34.2020301818848,
+          51.3279113769531,
+          6.85779762268066
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 7869,
+        "width_m": 20.16,
+        "yaw": 60.0
+      },
+      "mobile_wide_56m": {
+        "aabb_center_distance": 56.0000038146973,
+        "camera": [
+          35.4687728881836,
+          52.6919097900391,
+          7.58915138244629
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 2205,
+        "width_m": 20.16,
+        "yaw": 60.0
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
-  "near_file": "reference/alc_museum_d7b57574.glb",
-  "git_ref": "d7b57574d359952858319d17b43722651a0fcbcb",
+  "near_file": "reference/alc_museum_bf0c31b1.glb",
+  "git_ref": "bf0c31b1c871011008b455434d167224d14de59c",
   "path": "assets/landmarks/alcatraz_island/alc_museum.glb",
-  "revision": "v1",
-  "colour_status": "Formal near colours and geometry from Marco Polo d7b57574 / Plane7726588c; palette traced from actual COLOR_0, no inferred recolour."
+  "revision": "v1.1_pictogram",
+  "colour_status": "Near sign synchronized to bf0c31b1 / Plane4aa1b62e: same teal board, cream lighthouse pictogram, no lettering."
 }
