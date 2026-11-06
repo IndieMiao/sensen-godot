@@ -1,0 +1,2537 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "base_head": "4b1902a46961b65fc999fc13b44951f89abe7384",
+    "checks": [
+      {
+        "check": "unchanged layout.units",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.axes",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.reference",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.instances",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.camera",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.sun_direction",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.review_lighting",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.anchors",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.spawn",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.floor_y",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.footprint_m",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.boundaries",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.local_lights",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.author",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.virtual_user_id",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.preflight",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.light_patch_alpha",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.maze_contrast",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.camera_contract",
+        "passed": true
+      },
+      {
+        "check": "unchanged layout.bench",
+        "passed": true
+      },
+      {
+        "check": "every original asset placement / collider / material unchanged",
+        "passed": true
+      },
+      {
+        "check": "additions have zero collision",
+        "passed": true
+      },
+      {
+        "check": "foundation one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "foundation mesh name",
+        "passed": true
+      },
+      {
+        "check": "foundation single external atlas",
+        "passed": true
+      },
+      {
+        "check": "foundation finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "foundation Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "foundation original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "outer_steps one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "outer_steps mesh name",
+        "passed": true
+      },
+      {
+        "check": "outer_steps single external atlas",
+        "passed": true
+      },
+      {
+        "check": "outer_steps finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "outer_steps Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "outer_steps original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "grass_surround one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "grass_surround mesh name",
+        "passed": true
+      },
+      {
+        "check": "grass_surround single external atlas",
+        "passed": true
+      },
+      {
+        "check": "grass_surround finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "grass_surround Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "grass_surround original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "entry_landing one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "entry_landing mesh name",
+        "passed": true
+      },
+      {
+        "check": "entry_landing single external atlas",
+        "passed": true
+      },
+      {
+        "check": "entry_landing finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "entry_landing Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "entry_landing original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "labyrinth one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "labyrinth mesh name",
+        "passed": true
+      },
+      {
+        "check": "labyrinth single external atlas",
+        "passed": true
+      },
+      {
+        "check": "labyrinth finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "labyrinth Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "labyrinth original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "west_wall one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "west_wall mesh name",
+        "passed": true
+      },
+      {
+        "check": "west_wall single external atlas",
+        "passed": true
+      },
+      {
+        "check": "west_wall finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "west_wall Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "west_wall original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "north_wall one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "north_wall mesh name",
+        "passed": true
+      },
+      {
+        "check": "north_wall single external atlas",
+        "passed": true
+      },
+      {
+        "check": "north_wall finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "north_wall Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "north_wall original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "pointed_window one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "pointed_window mesh name",
+        "passed": true
+      },
+      {
+        "check": "pointed_window single external atlas",
+        "passed": true
+      },
+      {
+        "check": "pointed_window finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "pointed_window Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "pointed_window original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "window_surround one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "window_surround mesh name",
+        "passed": true
+      },
+      {
+        "check": "window_surround single external atlas",
+        "passed": true
+      },
+      {
+        "check": "window_surround finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "window_surround Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "window_surround original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps mesh name",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps single external atlas",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "altar_table one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "altar_table mesh name",
+        "passed": true
+      },
+      {
+        "check": "altar_table single external atlas",
+        "passed": true
+      },
+      {
+        "check": "altar_table finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "altar_table Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "altar_table original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "apse one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "apse mesh name",
+        "passed": true
+      },
+      {
+        "check": "apse single external atlas",
+        "passed": true
+      },
+      {
+        "check": "apse finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "apse Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "apse original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "rose_window one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "rose_window mesh name",
+        "passed": true
+      },
+      {
+        "check": "rose_window single external atlas",
+        "passed": true
+      },
+      {
+        "check": "rose_window finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "rose_window Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "rose_window original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "wood_pew one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "wood_pew mesh name",
+        "passed": true
+      },
+      {
+        "check": "wood_pew single external atlas",
+        "passed": true
+      },
+      {
+        "check": "wood_pew finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "wood_pew Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wood_pew original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ mesh name",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ single external atlas",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner mesh name",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner single external atlas",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier mesh name",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier single external atlas",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal mesh name",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal single external atlas",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter mesh name",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter single external atlas",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "stained_light one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "stained_light mesh name",
+        "passed": true
+      },
+      {
+        "check": "stained_light single external atlas",
+        "passed": true
+      },
+      {
+        "check": "stained_light finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "stained_light Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "stained_light original GLB+import byte identical",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet mesh name",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet single external atlas",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet normals agree with winding",
+        "passed": true
+      },
+      {
+        "check": "vault_extension one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "vault_extension mesh name",
+        "passed": true
+      },
+      {
+        "check": "vault_extension single external atlas",
+        "passed": true
+      },
+      {
+        "check": "vault_extension finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "vault_extension Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "vault_extension no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "vault_extension normals agree with winding",
+        "passed": true
+      },
+      {
+        "check": "grass_extension one mesh / surface / material",
+        "passed": true
+      },
+      {
+        "check": "grass_extension mesh name",
+        "passed": true
+      },
+      {
+        "check": "grass_extension single external atlas",
+        "passed": true
+      },
+      {
+        "check": "grass_extension finite positions/UV",
+        "passed": true
+      },
+      {
+        "check": "grass_extension Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "grass_extension no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "grass_extension normals agree with winding",
+        "passed": true
+      },
+      {
+        "check": "new carpet atlas square outside ALL original UV triangles + 4px gutter",
+        "passed": true
+      },
+      {
+        "check": "atlas pixels outside new 16x16 unused square identical",
+        "passed": true
+      },
+      {
+        "check": "carpet 1.20m wide / 4mm thick",
+        "passed": true
+      },
+      {
+        "check": "carpet top only 7mm above floor",
+        "passed": true
+      },
+      {
+        "check": "carpet clears labyrinth outer radius by 6cm",
+        "passed": true
+      },
+      {
+        "check": "carpet clears front altar step by 6cm",
+        "passed": true
+      },
+      {
+        "check": "placed triangle budget",
+        "passed": true
+      },
+      {
+        "check": "placed surface budget",
+        "passed": true
+      }
+    ],
+    "unchanged_glb_hashes": [
+      {
+        "file": "foundation.glb",
+        "sha256": "cb7b7d2e0758e9d43e3ed8fe21dd13af8e2becf33f70ca3572fdad31710b2710"
+      },
+      {
+        "file": "outer_steps.glb",
+        "sha256": "2cf534c56269ae65cb6f26512bf7f4332a3e330e27d0f308d5b949ee24e95fd5"
+      },
+      {
+        "file": "grass_surround.glb",
+        "sha256": "9ef86fbedf807ee58f5db36170217b842f1570b37034d451fb91a94c1b2abfe4"
+      },
+      {
+        "file": "entry_landing.glb",
+        "sha256": "e3d55f0c0356adf19c2282bf1c50d874d13eb45e282d0d921e5dd327b354ce8c"
+      },
+      {
+        "file": "labyrinth.glb",
+        "sha256": "00a7dea63451916c1d66538b5edc6a197dff93e9ea78b2198f64408bf8890023"
+      },
+      {
+        "file": "west_wall.glb",
+        "sha256": "8ca0a7e59924e38e394f85caa15fdbad9f879bfa76bbca56de3f83ea5f48950b"
+      },
+      {
+        "file": "north_wall.glb",
+        "sha256": "e496decbfbb2324395badea7ce8289bf75d485daa22565303f67dcc270327202"
+      },
+      {
+        "file": "pointed_window.glb",
+        "sha256": "6e995fad85e2b1f852a6e1dfd283321f5d952bb41fd9be58eb8ac6fc1566b87b"
+      },
+      {
+        "file": "window_surround.glb",
+        "sha256": "ef1fde4135f18f40dc02f2456259b7622a27d61dee520bd89b6b39eea1e41358"
+      },
+      {
+        "file": "sanctuary_steps.glb",
+        "sha256": "67b18f9162d28a724853a6d58840df5f2c9996b8e6471b5416173e8260bf198f"
+      },
+      {
+        "file": "altar_table.glb",
+        "sha256": "8f2c422b6611ff7598b7e2d2e98a171679f11a7cdc4178373c57a91ad3caeb83"
+      },
+      {
+        "file": "apse.glb",
+        "sha256": "3cd7c7dc1e7232d9a6d97f4bdaf8853f2a0e9b456e12fb90614bb82aca2fa65d"
+      },
+      {
+        "file": "rose_window.glb",
+        "sha256": "65d3b83b6bdc4ee94a40595b5530fdaf1633028d0e6d9c52973acc2568855f10"
+      },
+      {
+        "file": "wood_pew.glb",
+        "sha256": "5aec0c736b8b72a326867af4a7108699c0c36ced61c58a05ce58171db9d9b630"
+      },
+      {
+        "file": "pipe_organ.glb",
+        "sha256": "9eb55729d23748906a8f5929f3785378d7d6338bd5c64aea6f2021a06293b023"
+      },
+      {
+        "file": "hanging_banner.glb",
+        "sha256": "52d4de663bbf84d558821a3204239a6b0b261b02247a91d3aab2c59f1d0c43f5"
+      },
+      {
+        "file": "iron_chandelier.glb",
+        "sha256": "5205a285c9bcaafceaad82d6f7de29dfcadb5f26c40d978a57c61cfd4777c0d8"
+      },
+      {
+        "file": "flower_pedestal.glb",
+        "sha256": "94a74a5c1a9091cc5720fc57c84c5ea2bf4d3025ff5dedb1aaaf21d9ce873245"
+      },
+      {
+        "file": "leaf_planter.glb",
+        "sha256": "0a075be37e639e3f0121736266d48ac321707edc2b9303acbfb42e77e527ae4a"
+      },
+      {
+        "file": "stained_light.glb",
+        "sha256": "3d446ba68c4019d0c561dea6c9098f1384e331d37e7d26f0b9090c8cc63aff9e"
+      }
+    ],
+    "new_assets": [
+      {
+        "name": "aisle_carpet",
+        "triangles": 12,
+        "bounds": [
+          [
+            -0.6000000238418579,
+            0.0,
+            -2.7950000762939453
+          ],
+          [
+            0.6000000238418579,
+            0.004000000189989805,
+            2.7950000762939453
+          ]
+        ]
+      },
+      {
+        "name": "vault_extension",
+        "triangles": 2492,
+        "bounds": [
+          [
+            -7.449999809265137,
+            7.958186626434326,
+            -7.449999809265137
+          ],
+          [
+            7.449999809265137,
+            11.531813621520996,
+            7.449999809265137
+          ]
+        ]
+      },
+      {
+        "name": "grass_extension",
+        "triangles": 12,
+        "bounds": [
+          [
+            -15.0,
+            -0.8799999952316284,
+            -15.0
+          ],
+          [
+            15.0,
+            -0.699999988079071,
+            15.0
+          ]
+        ]
+      }
+    ],
+    "stats": {
+      "scene_triangles": 107454,
+      "static_draw_surfaces": 40,
+      "plant_triangles": 16984
+    },
+    "passed": true
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "scale": 1.01551556587219
+    },
+    "captures": [
+      {
+        "name": "default_360",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "default_360_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "corner_ne_360",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "corner_ne_360_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "corner_nw_360",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "corner_nw_360_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "corner_sw_360",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "corner_sw_360_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "corner_se_360",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "corner_se_360_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "planter_regression",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "planter_regression_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_-4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_-4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_-2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_-2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_0.0",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_0.0_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-4.85_4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_-4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_-4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_-2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_-2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_0.0",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_0.0_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_-2.425_4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_-4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_-4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_-2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_-2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_0.0",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_0.0_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_0.0_4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_-4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_-4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_-2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_-2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_0.0",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_0.0_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_2.425_4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_-4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_-4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_-2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_-2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_0.0",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_0.0_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_2.425",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_2.425_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_4.85",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "grid_4.85_4.85_magenta",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      }
+    ],
+    "checks": [
+      {
+        "check": "Placed triangle budget and manifest match",
+        "passed": true
+      },
+      {
+        "check": "Placed surface budget and manifest match",
+        "passed": true
+      },
+      {
+        "check": "Plant budget",
+        "passed": true
+      },
+      {
+        "check": "One 2048 atlas",
+        "passed": true
+      },
+      {
+        "check": "Coloured ground light alpha <= .35",
+        "passed": true
+      },
+      {
+        "check": "Eight seats",
+        "passed": true
+      },
+      {
+        "check": "seat_left_1 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_left_2 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_left_3 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_left_4 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_right_1 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_right_2 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_right_3 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "seat_right_4 owns actual seat surface",
+        "passed": true
+      },
+      {
+        "check": "foundation import",
+        "passed": true
+      },
+      {
+        "check": "foundation Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "foundation texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "outer_steps import",
+        "passed": true
+      },
+      {
+        "check": "outer_steps Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "outer_steps texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "grass_surround import",
+        "passed": true
+      },
+      {
+        "check": "grass_surround Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "grass_surround texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "entry_landing import",
+        "passed": true
+      },
+      {
+        "check": "entry_landing Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "entry_landing texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "labyrinth import",
+        "passed": true
+      },
+      {
+        "check": "labyrinth Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "labyrinth texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "west_wall import",
+        "passed": true
+      },
+      {
+        "check": "west_wall Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "west_wall texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "north_wall import",
+        "passed": true
+      },
+      {
+        "check": "north_wall Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "north_wall texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "pointed_window import",
+        "passed": true
+      },
+      {
+        "check": "pointed_window Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "pointed_window texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "window_surround import",
+        "passed": true
+      },
+      {
+        "check": "window_surround Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "window_surround texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps import",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "altar_table import",
+        "passed": true
+      },
+      {
+        "check": "altar_table Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "altar_table texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "apse import",
+        "passed": true
+      },
+      {
+        "check": "apse Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "apse texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "rose_window import",
+        "passed": true
+      },
+      {
+        "check": "rose_window Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "rose_window texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wood_pew import",
+        "passed": true
+      },
+      {
+        "check": "wood_pew Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "wood_pew texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ import",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "pipe_organ texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner import",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "hanging_banner texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier import",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal import",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter import",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "leaf_planter texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "stained_light import",
+        "passed": true
+      },
+      {
+        "check": "stained_light Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "stained_light texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet import",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "aisle_carpet texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "vault_extension import",
+        "passed": true
+      },
+      {
+        "check": "vault_extension Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "vault_extension texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "grass_extension import",
+        "passed": true
+      },
+      {
+        "check": "grass_extension Godot import UID",
+        "passed": true
+      },
+      {
+        "check": "grass_extension texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "Default avatar assembled",
+        "passed": true
+      },
+      {
+        "check": "Actual low sanctuary step blocks at shin height",
+        "passed": true
+      },
+      {
+        "check": "entry_to_aisle capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_left_1 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_left_2 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_left_3 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_left_4 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_right_1 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_right_2 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_right_3 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "approach_seat_right_4 capsule radius 0.25",
+        "passed": true
+      },
+      {
+        "check": "entry_to_aisle capsule radius 0.39",
+        "passed": true
+      },
+      {
+        "check": "capture default_360",
+        "passed": true
+      },
+      {
+        "check": "capture default_360_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture corner_ne_360",
+        "passed": true
+      },
+      {
+        "check": "capture corner_ne_360_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture corner_nw_360",
+        "passed": true
+      },
+      {
+        "check": "capture corner_nw_360_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture corner_sw_360",
+        "passed": true
+      },
+      {
+        "check": "capture corner_sw_360_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture corner_se_360",
+        "passed": true
+      },
+      {
+        "check": "capture corner_se_360_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture planter_regression",
+        "passed": true
+      },
+      {
+        "check": "capture planter_regression_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_-4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_-4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_-2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_-2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_0.0",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_0.0_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-4.85_4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_-4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_-4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_-2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_-2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_0.0",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_0.0_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_-2.425_4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_-4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_-4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_-2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_-2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_0.0",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_0.0_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_0.0_4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_-4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_-4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_-2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_-2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_0.0",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_0.0_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_2.425_4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_-4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_-4.85_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_-2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_-2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_0.0",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_0.0_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_2.425",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_2.425_magenta",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_4.85",
+        "passed": true
+      },
+      {
+        "check": "capture grid_4.85_4.85_magenta",
+        "passed": true
+      }
+    ],
+    "follow_cases": [
+      {
+        "blockers": [
+          "/root/ChurchReview/@SubViewport@2/@Node3D@3/PoiChurchArt/foundation/Floor"
+        ],
+        "focus": [
+          0.0,
+          1.39999997615814,
+          0.0
+        ],
+        "name": "default_360",
+        "player": [
+          1.661700963974,
+          0.0799999982118607,
+          4.20728540420532
+        ]
+      },
+      {
+        "blockers": [
+          "/root/ChurchReview/@SubViewport@2/@Node3D@3/PoiChurchArt/foundation/Floor"
+        ],
+        "focus": [
+          4.69999980926514,
+          0.0799999982118607,
+          -4.69999980926514
+        ],
+        "name": "corner_ne_360",
+        "player": [
+          4.69999980926514,
+          0.0799999982118607,
+          -4.69999980926514
+        ]
+      },
+      {
+        "blockers": [
+          "/root/ChurchReview/@SubViewport@2/@Node3D@3/PoiChurchArt/foundation/Floor"
+        ],
+        "focus": [
+          -4.69999980926514,
+          0.0799999982118607,
+          -4.69999980926514
+        ],
+        "name": "corner_nw_360",
+        "player": [
+          -4.69999980926514,
+          0.0799999982118607,
+          -4.69999980926514
+        ]
+      },
+      {
+        "blockers": [
+          "/root/ChurchReview/@SubViewport@2/@Node3D@3/PoiChurchArt/foundation/Floor"
+        ],
+        "focus": [
+          -4.69999980926514,
+          0.0799999982118607,
+          4.69999980926514
+        ],
+        "name": "corner_sw_360",
+        "player": [
+          -4.69999980926514,
+          0.0799999982118607,
+          4.69999980926514
+        ]
+      },
+      {
+        "blockers": [
+          "/root/ChurchReview/@SubViewport@2/@Node3D@3/PoiChurchArt/foundation/Floor"
+        ],
+        "focus": [
+          4.69999980926514,
+          0.0799999982118607,
+          4.69999980926514
+        ],
+        "name": "corner_se_360",
+        "player": [
+          4.69999980926514,
+          0.0799999982118607,
+          4.69999980926514
+        ]
+      },
+      {
+        "blockers": [
+          "/root/ChurchReview/@SubViewport@2/@Node3D@3/PoiChurchArt/foundation/Floor"
+        ],
+        "focus": [
+          3.54999995231628,
+          0.0799999982118607,
+          -3.20000004768372
+        ],
+        "name": "planter_regression",
+        "player": [
+          3.54999995231628,
+          0.0799999982118607,
+          -3.20000004768372
+        ]
+      }
+    ],
+    "geometry": {
+      "plant_triangles": 16984.0,
+      "surfaces": 40,
+      "triangles": 107454
+    },
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "routes": [
+      {
+        "failed_segments": [],
+        "name": "entry_to_aisle",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_left_1",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_left_2",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_left_3",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_left_4",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_right_1",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_right_2",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_right_3",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "approach_seat_right_4",
+        "radius": 0.25
+      },
+      {
+        "failed_segments": [],
+        "name": "entry_to_aisle",
+        "radius": 0.39
+      }
+    ]
+  },
+  "coverage": {
+    "method": "background-only colour toggle, fixed geometry/lights/camera; full native 360x800 pixels",
+    "cases": [
+      {
+        "name": "corner_ne_360.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "corner_nw_360.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "corner_se_360.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "corner_sw_360.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "default_360.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-2.425_-2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-2.425_-4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-2.425_0.0.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-2.425_2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-2.425_4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-4.85_-2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-4.85_-4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-4.85_0.0.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-4.85_2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_-4.85_4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_0.0_-2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_0.0_-4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_0.0_0.0.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_0.0_2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_0.0_4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_2.425_-2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_2.425_-4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_2.425_0.0.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_2.425_2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_2.425_4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_4.85_-2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_4.85_-4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_4.85_0.0.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_4.85_2.425.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "grid_4.85_4.85.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      },
+      {
+        "name": "planter_regression.png",
+        "different_pixels": 0,
+        "maximum_channel_difference": 0,
+        "corner_pixels": {
+          "tl": 0,
+          "tr": 0,
+          "bl": 0,
+          "br": 0
+        }
+      }
+    ],
+    "passed": true
+  },
+  "scope": "Isolated Godot 4.7.2 Mobile/Vulkan art assembly, 43deg yaw45 width6.72, default layout camera + stationary player-follow targets on floor. Not full live P0PoiRoom service/UI or Android acceptance."
+}
