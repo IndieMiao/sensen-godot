@@ -1,0 +1,1984 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "lookout_telescope manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope actual triangle count/budget",
+        "passed": true,
+        "evidence": 681
+      },
+      {
+        "check": "lookout_telescope actual bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope finite geometry/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope no degenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope texture-free",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope no rig/animation/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope opaque vertex colours",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope existing warm palette in linear COLOR_0",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "lookout_telescope bottom pivot atY0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope within2m module",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope unit node scale",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope Godot-generated UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_telescope meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m actual triangle count/budget",
+        "passed": true,
+        "evidence": 204
+      },
+      {
+        "check": "lookout_railing_2m actual bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m finite geometry/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m no degenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m texture-free",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m no rig/animation/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m opaque vertex colours",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m existing warm palette in linear COLOR_0",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "lookout_railing_2m bottom pivot atY0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m within2m module",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m unit node scale",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m Godot-generated UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_railing_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m actual triangle count/budget",
+        "passed": true,
+        "evidence": 360
+      },
+      {
+        "check": "lookout_semicircle_2m actual bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m finite geometry/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m no degenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m texture-free",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m no rig/animation/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m opaque vertex colours",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m existing warm palette in linear COLOR_0",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "lookout_semicircle_2m bottom pivot atY0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m within2m module",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m unit node scale",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m Godot-generated UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_semicircle_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Semicircle actual2m chord/1m projection",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Semicircle mounting contract",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc actual triangle count/budget",
+        "passed": true,
+        "evidence": 317
+      },
+      {
+        "check": "lookout_compass_disc actual bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc finite geometry/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc no degenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc texture-free",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc no rig/animation/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc opaque vertex colours",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc existing warm palette in linear COLOR_0",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "lookout_compass_disc bottom pivot atY0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc within2m module",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc unit node scale",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc Godot-generated UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc floor relief <=15mm",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_compass_disc every flat glyph faces upwards",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench actual triangle count/budget",
+        "passed": true,
+        "evidence": 728
+      },
+      {
+        "check": "lookout_sheltered_bench actual bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench finite geometry/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench no degenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench texture-free",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench no rig/animation/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench opaque vertex colours",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench existing warm palette in linear COLOR_0",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "lookout_sheltered_bench bottom pivot atY0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench within2m module",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench unit node scale",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench Godot-generated UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lookout_sheltered_bench seat height0.715m",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "All21 GLB UIDs unique",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Every original street-kit asset/material/import/palette preserved",
+        "passed": true,
+        "evidence": {
+          "files": 36
+        }
+      },
+      {
+        "check": "Combined21-piece catalogue totals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "No game scene/layout delivered",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Branch introduces no Alcatraz asset changes",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Pinned ground fixture unchanged",
+        "passed": true,
+        "evidence": {
+          "commit": "4efa7e900dac23c575a0130d421cad62112a5b78",
+          "files": 13
+        }
+      }
+    ],
+    "passed": true,
+    "new_assets": {
+      "lookout_telescope": {
+        "triangles": 681,
+        "bounds": [
+          [
+            -0.2712499797344208,
+            0.0,
+            -0.34329283237457275
+          ],
+          [
+            0.2849999964237213,
+            1.6310392618179321,
+            0.2970000207424164
+          ]
+        ],
+        "dimensions_m": [
+          0.5562499761581421,
+          1.6310392618179321,
+          0.6402928531169891
+        ]
+      },
+      "lookout_railing_2m": {
+        "triangles": 204,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.05999999865889549
+          ],
+          [
+            1.0,
+            0.9700000286102295,
+            0.05999999865889549
+          ]
+        ],
+        "dimensions_m": [
+          2.0,
+          0.9700000286102295,
+          0.11999999731779099
+        ]
+      },
+      "lookout_semicircle_2m": {
+        "triangles": 360,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          [
+            1.0,
+            1.090000033378601,
+            -0.0
+          ]
+        ],
+        "dimensions_m": [
+          2.0,
+          1.090000033378601,
+          1.0
+        ]
+      },
+      "lookout_compass_disc": {
+        "triangles": 317,
+        "bounds": [
+          [
+            -0.800000011920929,
+            0.0,
+            -0.800000011920929
+          ],
+          [
+            0.800000011920929,
+            0.014499999582767487,
+            0.800000011920929
+          ]
+        ],
+        "dimensions_m": [
+          1.600000023841858,
+          0.014499999582767487,
+          1.600000023841858
+        ]
+      },
+      "lookout_sheltered_bench": {
+        "triangles": 728,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.699999988079071
+          ],
+          [
+            1.0,
+            2.4600000381469727,
+            0.699999988079071
+          ]
+        ],
+        "dimensions_m": [
+          2.0,
+          2.4600000381469727,
+          1.399999976158142
+        ]
+      }
+    },
+    "new_triangles": 2290,
+    "new_surfaces": 5,
+    "combined_triangles": 8246,
+    "combined_surfaces": 21
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "source_height_m": 1.71833898495782
+    },
+    "captures": [
+      {
+        "camera_width": 6.71999979019165,
+        "file": "example_360.png",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ]
+      },
+      {
+        "camera_width": 1.95000004768372,
+        "file": "disc_detail.png",
+        "pitch": 90.0,
+        "size": [
+          700,
+          700
+        ]
+      },
+      {
+        "camera_width": 8.55000019073486,
+        "file": "catalog_lamp_single.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 8.47500038146973,
+        "file": "catalog_lamp_double.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_bench_wood.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_bench_stone.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_railing_straight_2m.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_railing_endpost.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_railing_corner.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_bollard.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_planter_square.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_planter_long.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_litter_bin.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.77500009536743,
+        "file": "catalog_sign_standing.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_sign_wall.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_bicycle_rack.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 7.14999961853027,
+        "file": "catalog_umbrella_table.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_drinking_fountain.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_lookout_telescope.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_lookout_railing_2m.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_lookout_semicircle_2m.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 4.36250019073486,
+        "file": "catalog_lookout_compass_disc.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      },
+      {
+        "camera_width": 6.15000009536743,
+        "file": "catalog_lookout_sheltered_bench.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          190
+        ]
+      }
+    ],
+    "catalog": {
+      "bench_stone": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.899999976158142,
+            0.0,
+            -0.334999978542328
+          ],
+          [
+            0.899999976158142,
+            1.28999996185303,
+            0.310000002384186
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 352.0
+      },
+      "bench_wood": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.899999976158142,
+            0.0,
+            -0.369112610816956
+          ],
+          [
+            0.899999976158142,
+            1.27778089046478,
+            0.302735984325409
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 604.0
+      },
+      "bicycle_rack": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.9200000166893,
+            0.0,
+            -0.360000014305115
+          ],
+          [
+            0.9200000166893,
+            0.927999973297119,
+            0.360000014305115
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 472.0
+      },
+      "bollard": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.140000000596046,
+            0.0,
+            -0.140000000596046
+          ],
+          [
+            0.140000000596046,
+            0.730000019073486,
+            0.140000000596046
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 140.0
+      },
+      "drinking_fountain": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.28999999165535,
+            0.0,
+            -0.28999999165535
+          ],
+          [
+            0.28999999165535,
+            1.19372081756592,
+            0.28999999165535
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 346.0
+      },
+      "lamp_double": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.879999995231628,
+            0.0,
+            -0.230000004172325
+          ],
+          [
+            0.879999995231628,
+            3.39000010490417,
+            0.230000004172325
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 652.0
+      },
+      "lamp_single": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.230000004172325,
+            0.0,
+            -0.230000004172325
+          ],
+          [
+            0.230000004172325,
+            3.42000007629395,
+            0.230000004172325
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 368.0
+      },
+      "litter_bin": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.300000011920929,
+            0.0,
+            -0.300000011920929
+          ],
+          [
+            0.300000011920929,
+            0.899999976158142,
+            0.300000011920929
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 536.0
+      },
+      "lookout_compass_disc": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.800000011920929,
+            0.0,
+            -0.800000011920929
+          ],
+          [
+            0.800000011920929,
+            0.0144999995827675,
+            0.800000011920929
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 317.0
+      },
+      "lookout_railing_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.0599999986588955
+          ],
+          [
+            1.0,
+            0.97000002861023,
+            0.0599999986588955
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 204.0
+      },
+      "lookout_semicircle_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          [
+            1.0,
+            1.0900000333786,
+            0.0
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 360.0
+      },
+      "lookout_sheltered_bench": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.699999988079071
+          ],
+          [
+            1.0,
+            2.46000003814697,
+            0.699999988079071
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 728.0
+      },
+      "lookout_telescope": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.271249979734421,
+            0.0,
+            -0.343292832374573
+          ],
+          [
+            0.284999996423721,
+            1.63103926181793,
+            0.297000020742416
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 681.0
+      },
+      "planter_long": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.987999975681305,
+            0.0,
+            -0.301600009202957
+          ],
+          [
+            0.987999975681305,
+            1.17999994754791,
+            0.301600009202957
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 568.0
+      },
+      "planter_square": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.44200000166893,
+            0.0,
+            -0.44200000166893
+          ],
+          [
+            0.44200000166893,
+            1.29499995708466,
+            0.44200000166893
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 408.0
+      },
+      "railing_corner": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.100000001490116,
+            0.0,
+            -0.100000001490116
+          ],
+          [
+            1.0,
+            1.08000004291534,
+            1.0
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 312.0
+      },
+      "railing_endpost": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.100000001490116,
+            0.0,
+            -0.100000001490116
+          ],
+          [
+            0.100000001490116,
+            1.08000004291534,
+            0.100000001490116
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 136.0
+      },
+      "railing_straight_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.0320000015199184
+          ],
+          [
+            1.0,
+            0.957712829113007,
+            0.0320000015199184
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 184.0
+      },
+      "sign_standing": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.574999988079071,
+            0.0,
+            -0.119999997317791
+          ],
+          [
+            0.574999988079071,
+            1.9099999666214,
+            0.142000004649162
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 208.0
+      },
+      "sign_wall": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.574999988079071,
+            -0.28999999165535,
+            0.0
+          ],
+          [
+            0.574999988079071,
+            0.28999999165535,
+            0.142000004649162
+          ]
+        ],
+        "pose_lift_m": 0.28999999165535,
+        "triangles": 148.0
+      },
+      "umbrella_table": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.949999988079071,
+            0.0,
+            -0.800000011920929
+          ],
+          [
+            0.949999988079071,
+            2.85999989509583,
+            0.800000011920929
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 522.0
+      }
+    },
+    "checks": [
+      {
+        "check": "lamp_single one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_single matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_single no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_single triangle budget",
+        "evidence": 368,
+        "passed": true
+      },
+      {
+        "check": "lamp_single single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_double one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_double matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_double no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_double triangle budget",
+        "evidence": 652,
+        "passed": true
+      },
+      {
+        "check": "lamp_double single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_wood one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_wood matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_wood no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_wood triangle budget",
+        "evidence": 604,
+        "passed": true
+      },
+      {
+        "check": "bench_wood single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_stone one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_stone matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_stone no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_stone triangle budget",
+        "evidence": 352,
+        "passed": true
+      },
+      {
+        "check": "bench_stone single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m triangle budget",
+        "evidence": 184,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost triangle budget",
+        "evidence": 136,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_corner one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_corner matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_corner no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_corner triangle budget",
+        "evidence": 312,
+        "passed": true
+      },
+      {
+        "check": "railing_corner single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bollard one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bollard matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bollard no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bollard triangle budget",
+        "evidence": 140,
+        "passed": true
+      },
+      {
+        "check": "bollard single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_square one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_square matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_square no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_square triangle budget",
+        "evidence": 408,
+        "passed": true
+      },
+      {
+        "check": "planter_square single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_long one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_long matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_long no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_long triangle budget",
+        "evidence": 568,
+        "passed": true
+      },
+      {
+        "check": "planter_long single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "litter_bin one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "litter_bin matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "litter_bin no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "litter_bin triangle budget",
+        "evidence": 536,
+        "passed": true
+      },
+      {
+        "check": "litter_bin single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_standing one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_standing matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_standing no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_standing triangle budget",
+        "evidence": 208,
+        "passed": true
+      },
+      {
+        "check": "sign_standing single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_wall one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_wall matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_wall no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_wall triangle budget",
+        "evidence": 148,
+        "passed": true
+      },
+      {
+        "check": "sign_wall single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack triangle budget",
+        "evidence": 472,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table triangle budget",
+        "evidence": 522,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain triangle budget",
+        "evidence": 346,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_telescope one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_telescope matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_telescope no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_telescope triangle budget",
+        "evidence": 681,
+        "passed": true
+      },
+      {
+        "check": "lookout_telescope single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_railing_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_railing_2m matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_railing_2m no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_railing_2m triangle budget",
+        "evidence": 204,
+        "passed": true
+      },
+      {
+        "check": "lookout_railing_2m single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_semicircle_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_semicircle_2m matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_semicircle_2m no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_semicircle_2m triangle budget",
+        "evidence": 360,
+        "passed": true
+      },
+      {
+        "check": "lookout_semicircle_2m single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_compass_disc one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_compass_disc matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_compass_disc no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_compass_disc triangle budget",
+        "evidence": 317,
+        "passed": true
+      },
+      {
+        "check": "lookout_compass_disc single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_sheltered_bench one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_sheltered_bench matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_sheltered_bench no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lookout_sheltered_bench triangle budget",
+        "evidence": 728,
+        "passed": true
+      },
+      {
+        "check": "lookout_sheltered_bench single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "All twenty-one street/lookout modules",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Default avatar assembled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Deck top ray (0.0, 2.0, -0.4)",
+        "evidence": [
+          0.0,
+          0.120000004768372,
+          -0.400000005960464
+        ],
+        "passed": true
+      },
+      {
+        "check": "Deck top ray (0.5, 2.0, -0.4)",
+        "evidence": [
+          0.5,
+          0.120000004768372,
+          -0.400000005960464
+        ],
+        "passed": true
+      },
+      {
+        "check": "Deck top ray (-0.5, 2.0, -0.4)",
+        "evidence": [
+          -0.5,
+          0.120000004768372,
+          -0.400000005960464
+        ],
+        "passed": true
+      },
+      {
+        "check": "Endpost covers old/new curved joint x=-1.04",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Endpost covers old/new curved joint x=-1.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Endpost covers old/new curved joint x=-0.96",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Endpost covers old/new curved joint x=0.96",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Endpost covers old/new curved joint x=1.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Endpost covers old/new curved joint x=1.04",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Semicircle deck flush with rectangle topY0.12",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Semicircle connector matches standard endpost -1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Semicircle connector matches standard endpost 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Old/new/curved handrail centre heights align at1.05",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture example_360",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture disc_detail",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lamp_single",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lamp_double",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_bench_wood",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_bench_stone",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_railing_straight_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_railing_endpost",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_railing_corner",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_bollard",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_planter_square",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_planter_long",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_litter_bin",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_sign_standing",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_sign_wall",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_bicycle_rack",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_umbrella_table",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_drinking_fountain",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lookout_telescope",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lookout_railing_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lookout_semicircle_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lookout_compass_disc",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lookout_sheltered_bench",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "example": {
+      "ground_review_commit": "4efa7e900dac23c575a0130d421cad62112a5b78",
+      "layout_exported": false,
+      "main_corner_bounds_m": [
+        [
+          -3,
+          0,
+          -2
+        ],
+        [
+          3,
+          0.12,
+          2
+        ]
+      ],
+      "main_corner_footprint_m": [
+        6,
+        4
+      ],
+      "outside_context": "Sea/land backdrop and approach path are review-only",
+      "pieces": {
+        "lookout_compass_disc": 1,
+        "lookout_railing_2m": 1,
+        "lookout_semicircle_2m": 1,
+        "lookout_sheltered_bench": 1,
+        "lookout_telescope": 1,
+        "planter_square": 1,
+        "railing_endpost": 4,
+        "railing_straight_2m": 1
+      },
+      "surfaces_including_review_ground": 15,
+      "triangles_including_review_ground": 3474
+    },
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  },
+  "cold_import": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "passed": true,
+    "fresh_cache": true,
+    "exit_code": 0,
+    "etc2_astc_enabled": true,
+    "source_kit_unchanged": true,
+    "workspace_status_unchanged": true,
+    "fixture_file_changes": [],
+    "fixture_files_checked": 62,
+    "street_kit_textures": 0,
+    "ground_dependency_images_have_mobile_formats": true,
+    "ground_commit": "4efa7e900dac23c575a0130d421cad62112a5b78"
+  },
+  "scope": "Five new lookout assets appended to street kit. No Alcatraz files, scene layout or game integration changed."
+}

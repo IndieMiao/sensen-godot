@@ -564,9 +564,236 @@
       "bowl_height_m": 1.05,
       "front": "+Z",
       "water": "No particles, water surface or runtime interaction"
+    },
+    "lookout_telescope": {
+      "file": "lookout_telescope.glb",
+      "triangles": 640,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.2712499797344208,
+          0.0,
+          -0.34329283237457275
+        ],
+        [
+          0.2849999964237213,
+          1.6310392618179321,
+          0.2970000207424164
+        ]
+      ],
+      "dimensions_m": [
+        0.5562499761581421,
+        1.6310392618179321,
+        0.6402928531169891
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/lookout_431/lookout_telescope.blend",
+      "sha256": "331d01482f1c41f4cdfb781006cde166fa819522f5c80c13328bb958adb78321",
+      "view_direction": "-Z, slightly up",
+      "eye_height_m": 1.4,
+      "content": "Vertical coin box matching pedestal; single horizontal slot, no dots/arrows/letters",
+      "coin_box_dimensions_m": [
+        0.14,
+        0.32,
+        0.08
+      ],
+      "coin_box_center_m": [
+        0,
+        0.89,
+        0.125
+      ],
+      "coin_box_srgb": "5D4C38",
+      "coin_slot_dimensions_m": [
+        0.1,
+        0.018,
+        0.006
+      ],
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "task": "SGODOT-431"
+    },
+    "lookout_railing_2m": {
+      "file": "lookout_railing_2m.glb",
+      "triangles": 180,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.03200000151991844
+        ],
+        [
+          1.0,
+          0.9577128291130066,
+          0.03200000151991844
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        0.9577128291130066,
+        0.06400000303983688
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/lookout_431/lookout_railing_2m.blend",
+      "sha256": "3118a659684087ef2226f3bb2030df3dd3a7c7d18a02315c033199b65ee6491b",
+      "grid_m": 2,
+      "connectors": {
+        "left": [
+          -1,
+          0,
+          0
+        ],
+        "right": [
+          1,
+          0,
+          0
+        ]
+      },
+      "rail_centres_y_m": [
+        0.23,
+        0.93
+      ],
+      "rail_radius_m": 0.032,
+      "rail_srgb": "5D4C38",
+      "endpost": "Use existing railing_endpost; one per shared seam",
+      "task": "SGODOT-431"
+    },
+    "lookout_semicircle_2m": {
+      "file": "lookout_semicircle_2m.glb",
+      "triangles": 464,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          1.0777127742767334,
+          -0.0
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        1.0777127742767334,
+        1.0
+      ],
+      "pivot": "chord midpoint at underside; floor undersideY0",
+      "source": "tools/art/source/lookout_431/lookout_semicircle_2m.blend",
+      "sha256": "6fa15577073f7beb0ba1b3303a8afcdf4b14aa5d476fba151ecd0880ba96ec32",
+      "grid_m": 2,
+      "chord_width_m": 2,
+      "outward_extent_m": 1,
+      "outward": "-Z",
+      "deck_top_y_m": 0.12,
+      "connectors": {
+        "left": [
+          -1,
+          0.12,
+          0
+        ],
+        "right": [
+          1,
+          0.12,
+          0
+        ]
+      },
+      "rail_centres_y_m": [
+        0.35,
+        1.05
+      ],
+      "rail_radius_m": 0.032,
+      "rail_srgb": "5D4C38",
+      "endpost": "Existing railing_endpost at both connector points covers5cm rail-centre offset",
+      "collisions": "None; scene owner supplies deck/navigation/collision at integration",
+      "task": "SGODOT-431"
+    },
+    "lookout_compass_disc": {
+      "file": "lookout_compass_disc.glb",
+      "triangles": 317,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.800000011920929,
+          0.0,
+          -0.800000011920929
+        ],
+        [
+          0.800000011920929,
+          0.014499999582767487,
+          0.800000011920929
+        ]
+      ],
+      "dimensions_m": [
+        1.600000023841858,
+        0.014499999582767487,
+        1.600000023841858
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/lookout_431/lookout_compass_disc.blend",
+      "sha256": "0ab32b487abc2b34cea0d6037f59369e8d18cfca4bd90d716e43b08eca132c57",
+      "diameter_m": 1.6,
+      "height_m": 0.0145,
+      "content": "Four arrows, passenger boat and lighthouse only; no lettering",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "task": "SGODOT-431"
+    },
+    "lookout_sheltered_bench": {
+      "file": "lookout_sheltered_bench.glb",
+      "triangles": 728,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.699999988079071
+        ],
+        [
+          1.0,
+          2.4600000381469727,
+          0.699999988079071
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        2.4600000381469727,
+        1.399999976158142
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/lookout_431/lookout_sheltered_bench.blend",
+      "sha256": "38f2ae42b0446e0a01c3ad9a7277fef4d3c0f1a99670d41ead07362110d67a94",
+      "grid_m": 2,
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "seat_height_m": 0.715,
+      "seat_width_m": 1.58,
+      "front": "+Z",
+      "content": "One bench and open slatted shade frame; decorative, no seat anchors",
+      "task": "SGODOT-431"
     }
   },
-  "unique_triangles": 5956,
-  "unique_surfaces": 16,
-  "scope": "Reusable furniture only; example is review-only, no game layout or location"
+  "unique_triangles": 8285,
+  "unique_surfaces": 21,
+  "scope": "Reusable furniture only; example is review-only, no game layout or location",
+  "extension_tasks": {
+    "SGODOT-431": {
+      "revision": "v1.1",
+      "assets": [
+        "lookout_telescope",
+        "lookout_railing_2m",
+        "lookout_semicircle_2m",
+        "lookout_compass_disc",
+        "lookout_sheltered_bench"
+      ],
+      "scope": "Lookout kit only; no Alcatraz integration/layout"
+    }
+  }
 }

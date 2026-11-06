@@ -1,0 +1,10 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-431",
+  "module": "lookout_telescope",
+  "geometry": "New geometry; existing street-kit assets unchanged",
+  "palette": "street_kit v1.2, muted #830 wood, Alcatraz cream/teal/metal",
+  "source": "tools/art/source/lookout_431/lookout_telescope.blend",
+  "generator": "tools/art/source/lookout_431/build.py"
+}
