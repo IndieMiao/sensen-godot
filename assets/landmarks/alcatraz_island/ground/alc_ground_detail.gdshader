@@ -3,8 +3,8 @@ render_mode diffuse_burley, specular_schlick_ggx;
 
 // Optional finishes for #792 bf0c31b1. COLOR is the imported LINEAR palette.
 // DATA samplers deliberately have no source_color hint. No UV dependency.
-uniform sampler2D fields : filter_linear_mipmap_anisotropic, repeat_enable;
-uniform sampler2D surfaces : filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D fields : filter_linear_mipmap, repeat_enable;
+uniform sampler2D surfaces : filter_linear_mipmap, repeat_enable;
 uniform int finish_kind : hint_enum("Terrain", "Dock boards") = 0;
 uniform float strength : hint_range(0.0, 1.0) = 1.0;
 uniform float palette_tolerance : hint_range(0.001, 0.03) = 0.012;

@@ -2,8 +2,8 @@ shader_type spatial;
 render_mode diffuse_burley, specular_schlick_ggx;
 
 // Packed linear DATA, not source_color. Opaque, static, no additional pass.
-uniform sampler2D fields : filter_linear_mipmap_anisotropic, repeat_enable;
-uniform sampler2D surfaces : filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D fields : filter_linear_mipmap, repeat_enable;
+uniform sampler2D surfaces : filter_linear_mipmap, repeat_enable;
 uniform int finish_kind : hint_enum("Vertex palette", "Grass", "Paving", "Wood", "Sand", "Wet sand") = 0;
 uniform float strength : hint_range(0.0, 1.0) = 1.0;
 uniform float palette_tolerance : hint_range(0.001, 0.1) = 0.012;
