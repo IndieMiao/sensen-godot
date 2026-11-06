@@ -1,0 +1,427 @@
+class_name GriffithObservatory
+extends Node3D
+## Local landmark visit using the owner's saved outfit and farm camera gestures.
+## The map remains below this instance; walking never writes farm state or rewards.
+
+const ROOT := "res://assets/landmarks/griffith_observatory/"
+const PITCH := 45.0
+const WALK_SPEED := 2.3
+const PHONE_WIDTH := 7.0
+const ASSETS := {
+	"bench": preload("res://assets/landmarks/griffith_observatory/bench.glb"),
+	"bush": preload("res://assets/landmarks/griffith_observatory/bush.glb"),
+	"bush_round": preload("res://assets/landmarks/griffith_observatory/bush_round.glb"),
+	"cafe": preload("res://assets/landmarks/griffith_observatory/cafe.glb"),
+	"city": preload("res://assets/landmarks/griffith_observatory/city.glb"),
+	"cypress": preload("res://assets/landmarks/griffith_observatory/cypress.glb"),
+	"fence_post": preload("res://assets/landmarks/griffith_observatory/fence_post.glb"),
+	"flowers": preload("res://assets/landmarks/griffith_observatory/flowers.glb"),
+	"fountain_0": preload("res://assets/landmarks/griffith_observatory/fountain_0.glb"),
+	"fountain_1": preload("res://assets/landmarks/griffith_observatory/fountain_1.glb"),
+	"fountain_2": preload("res://assets/landmarks/griffith_observatory/fountain_2.glb"),
+	"grass_clump": preload("res://assets/landmarks/griffith_observatory/grass_clump.glb"),
+	"lamp": preload("res://assets/landmarks/griffith_observatory/lamp.glb"),
+	"lawns": preload("res://assets/landmarks/griffith_observatory/lawns.glb"),
+	"observatory": preload("res://assets/landmarks/griffith_observatory/observatory.glb"),
+	"plaza": preload("res://assets/landmarks/griffith_observatory/plaza.glb"),
+	"rock": preload("res://assets/landmarks/griffith_observatory/rock.glb"),
+	"rope": preload("res://assets/landmarks/griffith_observatory/rope.glb"),
+	"telescope": preload("res://assets/landmarks/griffith_observatory/telescope.glb"),
+	"terrace": preload("res://assets/landmarks/griffith_observatory/terrace.glb"),
+	"terrain": preload("res://assets/landmarks/griffith_observatory/terrain.glb"),
+	"tree_big": preload("res://assets/landmarks/griffith_observatory/tree_big.glb"),
+	"tree_olive": preload("res://assets/landmarks/griffith_observatory/tree_olive.glb"),
+	"tree_round": preload("res://assets/landmarks/griffith_observatory/tree_round.glb"),
+}
+const ScenePan := preload("res://modules/farm/scene_pan.gd")
+
+var layout: Dictionary
+var camera_pan := ScenePan.new()
+var _paint: ShaderMaterial
+var _camera: Camera3D
+var _player: Node3D
+var _rig: AvatarRig
+var _nav_map: RID
+var _path: PackedVector3Array = []
+var _path_i := 0
+var _focus := Vector3.ZERO
+var _overview := false
+var _closeup := false
+var _running := false
+var _hud: CanvasLayer
+var _hud_root: Control
+var _focus_button: AvatarFocusButton
+var _environment: WorldEnvironment
+var _saved_environment: Environment
+var _camera_recenter: Tween
+
+func _ready() -> void:
+	get_viewport().transparent_bg = false
+	layout = JSON.parse_string(FileAccess.get_file_as_string(ROOT + "layout.json"))
+	var bounds: Array = layout.camera_bounds
+	var rect := Vector4(bounds[0] - 2.0, bounds[1] + 2.0, bounds[2] - 1.5, bounds[3] + 2.5)
+	_paint = ShaderMaterial.new()
+	_paint.shader = preload("res://modules/landmark/shaders/landmark_paint.gdshader")
+	_paint.set_shader_parameter("play_rect", rect)
+	_paint.set_shader_parameter("fade", 7.0)
+	_environment = WorldEnvironment.new()
+	_environment.environment = Environment.new()
+	_environment.environment.background_mode = Environment.BG_COLOR
+	_environment.environment.background_color = Color("e3ebe8")
+	_environment.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	_environment.environment.ambient_light_color = Color("d5e4ee")
+	_environment.environment.ambient_light_energy = 0.72
+	add_child(_environment)
+	var sun := DirectionalLight3D.new()
+	sun.shadow_enabled = true
+	sun.directional_shadow_max_distance = 0.0
+	sun.directional_shadow_fade_start = 1.0
+	sun.directional_shadow_pancake_size = 4.0
+	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+	sun.rotation_degrees = Vector3(-56, -34, 0)
+	sun.light_color = Color(1.0, 0.965, 0.88)
+	sun.light_energy = 0.98
+	sun.shadow_opacity = 0.48
+	sun.shadow_bias = 0.035
+	sun.shadow_normal_bias = 0.28
+	sun.shadow_blur = 1.8
+	add_child(sun)
+	for asset in layout.unique:
+		var node := _mesh_instance(str(asset))
+		if asset in ["terrain", "lawns"]:
+			var ground := ShaderMaterial.new()
+			ground.shader = preload("res://modules/landmark/shaders/landmark_terrain.gdshader")
+			ground.set_shader_parameter("meadow_texture", preload("res://assets/farm/art/meadow.png"))
+			ground.set_shader_parameter("play_rect", rect)
+			node.material_override = ground
+		if asset == "city":
+			# The distant city is meant to be seen: light haze only, no shadows.
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			var far := ShaderMaterial.new()
+			far.shader = preload("res://modules/landmark/shaders/landmark_city.gdshader")
+			node.material_override = far
+		add_child(node)
+	for asset in layout.props:
+		add_child(_batch(str(asset), layout.props[asset]))
+	for water in layout.water:
+		add_child(_water(water))
+	_build_navigation()
+	_camera = Camera3D.new()
+	_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+	_camera.keep_aspect = Camera3D.KEEP_WIDTH
+	add_child(_camera)
+	_camera.make_current()
+	_spawn_player()
+
+	camera_pan.free_pan = true
+	camera_pan.hold_enabled = false
+	camera_pan.tapped.connect(walk_to_screen)
+	_build_controls()
+	_update_camera()
+
+func _mesh_instance(asset: String) -> MeshInstance3D:
+	var node := MeshInstance3D.new()
+	node.name = asset.to_pascal_case()
+	node.mesh = _mesh(asset)
+	node.material_override = _paint
+	return node
+
+func _mesh(asset: String) -> Mesh:
+	var scene: PackedScene = ASSETS[asset]
+	var root := scene.instantiate()
+	var found := root.find_children("*", "MeshInstance3D", true, false)
+	if root is MeshInstance3D: found.push_front(root)
+	var mesh: Mesh = (found[0] as MeshInstance3D).mesh
+	root.free()
+	return mesh
+
+func _batch(asset: String, items: Array) -> MultiMeshInstance3D:
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = _mesh(asset)
+	mm.instance_count = items.size()
+	for i in items.size():
+		var p: Array = items[i]
+		var basis := Basis(Vector3.UP, float(p[3]))
+		# Rope segments stretch along x to their span; everything else scales uniformly.
+		basis = basis.scaled(Vector3(float(p[4]), 1, 1) if asset == "rope" else Vector3.ONE * float(p[4]))
+		mm.set_instance_transform(i, Transform3D(basis, Vector3(p[0], p[1], p[2])))
+	var node := MultiMeshInstance3D.new()
+	node.name = asset.to_pascal_case() + "Batch"
+	node.multimesh = mm
+	node.material_override = _paint
+	return node
+
+func _water(water: Dictionary) -> MeshInstance3D:
+	var node := MeshInstance3D.new()
+	var pos: Array = water.pos
+	node.position = Vector3(pos[0], pos[1], pos[2])
+	var r := float(water.radius)
+	if water.kind == "jet":
+		node.mesh = _jet_mesh(r, float(water.height))
+		var jet := ShaderMaterial.new()
+		jet.shader = preload("res://modules/landmark/shaders/landmark_jet.gdshader")
+		node.material_override = jet
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		return node
+	var disc := CylinderMesh.new()
+	disc.top_radius = r
+	disc.bottom_radius = r
+	disc.height = 0.02
+	disc.radial_segments = 40
+	node.mesh = disc
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://modules/landmark/shaders/landmark_water.gdshader")
+	mat.set_shader_parameter("radius", r)
+	node.material_override = mat
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return node
+
+## Tiered spray like the design: stacked crystal tiers up the jet, then a falling sheet over the bowl.
+func _jet_mesh(r: float, h: float) -> ArrayMesh:
+	var profile := [Vector2(r * 1.05, 0.0), Vector2(r * 0.85, h * 0.18), Vector2(r * 0.42, h * 0.40), Vector2(r * 0.62, h * 0.43),
+		Vector2(r * 0.30, h * 0.68), Vector2(r * 0.40, h * 0.71), Vector2(r * 0.12, h * 0.92), Vector2(0.01, h)]
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var seg := 20
+	for k in profile.size() - 1:
+		for i in seg:
+			var a0 := TAU * i / seg
+			var a1 := TAU * (i + 1) / seg
+			var quad := [[profile[k], a0], [profile[k], a1], [profile[k + 1], a1], [profile[k + 1], a0]]
+			for idx in [0, 1, 2, 0, 2, 3]:
+				var p: Vector2 = quad[idx][0]
+				var a: float = quad[idx][1]
+				st.set_uv(Vector2(a / TAU, p.y / h))
+				st.set_normal(Vector3(cos(a), 0.35, sin(a)).normalized())
+				st.add_vertex(Vector3(cos(a) * p.x, p.y, sin(a) * p.x))
+	st.index()
+	return st.commit()
+
+func _build_navigation() -> void:
+	var nav := NavigationMesh.new()
+	var verts := PackedVector3Array()
+	for v in layout.navigation.vertices: verts.append(Vector3(v[0], v[1], v[2]))
+	nav.vertices = verts
+	for poly in layout.navigation.polygons: nav.add_polygon(PackedInt32Array(poly))
+	nav.cell_size = 0.25
+	nav.cell_height = 0.1
+	var region := NavigationRegion3D.new()
+	region.navigation_mesh = nav
+	_nav_map = NavigationServer3D.map_create()
+	NavigationServer3D.map_set_active(_nav_map, true)
+	NavigationServer3D.map_set_cell_size(_nav_map, 0.25)
+	NavigationServer3D.map_set_cell_height(_nav_map, 0.1)
+	add_child(region)
+	# Entering the tree initially attaches a region to the world's default map.
+	region.set_navigation_map(_nav_map)
+
+func _spawn_player() -> void:
+	_player = Node3D.new()
+	add_child(_player)
+	var s: Array = layout.spawn
+	_player.position = Vector3(s[0], s[1], s[2])
+	_rig = Avatar.create_rig()
+	_rig.assembler = AvatarAssemblerMerged.new()
+	_rig.rotation.y = PI
+	for child in _rig.get_children():
+		if child is RigActivity:
+			child.sleep_distance = 80
+			child.reduced_distance = 60
+	_player.add_child(_rig)
+	_rig.config_applied.connect(func(_c): _animation("idle"))
+	_rig.apply_config(Avatar.load_outfit())
+	_focus = _player.position
+
+func _animation(name: String) -> void:
+	var ap := _rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if ap and ap.has_animation(name): ap.play(name)
+
+func _step_walk(delta: float) -> void:
+	if _path_i >= _path.size():
+		if _running:
+			_running = false
+			_animation("idle")
+		return
+	var goal := _path[_path_i]
+	var to := goal - _player.position
+	var step := WALK_SPEED * delta
+	if to.length() <= step:
+		_player.position = goal
+		_path_i += 1
+	else:
+		_player.position += to.normalized() * step
+		var flat := Vector3(to.x, 0, to.z)
+		if flat.length() > 0.01: _player.look_at(_player.position + flat, Vector3.UP)
+	if not _running:
+		_running = true
+		_animation("run")
+
+## Tap anywhere: walk to the nearest reachable point (never off the navigation cells).
+func navigation_ready() -> bool:
+	# The first map iteration can precede the region's asynchronous mesh sync.
+	return NavigationServer3D.map_get_iteration_id(_nav_map) > 0 \
+		and NavigationServer3D.map_get_closest_point_owner(_nav_map, _player.position).is_valid()
+
+func walk_to_screen(point: Vector2) -> void:
+	if not navigation_ready(): return
+	var origin := _camera.project_ray_origin(point)
+	var normal := _camera.project_ray_normal(point)
+	var y := 0.0
+	var goal := Vector3.ZERO
+	for i in 3:
+		var hit = Plane(Vector3.UP, y).intersects_ray(origin, normal)
+		if hit == null: return
+		goal = NavigationServer3D.map_get_closest_point(_nav_map, hit)
+		y = goal.y
+	walk_to(goal)
+
+func walk_to(goal: Vector3) -> void:
+	if not navigation_ready(): return
+	_path = NavigationServer3D.map_get_path(_nav_map, _player.position, goal, true)
+	_path_i = 0
+
+func _build_controls() -> void:
+	_hud = CanvasLayer.new()
+	_hud.name = "HUD"
+	add_child(_hud)
+	var safe := SafeAreaMargin.new()
+	safe.name = "SafeArea"
+	safe.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	safe.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	safe.theme = GameUi.theme()
+	_hud.add_child(safe)
+	_hud_root = Control.new()
+	_hud_root.name = "Root"
+	_hud_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	safe.add_child(_hud_root)
+	var header := HBoxContainer.new()
+	header.name = "Header"
+	header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	header.add_theme_constant_override("separation", 8)
+	_hud_root.add_child(header)
+	var back := GameUi.button("arrow-left", "", L10n.text("Return to map"))
+	back.name = "LandmarkBack"
+	back.custom_minimum_size = Vector2(44, 44)
+	back.pressed.connect(_leave)
+	header.add_child(back)
+	var title := GameUi.label(L10n.text("Griffith Observatory"), 15)
+	title.name = "LandmarkTitle"
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	header.add_child(title)
+	var overview := GameUi.button("map", L10n.text("Overview"), L10n.text("Overview"))
+	overview.name = "LandmarkOverview"
+	overview.pressed.connect(toggle_overview)
+	header.add_child(overview)
+	_focus_button = AvatarFocusButton.new()
+	_hud_root.add_child(_focus_button)
+	_focus_button.pressed.connect(recenter_on_player)
+
+func _process(delta: float) -> void:
+	_step_walk(delta)
+	camera_pan.step(delta, _camera)
+	_update_camera()
+
+func _update_camera() -> void:
+	var size := get_viewport().get_visible_rect().size
+	var aspect := size.y / maxf(1.0, size.x)
+	var width := (1536.0 / 58.0 if _overview else PHONE_WIDTH) / camera_pan.zoom
+	if _closeup: width = 10.5
+	_camera.size = width
+	# The farm commits released pan and zoom-anchor offsets into a persistent center.
+	if not camera_pan.active():
+		_focus += camera_pan.offset
+		camera_pan.offset = Vector3.ZERO
+		camera_pan._raw_offset = Vector3.ZERO
+	var target := _focus + camera_pan.offset
+	if _closeup: target = Vector3(0.3, 0.8, -2.6)
+	var dir := Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH)))
+	_camera.position = target + dir * 40.0
+	_camera.look_at(target, Vector3.UP)
+	_camera.near = maxf(1.0, 40.0 - width * aspect * 0.9 - 8.0)
+	_camera.far = 40.0 + width * aspect * 0.9 + 18.0
+	if _focus_button:
+		var viewport_rect := get_viewport().get_visible_rect()
+		var area := _hud_root.get_global_rect()
+		area.position.y += 52
+		area.size.y = maxf(0, area.size.y - 52)
+		_focus_button.update_indicator(_camera.unproject_position(_player.position + Vector3.UP * 0.7),
+			viewport_rect, area, _camera.is_position_behind(_player.position))
+
+func _input(event: InputEvent) -> void:
+	_handle_camera_input(event, false)
+
+func _unhandled_input(event: InputEvent) -> void:
+	_handle_camera_input(event, true)
+
+func _handle_camera_input(event: InputEvent, allow_start: bool) -> bool:
+	if camera_pan.handle(event, _camera, allow_start):
+		_stop_camera_recenter()
+		_update_camera()
+		get_viewport().set_input_as_handled()
+		return true
+	return false
+
+func _stop_camera_recenter() -> void:
+	if _camera_recenter:
+		_camera_recenter.kill()
+		_camera_recenter = null
+
+func recenter_on_player() -> void:
+	_stop_camera_recenter()
+	camera_pan.cancel()
+	_focus += camera_pan.offset
+	camera_pan.offset = Vector3.ZERO
+	camera_pan._raw_offset = Vector3.ZERO
+	_overview = false
+	_closeup = false
+	var start := _focus
+	_camera_recenter = create_tween()
+	_camera_recenter.tween_method(func(weight: float):
+		_focus = start.lerp(_player.position, weight)
+		_update_camera(), 0.0, 1.0, 0.34).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+func toggle_overview() -> void:
+	_stop_camera_recenter()
+	camera_pan.reset()
+	_closeup = false
+	_overview = not _overview
+	_focus = Vector3.ZERO if _overview else _player.position
+	_update_camera()
+
+func _leave() -> void:
+	if AppRouter.top_instance() == self: AppRouter.handle_back()
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED]:
+		camera_pan.cancel()
+		_stop_camera_recenter()
+
+func suspend() -> void:
+	_stop_camera_recenter()
+	camera_pan.cancel()
+	process_mode = Node.PROCESS_MODE_DISABLED
+	visible = false
+	for child in get_children():
+		if child is CanvasLayer: child.visible = false
+	_camera.current = false
+	_saved_environment = _environment.environment
+	_environment.environment = null
+
+func resume() -> void:
+	process_mode = Node.PROCESS_MODE_INHERIT
+	visible = true
+	for child in get_children():
+		if child is CanvasLayer: child.visible = true
+	get_viewport().transparent_bg = false
+	_environment.environment = _saved_environment
+	_camera.make_current()
+	_update_camera()
+
+func _exit_tree() -> void:
+	_stop_camera_recenter()
+	camera_pan.cancel()
+	if _nav_map.is_valid():
+		NavigationServer3D.free_rid(_nav_map)
+		_nav_map = RID()

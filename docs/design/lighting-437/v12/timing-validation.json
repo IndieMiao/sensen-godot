@@ -1,0 +1,99 @@
+{
+  "renderer": {
+    "engine": "4.7.2-stable (official)",
+    "gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "method": "mobile"
+  },
+  "presets": {
+    "original": {
+      "cpu_ms": {
+        "samples": 270,
+        "median": 0.189499996602535,
+        "p95": 0.25655000507831577,
+        "block_medians": [
+          0.181999996304512,
+          0.199000000953674,
+          0.187999993562698
+        ]
+      },
+      "gpu_ms": {
+        "samples": 270,
+        "median": 0.34400001168251,
+        "p95": 0.349000006914139,
+        "block_medians": [
+          0.33899998664856,
+          0.344999998807907,
+          0.344999998807907
+        ]
+      }
+    },
+    "warm_noon": {
+      "cpu_ms": {
+        "samples": 270,
+        "median": 0.197499997913837,
+        "p95": 0.2560999974608417,
+        "block_medians": [
+          0.196999996900558,
+          0.199500001966953,
+          0.190999999642372
+        ]
+      },
+      "gpu_ms": {
+        "samples": 270,
+        "median": 0.34400001168251,
+        "p95": 0.34799998998642,
+        "block_medians": [
+          0.33899998664856,
+          0.344999998807907,
+          0.344999998807907
+        ]
+      }
+    },
+    "cool_morning": {
+      "cpu_ms": {
+        "samples": 270,
+        "median": 0.184000000357628,
+        "p95": 0.24455000385642087,
+        "block_medians": [
+          0.18299999833107,
+          0.186500005424023,
+          0.18349999934434902
+        ]
+      },
+      "gpu_ms": {
+        "samples": 270,
+        "median": 0.34049999713897705,
+        "p95": 0.345999985933304,
+        "block_medians": [
+          0.33899998664856,
+          0.33899998664856,
+          0.34400001168251
+        ]
+      }
+    },
+    "golden_dusk": {
+      "cpu_ms": {
+        "samples": 270,
+        "median": 0.188999995589256,
+        "p95": 0.256000012159348,
+        "block_medians": [
+          0.175999999046326,
+          0.19250000268220901,
+          0.201500006020069
+        ]
+      },
+      "gpu_ms": {
+        "samples": 270,
+        "median": 0.340000003576279,
+        "p95": 0.345999985933304,
+        "block_medians": [
+          0.33899998664856,
+          0.33899998664856,
+          0.34400001168251
+        ]
+      }
+    }
+  },
+  "method": "3 interleaved cycles; 45 warmup + 90 measured frames per block, middle order reversed; fixed camera, geometry, sea/foam time.",
+  "scope": "Deck Vulkan Mobile viewport CPU/GPU; not physical phone or whole-app timing."
+}

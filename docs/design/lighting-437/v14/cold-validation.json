@@ -1,0 +1,42 @@
+{
+  "fresh_cache": true,
+  "runtime_files": 16,
+  "hashes_equal": true,
+  "resource_checks": 79,
+  "source_sha256": {
+    "warm_noon_sea.tres": "c89fb503547d3f73cac1629ebc9247fc0ec7ee5c39eb388ebe478f3a8c13ec80",
+    "lighting_rig.tscn": "d732064102bfa1f6913ba8c8127d4eac4691c9f29e63dea846a9284ed10e6544",
+    "lighting_rig.gd.uid": "fea667ab233568e9279cb9b4e0c3353f60e8bb096d3f662ec066924e3784f2c1",
+    "warm_noon.tres": "aa1dd99aaf3665bf695a86af166713b2d38505fd4d13a473c8fce8c370d635cb",
+    "lighting_rig.gd": "21c99d96b9c23a3f11edb563b732bd8104040556cb60f2995825221573e738b0",
+    "golden_dusk_sea.tres": "1e4889fe065f26382950a39d5f1437f8be2b24e558451dd8190d3c9e7a749ce0",
+    "golden_dusk.tres": "3caf0a2b358157e8ad8553d12ef2b043224e4c955e01b6034a65aad8f86c947d",
+    "lighting_preset.gd": "55a72f6646a1058738427b2fba924c94f1878b9a2d5088bf4dc7e06d3e2409b3",
+    "far_material_set.gd.uid": "076d19c9fdcc57d96223b19dd6eb4b85bfaabbf4c6d10ba19ca1a98514c9f4ef",
+    "cool_morning_sea.tres": "d6514bf7d45278b3b2acd768a59774e1d9a059d544d6d9528e37ed0eb301c138",
+    "cool_morning.tres": "6aaaf1f2e124eab02fcb2a835d0a308dbe3cad03184f5180a99db1b7a2e3c6d3",
+    "cool_morning_far.tres": "cc9b4a5219557a8d27a5aba72b8b147c78269ddeb6f38dfa727cd0a4887d8d59",
+    "golden_dusk_far.tres": "c9c2d34eb762486fb5cf655a13ecff6be8621bbafdad1383172b12d28525db8e",
+    "lighting_preset.gd.uid": "a2bca255e01b95accb3491a202b0b7d1c951b62b8c4e07bcdcb16df929d156b0",
+    "warm_noon_far.tres": "430b760b01882c8fb142cd4cb6fb18c73bf69fd554374740ee73e6a2d2c98dad",
+    "far_material_set.gd": "12d2adab74e4ed2d2ab9587dab7da5b45fd633106bd0a271fa9262d4387f5b4e"
+  },
+  "other_runtime_files_equal_v13": {
+    "warm_noon_sea.tres": true,
+    "lighting_rig.tscn": true,
+    "lighting_rig.gd.uid": true,
+    "warm_noon.tres": true,
+    "lighting_rig.gd": true,
+    "golden_dusk_sea.tres": true,
+    "lighting_preset.gd": true,
+    "far_material_set.gd.uid": true,
+    "cool_morning_sea.tres": true,
+    "cool_morning.tres": true,
+    "cool_morning_far.tres": true,
+    "golden_dusk_far.tres": true,
+    "lighting_preset.gd.uid": true,
+    "warm_noon_far.tres": true,
+    "far_material_set.gd": true
+  },
+  "scope": "Full staged coast fixture, removed .godot before editor import. Runtime source, pre-import copies, and post-import copies have identical hashes; then resource checks and actual desktop Mobile render."
+}

@@ -1,0 +1,110 @@
+{
+	"captures": [
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 31,
+			"name": "golden-dusk-v13",
+			"shadow_draws": 14,
+			"shadow_triangles": 2540,
+			"triangles": 11386,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 31,
+			"name": "golden-dusk-default-review",
+			"shadow_draws": 14,
+			"shadow_triangles": 2540,
+			"triangles": 11386,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 9,
+			"name": "golden-dusk-shadow-probe",
+			"shadow_draws": 4,
+			"shadow_triangles": 7586,
+			"triangles": 9060,
+			"width_m": 8.0
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 9,
+			"name": "golden-dusk-shadow-probe-off",
+			"shadow_draws": 0,
+			"shadow_triangles": 0,
+			"triangles": 9060,
+			"width_m": 8.0
+		}
+	],
+	"checks": [
+		{
+			"check": "avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "golden-dusk-v13: size",
+			"passed": true
+		},
+		{
+			"check": "golden-dusk-v13: save",
+			"passed": true
+		},
+		{
+			"check": "golden-dusk-default-review: size",
+			"passed": true
+		},
+		{
+			"check": "golden-dusk-default-review: save",
+			"passed": true
+		},
+		{
+			"check": "golden-dusk-shadow-probe: size",
+			"passed": true
+		},
+		{
+			"check": "golden-dusk-shadow-probe: save",
+			"passed": true
+		},
+		{
+			"check": "dusk person and bench shadows project toward upper right",
+			"passed": true
+		},
+		{
+			"check": "golden-dusk-shadow-probe-off: size",
+			"passed": true
+		},
+		{
+			"check": "golden-dusk-shadow-probe-off: save",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	},
+	"shadow_direction": {
+		"direction": "upper right",
+		"ground_shadow_m": "(-0.375705, 0.0, -5.372826)",
+		"height_deg": 18,
+		"person_base_screen": "(85.50574, 452.7435)",
+		"person_height_m": 1.75,
+		"person_shadow_tip_screen": "(129.6738, 290.217)",
+		"screen_delta": "(44.16801, -162.5265)",
+		"yaw_deg": 3.99999976158142
+	}
+}

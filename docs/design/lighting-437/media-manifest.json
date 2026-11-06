@@ -1,0 +1,26 @@
+{
+  "cool-morning-default-review.png": {
+    "bytes": 119089,
+    "sha256": "e2f527393c15d0a04ebd3f56e1c2c0a79c9ffb22f5274cd2793089c0b6ff3378"
+  },
+  "golden-dusk-default-review.png": {
+    "bytes": 104001,
+    "sha256": "68d9e219de378af9738df93cfee4cb07477f5a049090596cadd5d05898ae5d64"
+  },
+  "qa/android-cool_morning.png": {
+    "bytes": 84688,
+    "sha256": "c30f9196cec3ca0e6088a379912652da5cc1c1592135e43634deb8ca285c88bb"
+  },
+  "qa/android-golden_dusk.png": {
+    "bytes": 77729,
+    "sha256": "fe5dac24d046b97042a19ea1b381bb1f2bd05b8498db8942975b3a8933807ef9"
+  },
+  "qa/android-warm_noon.png": {
+    "bytes": 76988,
+    "sha256": "84a17eda5302a16faacf511d2de119f548d2d2f6ad1de9b499e5c3994b017a7a"
+  },
+  "warm-noon-default-review.png": {
+    "bytes": 101428,
+    "sha256": "4fe03117887ed13878b8fa707b4206d785de28bf8988de56517329d00465dfa1"
+  }
+}

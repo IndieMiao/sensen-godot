@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "states": [
+    {
+      "background": "e3ebe8ff",
+      "bridge_color": "(0.7882, 0.4549, 0.3294, 1.0)",
+      "button_next": [
+        180,
+        760
+      ],
+      "draws": 31,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "index": 0,
+      "kit": "437-v12",
+      "pid": 17728,
+      "preset": "warm_noon",
+      "renderer": "mobile",
+      "sea_far_color": "(0.4039, 0.6863, 0.7608, 1.0)"
+    },
+    {
+      "background": "c4d6e5ff",
+      "bridge_color": "(0.6863, 0.5529, 0.5843, 1.0)",
+      "button_next": [
+        180,
+        760
+      ],
+      "draws": 31,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "index": 1,
+      "kit": "437-v12",
+      "pid": 17728,
+      "preset": "cool_morning",
+      "renderer": "mobile",
+      "sea_far_color": "(0.8314, 0.8941, 0.9059, 1.0)"
+    },
+    {
+      "background": "dca7b5ff",
+      "bridge_color": "(0.651, 0.4863, 0.5137, 1.0)",
+      "button_next": [
+        180,
+        760
+      ],
+      "draws": 31,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "index": 2,
+      "kit": "437-v12",
+      "pid": 17728,
+      "preset": "golden_dusk",
+      "renderer": "mobile",
+      "sea_far_color": "(1.3, 1.12, 0.3, 1.0)"
+    },
+    {
+      "background": "e3ebe8ff",
+      "bridge_color": "(0.7882, 0.4549, 0.3294, 1.0)",
+      "button_next": [
+        180,
+        760
+      ],
+      "draws": 31,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "index": 0,
+      "kit": "437-v12",
+      "pid": 17728,
+      "preset": "warm_noon",
+      "renderer": "mobile",
+      "sea_far_color": "(0.4039, 0.6863, 0.7608, 1.0)"
+    }
+  ],
+  "apk_sha256": "aaf70b080558db28ce2c7f0b06982206dcf179880603da9fbe4c835e519c0044",
+  "installed_apk_readback_equal": true,
+  "scope": "API37 SwiftShader / Mobile; 3 real taps; not physical GPU timing."
+}

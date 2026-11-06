@@ -1,0 +1,305 @@
+{
+  "method": "Fixed polygon means in unretouched 360x800 Vulkan Mobile captures. Display Y-prime = .2126R + .7152G + .0722B, not linear physical luminance. Peak and clipping counts apply to the stated patches, not the whole image.",
+  "polygons_xy": {
+    "rock_lit": [
+      [
+        187,
+        225
+      ],
+      [
+        220,
+        199
+      ],
+      [
+        238,
+        219
+      ],
+      [
+        211,
+        244
+      ]
+    ],
+    "rock_shade": [
+      [
+        93,
+        317
+      ],
+      [
+        99,
+        321
+      ],
+      [
+        97,
+        325
+      ],
+      [
+        91,
+        322
+      ]
+    ],
+    "dock_top": [
+      [
+        209,
+        490
+      ],
+      [
+        227,
+        480
+      ],
+      [
+        247,
+        493
+      ],
+      [
+        230,
+        510
+      ]
+    ],
+    "stair_side": [
+      [
+        59,
+        259
+      ],
+      [
+        64,
+        259
+      ],
+      [
+        68,
+        267
+      ],
+      [
+        70,
+        274
+      ],
+      [
+        59,
+        273
+      ]
+    ],
+    "shrub_lit": [
+      [
+        82,
+        387
+      ],
+      [
+        88,
+        387
+      ],
+      [
+        91,
+        394
+      ],
+      [
+        84,
+        395
+      ]
+    ],
+    "grass_side": [
+      [
+        20,
+        429
+      ],
+      [
+        69,
+        454
+      ],
+      [
+        69,
+        456
+      ],
+      [
+        20,
+        432
+      ]
+    ]
+  },
+  "targets": {
+    "stair_side": "#F0B47A",
+    "shrub_lit": "#C9B46A",
+    "rock_lit_preserve": "#8D836F",
+    "rock_shade_noon_percent": 74,
+    "dock_top_previous": "#9A6F4A"
+  },
+  "samples": {
+    "v1.3": {
+      "rock_lit": {
+        "pixels": 1165,
+        "mean_rgb_255": [
+          141.3175965665236,
+          130.6901287553648,
+          110.93905579399141
+        ],
+        "hex": "#8D836F",
+        "mean_Yprime": 0.5157784350753176,
+        "maximum_channel_255": 176.0,
+        "p95_maximum_channel_255": 167.0,
+        "clipped_pixels": 0
+      },
+      "rock_shade": {
+        "pixels": 41,
+        "mean_rgb_255": [
+          97.53658536585365,
+          94.4390243902439,
+          110.0
+        ],
+        "hex": "#625E6E",
+        "mean_Yprime": 0.37733752271640364,
+        "maximum_channel_255": 119.0,
+        "p95_maximum_channel_255": 110.0,
+        "clipped_pixels": 0
+      },
+      "dock_top": {
+        "pixels": 596,
+        "mean_rgb_255": [
+          154.1258389261745,
+          111.18120805369128,
+          73.76342281879195
+        ],
+        "hex": "#9A6F4A",
+        "mean_Yprime": 0.46121440189498625,
+        "maximum_channel_255": 164.0,
+        "p95_maximum_channel_255": 162.0,
+        "clipped_pixels": 0
+      },
+      "stair_side": {
+        "pixels": 137,
+        "mean_rgb_255": [
+          255.0,
+          222.0,
+          121.0
+        ],
+        "hex": "#FFDE79",
+        "mean_Yprime": 0.8695043137254901,
+        "maximum_channel_255": 255.0,
+        "p95_maximum_channel_255": 255.0,
+        "clipped_pixels": 137
+      },
+      "shrub_lit": {
+        "pixels": 61,
+        "mean_rgb_255": [
+          219.36065573770492,
+          210.327868852459,
+          86.27868852459017
+        ],
+        "hex": "#DBD256",
+        "mean_Yprime": 0.7972230922532947,
+        "maximum_channel_255": 225.0,
+        "p95_maximum_channel_255": 225.0,
+        "clipped_pixels": 0
+      },
+      "grass_side": {
+        "pixels": 150,
+        "mean_rgb_255": [
+          198.98,
+          199.0,
+          91.0
+        ],
+        "hex": "#C7C75B",
+        "mean_Yprime": 0.7497966588235293,
+        "maximum_channel_255": 199.0,
+        "p95_maximum_channel_255": 199.0,
+        "clipped_pixels": 0
+      }
+    },
+    "v1.4": {
+      "rock_lit": {
+        "pixels": 1165,
+        "mean_rgb_255": [
+          146.70729613733906,
+          127.44463519313305,
+          113.89184549356223
+        ],
+        "hex": "#937F72",
+        "mean_Yprime": 0.5120053548767146,
+        "maximum_channel_255": 165.0,
+        "p95_maximum_channel_255": 165.0,
+        "clipped_pixels": 0,
+        "brightness_percent_of_v13": 99.2684687955106,
+        "brightness_percent_of_noon": 87.90613538292102
+      },
+      "rock_shade": {
+        "pixels": 41,
+        "mean_rgb_255": [
+          99.17073170731707,
+          94.7560975609756,
+          104.2439024390244
+        ],
+        "hex": "#635F68",
+        "mean_Yprime": 0.37795948350071734,
+        "maximum_channel_255": 119.0,
+        "p95_maximum_channel_255": 108.0,
+        "clipped_pixels": 0,
+        "brightness_percent_of_v13": 100.16482876652083,
+        "brightness_percent_of_noon": 74.40015074461787
+      },
+      "dock_top": {
+        "pixels": 596,
+        "mean_rgb_255": [
+          144.26006711409397,
+          99.78020134228188,
+          73.11073825503355
+        ],
+        "hex": "#906449",
+        "mean_Yprime": 0.42082778655086195,
+        "maximum_channel_255": 154.0,
+        "p95_maximum_channel_255": 151.25,
+        "clipped_pixels": 0,
+        "brightness_percent_of_v13": 91.24341842358169,
+        "brightness_percent_of_noon": 70.81219705798858
+      },
+      "stair_side": {
+        "pixels": 137,
+        "mean_rgb_255": [
+          241.98540145985402,
+          179.98540145985402,
+          126.0
+        ],
+        "hex": "#F2B47E",
+        "mean_Yprime": 0.7422308057821668,
+        "maximum_channel_255": 242.0,
+        "p95_maximum_channel_255": 242.0,
+        "clipped_pixels": 0,
+        "brightness_percent_of_v13": 85.36252138899629
+      },
+      "shrub_lit": {
+        "pixels": 61,
+        "mean_rgb_255": [
+          196.29508196721312,
+          175.50819672131146,
+          91.8360655737705
+        ],
+        "hex": "#C4B05C",
+        "mean_Yprime": 0.6819072966891674,
+        "maximum_channel_255": 203.0,
+        "p95_maximum_channel_255": 202.0,
+        "clipped_pixels": 0,
+        "brightness_percent_of_v13": 85.53531669056458
+      },
+      "grass_side": {
+        "pixels": 150,
+        "mean_rgb_255": [
+          172.0,
+          161.0,
+          95.0
+        ],
+        "hex": "#ACA15F",
+        "mean_Yprime": 0.6218564705882353,
+        "maximum_channel_255": 172.0,
+        "p95_maximum_channel_255": 172.0,
+        "clipped_pixels": 0,
+        "brightness_percent_of_v13": 82.93668200175246
+      }
+    }
+  },
+  "unchanged_background_pixels": {
+    "sky_far_max_255": 0.0,
+    "near_sea_max_255": 0.0
+  },
+  "v13_recapture_vs_committed": {
+    "maximum_rgb_255": 0.0,
+    "mean_rgb_255": 0.0,
+    "changed_pixels": 0
+  },
+  "sun_hue_degrees": 34.99999999999999
+}

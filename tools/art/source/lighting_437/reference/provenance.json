@@ -1,0 +1,10 @@
+{
+  "base_commit": "4e2c401acf7940638690362fbe40a5176b623506",
+  "sources": {
+    "scenes/landmark/alcatraz_island.gd": "f719bbba34c700a30b444fd92030c5bca032bdbdcc97b3d9a80e1d629daf6f12",
+    "scenes/landmark/griffith_observatory.gd": "e416217ad6fff62154583893a765e7c25c7bf33174dc16c36d02b4feef762cf6",
+    "project.godot": "baa2c7d3914eb594f59628589efebe2093875b38187592e353b624007bf292e8"
+  },
+  "coast_plants_review_only": "a590b559dd6e776dc1047f858757c932c3a7cf2b",
+  "other_review_kits": "426 / 430 / 432 / 434 from branch base; never copied into lighting runtime directory"
+}

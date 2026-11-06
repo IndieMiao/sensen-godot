@@ -1,0 +1,179 @@
+{
+  "budget": {
+    "directional_lights": 1,
+    "filter_quality": 2,
+    "fog": false,
+    "glow": false,
+    "runtime_process_callbacks": 0,
+    "sdfgi": false,
+    "shadow_cascades": 1,
+    "shadow_map_size": 2048,
+    "ssao": false,
+    "ssr": false,
+    "volumetric_fog": false,
+    "world_environments": 1
+  },
+  "captures": [
+    {
+      "dimensions": [
+        360,
+        800
+      ],
+      "draws": 31,
+      "name": "original-noon",
+      "shadow_draws": 14,
+      "shadow_triangles": 2540,
+      "triangles": 11386,
+      "width_m": 6.71999979019165
+    },
+    {
+      "dimensions": [
+        360,
+        800
+      ],
+      "draws": 31,
+      "name": "warm-noon-default-review",
+      "shadow_draws": 14,
+      "shadow_triangles": 2540,
+      "triangles": 11386,
+      "width_m": 6.71999979019165
+    },
+    {
+      "dimensions": [
+        360,
+        800
+      ],
+      "draws": 31,
+      "name": "warm-noon-shadow-off",
+      "shadow_draws": 0,
+      "shadow_triangles": 0,
+      "triangles": 11386,
+      "width_m": 6.71999979019165
+    },
+    {
+      "dimensions": [
+        360,
+        800
+      ],
+      "draws": 31,
+      "name": "cool-morning-default-review",
+      "shadow_draws": 14,
+      "shadow_triangles": 2540,
+      "triangles": 11386,
+      "width_m": 6.71999979019165
+    },
+    {
+      "dimensions": [
+        360,
+        800
+      ],
+      "draws": 31,
+      "name": "cool-morning-shadow-off",
+      "shadow_draws": 0,
+      "shadow_triangles": 0,
+      "triangles": 11386,
+      "width_m": 6.71999979019165
+    },
+    {
+      "dimensions": [
+        360,
+        800
+      ],
+      "draws": 31,
+      "name": "golden-dusk-default-review",
+      "shadow_draws": 14,
+      "shadow_triangles": 2540,
+      "triangles": 11386,
+      "width_m": 6.71999979019165
+    },
+    {
+      "dimensions": [
+        360,
+        800
+      ],
+      "draws": 31,
+      "name": "golden-dusk-shadow-off",
+      "shadow_draws": 0,
+      "shadow_triangles": 0,
+      "triangles": 11386,
+      "width_m": 6.71999979019165
+    }
+  ],
+  "checks": [
+    {
+      "check": "avatar assembled",
+      "passed": true
+    },
+    {
+      "check": "original-noon: size",
+      "passed": true
+    },
+    {
+      "check": "original-noon: save",
+      "passed": true
+    },
+    {
+      "check": "warm-noon-default-review: size",
+      "passed": true
+    },
+    {
+      "check": "warm-noon-default-review: save",
+      "passed": true
+    },
+    {
+      "check": "warm noon equals original lighting pixel-for-pixel",
+      "passed": true
+    },
+    {
+      "check": "warm-noon-shadow-off: size",
+      "passed": true
+    },
+    {
+      "check": "warm-noon-shadow-off: save",
+      "passed": true
+    },
+    {
+      "check": "cool-morning-default-review: size",
+      "passed": true
+    },
+    {
+      "check": "cool-morning-default-review: save",
+      "passed": true
+    },
+    {
+      "check": "cool-morning-shadow-off: size",
+      "passed": true
+    },
+    {
+      "check": "cool-morning-shadow-off: save",
+      "passed": true
+    },
+    {
+      "check": "golden-dusk-default-review: size",
+      "passed": true
+    },
+    {
+      "check": "golden-dusk-default-review: save",
+      "passed": true
+    },
+    {
+      "check": "golden-dusk-shadow-off: size",
+      "passed": true
+    },
+    {
+      "check": "golden-dusk-shadow-off: save",
+      "passed": true
+    }
+  ],
+  "noon_parity": {
+    "maximum_rgb_255": 0.0,
+    "mean_rgb_255": 0.0,
+    "pixels_over_one": 0
+  },
+  "passed": true,
+  "renderer": {
+    "engine": "4.7.2-stable (official)",
+    "gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "method": "mobile"
+  }
+}

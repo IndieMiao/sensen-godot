@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "base": "4e2c401acf7940638690362fbe40a5176b623506",
+  "runtime_file_count": 9,
+  "runtime_sha256": {
+    "README.md": "9893e855355cfe8a42873aae0464fb643ff460bff5f028844c099d6e63da8e48",
+    "cool_morning.tres": "578c59bed1fe522d87a7fc296c13db36bc9a93cf095ebe92760bf1560fa038c6",
+    "golden_dusk.tres": "6b1866dd92e164569e0f90ba58bd2475956bd84f8653a8ee64a98e0b3d296e72",
+    "lighting_preset.gd": "aaa656025c1c7cf7a851e27d9022d60c03e0834b092220a28d211d81a8d7f782",
+    "lighting_preset.gd.uid": "a2bca255e01b95accb3491a202b0b7d1c951b62b8c4e07bcdcb16df929d156b0",
+    "lighting_rig.gd": "b13d988ff8fdc63554e1a929d25783e1c60066ccfcbe141b736c0e6759b3b7c5",
+    "lighting_rig.gd.uid": "fea667ab233568e9279cb9b4e0c3353f60e8bb096d3f662ec066924e3784f2c1",
+    "lighting_rig.tscn": "d732064102bfa1f6913ba8c8127d4eac4691c9f29e63dea846a9284ed10e6544",
+    "warm_noon.tres": "c2875474aca75fca05e46e4de6678c5efe3b9de2ac3d44f9f5e0ae7f881c52f1"
+  },
+  "cold_import_unchanged": true,
+  "source_matches_tested_runtime": true,
+  "protected_paths_byte_identical": [
+    "assets/landmarks/alcatraz_island",
+    "assets/landmarks/griffith_observatory",
+    "scenes/landmark/alcatraz_island.gd",
+    "scenes/landmark/alcatraz_island.tscn",
+    "scenes/landmark/griffith_observatory.gd",
+    "scenes/landmark/griffith_observatory.tscn",
+    "assets/landmarks/_shared/coast_kit",
+    "assets/landmarks/_shared/water_edge",
+    "assets/landmarks/_shared/sea_backdrop",
+    "assets/landmarks/_shared/far_backdrop",
+    "project.godot",
+    ".codex/config.toml"
+  ],
+  "import_note": "Only native gd/tres/tscn. Godot-generated gd.uid retained. No new model/texture .import applies.",
+  "android_export_note": "QA project has no app icon; export logged that nonblocking message, then signed/exported successfully. No shader or script errors."
+}

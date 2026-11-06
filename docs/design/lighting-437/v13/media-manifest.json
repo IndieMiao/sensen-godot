@@ -1,0 +1,30 @@
+{
+  "color-regions.png": {
+    "bytes": 222086,
+    "sha256": "92a5cd7a0adf87d1d2086a2c9034df8d5f6f96be2207e56375bc8ac57977ef92"
+  },
+  "cool-morning-default-review.png": {
+    "bytes": 116133,
+    "sha256": "ba7e3a05340e411cbbf3a7ba49a694d16b6d41cc236103777ca8fe49b4442a36"
+  },
+  "golden-dusk-default-review.png": {
+    "bytes": 116883,
+    "sha256": "55f535cf30c259743b28ec5d31e7fcbbe64a0ea35e036497fb9e379fc29fd689"
+  },
+  "golden-dusk-shadow-probe-off.png": {
+    "bytes": 15219,
+    "sha256": "6febf8cf9ea97384f0a7e0ef047ae34f5f87344c118ee1e480d6d6589e27ae51"
+  },
+  "golden-dusk-shadow-probe.png": {
+    "bytes": 35803,
+    "sha256": "3a9660043e0965125d676d00ec604488cb20cc354cacadace192a3f0b8d71db2"
+  },
+  "lighting-three-presets.png": {
+    "bytes": 354859,
+    "sha256": "cde372baed344a7b75c54263f8b17412e0b2da30e5301ebea25e3e4bbdf1dbf1"
+  },
+  "warm-noon-default-review.png": {
+    "bytes": 94082,
+    "sha256": "9ed5d919caf1b56a73b4d2cd3cf1868fa7ace0b56deed7753cd3a88be043a795"
+  }
+}

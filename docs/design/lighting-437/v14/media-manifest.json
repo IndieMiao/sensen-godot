@@ -1,0 +1,10 @@
+{
+  "golden-dusk-default-review.png": {
+    "bytes": 118504,
+    "sha256": "fc1b9011a93b616fa4e158564464b6e10ee6d4ba7e4680b3ac906aa749300491"
+  },
+  "golden-dusk-v13-v14.png": {
+    "bytes": 257138,
+    "sha256": "7dd4b2895621849009158159c5613967f75681d3f5bf2665830a9ff43beb6c39"
+  }
+}

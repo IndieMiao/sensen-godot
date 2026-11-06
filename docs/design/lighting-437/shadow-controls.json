@@ -1,0 +1,14 @@
+{
+  "warm-noon": {
+    "pixels_changed_over_2_rgb": 11507,
+    "maximum_rgb_255": 26.0
+  },
+  "cool-morning": {
+    "pixels_changed_over_2_rgb": 29635,
+    "maximum_rgb_255": 26.0
+  },
+  "golden-dusk": {
+    "pixels_changed_over_2_rgb": 29667,
+    "maximum_rgb_255": 26.0
+  }
+}
