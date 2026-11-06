@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+  <!-- church (Grace Cathedral pin, SGODOT-423): a pointed-arch window, a pointed top pane over two lower panes; glass in the cross-free stained window's colours, no cross, no figures -->
+  <path d="M12 54V30A28 28 0 0 1 32 4.7A28 28 0 0 1 52 30V54A4 4 0 0 1 48 58H16A4 4 0 0 1 12 54Z" fill="#6E7B74"/>
+  <path d="M16.6 27.5A24 24 0 0 1 32 7.6A24 24 0 0 1 47.4 27.5Z" fill="#F2B83A"/>
+  <path d="M16.5 31H30.5V54H16.5Z" fill="#7FB8E8"/>
+  <path d="M33.5 31H47.5V54H33.5Z" fill="#B58CE0"/>
+  <path d="M24 26.5L32 13L40 26.5Z" fill="#FFE59A"/>
+  <path d="M18.5 33H24L18.5 42Z" fill="#B4DCFF"/>
+  <path d="M35.5 33H41L35.5 42Z" fill="#EAC4FF"/>
+</svg>

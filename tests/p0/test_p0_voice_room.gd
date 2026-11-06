@@ -86,6 +86,15 @@ func test_a_no_hides_voice_and_market_square_has_it_since_q286() -> void:
 	await m[0].fetch_status()
 	assert_bool(m[0].offered()).is_true()   # q(286): Market Square's whole layer has voice (SGODOT-415)
 
+## Grace Cathedral has no voice (奕星 11-06; 后裔's #800 NO_VOICE_ROLES ['church']): no mic key, no count, the server
+## answering yes or not.
+func test_the_cathedral_has_no_voice() -> void:
+	var c := _room("church")
+	answers["status"] = {"ok": true, "available": true, "age": "ok"}
+	await c[0].fetch_status()
+	assert_bool(c[0].here).is_false()
+	assert_bool(c[0].offered()).is_false()
+
 func test_mute_is_kept_by_handle_and_put_on_the_new_peer_in_another_layer() -> void:
 	var f := _room()
 	var room: P0VoiceRoom = f[0]

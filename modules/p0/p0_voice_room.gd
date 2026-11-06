@@ -21,17 +21,20 @@ var session: P0Session
 var online: P0Online
 var available := false   # the server has voice (P0_VOICE) and this phone can do it (Voice.supported())
 var age := "unknown"     # "ok" / "no" / "unknown", the server's
-var here := true         # this room has voice: every outpost room and pond, Market Square too since q(286) (SGODOT-415)
+var here := true         # this room has voice: every outpost room and pond, Market Square too since q(286) (SGODOT-415);
+                         # not Grace Cathedral (奕星 11-06; 后裔's #800 NO_VOICE_ROLES)
 var voice: Node          # the Voice autoload (tests give their own)
 ## Tests replace the HTTP call: request.call(method, path, body) -> {ok, json}, awaited.
 var request := Callable()
 var _mutes: Array = []   # public handles muted on this phone
 var _room := -1
 
-## `_role`: the room's (P0Outpost.role); none is left without voice since q(286) opened Market Square's (SGODOT-415).
-func setup(p_session: P0Session, p_online: P0Online, _role: String) -> void:
+## `role`: the room's (P0Outpost.role); a role in NO_VOICE_ROLES has no mic key and no count (the server's VOICE_NOT_HERE).
+const NO_VOICE_ROLES := ["church"]
+func setup(p_session: P0Session, p_online: P0Online, role: String) -> void:
 	session = p_session
 	online = p_online
+	here = not role in NO_VOICE_ROLES
 	if voice == null: voice = get_node_or_null("/root/Voice")
 	_mutes = _load_mutes()
 	_room = online.room if online.epoch > 0 else -1   # joined already (the HUD comes after the room's first join)

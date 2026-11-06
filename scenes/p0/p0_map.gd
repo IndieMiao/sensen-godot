@@ -315,8 +315,10 @@ func _open_outpost(id: String) -> void:
 # ---------------------------------------------------------------- destination pins and place cards (SGODOT-234 A2)
 const HOME_PIN := "home"
 ## The outposts' MapDestination icons by role (不知火舞 on 234): tea pot, tackle rod, market board, post travel; the Mine
-## Hut its crossed picks, i-mine-hut (q(204) ⑦: not the pickaxe tool — nothing is mined there).
-const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel", "mine_hut": "mine_hut"}   # casino: P0Outposts.cards_icon()
+## Hut its crossed picks, i-mine-hut (q(204) ⑦: not the pickaxe tool — nothing is mined there). Grace Cathedral
+## (SGODOT-423, role church, no keeper) its i-church, a pointed window in the stained glass's colours, no cross (安其拉;
+## 不知火舞 423 48c5b747: not the bell — the HUD's notices wear it).
+const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel", "mine_hut": "mine_hut", "church": "church"}   # casino: P0Outposts.cards_icon()
 ## Away from home the avatar stands left of the pin of the place it is at, level with its disc (Figma 1802:118849).
 const AVATAR_BESIDE := Vector2(-44, 0)
 var _here_sig := ""
@@ -388,7 +390,7 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 ## card room (an errand you choose, 不知火舞 on 351 0c2082b7), then (SGODOT-355, LOCK-24 125a71e4 / 0a2baa5a) a city's
 ## gathering spots, the open wild sites (quarry and vein alike, nearest home first: the style's `order`), the wild sites
 ## not open yet, and last the silhouette (不知火舞 355 3b2c6a43 ②), before landmarks and POIs.
-const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "mine_hut": 5, "tackle": 6, "casino": 6,
+const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "church": 4, "post": 5, "mine_hut": 5, "tackle": 6, "casino": 6,
 	"gather": 7, "wild": 8, "wild_closed": 9, "silhouette": 10}
 ## A gathering spot's glyph by its kind (v4q(4) ②, f6b4bdb3): the material it gives.
 const GATHER_ICONS := {"wood": "wood", "stone": "stone", "reed": "fiber", "clay": "clay", "herb": "crop_herb", "hardwood": "hardwood", "flax": "flax"}
