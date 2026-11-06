@@ -1,0 +1,41 @@
+{
+  "scope": "Proposal mockups only; no text, collision or gameplay",
+  "assets": {
+    "v10_demo_deck_connector": {
+      "triangles": 108,
+      "bytes": 10584
+    },
+    "v10_demo_ice_cushion": {
+      "triangles": 1140,
+      "bytes": 56140
+    },
+    "v10_demo_bird_rock": {
+      "triangles": 212,
+      "bytes": 14132
+    },
+    "v10_demo_anchor": {
+      "triangles": 836,
+      "bytes": 73072
+    },
+    "v10_demo_sundial": {
+      "triangles": 392,
+      "bytes": 27596
+    },
+    "v10_demo_fountain": {
+      "triangles": 788,
+      "bytes": 35536
+    }
+  },
+  "bird_landings": [
+    [
+      -0.45,
+      0.37,
+      -0.05
+    ],
+    [
+      0.45,
+      0.28,
+      0.12
+    ]
+  ]
+}

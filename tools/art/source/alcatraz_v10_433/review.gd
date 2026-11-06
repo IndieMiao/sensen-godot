@@ -27,7 +27,7 @@ func _ready() -> void:
 		scene.set_process(false);scene._rig.process_mode=Node.PROCESS_MODE_DISABLED
 		for root in scene.animated_roots:
 			var player := root.get_node("AnimationPlayer") as AnimationPlayer;player.pause();player.seek(0,true)
-		if phase=="after":apply_rail_visuals(plan.rail_visual_only)
+		if phase=="after":bind_proposal_material()
 		prepare_hud_audit()
 		if phase=="after":
 			for p in scene.layout.placements:
@@ -36,7 +36,10 @@ func _ready() -> void:
 		var collisions := collision_snapshot()
 		if phase=="before":prior_collisions=collisions
 		else:check("all_live_collisions_unchanged",collisions==prior_collisions,collisions.size())
-		if phase=="after":check_shelter_support(plan)
+		if phase=="after":
+			check_shelter_support(plan)
+			check_seaward_lookout(plan)
+			check_new_focal_footprints(plan)
 		audit[phase]["geometry_totals"]=geometry_totals()
 		set_view(AlcatrazIsland._vec(scene.layout.spawn))
 		await photograph("01-opening")
@@ -47,7 +50,6 @@ func _ready() -> void:
 		for key in views.view_metrics:
 			if not str(key).begins_with("route/"):continue
 			var index := int(str(key).split("-")[1])
-			if index<2 or index>11:continue
 			set_view(AlcatrazIsland._vec(views.view_metrics[key].player_position))
 			await photograph(str(key).replace("route/",""))
 			if phase=="after":record_projections(str(key))
@@ -117,51 +119,46 @@ func check_shelter_support(plan: Dictionary) -> void:
 	check("shelter_four_feet_supported",heights.all(func(y):return y!=null and absf(float(y)-position.y)<.045),heights)
 	check("shelter_clear_of_existing_solids",blockers.is_empty(),blockers)
 
-func apply_rail_visuals(names: Array) -> void:
-	var selected: Array = scene.layout.placements.filter(func(p):return p.name in names)
-	var surface := SurfaceTool.new();surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var material: Material
-	var posts := {}
-	var replaced := 0
-	for node in scene.batch_nodes:
-		if not str(node.name).begins_with("AlcRailStraightBatch"):continue
-		if node.get_parent()!=scene.zones.TerraceZone:continue
-		material=node.material_override
-		var source: Array = scene.layout.placements.filter(func(p):return p.asset=="alc_rail_straight" and p.zone=="TerraceZone")
-		var transforms: Array = source.map(func(p):return scene._transform_of(p))
-		var bounds: Array = transforms.map(func(t):return t*node.multimesh.mesh.get_aabb())
-		var kept: Array[Transform3D]=[];var kept_bounds: Array[AABB]=[]
-		for index in transforms.size():
-			var old: Transform3D=transforms[index]
-			var replace := selected.any(func(p):return scene._transform_of(p).is_equal_approx(old))
-			if not replace:kept.append(old);kept_bounds.append(bounds[index]);continue
-			replaced+=1
-			surface.append_from(scene._mesh("lookout_railing_2m"),0,old)
-			for side in [-1,1]:
-				var end := old*Vector3(side,0,0)
-				var key := str(end.snapped(Vector3(.01,.01,.01)))
-				if posts.has(key):continue
-				posts[key]=true
-				var post := Transform3D(Basis.IDENTITY.scaled(Vector3(.9,1.0/1.08,.9)),end)
-				surface.append_from(scene._mesh("railing_endpost"),0,post)
-		node.multimesh.instance_count=kept.size()
-		for i in kept.size():node.multimesh.set_instance_transform(i,kept[i])
-		node.set_meta("instance_transforms",kept);node.set_meta("instance_bounds",kept_bounds)
-	# Shared-kit GLBs normally receive street_matte from their import script.
-	# QA aliases retain COLOR_0; bind that same matte explicitly and batch the
-	# six new decorations with these static railing visuals, without collisions.
+func bind_proposal_material() -> void:
 	var furnishings := scene.zones.TerraceZone.get_node("LookoutFurnishings") as MeshInstance3D
-	surface.append_from(furnishings.mesh,0,furnishings.transform)
-	scene.mesh_nodes.erase(furnishings);furnishings.free()
-	var street_paint := StandardMaterial3D.new();street_paint.vertex_color_use_as_albedo=true
-	street_paint.roughness=.90;street_paint.metallic_specular=.15
-	var theme := MeshInstance3D.new();theme.name="LookoutRailVisualProposal"
-	theme.mesh=surface.commit();theme.material_override=street_paint
-	theme.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	scene.zones.TerraceZone.add_child(theme)
-	check("all_proposed_rail_visuals_applied",replaced==selected.size(),replaced)
-	audit.after["rail_visual_replacements"]=replaced
-	audit.after["railing_collision_policy"]="All original bodies, shapes and transforms retained. Visual meshes only."
+	var paint := StandardMaterial3D.new();paint.vertex_color_use_as_albedo=true
+	paint.roughness=.90;paint.metallic_specular=.15
+	furnishings.material_override=paint
+	audit.after["rail_visual_replacements"]=0
+	check("cream_route_rails_preserved",scene.layout.placements.filter(func(p):return str(p.asset).begins_with("alc_rail_")).size()>0)
+
+func check_seaward_lookout(plan: Dictionary) -> void:
+	var positions := {}
+	for item in plan.add:positions[item.name]=item
+	for name_ in ["v10_semicircle","v10_telescope","v10_compass"]:
+		var p: Dictionary=positions[name_]
+		var forward := Basis(Vector3.UP,float(p.yaw))*Vector3.FORWARD
+		check(name_+"_faces_west_sea",forward.dot(Vector3.LEFT)>.999,str(forward))
+	var deck: Dictionary=positions.v10_semicircle
+	var deck_transform := Transform3D(Basis(Vector3.UP,float(deck.yaw)),AlcatrazIsland._vec(deck.position))
+	var telescope_local: Vector3=deck_transform.affine_inverse()*AlcatrazIsland._vec(positions.v10_telescope.position)
+	check("telescope_visually_supported_on_deck",telescope_local.z<-.2 and Vector2(telescope_local.x,telescope_local.z).length()<.8 and absf(telescope_local.y-.12)<.01,str(telescope_local))
+	var bank_x := -24.0
+	for i in 121:
+		var x := -24.0-float(i)*.025
+		var ray := PhysicsRayQueryParameters3D.create(Vector3(x,3.5,6.3),Vector3(x,3.05,6.3))
+		var hit := scene.get_world_3d().direct_space_state.intersect_ray(ray)
+		if not hit.is_empty() and absf(hit.position.y-3.25)<.03:bank_x=x
+	var outer := deck_transform*Vector3(0,.12,-1)
+	check("deck_projects_about_one_metre_seaward",bank_x-outer.x>=.8 and bank_x-outer.x<=1.2,{"bank_x":bank_x,"deck_outer_x":outer.x,"extension_m":bank_x-outer.x})
+
+func check_new_focal_footprints(plan: Dictionary) -> void:
+	for item in plan.add:
+		if item.asset not in ["v10_demo_bird_rock","v10_demo_sundial","v10_demo_fountain","v10_demo_anchor"]:continue
+		var box: AABB=scene._mesh(item.asset).get_aabb()
+		var root := AlcatrazIsland._vec(item.position)
+		var minimum := INF
+		for fx in [0.0,.5,1.0]:
+			for fz in [0.0,.5,1.0]:
+				var point := root+Vector3(lerpf(box.position.x,box.end.x,fx),0,lerpf(box.position.z,box.end.z,fz))
+				var nearest := NavigationServer3D.map_get_closest_point(scene._nav_map,point)
+				minimum=minf(minimum,Vector2(nearest.x-point.x,nearest.z-point.z).length())
+		check(str(item.name)+"_footprint_outside_original_navigation",minimum>.05,minimum)
 
 func record_projections(key: String) -> void:
 	var rows: Array = []

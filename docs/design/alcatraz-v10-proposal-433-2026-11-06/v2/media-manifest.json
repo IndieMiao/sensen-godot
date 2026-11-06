@@ -1,0 +1,570 @@
+[
+  {
+    "file": "after/01-opening.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "601c70c99bff361ae27583bb2a90021585c4ce7246aaf0fee15f9b44f01836c0"
+  },
+  {
+    "file": "after/02-entry-lookout.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "b6911f9a546488019e1e9f1c19ad47d15a6435bba5785741b8001e562ea180a3"
+  },
+  {
+    "file": "after/04-top-layout.png",
+    "size": [
+      1000,
+      1200
+    ],
+    "sha256": "cf27304d48ef09b900fe70a281ed2e3c22007d53b5e713e875caca1db0fe4850"
+  },
+  {
+    "file": "after/step-00-000m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "bbd668cfa3237195b42cc5417c5fc4bb80f79fb197d9464713047ef318ad6b5c"
+  },
+  {
+    "file": "after/step-01-007m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "9a0c2f3bc6ee028767745014198a3b903ea51e929a9d41e7712558259d7cac5e"
+  },
+  {
+    "file": "after/step-02-013m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "7a7ad300806c3073e6538a0ce2c811f3bb25ac4af1a0fde9d720c1a757ce1c66"
+  },
+  {
+    "file": "after/step-03-020m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "df4fbaa755bb9523e2abd0724e96fb02c82f429d07b668123483d40d0115b28c"
+  },
+  {
+    "file": "after/step-04-026m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "2700e09240a9e172ced019396c6610e726b82e92889b93c19e8552a3a77a2906"
+  },
+  {
+    "file": "after/step-05-033m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "9c400206fc0ba3f5102cf65d80b1e83be9e7bda7ffa1faeffc19c01022e6f762"
+  },
+  {
+    "file": "after/step-06-039m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "659bea7ae0375be4538a3e74eadfd43ba260ce89d4ed429281195b8a828d9b8d"
+  },
+  {
+    "file": "after/step-07-046m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "e91f8c707f94c34d7081d0c83a5cbd81a1be2c6b7447c8f2f2015727e8041b2b"
+  },
+  {
+    "file": "after/step-08-052m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "45cdb6d195ba99f3ffae96ac3835f36f5ed02b208642170abb9208344d46e3d9"
+  },
+  {
+    "file": "after/step-09-059m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "bbf2b5d0c8671543d260a35a2bfde3604acf6ea046cd4f31660f9c838dcd475e"
+  },
+  {
+    "file": "after/step-10-065m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "06e82adb019ec01fb38c2f541b2b50d11b56f8922f51a38a0a0f520c0b9784f4"
+  },
+  {
+    "file": "after/step-11-072m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "7b55bdcb8b58ca5a48a52f2d4750a95deb6a296a875feeeffbd323216e0ce1f3"
+  },
+  {
+    "file": "after/step-12-079m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "2cc8c88ae828d3be43cfb328fd87dc881babebd2a02d178ed01191155b7d9ac2"
+  },
+  {
+    "file": "after/step-13-085m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "fa79f34f723a4c940b627ce000949dfc43c5563151e9b000b869ba20645d1b2c"
+  },
+  {
+    "file": "after/step-14-092m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "f8ea9162ffbcd7114a1b792cf72c048b1a369b30e9a49da22dc07d106ab64980"
+  },
+  {
+    "file": "after/step-15-098m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "f03940d695b8bd6216329a40582d805b2e955c7287491069a7871855ddb0caf3"
+  },
+  {
+    "file": "after/step-16-105m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "be6e1c16c269e68b8e586016902533d7b7e828f5387a37cc62d4235ba1f3581a"
+  },
+  {
+    "file": "after/step-17-111m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "49c769b65956bfc8eeffdd023038998312c931fcb66b314f87405ac56465a721"
+  },
+  {
+    "file": "after/step-18-118m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "d84c538885e13f4fbf35066a6bbefc245574f8a026ccc27b5b19bae469c68dc2"
+  },
+  {
+    "file": "after/step-19-119m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "776896284116cc8c62f63b8bddd1e20a93e75e7fe710bdfd044fd328a598d957"
+  },
+  {
+    "file": "before/01-opening.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "c190bfd3d1d6d6911c52b38322d4da9f189a8d3e7154eac203bfa7d49baea163"
+  },
+  {
+    "file": "before/02-entry-lookout.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "9d3ed144b1d312a75caa9f34d98a71e58f5840592ea44c0a6b394623705b176d"
+  },
+  {
+    "file": "before/04-top-layout.png",
+    "size": [
+      1000,
+      1200
+    ],
+    "sha256": "cbffe6d00d81e03fee7c1bb311ff3e1b211a51e2823b9033c155768214022bf5"
+  },
+  {
+    "file": "before/step-00-000m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "c0237808bfdcf7019de27a17e9567ea4340db89efe8f93ca5defbfb237555ebe"
+  },
+  {
+    "file": "before/step-01-007m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "dfcd241c4aa5500a9ba4bc521c4e2eb16f2de05310b886cfebe447fcd233af7b"
+  },
+  {
+    "file": "before/step-02-013m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "03e7d645c53cb65880b729df30658497d5634684bd78daac9b6d4489c3598546"
+  },
+  {
+    "file": "before/step-03-020m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "1d20ae8d46d6af3313db95e7e79372f55777af6bcf834d0432e5ce0b6ecc1902"
+  },
+  {
+    "file": "before/step-04-026m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "41528fe528f2c900ddcf1c66e3803ca276b5c8b8dc67dcda57befb65adb67782"
+  },
+  {
+    "file": "before/step-05-033m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "b57f75456cad9f46ab0574c9e3f4b100029d6e405b18b921b8827ed4406b2cdd"
+  },
+  {
+    "file": "before/step-06-039m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "29715aa4d916c3071e8b02a0adf2950c09aa2b562f0976d942d7e4b3c682c61f"
+  },
+  {
+    "file": "before/step-07-046m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "e2fab56bc595fdcc4e138423ad68fa1c7e4a891e969aa56c4b17a926e08ccec9"
+  },
+  {
+    "file": "before/step-08-052m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "1949e3644193f57bc48880fff1630f913e86750f7f5a0458d6555b0f1ef63433"
+  },
+  {
+    "file": "before/step-09-059m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "e5f4d326be6e354699855e364b0c9992f3131620aa24c31abd8ce98a625906b5"
+  },
+  {
+    "file": "before/step-10-065m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "b534732aa37c2c96961052c75cdc81c2c652fb60e19e9883dc6ed080447f91fb"
+  },
+  {
+    "file": "before/step-11-072m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "5b8900b0508f9e14a56f862a73727edc835642673333e47b71f4c3c80ecc53db"
+  },
+  {
+    "file": "before/step-12-079m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "fe4770800c3ac06f1f1de6bc469d4b77adb86296b1127a78a2d70753457cdd04"
+  },
+  {
+    "file": "before/step-13-085m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "13eca134c56598639e2e48dce31ce428d4ef553ad78d0249b4c2bd2e77bfdc03"
+  },
+  {
+    "file": "before/step-14-092m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "6842a67ba434af36493a1f07c6dedffd5801488e24ae846ab01cd14ce0bf0370"
+  },
+  {
+    "file": "before/step-15-098m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "5ff597a6ec0545d7b46326bd4cf5eb11c3c0db138ac37be23f63fd652d81c6da"
+  },
+  {
+    "file": "before/step-16-105m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "6ba5d3371af5aaae4f6f6272ca214a5e024bb103730a6d96002da3280db9b3f5"
+  },
+  {
+    "file": "before/step-17-111m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "f9a58b8a820bb991d9c8374ae8893362e37915eaf426d247885052dce1a2c0ba"
+  },
+  {
+    "file": "before/step-18-118m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "2f58833bb5f06b699e35a5630ed67b23cb49aee4623c4f7996422479491c99f9"
+  },
+  {
+    "file": "before/step-19-119m.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "745fd3773309cad2286dbf59f5262f524a9c4475e33df15048c05073c6cc82b1"
+  },
+  {
+    "file": "comparisons/01-opening.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "42936cbcbf555489a304cd033d79511fa0e1d763b860a72e6e20e9b730482883"
+  },
+  {
+    "file": "comparisons/02-entry-lookout.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "d428cc16dd2c62ff26a416b2daf4203d9602f8785a18890595c19a4a1268038d"
+  },
+  {
+    "file": "comparisons/step-00-000m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "f06d418b8a7458322ca6da6f28f842c090e6779d269d352845c92132f5f18a1a"
+  },
+  {
+    "file": "comparisons/step-01-007m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "155afe7fc42e4acafd671be117375a4d190be2d2f22dfd27e77620dc27e4e809"
+  },
+  {
+    "file": "comparisons/step-02-013m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "59bc72d478532506afb5e98f5a94f35d3234d5f3f441a6c2284d7c5d1c65adf5"
+  },
+  {
+    "file": "comparisons/step-03-020m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "9da55ad212ea573697ee31bcf2ed678eefecc01f64d66a1760225eae09008e97"
+  },
+  {
+    "file": "comparisons/step-04-026m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "b84b617929d153d7bf68b774bb357fc1e1b27461faa76840afd27006135923d6"
+  },
+  {
+    "file": "comparisons/step-05-033m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "bf6bc3fe06178f077eb7a6543b5925359620398bf210eab00ba9e35e19e70a9f"
+  },
+  {
+    "file": "comparisons/step-06-039m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "1c577df9bc5427a6571acd5cf5ba47e61e801130f85dbea268ea35d3cf3e457f"
+  },
+  {
+    "file": "comparisons/step-07-046m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "73a26b5a8c2e0864c3c7d3c2862c1fd75046ff1567cca2bec764eb1a4f695ca1"
+  },
+  {
+    "file": "comparisons/step-08-052m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "7ecaf9431b8c2779c511bad869f9dd10d3dc7aa3eb23d9f7137029ffeecc8784"
+  },
+  {
+    "file": "comparisons/step-09-059m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "0148384b5efc662fa568be0f55e9e4d69ef916b807ad055681db939493d7b318"
+  },
+  {
+    "file": "comparisons/step-10-065m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "2623118a6b5a1695631fcc6a4516d2a0e0e793c3d8b7f43d4d4cb6a5b982e59f"
+  },
+  {
+    "file": "comparisons/step-11-072m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "6b7fab145b4e7556a9437eb882362b3fa635524e44f14c41b0e94d5c9af81a5e"
+  },
+  {
+    "file": "comparisons/step-12-079m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "f22651afbb7439179666f69a431e39100ae2a90fa66980bf8470555e3deb54fb"
+  },
+  {
+    "file": "comparisons/step-13-085m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "5ab5ba826f6879b9516c2e81124b8f4d7dc2e6c2f5c2e5615c4b42beea9963ce"
+  },
+  {
+    "file": "comparisons/step-14-092m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "4b326a7bf266af461c3de718d0c5c6643566f5745f08df19bbfcf66d3428a69e"
+  },
+  {
+    "file": "comparisons/step-15-098m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "f0f36b288b250c1e588a7e8c8575aa41b026a393f276d6916572514302854bca"
+  },
+  {
+    "file": "comparisons/step-16-105m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "9be0790075528ffe0a8e3e916589a7c626ca06694adb407aa2e11a1d706ae589"
+  },
+  {
+    "file": "comparisons/step-17-111m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "a348d0461542e55fbd3cfd7e342864ef57143aaf2a9bb1ba9de03e7e054f96f1"
+  },
+  {
+    "file": "comparisons/step-18-118m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "77d0245d2ef0c9dfbbcdcbb825bc963bfece9d3f4050b41059254a1fca441042"
+  },
+  {
+    "file": "comparisons/step-19-119m.png",
+    "size": [
+      720,
+      840
+    ],
+    "sha256": "f5cd0ddfa4bd5b489219e97fed644437ca540f0d53437764f904afe9f56b50cf"
+  },
+  {
+    "file": "route-contact-sheet-1.png",
+    "size": [
+      1440,
+      704
+    ],
+    "sha256": "f1c97b824a11433e98f36310f916ae414bad971bc6c64ed10dfdece2cc415e21"
+  },
+  {
+    "file": "route-contact-sheet-2.png",
+    "size": [
+      1440,
+      704
+    ],
+    "sha256": "809ae761ccf75f50bfd1210a132a70563b837b6025de0a92c7d93dc524d3aa35"
+  },
+  {
+    "file": "top-layout-annotated.png",
+    "size": [
+      1000,
+      1200
+    ],
+    "sha256": "44ef1ad194cd8e6aa998495711df96cb1c077c0049516dae1eafa2ed61797ff2"
+  }
+]

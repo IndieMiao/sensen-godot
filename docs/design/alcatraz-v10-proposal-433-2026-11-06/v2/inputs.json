@@ -1,0 +1,74 @@
+{
+  "island_base": "4e2c401acf7940638690362fbe40a5176b623506",
+  "inputs": [
+    {
+      "asset": "lookout_sheltered_bench",
+      "source": "4e2c401acf7940638690362fbe40a5176b623506:assets/landmarks/_shared/street_kit/lookout_sheltered_bench.glb",
+      "sha256": "38f2ae42b0446e0a01c3ad9a7277fef4d3c0f1a99670d41ead07362110d67a94"
+    },
+    {
+      "asset": "lookout_semicircle_2m",
+      "source": "4e2c401acf7940638690362fbe40a5176b623506:assets/landmarks/_shared/street_kit/lookout_semicircle_2m.glb",
+      "sha256": "6fa15577073f7beb0ba1b3303a8afcdf4b14aa5d476fba151ecd0880ba96ec32"
+    },
+    {
+      "asset": "lookout_telescope",
+      "source": "4e2c401acf7940638690362fbe40a5176b623506:assets/landmarks/_shared/street_kit/lookout_telescope.glb",
+      "sha256": "331d01482f1c41f4cdfb781006cde166fa819522f5c80c13328bb958adb78321"
+    },
+    {
+      "asset": "railing_endpost",
+      "source": "4e2c401acf7940638690362fbe40a5176b623506:assets/landmarks/_shared/street_kit/railing_endpost.glb",
+      "sha256": "92946285a8d917fcd02ff671359f18ca46d8a83fac7c6078619af60ae1db42db"
+    },
+    {
+      "asset": "lookout_compass_disc",
+      "source": "4e2c401acf7940638690362fbe40a5176b623506:assets/landmarks/_shared/street_kit/lookout_compass_disc.glb",
+      "sha256": "0ab32b487abc2b34cea0d6037f59369e8d18cfca4bd90d716e43b08eca132c57"
+    },
+    {
+      "asset": "v10_demo_bird_rock",
+      "source": "proposal mockup: build_prototypes.py",
+      "sha256": "5857f27472ad46ece6e784c751d8ae39cec9a541855c5c46507d01e8c6389030"
+    },
+    {
+      "asset": "gull",
+      "source": "existing island asset",
+      "sha256": "cdeb84ff5c8a7d1121067980789c8b4d82cedc023e46c0b604e882022c0d64df"
+    },
+    {
+      "asset": "v10_demo_sundial",
+      "source": "proposal mockup: build_prototypes.py",
+      "sha256": "1e7e524371432d730673989226b2e37c93fbdb481fb177538c1d0eb619d4e1ac"
+    },
+    {
+      "asset": "v10_demo_fountain",
+      "source": "proposal mockup: build_prototypes.py",
+      "sha256": "d33d5f4c1dddf78ea59d070042a1cd20578f2bed465ddd94e6d5b5ffeae81b8d"
+    },
+    {
+      "asset": "v10_demo_ice_cushion",
+      "source": "proposal mockup: build_prototypes.py",
+      "sha256": "a8e228fae5be9acab0fe72ab619402ba6d755adbdc18de662e650d107a350700"
+    },
+    {
+      "asset": "v10_demo_deck_connector",
+      "source": "proposal mockup: build_prototypes.py",
+      "sha256": "b1f06da14903867c6ff7a161e8602665a4f398f2fcb0f1f5e286814ae1862293"
+    },
+    {
+      "asset": "lookout_railing_2m",
+      "source": "4e2c401acf7940638690362fbe40a5176b623506:assets/landmarks/_shared/street_kit/lookout_railing_2m.glb",
+      "sha256": "3118a659684087ef2226f3bb2030df3dd3a7c7d18a02315c033199b65ee6491b"
+    },
+    {
+      "asset": "v10_demo_anchor",
+      "source": "proposal mockup: build_prototypes.py",
+      "sha256": "d498f8874288de0b006c1a2db0e22bef5208d524369801549c3ec9370b22ded1"
+    }
+  ],
+  "collision_placements_identical": true,
+  "cream_route_rails_identical": true,
+  "navigation_and_camera_identical": true,
+  "limits": "Proposal only; coast plants and generated new focal props are provisional."
+}

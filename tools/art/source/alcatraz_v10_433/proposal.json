@@ -1,7 +1,9 @@
 {
-  "base": "05a2c032f88cc0d39caebca05bd79df98845fbbe",
-  "lookout_head": "1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f",
-  "stage": "proposal only; post-launch v10; no production asset changes",
+  "base": "4e2c401acf7940638690362fbe40a5176b623506",
+  "lookout_head": "4e2c401acf7940638690362fbe40a5176b623506",
+  "plants_head": "a590b559dd6e776dc1047f858757c932c3a7cf2b",
+  "revision": "v2",
+  "stage": "proposal only; post-launch; production resources unchanged",
   "remove": [
     "alc_flowers_daisy_009",
     "alc_flowers_daisy_010",
@@ -30,62 +32,6 @@
         1,
         1
       ]
-    },
-    {
-      "name": "alc_ruin_rubble_000",
-      "position": [
-        -6,
-        5.8,
-        0.05
-      ],
-      "yaw": 0,
-      "scale": [
-        1,
-        1,
-        0.8
-      ]
-    },
-    {
-      "name": "alc_ruin_rubble_001",
-      "position": [
-        4.8,
-        5.8,
-        0.05
-      ],
-      "yaw": 0,
-      "scale": [
-        1,
-        1,
-        0.8
-      ]
-    },
-    {
-      "name": "alc_ruin_flowers_000",
-      "position": [
-        -5.15,
-        5.8,
-        0.05
-      ],
-      "yaw": 0,
-      "scale": [
-        0.65,
-        0.65,
-        0.65
-      ]
-    },
-    {
-      "name": "alc_ruin_flowers_001",
-      "position": [
-        5.65,
-        5.8,
-        0.05
-      ],
-      "yaw": 0,
-      "scale": [
-        0.65,
-        0.65,
-        0.65
-      ]
     }
   ],
   "add": [
@@ -100,32 +46,32 @@
       "yaw": 1.5707963267948966
     },
     {
-      "name": "v10_telescope",
-      "asset": "lookout_telescope",
-      "position": [
-        -22.4,
-        3.25,
-        5.5
-      ],
-      "yaw": 3.141592653589793
-    },
-    {
       "name": "v10_semicircle",
       "asset": "lookout_semicircle_2m",
       "position": [
-        -14,
-        3.135,
-        5.8
+        -25.65,
+        3.13,
+        6.3
       ],
-      "yaw": 0
+      "yaw": 1.5707963267948966
+    },
+    {
+      "name": "v10_telescope",
+      "asset": "lookout_telescope",
+      "position": [
+        -26.35,
+        3.255,
+        6.5
+      ],
+      "yaw": 1.5707963267948966
     },
     {
       "name": "v10_left_post",
       "asset": "railing_endpost",
       "position": [
-        -15,
-        3.255,
-        5.8
+        -25.65,
+        3.25,
+        5.3
       ],
       "yaw": 0
     },
@@ -133,9 +79,9 @@
       "name": "v10_right_post",
       "asset": "railing_endpost",
       "position": [
-        -13,
-        3.255,
-        5.8
+        -25.65,
+        3.25,
+        7.3
       ],
       "yaw": 0
     },
@@ -143,56 +89,366 @@
       "name": "v10_compass",
       "asset": "lookout_compass_disc",
       "position": [
-        -7.5,
+        -21.8,
         3.28,
-        6.95
+        6.75
       ],
-      "yaw": 3.141592653589793
+      "yaw": 1.5707963267948966,
+      "scale": [
+        0.9,
+        1,
+        0.9
+      ]
+    },
+    {
+      "name": "v10_bird_rock",
+      "asset": "v10_demo_bird_rock",
+      "position": [
+        -14,
+        3.25,
+        5.25
+      ],
+      "yaw": 0,
+      "placeholder": true
+    },
+    {
+      "name": "v10_bird_west",
+      "asset": "gull",
+      "position": [
+        -14.45,
+        3.62,
+        5.2
+      ],
+      "yaw": -0.5
+    },
+    {
+      "name": "v10_bird_east",
+      "asset": "gull",
+      "position": [
+        -13.55,
+        3.53,
+        5.37
+      ],
+      "yaw": 0.7
+    },
+    {
+      "name": "v10_sundial",
+      "asset": "v10_demo_sundial",
+      "position": [
+        -7.1,
+        3.25,
+        5.47
+      ],
+      "yaw": 0,
+      "placeholder": true
+    },
+    {
+      "name": "v10_fountain",
+      "asset": "v10_demo_fountain",
+      "position": [
+        -11.25,
+        5.5,
+        0.75
+      ],
+      "yaw": 0,
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_0_0_0",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        -6.7,
+        5.8,
+        -0.08
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_0_0_1",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        -6,
+        5.8,
+        -0.08
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_0_0_2",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        -5.3,
+        5.8,
+        -0.08
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_0_1_0",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        -6.7,
+        5.8,
+        0.18
+      ],
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_0_1_1",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        -6,
+        5.8,
+        0.18
+      ],
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_0_1_2",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        -5.3,
+        5.8,
+        0.18
+      ],
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_1_0_0",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        4.1,
+        5.8,
+        -0.08
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_1_0_1",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        4.8,
+        5.8,
+        -0.08
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_1_0_2",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        5.5,
+        5.8,
+        -0.08
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_1_1_0",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        4.1,
+        5.8,
+        0.18
+      ],
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_1_1_1",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        4.8,
+        5.8,
+        0.18
+      ],
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_iceplant_1_1_2",
+      "asset": "v10_demo_ice_cushion",
+      "position": [
+        5.5,
+        5.8,
+        0.18
+      ],
+      "yaw": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "group": "garden_flowers",
+      "placeholder": true
+    },
+    {
+      "name": "v10_deck_connector",
+      "asset": "v10_demo_deck_connector",
+      "position": [
+        -25.35,
+        3.13,
+        6.3
+      ],
+      "yaw": 0,
+      "placeholder": true
+    },
+    {
+      "name": "v10_deck_side_north",
+      "asset": "lookout_railing_2m",
+      "position": [
+        -25.35,
+        3.25,
+        5.3
+      ],
+      "yaw": 0,
+      "scale": [
+        0.3,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "v10_deck_side_south",
+      "asset": "lookout_railing_2m",
+      "position": [
+        -25.35,
+        3.25,
+        7.3
+      ],
+      "yaw": 0,
+      "scale": [
+        0.3,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "v10_deck_inner_north",
+      "asset": "railing_endpost",
+      "position": [
+        -25.05,
+        3.25,
+        5.3
+      ],
+      "yaw": 0
+    },
+    {
+      "name": "v10_deck_inner_south",
+      "asset": "railing_endpost",
+      "position": [
+        -25.05,
+        3.25,
+        7.3
+      ],
+      "yaw": 0
+    },
+    {
+      "name": "v10_anchor",
+      "asset": "v10_demo_anchor",
+      "position": [
+        -19.5,
+        5.5,
+        0.65
+      ],
+      "yaw": 0,
+      "placeholder": true
     }
   ],
+  "rail_visual_only": [],
   "notes": [
-    "High lookout props stay on the western side to protect the action area on later terraces.",
-    "Semicircle is a decorative inset on existing grass behind the unchanged route rail; no new walkable side deck.",
-    "Move the existing collision-free fallen arch to the middle terrace eastern garden; original structural ruins remain fixed.",
-    "Keep colliding trees, benches, flowerbeds, all terrain, route/navigation and collision entries exact.",
-    "Replace selected railing visuals with approved lookout wood/metal sections at identical transforms; preserve every original collision body. Slim view-window segments reveal the fallen arch."
+    "Keep every cream-stone route rail and its original collider. Dark iron appears only on the west lookout deck.",
+    "Current merged near/far museum roofs and lookout v1.1 are the baseline, preserved exactly.",
+    "West is -X. The semicircle, telescope view axis and compass principal arrow all face -X. Deck projects 1m from its chord, approximately1.12m beyond the bank at Z6.3.",
+    "Cantilever is a visual proposal; existing navigation and all collisions stay exact, with no new walking branch in this preview.",
+    "Bird rock, sundial and fountain are editable proposal mockups only. Gulls are static; no text or interactions.",
+    "Dense pink iceplant cushions are original editable proposal placeholders using the SGODOT-435 palette; replace after #841 approval. Existing flowerbed masses are retained."
   ],
-  "rail_visual_only": [
-    "alc_rail_straight_065",
-    "alc_rail_straight_098",
-    "alc_rail_straight_099",
-    "alc_rail_straight_100",
-    "alc_rail_straight_101",
-    "alc_rail_straight_102",
-    "alc_rail_straight_103",
-    "alc_rail_straight_104",
-    "alc_rail_straight_105",
-    "alc_rail_straight_106",
-    "alc_rail_straight_107",
-    "alc_rail_straight_108",
-    "alc_rail_straight_109",
-    "alc_rail_straight_110",
-    "alc_rail_straight_111",
-    "alc_rail_straight_112",
-    "alc_rail_straight_126",
-    "alc_rail_straight_152",
-    "alc_rail_straight_153",
-    "alc_rail_straight_157",
-    "alc_rail_straight_158",
-    "alc_rail_straight_159",
-    "alc_rail_straight_160",
-    "alc_rail_straight_161",
-    "alc_rail_straight_162",
-    "alc_rail_straight_163",
-    "alc_rail_straight_164",
-    "alc_rail_straight_165",
-    "alc_rail_straight_166",
-    "alc_rail_straight_167",
-    "alc_rail_straight_168",
-    "alc_rail_straight_169",
-    "alc_rail_straight_170",
-    "alc_rail_straight_171",
-    "alc_rail_straight_178",
-    "alc_rail_straight_191"
-  ]
+  "coverage_candidates": {
+    "0": "码头渡轮与远桥",
+    "1": "欢迎棚与渡轮登岸区",
+    "2": "向海方位盘／观景入口",
+    "3": "海鸟栖石",
+    "4": "无字日晷",
+    "8": "倒塌拱券",
+    "10": "低喷泉",
+    "11": "船锚小陈列",
+    "13": "博物馆拱窗长廊",
+    "18": "博物馆图形正门"
+  }
 }

@@ -1,0 +1,202 @@
+[
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-01-opening.png",
+    "id": "ed1980c2-fdd7-4305-be1f-df1ac822811d",
+    "sha256": "42936cbcbf555489a304cd033d79511fa0e1d763b860a72e6e20e9b730482883",
+    "bytes": 162235,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-02-entry-lookout.png",
+    "id": "06bb36d5-10d4-4d22-beac-3a72d123e240",
+    "sha256": "d428cc16dd2c62ff26a416b2daf4203d9602f8785a18890595c19a4a1268038d",
+    "bytes": 312411,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-00-000m.png",
+    "id": "382cd9aa-68c8-4856-ac19-ce73236e02ff",
+    "sha256": "f06d418b8a7458322ca6da6f28f842c090e6779d269d352845c92132f5f18a1a",
+    "bytes": 162251,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-01-007m.png",
+    "id": "3afa3224-905d-4148-a556-64aee3c7a381",
+    "sha256": "155afe7fc42e4acafd671be117375a4d190be2d2f22dfd27e77620dc27e4e809",
+    "bytes": 283116,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-02-013m.png",
+    "id": "8138fcec-1bb7-478f-b0f2-c35866933c8a",
+    "sha256": "59bc72d478532506afb5e98f5a94f35d3234d5f3f441a6c2284d7c5d1c65adf5",
+    "bytes": 303648,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-03-020m.png",
+    "id": "bbdaac87-a710-4827-b8f4-efac09a297cb",
+    "sha256": "9da55ad212ea573697ee31bcf2ed678eefecc01f64d66a1760225eae09008e97",
+    "bytes": 297723,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-04-026m.png",
+    "id": "7cf50a8f-67b8-4ac9-90da-5e9ee1face0a",
+    "sha256": "b84b617929d153d7bf68b774bb357fc1e1b27461faa76840afd27006135923d6",
+    "bytes": 300330,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-05-033m.png",
+    "id": "1469a48c-3f69-4019-beb9-387de9a1d0bf",
+    "sha256": "bf6bc3fe06178f077eb7a6543b5925359620398bf210eab00ba9e35e19e70a9f",
+    "bytes": 300894,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-06-039m.png",
+    "id": "a15a279b-3987-48d2-80ff-71e54c490025",
+    "sha256": "1c577df9bc5427a6571acd5cf5ba47e61e801130f85dbea268ea35d3cf3e457f",
+    "bytes": 309107,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-07-046m.png",
+    "id": "d63de945-9f88-4f13-b44c-6aec5ff41fbc",
+    "sha256": "73a26b5a8c2e0864c3c7d3c2862c1fd75046ff1567cca2bec764eb1a4f695ca1",
+    "bytes": 309813,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-08-052m.png",
+    "id": "14df5bb9-155e-4a0d-9631-da705e6a1f34",
+    "sha256": "7ecaf9431b8c2779c511bad869f9dd10d3dc7aa3eb23d9f7137029ffeecc8784",
+    "bytes": 298701,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-09-059m.png",
+    "id": "22cc67a2-d880-4c17-ad4d-ae83b7dad5b5",
+    "sha256": "0148384b5efc662fa568be0f55e9e4d69ef916b807ad055681db939493d7b318",
+    "bytes": 304009,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-10-065m.png",
+    "id": "c4746352-4ed6-4c1a-98c6-dca02d3cd9bb",
+    "sha256": "2623118a6b5a1695631fcc6a4516d2a0e0e793c3d8b7f43d4d4cb6a5b982e59f",
+    "bytes": 295197,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-11-072m.png",
+    "id": "e81911e5-a009-4d77-b95a-77f98c21d1bd",
+    "sha256": "6b7fab145b4e7556a9437eb882362b3fa635524e44f14c41b0e94d5c9af81a5e",
+    "bytes": 300823,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-12-079m.png",
+    "id": "d02e86dc-c270-4b4b-a5d2-00a81f1f7dff",
+    "sha256": "f22651afbb7439179666f69a431e39100ae2a90fa66980bf8470555e3deb54fb",
+    "bytes": 293280,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-13-085m.png",
+    "id": "829eddf2-1191-420f-8f66-58e6212a9f42",
+    "sha256": "5ab5ba826f6879b9516c2e81124b8f4d7dc2e6c2f5c2e5615c4b42beea9963ce",
+    "bytes": 305545,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-14-092m.png",
+    "id": "2d63ddda-db62-483f-83c7-aecaf53a6ef2",
+    "sha256": "4b326a7bf266af461c3de718d0c5c6643566f5745f08df19bbfcf66d3428a69e",
+    "bytes": 307596,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-15-098m.png",
+    "id": "156134f7-a953-4fd5-9827-593878a91986",
+    "sha256": "f0f36b288b250c1e588a7e8c8575aa41b026a393f276d6916572514302854bca",
+    "bytes": 306238,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-16-105m.png",
+    "id": "18c88b4c-8d55-4014-8cae-b720f01cf3c6",
+    "sha256": "9be0790075528ffe0a8e3e916589a7c626ca06694adb407aa2e11a1d706ae589",
+    "bytes": 312692,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-17-111m.png",
+    "id": "d3f978f6-c579-49ad-9b4d-bc619c2be64c",
+    "sha256": "a348d0461542e55fbd3cfd7e342864ef57143aaf2a9bb1ba9de03e7e054f96f1",
+    "bytes": 306672,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-18-118m.png",
+    "id": "5644d51e-e81e-4b5c-b3c1-a1f925097a63",
+    "sha256": "77d0245d2ef0c9dfbbcdcbb825bc963bfece9d3f4050b41059254a1fca441042",
+    "bytes": 273359,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-comparisons-step-19-119m.png",
+    "id": "eaa8b9e6-0fbf-4eb4-8c64-f3f8b20c5b4f",
+    "sha256": "f5cd0ddfa4bd5b489219e97fed644437ca540f0d53437764f904afe9f56b50cf",
+    "bytes": 274847,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-route-contact-sheet-1.png",
+    "id": "443f2180-8ba1-49e6-879f-93db36d95490",
+    "sha256": "f1c97b824a11433e98f36310f916ae414bad971bc6c64ed10dfdece2cc415e21",
+    "bytes": 1326145,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-route-contact-sheet-2.png",
+    "id": "d4220f2c-e336-4864-8d2e-421116b6f3d0",
+    "sha256": "809ae761ccf75f50bfd1210a132a70563b837b6025de0a92c7d93dc524d3aa35",
+    "bytes": 1329539,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-433-proposal-v2-top-layout-annotated.png",
+    "id": "822289ec-15ec-48f8-8756-4ce5c0e33550",
+    "sha256": "44ef1ad194cd8e6aa998495711df96cb1c077c0049516dae1eafa2ed61797ff2",
+    "bytes": 516854,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  }
+]

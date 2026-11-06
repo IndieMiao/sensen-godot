@@ -1,0 +1,166 @@
+{
+  "counted_screens": 10,
+  "total_screens": 20,
+  "rows": [
+    {
+      "screen": 1,
+      "route_index": 0,
+      "view": "step-00-000m.png",
+      "counted": true,
+      "focal_point": "码头渡轮与远桥",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 2,
+      "route_index": 1,
+      "view": "step-01-007m.png",
+      "counted": true,
+      "focal_point": "欢迎棚与渡轮登岸区",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 3,
+      "route_index": 2,
+      "view": "step-02-013m.png",
+      "counted": true,
+      "focal_point": "向海方位盘／观景入口",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 4,
+      "route_index": 3,
+      "view": "step-03-020m.png",
+      "counted": true,
+      "focal_point": "海鸟栖石",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 5,
+      "route_index": 4,
+      "view": "step-04-026m.png",
+      "counted": true,
+      "focal_point": "无字日晷",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 6,
+      "route_index": 5,
+      "view": "step-05-033m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 7,
+      "route_index": 6,
+      "view": "step-06-039m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 8,
+      "route_index": 7,
+      "view": "step-07-046m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 9,
+      "route_index": 8,
+      "view": "step-08-052m.png",
+      "counted": true,
+      "focal_point": "倒塌拱券",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 10,
+      "route_index": 9,
+      "view": "step-09-059m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 11,
+      "route_index": 10,
+      "view": "step-10-065m.png",
+      "counted": true,
+      "focal_point": "低喷泉",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 12,
+      "route_index": 11,
+      "view": "step-11-072m.png",
+      "counted": true,
+      "focal_point": "船锚小陈列",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 13,
+      "route_index": 12,
+      "view": "step-12-079m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 14,
+      "route_index": 13,
+      "view": "step-13-085m.png",
+      "counted": true,
+      "focal_point": "博物馆拱窗长廊",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 15,
+      "route_index": 14,
+      "view": "step-14-092m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 16,
+      "route_index": 15,
+      "view": "step-15-098m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 17,
+      "route_index": 16,
+      "view": "step-16-105m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 18,
+      "route_index": 17,
+      "view": "step-17-111m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 19,
+      "route_index": 18,
+      "view": "step-18-118m.png",
+      "counted": true,
+      "focal_point": "博物馆图形正门",
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    },
+    {
+      "screen": 20,
+      "route_index": 19,
+      "view": "step-19-119m.png",
+      "counted": false,
+      "focal_point": null,
+      "method": "Manual visual assessment of the native frame; repeated views of one landmark and ordinary planting are not added again."
+    }
+  ]
+}
