@@ -1,0 +1,28 @@
+{
+  "author": "刘备",
+  "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "branch_base": "9d39f9636472c4613deb6e99dd60ae65f571e829",
+  "actual_references_inspected": {
+    "placement_points.json": "5d08d18120f05c5f96ce0384aa2778590f3c92231afd60ef11cff8dfa66f079e",
+    "layout.json": "2633e8990acd7a428ff5ec0033bc124329ed239aea97a9e01b8bb477f51269e9",
+    "c_alc2.png": "408027a23724ebaa5a0388f493c198b89f5a7c157f363d34b5470b032ef455d1",
+    "landmark_alcatraz_v2.jpg": "e25388b6e3be3af6e0815e269cd29090c00f1aae9e1f46707b7b10f026255932",
+    "alcatraz_island.gd": "576629ffdc79da8e515974c991f55955843169d62632585aec35fc63f8e97ca3"
+  },
+  "interpretation": "User concept has pier with bench/plaza furnishings. Additional shelter, blank panel, crates/rope and planters are authored to the explicit dock brief, not traced from photographic assets. Five prototypes, two planter instances.",
+  "toolchain": {
+    "blender": "5.2.2 LTS",
+    "godot": "4.7.2 / Vulkan Mobile",
+    "hardware": "Steam Deck / RADV VANGOGH"
+  },
+  "scopes_preserved": [
+    "b16c3198 layout.json",
+    "navigation",
+    "spawn and exit",
+    "camera and lights",
+    "dock/terrain/sea/far bridge",
+    "other artist prototypes"
+  ],
+  "preview_nature_context": "PR #801 / 07326180a86324b3d5835fe65048d0f94ae589db; only in isolated QA, not included in this PR"
+}

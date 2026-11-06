@@ -1,0 +1,18 @@
+{
+  "package": "com.sensen.alcatrazdock424qa",
+  "apk_sha256": "9daf072a1ecdba5b89897caeceb8a20de38e427f54d560e102785b836433d99f",
+  "bytes": 34589910,
+  "installed_apk_readback_equal": true,
+  "passed": true,
+  "decoded_mesh_arrays_bounds_materials_and_uids_equal": true,
+  "actual_export_uid_and_resource_path_equal": true,
+  "placements_and_manifest_bytes_equal": true,
+  "assets": [
+    "alc_dock_bollard",
+    "alc_dock_crates",
+    "alc_dock_planter",
+    "alc_dock_shelter",
+    "alc_dock_welcome"
+  ],
+  "note": "Godot removes authoring params/deps from packaged .import; actual exported UID/path and decoded mesh/material data verified. Offline emulator only."
+}

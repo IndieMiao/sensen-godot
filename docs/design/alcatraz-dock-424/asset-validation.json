@@ -1,0 +1,471 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "check": "alc_dock_bollard: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: GLB container",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: one mesh/primitive",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: exported triangle count",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: valid indices",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: no degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: self contained vertex material",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: opaque with normal backface culling",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: matte dielectric",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: static MultiMesh prototype",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter: manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter_000: decoration only",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter_000: dock floor / zone",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter_000: >=0.50m spawn clearance",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter_000: 0.90m central aisle clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter_000: on original 3m pier",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates_000: decoration only",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates_000: dock floor / zone",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates_000: >=0.50m spawn clearance",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates_000: 0.90m central aisle clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_crates_000: on original 3m pier",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome_000: decoration only",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome_000: dock floor / zone",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome_000: >=0.50m spawn clearance",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome_000: 0.90m central aisle clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome_000: on original 3m pier",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_000: decoration only",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_000: dock floor / zone",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_000: >=0.50m spawn clearance",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_000: 0.90m central aisle clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_000: on original plaza",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_001: decoration only",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_001: dock floor / zone",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_001: >=0.50m spawn clearance",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_001: 0.90m central aisle clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_001: on original plaza",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_000: decoration only",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_000: dock floor / zone",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_000: >=0.50m spawn clearance",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_000: 0.90m central aisle clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_000: on original 3m pier",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_001: decoration only",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_001: dock floor / zone",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_001: >=0.50m spawn clearance",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_001: 0.90m central aisle clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_bollard_001: on original 3m pier",
+      "passed": true
+    },
+    {
+      "check": "exactly two large planters",
+      "passed": true
+    },
+    {
+      "check": "all five kit pieces placed",
+      "passed": true
+    }
+  ],
+  "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "assets": 5,
+  "unique_triangles": 1382,
+  "instances": 7,
+  "placed_triangles": 1988,
+  "placement_bounds": [
+    {
+      "name": "alc_dock_shelter_000",
+      "footprint_xz": [
+        -23.5,
+        13.700000023841858,
+        -22.5,
+        16.999999976158144
+      ],
+      "spawn_clearance_m": 2.0615528359388287
+    },
+    {
+      "name": "alc_dock_crates_000",
+      "footprint_xz": [
+        -21.436149513721467,
+        17.884576153755187,
+        -20.563850486278533,
+        19.01542384624481
+      ],
+      "spawn_clearance_m": 0.5638504862785325
+    },
+    {
+      "name": "alc_dock_welcome_000",
+      "footprint_xz": [
+        -23.42179998755455,
+        17.499999994039534,
+        -22.57820001244545,
+        17.800000005960463
+      ],
+      "spawn_clearance_m": 1.3320342488415255
+    },
+    {
+      "name": "alc_dock_planter_000",
+      "footprint_xz": [
+        -23.965079998970033,
+        12.1299999833107,
+        -23.23492000102997,
+        13.470000016689301
+      ],
+      "spawn_clearance_m": 5.666209246432767
+    },
+    {
+      "name": "alc_dock_planter_001",
+      "footprint_xz": [
+        -21.54300001502037,
+        12.221428000926972,
+        -20.33699998497963,
+        12.87857199907303
+      ],
+      "spawn_clearance_m": 6.138463142905082
+    },
+    {
+      "name": "alc_dock_bollard_000",
+      "footprint_xz": [
+        -21.260000002384185,
+        19.365000000596048,
+        -20.639999997615813,
+        19.834999999403955
+      ],
+      "spawn_clearance_m": 0.8251212013434881
+    },
+    {
+      "name": "alc_dock_bollard_001",
+      "footprint_xz": [
+        -21.260000002384185,
+        15.415000000596047,
+        -20.639999997615813,
+        15.884999999403954
+      ],
+      "spawn_clearance_m": 3.2016909595063625
+    }
+  ],
+  "central_aisle_m": 0.9
+}
