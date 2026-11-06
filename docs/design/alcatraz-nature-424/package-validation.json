@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "package": "com.sensen.alcatraznature424qa",
+  "apk_sha256": "df0ab373212b591de137ab7507df79d8a18223d79828f3f293a18b81ccae9449",
+  "bytes": 34387932,
+  "installed_apk_readback_equal": true,
+  "six_meshes": [
+    {
+      "asset": "alc_grass_tuft",
+      "decoded_mesh_arrays_sha256": "ecf2b35a804daaab813784bedfa0e86c7b0400bad39d1dadeaf6f84080e52eaa",
+      "imported_geometry_material_uid_match": true
+    },
+    {
+      "asset": "alc_rock_a",
+      "decoded_mesh_arrays_sha256": "f49a4ddc6c7921556eeacb62040a9918e795bf4b5b7bf2c7509ff8c317576b62",
+      "imported_geometry_material_uid_match": true
+    },
+    {
+      "asset": "alc_rock_b",
+      "decoded_mesh_arrays_sha256": "cee103f9cf3c82324519158403658ce006de84e2ed9d001d9d696170573274c7",
+      "imported_geometry_material_uid_match": true
+    },
+    {
+      "asset": "alc_rock_c",
+      "decoded_mesh_arrays_sha256": "f7302186639c4c45900001d9699009415916c998ced2f7341673d763a8bd7955",
+      "imported_geometry_material_uid_match": true
+    },
+    {
+      "asset": "alc_shrub_a",
+      "decoded_mesh_arrays_sha256": "10f166314c62188535c426aacdac5c006d65d501a104fd4a87dd60666a297fa2",
+      "imported_geometry_material_uid_match": true
+    },
+    {
+      "asset": "alc_shrub_b",
+      "decoded_mesh_arrays_sha256": "ce40d4610cff3a9e7f4824c2bc3f7d889b87d20d8a62abd1e51d00111ebc7365",
+      "imported_geometry_material_uid_match": true
+    }
+  ],
+  "shared_material_properties_match": true,
+  "placement_bytes_match": true,
+  "manifest_asset_hashes_match": true,
+  "verification": "Read installed APK back; extract its resources; load exported meshes and shared material in Godot. All decoded mesh arrays, bounds, triangle counts, material properties and UIDs equal local tested imports. Serialized .scn byte equality is not asserted.",
+  "note": "Offline emulator QA only. Manifest explanatory godot_material field added after export; asset hash table unchanged."
+}

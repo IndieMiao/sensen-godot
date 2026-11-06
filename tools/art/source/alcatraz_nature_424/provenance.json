@@ -1,0 +1,27 @@
+{
+  "task": "SGODOT-424",
+  "references": [
+    {
+      "file": "blockout_layout.json",
+      "sha256": "2633e8990acd7a428ff5ec0033bc124329ed239aea97a9e01b8bb477f51269e9",
+      "bytes": 741018
+    },
+    {
+      "file": "c_alc2.png",
+      "sha256": "408027a23724ebaa5a0388f493c198b89f5a7c157f363d34b5470b032ef455d1",
+      "bytes": 2183669
+    },
+    {
+      "file": "landmark_alcatraz_v2.jpg",
+      "sha256": "e25388b6e3be3af6e0815e269cd29090c00f1aae9e1f46707b7b10f026255932",
+      "bytes": 1017271
+    }
+  ],
+  "reference_source": "User-provided ~/incoming/landmark/; two original concept files",
+  "blockout_source_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "author": "刘备",
+  "tools": {
+    "blender": "5.2.2 LTS",
+    "godot": "4.7.2 stable"
+  }
+}

@@ -1,0 +1,709 @@
+{
+	"avatar_source_height": 1.72073924541473,
+	"bridge_city_control": {
+		"max_rgb_error_255": 0.0,
+		"rect": [
+			0,
+			55,
+			170,
+			95
+		]
+	},
+	"captures": [
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.937862, -0.347009), Z: (0.0, 0.347009, 0.937862), O: (0.0, 8.0, 20.0)]",
+			"name": "01_scale_lineup",
+			"size": [
+				1500,
+				650
+			],
+			"visible_draw_calls": 10,
+			"visible_primitives": 9330,
+			"width_m": 17.0
+		},
+		{
+			"camera": "[X: (0.998969, 0.0, 0.045408), Y: (0.016517, 0.931495, -0.363379), Z: (-0.042297, 0.363754, 0.930534), O: (-4.0, 5.0, 11.0)]",
+			"name": "02_rock_detail",
+			"size": [
+				1500,
+				650
+			],
+			"visible_draw_calls": 4,
+			"visible_primitives": 590,
+			"width_m": 9.0
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.926178, -0.377087), Z: (0.0, 0.377087, 0.926178), O: (3.3, 3.2, 7.0)]",
+			"name": "03_foliage_detail",
+			"size": [
+				1500,
+				650
+			],
+			"visible_draw_calls": 4,
+			"visible_primitives": 382,
+			"width_m": 5.59999990463257
+		},
+		{
+			"camera": "[X: (0.752577, 0.0, 0.658505), Y: (0.304048, 0.887024, -0.347483), Z: (-0.584109, 0.461724, 0.667553), O: (-44.0, 18.0, 33.0)]",
+			"name": "04_blockout_shore",
+			"size": [
+				1100,
+				900
+			],
+			"visible_draw_calls": 30,
+			"visible_primitives": 43568,
+			"width_m": 18.0
+		},
+		{
+			"camera": "[X: (0.816968, 0.0, -0.576683), Y: (-0.388849, 0.738471, -0.550869), Z: (0.425864, 0.674285, 0.603307), O: (31.0, 23.0, 20.0)]",
+			"name": "05_blockout_terraces",
+			"size": [
+				1100,
+				900
+			],
+			"visible_draw_calls": 24,
+			"visible_primitives": 34510,
+			"width_m": 20.0
+		},
+		{
+			"camera": "[X: (0.828169, 0.0, -0.560478), Y: (-0.286213, 0.859783, -0.422912), Z: (0.48189, 0.510659, 0.712046), O: (67.0, 75.0, 97.0)]",
+			"name": "06_whole_island",
+			"size": [
+				1300,
+				1100
+			],
+			"visible_draw_calls": 48,
+			"visible_primitives": 51448,
+			"width_m": 77.0
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "07_default_opening",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 28,
+			"visible_primitives": 44084,
+			"width_m": 6.71999979019165
+		},
+		{
+			"camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+			"name": "08_no_rocks_control",
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 25,
+			"visible_primitives": 37028,
+			"width_m": 6.71999979019165
+		}
+	],
+	"checks": [
+		{
+			"check": "complete avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "avatar complete bounds",
+			"passed": true
+		},
+		{
+			"check": "01_scale_lineup: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 01_scale_lineup",
+			"passed": true
+		},
+		{
+			"check": "02_rock_detail: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 02_rock_detail",
+			"passed": true
+		},
+		{
+			"check": "03_foliage_detail: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 03_foliage_detail",
+			"passed": true
+		},
+		{
+			"check": "blockout avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "replace all 114 owner placeholders exactly once",
+			"passed": true
+		},
+		{
+			"check": "04_blockout_shore: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 04_blockout_shore",
+			"passed": true
+		},
+		{
+			"check": "05_blockout_terraces: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 05_blockout_terraces",
+			"passed": true
+		},
+		{
+			"check": "06_whole_island: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 06_whole_island",
+			"passed": true
+		},
+		{
+			"check": "07_default_opening: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 07_default_opening",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_000: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_000: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_000: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_001: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_001: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_001: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_002: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_002: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_002: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_003: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_003: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_003: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_004: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_004: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_004: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_005: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_005: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_005: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_006: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_006: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_006: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_007: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_007: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_007: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_008: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_008: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_008: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_009: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_009: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_009: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_010: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_010: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_010: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_a_011: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_b_011: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "alc_rock_c_011: clear of bridge and city strip",
+			"passed": true
+		},
+		{
+			"check": "08_no_rocks_control: dimensions",
+			"passed": true
+		},
+		{
+			"check": "save 08_no_rocks_control",
+			"passed": true
+		},
+		{
+			"check": "bridge/city pixels unchanged with rocks hidden",
+			"passed": true
+		},
+		{
+			"check": "Mobile renderer",
+			"passed": true
+		}
+	],
+	"lineup_avatar_height": 1.75,
+	"nature_batches": 9,
+	"nature_instances": 114,
+	"passed": true,
+	"removed_owner_placeholders": 114,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	},
+	"rock_screen_bounds": [
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_000",
+			"screen_rect": [
+				420.903442382812,
+				404.565490722656,
+				60.5390319824219,
+				65.8286437988281
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_000",
+			"screen_rect": [
+				597.701843261719,
+				398.981262207031,
+				121.862609863281,
+				131.373046875
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_000",
+			"screen_rect": [
+				780.027099609375,
+				379.233367919922,
+				172.132568359375,
+				208.789459228516
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_001",
+			"screen_rect": [
+				1048.00244140625,
+				518.114685058594,
+				51.1021728515625,
+				58.2772827148438
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_001",
+			"screen_rect": [
+				1225.33850097656,
+				509.650848388672,
+				111.3505859375,
+				129.580902099609
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_001",
+			"screen_rect": [
+				1394.56762695312,
+				487.154205322266,
+				187.812622070312,
+				212.495025634766
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_002",
+			"screen_rect": [
+				1665.80993652344,
+				624.234436035156,
+				60.2484130859375,
+				65.5848999023438
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_002",
+			"screen_rect": [
+				1856.39318847656,
+				622.878723144531,
+				94.00244140625,
+				122.672241210938
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_002",
+			"screen_rect": [
+				2014.87316894531,
+				599.096008300781,
+				191.963012695312,
+				208.158447265625
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_003",
+			"screen_rect": [
+				2285.25659179688,
+				731.363464355469,
+				66.1162109375,
+				70.8738403320312
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_003",
+			"screen_rect": [
+				2485.24584960938,
+				735.789855957031,
+				81.05810546875,
+				116.397033691406
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_c_003",
+			"screen_rect": [
+				-10.8099031448364,
+				223.379150390625,
+				64.1673889160156,
+				68.99560546875
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_004",
+			"screen_rect": [
+				-86.5521621704102,
+				94.8882598876953,
+				67.9249725341797,
+				73.4957885742188
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_004",
+			"screen_rect": [
+				45.862060546875,
+				-159.771392822266,
+				101.944641113281,
+				126.12890625
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_004",
+			"screen_rect": [
+				-15.8125448226929,
+				-415.629089355469,
+				165.379028320312,
+				176.90104675293
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_005",
+			"screen_rect": [
+				78.8949813842773,
+				-498.707000732422,
+				65.5639572143555,
+				73.2890930175781
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_005",
+			"screen_rect": [
+				120.456848144531,
+				-713.802978515625,
+				116.572540283203,
+				130.955932617188
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_005",
+			"screen_rect": [
+				221.862594604492,
+				-919.66552734375,
+				161.996047973633,
+				173.825439453125
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_006",
+			"screen_rect": [
+				2688.66748046875,
+				698.428588867188,
+				59.17822265625,
+				70.2672119140625
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_006",
+			"screen_rect": [
+				2794.39135742188,
+				513.416381835938,
+				124.04443359375,
+				130.581848144531
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_006",
+			"screen_rect": [
+				2910.07495117188,
+				301.018127441406,
+				182.40478515625,
+				193.841217041016
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_007",
+			"screen_rect": [
+				3154.20043945312,
+				216.415313720703,
+				49.1591796875,
+				64.6151733398438
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_007",
+			"screen_rect": [
+				3192.74877929688,
+				20.3758964538574,
+				123.900390625,
+				125.029434204102
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_007",
+			"screen_rect": [
+				3225.95703125,
+				-215.079879760742,
+				191.615966796875,
+				206.960678100586
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_008",
+			"screen_rect": [
+				3305.4404296875,
+				-304.819549560547,
+				52.6787109375,
+				66.6643218994141
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_008",
+			"screen_rect": [
+				492.798034667969,
+				-913.607788085938,
+				116.151245117188,
+				114.639831542969
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_008",
+			"screen_rect": [
+				715.667175292969,
+				-934.368591308594,
+				189.063537597656,
+				212.377502441406
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_009",
+			"screen_rect": [
+				1038.72009277344,
+				-791.1650390625,
+				61.6082763671875,
+				71.5166015625
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_009",
+			"screen_rect": [
+				1278.21374511719,
+				-769.096252441406,
+				101.271240234375,
+				100.050537109375
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_009",
+			"screen_rect": [
+				1500.72216796875,
+				-795.842529296875,
+				174.904907226562,
+				209.759399414062
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_010",
+			"screen_rect": [
+				1814.1220703125,
+				-655.02099609375,
+				66.755615234375,
+				73.6626586914062
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_010",
+			"screen_rect": [
+				2050.18090820312,
+				-637.644165039062,
+				113.2880859375,
+				111.580322265625
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_010",
+			"screen_rect": [
+				2291.14599609375,
+				-653.379821777344,
+				150.0087890625,
+				199.267395019531
+			]
+		},
+		{
+			"asset": "alc_rock_a",
+			"name": "alc_rock_a_011",
+			"screen_rect": [
+				2591.5732421875,
+				-517.457763671875,
+				67.8046875,
+				72.9696044921875
+			]
+		},
+		{
+			"asset": "alc_rock_b",
+			"name": "alc_rock_b_011",
+			"screen_rect": [
+				2823.419921875,
+				-506.145660400391,
+				122.761962890625,
+				123.017395019531
+			]
+		},
+		{
+			"asset": "alc_rock_c",
+			"name": "alc_rock_c_011",
+			"screen_rect": [
+				3082.1220703125,
+				-509.512817382812,
+				124.008544921875,
+				185.967254638672
+			]
+		}
+	],
+	"source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0"
+}

@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "blender": "5.2.2 LTS",
+  "assets": [
+    {
+      "asset": "alc_rock_a",
+      "editable_parts": [
+        "Fractured mineral mass / alc_rock_a"
+      ],
+      "triangles": 196,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_rock_b",
+      "editable_parts": [
+        "Fractured mineral mass / alc_rock_b"
+      ],
+      "triangles": 196,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_rock_c",
+      "editable_parts": [
+        "Fractured mineral mass / alc_rock_c"
+      ],
+      "triangles": 196,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_shrub",
+      "editable_parts": [
+        "Leaf cushion 00",
+        "Leaf cushion 01",
+        "Leaf cushion 02",
+        "Leaf cushion 03",
+        "Leaf cushion 04",
+        "Leaf cushion 05",
+        "Leaf cushion 06"
+      ],
+      "triangles": 140,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_shrub_b",
+      "editable_parts": [
+        "Leaf cushion 00.001",
+        "Leaf cushion 01.001",
+        "Leaf cushion 02.001",
+        "Leaf cushion 03.001",
+        "Leaf cushion 04.001",
+        "Leaf cushion 05.001",
+        "Leaf cushion 06.001",
+        "Leaf cushion 07",
+        "Leaf cushion 08"
+      ],
+      "triangles": 180,
+      "bounds_match": true
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "editable_parts": [
+        "Blade 00",
+        "Blade 01",
+        "Blade 02",
+        "Blade 03",
+        "Blade 04",
+        "Blade 05"
+      ],
+      "triangles": 60,
+      "bounds_match": true
+    }
+  ]
+}

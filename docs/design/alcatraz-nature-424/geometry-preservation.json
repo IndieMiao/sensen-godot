@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "baseline": "07326180a86324b3d5835fe65048d0f94ae589db",
+  "scope": "v3 foliage only; all three rocks intentionally revised",
+  "foliage": [
+    {
+      "asset": "alc_shrub",
+      "bytes_equal_v2": true,
+      "sha256": "7a9cf43c6b0660ef42e26ee2418889c5d0c455f968722325b9cd3ccf2c0c6674"
+    },
+    {
+      "asset": "alc_shrub_b",
+      "bytes_equal_v2": true,
+      "sha256": "cfda3d96859135b943bca7a354f9b040a4dcb8be85f9ca5f85a1406cbad4cc78"
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "bytes_equal_v2": true,
+      "sha256": "50822f15cfb8ad3b3be39143e89d9a35d63e32350888c03c15c780f8e8c933d4"
+    }
+  ]
+}

@@ -4,6 +4,7 @@
 
 ## 当前 UI 与 P0 美术
 
+- [刘备 · 恶魔岛岸石与坡地植被 SGODOT-424](alcatraz-nature-424/README.md)：六个单 surface 原型、179 个建议点位、白模实拍和 1.75 m 人物比例；交马可波罗接入，待双审。
 - [刘备 · 野外地表 SGODOT-422](wild-ground-422/README.md)：三层不规则草色、入口沙土路、裸土与平面散石；四张 1024 贴图、三塘原生开场前后图、俯视和程序参数样稿。正式地面着色器由程序接入，待双审。
 - [赵云 · NPC 小道具第三批 SGODOT-347 / 357 / 362](npc-parts-batch3-2026-10-29/README.md)：Lena / Rafa 三件换色、Nadia 面包师帽与围裙、Lou 荷官装，以及牌室后墙 AO；六件 NPC 专用，含 3 个 blend、18 张游戏实渲图和验证记录，运行时仅推分支，待双审与用户批准。
 - [刘备 · Ivo 矿口小屋 SGODOT-308](mine-hut-308-2026-10-16/README.md)：新 Mine Hut 套件、关闭矿道、盐烤鱼炉、原件复用与 Ivo 站位；共享图集、Godot 审阅图、实际交叠和通行验证，交 wp-3d-scene 双审。
