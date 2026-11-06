@@ -32,10 +32,16 @@ func _map() -> Node:
 	viewport.add_child(m)
 	return m
 
-func _room(id: String) -> Room:
+func _room(id: String, phone := false) -> Room:
 	var r := Room.new()
 	r.setup({"outpost_id": id})
-	add_child(r)
+	if phone:   # a 360 × 800 screen, as the phone's
+		var vp := SubViewport.new()
+		vp.size = Vector2i(360, 800)
+		add_child(auto_free(vp))
+		vp.add_child(r)
+	else:
+		add_child(r)
 	auto_free(r)
 	return r
 
@@ -121,3 +127,18 @@ func test_the_cathedral_camera_keeps_to_its_reach() -> void:
 	await get_tree().process_frame
 	var far := tea.room.position + Vector3(9, 0, 9)
 	assert_vector(tea._clamp_to_reach(far)).is_equal(far)
+
+## 周瑜 on #846: in every corner of the room's bounds the player is still on the screen, a margin in (the reach gives
+## way for them).
+func test_the_player_stays_on_screen_in_every_corner() -> void:
+	var r := _room(CHURCH_ID, true)
+	await get_tree().process_frame
+	var b: Array = P0Outposts.find(CHURCH_ID).bounds
+	for c in [Vector2(b[1], b[2]), Vector2(b[0], b[3]), Vector2(b[0], b[2]), Vector2(b[1], b[3])]:
+		r.actor.teleport(r.room.position + Vector3(c.x, r.floor_y, c.y))
+		r._focus = r.actor.position
+		for i in 90: r.p0_frame({}, 1.0 / 30.0)
+		var view := r._view()
+		for p in [r.actor.position, r.actor.position + Vector3(0, 1.75, 0)]:
+			var at := r.cam.unproject_position(p)
+			assert_bool(Rect2(Vector2(12, 0), view - Vector2(24, 0)).has_point(at)).override_failure_message("%s at %s, %s" % [c, at, view]).is_true()
