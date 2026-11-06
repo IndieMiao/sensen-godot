@@ -1,0 +1,320 @@
+{
+  "batches": 5,
+  "captures": [
+    {
+      "camera": "[X: (0.988936, 0.0, -0.14834), Y: (-0.040894, 0.96125, -0.272628), Z: (0.142592, 0.275678, 0.950615), O: (3.0, 6.5, 20.0)]",
+      "name": "01_scale_lineup",
+      "size": [
+        1500,
+        700
+      ],
+      "visible_draw_calls": 9,
+      "visible_primitives": 9744,
+      "width_m": 13.5
+    },
+    {
+      "camera": "[X: (0.99083, 0.0, 0.135113), Y: (0.057311, 0.905583, -0.420279), Z: (-0.122356, 0.424168, 0.897279), O: (-3.5, 6.0, 11.0)]",
+      "name": "02_dock_detail",
+      "size": [
+        1200,
+        850
+      ],
+      "visible_draw_calls": 5,
+      "visible_primitives": 1026,
+      "width_m": 8.0
+    },
+    {
+      "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+      "name": "03_opening_before",
+      "size": [
+        360,
+        800
+      ],
+      "visible_draw_calls": 28,
+      "visible_primitives": 43508,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+      "name": "04_dock_opening",
+      "size": [
+        360,
+        800
+      ],
+      "visible_draw_calls": 33,
+      "visible_primitives": 45496,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (0.84964, 0.0, -0.527363), Y: (-0.318, 0.79774, -0.512334), Z: (0.420698, 0.603001, 0.677792), O: (-13.0, 14.0, 30.0)]",
+      "name": "05_dock_context",
+      "size": [
+        1100,
+        1000
+      ],
+      "visible_draw_calls": 35,
+      "visible_primitives": 48510,
+      "width_m": 11.8000001907349
+    },
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (-22.0, 22.0, 15.5)]",
+      "name": "06_dock_top",
+      "size": [
+        1100,
+        1000
+      ],
+      "visible_draw_calls": 25,
+      "visible_primitives": 37074,
+      "width_m": 13.0
+    }
+  ],
+  "checks": [
+    {
+      "check": "complete avatar assembled",
+      "passed": true
+    },
+    {
+      "check": "complete human source bounds",
+      "passed": true
+    },
+    {
+      "check": "01_scale_lineup: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 01_scale_lineup",
+      "passed": true
+    },
+    {
+      "check": "02_dock_detail: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 02_dock_detail",
+      "passed": true
+    },
+    {
+      "check": "blockout avatar assembled",
+      "passed": true
+    },
+    {
+      "check": "replace all 114 owner placeholders exactly once",
+      "passed": true
+    },
+    {
+      "check": "03_opening_before: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 03_opening_before",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter_000: clear of zoom buttons plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter_000: clear of zoom buttons plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_shelter_000: future right-lower actions clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome_000: clear of zoom buttons plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome_000: clear of zoom buttons plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_welcome_000: future right-lower actions clear",
+      "passed": true
+    },
+    {
+      "check": "blank welcome clear of Map exit plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_000: clear of zoom buttons plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_000: clear of zoom buttons plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_000: future right-lower actions clear",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_001: clear of zoom buttons plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_001: clear of zoom buttons plus 12px",
+      "passed": true
+    },
+    {
+      "check": "alc_dock_planter_001: future right-lower actions clear",
+      "passed": true
+    },
+    {
+      "check": "Map exit visible",
+      "passed": true
+    },
+    {
+      "check": "pinned dock spawn unchanged",
+      "passed": true
+    },
+    {
+      "check": "default camera 6.72m",
+      "passed": true
+    },
+    {
+      "check": "04_dock_opening: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 04_dock_opening",
+      "passed": true
+    },
+    {
+      "check": "05_dock_context: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 05_dock_context",
+      "passed": true
+    },
+    {
+      "check": "06_dock_top: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 06_dock_top",
+      "passed": true
+    },
+    {
+      "check": "Mobile renderer",
+      "passed": true
+    }
+  ],
+  "instances": 7,
+  "lineup_avatar_height_m": 1.75,
+  "lineup_labels": [
+    {
+      "asset": "alc_dock_bollard",
+      "screen_x": 145.650024414062
+    },
+    {
+      "asset": "alc_dock_crates",
+      "screen_x": 326.955078125
+    },
+    {
+      "asset": "alc_dock_shelter",
+      "screen_x": 651.106384277344
+    },
+    {
+      "asset": "alc_dock_welcome",
+      "screen_x": 964.269592285156
+    },
+    {
+      "asset": "alc_dock_planter",
+      "screen_x": 1134.58642578125
+    }
+  ],
+  "nature_batches": 9,
+  "nature_instances": 114,
+  "opening_hud": {
+    "map_rect": "[P: (98.76958, 497.0955), S: (48.0, 64.0)]",
+    "projected_props": [
+      {
+        "name": "alc_dock_shelter_000",
+        "rect_xywh": [
+          129.028778076172,
+          228.624725341797,
+          96.1287384033203,
+          225.783050537109
+        ]
+      },
+      {
+        "name": "alc_dock_crates_000",
+        "rect_xywh": [
+          209.037185668945,
+          466.788543701172,
+          60.4101409912109,
+          76.6200256347656
+        ]
+      },
+      {
+        "name": "alc_dock_welcome_000",
+        "rect_xywh": [
+          122.354019165039,
+          402.540985107422,
+          47.7773895263672,
+          79.4488830566406
+        ]
+      },
+      {
+        "name": "alc_dock_planter_000",
+        "rect_xywh": [
+          152.256042480469,
+          226.038665771484,
+          55.8434906005859,
+          96.7835083007812
+        ]
+      },
+      {
+        "name": "alc_dock_planter_001",
+        "rect_xywh": [
+          285.810241699219,
+          255.699920654297,
+          71.36376953125,
+          72.7118835449219
+        ]
+      },
+      {
+        "name": "alc_dock_bollard_000",
+        "rect_xywh": [
+          207.180023193359,
+          525.897766113281,
+          38.4605102539062,
+          45.8040771484375
+        ]
+      },
+      {
+        "name": "alc_dock_bollard_001",
+        "rect_xywh": [
+          260.162292480469,
+          386.178894042969,
+          38.46044921875,
+          45.803955078125
+        ]
+      }
+    ],
+    "zoom_rects": "[[P: (300.0, 352.0), S: (44.0, 44.0)], [P: (300.0, 400.0), S: (44.0, 44.0)]]"
+  },
+  "passed": true,
+  "removed_owner_placeholders": 114,
+  "renderer": {
+    "engine": "4.7.2-stable (official)",
+    "gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "method": "mobile"
+  },
+  "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "bridge_pixel_check": {
+    "passed": true,
+    "region_xywh": [
+      0,
+      55,
+      140,
+      80
+    ],
+    "orange_bridge_pixels": 654,
+    "changed_pixels": 0,
+    "method": "before/after fixed opening, orange bridge geometry pixels, original PNG bytes"
+  }
+}
