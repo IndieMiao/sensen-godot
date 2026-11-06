@@ -1,0 +1,58 @@
+{
+  "renderer": {
+    "engine": "4.7.2-stable (official)",
+    "gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "method": "mobile"
+  },
+  "presets": {
+    "original": {
+      "cpu_ms": {
+        "samples": 270,
+        "median": 0.185000002384186,
+        "p95": 0.24185000509023663
+      },
+      "gpu_ms": {
+        "samples": 270,
+        "median": 0.34400001168251,
+        "p95": 0.349000006914139
+      }
+    },
+    "warm_noon": {
+      "cpu_ms": {
+        "samples": 270,
+        "median": 0.186000004410744,
+        "p95": 0.23809999749064423
+      },
+      "gpu_ms": {
+        "samples": 270,
+        "median": 0.34400001168251,
+        "p95": 0.349999994039536
+      }
+    },
+    "cool_morning": {
+      "cpu_ms": {
+        "samples": 270,
+        "median": 0.181999996304512,
+        "p95": 0.24154999777674688
+      },
+      "gpu_ms": {
+        "samples": 270,
+        "median": 0.340000003576279,
+        "p95": 0.34754999577999135
+      }
+    },
+    "golden_dusk": {
+      "cpu_ms": {
+        "samples": 270,
+        "median": 0.185000002384186,
+        "p95": 0.24355000182986286
+      },
+      "gpu_ms": {
+        "samples": 270,
+        "median": 0.340999990701675,
+        "p95": 0.34854999929666547
+      }
+    }
+  },
+  "scope": "Deck Vulkan Mobile viewport; 3 interleaved cycles, 270 samples per preset. Not a physical-phone or whole-app measurement."
+}

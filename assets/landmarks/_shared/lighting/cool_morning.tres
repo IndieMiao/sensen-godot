@@ -9,7 +9,7 @@
 background_mode = 1
 background_color = Color(0.768627451, 0.839215686, 0.898039216, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.827450980, 0.811764706, 0.933333333, 1)
+ambient_light_color = Color(0.788131776, 0.837254004, 0.789618049, 1)
 ambient_light_energy = 0.90
 ssao_enabled = false
 ssr_enabled = false

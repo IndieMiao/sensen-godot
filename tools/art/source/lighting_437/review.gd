@@ -137,9 +137,35 @@ func run():
  report.budget={"directional_lights":1,"world_environments":1,"shadow_cascades":1,"shadow_map_size":2048,"filter_quality":2,"ssao":false,"ssr":false,"sdfgi":false,"volumetric_fog":false,"fog":false,"glow":false,"runtime_process_callbacks":0}
  # Uncapped, interleaved viewport timing. TIME is frozen only in desktop review.
  if "--benchmark" in OS.get_cmdline_user_args():await benchmark()
+ if "--shadow-probe" in OS.get_cmdline_user_args():await shadow_probe(actor)
  report.passed=report.checks.all(func(c):return c.passed)
  FileAccess.open(output+"/render-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
  print("LIGHTING_RENDER ",report.passed);get_tree().quit(0 if report.passed else 1)
+
+func shadow_probe(actor):
+ # Separate QA-only floor: same camera angles, exact production light/shadows.
+ # The three coast captures above remain the original unchanged fixture.
+ set_preset(2)
+ var floor_node=MeshInstance3D.new();var plane=PlaneMesh.new();plane.size=Vector2(22,22)
+ floor_node.mesh=plane;floor_node.position=Vector3(30,.6,0)
+ var mat=StandardMaterial3D.new();mat.albedo_color=Color("b5b5ab");mat.roughness=.94
+ floor_node.material_override=mat;floor_node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;world.add_child(floor_node)
+ actor.reparent(world,true);actor.position=Vector3(28.4,.61,2.0)
+ # The coast fixture uses a blob shadow for its avatar. Enable casting only
+ # in this isolated diagnostic so a full 1.75 m directional shadow is visible.
+ for node in actor.find_children("*","MeshInstance3D",true,false):node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+ var bench=load("res://assets/landmarks/_shared/street_kit/bench_wood.glb").instantiate()
+ world.add_child(bench);bench.position=Vector3(31.0,.61,2.0);bench.rotation_degrees.y=14.5
+ frame(Vector3(30,.6,-.2),8.0)
+ for i in 60:await RenderingServer.frame_post_draw
+ await capture("golden-dusk-shadow-probe")
+ var sun=lighting.get_node("Sun");var ray=-sun.global_basis.z.normalized()
+ var ground_shadow=Vector3(ray.x,0,ray.z)*1.75/abs(ray.y)
+ var base=camera.unproject_position(actor.global_position)
+ var tip=camera.unproject_position(actor.global_position+ground_shadow)
+ report.shadow_direction={"height_deg":18,"yaw_deg":sun.rotation_degrees.y,"person_height_m":1.75,"ground_shadow_m":str(ground_shadow),"person_base_screen":str(base),"person_shadow_tip_screen":str(tip),"screen_delta":str(tip-base),"direction":"upper right" if tip.x>base.x and tip.y<base.y else "other"}
+ check(tip.y<base.y and tip.x>base.x,"dusk person and bench shadows project toward upper right")
+ sun.shadow_enabled=false;await capture("golden-dusk-shadow-probe-off");sun.shadow_enabled=true
 
 func set_preset(index):
  preset_index=index

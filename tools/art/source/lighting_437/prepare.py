@@ -18,6 +18,10 @@ def main():
  m=json.loads((ROOT/'assets/avatar/parts_manifest.json').read_text());m['parts']=[p for p in m['parts'] if p['id'] in ['body00','eyes00','hairhat0','cloth0','shoes0']];(QA/'assets/avatar/parts_manifest.json').write_text(json.dumps(m))
  for name in ['review.gd','verify.gd']:
   if (SRC/name).exists():shutil.copy2(SRC/name,QA/name)
+ # Existing bench is staged only for the optional v1.3 shadow-direction review.
+ street='assets/landmarks/_shared/street_kit'
+ for name in ['bench_wood.glb','bench_wood.glb.import','street_kit_import.gd','street_kit_import.gd.uid','street_matte.tres']:
+  dst=QA/street/name;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(ROOT/street/name,dst)
  shutil.copy2(SRC/'reference/alcatraz_island.gd',QA/'alcatraz_reference.txt')
  shutil.copy2(SRC/'reference/griffith_observatory.gd',QA/'griffith_reference.txt')
  (QA/'review.tscn').write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://review.gd" id="1"]\n[node name="LightingReview" type="Node"]\nscript=ExtResource("1")\n')

@@ -1,0 +1,384 @@
+{
+	"alcatraz_shadow_settings": {
+		"directional_shadow_blend_splits": false,
+		"directional_shadow_fade_start": 0.800000011920929,
+		"directional_shadow_max_distance": 120.0,
+		"directional_shadow_mode": 0,
+		"directional_shadow_pancake_size": 20.0,
+		"directional_shadow_split_1": 0.100000001490116,
+		"directional_shadow_split_2": 0.200000002980232,
+		"directional_shadow_split_3": 0.5,
+		"shadow_bias": 0.0350000001490116,
+		"shadow_blur": 1.0,
+		"shadow_caster_mask": 4294967295,
+		"shadow_enabled": true,
+		"shadow_normal_bias": 0.280000001192093,
+		"shadow_opacity": 0.479999989271164,
+		"shadow_reverse_cull_face": false,
+		"shadow_transmittance_bias": 0.0500000007450581
+	},
+	"checks": [
+		{
+			"check": "warm noon Environment matches original lighting with shared production background",
+			"passed": true
+		},
+		{
+			"check": "fragment has only one environment and one sun",
+			"passed": true
+		},
+		{
+			"check": "all shadow properties match original Alcatraz",
+			"passed": true
+		},
+		{
+			"check": "noon original sun color",
+			"passed": true
+		},
+		{
+			"check": "noon original sun energy",
+			"passed": true
+		},
+		{
+			"check": "noon original sun rotation",
+			"passed": true
+		},
+		{
+			"check": "fragment sun is independent of host transform",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: independent environment copy",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: host Griffith shadow settings preserved",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: ssao_enabled off",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: ssr_enabled off",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: sdfgi_enabled off",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: volumetric_fog_enabled off",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: fog_enabled off",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: glow_enabled off",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: no sky or radiance resource",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: constant ambient source",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: host edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: scene preset switch applies sun",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: host-local sea material shares original shader",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: switch applies sea palette",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: city host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: switch applies city palette",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: hills host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: switch applies hills palette",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: bridge host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: switch applies bridge palette",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: host sea edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "warm_noon: host far edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: independent environment copy",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: host Griffith shadow settings preserved",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: ssao_enabled off",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: ssr_enabled off",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: sdfgi_enabled off",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: volumetric_fog_enabled off",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: fog_enabled off",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: glow_enabled off",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: no sky or radiance resource",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: constant ambient source",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: host edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: scene preset switch applies sun",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: host-local sea material shares original shader",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: switch applies sea palette",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: city host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: switch applies city palette",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: hills host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: switch applies hills palette",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: bridge host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: switch applies bridge palette",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: host sea edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "cool_morning: host far edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: independent environment copy",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: host Griffith shadow settings preserved",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: ssao_enabled off",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: ssr_enabled off",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: sdfgi_enabled off",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: volumetric_fog_enabled off",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: fog_enabled off",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: glow_enabled off",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: no sky or radiance resource",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: constant ambient source",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: host edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: scene preset switch applies sun",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: host-local sea material shares original shader",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: switch applies sea palette",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: city host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: switch applies city palette",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: hills host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: switch applies hills palette",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: bridge host-local material uses original shader",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: switch applies bridge palette",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: host sea edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "golden_dusk: host far edits do not pollute preset",
+			"passed": true
+		},
+		{
+			"check": "unrelated Resource is rejected; valid preset retained",
+			"passed": true
+		},
+		{
+			"check": "invalid assignment leaves applied environment intact",
+			"passed": true
+		},
+		{
+			"check": "clearing preset safely leaves last applied lighting",
+			"passed": true
+		},
+		{
+			"check": "valid preset can be reapplied after null",
+			"passed": true
+		},
+		{
+			"check": "lighting_preset.gd: no per-frame callback",
+			"passed": true
+		},
+		{
+			"check": "lighting_rig.gd: no per-frame callback",
+			"passed": true
+		}
+	],
+	"griffith_shadow_settings_preserved": {
+		"directional_shadow_blend_splits": false,
+		"directional_shadow_fade_start": 1.0,
+		"directional_shadow_max_distance": 0.0,
+		"directional_shadow_mode": 0,
+		"directional_shadow_pancake_size": 4.0,
+		"directional_shadow_split_1": 0.100000001490116,
+		"directional_shadow_split_2": 0.200000002980232,
+		"directional_shadow_split_3": 0.5,
+		"shadow_bias": 0.0350000001490116,
+		"shadow_blur": 1.79999995231628,
+		"shadow_caster_mask": 4294967295,
+		"shadow_enabled": true,
+		"shadow_normal_bias": 0.280000001192093,
+		"shadow_opacity": 0.479999989271164,
+		"shadow_reverse_cull_face": false,
+		"shadow_transmittance_bias": 0.0500000007450581
+	},
+	"noon_environment_differences": [],
+	"passed": true,
+	"presets": {
+		"cool_morning": {
+			"ambient": "c9d5c9ff",
+			"ambient_energy": 0.899999976158142,
+			"background": "c4d6e5ff",
+			"sun": "e3efffff",
+			"sun_energy": 1.1,
+			"sun_rotation_degrees": "(-24.0, 65.0, 0.0)"
+		},
+		"golden_dusk": {
+			"ambient": "d4cbfbff",
+			"ambient_energy": 0.620000004768372,
+			"background": "dca7b5ff",
+			"sun": "ffe042ff",
+			"sun_energy": 1.73,
+			"sun_rotation_degrees": "(-18.0, -13.0, 0.0)"
+		},
+		"warm_noon": {
+			"ambient": "d5e4eeff",
+			"ambient_energy": 0.720000028610229,
+			"background": "e3ebe8ff",
+			"sun": "fff6e0ff",
+			"sun_energy": 0.98,
+			"sun_rotation_degrees": "(-56.0, -34.0, 0.0)"
+		}
+	}
+}

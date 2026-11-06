@@ -1,6 +1,6 @@
 # SGODOT-437 lighting review
 
-Current revision is v1.2: one lighting preset references an Environment, one sun,
+Current revision is v1.3: one lighting preset references an Environment, one sun,
 one sea ShaderMaterial and one far-material bundle (city / hills / bridge).
 Runtime stays under `assets/landmarks/_shared/lighting/`. The original 432 / 434
 shaders and materials are read-only dependencies. No global script classes.
@@ -59,3 +59,31 @@ exercise the same runtime switching path rather than QA-only recolouring.
 The initial v1 `package_review.py` and root review records are historical.
 The v1.1 `docs/design/lighting-437/v11/` records the class-cache / noon background
 fixes; the current v1.2 includes those fixes plus the visual revision.
+
+
+## v1.3 colour and shadow review
+
+Use `LIGHTING_REVIEW_OUT=output/lighting-437-v13` with the same preparation,
+import and resource checks. Run the desktop review with
+`--fixed-fps 30 --disable-vsync -- --benchmark --shadow-probe`, then run
+`package_v13.py` with NumPy / Pillow. Evidence goes to
+`docs/design/lighting-437/v13/`.
+
+Only the morning ambient colour and dusk sun/ambient colours, energies and
+approved sun yaw change. Dusk pitch stays -18 degrees; all shadow properties,
+noon/morning angles, backdrop parameters, geometry and materials are retained.
+The v1.3 package reports mean RGB, weighted display brightness and HSL saturation
+in explicitly outlined regions. The rock side previously sampled as a shadow
+now receives direct sun; the new shaded-facet region is separately disclosed,
+and v1.2/noon measurements at those exact coordinates are included.
+
+The optional shadow probe runs after the coast captures and timing. It stages
+an existing street-kit bench without changing the source asset and uses a
+separate floor above sea level. The coast avatar uses a blob shadow; casting is
+enabled only on its meshes in this diagnostic to show the full-height
+projection. No production avatar or shadow setting changes. Both real shadows
+and projected direction are recorded; the probe is excluded from coast budget
+and timing measurements.
+
+This colour-only revision reuses the already verified runtime switching path;
+Android v1.2 results remain historical and are not relabelled as v1.3 tests.
