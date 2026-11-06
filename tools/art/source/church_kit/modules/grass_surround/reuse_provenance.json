@@ -1,0 +1,10 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source_commit": "a530d90654b9f13e622530b05adf3ecf366366d3",
+  "module": "grass_surround",
+  "source": "assets/rooms/poi_church/grass_surround.glb",
+  "changes": "Original geometry BIN and JSON preserved; only image URI points to shared poi_church atlas; independent UID",
+  "editable_source": "tools/art/source/church_kit/grass_surround.blend",
+  "script": "tools/art/source/church_kit/prepare_assets.py"
+}

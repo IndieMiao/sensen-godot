@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+
+[ext_resource type="Shader" path="res://assets/landmarks/_shared/ground_detail/ground_detail.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://assets/landmarks/_shared/ground_detail/ground_fields.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/landmarks/_shared/ground_detail/ground_surfaces.png" id="3"]
+
+[resource]
+shader = ExtResource("1")
+shader_parameter/fields = ExtResource("2")
+shader_parameter/surfaces = ExtResource("3")
+resource_name = "Shared ground palette_example"
+shader_parameter/finish_kind = 0
+shader_parameter/tide_position_m = 6.7
+shader_parameter/wood_color = Color(0.639216, 0.505882, 0.364706, 1)
+shader_parameter/wood_light_color = Color(0.721569, 0.600000, 0.447059, 1)
+shader_parameter/wood_dark_color = Color(0.474510, 0.372549, 0.278431, 1)
+shader_parameter/wood_board_size_m = Vector2(1.8, 0.18)
+shader_parameter/wood_board_stagger = 0.5
+shader_parameter/wood_joint_width_m = 0.012
+shader_parameter/wood_joint_color = Color(0.411765, 0.329412, 0.250980, 1)
+shader_parameter/wood_board_tone_strength = 0.14
+shader_parameter/wet_sand_color = Color(0.650980, 0.545098, 0.388235, 1)
+shader_parameter/tide_color = Color(0.521569, 0.423529, 0.290196, 1)
+shader_parameter/tide_transition_m = 0.65
+shader_parameter/tide_band_width_m = 0.23
+shader_parameter/tide_band_strength = 0.22

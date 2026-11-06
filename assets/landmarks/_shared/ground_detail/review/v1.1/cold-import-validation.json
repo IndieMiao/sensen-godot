@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "fresh_cache": true,
+  "runtime_files": 13,
+  "before_sha256": {
+    "README.md": "679ee091e1592ce7409346b6f5370f722af8268952cea7f091e2ea0ca54cdeac",
+    "ground_detail.gdshader": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907",
+    "ground_detail.gdshader.uid": "f542c49dda7bfc07205c9b5c070303f22a54f887f422c74500ed1594202c7363",
+    "ground_fields.png": "481fdbc304e14c46ad7f59e8a830fa1ca748d8bcbd4b248b2edfd63783575451",
+    "ground_fields.png.import": "a972e665ee58e3903e2c59be08b5635f2ea9104d0505fe288d18b2f9c9562adf",
+    "ground_grass.tres": "2b6906558086e08f85220787b14d0b6fdfa01448006ec12c4e0d50dfc2c2e64a",
+    "ground_palette_example.tres": "108dd6ff666196ee71796dc1d856d5f6b4997e906fc05ee03e7a25bf4b62d2f4",
+    "ground_paving.tres": "6244976a0a8f4fac99bc29dc4e58b5f2cf991c5766dc04d8e47369d31069d612",
+    "ground_sand.tres": "45ac803417763659bc5aeb5e1877f729e859fd630557c1400a2691fb2a16a752",
+    "ground_surfaces.png": "b933f4abe85e380c0e70fe7dab5474b6ba70c13d45a1520ce70ad787cd5bc20d",
+    "ground_surfaces.png.import": "7abf061f2e8521d81eea117b92dc314cd1cb9e47c7c18ae387fb8ba8e14198bc",
+    "ground_wet_sand.tres": "53b6fc218cd4ed187dc917f60bb7c9ce60442ab9ca358e264cf041aa9f83f24c",
+    "ground_wood.tres": "f3c0dc9e95aeb102ee5a2bc40f0b6939173fef26b95915bc44d6939c837b7c47"
+  },
+  "after_sha256": {
+    "README.md": "679ee091e1592ce7409346b6f5370f722af8268952cea7f091e2ea0ca54cdeac",
+    "ground_detail.gdshader": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907",
+    "ground_detail.gdshader.uid": "f542c49dda7bfc07205c9b5c070303f22a54f887f422c74500ed1594202c7363",
+    "ground_fields.png": "481fdbc304e14c46ad7f59e8a830fa1ca748d8bcbd4b248b2edfd63783575451",
+    "ground_fields.png.import": "a972e665ee58e3903e2c59be08b5635f2ea9104d0505fe288d18b2f9c9562adf",
+    "ground_grass.tres": "2b6906558086e08f85220787b14d0b6fdfa01448006ec12c4e0d50dfc2c2e64a",
+    "ground_palette_example.tres": "108dd6ff666196ee71796dc1d856d5f6b4997e906fc05ee03e7a25bf4b62d2f4",
+    "ground_paving.tres": "6244976a0a8f4fac99bc29dc4e58b5f2cf991c5766dc04d8e47369d31069d612",
+    "ground_sand.tres": "45ac803417763659bc5aeb5e1877f729e859fd630557c1400a2691fb2a16a752",
+    "ground_surfaces.png": "b933f4abe85e380c0e70fe7dab5474b6ba70c13d45a1520ce70ad787cd5bc20d",
+    "ground_surfaces.png.import": "7abf061f2e8521d81eea117b92dc314cd1cb9e47c7c18ae387fb8ba8e14198bc",
+    "ground_wet_sand.tres": "53b6fc218cd4ed187dc917f60bb7c9ce60442ab9ca358e264cf041aa9f83f24c",
+    "ground_wood.tres": "f3c0dc9e95aeb102ee5a2bc40f0b6939173fef26b95915bc44d6939c837b7c47"
+  },
+  "changed_runtime_files": [],
+  "baseline_textures_imports_shader_uid_byte_identical": true,
+  "revision_parameter_values_checked_in_installed_apk": true,
+  "sampler_bindings": 2,
+  "texture_reads": {
+    "grass": 3,
+    "paving": 1,
+    "wood": 1,
+    "sand": 2,
+    "wet_sand": 2
+  },
+  "passes": 1
+}

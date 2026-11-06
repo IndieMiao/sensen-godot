@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "scope": "static material rendering and two real view-button taps; no game integration or physical-phone performance result",
+  "states": [
+    {
+      "button": [
+        180.0,
+        764.0
+      ],
+      "kit": "428-v1",
+      "pid": 13413,
+      "renderer": "mobile",
+      "size": [
+        360,
+        800
+      ],
+      "view": 0
+    },
+    {
+      "button": [
+        180.0,
+        764.0
+      ],
+      "kit": "428-v1",
+      "pid": 13413,
+      "renderer": "mobile",
+      "size": [
+        360,
+        800
+      ],
+      "view": 1
+    },
+    {
+      "button": [
+        180.0,
+        764.0
+      ],
+      "kit": "428-v1",
+      "pid": 13413,
+      "renderer": "mobile",
+      "size": [
+        360,
+        800
+      ],
+      "view": 2
+    }
+  ],
+  "apk_sha256": "daff2e45e1a673f0982e8ed4d7fb713e212593e774cf6309bbb8d0a0ecdf6ed7",
+  "installed_apk_readback_equal": true,
+  "default_desktop_android_rgb_difference_255": {
+    "mean": 0.5227223481985387,
+    "max": 61,
+    "region": "full width, rows0..734, excludes Android-only QA button"
+  }
+}

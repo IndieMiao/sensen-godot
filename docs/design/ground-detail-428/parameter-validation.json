@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "unmatched_key_preserves_vertex_color_max_rgb_255": 0,
+  "unmatched_key_sample_pixels": 38182,
+  "forced_grass_independent_of_vertex_keys": true,
+  "both_packed_textures_byte_identical_to_827": true,
+  "source_texture_reads_per_fragment": {
+    "grass": 3,
+    "paving": 1,
+    "wood": 1,
+    "dry_sand": 2,
+    "wet_sand": 2,
+    "unmatched": 0
+  },
+  "sampler_bindings": 2,
+  "opaque_surface_passes": 1
+}
