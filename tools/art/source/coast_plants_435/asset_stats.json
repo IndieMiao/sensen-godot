@@ -1,7 +1,7 @@
 {
   "author": "赵云",
   "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
-  "revision": "v1",
+  "revision": "v1.1",
   "units": "metres, Y up; wind leans toward +X; root at Y=0",
   "palette_srgb": {
     "grass": "869955",
@@ -16,15 +16,15 @@
     "pink_light": "E0A0BD",
     "pink_dark": "AD5D8D",
     "pollen": "E5C476",
-    "sage": "82967A",
-    "sage_light": "A4B392",
-    "sage_dark": "647E64",
+    "sage": "75976C",
+    "sage_light": "94B18A",
+    "sage_dark": "587D50",
     "shrub": "7E914E",
     "shrub_light": "A1AC68",
     "shrub_dark": "607A43",
-    "cypress": "71894F",
-    "cypress_light": "91A367",
-    "cypress_dark": "536E43",
+    "cypress": "59755F",
+    "cypress_light": "78927A",
+    "cypress_dark": "425E4C",
     "palm": "859848",
     "palm_light": "A9B25F",
     "palm_dark": "637B3B",
@@ -106,23 +106,23 @@
     },
     "coast_iceplant_a": {
       "file": "coast_iceplant_a.glb",
-      "triangles": 336,
+      "triangles": 394,
       "surfaces": 1,
       "bounds": [
         [
-          -0.39815035462379456,
+          -0.5,
           0.0,
-          -0.36295920610427856
+          -0.3799910545349121
         ],
         [
-          0.39815035462379456,
-          0.12600000202655792,
-          0.36295920610427856
+          0.5,
+          0.1809999942779541,
+          0.3799910545349121
         ]
       ],
-      "height_m": 0.12600000202655792,
-      "sha256": "ecdb391a498390a565650ab8c14b791a2f305d486a67b5afc3a8d38f2ccaf319",
-      "bytes": 12680,
+      "height_m": 0.1809999942779541,
+      "sha256": "13c50056a3aaa11ca36459dc3b6e885fbf07a1176295ddb857b4e735502a9004",
+      "bytes": 17316,
       "pivot": "root centre, Y=0",
       "front": "+Z",
       "material_contract": {
@@ -133,27 +133,41 @@
       },
       "family": "iceplant",
       "lod": "single",
-      "multimesh": true
+      "multimesh": true,
+      "cushion_size_m": [
+        1.0,
+        0.75
+      ],
+      "flower_count": 7,
+      "short_leaf_count": 26,
+      "edge_height_range_m": [
+        0.03,
+        0.046
+      ],
+      "recommended_pitch_m": [
+        0.82,
+        0.62
+      ]
     },
     "coast_iceplant_b": {
       "file": "coast_iceplant_b.glb",
-      "triangles": 392,
+      "triangles": 394,
       "surfaces": 1,
       "bounds": [
         [
-          -0.5731503963470459,
+          -0.699999988079071,
           0.0,
-          -0.32712501287460327
+          -0.5138684511184692
         ],
         [
-          0.5731503963470459,
-          0.13599999248981476,
-          0.32712501287460327
+          0.699999988079071,
+          0.1809999942779541,
+          0.5138684511184692
         ]
       ],
-      "height_m": 0.13599999248981476,
-      "sha256": "470c6798cce55adc5f8eccbeba701cda8b733391672014c42bf425de93c6005c",
-      "bytes": 14672,
+      "height_m": 0.1809999942779541,
+      "sha256": "3448e4704c26f6399b8ec0e354ad05ef37026752d4a6bb784ef155cdea6a0db1",
+      "bytes": 18136,
       "pivot": "root centre, Y=0",
       "front": "+Z",
       "material_contract": {
@@ -164,7 +178,21 @@
       },
       "family": "iceplant",
       "lod": "single",
-      "multimesh": true
+      "multimesh": true,
+      "cushion_size_m": [
+        1.4,
+        1.0
+      ],
+      "flower_count": 9,
+      "short_leaf_count": 21,
+      "edge_height_range_m": [
+        0.03,
+        0.046
+      ],
+      "recommended_pitch_m": [
+        1.18,
+        0.84
+      ]
     },
     "coast_shrub_a": {
       "file": "coast_shrub_a.glb",
@@ -183,7 +211,7 @@
         ]
       ],
       "height_m": 0.7500977516174316,
-      "sha256": "557192014867eb6f95af718304c39d54e7ca49453c231a0673086d79dfebba47",
+      "sha256": "e0c80a7676b2e0b03d9af5df3181b5b3e2230679a7ee87881b31b1b4fa2581d7",
       "bytes": 5680,
       "pivot": "root centre, Y=0",
       "front": "+Z",
@@ -230,23 +258,23 @@
     },
     "coast_cypress": {
       "file": "coast_cypress.glb",
-      "triangles": 372,
+      "triangles": 692,
       "surfaces": 1,
       "bounds": [
         [
-          -1.75,
+          -0.550000011920929,
           0.0,
-          -1.274999976158142
+          -0.7459999918937683
         ],
         [
-          3.450000047683716,
+          3.7699999809265137,
           5.800000190734863,
-          1.475000023841858
+          0.6840000152587891
         ]
       ],
       "height_m": 5.800000190734863,
-      "sha256": "7c06b4a2d2af912cc192e4ac4e9f62a52c6c2f9248175fab8b011065751c74ec",
-      "bytes": 10636,
+      "sha256": "60a82ff159cb2f9c383297ee647417fb28b509c22081f4dd739cf02a3881e938",
+      "bytes": 18692,
       "pivot": "root centre, Y=0",
       "front": "+Z",
       "material_contract": {
@@ -257,7 +285,16 @@
       },
       "family": "tree",
       "lod": "near",
-      "multimesh": true
+      "multimesh": true,
+      "cloud_layers": 4,
+      "layer_lengths_m": [
+        4.32,
+        3.564,
+        2.808,
+        1.944
+      ],
+      "windward_axis": "+X",
+      "trunk_crown_offset_x_m": 2.05
     },
     "coast_cypress_far": {
       "file": "coast_cypress_far.glb",
@@ -265,19 +302,19 @@
       "surfaces": 1,
       "bounds": [
         [
-          -1.75,
+          -0.550000011920929,
           0.0,
-          -1.274999976158142
+          -0.7459999918937683
         ],
         [
-          3.450000047683716,
+          3.7699999809265137,
           5.800000190734863,
-          1.475000023841858
+          0.6840000152587891
         ]
       ],
       "height_m": 5.800000190734863,
-      "sha256": "f01849ac8eb862e51ca7018eef910a23253de15f05a6955242bef155e596f135",
-      "bytes": 4540,
+      "sha256": "c3fab154cce2e20ff1f26d62779cd07ed240cc4b93f7ec6722fd196a9bc34d6d",
+      "bytes": 4916,
       "pivot": "root centre, Y=0",
       "front": "+Z",
       "material_contract": {
@@ -288,27 +325,36 @@
       },
       "family": "tree",
       "lod": "far",
-      "multimesh": true
+      "multimesh": true,
+      "cloud_layers": 4,
+      "layer_lengths_m": [
+        4.32,
+        3.564,
+        2.808,
+        1.944
+      ],
+      "windward_axis": "+X",
+      "trunk_crown_offset_x_m": 2.05
     },
     "coast_palm": {
       "file": "coast_palm.glb",
-      "triangles": 316,
+      "triangles": 752,
       "surfaces": 1,
       "bounds": [
         [
-          -1.2694039344787598,
+          -1.7897435426712036,
           0.0,
-          -2.0999796390533447
+          -2.29335880279541
         ],
         [
-          2.570178270339966,
-          6.160000324249268,
-          2.0196681022644043
+          2.943358898162842,
+          5.650017738342285,
+          2.5861282348632812
         ]
       ],
-      "height_m": 6.160000324249268,
-      "sha256": "dda11d2dc556278e8034551d8196cc43a83c058966a3de6b5e5b076a9dfd18af",
-      "bytes": 31696,
+      "height_m": 5.650017738342285,
+      "sha256": "c3e5f061884c35cebc9160e8ecc314498824ad125f42f24056c4f6daa603b53b",
+      "bytes": 32584,
       "pivot": "root centre, Y=0",
       "front": "+Z",
       "material_contract": {
@@ -319,7 +365,23 @@
       },
       "family": "tree",
       "lod": "near",
-      "multimesh": true
+      "multimesh": true,
+      "frond_count": 8,
+      "trunk_base_diameter_m": 0.22,
+      "ring_heights_m": [
+        0.7,
+        1.45,
+        2.2,
+        2.95,
+        3.7,
+        4.45
+      ],
+      "frond_tip_drop_m": [
+        0.95,
+        1.15,
+        1.35,
+        1.55
+      ]
     },
     "coast_palm_far": {
       "file": "coast_palm_far.glb",
@@ -327,19 +389,19 @@
       "surfaces": 1,
       "bounds": [
         [
-          -1.2694039344787598,
+          -1.7897435426712036,
           0.0,
-          -2.0999796390533447
+          -2.29335880279541
         ],
         [
-          2.570178270339966,
-          6.160000324249268,
-          2.0196681022644043
+          2.943358898162842,
+          5.650017738342285,
+          2.5861282348632812
         ]
       ],
-      "height_m": 6.160000324249268,
-      "sha256": "5d2d6b76b0432e70e1eeaa7f30fc219e2fa8617ee5904c978412809470f480ae",
-      "bytes": 11876,
+      "height_m": 5.650017738342285,
+      "sha256": "f87138ebd86224739d3f554ee99a29bc19bc8c8548ca50d5d71c435ccac0816a",
+      "bytes": 9892,
       "pivot": "root centre, Y=0",
       "front": "+Z",
       "material_contract": {
@@ -350,7 +412,16 @@
       },
       "family": "tree",
       "lod": "far",
-      "multimesh": true
+      "multimesh": true,
+      "frond_count": 8,
+      "trunk_base_diameter_m": 0.22,
+      "ring_heights_m": [],
+      "frond_tip_drop_m": [
+        0.95,
+        1.15,
+        1.35,
+        1.55
+      ]
     }
   },
   "lod_groups": [
@@ -361,14 +432,14 @@
       "margin_m": 0,
       "common_aabb": [
         [
-          -1.75,
+          -0.550000011920929,
           0.0,
-          -1.274999976158142
+          -0.7459999918937683
         ],
         [
-          3.450000047683716,
+          3.7699999809265137,
           5.800000190734863,
-          1.475000023841858
+          0.6840000152587891
         ]
       ],
       "pivot": "trunk base; do not recenter by canopy bounds",
@@ -381,14 +452,14 @@
       "margin_m": 0,
       "common_aabb": [
         [
-          -1.2694039344787598,
+          -1.7897435426712036,
           0.0,
-          -2.0999796390533447
+          -2.29335880279541
         ],
         [
-          2.570178270339966,
-          6.160000324249268,
-          2.0196681022644043
+          2.943358898162842,
+          5.650017738342285,
+          2.5861282348632812
         ]
       ],
       "pivot": "trunk base; do not recenter by canopy bounds",

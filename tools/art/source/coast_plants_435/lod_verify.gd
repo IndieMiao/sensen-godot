@@ -18,7 +18,7 @@ func mesh(name: String) -> Mesh:
 func photograph(name: String,near: MeshInstance3D,far: MeshInstance3D,center: Vector3,distance: float,expected: int) -> void:
 	camera.position=center+camera.basis.z*distance
 	await frames(10);RenderingServer.force_draw(true)
-	var image:=vp.get_texture().get_image();check(image.save_png("res://../"+name+".png")==OK,"capture "+name)
+	var image:=vp.get_texture().get_image();check(image.save_png("res://../v1.1/"+name+".png")==OK,"capture "+name)
 	var primitives:=vp.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_PRIMITIVES_IN_FRAME)
 	check(primitives==expected,name+": engine renders only the expected LOD triangles")
 	check(absf(camera.position.distance_to(center)-distance)<.0001,name+": actual camera-to-common-AABB distance")
@@ -60,5 +60,5 @@ func run() -> void:
 		near.queue_free();far.queue_free();await frames(2);vp.size=Vector2i(360,800)
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()};check(report.renderer.method=="mobile","Godot Mobile renderer")
 	report.passed=report.checks.all(func(c):return c.passed)
-	FileAccess.open("res://../lod-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n");print("COAST_PLANTS_LOD ",report.passed," ",report.checks.size()," checks")
+	FileAccess.open("res://../v1.1/lod-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n");print("COAST_PLANTS_LOD ",report.passed," ",report.checks.size()," checks")
 	get_tree().quit(0 if report.passed else 1)

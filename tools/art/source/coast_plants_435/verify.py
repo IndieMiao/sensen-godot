@@ -35,11 +35,93 @@ for name,e in data['assets'].items():
   for v,w in [(a,b),(b,c),(c,a)]:
    key=tuple(sorted([keys[v],keys[w]]));edges[key]=edges.get(key,0)+1
  check(all(n%2==0 for n in edges.values()),name+': no open edges, leaves and canopy have undersides')
+ if name in ['coast_grass_a','coast_grass_b','coast_shrub_b']:
+  previous=subprocess.check_output(['git','show','a590b559:assets/landmarks/_shared/coast_plants/'+name+'.glb'],cwd=ROOT)
+  check(path.read_bytes()==previous,name+': approved v1 GLB byte-identical')
+ if name=='coast_shrub_a':
+  old_path=QA/'v1.1/shrub_a_v1.glb';old_path.write_bytes(subprocess.check_output(['git','show','a590b559:assets/landmarks/_shared/coast_plants/coast_shrub_a.glb'],cwd=ROOT))
+  old,old_blob=load_glb(old_path);old_p=old['meshes'][0]['primitives'][0]
+  for attr,current in [('POSITION',xyz),('NORMAL',normal),('indices',ids.reshape(-1,1))]:
+   previous=np.array(accessor(old,old_blob,old_p['indices'] if attr=='indices' else old_p['attributes'][attr]))
+   check(np.array_equal(previous,current),name+': accepted '+attr+' preserved')
+  old_colors=np.array(accessor(old,old_blob,old_p['attributes']['COLOR_0']))
+  check(float(np.mean(colors[:,1]-colors[:,0]))>float(np.mean(old_colors[:,1]-old_colors[:,0])),name+': vertex paint moves toward green while retaining muted palette')
+ if name.startswith('coast_cypress'):
+  # Recover disconnected cloud components from actual exported triangles.
+  table={};parent=[];vertex_ids=[]
+  for key in keys:
+   if key not in table:table[key]=len(parent);parent.append(len(parent))
+   vertex_ids.append(table[key])
+  def root_of(x):
+   while parent[x]!=x:parent[x]=parent[parent[x]];x=parent[x]
+   return x
+  for tri in ids:
+   a,b,c=[vertex_ids[v] for v in tri];parent[root_of(b)]=root_of(a);parent[root_of(c)]=root_of(a)
+  groups={}
+  for tri in ids:groups.setdefault(root_of(vertex_ids[tri[0]]),[]).append(tri)
+  clouds=[];trunk=None
+  for group in groups.values():
+   points=xyz[np.unique(np.array(group))];bounds=np.array([points.min(0),points.max(0)])
+   if len(group)==(12 if e['lod']=='far' else 72):clouds.append(bounds)
+   if abs(bounds[0,1])<1e-6:trunk=points
+  clouds.sort(key=lambda box:float(box[:,1].mean()))
+  check(len(clouds)==8,name+': four paired cloud layers in exported mesh')
+  spans=[]
+  if len(clouds)==8:
+   for j in range(0,8,2):spans.append(float(max(clouds[j][1,0],clouds[j+1][1,0])-min(clouds[j][0,0],clouds[j+1][0,0])))
+  check(len(spans)==4 and all(a>b for a,b in zip(spans,spans[1:])),name+': cloud layers shorten upward')
+  check(trunk is not None and float(trunk[np.isclose(trunk[:,1],trunk[:,1].max()),0].mean())>1.9,name+': stronger +X trunk bend')
+  report.setdefault('cypress_layers',{})[name]={'measured_layer_spans_m':spans,'cloud_components':len(clouds)}
+ if e['family']=='iceplant':
+  # Count separately welded components: a solid cushion, fleshy leaves, blooms.
+  lookup={};parent=[];vertex_ids=[]
+  for key in keys:
+   if key not in lookup:lookup[key]=len(parent);parent.append(len(parent))
+   vertex_ids.append(lookup[key])
+  def find(x):
+   while parent[x]!=x:parent[x]=parent[parent[x]];x=parent[x]
+   return x
+  for tri in ids:
+   a,b,c=[vertex_ids[v] for v in tri];parent[find(b)]=find(a);parent[find(c)]=find(a)
+  counts={}
+  for tri in ids:
+   root=find(vertex_ids[tri[0]]);counts[root]=counts.get(root,0)+1
+  check(list(counts.values()).count(8)==e['short_leaf_count'],name+': actual short solid leaf count')
+  check(list(counts.values()).count(20)==e['flower_count'],name+': actual pink blossom count')
+  check(list(counts.values()).count(46)==1,name+': one continuous closed cushion')
+  # Sample a central rectangle through all up-facing triangles: no bare gaps.
+  triangles=xyz[ids[face[:,1]>1e-9]];a=triangles[:,0][:,[0,2]];u=triangles[:,1][:,[0,2]]-a;v=triangles[:,2][:,[0,2]]-a
+  det=u[:,0]*v[:,1]-u[:,1]*v[:,0];good=np.abs(det)>1e-10;a=a[good];u=u[good];v=v[good];det=det[good]
+  w,d=e['cushion_size_m'];hits=0
+  for x in np.linspace(-w*.36,w*.36,17):
+   for z in np.linspace(-d*.36,d*.36,13):
+    q=np.array([x,z])-a;first=(q[:,0]*v[:,1]-q[:,1]*v[:,0])/det;second=(u[:,0]*q[:,1]-u[:,1]*q[:,0])/det
+    hits+=bool(np.any((first>=-1e-6)&(second>=-1e-6)&(first+second<=1+1e-6)))
+  check(hits==221,name+': central cushion coverage is continuous at all 221 samples')
+  report.setdefault('cushions',{})[name]={'leaves':e['short_leaf_count'],'blooms':e['flower_count'],'covered_samples':hits,'samples':221}
+ if name.startswith('coast_palm'):
+  bottom=xyz[np.isclose(xyz[:,1],0,atol=1e-6)]
+  check(np.isclose(bottom[:,0].max()-bottom[:,0].min(),.22,atol=1e-6),name+': slimmer .22m trunk base')
+  dx=xyz[:,0]-.65;dz=xyz[:,2];radius=np.hypot(dx,dz);angle=np.arctan2(dz,dx)
+  sectors=np.rint((angle-.22)/(np.pi/4)).astype(int)%8;leaf_data=[]
+  for sector in range(8):
+   points=xyz[(sectors==sector)&(radius>1.5)]
+   ok=len(points)>0 and points[:,1].min()<4.3
+   check(ok,name+': radial leaf '+str(sector)+' has a descending tip')
+   leaf_data.append({'sector':sector,'tip_y':float(points[:,1].min()) if len(points) else None})
+  check(xyz[:,1].max()>5.5 and e['frond_count']==8,name+': arched canopy above 5.15m crown root')
+  if e['lod']=='near':
+   rgb=np.array([int('795F47'[i:i+2],16)/255 for i in [0,2,4]]);linear=np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4)
+   band_points=xyz[np.linalg.norm(colors[:,:3]-linear,axis=1)<1e-6]
+   check(all(np.any(np.isclose(band_points[:,1],h,atol=1e-6)) and np.any(np.isclose(band_points[:,1],h+.045,atol=1e-6)) for h in e['ring_heights_m']),name+': six narrow vertex-painted trunk rings')
+  report.setdefault('palm_fronds',{})[name]=leaf_data
  sha=hashlib.sha256(path.read_bytes()).hexdigest();check(sha==e['sha256'],name+': exported SHA matches manifest')
  uid=None
  if not args.geometry_only:
   s=(KIT/(name+'.glb.import')).read_text();m=re.search(r'^uid="(uid://[^"]+)"$',s,re.M);uid=m.group(1) if m else None;uids.append(uid)
   check(uid is not None and all(x in s.splitlines() for x in ['nodes/root_script=null','gltf/texture_map_mode=1','meshes/light_baking=1','meshes/generate_lods=false']),name+': generated UID and stable import settings')
+  previous=subprocess.check_output(['git','show','a590b559:assets/landmarks/_shared/coast_plants/'+name+'.glb.import'],cwd=ROOT)
+  check((KIT/(name+'.glb.import')).read_bytes()==previous,name+': accepted import UID and settings retained')
  report['assets'][name]={'triangles':len(ids),'budget':budget,'surface_count':1,'sha256':sha,'bounds':[lo.tolist(),hi.tolist()],'uid':uid,'reversed_faces':int((dots<=0).sum()),'open_edges':sum(n%2!=0 for n in edges.values())}
 for group in data['lod_groups']:
  near=report['assets'][group['near']];far=report['assets'][group['far']]

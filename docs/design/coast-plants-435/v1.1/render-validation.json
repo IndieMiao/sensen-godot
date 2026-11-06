@@ -1,0 +1,565 @@
+{
+	"assets": {
+		"coast_cypress": {
+			"sha256": "60a82ff159cb2f9c383297ee647417fb28b509c22081f4dd739cf02a3881e938",
+			"triangles": 692,
+			"uid": "uid://by8cywhbfsejq"
+		},
+		"coast_cypress_far": {
+			"sha256": "c3fab154cce2e20ff1f26d62779cd07ed240cc4b93f7ec6722fd196a9bc34d6d",
+			"triangles": 118,
+			"uid": "uid://cuw3ul3qflpls"
+		},
+		"coast_grass_a": {
+			"sha256": "44c0ed36a9606b7500610e389e442a33704451e27689151e450ae7000897a1bd",
+			"triangles": 216,
+			"uid": "uid://fjid8twv1cry"
+		},
+		"coast_grass_b": {
+			"sha256": "60a5e3abca44303936c5b9bec417ba8f0873b395ae93faeeeb9be9f67b96d0e3",
+			"triangles": 200,
+			"uid": "uid://ba87lor4g6si0"
+		},
+		"coast_iceplant_a": {
+			"sha256": "13c50056a3aaa11ca36459dc3b6e885fbf07a1176295ddb857b4e735502a9004",
+			"triangles": 394,
+			"uid": "uid://sbg5jf4nse1n"
+		},
+		"coast_iceplant_b": {
+			"sha256": "3448e4704c26f6399b8ec0e354ad05ef37026752d4a6bb784ef155cdea6a0db1",
+			"triangles": 394,
+			"uid": "uid://dshupovshkgta"
+		},
+		"coast_palm": {
+			"sha256": "c3e5f061884c35cebc9160e8ecc314498824ad125f42f24056c4f6daa603b53b",
+			"triangles": 752,
+			"uid": "uid://b8h1fqdb2g6oe"
+		},
+		"coast_palm_far": {
+			"sha256": "f87138ebd86224739d3f554ee99a29bc19bc8c8548ca50d5d71c435ccac0816a",
+			"triangles": 120,
+			"uid": "uid://bgvusnhe0u57"
+		},
+		"coast_shrub_a": {
+			"sha256": "e0c80a7676b2e0b03d9af5df3181b5b3e2230679a7ee87881b31b1b4fa2581d7",
+			"triangles": 156,
+			"uid": "uid://b7f0ojolek0mn"
+		},
+		"coast_shrub_b": {
+			"sha256": "705366e362e92776e28354640522bd6070b8392991f795516c77d5307cd29de1",
+			"triangles": 176,
+			"uid": "uid://7xa6kbdjon7t"
+		}
+	},
+	"captures": [
+		{
+			"camera_width_m": 3.09999990463257,
+			"draws": 5,
+			"name": "part_coast_grass_a",
+			"pitch": -42.9999961853027,
+			"size": [
+				450,
+				330
+			],
+			"triangles": 8578,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 3.09999990463257,
+			"draws": 5,
+			"name": "part_coast_grass_b",
+			"pitch": -42.9999961853027,
+			"size": [
+				450,
+				330
+			],
+			"triangles": 8562,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 3.09999990463257,
+			"draws": 5,
+			"name": "part_coast_iceplant_a",
+			"pitch": -42.9999961853027,
+			"size": [
+				450,
+				330
+			],
+			"triangles": 8756,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 3.09999990463257,
+			"draws": 5,
+			"name": "part_coast_iceplant_b",
+			"pitch": -42.9999961853027,
+			"size": [
+				450,
+				330
+			],
+			"triangles": 8756,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 3.09999990463257,
+			"draws": 5,
+			"name": "part_coast_shrub_a",
+			"pitch": -42.9999961853027,
+			"size": [
+				450,
+				330
+			],
+			"triangles": 8518,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 3.09999990463257,
+			"draws": 5,
+			"name": "part_coast_shrub_b",
+			"pitch": -42.9999961853027,
+			"size": [
+				450,
+				330
+			],
+			"triangles": 8538,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 8.5,
+			"draws": 5,
+			"name": "part_coast_cypress",
+			"pitch": -42.9999961853027,
+			"size": [
+				700,
+				550
+			],
+			"triangles": 9054,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 8.5,
+			"draws": 5,
+			"name": "part_coast_cypress_far",
+			"pitch": -42.9999961853027,
+			"size": [
+				700,
+				550
+			],
+			"triangles": 8480,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 8.5,
+			"draws": 5,
+			"name": "part_coast_palm",
+			"pitch": -42.9999961853027,
+			"size": [
+				700,
+				550
+			],
+			"triangles": 9114,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 8.5,
+			"draws": 5,
+			"name": "part_coast_palm_far",
+			"pitch": -42.9999961853027,
+			"size": [
+				700,
+				550
+			],
+			"triangles": 8482,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 2.79999995231628,
+			"draws": 2,
+			"name": "iceplant_detail",
+			"pitch": -42.9999961853027,
+			"size": [
+				700,
+				250
+			],
+			"triangles": 396,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 5.19999980926514,
+			"draws": 7,
+			"name": "iceplant_join",
+			"pitch": -42.9999961853027,
+			"size": [
+				700,
+				250
+			],
+			"triangles": 2366,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"draws": 23,
+			"name": "default_360x800",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 15234,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"draws": 23,
+			"name": "default_warm_360x800",
+			"pitch": -42.9999961853027,
+			"size": [
+				360,
+				800
+			],
+			"triangles": 15234,
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_width_m": 17.5,
+			"draws": 25,
+			"name": "coast_overview_warm",
+			"pitch": -42.9999961853027,
+			"size": [
+				1400,
+				850
+			],
+			"triangles": 16112,
+			"yaw": 14.4999990463257
+		}
+	],
+	"checks": [
+		{
+			"check": "original game avatar ready at 1.75m",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_grass_a.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_grass_a: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_grass_a: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_grass_a: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_grass_a",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_grass_b.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_grass_b: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_grass_b: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_grass_b: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_grass_b",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_iceplant_a.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_iceplant_a: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_iceplant_a: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_iceplant_a: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_iceplant_a",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_iceplant_b.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_iceplant_b: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_iceplant_b: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_iceplant_b: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_iceplant_b",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_shrub_a.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_shrub_a: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_shrub_a: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_shrub_a: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_shrub_a",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_shrub_b.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_shrub_b: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_shrub_b: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_shrub_b: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_shrub_b",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_cypress.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_cypress: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_cypress: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_cypress: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_cypress",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_cypress_far.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_cypress_far: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_cypress_far: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_cypress_far: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_cypress_far",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_palm.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_palm: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_palm: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_palm: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_palm",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_plants/coast_palm_far.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "coast_palm_far: imported mesh budget",
+			"passed": true
+		},
+		{
+			"check": "coast_palm_far: opaque vertex material retained",
+			"passed": true
+		},
+		{
+			"check": "coast_palm_far: UID/root_script",
+			"passed": true
+		},
+		{
+			"check": "capture part_coast_palm_far",
+			"passed": true
+		},
+		{
+			"check": "capture iceplant_detail",
+			"passed": true
+		},
+		{
+			"check": "capture iceplant_join",
+			"passed": true
+		},
+		{
+			"check": "432 original bay preset assigned",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_kit/coast_rock_straight_high.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/water_edge/water_edge_straight.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "430 original foam shader retained 0",
+			"passed": true
+		},
+		{
+			"check": "res://assets/landmarks/_shared/coast_kit/coast_rock_straight_low.glb: one imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "430 original foam shader retained 1",
+			"passed": true
+		},
+		{
+			"check": "430 original foam shader retained 2",
+			"passed": true
+		},
+		{
+			"check": "430 original foam shader retained 3",
+			"passed": true
+		},
+		{
+			"check": "430 original foam shader retained 4",
+			"passed": true
+		},
+		{
+			"check": "430 original foam shader retained 5",
+			"passed": true
+		},
+		{
+			"check": "example spans six 2m modules / 12m",
+			"passed": true
+		},
+		{
+			"check": "coast_grass_a: MultiMesh retains one vertex-colour surface",
+			"passed": true
+		},
+		{
+			"check": "coast_grass_b: MultiMesh retains one vertex-colour surface",
+			"passed": true
+		},
+		{
+			"check": "coast_iceplant_a: MultiMesh retains one vertex-colour surface",
+			"passed": true
+		},
+		{
+			"check": "coast_iceplant_b: MultiMesh retains one vertex-colour surface",
+			"passed": true
+		},
+		{
+			"check": "coast_shrub_a: MultiMesh retains one vertex-colour surface",
+			"passed": true
+		},
+		{
+			"check": "coast_shrub_b: MultiMesh retains one vertex-colour surface",
+			"passed": true
+		},
+		{
+			"check": "capture default_360x800",
+			"passed": true
+		},
+		{
+			"check": "capture default_warm_360x800",
+			"passed": true
+		},
+		{
+			"check": "capture coast_overview_warm",
+			"passed": true
+		},
+		{
+			"check": "target Mobile renderer",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"gpu": "NVIDIA GeForce RTX 2060",
+		"method": "mobile"
+	},
+	"scatter_batches": {
+		"coast_grass_a": {
+			"instances": 5,
+			"surfaces": 1
+		},
+		"coast_grass_b": {
+			"instances": 5,
+			"surfaces": 1
+		},
+		"coast_iceplant_a": {
+			"instances": 3,
+			"surfaces": 1
+		},
+		"coast_iceplant_b": {
+			"instances": 3,
+			"surfaces": 1
+		},
+		"coast_shrub_a": {
+			"instances": 3,
+			"surfaces": 1
+		},
+		"coast_shrub_b": {
+			"instances": 3,
+			"surfaces": 1
+		}
+	}
+}

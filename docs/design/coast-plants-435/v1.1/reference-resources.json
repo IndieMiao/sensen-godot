@@ -1,0 +1,305 @@
+{
+  "references": [
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_dock_straight.glb",
+      "sha256": "185461cd83b3af081b09c6f018f9a98f1c79addbb25f1a5a9b871459f883db3b",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_inner_high.glb",
+      "sha256": "46ff09bac9504d012a67b0b6a5501e78dd178174b2648bae59747cbfb370c0be",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_outer_high.glb.import",
+      "sha256": "12ce71b080ede5852c09f511eebbde235a4c8a6cac589a37bcfb23a698891927",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_dock_end.glb.import",
+      "sha256": "5b611befd121a6fd549ab3939184048d75d481bcd24af324c755093654f3573d",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_inner_low.glb.import",
+      "sha256": "d74168b4ab76aad27be3a0f4d4152f401e286a8d7905e6af957ae4eda99964d1",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_dock_straight.glb.import",
+      "sha256": "93aed0182fe87156bbc23935cc52bea6a1b92995f0990c8ce19fe146c063b9d0",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_seawall.glb",
+      "sha256": "3c0795c96af36f4006562221ab3bece9fd71f2105f9e656cb7a724395a11d60d",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_cool_gray.tres",
+      "sha256": "7d95dedf4de8b1cf16166b5c8f41332c7ea960769fb8b44b76e0ea48d970cbd6",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_scatter_a.glb.import",
+      "sha256": "e191874eff863ffcaed1789e2e7e151a020f2c37c228ebd8dc9e597f5505fa89",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_outer_high.glb",
+      "sha256": "28e24e3645858773be89d25a856f7e0ae142d450cc15ae7876bd72823f50c303",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_outer_low.glb.import",
+      "sha256": "8874300520efc0c7bad54e34f2e0f35e05fa46501197e49201f33f7e27bd1d8d",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_dock_bollard.glb.import",
+      "sha256": "e4599c6606ad38e1ce29af548b047ee33b496ea265f0ef60f70a2e1407e6b677",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_surface.gdshader.uid",
+      "sha256": "d377b9cc44c1a1b23b05c9fcd815a41b448e0d5328c138caf0966fe7edfe8fbf",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_dock_end.glb",
+      "sha256": "3108f00882248efb6d8fc1205f80d8a49c115ac1fc647b6724247111aa1dbf2d",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_buoy.glb.import",
+      "sha256": "f95a3857cc269487db873394aac79bcd9588e72bf542c08dce19028fbd197b86",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_inner_high.glb.import",
+      "sha256": "9852c9fd78ce4f203c1a721869c357f1afa4911578d083ae820d1d97b5d737a6",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_straight_high.glb",
+      "sha256": "522cd7560dd3c6f036c03841434de535a147fc77e4ccb40793f7270e5d551551",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_seawall.glb.import",
+      "sha256": "870651fbb7609ee8db711d1d11ec22a81b6981cad31decf66d82dc402bf2a1e5",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_buoy.glb",
+      "sha256": "ad728673a128c845d7c364b83d6a8ca8fc2676d1f5cddba0b48a51c1b0ca2def",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_scatter_c.glb",
+      "sha256": "78fc63f63f768c8b17a04157270a603df2c679aa1c10b74425fc9caeb6545f2e",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_kit_import.gd.uid",
+      "sha256": "46a6f83d731d4603227798202f77c1eeaeb23a69929e11cf381d7f4b2c27d8a1",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_scatter_b.glb",
+      "sha256": "47f7dd657a43d6118bdb85b9d5ff68102ba07b45a8f022067ab822006c6daf71",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_outer_low.glb",
+      "sha256": "36db8c8def91094093e7af2946ec1da37c23b9d7f710ab006d5a9334fb773296",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_straight_low.glb",
+      "sha256": "468ca175db81da1f6d8ee145db723d19a9c40c5a65e55024a45f2a8b3b3a0cc1",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_water_steps.glb.import",
+      "sha256": "459272f0e26fb96c66b79a0532ac2c90cd6b44afda114378a940bc29ed4fb5ad",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_kit_import.gd",
+      "sha256": "7308dca1e6ec9189df6a206fced6a1d32a35a496a776048a578fe207f851b5fb",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_straight_high.glb.import",
+      "sha256": "8a7495b08f8968d9fe2928eb9c0c077d6b38a8ddf0c7e6f2e52c3cdfb3e1de05",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_scatter_c.glb.import",
+      "sha256": "4b860a22c808b9b4e5b6087c8d56b4d9d336759b7f58bf5319c3f3566fd70f95",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_scatter_b.glb.import",
+      "sha256": "bd5d7ac4da515972b93d2d546c3b7ee957aad3800ce122b7efd88ebfd0489608",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_straight_low.glb.import",
+      "sha256": "b379ed99081abd7857e7b441e8d9b78d255cd9803a3b8f9afff047adb42955a3",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_water_steps.glb",
+      "sha256": "36e6bbeb5e71d22ca5395657e78d9173e79049378ca5109189bd8c42a3fe41fb",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_surface.gdshader",
+      "sha256": "1abd0e2538b69250ed45977e209f21306b90d97958b6e8db04a70f68c28a6bee",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_warm_sand.tres",
+      "sha256": "daef501123e51365b1049ccbadaf6cbbe3e0a10b1a24bcbb7eacc6d75da63f88",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/manifest.json",
+      "sha256": "97017dedbcb039810e1fe62a2cf1d0e833d6c2f8596c93ef6e43571a30cf17df",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_rock_inner_low.glb",
+      "sha256": "9e25f2433416b03c7d54d2bb73c81417a4b738fba56867e572b894258108ea58",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/README.md",
+      "sha256": "c9cb0a3e3111a36b1d2fbfeb9ec639aedeea495bbda67cc7014b0c5eafae3a41",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_scatter_a.glb",
+      "sha256": "4628af6437bad3215496ab819910e74776adebacc0c023b4298104435e90d40d",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/coast_kit/coast_dock_bollard.glb",
+      "sha256": "e230032aa26f0ae634bb94a9bbeaaeac7431ac1b0ab0838e29bf462501c9907f",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge.gdshader",
+      "sha256": "9c1bdb193771f8e54e6daa966048234c14c9b048c01959b899b10e45fc11f22a",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_inner.glb",
+      "sha256": "95b36affc16298fc1a2df3aff301948007f04a5b9643f6bd80155444dc609094",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge.gdshader.uid",
+      "sha256": "3563b90dc6169a0361b9ad4da30057a34a3e7ad0ed5cf49cf121da1456c43cab",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_straight.glb",
+      "sha256": "4bb569a2eafdb9d3a43f003a42c0c5cd45882b4d07a5fad551398b51428e8363",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_steps.glb",
+      "sha256": "848f895befc8375cc944d67bad897273ee24bca813e558a6e70322756e50586c",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_outer.glb",
+      "sha256": "ed9b8192c293b6a36e833be139f2a6b666a669817432b0ba0a6d12b1cf432d64",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_inner.glb.import",
+      "sha256": "7d283a7c6c316a9ea38c734b3d849d0b969e6072a12227978b355b126d3183b0",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_pile_ring.glb.import",
+      "sha256": "ffc7c07ea10a661f0bfbe81ffe91f1d4e264d48ca68cb1b2a590a46147feba1a",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_pile_ring.glb",
+      "sha256": "a7829ed1de33a694bde98c4ae219641f2acd0e9eb394a5d86f5ba46495be2722",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_steps.glb.import",
+      "sha256": "d9ec47864d08ca05615b347860569a894bea007a052a6ef76204aa15425db128",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_material.tres",
+      "sha256": "ece23e9f5bf2728a3008509edc86a919f77f77697c0f7887029ba02f4eb31ab4",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_soft.png",
+      "sha256": "12dc9ad8724c1945c06997d1f4cbc88cb349b3dc8b80e62bb7fd0bca7b7dfc93",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_straight.glb.import",
+      "sha256": "0bd37ac3291fbf23fedc88cbf6d5e431f6abfb405fc79979d3abed9e2107fc1e",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/manifest.json",
+      "sha256": "dce0bc06a28888ef80b02dcd7f71379d76637c369ddf11bca06c7ce42e0ad606",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_outer.glb.import",
+      "sha256": "ffb1c936ffb720bd6ac05375d631dcc0d04dee07eb46e80b5307915658339045",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/README.md",
+      "sha256": "6525e03c73646b431f00daccc966f898cfa8bb01d7ee278b04eb6c029c27d0c5",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/water_edge/water_edge_soft.png.import",
+      "sha256": "c6c2c7a4b75ec5c0da1559564b965f347a509596b1d5ec349f07adcb5c192b47",
+      "source_commit": "7214c718"
+    },
+    {
+      "path": "assets/landmarks/_shared/sea_backdrop/README.md",
+      "sha256": "9b8035f13e49a51477289259c44a16ec4d2aaf1ce8356496c6f6b017e72b1113",
+      "source_commit": "15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c"
+    },
+    {
+      "path": "assets/landmarks/_shared/sea_backdrop/bay.tres",
+      "sha256": "d2af4d604d1beb381e3595d6bf312afb4fba8d8afd4eff29d8af2f92dc106a9e",
+      "source_commit": "15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c"
+    },
+    {
+      "path": "assets/landmarks/_shared/sea_backdrop/lake.tres",
+      "sha256": "8f43eb9eea0089b81dba80939746d711e164bf38a2e59a36f872c5b9e948dbd0",
+      "source_commit": "15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c"
+    },
+    {
+      "path": "assets/landmarks/_shared/sea_backdrop/sea_backdrop.gdshader",
+      "sha256": "a3c67ad6e282e4c668dc0b3faa94a30b1385c9f4c0a721612410d0add8c60915",
+      "source_commit": "15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c"
+    },
+    {
+      "path": "assets/landmarks/_shared/sea_backdrop/sea_backdrop.gdshader.uid",
+      "sha256": "fcf5c01c6244645bef779d720c03b2c52f99113784d20b722aa0d1d7b761c313",
+      "source_commit": "15b0012ee4cb64eaaa07c6637a3d2ea76cafde4c"
+    }
+  ],
+  "borrowed_for_review_only": true
+}

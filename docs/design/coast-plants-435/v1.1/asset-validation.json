@@ -1,0 +1,1191 @@
+{
+  "checks": [
+    {
+      "passed": true,
+      "check": "coast_grass_a: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: footprint-centred scatter pivot"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: approved v1 GLB byte-identical"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_a: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: footprint-centred scatter pivot"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: approved v1 GLB byte-identical"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_grass_b: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: footprint-centred scatter pivot"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: actual short solid leaf count"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: actual pink blossom count"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: one continuous closed cushion"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: central cushion coverage is continuous at all 221 samples"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_a: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: footprint-centred scatter pivot"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: actual short solid leaf count"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: actual pink blossom count"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: one continuous closed cushion"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: central cushion coverage is continuous at all 221 samples"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_iceplant_b: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: footprint-centred scatter pivot"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: accepted POSITION preserved"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: accepted NORMAL preserved"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: accepted indices preserved"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: vertex paint moves toward green while retaining muted palette"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_a: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: footprint-centred scatter pivot"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: approved v1 GLB byte-identical"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_shrub_b: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: four paired cloud layers in exported mesh"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: cloud layers shorten upward"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: stronger +X trunk bend"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: four paired cloud layers in exported mesh"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: cloud layers shorten upward"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: stronger +X trunk bend"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress_far: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: slimmer .22m trunk base"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: radial leaf 0 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: radial leaf 1 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: radial leaf 2 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: radial leaf 3 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: radial leaf 4 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: radial leaf 5 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: radial leaf 6 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: radial leaf 7 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: arched canopy above 5.15m crown root"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: six narrow vertex-painted trunk rings"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: identity node and local root"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: measured triangles within budget"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: no texture / skin / animation"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: vertex paint without texture coordinates"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: finite vertex attributes"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: normalized normals"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: opaque bounded vertex colours"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: single opaque matte material, culled solid geometry"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: grounded and manifest bounds match"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: no zero-area triangles"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: outward geometric / shading normal agreement"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: no open edges, leaves and canopy have undersides"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: slimmer .22m trunk base"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: radial leaf 0 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: radial leaf 1 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: radial leaf 2 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: radial leaf 3 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: radial leaf 4 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: radial leaf 5 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: radial leaf 6 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: radial leaf 7 has a descending tip"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: arched canopy above 5.15m crown root"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: exported SHA matches manifest"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: generated UID and stable import settings"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm_far: accepted import UID and settings retained"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: near/far shared envelope and origin"
+    },
+    {
+      "passed": true,
+      "check": "coast_cypress: 40m switch contract"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: near/far shared envelope and origin"
+    },
+    {
+      "passed": true,
+      "check": "coast_palm: 40m switch contract"
+    },
+    {
+      "passed": true,
+      "check": "six ground prototypes plus two near/far tree pairs"
+    },
+    {
+      "passed": true,
+      "check": "no delivered example layout"
+    },
+    {
+      "passed": true,
+      "check": "source and runtime stats match"
+    },
+    {
+      "passed": true,
+      "check": "ten distinct Godot-generated UIDs"
+    },
+    {
+      "passed": true,
+      "check": "all previously tracked files preserved"
+    }
+  ],
+  "assets": {
+    "coast_grass_a": {
+      "triangles": 216,
+      "budget": 400,
+      "surface_count": 1,
+      "sha256": "44c0ed36a9606b7500610e389e442a33704451e27689151e450ae7000897a1bd",
+      "bounds": [
+        [
+          -0.382847398519516,
+          0.0,
+          -0.38519105315208435
+        ],
+        [
+          0.382847398519516,
+          0.8358205556869507,
+          0.38519105315208435
+        ]
+      ],
+      "uid": "uid://fjid8twv1cry",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_grass_b": {
+      "triangles": 200,
+      "budget": 400,
+      "surface_count": 1,
+      "sha256": "60a5e3abca44303936c5b9bec417ba8f0873b395ae93faeeeb9be9f67b96d0e3",
+      "bounds": [
+        [
+          -0.4797707796096802,
+          0.0,
+          -0.48270776867866516
+        ],
+        [
+          0.4797707796096802,
+          0.41499999165534973,
+          0.48270776867866516
+        ]
+      ],
+      "uid": "uid://ba87lor4g6si0",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_iceplant_a": {
+      "triangles": 394,
+      "budget": 400,
+      "surface_count": 1,
+      "sha256": "13c50056a3aaa11ca36459dc3b6e885fbf07a1176295ddb857b4e735502a9004",
+      "bounds": [
+        [
+          -0.5,
+          0.0,
+          -0.3799910545349121
+        ],
+        [
+          0.5,
+          0.1809999942779541,
+          0.3799910545349121
+        ]
+      ],
+      "uid": "uid://sbg5jf4nse1n",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_iceplant_b": {
+      "triangles": 394,
+      "budget": 400,
+      "surface_count": 1,
+      "sha256": "3448e4704c26f6399b8ec0e354ad05ef37026752d4a6bb784ef155cdea6a0db1",
+      "bounds": [
+        [
+          -0.699999988079071,
+          0.0,
+          -0.5138684511184692
+        ],
+        [
+          0.699999988079071,
+          0.1809999942779541,
+          0.5138684511184692
+        ]
+      ],
+      "uid": "uid://dshupovshkgta",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_shrub_a": {
+      "triangles": 156,
+      "budget": 400,
+      "surface_count": 1,
+      "sha256": "e0c80a7676b2e0b03d9af5df3181b5b3e2230679a7ee87881b31b1b4fa2581d7",
+      "bounds": [
+        [
+          -0.5303144454956055,
+          0.0,
+          -0.4481077194213867
+        ],
+        [
+          0.5303144454956055,
+          0.7500977516174316,
+          0.4481077194213867
+        ]
+      ],
+      "uid": "uid://b7f0ojolek0mn",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_shrub_b": {
+      "triangles": 176,
+      "budget": 400,
+      "surface_count": 1,
+      "sha256": "705366e362e92776e28354640522bd6070b8392991f795516c77d5307cd29de1",
+      "bounds": [
+        [
+          -0.4324955642223358,
+          0.0,
+          -0.3764212727546692
+        ],
+        [
+          0.4324955642223358,
+          0.9416977167129517,
+          0.3764212727546692
+        ]
+      ],
+      "uid": "uid://7xa6kbdjon7t",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_cypress": {
+      "triangles": 692,
+      "budget": 800,
+      "surface_count": 1,
+      "sha256": "60a82ff159cb2f9c383297ee647417fb28b509c22081f4dd739cf02a3881e938",
+      "bounds": [
+        [
+          -0.550000011920929,
+          0.0,
+          -0.7459999918937683
+        ],
+        [
+          3.7699999809265137,
+          5.800000190734863,
+          0.6840000152587891
+        ]
+      ],
+      "uid": "uid://by8cywhbfsejq",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_cypress_far": {
+      "triangles": 118,
+      "budget": 120,
+      "surface_count": 1,
+      "sha256": "c3fab154cce2e20ff1f26d62779cd07ed240cc4b93f7ec6722fd196a9bc34d6d",
+      "bounds": [
+        [
+          -0.550000011920929,
+          0.0,
+          -0.7459999918937683
+        ],
+        [
+          3.7699999809265137,
+          5.800000190734863,
+          0.6840000152587891
+        ]
+      ],
+      "uid": "uid://cuw3ul3qflpls",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_palm": {
+      "triangles": 752,
+      "budget": 800,
+      "surface_count": 1,
+      "sha256": "c3e5f061884c35cebc9160e8ecc314498824ad125f42f24056c4f6daa603b53b",
+      "bounds": [
+        [
+          -1.7897435426712036,
+          0.0,
+          -2.29335880279541
+        ],
+        [
+          2.943358898162842,
+          5.650017738342285,
+          2.5861282348632812
+        ]
+      ],
+      "uid": "uid://b8h1fqdb2g6oe",
+      "reversed_faces": 0,
+      "open_edges": 0
+    },
+    "coast_palm_far": {
+      "triangles": 120,
+      "budget": 120,
+      "surface_count": 1,
+      "sha256": "f87138ebd86224739d3f554ee99a29bc19bc8c8548ca50d5d71c435ccac0816a",
+      "bounds": [
+        [
+          -1.7897435426712036,
+          0.0,
+          -2.29335880279541
+        ],
+        [
+          2.943358898162842,
+          5.650017738342285,
+          2.5861282348632812
+        ]
+      ],
+      "uid": "uid://bgvusnhe0u57",
+      "reversed_faces": 0,
+      "open_edges": 0
+    }
+  },
+  "author": "赵云",
+  "cushions": {
+    "coast_iceplant_a": {
+      "leaves": 26,
+      "blooms": 7,
+      "covered_samples": 221,
+      "samples": 221
+    },
+    "coast_iceplant_b": {
+      "leaves": 21,
+      "blooms": 9,
+      "covered_samples": 221,
+      "samples": 221
+    }
+  },
+  "cypress_layers": {
+    "coast_cypress": {
+      "measured_layer_spans_m": [
+        4.319999992847443,
+        3.5640000700950623,
+        2.8080000281333923,
+        1.9440001249313354
+      ],
+      "cloud_components": 8
+    },
+    "coast_cypress_far": {
+      "measured_layer_spans_m": [
+        4.319999992847443,
+        3.5640000700950623,
+        2.8080000281333923,
+        1.9440001249313354
+      ],
+      "cloud_components": 8
+    }
+  },
+  "palm_fronds": {
+    "coast_palm": [
+      {
+        "sector": 0,
+        "tip_y": 4.200000286102295
+      },
+      {
+        "sector": 1,
+        "tip_y": 4.0
+      },
+      {
+        "sector": 2,
+        "tip_y": 3.8000001907348633
+      },
+      {
+        "sector": 3,
+        "tip_y": 3.6000001430511475
+      },
+      {
+        "sector": 4,
+        "tip_y": 4.200000286102295
+      },
+      {
+        "sector": 5,
+        "tip_y": 4.0
+      },
+      {
+        "sector": 6,
+        "tip_y": 3.8000001907348633
+      },
+      {
+        "sector": 7,
+        "tip_y": 3.6000001430511475
+      }
+    ],
+    "coast_palm_far": [
+      {
+        "sector": 0,
+        "tip_y": 4.200000286102295
+      },
+      {
+        "sector": 1,
+        "tip_y": 4.0
+      },
+      {
+        "sector": 2,
+        "tip_y": 3.8000001907348633
+      },
+      {
+        "sector": 3,
+        "tip_y": 3.6000001430511475
+      },
+      {
+        "sector": 4,
+        "tip_y": 4.200000286102295
+      },
+      {
+        "sector": 5,
+        "tip_y": 4.0
+      },
+      {
+        "sector": 6,
+        "tip_y": 3.8000001907348633
+      },
+      {
+        "sector": 7,
+        "tip_y": 3.6000001430511475
+      }
+    ]
+  },
+  "triangles_total": 3218,
+  "passed": true
+}
