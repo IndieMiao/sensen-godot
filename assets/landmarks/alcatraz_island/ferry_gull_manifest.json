@@ -1,0 +1,277 @@
+{
+  "task": "SGODOT-424",
+  "revision": "v1",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "units": "metres / Y up / unit transforms",
+  "host_ref": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "palette_srgb": {
+    "ivory": "F1EEE1",
+    "white": "FFF7E6",
+    "shadow": "D7D9CF",
+    "hull": "537E8D",
+    "stripe": "7E9CA3",
+    "glass": "527D8A",
+    "glass_light": "96B8BB",
+    "deck": "C9AF88",
+    "funnel": "667E84",
+    "funnel_top": "45585B",
+    "ring": "D98559",
+    "rope": "DAC9A7",
+    "wing": "CDD3D0",
+    "tip": "647275",
+    "beak": "E2BA60",
+    "eye": "34444A",
+    "foot": "D3A36D"
+  },
+  "assets": {
+    "ferry": {
+      "file": "ferry.glb",
+      "triangles": 5144,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -12.5,
+          -1.0,
+          -3.319999933242798
+        ],
+        [
+          12.5,
+          7.690000057220459,
+          3.319999933242798
+        ]
+      ],
+      "dimensions_m": [
+        25.0,
+        8.690000057220459,
+        6.639999866485596
+      ],
+      "sha256": "397855391e01f037f20c1eba30bcff40ae3f09806551debc8a486bedd249a62c",
+      "source": "tools/art/source/alcatraz_ferry_424/ferry.blend",
+      "style": "25m white passenger ferry; two cabin levels, blue hull, rounded rails, funnel and lifebuoys",
+      "long_axis": "X; bow -X, matching b16c3198 original",
+      "origin": "original ferry waterline-axis centre; y=0; submerged hull to -1m",
+      "cast_shadow": false,
+      "clickable": false,
+      "lod_switch_m": 55
+    },
+    "ferry_far": {
+      "file": "ferry_far.glb",
+      "triangles": 1480,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -12.5,
+          -1.0,
+          -3.0999999046325684
+        ],
+        [
+          12.5,
+          7.679999828338623,
+          3.0999999046325684
+        ]
+      ],
+      "dimensions_m": [
+        25.0,
+        8.679999828338623,
+        6.199999809265137
+      ],
+      "sha256": "fb49d1dced87c2358e2d96f9e488c47bf0efddffbc4da415093eeff3606ca11b",
+      "source": "tools/art/source/alcatraz_ferry_424/ferry_far.blend",
+      "style": "25m white passenger ferry; two cabin levels, blue hull, rounded rails, funnel and lifebuoys",
+      "long_axis": "X; bow -X, matching b16c3198 original",
+      "origin": "original ferry waterline-axis centre; y=0; submerged hull to -1m",
+      "cast_shadow": false,
+      "clickable": false,
+      "lod_switch_m": 55
+    },
+    "gull": {
+      "file": "gull.glb",
+      "triangles": 284,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.21299999952316284,
+          0.0,
+          -0.4000000059604645
+        ],
+        [
+          0.21299999952316284,
+          0.5799999833106995,
+          0.3700000047683716
+        ]
+      ],
+      "dimensions_m": [
+        0.4259999990463257,
+        0.5799999833106995,
+        0.7700000107288361
+      ],
+      "sha256": "cb4a554000c44570a47c00e7bb4e6fcf507a978cea26be4efda10ea5186eac2c",
+      "source": "tools/art/source/alcatraz_ferry_424/gull.blend",
+      "style": "quiet perched gull, ivory body, grey wings, muted ochre beak/feet",
+      "poses": [
+        "stand",
+        "preen",
+        "spread"
+      ],
+      "front": "-Z, matching original gull; no placement yaw changes",
+      "cast_shadow": false,
+      "clickable": false,
+      "animation": null,
+      "pose_selection": "stand: both weights 0; preen: preen=1; spread: spread=1; never both at once",
+      "pose_bounds": {
+        "stand": [
+          [
+            -0.21299999952316284,
+            0.0,
+            -0.4000000059604645
+          ],
+          [
+            0.21299999952316284,
+            0.5799999833106995,
+            0.3700000047683716
+          ]
+        ],
+        "preen": [
+          [
+            -0.21299999952316284,
+            0.0,
+            -0.23000000417232513
+          ],
+          [
+            0.21299999952316284,
+            0.43299999833106995,
+            0.3700000047683716
+          ]
+        ],
+        "spread": [
+          [
+            -0.6399999856948853,
+            0.0,
+            -0.4000000059604645
+          ],
+          [
+            0.6399999856948853,
+            0.5799999833106995,
+            0.3700000047683716
+          ]
+        ]
+      }
+    }
+  },
+  "placements": [
+    {
+      "asset": "ferry",
+      "position": [
+        -7,
+        0,
+        19
+      ],
+      "zone": "DockZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "ferry_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": false,
+      "owner": "马可波罗"
+    },
+    {
+      "asset": "gull",
+      "position": [
+        -23.6,
+        2,
+        18.2
+      ],
+      "zone": "DockZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "gull_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": false,
+      "owner": "马可波罗"
+    },
+    {
+      "asset": "gull",
+      "position": [
+        10,
+        4.25,
+        8.7
+      ],
+      "zone": "TerraceZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "gull_001",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": false,
+      "owner": "马可波罗"
+    },
+    {
+      "asset": "gull",
+      "position": [
+        -24,
+        11,
+        -7
+      ],
+      "zone": "SummitZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "gull_002",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": false,
+      "owner": "马可波罗"
+    }
+  ],
+  "ferry_lod_group": {
+    "name": "ferry",
+    "near": "ferry",
+    "far": "ferry_far",
+    "switch_distance_m": 55,
+    "margin_m": 0
+  },
+  "gull_pose_by_instance": {
+    "gull_000": "stand",
+    "gull_001": "preen",
+    "gull_002": "spread"
+  },
+  "interaction": "decorative; no collision, click target, particles or locomotion"
+}

@@ -176,6 +176,9 @@ func _add_asset(p: Dictionary, paint: Material) -> void:
 		node.transform = _transform_of(p)
 		zones[p.zone].add_child(node)
 		mesh_nodes.append(node)
+		if p.has("pose"):
+			for i in node.mesh.get_blend_shape_count():
+				node.set_blend_shape_value(i,1.0 if str(node.mesh.get_blend_shape_name(i))==str(p.pose) else 0.0)
 		if variant.ends_with("_far"):
 			node.visibility_range_begin = 55
 			node.visibility_range_begin_margin = 0
@@ -202,6 +205,8 @@ func _add_batch(items: Array, paint: Material) -> void:
 	node.multimesh = mm
 	node.material_override = paint
 	for definition in layout.assets:
+		if definition.name==asset and not bool(definition.get("cast_shadow",true)):
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		if definition.name==asset and definition.has("max_view_width_m"):
 			node.set_meta("max_view_width_m",float(definition.max_view_width_m))
 			_detail_batches.append(node)
@@ -215,12 +220,13 @@ func _add_prop_collision(p: Dictionary) -> void:
 	var definitions := {
 		"alc_bench":[Vector3(1.5,.9,.5),Vector3(0,.45,0)],
 		"alc_lamp":[Vector3(.14,3.5,.14),Vector3(0,1.75,0)],
-		"alc_rail_straight":[Vector3(2,1,.12),Vector3(0,.5,0)],
+		"alc_rail_straight":[Vector3(2,1,.18),Vector3(0,.5,0)],
 		"alc_rail_corner":[Vector3(.5,1,.5),Vector3(.2,.5,.2)],
 		"alc_tree_a":[Vector3(.3,1.4,.3),Vector3(0,.7,0)],
 		"alc_tree_b":[Vector3(.3,1.4,.3),Vector3(0,.7,0)],
-		"alc_flowerbed":[Vector3(1.4,.55,.7),Vector3(0,.275,0)],
-		"alc_bin":[Vector3(.45,.75,.45),Vector3(0,.375,0)],
+		"alc_flowerbed":[Vector3(1.7,.66,1.7),Vector3(0,.33,0)],
+		"alc_bin":[Vector3(.47,.8,.47),Vector3(0,.4,0)],
+		"alc_planter":[Vector3(.68,1.14,.68),Vector3(0,.57,0)],
 		"alc_sign":[Vector3(.12,1.3,.12),Vector3(0,.65,0)]}
 	if not definitions.has(p.asset):return
 	if not _prototype_shapes.has(p.asset):
@@ -236,7 +242,7 @@ func _add_prop_collision(p: Dictionary) -> void:
 	collision.shape = _prototype_shapes[p.asset]
 	if p.has("basis_columns"):
 		var conservative := BoxShape3D.new()
-		conservative.size = Vector3(float(p.scale[0])*2,1+absf(float(p.slope_rise_m)),.12)
+		conservative.size = Vector3(float(p.scale[0])*2,1+absf(float(p.slope_rise_m)),.18)
 		collision.shape = conservative
 	collision.position = definitions[p.asset][1]
 	body.add_child(collision)

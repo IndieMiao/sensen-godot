@@ -1,0 +1,10 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "asset": "gull",
+  "kind": "new authored geometry; shared modelling primitives only",
+  "script": "tools/art/source/alcatraz_ferry_424/build.py",
+  "reference": "reference/c_alc2.png",
+  "original_placement": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "changes": "Replace placeholder geometry. Preserve named pivot, world coordinates, yaw and scale; no interaction or collision."
+}

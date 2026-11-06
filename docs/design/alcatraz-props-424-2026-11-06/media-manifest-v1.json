@@ -1,0 +1,35 @@
+[
+  {
+    "name": "SGODOT-424_ALC_PROPS_v1_all_props_avatar.png",
+    "path": "docs/design/alcatraz-props-424-2026-11-06/SGODOT-424_ALC_PROPS_v1_all_props_avatar.png",
+    "sha256": "337fffc846e3df76eecee74cc9f359fe58d05bd7b6206e3f5db8c94b533f824d",
+    "bytes": 334675,
+    "mime": "image/png",
+    "size": [
+      1500,
+      1590
+    ]
+  },
+  {
+    "name": "SGODOT-424_ALC_PROPS_v1_opening_43.png",
+    "path": "docs/design/alcatraz-props-424-2026-11-06/SGODOT-424_ALC_PROPS_v1_opening_43.png",
+    "sha256": "0a79ef6f0c54d112c6070446c584b72881a62687d9f589d9f3399fe8d2946c88",
+    "bytes": 108784,
+    "mime": "image/png",
+    "size": [
+      360,
+      902
+    ]
+  },
+  {
+    "name": "SGODOT-424_ALC_PROPS_v1_rail_stair_detail.png",
+    "path": "docs/design/alcatraz-props-424-2026-11-06/SGODOT-424_ALC_PROPS_v1_rail_stair_detail.png",
+    "sha256": "ca7ba0f4ddd578535d47daa642705fe87625fd04e2c5807d6e5618669c30a92e",
+    "bytes": 653588,
+    "mime": "image/png",
+    "size": [
+      1200,
+      990
+    ]
+  }
+]

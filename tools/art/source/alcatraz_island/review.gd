@@ -135,7 +135,7 @@ func _ready() -> void:
 	check("all_liu_prototypes_placed",["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"].all(func(k):return int(nature_counts.get(k,0))>0),nature_counts)
 	check("vegetation_roots_on_terrain",unsupported.is_empty(),unsupported)
 	check("vegetation_navigation_clearance",encroaching.is_empty(),encroaching)
-	check("only_buildings_have_two_lods",scene.layout.lod_groups.size()==3 and scene.layout.lod_groups.all(func(g):return g.name in ["alc_museum","alc_lighthouse","alc_watertower"]))
+	check("buildings_and_ferry_have_two_lods",scene.layout.lod_groups.size()==4 and scene.layout.lod_groups.all(func(g):return g.name in ["alc_museum","alc_lighthouse","alc_watertower","ferry"]))
 
 	var corners_ok := true
 	for p in [Vector2(0,0),Vector2(359,0),Vector2(0,799),Vector2(359,799)]:

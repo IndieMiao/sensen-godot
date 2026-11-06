@@ -1,0 +1,15 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "base_head": "4b1902a46961b65fc999fc13b44951f89abe7384",
+  "modules": [
+    "aisle_carpet",
+    "vault_extension",
+    "grass_extension"
+  ],
+  "kind": "new additive geometry",
+  "source": "build_increment.py / church_v11_additions.blend",
+  "atlas": "same 2048 atlas; unused 16px square at (1896,124) reserved for muted warm carpet #986D61; existing sampled islands untouched",
+  "wall_extension": "Original north_wall / west_wall retained; actual upper backing 2m outward, 2m longer at both ends; dark band 7.99..11.50m local, sloping timber roof joins old 8m crown. Top world y11.58m.",
+  "grass_extension": "Additive low grass slab 30m square, top y-0.70 (old 27m grass top -0.67), no collision; closes bottom follow-view corners."
+}

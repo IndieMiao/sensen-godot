@@ -48,7 +48,8 @@
     "alc_museum",
     "alc_lighthouse",
     "alc_watertower",
-    "ferry"
+    "ferry",
+    "alc_planter"
   ],
   "ferry_upper_structure_only": true,
   "future_props": {

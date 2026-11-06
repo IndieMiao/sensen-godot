@@ -4,11 +4,14 @@ from finish import museum_proxy
 
 REPEATED=['alc_bench','alc_lamp','alc_rail_straight','alc_rail_corner','alc_curb','alc_tree_a','alc_tree_b','alc_flowerbed','alc_bin','alc_sign']
 OWNERS={name:'赵云' for name in REPEATED}
+GARDEN=['alc_flowers_poppy','alc_flowers_lavender','alc_flowers_daisy','alc_hedge','alc_planter']
+REPEATED+=GARDEN
+OWNERS.update({name:'赵云' for name in GARDEN})
 NATURAL=['alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft']
 REPEATED+=NATURAL
 OWNERS.update({name:'刘备' for name in NATURAL})
 OWNERS.update({n:'黄忠' for n in ['alc_lighthouse','alc_lighthouse_far','alc_watertower','alc_watertower_far','alc_museum_far',
- 'alc_far_bridge','alc_far_city','alc_far_hills','ferry','gull']})
+ 'alc_far_bridge','alc_far_city','alc_far_hills','ferry','ferry_far','gull']})
 
 
 def build(kit,box,prism,place):
@@ -87,16 +90,14 @@ def scatter(place):
         for i,x in enumerate([-21,-15,-9,-3,3,7]):
             asset=patterns[row][i]
             # Trees/planters stand just beyond the upper rail; seats stay on the paving edge.
-            pz=z-2.9 if asset.startswith('alc_tree_') else z-2.1 if asset=='alc_flowerbed' else z-.9
+            pz=z-2.9 if asset.startswith('alc_tree_') else z-2.5 if asset=='alc_flowerbed' else z-.9
             if asset=='alc_lamp':x,pz=-24,z-2.8
             elif asset=='alc_sign':x,pz=-24,z-1.5
             place(asset,(x,y,pz),'TerraceZone',collision=True)
-    for asset,p in [('alc_sign',(-23.8,1,11.0)),('alc_bench',(-19,1,13.4)),('alc_flowerbed',(-18.7,1,10.3))]:place(asset,p,'DockZone')
+    for asset,p in [('alc_sign',(-23.8,1,11.0)),('alc_bench',(-19,1,13.4)),('alc_flowerbed',(-18.7,1,9.45))]:place(asset,p,'DockZone')
     for i,x in enumerate([-24,-18,-12,-6,0,6,12,18,24]):
         asset=['alc_flowerbed','alc_bench','alc_lamp'][i%3]
-        place(asset,(-3 if x==6 and asset=='alc_lamp' else x,10,-7.6 if asset=='alc_lamp' else -5.05),'SummitZone')
-    for p,z in [((-23.5,1,14),'DockZone'),((-23.5,1,19.5),'DockZone'),((-27.8,10,-4.7),'SummitZone'),((27.8,10,-4.7),'SummitZone')]:
-        place('alc_rail_corner',p,z,collision=False)
+        place(asset,(-3 if x==6 and asset=='alc_lamp' else x,10,-7.6 if asset=='alc_lamp' else -5.55 if asset=='alc_flowerbed' else -5.05),'SummitZone')
     # Keep tall crowns on the flanks: lower-terrace trees otherwise obscure the
     # avatar on the next path above under the fixed 43-degree camera.
     for row,(y,points) in enumerate([

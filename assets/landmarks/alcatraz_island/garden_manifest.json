@@ -1,0 +1,271 @@
+{
+  "author": "赵云",
+  "assets": {
+    "alc_flowers_poppy": {
+      "triangles": 244,
+      "surfaces": 1,
+      "bytes": 12728,
+      "bounds_blender": [
+        [
+          -0.373355,
+          -0.346265,
+          -0.0
+        ],
+        [
+          0.373355,
+          0.346265,
+          0.69637
+        ]
+      ],
+      "bounds": [
+        [
+          -0.373355,
+          -0.0,
+          -0.346265
+        ],
+        [
+          0.373355,
+          0.69637,
+          0.346265
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_garden_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 250,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive garden decoration",
+      "sha256": "aa3cbc1723f6795b327fd7141ae659a7c5c85b39ff66bef09fd017505140ee31",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "alc_flowers_lavender": {
+      "triangles": 240,
+      "surfaces": 1,
+      "bytes": 10816,
+      "bounds_blender": [
+        [
+          -0.238,
+          -0.193,
+          0.0
+        ],
+        [
+          0.238,
+          0.193,
+          0.770593
+        ]
+      ],
+      "bounds": [
+        [
+          -0.238,
+          0.0,
+          -0.193
+        ],
+        [
+          0.238,
+          0.770593,
+          0.193
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_garden_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 250,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive garden decoration",
+      "sha256": "7df4094843f78c10af66b02f9aee55d03a35887308affb12f54c3c6f2c9cc110",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "alc_flowers_daisy": {
+      "triangles": 228,
+      "surfaces": 1,
+      "bytes": 12632,
+      "bounds_blender": [
+        [
+          -0.302755,
+          -0.282992,
+          0.0
+        ],
+        [
+          0.302755,
+          0.282992,
+          0.491707
+        ]
+      ],
+      "bounds": [
+        [
+          -0.302755,
+          0.0,
+          -0.282992
+        ],
+        [
+          0.302755,
+          0.491707,
+          0.282992
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_garden_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 250,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive garden decoration",
+      "sha256": "2cd433bd6fb7591bca11a27509b8db292ce5684bf356252d551af9e681369d25",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "alc_hedge": {
+      "triangles": 66,
+      "surfaces": 1,
+      "bytes": 4128,
+      "bounds_blender": [
+        [
+          -0.5,
+          -0.28,
+          0.0
+        ],
+        [
+          0.5,
+          0.28,
+          0.665
+        ]
+      ],
+      "bounds": [
+        [
+          -0.5,
+          0.0,
+          -0.28
+        ],
+        [
+          0.5,
+          0.665,
+          0.28
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_garden_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 80,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive garden decoration",
+      "sha256": "2feb90cdd76a5bad7d3db66e55cc4753bbc87171ce515d0ffead80b891643ed2",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    },
+    "alc_planter": {
+      "triangles": 194,
+      "surfaces": 1,
+      "bytes": 7136,
+      "bounds_blender": [
+        [
+          -0.34,
+          -0.34,
+          0.0
+        ],
+        [
+          0.34,
+          0.34,
+          1.14
+        ]
+      ],
+      "bounds": [
+        [
+          -0.34,
+          0.0,
+          -0.34
+        ],
+        [
+          0.34,
+          1.14,
+          0.34
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_garden_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "footprint bottom centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none; noninteractive garden decoration",
+      "sha256": "3e6a7cd17fbc2a0e81871791ffeb6603df3749f1a336342e7176cfc29489f367",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "material_contract": {
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "vertex_color_is_srgb": false
+      }
+    }
+  },
+  "palette_srgb": {
+    "stem": "668347",
+    "leaf": "7F9950",
+    "leaf_light": "9FB165",
+    "poppy": "E98931",
+    "poppy_light": "FFB34C",
+    "poppy_inner": "DA6D25",
+    "pollen": "D8B649",
+    "daisy": "FFF4D6",
+    "daisy_shade": "E8DDAD",
+    "lavender": "9274B9",
+    "lavender_light": "B19ACF",
+    "lavender_dark": "785F9D",
+    "hedge": "708A40",
+    "hedge_top": "95A952",
+    "hedge_shade": "5C7738",
+    "pot": "BF8155",
+    "pot_edge": "D9A474",
+    "soil": "6C6548"
+  },
+  "placement_reference": "b16c31982f34a64cdd4f9c6683064edbf20837a0"
+}

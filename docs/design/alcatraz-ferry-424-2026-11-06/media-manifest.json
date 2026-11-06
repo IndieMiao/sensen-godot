@@ -1,0 +1,27 @@
+[
+  {
+    "file": "SGODOT-424_ferry_gull_v1_dock_ferry_detail.png",
+    "bytes": 359698,
+    "sha256": "6cfe04569461356d051f2c618d9466a05d458a5d809490e844f3f51fad0c2a11"
+  },
+  {
+    "file": "SGODOT-424_ferry_gull_v1_gull_poses.png",
+    "bytes": 40582,
+    "sha256": "e2720d31b00640abed01b160b9199eff56df02df953b3daefd841206c2c9b797"
+  },
+  {
+    "file": "SGODOT-424_ferry_gull_v1_near_far.png",
+    "bytes": 122986,
+    "sha256": "9d1a2ae1777de319536c8ef9bfbbfcaf5d1be10c8504f4616537e827f981a875"
+  },
+  {
+    "file": "SGODOT-424_ferry_gull_v1_opening_360.png",
+    "bytes": 68129,
+    "sha256": "4173a7fccfb271834c607268f7492258c9a61e65c81ef2f42bc488a2ce521261"
+  },
+  {
+    "file": "SGODOT-424_ferry_gull_v1_validation.json",
+    "bytes": 19730,
+    "sha256": "202eaf2c31d79dba826565261c3401b61494f252c290b0f2c47f8156a492c0e3"
+  }
+]

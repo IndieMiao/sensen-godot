@@ -1,0 +1,529 @@
+{
+  "author": "赵云",
+  "reference_layout_commit": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
+  "palette_srgb": {
+    "wood": "BD8D51",
+    "wood_light": "DBAD69",
+    "wood_edge": "A87946",
+    "paint": "536F6A",
+    "paint_light": "75908A",
+    "stone": "DBC8AA",
+    "stone_top": "F0DFC2",
+    "stone_side": "C6B293",
+    "soil": "7F7450",
+    "globe": "FFF2C9",
+    "globe_top": "FFF9DE",
+    "bark": "98754B",
+    "bark_light": "B59260",
+    "leaf_dark": "6F873E",
+    "leaf": "90A448",
+    "leaf_light": "AABC5A",
+    "yellow": "ECCB59",
+    "white": "FFF0D2",
+    "lilac": "B8A5CF",
+    "pollen": "C8A453",
+    "bin_dark": "5E695B"
+  },
+  "assets": {
+    "alc_bench": {
+      "triangles": 252,
+      "surfaces": 1,
+      "bytes": 21780,
+      "bounds_blender": [
+        [
+          -0.75,
+          -0.2225,
+          0.0
+        ],
+        [
+          0.75,
+          0.2725,
+          0.915
+        ]
+      ],
+      "bounds": [
+        [
+          -0.75,
+          0.0,
+          -0.2725
+        ],
+        [
+          0.75,
+          0.915,
+          0.2225
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "6dcb115c2827b66ea978f921443c60f432d7c29732dd29d5fab01401c04d00a9",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 7,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_lamp": {
+      "triangles": 264,
+      "surfaces": 1,
+      "bytes": 7896,
+      "bounds_blender": [
+        [
+          -0.218743,
+          -0.23,
+          0.0
+        ],
+        [
+          0.218743,
+          0.23,
+          3.5
+        ]
+      ],
+      "bounds": [
+        [
+          -0.218743,
+          0.0,
+          -0.23
+        ],
+        [
+          0.218743,
+          3.5,
+          0.23
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "2321473dfaaec218140655b6b00fc4a606a8cca88dc89a6d8c026c5b8911d21e",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 6,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_rail_straight": {
+      "triangles": 48,
+      "surfaces": 1,
+      "bytes": 4992,
+      "bounds_blender": [
+        [
+          -1.0,
+          -0.09,
+          0.0
+        ],
+        [
+          1.0,
+          0.09,
+          1.0
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.09
+        ],
+        [
+          1.0,
+          1.0,
+          0.09
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 60,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "afccbf92fde39218866b2457375559ff347ee55de39af8e78abd18b1c6a98ca6",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 204,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_rail_corner": {
+      "triangles": 60,
+      "surfaces": 1,
+      "bytes": 5932,
+      "bounds_blender": [
+        [
+          -0.09,
+          -0.5,
+          0.0
+        ],
+        [
+          0.5,
+          0.09,
+          1.0
+        ]
+      ],
+      "bounds": [
+        [
+          -0.09,
+          0.0,
+          -0.09
+        ],
+        [
+          0.5,
+          1.0,
+          0.5
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 60,
+      "pivot": "corner post foot; arms +X/+Z .50m",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "5fa96b534fe818609b8a13a681a9415c1ecaeff37fa0acf58f4ca0a99bcff71c",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 4,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_curb": {
+      "triangles": 20,
+      "surfaces": 1,
+      "bytes": 2644,
+      "bounds_blender": [
+        [
+          -1.0,
+          -0.09,
+          0.0
+        ],
+        [
+          1.0,
+          0.09,
+          0.25
+        ]
+      ],
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.09
+        ],
+        [
+          1.0,
+          0.25,
+          0.09
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 60,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "8f531201101b657ee13781e7a0c3ca0e7ed392e7637566ae39c29c69e7be20e8",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 204,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_tree_a": {
+      "triangles": 520,
+      "surfaces": 1,
+      "bytes": 14560,
+      "bounds_blender": [
+        [
+          -1.328381,
+          -1.307703,
+          0.0
+        ],
+        [
+          3.388832,
+          1.38015,
+          6.424321
+        ]
+      ],
+      "bounds": [
+        [
+          -1.328381,
+          0.0,
+          -1.38015
+        ],
+        [
+          3.388832,
+          6.424321,
+          1.307703
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 600,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "04b30452d6db9d8b64acfc4e11e70be15bd0372c1ccab99ec79f63d7a9aeb5d2",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 2,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_tree_b": {
+      "triangles": 316,
+      "surfaces": 1,
+      "bytes": 9372,
+      "bounds_blender": [
+        [
+          -1.971087,
+          -1.46015,
+          0.0
+        ],
+        [
+          1.966312,
+          1.392597,
+          6.275
+        ]
+      ],
+      "bounds": [
+        [
+          -1.971087,
+          0.0,
+          -1.392597
+        ],
+        [
+          1.966312,
+          6.275,
+          1.46015
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 600,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "eb499135039ef55b4c5f0a90c6957510b7939c8580c6e65458e531e891acb3d7",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 1,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_flowerbed": {
+      "triangles": 500,
+      "surfaces": 1,
+      "bytes": 17616,
+      "bounds_blender": [
+        [
+          -0.85,
+          -0.85,
+          0.0
+        ],
+        [
+          0.85,
+          0.85,
+          0.6575
+        ]
+      ],
+      "bounds": [
+        [
+          -0.85,
+          0.0,
+          -0.85
+        ],
+        [
+          0.85,
+          0.6575,
+          0.85
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 500,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "bf11c6c06ce941a8096d05ce3ba818ed4a3fb47355c3b2c706b8820a398ca071",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 8,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_bin": {
+      "triangles": 128,
+      "surfaces": 1,
+      "bytes": 11556,
+      "bounds_blender": [
+        [
+          -0.235,
+          -0.235,
+          0.0
+        ],
+        [
+          0.235,
+          0.235,
+          0.8
+        ]
+      ],
+      "bounds": [
+        [
+          -0.235,
+          0.0,
+          -0.235
+        ],
+        [
+          0.235,
+          0.8,
+          0.235
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "71b7a259319a75159738847dd52dfba2f61e82afdf71fa67d487ea96cfd473cf",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 2,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_sign": {
+      "triangles": 36,
+      "surfaces": 1,
+      "bytes": 4068,
+      "bounds_blender": [
+        [
+          -0.38,
+          -0.056,
+          0.0
+        ],
+        [
+          0.38,
+          0.09,
+          1.5
+        ]
+      ],
+      "bounds": [
+        [
+          -0.38,
+          0.0,
+          -0.09
+        ],
+        [
+          0.38,
+          1.5,
+          0.056
+        ]
+      ],
+      "generator": "tools/art/build_alcatraz_props_424.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 300,
+      "pivot": "installation/ground centre",
+      "sockets": {},
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "front": "+Z",
+      "collision": "none in GLB; client owns collider sizes",
+      "sha256": "edab4d31efd5be4ec4519bda5f0455f5bc98312965f8525684e0fff4e7ac469b",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "instances_in_layout": 4,
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    }
+  }
+}
