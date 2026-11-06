@@ -10,6 +10,10 @@
 //                         out, that is what the manifest records, and given, it must be the same image (0.2.23 went out
 //                         with the client's commit there while the server stayed on the one before, #717). The preview
 //                         instance sends no such header, so with --preview it is required and recorded as given.
+//        --ahead-of <sha> with --backend: the APK goes up before its server is deployed (v7, 11-06: the update page that
+//                         the wipe's minimum points at must hold a link that already works). The live server must still
+//                         run <sha>, the image --backend replaces; --backend is recorded as given. Nothing points at
+//                         the new directory until the deploy's own steps do (min-version, the update page).
 //        --preview        a 355 preview (auth-preview.md): package com.sensen.p0preview against /preview/p0-next/v1, into
 //                         p0/demo/preview/p0-preview-<YYYYMMDD>-<sha12>/, never releases/. Only the preview gate's
 //                         min-version (deploy-hk.sh --target preview) may point at it; nothing here sets one.
@@ -106,8 +110,14 @@ const sameImage = (a, b) => IMAGE.test(a) && IMAGE.test(b) && (a.startsWith(b) |
 let backend = arg('--backend');
 // A typo, or `--backend` with its value left off (the next flag read as one), never goes into the manifest (后裔 on #719).
 if (has('--backend')) assert(IMAGE.test(backend ?? ''), `--backend wants an image sha (7–40 hex), not ${JSON.stringify(backend)}`);
-if (liveRelease) {
-  if (backend) assert(sameImage(backend, liveRelease), `--backend ${backend} is not the image the server runs (X-P0-Release ${liveRelease}): leave it out, or deploy first`);
+const aheadOf = arg('--ahead-of');
+if (has('--ahead-of')) {
+  assert(IMAGE.test(aheadOf ?? '') && backend, '--ahead-of <the image the server runs now> goes with --backend <the image to come>');
+  assert(!sameImage(backend, aheadOf), `--ahead-of ${aheadOf} is --backend itself: leave --ahead-of out`);
+  assert(liveRelease && sameImage(aheadOf, liveRelease), `the server runs ${liveRelease ?? 'an unnamed image'}, not --ahead-of ${aheadOf}`);
+  console.log(`published ahead of the deploy: the server runs ${liveRelease}, the manifest records ${backend}`);
+} else if (liveRelease) {
+  if (backend) assert(sameImage(backend, liveRelease), `--backend ${backend} is not the image the server runs (X-P0-Release ${liveRelease}): leave it out, deploy first, or --ahead-of ${liveRelease}`);
   else backend = liveRelease;
 } else {
   assert(backend, `${API} sends no X-P0-Release: pass --backend <the image it runs>`);
