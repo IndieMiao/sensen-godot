@@ -1,0 +1,401 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "revision": "v1",
+  "units": "metres, Y up; wind leans toward +X; root at Y=0",
+  "palette_srgb": {
+    "grass": "869955",
+    "grass_light": "ABB273",
+    "grass_dark": "637D43",
+    "dry_tip": "C4B780",
+    "ice": "6F8E62",
+    "ice_light": "99AE78",
+    "ice_shadow": "527553",
+    "ice_tip": "B0A67D",
+    "pink": "CA74A3",
+    "pink_light": "E0A0BD",
+    "pink_dark": "AD5D8D",
+    "pollen": "E5C476",
+    "sage": "82967A",
+    "sage_light": "A4B392",
+    "sage_dark": "647E64",
+    "shrub": "7E914E",
+    "shrub_light": "A1AC68",
+    "shrub_dark": "607A43",
+    "cypress": "71894F",
+    "cypress_light": "91A367",
+    "cypress_dark": "536E43",
+    "palm": "859848",
+    "palm_light": "A9B25F",
+    "palm_dark": "637B3B",
+    "wood": "A3815D",
+    "wood_light": "B89972",
+    "wood_dark": "795F47"
+  },
+  "material_contract": {
+    "vertex_color_is_srgb": false,
+    "roughness": 0.9,
+    "specular": 0.18,
+    "metallic": 0,
+    "opaque": true,
+    "surfaces_per_mesh": 1,
+    "textures": false
+  },
+  "assets": {
+    "coast_grass_a": {
+      "file": "coast_grass_a.glb",
+      "triangles": 216,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.382847398519516,
+          0.0,
+          -0.38519105315208435
+        ],
+        [
+          0.382847398519516,
+          0.8358205556869507,
+          0.38519105315208435
+        ]
+      ],
+      "height_m": 0.8358205556869507,
+      "sha256": "44c0ed36a9606b7500610e389e442a33704451e27689151e450ae7000897a1bd",
+      "bytes": 8204,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "grass",
+      "lod": "single",
+      "multimesh": true
+    },
+    "coast_grass_b": {
+      "file": "coast_grass_b.glb",
+      "triangles": 200,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.4797707796096802,
+          0.0,
+          -0.48270776867866516
+        ],
+        [
+          0.4797707796096802,
+          0.41499999165534973,
+          0.48270776867866516
+        ]
+      ],
+      "height_m": 0.41499999165534973,
+      "sha256": "60a5e3abca44303936c5b9bec417ba8f0873b395ae93faeeeb9be9f67b96d0e3",
+      "bytes": 7896,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "grass",
+      "lod": "single",
+      "multimesh": true
+    },
+    "coast_iceplant_a": {
+      "file": "coast_iceplant_a.glb",
+      "triangles": 336,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.39815035462379456,
+          0.0,
+          -0.36295920610427856
+        ],
+        [
+          0.39815035462379456,
+          0.12600000202655792,
+          0.36295920610427856
+        ]
+      ],
+      "height_m": 0.12600000202655792,
+      "sha256": "ecdb391a498390a565650ab8c14b791a2f305d486a67b5afc3a8d38f2ccaf319",
+      "bytes": 12680,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "iceplant",
+      "lod": "single",
+      "multimesh": true
+    },
+    "coast_iceplant_b": {
+      "file": "coast_iceplant_b.glb",
+      "triangles": 392,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.5731503963470459,
+          0.0,
+          -0.32712501287460327
+        ],
+        [
+          0.5731503963470459,
+          0.13599999248981476,
+          0.32712501287460327
+        ]
+      ],
+      "height_m": 0.13599999248981476,
+      "sha256": "470c6798cce55adc5f8eccbeba701cda8b733391672014c42bf425de93c6005c",
+      "bytes": 14672,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "iceplant",
+      "lod": "single",
+      "multimesh": true
+    },
+    "coast_shrub_a": {
+      "file": "coast_shrub_a.glb",
+      "triangles": 156,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.5303144454956055,
+          0.0,
+          -0.4481077194213867
+        ],
+        [
+          0.5303144454956055,
+          0.7500977516174316,
+          0.4481077194213867
+        ]
+      ],
+      "height_m": 0.7500977516174316,
+      "sha256": "557192014867eb6f95af718304c39d54e7ca49453c231a0673086d79dfebba47",
+      "bytes": 5680,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "shrub",
+      "lod": "single",
+      "multimesh": true
+    },
+    "coast_shrub_b": {
+      "file": "coast_shrub_b.glb",
+      "triangles": 176,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.4324955642223358,
+          0.0,
+          -0.3764212727546692
+        ],
+        [
+          0.4324955642223358,
+          0.9416977167129517,
+          0.3764212727546692
+        ]
+      ],
+      "height_m": 0.9416977167129517,
+      "sha256": "705366e362e92776e28354640522bd6070b8392991f795516c77d5307cd29de1",
+      "bytes": 6236,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "shrub",
+      "lod": "single",
+      "multimesh": true
+    },
+    "coast_cypress": {
+      "file": "coast_cypress.glb",
+      "triangles": 372,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.75,
+          0.0,
+          -1.274999976158142
+        ],
+        [
+          3.450000047683716,
+          5.800000190734863,
+          1.475000023841858
+        ]
+      ],
+      "height_m": 5.800000190734863,
+      "sha256": "7c06b4a2d2af912cc192e4ac4e9f62a52c6c2f9248175fab8b011065751c74ec",
+      "bytes": 10636,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "tree",
+      "lod": "near",
+      "multimesh": true
+    },
+    "coast_cypress_far": {
+      "file": "coast_cypress_far.glb",
+      "triangles": 118,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.75,
+          0.0,
+          -1.274999976158142
+        ],
+        [
+          3.450000047683716,
+          5.800000190734863,
+          1.475000023841858
+        ]
+      ],
+      "height_m": 5.800000190734863,
+      "sha256": "f01849ac8eb862e51ca7018eef910a23253de15f05a6955242bef155e596f135",
+      "bytes": 4540,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "tree",
+      "lod": "far",
+      "multimesh": true
+    },
+    "coast_palm": {
+      "file": "coast_palm.glb",
+      "triangles": 316,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.2694039344787598,
+          0.0,
+          -2.0999796390533447
+        ],
+        [
+          2.570178270339966,
+          6.160000324249268,
+          2.0196681022644043
+        ]
+      ],
+      "height_m": 6.160000324249268,
+      "sha256": "dda11d2dc556278e8034551d8196cc43a83c058966a3de6b5e5b076a9dfd18af",
+      "bytes": 31696,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "tree",
+      "lod": "near",
+      "multimesh": true
+    },
+    "coast_palm_far": {
+      "file": "coast_palm_far.glb",
+      "triangles": 120,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.2694039344787598,
+          0.0,
+          -2.0999796390533447
+        ],
+        [
+          2.570178270339966,
+          6.160000324249268,
+          2.0196681022644043
+        ]
+      ],
+      "height_m": 6.160000324249268,
+      "sha256": "5d2d6b76b0432e70e1eeaa7f30fc219e2fa8617ee5904c978412809470f480ae",
+      "bytes": 11876,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      },
+      "family": "tree",
+      "lod": "far",
+      "multimesh": true
+    }
+  },
+  "lod_groups": [
+    {
+      "near": "coast_cypress",
+      "far": "coast_cypress_far",
+      "switch_distance_m": 40,
+      "margin_m": 0,
+      "common_aabb": [
+        [
+          -1.75,
+          0.0,
+          -1.274999976158142
+        ],
+        [
+          3.450000047683716,
+          5.800000190734863,
+          1.475000023841858
+        ]
+      ],
+      "pivot": "trunk base; do not recenter by canopy bounds",
+      "far_closed": true
+    },
+    {
+      "near": "coast_palm",
+      "far": "coast_palm_far",
+      "switch_distance_m": 40,
+      "margin_m": 0,
+      "common_aabb": [
+        [
+          -1.2694039344787598,
+          0.0,
+          -2.0999796390533447
+        ],
+        [
+          2.570178270339966,
+          6.160000324249268,
+          2.0196681022644043
+        ]
+      ],
+      "pivot": "trunk base; do not recenter by canopy bounds",
+      "far_closed": true
+    }
+  ],
+  "source": "tools/art/source/coast_plants_435/coast_plants.blend",
+  "generator": "tools/art/build_coast_plants_435.py",
+  "example_layout_included": false
+}

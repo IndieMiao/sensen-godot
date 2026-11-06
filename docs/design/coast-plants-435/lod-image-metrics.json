@@ -1,0 +1,53 @@
+{
+  "note": "Matched 43 degree orthographic screenshot measurements; not visual acceptance or phone GPU timing.",
+  "measurements": [
+    {
+      "tree": "coast_cypress",
+      "view": "default14.5",
+      "silhouette_iou": 0.9283909622464448,
+      "overlap_rgb_mean_error_255": 7.591581784723842
+    },
+    {
+      "tree": "coast_cypress",
+      "view": "_yaw60",
+      "silhouette_iou": 0.9068320471900125,
+      "overlap_rgb_mean_error_255": 8.978124303853866
+    },
+    {
+      "tree": "coast_cypress",
+      "view": "_yaw150",
+      "silhouette_iou": 0.9281100730014721,
+      "overlap_rgb_mean_error_255": 7.732817591333808
+    },
+    {
+      "tree": "coast_cypress",
+      "view": "_yaw240",
+      "silhouette_iou": 0.9295730431142738,
+      "overlap_rgb_mean_error_255": 7.027177380014259
+    },
+    {
+      "tree": "coast_palm",
+      "view": "default14.5",
+      "silhouette_iou": 0.9505819821032093,
+      "overlap_rgb_mean_error_255": 8.136744877375518
+    },
+    {
+      "tree": "coast_palm",
+      "view": "_yaw60",
+      "silhouette_iou": 0.9421496452951412,
+      "overlap_rgb_mean_error_255": 8.860999033926237
+    },
+    {
+      "tree": "coast_palm",
+      "view": "_yaw150",
+      "silhouette_iou": 0.944998209382834,
+      "overlap_rgb_mean_error_255": 10.013105952944892
+    },
+    {
+      "tree": "coast_palm",
+      "view": "_yaw240",
+      "silhouette_iou": 0.9347851134923378,
+      "overlap_rgb_mean_error_255": 10.343615185504746
+    }
+  ]
+}
