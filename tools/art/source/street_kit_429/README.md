@@ -25,3 +25,7 @@ prepare.py复用本工位已验证的output/church-kit-427-v11/project Avatar隔
 verify.py独立读取GLB顶点/索引/颜色，测预算、边界、单位比例、原点与座高；验证线性颜色来自指定暖色板、
 唯一UID、root_script和所有旧文件保持不变。cold_import.py用全新缓存复导套件和原样的#830依赖，比较整个隔离工程内容哈希和源工作区状态。
 本目录.gdignore阻止源/审阅脚本进入运行时扫描，示例只在内存装配，不交layout。
+
+v1.1木色增量：`recolor_wood.py`从已验收76a13070的两件GLB生成颜色补丁，逐字节确认仅COLOR_0 RGB改变；
+随后用`flock ~/gs66-render.lock blender --background --python "$PWD/tools/art/source/street_kit_429/update_wood_blends.py"`同步两份编辑源。
+build.py也已按模块使用#830 v1.1木色，重新生成时不会改动其他件使用的饰边色。

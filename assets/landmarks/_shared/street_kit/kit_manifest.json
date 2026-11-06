@@ -1,6 +1,6 @@
 {
   "task": "SGODOT-429",
-  "revision": "v1",
+  "revision": "v1.1",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "grid_m": 2,
@@ -27,7 +27,10 @@
     "flower": "DFC570",
     "soil": "897A53",
     "basin": "A4A08F",
-    "drain": "4E4C43"
+    "drain": "4E4C43",
+    "furniture_wood": "A3815D",
+    "furniture_wood_light": "B89972",
+    "furniture_wood_dark": "795F47"
   },
   "assets": {
     "lamp_single": {
@@ -113,7 +116,7 @@
       ],
       "pivot": "base centre, Y up, +Z front",
       "source": "tools/art/source/street_kit_429/bench_wood.blend",
-      "sha256": "f8e704d711101b0b5ffc6bda7c3c45d9e63becca13ea74088e86ded821985831",
+      "sha256": "ae68408c032a725dd96bd65926b1140deca06593a063b5fc52c60119f4d6a2aa",
       "placement_cell_m": [
         2,
         2
@@ -510,7 +513,7 @@
       ],
       "pivot": "base centre, Y up, +Z front",
       "source": "tools/art/source/street_kit_429/umbrella_table.blend",
-      "sha256": "2afa80948abe989bf7df0b6de8f63a90cfe2f84688ee2a665d4a28b7d46bf061",
+      "sha256": "24b7534f9ac0f5714f0f5a697e1a33332e99ecb7a02a99bf2c5f4b80ecbb36a5",
       "placement_cell_m": [
         2,
         2

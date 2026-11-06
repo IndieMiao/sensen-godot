@@ -1,4 +1,4 @@
-# 街道家具套件 v1 · SGODOT-429
+# 街道家具套件 v1.1 · SGODOT-429
 
 黄忠。16件可复用家具，适用于后续地标、集市广场和室外POI。
 全部独立GLB、每件1mesh/1surface、单件136–652三角面，合计5,970面；顶点色、哑光、无贴图。
@@ -45,7 +45,9 @@
 
 所有GLB由street_kit_import.gd统一绑定street_matte.tres：vertex_color_use_as_albedo=true，
 roughness=0.90，metallic_specular=0.15。颜色在线性COLOR_0中；palette.json记录原始sRGB值。
-暖石CBB48F/D9C4A3、暖木BB8B52/D0A56C/9A7046、青绿35696A/608F99来自恶魔岛正式色板bf0c31b1；
+暖石CBB48F/D9C4A3、青绿35696A/608F99来自恶魔岛正式色板bf0c31b1；
+木长椅（椅面与靠背木板）、伞桌桌面/凳面及木杆按#830 v1.1改为木A3815D、亮B89972、暗795F47，
+保留板间轻微深浅变化；这两件的铁件深褐保持不变。其他件的暖色饰边保留原色。
 深褐金属5D4C38、奶油F0E1C2与Grace Cathedral同一暖色体系，伞布用奶油/鼠尾草绿。
 几何全部新制；Blender命名部件、脚本、每件provenance在tools/art/source/street_kit_429/。
 生成器只借用既有建模基础函数，不写回旧资产。
@@ -64,4 +66,6 @@ roughness=0.90，metallic_specular=0.15。颜色在线性COLOR_0中；palette.js
 铺石用刘备#830的54b76f78版本assets/landmarks/_shared/ground_detail/ground_paving.tres；背景草地用同版ground_grass。
 13份依赖通过git读取后只放在output的审阅工程，逐字节核对。它们不随本PR复制进运行时目录，也不被改写；
 将来实际使用广场地材时，应以#830合入后的共享地材为依赖。本次支墙也是只供挂墙牌展示的无细节审阅网格。
-审阅图及验证见docs/design/street-kit-429-2026-11-06/。
+审阅图及验证见docs/design/street-kit-429-2026-11-06/v1.1/。
+
+v1.1仅修改bench_wood和umbrella_table的COLOR_0 RGB字节；GLB JSON、几何、法线、索引、alpha及全部.import/UID不变，其他14个GLB逐字节不变。

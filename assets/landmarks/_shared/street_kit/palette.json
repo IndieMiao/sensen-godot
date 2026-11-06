@@ -21,7 +21,21 @@
     "flower": "DFC570",
     "soil": "897A53",
     "basin": "A4A08F",
-    "drain": "4E4C43"
+    "drain": "4E4C43",
+    "furniture_wood": "A3815D",
+    "furniture_wood_light": "B89972",
+    "furniture_wood_dark": "795F47"
   },
-  "source": "Alcatraz bf0c31b1 palette + Grace Cathedral cream/iron; see source reference/provenance.json"
+  "source": "Alcatraz bf0c31b1 palette + Grace Cathedral cream/iron; see source reference/provenance.json",
+  "furniture_wood_override": {
+    "modules": [
+      "bench_wood",
+      "umbrella_table"
+    ],
+    "source": "Shangguan Waner dispatch / Liubei #830 v1.1",
+    "wood": "A3815D",
+    "light": "B89972",
+    "dark": "795F47",
+    "other_materials": "unchanged"
+  }
 }

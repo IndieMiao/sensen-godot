@@ -1,0 +1,27 @@
+[
+  {
+    "file": "SGODOT-429_street_kit_v1.1_catalogue.png",
+    "bytes": 394950,
+    "sha256": "6b95396689d7b5cefaf358553332d2bfaf67fe87ff90eb71cacd4b090bb1cefe"
+  },
+  {
+    "file": "SGODOT-429_street_kit_v1.1_example_360.png",
+    "bytes": 250526,
+    "sha256": "76ad960e479f19069c890b9b6a234787d7dda67a9c8fe6567385df557b1240a7"
+  },
+  {
+    "file": "SGODOT-429_street_kit_v1.1_example_overview.png",
+    "bytes": 1235694,
+    "sha256": "81c9bf273dba972bbb9f106dc3eda1cbd4d0fa4c8286e53c232561be646186f0"
+  },
+  {
+    "file": "SGODOT-429_street_kit_v1.1_validation.json",
+    "bytes": 64763,
+    "sha256": "0ed9f92320906a8609b7a4690795c5b12ff826fad4ad788996c865f439779c2d"
+  },
+  {
+    "file": "SGODOT-429_street_kit_v1.1_wood_comparison.png",
+    "bytes": 74286,
+    "sha256": "b53b44d789088510a4424ded82add838b1abc546c699ae47ee16540e7ce3235b"
+  }
+]

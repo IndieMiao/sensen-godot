@@ -21,3 +21,5 @@
 
 可编辑blend、生成/审阅/冷导入脚本、每件provenance位于tools/art/source/street_kit_429/。
 审阅媒体哈希在media-manifest.json，validation.json保存所有检查与原样的地材版本信息。
+
+后续木色统一见 [v1.1](v1.1/README.md)：两件木色改为#A3815D/#B89972/#795F47，原v1图保留作对照。

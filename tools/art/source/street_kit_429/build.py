@@ -12,13 +12,17 @@ PAL={'stone':'CBB48F','stone_light':'D9C4A3','stone_shade':'BCA781','cream':'F0E
  'wood':'BB8B52','wood_light':'D0A56C','wood_dark':'9A7046','wood_seam':'795B43',
  'metal':'5D4C38','metal_light':'6D5746','teal':'35696A','teal_light':'608F99',
  'lamp':'F2DC9F','sage':'8AAFA2','canvas':'EFE7D4','leaf':'86A84F','leaf_light':'9AB55D',
- 'leaf_dark':'759448','flower':'DFC570','soil':'897A53','basin':'A4A08F','drain':'4E4C43'}
+ 'leaf_dark':'759448','flower':'DFC570','soil':'897A53','basin':'A4A08F','drain':'4E4C43',
+ 'furniture_wood':'A3815D','furniture_wood_light':'B89972','furniture_wood_dark':'795F47'}
 p.PAL=PAL
 box=p.box;rod=p.rod;lathe=p.lathe;mesh=p.mesh
 
 def begin(name):
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
  bpy.context.preferences.filepaths.save_version=0;p.PARTS=[];p.MATS={}
+ p.PAL=dict(PAL)
+ if name in ['bench_wood','umbrella_table']:
+  for role in ['wood','wood_light','wood_dark']:p.PAL[role]=PAL['furniture_'+role]
  p.PIVOT=bpy.data.objects.new(name+' / installation pivot',None);bpy.context.scene.collection.objects.link(p.PIVOT)
  p.PIVOT['author']='黄忠';p.PIVOT['module']=name
 
@@ -228,11 +232,11 @@ def main():
  if only:rows=json.loads((KIT/'kit_manifest.json').read_text())['assets']
  for name,builder in BUILDERS:
   if not only or only==name:rows[name]=export(name,builder)
- m={'task':'SGODOT-429','revision':'v1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','grid_m':2,'units':'metres; Y up; +Z front','palette_srgb':PAL,'assets':rows,'unique_triangles':sum(x['triangles'] for x in rows.values()),'unique_surfaces':len(rows),'scope':'Reusable furniture only; example is review-only, no game layout or location'}
+ m={'task':'SGODOT-429','revision':'v1.1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','grid_m':2,'units':'metres; Y up; +Z front','palette_srgb':PAL,'assets':rows,'unique_triangles':sum(x['triangles'] for x in rows.values()),'unique_surfaces':len(rows),'scope':'Reusable furniture only; example is review-only, no game layout or location'}
  (KIT/'kit_manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
- (KIT/'palette.json').write_text(json.dumps({'colors_srgb':PAL,'source':'Alcatraz bf0c31b1 palette + Grace Cathedral cream/iron; see source reference/provenance.json'},indent=2)+'\n')
+ (KIT/'palette.json').write_text(json.dumps({'colors_srgb':PAL,'source':'Alcatraz bf0c31b1 palette + Grace Cathedral cream/iron; see source reference/provenance.json','furniture_wood_override':{'modules':['bench_wood','umbrella_table'],'source':'Shangguan Waner dispatch / Liubei #830 v1.1','wood':'A3815D','light':'B89972','dark':'795F47','other_materials':'unchanged'}},indent=2)+'\n')
  for name,row in rows.items():
   folder=SRC/'modules'/name;folder.mkdir(parents=True,exist_ok=True)
-  (folder/'reuse_provenance.json').write_text(json.dumps({'author':m['author'],'virtual_user_id':m['virtual_user_id'],'module':name,'geometry':'New modular geometry; no old GLB edited','palette':'Alcatraz bf0c31b1 + Grace Cathedral warm iron/cream','source':row['source'],'generator':'tools/art/source/street_kit_429/build.py'},ensure_ascii=False,indent=2)+'\n')
+  (folder/'reuse_provenance.json').write_text(json.dumps({'author':m['author'],'virtual_user_id':m['virtual_user_id'],'module':name,'geometry':'New modular geometry; no old GLB edited','palette':'#830 v1.1 wood A3815D/B89972/795F47; Alcatraz/Grace iron and other colours unchanged' if name in ['bench_wood','umbrella_table'] else 'Alcatraz bf0c31b1 + Grace Cathedral warm iron/cream','source':row['source'],'generator':'tools/art/source/street_kit_429/build.py'},ensure_ascii=False,indent=2)+'\n')
 
 if __name__=='__main__':main()
