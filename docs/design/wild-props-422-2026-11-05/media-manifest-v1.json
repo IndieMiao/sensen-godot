@@ -1,0 +1,35 @@
+[
+  {
+    "name": "SGODOT-422_WILD_v1_all_props_resources.png",
+    "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1_all_props_resources.png",
+    "sha256": "65227720e72d3b089039a3eb6cc814da1fdcf71fb5f5c5d9cc74cee22fa93768",
+    "bytes": 1846384,
+    "mime": "image/png",
+    "size": [
+      1500,
+      1394
+    ]
+  },
+  {
+    "name": "SGODOT-422_WILD_v1_gourd_default_43.png",
+    "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1_gourd_default_43.png",
+    "sha256": "c49a31aa053c0a91ddf3e2e1b5c45dd2f5d3580554250cf620e9c925f04158d2",
+    "bytes": 329387,
+    "mime": "image/png",
+    "size": [
+      360,
+      902
+    ]
+  },
+  {
+    "name": "SGODOT-422_WILD_v1_whole_pond_density.png",
+    "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1_whole_pond_density.png",
+    "sha256": "08cca8c08f51cc1d619c3e8d990692f90c5db24dc629bcec3b9e2f8b30701dac",
+    "bytes": 1634712,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1290
+    ]
+  }
+]

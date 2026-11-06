@@ -1,0 +1,35 @@
+[
+  {
+    "name": "SGODOT-422_WILD_v1.1_tree_comparison.png",
+    "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1.1_tree_comparison.png",
+    "sha256": "7f976fe6a155dbb3653dd77a1d628a2119e9136dee33d0f40dd60daf471967e2",
+    "bytes": 1150792,
+    "mime": "image/png",
+    "size": [
+      1500,
+      1048
+    ]
+  },
+  {
+    "name": "SGODOT-422_WILD_v1.1_gourd_default_43.png",
+    "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1.1_gourd_default_43.png",
+    "sha256": "675e20f5d69be266be34d0fa16c7a8bb816a0cf9004e5a87dfd91810ba7c0de9",
+    "bytes": 332076,
+    "mime": "image/png",
+    "size": [
+      360,
+      924
+    ]
+  },
+  {
+    "name": "SGODOT-422_WILD_v1.1_whole_pond_trees.png",
+    "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1.1_whole_pond_trees.png",
+    "sha256": "2600ac16b213f41969575074deb378e44112f8794da0eec2d418083737e3c144",
+    "bytes": 1623084,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1290
+    ]
+  }
+]

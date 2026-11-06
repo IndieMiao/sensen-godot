@@ -1,0 +1,3793 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "assets": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "wild_flower_white: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: shorter/smaller than 0.65m flax resource",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: shorter/smaller than 0.65m flax resource",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: shorter/smaller than 0.65m flax resource",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: stones <=0.15m high",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: stones <=0.15m high",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: one mesh, one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: mobile mesh name",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: matte untextured/static asset",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: matte roughness .9 / metallic 0",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: opaque vertex-painted geometry only",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: actual triangle count <=300",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: winding/normals consistent",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: identity node transforms",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: finite opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: brown only on upper seed heads, no soil base",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: actual import UID, texture_map_mode/light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: export SHA matches source manifest",
+        "passed": true
+      },
+      {
+        "check": "12 distinct Godot-generated UIDs",
+        "passed": true
+      },
+      {
+        "check": "all previous manifest values preserved",
+        "passed": true
+      },
+      {
+        "check": "manifest only appends 12 entries in order",
+        "passed": true
+      },
+      {
+        "check": "source metadata and runtime manifest agree",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "wild_flower_white": {
+        "triangles": 264,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.22731776535511017,
+            -7.450580596923828e-09,
+            -0.19536703824996948
+          ],
+          [
+            0.22731779515743256,
+            0.33202630281448364,
+            0.1953670084476471
+          ]
+        ],
+        "uid": "uid://dg5oim2bait5h",
+        "sha256": "7b8cfea5871956316b4f5d85d27e14a5392762cea7bcd2a0f5e2673a93e1c46d"
+      },
+      "wild_flower_yellow": {
+        "triangles": 246,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2218230664730072,
+            -7.450580596923828e-09,
+            -0.19417613744735718
+          ],
+          [
+            0.22182311117649078,
+            0.33202630281448364,
+            0.1941761076450348
+          ]
+        ],
+        "uid": "uid://dt4742808h8qh",
+        "sha256": "1370ada54c43f4953de701b1f8013627f1259c5782e0a52e97a79e2c9033128f"
+      },
+      "wild_flower_lilac": {
+        "triangles": 228,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.22451648116111755,
+            -7.450580596923828e-09,
+            -0.18900325894355774
+          ],
+          [
+            0.22451651096343994,
+            0.33202627301216125,
+            0.18900325894355774
+          ]
+        ],
+        "uid": "uid://cwwe86iv2clju",
+        "sha256": "e9467672e8db3b44736dc939d6336e9ca176fb648c2979bc6be17896bd0fdd19"
+      },
+      "wild_clover": {
+        "triangles": 240,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.316501259803772,
+            0.0,
+            -0.2416313737630844
+          ],
+          [
+            0.316501259803772,
+            0.04399999603629112,
+            0.2416313737630844
+          ]
+        ],
+        "uid": "uid://c4s5smkp31nv1",
+        "sha256": "fd2f73b23a1dace876d93b960f0889e9ecc4dece49ff7bf746ec5f2afc6405b6"
+      },
+      "wild_pebbles_a": {
+        "triangles": 80,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2931376099586487,
+            0.0,
+            -0.19646871089935303
+          ],
+          [
+            0.29313763976097107,
+            0.09000000357627869,
+            0.19646871089935303
+          ]
+        ],
+        "uid": "uid://cd4g0c6q4p0ua",
+        "sha256": "a9a06856365428a773f14d7b5338ff76292badbe8a98911d87e1997060b6b98c"
+      },
+      "wild_pebbles_b": {
+        "triangles": 60,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.3103736937046051,
+            0.0,
+            -0.19422830641269684
+          ],
+          [
+            0.3103737235069275,
+            0.1080000102519989,
+            0.19422829151153564
+          ]
+        ],
+        "uid": "uid://dtiucesxeauai",
+        "sha256": "5540adfa48f5128c1b01f2ea05c101e6d2fd0cd5cc8025f6cf2f4fed017077fe"
+      },
+      "wild_mushrooms": {
+        "triangles": 228,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.20000000298023224,
+            0.0,
+            -0.16249999403953552
+          ],
+          [
+            0.19999998807907104,
+            0.27000001072883606,
+            0.16249999403953552
+          ]
+        ],
+        "uid": "uid://tcu77vod6334",
+        "sha256": "a8005c18783b478b3597ce47689ebed3ffd0caa84f27eb94d5ef181f1b66a2a5"
+      },
+      "wild_log_moss": {
+        "triangles": 157,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.48100000619888306,
+            0.0,
+            -0.13500000536441803
+          ],
+          [
+            0.48100000619888306,
+            0.2813926339149475,
+            0.13500000536441803
+          ]
+        ],
+        "uid": "uid://bo2rs3v0kj0c6",
+        "sha256": "3724ae49e92650d9772c5bbe2a40797b3659684b2efe7a80eeb17bfa394cb415"
+      },
+      "wild_fern": {
+        "triangles": 216,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.24636727571487427,
+            1.4901161193847656e-08,
+            -0.24734658002853394
+          ],
+          [
+            0.24636727571487427,
+            0.4231257438659668,
+            0.2473466396331787
+          ]
+        ],
+        "uid": "uid://blyibuwvxvllg",
+        "sha256": "37bb0a56350167fe3e3606d0eafb4881617b9f85008bab3ed097813d3634b11f"
+      },
+      "wild_bush_dark": {
+        "triangles": 240,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.34021157026290894,
+            -1.4901161193847656e-08,
+            -0.26019996404647827
+          ],
+          [
+            0.34021154046058655,
+            0.4415000081062317,
+            0.26020002365112305
+          ]
+        ],
+        "uid": "uid://c5liky1xa07sd",
+        "sha256": "74db7d33cd75b4c25fca9fe0de3e6638a998bd0764a8f81c5a9c98aa67254a84"
+      },
+      "wild_bush_olive": {
+        "triangles": 240,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.34021157026290894,
+            -1.4901161193847656e-08,
+            -0.26019996404647827
+          ],
+          [
+            0.34021154046058655,
+            0.4415000081062317,
+            0.26020002365112305
+          ]
+        ],
+        "uid": "uid://cgec34fv3xqej",
+        "sha256": "6944294117681bb655609d815abcee9858a486f7e4db945538aa687604938bbc"
+      },
+      "wild_cattail_water": {
+        "triangles": 96,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.19279849529266357,
+            0.0,
+            -0.11570952087640762
+          ],
+          [
+            0.19279849529266357,
+            0.7205798029899597,
+            0.11570953577756882
+          ]
+        ],
+        "uid": "uid://disgr7jkclnf4",
+        "sha256": "d91d4b10943fde59e79605de019e329c2bc8a9e05d16e6941d1da02c2a548c64"
+      }
+    },
+    "total_unique_triangles": 2295,
+    "base_commit": "93befb18cd5af7e30a966d2c112279287b71b3e2"
+  },
+  "godot": {
+    "assets": {
+      "wild_bush_dark": {
+        "sha256": "74db7d33cd75b4c25fca9fe0de3e6638a998bd0764a8f81c5a9c98aa67254a84",
+        "surfaces": 1,
+        "triangles": 240,
+        "uid": "uid://c5liky1xa07sd"
+      },
+      "wild_bush_olive": {
+        "sha256": "6944294117681bb655609d815abcee9858a486f7e4db945538aa687604938bbc",
+        "surfaces": 1,
+        "triangles": 240,
+        "uid": "uid://cgec34fv3xqej"
+      },
+      "wild_cattail_water": {
+        "sha256": "d91d4b10943fde59e79605de019e329c2bc8a9e05d16e6941d1da02c2a548c64",
+        "surfaces": 1,
+        "triangles": 96,
+        "uid": "uid://disgr7jkclnf4"
+      },
+      "wild_clover": {
+        "sha256": "fd2f73b23a1dace876d93b960f0889e9ecc4dece49ff7bf746ec5f2afc6405b6",
+        "surfaces": 1,
+        "triangles": 240,
+        "uid": "uid://c4s5smkp31nv1"
+      },
+      "wild_fern": {
+        "sha256": "37bb0a56350167fe3e3606d0eafb4881617b9f85008bab3ed097813d3634b11f",
+        "surfaces": 1,
+        "triangles": 216,
+        "uid": "uid://blyibuwvxvllg"
+      },
+      "wild_flower_lilac": {
+        "sha256": "e9467672e8db3b44736dc939d6336e9ca176fb648c2979bc6be17896bd0fdd19",
+        "surfaces": 1,
+        "triangles": 228,
+        "uid": "uid://cwwe86iv2clju"
+      },
+      "wild_flower_white": {
+        "sha256": "7b8cfea5871956316b4f5d85d27e14a5392762cea7bcd2a0f5e2673a93e1c46d",
+        "surfaces": 1,
+        "triangles": 264,
+        "uid": "uid://dg5oim2bait5h"
+      },
+      "wild_flower_yellow": {
+        "sha256": "1370ada54c43f4953de701b1f8013627f1259c5782e0a52e97a79e2c9033128f",
+        "surfaces": 1,
+        "triangles": 246,
+        "uid": "uid://dt4742808h8qh"
+      },
+      "wild_log_moss": {
+        "sha256": "3724ae49e92650d9772c5bbe2a40797b3659684b2efe7a80eeb17bfa394cb415",
+        "surfaces": 1,
+        "triangles": 157,
+        "uid": "uid://bo2rs3v0kj0c6"
+      },
+      "wild_mushrooms": {
+        "sha256": "a8005c18783b478b3597ce47689ebed3ffd0caa84f27eb94d5ef181f1b66a2a5",
+        "surfaces": 1,
+        "triangles": 228,
+        "uid": "uid://tcu77vod6334"
+      },
+      "wild_pebbles_a": {
+        "sha256": "a9a06856365428a773f14d7b5338ff76292badbe8a98911d87e1997060b6b98c",
+        "surfaces": 1,
+        "triangles": 80,
+        "uid": "uid://cd4g0c6q4p0ua"
+      },
+      "wild_pebbles_b": {
+        "sha256": "5540adfa48f5128c1b01f2ea05c101e6d2fd0cd5cc8025f6cf2f4fed017077fe",
+        "surfaces": 1,
+        "triangles": 60,
+        "uid": "uid://dtiucesxeauai"
+      }
+    },
+    "captures": [
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+        "name": "opening_before",
+        "pitch": -42.9999961853027,
+        "player": "(6.125, 0.0, -1.625)",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+        "name": "gourd_default_43",
+        "pitch": -42.9999961853027,
+        "player": "(6.125, 0.0, -1.625)",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 27.27993, 21.25415)]",
+        "name": "whole_pond_density",
+        "pitch": -42.9999961853027,
+        "player": "(6.125, 0.0, -1.625)",
+        "size": [
+          1200,
+          1200
+        ],
+        "width_m": 20.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 27.77993, 39.75415)]",
+        "name": "all_props_resources",
+        "pitch": -42.9999961853027,
+        "player": "(6.125, 0.0, -1.625)",
+        "size": [
+          1500,
+          1260
+        ],
+        "width_m": 12.1999998092651
+      }
+    ],
+    "checks": [
+      {
+        "check": "native player assembled",
+        "passed": true
+      },
+      {
+        "check": "gourd native opening camera",
+        "passed": true
+      },
+      {
+        "check": "native spawn unchanged",
+        "passed": true
+      },
+      {
+        "check": "native 43 degree pitch",
+        "passed": true
+      },
+      {
+        "check": "capture opening_before",
+        "passed": true
+      },
+      {
+        "check": "left foreground log/mushroom/fern group fully inside screen above y720",
+        "passed": true
+      },
+      {
+        "check": "2-3 corner groups",
+        "passed": true
+      },
+      {
+        "check": "all decoration footprints clear active resource slots by >=1.5m",
+        "passed": true
+      },
+      {
+        "check": "4-7 sparse water-only cattail clumps",
+        "passed": true
+      },
+      {
+        "check": "capture gourd_default_43",
+        "passed": true
+      },
+      {
+        "check": "capture whole_pond_density",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_white: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_yellow: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_flower_lilac: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_clover: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_a: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_pebbles_b: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_mushrooms: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_log_moss: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_fern: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_dark: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_bush_olive: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: one surface",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: <=300 triangles",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: imported triangle count matches current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: imported bounds match current GLB",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: comparison runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: matte linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: Godot UID / texture_map_mode 1",
+        "passed": true
+      },
+      {
+        "check": "wild_cattail_water: imported cache source hash is current",
+        "passed": true
+      },
+      {
+        "check": "capture all_props_resources",
+        "passed": true
+      },
+      {
+        "check": "Mobile renderer",
+        "passed": true
+      }
+    ],
+    "gallery": [
+      {
+        "asset": "spot_grove",
+        "label_at": "(307.3771, 456.944)",
+        "resource": true,
+        "screen_rect": [
+          185.83837890625,
+          162.422058105469,
+          435.999359130859,
+          461.420104980469
+        ]
+      },
+      {
+        "asset": "spot_rock_pile",
+        "label_at": "(602.459, 456.944)",
+        "resource": true,
+        "screen_rect": [
+          536.471557617188,
+          323.76220703125,
+          671.974548339844,
+          430.237274169922
+        ]
+      },
+      {
+        "asset": "flax_patch",
+        "label_at": "(897.541, 456.944)",
+        "resource": true,
+        "screen_rect": [
+          817.622924804688,
+          300.105041503906,
+          977.458984375,
+          449.546600341797
+        ]
+      },
+      {
+        "asset": "reed_bank",
+        "label_at": "(1192.623, 456.944)",
+        "resource": true,
+        "screen_rect": [
+          1118.85241699219,
+          286.859008789062,
+          1266.3935546875,
+          443.252136230469
+        ]
+      },
+      {
+        "asset": "wild_flower_white",
+        "label_at": "(196.7213, 743.7189)",
+        "resource": false,
+        "screen_rect": [
+          168.772415161133,
+          649.926574707031,
+          224.670227050781,
+          699.152587890625
+        ]
+      },
+      {
+        "asset": "wild_flower_yellow",
+        "label_at": "(418.0328, 743.7189)",
+        "resource": false,
+        "screen_rect": [
+          390.759460449219,
+          650.532043457031,
+          445.306121826172,
+          699.052917480469
+        ]
+      },
+      {
+        "asset": "wild_flower_lilac",
+        "label_at": "(639.3442, 743.7189)",
+        "resource": false,
+        "screen_rect": [
+          611.739807128906,
+          649.492492675781,
+          666.94873046875,
+          698.618835449219
+        ]
+      },
+      {
+        "asset": "wild_clover",
+        "label_at": "(860.6558, 743.7189)",
+        "resource": false,
+        "screen_rect": [
+          821.74169921875,
+          668.591674804688,
+          899.56982421875,
+          711.632019042969
+        ]
+      },
+      {
+        "asset": "wild_pebbles_a",
+        "label_at": "(1081.967, 743.7189)",
+        "resource": false,
+        "screen_rect": [
+          1045.92565917969,
+          669.648620605469,
+          1118.00866699219,
+          707.491271972656
+        ]
+      },
+      {
+        "asset": "wild_pebbles_b",
+        "label_at": "(1303.279, 743.7189)",
+        "resource": false,
+        "screen_rect": [
+          1265.11804199219,
+          668.714782714844,
+          1341.43933105469,
+          706.668640136719
+        ]
+      },
+      {
+        "asset": "wild_mushrooms",
+        "label_at": "(196.7213, 953.3495)",
+        "resource": false,
+        "screen_rect": [
+          172.131164550781,
+          871.935119628906,
+          221.311477661133,
+          911.045776367188
+        ]
+      },
+      {
+        "asset": "wild_log_moss",
+        "label_at": "(418.0328, 953.3495)",
+        "resource": false,
+        "screen_rect": [
+          357.671722412109,
+          856.928161621094,
+          478.392242431641,
+          922.704467773438
+        ]
+      },
+      {
+        "asset": "wild_fern",
+        "label_at": "(639.3442, 953.3495)",
+        "resource": false,
+        "screen_rect": [
+          609.053161621094,
+          854.6005859375,
+          669.635314941406,
+          908.090698242188
+        ]
+      },
+      {
+        "asset": "wild_bush_dark",
+        "label_at": "(860.6558, 953.3495)",
+        "resource": false,
+        "screen_rect": [
+          818.826477050781,
+          850.622375488281,
+          902.484985351562,
+          914.967041015625
+        ]
+      },
+      {
+        "asset": "wild_bush_olive",
+        "label_at": "(1081.967, 953.3495)",
+        "resource": false,
+        "screen_rect": [
+          1040.13781738281,
+          850.622375488281,
+          1123.79650878906,
+          914.967041015625
+        ]
+      },
+      {
+        "asset": "wild_cattail_water",
+        "label_at": "(1303.279, 953.3495)",
+        "resource": false,
+        "screen_rect": [
+          1279.57397460938,
+          837.935424804688,
+          1326.9833984375,
+          903.768920898438
+        ]
+      }
+    ],
+    "intercepted_requests": [
+      {
+        "method": 0,
+        "path": "/p0/state?space=pond&place=pond_san_francisco_01",
+        "type": ""
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "scatter": {
+      "corner_groups": 3,
+      "counts": {
+        "wild_bush_dark": 5,
+        "wild_bush_olive": 5,
+        "wild_cattail_water": 7,
+        "wild_clover": 24,
+        "wild_fern": 6,
+        "wild_flower_lilac": 12,
+        "wild_flower_white": 12,
+        "wild_flower_yellow": 12,
+        "wild_log_moss": 3,
+        "wild_mushrooms": 3,
+        "wild_pebbles_a": 7,
+        "wild_pebbles_b": 7
+      },
+      "foreground_group_placed": true,
+      "placements": [
+        {
+          "asset": "wild_log_moss",
+          "group": 1,
+          "position": [
+            3.88500022888184,
+            0.0,
+            3.02799415588379
+          ],
+          "radius": 0.474606545269489,
+          "scale": 0.95,
+          "screen_rect": [
+            34.5835037231445,
+            630.116271972656,
+            50.8330230712891,
+            29.2938842773438
+          ],
+          "slot_gap_m": 2.42644068449736,
+          "yaw_degrees": 17.1887338539247
+        },
+        {
+          "asset": "wild_mushrooms",
+          "group": 1,
+          "position": [
+            4.2350001335144,
+            0.0,
+            3.34799408912659
+          ],
+          "radius": 0.231924685835838,
+          "scale": 0.9,
+          "screen_rect": [
+            69.1071548461914,
+            646.827392578125,
+            19.2856979370117,
+            20.2073364257812
+          ],
+          "slot_gap_m": 2.96610435545445,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_fern",
+          "group": 1,
+          "position": [
+            3.52500009536743,
+            0.0,
+            2.7979941368103
+          ],
+          "radius": 0.331653742492199,
+          "scale": 0.95,
+          "screen_rect": [
+            25.0159111022949,
+            615.119079589844,
+            31.3967590332031,
+            37.2064208984375
+          ],
+          "slot_gap_m": 2.41379651576281,
+          "yaw_degrees": -17.1887338539247
+        },
+        {
+          "asset": "wild_fern",
+          "group": 1,
+          "position": [
+            4.30500030517578,
+            0.0,
+            2.85799407958984
+          ],
+          "radius": 0.296742822229862,
+          "scale": 0.85,
+          "screen_rect": [
+            67.7810211181641,
+            619.643188476562,
+            29.43798828125,
+            34.2003173828125
+          ],
+          "slot_gap_m": 2.41180953830481,
+          "yaw_degrees": 22.9183118052329
+        },
+        {
+          "asset": "wild_log_moss",
+          "group": 2,
+          "position": [
+            1.39999997615814,
+            0.0,
+            -15.6000003814697
+          ],
+          "radius": 0.474606545269489,
+          "scale": 0.95,
+          "screen_rect": [
+            -98.54150390625,
+            -50.4691619873047,
+            50.8329887390137,
+            29.2939205169678
+          ],
+          "slot_gap_m": 2.75029656141996,
+          "yaw_degrees": 17.1887338539247
+        },
+        {
+          "asset": "wild_mushrooms",
+          "group": 2,
+          "position": [
+            1.75,
+            0.0,
+            -15.2800006866455
+          ],
+          "radius": 0.231924685835838,
+          "scale": 0.9,
+          "screen_rect": [
+            -64.0178527832031,
+            -33.757926940918,
+            19.2857093811035,
+            20.2071685791016
+          ],
+          "slot_gap_m": 2.70761593878269,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_fern",
+          "group": 2,
+          "position": [
+            1.03999996185303,
+            0.0,
+            -15.8299999237061
+          ],
+          "radius": 0.331653742492199,
+          "scale": 0.95,
+          "screen_rect": [
+            -108.109092712402,
+            -65.4663543701172,
+            31.3967590332031,
+            37.2065048217773
+          ],
+          "slot_gap_m": 3.23240289241076,
+          "yaw_degrees": -17.1887338539247
+        },
+        {
+          "asset": "wild_fern",
+          "group": 2,
+          "position": [
+            1.8199999332428,
+            0.0,
+            -15.7700004577637
+          ],
+          "radius": 0.296742822229862,
+          "scale": 0.85,
+          "screen_rect": [
+            -65.3439788818359,
+            -60.942268371582,
+            29.4379539489746,
+            34.2002868652344
+          ],
+          "slot_gap_m": 2.49275526851416,
+          "yaw_degrees": 22.9183118052329
+        },
+        {
+          "asset": "wild_log_moss",
+          "group": 3,
+          "position": [
+            10.6999998092651,
+            0.0,
+            -16.7999992370605
+          ],
+          "radius": 0.474606545269489,
+          "scale": 0.95,
+          "screen_rect": [
+            399.672760009766,
+            -94.3118133544922,
+            50.8330078125,
+            29.2939224243164
+          ],
+          "slot_gap_m": 5.67762848585844,
+          "yaw_degrees": 17.1887338539247
+        },
+        {
+          "asset": "wild_mushrooms",
+          "group": 3,
+          "position": [
+            11.0500001907349,
+            0.0,
+            -16.4799995422363
+          ],
+          "radius": 0.231924685835838,
+          "scale": 0.9,
+          "screen_rect": [
+            434.196411132812,
+            -77.6007690429688,
+            19.2857666015625,
+            20.2073135375977
+          ],
+          "slot_gap_m": 6.23591169416904,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_fern",
+          "group": 3,
+          "position": [
+            10.3400001525879,
+            0.0,
+            -17.0299987792969
+          ],
+          "radius": 0.331653742492199,
+          "scale": 0.95,
+          "screen_rect": [
+            390.105194091797,
+            -109.308959960938,
+            31.3967590332031,
+            37.2064590454102
+          ],
+          "slot_gap_m": 5.50002703219652,
+          "yaw_degrees": -17.1887338539247
+        },
+        {
+          "asset": "wild_fern",
+          "group": 3,
+          "position": [
+            11.1199998855591,
+            0.0,
+            -16.9699993133545
+          ],
+          "radius": 0.296742822229862,
+          "scale": 0.85,
+          "screen_rect": [
+            432.870269775391,
+            -104.784866333008,
+            29.43798828125,
+            34.2001419067383
+          ],
+          "slot_gap_m": 6.2950168594718,
+          "yaw_degrees": 22.9183118052329
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            11.7523279190063,
+            0.00400000018998981,
+            -12.5906734466553
+          ],
+          "radius": 0.301082790415119,
+          "scale": 1.00449287891388,
+          "screen_rect": [
+            470.011535644531,
+            57.2521209716797,
+            22.9049377441406,
+            30.8395843505859
+          ],
+          "slot_gap_m": 7.62225657649772,
+          "yaw_degrees": 85.4394715352823
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            0.963953256607056,
+            0.00400000018998981,
+            -5.88150978088379
+          ],
+          "radius": 0.297180393317653,
+          "scale": 0.991473436355591,
+          "screen_rect": [
+            -111.998748779297,
+            301.337219238281,
+            31.0282211303711,
+            33.0857849121094
+          ],
+          "slot_gap_m": 3.06772067250876,
+          "yaw_degrees": 152.294517433337
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            12.4414329528809,
+            0.00400000018998981,
+            -1.71760559082031
+          ],
+          "radius": 0.30126334082059,
+          "scale": 1.00509524345398,
+          "screen_rect": [
+            502.663421630859,
+            453.163726806641,
+            31.4338073730469,
+            33.5171813964844
+          ],
+          "slot_gap_m": 4.55057620156833,
+          "yaw_degrees": 27.5435523281349
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            3.07711172103882,
+            0.00400000018998981,
+            4.52699279785156
+          ],
+          "radius": 0.308280509330228,
+          "scale": 1.02850639820099,
+          "screen_rect": [
+            0.540883541107178,
+            680.661254882812,
+            32.3587837219238,
+            34.5181884765625
+          ],
+          "slot_gap_m": 4.22313590683799,
+          "yaw_degrees": 150.893700276081
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            0.470083594322205,
+            0.00400000018998981,
+            -14.7373371124268
+          ],
+          "radius": 0.269132657837901,
+          "scale": 0.89789867401123,
+          "screen_rect": [
+            -136.824508666992,
+            -20.6639766693115,
+            27.7650985717773,
+            31.1989555358887
+          ],
+          "slot_gap_m": 4.04949279229638,
+          "yaw_degrees": 123.661462847673
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            6.81514167785645,
+            0.00400000018998981,
+            -17.0399971008301
+          ],
+          "radius": 0.318808566765405,
+          "scale": 1.06363081932068,
+          "screen_rect": [
+            205.284057617188,
+            -106.346984863281,
+            23.3756408691406,
+            32.1508331298828
+          ],
+          "slot_gap_m": 2.12832187490024,
+          "yaw_degrees": 87.4936577583528
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            0.00614261627197266,
+            0.00400000018998981,
+            1.2048168182373
+          ],
+          "radius": 0.312784693470824,
+          "scale": 1.04353356361389,
+          "screen_rect": [
+            -163.344635009766,
+            558.533386230469,
+            31.097412109375,
+            35.8229370117188
+          ],
+          "slot_gap_m": 4.06019637800134,
+          "yaw_degrees": 62.5625657028358
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            2.45284032821655,
+            0.00400000018998981,
+            -0.8406982421875
+          ],
+          "radius": 0.299256973099871,
+          "scale": 0.998401463031769,
+          "screen_rect": [
+            -29.2338905334473,
+            486.047088623047,
+            25.0221138000488,
+            31.9143371582031
+          ],
+          "slot_gap_m": 1.7528799249409,
+          "yaw_degrees": 259.380067391873
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            10.413631439209,
+            0.00400000018998981,
+            -6.16955280303955
+          ],
+          "radius": 0.291983968274545,
+          "scale": 0.974136769771576,
+          "screen_rect": [
+            394.85205078125,
+            291.578582763672,
+            29.7921142578125,
+            31.7809448242188
+          ],
+          "slot_gap_m": 5.24562894676452,
+          "yaw_degrees": 157.088558909877
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            -0.611357092857361,
+            0.00400000018998981,
+            0.864099502563477
+          ],
+          "radius": 0.28208749781089,
+          "scale": 0.941119492053986,
+          "screen_rect": [
+            -195.612991333008,
+            548.948120117188,
+            29.4734497070312,
+            31.4290771484375
+          ],
+          "slot_gap_m": 4.63143760671182,
+          "yaw_degrees": 207.884320597425
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            11.0233926773071,
+            0.00400000018998981,
+            -17.4339008331299
+          ],
+          "radius": 0.307694372609202,
+          "scale": 1.0265508890152,
+          "screen_rect": [
+            428.7685546875,
+            -119.351150512695,
+            27.2906799316406,
+            29.8585433959961
+          ],
+          "slot_gap_m": 6.27379852823919,
+          "yaw_degrees": 6.55177998727245
+        },
+        {
+          "asset": "wild_flower_white",
+          "group": 0,
+          "position": [
+            0.533770561218262,
+            0.00400000018998981,
+            -1.84279441833496
+          ],
+          "radius": 0.261683479694907,
+          "scale": 0.873046219348907,
+          "screen_rect": [
+            -132.560394287109,
+            451.213012695312,
+            26.0604934692383,
+            29.9887390136719
+          ],
+          "slot_gap_m": 3.95513866767448,
+          "yaw_degrees": 62.3221976855647
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            7.51580715179443,
+            0.00400000018998981,
+            -16.2057285308838
+          ],
+          "radius": 0.292817358378702,
+          "scale": 0.993259012699127,
+          "screen_rect": [
+            241.449310302734,
+            -75.405647277832,
+            26.1164245605469,
+            32.1445960998535
+          ],
+          "slot_gap_m": 2.63023852884359,
+          "yaw_degrees": 254.847280651085
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            11.5072202682495,
+            0.00400000018998981,
+            -9.298020362854
+          ],
+          "radius": 0.270127639513113,
+          "scale": 0.916293740272522,
+          "screen_rect": [
+            453.943420410156,
+            177.71907043457,
+            28.7796325683594,
+            31.6513824462891
+          ],
+          "slot_gap_m": 8.54151786829939,
+          "yaw_degrees": 132.725465385738
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            12.503399848938,
+            0.00400000018998981,
+            -16.0089378356934
+          ],
+          "radius": 0.260845094418698,
+          "scale": 0.884806632995605,
+          "screen_rect": [
+            511.347686767578,
+            -65.0382080078125,
+            20.7046203613281,
+            27.2005615234375
+          ],
+          "slot_gap_m": 7.64256009509546,
+          "yaw_degrees": 96.6048705639614
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            9.75483894348145,
+            0.00400000018998981,
+            1.03543663024902
+          ],
+          "radius": 0.276954940131436,
+          "scale": 0.939452469348907,
+          "screen_rect": [
+            360.037414550781,
+            554.760375976562,
+            28.8364562988281,
+            32.3461303710938
+          ],
+          "slot_gap_m": 2.97491879148172,
+          "yaw_degrees": 305.158973171776
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            12.7949323654175,
+            0.00400000018998981,
+            -4.2895565032959
+          ],
+          "radius": 0.315634823688008,
+          "scale": 1.07065761089325,
+          "screen_rect": [
+            521.905944824219,
+            357.518005371094,
+            30.82373046875,
+            36.0201721191406
+          ],
+          "slot_gap_m": 5.62884654914524,
+          "yaw_degrees": 114.510095359934
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            11.1937131881714,
+            0.00400000018998981,
+            -5.752610206604
+          ],
+          "radius": 0.316745216159994,
+          "scale": 1.0744241476059,
+          "screen_rect": [
+            435.966156005859,
+            305.143188476562,
+            31.1440734863281,
+            33.8135070800781
+          ],
+          "slot_gap_m": 5.32772023031217,
+          "yaw_degrees": 162.209766447661
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            0.91267728805542,
+            0.00400000018998981,
+            -10.4901885986328
+          ],
+          "radius": 0.270062096977341,
+          "scale": 0.91607141494751,
+          "screen_rect": [
+            -109.925895690918,
+            135.922485351562,
+            21.3886413574219,
+            28.1342620849609
+          ],
+          "slot_gap_m": 1.65120004806508,
+          "yaw_degrees": 83.5352284550611
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            4.32905864715576,
+            0.00400000018998981,
+            3.84431076049805
+          ],
+          "radius": 0.271059696543933,
+          "scale": 0.919455349445343,
+          "screen_rect": [
+            70.7190704345703,
+            658.30078125,
+            26.1395797729492,
+            30.7734375
+          ],
+          "slot_gap_m": 3.42409687770533,
+          "yaw_degrees": 112.967906947237
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            -0.729279458522797,
+            0.00400000018998981,
+            -13.7526416778564
+          ],
+          "radius": 0.263188916583978,
+          "scale": 0.892757058143616,
+          "screen_rect": [
+            -200.498519897461,
+            16.5655136108398,
+            26.6099395751953,
+            28.7598114013672
+          ],
+          "slot_gap_m": 4.50880042896656,
+          "yaw_degrees": 21.8722737979968
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            10.5066251754761,
+            0.00400000018998981,
+            -12.9230442047119
+          ],
+          "radius": 0.264851746531068,
+          "scale": 0.898397505283356,
+          "screen_rect": [
+            401.002471923828,
+            46.4190483093262,
+            27.4548950195312,
+            29.5991401672363
+          ],
+          "slot_gap_m": 6.39516955855316,
+          "yaw_degrees": 333.448114072352
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            10.1253156661987,
+            0.00400000018998981,
+            0.106853485107422
+          ],
+          "radius": 0.31870952419991,
+          "scale": 1.08108723163605,
+          "screen_rect": [
+            379.848541259766,
+            520.103271484375,
+            28.9081726074219,
+            31.965087890625
+          ],
+          "slot_gap_m": 2.62200936503654,
+          "yaw_degrees": 350.961921217558
+        },
+        {
+          "asset": "wild_flower_yellow",
+          "group": 0,
+          "position": [
+            11.9390735626221,
+            0.00400000018998981,
+            -15.0597562789917
+          ],
+          "radius": 0.298708753758341,
+          "scale": 1.01324307918549,
+          "screen_rect": [
+            478.558349609375,
+            -32.0585708618164,
+            25.8197326660156,
+            28.9282779693604
+          ],
+          "slot_gap_m": 7.10034958822164,
+          "yaw_degrees": 184.977519026981
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            12.9365787506104,
+            0.00400000018998981,
+            -17.1252632141113
+          ],
+          "radius": 0.285229011957203,
+          "scale": 0.971888422966003,
+          "screen_rect": [
+            530.339050292969,
+            -108.364105224609,
+            29.1339721679688,
+            31.1482391357422
+          ],
+          "slot_gap_m": 8.1269499812679,
+          "yaw_degrees": 22.517434683976
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            11.0278644561768,
+            0.00400000018998981,
+            -0.89130973815918
+          ],
+          "radius": 0.286228773494104,
+          "scale": 0.975295007228851,
+          "screen_rect": [
+            431.164794921875,
+            485.060363769531,
+            22.977294921875,
+            30.4901123046875
+          ],
+          "slot_gap_m": 3.17917478332963,
+          "yaw_degrees": 278.43331721373
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            3.10793256759644,
+            0.00400000018998981,
+            4.05474662780762
+          ],
+          "radius": 0.258235695358975,
+          "scale": 0.879911482334137,
+          "screen_rect": [
+            7.42707967758179,
+            669.539184570312,
+            21.8886699676514,
+            24.1878051757812
+          ],
+          "slot_gap_m": 3.81010079145743,
+          "yaw_degrees": 2.38137000011728
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            12.3686542510986,
+            0.00400000018998981,
+            -17.0410404205322
+          ],
+          "radius": 0.270252303201307,
+          "scale": 0.920856833457947,
+          "screen_rect": [
+            505.121124267578,
+            -102.945236206055,
+            18.7206726074219,
+            27.1283187866211
+          ],
+          "slot_gap_m": 7.56784431545104,
+          "yaw_degrees": 89.810772113523
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            -0.494053959846497,
+            0.00400000018998981,
+            -16.6732921600342
+          ],
+          "radius": 0.262335744483048,
+          "scale": 0.893881976604462,
+          "screen_rect": [
+            -184.731887817383,
+            -89.5292739868164,
+            20.2794036865234,
+            27.5191268920898
+          ],
+          "slot_gap_m": 4.87602046431822,
+          "yaw_degrees": 96.0868895078751
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            11.2987537384033,
+            0.00400000018998981,
+            -2.19754409790039
+          ],
+          "radius": 0.28418464397936,
+          "scale": 0.968329846858978,
+          "screen_rect": [
+            445.152313232422,
+            439.342834472656,
+            24.0261840820312,
+            26.5675659179688
+          ],
+          "slot_gap_m": 3.49957757258863,
+          "yaw_degrees": 357.808858011416
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            0.534262418746948,
+            0.00400000018998981,
+            3.65414428710938
+          ],
+          "radius": 0.289096023039622,
+          "scale": 0.98506486415863,
+          "screen_rect": [
+            -134.27375793457,
+            649.438293457031,
+            29.5399551391602,
+            33.7491455078125
+          ],
+          "slot_gap_m": 4.81832346777459,
+          "yaw_degrees": 57.5973870064517
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            1.87020111083984,
+            0.00400000018998981,
+            2.88530921936035
+          ],
+          "radius": 0.257621508399023,
+          "scale": 0.877818703651428,
+          "screen_rect": [
+            -61.1701354980469,
+            624.772399902344,
+            26.4690017700195,
+            28.29638671875
+          ],
+          "slot_gap_m": 3.36803152008914,
+          "yaw_degrees": 336.383483490813
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            13.3133792877197,
+            0.00400000018998981,
+            -5.60937690734863
+          ],
+          "radius": 0.320669231617394,
+          "scale": 1.09264731407166,
+          "screen_rect": [
+            551.442565917969,
+            312.09814453125,
+            27.2984008789062,
+            30.1327819824219
+          ],
+          "slot_gap_m": 6.77591842631107,
+          "yaw_degrees": 357.296375257611
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            -1.04084920883179,
+            0.00400000018998981,
+            -16.09645652771
+          ],
+          "radius": 0.321277908369936,
+          "scale": 1.09472131729126,
+          "screen_rect": [
+            -219.08708190918,
+            -74.2757339477539,
+            30.4046173095703,
+            36.5497589111328
+          ],
+          "slot_gap_m": 5.32039613337811,
+          "yaw_degrees": 291.948731618811
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            11.5708208084106,
+            0.00400000018998981,
+            -11.2946186065674
+          ],
+          "radius": 0.256489799260546,
+          "scale": 0.87396252155304,
+          "screen_rect": [
+            461.393402099609,
+            107.184028625488,
+            20.6940002441406,
+            27.3783493041992
+          ],
+          "slot_gap_m": 8.15379901146943,
+          "yaw_degrees": 261.238152053683
+        },
+        {
+          "asset": "wild_flower_lilac",
+          "group": 0,
+          "position": [
+            0.697023630142212,
+            0.00400000018998981,
+            0.404701232910156
+          ],
+          "radius": 0.293729600182793,
+          "scale": 1.0008533000946,
+          "screen_rect": [
+            -125.420890808105,
+            530.472229003906,
+            29.2728576660156,
+            34.0350341796875
+          ],
+          "slot_gap_m": 3.268364372977,
+          "yaw_degrees": 118.367492505023
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            12.5670442581177,
+            0.00400000018998981,
+            -15.4527835845947
+          ],
+          "radius": 0.351996335048383,
+          "scale": 0.883982181549072,
+          "screen_rect": [
+            507.954071044922,
+            -39.5806312561035,
+            34.3109436035156,
+            26.9104957580566
+          ],
+          "slot_gap_m": 7.63381871316939,
+          "yaw_degrees": 61.8861720693295
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            1.00997281074524,
+            0.00400000018998981,
+            -12.5896863937378
+          ],
+          "radius": 0.430711783551452,
+          "scale": 1.08166337013245,
+          "screen_rect": [
+            -116.240325927734,
+            63.8750801086426,
+            44.4420318603516,
+            28.8683433532715
+          ],
+          "slot_gap_m": 3.39052840313983,
+          "yaw_degrees": 338.266512003472
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            12.4791803359985,
+            0.00400000018998981,
+            -9.54408168792725
+          ],
+          "radius": 0.404865848686146,
+          "scale": 1.01675546169281,
+          "screen_rect": [
+            499.091003417969,
+            174.016784667969,
+            42.623046875,
+            31.2427825927734
+          ],
+          "slot_gap_m": 9.08894671234901,
+          "yaw_degrees": 131.931660800399
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            11.1537952423096,
+            0.00400000018998981,
+            -7.64190673828125
+          ],
+          "radius": 0.357600242512641,
+          "scale": 0.898055493831635,
+          "screen_rect": [
+            430.248870849609,
+            245.952819824219,
+            38.3017272949219,
+            26.5697937011719
+          ],
+          "slot_gap_m": 6.82507750330645,
+          "yaw_degrees": 215.889807738679
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            6.14375019073486,
+            0.00400000018998981,
+            -17.1937580108643
+          ],
+          "radius": 0.421485110390396,
+          "scale": 1.05849206447601,
+          "screen_rect": [
+            164.275466918945,
+            -104.527374267578,
+            33.4580230712891,
+            29.2877655029297
+          ],
+          "slot_gap_m": 1.52998168839195,
+          "yaw_degrees": 280.447731245264
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            12.4494152069092,
+            0.00400000018998981,
+            -2.47216892242432
+          ],
+          "radius": 0.382779981907959,
+          "scale": 0.96129035949707,
+          "screen_rect": [
+            498.835357666016,
+            434.929718017578,
+            39.9452209472656,
+            26.2661437988281
+          ],
+          "slot_gap_m": 4.58374557274902,
+          "yaw_degrees": 155.737834359994
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            7.44451332092285,
+            0.00400000018998981,
+            0.998117446899414
+          ],
+          "radius": 0.38750771736858,
+          "scale": 0.973163306713104,
+          "screen_rect": [
+            233.087142944336,
+            560.444946289062,
+            35.2021331787109,
+            28.7933349609375
+          ],
+          "slot_gap_m": 2.01564522528889,
+          "yaw_degrees": 249.379823503517
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            11.6117105484009,
+            0.00400000018998981,
+            0.505094528198242
+          ],
+          "radius": 0.407404317113844,
+          "scale": 1.02313041687012,
+          "screen_rect": [
+            452.276000976562,
+            541.168151855469,
+            43.3098449707031,
+            31.2350463867188
+          ],
+          "slot_gap_m": 4.03367768361858,
+          "yaw_degrees": 44.5220997462025
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            1.84083461761475,
+            0.00400000018998981,
+            4.5964527130127
+          ],
+          "radius": 0.368998738064116,
+          "scale": 0.926680982112885,
+          "screen_rect": [
+            -67.8967971801758,
+            694.757385253906,
+            36.77587890625,
+            23.1834716796875
+          ],
+          "slot_gap_m": 4.68817594455307,
+          "yaw_degrees": 344.17465295629
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            9.41014194488525,
+            0.00400000018998981,
+            3.01975631713867
+          ],
+          "radius": 0.430375374894513,
+          "scale": 1.0808185338974,
+          "screen_rect": [
+            333.1201171875,
+            633.159057617188,
+            45.7392578125,
+            30.9033203125
+          ],
+          "slot_gap_m": 4.3456961735674,
+          "yaw_degrees": 210.073601132089
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            1.27194023132324,
+            0.00400000018998981,
+            -17.2133636474609
+          ],
+          "radius": 0.377677056095363,
+          "scale": 0.948475182056427,
+          "screen_rect": [
+            -98.353515625,
+            -104.93140411377,
+            36.7363510131836,
+            28.8531341552734
+          ],
+          "slot_gap_m": 3.16467132876181,
+          "yaw_degrees": 117.849559260261
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            2.34993457794189,
+            0.00400000018998981,
+            -14.1590700149536
+          ],
+          "radius": 0.376014095113492,
+          "scale": 0.944298923015594,
+          "screen_rect": [
+            -42.16552734375,
+            7.68969058990479,
+            39.8597717285156,
+            26.7991065979004
+          ],
+          "slot_gap_m": 2.53118695659854,
+          "yaw_degrees": 330.993808537513
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            12.1765880584717,
+            0.00400000018998981,
+            -3.99144840240479
+          ],
+          "radius": 0.419029806625737,
+          "scale": 1.052325963974,
+          "screen_rect": [
+            481.970123291016,
+            377.520843505859,
+            44.4441833496094,
+            29.9112854003906
+          ],
+          "slot_gap_m": 4.84032049320947,
+          "yaw_degrees": 330.776389955853
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            -0.802318274974823,
+            0.00400000018998981,
+            -1.25662231445312
+          ],
+          "radius": 0.373164020275681,
+          "scale": 0.937141418457031,
+          "screen_rect": [
+            -209.650939941406,
+            480.828094482422,
+            37.0892028808594,
+            23.3324584960938
+          ],
+          "slot_gap_m": 4.8713099138979,
+          "yaw_degrees": 344.5687548714
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            2.71664047241211,
+            0.00400000018998981,
+            -2.99489784240723
+          ],
+          "radius": 0.406386926575653,
+          "scale": 1.02057540416718,
+          "screen_rect": [
+            -23.8522834777832,
+            413.204742431641,
+            42.5231857299805,
+            31.4175109863281
+          ],
+          "slot_gap_m": 3.09240929801846,
+          "yaw_degrees": 49.7753143500752
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            8.30109596252441,
+            0.00400000018998981,
+            -3.67554569244385
+          ],
+          "radius": 0.349723333731442,
+          "scale": 0.878273904323578,
+          "screen_rect": [
+            278.897338867188,
+            392.894744873047,
+            35.3584594726562,
+            22.5469055175781
+          ],
+          "slot_gap_m": 2.03137803612635,
+          "yaw_degrees": 161.968483185041
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            -0.625320196151733,
+            0.00400000018998981,
+            -12.9638080596924
+          ],
+          "radius": 0.369956199728399,
+          "scale": 0.929085493087769,
+          "screen_rect": [
+            -201.443344116211,
+            50.9241561889648,
+            39.6380767822266,
+            27.6955184936523
+          ],
+          "slot_gap_m": 3.60717922011718,
+          "yaw_degrees": 37.4933535619229
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            12.0169134140015,
+            0.00400000018998981,
+            -0.779691696166992
+          ],
+          "radius": 0.393351435265298,
+          "scale": 0.987838864326477,
+          "screen_rect": [
+            475.040222167969,
+            496.272186279297,
+            41.1959838867188,
+            27.2068786621094
+          ],
+          "slot_gap_m": 4.06690704862142,
+          "yaw_degrees": 25.1787410544433
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            8.58777809143066,
+            0.00400000018998981,
+            -17.0069599151611
+          ],
+          "radius": 0.381366965865146,
+          "scale": 0.957741796970367,
+          "screen_rect": [
+            293.464172363281,
+            -97.5183029174805,
+            36.9407348632812,
+            29.0929336547852
+          ],
+          "slot_gap_m": 3.73158145179843,
+          "yaw_degrees": 242.662168530269
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            8.48566436767578,
+            0.00400000018998981,
+            2.21562576293945
+          ],
+          "radius": 0.425425368580765,
+          "scale": 1.06838738918304,
+          "screen_rect": [
+            286.15576171875,
+            606.819580078125,
+            40.6168212890625,
+            24.8448486328125
+          ],
+          "slot_gap_m": 3.29709402915483,
+          "yaw_degrees": 190.369639188005
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            2.07174563407898,
+            0.00400000018998981,
+            -0.334657669067383
+          ],
+          "radius": 0.394300115272811,
+          "scale": 0.990221321582794,
+          "screen_rect": [
+            -58.261848449707,
+            511.384521484375,
+            42.2464447021484,
+            29.4972534179688
+          ],
+          "slot_gap_m": 1.83722053749818,
+          "yaw_degrees": 322.664283561655
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            -0.717527627944946,
+            0.00400000018998981,
+            0.107732772827148
+          ],
+          "radius": 0.414989152737693,
+          "scale": 1.04217851161957,
+          "screen_rect": [
+            -203.365982055664,
+            527.682556152344,
+            33.6040191650391,
+            29.1375732421875
+          ],
+          "slot_gap_m": 4.55271800439732,
+          "yaw_degrees": 78.2667961897176
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            -1.37312984466553,
+            0.00400000018998981,
+            -12.4059591293335
+          ],
+          "radius": 0.409019097654514,
+          "scale": 1.02718567848206,
+          "screen_rect": [
+            -239.408401489258,
+            74.8395462036133,
+            35.4457550048828,
+            20.4582443237305
+          ],
+          "slot_gap_m": 3.16199816766531,
+          "yaw_degrees": 358.658478902652
+        },
+        {
+          "asset": "wild_clover",
+          "group": 0,
+          "position": [
+            1.07732486724854,
+            0.00400000018998981,
+            -2.63148212432861
+          ],
+          "radius": 0.344509664106706,
+          "scale": 0.865180611610413,
+          "screen_rect": [
+            -108.372055053711,
+            430.526184082031,
+            35.9217681884766,
+            23.5976257324219
+          ],
+          "slot_gap_m": 3.87479251332249,
+          "yaw_degrees": 335.940176892923
+        },
+        {
+          "asset": "wild_pebbles_a",
+          "group": 0,
+          "position": [
+            -0.733505249023438,
+            0.00400000018998981,
+            -4.84974765777588
+          ],
+          "radius": 0.315065354161341,
+          "scale": 0.89281964302063,
+          "screen_rect": [
+            -204.286956787109,
+            348.075500488281,
+            33.7340545654297,
+            24.7508239746094
+          ],
+          "slot_gap_m": 3.85776618117801,
+          "yaw_degrees": 324.056440039044
+        },
+        {
+          "asset": "wild_pebbles_a",
+          "group": 0,
+          "position": [
+            1.26352334022522,
+            0.00400000018998981,
+            -16.6337814331055
+          ],
+          "radius": 0.337293269050955,
+          "scale": 0.955808222293854,
+          "screen_rect": [
+            -98.0620346069336,
+            -81.9695434570312,
+            35.2515640258789,
+            23.5449752807617
+          ],
+          "slot_gap_m": 3.05884492217219,
+          "yaw_degrees": 338.889643821831
+        },
+        {
+          "asset": "wild_pebbles_a",
+          "group": 0,
+          "position": [
+            13.0329465866089,
+            0.00400000018998981,
+            -9.02094173431396
+          ],
+          "radius": 0.341555908754831,
+          "scale": 0.9678875207901,
+          "screen_rect": [
+            532.139221191406,
+            193.958023071289,
+            35.8587036132812,
+            27.9268493652344
+          ],
+          "slot_gap_m": 9.0176989282813,
+          "yaw_degrees": 45.3458034846331
+        },
+        {
+          "asset": "wild_pebbles_a",
+          "group": 0,
+          "position": [
+            12.0077114105225,
+            0.00400000018998981,
+            1.95894050598145
+          ],
+          "radius": 0.346005054852537,
+          "scale": 0.98049533367157,
+          "screen_rect": [
+            477.735229492188,
+            594.695678710938,
+            34.820068359375,
+            28.720703125
+          ],
+          "slot_gap_m": 5.19569197044654,
+          "yaw_degrees": 126.095755928244
+        },
+        {
+          "asset": "wild_pebbles_a",
+          "group": 0,
+          "position": [
+            10.5690565109253,
+            0.00400000018998981,
+            -1.82726860046387
+          ],
+          "radius": 0.34915843689414,
+          "scale": 0.989431262016296,
+          "screen_rect": [
+            407.096618652344,
+            458.113800048828,
+            21.9556579589844,
+            25.1900024414062
+          ],
+          "slot_gap_m": 2.65048417365579,
+          "yaw_degrees": 92.1059410708899
+        },
+        {
+          "asset": "wild_pebbles_a",
+          "group": 0,
+          "position": [
+            -1.4363706111908,
+            0.00400000018998981,
+            -1.7990665435791
+          ],
+          "radius": 0.376984845899731,
+          "scale": 1.06828463077545,
+          "screen_rect": [
+            -241.601150512695,
+            456.282257080078,
+            33.0554962158203,
+            30.6357116699219
+          ],
+          "slot_gap_m": 5.63414405653557,
+          "yaw_degrees": 248.907830111112
+        },
+        {
+          "asset": "wild_pebbles_a",
+          "group": 0,
+          "position": [
+            11.0809020996094,
+            0.00400000018998981,
+            1.86215209960938
+          ],
+          "radius": 0.33471678008069,
+          "scale": 0.948507070541382,
+          "screen_rect": [
+            429.003814697266,
+            591.675964355469,
+            32.9818725585938,
+            27.8004760742188
+          ],
+          "slot_gap_m": 4.43585111390124,
+          "yaw_degrees": 303.047515812515
+        },
+        {
+          "asset": "wild_pebbles_b",
+          "group": 0,
+          "position": [
+            0.318101763725281,
+            0.00400000018998981,
+            -1.1408634185791
+          ],
+          "radius": 0.312687307553325,
+          "scale": 0.854016542434692,
+          "screen_rect": [
+            -144.670715332031,
+            482.662719726562,
+            27.1737594604492,
+            26.123779296875
+          ],
+          "slot_gap_m": 3.82568797473427,
+          "yaw_degrees": 112.166090550001
+        },
+        {
+          "asset": "wild_pebbles_b",
+          "group": 0,
+          "position": [
+            4.0280876159668,
+            0.00400000018998981,
+            4.2025032043457
+          ],
+          "radius": 0.328447267078332,
+          "scale": 0.897060394287109,
+          "screen_rect": [
+            51.31298828125,
+            680.865661621094,
+            32.7048263549805,
+            19.9822998046875
+          ],
+          "slot_gap_m": 3.73012740943534,
+          "yaw_degrees": 190.372753754266
+        },
+        {
+          "asset": "wild_pebbles_b",
+          "group": 0,
+          "position": [
+            -0.329769253730774,
+            0.00400000018998981,
+            3.07327270507812
+          ],
+          "radius": 0.338830313100313,
+          "scale": 0.925418734550476,
+          "screen_rect": [
+            -182.278457641602,
+            639.732788085938,
+            32.9745178222656,
+            19.6136474609375
+          ],
+          "slot_gap_m": 5.09438292084744,
+          "yaw_degrees": 172.689639879913
+        },
+        {
+          "asset": "wild_pebbles_b",
+          "group": 0,
+          "position": [
+            -0.923861622810364,
+            0.00400000018998981,
+            -6.16174221038818
+          ],
+          "radius": 0.318103372385686,
+          "scale": 0.86880898475647,
+          "screen_rect": [
+            -214.533981323242,
+            300.652191162109,
+            33.8327941894531,
+            23.2003479003906
+          ],
+          "slot_gap_m": 2.58790940112811,
+          "yaw_degrees": 154.902420262231
+        },
+        {
+          "asset": "wild_pebbles_b",
+          "group": 0,
+          "position": [
+            -1.11603307723999,
+            0.00400000018998981,
+            -11.3516693115234
+          ],
+          "radius": 0.315909173887684,
+          "scale": 0.862816154956818,
+          "screen_rect": [
+            -224.274597167969,
+            112.07544708252,
+            32.7242279052734,
+            21.1447982788086
+          ],
+          "slot_gap_m": 2.17331931312709,
+          "yaw_degrees": 342.763426590739
+        },
+        {
+          "asset": "wild_pebbles_b",
+          "group": 0,
+          "position": [
+            10.1730308532715,
+            0.00400000018998981,
+            2.82446670532227
+          ],
+          "radius": 0.393084846049781,
+          "scale": 1.07359957695007,
+          "screen_rect": [
+            378.297241210938,
+            629.444702148438,
+            37.1231079101562,
+            21.38232421875
+          ],
+          "slot_gap_m": 4.55328813979006,
+          "yaw_degrees": 356.145215174898
+        },
+        {
+          "asset": "wild_pebbles_b",
+          "group": 0,
+          "position": [
+            12.9127159118652,
+            0.00400000018998981,
+            -1.22448921203613
+          ],
+          "radius": 0.367067936590253,
+          "scale": 1.0025417804718,
+          "screen_rect": [
+            531.864868164062,
+            478.320617675781,
+            23.5255737304688,
+            28.0688781738281
+          ],
+          "slot_gap_m": 4.94854628688997,
+          "yaw_degrees": 265.298262383149
+        },
+        {
+          "asset": "wild_bush_dark",
+          "group": 0,
+          "position": [
+            12.8278350830078,
+            0.00400000018998981,
+            -11.3544130325317
+          ],
+          "radius": 0.446382317122449,
+          "scale": 1.04219794273376,
+          "screen_rect": [
+            517.259155273438,
+            93.7295455932617,
+            43.642578125,
+            43.2592849731445
+          ],
+          "slot_gap_m": 9.00236054939366,
+          "yaw_degrees": 346.735400159154
+        },
+        {
+          "asset": "wild_bush_dark",
+          "group": 0,
+          "position": [
+            10.6003684997559,
+            0.00400000018998981,
+            -14.5850639343262
+          ],
+          "radius": 0.385526443704892,
+          "scale": 0.900113761425018,
+          "screen_rect": [
+            403.77294921875,
+            -22.0850467681885,
+            31.9578552246094,
+            41.2786254882812
+          ],
+          "slot_gap_m": 5.77941248299189,
+          "yaw_degrees": 256.724052710465
+        },
+        {
+          "asset": "wild_bush_dark",
+          "group": 0,
+          "position": [
+            11.1463556289673,
+            0.00400000018998981,
+            -15.2143983840942
+          ],
+          "radius": 0.36841043013612,
+          "scale": 0.860151886940002,
+          "screen_rect": [
+            431.830444335938,
+            -44.5723037719727,
+            34.3414611816406,
+            40.9580230712891
+          ],
+          "slot_gap_m": 6.22491518479308,
+          "yaw_degrees": 66.9496166973025
+        },
+        {
+          "asset": "wild_bush_dark",
+          "group": 0,
+          "position": [
+            1.39310646057129,
+            0.00400000018998981,
+            -14.7560091018677
+          ],
+          "radius": 0.373937804074782,
+          "scale": 0.873057007789612,
+          "screen_rect": [
+            -91.1448287963867,
+            -28.317928314209,
+            35.3010864257812,
+            41.7210807800293
+          ],
+          "slot_gap_m": 3.06578282657097,
+          "yaw_degrees": 245.633929196628
+        },
+        {
+          "asset": "wild_bush_dark",
+          "group": 0,
+          "position": [
+            10.0098867416382,
+            0.00400000018998981,
+            -4.28721523284912
+          ],
+          "radius": 0.407467472397109,
+          "scale": 0.951340913772583,
+          "screen_rect": [
+            369.331481933594,
+            355.740478515625,
+            37.5749206542969,
+            37.2180480957031
+          ],
+          "slot_gap_m": 3.35332573667882,
+          "yaw_degrees": 353.19746945366
+        },
+        {
+          "asset": "wild_bush_olive",
+          "group": 0,
+          "position": [
+            10.4430532455444,
+            0.00400000018998981,
+            3.51055717468262
+          ],
+          "radius": 0.373470109487155,
+          "scale": 0.871965050697327,
+          "screen_rect": [
+            392.253723144531,
+            640.919250488281,
+            38.14111328125,
+            38.0263671875
+          ],
+          "slot_gap_m": 5.30072804114761,
+          "yaw_degrees": 340.192843915469
+        },
+        {
+          "asset": "wild_bush_olive",
+          "group": 0,
+          "position": [
+            11.1090135574341,
+            0.00400000018998981,
+            -3.87859344482422
+          ],
+          "radius": 0.419845244527117,
+          "scale": 0.980240106582642,
+          "screen_rect": [
+            426.961975097656,
+            369.185455322266,
+            40.0774841308594,
+            39.6866760253906
+          ],
+          "slot_gap_m": 3.87626967704271,
+          "yaw_degrees": 190.401058058187
+        },
+        {
+          "asset": "wild_bush_olive",
+          "group": 0,
+          "position": [
+            12.7484912872314,
+            0.00400000018998981,
+            1.81075477600098
+          ],
+          "radius": 0.390135430902545,
+          "scale": 0.910874664783478,
+          "screen_rect": [
+            516.690979003906,
+            575.8212890625,
+            36.27783203125,
+            43.3425903320312
+          ],
+          "slot_gap_m": 5.67747626343339,
+          "yaw_degrees": 292.804499680301
+        },
+        {
+          "asset": "wild_bush_olive",
+          "group": 0,
+          "position": [
+            -0.430036187171936,
+            0.00400000018998981,
+            -17.553352355957
+          ],
+          "radius": 0.45940061639239,
+          "scale": 1.07259261608124,
+          "screen_rect": [
+            -190.807067871094,
+            -130.944732666016,
+            39.2888488769531,
+            39.1178131103516
+          ],
+          "slot_gap_m": 4.80502370764325,
+          "yaw_degrees": 179.631516303234
+        },
+        {
+          "asset": "wild_bush_olive",
+          "group": 0,
+          "position": [
+            2.75058937072754,
+            0.00400000018998981,
+            -3.64908504486084
+          ],
+          "radius": 0.457879638873742,
+          "scale": 1.06904149055481,
+          "screen_rect": [
+            -23.5146045684814,
+            370.789367675781,
+            45.4852142333984,
+            51.7130737304688
+          ],
+          "slot_gap_m": 3.62639274576981,
+          "yaw_degrees": 300.587227031963
+        },
+        {
+          "asset": "wild_cattail_water",
+          "group": 0,
+          "position": [
+            10.0715265274048,
+            -0.0599999986588955,
+            -9.40549182891846
+          ],
+          "radius": 0.224855229258537,
+          "scale": 1.0,
+          "screen_rect": [
+            381.092620849609,
+            165.625839233398,
+            20.6568908691406,
+            36.6872863769531
+          ],
+          "slot_gap_m": 8.15347118675709,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_cattail_water",
+          "group": 0,
+          "position": [
+            9.12424182891846,
+            -0.0599999986588955,
+            -6.72185039520264
+          ],
+          "radius": 0.224855229258537,
+          "scale": 1.0,
+          "screen_rect": [
+            330.34521484375,
+            263.674499511719,
+            20.6568908691406,
+            36.68701171875
+          ],
+          "slot_gap_m": 5.31097383797169,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_cattail_water",
+          "group": 0,
+          "position": [
+            7.931236743927,
+            -0.0599999986588955,
+            -4.85051679611206
+          ],
+          "radius": 0.224855229258537,
+          "scale": 1.0,
+          "screen_rect": [
+            266.434204101562,
+            332.044769287109,
+            20.6569519042969,
+            36.6871032714844
+          ],
+          "slot_gap_m": 3.2415236979723,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_cattail_water",
+          "group": 0,
+          "position": [
+            6.11259698867798,
+            -0.0599999986588955,
+            -3.41531491279602
+          ],
+          "radius": 0.224855229258537,
+          "scale": 1.0,
+          "screen_rect": [
+            169.007080078125,
+            384.480804443359,
+            20.6569519042969,
+            36.6871948242188
+          ],
+          "slot_gap_m": 2.27991266548634,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_cattail_water",
+          "group": 0,
+          "position": [
+            3.76903438568115,
+            -0.0599999986588955,
+            -3.9547016620636
+          ],
+          "radius": 0.224855229258537,
+          "scale": 1.0,
+          "screen_rect": [
+            43.4591026306152,
+            364.773956298828,
+            20.6569175720215,
+            36.6871948242188
+          ],
+          "slot_gap_m": 3.90792866051197,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_cattail_water",
+          "group": 0,
+          "position": [
+            2.64075636863708,
+            -0.0599999986588955,
+            -6.05894327163696
+          ],
+          "radius": 0.224855229258537,
+          "scale": 1.0,
+          "screen_rect": [
+            -16.9843692779541,
+            287.894195556641,
+            20.656925201416,
+            36.6871032714844
+          ],
+          "slot_gap_m": 3.93421478569508,
+          "yaw_degrees": 0.0
+        },
+        {
+          "asset": "wild_cattail_water",
+          "group": 0,
+          "position": [
+            1.94117903709412,
+            -0.0599999986588955,
+            -8.93912315368652
+          ],
+          "radius": 0.224855229258537,
+          "scale": 1.0,
+          "screen_rect": [
+            -54.4617156982422,
+            182.664947509766,
+            20.6569137573242,
+            36.6871948242188
+          ],
+          "slot_gap_m": 2.01715035736561,
+          "yaw_degrees": 0.0
+        }
+      ],
+      "seed": 1790897285,
+      "used_slots": [
+        {
+          "blocks": [],
+          "low_only": false,
+          "near": [],
+          "opening_visible": true,
+          "resource": "spot_grove",
+          "slot": "F1",
+          "spawn_m": 2.6,
+          "stand": [
+            4.12,
+            -0.88
+          ],
+          "stand_m": 1.03,
+          "x": 4.25,
+          "z": 0.15,
+          "zone": "entry"
+        },
+        {
+          "blocks": [],
+          "low_only": true,
+          "near": [
+            "C2"
+          ],
+          "opening_visible": true,
+          "pieces": [
+            "flax",
+            "stone",
+            "clay"
+          ],
+          "resource": "flax_patch",
+          "slot": "F2",
+          "spawn_m": 1.5,
+          "stand": [
+            6.88,
+            -1.38
+          ],
+          "stand_m": 0.72,
+          "x": 7.6,
+          "z": -1.4,
+          "zone": "entry"
+        },
+        {
+          "blocks": [],
+          "low_only": false,
+          "near": [
+            "L1"
+          ],
+          "opening_visible": false,
+          "resource": "reed_bank",
+          "slot": "L2",
+          "spawn_m": 9.8,
+          "stand": [
+            0.88,
+            -8.88
+          ],
+          "stand_m": 1.18,
+          "x": -0.3,
+          "z": -9.0,
+          "zone": "left_bank"
+        },
+        {
+          "blocks": [],
+          "low_only": false,
+          "near": [
+            "B2"
+          ],
+          "opening_visible": false,
+          "resource": "spot_rock_pile",
+          "slot": "B1",
+          "spawn_m": 14.5,
+          "stand": [
+            4.62,
+            -15.12
+          ],
+          "stand_m": 0.88,
+          "x": 4.6,
+          "z": -16.0,
+          "zone": "far_bank"
+        }
+      ]
+    }
+  },
+  "stage": {
+    "runtime_head": "a43500f36c1b5a13729187c686e0f68a2011fbad",
+    "art_base": "93befb18cd5af7e30a966d2c112279287b71b3e2",
+    "scope": "Private P0Pond fixture, native lighting/player/HUD/camera. No runtime gameplay files committed."
+  },
+  "source_blend_sha256": "101135a32a0eca0852792185233fcef64b6d0034c646b1d7e5c116e9758999ae",
+  "images": [
+    {
+      "name": "SGODOT-422_WILD_v1_all_props_resources.png",
+      "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1_all_props_resources.png",
+      "sha256": "65227720e72d3b089039a3eb6cc814da1fdcf71fb5f5c5d9cc74cee22fa93768",
+      "bytes": 1846384,
+      "mime": "image/png",
+      "size": [
+        1500,
+        1394
+      ]
+    },
+    {
+      "name": "SGODOT-422_WILD_v1_gourd_default_43.png",
+      "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1_gourd_default_43.png",
+      "sha256": "c49a31aa053c0a91ddf3e2e1b5c45dd2f5d3580554250cf620e9c925f04158d2",
+      "bytes": 329387,
+      "mime": "image/png",
+      "size": [
+        360,
+        902
+      ]
+    },
+    {
+      "name": "SGODOT-422_WILD_v1_whole_pond_density.png",
+      "path": "docs/design/wild-props-422-2026-11-05/SGODOT-422_WILD_v1_whole_pond_density.png",
+      "sha256": "08cca8c08f51cc1d619c3e8d990692f90c5db24dc629bcec3b9e2f8b30701dac",
+      "bytes": 1634712,
+      "mime": "image/png",
+      "size": [
+        1200,
+        1290
+      ]
+    }
+  ],
+  "scope": "Art assets and placement proposal only. Existing ground is retained; no production shader, navigation, collision or scatter integration committed.",
+  "lock": "All Blender / Godot execution serialized with flock /home/zhangshaoji/gs66-render.lock; ADB port 5099; every process exits after work."
+}
