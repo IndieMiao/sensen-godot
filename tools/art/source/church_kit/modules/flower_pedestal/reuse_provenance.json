@@ -1,0 +1,10 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source_commit": "a530d90654b9f13e622530b05adf3ecf366366d3",
+  "module": "flower_pedestal",
+  "source": "assets/rooms/poi_church/flower_pedestal.glb",
+  "changes": "Independent copy; original GLB unchanged, fresh import UID and local atlas",
+  "editable_source": "tools/art/source/church_kit/flower_pedestal.blend",
+  "script": "tools/art/source/church_kit/prepare_assets.py"
+}

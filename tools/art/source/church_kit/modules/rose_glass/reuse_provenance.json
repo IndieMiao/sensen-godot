@@ -1,0 +1,10 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source_commit": "a530d90654b9f13e622530b05adf3ecf366366d3",
+  "module": "rose_glass",
+  "source": "KIT_rose_window",
+  "changes": "Palette-index UV from named glass groups; same source geometry/local pivot",
+  "editable_source": "tools/art/source/church_kit/rose_glass.blend",
+  "script": "tools/art/source/church_kit/build.py"
+}

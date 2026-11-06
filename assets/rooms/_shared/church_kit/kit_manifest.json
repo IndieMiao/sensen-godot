@@ -1,0 +1,693 @@
+{
+  "task": "SGODOT-423 church kit preparation",
+  "revision": "v1",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "units": "metres; Y up; +Z interior/front",
+  "grid_m": 2,
+  "wall_height_m": 4.8,
+  "assets": {
+    "wall_straight_2m": {
+      "file": "wall_straight_2m.glb",
+      "triangles": 144,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.12999999523162842
+        ],
+        [
+          1.0,
+          4.800000190734863,
+          0.28999999165534973
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        4.800000190734863,
+        0.41999998688697815
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/wall_straight_2m.blend",
+      "sha256": "0cb0aedf7b032fff426d8b583d8c00c62e6203d0bcae23a2b2069f154c30cfaa",
+      "module_length_m": 2,
+      "wall_height_m": 4.8,
+      "core_thickness_m": 0.26,
+      "mount_plane": "bottom centre; +Z interior",
+      "connectors": {
+        "left": [
+          -1,
+          0,
+          0
+        ],
+        "right": [
+          1,
+          0,
+          0
+        ]
+      },
+      "glass_mount": null,
+      "provenance": "tools/art/source/church_kit/modules/wall_straight_2m/reuse_provenance.json"
+    },
+    "wall_corner_2m": {
+      "file": "wall_corner_2m.glb",
+      "triangles": 276,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.12999999523162842,
+          0.0,
+          -0.12999999523162842
+        ],
+        [
+          1.0,
+          4.800000190734863,
+          1.0
+        ]
+      ],
+      "dimensions_m": [
+        1.1299999952316284,
+        4.800000190734863,
+        1.1299999952316284
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/wall_corner_2m.blend",
+      "sha256": "c04a168ee83f2e0bd1375df19e98be3f993dd67316885727e5fd34e878a5de40",
+      "arm_length_m": 1,
+      "wall_height_m": 4.8,
+      "core_thickness_m": 0.26,
+      "mount_plane": "bend at floor; arms +X and +Z",
+      "connectors": {
+        "x_end": [
+          1,
+          0,
+          0
+        ],
+        "z_end": [
+          0,
+          0,
+          1
+        ]
+      },
+      "provenance": "tools/art/source/church_kit/modules/wall_corner_2m/reuse_provenance.json"
+    },
+    "wall_pointed_2m": {
+      "file": "wall_pointed_2m.glb",
+      "triangles": 1596,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.12999999523162842
+        ],
+        [
+          1.0,
+          4.800000190734863,
+          0.375
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        4.800000190734863,
+        0.5049999952316284
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/wall_pointed_2m.blend",
+      "sha256": "b9d5319761276a6389aa3f97c1d4286dac0ef90c1c2607a43a10b134c4847749",
+      "module_length_m": 2,
+      "wall_height_m": 4.8,
+      "core_thickness_m": 0.26,
+      "mount_plane": "bottom centre; +Z interior",
+      "connectors": {
+        "left": [
+          -1,
+          0,
+          0
+        ],
+        "right": [
+          1,
+          0,
+          0
+        ]
+      },
+      "glass_mount": [
+        0,
+        0,
+        0.0
+      ],
+      "provenance": "tools/art/source/church_kit/modules/wall_pointed_2m/reuse_provenance.json"
+    },
+    "wall_rose_2m": {
+      "file": "wall_rose_2m.glb",
+      "triangles": 452,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.12999999523162842
+        ],
+        [
+          1.0,
+          4.800000190734863,
+          0.28999999165534973
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        4.800000190734863,
+        0.41999998688697815
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/wall_rose_2m.blend",
+      "sha256": "d5ff488e8753153d57e99a9304d1f3a59d3291bdab3c3e5675e9155fcf1ee111",
+      "module_length_m": 2,
+      "wall_height_m": 4.8,
+      "core_thickness_m": 0.26,
+      "mount_plane": "bottom centre; +Z interior",
+      "connectors": {
+        "left": [
+          -1,
+          0,
+          0
+        ],
+        "right": [
+          1,
+          0,
+          0
+        ]
+      },
+      "glass_mount": [
+        0,
+        3.25,
+        0
+      ],
+      "provenance": "tools/art/source/church_kit/modules/wall_rose_2m/reuse_provenance.json"
+    },
+    "roof_band_2m": {
+      "file": "roof_band_2m.glb",
+      "triangles": 420,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.12999999523162842
+        ],
+        [
+          1.0,
+          2.4000000953674316,
+          0.2750000059604645
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        2.4000000953674316,
+        0.4050000011920929
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/roof_band_2m.blend",
+      "sha256": "77d5d8e517321f46c5a46f89735415249cfc9e72fc619d995752d16ccff9c5e2",
+      "module_length_m": 2,
+      "height_m": 2.4,
+      "mount_y_on_wall": 4.8,
+      "connectors": {
+        "left": [
+          -1,
+          0,
+          0
+        ],
+        "right": [
+          1,
+          0,
+          0
+        ]
+      },
+      "provenance": "tools/art/source/church_kit/modules/roof_band_2m/reuse_provenance.json"
+    },
+    "floor_tile_2m": {
+      "file": "floor_tile_2m.glb",
+      "triangles": 108,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          0.11999999731779099,
+          1.0
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        0.11999999731779099,
+        2.0
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/floor_tile_2m.blend",
+      "sha256": "17acdbdc9184909c4e8e40baff6aa33581dce51192d2999c5196192629a46817",
+      "module_size_m": [
+        2,
+        2
+      ],
+      "height_m": 0.12,
+      "top_y": 0.12,
+      "mount_plane": "bottom centre; place y=-.12 for floor top0",
+      "provenance": "tools/art/source/church_kit/modules/floor_tile_2m/reuse_provenance.json"
+    },
+    "beam_2m": {
+      "file": "beam_2m.glb",
+      "triangles": 12,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          -0.09000000357627869,
+          -0.09000000357627869
+        ],
+        [
+          1.0,
+          0.09000000357627869,
+          0.09000000357627869
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        0.18000000715255737,
+        0.18000000715255737
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/beam_2m.blend",
+      "sha256": "afb32b0cd8577ec00e1168ad3f46ca0195f59578316888796ff9fd50e30a6dfa",
+      "module_length_m": 2,
+      "mount_plane": "beam centreline",
+      "connectors": {
+        "left": [
+          -1,
+          0,
+          0
+        ],
+        "right": [
+          1,
+          0,
+          0
+        ]
+      },
+      "provenance": "tools/art/source/church_kit/modules/beam_2m/reuse_provenance.json"
+    },
+    "steps_2m": {
+      "file": "steps_2m.glb",
+      "triangles": 36,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.75
+        ],
+        [
+          1.0,
+          0.5400000214576721,
+          0.75
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        0.5400000214576721,
+        1.5
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/steps_2m.blend",
+      "sha256": "a4115a1347b18bb003dd26ebba843e5e29aa9cf77299df9f91dbe1e08e2671fe",
+      "module_width_m": 2,
+      "riser_m": 0.18,
+      "risers": 3,
+      "height_m": 0.54,
+      "top_platform_m": [
+        2,
+        0.9
+      ],
+      "top_platform_center": [
+        0,
+        0.54,
+        -0.3
+      ],
+      "provenance": "tools/art/source/church_kit/modules/steps_2m/reuse_provenance.json"
+    },
+    "pointed_glass": {
+      "file": "pointed_glass.glb",
+      "triangles": 5368,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.6700000166893005,
+          1.1410000324249268,
+          -0.014999999664723873
+        ],
+        [
+          0.6700000166893005,
+          4.440000057220459,
+          0.09200000017881393
+        ]
+      ],
+      "dimensions_m": [
+        1.340000033378601,
+        3.2990000247955322,
+        0.10699999984353781
+      ],
+      "material": "glass",
+      "source": "tools/art/source/church_kit/pointed_glass.blend",
+      "sha256": "1a44361f5b68ddf38368b95ef71283ee77893a3e7401dfd8d20a42940e1652f8",
+      "source_collection": "KIT_pointed_window",
+      "provenance": "tools/art/source/church_kit/modules/pointed_glass/reuse_provenance.json"
+    },
+    "rose_glass": {
+      "file": "rose_glass.glb",
+      "triangles": 660,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.8372000455856323,
+          -0.8372000455856323,
+          -0.0184000376611948
+        ],
+        [
+          0.8372000455856323,
+          0.8372000455856323,
+          0.06532000005245209
+        ]
+      ],
+      "dimensions_m": [
+        1.6744000911712646,
+        1.6744000911712646,
+        0.08372003771364689
+      ],
+      "material": "glass",
+      "source": "tools/art/source/church_kit/rose_glass.blend",
+      "sha256": "6d9fd6cb4788332d842f3e43ce27effbdc435c488c2cccd495b799248931ea63",
+      "source_collection": "KIT_rose_window",
+      "uniform_scale_from_source": 0.92,
+      "mount_plane": "window centre/back plane; +Z front",
+      "pair": "rose_frame",
+      "provenance": "tools/art/source/church_kit/modules/rose_glass/reuse_provenance.json"
+    },
+    "rose_frame": {
+      "file": "rose_frame.glb",
+      "triangles": 3696,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.9435474872589111,
+          -0.9435474872589111,
+          -0.05060000345110893
+        ],
+        [
+          0.9434525966644287,
+          0.9435474872589111,
+          0.11500000208616257
+        ]
+      ],
+      "dimensions_m": [
+        1.8870000839233398,
+        1.8870949745178223,
+        0.1656000055372715
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/rose_frame.blend",
+      "sha256": "24063ee6ffb3433895028391281ad0b3e366d5d4a66967a9fc304d18f053eea4",
+      "source_collection": "KIT_rose_window",
+      "uniform_scale_from_source": 0.92,
+      "mount_plane": "window centre/back plane; +Z front",
+      "pair": "rose_glass",
+      "provenance": "tools/art/source/church_kit/modules/rose_frame/reuse_provenance.json"
+    },
+    "wood_pew": {
+      "file": "wood_pew.glb",
+      "triangles": 1692,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.3435001373291016,
+          0.0,
+          -0.32499998807907104
+        ],
+        [
+          1.3435001373291016,
+          1.3299999237060547,
+          0.3449999988079071
+        ]
+      ],
+      "dimensions_m": [
+        2.687000274658203,
+        1.3299999237060547,
+        0.6699999868869781
+      ],
+      "material": "atlas",
+      "source": "tools/art/source/church_kit/wood_pew.blend",
+      "sha256": "5aec0c736b8b72a326867af4a7108699c0c36ced61c58a05ce58171db9d9b630",
+      "reuse_from": "assets/rooms/poi_church/wood_pew.glb",
+      "geometry": "byte-identical exported original",
+      "mount_plane": "original local pivot; see dimensions/attachments",
+      "seat_height_m": 0.715,
+      "provenance": "tools/art/source/church_kit/modules/wood_pew/reuse_provenance.json"
+    },
+    "altar_table": {
+      "file": "altar_table.glb",
+      "triangles": 1412,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0100001096725464,
+          -1.1920928955078125e-07,
+          -0.44999992847442627
+        ],
+        [
+          1.0100001096725464,
+          1.715000033378601,
+          0.4930002689361572
+        ]
+      ],
+      "dimensions_m": [
+        2.0200002193450928,
+        1.7150001525878906,
+        0.9430001974105835
+      ],
+      "material": "atlas",
+      "source": "tools/art/source/church_kit/altar_table.blend",
+      "sha256": "8f2c422b6611ff7598b7e2d2e98a171679f11a7cdc4178373c57a91ad3caeb83",
+      "reuse_from": "assets/rooms/poi_church/altar_table.glb",
+      "geometry": "byte-identical exported original",
+      "mount_plane": "original local pivot; see dimensions/attachments",
+      "tabletop_height_m": 1.12,
+      "provenance": "tools/art/source/church_kit/modules/altar_table/reuse_provenance.json"
+    },
+    "sanctuary_steps": {
+      "file": "sanctuary_steps.glb",
+      "triangles": 60,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.4000003337860107,
+          0.0,
+          -1.549999713897705
+        ],
+        [
+          2.4000003337860107,
+          0.5400000214576721,
+          1.5500006675720215
+        ]
+      ],
+      "dimensions_m": [
+        4.8000006675720215,
+        0.5400000214576721,
+        3.1000003814697266
+      ],
+      "material": "atlas",
+      "source": "tools/art/source/church_kit/sanctuary_steps.blend",
+      "sha256": "67b18f9162d28a724853a6d58840df5f2c9996b8e6471b5416173e8260bf198f",
+      "reuse_from": "assets/rooms/poi_church/sanctuary_steps.glb",
+      "geometry": "byte-identical exported original",
+      "mount_plane": "original local pivot; see dimensions/attachments",
+      "provenance": "tools/art/source/church_kit/modules/sanctuary_steps/reuse_provenance.json"
+    },
+    "iron_chandelier": {
+      "file": "iron_chandelier.glb",
+      "triangles": 1004,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.6070003509521484,
+          -0.03500000014901161,
+          -0.5330460071563721
+        ],
+        [
+          0.6070003509521484,
+          1.7999999523162842,
+          0.5330460071563721
+        ]
+      ],
+      "dimensions_m": [
+        1.2140007019042969,
+        1.8349999524652958,
+        1.0660920143127441
+      ],
+      "material": "atlas",
+      "source": "tools/art/source/church_kit/iron_chandelier.blend",
+      "sha256": "5205a285c9bcaafceaad82d6f7de29dfcadb5f26c40d978a57c61cfd4777c0d8",
+      "reuse_from": "assets/rooms/poi_church/iron_chandelier.glb",
+      "geometry": "byte-identical exported original",
+      "mount_plane": "original local pivot; see dimensions/attachments",
+      "ceiling_hook": [
+        0,
+        1.8,
+        0
+      ],
+      "provenance": "tools/art/source/church_kit/modules/iron_chandelier/reuse_provenance.json"
+    },
+    "pipe_organ": {
+      "file": "pipe_organ.glb",
+      "triangles": 5256,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.800000011920929,
+          -1.4901161193847656e-08,
+          -0.30000030994415283
+        ],
+        [
+          0.7999999523162842,
+          3.1500000953674316,
+          0.5949997305870056
+        ]
+      ],
+      "dimensions_m": [
+        1.5999999642372131,
+        3.150000110268593,
+        0.8950000405311584
+      ],
+      "material": "atlas",
+      "source": "tools/art/source/church_kit/pipe_organ.blend",
+      "sha256": "9eb55729d23748906a8f5929f3785378d7d6338bd5c64aea6f2021a06293b023",
+      "reuse_from": "assets/rooms/poi_church/pipe_organ.glb",
+      "geometry": "byte-identical exported original",
+      "mount_plane": "original local pivot; see dimensions/attachments",
+      "provenance": "tools/art/source/church_kit/modules/pipe_organ/reuse_provenance.json"
+    },
+    "flower_pedestal": {
+      "file": "flower_pedestal.glb",
+      "triangles": 7040,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.36699867248535156,
+          0.0,
+          -0.35805463790893555
+        ],
+        [
+          0.3405647277832031,
+          1.8836712837219238,
+          0.31441447138786316
+        ]
+      ],
+      "dimensions_m": [
+        0.7075634002685547,
+        1.8836712837219238,
+        0.6724691092967987
+      ],
+      "material": "atlas",
+      "source": "tools/art/source/church_kit/flower_pedestal.blend",
+      "sha256": "94a74a5c1a9091cc5720fc57c84c5ea2bf4d3025ff5dedb1aaaf21d9ce873245",
+      "reuse_from": "assets/rooms/poi_church/flower_pedestal.glb",
+      "geometry": "byte-identical exported original",
+      "mount_plane": "original local pivot; see dimensions/attachments",
+      "provenance": "tools/art/source/church_kit/modules/flower_pedestal/reuse_provenance.json"
+    },
+    "grass_surround": {
+      "file": "grass_surround.glb",
+      "triangles": 188,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -13.5,
+          -0.8500000238418579,
+          -13.5
+        ],
+        [
+          13.5,
+          -0.6699999570846558,
+          13.5
+        ]
+      ],
+      "dimensions_m": [
+        27.0,
+        0.18000006675720215,
+        27.0
+      ],
+      "material": "atlas",
+      "source": "tools/art/source/church_kit/grass_surround.blend",
+      "sha256": "9ef86fbedf807ee58f5db36170217b842f1570b37034d451fb91a94c1b2abfe4",
+      "reuse_from": "assets/rooms/poi_church/grass_surround.glb",
+      "geometry": "byte-identical exported original",
+      "mount_plane": "original local pivot; see dimensions/attachments",
+      "provenance": "tools/art/source/church_kit/modules/grass_surround/reuse_provenance.json"
+    }
+  },
+  "glass_palette_slots": [
+    "blue",
+    "blue_dark",
+    "coral",
+    "glass_gold",
+    "glass_cream",
+    "iron"
+  ],
+  "status": "Reusable pieces only; example is an isolated review fixture, no new church/POI/layout",
+  "palettes": {
+    "slots": [
+      "blue",
+      "blue_dark",
+      "coral",
+      "glass_gold",
+      "glass_cream",
+      "iron",
+      "reserved_stone",
+      "reserved_white"
+    ],
+    "presets": {
+      "classic": [
+        "719ABF",
+        "517995",
+        "D68F70",
+        "E7BD68",
+        "F2DC9F",
+        "5D4C38",
+        "EBD8BC",
+        "FFFFFF"
+      ],
+      "meadow": [
+        "8AAFA2",
+        "5C827B",
+        "B790A6",
+        "C4B36F",
+        "E8E1BD",
+        "5D4C38",
+        "EBD8BC",
+        "FFFFFF"
+      ]
+    },
+    "parameter": "palette_texture on glass_palette_*.tres",
+    "scope": "Only pointed_glass / rose_glass; opaque stone/wood/props unchanged"
+  },
+  "source_preservation": {
+    "base_commit": "a530d90654b9f13e622530b05adf3ecf366366d3",
+    "original_directory": "assets/rooms/poi_church",
+    "expected_file_count": 71,
+    "hash_record": "tools/art/source/church_kit/original-files.json"
+  },
+  "unique_triangles": 29420,
+  "unique_surfaces": 18
+}
