@@ -204,7 +204,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	var clear := PondGather.clear_points(v)
 	if not clear.is_empty() and clear != _scenery_clear: _build_scenery(clear)   # the points came with the reply after the scene was built
 	var near: Dictionary = PondGather.nearest(gather.points, actor.position)
-	var reach := not near.is_empty() and _plan.is_empty() and PondGather.flat(PondGather.stand_of(near), actor.position) <= PondGather.REACH_M
+	var reach := _plan.is_empty() and PondGather.in_reach(near, actor.position)
 	rt.ui.set_action(PondGather.key(v, near, gather.pond) if reach else _action_state(v))   # 410: Gather at a point, else Cast
 	_gather_marks(v, near)
 	_trap_frame(v)
