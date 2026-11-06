@@ -1,0 +1,143 @@
+{
+	"materials": [
+		{
+			"kind": 0,
+			"preset": "palette_example",
+			"shader_sha256": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907",
+			"textures": {
+				"fields": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_fields.png",
+					"size": [
+						1024,
+						1024
+					]
+				},
+				"surfaces": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_surfaces.png",
+					"size": [
+						1024,
+						1024
+					]
+				}
+			}
+		},
+		{
+			"kind": 1,
+			"preset": "grass",
+			"shader_sha256": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907",
+			"textures": {
+				"fields": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_fields.png",
+					"size": [
+						1024,
+						1024
+					]
+				},
+				"surfaces": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_surfaces.png",
+					"size": [
+						1024,
+						1024
+					]
+				}
+			}
+		},
+		{
+			"kind": 2,
+			"preset": "paving",
+			"shader_sha256": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907",
+			"textures": {
+				"fields": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_fields.png",
+					"size": [
+						1024,
+						1024
+					]
+				},
+				"surfaces": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_surfaces.png",
+					"size": [
+						1024,
+						1024
+					]
+				}
+			}
+		},
+		{
+			"kind": 3,
+			"preset": "wood",
+			"shader_sha256": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907",
+			"textures": {
+				"fields": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_fields.png",
+					"size": [
+						1024,
+						1024
+					]
+				},
+				"surfaces": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_surfaces.png",
+					"size": [
+						1024,
+						1024
+					]
+				}
+			}
+		},
+		{
+			"kind": 4,
+			"preset": "sand",
+			"shader_sha256": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907",
+			"textures": {
+				"fields": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_fields.png",
+					"size": [
+						1024,
+						1024
+					]
+				},
+				"surfaces": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_surfaces.png",
+					"size": [
+						1024,
+						1024
+					]
+				}
+			}
+		},
+		{
+			"kind": 5,
+			"preset": "wet_sand",
+			"shader_sha256": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907",
+			"textures": {
+				"fields": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_fields.png",
+					"size": [
+						1024,
+						1024
+					]
+				},
+				"surfaces": {
+					"mipmaps": true,
+					"path": "res://assets/landmarks/_shared/ground_detail/ground_surfaces.png",
+					"size": [
+						1024,
+						1024
+					]
+				}
+			}
+		}
+	],
+	"passed": true
+}

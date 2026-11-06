@@ -1,0 +1,348 @@
+{
+	"captures": [
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "default",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "default-classes",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "default-lighting",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 28.0,
+			"name": "whole",
+			"pitch": 43,
+			"size": [
+				1000,
+				1000
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 28.0,
+			"name": "whole-classes",
+			"pitch": 43,
+			"size": [
+				1000,
+				1000
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 28.0,
+			"name": "whole-lighting",
+			"pitch": 43,
+			"size": [
+				1000,
+				1000
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 8.0,
+			"name": "grass_close",
+			"pitch": 43,
+			"size": [
+				1000,
+				650
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 8.0,
+			"name": "grass_close-classes",
+			"pitch": 43,
+			"size": [
+				1000,
+				650
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 8.0,
+			"name": "grass_close-lighting",
+			"pitch": 43,
+			"size": [
+				1000,
+				650
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 5.5,
+			"name": "hard_close",
+			"pitch": 43,
+			"size": [
+				1000,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 5.5,
+			"name": "hard_close-classes",
+			"pitch": 43,
+			"size": [
+				1000,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 5.5,
+			"name": "hard_close-lighting",
+			"pitch": 43,
+			"size": [
+				1000,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.0,
+			"name": "sand_close",
+			"pitch": 43,
+			"size": [
+				1000,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.0,
+			"name": "sand_close-classes",
+			"pitch": 43,
+			"size": [
+				1000,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.0,
+			"name": "sand_close-lighting",
+			"pitch": 43,
+			"size": [
+				1000,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "static-a",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "static-b",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "zero",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "vertex-original",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "unmatched-key",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		},
+		{
+			"camera_width_m": 6.71999979019165,
+			"name": "forced-grass",
+			"pitch": 43,
+			"size": [
+				360,
+				800
+			],
+			"visible_draw_calls": 1,
+			"yaw": 14.5
+		}
+	],
+	"checks": [
+		{
+			"check": "save default",
+			"passed": true
+		},
+		{
+			"check": "save default-classes",
+			"passed": true
+		},
+		{
+			"check": "save default-lighting",
+			"passed": true
+		},
+		{
+			"check": "save whole",
+			"passed": true
+		},
+		{
+			"check": "save whole-classes",
+			"passed": true
+		},
+		{
+			"check": "save whole-lighting",
+			"passed": true
+		},
+		{
+			"check": "save grass_close",
+			"passed": true
+		},
+		{
+			"check": "save grass_close-classes",
+			"passed": true
+		},
+		{
+			"check": "save grass_close-lighting",
+			"passed": true
+		},
+		{
+			"check": "save hard_close",
+			"passed": true
+		},
+		{
+			"check": "save hard_close-classes",
+			"passed": true
+		},
+		{
+			"check": "save hard_close-lighting",
+			"passed": true
+		},
+		{
+			"check": "save sand_close",
+			"passed": true
+		},
+		{
+			"check": "save sand_close-classes",
+			"passed": true
+		},
+		{
+			"check": "save sand_close-lighting",
+			"passed": true
+		},
+		{
+			"check": "save static-a",
+			"passed": true
+		},
+		{
+			"check": "save static-b",
+			"passed": true
+		},
+		{
+			"check": "static material: byte-identical rendered frames",
+			"passed": true
+		},
+		{
+			"check": "save zero",
+			"passed": true
+		},
+		{
+			"check": "save vertex-original",
+			"passed": true
+		},
+		{
+			"check": "strength zero matches vertex material within 8-bit rounding",
+			"passed": true
+		},
+		{
+			"check": "save unmatched-key",
+			"passed": true
+		},
+		{
+			"check": "save forced-grass",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	},
+	"terrain": {
+		"dimensions_m": [
+			20,
+			20
+		],
+		"surfaces": 1,
+		"triangles": 3200,
+		"uv_required": false
+	},
+	"zero_control": {
+		"max_rgb_255": 0.999999940395355,
+		"mean_max_rgb_255": 0.0000451388861984015
+	}
+}
