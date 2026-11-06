@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "godot": "4.7.2",
+  "fresh_cache": true,
+  "resource_file_count": 13,
+  "before_sha256": {
+    "README.md": "456017e3d4c3727fae8a4c5a892670c41a86ebd5023e708f8fd5520009344607",
+    "ground_detail.gdshader": "8f7e53cf9d7786892e9ad821c8f6cebf5393cbf3ed1eaa53c554fd1b533c38e4",
+    "ground_detail.gdshader.uid": "f542c49dda7bfc07205c9b5c070303f22a54f887f422c74500ed1594202c7363",
+    "ground_fields.png": "481fdbc304e14c46ad7f59e8a830fa1ca748d8bcbd4b248b2edfd63783575451",
+    "ground_fields.png.import": "a972e665ee58e3903e2c59be08b5635f2ea9104d0505fe288d18b2f9c9562adf",
+    "ground_grass.tres": "2b6906558086e08f85220787b14d0b6fdfa01448006ec12c4e0d50dfc2c2e64a",
+    "ground_palette_example.tres": "107769d8aafb213cb01531dfbbfba2ad5aadd323d1a7428149a01c5065bd7e10",
+    "ground_paving.tres": "6244976a0a8f4fac99bc29dc4e58b5f2cf991c5766dc04d8e47369d31069d612",
+    "ground_sand.tres": "45ac803417763659bc5aeb5e1877f729e859fd630557c1400a2691fb2a16a752",
+    "ground_surfaces.png": "b933f4abe85e380c0e70fe7dab5474b6ba70c13d45a1520ce70ad787cd5bc20d",
+    "ground_surfaces.png.import": "7abf061f2e8521d81eea117b92dc314cd1cb9e47c7c18ae387fb8ba8e14198bc",
+    "ground_wet_sand.tres": "6ec55eb2de80231d0e8f397a62d6bc4b64c12dda94af78b8458b45b22bd65d2e",
+    "ground_wood.tres": "238e3f39429b26f5aad08c1680b17560a904056d1c184bcd70a33a92f117287f"
+  },
+  "after_sha256": {
+    "README.md": "456017e3d4c3727fae8a4c5a892670c41a86ebd5023e708f8fd5520009344607",
+    "ground_detail.gdshader": "8f7e53cf9d7786892e9ad821c8f6cebf5393cbf3ed1eaa53c554fd1b533c38e4",
+    "ground_detail.gdshader.uid": "f542c49dda7bfc07205c9b5c070303f22a54f887f422c74500ed1594202c7363",
+    "ground_fields.png": "481fdbc304e14c46ad7f59e8a830fa1ca748d8bcbd4b248b2edfd63783575451",
+    "ground_fields.png.import": "a972e665ee58e3903e2c59be08b5635f2ea9104d0505fe288d18b2f9c9562adf",
+    "ground_grass.tres": "2b6906558086e08f85220787b14d0b6fdfa01448006ec12c4e0d50dfc2c2e64a",
+    "ground_palette_example.tres": "107769d8aafb213cb01531dfbbfba2ad5aadd323d1a7428149a01c5065bd7e10",
+    "ground_paving.tres": "6244976a0a8f4fac99bc29dc4e58b5f2cf991c5766dc04d8e47369d31069d612",
+    "ground_sand.tres": "45ac803417763659bc5aeb5e1877f729e859fd630557c1400a2691fb2a16a752",
+    "ground_surfaces.png": "b933f4abe85e380c0e70fe7dab5474b6ba70c13d45a1520ce70ad787cd5bc20d",
+    "ground_surfaces.png.import": "7abf061f2e8521d81eea117b92dc314cd1cb9e47c7c18ae387fb8ba8e14198bc",
+    "ground_wet_sand.tres": "6ec55eb2de80231d0e8f397a62d6bc4b64c12dda94af78b8458b45b22bd65d2e",
+    "ground_wood.tres": "238e3f39429b26f5aad08c1680b17560a904056d1c184bcd70a33a92f117287f"
+  },
+  "source_matches_cold_import": true,
+  "changed_asset_files": [],
+  "scene_imports": 0,
+  "root_script_note": "No scene imports; nodes/root_script=null is not a texture-import option. No GLBs/models are delivered."
+}

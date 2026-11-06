@@ -1,0 +1,105 @@
+{
+  "passed": true,
+  "metric": "Y'=(0.2126 R+0.7152 G+0.0722 B)/255 from rendered sRGB; 100*(reference-dark)/reference",
+  "sampling": "diagnostic class interiors eroded 1px, equal-albedo warm-light control within +/-0.008 of median; entire remaining masks, no hand-picked darkest pixel",
+  "views": [
+    {
+      "view": "default",
+      "samples": {
+        "deep": {
+          "pixels": 1029,
+          "mean_output_srgb_brightness": 0.4976322132662588
+        },
+        "ordinary": {
+          "pixels": 9104,
+          "mean_output_srgb_brightness": 0.6441597236293464
+        },
+        "sunlit": {
+          "pixels": 23959,
+          "mean_output_srgb_brightness": 0.7686475042576819
+        },
+        "sand": {
+          "pixels": 54474,
+          "mean_output_srgb_brightness": 0.8554888007878555
+        },
+        "wet_sand": {
+          "pixels": 37116,
+          "mean_output_srgb_brightness": 0.6378605879605855
+        }
+      },
+      "contrast_percent": {
+        "grass": 22.74707731453891,
+        "sand_wet_sand": 25.439048720082248
+      },
+      "lighting_reference_Yprime": 0.6837027450980391
+    },
+    {
+      "view": "whole",
+      "samples": {
+        "deep": {
+          "pixels": 6890,
+          "mean_output_srgb_brightness": 0.4971109035544551
+        },
+        "ordinary": {
+          "pixels": 12361,
+          "mean_output_srgb_brightness": 0.6444867731051649
+        },
+        "sunlit": {
+          "pixels": 17160,
+          "mean_output_srgb_brightness": 0.7685850170026052
+        },
+        "sand": {
+          "pixels": 69277,
+          "mean_output_srgb_brightness": 0.8530421794518
+        },
+        "wet_sand": {
+          "pixels": 49054,
+          "mean_output_srgb_brightness": 0.6388459522878747
+        }
+      },
+      "contrast_percent": {
+        "grass": 22.867167442497937,
+        "sand_wet_sand": 25.109687694643267
+      },
+      "lighting_reference_Yprime": 0.6837027450980391
+    },
+    {
+      "view": "grass_close",
+      "samples": {
+        "deep": {
+          "pixels": 75948,
+          "mean_output_srgb_brightness": 0.4961598019697687
+        },
+        "ordinary": {
+          "pixels": 41073,
+          "mean_output_srgb_brightness": 0.6419423698694289
+        },
+        "sunlit": {
+          "pixels": 130669,
+          "mean_output_srgb_brightness": 0.7673570160676901
+        }
+      },
+      "contrast_percent": {
+        "grass": 22.709603656370636
+      },
+      "lighting_reference_Yprime": 0.6873411764705882
+    },
+    {
+      "view": "sand_close",
+      "samples": {
+        "sand": {
+          "pixels": 394371,
+          "mean_output_srgb_brightness": 0.8558267416234568
+        },
+        "wet_sand": {
+          "pixels": 255150,
+          "mean_output_srgb_brightness": 0.6379169286010152
+        }
+      },
+      "contrast_percent": {
+        "sand_wet_sand": 25.461907466116163
+      },
+      "lighting_reference_Yprime": 0.6873411764705882
+    }
+  ]
+}
