@@ -24,20 +24,30 @@ t=fv[fi];cross=np.cross(t[:,1]-t[:,0],t[:,2]-t[:,0]);check((np.linalg.norm(cross
 check((np.sum(cross*fn[fi].mean(1),axis=1)>-1e-8).all(),'outward normals agree with winding')
 check(np.allclose(np.linalg.norm(fn,axis=1),1,atol=.001),'unit normals')
 check(set(map(tuple,nc.round(4)))==set(map(tuple,fc.round(4))),'exact inherited near colour set')
-# Non-window source triangles must remain, including custom normals and colours.
-def signatures(v,n,c,ix):
- return collections.Counter(tuple(sorted(tuple(np.concatenate([v[i],n[i],c[i]]).round(5)) for i in tri)) for tri in ix)
-near_other=[]
-for tri in ni:
- p=nv[tri];is_window=bool((p[:,2]>5.009).all() and (p[:,2]<5.051).all() and any((p[:,0]>=w['near_bounds'][0][0]-1e-5).all() and (p[:,0]<=w['near_bounds'][1][0]+1e-5).all() and (p[:,1]>=w['near_bounds'][0][1]-1e-5).all() and (p[:,1]<=w['near_bounds'][1][1]+1e-5).all() for w in m['windows']))
- if not is_window:near_other.append(tri)
-source=signatures(nv,nn,nc,near_other);target=signatures(fv,fn,fc,fi)
-# Export quantization can alter normals in their last decimals; compare to 4dp if required.
-missing=sum((source-target).values());check(missing==0,'every non-pane triangle retains positions/normals/colours',{'expected':len(near_other),'missing':missing})
+# Every component marked retained must remain; cuboids retain their measured envelope.
+def signature(v,n,c,tri):
+ return tuple(sorted(tuple(np.concatenate([v[i],n[i],c[i]]).round(5)) for i in tri))
+far_signatures=collections.Counter(signature(fv,fn,fc,t) for t in fi)
+kept=0;missing=0
+for part in m['parts']:
+ lo,hi=np.array(part['source_bounds']);mask=(nv>=lo-1e-6).all(1)&(nv<=hi+1e-6).all(1)
+ source_indices=[t for t in ni if mask[t].all()]
+ # Intersecting parts can share an AABB region, so use retained triangle match
+ # directly. The minimum expected count comes from the actual component audit.
+ if part['method']=='retain exact source vertices/normals/colours':
+  matched=sum(1 for t in source_indices if far_signatures[signature(nv,nn,nc,t)]>0)
+  check(matched>=part['far_triangles'],part['name']+' retained source triangles',{'expected':part['far_triangles'],'matching_in_bounds':matched})
+  kept+=part['far_triangles']
+ elif part['method'].startswith('replace subpixel'):
+  corners=np.array([[x,y,z] for x in [lo[0],hi[0]] for y in [lo[1],hi[1]] for z in [lo[2],hi[2]]])
+  check(all(np.max(np.abs(fv-v),axis=1).min()<1e-6 for v in corners),part['name']+' same-envelope corner positions')
+ else:
+  matched=sum(1 for t in source_indices if far_signatures[signature(nv,nn,nc,t)]>0)
+  check(matched>=part['far_triangles'],part['name']+' original front lettering retained',matched)
 check(len(m['windows'])==25,'retain all 25 window positions')
 for w in m['windows']:
  lo,hi=np.array(w['near_bounds']);mask=(np.abs(fv[:,2]-w['front_z'])<1e-6)&(fv[:,0]>=lo[0]-1e-5)&(fv[:,0]<=hi[0]+1e-5)&(fv[:,1]>=lo[1]-1e-5)&(fv[:,1]<=hi[1]+1e-5)
- p=fv[mask];check(len(p)>=12 and np.allclose(p.min(0)[:2],lo[:2],atol=1e-6) and np.allclose(p.max(0)[:2],hi[:2],atol=1e-6),w['name']+' actual front placement and dimensions')
+ p=fv[mask];check(len(p)>=13 and np.allclose(p.min(0)[:2],lo[:2],atol=1e-6) and np.allclose(p.max(0)[:2],hi[:2],atol=1e-6),w['name']+' actual front placement and dimensions')
 imported=(KIT/'alc_museum_far.glb.import').read_text();old=subprocess.check_output(['git','show','b16c3198:assets/landmarks/alcatraz_island/alc_museum_far.glb.import'],cwd=ROOT).decode()
 uid=re.search(r'uid="uid://[a-y0-8]+"',imported);check(uid and uid.group(0) in old,'preserved placeholder Godot UID')
 for line in ['nodes/root_script=null','gltf/texture_map_mode=1','meshes/light_baking=1']:check(line in imported,'import '+line)

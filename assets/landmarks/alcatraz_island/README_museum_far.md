@@ -1,17 +1,24 @@
-# alc_museum_far · SGODOT-424
+# alc_museum_far · SGODOT-424 v1
 
-黄忠，当前 **v0 形体阶段 / 正式配色待马可波罗交接**，保持草稿、暂不合并。
-源近档：#792 b16c31982f34a64cdd4f9c6683064edbf20837a0 的 alc_museum.glb。
+黄忠。依据马可波罗正式近档 **d7b57574d359952858319d17b43722651a0fcbcb** 制作，
+Plane交接7726588c。此版替代旧802面白模远档，形状和颜色均按新近档重新读取。
 
-- 远档 802 三角面 / 1 surface，近档 3,252 面的 24.66%。
-- 与近档相同原点和包围：X=-20..20、Y=0..9、Z=-5..5.24 m。
-- 主体、屋顶、门框、门、墙角饰条的552面顶点/法线/颜色直接保留；25扇窗各简化为10面。
-- 顶点色完全取自指定近档，不猜最终色板；材质哑光、不加纹理。
-- `alc_museum_far.glb.import` 保留原UID uid://mtqh1ecarvqm，带 nodes/root_script=null、
-  gltf/texture_map_mode=1、light_baking=1。材质沿用既有 alc_far_material_import.gd。
-- 装配维持 `(0,10,-13)`、yaw0、scale1，LOD 55m、margin0；待正式色确认并验收后，
-  马可波罗把主体 `lod_groups` 的 far_placeholder 改为 false。远档按原宿主规则不投影。
+- 近档8,778面 → 远档**2,417三角面 / 1 surface（27.53%）**。
+- 与新近档相同原点和包围：X=-20..20，Y=0..9，Z=-5..5.22249985m。
+- 原样保留25组无栏拱窗的框、玻璃和反光；主体/基座/屋顶轮廓和其它平面原样保留。
+  59个小件的细倒角换为同外包围的闭合方体；12个招牌字保留原正面，去掉隐藏背面/2mm侧面。
+- 精确保留10种近档COLOR_0值（暖石墙、奶油饰条、灰屋顶、蓝绿玻璃/反光、深绿招牌等），
+  不用色板猜值或另行调亮。色板备份只用于追溯，模型颜色来自实际近档GLB。
+- 原占位UID `uid://mtqh1ecarvqm`不变；.import含nodes/root_script=null、
+  texture_map_mode=1、light_baking=1，使用已有alc_far_material_import.gd。
+- 摆位保持(0,10,-13)、yaw0、scale1。现有lod_group 55m / margin0不改；
+  合成方在验收后把alc_museum的far_placeholder设为false，far按原宿主规则关闭投影。
 
-源和确定性脚本：`tools/art/source/alcatraz_museum_far_424/`。
-独立测量/切档截图：`docs/design/alcatraz-museum-far-424-2026-11-06/v0/`。
-配色交接在 Plane 424 评论 7dfec065；正式近档推送后再对色、重跑54/56m验图。
+验证：217项独立GLB/导入/图像检查、37项Godot检查通过。
+54m提交8,778面、56m提交2,417面，各仅1次可见绘制；整体外包围和25个窗位一致。
+整栋、正面、两种竖屏尺度及同一相机位置控制的对象区域平均RGB差异0.439–0.812/255，
+局部差异主要在细倒角边缘；不声称每个像素一致。比较隔离模型形色，不代替整岛阴影/性能验收。
+
+源：tools/art/source/alcatraz_museum_far_424/；正式对照：
+docs/design/alcatraz-museum-far-424-2026-11-06/v1/。
+v0目录是历史白模检查，不与此版混用。近档模型和主体layout/场景均未修改。

@@ -1,7 +1,7 @@
 {
-  "near_file": "reference/alc_museum_b16c3198.glb",
-  "git_ref": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "near_file": "reference/alc_museum_d7b57574.glb",
+  "git_ref": "d7b57574d359952858319d17b43722651a0fcbcb",
   "path": "assets/landmarks/alcatraz_island/alc_museum.glb",
-  "revision": "v0_geometry",
-  "colour_status": "Whitebox colours inherited exactly from b16c3198; formal near colours pending Marco Polo handoff. Not final colour acceptance."
+  "revision": "v1",
+  "colour_status": "Formal near colours and geometry from Marco Polo d7b57574 / Plane7726588c; palette traced from actual COLOR_0, no inferred recolour."
 }

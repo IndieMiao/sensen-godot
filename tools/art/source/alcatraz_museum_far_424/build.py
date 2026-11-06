@@ -1,5 +1,5 @@
 """Measured near->far reduction. Run Blender through flock ~/gs66-render.lock.
-Retain building silhouette and structural triangles; simplify only 25 thin panes.
+Retain formal arched windows and silhouette; simplify small box bevels and hidden glyph faces.
 All vertex colours come from the selected near GLB, never a guessed palette.
 """
 from pathlib import Path
@@ -36,19 +36,32 @@ def main():
  for triangles in components(vs,ix):
   ids=sorted({i for t in triangles for i in t});pts=[vs[i] for i in ids]
   lo=[min(p[j] for p in pts) for j in range(3)];hi=[max(p[j] for p in pts) for j in range(3)];dims=[hi[j]-lo[j] for j in range(3)];at=[(hi[j]+lo[j])/2 for j in range(3)]
-  pane=abs(dims[0]-1.25)<1e-4 and abs(dims[1]-2.15)<1e-4 and abs(dims[2]-.04)<1e-4
-  if pane:
-   # 12-point rounded rectangle: two chords per 90deg corner, no hidden back.
-   count+=1;name='Window_%02d_x%g_y%g'%(count,at[0],at[1]);radius=.018
-   vertices=[]
-   for cx,cy,start in [(hi[0]-radius,hi[1]-radius,0),(lo[0]+radius,hi[1]-radius,90),(lo[0]+radius,lo[1]+radius,180),(hi[0]-radius,lo[1]+radius,270)]:
-    for a in [start,start+45,start+90]:vertices.append((cx+radius*math.cos(math.radians(a)),cy+radius*math.sin(math.radians(a)),hi[2]))
-   faces=[tuple(range(12))];normals=[(0,0,1)]*12;colors=[tuple(sum(cs[i][j] for i in ids)/len(ids) for j in range(4))]*12
-   windows.append({'name':name,'near_bounds':[lo,hi],'center':at,'front_z':hi[2],'colour_linear':list(colors[0])})
+  pane=abs(dims[0]-1.25)<1e-4 and abs(dims[1]-2.10)<1e-4 and dims[2]<1e-5
+  is_box=len(triangles)==108 and min(dims)>1e-5
+  major=bool(dims[0]>39 and dims[2]>9.5)
+  glyph=dims[1]<.30 and dims[2]<.003 and lo[2]>5.18 and hi[2]<5.20
+  method='retain exact source vertices/normals/colours'
+  name='Part_%03d'%len(parts)
+  selected=triangles
+  if glyph:
+   selected=[t for t in triangles if all(abs(vs[i][2]-hi[2])<1e-6 for i in t) and sum(ns[i][2] for i in t)>2.9]
+   assert selected,('Missing front glyph',lo,hi)
+   name='Sign_glyph_%03d'%len(parts);method='retain original front glyph, remove hidden 2mm extrusion/back'
+  if is_box and not major:
+   name='Simplified_bevel_part_%03d'%len(parts);method='replace subpixel small-box bevels with same-envelope closed cuboid'
+   x0,y0,z0=lo;x1,y1,z1=hi
+   vertices=[(x0,y0,z0),(x1,y0,z0),(x1,y0,z1),(x0,y0,z1),(x0,y1,z0),(x1,y1,z0),(x1,y1,z1),(x0,y1,z1)]
+   faces=[(1,2,3,0),(7,6,5,4),(4,5,1,0),(5,6,2,1),(6,7,3,2),(7,4,0,3)]
+   axes=[(0,-1,0),(0,1,0),(0,0,-1),(1,0,0),(0,0,1),(-1,0,0)]
+   normals=[n for n in axes for _ in range(4)]
+   colors=[tuple(cs[ids[0]])]*24
   else:
+   ids=sorted({i for t in selected for i in t});mapping={old:i for i,old in enumerate(ids)}
+   vertices=[vs[i] for i in ids];faces=[tuple(mapping[i] for i in t) for t in selected];normals=[ns[i] for t in selected for i in t];colors=[cs[i] for t in selected for i in t]
    for i in ids:retained_normals[tuple(vs[i])].append(ns[i])
-   name=('Wall_body' if dims[1]>8.7 and dims[0]>39 else 'Roof' if dims[0]>39 else 'Public_door' if dims[2]<.06 else 'Door_frame' if dims[0]>2 else 'Corner_trim')+'_%02d'%len(parts)
-   mapping={old:i for i,old in enumerate(ids)};vertices=pts;faces=[tuple(mapping[i] for i in t) for t in triangles];normals=[ns[i] for t in triangles for i in t];colors=[cs[i] for t in triangles for i in t]
+   if major:name='Silhouette_exact_%03d'%len(parts)
+   if pane:
+    count+=1;name='Arch_glazing_%02d_x%g_y%g'%(count,at[0],at[1]);windows.append({'name':name,'near_bounds':[lo,hi],'center':at,'front_z':hi[2],'colour_linear':list(cs[ids[0]])})
   mesh=bpy.data.meshes.new(name);mesh.from_pydata([vec(v) for v in vertices],[],faces);mesh.update();mesh.materials.append(mat)
   attr=mesh.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='CORNER')
   for i,c in enumerate(colors):attr.data[i].color=c
@@ -56,12 +69,12 @@ def main():
   for face in mesh.polygons:face.use_smooth=True
   mesh.normals_split_custom_set([vec(n) for n in normals])
   obj=bpy.data.objects.new(name,mesh);bpy.context.scene.collection.objects.link(obj);objects.append(obj)
-  mesh.calc_loop_triangles();parts.append({'name':name,'source_triangles':len(triangles),'far_triangles':len(mesh.loop_triangles),'method':'replace shallow pane with same-size 12-corner front' if pane else 'retain exact source vertices/normals/colours'})
+  mesh.calc_loop_triangles();parts.append({'name':name,'source_triangles':len(triangles),'far_triangles':len(mesh.loop_triangles),'method':method,'source_bounds':[lo,hi]})
  assert count==25,('Near layout changed; review before export',count)
  bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'alc_museum_far.blend'))
  for o in objects:o.select_set(True)
  bpy.context.view_layer.objects.active=objects[0];bpy.ops.object.join();body=bpy.context.object;body.name='alc_museum_far';body.data.name='alc_museum_far_mobile'
- # Exporter triangulates the convex front polygons while preserving custom normals.
+ # Exporter triangulates simplified cuboids while retaining all original planar arches.
  path=KIT/'alc_museum_far.glb'
  bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_yup=True,export_materials='EXPORT',export_vertex_color='ACTIVE',export_all_vertex_colors=False,export_normals=True,export_texcoords=False,export_animations=False,export_cameras=False,export_lights=False)
  # Blender's custom-normal encoding can quantize by ~1.7e-4. Restore the
