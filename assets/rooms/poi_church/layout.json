@@ -454,7 +454,7 @@
       "colliders": [
         {
           "shape": "cylinder",
-          "radius": 0.38,
+          "radius": 0.7,
           "height": 0.8,
           "at": [
             0,
@@ -1026,6 +1026,32 @@
         5.2
       ],
       "name": "FrontRightBoundary"
+    },
+    {
+      "size": [
+        1.275,
+        3,
+        2.4
+      ],
+      "at": [
+        -4.6625,
+        1.58,
+        1.75
+      ],
+      "name": "OrganRearBoundary"
+    },
+    {
+      "size": [
+        2.3,
+        3,
+        2.3
+      ],
+      "at": [
+        -4.15,
+        1.58,
+        -4.15
+      ],
+      "name": "AltarRearBoundary"
     }
   ],
   "local_lights": [
