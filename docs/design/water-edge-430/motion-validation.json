@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "revision": "v1.1",
+  "loop_end_max_rgb_255": 0.0,
+  "frame_interval_s": 0.05,
+  "gif_duration_ms": 5500,
+  "gif_frames": 110,
+  "motion_clock": "110 actual Mobile-rendered shader samples at t=i/20 s; TIME replaced by uniform in QA only; not device FPS recording",
+  "edge_measurement": "edge-motion-validation.json"
+}

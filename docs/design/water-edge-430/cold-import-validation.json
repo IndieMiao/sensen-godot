@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "revision": "v1.1",
+  "scope": "Empty-cache Godot 4.7.2 import; complete runtime directory unchanged",
+  "file_count": 17,
+  "sha256": {
+    "water_edge_pile_ring.glb": "a7829ed1de33a694bde98c4ae219641f2acd0e9eb394a5d86f5ba46495be2722",
+    "water_edge.gdshader": "9c1bdb193771f8e54e6daa966048234c14c9b048c01959b899b10e45fc11f22a",
+    "water_edge_inner.glb.import": "7d283a7c6c316a9ea38c734b3d849d0b969e6072a12227978b355b126d3183b0",
+    "water_edge_steps.glb": "848f895befc8375cc944d67bad897273ee24bca813e558a6e70322756e50586c",
+    "water_edge_straight.glb": "4bb569a2eafdb9d3a43f003a42c0c5cd45882b4d07a5fad551398b51428e8363",
+    "water_edge_pile_ring.glb.import": "ffc7c07ea10a661f0bfbe81ffe91f1d4e264d48ca68cb1b2a590a46147feba1a",
+    "water_edge_steps.glb.import": "d9ec47864d08ca05615b347860569a894bea007a052a6ef76204aa15425db128",
+    "water_edge_material.tres": "ece23e9f5bf2728a3008509edc86a919f77f77697c0f7887029ba02f4eb31ab4",
+    "water_edge_outer.glb.import": "ffb1c936ffb720bd6ac05375d631dcc0d04dee07eb46e80b5307915658339045",
+    "water_edge_straight.glb.import": "0bd37ac3291fbf23fedc88cbf6d5e431f6abfb405fc79979d3abed9e2107fc1e",
+    "water_edge_inner.glb": "95b36affc16298fc1a2df3aff301948007f04a5b9643f6bd80155444dc609094",
+    "water_edge_outer.glb": "ed9b8192c293b6a36e833be139f2a6b666a669817432b0ba0a6d12b1cf432d64",
+    "water_edge.gdshader.uid": "3563b90dc6169a0361b9ad4da30057a34a3e7ad0ed5cf49cf121da1456c43cab",
+    "manifest.json": "dce0bc06a28888ef80b02dcd7f71379d76637c369ddf11bca06c7ce42e0ad606",
+    "water_edge_soft.png.import": "c6c2c7a4b75ec5c0da1559564b965f347a509596b1d5ec349f07adcb5c192b47",
+    "water_edge_soft.png": "12dc9ad8724c1945c06997d1f4cbc88cb349b3dc8b80e62bb7fd0bca7b7dfc93",
+    "README.md": "6525e03c73646b431f00daccc966f898cfa8bb01d7ee278b04eb6c029c27d0c5"
+  }
+}

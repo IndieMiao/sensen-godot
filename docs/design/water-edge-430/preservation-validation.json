@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "baseline": "13f4dcaab",
+  "same_files": [
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_pile_ring.glb",
+      "sha256": "a7829ed1de33a694bde98c4ae219641f2acd0e9eb394a5d86f5ba46495be2722"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_inner.glb.import",
+      "sha256": "7d283a7c6c316a9ea38c734b3d849d0b969e6072a12227978b355b126d3183b0"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_steps.glb",
+      "sha256": "848f895befc8375cc944d67bad897273ee24bca813e558a6e70322756e50586c"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_straight.glb",
+      "sha256": "4bb569a2eafdb9d3a43f003a42c0c5cd45882b4d07a5fad551398b51428e8363"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_pile_ring.glb.import",
+      "sha256": "ffc7c07ea10a661f0bfbe81ffe91f1d4e264d48ca68cb1b2a590a46147feba1a"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_steps.glb.import",
+      "sha256": "d9ec47864d08ca05615b347860569a894bea007a052a6ef76204aa15425db128"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_outer.glb.import",
+      "sha256": "ffb1c936ffb720bd6ac05375d631dcc0d04dee07eb46e80b5307915658339045"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_straight.glb.import",
+      "sha256": "0bd37ac3291fbf23fedc88cbf6d5e431f6abfb405fc79979d3abed9e2107fc1e"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_inner.glb",
+      "sha256": "95b36affc16298fc1a2df3aff301948007f04a5b9643f6bd80155444dc609094"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_outer.glb",
+      "sha256": "ed9b8192c293b6a36e833be139f2a6b666a669817432b0ba0a6d12b1cf432d64"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge.gdshader.uid",
+      "sha256": "3563b90dc6169a0361b9ad4da30057a34a3e7ad0ed5cf49cf121da1456c43cab"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/manifest.json",
+      "sha256": "dce0bc06a28888ef80b02dcd7f71379d76637c369ddf11bca06c7ce42e0ad606"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_soft.png.import",
+      "sha256": "c6c2c7a4b75ec5c0da1559564b965f347a509596b1d5ec349f07adcb5c192b47"
+    },
+    {
+      "file": "assets/landmarks/_shared/water_edge/water_edge_soft.png",
+      "sha256": "12dc9ad8724c1945c06997d1f4cbc88cb349b3dc8b80e62bb7fd0bca7b7dfc93"
+    }
+  ],
+  "shader_texture_reads": 1,
+  "geometry": "No VERTEX writes; GLB geometry and original 1-layer coverage unchanged",
+  "host_preservation": "Alcatraz, coast models and sea unchanged"
+}

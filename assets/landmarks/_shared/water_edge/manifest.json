@@ -1,0 +1,243 @@
+{
+  "task": "SGODOT-430",
+  "author": "刘备",
+  "coast_reference_commit": "d72d74f4c0ccbcc922c5691cb8b6866eca1ca8f9",
+  "foam_reference_commit": "1442acaf2d4e00cf64ca0c57349e8ed179e84ffe",
+  "module_m": 2,
+  "water_y_reference": 0.2,
+  "surface_lift_m": 0.018,
+  "shore_distance_m": [
+    0.4,
+    0.64,
+    0.88
+  ],
+  "assets": {
+    "water_edge_straight": {
+      "file": "water_edge_straight.glb",
+      "triangles": 40,
+      "surfaces": 1,
+      "closed": false,
+      "ports": [
+        {
+          "coast_port": [
+            -1,
+            0,
+            0
+          ],
+          "edge_xz": [
+            [
+              -1.0,
+              0.4
+            ],
+            [
+              -1.0,
+              0.64
+            ],
+            [
+              -1.0,
+              0.88
+            ]
+          ],
+          "uv_u": 0
+        },
+        {
+          "coast_port": [
+            1,
+            0,
+            0
+          ],
+          "edge_xz": [
+            [
+              1.0,
+              0.4
+            ],
+            [
+              1.0,
+              0.64
+            ],
+            [
+              1.0,
+              0.88
+            ]
+          ],
+          "uv_u": 1
+        }
+      ],
+      "local_water_y": 0,
+      "root_scale": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2456,
+      "sha256": "4bb569a2eafdb9d3a43f003a42c0c5cd45882b4d07a5fad551398b51428e8363"
+    },
+    "water_edge_outer": {
+      "file": "water_edge_outer.glb",
+      "triangles": 40,
+      "surfaces": 1,
+      "closed": false,
+      "ports": [
+        {
+          "coast_port": [
+            -1,
+            0,
+            0
+          ],
+          "edge_xz": [
+            [
+              -1.0,
+              0.3999999999999999
+            ],
+            [
+              -1.0,
+              0.6400000000000001
+            ],
+            [
+              -1.0,
+              0.8799999999999999
+            ]
+          ],
+          "uv_u": 0
+        },
+        {
+          "coast_port": [
+            0,
+            0,
+            -1
+          ],
+          "edge_xz": [
+            [
+              0.3999999999999999,
+              -1.0
+            ],
+            [
+              0.6400000000000001,
+              -1.0
+            ],
+            [
+              0.8799999999999999,
+              -1.0
+            ]
+          ],
+          "uv_u": 1
+        }
+      ],
+      "local_water_y": 0,
+      "root_scale": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2452,
+      "sha256": "ed9b8192c293b6a36e833be139f2a6b666a669817432b0ba0a6d12b1cf432d64"
+    },
+    "water_edge_inner": {
+      "file": "water_edge_inner.glb",
+      "triangles": 40,
+      "surfaces": 1,
+      "closed": false,
+      "ports": [
+        {
+          "coast_port": [
+            -1,
+            0,
+            0
+          ],
+          "edge_xz": [
+            [
+              -1.0,
+              0.4
+            ],
+            [
+              -1.0,
+              0.64
+            ],
+            [
+              -1.0,
+              0.88
+            ]
+          ],
+          "uv_u": 0
+        },
+        {
+          "coast_port": [
+            0,
+            0,
+            1
+          ],
+          "edge_xz": [
+            [
+              -0.4,
+              1.0
+            ],
+            [
+              -0.64,
+              1.0
+            ],
+            [
+              -0.88,
+              1.0
+            ]
+          ],
+          "uv_u": 1
+        }
+      ],
+      "local_water_y": 0,
+      "root_scale": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2452,
+      "sha256": "95b36affc16298fc1a2df3aff301948007f04a5b9643f6bd80155444dc609094"
+    },
+    "water_edge_pile_ring": {
+      "file": "water_edge_pile_ring.glb",
+      "triangles": 64,
+      "surfaces": 1,
+      "closed": true,
+      "ports": [],
+      "local_water_y": 0,
+      "root_scale": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 3212,
+      "sha256": "a7829ed1de33a694bde98c4ae219641f2acd0e9eb394a5d86f5ba46495be2722"
+    },
+    "water_edge_steps": {
+      "file": "water_edge_steps.glb",
+      "triangles": 40,
+      "surfaces": 1,
+      "closed": false,
+      "ports": [],
+      "local_water_y": 0,
+      "root_scale": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2448,
+      "sha256": "848f895befc8375cc944d67bad897273ee24bca813e558a6e70322756e50586c"
+    }
+  },
+  "unique_triangles": 224,
+  "texture": {
+    "file": "water_edge_soft.png",
+    "source": "#824 alc_foam_soft.png, unchanged bytes",
+    "sha256": "12dc9ad8724c1945c06997d1f4cbc88cb349b3dc8b80e62bb7fd0bca7b7dfc93",
+    "size": [
+      512,
+      128
+    ]
+  },
+  "budget": {
+    "texture_reads": 1,
+    "transparent_passes": 1,
+    "maximum_foam_layers": 1,
+    "triangle_limit_each": 80
+  },
+  "source": "tools/art/source/water_edge_430/water_edge.blend"
+}

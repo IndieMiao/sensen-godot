@@ -1,0 +1,79 @@
+{
+  "passed": true,
+  "method": "Mobile render, diagnostic white albedo over black; RGB decoded to linear alpha. Width contour alpha>0.02; source shader alpha unchanged.",
+  "default_straight_water_width_m": {
+    "minimum": 0.29757575766666666,
+    "mean": 0.3182330346619719,
+    "maximum": 0.3402424243333334
+  },
+  "shore_contact_alpha": {
+    "minimum": 0.7011018919329731,
+    "maximum": 0.7011018919329731
+  },
+  "inner_contact_minimum_alpha": 0.7011018919329731,
+  "straight_push_peak_to_peak_m": {
+    "minimum": 0.09866666666666667,
+    "mean": 0.1001164319248826,
+    "maximum": 0.10133333333333333
+  },
+  "pile_push_peak_to_peak_m": {
+    "minimum": 0.08850000000000002,
+    "mean": 0.09330078124999999,
+    "maximum": 0.09849999999999998
+  },
+  "two_hz_motion": [
+    {
+      "kind": "straight",
+      "changed_pixels_each_half_second": [
+        32304,
+        37751,
+        39603,
+        38955,
+        36044,
+        0,
+        36044,
+        38955,
+        39603,
+        37751,
+        32304
+      ],
+      "loop_max_alpha_delta": 0.0
+    },
+    {
+      "kind": "inner",
+      "changed_pixels_each_half_second": [
+        10443,
+        12964,
+        14954,
+        16162,
+        15983,
+        0,
+        15983,
+        16162,
+        14954,
+        12964,
+        10443
+      ],
+      "loop_max_alpha_delta": 0.0
+    },
+    {
+      "kind": "pile_ring",
+      "changed_pixels_each_half_second": [
+        134061,
+        142463,
+        123472,
+        97884,
+        73986,
+        0,
+        73986,
+        97884,
+        123472,
+        142463,
+        134061
+      ],
+      "loop_max_alpha_delta": 0.0
+    }
+  ],
+  "two_hz_note": "10 of 11 adjacent pairs must move; 2.5s and 3.0s are symmetric around the 2.75s turn",
+  "width_phase_note": "Default t=0 is expanded. The outer edge then retreats by 0.10m while the shore contact stays opaque; the sheet and inner boundary do not move."
+}

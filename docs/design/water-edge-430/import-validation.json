@@ -1,0 +1,330 @@
+{
+	"assets": {
+		"water_edge_inner": {
+			"aabb": "[P: (-1.0, 0.0, 0.4), S: (0.6, 0.00001, 0.6)]",
+			"material": "res://assets/landmarks/_shared/water_edge/water_edge_material.tres",
+			"mesh_arrays_sha256": "42543a601c21da913569f595947f34eeb777b64fe0e28cd90e6ce8e0398e7c6d",
+			"triangles": 40,
+			"uid": "uid://bqpoxju4iogre"
+		},
+		"water_edge_outer": {
+			"aabb": "[P: (-1.0, 0.0, -1.0), S: (1.88, 0.00001, 1.88)]",
+			"material": "res://assets/landmarks/_shared/water_edge/water_edge_material.tres",
+			"mesh_arrays_sha256": "84a03d564c6540a58b03addc3070e128ee733e4c709462c1fd73282bd60ce556",
+			"triangles": 40,
+			"uid": "uid://cqlklq2favuha"
+		},
+		"water_edge_pile_ring": {
+			"aabb": "[P: (-0.35, 0.0, -0.35), S: (0.7, 0.00001, 0.7)]",
+			"material": "res://assets/landmarks/_shared/water_edge/water_edge_material.tres",
+			"mesh_arrays_sha256": "ce3bf9910b8f8560c0acb79df080eb2a672e390c925b44e2005d1d34658f9efd",
+			"triangles": 64,
+			"uid": "uid://8d1wq4ceefco"
+		},
+		"water_edge_steps": {
+			"aabb": "[P: (-1.0, 0.0, 0.68), S: (2.0, 0.00001, 0.5)]",
+			"material": "res://assets/landmarks/_shared/water_edge/water_edge_material.tres",
+			"mesh_arrays_sha256": "2159691edca1cbf41530450265652ef6b9c4a1eeae1b6c73d6246a231d03f0fd",
+			"triangles": 40,
+			"uid": "uid://bg26js5c0h23"
+		},
+		"water_edge_straight": {
+			"aabb": "[P: (-1.0, 0.0, 0.4), S: (2.0, 0.00001, 0.48)]",
+			"material": "res://assets/landmarks/_shared/water_edge/water_edge_material.tres",
+			"mesh_arrays_sha256": "070c8d0a03402679abdc1522c93816a1103e453a337873df1cfda6eaf4ef0212",
+			"triangles": 40,
+			"uid": "uid://btwcoox1vje3n"
+		}
+	},
+	"checks": [
+		{
+			"check": "water_edge_straight: one mesh",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: one surface",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: triangle count",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: identity transform",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: waterplane pivot",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: upward normals",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: shared shader binding",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: shared material path",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: single pass / sea overlay",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: original size / mipmaps",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: MultiMesh resource",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: import loaded",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: distinct generated uid",
+			"passed": true
+		},
+		{
+			"check": "water_edge_straight: explicit root_script null",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: one mesh",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: one surface",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: triangle count",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: identity transform",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: waterplane pivot",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: upward normals",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: shared shader binding",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: shared material path",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: single pass / sea overlay",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: original size / mipmaps",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: MultiMesh resource",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: import loaded",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: distinct generated uid",
+			"passed": true
+		},
+		{
+			"check": "water_edge_outer: explicit root_script null",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: one mesh",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: one surface",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: triangle count",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: identity transform",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: waterplane pivot",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: upward normals",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: shared shader binding",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: shared material path",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: single pass / sea overlay",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: original size / mipmaps",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: MultiMesh resource",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: import loaded",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: distinct generated uid",
+			"passed": true
+		},
+		{
+			"check": "water_edge_inner: explicit root_script null",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: one mesh",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: one surface",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: triangle count",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: identity transform",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: waterplane pivot",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: upward normals",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: shared shader binding",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: shared material path",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: single pass / sea overlay",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: original size / mipmaps",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: MultiMesh resource",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: import loaded",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: distinct generated uid",
+			"passed": true
+		},
+		{
+			"check": "water_edge_pile_ring: explicit root_script null",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: one mesh",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: one surface",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: triangle count",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: identity transform",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: waterplane pivot",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: upward normals",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: shared shader binding",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: shared material path",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: single pass / sea overlay",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: original size / mipmaps",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: MultiMesh resource",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: import loaded",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: distinct generated uid",
+			"passed": true
+		},
+		{
+			"check": "water_edge_steps: explicit root_script null",
+			"passed": true
+		},
+		{
+			"check": "lossless RGBA texture / Android supported",
+			"passed": true
+		},
+		{
+			"check": "exactly one texture read / no depth or screen sampling",
+			"passed": true
+		}
+	],
+	"passed": true
+}
