@@ -1,0 +1,19 @@
+{
+  "pr": 830,
+  "head": "5f9b59b8b919566276a846d65d9a587f0c08d755",
+  "image_path": "assets/landmarks/_shared/ground_detail/review/v1.1/wood-close-review.png",
+  "sha256": "2e9117171104320eb9162b867a3bd8e7192ae61feb98fa0cac82e09315d52880",
+  "parameters": {
+    "board_size_m": [
+      1.8,
+      0.18
+    ],
+    "stagger": 0.5,
+    "joint_width_m": 0.012,
+    "tone_strength": 0.14,
+    "wood_color": "#A3815D",
+    "wood_light_color": "#B89972",
+    "wood_dark_color": "#795F47",
+    "wood_joint_color": "#69543F"
+  }
+}

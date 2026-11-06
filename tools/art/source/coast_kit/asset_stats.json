@@ -1,7 +1,7 @@
 {
   "author": "赵云",
   "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
-  "revision": "v1.1",
+  "revision": "v1.2",
   "module_grid_m": 2,
   "axes": "metres, Y up; straight coast +X tangent, +Z water / -Z land",
   "material_contract": {
@@ -44,10 +44,10 @@
     "roof": "A4A08F",
     "glass": "608F99",
     "glass_light": "86B0B3",
-    "wood": "9F8063",
-    "wood_light": "AA8E72",
-    "wood_dark": "675139",
-    "wood_seam": "665443",
+    "wood": "A3815D",
+    "wood_light": "B89972",
+    "wood_dark": "795F47",
+    "wood_seam": "69543F",
     "dark": "4E6769",
     "bird": "EEEDE6",
     "bridge": "C76845",
@@ -56,10 +56,6 @@
     "sign_cream": "FFF0CA",
     "flower_yellow": "DFC570",
     "soil": "897A53",
-    "plank_a": "9F8165",
-    "plank_b": "A7896B",
-    "plank_c": "A18468",
-    "plank_d": "AA8C6E",
     "rope": "B7A68D",
     "stone_joint": "8B8476"
   },
@@ -1341,9 +1337,9 @@
       "material": "coast_warm_sand.tres"
     },
     "coast_dock_straight": {
-      "triangles": 240,
+      "triangles": 224,
       "surfaces": 1,
-      "bytes": 21884,
+      "bytes": 20188,
       "bounds_blender": [
         [
           -1.0,
@@ -1552,12 +1548,309 @@
       ],
       "terminal": false,
       "mooring_bollard": false,
-      "planks": 11,
-      "plank_width_range_m": [
-        0.17181818181818165,
-        0.17681818181818187
+      "planks": 28,
+      "plank_rows": 11,
+      "board_nominal_size_m": [
+        1.8,
+        0.18
       ],
-      "joint_width_m": 0.01,
+      "half_stagger_m": 0.9,
+      "plank_width_range_m": [
+        0.168,
+        0.174
+      ],
+      "joint_width_m": 0.012,
+      "plank_patches": [
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        }
+      ],
+      "wood_reference": {
+        "pr": 830,
+        "head": "5f9b59b8",
+        "tone_strength": 0.14,
+        "base": "#A3815D",
+        "light": "#B89972",
+        "dark": "#795F47",
+        "joint": "#69543F"
+      },
       "pile_count": 4,
       "pile_centres": [
         [
@@ -1584,14 +1877,14 @@
       "pile_width_m": 0.16,
       "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
       "file": "coast_dock_straight.glb",
-      "sha256": "a2c52c9f5ce5d9081973988de1f81fa2db1d8c3d1ea4a839639fd2e9791429fb",
+      "sha256": "185461cd83b3af081b09c6f018f9a98f1c79addbb25f1a5a9b871459f883db3b",
       "source": "tools/art/source/coast_kit/coast_kit.blend",
       "material": "coast_warm_sand.tres"
     },
     "coast_dock_end": {
-      "triangles": 340,
+      "triangles": 324,
       "surfaces": 1,
-      "bytes": 31116,
+      "bytes": 29420,
       "bounds_blender": [
         [
           -1.0,
@@ -1719,12 +2012,309 @@
       ],
       "terminal": true,
       "mooring_bollard": false,
-      "planks": 11,
-      "plank_width_range_m": [
-        0.17181818181818165,
-        0.17681818181818187
+      "planks": 28,
+      "plank_rows": 11,
+      "board_nominal_size_m": [
+        1.8,
+        0.18
       ],
-      "joint_width_m": 0.01,
+      "half_stagger_m": 0.9,
+      "plank_width_range_m": [
+        0.168,
+        0.174
+      ],
+      "joint_width_m": 0.012,
+      "plank_patches": [
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        }
+      ],
+      "wood_reference": {
+        "pr": 830,
+        "head": "5f9b59b8",
+        "tone_strength": 0.14,
+        "base": "#A3815D",
+        "light": "#B89972",
+        "dark": "#795F47",
+        "joint": "#69543F"
+      },
       "pile_count": 4,
       "pile_centres": [
         [
@@ -1751,14 +2341,14 @@
       "pile_width_m": 0.16,
       "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
       "file": "coast_dock_end.glb",
-      "sha256": "2e70856fe1c152bbd91c2602a9eae9ef006d20c034df0ef347bfe58c1a46a541",
+      "sha256": "3108f00882248efb6d8fc1205f80d8a49c115ac1fc647b6724247111aa1dbf2d",
       "source": "tools/art/source/coast_kit/coast_kit.blend",
       "material": "coast_warm_sand.tres"
     },
     "coast_dock_bollard": {
-      "triangles": 384,
+      "triangles": 368,
       "surfaces": 1,
-      "bytes": 28748,
+      "bytes": 27052,
       "bounds_blender": [
         [
           -1.0,
@@ -1967,12 +2557,309 @@
       ],
       "terminal": false,
       "mooring_bollard": true,
-      "planks": 11,
-      "plank_width_range_m": [
-        0.17181818181818165,
-        0.17681818181818187
+      "planks": 28,
+      "plank_rows": 11,
+      "board_nominal_size_m": [
+        1.8,
+        0.18
       ],
-      "joint_width_m": 0.01,
+      "half_stagger_m": 0.9,
+      "plank_width_range_m": [
+        0.168,
+        0.174
+      ],
+      "joint_width_m": 0.012,
+      "plank_patches": [
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 0,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.99,
+            -0.8160000000000001
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 1,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.804,
+            -0.6360000000000001
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 2,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.624,
+            -0.456
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 3,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.44399999999999995,
+            -0.27599999999999997
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 4,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            -0.264,
+            -0.09600000000000003
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 5,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            -0.08400000000000007,
+            0.08399999999999991
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 1.07
+        },
+        {
+          "row": 6,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.09600000000000009,
+            0.26400000000000007
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 7,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.276,
+            0.444
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 1.1
+        },
+        {
+          "row": 8,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.45599999999999996,
+            0.6239999999999999
+          ],
+          "linear_tone_factor": 0.9
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            -0.99,
+            -0.006,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.86
+        },
+        {
+          "row": 9,
+          "bounds_xz": [
+            0.006,
+            0.99,
+            0.6359999999999999,
+            0.8039999999999998
+          ],
+          "linear_tone_factor": 0.96
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.99,
+            -0.906,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.04
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            -0.894,
+            0.894,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 1.1400000000000001
+        },
+        {
+          "row": 10,
+          "bounds_xz": [
+            0.906,
+            0.99,
+            0.8159999999999998,
+            0.9899999999999998
+          ],
+          "linear_tone_factor": 0.9299999999999999
+        }
+      ],
+      "wood_reference": {
+        "pr": 830,
+        "head": "5f9b59b8",
+        "tone_strength": 0.14,
+        "base": "#A3815D",
+        "light": "#B89972",
+        "dark": "#795F47",
+        "joint": "#69543F"
+      },
       "pile_count": 4,
       "pile_centres": [
         [
@@ -1999,7 +2886,7 @@
       "pile_width_m": 0.16,
       "placement_y": "desired walking height minus 1.2 m; piles may extend underwater",
       "file": "coast_dock_bollard.glb",
-      "sha256": "c448e04876c043102e271da0cf3bff3f742352c044a37f0f54e8df64567f2fd4",
+      "sha256": "e230032aa26f0ae634bb94a9bbeaaeac7431ac1b0ab0838e29bf462501c9907f",
       "source": "tools/art/source/coast_kit/coast_kit.blend",
       "material": "coast_warm_sand.tres"
     },

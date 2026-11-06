@@ -1,6 +1,6 @@
 """Audit exported geometry and every ordered out->in mating combination."""
 from pathlib import Path
-import argparse,colorsys,hashlib,json,math,re,subprocess,sys
+import argparse,hashlib,json,math,re,subprocess,sys
 import numpy as np
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3];KIT=ROOT/'assets/landmarks/_shared/coast_kit';QA=ROOT/'output/coast-kit'
 sys.path.insert(0,str(ROOT/'tools/art'))
@@ -50,24 +50,45 @@ for name,e in manifest['assets'].items():
     elif e['family'] in ['dock','seawall']:
         check(colors.shape[1]==4 and np.allclose(colors[:,3],.75),name+': wettable solid surface code')
     else:check(path.read_bytes()==base_path.read_bytes(),name+': already accepted GLB byte-identical')
+    if e['family']!='dock':
+        previous=subprocess.check_output(['git','show','85967444:assets/landmarks/_shared/coast_kit/'+name+'.glb'],cwd=ROOT)
+        check(path.read_bytes()==previous,name+': v1.1 non-dock GLB byte-identical')
     if e['family']=='dock':
-        check(e['planks']==11 and .15<=min(e['plank_width_range_m'])<=max(e['plank_width_range_m'])<=.20,name+': eleven 15–20cm boards')
+        check(e['plank_rows']==11 and e['planks']==28 and e['board_nominal_size_m']==[1.8,.18] and e['half_stagger_m']==.9,name+': #830 nominal boards / half stagger')
         check(e['pile_count']==4 and len(e['pile_centres'])==4,name+': four corner piles')
-        top=np.isclose(xyz[:,1],1.2,atol=1e-6)&np.isclose(np.abs(xyz[:,2]),1,atol=1e-6)
-        edges=np.unique(np.round(xyz[top,0],6));widths=edges[1::2]-edges[::2];gaps=edges[2::2]-edges[1:-1:2]
-        check(len(edges)==22 and (widths>=.15).all() and (widths<=.20).all() and np.allclose(gaps,.01,atol=2e-6),name+': actual top geometry has 11 narrow boards and visible 1cm joints')
+        top=np.all(np.isclose(xyz[ids,1],1.2,atol=1e-6),axis=1)&(face[:,1]>0)
+        top_ids=ids[top];top_face=face[top]
+        check(np.isclose(np.linalg.norm(top_face,axis=1).sum()/2,4,atol=1e-6),name+': top partitions exactly 4 square metres without stacked board faces')
+        def linear(hexcode):
+            c=np.array([int(hexcode[i:i+2],16)/255 for i in [0,2,4]])
+            return np.where(c<=.04045,c/12.92,((c+.055)/1.055)**2.4)
+        def sample(x,z):
+            points=xyz[top_ids][:,:,[0,2]];a=points[:,0];u=points[:,1]-a;v=points[:,2]-a;q=np.array([x,z])-a
+            det=u[:,0]*v[:,1]-u[:,1]*v[:,0]
+            first=(q[:,0]*v[:,1]-q[:,1]*v[:,0])/det;second=(u[:,0]*q[:,1]-u[:,1]*q[:,0])/det
+            hit=(first>=-1e-6)&(second>=-1e-6)&(first+second<=1+1e-6)
+            return colors[top_ids[hit],:3].mean(axis=1)
+        base=linear('A3815D');seam=linear('69543F')
+        tone_ok=True;stagger_ok=True;sampled=[]
+        for row in range(11):
+            z=-.9+row*.18
+            for x in [-.5,.3,.7]:
+                paint=sample(x,z);factors=paint/base
+                tone_ok &= len(paint)>0 and np.all(factors>=.85999) and np.all(factors<=1.14001) and np.allclose(factors[:,0],factors[:,1]) and np.allclose(factors[:,1],factors[:,2])
+                sampled.extend(factors[:,0].tolist())
+            joints=[-.9,.9] if row%2==0 else [0.0]
+            for x in joints:
+                paint=sample(x,z)
+                stagger_ok &= len(paint)>0 and np.allclose(paint,seam,atol=1e-6)
+                for side in [-.007,.007]:stagger_ok &= not np.allclose(sample(x+side,z),seam,atol=1e-6)
+        check(tone_ok and min(sampled)<.87 and max(sampled)>1.13,name+': measured exported board colour #A3815D with +/-14% linear variation')
+        check(stagger_ok,name+': actual 1.8m end joints alternate by .9m with .012m dark bands')
+        check(all(np.allclose(sample(.3,-.81+.18*i),seam,atol=1e-6) and not np.allclose(sample(.3,-.81+.18*i+.007),seam,atol=1e-6) for i in range(10)),name+': actual .18m row pitch and .012m long joints')
+        check(any(np.allclose(c,linear('B89972'),atol=1e-6) for c in colors[:,:3]) and any(np.allclose(c,linear('795F47'),atol=1e-6) for c in colors[:,:3]),name+': #830 light and dark wood colours present')
+        report.setdefault('wood_match',{})[name]={'reference':'#830 5f9b59b8','board_nominal_m':[1.8,.18],'stagger_m':.9,'joint_m':.012,'linear_tone_measured':[min(sampled),max(sampled)],'top_area_m2':float(np.linalg.norm(top_face,axis=1).sum()/2)}
         for centre in e['pile_centres']:
             expected=[np.array([centre[0]+dx,y,centre[2]+dz]) for dx in [-.08,.08] for dz in [-.08,.08] for y in [0,.98]]
             check(all(np.linalg.norm(xyz-p,axis=1).min()<1e-6 for p in expected),name+': actual pile corners at '+str(centre))
-        def saturation(values):
-            srgb=np.where(values<=.0031308,values*12.92,1.055*np.power(values,1/2.4)-.055)
-            return float(np.mean([colorsys.rgb_to_hsv(*c)[1] for c in srgb]))
-        old,old_blob=load_glb(base_path);old_p=old['meshes'][0]['primitives'][0]
-        old_xyz=np.array(accessor(old,old_blob,old_p['attributes']['POSITION']));old_colors=np.array(accessor(old,old_blob,old_p['attributes']['COLOR_0']))
-        old_top=np.isclose(old_xyz[:,1],1.2,atol=1e-6)&np.isclose(np.abs(old_xyz[:,2]),1,atol=1e-6)
-        old_s,new_s=saturation(old_colors[old_top,:3]),saturation(colors[top,:3])
-        check(new_s<old_s-.1,name+': plank colour is measurably less saturated than v1')
-        report.setdefault('plank_saturation',{})[name]={'v1':old_s,'v1.1':new_s}
     if e['family']=='seawall':
         cap=xyz[np.isclose(xyz[:,1],1.2,atol=1e-6)]
         check(np.isclose(cap[:,2].max()-cap[:,2].min(),.84,atol=1e-6),name+': actual overhanging coping width')

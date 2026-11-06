@@ -1,0 +1,14 @@
+{
+  "reference_pr": 824,
+  "commit": "1442acaf2d4e00cf64ca0c57349e8ed179e84ffe",
+  "files": {
+    "assets/landmarks/alcatraz_island/alc_foam_strip_a.glb": "8c9cbe342d71f49a6d39d35377f24c7a2958201c3752f6760a694001e4b96b44",
+    "assets/landmarks/alcatraz_island/alc_foam_strip_a.glb.import": "df91159884b1e54dbc13901c0479b6ede7368d6162d09e37db6fc56f3513ea86",
+    "assets/landmarks/alcatraz_island/alc_foam_ring.glb": "0fc8c4bd8c48edb775c325f54e6695dd37643e8c5710343659eab7da9cbc9046",
+    "assets/landmarks/alcatraz_island/alc_foam_ring.glb.import": "fb5c8d4962fd936eab9ed6d762abbdcb5a235e59226b58eb5478a9cd129831b1",
+    "assets/landmarks/alcatraz_island/alc_foam_material.tres": "5b877de330fe984db34a873f5f9bcf8f130dbc515113e64a36e293875615b88e",
+    "assets/landmarks/alcatraz_island/alc_foam_soft.png": "12dc9ad8724c1945c06997d1f4cbc88cb349b3dc8b80e62bb7fd0bca7b7dfc93",
+    "assets/landmarks/alcatraz_island/alc_foam_soft.png.import": "4bb9ed4476601cd0375e45be685825851307ae4985898e025e8d240b89971d96"
+  },
+  "review_only": true
+}

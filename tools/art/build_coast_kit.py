@@ -10,8 +10,7 @@ import build_decor_assets as K
 from verify_chef_sign import load_glb,accessor
 OUT=ROOT/'assets/landmarks/_shared/coast_kit';SRC=ROOT/'tools/art/source/coast_kit'
 PALETTE=json.loads((SRC/'reference/palette.json').read_text())['colors']
-PALETTE.update({'wood':'9F8063','wood_light':'AA8E72','wood_dark':'675139','wood_seam':'665443',
-                'plank_a':'9F8165','plank_b':'A7896B','plank_c':'A18468','plank_d':'AA8C6E',
+PALETTE.update({'wood':'A3815D','wood_light':'B89972','wood_dark':'795F47','wood_seam':'69543F',
                 'rope':'B7A68D','stone_joint':'8B8476'})
 ACTOR='8ea32e40-c0ba-4a31-864f-374a6bcbc554'
 # z (land - / sea +), y: the SAME six-vertex end profile for all six rocks.
@@ -120,16 +119,37 @@ def seawall():
             'ports':[port('in',[-1,0,0],[-1,0,0],left,'seawall'),port('out',[1,0,0],[1,0,0],right,'seawall')]}
 
 def dock(end=False,bollard=False):
-    # Eleven 17–18 cm boards, shallow visible joints over a solid dark backer.
-    # The end boards still reach X +/-1, preserving the exact old seam profile.
-    pitch=2/11;gap=.010;plank_widths=[]
-    shades=['plank_b','plank_a','plank_c','plank_b','plank_d','plank_c','plank_a','plank_b','plank_c','plank_d','plank_b']
-    for i in range(11):
-        left=-1+i*pitch+(gap/2 if i else 0);right=-1+(i+1)*pitch-(gap/2 if i<10 else 0)
-        plank_widths.append(right-left)
-        K.box('Deck plank %02d'%i,((left+right)/2,1.14,0),(right-left,.12,2),shades[i],0)
-    # Recess on all sides: no coplanar overlap with exposed board edges/undersides.
-    K.box('Dark continuous backing beneath joints',(0,1.115,0),(1.92,.05,1.98),'wood_seam',0)
+    # #830 v1.1: nominal 1.8 x .18 m boards, .9 m half stagger,
+    # .012 m dark joints. Crop the pattern inside the existing 2 m module.
+    # Partition one top plane, rather than stacking coplanar faces or making
+    # a closed box for each board; the original port silhouette stays exact.
+    slab=K.box('Deck / closed outer fascia and underside',(0,1.14,0),(2,.12,2),'wood_dark',0)
+    bm=bmesh.new();bm.from_mesh(slab.data)
+    bmesh.ops.delete(bm,geom=[f for f in bm.faces if f.normal.z>.5],context='FACES')
+    bm.to_mesh(slab.data);bm.free()
+    outer=[(-1,1.2,-1),(-1,1.2,1),(1,1.2,1),(1,1.2,-1)]
+    inner=[(-.99,1.2,-.99),(-.99,1.2,.99),(.99,1.2,.99),(.99,1.2,-.99)]
+    def upward(o):
+        # An open coplanar piece has no volume for recalc to choose an outside.
+        bm=bmesh.new();bm.from_mesh(o.data)
+        bmesh.ops.reverse_faces(bm,faces=[f for f in bm.faces if f.normal.z<0])
+        bm.to_mesh(o.data);bm.free()
+    upward(K.mesh('Deck / narrow edge strip',outer+inner,[(i,(i+1)%4,(i+1)%4+4,i+4) for i in range(4)],'wood_light'))
+    def tile(label,left,right,back,front,shade):
+        upward(K.mesh(label,[(left,1.2,back),(left,1.2,front),(right,1.2,front),(right,1.2,back)],[(0,1,2,3)],shade))
+    gap=.012;planks=[]
+    for row in range(11):
+        z0=-.99+row*.18;z1=z0+.18
+        back=z0+(gap/2 if row else 0);front=z1-(gap/2 if row<10 else 0)
+        joints=[-.9,.9] if row%2==0 else [0.0]
+        edges=[-.99]+[v for joint in joints for v in [joint-gap/2,joint+gap/2]]+[.99]
+        for i,(left,right) in enumerate(zip(edges,edges[1:])):
+            seam=i%2==1
+            tone=(row*5+(i//2)*3)%9
+            shade='wood_seam' if seam else 'plank_tone_'+str(tone)
+            tile(('Joint' if seam else 'Board')+' row %02d part %02d'%(row,i),left,right,back,front,shade)
+            if not seam:planks.append({'row':row,'bounds_xz':[left,right,back,front],'linear_tone_factor':1+[-.14,-.10,-.07,-.04,0,.04,.07,.10,.14][tone]})
+        if row<10:tile('Continuous long joint %02d'%row,-.99,.99,z1-gap/2,z1+gap/2,'wood_seam')
     for z in [-.72,.72]:
         K.box('Continuous longitudinal beam',(0,1.015,z),(2,.13,.14),'wood_dark',0)
         for x in [-.66,.66]:K.box('Corner timber pile', (x,.49,z),(.16,.98,.16),'wood_dark',0)
@@ -153,7 +173,9 @@ def dock(end=False,bollard=False):
     ports=[port('in',[-1,1.2,0],[-1,0,0],profile[0],'dock')]
     if not end:ports.append(port('out',[1,1.2,0],[1,0,0],profile[1],'dock'))
     return {'family':'dock','nominal_module_m':2,'deck_size_m':[2,2],'deck_y':1.2,'ports':ports,'terminal':end,'mooring_bollard':bollard,
-            'planks':11,'plank_width_range_m':[min(plank_widths),max(plank_widths)],'joint_width_m':gap,
+            'planks':len(planks),'plank_rows':11,'board_nominal_size_m':[1.8,.18],'half_stagger_m':.9,
+            'plank_width_range_m':[.168,.174],'joint_width_m':gap,'plank_patches':planks,
+            'wood_reference':{'pr':830,'head':'5f9b59b8','tone_strength':.14,'base':'#A3815D','light':'#B89972','dark':'#795F47','joint':'#69543F'},
             'pile_count':4,'pile_centres':[[x,0,z] for z in [-.72,.72] for x in [-.66,.66]],'pile_width_m':.16,
             'placement_y':'desired walking height minus 1.2 m; piles may extend underwater'}
 
@@ -206,6 +228,12 @@ def main():
     for role,value in PALETTE.items():
         m=bpy.data.materials.new(role);m.diffuse_color=(*K.rgb(value),1);m.use_nodes=True
         p=m.node_tree.nodes['Principled BSDF'];p.inputs['Base Color'].default_value=m.diffuse_color;p.inputs['Roughness'].default_value=.94;p.inputs['Specular IOR Level'].default_value=.15;K.MATS[role]=m
+    # Match #830's +/-14% tone in linear space, without quantizing to hex.
+    for i,tone in enumerate([-.14,-.10,-.07,-.04,0,.04,.07,.10,.14]):
+        m=K.MATS['wood'].copy();m.name='plank_tone_'+str(i)
+        m.diffuse_color=(*[v*(1+tone) for v in K.rgb(PALETTE['wood'])],1)
+        m.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=m.diffuse_color
+        K.MATS[m.name]=m
     material=bpy.data.materials.new('Coast kit / matte vertex paint');material.use_nodes=True;material.use_backface_culling=True
     shader=material.node_tree.nodes['Principled BSDF'];shader.inputs['Roughness'].default_value=.94;shader.inputs['Specular IOR Level'].default_value=.15
     vc=material.node_tree.nodes.new('ShaderNodeVertexColor');vc.layer_name='Color';material.node_tree.links.new(vc.outputs['Color'],shader.inputs['Base Color'])
@@ -225,7 +253,7 @@ def main():
             rock=meta['family'] in ['shore_rock','scatter'];encode_surface_codes(path,rock)
             entry.update(meta);entry.update(file=name+'.glb',sha256=hashlib.sha256(path.read_bytes()).hexdigest(),bytes=path.stat().st_size,source='tools/art/source/coast_kit/coast_kit.blend',material='coast_cool_gray.tres' if rock else 'coast_warm_sand.tres')
         records[name]=entry;print('COAST_KIT',name,entry['triangles'],entry['bounds'],flush=True)
-    manifest={'author':'赵云','virtual_user_id':ACTOR,'revision':'v1.1','module_grid_m':2,'axes':'metres, Y up; straight coast +X tangent, +Z water / -Z land','material_contract':{'vertex_color_is_srgb':False,'roughness':.94,'specular':.15,'metallic':0,'textures':False,'passes':1,'keep_imported_material':True,'vertex_alpha':'opaque surface tag: 1/8 rock base, 2/8 light, 3/8 shadow, 4/8 warm, 6/8 wettable solid'},'rock_palettes':{'selector':'rock_palette','warm_sand':0,'cool_gray_brown':1,'cool_reference':'SGODOT-424 #801 v3 af319757: #777A75 / #93958B / #515B59'},'wet_band':{'water_level_default':.15,'height_above_water_m':.25,'strength':.38,'space':'world; follows translated/scaled instances','foam_compatibility':'opaque underlying surface; existing #824 foam remains an independent transparent layer at water + 0.018m'},'palette_srgb':PALETTE,'reference':json.loads((SRC/'reference/provenance.json').read_text()),'assets':records,'example_layout_included':False}
+    manifest={'author':'赵云','virtual_user_id':ACTOR,'revision':'v1.2','module_grid_m':2,'axes':'metres, Y up; straight coast +X tangent, +Z water / -Z land','material_contract':{'vertex_color_is_srgb':False,'roughness':.94,'specular':.15,'metallic':0,'textures':False,'passes':1,'keep_imported_material':True,'vertex_alpha':'opaque surface tag: 1/8 rock base, 2/8 light, 3/8 shadow, 4/8 warm, 6/8 wettable solid'},'rock_palettes':{'selector':'rock_palette','warm_sand':0,'cool_gray_brown':1,'cool_reference':'SGODOT-424 #801 v3 af319757: #777A75 / #93958B / #515B59'},'wet_band':{'water_level_default':.15,'height_above_water_m':.25,'strength':.38,'space':'world; follows translated/scaled instances','foam_compatibility':'opaque underlying surface; existing #824 foam remains an independent transparent layer at water + 0.018m'},'palette_srgb':PALETTE,'reference':json.loads((SRC/'reference/provenance.json').read_text()),'assets':records,'example_layout_included':False}
     for path in [OUT/'manifest.json',SRC/'asset_stats.json']:path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     bpy.context.scene.unit_settings.system='METRIC';bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'coast_kit.blend'),compress=True)
 
