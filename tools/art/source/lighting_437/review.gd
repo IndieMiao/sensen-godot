@@ -117,6 +117,8 @@ func run():
  camera=Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.keep_aspect=Camera3D.KEEP_WIDTH;camera.far=150;world.add_child(camera);camera.make_current()
  frame(assembly.to_global(Vector3(.2,.2,2.6)),6.72)
  build_combo(0)
+ if "--dusk-v14" in OS.get_cmdline_user_args():
+  await dusk_v14(actor);return
  if OS.has_feature("android"):
   await android_start();return
  clock_set(0)
@@ -137,6 +139,23 @@ func run():
  report.budget={"directional_lights":1,"world_environments":1,"shadow_cascades":1,"shadow_map_size":2048,"filter_quality":2,"ssao":false,"ssr":false,"sdfgi":false,"volumetric_fog":false,"fog":false,"glow":false,"runtime_process_callbacks":0}
  # Uncapped, interleaved viewport timing. TIME is frozen only in desktop review.
  if "--benchmark" in OS.get_cmdline_user_args():await benchmark()
+ if "--shadow-probe" in OS.get_cmdline_user_args():await shadow_probe(actor)
+ report.passed=report.checks.all(func(c):return c.passed)
+ FileAccess.open(output+"/render-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
+ print("LIGHTING_RENDER ",report.passed);get_tree().quit(0 if report.passed else 1)
+
+func dusk_v14(actor):
+ # Matched v1.3 / current dusk; all geometry, camera and companion materials stay fixed.
+ set_preset(2)
+ var env=lighting.get_node("Environment").environment;var sun=lighting.get_node("Sun")
+ env.ambient_light_color=Color(.83,.795,.984);env.ambient_light_energy=.62
+ sun.light_color=Color(1,.88,.26);sun.light_energy=1.73;sun.rotation_degrees=Vector3(-18,-13,0)
+ for i in 60:await RenderingServer.frame_post_draw
+ await capture("golden-dusk-v13")
+ set_preset(2)
+ for i in 60:await RenderingServer.frame_post_draw
+ await capture("golden-dusk-default-review")
+ report.renderer={"engine":Engine.get_version_info().string,"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
  if "--shadow-probe" in OS.get_cmdline_user_args():await shadow_probe(actor)
  report.passed=report.checks.all(func(c):return c.passed)
  FileAccess.open(output+"/render-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")

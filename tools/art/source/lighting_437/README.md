@@ -1,6 +1,6 @@
 # SGODOT-437 lighting review
 
-Current revision is v1.3: one lighting preset references an Environment, one sun,
+Current revision is v1.4: one lighting preset references an Environment, one sun,
 one sea ShaderMaterial and one far-material bundle (city / hills / bridge).
 Runtime stays under `assets/landmarks/_shared/lighting/`. The original 432 / 434
 shaders and materials are read-only dependencies. No global script classes.
@@ -87,3 +87,22 @@ and timing measurements.
 
 This colour-only revision reuses the already verified runtime switching path;
 Android v1.2 results remain historical and are not relabelled as v1.3 tests.
+
+## v1.4 dusk highlight review
+
+Use `LIGHTING_REVIEW_OUT=output/lighting-437-v14` for preparation. Remove only
+that isolated project's `.godot` cache, then cold import and run the unchanged
+79 resource checks. Capture with `--fixed-fps 30 --disable-vsync --
+--dusk-v14 --shadow-probe`. This early review branch renders v1.3's exact light
+parameters, then the current production dusk resource at the same frozen clock
+and camera. It also rechecks the authorized horizontal light adjustment on the
+existing separate shadow probe. It does not recapture or change noon/morning.
+
+Compare all 16 runtime resource hashes before/after import and against source;
+write that record to `<output>/cold-validation.json`. Run `package_v14.py` with
+NumPy / Pillow. The only review board is `v14/golden-dusk-v13-v14.png`; the raw
+current 360x800 capture and explicit fixed sampling polygons accompany it.
+The recreated v1.3 image is pixel-identical to the committed v1.3 capture.
+Shadow-probe images stay in ignored output; its direction is recorded in the
+render JSON. Android and timing evidence from earlier versions remains
+historical; this revision adds no geometry, shading work or runtime logic.
