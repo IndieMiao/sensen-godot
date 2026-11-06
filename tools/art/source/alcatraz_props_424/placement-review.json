@@ -1,0 +1,138 @@
+[
+  {
+    "placement": "alc_flowerbed_000",
+    "position": [
+      -21,
+      3.25,
+      5.4
+    ],
+    "rail_intersections_conservative": [
+      "alc_rail_straight_100",
+      "alc_rail_straight_101"
+    ],
+    "suggested_shift": [
+      0,
+      0,
+      -0.4
+    ],
+    "requires_scene_owner_validation": true
+  },
+  {
+    "placement": "alc_flowerbed_001",
+    "position": [
+      -15,
+      5.5,
+      0.8999999999999999
+    ],
+    "rail_intersections_conservative": [
+      "alc_rail_straight_148",
+      "alc_rail_straight_149"
+    ],
+    "suggested_shift": [
+      0,
+      0,
+      -0.4
+    ],
+    "requires_scene_owner_validation": true
+  },
+  {
+    "placement": "alc_flowerbed_002",
+    "position": [
+      7,
+      5.5,
+      0.8999999999999999
+    ],
+    "rail_intersections_conservative": [
+      "alc_rail_straight_159",
+      "alc_rail_straight_160"
+    ],
+    "suggested_shift": [
+      0,
+      0,
+      -0.4
+    ],
+    "requires_scene_owner_validation": true
+  },
+  {
+    "placement": "alc_flowerbed_003",
+    "position": [
+      -9,
+      7.75,
+      -3.6
+    ],
+    "rail_intersections_conservative": [
+      "alc_rail_straight_076",
+      "alc_rail_straight_077"
+    ],
+    "suggested_shift": [
+      0,
+      0,
+      -0.4
+    ],
+    "requires_scene_owner_validation": true
+  },
+  {
+    "placement": "alc_flowerbed_004",
+    "position": [
+      -18.7,
+      1,
+      10.3
+    ],
+    "rail_intersections_conservative": [],
+    "suggested_shift": [
+      0,
+      0,
+      -0.6
+    ],
+    "requires_scene_owner_validation": true,
+    "other_intersection": "alc_sign_003: stem is inside the expanded 1.7m bed in current original placement; shift bed -Z approximately0.6m or move sign separately"
+  },
+  {
+    "placement": "alc_flowerbed_005",
+    "position": [
+      -24,
+      10,
+      -5.05
+    ],
+    "rail_intersections_conservative": [],
+    "suggested_shift": [
+      0,
+      0,
+      0
+    ],
+    "requires_scene_owner_validation": true,
+    "note": "No rail overlap flagged by the current rectangle audit. Keep placement unless scene/navigation review requires a move."
+  },
+  {
+    "placement": "alc_flowerbed_006",
+    "position": [
+      -6,
+      10,
+      -5.05
+    ],
+    "rail_intersections_conservative": [],
+    "suggested_shift": [
+      0,
+      0,
+      0
+    ],
+    "requires_scene_owner_validation": true,
+    "note": "No rail overlap flagged by the current rectangle audit. Keep placement unless scene/navigation review requires a move."
+  },
+  {
+    "placement": "alc_flowerbed_007",
+    "position": [
+      12,
+      10,
+      -5.05
+    ],
+    "rail_intersections_conservative": [],
+    "suggested_shift": [
+      0,
+      0,
+      0
+    ],
+    "requires_scene_owner_validation": true,
+    "note": "No rail overlap flagged by the current rectangle audit. Keep placement unless scene/navigation review requires a move."
+  }
+]
