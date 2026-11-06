@@ -11,6 +11,8 @@ const Art = preload("res://modules/farm/farm_art.gd")
 const CropMesh = preload("res://modules/farm/crop_plant_mesh.gd")
 const P0MaterialLogic := preload("res://modules/p0/p0_material_logic.gd")
 const REACH_M := 1.0      # from the point's stand: the key is Gather
+const PIECE_REACH_M := 1.5   # … or this near the piece itself: a stand on its far side (Pebble Pond's C1, by the water —
+                             # 李元芳 on 422) is reached from the front too
 const TAG_M := 8.0        # the nearest point within this has its name bar
 const CLEAR_M := 1.5      # the bank's trees and bushes keep this far off a point (pond_slots_v2 _doc.scenery_clearance)
 ## The pieces by kind (上官婉儿, 410 924d6611); the four new ones are farm-kit glbs (Art.instance), the rest are built.
@@ -70,6 +72,11 @@ static func stand_of(p: Dictionary) -> Vector3:
 
 static func flat(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
+
+## Whether `at` can gather `p`: within REACH_M of its stand, or PIECE_REACH_M of the piece (the server does not ask).
+static func in_reach(p: Dictionary, at: Vector3) -> bool:
+	if p.is_empty(): return false
+	return flat(stand_of(p), at) <= REACH_M or flat(Vector3(float(p.get("x", 0)), 0, float(p.get("z", 0))), at) <= PIECE_REACH_M
 
 ## The point nearest `at` (by its stand), {} with none.
 static func nearest(list: Array, at: Vector3) -> Dictionary:

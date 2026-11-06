@@ -40,6 +40,14 @@ func test_the_name_bar_is_the_items_name_dimmed_while_cooling() -> void:
 	assert_str(str(t.fact)).is_equal("Ready in 4h")
 	assert_bool(t.dimmed).is_true()
 
+## 李元芳 on 422: Pebble Pond's reeds (C1 (4, -2.4), its stand (3.88, -3.12) on the water's side) gather from the front too.
+func test_a_point_is_reached_at_its_stand_or_its_piece() -> void:
+	var reeds := {"id": "pond_san_francisco_04#C1", "kind": "reed", "x": 4.0, "z": -2.4, "stand": [3.88, -3.12]}
+	assert_bool(PondGather.in_reach(reeds, Vector3(3.88, 0, -3.12))).is_true()   # at the stand
+	assert_bool(PondGather.in_reach(reeds, Vector3(4.0, 0, -1.2))).is_true()     # in front of the reeds, 1.2 m off
+	assert_bool(PondGather.in_reach(reeds, Vector3(4.0, 0, -0.5))).is_false()    # further back: Cast
+	assert_bool(PondGather.in_reach({}, Vector3.ZERO)).is_false()
+
 func test_the_nearest_point_by_its_stand() -> void:
 	var a := _point("wood", 0.0, 3.0, -1.0)
 	var b := _point("stone", 0.0, 9.0, -1.0)
