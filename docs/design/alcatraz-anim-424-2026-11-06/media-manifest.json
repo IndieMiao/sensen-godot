@@ -1,0 +1,22 @@
+[
+  {
+    "file": "SGODOT-424_anim_v1_all_motion_6s.mp4",
+    "sha256": "1810458d3cf885cff36e22a97af38fca9f1040a5a6047c613b155b4276363a92",
+    "bytes": 517079
+  },
+  {
+    "file": "SGODOT-424_anim_v1_gull_poses.png",
+    "sha256": "f3b65b905f46f1943ae226eb66454e1853cfa4a00f144fdece6ef23ad4c5c30c",
+    "bytes": 37827
+  },
+  {
+    "file": "SGODOT-424_anim_v1_opening_6s.mp4",
+    "sha256": "7a2925688d6a195200af504f84ff1f15c6aa1db06a17d8feb2fddc1574ff85bb",
+    "bytes": 65393
+  },
+  {
+    "file": "SGODOT-424_anim_v1_validation.json",
+    "sha256": "fead45078ced4cb947f488aa4972bf7c6d0074d3baa4ca92cafa1e10d5f2174a",
+    "bytes": 16006
+  }
+]

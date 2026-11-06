@@ -1,0 +1,10 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "baseline": "996528d3a273d773e1e2168361ac79a1da9f15c4",
+  "gull": "Approved source geometry and preen/spread unchanged; turn_head added to the same284 triangles",
+  "ferry": "Both accepted hull GLBs/imports byte-identical; referenced by ferry.tscn, 4s BodyRig bob",
+  "flag": "New52-triangle vertex-colour cloth/pole, one flutter morph",
+  "scene_generator": "build_scenes.gd",
+  "runtime_scripts": "none; caller starts idle and chooses random phase"
+}

@@ -1,0 +1,70 @@
+{
+  "task": "SGODOT-424",
+  "revision": "v1",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "baseline": "996528d3a273d773e1e2168361ac79a1da9f15c4",
+  "gull": {
+    "scene": "gull.tscn",
+    "mesh": "gull.glb",
+    "triangles": 284,
+    "surfaces": 1,
+    "idle_s": 8.5,
+    "quiet_fraction": 0.671875,
+    "shape_targets": [
+      "preen",
+      "spread",
+      "turn_head"
+    ],
+    "autoplay": false,
+    "root_motion": false,
+    "instances": 3,
+    "phase_policy": "Caller randomizes start once per independent instance; stratified offsets recommended"
+  },
+  "ferry": {
+    "scene": "ferry.tscn",
+    "near": "ferry.glb",
+    "far": "ferry_far.glb",
+    "lod_distance_m": 55,
+    "idle_s": 4,
+    "bob_amplitude_m": 0.02,
+    "animated_node": "BodyRig",
+    "root_motion": false,
+    "autoplay": false,
+    "flag": {
+      "file": "ferry_flag.glb",
+      "triangles": 52,
+      "surfaces": 1,
+      "mount_position": [
+        11.2,
+        1.48,
+        2.5
+      ],
+      "pole_height_m": 1.65,
+      "cloth_size_m": [
+        0.8,
+        0.45
+      ],
+      "flutter_depth_m": 0.035,
+      "sha256": "eaaf1c0787001cc3f61513b159cd75f0a125ee04269241d6e33252a56f28f3b5"
+    },
+    "near_active_triangles": 5196,
+    "far_active_triangles": 1532,
+    "active_surfaces": 2
+  },
+  "placements_source": "b16c3198 unchanged ferry_gull_manifest.json placements",
+  "interaction": {
+    "clickable": false,
+    "collision": false,
+    "lights": false,
+    "cameras": false
+  },
+  "native_resource_sha256": {
+    "gull.tscn": "d550306ff74cbdc5230ffbbded41c6581c59b1f1ef091689df18b5b1ce7a579e",
+    "ferry.tscn": "fe15a27e011bf0620a497dd98d02857f3a9c19519162269a9c18c6798a89272a",
+    "gull_animations.tres": "b056a65fbeaa9fb8241950246fccc71a2d54a2bb10716eed926df0bbedca4247",
+    "ferry_animations.tres": "b3adfed4003879c776b0086a2e644283ec69893a85e3aa4b041552883326aef9",
+    "gull.glb": "cdeb84ff5c8a7d1121067980789c8b4d82cedc023e46c0b604e882022c0d64df",
+    "ferry_flag.glb": "eaaf1c0787001cc3f61513b159cd75f0a125ee04269241d6e33252a56f28f3b5"
+  }
+}

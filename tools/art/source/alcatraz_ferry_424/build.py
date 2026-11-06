@@ -109,7 +109,7 @@ def make_gull():
   faces=[(0,1,2,5),(2,3,4,5),(6,11,8,7),(8,11,10,9)]+[(i,(i+1)%6,(i+1)%6+6,i+6) for i in range(6)]
   mesh('Wing_L' if side<0 else 'Wing_R',pts,faces,['wing','tip','wing','tip']+['wing']*6)
  mesh('Tail',[(-.09,.21,.18),(.09,.21,.18),(.11,.16,.37),(-.11,.16,.37),(0,.26,.20)],[(0,1,4),(1,2,4),(2,3,4),(3,0,4),(0,3,2,1)],'tip')
- return {'style':'quiet perched gull, ivory body, grey wings, muted ochre beak/feet','poses':['stand','preen','spread'],'front':'-Z, matching original gull; no placement yaw changes','cast_shadow':False,'clickable':False,'animation':None,'pose_selection':'stand: both weights 0; preen: preen=1; spread: spread=1; never both at once'}
+ return {'style':'quiet perched gull, ivory body, grey wings, muted ochre beak/feet','poses':['stand','preen','spread','turn_head'],'front':'-Z, matching original gull; no placement yaw changes','cast_shadow':False,'clickable':False,'animation':None,'pose_selection':'stand: both weights 0; preen: preen=1; spread: spread=1; never both at once'}
 
 def export(name,builder):
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False);bpy.context.preferences.filepaths.save_version=0
@@ -137,7 +137,7 @@ def export(name,builder):
  bpy.context.view_layer.objects.active=copies[0];bpy.ops.object.join();body=bpy.context.object;body.name=name;body.data.name=name+'_mobile'
  bm=bmesh.new();bm.from_mesh(body.data);bmesh.ops.triangulate(bm,faces=list(bm.faces));bm.to_mesh(body.data);bm.free()
  if name=='gull':
-  basis=body.shape_key_add(name='stand');preen=body.shape_key_add(name='preen');spread=body.shape_key_add(name='spread')
+  basis=body.shape_key_add(name='stand');preen=body.shape_key_add(name='preen');spread=body.shape_key_add(name='spread');turn=body.shape_key_add(name='turn_head')
   for i,vert in enumerate(body.data.vertices):
    group=body.vertex_groups[vert.groups[0].group].name if vert.groups else ''
    # Blender coordinates -> Godot for easily auditable pose dimensions.
@@ -145,6 +145,8 @@ def export(name,builder):
    if group.startswith(('Head','Beak','Eye')):
     # Turn back into the right shoulder while keeping the root/feet still.
     preen.data[i].co=v((.115+(x*.75),.345+(y-.47)*.8,.13-(z+.18)*.8))
+    angle=math.radians(38);dx=x;dz=z+.18
+    turn.data[i].co=v((math.cos(angle)*dx+math.sin(angle)*dz,y,-.18-math.sin(angle)*dx+math.cos(angle)*dz))
    if group.startswith('Wing_'):
     side=-1 if x<0 else 1
     # Same broad shoulder root, outstretched quiet curved feather silhouette.
@@ -166,8 +168,11 @@ def export(name,builder):
 
 def main():
  KIT.mkdir(parents=True,exist_ok=True)
+ if '--gull-only' in sys.argv:
+  manifest=json.loads((KIT/'ferry_gull_manifest.json').read_text());manifest['assets']['gull']=export('gull',make_gull);manifest['revision']='v1.1_animation';manifest['gull_animation']={'scene':'gull.tscn','clip':'idle','length_s':8.5,'autoplay':False,'phase':'caller supplies random offset per independent instance'}
+  (KIT/'ferry_gull_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');return
  entries={n:export(n,b) for n,b in [('ferry',lambda:ferry(False)),('ferry_far',lambda:ferry(True)),('gull',make_gull)]}
  layout=json.loads((SRC/'reference/layout-b16c3198.json').read_text());points=[x for x in layout['placements'] if x['asset'] in ['ferry','gull']]
- manifest={'task':'SGODOT-424','revision':'v1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','units':'metres / Y up / unit transforms','host_ref':'b16c31982f34a64cdd4f9c6683064edbf20837a0','palette_srgb':p.PAL,'assets':entries,'placements':points,'ferry_lod_group':{'name':'ferry','near':'ferry','far':'ferry_far','switch_distance_m':55,'margin_m':0},'gull_pose_by_instance':{'gull_000':'stand','gull_001':'preen','gull_002':'spread'},'interaction':'decorative; no collision, click target, particles or locomotion'}
+ manifest={'task':'SGODOT-424','revision':'v1.1_animation','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','units':'metres / Y up / unit transforms','host_ref':'b16c31982f34a64cdd4f9c6683064edbf20837a0','palette_srgb':p.PAL,'assets':entries,'placements':points,'ferry_lod_group':{'name':'ferry','near':'ferry','far':'ferry_far','switch_distance_m':55,'margin_m':0},'gull_pose_by_instance':{'gull_000':'stand','gull_001':'preen','gull_002':'spread'},'gull_animation':{'scene':'gull.tscn','clip':'idle','length_s':8.5,'autoplay':False,'phase':'caller supplies random offset per independent instance'},'interaction':'decorative; no collision, click target, particles or locomotion'}
  (KIT/'ferry_gull_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 if __name__=='__main__':main()

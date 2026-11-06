@@ -38,8 +38,8 @@ for name,entry in m['assets'].items():
   check(abs(np.ptp(vs,axis=0)[0]-25)<1e-5,name+' exactly 25m X length')
   check(abs(vs.min(0)[1]+1)<1e-6,name+' original waterline pivot / submerged -1m keel')
  else:
-  names=mesh.get('extras',{}).get('targetNames',[]);check(names==['preen','spread'],name+' two named shape targets',names)
-  check(len(p.get('targets',[]))==2,name+' exactly three static poses including basis')
+  names=mesh.get('extras',{}).get('targetNames',[]);check(names==['preen','spread','turn_head'],name+' three named motion shape targets',names)
+  check(len(p.get('targets',[]))==3,name+' rest plus three motion targets')
   foot=vs[:,1]<.15
   for targetname,target in zip(names,p['targets']):
    delta=points(d,b,target['POSITION']);posed=vs+delta

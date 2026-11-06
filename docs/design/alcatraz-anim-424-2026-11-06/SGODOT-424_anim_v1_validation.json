@@ -1,0 +1,641 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "baseline": "996528d3a273d773e1e2168361ac79a1da9f15c4",
+    "checks": [
+      {
+        "check": "ferry.glb accepted original byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry.glb.import accepted original byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far.glb accepted original byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far.glb.import accepted original byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gull triangles unchanged at284",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gull one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Old two poses + turn_head",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gull original POSITION values unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gull original NORMAL values unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gull original COLOR_0 values unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gull original indices unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Original preen POSITION morph unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Original preen NORMAL morph unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Original spread POSITION morph unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Original spread NORMAL morph unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "preen foot vertices fixed",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "preen nondegenerate pose",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "spread foot vertices fixed",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "spread nondegenerate pose",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "turn_head foot vertices fixed",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "turn_head nondegenerate pose",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Turn head actually moves head vertices",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag52 triangles / one surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag has one flutter target",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag no texture / rig / embedded animation",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag pole-base origin grounded",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag nondegenerate throughout flutter 0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag nondegenerate throughout flutter 0.5",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag nondegenerate throughout flutter 1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag pole/cloth root stationary",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flag depth sway <=3.5cm",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gull UID preserved",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_flag Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_flag nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_flag gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_flag meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull.tscn native Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull.tscn references original GLBs without embedded mesh copies",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull.tscn no autoplay property",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull.tscn no runtime script dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry.tscn native Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry.tscn references original GLBs without embedded mesh copies",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry.tscn no autoplay property",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry.tscn no runtime script dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull_animations.tres native Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_animations.tres native Godot UID",
+        "passed": true,
+        "evidence": null
+      }
+    ],
+    "passed": true,
+    "triangles": {
+      "gull": 284,
+      "flag": 52,
+      "ferry_near_plus_flag": 5196,
+      "ferry_far_plus_flag": 1532
+    }
+  },
+  "godot": {
+    "Ferry_tracks": [
+      "BodyRig:position",
+      "BodyRig/SternFlag/ferry_flag:blend_shapes/flutter"
+    ],
+    "Gull0_tracks": [
+      "Model/gull:blend_shapes/turn_head",
+      "Model/gull:blend_shapes/preen",
+      "Model/gull:blend_shapes/spread"
+    ],
+    "Gull1_tracks": [
+      "Model/gull:blend_shapes/turn_head",
+      "Model/gull:blend_shapes/preen",
+      "Model/gull:blend_shapes/spread"
+    ],
+    "Gull2_tracks": [
+      "Model/gull:blend_shapes/turn_head",
+      "Model/gull:blend_shapes/preen",
+      "Model/gull:blend_shapes/spread"
+    ],
+    "checks": [
+      {
+        "check": "Original island navigation ready",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Original player spawn",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Original opening 43/yaw14.5/6.72m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 has no runtime root script",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 no camera/lights/collision",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 no autoplay",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 idle length and seamless loop",
+        "evidence": 8.5,
+        "passed": true
+      },
+      {
+        "check": "Gull0 track does not move root: Model/gull:blend_shapes/turn_head",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 track does not move root: Model/gull:blend_shapes/preen",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 track does not move root: Model/gull:blend_shapes/spread",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull 0 single independent mesh instance",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 has no runtime root script",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 no camera/lights/collision",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 no autoplay",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 idle length and seamless loop",
+        "evidence": 8.5,
+        "passed": true
+      },
+      {
+        "check": "Gull1 track does not move root: Model/gull:blend_shapes/turn_head",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 track does not move root: Model/gull:blend_shapes/preen",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 track does not move root: Model/gull:blend_shapes/spread",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull 1 single independent mesh instance",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 has no runtime root script",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 no camera/lights/collision",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 no autoplay",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 idle length and seamless loop",
+        "evidence": 8.5,
+        "passed": true
+      },
+      {
+        "check": "Gull2 track does not move root: Model/gull:blend_shapes/turn_head",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 track does not move root: Model/gull:blend_shapes/preen",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 track does not move root: Model/gull:blend_shapes/spread",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull 2 single independent mesh instance",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry has no runtime root script",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry no camera/lights/collision",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry no autoplay",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry idle length and seamless loop",
+        "evidence": 4.0,
+        "passed": true
+      },
+      {
+        "check": "Ferry track does not move root: BodyRig:position",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry track does not move root: BodyRig/SternFlag/ferry_flag:blend_shapes/flutter",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry references exactly near, far and flag meshes",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry retains shared 55m LOD",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "All animation roots remain at placement",
+        "evidence": 0.0,
+        "passed": true
+      },
+      {
+        "check": "Gull mostly motionless",
+        "evidence": 0.671875,
+        "passed": true
+      },
+      {
+        "check": "Turn / preen / flap separated; weights bounded",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry child moves only +/-2cm",
+        "evidence": [
+          -0.0199999995529652,
+          0.0199999995529652
+        ],
+        "passed": true
+      },
+      {
+        "check": "Three caller-supplied random start offsets",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 loop endpoint equal 0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 loop endpoint equal 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull0 loop endpoint equal 2",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 loop endpoint equal 0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 loop endpoint equal 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull1 loop endpoint equal 2",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 loop endpoint equal 0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 loop endpoint equal 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull2 loop endpoint equal 2",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry loop endpoint equal 0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry loop endpoint equal 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Supplementary viewport 0 renders scene geometry",
+        "evidence": 18946,
+        "passed": true
+      },
+      {
+        "check": "Supplementary viewport 1 renders scene geometry",
+        "evidence": 31618,
+        "passed": true
+      },
+      {
+        "check": "Supplementary viewport 2 renders scene geometry",
+        "evidence": 8030,
+        "passed": true
+      },
+      {
+        "check": "Supplementary viewport 3 renders scene geometry",
+        "evidence": 35916,
+        "passed": true
+      },
+      {
+        "check": "Opening bridge area unchanged through motion",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Opening visible budgets",
+        "evidence": [
+          35944,
+          34
+        ],
+        "passed": true
+      }
+    ],
+    "motion": {
+      "ferry_max_y": 0.0199999995529652,
+      "ferry_min_y": -0.0199999995529652,
+      "ferry_period_s": 4,
+      "gull_idle_s": 8.5,
+      "quiet_fraction": 0.671875,
+      "root_drift": 0.0
+    },
+    "passed": true,
+    "phase_offsets": [
+      1.99645154674848,
+      4.94671862324079,
+      6.96026123066743
+    ],
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "video": {
+      "duration_s": 6,
+      "fps": 30,
+      "frames": 180,
+      "method": "Godot deterministic animation sampling; camera/time scale unchanged, encoded at 30fps; not a GPU throughput measurement",
+      "peak_opening_draws_including_shadows": 34,
+      "peak_opening_triangles": 35944
+    }
+  },
+  "videos": [
+    {
+      "file": "SGODOT-424_anim_v1_opening_6s.mp4",
+      "frames": 180,
+      "duration_s": 6.0,
+      "width": 360,
+      "height": 800,
+      "frame_rate": "30/1",
+      "decoded_without_error": true
+    },
+    {
+      "file": "SGODOT-424_anim_v1_all_motion_6s.mp4",
+      "frames": 180,
+      "duration_s": 6.0,
+      "width": 1200,
+      "height": 800,
+      "frame_rate": "30/1",
+      "decoded_without_error": true
+    }
+  ],
+  "fixture": "b16c3198 host with #815 accepted meshes plus animation scenes, original point coordinates, camera and bridge. Only local temporary replacement.",
+  "rendering_note": "Deterministic Godot animation times sampled at 30fps, encoded to normal-speed 6s videos. Not realtime GPU throughput or phone performance.",
+  "approved_bridge_control": {
+    "baseline": "#815 opening_360.png",
+    "roi": [
+      0,
+      55,
+      120,
+      90
+    ],
+    "max_channel_difference": 0,
+    "different_pixels": 0
+  }
+}
