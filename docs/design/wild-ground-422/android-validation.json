@@ -1,0 +1,106 @@
+{
+  "package": "com.sensen.wildground422qa",
+  "apk_sha256": "d0c502ef54e5b8fd8609f8b01486282399199b0d332051613e6bb1826945f8dd",
+  "full_apk_readback_equal": true,
+  "packaged_textures": {
+    "crescent_layout.png.import": {
+      "ctex": ".godot/imported/crescent_layout.png-7201b5e52e237d9abe04536791b52690.ctex",
+      "sha256": "afa0b3ec4bcba51e8b9196a872a815d1f8225354b3c991c3bebf8f2a4ab9416e",
+      "bytes": 386448
+    },
+    "gourd_layout.png.import": {
+      "ctex": ".godot/imported/gourd_layout.png-f265bcdd7c7fbfe4bcc17c9313c84d34.ctex",
+      "sha256": "1c0bb87841084717bfdf8289550e24c9a81624c96633be4c0e5be8fbc9b58f12",
+      "bytes": 383422
+    },
+    "meadow_color.png.import": {
+      "ctex": ".godot/imported/meadow_color.png-ca5151d732d4cf0f1fd3100d2b6c8235.ctex",
+      "sha256": "f3363117a19a265a1c5eee1b346dd49f825a255e128ac8e4d69bc159016fe63b",
+      "bytes": 444048
+    },
+    "meander_layout.png.import": {
+      "ctex": ".godot/imported/meander_layout.png-191dc3b6c4948aef903d7c5ee6f0d423.ctex",
+      "sha256": "fba0294dfc724915a226e015b4002b1d77beec1bbda1f7e56549cda3717c2dae",
+      "bytes": 387682
+    }
+  },
+  "date": "2026-11-05",
+  "engine": "4.7.2",
+  "device": "isolated Android API 37.0 x86_64 emulator-5592 / private ADB 5071",
+  "physical_phone": false,
+  "before": {
+    "actor": [
+      6.125,
+      0.0,
+      -1.625
+    ],
+    "assembled": true,
+    "camera_size": 6.71999979019165,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "renderer": "mobile",
+    "shader": "res://pond_ground.sample.gdshader",
+    "zoom": 1.0
+  },
+  "after_pinch": {
+    "actor": [
+      6.125,
+      0.0,
+      -1.625
+    ],
+    "assembled": true,
+    "camera_size": 4.79996538162231,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "renderer": "mobile",
+    "shader": "res://pond_ground.sample.gdshader",
+    "zoom": 1.40001010746874
+  },
+  "after_drag": {
+    "actor": [
+      6.56779623031616,
+      0.0,
+      -1.625
+    ],
+    "assembled": true,
+    "camera_size": 4.79996538162231,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "renderer": "mobile",
+    "shader": "res://pond_ground.sample.gdshader",
+    "zoom": 1.40001010746874
+  },
+  "after_release": {
+    "actor": [
+      6.56779623031616,
+      0.0,
+      -1.625
+    ],
+    "assembled": true,
+    "camera_size": 4.79996538162231,
+    "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+    "renderer": "mobile",
+    "shader": "res://pond_ground.sample.gdshader",
+    "zoom": 1.40001010746874
+  },
+  "input": {
+    "pinch": "RoomTouch; 61 real MotionEvents, 2038ms; centre (180,320), spacing 100 -> 155px",
+    "drag": "RoomTouch; 34 real MotionEvents, 1112ms; (80,610)->(130,610), hold 800ms",
+    "tap": "adb touchscreen tap (320,745), native Bag sheet visibly opened"
+  },
+  "screenshots_reviewed": [
+    "before.png",
+    "after.png",
+    "bag.png",
+    "drag.png"
+  ],
+  "cleanup": {
+    "runner_force_stopped": true,
+    "temporary_dex_removed": true,
+    "display_restored": {
+      "override_size": "720x1280",
+      "density": "physical 440, no override"
+    },
+    "emulator_retained": true
+  },
+  "passed": true,
+  "limits": "Art/input smoke on software Vulkan only. No phone performance, full gameplay or production installation. Initial incorrect entry export was discarded; final APK materializes isolated project settings.",
+  "revision_scope": "Historical initial study b75bc30d, before water-preservation correction; not evidence for revised shader."
+}

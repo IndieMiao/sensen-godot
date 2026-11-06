@@ -1,0 +1,65 @@
+[
+  {
+    "name": "alc_lighthouse",
+    "sha256": "61cac63d1c1be7b8583e8dfd1692e958ee66a1dbad116cb4375fc6ac95dce9b9",
+    "glb_equal_accepted_base": true,
+    "import_uid": "uid://pcgnm0nyk6cr",
+    "import_effective_settings_preserved": true,
+    "import_change": "Godot adds nodes/root_script=null only",
+    "source": "tools/art/source/alcatraz_far_424/alc_lighthouse.blend"
+  },
+  {
+    "name": "alc_lighthouse_far",
+    "sha256": "bdbd5677a996fc2808a8cb41db5846d6580d0a62d0eb7dd7b2f5df167e36aefb",
+    "glb_equal_accepted_base": true,
+    "import_uid": "uid://cknbcqmudmwvc",
+    "import_effective_settings_preserved": true,
+    "import_change": "Godot adds nodes/root_script=null only",
+    "source": "tools/art/source/alcatraz_far_424/alc_lighthouse_far.blend"
+  },
+  {
+    "name": "alc_watertower",
+    "sha256": "92aaf9ffd5facab3c261180cae8dcb05bb46edea0345856acdd4cc9b5815cb11",
+    "glb_equal_accepted_base": true,
+    "import_uid": "uid://dvx4o36utnqmm",
+    "import_effective_settings_preserved": true,
+    "import_change": "Godot adds nodes/root_script=null only",
+    "source": "tools/art/source/alcatraz_far_424/alc_watertower.blend"
+  },
+  {
+    "name": "alc_watertower_far",
+    "sha256": "d37fd1ad196f152abb1a2cc754f000f11e82779bd6022cb6c31fddc17536c452",
+    "glb_equal_accepted_base": true,
+    "import_uid": "uid://2iw6qu5jkra",
+    "import_effective_settings_preserved": true,
+    "import_change": "Godot adds nodes/root_script=null only",
+    "source": "tools/art/source/alcatraz_far_424/alc_watertower_far.blend"
+  },
+  {
+    "name": "alc_far_bridge",
+    "sha256": "9cd46d07c4ca491efe7bdcb716723aa87976da4373df5e5e7288f8ee80ad7d37",
+    "glb_equal_accepted_base": true,
+    "import_uid": "uid://mxqkmjnlrxni",
+    "import_effective_settings_preserved": true,
+    "import_change": "Godot adds nodes/root_script=null only",
+    "source": "tools/art/source/alcatraz_far_424/alc_far_bridge.blend"
+  },
+  {
+    "name": "alc_far_city",
+    "sha256": "ae98acebd72673591318ede1f9b2a9c9832f30a45aa836f9eda0f6de1788c2d8",
+    "glb_equal_accepted_base": true,
+    "import_uid": "uid://bclmga48e41ak",
+    "import_effective_settings_preserved": true,
+    "import_change": "Godot adds nodes/root_script=null only",
+    "source": "tools/art/source/alcatraz_far_424/alc_far_city.blend"
+  },
+  {
+    "name": "alc_far_hills",
+    "sha256": "19dc64438b9c8bc7de842e696bcce0c36dd3269e0e13f61d0bd381187ec4f9e4",
+    "glb_equal_accepted_base": true,
+    "import_uid": "uid://cgiljtiaohnv0",
+    "import_effective_settings_preserved": true,
+    "import_change": "Godot adds nodes/root_script=null only",
+    "source": "tools/art/source/alcatraz_far_424/alc_far_hills.blend"
+  }
+]

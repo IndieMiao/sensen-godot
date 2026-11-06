@@ -1,0 +1,725 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "scope": "independent seven-asset review; placement and opening bridge shot pending v2 coordinate confirmation",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "alc_lighthouse one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse real target height",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far real target height",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower real target height",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far real target height",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills unit node transform",
+        "passed": true
+      },
+      {
+        "check": "Unique import UIDs",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse far/near ratio approx quarter",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse near/far same pivot and overall bounds",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower far/near ratio approx quarter",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower near/far same pivot and overall bounds",
+        "passed": true
+      },
+      {
+        "check": "Seven assets total <=40000",
+        "passed": true
+      }
+    ],
+    "measured": {
+      "alc_lighthouse": {
+        "triangles": 3262,
+        "dimensions_m": [
+          4.300000190734863,
+          15.0,
+          4.300000190734863
+        ],
+        "bounds": [
+          [
+            -2.1500000953674316,
+            0.0,
+            -2.1500000953674316
+          ],
+          [
+            2.1500000953674316,
+            15.0,
+            2.1500000953674316
+          ]
+        ]
+      },
+      "alc_lighthouse_far": {
+        "triangles": 830,
+        "dimensions_m": [
+          4.300000190734863,
+          15.0,
+          4.300000190734863
+        ],
+        "bounds": [
+          [
+            -2.1500000953674316,
+            0.0,
+            -2.1500000953674316
+          ],
+          [
+            2.1500000953674316,
+            15.0,
+            2.1500000953674316
+          ]
+        ]
+      },
+      "alc_watertower": {
+        "triangles": 3546,
+        "dimensions_m": [
+          4.039999961853027,
+          12.0,
+          4.039999961853027
+        ],
+        "bounds": [
+          [
+            -2.0199999809265137,
+            0.0,
+            -2.0199999809265137
+          ],
+          [
+            2.0199999809265137,
+            12.0,
+            2.0199999809265137
+          ]
+        ]
+      },
+      "alc_watertower_far": {
+        "triangles": 774,
+        "dimensions_m": [
+          4.039999961853027,
+          12.0,
+          4.039999961853027
+        ],
+        "bounds": [
+          [
+            -2.0199999809265137,
+            0.0,
+            -2.0199999809265137
+          ],
+          [
+            2.0199999809265137,
+            12.0,
+            2.0199999809265137
+          ]
+        ]
+      },
+      "alc_far_goldengate": {
+        "triangles": 1524,
+        "dimensions_m": [
+          4.811617374420166,
+          1.277500033378601,
+          0.23000000417232513
+        ],
+        "bounds": [
+          [
+            -2.405808687210083,
+            0.0,
+            -0.11500000208616257
+          ],
+          [
+            2.405808687210083,
+            1.277500033378601,
+            0.11500000208616257
+          ]
+        ]
+      },
+      "alc_far_skyline": {
+        "triangles": 1201,
+        "dimensions_m": [
+          12.104090690612793,
+          3.700000047683716,
+          0.3999999761581421
+        ],
+        "bounds": [
+          [
+            -6.0520453453063965,
+            0.0,
+            -0.19999998807907104
+          ],
+          [
+            6.0520453453063965,
+            3.700000047683716,
+            0.19999998807907104
+          ]
+        ]
+      },
+      "alc_far_hills": {
+        "triangles": 120,
+        "dimensions_m": [
+          20.0,
+          2.4881391525268555,
+          0.3799999952316284
+        ],
+        "bounds": [
+          [
+            -10.0,
+            0.0,
+            -0.1899999976158142
+          ],
+          [
+            10.0,
+            2.4881391525268555,
+            0.1899999976158142
+          ]
+        ]
+      }
+    },
+    "total_triangles": 11257,
+    "surfaces": 7,
+    "passed": true
+  },
+  "godot": {
+    "captures": [
+      {
+        "camera_width_m": 21.5,
+        "id": "lighthouse_lod_scale",
+        "size": [
+          1400,
+          1200
+        ]
+      },
+      {
+        "camera_width_m": 21.5,
+        "id": "watertower_lod_scale",
+        "size": [
+          1400,
+          1200
+        ]
+      },
+      {
+        "camera_width_m": 21.5,
+        "id": "towers_player_175",
+        "size": [
+          1400,
+          1200
+        ]
+      },
+      {
+        "camera_width_m": 23.0,
+        "id": "scenic_cards",
+        "size": [
+          1500,
+          650
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "check": "alc_lighthouse imported vertex colour / no texture",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse actual triangle count / single surface",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far imported vertex colour / no texture",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far actual triangle count / single surface",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower imported vertex colour / no texture",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower actual triangle count / single surface",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far imported vertex colour / no texture",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far actual triangle count / single surface",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate imported vertex colour / no texture",
+        "passed": true
+      },
+      {
+        "check": "alc_far_goldengate actual triangle count / single surface",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline imported vertex colour / no texture",
+        "passed": true
+      },
+      {
+        "check": "alc_far_skyline actual triangle count / single surface",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills imported vertex colour / no texture",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills actual triangle count / single surface",
+        "passed": true
+      },
+      {
+        "check": "All seven assets combined <=40000 triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse far triangles approximately one quarter",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower far triangles approximately one quarter",
+        "passed": true
+      },
+      {
+        "check": "Default player assembled",
+        "passed": true
+      },
+      {
+        "check": "Capture lighthouse_lod_scale",
+        "passed": true
+      },
+      {
+        "check": "Capture watertower_lod_scale",
+        "passed": true
+      },
+      {
+        "check": "Capture towers_player_175",
+        "passed": true
+      },
+      {
+        "check": "Capture scenic_cards",
+        "passed": true
+      }
+    ],
+    "imported": {
+      "alc_far_goldengate": {
+        "surfaces": 1,
+        "triangles": 1524
+      },
+      "alc_far_hills": {
+        "surfaces": 1,
+        "triangles": 120
+      },
+      "alc_far_skyline": {
+        "surfaces": 1,
+        "triangles": 1201
+      },
+      "alc_lighthouse": {
+        "surfaces": 1,
+        "triangles": 3262
+      },
+      "alc_lighthouse_far": {
+        "surfaces": 1,
+        "triangles": 830
+      },
+      "alc_watertower": {
+        "surfaces": 1,
+        "triangles": 3546
+      },
+      "alc_watertower_far": {
+        "surfaces": 1,
+        "triangles": 774
+      }
+    },
+    "passed": true,
+    "player": {
+      "height_m": 1.75,
+      "source_height": 1.71833898495782
+    },
+    "renderer": "mobile",
+    "total_triangles": 11257
+  },
+  "model_validation_passed": true,
+  "opening_review_complete": false
+}

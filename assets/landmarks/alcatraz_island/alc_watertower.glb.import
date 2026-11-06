@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://vne5pe6kjyhk"
+uid="uid://dvx4o36utnqmm"
 path="res://.godot/imported/alc_watertower.glb-d94c7661e2a53aa530e8d34724552972.scn"
 
 [deps]
@@ -24,18 +24,18 @@ nodes/import_as_skeleton_bones=false
 nodes/use_name_suffixes=true
 nodes/use_node_type_suffixes=true
 meshes/ensure_tangents=true
-meshes/generate_lods=true
+meshes/generate_lods=false
 meshes/create_shadow_meshes=true
 meshes/light_baking=1
 meshes/lightmap_texel_size=0.2
 meshes/force_disable_compression=false
 skins/use_named_skins=true
-animation/import=true
+animation/import=false
 animation/fps=30
 animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
-import_script/path=""
+import_script/path="res://assets/landmarks/alcatraz_island/alc_far_material_import.gd"
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""

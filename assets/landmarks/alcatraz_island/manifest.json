@@ -1,7 +1,7 @@
 {
   "generator": "tools/art/source/alcatraz_island/build.py",
   "reference": "landmark_alcatraz_v2.jpg + c_alc2.png",
-  "phase": "v4 whitebox integration",
+  "phase": "v5 whitebox integration",
   "assets": {
     "dock": {
       "triangles": 3468,
@@ -22,22 +22,6 @@
     "alc_museum_far": {
       "triangles": 12,
       "bytes": 2252
-    },
-    "alc_lighthouse": {
-      "triangles": 12,
-      "bytes": 2316
-    },
-    "alc_lighthouse_far": {
-      "triangles": 12,
-      "bytes": 2320
-    },
-    "alc_watertower": {
-      "triangles": 12,
-      "bytes": 2316
-    },
-    "alc_watertower_far": {
-      "triangles": 12,
-      "bytes": 2320
     },
     "alc_bench": {
       "triangles": 48,
@@ -99,18 +83,6 @@
       "triangles": 12,
       "bytes": 2312
     },
-    "alc_far_bridge": {
-      "triangles": 70,
-      "bytes": 6004
-    },
-    "alc_far_city": {
-      "triangles": 24,
-      "bytes": 2812
-    },
-    "alc_far_hills": {
-      "triangles": 13,
-      "bytes": 1652
-    },
     "gull": {
       "triangles": 288,
       "bytes": 17124
@@ -126,6 +98,55 @@
     "alc_ground_summit": {
       "triangles": 400,
       "bytes": 35372
+    },
+    "alc_lighthouse": {
+      "triangles": 3262,
+      "bytes": 135600,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_lighthouse.blend",
+      "sha256": "61cac63d1c1be7b8583e8dfd1692e958ee66a1dbad116cb4375fc6ac95dce9b9"
+    },
+    "alc_lighthouse_far": {
+      "triangles": 830,
+      "bytes": 28852,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_lighthouse_far.blend",
+      "sha256": "bdbd5677a996fc2808a8cb41db5846d6580d0a62d0eb7dd7b2f5df167e36aefb"
+    },
+    "alc_watertower": {
+      "triangles": 3546,
+      "bytes": 127324,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_watertower.blend",
+      "sha256": "92aaf9ffd5facab3c261180cae8dcb05bb46edea0345856acdd4cc9b5815cb11"
+    },
+    "alc_watertower_far": {
+      "triangles": 774,
+      "bytes": 25060,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_watertower_far.blend",
+      "sha256": "d37fd1ad196f152abb1a2cc754f000f11e82779bd6022cb6c31fddc17536c452"
+    },
+    "alc_far_bridge": {
+      "triangles": 498,
+      "bytes": 52068,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_bridge.blend",
+      "sha256": "9cd46d07c4ca491efe7bdcb716723aa87976da4373df5e5e7288f8ee80ad7d37"
+    },
+    "alc_far_city": {
+      "triangles": 208,
+      "bytes": 22512,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_city.blend",
+      "sha256": "ae98acebd72673591318ede1f9b2a9c9832f30a45aa836f9eda0f6de1788c2d8"
+    },
+    "alc_far_hills": {
+      "triangles": 120,
+      "bytes": 13504,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_hills.blend",
+      "sha256": "19dc64438b9c8bc7de842e696bcce0c36dd3269e0e13f61d0bd381187ec4f9e4"
     }
   }
 }

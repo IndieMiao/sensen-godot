@@ -263,10 +263,10 @@ func _ready() -> void:
 	var tower := scene._camera.unproject_position(Vector3(-25,17.5,-11.5))
 	check("wide_lighthouse_visible",Rect2(8,45,344,690).has_point(tower),tower)
 	var tower_inside := true
-	for x in [-26.85,-23.15]:
-		for y in [10,25]:
-			for z in [-13.35,-9.65]:
-				tower_inside = tower_inside and Rect2(0,0,360,800).has_point(scene._camera.unproject_position(Vector3(x,y,z)))
+	var tower_pose: Dictionary = scene.layout.placements.filter(func(p):return p.asset=="alc_lighthouse")[0]
+	var tower_bounds: AABB = scene._transform_of(tower_pose)*scene._mesh("alc_lighthouse").get_aabb()
+	for corner in 8:
+		tower_inside = tower_inside and Rect2(0,0,360,800).has_point(scene._camera.unproject_position(tower_bounds.get_endpoint(corner)))
 	check("wide_entire_tower_in_frame",tower_inside)
 	for i in 20:scene._zoom_buttons["ZoomIn"].pressed.emit()
 	check("zoom_in_limit",scene.camera_pan.zoom<=1.4001,scene.camera_pan.zoom)

@@ -1,0 +1,52 @@
+[
+  {
+    "file": "SGODOT-424_far_v1.1_mid_hill.png",
+    "bytes": 116497,
+    "sha256": "14ef1e90fd3e312772c4f0104665fc5d1d9de1ad4b9d872b77082ad940cf1c92",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-424_far_v1.1_opening_360.png",
+    "bytes": 61775,
+    "sha256": "b3d20f7abd739bc80f079e750661b5db9a34d54288a24f74d599dcd5b2dfcb4a",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-424_far_v1.1_opening_bridge_detail.png",
+    "bytes": 24092,
+    "sha256": "6b2f06ccb5e518ec945342ab08952d4c00b239f71918550a888be3379a332767",
+    "size": [
+      760,
+      550
+    ]
+  },
+  {
+    "file": "SGODOT-424_far_v1.1_summit.png",
+    "bytes": 107415,
+    "sha256": "b682b890ed84972d23cd2c38b42f766958165199bfd647b4f5fd3e91a5419bb3",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-424_far_v1.1_summit_wide.png",
+    "bytes": 139892,
+    "sha256": "39e7ec57d16457ef0cc9b79e4ec6d6839a43a6c307549ebe2e005161ffdf7a90",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-424_far_v1.1_validation.json",
+    "bytes": 26597,
+    "sha256": "e50fd503a619b36ac682e1a72eaa38c0d2dbb8b18aa5c50701b3e56f39d8b54f"
+  }
+]
