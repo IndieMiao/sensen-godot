@@ -101,9 +101,9 @@ def rail(corner=False):
  return {'grid_m':2,'connectors':{'left':[-1,0,0],'right':[1,0,0]},'post_policy':'Place separate endposts on exposed endpoints; consecutive spans share a post'}
 
 def bollard():
- lathe('Low rounded street bollard',[(0,.13),(.06,.14),(.12,.10),(.60,.085),(.66,.10),(.71,.075),(.73,0)],'metal',10)
- lathe('Cream visible collar',[(.57,.088),(.63,.088)],'cream',10)
- return {'placement_cell_m':[2,2],'height_m':.73}
+ lathe('Low rounded street bollard',[(0,.13),(.06,.14),(.12,.10),(.60,.085),(.64,.085)],'metal',10)
+ box('Cream limestone cap with softened corners',(0,.67,0),(.28,.12,.28),'cream',.018)
+ return {'placement_cell_m':[2,2],'height_m':.73,'cap_material':'cream limestone #F0E1C2','cap_dimensions_m':[.28,.12,.28],'cap_center_m':[0,.67,0]}
 
 def contour(w,d):
  c=min(w,d)*.14
@@ -167,7 +167,7 @@ def umbrella_table():
  lathe('Table pedestal',[(0,.25),(.06,.27),(.13,.10),(1.04,.085)],'metal',10)
  rod('Umbrella central mast',(0,0,0),(0,2.86,0),.036,'wood_dark',8)
  # Closed fabric shell, with broad alternating panels, no texture/transparency.
- profile=[(2.86,0),(2.79,.30),(2.62,.72),(2.43,1.0),(2.35,1.0)]
+ profile=[(2.86,0),(2.79,.24),(2.62,.576),(2.43,.80),(2.35,.80)]
  pts=[(0,2.86,0)]+[(r*math.cos(i*math.tau/12),y,r*math.sin(i*math.tau/12)) for y,r in profile[1:] for i in range(12)]
  faces=[];roles=[]
  for i in range(12):faces.append((0,1+i,1+(i+1)%12));roles.append('canvas' if i%2==0 else 'sage')
@@ -178,7 +178,7 @@ def umbrella_table():
  for x in [-.73,.73]:
   lathe('Round matching stool',[(.65,.18),(.67,.22),(.715,.22)],'wood',10,(x,0,0))
   lathe('Stool pedestal',[(0,.17),(.05,.18),(.10,.07),(.65,.055)],'metal',8,(x,0,0))
- return {'placement_cell_m':[2,2],'canopy_diameter_m':2,'tabletop_height_m':1.12,'seat_height_m':.715}
+ return {'placement_cell_m':[2,2],'canopy_diameter_m':1.6,'tabletop_height_m':1.12,'seat_height_m':.715}
 
 def drinking_fountain():
  lathe('Stone drinking fountain pedestal',[(0,.22),(.08,.25),(.14,.19),(.78,.14),(.87,.20)],'stone',10)
@@ -232,7 +232,7 @@ def main():
  if only:rows=json.loads((KIT/'kit_manifest.json').read_text())['assets']
  for name,builder in BUILDERS:
   if not only or only==name:rows[name]=export(name,builder)
- m={'task':'SGODOT-429','revision':'v1.1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','grid_m':2,'units':'metres; Y up; +Z front','palette_srgb':PAL,'assets':rows,'unique_triangles':sum(x['triangles'] for x in rows.values()),'unique_surfaces':len(rows),'scope':'Reusable furniture only; example is review-only, no game layout or location'}
+ m={'task':'SGODOT-429','revision':'v1.2','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','grid_m':2,'units':'metres; Y up; +Z front','palette_srgb':PAL,'assets':rows,'unique_triangles':sum(x['triangles'] for x in rows.values()),'unique_surfaces':len(rows),'scope':'Reusable furniture only; example is review-only, no game layout or location'}
  (KIT/'kit_manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
  (KIT/'palette.json').write_text(json.dumps({'colors_srgb':PAL,'source':'Alcatraz bf0c31b1 palette + Grace Cathedral cream/iron; see source reference/provenance.json','furniture_wood_override':{'modules':['bench_wood','umbrella_table'],'source':'Shangguan Waner dispatch / Liubei #830 v1.1','wood':'A3815D','light':'B89972','dark':'795F47','other_materials':'unchanged'}},indent=2)+'\n')
  for name,row in rows.items():

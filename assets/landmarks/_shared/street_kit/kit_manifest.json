@@ -1,6 +1,6 @@
 {
   "task": "SGODOT-429",
-  "revision": "v1.1",
+  "revision": "v1.2",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "grid_m": 2,
@@ -264,33 +264,44 @@
     },
     "bollard": {
       "file": "bollard.glb",
-      "triangles": 154,
+      "triangles": 140,
       "surfaces": 1,
       "bounds": [
         [
           -0.14000000059604645,
           0.0,
-          -0.13314791023731232
+          -0.14000000059604645
         ],
         [
           0.14000000059604645,
           0.7300000190734863,
-          0.13314791023731232
+          0.14000000059604645
         ]
       ],
       "dimensions_m": [
         0.2800000011920929,
         0.7300000190734863,
-        0.26629582047462463
+        0.2800000011920929
       ],
       "pivot": "base centre, Y up, +Z front",
       "source": "tools/art/source/street_kit_429/bollard.blend",
-      "sha256": "52916395f847c98833211b7aa00b8c13b3ffa9033d1b69728ce56d5a8a3d7414",
+      "sha256": "add9443544f5e0805cb5789a15f0c26ba136a80f968ae8c9bd8254da6e8dd4a2",
       "placement_cell_m": [
         2,
         2
       ],
-      "height_m": 0.73
+      "height_m": 0.73,
+      "cap_material": "cream limestone #F0E1C2",
+      "cap_dimensions_m": [
+        0.28,
+        0.12,
+        0.28
+      ],
+      "cap_center_m": [
+        0,
+        0.67,
+        0
+      ]
     },
     "planter_square": {
       "file": "planter_square.glb",
@@ -496,29 +507,29 @@
       "surfaces": 1,
       "bounds": [
         [
-          -1.0,
+          -0.949999988079071,
           0.0,
-          -1.0
+          -0.800000011920929
         ],
         [
-          1.0,
+          0.949999988079071,
           2.859999895095825,
-          1.0
+          0.800000011920929
         ]
       ],
       "dimensions_m": [
-        2.0,
+        1.899999976158142,
         2.859999895095825,
-        2.0
+        1.600000023841858
       ],
       "pivot": "base centre, Y up, +Z front",
       "source": "tools/art/source/street_kit_429/umbrella_table.blend",
-      "sha256": "24b7534f9ac0f5714f0f5a697e1a33332e99ecb7a02a99bf2c5f4b80ecbb36a5",
+      "sha256": "89e17a0c369a315da5e5440ab1abfa73033fa927432e1f95dace4769d8bd7e7a",
       "placement_cell_m": [
         2,
         2
       ],
-      "canopy_diameter_m": 2,
+      "canopy_diameter_m": 1.6,
       "tabletop_height_m": 1.12,
       "seat_height_m": 0.715
     },
@@ -555,7 +566,7 @@
       "water": "No particles, water surface or runtime interaction"
     }
   },
-  "unique_triangles": 5970,
+  "unique_triangles": 5956,
   "unique_surfaces": 16,
   "scope": "Reusable furniture only; example is review-only, no game layout or location"
 }

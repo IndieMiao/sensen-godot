@@ -43,6 +43,25 @@ check((KIT/'street_kit_import.gd.uid').exists(),'Importer UID included')
 check(not list(KIT.glob('*.png')) and not list(KIT.glob('*.tscn')) and not list(KIT.glob('*layout*')),'Kit has no image duplication or assembled runtime scene/layout')
 check(abs(rows['railing_straight_2m']['bounds'][0][0]+1)<1e-6 and abs(rows['railing_straight_2m']['bounds'][1][0]-1)<1e-6,'Railing exactly2m endpoints')
 corner=rows['railing_corner']['bounds'];check(abs(corner[1][0]-1)<1e-6 and abs(corner[1][2]-1)<1e-6,'Corner endpoints at1m on both axes')
+# v1.2: measure the cloth separately from the stools, and the light cap separately
+# from the dark shaft. Overall umbrella-table width includes its two unchanged stools.
+for name in ['umbrella_table','bollard']:
+ d,b=load_glb(KIT/(name+'.glb'));p=d['meshes'][0]['primitives'][0]
+ v=np.array(accessor(d,b,p['attributes']['POSITION']));c=np.array(accessor(d,b,p['attributes']['COLOR_0']))[:,:3]
+ if name=='umbrella_table':
+  cloth=(np.linalg.norm(c-rgb('EFE7D4'),axis=1)<.0001)|(np.linalg.norm(c-rgb('8AAFA2'),axis=1)<.0001)
+  check(abs(np.max(np.linalg.norm(v[cloth][:,[0,2]],axis=1))*2-1.6)<1e-6,'Canopy actual diameter1.6m')
+  check(abs(v[cloth,1].max()-2.86)<1e-6,'Canopy height preserved at2.86m')
+  for h in ['A3815D','B89972','795F47']:check((np.linalg.norm(c-rgb(h),axis=1)<.0001).any(),'Umbrella retains muted wood '+h)
+ else:
+  cap=v[np.linalg.norm(c-rgb('F0E1C2'),axis=1)<.0001]
+  check(np.allclose(np.ptp(cap,axis=0),[.28,.12,.28],atol=1e-6),'Bollard cream stone cap measured28x12x28cm')
+  check(abs(cap[:,1].min()-.61)<1e-6 and abs(cap[:,1].max()-.73)<1e-6,'Cap is at the top of73cm bollard')
+baseline='f842e3feffb76e17149f0857364f439bbd232e0b'
+for path in KIT.glob('*.glb'):
+ if path.stem not in ['umbrella_table','bollard']:
+  check(path.read_bytes()==subprocess.check_output(['git','show',baseline+':'+str(path.relative_to(ROOT))],cwd=ROOT),path.stem+' unchanged from v1.1')
+check(all(path.read_bytes()==subprocess.check_output(['git','show',baseline+':'+str(path.relative_to(ROOT))],cwd=ROOT) for path in KIT.glob('*.glb.import')),'All16 imports/UIDs byte-identical to v1.1')
 # Comparing all tracked original files to the branch base prevents unrelated art edits.
 diff=subprocess.check_output(['git','diff','--name-status',ref['base_commit']],cwd=ROOT,text=True)
 allowed=('assets/landmarks/_shared/street_kit/','tools/art/source/street_kit_429/','docs/design/street-kit-429-2026-11-06/')

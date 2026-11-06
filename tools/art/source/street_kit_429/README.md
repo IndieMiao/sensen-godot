@@ -29,3 +29,5 @@ verify.py独立读取GLB顶点/索引/颜色，测预算、边界、单位比例
 v1.1木色增量：`recolor_wood.py`从已验收76a13070的两件GLB生成颜色补丁，逐字节确认仅COLOR_0 RGB改变；
 随后用`flock ~/gs66-render.lock blender --background --python "$PWD/tools/art/source/street_kit_429/update_wood_blends.py"`同步两份编辑源。
 build.py也已按模块使用#830 v1.1木色，重新生成时不会改动其他件使用的饰边色。
+
+v1.2补充：伞面Ø1.6m、矮柱奶油石帽均在build.py中；只重建这两件可分别用`-- --only umbrella_table`和`-- --only bollard`。recolor_wood.py仅用于复现历史v1.1，不要在v1.2之后执行它覆盖新几何。
