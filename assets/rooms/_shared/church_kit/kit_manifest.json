@@ -1,6 +1,6 @@
 {
-  "task": "SGODOT-423 church kit preparation",
-  "revision": "v1",
+  "task": "SGODOT-427 church kit preparation",
+  "revision": "v1.1",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "units": "metres; Y up; +Z interior/front",
@@ -449,9 +449,9 @@
       ],
       "material": "atlas",
       "source": "tools/art/source/church_kit/wood_pew.blend",
-      "sha256": "5aec0c736b8b72a326867af4a7108699c0c36ced61c58a05ce58171db9d9b630",
+      "sha256": "4ab39c7989ca864639b16a77df22188adb42e5252a7e87632a8d730f7566511c",
       "reuse_from": "assets/rooms/poi_church/wood_pew.glb",
-      "geometry": "byte-identical exported original",
+      "geometry": "Original BIN and all JSON fields unchanged except shared atlas URI",
       "mount_plane": "original local pivot; see dimensions/attachments",
       "seat_height_m": 0.715,
       "provenance": "tools/art/source/church_kit/modules/wood_pew/reuse_provenance.json"
@@ -479,9 +479,9 @@
       ],
       "material": "atlas",
       "source": "tools/art/source/church_kit/altar_table.blend",
-      "sha256": "8f2c422b6611ff7598b7e2d2e98a171679f11a7cdc4178373c57a91ad3caeb83",
+      "sha256": "99fd9480e6daf89e46d1b4d2643abbe4ce4bc827b89c30c25117110c869dcf87",
       "reuse_from": "assets/rooms/poi_church/altar_table.glb",
-      "geometry": "byte-identical exported original",
+      "geometry": "Original BIN and all JSON fields unchanged except shared atlas URI",
       "mount_plane": "original local pivot; see dimensions/attachments",
       "tabletop_height_m": 1.12,
       "provenance": "tools/art/source/church_kit/modules/altar_table/reuse_provenance.json"
@@ -509,9 +509,9 @@
       ],
       "material": "atlas",
       "source": "tools/art/source/church_kit/sanctuary_steps.blend",
-      "sha256": "67b18f9162d28a724853a6d58840df5f2c9996b8e6471b5416173e8260bf198f",
+      "sha256": "ab5ccbded7e399d0f1a2f9732a9dfc9e523c219592199c849714b97ac07dccfa",
       "reuse_from": "assets/rooms/poi_church/sanctuary_steps.glb",
-      "geometry": "byte-identical exported original",
+      "geometry": "Original BIN and all JSON fields unchanged except shared atlas URI",
       "mount_plane": "original local pivot; see dimensions/attachments",
       "provenance": "tools/art/source/church_kit/modules/sanctuary_steps/reuse_provenance.json"
     },
@@ -538,9 +538,9 @@
       ],
       "material": "atlas",
       "source": "tools/art/source/church_kit/iron_chandelier.blend",
-      "sha256": "5205a285c9bcaafceaad82d6f7de29dfcadb5f26c40d978a57c61cfd4777c0d8",
+      "sha256": "0b5bf6197ea49c4c2029aa655e5eb65fde920f4ec197edd73227858b79e7f7fc",
       "reuse_from": "assets/rooms/poi_church/iron_chandelier.glb",
-      "geometry": "byte-identical exported original",
+      "geometry": "Original BIN and all JSON fields unchanged except shared atlas URI",
       "mount_plane": "original local pivot; see dimensions/attachments",
       "ceiling_hook": [
         0,
@@ -572,9 +572,9 @@
       ],
       "material": "atlas",
       "source": "tools/art/source/church_kit/pipe_organ.blend",
-      "sha256": "9eb55729d23748906a8f5929f3785378d7d6338bd5c64aea6f2021a06293b023",
+      "sha256": "daacd6bf1d88882bb9de4adc84e51f0a97f69839c14c43503959b63eda336446",
       "reuse_from": "assets/rooms/poi_church/pipe_organ.glb",
-      "geometry": "byte-identical exported original",
+      "geometry": "Original BIN and all JSON fields unchanged except shared atlas URI",
       "mount_plane": "original local pivot; see dimensions/attachments",
       "provenance": "tools/art/source/church_kit/modules/pipe_organ/reuse_provenance.json"
     },
@@ -601,9 +601,9 @@
       ],
       "material": "atlas",
       "source": "tools/art/source/church_kit/flower_pedestal.blend",
-      "sha256": "94a74a5c1a9091cc5720fc57c84c5ea2bf4d3025ff5dedb1aaaf21d9ce873245",
+      "sha256": "7ccf8f9c04cd31f735d0d0d0890dc9996cae12f0557952cce7073eb081ce49d3",
       "reuse_from": "assets/rooms/poi_church/flower_pedestal.glb",
-      "geometry": "byte-identical exported original",
+      "geometry": "Original BIN and all JSON fields unchanged except shared atlas URI",
       "mount_plane": "original local pivot; see dimensions/attachments",
       "provenance": "tools/art/source/church_kit/modules/flower_pedestal/reuse_provenance.json"
     },
@@ -630,11 +630,63 @@
       ],
       "material": "atlas",
       "source": "tools/art/source/church_kit/grass_surround.blend",
-      "sha256": "9ef86fbedf807ee58f5db36170217b842f1570b37034d451fb91a94c1b2abfe4",
+      "sha256": "c8b18dde9723e42acd4057c3d07994c8bbc72424b90b1da71d37481889651d57",
       "reuse_from": "assets/rooms/poi_church/grass_surround.glb",
-      "geometry": "byte-identical exported original",
+      "geometry": "Original BIN and all JSON fields unchanged except shared atlas URI",
       "mount_plane": "original local pivot; see dimensions/attachments",
       "provenance": "tools/art/source/church_kit/modules/grass_surround/reuse_provenance.json"
+    },
+    "wall_door_2m": {
+      "file": "wall_door_2m.glb",
+      "triangles": 1132,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.12999999523162842
+        ],
+        [
+          1.0,
+          4.800000190734863,
+          0.28999999165534973
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        4.800000190734863,
+        0.41999998688697815
+      ],
+      "material": "vertex",
+      "source": "tools/art/source/church_kit/wall_door_2m.blend",
+      "sha256": "ee710d98c7fbf2fc79f429689bef2ae2118a60e36ff5f5e6e13eb23ca188d833",
+      "module_length_m": 2,
+      "wall_height_m": 4.8,
+      "core_thickness_m": 0.26,
+      "mount_plane": "bottom centre; +Z interior",
+      "connectors": {
+        "left": [
+          -1,
+          0,
+          0
+        ],
+        "right": [
+          1,
+          0,
+          0
+        ]
+      },
+      "door_opening_m": [
+        1.4,
+        2.6
+      ],
+      "door_leaf_mode": "static closed oak pair, editable in Blender; no lettering or symbols",
+      "map_button_suggestion_local": [
+        0.35,
+        1.65,
+        0.2
+      ],
+      "provenance": "tools/art/source/church_kit/modules/wall_door_2m/reuse_provenance.json"
     }
   },
   "glass_palette_slots": [
@@ -688,6 +740,6 @@
     "expected_file_count": 71,
     "hash_record": "tools/art/source/church_kit/original-files.json"
   },
-  "unique_triangles": 29420,
-  "unique_surfaces": 18
+  "unique_triangles": 30552,
+  "unique_surfaces": 19
 }

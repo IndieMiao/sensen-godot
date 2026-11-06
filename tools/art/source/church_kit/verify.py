@@ -1,7 +1,7 @@
 from pathlib import Path
 import json,sys,hashlib,re,numpy as np
 from PIL import Image
-ROOT=Path(__file__).resolve().parents[4];SRC=Path(__file__).resolve().parent;KIT=ROOT/'assets/rooms/_shared/church_kit';OUT=ROOT/'output/church-kit-423';sys.path.insert(0,str(ROOT/'tools/art'))
+ROOT=Path(__file__).resolve().parents[4];SRC=Path(__file__).resolve().parent;KIT=ROOT/'assets/rooms/_shared/church_kit';OUT=ROOT/'output/church-kit-427-v11';sys.path.insert(0,str(ROOT/'tools/art'))
 from verify_chef_sign import load_glb,accessor
 original=json.loads((SRC/'original-files.json').read_text());m=json.loads((KIT/'kit_manifest.json').read_text());checks=[];uids=[];rows={}
 def check(ok,label,evidence=None):checks.append({'check':label,'passed':bool(ok),'evidence':evidence})
@@ -18,8 +18,11 @@ for name,row in m['assets'].items():
  check(np.isfinite(v).all() and np.isfinite(n).all(),name+' finite mesh')
  check((np.linalg.norm(np.cross(t[:,1]-t[:,0],t[:,2]-t[:,0]),axis=1)>1e-10).all(),name+' nondegenerate triangles')
  if row['material']=='atlas':
-  check(path.read_bytes()==(ROOT/row['reuse_from']).read_bytes(),name+' original GLB bytes copied')
-  check(d.get('images')==[{'uri':'room_albedo_ao.png'}],name+' atlas URI resolves inside new kit')
+  source_doc,source_bin=load_glb(ROOT/row['reuse_from'])
+  check(b==source_bin,name+' geometry BIN byte-identical')
+  source_doc['images'][0]['uri']='../../poi_church/room_albedo_ao.png'
+  check(d==source_doc,name+' only source GLB image URI changed')
+  check(d.get('images')==[{'uri':'../../poi_church/room_albedo_ao.png'}],name+' shared atlas relative URI')
  else:check(not d.get('images'),name+' no embedded/source atlas')
  if row['material']=='glass':
   uv=np.array(accessor(d,b,p['attributes']['TEXCOORD_0']));slot=np.rint(uv[:,0]*8-.5).astype(int)
@@ -34,13 +37,15 @@ for name,row in m['assets'].items():
   check(uid.group(1)!=source_uid,name+' independent new UID, no live-resource alias')
  rows[name]={'triangles':len(ix),'bounds':[v.min(0).tolist(),v.max(0).tolist()]}
 check(len(uids)==len(set(uids)),'Every module has unique Godot UID')
-check((KIT/'room_albedo_ao.png').read_bytes()==(ROOT/'assets/rooms/poi_church/room_albedo_ao.png').read_bytes(),'Shared copied atlas byte-identical')
-check(Image.open(KIT/'room_albedo_ao.png').size==(2048,2048),'One2048 atlas plus tiny glass palettes')
+check(not (KIT/'room_albedo_ao.png').exists() and not (KIT/'room_albedo_ao.png.import').exists(),'No duplicate atlas or import in kit')
+check('res://assets/rooms/poi_church/room_albedo_ao.png' in (KIT/'opaque_atlas.tres').read_text(),'Material shares existing church atlas')
+check(Image.open(ROOT/'assets/rooms/poi_church/room_albedo_ao.png').size==(2048,2048),'One shared2048 atlas plus tiny glass palettes')
 for palette in ['classic','meadow']:
  p=KIT/('glass_palette_'+palette+'.png');check(Image.open(p).size==(8,1),palette+' 8-cell colour resource')
  cfg=Path(str(p)+'.import').read_text();check('compress/mode=0' in cfg and 'mipmaps/generate=false' in cfg,palette+' uncompressed/no mip colour cells')
-for name in ['wall_straight_2m','wall_pointed_2m','wall_rose_2m','roof_band_2m','beam_2m']:
+for name in ['wall_straight_2m','wall_door_2m','wall_pointed_2m','wall_rose_2m','roof_band_2m','beam_2m']:
  b=rows[name]['bounds'];check(abs(b[0][0]+1)<1e-6 and abs(b[1][0]-1)<1e-6,name+' exact2m module length')
+check(abs(rows['wall_door_2m']['bounds'][1][1]-4.8)<1e-6,'Door bay 4.8m height')
 corner=rows['wall_corner_2m']['bounds'];check(abs(corner[1][0]-1)<1e-6 and abs(corner[1][2]-1)<1e-6,'Corner arms each1m')
 check(m['assets']['rose_frame']['dimensions_m'][0]<2 and m['assets']['rose_frame']['dimensions_m'][1]<2,'Rose assembly fits2m bay')
 check(abs(rows['steps_2m']['bounds'][1][1]-.54)<1e-6,'Three18cm stair risers total54cm')

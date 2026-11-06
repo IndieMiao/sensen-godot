@@ -4,7 +4,7 @@
   "source_commit": "a530d90654b9f13e622530b05adf3ecf366366d3",
   "module": "iron_chandelier",
   "source": "assets/rooms/poi_church/iron_chandelier.glb",
-  "changes": "Independent copy; original GLB unchanged, fresh import UID and local atlas",
+  "changes": "Original geometry BIN and JSON preserved; only image URI points to shared poi_church atlas; independent UID",
   "editable_source": "tools/art/source/church_kit/iron_chandelier.blend",
   "script": "tools/art/source/church_kit/prepare_assets.py"
 }

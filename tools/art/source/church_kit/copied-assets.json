@@ -9,5 +9,6 @@
     "grass_surround"
   ],
   "source": "assets/rooms/poi_church",
-  "atlas": "independent byte-identical room_albedo_ao.png; all GLB texture URIs resolve inside new kit"
+  "atlas": "res://assets/rooms/poi_church/room_albedo_ao.png; shared dependency, no duplicate",
+  "glb_changes": "Only JSON images[0].uri; complete BIN chunk and all other JSON fields preserved"
 }

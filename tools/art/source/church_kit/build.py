@@ -1,4 +1,4 @@
-"""SGODOT-423 reusable modular church kit. New assets only, no new POI layout.
+"""SGODOT-427 reusable modular church kit. New assets only, no new POI layout.
 Blender execution MUST be wrapped by flock ~/gs66-render.lock.
 """
 from pathlib import Path
@@ -65,6 +65,32 @@ def corner():
   y=.35+row*.5
   box('X arm mortar',(.565,y,.133),(.87,.012,.006),'stone_edge');box('Z arm mortar',(.133,y,.565),(.006,.012,.87),'stone_edge')
  return {'arm_length_m':1,'wall_height_m':4.8,'core_thickness_m':.26,'mount_plane':'bend at floor; arms +X and +Z','connectors':{'x_end':[1,0,0],'z_end':[0,0,1]}}
+def doorwall():
+ # A real 1.4 x 2.6m aperture. The static door leaves are editable named parts;
+ # future navigation/Map button integration is deliberately not part of this kit.
+ for x in [-.85,.85]:
+  box('Door wall pier',(x,2.4,0),(.30,4.8,.26),'stone')
+  box('Split skirting beside doorway',(x,.17,.10),(.30,.34,.38),'stone_light')
+ box('Masonry over true door opening',(0,3.70,0),(1.4,2.2,.26),'stone')
+ box('Continuous top cornice',(0,4.70,.08),(2,.20,.42),'stone_light')
+ for x in [-.76,.76]:box('Soft stone door jamb',(x,1.30,.12),(.12,2.60,.18),'stone_light',.018)
+ box('Soft stone door lintel',(0,2.67,.12),(1.64,.14,.18),'stone_light',.018)
+ for row in range(9):
+  y=.35+row*.5
+  for a,b in ([(-1,-.84),(.84,1)] if y<2.8 else [(-1,1)]):
+   box('Door bay horizontal masonry',((a+b)/2,y,.133),(b-a,.012,.006),'stone_edge')
+ for side in [-1,1]:
+  cx=side*.3475
+  box('Left wood door leaf' if side<0 else 'Right wood door leaf',(cx,1.30,.015),(.685,2.56,.10),'wood_dark',.012)
+  for j in range(4):
+   box('Soft vertical oak plank',(cx+(j-1.5)*.165,1.30,.073),(.153,2.49,.024),'wood' if j%2 else 'wood_light',.008)
+  for y in [.24,2.36]:box('Simple oak rail',(cx,y,.099),(.64,.11,.035),'wood_dark',.008)
+  box('Door pull escutcheon',(side*.11,1.22,.114),(.07,.20,.025),'iron',.01)
+  rod('Plain vertical door pull',(side*.11,1.15,.15),(side*.11,1.29,.15),.018,'iron',8)
+ return {'module_length_m':2,'wall_height_m':4.8,'core_thickness_m':.26,'mount_plane':'bottom centre; +Z interior',
+  'connectors':{'left':[-1,0,0],'right':[1,0,0]},'door_opening_m':[1.4,2.6],
+  'door_leaf_mode':'static closed oak pair, editable in Blender; no lettering or symbols',
+  'map_button_suggestion_local':[.35,1.65,.20]}
 def roofband():
  box('Modular dark upper band',(0,1.2,0),(2,2.4,.26),'vault')
  for y in [.07,2.33]:box('Continuous timber fascia',(0,y,.17),(2,.14,.14),'wood_dark')
@@ -128,7 +154,12 @@ def export(name,build,kind='vertex'):
 
 def main():
  builders=[('wall_straight_2m',lambda:wall_style()),('wall_corner_2m',corner),('wall_pointed_2m',lambda:wall_style(window=True)),('wall_rose_2m',lambda:wall_style(rose=True)),('roof_band_2m',roofband),('floor_tile_2m',floor),('beam_2m',beam),('steps_2m',steps),('pointed_glass',lambda:simple_source('pointed_window'),'glass'),('rose_glass',lambda:rose_source(True),'glass'),('rose_frame',lambda:rose_source(False))]
- for item in builders:ROWS[item[0]]=export(*item)
- manifest={'task':'SGODOT-423 church kit preparation','revision':'v1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','units':'metres; Y up; +Z interior/front','grid_m':2,'wall_height_m':4.8,'assets':ROWS,'glass_palette_slots':GLASS_ROLES,'status':'Reusable pieces only; example is an isolated review fixture, no new church/POI/layout'}
+ builders.insert(1,('wall_door_2m',doorwall))
+ only=sys.argv[sys.argv.index('--only')+1] if '--only' in sys.argv else None
+ if only:
+  manifest=json.loads((KIT/'kit_manifest.json').read_text());ROWS.update(manifest['assets'])
+ for item in builders:
+  if only is None or item[0]==only:ROWS[item[0]]=export(*item)
+ manifest={'task':'SGODOT-427 church kit preparation','revision':'v1.1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','units':'metres; Y up; +Z interior/front','grid_m':2,'wall_height_m':4.8,'assets':ROWS,'glass_palette_slots':GLASS_ROLES,'status':'Reusable pieces only; example is an isolated review fixture, no new church/POI/layout'}
  (KIT/'kit_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 if __name__=='__main__':main()

@@ -44,7 +44,9 @@ func inspect():
 			var mat=mi.mesh.surface_get_material(0);var kind=manifest.assets[name].material
 			check(mat is ShaderMaterial if kind=="glass" else mat is StandardMaterial3D,name+" material family")
 			if kind=="glass":check(mat.get_shader_parameter("palette_texture").get_size()==Vector2(8,1),name+" 8-cell palette resource")
-			elif kind=="atlas":check(mat.albedo_texture.get_size()==Vector2(2048,2048),name+" independent shared atlas")
+			elif kind=="atlas":
+				check(mat.albedo_texture.get_size()==Vector2(2048,2048),name+" shared poi_church atlas")
+				check(mat.albedo_texture.resource_path=="res://assets/rooms/poi_church/room_albedo_ao.png",name+" atlas dependency path")
 			else:check(mat.vertex_color_use_as_albedo,name+" opaque vertex colour enabled")
 		check(count==manifest.assets[name].triangles and surfaces==1,name+" measured count/surface",[count,surfaces])
 		n.free()
@@ -86,7 +88,7 @@ func sample_chapel():
 		piece("wall_rose_2m" if x==0 else "wall_pointed_2m",Vector3(x,0,-4))
 		if x!=0:piece("pointed_glass",Vector3(x,0,-4),0,"meadow")
 	for z in [-2,0,2]:
-		piece("wall_straight_2m" if z==0 else "wall_pointed_2m",Vector3(-4,0,z),90)
+		piece("wall_door_2m" if z==0 else "wall_pointed_2m",Vector3(-4,0,z),90)
 		if z!=0:piece("pointed_glass",Vector3(-4,0,z),90,"meadow")
 	piece("rose_frame",Vector3(0,3.25,-4));piece("rose_glass",Vector3(0,3.25,-4),0,"meadow")
 	for q in [-3,-1,1,3]:
@@ -116,7 +118,7 @@ func catalogue():
 		report.catalog[name]={"bounds":row.bounds,"triangles":row.triangles,"avatar_height":1.745,"pose_lift_m":-low.y}
 func joins_and_openings():
 	clear()
-	var nodes=[piece("wall_straight_2m",Vector3.ZERO),piece("wall_pointed_2m",Vector3(2,0,0)),piece("wall_corner_2m",Vector3(4,0,0),-90),piece("wall_rose_2m",Vector3(8,0,0))]
+	var nodes=[piece("wall_straight_2m",Vector3.ZERO),piece("wall_pointed_2m",Vector3(2,0,0)),piece("wall_corner_2m",Vector3(4,0,0),-90),piece("wall_rose_2m",Vector3(8,0,0)),piece("wall_door_2m",Vector3(10,0,0))]
 	for n in nodes:
 		for mi in n.find_children("*","MeshInstance3D",true,false):mi.create_trimesh_collision()
 	await get_tree().physics_frame
@@ -132,11 +134,23 @@ func joins_and_openings():
 	for point in [Vector3(2,2,2),Vector3(2,3.8,2),Vector3(8,3.25,2)]:
 		var hit=space.intersect_ray(PhysicsRayQueryParameters3D.create(point,point-Vector3(0,0,4)))
 		check(hit.is_empty(),"True window aperture "+str(point))
+	for x in [8.9999,9.0,9.0001]:
+		for y in [.05,1.5,2.7,4.7]:
+			var hit=space.intersect_ray(PhysicsRayQueryParameters3D.create(Vector3(x,y,2),Vector3(x,y,-2)))
+			check(not hit.is_empty(),"Door/window seam closed x="+str(x)+" y="+str(y))
+	# Through the masonry thickness, the opening is empty at the rear of the
+	# recessed wood leaves; beside/above it the limestone piers/lintel close it.
+	for point in [Vector3(9.31,.05,-.05),Vector3(10.69,2.55,-.05)]:
+		check(space.intersect_ray(PhysicsRayQueryParameters3D.create(point,point-Vector3(0,0,.3))).is_empty(),"Door opening clear behind wooden leaf "+str(point))
+	for point in [Vector3(9.29,1.5,-.05),Vector3(10.71,1.5,-.05),Vector3(10,2.61,-.05)]:
+		check(not space.intersect_ray(PhysicsRayQueryParameters3D.create(point-Vector3(0,0,.3),point)).is_empty(),"Door opening bounded by masonry "+str(point))
 	clear()
 func run():
 	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output);manifest=JSON.parse_string(FileAccess.get_file_as_string(KIT+"kit_manifest.json"))
-	setup();inspect();await avatar();await joins_and_openings();sample_chapel();pose(6.72,Vector3(.30,1.30,-1.0));await capture("example_360")
+	setup();inspect();await avatar();await joins_and_openings();sample_chapel();pose(6.72,Vector3(-.70,1.30,-.30));await capture("example_360")
 	vp.size=Vector2i(1400,1200);pose(15,Vector3(0,2.4,0));await capture("example_overview")
+	clear();piece("wall_door_2m",Vector3.ZERO);move_player(Vector3(1.48,0,.35));rig.rotation_degrees.y=180
+	vp.size=Vector2i(720,1000);pose(4.1,Vector3(.4,2.25,0),12,15);await capture("door_front")
 	# Single shader parameter changes the whole glass set; all opaque pieces stay.
 	clear();move_player(Vector3(2.2,0,0));piece("wall_pointed_2m",Vector3(-1.2,0,0));var a=piece("pointed_glass",Vector3(-1.2,0,0),0,"classic");piece("wall_pointed_2m",Vector3(1.2,0,0));piece("pointed_glass",Vector3(1.2,0,0),0,"meadow")
 	rig.visible=false;vp.size=Vector2i(1000,900);pose(6.0,Vector3(0,2.4,0),7,0);await capture("palette_swap")
