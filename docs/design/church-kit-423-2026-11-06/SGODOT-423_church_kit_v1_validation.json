@@ -1,0 +1,2869 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "Entire live poi_church directory byte-identical (including no added/deleted files)",
+        "passed": true,
+        "evidence": {
+          "files": 71,
+          "baseline": "a530d90654b9f13e622530b05adf3ecf366366d3"
+        }
+      },
+      {
+        "check": "wall_straight_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m triangles match",
+        "passed": true,
+        "evidence": 144
+      },
+      {
+        "check": "wall_straight_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m triangles match",
+        "passed": true,
+        "evidence": 276
+      },
+      {
+        "check": "wall_corner_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_corner_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m triangles match",
+        "passed": true,
+        "evidence": 1596
+      },
+      {
+        "check": "wall_pointed_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m triangles match",
+        "passed": true,
+        "evidence": 452
+      },
+      {
+        "check": "wall_rose_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m triangles match",
+        "passed": true,
+        "evidence": 420
+      },
+      {
+        "check": "roof_band_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m triangles match",
+        "passed": true,
+        "evidence": 108
+      },
+      {
+        "check": "floor_tile_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "floor_tile_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m triangles match",
+        "passed": true,
+        "evidence": 12
+      },
+      {
+        "check": "beam_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m triangles match",
+        "passed": true,
+        "evidence": 36
+      },
+      {
+        "check": "steps_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "steps_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass triangles match",
+        "passed": true,
+        "evidence": 5368
+      },
+      {
+        "check": "pointed_glass measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass only six valid colour-group centres",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass no stale original UV channel",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass multiple independently recolourable groups",
+        "passed": true,
+        "evidence": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "check": "pointed_glass Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pointed_glass meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass triangles match",
+        "passed": true,
+        "evidence": 660
+      },
+      {
+        "check": "rose_glass measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass only six valid colour-group centres",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass no stale original UV channel",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass multiple independently recolourable groups",
+        "passed": true,
+        "evidence": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "check": "rose_glass Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_glass meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame triangles match",
+        "passed": true,
+        "evidence": 3696
+      },
+      {
+        "check": "rose_frame measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame no embedded/source atlas",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rose_frame meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew triangles match",
+        "passed": true,
+        "evidence": 1692
+      },
+      {
+        "check": "wood_pew measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew original GLB bytes copied",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew atlas URI resolves inside new kit",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_pew independent new UID, no live-resource alias",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table triangles match",
+        "passed": true,
+        "evidence": 1412
+      },
+      {
+        "check": "altar_table measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table original GLB bytes copied",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table atlas URI resolves inside new kit",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "altar_table independent new UID, no live-resource alias",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps triangles match",
+        "passed": true,
+        "evidence": 60
+      },
+      {
+        "check": "sanctuary_steps measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps original GLB bytes copied",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps atlas URI resolves inside new kit",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sanctuary_steps independent new UID, no live-resource alias",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier triangles match",
+        "passed": true,
+        "evidence": 1004
+      },
+      {
+        "check": "iron_chandelier measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier original GLB bytes copied",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier atlas URI resolves inside new kit",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "iron_chandelier independent new UID, no live-resource alias",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ triangles match",
+        "passed": true,
+        "evidence": 5256
+      },
+      {
+        "check": "pipe_organ measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ original GLB bytes copied",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ atlas URI resolves inside new kit",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "pipe_organ independent new UID, no live-resource alias",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal triangles match",
+        "passed": true,
+        "evidence": 7040
+      },
+      {
+        "check": "flower_pedestal measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal original GLB bytes copied",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal atlas URI resolves inside new kit",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "flower_pedestal independent new UID, no live-resource alias",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround triangles match",
+        "passed": true,
+        "evidence": 188
+      },
+      {
+        "check": "grass_surround measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround no rigs/animations/cameras/lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround finite mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround nondegenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround original GLB bytes copied",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround atlas URI resolves inside new kit",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "grass_surround independent new UID, no live-resource alias",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Every module has unique Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Shared copied atlas byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "One2048 atlas plus tiny glass palettes",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "classic 8-cell colour resource",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "classic uncompressed/no mip colour cells",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "meadow 8-cell colour resource",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "meadow uncompressed/no mip colour cells",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_straight_2m exact2m module length",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_pointed_2m exact2m module length",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wall_rose_2m exact2m module length",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "roof_band_2m exact2m module length",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beam_2m exact2m module length",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Corner arms each1m",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Rose assembly fits2m bay",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Three18cm stair risers total54cm",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Kit contains no new POI layout or assembled runtime scene",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Example central aisle from actual pew bounds >=.8m",
+        "passed": true,
+        "evidence": 1.2129997253417968
+      },
+      {
+        "check": "Review/source folder excluded from game import",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Import script and shader Godot UIDs",
+        "passed": true,
+        "evidence": null
+      }
+    ],
+    "passed": true,
+    "original_files": 71,
+    "assets": {
+      "wall_straight_2m": {
+        "triangles": 144,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.12999999523162842
+          ],
+          [
+            1.0,
+            4.800000190734863,
+            0.28999999165534973
+          ]
+        ]
+      },
+      "wall_corner_2m": {
+        "triangles": 276,
+        "bounds": [
+          [
+            -0.12999999523162842,
+            0.0,
+            -0.12999999523162842
+          ],
+          [
+            1.0,
+            4.800000190734863,
+            1.0
+          ]
+        ]
+      },
+      "wall_pointed_2m": {
+        "triangles": 1596,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.12999999523162842
+          ],
+          [
+            1.0,
+            4.800000190734863,
+            0.375
+          ]
+        ]
+      },
+      "wall_rose_2m": {
+        "triangles": 452,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.12999999523162842
+          ],
+          [
+            1.0,
+            4.800000190734863,
+            0.28999999165534973
+          ]
+        ]
+      },
+      "roof_band_2m": {
+        "triangles": 420,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.12999999523162842
+          ],
+          [
+            1.0,
+            2.4000000953674316,
+            0.2750000059604645
+          ]
+        ]
+      },
+      "floor_tile_2m": {
+        "triangles": 108,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          [
+            1.0,
+            0.11999999731779099,
+            1.0
+          ]
+        ]
+      },
+      "beam_2m": {
+        "triangles": 12,
+        "bounds": [
+          [
+            -1.0,
+            -0.09000000357627869,
+            -0.09000000357627869
+          ],
+          [
+            1.0,
+            0.09000000357627869,
+            0.09000000357627869
+          ]
+        ]
+      },
+      "steps_2m": {
+        "triangles": 36,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.75
+          ],
+          [
+            1.0,
+            0.5400000214576721,
+            0.75
+          ]
+        ]
+      },
+      "pointed_glass": {
+        "triangles": 5368,
+        "bounds": [
+          [
+            -0.6700000166893005,
+            1.1410000324249268,
+            -0.014999999664723873
+          ],
+          [
+            0.6700000166893005,
+            4.440000057220459,
+            0.09200000017881393
+          ]
+        ]
+      },
+      "rose_glass": {
+        "triangles": 660,
+        "bounds": [
+          [
+            -0.8372000455856323,
+            -0.8372000455856323,
+            -0.0184000376611948
+          ],
+          [
+            0.8372000455856323,
+            0.8372000455856323,
+            0.06532000005245209
+          ]
+        ]
+      },
+      "rose_frame": {
+        "triangles": 3696,
+        "bounds": [
+          [
+            -0.9435474872589111,
+            -0.9435474872589111,
+            -0.05060000345110893
+          ],
+          [
+            0.9434525966644287,
+            0.9435474872589111,
+            0.11500000208616257
+          ]
+        ]
+      },
+      "wood_pew": {
+        "triangles": 1692,
+        "bounds": [
+          [
+            -1.3435001373291016,
+            0.0,
+            -0.32499998807907104
+          ],
+          [
+            1.3435001373291016,
+            1.3299999237060547,
+            0.3449999988079071
+          ]
+        ]
+      },
+      "altar_table": {
+        "triangles": 1412,
+        "bounds": [
+          [
+            -1.0100001096725464,
+            -1.1920928955078125e-07,
+            -0.44999992847442627
+          ],
+          [
+            1.0100001096725464,
+            1.715000033378601,
+            0.4930002689361572
+          ]
+        ]
+      },
+      "sanctuary_steps": {
+        "triangles": 60,
+        "bounds": [
+          [
+            -2.4000003337860107,
+            0.0,
+            -1.549999713897705
+          ],
+          [
+            2.4000003337860107,
+            0.5400000214576721,
+            1.5500006675720215
+          ]
+        ]
+      },
+      "iron_chandelier": {
+        "triangles": 1004,
+        "bounds": [
+          [
+            -0.6070003509521484,
+            -0.03500000014901161,
+            -0.5330460071563721
+          ],
+          [
+            0.6070003509521484,
+            1.7999999523162842,
+            0.5330460071563721
+          ]
+        ]
+      },
+      "pipe_organ": {
+        "triangles": 5256,
+        "bounds": [
+          [
+            -0.800000011920929,
+            -1.4901161193847656e-08,
+            -0.30000030994415283
+          ],
+          [
+            0.7999999523162842,
+            3.1500000953674316,
+            0.5949997305870056
+          ]
+        ]
+      },
+      "flower_pedestal": {
+        "triangles": 7040,
+        "bounds": [
+          [
+            -0.36699867248535156,
+            0.0,
+            -0.35805463790893555
+          ],
+          [
+            0.3405647277832031,
+            1.8836712837219238,
+            0.31441447138786316
+          ]
+        ]
+      },
+      "grass_surround": {
+        "triangles": 188,
+        "bounds": [
+          [
+            -13.5,
+            -0.8500000238418579,
+            -13.5
+          ],
+          [
+            13.5,
+            -0.6699999570846558,
+            13.5
+          ]
+        ]
+      }
+    },
+    "unique_triangles": 29420,
+    "unique_surfaces": 18
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "source_height_m": 1.71833898495782
+    },
+    "captures": [
+      {
+        "camera_width": 6.71999979019165,
+        "file": "example_360.png",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ]
+      },
+      {
+        "camera_width": 15.0,
+        "file": "example_overview.png",
+        "pitch": 42.9999961853027,
+        "size": [
+          1400,
+          1200
+        ]
+      },
+      {
+        "camera_width": 6.0,
+        "file": "palette_swap.png",
+        "pitch": 6.99999952316284,
+        "size": [
+          1000,
+          900
+        ]
+      },
+      {
+        "camera_width": 8.88000011444092,
+        "file": "catalog_wall_straight_2m.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 8.88000011444092,
+        "file": "catalog_wall_corner_2m.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 8.88000011444092,
+        "file": "catalog_wall_pointed_2m.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 8.88000011444092,
+        "file": "catalog_wall_rose_2m.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 4.44000005722046,
+        "file": "catalog_roof_band_2m.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 4.09999990463257,
+        "file": "catalog_floor_tile_2m.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 4.09999990463257,
+        "file": "catalog_beam_2m.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 4.09999990463257,
+        "file": "catalog_steps_2m.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 6.10314989089966,
+        "file": "catalog_pointed_glass.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 3.77439999580383,
+        "file": "catalog_rose_glass.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 3.98699998855591,
+        "file": "catalog_rose_frame.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 4.78700017929077,
+        "file": "catalog_wood_pew.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 4.12000036239624,
+        "file": "catalog_altar_table.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 6.90000057220459,
+        "file": "catalog_sanctuary_steps.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 3.39474987983704,
+        "file": "catalog_iron_chandelier.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 5.82750034332275,
+        "file": "catalog_pipe_organ.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 3.48479175567627,
+        "file": "catalog_flower_pedestal.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      },
+      {
+        "camera_width": 29.1000003814697,
+        "file": "catalog_grass_surround.png",
+        "pitch": 16.9999980926514,
+        "size": [
+          360,
+          220
+        ]
+      }
+    ],
+    "catalog": {
+      "altar_table": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.01000010967255,
+            -1.19209289550781e-07,
+            -0.449999928474426
+          ],
+          [
+            1.01000010967255,
+            1.7150000333786,
+            0.493000268936157
+          ]
+        ],
+        "pose_lift_m": 1.19209289550781e-07,
+        "triangles": 1412.0
+      },
+      "beam_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            -0.0900000035762787,
+            -0.0900000035762787
+          ],
+          [
+            1.0,
+            0.0900000035762787,
+            0.0900000035762787
+          ]
+        ],
+        "pose_lift_m": 0.0900000035762787,
+        "triangles": 12.0
+      },
+      "floor_tile_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          [
+            1.0,
+            0.119999997317791,
+            1.0
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 108.0
+      },
+      "flower_pedestal": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.366998672485352,
+            0.0,
+            -0.358054637908936
+          ],
+          [
+            0.340564727783203,
+            1.88367128372192,
+            0.314414471387863
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 7040.0
+      },
+      "grass_surround": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -13.5,
+            -0.850000023841858,
+            -13.5
+          ],
+          [
+            13.5,
+            -0.669999957084656,
+            13.5
+          ]
+        ],
+        "pose_lift_m": 0.850000023841858,
+        "triangles": 188.0
+      },
+      "iron_chandelier": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.607000350952148,
+            -0.0350000001490116,
+            -0.533046007156372
+          ],
+          [
+            0.607000350952148,
+            1.79999995231628,
+            0.533046007156372
+          ]
+        ],
+        "pose_lift_m": 0.0350000001490116,
+        "triangles": 1004.0
+      },
+      "pipe_organ": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.800000011920929,
+            -1.49011611938477e-08,
+            -0.300000309944153
+          ],
+          [
+            0.799999952316284,
+            3.15000009536743,
+            0.594999730587006
+          ]
+        ],
+        "pose_lift_m": 1.49011611938477e-08,
+        "triangles": 5256.0
+      },
+      "pointed_glass": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.670000016689301,
+            1.14100003242493,
+            -0.0149999996647239
+          ],
+          [
+            0.670000016689301,
+            4.44000005722046,
+            0.0920000001788139
+          ]
+        ],
+        "pose_lift_m": -1.14100003242493,
+        "triangles": 5368.0
+      },
+      "roof_band_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.129999995231628
+          ],
+          [
+            1.0,
+            2.40000009536743,
+            0.275000005960464
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 420.0
+      },
+      "rose_frame": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.943547487258911,
+            -0.943547487258911,
+            -0.0506000034511089
+          ],
+          [
+            0.943452596664429,
+            0.943547487258911,
+            0.115000002086163
+          ]
+        ],
+        "pose_lift_m": 0.943547487258911,
+        "triangles": 3696.0
+      },
+      "rose_glass": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.837200045585632,
+            -0.837200045585632,
+            -0.0184000376611948
+          ],
+          [
+            0.837200045585632,
+            0.837200045585632,
+            0.0653200000524521
+          ]
+        ],
+        "pose_lift_m": 0.837200045585632,
+        "triangles": 660.0
+      },
+      "sanctuary_steps": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -2.40000033378601,
+            0.0,
+            -1.54999971389771
+          ],
+          [
+            2.40000033378601,
+            0.540000021457672,
+            1.55000066757202
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 60.0
+      },
+      "steps_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.75
+          ],
+          [
+            1.0,
+            0.540000021457672,
+            0.75
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 36.0
+      },
+      "wall_corner_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.129999995231628,
+            0.0,
+            -0.129999995231628
+          ],
+          [
+            1.0,
+            4.80000019073486,
+            1.0
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 276.0
+      },
+      "wall_pointed_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.129999995231628
+          ],
+          [
+            1.0,
+            4.80000019073486,
+            0.375
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 1596.0
+      },
+      "wall_rose_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.129999995231628
+          ],
+          [
+            1.0,
+            4.80000019073486,
+            0.28999999165535
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 452.0
+      },
+      "wall_straight_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.129999995231628
+          ],
+          [
+            1.0,
+            4.80000019073486,
+            0.28999999165535
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 144.0
+      },
+      "wood_pew": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.3435001373291,
+            0.0,
+            -0.324999988079071
+          ],
+          [
+            1.3435001373291,
+            1.32999992370605,
+            0.344999998807907
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 1692.0
+      }
+    },
+    "checks": [
+      {
+        "check": "wall_straight_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_straight_2m material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_straight_2m opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_straight_2m measured count/surface",
+        "evidence": [
+          144,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "wall_corner_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_corner_2m material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_corner_2m opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_corner_2m measured count/surface",
+        "evidence": [
+          276,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "wall_pointed_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_pointed_2m material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_pointed_2m opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_pointed_2m measured count/surface",
+        "evidence": [
+          1596,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "wall_rose_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_rose_2m material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_rose_2m opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wall_rose_2m measured count/surface",
+        "evidence": [
+          452,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "roof_band_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "roof_band_2m material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "roof_band_2m opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "roof_band_2m measured count/surface",
+        "evidence": [
+          420,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "floor_tile_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "floor_tile_2m material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "floor_tile_2m opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "floor_tile_2m measured count/surface",
+        "evidence": [
+          108,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "beam_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "beam_2m material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "beam_2m opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "beam_2m measured count/surface",
+        "evidence": [
+          12,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "steps_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "steps_2m material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "steps_2m opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "steps_2m measured count/surface",
+        "evidence": [
+          36,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "pointed_glass one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "pointed_glass material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "pointed_glass 8-cell palette resource",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "pointed_glass measured count/surface",
+        "evidence": [
+          5368,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "rose_glass one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rose_glass material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rose_glass 8-cell palette resource",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rose_glass measured count/surface",
+        "evidence": [
+          660,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "rose_frame one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rose_frame material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rose_frame opaque vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rose_frame measured count/surface",
+        "evidence": [
+          3696,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "wood_pew one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_pew material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_pew independent shared atlas",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_pew measured count/surface",
+        "evidence": [
+          1692,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "altar_table one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "altar_table material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "altar_table independent shared atlas",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "altar_table measured count/surface",
+        "evidence": [
+          1412,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps independent shared atlas",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sanctuary_steps measured count/surface",
+        "evidence": [
+          60,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier independent shared atlas",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "iron_chandelier measured count/surface",
+        "evidence": [
+          1004,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "pipe_organ one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "pipe_organ material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "pipe_organ independent shared atlas",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "pipe_organ measured count/surface",
+        "evidence": [
+          5256,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal independent shared atlas",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "flower_pedestal measured count/surface",
+        "evidence": [
+          7040,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "grass_surround one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "grass_surround material family",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "grass_surround independent shared atlas",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "grass_surround measured count/surface",
+        "evidence": [
+          188,
+          1
+        ],
+        "passed": true
+      },
+      {
+        "check": "Default avatar assembled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=0.9999 y=0.05",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=0.9999 y=0.3",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=0.9999 y=1.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=0.9999 y=2.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=0.9999 y=4.5",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=0.9999 y=4.75",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0 y=0.05",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0 y=0.3",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0 y=1.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0 y=2.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0 y=4.5",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0 y=4.75",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0001 y=0.05",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0001 y=0.3",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0001 y=1.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0001 y=2.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0001 y=4.5",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Straight/window seam closed x=1.0001 y=4.75",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Corner joint closed x=2.9999",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Corner joint closed x=3.0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Corner joint closed x=3.0001",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "True window aperture (2.0, 2.0, 2.0)",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "True window aperture (2.0, 3.8, 2.0)",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "True window aperture (8.0, 3.25, 2.0)",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Example fits room budget",
+        "evidence": [
+          67516,
+          54
+        ],
+        "passed": true
+      },
+      {
+        "check": "Capture example_360",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture example_overview",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture palette_swap",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wall_straight_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wall_corner_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wall_pointed_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wall_rose_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_roof_band_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_floor_tile_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_beam_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_steps_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_pointed_glass",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_rose_glass",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_rose_frame",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wood_pew",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_altar_table",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_sanctuary_steps",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_iron_chandelier",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_pipe_organ",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_flower_pedestal",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_grass_surround",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "example": {
+      "centre_aisle_m": 1.2129997253417968,
+      "floor_footprint_m": [
+        8,
+        8
+      ],
+      "game_layout_exported": false,
+      "maze": false,
+      "palette": "meadow",
+      "pews": 4,
+      "pieces": {
+        "altar_table": 1,
+        "beam_2m": 4,
+        "floor_tile_2m": 16,
+        "flower_pedestal": 2,
+        "grass_surround": 1,
+        "iron_chandelier": 1,
+        "pipe_organ": 1,
+        "pointed_glass": 4,
+        "roof_band_2m": 8,
+        "rose_frame": 1,
+        "rose_glass": 1,
+        "steps_2m": 1,
+        "wall_corner_2m": 3,
+        "wall_pointed_2m": 4,
+        "wall_rose_2m": 1,
+        "wall_straight_2m": 1,
+        "wood_pew": 4
+      },
+      "surfaces": 54,
+      "triangles": 67516
+    },
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  },
+  "scope": "Only modular church kit. Example is a non-shipping isolated review script; no new church layout, POI or runtime scene."
+}

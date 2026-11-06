@@ -1,0 +1,14 @@
+{
+  "assets": [
+    "wood_pew",
+    "altar_table",
+    "sanctuary_steps",
+    "iron_chandelier",
+    "pipe_organ",
+    "flower_pedestal",
+    "grass_surround"
+  ],
+  "source": "assets/rooms/poi_church",
+  "atlas": "res://assets/rooms/poi_church/room_albedo_ao.png; shared dependency, no duplicate",
+  "glb_changes": "Only JSON images[0].uri; complete BIN chunk and all other JSON fields preserved"
+}

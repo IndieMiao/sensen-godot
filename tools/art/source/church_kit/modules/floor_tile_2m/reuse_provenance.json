@@ -1,0 +1,10 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source_commit": "a530d90654b9f13e622530b05adf3ecf366366d3",
+  "module": "floor_tile_2m",
+  "source": "Grace Cathedral palette and pointed-window proportions",
+  "changes": "Modular geometry or extracted stone frame, metre dimensions; standalone vertex-colour material",
+  "editable_source": "tools/art/source/church_kit/floor_tile_2m.blend",
+  "script": "tools/art/source/church_kit/build.py"
+}

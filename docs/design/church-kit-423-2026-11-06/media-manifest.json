@@ -1,0 +1,27 @@
+[
+  {
+    "file": "SGODOT-423_church_kit_v1_catalogue.png",
+    "bytes": 518986,
+    "sha256": "52b1fe27150e36aef3f38c8979b836cc11fa0d54eb5bc7c5f68675502ac14f6b"
+  },
+  {
+    "file": "SGODOT-423_church_kit_v1_example_360.png",
+    "bytes": 281822,
+    "sha256": "31a590768bdc645662ff96529fdfc91b51f5bd4496fc61c74aacd6ec4b47e11e"
+  },
+  {
+    "file": "SGODOT-423_church_kit_v1_example_overview.png",
+    "bytes": 1255633,
+    "sha256": "030067f0abc88c68625fcdff6ab68c04b704ae04b3f4d51a76c69737518f2797"
+  },
+  {
+    "file": "SGODOT-423_church_kit_v1_palette_swap.png",
+    "bytes": 437829,
+    "sha256": "a9d379aa1f7b9393093562700286addad8905c188e793a0d8d8cd3bfeabdf0c8"
+  },
+  {
+    "file": "SGODOT-423_church_kit_v1_validation.json",
+    "bytes": 65587,
+    "sha256": "0f15d9c592dd0774b12a5696f1f1fac903c745181e255d19ebcd84c757a14d7a"
+  }
+]
