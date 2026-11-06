@@ -68,7 +68,7 @@ static func stand_of(p: Dictionary) -> Vector3:
 	var s = p.get("stand", null)
 	return Vector3(float(s[0]), 0, float(s[1])) if s is Array and s.size() >= 2 else Vector3(float(p.get("x", 0)), 0, float(p.get("z", 0)))
 
-static func _flat(a: Vector3, b: Vector3) -> float:
+static func flat(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
 
 ## The point nearest `at` (by its stand), {} with none.
@@ -76,7 +76,7 @@ static func nearest(list: Array, at: Vector3) -> Dictionary:
 	var best := {}
 	var best_d := INF
 	for p in list:
-		var d := _flat(stand_of(p), at)
+		var d := flat(stand_of(p), at)
 		if d < best_d:
 			best_d = d
 			best = p

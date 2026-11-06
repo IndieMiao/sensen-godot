@@ -204,7 +204,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	var clear := PondGather.clear_points(v)
 	if not clear.is_empty() and clear != _scenery_clear: _build_scenery(clear)   # the points came with the reply after the scene was built
 	var near: Dictionary = PondGather.nearest(gather.points, actor.position)
-	var reach := not near.is_empty() and _plan.is_empty() and PondGather._flat(PondGather.stand_of(near), actor.position) <= PondGather.REACH_M
+	var reach := not near.is_empty() and _plan.is_empty() and PondGather.flat(PondGather.stand_of(near), actor.position) <= PondGather.REACH_M
 	rt.ui.set_action(PondGather.key(v, near, gather.pond) if reach else _action_state(v))   # 410: Gather at a point, else Cast
 	_gather_marks(v, near)
 	_trap_frame(v)
@@ -253,14 +253,16 @@ func p0_energy_verb() -> String: return str(rt.ui.fab_state().get("verb", "Cast"
 ## folded; the guide's `!` on the point its target names (view.guide.target.spot), whichever point is nearest.
 ## The bank's scenery, its trees and bushes off `clear` (410); built again when the pond's points first come or change.
 func _build_scenery(clear: Array) -> void:
-	if _scenery: _scenery.free()
+	if _scenery:   # out of the tree at once, freed at the frame's end (亚瑟 on #788)
+		remove_child(_scenery)
+		_scenery.queue_free()
 	_scenery_clear = clear
 	_scenery = PondScenery.build(entry, clear)
 	add_child(_scenery)
 	move_child(_scenery, cam.get_index() + 1)
 
 func _gather_marks(v: Dictionary, near: Dictionary) -> void:
-	var id := str(near.get("id", "")) if not near.is_empty() and PondGather._flat(PondGather.stand_of(near), actor.position) <= PondGather.TAG_M else ""
+	var id := str(near.get("id", "")) if not near.is_empty() and PondGather.flat(PondGather.stand_of(near), actor.position) <= PondGather.TAG_M else ""
 	if _gather_tag != "" and _gather_tag != id: rt.ui.name_bar("gather:" + _gather_tag, null, "", "", Vector2.ZERO, false)
 	_gather_tag = id
 	if id != "":

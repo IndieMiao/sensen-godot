@@ -23,15 +23,17 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 	material.shader = preload("res://modules/ponds/pond_ground.gdshader")
 	material.set_shader_parameter("grass_detail", preload("res://assets/farm/art/water/bank_grass.png"))
 	material.set_shader_parameter("surface_flow", preload("res://assets/farm/art/water/surface_flow.png"))
+	_wild_ground(material, str(entry.get("template_id", "")))
 	scene._mesh(ground, Vector3(6, -0.025, -8), material).name = "BankGround"
 	# Trunks and rocks remain in the blocked perimeter, clear of the shared nav.
+	# The bank's six trees are the wild's single pines and round trees now (SGODOT-422 ⑥: not the Timber grove's clump),
+	# placed with the rest of the wild's pieces (PondWildProps); the draws stay so the turf below keeps its place.
 	var trees: Array = []
 	for point in [Vector3(0.1, 0, -4), Vector3(-0.2, 0, -11), Vector3(2.2, 0, -16.1), Vector3(9.5, 0, -16.4), Vector3(12.2, 0, -12), Vector3(12.1, 0, -5.5)]:
-		var scale_value := scene._rng.randf_range(.85, 1.1)
-		var turn := scene._rng.randf_range(0, TAU)
-		if not _near(point, clear) and not _in_front(point, clear): trees.append(Transform3D(Basis(Vector3.UP, turn).scaled(Vector3.ONE * scale_value), point))
-	scene.add_child(preload("res://modules/ponds/pond_trees.gd").build(trees))
-	var layers := {"grass_clump": [], "daisy": [], "blue_flower": [], "bush": []}
+		scene._rng.randf_range(.85, 1.1)
+		scene._rng.randf_range(0, TAU)
+		if not _near(point, clear) and not _in_front(point, clear): trees.append(point)
+	var layers := {"grass_clump": []}
 	var spec := SystemPonds.site(entry)
 	for i in 150:
 		var point := Vector3(scene._rng.randf_range(-1.5, 13.5), 0.01, scene._rng.randf_range(-18, .4))
@@ -40,9 +42,11 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 		var asset := "bush" if edge and i % 4 == 0 else "daisy" if i % 7 == 0 else "blue_flower" if i % 11 == 0 else "grass_clump"
 		var scale_value := scene._rng.randf_range(.55, .90) if asset == "bush" else scene._rng.randf_range(.35, .60)
 		var turn := scene._rng.randf_range(0, TAU)
-		if asset == "bush" and _near(point, clear): continue
+		# the old flowers and bushes give way to the wild's own (blue flowers and mint bushes read as resources, 不知火舞)
+		if asset != "grass_clump": continue
 		layers[asset].append(Transform3D(Basis(Vector3.UP, turn).scaled(Vector3.ONE * scale_value), point))
-	for asset in layers: scene.add_child(Art.batch(asset, layers[asset], asset == "bush"))
+	for asset in layers: scene.add_child(Art.batch(asset, layers[asset], false))
+	scene.add_child(PondWildProps.build(entry, spec, clear, trees))
 	# Small batched tufts give the meadow a soft pile instead of a flat plane.
 	var turf: Array = []
 	for index in 4200:
@@ -76,6 +80,21 @@ func _mesh(mesh: Mesh, at: Vector3, material: Material) -> MeshInstance3D:
 	node.material_override = material
 	add_child(node)
 	return node
+
+## The wild ground (SGODOT-422, 刘备 #791 / #798): the meadow's colour over the bank's dry ground, the pond's shape's
+## layout (crescent / gourd / meander; another shape: none) and its channel of the shared dry-ground mask.
+const PondWildProps := preload("res://modules/ponds/pond_wild_props.gd")
+const GROUND_DIR := "res://assets/ponds/ground/"
+const DRY_CHANNEL := {"crescent": Vector3(1, 0, 0), "gourd": Vector3(0, 1, 0), "meander": Vector3(0, 0, 1)}
+static func _wild_ground(material: ShaderMaterial, shape: String) -> void:
+	var layout := GROUND_DIR + shape + "_layout.png"
+	if not DRY_CHANNEL.has(shape) or not ResourceLoader.exists(layout):
+		material.set_shader_parameter("dry_channel", Vector3.ZERO)   # the ground as it was
+		return
+	material.set_shader_parameter("meadow_color", load(GROUND_DIR + "meadow_color.png"))
+	material.set_shader_parameter("ground_layout", load(layout))
+	material.set_shader_parameter("dry_ground_mask", load(GROUND_DIR + "dry_ground_mask.png"))
+	material.set_shader_parameter("dry_channel", DRY_CHANNEL[shape])
 
 static func _near(point: Vector3, clear: Array) -> bool:
 	for c in clear:
