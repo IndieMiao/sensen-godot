@@ -1,0 +1,464 @@
+{
+	"assets": {
+		"alc_tree_c": {
+			"sha256": "3880ea841a0d648c4a029e17308559897c2a79d83af438460c894ab1b82aaa10",
+			"triangles": 240,
+			"uid": "uid://cb8bxwktdwqtv"
+		},
+		"alc_tree_c_far": {
+			"sha256": "ae2f1c73445f773dcfd6e125f8f78c2e431089c417b0197e26be96042812e6ab",
+			"triangles": 116,
+			"uid": "uid://dw7shdijhxlgp"
+		},
+		"alc_tree_d": {
+			"sha256": "466132def38484a05095a787c0eeeff487aed4abb058991d6fa629e539ef56b9",
+			"triangles": 316,
+			"uid": "uid://hqek2b20xc30"
+		},
+		"alc_tree_d_far": {
+			"sha256": "c058ae76a9fead0705cfafc3b0904a5557027fc8a765aa53cb8838d5fb3beacb",
+			"triangles": 118,
+			"uid": "uid://dv7vmxfgrujhm"
+		}
+	},
+	"avatar_label_at": "(1387.5, 659.6331)",
+	"captures": [
+		{
+			"camera": "[X: (0.819152, 0.0, -0.573576), Y: (-0.391178, 0.731354, -0.55866), Z: (0.419487, 0.681998, 0.59909), O: (43.16924, 49.9199, 31.94539)]",
+			"draw_calls": 23,
+			"name": "slope_before",
+			"pitch": -42.9999961853027,
+			"player": "(8.0, 5.5, 3.0)",
+			"size": [
+				720,
+				1000
+			],
+			"triangles": 37234,
+			"width_m": 27.0,
+			"yaw": 34.9999961853027
+		},
+		{
+			"camera": "[X: (0.819152, 0.0, -0.573576), Y: (-0.391178, 0.731354, -0.55866), Z: (0.419487, 0.681998, 0.59909), O: (43.16924, 49.9199, 31.94539)]",
+			"draw_calls": 24,
+			"name": "slope_after",
+			"pitch": -42.9999961853027,
+			"player": "(8.0, 5.5, 3.0)",
+			"size": [
+				720,
+				1000
+			],
+			"triangles": 35094,
+			"width_m": 27.0,
+			"yaw": 34.9999961853027
+		},
+		{
+			"camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.4, 37.29992, 74.56769)]",
+			"draw_calls": 8,
+			"name": "four_trees_avatar",
+			"pitch": -42.9999961853027,
+			"player": "(10.6, 0.0, 38.0)",
+			"size": [
+				1500,
+				950
+			],
+			"triangles": 9020,
+			"width_m": 24.0,
+			"yaw": 0.0
+		}
+	],
+	"checks": [
+		{
+			"check": "published v7 island / real game avatar ready",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_c: imported budget / one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_c: Godot UID / import",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_c: actual current import",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_c_far: imported budget / one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_c_far: Godot UID / import",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_c_far: actual current import",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_d: imported budget / one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_d: Godot UID / import",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_d: actual current import",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_d_far: imported budget / one surface",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_d_far: Godot UID / import",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_d_far: actual current import",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_000: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_000: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_002: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_002: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_003: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_003: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_005: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_005: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_004: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_004: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_008: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_008: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_012: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_012: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_013: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_013: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_014: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_014: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_007: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_007: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_015: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_015: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_008: matches published layout",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_008: original root clears navigation",
+			"passed": true
+		},
+		{
+			"check": "capture slope_before",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_004: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_000: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_002: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_003: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_005: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_008: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_012: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_013: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_014: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_a_015: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_007: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "alc_tree_b_008: original transform retained",
+			"passed": true
+		},
+		{
+			"check": "exactly the 12 named old instances removed",
+			"passed": true
+		},
+		{
+			"check": "two new type/zone batches, no duplicate trees",
+			"passed": true
+		},
+		{
+			"check": "capture slope_after",
+			"passed": true
+		},
+		{
+			"check": "before/after identical camera",
+			"passed": true
+		},
+		{
+			"check": "game avatar original 1.75m scale",
+			"passed": true
+		},
+		{
+			"check": "capture four_trees_avatar",
+			"passed": true
+		},
+		{
+			"check": "Vulkan Mobile renderer",
+			"passed": true
+		}
+	],
+	"gallery": [
+		{
+			"asset": "alc_tree_a",
+			"height_m": 6.42432117462158,
+			"label_at": "(225.0, 659.6331)",
+			"position": "(-8.0, 0.0, 38.0)"
+		},
+		{
+			"asset": "alc_tree_b",
+			"height_m": 6.27500009536743,
+			"label_at": "(587.5, 659.6331)",
+			"position": "(-2.2, 0.0, 38.0)"
+		},
+		{
+			"asset": "alc_tree_c",
+			"height_m": 7.80000019073486,
+			"label_at": "(918.75, 659.6331)",
+			"position": "(3.1, 0.0, 38.0)"
+		},
+		{
+			"asset": "alc_tree_d",
+			"height_m": 3.59999990463257,
+			"label_at": "(1187.5, 659.6331)",
+			"position": "(7.4, 0.0, 38.0)"
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"gpu": "NVIDIA GeForce RTX 2060",
+		"method": "mobile"
+	},
+	"replacements": [
+		{
+			"horizontal_clearance_m": 1.75,
+			"nearest_navigation": "(-23.25, 3.25, 6.5)",
+			"new_asset": "alc_tree_d",
+			"root": [
+				-25.0,
+				3.25,
+				6.5
+			],
+			"source_name": "alc_tree_a_000"
+		},
+		{
+			"horizontal_clearance_m": 11.3500003814697,
+			"nearest_navigation": "(24.5, 10.0, -4.75)",
+			"new_asset": "alc_tree_d",
+			"root": [
+				24.5,
+				3.25,
+				6.6
+			],
+			"source_name": "alc_tree_a_002"
+		},
+		{
+			"horizontal_clearance_m": 8.78381443023682,
+			"nearest_navigation": "(9.25, 4.79, 4.42)",
+			"new_asset": "alc_tree_d",
+			"root": [
+				18.0,
+				3.25,
+				3.65
+			],
+			"source_name": "alc_tree_a_003"
+		},
+		{
+			"horizontal_clearance_m": 2.7663152217865,
+			"nearest_navigation": "(-23.25, 6.1, 1.8)",
+			"new_asset": "alc_tree_d",
+			"root": [
+				-26.0,
+				5.5,
+				1.5
+			],
+			"source_name": "alc_tree_a_005"
+		},
+		{
+			"horizontal_clearance_m": 7.45000076293945,
+			"nearest_navigation": "(9.25, 5.5, 1.9)",
+			"new_asset": "alc_tree_d",
+			"root": [
+				16.7,
+				5.5,
+				1.9
+			],
+			"source_name": "alc_tree_b_004"
+		},
+		{
+			"horizontal_clearance_m": 6.65000009536743,
+			"nearest_navigation": "(22.0, 10.0, -4.75)",
+			"new_asset": "alc_tree_d",
+			"root": [
+				22.0,
+				5.5,
+				1.9
+			],
+			"source_name": "alc_tree_a_008"
+		},
+		{
+			"horizontal_clearance_m": 1.95000004768372,
+			"nearest_navigation": "(16.7, 10.0, -4.75)",
+			"new_asset": "alc_tree_d",
+			"root": [
+				16.7,
+				7.75,
+				-2.8
+			],
+			"source_name": "alc_tree_a_012"
+		},
+		{
+			"horizontal_clearance_m": 1.95000004768372,
+			"nearest_navigation": "(22.0, 10.0, -4.75)",
+			"new_asset": "alc_tree_d",
+			"root": [
+				22.0,
+				7.75,
+				-2.8
+			],
+			"source_name": "alc_tree_a_013"
+		},
+		{
+			"horizontal_clearance_m": 1.27475488185883,
+			"nearest_navigation": "(-27.75, 10.0, -7.75)",
+			"new_asset": "alc_tree_c",
+			"root": [
+				-28.0,
+				10.0,
+				-9.0
+			],
+			"source_name": "alc_tree_a_014"
+		},
+		{
+			"horizontal_clearance_m": 1.75,
+			"nearest_navigation": "(-22.2, 10.0, -7.75)",
+			"new_asset": "alc_tree_c",
+			"root": [
+				-22.2,
+				10.0,
+				-9.5
+			],
+			"source_name": "alc_tree_b_007"
+		},
+		{
+			"horizontal_clearance_m": 8.25378704071045,
+			"nearest_navigation": "(-27.75, 10.0, -7.75)",
+			"new_asset": "alc_tree_c",
+			"root": [
+				-28.0,
+				10.0,
+				-16.0
+			],
+			"source_name": "alc_tree_a_015"
+		},
+		{
+			"horizontal_clearance_m": 1.75,
+			"nearest_navigation": "(22.2, 10.0, -7.75)",
+			"new_asset": "alc_tree_c",
+			"root": [
+				22.2,
+				10.0,
+				-9.5
+			],
+			"source_name": "alc_tree_b_008"
+		}
+	]
+}

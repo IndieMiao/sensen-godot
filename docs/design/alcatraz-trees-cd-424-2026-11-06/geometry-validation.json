@@ -1,0 +1,558 @@
+{
+  "author": "赵云",
+  "checks": [
+    {
+      "check": "alc_tree_c: one mesh",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: one surface",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: mobile mesh name",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: no skeleton, animation or texture",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: identity root, no pivot translation or scale",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: one material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: matte material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: vertex colour contract",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: valid opaque vertex colours",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: measured bounds",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: requested physical height",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: bottom on Y=0",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: no degenerate or reversed shading faces",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: current manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: generated Godot UID",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: gltf/texture_map_mode=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: meshes/light_baking=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: meshes/generate_lods=false",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: one mesh",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: one surface",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: mobile mesh name",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: no skeleton, animation or texture",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: identity root, no pivot translation or scale",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: one material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: matte material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: vertex colour contract",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: valid opaque vertex colours",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: measured bounds",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: exact near/far bounds",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: requested physical height",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: bottom on Y=0",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: no degenerate or reversed shading faces",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: current manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: generated Godot UID",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: gltf/texture_map_mode=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: meshes/light_baking=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: meshes/generate_lods=false",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: one mesh",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: one surface",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: mobile mesh name",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: no skeleton, animation or texture",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: identity root, no pivot translation or scale",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: one material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: matte material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: vertex colour contract",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: valid opaque vertex colours",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: measured bounds",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: requested physical height",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: bottom on Y=0",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: no degenerate or reversed shading faces",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: current manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: generated Godot UID",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: gltf/texture_map_mode=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: meshes/light_baking=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: meshes/generate_lods=false",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: one mesh",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: one surface",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: mobile mesh name",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: no skeleton, animation or texture",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: identity root, no pivot translation or scale",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: one material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: matte material",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: vertex colour contract",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: measured triangle budget",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: unit normals",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: valid opaque vertex colours",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: measured bounds",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: exact near/far bounds",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: requested physical height",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: bottom on Y=0",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: no degenerate or reversed shading faces",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: current manifest hash",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: generated Godot UID",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: gltf/texture_map_mode=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: meshes/light_baking=1",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: meshes/generate_lods=false",
+      "passed": true
+    },
+    {
+      "check": "12 distinct existing replacement instances",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_000: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_002: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_003: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_005: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_004: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_008: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_012: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_013: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_014: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_007: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a_015: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b_008: exact original placement and collision metadata",
+      "passed": true
+    },
+    {
+      "check": "26 trees retained",
+      "passed": true
+    },
+    {
+      "check": "source/runtime manifest agree",
+      "passed": true
+    },
+    {
+      "check": "published island remains byte-identical: assets/landmarks/alcatraz_island/layout.json",
+      "passed": true
+    },
+    {
+      "check": "published island remains byte-identical: scenes/landmark/alcatraz_island.gd",
+      "passed": true
+    },
+    {
+      "check": "published island remains byte-identical: scenes/landmark/alcatraz_island.tscn",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a.glb: old asset unchanged",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_a.glb.import: old asset unchanged",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b.glb: old asset unchanged",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_b.glb.import: old asset unchanged",
+      "passed": true
+    },
+    {
+      "check": "native island render and replacement checks",
+      "passed": true
+    },
+    {
+      "check": "native visibility_range checks",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c: current GLB actually rendered",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: current GLB actually rendered",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_c_far: current far GLB actually switched",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d: current GLB actually rendered",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: current GLB actually rendered",
+      "passed": true
+    },
+    {
+      "check": "alc_tree_d_far: current far GLB actually switched",
+      "passed": true
+    }
+  ],
+  "assets": {
+    "alc_tree_c": {
+      "triangles": 240,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.7536808848381042,
+          0.0,
+          -0.6871153712272644
+        ],
+        [
+          0.8759885430335999,
+          7.800000190734863,
+          0.6929545998573303
+        ]
+      ],
+      "sha256": "3880ea841a0d648c4a029e17308559897c2a79d83af438460c894ab1b82aaa10",
+      "uid": "uid://cb8bxwktdwqtv",
+      "degenerate_faces": 0,
+      "reversed_faces": 0,
+      "minimum_face_normal_agreement": 0.6021365722020467
+    },
+    "alc_tree_c_far": {
+      "triangles": 116,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.7536808848381042,
+          0.0,
+          -0.6871153712272644
+        ],
+        [
+          0.8759885430335999,
+          7.800000190734863,
+          0.6929545998573303
+        ]
+      ],
+      "sha256": "ae2f1c73445f773dcfd6e125f8f78c2e431089c417b0197e26be96042812e6ab",
+      "uid": "uid://dw7shdijhxlgp",
+      "degenerate_faces": 0,
+      "reversed_faces": 0,
+      "minimum_face_normal_agreement": 0.5406316089763875
+    },
+    "alc_tree_d": {
+      "triangles": 316,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.599733829498291,
+          0.0,
+          -1.0272800922393799
+        ],
+        [
+          1.6949594020843506,
+          3.5999999046325684,
+          1.0359508991241455
+        ]
+      ],
+      "sha256": "466132def38484a05095a787c0eeeff487aed4abb058991d6fa629e539ef56b9",
+      "uid": "uid://hqek2b20xc30",
+      "degenerate_faces": 0,
+      "reversed_faces": 0,
+      "minimum_face_normal_agreement": 0.5832706127382332
+    },
+    "alc_tree_d_far": {
+      "triangles": 118,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.599733829498291,
+          0.0,
+          -1.0272800922393799
+        ],
+        [
+          1.6949594020843506,
+          3.5999999046325684,
+          1.0359508991241455
+        ]
+      ],
+      "sha256": "c058ae76a9fead0705cfafc3b0904a5557027fc8a765aa53cb8838d5fb3beacb",
+      "uid": "uid://dv7vmxfgrujhm",
+      "degenerate_faces": 0,
+      "reversed_faces": 0,
+      "minimum_face_normal_agreement": 0.18493786331899514
+    }
+  },
+  "native_render_checks": 57,
+  "native_lod_checks": 75,
+  "passed": true
+}

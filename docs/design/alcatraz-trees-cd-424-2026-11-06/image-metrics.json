@@ -1,0 +1,138 @@
+{
+  "alc_tree_c": {
+    "silhouette_iou": 0.9782,
+    "near_bbox_px": [
+      138,
+      246,
+      221,
+      557
+    ],
+    "far_bbox_px": [
+      138,
+      246,
+      221,
+      556
+    ],
+    "max_bbox_edge_shift_px": 1,
+    "intersection_rgb_mae_255": 2.756
+  },
+  "alc_tree_c_yaw60": {
+    "silhouette_iou": 0.90652,
+    "near_bbox_px": [
+      158,
+      125,
+      242,
+      473
+    ],
+    "far_bbox_px": [
+      153,
+      125,
+      246,
+      472
+    ],
+    "max_bbox_edge_shift_px": 5,
+    "intersection_rgb_mae_255": 3.114
+  },
+  "alc_tree_c_yaw150": {
+    "silhouette_iou": 0.94983,
+    "near_bbox_px": [
+      152,
+      125,
+      246,
+      474
+    ],
+    "far_bbox_px": [
+      156,
+      125,
+      242,
+      473
+    ],
+    "max_bbox_edge_shift_px": 4,
+    "intersection_rgb_mae_255": 2.753
+  },
+  "alc_tree_c_yaw240": {
+    "silhouette_iou": 0.91117,
+    "near_bbox_px": [
+      157,
+      133,
+      241,
+      477
+    ],
+    "far_bbox_px": [
+      153,
+      133,
+      246,
+      476
+    ],
+    "max_bbox_edge_shift_px": 5,
+    "intersection_rgb_mae_255": 2.988
+  },
+  "alc_tree_d": {
+    "silhouette_iou": 0.99649,
+    "near_bbox_px": [
+      91,
+      319,
+      270,
+      475
+    ],
+    "far_bbox_px": [
+      91,
+      319,
+      270,
+      475
+    ],
+    "max_bbox_edge_shift_px": 0,
+    "intersection_rgb_mae_255": 3.425
+  },
+  "alc_tree_d_yaw60": {
+    "silhouette_iou": 0.99122,
+    "near_bbox_px": [
+      126,
+      195,
+      281,
+      382
+    ],
+    "far_bbox_px": [
+      126,
+      195,
+      281,
+      381
+    ],
+    "max_bbox_edge_shift_px": 1,
+    "intersection_rgb_mae_255": 4.345
+  },
+  "alc_tree_d_yaw150": {
+    "silhouette_iou": 0.99429,
+    "near_bbox_px": [
+      109,
+      196,
+      292,
+      383
+    ],
+    "far_bbox_px": [
+      109,
+      196,
+      292,
+      382
+    ],
+    "max_bbox_edge_shift_px": 1,
+    "intersection_rgb_mae_255": 3.906
+  },
+  "alc_tree_d_yaw240": {
+    "silhouette_iou": 0.99434,
+    "near_bbox_px": [
+      118,
+      192,
+      273,
+      386
+    ],
+    "far_bbox_px": [
+      118,
+      192,
+      273,
+      385
+    ],
+    "max_bbox_edge_shift_px": 1,
+    "intersection_rgb_mae_255": 3.598
+  }
+}

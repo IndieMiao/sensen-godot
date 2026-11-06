@@ -1,0 +1,178 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "reference_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+  "palette_source": "tools/art/source/alcatraz_island/palette.json",
+  "palette_used": {
+    "garden": "86A84F",
+    "garden_light": "9AB55D",
+    "garden_dark": "759448",
+    "wood": "BB8B52",
+    "wood_dark": "9A7046",
+    "wood_light": "D0A56C"
+  },
+  "assets": {
+    "alc_tree_c": {
+      "file": "alc_tree_c.glb",
+      "triangles": 240,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.7536808848381042,
+          0.0,
+          -0.6871153712272644
+        ],
+        [
+          0.8759885430335999,
+          7.800000190734863,
+          0.6929545998573303
+        ]
+      ],
+      "height_m": 7.800000190734863,
+      "sha256": "3880ea841a0d648c4a029e17308559897c2a79d83af438460c894ab1b82aaa10",
+      "bytes": 7196,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_tree_c_far": {
+      "file": "alc_tree_c_far.glb",
+      "triangles": 116,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.7536808848381042,
+          0.0,
+          -0.6871153712272644
+        ],
+        [
+          0.8759885430335999,
+          7.800000190734863,
+          0.6929545998573303
+        ]
+      ],
+      "height_m": 7.800000190734863,
+      "sha256": "ae2f1c73445f773dcfd6e125f8f78c2e431089c417b0197e26be96042812e6ab",
+      "bytes": 4220,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_tree_d": {
+      "file": "alc_tree_d.glb",
+      "triangles": 316,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.599733829498291,
+          0.0,
+          -1.0272800922393799
+        ],
+        [
+          1.6949594020843506,
+          3.5999999046325684,
+          1.0359508991241455
+        ]
+      ],
+      "height_m": 3.5999999046325684,
+      "sha256": "466132def38484a05095a787c0eeeff487aed4abb058991d6fa629e539ef56b9",
+      "bytes": 9308,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    },
+    "alc_tree_d_far": {
+      "file": "alc_tree_d_far.glb",
+      "triangles": 118,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.599733829498291,
+          0.0,
+          -1.0272800922393799
+        ],
+        [
+          1.6949594020843506,
+          3.5999999046325684,
+          1.0359508991241455
+        ]
+      ],
+      "height_m": 3.5999999046325684,
+      "sha256": "c058ae76a9fead0705cfafc3b0904a5557027fc8a765aa53cb8838d5fb3beacb",
+      "bytes": 4988,
+      "pivot": "root centre, Y=0",
+      "front": "+Z",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
+    }
+  },
+  "lod_groups": [
+    {
+      "name": "alc_tree_c",
+      "near": "alc_tree_c",
+      "far": "alc_tree_c_far",
+      "switch_distance_m": 40,
+      "margin_m": 0,
+      "common_aabb": [
+        [
+          -0.7536808848381042,
+          0.0,
+          -0.6871153712272644
+        ],
+        [
+          0.8759885430335999,
+          7.800000190734863,
+          0.6929545998573303
+        ]
+      ],
+      "far_placeholder": false
+    },
+    {
+      "name": "alc_tree_d",
+      "near": "alc_tree_d",
+      "far": "alc_tree_d_far",
+      "switch_distance_m": 40,
+      "margin_m": 0,
+      "common_aabb": [
+        [
+          -1.599733829498291,
+          0.0,
+          -1.0272800922393799
+        ],
+        [
+          1.6949594020843506,
+          3.5999999046325684,
+          1.0359508991241455
+        ]
+      ],
+      "far_placeholder": false
+    }
+  ],
+  "far_camera_contract": {
+    "pitch_degrees_min": 40,
+    "island_pitch_degrees": 43,
+    "rotation": "upright trees, yaw only",
+    "note": "D canopy undersides invisible at all yaw above 40 degrees are omitted; C remains closed."
+  },
+  "source": "tools/art/source/alcatraz_trees_cd_424/trees_cd.blend",
+  "generator": "tools/art/build_alcatraz_trees_cd_424.py"
+}
