@@ -1,4 +1,7 @@
 {
+ "Church": "教堂",
+ "Church · Stained glass": "教堂 · 彩窗",
+ "Grace Cathedral": "Grace 大教堂",
  "_note": "李白 q(275) P0 中文版初稿（AI 翻译助手起草，待不知火舞 / 用户审）。口径来源：用户已批 / 设计已定的 12 条口径（Homestead=家园、Layer 不翻、NPC 人名与系统地名保留英文只翻类型词、Stamp=印章、Trip N=第 N 档、合规地区写法、中英数字间半角空格等）＞ q275 glossary-rules.md / glossary-draft.json ＞ Journey 现有 zh_CN.json。源清单 tools/p0/i18n/p0_strings_en.json（origin/pr-649 15f6eb83c，1,954 条）；纯格式 / 调试 / 节点名 / 人名等不译条目已省略，见 p0_zh_CN.notes.md。生成时间 2026-11-02 15:12。 11-03 补译 28 条（语音、屏蔽、鱼竿等级句、语音隐私说明、Pip 新初见句等，源 origin/feat/p0-i18n a3aec8c8，1,984 条）。 11-03 晚按不知火舞走查（385 82b3f369 B、C 节）改 20 条：黏土岸、XP 一律经验、能做三类食材的料理、今日下矿、送礼 / 受赠、换物、等级太高、开采、渔具铺掌柜、再次入城、拉不动、需要%s 不留空格；加 Since %s 模板。",
  "%+d Friendship": "%+d 好感",
  "%d %s around %s right now.": "{3} 附近现在有 {1} {2}。",

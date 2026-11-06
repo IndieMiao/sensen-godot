@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import type { OutpostRole, OutpostSpec } from './rooms.js';
 
 export const DEFAULT_P0_OUTPOSTS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../assets/p0/p0_outposts.json');
-const ROLES: OutpostRole[] = ['tackle', 'tea', 'post', 'market', 'mine_hut', 'casino'];
+const ROLES: OutpostRole[] = ['tackle', 'tea', 'post', 'market', 'mine_hut', 'casino', 'church'];
 const ID_RE = /^[a-z0-9_]{3,40}$/;
 
 /** A generated place an online room can be made for (world.ts roomPlace): an outpost, or a Mine Hut with its own walls. */
