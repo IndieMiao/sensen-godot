@@ -1,0 +1,23 @@
+{
+  "task": "SGODOT-424",
+  "author": "刘备",
+  "base_art_branch": "fb4af04584faab96a45fd8c2ad7b047f45fa8bb6",
+  "host_commit": "d7b57574d359952858319d17b43722651a0fcbcb",
+  "nature_commit": "af31975750619983f4c93c83486092612eef73b9",
+  "dock_commit": "cc59ef9fb47fb398eefccded423aeab85d16839f",
+  "references": [
+    {
+      "file": "blockout_layout.json",
+      "sha256": "7dee94386391e1a01e63a206bd983b2e53309e5e1eb8195a395ea17e44619ea7"
+    },
+    {
+      "file": "c_alc2.png",
+      "sha256": "408027a23724ebaa5a0388f493c198b89f5a7c157f363d34b5470b032ef455d1"
+    },
+    {
+      "file": "landmark_alcatraz_v2.jpg",
+      "sha256": "e25388b6e3be3af6e0815e269cd29090c00f1aae9e1f46707b7b10f026255932"
+    }
+  ],
+  "inference": "Independent low-contrast static foam pieces and two decorative floats interpreted from coast in user concept; no sea shader modification."
+}

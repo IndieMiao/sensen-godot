@@ -115,7 +115,7 @@ kit.begin('gull',ao=False)
 kit.ellipsoid('body',(0,.12,0),(.32,.24,.45),'bird',seg=10,rings=6)
 kit.ellipsoid('head',(0,.29,-.18),(.19,.19,.19),'bird',seg=8,rings=6)
 box('beak',(0,.28,-.29),(.08,.06,.13),'wood',.01)
-for p,z in [((-23.6,2,18.2),'DockZone'),((10,4.25,8.7),'TerraceZone'),((-24,11,-7),'SummitZone')]:place('gull',p,z,collision=False)
+for p,z in [((-23.6,2.03,18.25),'DockZone'),((9.5,4.25,8.94),'TerraceZone'),((-24,10.02,-7),'SummitZone')]:place('gull',p,z,collision=False)
 # World installation: 20 m seaward of the dock spawn. Fake elevation keeps cards in the opening's top edge.
 far_anchor=[-22,-.15,39]
 yaw=math.radians(14.5);pitch=math.radians(43)
@@ -207,12 +207,14 @@ layout={'revision':'B v8 pictogram and accepted effects with approved props, gar
  'camera':{'pitch':43,'yaw':14.5,'width':6.72,'zoom_min':1/3,'zoom_max':1.4,'forward_bias_m':2.8},
  'dimensions_m':{'island':[60,40],'museum':[40,9,10],'lighthouse_height':15,'water_tower_height':12,'ferry_length':25,'bench_length':1.5,'bench_seat_height':.45,'railing_height':1,'lamp_height':3.5,'avatar_nominal_height':1.75},
  'sea_size':512,'nav_connected_cells':len(cells),'clearance_m':.25,
- 'notes':['v7 museum/terrain/dock formal colour; approved #794/#802/#815/#816/#820/#821/#801 installed; museum far remains a proxy.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
+ 'notes':['v8 blank landmark signs with a lighthouse pictogram; accepted museum LOD, native gull/ferry animation and shoreline overlays installed.','FarZone cards mount 20m seaward, with documented false-perspective elevation and depth.']}
 authored.replace_preview_modules(kit,OUT,AUTHORED)
 # Public integration contract follows tea_house's camera/spawn/anchors/boundaries fields.
 lod_groups=[]
 for asset in ['alc_museum','alc_lighthouse','alc_watertower','ferry']:
     lod_groups.append({'name':asset,'near':asset,'far':asset+'_far','switch_distance_m':55,'margin_m':0,'far_placeholder':asset+'_far' not in AUTHORED})
+    if asset=='alc_museum':
+        lod_groups[-1]['sign_sync_pending']=AUTHORED.get('alc_museum_far',{}).get('near_source',{}).get('git_ref')!='bf0c31b1c871011008b455434d167224d14de59c'
 asset_instance_counts=defaultdict(int)
 for i,p in enumerate(placements):
     p['name']='%s_%03d'%(p['asset'],asset_instance_counts[p['asset']])
@@ -222,7 +224,12 @@ for i,p in enumerate(placements):
     p['multimesh']=p['asset'] in placeholders.REPEATED
     p['placeholder']=p['asset'] in placeholders.OWNERS and p['asset'] not in AUTHORED
     p['owner']=placeholders.OWNERS.get(p['asset'],'马可波罗')
-    if p['asset']=='gull':p['pose']=['stand','preen','spread'][asset_instance_counts['gull']-1]
+    if p['asset'] in ['gull','ferry']:
+        p['scene_file']=p['asset']+'.tscn';p['animation']='idle'
+        p['animation_phase_group']=asset_instance_counts[p['asset']]-1
+    if p['asset']=='ruins':p['render_merge_into']='alc_ground_terraces'
+    if p['asset'].startswith('alc_foam_'):p['surface_group']='shore_foam'
+    if p['asset'] in placeholders.DOCK or (p['asset']=='alc_sign' and p['zone']=='DockZone'):p['surface_group']='dock_furnishings'
     if p['asset'] in [g['near'] for g in lod_groups]:p['lod_group']=p['asset']
 used={i for p in polys for i in p};navpoints=[verts[i] for i in used]
 layout['walk_bounds']={'min':[min(p[k] for p in navpoints) for k in range(3)],'max':[max(p[k] for p in navpoints) for k in range(3)],'note':'Outer bounds only; walkability comes from navigation polygons.'}
@@ -239,15 +246,17 @@ layout['boundaries']=[{'name':'WestBoundary','size':[.2,36,40],'at':[-30.1,17.85
  {'name':'NorthBoundary','size':[60,36,.2],'at':[0,17.85,-20.1]},{'name':'SouthBoundary','size':[60,36,.2],'at':[0,17.85,20.1]}]
 layout['lod_groups']=lod_groups
 layout['palette']=PALETTE
+layout['render_groups']={'shore_foam':'static shared-material overlay; original prototypes and 102 placements retained','alc_ground_terraces':['ruins_000'],'dock_furnishings':'seven dock kit placements plus existing entrance sign; standalone prototypes retained'}
 layout['garden_design']=garden_design
 layout['rail_repairs']=rail_repairs
 layout['hud_clearance']=json.loads((HERE/'hud_contract.json').read_text())
 layout['far_anchor']=far_anchor
 layout['far_zone']={'node':'FarZone','anchor':far_anchor,'projection':'camera-facing XY cards, fake elevation, depth behind opaque island; local front +Z','render_depth_fractions':{'alc_far_bridge':.94,'alc_far_city':.96,'alc_far_hills':.98}}
-layout['instances']=[{k:p[k] for k in ['name','asset','zone','position','rotation_degrees','scale','basis_columns','slope_rise_m','owner','placeholder','source_name','support_y_offset_m'] if k in p} for p in placements if p['multimesh']]
+layout['instances']=[{k:p[k] for k in ['name','asset','zone','position','rotation_degrees','scale','basis_columns','slope_rise_m','owner','placeholder','source_name','support_y_offset_m','surface_group'] if k in p} for p in placements if p['multimesh']]
 layout['interest_points']=[{'name':p['name'],'asset':p['asset'],'position':p['position'],'zone':p['zone']} for p in placements if p['asset'] in placeholders.REPEATED and p['asset'] not in ['alc_rail_straight','alc_rail_corner','alc_curb']]
-layout['assets']=[{'name':name,'file':name+'.glb','placeholder':name in placeholders.OWNERS and name not in AUTHORED,'owner':placeholders.OWNERS.get(name,'马可波罗'),'pivot':'ground centre; +Z front','cast_shadow':name not in ['alc_curb','alc_lamp','alc_bin','alc_sign','alc_rail_corner','alc_flowerbed','alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft','ferry','gull']+placeholders.GARDEN+placeholders.RUINS+placeholders.DOCK+['alc_shrub_b'] and not name.startswith('alc_far_') and not name.endswith('_far'),'material':'vertex_color_placeholder' if name in placeholders.OWNERS and name not in AUTHORED else 'vertex_color'} for name in kit.assets]
+layout['assets']=[{'name':name,'file':name+'.glb','placeholder':name in placeholders.OWNERS and name not in AUTHORED,'owner':placeholders.OWNERS.get(name,'马可波罗'),'pivot':'ground centre; +Z front','cast_shadow':name not in ['alc_curb','alc_lamp','alc_bin','alc_sign','alc_rail_corner','alc_flowerbed','alc_rock_a','alc_rock_b','alc_rock_c','alc_shrub','alc_grass_tuft','ferry','gull']+placeholders.GARDEN+placeholders.RUINS+placeholders.DOCK+placeholders.SHORE+['alc_shrub_b','ferry_flag'] and not name.startswith('alc_far_') and not name.endswith('_far'),'material':'vertex_color_placeholder' if name in placeholders.OWNERS and name not in AUTHORED else 'vertex_color'} for name in kit.assets]
 for asset in layout['assets']:
+    if asset['name'] in placeholders.SHORE:asset['material']='imported'
     if asset['name'] in ['alc_grass_tuft','alc_shrub','alc_flowerbed','alc_bin','alc_rail_corner']+placeholders.GARDEN+placeholders.RUINS+['alc_shrub_b']:
         asset['max_view_width_m']=8.0
 (OUT/'placement_points.json').write_text(json.dumps({'units':'metres','axes':layout['axes'],'instances':layout['instances']},ensure_ascii=False,indent=2)+'\n')

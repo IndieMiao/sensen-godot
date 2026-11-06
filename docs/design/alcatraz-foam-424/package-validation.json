@@ -1,0 +1,20 @@
+{
+  "package": "com.sensen.alcatrazfoam424qa",
+  "apk_sha256": "8516e2842849af13502836f3aedfed24d234a1d3e17a6a53dc01a0fdebd43533",
+  "bytes": 34649405,
+  "installed_apk_readback_equal": true,
+  "passed": true,
+  "decoded_meshes_materials_uids_equal": true,
+  "exported_alpha_texture_bytes_equal": true,
+  "alpha_texture_sha256": "499d9f113da508d2cdf9f404e7e14303e5d60a915fbda2047b7d92ab2a91017d",
+  "placements_and_manifest_bytes_equal": true,
+  "assets": [
+    "alc_buoy",
+    "alc_driftwood",
+    "alc_foam_ring",
+    "alc_foam_strip_a",
+    "alc_foam_strip_b",
+    "alc_foam_strip_c"
+  ],
+  "note": "Offline Android API37 / SwiftShader; no physical GPU performance or full navigation/pinch claim."
+}

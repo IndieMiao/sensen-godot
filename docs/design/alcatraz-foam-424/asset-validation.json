@@ -1,0 +1,1741 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: single mesh and surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: real index triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: single material without duplicated texture embeds"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: static decorative prototype"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: manifest hash"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: exported bounds match manifest"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: local horizontal centre"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: exact flat water-plane mesh"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: upward facing"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: finite shared alpha UVs"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: bounded vertex alpha"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a: fade both strip ends"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: single mesh and surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: real index triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: single material without duplicated texture embeds"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: static decorative prototype"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: manifest hash"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: exported bounds match manifest"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: local horizontal centre"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: exact flat water-plane mesh"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: upward facing"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: finite shared alpha UVs"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: bounded vertex alpha"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b: fade both strip ends"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: single mesh and surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: real index triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: single material without duplicated texture embeds"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: static decorative prototype"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: manifest hash"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: exported bounds match manifest"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: local horizontal centre"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: exact flat water-plane mesh"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: upward facing"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: finite shared alpha UVs"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: bounded vertex alpha"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c: fade both strip ends"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: single mesh and surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: real index triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: single material without duplicated texture embeds"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: static decorative prototype"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: manifest hash"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: exported bounds match manifest"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: local horizontal centre"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: exact flat water-plane mesh"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: upward facing"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: finite shared alpha UVs"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring: bounded vertex alpha"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: single mesh and surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: real index triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: single material without duplicated texture embeds"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: static decorative prototype"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: manifest hash"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: exported bounds match manifest"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: local horizontal centre"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy: origin at floating waterline"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: single mesh and surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: real index triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: no degenerate triangles"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: single material without duplicated texture embeds"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: static decorative prototype"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: manifest hash"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: exported bounds match manifest"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: local horizontal centre"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood: origin at floating waterline"
+    },
+    {
+      "passed": true,
+      "check": "one 512x128 RGBA foam texture"
+    },
+    {
+      "passed": true,
+      "check": "periodic alpha texture seam"
+    },
+    {
+      "passed": true,
+      "check": "cross-band borders fully transparent"
+    },
+    {
+      "passed": true,
+      "check": "low contrast soft foam coverage"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_000: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_000: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_000: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_000: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_000: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_000: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_001: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_001: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_001: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_002: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_002: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_002: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_003: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_003: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_003: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_001: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_001: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_001: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_004: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_004: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_004: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_005: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_005: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_005: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_006: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_006: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_006: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_002: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_002: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_002: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_007: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_007: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_007: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_008: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_008: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_008: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_009: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_009: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_009: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_003: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_003: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_003: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_010: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_010: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_010: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_011: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_011: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_011: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_012: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_012: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_012: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_004: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_004: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_004: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_013: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_013: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_013: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_014: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_014: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_014: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_015: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_015: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_015: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_005: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_005: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_005: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_016: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_016: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_016: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_006: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_006: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_006: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_017: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_017: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_017: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_018: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_018: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_018: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_019: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_019: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_019: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_007: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_007: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_007: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_020: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_020: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_020: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_021: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_021: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_021: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_022: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_022: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_022: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_008: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_008: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_008: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_023: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_023: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_023: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_024: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_024: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_024: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_025: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_025: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_025: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_009: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_009: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_009: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_026: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_026: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_026: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_027: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_027: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_027: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_028: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_028: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_028: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_010: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_010: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_010: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_029: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_029: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_029: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_030: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_030: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_030: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_031: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_031: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_031: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_011: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_011: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_011: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_032: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_032: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_032: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_033: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_033: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_033: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_034: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_034: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_034: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_012: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_012: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_012: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_035: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_035: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_035: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_036: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_036: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_036: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_037: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_037: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_037: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_013: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_013: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_013: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_038: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_038: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_038: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_039: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_039: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_039: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_040: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_040: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_a_040: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_014: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_014: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_b_014: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_000: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_000: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_000: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_001: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_001: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_001: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_002: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_002: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_002: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_003: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_003: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_003: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_004: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_004: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_004: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_005: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_005: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_005: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_006: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_006: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_006: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_007: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_007: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_007: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_008: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_008: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_008: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_009: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_009: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_009: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_010: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_010: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_010: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_011: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_011: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_011: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_012: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_012: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_012: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_013: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_013: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_013: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_014: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_014: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_014: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_015: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_015: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_015: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_016: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_016: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_016: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_017: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_017: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_017: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_018: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_018: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_018: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_019: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_019: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_019: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_020: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_020: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_020: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_021: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_021: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_021: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_022: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_022: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_022: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_023: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_023: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_023: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_024: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_024: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_024: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_025: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_025: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_025: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_026: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_026: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_026: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_027: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_027: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_027: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_028: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_028: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_028: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_029: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_029: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_029: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_030: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_030: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_030: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_031: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_031: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_031: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_032: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_032: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_032: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_033: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_033: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_033: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_034: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_034: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_034: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_035: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_035: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_035: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_036: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_036: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_036: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_037: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_037: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_037: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_038: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_038: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_038: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_039: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_039: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_039: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_040: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_040: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_040: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_041: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_041: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_ring_041: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_000: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_000: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_000: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_001: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_001: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_001: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_002: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_002: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_002: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_003: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_003: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_foam_strip_c_003: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy_000: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy_000: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy_000: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy_001: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy_001: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_buoy_001: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_000: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_000: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_000: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_001: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_001: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_001: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_002: unique authored instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_002: decorative batched instance"
+    },
+    {
+      "passed": true,
+      "check": "alc_driftwood_002: water level and overlay separation"
+    },
+    {
+      "passed": true,
+      "check": "placement counts match instances"
+    },
+    {
+      "passed": true,
+      "check": "placed triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/layout.json: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/placement_points.json: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/sea_backdrop.gdshader: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/far_card.gdshader: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ground_dock.glb: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ground_terraces.glb: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ground_summit.glb: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/dock.glb: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_bridge.glb: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_city.glb: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "scenes/landmark/alcatraz_island.gd: host unchanged"
+    },
+    {
+      "passed": true,
+      "check": "scenes/landmark/alcatraz_island.tscn: host unchanged"
+    }
+  ],
+  "assets": 6,
+  "unique_triangles": 458,
+  "instances": 107,
+  "batches": 6,
+  "placed_triangles": 5006,
+  "host_commit": "d7b57574d359952858319d17b43722651a0fcbcb",
+  "unchanged_host_files": [
+    {
+      "file": "assets/landmarks/alcatraz_island/layout.json",
+      "sha256": "7dee94386391e1a01e63a206bd983b2e53309e5e1eb8195a395ea17e44619ea7"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/placement_points.json",
+      "sha256": "5d08d18120f05c5f96ce0384aa2778590f3c92231afd60ef11cff8dfa66f079e"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/sea_backdrop.gdshader",
+      "sha256": "ca71f9078c39d625c66b0f1a73b0bbc4b0fe62cbc481d0e9f0cdff0b1006d6d3"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/far_card.gdshader",
+      "sha256": "39386ef55891571e395cbe7a1880950ba2cd304e8568e6601c893890a16da5eb"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_ground_dock.glb",
+      "sha256": "e9495680ccced71df18f0256345eb8db69325100cad8f09dd1363f5e268de9b3"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_ground_terraces.glb",
+      "sha256": "d92a72e8c439fe79879767b9d106c2c314039db167930e1420af661b80ae3872"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_ground_summit.glb",
+      "sha256": "edd37a54e05d92b79d2cb8262b3a4a0d7af1740541768ccf8e172963562d661e"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/dock.glb",
+      "sha256": "a4a80d55c1f20fc5fa1cd8e60ce274c668816741bb8ca90decd8c76f85e4d817"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_far_bridge.glb",
+      "sha256": "9cd46d07c4ca491efe7bdcb716723aa87976da4373df5e5e7288f8ee80ad7d37"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/alc_far_city.glb",
+      "sha256": "ae98acebd72673591318ede1f9b2a9c9832f30a45aa836f9eda0f6de1788c2d8"
+    },
+    {
+      "file": "scenes/landmark/alcatraz_island.gd",
+      "sha256": "2c25c87308995121ce275a561fbec058ed7cb4ec97d644e1bb3798f62e89721e"
+    },
+    {
+      "file": "scenes/landmark/alcatraz_island.tscn",
+      "sha256": "68c859099f2254dd2f83357127178159f8fa9835bc539e726876e4b458f580f5"
+    }
+  ]
+}

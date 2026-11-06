@@ -418,7 +418,8 @@
         1
       ],
       "owner": "赵云",
-      "placeholder": false
+      "placeholder": false,
+      "surface_group": "dock_furnishings"
     },
     {
       "name": "alc_bench_003",
@@ -5735,7 +5736,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_dock_shelter_000"
+      "source_name": "alc_dock_shelter_000",
+      "surface_group": "dock_furnishings"
     },
     {
       "name": "alc_dock_crates_000",
@@ -5758,7 +5760,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_dock_crates_000"
+      "source_name": "alc_dock_crates_000",
+      "surface_group": "dock_furnishings"
     },
     {
       "name": "alc_dock_welcome_000",
@@ -5781,7 +5784,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_dock_welcome_000"
+      "source_name": "alc_dock_welcome_000",
+      "surface_group": "dock_furnishings"
     },
     {
       "name": "alc_dock_planter_000",
@@ -5804,7 +5808,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_dock_planter_000"
+      "source_name": "alc_dock_planter_000",
+      "surface_group": "dock_furnishings"
     },
     {
       "name": "alc_dock_planter_001",
@@ -5827,7 +5832,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_dock_planter_001"
+      "source_name": "alc_dock_planter_001",
+      "surface_group": "dock_furnishings"
     },
     {
       "name": "alc_dock_bollard_000",
@@ -5850,7 +5856,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_dock_bollard_000"
+      "source_name": "alc_dock_bollard_000",
+      "surface_group": "dock_furnishings"
     },
     {
       "name": "alc_dock_bollard_001",
@@ -5873,7 +5880,8 @@
       ],
       "owner": "刘备",
       "placeholder": false,
-      "source_name": "alc_dock_bollard_001"
+      "source_name": "alc_dock_bollard_001",
+      "surface_group": "dock_furnishings"
     },
     {
       "name": "alc_ruin_arch_000",
@@ -6173,6 +6181,3181 @@
       "owner": "赵云",
       "placeholder": false,
       "source_name": "alc_ruin_plaque_detail_12"
+    },
+    {
+      "name": "alc_foam_strip_a_000",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        27.7937,
+        -0.132,
+        1.33726
+      ],
+      "rotation_degrees": [
+        0,
+        -114.1435,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_000",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_000",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        26.37297,
+        -0.132,
+        4.61855
+      ],
+      "rotation_degrees": [
+        0,
+        -114.4434,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_000",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_001",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        24.64099,
+        -0.132,
+        7.63595
+      ],
+      "rotation_degrees": [
+        0,
+        -162.27615,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_001",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_002",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        23.85487,
+        -0.132,
+        9.19572
+      ],
+      "rotation_degrees": [
+        0,
+        -100.23491,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_002",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_003",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        23.97567,
+        -0.132,
+        11.69753
+      ],
+      "rotation_degrees": [
+        0,
+        -85.20748,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_003",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_001",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        22.24297,
+        -0.132,
+        14.15645
+      ],
+      "rotation_degrees": [
+        0,
+        -178.93474,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_001",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_004",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        18.82161,
+        -0.132,
+        14.14864
+      ],
+      "rotation_degrees": [
+        0,
+        179.43953,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_004",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_005",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        16.24767,
+        -0.132,
+        14.14859
+      ],
+      "rotation_degrees": [
+        0,
+        -179.97362,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_005",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_006",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        13.67103,
+        -0.132,
+        14.14057
+      ],
+      "rotation_degrees": [
+        0,
+        179.8373,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_006",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_002",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        10.09263,
+        -0.132,
+        14.15375
+      ],
+      "rotation_degrees": [
+        0,
+        179.11364,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_002",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_007",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        6.67794,
+        -0.132,
+        14.10327
+      ],
+      "rotation_degrees": [
+        0,
+        179.36415,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_007",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_008",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        4.08988,
+        -0.132,
+        14.00949
+      ],
+      "rotation_degrees": [
+        0,
+        174.9214,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_008",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_009",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        1.52063,
+        -0.132,
+        13.80938
+      ],
+      "rotation_degrees": [
+        0,
+        174.18134,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_009",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_003",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        -2.02184,
+        -0.132,
+        13.89772
+      ],
+      "rotation_degrees": [
+        0,
+        -178.11174,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_003",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_010",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -5.43113,
+        -0.132,
+        14.05597
+      ],
+      "rotation_degrees": [
+        0,
+        -177.81667,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_010",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_011",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -8.01457,
+        -0.132,
+        14.08153
+      ],
+      "rotation_degrees": [
+        0,
+        179.91917,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_011",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_012",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -10.58454,
+        -0.132,
+        14.11504
+      ],
+      "rotation_degrees": [
+        0,
+        -178.47306,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_012",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_004",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        -14.16391,
+        -0.132,
+        14.12147
+      ],
+      "rotation_degrees": [
+        0,
+        -179.4983,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_004",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_013",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -17.58223,
+        -0.132,
+        14.16982
+      ],
+      "rotation_degrees": [
+        0,
+        179.65595,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_013",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_014",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -20.15833,
+        -0.132,
+        14.15547
+      ],
+      "rotation_degrees": [
+        0,
+        179.61548,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_014",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_015",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -22.73104,
+        -0.132,
+        14.15869
+      ],
+      "rotation_degrees": [
+        0,
+        -179.46167,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_015",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_005",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        -24.4478,
+        -0.132,
+        11.46021
+      ],
+      "rotation_degrees": [
+        0,
+        97.70997,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_005",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_016",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -26.86202,
+        -0.132,
+        3.39669
+      ],
+      "rotation_degrees": [
+        0,
+        112.98035,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_016",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_006",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        -28.30246,
+        -0.132,
+        0.12867
+      ],
+      "rotation_degrees": [
+        0,
+        114.04188,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_006",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_017",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -29.41985,
+        -0.132,
+        -3.11721
+      ],
+      "rotation_degrees": [
+        0,
+        102.79952,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_017",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_018",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -29.99452,
+        -0.132,
+        -5.63321
+      ],
+      "rotation_degrees": [
+        0,
+        101.39393,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_018",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_019",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -30.0629,
+        -0.132,
+        -8.2441
+      ],
+      "rotation_degrees": [
+        0,
+        89.06705,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_019",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_007",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        -30.07836,
+        -0.132,
+        -11.81653
+      ],
+      "rotation_degrees": [
+        0,
+        89.99201,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_007",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_020",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -30.06648,
+        -0.132,
+        -15.23305
+      ],
+      "rotation_degrees": [
+        0,
+        89.79171,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_020",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_021",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -29.42005,
+        -0.132,
+        -17.7217
+      ],
+      "rotation_degrees": [
+        0,
+        44.90879,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_021",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_022",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -27.58479,
+        -0.132,
+        -19.52905
+      ],
+      "rotation_degrees": [
+        0,
+        44.90983,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_022",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_008",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        -24.09255,
+        -0.132,
+        -20.16779
+      ],
+      "rotation_degrees": [
+        0,
+        0.13383,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_008",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_023",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -20.6758,
+        -0.132,
+        -20.1637
+      ],
+      "rotation_degrees": [
+        0,
+        -0.08245000000000001,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_023",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_024",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -18.09973,
+        -0.132,
+        -20.15863
+      ],
+      "rotation_degrees": [
+        0,
+        -0.10261,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_024",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_025",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -15.52364,
+        -0.132,
+        -20.1523
+      ],
+      "rotation_degrees": [
+        0,
+        -0.12981,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_025",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_009",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        -11.94561,
+        -0.132,
+        -20.14044
+      ],
+      "rotation_degrees": [
+        0,
+        -0.71875,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_009",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_026",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -8.53107,
+        -0.132,
+        -20.11266
+      ],
+      "rotation_degrees": [
+        0,
+        -0.37705,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_026",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_027",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -5.95653,
+        -0.132,
+        -20.11244
+      ],
+      "rotation_degrees": [
+        0,
+        -0.00642,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_027",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_028",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        -3.37973,
+        -0.132,
+        -20.09847
+      ],
+      "rotation_degrees": [
+        0,
+        -0.24734,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_028",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_010",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        0.19366,
+        -0.132,
+        -20.05636
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_010",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_029",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        3.60358,
+        -0.132,
+        -20.08597
+      ],
+      "rotation_degrees": [
+        0,
+        1.59271,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_029",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_030",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        6.18716,
+        -0.132,
+        -20.10996
+      ],
+      "rotation_degrees": [
+        0,
+        -0.81025,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_030",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_031",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        8.75672,
+        -0.132,
+        -20.11522
+      ],
+      "rotation_degrees": [
+        0,
+        0.93351,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_031",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_011",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        12.33511,
+        -0.132,
+        -20.14162
+      ],
+      "rotation_degrees": [
+        0,
+        0.16676,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_011",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_032",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        15.75123,
+        -0.132,
+        -20.15005
+      ],
+      "rotation_degrees": [
+        0,
+        0.13058,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_032",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_033",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        18.32732,
+        -0.132,
+        -20.15558
+      ],
+      "rotation_degrees": [
+        0,
+        0.10261,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_033",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_034",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        20.90338,
+        -0.132,
+        -20.15728
+      ],
+      "rotation_degrees": [
+        0,
+        0.08247,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_034",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_012",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        24.47998,
+        -0.132,
+        -20.16289
+      ],
+      "rotation_degrees": [
+        0,
+        -0.10067,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_012",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_035",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        27.75247,
+        -0.132,
+        -19.38208
+      ],
+      "rotation_degrees": [
+        0,
+        -44.90979,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_035",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_036",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        29.57442,
+        -0.132,
+        -17.55857
+      ],
+      "rotation_degrees": [
+        0,
+        -45.41699,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_036",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_037",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        30.08874,
+        -0.132,
+        -15.01896
+      ],
+      "rotation_degrees": [
+        0,
+        -90.2624,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_037",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_013",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        30.09586,
+        -0.132,
+        -11.444
+      ],
+      "rotation_degrees": [
+        0,
+        -89.99198,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_013",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_038",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        30.05748,
+        -0.132,
+        -8.0249
+      ],
+      "rotation_degrees": [
+        0,
+        -91.16358,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_038",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_039",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        29.959,
+        -0.132,
+        -5.4238
+      ],
+      "rotation_degrees": [
+        0,
+        -102.16067,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_039",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_a_040",
+      "asset": "alc_foam_strip_a",
+      "zone": "DockZone",
+      "position": [
+        29.40542,
+        -0.132,
+        -2.90659
+      ],
+      "rotation_degrees": [
+        0,
+        -102.56309,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_a_040",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_b_014",
+      "asset": "alc_foam_strip_b",
+      "zone": "DockZone",
+      "position": [
+        28.44683,
+        -0.132,
+        -0.0038
+      ],
+      "rotation_degrees": [
+        0,
+        -114.18489,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_b_014",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_000",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -18.00995,
+        -0.132,
+        14.25151
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          0.61243058,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.56412847
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_000",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_001",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -14.02342,
+        -0.132,
+        14.2859
+      ],
+      "rotation_degrees": [
+        0,
+        64.74423,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          0.4647582,
+          0.0,
+          -0.98517126
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.7914986,
+          0.0,
+          0.3733924
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_001",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_002",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -9.93729,
+        -0.132,
+        14.31561
+      ],
+      "rotation_degrees": [
+        0,
+        129.48846,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          -1.00338917,
+          0.0,
+          -1.21770794
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          1.00697915,
+          0.0,
+          -0.82974902
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_002",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_003",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -5.99072,
+        -0.132,
+        14.24609
+      ],
+      "rotation_degrees": [
+        0,
+        194.23269,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          -0.59363216,
+          0.0,
+          0.15057249
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.13869691,
+          0.0,
+          -0.54681267
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_003",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_004",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -1.98613,
+        -0.132,
+        14.20945
+      ],
+      "rotation_degrees": [
+        0,
+        258.97692,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          -0.20827785,
+          0.0,
+          1.06919733
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.85900617,
+          0.0,
+          -0.16733296
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_004",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_005",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        1.92309,
+        -0.132,
+        14.20182
+      ],
+      "rotation_degrees": [
+        0,
+        323.72115,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          1.27197665,
+          0.0,
+          0.9336369
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.77206763,
+          0.0,
+          1.05185646
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_005",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_006",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        5.99197,
+        -0.132,
+        14.25607
+      ],
+      "rotation_degrees": [
+        0,
+        28.46539,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          0.53839092,
+          0.0,
+          -0.2919014
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.26887928,
+          0.0,
+          0.49592828
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_006",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_007",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        9.99652,
+        -0.132,
+        14.29272
+      ],
+      "rotation_degrees": [
+        0,
+        93.20962,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          -0.06098859,
+          0.0,
+          -1.08758585
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.87377973,
+          0.0,
+          -0.04899898
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_007",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_008",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        14.0864,
+        -0.132,
+        14.27779
+      ],
+      "rotation_degrees": [
+        0,
+        157.95385000000002,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          -1.46247805,
+          0.0,
+          -0.5922503
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.48975923,
+          0.0,
+          -1.2093909
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_008",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_009",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        18.00629,
+        -0.132,
+        14.24215
+      ],
+      "rotation_degrees": [
+        0,
+        222.69808,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          -0.4500981,
+          0.0,
+          0.41531062
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.38255527,
+          0.0,
+          -0.41459908
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_009",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_010",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        21.99287,
+        -0.132,
+        14.20774
+      ],
+      "rotation_degrees": [
+        0,
+        287.44231,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          0.32651097,
+          0.0,
+          1.03920796
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.83491234,
+          0.0,
+          0.26232289
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_010",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_011",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -27.01006,
+        -0.132,
+        11.50014
+      ],
+      "rotation_degrees": [
+        0,
+        352.18654,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          0.60674473,
+          0.0,
+          0.08325891
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.07669232,
+          0.0,
+          0.55889106
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_011",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_012",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -29.20417,
+        -0.132,
+        8.50916
+      ],
+      "rotation_degrees": [
+        0,
+        56.93077,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          0.33417396,
+          0.0,
+          -0.5132241
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.47274635,
+          0.0,
+          0.30781782
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_012",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_013",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -27.9827,
+        -0.132,
+        2.03921
+      ],
+      "rotation_degrees": [
+        0,
+        121.67499999999998,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          -0.57198898,
+          0.0,
+          -0.92703355
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.74479005,
+          0.0,
+          -0.45954291
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_013",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_014",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -29.9108,
+        -0.132,
+        -3.51675
+      ],
+      "rotation_degrees": [
+        0,
+        186.41923,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          -1.56795501,
+          0.0,
+          0.17640728
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.14587935,
+          0.0,
+          -1.29661469
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_014",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_015",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -30.29821,
+        -0.132,
+        -8.0099
+      ],
+      "rotation_degrees": [
+        0,
+        251.16346,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          -0.19773503,
+          0.0,
+          0.57963098
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.53391576,
+          0.0,
+          -0.18213977
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_015",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_016",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -30.32641,
+        -0.132,
+        -13.03375
+      ],
+      "rotation_degrees": [
+        0,
+        315.90769,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          0.78235284,
+          0.0,
+          0.75794896
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.60894543,
+          0.0,
+          0.6285518
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_016",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_017",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -29.28234,
+        -0.132,
+        -17.96183
+      ],
+      "rotation_degrees": [
+        0,
+        20.65192,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          1.4764554,
+          0.0,
+          -0.5564907
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.46018796,
+          0.0,
+          1.22094942
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_017",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_018",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        25.0007,
+        -0.132,
+        11.51004
+      ],
+      "rotation_degrees": [
+        0,
+        85.39616,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          0.04915724,
+          0.0,
+          -0.61045457
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.5623083,
+          0.0,
+          0.04528023
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_018",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_019",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        26.5339,
+        -0.132,
+        7.02622
+      ],
+      "rotation_degrees": [
+        0,
+        150.14039,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          -0.9446884,
+          0.0,
+          -0.54233422
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.43571792,
+          0.0,
+          -0.75897418
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_019",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_020",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        28.07043,
+        -0.132,
+        1.94276
+      ],
+      "rotation_degrees": [
+        0,
+        214.88462,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          -1.29431684,
+          0.0,
+          0.90241141
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.74624583,
+          0.0,
+          -1.0703306
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_020",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_021",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        29.99685,
+        -0.132,
+        -3.50956
+      ],
+      "rotation_degrees": [
+        0,
+        279.62885,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          0.1024383,
+          0.0,
+          0.60380262
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.556181,
+          0.0,
+          0.09435904
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_021",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_022",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        30.26069,
+        -0.132,
+        -8.01708
+      ],
+      "rotation_degrees": [
+        0,
+        344.37308,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          1.04902997,
+          0.0,
+          0.29342583
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.23574189,
+          0.0,
+          0.84280346
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_022",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_023",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        30.2458,
+        -0.132,
+        -12.9272
+      ],
+      "rotation_degrees": [
+        0,
+        49.11731,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          1.03272075,
+          0.0,
+          -1.19293349
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.98649201,
+          0.0,
+          0.85400466
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_023",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_024",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        29.2054,
+        -0.132,
+        -17.99151
+      ],
+      "rotation_degrees": [
+        0,
+        113.86154,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          -0.2477452,
+          0.0,
+          -0.5600835
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.51590998,
+          0.0,
+          -0.22820565
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_024",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_025",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -24.9577,
+        -0.132,
+        -20.2431
+      ],
+      "rotation_degrees": [
+        0,
+        178.60577,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          -1.08897205,
+          0.0,
+          -0.02650415
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.02129376,
+          0.0,
+          -0.87489342
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_025",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_026",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -19.96536,
+        -0.132,
+        -20.33389
+      ],
+      "rotation_degrees": [
+        0,
+        243.34999999999997,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          -0.70772639,
+          0.0,
+          1.4102219
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.16617787,
+          0.0,
+          -0.58525176
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_026",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_027",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -15.00732,
+        -0.132,
+        -20.2569
+      ],
+      "rotation_degrees": [
+        0,
+        308.09423,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          0.37784313,
+          0.0,
+          0.4819811
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.44396748,
+          0.0,
+          0.34804282
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_027",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_028",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -10.0427,
+        -0.132,
+        -20.24628
+      ],
+      "rotation_degrees": [
+        0,
+        12.83846,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          1.06206262,
+          0.0,
+          -0.24204461
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.19446159,
+          0.0,
+          0.85327405
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_028",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_029",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -5.01295,
+        -0.132,
+        -20.16017
+      ],
+      "rotation_degrees": [
+        0,
+        77.58269,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          0.33928501,
+          0.0,
+          -1.54093742
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          1.27427259,
+          0.0,
+          0.28057051
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_029",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_030",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        0.0088,
+        -0.132,
+        -20.24511
+      ],
+      "rotation_degrees": [
+        0,
+        142.32693,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          -0.48474543,
+          0.0,
+          -0.3742901
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.34477002,
+          0.0,
+          -0.44651379
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_030",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_031",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        5.04047,
+        -0.132,
+        -20.2641
+      ],
+      "rotation_degrees": [
+        0,
+        207.07116,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          -0.96995363,
+          0.0,
+          0.49573435
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.39827902,
+          0.0,
+          -0.77927257
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_031",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_032",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        9.99046,
+        -0.132,
+        -20.34026
+      ],
+      "rotation_degrees": [
+        0,
+        271.81539,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          0.04998492,
+          0.0,
+          1.57705547
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.30414028,
+          0.0,
+          0.04133484
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_032",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_033",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        14.99027,
+        -0.132,
+        -20.25258
+      ],
+      "rotation_degrees": [
+        0,
+        336.55962,
+        0
+      ],
+      "scale": [
+        0.6124305764546185,
+        1.0,
+        0.5641284675232342
+      ],
+      "basis_columns": [
+        [
+          0.56188943,
+          0.0,
+          0.24362159
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.22440727,
+          0.0,
+          0.51757348
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_033",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_034",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        19.96424,
+        -0.132,
+        -20.22638
+      ],
+      "rotation_degrees": [
+        0,
+        41.30385,
+        0
+      ],
+      "scale": [
+        1.0892945378973828,
+        1.0,
+        0.8751525078165675
+      ],
+      "basis_columns": [
+        [
+          0.81829962,
+          0.0,
+          -0.71899118
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.57764628,
+          0.0,
+          0.65743189
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_034",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_035",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        25.03143,
+        -0.132,
+        -20.16486
+      ],
+      "rotation_degrees": [
+        0,
+        106.04808,
+        0
+      ],
+      "scale": [
+        1.5778474108428182,
+        1.0,
+        1.304795172981346
+      ],
+      "basis_columns": [
+        [
+          -0.43618629,
+          0.0,
+          -1.51635879
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          1.25394738,
+          0.0,
+          -0.36070267
+        ]
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_035",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_036",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -23.6,
+        -0.132,
+        15.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.22,
+        1.0,
+        0.22
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_036",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_037",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -23.6,
+        -0.132,
+        18.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.22,
+        1.0,
+        0.22
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_037",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_038",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -23.6,
+        -0.132,
+        19.85
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.22,
+        1.0,
+        0.22
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_038",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_039",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -20.4,
+        -0.132,
+        15.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.22,
+        1.0,
+        0.22
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_039",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_040",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -20.4,
+        -0.132,
+        18.25
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.22,
+        1.0,
+        0.22
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_040",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_ring_041",
+      "asset": "alc_foam_ring",
+      "zone": "DockZone",
+      "position": [
+        -20.4,
+        -0.132,
+        19.85
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        0.22,
+        1.0,
+        0.22
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_ring_041",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_c_000",
+      "asset": "alc_foam_strip_c",
+      "zone": "DockZone",
+      "position": [
+        -23.78622,
+        -0.132,
+        14.06283
+      ],
+      "rotation_degrees": [
+        0,
+        -127.72065000000002,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_c_000",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_c_001",
+      "asset": "alc_foam_strip_c",
+      "zone": "DockZone",
+      "position": [
+        23.68624,
+        -0.132,
+        13.99426
+      ],
+      "rotation_degrees": [
+        0,
+        -48.05336,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_c_001",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_c_002",
+      "asset": "alc_foam_strip_c",
+      "zone": "DockZone",
+      "position": [
+        -29.3562,
+        -0.132,
+        -17.67238
+      ],
+      "rotation_degrees": [
+        0,
+        135.19797,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_c_002",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_foam_strip_c_003",
+      "asset": "alc_foam_strip_c",
+      "zone": "DockZone",
+      "position": [
+        29.35024,
+        -0.132,
+        -17.66909
+      ],
+      "rotation_degrees": [
+        0,
+        44.92184,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_foam_strip_c_003",
+      "surface_group": "shore_foam"
+    },
+    {
+      "name": "alc_buoy_000",
+      "asset": "alc_buoy",
+      "zone": "DockZone",
+      "position": [
+        -25.0,
+        -0.15,
+        18.6
+      ],
+      "rotation_degrees": [
+        0,
+        -18.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_buoy_000"
+    },
+    {
+      "name": "alc_buoy_001",
+      "asset": "alc_buoy",
+      "zone": "DockZone",
+      "position": [
+        18.5,
+        -0.15,
+        15.9
+      ],
+      "rotation_degrees": [
+        0,
+        21.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_buoy_001"
+    },
+    {
+      "name": "alc_driftwood_000",
+      "asset": "alc_driftwood",
+      "zone": "DockZone",
+      "position": [
+        -25.3,
+        -0.15,
+        15.2
+      ],
+      "rotation_degrees": [
+        0,
+        -42.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_driftwood_000"
+    },
+    {
+      "name": "alc_driftwood_001",
+      "asset": "alc_driftwood",
+      "zone": "DockZone",
+      "position": [
+        29.9,
+        -0.15,
+        5.2
+      ],
+      "rotation_degrees": [
+        0,
+        35.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_driftwood_001"
+    },
+    {
+      "name": "alc_driftwood_002",
+      "asset": "alc_driftwood",
+      "zone": "DockZone",
+      "position": [
+        -9.2,
+        -0.15,
+        -21.3
+      ],
+      "rotation_degrees": [
+        0,
+        -18.0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "owner": "刘备",
+      "placeholder": false,
+      "source_name": "alc_driftwood_002"
     },
     {
       "name": "alc_rail_straight_000",

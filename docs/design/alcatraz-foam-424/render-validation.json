@@ -1,0 +1,1672 @@
+{
+  "batches": 5,
+  "bridge_control": {
+    "changed_pixels": 0,
+    "max_rgb_255": 0.0,
+    "mean_max_rgb_255": 0.0
+  },
+  "captures": [
+    {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.842271, -0.539054), Z: (0.0, 0.539054, 0.842271), O: (0.0, 10.0, 15.0)]",
+      "name": "01_six_assets",
+      "size": [
+        1400,
+        900
+      ],
+      "visible_draw_calls": 10,
+      "visible_primitives": 8820,
+      "width_m": 13.8000001907349
+    },
+    {
+      "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+      "name": "02_opening_before",
+      "size": [
+        360,
+        800
+      ],
+      "visible_draw_calls": 33,
+      "visible_primitives": 41522,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (-13.99019, 34.14277, 49.97163)]",
+      "name": "03_dock_opening",
+      "size": [
+        360,
+        800
+      ],
+      "visible_draw_calls": 39,
+      "visible_primitives": 46528,
+      "width_m": 6.71999979019165
+    },
+    {
+      "camera": "[X: (0.690858, 0.0, 0.722991), Y: (0.37311, 0.85655, -0.356527), Z: (-0.619277, 0.516065, 0.591754), O: (-42.0, 15.0, 32.0)]",
+      "name": "04_shore_closeup",
+      "size": [
+        1100,
+        900
+      ],
+      "visible_draw_calls": 40,
+      "visible_primitives": 45988,
+      "width_m": 17.0
+    },
+    {
+      "camera": "[X: (0.690858, 0.0, 0.722991), Y: (0.37311, 0.85655, -0.356527), Z: (-0.619277, 0.516065, 0.591754), O: (-42.0, 15.0, 32.0)]",
+      "name": "05_shore_before",
+      "size": [
+        1100,
+        900
+      ],
+      "visible_draw_calls": 34,
+      "visible_primitives": 40982,
+      "width_m": 17.0
+    },
+    {
+      "camera": "[X: (0.919145, 0.0, -0.393919), Y: (-0.230628, 0.810693, -0.538133), Z: (0.319348, 0.585471, 0.745145), O: (14.0, 11.0, 28.0)]",
+      "name": "06_rock_contacts",
+      "size": [
+        1100,
+        900
+      ],
+      "visible_draw_calls": 21,
+      "visible_primitives": 32374,
+      "width_m": 13.0
+    },
+    {
+      "camera": "[X: (0.842271, 0.0, -0.539054), Y: (-0.287892, 0.845441, -0.44983), Z: (0.455738, 0.534068, 0.712091), O: (64.0, 78.0, 98.0)]",
+      "name": "07_whole_island",
+      "size": [
+        1300,
+        1100
+      ],
+      "visible_draw_calls": 59,
+      "visible_primitives": 54223,
+      "width_m": 78.0
+    }
+  ],
+  "checks": [
+    {
+      "check": "complete lineup avatar",
+      "passed": true
+    },
+    {
+      "check": "01_six_assets: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 01_six_assets",
+      "passed": true
+    },
+    {
+      "check": "independent foam and floats static / no flicker",
+      "passed": true
+    },
+    {
+      "check": "host avatar assembled",
+      "passed": true
+    },
+    {
+      "check": "replace all 114 owner placeholders exactly once",
+      "passed": true
+    },
+    {
+      "check": "02_opening_before: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 02_opening_before",
+      "passed": true
+    },
+    {
+      "check": "03_dock_opening: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 03_dock_opening",
+      "passed": true
+    },
+    {
+      "check": "original dock spawn",
+      "passed": true
+    },
+    {
+      "check": "original default camera width",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_000: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_000: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_001: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_002: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_003: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_001: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_004: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_005: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_006: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_002: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_007: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_008: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_009: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_003: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_010: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_011: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_012: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_004: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_013: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_014: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_015: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_005: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_016: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_006: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_017: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_018: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_019: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_007: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_020: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_021: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_022: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_008: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_023: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_024: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_025: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_009: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_026: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_027: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_028: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_010: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_029: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_030: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_031: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_011: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_032: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_033: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_034: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_012: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_035: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_036: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_037: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_013: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_038: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_039: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_a_040: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_b_014: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_000: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_001: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_002: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_003: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_004: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_005: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_006: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_007: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_008: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_009: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_010: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_011: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_012: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_013: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_014: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_015: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_016: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_017: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_018: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_019: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_020: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_021: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_022: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_023: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_024: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_025: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_026: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_027: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_028: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_029: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_030: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_031: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_032: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_033: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_034: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_035: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_036: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_037: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_038: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_039: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_040: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_ring_041: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_c_000: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_c_001: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_c_002: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_foam_strip_c_003: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_buoy_000: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_buoy_000: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_buoy_000: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_buoy_000: clear of Map button",
+      "passed": true
+    },
+    {
+      "check": "alc_buoy_001: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_buoy_001: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_buoy_001: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_buoy_001: clear of Map button",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_000: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_000: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_000: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_000: clear of Map button",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_001: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_001: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_001: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_001: clear of Map button",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_002: outside bridge/city strip",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_002: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_002: clear of zoom controls",
+      "passed": true
+    },
+    {
+      "check": "alc_driftwood_002: clear of Map button",
+      "passed": true
+    },
+    {
+      "check": "bridge and city pixels unchanged",
+      "passed": true
+    },
+    {
+      "check": "foam/float visible in opening",
+      "passed": true
+    },
+    {
+      "check": "fixed-time host comparison stable",
+      "passed": true
+    },
+    {
+      "check": "04_shore_closeup: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 04_shore_closeup",
+      "passed": true
+    },
+    {
+      "check": "05_shore_before: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 05_shore_before",
+      "passed": true
+    },
+    {
+      "check": "06_rock_contacts: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 06_rock_contacts",
+      "passed": true
+    },
+    {
+      "check": "07_whole_island: dimensions",
+      "passed": true
+    },
+    {
+      "check": "save 07_whole_island",
+      "passed": true
+    },
+    {
+      "check": "Mobile renderer",
+      "passed": true
+    }
+  ],
+  "comparison_clock": "QA Engine.time_scale=0 after assembly; host sea shader/material unmodified",
+  "instances": 7,
+  "lineup_avatar_height": 1.75,
+  "nature_batches": 9,
+  "nature_instances": 114,
+  "opening_overlay": {
+    "changed_pixels": 5074,
+    "max_rgb_255": 186.000000312924,
+    "mean_max_rgb_255": 1.26804072571963
+  },
+  "opening_projected_bounds": [
+    {
+      "name": "alc_foam_strip_a_000",
+      "rect_xywh": [
+        2937.87744140625,
+        356.604217529297,
+        123.178955078125,
+        96.4209594726562
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_000",
+      "rect_xywh": [
+        2777.185546875,
+        425.797637939453,
+        209.165283203125,
+        164.172027587891
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_001",
+      "rect_xywh": [
+        2674.45629882812,
+        583.59716796875,
+        154.01904296875,
+        30.3473510742188
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_002",
+      "rect_xywh": [
+        2641.57739257812,
+        594.46630859375,
+        96.389404296875,
+        104.570434570312
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_003",
+      "rect_xywh": [
+        2631.90649414062,
+        683.111694335938,
+        61.147216796875,
+        106.477355957031
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_001",
+      "rect_xywh": [
+        2404.12280273438,
+        768.446228027344,
+        271.017333984375,
+        78.0608520507812
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_004",
+      "rect_xywh": [
+        2284.107421875,
+        750.5615234375,
+        156.359619140625,
+        50.6819458007812
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_005",
+      "rect_xywh": [
+        2150.59033203125,
+        727.495971679688,
+        156.400146484375,
+        49.7177124023438
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_006",
+      "rect_xywh": [
+        2017.06579589844,
+        703.486145019531,
+        156.388793945312,
+        50.0288696289062
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_002",
+      "rect_xywh": [
+        1774.21301269531,
+        654.369873046875,
+        270.553466796875,
+        83.72509765625
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_007",
+      "rect_xywh": [
+        1654.88720703125,
+        637.807189941406,
+        156.352783203125,
+        50.8053588867188
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_008",
+      "rect_xywh": [
+        1522.34411621094,
+        607.257690429688,
+        155.495239257812,
+        57.919921875
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_009",
+      "rect_xywh": [
+        1391.89086914062,
+        576.100341796875,
+        155.261352539062,
+        59.072021484375
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_003",
+      "rect_xywh": [
+        1149.04711914062,
+        538.533081054688,
+        271.118408203125,
+        75.6446533203125
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_010",
+      "rect_xywh": [
+        1027.45568847656,
+        527.700622558594,
+        156.409790039062,
+        46.1296997070312
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_011",
+      "rect_xywh": [
+        893.130493164062,
+        503.089813232422,
+        156.39404296875,
+        49.8940124511719
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_012",
+      "rect_xywh": [
+        759.371154785156,
+        482.098175048828,
+        156.430358886719,
+        47.2287292480469
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_004",
+      "rect_xywh": [
+        516.398254394531,
+        433.343688964844,
+        270.915344238281,
+        79.7060546875
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_013",
+      "rect_xywh": [
+        395.727966308594,
+        418.473419189453,
+        156.376281738281,
+        50.3269348144531
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_014",
+      "rect_xywh": [
+        262.312316894531,
+        394.366943359375,
+        156.373291015625,
+        50.3933410644531
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_015",
+      "rect_xywh": [
+        128.810775756836,
+        371.706848144531,
+        156.422653198242,
+        48.8721923828125
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_005",
+      "rect_xywh": [
+        111.555389404297,
+        192.836715698242,
+        85.2442779541016,
+        184.302383422852
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_016",
+      "rect_xywh": [
+        108.096977233887,
+        -75.4736938476562,
+        58.0493392944336,
+        106.30989074707
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_006",
+      "rect_xywh": [
+        57.4954452514648,
+        -243.503524780273,
+        97.5047836303711,
+        184.823944091797
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_017",
+      "rect_xywh": [
+        71.5849075317383,
+        -328.379821777344,
+        40.4943084716797,
+        104.507827758789
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_018",
+      "rect_xywh": [
+        73.6798934936523,
+        -422.880065917969,
+        44.1889038085938,
+        105.002624511719
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_019",
+      "rect_xywh": [
+        89.6450119018555,
+        -516.6630859375,
+        75.2065353393555,
+        106.613739013672
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_007",
+      "rect_xywh": [
+        114.842964172363,
+        -682.204467773438,
+        119.042610168457,
+        184.686309814453
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_020",
+      "rect_xywh": [
+        184.07405090332,
+        -763.929077148438,
+        73.4657440185547,
+        106.655212402344
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_021",
+      "rect_xywh": [
+        212.958877563477,
+        -829.577941894531,
+        149.512008666992,
+        73.7232666015625
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_022",
+      "rect_xywh": [
+        332.387573242188,
+        -876.719116210938,
+        149.511291503906,
+        73.7243041992188
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_008",
+      "rect_xywh": [
+        461.418334960938,
+        -870.892211914062,
+        270.835021972656,
+        80.7761840820312
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_023",
+      "rect_xywh": [
+        695.794006347656,
+        -824.052124023438,
+        156.393859863281,
+        49.896728515625
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_024",
+      "rect_xywh": [
+        829.334594726562,
+        -800.324035644531,
+        156.392639160156,
+        49.9299926757812
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_025",
+      "rect_xywh": [
+        962.859558105469,
+        -776.557067871094,
+        156.391052246094,
+        49.974609375
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_009",
+      "rect_xywh": [
+        1091.16796875,
+        -760.039978027344,
+        270.60546875,
+        83.2421264648438
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_026",
+      "rect_xywh": [
+        1325.00646972656,
+        -711.391479492188,
+        156.3740234375,
+        50.381103515625
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_027",
+      "rect_xywh": [
+        1458.51989746094,
+        -687.527465820312,
+        156.398315429688,
+        49.7716064453125
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_028",
+      "rect_xywh": [
+        1591.98583984375,
+        -663.65966796875,
+        156.383178710938,
+        50.1678466796875
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_010",
+      "rect_xywh": [
+        1719.54528808594,
+        -644.979675292969,
+        270.802978515625,
+        81.1641845703125
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_029",
+      "rect_xywh": [
+        1953.98510742188,
+        -597.811157226562,
+        156.42919921875,
+        47.1189575195312
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_030",
+      "rect_xywh": [
+        2088.3505859375,
+        -577.011413574219,
+        156.3369140625,
+        51.0906372070312
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_031",
+      "rect_xywh": [
+        2221.64404296875,
+        -552.2548828125,
+        156.431396484375,
+        48.2172241210938
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_011",
+      "rect_xywh": [
+        2350.3857421875,
+        -536.68603515625,
+        270.843017578125,
+        80.6804504394531
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_032",
+      "rect_xywh": [
+        2584.89453125,
+        -490.167144775391,
+        156.406005859375,
+        49.5462341308594
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_033",
+      "rect_xywh": [
+        2718.57885742188,
+        -466.820251464844,
+        156.404052734375,
+        49.5924072265625
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_034",
+      "rect_xywh": [
+        2852.20922851562,
+        -443.331634521484,
+        156.403564453125,
+        49.6254577636719
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_012",
+      "rect_xywh": [
+        2980.59814453125,
+        -426.727478027344,
+        270.777587890625,
+        81.4561767578125
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_035",
+      "rect_xywh": [
+        3221.01391601562,
+        -379.378601074219,
+        108.45556640625,
+        101.867767333984
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_036",
+      "rect_xywh": [
+        3291.55126953125,
+        -298.348907470703,
+        107.45361328125,
+        102.144241333008
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_037",
+      "rect_xywh": [
+        3301.0908203125,
+        -206.067413330078,
+        73.59619140625,
+        106.652587890625
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_013",
+      "rect_xywh": [
+        3230.81909179688,
+        -118.567321777344,
+        118.974853515625,
+        184.689025878906
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_038",
+      "rect_xywh": [
+        3204.57568359375,
+        41.0675048828125,
+        75.75830078125,
+        106.597015380859
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_039",
+      "rect_xywh": [
+        3152.220703125,
+        133.570510864258,
+        100.474609375,
+        103.80078125
+      ]
+    },
+    {
+      "name": "alc_foam_strip_a_040",
+      "rect_xywh": [
+        3089.3251953125,
+        217.632888793945,
+        101.314697265625,
+        103.625015258789
+      ]
+    },
+    {
+      "name": "alc_foam_strip_b_014",
+      "rect_xywh": [
+        2947.13720703125,
+        281.076263427734,
+        208.384765625,
+        164.554595947266
+      ]
+    },
+    {
+      "name": "alc_foam_ring_000",
+      "rect_xywh": [
+        405.406524658203,
+        413.223327636719,
+        90.4600830078125,
+        58.7806396484375
+      ]
+    },
+    {
+      "name": "alc_foam_ring_001",
+      "rect_xywh": [
+        572.570922851562,
+        421.597351074219,
+        168.731994628906,
+        117.4013671875
+      ]
+    },
+    {
+      "name": "alc_foam_ring_002",
+      "rect_xywh": [
+        754.542053222656,
+        435.479736328125,
+        227.847412109375,
+        166.496398925781
+      ]
+    },
+    {
+      "name": "alc_foam_ring_003",
+      "rect_xywh": [
+        1036.19543457031,
+        528.548950195312,
+        75.7838134765625,
+        47.644775390625
+      ]
+    },
+    {
+      "name": "alc_foam_ring_004",
+      "rect_xywh": [
+        1204.70764160156,
+        530.563598632812,
+        155.138793945312,
+        114.289916992188
+      ]
+    },
+    {
+      "name": "alc_foam_ring_005",
+      "rect_xywh": [
+        1361.39099121094,
+        537.174926757812,
+        247.48046875,
+        172.048889160156
+      ]
+    },
+    {
+      "name": "alc_foam_ring_006",
+      "rect_xywh": [
+        1650.43395996094,
+        633.127563476562,
+        90.004638671875,
+        58.424072265625
+      ]
+    },
+    {
+      "name": "alc_foam_ring_007",
+      "rect_xywh": [
+        1836.63012695312,
+        648.1875,
+        132.021484375,
+        104.162475585938
+      ]
+    },
+    {
+      "name": "alc_foam_ring_008",
+      "rect_xywh": [
+        1989.00280761719,
+        653.63427734375,
+        251.920532226562,
+        167.039489746094
+      ]
+    },
+    {
+      "name": "alc_foam_ring_009",
+      "rect_xywh": [
+        2269.07202148438,
+        738.703308105469,
+        99.3486328125,
+        66.0968627929688
+      ]
+    },
+    {
+      "name": "alc_foam_ring_010",
+      "rect_xywh": [
+        2468.68286132812,
+        759.407897949219,
+        114.578369140625,
+        95.1901245117188
+      ]
+    },
+    {
+      "name": "alc_foam_ring_011",
+      "rect_xywh": [
+        -27.3500347137451,
+        231.264022827148,
+        96.2004776000977,
+        63.3949737548828
+      ]
+    },
+    {
+      "name": "alc_foam_ring_012",
+      "rect_xywh": [
+        -104.225814819336,
+        102.237411499023,
+        102.594085693359,
+        69.7121887207031
+      ]
+    },
+    {
+      "name": "alc_foam_ring_013",
+      "rect_xywh": [
+        25.8778228759766,
+        -135.171981811523,
+        142.65576171875,
+        109.169960021973
+      ]
+    },
+    {
+      "name": "alc_foam_ring_014",
+      "rect_xywh": [
+        -35.8131332397461,
+        -358.346801757812,
+        215.082183837891,
+        127.194122314453
+      ]
+    },
+    {
+      "name": "alc_foam_ring_015",
+      "rect_xywh": [
+        62.1319351196289,
+        -491.748718261719,
+        99.5411148071289,
+        69.0477294921875
+      ]
+    },
+    {
+      "name": "alc_foam_ring_016",
+      "rect_xywh": [
+        96.8382415771484,
+        -693.409729003906,
+        161.975479125977,
+        116.447998046875
+      ]
+    },
+    {
+      "name": "alc_foam_ring_017",
+      "rect_xywh": [
+        192.816864013672,
+        -861.561462402344,
+        210.522705078125,
+        123.222351074219
+      ]
+    },
+    {
+      "name": "alc_foam_ring_018",
+      "rect_xywh": [
+        2672.96923828125,
+        707.023071289062,
+        90.377685546875,
+        64.1443481445312
+      ]
+    },
+    {
+      "name": "alc_foam_ring_019",
+      "rect_xywh": [
+        2772.14404296875,
+        536.230895996094,
+        171.351806640625,
+        116.577270507812
+      ]
+    },
+    {
+      "name": "alc_foam_ring_020",
+      "rect_xywh": [
+        2886.57885742188,
+        354.282684326172,
+        238.238037109375,
+        148.962127685547
+      ]
+    },
+    {
+      "name": "alc_foam_ring_021",
+      "rect_xywh": [
+        3140.91186523438,
+        225.875701904297,
+        75.66552734375,
+        55.3035583496094
+      ]
+    },
+    {
+      "name": "alc_foam_ring_022",
+      "rect_xywh": [
+        3167.78515625,
+        41.7265663146973,
+        170.20849609375,
+        109.550216674805
+      ]
+    },
+    {
+      "name": "alc_foam_ring_023",
+      "rect_xywh": [
+        3192.31420898438,
+        -160.093444824219,
+        251.326904296875,
+        165.557159423828
+      ]
+    },
+    {
+      "name": "alc_foam_ring_024",
+      "rect_xywh": [
+        3291.51733398438,
+        -295.211181640625,
+        80.857177734375,
+        58.4895172119141
+      ]
+    },
+    {
+      "name": "alc_foam_ring_025",
+      "rect_xywh": [
+        473.666778564453,
+        -888.981079101562,
+        158.616363525391,
+        95.7976684570312
+      ]
+    },
+    {
+      "name": "alc_foam_ring_026",
+      "rect_xywh": [
+        688.626831054688,
+        -884.618957519531,
+        248.987854003906,
+        171.988464355469
+      ]
+    },
+    {
+      "name": "alc_foam_ring_027",
+      "rect_xywh": [
+        1022.28643798828,
+        -783.614379882812,
+        93.9013061523438,
+        66.135986328125
+      ]
+    },
+    {
+      "name": "alc_foam_ring_028",
+      "rect_xywh": [
+        1257.94140625,
+        -742.837524414062,
+        137.286865234375,
+        76.1641235351562
+      ]
+    },
+    {
+      "name": "alc_foam_ring_029",
+      "rect_xywh": [
+        1470.6162109375,
+        -739.629150390625,
+        231.36376953125,
+        167.86181640625
+      ]
+    },
+    {
+      "name": "alc_foam_ring_030",
+      "rect_xywh": [
+        1797.30029296875,
+        -647.625854492188,
+        101.180786132812,
+        69.7222290039062
+      ]
+    },
+    {
+      "name": "alc_foam_ring_031",
+      "rect_xywh": [
+        2031.87878417969,
+        -613.258483886719,
+        154.469116210938,
+        91.701171875
+      ]
+    },
+    {
+      "name": "alc_foam_ring_032",
+      "rect_xywh": [
+        2267.09838867188,
+        -601.535522460938,
+        199.53564453125,
+        153.430389404297
+      ]
+    },
+    {
+      "name": "alc_foam_ring_033",
+      "rect_xywh": [
+        2573.88134765625,
+        -510.495849609375,
+        102.24853515625,
+        69.0281982421875
+      ]
+    },
+    {
+      "name": "alc_foam_ring_034",
+      "rect_xywh": [
+        2798.41870117188,
+        -483.012481689453,
+        168.421142578125,
+        106.916534423828
+      ]
+    },
+    {
+      "name": "alc_foam_ring_035",
+      "rect_xywh": [
+        3061.6328125,
+        -448.776519775391,
+        165.96337890625,
+        135.50390625
+      ]
+    },
+    {
+      "name": "alc_foam_ring_036",
+      "rect_xywh": [
+        130.799957275391,
+        415.531768798828,
+        33.0309143066406,
+        22.5274963378906
+      ]
+    },
+    {
+      "name": "alc_foam_ring_037",
+      "rect_xywh": [
+        90.5603103637695,
+        521.647399902344,
+        33.0308456420898,
+        22.5275268554688
+      ]
+    },
+    {
+      "name": "alc_foam_ring_038",
+      "rect_xywh": [
+        69.0991668701172,
+        578.242431640625,
+        33.0308380126953,
+        22.5274658203125
+      ]
+    },
+    {
+      "name": "alc_foam_ring_039",
+      "rect_xywh": [
+        296.768188476562,
+        444.804748535156,
+        33.0308837890625,
+        22.5273742675781
+      ]
+    },
+    {
+      "name": "alc_foam_ring_040",
+      "rect_xywh": [
+        256.528533935547,
+        550.92041015625,
+        33.0308227539062,
+        22.52734375
+      ]
+    },
+    {
+      "name": "alc_foam_ring_041",
+      "rect_xywh": [
+        235.0673828125,
+        607.515380859375,
+        33.0308227539062,
+        22.5274047851562
+      ]
+    },
+    {
+      "name": "alc_foam_strip_c_000",
+      "rect_xywh": [
+        100.920562744141,
+        343.357482910156,
+        105.320587158203,
+        79.4840087890625
+      ]
+    },
+    {
+      "name": "alc_foam_strip_c_001",
+      "rect_xywh": [
+        2556.62255859375,
+        783.179382324219,
+        120.07958984375,
+        63.5260009765625
+      ]
+    },
+    {
+      "name": "alc_foam_strip_c_002",
+      "rect_xywh": [
+        230.672805786133,
+        -823.575134277344,
+        119.384414672852,
+        66.3751831054688
+      ]
+    },
+    {
+      "name": "alc_foam_strip_c_003",
+      "rect_xywh": [
+        3286.64282226562,
+        -293.97216796875,
+        96.981201171875,
+        81.4706878662109
+      ]
+    },
+    {
+      "name": "alc_buoy_000",
+      "rect_xywh": [
+        9.7993860244751,
+        488.853057861328,
+        39.9413566589355,
+        65.0091857910156
+      ]
+    },
+    {
+      "name": "alc_buoy_001",
+      "rect_xywh": [
+        2306.10668945312,
+        793.980102539062,
+        32.017333984375,
+        59.6050415039062
+      ]
+    },
+    {
+      "name": "alc_driftwood_000",
+      "rect_xywh": [
+        20.8186626434326,
+        373.709136962891,
+        77.9937286376953,
+        71.1936950683594
+      ]
+    },
+    {
+      "name": "alc_driftwood_001",
+      "rect_xywh": [
+        3012.19995117188,
+        532.909423828125,
+        89.39697265625,
+        55.27197265625
+      ]
+    },
+    {
+      "name": "alc_driftwood_002",
+      "rect_xywh": [
+        1339.70092773438,
+        -765.967529296875,
+        89.4488525390625,
+        62.9586181640625
+      ]
+    }
+  ],
+  "passed": true,
+  "placed_triangles": 5006.0,
+  "removed_owner_placeholders": 114,
+  "renderer": {
+    "engine": "4.7.2-stable (official)",
+    "gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "method": "mobile"
+  },
+  "shore_batches": 6,
+  "shore_instances": 107,
+  "static_control": {
+    "changed_pixels": 0,
+    "max_rgb_255": 0.0,
+    "mean_max_rgb_255": 0.0
+  },
+  "static_foam_control": {
+    "changed_pixels": 0,
+    "max_rgb_255": 0.0,
+    "mean_max_rgb_255": 0.0
+  },
+  "nature_base_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "host_commit": "d7b57574d359952858319d17b43722651a0fcbcb",
+  "nature_commit": "af31975750619983f4c93c83486092612eef73b9",
+  "dock_commit": "cc59ef9fb47fb398eefccded423aeab85d16839f"
+}

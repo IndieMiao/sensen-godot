@@ -13,11 +13,14 @@ REPEATED+=NATURAL
 RUINS=['alc_ruin_arch','alc_ruin_rubble','alc_ruin_vine','alc_ruin_flowers','alc_ruin_plaque']
 DOCK=['alc_dock_bollard','alc_dock_crates','alc_dock_shelter','alc_dock_welcome','alc_dock_planter']
 REPEATED+=RUINS+DOCK
+SHORE=['alc_foam_strip_a','alc_foam_strip_b','alc_foam_strip_c','alc_foam_ring','alc_buoy','alc_driftwood']
+REPEATED+=SHORE
+OWNERS.update({n:'刘备' for n in SHORE})
 OWNERS.update({n:'赵云' for n in RUINS})
 OWNERS.update({n:'刘备' for n in DOCK})
 OWNERS.update({name:'刘备' for name in NATURAL})
 OWNERS.update({n:'黄忠' for n in ['alc_lighthouse','alc_lighthouse_far','alc_watertower','alc_watertower_far','alc_museum_far',
- 'alc_far_bridge','alc_far_city','alc_far_hills','ferry','ferry_far','gull']})
+ 'alc_far_bridge','alc_far_city','alc_far_hills','ferry','ferry_far','ferry_flag','gull']})
 
 
 def build(kit,box,prism,place):

@@ -1,0 +1,266 @@
+[
+  {
+    "name": "SGODOT-424-v8-02-mid-hill.png",
+    "id": "e567304e-201a-469d-8206-4c4d71ac9985",
+    "sha256": "f57a81892004226cdb4568c1f16fb17527660f135a0992f6763f4dffd008a091",
+    "bytes": 203372,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-03-visitor-center.png",
+    "id": "c0f9dd12-94f9-40ae-a8d2-c2abe9d517c2",
+    "sha256": "2a630318e2c3fbd6aa5ae890048810dc652efd0b1c4a33f23575a77fc043881c",
+    "bytes": 207681,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-08-mid-hill-hud-comparison.png",
+    "id": "35178ef5-1f4e-45f0-b61d-5a0e8c520d3d",
+    "sha256": "68f88979572289927f886fc73858f5f80e32b48552d058629d5b1ea439089280",
+    "bytes": 340584,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-11-museum-before-after.png",
+    "id": "04cf8ebb-cd26-4384-ad3c-ffff7db5ecc6",
+    "sha256": "f36a5cac29c8968bf1837f83ea3f96ddf5015b08bf72c287fa5cb74958a832a9",
+    "bytes": 234571,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-02-013m.png",
+    "id": "42e2c137-9770-4bac-b04f-c7d3b2a26180",
+    "sha256": "4d0caef0284f64f3e8ead3132c02ab70959396c7bebd13f5390fab725f843ac8",
+    "bytes": 200959,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-03-020m.png",
+    "id": "3fb2a812-ea32-4322-8acb-137de15b41dc",
+    "sha256": "bdd99d17a2eee820a7f2e83073729e4355b4b7952905f0e0be52cc6db68ee052",
+    "bytes": 186019,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-04-026m.png",
+    "id": "c878c90c-0bca-4988-8c07-079975c67d1a",
+    "sha256": "602d2fd1b530ed080a46c2cd0c11817557aab819843e294e539b4f2d163a7a87",
+    "bytes": 184714,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-05-033m.png",
+    "id": "6066c03c-e797-487a-9bb8-fbdadc8d8bf8",
+    "sha256": "f5990aeb652738e7abec1d33aa077c39472484174fa81ec20d0c5a1ce3b3ee87",
+    "bytes": 182730,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-06-039m.png",
+    "id": "5caaf51e-f129-436a-932f-78056d3950e3",
+    "sha256": "35d809fe924a5eefa140e50d8b115f8e11ea2b9121e419726a680cf13f970305",
+    "bytes": 193985,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-07-046m.png",
+    "id": "36169242-3134-4300-b7c1-12129586f77c",
+    "sha256": "791569f111eac81ee57d0ef8780c8d2e15058bbf13800f37ee7fcbb2af97f3d3",
+    "bytes": 203614,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-08-052m.png",
+    "id": "2a333680-995d-4242-84b9-4f3810db6163",
+    "sha256": "b3a46bc7c0def1a6f3a4b10871d90368a195242ef0b89b6733e705bcd6bcb686",
+    "bytes": 201984,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-09-059m.png",
+    "id": "1d210b0b-250c-4061-ab79-b6db1216f8d7",
+    "sha256": "e71369eb43cfd55cded5e4d688422ac8138c6dfd5b1297d1d7c79f71e69957db",
+    "bytes": 209013,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-10-065m.png",
+    "id": "480e8b1f-b981-448c-a4df-6275d9284aed",
+    "sha256": "e64701982f6d4fe994d69d4bd8dfa02d8a616539d7951399c627bea51e93cd34",
+    "bytes": 199123,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-11-072m.png",
+    "id": "363f010a-e169-48f0-a420-ad4eef318432",
+    "sha256": "43b5b4aa79f7176e9f2da47b4a7aaa5243c7ddaec7b37191de032fa36c2903eb",
+    "bytes": 209791,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-13-085m.png",
+    "id": "c1bf62c4-3925-45e8-8acf-6e74331750c9",
+    "sha256": "3e36f3fefdecffcd6303c1a5d227a39aeb21cc59ca4fe4c33c350624536eeb22",
+    "bytes": 216334,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-14-092m.png",
+    "id": "b055bd06-1f56-4358-8d13-a75730e14718",
+    "sha256": "1e2fa51600135ead1ccae76e6564263e463d079de32f75c5e9450bb502bcc1e5",
+    "bytes": 216264,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-15-098m.png",
+    "id": "fe0821cc-d925-40eb-b3f4-31a2f0fb130b",
+    "sha256": "a35c1b3a44b7febdd9e89102bfa795a56e2cb66f77d6f5699e109a39c244f806",
+    "bytes": 217423,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-16-105m.png",
+    "id": "f2499450-d454-40b5-86ef-aad4079e7793",
+    "sha256": "f709d677d656c80907c253e70d66d2fa8c4d001ec802c97cb0b6415d59c90253",
+    "bytes": 224516,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-17-111m.png",
+    "id": "3f72ccac-da5a-4de1-aef5-1314b61fe65b",
+    "sha256": "bf4ea110191bba9b2fb852f0786bcc628650fb124ba2e1814c036f6c27a4567a",
+    "bytes": 234637,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-18-118m.png",
+    "id": "00062c09-634e-47f5-baa0-fd6d4dedcb7c",
+    "sha256": "3148a3c0951eba49b3d560e9b8bb2f1175b9cdba5f4bf8465bcb497bdd0dd783",
+    "bytes": 208146,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-19-119m.png",
+    "id": "2c16379a-f099-48d4-95e5-f572a6517b23",
+    "sha256": "2c451e22de1a4d4e6a386ab3648744b71cf847dca00ced879fd500cd025adcc2",
+    "bytes": 207668,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-sign-handoff-near-pictogram.png",
+    "id": "cb5d1425-713d-43d0-af4c-8cbaf4c5f79b",
+    "sha256": "2a630318e2c3fbd6aa5ae890048810dc652efd0b1c4a33f23575a77fc043881c",
+    "bytes": 207681,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-effects.mp4",
+    "id": "a324cb01-b343-40d1-84ec-3a25a68b1662",
+    "sha256": "bc3566b6e91395b6efbdef4af38b30f7ac066d637c639040e6a8ea7399eda146",
+    "bytes": 428161,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-01-opening.png",
+    "id": "12f0b719-6426-4d26-b381-c52e3abcbc23",
+    "sha256": "f9a501ac69e894e1b1dbbfb9891e91b59893f9413bedbd86209f136955465bdf",
+    "bytes": 95276,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-04-top-layout.png",
+    "id": "11518e8d-86da-4081-b123-8801ef88c79b",
+    "sha256": "4f25ed66ea11d30ec9374db1533ba509b6b02a84acf6eeb69ce6d7f41e32fdf9",
+    "bytes": 411533,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-05-whole-island.png",
+    "id": "903eb793-2509-4915-98d8-1c5a55525c7e",
+    "sha256": "b4021c5328001f40373e745f7980d80e3a85ec6c674cf3933ba5f92d0cd773be",
+    "bytes": 441580,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-06-summit-zoom-out.png",
+    "id": "b8840c64-25f7-437b-b75d-bc35ab87aa0d",
+    "sha256": "65ab7e7cdac22ccfd464dc6e6d333edf715d31df473d2f8576ff1c2a6cba64ea",
+    "bytes": 206861,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-07-route-contact-sheet.png",
+    "id": "6b92b61e-2d4d-45fc-bc7f-e43769f94881",
+    "sha256": "6a90700b5d24b54dd1622182fc5a37963f6e1227880e0d0bdf9a33480a013ece",
+    "bytes": 1378081,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-09-hud-route-contact-sheet.png",
+    "id": "54e502e5-38e3-42c1-b5f1-4efc4f7beb52",
+    "sha256": "5b5586c94bd91cef5ec3af0763f0e935d0607002b77b2212650327c9133987bf",
+    "bytes": 1401669,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-10-reference-colour-comparison.png",
+    "id": "e92958e7-6eeb-40a8-85e7-93e0986774dd",
+    "sha256": "5ce0b2b6115e12f5d4b620498d4b7dd8b82072ad8b1a568290d4add9341905db",
+    "bytes": 1104788,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-00-000m.png",
+    "id": "beb05c09-7c74-45a4-ac53-80c9c0b45832",
+    "sha256": "04b5a3db178da097aa1e9056e7a02c7d5edd0ff9694473559475c20b47df03fa",
+    "bytes": 95374,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-01-007m.png",
+    "id": "5761f685-34a1-493d-98a2-dc5f3ae47b96",
+    "sha256": "71f52aeb657ec62860ec6f82336fa1b146c8de7e657df5b3c92d5630ed021081",
+    "bytes": 179103,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  },
+  {
+    "name": "SGODOT-424-v8-route-step-12-079m.png",
+    "id": "98fb8338-4d02-429a-aeaf-7cd21162dceb",
+    "sha256": "aac468ec8bde0d027d25919b6f45af418c36ac0218ce40b2d763a203e7c1a402",
+    "bytes": 193034,
+    "readback_equal": true,
+    "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+  }
+]

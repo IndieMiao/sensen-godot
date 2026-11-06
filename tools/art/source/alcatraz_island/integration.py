@@ -15,10 +15,12 @@ def collaborator_points(folder,here,placements,place):
         p['source_name']=name;used.append(name)
     assert len(used)==len(table)==114,(len(used),len(table))
     for rows in [json.loads((folder/'alc_dock_placements.json').read_text())['points'],
-                 json.loads((here.parent/'alcatraz_ruins_424/suggested_placements.json').read_text())['instances']]:
+                 json.loads((here.parent/'alcatraz_ruins_424/suggested_placements.json').read_text())['instances'],
+                 json.loads((folder/'alc_shore_foam_placements.json').read_text())['points']]:
         for row in rows:
             p=place(row['asset'],row['position'],row['zone'],yaw=math.radians(row['rotation_degrees'][1]),scale=row['scale'],collision=False)
             p['source_name']=row['name']
+            if 'basis_columns' in row:p['basis_columns']=row['basis_columns']
     # Open the ruined arch view: move the two southern crowns behind its pillars.
     for p in placements:
         if p['asset'].startswith('alc_tree_') and p['position'][1]==3.25:

@@ -15,10 +15,6 @@
       "triangles": 756,
       "bytes": 66280
     },
-    "alc_museum_far": {
-      "triangles": 350,
-      "bytes": 26396
-    },
     "alc_ground_dock": {
       "triangles": 380,
       "bytes": 37808
@@ -166,10 +162,10 @@
     },
     "gull": {
       "triangles": 284,
-      "bytes": 20964,
+      "bytes": 25476,
       "author": "\u9ec4\u5fe0",
       "source": "tools/art/source/alcatraz_ferry_424/gull.blend",
-      "sha256": "cb4a554000c44570a47c00e7bb4e6fcf507a978cea26be4efda10ea5186eac2c"
+      "sha256": "cdeb84ff5c8a7d1121067980789c8b4d82cedc023e46c0b604e882022c0d64df"
     },
     "alc_flowers_poppy": {
       "triangles": 244,
@@ -317,6 +313,62 @@
       "author": "\u5218\u5907",
       "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
       "sha256": "50822f15cfb8ad3b3be39143e89d9a35d63e32350888c03c15c780f8e8c933d4"
+    },
+    "alc_foam_strip_a": {
+      "triangles": 24,
+      "bytes": 2340,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "8c9cbe342d71f49a6d39d35377f24c7a2958201c3752f6760a694001e4b96b44"
+    },
+    "alc_foam_strip_b": {
+      "triangles": 32,
+      "bytes": 2628,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "78f57717eeee8e322f19b0860559af084beea672d9aa3f32837809c471cd7262"
+    },
+    "alc_foam_strip_c": {
+      "triangles": 24,
+      "bytes": 2340,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "e9c42be25c6b0660a8cb1d7fd4894a5f8a812dae0c1fe27c61d112563ed3a941"
+    },
+    "alc_foam_ring": {
+      "triangles": 64,
+      "bytes": 3772,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "0fc8c4bd8c48edb775c325f54e6695dd37643e8c5710343659eab7da9cbc9046"
+    },
+    "alc_buoy": {
+      "triangles": 184,
+      "bytes": 5504,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "03a4ab3f1a1eb44c1811721a13f5d09722b368393270e320f9b2448ab364a7c4"
+    },
+    "alc_driftwood": {
+      "triangles": 130,
+      "bytes": 4644,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "9c80c9823a4d67e705ba10633a9301c0562bb74dcc3c867126329bd083ba5dd1"
+    },
+    "alc_museum_far": {
+      "triangles": 2205,
+      "bytes": 128452,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_museum_far_424/alc_museum_far.blend",
+      "sha256": "425290e75f9cc544f6f47ab6f23443227d6c9aee4dc7cad380623dcf1d65a6c8"
+    },
+    "ferry_flag": {
+      "triangles": 52,
+      "bytes": 4272,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_anim_424/ferry_flag.blend",
+      "sha256": "eaaf1c0787001cc3f61513b159cd75f0a125ee04269241d6e33252a56f28f3b5"
     }
   }
 }

@@ -48,7 +48,7 @@ func run():
 	for i in gulls.size():
 		var g=gulls[i];set_gull_pose(g,poses[i]);check(g.position.distance_to(positions[i])<.001,"Gull original placement "+str(i))
 		check(g.mesh.get_surface_count()==1 and tri(g.mesh)<=400,"Gull one surface / <=400 triangles",tri(g.mesh))
-		check(g.mesh.get_blend_shape_count()==2,"Gull two targets plus basis = three poses")
+		check(g.mesh.get_blend_shape_count()==3,"Gull rest plus preen / spread / turn targets")
 		report.poses[str(i)]={"pose":poses[i],"position":xyz(g.position)}
 	check(scene.find_children("*","AnimationPlayer",true,false).size()>=1,"Avatar animation only; decorative mesh has no autoplay")
 	await capture("SGODOT-424_ferry_gull_v1_opening_360")

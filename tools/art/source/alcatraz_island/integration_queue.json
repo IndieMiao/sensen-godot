@@ -1,6 +1,6 @@
 {
-  "state": "approved packs installed; full assembly reviewed separately",
-  "integrated_base": "6d06c9b0",
+  "state": "v8 integrated: matching near/far pictograms, accepted animation and shoreline overlays",
+  "integrated_base": "fc19d492",
   "accepted_packs": [
     {
       "pr": 794,
@@ -29,6 +29,18 @@
     {
       "pr": 801,
       "head": "af319757"
+    },
+    {
+      "pr": 819,
+      "head": "7738a2e7"
+    },
+    {
+      "pr": 823,
+      "head": "4aac9b05"
+    },
+    {
+      "pr": 824,
+      "head": "1442acaf"
     }
   ],
   "layout_fixes": {
@@ -47,20 +59,16 @@
       25
     ]
   },
-  "pending": [
-    {
-      "asset": "alc_museum_far",
-      "owner": "黄忠",
-      "status": "formal 2417-triangle far mesh received, awaiting technical/visual acceptance before replacement",
-      "pr": 819,
-      "head": "7738a2e78e103de547e6946498a3d05a6ae7fe21"
-    },
-    {
-      "asset": "gull / ferry motion",
-      "owner": "黄忠",
-      "status": "motion pack received, awaiting technical/visual acceptance; this assembly remains static",
-      "pr": 823,
-      "head": "4aac9b05f6ed3fbf72128da4a9427028c1e36ae9"
-    }
-  ]
+  "pending": [],
+  "render_groups": {
+    "shore_foam": "102 static alpha pieces, one shared material surface",
+    "dock_furnishings": "7 approved dock pieces plus original dock sign, one matte surface",
+    "alc_ground_terraces": "includes static original ruins geometry"
+  },
+  "sign_increment": {
+    "pr": 828,
+    "commit": "fbf5463a4ba975ad732712afe8aa5e329e6a562d",
+    "scope": "museum pictogram commit only; requested synchronization to bf0c31b1",
+    "assembly_review": "pending"
+  }
 }

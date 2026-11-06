@@ -40,11 +40,15 @@ var _zoom_buttons := {}
 var _prototype_shapes := {}
 var _backdrop_enabled := true
 var _sea_material: ShaderMaterial
+var animated_roots: Array[Node3D] = []
+var _animation_rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
 	get_viewport().transparent_bg = false
 	layout = JSON.parse_string(FileAccess.get_file_as_string(ROOT + "layout.json"))
+	if OS.get_environment("ALCATRAZ_REVIEW").is_empty():_animation_rng.randomize()
+	else:_animation_rng.seed=424
 	_environment = WorldEnvironment.new()
 	_environment.environment = Environment.new()
 	_environment.environment.background_mode = Environment.BG_COLOR
@@ -78,7 +82,14 @@ func _ready() -> void:
 		zones[zone_name] = zone
 	_far_zone = zones["FarZone"]
 	var batches := {}
+	var surface_groups := {}
 	for p in layout.placements:
+		if p.has("render_merge_into"):continue
+		if p.has("surface_group"):
+			var group_key := str(p.zone)+"/"+str(p.surface_group)
+			if not surface_groups.has(group_key):surface_groups[group_key]=[]
+			surface_groups[group_key].append(p)
+			continue
 		if bool(p.get("multimesh",false)):
 			var key := str(p.zone)+"/"+str(p.asset)
 			if not batches.has(key): batches[key]=[]
@@ -86,6 +97,7 @@ func _ready() -> void:
 		else:
 			_add_asset(p,paint)
 	for key in batches:_add_batch(batches[key],paint)
+	for key in surface_groups:_add_surface_group(surface_groups[key],paint)
 	_build_backdrop()
 	var sea := MeshInstance3D.new()
 	sea.name = "Sea"
@@ -167,12 +179,37 @@ func _far_material(asset: String) -> ShaderMaterial:
 	return material
 
 func _add_asset(p: Dictionary, paint: Material) -> void:
+	if p.has("scene_file"):
+		var root := (load(ROOT+str(p.scene_file)) as PackedScene).instantiate() as Node3D
+		root.name=str(p.name)
+		root.transform=_transform_of(p)
+		zones[p.zone].add_child(root)
+		for child in root.find_children("*","MeshInstance3D",true,false):
+			child.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mesh_nodes.append(child)
+		var animator := root.get_node("AnimationPlayer") as AnimationPlayer
+		animator.play(str(p.animation))
+		var length := animator.get_animation(str(p.animation)).length
+		var phase := (float(p.animation_phase_group)+_animation_rng.randf_range(.1,.9))*length/3.0 if p.asset=="gull" else 0.0
+		animator.seek(phase,true)
+		root.set_meta("placement",p)
+		root.set_meta("initial_phase_s",phase)
+		animated_roots.append(root)
+		return
 	var variants := [str(p.asset)]
 	if p.has("lod_group"):variants.append(str(p.asset)+"_far")
 	for variant in variants:
 		var node := MeshInstance3D.new()
 		node.name = variant.to_pascal_case()+str(mesh_nodes.size())
 		node.mesh = _mesh(variant)
+		if variant=="alc_ground_terraces":
+			var surface := SurfaceTool.new()
+			surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+			surface.append_from(node.mesh,0,Transform3D.IDENTITY)
+			for source in layout.placements:
+				if source.get("render_merge_into","")==variant:
+					surface.append_from(_mesh(str(source.asset)),0,_transform_of(p).affine_inverse()*_transform_of(source))
+			node.mesh=surface.commit()
 		node.material_override = _far_material(variant) if str(p.zone)=="FarZone" else paint
 		node.transform = _transform_of(p)
 		zones[p.zone].add_child(node)
@@ -194,6 +231,21 @@ func _add_asset(p: Dictionary, paint: Material) -> void:
 			node.extra_cull_margin = 100
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
+func _add_surface_group(items: Array, paint: Material) -> void:
+	# Static dock props and water-contact overlays each share a material.
+	# Original GLBs and instance transforms remain in the delivery contract.
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	surface.set_material(paint if items[0].surface_group=="dock_furnishings" else _mesh(str(items[0].asset)).surface_get_material(0))
+	for p in items:surface.append_from(_mesh(str(p.asset)),0,_transform_of(p))
+	var node := MeshInstance3D.new()
+	node.name=str(items[0].surface_group).to_pascal_case()
+	node.mesh=surface.commit()
+	node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	node.gi_mode=GeometryInstance3D.GI_MODE_DISABLED
+	zones[items[0].zone].add_child(node)
+	mesh_nodes.append(node)
+
 func _add_batch(items: Array, paint: Material) -> void:
 	var asset := str(items[0].asset)
 	var mm := MultiMesh.new()
@@ -206,6 +258,8 @@ func _add_batch(items: Array, paint: Material) -> void:
 	node.multimesh = mm
 	node.material_override = paint
 	for definition in layout.assets:
+		if definition.name==asset and definition.get("material","")=="imported":
+			node.material_override=null
 		if definition.name==asset and not bool(definition.get("cast_shadow",true)):
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		if definition.name==asset and definition.has("max_view_width_m"):

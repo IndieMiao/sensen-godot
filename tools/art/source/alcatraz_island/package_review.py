@@ -21,6 +21,7 @@ assert sweep['status']=='pass',sweep['failures']
 DOC.mkdir(parents=True,exist_ok=True);(DOC/'.gdignore').touch()
 expected={name+'.png' for name in verification['view_metrics']}
 for p in DOC.rglob('*.png'):
+    if p.is_relative_to(DOC/'sign-handoff'):continue
     if str(p.relative_to(DOC)) not in expected and p.name!='07-route-contact-sheet.png':p.unlink()
 for name in sorted(expected):
     src=REVIEW/name;dst=DOC/name;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
@@ -81,7 +82,7 @@ for name in manifest['assets']:
     acc=g['accessors'][primitives[0]['attributes']['POSITION']]
     dimensions[name]={'min':acc['min'],'max':acc['max'],'size':[b-a for a,b in zip(acc['min'],acc['max'])]}
     checks.append(name)
-for name in ['layout.json','manifest.json','placement_points.json','sea_backdrop.gdshader','far_card.gdshader']:
+for name in ['layout.json','manifest.json','placement_points.json','sea_backdrop.gdshader','far_card.gdshader','alc_foam_soft.png','alc_foam_soft.png.import','alc_foam_material.tres','alc_shore_props_material.tres','gull.tscn','ferry.tscn','gull_animations.tres','ferry_animations.tres']:
     assert (ASSETS/name).read_bytes()==(QA/'assets/landmarks/alcatraz_island'/name).read_bytes(),name
 assert re.fullmatch(r'uid://[a-y0-8]+\s*',(ASSETS/'sea_backdrop.gdshader.uid').read_text())
 for name in ['alcatraz_island.gd','alcatraz_island.tscn']:
@@ -166,11 +167,11 @@ for i,(label_,key) in enumerate(swatches):
     x=440+(i%3)*230;y=750+(i//3)*85;color=layout['palette']['colors'][key]
     pen.rectangle((x,y,x+210,y+42),fill='#'+color)
     pen.text((x,y+48),label_+' #'+color,font=small,fill='#263b44')
-pen.text((20,955),'Colour review. Concept proportions are illustrative; game dimensions follow the written brief. Approved collaborator packs installed; museum far LOD remains a proxy.',font=small,fill='#263b44')
+pen.text((20,955),'Colour review. Concept proportions are illustrative; game dimensions follow the written brief. Accepted museum LOD, gull/ferry animation and shoreline overlays installed.',font=small,fill='#263b44')
 board.save(DOC/'10-reference-colour-comparison.png')
 facade=Image.new('RGB',(720,840),'#f5f1e6');pen=ImageDraw.Draw(facade)
-pen.text((10,10),'v6 / blockout',font=f,fill='#263b44');pen.text((370,10),'v8 / public museum',font=f,fill='#263b44')
-facade.paste(Image.open(DOC.parent/'v6/03-visitor-center.png').convert('RGB'),(0,40))
+pen.text((10,10),'v7 / lettering',font=f,fill='#263b44');pen.text((370,10),'v8 / lighthouse pictogram',font=f,fill='#263b44')
+facade.paste(Image.open(DOC.parent/'v7/03-visitor-center.png').convert('RGB'),(0,40))
 facade.paste(Image.open(DOC/'03-visitor-center.png').convert('RGB'),(360,40))
 facade.save(DOC/'11-museum-before-after.png')
 evidence['reference_comparison']={'source':'tools/art/source/alcatraz_island/reference/c_alc2.png','overview_crop':list(crop),'scope':'Colour comparison only; generated concept geometry is not the measurement authority.'}

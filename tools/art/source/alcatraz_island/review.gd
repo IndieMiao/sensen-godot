@@ -63,12 +63,17 @@ func _ready() -> void:
 		FileAccess.open(destination.path_join("verification.json"),FileAccess.WRITE).store_string(JSON.stringify(baseline,"\t")+"\n")
 		get_tree().quit(0 if failures.is_empty() else 1)
 		return
+	if OS.get_environment("ALCATRAZ_EFFECTS_MOVIE")=="1":
+		await integrated_effects_movie()
+		return
 	if OS.get_environment("ALCATRAZ_MOVIE")=="1":
 		await colour_walk_movie()
 		return
 	if OS.get_environment("ALCATRAZ_SWEEP")=="1":
 		await budget_sweep()
 		return
+	await audit_museum_lod()
+	await audit_integrated_effects()
 	check("renderer", RenderingServer.get_current_rendering_method() == "mobile", RenderingServer.get_video_adapter_name())
 	check("no_network_autoload", get_node_or_null("/root/Net") == null)
 	check("farm_pitch",absf(scene._camera.rotation_degrees.x+43)<.01,scene._camera.rotation_degrees)
@@ -556,3 +561,178 @@ func top_layout_photo() -> void:
 		node.multimesh.visible_instance_count=-1
 		node.visible=true
 	await photograph("04-top-layout")
+
+func audit_integrated_effects() -> void:
+	check("four_independent_animation_roots",scene.animated_roots.size()==4,scene.animated_roots.size())
+	var phases: Array = []
+	for root in scene.animated_roots:
+		var placement: Dictionary = root.get_meta("placement")
+		var animator := root.get_node("AnimationPlayer") as AnimationPlayer
+		check(str(root.name)+"_idle_running",animator.is_playing() and animator.current_animation=="idle")
+		check(str(root.name)+"_decorative_only",root.find_children("*","CollisionObject3D",true,false).is_empty())
+		var initial := root.transform
+		var resume_time := animator.current_animation_position
+		var length := animator.get_animation("idle").length
+		animator.pause()
+		var quiet := 0
+		var active := 0
+		var min_bob := INF
+		var max_bob := -INF
+		var root_drift := 0.0
+		for i in 256:
+			animator.seek(float(i)*length/256.0,true)
+			root_drift=maxf(root_drift,root.position.distance_to(initial.origin))
+			if placement.asset=="gull":
+				var mi := root.find_children("*","MeshInstance3D",true,false)[0] as MeshInstance3D
+				var largest := 0.0
+				for k in mi.mesh.get_blend_shape_count():largest=maxf(largest,absf(mi.get_blend_shape_value(k)))
+				quiet+=int(largest<.001)
+				active+=int(largest>.1)
+			else:
+				var bob := (root.get_node("BodyRig") as Node3D).position.y
+				min_bob=minf(min_bob,bob);max_bob=maxf(max_bob,bob)
+		check(str(root.name)+"_root_fixed",root_drift<.00001 and root.transform.basis.is_equal_approx(initial.basis),root_drift)
+		if placement.asset=="gull":
+			phases.append(root.get_meta("initial_phase_s"))
+			var support_ray := PhysicsRayQueryParameters3D.create(root.position+Vector3.UP*.04,root.position-Vector3.UP*.12)
+			var support := scene.get_world_3d().direct_space_state.intersect_ray(support_ray)
+			check(str(root.name)+"_feet_supported",not support.is_empty() and absf(support.position.y-root.position.y)<.045,str(support.get("position")))
+			check(str(root.name)+"_mostly_still_small_actions",quiet>=160 and active>=20,{"quiet_of_256":quiet,"active_of_256":active})
+		else:
+			check("ferry_two_cm_bob",min_bob>=-.02001 and max_bob<=.02001 and max_bob-min_bob>.039,{"min":min_bob,"max":max_bob})
+			check("ferry_near_far_flag_once",root.find_children("*","MeshInstance3D",true,false).size()==3)
+		animator.play("idle");animator.seek(resume_time,true)
+	check("gull_start_phases_differ",phases.size()==3 and absf(phases[0]-phases[1])>.3 and absf(phases[1]-phases[2])>.3,phases)
+	var foam := scene.zones.DockZone.get_node("ShoreFoam") as MeshInstance3D
+	var material := foam.mesh.surface_get_material(0) as StandardMaterial3D
+	check("foam_transparent_imported_material",material!=null and material.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA and material.depth_draw_mode==BaseMaterial3D.DEPTH_DRAW_DISABLED and material.albedo_texture!=null)
+	check("foam_shared_surface",foam.mesh.get_surface_count()==1 and foam.material_override==null)
+	var shoreline_count := 0
+	for p in scene.layout.placements:
+		if p.asset.begins_with("alc_foam_") or p.asset in ["alc_buoy","alc_driftwood"]:shoreline_count+=1
+	check("shoreline_107_points_installed",shoreline_count==107,shoreline_count)
+	# Compare the shared-surface overlay against independent accepted prototypes.
+	# Freeze the QA clock only; shipped sea material and motion stay untouched.
+	var previous_scale := Engine.time_scale
+	Engine.time_scale=0
+	for i in 3:await RenderingServer.frame_post_draw
+	var merged := viewport.get_texture().get_image()
+	foam.visible=false
+	var controls: Array[MeshInstance3D] = []
+	for p in scene.layout.placements:
+		if p.get("surface_group","")!="shore_foam":continue
+		var node := MeshInstance3D.new();node.mesh=scene._mesh(str(p.asset));node.transform=scene._transform_of(p)
+		node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		scene.zones.DockZone.add_child(node);controls.append(node)
+	for i in 3:await RenderingServer.frame_post_draw
+	var independent := viewport.get_texture().get_image()
+	var maximum := 0.0
+	var total := 0.0
+	for y in 800:
+		for x in 360:
+			var a := merged.get_pixel(x,y);var b := independent.get_pixel(x,y)
+			var delta := maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b)))
+			maximum=maxf(maximum,delta);total+=delta
+	check("merged_foam_matches_prototypes",maximum<3.1/255.0 and total/(360*800)<.02/255.0,{"max_255":maximum*255,"mean_255":total*255/(360*800)})
+	for node in controls:node.free()
+	for i in 3:await RenderingServer.frame_post_draw
+	var without_foam := viewport.get_texture().get_image()
+	var bridge_change := 0.0
+	for y in range(45,159):
+		for x in 180:
+			var a := merged.get_pixel(x,y);var b := without_foam.get_pixel(x,y)
+			bridge_change=maxf(bridge_change,maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b))))
+	check("foam_keeps_opening_bridge_pixels",bridge_change<.5/255.0,bridge_change*255)
+	foam.visible=true
+	for i in 3:await RenderingServer.frame_post_draw
+	var dock := scene.zones.DockZone.get_node("DockFurnishings") as MeshInstance3D
+	var dock_reference := viewport.get_texture().get_image()
+	dock.visible=false
+	controls.clear()
+	for p in scene.layout.placements:
+		if p.get("surface_group","")!="dock_furnishings":continue
+		var node := MeshInstance3D.new();node.mesh=scene._mesh(str(p.asset));node.transform=scene._transform_of(p)
+		node.material_override=dock.mesh.surface_get_material(0)
+		node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		scene.zones.DockZone.add_child(node);controls.append(node)
+	for i in 3:await RenderingServer.frame_post_draw
+	var dock_independent := viewport.get_texture().get_image()
+	var edge_differences: Array = []
+	dock_reference.save_png(destination.path_join("dock-merged-control.png"))
+	dock_independent.save_png(destination.path_join("dock-independent-control.png"))
+	maximum=0;total=0
+	for y in 800:
+		for x in 360:
+			var a := dock_reference.get_pixel(x,y);var b := dock_independent.get_pixel(x,y)
+			var delta := maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b)))
+			maximum=maxf(maximum,delta);total+=delta
+			if delta>3.1/255:edge_differences.append([x,y,delta*255])
+	# CPU-baked transforms versus GPU instance transforms can cross an MSAA
+	# sample at a sharp crate edge. Review found one such pixel (24/255), with
+	# mean 0.000167/255. Allow only isolated edge samples, never a broad change.
+	check("dock_batch_visual_parity",maximum<32.1/255.0 and edge_differences.size()<=2 and total/(360*800)<.001/255.0,{"max_255":maximum*255,"mean_255":total*255/(360*800),"edge_differences":edge_differences})
+	for node in controls:node.free()
+	dock.visible=true
+	Engine.time_scale=previous_scale
+	for i in 3:await RenderingServer.frame_post_draw
+
+func effects_close_view(size: Vector2i, focus: Vector3, width: float, pitch: float, yaw: float, at: Vector2) -> void:
+	var view := SubViewport.new();view.size=size;view.world_3d=viewport.find_world_3d()
+	view.msaa_3d=Viewport.MSAA_4X;view.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(view)
+	var camera := Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL
+	camera.keep_aspect=Camera3D.KEEP_WIDTH;camera.current=true;camera.size=width;camera.near=.05;camera.far=220
+	view.add_child(camera);camera.rotation_degrees=Vector3(-pitch,yaw,0);camera.position=focus+camera.basis.z*maxf(5,width*1.5)
+	var display := TextureRect.new();display.texture=view.get_texture();display.position=at;display.size=Vector2(size)
+	display.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;add_child(display)
+
+func integrated_effects_movie() -> void:
+	scene.set_process(false)
+	scene._rig.process_mode=Node.PROCESS_MODE_DISABLED
+	for child in get_children():
+		if child is TextureRect:
+			child.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT);child.position=Vector2.ZERO;child.size=Vector2(360,800)
+	var background := ColorRect.new();background.position=Vector2(360,0);background.size=Vector2(480,800);background.color=Color("efeada");add_child(background)
+	var index := 0
+	for root in scene.animated_roots:
+		var placement: Dictionary = root.get_meta("placement")
+		if placement.asset=="ferry":effects_close_view(Vector2i(480,400),root.position+Vector3(0,3.0,0),30,30,-35,Vector2(360,0))
+		else:
+			effects_close_view(Vector2i(160,210),root.position+Vector3(0,.29,0),1.7,23,-90 if index==2 else -25 if index==0 else 155,Vector2(360+160*index,420));index+=1
+	var label := Label.new();label.position=Vector2(374,644);label.text="V8 / live island assembly\nLeft: opening 360 x 800\nRight: close views at current world positions\nGulls stay planted; ferry body bobs +/-2 cm\nStatic soft foam; no click targets\n9 s / 30 Hz art capture, desktop only"
+	label.add_theme_color_override("font_color",Color("263b44"));label.add_theme_font_size_override("font_size",15);add_child(label)
+	for i in 15:await RenderingServer.frame_post_draw
+	var ready_frame := Engine.get_frames_drawn()
+	for i in 270:await RenderingServer.frame_post_draw
+	var report := {"ready_frame":ready_frame,"fixed_fps":30,"duration_frames":270,"resolution":[840,800],"root_positions":[],"scope":"Simultaneous real scene cameras, current supported placements, normal animation speed; offline desktop capture."}
+	for root in scene.animated_roots:report.root_positions.append({"name":str(root.name),"position":str(root.position),"phase_s":root.get_meta("initial_phase_s")})
+	FileAccess.open(destination.path_join("effects-movie.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
+	get_tree().quit()
+
+func audit_museum_lod() -> void:
+	# Use the exact meshes/ranges installed by the island, with an isolated
+	# render counter so hidden near/far duplicates cannot masquerade as a pass.
+	var view := SubViewport.new();view.size=Vector2i(360,800);view.own_world_3d=true
+	view.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(view)
+	var near: MeshInstance3D
+	var far: MeshInstance3D
+	for node in scene.mesh_nodes:
+		if node.name.begins_with("AlcMuseumFar"):far=node
+		elif node.name.begins_with("AlcMuseum"):near=node
+	check("museum_pictogram_lod_ready",near!=null and far!=null and not bool(scene.layout.lod_groups[0].get("sign_sync_pending",true)))
+	for source in [near,far]:
+		var instance := MeshInstance3D.new();instance.mesh=source.mesh;instance.material_override=source.material_override
+		instance.visibility_range_begin=source.visibility_range_begin;instance.visibility_range_end=source.visibility_range_end
+		instance.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;view.add_child(instance)
+	var camera := Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.keep_aspect=Camera3D.KEEP_WIDTH
+	camera.size=6.72;camera.near=.05;camera.far=200;view.add_child(camera);camera.current=true
+	camera.rotation_degrees=Vector3(-43,14.5,0)
+	var center := near.mesh.get_aabb().get_center()
+	for spec in [[54,near.mesh],[56,far.mesh]]:
+		camera.position=center+camera.basis.z*float(spec[0])
+		for i in 6:await RenderingServer.frame_post_draw
+		var visible := view.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_PRIMITIVES_IN_FRAME)
+		var mesh: Mesh = spec[1]
+		var expected: int = mesh.surface_get_arrays(0)[Mesh.ARRAY_INDEX].size()/3
+		check("museum_lod_"+str(spec[0])+"m_only_expected_mesh",visible==expected,{"visible_triangles":visible,"expected_triangles":expected})
+	view.free()
+	for i in 2:await RenderingServer.frame_post_draw
