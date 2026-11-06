@@ -21,6 +21,9 @@ var _loading: CanvasLayer
 ## A host's own loading layer for open_instance (P0: SYS-LOADING-SCENE, SGODOT-233): factory(scene_path, args)
 ## returns a CanvasLayer with failed() and close_button like loading_overlay.gd, or null to keep that overlay.
 var loading_overlay_factory := Callable()
+## A scene's threaded load: given up after this long, and tried this many times when it fails (not when it is slow).
+const LOAD_TIMEOUT_MS := 30000
+const LOAD_TRIES := 2
 ## 实例栈（PRD §3.2 第二层空间）：地图常驻为底，农场/地点/换装房压在上面。
 var _stack: Array[Node] = []
 
@@ -165,17 +168,25 @@ func _load_with_feedback(scene_path: String, args := {}) -> PackedScene:
 	if _loading == null: _loading = preload("res://modules/ui/loading_overlay.gd").new()
 	add_child(_loading)
 	await _render_frame()
-	var error := ResourceLoader.load_threaded_request(scene_path, "PackedScene")
-	if error == OK:
-		var started := Time.get_ticks_msec()
+	var started := Time.get_ticks_msec()
+	# A load that failed stays in ResourceLoader until load_threaded_get takes it: left there, every later request of the
+	# path fails at once (李元芳 on 0.3.0's farmhouse, 11-06: once, then again 3 s after Go back, until the app restarted).
+	# So a failed one is taken, and asked once more before the place counts as not opening. One still loading after
+	# LOAD_TIMEOUT_MS is left to finish (a get would block until it does).
+	for attempt in LOAD_TRIES:
+		if ResourceLoader.load_threaded_request(scene_path, "PackedScene") != OK: break
 		var done := []   # the threaded load's own progress, for an overlay with a bar (P0LoadingLayer.progress)
 		while ResourceLoader.load_threaded_get_status(scene_path, done) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
 			if _loading.has_method(&"progress") and not done.is_empty(): _loading.call(&"progress", float(done[0]))
-			if Time.get_ticks_msec() - started > 30000: break
+			if Time.get_ticks_msec() - started > LOAD_TIMEOUT_MS: break
 			await get_tree().process_frame
-		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
+		var status := ResourceLoader.load_threaded_get_status(scene_path)
+		if status == ResourceLoader.THREAD_LOAD_LOADED:
 			if _loading.has_method(&"progress"): _loading.call(&"progress", 1.0)
 			return ResourceLoader.load_threaded_get(scene_path) as PackedScene
+		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS: break
+		ResourceLoader.load_threaded_get(scene_path)   # the failed load, taken: the next request starts afresh
+		push_warning("AppRouter: loading %s failed (try %d of %d)" % [scene_path, attempt + 1, LOAD_TRIES])
 	_loading.failed()
 	_loading.close_button.pressed.connect(_clear_transition, CONNECT_ONE_SHOT)
 	return null

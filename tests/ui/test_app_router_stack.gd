@@ -14,6 +14,23 @@ func test_loading_navigation_blocks_duplicate_requests_and_back_until_ready() ->
 	assert_that(AppRouter.top_instance().args).is_equal({"loading": true})
 	assert_that(AppRouter._loading).is_null()
 
+## 李元芳 on 0.3.0 (11-06): a scene whose threaded load failed once failed again at once on every later try, until the
+## app restarted — the failed load was never taken from ResourceLoader. Now it is: a place that failed opens on the next
+## try once it can (here: the file fixed in between).
+func test_a_failed_load_does_not_lock_the_place_out() -> void:
+	var path := OS.get_user_data_dir().path_join("router_flaky_probe.tscn")
+	var broken := '[gd_scene format=3]\n\n[node name="X" type="Node"]\nscript = ExtResource("nope")\n'
+	FileAccess.open(path, FileAccess.WRITE).store_string(broken)
+	assert_object(await AppRouter._load_with_feedback(path)).is_null()   # fails twice (both tries), then the card
+	AppRouter._clear_transition()
+	await get_tree().process_frame   # the overlay freed
+	FileAccess.open(path, FileAccess.WRITE).store_string('[gd_scene format=3]\n\n[node name="X" type="Node"]\n')
+	var packed: PackedScene = await AppRouter._load_with_feedback(path)
+	assert_object(packed).is_not_null()   # before: the stale failed load answered at once
+	AppRouter._clear_transition()
+	await get_tree().process_frame
+	DirAccess.remove_absolute(path)
+
 func after_test() -> void:
 	while AppRouter.instance_depth() > 0:
 		AppRouter.pop_instance()
