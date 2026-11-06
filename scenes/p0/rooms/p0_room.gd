@@ -644,6 +644,7 @@ func _clamp_focus(f: Vector3) -> Vector3:
 	var limit_lo := Vector2(-(view.x * 0.5 - SIDE_MARGIN), -(view.y * 0.5 - bottom.x)) * m
 	var limit_hi := Vector2(view.x * 0.5 - SIDE_MARGIN, view.y * 0.5 - (_safe_top() + HUD_BOTTOM)) * m
 	var centre_lo := Vector2(limit_lo.x, -(view.y * 0.5 - bottom.y) * m)
+	f = _clamp_to_reach(f, right, up, forward, limit_lo, limit_hi)
 	var q := Vector2(f.dot(right), f.dot(up))
 	for i in 2:
 		var lo := _bounds_lo[i] - limit_lo[i]   # q from here up: no backdrop between the art's low edge and the low line
@@ -652,6 +653,31 @@ func _clamp_focus(f: Vector3) -> Vector3:
 			q[i] = clampf(((_bounds_lo[i] + _bounds_hi[i]) - (centre_lo[i] + limit_hi[i])) * 0.5, hi, lo)
 		else:
 			q[i] = clampf(q[i], lo, hi)
+	return _on_floor(right, up, forward, q)
+
+## A kit with a camera_contract and a footprint (Grace Cathedral, SGODOT-423 — 10.5 m square, wider than the screen
+## both ways): the camera follows the player, its floor point kept within REACH_INSET_M of the footprint's edges as well.
+## On the 45° screen that room is a diamond and its art's box has empty corners: held off them, no backdrop shows
+## (上官婉儿 / 不知火舞 on 423; the outer steps and grass reach past where it can look). The player comes first: in a far
+## corner the point gives way so their feet and head stay REACH_PAD_M inside the limit lines (周瑜 on #846).
+const REACH_INSET_M := 3.0
+const REACH_PAD_M := 0.4
+func _clamp_to_reach(f: Vector3, right := Vector3.ZERO, up := Vector3.ZERO, forward := Vector3.ZERO,
+		limit_lo := Vector2.ZERO, limit_hi := Vector2.ZERO) -> Vector3:
+	var size = layout.get("footprint_m", null)
+	if not layout.has("camera_contract") or not (size is Array) or size.size() < 2: return f
+	var half := Vector2(float(size[0]), float(size[1])) * 0.5 - Vector2.ONE * REACH_INSET_M
+	var local := f - room.position
+	local.x = clampf(local.x, -half.x, half.x)
+	local.z = clampf(local.z, -half.y, half.y)
+	f = local + room.position
+	if actor == null or right == Vector3.ZERO: return f
+	var q := Vector2(f.dot(right), f.dot(up))
+	for p in [actor.position, actor.position + Vector3(0, 1.75, 0)]:
+		var o := Vector2(p.dot(right), p.dot(up)) - q   # the player off the screen's centre (metres, right; up)
+		for i in 2:
+			if o[i] > limit_hi[i] - REACH_PAD_M: q[i] += o[i] - (limit_hi[i] - REACH_PAD_M)
+			elif o[i] < limit_lo[i] + REACH_PAD_M: q[i] += o[i] - (limit_lo[i] + REACH_PAD_M)
 	return _on_floor(right, up, forward, q)
 
 ## The bottom controls, in px from the screen's bottom: (the art's lowest line, the centring band's bottom). With the
