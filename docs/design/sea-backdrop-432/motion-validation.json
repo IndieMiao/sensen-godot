@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "duration_ms": 4000,
+  "decoded_frames": 80,
+  "clock": "80 actual Mobile frames at t=i/20s, TIME substituted only in desktop QA. Real-speed excerpt, not a seamless loop; foam period remains 5.5s.",
+  "sea_motion_without_foam": {
+    "bay": {
+      "sea_only_t0_vs_t4_changed_pixels": 17148,
+      "whole_frame_mean_rgb_255": 0.21555902777777777,
+      "maximum_rgb_255": 13.0
+    },
+    "lake": {
+      "sea_only_t0_vs_t4_changed_pixels": 23862,
+      "whole_frame_mean_rgb_255": 0.16817824074074075,
+      "maximum_rgb_255": 5.0
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "bay-default-review.png": {
+    "bytes": 63147,
+    "sha256": "6c39344c2f2cc02d941e7eafa623582b07f4923bba3e51cf88105f466a363e92"
+  },
+  "lake-default-review.png": {
+    "bytes": 63894,
+    "sha256": "0e5e931da9dd0a61d70c789114af110f0f183a665f42e91c8cd34099554143ed"
+  },
+  "motion-review.gif": {
+    "bytes": 501837,
+    "sha256": "1aa00480ca66e4ccb0723c19b7022928663f5e43450bda62f1ddb1e0efa28fd5"
+  },
+  "android-bay.png": {
+    "bytes": 54998,
+    "sha256": "a51ccf3d0e49b359d2163d39bdc5492d00db44671e785c8b71d31730f5a2767e"
+  },
+  "android-lake.png": {
+    "bytes": 57155,
+    "sha256": "df06a5aefe9680180bc9b9687835e1f406e055ba470942ca579b27214a2d3597"
+  }
+}
