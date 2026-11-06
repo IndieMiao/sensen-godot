@@ -1,0 +1,830 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "ferry manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry exactly one mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry one surface/material",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry no textures/rig/animation/camera",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry no lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry original local pivot/unit transforms",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry triangle count/cap",
+        "passed": true,
+        "evidence": 5144
+      },
+      {
+        "check": "ferry finite geometry/colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry linear colour range",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry opaque vertex colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry actual bounds match",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry no degenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry normals agree with winding",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry unit normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry valid Godot-generated UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry import_script/path=\"res://assets/landmarks/alcatraz_island/ferry_gull_material_import.gd\"",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry preserve placeholder Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry exactly 25m X length",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry original waterline pivot / submerged -1m keel",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far exactly one mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far one surface/material",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far no textures/rig/animation/camera",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far no lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far original local pivot/unit transforms",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far triangle count/cap",
+        "passed": true,
+        "evidence": 1480
+      },
+      {
+        "check": "ferry_far finite geometry/colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far linear colour range",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far opaque vertex colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far actual bounds match",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far no degenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far normals agree with winding",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far unit normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far valid Godot-generated UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far import_script/path=\"res://assets/landmarks/alcatraz_island/ferry_gull_material_import.gd\"",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far exactly 25m X length",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ferry_far original waterline pivot / submerged -1m keel",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull manifest hash",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull exactly one mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull mesh name",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull one surface/material",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull no textures/rig/animation/camera",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull no lights",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull original local pivot/unit transforms",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull triangle count/cap",
+        "passed": true,
+        "evidence": 284
+      },
+      {
+        "check": "gull finite geometry/colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull linear colour range",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull opaque vertex colour",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull actual bounds match",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull no degenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull normals agree with winding",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull unit normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull valid Godot-generated UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull import_script/path=\"res://assets/landmarks/alcatraz_island/ferry_gull_material_import.gd\"",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull preserve placeholder Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "gull two named shape targets",
+        "passed": true,
+        "evidence": [
+          "preen",
+          "spread"
+        ]
+      },
+      {
+        "check": "gull exactly three static poses including basis",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "preen feet/root unmoved",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "preen pose bounds measured",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "preen finite",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "preen no collapsed triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "spread feet/root unmoved",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "spread pose bounds measured",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "spread finite",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "spread no collapsed triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "all four original placements / yaw / scale / collision fields identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "all decorative / noncolliding",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "55m hard LOD handoff",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "far <=30% near triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "import script Godot UID delivered",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "review pinned host byte-identical scenes/landmark/alcatraz_island.gd",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "review pinned host byte-identical assets/landmarks/alcatraz_island/sea_backdrop.gdshader",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "review pinned host byte-identical assets/landmarks/alcatraz_island/far_card.gdshader",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "review pinned host byte-identical modules/farm/farm_camera.gd",
+        "passed": true,
+        "evidence": null
+      }
+    ],
+    "measured": {
+      "ferry": {
+        "triangles": 5144,
+        "bounds": [
+          [
+            -12.5,
+            -1.0,
+            -3.319999933242798
+          ],
+          [
+            12.5,
+            7.690000057220459,
+            3.319999933242798
+          ]
+        ],
+        "uid": "uid://b2f7cy7wflju0"
+      },
+      "ferry_far": {
+        "triangles": 1480,
+        "bounds": [
+          [
+            -12.5,
+            -1.0,
+            -3.0999999046325684
+          ],
+          [
+            12.5,
+            7.679999828338623,
+            3.0999999046325684
+          ]
+        ],
+        "uid": "uid://c1fyk5oos7e8a"
+      },
+      "gull": {
+        "triangles": 284,
+        "bounds": [
+          [
+            -0.21299999952316284,
+            0.0,
+            -0.4000000059604645
+          ],
+          [
+            0.21299999952316284,
+            0.5799999833106995,
+            0.3700000047683716
+          ]
+        ],
+        "uid": "uid://bosltf0ey6601"
+      }
+    },
+    "placed_near_triangles": 5996,
+    "placed_far_triangles": 2332,
+    "passed": true
+  },
+  "godot": {
+    "captures": {
+      "SGODOT-424_ferry_gull_v1_dock_ferry_detail": {
+        "camera": [
+          -25.2964134216309,
+          33.8719253540039,
+          46.5581359863281
+        ],
+        "camera_width": 35.0,
+        "draws": 38,
+        "shadow_draws": 15,
+        "size": [
+          1400,
+          1000
+        ],
+        "triangles": 39748
+      },
+      "SGODOT-424_ferry_gull_v1_gull_poses": {
+        "camera": [
+          18.024866104126,
+          17.5019035339355,
+          -38.6544418334961
+        ],
+        "camera_width": 4.40000009536743,
+        "draws": 4,
+        "shadow_draws": 1,
+        "size": [
+          1400,
+          650
+        ],
+        "triangles": 854
+      },
+      "SGODOT-424_ferry_gull_v1_near_far": {
+        "camera": [
+          -4.68209934234619,
+          34.6719245910645,
+          33.3148651123047
+        ],
+        "camera_width": 34.0,
+        "draws": 3,
+        "shadow_draws": 1,
+        "size": [
+          1400,
+          1200
+        ],
+        "triangles": 6626
+      },
+      "SGODOT-424_ferry_gull_v1_opening_360": {
+        "camera": [
+          -13.9901876449585,
+          34.1427688598633,
+          49.9716300964355
+        ],
+        "camera_width": 6.71999979019165,
+        "draws": 27,
+        "shadow_draws": 7,
+        "size": [
+          360,
+          800
+        ],
+        "triangles": 35944
+      },
+      "opening_without_new_props_control": {
+        "camera": [
+          -13.9901876449585,
+          34.1427688598633,
+          49.9716300964355
+        ],
+        "camera_width": 6.71999979019165,
+        "draws": 25,
+        "shadow_draws": 7,
+        "size": [
+          360,
+          800
+        ],
+        "triangles": 30516
+      }
+    },
+    "checks": [
+      {
+        "check": "Pinned island navigation ready",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Original dock spawn",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Original 43deg/yaw14.5/6.72m opening",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry near and far",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Three original gull instances",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry original position",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry original yaw/unit scale",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry triangle cap",
+        "evidence": 5144,
+        "passed": true
+      },
+      {
+        "check": "Decorative ferry no shadow",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry original position",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry original yaw/unit scale",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry triangle cap",
+        "evidence": 1480,
+        "passed": true
+      },
+      {
+        "check": "Decorative ferry no shadow",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Ferry LOD55m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull original placement 0",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull one surface / <=400 triangles",
+        "evidence": 284,
+        "passed": true
+      },
+      {
+        "check": "Gull two targets plus basis = three poses",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull original placement 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull one surface / <=400 triangles",
+        "evidence": 284,
+        "passed": true
+      },
+      {
+        "check": "Gull two targets plus basis = three poses",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull original placement 2",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gull one surface / <=400 triangles",
+        "evidence": 284,
+        "passed": true
+      },
+      {
+        "check": "Gull two targets plus basis = three poses",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Avatar animation only; decorative mesh has no autoplay",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_ferry_gull_v1_opening_360 capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "opening_without_new_props_control capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_ferry_gull_v1_dock_ferry_detail capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_ferry_gull_v1_near_far capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_ferry_gull_v1_gull_poses capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry import readable",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry Godot UID",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry texture_map_mode",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry matte linear vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry no imported shadow",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry_far import readable",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry_far Godot UID",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry_far texture_map_mode",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry_far matte linear vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ferry_far no imported shadow",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "gull import readable",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "gull Godot UID",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "gull texture_map_mode",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "gull matte linear vertex colour enabled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "gull no imported shadow",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "poses": {
+      "0": {
+        "pose": "stand",
+        "position": [
+          -23.6000003814697,
+          2.0,
+          18.2000007629395
+        ]
+      },
+      "1": {
+        "pose": "preen",
+        "position": [
+          10.0,
+          4.25,
+          8.69999980926514
+        ]
+      },
+      "2": {
+        "pose": "spread",
+        "position": [
+          -24.0,
+          11.0,
+          -7.0
+        ]
+      }
+    },
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  },
+  "fixture": {
+    "source_ref": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+    "layout_fixture_only": "add ferry lod_group; positions/rotations/scales unchanged; gull poses applied by review only",
+    "host_hashes": {
+      "scenes/landmark/alcatraz_island.gd": "576629ffdc79da8e515974c991f55955843169d62632585aec35fc63f8e97ca3",
+      "assets/landmarks/alcatraz_island/sea_backdrop.gdshader": "b2e7b8aa7751ecb2024019057a066c86c0cee353a76d79a79adbd3eee1eb5883",
+      "assets/landmarks/alcatraz_island/far_card.gdshader": "39386ef55891571e395cbe7a1880950ba2cd304e8568e6601c893890a16da5eb",
+      "modules/farm/farm_camera.gd": "1e2b2be4eb363a4f5107958edce74db042ec5198e32aafe199cf3c87a33fd788"
+    }
+  },
+  "limits": "Desktop Vulkan Mobile review in pinned art blockout. No gameplay/server/Android or physical-device FPS acceptance.",
+  "opening_budget_passed": true
+}
