@@ -1,0 +1,76 @@
+{
+  "passed": true,
+  "revision": "1.1",
+  "package": "com.sensen.alcatrazground424qa",
+  "apk_sha256": "695acd03775c80e5519bf36100fe9f21d6492c2f60c8e8959d72210272bb4fae",
+  "readback_equal": true,
+  "resources": {
+    "materials": [
+      {
+        "finish_kind": 0,
+        "name": "alc_terrain_detail",
+        "shader_sha256": "a5196fbdc03df533b632a78057f3c84099d62fc0e897f23d61da973e2edc4937",
+        "textures": {
+          "fields": {
+            "mipmaps": true,
+            "path": "res://assets/landmarks/alcatraz_island/ground/alc_ground_fields.png",
+            "size": [
+              1024,
+              1024
+            ]
+          },
+          "surfaces": {
+            "mipmaps": true,
+            "path": "res://assets/landmarks/alcatraz_island/ground/alc_ground_surfaces.png",
+            "size": [
+              1024,
+              1024
+            ]
+          }
+        }
+      },
+      {
+        "finish_kind": 1,
+        "name": "alc_dock_detail",
+        "shader_sha256": "a5196fbdc03df533b632a78057f3c84099d62fc0e897f23d61da973e2edc4937",
+        "textures": {
+          "fields": {
+            "mipmaps": true,
+            "path": "res://assets/landmarks/alcatraz_island/ground/alc_ground_fields.png",
+            "size": [
+              1024,
+              1024
+            ]
+          },
+          "surfaces": {
+            "mipmaps": true,
+            "path": "res://assets/landmarks/alcatraz_island/ground/alc_ground_surfaces.png",
+            "size": [
+              1024,
+              1024
+            ]
+          }
+        }
+      }
+    ],
+    "passed": true
+  },
+  "compressed_textures_match_tested_imports": [
+    {
+      "path": ".godot/imported/alc_ground_surfaces.png-ab3eaff195cc90f972844b1c0e79edfd.astc.ctex",
+      "sha256": "ac43aad82a14ff958a882998214d6c1ec8917e6c48ea93d3ca7170ee29054c45",
+      "bytes": 1398180
+    },
+    {
+      "path": ".godot/imported/alc_ground_fields.png-de5ae2813a6f2cabd92100c44c4c94ca.astc.ctex",
+      "sha256": "6419fc10de1eb2211fee673176b73ba57124dff9fedd16ad314e901cef0ecfad",
+      "bytes": 1398180
+    }
+  ],
+  "grass_parameters_verified": {
+    "grass_deep_color": "#527E35",
+    "grass_base_color": "#78A044",
+    "grass_sun_color": "#A2B95D"
+  },
+  "scope": "Isolated emulator APK readback and decoded material/texture verification. No physical-phone performance claim."
+}

@@ -1,0 +1,537 @@
+{
+  "passed": true,
+  "host_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+  "checks": [
+    {
+      "passed": true,
+      "check": "alc_ground_dock: one original surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_dock: palette classes do not overlap"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_dock: no cliff/wall/soil/cap colours selected"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_dock: detail applies to actual top geometry"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_terraces: one original surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_terraces: palette classes do not overlap"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_terraces: no cliff/wall/soil/cap colours selected"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_terraces: detail applies to actual top geometry"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_summit: one original surface"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_summit: palette classes do not overlap"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_summit: no cliff/wall/soil/cap colours selected"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_summit: detail applies to actual top geometry"
+    },
+    {
+      "passed": true,
+      "check": "dock: one original surface"
+    },
+    {
+      "passed": true,
+      "check": "dock: palette classes do not overlap"
+    },
+    {
+      "passed": true,
+      "check": "dock: no cliff/wall/soil/cap colours selected"
+    },
+    {
+      "passed": true,
+      "check": "dock: detail applies to actual top geometry"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/README_ferry_gull.md: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/README_huangzhong_far.md: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_bench.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_bin.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_curb.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_dock_bollard.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_dock_crates.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_dock_manifest.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_dock_material.tres: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_dock_placements.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_dock_planter.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_dock_shelter.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_dock_welcome.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_bridge.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_city.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_hills.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_manifest.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_material_import.gd: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_material_import.gd.uid: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_far_placement.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_flowerbed.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_flowers_daisy.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_flowers_lavender.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_flowers_poppy.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_grass_tuft.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ground_dock.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ground_summit.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ground_terraces.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_hedge.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_lamp.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_lighthouse.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_lighthouse_far.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_museum.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_museum_far.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_nature_manifest.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_nature_material.tres: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_nature_placements.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_planter.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_rail_corner.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_rail_straight.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_rock_a.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_rock_b.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_rock_c.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ruin_arch.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ruin_flowers.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ruin_plaque.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ruin_rubble.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_ruin_vine.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_shrub.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_shrub_b.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_sign.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_tree_a.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_tree_b.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_watertower.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/alc_watertower_far.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/dock.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/far_card.gdshader: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/far_card.gdshader.uid: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/ferry.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/ferry_far.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/ferry_gull_manifest.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/ferry_gull_material_import.gd: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/ferry_gull_material_import.gd.uid: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/garden_manifest.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/gull.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/layout.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/manifest.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/placement_points.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/props_manifest.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/ruin_details_manifest.json: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/ruins.glb: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/sea_backdrop.gdshader: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "assets/landmarks/alcatraz_island/sea_backdrop.gdshader.uid: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "scenes/landmark/alcatraz_island.gd: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "scenes/landmark/alcatraz_island.tscn: owner bytes preserved"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_surfaces.png: 1024 RGB data"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_surfaces.png: engine UID, mips, VRAM compression"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_fields.png: 1024 RGB data"
+    },
+    {
+      "passed": true,
+      "check": "alc_ground_fields.png: engine UID, mips, VRAM compression"
+    },
+    {
+      "passed": true,
+      "check": "exactly two textures"
+    },
+    {
+      "passed": true,
+      "check": "two sampler bindings"
+    },
+    {
+      "passed": true,
+      "check": "static opaque, no depth/normal/UV/screen pass"
+    }
+  ],
+  "palette_regions": {
+    "alc_ground_dock": {
+      "triangles": 380,
+      "eligible_top_vertices": {
+        "garden": 4,
+        "garden_dark": 0,
+        "garden_light": 0,
+        "road": 4
+      },
+      "unchanged_other_vertices": 848
+    },
+    "alc_ground_terraces": {
+      "triangles": 3800,
+      "eligible_top_vertices": {
+        "garden": 12,
+        "garden_dark": 72,
+        "garden_light": 144,
+        "road": 264
+      },
+      "unchanged_other_vertices": 7044
+    },
+    "alc_ground_summit": {
+      "triangles": 1062,
+      "eligible_top_vertices": {
+        "garden": 6,
+        "garden_dark": 0,
+        "garden_light": 48,
+        "road": 12
+      },
+      "unchanged_other_vertices": 2148
+    },
+    "dock": {
+      "triangles": 2452,
+      "eligible_top_vertices": {
+        "wood": 52,
+        "wood_light": 28,
+        "wood_dark": 24
+      },
+      "unchanged_other_vertices": 5008
+    }
+  },
+  "textures": {
+    "alc_ground_surfaces.png": {
+      "size": [
+        1024,
+        1024
+      ],
+      "channels": "RGB data / linear",
+      "sha256": "b933f4abe85e380c0e70fe7dab5474b6ba70c13d45a1520ce70ad787cd5bc20d",
+      "png_bytes": 740544
+    },
+    "alc_ground_fields.png": {
+      "size": [
+        1024,
+        1024
+      ],
+      "channels": "RGB data / linear",
+      "sha256": "48220ea717a4663a1ac95d8b3e2fa25398ab7127d4860e15bf102296b1c6354c",
+      "png_bytes": 1753704
+    }
+  },
+  "preserved_host_sha256": {
+    "assets/landmarks/alcatraz_island/README_ferry_gull.md": "e63ac0d0b68e77b50e26f95cff9a41230dd1665c45df42896087aee314adc3c9",
+    "assets/landmarks/alcatraz_island/README_huangzhong_far.md": "aa667214784358f7fd106846f0a31c9c8aecf39c07e92293a1397edfb566bd31",
+    "assets/landmarks/alcatraz_island/alc_bench.glb": "6dcb115c2827b66ea978f921443c60f432d7c29732dd29d5fab01401c04d00a9",
+    "assets/landmarks/alcatraz_island/alc_bin.glb": "71b7a259319a75159738847dd52dfba2f61e82afdf71fa67d487ea96cfd473cf",
+    "assets/landmarks/alcatraz_island/alc_curb.glb": "8f531201101b657ee13781e7a0c3ca0e7ed392e7637566ae39c29c69e7be20e8",
+    "assets/landmarks/alcatraz_island/alc_dock_bollard.glb": "9ae6bc4ab0c004fd953d303210b843b02cc8871c3b4e356ae4732d3888168413",
+    "assets/landmarks/alcatraz_island/alc_dock_crates.glb": "237ff30b687aae44216ac4ceaac3806b8bc9c3765c52333fb7dfcfcc0b3e63b1",
+    "assets/landmarks/alcatraz_island/alc_dock_manifest.json": "6055f10746287fdb713b5ccdd9bb0a6ccce3fe23b44b08f89a98bd356075236b",
+    "assets/landmarks/alcatraz_island/alc_dock_material.tres": "b1ce3d929ec23fa296cb713669fbced01599cd43f0c11a580b14a6ae356b30a9",
+    "assets/landmarks/alcatraz_island/alc_dock_placements.json": "01002640b1bbd01a7ccbb724f5894586d46692499c67d5b83acb039890bf5ee4",
+    "assets/landmarks/alcatraz_island/alc_dock_planter.glb": "825c0cc23448e660f6742082903094adc9cf151717aaecc736967997c1ac1150",
+    "assets/landmarks/alcatraz_island/alc_dock_shelter.glb": "6a5c68b71f5945d3e6d01a49471ad02a2733ed6199c88d4a8ab386fb0bc9f5eb",
+    "assets/landmarks/alcatraz_island/alc_dock_welcome.glb": "46d76ed063494f0526ef5304ca8660e415aa8e8113cdf37497658c2d586f9f08",
+    "assets/landmarks/alcatraz_island/alc_far_bridge.glb": "9cd46d07c4ca491efe7bdcb716723aa87976da4373df5e5e7288f8ee80ad7d37",
+    "assets/landmarks/alcatraz_island/alc_far_city.glb": "ae98acebd72673591318ede1f9b2a9c9832f30a45aa836f9eda0f6de1788c2d8",
+    "assets/landmarks/alcatraz_island/alc_far_hills.glb": "19dc64438b9c8bc7de842e696bcce0c36dd3269e0e13f61d0bd381187ec4f9e4",
+    "assets/landmarks/alcatraz_island/alc_far_manifest.json": "fc06e889153476c95e8dca4acfc69759b85cbc1ecdc5816c064fb4bcb6c3c7b0",
+    "assets/landmarks/alcatraz_island/alc_far_material_import.gd": "92f820c8304b92358e161cc28d9012d6ab074e4c1063e223d3b4494781a04a00",
+    "assets/landmarks/alcatraz_island/alc_far_material_import.gd.uid": "a4675024a6174456e13c3ad47f1434d460985323727a2657a49ca7277ac9220f",
+    "assets/landmarks/alcatraz_island/alc_far_placement.json": "9b90da66b780060a9ffe7e82229e95a9d2df7ee303f7726daa2f6ab7d5133202",
+    "assets/landmarks/alcatraz_island/alc_flowerbed.glb": "bf11c6c06ce941a8096d05ce3ba818ed4a3fb47355c3b2c706b8820a398ca071",
+    "assets/landmarks/alcatraz_island/alc_flowers_daisy.glb": "2cd433bd6fb7591bca11a27509b8db292ce5684bf356252d551af9e681369d25",
+    "assets/landmarks/alcatraz_island/alc_flowers_lavender.glb": "7df4094843f78c10af66b02f9aee55d03a35887308affb12f54c3c6f2c9cc110",
+    "assets/landmarks/alcatraz_island/alc_flowers_poppy.glb": "aa3cbc1723f6795b327fd7141ae659a7c5c85b39ff66bef09fd017505140ee31",
+    "assets/landmarks/alcatraz_island/alc_grass_tuft.glb": "50822f15cfb8ad3b3be39143e89d9a35d63e32350888c03c15c780f8e8c933d4",
+    "assets/landmarks/alcatraz_island/alc_ground_dock.glb": "3663f515b56c9fe15d0b46fa07b50224ceef063493e694cca0660fc2b983a993",
+    "assets/landmarks/alcatraz_island/alc_ground_summit.glb": "8913a6a5b11e878fcfeb295fab3649044a18cf510d989d671e84225c29465e8a",
+    "assets/landmarks/alcatraz_island/alc_ground_terraces.glb": "18ab98372d17a5feaa30589d0f6cc5090b6bccccbf74466ba70843b6645789f3",
+    "assets/landmarks/alcatraz_island/alc_hedge.glb": "2feb90cdd76a5bad7d3db66e55cc4753bbc87171ce515d0ffead80b891643ed2",
+    "assets/landmarks/alcatraz_island/alc_lamp.glb": "2321473dfaaec218140655b6b00fc4a606a8cca88dc89a6d8c026c5b8911d21e",
+    "assets/landmarks/alcatraz_island/alc_lighthouse.glb": "61cac63d1c1be7b8583e8dfd1692e958ee66a1dbad116cb4375fc6ac95dce9b9",
+    "assets/landmarks/alcatraz_island/alc_lighthouse_far.glb": "bdbd5677a996fc2808a8cb41db5846d6580d0a62d0eb7dd7b2f5df167e36aefb",
+    "assets/landmarks/alcatraz_island/alc_museum.glb": "63e46cbcbe2949df8aba9e371ebb27308bb3315ae962a6e775e52cadcc3fd732",
+    "assets/landmarks/alcatraz_island/alc_museum_far.glb": "ba5cdfa4763734cbfbdefd517a51029ef6a22de5e24becf2052608630d427e73",
+    "assets/landmarks/alcatraz_island/alc_nature_manifest.json": "58e7fa718551de0a3c342a49befbc3427a7095933cc02c5d90f588aa1efb910f",
+    "assets/landmarks/alcatraz_island/alc_nature_material.tres": "d4b80fdb14b89a074af1eb22b3bc94ed7c34cac2a64297cabfa53246dd5e2d40",
+    "assets/landmarks/alcatraz_island/alc_nature_placements.json": "8e98729d59afe6f581eb66e7a066cc2a7df2f1b3af3439b5d663882184afc4f7",
+    "assets/landmarks/alcatraz_island/alc_planter.glb": "3e6a7cd17fbc2a0e81871791ffeb6603df3749f1a336342e7176cfc29489f367",
+    "assets/landmarks/alcatraz_island/alc_rail_corner.glb": "5fa96b534fe818609b8a13a681a9415c1ecaeff37fa0acf58f4ca0a99bcff71c",
+    "assets/landmarks/alcatraz_island/alc_rail_straight.glb": "afccbf92fde39218866b2457375559ff347ee55de39af8e78abd18b1c6a98ca6",
+    "assets/landmarks/alcatraz_island/alc_rock_a.glb": "690c268413ddd2faca95b589c9c9401fa6c1a31bbea61f4ac01eee57744c2d99",
+    "assets/landmarks/alcatraz_island/alc_rock_b.glb": "af44d6dba6fa31ba76fad57817f22c7c79499bd548c18263e6f91954d9905e4d",
+    "assets/landmarks/alcatraz_island/alc_rock_c.glb": "6f14e38b10de8e6fc2fcef681b5c50c6efdc7043921e58a2b2cbca6734f5e919",
+    "assets/landmarks/alcatraz_island/alc_ruin_arch.glb": "4a7ed72271e61c6dac6bd8fb093e9d1a5896843aff3a89ed1dfdc26372720352",
+    "assets/landmarks/alcatraz_island/alc_ruin_flowers.glb": "3273f98fecc89779539ae3d6a24a258bfe87a74fb358e4fefba76117c9d6e99b",
+    "assets/landmarks/alcatraz_island/alc_ruin_plaque.glb": "c547f6d0c844168ea9644798c925c0fb5586b871ee7b387b4ce91ea7576cd6b2",
+    "assets/landmarks/alcatraz_island/alc_ruin_rubble.glb": "e90c9554a244aa251598176b2e7c57bf8e631ca9fe8e71ec5209860fe475e213",
+    "assets/landmarks/alcatraz_island/alc_ruin_vine.glb": "6962d21aa19d89dafacad7b43b483c158bd57991ba515169a77f9c0666b4f156",
+    "assets/landmarks/alcatraz_island/alc_shrub.glb": "7a9cf43c6b0660ef42e26ee2418889c5d0c455f968722325b9cd3ccf2c0c6674",
+    "assets/landmarks/alcatraz_island/alc_shrub_b.glb": "cfda3d96859135b943bca7a354f9b040a4dcb8be85f9ca5f85a1406cbad4cc78",
+    "assets/landmarks/alcatraz_island/alc_sign.glb": "edab4d31efd5be4ec4519bda5f0455f5bc98312965f8525684e0fff4e7ac469b",
+    "assets/landmarks/alcatraz_island/alc_tree_a.glb": "04b30452d6db9d8b64acfc4e11e70be15bd0372c1ccab99ec79f63d7a9aeb5d2",
+    "assets/landmarks/alcatraz_island/alc_tree_b.glb": "eb499135039ef55b4c5f0a90c6957510b7939c8580c6e65458e531e891acb3d7",
+    "assets/landmarks/alcatraz_island/alc_watertower.glb": "92aaf9ffd5facab3c261180cae8dcb05bb46edea0345856acdd4cc9b5815cb11",
+    "assets/landmarks/alcatraz_island/alc_watertower_far.glb": "d37fd1ad196f152abb1a2cc754f000f11e82779bd6022cb6c31fddc17536c452",
+    "assets/landmarks/alcatraz_island/dock.glb": "7883a3cccc4ac62c4c085123b0477faec6e8270f5c2503827623bde60a20446a",
+    "assets/landmarks/alcatraz_island/far_card.gdshader": "39386ef55891571e395cbe7a1880950ba2cd304e8568e6601c893890a16da5eb",
+    "assets/landmarks/alcatraz_island/far_card.gdshader.uid": "5c2a4f610b5a5530402a579844ceb4565dd738b965cc3ae013417f38a84f1ed8",
+    "assets/landmarks/alcatraz_island/ferry.glb": "397855391e01f037f20c1eba30bcff40ae3f09806551debc8a486bedd249a62c",
+    "assets/landmarks/alcatraz_island/ferry_far.glb": "fb49d1dced87c2358e2d96f9e488c47bf0efddffbc4da415093eeff3606ca11b",
+    "assets/landmarks/alcatraz_island/ferry_gull_manifest.json": "1f74f94dacec025f05578bb18a006135dc26c711b656ee4b19f011d5a83a5156",
+    "assets/landmarks/alcatraz_island/ferry_gull_material_import.gd": "3591ee2d600d16eae4c5d9eaa3434eaf81107d5adf6e885fdd60a62b122ed75c",
+    "assets/landmarks/alcatraz_island/ferry_gull_material_import.gd.uid": "82900d49153067fc53a9fd9686e215478933c7581b37f786b96c4bd123bfba28",
+    "assets/landmarks/alcatraz_island/garden_manifest.json": "87463e42db2fd03fed7016b46fccd4b8b63c72113fdec1e5a98d796548e30a9a",
+    "assets/landmarks/alcatraz_island/gull.glb": "cb4a554000c44570a47c00e7bb4e6fcf507a978cea26be4efda10ea5186eac2c",
+    "assets/landmarks/alcatraz_island/layout.json": "8cafefed37207464b5e735470b50219cc15e38b52a43361e3a1a9841eaa85af9",
+    "assets/landmarks/alcatraz_island/manifest.json": "253de6857fa3a1f835516217c08f9f4c1d5977402495df421d6c4c1c55e8fb86",
+    "assets/landmarks/alcatraz_island/placement_points.json": "e4f1187a3128aae5f714b7bc4d111feca69acd9ed9c605a7534c893f2a87f8e6",
+    "assets/landmarks/alcatraz_island/props_manifest.json": "d163e69a0289c895bc19fd75680f0a49dc9c968f7a375c10fce79912f8aa16e3",
+    "assets/landmarks/alcatraz_island/ruin_details_manifest.json": "593de04bdb2333551afa848fd5b209775469a9f5a445421c80e8f75b86e422c7",
+    "assets/landmarks/alcatraz_island/ruins.glb": "b6d8d822880bc411c794748041c5342bd81f95192d66291b0127645054ba1d71",
+    "assets/landmarks/alcatraz_island/sea_backdrop.gdshader": "ca71f9078c39d625c66b0f1a73b0bbc4b0fe62cbc481d0e9f0cdff0b1006d6d3",
+    "assets/landmarks/alcatraz_island/sea_backdrop.gdshader.uid": "0a1e7ea1e6597436ae1728fd7458d28740e0cd40e4fcb69d0f9d6a7212bb8727",
+    "scenes/landmark/alcatraz_island.gd": "69b3d51c3c7c7a6b15335cc6dc84d94609ba1068eca5ac6e4d1462bc53aeefa1",
+    "scenes/landmark/alcatraz_island.tscn": "68c859099f2254dd2f83357127178159f8fa9835bc539e726876e4b458f580f5"
+  },
+  "scope": "optional materials only; host source archived solely into ignored QA project"
+}

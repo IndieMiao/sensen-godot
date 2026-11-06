@@ -1,0 +1,81 @@
+{
+  "version": "1.1",
+  "owner": "刘备",
+  "optional": true,
+  "host_commit": "bf0c31b1c871011008b455434d167224d14de59c",
+  "palette_source": "tools/art/source/alcatraz_island/palette.json @ bf0c31b1",
+  "apply": {
+    "alc_ground_dock": "alc_terrain_detail.tres",
+    "alc_ground_terraces": "alc_terrain_detail.tres",
+    "alc_ground_summit": "alc_terrain_detail.tres",
+    "dock": "alc_dock_detail.tres"
+  },
+  "texture_channels": {
+    "alc_ground_fields.png": {
+      "R": "periodic grass macro field + extra perimeter noise (independent seed4241107), repeats24m/38.832m",
+      "G": "leaf strokes, world repeat2m",
+      "B": "reserved mineral micrograin, unused by v1 shader"
+    },
+    "alc_ground_surfaces.png": {
+      "R": "paving joint mask, repeat4m, slabs1x0.5m",
+      "G": "individual slab variation",
+      "B": "wood grain along local X, repeat3x1m"
+    }
+  },
+  "parameters": {
+    "finish_kind": {
+      "terrain": 0,
+      "dock": 1
+    },
+    "strength": 1.0,
+    "palette_tolerance": 0.012,
+    "grass_patch_repeat_m": 24.0,
+    "grass_detail_repeat_m": 2.0,
+    "grass_detail_strength": 0.13,
+    "paving_repeat_m": 4.0,
+    "paving_joint_strength": 0.16,
+    "paving_tone_strength": 0.1,
+    "wood_repeat_m": [
+      3.0,
+      1.0
+    ],
+    "wood_grain_strength": 0.32,
+    "surface_roughness": 0.94,
+    "surface_specular": 0.15,
+    "grass_deep_color": "#527E35",
+    "grass_base_color": "#78A044",
+    "grass_sun_color": "#A2B95D"
+  },
+  "constraints": [
+    "No changes to host GLB, UV, layout, navigation, lighting, cameras, sea or rocks",
+    "Replace material_override on only the listed four MeshInstance3D objects; surface override alone is hidden by existing host material_override",
+    "Preserve imported linear COLOR_0, bind both packed textures as data (no source_color hint)",
+    "World-space grass/paving; dock-local grain. No triplanar cliff detail, no normal/depth/alpha or extra passes",
+    "If host vertex palette changes, update classification uniforms or leave optional material off",
+    "Dock selector assumes original top face local Y=0; reused mesh can translate/rotate without losing grain alignment",
+    "garden/garden_dark/garden_light remain original COLOR_0 selection keys; only grass_deep_color/grass_base_color/grass_sun_color control displayed grass hue. Keep source palette unchanged, including merged ruin/terrain surface."
+  ],
+  "shader_texture_reads": {
+    "grass": 3,
+    "paving": 1,
+    "wood": 1,
+    "other": 0
+  },
+  "texture_size_each": [
+    1024,
+    1024
+  ],
+  "added_geometry": 0,
+  "automatic_scene_application": false,
+  "acceptance": "不知火舞确定套用；v1.1只增强草坡，石板与木纹冻结于91c563b16",
+  "palette_hex": {
+    "garden": "86A84F",
+    "garden_light": "9AB55D",
+    "garden_dark": "759448",
+    "road": "DFCBA7",
+    "wood": "BB8B52",
+    "wood_light": "D0A56C",
+    "wood_dark": "9A7046"
+  },
+  "selection_palette_note": "palette_hex remains original host COLOR_0 selection keys; displayed grass colours are the three grass_*_color parameters."
+}

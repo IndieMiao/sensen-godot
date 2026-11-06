@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "package": "com.sensen.alcatrazground424qa",
+  "apk_sha256": "d73a6b273b681259adb88b8a4a31dbd6c434e7b9951954e8c6723bec3acc0468",
+  "readback_equal": true,
+  "resources": {
+    "materials": [
+      {
+        "finish_kind": 0,
+        "name": "alc_terrain_detail",
+        "shader_sha256": "1ccb9abddb444d73f02dbf6c3476477aa335d1b8de277111188c90c9927de406",
+        "textures": {
+          "fields": {
+            "mipmaps": true,
+            "path": "res://assets/landmarks/alcatraz_island/ground/alc_ground_fields.png",
+            "size": [
+              1024,
+              1024
+            ]
+          },
+          "surfaces": {
+            "mipmaps": true,
+            "path": "res://assets/landmarks/alcatraz_island/ground/alc_ground_surfaces.png",
+            "size": [
+              1024,
+              1024
+            ]
+          }
+        }
+      },
+      {
+        "finish_kind": 1,
+        "name": "alc_dock_detail",
+        "shader_sha256": "1ccb9abddb444d73f02dbf6c3476477aa335d1b8de277111188c90c9927de406",
+        "textures": {
+          "fields": {
+            "mipmaps": true,
+            "path": "res://assets/landmarks/alcatraz_island/ground/alc_ground_fields.png",
+            "size": [
+              1024,
+              1024
+            ]
+          },
+          "surfaces": {
+            "mipmaps": true,
+            "path": "res://assets/landmarks/alcatraz_island/ground/alc_ground_surfaces.png",
+            "size": [
+              1024,
+              1024
+            ]
+          }
+        }
+      }
+    ],
+    "passed": true
+  },
+  "compressed_textures_match_tested_imports": [
+    {
+      "path": ".godot/imported/alc_ground_surfaces.png-ab3eaff195cc90f972844b1c0e79edfd.astc.ctex",
+      "sha256": "ac43aad82a14ff958a882998214d6c1ec8917e6c48ea93d3ca7170ee29054c45",
+      "bytes": 1398180
+    },
+    {
+      "path": ".godot/imported/alc_ground_fields.png-de5ae2813a6f2cabd92100c44c4c94ca.astc.ctex",
+      "sha256": "92a852064b16b6fa1ac679a053332d4f99ee01967281ea1f8b98c337c36b1696",
+      "bytes": 1398180
+    }
+  ],
+  "note": "Two packaged materials decoded; 1024 sizes and mip chains verified. Shader source hash equals delivered shader. Two compressed texture files equal tested Android imports. No physical-phone performance claim."
+}
