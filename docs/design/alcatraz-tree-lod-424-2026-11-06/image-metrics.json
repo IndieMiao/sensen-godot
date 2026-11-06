@@ -1,0 +1,146 @@
+{
+  "alc_tree_a": {
+    "silhouette_iou": 0.93267,
+    "near_bbox_px": [
+      51,
+      258,
+      299,
+      525
+    ],
+    "far_bbox_px": [
+      49,
+      258,
+      301,
+      525
+    ],
+    "maximum_bbox_edge_shift_px": 2,
+    "mean_rgb_absolute_difference_on_intersection_255": 6.61,
+    "note": "Foreground threshold 10/255 from constant background. Descriptive measurements, not an art-approval threshold."
+  },
+  "alc_tree_a_yaw60": {
+    "silhouette_iou": 0.91638,
+    "near_bbox_px": [
+      94,
+      146,
+      302,
+      413
+    ],
+    "far_bbox_px": [
+      96,
+      148,
+      297,
+      412
+    ],
+    "maximum_bbox_edge_shift_px": 5,
+    "mean_rgb_absolute_difference_on_intersection_255": 7.91,
+    "note": "Foreground threshold 10/255 from constant background. Descriptive measurements, not an art-approval threshold."
+  },
+  "alc_tree_a_yaw150": {
+    "silhouette_iou": 0.94071,
+    "near_bbox_px": [
+      58,
+      152,
+      319,
+      426
+    ],
+    "far_bbox_px": [
+      53,
+      150,
+      323,
+      425
+    ],
+    "maximum_bbox_edge_shift_px": 5,
+    "mean_rgb_absolute_difference_on_intersection_255": 5.898,
+    "note": "Foreground threshold 10/255 from constant background. Descriptive measurements, not an art-approval threshold."
+  },
+  "alc_tree_a_yaw240": {
+    "silhouette_iou": 0.92434,
+    "near_bbox_px": [
+      97,
+      93,
+      305,
+      481
+    ],
+    "far_bbox_px": [
+      102,
+      97,
+      303,
+      483
+    ],
+    "maximum_bbox_edge_shift_px": 5,
+    "mean_rgb_absolute_difference_on_intersection_255": 5.968,
+    "note": "Foreground threshold 10/255 from constant background. Descriptive measurements, not an art-approval threshold."
+  },
+  "alc_tree_b": {
+    "silhouette_iou": 0.98785,
+    "near_bbox_px": [
+      73,
+      250,
+      284,
+      529
+    ],
+    "far_bbox_px": [
+      73,
+      251,
+      284,
+      529
+    ],
+    "maximum_bbox_edge_shift_px": 1,
+    "mean_rgb_absolute_difference_on_intersection_255": 2.846,
+    "note": "Foreground threshold 10/255 from constant background. Descriptive measurements, not an art-approval threshold."
+  },
+  "alc_tree_b_yaw60": {
+    "silhouette_iou": 0.99524,
+    "near_bbox_px": [
+      105,
+      136,
+      288,
+      444
+    ],
+    "far_bbox_px": [
+      105,
+      137,
+      288,
+      444
+    ],
+    "maximum_bbox_edge_shift_px": 1,
+    "mean_rgb_absolute_difference_on_intersection_255": 2.389,
+    "note": "Foreground threshold 10/255 from constant background. Descriptive measurements, not an art-approval threshold."
+  },
+  "alc_tree_b_yaw150": {
+    "silhouette_iou": 0.982,
+    "near_bbox_px": [
+      82,
+      148,
+      313,
+      446
+    ],
+    "far_bbox_px": [
+      82,
+      149,
+      313,
+      446
+    ],
+    "maximum_bbox_edge_shift_px": 1,
+    "mean_rgb_absolute_difference_on_intersection_255": 2.459,
+    "note": "Foreground threshold 10/255 from constant background. Descriptive measurements, not an art-approval threshold."
+  },
+  "alc_tree_b_yaw240": {
+    "silhouette_iou": 0.99272,
+    "near_bbox_px": [
+      111,
+      132,
+      294,
+      445
+    ],
+    "far_bbox_px": [
+      111,
+      135,
+      294,
+      445
+    ],
+    "maximum_bbox_edge_shift_px": 3,
+    "mean_rgb_absolute_difference_on_intersection_255": 2.734,
+    "note": "Foreground threshold 10/255 from constant background. Descriptive measurements, not an art-approval threshold."
+  }
+}
