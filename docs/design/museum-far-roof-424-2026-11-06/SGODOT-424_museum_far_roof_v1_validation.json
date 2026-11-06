@@ -1,0 +1,683 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "parent_head": "ebce1cec1d508d3b4b2de496a0f9c50b644e88d7",
+    "checks": [
+      {
+        "check": "Pinned ebce1cec near GLB unchanged",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Far .import and UID byte-identical",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Far manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Measured triangle counts",
+        "passed": true,
+        "evidence": [
+          8757,
+          2205,
+          2239
+        ]
+      },
+      {
+        "check": "Only34 extra triangles",
+        "passed": true,
+        "evidence": 1.5419501133786762
+      },
+      {
+        "check": "One mesh/surface/material",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Mesh name retained",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "No texture/skin/animation/camera",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Original local pivot/unit scale",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Near/far actual AABB match including enlarged vents",
+        "passed": true,
+        "evidence": [
+          [
+            -20.0,
+            0.0,
+            -5.0
+          ],
+          [
+            20.0,
+            9.180000305175781,
+            5.222499847412109
+          ]
+        ]
+      },
+      {
+        "check": "Vent top at9.18m",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "No degenerate triangles",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Winding agrees with outward normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Unit normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "All1941 previous non-roof triangles retain positions/normals/colours, including pictogram",
+        "passed": true,
+        "evidence": {
+          "missing": 0
+        }
+      },
+      {
+        "check": "Far uses exact museum_roof_slate #748B9C",
+        "passed": true,
+        "evidence": 24
+      },
+      {
+        "check": "Near verifies museum_roof_slate #748B9C",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Far uses exact museum_roof_cream #F0E1C2",
+        "passed": true,
+        "evidence": 2258
+      },
+      {
+        "check": "Near verifies museum_roof_cream #F0E1C2",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Far uses exact museum_skylight_blue #A9D5DF",
+        "passed": true,
+        "evidence": 12
+      },
+      {
+        "check": "Near verifies museum_skylight_blue #A9D5DF",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Far uses exact museum_skylight_shade #7FAEBE",
+        "passed": true,
+        "evidence": 12
+      },
+      {
+        "check": "Near verifies museum_skylight_shade #7FAEBE",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Far uses exact museum_skylight_glint #D7EDF0",
+        "passed": true,
+        "evidence": 12
+      },
+      {
+        "check": "Near verifies museum_skylight_glint #D7EDF0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Far uses exact museum_vent_body #5E7383",
+        "passed": true,
+        "evidence": 96
+      },
+      {
+        "check": "Near verifies museum_vent_body #5E7383",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Far uses exact museum_vent_shadow #3F5362",
+        "passed": true,
+        "evidence": 8
+      },
+      {
+        "check": "Near verifies museum_vent_shadow #3F5362",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Flat skylight1 centre/base dimensions",
+        "passed": true,
+        "evidence": [
+          [
+            -13.899999618530273,
+            8.704000473022461,
+            -0.4000000059604645
+          ],
+          [
+            -10.100000381469727,
+            8.704000473022461,
+            1.600000023841858
+          ]
+        ]
+      },
+      {
+        "check": "Flat skylight2 centre/base dimensions",
+        "passed": true,
+        "evidence": [
+          [
+            -1.899999976158142,
+            8.704000473022461,
+            -0.4000000059604645
+          ],
+          [
+            1.899999976158142,
+            8.704000473022461,
+            1.600000023841858
+          ]
+        ]
+      },
+      {
+        "check": "Flat skylight3 centre/base dimensions",
+        "passed": true,
+        "evidence": [
+          [
+            10.100000381469727,
+            8.704000473022461,
+            -0.4000000059604645
+          ],
+          [
+            13.899999618530273,
+            8.704000473022461,
+            1.600000023841858
+          ]
+        ]
+      },
+      {
+        "check": "Vent1 body exact measured envelope",
+        "passed": true,
+        "evidence": [
+          0.96,
+          0.45,
+          0.96
+        ]
+      },
+      {
+        "check": "Vent1 cap exact measured envelope",
+        "passed": true,
+        "evidence": [
+          1.23,
+          0.09,
+          1.23
+        ]
+      },
+      {
+        "check": "Vent2 body exact measured envelope",
+        "passed": true,
+        "evidence": [
+          0.96,
+          0.45,
+          0.96
+        ]
+      },
+      {
+        "check": "Vent2 cap exact measured envelope",
+        "passed": true,
+        "evidence": [
+          1.23,
+          0.09,
+          1.23
+        ]
+      },
+      {
+        "check": "Global manifest only updates far museum entry",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "55m LOD contract retained",
+        "passed": true,
+        "evidence": null
+      }
+    ],
+    "passed": true,
+    "comparisons": {
+      "full": {
+        "object_mean_rgb_255": 0.7210764235327067,
+        "pixels_changed_gt12": 3550,
+        "object_pixels": 152344,
+        "max_channel_255": 123.0
+      },
+      "front": {
+        "object_mean_rgb_255": 1.2613680819238293,
+        "pixels_changed_gt12": 3964,
+        "object_pixels": 115880,
+        "max_channel_255": 104.0
+      },
+      "mobile_wide": {
+        "object_mean_rgb_255": 0.9546007240174939,
+        "pixels_changed_gt12": 3174,
+        "object_pixels": 120347,
+        "max_channel_255": 165.0
+      },
+      "mobile_default": {
+        "object_mean_rgb_255": 0.9477555792791419,
+        "pixels_changed_gt12": 9960,
+        "object_pixels": 262280,
+        "max_channel_255": 177.0
+      },
+      "fixed": {
+        "object_mean_rgb_255": 0.7074165485130144,
+        "pixels_changed_gt12": 3549,
+        "object_pixels": 152344,
+        "max_channel_255": 123.0
+      }
+    },
+    "limitation": "Flat skylight panels intentionally omit near raised silhouette; pane normals match near slopes for lighting. Raster differences are reported, not asserted identical."
+  },
+  "godot": {
+    "checks": [
+      {
+        "check": "Actual mesh triangles match manifest",
+        "evidence": [
+          8757,
+          2239
+        ],
+        "passed": true
+      },
+      {
+        "check": "Far one surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Same imported AABB/pivot",
+        "evidence": [
+          [
+            -20.0,
+            0.0,
+            -5.0
+          ],
+          [
+            -20.0,
+            0.0,
+            -5.0
+          ]
+        ],
+        "passed": true
+      },
+      {
+        "check": "Far about quarter of near",
+        "evidence": 0.255681169350234,
+        "passed": true
+      },
+      {
+        "check": "Import readable",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Godot UID and root_script line",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Texture map mode 1",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "full_54m engine renders expected LOD only",
+        "evidence": 8757,
+        "passed": true
+      },
+      {
+        "check": "full_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "full_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "full_56m engine renders expected LOD only",
+        "evidence": 2239,
+        "passed": true
+      },
+      {
+        "check": "full_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "full_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "front_54m engine renders expected LOD only",
+        "evidence": 8757,
+        "passed": true
+      },
+      {
+        "check": "front_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "front_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "front_56m engine renders expected LOD only",
+        "evidence": 2239,
+        "passed": true
+      },
+      {
+        "check": "front_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "front_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m engine renders expected LOD only",
+        "evidence": 8757,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m engine renders expected LOD only",
+        "evidence": 2239,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_wide_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m engine renders expected LOD only",
+        "evidence": 8757,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_54m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m engine renders expected LOD only",
+        "evidence": 2239,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "mobile_default_56m capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fixed_near engine renders expected LOD only",
+        "evidence": 8757,
+        "passed": true
+      },
+      {
+        "check": "fixed_near one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "fixed_near capture",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fixed_far engine renders expected LOD only",
+        "evidence": 2239,
+        "passed": true
+      },
+      {
+        "check": "fixed_far one visible surface",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "fixed_far capture",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "views": {
+      "fixed_far": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.417911529541,
+          25.3464012145996
+        ],
+        "draws": 1,
+        "pitch": 43,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 2239,
+        "width_m": 43,
+        "yaw": 14.5
+      },
+      "fixed_near": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.417911529541,
+          25.3464031219482
+        ],
+        "draws": 1,
+        "pitch": 43,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 8757,
+        "width_m": 43,
+        "yaw": 14.5
+      },
+      "front_54m": {
+        "aabb_center_distance": 53.9999961853027,
+        "camera": [
+          0.0,
+          22.1053466796875,
+          40.5857238769531
+        ],
+        "draws": 1,
+        "pitch": 8.0,
+        "size": [
+          720,
+          320
+        ],
+        "visible_triangles": 8757,
+        "width_m": 43.0,
+        "yaw": 0.0
+      },
+      "front_56m": {
+        "aabb_center_distance": 55.9999961853027,
+        "camera": [
+          0.0,
+          22.3836936950684,
+          42.5662612915039
+        ],
+        "draws": 1,
+        "pitch": 8.0,
+        "size": [
+          720,
+          320
+        ],
+        "visible_triangles": 2239,
+        "width_m": 43.0,
+        "yaw": 0.0
+      },
+      "full_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.417911529541,
+          25.3464031219482
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 8757,
+        "width_m": 43.0,
+        "yaw": 14.5
+      },
+      "full_56m": {
+        "aabb_center_distance": 56.0,
+        "camera": [
+          10.2545156478882,
+          52.781909942627,
+          26.7625179290771
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          720,
+          620
+        ],
+        "visible_triangles": 2239,
+        "width_m": 43.0,
+        "yaw": 14.5
+      },
+      "mobile_default_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          9.88828277587891,
+          51.417911529541,
+          25.3464031219482
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 8757,
+        "width_m": 6.72,
+        "yaw": 14.5
+      },
+      "mobile_default_56m": {
+        "aabb_center_distance": 56.0,
+        "camera": [
+          10.2545156478882,
+          52.781909942627,
+          26.7625179290771
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 2239,
+        "width_m": 6.72,
+        "yaw": 14.5
+      },
+      "mobile_wide_54m": {
+        "aabb_center_distance": 54.0,
+        "camera": [
+          34.2020301818848,
+          51.417911529541,
+          6.85779762268066
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 8757,
+        "width_m": 20.16,
+        "yaw": 60.0
+      },
+      "mobile_wide_56m": {
+        "aabb_center_distance": 56.0000038146973,
+        "camera": [
+          35.4687728881836,
+          52.781909942627,
+          7.58915138244629
+        ],
+        "draws": 1,
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "visible_triangles": 2239,
+        "width_m": 20.16,
+        "yaw": 60.0
+      }
+    }
+  },
+  "near_parent": "ebce1cec1d508d3b4b2de496a0f9c50b644e88d7",
+  "scope": "Only far roof replacement; near/model imports/layout unchanged. Same-camera and54/56m actual visibility_range captures."
+}

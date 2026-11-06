@@ -18,3 +18,5 @@ output/art-setup/venv/bin/python tools/art/source/alcatraz_museum_far_424/packag
 继承原UID和导入方式，55m按Godot AABB中心测距；相机只沿视线移动、正交大小不变。
 历史b16c3198白模和d7b57574配色/带字版本仅为追溯，新审阅写入docs/v1.1，不覆盖历史图。
 与旧远档/图形的精确差分由../alcatraz_tower_color_424/verify.py补核。
+
+当前屋顶同步版本使用 ../museum_far_roof_424/ 的输入快照、blend和生成器；本目录保留原v1.1无字招牌版本供追溯。

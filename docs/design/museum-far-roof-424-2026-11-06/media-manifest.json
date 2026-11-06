@@ -1,0 +1,17 @@
+[
+  {
+    "file": "SGODOT-424_museum_far_roof_v1_full_54_56.png",
+    "bytes": 87838,
+    "sha256": "85f08749ef384d8ef8a165f353e4b1c91b3d46955b5f079a26e29f9b1d4632e4"
+  },
+  {
+    "file": "SGODOT-424_museum_far_roof_v1_mobile_default_54_56.png",
+    "bytes": 55570,
+    "sha256": "3fc2f7235a15389e62b34fec87c235a0d61f62e46d2ade91160af1a9043ef878"
+  },
+  {
+    "file": "SGODOT-424_museum_far_roof_v1_validation.json",
+    "bytes": 15857,
+    "sha256": "88c06a6b6f5b336dd3199c500546ef5b37d3c9f3e1a8279de0c785e94a885b33"
+  }
+]
