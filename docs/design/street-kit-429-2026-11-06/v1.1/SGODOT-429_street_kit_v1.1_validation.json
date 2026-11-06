@@ -1,0 +1,2750 @@
+{
+  "wood_colour": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "base": "76a13070d750fe3ded43372e6edb897fadc38506",
+    "mapping_srgb": {
+      "BB8B52": "A3815D",
+      "D0A56C": "B89972",
+      "9A7046": "795F47"
+    },
+    "assets": {
+      "bench_wood": {
+        "before_sha256": "f8e704d711101b0b5ffc6bda7c3c45d9e63becca13ea74088e86ded821985831",
+        "after_sha256": "ae68408c032a725dd96bd65926b1140deca06593a063b5fc52c60119f4d6a2aa",
+        "matched_vertices_by_old_srgb": {
+          "BB8B52": 384,
+          "D0A56C": 288,
+          "9A7046": 0
+        },
+        "unchanged_other_colour_vertices": 312,
+        "only_COLOR_0_RGB_bytes_changed": true,
+        "JSON_geometry_normals_indices_alpha_unchanged": true,
+        "triangles": 604
+      },
+      "umbrella_table": {
+        "before_sha256": "2afa80948abe989bf7df0b6de8f63a90cfe2f84688ee2a665d4a28b7d46bf061",
+        "after_sha256": "24b7534f9ac0f5714f0f5a697e1a33332e99ecb7a02a99bf2c5f4b80ecbb36a5",
+        "matched_vertices_by_old_srgb": {
+          "BB8B52": 60,
+          "D0A56C": 48,
+          "9A7046": 16
+        },
+        "unchanged_other_colour_vertices": 296,
+        "only_COLOR_0_RGB_bytes_changed": true,
+        "JSON_geometry_normals_indices_alpha_unchanged": true,
+        "triangles": 522
+      }
+    },
+    "all_16_imports_byte_identical": true,
+    "other_14_glbs_byte_identical": true,
+    "passed": true
+  },
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "lamp_single manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single measured triangle budget",
+        "passed": true,
+        "evidence": 368
+      },
+      {
+        "check": "lamp_single measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "lamp_single fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_single meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double measured triangle budget",
+        "passed": true,
+        "evidence": 652
+      },
+      {
+        "check": "lamp_double measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "lamp_double fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lamp_double meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood measured triangle budget",
+        "passed": true,
+        "evidence": 604
+      },
+      {
+        "check": "bench_wood measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.0091558125706091e-05
+      },
+      {
+        "check": "bench_wood fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood actual seat height",
+        "passed": true,
+        "evidence": 0.7183698415756226
+      },
+      {
+        "check": "bench_wood Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_wood meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone measured triangle budget",
+        "passed": true,
+        "evidence": 352
+      },
+      {
+        "check": "bench_stone measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.10666960477766e-06
+      },
+      {
+        "check": "bench_stone fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone actual seat height",
+        "passed": true,
+        "evidence": 0.7149999737739563
+      },
+      {
+        "check": "bench_stone Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bench_stone meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m measured triangle budget",
+        "passed": true,
+        "evidence": 184
+      },
+      {
+        "check": "railing_straight_2m measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "railing_straight_2m fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_straight_2m meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost measured triangle budget",
+        "passed": true,
+        "evidence": 136
+      },
+      {
+        "check": "railing_endpost measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "railing_endpost fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_endpost meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner measured triangle budget",
+        "passed": true,
+        "evidence": 312
+      },
+      {
+        "check": "railing_corner measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "railing_corner fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "railing_corner meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard measured triangle budget",
+        "passed": true,
+        "evidence": 154
+      },
+      {
+        "check": "bollard measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "bollard fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bollard meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square measured triangle budget",
+        "passed": true,
+        "evidence": 408
+      },
+      {
+        "check": "planter_square measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.10666960477766e-06
+      },
+      {
+        "check": "planter_square fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_square meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long measured triangle budget",
+        "passed": true,
+        "evidence": 568
+      },
+      {
+        "check": "planter_long measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.10666960477766e-06
+      },
+      {
+        "check": "planter_long fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "planter_long meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin measured triangle budget",
+        "passed": true,
+        "evidence": 536
+      },
+      {
+        "check": "litter_bin measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "litter_bin fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "litter_bin meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing measured triangle budget",
+        "passed": true,
+        "evidence": 208
+      },
+      {
+        "check": "sign_standing measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "sign_standing fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_standing meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall measured triangle budget",
+        "passed": true,
+        "evidence": 148
+      },
+      {
+        "check": "sign_wall measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 7.744889471428022e-06
+      },
+      {
+        "check": "sign_wall fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall rear-centre wall pivot",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "sign_wall meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack measured triangle budget",
+        "passed": true,
+        "evidence": 472
+      },
+      {
+        "check": "bicycle_rack measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "bicycle_rack fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "bicycle_rack meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table measured triangle budget",
+        "passed": true,
+        "evidence": 522
+      },
+      {
+        "check": "umbrella_table measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "umbrella_table fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table actual seat height",
+        "passed": true,
+        "evidence": 0.7149999737739563
+      },
+      {
+        "check": "umbrella_table Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "umbrella_table meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain measured triangle budget",
+        "passed": true,
+        "evidence": 346
+      },
+      {
+        "check": "drinking_fountain measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.311333753703327e-06
+      },
+      {
+        "check": "drinking_fountain fits2m placement cell",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "drinking_fountain meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "All sixteen modules",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Unique generated GLB UIDs",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Importer UID included",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Kit has no image duplication or assembled runtime scene/layout",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Railing exactly2m endpoints",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Corner endpoints at1m on both axes",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "No original tracked files changed, including Alcatraz/Grace",
+        "passed": true,
+        "evidence": {
+          "base": "647c8cb584d42714b81e066b6c1eff5681e653fd",
+          "unexpected": []
+        }
+      },
+      {
+        "check": "Review ground fixture byte-identical to #830",
+        "passed": true,
+        "evidence": {
+          "commit": "54b76f78f78eff3f992365c934586e170bd15fb1",
+          "files": 13
+        }
+      }
+    ],
+    "passed": true,
+    "assets": {
+      "lamp_single": {
+        "triangles": 368,
+        "bounds": [
+          [
+            -0.23000000417232513,
+            0.0,
+            -0.23000000417232513
+          ],
+          [
+            0.23000000417232513,
+            3.4200000762939453,
+            0.23000000417232513
+          ]
+        ],
+        "bytes": 9984
+      },
+      "lamp_double": {
+        "triangles": 652,
+        "bounds": [
+          [
+            -0.8799999952316284,
+            0.0,
+            -0.23000000417232513
+          ],
+          [
+            0.8799999952316284,
+            3.390000104904175,
+            0.23000000417232513
+          ]
+        ],
+        "bytes": 16812
+      },
+      "bench_wood": {
+        "triangles": 604,
+        "bounds": [
+          [
+            -0.8999999761581421,
+            0.0,
+            -0.36911261081695557
+          ],
+          [
+            0.8999999761581421,
+            1.2777808904647827,
+            0.30273598432540894
+          ]
+        ],
+        "bytes": 36432
+      },
+      "bench_stone": {
+        "triangles": 352,
+        "bounds": [
+          [
+            -0.8999999761581421,
+            0.0,
+            -0.3349999785423279
+          ],
+          [
+            0.8999999761581421,
+            1.2899999618530273,
+            0.3100000023841858
+          ]
+        ],
+        "bytes": 28004
+      },
+      "railing_straight_2m": {
+        "triangles": 184,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.03200000151991844
+          ],
+          [
+            1.0,
+            0.9577128291130066,
+            0.03200000151991844
+          ]
+        ],
+        "bytes": 6056
+      },
+      "railing_endpost": {
+        "triangles": 136,
+        "bounds": [
+          [
+            -0.10000000149011612,
+            0.0,
+            -0.10000000149011612
+          ],
+          [
+            0.10000000149011612,
+            1.0800000429153442,
+            0.10000000149011612
+          ]
+        ],
+        "bytes": 4440
+      },
+      "railing_corner": {
+        "triangles": 312,
+        "bounds": [
+          [
+            -0.10000000149011612,
+            0.0,
+            -0.10000000149011612
+          ],
+          [
+            1.0,
+            1.0800000429153442,
+            1.0
+          ]
+        ],
+        "bytes": 8920
+      },
+      "bollard": {
+        "triangles": 154,
+        "bounds": [
+          [
+            -0.14000000059604645,
+            0.0,
+            -0.13314791023731232
+          ],
+          [
+            0.14000000059604645,
+            0.7300000190734863,
+            0.13314791023731232
+          ]
+        ],
+        "bytes": 4812
+      },
+      "planter_square": {
+        "triangles": 408,
+        "bounds": [
+          [
+            -0.44200000166893005,
+            0.0,
+            -0.44200000166893005
+          ],
+          [
+            0.44200000166893005,
+            1.2949999570846558,
+            0.44200000166893005
+          ]
+        ],
+        "bytes": 34820
+      },
+      "planter_long": {
+        "triangles": 568,
+        "bounds": [
+          [
+            -0.9879999756813049,
+            0.0,
+            -0.30160000920295715
+          ],
+          [
+            0.9879999756813049,
+            1.1799999475479126,
+            0.30160000920295715
+          ]
+        ],
+        "bytes": 51264
+      },
+      "litter_bin": {
+        "triangles": 536,
+        "bounds": [
+          [
+            -0.30000001192092896,
+            0.0,
+            -0.30000001192092896
+          ],
+          [
+            0.30000001192092896,
+            0.8999999761581421,
+            0.30000001192092896
+          ]
+        ],
+        "bytes": 20276
+      },
+      "sign_standing": {
+        "triangles": 208,
+        "bounds": [
+          [
+            -0.574999988079071,
+            0.0,
+            -0.11999999731779099
+          ],
+          [
+            0.574999988079071,
+            1.909999966621399,
+            0.1420000046491623
+          ]
+        ],
+        "bytes": 10756
+      },
+      "sign_wall": {
+        "triangles": 148,
+        "bounds": [
+          [
+            -0.574999988079071,
+            -0.28999999165534973,
+            -0.0
+          ],
+          [
+            0.574999988079071,
+            0.28999999165534973,
+            0.1420000046491623
+          ]
+        ],
+        "bytes": 9360
+      },
+      "bicycle_rack": {
+        "triangles": 472,
+        "bounds": [
+          [
+            -0.9200000166893005,
+            0.0,
+            -0.36000001430511475
+          ],
+          [
+            0.9200000166893005,
+            0.9279999732971191,
+            0.36000001430511475
+          ]
+        ],
+        "bytes": 16632
+      },
+      "umbrella_table": {
+        "triangles": 522,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          [
+            1.0,
+            2.859999895095825,
+            1.0
+          ]
+        ],
+        "bytes": 17828
+      },
+      "drinking_fountain": {
+        "triangles": 346,
+        "bounds": [
+          [
+            -0.28999999165534973,
+            0.0,
+            -0.28999999165534973
+          ],
+          [
+            0.28999999165534973,
+            1.193720817565918,
+            0.28999999165534973
+          ]
+        ],
+        "bytes": 9268
+      }
+    },
+    "unique_triangles": 5970,
+    "unique_surfaces": 16,
+    "base_commit": "647c8cb584d42714b81e066b6c1eff5681e653fd"
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "source_height_m": 1.71833898495782
+    },
+    "captures": [
+      {
+        "camera_width": 6.71999979019165,
+        "file": "example_360.png",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ]
+      },
+      {
+        "camera_width": 15.8000001907349,
+        "file": "example_overview.png",
+        "pitch": 42.9999961853027,
+        "size": [
+          1400,
+          1100
+        ]
+      },
+      {
+        "camera_width": 6.3270001411438,
+        "file": "catalog_lamp_single.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 6.27150011062622,
+        "file": "catalog_lamp_double.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.89999985694885,
+        "file": "catalog_bench_wood.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.89999985694885,
+        "file": "catalog_bench_stone.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 4.09999990463257,
+        "file": "catalog_railing_straight_2m.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.22825002670288,
+        "file": "catalog_railing_endpost.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.22825002670288,
+        "file": "catalog_railing_corner.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.22825002670288,
+        "file": "catalog_bollard.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.22825002670288,
+        "file": "catalog_planter_square.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 4.07599973678589,
+        "file": "catalog_planter_long.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.22825002670288,
+        "file": "catalog_litter_bin.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.53349995613098,
+        "file": "catalog_sign_standing.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.25,
+        "file": "catalog_sign_wall.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.94000005722046,
+        "file": "catalog_bicycle_rack.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 5.29099988937378,
+        "file": "catalog_umbrella_table.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.22825002670288,
+        "file": "catalog_drinking_fountain.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      }
+    ],
+    "catalog": {
+      "bench_stone": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.899999976158142,
+            0.0,
+            -0.334999978542328
+          ],
+          [
+            0.899999976158142,
+            1.28999996185303,
+            0.310000002384186
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 352.0
+      },
+      "bench_wood": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.899999976158142,
+            0.0,
+            -0.369112610816956
+          ],
+          [
+            0.899999976158142,
+            1.27778089046478,
+            0.302735984325409
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 604.0
+      },
+      "bicycle_rack": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.9200000166893,
+            0.0,
+            -0.360000014305115
+          ],
+          [
+            0.9200000166893,
+            0.927999973297119,
+            0.360000014305115
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 472.0
+      },
+      "bollard": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.140000000596046,
+            0.0,
+            -0.133147910237312
+          ],
+          [
+            0.140000000596046,
+            0.730000019073486,
+            0.133147910237312
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 154.0
+      },
+      "drinking_fountain": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.28999999165535,
+            0.0,
+            -0.28999999165535
+          ],
+          [
+            0.28999999165535,
+            1.19372081756592,
+            0.28999999165535
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 346.0
+      },
+      "lamp_double": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.879999995231628,
+            0.0,
+            -0.230000004172325
+          ],
+          [
+            0.879999995231628,
+            3.39000010490417,
+            0.230000004172325
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 652.0
+      },
+      "lamp_single": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.230000004172325,
+            0.0,
+            -0.230000004172325
+          ],
+          [
+            0.230000004172325,
+            3.42000007629395,
+            0.230000004172325
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 368.0
+      },
+      "litter_bin": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.300000011920929,
+            0.0,
+            -0.300000011920929
+          ],
+          [
+            0.300000011920929,
+            0.899999976158142,
+            0.300000011920929
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 536.0
+      },
+      "planter_long": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.987999975681305,
+            0.0,
+            -0.301600009202957
+          ],
+          [
+            0.987999975681305,
+            1.17999994754791,
+            0.301600009202957
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 568.0
+      },
+      "planter_square": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.44200000166893,
+            0.0,
+            -0.44200000166893
+          ],
+          [
+            0.44200000166893,
+            1.29499995708466,
+            0.44200000166893
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 408.0
+      },
+      "railing_corner": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.100000001490116,
+            0.0,
+            -0.100000001490116
+          ],
+          [
+            1.0,
+            1.08000004291534,
+            1.0
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 312.0
+      },
+      "railing_endpost": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.100000001490116,
+            0.0,
+            -0.100000001490116
+          ],
+          [
+            0.100000001490116,
+            1.08000004291534,
+            0.100000001490116
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 136.0
+      },
+      "railing_straight_2m": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.0320000015199184
+          ],
+          [
+            1.0,
+            0.957712829113007,
+            0.0320000015199184
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 184.0
+      },
+      "sign_standing": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.574999988079071,
+            0.0,
+            -0.119999997317791
+          ],
+          [
+            0.574999988079071,
+            1.9099999666214,
+            0.142000004649162
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 208.0
+      },
+      "sign_wall": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.574999988079071,
+            -0.28999999165535,
+            0.0
+          ],
+          [
+            0.574999988079071,
+            0.28999999165535,
+            0.142000004649162
+          ]
+        ],
+        "pose_lift_m": 0.28999999165535,
+        "triangles": 148.0
+      },
+      "umbrella_table": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          [
+            1.0,
+            2.85999989509583,
+            1.0
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 522.0
+      }
+    },
+    "checks": [
+      {
+        "check": "lamp_single one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_single matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_single no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_single triangle budget",
+        "evidence": 368,
+        "passed": true
+      },
+      {
+        "check": "lamp_single single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_double one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_double matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_double no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lamp_double triangle budget",
+        "evidence": 652,
+        "passed": true
+      },
+      {
+        "check": "lamp_double single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_wood one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_wood matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_wood no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_wood triangle budget",
+        "evidence": 604,
+        "passed": true
+      },
+      {
+        "check": "bench_wood single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_stone one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_stone matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_stone no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bench_stone triangle budget",
+        "evidence": 352,
+        "passed": true
+      },
+      {
+        "check": "bench_stone single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m triangle budget",
+        "evidence": 184,
+        "passed": true
+      },
+      {
+        "check": "railing_straight_2m single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost triangle budget",
+        "evidence": 136,
+        "passed": true
+      },
+      {
+        "check": "railing_endpost single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_corner one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_corner matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_corner no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "railing_corner triangle budget",
+        "evidence": 312,
+        "passed": true
+      },
+      {
+        "check": "railing_corner single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bollard one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bollard matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bollard no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bollard triangle budget",
+        "evidence": 154,
+        "passed": true
+      },
+      {
+        "check": "bollard single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_square one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_square matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_square no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_square triangle budget",
+        "evidence": 408,
+        "passed": true
+      },
+      {
+        "check": "planter_square single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_long one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_long matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_long no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "planter_long triangle budget",
+        "evidence": 568,
+        "passed": true
+      },
+      {
+        "check": "planter_long single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "litter_bin one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "litter_bin matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "litter_bin no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "litter_bin triangle budget",
+        "evidence": 536,
+        "passed": true
+      },
+      {
+        "check": "litter_bin single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_standing one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_standing matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_standing no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_standing triangle budget",
+        "evidence": 208,
+        "passed": true
+      },
+      {
+        "check": "sign_standing single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_wall one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_wall matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_wall no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "sign_wall triangle budget",
+        "evidence": 148,
+        "passed": true
+      },
+      {
+        "check": "sign_wall single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack triangle budget",
+        "evidence": 472,
+        "passed": true
+      },
+      {
+        "check": "bicycle_rack single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table triangle budget",
+        "evidence": 522,
+        "passed": true
+      },
+      {
+        "check": "umbrella_table single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain triangle budget",
+        "evidence": 346,
+        "passed": true
+      },
+      {
+        "check": "drinking_fountain single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "All sixteen requested modules",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Default avatar assembled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Left corner/straight endpoint coincident",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Right corner/straight endpoint coincident",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Pinned #830 paving material loaded",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Example uses every furniture module",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture example_360",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture example_overview",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lamp_single",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lamp_double",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_bench_wood",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_bench_stone",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_railing_straight_2m",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_railing_endpost",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_railing_corner",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_bollard",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_planter_square",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_planter_long",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_litter_bin",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_sign_standing",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_sign_wall",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_bicycle_rack",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_umbrella_table",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_drinking_fountain",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "example": {
+      "game_layout_exported": false,
+      "ground_path": "assets/landmarks/_shared/ground_detail/ground_paving.tres",
+      "ground_review_commit": "54b76f78f78eff3f992365c934586e170bd15fb1",
+      "kit_pieces": {
+        "bench_stone": 1,
+        "bench_wood": 1,
+        "bicycle_rack": 1,
+        "bollard": 4,
+        "drinking_fountain": 1,
+        "lamp_double": 1,
+        "lamp_single": 1,
+        "litter_bin": 1,
+        "planter_long": 1,
+        "planter_square": 1,
+        "railing_corner": 2,
+        "railing_endpost": 4,
+        "railing_straight_2m": 2,
+        "sign_standing": 1,
+        "sign_wall": 1,
+        "umbrella_table": 1
+      },
+      "paved_footprint_m": [
+        6,
+        12
+      ],
+      "surfaces_including_review_ground_and_mount": 27,
+      "triangles_including_review_ground_and_mount": 7372
+    },
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  },
+  "cold_import": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "passed": true,
+    "fresh_cache": true,
+    "exit_code": 0,
+    "etc2_astc_enabled": true,
+    "source_kit_unchanged": true,
+    "workspace_status_unchanged": true,
+    "fixture_file_changes": [],
+    "fixture_files_checked": 52,
+    "street_kit_textures": 0,
+    "ground_dependency_images_have_mobile_formats": true,
+    "ground_commit": "54b76f78f78eff3f992365c934586e170bd15fb1"
+  },
+  "scope": "Only new street-kit files; plaza ground pinned to #830 is an isolated review dependency, not delivered runtime integration."
+}

@@ -1,0 +1,40 @@
+{
+  "reference": "landmark_alcatraz_v2.jpg / c_alc2.png",
+  "intent": "Warm limestone museum, light sand paths, yellow-green garden terraces and blue-green bay; matte vertex color.",
+  "colors": {
+    "stone": "CBB48F",
+    "stone_light": "D9C4A3",
+    "stone_shade": "BCA781",
+    "rock": "AD9D86",
+    "rock_light": "C0B099",
+    "rock_shadow": "948A78",
+    "rock_warm": "B6A189",
+    "garden": "86A84F",
+    "garden_light": "9AB55D",
+    "garden_dark": "759448",
+    "road": "DFCBA7",
+    "building": "DEC59B",
+    "trim": "F0E1C2",
+    "roof": "A4A08F",
+    "glass": "608F99",
+    "glass_light": "86B0B3",
+    "wood": "BB8B52",
+    "wood_light": "D0A56C",
+    "wood_dark": "9A7046",
+    "wood_seam": "795B43",
+    "dark": "4E6769",
+    "bird": "EEEDE6",
+    "bridge": "C76845",
+    "far": "B4C2C8",
+    "sign_teal": "35696A",
+    "sign_cream": "FFF0CA",
+    "flower_yellow": "DFC570",
+    "soil": "897A53"
+  },
+  "water": {
+    "near": "439BB0",
+    "deep": "31849F",
+    "far_fill": "67AFC2"
+  },
+  "limits": "Art palette under existing scene lighting; original concept supplies colour direction, written brief supplies physical dimensions."
+}

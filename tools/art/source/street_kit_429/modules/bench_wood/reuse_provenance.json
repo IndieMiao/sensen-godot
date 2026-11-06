@@ -1,0 +1,9 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "module": "bench_wood",
+  "geometry": "New modular geometry; no old GLB edited",
+  "palette": "#830 v1.1 wood A3815D/B89972/795F47; Alcatraz/Grace iron and other colours unchanged",
+  "source": "tools/art/source/street_kit_429/bench_wood.blend",
+  "generator": "tools/art/source/street_kit_429/build.py"
+}

@@ -1,0 +1,572 @@
+{
+  "task": "SGODOT-429",
+  "revision": "v1.2",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "grid_m": 2,
+  "units": "metres; Y up; +Z front",
+  "palette_srgb": {
+    "stone": "CBB48F",
+    "stone_light": "D9C4A3",
+    "stone_shade": "BCA781",
+    "cream": "F0E1C2",
+    "wood": "BB8B52",
+    "wood_light": "D0A56C",
+    "wood_dark": "9A7046",
+    "wood_seam": "795B43",
+    "metal": "5D4C38",
+    "metal_light": "6D5746",
+    "teal": "35696A",
+    "teal_light": "608F99",
+    "lamp": "F2DC9F",
+    "sage": "8AAFA2",
+    "canvas": "EFE7D4",
+    "leaf": "86A84F",
+    "leaf_light": "9AB55D",
+    "leaf_dark": "759448",
+    "flower": "DFC570",
+    "soil": "897A53",
+    "basin": "A4A08F",
+    "drain": "4E4C43",
+    "furniture_wood": "A3815D",
+    "furniture_wood_light": "B89972",
+    "furniture_wood_dark": "795F47"
+  },
+  "assets": {
+    "lamp_single": {
+      "file": "lamp_single.glb",
+      "triangles": 368,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.23000000417232513,
+          0.0,
+          -0.23000000417232513
+        ],
+        [
+          0.23000000417232513,
+          3.4200000762939453,
+          0.23000000417232513
+        ]
+      ],
+      "dimensions_m": [
+        0.46000000834465027,
+        3.4200000762939453,
+        0.46000000834465027
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/lamp_single.blend",
+      "sha256": "f6009405f517de819035068d8020d4d7a1422c027b3cc747e313459deab89eb6",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "lamp_style": "Opaque warm glass, no light/emission node"
+    },
+    "lamp_double": {
+      "file": "lamp_double.glb",
+      "triangles": 652,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.8799999952316284,
+          0.0,
+          -0.23000000417232513
+        ],
+        [
+          0.8799999952316284,
+          3.390000104904175,
+          0.23000000417232513
+        ]
+      ],
+      "dimensions_m": [
+        1.7599999904632568,
+        3.390000104904175,
+        0.46000000834465027
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/lamp_double.blend",
+      "sha256": "5f9fcf2a247235630d9cde230f2b007444d0f3bfd8834cc6ab9d1985ddc53aae",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "lamp_style": "Opaque warm glass, no light/emission node"
+    },
+    "bench_wood": {
+      "file": "bench_wood.glb",
+      "triangles": 604,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.8999999761581421,
+          0.0,
+          -0.36911261081695557
+        ],
+        [
+          0.8999999761581421,
+          1.2777808904647827,
+          0.30273598432540894
+        ]
+      ],
+      "dimensions_m": [
+        1.7999999523162842,
+        1.2777808904647827,
+        0.6718485951423645
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/bench_wood.blend",
+      "sha256": "ae68408c032a725dd96bd65926b1140deca06593a063b5fc52c60119f4d6a2aa",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "seat_height_m": 0.7183698415756226,
+      "front": "+Z",
+      "usable_seat_width_m": 1.8
+    },
+    "bench_stone": {
+      "file": "bench_stone.glb",
+      "triangles": 352,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.8999999761581421,
+          0.0,
+          -0.3349999785423279
+        ],
+        [
+          0.8999999761581421,
+          1.2899999618530273,
+          0.3100000023841858
+        ]
+      ],
+      "dimensions_m": [
+        1.7999999523162842,
+        1.2899999618530273,
+        0.6449999809265137
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/bench_stone.blend",
+      "sha256": "4aa457f4fbdb242e8fd9f9aa951ffe440001941b5c0ed311aa304db514c6ded8",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "seat_height_m": 0.715,
+      "front": "+Z",
+      "usable_seat_width_m": 1.8
+    },
+    "railing_straight_2m": {
+      "file": "railing_straight_2m.glb",
+      "triangles": 184,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.03200000151991844
+        ],
+        [
+          1.0,
+          0.9577128291130066,
+          0.03200000151991844
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        0.9577128291130066,
+        0.06400000303983688
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/railing_straight_2m.blend",
+      "sha256": "eddbacf6d49eab86c1d473f36ed111f0214c622d952689765f92e17abe82ee6a",
+      "grid_m": 2,
+      "connectors": {
+        "left": [
+          -1,
+          0,
+          0
+        ],
+        "right": [
+          1,
+          0,
+          0
+        ]
+      },
+      "post_policy": "Place separate endposts on exposed endpoints; consecutive spans share a post"
+    },
+    "railing_endpost": {
+      "file": "railing_endpost.glb",
+      "triangles": 136,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.10000000149011612,
+          0.0,
+          -0.10000000149011612
+        ],
+        [
+          0.10000000149011612,
+          1.0800000429153442,
+          0.10000000149011612
+        ]
+      ],
+      "dimensions_m": [
+        0.20000000298023224,
+        1.0800000429153442,
+        0.20000000298023224
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/railing_endpost.blend",
+      "sha256": "92946285a8d917fcd02ff671359f18ca46d8a83fac7c6078619af60ae1db42db",
+      "attachment_axis": "post centre",
+      "height_m": 1.08
+    },
+    "railing_corner": {
+      "file": "railing_corner.glb",
+      "triangles": 312,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.10000000149011612,
+          0.0,
+          -0.10000000149011612
+        ],
+        [
+          1.0,
+          1.0800000429153442,
+          1.0
+        ]
+      ],
+      "dimensions_m": [
+        1.1000000014901161,
+        1.0800000429153442,
+        1.1000000014901161
+      ],
+      "pivot": "bend at bottom; arms +X,+Z",
+      "source": "tools/art/source/street_kit_429/railing_corner.blend",
+      "sha256": "904dc08d5968440c78e7615662390b4a8e3182370aeb0b8bbedac08fb190bd5d",
+      "grid_m": 2,
+      "corner_arm_m": 1,
+      "connectors": {
+        "x_end": [
+          1,
+          0,
+          0
+        ],
+        "z_end": [
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    "bollard": {
+      "file": "bollard.glb",
+      "triangles": 140,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.14000000059604645,
+          0.0,
+          -0.14000000059604645
+        ],
+        [
+          0.14000000059604645,
+          0.7300000190734863,
+          0.14000000059604645
+        ]
+      ],
+      "dimensions_m": [
+        0.2800000011920929,
+        0.7300000190734863,
+        0.2800000011920929
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/bollard.blend",
+      "sha256": "add9443544f5e0805cb5789a15f0c26ba136a80f968ae8c9bd8254da6e8dd4a2",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "height_m": 0.73,
+      "cap_material": "cream limestone #F0E1C2",
+      "cap_dimensions_m": [
+        0.28,
+        0.12,
+        0.28
+      ],
+      "cap_center_m": [
+        0,
+        0.67,
+        0
+      ]
+    },
+    "planter_square": {
+      "file": "planter_square.glb",
+      "triangles": 408,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.44200000166893005,
+          0.0,
+          -0.44200000166893005
+        ],
+        [
+          0.44200000166893005,
+          1.2949999570846558,
+          0.44200000166893005
+        ]
+      ],
+      "dimensions_m": [
+        0.8840000033378601,
+        1.2949999570846558,
+        0.8840000033378601
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/planter_square.blend",
+      "sha256": "6c21042b08c000aa7c5b97c6c34c306fd4a9d4b3f721a53011ec338279d7c343",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "contains": "Planter, inset soil and compact foliage merged as one mesh"
+    },
+    "planter_long": {
+      "file": "planter_long.glb",
+      "triangles": 568,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.9879999756813049,
+          0.0,
+          -0.30160000920295715
+        ],
+        [
+          0.9879999756813049,
+          1.1799999475479126,
+          0.30160000920295715
+        ]
+      ],
+      "dimensions_m": [
+        1.9759999513626099,
+        1.1799999475479126,
+        0.6032000184059143
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/planter_long.blend",
+      "sha256": "ea3cb6ba184b0d7104049d9b0180a62af752c6d3278af18f70f4feb355980b9f",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "contains": "Planter, inset soil and compact foliage merged as one mesh"
+    },
+    "litter_bin": {
+      "file": "litter_bin.glb",
+      "triangles": 536,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.30000001192092896,
+          0.0,
+          -0.30000001192092896
+        ],
+        [
+          0.30000001192092896,
+          0.8999999761581421,
+          0.30000001192092896
+        ]
+      ],
+      "dimensions_m": [
+        0.6000000238418579,
+        0.8999999761581421,
+        0.6000000238418579
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/litter_bin.blend",
+      "sha256": "d9b6c51ee7e2f0e54ddfeb3f4b8eaee9343e6046aa9f64cc2d06c9e53c00767f",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "height_m": 0.9
+    },
+    "sign_standing": {
+      "file": "sign_standing.glb",
+      "triangles": 208,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.574999988079071,
+          0.0,
+          -0.11999999731779099
+        ],
+        [
+          0.574999988079071,
+          1.909999966621399,
+          0.1420000046491623
+        ]
+      ],
+      "dimensions_m": [
+        1.149999976158142,
+        1.909999966621399,
+        0.2620000019669533
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/sign_standing.blend",
+      "sha256": "691837edd24d20845c3b121c7879f3c5f63d3373f24913da6dfa25e63c135eb1",
+      "graphic_area_m": [
+        1.01,
+        0.44
+      ],
+      "graphic_area_center": [
+        0,
+        1.62,
+        0.125
+      ],
+      "content": "Blank; circular inset is a reserved graphic field, no letters/icon baked",
+      "placement_cell_m": [
+        2,
+        2
+      ]
+    },
+    "sign_wall": {
+      "file": "sign_wall.glb",
+      "triangles": 148,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.574999988079071,
+          -0.28999999165534973,
+          -0.0
+        ],
+        [
+          0.574999988079071,
+          0.28999999165534973,
+          0.1420000046491623
+        ]
+      ],
+      "dimensions_m": [
+        1.149999976158142,
+        0.5799999833106995,
+        0.1420000046491623
+      ],
+      "pivot": "back plane centre; +Z front",
+      "source": "tools/art/source/street_kit_429/sign_wall.blend",
+      "sha256": "48cf9050d098ece3495f0756d6921def757200d3f0bba68bc45dd0d7f869c8c2",
+      "graphic_area_m": [
+        1.01,
+        0.44
+      ],
+      "graphic_area_center": [
+        0,
+        0,
+        0.125
+      ],
+      "content": "Blank; circular inset is a reserved graphic field, no letters/icon baked",
+      "placement_cell_m": [
+        2,
+        2
+      ]
+    },
+    "bicycle_rack": {
+      "file": "bicycle_rack.glb",
+      "triangles": 472,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.9200000166893005,
+          0.0,
+          -0.36000001430511475
+        ],
+        [
+          0.9200000166893005,
+          0.9279999732971191,
+          0.36000001430511475
+        ]
+      ],
+      "dimensions_m": [
+        1.840000033378601,
+        0.9279999732971191,
+        0.7200000286102295
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/bicycle_rack.blend",
+      "sha256": "258cc2d3635d8969416bdc8dee558cebb48fe26f2f6ed154ec992848f5d7edea",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "front": "+Z; three bicycle bays across X"
+    },
+    "umbrella_table": {
+      "file": "umbrella_table.glb",
+      "triangles": 522,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.949999988079071,
+          0.0,
+          -0.800000011920929
+        ],
+        [
+          0.949999988079071,
+          2.859999895095825,
+          0.800000011920929
+        ]
+      ],
+      "dimensions_m": [
+        1.899999976158142,
+        2.859999895095825,
+        1.600000023841858
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/umbrella_table.blend",
+      "sha256": "89e17a0c369a315da5e5440ab1abfa73033fa927432e1f95dace4769d8bd7e7a",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "canopy_diameter_m": 1.6,
+      "tabletop_height_m": 1.12,
+      "seat_height_m": 0.715
+    },
+    "drinking_fountain": {
+      "file": "drinking_fountain.glb",
+      "triangles": 346,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.28999999165534973,
+          0.0,
+          -0.28999999165534973
+        ],
+        [
+          0.28999999165534973,
+          1.193720817565918,
+          0.28999999165534973
+        ]
+      ],
+      "dimensions_m": [
+        0.5799999833106995,
+        1.193720817565918,
+        0.5799999833106995
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/street_kit_429/drinking_fountain.blend",
+      "sha256": "0ae63705573aceac380bb19f421b558abbba98ea91fc9429fa3a1bb20a659fbc",
+      "placement_cell_m": [
+        2,
+        2
+      ],
+      "bowl_height_m": 1.05,
+      "front": "+Z",
+      "water": "No particles, water surface or runtime interaction"
+    }
+  },
+  "unique_triangles": 5956,
+  "unique_surfaces": 16,
+  "scope": "Reusable furniture only; example is review-only, no game layout or location"
+}
