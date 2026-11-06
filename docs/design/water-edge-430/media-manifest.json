@@ -1,0 +1,30 @@
+{
+  "default-review.png": {
+    "bytes": 57422,
+    "sha256": "07fd78351f534eb820833031ed49ed7ca03b0dc4caff1b44f78373445a5e8937"
+  },
+  "coast-overview.png": {
+    "bytes": 108547,
+    "sha256": "ab25199b9e5a6a3f73be06bee939aaa85c4c44a9032032c912d75e9389351ef1"
+  },
+  "close-review.png": {
+    "bytes": 100665,
+    "sha256": "71172f34ddfe2ae4eb45b91af07584aa6ea7b66c4469df9155e4acadc2d0f992"
+  },
+  "steps-review.png": {
+    "bytes": 112409,
+    "sha256": "97ea5c0689f7adebc97210005d95205fd9d06d0486180d800dc8eb63bdc79902"
+  },
+  "motion-review.gif": {
+    "bytes": 1605900,
+    "sha256": "3706337f54db067d3502ecba1a31ec316322dc9b55d1e5c9ba743f1342544f81"
+  },
+  "motion-review.apng": {
+    "bytes": 3662055,
+    "sha256": "9a5a0070d15f0065bd00a675ac1d73849f2dd2d06431dec9c8d02b4b460684c2"
+  },
+  "android-default.png": {
+    "bytes": 54908,
+    "sha256": "2eed7ca072113194a8b0868130b176a78eaa38384f821e1c0f23d827e7164346"
+  }
+}

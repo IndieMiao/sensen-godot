@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://assets/landmarks/_shared/water_edge/water_edge.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://assets/landmarks/_shared/water_edge/water_edge_soft.png" id="2"]
+
+[resource]
+render_priority = 1
+shader = ExtResource("1")
+shader_parameter/foam_texture = ExtResource("2")
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/intensity = 0.8
+shader_parameter/cycle_speed_hz = 0.25
+shader_parameter/drift_uv = 0.018
+shader_parameter/breath_amount = 0.06
+shader_parameter/end_fade_uv = Vector2(0, 0)

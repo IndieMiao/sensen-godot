@@ -1,0 +1,133 @@
+{
+	"captures": [
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 22,
+			"name": "default-review",
+			"triangles": 8980,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				360,
+				800
+			],
+			"draws": 14,
+			"name": "default-control-no-foam",
+			"triangles": 8612,
+			"width_m": 6.71999979019165
+		},
+		{
+			"dimensions": [
+				1000,
+				800
+			],
+			"draws": 22,
+			"name": "coast-overview",
+			"triangles": 9714,
+			"width_m": 10.6000003814697
+		},
+		{
+			"dimensions": [
+				900,
+				700
+			],
+			"draws": 20,
+			"name": "close-review",
+			"triangles": 9586,
+			"width_m": 5.19999980926514
+		},
+		{
+			"dimensions": [
+				900,
+				650
+			],
+			"draws": 13,
+			"name": "steps-review",
+			"triangles": 738,
+			"width_m": 4.19999980926514
+		},
+		{
+			"dimensions": [
+				700,
+				650
+			],
+			"draws": 9,
+			"name": "pile-review",
+			"triangles": 7510,
+			"width_m": 2.09999990463257
+		}
+	],
+	"checks": [
+		{
+			"check": "avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "default-review: size",
+			"passed": true
+		},
+		{
+			"check": "default-review: save",
+			"passed": true
+		},
+		{
+			"check": "default-control-no-foam: size",
+			"passed": true
+		},
+		{
+			"check": "default-control-no-foam: save",
+			"passed": true
+		},
+		{
+			"check": "coast-overview: size",
+			"passed": true
+		},
+		{
+			"check": "coast-overview: save",
+			"passed": true
+		},
+		{
+			"check": "close-review: size",
+			"passed": true
+		},
+		{
+			"check": "close-review: save",
+			"passed": true
+		},
+		{
+			"check": "steps-review: size",
+			"passed": true
+		},
+		{
+			"check": "steps-review: save",
+			"passed": true
+		},
+		{
+			"check": "pile-review: size",
+			"passed": true
+		},
+		{
+			"check": "pile-review: save",
+			"passed": true
+		}
+	],
+	"coast_commit": "d72d74f4c0ccbcc922c5691cb8b6866eca1ca8f9",
+	"motion": {
+		"clock": "uniform substituted for TIME only in QA; exact 4s cycle",
+		"duration_s": 4,
+		"fps": 15,
+		"frames": 60
+	},
+	"passed": true,
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	},
+	"review_only": true,
+	"wet_band": "QA opaque vertex-colour treatment, y=.20 to .45; not owner revision"
+}

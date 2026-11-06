@@ -1,0 +1,177 @@
+{
+  "checks": [
+    {
+      "passed": true,
+      "check": "water_edge_straight single surface"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_straight triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_straight normals"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_straight local water Y=0"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_straight external shared texture"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_outer single surface"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_outer triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_outer normals"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_outer local water Y=0"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_outer external shared texture"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_inner single surface"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_inner triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_inner normals"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_inner local water Y=0"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_inner external shared texture"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_pile_ring single surface"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_pile_ring triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_pile_ring normals"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_pile_ring local water Y=0"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_pile_ring external shared texture"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_steps single surface"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_steps triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_steps normals"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_steps local water Y=0"
+    },
+    {
+      "passed": true,
+      "check": "water_edge_steps external shared texture"
+    },
+    {
+      "passed": true,
+      "check": "straight to straight exact directed port",
+      "error_m": 0.0
+    },
+    {
+      "passed": true,
+      "check": "straight to outer exact directed port",
+      "error_m": 1.1102230246251565e-16
+    },
+    {
+      "passed": true,
+      "check": "straight to inner exact directed port",
+      "error_m": 0.0
+    },
+    {
+      "passed": true,
+      "check": "outer to straight exact directed port",
+      "error_m": 2.220446049250313e-16
+    },
+    {
+      "passed": true,
+      "check": "outer to outer exact directed port",
+      "error_m": 1.1102230246251565e-16
+    },
+    {
+      "passed": true,
+      "check": "outer to inner exact directed port",
+      "error_m": 2.220446049250313e-16
+    },
+    {
+      "passed": true,
+      "check": "inner to straight exact directed port",
+      "error_m": 1.1102230246251565e-16
+    },
+    {
+      "passed": true,
+      "check": "inner to outer exact directed port",
+      "error_m": 2.220446049250313e-16
+    },
+    {
+      "passed": true,
+      "check": "inner to inner exact directed port",
+      "error_m": 1.1102230246251565e-16
+    },
+    {
+      "passed": true,
+      "check": "no self overlapping foam triangles",
+      "max_area_m2": 1.4901161193847656e-08
+    },
+    {
+      "passed": true,
+      "check": "review foam layer count <= 1 everywhere",
+      "max_area_m2": 0
+    },
+    {
+      "passed": true,
+      "check": "U seam pixel-identical"
+    },
+    {
+      "passed": true,
+      "check": "V edge fully transparent"
+    },
+    {
+      "passed": true,
+      "check": "accepted #824 texture unchanged bytes"
+    }
+  ],
+  "passed": true,
+  "max_port_error_m": 2.220446049250313e-16,
+  "triangle_total": 224,
+  "texture_reads": 1,
+  "transparent_passes": 1,
+  "maximum_foam_layers": 1
+}
