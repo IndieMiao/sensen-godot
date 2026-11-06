@@ -185,7 +185,11 @@ func _load_with_feedback(scene_path: String, args := {}) -> PackedScene:
 			if _loading.has_method(&"progress"): _loading.call(&"progress", 1.0)
 			return ResourceLoader.load_threaded_get(scene_path) as PackedScene
 		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS: break
-		ResourceLoader.load_threaded_get(scene_path)   # the failed load, taken: the next request starts afresh
+		# The failed load, taken: once for each request still on it — an earlier try left at the time limit holds one too
+		# (周瑜 on #805: two requests need two takes) — so the next request starts afresh.
+		for take in 8:
+			if ResourceLoader.load_threaded_get_status(scene_path) != ResourceLoader.THREAD_LOAD_FAILED: break
+			ResourceLoader.load_threaded_get(scene_path)
 		push_warning("AppRouter: loading %s failed (try %d of %d)" % [scene_path, attempt + 1, LOAD_TRIES])
 	_loading.failed()
 	_loading.close_button.pressed.connect(_clear_transition, CONNECT_ONE_SHOT)

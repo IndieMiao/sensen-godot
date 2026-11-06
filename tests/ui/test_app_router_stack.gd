@@ -31,6 +31,22 @@ func test_a_failed_load_does_not_lock_the_place_out() -> void:
 	await get_tree().process_frame
 	DirAccess.remove_absolute(path)
 
+## 周瑜 on #805: a try left at the time limit keeps its request on the load; if that load then fails, the next try's
+## take must clear both requests, or the place is locked out again.
+func test_a_failed_load_left_over_from_a_timeout_is_cleared_too() -> void:
+	var path := OS.get_user_data_dir().path_join("router_flaky_probe2.tscn")
+	FileAccess.open(path, FileAccess.WRITE).store_string('[gd_scene format=3]\n\n[node name="X" type="Node"]\nscript = ExtResource("nope")\n')
+	ResourceLoader.load_threaded_request(path, "PackedScene")   # the timed-out try's request, never taken
+	while ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS: await get_tree().process_frame
+	assert_object(await AppRouter._load_with_feedback(path)).is_null()
+	AppRouter._clear_transition()
+	await get_tree().process_frame
+	FileAccess.open(path, FileAccess.WRITE).store_string('[gd_scene format=3]\n\n[node name="X" type="Node"]\n')
+	assert_object(await AppRouter._load_with_feedback(path)).is_not_null()
+	AppRouter._clear_transition()
+	await get_tree().process_frame
+	DirAccess.remove_absolute(path)
+
 func after_test() -> void:
 	while AppRouter.instance_depth() > 0:
 		AppRouter.pop_instance()
