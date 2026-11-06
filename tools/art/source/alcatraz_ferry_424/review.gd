@@ -1,4 +1,5 @@
 extends Node
+const AlcatrazIsland = preload("res://scenes/landmark/alcatraz_island.gd")
 var scene:AlcatrazIsland
 var vp:SubViewport
 var output:String

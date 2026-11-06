@@ -1,4 +1,3 @@
-class_name AlcatrazIsland
 extends Node3D
 ## SGODOT-424 blockout. Local sightseeing only; no network/rewards/save writes.
 ## Walking, isolated nav map and ScenePan gestures follow Griffith's implementation.

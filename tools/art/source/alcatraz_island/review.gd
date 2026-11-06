@@ -1,4 +1,5 @@
 extends Node
+const AlcatrazIsland = preload("res://scenes/landmark/alcatraz_island.gd")
 ## Real Mobile-rendered scene, deterministic art review and navigation checks.
 var scene: AlcatrazIsland
 var viewport: SubViewport
