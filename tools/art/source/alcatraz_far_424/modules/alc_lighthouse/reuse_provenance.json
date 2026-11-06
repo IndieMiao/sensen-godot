@@ -1,0 +1,9 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "module": "alc_lighthouse",
+  "kind": "new authored geometry",
+  "source": "tools/art/source/alcatraz_far_424/alc_lighthouse.blend",
+  "reference": "approved landmark_alcatraz_v2.jpg / c_alc2.png",
+  "changes": "Named source primitives; explicit near/far topology; compressed scenic silhouettes; linear vertex colour export."
+}

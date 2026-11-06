@@ -1,0 +1,43 @@
+[
+  {
+    "file": "SGODOT-424_far_v1_lighthouse_lod_scale.png",
+    "bytes": 215471,
+    "sha256": "590dfe2a6fb3188b51842ece54648354f88410d0ebcc532f27b53c7cc4a7e69d",
+    "size": [
+      1400,
+      1200
+    ]
+  },
+  {
+    "file": "SGODOT-424_far_v1_scenic_cards.png",
+    "bytes": 71188,
+    "sha256": "cdd7c3276cc94e45d9df0ac7681f907adf39db9167d9e14ff4aab2f658db524e",
+    "size": [
+      1500,
+      650
+    ]
+  },
+  {
+    "file": "SGODOT-424_far_v1_towers_player_175.png",
+    "bytes": 276936,
+    "sha256": "10bceba86e6d64f658d289d90b8c215f07cae8da2f83df49fcbf2f4f4f22f403",
+    "size": [
+      1400,
+      1200
+    ]
+  },
+  {
+    "file": "SGODOT-424_far_v1_validation.json",
+    "bytes": 17298,
+    "sha256": "28407f41be76476c3f4d390e3234fc589efbb837b113b336314469f843611a5b"
+  },
+  {
+    "file": "SGODOT-424_far_v1_watertower_lod_scale.png",
+    "bytes": 276318,
+    "sha256": "816b683a99a93975df1cdca53e19ed889eed62839e51cd9a6909a35cfaaced47",
+    "size": [
+      1400,
+      1200
+    ]
+  }
+]

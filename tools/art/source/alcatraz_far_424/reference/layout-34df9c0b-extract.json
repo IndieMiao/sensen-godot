@@ -1,0 +1,251 @@
+{
+  "revision": "B blockout v3 integration contract",
+  "units": "metres, Y up, north -Z",
+  "axes": "Godot Y-up, +X east, +Z south/dock; Blender (x,-z,y)",
+  "spawn": [
+    -22,
+    1,
+    19
+  ],
+  "camera": {
+    "pitch": 43,
+    "yaw": 14.5,
+    "width": 6.72,
+    "zoom_min": 0.3333333333333333,
+    "zoom_max": 1.4,
+    "forward_bias_m": 2.8,
+    "position": [
+      -13.990189868644503,
+      34.14277266548564,
+      49.971637722564864
+    ],
+    "target": [
+      -22.701064011352436,
+      1.7,
+      16.2891866069413
+    ],
+    "size": 6.72,
+    "default_zoom": 1,
+    "max_view_width_m": 20.16,
+    "zoom_out_factor": 3,
+    "pan_bounds": [
+      -50,
+      50,
+      -40,
+      40
+    ],
+    "wide_view": {
+      "yaw_degrees": 60,
+      "target": [
+        -5,
+        17.75,
+        -8
+      ],
+      "target_offset_from_player": [
+        -5,
+        7.75,
+        -2
+      ],
+      "size": 20.16
+    }
+  },
+  "far_anchor": [
+    -22,
+    -0.15,
+    39
+  ],
+  "far_zone": {
+    "node": "FarZone",
+    "anchor": [
+      -22,
+      -0.15,
+      39
+    ],
+    "projection": "camera-facing XY cards, fake elevation, depth behind opaque island; local front +Z",
+    "render_depth_fraction": 0.92
+  },
+  "lod_groups": [
+    {
+      "name": "alc_museum",
+      "near": "alc_museum",
+      "far": "alc_museum_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    },
+    {
+      "name": "alc_lighthouse",
+      "near": "alc_lighthouse",
+      "far": "alc_lighthouse_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    },
+    {
+      "name": "alc_watertower",
+      "near": "alc_watertower",
+      "far": "alc_watertower_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    },
+    {
+      "name": "alc_far_bridge",
+      "near": "alc_far_bridge",
+      "far": "alc_far_bridge_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    },
+    {
+      "name": "alc_far_city",
+      "near": "alc_far_city",
+      "far": "alc_far_city_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    },
+    {
+      "name": "alc_far_hills",
+      "near": "alc_far_hills",
+      "far": "alc_far_hills_far",
+      "switch_distance_m": 55,
+      "margin_m": 0,
+      "far_placeholder": true
+    }
+  ],
+  "source_commit": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
+  "layout_sha256": "7b86d7058338750e3c44e5c8e618d47457be8e8c9d81b729298e54fe35c23d84",
+  "placements": [
+    {
+      "asset": "alc_lighthouse",
+      "position": [
+        -25,
+        10,
+        -11.5
+      ],
+      "zone": "SummitZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_lighthouse_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": true,
+      "owner": "黄忠",
+      "lod_group": "alc_lighthouse"
+    },
+    {
+      "asset": "alc_watertower",
+      "position": [
+        25,
+        10,
+        -14
+      ],
+      "zone": "SummitZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "name": "alc_watertower_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": true,
+      "owner": "黄忠",
+      "lod_group": "alc_watertower"
+    },
+    {
+      "asset": "alc_far_bridge",
+      "position": [
+        -19.04838398410722,
+        30.166543193163445,
+        39
+      ],
+      "zone": "FarZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_far_bridge_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": true,
+      "owner": "黄忠",
+      "lod_group": "alc_far_bridge"
+    },
+    {
+      "asset": "alc_far_city",
+      "position": [
+        -15.69145796946474,
+        30.881962416703644,
+        39
+      ],
+      "zone": "FarZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_far_city_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": true,
+      "owner": "黄忠",
+      "lod_group": "alc_far_city"
+    },
+    {
+      "asset": "alc_far_hills",
+      "position": [
+        -16.827648312882193,
+        30.411582018691274,
+        39
+      ],
+      "zone": "FarZone",
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "name": "alc_far_hills_000",
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "multimesh": false,
+      "placeholder": true,
+      "owner": "黄忠",
+      "lod_group": "alc_far_hills"
+    }
+  ]
+}

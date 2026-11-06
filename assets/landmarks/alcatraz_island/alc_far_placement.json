@@ -1,0 +1,195 @@
+{
+  "task": "SGODOT-424",
+  "revision": "v1.1",
+  "author": "黄忠",
+  "source_commit": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
+  "source_layout_sha256": "7b86d7058338750e3c44e5c8e618d47457be8e8c9d81b729298e54fe35c23d84",
+  "coordinate_system": "Godot Y-up, +X east, +Z south/dock; Blender (x,-z,y)",
+  "spawn": [
+    -22,
+    1,
+    19
+  ],
+  "camera": {
+    "pitch": 43,
+    "yaw": 14.5,
+    "width": 6.72,
+    "zoom_min": 0.3333333333333333,
+    "zoom_max": 1.4,
+    "forward_bias_m": 2.8,
+    "position": [
+      -13.990189868644503,
+      34.14277266548564,
+      49.971637722564864
+    ],
+    "target": [
+      -22.701064011352436,
+      1.7,
+      16.2891866069413
+    ],
+    "size": 6.72,
+    "default_zoom": 1,
+    "max_view_width_m": 20.16,
+    "zoom_out_factor": 3,
+    "pan_bounds": [
+      -50,
+      50,
+      -40,
+      40
+    ],
+    "wide_view": {
+      "yaw_degrees": 60,
+      "target": [
+        -5,
+        17.75,
+        -8
+      ],
+      "target_offset_from_player": [
+        -5,
+        7.75,
+        -2
+      ],
+      "size": 20.16
+    }
+  },
+  "far_anchor": [
+    -22,
+    -0.15,
+    39
+  ],
+  "far_zone": {
+    "node": "FarZone",
+    "anchor": [
+      -22,
+      -0.15,
+      39
+    ],
+    "projection": "camera-facing XY cards, fake elevation, depth behind opaque island; local front +Z",
+    "render_depth_fraction": 0.92
+  },
+  "zone_transform": "identity in pinned scene; placements are already in world coordinates; do not add far_anchor twice",
+  "depth_note": "layout declares render_depth_fraction 0.92; pinned host shader binding uses bridge .94 / city .96 / hills .98; review preserves host code exactly",
+  "placements": [
+    {
+      "asset": "alc_lighthouse",
+      "zone": "SummitZone",
+      "position": [
+        -25,
+        10,
+        -11.5
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "owner": "黄忠",
+      "single_lod": false,
+      "far_asset": "alc_lighthouse_far",
+      "switch_distance_m": 55,
+      "margin_m": 0
+    },
+    {
+      "asset": "alc_watertower",
+      "zone": "SummitZone",
+      "position": [
+        25,
+        10,
+        -14
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": true,
+      "owner": "黄忠",
+      "single_lod": false,
+      "far_asset": "alc_watertower_far",
+      "switch_distance_m": 55,
+      "margin_m": 0
+    },
+    {
+      "asset": "alc_far_bridge",
+      "zone": "FarZone",
+      "position": [
+        -19.04838398410722,
+        30.166543193163445,
+        39
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "owner": "黄忠",
+      "single_lod": true,
+      "host_depth_fraction": 0.94
+    },
+    {
+      "asset": "alc_far_city",
+      "zone": "FarZone",
+      "position": [
+        -15.69145796946474,
+        30.881962416703644,
+        39
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "owner": "黄忠",
+      "single_lod": true,
+      "host_depth_fraction": 0.96
+    },
+    {
+      "asset": "alc_far_hills",
+      "zone": "FarZone",
+      "position": [
+        -16.827648312882193,
+        30.411582018691274,
+        39
+      ],
+      "rotation_degrees": [
+        0,
+        0.0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "collision": false,
+      "owner": "黄忠",
+      "single_lod": true,
+      "host_depth_fraction": 0.98
+    }
+  ],
+  "single_card_lod_agreement": "SGODOT-424 comment 6b09d152-58e2-4deb-bc6f-b7e51d760471 (Marco Polo)",
+  "host_layout_edit": "Remove lod_group from the three far-card placements and remove those three card lod_groups; keep both tower pairs at 55 m."
+}
