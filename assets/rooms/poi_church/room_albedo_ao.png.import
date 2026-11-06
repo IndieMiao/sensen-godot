@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dmdsiiwfv3wnh"
 path.bptc="res://.godot/imported/room_albedo_ao.png-80785de5d14737414a805584ef1b358e.bptc.ctex"
+path.astc="res://.godot/imported/room_albedo_ao.png-80785de5d14737414a805584ef1b358e.astc.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/rooms/poi_church/room_albedo_ao.png"
-dest_files=["res://.godot/imported/room_albedo_ao.png-80785de5d14737414a805584ef1b358e.bptc.ctex"]
+dest_files=["res://.godot/imported/room_albedo_ao.png-80785de5d14737414a805584ef1b358e.bptc.ctex", "res://.godot/imported/room_albedo_ao.png-80785de5d14737414a805584ef1b358e.astc.ctex"]
 
 [params]
 
