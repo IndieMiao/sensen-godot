@@ -446,7 +446,7 @@ static func ladder(position: Vector3, upward: bool) -> MeshInstance3D:
 ## the model never hints at it (不知火舞 11-03, contract-efg §10.1); the code-built ore without, or where the block is not
 ## imported. With `floor_seed` (the floor's, as Layout.p0_rocks) it turns about Y and sizes 0.9–1.1×, by its index, the same
 ## each time. The pose is the inner Rock's: the break's shake and shrink stay on the root (p0_mine._break_rock).
-static func rock(position: Vector3, index: int, floor_number: int, ore := "", floor_seed := "") -> Node3D:
+static func rock(position: Vector3, index: int, floor_number: int, ore := "", floor_seed := "", size_multiplier := 1.0) -> Node3D:
 	var root := Node3D.new()
 	root.position = position
 	var node: Node3D = kit(ROCK_KIT % ore) if ore != "" else null
@@ -464,7 +464,8 @@ static func rock(position: Vector3, index: int, floor_number: int, ore := "", fl
 		rng.seed = hash("%s:%d" % [floor_seed, index])
 		node.rotation.y = rng.randf() * TAU
 		size = rng.randf_range(0.9, 1.1)
-		node.scale = Vector3.ONE * size
+	size *= size_multiplier
+	node.scale = Vector3.ONE * size
 	root.add_child(node)
 	BlobShadow.attach(root,0.52*size)
 	return root

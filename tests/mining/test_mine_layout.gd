@@ -83,7 +83,7 @@ func test_random_navigation_matches_rocks_and_keeps_routes_before_and_after_mini
 func test_bounded_generation_fallback_is_safe() -> void:
 	var nodes: Array = []
 	var sources: Array = Layout.data().rocks
-	for index in sources.size(): nodes.append({"id": str(sources[index].id), "position": Layout.FALLBACK_POSITIONS[index]})
+	for index in sources.size(): nodes.append({"id": str(sources[index].id), "position": Layout.LEGACY_POSITIONS[index]})
 	assert_bool(Layout._layout_is_reachable(nodes)).is_true()
 	for index in nodes.size():
 		assert_bool(Layout._position_is_clear(nodes[index].position, nodes.slice(0, index))).is_true()
@@ -94,7 +94,7 @@ func test_elite_floor_has_no_rocks_or_old_rock_collisions() -> void:
 	var fresh := Layout.navigation(5, [], 9, "boss-farm")
 	var old := Layout.navigation(5, ["rock_1", "rock_6"], 9, "boss-farm")
 	assert_that(fresh.masks).is_equal(old.masks)
-	for point in Layout.FALLBACK_POSITIONS:
+	for point in Layout.LEGACY_POSITIONS:
 		assert_bool(fresh.is_walkable(fresh.world_to_cell(point))).is_true()
 
 func test_joystick_slides_at_generated_rock_faces_without_entering_blocked_cells() -> void:

@@ -177,3 +177,20 @@ func test_the_mine_scene_lays_the_kit_out() -> void:
 		var pose := (mine._rocks[i] as Node3D).get_node("Rock") as Node3D
 		assert_float(pose.rotation.y).is_equal_approx((want.get_node("Rock") as Node3D).rotation.y, 0.0001)
 		assert_float(pose.scale.x).is_equal_approx((want.get_node("Rock") as Node3D).scale.x, 0.0001)
+
+
+func test_q292_scene_enlarges_three_rocks_and_blocks_their_outer_navigation_ring() -> void:
+	await _open(Fx.view(3, {"rocks": 3, "mobs": []}), 3)
+	assert_int(mine._rocks.size()).is_equal(3)
+	var ring_cells := 0
+	for rock in mine._rocks.values():
+		assert_float((rock.get_node("Rock") as Node3D).scale.x).is_between(1.1699, 1.4301)
+		assert_vector(rock.scale).is_equal(Vector3.ONE)
+		for y in Layout.SIZE.y:
+			for x in Layout.SIZE.x:
+				var cell := Vector2i(x, y)
+				var d: float = mine.bp.cell_to_world(cell).distance_to(rock.position)
+				if d > 0.65 and d < 0.85:
+					ring_cells += 1
+					assert_bool(mine.bp.is_walkable(cell)).is_false()
+	assert_int(ring_cells).is_greater(0)
