@@ -1,0 +1,2662 @@
+{
+  "revision": "v1",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "ticket_booth manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth measured triangle budget",
+        "passed": true,
+        "evidence": 668
+      },
+      {
+        "check": "ticket_booth measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "ticket_booth unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "ticket_booth meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter measured triangle budget",
+        "passed": true,
+        "evidence": 716
+      },
+      {
+        "check": "waiting_shelter measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "waiting_shelter unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "waiting_shelter meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank measured triangle budget",
+        "passed": true,
+        "evidence": 412
+      },
+      {
+        "check": "boarding_gangplank measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "boarding_gangplank unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "boarding_gangplank meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand measured triangle budget",
+        "passed": true,
+        "evidence": 416
+      },
+      {
+        "check": "lifebuoy_stand measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "lifebuoy_stand unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "lifebuoy_stand meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat measured triangle budget",
+        "passed": true,
+        "evidence": 428
+      },
+      {
+        "check": "rope_coil_flat measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 6.8493579240357315e-06
+      },
+      {
+        "check": "rope_coil_flat unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_flat meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound measured triangle budget",
+        "passed": true,
+        "evidence": 468
+      },
+      {
+        "check": "rope_coil_bound measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.0946508584083767e-05
+      },
+      {
+        "check": "rope_coil_bound unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "rope_coil_bound meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed measured triangle budget",
+        "passed": true,
+        "evidence": 516
+      },
+      {
+        "check": "wood_crate_closed measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "wood_crate_closed unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_closed meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open measured triangle budget",
+        "passed": true,
+        "evidence": 568
+      },
+      {
+        "check": "wood_crate_open measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.0091558125706091e-05
+      },
+      {
+        "check": "wood_crate_open unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_crate_open meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed measured triangle budget",
+        "passed": true,
+        "evidence": 252
+      },
+      {
+        "check": "wood_barrel_closed measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.0091558125706091e-05
+      },
+      {
+        "check": "wood_barrel_closed unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_closed meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open measured triangle budget",
+        "passed": true,
+        "evidence": 344
+      },
+      {
+        "check": "wood_barrel_open measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "wood_barrel_open unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "wood_barrel_open meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack measured triangle budget",
+        "passed": true,
+        "evidence": 616
+      },
+      {
+        "check": "fishing_net_rack measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 1.10117427836226e-05
+      },
+      {
+        "check": "fishing_net_rack unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "fishing_net_rack meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole manifest digest",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole one mesh/surface",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole named mesh",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole measured triangle budget",
+        "passed": true,
+        "evidence": 274
+      },
+      {
+        "check": "beacon_pole measured bounds",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole finite vertices/normals",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole nondegenerate faces",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole no animation/rig/camera/light",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole no texture dependency",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole opaque vertex alpha",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole linear vertex colours match warm palette",
+        "passed": true,
+        "evidence": 9.755625150765387e-06
+      },
+      {
+        "check": "beacon_pole unit node scales",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole base pivot at0",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole Godot UID",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole nodes/root_script=null",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole gltf/texture_map_mode=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "beacon_pole meshes/light_baking=1",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "All twelve requested props",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Unique Godot-generated GLB UIDs",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Importer UID included",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "No texture duplication or runtime scene/layout",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Exact approved #830 wood palette",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gangplank budget includes both guardrails",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Actual gangplank span2.4m and width1.2m",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Booth blank graphic field dimensions",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Twelve editable source files",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Connection uses actual pinned426 terminal",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Connector transforms meet exactly",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "Gangplank clears terminal bumpers13cm per side",
+        "passed": true,
+        "evidence": null
+      },
+      {
+        "check": "All pre-existing tracked assets unchanged",
+        "passed": true,
+        "evidence": {
+          "base": "206ab822561354c2b264970e2b524628e059cd44",
+          "unexpected": []
+        }
+      },
+      {
+        "check": "Review dependencies identical to pinned426/430/432/434 and ground",
+        "passed": true,
+        "evidence": {
+          "files": 94,
+          "changed": []
+        }
+      }
+    ],
+    "passed": true,
+    "assets": {
+      "ticket_booth": {
+        "triangles": 668,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.8825000524520874
+          ],
+          [
+            1.0,
+            2.5999999046325684,
+            0.9000000357627869
+          ]
+        ],
+        "bytes": 51184
+      },
+      "waiting_shelter": {
+        "triangles": 716,
+        "bounds": [
+          [
+            -1.2000000476837158,
+            0.0,
+            -0.9075000286102295
+          ],
+          [
+            1.2000000476837158,
+            2.5999999046325684,
+            0.9075000286102295
+          ]
+        ],
+        "bytes": 53312
+      },
+      "boarding_gangplank": {
+        "triangles": 412,
+        "bounds": [
+          [
+            -1.2000000476837158,
+            0.0,
+            -0.6000000238418579
+          ],
+          [
+            1.2000000476837158,
+            1.0533826351165771,
+            0.6000000238418579
+          ]
+        ],
+        "bytes": 23008
+      },
+      "lifebuoy_stand": {
+        "triangles": 416,
+        "bounds": [
+          [
+            -0.3450000286102295,
+            0.0,
+            -0.25
+          ],
+          [
+            0.3450000286102295,
+            1.6100000143051147,
+            0.25
+          ]
+        ],
+        "bytes": 19152
+      },
+      "rope_coil_flat": {
+        "triangles": 428,
+        "bounds": [
+          [
+            -0.3047144114971161,
+            0.0,
+            -0.3675483465194702
+          ],
+          [
+            0.34340786933898926,
+            0.0560000017285347,
+            0.2873680591583252
+          ]
+        ],
+        "bytes": 10804
+      },
+      "rope_coil_bound": {
+        "triangles": 468,
+        "bounds": [
+          [
+            -0.32500001788139343,
+            0.0,
+            -0.12473218142986298
+          ],
+          [
+            0.32500001788139343,
+            0.45000001788139343,
+            0.12473218142986298
+          ]
+        ],
+        "bytes": 11692
+      },
+      "wood_crate_closed": {
+        "triangles": 516,
+        "bounds": [
+          [
+            -0.4404999911785126,
+            0.0,
+            -0.4404999911785126
+          ],
+          [
+            0.4404999911785126,
+            0.8500000238418579,
+            0.46449998021125793
+          ]
+        ],
+        "bytes": 38992
+      },
+      "wood_crate_open": {
+        "triangles": 568,
+        "bounds": [
+          [
+            -0.5974999666213989,
+            0.0,
+            -0.39750000834465027
+          ],
+          [
+            0.5974999666213989,
+            0.5199999809265137,
+            0.39750000834465027
+          ]
+        ],
+        "bytes": 43144
+      },
+      "wood_barrel_closed": {
+        "triangles": 252,
+        "bounds": [
+          [
+            -0.32499998807907104,
+            0.0,
+            -0.32499998807907104
+          ],
+          [
+            0.32499998807907104,
+            0.7829999923706055,
+            0.32499998807907104
+          ]
+        ],
+        "bytes": 8992
+      },
+      "wood_barrel_open": {
+        "triangles": 344,
+        "bounds": [
+          [
+            -0.38999998569488525,
+            0.0,
+            -0.38999998569488525
+          ],
+          [
+            0.38999998569488525,
+            0.949999988079071,
+            0.38999998569488525
+          ]
+        ],
+        "bytes": 10308
+      },
+      "fishing_net_rack": {
+        "triangles": 616,
+        "bounds": [
+          [
+            -0.7699999809265137,
+            0.0,
+            -0.2750000059604645
+          ],
+          [
+            0.7699999809265137,
+            1.75,
+            0.2750000059604645
+          ]
+        ],
+        "bytes": 28048
+      },
+      "beacon_pole": {
+        "triangles": 274,
+        "bounds": [
+          [
+            -0.20999999344348907,
+            0.0,
+            -0.20999999344348907
+          ],
+          [
+            0.20999999344348907,
+            2.299999952316284,
+            0.20999999344348907
+          ]
+        ],
+        "bytes": 10160
+      }
+    },
+    "unique_triangles": 5678,
+    "unique_surfaces": 12,
+    "base_commit": "206ab822561354c2b264970e2b524628e059cd44"
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "source_height_m": 1.71833898495782
+    },
+    "captures": [
+      {
+        "camera_width": 6.71999979019165,
+        "file": "example_360.png",
+        "pitch": 42.9999961853027,
+        "size": [
+          360,
+          800
+        ]
+      },
+      {
+        "camera_width": 5.58999967575073,
+        "file": "catalog_ticket_booth.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 5.58999967575073,
+        "file": "catalog_waiting_shelter.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 4.5,
+        "file": "catalog_boarding_gangplank.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.75174999237061,
+        "file": "catalog_lifebuoy_stand.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.75174999237061,
+        "file": "catalog_rope_coil_flat.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.75174999237061,
+        "file": "catalog_rope_coil_bound.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.75174999237061,
+        "file": "catalog_wood_crate_closed.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.75174999237061,
+        "file": "catalog_wood_crate_open.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.75174999237061,
+        "file": "catalog_wood_barrel_closed.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.75174999237061,
+        "file": "catalog_wood_barrel_open.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 3.76250004768372,
+        "file": "catalog_fishing_net_rack.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      },
+      {
+        "camera_width": 4.94499969482422,
+        "file": "catalog_beacon_pole.png",
+        "pitch": 24.0,
+        "size": [
+          360,
+          250
+        ]
+      }
+    ],
+    "catalog": {
+      "beacon_pole": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.209999993443489,
+            0.0,
+            -0.209999993443489
+          ],
+          [
+            0.209999993443489,
+            2.29999995231628,
+            0.209999993443489
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 274.0
+      },
+      "boarding_gangplank": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.20000004768372,
+            0.0,
+            -0.600000023841858
+          ],
+          [
+            1.20000004768372,
+            1.05338263511658,
+            0.600000023841858
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 412.0
+      },
+      "fishing_net_rack": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.769999980926514,
+            0.0,
+            -0.275000005960464
+          ],
+          [
+            0.769999980926514,
+            1.75,
+            0.275000005960464
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 616.0
+      },
+      "lifebuoy_stand": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.345000028610229,
+            0.0,
+            -0.25
+          ],
+          [
+            0.345000028610229,
+            1.61000001430511,
+            0.25
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 416.0
+      },
+      "rope_coil_bound": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.325000017881393,
+            0.0,
+            -0.124732181429863
+          ],
+          [
+            0.325000017881393,
+            0.450000017881393,
+            0.124732181429863
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 468.0
+      },
+      "rope_coil_flat": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.304714411497116,
+            0.0,
+            -0.36754834651947
+          ],
+          [
+            0.343407869338989,
+            0.0560000017285347,
+            0.287368059158325
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 428.0
+      },
+      "ticket_booth": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.882500052452087
+          ],
+          [
+            1.0,
+            2.59999990463257,
+            0.900000035762787
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 668.0
+      },
+      "waiting_shelter": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -1.20000004768372,
+            0.0,
+            -0.90750002861023
+          ],
+          [
+            1.20000004768372,
+            2.59999990463257,
+            0.90750002861023
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 716.0
+      },
+      "wood_barrel_closed": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.324999988079071,
+            0.0,
+            -0.324999988079071
+          ],
+          [
+            0.324999988079071,
+            0.782999992370605,
+            0.324999988079071
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 252.0
+      },
+      "wood_barrel_open": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.389999985694885,
+            0.0,
+            -0.389999985694885
+          ],
+          [
+            0.389999985694885,
+            0.949999988079071,
+            0.389999985694885
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 344.0
+      },
+      "wood_crate_closed": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.440499991178513,
+            0.0,
+            -0.440499991178513
+          ],
+          [
+            0.440499991178513,
+            0.850000023841858,
+            0.464499980211258
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 516.0
+      },
+      "wood_crate_open": {
+        "avatar_height": 1.745,
+        "bounds": [
+          [
+            -0.597499966621399,
+            0.0,
+            -0.39750000834465
+          ],
+          [
+            0.597499966621399,
+            0.519999980926514,
+            0.39750000834465
+          ]
+        ],
+        "pose_lift_m": 0.0,
+        "triangles": 568.0
+      }
+    },
+    "checks": [
+      {
+        "check": "ticket_booth one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ticket_booth matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ticket_booth no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "ticket_booth triangle budget",
+        "evidence": 668,
+        "passed": true
+      },
+      {
+        "check": "ticket_booth single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "waiting_shelter one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "waiting_shelter matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "waiting_shelter no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "waiting_shelter triangle budget",
+        "evidence": 716,
+        "passed": true
+      },
+      {
+        "check": "waiting_shelter single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "boarding_gangplank one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "boarding_gangplank matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "boarding_gangplank no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "boarding_gangplank triangle budget",
+        "evidence": 412,
+        "passed": true
+      },
+      {
+        "check": "boarding_gangplank single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lifebuoy_stand one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lifebuoy_stand matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lifebuoy_stand no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "lifebuoy_stand triangle budget",
+        "evidence": 416,
+        "passed": true
+      },
+      {
+        "check": "lifebuoy_stand single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_flat one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_flat matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_flat no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_flat triangle budget",
+        "evidence": 428,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_flat single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_bound one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_bound matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_bound no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_bound triangle budget",
+        "evidence": 468,
+        "passed": true
+      },
+      {
+        "check": "rope_coil_bound single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_closed one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_closed matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_closed no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_closed triangle budget",
+        "evidence": 516,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_closed single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_open one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_open matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_open no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_open triangle budget",
+        "evidence": 568,
+        "passed": true
+      },
+      {
+        "check": "wood_crate_open single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_closed one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_closed matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_closed no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_closed triangle budget",
+        "evidence": 252,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_closed single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_open one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_open matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_open no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_open triangle budget",
+        "evidence": 344,
+        "passed": true
+      },
+      {
+        "check": "wood_barrel_open single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fishing_net_rack one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fishing_net_rack matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fishing_net_rack no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "fishing_net_rack triangle budget",
+        "evidence": 616,
+        "passed": true
+      },
+      {
+        "check": "fishing_net_rack single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "beacon_pole one mesh",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "beacon_pole matte vertex material",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "beacon_pole no texture; roughness",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "beacon_pole triangle budget",
+        "evidence": 274,
+        "passed": true
+      },
+      {
+        "check": "beacon_pole single surface",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "All twelve dock props",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Default avatar assembled",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=0.999 z=-0.45",
+        "evidence": [
+          0.999000012874603,
+          1.20000004768372,
+          -0.449999988079071
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=0.999 z=0",
+        "evidence": [
+          0.999000012874603,
+          1.20000004768372,
+          0.0
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=0.999 z=0.45",
+        "evidence": [
+          0.999000012874603,
+          1.20000004768372,
+          0.449999988079071
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.0 z=-0.45",
+        "evidence": [
+          1.0,
+          1.20000004768372,
+          -0.449999988079071
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.0 z=0",
+        "evidence": [
+          1.0,
+          1.20000004768372,
+          0.0
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.0 z=0.45",
+        "evidence": [
+          1.0,
+          1.20000004768372,
+          0.449999988079071
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.001 z=-0.45",
+        "evidence": [
+          1.00100004673004,
+          1.20000004768372,
+          -0.449999988079071
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.001 z=0",
+        "evidence": [
+          1.00100004673004,
+          1.20000004768372,
+          0.0
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.001 z=0.45",
+        "evidence": [
+          1.00100004673004,
+          1.20000004768372,
+          0.449999988079071
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.005 z=-0.45",
+        "evidence": [
+          1.00499999523163,
+          1.20000004768372,
+          -0.449999988079071
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.005 z=0",
+        "evidence": [
+          1.00499999523163,
+          1.20000004768372,
+          0.0
+        ],
+        "passed": true
+      },
+      {
+        "check": "Flush dock/gang top x=1.005 z=0.45",
+        "evidence": [
+          1.00499999523163,
+          1.20000004768372,
+          0.449999988079071
+        ],
+        "passed": true
+      },
+      {
+        "check": "13cm clearance to each terminal bumper",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "All twelve new props used in landing",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Two shore ribbons and six separated pile rings",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gangplank dock connector matches426 terminal",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Gangplank far connector meets426 landing",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture example_360",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_ticket_booth",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_waiting_shelter",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_boarding_gangplank",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_lifebuoy_stand",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_rope_coil_flat",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_rope_coil_bound",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wood_crate_closed",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wood_crate_open",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wood_barrel_closed",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_wood_barrel_open",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_fishing_net_rack",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Capture catalog_beacon_pole",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "default_view": {
+      "draws": 33,
+      "triangles": 15480
+    },
+    "example": {
+      "bay_priority": -100,
+      "dependencies": {
+        "coast_kit/coast_dock_end": 1,
+        "coast_kit/coast_dock_straight": 1,
+        "coast_kit/coast_seawall": 2,
+        "far_backdrop/far_bridge": 1,
+        "far_backdrop/far_city_high": 1,
+        "far_backdrop/far_hills_a": 1,
+        "water_edge/water_edge_pile_ring": 6,
+        "water_edge/water_edge_straight": 2
+      },
+      "dock_deck_y": 1.2,
+      "far_cards": 3,
+      "foam_instances": 8,
+      "foam_y": 0.218,
+      "layout_exported": false,
+      "main_footprint_m": [
+        10.4,
+        6
+      ],
+      "props": {
+        "beacon_pole": 1,
+        "boarding_gangplank": 1,
+        "fishing_net_rack": 1,
+        "lifebuoy_stand": 1,
+        "rope_coil_bound": 1,
+        "rope_coil_flat": 1,
+        "ticket_booth": 1,
+        "waiting_shelter": 1,
+        "wood_barrel_closed": 1,
+        "wood_barrel_open": 1,
+        "wood_crate_closed": 1,
+        "wood_crate_open": 1
+      },
+      "surfaces_including_review_ground": 30,
+      "triangles_including_review_ground": 7854,
+      "water_y": 0.2
+    },
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  },
+  "cold_import": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "passed": true,
+    "fresh_cache": true,
+    "exit_code": 0,
+    "etc2_astc_enabled": true,
+    "source_kit_unchanged": true,
+    "workspace_status_unchanged": true,
+    "fixture_file_changes": [],
+    "fixture_files_checked": 124,
+    "dock_prop_textures": 0,
+    "dependency_images_have_mobile_formats_or_lossless": true,
+    "dependencies": {
+      "coast_kit": {
+        "path": "assets/landmarks/_shared/coast_kit",
+        "git_ref": "206ab822561354c2b264970e2b524628e059cd44"
+      },
+      "water_edge": {
+        "path": "assets/landmarks/_shared/water_edge",
+        "git_ref": "206ab822561354c2b264970e2b524628e059cd44"
+      },
+      "far_backdrop": {
+        "path": "assets/landmarks/_shared/far_backdrop",
+        "git_ref": "206ab822561354c2b264970e2b524628e059cd44"
+      },
+      "ground_detail": {
+        "path": "assets/landmarks/_shared/ground_detail",
+        "git_ref": "206ab822561354c2b264970e2b524628e059cd44"
+      },
+      "sea_backdrop": {
+        "path": "assets/landmarks/_shared/sea_backdrop",
+        "git_ref": "74cbc529e9ec72eb8d2e5a527437c4a4f7bfb131",
+        "pr": 837
+      }
+    }
+  },
+  "dependencies": {
+    "assets/landmarks/_shared/coast_kit/README.md": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "c9cb0a3e3111a36b1d2fbfeb9ec639aedeea495bbda67cc7014b0c5eafae3a41"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_buoy.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "ad728673a128c845d7c364b83d6a8ca8fc2676d1f5cddba0b48a51c1b0ca2def"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_buoy.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "f95a3857cc269487db873394aac79bcd9588e72bf542c08dce19028fbd197b86"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_cool_gray.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "7d95dedf4de8b1cf16166b5c8f41332c7ea960769fb8b44b76e0ea48d970cbd6"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_dock_bollard.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "e230032aa26f0ae634bb94a9bbeaaeac7431ac1b0ab0838e29bf462501c9907f"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_dock_bollard.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "e4599c6606ad38e1ce29af548b047ee33b496ea265f0ef60f70a2e1407e6b677"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_dock_end.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "3108f00882248efb6d8fc1205f80d8a49c115ac1fc647b6724247111aa1dbf2d"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_dock_end.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "5b611befd121a6fd549ab3939184048d75d481bcd24af324c755093654f3573d"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_dock_straight.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "185461cd83b3af081b09c6f018f9a98f1c79addbb25f1a5a9b871459f883db3b"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_dock_straight.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "93aed0182fe87156bbc23935cc52bea6a1b92995f0990c8ce19fe146c063b9d0"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_kit_import.gd": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "7308dca1e6ec9189df6a206fced6a1d32a35a496a776048a578fe207f851b5fb"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_kit_import.gd.uid": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "46a6f83d731d4603227798202f77c1eeaeb23a69929e11cf381d7f4b2c27d8a1"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_inner_high.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "46ff09bac9504d012a67b0b6a5501e78dd178174b2648bae59747cbfb370c0be"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_inner_high.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "9852c9fd78ce4f203c1a721869c357f1afa4911578d083ae820d1d97b5d737a6"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_inner_low.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "9e25f2433416b03c7d54d2bb73c81417a4b738fba56867e572b894258108ea58"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_inner_low.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "d74168b4ab76aad27be3a0f4d4152f401e286a8d7905e6af957ae4eda99964d1"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_outer_high.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "28e24e3645858773be89d25a856f7e0ae142d450cc15ae7876bd72823f50c303"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_outer_high.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "12ce71b080ede5852c09f511eebbde235a4c8a6cac589a37bcfb23a698891927"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_outer_low.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "36db8c8def91094093e7af2946ec1da37c23b9d7f710ab006d5a9334fb773296"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_outer_low.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "8874300520efc0c7bad54e34f2e0f35e05fa46501197e49201f33f7e27bd1d8d"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_straight_high.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "522cd7560dd3c6f036c03841434de535a147fc77e4ccb40793f7270e5d551551"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_straight_high.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "8a7495b08f8968d9fe2928eb9c0c077d6b38a8ddf0c7e6f2e52c3cdfb3e1de05"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_straight_low.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "468ca175db81da1f6d8ee145db723d19a9c40c5a65e55024a45f2a8b3b3a0cc1"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_rock_straight_low.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "b379ed99081abd7857e7b441e8d9b78d255cd9803a3b8f9afff047adb42955a3"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_scatter_a.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "4628af6437bad3215496ab819910e74776adebacc0c023b4298104435e90d40d"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_scatter_a.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "e191874eff863ffcaed1789e2e7e151a020f2c37c228ebd8dc9e597f5505fa89"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_scatter_b.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "47f7dd657a43d6118bdb85b9d5ff68102ba07b45a8f022067ab822006c6daf71"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_scatter_b.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "bd5d7ac4da515972b93d2d546c3b7ee957aad3800ce122b7efd88ebfd0489608"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_scatter_c.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "78fc63f63f768c8b17a04157270a603df2c679aa1c10b74425fc9caeb6545f2e"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_scatter_c.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "4b860a22c808b9b4e5b6087c8d56b4d9d336759b7f58bf5319c3f3566fd70f95"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_seawall.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "3c0795c96af36f4006562221ab3bece9fd71f2105f9e656cb7a724395a11d60d"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_seawall.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "870651fbb7609ee8db711d1d11ec22a81b6981cad31decf66d82dc402bf2a1e5"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_surface.gdshader": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "1abd0e2538b69250ed45977e209f21306b90d97958b6e8db04a70f68c28a6bee"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_surface.gdshader.uid": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "d377b9cc44c1a1b23b05c9fcd815a41b448e0d5328c138caf0966fe7edfe8fbf"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_warm_sand.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "daef501123e51365b1049ccbadaf6cbbe3e0a10b1a24bcbb7eacc6d75da63f88"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_water_steps.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "36e6bbeb5e71d22ca5395657e78d9173e79049378ca5109189bd8c42a3fe41fb"
+    },
+    "assets/landmarks/_shared/coast_kit/coast_water_steps.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "459272f0e26fb96c66b79a0532ac2c90cd6b44afda114378a940bc29ed4fb5ad"
+    },
+    "assets/landmarks/_shared/coast_kit/manifest.json": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "97017dedbcb039810e1fe62a2cf1d0e833d6c2f8596c93ef6e43571a30cf17df"
+    },
+    "assets/landmarks/_shared/water_edge/README.md": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "6525e03c73646b431f00daccc966f898cfa8bb01d7ee278b04eb6c029c27d0c5"
+    },
+    "assets/landmarks/_shared/water_edge/manifest.json": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "dce0bc06a28888ef80b02dcd7f71379d76637c369ddf11bca06c7ce42e0ad606"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge.gdshader": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "9c1bdb193771f8e54e6daa966048234c14c9b048c01959b899b10e45fc11f22a"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge.gdshader.uid": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "3563b90dc6169a0361b9ad4da30057a34a3e7ad0ed5cf49cf121da1456c43cab"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_inner.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "95b36affc16298fc1a2df3aff301948007f04a5b9643f6bd80155444dc609094"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_inner.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "7d283a7c6c316a9ea38c734b3d849d0b969e6072a12227978b355b126d3183b0"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_material.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "ece23e9f5bf2728a3008509edc86a919f77f77697c0f7887029ba02f4eb31ab4"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_outer.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "ed9b8192c293b6a36e833be139f2a6b666a669817432b0ba0a6d12b1cf432d64"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_outer.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "ffb1c936ffb720bd6ac05375d631dcc0d04dee07eb46e80b5307915658339045"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_pile_ring.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "a7829ed1de33a694bde98c4ae219641f2acd0e9eb394a5d86f5ba46495be2722"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_pile_ring.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "ffc7c07ea10a661f0bfbe81ffe91f1d4e264d48ca68cb1b2a590a46147feba1a"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_soft.png": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "12dc9ad8724c1945c06997d1f4cbc88cb349b3dc8b80e62bb7fd0bca7b7dfc93"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_soft.png.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "c6c2c7a4b75ec5c0da1559564b965f347a509596b1d5ec349f07adcb5c192b47"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_steps.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "848f895befc8375cc944d67bad897273ee24bca813e558a6e70322756e50586c"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_steps.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "d9ec47864d08ca05615b347860569a894bea007a052a6ef76204aa15425db128"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_straight.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "4bb569a2eafdb9d3a43f003a42c0c5cd45882b4d07a5fad551398b51428e8363"
+    },
+    "assets/landmarks/_shared/water_edge/water_edge_straight.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "0bd37ac3291fbf23fedc88cbf6d5e431f6abfb405fc79979d3abed9e2107fc1e"
+    },
+    "assets/landmarks/_shared/far_backdrop/README.md": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "021356494204fc600ee6aa2d75191654075118b4c65cb26fe7c993ef6850ccbe"
+    },
+    "assets/landmarks/_shared/far_backdrop/bridge.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "44fa12760df4874f28a14015fe8aa08504b0dc9af1ee914553054652ddcaba8c"
+    },
+    "assets/landmarks/_shared/far_backdrop/city.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "e36bd57572055b12f3a7574377cebbe713009adb0fed3e1b9055e61d063e1ecb"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_bridge.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "50577f015318fe958c4f91aa24ee24b74f49835926a7b9b8e414b21cd2cc6ebf"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_bridge.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "a48dc045a14e1f29a8d200883fb17e5222cbbbfd48391f513c8a55c3df9cc380"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_card.gdshader": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "f0b935ea4a697c00b51de2b156515e35037ae120a644378d364d655b4b62f22f"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_card.gdshader.uid": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "6c24415eda048ba8a49aca3981d414fea742128058795a686702e853ebc33686"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_card_import.gd": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "e6ec7fe889c0af667a7d39c5d36dda448132d5f572890c02f86efd97a346ca54"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_card_import.gd.uid": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "92030944cfb3dbd23ce71fd0ac0f4b7902defe0efeb2514f54c5b8159408e2d8"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_city_high.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "5641dbbd141946797d42f26132ec1c752f198dce28e20c999456967409dc9e99"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_city_high.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "9e003c694e053beb41a519faa9c2de7a73903ec42b208eacd8519a17404122a3"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_city_low.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "a6b314bcde125b450546269c2ec9a1bec11b72a77eaa1229d11307acf4889200"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_city_low.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "39df64284b17b592c9ea07c7f8da882d482495b4c14957ac6d0a7fa15e0dfad8"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_city_medium.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "4c2f9b559f4d506080ab92c8cd0443d983d668a532d828aa8a9e3a99be4064e9"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_city_medium.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "b30c71a30ffcafc8046a53e978a7cbf822fcdfcf4e837a01f0a4055530d0525a"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_hills_a.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "4e6bae5db8d74e21df98509055396e84a7ab644e1c1419ea964907dcc18ee29f"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_hills_a.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "350f4b850217ec64733e2b65dd4634441f499577c79ac20cf8f3507b6a09d39f"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_hills_b.glb": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "68d9e6488cec0c4e73f32eb538be99d2204b1f3c1fdfc3026e15a8548f3de84f"
+    },
+    "assets/landmarks/_shared/far_backdrop/far_hills_b.glb.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "4e837ec815a3f0c7757a02023113c1c90a866d213d03fe316b9657d3b7a5bf7b"
+    },
+    "assets/landmarks/_shared/far_backdrop/hills.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "be36caf8ae7123ecd44223c5c6fbb83224ce55a63dffa71ae6ac529f7910c8df"
+    },
+    "assets/landmarks/_shared/far_backdrop/manifest.json": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "f8fe2a17728dec786b4ef576e09f43abaa595173c4fefe1c4c0cedb2b652efe0"
+    },
+    "assets/landmarks/_shared/ground_detail/README.md": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "679ee091e1592ce7409346b6f5370f722af8268952cea7f091e2ea0ca54cdeac"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_detail.gdshader": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "71d31fe8ac8016fae1fd7c14dfd44cba499ae529112df1ca114a3b8b91d57907"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_detail.gdshader.uid": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "f542c49dda7bfc07205c9b5c070303f22a54f887f422c74500ed1594202c7363"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_fields.png": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "481fdbc304e14c46ad7f59e8a830fa1ca748d8bcbd4b248b2edfd63783575451"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_fields.png.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "a972e665ee58e3903e2c59be08b5635f2ea9104d0505fe288d18b2f9c9562adf"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_grass.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "2b6906558086e08f85220787b14d0b6fdfa01448006ec12c4e0d50dfc2c2e64a"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_palette_example.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "108dd6ff666196ee71796dc1d856d5f6b4997e906fc05ee03e7a25bf4b62d2f4"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_paving.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "6244976a0a8f4fac99bc29dc4e58b5f2cf991c5766dc04d8e47369d31069d612"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_sand.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "45ac803417763659bc5aeb5e1877f729e859fd630557c1400a2691fb2a16a752"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_surfaces.png": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "b933f4abe85e380c0e70fe7dab5474b6ba70c13d45a1520ce70ad787cd5bc20d"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_surfaces.png.import": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "7abf061f2e8521d81eea117b92dc314cd1cb9e47c7c18ae387fb8ba8e14198bc"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_wet_sand.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "53b6fc218cd4ed187dc917f60bb7c9ce60442ab9ca358e264cf041aa9f83f24c"
+    },
+    "assets/landmarks/_shared/ground_detail/ground_wood.tres": {
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44",
+      "sha256": "f3c0dc9e95aeb102ee5a2bc40f0b6939173fef26b95915bc44d6939c837b7c47"
+    },
+    "assets/landmarks/_shared/sea_backdrop/README.md": {
+      "git_ref": "74cbc529e9ec72eb8d2e5a527437c4a4f7bfb131",
+      "sha256": "766ebf5da2cb360c483104934e4e5be2a58e8ecfb83b8968c6e2180577f62f15"
+    },
+    "assets/landmarks/_shared/sea_backdrop/bay.tres": {
+      "git_ref": "74cbc529e9ec72eb8d2e5a527437c4a4f7bfb131",
+      "sha256": "d2af4d604d1beb381e3595d6bf312afb4fba8d8afd4eff29d8af2f92dc106a9e"
+    },
+    "assets/landmarks/_shared/sea_backdrop/lake.tres": {
+      "git_ref": "74cbc529e9ec72eb8d2e5a527437c4a4f7bfb131",
+      "sha256": "5adee615765566e6a33149ebb51bdf514724ee2ae7ef9aa9ac5b68bbc0623c72"
+    },
+    "assets/landmarks/_shared/sea_backdrop/sea_backdrop.gdshader": {
+      "git_ref": "74cbc529e9ec72eb8d2e5a527437c4a4f7bfb131",
+      "sha256": "0fc5fd9a019cab73958d6e7a9866061fac9f7ea23ec57286fb61ed65cdee041b"
+    },
+    "assets/landmarks/_shared/sea_backdrop/sea_backdrop.gdshader.uid": {
+      "git_ref": "74cbc529e9ec72eb8d2e5a527437c4a4f7bfb131",
+      "sha256": "fcf5c01c6244645bef779d720c03b2c52f99113784d20b722aa0d1d7b761c313"
+    }
+  },
+  "dock_connection": {
+    "source_task": "SGODOT-426",
+    "source_ref": "206ab822561354c2b264970e2b524628e059cd44",
+    "source_sha256": "3108f00882248efb6d8fc1205f80d8a49c115ac1fc647b6724247111aa1dbf2d",
+    "asset": "coast_dock_end.glb",
+    "deck_y": 1.2,
+    "terminal_edge_center": [
+      1,
+      1.2,
+      0
+    ],
+    "terminal_bumpers": {
+      "centres": [
+        [
+          0.87,
+          1.27,
+          -0.82
+        ],
+        [
+          0.87,
+          1.27,
+          0.82
+        ]
+      ],
+      "size": [
+        0.18,
+        0.14,
+        0.18
+      ],
+      "clear_width": 1.46
+    },
+    "new_gangplank": {
+      "length": 2.4,
+      "width": 1.2,
+      "deck_y": 0.1,
+      "dock_port": [
+        -1.2,
+        0.1,
+        0
+      ],
+      "boat_port": [
+        1.2,
+        0.1,
+        0
+      ],
+      "root_for_unrotated_end": [
+        2.2,
+        1.1,
+        0
+      ]
+    }
+  },
+  "scope": "12 new dock props only. Pinned426/430/432/434 plus ground are isolated review fixtures; no existing-file changes or game integration."
+}
