@@ -1,0 +1,398 @@
+{
+  "task": "SGODOT-436",
+  "revision": "v1",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "units": "metres; Y up; bottom-centre origin; +Z front except gangplank +X",
+  "palette_srgb": {
+    "wood": "A3815D",
+    "wood_light": "B89972",
+    "wood_dark": "795F47",
+    "wood_seam": "69543F",
+    "metal": "5D4C38",
+    "metal_light": "6D5746",
+    "cream": "F0E1C2",
+    "stone": "CBB48F",
+    "teal": "35696A",
+    "glass": "86B0B3",
+    "roof": "748B9C",
+    "roof_shade": "5E7383",
+    "rope": "B7A68D",
+    "rope_light": "C9BA9E",
+    "rope_dark": "96866F",
+    "red": "C76845",
+    "lamp": "F2DC9F",
+    "dark": "3F463D"
+  },
+  "assets": {
+    "ticket_booth": {
+      "file": "ticket_booth.glb",
+      "triangles": 668,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0,
+          0.0,
+          -0.8825000524520874
+        ],
+        [
+          1.0,
+          2.5999999046325684,
+          0.9000000357627869
+        ]
+      ],
+      "dimensions_m": [
+        2.0,
+        2.5999999046325684,
+        1.7825000882148743
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/ticket_booth.blend",
+      "sha256": "8e34c40948e6f1c4329939380ecdd428a9ed1226e8fd93f1c6c6d6b72446bbc0",
+      "front": "+Z service opening",
+      "countertop_y_m": 1.12,
+      "graphic_area_m": [
+        0.96,
+        0.23
+      ],
+      "graphic_center_m": [
+        0,
+        2.12,
+        0.78
+      ],
+      "content": "Blank graphic field only; no lettering or NPC/interaction anchors"
+    },
+    "waiting_shelter": {
+      "file": "waiting_shelter.glb",
+      "triangles": 716,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.2000000476837158,
+          0.0,
+          -0.9075000286102295
+        ],
+        [
+          1.2000000476837158,
+          2.5999999046325684,
+          0.9075000286102295
+        ]
+      ],
+      "dimensions_m": [
+        2.4000000953674316,
+        2.5999999046325684,
+        1.815000057220459
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/waiting_shelter.blend",
+      "sha256": "8f99f010f4ef988708f2391b420d43e2563b2ffebeac973ebdbf1463cb1b28b5",
+      "front": "+Z",
+      "seat_height_m": 0.715,
+      "seat_width_m": 1.82,
+      "content": "Shelter with decorative waiting bench; no seat anchors"
+    },
+    "boarding_gangplank": {
+      "file": "boarding_gangplank.glb",
+      "triangles": 412,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.2000000476837158,
+          0.0,
+          -0.6000000238418579
+        ],
+        [
+          1.2000000476837158,
+          1.0533826351165771,
+          0.6000000238418579
+        ]
+      ],
+      "dimensions_m": [
+        2.4000000953674316,
+        1.0533826351165771,
+        1.2000000476837158
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/boarding_gangplank.blend",
+      "sha256": "6aafd57fb0b437a21beaddd64f718434cf83c935bff343718de773eef99e2f55",
+      "axis": "+X boarding direction",
+      "deck_y_m": 0.1,
+      "deck_size_m": [
+        2.4,
+        1.2
+      ],
+      "ports": {
+        "dock": [
+          -1.2,
+          0.1,
+          0
+        ],
+        "boat": [
+          1.2,
+          0.1,
+          0
+        ]
+      },
+      "coast_426_connection": {
+        "asset": "coast_dock_end",
+        "dock_terminal": [
+          1,
+          1.2,
+          0
+        ],
+        "root_offset_for_unrotated_dock": [
+          2.2,
+          1.1,
+          0
+        ],
+        "terminal_bumper_clearance_each_side_m": 0.13
+      },
+      "content": "Level demonstration; adjust host transform about dock connector for other boat heights"
+    },
+    "lifebuoy_stand": {
+      "file": "lifebuoy_stand.glb",
+      "triangles": 416,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3450000286102295,
+          0.0,
+          -0.25
+        ],
+        [
+          0.3450000286102295,
+          1.6100000143051147,
+          0.25
+        ]
+      ],
+      "dimensions_m": [
+        0.690000057220459,
+        1.6100000143051147,
+        0.5
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/lifebuoy_stand.blend",
+      "sha256": "afeddcf231522b4f7ce2043efd961770e310d94fa9c0bf60f23dc326114ac361",
+      "front": "+Z",
+      "lifebuoy_outer_diameter_m": 0.69,
+      "content": "Static stand, no lettering"
+    },
+    "rope_coil_flat": {
+      "file": "rope_coil_flat.glb",
+      "triangles": 428,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3047144114971161,
+          0.0,
+          -0.3675483465194702
+        ],
+        [
+          0.34340786933898926,
+          0.0560000017285347,
+          0.2873680591583252
+        ]
+      ],
+      "dimensions_m": [
+        0.6481222808361053,
+        0.0560000017285347,
+        0.6549164056777954
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/rope_coil_flat.blend",
+      "sha256": "5f0d97b4aa3680235b2caad06a6fa7666ef9ef03bcc5e11becb16ee173259e40",
+      "content": "Flat2.75-turn coil with quiet loose end"
+    },
+    "rope_coil_bound": {
+      "file": "rope_coil_bound.glb",
+      "triangles": 468,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.32500001788139343,
+          0.0,
+          -0.12473218142986298
+        ],
+        [
+          0.32500001788139343,
+          0.45000001788139343,
+          0.12473218142986298
+        ]
+      ],
+      "dimensions_m": [
+        0.6500000357627869,
+        0.45000001788139343,
+        0.24946436285972595
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/rope_coil_bound.blend",
+      "sha256": "913142e1214692ffc47cf8502d5185e8a35093488aba7dac25687a4980cdc1b5",
+      "content": "Bound upright oval bundle; place against cargo or on crate"
+    },
+    "wood_crate_closed": {
+      "file": "wood_crate_closed.glb",
+      "triangles": 516,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.4404999911785126,
+          0.0,
+          -0.4404999911785126
+        ],
+        [
+          0.4404999911785126,
+          0.8500000238418579,
+          0.46449998021125793
+        ]
+      ],
+      "dimensions_m": [
+        0.8809999823570251,
+        0.8500000238418579,
+        0.9049999713897705
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/wood_crate_closed.blend",
+      "sha256": "2fd056f378a3c0d61094326a30382bbd234c30d1d7f6994a170ba4375041c152",
+      "lid": "closed",
+      "stack_top_y_m": 0.85
+    },
+    "wood_crate_open": {
+      "file": "wood_crate_open.glb",
+      "triangles": 568,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.5974999666213989,
+          0.0,
+          -0.39750000834465027
+        ],
+        [
+          0.5974999666213989,
+          0.5199999809265137,
+          0.39750000834465027
+        ]
+      ],
+      "dimensions_m": [
+        1.1949999332427979,
+        0.5199999809265137,
+        0.7950000166893005
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/wood_crate_open.blend",
+      "sha256": "0d87917221b6dfae40953775ed5212cf1ff61c56a4c47184b4b6f74a431d1080",
+      "lid": "open",
+      "content": "Empty cargo crate with open handholds"
+    },
+    "wood_barrel_closed": {
+      "file": "wood_barrel_closed.glb",
+      "triangles": 252,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.32499998807907104,
+          0.0,
+          -0.32499998807907104
+        ],
+        [
+          0.32499998807907104,
+          0.7829999923706055,
+          0.32499998807907104
+        ]
+      ],
+      "dimensions_m": [
+        0.6499999761581421,
+        0.7829999923706055,
+        0.6499999761581421
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/wood_barrel_closed.blend",
+      "sha256": "1d2f7935d12862beef3cf81d56eb7716c961921a94e8b2c28ea3cf35b44112ff",
+      "lid": "closed",
+      "content": "Wood staves and two dark hoops, no markings"
+    },
+    "wood_barrel_open": {
+      "file": "wood_barrel_open.glb",
+      "triangles": 344,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.38999998569488525,
+          0.0,
+          -0.38999998569488525
+        ],
+        [
+          0.38999998569488525,
+          0.949999988079071,
+          0.38999998569488525
+        ]
+      ],
+      "dimensions_m": [
+        0.7799999713897705,
+        0.949999988079071,
+        0.7799999713897705
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/wood_barrel_open.blend",
+      "sha256": "10f74afdd576e132493c90601863ca2a06ae1e85d70b495fb57e6a1bf8fc6514",
+      "lid": "open",
+      "content": "Wood staves and two dark hoops, no markings"
+    },
+    "fishing_net_rack": {
+      "file": "fishing_net_rack.glb",
+      "triangles": 616,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.7699999809265137,
+          0.0,
+          -0.2750000059604645
+        ],
+        [
+          0.7699999809265137,
+          1.75,
+          0.2750000059604645
+        ]
+      ],
+      "dimensions_m": [
+        1.5399999618530273,
+        1.75,
+        0.550000011920929
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/fishing_net_rack.blend",
+      "sha256": "9f4b82dce2140c6255bfd40094cfbb7f5bdf7875e4fcf8fffb5909ceee123790",
+      "front": "+Z",
+      "content": "Open geometric diamond net, suspended at three upper knots; no alpha texture or fish"
+    },
+    "beacon_pole": {
+      "file": "beacon_pole.glb",
+      "triangles": 274,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.20999999344348907,
+          0.0,
+          -0.20999999344348907
+        ],
+        [
+          0.20999999344348907,
+          2.299999952316284,
+          0.20999999344348907
+        ]
+      ],
+      "dimensions_m": [
+        0.41999998688697815,
+        2.299999952316284,
+        0.41999998688697815
+      ],
+      "pivot": "base centre, Y up, +Z front",
+      "source": "tools/art/source/dock_props_436/beacon_pole.blend",
+      "sha256": "e682d5e5e2cb0b2ad0a87ef18a8e7edb7694715c7645efc3c3c6d9dacf642836",
+      "content": "Static opaque warm lantern; no light/emission node",
+      "front": "+Z"
+    }
+  },
+  "unique_triangles": 5678,
+  "unique_surfaces": 12,
+  "scope": "Dock props only; ferry landing is review-only, no layout/game integration"
+}

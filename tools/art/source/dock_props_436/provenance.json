@@ -1,0 +1,30 @@
+{
+  "task": "SGODOT-436",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "base_commit": "206ab822561354c2b264970e2b524628e059cd44",
+  "dependencies": {
+    "coast_kit": {
+      "path": "assets/landmarks/_shared/coast_kit",
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44"
+    },
+    "water_edge": {
+      "path": "assets/landmarks/_shared/water_edge",
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44"
+    },
+    "far_backdrop": {
+      "path": "assets/landmarks/_shared/far_backdrop",
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44"
+    },
+    "ground_detail": {
+      "path": "assets/landmarks/_shared/ground_detail",
+      "git_ref": "206ab822561354c2b264970e2b524628e059cd44"
+    },
+    "sea_backdrop": {
+      "path": "assets/landmarks/_shared/sea_backdrop",
+      "git_ref": "74cbc529e9ec72eb8d2e5a527437c4a4f7bfb131",
+      "pr": 837
+    }
+  },
+  "scope": "12 new dock props; reviewed10x6 ferry landing only, no game layout or existing-file modifications"
+}

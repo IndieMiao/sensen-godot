@@ -1,0 +1,10 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-436",
+  "module": "wood_crate_open",
+  "geometry": "New editable geometry; existing assets untouched",
+  "palette": "#830 wood / Alcatraz cream and roof / street-kit dark metal",
+  "source": "tools/art/source/dock_props_436/wood_crate_open.blend",
+  "generator": "tools/art/source/dock_props_436/build.py"
+}
