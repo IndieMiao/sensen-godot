@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
+  "files": [
+    {
+      "file": "assets/landmarks/alcatraz_island/layout.json",
+      "matches_b16c3198": true,
+      "sha256": "2633e8990acd7a428ff5ec0033bc124329ed239aea97a9e01b8bb477f51269e9"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/placement_points.json",
+      "matches_b16c3198": true,
+      "sha256": "5d08d18120f05c5f96ce0384aa2778590f3c92231afd60ef11cff8dfa66f079e"
+    },
+    {
+      "file": "scenes/landmark/alcatraz_island.gd",
+      "matches_b16c3198": true,
+      "sha256": "576629ffdc79da8e515974c991f55955843169d62632585aec35fc63f8e97ca3"
+    },
+    {
+      "file": "assets/landmarks/alcatraz_island/sea_backdrop.gdshader",
+      "matches_b16c3198": true,
+      "sha256": "b2e7b8aa7751ecb2024019057a066c86c0cee353a76d79a79adbd3eee1eb5883"
+    }
+  ],
+  "main_shrub_uid_retained": true,
+  "runtime_changes": "none; independent review replaces nature batches only"
+}

@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "baseline_art_commit": "2dbef6b3b0fbd0a4057e210a731588a080ab106f",
+  "assets": [
+    {
+      "asset": "alc_shrub_b",
+      "prior_file": "alc_shrub_b.glb",
+      "whole_glb_equal": true,
+      "binary_geometry_color_normal_chunk_equal": true,
+      "binary_sha256": "64ccfdd1da8e728f9bb2b5d90b7898a512c331ad468a8967b2fbbf80928e3b7c"
+    },
+    {
+      "asset": "alc_rock_b",
+      "prior_file": "alc_rock_b.glb",
+      "whole_glb_equal": true,
+      "binary_geometry_color_normal_chunk_equal": true,
+      "binary_sha256": "48b339df174b67eaee755423b924c030fed14e733015b6164491c47f1bdd3c68"
+    },
+    {
+      "asset": "alc_shrub",
+      "prior_file": "alc_shrub_a.glb",
+      "whole_glb_equal": false,
+      "binary_geometry_color_normal_chunk_equal": true,
+      "binary_sha256": "20477a38b1f0e47e3eb90672c8bd8e8ceb926f9ccab5eb135c8ad159e792e4cf"
+    },
+    {
+      "asset": "alc_rock_a",
+      "prior_file": "alc_rock_a.glb",
+      "whole_glb_equal": true,
+      "binary_geometry_color_normal_chunk_equal": true,
+      "binary_sha256": "ba10b56b0368921dca1f4019b1e3723ffc9d7b8edf62f774b2d3bc308327924e"
+    },
+    {
+      "asset": "alc_rock_c",
+      "prior_file": "alc_rock_c.glb",
+      "whole_glb_equal": true,
+      "binary_geometry_color_normal_chunk_equal": true,
+      "binary_sha256": "a56e238eb585eaa0d537c148166ee38f4bdc2d6131c10c212ee4dffe0825284d"
+    },
+    {
+      "asset": "alc_grass_tuft",
+      "prior_file": "alc_grass_tuft.glb",
+      "whole_glb_equal": true,
+      "binary_geometry_color_normal_chunk_equal": true,
+      "binary_sha256": "b6401b32747dd308cad54fa42a91442b549835e031f057e6cb0db294c1e5b573"
+    }
+  ],
+  "note": "The main shrub changes resource/collection name only. Vertex positions, normals, colors and indices are exact."
+}

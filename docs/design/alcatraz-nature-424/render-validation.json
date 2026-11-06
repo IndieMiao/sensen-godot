@@ -41,8 +41,8 @@
 				1100,
 				900
 			],
-			"visible_draw_calls": 31,
-			"visible_primitives": 45424,
+			"visible_draw_calls": 30,
+			"visible_primitives": 42992,
 			"width_m": 18.0
 		},
 		{
@@ -52,8 +52,8 @@
 				1100,
 				900
 			],
-			"visible_draw_calls": 25,
-			"visible_primitives": 36194,
+			"visible_draw_calls": 24,
+			"visible_primitives": 33934,
 			"width_m": 20.0
 		},
 		{
@@ -63,8 +63,8 @@
 				1300,
 				1100
 			],
-			"visible_draw_calls": 49,
-			"visible_primitives": 55904,
+			"visible_draw_calls": 48,
+			"visible_primitives": 50872,
 			"width_m": 77.0
 		},
 		{
@@ -74,8 +74,8 @@
 				360,
 				800
 			],
-			"visible_draw_calls": 25,
-			"visible_primitives": 41149,
+			"visible_draw_calls": 28,
+			"visible_primitives": 43508,
 			"width_m": 6.71999979019165
 		}
 	],
@@ -117,6 +117,10 @@
 			"passed": true
 		},
 		{
+			"check": "replace all 114 owner placeholders exactly once",
+			"passed": true
+		},
+		{
 			"check": "04_blockout_shore: dimensions",
 			"passed": true
 		},
@@ -154,12 +158,14 @@
 		}
 	],
 	"lineup_avatar_height": 1.75,
-	"nature_batches": 12,
-	"nature_instances": 179,
+	"nature_batches": 9,
+	"nature_instances": 114,
 	"passed": true,
+	"removed_owner_placeholders": 114,
 	"renderer": {
 		"engine": "4.7.2-stable (official)",
 		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
 		"method": "mobile"
-	}
+	},
+	"source_layout_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0"
 }

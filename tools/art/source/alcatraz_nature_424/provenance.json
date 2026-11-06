@@ -3,8 +3,8 @@
   "references": [
     {
       "file": "blockout_layout.json",
-      "sha256": "7b86d7058338750e3c44e5c8e618d47457be8e8c9d81b729298e54fe35c23d84",
-      "bytes": 639576
+      "sha256": "2633e8990acd7a428ff5ec0033bc124329ed239aea97a9e01b8bb477f51269e9",
+      "bytes": 741018
     },
     {
       "file": "c_alc2.png",
@@ -18,7 +18,7 @@
     }
   ],
   "reference_source": "User-provided ~/incoming/landmark/; two original concept files",
-  "blockout_source_commit": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
+  "blockout_source_commit": "b16c31982f34a64cdd4f9c6683064edbf20837a0",
   "author": "刘备",
   "tools": {
     "blender": "5.2.2 LTS",

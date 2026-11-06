@@ -16,6 +16,7 @@
     "grass_tip": "ADB677"
   },
   "material": "linear COLOR_0, roughness .94, metallic 0, specular .15; opaque, no images, no external shader",
+  "godot_material": "res://assets/landmarks/alcatraz_island/alc_nature_material.tres (bound by each generated .glb.import)",
   "assets": {
     "alc_rock_a": {
       "triangle_limit": 200,
@@ -128,11 +129,11 @@
       "owner": "刘备",
       "placeholder": false
     },
-    "alc_shrub_a": {
+    "alc_shrub": {
       "triangle_limit": 200,
       "kind": "low deep-green shrub",
       "leaf_cushions": 7,
-      "file": "alc_shrub_a.glb",
+      "file": "alc_shrub.glb",
       "triangles": 140,
       "surfaces": 1,
       "bounds": [
@@ -152,8 +153,8 @@
         0.6210452914237976,
         0.7730791568756104
       ],
-      "bytes": 15596,
-      "sha256": "60955c6c8a9e6f68783f95387aafd15bd5b6d6a5a810d6dd07b0fcf27aad26d4",
+      "bytes": 15588,
+      "sha256": "7a9cf43c6b0660ef42e26ee2418889c5d0c455f968722325b9cd3ccf2c0c6674",
       "pivot": "bottom / footprint centre",
       "owner": "刘备",
       "placeholder": false
@@ -219,6 +220,5 @@
       "placeholder": false
     }
   },
-  "triangles_total": 920,
-  "godot_material": "res://assets/landmarks/alcatraz_island/alc_nature_material.tres (bound by each generated .glb.import)"
+  "triangles_total": 920
 }

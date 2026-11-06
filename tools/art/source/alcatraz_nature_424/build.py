@@ -93,7 +93,7 @@ def shrub(name,scale,warm,seed,count):
  for o in c.objects:
   for vert in o.data.vertices:vert.co-=offset
  records[name]={'triangle_limit':200,'kind':'low warm-green shrub' if warm else 'low deep-green shrub','leaf_cushions':count}
-shrub('alc_shrub_a',1,False,4244,7)
+shrub('alc_shrub',1,False,4244,7)
 shrub('alc_shrub_b',1.28,True,4245,9)
 c=collection('alc_grass_tuft');rng=random.Random(4246)
 for i in range(6):

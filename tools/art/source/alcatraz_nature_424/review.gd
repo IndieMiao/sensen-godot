@@ -39,6 +39,18 @@ func body_bounds():
  return bounds
 func add_nature():
  var manifest=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"alc_nature_placements.json"))
+ # Replace only the owner's existing batches; never stack a second layout.
+ var removed=0
+ var owner_assets=["alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"]
+ for zone in island.zones.values():
+  for n in zone.get_children():
+   if n is MultiMeshInstance3D:
+    for asset in owner_assets:
+     if str(n.name)==asset.to_pascal_case()+"Batch":
+      removed+=n.multimesh.instance_count
+      island.batch_nodes.erase(n);island._detail_batches.erase(n)
+      zone.remove_child(n);n.queue_free()
+ check(removed==manifest.points.size(),"replace all 114 owner placeholders exactly once")
  var batches={}
  for p in manifest.points:
   var key=str(p.zone)+"/"+str(p.asset)
@@ -51,6 +63,11 @@ func add_nature():
   for i in pts.size():mm.set_instance_transform(i,island._transform_of(pts[i]))
   var n=MultiMeshInstance3D.new();n.name="Nature_"+asset;n.multimesh=mm;n.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
   island.zones[pts[0].zone].add_child(n);nodes.append(n)
+  island.batch_nodes.append(n)
+  if pts[0].has("max_view_width_m"):
+   n.set_meta("max_view_width_m",float(pts[0].max_view_width_m));island._detail_batches.append(n)
+ report.source_layout_commit=manifest.source_layout_commit
+ report.removed_owner_placeholders=removed
  report.nature_instances=manifest.points.size();report.nature_batches=nodes.size()
  return nodes
 func run():
@@ -60,7 +77,7 @@ func run():
  world=Node3D.new();vp.add_child(world);light_scene()
  camera=Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.keep_aspect=Camera3D.KEEP_WIDTH;camera.size=17
  camera.position=Vector3(0,8,20);world.add_child(camera);camera.look_at(Vector3(0,.6,0));camera.make_current()
- var positions={"alc_rock_a":-6.7,"alc_rock_b":-4.55,"alc_rock_c":-1.55,"alc_shrub_a":1.5,"alc_shrub_b":3.2,"alc_grass_tuft":4.9}
+ var positions={"alc_rock_a":-6.7,"alc_rock_b":-4.55,"alc_rock_c":-1.55,"alc_shrub":1.5,"alc_shrub_b":3.2,"alc_grass_tuft":4.9}
  var models=[]
  for name in positions:
   var n=load(ROOT+name+".glb").instantiate();n.position=Vector3(positions[name],0,0);world.add_child(n);models.append(n)
@@ -89,6 +106,7 @@ func run():
  check(not island._rig.is_busy(),"blockout avatar assembled")
  var nature=add_nature();island.set_process(false);island._hud.hide();island._set_backdrop_visible(false)
  camera=island._camera;camera.far=300;camera.size=18
+ for n in nature:n.show() # whole-scene art review displays every authored item
  island._player.position=Vector3(-19.5,1,11.8)
  camera.position=Vector3(-44,18,33);camera.look_at(Vector3(-23,1.4,9))
  await capture("04_blockout_shore")

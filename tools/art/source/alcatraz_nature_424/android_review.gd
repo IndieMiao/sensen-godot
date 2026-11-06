@@ -25,7 +25,7 @@ func _process(dt):
  var goal=island._camera.unproject_position(Vector3(-22,1,17))
  var p=island._player.position
  var f=island._focus
- var data={"revision":"alcatraz-nature-424-v1","pid":OS.get_process_id(),"seq":command_seq,
+ var data={"revision":"alcatraz-nature-424-v2-b16c3198","pid":OS.get_process_id(),"seq":command_seq,
   "assembled":not island._rig.is_busy(),"navigation_ready":island.navigation_ready(),
   "actor":[p.x,p.y,p.z],"focus":[f.x,f.y,f.z],"zoom":island.camera_pan.zoom,
   "buttons":buttons,"walk_tap":[goal.x,goal.y],"running":island._running,

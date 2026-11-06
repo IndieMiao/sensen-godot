@@ -10,14 +10,14 @@ def labeled(raw,dest,title,footer):
  d.text((22,14),title,font=f(25),fill='#354138');d.text((22,im.height+86),footer,font=f(19),fill='#4d564d');canvas.save(DOC/dest)
 im=Image.open(OUT/'captures/01_scale_lineup.png').convert('RGB');canvas=Image.new('RGB',(1500,820),'#f3f1e8');canvas.paste(im,(0,70));d=ImageDraw.Draw(canvas)
 d.text((25,16),'刘备 · SGODOT-424  |  岸石 / 灌木 / 草丛  |  同比例 Godot Mobile 实渲',font=f(28),fill='#354138')
-labels=[(159,'alc_rock_a','0.95 × 0.70 × 0.84 m'),(348,'alc_rock_b','1.85 × 1.18 × 1.42 m'),(613,'alc_rock_c','2.80 × 2.08 × 2.24 m'),(882,'alc_shrub_a','0.91 × 0.62 × 0.77 m'),(1032,'alc_shrub_b','1.17 × 0.82 × 1.02 m'),(1182,'alc_grass_tuft','0.49 × 0.42 × 0.48 m'),(1315,'人物','高度 1.75 m')]
+labels=[(159,'alc_rock_a','0.95 × 0.70 × 0.84 m'),(348,'alc_rock_b','1.85 × 1.18 × 1.42 m'),(613,'alc_rock_c','2.80 × 2.08 × 2.24 m'),(882,'alc_shrub','0.91 × 0.62 × 0.77 m'),(1032,'alc_shrub_b','1.17 × 0.82 × 1.02 m'),(1182,'alc_grass_tuft','0.49 × 0.42 × 0.48 m'),(1315,'人物','高度 1.75 m')]
 for x,name,size in labels:
  d.text((x,735),name,font=f(18),fill='#354138',anchor='mt');d.text((x,766),size,font=f(12),fill='#4d564d',anchor='mt')
 canvas.save(DOC/'scale-lineup.png')
 for raw,dest,title,footer in [
- ('04_blockout_shore','blockout-shore.png','刘备 · 岸边岩石与低灌木 / 放入 #792 白模','主体 34df9c0b；新增六件原型与建议点位；海面、建筑和地形沿用白模。'),
+ ('04_blockout_shore','blockout-shore.png','刘备 · 岸边岩石与低灌木 / 放入 #792 白模','主体 b16c3198；六件正式原型替换 114 个刘备占位；海面、建筑和地形沿用白模。'),
  ('05_blockout_terraces','blockout-terraces.png','刘备 · 台地低灌木与草丛 / Godot Mobile','点位已避让原导航面；最终山坡改形后由主体重新贴地。'),
- ('06_whole_island','whole-island.png','刘备 · 179 个建议实例 / 白模整岛查看','当前白模不是最终整景美术；本次原型共 920 三角面，放置共 23,140 三角面。'),
+ ('06_whole_island','whole-island.png','刘备 · 114 个替换实例 / 白模整岛查看','当前白模不是最终整景美术；本次原型共 920 三角面，放置共 13,600 三角面。'),
  ('02_rock_detail','rock-detail.png','刘备 · 三种浅灰褐圆钝岸石','每件 180 三角面 / 1 surface；共享顶点色哑光材质。'),
  ('03_foliage_detail','foliage-detail.png','刘备 · 深绿、偏黄绿灌木与六片折叶草丛','灌木 140 / 180 三角面，草丛 60 三角面含背面；无透明贴图。')]:
  labeled(OUT/'captures'/f'{raw}.png',dest,title,footer)

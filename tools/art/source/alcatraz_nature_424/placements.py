@@ -1,55 +1,48 @@
-"""Suggested points only: never rewrites the scene owner's layout.json."""
+"""Replace the 114 owner placeholders from #792 v6; never append a second scatter."""
 from pathlib import Path
-import json,math,random
+import json,copy,hashlib
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'assets/landmarks/alcatraz_island'
+BASE='b16c31982f34a64cdd4f9c6683064edbf20837a0'
 def main():
- layout=json.loads((SRC/'reference/blockout_layout.json').read_text());manifest=json.loads((OUT/'alc_nature_manifest.json').read_text())
- rng=random.Random(42466);points=[]
- # The actual v3 terrain outline (including sloping sides), ordered clockwise.
- outline=[(-24,14),(24,14),(25,7.5),(27,3),(29,-1.5),(30,-6),(30,-17),(27,-20),(-27,-20),(-30,-17),(-30,-6),(-29,-1.5),(-27,3),(-25,7.5)]
- # Walk surfaces include corridors even where individual navigation cells were removed.
- walks=[(-23.5,-20.5,13.5,20),(-24,-18,10.5,14),(-23.5,9.5,6,9),(-23.5,9.5,1.5,4.5),(-23.5,9.5,-3,0),(-28,28,-8,-4.5),(-23.5,-20.5,7.5,12),(6.5,9.5,3,7.5),(-23.5,-20.5,-1.5,3),(6.5,9.5,-6,-1.5)]
- def near_walk(x,z,r):return any(a-r<x<b+r and c-r<z<d+r for a,b,c,d in walks)
- def add(name,pos,zone,scale=1,yaw=None):
-  points.append({'name':name+'_%03d'%sum(p['asset']==name for p in points),'asset':name,'position':[round(a,4) for a in pos],
-   'rotation_degrees':[0,round(rng.uniform(0,360) if yaw is None else yaw,3),0],'scale':[scale]*3,'zone':zone,
-   'owner':'刘备','placeholder':False,'collision':False,'multimesh':True,'cast_shadow':False})
- for a,b in zip(outline,outline[1:]+outline[:1]):
-  dx,dz=b[0]-a[0],b[1]-a[1];length=math.hypot(dx,dz);normal=(-dz/length,dx/length)
-  for i in range(max(1,int(length/2.15))):
-   t=(i+.5)/max(1,int(length/2.15));x=a[0]+dx*t;z=a[1]+dz*t
-   name=rng.choices(['alc_rock_a','alc_rock_b','alc_rock_c'],[2,4,4])[0];s=rng.uniform(.86,1.06)
-   # South bay stays open for ferry and dock; no rock in their footprints.
-   if z>12 and -25<x<7:continue
-   if near_walk(x,z,1.6):continue
-   x+=normal[0]*.35;z+=normal[1]*.35
-   add(name,(x,-.62,z),'DockZone',round(s,3))
- # Garden bands are flat in this blockout. Placement uses their actual height;
- # final sloping terrain must be raycast/reseated by the owner after remeshing.
- bands=[(-23,23,9.3,13.4,1,'DockZone'),(-24,24,4.8,5.7,3.25,'TerraceZone'),
-        (-26,26,.35,1.15,5.5,'TerraceZone'),(-28,28,-4.2,-3.4,7.75,'TerraceZone'),
-        (-28,28,-19.1,-18.6,10,'SummitZone')]
- for bi,(x0,x1,z0,z1,y,zone) in enumerate(bands):
-  for i in range(int((x1-x0)/2.2)):
-   x=x0+(i+.5)*2.2+rng.uniform(-.35,.35);z=rng.uniform(z0,z1)
-   name='alc_shrub_a' if i%3 else 'alc_shrub_b';s=round(rng.uniform(.8,1.05),3)
-   dim=manifest['assets'][name]['dimensions_m'];radius=math.hypot(dim[0],dim[2])/2*s
-   if near_walk(x,z,radius+.25):continue
-   if any(math.hypot(x-p['position'][0],z-p['position'][2])<radius+1 for p in layout['placements'] if abs(p['position'][1]-y)<.6):continue
-   if y==1 and x< -16:continue
-   add(name,(x,y-.035,z),zone,s)
- # Grass sprigs fill the same bands, keeping substantial visible earth between.
- for x0,x1,z0,z1,y,zone in bands:
-  for i in range(int((x1-x0)/1.15)):
-   x=x0+(i+.5)*1.15+rng.uniform(-.25,.25);z=rng.uniform(z0,z1)
-   if near_walk(x,z,.65):continue
-   if any(math.hypot(x-p['position'][0],z-p['position'][2])<.8 for p in points if abs(p['position'][1]-y)<.2):continue
-   if any(math.hypot(x-p['position'][0],z-p['position'][2])<1 for p in layout['placements'] if abs(p['position'][1]-y)<.6):continue
-   if y==1 and x< -16:continue
-   add('alc_grass_tuft',(x,y-.01,z),zone,round(rng.uniform(.85,1.1),3))
- result={'task':'SGODOT-424','owner':'刘备','source_layout_commit':'34df9c0b6af42a85567dfb5318c6717f929a4ab8','status':'suggested; merge once with owner placements, never append twice',
-  'axes':layout['axes'],'sea_y':-.15,'points':points,'navigation_unchanged':True,'notes':['No collisions or interactions. Keep decorative foliage low.','Rocks embed into island foot at Y=-0.62. Ground-centre origin remains Y=0 in each GLB.','Plants sit on v3 flat garden bands; re-seat after owner changes terrain.','Full island bounds extend slightly at shoreline; existing walking boundaries are untouched.','Cast shadows disabled in review for small repeated nature; final scene owner controls policy.']}
+ layout_path=SRC/'reference/blockout_layout.json'
+ layout=json.loads(layout_path.read_text());manifest=json.loads((OUT/'alc_nature_manifest.json').read_text())
+ points=[];adjustments=[]
+ for original in layout['placements']:
+  if original.get('owner')!='刘备':continue
+  p=copy.deepcopy(original);p['source_name']=original['name'];p['source_asset']=original['asset']
+  p['placeholder']=False;p['collision']=False;p['multimesh']=True;p['cast_shadow']=False
+  if p['asset']=='alc_shrub':
+   # Keep the agreed primary name; the warm variant is explicitly mapped here.
+   if int(p['name'].rsplit('_',1)[1])%3==0:p['asset']='alc_shrub_b'
+   p['position'][1]-=.035
+   p['max_view_width_m']=8.0
+  elif p['asset']=='alc_grass_tuft':
+   p['position'][1]-=.01
+   p['max_view_width_m']=8.0
+  if p['name']=='alc_rock_c_003':
+   # 2.8m finished rock is larger than the .8m placeholder. Keep the dock's
+   # walk corridor clear without shrinking the authored model or changing nav.
+   p['position'][0]=-26.2
+  if p['position']!=original['position'] or p['asset']!=original['asset']:
+   adjustments.append({'source_name':p['source_name'],'before_asset':original['asset'],'after_asset':p['asset'],
+    'before_position':original['position'],'after_position':p['position'],
+    'reason':'large rock moved 1.4m west to clear dock navigation' if p['name']=='alc_rock_c_003' else 'variant assignment and root seating'})
+  points.append(p)
+ assert len(points)==114 and len({p['source_name'] for p in points})==114
+ result={'task':'SGODOT-424','owner':'刘备','source_layout_commit':BASE,
+  'source_layout_sha256':hashlib.sha256(layout_path.read_bytes()).hexdigest(),
+  'status':'replacement suggestions; match source_name to existing owner points, never append',
+  'supersedes':'179-point proposal in PR801 at 37bbf81de; do not combine both sets',
+  'axes':layout['axes'],'sea_y':-.15,'points':points,'navigation_unchanged':True,
+  'notes':['Replace each existing owner=刘备 placement by source_name; leave all other placements intact.',
+   'Primary shrub is alc_shrub; optional warm variant alc_shrub_b has explicit assignments.',
+   'Only alc_rock_c_003 moves in X/Z: -24.8 to -26.2. Plant roots embed .035/.01m.',
+   'Rocks keep v6 base Y=-.35. No collisions or interactions; disable cast shadows.',
+   'Keep v6 foliage visibility rule: hide above 8m view width; whole-island art review shows all.',
+   'Re-seat after owner remeshes terrain; retain original navigation.'],
+  'adjustments':adjustments}
  result['counts']={n:sum(p['asset']==n for p in points) for n in manifest['assets']}
  result['placed_triangles']=sum(manifest['assets'][p['asset']]['triangles'] for p in points)
- (OUT/'alc_nature_placements.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n');print(result['counts'],result['placed_triangles'])
+ (OUT/'alc_nature_placements.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n')
+ print(result['counts'],result['placed_triangles'])
 if __name__=='__main__':main()

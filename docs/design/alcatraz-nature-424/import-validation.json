@@ -36,7 +36,7 @@
 			"uid": "uid://2wywi7cnooru",
 			"vertex_color": true
 		},
-		"alc_shrub_a": {
+		"alc_shrub": {
 			"aabb": "[P: (-0.456136, 0.0, -0.38654), S: (0.912273, 0.621045, 0.773079)]",
 			"material_class": "StandardMaterial3D",
 			"material_roughness": 0.939999997615814,
@@ -189,47 +189,47 @@
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: one mesh",
+			"check": "alc_shrub: one mesh",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: one surface",
+			"check": "alc_shrub: one surface",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: triangle budget",
+			"check": "alc_shrub: triangle budget",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: identity mesh transform",
+			"check": "alc_shrub: identity mesh transform",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: grounded pivot",
+			"check": "alc_shrub: grounded pivot",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: centred footprint",
+			"check": "alc_shrub: centred footprint",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: imported vertex colour",
+			"check": "alc_shrub: imported vertex colour",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: opaque matte material",
+			"check": "alc_shrub: opaque matte material",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: no external texture dependency",
+			"check": "alc_shrub: no external texture dependency",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: generated import",
+			"check": "alc_shrub: generated import",
 			"passed": true
 		},
 		{
-			"check": "alc_shrub_a: unique UID",
+			"check": "alc_shrub: unique UID",
 			"passed": true
 		},
 		{

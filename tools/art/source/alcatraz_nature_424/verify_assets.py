@@ -29,14 +29,22 @@ def main():
   check(hashlib.sha256(data).hexdigest()==spec['sha256'],name+': manifest hash')
  # Navigation footprint is checked independently of the generator's rectangles.
  layout=json.loads((SRC/'reference/blockout_layout.json').read_text());placements=json.loads((ASSETS/'alc_nature_placements.json').read_text());nav=layout['navigation'];rects=[]
+ originals={p['name']:p for p in layout['placements'] if p.get('owner')=='刘备'}
+ check(len(placements['points'])==len(originals)==114,'replace exactly 114 v6 owner points')
+ check({p['source_name'] for p in placements['points']}==set(originals),'every source placement replaced once')
+ check(placements['source_layout_sha256']==hashlib.sha256((SRC/'reference/blockout_layout.json').read_bytes()).hexdigest(),'pinned v6 layout hash')
  for polys in nav['zone_polygons'].values():
   for face in polys:
    vs=[nav['vertices'][i] for i in face];rects.append((min(p[0] for p in vs),max(p[0] for p in vs),min(p[2] for p in vs),max(p[2] for p in vs),sum(p[1] for p in vs)/len(vs)))
  for p in placements['points']:
   check(p['owner']=='刘备' and p['collision']==False and p['multimesh'],p['name']+': decoration metadata')
+  original=originals[p['source_name']]
+  expected=list(original['position']);expected[1]-=.035 if 'shrub' in p['asset'] else .01 if p['asset']=='alc_grass_tuft' else 0
+  if p['name']=='alc_rock_c_003':expected[0]=-26.2
+  check(p['position']==expected and p['rotation_degrees']==original['rotation_degrees'] and p['scale']==original['scale'] and p['zone']==original['zone'],p['name']+': only declared transform adjustments')
   x,y,z=p['position'];size=manifest['assets'][p['asset']]['dimensions_m'];r=math.hypot(size[0],size[2])*.5*p['scale'][0]
   hits=sum(1 for a,b,c,d,ny in rects if y<ny<y+size[1]*p['scale'][1]+.15 and math.hypot(max(a-x,0,x-b),max(c-z,0,z-d))<r+.15)
   check(hits==0,p['name']+': clear of original walk polygons')
- result={'passed':True,'checks':checks,'assets':len(manifest['assets']),'unique_triangles':sum(a['triangles'] for a in manifest['assets'].values()),'suggested_instances':len(placements['points']),'placed_triangles':placements['placed_triangles']}
+ result={'passed':True,'checks':checks,'source_layout_commit':placements['source_layout_commit'],'assets':len(manifest['assets']),'unique_triangles':sum(a['triangles'] for a in manifest['assets'].values()),'replacement_instances':len(placements['points']),'placed_triangles':placements['placed_triangles']}
  DOC.mkdir(exist_ok=True,parents=True);(DOC/'asset-validation.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n');print('ALC_ASSETS_PASS',len(checks),'checks')
 if __name__=='__main__':main()

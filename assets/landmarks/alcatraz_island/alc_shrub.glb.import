@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://jluwkbladwwm"
-path="res://.godot/imported/alc_shrub_a.glb-1e87345509c300a24ba8c0899a48de46.scn"
+path="res://.godot/imported/alc_shrub.glb-b95320b9fb238d6ab6d6c007f604a0e9.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/alc_shrub_a.glb"
-dest_files=["res://.godot/imported/alc_shrub_a.glb-1e87345509c300a24ba8c0899a48de46.scn"]
+source_file="res://assets/landmarks/alcatraz_island/alc_shrub.glb"
+dest_files=["res://.godot/imported/alc_shrub.glb-b95320b9fb238d6ab6d6c007f604a0e9.scn"]
 
 [params]
 

@@ -23,7 +23,7 @@ def gesture(*args):return call('shell','CLASSPATH=/data/local/tmp/alcatraz424-to
 try:
  before=wait(lambda s:s['revision']=='alcatraz-nature-424-v1' and s['assembled'] and s['navigation_ready'],140)
  time.sleep(4);capture('opening');checks=[]
- assert before['nature_instances']==179 and before['nature_batches']==12
+ assert before['nature_instances']==114 and before['nature_batches']==9
  tap(before['walk_tap'])
  walked=wait(lambda s:math.dist(s['actor'],before['actor'])>.65)
  time.sleep(2);walked=state();capture('walk')
