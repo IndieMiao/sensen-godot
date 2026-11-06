@@ -1,0 +1,17 @@
+{
+  "file": "ferry_flag.glb",
+  "triangles": 52,
+  "surfaces": 1,
+  "mount_position": [
+    11.2,
+    1.48,
+    2.5
+  ],
+  "pole_height_m": 1.65,
+  "cloth_size_m": [
+    0.8,
+    0.45
+  ],
+  "flutter_depth_m": 0.035,
+  "sha256": "eaaf1c0787001cc3f61513b159cd75f0a125ee04269241d6e33252a56f28f3b5"
+}

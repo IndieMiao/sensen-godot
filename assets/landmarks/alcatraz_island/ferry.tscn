@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://bcha4vcxnd13j"]
+
+[ext_resource type="PackedScene" path="res://assets/landmarks/alcatraz_island/ferry.glb" id="1"]
+[ext_resource type="PackedScene" path="res://assets/landmarks/alcatraz_island/ferry_far.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/landmarks/alcatraz_island/ferry_flag.glb" id="3"]
+[ext_resource type="AnimationLibrary" path="res://assets/landmarks/alcatraz_island/ferry_animations.tres" id="4"]
+
+[node name="Ferry" type="Node3D"]
+
+[node name="BodyRig" type="Node3D" parent="."]
+
+[node name="Near" parent="BodyRig" instance=ExtResource("1")]
+
+[node name="ferry" parent="BodyRig/Near" index="0"]
+visibility_range_end = 55.0
+
+[node name="Far" parent="BodyRig" instance=ExtResource("2")]
+
+[node name="ferry_far" parent="BodyRig/Far" index="0"]
+visibility_range_begin = 55.0
+
+[node name="SternFlag" parent="BodyRig" instance=ExtResource("3")]
+position = Vector3(11.2, 1.48, 2.5)
+
+[node name="ferry_flag" parent="BodyRig/SternFlag" index="0"]
+blend_shapes/flutter = 0.5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": ExtResource("4")
+}
+
+[editable path="BodyRig/Near"]
+[editable path="BodyRig/Far"]
+[editable path="BodyRig/SternFlag"]

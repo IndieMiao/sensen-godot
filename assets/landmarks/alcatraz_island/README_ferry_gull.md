@@ -55,3 +55,7 @@ func apply_gull_pose(instance: MeshInstance3D, pose: String) -> void:
 码头开场是原取景；完整渡轮/近远档/海鸥三姿势图是补充审阅视角，不能当作开场截图。
 审阅材料在 `docs/design/alcatraz-ferry-424-2026-11-06/`。
 桌面 Vulkan Mobile 计数不代替最终整岛或 vivo 手机验收。
+
+后续动作版：优先按 `README_animation.md` 使用 gull.tscn / ferry.tscn。
+GLB仍可作静态件；新增turn_head目标不改原站立/理毛/张翅形状。
+需要动作时由程序播idle并给三个独立实例随机起始偏移，不再同时套上表的静态权重。
