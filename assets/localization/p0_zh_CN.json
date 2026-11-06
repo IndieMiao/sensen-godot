@@ -2675,5 +2675,11 @@
  "◆ New for you": "◆ 你的新内容",
  "★ Good": "★ 不错",
  "★★ Perfect": "★★ 完美",
- "✓ Equipped": "✓ 已装备"
+ "✓ Equipped": "✓ 已装备",
+ "Attack %d": "攻击 %d",
+ "+%d HP": "+%d 生命",
+ "Restores full HP": "回满生命",
+ "In the mine only": "仅限矿内",
+ "Drink": "喝",
+ "Loading": "正在加载"
 }
