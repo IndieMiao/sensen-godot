@@ -76,7 +76,7 @@ func run():
 	clear_assets();add("alc_lighthouse",Vector3(-4.5,0,0));add("alc_watertower",Vector3(4.5,0,0));rig.position.x=0;rig.position.z=2
 	pose(21.5,Vector3(0,6.6,0),18,18);await capture("towers_player_175")
 	clear_assets();rig.visible=false
-	add("alc_far_hills",Vector3(0,0,-.4));add("alc_far_skyline",Vector3(3.5,0,0));add("alc_far_goldengate",Vector3(-7,0,.4))
+	add("alc_far_hills",Vector3(0,0,-.4));add("alc_far_city",Vector3(3.5,0,0));add("alc_far_bridge",Vector3(-7,0,.4))
 	pose(23,Vector3(0,1.5,0),8,0);vp.size=Vector2i(1500,650);await capture("scenic_cards")
 	report.passed=report.checks.all(func(c):return c.passed);report.renderer=RenderingServer.get_current_rendering_method()
 	FileAccess.open(output+"/godot-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")

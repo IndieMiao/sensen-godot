@@ -15,6 +15,7 @@ def main():
   check(set(a)=={'POSITION','NORMAL','COLOR_0'},name+' vertex colours without UV or skin')
   check(not d.get('images') and not d.get('textures') and not d.get('animations') and not d.get('skins'),name+' no textures, skeleton or animation')
   check(np.isfinite(v).all() and np.allclose(np.linalg.norm(n,axis=1),1,atol=.0001),name+' finite vertices / normals')
+  if name.startswith('alc_far_'):check(np.allclose(v[:,2],0,atol=1e-7),name+' true XY card, no world placement baked in')
   t=v[idx];area=np.linalg.norm(np.cross(t[:,1]-t[:,0],t[:,2]-t[:,0]),axis=1)
   check((area>1e-10).all(),name+' no zero-area triangles')
   low=v.min(0);high=v.max(0)
@@ -30,6 +31,7 @@ def main():
    if 'mesh' in node:check(node.get('translation',[0,0,0])==[0,0,0] and node.get('scale',[1,1,1])==[1,1,1] and node.get('rotation',[0,0,0,1])==[0,0,0,1],name+' unit node transform')
   measured[name]={'triangles':len(idx),'dimensions_m':(high-low).tolist(),'bounds':[low.tolist(),high.tolist()]}
  check(len(set(uids))==len(uids),'Unique import UIDs')
+ check(not (KIT/'alc_far_skyline.glb').exists() and not (KIT/'alc_far_goldengate.glb').exists(),'Superseded names removed from runtime package')
  for name in ['alc_lighthouse','alc_watertower']:
   ratio=measured[name+'_far']['triangles']/measured[name]['triangles'];check(.18<=ratio<=.30,name+' far/near ratio approx quarter')
   check(np.allclose(measured[name]['bounds'],measured[name+'_far']['bounds'],atol=1e-5),name+' near/far same pivot and overall bounds')

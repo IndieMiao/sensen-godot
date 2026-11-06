@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://mxqkmjnlrxni"
-path="res://.godot/imported/alc_far_goldengate.glb-7be8fa695be8c3c63aba63ee723bb741.scn"
+uid="uid://bclmga48e41ak"
+path="res://.godot/imported/alc_far_city.glb-1f46cc3ea94c91a32bfbf3b46a8a67c4.scn"
 
 [deps]
 
-source_file="res://assets/landmarks/alcatraz_island/alc_far_goldengate.glb"
-dest_files=["res://.godot/imported/alc_far_goldengate.glb-7be8fa695be8c3c63aba63ee723bb741.scn"]
+source_file="res://assets/landmarks/alcatraz_island/alc_far_city.glb"
+dest_files=["res://.godot/imported/alc_far_city.glb-1f46cc3ea94c91a32bfbf3b46a8a67c4.scn"]
 
 [params]
 

@@ -1,0 +1,1087 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "alc_lighthouse one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse real target height",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far real target height",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse_far unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower real target height",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far real target height",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower_far unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge true XY card, no world placement baked in",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city true XY card, no world placement baked in",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_far_city unit node transform",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills one named mesh",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills one surface/material",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills vertex colours without UV or skin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills no textures, skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills finite vertices / normals",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills true XY card, no world placement baked in",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills bottom / footprint-centre origin",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills measured manifest",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills import/material contract",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills SHA-256",
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills unit node transform",
+        "passed": true
+      },
+      {
+        "check": "Unique import UIDs",
+        "passed": true
+      },
+      {
+        "check": "Superseded names removed from runtime package",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse far/near ratio approx quarter",
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse near/far same pivot and overall bounds",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower far/near ratio approx quarter",
+        "passed": true
+      },
+      {
+        "check": "alc_watertower near/far same pivot and overall bounds",
+        "passed": true
+      },
+      {
+        "check": "Seven assets total <=40000",
+        "passed": true
+      }
+    ],
+    "measured": {
+      "alc_lighthouse": {
+        "triangles": 3262,
+        "dimensions_m": [
+          4.300000190734863,
+          15.0,
+          4.300000190734863
+        ],
+        "bounds": [
+          [
+            -2.1500000953674316,
+            0.0,
+            -2.1500000953674316
+          ],
+          [
+            2.1500000953674316,
+            15.0,
+            2.1500000953674316
+          ]
+        ]
+      },
+      "alc_lighthouse_far": {
+        "triangles": 830,
+        "dimensions_m": [
+          4.300000190734863,
+          15.0,
+          4.300000190734863
+        ],
+        "bounds": [
+          [
+            -2.1500000953674316,
+            0.0,
+            -2.1500000953674316
+          ],
+          [
+            2.1500000953674316,
+            15.0,
+            2.1500000953674316
+          ]
+        ]
+      },
+      "alc_watertower": {
+        "triangles": 3546,
+        "dimensions_m": [
+          4.039999961853027,
+          12.0,
+          4.039999961853027
+        ],
+        "bounds": [
+          [
+            -2.0199999809265137,
+            0.0,
+            -2.0199999809265137
+          ],
+          [
+            2.0199999809265137,
+            12.0,
+            2.0199999809265137
+          ]
+        ]
+      },
+      "alc_watertower_far": {
+        "triangles": 774,
+        "dimensions_m": [
+          4.039999961853027,
+          12.0,
+          4.039999961853027
+        ],
+        "bounds": [
+          [
+            -2.0199999809265137,
+            0.0,
+            -2.0199999809265137
+          ],
+          [
+            2.0199999809265137,
+            12.0,
+            2.0199999809265137
+          ]
+        ]
+      },
+      "alc_far_bridge": {
+        "triangles": 498,
+        "dimensions_m": [
+          2.0,
+          0.8999999761581421,
+          0.0
+        ],
+        "bounds": [
+          [
+            -1.0,
+            0.0,
+            -0.0
+          ],
+          [
+            1.0,
+            0.8999999761581421,
+            -0.0
+          ]
+        ]
+      },
+      "alc_far_city": {
+        "triangles": 208,
+        "dimensions_m": [
+          4.800000190734863,
+          0.9100000262260437,
+          0.0
+        ],
+        "bounds": [
+          [
+            -2.4000000953674316,
+            0.0,
+            -0.0
+          ],
+          [
+            2.4000000953674316,
+            0.9100000262260437,
+            -0.0
+          ]
+        ]
+      },
+      "alc_far_hills": {
+        "triangles": 120,
+        "dimensions_m": [
+          8.0,
+          0.5199999809265137,
+          0.0
+        ],
+        "bounds": [
+          [
+            -4.0,
+            0.0,
+            -0.0
+          ],
+          [
+            4.0,
+            0.5199999809265137,
+            -0.0
+          ]
+        ]
+      }
+    },
+    "total_triangles": 9238,
+    "surfaces": 7,
+    "passed": true
+  },
+  "combined_blockout": {
+    "bridge_pixels": {
+      "count": 1308,
+      "max": [
+        118,
+        121
+      ],
+      "min": [
+        11,
+        73
+      ],
+      "orange_below_hud": 645
+    },
+    "checks": [
+      {
+        "check": "Pinned blockout navigation ready",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Native dock spawn",
+        "evidence": [
+          -22.0,
+          1.0,
+          19.0
+        ],
+        "passed": true
+      },
+      {
+        "check": "Native default camera 43 / 14.5",
+        "evidence": [
+          -43.0000038146973,
+          14.5000038146973,
+          0.0
+        ],
+        "passed": true
+      },
+      {
+        "check": "Native default width 6.72",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_far_city single card, no duplicate far LOD",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "alc_far_city not culled by distance",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge single card, no duplicate far LOD",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "alc_far_bridge not culled by distance",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills single card, no duplicate far LOD",
+        "evidence": 1,
+        "passed": true
+      },
+      {
+        "check": "alc_far_hills not culled by distance",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse near/far pair",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse layout placement",
+        "evidence": [
+          -25.0,
+          10.0,
+          -11.5
+        ],
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse layout placement",
+        "evidence": [
+          -25.0,
+          10.0,
+          -11.5
+        ],
+        "passed": true
+      },
+      {
+        "check": "alc_lighthouse 55 m switch",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_watertower near/far pair",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "alc_watertower layout placement",
+        "evidence": [
+          25.0,
+          10.0,
+          -14.0
+        ],
+        "passed": true
+      },
+      {
+        "check": "alc_watertower layout placement",
+        "evidence": [
+          25.0,
+          10.0,
+          -14.0
+        ],
+        "passed": true
+      },
+      {
+        "check": "alc_watertower 55 m switch",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Combined blockout resident budgets including both LODs",
+        "evidence": [
+          46742,
+          47
+        ],
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_far_v1.1_opening_360 visible triangle budget",
+        "evidence": 29148,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_far_v1.1_opening_360 visible+shadow draw budget",
+        "evidence": 25,
+        "passed": true
+      },
+      {
+        "check": "Capture SGODOT-424_far_v1.1_opening_360",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Orange bridge visible near upper edge below HUD allowance",
+        "evidence": {
+          "changed_pixels": 1308,
+          "max": [
+            118,
+            121
+          ],
+          "min": [
+            11,
+            73
+          ],
+          "orange_pixels_y55_180": 645
+        },
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_far_v1.1_mid_hill visible triangle budget",
+        "evidence": 29928,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_far_v1.1_mid_hill visible+shadow draw budget",
+        "evidence": 36,
+        "passed": true
+      },
+      {
+        "check": "Capture SGODOT-424_far_v1.1_mid_hill",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_far_v1.1_summit visible triangle budget",
+        "evidence": 28752,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_far_v1.1_summit visible+shadow draw budget",
+        "evidence": 32,
+        "passed": true
+      },
+      {
+        "check": "Capture SGODOT-424_far_v1.1_summit",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "Native maximum width 20.16",
+        "evidence": null,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_far_v1.1_summit_wide visible triangle budget",
+        "evidence": 30750,
+        "passed": true
+      },
+      {
+        "check": "SGODOT-424_far_v1.1_summit_wide visible+shadow draw budget",
+        "evidence": 41,
+        "passed": true
+      },
+      {
+        "check": "Capture SGODOT-424_far_v1.1_summit_wide",
+        "evidence": null,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": "mobile",
+    "resident": {
+      "surfaces": 47,
+      "triangles": 46742
+    },
+    "views": {
+      "SGODOT-424_far_v1.1_mid_hill": {
+        "camera_position": [
+          14.8015584945679,
+          34.1427726745605,
+          29.2996826171875
+        ],
+        "camera_size": 6.71999979019165,
+        "player_position": [
+          8.0,
+          5.5,
+          3.0
+        ],
+        "shadow_draws": 9,
+        "total_draws": 36,
+        "triangles": 29928,
+        "visible_draws": 27
+      },
+      "SGODOT-424_far_v1.1_opening_360": {
+        "camera_position": [
+          -13.9901876449585,
+          34.1427688598633,
+          49.9716300964355
+        ],
+        "camera_size": 6.71999979019165,
+        "player_position": [
+          -22.0,
+          1.0,
+          19.0
+        ],
+        "shadow_draws": 5,
+        "total_draws": 25,
+        "triangles": 29148,
+        "visible_draws": 20
+      },
+      "SGODOT-424_far_v1.1_summit": {
+        "camera_position": [
+          5.59331178665161,
+          34.1427726745605,
+          15.6277322769165
+        ],
+        "camera_size": 6.71999979019165,
+        "player_position": [
+          0.0,
+          10.0,
+          -6.0
+        ],
+        "shadow_draws": 8,
+        "total_draws": 32,
+        "triangles": 28752,
+        "visible_draws": 24
+      },
+      "SGODOT-424_far_v1.1_summit_wide": {
+        "camera_position": [
+          20.366771697998,
+          45.064323425293,
+          6.64551115036011
+        ],
+        "camera_size": 20.1599998474121,
+        "player_position": [
+          0.0,
+          10.0,
+          -6.0
+        ],
+        "shadow_draws": 11,
+        "total_draws": 41,
+        "triangles": 30750,
+        "visible_draws": 30
+      }
+    }
+  },
+  "fixture": {
+    "source_commit": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
+    "source_layout_sha256": "7b86d7058338750e3c44e5c8e618d47457be8e8c9d81b729298e54fe35c23d84",
+    "review_layout_sha256": "b1f6f0ad84e9a038e1610f939c498a5316c14ed93464381460a73523e5497e98",
+    "layout_edit": "Remove lod_group only for three FarZone cards; preserve all positions/camera/navigation; native tower LOD 55m unchanged",
+    "host_files": {
+      "scenes/landmark/alcatraz_island.gd": "b6e49bfe6c5d0980e1040337c2410419985b4b1503710184e25661fbab75c41b",
+      "assets/landmarks/alcatraz_island/far_card.gdshader": "39386ef55891571e395cbe7a1880950ba2cd304e8568e6601c893890a16da5eb",
+      "modules/farm/farm_camera.gd": "1e2b2be4eb363a4f5107958edce74db042ec5198e32aafe199cf3c87a33fd788"
+    }
+  },
+  "placement": {
+    "task": "SGODOT-424",
+    "revision": "v1.1",
+    "author": "黄忠",
+    "source_commit": "34df9c0b6af42a85567dfb5318c6717f929a4ab8",
+    "source_layout_sha256": "7b86d7058338750e3c44e5c8e618d47457be8e8c9d81b729298e54fe35c23d84",
+    "coordinate_system": "Godot Y-up, +X east, +Z south/dock; Blender (x,-z,y)",
+    "spawn": [
+      -22,
+      1,
+      19
+    ],
+    "camera": {
+      "pitch": 43,
+      "yaw": 14.5,
+      "width": 6.72,
+      "zoom_min": 0.3333333333333333,
+      "zoom_max": 1.4,
+      "forward_bias_m": 2.8,
+      "position": [
+        -13.990189868644503,
+        34.14277266548564,
+        49.971637722564864
+      ],
+      "target": [
+        -22.701064011352436,
+        1.7,
+        16.2891866069413
+      ],
+      "size": 6.72,
+      "default_zoom": 1,
+      "max_view_width_m": 20.16,
+      "zoom_out_factor": 3,
+      "pan_bounds": [
+        -50,
+        50,
+        -40,
+        40
+      ],
+      "wide_view": {
+        "yaw_degrees": 60,
+        "target": [
+          -5,
+          17.75,
+          -8
+        ],
+        "target_offset_from_player": [
+          -5,
+          7.75,
+          -2
+        ],
+        "size": 20.16
+      }
+    },
+    "far_anchor": [
+      -22,
+      -0.15,
+      39
+    ],
+    "far_zone": {
+      "node": "FarZone",
+      "anchor": [
+        -22,
+        -0.15,
+        39
+      ],
+      "projection": "camera-facing XY cards, fake elevation, depth behind opaque island; local front +Z",
+      "render_depth_fraction": 0.92
+    },
+    "zone_transform": "identity in pinned scene; placements are already in world coordinates; do not add far_anchor twice",
+    "depth_note": "layout declares render_depth_fraction 0.92; pinned host shader binding uses bridge .94 / city .96 / hills .98; review preserves host code exactly",
+    "placements": [
+      {
+        "asset": "alc_lighthouse",
+        "zone": "SummitZone",
+        "position": [
+          -25,
+          10,
+          -11.5
+        ],
+        "rotation_degrees": [
+          0,
+          0.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "collision": true,
+        "owner": "黄忠",
+        "single_lod": false,
+        "far_asset": "alc_lighthouse_far",
+        "switch_distance_m": 55,
+        "margin_m": 0
+      },
+      {
+        "asset": "alc_watertower",
+        "zone": "SummitZone",
+        "position": [
+          25,
+          10,
+          -14
+        ],
+        "rotation_degrees": [
+          0,
+          0.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "collision": true,
+        "owner": "黄忠",
+        "single_lod": false,
+        "far_asset": "alc_watertower_far",
+        "switch_distance_m": 55,
+        "margin_m": 0
+      },
+      {
+        "asset": "alc_far_bridge",
+        "zone": "FarZone",
+        "position": [
+          -19.04838398410722,
+          30.166543193163445,
+          39
+        ],
+        "rotation_degrees": [
+          0,
+          0.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "collision": false,
+        "owner": "黄忠",
+        "single_lod": true,
+        "host_depth_fraction": 0.94
+      },
+      {
+        "asset": "alc_far_city",
+        "zone": "FarZone",
+        "position": [
+          -15.69145796946474,
+          30.881962416703644,
+          39
+        ],
+        "rotation_degrees": [
+          0,
+          0.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "collision": false,
+        "owner": "黄忠",
+        "single_lod": true,
+        "host_depth_fraction": 0.96
+      },
+      {
+        "asset": "alc_far_hills",
+        "zone": "FarZone",
+        "position": [
+          -16.827648312882193,
+          30.411582018691274,
+          39
+        ],
+        "rotation_degrees": [
+          0,
+          0.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "collision": false,
+        "owner": "黄忠",
+        "single_lod": true,
+        "host_depth_fraction": 0.98
+      }
+    ],
+    "single_card_lod_agreement": "SGODOT-424 comment 6b09d152-58e2-4deb-bc6f-b7e51d760471 (Marco Polo)",
+    "host_layout_edit": "Remove lod_group from the three far-card placements and remove those three card lod_groups; keep both tower pairs at 55 m."
+  },
+  "unchanged_tower_sha256": {
+    "assets/landmarks/alcatraz_island/alc_lighthouse.glb": "61cac63d1c1be7b8583e8dfd1692e958ee66a1dbad116cb4375fc6ac95dce9b9",
+    "assets/landmarks/alcatraz_island/alc_lighthouse.glb.import": "442941c2af90c291211b04dec1e2441fd451f4810fd69f5b0261974cdb8d4c7d",
+    "assets/landmarks/alcatraz_island/alc_lighthouse_far.glb": "bdbd5677a996fc2808a8cb41db5846d6580d0a62d0eb7dd7b2f5df167e36aefb",
+    "assets/landmarks/alcatraz_island/alc_lighthouse_far.glb.import": "563054098ce05f62c46a19876c323192dbbc4f312c0d5041b76330fa056122cb",
+    "assets/landmarks/alcatraz_island/alc_watertower.glb": "92aaf9ffd5facab3c261180cae8dcb05bb46edea0345856acdd4cc9b5815cb11",
+    "assets/landmarks/alcatraz_island/alc_watertower.glb.import": "2968700737f8b34aa80ed154c44468ba3f57ea3743745c68317138058645573a",
+    "assets/landmarks/alcatraz_island/alc_watertower_far.glb": "d37fd1ad196f152abb1a2cc754f000f11e82779bd6022cb6c31fddc17536c452",
+    "assets/landmarks/alcatraz_island/alc_watertower_far.glb.import": "3cec8ef3c296386e9ed8adce87f6eae817111752084a97d8118677f848d2df9b"
+  },
+  "passed": true
+}

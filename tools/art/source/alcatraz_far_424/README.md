@@ -11,9 +11,16 @@ flock ~/gs66-render.lock godot --headless --editor --path output/alcatraz-far-42
 flock ~/gs66-render.lock godot --headless --path output/alcatraz-far-424/project --script configure.gd -- /absolute/worktree
 flock ~/gs66-render.lock godot --path output/alcatraz-far-424/project --rendering-method mobile --rendering-driver vulkan --display-driver x11 --disable-vsync --max-fps 60
 output/art-setup/venv/bin/python tools/art/source/alcatraz_far_424/verify.py
+python3 tools/art/source/alcatraz_far_424/sync_placement.py
+python3 tools/art/source/alcatraz_far_424/prepare_island.py
+flock ~/gs66-render.lock godot --headless --editor --path output/alcatraz-far-424/island-project --import --quit
+flock ~/gs66-render.lock godot --path output/alcatraz-far-424/island-project --rendering-method mobile --rendering-driver vulkan --display-driver x11 --disable-vsync --max-fps 60
 ```
 
 导出前把各命名部件的平涂材质色转为线性 COLOR_0，合为一个 surface；保留源中的独立部件。
 远档是单独建模，保留全高、底部中心和外包围，不用运行时缩放伪造距离。
 独立审阅工程不加载账号、网络或主体场景；带实际 1.75 m 默认人物，截图最长边 1500 px。
-布局确认前不修改马可波罗文件，也不把推测的开场相机当作验收证据。
+v1.1 已按马可波罗 34df9c0b 布局确认。`prepare_island.py` 仅在 output 中取该头的白模、相机、shader 和导航，
+替换本包七件并去掉三卡 LOD；原宿主脚本逐文件哈希核对不变。`review_island.gd` 检查真实开场、
+两塔55 m切档和四个视角预算，通过实际桥开 / 关像素比较确认桥在画面上缘可见。
+`build.py -- --cards-only` 只重建三张卡片，不动四个塔 GLB。命名已改为 city / bridge，旧 skyline / goldengate 不再交付。

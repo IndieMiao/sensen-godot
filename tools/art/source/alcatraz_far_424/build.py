@@ -182,6 +182,31 @@ def export(name,builder):
  shift=Vector(((min(p.x for p in coords)+max(p.x for p in coords))*.5,(min(p.y for p in coords)+max(p.y for p in coords))*.5,min(p.z for p in coords)))
  for o in PARTS:o.location-=shift
  bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
+ if extra.get('scenic_card'):
+  # Final FarZone contract: XY card, bottom centre, +Z front. Project only
+  # forward-facing surfaces; omit collapsed side triangles instead of exporting
+  # zero-area geometry. Source part names and flat colours remain editable.
+  target={'alc_far_bridge':(2.0,.9),'alc_far_city':(4.8,.91),'alc_far_hills':(8.0,.52)}[name]
+  width=max(p.x for p in coords)-min(p.x for p in coords);height=max(p.z for p in coords)-min(p.z for p in coords)
+  for obj in PARTS:
+   evaluated=bpy.data.meshes.new_from_object(obj.evaluated_get(deps));evaluated.transform(obj.matrix_world);evaluated.calc_loop_triangles()
+   pts=[];faces=[];roles=[]
+   for t in evaluated.loop_triangles:
+    a,b,c=[evaluated.vertices[i].co for i in t.vertices]
+    # Blender -Y equals Godot front +Z; discard back/edge-on faces.
+    facing=(b-a).cross(c-a).y
+    open_card=obj.name.startswith('Layered soft shore hill') or obj.name.startswith('Salesforce rounded crown silhouette')
+    if (abs(facing)<1e-8 if open_card else facing>=-1e-8):continue
+    face=[]
+    for point in [a,b,c]:face.append(len(pts));pts.append((point.x*target[0]/width,0,point.z*target[1]/height))
+    faces.append(face);roles.append(t.material_index)
+   d=bpy.data.meshes.new(obj.name+' XY card');d.from_pydata(pts,[],faces);d.update()
+   for material in evaluated.materials:d.materials.append(material)
+   for f,role in zip(d.polygons,roles):f.material_index=role
+   obj.modifiers.clear();obj.data=d;obj.matrix_world.identity()
+   bpy.data.meshes.remove(evaluated)
+  bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
+  extra.update(card_dimensions_xy_m=list(target),projection='camera-facing XY card; local front +Z; false elevation/depth supplied by FarZone')
  bpy.ops.wm.save_as_mainfile(filepath=str(SRC/(name+'.blend')))
  flat=bpy.data.materials.new('Alcatraz matte vertex colour');flat.use_nodes=True;flat.use_backface_culling=not extra.get('scenic_card',False)
  q=flat.node_tree.nodes['Principled BSDF'];q.inputs['Base Color'].default_value=(1,1,1,1);q.inputs['Roughness'].default_value=.94;q.inputs['Metallic'].default_value=0;q.inputs['Specular IOR Level'].default_value=.15
@@ -209,11 +234,14 @@ def export(name,builder):
  bpy.context.window.scene=source;bpy.data.scenes.remove(exp);print(name,tri,lo,hi,flush=True);return entry
 def main():
  SRC.mkdir(parents=True,exist_ok=True);KIT.mkdir(parents=True,exist_ok=True)
- entries={}
- builders=[('alc_lighthouse',lambda:lighthouse(False)),('alc_lighthouse_far',lambda:lighthouse(True)),('alc_watertower',lambda:watertower(False)),('alc_watertower_far',lambda:watertower(True)),('alc_far_goldengate',goldengate),('alc_far_skyline',skyline),('alc_far_hills',hills)]
- for name,build in builders:entries[name]=export(name,build)
- m={'task':'SGODOT-424','revision':'v1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','units':'metres; Y up; +Z front; bottom-centre origin','palette_srgb':PAL,'assets':entries,
-  'placement_status':'pending v2 coordinate/camera confirmation with Marco Polo',
+ existing=KIT/'alc_far_manifest.json'
+ entries=json.loads(existing.read_text())['assets'] if '--cards-only' in sys.argv and existing.exists() else {}
+ builders=[('alc_lighthouse',lambda:lighthouse(False)),('alc_lighthouse_far',lambda:lighthouse(True)),('alc_watertower',lambda:watertower(False)),('alc_watertower_far',lambda:watertower(True)),('alc_far_bridge',goldengate),('alc_far_city',skyline),('alc_far_hills',hills)]
+ for name,build in builders:
+  if '--cards-only' not in sys.argv or name.startswith('alc_far_'):entries[name]=export(name,build)
+ m={'task':'SGODOT-424','revision':'v1.1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','units':'metres; Y up; +Z front; bottom-centre origin','palette_srgb':PAL,'assets':entries,
+  'placement_status':'aligned with 34df9c0b; see alc_far_placement.json; cards single LOD',
+  'placement_file':'alc_far_placement.json','card_lod_count':1,'card_names':['alc_far_city','alc_far_bridge','alc_far_hills'],
   'lod_pairs':[['alc_lighthouse','alc_lighthouse_far'],['alc_watertower','alc_watertower_far']]}
  (KIT/'alc_far_manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
 if __name__=='__main__':main()

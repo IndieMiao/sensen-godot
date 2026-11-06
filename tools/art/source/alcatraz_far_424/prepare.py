@@ -4,6 +4,10 @@ import hashlib,json,shutil,re
 ROOT=Path(__file__).resolve().parents[4];SRC=Path(__file__).resolve().parent
 KIT=ROOT/'assets/landmarks/alcatraz_island';OUT=ROOT/'output/alcatraz-far-424';P=OUT/'project'
 P.mkdir(parents=True,exist_ok=True)
+for obsolete in ['alc_far_skyline','alc_far_goldengate']:
+ for suffix in ['.glb','.glb.import']:
+  old=P/'assets/landmarks/alcatraz_island'/(obsolete+suffix)
+  if old.exists():old.unlink() # only our obsolete staging copies, not source assets
 for name in json.loads((ROOT/'tools/dev/scene_bench/fixtures/avatar-dependencies.json').read_text()):
  rel=name.removeprefix('res://');dest=P/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(ROOT/rel,dest)
 shutil.copytree(ROOT/'modules/avatar',P/'modules/avatar',dirs_exist_ok=True)

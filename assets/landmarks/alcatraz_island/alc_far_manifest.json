@@ -1,6 +1,6 @@
 {
   "task": "SGODOT-424",
-  "revision": "v1",
+  "revision": "v1.1",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "units": "metres; Y up; +Z front; bottom-centre origin",
@@ -134,64 +134,74 @@
       "height_m": 12,
       "style": "Rust timber and iron support structure; open X bracing retained in far LOD"
     },
-    "alc_far_goldengate": {
-      "file": "alc_far_goldengate.glb",
-      "triangles": 1524,
+    "alc_far_bridge": {
+      "file": "alc_far_bridge.glb",
+      "triangles": 498,
       "surfaces": 1,
       "bounds": [
         [
-          -2.405808687210083,
+          -1.0,
           0.0,
-          -0.11500000208616257
+          -0.0
         ],
         [
-          2.405808687210083,
-          1.277500033378601,
-          0.11500000208616257
+          1.0,
+          0.8999999761581421,
+          -0.0
         ]
       ],
       "dimensions_m": [
-        4.811617374420166,
-        1.277500033378601,
-        0.23000000417232513
+        2.0,
+        0.8999999761581421,
+        0.0
       ],
-      "sha256": "5e3ff7d772df06a5ed82629e6babbb15c7014a0df4edb4b68f96212dae88514e",
-      "source": "tools/art/source/alcatraz_far_424/alc_far_goldengate.blend",
+      "sha256": "9cd46d07c4ca491efe7bdcb716723aa87976da4373df5e5e7288f8ee80ad7d37",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_bridge.blend",
       "scenic_card": true,
       "real_scale_structure": false,
       "style": "Orange-red Golden Gate silhouette; two towers, broad roadway, continuous sagging cables",
-      "default_shadow": false
+      "default_shadow": false,
+      "card_dimensions_xy_m": [
+        2.0,
+        0.9
+      ],
+      "projection": "camera-facing XY card; local front +Z; false elevation/depth supplied by FarZone"
     },
-    "alc_far_skyline": {
-      "file": "alc_far_skyline.glb",
-      "triangles": 1201,
+    "alc_far_city": {
+      "file": "alc_far_city.glb",
+      "triangles": 208,
       "surfaces": 1,
       "bounds": [
         [
-          -6.0520453453063965,
+          -2.4000000953674316,
           0.0,
-          -0.19999998807907104
+          -0.0
         ],
         [
-          6.0520453453063965,
-          3.700000047683716,
-          0.19999998807907104
+          2.4000000953674316,
+          0.9100000262260437,
+          -0.0
         ]
       ],
       "dimensions_m": [
-        12.104090690612793,
-        3.700000047683716,
-        0.3999999761581421
+        4.800000190734863,
+        0.9100000262260437,
+        0.0
       ],
-      "sha256": "ce6c233c8c03f1127297007f22fc7a7cf0f2e54ebf095c4f78ad1fe71e9707df",
-      "source": "tools/art/source/alcatraz_far_424/alc_far_skyline.blend",
+      "sha256": "ae98acebd72673591318ede1f9b2a9c9832f30a45aa836f9eda0f6de1788c2d8",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_city.blend",
       "scenic_card": true,
       "landmark_silhouettes": [
         "Salesforce Tower",
         "Transamerica Pyramid"
       ],
       "default_shadow": false,
-      "style": "Pastel low-relief skyline, no lettering or photo texture"
+      "style": "Pastel low-relief skyline, no lettering or photo texture",
+      "card_dimensions_xy_m": [
+        4.8,
+        0.91
+      ],
+      "projection": "camera-facing XY card; local front +Z; false elevation/depth supplied by FarZone"
     },
     "alc_far_hills": {
       "file": "alc_far_hills.glb",
@@ -199,29 +209,34 @@
       "surfaces": 1,
       "bounds": [
         [
-          -10.0,
+          -4.0,
           0.0,
-          -0.1899999976158142
+          -0.0
         ],
         [
-          10.0,
-          2.4881391525268555,
-          0.1899999976158142
+          4.0,
+          0.5199999809265137,
+          -0.0
         ]
       ],
       "dimensions_m": [
-        20.0,
-        2.4881391525268555,
-        0.3799999952316284
+        8.0,
+        0.5199999809265137,
+        0.0
       ],
-      "sha256": "f434454d315a20c8e888c9a562931ff45efbe4ca62eb5cfd3851d3ccdd9cdd68",
+      "sha256": "19dc64438b9c8bc7de842e696bcce0c36dd3269e0e13f61d0bd381187ec4f9e4",
       "source": "tools/art/source/alcatraz_far_424/alc_far_hills.blend",
       "scenic_card": true,
       "default_shadow": false,
-      "style": "Three broad low-contrast hill layers, deliberately sparse silhouette"
+      "style": "Three broad low-contrast hill layers, deliberately sparse silhouette",
+      "card_dimensions_xy_m": [
+        8.0,
+        0.52
+      ],
+      "projection": "camera-facing XY card; local front +Z; false elevation/depth supplied by FarZone"
     }
   },
-  "placement_status": "pending v2 coordinate/camera confirmation with Marco Polo",
+  "placement_status": "aligned with 34df9c0b; cards single LOD",
   "lod_pairs": [
     [
       "alc_lighthouse",
@@ -231,5 +246,12 @@
       "alc_watertower",
       "alc_watertower_far"
     ]
-  ]
+  ],
+  "placement_file": "alc_far_placement.json",
+  "card_names": [
+    "alc_far_city",
+    "alc_far_bridge",
+    "alc_far_hills"
+  ],
+  "card_lod_count": 1
 }

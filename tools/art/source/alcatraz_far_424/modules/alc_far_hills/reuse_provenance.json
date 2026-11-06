@@ -5,5 +5,5 @@
   "kind": "new authored geometry",
   "source": "tools/art/source/alcatraz_far_424/alc_far_hills.blend",
   "reference": "approved landmark_alcatraz_v2.jpg / c_alc2.png",
-  "changes": "Named source primitives; explicit near/far topology; compressed scenic silhouettes; linear vertex colour export."
+  "changes": "v1.1: align final name and XY silhouette size to #792 34df9c0b; front-only colour geometry projected to Z=0; no baked world placement."
 }
