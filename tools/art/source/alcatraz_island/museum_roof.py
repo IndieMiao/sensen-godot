@@ -1,4 +1,4 @@
-"""Museum roof decoration in Godot metres; retain the 40 x 10 x 9 m envelope."""
+"""Museum roof decoration in Godot metres; retain the 40 x 10 x 9 m building."""
 import bpy
 from landmark_kit import hex_rgb
 
@@ -8,10 +8,30 @@ COLORS = {
     'museum_skylight_blue': 'A9D5DF',
     'museum_skylight_shade': '7FAEBE',
     'museum_skylight_glint': 'D7EDF0',
-    'museum_vent_shadow': '526C7C',
+    'museum_vent_body': '5E7383',
+    'museum_vent_shadow': '3F5362',
 }
 SKYLIGHT_CENTRES = [(-12, 0.6), (0, 0.6), (12, 0.6)]
 VENT_CENTRES = [(-16.3, -2.5), (16.3, -2.5)]
+VENT_SCALE = 1.5
+VENT_BASE_Y = 8.64
+
+
+def build_vents(kit, box):
+    """Scale the approved two vents about their supported bases only."""
+    for name in ['museum_vent_body', 'museum_vent_shadow']:
+        mat = bpy.data.materials.get(name) or bpy.data.materials.new(name)
+        mat.diffuse_color = (*hex_rgb(COLORS[name]), 1)
+        kit.mats[name] = mat
+    for i, (x, z) in enumerate(VENT_CENTRES, 1):
+        for part, y, offset_z, size, color, bevel in [
+            ('body', 8.79, 0, (.64, .30, .64), 'museum_vent_body', .02),
+            ('cap', 8.97, 0, (.82, .06, .82), 'museum_vent_body', .012),
+            ('inset', 8.82, .326, (.38, .095, .012), 'museum_vent_shadow', 0),
+        ]:
+            box('roof_vent_%d_%s' % (i, part),
+                (x, VENT_BASE_Y+(y-VENT_BASE_Y)*VENT_SCALE, z+offset_z*VENT_SCALE),
+                tuple(v*VENT_SCALE for v in size), color, bevel*VENT_SCALE)
 
 
 def is_roof_part(name):
@@ -68,8 +88,4 @@ def build(kit, box):
         glint = [(x-1.35, z+.15), (x-.75, z+.15), (x+.10, z+.72), (x-.65, z+.72)]
         kit.mesh(prefix+'sky_reflection', [(px, front_y(pz), pz) for px, pz in reversed(glint)],
                  [(0, 1, 2, 3)], 'museum_skylight_glint')
-    for i, (x, z) in enumerate(VENT_CENTRES, 1):
-        box('roof_vent_%d_body' % i, (x, 8.79, z), (.64, .30, .64), cream, .02)
-        box('roof_vent_%d_cap' % i, (x, 8.97, z), (.82, .06, .82), cream, .012)
-        box('roof_vent_%d_inset' % i, (x, 8.82, z+.326), (.38, .095, .012),
-            'museum_vent_shadow', 0)
+    build_vents(kit, box)

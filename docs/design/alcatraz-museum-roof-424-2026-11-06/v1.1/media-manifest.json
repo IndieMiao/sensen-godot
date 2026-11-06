@@ -1,0 +1,52 @@
+[
+  {
+    "file": "01-opening.png",
+    "sha256": "e330f52c9affc9f3b566e44ea4b40eccace1f0671cae79d966eba44a88f9ebbf",
+    "bytes": 134775
+  },
+  {
+    "file": "02-mid-hill.png",
+    "sha256": "a7a14d5d39ec9fc89a7a76de933cb4521ec9be11ae7e10c9b6a2df3bd38ca859",
+    "bytes": 272474
+  },
+  {
+    "file": "03-visitor-center.png",
+    "sha256": "a3aa319ee50631468bcad11bbee5fc7576048349ef98eb33c9ff79315eaad113",
+    "bytes": 243550
+  },
+  {
+    "file": "04-summit-wide-after.png",
+    "sha256": "5f67cd60f574e008d6cb8aec6a572881aeff68a7b68f3bc4c833bc78b06e5fa4",
+    "bytes": 248751
+  },
+  {
+    "file": "06-museum-after.png",
+    "sha256": "43c3d855b2b7b72d9271f12a14ea9a74a4e13e447af4b4d3ea74d02b054edcc2",
+    "bytes": 225533
+  },
+  {
+    "file": "07-vent-after.png",
+    "sha256": "75eeb7345021f965c23862dedaeb8d47c67d024ba11099f30d7281aeab16f0f5",
+    "bytes": 112226
+  },
+  {
+    "file": "07-vent-before.png",
+    "sha256": "30ba014110780df5f2594dbd9286575d4e55e4931e3d87e869c53ad0b48cefa8",
+    "bytes": 105573
+  },
+  {
+    "file": "08-museum-comparison.png",
+    "sha256": "1132063e2d59f322d4c1cf9d7af657b13560c6bef68265a159fa88e0cfbc0d8f",
+    "bytes": 180161
+  },
+  {
+    "file": "09-farm-camera-comparison.png",
+    "sha256": "42f2adf65ea4b88fe3e7cac5359ccfa747ba8bcd71ced4d9c5a97f868e0ef91d",
+    "bytes": 271298
+  },
+  {
+    "file": "10-vent-comparison.png",
+    "sha256": "00f7b288ee983866058fe4882d715c7c55ead34ea8022367dbe06684f6fda74e",
+    "bytes": 172125
+  }
+]

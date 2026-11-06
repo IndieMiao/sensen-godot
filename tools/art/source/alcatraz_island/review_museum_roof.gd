@@ -37,8 +37,11 @@ func _ready() -> void:
 	var old_scene := load("res://baseline/alc_museum.glb").instantiate() as Node3D
 	previous_mesh = old_scene.find_children("*","MeshInstance3D",true,false)[0].mesh
 	old_scene.free()
-	check("museum_bounds_unchanged",current_mesh.get_aabb().is_equal_approx(previous_mesh.get_aabb()),
+	var new_bounds := current_mesh.get_aabb()
+	var old_bounds := previous_mesh.get_aabb()
+	check("museum_footprint_and_origin_unchanged",new_bounds.position.is_equal_approx(old_bounds.position) and is_equal_approx(new_bounds.size.x,old_bounds.size.x) and is_equal_approx(new_bounds.size.z,old_bounds.size.z),
 		{"before":str(previous_mesh.get_aabb()),"after":str(current_mesh.get_aabb())})
+	check("enlarged_vents_top_9_18m",absf(new_bounds.end.y-9.18)<.00001,new_bounds.end.y)
 	check("one_opaque_surface",current_mesh.get_surface_count()==1 and near_node.material_override is StandardMaterial3D and near_node.material_override.transparency==BaseMaterial3D.TRANSPARENCY_DISABLED)
 	check("placement_unchanged",near_node.position.is_equal_approx(Vector3(0,10,-13)),str(near_node.position))
 	await audit_museum_lod()
@@ -79,6 +82,8 @@ func _ready() -> void:
 	await model_view("06-museum-before",previous_mesh,false)
 	await model_view("06-museum-after",current_mesh,false)
 	await model_view("07-skylight-detail",current_mesh,true)
+	await model_view("07-vent-before",previous_mesh,true,Vector3(-16.3,8.9,-2.5))
+	await model_view("07-vent-after",current_mesh,true,Vector3(-16.3,8.9,-2.5))
 	results["status"] = "pass" if failures.is_empty() else "fail"
 	results["failures"] = failures
 	results["view_metrics"] = metrics
@@ -94,7 +99,7 @@ func set_view(point: Vector3, zoom: float) -> void:
 	scene._focus = scene._follow_target()
 	scene._update_camera()
 
-func model_view(filename: String, mesh: Mesh, close: bool) -> void:
+func model_view(filename: String, mesh: Mesh, close: bool, detail_focus := Vector3(0,8.7,.6)) -> void:
 	var view := SubViewport.new()
 	view.size = Vector2i(1000,700) if not close else Vector2i(800,600)
 	view.own_world_3d = true
@@ -119,7 +124,7 @@ func model_view(filename: String, mesh: Mesh, close: bool) -> void:
 	camera.far = 200
 	camera.rotation_degrees = Vector3(-43,25,0)
 	view.add_child(camera)
-	camera.position = (Vector3(0,4.3,0) if not close else Vector3(0,8.7,.6))+camera.basis.z*65
+	camera.position = (Vector3(0,4.3,0) if not close else detail_focus)+camera.basis.z*65
 	camera.current = true
 	for frame in 10:await RenderingServer.frame_post_draw
 	view.get_texture().get_image().save_png(destination.path_join(filename+".png"))

@@ -22,14 +22,16 @@ bpy.context.preferences.filepaths.save_version = 0
 library = bpy.data.scenes['Alcatraz_Module_Library']
 bpy.context.window.scene = library
 collection = bpy.data.collections['alc_museum']
+vents_only = '--vents-only' in sys.argv
 for obj in list(collection.objects):
-    if museum_roof.is_roof_part(obj.name):
+    selected = obj.name.startswith('roof_vent_') if vents_only else museum_roof.is_roof_part(obj.name)
+    if selected:
         bpy.data.objects.remove(obj, do_unlink=True)
 kit = Kit(OUT, {})
 kit.current = collection
 kit.assets['alc_museum'] = collection
 kit.no_ao.add('alc_museum')
-museum_roof.build(kit, kit.box)
+(museum_roof.build_vents if vents_only else museum_roof.build)(kit, kit.box)
 stats = kit.export('alc_museum')
 data = (OUT/'alc_museum.glb').read_bytes()
 stats['sha256'] = hashlib.sha256(data).hexdigest()
@@ -45,12 +47,18 @@ contract = {
     'baseline': '02d5534768fc1a5557feaecb705b8f445562fd6b',
     'asset': 'alc_museum.glb', 'stats': stats,
     'units': 'metres, Godot Y-up, local ground centre; front +Z',
-    'placement': [0, 10, -13], 'envelope': [40, 9, 10],
+    'placement': [0, 10, -13], 'envelope': [40, 9.18, 10],
+    'building_envelope_without_vents': [40, 9, 10],
+    'vent_revision_baseline': '4a47e6223903e4adb504dfd738bbb0ab2cb63a27',
     'colors_srgb': museum_roof.COLORS,
     'skylights': [{'centre_xz': list(p), 'curb_size_xz': [3.8, 2.0],
                    'base_y': 8.62, 'top_y': 9.0} for p in museum_roof.SKYLIGHT_CENTRES],
-    'vents': [{'centre_xz': list(p), 'cap_size_xz': [.82, .82],
-               'base_y': 8.64, 'top_y': 9.0} for p in museum_roof.VENT_CENTRES],
+    'vents': [{'centre_xz': list(p), 'scale_from_v1': museum_roof.VENT_SCALE,
+               'body_size_xyz': [.96, .45, .96], 'body_center_y': 8.865,
+               'cap_size_xyz': [1.23, .09, 1.23], 'cap_center_y': 9.135,
+               'inset_size_xyz': [.57, .1425, .018], 'inset_center_y': 8.91,
+               'inset_offset_z': .489, 'body_bevel_m': .03, 'cap_bevel_m': .018,
+               'base_y': museum_roof.VENT_BASE_Y, 'top_y': 9.18} for p in museum_roof.VENT_CENTRES],
     'coping': {'top_y': 8.96, 'height': .06, 'width': .32},
     'material': 'One opaque matte vertex-colour surface; no textures or transparency',
 }

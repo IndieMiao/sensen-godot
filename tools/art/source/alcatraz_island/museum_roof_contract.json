@@ -4,8 +4,8 @@
   "asset": "alc_museum.glb",
   "stats": {
     "triangles": 8757,
-    "bytes": 720696,
-    "sha256": "9f2f28131f630a4162699c06a8620091185852a2c9e8af07233152e176cd3de9"
+    "bytes": 720712,
+    "sha256": "ff853c9768ea9a37569f1fe91d9133a8e49396e1e3bd835b9082249431fb1884"
   },
   "units": "metres, Godot Y-up, local ground centre; front +Z",
   "placement": [
@@ -15,16 +15,23 @@
   ],
   "envelope": [
     40,
+    9.18,
+    10
+  ],
+  "building_envelope_without_vents": [
+    40,
     9,
     10
   ],
+  "vent_revision_baseline": "4a47e6223903e4adb504dfd738bbb0ab2cb63a27",
   "colors_srgb": {
     "museum_roof_slate": "748B9C",
     "museum_roof_cream": "F0E1C2",
     "museum_skylight_blue": "A9D5DF",
     "museum_skylight_shade": "7FAEBE",
     "museum_skylight_glint": "D7EDF0",
-    "museum_vent_shadow": "526C7C"
+    "museum_vent_body": "5E7383",
+    "museum_vent_shadow": "3F5362"
   },
   "skylights": [
     {
@@ -70,24 +77,60 @@
         -16.3,
         -2.5
       ],
-      "cap_size_xz": [
-        0.82,
-        0.82
+      "scale_from_v1": 1.5,
+      "body_size_xyz": [
+        0.96,
+        0.45,
+        0.96
       ],
+      "body_center_y": 8.865,
+      "cap_size_xyz": [
+        1.23,
+        0.09,
+        1.23
+      ],
+      "cap_center_y": 9.135,
+      "inset_size_xyz": [
+        0.57,
+        0.1425,
+        0.018
+      ],
+      "inset_center_y": 8.91,
+      "inset_offset_z": 0.489,
+      "body_bevel_m": 0.03,
+      "cap_bevel_m": 0.018,
       "base_y": 8.64,
-      "top_y": 9.0
+      "top_y": 9.18
     },
     {
       "centre_xz": [
         16.3,
         -2.5
       ],
-      "cap_size_xz": [
-        0.82,
-        0.82
+      "scale_from_v1": 1.5,
+      "body_size_xyz": [
+        0.96,
+        0.45,
+        0.96
       ],
+      "body_center_y": 8.865,
+      "cap_size_xyz": [
+        1.23,
+        0.09,
+        1.23
+      ],
+      "cap_center_y": 9.135,
+      "inset_size_xyz": [
+        0.57,
+        0.1425,
+        0.018
+      ],
+      "inset_center_y": 8.91,
+      "inset_offset_z": 0.489,
+      "body_bevel_m": 0.03,
+      "cap_bevel_m": 0.018,
       "base_y": 8.64,
-      "top_y": 9.0
+      "top_y": 9.18
     }
   ],
   "coping": {

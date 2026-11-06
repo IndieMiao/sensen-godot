@@ -1,4 +1,4 @@
-"""Blender source comparison: only roof parts may differ from merged v9.
+"""Blender source comparison: only the two vents may differ from approved #835 v1.
 
 Run with Blender --background --python-exit-code 1 --python this_file.
 The baseline is recovered from the pinned merge, never another worktree.
@@ -14,8 +14,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 sys.path[:0] = [str(ROOT/'tools/art'), str(HERE)]
 import museum_roof
-BASE = '02d5534768fc1a5557feaecb705b8f445562fd6b'
-OUT = ROOT/'output/alcatraz-roof-424'
+BASE = '4a47e6223903e4adb504dfd738bbb0ab2cb63a27'
+OUT = ROOT/'output/alcatraz-roof-424/v1.1'
 OUT.mkdir(parents=True, exist_ok=True)
 baseline = OUT/'baseline-source.blend'
 baseline.write_bytes(subprocess.check_output(['git', 'show', BASE+':'+str((HERE/'alcatraz_blockout.blend').relative_to(ROOT))]))
@@ -26,7 +26,7 @@ def fingerprint(path):
     rows = {}
     roof = []
     for obj in bpy.data.objects:
-        if obj.type == 'MESH' and obj in bpy.data.collections['alc_museum'].objects.values() and museum_roof.is_roof_part(obj.name):
+        if obj.type == 'MESH' and obj in bpy.data.collections['alc_museum'].objects.values() and obj.name.startswith('roof_vent_'):
             roof.append(obj.name)
             continue
         row = {'name': obj.name, 'type': obj.type, 'matrix': [list(r) for r in obj.matrix_world],
@@ -53,9 +53,9 @@ assert not any(o.type == 'FONT' for o in collection.objects)
 assert len([o for o in collection.objects if o.name.startswith('museum_pictogram_')]) == 4
 assert len([o for o in collection.objects if o.name.startswith('museum_skylight_') and o.name.endswith('_curb')]) == 3
 assert len([o for o in collection.objects if o.name.startswith('roof_vent_') and o.name.endswith('_body')]) == 2
-report = {'passed': True, 'baseline': BASE, 'unchanged_nonroof_objects_and_instances': len(before),
+report = {'passed': True, 'baseline': BASE, 'unchanged_nonvent_objects_and_instances': len(before),
           'comparison': 'Named objects, vertices, faces, UVs, materials, bevels, transforms, collection membership and assembly instances',
-          'previous_roof_parts': old_roof, 'current_roof_parts': new_roof,
+          'previous_vent_parts': old_roof, 'current_vent_parts': new_roof,
           'skylights': 3, 'vents': 2, 'blank_sign_and_four_pictogram_parts_preserved': True,
           'blender': bpy.app.version_string}
 (OUT/'source-verification.json').write_text(json.dumps(report, indent=2)+'\n')

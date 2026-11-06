@@ -1,4 +1,4 @@
-"""Verify the exported roof delta against merged v9, independent of Blender."""
+"""Verify the exported vent delta against approved #835 v1, independent of Blender."""
 from collections import Counter, defaultdict
 from pathlib import Path
 import hashlib
@@ -8,9 +8,9 @@ import struct
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[4]
-BASE = '02d5534768fc1a5557feaecb705b8f445562fd6b'
+BASE = '4a47e6223903e4adb504dfd738bbb0ab2cb63a27'
 ASSETS = ROOT/'assets/landmarks/alcatraz_island'
-OUT = ROOT/'output/alcatraz-roof-424'
+OUT = ROOT/'output/alcatraz-roof-424/v1.1'
 
 
 def original(path):
@@ -56,15 +56,25 @@ def read_glb(data):
 near = ASSETS/'alc_museum.glb'
 before, old_bounds, _ = read_glb(original(near))
 after, new_bounds, surfaces = read_glb(near.read_bytes())
-assert old_bounds == new_bounds, (old_bounds, new_bounds)
+assert old_bounds[0] == new_bounds[0]
+assert old_bounds[1][0] == new_bounds[1][0] and old_bounds[1][2] == new_bounds[1][2]
+assert abs(new_bounds[1][1]-9.18) < .000001
 assert surfaces == 1
+
+
+def in_vent(triangle):
+    points = [dict(v)['POSITION'] for v in triangle]
+    return any(all(abs(p[0]-x) <= .616 and abs(p[2]+2.5) <= .616 and 8.639 <= p[1] <= 9.181
+                   for p in points) for x in [-16.3, 16.3])
+
+
 def geometry_and_uvs(triangles):
     geometry = Counter()
     uv_groups = defaultdict(list)
     for triangle, count in triangles.items():
         key = tuple(sorted(tuple(item for item in vertex if not item[0].startswith('TEXCOORD')) for vertex in triangle))
         geometry[key] += count
-        if min(dict(vertex)['POSITION'][1] for vertex in triangle) < 8.37:
+        if not in_vent(triangle):
             uv_groups[key].extend([tuple(dict(v).get('TEXCOORD_0', ()) for v in triangle)]*count)
     return geometry, uv_groups
 
@@ -84,6 +94,8 @@ assert max_uv_delta < .000001, max_uv_delta
 changed = list((old_geometry-new_geometry).elements())+list((new_geometry-old_geometry).elements())
 lowest = min(dict(vertex)['POSITION'][1] for triangle in changed for vertex in triangle)
 assert lowest >= 8.37, lowest
+assert all(in_vent(t) for t in changed), 'A changed triangle lies outside the two vent bounds'
+assert sum(before.values()) == sum(after.values())
 unchanged = []
 for p in ASSETS.rglob('*'):
     if not p.is_file() or p.name in ['alc_museum.glb', 'manifest.json']:
@@ -104,8 +116,8 @@ report = {'passed': True, 'baseline': BASE, 'old_near_triangles': sum(before.val
           'new_near_triangles': sum(after.values()), 'surfaces': surfaces,
           'bounds_before': old_bounds, 'bounds_after': new_bounds,
           'changed_triangles_min_y_m': lowest,
-          'method': 'Canonical triangle multiset of position/normal/vertex colour (6 decimals); every changed triangle is within the roof. Nonroof export UV float drift is measured separately; Blender source UVs are exact.',
-          'nonroof_export_max_uv_delta': max_uv_delta,
+          'method': 'Canonical triangle multiset of position/normal/vertex colour (6 decimals); every changed triangle is inside one of the two vent boxes. All other export UVs are checked separately; Blender source data outside the vents is exact.',
+          'nonvent_export_max_uv_delta': max_uv_delta,
           'unchanged_asset_files': unchanged, 'layout_and_runtime_scripts_exact': True,
           'import_uid_retained': uid, 'sha256': hashlib.sha256(near.read_bytes()).hexdigest()}
 (OUT/'asset-verification.json').write_text(json.dumps(report, indent=2)+'\n')

@@ -1,4 +1,4 @@
-"""Stage the current island plus merged-v9 roof control in an isolated project."""
+"""Stage the current island plus approved #835 v1 control in an isolated project."""
 from pathlib import Path
 import shutil
 import subprocess
@@ -7,7 +7,7 @@ import sys
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 QA = ROOT/'output/alcatraz-roof-424/project'
-BASE = '02d5534768fc1a5557feaecb705b8f445562fd6b'
+BASE = '4a47e6223903e4adb504dfd738bbb0ab2cb63a27'
 subprocess.run([sys.executable, str(HERE/'prepare.py')], check=True)
 shutil.copytree(ROOT/'output/alcatraz-424/project', QA, dirs_exist_ok=True,
                 ignore=shutil.ignore_patterns('.godot', '__pycache__'))
