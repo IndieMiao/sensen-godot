@@ -5,7 +5,7 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1")
-shader_parameter/shallow_color = Color(0.329411765, 0.835294118, 0.803921569, 1)
+shader_parameter/shallow_color = Color(0.435294118, 0.686274510, 0.627450980, 1)
 shader_parameter/deep_color = Color(0.078431373, 0.490196078, 0.631372549, 1)
 shader_parameter/far_color = Color(0.078431373, 0.490196078, 0.631372549, 1)
 shader_parameter/ripple_wavelength_m = 5.8

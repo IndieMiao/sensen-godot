@@ -1,0 +1,45 @@
+{
+  "patch_xyxy": [
+    295,
+    265,
+    315,
+    285
+  ],
+  "samples": {
+    "v1.1": {
+      "mean_rgb_255": [
+        78.065,
+        202.7325,
+        199.0325
+      ],
+      "mean_rgb_hsv": [
+        0.4950535090006083,
+        0.614935937750484,
+        0.7950294117647059
+      ]
+    },
+    "v1.2": {
+      "mean_rgb_255": [
+        103.0775,
+        168.6475,
+        160.0
+      ],
+      "mean_rgb_hsv": [
+        0.4780196736312337,
+        0.38879912242992043,
+        0.6613627450980393
+      ]
+    }
+  },
+  "rendered_saturation_ratio": 0.6322595551208121,
+  "reference_attachment": "31f7aa8a-4d7b-487a-adda-7dc9c6b74ec1",
+  "reference_sha256": "c6e45a6438ae37692e2c3fb5f6e49be06cad0e9fe5baba01e80f89528bb50401",
+  "reference_crop_xyxy": [
+    540,
+    0,
+    810,
+    600
+  ],
+  "reference_resize": "4/3 Lanczos; no colour edits; complete panel including UI",
+  "scope": "Rendered patch observation, not pixel registration or art acceptance."
+}

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "reference_head": "74cbc529e9ec72eb8d2e5a527437c4a4f7bfb131",
+  "runtime_diff": "only lake.tres shallow_color",
+  "cold_import_staged_file_count": 5,
+  "cold_import_all_staged_hashes_unchanged": true,
+  "current_native_files_match_rendered_import": {
+    "bay.tres": "d2af4d604d1beb381e3595d6bf312afb4fba8d8afd4eff29d8af2f92dc106a9e",
+    "lake.tres": "f6192088d814587dd39474afd772fce60946521f49bec6534ea8990a324f408f",
+    "sea_backdrop.gdshader": "0fc5fd9a019cab73958d6e7a9866061fac9f7ea23ec57286fb61ed65cdee041b",
+    "sea_backdrop.gdshader.uid": "fcf5c01c6244645bef779d720c03b2c52f99113784d20b722aa0d1d7b761c313"
+  },
+  "protected_paths_byte_identical": [
+    "assets/landmarks/alcatraz_island",
+    "assets/landmarks/_shared/water_edge",
+    "assets/landmarks/_shared/coast_kit",
+    "assets/ponds",
+    "modules/ponds",
+    ".codex/config.toml",
+    "assets/landmarks/_shared/sea_backdrop/bay.tres",
+    "assets/landmarks/_shared/sea_backdrop/sea_backdrop.gdshader",
+    "assets/landmarks/_shared/sea_backdrop/sea_backdrop.gdshader.uid"
+  ],
+  "android_scope": "Colour-only change, no Android rebuild this revision; v1.1 backend/input/readback evidence retained as historical evidence."
+}
