@@ -1,0 +1,31 @@
+{
+  "author": "ZHAOYUN",
+  "source": "SGODOT-324 hallkit_324.blend",
+  "changes": [
+    "Shared opal/brass sconce; unchanged local geometry, room palette mapping."
+  ],
+  "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+  "source_collection": "KIT_wall_sconce",
+  "name": "wall_sconce",
+  "file": "wall_sconce.glb",
+  "triangles": 292,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.07000000029802322,
+      -0.2800000011920929,
+      0.0
+    ],
+    [
+      0.07000000029802322,
+      0.2800000011920929,
+      0.15949998795986176
+    ]
+  ],
+  "dimensions_m": [
+    0.14000000059604645,
+    0.5600000023841858,
+    0.15949998795986176
+  ],
+  "sha256": "88d7dddbaf8370a2aac0c215c2b1d214c8c66d889346e6d1af089e7b79f0f3e6"
+}

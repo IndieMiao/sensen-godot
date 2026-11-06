@@ -1,0 +1,29 @@
+{
+  "author": "ZHAOYUN",
+  "source": "new accessory",
+  "changes": [
+    "Three closed books at the visible inner reading edge, outside the .74 m aisle."
+  ],
+  "name": "reading_books",
+  "file": "reading_books.glb",
+  "triangles": 1296,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.17000000178813934,
+      -0.000499999150633812,
+      -0.12999999523162842
+    ],
+    [
+      0.17000000178813934,
+      0.16449999809265137,
+      0.1339999884366989
+    ]
+  ],
+  "dimensions_m": [
+    0.3400000035762787,
+    0.16499999724328518,
+    0.26399998366832733
+  ],
+  "sha256": "e454800b4be21d7813a7029bb6e03f3645e93f1e1c109c86ec0d0f93346bd9a0"
+}

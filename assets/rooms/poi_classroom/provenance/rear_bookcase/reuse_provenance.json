@@ -1,0 +1,32 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/basic_room/basic_room.blend",
+  "changes": [
+    "Basic Room shelf board rebuilt into named case panels, shelves and back.",
+    "v1.1 rear case lowered to 1.50 m with three book tiers and a separate shared potted plant."
+  ],
+  "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+  "source_collection": "KIT_wall_shelf",
+  "name": "rear_bookcase",
+  "file": "rear_bookcase.glb",
+  "triangles": 10548,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.44999998807907104,
+      -5.662441071585533e-10,
+      -0.32499998807907104
+    ],
+    [
+      0.44999998807907104,
+      1.5,
+      0.32499998807907104
+    ]
+  ],
+  "dimensions_m": [
+    0.8999999761581421,
+    1.5000000005662442,
+    0.6499999761581421
+  ],
+  "sha256": "a24a358d25c8253932d2c262cfae756b1b60ae5ae7e536493b6fcc1751968f61"
+}

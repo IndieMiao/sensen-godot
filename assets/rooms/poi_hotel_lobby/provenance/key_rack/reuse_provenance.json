@@ -1,0 +1,37 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/post_office/post_office.blend",
+  "changes": [
+    "Remove floor drawers, labels and handles; retain 2.21 m width, rebuild upper cubbies as 1.30 m high shallow hanging key rack.",
+    "12 keys and wall mounting standoffs added; no letters or transactions."
+  ],
+  "source_sha256": "15725e7256a0188bc9b132f2086e7c4fd544bf186ed8afbb43b8c52cb8d965c1",
+  "source_collection": "KIT_sorting_cabinet",
+  "retained_parts": [
+    "Sorting cabinet back",
+    "Sorting cabinet stile",
+    "Sorting cabinet stile.001",
+    "Cabinet oak crown",
+    "Mail cubby shelf",
+    "Mail cubby shelf.001",
+    "Mail cubby shelf.002",
+    "Mail cubby shelf.003",
+    "Vertical cubby separator",
+    "Vertical cubby separator.001",
+    "Vertical cubby separator.002"
+  ],
+  "removed_parts": [
+    "Sorting bottom drawer",
+    "Drawer brass label frame",
+    "Drawer label",
+    "Sorting bottom drawer.001",
+    "Drawer brass label frame.001",
+    "Drawer label.001",
+    "Drawer brass pull",
+    "Drawer brass pull.001"
+  ],
+  "triangles": 4524,
+  "surfaces": 1,
+  "exported_sha256": "e12428184411e1601f68871a14fa6e9d25d26c26136f9354424b666190aff888"
+}

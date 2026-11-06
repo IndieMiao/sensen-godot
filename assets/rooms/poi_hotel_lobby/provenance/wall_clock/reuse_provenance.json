@@ -1,0 +1,32 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/post_office/post_office.blend",
+  "changes": [
+    "Original .78 m diameter and 592-triangle geometry retained; recolor only; tick marks, no numerals."
+  ],
+  "source_sha256": "15725e7256a0188bc9b132f2086e7c4fd544bf186ed8afbb43b8c52cb8d965c1",
+  "source_collection": "KIT_wall_clock",
+  "retained_parts": [
+    "Clock oak rim",
+    "Clock cream dial",
+    "Clock hour mark",
+    "Clock hour mark.001",
+    "Clock hour mark.002",
+    "Clock hour mark.003",
+    "Clock hour mark.004",
+    "Clock hour mark.005",
+    "Clock hour mark.006",
+    "Clock hour mark.007",
+    "Clock hour mark.008",
+    "Clock hour mark.009",
+    "Clock hour mark.010",
+    "Clock hour mark.011",
+    "Clock hour hand",
+    "Clock minute hand"
+  ],
+  "removed_parts": [],
+  "triangles": 592,
+  "surfaces": 1,
+  "exported_sha256": "fc24ffbcd5520bc5ea635b01187f945e11fe15d5e077a9b6d8c772b97f6c15f1"
+}

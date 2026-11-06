@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/rooms/poi_hotel_lobby/sign_b.png" id="1_8q25s"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_unufr"]
+albedo_texture = ExtResource("1_8q25s")
+metallic_specular = 0.15
+roughness = 0.9
+
+[sub_resource type="QuadMesh" id="QuadMesh_rsbno"]
+size = Vector2(1.6, 0.22)
+
+[node name="SignPatchB" type="Node3D" unique_id=725218379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 3.2, -2.912)
+
+[node name="BlankSign" type="MeshInstance3D" parent="." unique_id=1950640454]
+material_override = SubResource("StandardMaterial3D_unufr")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_rsbno")

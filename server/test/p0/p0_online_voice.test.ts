@@ -68,6 +68,7 @@ describe('P0 voice (SGODOT-383)', () => {
 
   it("Market Square's layer has voice since q(286): the whole layer of 30 (the user, 11-04)", async () => {
     expect(NO_VOICE_ROLES.has('market')).toBe(false);
+    expect(NO_VOICE_ROLES.has('poi')).toBe(true);   // POI rooms stay off (q(279) ⑧ B)
     const { voice, enter } = setup();
     voice.setAge('player-aaaa', true);
     enter('player-aaaa', 'sh_market_1');

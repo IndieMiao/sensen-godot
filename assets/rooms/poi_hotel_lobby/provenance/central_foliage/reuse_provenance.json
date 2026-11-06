@@ -1,0 +1,11 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "new",
+  "changes": [
+    "New compact broad-leaf planting; no extra floor pot."
+  ],
+  "triangles": 4992,
+  "surfaces": 1,
+  "exported_sha256": "2878663694a35a5dfb185cff59cfce8ecec628cb9ba14439b1d47422c59c30b0"
+}

@@ -1,0 +1,11 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "new",
+  "changes": [
+    "N1 v1.1: 1.68 x .30 m frame around a 1.60 x .22 m runtime text area; mounting pivot retained."
+  ],
+  "triangles": 284,
+  "surfaces": 1,
+  "exported_sha256": "823cd6c144728e8ddd78ee7ca10b997913ae1d55e47b68f74a32a53e5e8835b9"
+}

@@ -1,0 +1,1116 @@
+{
+  "source": "assets/rooms/_shared/shell_hall/hall_palette.json",
+  "source_atlas_sha256": "d4056944cff7feeb486961e0520ed86c23b91c4284849f26ce518fef711153ab",
+  "phase": "Prop colours only; shell skin not applied",
+  "slots": {
+    "parquet": {
+      "hex_srgb": "CB8655",
+      "rect_px_top_left": [
+        0,
+        0,
+        1024,
+        1024
+      ],
+      "safe_rect_px_top_left": [
+        16,
+        16,
+        992,
+        992
+      ],
+      "uv_rect_gltf": [
+        0.0078125,
+        0.0078125,
+        0.4921875,
+        0.4921875
+      ],
+      "uv_rect_blender": [
+        0.0078125,
+        0.5078125,
+        0.4921875,
+        0.9921875
+      ],
+      "kind": "shell_baked",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "plaster": {
+      "hex_srgb": "E7CBB0",
+      "rect_px_top_left": [
+        1024,
+        0,
+        1024,
+        512
+      ],
+      "safe_rect_px_top_left": [
+        1040,
+        16,
+        992,
+        480
+      ],
+      "uv_rect_gltf": [
+        0.5078125,
+        0.0078125,
+        0.9921875,
+        0.2421875
+      ],
+      "uv_rect_blender": [
+        0.5078125,
+        0.7578125,
+        0.9921875,
+        0.9921875
+      ],
+      "kind": "shell_baked",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "panel": {
+      "hex_srgb": "652E18",
+      "rect_px_top_left": [
+        1024,
+        512,
+        512,
+        512
+      ],
+      "safe_rect_px_top_left": [
+        1040,
+        528,
+        480,
+        480
+      ],
+      "uv_rect_gltf": [
+        0.5078125,
+        0.2578125,
+        0.7421875,
+        0.4921875
+      ],
+      "uv_rect_blender": [
+        0.5078125,
+        0.5078125,
+        0.7421875,
+        0.7421875
+      ],
+      "kind": "shell_baked",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "cornice": {
+      "hex_srgb": "672F1A",
+      "rect_px_top_left": [
+        1536,
+        512,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1552,
+        528,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.7578125,
+        0.2578125,
+        0.8671875,
+        0.3671875
+      ],
+      "uv_rect_blender": [
+        0.7578125,
+        0.6328125,
+        0.8671875,
+        0.7421875
+      ],
+      "kind": "shell_baked",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "skirting": {
+      "hex_srgb": "723A20",
+      "rect_px_top_left": [
+        1792,
+        512,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1808,
+        528,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.8828125,
+        0.2578125,
+        0.9921875,
+        0.3671875
+      ],
+      "uv_rect_blender": [
+        0.8828125,
+        0.6328125,
+        0.9921875,
+        0.7421875
+      ],
+      "kind": "shell_baked",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "window": {
+      "hex_srgb": "BE7839",
+      "rect_px_top_left": [
+        1536,
+        768,
+        512,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1552,
+        784,
+        480,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.7578125,
+        0.3828125,
+        0.9921875,
+        0.4921875
+      ],
+      "uv_rect_blender": [
+        0.7578125,
+        0.5078125,
+        0.9921875,
+        0.6171875
+      ],
+      "kind": "shell_baked",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "wood_dark": {
+      "hex_srgb": "551B0A",
+      "rect_px_top_left": [
+        0,
+        1024,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        16,
+        1040,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.0078125,
+        0.5078125,
+        0.1171875,
+        0.6171875
+      ],
+      "uv_rect_blender": [
+        0.0078125,
+        0.3828125,
+        0.1171875,
+        0.4921875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "wood_mid": {
+      "hex_srgb": "7B4023",
+      "rect_px_top_left": [
+        256,
+        1024,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        272,
+        1040,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.1328125,
+        0.5078125,
+        0.2421875,
+        0.6171875
+      ],
+      "uv_rect_blender": [
+        0.1328125,
+        0.3828125,
+        0.2421875,
+        0.4921875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "oak": {
+      "hex_srgb": "BE8747",
+      "rect_px_top_left": [
+        512,
+        1024,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        528,
+        1040,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.2578125,
+        0.5078125,
+        0.3671875,
+        0.6171875
+      ],
+      "uv_rect_blender": [
+        0.2578125,
+        0.3828125,
+        0.3671875,
+        0.4921875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "oak_light": {
+      "hex_srgb": "D59A53",
+      "rect_px_top_left": [
+        768,
+        1024,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        784,
+        1040,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.3828125,
+        0.5078125,
+        0.4921875,
+        0.6171875
+      ],
+      "uv_rect_blender": [
+        0.3828125,
+        0.3828125,
+        0.4921875,
+        0.4921875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "oak_edge": {
+      "hex_srgb": "AF7338",
+      "rect_px_top_left": [
+        1024,
+        1024,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1040,
+        1040,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.5078125,
+        0.5078125,
+        0.6171875,
+        0.6171875
+      ],
+      "uv_rect_blender": [
+        0.5078125,
+        0.3828125,
+        0.6171875,
+        0.4921875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "brass": {
+      "hex_srgb": "C0924A",
+      "rect_px_top_left": [
+        1280,
+        1024,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1296,
+        1040,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.6328125,
+        0.5078125,
+        0.7421875,
+        0.6171875
+      ],
+      "uv_rect_blender": [
+        0.6328125,
+        0.3828125,
+        0.7421875,
+        0.4921875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "linen": {
+      "hex_srgb": "EFE4CB",
+      "rect_px_top_left": [
+        1536,
+        1024,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1552,
+        1040,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.7578125,
+        0.5078125,
+        0.8671875,
+        0.6171875
+      ],
+      "uv_rect_blender": [
+        0.7578125,
+        0.3828125,
+        0.8671875,
+        0.4921875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "sky": {
+      "hex_srgb": "D8E7E4",
+      "rect_px_top_left": [
+        1792,
+        1024,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1808,
+        1040,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.8828125,
+        0.5078125,
+        0.9921875,
+        0.6171875
+      ],
+      "uv_rect_blender": [
+        0.8828125,
+        0.3828125,
+        0.9921875,
+        0.4921875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "sage": {
+      "hex_srgb": "567247",
+      "rect_px_top_left": [
+        0,
+        1280,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        16,
+        1296,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.0078125,
+        0.6328125,
+        0.1171875,
+        0.7421875
+      ],
+      "uv_rect_blender": [
+        0.0078125,
+        0.2578125,
+        0.1171875,
+        0.3671875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "iron": {
+      "hex_srgb": "494137",
+      "rect_px_top_left": [
+        256,
+        1280,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        272,
+        1296,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.1328125,
+        0.6328125,
+        0.2421875,
+        0.7421875
+      ],
+      "uv_rect_blender": [
+        0.1328125,
+        0.2578125,
+        0.2421875,
+        0.3671875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "porcelain": {
+      "hex_srgb": "F2E7D4",
+      "rect_px_top_left": [
+        512,
+        1280,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        528,
+        1296,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.2578125,
+        0.6328125,
+        0.3671875,
+        0.7421875
+      ],
+      "uv_rect_blender": [
+        0.2578125,
+        0.2578125,
+        0.3671875,
+        0.3671875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "sage_dark": {
+      "hex_srgb": "2B4726",
+      "rect_px_top_left": [
+        768,
+        1280,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        784,
+        1296,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.3828125,
+        0.6328125,
+        0.4921875,
+        0.7421875
+      ],
+      "uv_rect_blender": [
+        0.3828125,
+        0.2578125,
+        0.4921875,
+        0.3671875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "linen_green": {
+      "hex_srgb": "9FAB78",
+      "rect_px_top_left": [
+        1024,
+        1280,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1040,
+        1296,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.5078125,
+        0.6328125,
+        0.6171875,
+        0.7421875
+      ],
+      "uv_rect_blender": [
+        0.5078125,
+        0.2578125,
+        0.6171875,
+        0.3671875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "petal": {
+      "hex_srgb": "FFF2D4",
+      "rect_px_top_left": [
+        1280,
+        1280,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1296,
+        1296,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.6328125,
+        0.6328125,
+        0.7421875,
+        0.7421875
+      ],
+      "uv_rect_blender": [
+        0.6328125,
+        0.2578125,
+        0.7421875,
+        0.3671875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "print_portrait": {
+      "hex_srgb": "EFE4CB",
+      "rect_px_top_left": [
+        1536,
+        1280,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1552,
+        1296,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.7578125,
+        0.6328125,
+        0.8671875,
+        0.7421875
+      ],
+      "uv_rect_blender": [
+        0.7578125,
+        0.2578125,
+        0.8671875,
+        0.3671875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "print_landscape": {
+      "hex_srgb": "EFE4CB",
+      "rect_px_top_left": [
+        1792,
+        1280,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1808,
+        1296,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.8828125,
+        0.6328125,
+        0.9921875,
+        0.7421875
+      ],
+      "uv_rect_blender": [
+        0.8828125,
+        0.2578125,
+        0.9921875,
+        0.3671875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "glass": {
+      "hex_srgb": "EEF4EB",
+      "rect_px_top_left": [
+        0,
+        1536,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        16,
+        1552,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.0078125,
+        0.7578125,
+        0.1171875,
+        0.8671875
+      ],
+      "uv_rect_blender": [
+        0.0078125,
+        0.1328125,
+        0.1171875,
+        0.2421875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "stone": {
+      "hex_srgb": "C6B6A1",
+      "rect_px_top_left": [
+        256,
+        1536,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        272,
+        1552,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.1328125,
+        0.7578125,
+        0.2421875,
+        0.8671875
+      ],
+      "uv_rect_blender": [
+        0.1328125,
+        0.1328125,
+        0.2421875,
+        0.2421875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "plaster_solid": {
+      "hex_srgb": "E7CBB0",
+      "rect_px_top_left": [
+        512,
+        1536,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        528,
+        1552,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.2578125,
+        0.7578125,
+        0.3671875,
+        0.8671875
+      ],
+      "uv_rect_blender": [
+        0.2578125,
+        0.1328125,
+        0.3671875,
+        0.2421875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "wainscot_solid": {
+      "hex_srgb": "652E18",
+      "rect_px_top_left": [
+        768,
+        1536,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        784,
+        1552,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.3828125,
+        0.7578125,
+        0.4921875,
+        0.8671875
+      ],
+      "uv_rect_blender": [
+        0.3828125,
+        0.1328125,
+        0.4921875,
+        0.2421875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "cornice_solid": {
+      "hex_srgb": "672F1A",
+      "rect_px_top_left": [
+        1024,
+        1536,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1040,
+        1552,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.5078125,
+        0.7578125,
+        0.6171875,
+        0.8671875
+      ],
+      "uv_rect_blender": [
+        0.5078125,
+        0.1328125,
+        0.6171875,
+        0.2421875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "window_solid": {
+      "hex_srgb": "BE7839",
+      "rect_px_top_left": [
+        1280,
+        1536,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1296,
+        1552,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.6328125,
+        0.7578125,
+        0.7421875,
+        0.8671875
+      ],
+      "uv_rect_blender": [
+        0.6328125,
+        0.1328125,
+        0.7421875,
+        0.2421875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "floor_solid": {
+      "hex_srgb": "CB8655",
+      "rect_px_top_left": [
+        1536,
+        1536,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1552,
+        1552,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.7578125,
+        0.7578125,
+        0.8671875,
+        0.8671875
+      ],
+      "uv_rect_blender": [
+        0.7578125,
+        0.1328125,
+        0.8671875,
+        0.2421875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "soil": {
+      "hex_srgb": "51402C",
+      "rect_px_top_left": [
+        1792,
+        1536,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1808,
+        1552,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.8828125,
+        0.7578125,
+        0.9921875,
+        0.8671875
+      ],
+      "uv_rect_blender": [
+        0.8828125,
+        0.1328125,
+        0.9921875,
+        0.2421875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "leaf": {
+      "hex_srgb": "56873D",
+      "rect_px_top_left": [
+        0,
+        1792,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        16,
+        1808,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.0078125,
+        0.8828125,
+        0.1171875,
+        0.9921875
+      ],
+      "uv_rect_blender": [
+        0.0078125,
+        0.0078125,
+        0.1171875,
+        0.1171875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "leaf_light": {
+      "hex_srgb": "82AA4F",
+      "rect_px_top_left": [
+        256,
+        1792,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        272,
+        1808,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.1328125,
+        0.8828125,
+        0.2421875,
+        0.9921875
+      ],
+      "uv_rect_blender": [
+        0.1328125,
+        0.0078125,
+        0.2421875,
+        0.1171875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "leaf_dark": {
+      "hex_srgb": "365B2A",
+      "rect_px_top_left": [
+        512,
+        1792,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        528,
+        1808,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.2578125,
+        0.8828125,
+        0.3671875,
+        0.9921875
+      ],
+      "uv_rect_blender": [
+        0.2578125,
+        0.0078125,
+        0.3671875,
+        0.1171875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "terra": {
+      "hex_srgb": "BE754D",
+      "rect_px_top_left": [
+        768,
+        1792,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        784,
+        1808,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.3828125,
+        0.8828125,
+        0.4921875,
+        0.9921875
+      ],
+      "uv_rect_blender": [
+        0.3828125,
+        0.0078125,
+        0.4921875,
+        0.1171875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "terra_light": {
+      "hex_srgb": "D9905D",
+      "rect_px_top_left": [
+        1024,
+        1792,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1040,
+        1808,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.5078125,
+        0.8828125,
+        0.6171875,
+        0.9921875
+      ],
+      "uv_rect_blender": [
+        0.5078125,
+        0.0078125,
+        0.6171875,
+        0.1171875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "leather": {
+      "hex_srgb": "964B25",
+      "rect_px_top_left": [
+        1280,
+        1792,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1296,
+        1808,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.6328125,
+        0.8828125,
+        0.7421875,
+        0.9921875
+      ],
+      "uv_rect_blender": [
+        0.6328125,
+        0.0078125,
+        0.7421875,
+        0.1171875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "cloth_green": {
+      "hex_srgb": "2B4726",
+      "rect_px_top_left": [
+        1536,
+        1792,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1552,
+        1808,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.7578125,
+        0.8828125,
+        0.8671875,
+        0.9921875
+      ],
+      "uv_rect_blender": [
+        0.7578125,
+        0.0078125,
+        0.8671875,
+        0.1171875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    },
+    "accent_gold": {
+      "hex_srgb": "CFAB66",
+      "rect_px_top_left": [
+        1792,
+        1792,
+        256,
+        256
+      ],
+      "safe_rect_px_top_left": [
+        1808,
+        1808,
+        224,
+        224
+      ],
+      "uv_rect_gltf": [
+        0.8828125,
+        0.8828125,
+        0.9921875,
+        0.9921875
+      ],
+      "uv_rect_blender": [
+        0.8828125,
+        0.0078125,
+        0.9921875,
+        0.1171875
+      ],
+      "kind": "solid_reuse_swatch",
+      "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
+    }
+  },
+  "overrides": {
+    "cloth_green": "435B76",
+    "print_landscape": "6180A3",
+    "print_portrait": "BC4536",
+    "sky": "78A8C9"
+  },
+  "uv_layout_unchanged": true
+}
