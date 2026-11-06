@@ -1,0 +1,114 @@
+{
+  "verified_at_utc": "2026-11-06T00:34:50.642666+00:00",
+  "project": "SGODOT",
+  "work_item": "SGODOT-424",
+  "work_item_id": "8cf2d9ca-a2d8-4116-82c1-b62a1a8744b1",
+  "pull_request": "https://github.com/IndieMiao/sensen-godot/pull/801",
+  "art_commit": "2dbef6b3b0fbd0a4057e210a731588a080ab106f",
+  "all_readbacks_equal": true,
+  "all_visible_authors_verified": true,
+  "attachments": [
+    {
+      "source_name": "scale-lineup.png",
+      "attachment_id": "304f4f0d-f63a-4afd-9d69-c17f16539954",
+      "name": "liubei-424-alcatraz-nature-scale-lineup.png",
+      "bytes": 165006,
+      "sha256": "008528cb82286f22f5097377d07c45da4259dd81293dbf502220cea997b71dda",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "blockout-shore.png",
+      "attachment_id": "6755134b-1755-433f-8b64-ef85a49f8a55",
+      "name": "liubei-424-alcatraz-nature-blockout-shore.png",
+      "bytes": 601982,
+      "sha256": "e95a74c53c9bdfc555158abe33cf5cdf9ac5788048508d7db9c5d020a7e117f6",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "blockout-terraces.png",
+      "attachment_id": "b545de31-58a9-4b21-8198-d1dabcd27b30",
+      "name": "liubei-424-alcatraz-nature-blockout-terraces.png",
+      "bytes": 562667,
+      "sha256": "a87decb3adb42aafe3f41e1f57371720b4d00ab0dfc07fe5648e19d4be21f550",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "whole-island.png",
+      "attachment_id": "5514f54c-813c-47d5-8f8c-154f6e6a05b3",
+      "name": "liubei-424-alcatraz-nature-whole-island.png",
+      "bytes": 392232,
+      "sha256": "534e05ee9f599fa40e2e6288568d489ff16252f6130662c3fc1bf5fe7cf67df8",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "rock-detail.png",
+      "attachment_id": "a99646c8-0b0c-4d35-b5d5-e7f9bf175eee",
+      "name": "liubei-424-alcatraz-nature-rock-detail.png",
+      "bytes": 255663,
+      "sha256": "94fca2ebffe2e96ad4084327a3eb40ba389114e505035b8dfb1b0ac6d73d9ee3",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "foliage-detail.png",
+      "attachment_id": "16339673-319d-434a-9a69-777d36f8d490",
+      "name": "liubei-424-alcatraz-nature-foliage-detail.png",
+      "bytes": 156902,
+      "sha256": "043b0c227c133f8977246651a2ba0ee42cc087e97762182a34c5f0ab40fe6812",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "default-opening-360x800.png",
+      "attachment_id": "dc375226-1bdc-4501-b006-62d6ba382871",
+      "name": "liubei-424-alcatraz-nature-default-opening-360x800.png",
+      "bytes": 94777,
+      "sha256": "ed6d6f0c65b8e3e492c38b790eac74db50760009cf8e5ac9800fabd8a8fd8e17",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "android-smoke.png",
+      "attachment_id": "8e21d4f6-642a-4905-886a-f9c7935bd4ce",
+      "name": "liubei-424-alcatraz-nature-android-smoke.png",
+      "bytes": 218206,
+      "sha256": "c0e383a187cad5deff6261b7d6471a52af89d5c160ded05c8995006a9fca0d5d",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "README.md",
+      "attachment_id": "a259bd04-949c-40ec-a5fc-4c31fbe5fa66",
+      "name": "liubei-424-alcatraz-nature-nature-handoff.md",
+      "bytes": 5362,
+      "sha256": "488beac7384ae6a48c0f0344004b7241dbe7368a4b9583be21e555d2928cfe5b",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "asset-validation.json",
+      "attachment_id": "162e381b-9c0e-4bc8-aa0b-c5fe40b63069",
+      "name": "liubei-424-alcatraz-nature-asset-validation.json",
+      "bytes": 40594,
+      "sha256": "3a80f6303787dc245fe6021e671c8eed9c4d452c9fc82119d69fb55a5fc90838",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "android-validation.json",
+      "attachment_id": "73bb8a7e-c1f4-4a65-a4e5-f24959a0f63e",
+      "name": "liubei-424-alcatraz-nature-android-validation.json",
+      "bytes": 5125,
+      "sha256": "5593c3810bd15ff3c9ea103051c42897a4bbed7e05fae28263f43d223996b70b",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "package-validation.json",
+      "attachment_id": "32f874c8-df66-4ca6-ad32-683e441a286e",
+      "name": "liubei-424-alcatraz-nature-package-validation.json",
+      "bytes": 1942,
+      "sha256": "484d64bc6075f58988502def4273ad8750a2eb420537b5c8e5180eaf8203c050",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    }
+  ],
+  "comment": {
+    "id": "7acbc124-4637-46c9-8178-3295f81d1db2",
+    "actor": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "body_readback_equal": true,
+    "attribution_readback_verified": true
+  }
+}

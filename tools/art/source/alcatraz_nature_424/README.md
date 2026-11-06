@@ -8,7 +8,7 @@ Blender 5.2.2 LTS / Godot 4.7.2。交接及验收图见 [设计记录](../../../
 
 参考原件保留在 `reference/`，来源为用户指定的 `~/incoming/landmark/`。`blockout_layout.json` 来自马可波罗 #792 的 `34df9c0b6af42a85567dfb5318c6717f929a4ab8`。未见面、背面和单件尺寸是按设定风格作出的制作推定。`provenance.json` 记录文件哈希。
 
-在仓库根目录执行（Blender 脚本须用绝对路径）：
+在仓库根目录执行（Blender 脚本须用绝对路径）。隔离预览需要本地已有上述固定白模提交；新克隆可先 `git fetch origin refs/pull/792/head` 获取其历史，`prepare.py` 仍只解包固定的 `34df9c0b`：
 
 ```sh
 flock /home/deck/gs66-render.lock blender --background --python /绝对路径/tools/art/source/alcatraz_nature_424/build.py
