@@ -1,0 +1,36 @@
+# SGODOT-440 · Lv15 木作 / 石作整栋第一版
+
+刘备。依据用户2026-11-07 15:13已批准的 `SGODOT-282_homestead_design_v1.1.jpg`，在现有橙瓦、灰白墙、绿门窗上做两层整栋：a含木框架、木门廊、矮左翼；b含石砌底层、石拱门廊、石左翼与高石烟囱。两栋都有双老虎窗和花箱。参考原图与来源见 [reference](../../../tools/art/source/homestead_440/reference/provenance.json)。
+
+这是按上官已确认的439接口做的整栋候选。赵云四件仍在建，尚未取得其最终GLB；两边最终同款形状、Lv8宽度的逐件核对仍待439首版。已在 [草稿PR #854](https://github.com/IndieMiao/sensen-godot/pull/854) @赵云并给出接口。没有把这一项写成已验证。
+
+| 资产 | 三角面 | surface | 高度（含烟囱） | 默认镜头最高点 |
+|---|---:|---:|---:|---:|
+| 原 `house_cottage` | 7504 | 1 | 2.102 m | y=262.98 |
+| `master_farmhouse_a` | 7658 | 1 | 4.1085 m | y=227.94 |
+| `master_farmhouse_b` | 8662 | 1 | 4.1885 m | y=226.32 |
+
+两栋全宽约3.2034m，低于按当前 `look_parts` 真正旋转/缩放测得的Lv8木作占位组合3.2082m。主楼右界x=1.13不变；门板中心仍为(-.35,.495,.855)，原点/正面和`house_cottage`一致。上层窗和屋顶为2m门廊净空上提；总高≤4.2m、全屋入画、最高点低于y=150红线。原烟雾移到新烟口后，全周期保守投影边界分别y≥209.35/207.73；烟雾是原场景效果，不属于GLB模型高度。
+
+新增门廊地坪高0.048m。柱、凳、盆收在z≤0.975，第14行原台阶上方0.13–2m范围逐三角面裁切检查无新增几何；悬挑顶盖保持≥2m净空。门、前路、(11,14)/(7,14)/(5,14)三个牌子及邮箱均不移。近景和默认镜头的三牌中心视线均未被新房遮挡，附完整实拍。
+
+结构颜色实际采样自未修改的 `house_cottage.glb` COLOR_0；花叶用现有农场套件色板。原 `chef_sign_a/b` 的暖木和浅石与新房相容，顶点色、形状、尺寸全部保留原文件。继续使用原 `FarmArt.material()`，无新增材质pass或纹理采样。
+
+## 审阅图
+
+- [当前 / 木作 / 石作默认镜头并排](default-review.png)：每列原始360×800，无缩放或美化。
+- [最高点 y 值](height-review.png)：红线为y=150；黄点为模型实际最高屏幕投影点。
+- [门牌视角](door-sign-review.png)：两栋各一张360×800，三块牌子可见。
+- 原始图：`current-default.png`、`lv15-a/b-default.png`、`lv15-a/b-close.png`。
+
+实拍来自隔离展开的实际农场场景 `farm-dev 8493a5c42`，保留原UI、43°/14.5°镜头、光照与30块田的开场自动取景。固定离线fixture，不操作真实玩家数据。仅通过审阅脚本换两栋模型，并演示已确认的长凳(5,16)→(3,16)、左侧灌木沿-X移1m；正式程序仍由程序统一接入。原烟雾在审阅副本冻结到同一相位，未改正式shader。
+
+## 验证与接入
+
+57项独立GLB检查通过：预算、单surface、原点/朝向、无灯相机动画、实际顶点色、有限/单位法线、非退化拓扑、三角绕序、走道净空、原屋色板来源和导入元数据。Godot 4.7.2 / Deck RADV Vulkan Mobile实渲。独立Android资产场景用API37 GFXStream SwiftShader / Mobile验证三次真实点击切换、完整模型/人物、当前PID日志和安装包完整读回；不代表完整农场Android玩法或实体手机性能。
+
+新件带Godot生成的合法UID和 `nodes/root_script=null`。删除临时项目导入缓存后冷导入，两件源文件和.import的hash不变，资源加载通过。详细记录：[GLB](glb-validation.json)、[实渲](render-validation.json)、[Android](android-smoke.json)、[冷导入](cold-import.json)。
+
+正式接入要把 `look_house(a/b)` 映射换成新资产，Lv15时停止重复显示独立门廊/扩建，将原烟雾移到新烟口，并落实长凳/灌木的已批准位移。程序文件、旧房和招牌均未修改。完整参数、局部坐标和回退注意点见 [接口合同](../../../tools/art/source/homestead_440/contract.md)。
+
+可编辑源、逐组件面数/包围盒、生成脚本与隔离复拍方法见 [制作说明](../../../tools/art/source/homestead_440/README.md)。

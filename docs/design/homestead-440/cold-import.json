@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "godot": "4.7.2",
+  "source_and_import_hashes_unchanged": true,
+  "files": {
+    "assets/farm/art/master_farmhouse_a.glb": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+    "assets/farm/art/master_farmhouse_a.glb.import": "cab0b442cd267e966b4d7499627819ca61416ec1fa5879db6252538af5bd993f",
+    "assets/farm/art/master_farmhouse_b.glb": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+    "assets/farm/art/master_farmhouse_b.glb.import": "6f4b3cc31fa55423445fdc89f6ab13dc57aa1c97c8da5a393a8a8de34c6aef3e"
+  },
+  "scope": "New assets with empty .godot cache; no class registry or existing import cache."
+}

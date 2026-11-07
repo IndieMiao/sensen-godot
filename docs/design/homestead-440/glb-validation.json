@@ -1,0 +1,279 @@
+{
+  "checks": [
+    {
+      "check": "actual cottage palette source unchanged",
+      "passed": true
+    },
+    {
+      "check": "cream: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "glass: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "glass_dark: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "green: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "green_light: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "orange: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "orange_dark: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "orange_light: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "plaster: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "plaster_shade: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "roof_dark: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "stone: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "stone_light: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "stone_shade: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "wood: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "wood_dark: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "wood_light: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "yellow: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: one mesh",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: one surface",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: one vertex-color material, no textures",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: no lights / cameras / animations",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: position / normal / color only",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: triangle budget / manifest",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: GLB bounds equal manifest",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: grounded / chimney height <=4.2m",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: right limit no larger than cottage",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: left limit within measured existing Lv8 timber-wing envelope",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: origin / orientation / identity transform",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: opaque vertex color",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: unit normals",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: no zero-area triangles",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: winding agrees with normals",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: no new geometry in row14 below 2m, above original doorstep",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: recorded GLB hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: generated import UID / root_script=null",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: one mesh",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: one surface",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: one vertex-color material, no textures",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: no lights / cameras / animations",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: position / normal / color only",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: triangle budget / manifest",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: GLB bounds equal manifest",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: grounded / chimney height <=4.2m",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: right limit no larger than cottage",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: left limit within measured existing Lv8 timber-wing envelope",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: origin / orientation / identity transform",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: opaque vertex color",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: unit normals",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: no zero-area triangles",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: winding agrees with normals",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: no new geometry in row14 below 2m, above original doorstep",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: recorded GLB hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: generated import UID / root_script=null",
+      "passed": true
+    }
+  ],
+  "assets": {
+    "master_farmhouse_a": {
+      "triangles": 7658,
+      "bounds": [
+        [
+          -2.0733742713928223,
+          0.0,
+          -1.260000228881836
+        ],
+        [
+          1.1299999952316284,
+          4.108500003814697,
+          1.3975001573562622
+        ]
+      ],
+      "bytes": 552472,
+      "sha256": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+      "degenerate_triangles": 0,
+      "opposite_normals": 0
+    },
+    "master_farmhouse_b": {
+      "triangles": 8662,
+      "bounds": [
+        [
+          -2.0733742713928223,
+          0.0,
+          -1.260000228881836
+        ],
+        [
+          1.1299999952316284,
+          4.188499927520752,
+          1.159999966621399
+        ]
+      ],
+      "bytes": 630496,
+      "sha256": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+      "degenerate_triangles": 0,
+      "opposite_normals": 0
+    }
+  },
+  "existing_lv8_timber_width_m": 3.208161525726318,
+  "existing_lv8_timber_x_bounds": [
+    -2.0780000019073483,
+    1.1301615238189697
+  ],
+  "failures": [],
+  "pending": "Whole models using 439 approved coordinate contract; final shape match pending owner GLBs"
+}

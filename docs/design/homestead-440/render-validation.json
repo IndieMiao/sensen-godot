@@ -1,0 +1,314 @@
+{
+	"captures": [
+		{
+			"camera_position": "(10.77842, 15.26446, 9.111736)",
+			"camera_rotation": "(-43.0, 14.5, 0.0)",
+			"camera_size": 13.0227146148682,
+			"highest_pixel": [
+				200.520416259766,
+				262.977508544922
+			],
+			"model_height_m": 2.10199999809265,
+			"name": "current-default",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						108.76921081543,
+						309.092834472656
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						219.891174316406,
+						345.573791503906
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						150.306137084961,
+						335.322387695312
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 250.936920166016
+		},
+		{
+			"camera_position": "(10.77842, 15.26446, 9.111736)",
+			"camera_rotation": "(-43.0, 14.5, 0.0)",
+			"camera_size": 13.0227146148682,
+			"highest_pixel": [
+				176.125823974609,
+				227.937286376953
+			],
+			"model_height_m": 4.1085000038147,
+			"name": "lv15-a-default",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						108.76921081543,
+						309.092834472656
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						219.891174316406,
+						345.573791503906
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						150.306137084961,
+						335.322387695312
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 209.351287841797
+		},
+		{
+			"camera_position": "(7.668732, 10.14277, -1.555798)",
+			"camera_rotation": "(-43.0, 14.5, 0.0)",
+			"camera_size": 6.71999979019165,
+			"highest_pixel": [
+				190.690338134766,
+				271.670654296875
+			],
+			"model_height_m": 4.1085000038147,
+			"name": "lv15-a-close",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						60.1597175598145,
+						428.942230224609
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						275.503387451172,
+						499.638854980469
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						140.654266357422,
+						479.772552490234
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 235.652786254883
+		},
+		{
+			"camera_position": "(10.77842, 15.26446, 9.111736)",
+			"camera_rotation": "(-43.0, 14.5, 0.0)",
+			"camera_size": 13.0227146148682,
+			"highest_pixel": [
+				176.125823974609,
+				226.319900512695
+			],
+			"model_height_m": 4.18849992752075,
+			"name": "lv15-b-default",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						108.76921081543,
+						309.092834472656
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						219.891174316406,
+						345.573791503906
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						150.306137084961,
+						335.322387695312
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 207.73388671875
+		},
+		{
+			"camera_position": "(7.668732, 10.14277, -1.555798)",
+			"camera_rotation": "(-43.0, 14.5, 0.0)",
+			"camera_size": 6.71999979019165,
+			"highest_pixel": [
+				190.690338134766,
+				268.536315917969
+			],
+			"model_height_m": 4.18849992752075,
+			"name": "lv15-b-close",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						60.1597175598145,
+						428.942230224609
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						275.503387451172,
+						499.638854980469
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						140.654266357422,
+						479.772552490234
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 232.518417358398
+		}
+	],
+	"checks": [
+		{
+			"check": "original farm smoke found",
+			"passed": true
+		},
+		{
+			"check": "current-default 360x800",
+			"passed": true
+		},
+		{
+			"check": "current-default house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "current-default upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "current-default chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "current-default model top below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "current-default smoke full-cycle bound below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "authorized left shrub preview relocation",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-default 360x800",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-default house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-default upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-default chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-default model top below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-default smoke full-cycle bound below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-close 360x800",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-close house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-close upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-close chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-default 360x800",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-default house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-default upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-default chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-default model top below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-default smoke full-cycle bound below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-close 360x800",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-close house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-close upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-close chef_sign unobstructed by house",
+			"passed": true
+		}
+	],
+	"renderer": {
+		"engine": "4.7.2-stable (official)",
+		"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+		"method": "mobile"
+	},
+	"scenery_preview": {
+		"bench_grid_after": [
+			3,
+			16
+		],
+		"bench_grid_before": [
+			5,
+			16
+		],
+		"left_shrub_shift_m": [
+			-1,
+			0,
+			0
+		],
+		"production_scripts_modified": false
+	}
+}

@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "states": [
+    {
+      "assembled": true,
+      "asset": "house_cottage",
+      "button": [
+        180,
+        759
+      ],
+      "frames": 55,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "height": 2.10199999809265,
+      "model_triangles": 7504,
+      "pid": 23356,
+      "renderer": "mobile",
+      "sequence": 0,
+      "surfaces": 1,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "assembled": true,
+      "asset": "master_farmhouse_a",
+      "button": [
+        180,
+        759
+      ],
+      "frames": 89,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "height": 4.1085000038147,
+      "model_triangles": 7658,
+      "pid": 23356,
+      "renderer": "mobile",
+      "sequence": 1,
+      "surfaces": 1,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "assembled": true,
+      "asset": "master_farmhouse_b",
+      "button": [
+        180,
+        759
+      ],
+      "frames": 126,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "height": 4.18849992752075,
+      "model_triangles": 8662,
+      "pid": 23356,
+      "renderer": "mobile",
+      "sequence": 2,
+      "surfaces": 1,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "assembled": true,
+      "asset": "house_cottage",
+      "button": [
+        180,
+        759
+      ],
+      "frames": 163,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "height": 2.10199999809265,
+      "model_triangles": 7504,
+      "pid": 23356,
+      "renderer": "mobile",
+      "sequence": 3,
+      "surfaces": 1,
+      "viewport": [
+        360,
+        800
+      ]
+    }
+  ],
+  "real_button_taps": 3,
+  "apk_sha256": "384e4ead278ca01d52fd48c78ae9921addda609bbeb93af2ecfe4e6d292d63e7",
+  "installed_apk_readback_equal": true,
+  "scope": "Dedicated asset fixture, API37 SwiftShader / Vulkan Mobile. Not a full-game or physical-phone test.",
+  "packaged_imported_models_match": [
+    {
+      "asset": "master_farmhouse_a",
+      "imported_path": ".godot/imported/master_farmhouse_a.glb-16e3ecbd531ac50700f6a5403cd6e26c.scn",
+      "sha256": "b0b227a5ce6325641e24e25f851839519d1a14431e6ae3cd49b46fa2103caea8",
+      "bytes": 131072,
+      "source_glb_sha256": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+      "packed_uid_and_remap_match": true
+    },
+    {
+      "asset": "master_farmhouse_b",
+      "imported_path": ".godot/imported/master_farmhouse_b.glb-759711aa88b0bb831415bebc1fe8c8b0.scn",
+      "sha256": "9c9d44b56aea459ccd47d2301a8cd561e7d2580412333973bc655886ea4e9e6c",
+      "bytes": 146763,
+      "source_glb_sha256": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+      "packed_uid_and_remap_match": true
+    }
+  ]
+}

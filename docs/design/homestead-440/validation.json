@@ -1,0 +1,724 @@
+{
+  "task": "SGODOT-440",
+  "art_base": "5585f325f1057df263c187575a877632e5833b6c",
+  "runtime_reference": "8493a5c4258db3e59b2b845c83d3ee5b34724156",
+  "components_match_status": "439 coordinate interface applied; final shape cross-check awaiting owner first GLBs",
+  "preserved_files_sha256": {
+    "assets/farm/art/house_cottage.glb": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c",
+    "assets/farm/art/chef_sign_a.glb": "791b4165428c883f26aeafdec3fef65e7d872e39772ba64ef59fc5b96082130a",
+    "assets/farm/art/chef_sign_b.glb": "4aa4bce928d98e5f3d9131bbf76db888d3935e03924a4ea70eac99631c7ee708",
+    "modules/p0/p0_garden.gd": "54390c10bd1e7ff1c59e1880507444448ef49d3753e8d4fe205788dd0b7fa366"
+  },
+  "glb": {
+    "checks": [
+      {
+        "check": "actual cottage palette source unchanged",
+        "passed": true
+      },
+      {
+        "check": "cream: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "glass: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "glass_dark: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "green: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "green_light: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "orange: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "orange_dark: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "orange_light: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "plaster: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "plaster_shade: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "roof_dark: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "stone: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "stone_light: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "stone_shade: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "wood: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "wood_dark: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "wood_light: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "yellow: actual cottage COLOR_0 sample",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: one mesh",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: one surface",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: one vertex-color material, no textures",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: no lights / cameras / animations",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: position / normal / color only",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: triangle budget / manifest",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: GLB bounds equal manifest",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: grounded / chimney height <=4.2m",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: right limit no larger than cottage",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: left limit within measured existing Lv8 timber-wing envelope",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: origin / orientation / identity transform",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: opaque vertex color",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: finite attributes",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: unit normals",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: no new geometry in row14 below 2m, above original doorstep",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: recorded GLB hash",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_a: generated import UID / root_script=null",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: one mesh",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: one surface",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: one vertex-color material, no textures",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: no lights / cameras / animations",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: position / normal / color only",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: triangle budget / manifest",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: GLB bounds equal manifest",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: grounded / chimney height <=4.2m",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: right limit no larger than cottage",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: left limit within measured existing Lv8 timber-wing envelope",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: origin / orientation / identity transform",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: opaque vertex color",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: finite attributes",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: unit normals",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: no new geometry in row14 below 2m, above original doorstep",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: recorded GLB hash",
+        "passed": true
+      },
+      {
+        "check": "master_farmhouse_b: generated import UID / root_script=null",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "master_farmhouse_a": {
+        "triangles": 7658,
+        "bounds": [
+          [
+            -2.0733742713928223,
+            0.0,
+            -1.260000228881836
+          ],
+          [
+            1.1299999952316284,
+            4.108500003814697,
+            1.3975001573562622
+          ]
+        ],
+        "bytes": 552472,
+        "sha256": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+        "degenerate_triangles": 0,
+        "opposite_normals": 0
+      },
+      "master_farmhouse_b": {
+        "triangles": 8662,
+        "bounds": [
+          [
+            -2.0733742713928223,
+            0.0,
+            -1.260000228881836
+          ],
+          [
+            1.1299999952316284,
+            4.188499927520752,
+            1.159999966621399
+          ]
+        ],
+        "bytes": 630496,
+        "sha256": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+        "degenerate_triangles": 0,
+        "opposite_normals": 0
+      }
+    },
+    "existing_lv8_timber_width_m": 3.208161525726318,
+    "existing_lv8_timber_x_bounds": [
+      -2.0780000019073483,
+      1.1301615238189697
+    ],
+    "failures": [],
+    "pending": "Whole models using 439 approved coordinate contract; final shape match pending owner GLBs"
+  },
+  "render": {
+    "captures": [
+      {
+        "camera_position": "(10.77842, 15.26446, 9.111736)",
+        "camera_rotation": "(-43.0, 14.5, 0.0)",
+        "camera_size": 13.0227146148682,
+        "highest_pixel": [
+          200.520416259766,
+          262.977508544922
+        ],
+        "model_height_m": 2.10199999809265,
+        "name": "current-default",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              108.76921081543,
+              309.092834472656
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              219.891174316406,
+              345.573791503906
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              150.306137084961,
+              335.322387695312
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 250.936920166016
+      },
+      {
+        "camera_position": "(10.77842, 15.26446, 9.111736)",
+        "camera_rotation": "(-43.0, 14.5, 0.0)",
+        "camera_size": 13.0227146148682,
+        "highest_pixel": [
+          176.125823974609,
+          227.937286376953
+        ],
+        "model_height_m": 4.1085000038147,
+        "name": "lv15-a-default",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              108.76921081543,
+              309.092834472656
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              219.891174316406,
+              345.573791503906
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              150.306137084961,
+              335.322387695312
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 209.351287841797
+      },
+      {
+        "camera_position": "(7.668732, 10.14277, -1.555798)",
+        "camera_rotation": "(-43.0, 14.5, 0.0)",
+        "camera_size": 6.71999979019165,
+        "highest_pixel": [
+          190.690338134766,
+          271.670654296875
+        ],
+        "model_height_m": 4.1085000038147,
+        "name": "lv15-a-close",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              60.1597175598145,
+              428.942230224609
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              275.503387451172,
+              499.638854980469
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              140.654266357422,
+              479.772552490234
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 235.652786254883
+      },
+      {
+        "camera_position": "(10.77842, 15.26446, 9.111736)",
+        "camera_rotation": "(-43.0, 14.5, 0.0)",
+        "camera_size": 13.0227146148682,
+        "highest_pixel": [
+          176.125823974609,
+          226.319900512695
+        ],
+        "model_height_m": 4.18849992752075,
+        "name": "lv15-b-default",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              108.76921081543,
+              309.092834472656
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              219.891174316406,
+              345.573791503906
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              150.306137084961,
+              335.322387695312
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 207.73388671875
+      },
+      {
+        "camera_position": "(7.668732, 10.14277, -1.555798)",
+        "camera_rotation": "(-43.0, 14.5, 0.0)",
+        "camera_size": 6.71999979019165,
+        "highest_pixel": [
+          190.690338134766,
+          268.536315917969
+        ],
+        "model_height_m": 4.18849992752075,
+        "name": "lv15-b-close",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              60.1597175598145,
+              428.942230224609
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              275.503387451172,
+              499.638854980469
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              140.654266357422,
+              479.772552490234
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 232.518417358398
+      }
+    ],
+    "checks": [
+      {
+        "check": "original farm smoke found",
+        "passed": true
+      },
+      {
+        "check": "current-default 360x800",
+        "passed": true
+      },
+      {
+        "check": "current-default house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "current-default upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "current-default chef_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "current-default model top below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "current-default smoke full-cycle bound below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "authorized left shrub preview relocation",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-default 360x800",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-default house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-default upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-default chef_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-default model top below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-default smoke full-cycle bound below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-close 360x800",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-close house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-close upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-close chef_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-default 360x800",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-default house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-default upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-default chef_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-default model top below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-default smoke full-cycle bound below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-close 360x800",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-close house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-close upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-close chef_sign unobstructed by house",
+        "passed": true
+      }
+    ],
+    "renderer": {
+      "engine": "4.7.2-stable (official)",
+      "gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+      "method": "mobile"
+    },
+    "scenery_preview": {
+      "bench_grid_after": [
+        3,
+        16
+      ],
+      "bench_grid_before": [
+        5,
+        16
+      ],
+      "left_shrub_shift_m": [
+        -1,
+        0,
+        0
+      ],
+      "production_scripts_modified": false
+    }
+  },
+  "android": {
+    "passed": true,
+    "states": [
+      {
+        "assembled": true,
+        "asset": "house_cottage",
+        "button": [
+          180,
+          759
+        ],
+        "frames": 55,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "height": 2.10199999809265,
+        "model_triangles": 7504,
+        "pid": 23356,
+        "renderer": "mobile",
+        "sequence": 0,
+        "surfaces": 1,
+        "viewport": [
+          360,
+          800
+        ]
+      },
+      {
+        "assembled": true,
+        "asset": "master_farmhouse_a",
+        "button": [
+          180,
+          759
+        ],
+        "frames": 89,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "height": 4.1085000038147,
+        "model_triangles": 7658,
+        "pid": 23356,
+        "renderer": "mobile",
+        "sequence": 1,
+        "surfaces": 1,
+        "viewport": [
+          360,
+          800
+        ]
+      },
+      {
+        "assembled": true,
+        "asset": "master_farmhouse_b",
+        "button": [
+          180,
+          759
+        ],
+        "frames": 126,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "height": 4.18849992752075,
+        "model_triangles": 8662,
+        "pid": 23356,
+        "renderer": "mobile",
+        "sequence": 2,
+        "surfaces": 1,
+        "viewport": [
+          360,
+          800
+        ]
+      },
+      {
+        "assembled": true,
+        "asset": "house_cottage",
+        "button": [
+          180,
+          759
+        ],
+        "frames": 163,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "height": 2.10199999809265,
+        "model_triangles": 7504,
+        "pid": 23356,
+        "renderer": "mobile",
+        "sequence": 3,
+        "surfaces": 1,
+        "viewport": [
+          360,
+          800
+        ]
+      }
+    ],
+    "real_button_taps": 3,
+    "apk_sha256": "384e4ead278ca01d52fd48c78ae9921addda609bbeb93af2ecfe4e6d292d63e7",
+    "installed_apk_readback_equal": true,
+    "scope": "Dedicated asset fixture, API37 SwiftShader / Vulkan Mobile. Not a full-game or physical-phone test.",
+    "packaged_imported_models_match": [
+      {
+        "asset": "master_farmhouse_a",
+        "imported_path": ".godot/imported/master_farmhouse_a.glb-16e3ecbd531ac50700f6a5403cd6e26c.scn",
+        "sha256": "b0b227a5ce6325641e24e25f851839519d1a14431e6ae3cd49b46fa2103caea8",
+        "bytes": 131072,
+        "source_glb_sha256": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+        "packed_uid_and_remap_match": true
+      },
+      {
+        "asset": "master_farmhouse_b",
+        "imported_path": ".godot/imported/master_farmhouse_b.glb-759711aa88b0bb831415bebc1fe8c8b0.scn",
+        "sha256": "9c9d44b56aea459ccd47d2301a8cd561e7d2580412333973bc655886ea4e9e6c",
+        "bytes": 146763,
+        "source_glb_sha256": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+        "packed_uid_and_remap_match": true
+      }
+    ]
+  },
+  "cold_import": {
+    "passed": true,
+    "godot": "4.7.2",
+    "source_and_import_hashes_unchanged": true,
+    "files": {
+      "assets/farm/art/master_farmhouse_a.glb": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+      "assets/farm/art/master_farmhouse_a.glb.import": "cab0b442cd267e966b4d7499627819ca61416ec1fa5879db6252538af5bd993f",
+      "assets/farm/art/master_farmhouse_b.glb": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+      "assets/farm/art/master_farmhouse_b.glb.import": "6f4b3cc31fa55423445fdc89f6ab13dc57aa1c97c8da5a393a8a8de34c6aef3e"
+    },
+    "scope": "New assets with empty .godot cache; no class registry or existing import cache."
+  }
+}
