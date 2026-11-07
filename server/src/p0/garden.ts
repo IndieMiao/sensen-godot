@@ -110,7 +110,8 @@ export function growMs(c: P0Content, s: P0State, plot: Plot, grow_h: number): nu
   if (gh && greenhousePlots(c, s).has(plot.id)) cut += gh.grow_cut;
   else if (coveredPlots(c, s).has(plot.id)) cut += c.facilities.kinds.sprinkler.grow_cut;
   if (plot.fert) cut += 1 - (c.goods.fert_compost.grow_mult ?? 1);
-  return Math.round(grow_h * 3_600_000 * (1 - Math.min(cut, c.facilities.grow_cut_cap)));
+  // the priest's farm buff when it was sown (buffs.ts): after the cap, a layer of its own
+  return Math.round(grow_h * 3_600_000 * (1 - Math.min(cut, c.facilities.grow_cut_cap)) * (plot.boost ?? 1));
 }
 
 /** Ripening time in ms for `crop` starting to grow now on `plot`: a teaching seed's fixed time (q(217): no sprinkler,

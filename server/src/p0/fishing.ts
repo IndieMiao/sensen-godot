@@ -7,6 +7,7 @@ import { placeOf } from './world.js';
 import { firstXp, energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { draw, maxEnergy, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { P0State } from './state.js';
+import { fishTwin } from './buffs.js';
 
 export type Refusal = { code: string; detail?: Record<string, unknown> };
 export type FishCommand =
@@ -93,7 +94,10 @@ export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null }
   delete s.fishing.quick;
   const bite_ms = Math.round((f.bite_min_ms + draw(s) * (rod.bite_spread_ms ?? f.bite_spread_ms)) * wait * (quick ? qr!.wait : 1));   // Carbon Rod 1.8 s span
   const breaks = fish.level > level ? 'level' : fish.rarity > rod.reach ? 'rod' : null;
-  s.cast = { fish: fish.id, site: siteId, place, at: now, bite_ms, bait, xp_pct: xpPercent(c, level, fish.level), breaks, ...(pin ? { pin } : {}) };
+  // the priest's fish buff, as the line goes in (a snapshot: this cast lands two even if the buff ends while it bites)
+  const twin = fishTwin(c, s, now);
+  s.cast = { fish: fish.id, site: siteId, place, at: now, bite_ms, bait, xp_pct: xpPercent(c, level, fish.level), breaks, ...(pin ? { pin } : {}),
+    ...(twin ? { twin: true as const } : {}) };
   events.push({ kind: 'cast', bite_in: bite_ms, rarity: fish.rarity, breaks, bait });
   if (!s.firsts.includes('cast')) {
     s.firsts.push('cast');
@@ -123,13 +127,16 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
   if ((outcome === 'landed' || sure) && !cast.breaks) {
     const fish = fishById(c, cast.fish)!;
     if (room(c, s, fish.id) < 1) return { code: 'bag_full' };
+    // a cast under the priest's fish buff lands fish_qty (2) of it, as many as the bag takes (one at least, checked
+    // above); the XP, the firsts and the dex count the fish once
+    const qty = cast.twin ? Math.max(1, Math.min(c.buffs?.fish_qty ?? 1, room(c, s, fish.id))) : 1;
     s.cast = null;
     s.fishing.bites += 1;
     useBait(s, cast.bait, events);
-    add(c, s, fish.id, 1);
-    s.fishing.caught[fish.id] = (s.fishing.caught[fish.id] ?? 0) + 1;
-    events.push({ kind: 'item', id: fish.id, delta: 1 });
-    events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0 });
+    add(c, s, fish.id, qty);
+    s.fishing.caught[fish.id] = (s.fishing.caught[fish.id] ?? 0) + qty;
+    events.push({ kind: 'item', id: fish.id, delta: qty });
+    events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0, ...(cast.twin ? { qty } : {}) });
     gainXp(c, s, now, 'fishing', scaledXp(s, c.fishing.catch_xp[fish.rarity - 1], cast.xp_pct), cast.xp_pct, events);
     const qr = c.fishing.quick_recast;   // Quick Recast: a landed fish makes this pond's next cast quick (from Lv9)
     if (qr && cast.place && skillLevel(c, s, 'fishing') >= qr.level) s.fishing.quick = cast.place;

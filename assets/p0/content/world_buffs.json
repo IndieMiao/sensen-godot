@@ -1,0 +1,4 @@
+{
+  "_note": "The priest's buffs (the user 11-07: Grace Cathedral's Gabriel gives them; plan pm zhuge-355/priest-buff 2026-11-07, all 8 points as recommended). minutes: how long one lasts, real time, offline too; a second of the same starts it over. farm_mult: a crop sown under it ripens in this share of its time, after the 45% cap; quick and fast seeds and trees not. fish_qty: a cast thrown under it lands this many of the fish. daily: takes a player day, both kinds together, from limit_from (a player day, home time) on; before it no limit. Values are defaults for the demo (the user: economy later).",
+  "buffs": { "minutes": 20, "farm_mult": 0.5, "fish_qty": 2, "daily": 2, "limit_from": "2026-11-15" }
+}

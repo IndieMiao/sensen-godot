@@ -108,6 +108,14 @@ describe('a greenhouse over 4×4 plots (q(118) ②)', () => {
     expect(bed(s, two).ready_at).toBe(T0 + Math.round(24 * H * 0.75));
   });
 
+  it("sown under the priest's farm buff it grows as sown in half the glass time: the buff after the cap (priest-buff plan §3.4)", () => {
+    const one = inside(0);
+    let s = step(grower(), build(A)).s;
+    s.buffs = { farm: T0 + 20 * 60_000 };
+    s = sow(s, one);
+    expect(bed(s, one)).toMatchObject({ state: 'growing', boost: 0.5, ready_at: T0 + Math.round(4 * H * 0.75 * 0.5) });
+  });
+
   it('keeps trees and sprinklers out', () => {
     let s = step(grower(), build(A)).s;
     s.bag.push({ id: 'seed_apple', qty: 1 });

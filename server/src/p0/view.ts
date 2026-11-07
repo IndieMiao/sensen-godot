@@ -18,6 +18,7 @@ import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { firstDigView, pipLine } from './first_dig.js';
 import { gatherView } from './gathering.js';
+import { buffsView } from './buffs.js';
 import { workbenchView } from './workbench.js';
 import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, fieldCap, fieldsUsed, greenhousePlots, plotCount } from './garden.js';
 import { cityStamps, climateAt, climatesVisited, clusterById, clusterOf, homeClimate, travelShown } from './travel.js';
@@ -91,7 +92,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     plots: s.plots.map(p => ({
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,
       crop: p.crop ?? null, ready_in: p.state === 'growing' && p.ready_at ? Math.max(0, p.ready_at - now) : null,
-      xp_pct: p.xp_pct ?? null, fert: !!p.fert,
+      xp_pct: p.xp_pct ?? null, fert: !!p.fert, ...(p.boost !== undefined ? { boost: true } : {}),   // boost: sown under the priest's farm buff
       covered: covered.has(p.id), facility: facilityAt(c, s, p.id)?.id ?? null,   // P1: watered by a sprinkler / one stands here
       greenhouse: greenhouse.has(p.id),                                         // P1: under a greenhouse's glass (q(118) ②)
       ...(treeOf(c, p) ? { tree: true, picks: p.picks ?? 0 } : {}),            // P1: a tree stands here (q(118))
@@ -109,6 +110,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       creel_value: creelValue(c, s),   // q(259): away, the full creel's toast says what its fish fetch here and at home
     },
     drinks: drinksView(c, s, now),
+    ...buffsView(c, s, now),   // the priest's buffs: buffs [{id, left}], buff_takes {used, limit, resets_in}
     shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop, now)])),
     quotas: Object.fromEntries((Object.keys(c.quotas) as QuotaId[]).map(q => [q, quotaView(c, s, q, now)])),
     storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })),
@@ -165,7 +167,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       cast_energy: f.cast_energy,
       cast: s.cast ? { rarity: fishById(c, s.cast.fish)!.rarity, site: s.cast.site, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
         hook_ms: f.hook_window_ms + (rodById(c, s.gear.rod)?.hook_bonus_ms ?? 0), breaks: s.cast.breaks, bait: s.cast.bait,
-        sure: sureBite(s) && !s.cast.breaks } : null,   // q(219): one of the first two bites — the hook window stays open, the reel can't fail
+        sure: sureBite(s) && !s.cast.breaks, ...(s.cast.twin ? { twin: true } : {}) } : null,   // twin: cast under the priest's fish buff, lands two   // q(219): one of the first two bites — the hook window stays open, the reel can't fail
       protection_left: fishingLevel <= f.protect_max_level ? Math.max(0, f.protect_fails - s.day.fails) : null,
       caught: s.fishing.caught, seen: s.fishing.seen,
       dex: c.fish.map(fish => ({ id: fish.id, rarity: fish.rarity, level: fish.level, where: fish.where, caught: s.fishing.caught[fish.id] ?? 0,
