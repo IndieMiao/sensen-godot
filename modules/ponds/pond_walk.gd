@@ -32,8 +32,11 @@ static func blueprint(entry: Dictionary) -> FarmBlueprint:
 	return bp
 
 ## The bank's trees as they stand now (PondScenery.tree_points): their trunks block; the cells the last ones blocked
-## (`was`, from the previous call) walk again. Returns the cells now blocked, for the next call.
-static func set_trees(bp: FarmBlueprint, grid: BlueprintGrid, entry: Dictionary, trees: Array, was: Array = []) -> Array:
+## (`was`, from the previous call) walk again. Not within KEEP_M of `keep` (the player): a tree back after the day's
+## points change does not shut them in (周瑜 on #855). Returns the cells now blocked, for the next call.
+const KEEP_M := 0.6
+static func set_trees(bp: FarmBlueprint, grid: BlueprintGrid, entry: Dictionary, trees: Array, was: Array = [],
+		keep := Vector3.INF) -> Array:
 	for c in was:
 		_walk_cell(bp, c, true)
 		if grid: grid.set_solid(c, false)
@@ -46,6 +49,7 @@ static func set_trees(bp: FarmBlueprint, grid: BlueprintGrid, entry: Dictionary,
 				var c := at + Vector2i(i, j)
 				var w := bp.cell_to_world(c)
 				if not bp.is_walkable(c) or Vector2(w.x - t.x, w.z - t.z).length() > TREE_R_M: continue
+				if keep.is_finite() and Vector2(w.x - keep.x, w.z - keep.z).length() < KEEP_M: continue
 				_walk_cell(bp, c, false)
 				if grid: grid.set_solid(c, true)
 				now.append(c)

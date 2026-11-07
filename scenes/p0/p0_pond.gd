@@ -261,7 +261,7 @@ func _build_scenery(clear: Array) -> void:
 		_scenery.queue_free()
 	_scenery_clear = clear
 	_scenery = PondScenery.build(entry, clear)
-	if grid: _trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(clear), _trees)   # the trees that stand now
+	if grid: _trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(clear), _trees, actor.position if actor else Vector3.INF)   # the trees that stand now
 	add_child(_scenery)
 	move_child(_scenery, cam.get_index() + 1)
 

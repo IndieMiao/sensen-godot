@@ -158,23 +158,29 @@ static func valid_cast(id: String, origin: Vector3, target: Vector3, grid: Bluep
 		elif wet or (not dry_walkable(grid, p) and p.distance_to(nearest_water(id, p, pond)) > 0.55): return false
 	return true
 
+## Every cell of a blueprint's grid, from its first (grid_origin: a P0 pond's walk starts below zero, PondWalk; read from
+## (0, 0) the AStar was asked out of its region on every Fish, 周瑜 on #855).
+static func grid_cells(bp: FarmBlueprint) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	for y in bp.grid.y:
+		for x in bp.grid.x: out.append(bp.grid_origin + Vector2i(x, y))
+	return out
+
 ## Existing shore position is continuous; only automatic walking uses navigation cells.
 static func plan(id: String, from: Vector3, clicked: Vector3, grid: BlueprintGrid, pond: Dictionary = {}) -> Dictionary:
 	if pond.is_empty(): pond = site_for_plot(id, grid.bp)
 	var target := clicked if clicked.is_finite() else default_target(id, from, pond)
 	if valid_cast(id, from, target, grid, pond): return {"origin": from, "target": target}
 	var candidates: Array[Dictionary] = []
-	for y in grid.bp.grid.y:
-		for x in grid.bp.grid.x:
-			var cell := Vector2i(x, y)
-			if grid.astar.is_point_solid(cell): continue
-			var origin := grid.bp.cell_to_world(cell)
-			if contains(id, origin, 0.0, pond) or origin.distance_to(nearest_water(id, origin, pond)) > float(data().shore_range): continue
-			target = clicked if clicked.is_finite() else default_target(id, origin, pond)
-			if not valid_cast(id, origin, target, grid, pond): target = default_target(id, origin, pond)
-			if not valid_cast(id, origin, target, grid, pond): continue
-			var score := origin.distance_to(from) if not clicked.is_finite() else target.distance_to(clicked) * 4.0 + origin.distance_to(clicked) + origin.distance_to(from) * 0.15
-			candidates.append({"origin": origin, "target": target, "score": score})
+	for cell in grid_cells(grid.bp):
+		if grid.astar.is_point_solid(cell): continue
+		var origin := grid.bp.cell_to_world(cell)
+		if contains(id, origin, 0.0, pond) or origin.distance_to(nearest_water(id, origin, pond)) > float(data().shore_range): continue
+		target = clicked if clicked.is_finite() else default_target(id, origin, pond)
+		if not valid_cast(id, origin, target, grid, pond): target = default_target(id, origin, pond)
+		if not valid_cast(id, origin, target, grid, pond): continue
+		var score := origin.distance_to(from) if not clicked.is_finite() else target.distance_to(clicked) * 4.0 + origin.distance_to(clicked) + origin.distance_to(from) * 0.15
+		candidates.append({"origin": origin, "target": target, "score": score})
 	candidates.sort_custom(func(a, b): return a.score < b.score)
 	for candidate in candidates:
 		if not grid.point_path(from, candidate.origin).is_empty(): return candidate

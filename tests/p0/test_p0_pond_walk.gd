@@ -68,3 +68,36 @@ func test_trunks_block_and_free_again() -> void:
 	PondWalk.set_trees(bp, grid, e, [], was)
 	assert_bool(bp.is_walkable(at)).is_true()
 	assert_bool(grid.astar.is_point_solid(at)).is_false()
+
+## 周瑜 on #855: FishingModel.plan read the grid from cell (0, 0) — on the walk that starts below zero it asked the
+## AStar out of its region on every Fish and never stood the player on the new strips. From anywhere on the walk,
+## the left and near strips too, a Fish plans a stand on walkable floor by the water.
+func test_fish_plans_a_stand_from_anywhere_on_the_walk() -> void:
+	for id in SF:
+		var e := P0Ponds.location(id)
+		var bp := PondWalk.blueprint(e)
+		var grid := BlueprintGrid.new(bp)
+		var spec := SystemPonds.site(e)
+		for from in [Vector3(-2.2, 0, -8), Vector3(6, 0, 1.2), Vector3(14.2, 0, -8), Vector3(6, 0, -15.7)]:
+			var plan := FishingModel.plan(id, from, Vector3.INF, grid, spec)
+			assert_bool(plan.is_empty()).override_failure_message("%s from %s" % [id, from]).is_false()
+			var origin: Vector3 = plan.origin
+			assert_bool(bp.is_walkable(bp.world_to_cell(origin))).override_failure_message("%s %s" % [id, origin]).is_true()
+			assert_float(origin.distance_to(FishingModel.nearest_water(id, origin, spec))).is_less_equal(float(FishingModel.data().shore_range) + 0.01)
+	# the cells a plan reads are the grid's own, from its first: none out of the AStar's region, the new strips in
+	var fbp := PondWalk.blueprint(P0Ponds.location("pond_san_francisco_03"))
+	var cells := FishingModel.grid_cells(fbp)
+	assert_int(cells.size()).is_equal(fbp.grid.x * fbp.grid.y)
+	assert_bool(cells.all(func(c): return fbp.in_bounds(c))).is_true()
+	assert_vector(cells[0]).is_equal(fbp.grid_origin)
+	assert_bool(cells.any(func(c): return fbp.is_walkable(c) and fbp.cell_to_world(c).x < 0.0)).is_true()
+	assert_bool(cells.any(func(c): return fbp.is_walkable(c) and fbp.cell_to_world(c).z > 0.0)).is_true()
+
+## A tree back after the day's points change never shuts in the player standing by it.
+func test_a_tree_back_does_not_shut_the_player_in() -> void:
+	var e := P0Ponds.location("pond_san_francisco_01")
+	var bp := PondWalk.blueprint(e)
+	var tree := Vector3(0.1, 0, -4)
+	var me := tree + Vector3(0.2, 0, 0)
+	PondWalk.set_trees(bp, null, e, [tree], [], me)
+	assert_bool(bp.is_walkable(bp.world_to_cell(me))).is_true()
