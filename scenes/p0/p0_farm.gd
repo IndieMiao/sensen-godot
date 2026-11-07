@@ -1044,6 +1044,7 @@ func _exit_piece() -> void:
 	add_child(piece)
 	var ap := piece.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	if ap and ap.has_animation("bob"):
+		ap.get_animation("bob").loop_mode = Animation.LOOP_LINEAR   # a glTF clip imports one-shot (周瑜 on #860)
 		ap.play("bob")
 		return
 	# no loop of its own: its pin bobs EXIT_BOB_M either way every EXIT_BOB_S, eased (the user 11-07: "it floats"); the ring stays
