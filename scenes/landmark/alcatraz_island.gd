@@ -43,6 +43,12 @@ var animated_roots: Array[Node3D] = []
 var _animation_rng := RandomNumberGenerator.new()
 var tree_batches: Array[Dictionary] = []
 var _detail_groups: Array[MeshInstance3D] = []
+## Opened from the P0 map (q(295)): P0's HUD, stick and door prompt instead of this scene's own controls.
+var p0_visit: P0LandmarkVisit
+var _boundary_rids: Array[RID] = []
+
+func setup(args: Dictionary) -> void:
+	if P0LandmarkVisit.wanted(args): p0_visit = P0LandmarkVisit.new(self, args)
 
 
 func _ready() -> void:
@@ -129,6 +135,7 @@ func _ready() -> void:
 		collision.shape = shape
 		body.add_child(collision)
 		add_child(body)
+		_boundary_rids.append(body.get_rid())
 	_build_navigation()
 	_camera = Camera3D.new()
 	_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -142,8 +149,9 @@ func _ready() -> void:
 	camera_pan.free_pan = true
 	camera_pan.hold_enabled = false
 	camera_pan.tapped.connect(walk_to_screen)
-	_build_controls()
+	if p0_visit == null: _build_controls()
 	_update_camera()
+	if p0_visit: p0_visit.start()
 
 static func _vec(a: Array) -> Vector3:
 	return Vector3(float(a[0]), float(a[1]), float(a[2]))
@@ -437,6 +445,9 @@ func walk_to_screen(point: Vector2) -> void:
 	var normal := _camera.project_ray_normal(point)
 	# Actual geometry hit resolves multi-level stairs without projecting through a higher terrace.
 	var query := PhysicsRayQueryParameters3D.create(origin, origin + normal * 200.0)
+	# The invisible boundary walls stand between the camera and the island's south side: a tap goes through them (it
+	# stopped on SouthBoundary, so every tap walked to the south edge of the dock).
+	query.exclude = _boundary_rids
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	var goal: Vector3
 	if hit.is_empty():
@@ -513,6 +524,9 @@ func _update_camera() -> void:
 	_focus.z = clampf(_focus.z, -40, 40)
 	var target := _focus + camera_pan.offset
 	var wide := clampf((1.0/zoom_for_view-1.0)/2.0,0.0,1.0) if not _overview else 0.0
+	# In P0 the camera keeps FarmCamera's yaw at every zoom, on the player: the wide end's swing to 60° turned it out
+	# to sea from the dock (the island's south-west corner), the island off the screen's side.
+	if p0_visit: wide = 0.0
 	var yaw := deg_to_rad(lerpf(FarmCamera.YAW_DEG,60.0,wide))
 	var pitch := deg_to_rad(43.0)
 	# Approved oblique framing only at the wide end; default camera is unchanged.
@@ -617,10 +631,10 @@ func _zoom_by(factor: float) -> void:
 	_update_camera()
 
 func _input(event: InputEvent) -> void:
-	_handle_camera_input(event, false)
+	if p0_visit == null: _handle_camera_input(event, false)
 
 func _unhandled_input(event: InputEvent) -> void:
-	_handle_camera_input(event, true)
+	if p0_visit == null: _handle_camera_input(event, true)
 
 func _handle_camera_input(event: InputEvent, allow_start: bool) -> bool:
 	if camera_pan.handle(event, _camera, allow_start):
@@ -672,7 +686,7 @@ func suspend() -> void:
 	camera_pan.cancel()
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
-	_hud.visible = false
+	if _hud: _hud.visible = false
 	_set_backdrop_visible(false)
 	_camera.current = false
 	_saved_environment = _environment.environment
@@ -681,15 +695,68 @@ func suspend() -> void:
 func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
-	_hud.visible = true
+	if _hud: _hud.visible = true
 	get_viewport().transparent_bg = false
 	_environment.environment = _saved_environment
 	_camera.make_current()
 	_update_camera()
+	if p0_visit: p0_visit.resume()
 
 func _exit_tree() -> void:
+	if p0_visit: p0_visit.clear()
 	_stop_camera_recenter()
 	camera_pan.cancel()
 	if _nav_map.is_valid():
 		NavigationServer3D.free_rid(_nav_map)
 		_nav_map = RID()
+
+# ---------------------------------------------------------------- P0 world (P0LandmarkVisit, q(295))
+func p0_surface() -> String: return "visit"
+func p0_frame(_v: Dictionary, dt: float) -> void: p0_visit.frame(dt)
+func p0_tap(screen: Vector2) -> void: p0_visit.tap(screen)
+func p0_recenter() -> void: recenter_on_player()
+func p0_zoom_end() -> void: pass
+
+func p0_joystick(v: Vector2) -> void:
+	p0_visit.stick = v
+	if v != Vector2.ZERO: _path = PackedVector3Array()   # the stick takes over from a tap's walk
+
+## A pinch: about the player, who stays followed (P0 has no free pan here).
+func p0_zoom(f: float, _at := Vector2.INF) -> void:
+	_stop_camera_recenter()
+	camera_pan.reset(clampf(camera_pan.zoom * f, camera_pan.min_zoom, camera_pan.max_zoom))
+	_following = true
+	_update_camera()
+
+func p0_dev(step: Array) -> bool: return p0_visit.dev(step)
+
+## Dev: a named review point (layout `review_points`), INF for none; the player stood there, the camera on them.
+func dev_point(n: String) -> Vector3:
+	var pts: Dictionary = layout.get("review_points", {})
+	return _vec(pts[n]) if pts.has(n) else Vector3.INF
+
+func dev_stand(at: Vector3) -> void:
+	_path = PackedVector3Array()
+	_player.position = NavigationServer3D.map_get_closest_point(_nav_map, at) if navigation_ready() else at
+	_focus = _follow_target()
+
+func player_position() -> Vector3: return _player.position
+func exit_position() -> Vector3: return _vec(layout.exit)
+func walking() -> bool: return _path_i < _path.size()
+
+## The stick (P0LandmarkVisit.stick_step): the followed player runs while it is pushed.
+func step_stick(v: Vector2, dt: float) -> void:
+	if not navigation_ready(): return
+	if not P0LandmarkVisit.stick_step(_player, _nav_map, _camera, WALK_SPEED, v, dt):
+		_stick_idle()
+		return
+	_following = true
+	_overview = false
+	if not _running:
+		_running = true
+		_animation("run")
+
+func _stick_idle() -> void:
+	if _running and not walking():
+		_running = false
+		_animation("idle")

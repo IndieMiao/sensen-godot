@@ -222,9 +222,10 @@ func attach(w: Node) -> void:
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	if session.space in ["map", "pond", "outpost"]: ui.cook_page_from_today = ""   # left home: Today's stove page goes (q(99))
-	if session.space != "map": return_to = route_of(w)
+	# A world that is no space (a landmark, q(295)) leaves where the player is as it was: the chip goes back there.
+	if session.space not in ["map", ""]: return_to = route_of(w)
 	# On the map the chip still names where the player is; the farmhouse and the mine are the homestead (MAP-1).
-	elif return_to == "farm": ui.set_place(HOME_PLACE)
+	elif session.space == "map" and return_to == "farm": ui.set_place(HOME_PLACE)
 	ui.space = session.space
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	ui.place = session.place

@@ -34,6 +34,7 @@ const ASSETS := {
 	"tree_round": preload("res://assets/landmarks/griffith_observatory/tree_round.glb"),
 }
 const ScenePan := preload("res://modules/farm/scene_pan.gd")
+const FarmCamera := preload("res://modules/farm/farm_camera.gd")
 
 var layout: Dictionary
 var camera_pan := ScenePan.new()
@@ -54,6 +55,11 @@ var _focus_button: AvatarFocusButton
 var _environment: WorldEnvironment
 var _saved_environment: Environment
 var _camera_recenter: Tween
+## Opened from the P0 map (q(295)): P0's HUD and stick instead of this scene's own controls; the camera follows.
+var p0_visit: P0LandmarkVisit
+
+func setup(args: Dictionary) -> void:
+	if P0LandmarkVisit.wanted(args): p0_visit = P0LandmarkVisit.new(self, args)
 
 func _ready() -> void:
 	get_viewport().transparent_bg = false
@@ -116,8 +122,9 @@ func _ready() -> void:
 	camera_pan.free_pan = true
 	camera_pan.hold_enabled = false
 	camera_pan.tapped.connect(walk_to_screen)
-	_build_controls()
+	if p0_visit == null: _build_controls()
 	_update_camera()
+	if p0_visit: p0_visit.start()
 
 func _mesh_instance(asset: String) -> MeshInstance3D:
 	var node := MeshInstance3D.new()
@@ -321,6 +328,7 @@ func _build_controls() -> void:
 func _process(delta: float) -> void:
 	_step_walk(delta)
 	camera_pan.step(delta, _camera)
+	if p0_visit and not _camera_recenter: _focus = _focus.lerp(_player.position, 1.0 - exp(-8.0 * delta))
 	_update_camera()
 
 func _update_camera() -> void:
@@ -336,7 +344,10 @@ func _update_camera() -> void:
 		camera_pan._raw_offset = Vector3.ZERO
 	var target := _focus + camera_pan.offset
 	if _closeup: target = Vector3(0.3, 0.8, -2.6)
-	var dir := Vector3(0, sin(deg_to_rad(PITCH)), cos(deg_to_rad(PITCH)))
+	# In P0 the camera turns FarmCamera's yaw (14.5°) like every outdoor world (the user 11-07, 户外14.5ok); the Journey
+	# visit keeps its square-on view.
+	var yaw := deg_to_rad(FarmCamera.YAW_DEG) if p0_visit else 0.0
+	var dir := Vector3(sin(yaw) * cos(deg_to_rad(PITCH)), sin(deg_to_rad(PITCH)), cos(yaw) * cos(deg_to_rad(PITCH)))
 	_camera.position = target + dir * 40.0
 	_camera.look_at(target, Vector3.UP)
 	_camera.near = maxf(1.0, 40.0 - width * aspect * 0.9 - 8.0)
@@ -350,10 +361,10 @@ func _update_camera() -> void:
 			viewport_rect, area, _camera.is_position_behind(_player.position))
 
 func _input(event: InputEvent) -> void:
-	_handle_camera_input(event, false)
+	if p0_visit == null: _handle_camera_input(event, false)
 
 func _unhandled_input(event: InputEvent) -> void:
-	_handle_camera_input(event, true)
+	if p0_visit == null: _handle_camera_input(event, true)
 
 func _handle_camera_input(event: InputEvent, allow_start: bool) -> bool:
 	if camera_pan.handle(event, _camera, allow_start):
@@ -418,10 +429,61 @@ func resume() -> void:
 	_environment.environment = _saved_environment
 	_camera.make_current()
 	_update_camera()
+	if p0_visit: p0_visit.resume()
 
 func _exit_tree() -> void:
+	if p0_visit: p0_visit.clear()
 	_stop_camera_recenter()
 	camera_pan.cancel()
 	if _nav_map.is_valid():
 		NavigationServer3D.free_rid(_nav_map)
 		_nav_map = RID()
+
+# ---------------------------------------------------------------- P0 world (P0LandmarkVisit, q(295))
+func p0_surface() -> String: return "visit"
+func p0_frame(_v: Dictionary, dt: float) -> void: p0_visit.frame(dt)
+func p0_tap(screen: Vector2) -> void: p0_visit.tap(screen)
+func p0_recenter() -> void: recenter_on_player()
+func p0_zoom_end() -> void: pass
+
+func p0_joystick(v: Vector2) -> void:
+	p0_visit.stick = v
+	if v != Vector2.ZERO: _path = PackedVector3Array()   # the stick takes over from a tap's walk
+
+## A pinch: about the player, who stays followed.
+func p0_zoom(f: float, _at := Vector2.INF) -> void:
+	_stop_camera_recenter()
+	camera_pan.reset(clampf(camera_pan.zoom * f, camera_pan.min_zoom, camera_pan.max_zoom))
+	_overview = false
+	_update_camera()
+
+func p0_dev(step: Array) -> bool: return p0_visit.dev(step)
+
+## Dev: a named point to walk the lawn by (李元芳's frame-rate route), INF for none; the player stood there.
+const DEV_POINTS := {"opening": Vector3(-1.34, 0.03, 6.64), "lawn_west": Vector3(-9.0, 0.0, 4.0),
+	"lawn_east": Vector3(9.0, 0.0, 4.0), "building": Vector3(0.3, 0.0, -2.0),
+	# the walkable corners: the camera's edge check (q(295) 14.5°)
+	"sw": Vector3(-12.0, 0.0, 9.8), "se": Vector3(12.2, 0.0, 9.8), "nw": Vector3(-12.0, 0.0, -7.9), "ne": Vector3(12.2, 0.0, -7.9)}
+
+func dev_point(n: String) -> Vector3:
+	return DEV_POINTS.get(n, Vector3.INF)
+
+func dev_stand(at: Vector3) -> void:
+	_path = PackedVector3Array()
+	_player.position = NavigationServer3D.map_get_closest_point(_nav_map, at) if navigation_ready() else at
+	_focus = _player.position
+
+func player_position() -> Vector3: return _player.position
+func exit_position() -> Vector3: return Vector3.INF   # no way out on the ground: the place chip and Back
+func walking() -> bool: return _path_i < _path.size()
+
+## The stick (P0LandmarkVisit.stick_step): the player runs while it is pushed.
+func step_stick(v: Vector2, dt: float) -> void:
+	if not navigation_ready(): return
+	if P0LandmarkVisit.stick_step(_player, _nav_map, _camera, WALK_SPEED, v, dt):
+		if not _running:
+			_running = true
+			_animation("run")
+	elif _running and not walking():
+		_running = false
+		_animation("idle")

@@ -131,9 +131,11 @@ func _destination(entry: Dictionary) -> Dictionary:
 
 ## The pond card's action (Journey "Enter pond"; P0 "Go", §10.6.1 MAP-1).
 var pond_action := "Enter pond"
-## A landmark card's `Enter scene` for an authored scene (LandmarkScenes, Journey); P0 turns it off (q(213): no way
-## round the fog and the passes into the old scene).
+## A landmark card's `Enter scene` for an authored scene (LandmarkScenes, Journey). P0 hid it (q(213): no way round the
+## fog and the passes into the old scene) until q(295) gave its two scenes a Go through P0's own gate.
 var landmark_scenes := true
+## That key's label: P0 says Go, as on its ponds and outposts (q(295) ②).
+var landmark_action := "Enter scene"
 ## (entry) -> bool: whether a POI is drawn (P0, q(212) ⑤: only in the cities explored, the fog's holes); unset = all.
 var poi_shown := Callable()
 ## (entry) -> bool: whether a host place pin is drawn now (P0, SGODOT-355: a city's gathering spots only from a level
@@ -707,7 +709,7 @@ func select(entry: Dictionary) -> void:
 		info_action.text = L10n.text(str(entry.get("action", "Enter")))
 		info_action.icon = GameUi.icon(str(entry.get("action_icon", "footprints")))
 	elif not landmark_scene.is_empty():
-		info_action.text = L10n.text("Enter scene")
+		info_action.text = L10n.text(landmark_action)
 		info_action.icon = GameUi.icon("footprints")
 	info_art.texture = CityMapData.art_texture(entry)
 	info_art.modulate = Color.WHITE
@@ -1810,6 +1812,18 @@ func _settle_info() -> void:
 	await get_tree().process_frame
 	if not is_inside_tree(): return
 	_layout()
+	if info_settled.is_valid() and info.visible and not selected.is_empty(): info_settled.call(selected)
+
+## (entry) after the info card has its height: P0 moves a landmark's pin above it (q(295)).
+var info_settled := Callable()
+
+## Where a selected pin's name ends, in this view's pixels, once its jelly has grown it (FOCUS_SCALE); NAN without a
+## shown name.
+func selected_name_bottom(id: String) -> float:
+	var m: Dictionary = markers.get(id, {})
+	if m.is_empty() or not (m.get("label") is Label) or not (m.label as Label).visible: return NAN
+	var l: Label = m.label
+	return (m.node as Control).global_position.y + (l.position.y + l.size.y) * FOCUS_SCALE
 
 ## —— 城市切换 UI（spec 2026-09-23）——————————————————————————————————
 

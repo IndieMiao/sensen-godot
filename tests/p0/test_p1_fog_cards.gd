@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## q(212) (SGODOT-327): in a city not visited, every place pin is a silhouette and its tap — a Show on map landing on it,
 ## its Go — opens the city's silhouette card (MAP-3-FREE), pass or none: the fog first, the pass after. San Francisco's
 ## hand-written places are San Francisco's whatever the home; no POI is drawn in the fog; a city's card keeps no pin
-## selected. q(213): a landmark card in P0 has no Enter scene.
+## selected. q(295): a landmark card says Go only for a landmark with a scene, and goes in as a pond does.
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
@@ -262,19 +262,59 @@ func test_9_no_poi_in_a_city_not_visited() -> void:
 	city._update_markers()
 	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains(["poi-d"])   # visited: drawn
 
-## q(213): a landmark card in P0 is its name and kind alone — no Enter scene even for Griffith Observatory (Los
-## Angeles' authored scene), and a request for it goes nowhere.
-func test_a_landmark_card_has_no_enter_scene() -> void:
+## q(295) ②: of the landmarks only the two with a scene (Alcatraz, Griffith Observatory) have a key on their card — the
+## old card's own, footprints and Go; the rest stay their name and kind alone (q(213)).
+func test_a_landmark_card_says_go_only_with_a_scene() -> void:
 	var m: Node = await _map()
 	_travel(m)
-	assert_bool(m.city_map.landmark_scenes).is_false()
-	m.region = P0Clusters.region(LA)
-	assert_str(str(m.region.id)).is_equal("los_angeles")
-	var griffith := {"kind": "landmark", "id": "griffith_observatory", "name": "Griffith Observatory", "category": "Observatory",
-		"lat": 34.1184, "lng": -118.3004}
-	m.city_map.select(griffith)
+	m.region = P0Clusters.region(SF)
+	assert_str(str(m.region.id)).is_equal("san_francisco")
+	m.city_map.select(_landmark("san_francisco", "alcatraz_island"))
 	assert_bool(m.city_map.info.visible).is_true()
+	assert_bool(m.city_map.info_action.visible).is_true()
+	assert_str(m.city_map.info_action.text).is_equal("Go")
+	m.city_map.select(_landmark("san_francisco", "golden_gate_bridge"))
 	assert_bool(m.city_map.info_action.visible).is_false()
-	m._on_city_landmark_requested(griffith)
-	assert_object(AppRouter.top_instance()).is_null()
+	m.region = P0Clusters.region(LA)
+	m.city_map.select(_landmark("los_angeles", "griffith_observatory"))
+	assert_bool(m.city_map.info_action.visible).is_true()
+	m.city_map.select(_landmark("los_angeles", "hollywood_sign"))
+	assert_bool(m.city_map.info_action.visible).is_false()
 	m.city_map.clear_selection()
+
+## q(295) ③: in that city Go opens the scene at once (free, no pass), named for the loading cover and the chip; a city
+## not visited opens its silhouette card first, one visited but left its travel card — never round the fog.
+func test_b_a_landmarks_go_is_a_ponds_go() -> void:
+	var m: Node = await _map()
+	var opened := []
+	m.open_landmark = func(path: String, args: Dictionary): opened.append([path, args])
+	var rt: P0Runtime = m.rt
+	_travel(m)   # home and here San Francisco
+	m.region = P0Clusters.region(SF)
+	m._on_city_landmark_requested(_landmark("san_francisco", "alcatraz_island"))
+	assert_int(opened.size()).is_equal(1)
+	assert_str(str(opened[0][0])).is_equal(LandmarkScenes.ALCATRAZ)
+	assert_str(str(opened[0][1].chip)).is_equal("San Francisco · Alcatraz Island")
+	assert_bool(P0LandmarkVisit.wanted(opened[0][1])).is_true()
+	assert_str(P0LoadingLayer.destination(LandmarkScenes.ALCATRAZ, opened[0][1])).is_equal("San Francisco · Alcatraz Island")
+	m.region = P0Clusters.region(LA)
+	m._on_city_landmark_requested(_landmark("los_angeles", "griffith_observatory"))   # Los Angeles not visited
+	assert_int(opened.size()).is_equal(1)
+	assert_str(rt.ui.modal_kind).is_equal("city_card")
+	rt.ui.close_modal()
+	_travel(m, SF, {LA: {n = 1}})   # visited, no pass, not there
+	m._on_city_landmark_requested(_landmark("los_angeles", "griffith_observatory"))
+	assert_int(opened.size()).is_equal(1)
+	assert_str(rt.ui.modal_kind).is_equal("travel_card")
+	rt.ui.close_modal()
+	_travel(m, SF, {LA: {n = 1}}, {LA: PASS}, LA)   # there
+	m._on_city_landmark_requested(_landmark("los_angeles", "griffith_observatory"))
+	assert_int(opened.size()).is_equal(2)
+	assert_str(str(opened[1][0])).is_equal(LandmarkScenes.GRIFFITH)
+	m._on_city_landmark_requested(_landmark("los_angeles", "hollywood_sign"))   # no scene: nothing
+	assert_int(opened.size()).is_equal(2)
+
+func _landmark(region_id: String, id: String) -> Dictionary:
+	for p in CityMapData.landmarks(region_id):
+		if str(p.id) == id: return (p as Dictionary).merged({"kind": "landmark"})
+	return {}

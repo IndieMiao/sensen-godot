@@ -112,6 +112,7 @@ static func icon_for(path: String, args: Dictionary) -> Texture2D:
 		"p0_mine.tscn":
 			var t := str(P0WildSites.site(str(args.get("mine", ""))).get("type", "quarry"))
 			return P0Logic.icon(str({"quarry": "quarry", "vein": "vein", "geode": "geode", "abyss": "abyss", "ruin": "ruins"}.get(t, "quarry")))
+	if LandmarkScenes.is_scene(path): return P0Logic.icon("travel")   # a landmark has no pin of its own kind on the map
 	return null
 
 ## Where an AppRouter.open_instance into a P0 world goes, as the place chip will read there (`San Francisco · Fern Pond`);
@@ -122,4 +123,5 @@ static func destination(path: String, args: Dictionary) -> String:
 		"p0_pond.tscn": return P0City.chip_for(str(P0Ponds.location(str(args.get("pond_id", ""))).get("name", "Pond")), str(args.get("pond_id", "")))
 		"p0_outpost.tscn": return P0City.chip_for(str(P0Outposts.find(str(args.get("outpost_id", ""))).get("name", "Outpost")), str(args.get("outpost_id", "")))
 		"p0_mine.tscn": return P0City.chip("Mine · Floor %d" % int(args.get("floor", 1)))
+	if LandmarkScenes.is_scene(path): return str(args.get("chip", ""))   # q(295) ④: the landmark's name (P0LandmarkVisit)
 	return ""
