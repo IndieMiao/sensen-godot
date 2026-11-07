@@ -1,4 +1,4 @@
 {
-  "_note": "q(295): which landmarks with a scene (LandmarkScenes) say Go on the P0 map. Griffith is off until 马可波罗's fix for the trees hiding the player at its far corners is in the same build (不知火舞 / 奕星 11-08); flip it to true then.",
-  "landmark_scenes": {"alcatraz_island": true, "griffith_observatory": false}
+  "_note": "q(295): which landmarks with a scene (LandmarkScenes) say Go on the P0 map. Griffith was off until 马可波罗's fix for the trees hiding the player at its far corners (#859 / #871, 11-08); on since.",
+  "landmark_scenes": {"alcatraz_island": true, "griffith_observatory": true}
 }
