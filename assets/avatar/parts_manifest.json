@@ -985,6 +985,43 @@
 			"thumb": "res://assets/avatar/thumbs/cloth1_npc_lou.png",
 			"tier": 0,
 			"unity_guid": ""
+		},
+		{
+			"id": "cloth36_npc_gabriel",
+			"slot": "cloth",
+			"attach": "mesh",
+			"tier": 0,
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth36_npc_gabriel.res",
+			"thumb": "res://assets/avatar/thumbs/cloth36_npc_gabriel.png",
+			"unity_guid": ""
+		},
+		{
+			"id": "hairhat0_npc_gabriel",
+			"slot": "hairHat",
+			"attach": "socket",
+			"tier": 0,
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat0_npc_gabriel.res",
+			"thumb": "res://assets/avatar/thumbs/hairhat0_npc_gabriel.png",
+			"unity_guid": "",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			}
 		}
 	],
 	"version": 1
