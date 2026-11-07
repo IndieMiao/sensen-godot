@@ -2865,6 +2865,109 @@
       },
       "silhouette": "single pale trunk, one broad rounded crown",
       "replacement": "pond perimeter decoration only; never substitute Timber/Hardwood resource GLBs"
+    },
+    "farm_exit_pin": {
+      "file": "farm_exit_pin.glb",
+      "triangles": 504,
+      "mesh_triangles": {
+        "pin": 248,
+        "ring": 256
+      },
+      "surfaces": 2,
+      "surface_policy": "pin/ring: one surface each, one shared material; approved by Shangguan",
+      "materials": 1,
+      "runtime_material": "Assign the same FarmArt.material() as material_override on pin and ring",
+      "runtime_loading": "PackedScene.instantiate(); preserve both mesh nodes and AnimationPlayer",
+      "animation_player_path": "AnimationPlayer",
+      "nodes": [
+        "pin",
+        "ring"
+      ],
+      "bounds": [
+        [
+          -0.6000000238418579,
+          0.009999999776482582,
+          -0.6000000238418579
+        ],
+        [
+          0.6000000238418579,
+          1.375,
+          0.6000000238418579
+        ]
+      ],
+      "animated_bounds": [
+        [
+          -0.6,
+          0.01,
+          -0.6
+        ],
+        [
+          0.6,
+          1.475,
+          0.6
+        ]
+      ],
+      "sha256": "14102a54e722b142f7f4da9fa9f15f031ddb7f2971f90c9e754aceaa0143dd08",
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "pivot": "halo centre at ground; local (0,0,0)",
+      "axes": "metres; Y up; +Z toward camera",
+      "placement_name": "A",
+      "placement_world": [
+        1.6,
+        0,
+        0.0
+      ],
+      "pin_centre_z": -0.1,
+      "pin_width_m": 0.7714285714285715,
+      "pin_height_m": 1.125,
+      "reference_width_ratio": [
+        56,
+        36
+      ],
+      "tip_height_m": 0.25,
+      "halo_outer_diameter_m": 1.2,
+      "halo_width_m": 0.12,
+      "halo_bottom_y": 0.01,
+      "palette_srgb": {
+        "pin": "E07A5F",
+        "dot": "FBF8F1",
+        "halo": "F2C14E"
+      },
+      "vertex_brightness_linear": {
+        "pin": 1.0,
+        "dot": 1.035,
+        "halo": 1.1
+      },
+      "colliders": [],
+      "animations": {
+        "RESET": {
+          "pin_translation": [
+            0,
+            0,
+            0
+          ]
+        },
+        "bob": {
+          "period_s": 1.6,
+          "amplitude_m": 0.1,
+          "function": "sin(2*pi*t/1.6)",
+          "loop": true,
+          "target": "pin:position",
+          "autoplay": false,
+          "ring_static": true
+        }
+      },
+      "source_delivery": "SGODOT-443 source bundle; Blender, generator, validation and model-only review",
+      "reference": "SGODOT-443 d9e7a52a / exit_pin.svg",
+      "reference_sha256": "7c77afcf88185cf4e089423d5ddd6b7a9c4fdde4a72d7ee1c27116c75b5659d9",
+      "revision": "v1.1",
+      "comparison_placement_world": [
+        4.0,
+        0,
+        -0.35
+      ],
+      "placement_note": "A / C-D world coordinates per q(298); A is not a cell centre. Actual scene placement and screen exit icon belong to the exit integration PR"
     }
   }
 }
