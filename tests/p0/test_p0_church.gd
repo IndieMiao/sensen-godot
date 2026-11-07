@@ -142,3 +142,37 @@ func test_the_player_stays_on_screen_in_every_corner() -> void:
 		for p in [r.actor.position, r.actor.position + Vector3(0, 1.75, 0)]:
 			var at := r.cam.unproject_position(p)
 			assert_bool(Rect2(Vector2(12, 0), view - Vector2(24, 0)).has_point(at)).override_failure_message("%s at %s, %s" % [c, at, view]).is_true()
+
+## 李元芳 on 0.3.1: up from a pew the player stood in the gap between the left rows and could not walk out. Up from
+## every seat they stand beside it on floor the door reaches, and the spawn is on that floor too.
+func test_up_from_every_pew_onto_the_floor_the_door_reaches() -> void:
+	var r := _room(CHURCH_ID)
+	await get_tree().process_frame
+	var door: Vector3 = r.anchor("exit").global_position
+	var on_door_floor := func(p: Vector3) -> bool:
+		var c := P0RoomNav.nearest_reachable(r.bp, p, door)
+		return r.bp.world_to_cell(c) == r.bp.world_to_cell(p)
+	assert_bool(on_door_floor.call(r.actor.position)).override_failure_message("spawn %s" % r.actor.position).is_true()
+	for n in P0Outposts.find(CHURCH_ID).seats:
+		r._sit_down(str(n))
+		r._stand_up()
+		for i in 30: r.p0_frame({}, 1.0 / 30.0)
+		assert_str(r.seat).is_empty()
+		assert_bool(on_door_floor.call(r.actor.position)).override_failure_message("%s up at %s" % [n, r.actor.position]).is_true()
+		var at: Vector3 = r.anchor(str(n)).global_position
+		assert_float(Vector2(r.actor.position.x - at.x, r.actor.position.z - at.z).length()).override_failure_message(str(n)).is_less(1.6)   # beside it
+		assert_bool(P0RoomNav._open(r.bp, r.bp.world_to_cell(r.actor.position), 2)).override_failure_message("%s in the open" % n).is_true()   # not at a pew's end between rows
+
+## 不知火舞 on #850: the tea house's stools stand up beside them on the door's floor (no open-ground rule there, the
+## cathedral's is its kit's), and never hidden behind someone — up from the third table's they were, behind Hana.
+func test_tea_stools_stand_up_beside_them_in_sight() -> void:
+	for n in ["seat_table2_2", "seat_table3_1", "seat_table1_1"]:
+		var r := _room("sh_tea_1")
+		await get_tree().process_frame
+		r._sit_down(n)
+		r._stand_up()
+		for i in 30: r.p0_frame({}, 1.0 / 30.0)
+		var at: Vector3 = r.anchor(n).global_position
+		assert_float(Vector2(r.actor.position.x - at.x, r.actor.position.z - at.z).length()).override_failure_message(n).is_less(1.0)
+		var people: Array = r.npcs.values().map(func(x): return (x.root as Node3D).global_position)
+		assert_bool(P0RoomNav.hidden(r.actor.position, people, r._cam_dir)).override_failure_message("%s behind someone" % n).is_false()

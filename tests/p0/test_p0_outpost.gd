@@ -533,7 +533,7 @@ func test_the_tea_house_opens_on_its_own_kit() -> void:
 func test_every_tea_seat_is_walked_to_from_the_door() -> void:
 	for s in P0Outposts.find("sh_tea_1").seats:   # all twelve, the third table's and the bench's too (SGODOT-216)
 		var r := _room("sh_tea_1")
-		var beside := P0RoomNav.nearest_walkable(r.bp, r.anchor(s).global_position)
+		var beside := r.reachable(r.anchor(s).global_position)   # the floor beside it the door reaches (not a cut-off cell)
 		r.walk_to(s)
 		_walk_until_idle(r, 10.0)
 		assert_str(r.seat).override_failure_message(s).is_equal(s)
