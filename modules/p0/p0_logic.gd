@@ -2158,7 +2158,15 @@ const _KEEPER_COPY := {
 	"tackle": {"does": "Minds the tackle", "question": "Where are they biting?"},
 	"market": {"does": "Keeps the stall", "question": "What's fresh today?"},
 	"casino": {"does": "Deals the cards", "question": "How does it work?"},   # Lou at the Barbary Card Room (q(240))
+	"church": {"does": "Welcomes visitors", "question": "Any stories?"},   # Gabriel at Grace Cathedral (q(299)): talk only
 }
+## Gabriel's stories (q(299), 李白): his answer to Any stories?, the next one each time it is asked, round again after the
+## last; counted on this phone for this run only (P0Ui._keeper_told), from the first on the next start.
+const CHURCH_STORIES := ["The windows catch the afternoon light. Find a pew and watch.",
+	"Fog rolls in most mornings. It's quieter in here then.",
+	"Walk the labyrinth slowly. There's no wrong way to finish.",
+	"Long day on the farm? The pews don't mind a little dirt.",
+	"Nob Hill is steep. You've earned the quiet in here."]
 const _CUPS_OUT := "That's three cups today. Come back tomorrow."
 
 ## The city the player is in, by name (the Tea Host's `around San Francisco`): an arrived city's, else home's.
@@ -2224,12 +2232,17 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 			var short := bool(bj.get("open", false)) and int(view.get("coins", 0)) < least
 			greet = "Keep those coins for seeds. Come back with a few more." if short else "Pull up a chair. Care for a hand?"
 			answer = "Get closer to 21 than me without going over. You bet with your own coins."
+		"church":   # q(299): no counter, no requests — a welcome and his stories
+			greet = "Welcome to Grace. Sit as long as you like."
+			answer = CHURCH_STORIES[0]
 	var place := str(ctx.get("place", ""))
 	return {
 		"line": ("%s · %s" % [str(copy.get("does", "")), place]) if place != "" else str(copy.get("does", "")),
 		# one word on every keeper (q(154), Joey on 296): Trade at a counter, Play at the card room's table (q(240))
 		"greet": greet, "counter": counter if counter != "" else greet, "trade": "Play" if role == "casino" else "Trade",
 		"question": str(copy.get("question", "")), "answer": answer,   # no `Just passing by`: the card's ✕ closes it (q(154))
+		"answers": CHURCH_STORIES if role == "church" else [answer],   # what the question key says, one a press
+		"talk_only": role == "church",   # no Trade: a keeper with no counter (q(299))
 	}
 
 ## Words that keep their capital inside a sentence (不知火舞 on q(252) ④): the proper adjectives that begin a fish's

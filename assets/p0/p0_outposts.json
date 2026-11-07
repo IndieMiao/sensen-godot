@@ -90,10 +90,10 @@
       "lat": 37.7919,
       "lng": -122.413,
       "capacity": 12,
-      "keeper": {},
+      "keeper": {"role": "Priest", "name": "Gabriel"},
       "residents": [],
       "art": "poi_church",
-      "anchors": "res://assets/rooms/poi_church/layout.json",
+      "anchors": "res://assets/p0/outposts/church.anchors.json",
       "bounds": [-4.8, 4.8, -4.8, 4.8],
       "seats": ["seat_left_1", "seat_left_2", "seat_left_3", "seat_left_4", "seat_right_1", "seat_right_2", "seat_right_3", "seat_right_4"]
     }

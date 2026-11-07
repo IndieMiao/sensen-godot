@@ -57,8 +57,7 @@ func test_the_outpost_table_and_anchor_files_agree() -> void:
 		assert_array(names).override_failure_message(str(o.id) + " spawn / exit").contains(["spawn", "exit"])
 		assert_array(names.filter(func(n): return n.begins_with("seat_"))).override_failure_message(str(o.id) + " seats").is_equal(o.seats)
 		assert_int(int(o.capacity)).is_equal(30 if str(o.role) == "market" else 12)
-		# The keeper's finger card has its own badge_ point, clear above the door's card (安其拉's review of #14); Grace
-		# Cathedral has no keeper (SGODOT-423)
+		# The keeper's finger card has its own badge_ point, clear above the door's card (安其拉's review of #14)
 		if (o.keeper as Dictionary).is_empty(): continue
 		var at := {}
 		for a in anchors: at[str(a.name)] = Vector3(a.position[0], a.position[1], a.position[2])
