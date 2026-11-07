@@ -24,13 +24,7 @@ static func cards_icon() -> Texture2D:
 ## hidden before, no grey card, no words (不知火舞 351 8aa69403). The client reads the gate from the view itself, not
 ## view.blackjack: 0.2.12 ships the room, Lou and his greeting to a server without the table (用户 via 奕星 on 351), so
 ## a player past the gate walks in there too; only Play asks whether the table is open (P0Ui._play_blackjack).
-## TEMPORARY (iOS 0.3.1 (2), 11-07): Grace Cathedral closed on iOS — entering it crashed iOS 0.3.1 (1) at once (an
-## external tester; Android's release build enters it fine), its cause still being found. Its pin is not drawn there, so
-## nothing opens the room. Take this out with the cause's fix (奕星 11-07). Tests set it.
-static var church_closed := OS.get_name() == "iOS"
-
 static func shown(o: Dictionary, view: Dictionary) -> bool:
-	if str(o.get("role", "")) == "church": return not church_closed
 	if str(o.get("role", "")) != "casino": return true
 	var h = view.get("homestead", {})
 	return h is Dictionary and int(h.get("level", 1)) >= 2 and not P0Guide.guide_on(view)
