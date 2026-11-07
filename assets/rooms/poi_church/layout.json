@@ -72,7 +72,7 @@
       "name": "entry_landing",
       "file": "entry_landing.glb",
       "position": [
-        2.0,
+        0,
         0,
         5.65
       ],
@@ -141,11 +141,11 @@
       "name": "labyrinth",
       "file": "labyrinth.glb",
       "position": [
-        2.9344931419241727,
+        0,
         0.083,
-        2.9344931419241727
+        3.75
       ],
-      "yaw_degrees": 45,
+      "yaw_degrees": 0,
       "colliders": [],
       "material": "opaque",
       "vegetation": false,
@@ -249,11 +249,11 @@
       "name": "sanctuary_steps",
       "file": "sanctuary_steps.glb",
       "position": [
-        -3.146625176280137,
         0,
-        -3.146625176280137
+        0,
+        -1.9
       ],
-      "yaw_degrees": 45,
+      "yaw_degrees": 0,
       "colliders": [
         {
           "size": [
@@ -279,11 +279,11 @@
       "name": "altar_table",
       "file": "altar_table.glb",
       "position": [
-        -3.1819805153394642,
+        0,
         0.54,
-        -3.1819805153394642
+        -2.15
       ],
-      "yaw_degrees": 45,
+      "yaw_degrees": 0,
       "colliders": [
         {
           "size": [
@@ -308,11 +308,11 @@
       "name": "apse",
       "file": "apse.glb",
       "position": [
-        -4.065863991822648,
+        0,
         0.08,
-        -4.065863991822648
+        -3.75
       ],
-      "yaw_degrees": 45,
+      "yaw_degrees": 0,
       "colliders": [],
       "material": "opaque",
       "vegetation": false,
@@ -324,11 +324,11 @@
       "name": "rose_window",
       "file": "rose_window.glb",
       "position": [
-        -3.9597979746446663,
+        0,
         4.12,
-        -3.9597979746446663
+        -3.6
       ],
-      "yaw_degrees": 45,
+      "yaw_degrees": 0,
       "colliders": [],
       "material": "glass",
       "vegetation": false,
@@ -369,23 +369,24 @@
       "name": "pipe_organ",
       "file": "pipe_organ.glb",
       "position": [
-        -4.5,
+        -4.55,
         0.08,
-        1.75
+        -2.6
       ],
       "yaw_degrees": 90,
       "colliders": [
         {
           "size": [
-            1.55,
+            1.6,
             1.1,
-            0.65
+            0.9
           ],
           "at": [
             0,
             0.55,
             0.15
-          ]
+          ],
+          "name": "OrganBody"
         }
       ],
       "material": "opaque",
@@ -481,7 +482,7 @@
       "colliders": [],
       "material": "light_patch",
       "vegetation": false,
-      "review_only": false,
+      "review_only": true,
       "cast_shadow": false,
       "provenance": "tools/art/source/poi_church/modules/stained_light/reuse_provenance.json"
     },
@@ -489,17 +490,22 @@
       "name": "aisle_carpet",
       "file": "aisle_carpet.glb",
       "position": [
-        -0.03181980515339464,
+        0,
         0.083,
-        -0.03181980515339464
+        1.05
       ],
-      "yaw_degrees": 45,
+      "yaw_degrees": 0,
       "colliders": [],
       "material": "opaque",
       "vegetation": false,
       "review_only": false,
       "cast_shadow": false,
-      "provenance": "assets/rooms/poi_church/_source_v11/reuse_provenance.json"
+      "provenance": "assets/rooms/poi_church/_source_v11/reuse_provenance.json",
+      "scale": [
+        1,
+        1,
+        0.483005366726297
+      ]
     },
     {
       "name": "vault_extension",
@@ -616,86 +622,6 @@
       "yaw_degrees": 0
     },
     {
-      "name": "pew_left_1",
-      "asset": "wood_pew",
-      "position": [
-        -3.217071785686863,
-        0.08,
-        -0.2472233047033631
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "pew_left_2",
-      "asset": "wood_pew",
-      "position": [
-        -2.1564116139070416,
-        0.08,
-        0.8134368670764582
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "pew_left_3",
-      "asset": "wood_pew",
-      "position": [
-        -1.0957514421272203,
-        0.08,
-        1.87409703885628
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "pew_left_4",
-      "asset": "wood_pew",
-      "position": [
-        -0.03509127034739896,
-        0.08,
-        2.934757210636101
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "pew_right_1",
-      "asset": "wood_pew",
-      "position": [
-        -0.2472233047033631,
-        0.08,
-        -3.217071785686863
-      ],
-      "yaw_degrees": 90
-    },
-    {
-      "name": "pew_right_2",
-      "asset": "wood_pew",
-      "position": [
-        0.8134368670764582,
-        0.08,
-        -2.1564116139070415
-      ],
-      "yaw_degrees": 90
-    },
-    {
-      "name": "pew_right_3",
-      "asset": "wood_pew",
-      "position": [
-        1.87409703885628,
-        0.08,
-        -1.0957514421272203
-      ],
-      "yaw_degrees": 90
-    },
-    {
-      "name": "pew_right_4",
-      "asset": "wood_pew",
-      "position": [
-        2.9347572106361008,
-        0.08,
-        -0.03509127034739896
-      ],
-      "yaw_degrees": 90
-    },
-    {
       "name": "west_banner",
       "asset": "hanging_banner",
       "position": [
@@ -719,9 +645,9 @@
       "name": "chandelier_left",
       "asset": "iron_chandelier",
       "position": [
-        -3.7123106012293747,
-        4.0,
-        0.38890872965260104
+        -2.8,
+        4,
+        -1.9
       ],
       "yaw_degrees": 0
     },
@@ -729,9 +655,9 @@
       "name": "chandelier_right",
       "asset": "iron_chandelier",
       "position": [
-        0.38890872965260104,
-        4.0,
-        -3.7123106012293747
+        2.8,
+        4,
+        -1.9
       ],
       "yaw_degrees": 0
     },
@@ -739,21 +665,21 @@
       "name": "flowers_left",
       "asset": "flower_pedestal",
       "position": [
-        -4.384062043356595,
+        -1.65,
         0.54,
-        -2.0506096654409878
+        -2.25
       ],
-      "yaw_degrees": 45
+      "yaw_degrees": 0
     },
     {
       "name": "flowers_right",
       "asset": "flower_pedestal",
       "position": [
-        -2.0506096654409878,
+        1.65,
         0.54,
-        -4.384062043356595
+        -2.25
       ],
-      "yaw_degrees": 45
+      "yaw_degrees": 0
     },
     {
       "name": "west_planter",
@@ -769,9 +695,99 @@
       "name": "north_planter",
       "asset": "leaf_planter",
       "position": [
-        3.55,
+        3.9,
         0.08,
-        -4.3
+        -3.6
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "northwest_niche",
+      "asset": "apse",
+      "position": [
+        -4.0658639918,
+        0.08,
+        -4.0658639918
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "niche_flowers",
+      "asset": "flower_pedestal",
+      "position": [
+        -3.8,
+        0.08,
+        -3.8
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "niche_rose",
+      "asset": "rose_window",
+      "position": [
+        -3.9597979746,
+        4.12,
+        -3.9597979746
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "pew_left_1",
+      "asset": "wood_pew",
+      "position": [
+        -2.1935,
+        0.08,
+        0.15
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "pew_left_2",
+      "asset": "wood_pew",
+      "position": [
+        -2.1935,
+        0.08,
+        1.05
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "pew_left_3",
+      "asset": "wood_pew",
+      "position": [
+        -2.1935,
+        0.08,
+        1.95
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "pew_right_1",
+      "asset": "wood_pew",
+      "position": [
+        2.1935,
+        0.08,
+        0.15
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "pew_right_2",
+      "asset": "wood_pew",
+      "position": [
+        2.1935,
+        0.08,
+        1.05
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "pew_right_3",
+      "asset": "wood_pew",
+      "position": [
+        2.1935,
+        0.08,
+        1.95
       ],
       "yaw_degrees": 0
     }
@@ -780,12 +796,12 @@
     "position": [
       11.377193560937565,
       16.403963921374967,
-      11.377193560937565
+      10.377193560937565
     ],
     "target": [
       0,
       1.4,
-      0
+      -1.0
     ],
     "size": 6.72
   },
@@ -816,149 +832,29 @@
   },
   "anchors": [
     {
-      "name": "seat_left_1",
-      "position": [
-        -2.367071785686863,
-        0.7949999999999999,
-        -0.2672233047033632
-      ],
-      "yaw_degrees": 0,
-      "module": "pew_left_1",
-      "approach": [
-        -2.367071785686863,
-        0.08,
-        -0.917223304703363
-      ]
-    },
-    {
-      "name": "seat_left_2",
-      "position": [
-        -1.3064116139070414,
-        0.7949999999999999,
-        0.7934368670764582
-      ],
-      "yaw_degrees": 0,
-      "module": "pew_left_2",
-      "approach": [
-        -1.3064116139070414,
-        0.08,
-        0.14343686707645809
-      ]
-    },
-    {
-      "name": "seat_left_3",
-      "position": [
-        -0.24575144212722,
-        0.7949999999999999,
-        1.8540970388562799
-      ],
-      "yaw_degrees": 0,
-      "module": "pew_left_3",
-      "approach": [
-        -0.24575144212722,
-        0.08,
-        1.20409703885628
-      ]
-    },
-    {
-      "name": "seat_left_4",
-      "position": [
-        0.8149087296526009,
-        0.7949999999999999,
-        2.9147572106361013
-      ],
-      "yaw_degrees": 0,
-      "module": "pew_left_4",
-      "approach": [
-        0.8149087296526006,
-        0.08,
-        2.2647572106361014
-      ]
-    },
-    {
-      "name": "seat_right_1",
-      "position": [
-        -0.2672233047033632,
-        0.7949999999999999,
-        -2.367071785686863
-      ],
-      "yaw_degrees": 90,
-      "module": "pew_right_1",
-      "approach": [
-        -0.917223304703363,
-        0.08,
-        -2.367071785686863
-      ]
-    },
-    {
-      "name": "seat_right_2",
-      "position": [
-        0.7934368670764582,
-        0.7949999999999999,
-        -1.3064116139070414
-      ],
-      "yaw_degrees": 90,
-      "module": "pew_right_2",
-      "approach": [
-        0.14343686707645809,
-        0.08,
-        -1.3064116139070414
-      ]
-    },
-    {
-      "name": "seat_right_3",
-      "position": [
-        1.8540970388562799,
-        0.7949999999999999,
-        -0.24575144212722
-      ],
-      "yaw_degrees": 90,
-      "module": "pew_right_3",
-      "approach": [
-        1.20409703885628,
-        0.08,
-        -0.24575144212722
-      ]
-    },
-    {
-      "name": "seat_right_4",
-      "position": [
-        2.9147572106361013,
-        0.7949999999999999,
-        0.8149087296526009
-      ],
-      "yaw_degrees": 90,
-      "module": "pew_right_4",
-      "approach": [
-        2.2647572106361014,
-        0.08,
-        0.8149087296526006
-      ]
-    },
-    {
       "name": "spawn",
       "position": [
-        3.8,
+        0.5,
         0.08,
-        3.8
+        3.2
       ],
-      "yaw_degrees": 45
+      "yaw_degrees": 0
     },
     {
       "name": "exit",
       "position": [
-        2.0,
+        0,
         0.08,
-        5.85
+        4.55
       ],
       "yaw_degrees": 180
     },
     {
       "name": "badge_exit",
       "position": [
-        2.0,
+        -0.05,
         1.12,
-        5.85
+        4.8
       ],
       "yaw_degrees": 180,
       "label": "Map",
@@ -969,18 +865,138 @@
       "position": [
         0,
         1.4,
-        0
+        -1.0
       ],
       "yaw_degrees": 45,
       "pitch_degrees": 43,
       "width_m": 6.72,
       "fixed": true
+    },
+    {
+      "name": "seat_left_1",
+      "position": [
+        -1.3434999999999997,
+        0.795,
+        0.13
+      ],
+      "yaw_degrees": 0,
+      "module": "pew_left_1",
+      "approach": [
+        -0.375,
+        0.08,
+        0.15
+      ]
+    },
+    {
+      "name": "seat_left_2",
+      "position": [
+        -1.3434999999999997,
+        0.795,
+        1.03
+      ],
+      "yaw_degrees": 0,
+      "module": "pew_left_2",
+      "approach": [
+        -0.375,
+        0.08,
+        1.05
+      ]
+    },
+    {
+      "name": "seat_left_3",
+      "position": [
+        -1.3434999999999997,
+        0.795,
+        1.93
+      ],
+      "yaw_degrees": 0,
+      "module": "pew_left_3",
+      "approach": [
+        -0.375,
+        0.08,
+        1.95
+      ]
+    },
+    {
+      "name": "seat_right_1",
+      "position": [
+        1.3434999999999997,
+        0.795,
+        0.13
+      ],
+      "yaw_degrees": 0,
+      "module": "pew_right_1",
+      "approach": [
+        0.375,
+        0.08,
+        0.15
+      ]
+    },
+    {
+      "name": "seat_right_2",
+      "position": [
+        1.3434999999999997,
+        0.795,
+        1.03
+      ],
+      "yaw_degrees": 0,
+      "module": "pew_right_2",
+      "approach": [
+        0.375,
+        0.08,
+        1.05
+      ]
+    },
+    {
+      "name": "seat_right_3",
+      "position": [
+        1.3434999999999997,
+        0.795,
+        1.93
+      ],
+      "yaw_degrees": 0,
+      "module": "pew_right_3",
+      "approach": [
+        0.375,
+        0.08,
+        1.95
+      ]
+    },
+    {
+      "name": "seat_left_4",
+      "position": [
+        -1.9434999999999998,
+        0.795,
+        1.03
+      ],
+      "yaw_degrees": 0,
+      "module": "pew_left_2",
+      "approach": [
+        -0.375,
+        0.08,
+        1.05
+      ]
+    },
+    {
+      "name": "seat_right_4",
+      "position": [
+        1.9434999999999998,
+        0.795,
+        1.03
+      ],
+      "yaw_degrees": 0,
+      "module": "pew_right_2",
+      "approach": [
+        0.375,
+        0.08,
+        1.05
+      ]
     }
   ],
   "spawn": [
-    3.8,
+    0.5,
     0.08,
-    3.8
+    3.2
   ],
   "floor_y": 0.08,
   "footprint_m": [
@@ -1003,12 +1019,12 @@
     },
     {
       "size": [
-        6.5,
+        4.5,
         3,
         0.12
       ],
       "at": [
-        -2.0,
+        -3,
         1.58,
         5.2
       ],
@@ -1016,12 +1032,12 @@
     },
     {
       "size": [
-        2.5,
+        4.5,
         3,
         0.12
       ],
       "at": [
-        4.0,
+        3,
         1.58,
         5.2
       ],
@@ -1029,37 +1045,50 @@
     },
     {
       "size": [
-        1.275,
+        1,
         3,
-        2.4
+        2.1
       ],
       "at": [
-        -4.6625,
+        -4.75,
         1.58,
-        1.75
+        -2.6
       ],
       "name": "OrganRearBoundary"
     },
     {
       "size": [
-        2.3,
+        6.0,
         3,
-        2.3
+        2.8
       ],
       "at": [
-        -4.15,
+        0,
         1.58,
-        -4.15
+        -3.75
       ],
       "name": "AltarRearBoundary"
+    },
+    {
+      "name": "NorthwestNicheBoundary",
+      "at": [
+        -4.1,
+        1.58,
+        -4.1
+      ],
+      "size": [
+        2.2,
+        3,
+        2.2
+      ]
     }
   ],
   "local_lights": [
     {
       "position": [
-        -3.7123106012293747,
+        -2.8,
         4.08,
-        0.38890872965260104
+        -1.9
       ],
       "color": "FFDC9C",
       "energy": 0.65,
@@ -1067,9 +1096,9 @@
     },
     {
       "position": [
-        0.38890872965260104,
+        2.8,
         4.08,
-        -3.7123106012293747
+        -1.9
       ],
       "color": "FFDC9C",
       "energy": 0.65,
@@ -1084,128 +1113,16 @@
         "name": "entry_to_aisle",
         "points_xz": [
           [
-            2.0,
-            5.85
+            0.5,
+            3.2
           ],
           [
-            2.0,
-            4.7
+            0.5,
+            2.4
           ],
           [
-            1.6617009357883872,
-            4.207285348059958
-          ],
-          [
-            2.9344931419241727,
-            2.9344931419241727
-          ],
-          [
-            -1.8384776310850237,
-            -1.8384776310850237
-          ]
-        ]
-      },
-      {
-        "name": "approach_seat_left_1",
-        "points_xz": [
-          [
-            -1.7819090885901,
-            -1.7819090885901
-          ],
-          [
-            -2.6657925650732848,
-            -0.8980256121069156
-          ]
-        ]
-      },
-      {
-        "name": "approach_seat_left_2",
-        "points_xz": [
-          [
-            -0.7212489168102786,
-            -0.7212489168102786
-          ],
-          [
-            -1.6051323932934634,
-            0.16263455967290608
-          ]
-        ]
-      },
-      {
-        "name": "approach_seat_left_3",
-        "points_xz": [
-          [
-            0.3394112549695429,
-            0.3394112549695429
-          ],
-          [
-            -0.5444722215136418,
-            1.2232947314527274
-          ]
-        ]
-      },
-      {
-        "name": "approach_seat_left_4",
-        "points_xz": [
-          [
-            1.4000714267493646,
-            1.4000714267493646
-          ],
-          [
-            0.5161879502661799,
-            2.283954903232549
-          ]
-        ]
-      },
-      {
-        "name": "approach_seat_right_1",
-        "points_xz": [
-          [
-            -1.7819090885901,
-            -1.7819090885901
-          ],
-          [
-            -0.8980256121069156,
-            -2.6657925650732848
-          ]
-        ]
-      },
-      {
-        "name": "approach_seat_right_2",
-        "points_xz": [
-          [
-            -0.7212489168102786,
-            -0.7212489168102786
-          ],
-          [
-            0.16263455967290608,
-            -1.6051323932934634
-          ]
-        ]
-      },
-      {
-        "name": "approach_seat_right_3",
-        "points_xz": [
-          [
-            0.3394112549695429,
-            0.3394112549695429
-          ],
-          [
-            1.2232947314527274,
-            -0.5444722215136418
-          ]
-        ]
-      },
-      {
-        "name": "approach_seat_right_4",
-        "points_xz": [
-          [
-            1.4000714267493646,
-            1.4000714267493646
-          ],
-          [
-            2.283954903232549,
-            0.5161879502661799
+            0.5,
+            0.225
           ]
         ]
       }
@@ -1215,40 +1132,28 @@
         "name": "entry_to_aisle",
         "points_xz": [
           [
-            2.0,
-            5.85
+            0.5,
+            3.2
           ],
           [
-            2.0,
-            4.7
-          ],
-          [
-            1.6617009357883872,
-            4.207285348059958
-          ],
-          [
-            2.9344931419241727,
-            2.9344931419241727
-          ],
-          [
-            -1.8384776310850237,
-            -1.8384776310850237
+            0.5,
+            0.225
           ]
         ]
       }
     ],
     "standing_positions_xz": [
       [
-        2.7577164466275357,
-        2.7577164466275357
+        0.5,
+        3.2
       ],
       [
-        0.0,
-        0.0
+        0,
+        1.05
       ],
       [
-        -1.8384776310850237,
-        -1.8384776310850237
+        0,
+        0.225
       ]
     ]
   },
@@ -1259,105 +1164,51 @@
     "width_m": 6.72,
     "pitch_degrees": 43
   },
-  "revision": "v1.1",
+  "revision": "C-v1",
   "bench": {
     "floor_y": 0.08,
     "route": [
       {
         "name": "spawn",
         "position": [
-          1.6617009357883872,
+          0.5,
           0.08,
-          4.207285348059958
-        ]
-      },
-      {
-        "name": "entry_inside",
-        "position": [
-          2.0,
-          0.08,
-          4.75
-        ],
-        "capture": "door"
-      },
-      {
-        "name": "labyrinth",
-        "position": [
-          2.9344931419241727,
-          0.08,
-          2.9344931419241727
-        ]
-      },
-      {
-        "name": "aisle_front",
-        "position": [
-          1.7677669529663689,
-          0.08,
-          1.7677669529663689
+          3.2
         ]
       },
       {
         "name": "aisle_mid",
         "position": [
-          0.4242640687119285,
+          0.5,
           0.08,
-          0.4242640687119285
+          1.2
         ],
         "capture": "main"
       },
       {
-        "name": "aisle_rear",
+        "name": "altar_front",
         "position": [
-          -1.8384776310850237,
+          0.5,
           0.08,
-          -1.8384776310850237
-        ]
-      },
-      {
-        "name": "left_seat_approach",
-        "position": [
-          -2.6657925650732843,
-          0.08,
-          -0.8980256121069154
-        ]
-      },
-      {
-        "name": "return_aisle",
-        "position": [
-          -1.7819090885900999,
-          0.08,
-          -1.7819090885900999
-        ]
+          0.225
+        ],
+        "capture": "altar"
       }
     ],
     "blocked": [
       {
         "name": "pew_left",
         "from": [
-          1.5202795795510775,
+          -0.375,
           0.08,
-          3.3587572106361008
+          1.05
         ],
         "to": [
-          0.9545941546018392,
+          -2.1935,
           0.08,
-          2.793071785686863
+          1.05
         ],
-        "target": "/pew_left_4/"
-      },
-      {
-        "name": "altar_table",
-        "from": [
-          -1.8384776310850237,
-          0.08,
-          -1.8384776310850237
-        ],
-        "to": [
-          -3.1819805153394642,
-          0.08,
-          -3.1819805153394642
-        ],
-        "target": "/altar_table/"
+        "target": "/pew_left_2/"
       },
       {
         "name": "west_wall",
@@ -1390,53 +1241,39 @@
       {
         "name": "front_edge",
         "from": [
-          -1,
+          -1.5,
           0.08,
           4.7
         ],
         "to": [
-          -1,
+          -1.5,
           0.08,
           5.9
         ],
         "target": "FrontLeftBoundary"
-      },
-      {
-        "name": "landing_end",
-        "from": [
-          2.0,
-          0.08,
-          5.9
-        ],
-        "to": [
-          2.0,
-          0.08,
-          7
-        ],
-        "target": "LandingEnd"
       }
     ],
     "gaps": [
       {
         "name": "entry",
         "from": [
-          2.0,
+          0,
           0.08,
-          4.75
+          4.9
         ],
         "to": [
-          2.0,
+          0,
           0.08,
           5.95
         ],
         "measure": [
           [
-            1.3,
+            -0.7,
             0.73,
             5.6
           ],
           [
-            2.7,
+            0.7,
             0.73,
             5.6
           ]
@@ -1447,66 +1284,39 @@
       {
         "name": "central_aisle",
         "from": [
-          1.7677669529663689,
+          0,
           0.08,
-          1.7677669529663689
+          2.5
         ],
         "to": [
-          -1.8384776310850237,
+          0,
           0.08,
-          -1.8384776310850237
+          0.225
         ],
         "measure": [
           [
-            0.24748737341529156,
+            -0.85,
             0.73,
-            1.3788582233137678
+            1.05
           ],
           [
-            1.3788582233137678,
+            0.85,
             0.73,
-            0.24748737341529156
+            1.05
           ]
         ],
-        "minimum": 0.8,
-        "width": 1.6
-      },
-      {
-        "name": "between_rows",
-        "from": [
-          0.28284271247461906,
-          0.08,
-          0.28284271247461906
-        ],
-        "to": [
-          -1.202081528017131,
-          0.08,
-          1.7677669529663689
-        ],
-        "measure": [
-          [
-            -1.5026019100214136,
-            0.73,
-            1.4672465709620863
-          ],
-          [
-            -0.9015611460128482,
-            0.73,
-            2.0682873349706514
-          ]
-        ],
-        "minimum": 0.8,
-        "width": 0.85
+        "minimum": 1.2,
+        "width": 1.7
       }
     ],
     "entrance": {
       "inside": [
-        2.0,
+        0,
         0.08,
-        4.75
+        4.7
       ],
       "outside": [
-        2.0,
+        0,
         0.08,
         5.95
       ]
@@ -1530,9 +1340,9 @@
       "seconds": 0.6
     },
     "input_start": [
-      2.7223611075682084,
+      0.5,
       0.08,
-      2.7223611075682084
+      3.2
     ],
     "scale": {
       "door": {
