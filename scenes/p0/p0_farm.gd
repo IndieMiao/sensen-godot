@@ -97,6 +97,27 @@ const NOTICE_TAP_PX := 40.0
 const CHEF_SIGN_BOARD := AABB(Vector3(-0.582, 1.06, -0.025), Vector3(0.5, 0.45, 0.06))   # the board with its emblem (manifest)
 var _mailbox := Vector3.ZERO   # the farmhouse Mailbox (§12.5.2; SGODOT-234 C): opens the Inbox, as the bell does
 var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
+## The farm's way out to the map (SGODOT-443, the user 11-07: "a sign; tapped, the player walks to the exit and goes
+## into the map"; q(298); 不知火舞's spec v1.2): a map pin on the open grass the user marked, its `Map` prompt (the
+## rooms' door strip with the pin's icon, P0WorldPrompts.farm_exit). A tap on it walks to the ring's middle and the
+## arrival goes to the map as the place chip does; the joystick, a tap elsewhere or a panel opening stops the walk where
+## it is. Walked into the ring with the joystick it goes too: within EXIT_RADIUS_M, moving, once armed — never armed on
+## coming into the farm (the start, back from the map, out of the farmhouse), only after having been EXIT_ARM_M away
+## (不知火舞 443 603fe5ea: armed by the spawn's distance, a step left from a landing went in). Beside every way to the map.
+## EXIT_AT: the ring's middle (the user's frame; 不知火舞 42a1ed6a, in cell (7, 0)); EXIT_ICON: its prompt's icon, 安其拉's
+## pin in its ring (d9e7a52a); EXIT_PIECE: 赵云's pin and ring, its origin the ring's middle, standing there once it is in
+## (its `bob` loop played if it has one).
+const EXIT_AT := Vector3(4.875, 0, -0.575)
+const EXIT_ICON := "exit_pin"
+const EXIT_PIECE := "res://assets/farm/art/farm_exit_pin.glb"
+const EXIT_ARM_M := 2.5
+const EXIT_RADIUS_M := 0.6
+const EXIT_MARK := Vector3(0, 1.3, 0)   # over the pin's top (its piece about 1.0 m, its tip 0.25 m up)
+const EXIT_HIT := Vector3(0, 0.4, 0)
+const EXIT_TAP_PX := 40.0
+var _exit := Vector3.INF
+var _exit_armed := false
+var _exit_walk := false   # walking there after a tap on its prompt
 var _door_armed := false
 var _inside := false          # the farmhouse is open above this farm
 
@@ -152,6 +173,8 @@ func _notification(what: int) -> void:
 
 func resume() -> void:
 	get_viewport().transparent_bg = false
+	_exit_armed = false   # out of the farmhouse: back in the farm, the exit not armed (443 603fe5ea)
+	_exit_walk = false
 	if _saved_env: world_env.environment = _saved_env
 	for held in _held_layers:   # back in their places, in the order they were taken
 		add_child(held[0])
@@ -185,6 +208,8 @@ func _build_world() -> void:
 	ground.position = Vector3(bp.play_area_m * 0.5, -0.008, -bp.play_area_m * 0.5)
 	_house = bp.cell_to_world(bp.anchor("house"))
 	_door = bp.cell_to_world(bp.anchor("house") + Vector2i(0, -2))
+	_exit = EXIT_AT
+	_exit_piece()
 	var grass := ShaderMaterial.new()
 	grass.shader = preload("res://modules/farm/shaders/meadow.gdshader")
 	grass.set_shader_parameter("meadow_texture", preload("res://assets/farm/art/meadow.png"))
@@ -717,6 +742,7 @@ func p0_show_spot(where: String) -> void:
 
 # ---------------------------------------------------------------- frame
 func p0_joystick(v: Vector2) -> void:
+	if v != Vector2.ZERO: stop_exit_walk()   # the joystick takes over the walk out (SGODOT-443)
 	if actor: actor.set_input(v)
 
 var _dev_aim := Vector3.INF   # aimcell (shots): steer the joystick straight at this point, logging the player each frame
@@ -732,6 +758,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		print("P0_AIM %d %s" % [Engine.get_frames_drawn(), actor.position])
 	actor.step(dt)
 	_door_check()
+	_exit_check()
+	if not is_inside_tree(): return   # out to the map through the exit this frame: nothing left to draw
 	_follow(dt)
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
@@ -971,6 +999,52 @@ func enter_farmhouse() -> void:
 	_inside = true
 	AppRouter.open_instance(FARMHOUSE, {})
 
+## The farm's exit each frame (SGODOT-443): the walk there after a tap arrives and leaves, or a panel stops it; walked
+## into the ring with the joystick, it leaves once armed (as the farmhouse door takes the player in).
+func _exit_check() -> void:
+	if not _exit.is_finite(): return
+	var d := P0FarmMaterials.flat(actor.position, _exit)
+	if _exit_walk:
+		if rt.ui.has_modal(): stop_exit_walk()
+		elif d <= EXIT_RADIUS_M:
+			_exit_walk = false
+			leave_by_exit()
+		elif not actor.mover.is_moving(): _exit_walk = false   # no further to go (the nearest it could reach)
+		return
+	if d > EXIT_ARM_M: _exit_armed = true
+	elif _exit_armed and d <= EXIT_RADIUS_M and actor.mover.is_moving() and not rt.ui.has_modal():
+		_exit_armed = false
+		leave_by_exit()
+
+## Out to the map as the place chip goes (P0Runtime.leave_world: a world with its back lock asks it first).
+func leave_by_exit() -> void:
+	_exit_armed = false
+	if rt: rt.leave_world()
+
+## A tap on the exit's icon, strip or piece: walk there (the arrival leaves, _exit_check); out of reach, the nearest.
+func walk_to_exit() -> void:
+	if not _exit.is_finite(): return
+	if P0FarmMaterials.flat(actor.position, _exit) <= EXIT_RADIUS_M:
+		leave_by_exit()
+		return
+	_exit_walk = actor.mover.set_target_position(_exit)
+
+## 赵云's pin and ring at the exit (no collider: the player walks into the ring), once the piece is in this build.
+func _exit_piece() -> void:
+	if not ResourceLoader.exists(EXIT_PIECE): return
+	var piece := (load(EXIT_PIECE) as PackedScene).instantiate() as Node3D
+	piece.name = "ExitPin"
+	piece.position = _exit
+	add_child(piece)
+	var ap := piece.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	if ap and ap.has_animation("bob"): ap.play("bob")
+
+## The walk out stopped where the player is (the joystick, a tap elsewhere, a panel).
+func stop_exit_walk() -> void:
+	if not _exit_walk: return
+	_exit_walk = false
+	actor.mover.stop()
+
 func _door_check() -> void:
 	var off := Vector2(actor.position.x - _door.x, actor.position.z - _door.z)
 	if off.length() > DOOR_ARM_M: _door_armed = true
@@ -999,6 +1073,10 @@ func _hold_repeat() -> void:
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
 	var card := str(rt.ui.tapped_card)
+	if card != "exit": stop_exit_walk()   # a tap elsewhere stops the walk out
+	if card == "exit" or (card == "" and _exit.is_finite() and cam.unproject_position(_exit + EXIT_HIT).distance_to(screen) < EXIT_TAP_PX):
+		walk_to_exit()
+		return
 	if _guide != null and _guide.tap(screen, card): return
 	if _tap_card(card): return
 	if _facilities != null and _facilities.tap(screen): return   # P1: a sprinkler's status card (SGODOT-241)
@@ -1086,6 +1164,7 @@ func _prompts(v: Dictionary) -> void:
 	world_prompt("notice_board", P0WorldPrompts.notice_board(v), _notice, NOTICE_MARK, NOTICE_HIT, _notice_node.visible)
 	world_prompt("bench", P0WorldPrompts.bench(v), _bench, Vector3(0, 0.95, 0), Vector3(0, 0.35, 0))
 	world_prompt("mailbox", P0WorldPrompts.mailbox(v), _mailbox, MAILBOX_MARK, MAILBOX_HIT)
+	world_prompt("exit", P0WorldPrompts.farm_exit(EXIT_ICON), _exit, EXIT_MARK, EXIT_HIT, _exit.is_finite())
 	if _facilities: _facilities.prompts(v)
 
 ## One facility's prompt at `at` + `mark` (the former finger card's / mark's anchor): its strip when it is the open
@@ -1310,6 +1389,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 				bench_seat = at.call(_bench + Vector3(0, 0.35, 0)), unit_x = at.call(_chef_sign + Vector3.RIGHT) - at.call(_chef_sign),
 				shift = CHEF_SIGN_SHIFT.x, look = _chef_sign_look}))
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
+		"exit": walk_to_exit()   # the walk out through the exit's prompt, as a tap on it (443 shots)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
 		"island":   # the whole island in the picture, as far as the opening may zoom out (#624 walkthrough: a farm end to end)
 			var corners: Array[Vector3] = []
