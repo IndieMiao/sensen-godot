@@ -1,6 +1,7 @@
 /** Grace Cathedral (the user 11-06: in with v7, a place to see): an outpost of role church in San Francisco — a room of
- * its own (poi_church), no keeper, no counter, and never a place a board, a request or a notice sends anyone to (0.3.0
- * clients, whose outpost table lacks it, would show its raw id: 哪吒 / 亚瑟). */
+ * its own (poi_church), Gabriel its priest who only talks (q(299): a keeper with no counter, no requests), and never a
+ * place a board, a request or a notice sends anyone to (0.3.0 clients, whose outpost table lacks it, would show its raw
+ * id: 哪吒 / 亚瑟). */
 import { describe, expect, it } from 'vitest';
 import { crossTarget, visitPlaces } from '../../src/p0/boards.js';
 import { loadP0Content } from '../../src/p0/content.js';
@@ -14,13 +15,15 @@ const c = loadP0Content();
 const SF = 'gn-5391959', CHURCH = 'sf_church_1', T = Date.parse('2026-11-07T18:00:00Z');
 
 describe('Grace Cathedral (role church)', () => {
-  it("is in the outpost table as 不知火舞 named it: no keeper, its room's walls and 8 pews", () => {
+  it("is in the outpost table as 不知火舞 named it: Gabriel its keeper (q(299)), its room's walls and 8 pews", () => {
     const o = loadOutposts().find(x => x.id === CHURCH)!;
     expect(o).toMatchObject({ role: 'church', name: 'Grace Cathedral', category: 'Church · Stained glass', cluster: SF, capacity: 12,
-      art: 'poi_church', keeper: {}, residents: [] });
+      art: 'poi_church', keeper: { role: 'Priest', name: 'Gabriel' }, residents: [] });
     expect(o.seats).toHaveLength(8);
     expect(c.outposts?.find(x => x.id === CHURCH)).toMatchObject({ role: 'church', residents: [] });
-    expect(c.outposts?.find(x => x.id === CHURCH)).not.toHaveProperty('keeper');
+    // Gabriel signs no local request: church has no requests.local role (q(299): he only talks)
+    expect(c.outposts?.find(x => x.id === CHURCH)?.keeper).toEqual({ name: 'Gabriel', role: 'Priest' });
+    expect(Object.keys(c.requests.local?.roles ?? {})).not.toContain('church');
   });
 
   it('has a room of 12 with its seats, as any outpost', () => {
