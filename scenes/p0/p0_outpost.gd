@@ -551,13 +551,13 @@ func _stand_up(then := Callable()) -> void:
 		return
 	var m := anchor(seat)
 	var at := m.global_position if m else actor.position
-	# up onto the seat's approach (the kit's side of the pew) when it has one, never into a gap the door's floor does not
-	# reach (Grace Cathedral, 李元芳 on 0.3.1: stuck between the left rows)
-	var approach = anchor_data(seat).get("approach", null)
 	seat = ""
 	_sit_request = {}
 	if online and online.epoch > 0: online.stand()
-	var floor_at := reachable(room.to_global(P0RoomAnchors.vec(approach)) if approach is Array else at)
+	# up beside the seat as before, but never into a gap the door's floor does not reach (Grace Cathedral, 李元芳 on
+	# 0.3.1: stuck between the left rows). Not onto the kit's approach: the tea house's third table has its approach
+	# behind Hana, and up there the player was hidden (不知火舞 on #850).
+	var floor_at := reachable(at)
 	if floor_at == Vector3.INF: floor_at = actor.position
 	var ap := actor.rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	var dur := STAND_S if ap and ap.has_animation("sit_up") else 0.0

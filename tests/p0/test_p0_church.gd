@@ -144,7 +144,7 @@ func test_the_player_stays_on_screen_in_every_corner() -> void:
 			assert_bool(Rect2(Vector2(12, 0), view - Vector2(24, 0)).has_point(at)).override_failure_message("%s at %s, %s" % [c, at, view]).is_true()
 
 ## 李元芳 on 0.3.1: up from a pew the player stood in the gap between the left rows and could not walk out. Up from
-## every seat they stand on its approach (or the nearest floor the door reaches), and the spawn is on that floor too.
+## every seat they stand beside it on floor the door reaches, and the spawn is on that floor too.
 func test_up_from_every_pew_onto_the_floor_the_door_reaches() -> void:
 	var r := _room(CHURCH_ID)
 	await get_tree().process_frame
@@ -159,9 +159,5 @@ func test_up_from_every_pew_onto_the_floor_the_door_reaches() -> void:
 		for i in 30: r.p0_frame({}, 1.0 / 30.0)
 		assert_str(r.seat).is_empty()
 		assert_bool(on_door_floor.call(r.actor.position)).override_failure_message("%s up at %s" % [n, r.actor.position]).is_true()
-		var approach = r.anchor_data(str(n)).get("approach", null)
-		if approach is Array:   # an approach the door's floor reaches is where they stand; a blocked one, the nearest that is
-			var want: Vector3 = r.room.to_global(P0RoomAnchors.vec(approach))
-			if on_door_floor.call(want):
-				assert_float(Vector2(r.actor.position.x - want.x, r.actor.position.z - want.z).length()).override_failure_message(str(n)).is_less(0.2)
-			else: print("CHURCH_APPROACH_BLOCKED ", n, " ", approach)
+		var at: Vector3 = r.anchor(str(n)).global_position
+		assert_float(Vector2(r.actor.position.x - at.x, r.actor.position.z - at.z).length()).override_failure_message(str(n)).is_less(1.0)   # beside it
