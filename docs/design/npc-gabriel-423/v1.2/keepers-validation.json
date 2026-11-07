@@ -1,0 +1,59 @@
+{
+  "farm_dev_ref": "c6d490f7a747519fbc632be8e9976be761f6e538",
+  "templates": [
+    "assets/p0/art/keepers/lou_card.jpg.import",
+    "assets/p0/art/keepers/lou_head.jpg.import"
+  ],
+  "face_crop_xywh": [
+    70,
+    51,
+    165,
+    165
+  ],
+  "head_resample": "LANCZOS",
+  "head_jpeg_quality": 95,
+  "head_jpeg_subsampling": 0,
+  "new_files": [
+    "assets/p0/art/keepers/gabriel_card.jpg",
+    "assets/p0/art/keepers/gabriel_card.jpg.import",
+    "assets/p0/art/keepers/gabriel_head.jpg",
+    "assets/p0/art/keepers/gabriel_head.jpg.import"
+  ],
+  "sizes": {
+    "card": [
+      300,
+      660
+    ],
+    "head": [
+      132,
+      132
+    ]
+  },
+  "uids_generated_by_godot_at_keeper_paths": {
+    "card": "uid://bmvv70glopeje",
+    "head": "uid://d0awbed2l0kw6"
+  },
+  "godot_import_lossless": true,
+  "mipmaps": false,
+  "params_byte_match_lou": true,
+  "card_bytes_equal_resident_v12": true,
+  "residents_and_avatar_unchanged": true,
+  "cold_import": {
+    "fresh_cache": true,
+    "files_compared": 4,
+    "changed": [],
+    "errors": [],
+    "sha256": {
+      "assets/p0/art/keepers/gabriel_card.jpg": "b7923cbafe2d94c05174e27577d4978978fa5b4029bc5a741e7fbec26efca4c5",
+      "assets/p0/art/keepers/gabriel_card.jpg.import": "a3bd84b7defe8c3ffc4cf052fbb6c76a9839333398b7442ba3a4688ad05c49d5",
+      "assets/p0/art/keepers/gabriel_head.jpg": "94ec0d361afb303bcaf1f99ea862300969afc96846aeb90f4b85698339954776",
+      "assets/p0/art/keepers/gabriel_head.jpg.import": "90a8de26c4ee74dc58215449fa587650b077bb72389712211a29681c54cfc40c"
+    }
+  },
+  "runtime_load": {
+    "card": true,
+    "head": true,
+    "dimensions_verified": true,
+    "no_mipmaps_verified": true
+  }
+}

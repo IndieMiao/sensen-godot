@@ -1,6 +1,6 @@
 # Gabriel v1.2 · 前领片 / 前襟贴图
 
-刘备，2026-11-07。基于已验收 v1.1 `ccd6e7f0`，只改游戏资源：
+刘备，2026-11-07。基于已验收 v1.1 `ccd6e7f0`，领口阶段更新两张游戏资源图：
 
 - `assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png`
 - `assets/p0/art/residents/gabriel_card.jpg`（按新贴图开窗口重烘）
@@ -38,6 +38,21 @@ v1.1 已记录的限制；没有新的实体手机性能结论。
 
 整合以本次两张图覆盖 v1.1 对应路径即可；若尚未接入 v1.1，仍按上级说明向运行时现有
 manifest / npc_only 追加两条 Gabriel，保留其他 NPC。
+
+
+## 掌柜头像路径补齐
+
+程序按掌柜路径读图，因此另加以下两张及各自 `.import`：
+
+- `assets/p0/art/keepers/gabriel_card.jpg`：300×660，与 residents 下 v1.2 卡图字节一致。
+- `assets/p0/art/keepers/gabriel_head.jpg`：按 `[70,51,165,165]` 脸部方框裁切，LANCZOS 缩至 132×132，JPEG quality 95、无色度抽样。
+
+[卡图与 132×132 / 44×44 头像预览](keepers-review.png)，[验证与 UID](keepers-validation.json)。
+两份导入参数完整照 farm-dev `c6d490f7a7` 的 `lou_card.jpg.import` / `lou_head.jpg.import`：
+`compress/mode=0`、`mipmaps/generate=false`、`process/size_limit=0`。UID 由 Godot 在新
+keepers 路径生成，未复制 Lou 或 residents 的 UID。空缓存冷导入四文件字节稳定、0 错误；
+Godot 实际加载两张纹理的尺寸、无 mipmap 与合法 UID 均通过。原 residents 图和 crop 条目保留。
+本补件没有再次改衣服贴图、网格或头像内容。
 
 ## 贴图复现
 
