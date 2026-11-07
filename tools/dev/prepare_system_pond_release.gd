@@ -72,7 +72,7 @@ func _initialize() -> void:
 	if farm_home:
 		preset.set_value("preset.0", "name", "Android Farm Home Update")
 	preset.set_value("preset.0", "custom_features", "")
-	preset.set_value("preset.0", "include_filter", "mapbox_token.txt,assets/ponds/*.json,assets/map/*.json,assets/map/cities/*.json,assets/localization/*.json,assets/landmarks/griffith_observatory/layout.json,assets/farm/data/*.json,assets/farm/art/styles.json,assets/farm/presets/*.json,assets/blueprints/**/*.json,assets/avatar/**/*.json,assets/ui/icons/game/LICENSE.txt,assets/ui/icons/lucide/LICENSE,assets/ui/fonts/LICENSE-NotoSansSC.txt,assets/ui/fonts/Nunito-OFL.txt")
+	preset.set_value("preset.0", "include_filter", "mapbox_token.txt,assets/ponds/*.json,assets/map/*.json,assets/map/cities/*.json,assets/localization/*.json,assets/landmarks/griffith_observatory/layout.json,assets/landmarks/alcatraz_island/layout.json,assets/farm/data/*.json,assets/farm/art/styles.json,assets/farm/presets/*.json,assets/blueprints/**/*.json,assets/avatar/**/*.json,assets/ui/icons/game/LICENSE.txt,assets/ui/icons/lucide/LICENSE,assets/ui/fonts/LICENSE-NotoSansSC.txt,assets/ui/fonts/Nunito-OFL.txt")
 	preset.set_value("preset.0", "exclude_filter", "addons/*,tests/*,assets/avatar/source/*.fbx,tools/*,docs/*,reports/*,artifacts/*,build/*,output/*,server/*,tmp/*,native/*,*observer*,*probe*,*qa_account*,gallery_*.json,.playwright-mcp/*")
 	preset.set_value("preset.0", "export_path", "../sensen-journey-ponds-" + version + ".apk")
 	if integrated:

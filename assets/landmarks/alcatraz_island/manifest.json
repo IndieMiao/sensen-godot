@@ -1,0 +1,422 @@
+{
+  "generator": "tools/art/source/alcatraz_island/build.py",
+  "reference": "landmark_alcatraz_v2.jpg + c_alc2.png",
+  "phase": "v9 ground materials, calibrated towers and four tree species pass",
+  "assets": {
+    "dock": {
+      "triangles": 2452,
+      "bytes": 220508,
+      "sha256": "0fb5c90f4234d551c40ee3aa932ed07b7d420768c83367a49d36f770f69d7cb9"
+    },
+    "alc_museum": {
+      "triangles": 8757,
+      "bytes": 720712,
+      "sha256": "ff853c9768ea9a37569f1fe91d9133a8e49396e1e3bd835b9082249431fb1884"
+    },
+    "ruins": {
+      "triangles": 756,
+      "bytes": 66280,
+      "sha256": "72586b1719fd526c5bccb9101997c7b7d59c2f251794e00b6f35dbe9d100fba2"
+    },
+    "alc_ground_dock": {
+      "triangles": 380,
+      "bytes": 37808,
+      "sha256": "3663f515b56c9fe15d0b46fa07b50224ceef063493e694cca0660fc2b983a993"
+    },
+    "alc_ground_terraces": {
+      "triangles": 3800,
+      "bytes": 325544,
+      "sha256": "aab0796e4598b3af1c14d30980af67cd573825fe9b8bc14dfcfced927f666508"
+    },
+    "alc_ground_summit": {
+      "triangles": 1062,
+      "bytes": 96248,
+      "sha256": "8913a6a5b11e878fcfeb295fab3649044a18cf510d989d671e84225c29465e8a"
+    },
+    "alc_lighthouse": {
+      "triangles": 3262,
+      "bytes": 135600,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_lighthouse.blend",
+      "sha256": "a953a721d7c7b3863aa075252091addc4fa9a38bc9341a9f853e8121ff139b96"
+    },
+    "alc_lighthouse_far": {
+      "triangles": 830,
+      "bytes": 28852,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_lighthouse_far.blend",
+      "sha256": "b3a82c08d041beb6e953835a28a72c14adf7a9c3b13a50355c6416ac27459094"
+    },
+    "alc_watertower": {
+      "triangles": 3546,
+      "bytes": 127324,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_watertower.blend",
+      "sha256": "78e4a965f0e707d3bb8b61d9cacc25e8ca1d4e7cb86097a81d876fef6752da7d"
+    },
+    "alc_watertower_far": {
+      "triangles": 774,
+      "bytes": 25060,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_watertower_far.blend",
+      "sha256": "78b4abf332acaf75f4147c77e59c7fe06eafb04dabf524282aa3e2be6e537948"
+    },
+    "alc_far_bridge": {
+      "triangles": 498,
+      "bytes": 52068,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_bridge.blend",
+      "sha256": "9cd46d07c4ca491efe7bdcb716723aa87976da4373df5e5e7288f8ee80ad7d37"
+    },
+    "alc_far_city": {
+      "triangles": 208,
+      "bytes": 22512,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_city.blend",
+      "sha256": "ae98acebd72673591318ede1f9b2a9c9832f30a45aa836f9eda0f6de1788c2d8"
+    },
+    "alc_far_hills": {
+      "triangles": 120,
+      "bytes": 13504,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_hills.blend",
+      "sha256": "19dc64438b9c8bc7de842e696bcce0c36dd3269e0e13f61d0bd381187ec4f9e4"
+    },
+    "alc_bench": {
+      "triangles": 252,
+      "bytes": 21780,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "6dcb115c2827b66ea978f921443c60f432d7c29732dd29d5fab01401c04d00a9"
+    },
+    "alc_lamp": {
+      "triangles": 264,
+      "bytes": 7896,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "2321473dfaaec218140655b6b00fc4a606a8cca88dc89a6d8c026c5b8911d21e"
+    },
+    "alc_rail_straight": {
+      "triangles": 48,
+      "bytes": 4992,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "afccbf92fde39218866b2457375559ff347ee55de39af8e78abd18b1c6a98ca6"
+    },
+    "alc_rail_corner": {
+      "triangles": 60,
+      "bytes": 5932,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "5fa96b534fe818609b8a13a681a9415c1ecaeff37fa0acf58f4ca0a99bcff71c"
+    },
+    "alc_curb": {
+      "triangles": 20,
+      "bytes": 2644,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "8f531201101b657ee13781e7a0c3ca0e7ed392e7637566ae39c29c69e7be20e8"
+    },
+    "alc_tree_a": {
+      "triangles": 520,
+      "bytes": 14560,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "04b30452d6db9d8b64acfc4e11e70be15bd0372c1ccab99ec79f63d7a9aeb5d2"
+    },
+    "alc_tree_b": {
+      "triangles": 316,
+      "bytes": 9372,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "eb499135039ef55b4c5f0a90c6957510b7939c8580c6e65458e531e891acb3d7"
+    },
+    "alc_flowerbed": {
+      "triangles": 500,
+      "bytes": 17616,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "bf11c6c06ce941a8096d05ce3ba818ed4a3fb47355c3b2c706b8820a398ca071"
+    },
+    "alc_bin": {
+      "triangles": 128,
+      "bytes": 11556,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "71b7a259319a75159738847dd52dfba2f61e82afdf71fa67d487ea96cfd473cf"
+    },
+    "alc_sign": {
+      "triangles": 36,
+      "bytes": 4068,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_props_424/alcatraz_props.blend",
+      "sha256": "edab4d31efd5be4ec4519bda5f0455f5bc98312965f8525684e0fff4e7ac469b"
+    },
+    "ferry": {
+      "triangles": 5144,
+      "bytes": 257112,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_ferry_424/ferry.blend",
+      "sha256": "397855391e01f037f20c1eba30bcff40ae3f09806551debc8a486bedd249a62c"
+    },
+    "ferry_far": {
+      "triangles": 1480,
+      "bytes": 75268,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_ferry_424/ferry_far.blend",
+      "sha256": "fb49d1dced87c2358e2d96f9e488c47bf0efddffbc4da415093eeff3606ca11b"
+    },
+    "gull": {
+      "triangles": 284,
+      "bytes": 25476,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_ferry_424/gull.blend",
+      "sha256": "cdeb84ff5c8a7d1121067980789c8b4d82cedc023e46c0b604e882022c0d64df"
+    },
+    "alc_flowers_poppy": {
+      "triangles": 244,
+      "bytes": 12728,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "sha256": "aa3cbc1723f6795b327fd7141ae659a7c5c85b39ff66bef09fd017505140ee31"
+    },
+    "alc_flowers_lavender": {
+      "triangles": 240,
+      "bytes": 10816,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "sha256": "7df4094843f78c10af66b02f9aee55d03a35887308affb12f54c3c6f2c9cc110"
+    },
+    "alc_flowers_daisy": {
+      "triangles": 228,
+      "bytes": 12632,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "sha256": "2cd433bd6fb7591bca11a27509b8db292ce5684bf356252d551af9e681369d25"
+    },
+    "alc_hedge": {
+      "triangles": 66,
+      "bytes": 4128,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "sha256": "2feb90cdd76a5bad7d3db66e55cc4753bbc87171ce515d0ffead80b891643ed2"
+    },
+    "alc_planter": {
+      "triangles": 194,
+      "bytes": 7136,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_garden_424/alcatraz_garden.blend",
+      "sha256": "3e6a7cd17fbc2a0e81871791ffeb6603df3749f1a336342e7176cfc29489f367"
+    },
+    "alc_ruin_arch": {
+      "triangles": 144,
+      "bytes": 9516,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "4a7ed72271e61c6dac6bd8fb093e9d1a5896843aff3a89ed1dfdc26372720352"
+    },
+    "alc_ruin_rubble": {
+      "triangles": 112,
+      "bytes": 9688,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "e90c9554a244aa251598176b2e7c57bf8e631ca9fe8e71ec5209860fe475e213"
+    },
+    "alc_ruin_vine": {
+      "triangles": 312,
+      "bytes": 10820,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "6962d21aa19d89dafacad7b43b483c158bd57991ba515169a77f9c0666b4f156"
+    },
+    "alc_ruin_flowers": {
+      "triangles": 350,
+      "bytes": 13340,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "3273f98fecc89779539ae3d6a24a258bfe87a74fb358e4fefba76117c9d6e99b"
+    },
+    "alc_ruin_plaque": {
+      "triangles": 104,
+      "bytes": 9716,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_ruins_424/alcatraz_ruins_details.blend",
+      "sha256": "c547f6d0c844168ea9644798c925c0fb5586b871ee7b387b4ce91ea7576cd6b2"
+    },
+    "alc_dock_bollard": {
+      "triangles": 248,
+      "bytes": 7172,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "9ae6bc4ab0c004fd953d303210b843b02cc8871c3b4e356ae4732d3888168413"
+    },
+    "alc_dock_crates": {
+      "triangles": 312,
+      "bytes": 13440,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "237ff30b687aae44216ac4ceaac3806b8bc9c3765c52333fb7dfcfcc0b3e63b1"
+    },
+    "alc_dock_shelter": {
+      "triangles": 384,
+      "bytes": 27412,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "6a5c68b71f5945d3e6d01a49471ad02a2733ed6199c88d4a8ab386fb0bc9f5eb"
+    },
+    "alc_dock_welcome": {
+      "triangles": 80,
+      "bytes": 6672,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "46d76ed063494f0526ef5304ca8660e415aa8e8113cdf37497658c2d586f9f08"
+    },
+    "alc_dock_planter": {
+      "triangles": 358,
+      "bytes": 20956,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_dock_424/alcatraz_dock.blend",
+      "sha256": "825c0cc23448e660f6742082903094adc9cf151717aaecc736967997c1ac1150"
+    },
+    "alc_rock_a": {
+      "triangles": 196,
+      "bytes": 21308,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "690c268413ddd2faca95b589c9c9401fa6c1a31bbea61f4ac01eee57744c2d99"
+    },
+    "alc_rock_b": {
+      "triangles": 196,
+      "bytes": 21304,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "af44d6dba6fa31ba76fad57817f22c7c79499bd548c18263e6f91954d9905e4d"
+    },
+    "alc_rock_c": {
+      "triangles": 196,
+      "bytes": 21304,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "6f14e38b10de8e6fc2fcef681b5c50c6efdc7043921e58a2b2cbca6734f5e919"
+    },
+    "alc_shrub": {
+      "triangles": 140,
+      "bytes": 15588,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "7a9cf43c6b0660ef42e26ee2418889c5d0c455f968722325b9cd3ccf2c0c6674"
+    },
+    "alc_shrub_b": {
+      "triangles": 180,
+      "bytes": 19676,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "cfda3d96859135b943bca7a354f9b040a4dcb8be85f9ca5f85a1406cbad4cc78"
+    },
+    "alc_grass_tuft": {
+      "triangles": 60,
+      "bytes": 7444,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_nature_424/alcatraz_nature.blend",
+      "sha256": "50822f15cfb8ad3b3be39143e89d9a35d63e32350888c03c15c780f8e8c933d4"
+    },
+    "alc_foam_strip_a": {
+      "triangles": 24,
+      "bytes": 2340,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "8c9cbe342d71f49a6d39d35377f24c7a2958201c3752f6760a694001e4b96b44"
+    },
+    "alc_foam_strip_b": {
+      "triangles": 32,
+      "bytes": 2628,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "78f57717eeee8e322f19b0860559af084beea672d9aa3f32837809c471cd7262"
+    },
+    "alc_foam_strip_c": {
+      "triangles": 24,
+      "bytes": 2340,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "e9c42be25c6b0660a8cb1d7fd4894a5f8a812dae0c1fe27c61d112563ed3a941"
+    },
+    "alc_foam_ring": {
+      "triangles": 64,
+      "bytes": 3772,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "0fc8c4bd8c48edb775c325f54e6695dd37643e8c5710343659eab7da9cbc9046"
+    },
+    "alc_buoy": {
+      "triangles": 184,
+      "bytes": 5504,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "03a4ab3f1a1eb44c1811721a13f5d09722b368393270e320f9b2448ab364a7c4"
+    },
+    "alc_driftwood": {
+      "triangles": 130,
+      "bytes": 4644,
+      "author": "\u5218\u5907",
+      "source": "tools/art/source/alcatraz_foam_424/alcatraz_foam.blend",
+      "sha256": "9c80c9823a4d67e705ba10633a9301c0562bb74dcc3c867126329bd083ba5dd1"
+    },
+    "alc_tree_a_far": {
+      "triangles": 118,
+      "bytes": 5216,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_tree_lod_424/tree_lod.blend",
+      "sha256": "b5e4349cace99157462b0080c9514490453c0c3c2475c5405e3417f440273c98"
+    },
+    "alc_tree_b_far": {
+      "triangles": 118,
+      "bytes": 5104,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_tree_lod_424/tree_lod.blend",
+      "sha256": "814c86334c75ecb5d10a3f34797166e3d3bda1addb0a4017b702dfb10898f11a"
+    },
+    "alc_tree_c": {
+      "triangles": 240,
+      "bytes": 7196,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_trees_cd_424/trees_cd.blend",
+      "sha256": "3880ea841a0d648c4a029e17308559897c2a79d83af438460c894ab1b82aaa10"
+    },
+    "alc_tree_c_far": {
+      "triangles": 116,
+      "bytes": 4220,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_trees_cd_424/trees_cd.blend",
+      "sha256": "ae2f1c73445f773dcfd6e125f8f78c2e431089c417b0197e26be96042812e6ab"
+    },
+    "alc_tree_d": {
+      "triangles": 316,
+      "bytes": 9308,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_trees_cd_424/trees_cd.blend",
+      "sha256": "466132def38484a05095a787c0eeeff487aed4abb058991d6fa629e539ef56b9"
+    },
+    "alc_tree_d_far": {
+      "triangles": 118,
+      "bytes": 4988,
+      "author": "\u8d75\u4e91",
+      "source": "tools/art/source/alcatraz_trees_cd_424/trees_cd.blend",
+      "sha256": "c058ae76a9fead0705cfafc3b0904a5557027fc8a765aa53cb8838d5fb3beacb"
+    },
+    "alc_museum_far": {
+      "triangles": 2239,
+      "bytes": 130848,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/museum_far_roof_424/alc_museum_far.blend",
+      "sha256": "4cc97a8dd19cc26bd8ad2800a9a4ce6cd41c80010d70d274214cfb2de52af4b2"
+    },
+    "ferry_flag": {
+      "triangles": 52,
+      "bytes": 4272,
+      "author": "\u9ec4\u5fe0",
+      "source": "tools/art/source/alcatraz_anim_424/ferry_flag.blend",
+      "sha256": "eaaf1c0787001cc3f61513b159cd75f0a125ee04269241d6e33252a56f28f3b5"
+    }
+  }
+}

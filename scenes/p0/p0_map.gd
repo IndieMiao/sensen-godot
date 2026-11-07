@@ -9,6 +9,7 @@ extends "res://scenes/map_poc/map_poc.gd"
 const P0LocalRequest := preload("res://scenes/p0/panels/p0_local_request.gd")   # a local request's card (q(272))
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
+const P0LandmarkVisit := preload("res://modules/p0/p0_landmark_visit.gd")   # q(295): a landmark's scene as a P0 world
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a city's 2 regional fish (MAP-5's Fish here)
 const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")   # the wild sites read by viewport (SGODOT-355 C)
@@ -150,7 +151,9 @@ func _install_city_map() -> void:
 		city_map.fog_holes = fog_holes   # §11.7: the world greyed but for the cities explored (SGODOT-275)
 		city_map.poi_shown = poi_shown   # q(212) ⑤: no POI in the fog
 		city_map.place_shown = place_shown   # SGODOT-355: gathering spots and wild sites by zoom
-		city_map.landmark_scenes = false   # q(213): a landmark card is its name and kind alone, no Enter scene
+		city_map.landmark_action = "Go"   # q(295): the two landmarks with a scene (LandmarkScenes) say Go; the rest only their names
+		city_map.info_settled = _clear_card_of_pin
+		city_map.landmark_open = func(e: Dictionary): return P0LandmarkVisit.open(str(e.get("id", "")))
 		city_map.bubble_state = city_bubble
 		city_map.bubble_clear_rects = bubble_clear_rects   # no half bubble under the HUD, the keys or the bar (不知火舞 on 279)
 		_style_locate(city_map.recenter)
@@ -1661,7 +1664,7 @@ static func cluster_of_entry(entry: Dictionary) -> String:
 ## Those cards are the city's, not the pin's: the pin is not kept selected while one is up — a tap gives it the press
 ## alone (CityMapView.select), as a city bubble opens the same card with no pin at all (不知火舞 on 327, 11ca174e; it stayed raised after the card closed, q(212) ⑥). True when it opened one.
 func _travel_first(entry: Dictionary, going := true) -> bool:
-	if not str(entry.get("kind", "")) in ["pond", "place"] or str(entry.get("id", "")) == HOME_PIN: return false
+	if not str(entry.get("kind", "")) in ["pond", "place", "landmark"] or str(entry.get("id", "")) == HOME_PIN: return false
 	if bool(entry.get("wild", false)): return false   # no city's: its mouth card says Go (SGODOT-355)
 	var cluster := cluster_of_entry(entry)
 	var open := P0Travel.in_city(_view(), cluster) if going else P0Travel.covers(_view(), cluster)
@@ -1702,10 +1705,41 @@ func poi_shown(entry: Dictionary) -> bool:
 		if dx * dx + dy * dy <= float(c[2]): return true
 	return false
 
-## Landmarks open no scene in P0 (q(213)): the card has no Enter scene, and a request that reaches here anyway does
-## nothing (the old map's handler went in without a pass, round the fog).
-func _on_city_landmark_requested(_entry: Dictionary) -> void:
-	pass
+## q(295) ③ ④: a landmark's Go (Alcatraz, Griffith: LandmarkScenes) goes in as a pond's does — in that city at once, free,
+## no pass; elsewhere that city's travel card (or its silhouette card) first, never round the fog. Inside the player
+## only walks and looks (P0LandmarkVisit); Map or the place chip brings them back here, the camera still on the pin.
+func _on_city_landmark_requested(entry: Dictionary) -> void:
+	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	var region_id := str(region.get("id", ""))
+	var path := LandmarkScenes.path_for(region_id, entry) if P0LandmarkVisit.open(str(entry.get("id", ""))) else ""
+	if path.is_empty(): return
+	var cluster := P0Clusters.cluster_of_region(region_id)
+	if cluster == "": return
+	if _travel_first(entry.merged({"cluster": cluster})): return
+	city_map.dismiss_overlays()
+	_reset_gesture()
+	P0Runtime.nav_started()
+	open_landmark.call(path, P0LandmarkVisit.args_for(entry, str(region.get("name", ""))))
+
+## How a landmark scene opens (tests hold it to stay on the map).
+var open_landmark := func(path: String, args: Dictionary): AppRouter.open_instance(path, args)
+
+## q(295) (不知火舞 7f775d60): a landmark's card, taller with its Go, would cut its pin's name — the map slides so the name
+## ends at least CARD_CLEAR px above the card's top. Only the card's height counts: the pin is not centred otherwise.
+const CARD_CLEAR := 12.0
+
+func _clear_card_of_pin(entry: Dictionary) -> void:
+	if str(entry.get("kind", "")) != "landmark" or city_map == null or travelling(): return
+	var bottom := city_map.selected_name_bottom(str(entry.get("id", "")))
+	if is_nan(bottom): return
+	var over := bottom + CARD_CLEAR - city_map.info.get_global_rect().position.y
+	if over <= 0.5: return
+	var was := Vector2(center_lat, center_lng)
+	var z := zoom
+	_pan_by(Vector2(0, -over))
+	var to := Vector2(center_lat, center_lng)
+	_look(was, z)
+	_fly("card", to.x, to.y, z)
 
 ## The fog's holes (§11.7.3): one round every explored city near the screen, a little wider than its radius on the
 ## ground, in the city view's pixels; the farthest at most MapFogLayer.MAX_HOLES. Asked each frame; projection only, no
@@ -2238,6 +2272,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"pin":   # pin:home / pin:sh_tea_1 — a tap on that pin (its card), the Homestead pin only while away
 			var hit: Array = city_map.entries.filter(func(e): return str(e.get("id", "")) == step[1]) if city_map else []
 			if not hit.is_empty(): city_map.select(hit[0])
+		"lookat":   # lookat:37.8267:-122.423:15.5 — the camera there at that zoom (q(295) shots: a landmark's card)
+			_look(Vector2(float(step[1]), float(step[2])), float(step[3]) if step.size() > 3 else zoom)
+			_camera_dirty = true
 		"tapself": _own_pin_pressed()   # a tap on the player's own avatar: the card of where the player is
 		"recenter": _city_action("recenter")   # the MapLocateButton: back to the player, the zoom kept
 		"homekey": _city_action("home")   # the home key over it: back to the homestead, selected (SGODOT-261)
