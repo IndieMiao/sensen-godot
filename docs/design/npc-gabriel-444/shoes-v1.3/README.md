@@ -1,5 +1,7 @@
 # Gabriel 换鞋与头像 · SGODOT-444 · v1.3
 
+本版 shoes4 已被用户退回（白鞋不适合神父）。当前交付为 [v1.4 NPC 专用深色鞋](../dark-shoes-v1.4/README.md)，以下保留比较记录。
+
 刘备，2026-11-07。#863 的 Gabriel 改用现成 `shoes4`，去掉原 `shoes3` 自带的浅蓝星星。
 程序在 #867 同步以下 slots；NPC 只对话，本次不涉及 SGODOT-445 的 buff。
 

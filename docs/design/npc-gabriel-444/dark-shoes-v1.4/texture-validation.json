@@ -1,0 +1,32 @@
+{
+  "donor": "assets/avatar/source/shoes3",
+  "target": "assets/avatar/source/shoes3_npc_gabriel",
+  "source_size": [
+    512,
+    512
+  ],
+  "cyan_pixels": 28475,
+  "changed_percent": 10.862350463867188,
+  "mask": "G > R and B > R, including antialiased boundary",
+  "replacement_rgb_min": [
+    58,
+    57,
+    57
+  ],
+  "replacement_rgb_max": [
+    60,
+    59,
+    59
+  ],
+  "outside_mask_exact": true,
+  "alpha_exact": true,
+  "fbx_byte_identical": true,
+  "source_import_note": "Unmodified FBX retains four missing unused full-outfit texture references. No aliases or path fixes, per art director; runtime uses the recipe albedo.",
+  "donor_sha256": {
+    "SK_dt_skin03.fbx": "fc8ea72a89c6f0d9b53842c066963af64fd0a3c617c3ed43f5c282ca596c5310",
+    "SK_dt_skin03.fbx.import": "e6c3fa680867287e73368bf0b1ac5871d482c6a5bb8d78b0670ed6779d67a756",
+    "T_skin03_shoes_D.png": "06972c7947a70222d74f50eaba22f9a8f571ea636e4ac0e12c5e82c61cf4dc1d",
+    "T_skin03_shoes_D.png.import": "ce005ce501e10a80f6e5297f19533d8d21d5a2afb745a5fd85d5efde94ca6851"
+  },
+  "output_png_sha256": "7b831c7b61497c4b4439d433e51acba1de370dc3ddfdaf4c8e4c89eb649a4504"
+}

@@ -1,0 +1,12 @@
+ERROR: Resource file not found: res:// (expected type: Texture2D)
+ERROR: Can't open file from path 'res://assets/avatar/source/shoes3_npc_gabriel/T_skin02_eyes_D.png'.
+WARNING: FBX: Image index '0' couldn't be loaded from path: res://assets/avatar/source/shoes3_npc_gabriel/T_skin02_eyes_D.png because there was no data to load. Skipping it.
+ERROR: Resource file not found: res:// (expected type: Texture2D)
+ERROR: Can't open file from path 'res://assets/avatar/source/shoes3_npc_gabriel/T_skin02_body_D.png'.
+WARNING: FBX: Image index '1' couldn't be loaded from path: res://assets/avatar/source/shoes3_npc_gabriel/T_skin02_body_D.png because there was no data to load. Skipping it.
+ERROR: Resource file not found: res:// (expected type: Texture2D)
+ERROR: Can't open file from path 'res://assets/avatar/source/shoes3_npc_gabriel/T_skin03_cloth_D.png'.
+WARNING: FBX: Image index '2' couldn't be loaded from path: res://assets/avatar/source/shoes3_npc_gabriel/T_skin03_cloth_D.png because there was no data to load. Skipping it.
+ERROR: Resource file not found: res:// (expected type: Texture2D)
+ERROR: Can't open file from path 'res://assets/avatar/source/shoes3_npc_gabriel/T_skin03_hair_D.png'.
+WARNING: FBX: Image index '4' couldn't be loaded from path: res://assets/avatar/source/shoes3_npc_gabriel/T_skin03_hair_D.png because there was no data to load. Skipping it.
