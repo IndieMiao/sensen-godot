@@ -25,14 +25,13 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 	material.set_shader_parameter("surface_flow", preload("res://assets/farm/art/water/surface_flow.png"))
 	_wild_ground(material, str(entry.get("template_id", "")))
 	scene._mesh(ground, Vector3(6, -0.025, -8), material).name = "BankGround"
-	# Trunks and rocks remain in the blocked perimeter, clear of the shared nav.
 	# The bank's six trees are the wild's single pines and round trees now (SGODOT-422 ⑥: not the Timber grove's clump),
-	# placed with the rest of the wild's pieces (PondWildProps); the draws stay so the turf below keeps its place.
-	var trees: Array = []
-	for point in [Vector3(0.1, 0, -4), Vector3(-0.2, 0, -11), Vector3(2.2, 0, -16.1), Vector3(9.5, 0, -16.4), Vector3(12.2, 0, -12), Vector3(12.1, 0, -5.5)]:
+	# placed with the rest of the wild's pieces (PondWildProps); the draws stay so the turf below keeps its place. Their
+	# trunks block the P0 walk (PondWalk.set_trees), which reaches them since q(297).
+	for point in TREES:
 		scene._rng.randf_range(.85, 1.1)
 		scene._rng.randf_range(0, TAU)
-		if not _near(point, clear) and not _in_front(point, clear): trees.append(point)
+	var trees := tree_points(clear)
 	var layers := {"grass_clump": []}
 	var spec := SystemPonds.site(entry)
 	for i in 150:
@@ -95,6 +94,11 @@ static func _wild_ground(material: ShaderMaterial, shape: String) -> void:
 	material.set_shader_parameter("ground_layout", load(layout))
 	material.set_shader_parameter("dry_ground_mask", load(GROUND_DIR + "dry_ground_mask.png"))
 	material.set_shader_parameter("dry_channel", DRY_CHANNEL[shape])
+
+const TREES := [Vector3(0.1, 0, -4), Vector3(-0.2, 0, -11), Vector3(2.2, 0, -16.1), Vector3(9.5, 0, -16.4), Vector3(12.2, 0, -12), Vector3(12.1, 0, -5.5)]
+## The bank's trees that stand: those clear of the gathering points `clear` (CLEAR_M off, out of the strip in front).
+static func tree_points(clear: Array = []) -> Array:
+	return TREES.filter(func(point): return not _near(point, clear) and not _in_front(point, clear))
 
 static func _near(point: Vector3, clear: Array) -> bool:
 	for c in clear:
