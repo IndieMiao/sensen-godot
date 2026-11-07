@@ -277,16 +277,17 @@ func test_a_landmark_card_says_go_only_with_a_scene() -> void:
 	m.city_map.select(_landmark("san_francisco", "golden_gate_bridge"))
 	assert_bool(m.city_map.info_action.visible).is_false()
 	m.region = P0Clusters.region(LA)
-	# Griffith's Go waits for the fix to its far corners (content landmark_scenes, 不知火舞 / 奕星 11-08)
-	assert_bool(P0LandmarkVisit.open("griffith_observatory")).is_false()
+	# one flag each in the content table (landmark_scenes): off, the card has no key
+	var flags: Dictionary = P0Logic.content().landmark_scenes
+	var was: bool = flags["griffith_observatory"]
+	flags["griffith_observatory"] = false
 	m.city_map.select(_landmark("los_angeles", "griffith_observatory"))
 	assert_bool(m.city_map.info_action.visible).is_false()
-	var flags: Dictionary = P0Logic.content().landmark_scenes
 	flags["griffith_observatory"] = true   # its flag on: its key
 	m.city_map.clear_selection()
 	m.city_map.select(_landmark("los_angeles", "griffith_observatory"))
 	assert_bool(m.city_map.info_action.visible).is_true()
-	flags["griffith_observatory"] = false
+	flags["griffith_observatory"] = was
 	m.city_map.select(_landmark("los_angeles", "hollywood_sign"))
 	assert_bool(m.city_map.info_action.visible).is_false()
 	m.city_map.clear_selection()
@@ -308,6 +309,8 @@ func test_b_a_landmarks_go_is_a_ponds_go() -> void:
 	assert_str(P0LoadingLayer.destination(LandmarkScenes.ALCATRAZ, opened[0][1])).is_equal("San Francisco · Alcatraz Island")
 	m.region = P0Clusters.region(LA)
 	var flags: Dictionary = P0Logic.content().landmark_scenes
+	var was: bool = flags["griffith_observatory"]
+	flags["griffith_observatory"] = false
 	m._on_city_landmark_requested(_landmark("los_angeles", "griffith_observatory"))   # its flag off: nothing
 	assert_int(opened.size()).is_equal(1)
 	assert_str(rt.ui.modal_kind).is_equal("")
@@ -327,7 +330,7 @@ func test_b_a_landmarks_go_is_a_ponds_go() -> void:
 	assert_str(str(opened[1][0])).is_equal(LandmarkScenes.GRIFFITH)
 	m._on_city_landmark_requested(_landmark("los_angeles", "hollywood_sign"))   # no scene: nothing
 	assert_int(opened.size()).is_equal(2)
-	flags["griffith_observatory"] = false
+	flags["griffith_observatory"] = was
 
 func _landmark(region_id: String, id: String) -> Dictionary:
 	for p in CityMapData.landmarks(region_id):
