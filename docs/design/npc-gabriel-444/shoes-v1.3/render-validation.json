@@ -1,0 +1,97 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"captures": [
+		{
+			"camera_size": 2.02,
+			"file": "shoes4-full.png",
+			"size": [
+				360,
+				800
+			],
+			"slots": {
+				"cloth": "cloth36_npc_gabriel",
+				"glass": "glass0",
+				"hairHat": "hairhat0_npc_gabriel",
+				"shoes": "shoes4"
+			},
+			"yaw_deg": 0
+		},
+		{
+			"camera_size": 0.58,
+			"file": "shoes4-feet.png",
+			"size": [
+				360,
+				320
+			],
+			"slots": {
+				"cloth": "cloth36_npc_gabriel",
+				"glass": "glass0",
+				"hairHat": "hairhat0_npc_gabriel",
+				"shoes": "shoes4"
+			},
+			"yaw_deg": 45
+		},
+		{
+			"camera_size": 2.02,
+			"file": "shoes5-full.png",
+			"size": [
+				360,
+				800
+			],
+			"slots": {
+				"cloth": "cloth36_npc_gabriel",
+				"glass": "glass0",
+				"hairHat": "hairhat0_npc_gabriel",
+				"shoes": "shoes5"
+			},
+			"yaw_deg": 0
+		},
+		{
+			"camera_size": 0.58,
+			"file": "shoes5-feet.png",
+			"size": [
+				360,
+				320
+			],
+			"slots": {
+				"cloth": "cloth36_npc_gabriel",
+				"glass": "glass0",
+				"hairHat": "hairhat0_npc_gabriel",
+				"shoes": "shoes5"
+			},
+			"yaw_deg": 45
+		},
+		{
+			"camera_size": 2.02,
+			"file": "shoes0-full.png",
+			"size": [
+				360,
+				800
+			],
+			"slots": {
+				"cloth": "cloth36_npc_gabriel",
+				"glass": "glass0",
+				"hairHat": "hairhat0_npc_gabriel",
+				"shoes": "shoes0"
+			},
+			"yaw_deg": 0
+		},
+		{
+			"camera_size": 0.58,
+			"file": "shoes0-feet.png",
+			"size": [
+				360,
+				320
+			],
+			"slots": {
+				"cloth": "cloth36_npc_gabriel",
+				"glass": "glass0",
+				"hairHat": "hairhat0_npc_gabriel",
+				"shoes": "shoes0"
+			},
+			"yaw_deg": 45
+		}
+	],
+	"renderer": "mobile",
+	"scale": 1.0
+}

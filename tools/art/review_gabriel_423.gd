@@ -1,6 +1,6 @@
 extends SceneTree
 ## Isolated farm-dev fixture only. Real Avatar rig, resident lighting, fixed camera/scale.
-const SLOTS = {"hairHat":"hairhat0_npc_gabriel","cloth":"cloth36_npc_gabriel","shoes":"shoes3","glass":"glass0"}
+const SLOTS = {"hairHat":"hairhat0_npc_gabriel","cloth":"cloth36_npc_gabriel","shoes":"shoes4","glass":"glass0"}
 var elapsed=0.0
 func _initialize():run.call_deferred()
 func _process(delta):

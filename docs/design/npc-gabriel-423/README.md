@@ -1,6 +1,7 @@
 # SGODOT-423 · Gabriel 神父 / Father Gabriel · v1.1
 
-**最新 v1.2：**[前领片与前襟贴图小改、重烘头像及 keepers 两图](v1.2/README.md)。以下保留 v1.1 交付记录；当前游戏贴图及头像以 v1.2 为准。
+**最新 v1.3 / SGODOT-444：**[三双鞋实渲对比、改用 shoes4 及三张重烘头像](../npc-gabriel-444/shoes-v1.3/README.md)。
+衣服保留 [v1.2 前领片与前襟贴图](v1.2/README.md)；以下保留 v1.1 交付记录。
 
 **部件压缩补正：**衣服、头发两份 `.import` 已按各自 donor 改为 `compress/mode=2`，
 由 Godot 写回 `s3tc_bptc` / `etc2_astc`；原 UID、512² 上限、mipmaps 保留。
@@ -11,7 +12,7 @@
 刘备，2026-11-07。本版替换已退回的短袖短裤方案；供 #863 审阅，程序接入只对话的 NPC。
 
 ```json
-{"hairHat":"hairhat0_npc_gabriel","cloth":"cloth36_npc_gabriel","shoes":"shoes3","glass":"glass0"}
+{"hairHat":"hairhat0_npc_gabriel","cloth":"cloth36_npc_gabriel","shoes":"shoes4","glass":"glass0"}
 ```
 
 实拍比较了 cloth36、cloth1_1、cloth28：cloth1_1 仍是短袖短裤；cloth28 是卷袖制服，
@@ -20,7 +21,7 @@
 领口留白色带，袖口与下摆用深灰。没有文字、十字或新增宗教符号。
 
 短发采用 hairhat0 的暖白贴图变体，保留阴影层次；不加胡子。
-glass0 是现成圆框透明眼镜，镜框和挂点不改；shoes3 仍用原黑靴。
+glass0 是现成圆框透明眼镜，镜框和挂点不改；鞋现已改用 shoes4，见最新交付。
 
 ## 审阅图
 

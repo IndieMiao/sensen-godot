@@ -1,5 +1,7 @@
 # Gabriel v1.2 · 前领片 / 前襟贴图
 
+后续鞋和头像更新见 [SGODOT-444 / v1.3](../../npc-gabriel-444/shoes-v1.3/README.md)：当前 shoes 为 shoes4。本页图和 slots 保留为 v1.2 历史记录。
+
 刘备，2026-11-07。基于已验收 v1.1 `ccd6e7f0`，领口阶段更新两张游戏资源图：
 
 - `assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png`

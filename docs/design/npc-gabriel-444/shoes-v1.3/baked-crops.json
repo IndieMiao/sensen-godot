@@ -1,0 +1,31 @@
+{
+  "baker": {
+    "stamp": [
+      67,
+      47,
+      170,
+      213
+    ],
+    "face": [
+      70,
+      51,
+      165,
+      165
+    ]
+  },
+  "delivered_resident_crop": {
+    "stamp": [
+      68,
+      47,
+      170,
+      213
+    ],
+    "face": [
+      70,
+      51,
+      165,
+      165
+    ]
+  },
+  "note": "Baker stamp x moved by 1 px; existing resident crop still encloses the head and is retained. Face square is identical and used for the keeper head."
+}
