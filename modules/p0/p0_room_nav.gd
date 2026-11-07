@@ -120,21 +120,35 @@ static func _blocked(p: Vector2, obstacles: Array, radius: float) -> bool:
 ## The walkable cell nearest `at` among those a walk from `from` (the room's door) reaches — never a pocket between two
 ## pews or behind a table that only looks close (Grace Cathedral: up from a pew the player was put in the 0.4 m gap
 ## between rows and stuck, 李元芳 on 0.3.1). Without a walkable cell near `from`, nearest_walkable.
-static func nearest_reachable(bp: FarmBlueprint, at: Vector3, from: Vector3) -> Vector3:
+## `clear`: the cell must have this many walkable cells on every side too (up from a seat: in the open, not wedged in the
+## gap between two pews where the front one hides the player — 不知火舞 on #850); none such reached, any reached cell.
+static func nearest_reachable(bp: FarmBlueprint, at: Vector3, from: Vector3, clear := 0) -> Vector3:
+	if clear > 0:
+		var open := _nearest_reached(bp, at, from, clear)
+		if open != Vector3.INF: return open
+	return _nearest_reached(bp, at, from, 0)
+
+static func _open(bp: FarmBlueprint, c: Vector2i, clear: int) -> bool:
+	for j in range(-clear, clear + 1):
+		for i in range(-clear, clear + 1):
+			if not bp.is_walkable(c + Vector2i(i, j)): return false
+	return true
+
+static func _nearest_reached(bp: FarmBlueprint, at: Vector3, from: Vector3, clear: int) -> Vector3:
 	var origin := nearest_walkable(bp, from)
-	if origin == Vector3.INF: return nearest_walkable(bp, at)
+	if origin == Vector3.INF: return nearest_walkable(bp, at) if clear == 0 else Vector3.INF
 	var start := bp.world_to_cell(origin)
 	var seen := {start: true}
 	var queue: Array[Vector2i] = [start]
-	var best := origin
-	var best_d := Vector2(origin.x - at.x, origin.z - at.z).length()
+	var best := Vector3.INF
+	var best_d := INF
 	var i := 0
 	while i < queue.size():
 		var c := queue[i]
 		i += 1
 		var w := bp.cell_to_world(c)
 		var d := Vector2(w.x - at.x, w.z - at.z).length()
-		if d < best_d:
+		if d < best_d and (clear == 0 or _open(bp, c, clear)):
 			best_d = d
 			best = w
 		for step in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:

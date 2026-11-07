@@ -782,9 +782,9 @@ func _ease_shot(to: float) -> void:
 ## Walk to where `n` is used (its stand_ anchor, else the walkable cell nearest to it), face it, then `done`.
 ## The floor point nearest `at` that the door's floor reaches (P0RoomNav.nearest_reachable): where the player is put
 ## or sent near furniture, never a cut-off gap.
-func reachable(at: Vector3) -> Vector3:
+func reachable(at: Vector3, clear := 0) -> Vector3:
 	var door := anchor("exit")
-	return P0RoomNav.nearest_reachable(bp, at, door.global_position if door else at)
+	return P0RoomNav.nearest_reachable(bp, at, door.global_position if door else at, clear)
 
 func walk_to(n: String, done := Callable()) -> void:
 	var target := anchor(n)

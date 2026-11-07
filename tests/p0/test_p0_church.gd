@@ -160,4 +160,17 @@ func test_up_from_every_pew_onto_the_floor_the_door_reaches() -> void:
 		assert_str(r.seat).is_empty()
 		assert_bool(on_door_floor.call(r.actor.position)).override_failure_message("%s up at %s" % [n, r.actor.position]).is_true()
 		var at: Vector3 = r.anchor(str(n)).global_position
-		assert_float(Vector2(r.actor.position.x - at.x, r.actor.position.z - at.z).length()).override_failure_message(str(n)).is_less(1.0)   # beside it
+		assert_float(Vector2(r.actor.position.x - at.x, r.actor.position.z - at.z).length()).override_failure_message(str(n)).is_less(1.6)   # beside it
+		assert_bool(P0RoomNav._open(r.bp, r.bp.world_to_cell(r.actor.position), 2)).override_failure_message("%s in the open" % n).is_true()   # not at a pew's end between rows
+
+## 不知火舞 on #850: the tea house's stools stand up where 0.3.0 did — beside the stool on the door's floor, no open-ground
+## rule there (the cathedral's is its kit's).
+func test_tea_stools_stand_up_beside_them() -> void:
+	for n in ["seat_table2_2", "seat_table3_1", "seat_table1_1"]:
+		var r := _room("sh_tea_1")
+		await get_tree().process_frame
+		var want: Vector3 = r.reachable(r.anchor(n).global_position)
+		r._sit_down(n)
+		r._stand_up()
+		for i in 30: r.p0_frame({}, 1.0 / 30.0)
+		assert_float(Vector2(r.actor.position.x - want.x, r.actor.position.z - want.z).length()).override_failure_message(n).is_less(0.05)

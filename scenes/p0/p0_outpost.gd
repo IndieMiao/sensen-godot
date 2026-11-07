@@ -26,6 +26,10 @@ const SIT_ROOT_BELOW_SEAT := 0.34
 ## sit_up runs at this speed; the player is released once it is upright.
 const STAND_SPEED := 2.0
 const STAND_S := 0.55
+## Cells free on every side of where the player stands up (0.15 m each), by room kit: Grace Cathedral's pews end at the
+## aisle with a gap between rows the front pew hides (不知火舞 on #850); elsewhere none — the tea house's stools stand
+## up where they were walked to, as in 0.3.0.
+const STAND_CLEAR := {"poi_church": 2}
 ## The root eases onto the seat within this time (art director: aligned within 0.3 s); clips cross-fade in.
 const SIT_GLIDE_S := 0.3
 const CLIP_BLEND_S := 0.1
@@ -555,9 +559,10 @@ func _stand_up(then := Callable()) -> void:
 	_sit_request = {}
 	if online and online.epoch > 0: online.stand()
 	# up beside the seat as before, but never into a gap the door's floor does not reach (Grace Cathedral, 李元芳 on
-	# 0.3.1: stuck between the left rows). Not onto the kit's approach: the tea house's third table has its approach
-	# behind Hana, and up there the player was hidden (不知火舞 on #850).
-	var floor_at := reachable(at)
+	# 0.3.1: stuck between the left rows) and in the open (STAND_CLEAR cells free all round: not wedged at a pew's end
+	# with the front one hiding them). Not onto the kit's approach: the tea house's third table has its approach behind
+	# Hana, and up there the player was hidden (不知火舞 on #850).
+	var floor_at := reachable(at, int(STAND_CLEAR.get(str(outpost.get("art", "")), 0)))
 	if floor_at == Vector3.INF: floor_at = actor.position
 	var ap := actor.rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	var dur := STAND_S if ap and ap.has_animation("sit_up") else 0.0
