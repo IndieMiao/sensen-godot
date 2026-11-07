@@ -71,24 +71,27 @@ func test_the_joystick_or_a_panel_stops_the_walk_where_it_is() -> void:
 	assert_int(farm.left).is_equal(0)
 	assert_float(farm.actor.position.distance_to(at)).is_less(0.3)   # stopped there, not still walking out
 
-func test_from_the_landing_straight_into_the_ring_never_leaves() -> void:
+func test_landing_and_standing_still_never_leaves() -> void:
 	var farm := _farm()
-	farm.actor.teleport(farm.bp.cell_to_world(farm.bp.anchor("spawn")))   # back from the map
-	farm._exit_check()
-	assert_bool(farm._exit_armed).is_false()
-	farm.actor.mover.set_target_position(farm._exit + Vector3(0.1, 0, 0))   # straight into the ring
-	_run(farm, 3.0)
+	var spawn: Vector3 = farm.bp.cell_to_world(farm.bp.anchor("spawn"))
+	assert_float(P0FarmMaterials.flat(spawn, farm._exit)).is_greater(P0Farm.EXIT_ARM_M)   # 4.6 m: no two steps out (bot 389)
+	farm.actor.teleport(spawn)   # back from the map
+	_run(farm, 1.0)
 	assert_int(farm.left).is_equal(0)
 
-func test_turning_round_where_it_landed_never_leaves() -> void:
+func test_from_the_landing_walking_into_the_ring_leaves_once() -> void:
 	var farm := _farm()
 	farm.actor.teleport(farm.bp.cell_to_world(farm.bp.anchor("spawn")))
-	for v in [Vector2(-1, 0), Vector2(0, 1), Vector2(1, 0), Vector2(0, -1)]:
+	farm.actor.mover.set_target_position(farm._exit + Vector3(0.1, 0, 0))   # the walk there is the player's own
+	_run(farm, 6.0)
+	assert_int(farm.left).is_equal(1)
+	for v in [Vector2(-1, 0), Vector2(0, 1), Vector2(1, 0)]:   # turning round in the ring: not again
 		farm.actor.face(farm.actor.position + Vector3(v.x, 0, v.y))
-		farm._exit_check()
-	_run(farm, 0.5)
-	assert_int(farm.left).is_equal(0)
-	assert_bool(farm._exit_armed).is_false()
+		farm.actor.mover.set_target_position(farm.actor.position + Vector3(v.x, 0, v.y) * 0.2)
+		for i in 6:
+			farm.actor.step(1.0 / 30.0)
+			farm._exit_check()
+	assert_int(farm.left).is_equal(1)
 
 func test_away_past_the_arming_distance_and_back_into_the_ring_leaves() -> void:
 	var farm := _farm()
@@ -105,7 +108,18 @@ func test_away_past_the_arming_distance_and_back_into_the_ring_leaves() -> void:
 
 func test_the_exit_stands_on_the_farms_walk() -> void:
 	var bp := P0Garden.blueprint()
+	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))   # the yard fence, as the farm blocks it
 	var exit := P0Farm.EXIT_AT
 	assert_bool(bp.is_walkable(bp.world_to_cell(exit))).is_true()
+	for d in [Vector3(-0.6, 0, 0), Vector3(0.6, 0, 0), Vector3(0, 0, -0.6), Vector3(0, 0, 0.6)]:   # the whole ring on the walk
+		assert_bool(bp.is_walkable(bp.world_to_cell(exit + d))).override_failure_message(str(d)).is_true()
 	var grid := BlueprintGrid.new(bp)
 	assert_bool(grid.path(bp.anchor("spawn"), bp.world_to_cell(exit)).is_empty()).is_false()
+
+## 周瑜 on #860: the exit is one of the facilities whose strip opens nearest (its `Map` strip, spec v1.2 §3).
+func test_beside_it_its_map_strip_opens() -> void:
+	var farm := _farm()
+	assert_str(FileAccess.get_file_as_string("res://scenes/p0/p0_farm.gd")).contains("exit_card()]")   # in _card_candidates
+	var far := ["mailbox", farm._exit + Vector3(6, 0, -6), P0Farm.SIGN_NEAR]
+	assert_str(P0Garden.pick_card([far, farm.exit_card()], farm._exit + Vector3(0.8, 0, 0), "")).is_equal("exit")
+	assert_str(P0Garden.pick_card([far, farm.exit_card()], farm._exit + Vector3(4, 0, 0), "")).is_equal("")   # past its reach

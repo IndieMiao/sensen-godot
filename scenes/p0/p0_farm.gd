@@ -104,14 +104,18 @@ var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
 ## it is. Walked into the ring with the joystick it goes too: within EXIT_RADIUS_M, moving, once armed — never armed on
 ## coming into the farm (the start, back from the map, out of the farmhouse), only after having been EXIT_ARM_M away
 ## (不知火舞 443 603fe5ea: armed by the spawn's distance, a step left from a landing went in). Beside every way to the map.
-## EXIT_AT: the ring's middle (the user's frame; 不知火舞 42a1ed6a, in cell (7, 0)); EXIT_ICON: its prompt's icon, 安其拉's
-## pin in its ring (d9e7a52a); EXIT_PIECE: 赵云's pin and ring, its origin the ring's middle, standing there once it is in
-## (its `bob` loop played if it has one).
-const EXIT_AT := Vector3(4.875, 0, -0.575)
+## EXIT_AT: the ring's middle, 4.6 m left of the spawn (A, 上官婉儿 / 不知火舞) (the user 11-07, bot 389: "further from the spawn",
+## not two steps out of the farm; off the opening shot, its icon shows the way); EXIT_ICON: its prompt's icon, 安其拉's
+## pin in its ring (d9e7a52a); EXIT_PIECE: 赵云's pin and ring, its origin the ring's middle — its `bob` loop played from
+## the start, always (the user: "it floats"), else its pin bobbed the same way here.
+const EXIT_AT := Vector3(1.6, 0, 0.0)
 const EXIT_ICON := "exit_pin"
 const EXIT_PIECE := "res://assets/farm/art/farm_exit_pin.glb"
 const EXIT_ARM_M := 2.5
 const EXIT_RADIUS_M := 0.6
+const EXIT_PIN_NODE := "pin"   # the piece's pin, bobbed when the piece has no `bob` loop
+const EXIT_BOB_M := 0.1   # either way of where it stands (0.2 m in all; 不知火舞)
+const EXIT_BOB_S := 1.6
 const EXIT_MARK := Vector3(0, 1.3, 0)   # over the pin's top (its piece about 1.0 m, its tip 0.25 m up)
 const EXIT_HIT := Vector3(0, 0.4, 0)
 const EXIT_TAP_PX := 40.0
@@ -1016,10 +1020,12 @@ func _exit_check() -> void:
 		_exit_armed = false
 		leave_by_exit()
 
-## Out to the map as the place chip goes (P0Runtime.leave_world: a world with its back lock asks it first).
+## Out to the map as the place chip goes (P0Runtime.leave_world: a world with its back lock asks it first). An open
+## layer (the radial, a card) only closes: still here, the ring is armed again, and the next step in it goes (周瑜 on #860).
 func leave_by_exit() -> void:
 	_exit_armed = false
 	if rt: rt.leave_world()
+	if is_inside_tree(): _exit_armed = true
 
 ## A tap on the exit's icon, strip or piece: walk there (the arrival leaves, _exit_check); out of reach, the nearest.
 func walk_to_exit() -> void:
@@ -1037,7 +1043,17 @@ func _exit_piece() -> void:
 	piece.position = _exit
 	add_child(piece)
 	var ap := piece.find_child("AnimationPlayer", true, false) as AnimationPlayer
-	if ap and ap.has_animation("bob"): ap.play("bob")
+	if ap and ap.has_animation("bob"):
+		ap.play("bob")
+		return
+	# no loop of its own: its pin bobs EXIT_BOB_M either way every EXIT_BOB_S, eased (the user 11-07: "it floats"); the ring stays
+	var pin := piece.find_child(EXIT_PIN_NODE, true, false) as Node3D
+	if pin == null: return
+	var y := pin.position.y
+	pin.position.y = y - EXIT_BOB_M
+	var tween := pin.create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(pin, "position:y", y + EXIT_BOB_M, EXIT_BOB_S * 0.5)
+	tween.tween_property(pin, "position:y", y - EXIT_BOB_M, EXIT_BOB_S * 0.5)
 
 ## The walk out stopped where the player is (the joystick, a tap elsewhere, a panel).
 func stop_exit_walk() -> void:
@@ -1192,9 +1208,12 @@ func _facing_side() -> UiWorldNameBar.Dir:
 
 ## Every facility that can open its name strip on the farm, [id, position, reach m] in a fixed order (LOCK-07 v2: one
 ## strip, the nearest in reach): the rest bench, and SGODOT-231's five gathering spots and the workbench.
+## The exit among the facilities whose strip opens nearest: its `Map` strip (443 v1.2 §3; 周瑜 on #860).
+func exit_card() -> Array: return ["exit", _exit, SIGN_NEAR]
+
 func _card_candidates() -> Array:
 	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR], ["bench", _bench, BENCH_NEAR_M],
-		["mailbox", _mailbox, SIGN_NEAR]]
+		["mailbox", _mailbox, SIGN_NEAR], exit_card()]
 	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
 	if _chef_sign_node.visible: out.append(["chef_sign", _chef_sign, SIGN_NEAR])
 	if _notice_node.visible: out.append(["notice_board", _notice, SIGN_NEAR])
@@ -1390,6 +1409,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 				shift = CHEF_SIGN_SHIFT.x, look = _chef_sign_look}))
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
 		"exit": walk_to_exit()   # the walk out through the exit's prompt, as a tap on it (443 shots)
+		"spawnat": actor.teleport(Vector3(float(step[1]), 0, float(step[2])))   # spawnat:x:z — stood there (443 D: a spawn further right)
+		"exitat":   # exitat:x:z — the exit (and its piece) moved there (443: places compared for the user)
+			_exit = Vector3(float(step[1]), 0, float(step[2]))
+			var piece := get_node_or_null("ExitPin") as Node3D
+			if piece: piece.position = _exit
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
 		"island":   # the whole island in the picture, as far as the opening may zoom out (#624 walkthrough: a farm end to end)
 			var corners: Array[Vector3] = []
