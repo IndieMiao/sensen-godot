@@ -122,11 +122,27 @@ static func _blocked(p: Vector2, obstacles: Array, radius: float) -> bool:
 ## between rows and stuck, 李元芳 on 0.3.1). Without a walkable cell near `from`, nearest_walkable.
 ## `clear`: the cell must have this many walkable cells on every side too (up from a seat: in the open, not wedged in the
 ## gap between two pews where the front one hides the player — 不知火舞 on #850); none such reached, any reached cell.
-static func nearest_reachable(bp: FarmBlueprint, at: Vector3, from: Vector3, clear := 0) -> Vector3:
-	if clear > 0:
-		var open := _nearest_reached(bp, at, from, clear)
+## `avoid`: floor points (NPCs) the cell is not hidden behind — within AVOID_M of one, or up to HIDE_DEPTH_M behind one
+## along `toward` (the camera's direction over the floor) and HIDE_SIDE_M either side of it: up behind Hana at the tea
+## house's third table the player was hidden (不知火舞 on #850).
+const AVOID_M := 0.6
+const HIDE_DEPTH_M := 2.0
+const HIDE_SIDE_M := 0.45
+static func nearest_reachable(bp: FarmBlueprint, at: Vector3, from: Vector3, clear := 0, avoid: Array = [],
+		toward := Vector3.ZERO) -> Vector3:
+	if clear > 0 or not avoid.is_empty():
+		var open := _nearest_reached(bp, at, from, clear, avoid, toward)
 		if open != Vector3.INF: return open
-	return _nearest_reached(bp, at, from, 0)
+	return _nearest_reached(bp, at, from, 0, [], toward)
+
+static func hidden(w: Vector3, avoid: Array, toward: Vector3) -> bool:
+	var dir := Vector2(toward.x, toward.z).normalized()
+	for a in avoid:
+		var v := Vector2((a as Vector3).x - w.x, (a as Vector3).z - w.z)
+		if v.length() < AVOID_M: return true
+		var depth := v.dot(dir)
+		if dir != Vector2.ZERO and depth > 0.0 and depth < HIDE_DEPTH_M and absf(v.cross(dir)) < HIDE_SIDE_M: return true
+	return false
 
 static func _open(bp: FarmBlueprint, c: Vector2i, clear: int) -> bool:
 	for j in range(-clear, clear + 1):
@@ -134,9 +150,9 @@ static func _open(bp: FarmBlueprint, c: Vector2i, clear: int) -> bool:
 			if not bp.is_walkable(c + Vector2i(i, j)): return false
 	return true
 
-static func _nearest_reached(bp: FarmBlueprint, at: Vector3, from: Vector3, clear: int) -> Vector3:
+static func _nearest_reached(bp: FarmBlueprint, at: Vector3, from: Vector3, clear: int, avoid: Array, toward: Vector3) -> Vector3:
 	var origin := nearest_walkable(bp, from)
-	if origin == Vector3.INF: return nearest_walkable(bp, at) if clear == 0 else Vector3.INF
+	if origin == Vector3.INF: return nearest_walkable(bp, at) if clear == 0 and avoid.is_empty() else Vector3.INF
 	var start := bp.world_to_cell(origin)
 	var seen := {start: true}
 	var queue: Array[Vector2i] = [start]
@@ -148,7 +164,7 @@ static func _nearest_reached(bp: FarmBlueprint, at: Vector3, from: Vector3, clea
 		i += 1
 		var w := bp.cell_to_world(c)
 		var d := Vector2(w.x - at.x, w.z - at.z).length()
-		if d < best_d and (clear == 0 or _open(bp, c, clear)):
+		if d < best_d and (clear == 0 or _open(bp, c, clear)) and not hidden(w, avoid, toward):
 			best_d = d
 			best = w
 		for step in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
