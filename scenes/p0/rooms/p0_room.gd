@@ -145,7 +145,7 @@ func _ready() -> void:
 	actor = P0Actor.new()
 	add_child(actor)
 	var spawn := anchor("spawn")
-	var at := P0RoomNav.nearest_walkable(bp, spawn.global_position if spawn else bp.cell_to_world(Vector2i(bp.grid.x / 2, bp.grid.y / 2)))
+	var at := reachable(spawn.global_position if spawn else bp.cell_to_world(Vector2i(bp.grid.x / 2, bp.grid.y / 2)))
 	actor.setup(bp, grid, cam, Vector3(at.x, floor_y, at.z))
 	actor.ground_height = func(_p: Vector3) -> float: return floor_y
 	if spawn: actor.face(actor.position + yaw_dir(float(_data.spawn.get("yaw_degrees", 180))))
@@ -780,11 +780,17 @@ func _ease_shot(to: float) -> void:
 
 # ---------------------------------------------------------------- walking to facilities and the door
 ## Walk to where `n` is used (its stand_ anchor, else the walkable cell nearest to it), face it, then `done`.
+## The floor point nearest `at` that the door's floor reaches (P0RoomNav.nearest_reachable): where the player is put
+## or sent near furniture, never a cut-off gap.
+func reachable(at: Vector3) -> Vector3:
+	var door := anchor("exit")
+	return P0RoomNav.nearest_reachable(bp, at, door.global_position if door else at)
+
 func walk_to(n: String, done := Callable()) -> void:
 	var target := anchor(n)
 	if target == null: return
 	var stand := P0RoomAnchors.stand_for(n, _anchors.keys())
-	var point := anchor(stand).global_position if stand != "" and anchor(stand) else P0RoomNav.nearest_walkable(bp, target.global_position)
+	var point := anchor(stand).global_position if stand != "" and anchor(stand) else reachable(target.global_position)
 	if point == Vector3.INF: return
 	point.y = 0.0
 	_walk = {name = n, point = point, done = done}

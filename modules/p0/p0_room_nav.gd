@@ -117,6 +117,33 @@ static func _blocked(p: Vector2, obstacles: Array, radius: float) -> bool:
 	return false
 
 ## Nearest walkable cell centre (blueprint space) to a blueprint-space point, or Vector3.INF.
+## The walkable cell nearest `at` among those a walk from `from` (the room's door) reaches — never a pocket between two
+## pews or behind a table that only looks close (Grace Cathedral: up from a pew the player was put in the 0.4 m gap
+## between rows and stuck, 李元芳 on 0.3.1). Without a walkable cell near `from`, nearest_walkable.
+static func nearest_reachable(bp: FarmBlueprint, at: Vector3, from: Vector3) -> Vector3:
+	var origin := nearest_walkable(bp, from)
+	if origin == Vector3.INF: return nearest_walkable(bp, at)
+	var start := bp.world_to_cell(origin)
+	var seen := {start: true}
+	var queue: Array[Vector2i] = [start]
+	var best := origin
+	var best_d := Vector2(origin.x - at.x, origin.z - at.z).length()
+	var i := 0
+	while i < queue.size():
+		var c := queue[i]
+		i += 1
+		var w := bp.cell_to_world(c)
+		var d := Vector2(w.x - at.x, w.z - at.z).length()
+		if d < best_d:
+			best_d = d
+			best = w
+		for step in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = c + step
+			if seen.has(n) or not bp.is_walkable(n): continue
+			seen[n] = true
+			queue.append(n)
+	return best
+
 static func nearest_walkable(bp: FarmBlueprint, at: Vector3) -> Vector3:
 	var start := bp.world_to_cell(at)
 	var best := Vector3.INF
