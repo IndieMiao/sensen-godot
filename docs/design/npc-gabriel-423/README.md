@@ -2,6 +2,12 @@
 
 **最新 v1.2：**[前领片与前襟贴图小改、重烘头像及 keepers 两图](v1.2/README.md)。以下保留 v1.1 交付记录；当前游戏贴图及头像以 v1.2 为准。
 
+**部件压缩补正：**衣服、头发两份 `.import` 已按各自 donor 改为 `compress/mode=2`，
+由 Godot 写回 `s3tc_bptc` / `etc2_astc`；原 UID、512² 上限、mipmaps 保留。
+重建脚本也改为继承 donor 参数。两张 PNG 与 keeper 头像不变，keeper 仍为无损、无 mipmap。
+[验证记录](vram-import-validation.json)：两张纹理及导入文件共四文件在独立空缓存冷导入后
+哈希一致；实际加载为 512² 压缩纹理且含 mipmaps。已有审阅图和 Android 冒烟是压缩补正前的记录。
+
 刘备，2026-11-07。本版替换已退回的短袖短裤方案；供 #863 审阅，程序接入只对话的 NPC。
 
 ```json
@@ -39,8 +45,8 @@ glass0 是现成圆框透明眼镜，镜框和挂点不改；shoes3 仍用原黑
 | smoothness | 0.1 | 0.1 |
 
 贴图为原 UV 上的确定性改色：近黑 #2B2A2E，白领 #F4F1E8，收边 #39373D；
-头发基色约 #E7E5DF。衣服和头发源图均 1024²，运行时上限 512²、mipmaps、无损导入，
-保留原 alpha。每张 RGBA8 含 mip 最坏约 1.33 MiB；各自替换 donor 原采样。
+头发基色约 #E7E5DF。衣服和头发源图均 1024²，运行时上限 512²、mipmaps、显存压缩导入，
+源图 alpha 不变；各自替换 donor 原采样。
 
 `cloth36` 源 FBX 在美术基底缺失，因此此 PR 带其副本。仅修复其中 17 条源贴图路径，
 解决 donor FBX 的失效外链；没有改 mesh/UV/蒙皮/骨架数据。原文件及交付哈希、路径差异见
@@ -51,7 +57,7 @@ body/eyes/shoes 子网格不会提取，实际 cloth 材质由配方绑定。场
 - [29 项结构检查](cloth-import-validation.json)：全部通过；包含两件 NPC-only 排除和旧短装 ID 移除。
 - [桌面实渲 / idle、walk](render-validation.json)：Vulkan Mobile / Deck RADV；两种动作骨骼变化通过。
 - [冷导入](cold-import.json)：空 `.godot`，15 个交付文件字节稳定、0 错误、6 个合法唯一 UID。包括新 cloth36 FBX、运行时 .res/.tscn、贴图、缩略图、头像；排除其他历史 authoring FBX。
-- [Android smoke](android-smoke.json)、[正面](android-front.png)：独立 API 37 / GFXStream SwiftShader 夹具，完整显示、3 次真实点按、walk 时间推进、APK 与部件/贴图回读。既有皮肤、眼镜和鞋仍有模拟器偏亮色差；新黑衣/白发无损导入。模拟器检查不代表实体手机性能或整游戏验收。
+- [Android smoke](android-smoke.json)、[正面](android-front.png)：独立 API 37 / GFXStream SwiftShader 夹具，完整显示、3 次真实点按、walk 时间推进、APK 与部件/贴图回读。既有皮肤、眼镜和鞋仍有模拟器偏亮色差；该次黑衣/白发使用补正前的无损导入设置。模拟器检查不代表实体手机性能或整游戏验收。
 
 ## 程序交接
 

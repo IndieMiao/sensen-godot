@@ -41,7 +41,7 @@ for c,base in enumerate([231,229,223]):ho[:,:,c]=np.rint(np.clip(base+(hl-205)*.
 Image.fromarray(ho).save(H/'T_gabriel_hairHat_D.png')
 for folder,name,params in [(D,'T_gabriel_cloth_D.png',subprocess.check_output(['git','show',RUNTIME+':assets/avatar/source/cloth36_npc_sigrid/T_skin36_cloth_D.png.import'],cwd=R,text=True)),(H,'T_gabriel_hairHat_D.png',(R/'assets/avatar/source/hairhat0/T_base_boy_hairHat_D.png.import').read_text())]:
  side=folder/(name+'.import')
- if not side.exists():side.write_text('[remap]\nimporter="texture"\ntype="CompressedTexture2D"\n\n[params]'+params.split('[params]',1)[1].replace('compress/mode=2','compress/mode=0'))
+ if not side.exists():side.write_text('[remap]\nimporter="texture"\ntype="CompressedTexture2D"\n\n[params]'+params.split('[params]',1)[1])
 Image.fromarray(np.dstack([np.array(mask),trim.astype('uint8')*255,np.zeros((h,w),dtype='uint8')])).save(R/'tools/art/source/gabriel_423/collar-trim-mask.png')
 report={'revision':'v1.1','base':'cloth36_npc_sigrid / cloth36','id':'cloth36_npc_gabriel','source_size':[w,h],'near_black':'#2B2A2E','collar':'#F4F1E8','trim':'#39373D','alpha_exact':bool(np.array_equal(a[:,:,3],out[:,:,3])),'hair_alpha_exact':bool(np.array_equal(hair[:,:,3],ho[:,:,3])),'source_fbx_sha256':hashlib.sha256((D/'SK_dt_skin36.fbx').read_bytes()).hexdigest(),'geometry_edits':0,'note':'cloth36 geometry/rig unchanged, FBX source texture links repointed; long sleeves and trousers. Existing glass0; neutral warm-white hairhat0 texture variant. No added geometry or symbols.'}
 (R/'tools/art/source/gabriel_423/texture-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
