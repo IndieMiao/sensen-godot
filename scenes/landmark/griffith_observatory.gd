@@ -474,7 +474,14 @@ func dev_stand(at: Vector3) -> void:
 	_focus = _player.position
 
 func player_position() -> Vector3: return _player.position
-func exit_position() -> Vector3: return Vector3.INF   # no way out on the ground: the place chip and Back
+## The way out (q(295) ④: a door prompt and Map, 不知火舞 on #870): on the path south of the spawn, where the visit
+## came up; snapped to the walkable ground once the navigation is ready.
+const EXIT := Vector3(-1.34, 0.0, 9.6)
+var _exit := Vector3.INF
+
+func exit_position() -> Vector3:
+	if _exit == Vector3.INF and navigation_ready(): _exit = NavigationServer3D.map_get_closest_point(_nav_map, EXIT)
+	return _exit if _exit != Vector3.INF else EXIT
 func walking() -> bool: return _path_i < _path.size()
 
 ## The stick (P0LandmarkVisit.stick_step): the player runs while it is pushed.

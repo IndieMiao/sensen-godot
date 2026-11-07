@@ -32,9 +32,13 @@ static func args_for(entry: Dictionary, city: String) -> Dictionary:
 
 static func wanted(args: Dictionary) -> bool: return bool(args.get("p0_visit", false))
 
+var _dev := {}   # P0_SCENE's landmark:<id>:<point>:<zoom> (dev_point, dev_zoom)
+
 func _init(s: Node3D, args: Dictionary) -> void:
 	scene = s
 	chip = str(args.get("chip", ""))
+	for k in ["dev_point", "dev_zoom"]:
+		if args.has(k): _dev[k] = args[k]
 
 ## From the scene's _ready, once it stands: the world P0 drives.
 func start() -> void:
@@ -42,6 +46,34 @@ func start() -> void:
 	rt.attach(scene)
 	rt.ui.set_place(chip)
 	_armed = false
+	if exit_at() != Vector3.INF: _step_off_the_door.call_deferred()
+	if _dev.has("dev_point"): _stand_when_ready.call_deferred(str(_dev.dev_point))
+	if _dev.has("dev_zoom"): scene.call("p0_zoom", float(_dev.dev_zoom))
+
+## Landed by the way out (Alcatraz's spawn is 1.1 m from its dock), the Map strip would touch the player (不知火舞 on
+## #870: ≥ 8 px between them, as in the cathedral): the player starts START_FROM_EXIT_M from it, on the same side.
+const START_FROM_EXIT_M := 2.2
+
+func _step_off_the_door() -> void:
+	for i in 30:
+		if not scene.is_inside_tree(): return
+		if bool(scene.call("navigation_ready")): break
+		await scene.get_tree().physics_frame
+	var at: Vector3 = scene.call("player_position")
+	var exit := exit_at()
+	var away := Vector3(at.x - exit.x, 0, at.z - exit.z)
+	if away.length() >= START_FROM_EXIT_M or away.length() < 0.01: return
+	scene.call("dev_stand", exit + away.normalized() * START_FROM_EXIT_M + Vector3.UP * (at.y - exit.y))
+
+## The navigation is ready a physics frame or two after the scene stands: the dev point waits for it.
+func _stand_when_ready(point: String) -> void:
+	var at: Vector3 = scene.call("dev_point", point)
+	if at == Vector3.INF: return
+	for i in 30:
+		if not scene.is_inside_tree(): return
+		if bool(scene.call("navigation_ready")): break
+		await scene.get_tree().physics_frame
+	scene.call("dev_stand", at)
 
 func resume() -> void:
 	if rt == null: return
@@ -120,6 +152,10 @@ func dev(step: Array) -> bool:
 			var at: Vector3 = scene.call("dev_point", str(step[1]))
 			if at == Vector3.INF: return false
 			scene.call("walk_to", at)
+		"lmwhere":   # where the player is on screen (shots: circle them), and in the scene
+			var cam := scene.get_viewport().get_camera_3d()
+			var p: Vector3 = scene.call("player_position")
+			print("P0_LM_WHERE screen=", cam.unproject_position(p + Vector3.UP * 0.8), " at=", p, " vp=", scene.get_viewport().get_visible_rect().size)
 		"lmexit":
 			_to_exit = true
 			_armed = true

@@ -62,6 +62,13 @@ func test_the_stick_walks() -> void:
 	scene.step_stick(Vector2.ZERO, 1.0 / 30.0)
 	assert_bool(scene._running).is_false()
 
+## 不知火舞 on #870: landed 1.1 m from the dock, its Map strip touched the player — the visit starts 2.2 m from it.
+func test_the_player_starts_clear_of_the_door() -> void:
+	var scene := await _alcatraz()
+	var p: Vector3 = scene.player_position()
+	var exit: Vector3 = scene.exit_position()
+	assert_float(Vector2(p.x - exit.x, p.z - exit.z).length()).is_greater(2.1)
+
 func _alcatraz() -> Node3D:
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(360, 800)
