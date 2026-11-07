@@ -158,6 +158,23 @@ static func valid_cast(id: String, origin: Vector3, target: Vector3, grid: Bluep
 		elif wet or (not dry_walkable(grid, p) and p.distance_to(nearest_water(id, p, pond)) > 0.55): return false
 	return true
 
+## The water's box (x, z): a polygon's points, an ellipse's centre ± radii; an empty Rect2 for a path site (no filter).
+static func water_rect(id: String, pond: Dictionary = {}) -> Rect2:
+	var spec := site(id, pond)
+	if spec.has("polygon"):
+		var r := Rect2()
+		var first := true
+		for p in _polygon(spec):
+			if first: r = Rect2(p, Vector2.ZERO)
+			else: r = r.expand(p)
+			first = false
+		return r
+	if spec.has("center"):
+		var c := Vector2(float(spec.center[0]), float(spec.center[1]))
+		var a := Vector2(float(spec.radii[0]), float(spec.radii[1]))
+		return Rect2(c - a, a * 2.0)
+	return Rect2()
+
 ## Every cell of a blueprint's grid, from its first (grid_origin: a P0 pond's walk starts below zero, PondWalk; read from
 ## (0, 0) the AStar was asked out of its region on every Fish, 周瑜 on #855).
 static func grid_cells(bp: FarmBlueprint) -> Array[Vector2i]:
@@ -171,17 +188,37 @@ static func plan(id: String, from: Vector3, clicked: Vector3, grid: BlueprintGri
 	if pond.is_empty(): pond = site_for_plot(id, grid.bp)
 	var target := clicked if clicked.is_finite() else default_target(id, from, pond)
 	if valid_cast(id, from, target, grid, pond): return {"origin": from, "target": target}
-	var candidates: Array[Dictionary] = []
+	# no shore spot lies further than shore_range from the water's box: cells past it are not measured (周瑜 on #855: the
+	# walk to the meadow made a far-off Fish read 1.5× the cells)
+	var near := water_rect(id, pond).grow(float(data().shore_range) + 0.01)
+	var shore: Array[Vector3] = []
 	for cell in grid_cells(grid.bp):
 		if grid.astar.is_point_solid(cell): continue
 		var origin := grid.bp.cell_to_world(cell)
+		if near.has_area() and not near.has_point(Vector2(origin.x, origin.z)): continue
 		if contains(id, origin, 0.0, pond) or origin.distance_to(nearest_water(id, origin, pond)) > float(data().shore_range): continue
-		target = clicked if clicked.is_finite() else default_target(id, origin, pond)
+		shore.append(origin)
+	if not clicked.is_finite():
+		# the Fish key: the nearest shore spot that casts and is walked to — nearest first, the rest never cast-checked
+		# (the check is most of the cost: 575 shore cells, 235 of 280 ms on a desktop)
+		shore.sort_custom(func(a, b): return a.distance_to(from) < b.distance_to(from))
+		for origin in shore:
+			var t := default_target(id, origin, pond)
+			if valid_cast(id, origin, t, grid, pond) and not grid.point_path(from, origin).is_empty():
+				return {"origin": origin, "target": t}
+		return {}
+	# A tap on the water: a spot scores 4 × its line's miss + its distance to the tap + 0.15 × the walk to it, so the last two
+	# are a floor under its score. Spots are cast-checked lowest floor first, until the next floor is no better than the
+	# best spot found that is walked to: none after it can beat that — the same spot as checking them all.
+	var floor_of := func(o: Vector3) -> float: return o.distance_to(clicked) + o.distance_to(from) * 0.15
+	shore.sort_custom(func(a, b): return floor_of.call(a) < floor_of.call(b))
+	var best := {}
+	for origin in shore:
+		if not best.is_empty() and floor_of.call(origin) >= float(best.score): break
+		target = clicked
 		if not valid_cast(id, origin, target, grid, pond): target = default_target(id, origin, pond)
 		if not valid_cast(id, origin, target, grid, pond): continue
-		var score := origin.distance_to(from) if not clicked.is_finite() else target.distance_to(clicked) * 4.0 + origin.distance_to(clicked) + origin.distance_to(from) * 0.15
-		candidates.append({"origin": origin, "target": target, "score": score})
-	candidates.sort_custom(func(a, b): return a.score < b.score)
-	for candidate in candidates:
-		if not grid.point_path(from, candidate.origin).is_empty(): return candidate
-	return {}
+		var score: float = target.distance_to(clicked) * 4.0 + float(floor_of.call(origin))
+		if (best.is_empty() or score < float(best.score)) and not grid.point_path(from, origin).is_empty():
+			best = {"origin": origin, "target": target, "score": score}
+	return best

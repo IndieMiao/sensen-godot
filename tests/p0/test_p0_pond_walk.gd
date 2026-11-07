@@ -101,3 +101,41 @@ func test_a_tree_back_does_not_shut_the_player_in() -> void:
 	var me := tree + Vector3(0.2, 0, 0)
 	PondWalk.set_trees(bp, null, e, [tree], [], me)
 	assert_bool(bp.is_walkable(bp.world_to_cell(me))).is_true()
+
+## The plan as it was, every shore spot cast-checked (the reference for test_the_quick_plan_picks_the_same_spot).
+static func _plan_all(id: String, from: Vector3, clicked: Vector3, grid: BlueprintGrid, pond: Dictionary) -> Dictionary:
+	var target := clicked if clicked.is_finite() else FishingModel.default_target(id, from, pond)
+	if FishingModel.valid_cast(id, from, target, grid, pond): return {"origin": from, "target": target}
+	var candidates: Array = []
+	for cell in FishingModel.grid_cells(grid.bp):
+		if grid.astar.is_point_solid(cell): continue
+		var origin := grid.bp.cell_to_world(cell)
+		if FishingModel.contains(id, origin, 0.0, pond) or origin.distance_to(FishingModel.nearest_water(id, origin, pond)) > float(FishingModel.data().shore_range): continue
+		target = clicked if clicked.is_finite() else FishingModel.default_target(id, origin, pond)
+		if not FishingModel.valid_cast(id, origin, target, grid, pond): target = FishingModel.default_target(id, origin, pond)
+		if not FishingModel.valid_cast(id, origin, target, grid, pond): continue
+		var score := origin.distance_to(from) if not clicked.is_finite() else target.distance_to(clicked) * 4.0 + origin.distance_to(clicked) + origin.distance_to(from) * 0.15
+		candidates.append({"origin": origin, "target": target, "score": score})
+	candidates.sort_custom(func(a, b): return a.score < b.score)
+	for c in candidates:
+		if not grid.point_path(from, c.origin).is_empty(): return c
+	return {}
+
+## 周瑜 on #855 (a far-off Fish 0.31 → 0.45 s on the wider walk): the quick plan — the Fish key's nearest-first, a tap's
+## lowest floor first — picks the spot that checking every shore cell picks (same score; ties may fall either way).
+func test_the_quick_plan_picks_the_same_spot() -> void:
+	for id in SF:
+		var e := P0Ponds.location(id)
+		var bp := PondWalk.blueprint(e)
+		var grid := BlueprintGrid.new(bp)
+		var spec := SystemPonds.site(e)
+		for from in [Vector3(-2.2, 0, 1.2), Vector3(14.2, 0, 1.2), Vector3(6, 0, -15.7)]:
+			for clicked in [Vector3.INF, Vector3(6, 0, -8), Vector3(3, 0, -10)]:
+				var quick := FishingModel.plan(id, from, clicked, grid, spec)
+				var all := _plan_all(id, from, clicked, grid, spec)
+				assert_bool(quick.is_empty()).override_failure_message("%s %s %s" % [id, from, clicked]).is_equal(all.is_empty())
+				if all.is_empty(): continue
+				var score := func(p: Dictionary) -> float:
+					var o: Vector3 = p.origin
+					return o.distance_to(from) if not clicked.is_finite() else (p.target as Vector3).distance_to(clicked) * 4.0 + o.distance_to(clicked) + o.distance_to(from) * 0.15
+				assert_float(score.call(quick)).override_failure_message("%s %s %s" % [id, from, clicked]).is_equal_approx(score.call(all), 0.0001)
