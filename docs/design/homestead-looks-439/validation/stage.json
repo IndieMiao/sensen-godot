@@ -1,0 +1,11 @@
+{
+  "runtime_head": "8493a5c4258db3e59b2b845c83d3ee5b34724156",
+  "original_sha256": {
+    "modules/p0/p0_garden.gd": "1c496f455ef0fe25fe09d72d08606e561790c260f3dbd4cf0969022ec968bf92",
+    "scenes/p0/p0_farm.gd": "23b7ce694d5eb26a6d6203635035d9458bb936657e01d83d19e5936cbc107879",
+    "scenes/p0/p0_garden_scenery.gd": "fb1aacd911515b86b61e44d8399bd53e3dc65123866fd80e9b9d67a55203751e",
+    "modules/farm/farm_art.gd": "c389f99b08eca2702126783716fcba626121dc62c72fa01eb4b920045f53b6f4",
+    "assets/farm/art/house_cottage.glb": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c"
+  },
+  "scope": "isolated local QA only; no runtime source changes committed"
+}

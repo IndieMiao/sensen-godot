@@ -1,0 +1,5604 @@
+{
+	"assets": {
+		"kitchen_wing_a": {
+			"sha256": "98973502b257b535b572c56e040be684c4b91ed92cb59ebd0e35b7ae73bd0270",
+			"triangles": 936,
+			"uid": "uid://cea5idchwb8wf"
+		},
+		"kitchen_wing_b": {
+			"sha256": "47f4e3799a69c94bff50af7e6f90a9fa8b1ea6208b57c1f6a2484a42fdf770da",
+			"triangles": 1360,
+			"uid": "uid://f18rfwxksle3"
+		},
+		"porch_a": {
+			"sha256": "a9c28bdd0be686293c3d3fa9dcb3702769c48ffa0b675edff13f44e21b002571",
+			"triangles": 1104,
+			"uid": "uid://dx0yqj4mccb0a"
+		},
+		"porch_b": {
+			"sha256": "e162a2d4f4d2852e6c89fa64d5a73f087686e344a13b65d6dd4a97e1869bb71e",
+			"triangles": 652,
+			"uid": "uid://b087gv2anatoy"
+		}
+	},
+	"captures": [
+		{
+			"camera": {
+				"actor": [
+					6.17500019073486,
+					0.0,
+					0.324999988079071
+				],
+				"basis": [
+					[
+						0.9681476354599,
+						0.0,
+						-0.250379949808121
+					],
+					[
+						-0.170758724212646,
+						0.73135370016098,
+						-0.660275101661682
+					],
+					[
+						0.183116301894188,
+						0.681998372077942,
+						0.70805835723877
+					]
+				],
+				"pitch": -43.0,
+				"position": [
+					10.8591241836548,
+					14.9741487503052,
+					8.77381229400635
+				],
+				"width": 12.6654653549194,
+				"yaw": 14.4999952316284,
+				"zoom": 0.530576653312945
+			},
+			"name": "a_current",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera": {
+				"actor": [
+					6.17500019073486,
+					0.0,
+					0.324999988079071
+				],
+				"basis": [
+					[
+						0.9681476354599,
+						0.0,
+						-0.250379949808121
+					],
+					[
+						-0.170758724212646,
+						0.73135370016098,
+						-0.660275101661682
+					],
+					[
+						0.183116301894188,
+						0.681998372077942,
+						0.70805835723877
+					]
+				],
+				"pitch": -43.0,
+				"position": [
+					10.8591241836548,
+					14.9741487503052,
+					8.77381229400635
+				],
+				"width": 12.6654653549194,
+				"yaw": 14.4999952316284,
+				"zoom": 0.530576653312945
+			},
+			"name": "a_porch",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera": {
+				"actor": [
+					6.17500019073486,
+					0.0,
+					0.324999988079071
+				],
+				"basis": [
+					[
+						0.9681476354599,
+						0.0,
+						-0.250379949808121
+					],
+					[
+						-0.170758724212646,
+						0.73135370016098,
+						-0.660275101661682
+					],
+					[
+						0.183116301894188,
+						0.681998372077942,
+						0.70805835723877
+					]
+				],
+				"pitch": -43.0,
+				"position": [
+					10.8591241836548,
+					14.9741487503052,
+					8.77381229400635
+				],
+				"width": 12.6654653549194,
+				"yaw": 14.4999952316284,
+				"zoom": 0.530576653312945
+			},
+			"name": "a_kitchen",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera": {
+				"actor": [
+					6.17500019073486,
+					0.0,
+					0.324999988079071
+				],
+				"basis": [
+					[
+						0.9681476354599,
+						0.0,
+						-0.250379949808121
+					],
+					[
+						-0.170758724212646,
+						0.73135370016098,
+						-0.660275101661682
+					],
+					[
+						0.183116301894188,
+						0.681998372077942,
+						0.70805835723877
+					]
+				],
+				"pitch": -43.0,
+				"position": [
+					10.8591241836548,
+					14.9741487503052,
+					8.77381229400635
+				],
+				"width": 12.6654653549194,
+				"yaw": 14.4999952316284,
+				"zoom": 0.530576653312945
+			},
+			"name": "b_current",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera": {
+				"actor": [
+					6.17500019073486,
+					0.0,
+					0.324999988079071
+				],
+				"basis": [
+					[
+						0.9681476354599,
+						0.0,
+						-0.250379949808121
+					],
+					[
+						-0.170758724212646,
+						0.73135370016098,
+						-0.660275101661682
+					],
+					[
+						0.183116301894188,
+						0.681998372077942,
+						0.70805835723877
+					]
+				],
+				"pitch": -43.0,
+				"position": [
+					10.8591241836548,
+					14.9741487503052,
+					8.77381229400635
+				],
+				"width": 12.6654653549194,
+				"yaw": 14.4999952316284,
+				"zoom": 0.530576653312945
+			},
+			"name": "b_porch",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera": {
+				"actor": [
+					6.17500019073486,
+					0.0,
+					0.324999988079071
+				],
+				"basis": [
+					[
+						0.9681476354599,
+						0.0,
+						-0.250379949808121
+					],
+					[
+						-0.170758724212646,
+						0.73135370016098,
+						-0.660275101661682
+					],
+					[
+						0.183116301894188,
+						0.681998372077942,
+						0.70805835723877
+					]
+				],
+				"pitch": -43.0,
+				"position": [
+					10.8591241836548,
+					14.9741487503052,
+					8.77381229400635
+				],
+				"width": 12.6654653549194,
+				"yaw": 14.4999952316284,
+				"zoom": 0.530576653312945
+			},
+			"name": "b_kitchen",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera": {
+				"actor": [
+					6.17500019073486,
+					0.0,
+					0.324999988079071
+				],
+				"basis": [
+					[
+						0.9681476354599,
+						0.0,
+						-0.250380009412766
+					],
+					[
+						-0.170758754014969,
+						0.73135370016098,
+						-0.660275101661682
+					],
+					[
+						0.183116346597672,
+						0.681998372077942,
+						0.70805835723877
+					]
+				],
+				"pitch": -43.0,
+				"position": [
+					7.96601247787476,
+					9.23264408111572,
+					-0.766313076019287
+				],
+				"width": 5.59999990463257,
+				"yaw": 14.4999990463257,
+				"zoom": 1.2
+			},
+			"name": "a_sign_view",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera": {
+				"actor": [
+					6.17500019073486,
+					0.0,
+					0.324999988079071
+				],
+				"basis": [
+					[
+						0.9681476354599,
+						0.0,
+						-0.250380009412766
+					],
+					[
+						-0.170758754014969,
+						0.73135370016098,
+						-0.660275101661682
+					],
+					[
+						0.183116346597672,
+						0.681998372077942,
+						0.70805835723877
+					]
+				],
+				"pitch": -43.0,
+				"position": [
+					7.96601247787476,
+					9.23264408111572,
+					-0.766313076019287
+				],
+				"width": 5.59999990463257,
+				"yaw": 14.4999990463257,
+				"zoom": 1.2
+			},
+			"name": "b_sign_view",
+			"size": [
+				360,
+				800
+			]
+		}
+	],
+	"checks": [
+		{
+			"check": "imported budget porch_a",
+			"passed": true
+		},
+		{
+			"check": "UID/root_script porch_a",
+			"passed": true
+		},
+		{
+			"check": "imported budget porch_b",
+			"passed": true
+		},
+		{
+			"check": "UID/root_script porch_b",
+			"passed": true
+		},
+		{
+			"check": "imported budget kitchen_wing_a",
+			"passed": true
+		},
+		{
+			"check": "UID/root_script kitchen_wing_a",
+			"passed": true
+		},
+		{
+			"check": "imported budget kitchen_wing_b",
+			"passed": true
+		},
+		{
+			"check": "UID/root_script kitchen_wing_b",
+			"passed": true
+		},
+		{
+			"check": "game player assembled a current",
+			"passed": true
+		},
+		{
+			"check": "unchanged cottage under attachments a current",
+			"passed": true
+		},
+		{
+			"check": "actual look_parts count a current",
+			"passed": true
+		},
+		{
+			"check": "same native opening camera a current",
+			"passed": true
+		},
+		{
+			"check": "unchanged navigation mask a current",
+			"passed": true
+		},
+		{
+			"check": "43 degree opening a current",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave chef_board visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave homestead_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave upgrade_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_0_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_0_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_0_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_1_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_1_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_1_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_2_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_2_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_current: addons leave door_2_2 visible",
+			"passed": true
+		},
+		{
+			"check": "native 360x800 a_current",
+			"passed": true
+		},
+		{
+			"check": "saved a_current",
+			"passed": true
+		},
+		{
+			"check": "game player assembled a porch",
+			"passed": true
+		},
+		{
+			"check": "unchanged cottage under attachments a porch",
+			"passed": true
+		},
+		{
+			"check": "actual look_parts count a porch",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: PorchA",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: PorchA",
+			"passed": true
+		},
+		{
+			"check": "two overlapping visual stepping stones replaced by flush landing",
+			"passed": true
+		},
+		{
+			"check": "same native opening camera a porch",
+			"passed": true
+		},
+		{
+			"check": "unchanged navigation mask a porch",
+			"passed": true
+		},
+		{
+			"check": "43 degree opening a porch",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave chef_board visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave homestead_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave upgrade_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_0_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_0_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_0_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_1_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_1_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_1_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_2_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_2_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_porch: addons leave door_2_2 visible",
+			"passed": true
+		},
+		{
+			"check": "native 360x800 a_porch",
+			"passed": true
+		},
+		{
+			"check": "saved a_porch",
+			"passed": true
+		},
+		{
+			"check": "game player assembled a kitchen",
+			"passed": true
+		},
+		{
+			"check": "unchanged cottage under attachments a kitchen",
+			"passed": true
+		},
+		{
+			"check": "actual look_parts count a kitchen",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: PorchA",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: PorchA",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: KitchenWingA",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: KitchenWingA",
+			"passed": true
+		},
+		{
+			"check": "two overlapping visual stepping stones replaced by flush landing",
+			"passed": true
+		},
+		{
+			"check": "actual left bench found",
+			"passed": true
+		},
+		{
+			"check": "one left-house shrub moved out of the wing",
+			"passed": true
+		},
+		{
+			"check": "same native opening camera a kitchen",
+			"passed": true
+		},
+		{
+			"check": "unchanged navigation mask a kitchen",
+			"passed": true
+		},
+		{
+			"check": "43 degree opening a kitchen",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave chef_board visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave homestead_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave upgrade_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_0_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_0_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_0_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_1_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_1_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_1_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_2_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_2_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_kitchen: addons leave door_2_2 visible",
+			"passed": true
+		},
+		{
+			"check": "native 360x800 a_kitchen",
+			"passed": true
+		},
+		{
+			"check": "saved a_kitchen",
+			"passed": true
+		},
+		{
+			"check": "game player assembled b current",
+			"passed": true
+		},
+		{
+			"check": "unchanged cottage under attachments b current",
+			"passed": true
+		},
+		{
+			"check": "actual look_parts count b current",
+			"passed": true
+		},
+		{
+			"check": "same native opening camera b current",
+			"passed": true
+		},
+		{
+			"check": "unchanged navigation mask b current",
+			"passed": true
+		},
+		{
+			"check": "43 degree opening b current",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave chef_board visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave homestead_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave upgrade_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_0_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_0_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_0_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_1_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_1_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_1_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_2_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_2_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_current: addons leave door_2_2 visible",
+			"passed": true
+		},
+		{
+			"check": "native 360x800 b_current",
+			"passed": true
+		},
+		{
+			"check": "saved b_current",
+			"passed": true
+		},
+		{
+			"check": "game player assembled b porch",
+			"passed": true
+		},
+		{
+			"check": "unchanged cottage under attachments b porch",
+			"passed": true
+		},
+		{
+			"check": "actual look_parts count b porch",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: PorchB",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: PorchB",
+			"passed": true
+		},
+		{
+			"check": "two overlapping visual stepping stones replaced by flush landing",
+			"passed": true
+		},
+		{
+			"check": "same native opening camera b porch",
+			"passed": true
+		},
+		{
+			"check": "unchanged navigation mask b porch",
+			"passed": true
+		},
+		{
+			"check": "43 degree opening b porch",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave chef_board visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave homestead_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave upgrade_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_0_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_0_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_0_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_1_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_1_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_1_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_2_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_2_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_porch: addons leave door_2_2 visible",
+			"passed": true
+		},
+		{
+			"check": "native 360x800 b_porch",
+			"passed": true
+		},
+		{
+			"check": "saved b_porch",
+			"passed": true
+		},
+		{
+			"check": "game player assembled b kitchen",
+			"passed": true
+		},
+		{
+			"check": "unchanged cottage under attachments b kitchen",
+			"passed": true
+		},
+		{
+			"check": "actual look_parts count b kitchen",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: PorchB",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: PorchB",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: KitchenWingB",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: KitchenWingB",
+			"passed": true
+		},
+		{
+			"check": "two overlapping visual stepping stones replaced by flush landing",
+			"passed": true
+		},
+		{
+			"check": "actual left bench found",
+			"passed": true
+		},
+		{
+			"check": "one left-house shrub moved out of the wing",
+			"passed": true
+		},
+		{
+			"check": "same native opening camera b kitchen",
+			"passed": true
+		},
+		{
+			"check": "unchanged navigation mask b kitchen",
+			"passed": true
+		},
+		{
+			"check": "43 degree opening b kitchen",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave chef_board visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave homestead_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave upgrade_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_0_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_0_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_0_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_1_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_1_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_1_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_2_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_2_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_kitchen: addons leave door_2_2 visible",
+			"passed": true
+		},
+		{
+			"check": "native 360x800 b_kitchen",
+			"passed": true
+		},
+		{
+			"check": "saved b_kitchen",
+			"passed": true
+		},
+		{
+			"check": "game player assembled a kitchen",
+			"passed": true
+		},
+		{
+			"check": "unchanged cottage under attachments a kitchen",
+			"passed": true
+		},
+		{
+			"check": "actual look_parts count a kitchen",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: PorchA",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: PorchA",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: KitchenWingA",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: KitchenWingA",
+			"passed": true
+		},
+		{
+			"check": "two overlapping visual stepping stones replaced by flush landing",
+			"passed": true
+		},
+		{
+			"check": "actual left bench found",
+			"passed": true
+		},
+		{
+			"check": "one left-house shrub moved out of the wing",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave chef_board visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave homestead_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave upgrade_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_0_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_0_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_0_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_1_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_1_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_1_2 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_2_0 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_2_1 visible",
+			"passed": true
+		},
+		{
+			"check": "a_sign_view: addons leave door_2_2 visible",
+			"passed": true
+		},
+		{
+			"check": "native 360x800 a_sign_view",
+			"passed": true
+		},
+		{
+			"check": "saved a_sign_view",
+			"passed": true
+		},
+		{
+			"check": "game player assembled b kitchen",
+			"passed": true
+		},
+		{
+			"check": "unchanged cottage under attachments b kitchen",
+			"passed": true
+		},
+		{
+			"check": "actual look_parts count b kitchen",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: PorchB",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: PorchB",
+			"passed": true
+		},
+		{
+			"check": "part uses house anchor / scale one: KitchenWingB",
+			"passed": true
+		},
+		{
+			"check": "actual FarmArt vertex material: KitchenWingB",
+			"passed": true
+		},
+		{
+			"check": "two overlapping visual stepping stones replaced by flush landing",
+			"passed": true
+		},
+		{
+			"check": "actual left bench found",
+			"passed": true
+		},
+		{
+			"check": "one left-house shrub moved out of the wing",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave chef_board visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave homestead_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_3 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_4 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_5 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_6 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_7 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_8 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_9 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_10 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_11 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_12 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_13 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_14 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave upgrade_icon_edge_15 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_0_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_0_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_0_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_1_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_1_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_1_2 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_2_0 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_2_1 visible",
+			"passed": true
+		},
+		{
+			"check": "b_sign_view: addons leave door_2_2 visible",
+			"passed": true
+		},
+		{
+			"check": "native 360x800 b_sign_view",
+			"passed": true
+		},
+		{
+			"check": "saved b_sign_view",
+			"passed": true
+		},
+		{
+			"check": "Vulkan Mobile target renderer",
+			"passed": true
+		}
+	],
+	"hidden_scenery": [
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.16549110412598,
+				0.0109999999403954,
+				-8.97499942779541
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 3
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.14060258865356,
+				0.0109999999403954,
+				-9.23499965667725
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 4
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.16549110412598,
+				0.0109999999403954,
+				-8.97499942779541
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 3
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.14060258865356,
+				0.0109999999403954,
+				-9.23499965667725
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 4
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.16549110412598,
+				0.0109999999403954,
+				-8.97499942779541
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 3
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.14060258865356,
+				0.0109999999403954,
+				-9.23499965667725
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 4
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.16549110412598,
+				0.0109999999403954,
+				-8.97499942779541
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 3
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.14060258865356,
+				0.0109999999403954,
+				-9.23499965667725
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 4
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.16549110412598,
+				0.0109999999403954,
+				-8.97499942779541
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 3
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.14060258865356,
+				0.0109999999403954,
+				-9.23499965667725
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 4
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.16549110412598,
+				0.0109999999403954,
+				-8.97499942779541
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 3
+		},
+		{
+			"object": "door stepping stone",
+			"position": [
+				6.14060258865356,
+				0.0109999999403954,
+				-9.23499965667725
+			],
+			"reason": "new flush landing replaces its visual surface; navigation unchanged",
+			"source_instance": 4
+		}
+	],
+	"icon_clearance_radius_px": 16,
+	"passed": true,
+	"renderer": {
+		"gpu": "NVIDIA GeForce RTX 2060",
+		"method": "mobile"
+	},
+	"scenery_moves": [
+		{
+			"anchor_from": [
+				5,
+				16
+			],
+			"anchor_to": [
+				3,
+				16
+			],
+			"from": [
+				3.90000009536743,
+				0.0,
+				-10.7250003814697
+			],
+			"node": "Bench",
+			"note": "preview only; program must move anchor/footprint/interaction together",
+			"to": [
+				2.60000014305115,
+				0.0,
+				-10.7250003814697
+			]
+		},
+		{
+			"from": [
+				4.42500019073486,
+				0.0,
+				-11.625
+			],
+			"node": "Bush instance 0",
+			"note": "preview only; no RNG calls or navigation edits",
+			"to": [
+				2.92500019073486,
+				0.0,
+				-11.625
+			]
+		},
+		{
+			"anchor_from": [
+				5,
+				16
+			],
+			"anchor_to": [
+				3,
+				16
+			],
+			"from": [
+				3.90000009536743,
+				0.0,
+				-10.7250003814697
+			],
+			"node": "Bench",
+			"note": "preview only; program must move anchor/footprint/interaction together",
+			"to": [
+				2.60000014305115,
+				0.0,
+				-10.7250003814697
+			]
+		},
+		{
+			"from": [
+				4.42500019073486,
+				0.0,
+				-11.625
+			],
+			"node": "Bush instance 0",
+			"note": "preview only; no RNG calls or navigation edits",
+			"to": [
+				2.92500019073486,
+				0.0,
+				-11.625
+			]
+		},
+		{
+			"anchor_from": [
+				5,
+				16
+			],
+			"anchor_to": [
+				3,
+				16
+			],
+			"from": [
+				3.90000009536743,
+				0.0,
+				-10.7250003814697
+			],
+			"node": "Bench",
+			"note": "preview only; program must move anchor/footprint/interaction together",
+			"to": [
+				2.60000014305115,
+				0.0,
+				-10.7250003814697
+			]
+		},
+		{
+			"from": [
+				4.42500019073486,
+				0.0,
+				-11.625
+			],
+			"node": "Bush instance 0",
+			"note": "preview only; no RNG calls or navigation edits",
+			"to": [
+				2.92500019073486,
+				0.0,
+				-11.625
+			]
+		},
+		{
+			"anchor_from": [
+				5,
+				16
+			],
+			"anchor_to": [
+				3,
+				16
+			],
+			"from": [
+				3.90000009536743,
+				0.0,
+				-10.7250003814697
+			],
+			"node": "Bench",
+			"note": "preview only; program must move anchor/footprint/interaction together",
+			"to": [
+				2.60000014305115,
+				0.0,
+				-10.7250003814697
+			]
+		},
+		{
+			"from": [
+				4.42500019073486,
+				0.0,
+				-11.625
+			],
+			"node": "Bush instance 0",
+			"note": "preview only; no RNG calls or navigation edits",
+			"to": [
+				2.92500019073486,
+				0.0,
+				-11.625
+			]
+		}
+	],
+	"visibility": [
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				216.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				144.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				102.134185791016,
+				306.444061279297
+			],
+			"target": "chef_board"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				232.390518188477,
+				329.402526855469
+			],
+			"target": "homestead_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				231.172592163086,
+				323.279571533203
+			],
+			"target": "homestead_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				227.704223632812,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				222.513442993164,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				216.390518188477,
+				313.402557373047
+			],
+			"target": "homestead_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				210.267593383789,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				205.076812744141,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				201.608459472656,
+				323.279602050781
+			],
+			"target": "homestead_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				200.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				201.608444213867,
+				335.525482177734
+			],
+			"target": "homestead_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				205.076812744141,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				210.267593383789,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				216.390518188477,
+				345.402557373047
+			],
+			"target": "homestead_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				222.513458251953,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				227.704238891602,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				231.172576904297,
+				335.525512695312
+			],
+			"target": "homestead_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				160.842727661133,
+				323.019500732422
+			],
+			"target": "upgrade_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				159.624801635742,
+				316.896545410156
+			],
+			"target": "upgrade_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				156.156448364258,
+				311.705810546875
+			],
+			"target": "upgrade_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				150.96565246582,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				144.842727661133,
+				307.019500732422
+			],
+			"target": "upgrade_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				138.719787597656,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				133.529006958008,
+				311.705841064453
+			],
+			"target": "upgrade_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				130.060668945312,
+				316.896575927734
+			],
+			"target": "upgrade_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				128.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				130.060653686523,
+				329.142456054688
+			],
+			"target": "upgrade_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				133.529006958008,
+				334.333251953125
+			],
+			"target": "upgrade_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				138.719802856445,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				144.842727661133,
+				339.01953125
+			],
+			"target": "upgrade_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				150.965667724609,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				156.156448364258,
+				334.333221435547
+			],
+			"target": "upgrade_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				159.624786376953,
+				329.142486572266
+			],
+			"target": "upgrade_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				168.878601074219,
+				332.761871337891
+			],
+			"target": "door_0_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				168.878601074219,
+				327.149169921875
+			],
+			"target": "door_0_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				168.878601074219,
+				321.536468505859
+			],
+			"target": "door_0_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				173.831893920898,
+				333.635498046875
+			],
+			"target": "door_1_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				173.831893920898,
+				328.022796630859
+			],
+			"target": "door_1_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				173.831893920898,
+				322.410125732422
+			],
+			"target": "door_1_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				178.785202026367,
+				334.509155273438
+			],
+			"target": "door_2_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				178.785202026367,
+				328.896453857422
+			],
+			"target": "door_2_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_current",
+			"screen": [
+				178.785202026367,
+				323.283752441406
+			],
+			"target": "door_2_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				216.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				144.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				102.134185791016,
+				306.444061279297
+			],
+			"target": "chef_board"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				232.390518188477,
+				329.402526855469
+			],
+			"target": "homestead_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				231.172592163086,
+				323.279571533203
+			],
+			"target": "homestead_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				227.704223632812,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				222.513442993164,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				216.390518188477,
+				313.402557373047
+			],
+			"target": "homestead_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				210.267593383789,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				205.076812744141,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				201.608459472656,
+				323.279602050781
+			],
+			"target": "homestead_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				200.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				201.608444213867,
+				335.525482177734
+			],
+			"target": "homestead_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				205.076812744141,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				210.267593383789,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				216.390518188477,
+				345.402557373047
+			],
+			"target": "homestead_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				222.513458251953,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				227.704238891602,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				231.172576904297,
+				335.525512695312
+			],
+			"target": "homestead_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				160.842727661133,
+				323.019500732422
+			],
+			"target": "upgrade_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				159.624801635742,
+				316.896545410156
+			],
+			"target": "upgrade_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				156.156448364258,
+				311.705810546875
+			],
+			"target": "upgrade_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				150.96565246582,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				144.842727661133,
+				307.019500732422
+			],
+			"target": "upgrade_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				138.719787597656,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				133.529006958008,
+				311.705841064453
+			],
+			"target": "upgrade_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				130.060668945312,
+				316.896575927734
+			],
+			"target": "upgrade_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				128.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				130.060653686523,
+				329.142456054688
+			],
+			"target": "upgrade_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				133.529006958008,
+				334.333251953125
+			],
+			"target": "upgrade_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				138.719802856445,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				144.842727661133,
+				339.01953125
+			],
+			"target": "upgrade_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				150.965667724609,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				156.156448364258,
+				334.333221435547
+			],
+			"target": "upgrade_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				159.624786376953,
+				329.142486572266
+			],
+			"target": "upgrade_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				168.878601074219,
+				332.761871337891
+			],
+			"target": "door_0_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				168.878601074219,
+				327.149169921875
+			],
+			"target": "door_0_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				168.878601074219,
+				321.536468505859
+			],
+			"target": "door_0_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				173.831893920898,
+				333.635498046875
+			],
+			"target": "door_1_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				173.831893920898,
+				328.022796630859
+			],
+			"target": "door_1_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				173.831893920898,
+				322.410125732422
+			],
+			"target": "door_1_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				178.785202026367,
+				334.509155273438
+			],
+			"target": "door_2_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				178.785202026367,
+				328.896453857422
+			],
+			"target": "door_2_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_porch",
+			"screen": [
+				178.785202026367,
+				323.283752441406
+			],
+			"target": "door_2_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				216.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				144.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				102.134185791016,
+				306.444061279297
+			],
+			"target": "chef_board"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				232.390518188477,
+				329.402526855469
+			],
+			"target": "homestead_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				231.172592163086,
+				323.279571533203
+			],
+			"target": "homestead_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				227.704223632812,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				222.513442993164,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				216.390518188477,
+				313.402557373047
+			],
+			"target": "homestead_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				210.267593383789,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				205.076812744141,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				201.608459472656,
+				323.279602050781
+			],
+			"target": "homestead_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				200.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				201.608444213867,
+				335.525482177734
+			],
+			"target": "homestead_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				205.076812744141,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				210.267593383789,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				216.390518188477,
+				345.402557373047
+			],
+			"target": "homestead_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				222.513458251953,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				227.704238891602,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				231.172576904297,
+				335.525512695312
+			],
+			"target": "homestead_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				160.842727661133,
+				323.019500732422
+			],
+			"target": "upgrade_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				159.624801635742,
+				316.896545410156
+			],
+			"target": "upgrade_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				156.156448364258,
+				311.705810546875
+			],
+			"target": "upgrade_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				150.96565246582,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				144.842727661133,
+				307.019500732422
+			],
+			"target": "upgrade_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				138.719787597656,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				133.529006958008,
+				311.705841064453
+			],
+			"target": "upgrade_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				130.060668945312,
+				316.896575927734
+			],
+			"target": "upgrade_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				128.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				130.060653686523,
+				329.142456054688
+			],
+			"target": "upgrade_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				133.529006958008,
+				334.333251953125
+			],
+			"target": "upgrade_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				138.719802856445,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				144.842727661133,
+				339.01953125
+			],
+			"target": "upgrade_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				150.965667724609,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				156.156448364258,
+				334.333221435547
+			],
+			"target": "upgrade_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				159.624786376953,
+				329.142486572266
+			],
+			"target": "upgrade_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				168.878601074219,
+				332.761871337891
+			],
+			"target": "door_0_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				168.878601074219,
+				327.149169921875
+			],
+			"target": "door_0_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				168.878601074219,
+				321.536468505859
+			],
+			"target": "door_0_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				173.831893920898,
+				333.635498046875
+			],
+			"target": "door_1_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				173.831893920898,
+				328.022796630859
+			],
+			"target": "door_1_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				173.831893920898,
+				322.410125732422
+			],
+			"target": "door_1_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				178.785202026367,
+				334.509155273438
+			],
+			"target": "door_2_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				178.785202026367,
+				328.896453857422
+			],
+			"target": "door_2_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_kitchen",
+			"screen": [
+				178.785202026367,
+				323.283752441406
+			],
+			"target": "door_2_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				216.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				144.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				102.134185791016,
+				306.444061279297
+			],
+			"target": "chef_board"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				232.390518188477,
+				329.402526855469
+			],
+			"target": "homestead_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				231.172592163086,
+				323.279571533203
+			],
+			"target": "homestead_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				227.704223632812,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				222.513442993164,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				216.390518188477,
+				313.402557373047
+			],
+			"target": "homestead_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				210.267593383789,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				205.076812744141,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				201.608459472656,
+				323.279602050781
+			],
+			"target": "homestead_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				200.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				201.608444213867,
+				335.525482177734
+			],
+			"target": "homestead_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				205.076812744141,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				210.267593383789,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				216.390518188477,
+				345.402557373047
+			],
+			"target": "homestead_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				222.513458251953,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				227.704238891602,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				231.172576904297,
+				335.525512695312
+			],
+			"target": "homestead_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				160.842727661133,
+				323.019500732422
+			],
+			"target": "upgrade_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				159.624801635742,
+				316.896545410156
+			],
+			"target": "upgrade_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				156.156448364258,
+				311.705810546875
+			],
+			"target": "upgrade_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				150.96565246582,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				144.842727661133,
+				307.019500732422
+			],
+			"target": "upgrade_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				138.719787597656,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				133.529006958008,
+				311.705841064453
+			],
+			"target": "upgrade_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				130.060668945312,
+				316.896575927734
+			],
+			"target": "upgrade_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				128.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				130.060653686523,
+				329.142456054688
+			],
+			"target": "upgrade_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				133.529006958008,
+				334.333251953125
+			],
+			"target": "upgrade_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				138.719802856445,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				144.842727661133,
+				339.01953125
+			],
+			"target": "upgrade_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				150.965667724609,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				156.156448364258,
+				334.333221435547
+			],
+			"target": "upgrade_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				159.624786376953,
+				329.142486572266
+			],
+			"target": "upgrade_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				168.878601074219,
+				332.761871337891
+			],
+			"target": "door_0_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				168.878601074219,
+				327.149169921875
+			],
+			"target": "door_0_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				168.878601074219,
+				321.536468505859
+			],
+			"target": "door_0_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				173.831893920898,
+				333.635498046875
+			],
+			"target": "door_1_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				173.831893920898,
+				328.022796630859
+			],
+			"target": "door_1_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				173.831893920898,
+				322.410125732422
+			],
+			"target": "door_1_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				178.785202026367,
+				334.509155273438
+			],
+			"target": "door_2_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				178.785202026367,
+				328.896453857422
+			],
+			"target": "door_2_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_current",
+			"screen": [
+				178.785202026367,
+				323.283752441406
+			],
+			"target": "door_2_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				216.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				144.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				102.134185791016,
+				306.444061279297
+			],
+			"target": "chef_board"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				232.390518188477,
+				329.402526855469
+			],
+			"target": "homestead_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				231.172592163086,
+				323.279571533203
+			],
+			"target": "homestead_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				227.704223632812,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				222.513442993164,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				216.390518188477,
+				313.402557373047
+			],
+			"target": "homestead_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				210.267593383789,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				205.076812744141,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				201.608459472656,
+				323.279602050781
+			],
+			"target": "homestead_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				200.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				201.608444213867,
+				335.525482177734
+			],
+			"target": "homestead_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				205.076812744141,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				210.267593383789,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				216.390518188477,
+				345.402557373047
+			],
+			"target": "homestead_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				222.513458251953,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				227.704238891602,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				231.172576904297,
+				335.525512695312
+			],
+			"target": "homestead_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				160.842727661133,
+				323.019500732422
+			],
+			"target": "upgrade_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				159.624801635742,
+				316.896545410156
+			],
+			"target": "upgrade_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				156.156448364258,
+				311.705810546875
+			],
+			"target": "upgrade_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				150.96565246582,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				144.842727661133,
+				307.019500732422
+			],
+			"target": "upgrade_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				138.719787597656,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				133.529006958008,
+				311.705841064453
+			],
+			"target": "upgrade_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				130.060668945312,
+				316.896575927734
+			],
+			"target": "upgrade_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				128.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				130.060653686523,
+				329.142456054688
+			],
+			"target": "upgrade_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				133.529006958008,
+				334.333251953125
+			],
+			"target": "upgrade_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				138.719802856445,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				144.842727661133,
+				339.01953125
+			],
+			"target": "upgrade_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				150.965667724609,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				156.156448364258,
+				334.333221435547
+			],
+			"target": "upgrade_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				159.624786376953,
+				329.142486572266
+			],
+			"target": "upgrade_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				168.878601074219,
+				332.761871337891
+			],
+			"target": "door_0_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				168.878601074219,
+				327.149169921875
+			],
+			"target": "door_0_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				168.878601074219,
+				321.536468505859
+			],
+			"target": "door_0_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				173.831893920898,
+				333.635498046875
+			],
+			"target": "door_1_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				173.831893920898,
+				328.022796630859
+			],
+			"target": "door_1_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				173.831893920898,
+				322.410125732422
+			],
+			"target": "door_1_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				178.785202026367,
+				334.509155273438
+			],
+			"target": "door_2_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				178.785202026367,
+				328.896453857422
+			],
+			"target": "door_2_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_porch",
+			"screen": [
+				178.785202026367,
+				323.283752441406
+			],
+			"target": "door_2_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				216.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				144.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				102.134185791016,
+				306.444061279297
+			],
+			"target": "chef_board"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				232.390518188477,
+				329.402526855469
+			],
+			"target": "homestead_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				231.172592163086,
+				323.279571533203
+			],
+			"target": "homestead_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				227.704223632812,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				222.513442993164,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				216.390518188477,
+				313.402557373047
+			],
+			"target": "homestead_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				210.267593383789,
+				314.620452880859
+			],
+			"target": "homestead_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				205.076812744141,
+				318.0888671875
+			],
+			"target": "homestead_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				201.608459472656,
+				323.279602050781
+			],
+			"target": "homestead_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				200.390518188477,
+				329.402557373047
+			],
+			"target": "homestead_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				201.608444213867,
+				335.525482177734
+			],
+			"target": "homestead_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				205.076812744141,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				210.267593383789,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				216.390518188477,
+				345.402557373047
+			],
+			"target": "homestead_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				222.513458251953,
+				344.184600830078
+			],
+			"target": "homestead_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				227.704238891602,
+				340.716247558594
+			],
+			"target": "homestead_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				231.172576904297,
+				335.525512695312
+			],
+			"target": "homestead_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				160.842727661133,
+				323.019500732422
+			],
+			"target": "upgrade_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				159.624801635742,
+				316.896545410156
+			],
+			"target": "upgrade_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				156.156448364258,
+				311.705810546875
+			],
+			"target": "upgrade_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				150.96565246582,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				144.842727661133,
+				307.019500732422
+			],
+			"target": "upgrade_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				138.719787597656,
+				308.237457275391
+			],
+			"target": "upgrade_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				133.529006958008,
+				311.705841064453
+			],
+			"target": "upgrade_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				130.060668945312,
+				316.896575927734
+			],
+			"target": "upgrade_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				128.842727661133,
+				323.01953125
+			],
+			"target": "upgrade_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				130.060653686523,
+				329.142456054688
+			],
+			"target": "upgrade_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				133.529006958008,
+				334.333251953125
+			],
+			"target": "upgrade_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				138.719802856445,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				144.842727661133,
+				339.01953125
+			],
+			"target": "upgrade_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				150.965667724609,
+				337.801544189453
+			],
+			"target": "upgrade_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				156.156448364258,
+				334.333221435547
+			],
+			"target": "upgrade_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				159.624786376953,
+				329.142486572266
+			],
+			"target": "upgrade_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				168.878601074219,
+				332.761871337891
+			],
+			"target": "door_0_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				168.878601074219,
+				327.149169921875
+			],
+			"target": "door_0_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				168.878601074219,
+				321.536468505859
+			],
+			"target": "door_0_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				173.831893920898,
+				333.635498046875
+			],
+			"target": "door_1_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				173.831893920898,
+				328.022796630859
+			],
+			"target": "door_1_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				173.831893920898,
+				322.410125732422
+			],
+			"target": "door_1_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				178.785202026367,
+				334.509155273438
+			],
+			"target": "door_2_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				178.785202026367,
+				328.896453857422
+			],
+			"target": "door_2_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_kitchen",
+			"screen": [
+				178.785202026367,
+				323.283752441406
+			],
+			"target": "door_2_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				288.809326171875,
+				407.091461181641
+			],
+			"target": "homestead_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				126.990379333496,
+				392.654998779297
+			],
+			"target": "upgrade_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				30.3969058990479,
+				355.166381835938
+			],
+			"target": "chef_board"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				304.809326171875,
+				407.091461181641
+			],
+			"target": "homestead_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				303.591400146484,
+				400.968566894531
+			],
+			"target": "homestead_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				300.123016357422,
+				395.777709960938
+			],
+			"target": "homestead_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				294.932250976562,
+				392.309417724609
+			],
+			"target": "homestead_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				288.809326171875,
+				391.091461181641
+			],
+			"target": "homestead_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				282.686401367188,
+				392.309387207031
+			],
+			"target": "homestead_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				277.495635986328,
+				395.777709960938
+			],
+			"target": "homestead_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				274.027252197266,
+				400.968566894531
+			],
+			"target": "homestead_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				272.809356689453,
+				407.091461181641
+			],
+			"target": "homestead_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				274.027252197266,
+				413.214416503906
+			],
+			"target": "homestead_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				277.495635986328,
+				418.405151367188
+			],
+			"target": "homestead_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				282.686401367188,
+				421.873565673828
+			],
+			"target": "homestead_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				288.809326171875,
+				423.091400146484
+			],
+			"target": "homestead_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				294.932281494141,
+				421.873596191406
+			],
+			"target": "homestead_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				300.123016357422,
+				418.405151367188
+			],
+			"target": "homestead_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				303.591369628906,
+				413.214416503906
+			],
+			"target": "homestead_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				142.990371704102,
+				392.654968261719
+			],
+			"target": "upgrade_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				141.772430419922,
+				386.532104492188
+			],
+			"target": "upgrade_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				138.304061889648,
+				381.34130859375
+			],
+			"target": "upgrade_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				133.113296508789,
+				377.872955322266
+			],
+			"target": "upgrade_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				126.990379333496,
+				376.655029296875
+			],
+			"target": "upgrade_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				120.867416381836,
+				377.872955322266
+			],
+			"target": "upgrade_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				115.676681518555,
+				381.34130859375
+			],
+			"target": "upgrade_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				112.208282470703,
+				386.532104492188
+			],
+			"target": "upgrade_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				110.990394592285,
+				392.654998779297
+			],
+			"target": "upgrade_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				112.208282470703,
+				398.777954101562
+			],
+			"target": "upgrade_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				115.67667388916,
+				403.968658447266
+			],
+			"target": "upgrade_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				120.867416381836,
+				407.437103271484
+			],
+			"target": "upgrade_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				126.990379333496,
+				408.654998779297
+			],
+			"target": "upgrade_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				133.113311767578,
+				407.437103271484
+			],
+			"target": "upgrade_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				138.304077148438,
+				403.968688964844
+			],
+			"target": "upgrade_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				141.772415161133,
+				398.777954101562
+			],
+			"target": "upgrade_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				181.35205078125,
+				414.689208984375
+			],
+			"target": "door_0_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				181.35205078125,
+				401.994995117188
+			],
+			"target": "door_0_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				181.35205078125,
+				389.300811767578
+			],
+			"target": "door_0_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				192.554885864258,
+				416.665130615234
+			],
+			"target": "door_1_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				192.554885864258,
+				403.970886230469
+			],
+			"target": "door_1_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				192.554885864258,
+				391.276733398438
+			],
+			"target": "door_1_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				203.757720947266,
+				418.641082763672
+			],
+			"target": "door_2_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				203.757720947266,
+				405.946838378906
+			],
+			"target": "door_2_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "a_sign_view",
+			"screen": [
+				203.757720947266,
+				393.252655029297
+			],
+			"target": "door_2_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				288.809326171875,
+				407.091461181641
+			],
+			"target": "homestead_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				126.990379333496,
+				392.654998779297
+			],
+			"target": "upgrade_icon"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				30.3969058990479,
+				355.166381835938
+			],
+			"target": "chef_board"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				304.809326171875,
+				407.091461181641
+			],
+			"target": "homestead_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				303.591400146484,
+				400.968566894531
+			],
+			"target": "homestead_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				300.123016357422,
+				395.777709960938
+			],
+			"target": "homestead_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				294.932250976562,
+				392.309417724609
+			],
+			"target": "homestead_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				288.809326171875,
+				391.091461181641
+			],
+			"target": "homestead_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				282.686401367188,
+				392.309387207031
+			],
+			"target": "homestead_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				277.495635986328,
+				395.777709960938
+			],
+			"target": "homestead_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				274.027252197266,
+				400.968566894531
+			],
+			"target": "homestead_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				272.809356689453,
+				407.091461181641
+			],
+			"target": "homestead_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				274.027252197266,
+				413.214416503906
+			],
+			"target": "homestead_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				277.495635986328,
+				418.405151367188
+			],
+			"target": "homestead_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				282.686401367188,
+				421.873565673828
+			],
+			"target": "homestead_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				288.809326171875,
+				423.091400146484
+			],
+			"target": "homestead_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				294.932281494141,
+				421.873596191406
+			],
+			"target": "homestead_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				300.123016357422,
+				418.405151367188
+			],
+			"target": "homestead_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				303.591369628906,
+				413.214416503906
+			],
+			"target": "homestead_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				142.990371704102,
+				392.654968261719
+			],
+			"target": "upgrade_icon_edge_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				141.772430419922,
+				386.532104492188
+			],
+			"target": "upgrade_icon_edge_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				138.304061889648,
+				381.34130859375
+			],
+			"target": "upgrade_icon_edge_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				133.113296508789,
+				377.872955322266
+			],
+			"target": "upgrade_icon_edge_3"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				126.990379333496,
+				376.655029296875
+			],
+			"target": "upgrade_icon_edge_4"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				120.867416381836,
+				377.872955322266
+			],
+			"target": "upgrade_icon_edge_5"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				115.676681518555,
+				381.34130859375
+			],
+			"target": "upgrade_icon_edge_6"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				112.208282470703,
+				386.532104492188
+			],
+			"target": "upgrade_icon_edge_7"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				110.990394592285,
+				392.654998779297
+			],
+			"target": "upgrade_icon_edge_8"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				112.208282470703,
+				398.777954101562
+			],
+			"target": "upgrade_icon_edge_9"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				115.67667388916,
+				403.968658447266
+			],
+			"target": "upgrade_icon_edge_10"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				120.867416381836,
+				407.437103271484
+			],
+			"target": "upgrade_icon_edge_11"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				126.990379333496,
+				408.654998779297
+			],
+			"target": "upgrade_icon_edge_12"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				133.113311767578,
+				407.437103271484
+			],
+			"target": "upgrade_icon_edge_13"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				138.304077148438,
+				403.968688964844
+			],
+			"target": "upgrade_icon_edge_14"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				141.772415161133,
+				398.777954101562
+			],
+			"target": "upgrade_icon_edge_15"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				181.35205078125,
+				414.689208984375
+			],
+			"target": "door_0_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				181.35205078125,
+				401.994995117188
+			],
+			"target": "door_0_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				181.35205078125,
+				389.300811767578
+			],
+			"target": "door_0_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				192.554885864258,
+				416.665130615234
+			],
+			"target": "door_1_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				192.554885864258,
+				403.970886230469
+			],
+			"target": "door_1_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				192.554885864258,
+				391.276733398438
+			],
+			"target": "door_1_2"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				203.757720947266,
+				418.641082763672
+			],
+			"target": "door_2_0"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				203.757720947266,
+				405.946838378906
+			],
+			"target": "door_2_1"
+		},
+		{
+			"blocked_by": "",
+			"capture": "b_sign_view",
+			"screen": [
+				203.757720947266,
+				393.252655029297
+			],
+			"target": "door_2_2"
+		}
+	]
+}

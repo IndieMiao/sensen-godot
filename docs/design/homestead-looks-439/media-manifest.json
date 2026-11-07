@@ -1,0 +1,22 @@
+[
+  {
+    "name": "SGODOT-439_HOMESTEAD_v1_three_stages.png",
+    "path": "docs/design/homestead-looks-439/SGODOT-439_HOMESTEAD_v1_three_stages.png",
+    "mime": "image/png",
+    "size": [
+      1080,
+      1600
+    ],
+    "sha256": "b90c1ed3c53bd969bf6e46db3394cac92a9a0185f8a21f05883f6b1a8f3f0947"
+  },
+  {
+    "name": "SGODOT-439_HOMESTEAD_v1_sign_view.png",
+    "path": "docs/design/homestead-looks-439/SGODOT-439_HOMESTEAD_v1_sign_view.png",
+    "mime": "image/png",
+    "size": [
+      720,
+      800
+    ],
+    "sha256": "5446637a789bb753d34f9705d5a7d78697d54401dbd0e4e0e28d906d5e5f48a8"
+  }
+]
