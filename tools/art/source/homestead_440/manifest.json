@@ -4,9 +4,9 @@
   "units": "m",
   "assets": {
     "master_farmhouse_a": {
-      "triangles": 7658,
+      "triangles": 7874,
       "surfaces": 1,
-      "bytes": 552472,
+      "bytes": 569320,
       "bounds": [
         [
           -2.073374,
@@ -19,7 +19,7 @@
           1.3975
         ]
       ],
-      "sha256": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+      "sha256": "05263dfa07ae3a706c2132b99de4ba1765ceb4f381c32582c8154e9192ed1846",
       "generator": "tools/art/build_homestead_lv15.py",
       "triangle_limit": 9000,
       "pivot": "Identical cottage anchor at ground (0,0,0)",
@@ -44,8 +44,8 @@
       "units": "m",
       "components": {
         "main": {
-          "triangles": 5310,
-          "source_parts": 298,
+          "triangles": 5454,
+          "source_parts": 374,
           "bounds": [
             [
               -1.13,
@@ -60,7 +60,7 @@
           ]
         },
         "porch": {
-          "triangles": 928,
+          "triangles": 896,
           "source_parts": 46,
           "bounds": [
             [
@@ -76,8 +76,8 @@
           ]
         },
         "kitchen_wing": {
-          "triangles": 1420,
-          "source_parts": 73,
+          "triangles": 1524,
+          "source_parts": 107,
           "bounds": [
             [
               -2.073374,
@@ -94,9 +94,9 @@
       }
     },
     "master_farmhouse_b": {
-      "triangles": 8662,
+      "triangles": 8798,
       "surfaces": 1,
-      "bytes": 630496,
+      "bytes": 641104,
       "bounds": [
         [
           -2.073374,
@@ -109,7 +109,7 @@
           1.16
         ]
       ],
-      "sha256": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+      "sha256": "cf112259a1ed269cea5104da55dcf28ac25566333e876218227a2a49cc3e6670",
       "generator": "tools/art/build_homestead_lv15.py",
       "triangle_limit": 9000,
       "pivot": "Identical cottage anchor at ground (0,0,0)",
@@ -134,8 +134,8 @@
       "units": "m",
       "components": {
         "main": {
-          "triangles": 5678,
-          "source_parts": 350,
+          "triangles": 5712,
+          "source_parts": 431,
           "bounds": [
             [
               -1.13,
@@ -166,8 +166,8 @@
           ]
         },
         "kitchen_wing": {
-          "triangles": 1968,
-          "source_parts": 124,
+          "triangles": 2070,
+          "source_parts": 164,
           "bounds": [
             [
               -2.073374,

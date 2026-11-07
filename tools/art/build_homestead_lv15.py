@@ -4,7 +4,7 @@ Only the two new GLBs and own source/manifest are written.
 """
 from pathlib import Path
 import json,math,sys,random,hashlib
-import bpy
+import bpy,bmesh
 from mathutils import Vector
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import build_decor_assets as kit
@@ -23,6 +23,87 @@ PALETTE={
 B=kit.box;M=kit.mesh
 
 def beam(name,a,b,width,color='wood',depth=None):return kit.beam(name,a,b,width,color,depth=depth,radius=0)
+
+def omit_tile_underside(obj):
+ # The solid roof slab already closes the underside. Retain the visible tile
+ # tops and all four rims; use the saved triangles on the unseen facades.
+ bm=bmesh.new();bm.from_mesh(obj.data)
+ bmesh.ops.delete(bm,geom=[f for f in bm.faces if f.normal.z<-.9],context='FACES')
+ bm.to_mesh(obj.data);bm.free()
+
+def facade_part(name,origin,normal,offset,size,color,raised=False):
+ # Local u is horizontal as seen from outside; v is up; w points out of wall.
+ # Wall-backed details omit their buried back face, not a visible house face.
+ nx,nz=normal
+ def at(u,v,w):return (origin[0]+nz*u+nx*w,origin[1]+v,origin[2]-nx*u+nz*w)
+ u,v,w=offset;a,b,depth=size
+ corners=[(-a/2,-b/2),(a/2,-b/2),(a/2,b/2),(-a/2,b/2)]
+ verts=[at(u+x,v+y,w+depth/2) for x,y in corners]
+ faces=[(0,1,2,3)]
+ if raised:
+  verts += [at(u+x,v+y,w-depth/2) for x,y in corners]
+  faces += [(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)]
+ return M(name,verts,faces,color)
+
+def secondary_window(origin,normal,width=.40,height=.42):
+ # Same green surround, cream muntins and shutters as the front, with relief
+ # only on frame/sill. Flat paint details have no texture or extra surface.
+ def p(name,offset,size,color,raised=False):return facade_part(name,origin,normal,offset,size,color,raised)
+ p('Side rear green surround',(0,0,.025),(width+.10,height+.10,.05),'green',True)
+ p('Side rear blue green pane',(0,0,.052),(width,height,0),'glass')
+ p('Side rear vertical muntin',(0,0,.055),(.022,height,0),'cream')
+ p('Side rear horizontal muntin',(0,0,.056),(width,.023,0),'cream')
+ p('Side rear sky accent',(-width*.22,height*.25,.057),(width*.26,.019,0),'cream')
+ p('Side rear sill',(0,-height/2-.045,.025),(width+.14,.06,.075),'wood_light',True)
+ for s in [-1,1]:
+  p('Side rear green shutter',(s*(width/2+.075),0,.057),(.09,height+.04,0),'green')
+  for k in range(3):p('Side rear louvre',(s*(width/2+.075),-height*.28+k*height*.28,.060),(.075,.02,0),'green_light')
+
+def rear_facade(variant):
+ normal=(0,-1)
+ for x in [-.43,.43]:secondary_window((x,2.62,-.828),normal,.36,.42)
+ secondary_window((.44,.82,-.828),normal,.38,.42)
+ secondary_window((-.861,2.62,-.15),(-1,0),.40,.40)
+ # Closed utility door is facade detail only; no new path, step or interaction.
+ origin=(-.38,.54,-.828)
+ facade_part('Rear utility door green frame',origin,normal,(0,0,.025),(.55,.94,.05),'green',True)
+ facade_part('Rear utility oak door',origin,normal,(0,0,.052),(.43,.84,0),'wood_light')
+ for x in [-.10,0,.10]:facade_part('Rear door plank seam',origin,normal,(x,0,.054),(.008,.78,0),'wood')
+ facade_part('Rear door brass latch',origin,normal,(.14,-.02,.059),(.035,.035,.012),'yellow',True)
+ if variant=='a':
+  for x in [-.815,.815]:B('Rear oak corner post',(x,1.525,-.836),(.085,2.85,.06),'wood',0)
+  for y in [1.60,2.92]:
+   B('Rear timber rail',(0,y,-.842),(1.74,.09,.055),'wood',0)
+   B('Left upper timber rail',(-.867,y,0),(.055,.09,1.65),'wood',0)
+  for z in [-.79,0,.79]:B('Left upper timber upright',(-.866,2.25,z),(.055,1.36,.075),'wood',0)
+  beam('Rear diagonal timber',(-.76,1.68,-.852),(-.14,2.22,-.852),.065,'wood')
+  beam('Left diagonal timber',(-.866,1.65,-.72),(-.866,2.22,-.10),.065,'wood')
+  for z in [-.78,.78]:beam('Left gable timber',(-.865,2.96,z),(-.865,3.67,0),.06,'wood')
+  beam('Left gable centre post',(-.865,2.96,0),(-.865,3.67,0),.06,'wood')
+ else:
+  # Shallow bevels around the window/door; mortar stays on the existing wall.
+  facade_part('Rear stone mortar backing',(0,.83,-.822),normal,(0,0,0),(1.70,1.43,0),'stone_shade')
+  for row in range(6):
+   for col in range(5):
+    x=-.68+col*.34;y=.235+row*.239
+    if x<-.09 and y<1.04:continue
+    if x>.10 and .51<y<1.12:continue
+    facade_part('Rear cut stone',(x,y,-.825),normal,(0,0,.02),(.323,.222,.04),'stone_light' if (row+col)%4==0 else 'stone',True)
+
+def wing_back_and_side(variant):
+ secondary_window((-2.002,.85,-.23),(-1,0),.38,.36)
+ secondary_window((-1.43,.91,-1.128),(0,-1),.36,.36)
+ if variant=='a':
+  for z in [-1.08,.63]:B('Kitchen outside corner timber',(-2.006,.72,z),(.05,1.22,.065),'wood',0)
+  B('Kitchen outside low rail',(-2.006,.23,-.22),(.05,.06,1.75),'wood',0)
+  for x in [-1.96,-.89]:B('Kitchen rear upright',(x,.72,-1.13),(.065,1.22,.05),'wood',0)
+  B('Kitchen rear low rail',(-1.425,.23,-1.135),(1.11,.06,.045),'wood',0)
+ else:
+  for row in range(5):
+   for col in range(3):
+    x=-1.805+col*.38;y=.24+row*.23
+    if col==1 and .58<y<1.2:continue
+    facade_part('Kitchen rear cut stone',(x,y,-1.125),(0,-1),(0,0,.018),(.36,.215,.036),'stone_light' if (row+col)%4==0 else 'stone',True)
 
 def window(x,y,z,width=.37,height=.40,side=False,flowers=False):
  def part(name,offset,size,color,r=0):
@@ -70,6 +151,7 @@ def roof(cx,cz,width,depth,eave,peak,across=False,rows=5,cols=9,name='Orange til
       'orange_light' if (row*7+col)%5==0 else 'orange',0)
     if across:tile.rotation_euler.x=side*ang
     else:tile.rotation_euler.y=side*ang
+    omit_tile_underside(tile)
   for end in [-1,1]:beam(name+' gable verge',pos(0,peak+.04,end*ridge_len/2),pos(side*(half+.025),eave+.025,end*ridge_len/2),.065,'orange')
  beam(name+' ridge cap',pos(0,peak+.055,-ridge_len/2-.025),pos(0,peak+.055,ridge_len/2+.025),.09,'orange_light')
 
@@ -105,14 +187,14 @@ def chimney(x,z,base,top,stone=False):
  B('Dark flue opening',(x,top+.064,z),(.19,.009,.20),'roof_dark',0)
 
 def stone_course(at,size,color,side=False):
- # Truncated front edges, 12 triangles per individual stone. Hidden bevels omitted.
+ # Truncated front edges, 10 triangles per stone. Buried back face omitted.
  w,h,depth=(size[2],size[1],size[0]) if side else size
  r=min(.025,w*.14,h*.14)
  verts=[]
  for z,ww,hh in [(-depth/2,w,h),(depth/2,w-2*r,h-2*r)]:
   for x,y in [(-ww/2,-hh/2),(ww/2,-hh/2),(ww/2,hh/2),(-ww/2,hh/2)]:
    verts.append((at[0]+z,at[1]+y,at[2]-x) if side else (at[0]+x,at[1]+y,at[2]+z))
- return M('Chamfered masonry course',verts,[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],color)
+ return M('Chamfered masonry course',verts,[(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],color)
 
 def pot(x,z,stone=False):
  kit.cylinder('Low flower pot',(x,.11,z),.105,.22,'stone_light' if stone else 'wood',top=.13,segments=10)
@@ -163,6 +245,7 @@ def wing(variant):
   for col in range(7):
    tile=B('Kitchen separate clay tile',(x0+(x1-x0)*t,y0+(y1-y0)*t+.025,z0+(col+.5)*(z1-z0)/7),(length/4+.015,.035,(z1-z0)/7-.008),'orange_light' if (row+col)%4==0 else 'orange',0)
    tile.rotation_euler.y=-slope
+   omit_tile_underside(tile)
  for z in [z0,z1]:beam('Kitchen roof side verge',(x0,y0+.03,z),(x1,y1+.03,z),.07,'orange')
  window(-1.43,.92,.695,.36,.36,flowers=True)
  if variant=='a':
@@ -179,6 +262,7 @@ def wing(variant):
    for k in range(5):
     B('Kitchen side stone',(-2.02,.24+j*.23,-.94+k*.36),(.045,.215,.34),'stone_light' if (j+k)%4==0 else 'stone',0)
   chimney(-1.76,-.60,1.45,2.64,True)
+ wing_back_and_side(variant)
 
 def main_house(variant):
  name='master_farmhouse_'+variant
@@ -234,6 +318,7 @@ def main_house(variant):
     if abs(-p.y+.12)<.34 and .43<p.z<1.02:bpy.data.objects.remove(o,do_unlink=True)
   B('Stone storey cornice',(0,1.60,0),(1.79,.11,1.72),'stone_light',.018)
   chimney(-.66,-.39,3.15,4.12,True)
+ rear_facade(variant)
  for obj in kit.CURRENT.objects:obj['component']='main'
  before=set(kit.CURRENT.objects);porch(variant)
  for obj in set(kit.CURRENT.objects)-before:obj['component']='porch'

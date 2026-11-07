@@ -15,7 +15,7 @@ func transport(_method,_path,_body,cmd):
 func check(ok,label):
  report.checks.append({"passed":bool(ok),"check":label})
  if not ok:push_error(label)
-func capture(name):
+func capture(name,check_signs=true):
  for i in 8:await RenderingServer.frame_post_draw
  var im=vp.get_texture().get_image()
  check(im.get_size()==Vector2i(360,800),name+" 360x800")
@@ -43,12 +43,17 @@ func capture(name):
   for i in range(0,faces.size(),3):
    var a=farm._looks._house.to_global(faces[i]);var b=farm._looks._house.to_global(faces[i+1]);var c=farm._looks._house.to_global(faces[i+2])
    if Geometry3D.segment_intersects_triangle(origin,point,a,b,c)!=null:hit=true;break
-  check(not hit,name+" "+entry[0]+" unobstructed by house")
+  if check_signs:check(not hit,name+" "+entry[0]+" unobstructed by house")
   sign_views[entry[0]]={"screen":[xy.x,xy.y],"house_occludes":hit}
  if name.ends_with("default"):
   check(min_y>=150,name+" model top below y150 limit")
   check(smoke_min_y>=150,name+" smoke full-cycle bound below y150 limit")
  report.captures.append({"name":name,"highest_pixel":[at.x,at.y],"smoke_full_cycle_top_bound_px":smoke_min_y,"model_height_m":mesh.get_aabb().end.y,"camera_size":farm.cam.size,"camera_position":str(farm.cam.position),"camera_rotation":str(farm.cam.rotation_degrees),"signs":sign_views})
+func angle_view(yaw_deg,center,size):
+ var pitch=deg_to_rad(farm.FarmCamera.PITCH_DEG);var yaw=deg_to_rad(yaw_deg)
+ farm.cam.size=size
+ farm.cam.position=center+Vector3(sin(yaw)*11*cos(pitch),11*sin(pitch),cos(yaw)*11*cos(pitch))
+ farm.cam.look_at(center,Vector3.UP);farm.FarmCamera.fit_ground_depth(farm.cam)
 func run():
  out=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(out)
  fixture=JSON.parse_string(FileAccess.get_file_as_string("res://review-view.json"))
@@ -94,6 +99,22 @@ func run():
   runtime.ui.hide()
   farm.cam.size=6.72;farm.FarmCamera.place(farm.cam,farm._house+Vector3(-.8,1.6,.3));farm.FarmCamera.fit_ground_depth(farm.cam)
   await capture("lv15-"+v+"-close")
+  farm.cam.size=saved_size;farm.cam.transform=saved_transform
+  farm.cam.near=saved_near;farm.cam.far=saved_far;runtime.ui.show()
+  # 45-degree future layout review: retain the real default scale and house
+  # screen position. Only yaw changes; no production camera/layout edit.
+  var old_screen=farm.cam.unproject_position(farm._house)
+  angle_view(45.0,farm._house,saved_size)
+  var delta=farm.cam.project_position(old_screen,10)-farm.cam.project_position(Vector2(180,400),10)
+  farm.cam.position-=delta;farm.FarmCamera.fit_ground_depth(farm.cam)
+  await capture("lv15-"+v+"-45-default")
+  runtime.ui.hide()
+  angle_view(45.0,farm._house+Vector3(-.50,1.7,0),6.72)
+  await capture("lv15-"+v+"-45-close")
+  # Reverse diagonal verifies the rear + left elevations using the same real
+  # farm/light. Existing trees may overlap; no scenery is removed for review.
+  angle_view(225.0,farm._house+Vector3(-.50,1.7,0),6.72)
+  await capture("lv15-"+v+"-rear-left",false)
   farm.cam.size=saved_size;farm.cam.transform=saved_transform
   farm.cam.near=saved_near;farm.cam.far=saved_far;runtime.ui.show()
  report.renderer={"engine":Engine.get_version_info().string,"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}

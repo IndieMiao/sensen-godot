@@ -30,3 +30,9 @@ flock /home/deck/gs66-render.lock python3 tools/art/source/homestead_440/android
 该脚本默认已有 `emulator-5592` / 私有ADB 5071，可用环境变量ADB/JOURNEY_SERIAL/ADB_SERVER_SOCKET覆盖；使用包 `com.sensen.homestead440qa`，恢复原wm尺寸密度，结束后停掉该QA应用。验证3次真实点击切换、完整人物与GLB渲染、当前PID日志、安装包完整读回。它是独立资产场景，不是完整农场Android玩法或真机性能结论。
 
 最后用带Pillow的Python运行 `package.py`，把实拍与记录放入 `docs/design/homestead-440/`。图片标题区可加说明，原始360×800像素不缩放、不修饰；原始图也一起保留。
+
+## 45° 补图 / 四立面 v1.1
+
+`secondary_window()` / `rear_facade()` / `wing_back_and_side()` 只补侧后立面，绿窗和木石取色仍来自原屋。前门和外轮廓不变；后门是封闭的静态细节。瓦片仅省掉被实心底板挡住的下面，石块仅省掉埋在实心墙里的背面；不删除完整房体的墙或屋顶。
+
+`review.gd` 额外拍水平45°默认尺度及近景，再拍225°背面与左侧。所有机位俯仰仍43°；45°默认图为检查立面而保留原房屋屏幕位置，不能当成未来全农场最终取景方案。相机参数只改在隔离审阅脚本。反向机位不做前方门牌遮挡断言；两个正面45°机位照常检查三牌。

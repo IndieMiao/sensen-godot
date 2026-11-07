@@ -106,6 +106,111 @@
 			"smoke_full_cycle_top_bound_px": 235.652786254883
 		},
 		{
+			"camera_position": "(20.20934, 15.26445, 4.030499)",
+			"camera_rotation": "(-43.0, 45.0, 0.0)",
+			"camera_size": 13.0227146148682,
+			"highest_pixel": [
+				189.014343261719,
+				223.650955200195
+			],
+			"model_height_m": 4.1085000038147,
+			"name": "lv15-a-45-default",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						112.936370849609,
+						278.137054443359
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						194.096633911133,
+						350.369873046875
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						143.273727416992,
+						317.73046875
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 206.680099487305
+		},
+		{
+			"camera_position": "(12.07698, 10.14277, -4.323021)",
+			"camera_rotation": "(-43.0, 45.0, 0.0)",
+			"camera_size": 6.71999979019165,
+			"highest_pixel": [
+				189.091384887695,
+				283.49267578125
+			],
+			"model_height_m": 4.1085000038147,
+			"name": "lv15-a-45-close",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						41.6595764160156,
+						389.081573486328
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						198.940322875977,
+						529.061767578125
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						100.450462341309,
+						465.809814453125
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 250.604827880859
+		},
+		{
+			"camera_position": "(-0.726979, 10.14277, -17.12698)",
+			"camera_rotation": "(-43.0, -135.0, 0.0)",
+			"camera_size": 6.71999979019165,
+			"highest_pixel": [
+				176.969589233398,
+				265.885833740234
+			],
+			"model_height_m": 4.1085000038147,
+			"name": "lv15-a-rear-left",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						318.340423583984,
+						443.437561035156
+					]
+				},
+				"house_sign": {
+					"house_occludes": true,
+					"screen": [
+						161.059677124023,
+						368.887359619141
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": true,
+					"screen": [
+						259.549530029297,
+						439.975219726562
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 267.840393066406
+		},
+		{
 			"camera_position": "(10.77842, 15.26446, 9.111736)",
 			"camera_rotation": "(-43.0, 14.5, 0.0)",
 			"camera_size": 13.0227146148682,
@@ -174,6 +279,111 @@
 				}
 			},
 			"smoke_full_cycle_top_bound_px": 232.518417358398
+		},
+		{
+			"camera_position": "(20.20934, 15.26445, 4.030499)",
+			"camera_rotation": "(-43.0, 45.0, 0.0)",
+			"camera_size": 13.0227146148682,
+			"highest_pixel": [
+				189.014343261719,
+				222.033569335938
+			],
+			"model_height_m": 4.18849992752075,
+			"name": "lv15-b-45-default",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						112.936370849609,
+						278.137054443359
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						194.096633911133,
+						350.369873046875
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						143.273727416992,
+						317.73046875
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 205.062698364258
+		},
+		{
+			"camera_position": "(12.07698, 10.14277, -4.323021)",
+			"camera_rotation": "(-43.0, 45.0, 0.0)",
+			"camera_size": 6.71999979019165,
+			"highest_pixel": [
+				189.091384887695,
+				280.358337402344
+			],
+			"model_height_m": 4.18849992752075,
+			"name": "lv15-b-45-close",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						41.6595764160156,
+						389.081573486328
+					]
+				},
+				"house_sign": {
+					"house_occludes": false,
+					"screen": [
+						198.940322875977,
+						529.061767578125
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": false,
+					"screen": [
+						100.450462341309,
+						465.809814453125
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 247.470458984375
+		},
+		{
+			"camera_position": "(-0.726979, 10.14277, -17.12698)",
+			"camera_rotation": "(-43.0, -135.0, 0.0)",
+			"camera_size": 6.71999979019165,
+			"highest_pixel": [
+				176.969589233398,
+				265.885833740234
+			],
+			"model_height_m": 4.18849992752075,
+			"name": "lv15-b-rear-left",
+			"signs": {
+				"chef_sign": {
+					"house_occludes": false,
+					"screen": [
+						318.340423583984,
+						443.437561035156
+					]
+				},
+				"house_sign": {
+					"house_occludes": true,
+					"screen": [
+						161.059677124023,
+						368.887359619141
+					]
+				},
+				"upgrade_plaque": {
+					"house_occludes": true,
+					"screen": [
+						259.549530029297,
+						439.975219726562
+					]
+				}
+			},
+			"smoke_full_cycle_top_bound_px": 264.706024169922
 		}
 	],
 	"checks": [
@@ -250,6 +460,50 @@
 			"passed": true
 		},
 		{
+			"check": "lv15-a-45-default 360x800",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-default house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-default upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-default chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-default model top below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-default smoke full-cycle bound below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-close 360x800",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-close house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-close upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-45-close chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-a-rear-left 360x800",
+			"passed": true
+		},
+		{
 			"check": "lv15-b-default 360x800",
 			"passed": true
 		},
@@ -287,6 +541,50 @@
 		},
 		{
 			"check": "lv15-b-close chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-default 360x800",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-default house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-default upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-default chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-default model top below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-default smoke full-cycle bound below y150 limit",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-close 360x800",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-close house_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-close upgrade_plaque unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-45-close chef_sign unobstructed by house",
+			"passed": true
+		},
+		{
+			"check": "lv15-b-rear-left 360x800",
 			"passed": true
 		}
 	],

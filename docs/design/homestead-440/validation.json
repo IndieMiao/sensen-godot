@@ -242,7 +242,7 @@
     ],
     "assets": {
       "master_farmhouse_a": {
-        "triangles": 7658,
+        "triangles": 7874,
         "bounds": [
           [
             -2.0733742713928223,
@@ -255,13 +255,13 @@
             1.3975001573562622
           ]
         ],
-        "bytes": 552472,
-        "sha256": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+        "bytes": 569320,
+        "sha256": "05263dfa07ae3a706c2132b99de4ba1765ceb4f381c32582c8154e9192ed1846",
         "degenerate_triangles": 0,
         "opposite_normals": 0
       },
       "master_farmhouse_b": {
-        "triangles": 8662,
+        "triangles": 8798,
         "bounds": [
           [
             -2.0733742713928223,
@@ -274,8 +274,8 @@
             1.159999966621399
           ]
         ],
-        "bytes": 630496,
-        "sha256": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+        "bytes": 641104,
+        "sha256": "cf112259a1ed269cea5104da55dcf28ac25566333e876218227a2a49cc3e6670",
         "degenerate_triangles": 0,
         "opposite_normals": 0
       }
@@ -396,6 +396,111 @@
         "smoke_full_cycle_top_bound_px": 235.652786254883
       },
       {
+        "camera_position": "(20.20934, 15.26445, 4.030499)",
+        "camera_rotation": "(-43.0, 45.0, 0.0)",
+        "camera_size": 13.0227146148682,
+        "highest_pixel": [
+          189.014343261719,
+          223.650955200195
+        ],
+        "model_height_m": 4.1085000038147,
+        "name": "lv15-a-45-default",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              112.936370849609,
+              278.137054443359
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              194.096633911133,
+              350.369873046875
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              143.273727416992,
+              317.73046875
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 206.680099487305
+      },
+      {
+        "camera_position": "(12.07698, 10.14277, -4.323021)",
+        "camera_rotation": "(-43.0, 45.0, 0.0)",
+        "camera_size": 6.71999979019165,
+        "highest_pixel": [
+          189.091384887695,
+          283.49267578125
+        ],
+        "model_height_m": 4.1085000038147,
+        "name": "lv15-a-45-close",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              41.6595764160156,
+              389.081573486328
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              198.940322875977,
+              529.061767578125
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              100.450462341309,
+              465.809814453125
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 250.604827880859
+      },
+      {
+        "camera_position": "(-0.726979, 10.14277, -17.12698)",
+        "camera_rotation": "(-43.0, -135.0, 0.0)",
+        "camera_size": 6.71999979019165,
+        "highest_pixel": [
+          176.969589233398,
+          265.885833740234
+        ],
+        "model_height_m": 4.1085000038147,
+        "name": "lv15-a-rear-left",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              318.340423583984,
+              443.437561035156
+            ]
+          },
+          "house_sign": {
+            "house_occludes": true,
+            "screen": [
+              161.059677124023,
+              368.887359619141
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": true,
+            "screen": [
+              259.549530029297,
+              439.975219726562
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 267.840393066406
+      },
+      {
         "camera_position": "(10.77842, 15.26446, 9.111736)",
         "camera_rotation": "(-43.0, 14.5, 0.0)",
         "camera_size": 13.0227146148682,
@@ -464,6 +569,111 @@
           }
         },
         "smoke_full_cycle_top_bound_px": 232.518417358398
+      },
+      {
+        "camera_position": "(20.20934, 15.26445, 4.030499)",
+        "camera_rotation": "(-43.0, 45.0, 0.0)",
+        "camera_size": 13.0227146148682,
+        "highest_pixel": [
+          189.014343261719,
+          222.033569335938
+        ],
+        "model_height_m": 4.18849992752075,
+        "name": "lv15-b-45-default",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              112.936370849609,
+              278.137054443359
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              194.096633911133,
+              350.369873046875
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              143.273727416992,
+              317.73046875
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 205.062698364258
+      },
+      {
+        "camera_position": "(12.07698, 10.14277, -4.323021)",
+        "camera_rotation": "(-43.0, 45.0, 0.0)",
+        "camera_size": 6.71999979019165,
+        "highest_pixel": [
+          189.091384887695,
+          280.358337402344
+        ],
+        "model_height_m": 4.18849992752075,
+        "name": "lv15-b-45-close",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              41.6595764160156,
+              389.081573486328
+            ]
+          },
+          "house_sign": {
+            "house_occludes": false,
+            "screen": [
+              198.940322875977,
+              529.061767578125
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": false,
+            "screen": [
+              100.450462341309,
+              465.809814453125
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 247.470458984375
+      },
+      {
+        "camera_position": "(-0.726979, 10.14277, -17.12698)",
+        "camera_rotation": "(-43.0, -135.0, 0.0)",
+        "camera_size": 6.71999979019165,
+        "highest_pixel": [
+          176.969589233398,
+          265.885833740234
+        ],
+        "model_height_m": 4.18849992752075,
+        "name": "lv15-b-rear-left",
+        "signs": {
+          "chef_sign": {
+            "house_occludes": false,
+            "screen": [
+              318.340423583984,
+              443.437561035156
+            ]
+          },
+          "house_sign": {
+            "house_occludes": true,
+            "screen": [
+              161.059677124023,
+              368.887359619141
+            ]
+          },
+          "upgrade_plaque": {
+            "house_occludes": true,
+            "screen": [
+              259.549530029297,
+              439.975219726562
+            ]
+          }
+        },
+        "smoke_full_cycle_top_bound_px": 264.706024169922
       }
     ],
     "checks": [
@@ -540,6 +750,50 @@
         "passed": true
       },
       {
+        "check": "lv15-a-45-default 360x800",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-default house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-default upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-default chef_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-default model top below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-default smoke full-cycle bound below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-close 360x800",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-close house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-close upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-45-close chef_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-a-rear-left 360x800",
+        "passed": true
+      },
+      {
         "check": "lv15-b-default 360x800",
         "passed": true
       },
@@ -578,6 +832,50 @@
       {
         "check": "lv15-b-close chef_sign unobstructed by house",
         "passed": true
+      },
+      {
+        "check": "lv15-b-45-default 360x800",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-default house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-default upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-default chef_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-default model top below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-default smoke full-cycle bound below y150 limit",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-close 360x800",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-close house_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-close upgrade_plaque unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-45-close chef_sign unobstructed by house",
+        "passed": true
+      },
+      {
+        "check": "lv15-b-rear-left 360x800",
+        "passed": true
       }
     ],
     "renderer": {
@@ -612,11 +910,11 @@
           180,
           759
         ],
-        "frames": 55,
+        "frames": 54,
         "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
         "height": 2.10199999809265,
         "model_triangles": 7504,
-        "pid": 23356,
+        "pid": 23946,
         "renderer": "mobile",
         "sequence": 0,
         "surfaces": 1,
@@ -635,8 +933,8 @@
         "frames": 89,
         "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
         "height": 4.1085000038147,
-        "model_triangles": 7658,
-        "pid": 23356,
+        "model_triangles": 7874,
+        "pid": 23946,
         "renderer": "mobile",
         "sequence": 1,
         "surfaces": 1,
@@ -655,8 +953,8 @@
         "frames": 126,
         "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
         "height": 4.18849992752075,
-        "model_triangles": 8662,
-        "pid": 23356,
+        "model_triangles": 8798,
+        "pid": 23946,
         "renderer": "mobile",
         "sequence": 2,
         "surfaces": 1,
@@ -676,7 +974,7 @@
         "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
         "height": 2.10199999809265,
         "model_triangles": 7504,
-        "pid": 23356,
+        "pid": 23946,
         "renderer": "mobile",
         "sequence": 3,
         "surfaces": 1,
@@ -687,38 +985,39 @@
       }
     ],
     "real_button_taps": 3,
-    "apk_sha256": "384e4ead278ca01d52fd48c78ae9921addda609bbeb93af2ecfe4e6d292d63e7",
+    "apk_sha256": "6f9961bff8743e3eb27a1592be86822e95d9071850388d42f4aafb1006f909fe",
     "installed_apk_readback_equal": true,
-    "scope": "Dedicated asset fixture, API37 SwiftShader / Vulkan Mobile. Not a full-game or physical-phone test.",
     "packaged_imported_models_match": [
       {
         "asset": "master_farmhouse_a",
         "imported_path": ".godot/imported/master_farmhouse_a.glb-16e3ecbd531ac50700f6a5403cd6e26c.scn",
-        "sha256": "b0b227a5ce6325641e24e25f851839519d1a14431e6ae3cd49b46fa2103caea8",
-        "bytes": 131072,
-        "source_glb_sha256": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+        "sha256": "bdaf9f30be018e8f4f59a79c8e7bcdd87c11bd7188041b74fc14aa55c18ad4cd",
+        "bytes": 136413,
+        "source_glb_sha256": "05263dfa07ae3a706c2132b99de4ba1765ceb4f381c32582c8154e9192ed1846",
         "packed_uid_and_remap_match": true
       },
       {
         "asset": "master_farmhouse_b",
         "imported_path": ".godot/imported/master_farmhouse_b.glb-759711aa88b0bb831415bebc1fe8c8b0.scn",
-        "sha256": "9c9d44b56aea459ccd47d2301a8cd561e7d2580412333973bc655886ea4e9e6c",
-        "bytes": 146763,
-        "source_glb_sha256": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+        "sha256": "3ef852a78bf6b12fa5eecc03d5d74c8071aebf31562cd0cb2014f3a926fb75c1",
+        "bytes": 151457,
+        "source_glb_sha256": "cf112259a1ed269cea5104da55dcf28ac25566333e876218227a2a49cc3e6670",
         "packed_uid_and_remap_match": true
       }
-    ]
+    ],
+    "scope": "Dedicated asset fixture, API37 SwiftShader / Vulkan Mobile. Not a full-game or physical-phone test."
   },
   "cold_import": {
     "passed": true,
     "godot": "4.7.2",
     "source_and_import_hashes_unchanged": true,
     "files": {
-      "assets/farm/art/master_farmhouse_a.glb": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+      "assets/farm/art/master_farmhouse_a.glb": "05263dfa07ae3a706c2132b99de4ba1765ceb4f381c32582c8154e9192ed1846",
       "assets/farm/art/master_farmhouse_a.glb.import": "cab0b442cd267e966b4d7499627819ca61416ec1fa5879db6252538af5bd993f",
-      "assets/farm/art/master_farmhouse_b.glb": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+      "assets/farm/art/master_farmhouse_b.glb": "cf112259a1ed269cea5104da55dcf28ac25566333e876218227a2a49cc3e6670",
       "assets/farm/art/master_farmhouse_b.glb.import": "6f4b3cc31fa55423445fdc89f6ab13dc57aa1c97c8da5a393a8a8de34c6aef3e"
     },
     "scope": "New assets with empty .godot cache; no class registry or existing import cache."
-  }
+  },
+  "revision": "v1.1 four facades / 197 LOCK-34"
 }

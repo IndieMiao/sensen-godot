@@ -231,7 +231,7 @@
   ],
   "assets": {
     "master_farmhouse_a": {
-      "triangles": 7658,
+      "triangles": 7874,
       "bounds": [
         [
           -2.0733742713928223,
@@ -244,13 +244,13 @@
           1.3975001573562622
         ]
       ],
-      "bytes": 552472,
-      "sha256": "b8edc1db33d2ee5ad9b9ea1a4bc99b51b84555ffaa8493091d7fb3df54850ce7",
+      "bytes": 569320,
+      "sha256": "05263dfa07ae3a706c2132b99de4ba1765ceb4f381c32582c8154e9192ed1846",
       "degenerate_triangles": 0,
       "opposite_normals": 0
     },
     "master_farmhouse_b": {
-      "triangles": 8662,
+      "triangles": 8798,
       "bounds": [
         [
           -2.0733742713928223,
@@ -263,8 +263,8 @@
           1.159999966621399
         ]
       ],
-      "bytes": 630496,
-      "sha256": "6ce260181d1dbed855042639035242f59aefad6b12b76f8cda98990c2125ba5c",
+      "bytes": 641104,
+      "sha256": "cf112259a1ed269cea5104da55dcf28ac25566333e876218227a2a49cc3e6670",
       "degenerate_triangles": 0,
       "opposite_normals": 0
     }
