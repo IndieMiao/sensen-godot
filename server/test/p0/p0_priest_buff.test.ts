@@ -2,6 +2,7 @@
  * Grace Cathedral, each 20 minutes of real time; the farm one halves the ripening of what is sown under it, the fish one
  * lands two of what is cast under it; takes unlimited in the demo week, 2 a player day from 11-15. */
 import { describe, expect, it } from 'vitest';
+import { count } from '../../src/p0/bag.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { growMs } from '../../src/p0/garden.js';
 import { applyP0, type P0Command, type P0Result } from '../../src/p0/reducer.js';
@@ -93,5 +94,48 @@ describe('the farm buff: a snapshot as the seed goes in', () => {
     s = ok(at(s)({ type: 'sow', plot: 2, seed: quick.seed, space: 'home' }, DEMO + M)).state;
     expect(s.plots.find(p => p.id === 2)!.crop).toBe(quick.id);
     expect(s.plots.find(p => p.id === 2)!.boost).toBeUndefined();
+  });
+});
+
+describe('the fish buff: a cast under it lands two', () => {
+  /** Cast at Fern Pond until a fish that comes in (no gate), then land it; returns the result. */
+  function landOne(s: P0State, now: number): { r: P0Result; at: number } {
+    for (let t = now; t < now + 40 * M; t += M) {
+      const cast = ok(at(s)({ type: 'cast', space: 'pond', place: FERN }, t));
+      if (cast.state.cast!.breaks) { s = ok(at(cast.state)({ type: 'reel', outcome: 'cancel', space: 'pond', place: FERN }, t + 100)).state; continue; }
+      const when = t + cast.state.cast!.bite_ms + 1000;
+      return { r: ok(at(cast.state)({ type: 'reel', outcome: 'landed', space: 'pond', place: FERN }, when)), at: when };
+    }
+    throw new Error('no fish came in');
+  }
+
+  it('two of the fish into the bag and the dex count, the XP and the firsts once; a cast before it, one', () => {
+    const plain = landOne(save(), DEMO);
+    const one = ok(plain.r).events.find(e => e.kind === 'catch') as unknown as { fish: string; qty?: number };
+    expect(one.qty).toBeUndefined();
+    let s = save();
+    s = ok(at(s)({ type: 'buff', buff: 'fish', ...CHURCH }, DEMO)).state;
+    const { r } = landOne(s, DEMO + M);
+    const caught = ok(r).events.find(e => e.kind === 'catch') as unknown as { fish: string; qty: number };
+    expect(caught.qty).toBe(2);
+    expect(ok(r).events).toContainEqual({ kind: 'item', id: caught.fish, delta: 2 });
+    expect(count(ok(r).state.bag, caught.fish)).toBe(2);
+    expect(ok(r).state.fishing.caught[caught.fish]).toBe(2);
+    const xp = (res: P0Result) => ok(res).events.filter(e => e.kind === 'xp').map(e => JSON.stringify(e));
+    if (caught.fish === one.fish) expect(xp(r)).toEqual(xp(plain.r));   // the same fish: the same XP
+  });
+
+  it('the cast decides: thrown under it, two even if it ended before the bite; the view marks the cast', () => {
+    let s = save();
+    s = ok(at(s)({ type: 'buff', buff: 'fish', ...CHURCH }, DEMO)).state;
+    for (let t = DEMO + 19 * M; ; t += 1000) {
+      const cast = ok(at(s)({ type: 'cast', space: 'pond', place: FERN }, t));
+      if (cast.state.cast!.breaks) { s = ok(at(cast.state)({ type: 'reel', outcome: 'cancel', space: 'pond', place: FERN }, t + 100)).state; continue; }
+      expect(cast.state.cast!.twin).toBe(true);
+      expect((viewOf(c, cast.state, t) as { fishing: { cast: { twin?: boolean } } }).fishing.cast.twin).toBe(true);
+      const land = ok(at(cast.state)({ type: 'reel', outcome: 'landed', space: 'pond', place: FERN }, DEMO + 21 * M));   // the buff is over
+      expect((land.events.find(e => e.kind === 'catch') as unknown as { qty: number }).qty).toBe(2);
+      break;
+    }
   });
 });

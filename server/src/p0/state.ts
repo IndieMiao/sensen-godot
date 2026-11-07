@@ -41,6 +41,7 @@ export interface Cast {
   xp_pct: number;                       // level difference locked at the bite (§6.7.1)
   breaks: 'level' | 'rod' | null;       // gate failure decided up front, shown after the reel starts
   pin?: string;                         // a teaching pin this cast used (handed back if the line comes in before the bite)
+  twin?: true;                          // the priest's fish buff was on when this was cast: it lands fish_qty of the fish
 }
 /** One heat ring (§7.2.4). q(288) (SGODOT-419): `from` is where the needle sets off on screen (degrees clockwise from 12,
  * shown only), `drift` how fast the ring turns against the needle (°/s); both absent on the teaching pot and older pots. */
