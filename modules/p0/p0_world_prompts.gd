@@ -20,7 +20,7 @@ enum Show { NONE, ICON, BAR }
 static func show(id: String, open: String, metres: float, prompt: Dictionary) -> Show:
 	if id == open: return Show.BAR
 	if not bool(prompt.get("button", true)): return Show.NONE
-	if int(prompt.get("status", -1)) >= 0 or str(prompt.get("count", "")) != "" or metres <= RANGE: return Show.ICON
+	if bool(prompt.get("always", false)) or int(prompt.get("status", -1)) >= 0 or str(prompt.get("count", "")) != "" or metres <= RANGE: return Show.ICON
 	return Show.NONE
 
 static func _p(icon: String, text: String, fact := "", status := -1, dimmed := false, button := true, count := "") -> Dictionary:
@@ -83,6 +83,15 @@ static func bench(view: Dictionary) -> Dictionary:
 ## WORLD-HINT-6a 1822:123663 (far, the tag) / 6b 1822:123873 (near, the strip).
 static func mailbox(view: Dictionary) -> Dictionary:
 	return _p("mailbox", "Mailbox", "", -1, false, true, "" if P0Inbox.parcels(view).is_empty() else "Parcel")
+
+## The farm's way out to the map (SGODOT-443, the user 11-07): the rooms' door — i-door, `Map` (SGODOT-250). Its icon
+## shows from any distance while on screen (不知火舞's spec v1.1 §3, with q(298): from the spawn it is mostly past RANGE,
+## and the sign the user asked for would not be there); its strip opens as any facility's, the nearest.
+## `icon`: the farm's exit icon (P0Farm.EXIT_ICON; q(298) the user 11-07: a map pin with a glow ring, 安其拉 drawing it).
+static func farm_exit(icon := "door") -> Dictionary:
+	var p := _p(icon, "Map")
+	p["always"] = true
+	return p
 
 ## Workbench (231): name only.
 static func workbench() -> Dictionary:

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+  <!-- exit_pin (SGODOT-443, the farm exit's name bar): map.svg's red drop pin with its white dot, its tip sunk in a flat gold ring wider than the pin; the ring thick enough to read at 22 px -->
+  <path fill-rule="evenodd" d="M32 42C47.5 42 60 47.4 60 53S47.5 64 32 64 4 58.6 4 53 16.5 42 32 42ZM32 48.5C23.2 48.5 16 50.5 16 53S23.2 57.5 32 57.5 48 55.5 48 53 40.8 48.5 32 48.5Z" fill="#F2C14E"/>
+  <path d="M32 56C26.5 48.5 14 36 14 21.5A18 18 0 0 1 50 21.5C50 36 37.5 48.5 32 56Z" fill="#E07A5F"/>
+  <circle cx="32" cy="21.5" r="7.5" fill="#FBF8F1"/>
+</svg>
