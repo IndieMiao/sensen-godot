@@ -178,20 +178,6 @@ func test_tea_stools_stand_up_beside_them_in_sight() -> void:
 		var people: Array = r.npcs.values().map(func(x): return (x.root as Node3D).global_position)
 		assert_bool(P0RoomNav.hidden(r.actor.position, people, r._cam_dir)).override_failure_message("%s behind someone" % n).is_false()
 
-## iOS 0.3.1 (2), TEMPORARY (11-07): entering the cathedral crashed iOS 0.3.1 (1); until its cause is fixed the
-## cathedral's pin is not drawn on iOS, so nothing opens it. Android (and the desktop) keep it.
-func test_the_cathedral_is_closed_on_ios_only_for_now() -> void:
-	var church := {"id": "sf_church_1", "role": "church"}
-	var tea := {"id": "sf_tea_1", "role": "tea"}
-	var was := P0Outposts.church_closed
-	P0Outposts.church_closed = true   # as on iOS
-	assert_bool(P0Outposts.shown(church, {})).is_false()
-	assert_bool(P0Outposts.shown(tea, {})).is_true()   # the other places as before
-	P0Outposts.church_closed = false   # Android, the desktop
-	assert_bool(P0Outposts.shown(church, {})).is_true()
-	P0Outposts.church_closed = was
-	assert_bool(P0Outposts.church_closed).is_equal(OS.get_name() == "iOS")
-
 ## q(299): Gabriel greets with no Trade — only his question, which tells his stories in turn, one a tap, round again
 ## after the fifth — and he gives no requests (church is not in requests.local.roles; the card shows none).
 func test_gabriel_only_talks() -> void:
