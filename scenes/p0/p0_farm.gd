@@ -116,7 +116,7 @@ const EXIT_RADIUS_M := 0.6
 const EXIT_PIN_NODE := "pin"   # the piece's pin, bobbed when the piece has no `bob` loop
 const EXIT_BOB_M := 0.1   # either way of where it stands (0.2 m in all; 不知火舞)
 const EXIT_BOB_S := 1.6
-const EXIT_MARK := Vector3(0, 1.3, 0)   # over the pin's top (its piece about 1.0 m, its tip 0.25 m up)
+const EXIT_MARK := Vector3(0, 2.0, 0)   # its strip (centred here, 32 px) ≥ 4 px over the pin's top at its highest bob, about 1.475 m (不知火舞 / 上官婉儿 on 443)
 const EXIT_HIT := Vector3(0, 0.4, 0)
 const EXIT_TAP_PX := 40.0
 var _exit := Vector3.INF
@@ -1041,6 +1041,9 @@ func _exit_piece() -> void:
 	var piece := (load(EXIT_PIECE) as PackedScene).instantiate() as Node3D
 	piece.name = "ExitPin"
 	piece.position = _exit
+	# its red and yellow are vertex colours (赵云's #862): its glTF materials have no albedo of their own (上官婉儿 /
+	# 不知火舞 on 443: white in the game), so the farm art's vertex-colour material on the pin and the ring alike
+	for m in piece.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = FarmArt.material()
 	add_child(piece)
 	var ap := piece.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	if ap and ap.has_animation("bob"):

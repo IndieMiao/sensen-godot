@@ -123,3 +123,16 @@ func test_beside_it_its_map_strip_opens() -> void:
 	var far := ["mailbox", farm._exit + Vector3(6, 0, -6), P0Farm.SIGN_NEAR]
 	assert_str(P0Garden.pick_card([far, farm.exit_card()], farm._exit + Vector3(0.8, 0, 0), "")).is_equal("exit")
 	assert_str(P0Garden.pick_card([far, farm.exit_card()], farm._exit + Vector3(4, 0, 0), "")).is_equal("")   # past its reach
+
+## 不知火舞 / 上官婉儿 on 443: 赵云's pin and ring keep their red and yellow — vertex colours, which their glTF materials
+## do not read (white in the game) — so both wear the farm art's vertex-colour material.
+func test_the_pin_and_its_ring_keep_their_colours() -> void:
+	if not ResourceLoader.exists(P0Farm.EXIT_PIECE): return   # the piece not in this build yet
+	var farm := _farm()
+	farm._exit_piece()
+	var meshes: Array = farm.get_node("ExitPin").find_children("*", "MeshInstance3D", true, false)
+	assert_int(meshes.size()).is_greater_equal(2)   # the pin and the ring
+	for m in meshes:
+		var mat := (m as MeshInstance3D).material_override as BaseMaterial3D
+		assert_object(mat).override_failure_message(str(m.name)).is_not_null()
+		assert_bool(mat.vertex_color_use_as_albedo).override_failure_message(str(m.name)).is_true()
