@@ -1,0 +1,31 @@
+{
+  "source_size": [
+    300,
+    660
+  ],
+  "runtime_directory": "assets/p0/art/residents",
+  "windowed": true,
+  "renderer": "Vulkan Mobile / RADV VANGOGH",
+  "card_sha256": "489c5d7666c95c54b2e097cec8c2565a8392f4207845776aa6c710aad83e2880",
+  "existing_crop_entries_unchanged": 11,
+  "added_crop": {
+    "gabriel": {
+      "stamp": [
+        68,
+        47,
+        170,
+        213
+      ],
+      "face": [
+        70,
+        51,
+        165,
+        165
+      ]
+    }
+  },
+  "formal_baker_unchanged": true,
+  "cold_import_bytes_stable": true,
+  "cold_import_errors": 0,
+  "import_uid": "uid://c6vndeouifivo"
+}

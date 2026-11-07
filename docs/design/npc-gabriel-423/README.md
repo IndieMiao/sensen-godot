@@ -56,5 +56,15 @@ godot --headless --path . --script res://tools/art/verify_gabriel_423.gd
 godot --path . --script res://tools/art/review_gabriel_423.gd
 ```
 
-头像按下一步交付，用原版 `tools/art/bake_resident_portraits.gd` 开窗口烘焙，
-写入 `assets/p0/art/residents/gabriel_card.jpg` 并只追加 Gabriel 裁切坐标。
+## 头像已补齐
+
+`assets/p0/art/residents/gabriel_card.jpg`（300×660，JPEG .92）已用居民头像流程开窗口烘出，
+原舞台、光照、镜头、姿态与裁切算法保留。[头像 / 邮票 / 脸框审阅](portrait-review.png)。
+`portrait_crops.json` 仅追加 `gabriel`：stamp `[68,47,170,213]`，face `[70,51,165,165]`；
+原有 11 条保持原值与文本前缀。产出先在隔离项目的 `assets/p0/art/residents/` 下生成，
+再取出 JPEG 和单条 crop 合并，未覆盖其他居民照片或 crop。
+
+现版运行时的 P0Logic 引用图在 `--script` 过早编译时找不到 Avatar / Localization。
+仅在临时烘焙副本中把 `P0Logic.content()` 改为延迟 `load(...).content()`，待 autoload 就绪后
+读取内容；正式 `tools/art/bake_resident_portraits.gd` 字节不变。唯一行改动及脚本 SHA-256
+见 [provenance](portrait-script-provenance.json)，产出核对见 [portrait-validation](portrait-validation.json)。

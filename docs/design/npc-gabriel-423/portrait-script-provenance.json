@@ -1,0 +1,11 @@
+{
+  "source": "tools/art/bake_resident_portraits.gd",
+  "source_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+  "temporary_copy_sha256": "9342d7627e9191d9dd5e3e4244f9325d8d5753ef292452ee345aad6d8f612622",
+  "only_change": {
+    "before": "var content := P0Logic.content()",
+    "after": "var content: Dictionary = load(\"res://modules/p0/p0_logic.gd\").content()"
+  },
+  "reason": "Current runtime P0Logic graph reaches Avatar/Localization autoload identifiers; --script compiles it too early. Load P0Logic after autoload startup. Camera, light, sizing, assembly, JPEG and crop algorithm are unchanged.",
+  "formal_baker_unchanged": true
+}
