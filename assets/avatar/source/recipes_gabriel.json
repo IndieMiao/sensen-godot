@@ -1,0 +1,38 @@
+{
+	"version": 1,
+	"base": {
+		"fbx": "res://assets/avatar/source/base/SK_DtBase.fbx",
+		"anim_fbx": {
+			"idle": "res://assets/avatar/source/base/dt@idle02.fbx",
+			"walk": "res://assets/avatar/source/base/dt@walk01.fbx",
+			"run": "res://assets/avatar/source/base/dt@run01.fbx"
+		}
+	},
+	"parts": [
+		{
+			"id": "cloth1_npc_gabriel",
+			"slot": "cloth",
+			"attach": "mesh",
+			"tier": 0,
+			"unity_guid": "",
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/cloth1_npc_gabriel/T_gabriel_cloth_D.png",
+					"ao": null,
+					"floats": {
+						"rim_strength": 0.0,
+						"ao_strength": 0.3,
+						"diffuse_strength": 1.0,
+						"emission_strength": 0.3,
+						"smoothness": 0.1
+					}
+				}
+			],
+			"offset": null,
+			"thumb_src": null,
+			"fbx": "res://assets/avatar/source/cloth1/SK_dt_skin01.fbx",
+			"mesh_name": "cloth",
+			"src_files": []
+		}
+	]
+}

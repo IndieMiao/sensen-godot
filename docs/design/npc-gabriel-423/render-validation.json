@@ -1,0 +1,67 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"captures": [
+		{
+			"camera_size": 2.02,
+			"id": "gabriel",
+			"size": [
+				360,
+				800
+			],
+			"view": "front"
+		},
+		{
+			"camera_size": 2.02,
+			"id": "gabriel",
+			"size": [
+				360,
+				800
+			],
+			"view": "three-quarter"
+		},
+		{
+			"camera_size": 2.02,
+			"id": "gabriel",
+			"size": [
+				360,
+				800
+			],
+			"view": "back"
+		},
+		{
+			"camera_size": 2.02,
+			"id": "kai",
+			"size": [
+				360,
+				800
+			],
+			"view": "front"
+		},
+		{
+			"camera_size": 2.02,
+			"id": "mei",
+			"size": [
+				360,
+				800
+			],
+			"view": "front"
+		}
+	],
+	"motion": {
+		"idle": {
+			"animation": "idle",
+			"wrist_moves": true
+		},
+		"walk": {
+			"animation": "walk",
+			"wrist_moves": true
+		}
+	},
+	"renderer": "mobile",
+	"scale": 1.0,
+	"slots": {
+		"cloth": "cloth1_npc_gabriel",
+		"hairHat": "hairhat0",
+		"shoes": "shoes3"
+	}
+}

@@ -1,0 +1,82 @@
+{
+	"checks": [
+		{
+			"check": "Recipe reuses the original cloth1 FBX directly",
+			"passed": true
+		},
+		{
+			"check": "Original cloth1 source FBX bytes preserved",
+			"passed": true
+		},
+		{
+			"check": "Cloth slot uses mesh attachment",
+			"passed": true
+		},
+		{
+			"check": "One mesh surface",
+			"passed": true
+		},
+		{
+			"check": "Extracted vertices, normals, UVs, indices, bones and weights match cloth1",
+			"passed": true
+		},
+		{
+			"check": "Bounds match cloth1",
+			"passed": true
+		},
+		{
+			"check": "All skin bind bones, names and poses match cloth1",
+			"passed": true
+		},
+		{
+			"check": "Runtime material binds the new Gabriel texture",
+			"passed": true
+		},
+		{
+			"check": "Runtime texture size matches cloth1",
+			"passed": true
+		},
+		{
+			"check": "Material parameter unchanged: rim_strength",
+			"passed": true
+		},
+		{
+			"check": "Material parameter unchanged: ao_strength",
+			"passed": true
+		},
+		{
+			"check": "Material parameter unchanged: diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "Material parameter unchanged: emission_strength",
+			"passed": true
+		},
+		{
+			"check": "Material parameter unchanged: smoothness",
+			"passed": true
+		},
+		{
+			"check": "NPC catalog contains Gabriel clothing",
+			"passed": true
+		},
+		{
+			"check": "Player clothing pool excludes Gabriel clothing",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"part": {
+		"attach": "mesh",
+		"bounds": "[P: (-0.280469, 0.545456, -0.116736), S: (0.562752, 0.694843, 0.261729)]",
+		"id": "cloth1_npc_gabriel",
+		"skin_binds": 59,
+		"slot": "cloth",
+		"surfaces": 1,
+		"texture_pixels": [
+			512,
+			512
+		],
+		"triangles": 1629
+	}
+}

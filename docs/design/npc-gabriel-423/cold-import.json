@@ -1,0 +1,17 @@
+{
+  "fresh_godot_cache": true,
+  "scope": "Delivered runtime part, textures and thumbnail; inherited authoring FBXs are excluded from the runtime cold fixture. Original cloth1 FBX separately loaded and audited in 16 structural checks.",
+  "files_compared": 5,
+  "changed_files": [],
+  "errors": [],
+  "source_fbx_reused_not_copied": true,
+  "original_scene_root_script_null": true,
+  "texture_lossless": true,
+  "sha256": {
+    "assets/avatar/source/cloth1_npc_gabriel/T_gabriel_cloth_D.png": "98590ee4f4e47500bf9d92eaa49babadd529fa06c8bba6e1811641add87285f3",
+    "assets/avatar/source/cloth1_npc_gabriel/T_gabriel_cloth_D.png.import": "509095b559b073e34ad702049c1cddc5860a9167faec4accab30fd2252aa85e2",
+    "assets/avatar/parts/cloth1_npc_gabriel.res": "1a70755b1c3372f22114d016f1b4d1048e6baeed5d3e2ace8f214fee1324670e",
+    "assets/avatar/thumbs/cloth1_npc_gabriel.png": "5aab48821d3d1dce4ab904c3d71bfec8c1ce1c5e8aa9c190c45dfbc38e4d6ecb",
+    "assets/avatar/thumbs/cloth1_npc_gabriel.png.import": "f895110ceb32fdd3afd77c97ab4fe78fbde7695eddaeb3b06f6d6bd763bc35c8"
+  }
+}

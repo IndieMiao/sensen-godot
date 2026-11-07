@@ -459,6 +459,16 @@
 			"thumb": "res://assets/avatar/thumbs/glass8.png",
 			"tier": 0,
 			"unity_guid": "a31a8ec11cac7794b9e67c558b7d6f0e"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth1_npc_gabriel",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth1_npc_gabriel.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth1_npc_gabriel.png",
+			"tier": 0,
+			"unity_guid": ""
 		}
 	],
 	"version": 1
