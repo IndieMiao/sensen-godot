@@ -213,3 +213,18 @@ func test_gabriel_only_talks() -> void:
 		(card.content.get_child(0) as UiCommandButton).activated.emit()
 		told.append(card.line)
 	assert_array(told).is_equal(P0Logic.CHURCH_STORIES + [P0Logic.CHURCH_STORIES[0]])
+
+## 不知火舞 / 上官婉儿 on q(299): Gabriel stands up on the sanctuary, so by his own spot every floor point is nearer the
+## first pews' seats; at the spot the player talks to him from it is his name that opens, and beside a pew its seat.
+func test_gabriel_opens_at_his_talking_spot() -> void:
+	var r := _room(CHURCH_ID)
+	await get_tree().process_frame
+	var marks := {}
+	for n in r._tappable():
+		var m: Dictionary = r._marker(n, {})
+		if not m.is_empty(): marks[n] = m
+	r.actor.teleport(r.anchor("stand_keeper").global_position)
+	assert_str(r.card_pick(marks)).is_equal("npc_keeper")
+	r._card = ""
+	r.actor.teleport(r.room.position + Vector3(-0.375, r.floor_y, 1.03))   # the aisle beside the second left pew
+	assert_str(r.card_pick(marks)).is_equal("seat_left_2")
