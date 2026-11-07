@@ -1,0 +1,8 @@
+{
+  "_note": "Grace Cathedral (SGODOT-423 / q(299)): the kit's layout.json anchors (pews, spawn, exit, camera) and Gabriel the priest, its keeper with no counter (talk only) — up on the sanctuary platform (its top 0.54) by the altar table's door side, a little left, facing the door; badge_keeper 2.32 over his feet as in every room; the player greets him on the carpet before the steps (上官婉儿 on church C, 423 3b31f242). His cloth is Lou's dark one until 刘备's cloth1_npc_gabriel (black, a white collar).",
+  "anchors": [
+    {"name": "npc_keeper", "position": [-1.3, 0.54, -1.2], "yaw_degrees": 180},
+    {"name": "badge_keeper", "position": [-1.3, 2.86, -1.2]},
+    {"name": "stand_keeper", "position": [-0.4, 0.08, -0.2], "yaw_degrees": 42}
+  ]
+}

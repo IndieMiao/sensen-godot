@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
-## Grace Cathedral (SGODOT-423; 亚瑟 / 后裔: role `church`, keeper {}, art `poi_church`, 黄忠's kit): its pin, its card
-## and its room. And what made 0.3.0 safe without a forced update (亚瑟 on 423), kept for the next new kind of place: an
+## Grace Cathedral (SGODOT-423; 亚瑟 / 后裔: role `church`, art `poi_church`, 黄忠's kit): its pin, its card and its
+## room, and Gabriel the priest, its keeper who only talks (q(299)). And what made 0.3.0 safe without a forced update (亚瑟 on 423), kept for the next new kind of place: an
 ## outpost of a role and art this build does not know falls back — the travel icon at the post's rank, a card with no
 ## keeper row, the Basic Room — and nothing errors.
 
@@ -65,12 +65,13 @@ func test_the_cathedral_room_on_its_kit() -> void:
 	r.p0_frame({}, 1.0 / 30.0)
 	assert_str(r.place_name).is_equal("Grace Cathedral")
 	assert_str(r.art.scene_file_path).is_equal("res://scenes/poi_church/poi_church_art.tscn")
-	assert_bool(r.npcs.is_empty()).is_true()   # no keeper, no residents, no sign
+	assert_array(r.npcs.keys()).is_equal(["npc_keeper"])   # Gabriel (q(299)); no residents, no sign
+	assert_str(str(r.npcs.npc_keeper.name)).is_equal("Gabriel")
 	assert_object(r.get_node_or_null("Room").find_child("SignText", true, false)).is_null()
 	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("spawn").global_position)).is_less(0.2)
 	assert_str(r.exit_to).is_equal("Map")
 	for n in P0Outposts.find(CHURCH_ID).seats: assert_object(r.anchor(str(n))).override_failure_message(str(n)).is_not_null()
-	assert_array(r.opening_subjects()).is_equal([[r.anchor("cam_default").global_position]])   # nobody: the room's middle
+	assert_vector(r.opening_subjects()[0][0]).is_equal(r.npcs.npc_keeper.root.global_position)   # the opening frames him
 
 func test_an_unknown_place_falls_back() -> void:
 	var m := _map()
@@ -190,3 +191,40 @@ func test_the_cathedral_is_closed_on_ios_only_for_now() -> void:
 	assert_bool(P0Outposts.shown(church, {})).is_true()
 	P0Outposts.church_closed = was
 	assert_bool(P0Outposts.church_closed).is_equal(OS.get_name() == "iOS")
+
+## q(299): Gabriel greets with no Trade — only his question, which tells his stories in turn, one a tap, round again
+## after the fifth — and he gives no requests (church is not in requests.local.roles; the card shows none).
+func test_gabriel_only_talks() -> void:
+	var lines := P0Logic.keeper_lines({}, "church")
+	assert_bool(bool(lines.talk_only)).is_true()
+	assert_array(lines.answers).is_equal(P0Logic.CHURCH_STORIES)
+	assert_bool(bool(P0Logic.keeper_lines({}, "tea").get("talk_only", false))).is_false()
+	var ui := P0Ui.new()
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.open_keeper_greeting("church", {"outpost": CHURCH_ID})
+	assert_str(ui.modal_kind).is_equal("greeting")
+	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
+	assert_str(card.title).is_equal("Priest · Gabriel")
+	assert_array(card.content.get_children().map(func(b): return (b as Button).text)).is_equal(["Any stories?"])
+	assert_str(card.line).is_equal("Welcome to Grace. Sit as long as you like.")
+	var told := []
+	for i in 6:
+		(card.content.get_child(0) as UiCommandButton).activated.emit()
+		told.append(card.line)
+	assert_array(told).is_equal(P0Logic.CHURCH_STORIES + [P0Logic.CHURCH_STORIES[0]])
+
+## 不知火舞 / 上官婉儿 on q(299): Gabriel stands up on the sanctuary, so by his own spot every floor point is nearer the
+## first pews' seats; at the spot the player talks to him from it is his name that opens, and beside a pew its seat.
+func test_gabriel_opens_at_his_talking_spot() -> void:
+	var r := _room(CHURCH_ID)
+	await get_tree().process_frame
+	var marks := {}
+	for n in r._tappable():
+		var m: Dictionary = r._marker(n, {})
+		if not m.is_empty(): marks[n] = m
+	r.actor.teleport(r.anchor("stand_keeper").global_position)
+	assert_str(r.card_pick(marks)).is_equal("npc_keeper")
+	r._card = ""
+	r.actor.teleport(r.room.position + Vector3(-0.375, r.floor_y, 1.03))   # the aisle beside the second left pew
+	assert_str(r.card_pick(marks)).is_equal("seat_left_2")

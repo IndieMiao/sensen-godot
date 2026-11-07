@@ -2501,6 +2501,7 @@ func _show_need_source(tile: Control, id: String) -> void:
 ## by` took a whole row to close the card, `Trade · open the stall` a sentence for a button). role = the counter id ("tackle", "tea", "post",
 ## "market"); ctx = the outpost's keeper ctx {keeper, place, nearest} (SGODOT-227), passed through untouched and kept
 ## for the counter's keeper bar.
+var _keeper_told := {}   # role → answers given this run (Gabriel's stories round, q(299))
 func open_keeper_greeting(role: String, ctx := {}) -> void:
 	if not ctx.is_empty(): _counter_ctx[role] = ctx
 	var c: Dictionary = _counter_ctx.get(role, {})
@@ -2512,10 +2513,11 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	card.theme = UiKit.theme()
 	card.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
 	card.place = str(lines.line)
-	var trade := UiCommandButton.new(str(lines.trade))
-	if role == "casino": trade.activated.connect(func(): _play_blackjack(c))   # Play: the table page, no counter (q(240))
-	else: trade.activated.connect(func(): open_counter(role))
-	card.content.add_child(trade)
+	if not bool(lines.get("talk_only", false)):   # Gabriel has no counter: no Trade (q(299))
+		var trade := UiCommandButton.new(str(lines.trade))
+		if role == "casino": trade.activated.connect(func(): _play_blackjack(c))   # Play: the table page, no counter (q(240))
+		else: trade.activated.connect(func(): open_counter(role))
+		card.content.add_child(trade)
 	# q(272) (不知火舞 378 091a3ae9, LOCK-16 复议 197 1387e81b): a keeper away from home with a local request for the
 	# player — one full-width secondary key under Trade, the question below it; none at all when they have none
 	var lk := P0Locals.key(view, str(c.get("outpost", "")))
@@ -2537,7 +2539,11 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 		card.content.add_child(key)
 	if str(lines.question) != "" and str(lines.answer) != "":
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
-		ask.activated.connect(func(): card.line = str(lines.answer))
+		var answers: Array = lines.get("answers", [lines.answer])
+		ask.activated.connect(func():   # the next answer each press (Gabriel's stories, q(299)); one answer stays as it was
+			var i := int(_keeper_told.get(role, 0))
+			card.line = str(answers[i % answers.size()])
+			_keeper_told[role] = i + 1)
 		card.content.add_child(ask)
 	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	card.offset_left = UiTokens.SIZE_QUICK_BAR_X

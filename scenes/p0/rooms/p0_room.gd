@@ -950,9 +950,18 @@ func card_pick(marks: Dictionary) -> String:
 	var cands: Array = []
 	for n in marks:
 		var m: Dictionary = marks[n]
-		if m.has("kind") and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
+		if m.has("kind") and anchor(n): cands.append([n, _near_point(n), CARD_NEAR_M])
 	_card = P0Garden.pick_card(cands, actor.position, _card)
 	return _card
+
+## Where an anchor counts as near: the anchor itself, but for someone up on a platform (Gabriel on the cathedral's
+## sanctuary, q(299)) the floor spot the player talks to them from — else every floor point is nearer the pew seats.
+func _near_point(n: String) -> Vector3:
+	var at := anchor(n).global_position
+	if P0RoomAnchors.prefix_of(n) == "npc" and at.y - (room.position.y + floor_y) > 0.3:
+		var s := anchor("stand_" + n.trim_prefix("npc_"))
+		if s: return s.global_position
+	return at
 
 ## World prompts and status badges over tappable anchors (SGODOT-250, LOCK-07 / 16 / 30 v2; rt.ui.badge when present),
 ## with the one in reach (`_card`) the only one opened:
