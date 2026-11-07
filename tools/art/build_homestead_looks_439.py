@@ -4,7 +4,7 @@ No edits to the house, the live farm, navigation or existing kit entries.
 from pathlib import Path
 import json,math,sys,hashlib
 import bpy,bmesh
-from mathutils import Vector
+from mathutils import Vector,Matrix
 from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'tools/art'))
 import build_decor_assets as K
@@ -127,6 +127,22 @@ def window(name,x,y,z):
         box(name+' / shutter',(x+side*.28,y,z+.02),(.10,.36,.025),'green')
         for k in range(3):box(name+' / shutter louvre',(x+side*.28,y-.105+k*.105,z+.038),(.08,.018,.014),'green_light')
 
+def secondary_window(name,center,yaw):
+    # Five closed boxes: 60 triangles; the exposed side/rear retain a readable green frame.
+    before=set(K.CURRENT.objects)
+    box(name+' / green surround',(0,0,0),(.46,.37,.045),'green')
+    box(name+' / blue glass',(0,0,.028),(.35,.27,.016),'glass')
+    box(name+' / upright muntin',(0,0,.042),(.022,.27,.014),'cream')
+    box(name+' / horizontal muntin',(0,0,.043),(.35,.021,.014),'cream')
+    box(name+' / sill',(0,-.202,.025),(.51,.035,.11),'wood_light')
+    transform=Matrix.Translation(K.v(center))@Matrix.Rotation(math.radians(yaw),4,'Z')
+    bpy.context.view_layer.update()
+    for obj in set(K.CURRENT.objects)-before:obj.matrix_world=transform@obj.matrix_world
+
+def secondary_facades(name):
+    secondary_window(name+' / outer side window',(-2.345,.64,-.60),-90)
+    secondary_window(name+' / rear window',(-1.40,.69,-1.347),180)
+
 def chimney(name,x,z,bottom,top,stone):
     width=.36 if stone else .22;depth=.35 if stone else .23
     if stone:
@@ -147,7 +163,7 @@ def chimney(name,x,z,bottom,top,stone):
     return [x,top+.075,z]
 
 def kitchen_wing_a():
-    name='Timber kitchen';wing_body(name,False)
+    name='Timber kitchen';wing_body(name,False);secondary_facades(name)
     for x in [-2.285,-.87]:box(name+' / front timber corner',(x,.51,-.015),(.055,.96,.07),'wood')
     box(name+' / front timber sill',(-1.58,.18,-.012),(1.39,.065,.065),'wood_light')
     window(name,-1.60,.63,-.018)
@@ -161,7 +177,7 @@ def kitchen_wing_a():
     return {'stage':'kitchen_extension','look':'a','placement':'house anchor, no additional transform','reference_centre':[-1.63,0,-.75],'smoke_anchor':smoke,'house_join_x':-.845,'required_scenery_moves':['bench','left_house_bush']}
 
 def kitchen_wing_b():
-    name='Stone kitchen';wing_body(name,True)
+    name='Stone kitchen';wing_body(name,True);secondary_facades(name)
     # Slightly irregular visible courses rather than high-poly boulders.
     for row in range(3):
         for col in range(4):
@@ -232,7 +248,7 @@ def main():
     HOUSE_POINTS=[K.v(p) for p in accessor(doc,buf,pr['attributes']['POSITION'])];ids=[x[0] for x in accessor(doc,buf,pr['indices'])];HOUSE_FACES=[ids[i:i+3] for i in range(0,len(ids),3)]
     for name,make in [('porch_a',porch_a),('porch_b',porch_b),('kitchen_wing_a',kitchen_wing_a),('kitchen_wing_b',kitchen_wing_b)]:
         K.begin(name,[1,1],1500);meta=make();export(name,meta)
-    spec={'author':'赵云','virtual_user_id':ACTOR,'revision':'v1','house_sha256':hashlib.sha256((OUT/'house_cottage.glb').read_bytes()).hexdigest(),'runtime_reference':'8493a5c4','palette_srgb':COLORS,'assets':REC,'components':PARTS,'protected_cells':[[x,14] for x in [4,5,7,8,9,10,11]],'porch_floor_max_m':.05,'front_eave_clearance_m':2.0,'ground_fixture_front_limit_z':.975,'source':'tools/art/source/homestead_looks_439/homestead_looks.blend','generator':'tools/art/build_homestead_looks_439.py'}
+    spec={'author':'赵云','virtual_user_id':ACTOR,'revision':'v1.1','house_sha256':hashlib.sha256((OUT/'house_cottage.glb').read_bytes()).hexdigest(),'runtime_reference':'8493a5c4','palette_srgb':COLORS,'assets':REC,'components':PARTS,'protected_cells':[[x,14] for x in [4,5,7,8,9,10,11]],'porch_floor_max_m':.05,'front_eave_clearance_m':2.0,'ground_fixture_front_limit_z':.975,'source':'tools/art/source/homestead_looks_439/homestead_looks.blend','generator':'tools/art/build_homestead_looks_439.py'}
     (SRC/'asset_stats.json').write_text(json.dumps(spec,ensure_ascii=False,indent=2)+'\n')
     (OUT/'homestead_looks_manifest.json').write_text(json.dumps({k:v for k,v in spec.items() if k!='components'},ensure_ascii=False,indent=2)+'\n')
     manifest=json.loads((OUT/'manifest.json').read_text());manifest['assets'].update(REC);(OUT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')

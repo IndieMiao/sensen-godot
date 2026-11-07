@@ -1,7 +1,7 @@
 {
   "author": "赵云",
   "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
-  "revision": "v1",
+  "revision": "v1.1",
   "house_sha256": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c",
   "runtime_reference": "8493a5c4",
   "palette_srgb": {
@@ -102,11 +102,11 @@
     },
     "kitchen_wing_a": {
       "file": "kitchen_wing_a.glb",
-      "triangles": 936,
+      "triangles": 1056,
       "surfaces": 1,
       "bounds": [
         [
-          -2.3974997997283936,
+          -2.4250001907348633,
           0.0,
           -1.537500262260437
         ],
@@ -116,8 +116,8 @@
           0.23749999701976776
         ]
       ],
-      "bytes": 69560,
-      "sha256": "98973502b257b535b572c56e040be684c4b91ed92cb59ebd0e35b7ae73bd0270",
+      "bytes": 78920,
+      "sha256": "7d5f99832e17c8ce79b619b8a9fa513b173ca2e12af0021059f7eed15b680e6b",
       "origin": "P0Garden.ANCHORS.house",
       "axes": "metres, Y up, +Z toward camera",
       "author": "赵云",
@@ -144,11 +144,11 @@
     },
     "kitchen_wing_b": {
       "file": "kitchen_wing_b.glb",
-      "triangles": 1360,
+      "triangles": 1480,
       "surfaces": 1,
       "bounds": [
         [
-          -2.3974997997283936,
+          -2.4250001907348633,
           0.0,
           -1.537500262260437
         ],
@@ -158,8 +158,8 @@
           0.12999999523162842
         ]
       ],
-      "bytes": 104508,
-      "sha256": "47f4e3799a69c94bff50af7e6f90a9fa8b1ea6208b57c1f6a2484a42fdf770da",
+      "bytes": 113868,
+      "sha256": "a1686921bece7d62b0cf8d7c883ab1e92799492ddfe36595b1052e5339f65116",
       "origin": "P0Garden.ANCHORS.house",
       "axes": "metres, Y up, +Z toward camera",
       "author": "赵云",

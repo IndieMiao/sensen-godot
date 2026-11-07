@@ -31,10 +31,10 @@ python3 tools/art/source/homestead_looks_439/prepare.py
 python3 tools/art/source/homestead_looks_439/apply_preview.py
 node --experimental-strip-types --loader ./tools/art/source/homestead_looks_439/ts_resolve.mjs tools/art/source/homestead_looks_439/make_view.ts
 flock ~/gs66-render.lock godot --headless --path output/homestead-439/project --import
-flock ~/gs66-render.lock godot --path output/homestead-439/project --rendering-method mobile --rendering-driver vulkan --max-fps 60 --quit-after 9000
+flock ~/gs66-render.lock godot --path output/homestead-439/project --rendering-method mobile --rendering-driver vulkan --disable-vsync --max-fps 60 --quit-after 9000
 ```
 
-`review.gd` 自动生成六张默认开场和两张门牌近景、`render-validation.json`，结束自行退出。临时移动长凳 / 灌木、隐藏两枚旧踏石的操作只在审阅节点中发生，记录在报告里。六格同一 Lv8 场地保留人物，近景 Lv10 隐藏人物。原生开场宽12.665465 m、近景宽5.6 m；没有强制室内镜头宽。
+`review.gd` 自动生成六张默认开场、两张门牌近景和四张45° / 后侧补充视角、`render-validation.json`，结束自行退出。临时移动长凳 / 灌木、隐藏两枚旧踏石的操作只在审阅节点中发生，记录在报告里。六格同一 Lv8 场地保留人物，近景 Lv10 隐藏人物。原生开场宽12.665465 m、近景宽5.6 m；没有强制室内镜头宽。
 
 ## 占地与打包
 
@@ -46,7 +46,7 @@ python3 tools/art/source/homestead_looks_439/package_review.py
 
 MultiMesh 实际变换审计必须用 Vulkan，headless dummy 的 readback 会返回 identity，不能拿来证明占地。`verify_footprint.py` 按命名部件包围盒给出保守分离距离、记录旧摆件接触候选。它不把包围盒候选宣称为三角形交叠，也不代替将来的程序接入检查。
 
-`package_review.py` 仅拼原始图并加说明标签，保留 `raw/`；媒体哈希写入 media-manifest.json，Plane 上传后下载回读核哈希。默认图需另行实际看过，不能凭脚本成功就宣称通过画面验收。
+`package_review.py` 仅拼原始图并加说明标签，保留 `docs/design/homestead-looks-439/v1.1/raw/`；媒体哈希写入 media-manifest.json，Plane 上传后下载回读核哈希。默认图需另行实际看过，不能凭脚本成功就宣称通过画面验收。
 
 ## 来源
 

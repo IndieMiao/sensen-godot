@@ -11,7 +11,9 @@ var reference_walk:=""
 var mesh_cache:={}
 const FarmArt:=preload("res://modules/farm/farm_art.gd")
 const NAMES:=["porch_a","porch_b","kitchen_wing_a","kitchen_wing_b"]
-func _ready() -> void:run.call_deferred()
+func _ready() -> void:
+ OS.low_processor_usage_mode=false
+ run.call_deferred()
 func check(ok:bool,label:String) -> void:
  checks.append({"check":label,"passed":ok})
  if not ok:push_error(label)
@@ -139,8 +141,24 @@ func run() -> void:
   visibility(look+"_sign_view")
   await shot(look+"_sign_view")
   await finish_farm()
+ # Supplement only: the game's existing dev-yaw hook, with no production camera change.
+ for look in ["a","b"]:
+  await begin_farm(10,look,"kitchen")
+  farm.actor.visible=false
+  farm._opening=false;farm._opening_zoom=false;farm._cam_follow.hold();farm._zoom=1.2
+  farm._focus=farm._house+Vector3(-.5,0,.3)
+  for angle in [45.0,225.0]:
+   if angle==225.0:
+    for node in farm._scenery.find_children("*","MultiMeshInstance3D",true,false):
+     if node.multimesh.mesh in [FarmArt.mesh_for("tree_0"),FarmArt.mesh_for("tree_1"),FarmArt.mesh_for("tree_2")]:node.visible=false
+   farm._dev_yaw=angle;farm._place_camera();await frames(6)
+   check(absf(farm.cam.rotation_degrees.x+43)<.01,"supplement retains pitch43")
+   check(absf(wrapf(farm.cam.rotation_degrees.y-angle,-180,180))<.01,"supplement yaw "+str(angle))
+   await shot(look+("_yaw45" if angle==45.0 else "_rear225"))
+  await finish_farm()
  report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
  check(report.renderer.method=="mobile","Vulkan Mobile target renderer")
+ report.supplemental_preview_notes="rear225 only: background decorative trees hidden for facade inspection; regular and yaw45 shots retain them"
  report.icon_clearance_radius_px=16
  report.checks=checks;report.passed=checks.all(func(c):return c.passed)
  FileAccess.open("res://../render-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
