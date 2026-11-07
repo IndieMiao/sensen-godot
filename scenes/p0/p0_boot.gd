@@ -10,6 +10,7 @@ const FARM := "res://scenes/p0/p0_farm.tscn"
 const POND := "res://scenes/p0/p0_pond.tscn"
 const OUTPOST := "res://scenes/p0/p0_outpost.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
+const P0LandmarkVisit := preload("res://modules/p0/p0_landmark_visit.gd")
 
 static func wanted() -> String:
 	var s := OS.get_environment("P0_SCENE")

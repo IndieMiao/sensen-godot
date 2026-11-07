@@ -35,6 +35,7 @@ const ASSETS := {
 }
 const ScenePan := preload("res://modules/farm/scene_pan.gd")
 const FarmCamera := preload("res://modules/farm/farm_camera.gd")
+const P0LandmarkVisit := preload("res://modules/p0/p0_landmark_visit.gd")
 
 var layout: Dictionary
 var camera_pan := ScenePan.new()
@@ -392,6 +393,8 @@ func recenter_on_player() -> void:
 	_camera_recenter.tween_method(func(weight: float):
 		_focus = start.lerp(_player.position, weight)
 		_update_camera(), 0.0, 1.0, 0.34).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	# done, the P0 visit follows the player again (周瑜 on #870: it waited on a finished tween, never null)
+	_camera_recenter.finished.connect(func(): _camera_recenter = null)
 
 func toggle_overview() -> void:
 	_stop_camera_recenter()

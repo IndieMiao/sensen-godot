@@ -9,6 +9,7 @@ extends "res://scenes/map_poc/map_poc.gd"
 const P0LocalRequest := preload("res://scenes/p0/panels/p0_local_request.gd")   # a local request's card (q(272))
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
+const P0LandmarkVisit := preload("res://modules/p0/p0_landmark_visit.gd")   # q(295): a landmark's scene as a P0 world
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a city's 2 regional fish (MAP-5's Fish here)
 const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")   # the wild sites read by viewport (SGODOT-355 C)
@@ -152,6 +153,7 @@ func _install_city_map() -> void:
 		city_map.place_shown = place_shown   # SGODOT-355: gathering spots and wild sites by zoom
 		city_map.landmark_action = "Go"   # q(295): the two landmarks with a scene (LandmarkScenes) say Go; the rest only their names
 		city_map.info_settled = _clear_card_of_pin
+		city_map.landmark_open = func(e: Dictionary): return P0LandmarkVisit.open(str(e.get("id", "")))
 		city_map.bubble_state = city_bubble
 		city_map.bubble_clear_rects = bubble_clear_rects   # no half bubble under the HUD, the keys or the bar (不知火舞 on 279)
 		_style_locate(city_map.recenter)
@@ -1709,7 +1711,7 @@ func poi_shown(entry: Dictionary) -> bool:
 func _on_city_landmark_requested(entry: Dictionary) -> void:
 	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
 	var region_id := str(region.get("id", ""))
-	var path := LandmarkScenes.path_for(region_id, entry)
+	var path := LandmarkScenes.path_for(region_id, entry) if P0LandmarkVisit.open(str(entry.get("id", ""))) else ""
 	if path.is_empty(): return
 	var cluster := P0Clusters.cluster_of_region(region_id)
 	if cluster == "": return

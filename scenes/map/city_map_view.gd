@@ -136,6 +136,12 @@ var pond_action := "Enter pond"
 var landmark_scenes := true
 ## That key's label: P0 says Go, as on its ponds and outposts (q(295) ②).
 var landmark_action := "Enter scene"
+## (entry) -> bool: whether a landmark with a scene shows its key (P0: one flag each in its content table); unset = all.
+var landmark_open := Callable()
+
+func _landmark_scene(entry: Dictionary) -> String:
+	if not landmark_scenes or (landmark_open.is_valid() and not bool(landmark_open.call(entry))): return ""
+	return LandmarkScenes.path_for(str(host.region.get("id", "")), entry)
 ## (entry) -> bool: whether a POI is drawn (P0, q(212) ⑤: only in the cities explored, the fog's holes); unset = all.
 var poi_shown := Callable()
 ## (entry) -> bool: whether a host place pin is drawn now (P0, SGODOT-355: a city's gathering spots only from a level
@@ -694,7 +700,7 @@ func select(entry: Dictionary) -> void:
 	info_category.text = _category_text(str(entry.get("category", "Place")), _place_city(entry))
 	info_address.text = str(entry.get("address", ""))
 	info_address.visible = not info_address.text.is_empty()
-	var landmark_scene := LandmarkScenes.path_for(str(host.region.get("id", "")), entry) if landmark_scenes else ""
+	var landmark_scene := _landmark_scene(entry)
 	info_action.visible = entry.kind in ["resident", "pond", "place"] or not landmark_scene.is_empty()
 	if entry.kind == "resident":
 		info_category.text = L10n.text("Resident") + " · " + L10n.text(str(entry.get("status", "Talk")))
@@ -748,7 +754,7 @@ func _on_info_action() -> void:
 		"pond": pond_requested.emit(selected)
 		"place": place_requested.emit(selected)
 		"landmark":
-			if not LandmarkScenes.path_for(str(host.region.get("id", "")), selected).is_empty():
+			if not _landmark_scene(selected).is_empty():
 				landmark_requested.emit(selected)
 
 func _pond_view_cells() -> Array:

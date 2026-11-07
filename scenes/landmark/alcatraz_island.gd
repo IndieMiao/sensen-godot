@@ -7,6 +7,7 @@ signal exit_requested
 const ROOT := "res://assets/landmarks/alcatraz_island/"
 const ScenePan := preload("res://modules/farm/scene_pan.gd")
 const FarmCamera := preload("res://modules/farm/farm_camera.gd")
+const P0LandmarkVisit := preload("res://modules/p0/p0_landmark_visit.gd")
 const PHONE_WIDTH := 6.72
 const PITCH := 43.0
 const WALK_SPEED := 2.3

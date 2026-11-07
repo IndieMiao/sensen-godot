@@ -3,6 +3,7 @@ extends GdUnitTestSuite
 ## P0's HUD over them, no Journey chrome, the stick and taps walk, nothing sent; Alcatraz's taps reach the island
 ## through its invisible boundary walls.
 
+const P0LandmarkVisit := preload("res://modules/p0/p0_landmark_visit.gd")
 const ALCATRAZ := "res://scenes/landmark/alcatraz_island.tscn"
 
 func before_test() -> void:

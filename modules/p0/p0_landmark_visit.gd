@@ -1,4 +1,3 @@
-class_name P0LandmarkVisit
 extends RefCounted
 ## q(295) ④: a landmark scene (LandmarkScenes: Alcatraz, Griffith) opened from the P0 map is a P0 world with no
 ## function — P0's HUD and place chip over it (the chip and Android Back go back to the map), the stick and a tap on the
@@ -31,6 +30,11 @@ static func args_for(entry: Dictionary, city: String) -> Dictionary:
 	return {"p0_visit": true, "landmark": str(entry.get("id", "")), "chip": "%s · %s" % [city, place] if city != "" else place}
 
 static func wanted(args: Dictionary) -> bool: return bool(args.get("p0_visit", false))
+
+## Whether a landmark's Go is on in P0: the content table's landmark_scenes (one flag each, assets/p0/content/
+## landmarks.json). Off, its card has no key and a request for it goes nowhere; the dev entry ignores it.
+static func open(id: String) -> bool:
+	return bool(P0Logic.content().get("landmark_scenes", {}).get(id, false))
 
 var _dev := {}   # P0_SCENE's landmark:<id>:<point>:<zoom> (dev_point, dev_zoom)
 

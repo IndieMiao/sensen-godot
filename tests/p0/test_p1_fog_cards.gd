@@ -4,6 +4,7 @@ extends GdUnitTestSuite
 ## hand-written places are San Francisco's whatever the home; no POI is drawn in the fog; a city's card keeps no pin
 ## selected. q(295): a landmark card says Go only for a landmark with a scene, and goes in as a pond does.
 
+const P0LandmarkVisit := preload("res://modules/p0/p0_landmark_visit.gd")
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
@@ -276,8 +277,16 @@ func test_a_landmark_card_says_go_only_with_a_scene() -> void:
 	m.city_map.select(_landmark("san_francisco", "golden_gate_bridge"))
 	assert_bool(m.city_map.info_action.visible).is_false()
 	m.region = P0Clusters.region(LA)
+	# Griffith's Go waits for the fix to its far corners (content landmark_scenes, 不知火舞 / 奕星 11-08)
+	assert_bool(P0LandmarkVisit.open("griffith_observatory")).is_false()
+	m.city_map.select(_landmark("los_angeles", "griffith_observatory"))
+	assert_bool(m.city_map.info_action.visible).is_false()
+	var flags: Dictionary = P0Logic.content().landmark_scenes
+	flags["griffith_observatory"] = true   # its flag on: its key
+	m.city_map.clear_selection()
 	m.city_map.select(_landmark("los_angeles", "griffith_observatory"))
 	assert_bool(m.city_map.info_action.visible).is_true()
+	flags["griffith_observatory"] = false
 	m.city_map.select(_landmark("los_angeles", "hollywood_sign"))
 	assert_bool(m.city_map.info_action.visible).is_false()
 	m.city_map.clear_selection()
@@ -298,6 +307,11 @@ func test_b_a_landmarks_go_is_a_ponds_go() -> void:
 	assert_bool(P0LandmarkVisit.wanted(opened[0][1])).is_true()
 	assert_str(P0LoadingLayer.destination(LandmarkScenes.ALCATRAZ, opened[0][1])).is_equal("San Francisco · Alcatraz Island")
 	m.region = P0Clusters.region(LA)
+	var flags: Dictionary = P0Logic.content().landmark_scenes
+	m._on_city_landmark_requested(_landmark("los_angeles", "griffith_observatory"))   # its flag off: nothing
+	assert_int(opened.size()).is_equal(1)
+	assert_str(rt.ui.modal_kind).is_equal("")
+	flags["griffith_observatory"] = true
 	m._on_city_landmark_requested(_landmark("los_angeles", "griffith_observatory"))   # Los Angeles not visited
 	assert_int(opened.size()).is_equal(1)
 	assert_str(rt.ui.modal_kind).is_equal("city_card")
@@ -313,6 +327,7 @@ func test_b_a_landmarks_go_is_a_ponds_go() -> void:
 	assert_str(str(opened[1][0])).is_equal(LandmarkScenes.GRIFFITH)
 	m._on_city_landmark_requested(_landmark("los_angeles", "hollywood_sign"))   # no scene: nothing
 	assert_int(opened.size()).is_equal(2)
+	flags["griffith_observatory"] = false
 
 func _landmark(region_id: String, id: String) -> Dictionary:
 	for p in CityMapData.landmarks(region_id):
