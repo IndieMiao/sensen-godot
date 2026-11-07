@@ -33,11 +33,13 @@ const P0City := preload("res://modules/p0/p0_city.gd")
 const OnlineCrowd := preload("res://modules/net/online_crowd.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
+const PondWalk := preload("res://modules/ponds/pond_walk.gd")
 const PondGather := preload("res://scenes/p0/p0_pond_gather.gd")   # the pond's gathering points (SGODOT-410)
 var gather: Node3D       # PondGather: the pieces, their name bar and the Gather key
 var _gather_tag := ""    # the point whose name bar is up
 var _gather_marked := "" # the point the guide's `!` is on
 var _scenery: Node3D
+var _trees: Array = []   # the walk's cells the bank's trees block (PondWalk.set_trees), freed when they move
 var _scenery_clear: Array = []   # the points the bank's scenery was built keeping off
 ## The farthest pinch: the farm's 0.8 widened so the open-water ponds (SGODOT-374, 不知火舞: up to 9.7 m across) still
 ## fit one view whole; the opening and the walk stay at 1.0, the farm's player scale.
@@ -138,8 +140,9 @@ func _ready() -> void:
 	var water := FishingWater.build(str(entry.id), site_spec)
 	water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
 	add_child(water)
-	bp = SystemPonds.blueprint(entry)
+	bp = PondWalk.blueprint(entry)   # q(297): the whole meadow but its edges, not the template's 12 × 16 m
 	grid = BlueprintGrid.new(bp)
+	_trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(_scenery_clear))
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
@@ -258,6 +261,7 @@ func _build_scenery(clear: Array) -> void:
 		_scenery.queue_free()
 	_scenery_clear = clear
 	_scenery = PondScenery.build(entry, clear)
+	if grid: _trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(clear), _trees)   # the trees that stand now
 	add_child(_scenery)
 	move_child(_scenery, cam.get_index() + 1)
 
