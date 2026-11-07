@@ -1,6 +1,7 @@
 {
 	"version": 1,
 	"npc_only": [
-		"cloth1_npc_gabriel"
+		"cloth36_npc_gabriel",
+		"hairhat0_npc_gabriel"
 	]
 }

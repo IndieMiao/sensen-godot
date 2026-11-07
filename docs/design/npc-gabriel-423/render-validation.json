@@ -60,8 +60,9 @@
 	"renderer": "mobile",
 	"scale": 1.0,
 	"slots": {
-		"cloth": "cloth1_npc_gabriel",
-		"hairHat": "hairhat0",
+		"cloth": "cloth36_npc_gabriel",
+		"glass": "glass0",
+		"hairHat": "hairhat0_npc_gabriel",
 		"shoes": "shoes3"
 	}
 }

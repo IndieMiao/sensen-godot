@@ -1,6 +1,6 @@
 extends SceneTree
 ## Isolated farm-dev fixture only. Real Avatar rig, resident lighting, fixed camera/scale.
-const SLOTS = {"hairHat":"hairhat0","cloth":"cloth1_npc_gabriel","shoes":"shoes3"}
+const SLOTS = {"hairHat":"hairhat0_npc_gabriel","cloth":"cloth36_npc_gabriel","shoes":"shoes3","glass":"glass0"}
 var elapsed=0.0
 func _initialize():run.call_deferred()
 func _process(delta):
@@ -47,9 +47,10 @@ func run():
    ap.pause()
   kp._viewport.remove_child(rig);rig.free()
  var thumbnailer=PartThumbnailer.new();thumbnailer.catalog=avatar.catalog;root.add_child(thumbnailer)
- var thumb=await thumbnailer.thumbnail("cloth1_npc_gabriel")
- assert(thumb!=null)
- assert(thumb.get_image().save_png("res://assets/avatar/thumbs/cloth1_npc_gabriel.png")==OK)
+ for id in ["cloth36_npc_gabriel","hairhat0_npc_gabriel"]:
+  var thumb=await thumbnailer.thumbnail(id)
+  assert(thumb!=null)
+  assert(thumb.get_image().save_png("res://assets/avatar/thumbs/"+id+".png")==OK)
  FileAccess.open(dir+"/render-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
  print("GABRIEL_REVIEW ",JSON.stringify(report))
  thumbnailer.free();kp.free();quit()

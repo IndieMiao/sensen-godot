@@ -4,7 +4,7 @@ root=Path(__file__).resolve().parents[2]
 (root/"output/gabriel-423").mkdir(parents=True,exist_ok=True)
 (root/"output/.gdignore").touch()
 bpy.ops.wm.read_factory_settings(use_empty=True)
-bpy.ops.import_scene.fbx(filepath=str(root/'assets/avatar/source/cloth1/SK_dt_skin01.fbx'))
+bpy.ops.import_scene.fbx(filepath=str(root/'assets/avatar/source/cloth36_npc_gabriel/SK_dt_skin36.fbx'))
 for o in bpy.context.scene.objects:
  if o.type!='MESH': continue
  m=o.data;m.calc_loop_triangles()

@@ -1,12 +1,14 @@
 {
+  "revision": "v1.1",
   "gabriel": {
     "name_en": "Father Gabriel",
     "name_zh": "Gabriel 神父",
     "scale": 1.0,
     "slots": {
-      "hairHat": "hairhat0",
-      "cloth": "cloth1_npc_gabriel",
-      "shoes": "shoes3"
+      "hairHat": "hairhat0_npc_gabriel",
+      "cloth": "cloth36_npc_gabriel",
+      "shoes": "shoes3",
+      "glass": "glass0"
     }
   }
 }

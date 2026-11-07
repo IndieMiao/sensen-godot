@@ -1,11 +1,11 @@
 {
 	"checks": [
 		{
-			"check": "Recipe reuses the original cloth1 FBX directly",
+			"check": "Recipe uses the cloth36 donor with source image links repaired",
 			"passed": true
 		},
 		{
-			"check": "Original cloth1 source FBX bytes preserved",
+			"check": "Repathed FBX matches recorded SHA-256; geometry checked separately",
 			"passed": true
 		},
 		{
@@ -17,15 +17,15 @@
 			"passed": true
 		},
 		{
-			"check": "Extracted vertices, normals, UVs, indices, bones and weights match cloth1",
+			"check": "Extracted vertices, normals, UVs, indices, bones and weights match cloth36",
 			"passed": true
 		},
 		{
-			"check": "Bounds match cloth1",
+			"check": "Bounds match cloth36",
 			"passed": true
 		},
 		{
-			"check": "All skin bind bones, names and poses match cloth1",
+			"check": "All skin bind bones, names and poses match cloth36",
 			"passed": true
 		},
 		{
@@ -33,7 +33,7 @@
 			"passed": true
 		},
 		{
-			"check": "Runtime texture size matches cloth1",
+			"check": "Runtime texture size matches cloth36",
 			"passed": true
 		},
 		{
@@ -63,20 +63,72 @@
 		{
 			"check": "Player clothing pool excludes Gabriel clothing",
 			"passed": true
+		},
+		{
+			"check": "Hair retains hairHat socket attachment",
+			"passed": true
+		},
+		{
+			"check": "Hair socket offsets match donor",
+			"passed": true
+		},
+		{
+			"check": "Hair scene hierarchy and transforms match donor",
+			"passed": true
+		},
+		{
+			"check": "Hair mesh arrays unchanged",
+			"passed": true
+		},
+		{
+			"check": "Hair material parameter unchanged: rim_strength",
+			"passed": true
+		},
+		{
+			"check": "Hair material parameter unchanged: ao_strength",
+			"passed": true
+		},
+		{
+			"check": "Hair material parameter unchanged: diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "Hair material parameter unchanged: emission_strength",
+			"passed": true
+		},
+		{
+			"check": "Hair material parameter unchanged: smoothness",
+			"passed": true
+		},
+		{
+			"check": "NPC catalog contains hair variant",
+			"passed": true
+		},
+		{
+			"check": "Player hair pool excludes Gabriel hair",
+			"passed": true
+		},
+		{
+			"check": "Existing glass0 available",
+			"passed": true
+		},
+		{
+			"check": "Retired short-sleeve Gabriel ID removed",
+			"passed": true
 		}
 	],
 	"failures": [],
 	"part": {
 		"attach": "mesh",
-		"bounds": "[P: (-0.280469, 0.545456, -0.116736), S: (0.562752, 0.694843, 0.261729)]",
-		"id": "cloth1_npc_gabriel",
-		"skin_binds": 59,
+		"bounds": "[P: (-0.476808, 0.103615, -0.116996), S: (0.953615, 1.139301, 0.282431)]",
+		"id": "cloth36_npc_gabriel",
+		"skin_binds": 38,
 		"slot": "cloth",
 		"surfaces": 1,
 		"texture_pixels": [
 			512,
 			512
 		],
-		"triangles": 1629
+		"triangles": 3192
 	}
 }

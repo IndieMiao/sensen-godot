@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d30dw5uh6i486"
-path="res://.godot/imported/cloth1_npc_gabriel.png-1049da1c52dfbc9f2016e599e7d934df.ctex"
+uid="uid://b4lhfjkm027ee"
+path="res://.godot/imported/hairhat0_npc_gabriel.png-e4c07d8af62b9806eb4599dfba506fab.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/avatar/thumbs/cloth1_npc_gabriel.png"
-dest_files=["res://.godot/imported/cloth1_npc_gabriel.png-1049da1c52dfbc9f2016e599e7d934df.ctex"]
+source_file="res://assets/avatar/thumbs/hairhat0_npc_gabriel.png"
+dest_files=["res://.godot/imported/hairhat0_npc_gabriel.png-e4c07d8af62b9806eb4599dfba506fab.ctex"]
 
 [params]
 

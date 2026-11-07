@@ -10,18 +10,18 @@
 	},
 	"parts": [
 		{
-			"id": "cloth1_npc_gabriel",
+			"id": "cloth36_npc_gabriel",
 			"slot": "cloth",
 			"attach": "mesh",
 			"tier": 0,
 			"unity_guid": "",
 			"materials": [
 				{
-					"albedo": "res://assets/avatar/source/cloth1_npc_gabriel/T_gabriel_cloth_D.png",
+					"albedo": "res://assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png",
 					"ao": null,
 					"floats": {
 						"rim_strength": 0.0,
-						"ao_strength": 0.3,
+						"ao_strength": 0.1,
 						"diffuse_strength": 1.0,
 						"emission_strength": 0.3,
 						"smoothness": 0.1
@@ -30,8 +30,49 @@
 			],
 			"offset": null,
 			"thumb_src": null,
-			"fbx": "res://assets/avatar/source/cloth1/SK_dt_skin01.fbx",
+			"fbx": "res://assets/avatar/source/cloth36_npc_gabriel/SK_dt_skin36.fbx",
 			"mesh_name": "cloth",
+			"src_files": []
+		},
+		{
+			"id": "hairhat0_npc_gabriel",
+			"slot": "hairHat",
+			"attach": "socket",
+			"tier": 0,
+			"unity_guid": "",
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png",
+					"ao": null,
+					"floats": {
+						"rim_strength": 0.0,
+						"ao_strength": 0.5,
+						"diffuse_strength": 1.0,
+						"emission_strength": 0.6,
+						"smoothness": 0.1
+					}
+				}
+			],
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"thumb_src": null,
+			"fbx": "res://assets/avatar/source/hairhat0/SM_hairHat0.fbx",
+			"mesh_name": null,
 			"src_files": []
 		}
 	]

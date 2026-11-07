@@ -1,7 +1,7 @@
 """Dedicated offline emulator fixture: three real taps, animation and package readback."""
 from pathlib import Path
 import hashlib,json,os,re,subprocess,time,zipfile
-R=Path(__file__).resolve().parents[4];O=R/'output/gabriel-423';D=O/'android';D.mkdir(exist_ok=True)
+R=Path(__file__).resolve().parents[4];O=R/'output/gabriel-423';D=O/'android-v11';D.mkdir(exist_ok=True)
 PKG='com.sensen.gabriel423qa';ADB=['/home/deck/Android/Sdk/platform-tools/adb','-s','emulator-5592'];env=dict(os.environ,ADB_SERVER_SOCKET='tcp:127.0.0.1:5071')
 def call(*args):return subprocess.check_output(ADB+list(map(str,args)),env=env,stderr=subprocess.STDOUT)
 def override(kind):
@@ -33,9 +33,12 @@ try:
  path=call('shell','pm','path',PKG).decode().strip().removeprefix('package:');call('pull',path,D/'installed.apk')
  digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
  assert digest(O/'gabriel-qa.apk')==digest(D/'installed.apk')
- z=zipfile.ZipFile(D/'installed.apk');part='assets/avatar/parts/cloth1_npc_gabriel.res';key='assets/'+part
- assert z.read(key)==(R/part).read_bytes()
- tex=[n for n in z.namelist() if n.endswith('.ctex') and 'T_gabriel_cloth_D' in n];assert tex
+ z=zipfile.ZipFile(D/'installed.apk');parts=['assets/avatar/parts/cloth36_npc_gabriel.res','assets/avatar/parts/hairhat0_npc_gabriel.res','assets/avatar/parts/glass0.res']
+ for part in parts:assert z.read('assets/'+part)==(R/part).read_bytes()
+ remap=z.read('assets/assets/avatar/parts/hairhat0_npc_gabriel_scene.tscn.remap').decode()
+ scene_path=re.search(r'path="res://([^"]+)"',remap)[1]
+ assert z.read('assets/'+scene_path)==(O/'mobile-project'/scene_path).read_bytes()
+ tex=[n for n in z.namelist() if n.endswith('.ctex') and ('T_gabriel_cloth_D' in n or 'T_gabriel_hairHat_D' in n)];assert tex
  for n in tex:assert z.read(n)==(O/'mobile-project'/n.removeprefix('assets/')).read_bytes()
  (D/'smoke.json').write_text(json.dumps({'passed':True,'states':records,'real_button_taps':3,'walk_time_advanced':True,'apk_sha256':digest(O/'gabriel-qa.apk'),'installed_apk_readback_equal':True,'packed_part_and_texture_exact':True,'scope':'Offline asset fixture / API37 GFXStream SwiftShader / Vulkan Mobile. No physical-phone timing or full-game claim.'},indent=2)+'\n')
  print('GABRIEL_ANDROID_PASS',flush=True)

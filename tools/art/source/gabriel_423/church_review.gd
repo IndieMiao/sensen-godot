@@ -40,7 +40,7 @@ func run():
   if c is RigActivity:rig.remove_child(c);c.free()
  world.add_child(rig)
  var cfg=avatar.slot_table.default_config()
- for slot in {"hairHat":"hairhat0","cloth":"cloth1_npc_gabriel","shoes":"shoes3"}:cfg.slots[StringName(slot)]={"hairHat":"hairhat0","cloth":"cloth1_npc_gabriel","shoes":"shoes3"}[slot]
+ for slot in {"hairHat":"hairhat0_npc_gabriel","cloth":"cloth36_npc_gabriel","shoes":"shoes3","glass":"glass0"}:cfg.slots[StringName(slot)]={"hairHat":"hairhat0_npc_gabriel","cloth":"cloth36_npc_gabriel","shoes":"shoes3","glass":"glass0"}[slot]
  rig.apply_config(cfg)
  while rig.is_busy():await get_tree().process_frame
  rig.position=Vector3(-1.3,.54,-1.2);rig.rotation_degrees.y=180

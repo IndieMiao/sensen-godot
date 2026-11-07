@@ -1,70 +1,89 @@
-# SGODOT-423 · Father Gabriel / Gabriel 神父
+# SGODOT-423 · Gabriel 神父 / Father Gabriel · v1.1
 
-刘备，2026-11-07。只交 NPC 外观；对话、站位、名字条由哪吒接入。
+刘备，2026-11-07。本版替换已退回的短袖短裤方案；供 #863 审阅，程序接入只对话的 NPC。
 
 ```json
-{"hairHat":"hairhat0","cloth":"cloth1_npc_gabriel","shoes":"shoes3"}
+{"hairHat":"hairhat0_npc_gabriel","cloth":"cloth36_npc_gabriel","shoes":"shoes3","glass":"glass0"}
 ```
 
-使用现成灰白短发 `hairhat0` 和黑靴 `shoes3`。Ivo 的头件含矿工帽，未选用。
-衣服直接引用 cloth1 的原始 FBX，只复制并改色贴图，在原 UV 上改成近黑 `#2B2A2E`、白领
-`#F4F1E8`、深灰袖口与下摆 `#39373D`。没有新增文字、十字或宗教符号。
-**遵守不改网格：仍是 cloth1 原有短袖和短裤，不是新增长袍。**
+实拍比较了 cloth36、cloth1_1、cloth28：cloth1_1 仍是短袖短裤；cloth28 是卷袖制服，
+带腰部器具；cloth36 是完整长袖外套、长裤，选它作为黑色神父服的底件。
+保留现成西装外形，没有重建长袍或修改网格。原白衬衫、红领带、金纽扣统一改近黑，
+领口留白色带，袖口与下摆用深灰。没有文字、十字或新增宗教符号。
 
-衣服 1,629 三角形、一个 surface、59 个 skin binds；顶点、法线、UV、索引、权重、
-原点与骨架均与 cloth1 相同，原始 FBX 未改、也未另存副本。材质参数照底件：rim 0、AO .3、diffuse 1、
-emission .3、smoothness .1。原始贴图 1024²，导入上限 512²，保留 mipmaps。
-新贴图用无损导入：SwiftShader 对 ETC2 采样把黑衣显著抬灰，无损对照恢复了近黑色。
-不改 shader、不加采样或 pass；RGBA8 含 mip 的最坏预算约 1.33 MiB。
+短发采用 hairhat0 的暖白贴图变体，保留阴影层次；不加胡子。
+glass0 是现成圆框透明眼镜，镜框和挂点不改；shoes3 仍用原黑靴。
 
-## 审阅图与检查
+## 审阅图
 
-- [全身正面](gabriel-front.png)、[3/4](gabriel-three-quarter.png)、[背面](gabriel-back.png)，各 360×800。
-- [Kai / Gabriel / Mei 并排](kai-gabriel-mei-lineup.png)：同骨架、scale 1、同镜头 2.02 m。
-- [教堂 360×800](church-360x800.png)：#861 C 版 `4d9668c2` 的艺术装配预览；镜头 43° / 45°、宽 6.72 m，cam_default (0,1.4,-1)。Gabriel 临时摆在 423 评论 `3b31f242` 的 (-1.3,.54,-1.2)、yaw 180。未改正式 layout、导航、房间代码或 UI，这张不是接入后的游戏验收。
-- [16 项导入检查](cloth-import-validation.json)：全部通过，含 NPC catalog 可用、玩家衣柜排除、材质与几何保留。
-- [桌面实渲与 idle / walk](render-validation.json)：Godot 4.7.2 Vulkan Mobile / Deck RADV。
-- [Android smoke](android-smoke.json)、[画面](android-front.png)：独立 APK / API 37 GFXStream SwiftShader；完整蒙皮、3 次真实点按、行走时间推进、APK 和打包 .res / 贴图回读一致。现成头发、黑鞋仍有模拟器偏亮色差；本检查不代表整机色彩一致或实体手机性能。
-- 运行时资产冷导入与新件 UID 检查见 `cold-import.json`（5 个交付文件字节稳定，0 错误）。原始 authoring FBX 的历史外链贴图缺失诊断在完整源码导入中仍存在；配方明确绑定新贴图，原 FBX 单独通过结构审计，本次未改。复用的原始 `.fbx.import` 保留 `nodes/root_script=null`；贴图无损，缩略图用现有 `PartThumbnailer` 实渲。
+- [v1 → v1.1 同机位](v1.1/before-after.png)。v1 仅作为已退回的对照。
+- [正面 / 3/4 / 背面](v1.1/full-body-review.png)：每列 360×800，真实 Godot Vulkan Mobile，未缩放角色。
+- [Kai / Gabriel / Mei](kai-gabriel-mei-lineup.png)：同骨架、scale 1、镜头 2.02 m。
+- [教堂 360×800](church-360x800.png)：#861 C `4d9668c2` 艺术装配预览；镜头俯角 43° / 水平 45°、宽 6.72 m，焦点 (0,1.4,-1)。Gabriel 在 423 评论 `3b31f242` 指定的 (-1.3,.54,-1.2)、yaw 180。站位未变；本图不含正式玩法/UI 接入。
+- [新头像 / 邮票 / 脸框](portrait-review.png)：居民头像烘焙流程开窗口重烘。
 
-## 程序交接：追加，保留已有注册表
+## 网格、材质、导入
 
-本美术分支的基底 `5585f325` 只有 25 个基础部件，**没有运行时的 NPC 扩充表**。
-因此 PR 在美术 manifest 追加一个条目，新 `npc_only.json` 仅列 Gabriel。
-整合到 farm-dev 时，只追加 `cloth1_npc_gabriel` 到现有两个列表，不能整文件覆盖；
-`outpost_npcs.json` 未改。测试夹具基于 farm-dev `8493a5c4`，保留已有 22 个 NPC-only
-部件，加入 Gabriel 后为 23 个。
+衣服 3,192 三角形、1 surface、38 skin binds。顶点、法线、UV、索引、权重、包围盒及
+所有 bind pose 与 `cloth36_npc_sigrid` 完全相同。头发网格、层级、transform、socket offset
+与 hairhat0 一致。材质浮点参数沿用各自 donor，shader、采样次数、pass 均未改：
 
-`assets/avatar/source/recipes_gabriel.json` 按 `recipes_284.json` 的 schema 新列独立配方。
-`tools/art/extract_gabriel_423.gd` 复用现有提取器的单件处理，并保留所有旧条目；可用于
-美术分支和运行时分支。不要在美术基底直接跑旧提取器：该版本不支持 `--append`。
+| 参数 | cloth36 | hairhat0 |
+|---|---:|---:|
+| rim_strength | 0 | 0 |
+| ao_strength | 0.1 | 0.5 |
+| diffuse_strength | 1 | 1 |
+| emission_strength | 0.3 | 0.6 |
+| smoothness | 0.1 | 0.1 |
 
-## 可复现源
+贴图为原 UV 上的确定性改色：近黑 #2B2A2E，白领 #F4F1E8，收边 #39373D；
+头发基色约 #E7E5DF。衣服和头发源图均 1024²，运行时上限 512²、mipmaps、无损导入，
+保留原 alpha。每张 RGBA8 含 mip 最坏约 1.33 MiB；各自替换 donor 原采样。
 
-`tools/art/inspect_gabriel_423.py` 只读取 FBX 的 UV / 坐标；
-`tools/art/recolor_gabriel_423.py` 按原 UV 生成贴图，不导出或修改几何。
-`tools/art/source/gabriel_423/collar-trim-mask.png`：R 白领，G 袖口 / 下摆。
-贴图及原始 FBX 哈希、alpha 保留记录在同目录 `texture-validation.json`。
+`cloth36` 源 FBX 在美术基底缺失，因此此 PR 带其副本。仅修复其中 17 条源贴图路径，
+解决 donor FBX 的失效外链；没有改 mesh/UV/蒙皮/骨架数据。原文件及交付哈希、路径差异见
+[FBX provenance](../../../tools/art/source/gabriel_423/fbx-provenance.json)。未使用的 donor
+body/eyes/shoes 子网格不会提取，实际 cloth 材质由配方绑定。场景 `.import` 有合法 UID、
+`nodes/root_script=null`；两件缩略图由现有 PartThumbnailer 实渲。
+
+- [29 项结构检查](cloth-import-validation.json)：全部通过；包含两件 NPC-only 排除和旧短装 ID 移除。
+- [桌面实渲 / idle、walk](render-validation.json)：Vulkan Mobile / Deck RADV；两种动作骨骼变化通过。
+- [冷导入](cold-import.json)：空 `.godot`，15 个交付文件字节稳定、0 错误、6 个合法唯一 UID。包括新 cloth36 FBX、运行时 .res/.tscn、贴图、缩略图、头像；排除其他历史 authoring FBX。
+- [Android smoke](android-smoke.json)、[正面](android-front.png)：独立 API 37 / GFXStream SwiftShader 夹具，完整显示、3 次真实点按、walk 时间推进、APK 与部件/贴图回读。既有皮肤、眼镜和鞋仍有模拟器偏亮色差；新黑衣/白发无损导入。模拟器检查不代表实体手机性能或整游戏验收。
+
+## 程序交接
+
+旧 `cloth1_npc_gabriel` 已从本 PR 删除。请同步更新 outpost NPC 的四个 slots（含 glass），
+向运行时现有 manifest / npc_only **追加这两件**，保留所有其他 NPC，不能整文件覆盖。
+美术基底保留原 29 条 manifest；运行时夹具使用 farm-dev `8493a5c4`，原 22 件 NPC-only
+保留，加入两件后为 24。注册表只更新 Gabriel；outpost_npcs、导航、任务及对话代码不在本 PR。
+
+配方 `assets/avatar/source/recipes_gabriel.json` 沿用 recipes_284 的 schema。
+`tools/art/extract_gabriel_423.gd` 安全替换 Gabriel 两条，保留其他 ID。不要直接使用美术基底
+旧提取器覆盖全表，它不支持 `--append`。
+
+## 头像与复现
+
+`assets/p0/art/residents/gabriel_card.jpg` 在该规定路径下开窗口生成，300×660；
+`portrait_crops.json` 的 Gabriel 数值本次未变：stamp `[68,47,170,213]`、face `[70,51,165,165]`。
+保留其他 11 条及整个裁切文件原字节；头像像素已换为长袖、白发、眼镜。
+
+临时 baker 仅把 `P0Logic.content()` 延迟 load，适配 autoload 编译顺序；正式 baker、
+镜头、光照、姿态、裁切算法未改。见 [provenance](portrait-script-provenance.json) 和
+[portrait-validation](portrait-validation.json)。
 
 ```sh
+python tools/art/source/gabriel_423/repath_fbx.py
 blender --background --python tools/art/inspect_gabriel_423.py
 python tools/art/recolor_gabriel_423.py
 python tools/art/source/gabriel_423/stage_review.py
-# 以下在打印出的隔离项目内，Godot 命令均持有 ~/gs66-render.lock。
+# 在输出的隔离项目，Godot 工作持有 ~/gs66-render.lock：
 godot --headless --path . --editor --import
+godot --headless --path . --script res://tools/art/extract_gabriel_423.gd
 godot --headless --path . --script res://tools/art/verify_gabriel_423.gd
 godot --path . --script res://tools/art/review_gabriel_423.gd
+godot --path . --script res://tools/art/bake_resident_portraits.gd -- --looks=output/gabriel-looks.json --ids=gabriel --out=assets/p0/art/residents
 ```
 
-## 头像已补齐
-
-`assets/p0/art/residents/gabriel_card.jpg`（300×660，JPEG .92）已用居民头像流程开窗口烘出，
-原舞台、光照、镜头、姿态与裁切算法保留。[头像 / 邮票 / 脸框审阅](portrait-review.png)。
-`portrait_crops.json` 仅追加 `gabriel`：stamp `[68,47,170,213]`，face `[70,51,165,165]`；
-原有 11 条保持原值与文本前缀。产出先在隔离项目的 `assets/p0/art/residents/` 下生成，
-再取出 JPEG 和单条 crop 合并，未覆盖其他居民照片或 crop。
-
-现版运行时的 P0Logic 引用图在 `--script` 过早编译时找不到 Avatar / Localization。
-仅在临时烘焙副本中把 `P0Logic.content()` 改为延迟 `load(...).content()`，待 autoload 就绪后
-读取内容；正式 `tools/art/bake_resident_portraits.gd` 字节不变。唯一行改动及脚本 SHA-256
-见 [provenance](portrait-script-provenance.json)，产出核对见 [portrait-validation](portrait-validation.json)。
+重烘脚本会覆盖临时裁切表，只把 Gabriel 单条合回正式表。源掩码 R=白领、G=收边；
+`texture-validation.json` 记录色值、alpha 与交付 FBX 哈希。
