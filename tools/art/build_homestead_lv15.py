@@ -90,22 +90,7 @@ def rear_facade(variant):
     if x>.10 and .51<y<1.12:continue
     facade_part('Rear cut stone',(x,y,-.825),normal,(0,0,.02),(.323,.222,.04),'stone_light' if (row+col)%4==0 else 'stone',True)
 
-def wing_back_and_side(variant):
- secondary_window((-2.002,.85,-.23),(-1,0),.38,.36)
- secondary_window((-1.43,.91,-1.128),(0,-1),.36,.36)
- if variant=='a':
-  for z in [-1.08,.63]:B('Kitchen outside corner timber',(-2.006,.72,z),(.05,1.22,.065),'wood',0)
-  B('Kitchen outside low rail',(-2.006,.23,-.22),(.05,.06,1.75),'wood',0)
-  for x in [-1.96,-.89]:B('Kitchen rear upright',(x,.72,-1.13),(.065,1.22,.05),'wood',0)
-  B('Kitchen rear low rail',(-1.425,.23,-1.135),(1.11,.06,.045),'wood',0)
- else:
-  for row in range(5):
-   for col in range(3):
-    x=-1.805+col*.38;y=.24+row*.23
-    if col==1 and .58<y<1.2:continue
-    facade_part('Kitchen rear cut stone',(x,y,-1.125),(0,-1),(0,0,.018),(.36,.215,.036),'stone_light' if (row+col)%4==0 else 'stone',True)
-
-def window(x,y,z,width=.37,height=.40,side=False,flowers=False):
+def window(x,y,z,width=.37,height=.40,side=False,flowers=False,flower_raise=0):
  def part(name,offset,size,color,r=0):
   p=(x+offset[2],y+offset[1],z-offset[0]) if side else (x+offset[0],y+offset[1],z+offset[2])
   s=(size[2],size[1],size[0]) if side else size
@@ -120,7 +105,7 @@ def window(x,y,z,width=.37,height=.40,side=False,flowers=False):
   part('Painted green shutter',(s*(width/2+.075),0,.036),(.09,height+.04,.025),'green')
   for k in range(3):part('Shutter louvre',(s*(width/2+.075),-height*.28+k*height*.28,.052),(.075,.02,.013),'green_light')
  if flowers:
-  flower_box(x,y-height/2-.16,z+.09,width+.20)
+  flower_box(x,y-height/2-.16+flower_raise,z+.09,width+.20)
 
 def flower_box(x,y,z,w):
  B('Flower box front',(x,y,z+.10),(w,.14,.07),'wood_light',.012)
@@ -196,73 +181,29 @@ def stone_course(at,size,color,side=False):
    verts.append((at[0]+z,at[1]+y,at[2]-x) if side else (at[0]+x,at[1]+y,at[2]+z))
  return M('Chamfered masonry course',verts,[(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],color)
 
-def pot(x,z,stone=False):
- kit.cylinder('Low flower pot',(x,.11,z),.105,.22,'stone_light' if stone else 'wood',top=.13,segments=10)
- kit.ellipsoid('Potted clipped green',(x,.25,z),(.22,.20,.22),'leaf',8,4)
- for i in range(4):
-  a=i*math.tau/4
-  kit.ellipsoid('Cream porch flower',(x+math.cos(a)*.065,.31,z+math.sin(a)*.065),(.045,.034,.045),'flower',6,3)
-
-def porch(variant):
- # Supports/pots end before row14 (z=.975). Roof alone cantilevers, clear >=2m.
- B('Shallow porch landing',(-.35,.024,.78),(1.17,.048,.38),'wood' if variant=='a' else 'stone_light',.009)
- if variant=='a':
-  for x in [-.84,.14]:
-   B('Porch oak support',(x,1.04,.865),(.105,2.08,.105),'wood',.008)
-   beam('Porch cantilever knee',(x,1.75,.72),(x,2.04,.94),.065,'wood')
-   beam('Porch cantilever arm',(x,2.04,.84),(x,2.04,1.30),.065,'wood')
-  B('Porch eave cross beam',(-.35,2.04,1.265),(1.09,.07,.075),'wood',.006)
-  roof(-.35,1.02,1.16,.69,2.08,2.22,rows=2,cols=4,name='Porch orange tile')
-  B('Porch small bench seat',(.49,.34,.835),(.45,.06,.23),'wood_light',.01)
-  for x in [.33,.65]:B('Porch small bench leg',(x,.17,.835),(.055,.30,.15),'wood',0)
- else:
-  for x in [-.90,.20]:
-   for j in range(5):B('Stone porch pier',(x,.21+j*.405,.86),(.17,.392,.17),'stone_light' if j%2 else 'stone',.012)
-   B('Stone porch capital',(x,2.045,.86),(.24,.09,.21),'stone_light',.009)
-  # Flat elliptical arch: generous clearance without crossing the upstairs sill.
-  for i in range(7):
-   a=i*math.pi/7+.014;b=(i+1)*math.pi/7-.014
-   verts=[]
-   for z in [.82,1.16]:
-    for angle,rx,ry in [(a,.53,.20),(b,.53,.20),(b,.69,.31),(a,.69,.31)]:verts.append((-.35+math.cos(angle)*rx,2.08+math.sin(angle)*ry,z))
-   M('Stone porch arch voussoir',verts,[(0,1,2,3),(7,6,5,4),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)],'stone_light' if i%3 else 'stone')
- for x in [-1.02,.80]:pot(x,.825,variant=='b')
-
-def wing(variant):
- # Root from look_parts: (-1.63,0,-.75). Wall/roof reach the cottage's left wall.
- left=-2.00;right=-.85;front=.68;back=-1.12
- verts=[(left,.12,back),(right,.12,back),(right,.12,front),(left,.12,front),
-  (left,1.38,back),(right,1.94,back),(right,1.94,front),(left,1.38,front)]
- M('Kitchen wing plaster body',verts,[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],'plaster' if variant=='a' else 'stone')
- B('Kitchen wing low foundation',(-1.425,.06,-.22),(1.19,.12,1.84),'stone',.018)
- # Single slope up into main wall; preserve the existing Lv8 placeholder's outer left limit.
- x0=-2.058;x1=-.79;y0=1.40;y1=2.02;z0=-1.225;z1=.775
- M('Kitchen orange roof slab',[(x0,y0,z0),(x1,y1,z0),(x1,y1,z1),(x0,y0,z1),
-  (x0,y0-.065,z0),(x1,y1-.065,z0),(x1,y1-.065,z1),(x0,y0-.065,z1)],[(0,1,2,3),(7,6,5,4),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)],'orange_dark')
- slope=math.atan2(y1-y0,x1-x0);length=math.hypot(y1-y0,x1-x0)
- for row in range(4):
-  t=(row+.5)/4
-  for col in range(7):
-   tile=B('Kitchen separate clay tile',(x0+(x1-x0)*t,y0+(y1-y0)*t+.025,z0+(col+.5)*(z1-z0)/7),(length/4+.015,.035,(z1-z0)/7-.008),'orange_light' if (row+col)%4==0 else 'orange',0)
-   tile.rotation_euler.y=-slope
-   omit_tile_underside(tile)
- for z in [z0,z1]:beam('Kitchen roof side verge',(x0,y0+.03,z),(x1,y1+.03,z),.07,'orange')
- window(-1.43,.92,.695,.36,.36,flowers=True)
- if variant=='a':
-  for x in [-1.96,-.89]:B('Kitchen timber upright',(x,.72,.70),(.065,1.22,.065),'wood',.006)
-  B('Kitchen low timber rail',(-1.425,.23,.715),(1.11,.06,.055),'wood',0)
-  chimney(-1.76,-.60,1.44,2.27)
- else:
-  masonry_wall(-1.43,.30,.721,1.06,.31)
-  masonry_wall(-1.91,.89,.721,.18,1.18)
-  masonry_wall(-.95,.95,.721,.16,1.30)
-  masonry_wall(-1.43,1.34,.721,.69,.29)
-  # Left side wall: low courses, hidden against original foliage.
-  for j in range(5):
-   for k in range(5):
-    B('Kitchen side stone',(-2.02,.24+j*.23,-.94+k*.36),(.045,.215,.34),'stone_light' if (j+k)%4==0 else 'stone',0)
-  chimney(-1.76,-.60,1.45,2.64,True)
- wing_back_and_side(variant)
+def source_component(name,component):
+ # Reuse the exact approved 439 buffers at their already-baked house origin.
+ # Build a named editable mesh with original normals and AO vertex colours.
+ folder=SRC/'reference/439';meta=json.loads((folder/'provenance.json').read_text())
+ path=folder/(name+'.glb');digest=hashlib.sha256(path.read_bytes()).hexdigest()
+ assert digest==meta['files'][path.name]['sha256']
+ doc,data=load_glb(path);p=doc['meshes'][0]['primitives'][0]
+ assert len(doc['meshes'])==1 and len(doc['meshes'][0]['primitives'])==1
+ assert all(n.get('scale',[1,1,1])==[1,1,1] and n.get('translation',[0,0,0])==[0,0,0] and n.get('rotation',[0,0,0,1])==[0,0,0,1] for n in doc['nodes'])
+ xyz=accessor(doc,data,p['attributes']['POSITION']);normals=accessor(doc,data,p['attributes']['NORMAL']);colors=accessor(doc,data,p['attributes']['COLOR_0']);indices=[x[0] for x in accessor(doc,data,p['indices'])]
+ mesh=bpy.data.meshes.new(name+' / exact 439 mesh')
+ mesh.from_pydata([kit.v(v) for v in xyz],[],[indices[i:i+3] for i in range(0,len(indices),3)]);mesh.update()
+ for face in mesh.polygons:face.use_smooth=True
+ mesh.normals_split_custom_set_from_vertices([kit.v(n) for n in normals])
+ attr=mesh.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='CORNER')
+ for loop in mesh.loops:
+  c=colors[loop.vertex_index];attr.data[loop.index].color=(*c[:3],c[3] if len(c)>3 else 1)
+ mesh.color_attributes.active_color=attr;mesh.color_attributes.render_color_index=0
+ mesh.materials.append(bpy.data.materials['Farm vertex paint'])
+ obj=bpy.data.objects.new('439 / '+name+' / original geometry and vertex colour',mesh);kit.CURRENT.objects.link(obj)
+ obj['component']=component;obj['source_commit']=meta['commit'];obj['source_sha256']=digest
+ obj['source_file']=str(path.relative_to(ROOT))
+ return {'name':name,'owner':'赵云','commit':meta['commit'],'sha256':digest,'triangles':len(indices)//3,'transform':'identity / house anchor / no offset','editable_source':meta['editable_source']}
 
 def main_house(variant):
  name='master_farmhouse_'+variant
@@ -286,7 +227,7 @@ def main_house(variant):
   M('Upper side gable',[(x,2.94,-.82),(x,2.94,.82),(x,3.69,0)],[(0,1,2)] if side==1 else [(2,1,0)],'plaster')
  roof(0,0,2.195,2.108,2.94,3.76,across=True)
  for x in [-.43,.43]:
-  window(x,2.62,.836,.36,.42,flowers=True)
+  window(x,2.62,.836,.36,.42,flowers=True,flower_raise=.17 if variant=='a' else 0)
   dormer(x)
  window(.868,2.62,-.15,.40,.40,side=True)
  if variant=='a':
@@ -320,14 +261,11 @@ def main_house(variant):
   chimney(-.66,-.39,3.15,4.12,True)
  rear_facade(variant)
  for obj in kit.CURRENT.objects:obj['component']='main'
- before=set(kit.CURRENT.objects);porch(variant)
- for obj in set(kit.CURRENT.objects)-before:obj['component']='porch'
- before=set(kit.CURRENT.objects);wing(variant)
- for obj in set(kit.CURRENT.objects)-before:obj['component']='kitchen_wing'
+ kit.META[name]['source_components']=[source_component('porch_'+variant,'porch'),source_component('kitchen_wing_'+variant,'kitchen_wing')]
  kit.META[name].pop('footprint_cells',None)
  kit.META[name]['sockets']={'door':[-.35,.495,.855],
   'chimney':[-.66,4.1085 if variant=='a' else 4.1885,-.39],
-  'kitchen_wing_anchor':[-1.63,0,-.75]}
+  'kitchen_wing_anchor':[0,0,0],'kitchen_wing_reference_center':[-1.63,0,-.75]}
  return name
 
 def main():
@@ -350,7 +288,7 @@ def main():
  shader=material.node_tree.nodes['Principled BSDF'];shader.inputs['Roughness'].default_value=.9;shader.inputs['Specular IOR Level'].default_value=.18
  color=material.node_tree.nodes.new('ShaderNodeVertexColor');color.layer_name='Color';material.node_tree.links.new(color.outputs['Color'],shader.inputs['Base Color'])
  for variant in ['a','b']:main_house(variant)
- manifest={'author':'刘备','task':'SGODOT-440','units':'m','assets':{},'palette_target_srgb':PALETTE,'door_center':[-.35,.495,.855],'status':'Whole models using 439 approved coordinate contract; final shape match pending owner GLBs','module_contract':{'house_anchor':[9,16],'house_footprint':[8,15,4,3],'grid_m':.65,'house_front_m':1.13,'wing_anchor':[-1.63,0,-.75],'porch_ground_max_z':.975,'porch_floor_max_y':.05,'porch_clearance_min_y':2.0}}
+ manifest={'author':'刘备','task':'SGODOT-440','units':'m','assets':{},'palette_target_srgb':PALETTE,'door_center':[-.35,.495,.855],'status':'Exact 439 components reused from #858 head 262533a76cf8cef31d52782698f5837611aea6dd; geometry / normals / vertex colours independently compared','module_contract':{'house_anchor':[9,16],'house_footprint':[8,15,4,3],'grid_m':.65,'house_front_m':1.13,'wing_anchor':[0,0,0],'wing_reference_center':[-1.63,0,-.75],'porch_ground_max_z':.975,'porch_floor_max_y':.05,'porch_clearance_min_y':2.0,'attachments_placement':'All four at house anchor with identity transform; no legacy offsets','lv8_combined_x_envelope':[-2.4250001907348633,1.6349704265594482]}}
  manifest['palette_sampled_linear']=samples
  manifest['structural_palette_keys']=sorted(structural)
  manifest['cottage_palette_sha256']=hashlib.sha256((ROOT/'assets/farm/art/house_cottage.glb').read_bytes()).hexdigest()

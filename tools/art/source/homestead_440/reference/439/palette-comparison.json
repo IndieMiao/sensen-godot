@@ -1,0 +1,161 @@
+{
+  "source_commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+  "all_shared_roles_match": true,
+  "roles": [
+    {
+      "role_440": "cream",
+      "role_439": "cream",
+      "target_srgb_440": "fff4d2",
+      "target_srgb_439": "fff4d2",
+      "equal": true
+    },
+    {
+      "role_440": "flower",
+      "role_439": "flower",
+      "target_srgb_440": "fff5df",
+      "target_srgb_439": "fff5df",
+      "equal": true
+    },
+    {
+      "role_440": "glass",
+      "role_439": "glass",
+      "target_srgb_440": "82c5c6",
+      "target_srgb_439": "82c5c6",
+      "equal": true
+    },
+    {
+      "role_440": "glass_dark",
+      "role_439": "glass_dark",
+      "target_srgb_440": "548f99",
+      "target_srgb_439": "548f99",
+      "equal": true
+    },
+    {
+      "role_440": "green",
+      "role_439": "green",
+      "target_srgb_440": "437d64",
+      "target_srgb_439": "437d64",
+      "equal": true
+    },
+    {
+      "role_440": "green_light",
+      "role_439": "green_light",
+      "target_srgb_440": "6a9b6a",
+      "target_srgb_439": "6a9b6a",
+      "equal": true
+    },
+    {
+      "role_440": "leaf",
+      "role_439": "leaf",
+      "target_srgb_440": "6d9a44",
+      "target_srgb_439": "6d9a44",
+      "equal": true
+    },
+    {
+      "role_440": "leaf_dark",
+      "role_439": "leaf_dark",
+      "target_srgb_440": "4e824d",
+      "target_srgb_439": "4e824d",
+      "equal": true
+    },
+    {
+      "role_440": "leaf_light",
+      "role_439": "leaf_light",
+      "target_srgb_440": "97b75b",
+      "target_srgb_439": "97b75b",
+      "equal": true
+    },
+    {
+      "role_440": "orange",
+      "role_439": "orange",
+      "target_srgb_440": "e7954e",
+      "target_srgb_439": "e7954e",
+      "equal": true
+    },
+    {
+      "role_440": "orange_light",
+      "role_439": "orange_light",
+      "target_srgb_440": "f4ad60",
+      "target_srgb_439": "f4ad60",
+      "equal": true
+    },
+    {
+      "role_440": "pink",
+      "role_439": "pink",
+      "target_srgb_440": "e68c9e",
+      "target_srgb_439": "e68c9e",
+      "equal": true
+    },
+    {
+      "role_440": "plaster",
+      "role_439": "plaster",
+      "target_srgb_440": "f0edd0",
+      "target_srgb_439": "f0edd0",
+      "equal": true
+    },
+    {
+      "role_440": "plaster_shade",
+      "role_439": "plaster_shade",
+      "target_srgb_440": "d9d4ae",
+      "target_srgb_439": "d9d4ae",
+      "equal": true
+    },
+    {
+      "role_440": "roof_dark",
+      "role_439": "roof_dark",
+      "target_srgb_440": "454956",
+      "target_srgb_439": "454956",
+      "equal": true
+    },
+    {
+      "role_440": "soil",
+      "role_439": "soil_dark",
+      "target_srgb_440": "785c40",
+      "target_srgb_439": "785c40",
+      "equal": true
+    },
+    {
+      "role_440": "stone",
+      "role_439": "stone",
+      "target_srgb_440": "a5ad98",
+      "target_srgb_439": "a5ad98",
+      "equal": true
+    },
+    {
+      "role_440": "stone_light",
+      "role_439": "stone_light",
+      "target_srgb_440": "c4c6b1",
+      "target_srgb_439": "c4c6b1",
+      "equal": true
+    },
+    {
+      "role_440": "wood",
+      "role_439": "wood",
+      "target_srgb_440": "a87948",
+      "target_srgb_439": "a87948",
+      "equal": true
+    },
+    {
+      "role_440": "wood_dark",
+      "role_439": "wood_dark",
+      "target_srgb_440": "675139",
+      "target_srgb_439": "675139",
+      "equal": true
+    },
+    {
+      "role_440": "wood_light",
+      "role_439": "wood_light",
+      "target_srgb_440": "cba067",
+      "target_srgb_439": "cba067",
+      "equal": true
+    },
+    {
+      "role_440": "yellow",
+      "role_439": "yellow",
+      "target_srgb_440": "f1ce58",
+      "target_srgb_439": "f1ce58",
+      "equal": true
+    }
+  ],
+  "note": "440 soil is the dark potting-soil role 439 calls soil_dark (#785C40); 439 soil (#96764F) is a separate unused role in 440. Imported porch/wing keep the exact 439 AO vertex colours. Main facade keeps the actual cottage sample palette."
+}

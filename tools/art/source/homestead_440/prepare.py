@@ -31,6 +31,9 @@ for name in ['master_farmhouse_a','master_farmhouse_b']:
  for suffix in ['.glb','.glb.import']:
   p=ROOT/'assets/farm/art'/(name+suffix)
   if p.exists():shutil.copy2(p,QA/'assets/farm/art'/p.name)
+for name in ['porch_a','porch_b','kitchen_wing_a','kitchen_wing_b']:
+ for suffix in ['.glb','.glb.import']:
+  p=SRC/'reference/439'/(name+suffix);shutil.copy2(p,QA/'assets/farm/art'/p.name)
 for name in ['review.gd','review.tscn','verify.gd','review-view.json']:
  if (SRC/name).exists():shutil.copy2(SRC/name,QA/name)
 print(QA)

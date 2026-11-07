@@ -12,8 +12,8 @@ assert all(x['passed'] for x in report['checks'])
 for stale in ['main-block-default-preview.png','main-block-close-preview.png']:(DOC/stale).unlink(missing_ok=True)
 for annotated in [False,True]:
  board=Image.new('RGB',(1104,976),'#f4f1e8');d=ImageDraw.Draw(board)
- d.text((16,10),'SGODOT-440 · Lv15 v1.1 四立面补齐 · 木作 / 石作',font=f(25),fill='#283c36')
- d.text((16,46),'实际农场 · 同机位同光照 · 每列原始 360 × 800 · 439 已定接口，最终几何待核同款',font=f(17),fill='#40594d')
+ d.text((16,10),'SGODOT-440 · Lv15 v1.2 对齐439 · 木作 / 石作',font=f(25),fill='#283c36')
+ d.text((16,46),'实际农场 · 同机位同光照 · 每列原始 360 × 800 · 完整复用439 / #858 262533a7四件',font=f(17),fill='#40594d')
  for i,(name,label) in enumerate([('current-default','现房 Cottage'),('lv15-a-default','Lv15 a 木作'),('lv15-b-default','Lv15 b 石作')]):
   x=8+i*368;y=110;im=Image.open(CAP/(name+'.png')).convert('RGB');assert im.size==(360,800);board.paste(im,(x,y))
   d.text((x+6,78),label,font=f(21),fill='#263c32')
@@ -29,7 +29,7 @@ for annotated in [False,True]:
  board.save(DOC/('height-review.png' if annotated else 'default-review.png'))
 close=Image.new('RGB',(744,930),'#f4f1e8');d=ImageDraw.Draw(close)
 d.text((12,8),'门牌视角 · 木作 a / 石作 b',font=f(24),fill='#283c36')
-d.text((12,41),'门、路、三牌不移；长凳(3,16)、左灌木左移为隔离接入预览。',font=f(16),fill='#40594d')
+d.text((12,41),'439同款门廊 / 左翼；近景隐藏远处人物，避免下沿截头。',font=f(16),fill='#40594d')
 for i,v in enumerate(['a','b']):
  x=8+i*368;close.paste(Image.open(CAP/('lv15-'+v+'-close.png')),(x,82))
  d.text((x+8,889),'暖木门廊 / 左翼' if v=='a' else '石拱门廊 / 左翼',font=f(18),fill='#283c36')
@@ -46,6 +46,22 @@ for suffix,title,note in [
    board.paste(Image.open(CAP/(name+'.png')),(x,82))
    d.text((x+8,889),'木作 a' if v=='a' else '石作 b',font=f(18),fill='#283c36')
   board.save(DOC/('angle-45-review.png' if suffix=='45-default' else suffix+'-review.png'))
+# The requested Lv8 / Lv15 comparison keeps the native viewport pixels.
+for suffix,filename,title in [
+ ('default','default-review.png','默认镜头 14.5° · Lv8 赵云版 / Lv15 刘备版'),
+ ('45-default','angle-45-review.png','水平45°、默认尺度 · Lv8 / Lv15'),
+ ('45-close','45-close-review.png','水平45°近景 · 同款门廊、左翼逐件对照')]:
+ board=Image.new('RGB',(1480,976),'#f4f1e8');d=ImageDraw.Draw(board)
+ d.text((16,10),'SGODOT-440 v1.2 · '+title,font=f(25),fill='#283c36')
+ d.text((16,46),'同一实际农场场地、光照；每列原始360×800。Lv8=现房+#858四件；Lv15完整复用同四件，主楼向上生长。',font=f(18),fill='#40594d')
+ for i,(v,level) in enumerate([('a',8),('a',15),('b',8),('b',15)]):
+  x=8+i*368;name='lv'+str(level)+'-'+v+'-'+suffix
+  board.paste(Image.open(CAP/(name+'.png')),(x,110))
+  d.text((x+6,78),('木作 a' if v=='a' else '石作 b')+' · Lv'+str(level)+(' 赵云版' if level==8 else ' 刘备版'),font=f(21),fill='#283c36')
+  width=4.059970617 if v=='a' else 3.6700001955
+  d.text((x+6,918),f'全宽 {width:.3f} m · 总高 {metrics[name]["model_height_m"]:.4f} m',font=f(16),fill='#344d3f')
+  d.text((x+6,943),'同一原点 / 无偏移；门廊、左翼逐值匹配439',font=f(15),fill='#344d3f')
+ board.save(DOC/filename)
 for name in metrics:shutil.copy2(CAP/(name+'.png'),DOC/(name+'.png'))
 for src,name in [(OUT/'glb-validation.json','glb-validation.json'),(CAP/'render-validation.json','render-validation.json'),(OUT/'cold-import.json','cold-import.json'),(OUT/'android/smoke.json','android-smoke.json')]:
  if src.exists():shutil.copy2(src,DOC/name)

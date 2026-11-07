@@ -109,11 +109,35 @@
       "passed": true
     },
     {
-      "check": "master_farmhouse_a: right limit no larger than cottage",
+      "check": "master_farmhouse_a: within same-look Lv8 cottage + exact 439 porch / wing envelope",
       "passed": true
     },
     {
-      "check": "master_farmhouse_a: left limit within measured existing Lv8 timber-wing envelope",
+      "check": "master_farmhouse_a: within approved combined Lv8 X envelope (exact source limits)",
+      "passed": true
+    },
+    {
+      "check": "porch_a: pinned 439 source hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: all porch_a triangle positions / normals / vertex colours equal 439 float32 values",
+      "passed": true
+    },
+    {
+      "check": "porch_a: source triangle count",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_a: pinned 439 source hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: all kitchen_wing_a triangle positions / normals / vertex colours equal 439 float32 values",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_a: source triangle count",
       "passed": true
     },
     {
@@ -185,11 +209,35 @@
       "passed": true
     },
     {
-      "check": "master_farmhouse_b: right limit no larger than cottage",
+      "check": "master_farmhouse_b: within same-look Lv8 cottage + exact 439 porch / wing envelope",
       "passed": true
     },
     {
-      "check": "master_farmhouse_b: left limit within measured existing Lv8 timber-wing envelope",
+      "check": "master_farmhouse_b: within approved combined Lv8 X envelope (exact source limits)",
+      "passed": true
+    },
+    {
+      "check": "porch_b: pinned 439 source hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: all porch_b triangle positions / normals / vertex colours equal 439 float32 values",
+      "passed": true
+    },
+    {
+      "check": "porch_b: source triangle count",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_b: pinned 439 source hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: all kitchen_wing_b triangle positions / normals / vertex colours equal 439 float32 values",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_b: source triangle count",
       "passed": true
     },
     {
@@ -231,49 +279,129 @@
   ],
   "assets": {
     "master_farmhouse_a": {
-      "triangles": 7874,
+      "triangles": 7614,
       "bounds": [
         [
-          -2.0733742713928223,
-          0.0,
-          -1.260000228881836
+          -2.4250001907348633,
+          -4.284083843231201e-08,
+          -1.537500262260437
         ],
         [
-          1.1299999952316284,
+          1.6349704265594482,
           4.108500003814697,
-          1.3975001573562622
+          1.9200000762939453
         ]
       ],
-      "bytes": 569320,
-      "sha256": "05263dfa07ae3a706c2132b99de4ba1765ceb4f381c32582c8154e9192ed1846",
+      "bytes": 602556,
+      "sha256": "91d245ca64a19aff29229f3f0a59544f95c064cdd7a5433ac2f7533a2efec27f",
       "degenerate_triangles": 0,
-      "opposite_normals": 0
+      "opposite_normals": 0,
+      "lv8_reference_x_bounds": [
+        -2.4250001907348633,
+        1.6349704265594482
+      ],
+      "lv8_reference_width_m": 4.0599706172943115
     },
     "master_farmhouse_b": {
-      "triangles": 8798,
+      "triangles": 7844,
       "bounds": [
         [
-          -2.0733742713928223,
+          -2.4250001907348633,
           0.0,
-          -1.260000228881836
+          -1.537500262260437
         ],
         [
-          1.1299999952316284,
+          1.2450000047683716,
           4.188499927520752,
-          1.159999966621399
+          1.9279999732971191
         ]
       ],
-      "bytes": 641104,
-      "sha256": "cf112259a1ed269cea5104da55dcf28ac25566333e876218227a2a49cc3e6670",
+      "bytes": 629920,
+      "sha256": "0c6cfb2481d82cc943ccdffe733000fe2f61e93c0e2dad5f62638703504a3432",
       "degenerate_triangles": 0,
-      "opposite_normals": 0
+      "opposite_normals": 0,
+      "lv8_reference_x_bounds": [
+        -2.4250001907348633,
+        1.2450000047683716
+      ],
+      "lv8_reference_width_m": 3.670000195503235
     }
   },
-  "existing_lv8_timber_width_m": 3.208161525726318,
-  "existing_lv8_timber_x_bounds": [
-    -2.0780000019073483,
-    1.1301615238189697
-  ],
+  "source_439_commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+  "source_components": {
+    "porch_a": {
+      "sha256": "a9c28bdd0be686293c3d3fa9dcb3702769c48ffa0b675edff13f44e21b002571",
+      "triangles": 1104,
+      "missing_or_changed_triangles": 0,
+      "bounds": [
+        [
+          -1.2865523099899292,
+          -4.284083843231201e-08,
+          0.2749999761581421
+        ],
+        [
+          1.6349704265594482,
+          2.4125001430511475,
+          1.9200000762939453
+        ]
+      ],
+      "placement": "identity, house anchor"
+    },
+    "kitchen_wing_a": {
+      "sha256": "7d5f99832e17c8ce79b619b8a9fa513b173ca2e12af0021059f7eed15b680e6b",
+      "triangles": 1056,
+      "missing_or_changed_triangles": 0,
+      "bounds": [
+        [
+          -2.4250001907348633,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          -0.8131667375564575,
+          1.809999942779541,
+          0.23749999701976776
+        ]
+      ],
+      "placement": "identity, house anchor"
+    },
+    "porch_b": {
+      "sha256": "e162a2d4f4d2852e6c89fa64d5a73f087686e344a13b65d6dd4a97e1869bb71e",
+      "triangles": 652,
+      "missing_or_changed_triangles": 0,
+      "bounds": [
+        [
+          -1.2449703216552734,
+          0.0,
+          0.5
+        ],
+        [
+          1.2450000047683716,
+          1.2842596769332886,
+          1.9279999732971191
+        ]
+      ],
+      "placement": "identity, house anchor"
+    },
+    "kitchen_wing_b": {
+      "sha256": "a1686921bece7d62b0cf8d7c883ab1e92799492ddfe36595b1052e5339f65116",
+      "triangles": 1480,
+      "missing_or_changed_triangles": 0,
+      "bounds": [
+        [
+          -2.4250001907348633,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          -0.8131667375564575,
+          2.3600001335144043,
+          0.12999999523162842
+        ]
+      ],
+      "placement": "identity, house anchor"
+    }
+  },
   "failures": [],
-  "pending": "Whole models using 439 approved coordinate contract; final shape match pending owner GLBs"
+  "component_match_status": "Exact 439 components reused from #858 head 262533a76cf8cef31d52782698f5837611aea6dd; geometry / normals / vertex colours independently compared"
 }
