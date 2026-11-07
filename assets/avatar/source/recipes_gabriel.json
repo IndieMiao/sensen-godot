@@ -74,6 +74,31 @@
 			"fbx": "res://assets/avatar/source/hairhat0/SM_hairHat0.fbx",
 			"mesh_name": null,
 			"src_files": []
+		},
+		{
+			"id": "shoes3_npc_gabriel",
+			"slot": "shoes",
+			"attach": "mesh",
+			"tier": 0,
+			"unity_guid": "",
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/shoes3_npc_gabriel/T_skin03_shoes_D.png",
+					"ao": null,
+					"floats": {
+						"rim_strength": 0.0,
+						"ao_strength": 0.54,
+						"diffuse_strength": 1.0,
+						"emission_strength": 0.45,
+						"smoothness": 0.1
+					}
+				}
+			],
+			"offset": null,
+			"thumb_src": null,
+			"fbx": "res://assets/avatar/source/shoes3_npc_gabriel/SK_dt_skin03.fbx",
+			"mesh_name": "shoes",
+			"src_files": []
 		}
 	]
 }

@@ -1022,6 +1022,16 @@
 					1.0
 				]
 			}
+		},
+		{
+			"id": "shoes3_npc_gabriel",
+			"slot": "shoes",
+			"attach": "mesh",
+			"tier": 0,
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shoes3_npc_gabriel.res",
+			"thumb": "res://assets/avatar/thumbs/shoes3_npc_gabriel.png",
+			"unity_guid": ""
 		}
 	],
 	"version": 1
