@@ -30,6 +30,7 @@ import { wearTitle } from './titles.js';
 
 import { guideAck, guideKeys, settleGuide } from './guide.js';
 import { blackjackCommand, settleBlackjack, type BjCommand } from './blackjack.js';
+import { farmBoost, takeBuff } from './buffs.js';
 export type { P0Event } from './progress.js';
 
 /** Every command may carry `expect_seq`: the state version the client saw. A mismatch is refused as
@@ -47,6 +48,7 @@ type P0CommandBody =
   | { type: 'equip'; item: string }
   | { type: 'sell'; item: string; qty: number | 'all'; shop?: string }
   | { type: 'drink'; item: string; shop?: string }
+  | { type: 'buff'; buff: 'farm' | 'fish' }   // the priest's buffs, in the cathedral (buffs.ts)
   | { type: 'lock' | 'unlock'; item: string }
   | { type: 'store' | 'take_out'; item: string; qty: number | 'all' }
   | { type: 'rest' }
@@ -192,11 +194,15 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const pct = xpPercent(c, skillLevel(c, s, 'farming'), crop.level);
       noteSown(c, s, n, crop.id);
       const watered = wateredPlots(c, s);   // a sprinkler's ring or a greenhouse
+      // the priest's farm buff, as the seed goes in (a snapshot: it ripens faster all the way, the buff gone by or not);
+      // quick and fast seeds keep their fixed times
+      const boost = crop.quick ? undefined : farmBoost(c, s, now);
       for (const plot of plots as Plot[]) {
         plot.state = 'sown';
         plot.crop = crop.id;
         plot.xp_pct = pct;
-        delete plot.ready_at; delete plot.fert;
+        delete plot.ready_at; delete plot.fert; delete plot.boost;
+        if (boost !== undefined) plot.boost = boost;
         // §5.7: under a sprinkler it grows as it is sown (−15%, locked now), no Water step.
         if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + ripenMs(c, s, plot, crop); }
       }
@@ -290,9 +296,14 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
           firstXp(c, s, now, 'farming', first, crop.first_xp, events);
         }
         plot.state = 'tilled';
-        delete plot.crop; delete plot.xp_pct; delete plot.ready_at; delete plot.fert;
+        delete plot.crop; delete plot.xp_pct; delete plot.ready_at; delete plot.fert; delete plot.boost;
       }
       if (fits < plots.length) events.push({ kind: 'harvest_short', got: fits, of: plots.length, plot: plots[fits]!.id });
+      break;
+    }
+    case 'buff': {   // the priest's buffs (buffs.ts): in the cathedral, the day's takes, 20 minutes from now
+      const refusal = takeBuff(c, s, cmd, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'buy': case 'sell': case 'drink': case 'lock': case 'unlock': case 'store': case 'take_out': {

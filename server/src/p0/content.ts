@@ -349,6 +349,9 @@ export interface P0Content {
     first_dig?: { giver: string; floor: number; gate: { homestead: number }; reward: { weapon?: string; affinity?: number };
       lines?: Record<string, string> };
   };
+  /** The priest's buffs (assets/p0/content/world_buffs.json; buffs.ts): minutes each lasts, the farm one's share of a
+   * ripening time, the fish one's catch, and the takes a player day from limit_from on. Absent: no buffs in this build. */
+  buffs?: { minutes: number; farm_mult: number; fish_qty: number; daily: number; limit_from: string };
   /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
   /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; how many of them the homestead has

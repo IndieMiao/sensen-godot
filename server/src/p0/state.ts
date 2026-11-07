@@ -13,6 +13,7 @@ export interface Plot {
   crop?: string; xp_pct?: number; ready_at?: number;
   fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest; on a tree, Orchard Feed
   picks?: number;                 // a tree (P1, q(118)): times picked; 0 while it ripens the first time
+  boost?: number;                 // the priest's farm buff when this was sown (its share of the ripening time, 0.5), gone at harvest
 }
 /** A facility standing on a plot (P1, SGODOT-239): a sprinkler waters the ring of 8 around it. Never removed (q(22)). */
 export interface Facility { id: number; kind: string; plot: number; under?: 'wild' | 'tilled'; cell?: [number, number] }   // under: the plot as it was, back when it moves; cell: a yard facility's cell (plot −1)
@@ -174,6 +175,7 @@ export interface P0Day {
   mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)
   compost?: number;                     // crops turned into Compost at the Compost Bin today (q(118) ③, ≤ 5)
   bj_net?: number;                      // SGODOT-351: the card room's net coins today, hands begun today only — the observation log's, no economy's
+  buffs?: number;                       // the priest's buffs taken today, both kinds (buffs.ts; limited from content.buffs.limit_from)
 }
 
 /** The save version this server writes. v7 is SGODOT-355's first batch: the save is cleared at that release (plan v4
@@ -240,6 +242,7 @@ export interface P0State {
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   guide?: GuideState;            // SGODOT-341 new-player guide: step and counts (guide.ts); older saves are legacy, no version of its own
   blackjack?: import('./blackjack.js').BjState;   // SGODOT-351 the card room: intro seen, hand count, the hand in play, a result not yet seen (no version of its own)
+  buffs?: { farm?: number; fish?: number };   // the priest's buffs (buffs.ts): each one's end, real time; one gone by is dropped at the next take
   title?: string;                // q(180): the title worn, a stable id (titles.ts); absent until the player picks one, never filled in
   rng: number;
   seq: number;
