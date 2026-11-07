@@ -2914,9 +2914,9 @@
       "axes": "metres; Y up; +Z toward camera",
       "placement_name": "A",
       "placement_world": [
-        1.6,
+        1.625,
         0,
-        0
+        -0.325
       ],
       "pin_centre_z": -0.1,
       "pin_width_m": 0.7714285714285715,
@@ -2961,7 +2961,17 @@
       "source_delivery": "SGODOT-443 source bundle; Blender, generator, validation and model-only review",
       "reference": "SGODOT-443 d9e7a52a / exit_pin.svg",
       "reference_sha256": "7c77afcf88185cf4e089423d5ddd6b7a9c4fdde4a72d7ee1c27116c75b5659d9",
-      "revision": "v1.1"
+      "revision": "v1.1",
+      "placement_cell": [
+        2,
+        0
+      ],
+      "comparison_placement_world": [
+        4.875,
+        0,
+        -0.575
+      ],
+      "placement_note": "A/C isolated review; actual scene placement and screen exit icon belong to the exit integration PR"
     }
   }
 }
