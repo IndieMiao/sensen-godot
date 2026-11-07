@@ -3,6 +3,7 @@
  * lands two of what is cast under it; takes unlimited in the demo week, 2 a player day from 11-15. */
 import { describe, expect, it } from 'vitest';
 import { count } from '../../src/p0/bag.js';
+import { room, stackLimit } from '../../src/p0/bag.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { growMs } from '../../src/p0/garden.js';
 import { applyP0, type P0Command, type P0Result } from '../../src/p0/reducer.js';
@@ -97,6 +98,23 @@ describe('the farm buff: a snapshot as the seed goes in', () => {
   });
 });
 
+describe('the farm buff skips the fixed-time seeds (周瑜 on #865)', () => {
+  it('a fast crop (Cress) keeps its fixed time and no boost', () => {
+    let s = save();
+    s = ok(at(s)({ type: 'buff', buff: 'farm', ...CHURCH }, DEMO)).state;
+    const fast = c.fast_crops?.find(f => f.id === 'crop_cress');
+    expect(fast).toBeDefined();
+    if (!fast) return;
+    if (!s.bag.some(b => b.id === fast.seed)) s.bag.push({ id: fast.seed, qty: 1 } as never);
+    s = ok(at(s)({ type: 'sow', plot: 3, seed: fast.seed, space: 'home' }, DEMO + M)).state;
+    s = ok(at(s)({ type: 'water', plot: 3, space: 'home' }, DEMO + 2 * M)).state;
+    const p = s.plots.find(x => x.id === 3)!;
+    expect(p.crop).toBe('crop_cress');
+    expect(p.boost).toBeUndefined();
+    expect(p.ready_at! - (DEMO + 2 * M)).toBe(fast.grow_s * 1000);
+  });
+});
+
 describe('the fish buff: a cast under it lands two', () => {
   /** Cast at Fern Pond until a fish that comes in (no gate), then land it; returns the result. */
   function landOne(s: P0State, now: number): { r: P0Result; at: number } {
@@ -123,6 +141,43 @@ describe('the fish buff: a cast under it lands two', () => {
     expect(ok(r).state.fishing.caught[caught.fish]).toBe(2);
     const xp = (res: P0Result) => ok(res).events.filter(e => e.kind === 'xp').map(e => JSON.stringify(e));
     if (caught.fish === one.fish) expect(xp(r)).toEqual(xp(plain.r));   // the same fish: the same XP
+  });
+
+  /** Cast, then make the line's fish a set one that comes in (so two runs compare like for like). */
+  function castFixed(s: P0State, now: number, fish = 'fish_crucian'): P0State {
+    const cast = ok(at(s)({ type: 'cast', space: 'pond', place: FERN }, now)).state;
+    cast.cast = { ...cast.cast!, fish, breaks: null };
+    return cast;
+  }
+
+  it('the same fish twice gives the same XP and firsts, buff or not: the fish counts once (周瑜 on #865)', () => {
+    const plain = castFixed(save(), DEMO);
+    const one = ok(at(plain)({ type: 'reel', outcome: 'landed', space: 'pond', place: FERN }, DEMO + plain.cast!.bite_ms + 1000));
+    let s = save();
+    s = ok(at(s)({ type: 'buff', buff: 'fish', ...CHURCH }, DEMO - M)).state;
+    s = castFixed(s, DEMO);
+    const two = ok(at(s)({ type: 'reel', outcome: 'landed', space: 'pond', place: FERN }, DEMO + s.cast!.bite_ms + 1000));
+    const rest = (r: P0Result) => ok(r).events.filter(e => e.kind !== 'item' && e.kind !== 'catch').map(e => JSON.stringify(e));
+    expect(rest(two)).toEqual(rest(one));   // XP, first catch, dex: the very same events
+    expect(count(two.state.bag, 'fish_crucian')).toBe(2);
+    expect(count(one.state.bag, 'fish_crucian')).toBe(1);
+  });
+
+  it('room for one only (the bag filled while it bit): one landed, qty 1, the second not given (周瑜 on #865)', () => {
+    let s = save();
+    s = ok(at(s)({ type: 'buff', buff: 'fish', ...CHURCH }, DEMO - M)).state;
+    s = castFixed(s, DEMO);
+    // fill the bag so the crucian has room for one: a stack one short of full, every other slot taken
+    const stack = stackLimit(c, 'fish_crucian', s);
+    s.bag = [{ id: 'fish_crucian', qty: stack - 1 } as never];
+    const fillers = Object.keys(c.materials).filter(id => id !== 'fish_crucian');
+    for (let i = 0; s.bag.length < s.bag_cap; i++) s.bag.push({ id: fillers[i % fillers.length], qty: stackLimit(c, fillers[i % fillers.length], s) } as never);
+    expect(room(c, s, 'fish_crucian')).toBe(1);
+    const r = ok(at(s)({ type: 'reel', outcome: 'landed', space: 'pond', place: FERN }, DEMO + s.cast!.bite_ms + 1000));
+    expect((r.events.find(e => e.kind === 'catch') as unknown as { qty: number }).qty).toBe(1);
+    expect(r.events).toContainEqual({ kind: 'item', id: 'fish_crucian', delta: 1 });
+    expect(count(r.state.bag, 'fish_crucian')).toBe(stack);
+    expect(r.state.fishing.caught.fish_crucian).toBe(1);
   });
 
   it('the cast decides: thrown under it, two even if it ended before the bite; the view marks the cast', () => {
