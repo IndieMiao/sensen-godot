@@ -128,18 +128,98 @@ func clear() -> void:
 	rt.ui.world_icon(EXIT_ID, null, Vector2.ZERO, false)
 
 ## The stick moves `player` along the ground as `cam` faces, at `speed` scaled by how far it is pushed, kept on the
-## navigation `nav` (its nearest point, so a push into a wall slides along it). False when the push is too small.
-static func stick_step(player: Node3D, nav: RID, cam: Camera3D, speed: float, v: Vector2, dt: float) -> bool:
+## navigation `nav`; a push off it slides along its edge (slide_on, 不知火舞's stick-slide spec v1), the player facing
+## the way it goes — stopped, the way it pushes. How far it went over how far the stick asked (1 free, sin θ along an
+## edge, 0 stopped); −1 when the push is too small to count.
+static func stick_step(player: Node3D, nav: RID, cam: Camera3D, speed: float, v: Vector2, dt: float) -> float:
 	var right := cam.global_basis.x
 	right.y = 0
 	var ahead := -cam.global_basis.z
 	ahead.y = 0
 	var dir := right.normalized() * v.x - ahead.normalized() * v.y
 	if dir.length() > 1.0: dir = dir.normalized()
-	if dir.length() < 0.05: return false
-	player.position = NavigationServer3D.map_get_closest_point(nav, player.position + dir * speed * dt)
-	player.look_at(player.position + dir, Vector3.UP)
-	return true
+	if dir.length() < 0.05: return -1.0
+	var want := dir * speed * dt
+	var from := player.position
+	var to := slide_on(nav, from, want)
+	var went := Vector3(to.x - from.x, 0.0, to.z - from.z)
+	var ratio := went.length() / want.length()
+	if ratio < PlayerMover.STUCK_RATIO:   # stopped where it stands (no snapping back and forth in a corner)
+		player.look_at(from + dir, Vector3.UP)
+		return 0.0
+	player.position = to
+	player.look_at(to + went.normalized(), Vector3.UP)
+	return minf(ratio, 1.0)
+
+## Where a step `want` from `p` ends on the navigation `nav` (the slide spec, as PlayerMover's on the grid): on it
+## as asked; else along the edge it runs off — at sin θ, θ the push's angle off the edge's normal, once more along a
+## second edge in a corner unless that turns it back or leaves under STUCK_RATIO; square-on (θ < SLIDE_MIN_DEG) not
+## at all, but for the edge's end within YIELD_M to one side, stepped round at sin SLIDE_MIN_DEG. `p` when it stops.
+static func slide_on(nav: RID, p: Vector3, want: Vector3) -> Vector3:
+	var on := _on_nav(nav, p + want)
+	if on != Vector3.INF: return on
+	var n := _crossed(nav, p, want)
+	var length := want.length()
+	var d := want / length
+	if n == Vector3.ZERO or d.dot(n) >= 0.0: return p
+	if -d.dot(n) > cos(deg_to_rad(PlayerMover.SLIDE_MIN_DEG)):
+		var across := n.cross(Vector3.UP).normalized()
+		var k := PlayerMover.YIELD_STEP_M
+		while k <= PlayerMover.YIELD_M + 0.0001:
+			for side in [1.0, -1.0]:
+				var off: Vector3 = p + across * side * k
+				if _on_nav(nav, off) != Vector3.INF and _on_nav(nav, off + d * maxf(length, YIELD_LOOK_M)) != Vector3.INF:
+					on = _on_nav(nav, p + across * side * length * sin(deg_to_rad(PlayerMover.SLIDE_MIN_DEG)))
+					return on if on != Vector3.INF else p
+			k += PlayerMover.YIELD_STEP_M
+		return p
+	var t := want - n * want.dot(n)
+	on = _on_nav(nav, p + t)
+	if on != Vector3.INF: return on
+	var n2 := _crossed(nav, p, t)
+	var t2 := t - n2 * t.dot(n2)
+	if n2 == Vector3.ZERO or t2.dot(t) <= 0.0 or t2.length() < length * PlayerMover.STUCK_RATIO: return p
+	on = _on_nav(nav, p + t2)
+	return on if on != Vector3.INF else p
+
+const NAV_ON_M := 0.005    # off the navigation by more than this (flat) is off it
+const YIELD_LOOK_M := 0.3  # past an edge's end, this much ahead clear
+## The navigation's ground under `q`: its nearest point, asked again at that height until it is under `q` (a slope or a
+## stair is not off it; each ask closes most of the way on a slope).
+static func _ground(nav: RID, q: Vector3) -> Vector3:
+	var c := NavigationServer3D.map_get_closest_point(nav, q)
+	for i in 3:
+		if _flat(c, q) < 0.001: break
+		c = NavigationServer3D.map_get_closest_point(nav, Vector3(q.x, c.y, q.z))
+	return c
+
+## `q` on the navigation (its ground), INF off it.
+static func _on_nav(nav: RID, q: Vector3) -> Vector3:
+	var g := _ground(nav, q)
+	return g if _flat(g, q) < NAV_ON_M else Vector3.INF
+
+## The normal of the edge a step `want` from `p` runs off the navigation by (flat, unit, inward): asked just past where
+## it leaves — past a corner the step's end can be nearer another edge than the one it crossed.
+static func _crossed(nav: RID, p: Vector3, want: Vector3) -> Vector3:
+	var lo := 0.0
+	var hi := 1.0
+	for i in 6:
+		var mid := (lo + hi) * 0.5
+		if _on_nav(nav, p + want * mid) != Vector3.INF: lo = mid
+		else: hi = mid
+	return _into_nav(nav, p + want * hi + want.normalized() * 0.002)
+
+## The way back onto the navigation from `q` off it (flat, unit): its edge's normal.
+static func _into_nav(nav: RID, q: Vector3) -> Vector3:
+	var g := _ground(nav, q)
+	var v := Vector3(g.x - q.x, 0.0, g.z - q.z)
+	return v.normalized() if v.length() > 1e-6 else Vector3.ZERO
+
+## The scene rig's clips' speed: a stick's run at `ratio` of the walk's along an edge, not under SLIDE_RUN_MIN; 1 else.
+static func run_speed(rig: Node, ratio: float) -> void:
+	var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer if rig != null else null
+	var scale := 1.0 if ratio >= 1.0 else maxf(PlayerMover.SLIDE_RUN_MIN, ratio)
+	if ap != null and ap.speed_scale != scale: ap.speed_scale = scale
 
 ## Shot steps (P0Runtime._dev_shot hands its unknown ones to the world): lmtap:x:y a tap at that viewport point;
 ## lmzoom:f a pinch by f; lmgoto:<point> the player stood at one of the scene's review points (dev_point), lmwalk:<point>
