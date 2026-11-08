@@ -202,3 +202,37 @@ func test_its_pin_and_card_say_who_is_in() -> void:
 	pin = m.city_map.extra_places.filter(func(e): return str(e.id) == HUT)
 	assert_int(int(pin[0].online)).is_equal(0)
 	assert_array(m.place_card(entry).facts.map(func(f): return f[0])).is_equal(["Distance"])
+
+## LOCK-34 v2 at the rooms' 33° (不知火舞 on #882): the hut's spawn was 0.53 m inside its door and the door prompt fell on
+## the player at the opening. The spawn anchor moved in (mine_hut.anchors.json; the server only passes the file's path
+## on, the online join places us at this anchor): the player opens there, on the floor between the two rugs, not on or
+## behind anyone, far enough from the door that the opening cannot leave by it and walking back still does.
+func test_the_player_opens_clear_of_the_door() -> void:
+	P0CityPlaces.accept(DENVER, CITY)
+	var vp := SubViewport.new()
+	vp.size = Vector2i(360, 800)
+	add_child(auto_free(vp))
+	var r := Hut.new()
+	r.setup({"outpost_id": HUT})
+	vp.add_child(r)
+	auto_free(r)
+	var spawn: Vector3 = r.anchor("spawn").global_position
+	var at: Vector3 = r.actor.position
+	assert_float(Vector2(at.x - spawn.x, at.z - spawn.z).length()).is_less(0.15)   # on its anchor (walkable)
+	var door: Vector3 = r.anchor("exit").global_position
+	assert_float(Vector2(at.x - door.x, at.z - door.z).length()).is_greater(P0Room.EXIT_ARM_M)
+	var people: Array = r.npcs.values().map(func(x): return (x.root as Node3D).global_position)
+	for p in people:
+		assert_float(Vector2(at.x - (p as Vector3).x, at.z - (p as Vector3).z).length()).is_greater(0.6)
+	assert_bool(P0RoomNav.hidden(at, people, r._cam_dir)).is_false()
+	for n in r._anchors.keys():
+		if str(n).begins_with("seat_") and r.anchor(n):
+			var sp: Vector3 = r.anchor(n).global_position
+			assert_float(Vector2(at.x - sp.x, at.z - sp.z).length()).override_failure_message(str(n)).is_greater(0.4)
+	# the door prompt on screen (its badge anchor) stays clear of the standing player's box at the opening
+	r._update_camera()
+	var feet := r.cam.unproject_position(at)
+	var head := r.cam.unproject_position(at + Vector3.UP * 1.75)
+	var badge := r.cam.unproject_position(r.anchor("badge_exit").global_position)
+	assert_float(badge.y - 16.0 - feet.y).is_greater_equal(8.0)   # the strip's top (32 high) under the feet
+	assert_float(head.y).is_less(feet.y)

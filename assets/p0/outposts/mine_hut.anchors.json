@@ -3,7 +3,7 @@
   "anchors": [
     {"name": "npc_ivo", "position": [1.4, 0.082, -0.84], "yaw_degrees": 160},
     {"name": "stand_ivo", "position": [0.8, 0.082, 0.05], "yaw_degrees": -34},
-    {"name": "spawn", "position": [0.0, 0.082, 2.55], "yaw_degrees": 0},
+    {"name": "spawn", "position": [-0.7, 0.082, 0.75], "yaw_degrees": 0},
     {"name": "exit", "position": [0.0, 0.082, 3.08]},
     {"name": "badge_exit", "position": [0.0, 0.7, 3.08]}
   ]
