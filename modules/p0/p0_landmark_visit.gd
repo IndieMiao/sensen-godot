@@ -161,9 +161,17 @@ static func slide_on(nav: RID, p: Vector3, want: Vector3) -> Vector3:
 	# stick asked, on the ground again.
 	for i in 2:
 		var went := Vector2(to.x - p.x, to.z - p.z).length()
-		if went <= want.length() * 1.001: break
-		var back := _on_nav(nav, p + Vector3(to.x - p.x, 0.0, to.z - p.z) * (want.length() / went))
-		if back == Vector3.INF: break
+		if went <= want.length() * 1.001: return to
+		var flat := Vector3(to.x - p.x, 0.0, to.z - p.z)
+		var back := _on_nav(nav, p + flat * (want.length() / went))
+		if back == Vector3.INF:   # cut back off the navigation (an opening's corner): the farthest of it on it, short of that
+			var lo := 0.0
+			var hi := want.length() / went
+			for k in 6:
+				var mid := (lo + hi) * 0.5
+				if _on_nav(nav, p + flat * mid) != Vector3.INF: lo = mid
+				else: hi = mid
+			return _on_nav(nav, p + flat * lo) if lo > 0.0 else p
 		to = back
 	return to
 
