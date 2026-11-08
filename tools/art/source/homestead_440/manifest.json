@@ -1,0 +1,445 @@
+{
+  "author": "刘备",
+  "task": "SGODOT-440",
+  "units": "m",
+  "assets": {
+    "master_farmhouse_a": {
+      "triangles": 7614,
+      "surfaces": 1,
+      "bytes": 602556,
+      "bounds": [
+        [
+          -2.425,
+          -0.0,
+          -1.5375
+        ],
+        [
+          1.63497,
+          4.1085,
+          1.92
+        ]
+      ],
+      "sha256": "91d245ca64a19aff29229f3f0a59544f95c064cdd7a5433ac2f7533a2efec27f",
+      "generator": "tools/art/build_homestead_lv15.py",
+      "triangle_limit": 9000,
+      "pivot": "Identical cottage anchor at ground (0,0,0)",
+      "sockets": {
+        "door": [
+          -0.35,
+          0.495,
+          0.855
+        ],
+        "chimney": [
+          -0.66,
+          4.1085,
+          -0.39
+        ],
+        "kitchen_wing_anchor": [
+          0,
+          0,
+          0
+        ],
+        "kitchen_wing_reference_center": [
+          -1.63,
+          0,
+          -0.75
+        ]
+      },
+      "front": "+Z",
+      "units": "m",
+      "source_components": [
+        {
+          "name": "porch_a",
+          "owner": "赵云",
+          "commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+          "sha256": "a9c28bdd0be686293c3d3fa9dcb3702769c48ffa0b675edff13f44e21b002571",
+          "triangles": 1104,
+          "transform": "identity / house anchor / no offset",
+          "editable_source": "https://github.com/IndieMiao/sensen-godot/blob/262533a76cf8cef31d52782698f5837611aea6dd/tools/art/source/homestead_looks_439/homestead_looks.blend"
+        },
+        {
+          "name": "kitchen_wing_a",
+          "owner": "赵云",
+          "commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+          "sha256": "7d5f99832e17c8ce79b619b8a9fa513b173ca2e12af0021059f7eed15b680e6b",
+          "triangles": 1056,
+          "transform": "identity / house anchor / no offset",
+          "editable_source": "https://github.com/IndieMiao/sensen-godot/blob/262533a76cf8cef31d52782698f5837611aea6dd/tools/art/source/homestead_looks_439/homestead_looks.blend"
+        }
+      ],
+      "components": {
+        "main": {
+          "triangles": 5454,
+          "source_parts": 374,
+          "bounds": [
+            [
+              -1.13,
+              0.0,
+              -1.09889
+            ],
+            [
+              1.13,
+              4.1085,
+              1.13
+            ]
+          ]
+        },
+        "porch": {
+          "triangles": 1104,
+          "source_parts": 1,
+          "bounds": [
+            [
+              -1.286552,
+              -0.0,
+              0.275
+            ],
+            [
+              1.63497,
+              2.4125,
+              1.92
+            ]
+          ]
+        },
+        "kitchen_wing": {
+          "triangles": 1056,
+          "source_parts": 1,
+          "bounds": [
+            [
+              -2.425,
+              0.0,
+              -1.5375
+            ],
+            [
+              -0.813167,
+              1.81,
+              0.2375
+            ]
+          ]
+        }
+      }
+    },
+    "master_farmhouse_b": {
+      "triangles": 7844,
+      "surfaces": 1,
+      "bytes": 629920,
+      "bounds": [
+        [
+          -2.425,
+          0.0,
+          -1.5375
+        ],
+        [
+          1.245,
+          4.1885,
+          1.928
+        ]
+      ],
+      "sha256": "0c6cfb2481d82cc943ccdffe733000fe2f61e93c0e2dad5f62638703504a3432",
+      "generator": "tools/art/build_homestead_lv15.py",
+      "triangle_limit": 9000,
+      "pivot": "Identical cottage anchor at ground (0,0,0)",
+      "sockets": {
+        "door": [
+          -0.35,
+          0.495,
+          0.855
+        ],
+        "chimney": [
+          -0.66,
+          4.1885,
+          -0.39
+        ],
+        "kitchen_wing_anchor": [
+          0,
+          0,
+          0
+        ],
+        "kitchen_wing_reference_center": [
+          -1.63,
+          0,
+          -0.75
+        ]
+      },
+      "front": "+Z",
+      "units": "m",
+      "source_components": [
+        {
+          "name": "porch_b",
+          "owner": "赵云",
+          "commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+          "sha256": "e162a2d4f4d2852e6c89fa64d5a73f087686e344a13b65d6dd4a97e1869bb71e",
+          "triangles": 652,
+          "transform": "identity / house anchor / no offset",
+          "editable_source": "https://github.com/IndieMiao/sensen-godot/blob/262533a76cf8cef31d52782698f5837611aea6dd/tools/art/source/homestead_looks_439/homestead_looks.blend"
+        },
+        {
+          "name": "kitchen_wing_b",
+          "owner": "赵云",
+          "commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+          "sha256": "a1686921bece7d62b0cf8d7c883ab1e92799492ddfe36595b1052e5339f65116",
+          "triangles": 1480,
+          "transform": "identity / house anchor / no offset",
+          "editable_source": "https://github.com/IndieMiao/sensen-godot/blob/262533a76cf8cef31d52782698f5837611aea6dd/tools/art/source/homestead_looks_439/homestead_looks.blend"
+        }
+      ],
+      "components": {
+        "main": {
+          "triangles": 5712,
+          "source_parts": 431,
+          "bounds": [
+            [
+              -1.13,
+              0.0,
+              -1.09889
+            ],
+            [
+              1.13,
+              4.1885,
+              1.13
+            ]
+          ]
+        },
+        "porch": {
+          "triangles": 652,
+          "source_parts": 1,
+          "bounds": [
+            [
+              -1.24497,
+              0.0,
+              0.5
+            ],
+            [
+              1.245,
+              1.28426,
+              1.928
+            ]
+          ]
+        },
+        "kitchen_wing": {
+          "triangles": 1480,
+          "source_parts": 1,
+          "bounds": [
+            [
+              -2.425,
+              0.0,
+              -1.5375
+            ],
+            [
+              -0.813167,
+              2.36,
+              0.13
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "palette_target_srgb": {
+    "plaster": "f0edd0",
+    "plaster_shade": "d9d4ae",
+    "cream": "fff4d2",
+    "wood": "a87948",
+    "wood_light": "cba067",
+    "wood_dark": "675139",
+    "green": "437d64",
+    "green_light": "6a9b6a",
+    "glass": "82c5c6",
+    "glass_dark": "548f99",
+    "orange": "e7954e",
+    "orange_light": "f4ad60",
+    "orange_dark": "cf7f40",
+    "stone": "a5ad98",
+    "stone_light": "c4c6b1",
+    "stone_shade": "8e9588",
+    "leaf": "6d9a44",
+    "leaf_light": "97b75b",
+    "leaf_dark": "4e824d",
+    "flower": "fff5df",
+    "pink": "e68c9e",
+    "yellow": "f1ce58",
+    "soil": "785c40",
+    "roof_dark": "454956"
+  },
+  "door_center": [
+    -0.35,
+    0.495,
+    0.855
+  ],
+  "status": "Exact 439 components reused from #858 head 262533a76cf8cef31d52782698f5837611aea6dd; geometry / normals / vertex colours independently compared",
+  "module_contract": {
+    "house_anchor": [
+      9,
+      16
+    ],
+    "house_footprint": [
+      8,
+      15,
+      4,
+      3
+    ],
+    "grid_m": 0.65,
+    "house_front_m": 1.13,
+    "wing_anchor": [
+      0,
+      0,
+      0
+    ],
+    "porch_ground_max_z": 0.975,
+    "porch_floor_max_y": 0.05,
+    "porch_clearance_min_y": 2.0,
+    "attachments_placement": "All four at house anchor with identity transform; no legacy offsets",
+    "lv8_combined_x_envelope": [
+      -2.4250001907348633,
+      1.6349704265594482
+    ],
+    "wing_reference_center": [
+      -1.63,
+      0,
+      -0.75
+    ]
+  },
+  "palette_sampled_linear": {
+    "plaster": [
+      0.8578607439994812,
+      0.8337465524673462,
+      0.6209803223609924
+    ],
+    "plaster_shade": [
+      0.6938717365264893,
+      0.6583748459815979,
+      0.423267662525177
+    ],
+    "cream": [
+      1.0,
+      0.9046611785888672,
+      0.6444796919822693
+    ],
+    "wood": [
+      0.3915724754333496,
+      0.19120168685913086,
+      0.06480326503515244
+    ],
+    "wood_light": [
+      0.5972017645835876,
+      0.35153260827064514,
+      0.13563333451747894
+    ],
+    "wood_dark": [
+      0.05951123684644699,
+      0.0666259378194809,
+      0.09305896610021591
+    ],
+    "green": [
+      0.05612849071621895,
+      0.20507873594760895,
+      0.12743768095970154
+    ],
+    "green_light": [
+      0.1441284716129303,
+      0.3277781009674072,
+      0.1441284716129303
+    ],
+    "glass": [
+      0.22322796285152435,
+      0.5583403706550598,
+      0.5647115111351013
+    ],
+    "glass_dark": [
+      0.13888952136039734,
+      0.34739208221435547,
+      0.3513561189174652
+    ],
+    "orange": [
+      0.7991027235984802,
+      0.30054378509521484,
+      0.07618538290262222
+    ],
+    "orange_light": [
+      0.9046611785888672,
+      0.41788506507873535,
+      0.11697066575288773
+    ],
+    "orange_dark": [
+      0.6154347658157349,
+      0.23146596550941467,
+      0.05867472290992737
+    ],
+    "stone": [
+      0.3762621283531189,
+      0.41788506507873535,
+      0.31398871541023254
+    ],
+    "stone_light": [
+      0.5520114302635193,
+      0.5647115111351013,
+      0.43965718150138855
+    ],
+    "stone_shade": [
+      0.27633845806121826,
+      0.30690762400627136,
+      0.2306029498577118
+    ],
+    "leaf": [
+      0.15292615199615017,
+      0.32314320911295075,
+      0.05780543019106723
+    ],
+    "leaf_light": [
+      0.30946892281750854,
+      0.47353149614800955,
+      0.10461648409110419
+    ],
+    "leaf_dark": [
+      0.07618538148130785,
+      0.2232279573168085,
+      0.07421356838014963
+    ],
+    "flower": [
+      1.0,
+      0.9130986517934192,
+      0.7379104087727308
+    ],
+    "pink": [
+      0.7912979403326302,
+      0.26225065752969623,
+      0.3419144249086609
+    ],
+    "yellow": [
+      0.8796223998069763,
+      0.6172065734863281,
+      0.09758734703063965
+    ],
+    "soil": [
+      0.18782077230067787,
+      0.10702310297826761,
+      0.05126945837404324
+    ],
+    "roof_dark": [
+      0.05951123684644699,
+      0.0666259378194809,
+      0.09305896610021591
+    ]
+  },
+  "structural_palette_keys": [
+    "cream",
+    "glass",
+    "glass_dark",
+    "green",
+    "green_light",
+    "orange",
+    "orange_dark",
+    "orange_light",
+    "plaster",
+    "plaster_shade",
+    "roof_dark",
+    "stone",
+    "stone_light",
+    "stone_shade",
+    "wood",
+    "wood_dark",
+    "wood_light",
+    "yellow"
+  ],
+  "cottage_palette_sha256": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c",
+  "structural_palette_source": "Nearest actual COLOR_0 values from unchanged house_cottage.glb, before runtime lighting; vegetation uses the existing farm kit palette."
+}

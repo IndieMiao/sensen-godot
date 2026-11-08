@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "states": [
+    {
+      "assembled": true,
+      "asset": "house_cottage",
+      "button": [
+        180,
+        759
+      ],
+      "frames": 52,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "height": 2.10199999809265,
+      "model_triangles": 7504,
+      "pid": 24556,
+      "renderer": "mobile",
+      "sequence": 0,
+      "surfaces": 1,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "assembled": true,
+      "asset": "master_farmhouse_a",
+      "button": [
+        180,
+        759
+      ],
+      "frames": 93,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "height": 4.1085000038147,
+      "model_triangles": 7614,
+      "pid": 24556,
+      "renderer": "mobile",
+      "sequence": 1,
+      "surfaces": 1,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "assembled": true,
+      "asset": "master_farmhouse_b",
+      "button": [
+        180,
+        759
+      ],
+      "frames": 130,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "height": 4.18849992752075,
+      "model_triangles": 7844,
+      "pid": 24556,
+      "renderer": "mobile",
+      "sequence": 2,
+      "surfaces": 1,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "assembled": true,
+      "asset": "house_cottage",
+      "button": [
+        180,
+        759
+      ],
+      "frames": 167,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "height": 2.10199999809265,
+      "model_triangles": 7504,
+      "pid": 24556,
+      "renderer": "mobile",
+      "sequence": 3,
+      "surfaces": 1,
+      "viewport": [
+        360,
+        800
+      ]
+    }
+  ],
+  "real_button_taps": 3,
+  "apk_sha256": "ec8bb18452311335d701a82dfd79af49bf4a90deb1aa086c6c4312054e1c8799",
+  "installed_apk_readback_equal": true,
+  "packaged_imported_models_match": [
+    {
+      "asset": "master_farmhouse_a",
+      "imported_path": ".godot/imported/master_farmhouse_a.glb-16e3ecbd531ac50700f6a5403cd6e26c.scn",
+      "sha256": "5386cdde9cb33bc67051b066eaa9e12f278c7871dc05d448c6b1770a4bab889a",
+      "bytes": 136553,
+      "source_glb_sha256": "91d245ca64a19aff29229f3f0a59544f95c064cdd7a5433ac2f7533a2efec27f",
+      "packed_uid_and_remap_match": true
+    },
+    {
+      "asset": "master_farmhouse_b",
+      "imported_path": ".godot/imported/master_farmhouse_b.glb-759711aa88b0bb831415bebc1fe8c8b0.scn",
+      "sha256": "fd3d5d037437e120d6750450edb021e93e54a254fdbf8dacd0b14eb6cab00265",
+      "bytes": 141413,
+      "source_glb_sha256": "0c6cfb2481d82cc943ccdffe733000fe2f61e93c0e2dad5f62638703504a3432",
+      "packed_uid_and_remap_match": true
+    }
+  ],
+  "scope": "Dedicated asset fixture, API37 SwiftShader / Vulkan Mobile. Not a full-game or physical-phone test."
+}
