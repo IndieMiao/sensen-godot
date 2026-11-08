@@ -1079,7 +1079,9 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 	bar.dimmed = dimmed
 	bar.status = status
 	bar.side = _name_bar_side(bar, screen, UiWorldNameBar.Dir.RIGHT if side < 0 else side, id)
-	bar.anchor_at(screen + Vector2(_name_bar_shift(bar.rect_for(screen, bar.side)), 0.0))
+	var shift := Vector2(_name_bar_shift(bar.rect_for(screen, bar.side)), 0.0)
+	shift.y = _name_bar_lift(bar.rect_for(screen, bar.side), shift.x)
+	bar.anchor_at(screen + shift)
 	var b: UiWorldIconButton = _icons.get(id)
 	if b: b.visible = false   # the strip stands in for its button
 	_raise_marker(bar)   # above ordinary markers; teaching-plot states stay above facility strips (341 c76fc1ea)
@@ -1117,22 +1119,50 @@ func prompt_rect(id: String) -> Rect2:
 		if m != null and m.is_visible_in_tree() and not m.get_meta("folding", false): return m.hit_rect()
 	return Rect2()
 
-## Which way a strip opens (不知火舞 on #59), in this order: ① the whole strip on screen with 12 px to spare (贴边翻转);
+## Which way a strip opens (不知火舞 on #59), in this order: ① the whole strip on screen with 12 px to spare (贴边翻转),
+## the action group's keys counting as the screen's edge (_key_rects; 不知火舞 442 a9474fa3, 197);
 ## ② not over an NPC's name tag or another facility's button (#57; 苏烈 on #59) — covered tags fade while it is open,
 ## covered buttons sit under it; ③ the way the character faces (`want`). If neither side fits, the roomier one: a
 ## strip may cover a button, never leave the screen.
 func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int, id := "") -> int:
 	var other := UiWorldNameBar.Dir.LEFT if want == UiWorldNameBar.Dir.RIGHT else UiWorldNameBar.Dir.RIGHT
 	var area := _marker_area()
-	var room := func(d: int) -> float:   # px to spare at the tighter edge (negative: off screen)
+	var keys := _key_rects()
+	var room := func(d: int) -> float:   # px to spare at the tighter edge (negative: off screen, or over the keys)
 		var r := bar.rect_for(screen, d)
-		return minf(r.position.x - area.position.x, area.end.x - r.end.x) - UiTokens.SPACE_ROW
+		var spare := minf(r.position.x - area.position.x, area.end.x - r.end.x) - UiTokens.SPACE_ROW
+		for k in keys: if r.intersects(k): spare = minf(spare, -(r.intersection(k).size.x))
+		return spare
 	var fits_want: bool = room.call(want) >= 0.0
 	var fits_other: bool = room.call(other) >= 0.0
 	if fits_want != fits_other: return want if fits_want else other
 	if not fits_want: return want if room.call(want) >= room.call(other) else other
 	if _covers_marker(bar.rect_for(screen, want), id) and not _covers_marker(bar.rect_for(screen, other), id): return other
 	return want
+
+## The action group's switch, tool badge and main key, each KEY_CLEAR_PX out, in this UI's coordinates: a name strip
+## keeps off them as off the screen's edge (不知火舞 442 a9474fa3, 197: the pond's camera turned 14.5°, a gathering
+## point by the ⇄ showed its strip as `St`). Empty while the group is hidden (rooms' facilities, a panel up).
+const KEY_CLEAR_PX := 8.0
+func _key_rects() -> Array:
+	var out := []
+	if _keys == null or not _keys.is_visible_in_tree(): return out
+	for c in [_keys.switch_button(), _keys.tool_badge(), _keys.key()]:
+		if c != null and (c as Control).is_visible_in_tree():
+			var g := (c as Control).get_global_rect()
+			out.append(Rect2(g.position - _kit.global_position, g.size).grow(KEY_CLEAR_PX))
+	return out
+
+## A strip still over the keys on the side it opens to (moved across by `dx`): lifted whole to KEY_CLEAR_PX over the
+## group's top (the keys' rects already hold that gap); 0 when it clears them.
+func _name_bar_lift(r: Rect2, dx: float) -> float:
+	var at := Rect2(r.position + Vector2(dx, 0.0), r.size)
+	var keys := _key_rects()
+	if not keys.any(func(k): return at.intersects(k)): return 0.0
+	var top := INF
+	for k in keys:   # every key under its span, the switch over the main key too
+		if (k as Rect2).position.x < at.end.x and (k as Rect2).end.x > at.position.x: top = minf(top, (k as Rect2).position.y)
+	return minf(0.0, top - at.end.y)
 
 ## Last resort when neither side fits (a long fact near the middle of a narrow screen): slide the strip back on
 ## screen, 12 px from the edge, off its button's spot — never off screen (不知火舞 on #59). The tap still goes to `hit`.
@@ -1352,6 +1382,13 @@ func camera_band() -> Rect2:
 	if _keys != null and _keys.is_visible_in_tree():
 		r.end.y = minf(r.end.y, _keys.get_global_rect().position.y - root.global_position.y)
 	return r
+
+## The action group's column (its switch over its main key) in this UI's coordinates, as camera_band; empty while it
+## is hidden. A world camera keeps a player standing on its side clear of its top (不知火舞 on 442).
+func key_column() -> Rect2:
+	if _keys == null or not _keys.is_visible_in_tree(): return Rect2()
+	var g := _keys.get_global_rect()
+	return Rect2(g.position - root.global_position, g.size)
 
 ## FloatText (1178:82191, UiFloatText from 2B; SGODOT-224): one line rising from `screen` (its bottom centre) in its
 ## tone; `stack` = the line's place in one reply (each starts 28 higher and 60 ms later, at most 3). Copy longer

@@ -61,6 +61,9 @@ static func ahead_axis() -> Vector3: return Vector3(-sin(deg_to_rad(YAW_DEG)), 0
 ## The player kept this far inside the screen's sides, feet to head inside the band (the HUD above, the keys below),
 ## wherever the meadow clamp would put the camera: the player first, the ground past the meadow shows instead (442).
 const PLAYER_SAFE_PX := 16.0
+## On the action group's side of the screen (its column's left edge, this far out) the feet stay this far over its
+## top, the ⇄ (不知火舞 on 442: the shoes touched it at the lower right); elsewhere the band's bottom as before.
+const KEY_GAP_PX := 8.0
 const DISTANCE := 40.0
 ## The opening shot puts the player's feet this far above the band's bottom edge (不知火舞 on 231: 40; on it since the
 ## camera turned 14.5°, 442 — her 480–600: the water at least as at 0° with a gathering point still in sight).
@@ -434,7 +437,7 @@ func _update_camera(dt := -1.0) -> void:
 	var band := _camera_band(rt.ui if rt != null else null)
 	if band.has_area() and not _parked:
 		if _opening: _focus = opening_focus(actor.position, cam.size, view, band, _water_at(), _nearest_piece())
-		var target := clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW, actor.position)
+		var target := clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW, actor.position, _key_column())
 		if _settling and dt >= 0.0:
 			# eased by the time since it began: the safe box puts the player back in the middle every still frame, and
 			# a per-frame step from there never got to a target the clamp holds off them (442: the turned band's corner)
@@ -477,6 +480,10 @@ static func opening_focus(player: Vector3, size: float, view: Vector2, band: Rec
 func _nearest_piece() -> Vector3:
 	var p: Dictionary = PondGather.nearest(gather.points, actor.position) if gather != null else {}
 	return Vector3(float(p.x), 0, float(p.z)) if not p.is_empty() and p.has("x") and p.has("z") else Vector3.INF
+
+## The action group's column on the screen (P0Ui.key_column), empty without the UI or with it hidden.
+func _key_column() -> Rect2:
+	return rt.ui.key_column() if rt != null and rt.ui != null and rt.ui.is_node_ready() else Rect2()
 
 ## The middle of this pond's water (x, z on the ground); INF when it has no box (a path site).
 func _water_at() -> Vector3:
@@ -559,7 +566,7 @@ static func place(camera: Camera3D, focus: Vector3) -> void:
 ## one). Along an axis the meadow can't fill, the middle. Then, as the cathedral's reach gives way (#846), a player the
 ## clamp would push off the screen or under the HUD / keys moves the camera back: the ground past the meadow shows
 ## rather than the player going (442; q(297)'s walk reaches past the clamp at 14.5°).
-static func clamp_focus(focus: Vector3, size: float, view: Vector2, band: Rect2, art: Rect2, player := Vector3.INF) -> Vector3:
+static func clamp_focus(focus: Vector3, size: float, view: Vector2, band: Rect2, art: Rect2, player := Vector3.INF, keys := Rect2()) -> Vector3:
 	var half := size * 0.5
 	var px := view.x / size   # px per metre (KEEP_WIDTH)
 	var pitch := deg_to_rad(PITCH_DEG)
@@ -576,12 +583,12 @@ static func clamp_focus(focus: Vector3, size: float, view: Vector2, band: Rect2,
 			lo = lo.max(Vector2(art.position.x - off.x, art.position.y - off.z))
 			hi = hi.min(Vector2(art.end.x - off.x, art.end.y - off.z))
 	var f := Vector3(clamp_or_centre(focus.x, lo.x, hi.x), focus.y, clamp_or_centre(focus.z, lo.y, hi.y))
-	if player.is_finite(): f = keep_on_screen(f, player, size, view, band)
+	if player.is_finite(): f = keep_on_screen(f, player, size, view, band, keys)
 	return f
 
 ## `focus` moved the least that brings `player` — feet to HEAD_M, PLAYER_HALF_M a side — PLAYER_SAFE_PX inside the
-## screen's sides and inside `band` top to bottom.
-static func keep_on_screen(focus: Vector3, player: Vector3, size: float, view: Vector2, band: Rect2) -> Vector3:
+## screen's sides and inside `band` top to bottom; on the side of `keys` (the action group's column), KEY_GAP_PX over it.
+static func keep_on_screen(focus: Vector3, player: Vector3, size: float, view: Vector2, band: Rect2, keys := Rect2()) -> Vector3:
 	var px := view.x / size
 	var pitch := deg_to_rad(PITCH_DEG)
 	var across := (player - focus).dot(right_axis()) * px   # the player's px right of the screen's middle
@@ -593,7 +600,10 @@ static func keep_on_screen(focus: Vector3, player: Vector3, size: float, view: V
 	dx -= maxf(0.0, (view.x * 0.5 + across + side) - (view.x - PLAYER_SAFE_PX))
 	var dy := 0.0
 	dy += maxf(0.0, band.position.y - head)
-	dy -= maxf(0.0, feet - band.end.y)
+	var floor_y := band.end.y
+	if keys.has_area() and view.x * 0.5 + across + dx + side >= keys.position.x - KEY_GAP_PX:   # after the sides moved it
+		floor_y = minf(floor_y, keys.position.y - KEY_GAP_PX)
+	dy -= maxf(0.0, feet - floor_y)
 	return focus - right_axis() * (dx / px) + ahead_axis() * (dy / px / sin(pitch))   # the focus further up: the player lower
 
 static func clamp_or_centre(v: float, lo: float, hi: float) -> float:
