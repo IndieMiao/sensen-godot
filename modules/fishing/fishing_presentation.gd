@@ -233,6 +233,7 @@ func step(dt: float) -> void:
 		if _phase == "casting": _cast_age = float(remote_state.get("cast_age", 0)) if remote else 0
 		if _phase == "hook": _splash_age = 0
 		if _phase == "playing": _splash_age = 0
+		if _phase == "result": _splash_age = 0   # a landed fish leaves the water: one splash where it came out
 		if _phase == "error": _cast_age = 10
 	var fighting := _phase in ["playing", "settling"]
 	if fighting and held: _crank_angle += dt * 10.0
@@ -277,7 +278,8 @@ func step(dt: float) -> void:
 		bobber_position = grip.lerp(_landing, flight) + Vector3.UP * sin(flight * PI) * 1.2
 		if _cast_age - dt < 0.85 and _cast_age >= 0.85: _splash_age = 0
 	var landed: bool = _phase == "result" and model.get("outcome") == "caught" and result.get("outcome") == "caught"
-	if landed and _phase_age < CATCH_LIFT_S:
+	var lifting := landed and _phase_age < CATCH_LIFT_S
+	if lifting:
 		active_float = true
 		var lift := smoothstep(0, 1, _phase_age / CATCH_LIFT_S)
 		bobber_position = _landing.lerp(grip + Vector3.UP * 0.25, lift) + Vector3.UP * sin(lift * PI) * 1.7
@@ -294,11 +296,16 @@ func step(dt: float) -> void:
 	if _ring != null: _place_ring()
 	if not active_float: bobber_position = rod_tip - Vector3.UP * 0.3
 	_draw_line(rod_tip, bobber_position, 0.025 if pull > 0.5 else 0.22)
+	# The water's splash and rings stay where the float is on the water; a landed fish's float is in the air on its way
+	# to the hand, so they stay where it came out and fade there (the user 11-08, SGODOT-447: they followed the float).
+	var on_water := _landing if lifting else bobber_position
 	_splash.visible = _splash_age < 0.75 and active_float
-	_splash.global_position = Vector3(bobber_position.x, 0.085, bobber_position.z)
+	_splash.global_position = Vector3(on_water.x, 0.085, on_water.z)
 	_splash.scale = Vector3.ONE * (0.5 + _splash_age * 4.0)
 	_splash_material.albedo_color.a = maxf(0, 0.8 - _splash_age)
-	if is_instance_valid(_water): _water.interact(bobber_position, 0.7 if fighting else 0.3 if active_float and _cast_age >= 0.85 else 0.0)
+	var stir := 0.7 if fighting else 0.3 if active_float and _cast_age >= 0.85 else 0.0
+	if lifting: stir = 0.7 * (1.0 - smoothstep(0.0, 1.0, _phase_age / CATCH_LIFT_S))   # the fight's rings, fading
+	if is_instance_valid(_water): _water.interact(on_water, stir)
 	_frame_camera(1.0 - exp(-dt * 7.0))
 	if not remote: panel.anchor_gauge(camera.unproject_position(_landing))
 
