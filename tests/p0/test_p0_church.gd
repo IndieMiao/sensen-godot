@@ -215,42 +215,49 @@ func test_gabriel_opens_at_his_talking_spot() -> void:
 	r.actor.teleport(r.room.position + Vector3(-0.375, r.floor_y, 1.03))   # the aisle beside the second left pew
 	assert_str(r.card_pick(marks)).is_equal("seat_left_2")
 
-## q(300), SGODOT-445 (不知火舞 priest-buff ui-spec v1.1 §2): two full-width keys over `Any stories?`, fishing above and
-## farming below — the primary `· 20 min` when not taken, the secondary `· 12:41 left` while on, ticking with the view;
-## a tap sends the buff command and the card stays up. A server without buffs (no view.buff_takes) shows neither.
-func test_gabriel_gives_the_two_buffs() -> void:
-	var v := {"buffs": [{"id": "fish", "left": 761000.0}], "buff_takes": {"used": 1, "limit": null, "resets_in": 3600000.0}}
-	var keys := P0Logic.priest_keys(v)
-	assert_array(keys.map(func(k): return k.text)).is_equal(["Twin Catch · 12:41 left", "Swift Growth · 20 min"])
-	assert_array(keys.map(func(k): return k.on)).is_equal([true, false])
-	assert_array(P0Logic.priest_keys({})).is_empty()
-	# the view ages them: 41 s on, 12:00 left; past the end the buff is gone from the array (亚瑟's `… has worn off`)
-	assert_str(str(P0Logic.priest_keys(P0Logic.project(v, 41000.0))[0].text)).is_equal("Twin Catch · 12:00 left")
-	assert_array(P0Logic.project(v, 761000.0).buffs).is_empty()
-	assert_array(v.buffs).has_size(1)   # the server's view left as it was
+## q(300) v1.2, SGODOT-445 (the user 11-08; 不知火舞 priest-buff ui-spec v1.2 §2): one full-width `Pray` over
+## `Any stories?`; each tap draws Twin Catch or Swift Growth half and half and sends the buff command, the card stays up.
+## No time on the card. In the demo (no limit) no count line; from 11-15 `2 left today`, then a grey Pray with
+## `Limit reached · resets in …`. A server without buffs (no view.buff_takes) shows no Pray.
+func test_gabriel_prays() -> void:
+	assert_str(P0Logic.pray_draw(0.0)).is_equal("fish")
+	assert_str(P0Logic.pray_draw(0.4999)).is_equal("fish")
+	assert_str(P0Logic.pray_draw(0.5)).is_equal("farm")
+	assert_str(P0Logic.pray_draw(0.9999)).is_equal("farm")
+	assert_dict(P0Logic.priest_pray({})).is_empty()
+	var demo := {"buffs": [{"id": "fish", "left": 761000.0}], "buff_takes": {"used": 7, "limit": null, "resets_in": 3600000.0}}
+	assert_dict(P0Logic.priest_pray(demo)).is_equal({"reason": "", "line": ""})
+	# the view ages the buffs: past the end one is gone from the array (亚瑟's `… has worn off`)
+	assert_float(float(P0Logic.project(demo, 41000.0).buffs[0].left)).is_equal(720000.0)
+	assert_array(P0Logic.project(demo, 761000.0).buffs).is_empty()
+	assert_array(demo.buffs).has_size(1)   # the server's view left as it was
 	var ui := P0Ui.new()
 	add_child(auto_free(ui))
 	await await_idle_frame()
-	ui.view = v
+	ui.view = demo
 	ui.open_keeper_greeting("church", {"outpost": CHURCH_ID})
 	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
-	assert_array(card.content.get_children().map(func(b): return (b as UiCommandButton).label)).is_equal(
-		["Twin Catch · 12:41 left", "Swift Growth · 20 min", "Any stories?"])
-	var fish := card.content.get_child(0) as UiCommandButton
-	var farm := card.content.get_child(1) as UiCommandButton
-	assert_int(fish.kind).is_equal(UiCommandButton.Kind.SECONDARY)
-	assert_int(farm.kind).is_equal(UiCommandButton.Kind.PRIMARY)
-	assert_bool(fish.fit_text and farm.fit_text).is_true()
+	var keys := card.content.get_children().filter(func(n): return n is UiCommandButton)
+	assert_array(keys.map(func(b): return (b as UiCommandButton).label)).is_equal(["Pray", "Any stories?"])
+	var pray := keys[0] as UiCommandButton
+	var count := card.content.get_node("PrayCount") as Label
+	assert_int(pray.kind).is_equal(UiCommandButton.Kind.PRIMARY)
+	assert_str(pray.reason).is_empty()
+	assert_bool(count.visible).is_false()
 	var sent := []
 	ui.command.connect(func(c): sent.append(c))
-	farm.activated.emit()
-	fish.activated.emit()
-	assert_array(sent).is_equal([{"type": "buff", "buff": "farm"}, {"type": "buff", "buff": "fish"}])
+	var rolls := [0.2, 0.7, 0.3]
+	ui.pray_roll = func() -> float: return rolls.pop_front()
+	for i in 3: pray.activated.emit()
+	assert_array(sent.map(func(c): return c.buff)).is_equal(["fish", "farm", "fish"])
+	assert_bool(sent.all(func(c): return c.type == "buff")).is_true()
 	assert_str(ui.modal_kind).is_equal("greeting")
-	# the answer: farm taken, fish ticking on; then fish out
-	ui.set_view({"buffs": [{"id": "fish", "left": 700000.0}, {"id": "farm", "left": 1200000.0}], "buff_takes": v.buff_takes})
-	assert_array([fish.label, farm.label]).is_equal(["Twin Catch · 11:40 left", "Swift Growth · 20:00 left"])
-	assert_int(farm.kind).is_equal(UiCommandButton.Kind.SECONDARY)
-	ui.set_view({"buffs": [{"id": "farm", "left": 1199000.0}], "buff_takes": v.buff_takes})
-	assert_str(fish.label).is_equal("Twin Catch · 20 min")
-	assert_int(fish.kind).is_equal(UiCommandButton.Kind.PRIMARY)
+	# from 11-15: the count line, then the grey key with the limit beside it
+	ui.set_view({"buffs": [], "buff_takes": {"used": 1, "limit": 2, "resets_in": 3600000.0}})
+	assert_bool(count.visible).is_true()
+	assert_str(count.text).is_equal("1 left today")
+	assert_str(pray.reason).is_empty()
+	ui.set_view({"buffs": [], "buff_takes": {"used": 2, "limit": 2, "resets_in": 18720000.0}})
+	assert_str(count.text).is_equal("Limit reached · resets in 5h 12m")
+	assert_str(pray.reason).is_equal("Limit reached · resets in 5h 12m")
+	assert_str(pray.label).is_equal("Pray")
