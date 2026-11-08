@@ -1,0 +1,94 @@
+{
+  "generator": "tools/art/source/market_plaza/build_market_plaza.py",
+  "author": "\u9a6c\u53ef\u6ce2\u7f57",
+  "assets": {
+    "mp_ground": {
+      "triangles": 44,
+      "bytes": 5364
+    },
+    "mp_surround": {
+      "triangles": 44,
+      "bytes": 5352
+    },
+    "mp_sidewalk": {
+      "triangles": 44,
+      "bytes": 5368
+    },
+    "mp_edge_trim": {
+      "triangles": 44,
+      "bytes": 5380
+    },
+    "mp_gate_post": {
+      "triangles": 300,
+      "bytes": 19244
+    },
+    "mp_facade_placeholder": {
+      "triangles": 264,
+      "bytes": 25876
+    },
+    "facade_sf_0": {
+      "triangles": 5272,
+      "bytes": 373688
+    },
+    "facade_sf_1": {
+      "triangles": 5272,
+      "bytes": 373688
+    },
+    "facade_sf_2": {
+      "triangles": 5272,
+      "bytes": 373688
+    },
+    "facade_sf_3": {
+      "triangles": 5272,
+      "bytes": 373688
+    },
+    "facade_generic_0": {
+      "triangles": 4860,
+      "bytes": 345780
+    },
+    "facade_generic_1": {
+      "triangles": 4860,
+      "bytes": 345780
+    },
+    "facade_generic_2": {
+      "triangles": 4860,
+      "bytes": 345780
+    },
+    "facade_generic_3": {
+      "triangles": 4860,
+      "bytes": 345780
+    },
+    "mp_keeper_flowerbed": {
+      "triangles": 5072,
+      "bytes": 256664
+    },
+    "mp_tree_pot": {
+      "triangles": 1304,
+      "bytes": 45440
+    },
+    "mp_fountain_placeholder": {
+      "triangles": 476,
+      "bytes": 21768
+    },
+    "mp_stall_placeholder": {
+      "triangles": 236,
+      "bytes": 22904
+    },
+    "mp_keeper_placeholder": {
+      "triangles": 236,
+      "bytes": 22904
+    },
+    "mp_board_placeholder": {
+      "triangles": 132,
+      "bytes": 13640
+    },
+    "mp_string_lights": {
+      "triangles": 524,
+      "bytes": 31216
+    },
+    "mp_bunting": {
+      "triangles": 184,
+      "bytes": 17568
+    }
+  }
+}

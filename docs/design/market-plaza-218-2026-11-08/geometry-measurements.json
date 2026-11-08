@@ -1,0 +1,623 @@
+{
+  "note": "Full meshes before Godot generated LODs; excludes skyline cards, avatars, HUD and repeated shadow passes. Instance counts are not measured frame draw calls.",
+  "by_file": {
+    "mp_ground.glb": {
+      "triangles": 44,
+      "surfaces": 1,
+      "min": [
+        -8.0,
+        -0.2,
+        -8.0
+      ],
+      "max": [
+        8.0,
+        0.05,
+        8.0
+      ],
+      "size_xyz": [
+        16.0,
+        0.25,
+        16.0
+      ]
+    },
+    "mp_surround.glb": {
+      "triangles": 44,
+      "surfaces": 1,
+      "min": [
+        -18.0,
+        -0.24,
+        -18.0
+      ],
+      "max": [
+        18.0,
+        0.0,
+        18.0
+      ],
+      "size_xyz": [
+        36.0,
+        0.24,
+        36.0
+      ]
+    },
+    "mp_sidewalk.glb": {
+      "triangles": 44,
+      "surfaces": 1,
+      "min": [
+        -1.0,
+        -0.04,
+        -13.0
+      ],
+      "max": [
+        1.0,
+        0.03,
+        13.0
+      ],
+      "size_xyz": [
+        2.0,
+        0.07,
+        26.0
+      ]
+    },
+    "mp_edge_trim.glb": {
+      "triangles": 44,
+      "surfaces": 1,
+      "min": [
+        -1.0,
+        0.0,
+        -0.08
+      ],
+      "max": [
+        1.0,
+        0.16,
+        0.08
+      ],
+      "size_xyz": [
+        2.0,
+        0.16,
+        0.16
+      ]
+    },
+    "facade_generic_0.glb": {
+      "triangles": 4860,
+      "surfaces": 1,
+      "min": [
+        -2.09,
+        0.0,
+        -1.27
+      ],
+      "max": [
+        2.09,
+        6.5075,
+        1.88
+      ],
+      "size_xyz": [
+        4.18,
+        6.5075,
+        3.15
+      ]
+    },
+    "facade_sf_0.glb": {
+      "triangles": 5272,
+      "surfaces": 1,
+      "min": [
+        -2.09,
+        0.0,
+        -1.27
+      ],
+      "max": [
+        2.09,
+        6.5075,
+        1.88
+      ],
+      "size_xyz": [
+        4.18,
+        6.5075,
+        3.15
+      ]
+    },
+    "facade_generic_1.glb": {
+      "triangles": 4860,
+      "surfaces": 1,
+      "min": [
+        -2.09,
+        0.0,
+        -1.27
+      ],
+      "max": [
+        2.09,
+        6.5075,
+        1.88
+      ],
+      "size_xyz": [
+        4.18,
+        6.5075,
+        3.15
+      ]
+    },
+    "facade_sf_1.glb": {
+      "triangles": 5272,
+      "surfaces": 1,
+      "min": [
+        -2.09,
+        0.0,
+        -1.27
+      ],
+      "max": [
+        2.09,
+        6.5075,
+        1.88
+      ],
+      "size_xyz": [
+        4.18,
+        6.5075,
+        3.15
+      ]
+    },
+    "facade_sf_2.glb": {
+      "triangles": 5272,
+      "surfaces": 1,
+      "min": [
+        -2.09,
+        0.0,
+        -1.27
+      ],
+      "max": [
+        2.09,
+        6.5075,
+        1.88
+      ],
+      "size_xyz": [
+        4.18,
+        6.5075,
+        3.15
+      ]
+    },
+    "facade_generic_2.glb": {
+      "triangles": 4860,
+      "surfaces": 1,
+      "min": [
+        -2.09,
+        0.0,
+        -1.27
+      ],
+      "max": [
+        2.09,
+        6.5075,
+        1.88
+      ],
+      "size_xyz": [
+        4.18,
+        6.5075,
+        3.15
+      ]
+    },
+    "facade_sf_3.glb": {
+      "triangles": 5272,
+      "surfaces": 1,
+      "min": [
+        -2.09,
+        0.0,
+        -1.27
+      ],
+      "max": [
+        2.09,
+        6.5075,
+        1.88
+      ],
+      "size_xyz": [
+        4.18,
+        6.5075,
+        3.15
+      ]
+    },
+    "facade_generic_3.glb": {
+      "triangles": 4860,
+      "surfaces": 1,
+      "min": [
+        -2.09,
+        0.0,
+        -1.27
+      ],
+      "max": [
+        2.09,
+        6.5075,
+        1.88
+      ],
+      "size_xyz": [
+        4.18,
+        6.5075,
+        3.15
+      ]
+    },
+    "res://assets/landmarks/_shared/street_kit/planter_long.glb": {
+      "triangles": 568,
+      "surfaces": 1,
+      "min": [
+        -0.988,
+        0.0,
+        -0.3016
+      ],
+      "max": [
+        0.988,
+        1.18,
+        0.3016
+      ],
+      "size_xyz": [
+        1.976,
+        1.18,
+        0.6032
+      ]
+    },
+    "res://assets/landmarks/_shared/street_kit/bollard.glb": {
+      "triangles": 140,
+      "surfaces": 1,
+      "min": [
+        -0.14,
+        0.0,
+        -0.14
+      ],
+      "max": [
+        0.14,
+        0.73,
+        0.14
+      ],
+      "size_xyz": [
+        0.28,
+        0.73,
+        0.28
+      ]
+    },
+    "mp_gate_post.glb": {
+      "triangles": 300,
+      "surfaces": 1,
+      "min": [
+        -0.23,
+        0.0,
+        -0.23
+      ],
+      "max": [
+        0.23,
+        1.355,
+        0.23
+      ],
+      "size_xyz": [
+        0.46,
+        1.355,
+        0.46
+      ]
+    },
+    "res://assets/landmarks/_shared/street_kit/planter_square.glb": {
+      "triangles": 408,
+      "surfaces": 1,
+      "min": [
+        -0.442,
+        0.0,
+        -0.442
+      ],
+      "max": [
+        0.442,
+        1.295,
+        0.442
+      ],
+      "size_xyz": [
+        0.884,
+        1.295,
+        0.884
+      ]
+    },
+    "mp_tree_pot.glb": {
+      "triangles": 1304,
+      "surfaces": 1,
+      "min": [
+        -0.7069,
+        0.0,
+        -0.7694
+      ],
+      "max": [
+        0.791,
+        3.1,
+        0.7694
+      ],
+      "size_xyz": [
+        1.4979,
+        3.1,
+        1.5389
+      ]
+    },
+    "res://assets/landmarks/_shared/street_kit/lamp_single.glb": {
+      "triangles": 368,
+      "surfaces": 1,
+      "min": [
+        -0.23,
+        0.0,
+        -0.23
+      ],
+      "max": [
+        0.23,
+        3.42,
+        0.23
+      ],
+      "size_xyz": [
+        0.46,
+        3.42,
+        0.46
+      ]
+    },
+    "mp_string_lights.glb": {
+      "triangles": 524,
+      "surfaces": 1,
+      "min": [
+        -1.0013,
+        -0.255,
+        -0.0333
+      ],
+      "max": [
+        1.0013,
+        0.0059,
+        0.0333
+      ],
+      "size_xyz": [
+        2.0026,
+        0.2609,
+        0.0666
+      ]
+    },
+    "mp_bunting.glb": {
+      "triangles": 184,
+      "surfaces": 1,
+      "min": [
+        -1.0009,
+        -0.39,
+        -0.005
+      ],
+      "max": [
+        1.0009,
+        0.0049,
+        0.005
+      ],
+      "size_xyz": [
+        2.0018,
+        0.3949,
+        0.01
+      ]
+    },
+    "stall_fish.glb": {
+      "triangles": 1048,
+      "surfaces": 1,
+      "min": [
+        -1.0,
+        0.0,
+        -0.8
+      ],
+      "max": [
+        1.0,
+        2.55,
+        0.8
+      ],
+      "size_xyz": [
+        2.0,
+        2.55,
+        1.6
+      ]
+    },
+    "stall_bakery.glb": {
+      "triangles": 1280,
+      "surfaces": 1,
+      "min": [
+        -1.0,
+        0.0,
+        -0.8
+      ],
+      "max": [
+        1.0,
+        2.55,
+        0.8
+      ],
+      "size_xyz": [
+        2.0,
+        2.55,
+        1.6
+      ]
+    },
+    "stall_spice.glb": {
+      "triangles": 1202,
+      "surfaces": 1,
+      "min": [
+        -1.0,
+        0.0,
+        -0.8
+      ],
+      "max": [
+        1.0,
+        2.55,
+        0.8
+      ],
+      "size_xyz": [
+        2.0,
+        2.55,
+        1.6
+      ]
+    },
+    "stall_veg.glb": {
+      "triangles": 1436,
+      "surfaces": 1,
+      "min": [
+        -1.0,
+        0.0,
+        -0.8
+      ],
+      "max": [
+        1.0,
+        2.55,
+        0.8
+      ],
+      "size_xyz": [
+        2.0,
+        2.55,
+        1.6
+      ]
+    },
+    "stall_tools.glb": {
+      "triangles": 1296,
+      "surfaces": 1,
+      "min": [
+        -1.0,
+        0.0,
+        -0.8
+      ],
+      "max": [
+        1.0,
+        2.55,
+        0.8
+      ],
+      "size_xyz": [
+        2.0,
+        2.55,
+        1.6
+      ]
+    },
+    "flower_cart.glb": {
+      "triangles": 1356,
+      "surfaces": 1,
+      "min": [
+        -1.0,
+        0.0,
+        -0.7
+      ],
+      "max": [
+        1.0,
+        2.35,
+        0.7
+      ],
+      "size_xyz": [
+        2.0,
+        2.35,
+        1.4
+      ]
+    },
+    "stall_keeper.glb": {
+      "triangles": 2232,
+      "surfaces": 1,
+      "min": [
+        -1.6,
+        0.0,
+        -0.8
+      ],
+      "max": [
+        1.6,
+        2.85,
+        0.8
+      ],
+      "size_xyz": [
+        3.2,
+        2.85,
+        1.6
+      ]
+    },
+    "market_board.glb": {
+      "triangles": 436,
+      "surfaces": 1,
+      "min": [
+        -0.6,
+        0.0,
+        -0.15
+      ],
+      "max": [
+        0.6,
+        1.8,
+        0.15
+      ],
+      "size_xyz": [
+        1.2,
+        1.8,
+        0.3
+      ]
+    },
+    "fountain.glb": {
+      "triangles": 1956,
+      "surfaces": 1,
+      "min": [
+        -1.5,
+        0.0,
+        -1.5
+      ],
+      "max": [
+        1.5,
+        2.03,
+        1.5
+      ],
+      "size_xyz": [
+        3.0,
+        2.03,
+        3.0
+      ]
+    },
+    "mp_keeper_flowerbed.glb": {
+      "triangles": 5072,
+      "surfaces": 1,
+      "min": [
+        -1.7375,
+        0.0,
+        -1.1935
+      ],
+      "max": [
+        1.7375,
+        0.445,
+        1.1935
+      ],
+      "size_xyz": [
+        3.475,
+        0.445,
+        2.387
+      ]
+    },
+    "res://assets/rooms/fruit_shop/floor_fig_crate.glb": {
+      "triangles": 2616,
+      "surfaces": 1,
+      "min": [
+        -0.4475,
+        -0.0,
+        -0.3525
+      ],
+      "max": [
+        0.4475,
+        0.5951,
+        0.3525
+      ],
+      "size_xyz": [
+        0.895,
+        0.5951,
+        0.705
+      ]
+    },
+    "res://assets/landmarks/_shared/street_kit/bench_wood.glb": {
+      "triangles": 604,
+      "surfaces": 1,
+      "min": [
+        -0.9,
+        0.0,
+        -0.3691
+      ],
+      "max": [
+        0.9,
+        1.2778,
+        0.3027
+      ],
+      "size_xyz": [
+        1.8,
+        1.2778,
+        0.6718
+      ]
+    }
+  },
+  "placed": {
+    "san_francisco": {
+      "triangles": 89490,
+      "surfaces": 113
+    },
+    "generic": {
+      "triangles": 86194,
+      "surfaces": 113
+    }
+  }
+}

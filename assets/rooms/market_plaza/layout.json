@@ -1,0 +1,3103 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up; +Z front; camera from +X+Z; object meshes face +Z; P0 facing anchors use -Z",
+  "reference": {
+    "card": "SGODOT-218",
+    "revision": "v2.1 + a2-a9: 33 degrees, scheme C, counter names, three trees, service-gap exclusions",
+    "source": "~/incoming/market-45-1108/SGODOT-218_market_room45_v2.1.png"
+  },
+  "assets": [
+    {
+      "name": "ground",
+      "file": "mp_ground.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "Floor",
+          "size": [
+            16,
+            0.25,
+            16
+          ],
+          "at": [
+            0,
+            -0.075,
+            0
+          ]
+        }
+      ],
+      "group": "Ground",
+      "material": "paving",
+      "cast_shadow": true
+    },
+    {
+      "name": "surround",
+      "file": "mp_surround.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "grass",
+      "cast_shadow": false
+    },
+    {
+      "name": "east_sidewalk",
+      "file": "mp_sidewalk.glb",
+      "position": [
+        9,
+        0,
+        5
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "paving",
+      "cast_shadow": false
+    },
+    {
+      "name": "south_sidewalk",
+      "file": "mp_sidewalk.glb",
+      "position": [
+        5,
+        0,
+        9
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "paving",
+      "cast_shadow": false
+    },
+    {
+      "name": "outer_curb_south_0",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        -7,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_1",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        -5,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_2",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        -3,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_3",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        -1,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_4",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        1,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_5",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        3,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_6",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        5,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_7",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        7,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_8",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        9,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_9",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        11,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_10",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        13,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_11",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        15,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_south_12",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        17,
+        0,
+        10
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_0",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        -7
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_1",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        -5
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_2",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        -3
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_3",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        -1
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_4",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        1
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_5",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        3
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_6",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        5
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_7",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        7
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_8",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        9
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_9",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        11
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_10",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        13
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_11",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        15
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "outer_curb_east_12",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        10,
+        0,
+        17
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "facade_north_0",
+      "file": "facade_sf_0.glb",
+      "position": [
+        -6,
+        0.05,
+        -9.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "FacadeBarrier",
+          "size": [
+            4,
+            6.5,
+            2.5
+          ],
+          "at": [
+            0,
+            3.25,
+            0
+          ]
+        },
+        {
+          "name": "DecorativeDoorSteps",
+          "size": [
+            1.36,
+            0.32,
+            0.85
+          ],
+          "at": [
+            0,
+            0.16,
+            1.55
+          ]
+        }
+      ],
+      "group": "FarFacades",
+      "material": "matte",
+      "cast_shadow": true,
+      "variants": {
+        "san_francisco": "facade_sf_0.glb",
+        "generic": "facade_generic_0.glb"
+      }
+    },
+    {
+      "name": "facade_north_1",
+      "file": "facade_sf_1.glb",
+      "position": [
+        -2,
+        0.05,
+        -9.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "FacadeBarrier",
+          "size": [
+            4,
+            6.5,
+            2.5
+          ],
+          "at": [
+            0,
+            3.25,
+            0
+          ]
+        },
+        {
+          "name": "DecorativeDoorSteps",
+          "size": [
+            1.36,
+            0.32,
+            0.85
+          ],
+          "at": [
+            0,
+            0.16,
+            1.55
+          ]
+        }
+      ],
+      "group": "FarFacades",
+      "material": "matte",
+      "cast_shadow": true,
+      "variants": {
+        "san_francisco": "facade_sf_1.glb",
+        "generic": "facade_generic_1.glb"
+      }
+    },
+    {
+      "name": "facade_north_2",
+      "file": "facade_sf_2.glb",
+      "position": [
+        2,
+        0.05,
+        -9.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "FacadeBarrier",
+          "size": [
+            4,
+            6.5,
+            2.5
+          ],
+          "at": [
+            0,
+            3.25,
+            0
+          ]
+        },
+        {
+          "name": "DecorativeDoorSteps",
+          "size": [
+            1.36,
+            0.32,
+            0.85
+          ],
+          "at": [
+            0,
+            0.16,
+            1.55
+          ]
+        }
+      ],
+      "group": "FarFacades",
+      "material": "matte",
+      "cast_shadow": true,
+      "variants": {
+        "san_francisco": "facade_sf_2.glb",
+        "generic": "facade_generic_2.glb"
+      }
+    },
+    {
+      "name": "facade_north_3",
+      "file": "facade_sf_3.glb",
+      "position": [
+        6,
+        0.05,
+        -9.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "FacadeBarrier",
+          "size": [
+            4,
+            6.5,
+            2.5
+          ],
+          "at": [
+            0,
+            3.25,
+            0
+          ]
+        },
+        {
+          "name": "DecorativeDoorSteps",
+          "size": [
+            1.36,
+            0.32,
+            0.85
+          ],
+          "at": [
+            0,
+            0.16,
+            1.55
+          ]
+        }
+      ],
+      "group": "FarFacades",
+      "material": "matte",
+      "cast_shadow": true,
+      "variants": {
+        "san_francisco": "facade_sf_3.glb",
+        "generic": "facade_generic_3.glb"
+      }
+    },
+    {
+      "name": "facade_west_0",
+      "file": "facade_sf_0.glb",
+      "position": [
+        -9.25,
+        0.05,
+        -6
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "name": "FacadeBarrier",
+          "size": [
+            4,
+            6.5,
+            2.5
+          ],
+          "at": [
+            0,
+            3.25,
+            0
+          ]
+        },
+        {
+          "name": "DecorativeDoorSteps",
+          "size": [
+            1.36,
+            0.32,
+            0.85
+          ],
+          "at": [
+            0,
+            0.16,
+            1.55
+          ]
+        }
+      ],
+      "group": "FarFacades",
+      "material": "matte",
+      "cast_shadow": true,
+      "variants": {
+        "san_francisco": "facade_sf_0.glb",
+        "generic": "facade_generic_0.glb"
+      }
+    },
+    {
+      "name": "facade_west_1",
+      "file": "facade_sf_1.glb",
+      "position": [
+        -9.25,
+        0.05,
+        -2
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "name": "FacadeBarrier",
+          "size": [
+            4,
+            6.5,
+            2.5
+          ],
+          "at": [
+            0,
+            3.25,
+            0
+          ]
+        },
+        {
+          "name": "DecorativeDoorSteps",
+          "size": [
+            1.36,
+            0.32,
+            0.85
+          ],
+          "at": [
+            0,
+            0.16,
+            1.55
+          ]
+        }
+      ],
+      "group": "FarFacades",
+      "material": "matte",
+      "cast_shadow": true,
+      "variants": {
+        "san_francisco": "facade_sf_1.glb",
+        "generic": "facade_generic_1.glb"
+      }
+    },
+    {
+      "name": "facade_west_2",
+      "file": "facade_sf_2.glb",
+      "position": [
+        -9.25,
+        0.05,
+        2
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "name": "FacadeBarrier",
+          "size": [
+            4,
+            6.5,
+            2.5
+          ],
+          "at": [
+            0,
+            3.25,
+            0
+          ]
+        },
+        {
+          "name": "DecorativeDoorSteps",
+          "size": [
+            1.36,
+            0.32,
+            0.85
+          ],
+          "at": [
+            0,
+            0.16,
+            1.55
+          ]
+        }
+      ],
+      "group": "FarFacades",
+      "material": "matte",
+      "cast_shadow": true,
+      "variants": {
+        "san_francisco": "facade_sf_2.glb",
+        "generic": "facade_generic_2.glb"
+      }
+    },
+    {
+      "name": "facade_west_3",
+      "file": "facade_sf_3.glb",
+      "position": [
+        -9.25,
+        0.05,
+        6
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "name": "FacadeBarrier",
+          "size": [
+            4,
+            6.5,
+            2.5
+          ],
+          "at": [
+            0,
+            3.25,
+            0
+          ]
+        },
+        {
+          "name": "DecorativeDoorSteps",
+          "size": [
+            1.36,
+            0.32,
+            0.85
+          ],
+          "at": [
+            0,
+            0.16,
+            1.55
+          ]
+        }
+      ],
+      "group": "FarFacades",
+      "material": "matte",
+      "cast_shadow": true,
+      "variants": {
+        "san_francisco": "facade_sf_3.glb",
+        "generic": "facade_generic_3.glb"
+      }
+    },
+    {
+      "name": "edge_planter_south_0",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        -6.8,
+        0.05,
+        7.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_south_1",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        -4.6,
+        0.05,
+        7.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_south_2",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        -2.4,
+        0.05,
+        7.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_south_3",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        -0.2,
+        0.05,
+        7.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_south_4",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        2,
+        0.05,
+        7.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_south_5",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        4.2,
+        0.05,
+        7.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "bollard_south_0",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        -7.8,
+        0.05,
+        7.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_south_1",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        -5.7,
+        0.05,
+        7.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_south_2",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        -3.5,
+        0.05,
+        7.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_south_3",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        -1.3,
+        0.05,
+        7.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_south_4",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        0.9,
+        0.05,
+        7.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_south_5",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        3.1,
+        0.05,
+        7.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_south_6",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        5.4,
+        0.05,
+        7.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "edge_planter_east_0",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        7.77,
+        0.05,
+        -6.8
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_east_1",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        7.77,
+        0.05,
+        -4.6
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_east_2",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        7.77,
+        0.05,
+        -2.4
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_east_3",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        7.77,
+        0.05,
+        -0.2
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_east_4",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        7.77,
+        0.05,
+        2
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "edge_planter_east_5",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_long.glb",
+      "position": [
+        7.77,
+        0.05,
+        4.2
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        1,
+        0.42,
+        1
+      ]
+    },
+    {
+      "name": "bollard_east_0",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        7.76,
+        0.05,
+        -7.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_east_1",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        7.76,
+        0.05,
+        -5.7
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_east_2",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        7.76,
+        0.05,
+        -3.5
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_east_3",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        7.76,
+        0.05,
+        -1.3
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_east_4",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        7.76,
+        0.05,
+        0.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_east_5",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        7.76,
+        0.05,
+        3.1
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "bollard_east_6",
+      "file": "res://assets/landmarks/_shared/street_kit/bollard.glb",
+      "position": [
+        7.76,
+        0.05,
+        5.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "gate_post_0",
+      "file": "mp_gate_post.glb",
+      "position": [
+        5.6,
+        0.05,
+        8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "GatePier",
+          "size": [
+            0.46,
+            1.38,
+            0.46
+          ],
+          "at": [
+            0,
+            0.69,
+            0
+          ]
+        }
+      ],
+      "group": "NearEdges",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "gate_post_1",
+      "file": "mp_gate_post.glb",
+      "position": [
+        8,
+        0.05,
+        5.6
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "GatePier",
+          "size": [
+            0.46,
+            1.38,
+            0.46
+          ],
+          "at": [
+            0,
+            0.69,
+            0
+          ]
+        }
+      ],
+      "group": "NearEdges",
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "entry_low_flowerpot_0",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_square.glb",
+      "position": [
+        4.8,
+        0.05,
+        7.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        0.7,
+        0.4,
+        0.7
+      ]
+    },
+    {
+      "name": "entry_low_flowerpot_1",
+      "file": "res://assets/landmarks/_shared/street_kit/planter_square.glb",
+      "position": [
+        7.65,
+        0.05,
+        4.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "NearEdges",
+      "material": "preserve",
+      "cast_shadow": true,
+      "scale": [
+        0.7,
+        0.4,
+        0.7
+      ]
+    },
+    {
+      "name": "corner_tree_0",
+      "file": "mp_tree_pot.glb",
+      "position": [
+        -7.8,
+        0.05,
+        -7.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "TreePot",
+          "shape": "cylinder",
+          "radius": 0.52,
+          "height": 0.75,
+          "at": [
+            0,
+            0.375,
+            0
+          ]
+        }
+      ],
+      "group": "Garden",
+      "material": "matte",
+      "cast_shadow": true,
+      "occluder": true
+    },
+    {
+      "name": "corner_tree_pad_0",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        -7.8,
+        0.01,
+        -7.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true,
+      "scale": [
+        0.65,
+        0.25,
+        8.1
+      ]
+    },
+    {
+      "name": "corner_tree_1",
+      "file": "mp_tree_pot.glb",
+      "position": [
+        -7.8,
+        0.05,
+        7.8
+      ],
+      "yaw_degrees": 37,
+      "colliders": [
+        {
+          "name": "TreePot",
+          "shape": "cylinder",
+          "radius": 0.52,
+          "height": 0.75,
+          "at": [
+            0,
+            0.375,
+            0
+          ]
+        }
+      ],
+      "group": "Garden",
+      "material": "matte",
+      "cast_shadow": true,
+      "occluder": true
+    },
+    {
+      "name": "corner_tree_pad_1",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        -7.8,
+        0.01,
+        7.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true,
+      "scale": [
+        0.65,
+        0.25,
+        8.1
+      ]
+    },
+    {
+      "name": "corner_tree_2",
+      "file": "mp_tree_pot.glb",
+      "position": [
+        7.8,
+        0.05,
+        -7.8
+      ],
+      "yaw_degrees": 74,
+      "colliders": [
+        {
+          "name": "TreePot",
+          "shape": "cylinder",
+          "radius": 0.52,
+          "height": 0.75,
+          "at": [
+            0,
+            0.375,
+            0
+          ]
+        }
+      ],
+      "group": "Garden",
+      "material": "matte",
+      "cast_shadow": true,
+      "occluder": true
+    },
+    {
+      "name": "corner_tree_pad_2",
+      "file": "mp_edge_trim.glb",
+      "position": [
+        7.8,
+        0.01,
+        -7.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "group": "Ground",
+      "material": "matte",
+      "cast_shadow": true,
+      "scale": [
+        0.65,
+        0.25,
+        8.1
+      ]
+    },
+    {
+      "name": "lamp_0",
+      "file": "res://assets/landmarks/_shared/street_kit/lamp_single.glb",
+      "position": [
+        -7.3,
+        0.05,
+        -4.5
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "LampPost",
+          "shape": "cylinder",
+          "radius": 0.11,
+          "height": 2.9,
+          "at": [
+            0,
+            1.45,
+            0
+          ]
+        }
+      ],
+      "group": "LightingDecor",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "lamp_1",
+      "file": "res://assets/landmarks/_shared/street_kit/lamp_single.glb",
+      "position": [
+        -7.3,
+        0.05,
+        2.5
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "LampPost",
+          "shape": "cylinder",
+          "radius": 0.11,
+          "height": 2.9,
+          "at": [
+            0,
+            1.45,
+            0
+          ]
+        }
+      ],
+      "group": "LightingDecor",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "lamp_2",
+      "file": "res://assets/landmarks/_shared/street_kit/lamp_single.glb",
+      "position": [
+        -4.5,
+        0.05,
+        -7.3
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "LampPost",
+          "shape": "cylinder",
+          "radius": 0.11,
+          "height": 2.9,
+          "at": [
+            0,
+            1.45,
+            0
+          ]
+        }
+      ],
+      "group": "LightingDecor",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "lamp_3",
+      "file": "res://assets/landmarks/_shared/street_kit/lamp_single.glb",
+      "position": [
+        2.5,
+        0.05,
+        -7.3
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "LampPost",
+          "shape": "cylinder",
+          "radius": 0.11,
+          "height": 2.9,
+          "at": [
+            0,
+            1.45,
+            0
+          ]
+        }
+      ],
+      "group": "LightingDecor",
+      "material": "preserve",
+      "cast_shadow": true
+    },
+    {
+      "name": "string_light_0_0",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -7.3,
+        3.084077988116189,
+        -3.625
+      ],
+      "yaw_degrees": -90.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "string_light_0_1",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -7.3,
+        3.0191344560986453,
+        -1.875
+      ],
+      "yaw_degrees": -90.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "string_light_0_2",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -7.3,
+        3.0191344560986453,
+        -0.125
+      ],
+      "yaw_degrees": -90.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "string_light_0_3",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -7.3,
+        3.084077988116189,
+        1.625
+      ],
+      "yaw_degrees": -90.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "string_light_1_0",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -3.625,
+        3.084077988116189,
+        -7.3
+      ],
+      "yaw_degrees": -0.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "string_light_1_1",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -1.875,
+        3.0191344560986453,
+        -7.3
+      ],
+      "yaw_degrees": -0.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "string_light_1_2",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -0.125,
+        3.0191344560986453,
+        -7.3
+      ],
+      "yaw_degrees": -0.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "string_light_1_3",
+      "file": "mp_string_lights.glb",
+      "position": [
+        1.625,
+        3.084077988116189,
+        -7.3
+      ],
+      "yaw_degrees": -0.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.875,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "cross_string_0",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -6.6,
+        3.3232974879252417,
+        1.7999999999999998
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "cross_string_1",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -5.199999999999999,
+        3.2751812237769515,
+        0.3999999999999999
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "cross_string_2",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -3.7999999999999994,
+        3.2418837358517094,
+        -1.0000000000000004
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "cross_string_3",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -2.3999999999999995,
+        3.2299999999999995,
+        -2.4000000000000004
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "cross_string_4",
+      "file": "mp_string_lights.glb",
+      "position": [
+        -0.9999999999999991,
+        3.2418837358517094,
+        -3.8000000000000007
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "cross_string_5",
+      "file": "mp_string_lights.glb",
+      "position": [
+        0.40000000000000036,
+        3.2751812237769515,
+        -5.2
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "cross_string_6",
+      "file": "mp_string_lights.glb",
+      "position": [
+        1.8000000000000016,
+        3.3232974879252417,
+        -6.600000000000001
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "market_bunting_0",
+      "file": "mp_bunting.glb",
+      "position": [
+        -6.6,
+        2.953297487925242,
+        1.7999999999999998
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "market_bunting_1",
+      "file": "mp_bunting.glb",
+      "position": [
+        -5.199999999999999,
+        2.905181223776952,
+        0.3999999999999999
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "market_bunting_2",
+      "file": "mp_bunting.glb",
+      "position": [
+        -3.7999999999999994,
+        2.8718837358517098,
+        -1.0000000000000004
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "market_bunting_3",
+      "file": "mp_bunting.glb",
+      "position": [
+        -2.3999999999999995,
+        2.86,
+        -2.4000000000000004
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "market_bunting_4",
+      "file": "mp_bunting.glb",
+      "position": [
+        -0.9999999999999991,
+        2.8718837358517098,
+        -3.8000000000000007
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "market_bunting_5",
+      "file": "mp_bunting.glb",
+      "position": [
+        0.40000000000000036,
+        2.905181223776952,
+        -5.2
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "market_bunting_6",
+      "file": "mp_bunting.glb",
+      "position": [
+        1.8000000000000016,
+        2.953297487925242,
+        -6.600000000000001
+      ],
+      "yaw_degrees": 45.0,
+      "colliders": [],
+      "group": "LightingDecor",
+      "material": "matte",
+      "cast_shadow": false,
+      "scale": [
+        0.9899494936611666,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "stall_fish",
+      "file": "stall_fish.glb",
+      "position": [
+        -6.6,
+        0.05,
+        4.5
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "StallReserved",
+          "size": [
+            2,
+            1.45,
+            1.6
+          ],
+          "at": [
+            0,
+            0.725,
+            0
+          ]
+        },
+        {
+          "name": "RearServiceGapBoundary",
+          "size": [
+            2.0,
+            3.0,
+            2.4
+          ],
+          "at": [
+            0,
+            1.5,
+            -2.0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_stall_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877",
+      "footprint_m": [
+        2,
+        1.6
+      ],
+      "occluder": true
+    },
+    {
+      "name": "stall_bread",
+      "file": "stall_bakery.glb",
+      "position": [
+        -6.6,
+        0.05,
+        0.5
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "StallReserved",
+          "size": [
+            2,
+            1.45,
+            1.6
+          ],
+          "at": [
+            0,
+            0.725,
+            0
+          ]
+        },
+        {
+          "name": "RearServiceGapBoundary",
+          "size": [
+            2.0,
+            3.0,
+            2.4
+          ],
+          "at": [
+            0,
+            1.5,
+            -2.0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_stall_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877",
+      "footprint_m": [
+        2,
+        1.6
+      ],
+      "occluder": true
+    },
+    {
+      "name": "stall_spice",
+      "file": "stall_spice.glb",
+      "position": [
+        -6.6,
+        0.05,
+        -3.5
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "StallReserved",
+          "size": [
+            2,
+            1.45,
+            1.6
+          ],
+          "at": [
+            0,
+            0.725,
+            0
+          ]
+        },
+        {
+          "name": "RearServiceGapBoundary",
+          "size": [
+            2.0,
+            3.0,
+            2.4
+          ],
+          "at": [
+            0,
+            1.5,
+            -2.0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_stall_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877",
+      "footprint_m": [
+        2,
+        1.6
+      ],
+      "occluder": true
+    },
+    {
+      "name": "stall_vegetable",
+      "file": "stall_veg.glb",
+      "position": [
+        -3.5,
+        0.05,
+        -6.6
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "StallReserved",
+          "size": [
+            2,
+            1.45,
+            1.6
+          ],
+          "at": [
+            0,
+            0.725,
+            0
+          ]
+        },
+        {
+          "name": "RearServiceGapBoundary",
+          "size": [
+            2.0,
+            3.0,
+            2.4
+          ],
+          "at": [
+            0,
+            1.5,
+            -2.0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_stall_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877",
+      "footprint_m": [
+        2,
+        1.6
+      ],
+      "occluder": true
+    },
+    {
+      "name": "stall_tools",
+      "file": "stall_tools.glb",
+      "position": [
+        0.5,
+        0.05,
+        -6.6
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "StallReserved",
+          "size": [
+            2,
+            1.45,
+            1.6
+          ],
+          "at": [
+            0,
+            0.725,
+            0
+          ]
+        },
+        {
+          "name": "RearServiceGapBoundary",
+          "size": [
+            2.0,
+            3.0,
+            2.4
+          ],
+          "at": [
+            0,
+            1.5,
+            -2.0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_stall_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877",
+      "footprint_m": [
+        2,
+        1.6
+      ],
+      "occluder": true
+    },
+    {
+      "name": "stall_flower_cart",
+      "file": "flower_cart.glb",
+      "position": [
+        4.5,
+        0.05,
+        -6.6
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "StallReserved",
+          "size": [
+            2,
+            1.45,
+            1.4
+          ],
+          "at": [
+            0,
+            0.725,
+            0
+          ]
+        },
+        {
+          "name": "RearServiceGapBoundary",
+          "size": [
+            2.0,
+            3.0,
+            2.4
+          ],
+          "at": [
+            0,
+            1.5,
+            -2.0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_stall_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877",
+      "footprint_m": [
+        2,
+        1.4
+      ],
+      "occluder": true
+    },
+    {
+      "name": "stall_keeper",
+      "file": "stall_keeper.glb",
+      "position": [
+        2.2,
+        0.05,
+        2.2
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "KeeperStallReserved",
+          "size": [
+            3.2,
+            1.45,
+            1.6
+          ],
+          "at": [
+            0,
+            0.725,
+            0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_keeper_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877",
+      "footprint_m": [
+        3.2,
+        1.6
+      ],
+      "anchor_module": true,
+      "occluder": true
+    },
+    {
+      "name": "market_board",
+      "file": "market_board.glb",
+      "position": [
+        1.1,
+        0.05,
+        4.2
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "Board",
+          "size": [
+            1.2,
+            1.8,
+            0.3
+          ],
+          "at": [
+            0,
+            0.9,
+            0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_board_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877",
+      "anchor_module": true
+    },
+    {
+      "name": "fountain",
+      "file": "fountain.glb",
+      "position": [
+        -0.8,
+        0.05,
+        -0.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "name": "FountainBasin",
+          "shape": "cylinder",
+          "radius": 1.5,
+          "height": 2.03,
+          "at": [
+            0,
+            1.015,
+            0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "fallback_file": "mp_fountain_placeholder.glb",
+      "dependency_pr": 877,
+      "pending_owner": "黄忠 #877"
+    },
+    {
+      "name": "keeper_rear_flowerbed",
+      "file": "mp_keeper_flowerbed.glb",
+      "position": [
+        0.8174154390516488,
+        0.05,
+        0.8174154390516488
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "VisibleGardenBed",
+          "size": [
+            3.4,
+            0.445,
+            2.312
+          ],
+          "at": [
+            0,
+            0.2225,
+            0
+          ]
+        }
+      ],
+      "group": "Garden",
+      "material": "matte",
+      "cast_shadow": true,
+      "height_m": 0.445,
+      "purpose": "approved low flowerbed closes keeper rear strip; circulation goes around other fountain sides"
+    },
+    {
+      "name": "floor_fig_crate",
+      "file": "res://assets/rooms/fruit_shop/floor_fig_crate.glb",
+      "position": [
+        4.2,
+        0.05,
+        1.1
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "name": "SpecialtyCrate",
+          "size": [
+            0.9,
+            0.54,
+            0.7
+          ],
+          "at": [
+            0,
+            0.27,
+            0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "fruit",
+      "cast_shadow": true,
+      "anchor_module": true
+    },
+    {
+      "name": "bench_1",
+      "file": "res://assets/landmarks/_shared/street_kit/bench_wood.glb",
+      "position": [
+        -3.6,
+        0.05,
+        1
+      ],
+      "yaw_degrees": 122.7352262721076,
+      "colliders": [
+        {
+          "name": "Bench",
+          "size": [
+            1.8,
+            1.28,
+            0.672
+          ],
+          "at": [
+            0,
+            0.64,
+            0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "anchor_module": true
+    },
+    {
+      "name": "bench_2",
+      "file": "res://assets/landmarks/_shared/street_kit/bench_wood.glb",
+      "position": [
+        1,
+        0.05,
+        -3.6
+      ],
+      "yaw_degrees": -32.7352262721076,
+      "colliders": [
+        {
+          "name": "Bench",
+          "size": [
+            1.8,
+            1.28,
+            0.672
+          ],
+          "at": [
+            0,
+            0.64,
+            0
+          ]
+        }
+      ],
+      "group": "MarketProps",
+      "material": "preserve",
+      "cast_shadow": true,
+      "anchor_module": true
+    }
+  ],
+  "instances": [],
+  "camera": {
+    "position": [
+      16.604830081721907,
+      16.64989298042076,
+      16.604830081721907
+    ],
+    "target": [
+      0,
+      1.4,
+      0
+    ],
+    "size": 6.72,
+    "near": 0.1,
+    "far": 110,
+    "yaw_degrees": 45,
+    "pitch_degrees": 33
+  },
+  "camera_contract": {
+    "yaw_degrees": 45,
+    "pitch_degrees": 33,
+    "width_m": 6.72,
+    "pitch_status": "user approved 33 degrees, 2026-11-08"
+  },
+  "city_backdrop": {
+    "scene": "res://scenes/market_plaza/market_city_backdrop.tscn",
+    "default_variant": "san_francisco",
+    "variants": [
+      "san_francisco",
+      "generic"
+    ],
+    "source": "SGODOT-434",
+    "screen_anchor_below_hud": true
+  },
+  "review_lighting": {
+    "background": "DDE8E7",
+    "ambient_color": "FFF0DC",
+    "ambient": 0.7,
+    "sun_color": "FFF1D8",
+    "sun": 1.0,
+    "sun_position": [
+      -6,
+      9,
+      3
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "points": []
+  },
+  "sun_direction": [
+    -6,
+    9,
+    3
+  ],
+  "anchors": [
+    {
+      "name": "use_counter",
+      "position": [
+        2.6,
+        1.05,
+        2.6
+      ],
+      "module": "stall_keeper"
+    },
+    {
+      "name": "stand_counter",
+      "position": [
+        3.25,
+        0.05,
+        3.25
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "npc_keeper",
+      "position": [
+        1.75,
+        0.05,
+        1.75
+      ],
+      "yaw_degrees": 225
+    },
+    {
+      "name": "badge_keeper",
+      "position": [
+        1.75,
+        2.5,
+        1.75
+      ]
+    },
+    {
+      "name": "stand_keeper",
+      "position": [
+        3.25,
+        0.05,
+        3.25
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "use_market_board",
+      "position": [
+        1.1,
+        1.8,
+        4.2
+      ],
+      "module": "market_board"
+    },
+    {
+      "name": "stand_market_board",
+      "position": [
+        1.6,
+        0.05,
+        4.7
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "use_specialty_shelf",
+      "position": [
+        4.2,
+        0.7,
+        1.1
+      ],
+      "module": "floor_fig_crate"
+    },
+    {
+      "name": "stand_specialty_shelf",
+      "position": [
+        4.7,
+        0.05,
+        1.6
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "npc_nadia",
+      "position": [
+        -1.2,
+        0.05,
+        1.6
+      ],
+      "yaw_degrees": 225
+    },
+    {
+      "name": "stand_nadia",
+      "position": [
+        -0.7,
+        0.05,
+        2.1
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "npc_theo",
+      "position": [
+        1.5,
+        0.05,
+        -4.4
+      ],
+      "yaw_degrees": 225
+    },
+    {
+      "name": "stand_theo",
+      "position": [
+        2,
+        0.05,
+        -3.9
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "npc_tomo",
+      "position": [
+        -1.2,
+        0.05,
+        1.6
+      ],
+      "yaw_degrees": 225
+    },
+    {
+      "name": "stand_tomo",
+      "position": [
+        -0.7,
+        0.05,
+        2.1
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "spawn",
+      "position": [
+        5.8,
+        0.05,
+        5.8
+      ],
+      "yaw_degrees": 45
+    },
+    {
+      "name": "exit",
+      "position": [
+        7.2,
+        0.05,
+        7.2
+      ],
+      "yaw_degrees": 225
+    },
+    {
+      "name": "badge_exit",
+      "position": [
+        5.6,
+        1.1,
+        8
+      ],
+      "label": "Map",
+      "icon": "i-door"
+    },
+    {
+      "name": "seat_1",
+      "position": [
+        -3.6,
+        0.768,
+        1
+      ],
+      "yaw_degrees": 302.7352262721076,
+      "module": "bench_1",
+      "approach": [
+        -2.9271,
+        0.05,
+        0.5674
+      ]
+    },
+    {
+      "name": "seat_2",
+      "position": [
+        1,
+        0.768,
+        -3.6
+      ],
+      "yaw_degrees": 147.2647737278924,
+      "module": "bench_2",
+      "approach": [
+        0.5674,
+        0.05,
+        -2.9271
+      ]
+    }
+  ],
+  "spawn": [
+    5.8,
+    0.05,
+    5.8
+  ],
+  "floor_y": 0.05,
+  "footprint_m": [
+    16,
+    16
+  ],
+  "boundaries": [
+    {
+      "name": "NorthBoundary",
+      "size": [
+        16.1,
+        3,
+        0.12
+      ],
+      "at": [
+        0,
+        1.55,
+        -8
+      ]
+    },
+    {
+      "name": "WestBoundary",
+      "size": [
+        0.12,
+        3,
+        16.1
+      ],
+      "at": [
+        -8,
+        1.55,
+        0
+      ]
+    },
+    {
+      "name": "SouthBoundary",
+      "size": [
+        13.6,
+        3,
+        0.12
+      ],
+      "at": [
+        -1.2,
+        1.55,
+        8
+      ]
+    },
+    {
+      "name": "EastBoundary",
+      "size": [
+        0.12,
+        3,
+        13.6
+      ],
+      "at": [
+        8,
+        1.55,
+        -1.2
+      ]
+    },
+    {
+      "name": "EntryEndBoundary",
+      "size": [
+        3.4,
+        3,
+        0.12
+      ],
+      "at": [
+        7.95,
+        1.55,
+        7.95
+      ],
+      "rotation_degrees": [
+        0,
+        45,
+        0
+      ]
+    }
+  ],
+  "local_lights": [],
+  "preflight": {
+    "routes": [
+      {
+        "name": "entry_to_keeper",
+        "points_xz": [
+          [
+            7.2,
+            7.2
+          ],
+          [
+            5.8,
+            5.8
+          ],
+          [
+            3.25,
+            3.25
+          ]
+        ]
+      },
+      {
+        "name": "entry_to_fountain_left",
+        "points_xz": [
+          [
+            5.8,
+            5.8
+          ],
+          [
+            1.6,
+            4.7
+          ],
+          [
+            -1.8,
+            3.0
+          ],
+          [
+            -3.4,
+            -0.8
+          ],
+          [
+            -0.8,
+            -3.4
+          ]
+        ]
+      },
+      {
+        "name": "entry_to_fountain_right",
+        "points_xz": [
+          [
+            5.8,
+            5.8
+          ],
+          [
+            4.7,
+            1.6
+          ],
+          [
+            3.0,
+            -1.8
+          ],
+          [
+            -0.8,
+            -3.4
+          ]
+        ]
+      }
+    ],
+    "main_routes": [
+      {
+        "name": "entry_to_keeper",
+        "points_xz": [
+          [
+            7.2,
+            7.2
+          ],
+          [
+            5.8,
+            5.8
+          ],
+          [
+            3.25,
+            3.25
+          ]
+        ]
+      }
+    ],
+    "standing_positions_xz": [
+      [
+        3.25,
+        3.25
+      ],
+      [
+        1.6,
+        4.7
+      ],
+      [
+        4.7,
+        1.6
+      ],
+      [
+        -0.7,
+        2.1
+      ],
+      [
+        2,
+        -3.9
+      ]
+    ],
+    "ring": {
+      "center": [
+        -0.8,
+        -0.8
+      ],
+      "basin_radius_m": 1.5,
+      "nominal_outer_radius_m": 4.5,
+      "keeper_rear_strip": "closed by visible low flowerbed per a8/a9; left and right approaches stay open"
+    }
+  },
+  "bench": {
+    "floor_y": 0.05,
+    "route": [
+      {
+        "name": "spawn",
+        "position": [
+          5.8,
+          0.05,
+          5.8
+        ],
+        "capture": "opening"
+      },
+      {
+        "name": "keeper",
+        "position": [
+          3.25,
+          0.05,
+          3.25
+        ]
+      },
+      {
+        "name": "board",
+        "position": [
+          1.6,
+          0.05,
+          4.7
+        ]
+      },
+      {
+        "name": "ring_west",
+        "position": [
+          -3.8,
+          0.05,
+          -0.8
+        ],
+        "capture": "ring"
+      },
+      {
+        "name": "far_west",
+        "position": [
+          -5,
+          0.05,
+          -3.2
+        ]
+      },
+      {
+        "name": "far_north",
+        "position": [
+          -3.2,
+          0.05,
+          -5
+        ]
+      },
+      {
+        "name": "north_east",
+        "position": [
+          4.7,
+          0.05,
+          -4.8
+        ]
+      },
+      {
+        "name": "east_side",
+        "position": [
+          5.2,
+          0.05,
+          2.6
+        ]
+      },
+      {
+        "name": "exit",
+        "position": [
+          7.2,
+          0.05,
+          7.2
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "fountain",
+        "from": [
+          1.2,
+          0.05,
+          -0.8
+        ],
+        "to": [
+          -0.8,
+          0.05,
+          -0.8
+        ],
+        "target": "FountainBasin"
+      }
+    ],
+    "entrance": {
+      "inside": [
+        5.8,
+        0.05,
+        5.8
+      ],
+      "outside": [
+        7.2,
+        0.05,
+        7.2
+      ]
+    },
+    "gaps": []
+  },
+  "navigation": {
+    "source": "P0RoomNav.build(P0RoomNav.shapes_from(art))",
+    "cell_m": 0.15,
+    "actor_radius_m": 0.21,
+    "runtime_rebuilt": true,
+    "snapshot": "navigation_snapshot.json"
+  },
+  "integration": {
+    "outpost_id": "sh_market_1",
+    "art": "market_plaza",
+    "bounds": [
+      -8,
+      8,
+      -8,
+      8
+    ],
+    "anchors_override": "must clear old market.anchors.json override or replace with this anchors list",
+    "seats": [
+      "seat_1",
+      "seat_2"
+    ],
+    "server_room_bounds": "must update to match; program-owned"
+  },
+  "facade_variants": {
+    "default": "san_francisco",
+    "bone_contract": "same4m bays/door/window/steps/flowerboxes/collision placement; wall6m+roof0.5m; depth2.5m",
+    "san_francisco": {
+      "files": [
+        "facade_sf_0.glb",
+        "facade_sf_1.glb",
+        "facade_sf_2.glb",
+        "facade_sf_3.glb"
+      ],
+      "style": "pastel Victorian row houses",
+      "due": "2026-11-11 18:00"
+    },
+    "generic": {
+      "files": [
+        "facade_generic_0.glb",
+        "facade_generic_1.glb",
+        "facade_generic_2.glb",
+        "facade_generic_3.glb"
+      ],
+      "style": "shared bone, neutral palette and simplified trim",
+      "due": "2026-11-12 18:00"
+    }
+  },
+  "pending": {
+    "huangzhong_props": "#877 finished kit 288b47b94f966981603b3d132552d6b16f923303 technically accepted; assembled visual acceptance pending; integrate dependency before this scene ships"
+  },
+  "author": "马可波罗",
+  "virtual_user_id": "5a7c76bc-19d2-47e1-9406-4f4e0feeefb4"
+}
