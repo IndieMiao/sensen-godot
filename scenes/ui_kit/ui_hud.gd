@@ -4,7 +4,8 @@ extends Control
 ## full-rect Control (P0 world, map); it anchors itself at the top (x 8, y 16 + safe_top, 344 wide). Only the
 ## chips take touches.
 ##   Row 1: avatar with the two-colour skill ring (→ Profile) · Energy chip (number, bar, +1 in m:ss / Full /
-##          bonus) · optional Buff chip (icon + remaining) · coins · bell with the red unread count.
+##          bonus) · optional Buff chip (icon + remaining) · the priest's buffs, each an icon in a countdown ring over
+##          its time (q(300), BuffRing below) · coins · bell with the red unread count.
 ##   Row 2: Today icon (list-checks in a 32 x 24 pill, 44 hit area; a red dot at its top-right when the Today panel
 ##          has something new to do now, q(107) / SGODOT-271) · location chip `City · Space` with the player's ACTUAL
 ##          place in the rest of the row (never Map; foreign city adds `· Day Pass 23h`; the space is truncated first).
@@ -47,6 +48,17 @@ const _ICON_COIN := 13
 const _ICON_BELL := 18
 const _SKILL_GAP := 4.0           # degrees each skill half stops short of 12 and 6 o'clock
 const _ICON_BUFF := 14
+# The priest's buffs (q(300) ⑨, 不知火舞's spec v1.1 §3): a 28 circle on the surface colour, its 16 icon inside, a
+# 2.5 arc for the time left from 12 o'clock clockwise on NEED-TILE's light track; under it the time in a caption pill
+# (16 high, radius 8, 4 in, 1 px border, C10 XB primary) whose top covers the circle's bottom 4 px — 40 high, centred
+# in the 44 row. Two side by side, centres 40 apart; the left pill starts _BUFF_GAP after the Energy chip.
+const _BUFF_RING := 28.0
+const _BUFF_RING_ICON := 16
+const _BUFF_RING_STROKE := 2.5
+const _BUFF_PITCH := 40.0
+const _BUFF_PILL_H := 16.0
+const _BUFF_PILL_OVER := 4.0
+const _BUFF_PILL_PAD := 4
 const _ICON_PLACE := 11
 const _ICON_TODAY := 14
 const _DOT := 8.0                 # the Today icon's red dot: the unread dot of UiSegmentTab / UiInboxRow
@@ -57,7 +69,7 @@ const _BADGE_OVER := Vector2(2, 8)   # unread badge: past the bell's right edge 
 var data := {
 	energy = 0, energy_max = 200, regen = "Full", next_cost = 0,
 	skills = {farming = 0.0, fishing = 0.0},
-	coins = 0, unread = 0, buff = {}, today_dot = false,
+	coins = 0, unread = 0, buff = {}, buffs = [], today_dot = false,
 	place = {city = "", space = "", kind = PlaceKind.HOME, day_pass = "", helping = false},
 }
 var safe_top := 0.0: set = set_safe_top
@@ -75,6 +87,7 @@ var _energy_regen: Label
 var _buff: PanelContainer
 var _buff_icon: TextureRect
 var _buff_left: Label
+var _buff_rings: _BuffRings
 var _coins: Label
 var _balances: HBoxContainer
 var _inbox: _Chip
@@ -267,6 +280,8 @@ func _build_row1() -> void:
 	_buff_left.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bh.add_child(_buff_left)
 	row.add_child(_buff)
+	_buff_rings = _BuffRings.new()
+	row.add_child(_buff_rings)
 	var spacer := Control.new()
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -404,6 +419,7 @@ func _refresh() -> void:
 	_buff.visible = not buff.is_empty()
 	_buff_icon.texture = buff.get("icon", null)
 	_buff_left.text = str(buff.get("remaining", ""))
+	_buff_rings.show_buffs(data.buffs)
 	_coins.text = str(int(data.coins))
 	var unread := int(data.unread)
 	_badge.visible = unread > 0
@@ -527,3 +543,77 @@ class _Track extends Control:
 			var w := maxf(size.y, size.x * over)
 			draw_rect(Rect2(Vector2(size.x - w, 0.0), Vector2(w, size.y)), UiTokens.COLOR_ENERGY_BONUS)
 
+## The priest's buffs (q(300) ⑨): `buffs` [{icon, remaining "18:20", progress 0..1}], left to right; display only.
+## Laid out by hand: the pills are wider than the circles and set the slots, the circles' centres 40 apart.
+class _BuffRings extends Control:
+	var _slots: Array = []   # [ring, icon, pill, label]
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		custom_minimum_size = Vector2(0, UiTokens.SIZE_TOUCH)
+		size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+	func show_buffs(buffs: Array) -> void:
+		visible = not buffs.is_empty()
+		while _slots.size() < buffs.size(): _slots.append(_slot())
+		var top := (UiTokens.SIZE_TOUCH - (_BUFF_RING + _BUFF_PILL_H - _BUFF_PILL_OVER)) * 0.5
+		var centre := 0.0
+		var right := 0.0
+		for i in _slots.size():
+			var s: Array = _slots[i]
+			var on := i < buffs.size()
+			for n in s: (n as Control).visible = on
+			if not on: continue
+			var b: Dictionary = buffs[i]
+			var ring: _BuffRing = s[0]
+			ring.progress = clampf(float(b.get("progress", 0.0)), 0.0, 1.0)
+			ring.queue_redraw()
+			(s[1] as TextureRect).texture = b.get("icon", null)
+			(s[3] as Label).text = str(b.get("remaining", ""))
+			var pill: PanelContainer = s[2]
+			var pw := pill.get_combined_minimum_size().x
+			var half := maxf(pw, _BUFF_RING) * 0.5
+			centre = half if i == 0 else centre + _BUFF_PITCH
+			ring.position = Vector2(centre - _BUFF_RING * 0.5, top)
+			(s[1] as Control).position = Vector2(centre - _BUFF_RING_ICON * 0.5, top + (_BUFF_RING - _BUFF_RING_ICON) * 0.5)
+			pill.size = Vector2(pw, _BUFF_PILL_H)
+			pill.position = Vector2(centre - pw * 0.5, top + _BUFF_RING - _BUFF_PILL_OVER)
+			right = centre + half
+		custom_minimum_size.x = right
+		update_minimum_size()
+
+	func _slot() -> Array:
+		var ring := _BuffRing.new()
+		ring.size = Vector2(_BUFF_RING, _BUFF_RING)
+		add_child(ring)
+		var icon := UiKit.icon(null, _BUFF_RING_ICON)
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.size = Vector2(_BUFF_RING_ICON, _BUFF_RING_ICON)
+		add_child(icon)
+		var pill := PanelContainer.new()
+		pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _BUFF_PILL_H * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+		pill.add_theme_stylebox_override(&"panel", box.with_margins(_BUFF_PILL_PAD, 0, _BUFF_PILL_PAD, 0))
+		pill.custom_minimum_size.y = _BUFF_PILL_H
+		var label := UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_PRIMARY)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		pill.add_child(label)
+		add_child(pill)
+		return [ring, icon, pill, label]
+
+## One buff's circle: the surface colour, NEED-TILE's light track and its green arc for the share of time left.
+class _BuffRing extends Control:
+	var progress := 0.0
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var c := Vector2(_BUFF_RING, _BUFF_RING) * 0.5
+		var r := _BUFF_RING * 0.5 - _BUFF_RING_STROKE * 0.5
+		draw_circle(c, _BUFF_RING * 0.5, UiTokens.COLOR_SURFACE, true, -1.0, true)
+		draw_arc(c, r, 0.0, TAU, 64, UiTokens.COLOR_BORDER, _BUFF_RING_STROKE, true)
+		if progress > 0.0:
+			draw_arc(c, r, -PI * 0.5, -PI * 0.5 + TAU * progress, maxi(8, int(64 * progress)), UiTokens.COLOR_PRIMARY,
+				_BUFF_RING_STROKE, true)

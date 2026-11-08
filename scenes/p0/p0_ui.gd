@@ -487,6 +487,7 @@ func set_view(v: Dictionary) -> void:
 	if blackjack() != null: _blackjack.refresh(v)
 	_refresh_rest_card(v)
 	_refresh_priest_keys()
+	_watch_buffs(v)
 	_refresh_hud()
 	_refresh_bar()
 	_refresh_request_reward()
@@ -1832,6 +1833,25 @@ func toast_success(text: String, break_at_dot := false, action := "") -> void:
 		return
 	_aim_toast()
 	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.SUCCESS, action)
+
+## The priest's buffs' toasts (q(300) ⑨, spec v1.1 §4), from view.buffs as P0Logic.project counts it down: one taken or
+## renewed (new, or its time up by more than BUFF_RENEW_MS — a server answer resets a projection by a fraction of a
+## second) says what it does; one that runs out on screen says it has worn off. The first view after launch says
+## nothing, nor does one gone at a jump (back from the background, offline: no catch-up, spec §4).
+const BUFF_RENEW_MS := 5000.0
+const BUFF_LINES := {"fish": "%s · %d min · every fish lands ×2", "farm": "%s · %d min · crops sown now grow 2× faster"}
+var _buffs_seen = null   # {id: ms left} at the last view; null before the first
+
+func _watch_buffs(v: Dictionary) -> void:
+	var now := P0Logic.buffs_left(v)
+	if _buffs_seen is Dictionary:
+		var minutes := int(P0Logic.content().get("buffs", {}).get("minutes", 20))
+		for id in P0Logic.BUFF_ORDER:
+			if now.has(id) and (not _buffs_seen.has(id) or float(now[id]) > float(_buffs_seen[id]) + BUFF_RENEW_MS):
+				toast_success(BUFF_LINES[id] % [P0Logic.BUFF_NAMES[id], minutes])
+			elif _buffs_seen.has(id) and not now.has(id) and float(_buffs_seen[id]) <= BUFF_RENEW_MS:
+				toast("%s has worn off" % P0Logic.BUFF_NAMES[id])
+	_buffs_seen = now
 
 ## DECOR-BOUGHT (Figma 2189:32861, q(111)): `Flower Planter` / `in Farm Storage` + `Place now ›`, which closes the drawer
 ## and opens Decorate with that piece picked.
@@ -4240,6 +4260,7 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event
 	m.event = event
 	m.icon = P0Logic.icon(fish_id)
 	m.item_name = P0Logic.item_name(view, fish_id)
+	if int(extras.get("qty", 1)) > 1: m.item_name += " ×%d" % int(extras.qty)   # Twin Catch: `Bluegill ×2` (q(124), q(300))
 	m.rarity = rarity
 	m.rarity_word = P0Logic.rarity_name(view, rarity)
 	var once: Array = []
