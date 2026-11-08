@@ -27,20 +27,20 @@
       "bytes": 25876
     },
     "facade_sf_0": {
-      "triangles": 5272,
-      "bytes": 373688
+      "triangles": 5125,
+      "bytes": 365728
     },
     "facade_sf_1": {
-      "triangles": 5272,
-      "bytes": 373688
+      "triangles": 5292,
+      "bytes": 381236
     },
     "facade_sf_2": {
-      "triangles": 5272,
-      "bytes": 373688
+      "triangles": 5125,
+      "bytes": 365732
     },
     "facade_sf_3": {
-      "triangles": 5272,
-      "bytes": 373688
+      "triangles": 5292,
+      "bytes": 381236
     },
     "facade_generic_0": {
       "triangles": 4860,
@@ -89,6 +89,22 @@
     "mp_bunting": {
       "triangles": 184,
       "bytes": 17568
+    },
+    "facade_sf_4": {
+      "triangles": 5125,
+      "bytes": 365732
+    },
+    "facade_sf_5": {
+      "triangles": 5292,
+      "bytes": 381236
+    },
+    "facade_sf_6": {
+      "triangles": 5125,
+      "bytes": 365732
+    },
+    "facade_sf_7": {
+      "triangles": 5292,
+      "bytes": 381236
     }
   }
 }

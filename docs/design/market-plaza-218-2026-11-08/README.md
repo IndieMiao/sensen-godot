@@ -1,5 +1,7 @@
 # SGODOT-218 集市广场整场 v1 · 2026-11-08
 
+最新：[旧金山排屋 v2 与门图标核查](v2/README.md)。下文保留v1审阅证据。
+
 马可波罗交审：16×16 m场子、428铺石、近侧低件、三盆树、串灯和彩旗、两套带完整屋顶的排屋、可替换城市远景、20个锚点、实时碰撞导航。按用户已批v2.1/33°/排屋C和a8/a9制作。黄忠#877成品 `288b47b94f966981603b3d132552d6b16f923303` 装配于审阅副本，摊位坐标和遮阳没有改。
 
 场景：`scenes/market_plaza/market_plaza_art.tscn`。具体坐标、依赖与程序接入见 [LAYOUT_HANDOFF](../../../assets/rooms/market_plaza/LAYOUT_HANDOFF.md)。

@@ -43,7 +43,10 @@ func _ready() -> void:
 		var path: Array[Vector3]=scene.grid.point_path(ring[i],ring[i+1])
 		report.ring_paths.append({"from":xyz(ring[i]-scene.room.position),"to":xyz(ring[i+1]-scene.room.position),"points":path.size(),"path":path.map(func(v):return xyz(v-scene.room.position))})
 	for spec in [["far_corner",Vector3(-7,.05,-7)],["left_corner",Vector3(-7,.05,7)],["right_corner",Vector3(7,.05,-7)],["entry_corner",Vector3(6.4,.05,6.4)],["ring",Vector3(-3.4,.05,-.8)]]:
-		stand(spec[1]);await capture(spec[0])
+		stand(spec[1])
+		# Preserve the short-settle diagnostic: the exit strip folds for 170 ms.
+		if spec[0] in ["far_corner","ring"]:await capture(spec[0]+"_transition",10)
+		await capture(spec[0])
 	stand(Vector3(-7,.05,-7));scene.art.city_variant="generic";await capture("far_corner_generic");scene.art.city_variant="san_francisco"
 	# P0's actual seat flow, local/offline claim. Two screenshots of resulting poses.
 	for seat_ in ["seat_1","seat_2"]:
@@ -83,8 +86,9 @@ func stand(local:Vector3) -> void:
 	var at:Vector3=scene.reachable(local+scene.room.position)
 	scene.actor.teleport(Vector3(at.x,scene.floor_y,at.z));scene.actor.stand_still()
 	scene._focus=scene.actor.position;scene._follow.hold();scene._update_camera()
-func capture(label:String) -> void:
-	for f in 10:await get_tree().process_frame
+func capture(label:String,settle_frames:int=30) -> void:
+	# Wait beyond P0Ui name-strip collapse before taking the acceptance still.
+	for f in settle_frames:await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var im:Image=get_viewport().get_texture().get_image();assert(im.get_size()==Vector2i(360,800))
 	assert(im.save_png(folder.path_join(label+".png"))==OK)
@@ -100,7 +104,10 @@ func capture(label:String) -> void:
 	for id in rt.ui._icons:
 		var b:Control=rt.ui._icons[id]
 		if b.visible:icons[id]=rect(b.get_global_rect())
-	report.views[label]={"actor":xyz(scene.actor.position-scene.room.position),"player_box":rect(scene.actor.screen_box(scene.cam)),"anchor_pixels":points,"name_bars":bars,"icons":icons,"draw_calls":RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),"triangles":RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)}
+	var exit_bar:Control=rt.ui._name_bars.get("room:exit")
+	var exit_icon:Control=rt.ui._icons.get("room:exit")
+	var exit_state={"bar_visible":exit_bar.visible if exit_bar else false,"bar_folding":exit_bar.get_meta("folding",false) if exit_bar else false,"bar_openness":exit_bar.openness() if exit_bar else 0.0,"bar_rect":rect(exit_bar.get_global_rect()) if exit_bar else [],"icon_visible":exit_icon.visible if exit_icon else false,"icon_rect":rect(exit_icon.get_global_rect()) if exit_icon else [],"marker_area":rect(rt.ui._marker_area())}
+	report.views[label]={"exit_prompt_state":exit_state,"actor":xyz(scene.actor.position-scene.room.position),"player_box":rect(scene.actor.screen_box(scene.cam)),"anchor_pixels":points,"name_bars":bars,"icons":icons,"draw_calls":RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),"triangles":RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)}
 func xyz(v:Vector3)->Array:return [v.x,v.y,v.z]
 func xy(v:Vector2)->Array:return [v.x,v.y]
 func rect(r:Rect2)->Array:return [r.position.x,r.position.y,r.size.x,r.size.y]

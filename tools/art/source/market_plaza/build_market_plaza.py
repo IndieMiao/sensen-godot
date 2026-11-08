@@ -16,7 +16,8 @@ PALETTE={'stone':'D9C4A3','cream':'F0E1C2','cream_light':'FFF0D2','pave':'DFCBA7
  'leaf':'82AA55','leaf_light':'A8C873','leaf_dark':'658B45','trunk':'795F47',
  'sage':'9AAD82','mint':'B4C8A0','teal':'91B9B3','yellow':'DDC59B','wood':'A3815D',
  'iron':'5D4C38','bulb':'FFE0A3','water':'91C3CC',
- 'sf_blue':'8FAEB1','sf_pink':'CFA59B','sf_cream':'E3D5B9','sf_yellow':'D7BE8D',
+ 'sf_blue':'6398BC','sf_pink':'D5888C','sf_cream':'E8D1A4','sf_yellow':'DDB354','sf_mint':'7DAE9A',
+ 'sf_trim':'F5ECD9','sf_roof_blue':'85786D','sf_roof_pink':'98766D','sf_roof_cream':'A18B6C','sf_roof_yellow':'9B825E','sf_roof_mint':'6F8579',
  'generic_sage':'B9C5BA','generic_sand':'D8CBB2','generic_ivory':'D9D6C7','generic_clay':'C6B9A5',
  'glass':'8DAEAC','door':'6F8A75','slate':'748B9C','petal_white':'F4E6C9','petal_lilac':'BBA9CC','petal_yellow':'E6C778'}
 kit=Kit(OUT,PALETTE)
@@ -86,7 +87,80 @@ def facade(name,paint,victorian):
    xx=x+(j-2)*width*.17
    kit.ellipsoid('Window foliage',(xx,y+.16,z),(.24,.22,.27),'leaf' if j%2 else 'leaf_light',8,5)
    kit.ellipsoid('Window flower',(xx,y+.285,z+.04),(.14,.07,.14),('petal_lilac' if victorian else 'petal_white') if j%2 else 'petal_yellow',8,5)
-for i,col in enumerate(['sf_blue','sf_pink','sf_cream','sf_yellow']):facade('facade_sf_'+str(i),col,True)
+def sf_house(index,paint,roof_color):
+ # Each 4 m bay remains at its approved pivot. The five-colour sequence runs
+ # west-to-north; cornices alternate 6.0 / 6.4 m, independent of collision.
+ kit.begin('facade_sf_'+str(index))
+ eave=6.0 if index%2==0 else 6.4
+ trim='sf_trim';wall_half=1.96;front=1.25
+ kit.box('Painted two-storey house',(0,eave/2,0),(3.92,eave,2.5),paint,.025)
+ kit.box('Low foundation',(0,.11,0),(3.94,.22,2.5),'stone',.018)
+ for x in [-1.91,1.91]:kit.box('House edge trim',(x,eave/2,1.28),(.09,eave,.09),trim,.01)
+ kit.box('Storey belt',(0,3.0,1.30),(3.98,.105,.14),trim,.016)
+ # Different heights and ridge directions prevent a continuous roof across bays.
+ if index%2==0:
+  peak=eave+.60
+  kit.mesh('Closed gable roof',[
+   (-1.99,eave,-1.28),(1.99,eave,-1.28),(0,peak,-1.28),
+   (-1.99,eave,1.28),(1.99,eave,1.28),(0,peak,1.28)],
+   [(0,2,1),(3,4,5),(0,3,5,2),(2,5,4,1),(0,1,4,3)],roof_color)
+  kit.mesh('Painted triangular pediment',[(-1.94,eave,1.29),(1.94,eave,1.29),(0,peak-.035,1.29)],[(0,1,2)],paint)
+  kit.box('Gable sill',(0,eave,1.33),(3.98,.12,.18),trim,.018)
+  kit.beam('Left pediment rake',(-1.97,eave,1.34),(0,peak,1.34),.11,trim,.15)
+  kit.beam('Right pediment rake',(0,peak,1.34),(1.97,eave,1.34),.11,trim,.15)
+ else:
+  kit.box('Warm flat roof',(0,eave-.04,0),(3.94,.12,2.5),roof_color,.018)
+  for z in [-1.20,1.20]:kit.box('Roof parapet',(0,eave+.065,z),(3.98,.13,.10),trim,.012)
+  for x in [-1.94,1.94]:kit.box('Parapet end',(x,eave+.065,0),(.10,.13,2.5),trim,.012)
+  kit.box('Deep front cornice',(0,eave-.04,1.35),(3.99,.18,.28),trim,.025)
+  kit.box('Cornice lower moulding',(0,eave-.22,1.31),(3.96,.10,.18),trim,.015)
+ for x in [-1.5,-.5,.5,1.5]:kit.box('Cornice brackets',(x,eave-.32,1.33),(.13,.21,.17),trim,.016)
+
+ def window(x,y,z,w,h,yaw=0):
+  # Entire framed window is local to its plane; side windows follow bay chamfers.
+  def piece(name,u,v,d,size,color,bevel=.01):
+   kit.box(name,(x+u*math.cos(yaw)+d*math.sin(yaw),y+v,z-u*math.sin(yaw)+d*math.cos(yaw)),size,color,bevel,rot_y=yaw)
+  piece('Opaque window glass',0,0,0,(w,h,.035),'glass')
+  for u in [-w/2-.035,w/2+.035]:piece('Window jamb',u,0,.025,(.07,h+.14,.09),trim)
+  for v in [-h/2-.035,h/2+.035]:piece('Window horizontal frame',0,v,.03,(w+.14,.07,.10),trim)
+  piece('Window mullion',0,0,.04,(.035,h,.075),trim,.005)
+  piece('Window transom',0,.12,.04,(w,.035,.075),trim,.005)
+  piece('Window sill',0,-h/2-.10,.07,(w+.20,.10,.18),trim,.012)
+ for x in [-1.25,1.25]:window(x,1.56,1.29,.62,1.28)
+ # One real canted bay, projecting 0.40 m from the wall; colored apron below.
+ bay=[(-1.10,1.24),(-.76,1.65),(.76,1.65),(1.10,1.24)]
+ kit.slab('Painted projecting bay',bay,3.62,5.38,paint,bevel=.012)
+ kit.slab('Bay lower sill',[(-1.15,1.23),(-.80,1.70),(.80,1.70),(1.15,1.23)],3.54,3.66,trim,bevel=.012)
+ kit.slab('Bay cap',[(-1.15,1.23),(-.80,1.70),(.80,1.70),(1.15,1.23)],5.34,5.46,trim,bevel=.015)
+ window(0,4.48,1.67,1.28,1.38)
+ for a,b in [(bay[0],bay[1]),(bay[2],bay[3])]:
+  yaw=-math.atan2(b[1]-a[1],b[0]-a[0]);width=math.dist(a,b)-.14
+  window((a[0]+b[0])/2,4.48,(a[1]+b[1])/2+.02,width,1.38,yaw)
+ # Reference stoop/porch: three shallow steps, cream cheeks, recessed leaf,
+ # two slim jamb pillars and a small gabled hood; stays in approved step envelope.
+ kit.box('Closed decorative door',(0,1.35,1.29),(.91,2.22,.08),'door',.015)
+ for y in [.76,1.31]:kit.box('Door inset panel',(0,y,1.345),(.70,.39,.025),'wood',.016)
+ kit.box('Door transom',(0,2.12,1.35),(.70,.43,.025),'glass',.01)
+ kit.ellipsoid('Door knob',(.30,1.23,1.385),(.055,.055,.04),'iron',8,5)
+ for x in [-.55,.55]:
+  kit.box('Porch jamb',(x,1.41,1.47),(.13,2.28,.26),trim,.016)
+  kit.box('Stoop cheek',(x,.37,1.64),(.14,.58,.60),trim,.025)
+ for i in range(3):
+  kit.box('Front stoop step %d'%i,(0,.04+.08*i,1.84-.19*i),(1.02,.08+.16*i,.24),'stone',.012)
+ kit.box('Porch landing',(0,.14,1.34),(1.30,.28,.40),'stone',.012)
+ kit.box('Porch lintel',(0,2.61,1.49),(1.30,.16,.40),trim,.02)
+ kit.mesh('Closed porch hood',[(-.65,2.68,1.24),(.65,2.68,1.24),(0,2.91,1.24),(-.65,2.68,1.72),(.65,2.68,1.72),(0,2.91,1.72)],[(0,2,1),(3,4,5),(0,3,5,2),(2,5,4,1),(0,1,4,3)],trim)
+ # Retain the established window flowerbox anchors within the shared skeleton.
+ for x,y,z in [(-1.25,.79,1.53),(1.25,.79,1.53),(0,3.43,1.62)]:
+  width=.84 if y<1 else 1.5
+  kit.box('Window flowerbox',(x,y,z),(width,.24,.30),trim,.025)
+  for j in range(5):
+   xx=x+(j-2)*width*.17
+   kit.ellipsoid('Window foliage',(xx,y+.16,z),(.24,.22,.27),'leaf' if j%2 else 'leaf_light',8,5)
+   kit.ellipsoid('Window flower',(xx,y+.285,z+.04),(.14,.07,.14),'petal_lilac' if j%2 else 'petal_yellow',8,5)
+
+SF_COLORS=['blue','pink','cream','yellow','mint','blue','pink','cream']
+for i,col in enumerate(SF_COLORS):sf_house(i,'sf_'+col,'sf_roof_'+col)
 for i,col in enumerate(['generic_sage','generic_sand','generic_ivory','generic_clay']):facade('facade_generic_'+str(i),col,False)
 
 kit.begin('mp_keeper_flowerbed')
@@ -168,6 +242,11 @@ for obj in bpy.data.objects:
  for modifier in obj.modifiers:
   if modifier.type=="BEVEL":modifier.segments=1
 bpy.ops.wm.save_as_mainfile(filepath=str(SOURCE/'market_plaza.blend'))
-stats={name:kit.export(name) for name in list(kit.assets)}
+# Incremental SF export keeps the accepted generic/ground/props byte-identical.
+sf_only='--sf-only' in sys.argv
+old_stats=OUT/'shell_asset_stats.json'
+stats=json.loads(old_stats.read_text())['assets'] if sf_only and old_stats.exists() else {}
+for name in kit.assets:
+ if not sf_only or name.startswith('facade_sf_'):stats[name]=kit.export(name)
 (OUT/'shell_asset_stats.json').write_text(json.dumps({'generator':str(Path(__file__).relative_to(ROOT)),'author':'马可波罗','assets':stats},indent=2)+'\n')
 print('MARKET_SHELL_EXPORT',json.dumps(stats),flush=True)

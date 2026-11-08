@@ -20,9 +20,10 @@ for side in ['south','east']:
   asset(f'outer_curb_{side}_{i}','mp_edge_trim.glb',[t,0,10] if side=='south' else [10,0,t],0 if side=='south' else 90,group='Ground')
 for side in ['north','west']:
  for i,t in enumerate([-6,-2,2,6]):
-  asset(f'facade_{side}_{i}',f'facade_sf_{i}.glb',[t,F,-9.25] if side=='north' else [-9.25,F,t],0 if side=='north' else 90,
+  sf_index=(i+4) if side=='north' else (3-i)
+  asset(f'facade_{side}_{i}',f'facade_sf_{sf_index}.glb',[t,F,-9.25] if side=='north' else [-9.25,F,t],0 if side=='north' else 90,
    [box('FacadeBarrier',[4,6.5,2.5],[0,3.25,0]),box('DecorativeDoorSteps',[1.36,.32,.85],[0,.16,1.55])],group='FarFacades',
-   variants={'san_francisco':f'facade_sf_{i}.glb','generic':f'facade_generic_{i}.glb'})
+   variants={'san_francisco':f'facade_sf_{sf_index}.glb','generic':f'facade_generic_{i}.glb'})
 for side in ['south','east']:
  for i,t in enumerate([-6.8,-4.6,-2.4,-.2,2,4.2]):
   at=[t,F,7.77] if side=='south' else [7.77,F,t]
@@ -132,7 +133,7 @@ layout={'units':'metres','axes':'Godot Y-up; +Z front; camera from +X+Z; object 
  'navigation':{'source':'P0RoomNav.build(P0RoomNav.shapes_from(art))','cell_m':.15,'actor_radius_m':.21,'runtime_rebuilt':True,'snapshot':'navigation_snapshot.json'},
  'integration':{'outpost_id':'sh_market_1','art':'market_plaza','bounds':[-8,8,-8,8],'anchors_override':'must clear old market.anchors.json override or replace with this anchors list','seats':['seat_1','seat_2'],'server_room_bounds':'must update to match; program-owned'},
  'facade_variants':{'default':'san_francisco','bone_contract':'same4m bays/door/window/steps/flowerboxes/collision placement; wall6m+roof0.5m; depth2.5m',
-  'san_francisco':{'files':[f'facade_sf_{i}.glb' for i in range(4)],'style':'pastel Victorian row houses','due':'2026-11-11 18:00'},
+  'san_francisco':{'files':[f'facade_sf_{i}.glb' for i in range(8)],'style':'pastel Victorian row houses','due':'2026-11-11 18:00'},
   'generic':{'files':[f'facade_generic_{i}.glb' for i in range(4)],'style':'shared bone, neutral palette and simplified trim','due':'2026-11-12 18:00'}},
  'pending':{'huangzhong_props':'#877 finished kit 288b47b94f966981603b3d132552d6b16f923303 technically accepted; assembled visual acceptance pending; integrate dependency before this scene ships'},
  'author':'马可波罗','virtual_user_id':'5a7c76bc-19d2-47e1-9406-4f4e0feeefb4'}

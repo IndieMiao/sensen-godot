@@ -443,7 +443,7 @@
     },
     {
       "name": "facade_north_0",
-      "file": "facade_sf_0.glb",
+      "file": "facade_sf_4.glb",
       "position": [
         -6,
         0.05,
@@ -482,13 +482,13 @@
       "material": "matte",
       "cast_shadow": true,
       "variants": {
-        "san_francisco": "facade_sf_0.glb",
+        "san_francisco": "facade_sf_4.glb",
         "generic": "facade_generic_0.glb"
       }
     },
     {
       "name": "facade_north_1",
-      "file": "facade_sf_1.glb",
+      "file": "facade_sf_5.glb",
       "position": [
         -2,
         0.05,
@@ -527,13 +527,13 @@
       "material": "matte",
       "cast_shadow": true,
       "variants": {
-        "san_francisco": "facade_sf_1.glb",
+        "san_francisco": "facade_sf_5.glb",
         "generic": "facade_generic_1.glb"
       }
     },
     {
       "name": "facade_north_2",
-      "file": "facade_sf_2.glb",
+      "file": "facade_sf_6.glb",
       "position": [
         2,
         0.05,
@@ -572,13 +572,13 @@
       "material": "matte",
       "cast_shadow": true,
       "variants": {
-        "san_francisco": "facade_sf_2.glb",
+        "san_francisco": "facade_sf_6.glb",
         "generic": "facade_generic_2.glb"
       }
     },
     {
       "name": "facade_north_3",
-      "file": "facade_sf_3.glb",
+      "file": "facade_sf_7.glb",
       "position": [
         6,
         0.05,
@@ -617,13 +617,13 @@
       "material": "matte",
       "cast_shadow": true,
       "variants": {
-        "san_francisco": "facade_sf_3.glb",
+        "san_francisco": "facade_sf_7.glb",
         "generic": "facade_generic_3.glb"
       }
     },
     {
       "name": "facade_west_0",
-      "file": "facade_sf_0.glb",
+      "file": "facade_sf_3.glb",
       "position": [
         -9.25,
         0.05,
@@ -662,13 +662,13 @@
       "material": "matte",
       "cast_shadow": true,
       "variants": {
-        "san_francisco": "facade_sf_0.glb",
+        "san_francisco": "facade_sf_3.glb",
         "generic": "facade_generic_0.glb"
       }
     },
     {
       "name": "facade_west_1",
-      "file": "facade_sf_1.glb",
+      "file": "facade_sf_2.glb",
       "position": [
         -9.25,
         0.05,
@@ -707,13 +707,13 @@
       "material": "matte",
       "cast_shadow": true,
       "variants": {
-        "san_francisco": "facade_sf_1.glb",
+        "san_francisco": "facade_sf_2.glb",
         "generic": "facade_generic_1.glb"
       }
     },
     {
       "name": "facade_west_2",
-      "file": "facade_sf_2.glb",
+      "file": "facade_sf_1.glb",
       "position": [
         -9.25,
         0.05,
@@ -752,13 +752,13 @@
       "material": "matte",
       "cast_shadow": true,
       "variants": {
-        "san_francisco": "facade_sf_2.glb",
+        "san_francisco": "facade_sf_1.glb",
         "generic": "facade_generic_2.glb"
       }
     },
     {
       "name": "facade_west_3",
-      "file": "facade_sf_3.glb",
+      "file": "facade_sf_0.glb",
       "position": [
         -9.25,
         0.05,
@@ -797,7 +797,7 @@
       "material": "matte",
       "cast_shadow": true,
       "variants": {
-        "san_francisco": "facade_sf_3.glb",
+        "san_francisco": "facade_sf_0.glb",
         "generic": "facade_generic_3.glb"
       }
     },
@@ -3079,7 +3079,11 @@
         "facade_sf_0.glb",
         "facade_sf_1.glb",
         "facade_sf_2.glb",
-        "facade_sf_3.glb"
+        "facade_sf_3.glb",
+        "facade_sf_4.glb",
+        "facade_sf_5.glb",
+        "facade_sf_6.glb",
+        "facade_sf_7.glb"
       ],
       "style": "pastel Victorian row houses",
       "due": "2026-11-11 18:00"

@@ -1,0 +1,198 @@
+{
+  "runtime_base": "069dfeb13a4988fa2c0d04b80b29af69fbcc2746",
+  "anchors_override": "",
+  "exit": [
+    7.2,
+    0.05,
+    7.2
+  ],
+  "badge_exit": [
+    5.6,
+    1.1,
+    8
+  ],
+  "exit_count": 1,
+  "badge_exit_count": 1,
+  "ui_file": "scenes/p0/p0_ui.gd",
+  "fold_function": "_fold_name_bar",
+  "collapse_duration_ms": 160,
+  "hide_timer_ms": 170,
+  "conclusion": "Capture caught same exit name-bar collapsing at its previous anchor, not duplicate anchors or persistent edge-clamped indicator; settled captures hide both exit bar and icon. No program UI edits.",
+  "views": {
+    "opening": {
+      "exit_prompt_state": {
+        "bar_folding": false,
+        "bar_openness": 1.0,
+        "bar_rect": [
+          73.0863189697266,
+          522.541564941406,
+          70.0,
+          32.0
+        ],
+        "bar_visible": true,
+        "icon_rect": [],
+        "icon_visible": false,
+        "marker_area": [
+          0.0,
+          98.0,
+          360.0,
+          610.0
+        ]
+      },
+      "badge_exit_pixel": [
+        89.0863189697266,
+        538.541564941406
+      ]
+    },
+    "far_corner_transition": {
+      "exit_prompt_state": {
+        "bar_folding": true,
+        "bar_openness": 0.0,
+        "bar_rect": [
+          73.0863189697266,
+          522.541564941406,
+          32.0,
+          32.0
+        ],
+        "bar_visible": true,
+        "icon_rect": [
+          67.0863418579102,
+          817.723815917969,
+          44.0,
+          44.0
+        ],
+        "icon_visible": false,
+        "marker_area": [
+          0.0,
+          98.0,
+          360.0,
+          610.0
+        ]
+      },
+      "badge_exit_pixel": [
+        89.0863418579102,
+        839.723815917969
+      ]
+    },
+    "far_corner": {
+      "exit_prompt_state": {
+        "bar_folding": false,
+        "bar_openness": 0.0,
+        "bar_rect": [
+          73.0863189697266,
+          522.541564941406,
+          32.0,
+          32.0
+        ],
+        "bar_visible": false,
+        "icon_rect": [
+          67.0863418579102,
+          817.723815917969,
+          44.0,
+          44.0
+        ],
+        "icon_visible": false,
+        "marker_area": [
+          0.0,
+          98.0,
+          360.0,
+          610.0
+        ]
+      },
+      "badge_exit_pixel": [
+        89.0863418579102,
+        839.723815917969
+      ]
+    },
+    "entry_corner": {
+      "exit_prompt_state": {
+        "bar_folding": false,
+        "bar_openness": 1.0,
+        "bar_rect": [
+          73.0863418579102,
+          411.09765625,
+          69.9999923706055,
+          32.0
+        ],
+        "bar_visible": true,
+        "icon_rect": [
+          0.0,
+          611.410766601562,
+          44.0,
+          44.0
+        ],
+        "icon_visible": false,
+        "marker_area": [
+          0.0,
+          98.0,
+          360.0,
+          610.0
+        ]
+      },
+      "badge_exit_pixel": [
+        89.0863418579102,
+        427.09765625
+      ]
+    },
+    "ring_transition": {
+      "exit_prompt_state": {
+        "bar_folding": true,
+        "bar_openness": 0.0,
+        "bar_rect": [
+          73.0863418579102,
+          411.09765625,
+          32.0,
+          32.0
+        ],
+        "bar_visible": true,
+        "icon_rect": [
+          167.470260620117,
+          698.062316894531,
+          44.0,
+          44.0
+        ],
+        "icon_visible": false,
+        "marker_area": [
+          0.0,
+          98.0,
+          360.0,
+          610.0
+        ]
+      },
+      "badge_exit_pixel": [
+        189.470260620117,
+        720.062316894531
+      ]
+    },
+    "ring": {
+      "exit_prompt_state": {
+        "bar_folding": false,
+        "bar_openness": 0.0,
+        "bar_rect": [
+          73.0863418579102,
+          411.09765625,
+          32.0,
+          32.0
+        ],
+        "bar_visible": false,
+        "icon_rect": [
+          167.470260620117,
+          698.062316894531,
+          44.0,
+          44.0
+        ],
+        "icon_visible": false,
+        "marker_area": [
+          0.0,
+          98.0,
+          360.0,
+          610.0
+        ]
+      },
+      "badge_exit_pixel": [
+        189.470260620117,
+        720.062316894531
+      ]
+    }
+  }
+}
