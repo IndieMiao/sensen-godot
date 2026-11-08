@@ -28,7 +28,7 @@ for row in stats['assets']:
  check(not doc.get('animations') and not doc.get('skins') and not doc.get('cameras') and not doc.get('images') and not doc.get('textures') and not doc.get('extensions',{}).get('KHR_lights_punctual'),name+' static texture-free prop only')
  check(len(doc['materials'])==1 and doc['materials'][0]['pbrMetallicRoughness']['roughnessFactor']>=.85,name+' one matte material')
  if name.startswith('stall_'):
-  w=3.2 if name=='stall_keeper' else 2.;h=2.9 if name=='stall_keeper' else 2.6
+  w=3.2 if name=='stall_keeper' else 2.;h=3.1 if name=='stall_keeper' else 2.6
   check(np.allclose(dims[[0,2]],[w,1.6],atol=1e-5) and dims[1]<=h,name+' hard footprint and height',dims.tolist())
  if name=='flower_cart':check(np.allclose(dims[[0,2]],[2,1.4],atol=1e-5) and dims[1]<=2.4,name+' hard cart dimensions')
  if name=='market_board':check(np.allclose(dims,[1.2,1.8,.3],atol=1e-5),name+' hard board dimensions')

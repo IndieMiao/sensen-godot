@@ -10,7 +10,7 @@ PAL={'wood':'A3815D','wood_light':'B89972','wood_dark':'795F47','seam':'685640',
 box=p.box;mesh=p.mesh;rod=p.rod;lathe=p.lathe
 STAGE=sys.argv[sys.argv.index('--stage')+1] if '--stage' in sys.argv else 'final'
 LIMITS={'stall_keeper':2500,'stall_veg':1500,'stall_fish':1500,'stall_bakery':1500,'stall_spice':1500,'stall_tools':1500,'flower_cart':1500,'market_board':600,'fountain':2000,'produce_crate':300,'basket':300,'flower_tub':300}
-BOUNDS={'stall_keeper':[3.2,2.85,1.6],**{n:[2,2.55,1.6] for n in LIMITS if n.startswith('stall_') and n!='stall_keeper'},'flower_cart':[2,2.35,1.4],'market_board':[1.2,1.8,.3],'fountain':[3,2.12,3],'produce_crate':[.62,.43,.44],'basket':[.46,.56,.46],'flower_tub':[.68,.86,.68]}
+BOUNDS={'stall_keeper':[3.2,3.10,1.6],**{n:[2,2.55,1.6] for n in LIMITS if n.startswith('stall_') and n!='stall_keeper'},'flower_cart':[2,2.35,1.4],'market_board':[1.2,1.8,.3],'fountain':[3,2.12,3],'produce_crate':[.62,.43,.44],'basket':[.46,.56,.46],'flower_tub':[.68,.86,.68]}
 def start(name):
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False);bpy.context.preferences.filepaths.save_version=0
  p.PARTS=[];p.MATS={};p.PAL=PAL if STAGE=='final' else {k:PAL['whitebox'] for k in PAL}
@@ -57,6 +57,29 @@ def canopy(w,d,top,color,stripes=6):
  for z in [-d/2+.09,d/2-.09]:box('Under-canopy crossbar',(0,edge-.07,z),(w-.16,.08,.07),'wood_dark')
 
 
+def keeper_canopy(w,d):
+ # v1.1 option A: front-high sloping fabric roof, closed 35mm thick panels.
+ # World camera looks along local +Z at33deg. Front scallops stay above head rays.
+ back_top=2.60;front_top=3.10
+ def roof_y(z):return back_top+(z+d/2)/d*(front_top-back_top)
+ for j in range(8):
+  a=-w/2+j*w/8;b=a+w/8;role='sage' if j%2==0 else 'canvas'
+  outline=[(-d/2,back_top),(d/2,front_top),(d/2,front_top-.035),(-d/2,back_top-.035)]
+  n=len(outline);vs=[(x,y,z) for x in [a,b] for z,y in outline]
+  mesh('Keeper closed rising canopy stripe %02d'%j,vs,[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)],role)
+  for front in [-1,1]:
+   edge=front_top if front>0 else back_top
+   profile=[(a,edge-.02),(b,edge-.02)]+[(b-(b-a)*t/6,edge-.09-.09*math.sin(math.pi*t/6)) for t in range(7)]
+   n=len(profile);z=front*(d/2-.016)
+   vs=[(x,y,z+dz) for dz in [-.016,.016] for x,y in profile]
+   mesh('Keeper front scallop' if front>0 else 'Keeper back scallop',vs,[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)],role)
+ for z in [-.69,.69]:
+  y=roof_y(z)-.095
+  box('Keeper sloped roof crossbar',(0,y,z),(w-.16,.08,.07),'wood_dark')
+  for x in [-w/2+.10,w/2-.10]:
+   top=roof_y(z)-.05
+   box('Keeper high front upright' if z>0 else 'Keeper low rear upright',(x,top/2,z),(.10,top,.10),'wood',.012)
+
 def tray(x,z,y,w=.50,d=.42):
  box('Inset produce tray',(x,y,z),(w,.055,d),'wood_dark')
  for xx in [-1,1]:box('Tray side',(x+xx*(w/2-.015),y+.065,z),(.03,.13,d),'wood_light')
@@ -79,9 +102,13 @@ def lantern(x,z,y):
  rod('Short lantern drop',(x,y+.25,z),(x,y+.42,z),.012,'metal',5)
 
 def stall(name):
- keeper=name=='stall_keeper';w,h,d=BOUNDS[name];canopy(w,d,h,{'stall_keeper':'sage','stall_veg':'sage','stall_fish':'teal','stall_bakery':'yellow','stall_spice':'mint','stall_tools':'teal'}[name],8 if keeper else 6)
- for x in [-w/2+.10,w/2-.10]:
-  for z in [-.69,.69]:box('Rounded timber canopy upright',(x,(h-.29)/2,z),(.10,h-.29,.10),'wood',.012)
+ keeper=name=='stall_keeper';w,h,d=BOUNDS[name]
+ if keeper and STAGE=='blockout':h=2.85
+ if keeper and STAGE=='final':keeper_canopy(w,d)
+ else:
+  canopy(w,d,2.85 if keeper else h,{'stall_keeper':'sage','stall_veg':'sage','stall_fish':'teal','stall_bakery':'yellow','stall_spice':'mint','stall_tools':'teal'}[name],8 if keeper else 6)
+  for x in [-w/2+.10,w/2-.10]:
+   for z in [-.69,.69]:box('Rounded timber canopy upright',(x,(h-.29)/2,z),(.10,h-.29,.10),'wood',.012)
  # Counter rear face z=.06; reserved Mei standing rectangle z=-.76..+.04 (0.80m).
  deck_y=1.05;counter_w=w-.24
  box('Solid cabinet',(0,.50,.38),(counter_w,.86,.64),'wood_dark',.015)
@@ -101,7 +128,7 @@ def stall(name):
    tray(x,.39,1.09,.56 if keeper else .50,.44)
    produce(x,.39,1.22,['tomato','pear','carrot','leaf_light'][j%4],6)
   if keeper:
-   for x in [-1.37,1.37]:lantern(x,.54,1.86)
+   for x in [-1.37,1.37]:lantern(x,.69,2.55)
    # Small side foliage, kept behind/front posts and outside Mei's central stand area.
    for x in [-1.40,1.40]:
     for k in range(4):ico('Trimmed climbing market foliage',(x,1.15+k*.21,-.61),(.11,.14,.105),'leaf' if k%2 else 'leaf_light')

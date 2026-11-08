@@ -3,7 +3,7 @@
     {
       "name": "stall_keeper",
       "file": "stall_keeper.glb",
-      "triangles": 2232,
+      "triangles": 2296,
       "triangle_limit": 2500,
       "surfaces": 1,
       "bounds": [
@@ -14,17 +14,17 @@
         ],
         [
           1.600000023841858,
-          2.8499999046325684,
+          3.0999999046325684,
           0.800000011920929
         ]
       ],
       "dimensions_m": [
         3.200000047683716,
-        2.8499999046325684,
+        3.0999999046325684,
         1.600000023841858
       ],
-      "bytes": 115380,
-      "sha256": "3a87eaff36f71796745d6fa9998d98b9c8cc50ee054a3ec1dd4a1f3aaa98dbf2",
+      "bytes": 116788,
+      "sha256": "3c97b6fb3a43a20fd8360f3c3bc3a9037fe2b9a1f1e3239bb84146338322dfce",
       "source": "tools/art/source/market_props_218/stall_keeper.blend",
       "counter_height_m": 1.05,
       "keeper_clearance_local_m": {
@@ -380,7 +380,7 @@
   "units": "metres, Y up, front +Z, floor-centre origin",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
-  "unique_triangles": 13036,
+  "unique_triangles": 13100,
   "palette_srgb": {
     "wood": "A3815D",
     "wood_light": "B89972",
