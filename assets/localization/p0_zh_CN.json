@@ -2690,5 +2690,13 @@
  "Fog rolls in most mornings. It's quieter in here then.": "早上常起雾，那时这里更安静。",
  "Walk the labyrinth slowly. There's no wrong way to finish.": "地上的迷宫慢慢走就好，怎么走完都不算错。",
  "Long day on the farm? The pews don't mind a little dirt.": "农场忙了一天？长椅不嫌你身上有土。",
- "Nob Hill is steep. You've earned the quiet in here.": "Nob Hill 的坡很陡，进来安静一会儿吧。"
+ "Nob Hill is steep. You've earned the quiet in here.": "Nob Hill 的坡很陡，进来安静一会儿吧。",
+ "Twin Catch": "双倍渔获",
+ "Swift Growth": "加速生长",
+ "%s · %d min · every fish lands ×2": "%s · %d 分钟 · 每条鱼都 ×2",
+ "%s · %d min · crops sown now grow 2× faster": "%s · %d 分钟 · 现在种下的作物长得快一倍",
+ "%s has worn off": "%s结束了",
+ "Pray": "祈祷",
+ "%s · back to 20 min": "%s · 重新计时 20 分钟",
+ "%d left today": "今日还剩 %d 次"
 }
