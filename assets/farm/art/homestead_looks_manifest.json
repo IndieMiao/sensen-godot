@@ -1,0 +1,223 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "revision": "v1.1",
+  "house_sha256": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c",
+  "runtime_reference": "8493a5c4",
+  "palette_srgb": {
+    "plaster": "f0edd0",
+    "plaster_shade": "d9d4ae",
+    "cream": "fff4d2",
+    "wood": "a87948",
+    "wood_light": "cba067",
+    "wood_dark": "675139",
+    "green": "437d64",
+    "green_light": "6a9b6a",
+    "glass": "82c5c6",
+    "glass_dark": "548f99",
+    "orange": "e7954e",
+    "orange_light": "f4ad60",
+    "red": "ca6452",
+    "red_light": "df7d63",
+    "blue": "4c86dd",
+    "roof_dark": "454956",
+    "stone": "a5ad98",
+    "stone_light": "c4c6b1",
+    "soil": "96764f",
+    "soil_light": "af906a",
+    "soil_dark": "785c40",
+    "path": "dfcb94",
+    "leaf": "6d9a44",
+    "leaf_light": "97b75b",
+    "leaf_dark": "4e824d",
+    "grass": "afcb6c",
+    "flower": "fff5df",
+    "yellow": "f1ce58",
+    "pink": "e68c9e",
+    "lavender": "a7a0d2",
+    "water": "589da5"
+  },
+  "assets": {
+    "porch_a": {
+      "file": "porch_a.glb",
+      "triangles": 1104,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.2865523099899292,
+          -4.284083843231201e-08,
+          0.2749999761581421
+        ],
+        [
+          1.6349704265594482,
+          2.4125001430511475,
+          1.9200000762939453
+        ]
+      ],
+      "bytes": 71728,
+      "sha256": "a9c28bdd0be686293c3d3fa9dcb3702769c48ffa0b675edff13f44e21b002571",
+      "origin": "P0Garden.ANCHORS.house",
+      "axes": "metres, Y up, +Z toward camera",
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "source": "tools/art/source/homestead_looks_439/homestead_looks.blend",
+      "stage": "porch",
+      "look": "a",
+      "placement": "house anchor, no additional transform",
+      "porch_reference_z": 1.48,
+      "floor_top_m": 0.035,
+      "front_eave_min_m": 2.0,
+      "ground_fixture_z_max": 0.975
+    },
+    "porch_b": {
+      "file": "porch_b.glb",
+      "triangles": 652,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.2449703216552734,
+          0.0,
+          0.5
+        ],
+        [
+          1.2450000047683716,
+          1.2842596769332886,
+          1.9279999732971191
+        ]
+      ],
+      "bytes": 44644,
+      "sha256": "e162a2d4f4d2852e6c89fa64d5a73f087686e344a13b65d6dd4a97e1869bb71e",
+      "origin": "P0Garden.ANCHORS.house",
+      "axes": "metres, Y up, +Z toward camera",
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "source": "tools/art/source/homestead_looks_439/homestead_looks.blend",
+      "stage": "porch",
+      "look": "b",
+      "placement": "house anchor, no additional transform",
+      "porch_reference_z": 1.48,
+      "floor_top_m": 0.036,
+      "arch_attached_to_existing_door": true,
+      "ground_fixture_z_max": 0.975
+    },
+    "kitchen_wing_a": {
+      "file": "kitchen_wing_a.glb",
+      "triangles": 1056,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.4250001907348633,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          -0.8131667375564575,
+          1.809999942779541,
+          0.23749999701976776
+        ]
+      ],
+      "bytes": 78920,
+      "sha256": "7d5f99832e17c8ce79b619b8a9fa513b173ca2e12af0021059f7eed15b680e6b",
+      "origin": "P0Garden.ANCHORS.house",
+      "axes": "metres, Y up, +Z toward camera",
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "source": "tools/art/source/homestead_looks_439/homestead_looks.blend",
+      "stage": "kitchen_extension",
+      "look": "a",
+      "placement": "house anchor, no additional transform",
+      "reference_centre": [
+        -1.63,
+        0,
+        -0.75
+      ],
+      "smoke_anchor": [
+        -2.02,
+        1.815,
+        -1.05
+      ],
+      "house_join_x": -0.845,
+      "required_scenery_moves": [
+        "bench",
+        "left_house_bush"
+      ]
+    },
+    "kitchen_wing_b": {
+      "file": "kitchen_wing_b.glb",
+      "triangles": 1480,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.4250001907348633,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          -0.8131667375564575,
+          2.3600001335144043,
+          0.12999999523162842
+        ]
+      ],
+      "bytes": 113868,
+      "sha256": "a1686921bece7d62b0cf8d7c883ab1e92799492ddfe36595b1052e5339f65116",
+      "origin": "P0Garden.ANCHORS.house",
+      "axes": "metres, Y up, +Z toward camera",
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "source": "tools/art/source/homestead_looks_439/homestead_looks.blend",
+      "stage": "kitchen_extension",
+      "look": "b",
+      "placement": "house anchor, no additional transform",
+      "reference_centre": [
+        -1.63,
+        0,
+        -0.75
+      ],
+      "smoke_anchor": [
+        -2.03,
+        2.365,
+        -1.06
+      ],
+      "house_join_x": -0.845,
+      "required_scenery_moves": [
+        "bench",
+        "left_house_bush"
+      ]
+    }
+  },
+  "protected_cells": [
+    [
+      4,
+      14
+    ],
+    [
+      5,
+      14
+    ],
+    [
+      7,
+      14
+    ],
+    [
+      8,
+      14
+    ],
+    [
+      9,
+      14
+    ],
+    [
+      10,
+      14
+    ],
+    [
+      11,
+      14
+    ]
+  ],
+  "porch_floor_max_m": 0.05,
+  "front_eave_clearance_m": 2.0,
+  "ground_fixture_front_limit_z": 0.975,
+  "source": "tools/art/source/homestead_looks_439/homestead_looks.blend",
+  "generator": "tools/art/build_homestead_looks_439.py"
+}

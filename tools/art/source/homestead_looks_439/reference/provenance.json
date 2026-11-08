@@ -1,0 +1,33 @@
+{
+  "runtime_reference": "8493a5c4",
+  "art_base": "5585f325",
+  "files": [
+    {
+      "path": "assets/farm/art/house_cottage.glb",
+      "sha256": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c",
+      "commit": "8493a5c4"
+    },
+    {
+      "path": "modules/p0/p0_garden.gd",
+      "sha256": "1c496f455ef0fe25fe09d72d08606e561790c260f3dbd4cf0969022ec968bf92",
+      "commit": "8493a5c4"
+    },
+    {
+      "path": "scenes/p0/p0_looks.gd",
+      "sha256": "b1e464e104ad9ec1e57fd7c620b008b02434d0b1eec175ecfbb9ff11b1d9a918",
+      "commit": "8493a5c4"
+    },
+    {
+      "path": "scenes/p0/p0_farm.gd",
+      "sha256": "23b7ce694d5eb26a6d6203635035d9458bb936657e01d83d19e5936cbc107879",
+      "commit": "8493a5c4"
+    },
+    {
+      "path": "modules/blueprint/blueprint.gd",
+      "sha256": "bfa17d24435670ca82047593cd787eb5f807c17923863016dd3fb1b3be77e7c0",
+      "commit": "8493a5c4"
+    }
+  ],
+  "design": "SGODOT-282_homestead_design_v1.1.jpg",
+  "author": "赵云"
+}

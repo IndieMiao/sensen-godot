@@ -1,0 +1,62 @@
+{
+  "house_sha256": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c",
+  "primary_palette_matches_actual_house": true,
+  "palette": {
+    "orange": {
+      "srgb": "#E7954E",
+      "matching_house_vertices": 7848,
+      "brightest_house_ao_factor": 0.9999999806549071
+    },
+    "orange_light": {
+      "srgb": "#F4AD60",
+      "matching_house_vertices": 2304,
+      "brightest_house_ao_factor": 1.0000000011442745
+    },
+    "plaster": {
+      "srgb": "#F0EDD0",
+      "matching_house_vertices": 234,
+      "brightest_house_ao_factor": 0.984499822646887
+    },
+    "plaster_shade": {
+      "srgb": "#D9D4AE",
+      "matching_house_vertices": 216,
+      "brightest_house_ao_factor": 0.9999999986790029
+    },
+    "green": {
+      "srgb": "#437D64",
+      "matching_house_vertices": 1032,
+      "brightest_house_ao_factor": 1.000000000218242
+    },
+    "green_light": {
+      "srgb": "#6A9B6A",
+      "matching_house_vertices": 1968,
+      "brightest_house_ao_factor": 1.0000000078646767
+    },
+    "glass": {
+      "srgb": "#82C5C6",
+      "matching_house_vertices": 192,
+      "brightest_house_ao_factor": 0.9999999907492771
+    },
+    "wood": {
+      "srgb": "#A87948",
+      "matching_house_vertices": 72,
+      "brightest_house_ao_factor": 0.9999999988303024
+    },
+    "wood_light": {
+      "srgb": "#CBA067",
+      "matching_house_vertices": 528,
+      "brightest_house_ao_factor": 0.9999999790240433
+    },
+    "stone": {
+      "srgb": "#A5AD98",
+      "matching_house_vertices": 432,
+      "brightest_house_ao_factor": 1.0000000005917815
+    },
+    "stone_light": {
+      "srgb": "#C4C6B1",
+      "matching_house_vertices": 504,
+      "brightest_house_ao_factor": 1.0000000273047402
+    }
+  },
+  "note": "Same linear base colours and original 8-ray AO recipe; accessories use the same farm palette."
+}
