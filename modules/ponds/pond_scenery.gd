@@ -3,12 +3,13 @@ extends Node3D
 ## Static, seeded scenery shared by entry previews and playable ponds.
 var _rng := RandomNumberGenerator.new()
 const Art = preload("res://modules/farm/farm_art.gd")
+const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 ## The decorated meadow (x, z): the turf pile covers it, flowers and trees sit inside; past it the bank ground runs on
 ## plain. The P0 pond camera keeps the screen on it (不知火舞 on 231).
 const MEADOW := Rect2(-3, -19, 18, 21)
 
 ## `clear`: world points (a pond's gathering pieces, SGODOT-410) its trees and bushes keep CLEAR_M off — a tree also
-## stays out of the strip in front of one (FRONT_M toward the camera, +z, FRONT_HALF_W a side), where its crown would
+## stays out of the strip in front of one (FRONT_M toward the camera, FRONT_HALF_W a side), where its crown would
 ## cover it; the draws are the same either way, so the rest of the bank stays where it was.
 const CLEAR_M := 1.5
 const FRONT_M := 4.0
@@ -108,6 +109,8 @@ static func _near(point: Vector3, clear: Array) -> bool:
 ## A tree here would stand between the camera and one of `clear`.
 static func _in_front(point: Vector3, clear: Array) -> bool:
 	for c in clear:
-		var dz := point.z - (c as Vector3).z
-		if dz > 0.0 and dz <= FRONT_M and absf(point.x - (c as Vector3).x) < FRONT_HALF_W: return true
+		var d := point - (c as Vector3)
+		var yaw := deg_to_rad(FarmCamera.YAW_DEG)   # the pond's camera turns as the farm's (442): "in front" along its axes
+		var toward := d.x * sin(yaw) + d.z * cos(yaw)   # toward the camera on the ground
+		if toward > 0.0 and toward <= FRONT_M and absf(d.x * cos(yaw) - d.z * sin(yaw)) < FRONT_HALF_W: return true
 	return false
