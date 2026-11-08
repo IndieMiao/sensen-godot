@@ -10,6 +10,7 @@ const FarmCamera := preload("res://modules/farm/farm_camera.gd")
 const PondWalk := preload("res://modules/ponds/pond_walk.gd")
 const PHONE := Vector2(360, 800)
 const BAND := Rect2(0, 98, 360, 422)   # HUD row 2 … main key top at 360 × 800 in the pond (desktop shot, P0Ui.camera_band)
+const KEYS := Rect2(249, 520, 95, 148)   # the action group's column under the band's bottom (P0Ui.key_column)
 
 func test_the_pond_opens_at_the_farms_size_and_pitch_and_pinches_like_it() -> void:
 	assert_float(P0Pond.PITCH_DEG).is_equal(FarmCamera.PITCH_DEG)
@@ -115,6 +116,21 @@ func test_the_player_stays_on_screen_anywhere_on_the_walk() -> void:
 			assert_float(feet.x + side).override_failure_message(why).is_less_equal(PHONE.x - P0Pond.PLAYER_SAFE_PX + 0.01)
 			assert_float(head.y).override_failure_message(why).is_greater_equal(BAND.position.y - 0.01)
 			assert_float(feet.y).override_failure_message(why).is_less_equal(BAND.end.y + 0.01)
+
+## 不知火舞 on 442 (Fern's lower right: the shoes touched the ⇄): standing on the action group's side of the screen, the
+## feet keep KEY_GAP_PX over the column's top; on the other side the keys change nothing.
+func test_by_the_keys_the_feet_keep_clear_of_the_switch() -> void:
+	var walk := PondWalk.WALK
+	for zoom in [1.0, P0Pond.FAR_ZOOM, 1.4]:
+		var cam := _phone_camera(zoom)
+		var right := Vector3(walk.end.x - 0.1, 0, walk.end.y - 0.1)
+		P0Pond.place(cam, P0Pond.clamp_focus(right, cam.size, PHONE, BAND, PondScenery.MEADOW, right, KEYS))
+		var feet := cam.unproject_position(right)
+		assert_float(feet.x + P0Pond.PLAYER_HALF_M * PHONE.x / cam.size).is_greater_equal(KEYS.position.x - P0Pond.KEY_GAP_PX)
+		assert_float(feet.y).override_failure_message("zoom %s feet %s" % [zoom, feet]).is_less_equal(KEYS.position.y - P0Pond.KEY_GAP_PX + 0.01)
+		var left := Vector3(walk.position.x + 0.1, 0, walk.end.y - 0.1)
+		assert_vector(P0Pond.clamp_focus(left, cam.size, PHONE, BAND, PondScenery.MEADOW, left, KEYS)).is_equal(
+			P0Pond.clamp_focus(left, cam.size, PHONE, BAND, PondScenery.MEADOW, left))   # the left as before
 
 ## The whole pond in one view at the farthest zoom (美术总监 / 奕星): every shape's water is narrower than the screen and
 ## shallower than the band's ground there.

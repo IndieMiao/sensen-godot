@@ -107,7 +107,7 @@ func test_a_strip_over_a_name_tag_opens_the_other_way() -> void:
 	ui.npc_tag("ama", "Ama", at + Vector2(70, 10), true)
 	ui.name_bar("stall", HOME, "Homestead Stall", "", at, true, UiWorldNameBar.Dir.RIGHT)
 	assert_int(ui._name_bars.stall.side).is_equal(UiWorldNameBar.Dir.LEFT)
-	ui.name_bar("cabinet", HOME, "Warming Cabinet", "", at + Vector2(0, 120), true, UiWorldNameBar.Dir.RIGHT)
+	ui.name_bar("cabinet", HOME, "Warming Cabinet", "", at + Vector2(-60, 120), true, UiWorldNameBar.Dir.RIGHT)   # left of the keys (442)
 	assert_int(ui._name_bars.cabinet.side).is_equal(UiWorldNameBar.Dir.RIGHT)   # nothing in the way
 	# 苏烈 on #59: another facility's button counts too (the plaque's strip over the sign's button).
 	ui.world_icon("sign", HOME, at + Vector2(80, 200), true)
@@ -213,3 +213,22 @@ func test_a_strip_folds_when_its_facility_leaves_the_screen() -> void:
 	assert_bool(bar.visible).is_false()
 	ui.name_bar("workbench", HOME, "Workbench", "", at, true)
 	assert_bool(bar.visible).is_true()
+
+## 不知火舞 442 a9474fa3 (197): the action group's keys — the switch, the tool badge, the main key, each KEY_CLEAR_PX
+## out — count as the screen's edge: a strip that would open over them opens the other way; over them either way, it
+## lifts whole to KEY_CLEAR_PX over the group's top. Fern's Stone by the ⇄ read `St` at 14.5°.
+func test_a_strip_keeps_off_the_action_keys() -> void:
+	var keys := ui._key_rects()
+	assert_int(keys.size()).is_greater_equal(2)   # the switch and the main key at least
+	var switch: Rect2 = keys[0]
+	var by_switch := Vector2(switch.position.x - 20, switch.get_center().y)   # just left of the ⇄: right runs over it
+	ui.name_bar("stone", HOME, "Stone", "", by_switch, true, UiWorldNameBar.Dir.RIGHT)
+	var bar: UiWorldNameBar = ui._name_bars.stone
+	assert_int(bar.side).is_equal(UiWorldNameBar.Dir.LEFT)
+	assert_bool(keys.any(func(k): return bar.full_rect().intersects(k))).is_false()
+	var on_key := (keys[keys.size() - 1] as Rect2).get_center()   # on the main key itself: over the keys either way
+	ui.name_bar("log", HOME, "Hardwood", "", on_key, true, UiWorldNameBar.Dir.RIGHT)
+	var lifted: UiWorldNameBar = ui._name_bars.log
+	assert_bool(keys.any(func(k): return lifted.full_rect().intersects(k))).is_false()
+	var top: float = keys.map(func(k): return (k as Rect2).position.y).min()
+	assert_float(lifted.full_rect().end.y).is_less_equal(top + 0.01)   # KEY_CLEAR_PX over the group (in the rects)
