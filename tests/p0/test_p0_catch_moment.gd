@@ -73,6 +73,66 @@ func test_the_arc_scales_the_fish_node_and_not_the_camera() -> void:
 	view.finish()
 	await get_tree().process_frame
 
+class _Water extends FishingWater:   # the pond's water, its float rings recorded
+	var calls := []
+	func interact(point: Vector3, strength: float) -> void: calls.append([point, strength])
+
+## The user 11-08 (SGODOT-447): a landed fish's float goes up with it to the hand; the water's rings and splash stayed
+## under it and followed it. Through the whole arc they stay where it came out of the water, and fade there; the fish
+## itself does leave that spot.
+func test_a_landed_fishs_splash_stays_where_it_left_the_water() -> void:
+	var vp := SubViewport.new()
+	vp.size = Vector2i(PHONE)
+	add_child(auto_free(vp))
+	var root := Node3D.new()
+	vp.add_child(root)
+	var water := _Water.new()
+	water.name = "zz_pond"
+	root.add_child(water)
+	var actor := Node3D.new()
+	actor.position = Vector3(6, 0, -2.6)
+	root.add_child(actor)
+	var rig := preload("res://assets/avatar/base/base_rig.tscn").instantiate() as AvatarRig
+	actor.add_child(rig)
+	var cam := Camera3D.new()
+	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	root.add_child(cam)
+	var panel := P0FishingPanel.new()
+	root.add_child(panel)
+	panel.site_id = "zz_pond"
+	panel.landing = Vector3(6, 0, -4.4)
+	panel.set_process(false)
+	panel.phase = "playing"
+	panel.model = {"outcome": "caught", "fish": 0.9}
+	var view := FishingPresentation.new()
+	view.close_up = false
+	root.add_child(view)
+	view.configure(panel, actor, rig, cam, [])
+	view.set_process(false)
+	for i in 10: view.step(0.05)   # the fight: the rings follow the float
+	assert_float(Vector2(water.calls[-1][0].x - 6.0, water.calls[-1][0].z + 4.4).length()).is_greater(0.05)
+	panel.phase = "result"
+	panel._last = {"outcome": "caught", "fish_id": "fish_crucian", "tier": 1}
+	water.calls.clear()
+	var strengths := []
+	var away := 0.0
+	for i in 25:   # 0.05 s a step: the 1.25 s arc
+		view.step(0.05)
+		var at: Vector3 = water.calls[-1][0]
+		assert_vector(Vector2(at.x, at.z)).override_failure_message("rings at %s, step %d" % [at, i]).is_equal_approx(Vector2(6, -4.4), Vector2.ONE * 0.001)
+		strengths.append(float(water.calls[-1][1]))
+		if view._splash.visible:
+			assert_vector(Vector2(view._splash.global_position.x, view._splash.global_position.z)).is_equal_approx(Vector2(6, -4.4), Vector2.ONE * 0.001)
+		if view._catch.visible: away = maxf(away, Vector2(view._catch.global_position.x - 6.0, view._catch.global_position.z + 4.4).length())
+	assert_float(away).is_greater(0.5)   # the fish did fly off
+	assert_float(strengths[0]).is_greater(0.5)   # the fight's rings, at first …
+	for i in range(1, strengths.size()): assert_float(strengths[i]).is_less_equal(strengths[i - 1])   # … fading
+	assert_float(strengths[-1]).is_less(0.01)
+	view.step(0.05)
+	assert_float(float(water.calls[-1][1])).is_equal(0.0)   # in the hand: no rings
+	view.finish()
+	await get_tree().process_frame
+
 # ---------------------------------------------------------------- ① the reply's floats wait for the hand
 
 class _Shows extends Node:   # a world showing the catch itself, as the pond with its panel open
