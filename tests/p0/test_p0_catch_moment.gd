@@ -210,14 +210,14 @@ func test_after_a_cast_the_camera_holds_until_the_safe_box_moves_it_then_eases_b
 			break
 	assert_int(moved).is_greater(5)   # steps inside the box first: the camera did not move for those
 	assert_bool(pond._settling).is_true()
-	var target := P0Pond.clamp_focus(pond._focus, cam.size, PHONE, BAND, PondScenery.MEADOW)
+	var target := P0Pond.clamp_focus(pond._focus, cam.size, PHONE, BAND, PondScenery.MEADOW, pond.actor.position)
 	assert_float(pond._focus.distance_to(target)).is_greater(0.005)   # eased: not there in one frame
 	pond.actor.set_input(Vector2.ZERO)
 	for i in 180:
 		pond.actor.step(1.0 / 60.0)
 		pond._follow(1.0 / 60.0)
 	assert_bool(pond._settling).is_false()   # back on the walking band's clamp
-	assert_vector(pond._focus).is_equal_approx(P0Pond.clamp_focus(pond._focus, cam.size, PHONE, BAND, PondScenery.MEADOW), Vector3.ONE * 0.001)
+	assert_vector(pond._focus).is_equal_approx(P0Pond.clamp_focus(pond._focus, cam.size, PHONE, BAND, PondScenery.MEADOW, pond.actor.position), Vector3.ONE * 0.001)
 
 ## A pinch after a cast brings the clamp back the same way (不知火舞 on #143).
 func test_a_pinch_after_a_cast_unparks_the_camera_eased() -> void:

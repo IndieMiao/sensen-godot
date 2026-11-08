@@ -50,11 +50,21 @@ var _band := Rect2()                   # the last camera band seen with no panel
 var _opening := true                   # the opening shot: framed low in the band until the first step or pinch
 var _parked := false                   # after a cast: the camera holds still, the meadow clamp waits (不知火舞)
 var _settling := false                 # … then eases back in once the safe box first moves the camera
-## The farm's pitch (camera unification, 奕星 2026-10-09); the pond keeps its own yaw 0, looking straight up the pond.
+var _settle_t := 0.0                   # … for this long: the ease's progress, kept apart from the safe box's re-centring
+## The farm's pitch (camera unification, 奕星 2026-10-09) and, outdoors, its yaw (the user, 197 LOCK-34 v2: 14.5°
+## outdoors, 45° in rooms; SGODOT-442): the pond is seen as the farm is.
 const PITCH_DEG := FarmCamera.PITCH_DEG
+const YAW_DEG := FarmCamera.YAW_DEG
+## The screen's axes on the ground at YAW_DEG: RIGHT across it, AHEAD up it (away from the camera).
+static func right_axis() -> Vector3: return Vector3(cos(deg_to_rad(YAW_DEG)), 0, -sin(deg_to_rad(YAW_DEG)))
+static func ahead_axis() -> Vector3: return Vector3(-sin(deg_to_rad(YAW_DEG)), 0, -cos(deg_to_rad(YAW_DEG)))
+## The player kept this far inside the screen's sides, feet to head inside the band (the HUD above, the keys below),
+## wherever the meadow clamp would put the camera: the player first, the ground past the meadow shows instead (442).
+const PLAYER_SAFE_PX := 16.0
 const DISTANCE := 40.0
-## The opening shot puts the player's feet this far above the band's bottom edge (不知火舞 on 231).
-const OPENING_LIFT := 40.0
+## The opening shot puts the player's feet this far above the band's bottom edge (不知火舞 on 231: 40; on it since the
+## camera turned 14.5°, 442 — her 480–600: the water at least as at 0° with a gathering point still in sight).
+const OPENING_LIFT := 0.0
 var _plan: Dictionary = {}
 # Fish Trap (SGODOT-283, q(109) ⑦): the player's trap here is a float on the water at a fixed spot; its prompt follows
 # the facility rules (icon button, the strip near it, Ready with fish), a tap walks to its bank spot and opens its
@@ -410,6 +420,7 @@ func _follow(_dt: float) -> void:
 	if _parked and not _focus.is_equal_approx(before):   # the safe box moved the camera: the clamp comes back, eased
 		_parked = false
 		_settling = true
+		_settle_t = 0.0
 	if _pinch.step(_dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
 	else: _update_camera(_dt)
 
@@ -422,11 +433,15 @@ func _update_camera(dt := -1.0) -> void:
 	cam.size = view_size(view, _zoom)
 	var band := _camera_band(rt.ui if rt != null else null)
 	if band.has_area() and not _parked:
-		if _opening: _focus = opening_focus(actor.position, cam.size, view, band)
-		var target := clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW)
+		if _opening: _focus = opening_focus(actor.position, cam.size, view, band, _water_at(), _nearest_piece())
+		var target := clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW, actor.position)
 		if _settling and dt >= 0.0:
-			_focus = _focus.lerp(target, 1.0 - exp(-dt * FISH_EASE))
-			_settling = _focus.distance_to(target) > 0.005
+			# eased by the time since it began: the safe box puts the player back in the middle every still frame, and
+			# a per-frame step from there never got to a target the clamp holds off them (442: the turned band's corner)
+			_settle_t += dt
+			var k := 1.0 - exp(-_settle_t * FISH_EASE)
+			_focus = _focus.lerp(target, k)
+			_settling = k < 0.995 and _focus.distance_to(target) > 0.005
 		else:
 			_focus = target
 			_settling = false
@@ -435,13 +450,38 @@ func _update_camera(dt := -1.0) -> void:
 static func view_size(view: Vector2, zoom: float) -> float:
 	return FarmCamera.player_scale_size(view, PITCH_DEG) / zoom
 
-## The opening shot (不知火舞 on 231, 2026-10-09): the player centred across, feet OPENING_LIFT above the band's bottom
-## edge (the main key / quick bar), so from a bank the water beyond fills the band instead of the grass behind them.
-## Inside P0Follow's safe box, so the first steps move the player, not the camera.
-static func opening_focus(player: Vector3, size: float, view: Vector2, band: Rect2) -> Vector3:
+## The opening shot (不知火舞 on 231, 2026-10-09): feet OPENING_LIFT above the band's bottom edge (the main key / quick
+## bar; on it since 442), so from a bank the water beyond fills the band instead of the grass behind them; across, the camera turned
+## 14.5° (442) leans toward `water` (its middle) as far as P0Follow's safe box keeps the player — centred without it —
+## and no further than keeps `piece` (the nearest gathering point, 410) OPENING_PIECE_PX inside the screen's sides
+## when it was on the screen unleaned: the opening shows 1–3 points as at 0° (上官婉儿), and the water no less.
+## Inside the safe box, so the first steps move the player, not the camera.
+const OPENING_PIECE_PX := 40.0
+static func opening_focus(player: Vector3, size: float, view: Vector2, band: Rect2, water := Vector3.INF, piece := Vector3.INF) -> Vector3:
 	var px := view.x / size
 	var nearer := (band.end.y - OPENING_LIFT - view.y * 0.5) / px / sin(deg_to_rad(PITCH_DEG))   # ground metres below the centre row
-	return Vector3(player.x, player.y, player.z - nearer)
+	var focus := player + ahead_axis() * nearer
+	if not water.is_finite(): return focus
+	var room := (view.x * 0.5 - P0Follow.box(view).position.x) / px   # metres the player may sit off the middle
+	var lo := -room
+	var hi := room
+	var off := (piece - player).dot(right_axis()) if piece.is_finite() else INF   # the piece right of the player (m)
+	var edge := (view.x * 0.5 - OPENING_PIECE_PX) / px
+	if absf(off) <= edge:   # on the screen unleaned: kept on it
+		lo = maxf(lo, off - edge)
+		hi = minf(hi, off + edge)
+	var lean := clampf((water - player).dot(right_axis()), lo, maxf(lo, hi))
+	return focus + right_axis() * lean
+
+## The gathering point nearest the player (its piece, on the ground); INF before the points come or with none.
+func _nearest_piece() -> Vector3:
+	var p: Dictionary = PondGather.nearest(gather.points, actor.position) if gather != null else {}
+	return Vector3(float(p.x), 0, float(p.z)) if not p.is_empty() and p.has("x") and p.has("z") else Vector3.INF
+
+## The middle of this pond's water (x, z on the ground); INF when it has no box (a path site).
+func _water_at() -> Vector3:
+	var r := FishingModel.water_rect(str(entry.id), site_spec) if not entry.is_empty() else Rect2()
+	return Vector3(r.get_center().x, 0, r.get_center().y) if r.has_area() else Vector3.INF
 
 ## While fishing (camera unification, 不知火舞 on 231): the walking camera pans so the point midway between the player
 ## and the float sits in the middle of the fishing band — under the bite notice, above the guide line over the Hook
@@ -461,11 +501,13 @@ const LINE_INK := Color("#2F3A33B3")   # ink, 70 %
 static func fishing_focus(player: Vector3, landing: Vector3, focus_y: float, size: float, view: Vector2, band: Rect2) -> Vector3:
 	var px := view.x / size
 	var pitch := deg_to_rad(PITCH_DEG)
+	var right := right_axis()
+	var ahead := ahead_axis()
 	var mid := (player + landing) * 0.5
 	var c := band.get_center()
-	var x := mid.x - (c.x - view.x * 0.5) / px
-	var float_x := view.x * 0.5 + (landing.x - x) * px   # screen x with that focus (yaw 0: x maps straight across)
-	var body_x := view.x * 0.5 + (player.x - x) * px
+	var x := mid.dot(right) - (c.x - view.x * 0.5) / px   # the focus across the screen (metres along `right`)
+	var float_x := view.x * 0.5 + (landing.dot(right) - x) * px   # screen x with that focus
+	var body_x := view.x * 0.5 + (player.dot(right) - x) * px
 	var body := Rect2(body_x - PLAYER_HALF_M * px, 0.0, PLAYER_HALF_M * px * 2.0, 1.0)
 	var lo := FLOAT_EDGE
 	var hi := view.x - FLOAT_EDGE
@@ -473,8 +515,8 @@ static func fishing_focus(player: Vector3, landing: Vector3, focus_y: float, siz
 	else: lo = FLOAT_ROOM
 	x -= (clampf(float_x, lo, hi) - float_x) / px
 	var up := (view.y * 0.5 - c.y) / px   # the band's middle above the screen's, on the camera's up axis
-	var z := mid.z + (up - (mid.y - focus_y) * cos(pitch)) / sin(pitch)
-	return Vector3(x, focus_y, z)
+	var along := mid.dot(ahead) - (up - (mid.y - focus_y) * cos(pitch)) / sin(pitch)   # the focus up the screen
+	return right * x + ahead * along + Vector3(0, focus_y, 0)
 
 ## The player's box on screen, feet to head, for the reel gauge to keep clear of.
 static func player_box(camera: Camera3D, player: Vector3, view: Vector2) -> Rect2:
@@ -500,29 +542,59 @@ func _frame_fishing(dt: float) -> void:
 	var view := get_viewport().get_visible_rect().size
 	var band := _fishing_band()
 	var target := fishing_focus(actor.position, panel.landing, _focus.y, cam.size, view, band)
-	target = clamp_focus(target, cam.size, view, band, PondScenery.MEADOW)
+	target = clamp_focus(target, cam.size, view, band, PondScenery.MEADOW, actor.position)
 	_focus = _focus.lerp(target, 1.0 - exp(-dt * FISH_EASE))
 	place(cam, _focus)
 	panel.player_rect = player_box(cam, actor.position, view)
 
 static func place(camera: Camera3D, focus: Vector3) -> void:
 	var pitch := deg_to_rad(PITCH_DEG)
-	camera.position = focus + Vector3(0, sin(pitch), cos(pitch)) * DISTANCE
+	camera.position = focus + (Vector3.UP * sin(pitch) - ahead_axis() * cos(pitch)) * DISTANCE
 	camera.look_at(focus, Vector3.UP)
 
-## The focus that keeps `band` (screen) inside `art` (x, z on the ground). Yaw 0 and orthographic, so a screen column
-## is one world x and a screen row one ground z: the sides stop flush with art's x edges, the band's top row on its
-## far edge and its bottom row on its near edge.
-static func clamp_focus(focus: Vector3, size: float, view: Vector2, band: Rect2, art: Rect2) -> Vector3:
+## The focus that keeps `band` (screen) inside `art` (x, z on the ground), then `player` on the screen. Orthographic:
+## the band is a parallelogram on the ground — its sides `half` either way along RIGHT, its top and bottom rows `ahead`
+## and `behind` along AHEAD — and it is inside the meadow when its four corners are, which bounds the focus's world x
+## and z each (at yaw 0: the sides flush with art's x edges, the top row on its far edge, the bottom row on its near
+## one). Along an axis the meadow can't fill, the middle. Then, as the cathedral's reach gives way (#846), a player the
+## clamp would push off the screen or under the HUD / keys moves the camera back: the ground past the meadow shows
+## rather than the player going (442; q(297)'s walk reaches past the clamp at 14.5°).
+static func clamp_focus(focus: Vector3, size: float, view: Vector2, band: Rect2, art: Rect2, player := Vector3.INF) -> Vector3:
 	var half := size * 0.5
 	var px := view.x / size   # px per metre (KEEP_WIDTH)
 	var pitch := deg_to_rad(PITCH_DEG)
+	var right := right_axis()
+	var up_screen := ahead_axis()
 	var lift := focus.y / tan(pitch)   # the focus sits on a raised bank: the centre row meets the ground beyond it
 	var ahead := (view.y * 0.5 - band.position.y) / px / sin(pitch)   # ground metres from the centre row to the band's top …
 	var behind := (view.y * 0.5 - band.end.y) / px / sin(pitch)       # … and to its bottom (negative: nearer)
-	var x := clamp_or_centre(focus.x, art.position.x + half, art.end.x - half)
-	var z := clamp_or_centre(focus.z, art.position.y + lift + ahead, art.end.y + lift + behind)
-	return Vector3(x, focus.y, z)
+	var lo := Vector2(-INF, -INF)
+	var hi := Vector2(INF, INF)
+	for u in [-half, half]:
+		for v in [ahead, behind]:
+			var off: Vector3 = right * u + up_screen * (lift + v)   # a band corner from the focus, on the ground
+			lo = lo.max(Vector2(art.position.x - off.x, art.position.y - off.z))
+			hi = hi.min(Vector2(art.end.x - off.x, art.end.y - off.z))
+	var f := Vector3(clamp_or_centre(focus.x, lo.x, hi.x), focus.y, clamp_or_centre(focus.z, lo.y, hi.y))
+	if player.is_finite(): f = keep_on_screen(f, player, size, view, band)
+	return f
+
+## `focus` moved the least that brings `player` — feet to HEAD_M, PLAYER_HALF_M a side — PLAYER_SAFE_PX inside the
+## screen's sides and inside `band` top to bottom.
+static func keep_on_screen(focus: Vector3, player: Vector3, size: float, view: Vector2, band: Rect2) -> Vector3:
+	var px := view.x / size
+	var pitch := deg_to_rad(PITCH_DEG)
+	var across := (player - focus).dot(right_axis()) * px   # the player's px right of the screen's middle
+	var feet := view.y * 0.5 - ((player - focus).dot(ahead_axis()) * sin(pitch) + (player.y - focus.y) * cos(pitch)) * px
+	var head := feet - HEAD_M * cos(pitch) * px
+	var side := PLAYER_HALF_M * px
+	var dx := 0.0   # px the player must move on the screen: the camera moves the other way
+	dx += maxf(0.0, PLAYER_SAFE_PX - (view.x * 0.5 + across - side))
+	dx -= maxf(0.0, (view.x * 0.5 + across + side) - (view.x - PLAYER_SAFE_PX))
+	var dy := 0.0
+	dy += maxf(0.0, band.position.y - head)
+	dy -= maxf(0.0, feet - band.end.y)
+	return focus - right_axis() * (dx / px) + ahead_axis() * (dy / px / sin(pitch))   # the focus further up: the player lower
 
 static func clamp_or_centre(v: float, lo: float, hi: float) -> float:
 	return (lo + hi) * 0.5 if lo > hi else clampf(v, lo, hi)
@@ -552,6 +624,7 @@ func p0_zoom(f: float, at := Vector2.INF) -> void:
 	if _parked:   # a pinch after a cast brings the walking band's clamp back, eased like a step (不知火舞 on #143)
 		_parked = false
 		_settling = true
+		_settle_t = 0.0
 	_zoom_at = at
 	_pinch.pinch(f)
 	_cam_follow.hold()   # the pinched framing stays until the player walks
