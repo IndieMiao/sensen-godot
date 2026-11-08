@@ -486,6 +486,7 @@ func set_view(v: Dictionary) -> void:
 	if passport() != null: _passport.call("refresh", v)
 	if blackjack() != null: _blackjack.refresh(v)
 	_refresh_rest_card(v)
+	_refresh_priest_keys()
 	_refresh_hud()
 	_refresh_bar()
 	_refresh_request_reward()
@@ -2502,6 +2503,7 @@ func _show_need_source(tile: Control, id: String) -> void:
 ## "market"); ctx = the outpost's keeper ctx {keeper, place, nearest} (SGODOT-227), passed through untouched and kept
 ## for the counter's keeper bar.
 var _keeper_told := {}   # role → answers given this run (Gabriel's stories round, q(299))
+var _priest_card: UiDialogueCard   # Gabriel's greeting while it is up: its buff keys follow the view (q(300))
 func open_keeper_greeting(role: String, ctx := {}) -> void:
 	if not ctx.is_empty(): _counter_ctx[role] = ctx
 	var c: Dictionary = _counter_ctx.get(role, {})
@@ -2537,6 +2539,16 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 			# the gap key is grey (LOCK-10): a tap on it is unavailable_pressed, and it opens the card all the same
 			key.unavailable_pressed.connect(func(_r: String): open_card.call())
 		card.content.add_child(key)
+	_priest_card = card if role == "church" else null
+	if role == "church":   # Gabriel's buffs (q(300), SGODOT-445): a key each, the card stays up (_refresh_priest_keys)
+		for k in P0Logic.priest_keys(view):
+			var key := UiCommandButton.new(str(k.text), UiCommandButton.Kind.SECONDARY if k.on else UiCommandButton.Kind.PRIMARY)
+			key.name = "Buff_" + str(k.id)
+			key.fit_text = true
+			key.sends = true
+			var id := str(k.id)
+			key.activated.connect(func(): command.emit({"type": "buff", "buff": id}))   # the toast is the HUD's (亚瑟)
+			card.content.add_child(key)
 	if str(lines.question) != "" and str(lines.answer) != "":
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
 		var answers: Array = lines.get("answers", [lines.answer])
@@ -2553,6 +2565,17 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	_open_modal(card, 0.0, true)
 	_close_above(card, _CLOSE_ABOVE_CARD)
 	modal_kind = "greeting"
+
+## The buff keys follow the view (set_view, every 250 ms): the time left ticks, a taken one turns secondary, one run out
+## primary again.
+func _refresh_priest_keys() -> void:
+	if modal_kind != "greeting" or _priest_card == null or not is_instance_valid(_priest_card): return
+	for k in P0Logic.priest_keys(view):
+		var key := _priest_card.content.get_node_or_null("Buff_" + str(k.id)) as UiCommandButton
+		if key == null: continue
+		var kind := UiCommandButton.Kind.SECONDARY if k.on else UiCommandButton.Kind.PRIMARY
+		if key.label != str(k.text): key.label = str(k.text)
+		if key.kind != kind: key.kind = kind
 
 ## Lou's Play and the blackjack table (SGODOT-351): the full-screen table page (哪吒's open_blackjack(ctx), 351 d6fae42c),
 ## the greeting card closed first — only while view.blackjack says the table is open. A server without the table (no

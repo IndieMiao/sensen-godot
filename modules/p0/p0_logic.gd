@@ -1057,6 +1057,14 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 				if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
 			plots.append(p)
 		v["plots"] = plots
+	# the priest's buffs (q(300), SGODOT-445: view.buffs[].left, ms): counted down, gone once out — the greeting's keys
+	# tick on it and 亚瑟's HUD rings and `… has worn off` read it (a buff gone from the array is a buff ended)
+	if v.get("buffs") is Array and not (v.buffs as Array).is_empty():
+		var bs: Array = []
+		for b in v.buffs:
+			var ms := float(b.get("left", 0)) - elapsed_ms
+			if ms > 0.0: bs.append({"id": str(b.get("id", "")), "left": ms})
+		v["buffs"] = bs
 	# a city gathering spot's cooldown (v4q(4): view.gather.city_ready, ms left): counted down, gone once ready
 	var g = v.get("gather", null)
 	if g is Dictionary and g.get("city_ready") is Dictionary and not (g.city_ready as Dictionary).is_empty():
@@ -2174,6 +2182,23 @@ static func _here_name(view: Dictionary) -> String:
 	var travel = load("res://modules/p0/p0_travel.gd")
 	var cl := P0Clusters.get_cluster(travel.here(view))
 	return str(cl.name) if not cl.is_empty() and travel.away(view) else travel.home_name(view)
+
+## Gabriel's two buffs (q(300), SGODOT-445; 不知火舞 priest-buff ui-spec v1.1 §1–2, LOCK-16 增补): two full-width keys
+## over `Any stories?`, fishing above and farming below. Not taken: the primary `Twin Catch · 20 min`; on: the secondary
+## `Twin Catch · 12:41 left`, ticking, a tap renews it. [] from a server without them (no view.buff_takes, before #865).
+## The 11-15 daily limit (the count line, the grey keys, `Tap again to renew`) is not shown in the demo.
+const PRIEST_BUFFS := [["fish", "Twin Catch"], ["farm", "Swift Growth"]]
+static func priest_keys(view: Dictionary) -> Array:
+	if not view.has("buff_takes"): return []
+	var left := {}
+	for b in view.get("buffs", []): left[str(b.get("id", ""))] = float(b.get("left", 0))
+	var minutes := int(content().get("buffs", {}).get("minutes", 20))
+	var out: Array = []
+	for pair in PRIEST_BUFFS:
+		var ms := float(left.get(pair[0], 0.0))
+		out.append({"id": pair[0], "name": pair[1], "on": ms > 0.0,
+			"text": ("%s · %s left" % [pair[1], duration(ms)]) if ms > 0.0 else ("%s · %d min" % [pair[1], minutes])})
+	return out
 
 static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionary:
 	var copy: Dictionary = _KEEPER_COPY.get(role, {})

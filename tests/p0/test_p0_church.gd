@@ -214,3 +214,43 @@ func test_gabriel_opens_at_his_talking_spot() -> void:
 	r._card = ""
 	r.actor.teleport(r.room.position + Vector3(-0.375, r.floor_y, 1.03))   # the aisle beside the second left pew
 	assert_str(r.card_pick(marks)).is_equal("seat_left_2")
+
+## q(300), SGODOT-445 (不知火舞 priest-buff ui-spec v1.1 §2): two full-width keys over `Any stories?`, fishing above and
+## farming below — the primary `· 20 min` when not taken, the secondary `· 12:41 left` while on, ticking with the view;
+## a tap sends the buff command and the card stays up. A server without buffs (no view.buff_takes) shows neither.
+func test_gabriel_gives_the_two_buffs() -> void:
+	var v := {"buffs": [{"id": "fish", "left": 761000.0}], "buff_takes": {"used": 1, "limit": null, "resets_in": 3600000.0}}
+	var keys := P0Logic.priest_keys(v)
+	assert_array(keys.map(func(k): return k.text)).is_equal(["Twin Catch · 12:41 left", "Swift Growth · 20 min"])
+	assert_array(keys.map(func(k): return k.on)).is_equal([true, false])
+	assert_array(P0Logic.priest_keys({})).is_empty()
+	# the view ages them: 41 s on, 12:00 left; past the end the buff is gone from the array (亚瑟's `… has worn off`)
+	assert_str(str(P0Logic.priest_keys(P0Logic.project(v, 41000.0))[0].text)).is_equal("Twin Catch · 12:00 left")
+	assert_array(P0Logic.project(v, 761000.0).buffs).is_empty()
+	assert_array(v.buffs).has_size(1)   # the server's view left as it was
+	var ui := P0Ui.new()
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.view = v
+	ui.open_keeper_greeting("church", {"outpost": CHURCH_ID})
+	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
+	assert_array(card.content.get_children().map(func(b): return (b as UiCommandButton).label)).is_equal(
+		["Twin Catch · 12:41 left", "Swift Growth · 20 min", "Any stories?"])
+	var fish := card.content.get_child(0) as UiCommandButton
+	var farm := card.content.get_child(1) as UiCommandButton
+	assert_int(fish.kind).is_equal(UiCommandButton.Kind.SECONDARY)
+	assert_int(farm.kind).is_equal(UiCommandButton.Kind.PRIMARY)
+	assert_bool(fish.fit_text and farm.fit_text).is_true()
+	var sent := []
+	ui.command.connect(func(c): sent.append(c))
+	farm.activated.emit()
+	fish.activated.emit()
+	assert_array(sent).is_equal([{"type": "buff", "buff": "farm"}, {"type": "buff", "buff": "fish"}])
+	assert_str(ui.modal_kind).is_equal("greeting")
+	# the answer: farm taken, fish ticking on; then fish out
+	ui.set_view({"buffs": [{"id": "fish", "left": 700000.0}, {"id": "farm", "left": 1200000.0}], "buff_takes": v.buff_takes})
+	assert_array([fish.label, farm.label]).is_equal(["Twin Catch · 11:40 left", "Swift Growth · 20:00 left"])
+	assert_int(farm.kind).is_equal(UiCommandButton.Kind.SECONDARY)
+	ui.set_view({"buffs": [{"id": "farm", "left": 1199000.0}], "buff_takes": v.buff_takes})
+	assert_str(fish.label).is_equal("Twin Catch · 20 min")
+	assert_int(fish.kind).is_equal(UiCommandButton.Kind.PRIMARY)
