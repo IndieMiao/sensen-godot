@@ -417,14 +417,18 @@ func _build_hearth_glow() -> void:
 	room.add_child(glow)
 
 # ---------------------------------------------------------------- camera: the room's accepted view + safe box
-## One camera pitch everywhere (用户 2026-10-09, camera unification step 2): a room keeps its kit's yaw (about 45°, the
-## corner view its art was built for — the user kept it) and distance, and looks down at the farm's pitch
-## (FarmCamera.PITCH_DEG) instead of its kit's 25–37°. All three spaces are orthographic, so with the farm's player
-## scale (frame_all) the picture is the farm's too. The kit's own camera stays for the reviewcam shot step.
-static func at_farm_pitch(dir: Vector3) -> Vector3:
+## One camera pitch in every room (用户 2026-10-09, camera unification step 2): a room keeps its kit's yaw (about 45°,
+## the corner view its art was built for — the user kept it) and distance, and looks down at ROOM_PITCH_DEG instead of
+## its kit's 25–37°. It was the farm's 43° until the user lowered it indoors only (11-08, bot 439 「室内 33」, from 43 / 38
+## / 33 / 28 side by side): the farmhouse and its kitchen and every outpost; the farm, ponds and the mine keep theirs.
+## All are orthographic, and frame_all keeps the farm's player scale at any pitch (FarmCamera.player_scale_size), so
+## only the room around the player looks flatter. The kit's own camera stays for the reviewcam shot step.
+const ROOM_PITCH_DEG := 33.0
+
+static func at_room_pitch(dir: Vector3) -> Vector3:
 	var flat := Vector2(dir.x, dir.z)
 	flat = flat.normalized() if flat.length() > 0.001 else Vector2(0.0, 1.0)
-	var p := deg_to_rad(FarmCamera.PITCH_DEG)
+	var p := deg_to_rad(ROOM_PITCH_DEG)
 	return Vector3(flat.x * cos(p), sin(p), flat.y * cos(p))
 
 func _build_camera() -> void:
@@ -434,7 +438,7 @@ func _build_camera() -> void:
 		_cam_dir = off.normalized()
 		_cam_dist = off.length()
 	_kit_dir = _cam_dir
-	_cam_dir = at_farm_pitch(_cam_dir)
+	_cam_dir = at_room_pitch(_cam_dir)
 	_cam_size = float(spec.get("size", _cam_size))
 	cam = Camera3D.new()
 	cam.name = "RoomCamera"
@@ -1270,7 +1274,7 @@ func calib_project(points: Dictionary) -> Dictionary:
 
 # ---------------------------------------------------------------- dev steps for P0_SHOT
 var _review_view := false
-var _kit_dir := Vector3.ZERO   # the kit's own direction, before the farm's pitch (shot step "kitpitch")
+var _kit_dir := Vector3.ZERO   # the kit's own direction, before the room pitch (shot step "kitpitch")
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"kitpitch":   # back to the kit's own pitch (light sampling against renders signed at it)
