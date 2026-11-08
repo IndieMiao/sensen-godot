@@ -1,0 +1,32 @@
+[
+  {
+    "file": "SGODOT-218_market_props_blockout_v0_33_catalogue.png",
+    "sha256": "cc581c925632408f8ce5bc895ef89f2cc184eb17f49483add1fc744ab85311d8",
+    "bytes": 291295
+  },
+  {
+    "file": "SGODOT-218_market_props_blockout_v0_33_family.png",
+    "sha256": "4095aeca911f54e25ba3fa997aacb5d25cff5d931da4931ebf4c6edf8ebf6dec",
+    "bytes": 314824
+  },
+  {
+    "file": "SGODOT-218_market_props_blockout_v0_33_rear_underside.png",
+    "sha256": "484cd58e7a0eb4e8896daccfdf3846874e8f7aceaf92d91bcca2c2262a1a3a86",
+    "bytes": 197649
+  },
+  {
+    "file": "SGODOT-218_market_props_blockout_v0_33_asset_stats.json",
+    "sha256": "17d00a64169850b2e88de09d197d7bb33b761363ae80650f9f4194868586e752",
+    "bytes": 10152
+  },
+  {
+    "file": "SGODOT-218_market_props_blockout_v0_33_godot_validation.json",
+    "sha256": "c4eb380bf6a52d1358988d889a666a6e86e60271cc0e18c5f9f56e22a382ef3d",
+    "bytes": 11051
+  },
+  {
+    "file": "SGODOT-218_market_props_blockout_v0_33_geometry_validation.json",
+    "sha256": "e34b57ffdbe8afe8ad3ab111fbf6c82efa71e03726e6b038c5fbb5cd703c7262",
+    "bytes": 25985
+  }
+]

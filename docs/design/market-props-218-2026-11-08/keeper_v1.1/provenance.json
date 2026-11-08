@@ -1,0 +1,16 @@
+{
+  "assembly_pr": 883,
+  "assembly_head": "2516abd7b967b12a799c8200f77595618d1dd91b",
+  "runtime_base": "069dfeb13a4988fa2c0d04b80b29af69fbcc2746",
+  "supplier_before": "288b47b94f966981603b3d132552d6b16f923303",
+  "layout_sha256": "590e3ec1682916cf83b5a7b7afebd97554d169819167cc4606fd2e5fce553557",
+  "reference_attachment_id": "68092d60-15cd-4f0e-b341-bbfa51159997",
+  "reference_attachment_sha256": "9eb1de58a469370fdd645bfcf68fb81dd89176c193cbf0fe23ae64132563d45d",
+  "before_glb_sha256": "3a87eaff36f71796745d6fa9998d98b9c8cc50ee054a3ec1dd4a1f3aaa98dbf2",
+  "after_glb_sha256": "3c97b6fb3a43a20fd8360f3c3bc3a9037fe2b9a1f1e3239bb84146338322dfce",
+  "review_only_patches": [
+    "sh_market_1 art/bounds/anchors/seats",
+    "P0Room use layout33-degree pitch and6.72m width"
+  ],
+  "runtime_patches_committed": false
+}

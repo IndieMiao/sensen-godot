@@ -1,0 +1,67 @@
+[
+  {
+    "file": "SGODOT-218_keeper_v1.1_asset_stats.json",
+    "sha256": "95b1fed322b7a001b2fecd489c90c1166e01266c88c983eedf9390f9b08ff5f0",
+    "bytes": 10316
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_cold_import.json",
+    "sha256": "c6a1820604c076a324a49150efe4b965a70ab75c591d8de943fd2d6cd882fbc8",
+    "bytes": 262
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_delivery.md",
+    "sha256": "4dc7ac21586fd204ca657eac392e5d6f3864ef81145d2e54508c519177aa967d",
+    "bytes": 2293
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_front_size_comparison.png",
+    "sha256": "7267422a405ed27c520191d27bd7dcb838bf603df4c4de779254abad721e345a",
+    "bytes": 311198
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_geometry_validation.json",
+    "sha256": "e7be7d666bdf29072bc1d93c9f543ba96d860b505b3d4496233a67273266dd7f",
+    "bytes": 27433
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_head_crop.png",
+    "sha256": "adeda397d1a101ed95b491bba591948c139dfd5b4ed1a0a95ec7d981f6906cbf",
+    "bytes": 61673
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_keeper_33.png",
+    "sha256": "aaf2189363f80a29cdd86084c8390f9eac7bfafa1bc415f603d8f5cbfaf4abf0",
+    "bytes": 214610
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_keeper_rear20.png",
+    "sha256": "f539f96e959343a28613aaf9d0001caa7f04b66b0d267018b659a2af47138c86",
+    "bytes": 213456
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_keeper_validation.json",
+    "sha256": "34329cf5afe5da0f9e57d479b25ffcd0dc2abafa53f8d9db65e4e28219bca344",
+    "bytes": 11278
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_opening_after.png",
+    "sha256": "a5db2c7122eb597e14329378cfe693773e893770aaf58ceb6e30a97e4a9f6096",
+    "bytes": 191640
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_opening_before.png",
+    "sha256": "47e5003d119ad09a0f36bd85edceddbc5543d115ca30777aa326fb465b5b4cee",
+    "bytes": 186065
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_opening_compare.png",
+    "sha256": "b7635c80deb15e3c7c21382c5bdb243d141796f93b882e64b67ac135c95769b0",
+    "bytes": 235005
+  },
+  {
+    "file": "SGODOT-218_keeper_v1.1_opening_validation.json",
+    "sha256": "15277ce9ffed0b05886e7bcd1d34612405aa30a6eb224c8759085dd298a8d180",
+    "bytes": 9539
+  }
+]

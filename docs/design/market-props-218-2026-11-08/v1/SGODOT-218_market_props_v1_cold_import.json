@@ -1,0 +1,12 @@
+{
+  "exit_code": 0,
+  "changed_fixture_files": [],
+  "engine_errors": [],
+  "source_unchanged": true,
+  "tracked_status_unchanged": true,
+  "fresh_cache": true,
+  "etc2_astc_enabled": true,
+  "private_adb_port": "5097",
+  "files_checked": 28,
+  "passed": true
+}

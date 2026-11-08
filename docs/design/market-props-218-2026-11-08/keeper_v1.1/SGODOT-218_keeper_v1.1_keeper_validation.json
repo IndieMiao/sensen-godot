@@ -1,0 +1,565 @@
+{
+  "baseline": "288b47b94f966981603b3d132552d6b16f923303",
+  "option": "A front-high sloping canopy",
+  "checks": [
+    {
+      "check": "All triangles entirely below1.8m retain position/colour",
+      "passed": true,
+      "evidence": {
+        "before": 1242,
+        "after": 1242
+      }
+    },
+    {
+      "check": "Measured3.2x1.6x3.1m envelope",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Keeper triangle budget",
+      "passed": true,
+      "evidence": 2296
+    },
+    {
+      "check": "Palette unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Front scallop lower edge>=2.8m",
+      "passed": true,
+      "evidence": 2.9200000762939453
+    },
+    {
+      "check": "Rear scallop lower edge>=2.3m",
+      "passed": true,
+      "evidence": 2.4200000762939453
+    },
+    {
+      "check": "Overall highest point3.10m",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Baseline reproduces head occlusion",
+      "passed": true,
+      "evidence": 15
+    },
+    {
+      "check": "All15 head region rays clear after change",
+      "passed": true,
+      "evidence": [
+        {
+          "world_head_height_m": 1.6,
+          "local_origin": [
+            -0.18,
+            1.55,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.6,
+          "local_origin": [
+            0.0,
+            1.55,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 4,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.6,
+          "local_origin": [
+            0.18,
+            1.55,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.8,
+          "local_origin": [
+            -0.18,
+            1.75,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.8,
+          "local_origin": [
+            0.0,
+            1.75,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 4,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.8,
+          "local_origin": [
+            0.18,
+            1.75,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.9,
+          "local_origin": [
+            -0.18,
+            1.8499999999999999,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.9,
+          "local_origin": [
+            0.0,
+            1.8499999999999999,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 4,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.9,
+          "local_origin": [
+            0.18,
+            1.8499999999999999,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.95,
+          "local_origin": [
+            -0.18,
+            1.9,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.95,
+          "local_origin": [
+            0.0,
+            1.9,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 4,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 1.95,
+          "local_origin": [
+            0.18,
+            1.9,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 2.0,
+          "local_origin": [
+            -0.18,
+            1.95,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 2.0,
+          "local_origin": [
+            0.0,
+            1.95,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 4,
+            "after": 0
+          }
+        },
+        {
+          "world_head_height_m": 2.0,
+          "local_origin": [
+            0.18,
+            1.95,
+            -0.6363961030678928
+          ],
+          "hits": {
+            "before": 2,
+            "after": 0
+          }
+        }
+      ]
+    },
+    {
+      "check": "stall_fish.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "market_props_matte.tres unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "basket.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_keeper.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_veg.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "basket.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "produce_crate.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_veg.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "flower_tub.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "fountain.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_fish.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_spice.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "flower_cart.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "flower_tub.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "market_board.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_tools.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_bakery.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "flower_cart.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_bakery.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "market_board.glb unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "fountain.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_tools.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "produce_crate.glb.import unchanged",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "stall_spice.glb unchanged",
+      "passed": true,
+      "evidence": null
+    }
+  ],
+  "rays": [
+    {
+      "world_head_height_m": 1.6,
+      "local_origin": [
+        -0.18,
+        1.55,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.6,
+      "local_origin": [
+        0.0,
+        1.55,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 4,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.6,
+      "local_origin": [
+        0.18,
+        1.55,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.8,
+      "local_origin": [
+        -0.18,
+        1.75,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.8,
+      "local_origin": [
+        0.0,
+        1.75,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 4,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.8,
+      "local_origin": [
+        0.18,
+        1.75,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.9,
+      "local_origin": [
+        -0.18,
+        1.8499999999999999,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.9,
+      "local_origin": [
+        0.0,
+        1.8499999999999999,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 4,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.9,
+      "local_origin": [
+        0.18,
+        1.8499999999999999,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.95,
+      "local_origin": [
+        -0.18,
+        1.9,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.95,
+      "local_origin": [
+        0.0,
+        1.9,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 4,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 1.95,
+      "local_origin": [
+        0.18,
+        1.9,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 2.0,
+      "local_origin": [
+        -0.18,
+        1.95,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 2.0,
+      "local_origin": [
+        0.0,
+        1.95,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 4,
+        "after": 0
+      }
+    },
+    {
+      "world_head_height_m": 2.0,
+      "local_origin": [
+        0.18,
+        1.95,
+        -0.6363961030678928
+      ],
+      "hits": {
+        "before": 2,
+        "after": 0
+      }
+    }
+  ],
+  "unchanged_files": [
+    "stall_fish.glb.import",
+    "market_props_matte.tres",
+    "basket.glb",
+    "stall_keeper.glb.import",
+    "stall_veg.glb.import",
+    "basket.glb.import",
+    "produce_crate.glb",
+    "stall_veg.glb",
+    "flower_tub.glb.import",
+    "fountain.glb",
+    "stall_fish.glb",
+    "stall_spice.glb.import",
+    "flower_cart.glb.import",
+    "flower_tub.glb",
+    "market_board.glb.import",
+    "stall_tools.glb",
+    "stall_bakery.glb.import",
+    "flower_cart.glb",
+    "stall_bakery.glb",
+    "market_board.glb",
+    "fountain.glb.import",
+    "stall_tools.glb.import",
+    "produce_crate.glb.import",
+    "stall_spice.glb"
+  ],
+  "passed": true,
+  "sha256": "3c97b6fb3a43a20fd8360f3c3bc3a9037fe2b9a1f1e3239bb84146338322dfce"
+}
