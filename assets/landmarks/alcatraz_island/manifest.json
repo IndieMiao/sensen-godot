@@ -24,9 +24,9 @@
       "sha256": "3663f515b56c9fe15d0b46fa07b50224ceef063493e694cca0660fc2b983a993"
     },
     "alc_ground_terraces": {
-      "triangles": 4065,
-      "bytes": 513520,
-      "sha256": "ebd4f5154e0744206dbcb969d839772f23c4e0fe12368d8edcba90200f04f52a",
+      "triangles": 4184,
+      "bytes": 528508,
+      "sha256": "49d98ab7ab1f479637a0a627c7872aeded284319892f789bd758587307a34670",
       "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
       "author": "\u9a6c\u53ef\u6ce2\u7f57"
     },

@@ -28,7 +28,8 @@ kit.box('Terminal foot',(0,.05,0),(.22,.10,.22),'stone',.012)
 for obj in bpy.data.objects:
  for mod in obj.modifiers:
   if mod.type=='BEVEL':mod.segments=1
-stats={name:kit.export(name) for name in kit.assets}
+stats=(json.loads((HERE/'geometry_report.json').read_text())['assets']
+       if '--terraces-only' in sys.argv else {name:kit.export(name) for name in kit.assets})
 # Subtract the exact construction volumes from existing triangle surfaces, with
 # interpolated vertex colour/UV. No broad rebuild, recolouring or ground UV reset.
 # The new closed stairs/landing solids fill these openings; top-mouth cuts remove
@@ -42,8 +43,12 @@ def split(poly,axis,value):
  inside=[];outside=[]
  for a,b in zip(poly,poly[1:]+poly[:1]):
   da=a['p'][axis]-value;db=b['p'][axis]-value
-  (inside if da<=1e-7 else outside).append(a)
-  if (da<0 and db>0) or (da>0 and db<0):
+  # A vertex on the cutting plane belongs to BOTH half-polygons. Successive
+  # neighbouring cutters share planes; assigning their boundary vertices only
+  # to one side collapsed otherwise untouched road triangles to two vertices.
+  if da<=1e-7:inside.append(a)
+  if da>=-1e-7:outside.append(a)
+  if (da < -1e-7 and db > 1e-7) or (da > 1e-7 and db < -1e-7):
    t=da/(da-db);v={k:[x+(y-x)*t for x,y in zip(a[k],b[k])] for k in a};inside.append(v);outside.append(v)
  return inside,outside
 def subtract(poly,cut):
@@ -103,7 +108,10 @@ for name in ['alc_ground_terraces','alc_ground_summit']:
  for f in data.polygons:f.use_smooth=True
  data.normals_split_custom_set([v['n'] for v in records])
  bpy.ops.object.select_all(action='DESELECT');obj.select_set(True);bpy.context.view_layer.objects.active=obj
- bpy.ops.export_scene.gltf(filepath=str(OUT/(name+'.glb')),export_format='GLB',use_selection=True,export_yup=True,export_materials='EXPORT',export_attributes=False,export_vertex_color='ACTIVE',export_cameras=False,export_lights=False,export_animations=False)
+ # The incremental top-face repair exports only terraces; keep the already
+ # verified summit bytes (its geometry is also present in the editable blend).
+ if '--terraces-only' not in sys.argv or name=='alc_ground_terraces':
+  bpy.ops.export_scene.gltf(filepath=str(OUT/(name+'.glb')),export_format='GLB',use_selection=True,export_yup=True,export_materials='EXPORT',export_attributes=False,export_vertex_color='ACTIVE',export_cameras=False,export_lights=False,export_animations=False)
  report[name]={'source':BASE,'input_triangles':len(mesh.loop_triangles),'cut_triangles':touched,'output_triangles':len(faces),'vertex_colors_preserved':bool(color),'uv_preserved':bool(uv)}
  stats[name]={'triangles':len(faces),'bytes':(OUT/(name+'.glb')).stat().st_size}
 # Editable reconstruction: named treads/landings, terminals, cut ground and named cutters.

@@ -123,7 +123,7 @@
       "source": "edd184d65",
       "input_triangles": 3800,
       "cut_triangles": 133,
-      "output_triangles": 4065,
+      "output_triangles": 4184,
       "vertex_colors_preserved": true,
       "uv_preserved": true
     },
@@ -152,9 +152,9 @@
       "author": "\u9a6c\u53ef\u6ce2\u7f57"
     },
     "alc_ground_terraces": {
-      "triangles": 4065,
-      "bytes": 513520,
-      "sha256": "ebd4f5154e0744206dbcb969d839772f23c4e0fe12368d8edcba90200f04f52a",
+      "triangles": 4184,
+      "bytes": 528508,
+      "sha256": "49d98ab7ab1f479637a0a627c7872aeded284319892f789bd758587307a34670",
       "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
       "author": "\u9a6c\u53ef\u6ce2\u7f57"
     },

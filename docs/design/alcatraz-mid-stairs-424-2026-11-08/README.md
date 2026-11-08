@@ -1,5 +1,7 @@
 # SGODOT-424 恶魔岛中段台阶 A · 草稿交审
 
+**11-08 晚增量：**修复三层东侧顶面被裁切器误删的回归，开口外 0.5 m 网格复查缺失为 0；同站位前后图、冷导入、#890 路线测试及三段脚部/点击诊断见 [顶面修复记录](surface-followup/README.md)。下文为首轮交付记录。
+
 新增三段中央折返台阶、六个栏杆/路缘口和十二根端柱。真实踏步与平台单独出 `alc_mid_stairs.glb`，在 `alc_ground_terraces.glb` 和顶层 `alc_ground_summit.glb` 切掉相应重叠面/挡土墙口；保留花台、树、主楼和两端原台阶。**仅草稿，等用户确认“恶魔岛路 ok”再合。**
 
 美术基线 `edd184d65`；P0实拍/测试基线 `cf82ca0ac`（已含#886）。本分支没有改 `alcatraz_island.gd`、`griffith_observatory.gd` 或任何程序测试。

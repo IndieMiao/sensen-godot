@@ -10,6 +10,7 @@ This is an incremental art/data generator pinned to art base `edd184d65`. It pre
 - `review.gd`: native P0 fixture, true navigation/walking, physical click and foot probes, HUD audit, overhead and 360×800 stills. Copy it into the isolated current-P0 review project. `hud_helper.gd` is copied from the original island review tool; no in-game HUD code is modified.
 - `check_review.py`: NumPy near-tree ray intersections over live nav samples and the route.
 - `verify_old_routes.gd`: read-only Godot proof of all original stair corridors and original route legs.
+- `check_surface_preservation.py`: compares upward horizontal faces to farm-dev `188d82c0`, excluding exact construction volumes, with continuous coverage and a 0.5 m grid. Detects lost road/grass faces even when their triangle centroids lie outside the reviewed strip. Coplanar cutter vertices must belong to both half-polygons.
 
 Generate layout with Python/Shapely, then always use the shared lock for Blender/Godot:
 
@@ -19,6 +20,8 @@ flock ~/gs66-render.lock blender --background --factory-startup --python "$PWD/t
 ```
 
 For a layout change, refresh `route_verified.json` from the actual Godot map before final export; do not hand-adjust the reported distance. The runtime probe uses the same .25 m/.1 m map and region geometry as the landmark. The current source staging uses P0 base `cf82ca0ac` (#886); preserve its two landmark scripts when overlaying art assets.
+
+For the top-surface correction only, append `-- --terraces-only` to the Blender command. This rebuilds the editable source but exports only terraces, retaining all other GLB bytes. Then run `check_surface_preservation.py` with the NumPy/Shapely environment.
 
 The renderer already merges `render_merge_into` placements into the terrace mesh. New guard/endpost transforms remain in layout, with that flag, so their collision follows actual triangles instead of the old conservative sloped-rail boxes. Use master `layout.placements` as the full placement/collision/render contract; `placement_points.json` remains the transform handoff.
 
