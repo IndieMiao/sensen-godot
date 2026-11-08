@@ -47,6 +47,9 @@ var _detail_groups: Array[MeshInstance3D] = []
 ## Opened from the P0 map (q(295)): P0's HUD, stick and door prompt instead of this scene's own controls.
 var p0_visit: P0LandmarkVisit
 var _boundary_rids: Array[RID] = []
+## The P0 stick is walking the player: the run plays on (_step_walk without a path would set it idle each frame, and
+## play_motion starts a clip over from its first frame, so the player slid; 用户 0.3.2, 424 da2e9368).
+var stick_moving := false
 
 func setup(args: Dictionary) -> void:
 	if P0LandmarkVisit.wanted(args): p0_visit = P0LandmarkVisit.new(self, args)
@@ -280,7 +283,9 @@ func _add_batch(items: Array, paint: Material) -> void:
 			node.material_override=null
 		if definition.name==asset and not bool(definition.get("cast_shadow",true)):
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		if definition.name==asset and definition.has("max_view_width_m"):
+		# Hidden past a view width only if nothing in it stands in the way: zoomed out, the flowerbeds, planters, bins,
+		# lamps and signs went while their collision and navigation holes stayed, invisible walls (用户 0.3.2, 424 da2e9368).
+		if definition.name==asset and definition.has("max_view_width_m") and not items.any(func(p): return bool(p.get("collision", false))):
 			node.set_meta("max_view_width_m",float(definition.max_view_width_m))
 			_detail_batches.append(node)
 	if asset in ["alc_curb","alc_lamp","alc_bin","alc_sign","alc_rail_corner","alc_flowerbed","alc_rock_a","alc_rock_b","alc_rock_c","alc_shrub","alc_grass_tuft"]:node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -481,7 +486,7 @@ func walk_to(goal: Vector3) -> void:
 
 func _step_walk(delta: float) -> void:
 	if _path_i >= _path.size():
-		if _running:
+		if _running and not stick_moving:   # the stick's walk is the stick's to end (step_stick)
 			_running = false
 			_animation("idle")
 		return
@@ -748,7 +753,8 @@ func walking() -> bool: return _path_i < _path.size()
 ## The stick (P0LandmarkVisit.stick_step): the followed player runs while it is pushed.
 func step_stick(v: Vector2, dt: float) -> void:
 	if not navigation_ready(): return
-	if not P0LandmarkVisit.stick_step(_player, _nav_map, _camera, WALK_SPEED, v, dt):
+	stick_moving = P0LandmarkVisit.stick_step(_player, _nav_map, _camera, WALK_SPEED, v, dt)
+	if not stick_moving:
 		_stick_idle()
 		return
 	_following = true

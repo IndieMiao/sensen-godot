@@ -70,6 +70,32 @@ func test_the_player_starts_clear_of_the_door() -> void:
 	var exit: Vector3 = scene.exit_position()
 	assert_float(Vector2(p.x - exit.x, p.z - exit.z).length()).is_greater(2.1)
 
+## 用户 0.3.2 (424 da2e9368): walking by the stick the player slid — with no tap path _step_walk set idle each frame and
+## step_stick run again, and play_motion starts a clip over. Held, the run stays on through the scene's own frames.
+func test_the_stick_walk_keeps_running() -> void:
+	var scene := await _alcatraz()
+	for i in 10:
+		scene.step_stick(Vector2(0, -1), 1.0 / 30.0)
+		scene._step_walk(1.0 / 30.0)
+		assert_bool(scene._running).override_failure_message("frame %d" % i).is_true()
+	scene.step_stick(Vector2.ZERO, 1.0 / 30.0)
+	scene._step_walk(1.0 / 30.0)
+	assert_bool(scene._running).is_false()   # let go: idle
+
+## 用户 0.3.2 (424 da2e9368): zoomed out past their view width the flowerbeds, planters, bins, lamps and signs were hidden
+## while their collision stayed — invisible walls. What stands in the way is drawn at every width; flowers and grass
+## still go.
+func test_what_blocks_the_way_stays_drawn_when_zoomed_out() -> void:
+	var scene := await _alcatraz()
+	var hidden_by_width: Array = scene._detail_batches.map(func(n): return str(n.name))
+	for blocker in ["AlcFlowerbedBatch", "AlcPlanterBatch", "AlcBinBatch", "AlcLampBatch", "AlcSignBatch"]:
+		assert_array(hidden_by_width).not_contains([blocker])
+	assert_array(hidden_by_width).contains(["AlcGrassTuftBatch"])
+	scene.camera_pan.reset(1.0 / 3.0)   # the widest view
+	scene._update_camera()
+	for n in scene.batch_nodes:
+		if str(n.name) == "AlcFlowerbedBatch": assert_bool((n as Node3D).visible).is_true()
+
 func _alcatraz() -> Node3D:
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(360, 800)

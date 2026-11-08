@@ -58,6 +58,8 @@ var _saved_environment: Environment
 var _camera_recenter: Tween
 ## Opened from the P0 map (q(295)): P0's HUD and stick instead of this scene's own controls; the camera follows.
 var p0_visit: P0LandmarkVisit
+## The P0 stick is walking the player: the run plays on (as Alcatraz's; 用户 0.3.2, 424 da2e9368).
+var stick_moving := false
 
 func setup(args: Dictionary) -> void:
 	if P0LandmarkVisit.wanted(args): p0_visit = P0LandmarkVisit.new(self, args)
@@ -247,7 +249,7 @@ func _animation(name: String) -> void:
 
 func _step_walk(delta: float) -> void:
 	if _path_i >= _path.size():
-		if _running:
+		if _running and not stick_moving:   # the stick's walk is the stick's to end (step_stick)
 			_running = false
 			_animation("idle")
 		return
@@ -490,7 +492,8 @@ func walking() -> bool: return _path_i < _path.size()
 ## The stick (P0LandmarkVisit.stick_step): the player runs while it is pushed.
 func step_stick(v: Vector2, dt: float) -> void:
 	if not navigation_ready(): return
-	if P0LandmarkVisit.stick_step(_player, _nav_map, _camera, WALK_SPEED, v, dt):
+	stick_moving = P0LandmarkVisit.stick_step(_player, _nav_map, _camera, WALK_SPEED, v, dt)
+	if stick_moving:
 		if not _running:
 			_running = true
 			_animation("run")
