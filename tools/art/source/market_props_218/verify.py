@@ -1,6 +1,6 @@
 """Audit exported buffers, independent of Blender evaluated statistics."""
 from pathlib import Path
-import json,hashlib,re,sys,argparse
+import json,hashlib,re,sys,argparse,collections
 import numpy as np
 ROOT=Path(__file__).resolve().parents[4];KIT=ROOT/'assets/rooms/market_plaza'
 sys.path.insert(0,str(ROOT/'tools/art'));from verify_chef_sign import load_glb,accessor
@@ -18,6 +18,11 @@ for row in stats['assets']:
  check(path.stat().st_size==row['bytes'] and hashlib.sha256(path.read_bytes()).hexdigest()==row['sha256'],name+' bytes and SHA256')
  check(np.isfinite(v).all() and np.isfinite(n).all() and np.isfinite(c).all(),name+' finite geometry and colours')
  check((np.linalg.norm(np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0]),axis=1)>1e-10).all(),name+' no degenerate faces')
+ edges=collections.Counter()
+ for t in tri:
+  q=[tuple(np.round(point,6)) for point in t]
+  for j in range(3):edges[tuple(sorted((q[j],q[(j+1)%3])))]+=1
+ check(not any(count==1 for count in edges.values()),name+' closed shells, no boundary edges',sum(count==1 for count in edges.values()))
  check(abs(bounds[0,1])<1e-6,name+' ground is Y0')
  check(doc['meshes'][0]['name']==name+'_mobile',name+' mesh name')
  check(not doc.get('animations') and not doc.get('skins') and not doc.get('cameras') and not doc.get('images') and not doc.get('textures') and not doc.get('extensions',{}).get('KHR_lights_punctual'),name+' static texture-free prop only')

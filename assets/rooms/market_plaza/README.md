@@ -20,3 +20,5 @@
 12件均为单surface、哑光顶点色，无贴图。GLB导入按房间件关闭自动LOD/动画、light_baking=0，保留root_script=null；UID由Godot导入生成。`market_props_matte.tres`由每份.import的materials映射共用，实例化GLB即可正确显示顶点色。没有新增PNG，不涉及纹理compress/mode。
 
 模型、源Blend和生成脚本对应；修改脚本后请在共享锁中运行Blender。`asset_stats.json`列出本批12件实际导出顶点的面数、AABB、字节和SHA256，装配场景统计由装配方另合并。未包含路灯、长椅、花槽，装配时复用street_kit。
+
+审阅基准已更新为 yaw45° / pitch33°，背面附20°低俯角检查。最终v1为13,036三角面、12surface；12件均无开放边，所有尺寸/预算检查通过。

@@ -1,0 +1,1200 @@
+{
+  "task": "SGODOT-218",
+  "stage": "blockout",
+  "checks": [
+    {
+      "passed": true,
+      "check": "stall_keeper one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper triangles within budget",
+      "evidence": 1276
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper actual vertex bounds match stats",
+      "evidence": [
+        [
+          -1.600000023841858,
+          0.0,
+          -0.800000011920929
+        ],
+        [
+          1.600000023841858,
+          2.8499999046325684,
+          0.800000011920929
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper actual dimensions match stats",
+      "evidence": [
+        3.200000047683716,
+        2.8499999046325684,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper hard footprint and height",
+      "evidence": [
+        3.200000047683716,
+        2.8499999046325684,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "Mei rear 0.80m work lane has no model faces",
+      "evidence": {
+        "box": {
+          "min": [
+            -1.4,
+            0,
+            -0.76
+          ],
+          "max": [
+            1.4,
+            1.85,
+            0.04
+          ]
+        },
+        "overlapping_triangle_bounds": 0
+      }
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_keeper root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg triangles within budget",
+      "evidence": 1028
+    },
+    {
+      "passed": true,
+      "check": "stall_veg actual vertex bounds match stats",
+      "evidence": [
+        [
+          -1.0,
+          0.0,
+          -0.800000011920929
+        ],
+        [
+          1.0,
+          2.549999952316284,
+          0.800000011920929
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_veg actual dimensions match stats",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_veg bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg hard footprint and height",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_veg engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_veg root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish triangles within budget",
+      "evidence": 1028
+    },
+    {
+      "passed": true,
+      "check": "stall_fish actual vertex bounds match stats",
+      "evidence": [
+        [
+          -1.0,
+          0.0,
+          -0.800000011920929
+        ],
+        [
+          1.0,
+          2.549999952316284,
+          0.800000011920929
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_fish actual dimensions match stats",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_fish bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish hard footprint and height",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_fish engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_fish root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery triangles within budget",
+      "evidence": 1028
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery actual vertex bounds match stats",
+      "evidence": [
+        [
+          -1.0,
+          0.0,
+          -0.800000011920929
+        ],
+        [
+          1.0,
+          2.549999952316284,
+          0.800000011920929
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery actual dimensions match stats",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery hard footprint and height",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_bakery root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice triangles within budget",
+      "evidence": 1028
+    },
+    {
+      "passed": true,
+      "check": "stall_spice actual vertex bounds match stats",
+      "evidence": [
+        [
+          -1.0,
+          0.0,
+          -0.800000011920929
+        ],
+        [
+          1.0,
+          2.549999952316284,
+          0.800000011920929
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_spice actual dimensions match stats",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_spice bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice hard footprint and height",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_spice engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_spice root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools triangles within budget",
+      "evidence": 1028
+    },
+    {
+      "passed": true,
+      "check": "stall_tools actual vertex bounds match stats",
+      "evidence": [
+        [
+          -1.0,
+          0.0,
+          -0.800000011920929
+        ],
+        [
+          1.0,
+          2.549999952316284,
+          0.800000011920929
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_tools actual dimensions match stats",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_tools bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools hard footprint and height",
+      "evidence": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ]
+    },
+    {
+      "passed": true,
+      "check": "stall_tools engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "stall_tools root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart triangles within budget",
+      "evidence": 1008
+    },
+    {
+      "passed": true,
+      "check": "flower_cart actual vertex bounds match stats",
+      "evidence": [
+        [
+          -1.0,
+          0.0,
+          -0.699999988079071
+        ],
+        [
+          1.0,
+          2.3499999046325684,
+          0.699999988079071
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "flower_cart actual dimensions match stats",
+      "evidence": [
+        2.0,
+        2.3499999046325684,
+        1.399999976158142
+      ]
+    },
+    {
+      "passed": true,
+      "check": "flower_cart bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart hard cart dimensions",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_cart root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board triangles within budget",
+      "evidence": 400
+    },
+    {
+      "passed": true,
+      "check": "market_board actual vertex bounds match stats",
+      "evidence": [
+        [
+          -0.6000000238418579,
+          0.0,
+          -0.15000000596046448
+        ],
+        [
+          0.6000000238418579,
+          1.7999999523162842,
+          0.15000000596046448
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "market_board actual dimensions match stats",
+      "evidence": [
+        1.2000000476837158,
+        1.7999999523162842,
+        0.30000001192092896
+      ]
+    },
+    {
+      "passed": true,
+      "check": "market_board bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board hard board dimensions",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "market_board root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain triangles within budget",
+      "evidence": 1740
+    },
+    {
+      "passed": true,
+      "check": "fountain actual vertex bounds match stats",
+      "evidence": [
+        [
+          -1.5,
+          0.0,
+          -1.5
+        ],
+        [
+          1.5,
+          2.0299999713897705,
+          1.5
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "fountain actual dimensions match stats",
+      "evidence": [
+        3.0,
+        2.0299999713897705,
+        3.0
+      ]
+    },
+    {
+      "passed": true,
+      "check": "fountain bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain fountain diameter and height",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "fountain root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate triangles within budget",
+      "evidence": 156
+    },
+    {
+      "passed": true,
+      "check": "produce_crate actual vertex bounds match stats",
+      "evidence": [
+        [
+          -0.3100000023841858,
+          0.0,
+          -0.2199999988079071
+        ],
+        [
+          0.3100000023841858,
+          0.33000001311302185,
+          0.2199999988079071
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "produce_crate actual dimensions match stats",
+      "evidence": [
+        0.6200000047683716,
+        0.33000001311302185,
+        0.4399999976158142
+      ]
+    },
+    {
+      "passed": true,
+      "check": "produce_crate bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "produce_crate root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket triangles within budget",
+      "evidence": 296
+    },
+    {
+      "passed": true,
+      "check": "basket actual vertex bounds match stats",
+      "evidence": [
+        [
+          -0.23000000417232513,
+          0.0,
+          -0.2187429964542389
+        ],
+        [
+          0.23000000417232513,
+          0.5550000071525574,
+          0.2187429964542389
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "basket actual dimensions match stats",
+      "evidence": [
+        0.46000000834465027,
+        0.5550000071525574,
+        0.4374859929084778
+      ]
+    },
+    {
+      "passed": true,
+      "check": "basket bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "basket root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub one mesh and one surface",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub triangles within budget",
+      "evidence": 224
+    },
+    {
+      "passed": true,
+      "check": "flower_tub actual vertex bounds match stats",
+      "evidence": [
+        [
+          -0.29994073510169983,
+          0.0,
+          -0.2567852735519409
+        ],
+        [
+          0.29994073510169983,
+          0.75,
+          0.27311521768569946
+        ]
+      ]
+    },
+    {
+      "passed": true,
+      "check": "flower_tub actual dimensions match stats",
+      "evidence": [
+        0.5998814702033997,
+        0.75,
+        0.5299004912376404
+      ]
+    },
+    {
+      "passed": true,
+      "check": "flower_tub bytes and SHA256",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub finite geometry and colours",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub no degenerate faces",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub ground is Y0",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub mesh name",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub static texture-free prop only",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub one matte material",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub engine-generated valid UID",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "flower_tub root_script and import convention",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "12 unique Godot UIDs",
+      "evidence": null
+    },
+    {
+      "passed": true,
+      "check": "All 12 requested reusable models",
+      "evidence": null
+    }
+  ],
+  "passed": true,
+  "assets": [
+    {
+      "name": "stall_keeper",
+      "triangles": 1276,
+      "dimensions_m": [
+        3.200000047683716,
+        2.8499999046325684,
+        1.600000023841858
+      ],
+      "bytes": 84236,
+      "sha256": "9a97909549be4c202c694628f31655bfe2798294c77b0249987a6351723b0718"
+    },
+    {
+      "name": "stall_veg",
+      "triangles": 1028,
+      "dimensions_m": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ],
+      "bytes": 68880,
+      "sha256": "1acadda0a7ebe7a71ac814a5cba5f276ca9660696da0ed95ba773e6574b0a612"
+    },
+    {
+      "name": "stall_fish",
+      "triangles": 1028,
+      "dimensions_m": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ],
+      "bytes": 68884,
+      "sha256": "2db4066631ea0b2693e74f59cca1ef76718d1995c68757bd03a12a5ff4df8c35"
+    },
+    {
+      "name": "stall_bakery",
+      "triangles": 1028,
+      "dimensions_m": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ],
+      "bytes": 68888,
+      "sha256": "6227166e855aaa76af6f1818149e7627081a7fdb525e56640d8263437dd022a4"
+    },
+    {
+      "name": "stall_spice",
+      "triangles": 1028,
+      "dimensions_m": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ],
+      "bytes": 68888,
+      "sha256": "283e6ce3557ab473053c6422b20ab9955ade60b3dd4b6e2a523de20adee92406"
+    },
+    {
+      "name": "stall_tools",
+      "triangles": 1028,
+      "dimensions_m": [
+        2.0,
+        2.549999952316284,
+        1.600000023841858
+      ],
+      "bytes": 68888,
+      "sha256": "5d4587356cb7dee864e06b74fb2f6ff1ffe8f391e33f0670cb7a64236db56096"
+    },
+    {
+      "name": "flower_cart",
+      "triangles": 1008,
+      "dimensions_m": [
+        2.0,
+        2.3499999046325684,
+        1.399999976158142
+      ],
+      "bytes": 54176,
+      "sha256": "9f111d4b2ebf1abd3c57fbeb9ec7e15195c4d287dcf34a8eec566e2fce35fbde"
+    },
+    {
+      "name": "market_board",
+      "triangles": 400,
+      "dimensions_m": [
+        1.2000000476837158,
+        1.7999999523162842,
+        0.30000001192092896
+      ],
+      "bytes": 30980,
+      "sha256": "1a0a1d09a61de26ff269bdd6ecb5c3585b47c12ad2ed33723fb2e705e5bd921b"
+    },
+    {
+      "name": "fountain",
+      "triangles": 1740,
+      "dimensions_m": [
+        3.0,
+        2.0299999713897705,
+        3.0
+      ],
+      "bytes": 40036,
+      "sha256": "fd797fec64e9e3284fdb33ba62ed37f798e381e7b214e86d8a49c4225bbbf7ca"
+    },
+    {
+      "name": "produce_crate",
+      "triangles": 156,
+      "dimensions_m": [
+        0.6200000047683716,
+        0.33000001311302185,
+        0.4399999976158142
+      ],
+      "bytes": 12232,
+      "sha256": "7f99387578c5ba8153b6ea898a7f63fa5e8fc18e59d56f565ff48226776fd9e5"
+    },
+    {
+      "name": "basket",
+      "triangles": 296,
+      "dimensions_m": [
+        0.46000000834465027,
+        0.5550000071525574,
+        0.4374859929084778
+      ],
+      "bytes": 8060,
+      "sha256": "9cd60a3ebbcf02cffe635e8eb6074267f563b455e48e866b81d089351f914dc4"
+    },
+    {
+      "name": "flower_tub",
+      "triangles": 224,
+      "dimensions_m": [
+        0.5998814702033997,
+        0.75,
+        0.5299004912376404
+      ],
+      "bytes": 6536,
+      "sha256": "db39dce6bfa989d5b66a5b81fe80821cbd78e45265e4893e6e0a25ff65f3c05d"
+    }
+  ],
+  "total_triangles": 10240
+}

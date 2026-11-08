@@ -38,6 +38,7 @@ def canopy(w,d,top,color,stripes=6):
  # Each stripe is an actual closed thin prism: visible underside and capped side ends.
  edge=top-.27
  profile=[(-d/2,edge),(-d*.26,top-.09),(0,top),(d*.26,top-.09),(d/2,edge)]
+ if STAGE=='final':profile=[(-d/2,edge),(0,top),(d/2,edge)]
  outline=[(z,y) for z,y in profile]+[(z,y-.035) for z,y in reversed(profile)]
  for j in range(stripes):
   a=-w/2+j*w/stripes;b=a+w/stripes;role=color if j%2==0 else 'canvas';n=len(outline)
@@ -45,7 +46,8 @@ def canopy(w,d,top,color,stripes=6):
   faces=[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)]
   mesh('Closed striped canopy panel %02d'%j,vs,faces,role)
   # Broad rounded scallop at both ends, genuine cloth thickness.
-  outline2=[(a,edge-.02),(b,edge-.02)]+[(b-(b-a)*t/6,edge-.105-.105*math.sin(math.pi*t/6)) for t in range(7)]
+  segments=4 if STAGE=='final' else 6
+  outline2=[(a,edge-.02),(b,edge-.02)]+[(b-(b-a)*t/segments,edge-.105-.105*math.sin(math.pi*t/segments)) for t in range(segments+1)]
   for front in [-1,1]:
    n2=len(outline2);z=front*(d/2-.016)
    vs=[(x,y,z+dz) for dz in [-.016,.016] for x,y in outline2]
@@ -79,7 +81,7 @@ def lantern(x,z,y):
 def stall(name):
  keeper=name=='stall_keeper';w,h,d=BOUNDS[name];canopy(w,d,h,{'stall_keeper':'sage','stall_veg':'sage','stall_fish':'teal','stall_bakery':'yellow','stall_spice':'mint','stall_tools':'teal'}[name],8 if keeper else 6)
  for x in [-w/2+.10,w/2-.10]:
-  for z in [-.69,.69]:box('Rounded timber canopy upright',(x,(h-.24)/2,z),(.10,h-.24,.10),'wood',.012)
+  for z in [-.69,.69]:box('Rounded timber canopy upright',(x,(h-.29)/2,z),(.10,h-.29,.10),'wood',.012)
  # Counter rear face z=.06; reserved Mei standing rectangle z=-.76..+.04 (0.80m).
  deck_y=1.05;counter_w=w-.24
  box('Solid cabinet',(0,.50,.38),(counter_w,.86,.64),'wood_dark',.015)
@@ -138,13 +140,13 @@ def bloom(at,r=.10,role='flower_cream'):
  x,y,z=at
  for i in range(5):
   a=i*math.tau/5
-  mesh('Five petal flower',[(x,y,z),(x+r*math.cos(a-.33),y+.018,z+r*math.sin(a-.33)),(x+r*1.2*math.cos(a),y,z+r*1.2*math.sin(a)),(x+r*math.cos(a+.33),y+.018,z+r*math.sin(a+.33)),(x,y-.012,z)],[(0,1,2),(0,2,3),(4,2,1),(4,3,2)],role)
+  mesh('Five petal flower',[(x,y,z),(x+r*math.cos(a-.33),y+.018,z+r*math.sin(a-.33)),(x+r*1.2*math.cos(a),y,z+r*1.2*math.sin(a)),(x+r*math.cos(a+.33),y+.018,z+r*math.sin(a+.33)),(x,y-.012,z)],[(0,1,2),(0,2,3),(4,2,1),(4,3,2),(0,4,1),(0,3,4)],role)
  lathe('Flower warm centre',[(0,.025),(.016,0)],'yellow',5,(x,y+.015,z))
 
 def flower_cart():
  canopy(2,1.4,2.35,'mint',6)
  for x in [-.85,.85]:
-  for z in [-.56,.56]:box('Cart roof support',(x,1.31,z),(.075,1.65,.075),'wood')
+  for z in [-.56,.56]:box('Cart roof support',(x,1.28,z),(.075,1.59,.075),'wood')
  box('Cart broad flower bed',(0,.77,0),(1.72,.22,1.05),'wood',.025)
  box('Inset cart soil',(0,.895,0),(1.58,.03,.90),'soil')
  for x in [-.93,.93]:
@@ -152,7 +154,9 @@ def flower_cart():
   wheel.rotation_euler.y=math.pi/2;wheel.location=p.v((x,.27,0))
   # cylinder axis mapped to local X; wheel thickness contained in 2.0m canopy.
   for a in [0,math.pi/3,2*math.pi/3]:rod('Cart wheel spoke',(x,.27-.23*math.cos(a),-.23*math.sin(a)),(x,.27+.23*math.cos(a),.23*math.sin(a)),.016,'wood_dark',4)
- for x in [-.64,.64]:box('Cart grounded foot',(x,.28,.43),(.08,.56,.08),'wood_dark')
+ for x in [-.64,.64]:box('Cart grounded foot',(x,.345,.43),(.08,.69,.08),'wood_dark')
+ rod('Continuous wheel axle',(-.95,.27,0),(.95,.27,0),.028,'metal',6)
+ for x in [-.75,.75]:rod('Wheel-to-bed timber bracket',(x,.27,0),(x,.70,0),.038,'wood_dark',6)
  if STAGE=='final':
   for j in range(5):
    x=(j-2)*.30;z=(j%2-.5)*.38
@@ -178,9 +182,9 @@ def board():
  return {'blank_badge_reserved_local_m':{'min':[.24,1.35,.105],'max':[.49,1.56,.15]},'notes':'Blank papers; upper right panel clear, ! belongs to runtime UI'}
 
 def fountain():
- lathe('Circular plinth',[(0,1.42),(.10,1.50),(.16,1.50),(.23,1.40)],'stone',32)
- lathe('Lower carved stone basin',[(.18,1.28),(.33,1.40),(.48,1.40),(.54,1.34),(.54,1.20),(.45,1.15),(.29,1.10)],'stone_light',32)
- lathe('Lower pool opaque water',[(.365,1.16),(.375,1.16)],'water',32)
+ lathe('Circular plinth',[(0,1.42),(.10,1.50),(.16,1.50),(.23,1.40)],'stone',24 if STAGE=='final' else 32)
+ lathe('Lower carved stone basin',[(.18,1.28),(.33,1.40),(.48,1.40),(.54,1.34),(.54,1.20),(.45,1.15),(.29,1.10)],'stone_light',24 if STAGE=='final' else 32)
+ lathe('Lower pool opaque water',[(.365,1.16),(.375,1.16)],'water',24 if STAGE=='final' else 32)
  lathe('Turned fountain stem',[(.36,.34),(.44,.37),(.55,.28),(.80,.19),(1.03,.23),(1.13,.33),(1.18,.36)],'stone',20)
  lathe('Upper scalloped bowl',[(1.10,.32),(1.19,.56),(1.34,.67),(1.43,.64),(1.43,.52),(1.32,.44),(1.28,.29)],'stone_light',24)
  lathe('Upper water surface',[(1.345,.51),(1.35,.51)],'water',24)
@@ -194,7 +198,7 @@ def fountain():
     r=.48+t*.53;y=1.37+.20*math.sin(t*math.pi)-t*t*1.0
     points.append((r*math.cos(a),y,r*math.sin(a)))
    tube('Quiet static water arc',points,.017,'foam',5)
-   lathe('Small water landing ring',[(.38,.10),(.39,.12),(.39,.085),(.38,.075)],'foam',10,(1.01*math.cos(a),0,1.01*math.sin(a)))
+   lathe('Small water landing ring',[(.38,.10),(.39,.12),(.39,.085),(.38,.075)],'foam',8,(1.01*math.cos(a),0,1.01*math.sin(a)))
  return {'radius_m':1.5,'tiers':2,'water':'Opaque matte vertex-colour pools plus static arcs; no transparency, particles, animation or lights','flower_tub_instances':4,'flower_tub_is_separate_asset':True}
 
 def crate():
@@ -215,7 +219,7 @@ def basket():
  return {}
 
 def flower_tub():
- lathe('Terracotta flower tub',[(0,.19),(.05,.21),(.35,.25),(.40,.27),(.44,.26),(.44,.22),(.37,.21)],'pot',10)
+ lathe('Terracotta flower tub',[(0,.19),(.05,.21),(.35,.25),(.40,.27),(.44,.26),(.44,.22),(.37,.21)],'pot',6)
  lathe('Inset potting soil',[(.38,.21),(.385,.21)],'soil',8)
  for i,(x,z) in enumerate([(-.13,0),(.13,0),(0,.12)]):ico('Broad quiet leaf cluster',(x,.58,z),(.19,.17,.18),'leaf' if i%2 else 'leaf_light')
  if STAGE=='final':
@@ -258,7 +262,12 @@ def export(name,builder):
  bpy.context.window.scene=original;bpy.data.scenes.remove(scene);return row
 
 def main():
- KIT.mkdir(parents=True,exist_ok=True);rows=[export(n,b) for n,b in BUILDERS.items()]
+ KIT.mkdir(parents=True,exist_ok=True)
+ only=sys.argv[sys.argv.index('--only')+1] if '--only' in sys.argv else None
+ if only:
+  old=json.loads((KIT/'asset_stats.json').read_text());assert old['stage']==STAGE
+  changed=export(only,BUILDERS[only]);rows=[changed if r['name']==only else r for r in old['assets']]
+ else:rows=[export(n,b) for n,b in BUILDERS.items()]
  (KIT/'asset_stats.json').write_text(json.dumps({'assets':rows,'stage':STAGE,'units':'metres, Y up, front +Z, floor-centre origin','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','unique_triangles':sum(x['triangles'] for x in rows),'palette_srgb':PAL},ensure_ascii=False,indent=2)+'\n')
  print('MARKET_COMPLETE',STAGE,len(rows),sum(x['triangles'] for x in rows),flush=True)
 if __name__=='__main__':main()

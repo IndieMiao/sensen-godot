@@ -1,0 +1,102 @@
+[
+  {
+    "file": "SGODOT-218_market_props_v1_stall_keeper.png",
+    "sha256": "36426d74f93f570f7b26acaa7befff211aa540b8466471fbbe52d7a506c9c626",
+    "bytes": 287842
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_stall_veg.png",
+    "sha256": "e1904e3ecda23789c16e67953392aa5c6e73a8f52ddcbf813ff4dfb48eb24391",
+    "bytes": 266793
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_stall_fish.png",
+    "sha256": "87ebf8a771af6aeacf5f4d457bee0152fad80313bb8aaa2570f979e1b507f4f5",
+    "bytes": 256861
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_stall_bakery.png",
+    "sha256": "5c12fd931ece5157b705bd743243a703a698d9764ae1ee3a0e26bdd2f2c40024",
+    "bytes": 259551
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_stall_spice.png",
+    "sha256": "9dcc3829738c0db20827604019bef4447ef73023de5f19a981ae65e88da74f56",
+    "bytes": 257207
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_stall_tools.png",
+    "sha256": "5ef16704a8335331369053c0d9f5967370b66bb0c61c21e1814cd97a6f72c7ca",
+    "bytes": 263156
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_flower_cart.png",
+    "sha256": "1d6842ab460f56fc182e16e840e1169a231b3d36550b762051acbe637fe0bf10",
+    "bytes": 231091
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_market_board.png",
+    "sha256": "60b376f871a9ecde4ffdb332a2628d531e42f41d1e207eaaa4649c925f8ac69c",
+    "bytes": 264994
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_fountain.png",
+    "sha256": "3f35b6145aeec2f7c303cb38e20af732fdcd03b35a856ddf73844aa8340d4378",
+    "bytes": 196758
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_produce_crate.png",
+    "sha256": "4a788401efea3db5a72a9b3f38a702172dd3a2fc0584b5c692628b68056266a7",
+    "bytes": 268392
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_basket.png",
+    "sha256": "9b6bb8600933d6cb9b7590a8931b5548828c0036a55e0a339f3eb69529aea0e6",
+    "bytes": 252754
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_flower_tub.png",
+    "sha256": "e7fa6b89d079590dce89d218ae2249f47cb7d2c39d2217d9ce454e46e8a429b9",
+    "bytes": 234701
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_catalogue.png",
+    "sha256": "501bdf704c2f21cb9922a487d582cbcd025887c3cfb7d62f1ef32bbd30a17bf4",
+    "bytes": 364344
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_family.png",
+    "sha256": "0058b67f520a6f866a0af43bee1e81f74e200dc74e4e9f8f6c5e2db383baae9e",
+    "bytes": 354140
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_rear_underside.png",
+    "sha256": "a82d7d0151fbbf833c74d9eb16b620d4fdd0c755b01b648a004f9210a16df3a2",
+    "bytes": 243914
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_asset_stats.json",
+    "sha256": "2447142a47a66c8faa101081e262244e8816dc3178e4e6400eb856a18a9d7f0e",
+    "bytes": 10316
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_godot_validation.json",
+    "sha256": "412508e8435247a782e9652b65103f06c079c3966b666b236a9af87794cf4801",
+    "bytes": 11048
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_geometry_validation.json",
+    "sha256": "dccf6a4df4af2101a444071be898a185ed12a75f641c792dfb9e04c84757e79c",
+    "bytes": 27433
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_cold_import.json",
+    "sha256": "c6a1820604c076a324a49150efe4b965a70ab75c591d8de943fd2d6cd882fbc8",
+    "bytes": 262
+  },
+  {
+    "file": "SGODOT-218_market_props_v1_delivery.md",
+    "sha256": "f046383f3d31b38d770bd4a6b5b5864c5d6440da08879f055ffb3a13fd55b9b9",
+    "bytes": 2421
+  }
+]

@@ -1,0 +1,654 @@
+{
+	"avatar": {
+		"height_m": 1.745,
+		"source_height_m": 1.71833898495782
+	},
+	"captures": [
+		{
+			"camera_width": 5.00175714492798,
+			"file": "detail_stall_keeper.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 5.12313032150269,
+			"file": "scale_stall_keeper.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 5.0962438583374,
+			"file": "back20_stall_keeper.png",
+			"pitch": 19.9999980926514,
+			"size": [
+				720,
+				640
+			]
+		},
+		{
+			"camera_width": 4.15954065322876,
+			"file": "detail_stall_veg.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 4.12186670303345,
+			"file": "scale_stall_veg.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 4.15954065322876,
+			"file": "detail_stall_fish.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 4.12186670303345,
+			"file": "scale_stall_fish.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 4.33675289154053,
+			"file": "back20_stall_fish.png",
+			"pitch": 19.9999980926514,
+			"size": [
+				720,
+				640
+			]
+		},
+		{
+			"camera_width": 4.15954065322876,
+			"file": "detail_stall_bakery.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 4.12186670303345,
+			"file": "scale_stall_bakery.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 4.15954065322876,
+			"file": "detail_stall_spice.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 4.12186670303345,
+			"file": "scale_stall_spice.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 4.15954065322876,
+			"file": "detail_stall_tools.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 4.12186670303345,
+			"file": "scale_stall_tools.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 3.87072658538818,
+			"file": "detail_flower_cart.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 3.95498919487,
+			"file": "scale_flower_cart.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 4.02305459976196,
+			"file": "back20_flower_cart.png",
+			"pitch": 19.9999980926514,
+			"size": [
+				720,
+				640
+			]
+		},
+		{
+			"camera_width": 2.46299505233765,
+			"file": "detail_market_board.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 2.64205050468445,
+			"file": "scale_market_board.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 5.0063157081604,
+			"file": "detail_fountain.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 6.12439298629761,
+			"file": "scale_fountain.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 0.907246887683868,
+			"file": "detail_produce_crate.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 2.00252652168274,
+			"file": "scale_produce_crate.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 0.957098126411438,
+			"file": "detail_basket.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 1.99593067169189,
+			"file": "scale_basket.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 1.32536745071411,
+			"file": "detail_flower_tub.png",
+			"pitch": 33.0,
+			"size": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_width": 2.05798602104187,
+			"file": "scale_flower_tub.png",
+			"pitch": 33.0,
+			"size": [
+				720,
+				800
+			]
+		},
+		{
+			"camera_width": 21.0265254974365,
+			"file": "family.png",
+			"pitch": 33.0,
+			"size": [
+				1500,
+				1100
+			]
+		}
+	],
+	"catalog": {},
+	"checks": [
+		{
+			"check": "stall_keeper vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_keeper matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_keeper single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_keeper triangle budget",
+			"evidence": 2232,
+			"passed": true
+		},
+		{
+			"check": "stall_veg vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_veg matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_veg single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_veg triangle budget",
+			"evidence": 1436,
+			"passed": true
+		},
+		{
+			"check": "stall_fish vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_fish matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_fish single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_fish triangle budget",
+			"evidence": 1048,
+			"passed": true
+		},
+		{
+			"check": "stall_bakery vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_bakery matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_bakery single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_bakery triangle budget",
+			"evidence": 1280,
+			"passed": true
+		},
+		{
+			"check": "stall_spice vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_spice matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_spice single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_spice triangle budget",
+			"evidence": 1202,
+			"passed": true
+		},
+		{
+			"check": "stall_tools vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_tools matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_tools single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "stall_tools triangle budget",
+			"evidence": 1296,
+			"passed": true
+		},
+		{
+			"check": "flower_cart vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "flower_cart matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "flower_cart single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "flower_cart triangle budget",
+			"evidence": 1356,
+			"passed": true
+		},
+		{
+			"check": "market_board vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "market_board matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "market_board single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "market_board triangle budget",
+			"evidence": 436,
+			"passed": true
+		},
+		{
+			"check": "fountain vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "fountain matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "fountain single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "fountain triangle budget",
+			"evidence": 1956,
+			"passed": true
+		},
+		{
+			"check": "produce_crate vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "produce_crate matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "produce_crate single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "produce_crate triangle budget",
+			"evidence": 216,
+			"passed": true
+		},
+		{
+			"check": "basket vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "basket matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "basket single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "basket triangle budget",
+			"evidence": 296,
+			"passed": true
+		},
+		{
+			"check": "flower_tub vertex colour",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "flower_tub matte, no image dependency",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "flower_tub single surface",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "flower_tub triangle budget",
+			"evidence": 282,
+			"passed": true
+		},
+		{
+			"check": "Default avatar assembled",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_stall_keeper",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_stall_keeper",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture back20_stall_keeper",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_stall_veg",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_stall_veg",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_stall_fish",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_stall_fish",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture back20_stall_fish",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_stall_bakery",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_stall_bakery",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_stall_spice",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_stall_spice",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_stall_tools",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_stall_tools",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_flower_cart",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_flower_cart",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture back20_flower_cart",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_market_board",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_market_board",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_fountain",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_fountain",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_produce_crate",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_produce_crate",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_basket",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_basket",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture detail_flower_tub",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture scale_flower_tub",
+			"evidence": null,
+			"passed": true
+		},
+		{
+			"check": "Capture family",
+			"evidence": null,
+			"passed": true
+		}
+	],
+	"passed": true,
+	"renderer": {
+		"gpu": "NVIDIA GeForce RTX 2060",
+		"method": "mobile"
+	},
+	"stage": "final"
+}

@@ -22,7 +22,7 @@ func setup():
 	var we=WorldEnvironment.new();we.environment=env;world.add_child(we)
 	var sun=DirectionalLight3D.new();sun.rotation_degrees=Vector3(-48,-35,0);sun.light_color=Color("FFF8EF");sun.light_energy=.70;sun.shadow_enabled=true;sun.shadow_opacity=.50;sun.directional_shadow_mode=DirectionalLight3D.SHADOW_ORTHOGONAL;sun.shadow_bias=.05;sun.shadow_normal_bias=.25;world.add_child(sun)
 	camera=Camera3D.new();camera.current=true;camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.keep_aspect=Camera3D.KEEP_WIDTH;camera.near=.1;camera.far=120;world.add_child(camera)
-func pose(width:float,focus:Vector3,pitch=43.0,yaw=45.0):
+func pose(width:float,focus:Vector3,pitch=33.0,yaw=45.0):
 	camera.size=width;camera.rotation_degrees=Vector3(-pitch,yaw,0);camera.position=focus+camera.basis.z*42
 func piece(name:String,at:Vector3,yaw=0.0):
 	var n=load(KIT+name+".glb").instantiate();n.name=name+"_"+str(assembly.get_child_count());assembly.add_child(n);n.position=at;n.rotation_degrees.y=yaw;n.set_meta("kit_id",name)
@@ -66,7 +66,7 @@ func bounds_points(row:Dictionary,offset=Vector3.ZERO):
 		for y in [lo.y,hi.y]:
 			for z in [lo.z,hi.z]:points.append(Vector3(x,y,z)+offset)
 	return points
-func fit(points:Array,pitch=43.0,yaw=45.0):
+func fit(points:Array,pitch=33.0,yaw=45.0):
 	camera.rotation_degrees=Vector3(-pitch,yaw,0)
 	var lo=Vector2(INF,INF);var hi=Vector2(-INF,-INF)
 	for q in points:
@@ -88,14 +88,14 @@ func inspect():
 func catalogue():
 	for row in manifest.assets:
 		clear();piece(row.name,Vector3.ZERO);floor_pad(Vector3(16,.08,16));rig.visible=false
-		vp.size=Vector2i(640,640);fit(bounds_points(row),43,45);await capture("detail_"+row.name)
+		vp.size=Vector2i(640,640);fit(bounds_points(row),33,45);await capture("detail_"+row.name)
 		var w=float(row.dimensions_m[0]);var d=float(row.dimensions_m[2]);var at=Vector3(w*.5+.80,0,-d*.5)
 		move_player(at);rig.visible=true;rig.rotation_degrees.y=180
 		var points=bounds_points(row)
 		for x in [-.32,.32]:
 			for y in [0,1.745]:
 				for z in [-.22,.22]:points.append(at+Vector3(x,y,z))
-		vp.size=Vector2i(720,800);fit(points,43,45);await capture("scale_"+row.name)
+		vp.size=Vector2i(720,800);fit(points,33,45);await capture("scale_"+row.name)
 		if row.name in ["stall_keeper","stall_fish","flower_cart"]:
 			rig.visible=false;vp.size=Vector2i(720,640);fit(bounds_points(row),20,225);await capture("back20_"+row.name)
 func family():
@@ -104,7 +104,7 @@ func family():
 		var at=Vector3((i%4-1.5)*4.0,0,(i/4-1)*4.2)
 		piece(row.name,at);points.append_array(bounds_points(row,at));i+=1
 	floor_pad(Vector3(20,.08,18));rig.visible=true;move_player(Vector3(5.8,0,6.2));rig.rotation_degrees.y=180
-	points.append(Vector3(5.8,1.745,6.2));fit(points,43,35);await capture("family")
+	points.append(Vector3(5.8,1.745,6.2));fit(points,33,45);await capture("family")
 func run():
 	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
 	manifest=JSON.parse_string(FileAccess.get_file_as_string(KIT+"asset_stats.json"))
