@@ -441,3 +441,24 @@ func test_p0_bold_italic_is_upright_bold_under_chinese() -> void:
 	TranslationServer.set_locale("en")
 	assert_object(UiKit.bold_italic()).is_not_same(UiKit.font(&"bold"))
 	assert_float(UiKit.bold_italic().variation_transform.x.y).is_not_equal(0.0)   # slanted
+
+## 11-08 (445's Chinese shots): a toast's figure keeps its word by a no-break space (ToastLayer.keep_units), and the
+## table's keys have plain spaces. The line is looked up with plain ones — whole, or part by part along ` · ` — and the
+## Chinese keeps its figures with their words again; a part with no Chinese stays English with its no-break space, and
+## a line with none at all gives "" (the source shown as it was, English mode's too).
+func test_p0_a_toasts_no_break_space_is_looked_up_as_a_space() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t._get_message(ToastLayer.keep_units(s), &""))
+	var plain := func(s: String) -> String: return s.replace(char(0xa0), " ")
+	# a figure and its word, the whole line in the table
+	assert_str(ToastLayer.keep_units("Request complete · +20 coins")).contains(char(0xa0))
+	assert_str(plain.call(zh.call("Request complete · +20 coins"))).is_equal("委托完成 · +20 金币")
+	assert_str(zh.call("Request complete · +20 coins")).is_equal(ToastLayer.keep_units("委托完成 · +20 金币"))   # still kept together
+	# the priest's two (q(300) v1.2)
+	assert_str(plain.call(zh.call("Twin Catch · back to 20 min"))).is_equal("双倍渔获 · 重新计时 20 分钟")
+	assert_str(plain.call(zh.call("Swift Growth · 20 min · crops sown now grow 2× faster"))).is_equal("加速生长 · 20 分钟 · 现在种下的作物长得快一倍")
+	# part by part along ` · `: the known part in Chinese, the unknown one English with its no-break space kept
+	assert_str(zh.call("Twin Catch · 20 zorbs")).is_equal("双倍渔获 · 20" + char(0xa0) + "zorbs")
+	# no part known: "" (English mode and an untranslated line show the source, no-break space and all)
+	assert_str(zh.call("Zorb 20 quarks")).is_empty()

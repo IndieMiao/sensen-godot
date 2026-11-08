@@ -194,6 +194,12 @@ class P0Translation extends Translation:
 
 	func _get_message(src_message: StringName, _context: StringName) -> StringName:
 		var s := String(src_message)
+		# A toast keeps a figure with its word by a no-break space (ToastLayer.keep_units, 不知火舞 on 344); the table's keys
+		# have plain spaces. Looked up with plain ones (the whole line, or part by part), then the Chinese keeps its figures
+		# with their words the same way, a part left in English too; no line found: "", the source shown as it was (11-08)
+		if s.contains("\u00a0"):
+			var plain := String(_get_message(s.replace("\u00a0", " "), _context))
+			return ToastLayer.keep_units(plain) if plain != "" else &""
 		if s.is_empty() or not _letters(s): return &""   # numbers and signs alone: nothing to translate
 		if _exact.has(s): return _exact[s]
 		if _cache.has(s): return _cache[s]
@@ -221,6 +227,7 @@ class P0Translation extends Translation:
 
 	## The Chinese for one line, or "" when no part of it is known.
 	func translate_line(s: String) -> String:
+		s = s.replace("\u00a0", " ")   # a part of a toast's line (_get_message): looked up with plain spaces
 		if _exact.has(s): return _exact[s]
 		var t := _template(s)
 		if t != "": return t
