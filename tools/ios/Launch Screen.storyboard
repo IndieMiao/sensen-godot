@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- q(290) (SGODOT-302 c9986a33): the launch screen is the splash's sky colour alone, #61BBFA — no art, no words (Apple's
-     launch-screen guidance; the game's own splash comes next). tools/ios/inject_launch_screen.py copies this over the
-     release project's sensen/Launch Screen.storyboard. -->
+<!-- SGODOT-420 (不知火舞's boot-splash spec v1.1 §2, iOS layer 1): the launch splash (assets/p0/ui/launch_splash.png,
+     1214 × 1618, the SplashImage asset) the screen's height, centred — the engine's boot splash (Keep Height) and the
+     game's launch cover draw it the same way next, so nothing moves; past a 3:4 screen the sides are the art's sky,
+     #61BBFA. tools/ios/inject_launch_screen.py copies this and the image into the release project. -->
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
@@ -18,7 +19,20 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SplashImage" translatesAutoresizingMaskIntoConstraints="NO" id="Spl-1m-g4e">
+                                <rect key="frame" x="-129.21" y="0.0" width="672.42" height="896"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="Spl-1m-g4e" secondAttribute="height" multiplier="1214:1618" id="Spl-as-p3c"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
                         <color key="backgroundColor" red="0.380392" green="0.733333" blue="0.980392" alpha="1.0" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="Spl-1m-g4e" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="Spl-tp-c0n"/>
+                            <constraint firstItem="Spl-1m-g4e" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="Spl-bt-c0n"/>
+                            <constraint firstItem="Spl-1m-g4e" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Spl-cx-c0n"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                     </view>
                 </viewController>
@@ -27,4 +41,7 @@
             <point key="canvasLocation" x="52.173913043478265" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="SplashImage" width="1214" height="1618"/>
+    </resources>
 </document>
