@@ -94,4 +94,5 @@ func test_a_slope_is_not_an_edge() -> void:
 	var p := NavigationServer3D.map_get_closest_point(map, Vector3(5, 2.5, 5))
 	var to: Vector3 = P0LandmarkVisit.slide_on(map, p, Vector3(0, 0, -0.1))
 	assert_float(Vector2(to.x - p.x, to.z - p.z).length()).is_equal_approx(0.1, 0.002)
+	assert_float(Vector2(to.x - p.x, to.z - p.z).length()).is_less_equal(0.1 * 1.001)   # never past the step (周瑜 on #893)
 	assert_float(to.y).is_greater(p.y)

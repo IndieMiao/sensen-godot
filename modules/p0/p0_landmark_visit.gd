@@ -156,6 +156,18 @@ static func stick_step(player: Node3D, nav: RID, cam: Camera3D, speed: float, v:
 ## second edge in a corner unless that turns it back or leaves under STUCK_RATIO; square-on (θ < SLIDE_MIN_DEG) not
 ## at all, but for the edge's end within YIELD_M to one side, stepped round at sin SLIDE_MIN_DEG. `p` when it stops.
 static func slide_on(nav: RID, p: Vector3, want: Vector3) -> Vector3:
+	var to := _slide(nav, p, want)
+	# A stair's ground can sit a little past the step (周瑜 on #893: 4.3 % on Alcatraz's new steps): no further than the
+	# stick asked, on the ground again.
+	for i in 2:
+		var went := Vector2(to.x - p.x, to.z - p.z).length()
+		if went <= want.length() * 1.001: break
+		var back := _on_nav(nav, p + Vector3(to.x - p.x, 0.0, to.z - p.z) * (want.length() / went))
+		if back == Vector3.INF: break
+		to = back
+	return to
+
+static func _slide(nav: RID, p: Vector3, want: Vector3) -> Vector3:
 	var on := _on_nav(nav, p + want)
 	if on != Vector3.INF: return on
 	var n := _crossed(nav, p, want)
