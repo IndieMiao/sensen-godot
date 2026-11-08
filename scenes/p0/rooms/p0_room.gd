@@ -1277,6 +1277,15 @@ var _review_view := false
 var _kit_dir := Vector3.ZERO   # the kit's own direction, before the room pitch (shot step "kitpitch")
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
+		"nearexit":   # stood 1.4 m in from the door, facing it: its Map strip opens without leaving (room shots)
+			var door := anchor("exit")
+			if door == null: return false
+			var inward := room.position + Vector3(floor_rect.get_center().x, floor_y, floor_rect.get_center().y) - door.global_position
+			inward.y = 0.0
+			actor.teleport(door.global_position + inward.normalized() * 1.4)
+			actor.face(door.global_position)
+			_exit_armed = false
+			return true
 		"kitpitch":   # back to the kit's own pitch (light sampling against renders signed at it)
 			_cam_dir = _kit_dir
 			_update_camera()
