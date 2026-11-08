@@ -24,14 +24,18 @@
       "sha256": "3663f515b56c9fe15d0b46fa07b50224ceef063493e694cca0660fc2b983a993"
     },
     "alc_ground_terraces": {
-      "triangles": 3800,
-      "bytes": 325544,
-      "sha256": "aab0796e4598b3af1c14d30980af67cd573825fe9b8bc14dfcfced927f666508"
+      "triangles": 4184,
+      "bytes": 528508,
+      "sha256": "49d98ab7ab1f479637a0a627c7872aeded284319892f789bd758587307a34670",
+      "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
+      "author": "\u9a6c\u53ef\u6ce2\u7f57"
     },
     "alc_ground_summit": {
-      "triangles": 1062,
-      "bytes": 96248,
-      "sha256": "8913a6a5b11e878fcfeb295fab3649044a18cf510d989d671e84225c29465e8a"
+      "triangles": 1130,
+      "bytes": 143712,
+      "sha256": "15d58ae8e058d1bedf432367a9db0543b951ca700abd37f3f2a1b09954b54b75",
+      "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
+      "author": "\u9a6c\u53ef\u6ce2\u7f57"
     },
     "alc_lighthouse": {
       "triangles": 3262,
@@ -417,6 +421,20 @@
       "author": "\u9ec4\u5fe0",
       "source": "tools/art/source/alcatraz_anim_424/ferry_flag.blend",
       "sha256": "eaaf1c0787001cc3f61513b159cd75f0a125ee04269241d6e33252a56f28f3b5"
+    },
+    "alc_mid_stairs": {
+      "triangles": 612,
+      "bytes": 43992,
+      "sha256": "8878e88cdb5eee0a473f287cfecde0ecf36340bd80908bc6bd8bda7f3397146d",
+      "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
+      "author": "\u9a6c\u53ef\u6ce2\u7f57"
+    },
+    "alc_railing_endpost": {
+      "triangles": 132,
+      "bytes": 13640,
+      "sha256": "5fc5858f151a9d730844f4a2c88d91d9357124b4fbcbcabaf75292beeb99441d",
+      "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
+      "author": "\u9a6c\u53ef\u6ce2\u7f57"
     }
   }
 }
