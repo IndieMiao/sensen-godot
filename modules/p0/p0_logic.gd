@@ -1082,8 +1082,7 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 				if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
 			plots.append(p)
 		v["plots"] = plots
-	# the priest's buffs (q(300), SGODOT-445: view.buffs[].left, ms): counted down, gone once out — the greeting's keys
-	# tick on it and 亚瑟's HUD rings and `… has worn off` read it (a buff gone from the array is a buff ended)
+	# the priest's buffs (q(300), SGODOT-445: view.buffs[].left, ms): counted down, gone once out — 亚瑟's HUD rings and `… has worn off` read it (a buff gone from the array is a buff ended)
 	if v.get("buffs") is Array and not (v.buffs as Array).is_empty():
 		var bs: Array = []
 		for b in v.buffs:
@@ -2208,22 +2207,25 @@ static func _here_name(view: Dictionary) -> String:
 	var cl := P0Clusters.get_cluster(travel.here(view))
 	return str(cl.name) if not cl.is_empty() and travel.away(view) else travel.home_name(view)
 
-## Gabriel's two buffs (q(300), SGODOT-445; 不知火舞 priest-buff ui-spec v1.1 §1–2, LOCK-16 增补): two full-width keys
-## over `Any stories?`, fishing above and farming below. Not taken: the primary `Twin Catch · 20 min`; on: the secondary
-## `Twin Catch · 12:41 left`, ticking, a tap renews it. [] from a server without them (no view.buff_takes, before #865).
-## The 11-15 daily limit (the count line, the grey keys, `Tap again to renew`) is not shown in the demo.
-const PRIEST_BUFFS := [["fish", "Twin Catch"], ["farm", "Swift Growth"]]
-static func priest_keys(view: Dictionary) -> Array:
-	if not view.has("buff_takes"): return []
-	var left := {}
-	for b in view.get("buffs", []): left[str(b.get("id", ""))] = float(b.get("left", 0))
-	var minutes := int(content().get("buffs", {}).get("minutes", 20))
-	var out: Array = []
-	for pair in PRIEST_BUFFS:
-		var ms := float(left.get(pair[0], 0.0))
-		out.append({"id": pair[0], "name": pair[1], "on": ms > 0.0,
-			"text": ("%s · %s left" % [pair[1], duration(ms)]) if ms > 0.0 else ("%s · %d min" % [pair[1], minutes])})
-	return out
+## Gabriel's Pray (q(300), SGODOT-445; the user 11-08 via 奕星, 不知火舞 priest-buff ui-spec v1.2 §2): one full-width key
+## over `Any stories?` for both buffs — each tap draws one of them, half and half (BUFF_ORDER), and takes it with the
+## buff command the server already has: both may be on at once, a draw of one already on starts its 20 minutes again.
+## The time left is the HUD's, not the card's. {} from a server without buffs (no view.buff_takes, before #865).
+## From the daily limit (view.buff_takes.limit, 11-15): the count line `2 left today`; used up, the key greys (LOCK-10,
+## reason beside it) and the line says `Limit reached · resets in 5h 12m`. In the demo (no limit) neither shows.
+const PRAY := "Pray"
+static func priest_pray(view: Dictionary) -> Dictionary:
+	var takes = view.get("buff_takes", null)
+	if not takes is Dictionary: return {}
+	if takes.get("limit", null) == null: return {"reason": "", "line": ""}
+	var left := int(takes.limit) - int(takes.get("used", 0))
+	if left > 0: return {"reason": "", "line": "%d left today" % left}
+	var full := "Limit reached · resets in %s" % span(float(takes.get("resets_in", 0)))
+	return {"reason": full, "line": full}
+
+## Which buff a prayer draws, from a roll in [0, 1): the first half Twin Catch, the second Swift Growth.
+static func pray_draw(roll: float) -> String:
+	return str(BUFF_ORDER[clampi(int(roll * BUFF_ORDER.size()), 0, BUFF_ORDER.size() - 1)])
 
 static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionary:
 	var copy: Dictionary = _KEEPER_COPY.get(role, {})

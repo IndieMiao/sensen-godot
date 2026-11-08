@@ -1834,11 +1834,12 @@ func toast_success(text: String, break_at_dot := false, action := "") -> void:
 	_aim_toast()
 	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.SUCCESS, action)
 
-## The priest's buffs' toasts (q(300) ⑨, spec v1.1 §4), from view.buffs as P0Logic.project counts it down: one taken or
-## renewed (new, or its time up by more than BUFF_RENEW_MS — a server answer resets a projection by a fraction of a
-## second) says what it does; one that runs out on screen says it has worn off. The first view after launch says
+## The priest's buffs' toasts (q(300) ⑨, spec v1.2 §4), from view.buffs as P0Logic.project counts it down: one new says
+## what it does; one renewed (Pray drew it while on: its time up by more than BUFF_RENEW_MS — a server answer resets a
+## projection by a fraction of a second) says `Twin Catch · back to 20 min`; one that runs out on screen says it has worn off. The first view after launch says
 ## nothing, nor does one gone at a jump (back from the background, offline: no catch-up, spec §4).
 const BUFF_RENEW_MS := 5000.0
+const BUFF_RENEWED := "%s · back to 20 min"   # the spec's words, as the translation table keys them (李白)
 const BUFF_LINES := {"fish": "%s · %d min · every fish lands ×2", "farm": "%s · %d min · crops sown now grow 2× faster"}
 var _buffs_seen = null   # {id: ms left} at the last view; null before the first
 
@@ -1847,8 +1848,10 @@ func _watch_buffs(v: Dictionary) -> void:
 	if _buffs_seen is Dictionary:
 		var minutes := int(P0Logic.content().get("buffs", {}).get("minutes", 20))
 		for id in P0Logic.BUFF_ORDER:
-			if now.has(id) and (not _buffs_seen.has(id) or float(now[id]) > float(_buffs_seen[id]) + BUFF_RENEW_MS):
+			if now.has(id) and not _buffs_seen.has(id):
 				toast_success(BUFF_LINES[id] % [P0Logic.BUFF_NAMES[id], minutes])
+			elif now.has(id) and float(now[id]) > float(_buffs_seen[id]) + BUFF_RENEW_MS:   # Pray drew one already on (v1.2 §4)
+				toast_success(BUFF_RENEWED % P0Logic.BUFF_NAMES[id])
 			elif _buffs_seen.has(id) and not now.has(id) and float(_buffs_seen[id]) <= BUFF_RENEW_MS:
 				toast("%s has worn off" % P0Logic.BUFF_NAMES[id])
 	_buffs_seen = now
@@ -2523,7 +2526,8 @@ func _show_need_source(tile: Control, id: String) -> void:
 ## "market"); ctx = the outpost's keeper ctx {keeper, place, nearest} (SGODOT-227), passed through untouched and kept
 ## for the counter's keeper bar.
 var _keeper_told := {}   # role → answers given this run (Gabriel's stories round, q(299))
-var _priest_card: UiDialogueCard   # Gabriel's greeting while it is up: its buff keys follow the view (q(300))
+var _priest_card: UiDialogueCard   # Gabriel's greeting while it is up: its Pray key and count line follow the view (q(300))
+var pray_roll := func() -> float: return randf()   # Pray's draw (tests set it)
 func open_keeper_greeting(role: String, ctx := {}) -> void:
 	if not ctx.is_empty(): _counter_ctx[role] = ctx
 	var c: Dictionary = _counter_ctx.get(role, {})
@@ -2560,15 +2564,22 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 			key.unavailable_pressed.connect(func(_r: String): open_card.call())
 		card.content.add_child(key)
 	_priest_card = card if role == "church" else null
-	if role == "church":   # Gabriel's buffs (q(300), SGODOT-445): a key each, the card stays up (_refresh_priest_keys)
-		for k in P0Logic.priest_keys(view):
-			var key := UiCommandButton.new(str(k.text), UiCommandButton.Kind.SECONDARY if k.on else UiCommandButton.Kind.PRIMARY)
-			key.name = "Buff_" + str(k.id)
-			key.fit_text = true
-			key.sends = true
-			var id := str(k.id)
-			key.activated.connect(func(): command.emit({"type": "buff", "buff": id}))   # the toast is the HUD's (亚瑟)
-			card.content.add_child(key)
+	var pray := P0Logic.priest_pray(view) if role == "church" else {}
+	if not pray.is_empty():   # Gabriel's Pray (q(300) v1.2, SGODOT-445): a buff drawn at random, the card stays up
+		var key := UiCommandButton.new(P0Logic.PRAY)
+		key.name = "Pray"
+		key.fit_text = true
+		key.sends = true
+		key.reason_beside = true
+		key.reason = str(pray.reason)
+		key.activated.connect(func(): command.emit({"type": "buff", "buff": P0Logic.pray_draw(pray_roll.call())}))   # the toast is the HUD's
+		key.unavailable_pressed.connect(func(r: String): toast(r))
+		card.content.add_child(key)
+		var count := UiKit.label(str(pray.line), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+		count.name = "PrayCount"
+		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		count.visible = str(pray.line) != ""
+		card.content.add_child(count)
 	if str(lines.question) != "" and str(lines.answer) != "":
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
 		var answers: Array = lines.get("answers", [lines.answer])
@@ -2586,16 +2597,17 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	_close_above(card, _CLOSE_ABOVE_CARD)
 	modal_kind = "greeting"
 
-## The buff keys follow the view (set_view, every 250 ms): the time left ticks, a taken one turns secondary, one run out
-## primary again.
+## The Pray key and its count line follow the view (set_view, every 250 ms): a take counted, the limit reached at the
+## 11-15 rollover, the day passing.
 func _refresh_priest_keys() -> void:
 	if modal_kind != "greeting" or _priest_card == null or not is_instance_valid(_priest_card): return
-	for k in P0Logic.priest_keys(view):
-		var key := _priest_card.content.get_node_or_null("Buff_" + str(k.id)) as UiCommandButton
-		if key == null: continue
-		var kind := UiCommandButton.Kind.SECONDARY if k.on else UiCommandButton.Kind.PRIMARY
-		if key.label != str(k.text): key.label = str(k.text)
-		if key.kind != kind: key.kind = kind
+	var pray := P0Logic.priest_pray(view)
+	var key := _priest_card.content.get_node_or_null("Pray") as UiCommandButton
+	var count := _priest_card.content.get_node_or_null("PrayCount") as Label
+	if pray.is_empty() or key == null or count == null: return
+	if key.reason != str(pray.reason): key.reason = str(pray.reason)
+	if count.text != str(pray.line): count.text = str(pray.line)
+	count.visible = str(pray.line) != ""
 
 ## Lou's Play and the blackjack table (SGODOT-351): the full-screen table page (哪吒's open_blackjack(ctx), 351 d6fae42c),
 ## the greeting card closed first — only while view.blackjack says the table is open. A server without the table (no

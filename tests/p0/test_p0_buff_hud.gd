@@ -52,10 +52,10 @@ func test_toasts_on_taking_renewing_and_running_out() -> void:
 	assert_str(ui.toast_text()).is_empty()
 	ui.set_view(_view([{"id": "fish", "left": 599000}, {"id": "farm", "left": 1200000}]))   # farm taken
 	assert_str(ui.toast_text()).is_equal("Swift Growth · 20 min · crops sown now grow 2× faster")
-	ui.set_view(_view([{"id": "fish", "left": 1200000}, {"id": "farm", "left": 1199000}]))   # fish renewed
-	assert_str(ui.toast_text()).is_equal("Twin Catch · 20 min · every fish lands ×2")
+	ui.set_view(_view([{"id": "fish", "left": 1200000}, {"id": "farm", "left": 1199000}]))   # fish renewed (Pray drew it, v1.2 §4)
+	assert_str(ui.toast_text()).is_equal("Twin Catch · back to 20 min")
 	ui.set_view(_view([{"id": "fish", "left": 1199500}, {"id": "farm", "left": 1198600}]))   # a server answer: no toast
-	assert_str(ui.toast_text()).is_equal("Twin Catch · 20 min · every fish lands ×2")
+	assert_str(ui.toast_text()).is_equal("Twin Catch · back to 20 min")
 	ui.set_view(_view([{"id": "fish", "left": 1199000}, {"id": "farm", "left": 800}]))
 	ui.set_view(_view([{"id": "fish", "left": 1198000}]))   # farm ran out on screen
 	assert_str(ui.toast_text()).is_equal("Swift Growth has worn off")
