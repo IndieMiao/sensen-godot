@@ -777,7 +777,7 @@ func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> voi
 	# a room whose residents do not fit opens as before: Rafa back in the kit's corner
 	var r := _room("gn-testrafa~tackle0", true)
 	await get_tree().process_frame
-	r.anchor("npc_rafa").position = Vector3(1.85, 0.08, -1.55)
+	r.anchor("npc_rafa").position = Vector3(3.6, 0.08, -1.55)   # past the band even at the rooms' 33° (wider than at 43°)
 	(r.npcs.npc_rafa.root as Node3D).global_position = r.anchor("npc_rafa").global_position
 	var forward := -r._cam_dir
 	var right := forward.cross(Vector3.UP).normalized()
