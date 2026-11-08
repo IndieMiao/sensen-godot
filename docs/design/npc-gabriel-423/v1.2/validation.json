@@ -1,0 +1,173 @@
+{
+  "revision": "v1.2",
+  "baseline": "ccd6e7f0050fc7fee83cb9931b524afb66dda269",
+  "only_runtime_changes": [
+    "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png",
+    "assets/p0/art/residents/gabriel_card.jpg"
+  ],
+  "unchanged": "All meshes, FBX, .res, materials/shaders, .import files, registries and crop table are byte-identical to baseline.",
+  "texture": {
+    "size": [
+      1024,
+      1024
+    ],
+    "runtime_limit": 512,
+    "alpha_unchanged": true,
+    "changed_pixels": 78661,
+    "front_albedo": "#2B2A2E",
+    "white_tab": "#F4F1E8",
+    "nominal_tab_width_m": 0.025,
+    "sha256": "a06ee4ed569813b471091c9a6b4280dbc678337c940079b650eaa11e30ea2716",
+    "deterministic_repaint_exact": true,
+    "limitation": "Original modeled tie/knot/button edge shadows remain. Only color contrast and painted divisions are removed."
+  },
+  "portrait": {
+    "size": [
+      300,
+      660
+    ],
+    "windowed": true,
+    "path": "assets/p0/art/residents/gabriel_card.jpg",
+    "sha256": "b7923cbafe2d94c05174e27577d4978978fa5b4029bc5a741e7fbec26efca4c5",
+    "crop": {
+      "stamp": [
+        68,
+        47,
+        170,
+        213
+      ],
+      "face": [
+        70,
+        51,
+        165,
+        165
+      ]
+    },
+    "other_crop_entries_unchanged": 11,
+    "entire_crop_file_byte_unchanged": true
+  },
+  "cold_import": {
+    "fresh_cache": true,
+    "files_compared": 15,
+    "changed": [],
+    "errors": [],
+    "sha256": {
+      "assets/avatar/source/cloth36_npc_gabriel/SK_dt_skin36.fbx": "145d75b1afcf21b81ce0cc941f2076155786fc7f746d3a12c3a6128bdc7f07e0",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png.import": "b9b9843a853ad978b2460b0413f0f22db207e57cfe2eaff4b800a05cbd6f8803",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png": "a06ee4ed569813b471091c9a6b4280dbc678337c940079b650eaa11e30ea2716",
+      "assets/avatar/source/cloth36_npc_gabriel/SK_dt_skin36.fbx.import": "3f1ebf1bf6cec671c36ea7b429b5641b66b15208d01c66ea4ad3d27a5eb5202e",
+      "assets/avatar/parts/cloth36_npc_gabriel.res": "2907a178c2475daf2d58969c143fc94d06d826d0d510d797b42e81ce22267c84",
+      "assets/avatar/thumbs/cloth36_npc_gabriel.png": "2b31ec521ecd790d779e012a5f70db37007654e8a13465a92f3180eb7d0fade4",
+      "assets/avatar/thumbs/cloth36_npc_gabriel.png.import": "5170deacc1b7efdd48fe10a0fb7cc94009a513719d4f8413a751af85fef73cff",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png.import": "e027d76b2612eb9c78adff122cdec835a09a6819f7853c441def18145843933f",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png": "7cc4404bec33a7c8753cad4a3f31dbede30eb049351574d0a4b2ffb8377d672d",
+      "assets/avatar/parts/hairhat0_npc_gabriel.res": "01f69310adb412d75bd6f2eb3611152f94e5111d3ccc91369461a154c891d9ec",
+      "assets/avatar/thumbs/hairhat0_npc_gabriel.png": "604802c545e9d48d8bb5821226481ea59104de4b3d55fdf251f7cd982b86644a",
+      "assets/avatar/thumbs/hairhat0_npc_gabriel.png.import": "585ef709cdcba7b3ffc349730883e7d4d87f3da5d244e60d70d163c5e1cbab6b",
+      "assets/avatar/parts/hairhat0_npc_gabriel_scene.tscn": "3e11c0bb84dd79694bb5edf8f7b4bb67d14ab59fbac409f8a6dd77435fc01543",
+      "assets/p0/art/residents/gabriel_card.jpg": "b7923cbafe2d94c05174e27577d4978978fa5b4029bc5a741e7fbec26efca4c5",
+      "assets/p0/art/residents/gabriel_card.jpg.import": "47c16f3f71f495fd05933ee71dee1d9b8a3e8871827e603469bd23811efecabb"
+    }
+  },
+  "android": {
+    "passed": true,
+    "states": [
+      {
+        "animation": "",
+        "assembled": true,
+        "button": [
+          180,
+          775
+        ],
+        "frames": 5,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "pid": 4657,
+        "renderer": "mobile",
+        "sequence": 0,
+        "time": 0.0,
+        "viewport": [
+          360,
+          800
+        ]
+      },
+      {
+        "animation": "",
+        "assembled": true,
+        "button": [
+          180,
+          775
+        ],
+        "frames": 30,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "pid": 4657,
+        "renderer": "mobile",
+        "sequence": 1,
+        "time": 0.0,
+        "viewport": [
+          360,
+          800
+        ]
+      },
+      {
+        "animation": "walk",
+        "assembled": true,
+        "button": [
+          180,
+          775
+        ],
+        "frames": 47,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "pid": 4657,
+        "renderer": "mobile",
+        "sequence": 2,
+        "time": 0.0864503333333333,
+        "viewport": [
+          360,
+          800
+        ]
+      },
+      {
+        "animation": "walk",
+        "assembled": true,
+        "button": [
+          180,
+          775
+        ],
+        "frames": 90,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "pid": 4657,
+        "renderer": "mobile",
+        "sequence": 2,
+        "time": 0.0743400000000001,
+        "viewport": [
+          360,
+          800
+        ]
+      },
+      {
+        "animation": "",
+        "assembled": true,
+        "button": [
+          180,
+          775
+        ],
+        "frames": 106,
+        "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+        "pid": 4657,
+        "renderer": "mobile",
+        "sequence": 3,
+        "time": 0.0,
+        "viewport": [
+          360,
+          800
+        ]
+      }
+    ],
+    "real_button_taps": 3,
+    "walk_time_advanced": true,
+    "apk_sha256": "2e1f3144693b122be48d47f7fa628aa4bb6e3b7952489f36619ade97bdd62d36",
+    "installed_apk_readback_equal": true,
+    "packed_part_and_texture_exact": true,
+    "scope": "Offline asset fixture / API37 GFXStream SwiftShader / Vulkan Mobile. No physical-phone timing or full-game claim."
+  }
+}

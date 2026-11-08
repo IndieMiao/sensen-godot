@@ -1,0 +1,94 @@
+{
+  "donor_ref": "8493a5c4258db3e59b2b845c83d3ee5b34724156",
+  "donor_sha256": "a6eb2b2b8ff143be3ca1d189da16312388d7a9b25d4fb8ae944c40c35fbc9901",
+  "delivered_sha256": "145d75b1afcf21b81ce0cc941f2076155786fc7f746d3a12c3a6128bdc7f07e0",
+  "changes": [
+    {
+      "field": "Filename",
+      "before": "X:/gensen/characters/dt_skin02/T_skin02_eyes_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "RelativeFilename",
+      "before": "X:\\gensen\\characters\\dt_skin02\\T_skin02_eyes_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "Filename",
+      "before": "X:/gensen/characters/dt_skin02/T_skin02_body_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "RelativeFilename",
+      "before": "X:\\gensen\\characters\\dt_skin02\\T_skin02_body_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "Filename",
+      "before": "d:/projects/P4V/sensen_dcc001/gensen/characters/dt_skin36/T_skin36_shoes_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "RelativeFilename",
+      "before": "T_skin36_shoes_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "Filename",
+      "before": "d:/projects/P4V/sensen_dcc001/gensen/characters/dt_skin36/T_skin36_cloth_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "RelativeFilename",
+      "before": "T_skin36_cloth_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "FileName",
+      "before": "X:/gensen/characters/dt_skin02/T_skin02_eyes_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "RelativeFilename",
+      "before": "X:\\gensen\\characters\\dt_skin02\\T_skin02_eyes_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "FileName",
+      "before": "X:/gensen/characters/dt_skin02/T_skin02_body_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "RelativeFilename",
+      "before": "X:\\gensen\\characters\\dt_skin02\\T_skin02_body_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "FileName",
+      "before": "d:/projects/P4V/sensen_dcc001/gensen/characters/dt_skin36/T_skin36_shoes_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "RelativeFilename",
+      "before": "T_skin36_shoes_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "FileName",
+      "before": "d:/projects/P4V/sensen_dcc001/gensen/characters/dt_skin36/T_skin36_cloth_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "RelativeFilename",
+      "before": "T_skin36_cloth_D.png",
+      "after": "T_gabriel_cloth_D.png"
+    },
+    {
+      "field": "FileName",
+      "before": "dt_skin36_rig.tak",
+      "after": "T_gabriel_cloth_D.png"
+    }
+  ],
+  "non_image_properties_byte_preserved": true,
+  "note": "Only FBX filename string properties plus enclosing byte offsets changed; no mesh, UV, bones, skin or transforms edited. Ancillary donor body/eyes/shoes are never extracted."
+}

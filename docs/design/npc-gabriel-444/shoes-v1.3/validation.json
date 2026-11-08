@@ -1,0 +1,230 @@
+{
+  "task": "SGODOT-444 / PR #863 / shoes v1.3",
+  "baseline": "f6231988fce505bbb00de405734a1444f7e0eb01",
+  "selected_slots": {
+    "hairHat": "hairhat0_npc_gabriel",
+    "cloth": "cloth36_npc_gabriel",
+    "shoes": "shoes4",
+    "glass": "glass0"
+  },
+  "reason": "shoes4 is the darkest low-cut candidate. Existing white toe, sole and pattern remain; no pale-blue star. shoes5 is a tan fur-trimmed boot; shoes0 is mostly pale grey/white.",
+  "candidates": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "captures": [
+      {
+        "camera_size": 2.02,
+        "file": "shoes4-full.png",
+        "size": [
+          360,
+          800
+        ],
+        "slots": {
+          "cloth": "cloth36_npc_gabriel",
+          "glass": "glass0",
+          "hairHat": "hairhat0_npc_gabriel",
+          "shoes": "shoes4"
+        },
+        "yaw_deg": 0
+      },
+      {
+        "camera_size": 0.58,
+        "file": "shoes4-feet.png",
+        "size": [
+          360,
+          320
+        ],
+        "slots": {
+          "cloth": "cloth36_npc_gabriel",
+          "glass": "glass0",
+          "hairHat": "hairhat0_npc_gabriel",
+          "shoes": "shoes4"
+        },
+        "yaw_deg": 45
+      },
+      {
+        "camera_size": 2.02,
+        "file": "shoes5-full.png",
+        "size": [
+          360,
+          800
+        ],
+        "slots": {
+          "cloth": "cloth36_npc_gabriel",
+          "glass": "glass0",
+          "hairHat": "hairhat0_npc_gabriel",
+          "shoes": "shoes5"
+        },
+        "yaw_deg": 0
+      },
+      {
+        "camera_size": 0.58,
+        "file": "shoes5-feet.png",
+        "size": [
+          360,
+          320
+        ],
+        "slots": {
+          "cloth": "cloth36_npc_gabriel",
+          "glass": "glass0",
+          "hairHat": "hairhat0_npc_gabriel",
+          "shoes": "shoes5"
+        },
+        "yaw_deg": 45
+      },
+      {
+        "camera_size": 2.02,
+        "file": "shoes0-full.png",
+        "size": [
+          360,
+          800
+        ],
+        "slots": {
+          "cloth": "cloth36_npc_gabriel",
+          "glass": "glass0",
+          "hairHat": "hairhat0_npc_gabriel",
+          "shoes": "shoes0"
+        },
+        "yaw_deg": 0
+      },
+      {
+        "camera_size": 0.58,
+        "file": "shoes0-feet.png",
+        "size": [
+          360,
+          320
+        ],
+        "slots": {
+          "cloth": "cloth36_npc_gabriel",
+          "glass": "glass0",
+          "hairHat": "hairhat0_npc_gabriel",
+          "shoes": "shoes0"
+        },
+        "yaw_deg": 45
+      }
+    ],
+    "renderer": "mobile",
+    "scale": 1.0
+  },
+  "source_shoes_unchanged_sha256": {
+    "assets/avatar/parts/shoes0.res": "9c4d5a651f150ead79d29308d516c633cae3a8a76da5ecc296e211f985701568",
+    "assets/avatar/parts/shoes3.res": "32c2599e63fdce259de2a4ba1e48734cd8a7c832e51a9faa18f70009cbb6953d",
+    "assets/avatar/parts/shoes4.res": "6cfc8603d73df9d8442865ecef98f6b04a7cf28a9125ab926edf1816c0cec58a",
+    "assets/avatar/parts/shoes5.res": "7235a99769ed5bfc3714087689d68cac556f79c01de793157f08047caaeca3ad",
+    "assets/avatar/source/shoes0/SK_DtBase.fbx": "86ec0836cfb0d62b946c7bdf505c596362cb3e8b497b51746f3aec0c7e3def3a",
+    "assets/avatar/source/shoes0/SK_DtBase.fbx.import": "c3769c219d8706e90360314dc04df98428020173eb93d9a418e5b0ca5c99432d",
+    "assets/avatar/source/shoes0/T_base_boy_shoes_AO.png": "138816b6b5daf7908a7c0fe7984911f63f8f1e2eea4fa0d5733236d53b8f580d",
+    "assets/avatar/source/shoes0/T_base_boy_shoes_AO.png.import": "9cc59bb677d4af67830980b1ce9c4fdebf0551f42f9b73e35f747ab210134068",
+    "assets/avatar/source/shoes0/T_base_boy_shoes_D.png": "e6a4ce729f1056a921f6dfb06eb8a88adc5024b8bd19004af02ccbe6c4440a4d",
+    "assets/avatar/source/shoes0/T_base_boy_shoes_D.png.import": "91174a373d7ffcfe1863cc205f2946f9cdbc988d1d7cedcf7d394bfa9cd5b6fe",
+    "assets/avatar/source/shoes3/SK_dt_skin03.fbx": "fc8ea72a89c6f0d9b53842c066963af64fd0a3c617c3ed43f5c282ca596c5310",
+    "assets/avatar/source/shoes3/SK_dt_skin03.fbx.import": "e6c3fa680867287e73368bf0b1ac5871d482c6a5bb8d78b0670ed6779d67a756",
+    "assets/avatar/source/shoes3/T_skin03_shoes_D.png": "06972c7947a70222d74f50eaba22f9a8f571ea636e4ac0e12c5e82c61cf4dc1d",
+    "assets/avatar/source/shoes3/T_skin03_shoes_D.png.import": "ce005ce501e10a80f6e5297f19533d8d21d5a2afb745a5fd85d5efde94ca6851",
+    "assets/avatar/source/shoes4/SK_dt_skin04.fbx": "a54b7961167a7f601cb23295930e7c602c05ec72286618bd38b594bd16d30a4e",
+    "assets/avatar/source/shoes4/SK_dt_skin04.fbx.import": "c28c4e24d613c44e751186dd74f2d8060ff922b30af248c33aa8ea168b685586",
+    "assets/avatar/source/shoes4/T_skin04_shoes_D.png": "9270e3bad9df0bf50ea1f3de2e569b6a41c2073b5b3371ccb7fd8cc2f702a77e",
+    "assets/avatar/source/shoes4/T_skin04_shoes_D.png.import": "84336ad96b4971b50c9884edab429c848202a7810aaeb4cc4d98b259fb6b64cc",
+    "assets/avatar/source/shoes5/SK_dt_skin05.fbx": "23c227935c410c56229b040d6559086cc36d34c16d8dabf350a31fea9e2df10a",
+    "assets/avatar/source/shoes5/SK_dt_skin05.fbx.import": "2039716375c87ef53b010df993f5ef55573d5ede1a0e2368fcbc8dd0e3dc6f41",
+    "assets/avatar/source/shoes5/T_skin05_shoes_D.png": "bb40b1f4884031f5bd7d6ba8d425b9621bfda6088a0358771dc95b1a3e647980",
+    "assets/avatar/source/shoes5/T_skin05_shoes_D.png.import": "60be723fd3bc74f069fd99f7f6731800d9ad1441ddcc692c2282f491e7d26faf"
+  },
+  "asset_diff_exactly_three_portraits": [
+    "assets/p0/art/keepers/gabriel_card.jpg",
+    "assets/p0/art/keepers/gabriel_head.jpg",
+    "assets/p0/art/residents/gabriel_card.jpg"
+  ],
+  "portrait_bake": {
+    "windowed": true,
+    "renderer": "Vulkan Mobile / AMD RADV VANGOGH",
+    "formal_script_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+    "staged_script_sha256": "9342d7627e9191d9dd5e3e4244f9325d8d5753ef292452ee345aad6d8f612622",
+    "only_script_adaptation": "Deferred P0Logic.content() load as documented in v1.1",
+    "output_path": "assets/p0/art/residents/",
+    "keeper_card_identical_to_resident": true,
+    "face_xywh": [
+      70,
+      51,
+      165,
+      165
+    ],
+    "head_resample": "LANCZOS",
+    "head_jpeg_quality": 95,
+    "head_jpeg_subsampling": 0,
+    "crop_table_unchanged": true
+  },
+  "cold_import": {
+    "fresh_cache": true,
+    "six_files_byte_stable": true,
+    "before_sha256": {
+      "assets/p0/art/residents/gabriel_card.jpg": "734f5100d815828cfeb4486abefdeee2c0253b7d14c53ea10c62bba0e12091e4",
+      "assets/p0/art/residents/gabriel_card.jpg.import": "47c16f3f71f495fd05933ee71dee1d9b8a3e8871827e603469bd23811efecabb",
+      "assets/p0/art/keepers/gabriel_card.jpg": "734f5100d815828cfeb4486abefdeee2c0253b7d14c53ea10c62bba0e12091e4",
+      "assets/p0/art/keepers/gabriel_card.jpg.import": "a3bd84b7defe8c3ffc4cf052fbb6c76a9839333398b7442ba3a4688ad05c49d5",
+      "assets/p0/art/keepers/gabriel_head.jpg": "378d5feb0c71246c0e9c90dbf4a49dadbb7972d4daae6fb275aaf950b78013d8",
+      "assets/p0/art/keepers/gabriel_head.jpg.import": "90a8de26c4ee74dc58215449fa587650b077bb72389712211a29681c54cfc40c"
+    },
+    "after_sha256": {
+      "assets/p0/art/residents/gabriel_card.jpg": "734f5100d815828cfeb4486abefdeee2c0253b7d14c53ea10c62bba0e12091e4",
+      "assets/p0/art/residents/gabriel_card.jpg.import": "47c16f3f71f495fd05933ee71dee1d9b8a3e8871827e603469bd23811efecabb",
+      "assets/p0/art/keepers/gabriel_card.jpg": "734f5100d815828cfeb4486abefdeee2c0253b7d14c53ea10c62bba0e12091e4",
+      "assets/p0/art/keepers/gabriel_card.jpg.import": "a3bd84b7defe8c3ffc4cf052fbb6c76a9839333398b7442ba3a4688ad05c49d5",
+      "assets/p0/art/keepers/gabriel_head.jpg": "378d5feb0c71246c0e9c90dbf4a49dadbb7972d4daae6fb275aaf950b78013d8",
+      "assets/p0/art/keepers/gabriel_head.jpg.import": "90a8de26c4ee74dc58215449fa587650b077bb72389712211a29681c54cfc40c"
+    },
+    "uids_retained": {
+      "assets/p0/art/residents/gabriel_card.jpg.import": "uid://c6vndeouifivo",
+      "assets/p0/art/keepers/gabriel_card.jpg.import": "uid://bmvv70glopeje",
+      "assets/p0/art/keepers/gabriel_head.jpg.import": "uid://d0awbed2l0kw6"
+    },
+    "runtime_load": [
+      {
+        "mipmaps": false,
+        "path": "res://assets/p0/art/residents/gabriel_card.jpg",
+        "size": [
+          300,
+          660
+        ]
+      },
+      {
+        "mipmaps": false,
+        "path": "res://assets/p0/art/keepers/gabriel_card.jpg",
+        "size": [
+          300,
+          660
+        ]
+      },
+      {
+        "mipmaps": false,
+        "path": "res://assets/p0/art/keepers/gabriel_head.jpg",
+        "size": [
+          132,
+          132
+        ]
+      }
+    ]
+  },
+  "logs": {
+    "shoes-import.log": {
+      "sha256": "2683125bd5af4b5f802c39652b9d067297bc72799b40bcbb59cd9cd6f22b3cf0",
+      "errors": 0
+    },
+    "shoes-render.log": {
+      "sha256": "802f5e9de10fef6abc08b2ae168c279d5c1d0469c31eb296b68780befe66ea38",
+      "errors": 0
+    },
+    "shoes-portrait-bake.log": {
+      "sha256": "0ab5fd5ec3f5efd600f44ef5600a248691a39a61900574f9c281d624118e78e2",
+      "errors": 0
+    },
+    "cold-import.log": {
+      "sha256": "c274076b294f7f77c9527e8f4a4e8292f5ff0158ba0a932f9fa04d2f484e5b1b",
+      "errors": 0
+    },
+    "resource-load.log": {
+      "sha256": "82bde855c52f8ef59f488581caabe861c5ac4202d6a7adc17b378aa8bb2ddb47",
+      "errors": 0
+    }
+  },
+  "limits": "Desktop capture and cold resource import/load only; no new Android or physical-phone performance claim."
+}

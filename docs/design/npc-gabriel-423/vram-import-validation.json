@@ -1,0 +1,111 @@
+{
+  "task": "SGODOT-423 / PR #863",
+  "baseline": "3e7c39bacdc276adadb7c04f00a6738536e16fc4",
+  "godot": "4.7.2.stable.official.ed1daf0bf",
+  "scope": "Two avatar-part texture imports; PNG bytes and keeper JPEG/import files unchanged. Generator now inherits donor parameters.",
+  "cold_import": {
+    "fixture": "Fresh minimal project with exact res:// paths, no existing .godot cache; both desktop and Android VRAM format imports enabled.",
+    "source_files_stable": true,
+    "before_sha256": {
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png": "a06ee4ed569813b471091c9a6b4280dbc678337c940079b650eaa11e30ea2716",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png.import": "d25ab0cd19397b7baf21b8c4056902200937be551662e1c6bdf555ded852e30b",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png": "7cc4404bec33a7c8753cad4a3f31dbede30eb049351574d0a4b2ffb8377d672d",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png.import": "af604dd6bfed458b45f05640917ee4c93c8126d7c92db4abc73122153c8ae89d"
+    },
+    "after_sha256": {
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png": "a06ee4ed569813b471091c9a6b4280dbc678337c940079b650eaa11e30ea2716",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png.import": "d25ab0cd19397b7baf21b8c4056902200937be551662e1c6bdf555ded852e30b",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png": "7cc4404bec33a7c8753cad4a3f31dbede30eb049351574d0a4b2ffb8377d672d",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png.import": "af604dd6bfed458b45f05640917ee4c93c8126d7c92db4abc73122153c8ae89d"
+    },
+    "logs": {
+      "vram-import.log": {
+        "sha256": "35ab145f5344e8237013b4657a0ab45678814fde84a8010c81840eda9d46804a",
+        "errors": 0
+      },
+      "vram-cold.log": {
+        "sha256": "35ab145f5344e8237013b4657a0ab45678814fde84a8010c81840eda9d46804a",
+        "errors": 0
+      },
+      "vram-load.log": {
+        "sha256": "6699830303600063f16932b412b18a06a119ab10ecb777c4c9cb8e183da11aec",
+        "errors": 0
+      }
+    }
+  },
+  "textures": [
+    {
+      "source": "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png",
+      "uid": "uid://caxp6161kvvb2",
+      "compress_mode": 2,
+      "imported_formats": [
+        "s3tc_bptc",
+        "etc2_astc"
+      ],
+      "donor": {
+        "revision": "8493a5c4258db3e59b2b845c83d3ee5b34724156",
+        "path": "assets/avatar/source/cloth36_npc_sigrid/T_skin36_cloth_D.png.import",
+        "params_match_exactly": true
+      },
+      "source_png_unchanged": true,
+      "generated_formats": {
+        "s3tc": {
+          "bytes": 174828,
+          "sha256": "a531a628c0c490319848aaf343ef7f5bb1953aae2862098a9a32f9c17ad59a6a"
+        },
+        "etc2": {
+          "bytes": 174828,
+          "sha256": "1b2442db148384bfd0a0d73bf19b1f4e813838ce3d7f13a71c4f95d87d6d4da5"
+        }
+      },
+      "cold_load": {
+        "compressed": true,
+        "decoded_resource_bytes": 174776,
+        "image_format": 17,
+        "mipmaps": true,
+        "path": "res://assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png",
+        "size": [
+          512,
+          512
+        ]
+      }
+    },
+    {
+      "source": "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png",
+      "uid": "uid://d0p1qehweqhu4",
+      "compress_mode": 2,
+      "imported_formats": [
+        "s3tc_bptc",
+        "etc2_astc"
+      ],
+      "donor": {
+        "revision": "3e7c39bacdc276adadb7c04f00a6738536e16fc4",
+        "path": "assets/avatar/source/hairhat0/T_base_boy_hairHat_D.png.import",
+        "params_match_exactly": true
+      },
+      "source_png_unchanged": true,
+      "generated_formats": {
+        "s3tc": {
+          "bytes": 174828,
+          "sha256": "631bbd0520cb8071838d9fd48af528771814ba997418c454412acff13a26e7a5"
+        },
+        "etc2": {
+          "bytes": 174828,
+          "sha256": "12dc3d9076010225d2f0fdb68912f5005f7a6868c61f3823988dac222dfa0fec"
+        }
+      },
+      "cold_load": {
+        "compressed": true,
+        "decoded_resource_bytes": 174776,
+        "image_format": 17,
+        "mipmaps": true,
+        "path": "res://assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png",
+        "size": [
+          512,
+          512
+        ]
+      }
+    }
+  ],
+  "limits": "Headless import/resource-load validation only; existing review images and Android smoke precede this compression change. No physical-device memory measurement."
+}

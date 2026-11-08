@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "states": [
+    {
+      "animation": "",
+      "assembled": true,
+      "button": [
+        180,
+        775
+      ],
+      "frames": 16,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "pid": 3733,
+      "renderer": "mobile",
+      "sequence": 0,
+      "time": 0.0,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "animation": "",
+      "assembled": true,
+      "button": [
+        180,
+        775
+      ],
+      "frames": 30,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "pid": 3733,
+      "renderer": "mobile",
+      "sequence": 1,
+      "time": 0.0,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "animation": "walk",
+      "assembled": true,
+      "button": [
+        180,
+        775
+      ],
+      "frames": 48,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "pid": 3733,
+      "renderer": "mobile",
+      "sequence": 2,
+      "time": 0.0891413333333333,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "animation": "walk",
+      "assembled": true,
+      "button": [
+        180,
+        775
+      ],
+      "frames": 90,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "pid": 3733,
+      "renderer": "mobile",
+      "sequence": 2,
+      "time": 1.17175076190476,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "animation": "",
+      "assembled": true,
+      "button": [
+        180,
+        775
+      ],
+      "frames": 106,
+      "gpu": "Goldfish GFXStream (SwiftShader Device (Subzero))",
+      "pid": 3733,
+      "renderer": "mobile",
+      "sequence": 3,
+      "time": 0.0,
+      "viewport": [
+        360,
+        800
+      ]
+    }
+  ],
+  "real_button_taps": 3,
+  "walk_time_advanced": true,
+  "apk_sha256": "f4c4e405b0cb3b5bcc7f5a82fd192a6d6421af83a742baf0ce56f577ac19b8eb",
+  "installed_apk_readback_equal": true,
+  "packed_part_and_texture_exact": true,
+  "scope": "Offline asset fixture / API37 GFXStream SwiftShader / Vulkan Mobile. No physical-phone timing or full-game claim."
+}

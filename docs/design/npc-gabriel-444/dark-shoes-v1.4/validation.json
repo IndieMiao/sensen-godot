@@ -1,0 +1,236 @@
+{
+  "task": "SGODOT-444 / PR #863 / dark shoes v1.4",
+  "baseline": "38b5a0f33b99408c66d943ece60e04e87836cc99",
+  "donor_farm_dev_ref": "594a953b87cc42a6cd1a99a3034b6fd14a5c5aef",
+  "slots": {
+    "hairHat": "hairhat0_npc_gabriel",
+    "cloth": "cloth36_npc_gabriel",
+    "shoes": "shoes3_npc_gabriel",
+    "glass": "glass0"
+  },
+  "source_fbx_byte_identical": true,
+  "source_folder_exact_files": [
+    "SK_dt_skin03.fbx",
+    "SK_dt_skin03.fbx.import",
+    "T_skin03_shoes_D.png",
+    "T_skin03_shoes_D.png.import"
+  ],
+  "source_aliases": 0,
+  "common_shoes3_unchanged_sha256": {
+    "assets/avatar/parts/shoes3.res": "32c2599e63fdce259de2a4ba1e48734cd8a7c832e51a9faa18f70009cbb6953d",
+    "assets/avatar/source/shoes3/SK_dt_skin03.fbx": "fc8ea72a89c6f0d9b53842c066963af64fd0a3c617c3ed43f5c282ca596c5310",
+    "assets/avatar/source/shoes3/SK_dt_skin03.fbx.import": "e6c3fa680867287e73368bf0b1ac5871d482c6a5bb8d78b0670ed6779d67a756",
+    "assets/avatar/source/shoes3/T_skin03_shoes_D.png": "06972c7947a70222d74f50eaba22f9a8f571ea636e4ac0e12c5e82c61cf4dc1d",
+    "assets/avatar/source/shoes3/T_skin03_shoes_D.png.import": "ce005ce501e10a80f6e5297f19533d8d21d5a2afb745a5fd85d5efde94ca6851",
+    "assets/avatar/thumbs/shoes3.png": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6",
+    "assets/avatar/thumbs/shoes3.png.import": "4c60000c99acba1a64bcd349aca6b53936415c003c07f612978fc8ba844d41b0"
+  },
+  "registry_change": "Exactly one new shoe entry per recipe/manifest/npc_only; every prior entry preserved",
+  "import_params_exactly_match_donor": true,
+  "texture_import_formats": [
+    "s3tc_bptc",
+    "etc2_astc"
+  ],
+  "cold_import": {
+    "fresh_cache": true,
+    "files_verified": 18,
+    "changed_files": [],
+    "before_sha256": {
+      "assets/avatar/source/shoes3_npc_gabriel/SK_dt_skin03.fbx": "fc8ea72a89c6f0d9b53842c066963af64fd0a3c617c3ed43f5c282ca596c5310",
+      "assets/avatar/source/shoes3_npc_gabriel/SK_dt_skin03.fbx.import": "832bb41be18c6ff1693be64b20beeb212ffaef956689cf1c6f3e805e40121b27",
+      "assets/avatar/source/shoes3_npc_gabriel/T_skin03_shoes_D.png": "7b831c7b61497c4b4439d433e51acba1de370dc3ddfdaf4c8e4c89eb649a4504",
+      "assets/avatar/source/shoes3_npc_gabriel/T_skin03_shoes_D.png.import": "0b3630db15dea9f7e1ccfe0395639fe77500a8dbc1553ed989952b339e426f3a",
+      "assets/avatar/parts/shoes3_npc_gabriel.res": "6e647eefb0e4170cc12e1a2dc76426a2b66017ca34c87187b56b18f6484d6f1d",
+      "assets/avatar/thumbs/shoes3_npc_gabriel.png": "bd48138c68b90be06b00f7ef4828694a6474814bc4f174b05dd1039aec704716",
+      "assets/avatar/thumbs/shoes3_npc_gabriel.png.import": "147182436abca67d1d432804e0893bbefdb9fed9e4d988c680cf2a656ddee8f2",
+      "assets/p0/art/residents/gabriel_card.jpg": "2dcbd92e4ddfa5e0cf82f57dc3af6827e3997a82c95a78261f575d5d1cbbf7c1",
+      "assets/p0/art/residents/gabriel_card.jpg.import": "47c16f3f71f495fd05933ee71dee1d9b8a3e8871827e603469bd23811efecabb",
+      "assets/p0/art/keepers/gabriel_card.jpg": "2dcbd92e4ddfa5e0cf82f57dc3af6827e3997a82c95a78261f575d5d1cbbf7c1",
+      "assets/p0/art/keepers/gabriel_card.jpg.import": "a3bd84b7defe8c3ffc4cf052fbb6c76a9839333398b7442ba3a4688ad05c49d5",
+      "assets/p0/art/keepers/gabriel_head.jpg": "229e9750946fd3ad075f91cf5658beaddfccc82f2bfa97527dc40c02db93ec5b",
+      "assets/p0/art/keepers/gabriel_head.jpg.import": "90a8de26c4ee74dc58215449fa587650b077bb72389712211a29681c54cfc40c",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png": "a06ee4ed569813b471091c9a6b4280dbc678337c940079b650eaa11e30ea2716",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png.import": "d25ab0cd19397b7baf21b8c4056902200937be551662e1c6bdf555ded852e30b",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png": "7cc4404bec33a7c8753cad4a3f31dbede30eb049351574d0a4b2ffb8377d672d",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png.import": "af604dd6bfed458b45f05640917ee4c93c8126d7c92db4abc73122153c8ae89d",
+      "assets/avatar/source/recipes_gabriel.json": "983ae50ff4cbb49c3fcb252781ce68115d8735d77ba0b25307d25f8146e208e3"
+    },
+    "after_sha256": {
+      "assets/avatar/source/shoes3_npc_gabriel/SK_dt_skin03.fbx": "fc8ea72a89c6f0d9b53842c066963af64fd0a3c617c3ed43f5c282ca596c5310",
+      "assets/avatar/source/shoes3_npc_gabriel/SK_dt_skin03.fbx.import": "832bb41be18c6ff1693be64b20beeb212ffaef956689cf1c6f3e805e40121b27",
+      "assets/avatar/source/shoes3_npc_gabriel/T_skin03_shoes_D.png": "7b831c7b61497c4b4439d433e51acba1de370dc3ddfdaf4c8e4c89eb649a4504",
+      "assets/avatar/source/shoes3_npc_gabriel/T_skin03_shoes_D.png.import": "0b3630db15dea9f7e1ccfe0395639fe77500a8dbc1553ed989952b339e426f3a",
+      "assets/avatar/parts/shoes3_npc_gabriel.res": "6e647eefb0e4170cc12e1a2dc76426a2b66017ca34c87187b56b18f6484d6f1d",
+      "assets/avatar/thumbs/shoes3_npc_gabriel.png": "bd48138c68b90be06b00f7ef4828694a6474814bc4f174b05dd1039aec704716",
+      "assets/avatar/thumbs/shoes3_npc_gabriel.png.import": "147182436abca67d1d432804e0893bbefdb9fed9e4d988c680cf2a656ddee8f2",
+      "assets/p0/art/residents/gabriel_card.jpg": "2dcbd92e4ddfa5e0cf82f57dc3af6827e3997a82c95a78261f575d5d1cbbf7c1",
+      "assets/p0/art/residents/gabriel_card.jpg.import": "47c16f3f71f495fd05933ee71dee1d9b8a3e8871827e603469bd23811efecabb",
+      "assets/p0/art/keepers/gabriel_card.jpg": "2dcbd92e4ddfa5e0cf82f57dc3af6827e3997a82c95a78261f575d5d1cbbf7c1",
+      "assets/p0/art/keepers/gabriel_card.jpg.import": "a3bd84b7defe8c3ffc4cf052fbb6c76a9839333398b7442ba3a4688ad05c49d5",
+      "assets/p0/art/keepers/gabriel_head.jpg": "229e9750946fd3ad075f91cf5658beaddfccc82f2bfa97527dc40c02db93ec5b",
+      "assets/p0/art/keepers/gabriel_head.jpg.import": "90a8de26c4ee74dc58215449fa587650b077bb72389712211a29681c54cfc40c",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png": "a06ee4ed569813b471091c9a6b4280dbc678337c940079b650eaa11e30ea2716",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png.import": "d25ab0cd19397b7baf21b8c4056902200937be551662e1c6bdf555ded852e30b",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png": "7cc4404bec33a7c8753cad4a3f31dbede30eb049351574d0a4b2ffb8377d672d",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png.import": "af604dd6bfed458b45f05640917ee4c93c8126d7c92db4abc73122153c8ae89d",
+      "assets/avatar/source/recipes_gabriel.json": "983ae50ff4cbb49c3fcb252781ce68115d8735d77ba0b25307d25f8146e208e3"
+    },
+    "uids": {
+      "assets/avatar/source/shoes3_npc_gabriel/SK_dt_skin03.fbx.import": "uid://cancydl8xfiyp",
+      "assets/avatar/source/shoes3_npc_gabriel/T_skin03_shoes_D.png.import": "uid://kig2kxr1s6k1",
+      "assets/avatar/thumbs/shoes3_npc_gabriel.png.import": "uid://dxjv1exxlau64",
+      "assets/p0/art/residents/gabriel_card.jpg.import": "uid://c6vndeouifivo",
+      "assets/p0/art/keepers/gabriel_card.jpg.import": "uid://bmvv70glopeje",
+      "assets/p0/art/keepers/gabriel_head.jpg.import": "uid://d0awbed2l0kw6",
+      "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png.import": "uid://caxp6161kvvb2",
+      "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png.import": "uid://d0p1qehweqhu4"
+    },
+    "inherited_fbx_warnings": 4,
+    "associated_resource_file_errors": 8,
+    "unexpected_diagnostics": 0,
+    "diagnostics_file": "cold-import-source-warnings.txt",
+    "accepted_scope": "Art director explicitly requested the unmodified FBX and no aliases; retain inherited unused source-texture diagnostics, require tracked-file stability and runtime loading."
+  },
+  "runtime_geometry_and_npc_pool": {
+    "checks": [
+      {
+        "check": "ID, slot, attachment and tier",
+        "passed": true
+      },
+      {
+        "check": "Surface count unchanged",
+        "passed": true
+      },
+      {
+        "check": "Vertices, normals, UVs, indices, bones and weights identical",
+        "passed": true
+      },
+      {
+        "check": "Bounds identical",
+        "passed": true
+      },
+      {
+        "check": "All skin bind names, bones and poses identical",
+        "passed": true
+      },
+      {
+        "check": "Shader unchanged",
+        "passed": true
+      },
+      {
+        "check": "Material float unchanged: rim_strength",
+        "passed": true
+      },
+      {
+        "check": "Material float unchanged: ao_strength",
+        "passed": true
+      },
+      {
+        "check": "Material float unchanged: diffuse_strength",
+        "passed": true
+      },
+      {
+        "check": "Material float unchanged: emission_strength",
+        "passed": true
+      },
+      {
+        "check": "Material float unchanged: smoothness",
+        "passed": true
+      },
+      {
+        "check": "AO texture unchanged",
+        "passed": true
+      },
+      {
+        "check": "New texture bound to runtime shoe",
+        "passed": true
+      },
+      {
+        "check": "512² compressed texture with mipmaps",
+        "passed": true
+      },
+      {
+        "check": "New shoe in NPC catalog",
+        "passed": true
+      },
+      {
+        "check": "New shoe excluded from player wardrobe",
+        "passed": true
+      },
+      {
+        "check": "Original shoes3 still available to players",
+        "passed": true
+      }
+    ],
+    "failures": [],
+    "geometry": {
+      "bounds": "[P: (-0.199655, -0.000119, -0.106844), S: (0.399311, 0.306456, 0.324512)]",
+      "skin_binds": 6,
+      "surfaces": 1,
+      "triangles": 1202
+    }
+  },
+  "portrait_load": [
+    {
+      "mipmaps": false,
+      "path": "res://assets/p0/art/residents/gabriel_card.jpg",
+      "size": [
+        300,
+        660
+      ]
+    },
+    {
+      "mipmaps": false,
+      "path": "res://assets/p0/art/keepers/gabriel_card.jpg",
+      "size": [
+        300,
+        660
+      ]
+    },
+    {
+      "mipmaps": false,
+      "path": "res://assets/p0/art/keepers/gabriel_head.jpg",
+      "size": [
+        132,
+        132
+      ]
+    }
+  ],
+  "portrait_uids_retained": true,
+  "crop_table_unchanged": true,
+  "card_paths_identical": true,
+  "texture_scope": {
+    "donor": "assets/avatar/source/shoes3",
+    "target": "assets/avatar/source/shoes3_npc_gabriel",
+    "source_size": [
+      512,
+      512
+    ],
+    "cyan_pixels": 28475,
+    "changed_percent": 10.862350463867188,
+    "mask": "G > R and B > R, including antialiased boundary",
+    "replacement_rgb_min": [
+      58,
+      57,
+      57
+    ],
+    "replacement_rgb_max": [
+      60,
+      59,
+      59
+    ],
+    "outside_mask_exact": true,
+    "alpha_exact": true,
+    "fbx_byte_identical": true,
+    "source_import_note": "Unmodified FBX retains four missing unused full-outfit texture references. No aliases or path fixes, per art director; runtime uses the recipe albedo.",
+    "donor_sha256": {
+      "SK_dt_skin03.fbx": "fc8ea72a89c6f0d9b53842c066963af64fd0a3c617c3ed43f5c282ca596c5310",
+      "SK_dt_skin03.fbx.import": "e6c3fa680867287e73368bf0b1ac5871d482c6a5bb8d78b0670ed6779d67a756",
+      "T_skin03_shoes_D.png": "06972c7947a70222d74f50eaba22f9a8f571ea636e4ac0e12c5e82c61cf4dc1d",
+      "T_skin03_shoes_D.png.import": "ce005ce501e10a80f6e5297f19533d8d21d5a2afb745a5fd85d5efde94ca6851"
+    },
+    "output_png_sha256": "7b831c7b61497c4b4439d433e51acba1de370dc3ddfdaf4c8e4c89eb649a4504"
+  },
+  "visual_limit": "Pale-blue color removed. Original raised star geometry remains and can cast a dark outline; mesh unchanged as requested.",
+  "platform": "Desktop Vulkan Mobile / Steam Deck RADV; no new Android or physical-phone performance claim."
+}

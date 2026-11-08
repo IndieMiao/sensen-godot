@@ -1,0 +1,60 @@
+{
+  "verified_at_utc": "2026-11-07T12:01:46.586425+00:00",
+  "project": "SGODOT",
+  "work_item": "SGODOT-423",
+  "work_item_id": "c4113d7c-29f9-4ff0-b385-7452400b1623",
+  "pull_request": "https://github.com/IndieMiao/sensen-godot/pull/863",
+  "art_commit": "88902f7f1a0a790ff683beefa9505c477980c468",
+  "all_readbacks_equal": true,
+  "all_visible_authors_verified": true,
+  "attachments": [
+    {
+      "source_name": "gabriel-front.png",
+      "attachment_id": "ece1a754-faca-489f-9a5b-516791ccfd11",
+      "name": "liubei-423-gabriel-v1-gabriel-front.png",
+      "bytes": 107629,
+      "sha256": "b6262223bcb86d45af5f1ac5b54c2e91144f7d26c8a405671344a7090b61143c",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "gabriel-three-quarter.png",
+      "attachment_id": "9810597e-a834-4e33-bd83-f874f960ea22",
+      "name": "liubei-423-gabriel-v1-gabriel-three-quarter.png",
+      "bytes": 103207,
+      "sha256": "bbaa302d0d925a86c8b7ff0799598a86b5fe012af0a714bc8a9b92da43bce6c6",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "gabriel-back.png",
+      "attachment_id": "d6795ff1-2bb4-48be-bc4a-2fe65c9bbcb4",
+      "name": "liubei-423-gabriel-v1-gabriel-back.png",
+      "bytes": 102890,
+      "sha256": "ad7a4e1a09d0a5ebff48ed534fd77680dcb4d86a9dfb0f2ba331897f8be0e13a",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "kai-gabriel-mei-lineup.png",
+      "attachment_id": "b9cdb9a9-249a-49a9-ae8f-bb1c439aa4f2",
+      "name": "liubei-423-gabriel-v1-kai-gabriel-mei-lineup.png",
+      "bytes": 308197,
+      "sha256": "82d8fd18be08da6bab74963433d4faff493740aedc49ffe75e18f5efcf40d0d5",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "church-360x800.png",
+      "attachment_id": "21f3d0ca-da05-4a90-b00c-fecdff6bb00d",
+      "name": "liubei-423-gabriel-v1-church-360x800.png",
+      "bytes": 327792,
+      "sha256": "3e2bda80a3195e55b7647c0dd5786b58cbb8330b1b7968e6f5697e60d35818e7",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "README.md",
+      "attachment_id": "48d04e74-f3fa-4935-81a9-6b5d899110f7",
+      "name": "liubei-423-gabriel-v1-README.md",
+      "bytes": 4442,
+      "sha256": "cec1c599a1d96a16acebc00a123dc629d0d36cee5fb2bbbe0962a432f1a1a8e3",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    }
+  ]
+}

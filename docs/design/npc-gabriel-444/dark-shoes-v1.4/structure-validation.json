@@ -1,0 +1,79 @@
+{
+	"checks": [
+		{
+			"check": "ID, slot, attachment and tier",
+			"passed": true
+		},
+		{
+			"check": "Surface count unchanged",
+			"passed": true
+		},
+		{
+			"check": "Vertices, normals, UVs, indices, bones and weights identical",
+			"passed": true
+		},
+		{
+			"check": "Bounds identical",
+			"passed": true
+		},
+		{
+			"check": "All skin bind names, bones and poses identical",
+			"passed": true
+		},
+		{
+			"check": "Shader unchanged",
+			"passed": true
+		},
+		{
+			"check": "Material float unchanged: rim_strength",
+			"passed": true
+		},
+		{
+			"check": "Material float unchanged: ao_strength",
+			"passed": true
+		},
+		{
+			"check": "Material float unchanged: diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "Material float unchanged: emission_strength",
+			"passed": true
+		},
+		{
+			"check": "Material float unchanged: smoothness",
+			"passed": true
+		},
+		{
+			"check": "AO texture unchanged",
+			"passed": true
+		},
+		{
+			"check": "New texture bound to runtime shoe",
+			"passed": true
+		},
+		{
+			"check": "512² compressed texture with mipmaps",
+			"passed": true
+		},
+		{
+			"check": "New shoe in NPC catalog",
+			"passed": true
+		},
+		{
+			"check": "New shoe excluded from player wardrobe",
+			"passed": true
+		},
+		{
+			"check": "Original shoes3 still available to players",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"geometry": {
+		"bounds": "[P: (-0.199655, -0.000119, -0.106844), S: (0.399311, 0.306456, 0.324512)]",
+		"skin_binds": 6,
+		"surfaces": 1,
+		"triangles": 1202
+	}
+}

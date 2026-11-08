@@ -1,0 +1,35 @@
+{
+  "revision": "v1.1",
+  "fresh_godot_cache": true,
+  "scope": "All runtime parts/textures/thumbs/portrait plus NEW cloth36 authoring FBX included. Unrelated inherited FBXs excluded. Delivered FBX image links repaired; unchanged mesh/UV/skin checked against donor independently.",
+  "files_compared": 15,
+  "changed_files": [],
+  "errors": [],
+  "new_scene_root_script_null": true,
+  "texture_lossless": true,
+  "uids": {
+    "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png.import": "uid://caxp6161kvvb2",
+    "assets/avatar/source/cloth36_npc_gabriel/SK_dt_skin36.fbx.import": "uid://ba78yfuj1n0va",
+    "assets/avatar/thumbs/cloth36_npc_gabriel.png.import": "uid://cy7e0kwh4gytw",
+    "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png.import": "uid://d0p1qehweqhu4",
+    "assets/avatar/thumbs/hairhat0_npc_gabriel.png.import": "uid://b4lhfjkm027ee",
+    "assets/p0/art/residents/gabriel_card.jpg.import": "uid://c6vndeouifivo"
+  },
+  "sha256": {
+    "assets/avatar/source/cloth36_npc_gabriel/SK_dt_skin36.fbx": "145d75b1afcf21b81ce0cc941f2076155786fc7f746d3a12c3a6128bdc7f07e0",
+    "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png.import": "b9b9843a853ad978b2460b0413f0f22db207e57cfe2eaff4b800a05cbd6f8803",
+    "assets/avatar/source/cloth36_npc_gabriel/T_gabriel_cloth_D.png": "6f0a39cee18605459c2776730420eea9b5884bd7d3117371d069555ceab26f00",
+    "assets/avatar/source/cloth36_npc_gabriel/SK_dt_skin36.fbx.import": "3f1ebf1bf6cec671c36ea7b429b5641b66b15208d01c66ea4ad3d27a5eb5202e",
+    "assets/avatar/parts/cloth36_npc_gabriel.res": "2907a178c2475daf2d58969c143fc94d06d826d0d510d797b42e81ce22267c84",
+    "assets/avatar/thumbs/cloth36_npc_gabriel.png": "2b31ec521ecd790d779e012a5f70db37007654e8a13465a92f3180eb7d0fade4",
+    "assets/avatar/thumbs/cloth36_npc_gabriel.png.import": "5170deacc1b7efdd48fe10a0fb7cc94009a513719d4f8413a751af85fef73cff",
+    "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png.import": "e027d76b2612eb9c78adff122cdec835a09a6819f7853c441def18145843933f",
+    "assets/avatar/source/hairhat0_npc_gabriel/T_gabriel_hairHat_D.png": "7cc4404bec33a7c8753cad4a3f31dbede30eb049351574d0a4b2ffb8377d672d",
+    "assets/avatar/parts/hairhat0_npc_gabriel.res": "01f69310adb412d75bd6f2eb3611152f94e5111d3ccc91369461a154c891d9ec",
+    "assets/avatar/thumbs/hairhat0_npc_gabriel.png": "604802c545e9d48d8bb5821226481ea59104de4b3d55fdf251f7cd982b86644a",
+    "assets/avatar/thumbs/hairhat0_npc_gabriel.png.import": "585ef709cdcba7b3ffc349730883e7d4d87f3da5d244e60d70d163c5e1cbab6b",
+    "assets/avatar/parts/hairhat0_npc_gabriel_scene.tscn": "3e11c0bb84dd79694bb5edf8f7b4bb67d14ab59fbac409f8a6dd77435fc01543",
+    "assets/p0/art/residents/gabriel_card.jpg": "e6d166d040df0e5bf040ccd20ae811e1308435c0e9bbc6e46289711a32c3e8ab",
+    "assets/p0/art/residents/gabriel_card.jpg.import": "47c16f3f71f495fd05933ee71dee1d9b8a3e8871827e603469bd23811efecabb"
+  }
+}

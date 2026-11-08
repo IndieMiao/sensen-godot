@@ -1,0 +1,17 @@
+{
+  "revision": "v1.1",
+  "base": "cloth36_npc_sigrid / cloth36",
+  "id": "cloth36_npc_gabriel",
+  "source_size": [
+    1024,
+    1024
+  ],
+  "near_black": "#2B2A2E",
+  "collar": "#F4F1E8",
+  "trim": "#39373D",
+  "alpha_exact": true,
+  "hair_alpha_exact": true,
+  "source_fbx_sha256": "145d75b1afcf21b81ce0cc941f2076155786fc7f746d3a12c3a6128bdc7f07e0",
+  "geometry_edits": 0,
+  "note": "cloth36 geometry/rig unchanged, FBX source texture links repointed; long sleeves and trousers. Existing glass0; neutral warm-white hairhat0 texture variant. No added geometry or symbols."
+}
