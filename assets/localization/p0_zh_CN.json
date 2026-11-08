@@ -2698,5 +2698,7 @@
  "%s has worn off": "%s结束了",
  "Pray": "祈祷",
  "%s · back to 20 min": "%s · 重新计时 20 分钟",
- "%d left today": "今日还剩 %d 次"
+ "%d left today": "今日还剩 %d 次",
+ "%s · %d min": "%s · %d 分钟",
+ "%s · %s left": "%s · 还剩 %s"
 }
