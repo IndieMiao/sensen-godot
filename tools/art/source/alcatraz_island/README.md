@@ -1,5 +1,7 @@
 # SGODOT-424 · 恶魔岛源文件
 
+中段台阶A增量见 `../alcatraz_mid_stairs_424/README.md`；它以固定原件做开口和导航，旧主岛全量生成器未包含此增量，不要用旧全量生成器覆盖中段交付。
+
 主楼屋顶增量：`build_museum_roof.py` 只替换近档屋顶装饰，保留整岛其余命名对象；`museum_roof.py` 为可复用生成函数，`museum_roof_contract.json` 给黄忠远档配色／尺寸。专用验证和重建见[屋顶交付](../../../../docs/design/alcatraz-museum-roof-424-2026-11-06/README.md)。历史 v9 的六件原样保留断言仅对应 v9；当前 `preserved_geometry.json` 已更新主楼哈希，其他五件不变。
 
 屋顶 v1.1：仅通风口放大并压暗，使用 `build_museum_roof.py -- --vents-only` 重建；`verify_museum_roof*.py` 当前比较已验 v1（`4a47e622`），要求六个通风口构件之外的数据保留。尺寸／颜色／高度和审阅见 [v1.1](../../../../docs/design/alcatraz-museum-roof-424-2026-11-06/v1.1/README.md)，近远档须一起合。

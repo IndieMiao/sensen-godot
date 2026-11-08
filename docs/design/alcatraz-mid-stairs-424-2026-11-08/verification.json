@@ -1,0 +1,549 @@
+{
+  "layout_path_length_m": 61.9965694304556,
+  "p0_path_length_m": 61.5040916064754,
+  "walk_end_error_m": 0.0,
+  "nav_samples_05m": 1744,
+  "tree_blocked_sample_count": 140,
+  "route_samples_05m": 124,
+  "route_tree_blocked_sample_count": 0,
+  "route_tree_blockers": {},
+  "hud_samples": 117,
+  "hud_failures": [],
+  "openings": [
+    {
+      "end_error": 0.0,
+      "flight": 5.0,
+      "kind": "lower",
+      "path_points": 42,
+      "point": [
+        -4.125,
+        3.25,
+        5.90000009536743
+      ]
+    },
+    {
+      "end_error": 1.19209289550781e-07,
+      "flight": 5.0,
+      "kind": "upper",
+      "path_points": 75,
+      "point": [
+        1.625,
+        5.5,
+        5.90000009536743
+      ]
+    },
+    {
+      "end_error": 0.0,
+      "flight": 6.0,
+      "kind": "lower",
+      "path_points": 86,
+      "point": [
+        1.625,
+        5.5,
+        1.39999997615814
+      ]
+    },
+    {
+      "end_error": 4.76837158203125e-07,
+      "flight": 6.0,
+      "kind": "upper",
+      "path_points": 114,
+      "point": [
+        -4.125,
+        7.75,
+        1.39999997615814
+      ]
+    },
+    {
+      "end_error": 0.0,
+      "flight": 7.0,
+      "kind": "lower",
+      "path_points": 125,
+      "point": [
+        -4.125,
+        7.75,
+        -3.09999990463257
+      ]
+    },
+    {
+      "end_error": 1.19209289550781e-07,
+      "flight": 7.0,
+      "kind": "upper",
+      "path_points": 153,
+      "point": [
+        1.625,
+        10.0,
+        -3.09999990463257
+      ]
+    }
+  ],
+  "tread_foot_sample_count": 315,
+  "tread_max_abs_y_error_m": 0.000101089477539062,
+  "stair_click": {
+    "collider": "/root/Review/AlcatrazIsland/TerraceZone/AlcMidStairs19/AlcMidStairs19_col",
+    "expected": [
+      -1.25,
+      4.44999980926514,
+      5.5
+    ],
+    "hit": [
+      -1.24999856948853,
+      4.45000076293945,
+      5.5000057220459
+    ],
+    "path_end": [
+      -1.24999856948853,
+      4.44999980926514,
+      5.5000057220459
+    ],
+    "pixel": [
+      211.119033813477,
+      523.460388183594
+    ]
+  },
+  "art_base": "edd184d65",
+  "runtime_base": "cf82ca0ac",
+  "centerline_before_m": 125.1246117974981,
+  "centerline_after_m": 56.92415805178299,
+  "p0_walk_before_m": 116.856977954507,
+  "p0_walk_after_m": 61.5040916064754,
+  "actual_layout_spawn_step_path_m": 61.9965694304556,
+  "centerline_metric": "straight sloped span across each new flight, same field convention as baseline",
+  "old_route_checks": {
+    "flights": [
+      {
+        "directions": [
+          {
+            "end_error": 0.0,
+            "length": 5.03115302324295,
+            "x_range": [
+              -22.0,
+              -22.0
+            ]
+          },
+          {
+            "end_error": 0.0,
+            "length": 5.28736039996147,
+            "x_range": [
+              -22.0,
+              -21.75
+            ]
+          }
+        ],
+        "lower": [
+          -22.0,
+          1.0,
+          12.0
+        ],
+        "upper": [
+          -22.0,
+          3.25,
+          7.5
+        ]
+      },
+      {
+        "directions": [
+          {
+            "end_error": 0.0,
+            "length": 5.03115302324295,
+            "x_range": [
+              8.0,
+              8.0
+            ]
+          },
+          {
+            "end_error": 0.0,
+            "length": 5.03115302324295,
+            "x_range": [
+              8.0,
+              8.0
+            ]
+          }
+        ],
+        "lower": [
+          8.0,
+          3.25,
+          7.5
+        ],
+        "upper": [
+          8.0,
+          5.5,
+          3.0
+        ]
+      },
+      {
+        "directions": [
+          {
+            "end_error": 0.0,
+            "length": 5.03115302324295,
+            "x_range": [
+              -22.0,
+              -22.0
+            ]
+          },
+          {
+            "end_error": 0.0,
+            "length": 5.03115302324295,
+            "x_range": [
+              -22.0,
+              -22.0
+            ]
+          }
+        ],
+        "lower": [
+          -22.0,
+          5.5,
+          3.0
+        ],
+        "upper": [
+          -22.0,
+          7.75,
+          -1.5
+        ]
+      },
+      {
+        "directions": [
+          {
+            "end_error": 0.0,
+            "length": 5.03115302324295,
+            "x_range": [
+              8.0,
+              8.0
+            ]
+          },
+          {
+            "end_error": 0.0,
+            "length": 5.03115302324295,
+            "x_range": [
+              8.0,
+              8.0
+            ]
+          }
+        ],
+        "lower": [
+          8.0,
+          7.75,
+          -1.5
+        ],
+        "upper": [
+          8.0,
+          10.0,
+          -6.0
+        ]
+      }
+    ],
+    "original_route_legs": [
+      {
+        "end_error": 0.0,
+        "leg": 1,
+        "points": 6
+      },
+      {
+        "end_error": 0.0,
+        "leg": 2,
+        "points": 19
+      },
+      {
+        "end_error": 0.0,
+        "leg": 3,
+        "points": 28
+      },
+      {
+        "end_error": 0.0,
+        "leg": 4,
+        "points": 19
+      },
+      {
+        "end_error": 0.0,
+        "leg": 5,
+        "points": 31
+      },
+      {
+        "end_error": 0.0,
+        "leg": 6,
+        "points": 19
+      },
+      {
+        "end_error": 0.0,
+        "leg": 7,
+        "points": 34
+      },
+      {
+        "end_error": 0.0,
+        "leg": 8,
+        "points": 19
+      },
+      {
+        "end_error": 0.0,
+        "leg": 9,
+        "points": 9
+      }
+    ]
+  },
+  "widths": [
+    {
+      "flight": 5,
+      "physical_clear_m": 2.0100000000000007,
+      "actor_radius_m": 0.25,
+      "actual_nav_clear_m": 1.5099999999999998,
+      "section_x": -1.25,
+      "actor_center_z": [
+        7.1499999999999995,
+        8.66
+      ]
+    },
+    {
+      "flight": 6,
+      "physical_clear_m": 2.0100000000000002,
+      "actor_radius_m": 0.25,
+      "actual_nav_clear_m": 1.5100000000000002,
+      "section_x": -1.25,
+      "actor_center_z": [
+        2.65,
+        4.16
+      ]
+    },
+    {
+      "flight": 7,
+      "physical_clear_m": 2.0100000000000002,
+      "actor_radius_m": 0.25,
+      "actual_nav_clear_m": 1.51,
+      "section_x": -1.25,
+      "actor_center_z": [
+        -1.85,
+        -0.33999999999999997
+      ]
+    }
+  ],
+  "click_checks": [
+    {
+      "collider": "/root/Review/AlcatrazIsland/TerraceZone/AlcMidStairs19/AlcMidStairs19_col",
+      "flight": 5.0,
+      "hit": [
+        -1.24999856948853,
+        4.45000076293945,
+        5.5000057220459
+      ],
+      "path_end": [
+        -1.24999856948853,
+        4.44999980926514,
+        5.5000057220459
+      ],
+      "point": [
+        -1.25,
+        4.44999980926514,
+        5.5
+      ]
+    },
+    {
+      "collider": "/root/Review/AlcatrazIsland/TerraceZone/AlcMidStairs19/AlcMidStairs19_col",
+      "flight": 6.0,
+      "hit": [
+        -1.2500262260437,
+        6.69989967346191,
+        0.999897003173828
+      ],
+      "path_end": [
+        -1.2500262260437,
+        6.69999980926514,
+        1.0
+      ],
+      "point": [
+        -1.25,
+        6.69999980926514,
+        1.0
+      ]
+    },
+    {
+      "collider": "/root/Review/AlcatrazIsland/TerraceZone/AlcMidStairs19/AlcMidStairs19_col",
+      "flight": 7.0,
+      "hit": [
+        -1.25,
+        8.95000076293945,
+        -3.5
+      ],
+      "path_end": [
+        -1.25,
+        8.94999980926514,
+        -3.5
+      ],
+      "point": [
+        -1.25,
+        8.94999980926514,
+        -3.5
+      ]
+    }
+  ],
+  "cold_import": {
+    "source_files_checked": 177,
+    "source_files_changed": [],
+    "import_error_lines": [],
+    "check_log": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nALC_COLD_GEOMETRY_OK 4 meshes/trimeshes\n"
+  },
+  "gdunit": {
+    "suites": 5,
+    "cases": 37,
+    "failures": 0,
+    "final_landmark_repeat": {
+      "cases": 6,
+      "failures": 0
+    }
+  },
+  "global_canopy_baseline": {
+    "same_sites_as_before": true,
+    "before": 140,
+    "after": 140,
+    "sources": {
+      "alc_tree_a_004": {
+        "position": [
+          -27,
+          7.75,
+          -5
+        ],
+        "rays": 30
+      },
+      "alc_tree_b_004": {
+        "position": [
+          -27,
+          7.75,
+          -3
+        ],
+        "rays": 22
+      },
+      "alc_tree_a_005": {
+        "position": [
+          16,
+          7.75,
+          -4.8
+        ],
+        "rays": 80
+      },
+      "alc_tree_a_006": {
+        "position": [
+          19,
+          7.75,
+          -4.8
+        ],
+        "rays": 78
+      },
+      "alc_tree_b_005": {
+        "position": [
+          24,
+          7.75,
+          -4.8
+        ],
+        "rays": 79
+      }
+    }
+  },
+  "prop_moves": [
+    {
+      "name": "alc_bench_000",
+      "before": [
+        -3,
+        3.25,
+        6.6
+      ],
+      "after": [
+        -6.0,
+        3.25,
+        6.6
+      ]
+    },
+    {
+      "name": "alc_bench_001",
+      "before": [
+        3,
+        5.5,
+        2.1
+      ],
+      "after": [
+        4,
+        5.5,
+        2.1
+      ]
+    },
+    {
+      "name": "alc_bench_002",
+      "before": [
+        -3,
+        7.75,
+        -2.4
+      ],
+      "after": [
+        -6.0,
+        7.75,
+        -2.4
+      ]
+    },
+    {
+      "name": "alc_bench_005",
+      "before": [
+        0,
+        10,
+        -5.05
+      ],
+      "after": [
+        -1.25,
+        10,
+        -5.05
+      ]
+    }
+  ],
+  "climb_x_range": [
+    -3.5,
+    1.0
+  ],
+  "museum_goal_before": [
+    0,
+    10,
+    -6
+  ],
+  "museum_goal_after": [
+    0.0,
+    10.0,
+    -6.0
+  ],
+  "summit": {
+    "sample_rect_xz": [
+      -8,
+      8,
+      -8,
+      -5
+    ],
+    "spacing_m": 0.25,
+    "samples": 845,
+    "on_nav_samples": 638,
+    "reachable_on_nav_samples": 638,
+    "max_path_end_error": 9.536743199589637e-07,
+    "flowerbed": {
+      "name": "alc_flowerbed_009",
+      "position": [
+        -6,
+        10,
+        -5.55
+      ],
+      "collision_min": [
+        -6.85,
+        10,
+        -6.4
+      ],
+      "collision_max": [
+        -5.15,
+        10.66,
+        -4.7
+      ],
+      "untouched": true
+    },
+    "lamp": {
+      "name": "alc_lamp_004",
+      "position": [
+        -3,
+        10,
+        -7.6
+      ],
+      "untouched": true
+    },
+    "program_fix": "#886 retains collidable props when zoomed out; no isolated navigation component found around the reported flowerbed"
+  }
+}

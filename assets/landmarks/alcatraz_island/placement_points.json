@@ -73,7 +73,7 @@
       "asset": "alc_bench",
       "zone": "TerraceZone",
       "position": [
-        -3,
+        -6.0,
         3.25,
         6.6
       ],
@@ -227,7 +227,7 @@
       "asset": "alc_bench",
       "zone": "TerraceZone",
       "position": [
-        3,
+        4,
         5.5,
         2.1
       ],
@@ -337,7 +337,7 @@
       "asset": "alc_bench",
       "zone": "TerraceZone",
       "position": [
-        -3,
+        -6.0,
         7.75,
         -2.4
       ],
@@ -558,7 +558,7 @@
       "asset": "alc_bench",
       "zone": "SummitZone",
       "position": [
-        0,
+        -1.25,
         10,
         -5.05
       ],
@@ -11301,17 +11301,17 @@
       "asset": "alc_rail_straight",
       "zone": "SummitZone",
       "position": [
-        1.875,
+        2.5,
         10.0,
         -4.5
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.875,
+        0.25,
         1,
         1
       ],
@@ -11323,17 +11323,17 @@
       "asset": "alc_curb",
       "zone": "SummitZone",
       "position": [
-        1.875,
+        2.5,
         10.0,
         -4.5
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.875,
+        0.25,
         1,
         1
       ],
@@ -13105,17 +13105,17 @@
       "asset": "alc_rail_straight",
       "zone": "TerraceZone",
       "position": [
-        -4.875,
+        -5.25,
         7.75,
         -3.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.875,
+        0.5,
         1,
         1
       ],
@@ -13127,105 +13127,17 @@
       "asset": "alc_curb",
       "zone": "TerraceZone",
       "position": [
-        -4.875,
+        -5.25,
         7.75,
         -3.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.875,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_rail_straight_078",
-      "asset": "alc_rail_straight",
-      "zone": "TerraceZone",
-      "position": [
-        -1.175,
-        7.75,
-        -3.0
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.825,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_curb_081",
-      "asset": "alc_curb",
-      "zone": "TerraceZone",
-      "position": [
-        -1.175,
-        7.75,
-        -3.0
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.825,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_rail_straight_079",
-      "asset": "alc_rail_straight",
-      "zone": "TerraceZone",
-      "position": [
-        0.47499999999999964,
-        7.75,
-        -3.0
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.825,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_curb_082",
-      "asset": "alc_curb",
-      "zone": "TerraceZone",
-      "position": [
-        0.47499999999999964,
-        7.75,
-        -3.0
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.825,
+        0.5,
         1,
         1
       ],
@@ -13237,17 +13149,17 @@
       "asset": "alc_rail_straight",
       "zone": "TerraceZone",
       "position": [
-        2.125,
+        2.6,
         7.75,
         -3.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.825,
+        0.3500000000000001,
         1,
         1
       ],
@@ -13259,17 +13171,17 @@
       "asset": "alc_curb",
       "zone": "TerraceZone",
       "position": [
-        2.125,
+        2.6,
         7.75,
         -3.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.825,
+        0.3500000000000001,
         1,
         1
       ],
@@ -13897,17 +13809,17 @@
       "asset": "alc_rail_straight",
       "zone": "TerraceZone",
       "position": [
-        1.2916666666666679,
+        0.65,
         5.5,
         4.5
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.9916666666666667,
+        0.3499999999999994,
         1,
         1
       ],
@@ -13919,17 +13831,17 @@
       "asset": "alc_curb",
       "zone": "TerraceZone",
       "position": [
-        1.2916666666666679,
+        0.65,
         5.5,
         4.5
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.9916666666666667,
+        0.3499999999999994,
         1,
         1
       ],
@@ -14425,17 +14337,17 @@
       "asset": "alc_rail_straight",
       "zone": "TerraceZone",
       "position": [
-        -4.975000000000001,
+        -5.35,
         3.25,
         6.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.975,
+        0.6000000000000005,
         1,
         1
       ],
@@ -14447,105 +14359,17 @@
       "asset": "alc_curb",
       "zone": "TerraceZone",
       "position": [
-        -4.975000000000001,
+        -5.35,
         3.25,
         6.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.975,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_rail_straight_108",
-      "asset": "alc_rail_straight",
-      "zone": "TerraceZone",
-      "position": [
-        -1.25,
-        3.25,
-        6.0
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.75,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_curb_111",
-      "asset": "alc_curb",
-      "zone": "TerraceZone",
-      "position": [
-        -1.25,
-        3.25,
-        6.0
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.75,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_rail_straight_109",
-      "asset": "alc_rail_straight",
-      "zone": "TerraceZone",
-      "position": [
-        0.25,
-        3.25,
-        6.0
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.75,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_curb_112",
-      "asset": "alc_curb",
-      "zone": "TerraceZone",
-      "position": [
-        0.25,
-        3.25,
-        6.0
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.75,
+        0.6000000000000005,
         1,
         1
       ],
@@ -14557,17 +14381,17 @@
       "asset": "alc_rail_straight",
       "zone": "TerraceZone",
       "position": [
-        1.75,
+        2.375,
         3.25,
         6.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.75,
+        0.125,
         1,
         1
       ],
@@ -14579,17 +14403,17 @@
       "asset": "alc_curb",
       "zone": "TerraceZone",
       "position": [
-        1.75,
+        2.375,
         3.25,
         6.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.75,
+        0.125,
         1,
         1
       ],
@@ -15823,17 +15647,17 @@
       "asset": "alc_rail_straight",
       "zone": "TerraceZone",
       "position": [
-        -5.375,
+        -5.5583333,
         7.75,
         0.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.9916666666666667,
+        0.8083333333333336,
         1,
         1
       ],
@@ -15845,17 +15669,17 @@
       "asset": "alc_curb",
       "zone": "TerraceZone",
       "position": [
-        -5.375,
+        -5.5583333,
         7.75,
         0.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.9916666666666667,
+        0.8083333333333336,
         1,
         1
       ],
@@ -15867,17 +15691,17 @@
       "asset": "alc_rail_straight",
       "zone": "TerraceZone",
       "position": [
-        -3.3916666666666657,
+        -2.95,
         7.75,
         0.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.9916666666666667,
+        0.5500000000000005,
         1,
         1
       ],
@@ -15889,17 +15713,17 @@
       "asset": "alc_curb",
       "zone": "TerraceZone",
       "position": [
-        -3.3916666666666657,
+        -2.95,
         7.75,
         0.0
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.9916666666666667,
+        0.5500000000000005,
         1,
         1
       ],
@@ -16527,17 +16351,17 @@
       "asset": "alc_rail_straight",
       "zone": "TerraceZone",
       "position": [
-        -4.489583333333332,
+        -5.0833333,
         5.5,
         1.5
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.9270833333333334,
+        0.3333333333333326,
         1,
         1
       ],
@@ -16549,149 +16373,17 @@
       "asset": "alc_curb",
       "zone": "TerraceZone",
       "position": [
-        -4.489583333333332,
+        -5.0833333,
         5.5,
         1.5
       ],
       "rotation_degrees": [
         0,
-        0.0,
+        -0.0,
         0
       ],
       "scale": [
-        0.9270833333333334,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_rail_straight_151",
-      "asset": "alc_rail_straight",
-      "zone": "TerraceZone",
-      "position": [
-        -2.6354166666666643,
-        5.5,
-        1.5
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.9270833333333334,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_curb_157",
-      "asset": "alc_curb",
-      "zone": "TerraceZone",
-      "position": [
-        -2.6354166666666643,
-        5.5,
-        1.5
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.9270833333333334,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_rail_straight_152",
-      "asset": "alc_rail_straight",
-      "zone": "TerraceZone",
-      "position": [
-        -0.78125,
-        5.5,
-        1.5
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.9270833333333334,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_curb_158",
-      "asset": "alc_curb",
-      "zone": "TerraceZone",
-      "position": [
-        -0.78125,
-        5.5,
-        1.5
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.9270833333333334,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_rail_straight_153",
-      "asset": "alc_rail_straight",
-      "zone": "TerraceZone",
-      "position": [
-        1.0729166666666679,
-        5.5,
-        1.5
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.9270833333333334,
-        1,
-        1
-      ],
-      "owner": "赵云",
-      "placeholder": false
-    },
-    {
-      "name": "alc_curb_159",
-      "asset": "alc_curb",
-      "zone": "TerraceZone",
-      "position": [
-        1.0729166666666679,
-        5.5,
-        1.5
-      ],
-      "rotation_degrees": [
-        0,
-        0.0,
-        0
-      ],
-      "scale": [
-        0.9270833333333334,
+        0.3333333333333326,
         1,
         1
       ],
@@ -19370,6 +19062,2106 @@
       ],
       "slope_rise_m": 0,
       "owner": "赵云",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_north_alc_rail_straight_0",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        3.625,
+        5.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_north_alc_curb_0",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        3.625,
+        5.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_north_alc_rail_straight_1",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        4.375,
+        5.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_north_alc_curb_1",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        4.375,
+        5.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_north_alc_rail_straight_2",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        5.125,
+        5.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_north_alc_curb_2",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        5.125,
+        5.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_south_alc_rail_straight_0",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        3.625,
+        6.8
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_south_alc_curb_0",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        3.625,
+        6.8
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_south_alc_rail_straight_1",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        4.375,
+        6.8
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_south_alc_curb_1",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        4.375,
+        6.8
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_south_alc_rail_straight_2",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        5.125,
+        6.8
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_south_alc_curb_2",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        5.125,
+        6.8
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_lower_west_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        -4.86,
+        3.25,
+        6.79
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_lower_east_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        -3.39,
+        3.25,
+        6.79
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_lower_alc_rail_straight_end",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -4.75,
+        3.25,
+        5.9
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.8999999999999999,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_lower_alc_curb_end",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -4.75,
+        3.25,
+        5.9
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.8999999999999999,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_upper_west_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        0.89,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_upper_east_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        2.36,
+        5.5,
+        4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_upper_alc_rail_straight_lip",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        1.625,
+        5.5,
+        6.8
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_upper_alc_curb_lip",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        1.625,
+        5.5,
+        6.8
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_upper_alc_rail_straight_end",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        2.25,
+        5.5,
+        5.525
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.275,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid5_upper_alc_curb_end",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        2.25,
+        5.5,
+        5.525
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.275,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_north_alc_rail_straight_0",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        7.375,
+        0.5
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_north_alc_curb_0",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        7.375,
+        0.5
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_north_alc_rail_straight_1",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        6.625,
+        0.5
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_north_alc_curb_1",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        6.625,
+        0.5
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_north_alc_rail_straight_2",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        5.875,
+        0.5
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_north_alc_curb_2",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        5.875,
+        0.5
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_south_alc_rail_straight_0",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        7.375,
+        2.3
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_south_alc_curb_0",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        7.375,
+        2.3
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_south_alc_rail_straight_1",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        6.625,
+        2.3
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_south_alc_curb_1",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        6.625,
+        2.3
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_south_alc_rail_straight_2",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        5.875,
+        2.3
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_south_alc_curb_2",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        5.875,
+        2.3
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          -0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": -0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_lower_west_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        0.89,
+        5.5,
+        2.29
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_lower_east_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        2.36,
+        5.5,
+        2.29
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_lower_alc_rail_straight_end",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        2.25,
+        5.5,
+        1.4
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.8999999999999999,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_lower_alc_curb_end",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        2.25,
+        5.5,
+        1.4
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.8999999999999999,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_upper_west_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        -4.86,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_upper_east_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        -3.39,
+        7.75,
+        0.0
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_upper_alc_rail_straight_lip",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -4.125,
+        7.75,
+        2.3
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_upper_alc_curb_lip",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -4.125,
+        7.75,
+        2.3
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_upper_alc_rail_straight_end",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -4.75,
+        7.75,
+        1.025
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.275,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid6_upper_alc_curb_end",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -4.75,
+        7.75,
+        1.025
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.275,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_north_alc_rail_straight_0",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        8.125,
+        -4.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_north_alc_curb_0",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        8.125,
+        -4.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_north_alc_rail_straight_1",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        8.875,
+        -4.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_north_alc_curb_1",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        8.875,
+        -4.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_north_alc_rail_straight_2",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        9.625,
+        -4.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_north_alc_curb_2",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        9.625,
+        -4.0
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_south_alc_rail_straight_0",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        8.125,
+        -2.2
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_south_alc_curb_0",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -2.75,
+        8.125,
+        -2.2
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_south_alc_rail_straight_1",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        8.875,
+        -2.2
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_south_alc_curb_1",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -1.25,
+        8.875,
+        -2.2
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_south_alc_rail_straight_2",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        9.625,
+        -2.2
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_south_alc_curb_2",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        0.25,
+        9.625,
+        -2.2
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.75,
+        1,
+        1
+      ],
+      "basis_columns": [
+        [
+          0.75,
+          0.375,
+          0.0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -0.0,
+          0,
+          1.0
+        ]
+      ],
+      "slope_rise_m": 0.75,
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_lower_west_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        -4.86,
+        7.75,
+        -2.21
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_lower_east_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "TerraceZone",
+      "position": [
+        -3.39,
+        7.75,
+        -2.21
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_lower_alc_rail_straight_end",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        -4.75,
+        7.75,
+        -3.1
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.8999999999999999,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_lower_alc_curb_end",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        -4.75,
+        7.75,
+        -3.1
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        0.8999999999999999,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_upper_west_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "SummitZone",
+      "position": [
+        0.89,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_upper_east_endpost",
+      "asset": "alc_railing_endpost",
+      "zone": "SummitZone",
+      "position": [
+        2.36,
+        10.0,
+        -4.5
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_upper_alc_rail_straight_lip",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        1.625,
+        10.0,
+        -2.2
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_upper_alc_curb_lip",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        1.625,
+        10.0,
+        -2.2
+      ],
+      "rotation_degrees": [
+        0,
+        -0.0,
+        0
+      ],
+      "scale": [
+        0.625,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_upper_alc_rail_straight_end",
+      "asset": "alc_rail_straight",
+      "zone": "TerraceZone",
+      "position": [
+        2.25,
+        10.0,
+        -3.475
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.275,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
+      "placeholder": false
+    },
+    {
+      "name": "mid7_upper_alc_curb_end",
+      "asset": "alc_curb",
+      "zone": "TerraceZone",
+      "position": [
+        2.25,
+        10.0,
+        -3.475
+      ],
+      "rotation_degrees": [
+        0,
+        -90.0,
+        0
+      ],
+      "scale": [
+        1.275,
+        1,
+        1
+      ],
+      "owner": "马可波罗",
       "placeholder": false
     }
   ]
