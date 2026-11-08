@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-11-08" name="report_2" tests="6" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="test_landmark_p0_visit" package="tests/landmark" timestamp="2026-11-08T12:55:12" hostname="localhost" tests="6" failures="0" errors="0" skipped="0" flaky="0" time="1.309">
+		<testcase name="test_only_the_two_landmarks_have_a_scene" classname="test_landmark_p0_visit" time="0.004">
+		</testcase>
+		<testcase name="test_args_name_the_place_for_the_chip_and_the_cover" classname="test_landmark_p0_visit" time="0.003">
+		</testcase>
+		<testcase name="test_a_visit_keeps_the_way_back" classname="test_landmark_p0_visit" time="0.356">
+		</testcase>
+		<testcase name="test_a_tap_goes_through_the_boundary_walls" classname="test_landmark_p0_visit" time="0.282">
+		</testcase>
+		<testcase name="test_the_stick_walks" classname="test_landmark_p0_visit" time="0.353">
+		</testcase>
+		<testcase name="test_the_player_starts_clear_of_the_door" classname="test_landmark_p0_visit" time="0.290">
+		</testcase>
+	</testsuite>
+</testsuites>

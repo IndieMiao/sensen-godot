@@ -1,0 +1,37 @@
+{
+  "art_base": "edd184d65",
+  "runtime_base": "cf82ca0ac",
+  "protected_scripts": {
+    "scenes/landmark/alcatraz_island.gd": "a4a66de68926889f63a6c5c62e74dc52c86b0e40a59f60585a3e188f680c4fdb",
+    "scenes/landmark/griffith_observatory.gd": "6338307264cd0cdc219f2d14cc424497b0e0b358f8d255e2315ba47887421d43"
+  },
+  "untouched_nonrail_placements": 400,
+  "unchanged_contract_keys": [
+    "anchors",
+    "spawn",
+    "exit",
+    "camera",
+    "boundaries",
+    "lod_groups",
+    "dimensions_m"
+  ],
+  "changed_meshes": [
+    {
+      "file": "alc_ground_terraces.glb",
+      "kind": "modified"
+    },
+    {
+      "file": "alc_railing_endpost.glb",
+      "kind": "new"
+    },
+    {
+      "file": "alc_mid_stairs.glb",
+      "kind": "new"
+    },
+    {
+      "file": "alc_ground_summit.glb",
+      "kind": "modified"
+    }
+  ],
+  "layout_sha256": "5bdc42e7de9a50efe8838eca875c8b90da299c5769c7b343c0ab753e1bf71aa6"
+}

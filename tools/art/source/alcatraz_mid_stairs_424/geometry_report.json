@@ -1,0 +1,169 @@
+{
+  "cutters": [
+    {
+      "name": "mid5_flight",
+      "min": [
+        -3.5,
+        3.1,
+        5.0
+      ],
+      "max": [
+        1.0,
+        5.53,
+        6.8
+      ]
+    },
+    {
+      "name": "mid5_lower",
+      "min": [
+        -4.75,
+        3.1,
+        5.0
+      ],
+      "max": [
+        -3.5,
+        5.53,
+        6.8
+      ]
+    },
+    {
+      "name": "mid5_upper",
+      "min": [
+        1.0,
+        3.1,
+        4.25
+      ],
+      "max": [
+        2.25,
+        5.53,
+        6.8
+      ]
+    },
+    {
+      "name": "mid6_flight",
+      "min": [
+        -3.5,
+        5.35,
+        0.5
+      ],
+      "max": [
+        1.0,
+        7.78,
+        2.3
+      ]
+    },
+    {
+      "name": "mid6_lower",
+      "min": [
+        1.0,
+        5.35,
+        0.5
+      ],
+      "max": [
+        2.25,
+        7.78,
+        2.3
+      ]
+    },
+    {
+      "name": "mid6_upper",
+      "min": [
+        -4.75,
+        5.35,
+        -0.25
+      ],
+      "max": [
+        -3.5,
+        7.78,
+        2.3
+      ]
+    },
+    {
+      "name": "mid7_flight",
+      "min": [
+        -3.5,
+        7.6,
+        -4.0
+      ],
+      "max": [
+        1.0,
+        10.03,
+        -2.2
+      ]
+    },
+    {
+      "name": "mid7_lower",
+      "min": [
+        -4.75,
+        7.6,
+        -4.0
+      ],
+      "max": [
+        -3.5,
+        10.03,
+        -2.2
+      ]
+    },
+    {
+      "name": "mid7_upper",
+      "min": [
+        1.0,
+        7.6,
+        -4.75
+      ],
+      "max": [
+        2.25,
+        10.03,
+        -2.2
+      ]
+    }
+  ],
+  "ground": {
+    "alc_ground_terraces": {
+      "source": "edd184d65",
+      "input_triangles": 3800,
+      "cut_triangles": 133,
+      "output_triangles": 4065,
+      "vertex_colors_preserved": true,
+      "uv_preserved": true
+    },
+    "alc_ground_summit": {
+      "source": "edd184d65",
+      "input_triangles": 1062,
+      "cut_triangles": 32,
+      "output_triangles": 1130,
+      "vertex_colors_preserved": true,
+      "uv_preserved": true
+    }
+  },
+  "assets": {
+    "alc_mid_stairs": {
+      "triangles": 612,
+      "bytes": 43992,
+      "sha256": "8878e88cdb5eee0a473f287cfecde0ecf36340bd80908bc6bd8bda7f3397146d",
+      "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
+      "author": "\u9a6c\u53ef\u6ce2\u7f57"
+    },
+    "alc_railing_endpost": {
+      "triangles": 132,
+      "bytes": 13640,
+      "sha256": "5fc5858f151a9d730844f4a2c88d91d9357124b4fbcbcabaf75292beeb99441d",
+      "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
+      "author": "\u9a6c\u53ef\u6ce2\u7f57"
+    },
+    "alc_ground_terraces": {
+      "triangles": 4065,
+      "bytes": 513520,
+      "sha256": "ebd4f5154e0744206dbcb969d839772f23c4e0fe12368d8edcba90200f04f52a",
+      "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
+      "author": "\u9a6c\u53ef\u6ce2\u7f57"
+    },
+    "alc_ground_summit": {
+      "triangles": 1130,
+      "bytes": 143712,
+      "sha256": "15d58ae8e058d1bedf432367a9db0543b951ca700abd37f3f2a1b09954b54b75",
+      "source": "tools/art/source/alcatraz_mid_stairs_424/alcatraz_mid_stairs.blend",
+      "author": "\u9a6c\u53ef\u6ce2\u7f57"
+    }
+  }
+}

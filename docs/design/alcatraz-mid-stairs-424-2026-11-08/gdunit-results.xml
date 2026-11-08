@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-11-08" name="report_3" tests="37" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="test_landmark_p0_visit" package="tests/landmark" timestamp="2026-11-08T13:18:58" hostname="localhost" tests="6" failures="0" errors="0" skipped="0" flaky="0" time="1.381">
+		<testcase name="test_only_the_two_landmarks_have_a_scene" classname="test_landmark_p0_visit" time="0.003">
+		</testcase>
+		<testcase name="test_args_name_the_place_for_the_chip_and_the_cover" classname="test_landmark_p0_visit" time="0.004">
+		</testcase>
+		<testcase name="test_a_visit_keeps_the_way_back" classname="test_landmark_p0_visit" time="0.383">
+		</testcase>
+		<testcase name="test_a_tap_goes_through_the_boundary_walls" classname="test_landmark_p0_visit" time="0.314">
+		</testcase>
+		<testcase name="test_the_stick_walks" classname="test_landmark_p0_visit" time="0.319">
+		</testcase>
+		<testcase name="test_the_player_starts_clear_of_the_door" classname="test_landmark_p0_visit" time="0.335">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="test_global_landmarks" package="tests/map" timestamp="2026-11-08T13:18:59" hostname="localhost" tests="5" failures="0" errors="0" skipped="0" flaky="0" time="0.037">
+		<testcase name="test_catalog_has_art_names_and_valid_coordinates" classname="test_global_landmarks" time="0.009">
+		</testcase>
+		<testcase name="test_san_francisco_shows_its_four_landmarks" classname="test_global_landmarks" time="0.004">
+		</testcase>
+		<testcase name="test_city_sights_stay_local_while_parks_reach_nearby_towns" classname="test_global_landmarks" time="0.003">
+		</testcase>
+		<testcase name="test_los_angeles_keeps_its_own_landmarks_without_duplicates" classname="test_global_landmarks" time="0.004">
+		</testcase>
+		<testcase name="test_distance_is_roughly_right" classname="test_global_landmarks" time="0.003">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="test_city_map" package="tests/map" timestamp="2026-11-08T13:18:59" hostname="localhost" tests="12" failures="0" errors="0" skipped="0" flaky="0" time="3.404">
+		<testcase name="test_poi_categories_do_not_guess_cuisine_from_a_name" classname="test_city_map" time="0.003">
+		</testcase>
+		<testcase name="test_poi_art_covers_more_provider_categories" classname="test_city_map" time="0.003">
+		</testcase>
+		<testcase name="test_provider_results_validate_coordinates_and_deduplicate" classname="test_city_map" time="0.004">
+		</testcase>
+		<testcase name="test_landmark_coordinates_are_independent_of_player_save" classname="test_city_map" time="0.004">
+		</testcase>
+		<testcase name="test_residents_follow_existing_unlock_rules" classname="test_city_map" time="0.003">
+		</testcase>
+		<testcase name="test_city_zoom_does_not_change_home" classname="test_city_map" time="0.805">
+		</testcase>
+		<testcase name="test_place_card_fits_above_navigation_and_refreshed_list_keeps_ids" classname="test_city_map" time="0.321">
+		</testcase>
+		<testcase name="test_city_has_no_neighbour_list_or_jump_entry_at_any_size" classname="test_city_map" time="0.497">
+		</testcase>
+		<testcase name="test_shanghai_uses_the_same_city_map_framework" classname="test_city_map" time="0.872">
+		</testcase>
+		<testcase name="test_landmarks_follow_the_map_center_beyond_the_active_city" classname="test_city_map" time="0.290">
+		</testcase>
+		<testcase name="test_place_card_names_the_city_under_the_place" classname="test_city_map" time="0.278">
+		</testcase>
+		<testcase name="test_ponds_follow_the_map_center_by_cells" classname="test_city_map" time="0.288">
+		</testcase>
+	</testsuite>
+	<testsuite id="3" name="test_p0_map_city" package="tests/p0" timestamp="2026-11-08T13:19:03" hostname="localhost" tests="3" failures="0" errors="0" skipped="0" flaky="0" time="0.354">
+		<testcase name="test_the_home_city_is_san_francisco" classname="test_p0_map_city" time="0.014">
+		</testcase>
+		<testcase name="test_the_map_opens_on_the_homestead_in_san_francisco" classname="test_p0_map_city" time="0.208">
+		</testcase>
+		<testcase name="test_the_first_sessions_opening_view_holds_home_fern_pond_and_the_tackle_shop" classname="test_p0_map_city" time="0.121">
+		</testcase>
+	</testsuite>
+	<testsuite id="4" name="test_p1_fog_cards" package="tests/p0" timestamp="2026-11-08T13:19:03" hostname="localhost" tests="11" failures="0" errors="0" skipped="0" flaky="0" time="1.850">
+		<testcase name="test_1_a_clean_save_opens_the_silhouette_card_from_every_place_pin" classname="test_p1_fog_cards" time="0.204">
+		</testcase>
+		<testcase name="test_2_a_pass_without_a_visit_opens_the_silhouette_card" classname="test_p1_fog_cards" time="0.126">
+		</testcase>
+		<testcase name="test_3_visited_with_a_pass_opens_the_place_card" classname="test_p1_fog_cards" time="0.124">
+		</testcase>
+		<testcase name="test_4_visited_without_a_pass_opens_the_travel_card" classname="test_p1_fog_cards" time="0.114">
+		</testcase>
+		<testcase name="test_5_show_on_map_into_the_fog_opens_the_silhouette_card" classname="test_p1_fog_cards" time="0.120">
+		</testcase>
+		<testcase name="test_6_san_franciscos_written_places_are_its_own_with_a_home_elsewhere" classname="test_p1_fog_cards" time="0.120">
+		</testcase>
+		<testcase name="test_7_the_pin_is_not_kept_selected_by_a_citys_card" classname="test_p1_fog_cards" time="0.575">
+		</testcase>
+		<testcase name="test_8_show_local_pond_lands_on_a_visited_citys_pond" classname="test_p1_fog_cards" time="0.099">
+		</testcase>
+		<testcase name="test_9_no_poi_in_a_city_not_visited" classname="test_p1_fog_cards" time="0.094">
+		</testcase>
+		<testcase name="test_a_landmark_card_says_go_only_with_a_scene" classname="test_p1_fog_cards" time="0.122">
+		</testcase>
+		<testcase name="test_b_a_landmarks_go_is_a_ponds_go" classname="test_p1_fog_cards" time="0.119">
+		</testcase>
+	</testsuite>
+</testsuites>
