@@ -1110,14 +1110,16 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 		"landed":
 			var fid := str(ev.fish)
 			var r := int(ev.rarity)
+			var qty := maxi(1, int(ev.get("qty", 1)))   # Twin Catch (q(300)): a cast under it lands 2
 			if last_first_catch_xp > 0:
 				var first := last_first_catch_xp
 				var extras := last_catch_extras.duplicate()
+				extras["qty"] = qty
 				var card := func(): ui.queue_card(func(): ui.show_catch(fid, r, first, extras))
 				if card_after > 0.0: get_tree().create_timer(card_after).timeout.connect(card)
 				else: card.call()
 			else:   # a repeat species: no card, `Pond Crucian ×1` beside its +XP (§4.8.6) — one group, Energy → XP → items
-				ui.queue_floats([{kind = "item", key = "catch:" + fid, text = "%s ×1" % P0Logic.item_name(v, fid),
+				ui.queue_floats([{kind = "item", key = "catch:" + fid, text = "%s ×%d" % [P0Logic.item_name(v, fid), qty],
 					tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(fid)}], where)
 		"broke_free":
 			var gone: Dictionary = ev
@@ -2100,7 +2102,9 @@ func _dev_shot(dt: float) -> void:
 				ui.set_view(session.current())
 			"resprofile": ui.open_resident_profile(step[1] if step.size() > 1 else ui._resident)   # resprofile[:res_old_kai]
 			# SGODOT-233 result moments, shown directly: catchcard:<fish>, gotaway:<fish>:level|rod
-			"catchcard": ui.show_catch(step[1], int(P0Logic.item(session.current(), step[1]).get("rarity", 1)), 15, {"energy": 20})
+			"catchcard":   # catchcard:<fish>[:qty] — the Caught! card; qty 2 as Twin Catch lands it (q(300) shots)
+				ui.show_catch(step[1], int(P0Logic.item(session.current(), step[1]).get("rarity", 1)), 15,
+					{"energy": 20, "qty": int(step[2]) if step.size() > 2 else 1})
 			"gotaway":
 				var gone := {"fish": step[1], "rarity": int(P0Logic.item(session.current(), step[1]).get("rarity", 3)), "refund": 5, "protected_left": 8}
 				if step.size() < 3 or step[2] == "level": gone["need_level"] = 4

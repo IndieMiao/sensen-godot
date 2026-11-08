@@ -977,10 +977,35 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
 		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", P0Inbox.badge(view))), "buff": {},
+		"buffs": buff_rings(view),
 		"today_dots": today_dots(rows),
 		"today_key": today_chip_key(rows),
 	}
 	if ctx.has("place"): out["place"] = ctx.place
+	return out
+
+## The priest's buffs (q(300); 不知火舞's spec v1.1): fish first, then farm — their names, their HUD icons.
+const BUFF_ORDER := ["fish", "farm"]
+const BUFF_NAMES := {"fish": "Twin Catch", "farm": "Swift Growth"}
+const BUFF_ICONS := {"fish": "fish", "farm": "field"}
+
+## The HUD's buff rings from view.buffs [{id, left ms}] (projected each frame): fish left of farm, each its icon, the
+## time left `18:20` and the share of the full time (content buffs.minutes) its arc shows. None on: [].
+static func buff_rings(view: Dictionary) -> Array:
+	var full := float(content().get("buffs", {}).get("minutes", 20)) * 60000.0
+	var left := buffs_left(view)
+	var out: Array = []
+	for id in BUFF_ORDER:
+		if not left.has(id): continue
+		out.append({"id": id, "icon": icon(BUFF_ICONS[id]), "remaining": duration(left[id]),
+			"progress": clampf(left[id] / full, 0.0, 1.0)})
+	return out
+
+## view.buffs as {id: ms left}, the ones still on.
+static func buffs_left(view: Dictionary) -> Dictionary:
+	var out := {}
+	for b in view.get("buffs", []):
+		if b is Dictionary and float(b.get("left", 0)) > 0.0: out[str(b.get("id", ""))] = float(b.left)
 	return out
 
 ## Location chip data from a scene's "City · Space" text (P0 is always the home city).
