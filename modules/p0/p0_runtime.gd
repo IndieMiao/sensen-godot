@@ -2156,6 +2156,23 @@ func _dev_shot(dt: float) -> void:
 					var m: Marker3D = world.call("anchor", step[1])
 					world.actor.teleport(m.global_position)
 					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
+			"at":   # at:x:z — the player stood at that world point (the stick-slide recordings: up to a wall, then walk:)
+				if is_instance_valid(world) and world.get("actor") is P0Actor:
+					(world.actor as P0Actor).teleport(Vector3(float(step[1]), (world.actor as P0Actor).position.y, float(step[2])))
+			"gridmap":   # the world's walk grid, north row first ('#' blocked, '@' the player), with its cell size and origin
+				if is_instance_valid(world) and world.get("actor") is P0Actor:
+					var mv := (world.actor as P0Actor).mover
+					var me := mv.cell()
+					var cam := get_viewport().get_camera_3d()
+					print("P0_GRIDMAP cell_m=%s origin=%s size=%s player=%s at=%s cam_right=%s cam_back=%s" % [mv.bp.cell_m,
+						mv.bp.grid_origin, mv.bp.grid, me, mv.position, cam.global_basis.x if cam else Vector3.ZERO,
+						cam.global_basis.z if cam else Vector3.ZERO])
+					for j in range(mv.bp.grid.y - 1, -1, -1):
+						var row := ""
+						for i in mv.bp.grid.x:
+							var c := mv.bp.grid_origin + Vector2i(i, j)
+							row += "@" if c == me else ("." if mv.grid.trace_walkable(mv.bp.cell_to_world(c), mv.bp.cell_to_world(c)) else "#")
+						print("P0_GRIDMAP %3d %s" % [mv.bp.grid_origin.y + j, row])
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|sceneslow|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
