@@ -423,43 +423,71 @@ func test_go_back_and_back_leave_for_where_the_player_came_from() -> void:
 # ---------------------------------------------------------------- q(290) the splash (不知火舞's spec v1, 302 c9986a33)
 
 ## A screen on a phone-sized host (it fills its parent).
-func _screen_on(size: Vector2, status := 0.0) -> P0SysScreen:
+func _screen_on(size: Vector2) -> P0SysScreen:
 	var host: Control = auto_free(Control.new())
 	host.size = size
 	add_child(host)
 	var s := P0SysScreen.new()
-	s.status_top = status
 	host.add_child(s)
 	return s
 
-## One formula, her six measured screens: the art's bottom on the screen's, centred; covering while the wordmark's top
-## (row 85 on the v2 art) stays 8 under the status bar (20:9, an iPhone's 19.5:9, 21:9), else fitted to it (18:9, 16:9, an iPad).
-func test_the_splash_covers_or_fits_as_the_six_measured_screens() -> void:
-	for c in [[Vector2(360, 800), 24.0, 0.985, false], [Vector2(390, 844), 47.0, 1.040, false], [Vector2(360, 840), 24.0, 1.034, false],
-			[Vector2(360, 720), 24.0, 0.946, true], [Vector2(360, 640), 24.0, 0.836, true], [Vector2(600, 800), 24.0, 1.056, true]]:
-		var l := P0SysScreen.splash_layout(c[0], c[1])
+## 420 (spec v1.1 §2): the splash keeps the screen's height, centred, at her five ratios (21:9-ish 0.43, the art's
+## 0.4618, 18:9, 16:9, 3:4) — the art's bottom on the screen's, the wordmark's top (row 85) at least 8 under the status
+## bar (24 on Android, 47 on an iPhone).
+func test_the_splash_keeps_the_screens_height_centred() -> void:
+	for c in [[Vector2(360, 837.2), 47.0], [Vector2(375, 812), 47.0], [Vector2(360, 720), 24.0], [Vector2(360, 640), 24.0],
+			[Vector2(600, 800), 24.0]]:
 		var screen: Vector2 = c[0]
-		assert_float(float(l.scale)).override_failure_message("%s" % screen).is_equal_approx(c[2], 0.001)
-		assert_bool(bool(l.fit)).override_failure_message("%s" % screen).is_equal(c[3])
+		var l := P0SysScreen.splash_layout(screen)
 		var s := float(l.scale)
 		var o: Vector2 = l.origin
-		assert_float(o.y + 812.0 * s).is_equal_approx(screen.y, 0.01)   # its bottom on the screen's
-		assert_float(o.x * 2.0 + 375.0 * s).is_equal_approx(screen.x, 0.01)   # centred
-		assert_bool(o.y + P0SysScreen.SPLASH_MARK_TOP * s >= float(c[1]) + 8.0 - 0.01).is_true()   # the wordmark under the status bar
-	# 21:9 cuts 14 off each side; 16:9 shows 23 of the blurred copy each side
-	assert_float(roundf(-float(P0SysScreen.splash_layout(Vector2(360, 840), 24.0).origin.x))).is_equal(14.0)
-	assert_float(roundf(float(P0SysScreen.splash_layout(Vector2(360, 640), 24.0).origin.x))).is_equal(23.0)
+		var why := "%s" % screen
+		assert_float(s).override_failure_message(why).is_equal_approx(screen.y / 812.0, 0.0001)
+		assert_float(o.y).override_failure_message(why).is_equal(0.0)
+		assert_float(o.y + P0SysScreen.SPLASH_SIZE.y * s).override_failure_message(why).is_equal_approx(screen.y, 0.01)   # the art's bottom too
+		assert_float(o.x * 2.0 + P0SysScreen.SPLASH_SIZE.x * s).override_failure_message(why).is_equal_approx(screen.x, 0.01)   # centred
+		assert_bool(o.y + P0SysScreen.SPLASH_MARK_TOP * s >= float(c[1]) + 8.0).override_failure_message(why).is_true()
+	# The art (747 of the 1214, at x 233): 21:9 cuts 14 off each side of it; 16:9 shows 32 of the blurred sides each side
+	var art_left := func(screen: Vector2) -> float:
+		var l := P0SysScreen.splash_layout(screen)
+		return float((l.origin as Vector2).x) + 233.0 / 1618.0 * 812.0 * float(l.scale)
+	assert_float(roundf(art_left.call(Vector2(360, 840)))).is_equal(-14.0)
+	assert_float(roundf(art_left.call(Vector2(360, 640)))).is_equal(32.0)
+
+## The boot splash draws the same file the same way: project.godot's image is this script's, Keep Height (3), and the
+## engine's rect (RenderingServerTypes::get_splash_stretched_screen_rect, in the window's pixels) is this layout's at the
+## content scale — so the boot splash hands over to the launch cover pixel for pixel.
+func test_the_boot_splash_is_the_same_image_laid_out_the_same() -> void:
+	assert_bool(ProjectSettings.get_setting("application/boot_splash/show_image")).is_true()
+	assert_int(ProjectSettings.get_setting("application/boot_splash/stretch_mode")).is_equal(3)
+	assert_str(ProjectSettings.get_setting("application/boot_splash/image")).is_equal(P0SysScreen.SPLASH.resource_path)
+	assert_str((ProjectSettings.get_setting("application/boot_splash/bg_color") as Color).to_html(false)).is_equal(
+		P0SysScreen.SPLASH_SKY.to_html(false))
+	var img := Vector2(P0SysScreen.SPLASH.get_size())
+	assert_vector(img).is_equal(Vector2(1214, 1618))
+	assert_float(P0SysScreen.SPLASH_SIZE.x / P0SysScreen.SPLASH_SIZE.y).is_equal_approx(img.x / img.y, 0.000001)
+	for c in [[Vector2(1080, 2400), 3.0], [Vector2(1170, 2532), 3.0], [Vector2(720, 1280), 2.0], [Vector2(1080, 2160), 3.0]]:
+		var window: Vector2 = c[0]
+		var k: float = c[1]
+		var engine := Rect2(Vector2((window.x - img.x * window.y / img.y) / 2.0, 0.0), Vector2(img.x * window.y / img.y, window.y))
+		var l := P0SysScreen.splash_layout(window / k)
+		var ours := Rect2((l.origin as Vector2) * k, P0SysScreen.SPLASH_SIZE * float(l.scale) * k)
+		assert_vector(ours.position).override_failure_message("%s" % window).is_equal_approx(engine.position, Vector2.ONE * 0.01)
+		assert_vector(ours.size).override_failure_message("%s" % window).is_equal_approx(engine.size, Vector2.ONE * 0.01)
 
 ## The launch cover is the splash on the sky colour, no farm backdrop and no wordmark over it; Can't connect is the same
 ## art under the scrim with its card; maintenance keeps its backdrop and wordmark (not in q(290)).
 func test_the_launch_and_cant_connect_show_the_splash_and_nothing_over_it() -> void:
-	var s := _screen_on(Vector2(360, 720), 24.0)   # an 18:9: fitted, the blurred sides showing
+	var s := _screen_on(Vector2(360, 720))   # an 18:9: the blurred sides showing
 	s.show_kind(K.LAUNCH)
+	assert_float(s._splash.modulate.a).is_equal(1.0)   # whole from its first frame (420): no fade in from the sky
+	assert_float(s.modulate.a).is_equal(1.0)
 	await get_tree().process_frame
 	assert_that(s._bg.color).is_equal(P0SysScreen.SPLASH_SKY)
-	assert_that([s._splash.visible, s._splash_blur.visible, s._art.visible, s._mark.visible, s._scrim.visible, s._slow_card.visible]).is_equal(
-		[true, true, false, false, false, false])
-	assert_vector(s._splash.size).is_equal((P0SysScreen.SPLASH_SIZE * (688.0 / 727.0)).round())
+	assert_that([s._splash.visible, s._art.visible, s._mark.visible, s._scrim.visible, s._slow_card.visible]).is_equal(
+		[true, false, false, false, false])
+	assert_vector(s._splash.size).is_equal_approx(P0SysScreen.SPLASH_SIZE * (720.0 / 812.0), Vector2.ONE * 0.01)
+	assert_float(s._splash.get_rect().get_center().x).is_equal_approx(180.0, 0.01)
 	s.show_kind(K.FAIL)
 	await get_tree().process_frame
 	assert_that([s._splash.visible, s._mark.visible, s._art.visible, s._scrim.visible, s.card.visible]).is_equal([true, false, false, true, true])
@@ -467,10 +495,6 @@ func test_the_launch_and_cant_connect_show_the_splash_and_nothing_over_it() -> v
 	await get_tree().process_frame
 	assert_that([s._splash.visible, s._mark.visible, s._art.visible]).is_equal([false, true, true])
 	assert_that(s._bg.color).is_equal(UiTokens.COLOR_SURFACE)
-	(s.get_parent() as Control).size = Vector2(360, 800)   # a 20:9 covers: no blurred sides
-	s.show_kind(K.LAUNCH)
-	await get_tree().process_frame
-	assert_bool(s._splash_blur.visible).is_false()
 
 ## 8 s in: the spinner and `Taking longer than usual…` on a 90 % surface card, centred, ending 16 above the art's small
 ## Gensen mark (row 752) — not over a face.
@@ -479,7 +503,7 @@ func test_taking_longer_sits_on_a_card_above_the_arts_gensen_mark() -> void:
 	s.show_kind(K.LAUNCH)
 	s.taking_longer()
 	await get_tree().process_frame
-	var l := P0SysScreen.splash_layout(s.size, 0.0)
+	var l := P0SysScreen.splash_layout(s.size)
 	var card := s._slow_card.get_rect()
 	assert_bool(s._slow_card.visible).is_true()
 	assert_float(card.end.y).is_equal_approx(roundf(float((l.origin as Vector2).y) + 752.0 * float(l.scale) - 16.0), 1.0)
@@ -506,7 +530,7 @@ func test_the_splash_fades_into_the_scene_after_its_least_time() -> void:
 
 ## iOS 0.2.25 crashed at launch (蒙恬's stack: Viewport::get_visible_rect on a null viewport): the launch cover comes from
 ## a deferred call before the UI is in the tree, and safe_top() read its viewport. Out of the tree it is 0 and nothing is
-## read; the screen takes the real status bar once it is in the tree.
+## read; the cover (laid out by the screen's height alone since 420) shows once it is in the tree.
 func test_the_launch_cover_before_the_ui_is_in_the_tree_reads_no_viewport() -> void:
 	OS.set_environment("P0_DEV_SAFE_TOP", "24")
 	var ui := P0Ui.new()
@@ -514,9 +538,9 @@ func test_the_launch_cover_before_the_ui_is_in_the_tree_reads_no_viewport() -> v
 	assert_float(ui.safe_top()).is_equal(0.0)   # out of the tree: no viewport read
 	assert_float(ui.safe_bottom()).is_equal(0.0)
 	ui.show_screen(K.LAUNCH)
-	assert_float(ui.screen().status_top).is_equal(0.0)
 	add_child(auto_free(ui))
 	await get_tree().process_frame
 	assert_float(ui.safe_top()).is_equal(24.0)
-	assert_float(ui.screen().status_top).is_equal(24.0)   # read again once the screen is in the tree
+	assert_int(ui.screen_kind()).is_equal(K.LAUNCH)
+	assert_bool(ui.screen()._splash.visible).is_true()
 	OS.unset_environment("P0_DEV_SAFE_TOP")
