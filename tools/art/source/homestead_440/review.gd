@@ -7,6 +7,8 @@ var vp:SubViewport
 var out: String
 var smoke:MultiMeshInstance3D
 var addons:Array[MeshInstance3D]=[]
+var active_level=0
+var active_variant=""
 var report={"checks":[],"captures":[]}
 const Art=preload("res://modules/farm/farm_art.gd")
 func _ready():run.call_deferred()
@@ -25,9 +27,11 @@ func capture(name,check_signs=true):
  for node in addons:
   if node.visible:parts.append(node)
  var min_y=INF;var at=Vector2.ZERO;var height=0.0
+ var screen_min=Vector2(INF,INF);var screen_max=Vector2(-INF,-INF)
  for node in parts:
   for p in node.mesh.get_faces():
    var screen=farm.cam.unproject_position(node.to_global(p))
+   screen_min=screen_min.min(screen);screen_max=screen_max.max(screen)
    height=max(height,node.to_global(p).y-farm._house.y)
    if screen.y<min_y:min_y=screen.y;at=screen
  var smoke_min_y=INF
@@ -54,7 +58,17 @@ func capture(name,check_signs=true):
  if name.ends_with("default"):
   check(min_y>=150,name+" model top below y150 limit")
   check(smoke_min_y>=150,name+" smoke full-cycle bound below y150 limit")
- report.captures.append({"name":name,"highest_pixel":[at.x,at.y],"smoke_full_cycle_top_bound_px":smoke_min_y,"model_height_m":height,"camera_size":farm.cam.size,"camera_position":str(farm.cam.position),"camera_rotation":str(farm.cam.rotation_degrees),"signs":sign_views})
+  check(screen_min.x>=0 and screen_max.x<=360 and screen_max.y<=800,name+" complete model inside viewport")
+ var component_boxes={}
+ for kind in ["porch","kitchen_wing"]:
+  if active_level==0 or (kind=="kitchen_wing" and active_level==5):continue
+  var bounds=Art.mesh_for(kind+"_"+active_variant).get_aabb()
+  var corners=[]
+  for i in 8:
+   var point=farm.cam.unproject_position(farm._house+bounds.get_endpoint(i))
+   corners.append([point.x,point.y])
+  component_boxes[kind]={"screen_corners":corners,"position":str(bounds.position),"size":str(bounds.size)}
+ report.captures.append({"name":name,"highest_pixel":[at.x,at.y],"screen_bounds":[[screen_min.x,screen_min.y],[screen_max.x,screen_max.y]],"component_boxes":component_boxes,"smoke_full_cycle_top_bound_px":smoke_min_y,"model_height_m":height,"camera_size":farm.cam.size,"camera_position":str(farm.cam.position),"camera_rotation":str(farm.cam.rotation_degrees),"signs":sign_views})
 func angle_view(yaw_deg,center,size):
  var pitch=deg_to_rad(farm.FarmCamera.PITCH_DEG);var yaw=deg_to_rad(yaw_deg)
  farm.cam.size=size
@@ -111,12 +125,13 @@ func run():
  for v in ['a','b']:
   for name in ['porch_'+v,'kitchen_wing_'+v]:
    var node=Art.instance(name,farm._house);farm.add_child(node);addons.append(node)
-  for level in [8,15]:
+  for level in [5,8,15]:
+   active_level=level;active_variant=v
    var prefix="lv"+str(level)+"-"+v
-   farm._looks._house.mesh=Art.mesh_for("house_cottage" if level==8 else "master_farmhouse_"+v)
+   farm._looks._house.mesh=Art.mesh_for("house_cottage" if level<15 else "master_farmhouse_"+v)
    farm._chef_sign_model(v)
-   for node in addons:node.visible=level==8
-   smoke.global_position=original_smoke_position if level==8 else farm._house+Vector3(-.66,farm._looks._house.mesh.get_aabb().end.y,-.39)
+   for i in addons.size():addons[i].visible=level==8 or (level==5 and i==0)
+   smoke.global_position=original_smoke_position if level<15 else farm._house+Vector3(-.66,farm._looks._house.mesh.get_aabb().end.y,-.39)
    await capture(prefix+"-default")
    var saved_size=farm.cam.size;var saved_transform=farm.cam.transform
    var saved_near=farm.cam.near;var saved_far=farm.cam.far

@@ -1,7 +1,7 @@
 """Independent audit of exported farmhouse buffers; run with ordinary Python."""
 from pathlib import Path
 from collections import Counter
-import hashlib,json,math,sys
+import hashlib,json,math,sys,subprocess
 ROOT=Path(__file__).resolve().parents[4]
 sys.path.insert(0,str(ROOT/'tools/art'))
 from verify_chef_sign import load_glb,accessor,cross,sub
@@ -20,6 +20,18 @@ source_folder=SRC/'reference/439'
 source=json.loads((source_folder/'homestead_looks_manifest.json').read_text())
 provenance=json.loads((source_folder/'provenance.json').read_text())
 report['source_439_commit']=provenance['commit'];report['source_components']={}
+def measured_bounds(vertices):
+ return [[f(v[i] for v in vertices) for i in range(3)] for f in [min,max]]
+def identity_nodes(doc):
+ return all(n.get('scale',[1,1,1])==[1,1,1] and n.get('translation',[0,0,0])==[0,0,0] and n.get('rotation',[0,0,0,1])==[0,0,0,1] and 'matrix' not in n for n in doc['nodes'])
+source_vertices={}
+for n in ['porch_a','porch_b','kitchen_wing_a','kitchen_wing_b']:
+ path=source_folder/(n+'.glb');sd,sb=load_glb(path)
+ check(path.read_bytes()==subprocess.check_output(['git','show',provenance['commit']+':assets/farm/art/'+n+'.glb'],cwd=ROOT),n+': bytes match exact #858 commit')
+ check(identity_nodes(sd),n+': source node transforms are identity')
+ source_vertices[n]=accessor(sd,sb,sd['meshes'][0]['primitives'][0]['attributes']['POSITION'])
+check(identity_nodes(cottage),'cottage node transforms are identity')
+report['level_bounds']={}
 def signatures(doc,data):
  p=doc['meshes'][0]['primitives'][0]
  positions=accessor(doc,data,p['attributes']['POSITION']);normals=accessor(doc,data,p['attributes']['NORMAL']);colors=accessor(doc,data,p['attributes']['COLOR_0'])
@@ -40,13 +52,16 @@ for name in ['master_farmhouse_a','master_farmhouse_b']:
  vertices=accessor(doc,data,p['attributes']['POSITION']);normals=accessor(doc,data,p['attributes']['NORMAL']);colors=accessor(doc,data,p['attributes']['COLOR_0'])
  indices=[x[0] for x in accessor(doc,data,p['indices'])]
  check(len(indices)%3==0 and len(indices)//3==entry['triangles'] and len(indices)//3<=9000,name+': triangle budget / manifest')
- bounds=[[f(v[i] for v in vertices) for i in range(3)] for f in [min,max]]
+ bounds=measured_bounds(vertices)
  check(all(abs(bounds[j][i]-entry['bounds'][j][i])<1e-6 for i in range(3) for j in range(2)),name+': GLB bounds equal manifest')
  check(abs(bounds[0][1])<1e-6 and bounds[1][1]<=4.2,name+': grounded / chimney height <=4.2m')
  variant=name[-1];names=['porch_'+variant,'kitchen_wing_'+variant]
- low=min([min(p[0] for p in cottage_vertices)]+[source['assets'][n]['bounds'][0][0] for n in names])
- high=max([max(p[0] for p in cottage_vertices)]+[source['assets'][n]['bounds'][1][0] for n in names])
- check(bounds[1][0]<=high+1e-6 and bounds[0][0]>=low-1e-6,name+': within same-look Lv8 cottage + exact 439 porch / wing envelope')
+ lv5=measured_bounds(cottage_vertices+source_vertices[names[0]])
+ lv8=measured_bounds(cottage_vertices+source_vertices[names[0]]+source_vertices[names[1]])
+ report['level_bounds'][variant]={'lv5':lv5,'lv8':lv8,'lv15':bounds,'basis':'decoded GLB POSITION values, identity nodes; no manifest-derived bounds'}
+ low,high=lv8[0][0],lv8[1][0]
+ for axis,label in [(0,'X'),(2,'Z')]:
+  check(bounds[0][axis]>=lv8[0][axis]-1e-6 and bounds[1][axis]<=lv8[1][axis]+1e-6,name+': within actual same-look Lv8 '+label+' vertex envelope')
  check(bounds[0][0]>=-2.430001 and bounds[1][0]<=1.634971,name+': within approved combined Lv8 X envelope (exact source limits)')
  combined=signatures(doc,data)
  for n in names:
@@ -56,7 +71,7 @@ for name in ['master_farmhouse_a','master_farmhouse_b']:
   missing=wanted-combined
   check(not missing,name+': all '+n+' triangle positions / normals / vertex colours equal 439 float32 values')
   check(sum(wanted.values())==source['assets'][n]['triangles'],n+': source triangle count')
-  report['source_components'][n]={'sha256':digest,'triangles':sum(wanted.values()),'missing_or_changed_triangles':sum(missing.values()),'bounds':source['assets'][n]['bounds'],'placement':'identity, house anchor'}
+  report['source_components'][n]={'sha256':digest,'triangles':sum(wanted.values()),'missing_or_changed_triangles':sum(missing.values()),'bounds':measured_bounds(source_vertices[n]),'placement':'identity, house anchor'}
   combined.subtract(wanted)
  check(all(n.get('scale',[1,1,1])==[1,1,1] and n.get('translation',[0,0,0])==[0,0,0] and n.get('rotation',[0,0,0,1])==[0,0,0,1] for n in doc['nodes']),name+': origin / orientation / identity transform')
  check(all(len(c)==3 or abs(c[3]-1)<1e-6 for c in colors),name+': opaque vertex color')
@@ -91,7 +106,7 @@ for name in ['master_farmhouse_a','master_farmhouse_b']:
  digest=hashlib.sha256(path.read_bytes()).hexdigest();check(digest==entry['sha256'],name+': recorded GLB hash')
  imp=Path(str(path)+'.import').read_text()
  check('nodes/root_script=null' in imp and 'uid="uid://' in imp,name+': generated import UID / root_script=null')
- report['assets'][name]={'triangles':len(indices)//3,'bounds':bounds,'bytes':path.stat().st_size,'sha256':digest,'degenerate_triangles':degenerate,'opposite_normals':opposite,'lv8_reference_x_bounds':[low,high],'lv8_reference_width_m':high-low}
+ report['assets'][name]={'triangles':len(indices)//3,'bounds':bounds,'bytes':path.stat().st_size,'sha256':digest,'degenerate_triangles':degenerate,'opposite_normals':opposite,'lv8_reference_x_bounds':[low,high],'lv8_reference_z_bounds':[lv8[0][2],lv8[1][2]],'lv8_reference_width_m':high-low,'lv8_reference_depth_m':lv8[1][2]-lv8[0][2]}
 report['failures']=[x for x in report['checks'] if not x['passed']]
 report['component_match_status']=manifest.get('status')
 OUT.mkdir(parents=True,exist_ok=True);(OUT/'glb-validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')

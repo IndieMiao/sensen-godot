@@ -1,4 +1,10 @@
-# SGODOT-440 · Lv15 整栋 v1.2 · 对齐439
+# SGODOT-440 · Lv15 整栋 v1.3 · 对齐439
+
+2026-11-08复核：直接读取#858 `262533a7`的GLB顶点，Lv15与对应Lv8的X、Z整体包络完全一致，四件组件逐三角面匹配。`00e7e2ce`的两栋GLB及.import已满足要求，本轮保持原样，新增Lv5/Lv8/Lv15三列实拍、投影包围盒和接入说明。审阅提交到**SGODOT-439**。
+
+[本轮说明及精确测量表](v1.3/README.md) · [默认木作三列](v1.3/default-a-review.png) · [默认石作三列](v1.3/default-b-review.png) · [木作门牌近景](v1.3/close-a-review.png) · [石作门牌近景](v1.3/close-b-review.png) · [45°木作](v1.3/45-default-a-review.png) · [45°石作](v1.3/45-default-b-review.png)。80项GLB检查、148项Godot Mobile实渲检查及冷导入通过。接入时注意Lv8会碰到木桌，长凳从(5,16)挪到(3,16)。
+
+以下保留v1.2的制作与验证记录；Android结果是该轮历史证据，本轮未重跑Android。
 
 刘备。木作 `master_farmhouse_a`、石作 `master_farmhouse_b` 是现有橙瓦小屋向上长成的两层整栋，含双老虎窗、花箱、完整四立面。依据用户2026-11-07 15:13批准的设定 v1.1 与197 LOCK-34；[参考与来源](../../../tools/art/source/homestead_440/reference/provenance.json)。
 

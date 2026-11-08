@@ -40,3 +40,9 @@ flock /home/deck/gs66-render.lock python3 tools/art/source/homestead_440/android
 不要在440的.blend里改动锁定组件后期待覆盖源件：这四件的可编辑命名源仍由赵云维护，固定版本链接记录在 `reference/439/provenance.json`。要升级它们，应先取得439的新版本，再同步源GLB/.import/manifest和来源hash并重新核同款。主楼部件仍由本生成器完整重建。
 
 `review.gd`用同一场地循环Lv8（现房+439原件）/Lv15整栋，拍默认14.5°、水平45°默认尺度/近景和225°背面左侧；俯角始终43°。45°同尺度图保持房屋屏幕位置，不代表未来全农场正式构图。只对正面机位做三牌遮挡断言，背面视角自然会被房体挡住。`package.py`输出四列Lv8/Lv15对照，不缩放原始360×800图。
+
+## 439对齐复核 v1.3
+
+最新`review.gd`增加Lv5原屋+门廊，每款在同一机位循环Lv5/Lv8/Lv15，并输出完整模型的屏幕范围和组件AABB的八角投影。`verify.py`直接解码源GLB POSITION，以源件和cottage的实际顶点计算Lv5/Lv8包络，分别检查Lv15的X和Z范围；同时将四件源文件与#858精确commit逐字节比对。不从manifest估算包络。当前GLB已符合，不重新导出模型。
+
+执行上述verify、prepare、导入、实渲和cold_import后，使用带Pillow的Python运行`tools/art/source/homestead_440/package_alignment.py`，输出`docs/design/homestead-440/v1.3/`的三列默认、门牌近景和45°图（木/石各一张），保留原始360×800图与本轮报告。旧`package.py`保留为v1.2历史排版。本轮审阅传SGODOT-439。
