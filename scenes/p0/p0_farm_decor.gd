@@ -598,7 +598,8 @@ func _select(p: Dictionary) -> void:
 
 # ---------------------------------------------------------------- the Kitchen Wing's held cells (q(303), SGODOT-450)
 ## Decorate on what holds the Kitchen Wing's cells (不知火舞 450 v1.2 ④, frame B2): in close over them (HELD_PX), the
-## cells red as a spot that may not take a piece (BAD_FILL with its edge), each piece or facility on them in a red edge
+## wing's cells red as a spot that may not take a piece (BAD_FILL with its edge) and grid lines round them fading out
+## over HALO_R cells as round a piece picked, each piece or facility on them in a red edge
 ## 1.25 × its cells (the white selection's texture, no fill), the first of them picked — a piece before a facility
 ## (后裔). Moved off, its edge goes; all clear, the red cells fade out in HELD_FADE_S. The view says what holds them
 ## (homestead.next.blocked, or wing_blocked past Lv8); a homestead_blocked refusal's detail stands in until the view moves.
@@ -611,6 +612,7 @@ var _held_sig := ""
 var _held_fills: Array = []
 var _held_edges: Array = []
 var _held_frames: Array = []
+var _held_halo: Array = []
 var _held_fade: Tween
 
 ## What holds the wing's cells now: the view's, or a refusal's while the view has not caught up; {} when nothing does.
@@ -647,9 +649,9 @@ func begin_held(detail := {}) -> void:
 				open_bin_card(g)
 				return
 
-## The middle of the held cells on the ground.
+## The middle of the wing's cells on the ground (all of them: the red block the frame centres on).
 func held_centre(b: Dictionary) -> Vector3:
-	var cs := P0Decor.held_cells(b)
+	var cs := P0Decor.wing_cells() if not b.is_empty() else []
 	if cs.is_empty(): return yard_centre()
 	var sum := Vector3.ZERO
 	for c in cs: sum += farm.bp.cell_to_world(c)
@@ -674,17 +676,20 @@ func _paint_held() -> void:
 		else: _held_cells([])
 		return
 	if _held_fade and _held_fade.is_valid(): _held_fade.kill()
-	_held_cells(P0Decor.held_cells(b))
+	_held_cells(P0Decor.wing_cells())
 
 func _held_cells(cells: Array) -> void:
 	_squares(_held_fills, cells.map(func(c): return [c, BAD_FILL]), false, 0.029)
 	_squares(_held_edges, cells.map(func(c): return [c, Color(BAD_FILL, 1.0)]), true, 0.031)
+	var lines: Array = []
+	for h in halo_cells(_view(), cells): lines.append([h[0], Color(1, 1, 1, HALO_A * (1.0 - float(int(h[1]) - 1) / float(HALO_R)))])
+	_squares(_held_halo, lines, true, 0.027)
 
 ## All clear: the red cells fade out (HELD_FADE_S), then hide.
 func _fade_held() -> void:
 	if _held_fade and _held_fade.is_valid(): _held_fade.kill()
 	_held_fade = create_tween().set_parallel()
-	for q in _held_fills + _held_edges:
+	for q in _held_fills + _held_edges + _held_halo:
 		if not (q as MeshInstance3D).visible: continue
 		var m := (q as MeshInstance3D).material_override as StandardMaterial3D
 		_held_fade.tween_property(m, "albedo_color:a", 0.0, HELD_FADE_S)
