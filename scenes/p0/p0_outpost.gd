@@ -296,6 +296,12 @@ func _spawn_npcs() -> void:
 		var rig := Avatar.create_rig()
 		rig.assembler = AvatarAssemblerMerged.new()
 		rig.rotation.y = PI   # the rig faces +Z; the anchor's yaw is where the NPC faces
+		# The room's orthographic camera stands 22–30 m off: past RigActivity's 16 m every keeper and resident slept on
+		# their first frame (用户 on 0.3.4's market: 「市场的两个角色没有 idle 动画」). As the farm's residents (resident_cast).
+		for child in rig.get_children():
+			if child is RigActivity:
+				child.reduced_distance = 50
+				child.sleep_distance = 80
 		root.add_child(rig)
 		rig.config_applied.connect(func(_c): rig.play_motion("idle"))
 		rig.apply_config(OnlineAppearance.config({"version": 1, "slots": def.get("slots", {})}, true))   # NPC-only parts (SGODOT-229) too

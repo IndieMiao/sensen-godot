@@ -1169,3 +1169,15 @@ func test_a_trading_post_keeps_the_coffee_shop_and_a_tea_house_its_own_kit() -> 
 		"lng": 1.0, "capacity": 12, "residents": []})
 	assert_str(str(old.art)).is_equal("tea_house")
 
+
+## 用户 on 0.3.4's market (「市场的两个角色没有 idle 动画」): the room's camera stands 22–30 m off, past RigActivity's
+## 16 m, so every keeper and resident slept on its first frame. They stay awake in the room as the farm's residents do.
+func test_keepers_and_residents_stay_awake_at_the_rooms_camera_distance() -> void:
+	var o := _room("sh_market_1")
+	assert_bool(o.npcs.is_empty()).is_false()
+	for n in o.npcs:
+		var acts: Array = (o.npcs[n].root as Node3D).find_children("*", "RigActivity", true, false)
+		assert_int(acts.size()).override_failure_message(n).is_equal(1)
+		var a: RigActivity = acts[0]
+		var d := o.cam.global_position.distance_to((o.npcs[n].root as Node3D).global_position)
+		assert_int(a.level_for(d, true)).override_failure_message("%s at %.1f m" % [n, d]).is_equal(RigActivity.Level.ACTIVE)
