@@ -2016,8 +2016,10 @@ func _dev_shot(dt: float) -> void:
 			"kindredcard": ui.show_kindred(P0Kindred.card(session.current(), {"resident": step[1]}))   # kindredcard:res_pip
 			"room":   # room:gn-498687~cabin0 — a generated city's outpost room, its city read first (resident shots)
 				var id := str(step[1])
-				load("res://modules/p0/p0_city_places.gd").fetch(session, id.get_slice("~", 0),
-					func(_c): AppRouter.open_instance("res://scenes/p0/p0_outpost.tscn", {"outpost_id": id}))
+				# a place the city no longer has opens nothing: an empty room there has no door (11-08's "cabin without an exit")
+				load("res://modules/p0/p0_city_places.gd").fetch(session, id.get_slice("~", 0), func(_c):
+					if P0Outposts.find(id).is_empty(): push_warning("P0_SHOT: %s is not in its city" % id)
+					else: AppRouter.open_instance("res://scenes/p0/p0_outpost.tscn", {"outpost_id": id}))
 			"biteboard": ui.open_bite_board(P0Outposts.by_role("tackle"))   # the home tackle shop's Bite Board (its keeper's line)
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000

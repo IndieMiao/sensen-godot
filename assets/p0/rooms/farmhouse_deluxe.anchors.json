@@ -1,5 +1,5 @@
 {
-  "_comment": "SGODOT-282 (282 c62a6ed9 ②): the farmhouse kitchen corner in the Deluxe Room (Homestead Lv10). The stoves, the Spice Rack, stand_stove, cam_stove, spawn and exit are the room's own hooks in assets/rooms/deluxe_room_10/layout.json; this file adds what the farmhouse needs besides: badge_stove_N 0.43 above each pot mouth (as the Basic Room's), cam_stove_2 / _3 / _4 at cam_stove's offset from stove 1 (stove 4, Homestead Lv17: the cooker's back-left burner, 上官婉儿 on 355), stands and shots for the rack and the cabinet, and moves use_warming_cabinet from the floor (the cabinet's placement origin) to the front of its counter cabinet in the fittings, where it is tapped; its button hangs low on that front (y 0.4), clear of stove 1's open strip.",
+  "_comment": "SGODOT-282 (282 c62a6ed9 ②): the farmhouse kitchen corner in the Deluxe Room (Homestead Lv10). The stoves, the Spice Rack, stand_stove, cam_stove and exit are the room's own hooks in assets/rooms/deluxe_room_10/layout.json; this file adds what the farmhouse needs besides: badge_stove_N 0.43 above each pot mouth (as the Basic Room's), cam_stove_2 / _3 / _4 at cam_stove's offset from stove 1 (stove 4, Homestead Lv17: the cooker's back-left burner, 上官婉儿 on 355), stands and shots for the rack and the cabinet, and moves use_warming_cabinet from the floor (the cabinet's placement origin) to the front of its counter cabinet in the fittings, where it is tapped; its button hangs low on that front (y 0.4), clear of stove 1's open strip. spawn 2.56 m in from the door, in front of the fireplace (亚瑟 11-09, 不知火舞 on 441, 197 00a0ca99): at the layout's 0.72 the door's Farm strip opened over the player's head and the plant hid the rest; at 1.8 m, as the other two rooms, the loft's post and the fireplace hid the player.",
   "anchors": [
     {
       "name": "badge_stove_1",
@@ -121,6 +121,15 @@
         1.4,
         -0.6
       ]
+    },
+    {
+      "name": "spawn",
+      "position": [
+        3.85,
+        0.083,
+        -1.0
+      ],
+      "yaw_degrees": 180
     }
   ]
 }

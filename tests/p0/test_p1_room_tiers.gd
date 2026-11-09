@@ -44,6 +44,20 @@ func test_each_rooms_kitchen_corner_is_complete_and_reachable() -> void:
 		for a in r.hit_nodes: assert_bool(r.art.has_node(NodePath(str(r.hit_nodes[a])))).override_failure_message("%s %s" % [label, a]).is_true()
 		assert_array(Array(r._tappable())).override_failure_message(label).contains(["use_stove_1", "use_spice_rack", "use_warming_cabinet", "exit"])
 
+## Each room opens with the player clear of the door (不知火舞 on 441, 197 00a0ca99): 1.8 m in (the Deluxe Room 2.56, in
+## front of its fireplace; at 1.8 the loft's post hid the player); at 0.75 the door's Farm strip opened over the head.
+## Already past the door's arm distance there, so the door is live but the opening never leaves.
+func test_each_room_opens_with_the_player_clear_of_the_door() -> void:
+	for lv in [1, 5, 12]:
+		var r := _farmhouse(lv)
+		var label := "Lv%d %s" % [lv, r.get("room_kind")]
+		var door := r.anchor("exit").global_position
+		assert_float(P0Room._flat_distance(r.actor.position, r.anchor("spawn").global_position)).override_failure_message(label).is_less(0.2)
+		assert_float(P0Room._flat_distance(r.actor.position, door)).override_failure_message(label).is_between(1.7, 2.6)
+		r._door_check()
+		assert_bool(r._leaving).override_failure_message(label).is_false()
+		assert_float(r.actor.facing().z).override_failure_message(label).is_greater(0.9)   # towards the camera, as before
+
 ## The stoves sit on the cooker's hob (Standard / Deluxe range_cooker.glb), each pot mouth above its own burner.
 func test_the_stoves_are_on_the_range_cookers_hob() -> void:
 	for lv in [5, 10]:
