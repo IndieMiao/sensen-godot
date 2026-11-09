@@ -1,7 +1,7 @@
 {
   "author": "赵云",
   "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
-  "revision": "v1.1",
+  "revision": "SGODOT-448 wings; #858 porch snapshots unchanged",
   "house_sha256": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c",
   "runtime_reference": "8493a5c4",
   "palette_srgb": {
@@ -102,22 +102,22 @@
     },
     "kitchen_wing_a": {
       "file": "kitchen_wing_a.glb",
-      "triangles": 1056,
+      "triangles": 1072,
       "surfaces": 1,
       "bounds": [
         [
-          -2.4250001907348633,
+          -2.3975000381469727,
           0.0,
           -1.537500262260437
         ],
         [
-          -0.8131667375564575,
+          -0.7925000190734863,
           1.809999942779541,
           0.23749999701976776
         ]
       ],
-      "bytes": 78920,
-      "sha256": "7d5f99832e17c8ce79b619b8a9fa513b173ca2e12af0021059f7eed15b680e6b",
+      "bytes": 79448,
+      "sha256": "2da45e3e3a8c223c5e7e34b26fec5ca220bd61326a874a8eb70a84b2632f5ba3",
       "origin": "P0Garden.ANCHORS.house",
       "axes": "metres, Y up, +Z toward camera",
       "author": "赵云",
@@ -137,29 +137,37 @@
         -1.05
       ],
       "house_join_x": -0.845,
-      "required_scenery_moves": [
-        "bench",
-        "left_house_bush"
-      ]
+      "required_scenery_moves": [],
+      "bench_clearance_local_xz": [
+        [
+          -2.925,
+          -0.825
+        ],
+        [
+          -1.625,
+          0.825
+        ]
+      ],
+      "footprint": "L-shaped front-left setback; bench unchanged"
     },
     "kitchen_wing_b": {
       "file": "kitchen_wing_b.glb",
-      "triangles": 1480,
+      "triangles": 1448,
       "surfaces": 1,
       "bounds": [
         [
-          -2.4250001907348633,
+          -2.3975000381469727,
           0.0,
           -1.537500262260437
         ],
         [
-          -0.8131667375564575,
+          -0.7925000190734863,
           2.3600001335144043,
           0.12999999523162842
         ]
       ],
-      "bytes": 113868,
-      "sha256": "a1686921bece7d62b0cf8d7c883ab1e92799492ddfe36595b1052e5339f65116",
+      "bytes": 110652,
+      "sha256": "192a068f196e183f21a2b9edffd1a5b244fa8b6911cf62e1fbfd4fc34948866a",
       "origin": "P0Garden.ANCHORS.house",
       "axes": "metres, Y up, +Z toward camera",
       "author": "赵云",
@@ -179,10 +187,18 @@
         -1.06
       ],
       "house_join_x": -0.845,
-      "required_scenery_moves": [
-        "bench",
-        "left_house_bush"
-      ]
+      "required_scenery_moves": [],
+      "bench_clearance_local_xz": [
+        [
+          -2.925,
+          -0.825
+        ],
+        [
+          -1.625,
+          0.825
+        ]
+      ],
+      "footprint": "L-shaped front-left setback; bench unchanged"
     }
   },
   "protected_cells": [
@@ -219,5 +235,6 @@
   "front_eave_clearance_m": 2.0,
   "ground_fixture_front_limit_z": 0.975,
   "source": "tools/art/source/homestead_looks_439/homestead_looks.blend",
-  "generator": "tools/art/build_homestead_looks_439.py"
+  "generator": "tools/art/build_homestead_looks_439.py",
+  "source_scope_note": "Master farmhouses retain the original built-in porches; this revision updates their wings only."
 }

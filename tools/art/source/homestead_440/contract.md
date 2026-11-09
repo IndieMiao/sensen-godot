@@ -1,5 +1,7 @@
 # SGODOT-440 Lv15整栋接口 v1.3 · SGODOT-439对齐复核
 
+> **2026-11-09 SGODOT-448 覆盖说明**：本文件下方保留439/440历史接入记录。当前长凳保持(5,16)两格，禁止沿用“挪到(3,16)”或旧QA里的移Bench操作；左翼已改L形凹口让位。Lv5两套改贴墙瓦檐；Lv15仅替换左翼，其内置门廊仍锁原#858。当前门罩高度豁免、面数、7个可摆格依赖及全套复现见 [448说明](../../../../docs/design/homestead-clearance-448/README.md)，拍本轮请用 `homestead_clearance_448` 工具。
+
 刘备。两件 `master_farmhouse_a/b` 沿用house_cottage原点：米、+Y上、+Z正面，摆 `bp.cell_to_world(ANCHORS.house)`，yaw0、scale1。各1 mesh/surface，7614/7844三角面，高4.1085/4.1885m。
 
 ## 439同款组件

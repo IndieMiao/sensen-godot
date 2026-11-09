@@ -12,7 +12,7 @@ if a.action=='stage':
    if s.exists():shutil.copy2(s,QA/KIT/s.name)
  (QA/'project.godot').write_text('config_version=5\n[application]\nconfig/name="Homestead439Import"\nconfig/features=PackedStringArray("4.7", "Mobile")\n[rendering]\nrenderer/rendering_method="mobile"\n')
 elif a.action=='configure':
- settings={'gltf/texture_map_mode':'1','meshes/light_baking':'1','meshes/generate_lods':'false','meshes/ensure_tangents':'false','meshes/create_shadow_meshes':'false','animation/import':'false'}
+ settings={'gltf/texture_map_mode':'1','meshes/light_baking':'1','meshes/generate_lods':'false','meshes/ensure_tangents':'false','meshes/create_shadow_meshes':'true','animation/import':'false'}
  for name in NAMES:
   p=QA/KIT/(name+'.glb.import');s=p.read_text();assert 'uid="uid://' in s and 'nodes/root_script=null' in s
   for key,value in settings.items():s,n=re.subn('^'+re.escape(key)+r'=.*$',key+'='+value,s,flags=re.M);assert n==1,key

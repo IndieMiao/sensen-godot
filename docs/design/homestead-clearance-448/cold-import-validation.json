@@ -1,0 +1,32 @@
+{
+  "porch_a": {
+    "uid": "uid://dx0yqj4mccb0a",
+    "import_sha256": "83501f2242f7e55ec6f3df08a2a02db5a9b53977495c3c59ae2fcdcfad4bca0f",
+    "glb_sha256": "eda32433eec161ea9f1d35644c108f0b3eb8b0e473463cdc99f90005f2b48d50"
+  },
+  "porch_b": {
+    "uid": "uid://b087gv2anatoy",
+    "import_sha256": "bc6b2c51011ba69c684d0b43c6e023e7c2cdc7d8bce2cb60dde5ec4d2e36dd55",
+    "glb_sha256": "f67e090eb523a64abbcb59b879ca41c936f551fc71bf4feec2bb06d8b2e07e49"
+  },
+  "kitchen_wing_a": {
+    "uid": "uid://cea5idchwb8wf",
+    "import_sha256": "42bd1fb31f1ba2b310d1533e28683e8be3a50e2e531512fff810a381e5596a61",
+    "glb_sha256": "2da45e3e3a8c223c5e7e34b26fec5ca220bd61326a874a8eb70a84b2632f5ba3"
+  },
+  "kitchen_wing_b": {
+    "uid": "uid://f18rfwxksle3",
+    "import_sha256": "d4dc4500b14f2efedbea0da88e8c26ba42ca84ce7cf92101184a695725dcafe2",
+    "glb_sha256": "192a068f196e183f21a2b9edffd1a5b244fa8b6911cf62e1fbfd4fc34948866a"
+  },
+  "master_farmhouse_a": {
+    "uid": "uid://dy5i2yyq4uqdj",
+    "import_sha256": "cab0b442cd267e966b4d7499627819ca61416ec1fa5879db6252538af5bd993f",
+    "glb_sha256": "bd9a231a01ee8965f96d7e1ce2144195b4e033f3c0e68bb8beccd817e039dc7b"
+  },
+  "master_farmhouse_b": {
+    "uid": "uid://c1741x3kxf8pr",
+    "import_sha256": "6f4b3cc31fa55423445fdc89f6ab13dc57aa1c97c8da5a393a8a8de34c6aef3e",
+    "glb_sha256": "b547a546a8bd53068635492aaee3c98a233441c056b9ae5b09a3b21492cf4fa9"
+  }
+}

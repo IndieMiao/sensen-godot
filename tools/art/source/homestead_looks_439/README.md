@@ -1,5 +1,7 @@
 # Homestead looks 439 — source / review
 
+> **2026-11-09 SGODOT-448 覆盖说明**：本文件下方保留439/440历史接入记录。当前长凳保持(5,16)两格，禁止沿用“挪到(3,16)”或旧QA里的移Bench操作；左翼已改L形凹口让位。Lv5两套改贴墙瓦檐；Lv15仅替换左翼，其内置门廊仍锁原#858。当前门罩高度豁免、面数、7个可摆格依赖及全套复现见 [448说明](../../../../docs/design/homestead-clearance-448/README.md)，拍本轮请用 `homestead_clearance_448` 工具。
+
 四个 house-anchor-relative 部件，交付说明和图片在 [docs/design/homestead-looks-439](../../../../docs/design/homestead-looks-439/README.md)。原点不是各件包围盒中心；几何已含门廊 / 扩建偏移。生成器会覆盖本目录 `.blend`、四个 GLB、统计和 manifest 追加项；手工修改应先回写生成器再重建。
 
 已验证：Blender 5.2.2、Godot 4.7.2、Node 22.20、Python 3 + NumPy/Pillow。所有 Blender / Godot 调用必须持有 gs66 渲染锁；启动前查看 nvidia-smi，使用赵云私有 ADB 5099，结束立即退出。

@@ -1,0 +1,541 @@
+{
+  "checks": [
+    {
+      "check": "porch_a: wings match this PR; porch snapshots match #858",
+      "passed": true
+    },
+    {
+      "check": "porch_a: source node transforms are identity",
+      "passed": true
+    },
+    {
+      "check": "porch_b: wings match this PR; porch snapshots match #858",
+      "passed": true
+    },
+    {
+      "check": "porch_b: source node transforms are identity",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_a: wings match this PR; porch snapshots match #858",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_a: source node transforms are identity",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_b: wings match this PR; porch snapshots match #858",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_b: source node transforms are identity",
+      "passed": true
+    },
+    {
+      "check": "cottage node transforms are identity",
+      "passed": true
+    },
+    {
+      "check": "actual cottage palette source unchanged",
+      "passed": true
+    },
+    {
+      "check": "cream: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "glass: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "glass_dark: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "green: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "green_light: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "orange: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "orange_dark: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "orange_light: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "plaster: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "plaster_shade: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "roof_dark: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "stone: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "stone_light: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "stone_shade: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "wood: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "wood_dark: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "wood_light: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "yellow: actual cottage COLOR_0 sample",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: one mesh",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: one surface",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: one vertex-color material, no textures",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: no lights / cameras / animations",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: position / normal / color only",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: triangle budget / manifest",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: GLB bounds equal manifest",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: grounded / chimney height <=4.2m",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: within actual same-look Lv8 X vertex envelope",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: within actual same-look Lv8 Z vertex envelope",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: within approved combined Lv8 X envelope (exact source limits)",
+      "passed": true
+    },
+    {
+      "check": "porch_a: pinned 439 source hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: all porch_a triangle positions / normals / vertex colours equal 439 float32 values",
+      "passed": true
+    },
+    {
+      "check": "porch_a: source triangle count",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_a: pinned 439 source hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: all kitchen_wing_a triangle positions / normals / vertex colours equal 439 float32 values",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_a: source triangle count",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: origin / orientation / identity transform",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: opaque vertex color",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: unit normals",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: no zero-area triangles",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: winding agrees with normals",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: no new geometry in row14 below 2m, above original doorstep",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: recorded GLB hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_a: generated import UID / root_script=null",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: one mesh",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: one surface",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: one vertex-color material, no textures",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: no lights / cameras / animations",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: position / normal / color only",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: triangle budget / manifest",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: GLB bounds equal manifest",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: grounded / chimney height <=4.2m",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: within actual same-look Lv8 X vertex envelope",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: within actual same-look Lv8 Z vertex envelope",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: within approved combined Lv8 X envelope (exact source limits)",
+      "passed": true
+    },
+    {
+      "check": "porch_b: pinned 439 source hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: all porch_b triangle positions / normals / vertex colours equal 439 float32 values",
+      "passed": true
+    },
+    {
+      "check": "porch_b: source triangle count",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_b: pinned 439 source hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: all kitchen_wing_b triangle positions / normals / vertex colours equal 439 float32 values",
+      "passed": true
+    },
+    {
+      "check": "kitchen_wing_b: source triangle count",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: origin / orientation / identity transform",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: opaque vertex color",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: finite attributes",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: unit normals",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: no zero-area triangles",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: winding agrees with normals",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: no new geometry in row14 below 2m, above original doorstep",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: recorded GLB hash",
+      "passed": true
+    },
+    {
+      "check": "master_farmhouse_b: generated import UID / root_script=null",
+      "passed": true
+    }
+  ],
+  "assets": {
+    "master_farmhouse_a": {
+      "triangles": 7630,
+      "bounds": [
+        [
+          -2.3975000381469727,
+          -4.284083843231201e-08,
+          -1.537500262260437
+        ],
+        [
+          1.6349704265594482,
+          4.108500003814697,
+          1.9200000762939453
+        ]
+      ],
+      "bytes": 602208,
+      "sha256": "bd9a231a01ee8965f96d7e1ce2144195b4e033f3c0e68bb8beccd817e039dc7b",
+      "degenerate_triangles": 0,
+      "opposite_normals": 0,
+      "lv8_reference_x_bounds": [
+        -2.3975000381469727,
+        1.6349704265594482
+      ],
+      "lv8_reference_z_bounds": [
+        -1.537500262260437,
+        1.9200000762939453
+      ],
+      "lv8_reference_width_m": 4.032470464706421,
+      "lv8_reference_depth_m": 3.4575003385543823
+    },
+    "master_farmhouse_b": {
+      "triangles": 7812,
+      "bounds": [
+        [
+          -2.3975000381469727,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          1.2450000047683716,
+          4.188499927520752,
+          1.9279999732971191
+        ]
+      ],
+      "bytes": 625612,
+      "sha256": "b547a546a8bd53068635492aaee3c98a233441c056b9ae5b09a3b21492cf4fa9",
+      "degenerate_triangles": 0,
+      "opposite_normals": 0,
+      "lv8_reference_x_bounds": [
+        -2.3975000381469727,
+        1.2450000047683716
+      ],
+      "lv8_reference_z_bounds": [
+        -1.537500262260437,
+        1.9279999732971191
+      ],
+      "lv8_reference_width_m": 3.6425000429153442,
+      "lv8_reference_depth_m": 3.465500235557556
+    }
+  },
+  "source_439_commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+  "source_components": {
+    "porch_a": {
+      "sha256": "a9c28bdd0be686293c3d3fa9dcb3702769c48ffa0b675edff13f44e21b002571",
+      "triangles": 1104,
+      "missing_or_changed_triangles": 0,
+      "bounds": [
+        [
+          -1.2865523099899292,
+          -4.284083843231201e-08,
+          0.2749999761581421
+        ],
+        [
+          1.6349704265594482,
+          2.4125001430511475,
+          1.9200000762939453
+        ]
+      ],
+      "placement": "identity, house anchor"
+    },
+    "kitchen_wing_a": {
+      "sha256": "2da45e3e3a8c223c5e7e34b26fec5ca220bd61326a874a8eb70a84b2632f5ba3",
+      "triangles": 1072,
+      "missing_or_changed_triangles": 0,
+      "bounds": [
+        [
+          -2.3975000381469727,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          -0.7925000190734863,
+          1.809999942779541,
+          0.23749999701976776
+        ]
+      ],
+      "placement": "identity, house anchor"
+    },
+    "porch_b": {
+      "sha256": "e162a2d4f4d2852e6c89fa64d5a73f087686e344a13b65d6dd4a97e1869bb71e",
+      "triangles": 652,
+      "missing_or_changed_triangles": 0,
+      "bounds": [
+        [
+          -1.2449703216552734,
+          0.0,
+          0.5
+        ],
+        [
+          1.2450000047683716,
+          1.2842596769332886,
+          1.9279999732971191
+        ]
+      ],
+      "placement": "identity, house anchor"
+    },
+    "kitchen_wing_b": {
+      "sha256": "192a068f196e183f21a2b9edffd1a5b244fa8b6911cf62e1fbfd4fc34948866a",
+      "triangles": 1448,
+      "missing_or_changed_triangles": 0,
+      "bounds": [
+        [
+          -2.3975000381469727,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          -0.7925000190734863,
+          2.3600001335144043,
+          0.12999999523162842
+        ]
+      ],
+      "placement": "identity, house anchor"
+    }
+  },
+  "level_bounds": {
+    "a": {
+      "lv5": [
+        [
+          -1.2865523099899292,
+          -4.284083843231201e-08,
+          -1.070000171661377
+        ],
+        [
+          1.6349704265594482,
+          2.4125001430511475,
+          1.9200000762939453
+        ]
+      ],
+      "lv8": [
+        [
+          -2.3975000381469727,
+          -4.284083843231201e-08,
+          -1.537500262260437
+        ],
+        [
+          1.6349704265594482,
+          2.4125001430511475,
+          1.9200000762939453
+        ]
+      ],
+      "lv15": [
+        [
+          -2.3975000381469727,
+          -4.284083843231201e-08,
+          -1.537500262260437
+        ],
+        [
+          1.6349704265594482,
+          4.108500003814697,
+          1.9200000762939453
+        ]
+      ],
+      "basis": "decoded GLB POSITION values, identity nodes; no manifest-derived bounds"
+    },
+    "b": {
+      "lv5": [
+        [
+          -1.2449703216552734,
+          0.0,
+          -1.070000171661377
+        ],
+        [
+          1.2450000047683716,
+          2.1019999980926514,
+          1.9279999732971191
+        ]
+      ],
+      "lv8": [
+        [
+          -2.3975000381469727,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          1.2450000047683716,
+          2.3600001335144043,
+          1.9279999732971191
+        ]
+      ],
+      "lv15": [
+        [
+          -2.3975000381469727,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          1.2450000047683716,
+          4.188499927520752,
+          1.9279999732971191
+        ]
+      ],
+      "basis": "decoded GLB POSITION values, identity nodes; no manifest-derived bounds"
+    }
+  },
+  "failures": [],
+  "component_match_status": "SGODOT-448 kitchen wings with bench setback; porch snapshots remain #858 262533a7; main house unchanged"
+}
