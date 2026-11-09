@@ -10,8 +10,8 @@
 [ext_resource type="Script" path="res://assets/props/cooking_pot_wait/steam_lid_clearance.gd" id="8_steam_mask"]
 
 [sub_resource type="Gradient" id="Gradient_011xv"]
-offsets = PackedFloat32Array(0, 0.5, 0.65, 0.78, 0.9, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0.35, 1, 1, 1, 0.24, 1, 1, 1, 0.1, 1, 1, 1, 0)
+offsets = PackedFloat32Array(0, 0.10, 0.30, 0.65, 0.88, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.50, 1, 1, 1, 0.60, 1, 1, 1, 0.60, 1, 1, 1, 0.18, 1, 1, 1, 0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_p5wds"]
 gradient = SubResource("Gradient_011xv")
@@ -19,8 +19,8 @@ gradient = SubResource("Gradient_011xv")
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xclje"]
 direction = Vector3(0, 1, 0)
 spread = 0.0
-initial_velocity_min = 0.11
-initial_velocity_max = 0.11
+initial_velocity_min = 0.105
+initial_velocity_max = 0.105
 gravity = Vector3(0, 0, 0)
 scale_min = 1.0
 scale_max = 1.0
@@ -28,7 +28,7 @@ color_ramp = SubResource("GradientTexture1D_p5wds")
 
 [sub_resource type="QuadMesh" id="QuadMesh_r7biw"]
 material = ExtResource("4_jh8qm")
-size = Vector2(0.038, 0.048)
+size = Vector2(0.050, 0.050)
 
 [sub_resource type="Animation" id="Animation_wnf0o"]
 resource_name = "idle"
@@ -227,14 +227,14 @@ mesh = ExtResource("3_po516")
 
 [node name="Steam" type="GPUParticles3D" parent="PotRig/StovePot/pot_big/lid" parent_id_path=PackedInt32Array(699015236, 444717255) index="1" unique_id=475151764]
 script = ExtResource("8_steam_mask")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.032, 0.146)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.186, 0.146)
 cast_shadow = 0
-amount = 5
+amount = 3
 lifetime = 1.8
 preprocess = 1.8
 use_fixed_seed = true
 seed = 419
-visibility_aabb = AABB(-0.06, -0.04, -0.06, 0.12, 0.28, 0.12)
+visibility_aabb = AABB(-0.08, -0.05, -0.08, 0.16, 0.31, 0.16)
 local_coords = true
 process_material = SubResource("ParticleProcessMaterial_xclje")
 draw_pass_1 = SubResource("QuadMesh_r7biw")

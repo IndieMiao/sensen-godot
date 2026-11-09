@@ -2,8 +2,11 @@
 
 [ext_resource type="Shader" path="res://assets/props/cooking_pot_wait/steam_clear_lid.gdshader" id="1"]
 
+[ext_resource type="Texture2D" path="res://assets/props/cooking_pot_wait/steam_puff.png" id="2_puff"]
+
 [resource]
 resource_name = "WarmWhiteSteam_ClearLid"
 shader = ExtResource("1")
 shader_parameter/steam_colour = Color(1, 0.97254902, 0.94117647, 1)
 shader_parameter/lid_top_uv = 0.0
+shader_parameter/puff_texture = ExtResource("2_puff")
