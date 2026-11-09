@@ -68,8 +68,9 @@ func sync(view: Dictionary) -> void:
 		if previews.get(stage, "") == have and _seen: previews.erase(stage)   # the reply landed (or nothing to preview)
 		var want: String = previews.get(stage, have)
 		if stage == WING_STAGE and held: want = ""   # q(303) ⑨: no wing while its cells are held
-		# the house and the porch before it change with the wing's hold too (the old house while it waits)
-		if want == _shown.get(stage, "") and not (held_changed and stage == HOUSE_STAGE): continue
+		# the Master Farmhouse (and the porch before it) changes with the wing's hold too, the old house while it waits;
+		# below Lv15 the house is the farm's own either way — its porch stays as it stands (周瑜 on #916)
+		if want == _shown.get(stage, "") and not (held_changed and stage == HOUSE_STAGE and want != ""): continue
 		_shown[stage] = want
 		changed = true
 		if stage == HOUSE_STAGE:

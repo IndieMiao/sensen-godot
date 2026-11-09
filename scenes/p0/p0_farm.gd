@@ -669,7 +669,8 @@ func _on_decor_requested(item: String) -> void:
 func _say_wing(v: Dictionary) -> void:
 	if _wing_said or v.get("homestead", null) == null: return
 	_wing_said = true
-	if not P0Decor.wing_blocked(v).is_empty(): rt.ui.toast_error(P0Logic.HOME_BLOCKED_TAP, P0Ui.DECORATE_ACTION)
+	# once the launch's cover is gone: under it the toast ran out unseen (不知火舞 on #916 B5a)
+	if not P0Decor.wing_blocked(v).is_empty(): rt.toast_on_arrival(P0Logic.HOME_BLOCKED_TAP, P0Ui.DECORATE_ACTION)
 
 ## The last homestead_blocked's detail, once (P0Runtime.held_detail).
 func _take_held_detail() -> Dictionary:

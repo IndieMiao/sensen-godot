@@ -226,3 +226,35 @@ func test_the_dressing_on_the_wings_cells_hides_with_the_wing() -> void:
 	assert_bool(dress.visible).is_false()
 	scenery.show_wing(false)
 	assert_bool(dress.visible).is_true()
+
+## Below Lv15 the house is the farm's own whether the wing is held or not: its porch stays as it stands when the wing
+## clears or is held again — not rebuilt nor popped in again (周瑜 on #916).
+func test_the_porch_stays_as_the_wing_is_held_or_cleared() -> void:
+	var looks: Node3D = _farm_looks()[0]
+	var v := _looks_view(9)
+	v.homestead.wing_blocked = _held()
+	looks.sync(v)
+	var porch: Node3D = looks.parts("porch")[0]
+	v.homestead.erase("wing_blocked")
+	looks.sync(v)
+	assert_object(looks.parts("porch")[0]).is_same(porch)
+	assert_vector(porch.scale).is_equal(Vector3.ONE)
+	v.homestead.wing_blocked = _held()
+	looks.sync(v)
+	assert_object(looks.parts("porch")[0]).is_same(porch)
+
+## B5a: a save past Lv8 with the wing held is told on the launch's first farm view — after the launch cover is gone,
+## an Error with Decorate ›; under the cover it ran out unseen (不知火舞 on #916).
+func test_the_held_wing_is_said_once_the_launch_cover_is_gone() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt._launch_s = 0.5   # the launch cover is up
+	rt.toast_on_arrival(P0Logic.HOME_BLOCKED_TAP, P0Ui.DECORATE_ACTION)
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.toast_text()).is_empty()
+	rt._launch_s = -1.0
+	rt._flush_arrival_toast()
+	assert_str(rt.ui.toast_text().replace("\n", " ").replace(" · ", " ")).is_equal("Space taken clear it first")
+	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
+	assert_str(rt.ui._toasts.current_action()).is_equal(P0Ui.DECORATE_ACTION)
