@@ -90,24 +90,29 @@ static func shown_blocks(a: Dictionary, at: Vector2) -> Array:
 
 ## A distance as q(132) writes it: under 10 km one decimal (`0.8 km`), from 10 km whole with thousands (`11 km`).
 static func km_text(d: float) -> String:
-	if snappedf(d, 0.1) < 10.0: return "%s km" % String.num(snappedf(d, 0.1), 1)   # 9.96 is `10 km`, not `10.0 km` (周瑜)
+	return km_figure(d) + " km"
+
+## km_text's figure alone (`0.8`, `8,269`): the two lines below keep ` km` in their own words, so 中文's `%s km to %s`
+## takes only a distance — a bare `%s to %s` took any line with a ` to ` in it (SGODOT-450, 周瑜).
+static func km_figure(d: float) -> String:
+	if snappedf(d, 0.1) < 10.0: return String.num(snappedf(d, 0.1), 1)   # 9.96 is `10 km`, not `10.0 km` (周瑜)
 	var n := str(int(round(d)))
 	var out := ""
 	while n.length() > 3:
 		out = "," + n.right(3) + out
 		n = n.left(n.length() - 3)
-	return n + out + " km"
+	return n + out
 
 ## The card's one line (3e4fbec7; fdf7c5df: the same when it cannot stand): `0.8 km to Fern Pond · west`, the pin on
 ## the pond's west. pond: {name, at}.
 static func card_line(at: Vector2, pond: Dictionary) -> String:
 	if pond.is_empty(): return ""
-	return "%s to %s · %s" % [km_text(km(pond.at, at)), str(pond.name), toward(pond.at, at)]
+	return "%s km to %s · %s" % [km_figure(km(pond.at, at)), str(pond.name), toward(pond.at, at)]
 
 ## The confirm card's first line (q(216) ③): `San Francisco · 0.8 km to Fern Pond`, no side.
 static func confirm_line(city_name: String, at: Vector2, pond: Dictionary) -> String:
 	if pond.is_empty(): return city_name
-	return "%s · %s to %s" % [city_name, km_text(km(pond.at, at)), str(pond.name)]
+	return "%s · %s km to %s" % [city_name, km_figure(km(pond.at, at)), str(pond.name)]
 
 ## The grey Build here and its toast for a refusal (q(216) ③): {key, short, toast}. `short` is the general word for
 ## when the place's own name does not fit the key (pond / shop / hut; the page measures). names: id → {name, kind}.
