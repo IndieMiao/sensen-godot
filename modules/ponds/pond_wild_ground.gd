@@ -132,7 +132,10 @@ static func _mesh(polygon: PackedVector2Array, terrace: float, seed_value: int) 
 static func _water_sdf(polygon: PackedVector2Array) -> ImageTexture:
 	var w := int(SDF_EXTENT.x / SDF_PX)
 	var h := int(SDF_EXTENT.y / SDF_PX)
-	var img := Image.create_empty(w, h, false, Image.FORMAT_RF)
+	# half float, not FORMAT_RF: 32-bit float textures are not filterable on iOS (Metal) and on many GLES3 phones (no
+	# OES_texture_float_linear), so they fell back to nearest there and every sand / grass edge stepped in 0.25 m
+	# squares (the user's 0.3.4 (2) shots, bot 589 / 590); 16-bit float filters everywhere, a few mm off at these values
+	var img := Image.create_empty(w, h, false, Image.FORMAT_RH)
 	for y in h:
 		for x in w:
 			var p := SDF_ORIGIN + (Vector2(x, y) + Vector2(0.5, 0.5)) * SDF_PX
