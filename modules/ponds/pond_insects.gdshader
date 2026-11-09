@@ -132,7 +132,8 @@ void fragment() {
 	} else {
 		if (side != 0.0) {
 			alpha = step(length((wing - vec2(0.5)) * vec2(2.0, 2.4)), 1.0);
-			colour = palette[4];
+			// the leading edge in the body's colour: the pale wing has an outline on the water (上官婉儿 on #929)
+			colour = wing.y > 0.64 ? palette[k] : palette[4];
 		} else {
 			colour = local.z > 0.105 ? palette[2 + k] : palette[k];   // the head a shade darker
 		}

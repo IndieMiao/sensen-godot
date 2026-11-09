@@ -12,7 +12,7 @@ const SHADER := preload("res://modules/ponds/pond_insects.gdshader")
 const PondWildGround := preload("res://modules/ponds/pond_wild_ground.gd")
 const KINDS := ["bee", "butterfly", "dragonfly"]
 const COUNT := {"bee": 6, "butterfly": 6, "dragonfly": 4}
-## On the opening screen (its anchor in the camera band) at most this many of a kind (上官婉儿: 3–6 in all there), the
+## On the opening screen (its anchor where it shows the world) at most this many of a kind (上官婉儿: 3–6 in all there), the
 ## rest round the meadow; two dragonflies, as some ponds open on little but water and sand (Fern).
 const OPENING := {"bee": 2, "butterfly": 2, "dragonfly": 2}
 ## Height over the ground (the water's for a dragonfly) the whole flight keeps in, and the shader's rise and fall about
@@ -25,11 +25,18 @@ const CLEAR_M := 1.5
 const SPACING_M := 1.6   # between any two anchors
 const SHORE := Vector2(0.3, 1.5)   # a dragonfly's anchor: in the water, this far off its edge
 const SCALE_JITTER := 0.12
+## The meshes are the spec's sizes; on the phone (~45 px/m at the opening) they read as white specks, so they are drawn
+## this much bigger (上官婉儿 on #929: bee 8–10 px, butterfly 12–14, dragonfly 16–18).
+const SIZE := {"bee": 1.9, "butterfly": 1.9, "dragonfly": 1.3}
+## Half a mesh's longest reach (its wings or its body), unscaled: what a flight's box adds round its path.
+const HALF := {"bee": 0.09, "butterfly": 0.13, "dragonfly": 0.17}
 ## Colours (sRGB, 上官婉儿's spec), in the shader's palette order.
 const PALETTE := {
 	"bee": ["f2c230", "3a2e26", "eaf4ff"],   # body, stripes, wings
 	"butterfly": ["3e3a36", "f5d547", "f7f3e8", "c9a7e8", "e8a23a", "4a4a4a", "f2e6ff"],   # body; yellow, white, lilac; tip, dot, inner
-	"dragonfly": ["3fb38c", "2e8fb5", "2f8a6b", "226d8a", "d6f0f7"],   # teal, lake blue; their heads a shade darker; wings
+	# green, blue (上官婉儿 on #929: a shade deeper, and paler wings edged in the body's colour, to show on the water);
+	# their heads a shade darker; wings
+	"dragonfly": ["23845f", "1f6e8c", "1b674a", "18566d", "eef6fa"],
 }
 
 ## Timing them (李元芳's frame times, one build measured twice): a user://p0_no_insects marker (adb shell run-as <package>
@@ -40,7 +47,7 @@ static func wanted() -> bool:
 
 ## {kind: [{at: Vector3 (the anchor, at its height), radius, phase, variant, scale}]} for this pond. `wild`: points(),
 ## where its plants and cattails stand. `opening`: {screen: (corners: PackedVector3Array) -> Rect2 on the opening screen,
-## keep_off: [Rect2] its keys / player / name bars, band: Rect2 the camera band}; empty, no screen.
+## keep_off: [Rect2] its keys / quick bar / player / points / name bar, shown: Rect2 the world it shows}; empty, no screen.
 static func layout(entry: Dictionary, spec: Dictionary, wild: Dictionary, clear: Array, spawn: Vector3, opening := {},
 		gles := false) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
@@ -48,25 +55,30 @@ static func layout(entry: Dictionary, spec: Dictionary, wild: Dictionary, clear:
 	var id := str(entry.id)
 	var screen: Callable = opening.get("screen", Callable())
 	var keep_off: Array = opening.get("keep_off", [])
-	var band: Rect2 = opening.get("band", Rect2())
+	var shown: Rect2 = opening.get("shown", Rect2())
 	var taken: Array = []
 	var out := {}
 	for kind in ["dragonfly", "bee", "butterfly"]:   # the water's few first: the bank's plants are many
 		out[kind] = []
 		var want: int = floori(COUNT[kind] / 2.0) if gles else COUNT[kind]
-		var points := _water_points(id, spec, wild.get("reeds", []), rng) if kind == "dragonfly" \
+		var reeds: Array = wild.get("reeds", [])
+		var points := _water_points(id, spec, reeds, rng) if kind == "dragonfly" \
 			else _shuffled(wild.get("flowers", []), rng) + _shuffled(wild.get("leafy", []), rng)
-		if kind == "butterfly": points += _shuffled(wild.get("reeds", []), rng)   # last, a pond opening on water (Fern)
+		if kind == "butterfly": points += _shuffled(reeds, rng)   # last, a pond opening on water (Fern)
+		# the opening's share from the plants nearest the player (上官婉儿 on #929: a bee and a butterfly on the clumps
+		# 3–5 m off), the rest round the meadow in the seeded order
+		var nearest := points.duplicate()
+		if kind != "dragonfly": nearest.sort_custom(func(a, b): return _flat(a, spawn) < _flat(b, spawn))
 		var seen := 0
 		for later in [false, true]:   # the opening's share first (OPENING), then off it round the meadow
-			for p in points:
+			for p in (points if later else nearest):
 				if out[kind].size() >= want: break
-				var a := _anchor(kind, p, rng)
+				var a := _anchor(kind, p, rng, not p in reeds)
 				if not _free(a, taken, clear, spawn): continue
 				if screen.is_valid():
 					var box: Rect2 = screen.call(_flight_box(kind, a))
 					if keep_off.any(func(r): return (r as Rect2).intersects(box)): continue
-					var on_screen := band.has_point((screen.call(PackedVector3Array([a.at])) as Rect2).position)
+					var on_screen := shown.has_point((screen.call(PackedVector3Array([a.at])) as Rect2).position)
 					if on_screen == later or (on_screen and seen >= OPENING[kind]): continue
 					if on_screen: seen += 1
 				out[kind].append(a)
@@ -74,30 +86,34 @@ static func layout(entry: Dictionary, spec: Dictionary, wild: Dictionary, clear:
 			if not screen.is_valid(): break
 	return out
 
-static func _anchor(kind: String, p: Vector3, rng: RandomNumberGenerator) -> Dictionary:
+## `grass`: over the meadow's plants (not a cattail in the water), where a white butterfly may fly.
+static func _anchor(kind: String, p: Vector3, rng: RandomNumberGenerator, grass := true) -> Dictionary:
 	var h: Vector2 = HEIGHT[kind]
 	var r: Vector2 = RADIUS[kind]
 	var bob: float = BOB[kind]
 	var ground := WATER_Y if kind == "dragonfly" else 0.0
 	var variant := 0
-	if kind == "butterfly":   # yellow : white : lilac, 5 : 3 : 2
-		var roll := rng.randf()
-		variant = 0 if roll < 0.5 else (1 if roll < 0.8 else 2)
+	if kind == "butterfly":   # yellow : white : lilac, 5 : 1 : 4 (上官婉儿 / 不知火舞 on #929: a white one melts into the
+		var roll := rng.randf()   # grass's light and the sand; it flies only over the meadow's plants, else a lilac one)
+		variant = 0 if roll < 0.5 else (1 if roll < 0.6 and grass else 2)
 	elif kind == "dragonfly":
 		variant = rng.randi() % 2
 	return {"at": Vector3(p.x, ground + rng.randf_range(h.x + bob, h.y - bob), p.z), "radius": rng.randf_range(r.x, r.y),
-		"phase": rng.randf(), "variant": variant, "scale": 1.0 + rng.randf_range(-SCALE_JITTER, SCALE_JITTER)}
+		"phase": rng.randf(), "variant": variant, "scale": SIZE[kind] * (1.0 + rng.randf_range(-SCALE_JITTER, SCALE_JITTER))}
+
+static func _flat(p: Vector3, q: Vector3) -> float: return Vector2(p.x - q.x, p.z - q.z).length()
 
 static func _free(a: Dictionary, taken: Array, clear: Array, spawn: Vector3) -> bool:
 	var at: Vector3 = a.at
-	if PondScenery._near(at, clear) or Vector2(at.x - spawn.x, at.z - spawn.z).length() < CLEAR_M: return false
-	return not taken.any(func(o): return Vector2(o.x - at.x, o.z - at.z).length() < SPACING_M)
+	if PondScenery._near(at, clear) or _flat(at, spawn) < CLEAR_M: return false
+	return not taken.any(func(o): return _flat(o, at) < SPACING_M)
 
-## The box a flight keeps in (its radius round the anchor, its rise and fall): the 8 corners.
+## The box a flight keeps in (its radius round the anchor, its rise and fall, the insect's own size): the 8 corners.
 static func _flight_box(kind: String, a: Dictionary) -> PackedVector3Array:
 	var out := PackedVector3Array()
-	var r: float = a.radius
-	var bob: float = BOB[kind]
+	var own: float = HALF[kind] * a.scale
+	var r: float = a.radius + own
+	var bob: float = BOB[kind] + own
 	for k in 8:
 		out.append(a.at + Vector3(r if k & 1 else -r, bob if k & 2 else -bob, r if k & 4 else -r))
 	return out
@@ -174,7 +190,7 @@ static func _batch(kind: String, anchors: Array) -> MultiMeshInstance3D:
 		var a: Dictionary = anchors[i]
 		mm.set_instance_transform(i, Transform3D(Basis(), a.at))
 		mm.set_instance_custom_data(i, Color(a.radius, a.phase, a.variant, a.scale))
-		var reach := Vector3(a.radius, BOB[kind], a.radius) + Vector3.ONE * 0.2   # the flight, the wings, the scale
+		var reach: Vector3 = Vector3(a.radius, BOB[kind], a.radius) + Vector3.ONE * (HALF[kind] * a.scale + 0.05)   # the flight, the insect
 		var box := AABB(a.at - reach, reach * 2.0)
 		bounds = box if i == 0 else bounds.merge(box)
 	node.multimesh = mm
@@ -202,8 +218,8 @@ static func mesh(kind: String) -> ArrayMesh:
 		"butterfly":   # 0.10 long, 0.26 across: 6 + 4 faces
 			_body(v, uv, uv2, Vector3(0, 0, 0.05), Vector3(0, 0, -0.05), 0.01, _ring(0.01))
 			for side in [1.0, -1.0]: _wing(v, uv, uv2, side, 0, 0.0, -0.055, 0.05, 0.13, 0.0)
-		"dragonfly":   # 0.30 long, 0.32 across: 6 + 8 faces
-			_body(v, uv, uv2, Vector3(0, 0, 0.13), Vector3(0, 0, -0.17), 0.07, _ring(0.02))
+		"dragonfly":   # 0.30 long, 0.32 across: 6 + 8 faces; the body 1.3 × thicker (上官婉儿 on #929)
+			_body(v, uv, uv2, Vector3(0, 0, 0.13), Vector3(0, 0, -0.17), 0.07, _ring(0.026))
 			for side in [1.0, -1.0]:
 				_wing(v, uv, uv2, side, 0, 0.015, 0.08, 0.115, 0.16, 0.01)
 				_wing(v, uv, uv2, side, 1, 0.015, 0.035, 0.075, 0.155, 0.015)

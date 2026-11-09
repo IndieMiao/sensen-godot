@@ -581,22 +581,25 @@ static func opening_screen(spawn: Vector3, water: Vector3, piece: Vector3) -> Ca
 ## The wild's insects on that opening screen (SGODOT-454, PondInsects.layout's `opening`): their flights keep off the
 ## action keys, the player at the spawn (feet to HEAD_M, PLAYER_HALF_M a side), the gathering points' pieces, and the
 ## name bar the nearest one (`piece`) opens there (UiWorldNameBar, 32 px tall, its strip out to either side of its icon
-## at _gather_screen's height, a point's or a tree's).
+## at _gather_screen's height, a point's or a tree's) and the quick bar (P0Ui: its top at 708). `shown`: the world on that
+## screen between the HUD's rows and the quick bar, the lower grass too (不知火舞 on #929: some near the player there).
 const NAME_BAR_REACH := Vector2(150, 16)
+const REF_QUICK_BAR := Rect2(0, 708, 360, 92)
+const REF_SHOWN := Rect2(0, 98, 360, 610)
 static func insects_opening(spawn: Vector3, water: Vector3, piece: Vector3, clear: Array) -> Dictionary:
 	var screen := opening_screen(spawn, water, piece)
 	var upright := func(at: Vector3, half: float, tall: float) -> PackedVector3Array:
 		var out := PackedVector3Array()
 		for k in 8: out.append(at + Vector3(half if k & 1 else -half, tall if k & 2 else 0.0, half if k & 4 else -half))
 		return out
-	var keep_off: Array = REF_KEYS.duplicate()
+	var keep_off: Array = REF_KEYS + [REF_QUICK_BAR]
 	keep_off.append(screen.call(upright.call(spawn, PLAYER_HALF_M, HEAD_M)))
 	for c in clear: keep_off.append(screen.call(upright.call(c, 0.5, 1.2)))
 	if piece.is_finite():
 		for tall in [1.0, 2.2]:
 			var icon: Vector2 = (screen.call(PackedVector3Array([piece + Vector3(0, tall, 0)])) as Rect2).position
 			keep_off.append(Rect2(icon - NAME_BAR_REACH, NAME_BAR_REACH * 2.0))
-	return {"screen": screen, "keep_off": keep_off, "band": REF_BAND}
+	return {"screen": screen, "keep_off": keep_off, "shown": REF_SHOWN}
 
 ## The action group's column on the screen (P0Ui.key_column), empty without the UI or with it hidden.
 func _key_column() -> Rect2:

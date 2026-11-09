@@ -1,8 +1,9 @@
 extends GdUnitTestSuite
 ## The wild's insects (SGODOT-454; 上官婉儿's plan and spec): a kind a MultiMesh, small meshes, no shadows; the same
 ## pond has them in the same places; their anchors off the gathering points and the spawn at the spec's heights, the
-## dragonflies over the water off its edge; half as many under gl_compatibility; on the opening screen 3–6 of them, none
-## of their flights over the keys, the player or a point's name bar.
+## dragonflies over the water off its edge; half as many under gl_compatibility; on the opening screen 3–6 of them, a bee
+## or a yellow butterfly among them within 5 m of the player, none of their flights over the keys, the player or a point's name
+## bar.
 
 const PondInsects := preload("res://modules/ponds/pond_insects.gd")
 const PondWalk := preload("res://modules/ponds/pond_walk.gd")
@@ -81,14 +82,21 @@ func test_the_opening_shows_three_to_six_none_over_the_keys_the_player_or_the_po
 		var entry := P0Ponds.location(id)
 		var opening := _opening(entry, FERN_CLEAR)
 		var l := _layout(id, FERN_CLEAR, opening)
+		var spawn := _spawn(entry)
+		var near := 0
 		var seen := 0
 		for kind in l:
 			for a in l[kind]:
 				var box: Rect2 = opening.screen.call(PondInsects._flight_box(kind, a))
 				for r in opening.keep_off:
 					assert_bool((r as Rect2).intersects(box)).override_failure_message("%s %s %s over %s" % [id, kind, box, r]).is_false()
-				if (opening.band as Rect2).has_point((opening.screen.call(PackedVector3Array([a.at])) as Rect2).position): seen += 1
+				if not (opening.shown as Rect2).has_point((opening.screen.call(PackedVector3Array([a.at])) as Rect2).position): continue
+				seen += 1
+				var bright: bool = kind == "bee" or (kind == "butterfly" and a.variant == 0)
+				if bright and Vector2(a.at.x - spawn.x, a.at.z - spawn.z).length() <= 5.0: near += 1
 		assert_int(seen).override_failure_message(id).is_between(3, 6)
+		# 1–2 bees or yellow butterflies near the player (上官婉儿 on #929: over the grass and flowers 3–5 m off)
+		assert_int(near).override_failure_message(id).is_greater_equal(1)
 
 ## One build timed with and without them (李元芳 on gs66): a user://p0_no_insects marker leaves them out.
 func test_a_marker_file_leaves_them_out() -> void:
