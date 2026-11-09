@@ -1,0 +1,2157 @@
+{
+  "host_head": "5d50bf0c2aa3868aba89b777a3c8a4925cdd15c9",
+  "renderer": "mobile",
+  "gpu": "NVIDIA GeForce RTX 2060",
+  "scope": "native Common wait overlay, no host/camera changes",
+  "checks": [
+    {
+      "check": "At least3 seconds native capture at20+fps",
+      "passed": true,
+      "evidence": {
+        "frames": 91,
+        "wall_ms": 3021
+      }
+    },
+    {
+      "check": "Real host HDR target enabled",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Three emitting particles in real wait overlay",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Pot mouth fixed180,235",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Native expanded frame80,110/200x220",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Steam stays within allowed strip and fades beforey120",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Composite alpha<=0.5 over ring",
+      "passed": true,
+      "evidence": 0.490234375
+    },
+    {
+      "check": "Composite upper alpha about0.75",
+      "passed": true,
+      "evidence": 0.73681640625
+    },
+    {
+      "check": "Warm core matchesFFF8F0 in native target",
+      "passed": true,
+      "evidence": null
+    },
+    {
+      "check": "Cool edge matchesD9DEE3 in native target",
+      "passed": true,
+      "evidence": null
+    }
+  ],
+  "passed": true,
+  "frames": [
+    {
+      "frame": 0,
+      "bounds_xyxy": [
+        176,
+        123,
+        215,
+        182
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.326171875,
+      "warm_core_pixels_within_3rgb": 1141,
+      "cool_edge_pixels_within_3rgb": 120,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.9600067138672,
+        227.11000061035156
+      ]
+    },
+    {
+      "frame": 1,
+      "bounds_xyxy": [
+        176,
+        123,
+        215,
+        183
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.329833984375,
+      "warm_core_pixels_within_3rgb": 1190,
+      "cool_edge_pixels_within_3rgb": 113,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.9499969482422
+      ],
+      "nearest_edge_srgb": [
+        217.1300048828125,
+        221.97999572753906,
+        227.1199951171875
+      ]
+    },
+    {
+      "frame": 2,
+      "bounds_xyxy": [
+        175,
+        123,
+        215,
+        183
+      ],
+      "peak_alpha": 0.72119140625,
+      "ring_peak_alpha": 0.33251953125,
+      "warm_core_pixels_within_3rgb": 1219,
+      "cool_edge_pixels_within_3rgb": 132,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.99000549316406
+      ],
+      "nearest_edge_srgb": [
+        217.14999389648438,
+        221.97000122070312,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 3,
+      "bounds_xyxy": [
+        174,
+        122,
+        215,
+        182
+      ],
+      "peak_alpha": 0.71240234375,
+      "ring_peak_alpha": 0.3193359375,
+      "warm_core_pixels_within_3rgb": 1243,
+      "cool_edge_pixels_within_3rgb": 122,
+      "nearest_core_srgb": [
+        255.0,
+        247.9600067138672,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        222.0,
+        227.17999267578125
+      ]
+    },
+    {
+      "frame": 4,
+      "bounds_xyxy": [
+        173,
+        121,
+        214,
+        182
+      ],
+      "peak_alpha": 0.70703125,
+      "ring_peak_alpha": 0.29052734375,
+      "warm_core_pixels_within_3rgb": 1266,
+      "cool_edge_pixels_within_3rgb": 143,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02999877929688,
+        227.11000061035156
+      ]
+    },
+    {
+      "frame": 5,
+      "bounds_xyxy": [
+        170,
+        121,
+        214,
+        194
+      ],
+      "peak_alpha": 0.70166015625,
+      "ring_peak_alpha": 0.329345703125,
+      "warm_core_pixels_within_3rgb": 1448,
+      "cool_edge_pixels_within_3rgb": 118,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.99000549316406
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 6,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        194
+      ],
+      "peak_alpha": 0.69873046875,
+      "ring_peak_alpha": 0.3818359375,
+      "warm_core_pixels_within_3rgb": 1577,
+      "cool_edge_pixels_within_3rgb": 132,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.94000244140625
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02999877929688,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 7,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        194
+      ],
+      "peak_alpha": 0.6884765625,
+      "ring_peak_alpha": 0.42626953125,
+      "warm_core_pixels_within_3rgb": 1603,
+      "cool_edge_pixels_within_3rgb": 133,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 8,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        195
+      ],
+      "peak_alpha": 0.66796875,
+      "ring_peak_alpha": 0.4755859375,
+      "warm_core_pixels_within_3rgb": 1634,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02999877929688,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 9,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        195
+      ],
+      "peak_alpha": 0.646484375,
+      "ring_peak_alpha": 0.484375,
+      "warm_core_pixels_within_3rgb": 1625,
+      "cool_edge_pixels_within_3rgb": 128,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02999877929688,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 10,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        194
+      ],
+      "peak_alpha": 0.62158203125,
+      "ring_peak_alpha": 0.48388671875,
+      "warm_core_pixels_within_3rgb": 1601,
+      "cool_edge_pixels_within_3rgb": 130,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.02999877929688
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.0,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 11,
+      "bounds_xyxy": [
+        169,
+        121,
+        213,
+        194
+      ],
+      "peak_alpha": 0.6103515625,
+      "ring_peak_alpha": 0.4833984375,
+      "warm_core_pixels_within_3rgb": 1557,
+      "cool_edge_pixels_within_3rgb": 136,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.97000122070312,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 12,
+      "bounds_xyxy": [
+        168,
+        121,
+        213,
+        194
+      ],
+      "peak_alpha": 0.63330078125,
+      "ring_peak_alpha": 0.452392578125,
+      "warm_core_pixels_within_3rgb": 1524,
+      "cool_edge_pixels_within_3rgb": 143,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 13,
+      "bounds_xyxy": [
+        168,
+        122,
+        213,
+        193
+      ],
+      "peak_alpha": 0.66015625,
+      "ring_peak_alpha": 0.375244140625,
+      "warm_core_pixels_within_3rgb": 1496,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.14999389648438,
+        221.9600067138672,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 14,
+      "bounds_xyxy": [
+        167,
+        122,
+        212,
+        192
+      ],
+      "peak_alpha": 0.67236328125,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1438,
+      "cool_edge_pixels_within_3rgb": 134,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.00999450683594,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 15,
+      "bounds_xyxy": [
+        167,
+        122,
+        212,
+        190
+      ],
+      "peak_alpha": 0.6884765625,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1392,
+      "cool_edge_pixels_within_3rgb": 117,
+      "nearest_core_srgb": [
+        255.0,
+        247.91000366210938,
+        239.9600067138672
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 16,
+      "bounds_xyxy": [
+        166,
+        122,
+        211,
+        189
+      ],
+      "peak_alpha": 0.6982421875,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1360,
+      "cool_edge_pixels_within_3rgb": 138,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.99000549316406,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 17,
+      "bounds_xyxy": [
+        166,
+        122,
+        211,
+        188
+      ],
+      "peak_alpha": 0.7109375,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1304,
+      "cool_edge_pixels_within_3rgb": 118,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 18,
+      "bounds_xyxy": [
+        165,
+        122,
+        210,
+        187
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.3759765625,
+      "warm_core_pixels_within_3rgb": 1233,
+      "cool_edge_pixels_within_3rgb": 115,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.14999389648438,
+        221.97000122070312,
+        227.08999633789062
+      ]
+    },
+    {
+      "frame": 19,
+      "bounds_xyxy": [
+        165,
+        123,
+        210,
+        186
+      ],
+      "peak_alpha": 0.736328125,
+      "ring_peak_alpha": 0.3759765625,
+      "warm_core_pixels_within_3rgb": 1199,
+      "cool_edge_pixels_within_3rgb": 116,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.9499969482422,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 20,
+      "bounds_xyxy": [
+        165,
+        124,
+        209,
+        184
+      ],
+      "peak_alpha": 0.72119140625,
+      "ring_peak_alpha": 0.363525390625,
+      "warm_core_pixels_within_3rgb": 1200,
+      "cool_edge_pixels_within_3rgb": 108,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.0399932861328,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 21,
+      "bounds_xyxy": [
+        164,
+        123,
+        206,
+        183
+      ],
+      "peak_alpha": 0.7060546875,
+      "ring_peak_alpha": 0.338134765625,
+      "warm_core_pixels_within_3rgb": 1225,
+      "cool_edge_pixels_within_3rgb": 123,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0399932861328
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.00999450683594,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 22,
+      "bounds_xyxy": [
+        164,
+        122,
+        204,
+        182
+      ],
+      "peak_alpha": 0.7060546875,
+      "ring_peak_alpha": 0.303955078125,
+      "warm_core_pixels_within_3rgb": 1250,
+      "cool_edge_pixels_within_3rgb": 142,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.13999938964844,
+        221.99000549316406,
+        227.10000610351562
+      ]
+    },
+    {
+      "frame": 23,
+      "bounds_xyxy": [
+        164,
+        121,
+        204,
+        194
+      ],
+      "peak_alpha": 0.703125,
+      "ring_peak_alpha": 0.32861328125,
+      "warm_core_pixels_within_3rgb": 1422,
+      "cool_edge_pixels_within_3rgb": 120,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0399932861328
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        222.00999450683594,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 24,
+      "bounds_xyxy": [
+        163,
+        121,
+        204,
+        194
+      ],
+      "peak_alpha": 0.69482421875,
+      "ring_peak_alpha": 0.379638671875,
+      "warm_core_pixels_within_3rgb": 1535,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        240.02999877929688
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02999877929688,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 25,
+      "bounds_xyxy": [
+        163,
+        121,
+        204,
+        194
+      ],
+      "peak_alpha": 0.69189453125,
+      "ring_peak_alpha": 0.4296875,
+      "warm_core_pixels_within_3rgb": 1582,
+      "cool_edge_pixels_within_3rgb": 141,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.94000244140625
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 26,
+      "bounds_xyxy": [
+        163,
+        121,
+        205,
+        195
+      ],
+      "peak_alpha": 0.66650390625,
+      "ring_peak_alpha": 0.479736328125,
+      "warm_core_pixels_within_3rgb": 1603,
+      "cool_edge_pixels_within_3rgb": 135,
+      "nearest_core_srgb": [
+        255.0,
+        247.9600067138672,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.13999938964844,
+        221.9600067138672,
+        227.13999938964844
+      ]
+    },
+    {
+      "frame": 27,
+      "bounds_xyxy": [
+        163,
+        121,
+        205,
+        195
+      ],
+      "peak_alpha": 0.6435546875,
+      "ring_peak_alpha": 0.490234375,
+      "warm_core_pixels_within_3rgb": 1611,
+      "cool_edge_pixels_within_3rgb": 143,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        221.97999572753906,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 28,
+      "bounds_xyxy": [
+        163,
+        121,
+        206,
+        194
+      ],
+      "peak_alpha": 0.6220703125,
+      "ring_peak_alpha": 0.487060546875,
+      "warm_core_pixels_within_3rgb": 1591,
+      "cool_edge_pixels_within_3rgb": 131,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.97999572753906
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.05999755859375,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 29,
+      "bounds_xyxy": [
+        163,
+        121,
+        206,
+        194
+      ],
+      "peak_alpha": 0.61083984375,
+      "ring_peak_alpha": 0.487060546875,
+      "warm_core_pixels_within_3rgb": 1555,
+      "cool_edge_pixels_within_3rgb": 125,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.99000549316406
+      ],
+      "nearest_edge_srgb": [
+        217.1199951171875,
+        222.00999450683594,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 30,
+      "bounds_xyxy": [
+        163,
+        121,
+        206,
+        194
+      ],
+      "peak_alpha": 0.65234375,
+      "ring_peak_alpha": 0.434814453125,
+      "warm_core_pixels_within_3rgb": 1518,
+      "cool_edge_pixels_within_3rgb": 139,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0399932861328
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.00999450683594,
+        227.13999938964844
+      ]
+    },
+    {
+      "frame": 31,
+      "bounds_xyxy": [
+        163,
+        122,
+        207,
+        193
+      ],
+      "peak_alpha": 0.66357421875,
+      "ring_peak_alpha": 0.375244140625,
+      "warm_core_pixels_within_3rgb": 1489,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.97999572753906
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 32,
+      "bounds_xyxy": [
+        163,
+        122,
+        207,
+        192
+      ],
+      "peak_alpha": 0.6767578125,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1447,
+      "cool_edge_pixels_within_3rgb": 130,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.9600067138672
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        221.97000122070312,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 33,
+      "bounds_xyxy": [
+        163,
+        122,
+        208,
+        190
+      ],
+      "peak_alpha": 0.6865234375,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1393,
+      "cool_edge_pixels_within_3rgb": 131,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        221.99000549316406,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 34,
+      "bounds_xyxy": [
+        164,
+        122,
+        208,
+        189
+      ],
+      "peak_alpha": 0.697265625,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1345,
+      "cool_edge_pixels_within_3rgb": 115,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.97999572753906,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 35,
+      "bounds_xyxy": [
+        164,
+        122,
+        209,
+        187
+      ],
+      "peak_alpha": 0.7109375,
+      "ring_peak_alpha": 0.375732421875,
+      "warm_core_pixels_within_3rgb": 1275,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.0399932861328
+      ],
+      "nearest_edge_srgb": [
+        217.11000061035156,
+        222.02999877929688,
+        227.10000610351562
+      ]
+    },
+    {
+      "frame": 36,
+      "bounds_xyxy": [
+        165,
+        122,
+        209,
+        186
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.3759765625,
+      "warm_core_pixels_within_3rgb": 1222,
+      "cool_edge_pixels_within_3rgb": 128,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0399932861328,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 37,
+      "bounds_xyxy": [
+        165,
+        123,
+        210,
+        184
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.363037109375,
+      "warm_core_pixels_within_3rgb": 1202,
+      "cool_edge_pixels_within_3rgb": 122,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        239.99000549316406
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        221.97999572753906,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 38,
+      "bounds_xyxy": [
+        166,
+        123,
+        210,
+        183
+      ],
+      "peak_alpha": 0.720703125,
+      "ring_peak_alpha": 0.32958984375,
+      "warm_core_pixels_within_3rgb": 1216,
+      "cool_edge_pixels_within_3rgb": 121,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        222.0,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 39,
+      "bounds_xyxy": [
+        169,
+        121,
+        211,
+        181
+      ],
+      "peak_alpha": 0.71337890625,
+      "ring_peak_alpha": 0.285888671875,
+      "warm_core_pixels_within_3rgb": 1234,
+      "cool_edge_pixels_within_3rgb": 131,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        240.02999877929688
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0399932861328,
+        227.10000610351562
+      ]
+    },
+    {
+      "frame": 40,
+      "bounds_xyxy": [
+        170,
+        121,
+        211,
+        179
+      ],
+      "peak_alpha": 0.7060546875,
+      "ring_peak_alpha": 0.28662109375,
+      "warm_core_pixels_within_3rgb": 1235,
+      "cool_edge_pixels_within_3rgb": 142,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.02999877929688
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02999877929688,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 41,
+      "bounds_xyxy": [
+        171,
+        121,
+        212,
+        194
+      ],
+      "peak_alpha": 0.7041015625,
+      "ring_peak_alpha": 0.328857421875,
+      "warm_core_pixels_within_3rgb": 1439,
+      "cool_edge_pixels_within_3rgb": 110,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        221.97999572753906,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 42,
+      "bounds_xyxy": [
+        171,
+        121,
+        212,
+        194
+      ],
+      "peak_alpha": 0.69775390625,
+      "ring_peak_alpha": 0.376953125,
+      "warm_core_pixels_within_3rgb": 1537,
+      "cool_edge_pixels_within_3rgb": 110,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        240.02999877929688
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0399932861328,
+        227.13999938964844
+      ]
+    },
+    {
+      "frame": 43,
+      "bounds_xyxy": [
+        171,
+        121,
+        213,
+        194
+      ],
+      "peak_alpha": 0.6953125,
+      "ring_peak_alpha": 0.367919921875,
+      "warm_core_pixels_within_3rgb": 1503,
+      "cool_edge_pixels_within_3rgb": 132,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        222.02999877929688,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 44,
+      "bounds_xyxy": [
+        171,
+        121,
+        213,
+        193
+      ],
+      "peak_alpha": 0.66650390625,
+      "ring_peak_alpha": 0.357421875,
+      "warm_core_pixels_within_3rgb": 1465,
+      "cool_edge_pixels_within_3rgb": 144,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 45,
+      "bounds_xyxy": [
+        172,
+        121,
+        213,
+        192
+      ],
+      "peak_alpha": 0.64306640625,
+      "ring_peak_alpha": 0.375244140625,
+      "warm_core_pixels_within_3rgb": 1420,
+      "cool_edge_pixels_within_3rgb": 139,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.13999938964844,
+        221.9600067138672,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 46,
+      "bounds_xyxy": [
+        172,
+        121,
+        214,
+        190
+      ],
+      "peak_alpha": 0.6337890625,
+      "ring_peak_alpha": 0.375,
+      "warm_core_pixels_within_3rgb": 1377,
+      "cool_edge_pixels_within_3rgb": 128,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 47,
+      "bounds_xyxy": [
+        172,
+        121,
+        214,
+        188
+      ],
+      "peak_alpha": 0.63671875,
+      "ring_peak_alpha": 0.375244140625,
+      "warm_core_pixels_within_3rgb": 1329,
+      "cool_edge_pixels_within_3rgb": 131,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.97999572753906
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.99000549316406,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 48,
+      "bounds_xyxy": [
+        173,
+        121,
+        214,
+        187
+      ],
+      "peak_alpha": 0.65087890625,
+      "ring_peak_alpha": 0.375244140625,
+      "warm_core_pixels_within_3rgb": 1281,
+      "cool_edge_pixels_within_3rgb": 133,
+      "nearest_core_srgb": [
+        255.0,
+        247.9600067138672,
+        240.02999877929688
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        221.99000549316406,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 49,
+      "bounds_xyxy": [
+        174,
+        121,
+        214,
+        185
+      ],
+      "peak_alpha": 0.662109375,
+      "ring_peak_alpha": 0.375244140625,
+      "warm_core_pixels_within_3rgb": 1214,
+      "cool_edge_pixels_within_3rgb": 125,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        221.97999572753906,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 50,
+      "bounds_xyxy": [
+        174,
+        122,
+        215,
+        184
+      ],
+      "peak_alpha": 0.671875,
+      "ring_peak_alpha": 0.3720703125,
+      "warm_core_pixels_within_3rgb": 1179,
+      "cool_edge_pixels_within_3rgb": 120,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 51,
+      "bounds_xyxy": [
+        175,
+        122,
+        215,
+        183
+      ],
+      "peak_alpha": 0.689453125,
+      "ring_peak_alpha": 0.359619140625,
+      "warm_core_pixels_within_3rgb": 1124,
+      "cool_edge_pixels_within_3rgb": 108,
+      "nearest_core_srgb": [
+        255.0,
+        247.9600067138672,
+        239.99000549316406
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 52,
+      "bounds_xyxy": [
+        175,
+        122,
+        215,
+        183
+      ],
+      "peak_alpha": 0.697265625,
+      "ring_peak_alpha": 0.34765625,
+      "warm_core_pixels_within_3rgb": 1131,
+      "cool_edge_pixels_within_3rgb": 120,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02000427246094,
+        227.11000061035156
+      ]
+    },
+    {
+      "frame": 53,
+      "bounds_xyxy": [
+        176,
+        122,
+        215,
+        182
+      ],
+      "peak_alpha": 0.7109375,
+      "ring_peak_alpha": 0.33203125,
+      "warm_core_pixels_within_3rgb": 1133,
+      "cool_edge_pixels_within_3rgb": 114,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.0,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 54,
+      "bounds_xyxy": [
+        176,
+        123,
+        215,
+        182
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.326171875,
+      "warm_core_pixels_within_3rgb": 1141,
+      "cool_edge_pixels_within_3rgb": 120,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.9600067138672,
+        227.11000061035156
+      ]
+    },
+    {
+      "frame": 55,
+      "bounds_xyxy": [
+        176,
+        123,
+        215,
+        183
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.329833984375,
+      "warm_core_pixels_within_3rgb": 1190,
+      "cool_edge_pixels_within_3rgb": 113,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.9499969482422
+      ],
+      "nearest_edge_srgb": [
+        217.1300048828125,
+        221.97999572753906,
+        227.1199951171875
+      ]
+    },
+    {
+      "frame": 56,
+      "bounds_xyxy": [
+        175,
+        123,
+        215,
+        183
+      ],
+      "peak_alpha": 0.72119140625,
+      "ring_peak_alpha": 0.33251953125,
+      "warm_core_pixels_within_3rgb": 1219,
+      "cool_edge_pixels_within_3rgb": 132,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.99000549316406
+      ],
+      "nearest_edge_srgb": [
+        217.14999389648438,
+        221.97000122070312,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 57,
+      "bounds_xyxy": [
+        174,
+        122,
+        215,
+        182
+      ],
+      "peak_alpha": 0.71240234375,
+      "ring_peak_alpha": 0.319580078125,
+      "warm_core_pixels_within_3rgb": 1243,
+      "cool_edge_pixels_within_3rgb": 120,
+      "nearest_core_srgb": [
+        255.0,
+        247.9600067138672,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        221.97999572753906,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 58,
+      "bounds_xyxy": [
+        173,
+        121,
+        214,
+        182
+      ],
+      "peak_alpha": 0.70703125,
+      "ring_peak_alpha": 0.290771484375,
+      "warm_core_pixels_within_3rgb": 1266,
+      "cool_edge_pixels_within_3rgb": 143,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02999877929688,
+        227.11000061035156
+      ]
+    },
+    {
+      "frame": 59,
+      "bounds_xyxy": [
+        170,
+        121,
+        214,
+        194
+      ],
+      "peak_alpha": 0.70166015625,
+      "ring_peak_alpha": 0.329345703125,
+      "warm_core_pixels_within_3rgb": 1448,
+      "cool_edge_pixels_within_3rgb": 118,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.99000549316406
+      ],
+      "nearest_edge_srgb": [
+        217.13999938964844,
+        222.00999450683594,
+        227.13999938964844
+      ]
+    },
+    {
+      "frame": 60,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        194
+      ],
+      "peak_alpha": 0.69873046875,
+      "ring_peak_alpha": 0.3818359375,
+      "warm_core_pixels_within_3rgb": 1577,
+      "cool_edge_pixels_within_3rgb": 132,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.94000244140625
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02999877929688,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 61,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        194
+      ],
+      "peak_alpha": 0.6884765625,
+      "ring_peak_alpha": 0.42626953125,
+      "warm_core_pixels_within_3rgb": 1603,
+      "cool_edge_pixels_within_3rgb": 133,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 62,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        195
+      ],
+      "peak_alpha": 0.66796875,
+      "ring_peak_alpha": 0.4755859375,
+      "warm_core_pixels_within_3rgb": 1634,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.97999572753906
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02999877929688,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 63,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        195
+      ],
+      "peak_alpha": 0.646484375,
+      "ring_peak_alpha": 0.484375,
+      "warm_core_pixels_within_3rgb": 1625,
+      "cool_edge_pixels_within_3rgb": 128,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.02999877929688,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 64,
+      "bounds_xyxy": [
+        169,
+        121,
+        214,
+        194
+      ],
+      "peak_alpha": 0.62158203125,
+      "ring_peak_alpha": 0.48388671875,
+      "warm_core_pixels_within_3rgb": 1603,
+      "cool_edge_pixels_within_3rgb": 129,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.02999877929688
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0399932861328,
+        227.13999938964844
+      ]
+    },
+    {
+      "frame": 65,
+      "bounds_xyxy": [
+        169,
+        121,
+        213,
+        194
+      ],
+      "peak_alpha": 0.6103515625,
+      "ring_peak_alpha": 0.4833984375,
+      "warm_core_pixels_within_3rgb": 1557,
+      "cool_edge_pixels_within_3rgb": 136,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.97000122070312,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 66,
+      "bounds_xyxy": [
+        168,
+        121,
+        213,
+        194
+      ],
+      "peak_alpha": 0.63330078125,
+      "ring_peak_alpha": 0.452880859375,
+      "warm_core_pixels_within_3rgb": 1524,
+      "cool_edge_pixels_within_3rgb": 143,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        221.97000122070312,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 67,
+      "bounds_xyxy": [
+        168,
+        122,
+        213,
+        193
+      ],
+      "peak_alpha": 0.66015625,
+      "ring_peak_alpha": 0.375244140625,
+      "warm_core_pixels_within_3rgb": 1496,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.14999389648438,
+        221.9600067138672,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 68,
+      "bounds_xyxy": [
+        167,
+        122,
+        212,
+        192
+      ],
+      "peak_alpha": 0.67236328125,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1438,
+      "cool_edge_pixels_within_3rgb": 134,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.00999450683594,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 69,
+      "bounds_xyxy": [
+        167,
+        122,
+        212,
+        190
+      ],
+      "peak_alpha": 0.6884765625,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1392,
+      "cool_edge_pixels_within_3rgb": 117,
+      "nearest_core_srgb": [
+        255.0,
+        247.91000366210938,
+        239.9600067138672
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 70,
+      "bounds_xyxy": [
+        166,
+        122,
+        211,
+        189
+      ],
+      "peak_alpha": 0.6982421875,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1359,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.99000549316406,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 71,
+      "bounds_xyxy": [
+        166,
+        122,
+        211,
+        188
+      ],
+      "peak_alpha": 0.7109375,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1304,
+      "cool_edge_pixels_within_3rgb": 119,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 72,
+      "bounds_xyxy": [
+        165,
+        122,
+        210,
+        187
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.3759765625,
+      "warm_core_pixels_within_3rgb": 1235,
+      "cool_edge_pixels_within_3rgb": 115,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.0,
+        227.17999267578125
+      ]
+    },
+    {
+      "frame": 73,
+      "bounds_xyxy": [
+        165,
+        123,
+        210,
+        186
+      ],
+      "peak_alpha": 0.736328125,
+      "ring_peak_alpha": 0.3759765625,
+      "warm_core_pixels_within_3rgb": 1199,
+      "cool_edge_pixels_within_3rgb": 116,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.14999389648438,
+        221.97999572753906,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 74,
+      "bounds_xyxy": [
+        165,
+        124,
+        209,
+        184
+      ],
+      "peak_alpha": 0.72119140625,
+      "ring_peak_alpha": 0.363525390625,
+      "warm_core_pixels_within_3rgb": 1200,
+      "cool_edge_pixels_within_3rgb": 108,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.0399932861328,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 75,
+      "bounds_xyxy": [
+        164,
+        123,
+        206,
+        183
+      ],
+      "peak_alpha": 0.7060546875,
+      "ring_peak_alpha": 0.338134765625,
+      "warm_core_pixels_within_3rgb": 1224,
+      "cool_edge_pixels_within_3rgb": 124,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.02000427246094
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.0,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 76,
+      "bounds_xyxy": [
+        164,
+        122,
+        204,
+        182
+      ],
+      "peak_alpha": 0.7060546875,
+      "ring_peak_alpha": 0.303955078125,
+      "warm_core_pixels_within_3rgb": 1246,
+      "cool_edge_pixels_within_3rgb": 142,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.0
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02999877929688,
+        227.14999389648438
+      ]
+    },
+    {
+      "frame": 77,
+      "bounds_xyxy": [
+        164,
+        121,
+        204,
+        194
+      ],
+      "peak_alpha": 0.703125,
+      "ring_peak_alpha": 0.32861328125,
+      "warm_core_pixels_within_3rgb": 1422,
+      "cool_edge_pixels_within_3rgb": 120,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0399932861328
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        222.00999450683594,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 78,
+      "bounds_xyxy": [
+        163,
+        121,
+        204,
+        194
+      ],
+      "peak_alpha": 0.69482421875,
+      "ring_peak_alpha": 0.379638671875,
+      "warm_core_pixels_within_3rgb": 1535,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        240.02999877929688
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02999877929688,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 79,
+      "bounds_xyxy": [
+        163,
+        121,
+        204,
+        194
+      ],
+      "peak_alpha": 0.69189453125,
+      "ring_peak_alpha": 0.4296875,
+      "warm_core_pixels_within_3rgb": 1582,
+      "cool_edge_pixels_within_3rgb": 141,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.94000244140625
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 80,
+      "bounds_xyxy": [
+        163,
+        121,
+        205,
+        195
+      ],
+      "peak_alpha": 0.66650390625,
+      "ring_peak_alpha": 0.479736328125,
+      "warm_core_pixels_within_3rgb": 1603,
+      "cool_edge_pixels_within_3rgb": 135,
+      "nearest_core_srgb": [
+        255.0,
+        247.9600067138672,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.13999938964844,
+        221.9600067138672,
+        227.13999938964844
+      ]
+    },
+    {
+      "frame": 81,
+      "bounds_xyxy": [
+        163,
+        121,
+        205,
+        195
+      ],
+      "peak_alpha": 0.6435546875,
+      "ring_peak_alpha": 0.490234375,
+      "warm_core_pixels_within_3rgb": 1611,
+      "cool_edge_pixels_within_3rgb": 143,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        221.97999572753906,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 82,
+      "bounds_xyxy": [
+        163,
+        121,
+        206,
+        194
+      ],
+      "peak_alpha": 0.6220703125,
+      "ring_peak_alpha": 0.487060546875,
+      "warm_core_pixels_within_3rgb": 1591,
+      "cool_edge_pixels_within_3rgb": 131,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        239.97999572753906
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.05999755859375,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 83,
+      "bounds_xyxy": [
+        163,
+        121,
+        206,
+        194
+      ],
+      "peak_alpha": 0.61083984375,
+      "ring_peak_alpha": 0.487060546875,
+      "warm_core_pixels_within_3rgb": 1555,
+      "cool_edge_pixels_within_3rgb": 125,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.99000549316406
+      ],
+      "nearest_edge_srgb": [
+        217.1199951171875,
+        222.00999450683594,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 84,
+      "bounds_xyxy": [
+        163,
+        121,
+        206,
+        194
+      ],
+      "peak_alpha": 0.65234375,
+      "ring_peak_alpha": 0.434814453125,
+      "warm_core_pixels_within_3rgb": 1518,
+      "cool_edge_pixels_within_3rgb": 139,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.0399932861328
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.00999450683594,
+        227.13999938964844
+      ]
+    },
+    {
+      "frame": 85,
+      "bounds_xyxy": [
+        163,
+        122,
+        207,
+        193
+      ],
+      "peak_alpha": 0.66357421875,
+      "ring_peak_alpha": 0.375244140625,
+      "warm_core_pixels_within_3rgb": 1489,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.97999572753906
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        222.02000427246094,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 86,
+      "bounds_xyxy": [
+        163,
+        122,
+        207,
+        192
+      ],
+      "peak_alpha": 0.6767578125,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1447,
+      "cool_edge_pixels_within_3rgb": 130,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        239.9600067138672
+      ],
+      "nearest_edge_srgb": [
+        217.17999267578125,
+        221.97000122070312,
+        227.1699981689453
+      ]
+    },
+    {
+      "frame": 87,
+      "bounds_xyxy": [
+        163,
+        122,
+        208,
+        190
+      ],
+      "peak_alpha": 0.6865234375,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1393,
+      "cool_edge_pixels_within_3rgb": 131,
+      "nearest_core_srgb": [
+        255.0,
+        247.9499969482422,
+        239.97000122070312
+      ],
+      "nearest_edge_srgb": [
+        217.1699981689453,
+        221.99000549316406,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 88,
+      "bounds_xyxy": [
+        164,
+        122,
+        208,
+        189
+      ],
+      "peak_alpha": 0.697265625,
+      "ring_peak_alpha": 0.37548828125,
+      "warm_core_pixels_within_3rgb": 1345,
+      "cool_edge_pixels_within_3rgb": 115,
+      "nearest_core_srgb": [
+        255.0,
+        247.92999267578125,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        221.97999572753906,
+        227.16000366210938
+      ]
+    },
+    {
+      "frame": 89,
+      "bounds_xyxy": [
+        164,
+        122,
+        209,
+        187
+      ],
+      "peak_alpha": 0.7109375,
+      "ring_peak_alpha": 0.375732421875,
+      "warm_core_pixels_within_3rgb": 1275,
+      "cool_edge_pixels_within_3rgb": 137,
+      "nearest_core_srgb": [
+        255.0,
+        247.9199981689453,
+        240.0399932861328
+      ],
+      "nearest_edge_srgb": [
+        217.11000061035156,
+        222.02999877929688,
+        227.10000610351562
+      ]
+    },
+    {
+      "frame": 90,
+      "bounds_xyxy": [
+        165,
+        122,
+        209,
+        186
+      ],
+      "peak_alpha": 0.73681640625,
+      "ring_peak_alpha": 0.3759765625,
+      "warm_core_pixels_within_3rgb": 1222,
+      "cool_edge_pixels_within_3rgb": 128,
+      "nearest_core_srgb": [
+        255.0,
+        247.94000244140625,
+        240.00999450683594
+      ],
+      "nearest_edge_srgb": [
+        217.16000366210938,
+        222.0399932861328,
+        227.14999389648438
+      ]
+    }
+  ]
+}

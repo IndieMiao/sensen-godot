@@ -1,0 +1,27 @@
+[
+  {
+    "file": "SGODOT-449_steam_candidate_v1_cold_import.json",
+    "sha256": "13c9fc555619f55dd8b3d9b969918325e85a31dde4d233e350cbbcac0f0a47d5",
+    "bytes": 206
+  },
+  {
+    "file": "SGODOT-449_steam_candidate_v1_isolated.png",
+    "sha256": "bd93a9a3d20bc0cb71e9f1eb062ac7685739a0a1ce5c500b138e4bcb16312d9a",
+    "bytes": 43308
+  },
+  {
+    "file": "SGODOT-449_steam_candidate_v1_isolated_3s.mp4",
+    "sha256": "56a3f4417749e09e11d67f817e68b485265d44a9d772f5f8aba72def51be211e",
+    "bytes": 61335
+  },
+  {
+    "file": "SGODOT-449_steam_candidate_v1_notes.md",
+    "sha256": "a7ca68273f72d8662c3fe27208f95815fbdcb7f8155fb5779ed00c5691f45b80",
+    "bytes": 2079
+  },
+  {
+    "file": "SGODOT-449_steam_candidate_v1_validation.json",
+    "sha256": "3b6c21f48bbdf52bdbd833a5e07d07e52014330a2ba434ee550cd8b6113f948f",
+    "bytes": 22249
+  }
+]

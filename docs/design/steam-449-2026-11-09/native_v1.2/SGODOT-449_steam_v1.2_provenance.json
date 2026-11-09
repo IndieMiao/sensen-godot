@@ -1,0 +1,64 @@
+{
+  "revision": "v1.2",
+  "previous_art_head": "daa845518687532a4df32454d02f2770753e1572",
+  "host_ref": "feat/449-steam-box",
+  "host_head": "5d50bf0c2aa3868aba89b777a3c8a4925cdd15c9",
+  "host_files_unchanged": {
+    "scenes/p0/kitchen/p0_wait_pot.gd": "c803e96b14956648b658c720df9dd01b45f60a232d089d2b0d907a432ed4330a",
+    "scenes/p0/kitchen/p0_wait_pot_layer.gdshader": "400509ba08094aa4ed2095f7651e5ec133091635b9c431b41298bca70e8f5304",
+    "scenes/p0/kitchen/p0_kitchen.gd": "e2c955c59f4baa09dab633da5fb05ee3b8c04f0eea4cc99359f95053c049ed8f",
+    "scenes/p0/rooms/p0_room.gd": "fbe45afc7448f2947dae2e42d79bc328d7535baeaa98e44b97562358c7941976",
+    "modules/farm/farm_camera.gd": "e00de7afbda6bbfd490a0e434f0987eb0a06b8176d97efbd986b3204f447de24"
+  },
+  "fixture": "cookreal.base.json",
+  "fixture_sha256": "ec1c762395174e6ff4932d48040e4ea8e6931c80d2872e6481f4e7ad881c6b58",
+  "steps": "wait:2,farmhouse,wait:2,cook:dish_grilled_crucian,wait:4.2",
+  "selected_frame": 30,
+  "selected_cook_elapsed_ms": 2227.0,
+  "raw_frame_count": 91,
+  "recorded_wall_ms": 3021,
+  "capture_method": "Native Common overlay; actual wall-time frame timestamps; readback buffered, encoded at30fps/3.000s without acceleration",
+  "primary_view_unchanged": true,
+  "alpha_measurement": "Steam-only extra viewport shares native world/camera, never shown in official capture; every RGBA16F pixel checked",
+  "mouth_px": [
+    180.0,
+    235.0
+  ],
+  "camera_rotation": [
+    -33.0,
+    43.0212707519531,
+    0.0
+  ],
+  "delivered_files_sha256": {
+    "steam_clear_lid.gdshader.uid": "0807e8d359ae2c62af59bd483dd81e19b1f51d803b7da8c5814f73110529a988",
+    "steam_puff.png": "f05fcea3945861a47694bb61e59249f90764f9659e6d7736e5041a2d1b8c2850",
+    "soup_surface.res": "1e7ae4cab1fd78b56a014e655ca9256de7c5e91b394a94ee81cec7d94fbc406d",
+    "resource_uids.json": "df2d01f99a4fae4cac03cfd35a2266e6bd54f28cc2d638cc8c06584e1e3b3cd0",
+    "rim_foam.res": "9a3fb5df000eaa270ca4343d8eb74f640f324803d2edd51024eb13e748158e12",
+    "soup_matte.tres": "2686f7d7cc3b7510e3a035d4a955e23962cab1cc6050c5691291ede6b04d9243",
+    "steam_lid_clearance.gd.uid": "750258f9c271c67a9dfb0b8995ab89719e4ac29f6a72bce9fd0373f986abd289",
+    "steam.tres": "5a25d6e7927a1be88d832c65be8382f5cfa868f401b9a834e4295ca12b1edc63",
+    "steam_lid_clearance.gd": "9e555144f27e5b979d5bab3bd4536f784b51ea346dc161e5bb1d014627141f9b",
+    "steam_puff.png.import": "6b3144b0436925672ee4c7ae978ee8d49277178584a952a8e4783675b07a3200",
+    "pot_body_colours.res": "c112bf040a3f55640949979eb5fff64a58b3989f068d8db89b3678df59cbc428",
+    "steam_clear_lid.gdshader": "39230f4afd048f7d20c5fdb5f4cd16b58c17b7dcaf121f0930e2c45155cc6a5f",
+    "manifest.json": "c27c7df83f131c41425809aa41ff34702505957c65374d23ea5d6ec5a999c877",
+    "pot_lid_colours.res": "2c3c688ec0f79af01d586d39edceb3e111d39a4ba53d69f97768e082a2d1eb70",
+    "cooking_pot_wait.tscn": "47d94de636a14e361b93d9989ef1bdf984a111e7d1fe495afbe1eda0fbbb055a",
+    "soup_bubble.res": "6670c5a2a51072e82ba215e48160f13db8871753e960c9904f19b61ef3f37e69",
+    "README.md": "6af7096d438f0bf8230b8a1724fe3f42e735bcc7292afc5a3d61690c72ed3d61"
+  },
+  "unchanged_from_v11": [
+    "steam_clear_lid.gdshader.uid",
+    "soup_surface.res",
+    "rim_foam.res",
+    "soup_matte.tres",
+    "steam_lid_clearance.gd.uid",
+    "steam.tres",
+    "steam_lid_clearance.gd",
+    "steam_puff.png.import",
+    "pot_body_colours.res",
+    "pot_lid_colours.res",
+    "soup_bubble.res"
+  ]
+}

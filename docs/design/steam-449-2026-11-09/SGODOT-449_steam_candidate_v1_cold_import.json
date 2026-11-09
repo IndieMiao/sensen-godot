@@ -1,0 +1,10 @@
+{
+  "exit_code": 0,
+  "changed": [],
+  "errors": [],
+  "source_unchanged": true,
+  "fresh_cache": true,
+  "texture_format": "lossless RGBA, mipmaps;128x128",
+  "etc2_astc_enabled": true,
+  "passed": true
+}
