@@ -31,6 +31,7 @@ func _init() -> void:
 	view.name = "PotWorld"
 	view.own_world_3d = true
 	view.transparent_bg = true
+	view.use_hdr_2d = true   # a half-float target: the default transparent one keeps 4 alpha levels (黄忠 on 449)
 	view.msaa_3d = Viewport.MSAA_4X
 	# drawn every frame while it shows (its tumble, its steam), not at all while it is hidden on the stove (周瑜 on #764);
 	# UPDATE_WHEN_PARENT_VISIBLE froze it on its first frame: its parent is no SubViewportContainer
@@ -43,11 +44,11 @@ func _init() -> void:
 	_tex.stretch_mode = TextureRect.STRETCH_SCALE
 	_tex.size = BOX.size
 	_tex.texture = view.get_texture()
-	# the transparent world comes out premultiplied (its colours already × alpha over the clear black): blended as such,
-	# or the steam's white is darkened a second time and reads dirty grey (黄忠 on 449 d971ef94)
-	var blend := CanvasItemMaterial.new()
-	blend.blend_mode = CanvasItemMaterial.BLEND_MODE_PREMULT_ALPHA
-	_tex.material = blend
+	# its world comes out linear and premultiplied (colours already × alpha over the clear black): turned to the canvas's
+	# sRGB and blended as premultiplied, or the steam's white is darkened a second time and reads dirty grey (黄忠 on 449)
+	var layer := ShaderMaterial.new()
+	layer.shader = preload("res://scenes/p0/kitchen/p0_wait_pot_layer.gdshader")
+	_tex.material = layer
 	add_child(_tex)
 	_cam = Camera3D.new()
 	_cam.projection = Camera3D.PROJECTION_ORTHOGONAL
