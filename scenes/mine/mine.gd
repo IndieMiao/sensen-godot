@@ -565,14 +565,15 @@ func _sync_markers() -> void:
 		button.visible = target.marker_visible and not cam.is_position_behind(target.world) and area.encloses(Rect2(point - Vector2(22, 22), Vector2(44, 44)))
 		button.disabled = busy or not _dig_target.is_empty()
 
-## A target model's box in its own space: a mesh's own, or a shell's meshes' boxes merged; empty with none.
+## A target model's box in its own space: a mesh's own, or a shell's drawn parts' boxes merged (geometry only: a light
+## under the shell would stretch it; 周瑜 on #931); empty with none.
 static func _model_box(model: Node3D) -> AABB:
-	if model is VisualInstance3D: return (model as VisualInstance3D).get_aabb()
+	if model is GeometryInstance3D: return (model as GeometryInstance3D).get_aabb()
 	var box := AABB()
 	var found := false
 	var to_model := model.global_transform.affine_inverse()
-	for child in model.find_children("*", "VisualInstance3D", true, false):
-		var part := to_model * (child as VisualInstance3D).global_transform * (child as VisualInstance3D).get_aabb()
+	for child in model.find_children("*", "GeometryInstance3D", true, false):
+		var part := to_model * (child as GeometryInstance3D).global_transform * (child as GeometryInstance3D).get_aabb()
 		box = part if not found else box.merge(part)
 		found = true
 	return box
@@ -580,7 +581,7 @@ static func _model_box(model: Node3D) -> AABB:
 func _project_model_rect(model: Node3D) -> Rect2:
 	if not is_instance_valid(model) or not model.is_visible_in_tree(): return Rect2()
 	var bounds := _model_box(model)
-	if not bounds.has_volume(): return Rect2()
+	if bounds.size == Vector3.ZERO: return Rect2()   # none; a flat mesh still has a box to tap
 	var rect := Rect2()
 	for corner in 8:
 		var world := model.global_transform * bounds.get_endpoint(corner)
