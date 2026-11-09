@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 ## LOOK-PICK (SGODOT-282; 不知火舞 49498df6 / e2d76a7c, q(112) / q(115)): Homestead looks a (timber) / b (stone) at
-## Lv3 / 5 / 8 / 10 — HOME-1's Looks rows, the card, and the parts on the farm.
+## Lv3 / 5 / 8 / 15 — HOME-1's Looks rows, the card, and the parts on the farm.
 
 const Looks = preload("res://scenes/p0/p0_looks.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
@@ -123,24 +123,37 @@ func test_stone_wall_follows_the_fence_run_three_rocks_a_segment() -> void:
 			var p: Vector3 = wall[i * P0Garden.STONE_PER_SEG + k].pos
 			assert_float(p.distance_to(seg.pos)).is_less(P0Garden.FENCE_SEG * float(seg.stretch) * 0.5)
 
-func test_porch_and_kitchen_parts_keep_off_the_door_path() -> void:
+## #875's models (赵云 #858, 刘备 #854): each stage one model, its origin the house anchor, set there as it is; the
+## Master Farmhouse the house's own mesh. Every one is in the farm's art and drawn with its vertex colours. The wing's
+## (and the Master Farmhouse's, which has it built in) wait while P0Garden.WING_WAITS (不知火舞 448 b18d13c6): the old
+## lean-to / stone room and house_barn / house_dome, and the standalone parts stay up beside them.
+func test_each_look_is_its_model_at_the_house() -> void:
 	var bp := P0Garden.blueprint()
-	var door := bp.cell_to_world(P0Garden.ANCHORS.house + Vector2i(0, -2))
-	for stage in ["porch", "kitchen_extension"]:
-		for look in ["a", "b"]:
-			var parts := P0Garden.look_parts(bp, stage, look)
-			assert_array(parts).is_not_empty()
-			for p in parts:
-				if str(p.asset) == "path_tile": continue   # the landing is the door path itself
-				assert_float(absf((p.pos as Vector3).x - door.x)).override_failure_message("%s %s %s" % [stage, look, p.asset]).is_greater(0.6)
-	# every part stands on the ground: nothing set on another's top, where it would float (不知火舞 on #250, Lv8 b)
-	for stage in ["porch", "kitchen_extension"]:
-		for look in ["a", "b"]:
-			for p in P0Garden.look_parts(bp, stage, look):
-				assert_float((p.pos as Vector3).y).override_failure_message("%s %s %s" % [stage, look, p.asset]).is_less(0.01)
-	assert_str(P0Garden.look_house("a")).is_equal("house_barn")
-	assert_str(P0Garden.look_house("b")).is_equal("house_dome")
+	var house := bp.cell_to_world(P0Garden.ANCHORS.house)
+	for look in ["a", "b"]:
+		var porch := P0Garden.look_parts(bp, "porch", look)
+		assert_array(porch.map(func(p): return p.asset)).is_equal(["porch_" + look])
+		assert_object(porch[0].pos).is_equal(house)
+		assert_float(float(porch[0].yaw)).is_equal(0.0)
+		var wing := P0Garden.look_parts(bp, "kitchen_extension", look)
+		if P0Garden.WING_WAITS:
+			var old: Array = ["storage"] if look == "a" else ["path_tile", "rock", "rock"]
+			assert_array(wing.map(func(p): return p.asset)).is_equal(old)
+			for p in wing: assert_float((p.pos as Vector3).y).is_less(0.01)   # on the ground, nothing stacked (#250)
+		else:
+			assert_array(wing.map(func(p): return p.asset)).is_equal(["kitchen_wing_" + look])
+	for asset in ["porch_a", "porch_b", "kitchen_wing_a", "kitchen_wing_b", "master_farmhouse_a", "master_farmhouse_b"]:
+		assert_object(FarmArt.mesh_for(asset)).override_failure_message(asset).is_not_null()
+	assert_array(P0Garden.look_parts(bp, "porch", "")).is_empty()
+	var whole := not P0Garden.WING_WAITS
+	assert_str(P0Garden.look_house("a")).is_equal("master_farmhouse_a" if whole else "house_barn")
+	assert_str(P0Garden.look_house("b")).is_equal("master_farmhouse_b" if whole else "house_dome")
 	assert_str(P0Garden.look_house("")).is_equal("house_cottage")
+	assert_bool(P0Garden.whole_house("a")).is_equal(whole)
+	assert_bool(P0Garden.whole_house("")).is_false()
+	var m := FarmArt.instance("porch_a")   # the colour is in the vertex colours: the farm's one material (上官婉儿 on #875)
+	assert_object(m.material_override).is_same(FarmArt.material())
+	m.free()
 
 func test_the_farm_shows_the_views_looks_and_the_cards_preview() -> void:
 	var bp := P0Garden.blueprint()
@@ -158,12 +171,12 @@ func test_the_farm_shows_the_views_looks_and_the_cards_preview() -> void:
 	fence.sync(v)
 	assert_str(looks.shown("porch")).is_equal("a")
 	assert_str(looks.shown("kitchen_extension")).is_equal("")   # Lv8 not reached: nothing there
-	assert_int(looks.parts("porch").size()).is_equal(2)          # two timber railings
+	assert_object((looks.parts("porch")[0] as MeshInstance3D).mesh).is_same(FarmArt.mesh_for("porch_a"))
 	assert_str(fence.look).is_equal("a")
 	looks.preview("porch", "b")   # LOOK-PICK's preview
 	looks.sync(v)
 	assert_str(looks.shown("porch")).is_equal("b")
-	assert_int(looks.parts("porch").size()).is_equal(3)          # a landing and two rocks
+	assert_object((looks.parts("porch")[0] as MeshInstance3D).mesh).is_same(FarmArt.mesh_for("porch_b"))
 	var used := _view(5, {"porch": "b"})   # Use landed: the preview lets go, the view keeps b
 	looks.sync(used)
 	assert_bool(looks.previews.has("porch")).is_false()
@@ -173,7 +186,85 @@ func test_the_farm_shows_the_views_looks_and_the_cards_preview() -> void:
 	assert_str(fence.look).is_equal("b")   # Stone Wall
 	var ring: MultiMeshInstance3D = fence.find_child("Ring", true, false)   # one batch, one draw (上官婉儿 on #250)
 	assert_int(ring.multimesh.instance_count).is_equal(P0Garden.fence_ring(bp).size() * P0Garden.STONE_PER_SEG)
-	var lv10 := _view(15, {"master_farmhouse": "b"})   # the Master Farmhouse at Lv15 since v4q(1) ⑧
-	looks.sync(lv10)
+	var lv8 := _view(8, {"porch": "b"})
+	looks.sync(lv8)
+	var wing_a := P0Garden.look_parts(P0Garden.blueprint(), "kitchen_extension", "a")
+	assert_int(looks.parts("kitchen_extension").size()).is_equal(wing_a.size())
+	var lv15 := _view(15, {"porch": "b", "master_farmhouse": "b"})   # the Master Farmhouse at Lv15 since v4q(1) ⑧
+	looks.sync(lv15)
 	assert_object(house.mesh).is_not_same(cottage)
-	assert_object(house.mesh).is_same(FarmArt.mesh_for("house_dome"))
+	assert_object(house.mesh).is_same(FarmArt.mesh_for(P0Garden.look_house("b")))
+	# a whole house has its porch and wing in it: the standalone two stand down; the old house keeps them beside it
+	for stage in ["porch", "kitchen_extension"]:
+		assert_bool((looks.parts(stage)[0] as Node3D).get_parent().visible).override_failure_message(stage) \
+			.is_equal(not P0Garden.whole_house("b"))
+
+## 亚瑟 on #896: a model one walks into is a picture — the cells a shown porch, wing or whole house stands on are solid,
+## off the house's own footprint and the door path, and the bench is still reached from the yard. While WING_WAITS the
+## old wing and house block nothing new (as before); the porch's model blocks its cells.
+func test_a_shown_model_stands_on_its_cells() -> void:
+	var bp := P0Garden.blueprint()
+	for asset in ["porch_a", "porch_b", "kitchen_wing_a", "kitchen_wing_b", "master_farmhouse_a", "master_farmhouse_b"]:
+		var cells := P0Garden.look_cells(bp, asset)
+		for c in cells:
+			assert_bool(P0Garden.FOOTPRINTS.house.has_point(c) or P0Garden.DOOR_PATH.has_point(c)).is_false()
+	# the wing's walls and the room they close, on the house's left and back (亚瑟 counted (5..7, 17..18), (7, 16),
+	# (8, 18) from its box; (5, 18) its set-back corner does not reach); the porch's left post; the whole house both
+	var wing: Array[Vector2i] = [Vector2i(5, 17), Vector2i(6, 17), Vector2i(6, 18), Vector2i(7, 16), Vector2i(7, 17),
+		Vector2i(7, 18), Vector2i(8, 18)]
+	for look in ["a", "b"]:
+		assert_array(P0Garden.look_cells(bp, "kitchen_wing_" + look)).contains_exactly_in_any_order(wing)
+		assert_array(P0Garden.look_cells(bp, "porch_" + look)).contains_exactly([Vector2i(7, 15)])
+		assert_array(P0Garden.look_cells(bp, "master_farmhouse_" + look)) \
+			.contains_exactly_in_any_order(wing + [Vector2i(7, 15)])
+	# with the whole house standing, the bench (5, 16) is still sat on from the yard in front of it
+	var grid := BlueprintGrid.new(bp)
+	for c in P0Garden.look_cells(bp, "master_farmhouse_a"): grid.set_solid(c, true)
+	assert_array(grid.path(Vector2i(5, 12), Vector2i(5, 15))).is_not_empty()
+	# on the farm: what the shown looks hold, and back when they go
+	var house := FarmProps.build("house", bp.cell_to_world(P0Garden.ANCHORS.house), 1.0, "cottage")
+	add_child(auto_free(house))
+	var fence: Node3D = auto_free(Fence.new())
+	add_child(fence)
+	fence.build(bp)
+	var looks: Node3D = auto_free(Looks.new())
+	add_child(looks)
+	looks.build(bp, house, "cottage", fence)
+	looks.grid = BlueprintGrid.new(bp)
+	looks.sync(_view(8))
+	var held: Array = P0Garden.look_cells(bp, "porch_a")
+	if not P0Garden.WING_WAITS: held += P0Garden.look_cells(bp, "kitchen_wing_a")
+	assert_int(looks.solid_cells().size()).is_equal(held.size())
+	for c in looks.solid_cells(): assert_bool(looks.grid._blocked(c)).is_true()
+	looks.sync(_view(2))   # no looks: every cell walkable again
+	assert_array(looks.solid_cells()).is_empty()
+	for c in held: assert_bool(looks.grid._blocked(c)).override_failure_message(str(c)).is_false()
+	# a cell something else holds first (a decor piece, a tree) stays that thing's: not taken, not let go (亚瑟)
+	looks.grid.set_solid(Vector2i(7, 15), true)
+	looks.sync(_view(5))
+	assert_array(looks.solid_cells()).not_contains([Vector2i(7, 15)])
+	looks.sync(_view(2))
+	assert_bool(looks.grid._blocked(Vector2i(7, 15))).is_true()
+
+## 上官婉儿 448: while WING_WAITS the old barn (Lv15 a) keeps the old Timber Porch — two railings — not the new one,
+## whose tiles cut across its red roof and door; the Stone Manor keeps the new stone porch.
+func test_the_old_barn_keeps_the_old_timber_porch() -> void:
+	var bp := P0Garden.blueprint()
+	var barn := P0Garden.look_parts(bp, "porch", "a", "a").map(func(p): return p.asset)
+	assert_array(barn).is_equal(["fence", "fence"] if P0Garden.WING_WAITS else ["porch_a"])
+	assert_array(P0Garden.look_parts(bp, "porch", "a", "b").map(func(p): return p.asset)).is_equal(["porch_a"])
+	assert_array(P0Garden.look_parts(bp, "porch", "b", "a").map(func(p): return p.asset)).is_equal(["porch_b"])
+	var house := FarmProps.build("house", bp.cell_to_world(P0Garden.ANCHORS.house), 1.0, "cottage")
+	add_child(auto_free(house))
+	var fence: Node3D = auto_free(Fence.new())
+	add_child(fence)
+	fence.build(bp)
+	var looks: Node3D = auto_free(Looks.new())
+	add_child(looks)
+	looks.build(bp, house, "cottage", fence)
+	looks.grid = BlueprintGrid.new(bp)
+	looks.sync(_view(8))
+	assert_int(looks.parts("porch").size()).is_equal(1)   # the new Timber Porch
+	looks.sync(_view(15))   # the Master Farmhouse comes: the porch follows its house
+	assert_int(looks.parts("porch").size()).is_equal(2 if P0Garden.WING_WAITS else 1)
+	if P0Garden.WING_WAITS: assert_array(looks.solid_cells()).is_empty()   # railings, as before: nothing new held

@@ -5,6 +5,8 @@ extends RefCounted
 ## content.garden.plots (the server's too: sprinkler coverage, greenhouses), 63 beds since SGODOT-355 b1.
 ## Plots and facilities are solid; the player works a bed from the walkway beside it. Pure data: no nodes, unit-tested.
 
+const FarmArt = preload("res://modules/farm/farm_art.gd")
+
 const CELL_MM := 650
 ## 22 × 24 from row −2: the yard's front reaches two rows past row 0 (q(172) A, 不知火舞 282 4ddb69db: the farm grows
 ## toward the camera for a whole row of Homestead Lv7 beds), every older cell keeping its place in the world.
@@ -189,37 +191,121 @@ static func stone_wall(segments: Array) -> Array:
 				"yaw": yaw + 0.35 * float((i * STONE_PER_SEG + k) % 3 - 1), "scale": STONE_SCALE})
 	return out
 
-## Porch (Lv5) and Kitchen Wing (Lv8) parts, a or b. The porch stands at the door between the house front and the
-## yard fence's front row (0.8 m), clear of the door path, the plaque and the sign; the kitchen wing on the house's
-## left behind the rest bench.
-static func look_parts(bp: FarmBlueprint, stage: String, look: String) -> Array:
+## The Kitchen Wing's models (Lv8, and the Master Farmhouse's, which has it built in) wait until the wing and the rest
+## bench stand apart: today the wing's front wall cuts through the bench, and one sitting there sat half in the wall
+## (不知火舞 448 b18d13c6, 上官婉儿). Until then Lv8 and Lv15 keep their old looks; the Porch's model is in.
+const WING_WAITS := true
+
+## Porch (Lv5) and Kitchen Wing (Lv8), a (timber) or b (stone): 赵云's porch_a / _b and kitchen_wing_a / _b (#858, in
+## farm-dev by #875), each one model with its origin at the house anchor (P0Garden.ANCHORS.house, +Z toward the camera),
+## put there as it is — the porch at the door, the wing on the house's left. Their colour is in the vertex colours
+## (FarmArt.instance's material). While WING_WAITS the wing is the old one: a lean-to (a) or a stone room (b).
+## house_look: the Master Farmhouse's look, when it is up — while WING_WAITS the Timber Porch in front of the old barn
+## is the old one, two railings by the door (上官婉儿 448: the new porch's tiles cut across the barn's red roof and its
+## door; 赵云 makes it a door canopy, then it is seen again).
+static func look_parts(bp: FarmBlueprint, stage: String, look: String, house_look := "") -> Array:
+	if look not in ["a", "b"]: return []
 	var house := bp.cell_to_world(ANCHORS.house)
-	var porch_z := house.z + HOUSE_FRONT + 0.35
-	match [stage, look]:
-		["porch", "a"]:   # Timber Porch: two railings flanking the door
-			return [{"asset": "fence", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": Vector3(0.55, 1, 1)},
-				{"asset": "fence", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": Vector3(0.55, 1, 1)}]
-		["porch", "b"]:   # Stone Porch: a paved landing and two rocks either side
-			return [{"asset": "path_tile", "pos": Vector3(house.x, 0.004, porch_z), "yaw": 0.0, "scale": Vector3(1.1, 1, 0.6)},
-				{"asset": "rock", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": 0.4, "scale": Vector3.ONE * 1.4},
-				{"asset": "rock", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": -0.6, "scale": Vector3.ONE * 1.4}]
-		["kitchen_extension", "a"]:   # Timber Kitchen Wing: a wooden lean-to on the left
-			return [{"asset": "storage", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75), "yaw": PI * 0.5, "scale": Vector3.ONE * 1.6}]
-		["kitchen_extension", "b"]:   # Stone Kitchen Wing: a stone room with a chimney stack
-			return [{"asset": "path_tile", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0.004, house.z - 0.75), "yaw": 0.0, "scale": Vector3(0.8, 1, 0.75)},
-				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75), "yaw": 0.2, "scale": Vector3(2.4, 2.2, 2.6)},
-				# the chimney: a tall rock standing on the ground at the room's back corner, sunk into it (never stacked:
-				# a rock set on another's rounded top floats, 不知火舞 on #250)
-				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.85, 0, house.z - 1.0), "yaw": 1.1, "scale": Vector3(1.1, 3.0, 1.1)}]
+	match stage:
+		"porch":
+			if WING_WAITS and look == "a" and house_look == "a":
+				var porch_z := house.z + HOUSE_FRONT + 0.35
+				var rail := Vector3(0.55, 1, 1)
+				return [{"asset": "fence", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": rail},
+					{"asset": "fence", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": rail}]
+			return [{"asset": "porch_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
+		"kitchen_extension":
+			if not WING_WAITS:
+				return [{"asset": "kitchen_wing_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
+			var wing := Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75)
+			if look == "a":   # Timber Kitchen Wing: a wooden lean-to on the left
+				return [{"asset": "storage", "pos": wing, "yaw": PI * 0.5, "scale": Vector3.ONE * 1.6}]
+			# Stone Kitchen Wing: a stone room with a chimney stack — the chimney a tall rock on the ground at the
+			# room's back corner, sunk into it (never stacked: a rock on another's rounded top floats, 不知火舞 on #250)
+			return [
+				{"asset": "path_tile", "pos": wing + Vector3(0, 0.004, 0), "yaw": 0.0, "scale": Vector3(0.8, 1, 0.75)},
+				{"asset": "rock", "pos": wing, "yaw": 0.2, "scale": Vector3(2.4, 2.2, 2.6)},
+				{"asset": "rock", "pos": wing + Vector3(-0.35, 0, -0.25), "yaw": 1.1, "scale": Vector3(1.1, 3.0, 1.1)}]
 	return []
 
-## Master Farmhouse (Lv10): the house model, a Timber Lodge (house_barn) or a Stone Manor (house_dome); before Lv10 the
-## farm's own style (不知火舞 e6b93272: placeholders until Stark's design).
+## Master Farmhouse (Lv15, v4q(1)): 刘备's master_farmhouse_a (Timber Lodge) / _b (Stone Manor) (#854, in farm-dev by
+## #875), the whole house with its porch and wing in one, origin at the house anchor as the house's own; while
+## WING_WAITS the old house_barn / house_dome. Before it the farm's own style.
 static func look_house(look: String, style := "cottage") -> String:
-	match look:
-		"a": return "house_barn"
-		"b": return "house_dome"
+	if look in ["a", "b"]:
+		if WING_WAITS: return "house_barn" if look == "a" else "house_dome"
+		return "master_farmhouse_" + look
 	return "house_" + style
+
+## Whether the house shown for this Master Farmhouse look has the porch and wing in it (the standalone ones put away).
+static func whole_house(look: String) -> bool:
+	return look in ["a", "b"] and not WING_WAITS
+
+## The door's way out to the yard (the first of decor.yard.paths): no look stands on it.
+const DOOR_PATH := Rect2i(8, 13, 3, 2)
+
+## The yard cells a look's model stands on (亚瑟 on #896: the wing was a picture one walked into): every walkable cell
+## that a wall or post of the model (its upright faces below 1 m, set at the house anchor) reaches more than LOOK_REACH
+## into, and the cells those walls close in, less the house's own footprint and the door path. A floor (the porch's
+## deck, a step) is walked on; a box round the whole model would close the yard in front of the wing. [] for a model
+## not in the farm's art.
+const LOOK_REACH := 0.1
+static var _look_cells := {}
+static func look_cells(bp: FarmBlueprint, asset: String) -> Array[Vector2i]:
+	if _look_cells.has(asset): return (_look_cells[asset] as Array[Vector2i]).duplicate()
+	var out: Array[Vector2i] = []
+	var mesh := FarmArt.mesh_for(asset)
+	if mesh == null: return out
+	var house := bp.cell_to_world(ANCHORS.house)
+	var half := bp.cell_m * 0.5 - LOOK_REACH
+	var faces := mesh.get_faces()
+	var walls: Array[Rect2] = []
+	for i in range(0, faces.size(), 3):
+		var a := faces[i]
+		var b := faces[i + 1]
+		var c := faces[i + 2]
+		var n := (b - a).cross(c - a)
+		if n.length_squared() < 1e-12 or absf(n.normalized().y) > 0.5 or minf(a.y, minf(b.y, c.y)) > 1.0: continue
+		var r := Rect2(Vector2(a.x, a.z), Vector2.ZERO).expand(Vector2(b.x, b.z)).expand(Vector2(c.x, c.z))
+		walls.append(r)
+	var box := mesh.get_aabb()
+	var lo := bp.world_to_cell(house + Vector3(box.position.x, 0, box.position.z))
+	var hi := bp.world_to_cell(house + Vector3(box.end.x, 0, box.end.z))
+	var area := Rect2i(Vector2i(mini(lo.x, hi.x) - 1, mini(lo.y, hi.y) - 1), (lo - hi).abs() + Vector2i(3, 3))
+	var shut := {}   # a cell one cannot be on: a wall in it, the house, or off the plan
+	for x in range(area.position.x, area.end.x):
+		for y in range(area.position.y, area.end.y):
+			var cell := Vector2i(x, y)
+			if FOOTPRINTS.house.has_point(cell) or not bp.is_walkable(cell):
+				shut[cell] = true
+				continue
+			if DOOR_PATH.has_point(cell): continue
+			var at := bp.cell_to_world(cell) - house
+			var inner := Rect2(at.x - half, at.z - half, half * 2.0, half * 2.0)
+			if walls.any(func(w: Rect2): return w.grow(0.0001).intersects(inner)):
+				shut[cell] = true
+				out.append(cell)
+	# and the cells the walls close in (the wing's room): not reached from the area's edge
+	var seen := {}
+	var todo: Array[Vector2i] = []
+	for x in range(area.position.x, area.end.x):
+		for y in range(area.position.y, area.end.y):
+			var cell := Vector2i(x, y)
+			var edge := x == area.position.x or y == area.position.y or x == area.end.x - 1 or y == area.end.y - 1
+			if edge and not shut.has(cell): todo.append(cell)
+	while not todo.is_empty():
+		var cell: Vector2i = todo.pop_back()
+		if seen.has(cell): continue
+		seen[cell] = true
+		for d in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			var next: Vector2i = cell + d
+			if area.has_point(next) and not shut.has(next) and not seen.has(next): todo.append(next)
+	for x in range(area.position.x, area.end.x):
+		for y in range(area.position.y, area.end.y):
+			var cell := Vector2i(x, y)
+			if not shut.has(cell) and not seen.has(cell): out.append(cell)
+	_look_cells[asset] = out
+	return out.duplicate()
 
 ## Points along the yard fence for block_points: the player walks round it, through the door opening.
 static func fence_block_points(bp: FarmBlueprint) -> Array:
