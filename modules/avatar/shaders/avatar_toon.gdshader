@@ -17,6 +17,9 @@
 // 所以这里**不写 light()**，交给引擎标准光照——既是对齐原版，也更简单。
 shader_type spatial;
 render_mode cull_back, depth_draw_opaque;
+// GLES 下贴图取到的是 sRGB 原值、ALBEDO / EMISSION 也要交 sRGB：乘 lit_w 之前先转线性，算完再转回去，
+// 否则系数 k 在 GLES 下等于 k^2.2，人物整体偏暗（SGODOT-458）。Mobile / Vulkan 下这两个函数原样返回。
+#include "res://modules/render/gles_colour.gdshaderinc"
 
 uniform sampler2D albedo_tex : source_color, filter_linear_mipmap, repeat_enable;
 uniform sampler2D ao_tex : hint_default_white, filter_linear_mipmap, repeat_enable;
@@ -36,7 +39,8 @@ void fragment() {
 	float energy = max(diffuse_strength + emission_strength, 1.0);
 	float lit_w = diffuse_strength / energy;
 	float flat_w = emission_strength / energy;
-	ALBEDO = alb.rgb * lit_w;
+	vec3 a = src_linear(alb.rgb);
+	ALBEDO = albedo_out(a * lit_w);
 	// URP 的 Occlusion 只压间接光。AO_LIGHT_AFFECT=0 就是这个语义。
 	AO = mix(1.0, texture(ao_tex, UV).r, ao_strength);
 	AO_LIGHT_AFFECT = 0.0;
@@ -44,5 +48,5 @@ void fragment() {
 	SPECULAR = 0.5; // URP Lit 非金属反射率 0.04 ≈ Godot SPECULAR 0.5
 	METALLIC = 0.0;
 	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
-	EMISSION = alb.rgb * (flat_w + rim * rim_strength);
+	EMISSION = albedo_out(a * (flat_w + rim * rim_strength));
 }
