@@ -9,6 +9,7 @@ extends P0Room
 const P0Locals := preload("res://modules/p0/p0_locals.gd")   # the keeper's local requests (q(272))
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 var voice_room: Node   # P0VoiceRoom: this room's voice (SGODOT-383; Market Square's too since q(286)), for the HUD's mic key and drawer
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
 ## Drawn in the art but without a P0 use: no finger card, no tap (§17.2.1; SGODOT-227 5a63a8ec).
@@ -97,6 +98,14 @@ func _go_online(session: P0Session) -> void:
 	var door := anchor_data("spawn")
 	var at := P0RoomAnchors.vec(door.get("position", [0, 0, 0]))
 	online.start(str(outpost.id), Vector2(at.x, at.z))
+
+## The market plaza's row houses and far city by city (SGODOT-218, layout.json facade_variants): San Francisco's
+## pastel Victorians in San Francisco (Mission Market Square), the plain set in every other city's square.
+func _art_options(kit: Node) -> void:
+	if "city_variant" in kit: kit.set("city_variant", city_variant(outpost))
+
+static func city_variant(o: Dictionary) -> String:
+	return "san_francisco" if str(o.get("cluster", "")) == P0Clusters.cluster_of_region("san_francisco") else "generic"
 
 ## Wires a room connection to this room: the crowd, our position in room metres, joins and seat results.
 func attach_online(o: P0Online) -> void:

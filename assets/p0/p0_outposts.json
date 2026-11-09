@@ -62,7 +62,7 @@
       "keeper": {"role": "Market Keeper", "name": "Mei"},
       "residents": ["res_nadia", "res_theo"],
       "art": "market_plaza",
-      "backdrop": {"top": "D5EFF3"},
+      "backdrop": {"top": "DDE8E7"},
       "bounds": [-8, 8, -8, 8],
       "seats": ["seat_1", "seat_2"],
       "before": {"art": "fruit_shop", "bounds": [-3.05, 3.05, -2.8, 2.8], "seats": []}

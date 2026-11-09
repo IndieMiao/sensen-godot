@@ -23,7 +23,7 @@ class Sample extends "res://scenes/p0/p0_outpost.gd":
 
 ## An outpost's anchors as its room has them: its kit's layout, then its anchors file (same name replaces).
 func _anchors_of(o: Dictionary) -> Array:
-	return P0RoomAnchors.merge(P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % str(o.art)), P0RoomAnchors.read_json(str(o.anchors)))
+	return P0RoomAnchors.merge(P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % str(o.art)), P0RoomAnchors.read_json(str(o.get("anchors", ""))))
 
 func _room(id: String, phone := false) -> Sample:
 	var r := Sample.new()
@@ -617,12 +617,44 @@ func test_the_tea_house_lights_as_its_kit_was_signed() -> void:
 	assert_str(P0Room.aces_screen(mat.get_shader_parameter("bottom_input")).to_html(false)).is_equal("dde8e7")
 	assert_float(-plate.position.z).is_less(r.cam.far)
 
+## SGODOT-218: the market plaza (16 m square, its grass to 18 m and a far city past it) frames as Grace Cathedral does — the
+## camera follows the player but never past REACH_INSET_M from its 16 m footprint; in every corner of its bounds the
+## player is still on the screen; its view is the room's 33°, its kit's 45° yaw, the farm's player scale.
+func test_the_market_plaza_camera_keeps_to_its_reach() -> void:
+	var r := _room("sh_market_1", true)
+	await get_tree().process_frame
+	r.p0_frame({}, 1.0 / 30.0)
+	assert_float(rad_to_deg(asin(r._cam_dir.y))).is_equal_approx(P0Room.ROOM_PITCH_DEG, 0.01)
+	assert_float(rad_to_deg(atan2(r._cam_dir.x, r._cam_dir.z))).is_equal_approx(45.0, 0.5)
+	var half := 16.0 * 0.5 - P0Room.REACH_INSET_M
+	for corner in [Vector3(-9, 0, -9), Vector3(9, 0, -9), Vector3(-9, 0, 9), Vector3(9, 0, 9)]:
+		var f: Vector3 = r._clamp_to_reach(r.room.position + corner) - r.room.position
+		assert_float(absf(f.x)).is_less_equal(half + 0.001)
+		assert_float(absf(f.z)).is_less_equal(half + 0.001)
+	var b: Array = P0Outposts.find("sh_market_1").bounds
+	for c in [Vector2(b[1], b[2]), Vector2(b[0], b[3]), Vector2(b[0], b[2]), Vector2(b[1], b[3])]:
+		r.actor.teleport(r.room.position + Vector3(c.x, r.floor_y, c.y))
+		r._focus = r.actor.position
+		for i in 90: r.p0_frame({}, 1.0 / 30.0)
+		var view := r._view()
+		for p in [r.actor.position, r.actor.position + Vector3(0, 1.75, 0)]:
+			var at := r.cam.unproject_position(p)
+			assert_bool(Rect2(Vector2(12, 0), view - Vector2(24, 0)).has_point(at)).override_failure_message("%s at %s" % [c, at]).is_true()
+
+## The plaza's row houses and far city are San Francisco's in Mission Market Square, the plain set in another city's.
+func test_the_market_plaza_dresses_by_city() -> void:
+	assert_str(OutpostScript.city_variant(P0Outposts.find("sh_market_1"))).is_equal("san_francisco")
+	assert_str(OutpostScript.city_variant({"cluster": "gn-1850147"})).is_equal("generic")
+	var r := _room("sh_market_1")
+	await get_tree().process_frame
+	assert_str(str(r.art.get("city_variant"))).is_equal("san_francisco")
+
 ## Scene integration (SGODOT-227): every outpost opens on its own kit with every anchor of its file and the background
 ## sampled from its signed render; its view shows the player at the farm's scale, pans across inside its art and holds
 ## down in the free band (用户 2026-10-09, 不知火舞 on 226; superseding 227's whole-art opening); the door's prompt is
 ## clear of the player who comes in.
 func test_every_outpost_opens_on_its_kit() -> void:
-	var kits := {"sh_tackle_1": "tackle_shop", "sh_tea_1": "tea_house", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
+	var kits := {"sh_tackle_1": "tackle_shop", "sh_tea_1": "tea_house", "sh_post_1": "post_office", "sh_market_1": "market_plaza"}
 	for id in kits:
 		var o := P0Outposts.find(id)
 		var r := _room(id, true)
@@ -632,7 +664,9 @@ func test_every_outpost_opens_on_its_kit() -> void:
 			assert_object(r.anchor(str(a.name))).override_failure_message("%s %s" % [id, a.name]).is_not_null()
 		var clear := r.environment.background_color.srgb_to_linear()
 		assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).override_failure_message(id).is_equal(str(o.backdrop.top).to_lower())
-		_assert_player_scale_framing(r, id)
+		# The market plaza (SGODOT-218) is held to its footprint's reach, as Grace Cathedral (camera_contract): its grass and
+		# far city run well past the walls (test_the_market_plaza_camera_keeps_to_its_reach)
+		if not r.layout.has("camera_contract"): _assert_player_scale_framing(r, id)
 		r.frame_all()   # back to the opening view for the door check
 		# The door's prompt keeps off the player at spawn: below the feet at a front door, above the head at a back one.
 		var feet := r.cam.unproject_position(r.actor.position)
@@ -762,6 +796,12 @@ func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> voi
 		assert_bool(extras.is_empty()).override_failure_message(id).is_equal(P0Outposts.find(id).get("residents", []).is_empty())
 		# the band opening_focus fits them in (刘邦 on #465): SIDE_MARGIN across, the HUD's bottom to the bottom controls down
 		var band := Rect2(P0Room.SIDE_MARGIN, P0Room.HUD_BOTTOM, view.x - 2.0 * P0Room.SIDE_MARGIN, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
+		# The market plaza (SGODOT-218, 16 m square): Theo at the tool stall across the fountain does not fit with the player
+		# at the gate, so it opens as before — the player, Mei and her counter in the band.
+		if id == "sh_market_1":
+			for p in [r.actor.position, r.anchor("npc_keeper").global_position, r.anchor("use_counter").global_position]:
+				assert_bool(band.grow(0.5).has_point(r.cam.unproject_position(p))).override_failure_message("market %s" % p).is_true()
+			continue
 		for p in extras:
 			var at := r.cam.unproject_position(p)
 			assert_bool(band.grow(0.5).has_point(at)).override_failure_message("%s resident point %s, band %s" % [id, at, band]).is_true()
@@ -973,6 +1013,28 @@ func test_the_cabin_shows_pip_and_its_second_resident() -> void:
 		"art": str(room.art), "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
 		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": ""}, "residents": []}]}})
 	assert_str(str(P0Outposts.find("gn-testtea~tea0").anchors)).is_equal("res://assets/p0/outposts/tea.anchors.json")
+
+## SGODOT-218: a generated city's square, still named on the fruit shop (what 0.3.2 and older open), opens on the market
+## plaza in this client (world.room.market.client_art) — Mission Market Square's ±8 m walls and benches, the plaza's own
+## anchors (not the fruit shop's file the server names), the plain row houses, and joins the plaza's own instances.
+func test_a_generated_square_opens_on_the_market_plaza() -> void:
+	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get("market", {})
+	assert_str(str(room.art)).is_equal("fruit_shop")
+	assert_str(str(room.client_art)).is_equal("market_plaza")
+	var id := "gn-1850147~market7"
+	P0CityPlaces.accept("gn-1850147", {"detail": {"outposts": [{"id": id, "role": "market", "name": "Test Market Square",
+		"art": str(room.art), "anchors": str(room.anchors), "category": str(room.category), "lat": 35.7, "lng": 139.7,
+		"capacity": 30, "keeper": {"role": "Market Keeper", "name": "Ivy", "look": ""}, "residents": ["res_nadia"]}]}})
+	var o := P0Outposts.find(id)
+	assert_str(str(o.art)).is_equal("market_plaza")
+	assert_str(str(o.get("anchors", ""))).is_equal("")   # the plaza's layout.json, not market.anchors.json
+	assert_array(o.bounds).is_equal([-8.0, 8.0, -8.0, 8.0])
+	assert_array(o.seats).is_equal(["seat_1", "seat_2"])
+	var r := _room(id)
+	await get_tree().process_frame
+	assert_str(r.layout_path).is_equal("res://assets/rooms/market_plaza/layout.json")
+	assert_str(str(r.art.get("city_variant"))).is_equal("generic")
+	assert_vector(r.anchor("use_counter").position).is_equal_approx(Vector3(2.6, 1.05, 2.6), Vector3.ONE * 0.01)
 
 ## SGODOT-214: a generated tackle shop still named on the Farm Tools Store (what 0.2.9 and older can open) opens on the
 ## tackle shop's own kit in this client (world.room.tackle.client_art), with Mission Tackle Shop's walls and backdrop, and
