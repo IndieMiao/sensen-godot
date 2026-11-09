@@ -412,6 +412,7 @@ func test_p0_pieced_lines_read_whole_under_chinese() -> void:
 ## Fairfield's English width and the gap before 「· 加州」 followed the English.
 const CityRowScript := preload("res://scenes/p0/panels/p0_city_row.gd")
 const HomePinScript := preload("res://modules/p0/p0_home_pin.gd")
+const BackPillScript := preload("res://scenes/p0/panels/p0_back_pill.gd")
 func test_p0_a_city_rows_name_is_measured_in_chinese() -> void:
 	var t: Translation = LocalizationScript.P0Translation.new()
 	t.locale = "zh_CN"
@@ -477,7 +478,7 @@ func test_p0_the_decor_cap_line_reads_as_one_sentence() -> void:
 	for i in 52: v.decor.placed.append({"uid": i + 1, "id": "deco_planter", "x": 99, "y": i, "rot": 0})
 	var full := P0Decor.cap_line(v, m)
 	assert_str(full).is_equal("Decor 52/52 · Store one to place this")
-	assert_str(zh.call(full)).is_equal("摆件 52/52 · 收起一件才能摆放这个")
+	assert_str(zh.call(full)).is_equal("摆件 52/52 · 先收起一件再摆")
 	v.homestead.level = 2
 	v.decor.cap = 24
 	v.decor.placed.resize(24)
@@ -530,3 +531,19 @@ func test_p0_the_home_pins_distance_lines_take_only_a_distance() -> void:
 	assert_str(zh.call("Back to map · Carrot")).not_contains("距")
 	# no bare side word in the table: elsewhere `west` stays as it is
 	assert_str(zh.call("west")).is_empty()
+
+## The pin and pick pages' back key (P0BackPill, `‹  Change city` / `‹  Settings`) stayed English: the whole string is
+## not in the table and nothing read past a leading `‹` (李白 on 450's shots). The arrow and its spaces stay, the words
+## after it are the table's own; a word the table does not know leaves the key English.
+func test_p0_a_back_keys_words_are_translated_after_its_arrow() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t._get_message(s, &""))
+	var pill: Button = BackPillScript.new("Change city")
+	assert_str(pill.text).is_equal("‹  Change city")
+	assert_str(zh.call(pill.text)).is_equal("‹  更换城市")
+	pill.free()
+	assert_str(zh.call("‹  Settings")).is_equal("‹  设置")
+	assert_str(zh.call("‹  Zorb quarks")).is_empty()
+	assert_str(zh.call("‹")).is_empty()
+

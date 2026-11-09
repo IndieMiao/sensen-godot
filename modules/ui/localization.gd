@@ -120,8 +120,9 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 ## template — a source with format specs (%d, %s, %+d, %.1f; %% a percent sign: `Need %d more %s` → `还差 %d 个%s`;
 ## `{1}` / `{2}` in the Chinese to reorder) — with each %s it caught translated again (an item's name, a weekday) and a
 ## plural ending (`dish%s` → s / es) dropped; then line by line, then by its ` · ` parts; a link's ` ›` (`Edit look ›`),
-## a list whose every item it knows (`Carrot, Herb` → `胡萝卜、香草`), spaces around a line (`Muscle Memory `), curly
-## quotes around it and a count after it (`Home Cook 0/8`) are read around. Nothing found: "" (the English stays).
+## a back key's `‹ ` (`‹  Change city`), a list whose every item it knows (`Carrot, Herb` → `胡萝卜、香草`), spaces
+## around a line (`Muscle Memory `), curly quotes around it and a count after it (`Home Cook 0/8`) are read around.
+## Nothing found: "" (the English stays).
 ## Answers are cached: labels ask again on every redraw. P0_I18N_MISSES=<file> (QA): every line drawn that found
 ## nothing is written there once, for the translators.
 class P0Translation extends Translation:
@@ -131,6 +132,7 @@ class P0Translation extends Translation:
 	const CACHE_MAX := 4096
 	const PLURAL_ENDINGS := ["s", "es"]   # `%d dish%s`: English's plural, nothing in Chinese (李白's notes, q(275))
 	const LINK := " ›"   # a row or key that opens something: the arrow stays, the words before it are translated
+	const BACK := "‹"   # a back key (P0BackPill `‹  Change city`): the arrow and its spaces stay, the words after it translated
 	const LIST_LAST := {" and ": "和", " or ": "或"}   # a list's last item: `Carrot and Herb` 胡萝卜和香草
 	var _misses := {}
 	var _miss_file: FileAccess
@@ -267,6 +269,9 @@ class P0Translation extends Translation:
 		if s.ends_with(LINK) and s.length() > LINK.length():
 			var head := translate_line(s.left(s.length() - LINK.length()))
 			return head + LINK if head != "" else ""
+		if s.begins_with(BACK) and s.length() > BACK.length():
+			var tail := translate_line(s.substr(BACK.length()))
+			return BACK + tail if tail != "" else ""
 		var count := COUNT.search(s)
 		# A title with its count after it (`Home Cook 0/8`): the count stays. Only `n/m` — a bare number may be part of
 		# the name (`Floor 10`).
