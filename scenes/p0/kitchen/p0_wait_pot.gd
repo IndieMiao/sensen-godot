@@ -1,13 +1,13 @@
 extends Control
 ## The pot in the middle of the watch (SGODOT-419, q(288); 不知火舞 419 bd102c55, choice (b)): a 3D layer over the
-## kitchen, its own small world drawn with a transparent background into the box x 80–280, y 150–330, the pot's mouth
+## kitchen, its own small world drawn with a transparent background into the box x 80–280, y 110–330, the pot's mouth
 ## fixed at (180, 235) — the heat ring, the countdown and its bar line up under it, whatever the camera does. The same
 ## pot as on the stove, seen from the kitchen camera's side and lit warm from the upper left as the kitchen is; its
 ## `tumble` loop plays when the model has one (黄忠's cooking_pot_wait.tscn), else the stove's own pot stands in.
 ## There is one pot on the screen: the host hides the stove's while this shows. It flies in from the stove pot's place
 ## and size on the screen (0.25 s, ease out) and back the same way.
 
-const BOX := Rect2(80, 150, 200, 180)
+const BOX := Rect2(80, 110, 200, 220)   # its top 150 → 110 for the steam over the lid (不知火舞 449 v1); the pot as before
 const MOUTH := Vector2(180, 235)
 const FLY_S := 0.25
 const POT_W_PX := 150.0   # the pot's width in the box
@@ -43,6 +43,11 @@ func _init() -> void:
 	_tex.stretch_mode = TextureRect.STRETCH_SCALE
 	_tex.size = BOX.size
 	_tex.texture = view.get_texture()
+	# the transparent world comes out premultiplied (its colours already × alpha over the clear black): blended as such,
+	# or the steam's white is darkened a second time and reads dirty grey (黄忠 on 449 d971ef94)
+	var blend := CanvasItemMaterial.new()
+	blend.blend_mode = CanvasItemMaterial.BLEND_MODE_PREMULT_ALPHA
+	_tex.material = blend
 	add_child(_tex)
 	_cam = Camera3D.new()
 	_cam.projection = Camera3D.PROJECTION_ORTHOGONAL
