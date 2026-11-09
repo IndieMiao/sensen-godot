@@ -60,7 +60,6 @@ var _camera_recenter: Tween
 var p0_visit: P0LandmarkVisit
 ## The P0 stick is walking the player: the run plays on (as Alcatraz's; 用户 0.3.2, 424 da2e9368).
 var stick_moving := false
-var _stick_still := 0.0   # seconds the stick has pushed without moving the player
 
 func setup(args: Dictionary) -> void:
 	if P0LandmarkVisit.wanted(args): p0_visit = P0LandmarkVisit.new(self, args)
@@ -490,22 +489,14 @@ func exit_position() -> Vector3:
 	return _exit if _exit != Vector3.INF else EXIT
 func walking() -> bool: return _path_i < _path.size()
 
-## The stick (P0LandmarkVisit.stick_step): the player runs while it is pushed, along an edge at the slide's speed;
-## held against one it cannot pass, it stands after P0Actor.PUSH_IDLE_S (SGODOT-306, the slide spec).
+## The stick (P0LandmarkVisit.stick_step): the player runs while it is pushed.
 func step_stick(v: Vector2, dt: float) -> void:
 	if not navigation_ready(): return
-	var went := P0LandmarkVisit.stick_step(_player, _nav_map, _camera, WALK_SPEED, v, dt)
-	stick_moving = went >= 0.0
-	if not stick_moving:
-		_stick_still = 0.0
-		P0LandmarkVisit.run_speed(_rig, 1.0)
-		if _running and not walking():
-			_running = false
-			_animation("idle")
-		return
-	_stick_still = _stick_still + dt if went < PlayerMover.STUCK_RATIO else 0.0
-	var run := _stick_still < P0Actor.PUSH_IDLE_S
-	if run != _running:
-		_running = run
-		_animation("run" if run else "idle")
-	P0LandmarkVisit.run_speed(_rig, went if run and went >= PlayerMover.STUCK_RATIO else 1.0)
+	stick_moving = P0LandmarkVisit.stick_step(_player, _nav_map, _camera, WALK_SPEED, v, dt)
+	if stick_moving:
+		if not _running:
+			_running = true
+			_animation("run")
+	elif _running and not walking():
+		_running = false
+		_animation("idle")

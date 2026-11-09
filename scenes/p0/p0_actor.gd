@@ -78,9 +78,6 @@ func step(dt: float) -> void:
 		state = "move"
 		_attack_left = 0.0   # the stick past the strike takes the body back from the slash's follow-through
 		_play("idle" if _stuck_s >= PUSH_IDLE_S else "run")
-		# The slide spec: along a wall the run goes at the slide's speed over the walk's, not under SLIDE_RUN_MIN.
-		if _clip == "run" and mover.sliding: _speed(maxf(PlayerMover.SLIDE_RUN_MIN, mover.stick_ratio))
-		elif _clip == "run": _speed(1.0)
 	elif state == "move":
 		state = "idle"
 	if state == "idle" and _attack_left <= 0.0: _play("idle")
@@ -149,13 +146,7 @@ func teleport(p: Vector3) -> void:
 	mover.position = p
 	position = p
 
-## The rig's clips' speed (1 but for a slide's run).
-func _speed(scale: float) -> void:
-	var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer if rig != null else null
-	if ap != null and ap.speed_scale != scale: ap.speed_scale = scale
-
 func _play(clip: String, force := false) -> void:
 	if rig == null or (clip == _clip and not force): return
 	_clip = clip
-	_speed(1.0)
 	rig.play_motion(clip)
