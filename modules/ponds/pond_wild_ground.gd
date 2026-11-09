@@ -34,12 +34,16 @@ const COLOURS := {"grass": Color("86a74b"), "grass_far": Color("749543"), "plate
 	"dapple_cool": Color("6f9b52"), "soft_grass": Color("a8b46b")}
 
 const CACHE_MAX := 4   # a rebuild and the last few ponds reuse it; the memory stays bounded
-## LOOK under a rendering method: under gl_compatibility the shadows' cool cast is off — it goes straight into the
-## light there and, added on sRGB-encoded light, swells to ~+30 levels (周瑜 on 422: Fern's tree shade turned blue-green);
-## the other renderers keep LOOK as it is.
+## gl_compatibility draws a shadowed sun as a pass of its own, added on top of the sRGB-encoded ambient (周瑜 on 422
+## 43fdd5fe), so this light ground burned near white there (不知火舞) while the darker pieces did not (上官婉儿: the
+## sun stays as it is for them). This ground takes only GLES_SUN_K of the sun there — in its ambient-only 99 the sun's
+## share 160 − 99 = sRGB 61 → linear 0.0467 against the 131 → 0.227 it adds now — and its shadows no cool cast (it
+## swells to ~+30 levels on that pass). The other renderers keep LOOK as it is.
+const GLES_SUN_K := 0.206
 static func look_for(method: String) -> Dictionary:
 	if method != "gl_compatibility": return LOOK
 	var look := LOOK.duplicate()
+	look["sun_k"] = GLES_SUN_K
 	look["shadow_cool"] = Vector3.ZERO
 	look["shadow_cool_sand"] = Vector3.ZERO
 	return look
