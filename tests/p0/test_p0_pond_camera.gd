@@ -217,3 +217,11 @@ func test_on_gles_the_pond_draws_its_3d_at_0_8_and_gives_the_scale_back() -> voi
 	P0Pond.set_scale_3d(vp, was)
 	assert_float(vp.scaling_3d_scale).is_equal_approx(1.0, 0.001)
 	vp.queue_free()
+
+## 周瑜 on 422 (43fdd5fe): under gl_compatibility the shadowed sun's pass adds on sRGB-encoded light, so the pond's sun is
+## scaled there only (the other renderers keep it, to the pixel).
+func test_on_gles_the_ponds_sun_is_scaled_and_elsewhere_kept() -> void:
+	assert_float(P0Pond.sun_energy_scale("gl_compatibility")).is_equal_approx(P0Pond.GLES_SUN_K, 0.0001)
+	assert_float(P0Pond.GLES_SUN_K).is_equal_approx(0.206, 0.0001)
+	for method in ["forward_plus", "mobile", "dummy"]:
+		assert_float(P0Pond.sun_energy_scale(method)).override_failure_message(method).is_equal(1.0)

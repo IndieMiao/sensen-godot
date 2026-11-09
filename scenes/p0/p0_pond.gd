@@ -145,6 +145,7 @@ func _ready() -> void:
 	sun.shadow_opacity = 1.0
 	sun.light_angular_distance = 1.0
 	sun.directional_shadow_max_distance = 28
+	sun.light_energy *= sun_energy_scale(RenderingServer.get_current_rendering_method())
 	add_child(sun)
 	cam = Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -186,6 +187,13 @@ func _ready() -> void:
 	add_child(crowd)   # pond metres: the scene's own, no room offset
 	_go_online(rt.session)
 
+## gl_compatibility draws a shadowed sun as a pass of its own, added on top of the sRGB-encoded ambient (周瑜 on 422
+## 43fdd5fe: sun 131 + ambient 101 ≈ 229 there, Mobile adds them linearly to 159), so the pond came out too light — the
+## sand and the paths near white (不知火舞). The sun's energy there scaled so its pass adds what Mobile's does: in the
+## ambient-only 99, the sun's share 160 − 99 = sRGB 61 → linear 0.0467 against the 131 → 0.227 it adds now. Shadows kept.
+const GLES_SUN_K := 0.206
+## The factor on the pond's sun under a rendering method: GLES_SUN_K under gl_compatibility, else 1.
+static func sun_energy_scale(method: String) -> float: return GLES_SUN_K if method == "gl_compatibility" else 1.0
 const GLES_SCALE_3D := 0.8
 var _scale_3d_was := -1.0   # the viewport's 3D scale before the pond set it, < 0: not set
 ## The 3D render scale the pond uses under a rendering method, < 0: leave it as it is.
