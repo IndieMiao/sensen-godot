@@ -189,36 +189,25 @@ static func stone_wall(segments: Array) -> Array:
 				"yaw": yaw + 0.35 * float((i * STONE_PER_SEG + k) % 3 - 1), "scale": STONE_SCALE})
 	return out
 
-## Porch (Lv5) and Kitchen Wing (Lv8) parts, a or b. The porch stands at the door between the house front and the
-## yard fence's front row (0.8 m), clear of the door path, the plaque and the sign; the kitchen wing on the house's
-## left behind the rest bench.
+## Porch (Lv5) and Kitchen Wing (Lv8), a (timber) or b (stone): 赵云's porch_a / _b and kitchen_wing_a / _b (#858, in
+## farm-dev by #875), each one model with its origin at the house anchor (P0Garden.ANCHORS.house, +Z toward the camera),
+## put there as it is — the porch at the door, the wing on the house's left. Their colour is in the vertex colours
+## (FarmArt.instance's material).
 static func look_parts(bp: FarmBlueprint, stage: String, look: String) -> Array:
+	if look not in ["a", "b"]: return []
 	var house := bp.cell_to_world(ANCHORS.house)
-	var porch_z := house.z + HOUSE_FRONT + 0.35
-	match [stage, look]:
-		["porch", "a"]:   # Timber Porch: two railings flanking the door
-			return [{"asset": "fence", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": Vector3(0.55, 1, 1)},
-				{"asset": "fence", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": Vector3(0.55, 1, 1)}]
-		["porch", "b"]:   # Stone Porch: a paved landing and two rocks either side
-			return [{"asset": "path_tile", "pos": Vector3(house.x, 0.004, porch_z), "yaw": 0.0, "scale": Vector3(1.1, 1, 0.6)},
-				{"asset": "rock", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": 0.4, "scale": Vector3.ONE * 1.4},
-				{"asset": "rock", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": -0.6, "scale": Vector3.ONE * 1.4}]
-		["kitchen_extension", "a"]:   # Timber Kitchen Wing: a wooden lean-to on the left
-			return [{"asset": "storage", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75), "yaw": PI * 0.5, "scale": Vector3.ONE * 1.6}]
-		["kitchen_extension", "b"]:   # Stone Kitchen Wing: a stone room with a chimney stack
-			return [{"asset": "path_tile", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0.004, house.z - 0.75), "yaw": 0.0, "scale": Vector3(0.8, 1, 0.75)},
-				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75), "yaw": 0.2, "scale": Vector3(2.4, 2.2, 2.6)},
-				# the chimney: a tall rock standing on the ground at the room's back corner, sunk into it (never stacked:
-				# a rock set on another's rounded top floats, 不知火舞 on #250)
-				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.85, 0, house.z - 1.0), "yaw": 1.1, "scale": Vector3(1.1, 3.0, 1.1)}]
+	match stage:
+		"porch": return [{"asset": "porch_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
+		"kitchen_extension": return [{"asset": "kitchen_wing_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
 	return []
 
-## Master Farmhouse (Lv10): the house model, a Timber Lodge (house_barn) or a Stone Manor (house_dome); before Lv10 the
-## farm's own style (不知火舞 e6b93272: placeholders until Stark's design).
+## Master Farmhouse (Lv15, v4q(1)): 刘备's master_farmhouse_a (Timber Lodge) / _b (Stone Manor) (#854, in farm-dev by
+## #875), the whole house with its porch and wing in one, origin at the house anchor as the house's own; before it the
+## farm's own style.
 static func look_house(look: String, style := "cottage") -> String:
 	match look:
-		"a": return "house_barn"
-		"b": return "house_dome"
+		"a": return "master_farmhouse_a"
+		"b": return "master_farmhouse_b"
 	return "house_" + style
 
 ## Points along the yard fence for block_points: the player walks round it, through the door opening.

@@ -1,7 +1,8 @@
 extends Node3D
-## Homestead looks on the farm (LOOK-PICK, SGODOT-282; §8.3.1, q(24) / q(112)): the Porch (Lv5) and Kitchen Wing (Lv8)
-## as standalone parts beside the farmhouse, and at Lv10 the Master Farmhouse in the house's place — each stage a
-## (timber) or b (stone), as the view says (homestead.looks) or as LOOK-PICK previews it. A stage reached or swapped
+## Homestead looks on the farm (LOOK-PICK, SGODOT-282; §8.3.1, q(24) / q(112); models by #875): the Porch (Lv5) and
+## Kitchen Wing (Lv8) as standalone parts at the farmhouse, and at Lv15 the Master Farmhouse in the house's place, its
+## own porch and wing built in (the standalone two put away while it stands) — each stage a (timber) or b (stone), as
+## the view says (homestead.looks) or as LOOK-PICK previews it. A stage reached or swapped
 ## while the farm is up pops its parts in with dust (P0Fence.pop_in); a save already there shows them at once. The
 ## Fence & Mailbox stage (Lv3) is the fence's own (p0_fence.gd). Placements: P0Garden.look_parts / look_house.
 
@@ -11,7 +12,7 @@ const STAGES := ["porch", "kitchen_extension"]
 const HOUSE_STAGE := "master_farmhouse"
 
 var _bp: FarmBlueprint
-var _house: MeshInstance3D     # the farm's house prop: its mesh changes at Lv10
+var _house: MeshInstance3D     # the farm's house prop: its mesh changes at Lv15
 var _style := "cottage"
 var _shown := {}               # stage → "a" / "b" / "" on show
 var _parts := {}               # stage → Node3D holding its parts
@@ -54,6 +55,11 @@ func sync(view: Dictionary) -> void:
 		_shown[stage] = want
 		if stage == HOUSE_STAGE: _set_house(want, _seen)
 		else: _set_parts(stage, want, _seen)
+	# the Master Farmhouse has the porch and the wing in it: the standalone ones stand down while it is up
+	var whole := shown(HOUSE_STAGE) != ""
+	for stage in STAGES:
+		var root: Node3D = _parts.get(stage)
+		if root and root.visible == whole: root.visible = not whole
 	_seen = true
 
 func shown(stage: String) -> String: return str(_shown.get(stage, ""))

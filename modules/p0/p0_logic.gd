@@ -1082,7 +1082,8 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 				if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
 			plots.append(p)
 		v["plots"] = plots
-	# the priest's buffs (q(300), SGODOT-445: view.buffs[].left, ms): counted down, gone once out — 亚瑟's HUD rings and `… has worn off` read it (a buff gone from the array is a buff ended)
+	# the priest's buffs (q(300), SGODOT-445: view.buffs[].left, ms): counted down, gone once out — 亚瑟's HUD rings and
+	# `… has worn off` read it (a buff gone from the array is a buff ended)
 	if v.get("buffs") is Array and not (v.buffs as Array).is_empty():
 		var bs: Array = []
 		for b in v.buffs:

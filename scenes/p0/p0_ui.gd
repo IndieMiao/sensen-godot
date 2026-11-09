@@ -1869,8 +1869,9 @@ func toast_success(text: String, break_at_dot := false, action := "") -> void:
 
 ## The priest's buffs' toasts (q(300) ⑨, spec v1.2 §4), from view.buffs as P0Logic.project counts it down: one new says
 ## what it does; one renewed (Pray drew it while on: its time up by more than BUFF_RENEW_MS — a server answer resets a
-## projection by a fraction of a second) says `Twin Catch · back to 20 min`; one that runs out on screen says it has worn off. The first view after launch says
-## nothing, nor does one gone at a jump (back from the background, offline: no catch-up, spec §4).
+## projection by a fraction of a second) says `Twin Catch · back to 20 min`; one that runs out on screen says it has
+## worn off. The first view after launch says nothing, nor does one gone at a jump (back from the background, offline:
+## no catch-up, spec §4).
 const BUFF_RENEW_MS := 5000.0
 const BUFF_RENEWED := "%s · back to 20 min"   # the spec's words, as the translation table keys them (李白)
 const BUFF_LINES := {"fish": "%s · %d min · every fish lands ×2", "farm": "%s · %d min · crops sown now grow 2× faster"}
@@ -1883,7 +1884,7 @@ func _watch_buffs(v: Dictionary) -> void:
 		for id in P0Logic.BUFF_ORDER:
 			if now.has(id) and not _buffs_seen.has(id):
 				toast_success(BUFF_LINES[id] % [P0Logic.BUFF_NAMES[id], minutes])
-			elif now.has(id) and float(now[id]) > float(_buffs_seen[id]) + BUFF_RENEW_MS:   # Pray drew one already on (v1.2 §4)
+			elif now.has(id) and float(now[id]) > float(_buffs_seen[id]) + BUFF_RENEW_MS:   # Pray drew one on (v1.2 §4)
 				toast_success(BUFF_RENEWED % P0Logic.BUFF_NAMES[id])
 			elif _buffs_seen.has(id) and not now.has(id) and float(_buffs_seen[id]) <= BUFF_RENEW_MS:
 				toast("%s has worn off" % P0Logic.BUFF_NAMES[id])
@@ -2559,7 +2560,7 @@ func _show_need_source(tile: Control, id: String) -> void:
 ## "market"); ctx = the outpost's keeper ctx {keeper, place, nearest} (SGODOT-227), passed through untouched and kept
 ## for the counter's keeper bar.
 var _keeper_told := {}   # role → answers given this run (Gabriel's stories round, q(299))
-var _priest_card: UiDialogueCard   # Gabriel's greeting while it is up: its Pray key and count line follow the view (q(300))
+var _priest_card: UiDialogueCard   # Gabriel's greeting while up: its Pray key and count line follow the view (q(300))
 var pray_roll := func() -> float: return randf()   # Pray's draw (tests set it)
 func open_keeper_greeting(role: String, ctx := {}) -> void:
 	if not ctx.is_empty(): _counter_ctx[role] = ctx
@@ -2605,7 +2606,8 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 		key.sends = true
 		key.reason_beside = true
 		key.reason = str(pray.reason)
-		key.activated.connect(func(): command.emit({"type": "buff", "buff": P0Logic.pray_draw(pray_roll.call())}))   # the toast is the HUD's
+		# the toast is the HUD's (亚瑟)
+		key.activated.connect(func(): command.emit({"type": "buff", "buff": P0Logic.pray_draw(pray_roll.call())}))
 		key.unavailable_pressed.connect(func(r: String): toast(r))
 		card.content.add_child(key)
 		var count := UiKit.label(str(pray.line), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)

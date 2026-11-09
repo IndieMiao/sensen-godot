@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 ## LOOK-PICK (SGODOT-282; 不知火舞 49498df6 / e2d76a7c, q(112) / q(115)): Homestead looks a (timber) / b (stone) at
-## Lv3 / 5 / 8 / 10 — HOME-1's Looks rows, the card, and the parts on the farm.
+## Lv3 / 5 / 8 / 15 — HOME-1's Looks rows, the card, and the parts on the farm.
 
 const Looks = preload("res://scenes/p0/p0_looks.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
@@ -123,24 +123,27 @@ func test_stone_wall_follows_the_fence_run_three_rocks_a_segment() -> void:
 			var p: Vector3 = wall[i * P0Garden.STONE_PER_SEG + k].pos
 			assert_float(p.distance_to(seg.pos)).is_less(P0Garden.FENCE_SEG * float(seg.stretch) * 0.5)
 
-func test_porch_and_kitchen_parts_keep_off_the_door_path() -> void:
+## #875's models (赵云 #858, 刘备 #854): each stage one model, its origin the house anchor, set there as it is; the
+## Master Farmhouse the house's own mesh. Every one is in the farm's art and drawn with its vertex colours.
+func test_each_look_is_its_model_at_the_house() -> void:
 	var bp := P0Garden.blueprint()
-	var door := bp.cell_to_world(P0Garden.ANCHORS.house + Vector2i(0, -2))
+	var house := bp.cell_to_world(P0Garden.ANCHORS.house)
 	for stage in ["porch", "kitchen_extension"]:
 		for look in ["a", "b"]:
 			var parts := P0Garden.look_parts(bp, stage, look)
-			assert_array(parts).is_not_empty()
-			for p in parts:
-				if str(p.asset) == "path_tile": continue   # the landing is the door path itself
-				assert_float(absf((p.pos as Vector3).x - door.x)).override_failure_message("%s %s %s" % [stage, look, p.asset]).is_greater(0.6)
-	# every part stands on the ground: nothing set on another's top, where it would float (不知火舞 on #250, Lv8 b)
-	for stage in ["porch", "kitchen_extension"]:
-		for look in ["a", "b"]:
-			for p in P0Garden.look_parts(bp, stage, look):
-				assert_float((p.pos as Vector3).y).override_failure_message("%s %s %s" % [stage, look, p.asset]).is_less(0.01)
-	assert_str(P0Garden.look_house("a")).is_equal("house_barn")
-	assert_str(P0Garden.look_house("b")).is_equal("house_dome")
+			assert_array(parts.map(func(p): return p.asset)).is_equal(
+				[("porch_" if stage == "porch" else "kitchen_wing_") + look])
+			assert_object(parts[0].pos).is_equal(house)
+			assert_float(float(parts[0].yaw)).is_equal(0.0)
+			assert_object(FarmArt.mesh_for(str(parts[0].asset))).is_not_null()
+	assert_array(P0Garden.look_parts(bp, "porch", "")).is_empty()
+	assert_str(P0Garden.look_house("a")).is_equal("master_farmhouse_a")
+	assert_str(P0Garden.look_house("b")).is_equal("master_farmhouse_b")
 	assert_str(P0Garden.look_house("")).is_equal("house_cottage")
+	for asset in ["master_farmhouse_a", "master_farmhouse_b"]: assert_object(FarmArt.mesh_for(asset)).is_not_null()
+	var m := FarmArt.instance("porch_a")   # the colour is in the vertex colours: the farm's one material (上官婉儿 on #875)
+	assert_object(m.material_override).is_same(FarmArt.material())
+	m.free()
 
 func test_the_farm_shows_the_views_looks_and_the_cards_preview() -> void:
 	var bp := P0Garden.blueprint()
@@ -158,12 +161,12 @@ func test_the_farm_shows_the_views_looks_and_the_cards_preview() -> void:
 	fence.sync(v)
 	assert_str(looks.shown("porch")).is_equal("a")
 	assert_str(looks.shown("kitchen_extension")).is_equal("")   # Lv8 not reached: nothing there
-	assert_int(looks.parts("porch").size()).is_equal(2)          # two timber railings
+	assert_array(looks.parts("porch").map(func(n): return (n as MeshInstance3D).mesh)).is_equal([FarmArt.mesh_for("porch_a")])
 	assert_str(fence.look).is_equal("a")
 	looks.preview("porch", "b")   # LOOK-PICK's preview
 	looks.sync(v)
 	assert_str(looks.shown("porch")).is_equal("b")
-	assert_int(looks.parts("porch").size()).is_equal(3)          # a landing and two rocks
+	assert_array(looks.parts("porch").map(func(n): return (n as MeshInstance3D).mesh)).is_equal([FarmArt.mesh_for("porch_b")])
 	var used := _view(5, {"porch": "b"})   # Use landed: the preview lets go, the view keeps b
 	looks.sync(used)
 	assert_bool(looks.previews.has("porch")).is_false()
@@ -173,7 +176,18 @@ func test_the_farm_shows_the_views_looks_and_the_cards_preview() -> void:
 	assert_str(fence.look).is_equal("b")   # Stone Wall
 	var ring: MultiMeshInstance3D = fence.find_child("Ring", true, false)   # one batch, one draw (上官婉儿 on #250)
 	assert_int(ring.multimesh.instance_count).is_equal(P0Garden.fence_ring(bp).size() * P0Garden.STONE_PER_SEG)
-	var lv10 := _view(15, {"master_farmhouse": "b"})   # the Master Farmhouse at Lv15 since v4q(1) ⑧
-	looks.sync(lv10)
+	var lv8 := _view(8, {"porch": "b"})
+	looks.sync(lv8)
+	assert_array(looks.parts("kitchen_extension").map(func(n): return (n as MeshInstance3D).mesh)).is_equal(
+		[FarmArt.mesh_for("kitchen_wing_a")])
+	var lv15 := _view(15, {"porch": "b", "master_farmhouse": "b"})   # the Master Farmhouse at Lv15 since v4q(1) ⑧
+	looks.sync(lv15)
 	assert_object(house.mesh).is_not_same(cottage)
-	assert_object(house.mesh).is_same(FarmArt.mesh_for("house_dome"))
+	assert_object(house.mesh).is_same(FarmArt.mesh_for("master_farmhouse_b"))
+	# its porch and wing are in it: the standalone two stand down (#875), under either look of it
+	for stage in ["porch", "kitchen_extension"]:
+		assert_bool((looks.parts(stage)[0] as Node3D).get_parent().visible).override_failure_message(stage).is_false()
+	looks.preview("master_farmhouse", "a")
+	looks.sync(lv15)
+	assert_object(house.mesh).is_same(FarmArt.mesh_for("master_farmhouse_a"))
+	assert_bool((looks.parts("porch")[0] as Node3D).get_parent().visible).is_false()
