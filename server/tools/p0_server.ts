@@ -78,7 +78,7 @@ const outpostTable = loadOutposts();
 const generatedRoom = generatedOutpostSpec(outpostTable, id => roomPlace(content, id));
 // Ponds (11-02, pond multiplayer): `pond:<id>`, a room of 8 for a pond the content knows, made on first join.
 const pondRoom = pondRoomSpec(id => !!placeOf(content, id));
-const rooms = new OutpostRooms(outpostTable, Date.now, id => pondRoom(id) ?? generatedRoom(id));
+const rooms = new OutpostRooms(outpostTable, Date.now, (id, layout) => layout ? generatedRoom(id, layout) : pondRoom(id) ?? generatedRoom(id));
 // q(188) ① `Near you`: the address table made from DB-IP City Lite at image build (tools/ip_near_table.ts); none, no guess.
 let ipNear: IpNear | undefined;
 if (process.env.P0_IP_NEAR_TABLE) {

@@ -9,9 +9,16 @@ const ROLES: OutpostRole[] = ['tackle', 'tea', 'post', 'market', 'mine_hut', 'ca
 const ID_RE = /^[a-z0-9_]{3,40}$/;
 
 /** A generated place an online room can be made for (world.ts roomPlace): an outpost, or a Mine Hut with its own walls. */
-export interface GeneratedRoomPlace { role: string; art: string; capacity: number; bounds?: [number, number, number, number]; seats?: string[] }
+export interface GeneratedRoomPlace { role: string; art: string; capacity: number; bounds?: [number, number, number, number]; seats?: string[];
+  /** The kit newer clients draw for this room kind over `art` (world.room[kind].client_art). */
+  client_art?: string }
 
 export interface OutpostEntry extends OutpostSpec { name: string; category: string; lat: number; lng: number; art: string; anchors: string }
+
+const BOX = (b: unknown): b is [number, number, number, number] =>
+  Array.isArray(b) && b.length === 4 && b.every(v => Number.isFinite(v)) && b[0] < b[1] && b[2] < b[3];
+const SEATS = (s: unknown): s is string[] =>
+  Array.isArray(s) && s.every(n => typeof n === 'string' && /^seat_[a-z0-9_]+$/.test(n)) && new Set(s).size === s.length;
 
 export function loadOutposts(file = DEFAULT_P0_OUTPOSTS): OutpostEntry[] {
   const data = JSON.parse(readFileSync(file, 'utf8')) as { version: number; outposts: OutpostEntry[] };
@@ -20,7 +27,8 @@ export function loadOutposts(file = DEFAULT_P0_OUTPOSTS): OutpostEntry[] {
   for (const o of data.outposts) {
     const [x0, x1, z0, z1] = o.bounds ?? [];
     if (!ID_RE.test(o.id) || seen.has(o.id) || !ROLES.includes(o.role) || !Number.isInteger(o.capacity) || o.capacity < 1 || o.capacity > 64 ||
-      !(x0 < x1 && z0 < z1) || !Array.isArray(o.seats) || o.seats.some(s => !/^seat_[a-z0-9_]+$/.test(s)) || new Set(o.seats).size !== o.seats.length)
+      !(x0 < x1 && z0 < z1) || !Array.isArray(o.seats) || o.seats.some(s => !/^seat_[a-z0-9_]+$/.test(s)) || new Set(o.seats).size !== o.seats.length ||
+      (o.before !== undefined && (typeof o.before.art !== 'string' || !o.before.art || o.before.art === o.art || !BOX(o.before.bounds) || !SEATS(o.before.seats))))
       throw new Error('OUTPOSTS_SCHEMA:' + String(o.id));
     seen.add(o.id);
   }
@@ -33,16 +41,23 @@ export function loadOutposts(file = DEFAULT_P0_OUTPOSTS): OutpostEntry[] {
  * world_gen.json `room`), or the walls and seats its room gives itself (the Mine Hut: no hand-written room stands in for
  * it, q(204)). A kit no hand-written room is on any more falls back to the hand-written room of its role: the tackle
  * shop's, on its own kit since SGODOT-214 while generated ones still name the Farm Tools Store for 0.2.9 and older
- * (world_gen.json room.tackle.client_art). Undefined for an id the generator does not know.
+ * (world_gen.json room.tackle.client_art). Undefined for an id the generator does not know. `layout`: a newer client's
+ * kit that took the placeholder room's place (OutpostSpec.before; the market plaza, SGODOT-218) — that kit's walls and
+ * seats, for that layout's instances; undefined for any other.
  */
 export function generatedOutpostSpec(table: OutpostEntry[], detail: (outpost: string) => GeneratedRoomPlace | undefined) {
-  const byArt = new Map(table.map(o => [o.art, o]));
-  return (outpost: string): OutpostSpec | undefined => {
+  const byArt = new Map<string, { bounds: [number, number, number, number]; seats: string[] }>(table.map(o => [o.art, o]));
+  for (const o of table) if (o.before) byArt.set(o.before.art, o.before);
+  // SGODOT-218: a layout of its own only for a kit that took a room's place (`before`): the market plaza, as the hand-written
+  // square's. A kit newer clients draw over the server's for no such reason (the tackle shop's, SGODOT-214) shares its room.
+  const newer = new Set(table.filter(o => o.before).map(o => o.art));
+  return (outpost: string, layout = ''): OutpostSpec | undefined => {
     if (outpost.indexOf('~') <= 0) return undefined;
     const d = detail(outpost);
-    const room = d?.bounds ? { bounds: d.bounds, seats: d.seats ?? [] } : d ? byArt.get(d.art) ?? table.find(o => o.role === d.role) : undefined;
-    if (!d || !room || !ROLES.includes(d.role as OutpostRole)) return undefined;
-    return { id: outpost, role: d.role as OutpostRole, capacity: d.capacity, bounds: room.bounds, seats: room.seats };
+    if (!d || (layout && (!newer.has(layout) || layout !== d.client_art))) return undefined;
+    const room = d.bounds && !layout ? { bounds: d.bounds, seats: d.seats ?? [] } : byArt.get(layout || d.art) ?? table.find(o => o.role === d.role);
+    if (!room || !ROLES.includes(d.role as OutpostRole)) return undefined;
+    return { id: outpost, role: d.role as OutpostRole, capacity: d.capacity, bounds: room.bounds, seats: room.seats, ...(layout ? { layout } : {}) };
   };
 }
 

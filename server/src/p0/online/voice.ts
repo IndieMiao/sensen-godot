@@ -70,9 +70,11 @@ export class P0Voice {
       { requestTimeout: 2, failover: false }) : undefined);
   }
 
-  /** The LiveKit room of a hub instance: the place hashed (no `:` or `~` reaches the SFU: 亚瑟), and its number. */
-  roomName(o: Pick<Occupant, 'outpost' | 'room'>): string {
-    return `${this.config?.namespace ?? 'p0-off'}-${createHash('sha256').update(o.outpost).digest('hex').slice(0, 12)}-${o.room}`;
+  /** The LiveKit room of a hub instance: the place hashed (no `:` or `~` reaches the SFU: 亚瑟), with its layout group
+   * when it has one (SGODOT-218: the market plaza's Room 1 is not the fruit shop's), and its number. */
+  roomName(o: Pick<Occupant, 'outpost' | 'room'> & { layout?: string }): string {
+    const place = o.layout ? `${o.outpost}@${o.layout}` : o.outpost;
+    return `${this.config?.namespace ?? 'p0-off'}-${createHash('sha256').update(place).digest('hex').slice(0, 12)}-${o.room}`;
   }
 
   status(player: string) {
@@ -93,7 +95,7 @@ export class P0Voice {
     if (this.ages[player] !== true) return refuse('AGE_GATE', 403);
     const o = this.rooms.occupant(player);
     if (!o) return refuse('NOT_IN_ROOM', 403);
-    const spec = this.rooms.spec(o.outpost);
+    const spec = this.rooms.spec(o.outpost, o.layout);
     if (!spec || NO_VOICE_ROLES.has(spec.role)) return refuse('VOICE_NOT_HERE', 403);
     return { o, spec };
   }
@@ -193,7 +195,7 @@ export class P0Voice {
    * may still be in LiveKit or back under a new id: 李元芳 on 384 b5b6a124). */
   joined(o: Occupant): void {
     let mine = false;
-    for (const m of this.rooms.members(o.outpost, o.room)) {
+    for (const m of this.rooms.members(o.outpost, o.room, o.layout)) {
       if (m.player === o.player) continue;
       if (this.blocking(m.player, o.player) || this.refused.get(m.player)?.has(String(o.id))) this.tellBlocks(m.player);
       if (this.blocking(o.player, m.player)) mine = true;
@@ -224,7 +226,7 @@ export class P0Voice {
   blockedPeers(player: string): string[] {
     const o = this.rooms.occupant(player);
     if (!o) return [];
-    return this.rooms.members(o.outpost, o.room).filter(m => m.player !== player && this.blocking(player, m.player)).map(m => String(m.id));
+    return this.rooms.members(o.outpost, o.room, o.layout).filter(m => m.player !== player && this.blocking(player, m.player)).map(m => String(m.id));
   }
 
   private blocking(a: string, b: string): boolean {
@@ -234,7 +236,7 @@ export class P0Voice {
   private playerAt(player: string, peer: number): string | undefined {
     const o = this.rooms.occupant(player);
     if (!o || !Number.isInteger(peer)) return undefined;
-    return this.rooms.members(o.outpost, o.room).find(m => m.id === peer && m.player !== player)?.player;
+    return this.rooms.members(o.outpost, o.room, o.layout).find(m => m.id === peer && m.player !== player)?.player;
   }
 
   private async drop(player: string): Promise<void> {

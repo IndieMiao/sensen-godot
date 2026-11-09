@@ -61,11 +61,11 @@
       "capacity": 30,
       "keeper": {"role": "Market Keeper", "name": "Mei"},
       "residents": ["res_nadia", "res_theo"],
-      "art": "fruit_shop",
+      "art": "market_plaza",
       "backdrop": {"top": "D5EFF3"},
-      "anchors": "res://assets/p0/outposts/market.anchors.json",
-      "bounds": [-3.05, 3.05, -2.8, 2.8],
-      "seats": []
+      "bounds": [-8, 8, -8, 8],
+      "seats": ["seat_1", "seat_2"],
+      "before": {"art": "fruit_shop", "bounds": [-3.05, 3.05, -2.8, 2.8], "seats": []}
     },
     {
       "id": "sf_card_room_1", "cluster": "gn-5391959",
