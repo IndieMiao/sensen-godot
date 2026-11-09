@@ -31,8 +31,17 @@ const STAND_S := 0.55
 ## aisle with a gap between rows the front pew hides (不知火舞 on #850); elsewhere none — the tea house's stools stand
 ## up where they were walked to, as in 0.3.0.
 const STAND_CLEAR := {"poi_church": 2}
-## The root eases onto the seat within this time (art director: aligned within 0.3 s); clips cross-fade in.
+## The root eases onto the seat within this time (art director: aligned within 0.3 s); clips cross-fade in. Further than
+## SIT_GLIDE_S covers at SIT_SLIDE_MPS (along a pew from the aisle to its middle, q(304)) it takes as long as it needs.
 const SIT_GLIDE_S := 0.3
+const SIT_SLIDE_MPS := 2.5
+## Kits whose lone seats are walked to by their layout `approach` (the aisle end of the pew) and slid onto along the pew,
+## their icons kept on their anchors, never spread (q(304), the user on 0.3.5: one seat in each pew's middle).
+const PEW_KITS := ["poi_church"]
+## The two second seats q(304) took off the pews, still in the shared outpost table so an older client may sit there:
+## its pew counts as taken while one does (no icon, no seat for us), and that player is drawn where it sat, at the
+## height of the pew's own seat (不知火舞 on q(304): one to a pew while both builds are about).
+const LEGACY_SEATS := {"seat_left_4": "seat_left_2", "seat_right_4": "seat_right_2"}
 const CLIP_BLEND_S := 0.1
 
 var outpost: Dictionary = {}
@@ -184,7 +193,7 @@ func resident_spot(where: String) -> String:
 ## Other players stand on the floor, or on their seat (room metres; the crowd lives in the room node).
 func _crowd_height(id: int) -> float:
 	var s := online.seat_of(id) if online else ""
-	return (seat_root_y(s) if s != "" and anchor(s) else floor_y) - room.position.y
+	return (seat_root_y(s) if s != "" and _seat_anchor(s) else floor_y) - room.position.y
 
 func to_room(world: Vector3) -> Vector3:
 	return world - room.position
@@ -313,6 +322,28 @@ func _lone_seats() -> PackedStringArray:
 	for n in outpost.get("seats", []):
 		if anchor(str(n)) != null and not grouped.any(func(prefix): return str(n).begins_with(prefix)): out.append(str(n))
 	return out
+
+func _pews() -> bool: return PEW_KITS.has(str(outpost.get("art", "")))
+
+## A pew's seat: from the aisle end of its pew (the layout's `approach`, in the anchors' own space), slid along it to
+## the middle (_sit_down).
+func _walk_point(n: String, target: Node3D) -> Vector3:
+	var appr = anchor_data(n).get("approach", null)
+	if _pews() and appr is Array and (appr as Array).size() == 3 and _lone_seats().has(n):
+		return (target.get_parent() as Node3D).to_global(Vector3(float(appr[0]), float(appr[1]), float(appr[2])))
+	return super(n, target)
+
+func _may_overlap(n: String) -> bool: return _pews() and _lone_seats().has(n)
+
+## A pew's seat is near from where it is sat down from, its aisle end (its middle is between two rows).
+func _near_point(n: String) -> Vector3:
+	if _pews() and _lone_seats().has(n) and anchor(n): return _walk_point(n, anchor(n))
+	return super(n)
+
+## A seat's anchor, or for an older client's seat q(304) took off, its pew's own.
+func _seat_anchor(s: String) -> Marker3D:
+	var m := anchor(s)
+	return m if m != null or not LEGACY_SEATS.has(s) else anchor(str(LEGACY_SEATS[s]))
 
 func p0_tap(screen: Vector2) -> void:
 	if rt and rt.ui.has_modal(): return
@@ -510,7 +541,10 @@ func _free_seats(prefix: String) -> Array[Marker3D]:
 	var taken := {}
 	if online:
 		for id in online.members:
-			if int(id) != online.self_id and str(online.members[id].get("seat", "")) != "": taken[str(online.members[id].seat)] = true
+			var s := str(online.members[id].get("seat", ""))
+			if int(id) == online.self_id or s == "": continue
+			taken[s] = true
+			if LEGACY_SEATS.has(s): taken[str(LEGACY_SEATS[s])] = true   # an older client on the pew's second seat (q(304))
 	var out: Array[Marker3D] = []
 	for m in anchors(prefix):
 		if not taken.has(str(m.name)): out.append(m)
@@ -546,7 +580,8 @@ func _sit_down(n: String) -> void:
 	seat = n
 	_standing = {}
 	actor.lock(true)
-	_glide_to(Vector3(m.global_position.x, seat_root_y(n), m.global_position.z), SIT_GLIDE_S)
+	var to := Vector3(m.global_position.x, seat_root_y(n), m.global_position.z)
+	_glide_to(to, maxf(SIT_GLIDE_S, _flat_distance(actor.position, to) / SIT_SLIDE_MPS))
 	actor.face(actor.position + yaw_dir(float(anchor_data(n).get("yaw_degrees", 0))))
 	_play_seated(actor.rig, true)
 
@@ -569,7 +604,7 @@ func _glide_point() -> Vector3:
 
 ## Rig root height (world) for a player on this seat: the seat anchor is the seat surface.
 func seat_root_y(seat_name: String) -> float:
-	var m := anchor(seat_name)
+	var m := _seat_anchor(seat_name)
 	return m.global_position.y - SIT_ROOT_BELOW_SEAT if m else floor_y
 
 ## Stand up: sit_up (sped up) while the root eases down to the floor beside the seat, then the player is
@@ -588,11 +623,15 @@ func _stand_up(then := Callable()) -> void:
 	# with the front one hiding them). Not onto the kit's approach: the tea house's third table has its approach behind
 	# Hana, and up there the player was hidden (不知火舞 on #850).
 	# and not behind anyone in the room: up behind Hana at the tea house's third table the player was hidden (不知火舞)
+	# a pew's seat (q(304)): up at the aisle end it was slid in from, along the pew — its middle is between two rows
+	var pew := m != null and _pews() and _lone_seats().has(str(m.name))
+	if pew: at = _walk_point(str(m.name), m)
 	var floor_at := reachable(at, int(STAND_CLEAR.get(str(outpost.get("art", "")), 0)), npcs.values().map(func(x): return (x.root as Node3D).global_position))
 	if floor_at == Vector3.INF: floor_at = actor.position
 	var ap := actor.rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	var dur := STAND_S if ap and ap.has_animation("sit_up") else 0.0
 	if dur > 0.0: ap.play("sit_up", CLIP_BLEND_S, STAND_SPEED)
+	if pew and dur > 0.0: dur = maxf(dur, _flat_distance(actor.position, floor_at) / SIT_SLIDE_MPS)
 	_glide_to(Vector3(floor_at.x, floor_y, floor_at.z), dur)
 	_standing = {left = dur, then = then}
 	if dur <= 0.0: _finish_stand()
