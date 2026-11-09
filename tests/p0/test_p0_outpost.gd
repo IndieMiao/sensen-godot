@@ -641,6 +641,23 @@ func test_the_market_plaza_camera_keeps_to_its_reach() -> void:
 			var at := r.cam.unproject_position(p)
 			assert_bool(Rect2(Vector2(12, 0), view - Vector2(24, 0)).has_point(at)).override_failure_message("%s at %s" % [c, at]).is_true()
 
+## 不知火舞 on #895: the plaza opens with the player's feet at y 600 of the 360 × 800 frame (its own, as the pond's), Mei, her
+## counter, the board, the specialty shelf and Nadia whole on the screen, the door's prompt clear of the player.
+func test_the_market_plaza_opens_low_on_the_player() -> void:
+	var r := _room("sh_market_1", true)
+	await get_tree().process_frame
+	r.p0_frame({}, 1.0 / 30.0)
+	assert_float(r.cam.unproject_position(r.actor.position).y).is_equal_approx(600.0, 3.0)
+	var view := r._view()
+	for n in ["npc_keeper", "use_counter", "use_market_board", "use_specialty_shelf", "npc_nadia"]:
+		var at := r.cam.unproject_position(r.anchor(n).global_position)
+		assert_bool(Rect2(Vector2.ZERO, view).grow(-12.0).has_point(at)).override_failure_message("%s at %s" % [n, at]).is_true()
+	var prompt := r.cam.unproject_position(r.pick_point("exit"))
+	var feet := r.cam.unproject_position(r.actor.position)
+	assert_float(prompt.distance_to(feet)).is_greater(8.0)
+	# another room keeps its shot: the tea house has no entry
+	assert_bool(OutpostScript.OPENING_FEET_Y.has("tea_house")).is_false()
+
 ## The plaza's row houses and far city are San Francisco's in Mission Market Square, the plain set in another city's.
 func test_the_market_plaza_dresses_by_city() -> void:
 	assert_str(OutpostScript.city_variant(P0Outposts.find("sh_market_1"))).is_equal("san_francisco")

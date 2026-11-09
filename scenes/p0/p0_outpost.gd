@@ -99,6 +99,21 @@ func _go_online(session: P0Session) -> void:
 	var at := P0RoomAnchors.vec(door.get("position", [0, 0, 0]))
 	online.start(str(outpost.id), Vector2(at.x, at.z))
 
+## 不知火舞 on #895 (SGODOT-218): the market plaza opens framed on its own, as the pond does — the player's feet at this row
+## of the 800 px frame, so the stalls, Mei's counter and the row houses' ground floor show above under the HUD (its 16 m
+## square left the lower third bare when centred). Across, as the room's opening shot has it. Other rooms: no entry.
+const OPENING_FEET_Y := {"market_plaza": 600.0}
+
+func opening_focus(right: Vector3, up: Vector3, forward: Vector3) -> Vector3:
+	var base := super.opening_focus(right, up, forward)
+	var feet_y := float(OPENING_FEET_Y.get(str(outpost.get("art", "")), -1.0))
+	if feet_y < 0.0: return base
+	var view := _view()
+	var m := cam.size / maxf(view.x, 1.0)   # metres per px
+	var q := Vector2(base.dot(right), base.dot(up))
+	q.y = actor.position.dot(up) - (view.y * 0.5 - feet_y / 800.0 * view.y) * m   # the screen's centre that far above the feet
+	return _on_floor(right, up, forward, q)
+
 ## The market plaza's row houses and far city by city (SGODOT-218, layout.json facade_variants): San Francisco's
 ## pastel Victorians in San Francisco (Mission Market Square), the plain set in every other city's square.
 func _art_options(kit: Node) -> void:
