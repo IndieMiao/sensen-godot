@@ -440,7 +440,7 @@
       "material": "opaque",
       "vegetation": true,
       "review_only": true,
-      "cast_shadow": false,
+      "cast_shadow": true,
       "provenance": "tools/art/source/poi_church/modules/flower_pedestal/reuse_provenance.json"
     },
     {
@@ -467,7 +467,7 @@
       "material": "opaque",
       "vegetation": true,
       "review_only": true,
-      "cast_shadow": false,
+      "cast_shadow": true,
       "provenance": "tools/art/source/poi_church/modules/leaf_planter/reuse_provenance.json"
     },
     {
