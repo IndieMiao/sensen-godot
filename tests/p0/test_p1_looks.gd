@@ -206,7 +206,6 @@ func test_a_shown_model_stands_on_its_cells() -> void:
 	var bp := P0Garden.blueprint()
 	for asset in ["porch_a", "porch_b", "kitchen_wing_a", "kitchen_wing_b", "master_farmhouse_a", "master_farmhouse_b"]:
 		var cells := P0Garden.look_cells(bp, asset)
-		print("LOOK cells ", asset, " ", cells)
 		for c in cells:
 			assert_bool(P0Garden.FOOTPRINTS.house.has_point(c) or P0Garden.DOOR_PATH.has_point(c)).is_false()
 	# the wing's walls and the room they close, on the house's left and back (亚瑟 counted (5..7, 17..18), (7, 16),
@@ -240,6 +239,12 @@ func test_a_shown_model_stands_on_its_cells() -> void:
 	looks.sync(_view(2))   # no looks: every cell walkable again
 	assert_array(looks.solid_cells()).is_empty()
 	for c in held: assert_bool(looks.grid._blocked(c)).override_failure_message(str(c)).is_false()
+	# a cell something else holds first (a decor piece, a tree) stays that thing's: not taken, not let go (亚瑟)
+	looks.grid.set_solid(Vector2i(7, 15), true)
+	looks.sync(_view(5))
+	assert_array(looks.solid_cells()).not_contains([Vector2i(7, 15)])
+	looks.sync(_view(2))
+	assert_bool(looks.grid._blocked(Vector2i(7, 15))).is_true()
 
 ## 上官婉儿 448: while WING_WAITS the old barn (Lv15 a) keeps the old Timber Porch — two railings — not the new one,
 ## whose tiles cut across its red roof and door; the Stone Manor keeps the new stone porch.

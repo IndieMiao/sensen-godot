@@ -86,11 +86,18 @@ func _block(whole: bool) -> void:
 	var now: Array[Vector2i] = []
 	for model in models:
 		for c in P0Garden.look_cells(_bp, model): if not now.has(c): now.append(c)
-	for c in _solid: if not now.has(c): grid.set_solid(c, false)
-	for c in now: if not _solid.has(c): grid.set_solid(c, true)
-	_solid = now
+	# only the cells the looks took: one something else already held is left to it, then and when the look goes (亚瑟)
+	var held: Array[Vector2i] = []
+	for c in _solid:
+		if now.has(c): held.append(c)
+		else: grid.set_solid(c, false)
+	for c in now:
+		if held.has(c) or grid.astar.is_point_solid(c): continue
+		grid.set_solid(c, true)
+		held.append(c)
+	_solid = held
 
-## The cells the shown looks hold solid (tests).
+## The cells the shown looks hold solid, those they took (tests).
 func solid_cells() -> Array[Vector2i]: return _solid
 
 func shown(stage: String) -> String: return str(_shown.get(stage, ""))
