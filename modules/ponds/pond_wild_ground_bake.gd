@@ -18,8 +18,9 @@ const FAR_SUPER := 2      # … drawn at twice that and halved, so its fine grai
 ## The live material's settings, from the full one's.
 const LIVE_KEYS := ["sun_k", "walk", "grass", "grass_far", "plateau", "rock", "gradient", "centre", "south_dark", "vignette", "seed_off", "detail",
 	"shadow_tint", "shadow_tint_sand", "shadow_cool", "shadow_cool_sand"]
-## One bake kept (≈ 14.3 MB of textures, see bytes()): entering the same pond again with the same plants takes it as
-## it is; a rebuild (the gathering points came) or another pond bakes anew and lets the old one go.
+## One bake kept (≈ 14.3 MB of textures, see bytes()) while in a pond: a rebuild with the same plants takes it as it is;
+## the gathering points coming bake anew and let the old one go. Leaving the pond lets it go too (P0Pond._exit_tree,
+## clear_cache — 上官婉儿: the 14 MB not kept outside the wild), so a later visit bakes again (~46 ms on the desktop).
 const CACHE_MAX := 1
 static var _CACHE := {}   # key() -> [near ImageTexture, far ImageTexture]
 ## The last bake's timings, ms (dev: P0_BAKE_LOG prints them): read back, mipmaps, upload, total from the request.

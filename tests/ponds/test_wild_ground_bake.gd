@@ -49,3 +49,13 @@ func test_one_bake_kept_and_its_size() -> void:
 	assert_int(b.y).is_between(1_400_000, 1_500_000)     # 528 × 512
 	var a := _painted(auto_free(PondScenery.build(P0Ponds.location(SF[0]))))
 	assert_float(PondWildGroundBake.soft_share(a.material_override)).is_between(0.5, 0.75)
+
+## 上官婉儿: the ~14 MB bake is not kept past the pond — P0Pond lets it go when it leaves the tree.
+func test_leaving_the_pond_lets_the_bake_go() -> void:
+	PondWildGroundBake._CACHE["probe"] = [null, null]
+	var src: String = (load("res://scenes/p0/p0_pond.gd") as GDScript).source_code
+	var exit_at := src.find("func _exit_tree()")
+	assert_int(exit_at).is_greater(0)
+	assert_bool(src.substr(exit_at, 200).contains("PondWildGroundBake.clear_cache()")).is_true()
+	PondWildGroundBake.clear_cache()
+	assert_int(PondWildGroundBake._CACHE.size()).is_equal(0)

@@ -34,6 +34,7 @@ const OnlineCrowd := preload("res://modules/net/online_crowd.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
 const PondWalk := preload("res://modules/ponds/pond_walk.gd")
+const PondWildGroundBake := preload("res://modules/ponds/pond_wild_ground_bake.gd")   # the wild's baked ground (#917)
 const PondGather := preload("res://scenes/p0/p0_pond_gather.gd")   # the pond's gathering points (SGODOT-410)
 var gather: Node3D       # PondGather: the pieces, their name bar and the Gather key
 var _gather_tag := ""    # the point whose name bar is up
@@ -197,6 +198,7 @@ static func set_scale_3d(vp: Viewport, scale: float) -> float:
 	return was
 
 func _exit_tree() -> void:
+	PondWildGroundBake.clear_cache()   # the baked ground (~14 MB) not kept past the pond (上官婉儿)
 	if _scale_3d_was >= 0.0:   # no other screen keeps the pond's 0.8
 		set_scale_3d(get_viewport(), _scale_3d_was)
 		_scale_3d_was = -1.0
