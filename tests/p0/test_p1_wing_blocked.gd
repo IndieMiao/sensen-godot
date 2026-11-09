@@ -202,26 +202,40 @@ func test_a_held_wing_is_not_drawn_until_its_cells_clear() -> void:
 
 ## The grass, flowers and the bush on the wing's cells and (6, 17) are their own draw, hidden while the wing's model
 ## stands there; every other point of the dressing is where it was (the scatter's draws unchanged).
+## The points are read as the scenery hands them to its batches (Recording), not back from the MultiMeshes: without a
+## renderer (--headless, the freeze's full run) a MultiMesh keeps no instance transforms and every one reads as the origin.
+class Recording extends "res://scenes/p0/p0_garden_scenery.gd":
+	var split: Array = []   # [asset, kept transforms, wing transforms] per _add_split
+	func _add_split(bp: FarmBlueprint, asset: String, xfs: Array, shadows := true) -> void:
+		var parts := _split(bp, xfs)
+		split.append([asset, parts[0], parts[1]])
+		super(bp, asset, xfs, shadows)
+
 func test_the_dressing_on_the_wings_cells_hides_with_the_wing() -> void:
 	var bp := P0Garden.blueprint()
-	var scenery: Node3D = auto_free(GardenScenery.new())
+	var scenery: Recording = auto_free(Recording.new())
 	add_child(scenery)
 	scenery.build(bp, "cottage")
 	var dress: Node3D = scenery.find_child("WingDressing", false, false)
 	var cells := GardenScenery.wing_dress_cells()
 	var inside := 0
-	for mm in dress.get_children():
-		var m := (mm as MultiMeshInstance3D).multimesh
-		for i in m.instance_count:
-			assert_bool(cells.has(bp.world_to_cell(m.get_instance_transform(i).origin))).is_true()
-			inside += 1
+	var drawn: Array = []   # the wing's own batches, in the order they were added
+	for s in scenery.split:
+		for xf in s[1]: assert_bool(cells.has(bp.world_to_cell((xf as Transform3D).origin))).override_failure_message(str(s[0])).is_false()
+		for xf in s[2]: assert_bool(cells.has(bp.world_to_cell((xf as Transform3D).origin))).override_failure_message(str(s[0])).is_true()
+		inside += (s[2] as Array).size()
+		if not (s[2] as Array).is_empty(): drawn.append((s[2] as Array).size())
 	assert_int(inside).is_greater(0)   # the bush at (6, 17) at least
-	for mm in scenery.get_children():
-		if not mm is MultiMeshInstance3D: continue
-		var m := (mm as MultiMeshInstance3D).multimesh
-		if str(mm.name) in ["TreeN0", "Tree0", "SteppingStone"]: continue
-		for i in m.instance_count:
-			assert_bool(cells.has(bp.world_to_cell(m.get_instance_transform(i).origin))).override_failure_message(str(mm.name)).is_false()
+	# what the wing's node draws is those points: one batch for each layer with any, as many instances
+	assert_array(dress.get_children().map(func(mm): return (mm as MultiMeshInstance3D).multimesh.instance_count)).is_equal(drawn)
+	# with a renderer, the batches drawn straight onto the scenery (the hedges) keep off the cells too
+	if DisplayServer.get_name() != "headless":
+		for mm in scenery.get_children():
+			if not mm is MultiMeshInstance3D: continue
+			var m := (mm as MultiMeshInstance3D).multimesh
+			if str(mm.name) in ["TreeN0", "Tree0", "SteppingStone"]: continue
+			for i in m.instance_count:
+				assert_bool(cells.has(bp.world_to_cell(m.get_instance_transform(i).origin))).override_failure_message(str(mm.name)).is_false()
 	scenery.show_wing(true)
 	assert_bool(dress.visible).is_false()
 	scenery.show_wing(false)
