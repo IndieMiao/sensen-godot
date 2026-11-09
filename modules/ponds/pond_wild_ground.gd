@@ -35,19 +35,6 @@ const COLOURS := {"grass": Color("86a74b"), "grass_far": Color("749543"), "plate
 	"dapple_cool": Color("6f9b52"), "soft_grass": Color("a8b46b")}
 
 const CACHE_MAX := 4   # a rebuild and the last few ponds reuse it; the memory stays bounded (under 1 MB each)
-## gl_compatibility draws a shadowed sun as a pass of its own, added on top of the sRGB-encoded ambient (周瑜 on 422
-## 43fdd5fe), so this light ground burned near white there (不知火舞) while the darker pieces did not (上官婉儿: the
-## sun stays as it is for them). This ground takes only GLES_SUN_K of the sun there — in its ambient-only 99 the sun's
-## share 160 − 99 = sRGB 61 → linear 0.0467 against the 131 → 0.227 it adds now — and its shadows no cool cast (it
-## swells to ~+30 levels on that pass). The other renderers keep LOOK as it is.
-const GLES_SUN_K := 0.19   # 0.206 by the derivation; one step down so the sand too comes within ±16 (周瑜 on #920)
-static func look_for(method: String) -> Dictionary:
-	if method != "gl_compatibility": return LOOK
-	var look := LOOK.duplicate()
-	look["sun_k"] = GLES_SUN_K
-	look["shadow_cool"] = Vector3.ZERO
-	look["shadow_cool_sand"] = Vector3.ZERO
-	return look
 static var _CACHE := {}   # "shape hash|seed" -> [ground mesh, water distance texture], shared and never edited
 # (the ground's baked textures, ~14 MB, are kept apart and only one: PondWildGroundBake)
 ## `trees`: the bank's tree points (the ground deepens to blue-green under them).
@@ -79,8 +66,7 @@ static func build(entry: Dictionary, spec: Dictionary, clear: Array = [], trees:
 	material.set_shader_parameter("path_count", path.size())
 	var w := PondWalk.WALK
 	material.set_shader_parameter("walk", Vector4(w.position.x, w.position.y, w.end.x, w.end.y))
-	var look := look_for(RenderingServer.get_current_rendering_method())
-	for key in look: material.set_shader_parameter(key, look[key])
+	for key in LOOK: material.set_shader_parameter(key, LOOK[key])
 	var under := PackedVector2Array()   # the ground under the bank's trees a deeper blue-green
 	for t in trees: if under.size() < 8: under.append(Vector2(t.x, t.z))
 	while under.size() < 8: under.append(Vector2(1e4, 1e4))
