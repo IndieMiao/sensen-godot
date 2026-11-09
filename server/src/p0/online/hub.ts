@@ -226,7 +226,7 @@ export class P0OnlineHub {
     const phase = FISH_PHASES.find(p => p === b.phase);
     if (!phase) throw new Error('SCHEMA');
     const now = Date.now();
-    const [x0, x1, z0, z1] = this.deps.rooms.spec(me.outpost)!.bounds;
+    const [x0, x1, z0, z1] = this.deps.rooms.spec(me.outpost, me.layout)!.bounds;
     const target = Array.isArray(b.target) && b.target.length === 2 && b.target.every(v => typeof v === 'number' && Number.isFinite(v))
       ? [Math.min(x1, Math.max(x0, Number(b.target[0]))), Math.min(z1, Math.max(z0, Number(b.target[1])))] as [number, number] : undefined;
     const was = c.fishing;
