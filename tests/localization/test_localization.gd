@@ -462,3 +462,13 @@ func test_p0_a_toasts_no_break_space_is_looked_up_as_a_space() -> void:
 	assert_str(zh.call("Twin Catch · 20 zorbs")).is_equal("双倍渔获 · 20" + char(0xa0) + "zorbs")
 	# no part known: "" (English mode and an untranslated line show the source, no-break space and all)
 	assert_str(zh.call("Zorb 20 quarks")).is_empty()
+
+## SGODOT-450 / q(303) (李白, 不知火舞): the Decorate entry at the cap, `Decor 52/52 · Store one to place this`
+## (P0Decor.cap_line), was eaten whole by `%s · %s to %s` (`{1} · 距 {3} {2}`) and read 「摆件 52/52 · 距 place this
+## Store one」; its own whole-line template reads it, and the Decor page head stays as it was.
+func test_p0_the_decor_cap_line_reads_as_one_sentence() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t._get_message(s, &""))
+	assert_str(zh.call("Decor 52/52 · Store one to place this")).is_equal("摆件 52/52 · 收起一件才能摆放这个")
+	assert_str(zh.call("Decor 12/24 · Goes to Farm Storage")).is_equal("摆件 12/24 · 放入仓库")
