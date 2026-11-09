@@ -13,7 +13,7 @@ uniform float lid_top_uv = 0.0;
 void vertex() {
 	vec3 scale = vec3(length(MODEL_MATRIX[0].xyz), length(MODEL_MATRIX[1].xyz), length(MODEL_MATRIX[2].xyz));
 	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
-	VERTEX *= scale * mix(1.0, 1.58, smoothstep(0.10, 0.78, INSTANCE_CUSTOM.y));
+	VERTEX *= scale * mix(1.0, 1.52, smoothstep(0.10, 0.78, INSTANCE_CUSTOM.y));
 	MODELVIEW_MATRIX[3].x += 0.016 * sin(float(INSTANCE_ID)*2.094395 + INSTANCE_CUSTOM.y*3.2);
 }
 

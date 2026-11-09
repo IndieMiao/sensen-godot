@@ -12,7 +12,7 @@
       0.21399998664856
     ]
   },
-  "check_count": 33,
+  "check_count": 39,
   "errors": [],
   "max_body_bounce_m": 0.00200000032782555,
   "max_lid_front_lift_m": 0.0172247233390808,
@@ -40,17 +40,17 @@
   "source_glb_sha256": "04f6faee84c5f25629ce57d4bb884763ca3897dc87df9ac58b04bfc70a5d78ab",
   "steam_node": "PotRig/StovePot/pot_big/lid/Steam",
   "autoplay": "",
-  "revision": "SGODOT-449 candidate v1; live overlay verification pending",
+  "revision": "SGODOT-449 v1.1 / verified in native Common overlay5d50bf0c",
   "steam_lifetime_s": 1.8,
   "steam_spread_degrees": 0,
   "steam_initial_velocity_m_s": [
-    0.105,
-    0.105
+    0.098,
+    0.098
   ],
   "steam_colour_srgb": "#FFF8F0",
   "steam_fade_start_rise_m": 0,
   "steam_screen_mask": "alpha is zero at/below projected lid upper edge",
-  "steam_total_rise_m": 0.189,
+  "steam_total_rise_m": 0.1764,
   "overlay_review_v11_historical": {
     "camera_horizontal_fov_degrees": 39.9252510070801,
     "camera_pitch_degrees": 62,
@@ -91,8 +91,8 @@
   },
   "steam_visual_script": "steam_lid_clearance.gd",
   "steam_material": "steam.tres / steam_clear_lid.gdshader",
-  "steam_composite_peak_preview_alpha": 0.6,
-  "steam_composite_ring_preview_alpha": 0.43529411764705883,
+  "steam_composite_peak_preview_alpha": 0.6015625,
+  "steam_composite_ring_preview_alpha": 0.38330078125,
   "steam_count": 3,
   "steam_interval_s": 0.6,
   "steam_screen_region_360": [
@@ -121,6 +121,30 @@
       180,
       235
     ],
-    "status": "real overlay branch pending; premultiplied/high-precision composition needs integration verification"
+    "status": "Desktop native Common overlay verified on5d50bf0c; phone verification owned by integration"
+  },
+  "steam_emitter_local_m": [
+    0.062,
+    0.15,
+    0.146
+  ],
+  "steam_projected_rise_px": 73.970744,
+  "steam_initial_measured_diameter_px": [
+    25,
+    26
+  ],
+  "steam_grown_measured_diameter_px": [
+    34,
+    39
+  ],
+  "steam_native_validation": {
+    "host_head": "5d50bf0c2aa3868aba89b777a3c8a4925cdd15c9",
+    "viewport": [
+      360,
+      800
+    ],
+    "pitch_degrees": 33,
+    "common_one_ring": true,
+    "source": "docs/design/steam-449-2026-11-09/native_v1.1/"
   }
 }
