@@ -102,12 +102,20 @@ func test_the_placeholder_anchor_files_pass_validation() -> void:
 ## room's client_art is the kit this client opens, SGODOT-214), the farmhouse's rooms (282), else the Basic Room (SGODOT-227).
 func _kit_of() -> Dictionary:
 	var kit_of := {}
-	for o in P0Outposts.all(): kit_of[str(o.anchors)] = str(o.get("art", "basic_room"))
+	for o in P0Outposts.all():
+		if str(o.get("anchors", "")) != "": kit_of[str(o.anchors)] = str(o.get("art", "basic_room"))   # the plaza: its layout's own
 	var rooms: Dictionary = P0Logic.content().get("world", {}).get("room", {})
 	for kind in rooms:
 		if not rooms[kind] is Dictionary: continue
 		for key in ["anchors", "client_anchors"]:
-			if rooms[kind].has(key): kit_of[str(rooms[kind][key])] = str(rooms[kind].get("client_art", rooms[kind].get("art", "basic_room")))
+			if not rooms[kind].has(key): continue
+			var kit := str(rooms[kind].get("client_art", rooms[kind].get("art", "basic_room")))
+			# SGODOT-218: a client kit that took a room's place (`before`, the market plaza) has its own anchors; the file
+			# the server names is the older kit's (the fruit shop's, for 0.3.2 and older)
+			var old := str(rooms[kind].get("art", ""))
+			if key == "anchors" and P0Outposts.all().any(func(o): return str(o.get("art", "")) == kit and str((o.get("before", {}) as Dictionary).get("art", "")) == old):
+				kit = old
+			kit_of[str(rooms[kind][key])] = kit
 	for kind in FARMHOUSE.ROOMS: kit_of[str(FARMHOUSE.ROOMS[kind].anchors)] = str(FARMHOUSE.ROOMS[kind].art)
 	return kit_of
 
