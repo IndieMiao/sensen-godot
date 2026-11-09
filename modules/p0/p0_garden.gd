@@ -189,26 +189,46 @@ static func stone_wall(segments: Array) -> Array:
 				"yaw": yaw + 0.35 * float((i * STONE_PER_SEG + k) % 3 - 1), "scale": STONE_SCALE})
 	return out
 
+## The Kitchen Wing's models (Lv8, and the Master Farmhouse's, which has it built in) wait until the wing and the rest
+## bench stand apart: today the wing's front wall cuts through the bench, and one sitting there sat half in the wall
+## (不知火舞 448 b18d13c6, 上官婉儿). Until then Lv8 and Lv15 keep their old looks; the Porch's model is in.
+const WING_WAITS := true
+
 ## Porch (Lv5) and Kitchen Wing (Lv8), a (timber) or b (stone): 赵云's porch_a / _b and kitchen_wing_a / _b (#858, in
 ## farm-dev by #875), each one model with its origin at the house anchor (P0Garden.ANCHORS.house, +Z toward the camera),
 ## put there as it is — the porch at the door, the wing on the house's left. Their colour is in the vertex colours
-## (FarmArt.instance's material).
+## (FarmArt.instance's material). While WING_WAITS the wing is the old one: a lean-to (a) or a stone room (b).
 static func look_parts(bp: FarmBlueprint, stage: String, look: String) -> Array:
 	if look not in ["a", "b"]: return []
 	var house := bp.cell_to_world(ANCHORS.house)
 	match stage:
 		"porch": return [{"asset": "porch_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
-		"kitchen_extension": return [{"asset": "kitchen_wing_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
+		"kitchen_extension":
+			if not WING_WAITS:
+				return [{"asset": "kitchen_wing_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
+			var wing := Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75)
+			if look == "a":   # Timber Kitchen Wing: a wooden lean-to on the left
+				return [{"asset": "storage", "pos": wing, "yaw": PI * 0.5, "scale": Vector3.ONE * 1.6}]
+			# Stone Kitchen Wing: a stone room with a chimney stack — the chimney a tall rock on the ground at the
+			# room's back corner, sunk into it (never stacked: a rock on another's rounded top floats, 不知火舞 on #250)
+			return [
+				{"asset": "path_tile", "pos": wing + Vector3(0, 0.004, 0), "yaw": 0.0, "scale": Vector3(0.8, 1, 0.75)},
+				{"asset": "rock", "pos": wing, "yaw": 0.2, "scale": Vector3(2.4, 2.2, 2.6)},
+				{"asset": "rock", "pos": wing + Vector3(-0.35, 0, -0.25), "yaw": 1.1, "scale": Vector3(1.1, 3.0, 1.1)}]
 	return []
 
 ## Master Farmhouse (Lv15, v4q(1)): 刘备's master_farmhouse_a (Timber Lodge) / _b (Stone Manor) (#854, in farm-dev by
-## #875), the whole house with its porch and wing in one, origin at the house anchor as the house's own; before it the
-## farm's own style.
+## #875), the whole house with its porch and wing in one, origin at the house anchor as the house's own; while
+## WING_WAITS the old house_barn / house_dome. Before it the farm's own style.
 static func look_house(look: String, style := "cottage") -> String:
-	match look:
-		"a": return "master_farmhouse_a"
-		"b": return "master_farmhouse_b"
+	if look in ["a", "b"]:
+		if WING_WAITS: return "house_barn" if look == "a" else "house_dome"
+		return "master_farmhouse_" + look
 	return "house_" + style
+
+## Whether the house shown for this Master Farmhouse look has the porch and wing in it (the standalone ones put away).
+static func whole_house(look: String) -> bool:
+	return look in ["a", "b"] and not WING_WAITS
 
 ## Points along the yard fence for block_points: the player walks round it, through the door opening.
 static func fence_block_points(bp: FarmBlueprint) -> Array:
