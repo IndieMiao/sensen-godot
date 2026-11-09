@@ -620,8 +620,8 @@ func test_floor_rebuild_keeps_art_independent_and_all_saved_targets_pickable_aft
 		mine._refresh()
 		await get_tree().process_frame
 		for id in mine.targets:
-			var model: MeshInstance3D = mine.targets[id].model
-			var center: Vector3 = model.global_transform * model.get_aabb().get_center()
+			var model: Node3D = mine.targets[id].model   # the elevator station is a shell of meshes (SGODOT-459)
+			var center: Vector3 = model.global_transform * mine._model_box(model).get_center()
 			_pan_to(mine, center)
 			var point: Vector2 = mine.cam.unproject_position(center)
 			assert_bool(mine.world_area().has_point(point)).override_failure_message("Target clipped: %d / %s" % [floor_number,id]).is_true()
