@@ -3189,6 +3189,1237 @@
       "stage": "master_farmhouse",
       "look": "b",
       "placement": "house anchor, no additional transform; replaces the cottage, porch and kitchen wing at Lv15"
+    },
+    "wild_pz_bush_05": {
+      "triangles": 62,
+      "surfaces": 1,
+      "bytes": 6892,
+      "bounds_blender": [
+        [
+          -0.644459,
+          -0.643077,
+          0.0
+        ],
+        [
+          0.644459,
+          0.643077,
+          1.071473
+        ]
+      ],
+      "bounds": [
+        [
+          -0.644459,
+          0.0,
+          -0.643077
+        ],
+        [
+          0.644459,
+          1.071473,
+          0.643077
+        ]
+      ],
+      "sha256": "d8891d9378401caa5ebff4ebd1c6012f7a6021e290b06f6f2044ac35173b306a",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Bush_05",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_bush_07": {
+      "triangles": 78,
+      "surfaces": 1,
+      "bytes": 8072,
+      "bounds_blender": [
+        [
+          -0.637015,
+          -0.632726,
+          0.0
+        ],
+        [
+          0.637015,
+          0.632726,
+          1.451913
+        ]
+      ],
+      "bounds": [
+        [
+          -0.637015,
+          0.0,
+          -0.632726
+        ],
+        [
+          0.637015,
+          1.451913,
+          0.632726
+        ]
+      ],
+      "sha256": "58872470ecee92329bf46a2b49b34b8496947b19e5cc5ffe59300d02bfd6d598",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Bush_07",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_bush_11": {
+      "triangles": 144,
+      "surfaces": 1,
+      "bytes": 11096,
+      "bounds_blender": [
+        [
+          -0.323511,
+          -0.323511,
+          0.0
+        ],
+        [
+          0.323511,
+          0.323511,
+          0.684571
+        ]
+      ],
+      "bounds": [
+        [
+          -0.323511,
+          0.0,
+          -0.323511
+        ],
+        [
+          0.323511,
+          0.684571,
+          0.323511
+        ]
+      ],
+      "sha256": "815a40c20d120d5c4f1e6c056588059a064b8f5319e329b01c679a7d1ab218a6",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Bush_11",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_bush_15": {
+      "triangles": 192,
+      "surfaces": 1,
+      "bytes": 14456,
+      "bounds_blender": [
+        [
+          -0.460716,
+          -0.460716,
+          0.0
+        ],
+        [
+          0.460716,
+          0.460716,
+          0.772425
+        ]
+      ],
+      "bounds": [
+        [
+          -0.460716,
+          0.0,
+          -0.460716
+        ],
+        [
+          0.460716,
+          0.772425,
+          0.460716
+        ]
+      ],
+      "sha256": "2ef38eaff85723a267e69ddb67272adce46f3d4bdc42f5998ece4aa590445e38",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Bush_15",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_flower_20": {
+      "triangles": 136,
+      "surfaces": 1,
+      "bytes": 10092,
+      "bounds_blender": [
+        [
+          -0.231333,
+          -0.17387,
+          0.0
+        ],
+        [
+          0.231333,
+          0.17387,
+          0.639837
+        ]
+      ],
+      "bounds": [
+        [
+          -0.231333,
+          0.0,
+          -0.17387
+        ],
+        [
+          0.231333,
+          0.639837,
+          0.17387
+        ]
+      ],
+      "sha256": "a233121c0889392800398ff37d3dce27beb2275ac876c400b6cfae2581a12835",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Flower_20",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_flower_23": {
+      "triangles": 112,
+      "surfaces": 1,
+      "bytes": 8220,
+      "bounds_blender": [
+        [
+          -0.229071,
+          -0.186653,
+          0.0
+        ],
+        [
+          0.229071,
+          0.186653,
+          0.614215
+        ]
+      ],
+      "bounds": [
+        [
+          -0.229071,
+          0.0,
+          -0.186653
+        ],
+        [
+          0.229071,
+          0.614215,
+          0.186653
+        ]
+      ],
+      "sha256": "90d2c7ca7fcfaba3a25b27986d87c5e715c7f5caa99c0b35476021093a6e5aca",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Flower_23",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_flower_26": {
+      "triangles": 140,
+      "surfaces": 1,
+      "bytes": 10628,
+      "bounds_blender": [
+        [
+          -0.229071,
+          -0.144661,
+          0.0
+        ],
+        [
+          0.229071,
+          0.144661,
+          0.586115
+        ]
+      ],
+      "bounds": [
+        [
+          -0.229071,
+          0.0,
+          -0.144661
+        ],
+        [
+          0.229071,
+          0.586115,
+          0.144661
+        ]
+      ],
+      "sha256": "6dc029662c369d76a073801fb08be65197ba80185f8200886b24a488d862b17a",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Flower_26",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_foot_leafy": {
+      "triangles": 64,
+      "surfaces": 1,
+      "bytes": 5504,
+      "bounds_blender": [
+        [
+          -0.213471,
+          -0.243738,
+          0.0
+        ],
+        [
+          0.213471,
+          0.243738,
+          0.186204
+        ]
+      ],
+      "bounds": [
+        [
+          -0.213471,
+          0.0,
+          -0.243738
+        ],
+        [
+          0.213471,
+          0.186204,
+          0.243738
+        ]
+      ],
+      "sha256": "91e8fd4d0907a00d812b8bd87456b350033de79472f04aea07a4383bcffed284",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Grass_41",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_grass_24": {
+      "triangles": 128,
+      "surfaces": 1,
+      "bytes": 9976,
+      "bounds_blender": [
+        [
+          -0.5594,
+          -0.525446,
+          0.0
+        ],
+        [
+          0.5594,
+          0.525446,
+          0.459219
+        ]
+      ],
+      "bounds": [
+        [
+          -0.5594,
+          0.0,
+          -0.525446
+        ],
+        [
+          0.5594,
+          0.459219,
+          0.525446
+        ]
+      ],
+      "sha256": "820ffada31eff20b8a0abd2a49d76a7cfd0bd2c2e5458d8907bf7519e94bec69",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Grass_24",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_grass_40": {
+      "triangles": 192,
+      "surfaces": 1,
+      "bytes": 14460,
+      "bounds_blender": [
+        [
+          -0.287683,
+          -0.286644,
+          0.0
+        ],
+        [
+          0.287683,
+          0.286644,
+          0.195259
+        ]
+      ],
+      "bounds": [
+        [
+          -0.287683,
+          0.0,
+          -0.286644
+        ],
+        [
+          0.287683,
+          0.195259,
+          0.286644
+        ]
+      ],
+      "sha256": "590b02d2d7af43ca2e3923e0b2bc17ca77d4ab358dd784d4eb58ab4ce7b56379",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Grass_40",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_grass_41": {
+      "triangles": 64,
+      "surfaces": 1,
+      "bytes": 5500,
+      "bounds_blender": [
+        [
+          -0.213471,
+          -0.243738,
+          0.0
+        ],
+        [
+          0.213471,
+          0.243738,
+          0.186204
+        ]
+      ],
+      "bounds": [
+        [
+          -0.213471,
+          0.0,
+          -0.243738
+        ],
+        [
+          0.213471,
+          0.186204,
+          0.243738
+        ]
+      ],
+      "sha256": "c6b702e80d21775434e64e585234a6fd93c0b7d789b22d3b79667825abbcf399",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Grass_41",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_log_01": {
+      "triangles": 230,
+      "surfaces": 1,
+      "bytes": 17116,
+      "bounds_blender": [
+        [
+          -0.521943,
+          -1.315639,
+          0.0
+        ],
+        [
+          0.521943,
+          1.315639,
+          0.840089
+        ]
+      ],
+      "bounds": [
+        [
+          -0.521943,
+          0.0,
+          -1.315639
+        ],
+        [
+          0.521943,
+          0.840089,
+          1.315639
+        ]
+      ],
+      "sha256": "802ed44e8c491e780294eaf024567b028cbfbf2e818d4ee16f0f7199d5a80b1a",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Log_01",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_log_02": {
+      "triangles": 254,
+      "surfaces": 1,
+      "bytes": 18860,
+      "bounds_blender": [
+        [
+          -0.46476,
+          -1.444783,
+          0.0
+        ],
+        [
+          0.46476,
+          1.444783,
+          0.916213
+        ]
+      ],
+      "bounds": [
+        [
+          -0.46476,
+          0.0,
+          -1.444783
+        ],
+        [
+          0.46476,
+          0.916213,
+          1.444783
+        ]
+      ],
+      "sha256": "9746fc94263a9421b4fd846cadebad280c6ad0cf16e58f95eabf74f6bfa50e35",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Log_02",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_log_05": {
+      "triangles": 189,
+      "surfaces": 1,
+      "bytes": 14468,
+      "bounds_blender": [
+        [
+          -0.646487,
+          -0.786696,
+          0.0
+        ],
+        [
+          0.646487,
+          0.786696,
+          1.367312
+        ]
+      ],
+      "bounds": [
+        [
+          -0.646487,
+          0.0,
+          -0.786696
+        ],
+        [
+          0.646487,
+          1.367312,
+          0.786696
+        ]
+      ],
+      "sha256": "2d4a270b581c32a168593f23f74b48e596170eb72e5b9891120266d362436aaf",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Log_05",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_pine_01": {
+      "triangles": 1162,
+      "surfaces": 1,
+      "bytes": 90556,
+      "bounds_blender": [
+        [
+          -1.52392,
+          -1.523921,
+          0.0
+        ],
+        [
+          1.52392,
+          1.523921,
+          3.599087
+        ]
+      ],
+      "bounds": [
+        [
+          -1.52392,
+          0.0,
+          -1.523921
+        ],
+        [
+          1.52392,
+          3.599087,
+          1.523921
+        ]
+      ],
+      "sha256": "f143f38380e35f9ec1bd3b044a111d017a271c0304be85d1d3e17acbf81c3af9",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_01",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_pine_01_dk": {
+      "triangles": 1162,
+      "surfaces": 1,
+      "bytes": 90564,
+      "bounds_blender": [
+        [
+          -1.52392,
+          -1.523921,
+          0.0
+        ],
+        [
+          1.52392,
+          1.523921,
+          3.599087
+        ]
+      ],
+      "bounds": [
+        [
+          -1.52392,
+          0.0,
+          -1.523921
+        ],
+        [
+          1.52392,
+          3.599087,
+          1.523921
+        ]
+      ],
+      "sha256": "9b606e7ecdae93be24e5f5908338d5f8e1c7491518090ab2187c8e1ffe7cd1bf",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_01",
+      "variant": "压暗 13%",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_pine_01_g": {
+      "triangles": 1162,
+      "surfaces": 1,
+      "bytes": 90560,
+      "bounds_blender": [
+        [
+          -1.52392,
+          -1.523921,
+          0.0
+        ],
+        [
+          1.52392,
+          1.523921,
+          3.599087
+        ]
+      ],
+      "bounds": [
+        [
+          -1.52392,
+          0.0,
+          -1.523921
+        ],
+        [
+          1.52392,
+          3.599087,
+          1.523921
+        ]
+      ],
+      "sha256": "3d18b58cf4679ceb726c938dcf5a4ad57060e7cd87506e41d50ca1ccfc9e9576",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_01",
+      "variant": "采集树 +饱和",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_pine_03": {
+      "triangles": 477,
+      "surfaces": 1,
+      "bytes": 35916,
+      "bounds_blender": [
+        [
+          -1.047972,
+          -1.007652,
+          0.0
+        ],
+        [
+          1.047972,
+          1.007652,
+          4.695981
+        ]
+      ],
+      "bounds": [
+        [
+          -1.047972,
+          0.0,
+          -1.007652
+        ],
+        [
+          1.047972,
+          4.695981,
+          1.007652
+        ]
+      ],
+      "sha256": "f5e8ac236021137aa6a2da7128ae449fd3f96ef1d7ffb3c70614ef88a99cf52e",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_03",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_pine_03_dk": {
+      "triangles": 477,
+      "surfaces": 1,
+      "bytes": 35924,
+      "bounds_blender": [
+        [
+          -1.047972,
+          -1.007652,
+          0.0
+        ],
+        [
+          1.047972,
+          1.007652,
+          4.695981
+        ]
+      ],
+      "bounds": [
+        [
+          -1.047972,
+          0.0,
+          -1.007652
+        ],
+        [
+          1.047972,
+          4.695981,
+          1.007652
+        ]
+      ],
+      "sha256": "235a0d1cb33c6730f604006377234f124a1462c78d2596c3e990cff3ecdc9460",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_03",
+      "variant": "压暗 13%",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_pine_03_lt": {
+      "triangles": 477,
+      "surfaces": 1,
+      "bytes": 35924,
+      "bounds_blender": [
+        [
+          -1.047972,
+          -1.007652,
+          0.0
+        ],
+        [
+          1.047972,
+          1.007652,
+          4.695981
+        ]
+      ],
+      "bounds": [
+        [
+          -1.047972,
+          0.0,
+          -1.007652
+        ],
+        [
+          1.047972,
+          4.695981,
+          1.007652
+        ]
+      ],
+      "sha256": "271ef54126209aa0e308e76e5f4f176455031581dffb5082312ecbd92dc9b4fc",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_03",
+      "variant": "提亮 17%",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_pine_04": {
+      "triangles": 590,
+      "surfaces": 1,
+      "bytes": 44116,
+      "bounds_blender": [
+        [
+          -1.2407,
+          -1.26045,
+          0.0
+        ],
+        [
+          1.2407,
+          1.26045,
+          7.357591
+        ]
+      ],
+      "bounds": [
+        [
+          -1.2407,
+          0.0,
+          -1.26045
+        ],
+        [
+          1.2407,
+          7.357591,
+          1.26045
+        ]
+      ],
+      "sha256": "f1600816d20d7fe966c46e3b16bbbee699e1be4fd3f176a6741901527aa8296a",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_04",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_08": {
+      "triangles": 80,
+      "surfaces": 1,
+      "bytes": 6072,
+      "bounds_blender": [
+        [
+          -0.679036,
+          -0.424229,
+          0.0
+        ],
+        [
+          0.679036,
+          0.424229,
+          1.261006
+        ]
+      ],
+      "bounds": [
+        [
+          -0.679036,
+          0.0,
+          -0.424229
+        ],
+        [
+          0.679036,
+          1.261006,
+          0.424229
+        ]
+      ],
+      "sha256": "348588e4b748736aa8bdf5a82309110a941791172d80849f71454b7ba5b39bcc",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_08",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_13": {
+      "triangles": 68,
+      "surfaces": 1,
+      "bytes": 4876,
+      "bounds_blender": [
+        [
+          -0.463375,
+          -0.462435,
+          0.0
+        ],
+        [
+          0.463375,
+          0.462435,
+          0.818558
+        ]
+      ],
+      "bounds": [
+        [
+          -0.463375,
+          0.0,
+          -0.462435
+        ],
+        [
+          0.463375,
+          0.818558,
+          0.462435
+        ]
+      ],
+      "sha256": "08ef039456e137bd8c24e8ac3259e4fb32443e15898104965f0de0de421688f2",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_13",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_16": {
+      "triangles": 92,
+      "surfaces": 1,
+      "bytes": 6876,
+      "bounds_blender": [
+        [
+          -0.515482,
+          -0.55297,
+          0.0
+        ],
+        [
+          0.515482,
+          0.55297,
+          1.177134
+        ]
+      ],
+      "bounds": [
+        [
+          -0.515482,
+          0.0,
+          -0.55297
+        ],
+        [
+          0.515482,
+          1.177134,
+          0.55297
+        ]
+      ],
+      "sha256": "209443794f4b75688246f5eee7fac60abfe4ec4664001ff87489f3e78b67224d",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_16",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_19": {
+      "triangles": 52,
+      "surfaces": 1,
+      "bytes": 4012,
+      "bounds_blender": [
+        [
+          -0.373778,
+          -0.37881,
+          0.0
+        ],
+        [
+          0.373778,
+          0.37881,
+          1.244388
+        ]
+      ],
+      "bounds": [
+        [
+          -0.373778,
+          0.0,
+          -0.37881
+        ],
+        [
+          0.373778,
+          1.244388,
+          0.37881
+        ]
+      ],
+      "sha256": "8439357db9568b337b00eac97c0b8b52b0277748b29914ca0cb72087ac9165e0",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_19",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_21": {
+      "triangles": 56,
+      "surfaces": 1,
+      "bytes": 4228,
+      "bounds_blender": [
+        [
+          -0.272687,
+          -0.272687,
+          0.0
+        ],
+        [
+          0.272687,
+          0.272687,
+          0.976182
+        ]
+      ],
+      "bounds": [
+        [
+          -0.272687,
+          0.0,
+          -0.272687
+        ],
+        [
+          0.272687,
+          0.976182,
+          0.272687
+        ]
+      ],
+      "sha256": "145b3273d8ef0d1283b3ef7526d90d2dff9b10da21ed47495703d7e5539b37eb",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_21",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_22": {
+      "triangles": 72,
+      "surfaces": 1,
+      "bytes": 5096,
+      "bounds_blender": [
+        [
+          -0.429483,
+          -0.467408,
+          0.0
+        ],
+        [
+          0.429483,
+          0.467408,
+          0.934816
+        ]
+      ],
+      "bounds": [
+        [
+          -0.429483,
+          0.0,
+          -0.467408
+        ],
+        [
+          0.429483,
+          0.934816,
+          0.467408
+        ]
+      ],
+      "sha256": "ec314507faed46e7636b36b84d40734f709d7669c4112225971f5f50c6b8acbe",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_22",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_27": {
+      "triangles": 44,
+      "surfaces": 1,
+      "bytes": 3764,
+      "bounds_blender": [
+        [
+          -1.033904,
+          -0.816272,
+          0.0
+        ],
+        [
+          1.033904,
+          0.816272,
+          1.262217
+        ]
+      ],
+      "bounds": [
+        [
+          -1.033904,
+          0.0,
+          -0.816272
+        ],
+        [
+          1.033904,
+          1.262217,
+          0.816272
+        ]
+      ],
+      "sha256": "83dfb4f2d247600ef737f382e92b1d487e41c04740083d81349d8a1be40c8d85",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_27",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_29": {
+      "triangles": 100,
+      "surfaces": 1,
+      "bytes": 6608,
+      "bounds_blender": [
+        [
+          -0.538062,
+          -0.460698,
+          0.0
+        ],
+        [
+          0.538062,
+          0.460698,
+          0.988618
+        ]
+      ],
+      "bounds": [
+        [
+          -0.538062,
+          0.0,
+          -0.460698
+        ],
+        [
+          0.538062,
+          0.988618,
+          0.460698
+        ]
+      ],
+      "sha256": "1fa1df64f0775e89b603fb9e9aa44a7c91e7b624167fbb51c880a0fd1d3d2b77",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_29",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rock_30": {
+      "triangles": 92,
+      "surfaces": 1,
+      "bytes": 6176,
+      "bounds_blender": [
+        [
+          -0.328041,
+          -0.382783,
+          0.0
+        ],
+        [
+          0.328041,
+          0.382783,
+          1.640842
+        ]
+      ],
+      "bounds": [
+        [
+          -0.328041,
+          0.0,
+          -0.382783
+        ],
+        [
+          0.328041,
+          1.640842,
+          0.382783
+        ]
+      ],
+      "sha256": "9f62ccb7f6c06f233ec440de68a942c789ec9c479053f24c51833049337b4c02",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_30",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_rosette": {
+      "triangles": 80,
+      "surfaces": 1,
+      "bytes": 4372,
+      "bounds_blender": [
+        [
+          -0.377135,
+          -0.39379,
+          0.0
+        ],
+        [
+          0.377135,
+          0.39379,
+          0.0
+        ]
+      ],
+      "bounds": [
+        [
+          -0.377135,
+          0.0,
+          -0.39379
+        ],
+        [
+          0.377135,
+          0.0,
+          0.39379
+        ]
+      ],
+      "sha256": "dde6fec4e749a6f33df042ce2f4bfec858220538e4a27268b86698d4cb3e442c",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Foliage_07",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_softrock_10": {
+      "triangles": 100,
+      "surfaces": 1,
+      "bytes": 10964,
+      "bounds_blender": [
+        [
+          -0.494272,
+          -0.500501,
+          0.0
+        ],
+        [
+          0.494272,
+          0.500501,
+          0.441177
+        ]
+      ],
+      "bounds": [
+        [
+          -0.494272,
+          0.0,
+          -0.500501
+        ],
+        [
+          0.494272,
+          0.441177,
+          0.500501
+        ]
+      ],
+      "sha256": "fa3819e63d3c7d841f24675822864fd98abcdf60b0959ec2abfe2e6f8df87035",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / SoftRock_10",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_tree_20": {
+      "triangles": 381,
+      "surfaces": 1,
+      "bytes": 32456,
+      "bounds_blender": [
+        [
+          -1.655044,
+          -1.425562,
+          0.0
+        ],
+        [
+          1.655044,
+          1.425562,
+          4.455929
+        ]
+      ],
+      "bounds": [
+        [
+          -1.655044,
+          0.0,
+          -1.425562
+        ],
+        [
+          1.655044,
+          4.455929,
+          1.425562
+        ]
+      ],
+      "sha256": "a30af983454d6163612d3de167ee9ac234eb004ed64a04a234134aff6ba9d88f",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_20",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_tree_20_dk": {
+      "triangles": 381,
+      "surfaces": 1,
+      "bytes": 32464,
+      "bounds_blender": [
+        [
+          -1.655044,
+          -1.425562,
+          0.0
+        ],
+        [
+          1.655044,
+          1.425562,
+          4.455929
+        ]
+      ],
+      "bounds": [
+        [
+          -1.655044,
+          0.0,
+          -1.425562
+        ],
+        [
+          1.655044,
+          4.455929,
+          1.425562
+        ]
+      ],
+      "sha256": "c027f4101b3ea0f381d0cb6b9c11367318d168da3739edb2fb3114b16823aed8",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_20",
+      "variant": "压暗 13%",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_tree_20_g": {
+      "triangles": 381,
+      "surfaces": 1,
+      "bytes": 32460,
+      "bounds_blender": [
+        [
+          -1.655044,
+          -1.425562,
+          0.0
+        ],
+        [
+          1.655044,
+          1.425562,
+          4.455929
+        ]
+      ],
+      "bounds": [
+        [
+          -1.655044,
+          0.0,
+          -1.425562
+        ],
+        [
+          1.655044,
+          4.455929,
+          1.425562
+        ]
+      ],
+      "sha256": "1438c49507379eea567ed8df30558069c71ddc6f3567cc8ae428b36a35378be5",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_20",
+      "variant": "采集树 +饱和",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
+    },
+    "wild_pz_tree_20_lt": {
+      "triangles": 381,
+      "surfaces": 1,
+      "bytes": 32464,
+      "bounds_blender": [
+        [
+          -1.655044,
+          -1.425562,
+          0.0
+        ],
+        [
+          1.655044,
+          1.425562,
+          4.455929
+        ]
+      ],
+      "bounds": [
+        [
+          -1.655044,
+          0.0,
+          -1.425562
+        ],
+        [
+          1.655044,
+          4.455929,
+          1.425562
+        ]
+      ],
+      "sha256": "7b4bf1ce8541e8d2c677934a8b6cec5949c516f20c82e41a16db213f6b91b638",
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_20",
+      "variant": "提亮 17%",
+      "license": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "author": "盘古",
+      "virtual_user_id": "6ee46cb4-654a-4f16-8e01-449f5377ccf5"
     }
   }
 }

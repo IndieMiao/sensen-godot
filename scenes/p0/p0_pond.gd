@@ -135,10 +135,12 @@ func _ready() -> void:
 	sun.light_energy = 1.15
 	sun.light_specular = 0.13
 	sun.shadow_enabled = true
-	sun.shadow_blur = 3.0
-	sun.shadow_opacity = 0.82
+	# the shadow map spread over less ground — crowns' shapes, soft edges (SGODOT-422 v7); full opacity: the wild ground's
+	# light() colours what a shadow keeps (grass blue-green, sand violet)
+	sun.shadow_blur = 4.5
+	sun.shadow_opacity = 1.0
 	sun.light_angular_distance = 1.0
-	sun.directional_shadow_max_distance = 65
+	sun.directional_shadow_max_distance = 28
 	add_child(sun)
 	cam = Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -159,6 +161,8 @@ func _ready() -> void:
 	var water := FishingWater.build(str(entry.id), site_spec)
 	water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
 	add_child(water)
+	var bank := water.find_child("NaturalWaterBank", true, false)
+	if bank: bank.visible = false   # SGODOT-422 v7: the wild ground's sand band and rock groups are the bank, not the round stones
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
