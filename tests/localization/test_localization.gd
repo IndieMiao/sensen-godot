@@ -462,3 +462,45 @@ func test_p0_a_toasts_no_break_space_is_looked_up_as_a_space() -> void:
 	assert_str(zh.call("Twin Catch · 20 zorbs")).is_equal("双倍渔获 · 20" + char(0xa0) + "zorbs")
 	# no part known: "" (English mode and an untranslated line show the source, no-break space and all)
 	assert_str(zh.call("Zorb 20 quarks")).is_empty()
+
+## SGODOT-450 / q(303) (李白, 不知火舞): the Decorate entry at the cap, `Decor 52/52 · Store one to place this`
+## (P0Decor.cap_line), was eaten whole by `%s · %s to %s` (`{1} · 距 {3} {2}`) and read 「摆件 52/52 · 距 place this
+## Store one」; its own whole-line template reads it, and the Decor page head stays as it was.
+func test_p0_the_decor_cap_line_reads_as_one_sentence() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t._get_message(s, &""))
+	# the English as P0Decor draws it, then its Chinese: at the cap (decor_max.max 52), below it, and the Decor page head
+	var m := {"base": 20, "per_level": 4, "max": 52}
+	var v := {"homestead": {"level": 9}, "decor": {"placed": [], "cap": 52, "stored": {}}}
+	for i in 52: v.decor.placed.append({"uid": i + 1, "id": "deco_planter", "x": 99, "y": i, "rot": 0})
+	var full := P0Decor.cap_line(v, m)
+	assert_str(full).is_equal("Decor 52/52 · Store one to place this")
+	assert_str(zh.call(full)).is_equal("摆件 52/52 · 收起一件才能摆放这个")
+	v.homestead.level = 2
+	v.decor.cap = 24
+	v.decor.placed.resize(24)
+	var below := P0Decor.cap_line(v)
+	assert_str(below).is_equal("Decor 24/24 · Homestead Lv3 adds 4")
+	assert_str(zh.call(below)).is_equal("摆件 24/24 · 家园 Lv3 时 +4")
+	v.decor.placed.resize(12)
+	var head := P0Decor.header_line(v)
+	assert_str(head).is_equal("Decor 12/24 · Goes to Farm Storage")
+	assert_str(zh.call(head)).is_equal("摆件 12/24 · 放入仓库")
+
+## The same `%s · %s to %s` / `%s to %s · %s` ate two more lines joined by ` · ` (哪吒's sweep for 450, 李白's Chinese):
+## the Inbox's `3 new · 2 to do` (P0Inbox.new_line) read 「新 3 · 距 do 2」, a skill gate's `18 XP to go · harvest 9
+## radishes` (P0Logic.gate_spec's note) 「距 go 18 经验 · …」. Each its own whole-line template; its halves as before.
+func test_p0_lines_with_a_to_are_not_read_as_a_distance() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t._get_message(s, &""))
+	assert_str(zh.call("3 new · 2 to do")).is_equal("新 3 · 待办 2")
+	assert_str(zh.call("2 to do")).is_equal("待办 2")
+	assert_str(zh.call("18 XP to go · harvest 9 radishes")).is_equal("还差 18 经验 · 收获 9 个小萝卜")
+	assert_str(zh.call("18 XP to go · about 6 casts")).is_equal("还差 18 经验 · 约 6 竿")
+	assert_str(zh.call("18 XP to go · about 1 new dish")).is_equal("还差 18 经验 · 约 1 道新料理")
+	assert_str(zh.call("18 XP to go · about 2 Fine dishes")).is_equal("还差 18 经验 · 约 2 份上品料理")
+	assert_str(zh.call("Fishing Lv3 · 40 XP to go")).is_equal("钓鱼 Lv3 · 还差 40 经验")
+	# what the two were for, the home pin's distance to a pond, reads as it did
+	assert_str(zh.call("San Francisco · 0.8 km to Fern Pond")).is_equal("旧金山 · 距 Fern 塘 0.8 km")
