@@ -5,6 +5,7 @@ extends GdUnitTestSuite
 ## bank's trees are the wild's single trees; the ground's overlay on the pond's shape's channel only.
 
 const PondWildProps := preload("res://modules/ponds/pond_wild_props.gd")
+const PondWildGround := preload("res://modules/ponds/pond_wild_ground.gd")
 const SF := ["pond_san_francisco_01", "pond_san_francisco_02", "pond_san_francisco_03"]
 const TALL := ["wild_tree_pine", "wild_tree_round", "wild_bush_dark", "wild_bush_olive", "wild_log_moss", "wild_fern"]
 
@@ -123,3 +124,14 @@ func test_on_the_keys_only_low_pieces_by_their_box() -> void:
 			for t in l[asset]:
 				var at: Vector3 = (t as Transform3D).origin
 				assert_bool(PondWildProps.KEY_COLUMN.has_point(Vector2(at.x, at.z))).override_failure_message("%s %s at %s" % [id, asset, at]).is_false()
+
+## 周瑜 / 上官婉儿 on 422: under gl_compatibility this ground takes a share of the sun and its shadows no cool cast (the
+## sun's pass adds on sRGB-encoded light); elsewhere LOOK stays as it is, to the value.
+func test_on_gles_the_grounds_shadows_take_no_cool_cast() -> void:
+	var gl := PondWildGround.look_for("gl_compatibility")
+	assert_vector(gl["shadow_cool"]).is_equal(Vector3.ZERO)
+	assert_vector(gl["shadow_cool_sand"]).is_equal(Vector3.ZERO)
+	assert_float(gl["sun_k"]).is_equal_approx(0.206, 0.0001)   # only this ground's share of the sun, the pond's sun kept
+	for method in ["forward_plus", "mobile", "dummy"]:
+		assert_dict(PondWildGround.look_for(method)).override_failure_message(method).is_equal(PondWildGround.LOOK)
+	assert_vector(PondWildGround.LOOK["shadow_cool"]).is_not_equal(Vector3.ZERO)
