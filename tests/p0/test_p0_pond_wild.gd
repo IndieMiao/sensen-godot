@@ -135,3 +135,13 @@ func test_on_gles_the_grounds_shadows_take_no_cool_cast() -> void:
 	for method in ["forward_plus", "mobile", "dummy"]:
 		assert_dict(PondWildGround.look_for(method)).override_failure_message(method).is_equal(PondWildGround.LOOK)
 	assert_vector(PondWildGround.LOOK["shadow_cool"]).is_not_equal(Vector3.ZERO)
+
+## The user's 0.3.4 (2) on an iPhone (bot 589 / 590): a 32-bit float texture is not filterable there (nor on many GLES3
+## phones), so the water's distance field fell back to nearest and the sand edges stepped in 0.25 m squares. It stays
+## a 16-bit float one, which filters everywhere.
+func test_the_water_distance_field_is_a_filterable_half_float() -> void:
+	var e: Dictionary = P0Ponds.location(SF[0])
+	var polygon := PackedVector2Array()
+	for q in SystemPonds.site(e).get("polygon", []): polygon.append(Vector2(float(q[0]), float(q[1])))
+	var tex := PondWildGround._water_sdf(polygon)
+	assert_int(tex.get_image().get_format()).is_equal(Image.FORMAT_RH)
