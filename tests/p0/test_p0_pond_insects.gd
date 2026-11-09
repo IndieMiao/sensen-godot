@@ -98,6 +98,15 @@ func test_the_opening_shows_three_to_six_none_over_the_keys_the_player_or_the_po
 		var spawn := _spawn(entry)
 		var near := 0
 		var seen := 0
+		# under gl_compatibility (the first half) the ones by the player still fly (不知火舞 on #929)
+		var gles := _layout(id, FERN_CLEAR, opening, true)
+		var gles_near := 0
+		for kind in gles:
+			for a in gles[kind]:
+				var shows := (opening.shown as Rect2).has_point((opening.screen.call(PackedVector3Array([a.at])) as Rect2).position)
+				if shows and (kind == "bee" or (kind == "butterfly" and a.variant == 0)) and Vector2(a.at.x - spawn.x, a.at.z - spawn.z).length() <= 5.0:
+					gles_near += 1
+		assert_int(gles_near).override_failure_message("%s gles" % id).is_greater_equal(1)
 		for kind in l:
 			for a in l[kind]:
 				var box: Rect2 = opening.screen.call(PondInsects._flight_box(kind, a))
