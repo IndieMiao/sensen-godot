@@ -96,6 +96,39 @@ func test_a_tap_on_each_middle_flight_lands_on_it() -> void:
 		assert_float(off).override_failure_message("tap on %s ends %s" % [step, end]).is_less(1.0)
 		assert_float(absf(end.y - step.y)).override_failure_message("tap on %s ends %s" % [step, end]).is_less(0.5)
 
+## 用户 0.3.3: the stick did not take the player up the middle flights (their navigation was flat treads joined by
+## upright links: a push found the nearest point on the tread it stood on). Each middle flight (layout.stairs with an
+## ascent), from its lower landing's middle, the stick held the way it climbs: the player is up on its upper landing;
+## held the other way, back down on the lower one.
+func test_the_stick_climbs_each_middle_flight() -> void:
+	var scene := await _alcatraz()
+	var cam: Camera3D = scene._camera
+	var right := Vector3(cam.global_basis.x.x, 0, cam.global_basis.x.z).normalized()
+	var ahead := Vector3(-cam.global_basis.z.x, 0, -cam.global_basis.z.z).normalized()
+	var flights: Array = scene.layout.stairs.filter(func(f): return f.has("ascent"))
+	assert_int(flights.size()).is_equal(3)
+	for f in flights:
+		var low: Array = f.lower_platform
+		var mid := Vector2((float(low[0]) + float(low[1])) * 0.5, (float(low[2]) + float(low[3])) * 0.5)
+		var start := Vector3(mid.x, float(f.lower), mid.y)
+		scene._player.position = NavigationServer3D.map_get_closest_point(scene._nav_map, start)
+		var way := Vector3(1 if str(f.ascent) == "east" else -1, 0, 0)
+		var stick := Vector2(way.dot(right), -way.dot(ahead))   # P0LandmarkVisit.stick_step's own sum, solved
+		for frame in 240:   # 8 s at 30 fps: the 4.5 m run and a landing at the walk's speed, with room
+			scene.step_stick(stick, 1.0 / 30.0)
+			if scene.player_position().y >= float(f.upper) - 0.05: break
+		var at: Vector3 = scene.player_position()
+		print("ALC stick flight ", f.flight, " from ", start, " to ", at)
+		assert_float(at.y).override_failure_message("flight %d stopped at %s" % [f.flight, at]) \
+			.is_greater(float(f.upper) - 0.1)
+		for frame in 240:   # and back down the way it came
+			scene.step_stick(-stick, 1.0 / 30.0)
+			if scene.player_position().y <= float(f.lower) + 0.05: break
+		at = scene.player_position()
+		assert_float(at.y).override_failure_message("flight %d stopped going down at %s" % [f.flight, at]) \
+			.is_less(float(f.lower) + 0.1)
+		scene.step_stick(Vector2.ZERO, 1.0 / 30.0)
+
 func _alcatraz() -> Node3D:
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(360, 800)
