@@ -20,12 +20,12 @@ static func build(entry: Dictionary, clear: Array = [], in_key := Callable()) ->
 	scene._rng.seed = int(entry.decoration_seed)
 	var spec := SystemPonds.site(entry)
 	# the wild's painted ground and its bank rocks (SGODOT-422 v7, 盘古); the ground deepens under the bank's trees
-	scene.add_child(PondWildGround.build(entry, spec, clear, tree_points(clear)))
+	var trees := tree_points(clear, in_key)
+	scene.add_child(PondWildGround.build(entry, spec, clear, trees))
 	# The bank's six trees are the wild's single pines and round trees (SGODOT-422 ⑥), placed with the rest of the wild's
 	# pieces (PondWildProps, PondWildGround.regroup turns them into the pack's trees); their trunks block the P0 walk
 	# (PondWalk.set_trees), which reaches them since q(297). The old soft grass tufts are not drawn on the painted ground
 	# (the user on the v1 sample: no grass piles back), nor the turf pile and the spawn's crumbs.
-	var trees := tree_points(clear, in_key)
 	scene.add_child(PondWildProps.build(entry, spec, clear, trees, in_key))
 	var painted := scene.find_child("PaintedGround", true, false) as MeshInstance3D
 	if painted:   # the ground darkens a little under the plants' feet, now that they are placed
