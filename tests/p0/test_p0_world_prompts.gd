@@ -232,3 +232,21 @@ func test_a_strip_keeps_off_the_action_keys() -> void:
 	assert_bool(keys.any(func(k): return lifted.full_rect().intersects(k))).is_false()
 	var top: float = keys.map(func(k): return (k as Rect2).position.y).min()
 	assert_float(lifted.full_rect().end.y).is_less_equal(top + 0.01)   # KEY_CLEAR_PX over the group (in the rects)
+
+## 不知火舞 on 441 (LOCK-07 38239b9a): an icon button keeps off the action keys as a strip does — the farm's Mailbox
+## button sat under the ⇄ with the player stood left of it. Lifted KEY_CLEAR_PX over the group's top; its tap still
+## goes to the facility's own point.
+func test_an_icon_button_keeps_off_the_action_keys() -> void:
+	var keys := ui._key_rects()
+	var switch: Rect2 = keys[0]
+	var hit := Vector2(switch.get_center().x, switch.position.y + 4)   # the Mailbox's spot, its disc on the ⇄'s top
+	ui.world_icon("mailbox", HOME, hit, true)
+	var b: UiWorldIconButton = ui._icons.mailbox
+	var drawn := Rect2(b.position + b.drawn_rect().position, b.drawn_rect().size)
+	assert_bool(b.visible).is_true()
+	assert_bool(keys.any(func(k): return drawn.intersects(k))).is_false()
+	assert_float(drawn.end.y).is_equal_approx(switch.position.y, 0.01)   # KEY_CLEAR_PX over the ⇄ (in the rect)
+	assert_vector(ui._card_hits.mailbox).is_equal(hit)
+	var clear := Vector2(switch.position.x - 60, switch.position.y - 60)   # clear of the keys: where it was put
+	ui.world_icon("sign", HOME, clear, true)
+	assert_vector((ui._icons.sign as UiWorldIconButton).position + (ui._icons.sign as UiWorldIconButton).size * 0.5).is_equal(clear)

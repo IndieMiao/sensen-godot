@@ -1038,6 +1038,10 @@ func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near :
 	b.count = count
 	b.place_at(screen)
 	_keep_off_sides(b, b.drawn_rect())
+	# Over the action group: lifted KEY_CLEAR_PX over its top as a strip is (不知火舞 on 441, LOCK-07 38239b9a: the farm's
+	# Mailbox button under the ⇄ once the player stood left of it). A tap on it still goes to `hit`.
+	var drawn := b.drawn_rect()
+	b.position.y += _name_bar_lift(Rect2(b.position + drawn.position, drawn.size), 0.0)
 	# Covered by another facility's open strip (it had no clear side, 不知火舞 on 226 C21: off screen first, then other
 	# buttons): this button fades while the strip is open and comes back once it folds, as covered name tags do (#57).
 	_yield_tag(b, _modal == null and _strip_over(Rect2(b.position, b.size).grow(-8.0)))   # its 28 disc
@@ -1140,7 +1144,7 @@ func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int, id := "") -
 	if _covers_marker(bar.rect_for(screen, want), id) and not _covers_marker(bar.rect_for(screen, other), id): return other
 	return want
 
-## The action group's switch, tool badge and main key, each KEY_CLEAR_PX out, in this UI's coordinates: a name strip
+## The action group's switch, tool badge and main key, each KEY_CLEAR_PX out, in this UI's coordinates: a name strip (and an icon button)
 ## keeps off them as off the screen's edge (不知火舞 442 a9474fa3, 197: the pond's camera turned 14.5°, a gathering
 ## point by the ⇄ showed its strip as `St`). Empty while the group is hidden (rooms' facilities, a panel up).
 const KEY_CLEAR_PX := 8.0
