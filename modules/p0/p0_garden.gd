@@ -191,10 +191,10 @@ static func stone_wall(segments: Array) -> Array:
 				"yaw": yaw + 0.35 * float((i * STONE_PER_SEG + k) % 3 - 1), "scale": STONE_SCALE})
 	return out
 
-## The Kitchen Wing's models (Lv8, and the Master Farmhouse's, which has it built in) wait until the wing and the rest
-## bench stand apart: today the wing's front wall cuts through the bench, and one sitting there sat half in the wall
-## (不知火舞 448 b18d13c6, 上官婉儿). Until then Lv8 and Lv15 keep their old looks; the Porch's model is in.
-const WING_WAITS := true
+## The Kitchen Wing's models (Lv8, and the Master Farmhouse's, which has it built in) waited until the wing and the rest
+## bench stood apart (不知火舞 448 b18d13c6, 上官婉儿): 赵云's #902 set the wing back behind the bench (#913), and the
+## server keeps pieces off its cells from Lv8 (q(303), SGODOT-450, #914) — they are drawn. True brings the old looks back.
+const WING_WAITS := false
 
 ## Porch (Lv5) and Kitchen Wing (Lv8), a (timber) or b (stone): 赵云's porch_a / _b and kitchen_wing_a / _b (#858, in
 ## farm-dev by #875), each one model with its origin at the house anchor (P0Garden.ANCHORS.house, +Z toward the camera),
