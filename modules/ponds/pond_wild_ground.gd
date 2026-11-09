@@ -34,6 +34,7 @@ const COLOURS := {"grass": Color("86a74b"), "grass_far": Color("749543"), "plate
 	"dapple_cool": Color("6f9b52"), "soft_grass": Color("a8b46b")}
 
 ## `trees`: the bank's tree points (the ground deepens to blue-green under them).
+static var _CACHE := {}   # "shape hash|seed" -> [ground mesh, water distance texture], shared and never edited
 static func build(entry: Dictionary, spec: Dictionary, clear: Array = [], trees: Array = []) -> Node3D:
 	var seed_value := int(entry.decoration_seed)
 	var polygon := PackedVector2Array()
@@ -42,10 +43,14 @@ static func build(entry: Dictionary, spec: Dictionary, clear: Array = [], trees:
 	root.name = "WildGround"
 	var ground := MeshInstance3D.new()
 	ground.name = "PaintedGround"
-	ground.mesh = _mesh(polygon, TERRACE_M, seed_value)
+	# the ground's mesh and its distance-to-water texture depend on the pond's shape and seed only: built once a pond
+	# (周瑜 on #917: the texture alone ~98 ms; the scenery is built again when the gathering points come)
+	var shape_key := "%s|%d" % [str(polygon).hash(), seed_value]
+	if not _CACHE.has(shape_key): _CACHE[shape_key] = [_mesh(polygon, TERRACE_M, seed_value), _water_sdf(polygon)]
+	ground.mesh = _CACHE[shape_key][0]
 	var material := ShaderMaterial.new()
 	material.shader = preload("res://modules/ponds/pond_wild_ground.gdshader")
-	material.set_shader_parameter("water_sdf", _water_sdf(polygon))
+	material.set_shader_parameter("water_sdf", _CACHE[shape_key][1])
 	material.set_shader_parameter("sdf_origin", SDF_ORIGIN)
 	material.set_shader_parameter("sdf_extent", SDF_EXTENT)
 	var path: Array = PATHS.get(str(spec.get("template_id", "")), [])
