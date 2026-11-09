@@ -14,7 +14,7 @@ const MEADOW := Rect2(-3, -19, 18, 21)
 const CLEAR_M := 1.5
 const FRONT_M := 4.0
 const FRONT_HALF_W := 2.0
-static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
+static func build(entry: Dictionary, clear: Array = [], in_key := Callable()) -> PondScenery:
 	var scene := PondScenery.new()
 	scene.name = "Scenery"
 	scene._rng.seed = int(entry.decoration_seed)
@@ -32,7 +32,7 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 	for point in TREES:
 		scene._rng.randf_range(.85, 1.1)
 		scene._rng.randf_range(0, TAU)
-	var trees := tree_points(clear)
+	var trees := tree_points(clear, in_key)
 	var layers := {"grass_clump": []}
 	var spec := SystemPonds.site(entry)
 	for i in 150:
@@ -46,7 +46,7 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 		if asset != "grass_clump": continue
 		layers[asset].append(Transform3D(Basis(Vector3.UP, turn).scaled(Vector3.ONE * scale_value), point))
 	for asset in layers: scene.add_child(Art.batch(asset, layers[asset], false))
-	scene.add_child(PondWildProps.build(entry, spec, clear, trees))
+	scene.add_child(PondWildProps.build(entry, spec, clear, trees, in_key))
 	# Small batched tufts give the meadow a soft pile instead of a flat plane.
 	var turf: Array = []
 	for index in 4200:
@@ -97,9 +97,18 @@ static func _wild_ground(material: ShaderMaterial, shape: String) -> void:
 	material.set_shader_parameter("dry_channel", DRY_CHANNEL[shape])
 
 const TREES := [Vector3(0.1, 0, -4), Vector3(-0.2, 0, -11), Vector3(2.2, 0, -16.1), Vector3(9.5, 0, -16.4), Vector3(12.2, 0, -12), Vector3(12.1, 0, -5.5)]
-## The bank's trees that stand: those clear of the gathering points `clear` (CLEAR_M off, out of the strip in front).
-static func tree_points(clear: Array = []) -> Array:
-	return TREES.filter(func(point): return not _near(point, clear) and not _in_front(point, clear))
+## The bank's trees that stand: those clear of the gathering points `clear` (CLEAR_M off, out of the strip in front),
+## and with `in_key` (PondWildProps.layout's) off the opening screen's action keys.
+static func tree_points(clear: Array = [], in_key := Callable()) -> Array:
+	return TREES.filter(func(point): return not _near(point, clear) and not _in_front(point, clear) \
+		and not (in_key.is_valid() and _tree_under_keys(point, in_key)))
+
+## A bank tree whose crown would stand on the opening screen's action keys (盘古 on 422): it does not stand — its point
+## is fixed (its trunk blocks the walk), so it is left out rather than moved. Either kind, at its largest.
+static func _tree_under_keys(point: Vector3, in_key: Callable) -> bool:
+	for asset in PondWildProps.TREES:
+		if bool(in_key.call(PondWildProps.box_corners(asset, point, 1.1))): return true
+	return false
 
 static func _near(point: Vector3, clear: Array) -> bool:
 	for c in clear:
