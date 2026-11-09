@@ -270,6 +270,7 @@ func _build_world() -> void:
 	props.add_child(_mailbox_prop(_mailbox))
 	P0Garden.block_points(bp, [_mailbox])
 	grid = BlueprintGrid.new(bp)
+	_looks.grid = grid   # a shown porch, wing or whole house stands on cells one walks round (亚瑟 on #896)
 	# One thick soil bed per plot (plot.glb), tinted per state (watered beds read darker).
 	var xfs: Array = []
 	var tints := PackedColorArray()

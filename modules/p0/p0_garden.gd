@@ -5,6 +5,8 @@ extends RefCounted
 ## content.garden.plots (the server's too: sprinkler coverage, greenhouses), 63 beds since SGODOT-355 b1.
 ## Plots and facilities are solid; the player works a bed from the walkway beside it. Pure data: no nodes, unit-tested.
 
+const FarmArt = preload("res://modules/farm/farm_art.gd")
+
 const CELL_MM := 650
 ## 22 × 24 from row −2: the yard's front reaches two rows past row 0 (q(172) A, 不知火舞 282 4ddb69db: the farm grows
 ## toward the camera for a whole row of Homestead Lv7 beds), every older cell keeping its place in the world.
@@ -229,6 +231,72 @@ static func look_house(look: String, style := "cottage") -> String:
 ## Whether the house shown for this Master Farmhouse look has the porch and wing in it (the standalone ones put away).
 static func whole_house(look: String) -> bool:
 	return look in ["a", "b"] and not WING_WAITS
+
+## The door's way out to the yard (the first of decor.yard.paths): no look stands on it.
+const DOOR_PATH := Rect2i(8, 13, 3, 2)
+
+## The yard cells a look's model stands on (亚瑟 on #896: the wing was a picture one walked into): every walkable cell
+## that a wall or post of the model (its upright faces below 1 m, set at the house anchor) reaches more than LOOK_REACH
+## into, and the cells those walls close in, less the house's own footprint and the door path. A floor (the porch's
+## deck, a step) is walked on; a box round the whole model would close the yard in front of the wing. [] for a model
+## not in the farm's art.
+const LOOK_REACH := 0.1
+static var _look_cells := {}
+static func look_cells(bp: FarmBlueprint, asset: String) -> Array[Vector2i]:
+	if _look_cells.has(asset): return (_look_cells[asset] as Array[Vector2i]).duplicate()
+	var out: Array[Vector2i] = []
+	var mesh := FarmArt.mesh_for(asset)
+	if mesh == null: return out
+	var house := bp.cell_to_world(ANCHORS.house)
+	var half := bp.cell_m * 0.5 - LOOK_REACH
+	var faces := mesh.get_faces()
+	var walls: Array[Rect2] = []
+	for i in range(0, faces.size(), 3):
+		var a := faces[i]
+		var b := faces[i + 1]
+		var c := faces[i + 2]
+		var n := (b - a).cross(c - a)
+		if n.length_squared() < 1e-12 or absf(n.normalized().y) > 0.5 or minf(a.y, minf(b.y, c.y)) > 1.0: continue
+		var r := Rect2(Vector2(a.x, a.z), Vector2.ZERO).expand(Vector2(b.x, b.z)).expand(Vector2(c.x, c.z))
+		walls.append(r)
+	var box := mesh.get_aabb()
+	var lo := bp.world_to_cell(house + Vector3(box.position.x, 0, box.position.z))
+	var hi := bp.world_to_cell(house + Vector3(box.end.x, 0, box.end.z))
+	var area := Rect2i(Vector2i(mini(lo.x, hi.x) - 1, mini(lo.y, hi.y) - 1), (lo - hi).abs() + Vector2i(3, 3))
+	var shut := {}   # a cell one cannot be on: a wall in it, the house, or off the plan
+	for x in range(area.position.x, area.end.x):
+		for y in range(area.position.y, area.end.y):
+			var cell := Vector2i(x, y)
+			if FOOTPRINTS.house.has_point(cell) or not bp.is_walkable(cell):
+				shut[cell] = true
+				continue
+			if DOOR_PATH.has_point(cell): continue
+			var at := bp.cell_to_world(cell) - house
+			var inner := Rect2(at.x - half, at.z - half, half * 2.0, half * 2.0)
+			if walls.any(func(w: Rect2): return w.grow(0.0001).intersects(inner)):
+				shut[cell] = true
+				out.append(cell)
+	# and the cells the walls close in (the wing's room): not reached from the area's edge
+	var seen := {}
+	var todo: Array[Vector2i] = []
+	for x in range(area.position.x, area.end.x):
+		for y in range(area.position.y, area.end.y):
+			var cell := Vector2i(x, y)
+			var edge := x == area.position.x or y == area.position.y or x == area.end.x - 1 or y == area.end.y - 1
+			if edge and not shut.has(cell): todo.append(cell)
+	while not todo.is_empty():
+		var cell: Vector2i = todo.pop_back()
+		if seen.has(cell): continue
+		seen[cell] = true
+		for d in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			var next: Vector2i = cell + d
+			if area.has_point(next) and not shut.has(next) and not seen.has(next): todo.append(next)
+	for x in range(area.position.x, area.end.x):
+		for y in range(area.position.y, area.end.y):
+			var cell := Vector2i(x, y)
+			if not shut.has(cell) and not seen.has(cell): out.append(cell)
+	_look_cells[asset] = out
+	return out.duplicate()
 
 ## Points along the yard fence for block_points: the player walks round it, through the door opening.
 static func fence_block_points(bp: FarmBlueprint) -> Array:

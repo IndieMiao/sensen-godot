@@ -198,3 +198,45 @@ func test_the_farm_shows_the_views_looks_and_the_cards_preview() -> void:
 	for stage in ["porch", "kitchen_extension"]:
 		assert_bool((looks.parts(stage)[0] as Node3D).get_parent().visible).override_failure_message(stage) \
 			.is_equal(not P0Garden.whole_house("b"))
+
+## 亚瑟 on #896: a model one walks into is a picture — the cells a shown porch, wing or whole house stands on are solid,
+## off the house's own footprint and the door path, and the bench is still reached from the yard. While WING_WAITS the
+## old wing and house block nothing new (as before); the porch's model blocks its cells.
+func test_a_shown_model_stands_on_its_cells() -> void:
+	var bp := P0Garden.blueprint()
+	for asset in ["porch_a", "porch_b", "kitchen_wing_a", "kitchen_wing_b", "master_farmhouse_a", "master_farmhouse_b"]:
+		var cells := P0Garden.look_cells(bp, asset)
+		print("LOOK cells ", asset, " ", cells)
+		for c in cells:
+			assert_bool(P0Garden.FOOTPRINTS.house.has_point(c) or P0Garden.DOOR_PATH.has_point(c)).is_false()
+	# the wing's walls and the room they close, on the house's left and back (亚瑟 counted (5..7, 17..18), (7, 16),
+	# (8, 18) from its box; (5, 18) its set-back corner does not reach); the porch's left post; the whole house both
+	var wing: Array[Vector2i] = [Vector2i(5, 17), Vector2i(6, 17), Vector2i(6, 18), Vector2i(7, 16), Vector2i(7, 17),
+		Vector2i(7, 18), Vector2i(8, 18)]
+	for look in ["a", "b"]:
+		assert_array(P0Garden.look_cells(bp, "kitchen_wing_" + look)).contains_exactly_in_any_order(wing)
+		assert_array(P0Garden.look_cells(bp, "porch_" + look)).contains_exactly([Vector2i(7, 15)])
+		assert_array(P0Garden.look_cells(bp, "master_farmhouse_" + look)) \
+			.contains_exactly_in_any_order(wing + [Vector2i(7, 15)])
+	# with the whole house standing, the bench (5, 16) is still sat on from the yard in front of it
+	var grid := BlueprintGrid.new(bp)
+	for c in P0Garden.look_cells(bp, "master_farmhouse_a"): grid.set_solid(c, true)
+	assert_array(grid.path(Vector2i(5, 12), Vector2i(5, 15))).is_not_empty()
+	# on the farm: what the shown looks hold, and back when they go
+	var house := FarmProps.build("house", bp.cell_to_world(P0Garden.ANCHORS.house), 1.0, "cottage")
+	add_child(auto_free(house))
+	var fence: Node3D = auto_free(Fence.new())
+	add_child(fence)
+	fence.build(bp)
+	var looks: Node3D = auto_free(Looks.new())
+	add_child(looks)
+	looks.build(bp, house, "cottage", fence)
+	looks.grid = BlueprintGrid.new(bp)
+	looks.sync(_view(8))
+	var held: Array = P0Garden.look_cells(bp, "porch_a")
+	if not P0Garden.WING_WAITS: held += P0Garden.look_cells(bp, "kitchen_wing_a")
+	assert_int(looks.solid_cells().size()).is_equal(held.size())
+	for c in looks.solid_cells(): assert_bool(looks.grid._blocked(c)).is_true()
+	looks.sync(_view(2))   # no looks: every cell walkable again
+	assert_array(looks.solid_cells()).is_empty()
+	for c in held: assert_bool(looks.grid._blocked(c)).override_failure_message(str(c)).is_false()
