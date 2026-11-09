@@ -88,6 +88,7 @@ func _go_online(session: P0Session) -> void:
 	o.version = session.version
 	o.features = session.features()
 	o.appearance = OnlineAppearance.payload(Avatar.load_outfit())
+	o.layout = str(outpost.get("art", ""))   # the kit drawn here: the market plaza has instances of its own (SGODOT-218)
 	attach_online(o)
 	voice_room = P0VoiceRoom.new()
 	add_child(voice_room)

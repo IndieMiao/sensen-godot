@@ -30,6 +30,9 @@ var access_key := ""   # the demo server's key (P0Session.access_key, SGODOT-232
 var version := 0       # P0Session.version, sent as x-p0-version: an old build's handshake gets 426 like its requests (q(74))
 var features := ""     # P0Session.features(), sent as x-p0-features: without save_v7 the handshake gets 426 (SGODOT-397)
 var outpost := ""
+## The room kit this client draws there (the outpost's `art`), sent on join (SGODOT-218): the server puts a client that
+## draws a kit which took a room's place (the market plaza) in that layout's instances, apart from older clients'.
+var layout := ""
 var spawn_at := Vector2.ZERO
 var appearance: Dictionary = {}
 ## () -> {position: Vector3, yaw: float, action: String}; read at the send rate.
@@ -91,6 +94,13 @@ func start(outpost_id: String, at: Vector2) -> void:
 	_stopped = false
 	_attempt = 0
 	_connect()
+
+## The join sent once the socket opens: the outpost, our door position, our look and the kit we draw there.
+func join_message() -> Dictionary:
+	var join := {"t": "join", "outpost": outpost, "at": [spawn_at.x, spawn_at.y]}
+	if not appearance.is_empty(): join.appearance = appearance
+	if layout != "": join.layout = layout
+	return join
 
 ## Leaves the room on purpose (no reconnect, no seat kept); the socket keeps polling until the close completes.
 func stop() -> void:
@@ -183,8 +193,7 @@ func _process(dt: float) -> void:
 				connected = true
 				_attempt = 0
 				connection_changed.emit(true)
-				_send({"t": "join", "outpost": outpost, "at": [spawn_at.x, spawn_at.y], "appearance": appearance} if not appearance.is_empty()
-					else {"t": "join", "outpost": outpost, "at": [spawn_at.x, spawn_at.y]})
+				_send(join_message())
 			while socket.get_available_packet_count() > 0:
 				var packet := socket.get_packet()
 				if socket.was_string_packet(): _message(packet.get_string_from_utf8())
