@@ -218,14 +218,17 @@ func test_the_dressing_on_the_wings_cells_hides_with_the_wing() -> void:
 	scenery.build(bp, "cottage")
 	var dress: Node3D = scenery.find_child("WingDressing", false, false)
 	var cells := GardenScenery.wing_dress_cells()
-	var inside := 0
 	var drawn: Array = []   # the wing's own batches, in the order they were added
 	for s in scenery.split:
-		for xf in s[1]: assert_bool(cells.has(bp.world_to_cell((xf as Transform3D).origin))).override_failure_message(str(s[0])).is_false()
-		for xf in s[2]: assert_bool(cells.has(bp.world_to_cell((xf as Transform3D).origin))).override_failure_message(str(s[0])).is_true()
-		inside += (s[2] as Array).size()
 		if not (s[2] as Array).is_empty(): drawn.append((s[2] as Array).size())
-	assert_int(inside).is_greater(0)   # the bush at (6, 17) at least
+	# a fact of its own, not _split's test again (周瑜 on #928): the bush left of the house, 1.75 m west and 0.9 m back of
+	# its anchor, stands on (6, 17) and goes with the wing; the yard's other three bushes stay
+	var bush: Array = scenery.split.filter(func(s): return s[0] == "bush")
+	assert_int(bush.size()).is_equal(1)
+	var by_house: Vector3 = bp.cell_to_world(bp.anchor("house")) + Vector3(-1.75, 0, -0.9)
+	assert_object(bp.world_to_cell(by_house)).is_equal(Vector2i(6, 17))
+	assert_array((bush[0][2] as Array).map(func(xf): return (xf as Transform3D).origin)).is_equal([by_house])
+	assert_int((bush[0][1] as Array).size()).is_equal(3)
 	# what the wing's node draws is those points: one batch for each layer with any, as many instances
 	assert_array(dress.get_children().map(func(mm): return (mm as MultiMeshInstance3D).multimesh.instance_count)).is_equal(drawn)
 	# with a renderer, the batches drawn straight onto the scenery (the hedges) keep off the cells too
