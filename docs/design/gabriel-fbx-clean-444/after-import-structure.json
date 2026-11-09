@@ -1,0 +1,172 @@
+{
+	"animations": {
+		"dt_skin03_rig": {
+			"length": 6.25,
+			"tracks": 15,
+			"tracks_sha256": "d029718f7947a1ba62ec8b5630d9eefb1b5bff2129952432eb5333a07b450a45"
+		}
+	},
+	"meshes": {
+		"body": {
+			"bounds": "[P: (-0.631477, 0.027174, -0.183043), S: (1.262954, 1.570851, 0.351831)]",
+			"skeleton_path": "..",
+			"skin_bind_count": 38,
+			"skin_bind_sha256": "1ac7cacbff9f366782df6c9fd77dbacb6da48d040cacce7b6a01f6a3b31aa740",
+			"surfaces": [
+				{
+					"arrays_sha256": "35628dd0e0e145da390bb9f8d488d24ab5a98b9d4ae4007b5e83e289ae7adbd2",
+					"attribute_sha256": [
+						"69ee4792fda4db26127dd05afeec8a1114a0bec5443a8692a66f87127b13cf18",
+						"84d1ac2624f4df7b8a2b1613cd1e2c5fb3fba7b29cbc328422c8641eaf67b3ba",
+						"44566f9e8b23c312fb28b8919974572832f6cff046cad5f591c75023d3581b75",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"4172bd9908deeb773667d7ee4d32b7b9b09dc1e94d9d89ee591547218770a566",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"5b16199894938c8370cc92e181737a8dbdae365bccb7eb10df70723b92ce167f",
+						"834996cf7ac005fdfb0ca9515a5c08cd71e4ab06fa5d692369c0e589cf382c13",
+						"3916ea56a6f794de6cc626b1453ff6063c23dc48c05b77031798ce1ff79111dc"
+					],
+					"material_name": "",
+					"name": "",
+					"primitive": 3
+				}
+			],
+			"transform_sha256": "be9f301699d258d220426ad8735455710ff34570d90324037dfb901c8dc72950",
+			"triangles": 3942
+		},
+		"cloth": {
+			"bounds": "[P: (-0.484518, 0.625388, -0.168703), S: (0.969036, 0.621993, 0.316748)]",
+			"skeleton_path": "..",
+			"skin_bind_count": 25,
+			"skin_bind_sha256": "441c4dfff152fb267c063d7b2fd2565b6b0b4d66436856966342e96784e3f62d",
+			"surfaces": [
+				{
+					"arrays_sha256": "21d6e50b0dee34f73af1b0dbee1c80ec702bc63e868222655fb2943c5995c391",
+					"attribute_sha256": [
+						"a3ae1d8bd5bcad7601d3e8b369fad3d6a5e6fb141c65962e12314315d6977658",
+						"b71a48f0a08a1c7a93f7b1941d5dd9c593051c80136a7afad4c2014b84d46573",
+						"69d1f6550841acdfaefea5b569ea704197aad33fa448c1f31feeaf134552adf9",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"8d5ed4a516e2fa4fc7aae995a11cc51eba1a210f8d08a3f58c29a404b9729759",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"75a2db2e7d317730473c61ad4e4f96226d2ef4aa79e743b85f03437bb3fe41d0",
+						"bc554fd3f410c3d18f57446c3f68734bdbbe1d5dd129f72e28a3481daa4f62e2",
+						"018292981ac9dd674c37ec933662e3d79400b8dc3ebbb383867501d2de2c5529"
+					],
+					"material_name": "",
+					"name": "",
+					"primitive": 3
+				}
+			],
+			"transform_sha256": "be9f301699d258d220426ad8735455710ff34570d90324037dfb901c8dc72950",
+			"triangles": 3271
+		},
+		"eyes": {
+			"bounds": "[P: (-0.102225, 1.350711, 0.123186), S: (0.20445, 0.066383, 0.028811)]",
+			"skeleton_path": "..",
+			"skin_bind_count": 2,
+			"skin_bind_sha256": "c1d0b33d47583270992e730eb357e9563d076ef8c5b84a997e722a7d54c6b947",
+			"surfaces": [
+				{
+					"arrays_sha256": "3e07d898402b5cbda80dbcc0a722ac303e049489c82640bf93952e639d88b432",
+					"attribute_sha256": [
+						"1a45f6f7fc461b6cb1fca3710c1b8b81d0554e27ba6ad77660a80051308f6184",
+						"d4d6e65f53dfeadadd4023e74b11a7564ac8b3f354aa5edeb7b4764f46bdd3d4",
+						"53bceefeca4510acee0e16d30472a30d11dcc1c0b2609c2d49e7e6b081b7b77f",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"07afc84ad113d87ed7cdbae30099c0da0d5777f924fe28c43f176e3e1688f751",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"ace2db908a50b87a1ded7b3b7f32e1d5664a2adfba0c2982a65d9873a34bb781",
+						"9d043b186e5049b54c22cf9d9d9d2a57d14ab00af0586b33d90f113cf62fbd80",
+						"31f40854fe2a26610601f50c0a2849105d0d2d04ed87ac8f0e1c27ddf222b240"
+					],
+					"material_name": "",
+					"name": "",
+					"primitive": 3
+				}
+			],
+			"transform_sha256": "be9f301699d258d220426ad8735455710ff34570d90324037dfb901c8dc72950",
+			"triangles": 152
+		},
+		"hairHat": {
+			"bounds": "[P: (-0.489959, 1.12448, -0.293515), S: (0.979918, 0.597743, 0.503948)]",
+			"skeleton_path": "..",
+			"skin_bind_count": 13,
+			"skin_bind_sha256": "53faba3c7c8a949181968504bf6c885ee456ed732e8ea26ba8e4ae6eb0ee7b82",
+			"surfaces": [
+				{
+					"arrays_sha256": "b1a0d721254944e4f731045fa2d9cb71888843cf28a7bc92daa04eb04eec6525",
+					"attribute_sha256": [
+						"cabc25a227b42b50978efbb6ea1dba7636e1b40b3b0d40f911df75c288734b57",
+						"3030c67c311d5aaedbd94a41c19d2df682a16ae7cb9b283fe6a73e118f9b37b1",
+						"247d29da10ac8f1ffd68e35e2a0f723466483888f8f3c96d6f766d5703fc8390",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"1ad519c126a722862db08742ebcf402692593e8667f9e7efaba8ee6a521e00f4",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"138fe04329094536f00d0bf5ba80d209043de0d9b6ab9dbd25070c1ec7de0f43",
+						"dca232ca09e139a125037aa6acb63c1712cb573838d5605ac27b5ea4d67b4afc",
+						"7b509779b337aa56c2a9155224e94a1ae849847a68fd79e1cff008e39f4b70fe"
+					],
+					"material_name": "",
+					"name": "",
+					"primitive": 3
+				}
+			],
+			"transform_sha256": "be9f301699d258d220426ad8735455710ff34570d90324037dfb901c8dc72950",
+			"triangles": 2057
+		},
+		"shoes": {
+			"bounds": "[P: (-0.199655, -0.000119, -0.106844), S: (0.399311, 0.306456, 0.324512)]",
+			"skeleton_path": "..",
+			"skin_bind_count": 6,
+			"skin_bind_sha256": "9ac30a7364b9476a7d3afd4fb686da08752ac69dc9353061db8c4d6244de2c03",
+			"surfaces": [
+				{
+					"arrays_sha256": "a1594395f7bd1943b13b33885beebf9e4f66fe9f2a32eb8c9a82c694d590c9db",
+					"attribute_sha256": [
+						"e1c62fc65054ae0d01be6cf895f11b3926f793d096d4e93cf74edb63726e5441",
+						"fa660cd021d7274865e9139f1dbc233a2530a04a2da3186c29e489468b671057",
+						"91bce6626f5d23706a341308b643d9a528b188ce5d00ae67923bb2468bcc1f16",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"4c20c07aa2d7ebf393035a350ca89a788c8802eafa2d81b0f5cfa91626475ff7",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119",
+						"1376f51c885ec3df0446c0085dfa258374881d684315831653c8fae3e8ab73a9",
+						"fc0e93fd8c4a3d2c1c180ad8f585d89110a24792026456d7e93ef5aeff427ba8",
+						"df9060b2ffe8fde866c911f99465d767137c3614e3363fd1e83c35225376d874"
+					],
+					"material_name": "shoes_mat",
+					"name": "shoes_mat",
+					"primitive": 3
+				}
+			],
+			"transform_sha256": "be9f301699d258d220426ad8735455710ff34570d90324037dfb901c8dc72950",
+			"triangles": 1202
+		}
+	},
+	"skeletons": {
+		"Skeleton3D": {
+			"bone_count": 62,
+			"names_parents_rest_pose_sha256": "5c6d674a56fe3cf29cd1fc35ddc7fb0e95a43d444110093c785d29b0385b8488"
+		}
+	}
+}

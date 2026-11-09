@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Copy shoes3 FBX exactly; recolor only its cyan texture region for Gabriel."""
+"""Recolor Gabriel's shoes and export the source FBX without unused image links."""
 from pathlib import Path
 import hashlib
 import json
-import shutil
+import subprocess
+import sys
 import numpy as np
 from PIL import Image
 
@@ -26,7 +27,11 @@ out[mask, 0] = shade[mask]
 out[mask, 1] = shade[mask] - 1
 out[mask, 2] = shade[mask] - 1
 Image.fromarray(out).save(TARGET / texture)
-shutil.copyfile(DONOR / fbx, TARGET / fbx)
+# Keep the approved shoe geometry/skin, without restoring the four missing images.
+audit_path = ROOT / "output/gabriel-fbx-444/source-audit.json"
+subprocess.run([sys.executable, str(ROOT / "tools/art/source/gabriel_fbx_444/export_clean_fbx.py")],
+               cwd=ROOT, check=True)
+fbx_audit = json.loads(audit_path.read_text())
 
 # Copy parameters only; Godot creates independent UIDs and path remaps.
 for name, importer, resource in [(texture, "texture", "CompressedTexture2D"), (fbx, "scene", "PackedScene")]:
@@ -48,10 +53,11 @@ report = {
     "outside_mask_exact": bool(np.array_equal(source[~mask], out[~mask])),
     "alpha_exact": bool(np.array_equal(source[:, :, 3], out[:, :, 3])),
     "fbx_byte_identical": (DONOR / fbx).read_bytes() == (TARGET / fbx).read_bytes(),
-    "source_import_note": "Unmodified FBX retains four missing unused full-outfit texture references. No aliases or path fixes, per art director; runtime uses the recipe albedo.",
+    "fbx_geometry_skin_unchanged": fbx_audit["all_geometry_skin_weights_uv_transforms_animations_byte_identical"],
+    "source_import_note": "Source FBX re-export removes four unused materials/images; shoe geometry, skin and shoes_mat remain unchanged. No alias textures.",
     "donor_sha256": {p.name: sha(p) for p in sorted(DONOR.iterdir()) if p.is_file()},
     "output_png_sha256": sha(TARGET / texture),
 }
-assert report["outside_mask_exact"] and report["alpha_exact"] and report["fbx_byte_identical"]
+assert report["outside_mask_exact"] and report["alpha_exact"] and report["fbx_geometry_skin_unchanged"]
 (REPORT / "texture-validation.json").write_text(json.dumps(report, indent=2) + "\n")
 print(json.dumps(report, indent=2))
