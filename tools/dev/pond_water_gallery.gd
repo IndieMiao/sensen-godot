@@ -49,7 +49,7 @@ func _run() -> void:
 				points.append([pixel.x, pixel.y])
 		report.append({"template":shape,"rgb_samples":measurements,"sample_pixels":points,
 			"flow_speed":RenderingServer.shader_get_parameter_default(water.water_material.shader.get_rid(), "flow_speed"),
-			"ground_in_reflection":scene.get_node("Scenery/BankGround").get_layer_mask_value(3),
+			"ground_in_reflection":_ground_in_reflection(scene),
 			"network_booted":Net.booted_once})
 		if _movie:
 			for frame_index in 150: await get_tree().process_frame
@@ -58,3 +58,8 @@ func _run() -> void:
 		for frame_index in 4: await get_tree().process_frame
 	FileAccess.open(_out.path_join("measurements.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	get_tree().quit()
+
+## The pond's ground drawn in the water's reflection (its layer 3): the wild's painted ground since SGODOT-422 v7.
+static func _ground_in_reflection(scene: Node) -> bool:
+	var ground := scene.find_child("PaintedGround", true, false) as VisualInstance3D
+	return ground != null and ground.get_layer_mask_value(3)

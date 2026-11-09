@@ -21,25 +21,11 @@ static func build(entry: Dictionary, clear: Array = [], in_key := Callable()) ->
 	var spec := SystemPonds.site(entry)
 	# the wild's painted ground and its bank rocks (SGODOT-422 v7, 盘古); the ground deepens under the bank's trees
 	scene.add_child(PondWildGround.build(entry, spec, clear, tree_points(clear)))
-	# The bank's six trees are the wild's single pines and round trees now (SGODOT-422 ⑥: not the Timber grove's clump),
-	# placed with the rest of the wild's pieces (PondWildProps); the draws stay so the grass below keeps its place. Their
-	# trunks block the P0 walk (PondWalk.set_trees), which reaches them since q(297).
-	for point in TREES:
-		scene._rng.randf_range(.85, 1.1)
-		scene._rng.randf_range(0, TAU)
+	# The bank's six trees are the wild's single pines and round trees (SGODOT-422 ⑥), placed with the rest of the wild's
+	# pieces (PondWildProps, PondWildGround.regroup turns them into the pack's trees); their trunks block the P0 walk
+	# (PondWalk.set_trees), which reaches them since q(297). The old soft grass tufts are not drawn on the painted ground
+	# (the user on the v1 sample: no grass piles back), nor the turf pile and the spawn's crumbs.
 	var trees := tree_points(clear, in_key)
-	var layers := {"grass_clump": []}
-	for i in 150:
-		var point := Vector3(scene._rng.randf_range(-1.5, 13.5), 0.01, scene._rng.randf_range(-18, .4))
-		if FishingModel.contains(str(entry.id), point, .5, spec) or (point.z > -3 and absf(point.x - 6) < 1.4): continue
-		var edge := point.x < .7 or point.x > 11.3 or point.z < -15.3
-		var asset := "bush" if edge and i % 4 == 0 else "daisy" if i % 7 == 0 else "blue_flower" if i % 11 == 0 else "grass_clump"
-		var scale_value := scene._rng.randf_range(.55, .90) if asset == "bush" else scene._rng.randf_range(.35, .60)
-		var turn := scene._rng.randf_range(0, TAU)
-		# the old flowers and bushes give way to the wild's own (blue flowers and mint bushes read as resources, 不知火舞)
-		if asset != "grass_clump": continue
-		layers[asset].append(Transform3D(Basis(Vector3.UP, turn).scaled(Vector3.ONE * scale_value), point))
-	for asset in layers: scene.add_child(Art.batch(asset, layers[asset], false))
 	scene.add_child(PondWildProps.build(entry, spec, clear, trees, in_key))
 	var painted := scene.find_child("PaintedGround", true, false) as MeshInstance3D
 	if painted:   # the ground darkens a little under the plants' feet, now that they are placed
