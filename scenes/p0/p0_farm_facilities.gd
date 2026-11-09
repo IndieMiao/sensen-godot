@@ -35,6 +35,9 @@ var _art := {}                  # facility id → Node3D
 var _sig := ""
 ## Placement in progress: {recipe, facility (Move), plot (the spot shown), ok}; empty when not placing.
 var placing := {}
+## Called once the placement ends, however it ends (Decorate on the Kitchen Wing's held cells again after the Compost
+## Bin's Move from there, q(303) ④); cleared as it is called.
+var after_end := Callable()
 var _preview: Node3D
 var _cells: Array = []          # preview / highlight squares, reused
 var _overlay: Array = []        # Coverage Overlay outlines, reused
@@ -432,6 +435,8 @@ func _begin(p: Dictionary) -> void:
 	if is_block(str(p.kind)) and not has_open_block(v, str(p.kind)): rt.ui.toast("More plots open as your Homestead grows")
 
 ## A yard facility: the preview starts on the free cell nearest the workbench (a moved one: nearest where it stands).
+## No free cell in the yard: Info `Store one to place this` (不知火舞 450 v1.2 ⑩) — a piece stored makes room.
+const STORE_ONE := "Store one to place this"
 func _begin_yard(v: Dictionary) -> void:
 	var from := P0Decor.NONE
 	var span := 0
@@ -441,6 +446,7 @@ func _begin_yard(v: Dictionary) -> void:
 		span = 1
 	placing.plot = -1
 	placing.cell = nearest_yard_cell(v, from, int(placing.facility), span)
+	if placing.cell == P0Decor.NONE: rt.ui.toast(STORE_ONE)   # a full yard: nowhere it may go (q(303) ⑩)
 	_preview = _bin_art()
 	_preview.name = "PlacementPreview"
 	farm.add_child(_preview)
@@ -594,6 +600,10 @@ func _end(taken: Array = []) -> void:
 	_preview = null
 	_paint([], [], false)
 	rt.ui.end_placement()
+	if after_end.is_valid():
+		var then := after_end
+		after_end = Callable()
+		then.call_deferred()
 
 # ---------------------------------------------------------------- squares on beds
 ## centre: the spot's bed (red when bad); cover: light blue beds round it.

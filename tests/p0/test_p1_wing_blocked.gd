@@ -104,3 +104,125 @@ func test_decorate_is_a_farm_target() -> void:
 	assert_bool(P0Ui.home_target(P0Logic.DECORATE_GO)).is_true()
 	assert_str(P0Ui.show_label(P0Logic.DECORATE_GO, "home", true)).is_equal("Show")
 	assert_str(P0Ui.show_label(P0Logic.DECORATE_GO, "map", true)).is_equal("Show")
+
+# ---------------------------------------------------------------- the screens (frames B1, B5, B6)
+const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
+const Looks = preload("res://scenes/p0/p0_looks.gd")
+const Fence = preload("res://scenes/p0/p0_fence.gd")
+const FarmProps = preload("res://modules/farm/farm_props.gd")
+const FarmArt = preload("res://modules/farm/farm_art.gd")
+const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
+
+func _ui(v: Dictionary) -> P0Ui:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	add_child(ui)
+	ui.set_view(v)
+	return ui
+
+## B1: the grey key says `Space taken`; a tap is an Error `Space taken · clear it first` with Decorate ›, which goes
+## into Decorate on the held cells (P0Farm.p0_show_spot) — out of the farmhouse first when there.
+func test_home1s_grey_key_offers_decorate() -> void:
+	var v := _lv7()
+	v.homestead.next.blocked = _held()
+	var ui := _ui(v)
+	ui.space = "home"
+	HomePanel.open(ui)
+	var button: UiCommandButton = ui.find_children("*", "UiCommandButton", true, false)[0]
+	assert_str(button.reason).is_equal("Space taken")
+	button.unavailable_pressed.emit(button.reason)
+	assert_str(ui.toast_text().replace("\n", " ").replace(" · ", " ")).is_equal("Space taken clear it first")   # its lines: the frame's width
+	var went: Array = []
+	ui.show_spot.connect(func(w): went.append(w))
+	ui._on_toast_action(P0Ui.DECORATE_ACTION)
+	assert_array(went).is_equal([P0Logic.DECORATE_GO])
+	assert_str(ui.modal_kind).is_empty()   # HOME-1 closed
+	ui.space = "pond"   # nowhere else to decorate
+	ui._on_toast_action(P0Ui.DECORATE_ACTION)
+	assert_int(went.size()).is_equal(1)
+
+## The server's homestead_blocked (a view not caught up): the same words, and its detail kept for Decorate's marks.
+func test_a_blocked_upgrade_says_it_and_keeps_what_holds_the_cells() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.view = _lv7()
+	rt._on_refused("homestead_blocked", _held(), {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text().replace("\n", " ").replace(" · ", " ")).is_equal("Space taken clear it first")
+	assert_array(P0Decor.held_cells(rt.held_detail)).is_equal([Vector2i(7, 16), Vector2i(6, 18)])
+
+func _farm_looks() -> Array:
+	var bp := P0Garden.blueprint()
+	var house := FarmProps.build("house", bp.cell_to_world(P0Garden.ANCHORS.house), 1.0, "cottage")
+	add_child(auto_free(house))
+	var fence: Node3D = auto_free(Fence.new())
+	add_child(fence)
+	fence.build(bp)
+	var looks: Node3D = auto_free(Looks.new())
+	add_child(looks)
+	looks.build(bp, house, "cottage", fence)
+	return [looks, house]
+
+static func _looks_view(level: int) -> Dictionary:
+	var rows: Array = []
+	for l in P0Logic.look_stages():
+		rows.append({"id": l.id, "level": l.level, "name": l.name, "a": l.a, "b": l.b, "look": "a" if level >= int(l.level) else null})
+	return {"homestead": {"level": level, "looks": rows, "next": null}}
+
+## B5 / B6: a save past Lv8 with the wing's cells held shows no wing, old or new, and the old house; cleared between two
+## views, the wing pops in and says `Lv8 look · Kitchen Wing`; a save that opens already clear says nothing.
+func test_a_held_wing_is_not_drawn_until_its_cells_clear() -> void:
+	var made := _farm_looks()
+	var looks: Node3D = made[0]
+	var said: Array = []
+	looks.wing_cleared.connect(func(stage): said.append("Lv%d look · %s" % [int(stage.level), str(stage.name)]))
+	var v := _looks_view(9)
+	v.homestead.wing_blocked = _held()
+	looks.sync(v)
+	assert_str(looks.shown("kitchen_extension")).is_empty()
+	assert_array(looks.parts("kitchen_extension")).is_empty()
+	assert_bool(looks.waits()).is_true()
+	assert_bool(looks.wing_model_shown()).is_false()
+	v.homestead.erase("wing_blocked")
+	looks.sync(v)
+	assert_str(looks.shown("kitchen_extension")).is_equal("a")
+	assert_array(said).is_equal(["Lv8 look · Kitchen Wing"])
+	assert_bool(looks.waits()).is_equal(P0Garden.WING_WAITS)
+	var fresh: Node3D = _farm_looks()[0]   # a launch on a save already clear: no toast
+	var quiet: Array = []
+	fresh.wing_cleared.connect(func(s): quiet.append(s))
+	fresh.sync(v)
+	assert_array(quiet).is_empty()
+	var lv15: Array = _farm_looks()   # the Master Farmhouse: the old house while held
+	var house: MeshInstance3D = lv15[1]
+	var w15 := _looks_view(15)
+	w15.homestead.wing_blocked = _held()
+	(lv15[0] as Node3D).sync(w15)
+	assert_object(house.mesh).is_same(FarmArt.mesh_for(P0Garden.look_house("a", "cottage", true)))
+	assert_array((lv15[0] as Node3D).parts("kitchen_extension")).is_empty()
+
+## The grass, flowers and the bush on the wing's cells and (6, 17) are their own draw, hidden while the wing's model
+## stands there; every other point of the dressing is where it was (the scatter's draws unchanged).
+func test_the_dressing_on_the_wings_cells_hides_with_the_wing() -> void:
+	var bp := P0Garden.blueprint()
+	var scenery: Node3D = auto_free(GardenScenery.new())
+	add_child(scenery)
+	scenery.build(bp, "cottage")
+	var dress: Node3D = scenery.find_child("WingDressing", false, false)
+	var cells := GardenScenery.wing_dress_cells()
+	var inside := 0
+	for mm in dress.get_children():
+		var m := (mm as MultiMeshInstance3D).multimesh
+		for i in m.instance_count:
+			assert_bool(cells.has(bp.world_to_cell(m.get_instance_transform(i).origin))).is_true()
+			inside += 1
+	assert_int(inside).is_greater(0)   # the bush at (6, 17) at least
+	for mm in scenery.get_children():
+		if not mm is MultiMeshInstance3D: continue
+		var m := (mm as MultiMeshInstance3D).multimesh
+		if str(mm.name) in ["TreeN0", "Tree0", "SteppingStone"]: continue
+		for i in m.instance_count:
+			assert_bool(cells.has(bp.world_to_cell(m.get_instance_transform(i).origin))).override_failure_message(str(mm.name)).is_false()
+	scenery.show_wing(true)
+	assert_bool(dress.visible).is_false()
+	scenery.show_wing(false)
+	assert_bool(dress.visible).is_true()

@@ -1155,6 +1155,10 @@ static func wrong_city_line(view: Dictionary, request: String, city: String) -> 
 	var name := str(P0Clusters.get_cluster(city).get("name", "")) if city != "" else ""
 	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
 
+## The last homestead_blocked refusal's {cells, pieces, facilities} (q(303)): Decorate › marks them until the view
+## says what holds the Kitchen Wing's cells itself; taken by the farm as it opens Decorate.
+var held_detail := {}
+
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "mine_drink":
 		if code == "potion_cooldown":
@@ -1248,6 +1252,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast_error("Rest used today")
+		"homestead_blocked":
+			# q(303) ⑤ (SGODOT-450): the Kitchen Wing's cells held — HOME-1's words and Decorate › on them, the refusal's own
+			# {cells, pieces, facilities} marked in case the view has not caught up (held_detail, P0Farm)
+			held_detail = detail
+			ui.toast_error(P0Logic.HOME_BLOCKED_TAP, P0Ui.DECORATE_ACTION)
 		"not_home":
 			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
 			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")

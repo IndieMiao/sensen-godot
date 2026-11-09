@@ -203,19 +203,21 @@ const WING_WAITS := true
 ## house_look: the Master Farmhouse's look, when it is up — while WING_WAITS the Timber Porch in front of the old barn
 ## is the old one, two railings by the door (上官婉儿 448: the new porch's tiles cut across the barn's red roof and its
 ## door; 赵云 makes it a door canopy, then it is seen again).
-static func look_parts(bp: FarmBlueprint, stage: String, look: String, house_look := "") -> Array:
+## waits: the old wing and house for this farm — WING_WAITS, or a save past Lv8 whose wing's cells are held (q(303)
+## ⑨, homestead.wing_blocked: P0Looks shows no wing then, and the old house).
+static func look_parts(bp: FarmBlueprint, stage: String, look: String, house_look := "", waits := WING_WAITS) -> Array:
 	if look not in ["a", "b"]: return []
 	var house := bp.cell_to_world(ANCHORS.house)
 	match stage:
 		"porch":
-			if WING_WAITS and look == "a" and house_look == "a":
+			if waits and look == "a" and house_look == "a":
 				var porch_z := house.z + HOUSE_FRONT + 0.35
 				var rail := Vector3(0.55, 1, 1)
 				return [{"asset": "fence", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": rail},
 					{"asset": "fence", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": rail}]
 			return [{"asset": "porch_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
 		"kitchen_extension":
-			if not WING_WAITS:
+			if not waits:
 				return [{"asset": "kitchen_wing_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
 			var wing := Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75)
 			if look == "a":   # Timber Kitchen Wing: a wooden lean-to on the left
@@ -231,15 +233,15 @@ static func look_parts(bp: FarmBlueprint, stage: String, look: String, house_loo
 ## Master Farmhouse (Lv15, v4q(1)): 刘备's master_farmhouse_a (Timber Lodge) / _b (Stone Manor) (#854, in farm-dev by
 ## #875), the whole house with its porch and wing in one, origin at the house anchor as the house's own; while
 ## WING_WAITS the old house_barn / house_dome. Before it the farm's own style.
-static func look_house(look: String, style := "cottage") -> String:
+static func look_house(look: String, style := "cottage", waits := WING_WAITS) -> String:
 	if look in ["a", "b"]:
-		if WING_WAITS: return "house_barn" if look == "a" else "house_dome"
+		if waits: return "house_barn" if look == "a" else "house_dome"
 		return "master_farmhouse_" + look
 	return "house_" + style
 
 ## Whether the house shown for this Master Farmhouse look has the porch and wing in it (the standalone ones put away).
-static func whole_house(look: String) -> bool:
-	return look in ["a", "b"] and not WING_WAITS
+static func whole_house(look: String, waits := WING_WAITS) -> bool:
+	return look in ["a", "b"] and not waits
 
 ## The door's way out to the yard (the first of decor.yard.paths): no look stands on it.
 const DOOR_PATH := Rect2i(8, 13, 3, 2)
