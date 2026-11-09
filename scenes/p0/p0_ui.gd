@@ -3111,7 +3111,7 @@ func _show_today_row(i: int) -> void:
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button. In an outpost, a
 ## target at that very outpost (`outpost:<its id>`, a resident's request handed in there; q(204) ⑨: Ivo's in his Mine
 ## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign", "decorate"]   # decorate: q(303), into Decorate at the wing
 
 ## A target on the homestead: the fixed ones and the Homestead sign (q(255)). The mine mouth left the farm in 355 b1,
 ## the gathering spots with v4q(4) ①.
