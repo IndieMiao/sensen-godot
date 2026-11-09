@@ -411,6 +411,7 @@ func test_p0_pieced_lines_read_whole_under_chinese() -> void:
 ## 0.2.23 (不知火舞 385 fd216262): a Nearby row's name and ` · state` are measured as they show — 「费尔菲尔德」 was cut at
 ## Fairfield's English width and the gap before 「· 加州」 followed the English.
 const CityRowScript := preload("res://scenes/p0/panels/p0_city_row.gd")
+const HomePinScript := preload("res://modules/p0/p0_home_pin.gd")
 func test_p0_a_city_rows_name_is_measured_in_chinese() -> void:
 	var t: Translation = LocalizationScript.P0Translation.new()
 	t.locale = "zh_CN"
@@ -504,3 +505,28 @@ func test_p0_lines_with_a_to_are_not_read_as_a_distance() -> void:
 	assert_str(zh.call("Fishing Lv3 · 40 XP to go")).is_equal("钓鱼 Lv3 · 还差 40 经验")
 	# what the two were for, the home pin's distance to a pond, reads as it did
 	assert_str(zh.call("San Francisco · 0.8 km to Fern Pond")).is_equal("旧金山 · 距 Fern 塘 0.8 km")
+
+## The home pin's two lines keep ` km` in their own words (P0HomePin.km_figure), so 中文's `%s km to %s · %s` /
+## `%s · %s km to %s` take only a distance: a bare `%s to %s` took any line with a ` to ` joined by ` · ` (周瑜 on #907,
+## SGODOT-450). The pin card's side reads by its own eight lines (李白: 「X 侧」), no bare `west` key for other lines.
+func test_p0_the_home_pins_distance_lines_take_only_a_distance() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t._get_message(s, &""))
+	var pond := {"name": "Fern Pond", "at": Vector2(37.76, -122.44)}
+	var west := Vector2(37.76, -122.44909)   # 0.8 km west of the pond (test_p1_home_pin's W08)
+	var card: String = HomePinScript.card_line(west, pond)
+	assert_str(card).is_equal("0.8 km to Fern Pond · west")
+	assert_str(zh.call(card)).is_equal("距 Fern 塘 0.8 km · 西侧")
+	var confirm: String = HomePinScript.confirm_line("San Francisco", west, pond)
+	assert_str(confirm).is_equal("San Francisco · 0.8 km to Fern Pond")
+	assert_str(zh.call(confirm)).is_equal("旧金山 · 距 Fern 塘 0.8 km")
+	assert_str(zh.call("8,269 km to Fern Pond · northeast")).is_equal("距 Fern 塘 8,269 km · 东北侧")
+	assert_str(zh.call("11 km to Fern Pond · north")).is_equal("距 Fern 塘 11 km · 北侧")
+	# a line with a ` to ` joined by ` · ` reads part by part now, its halves as the table has them
+	assert_str(zh.call("Carrot · Back to map")).is_equal("%s · %s" % [zh.call("Carrot"), zh.call("Back to map")])
+	assert_str(zh.call("Back to map · Carrot")).is_equal("%s · %s" % [zh.call("Back to map"), zh.call("Carrot")])
+	assert_str(zh.call("Carrot · Tap to skip")).is_equal("%s · %s" % [zh.call("Carrot"), zh.call("Tap to skip")])
+	assert_str(zh.call("Back to map · Carrot")).not_contains("距")
+	# no bare side word in the table: elsewhere `west` stays as it is
+	assert_str(zh.call("west")).is_empty()
