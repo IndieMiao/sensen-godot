@@ -200,11 +200,20 @@ const WING_WAITS := true
 ## farm-dev by #875), each one model with its origin at the house anchor (P0Garden.ANCHORS.house, +Z toward the camera),
 ## put there as it is — the porch at the door, the wing on the house's left. Their colour is in the vertex colours
 ## (FarmArt.instance's material). While WING_WAITS the wing is the old one: a lean-to (a) or a stone room (b).
-static func look_parts(bp: FarmBlueprint, stage: String, look: String) -> Array:
+## house_look: the Master Farmhouse's look, when it is up — while WING_WAITS the Timber Porch in front of the old barn
+## is the old one, two railings by the door (上官婉儿 448: the new porch's tiles cut across the barn's red roof and its
+## door; 赵云 makes it a door canopy, then it is seen again).
+static func look_parts(bp: FarmBlueprint, stage: String, look: String, house_look := "") -> Array:
 	if look not in ["a", "b"]: return []
 	var house := bp.cell_to_world(ANCHORS.house)
 	match stage:
-		"porch": return [{"asset": "porch_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
+		"porch":
+			if WING_WAITS and look == "a" and house_look == "a":
+				var porch_z := house.z + HOUSE_FRONT + 0.35
+				var rail := Vector3(0.55, 1, 1)
+				return [{"asset": "fence", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": rail},
+					{"asset": "fence", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": rail}]
+			return [{"asset": "porch_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]
 		"kitchen_extension":
 			if not WING_WAITS:
 				return [{"asset": "kitchen_wing_" + look, "pos": house, "yaw": 0.0, "scale": Vector3.ONE}]

@@ -59,7 +59,10 @@ func sync(view: Dictionary) -> void:
 		if want == _shown.get(stage, ""): continue
 		_shown[stage] = want
 		changed = true
-		if stage == HOUSE_STAGE: _set_house(want, _seen)
+		if stage == HOUSE_STAGE:
+			_set_house(want, _seen)
+			# the porch that goes with this house (P0Garden.look_parts: the old barn keeps the old Timber Porch)
+			if _parts.has("porch"): _set_parts("porch", shown("porch"), _seen)
 		else: _set_parts(stage, want, _seen)
 	# the Master Farmhouse has the porch and the wing in it: the standalone ones stand down while it is up
 	var whole := P0Garden.whole_house(shown(HOUSE_STAGE))
@@ -77,7 +80,7 @@ func _block(whole: bool) -> void:
 	if whole: models.append(P0Garden.look_house(shown(HOUSE_STAGE)))
 	else:
 		for stage in STAGES:
-			for p in P0Garden.look_parts(_bp, stage, shown(stage)):
+			for p in P0Garden.look_parts(_bp, stage, shown(stage), shown(HOUSE_STAGE)):
 				var model := str(p.asset)
 				if model.begins_with("porch_") or model.begins_with("kitchen_wing_"): models.append(model)
 	var now: Array[Vector2i] = []
@@ -101,7 +104,7 @@ func _set_parts(stage: String, look: String, animate: bool) -> void:
 	root.name = "Look_%s_%s" % [stage, look]
 	add_child(root)
 	_parts[stage] = root
-	for p in P0Garden.look_parts(_bp, stage, look):
+	for p in P0Garden.look_parts(_bp, stage, look, shown(HOUSE_STAGE)):
 		var m := FarmArt.instance(str(p.asset))
 		m.transform = Transform3D(Basis(Vector3.UP, float(p.yaw)) * Basis.from_scale(p.scale), p.pos)
 		root.add_child(m)

@@ -240,3 +240,26 @@ func test_a_shown_model_stands_on_its_cells() -> void:
 	looks.sync(_view(2))   # no looks: every cell walkable again
 	assert_array(looks.solid_cells()).is_empty()
 	for c in held: assert_bool(looks.grid._blocked(c)).override_failure_message(str(c)).is_false()
+
+## 上官婉儿 448: while WING_WAITS the old barn (Lv15 a) keeps the old Timber Porch — two railings — not the new one,
+## whose tiles cut across its red roof and door; the Stone Manor keeps the new stone porch.
+func test_the_old_barn_keeps_the_old_timber_porch() -> void:
+	var bp := P0Garden.blueprint()
+	var barn := P0Garden.look_parts(bp, "porch", "a", "a").map(func(p): return p.asset)
+	assert_array(barn).is_equal(["fence", "fence"] if P0Garden.WING_WAITS else ["porch_a"])
+	assert_array(P0Garden.look_parts(bp, "porch", "a", "b").map(func(p): return p.asset)).is_equal(["porch_a"])
+	assert_array(P0Garden.look_parts(bp, "porch", "b", "a").map(func(p): return p.asset)).is_equal(["porch_b"])
+	var house := FarmProps.build("house", bp.cell_to_world(P0Garden.ANCHORS.house), 1.0, "cottage")
+	add_child(auto_free(house))
+	var fence: Node3D = auto_free(Fence.new())
+	add_child(fence)
+	fence.build(bp)
+	var looks: Node3D = auto_free(Looks.new())
+	add_child(looks)
+	looks.build(bp, house, "cottage", fence)
+	looks.grid = BlueprintGrid.new(bp)
+	looks.sync(_view(8))
+	assert_int(looks.parts("porch").size()).is_equal(1)   # the new Timber Porch
+	looks.sync(_view(15))   # the Master Farmhouse comes: the porch follows its house
+	assert_int(looks.parts("porch").size()).is_equal(2 if P0Garden.WING_WAITS else 1)
+	if P0Garden.WING_WAITS: assert_array(looks.solid_cells()).is_empty()   # railings, as before: nothing new held
