@@ -40,7 +40,7 @@ const CACHE_MAX := 4   # a rebuild and the last few ponds reuse it; the memory s
 ## sun stays as it is for them). This ground takes only GLES_SUN_K of the sun there — in its ambient-only 99 the sun's
 ## share 160 − 99 = sRGB 61 → linear 0.0467 against the 131 → 0.227 it adds now — and its shadows no cool cast (it
 ## swells to ~+30 levels on that pass). The other renderers keep LOOK as it is.
-const GLES_SUN_K := 0.206
+const GLES_SUN_K := 0.19   # 0.206 by the derivation; one step down so the sand too comes within ±16 (周瑜 on #920)
 static func look_for(method: String) -> Dictionary:
 	if method != "gl_compatibility": return LOOK
 	var look := LOOK.duplicate()

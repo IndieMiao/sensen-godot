@@ -228,7 +228,14 @@ void light() {
     float fd90 = 0.5 + 2.0 * ROUGHNESS * lh * lh;
     float diffuse = (1.0 + (fd90 - 1.0) * pow(1.0 - nl, 5.0))
                   * (1.0 + (fd90 - 1.0) * pow(1.0 - nv, 5.0));
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+    // gl_compatibility draws a shadowed sun as a pass of its own on top of the sRGB-encoded ambient (周瑜 on 422
+    // 43fdd5fe), so the water burned light there; it takes the same share of the sun as the wild ground there
+    // (PondWildGround.GLES_SUN_K). The other renderers: as before, to the pixel.
+    DIFFUSE_LIGHT += LIGHT_COLOR * ATTENUATION * nl * diffuse / PI * 0.19;
+#else
     DIFFUSE_LIGHT += LIGHT_COLOR * ATTENUATION * nl * diffuse / PI;
+#endif
     // Josh routes the stylized glints to emission. Here the same kind of mask
     // is light- and view-gated, retaining the user's requirement that real
     // light intensity, direction and shadowing affect the highlights.
