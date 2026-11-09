@@ -114,6 +114,10 @@ func _ready() -> void:
 		push_error("P0 pond: unknown pond id")
 		return
 	site_spec = SystemPonds.site(entry)
+	# the wild's painted ground is heavy per pixel under gl_compatibility (#917, 李元芳 / 周瑜: Fern's opening 13 → 27 ms):
+	# the 3D drawn at 0.8 there while in the pond, the UI at full size; put back on leaving (Vulkan / Mobile untouched)
+	var scale_3d := pond_scale_3d(RenderingServer.get_current_rendering_method())
+	if scale_3d > 0.0: _scale_3d_was = set_scale_3d(get_viewport(), scale_3d)
 	site = site_for(str(entry.get("template_id", "")))
 	get_viewport().transparent_bg = false
 	add_child((load("res://modules/ui/opaque_scene_layer.tscn") as PackedScene).instantiate())
@@ -182,7 +186,20 @@ func _ready() -> void:
 	add_child(crowd)   # pond metres: the scene's own, no room offset
 	_go_online(rt.session)
 
+const GLES_SCALE_3D := 0.8
+var _scale_3d_was := -1.0   # the viewport's 3D scale before the pond set it, < 0: not set
+## The 3D render scale the pond uses under a rendering method, < 0: leave it as it is.
+static func pond_scale_3d(method: String) -> float: return GLES_SCALE_3D if method == "gl_compatibility" else -1.0
+## Sets a viewport's 3D render scale, returning the one it had.
+static func set_scale_3d(vp: Viewport, scale: float) -> float:
+	var was := vp.scaling_3d_scale
+	vp.scaling_3d_scale = scale
+	return was
+
 func _exit_tree() -> void:
+	if _scale_3d_was >= 0.0:   # no other screen keeps the pond's 0.8
+		set_scale_3d(get_viewport(), _scale_3d_was)
+		_scale_3d_was = -1.0
 	if online: online.stop()
 	_end_fishing()
 	if is_instance_valid(_trap_card): _trap_card.queue_free()

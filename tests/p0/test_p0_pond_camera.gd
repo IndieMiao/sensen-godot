@@ -201,3 +201,19 @@ func _band_corners(cam: Camera3D) -> Array:
 		var p := o + d * (-o.y / d.y)
 		out.append(Vector2(p.x, p.z))
 	return out
+
+## #917 (李元芳 / 周瑜: the wild's ground heavy per pixel on GLES): only under gl_compatibility the pond draws its 3D at
+## 0.8; the scale it found is put back on leaving.
+func test_on_gles_the_pond_draws_its_3d_at_0_8_and_gives_the_scale_back() -> void:
+	assert_float(P0Pond.pond_scale_3d("gl_compatibility")).is_equal(P0Pond.GLES_SCALE_3D)
+	assert_float(P0Pond.GLES_SCALE_3D).is_equal(0.8)
+	for method in ["forward_plus", "mobile", "dummy"]:
+		assert_bool(P0Pond.pond_scale_3d(method) < 0.0).override_failure_message(method).is_true()
+	var vp := SubViewport.new()
+	add_child(vp)
+	vp.scaling_3d_scale = 1.0
+	var was := P0Pond.set_scale_3d(vp, P0Pond.pond_scale_3d("gl_compatibility"))
+	assert_float(vp.scaling_3d_scale).is_equal_approx(0.8, 0.001)
+	P0Pond.set_scale_3d(vp, was)
+	assert_float(vp.scaling_3d_scale).is_equal_approx(1.0, 0.001)
+	vp.queue_free()
