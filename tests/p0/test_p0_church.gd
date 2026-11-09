@@ -284,16 +284,24 @@ func test_one_seat_in_each_pews_middle() -> void:
 		# walked to from the aisle end of its pew (the layout's approach), not the floor nearest the middle
 		var appr: Array = r.anchor_data(n).approach
 		var want: Vector3 = (r.anchor(n).get_parent() as Node3D).to_global(Vector3(float(appr[0]), float(appr[1]), float(appr[2])))
-		assert_vector(r._walk_point(n, r.anchor(n))).override_failure_message(n).is_equal_approx(want, Vector3.ONE * 0.001)
+		assert_float(P0Room._flat_distance(r._walk_point(n, r.anchor(n)), want)).override_failure_message(n).is_less(0.2)   # on the floor by it
 		assert_bool(r._may_overlap(n)).is_true()
 	# from the aisle the slide to the middle takes longer than the 0.3 s onto a stool
 	r.actor.teleport(r._walk_point("seat_left_2", r.anchor("seat_left_2")))
 	r._sit_down("seat_left_2")
 	assert_float(float(r._glide.dur)).is_greater(r.SIT_GLIDE_S)
 	assert_float(float(r._glide.dur)).is_equal_approx(P0Room._flat_distance(r._glide.from, r._glide.to) / r.SIT_SLIDE_MPS, 0.01)
-	var tea := _room("sh_tea_1")   # elsewhere seats are walked to as before and spread as before
+	r._glide = {}
+	r._stand_up()   # getting up: no seat prompts while sliding out, back once on the aisle (不知火舞 on #925)
+	assert_dict(r._marker("seat_left_1", {})).is_empty()
+	for i in 60: r.p0_frame({}, 1.0 / 30.0)
+	assert_str(str(r._marker("seat_left_1", {}).get("kind", ""))).is_equal("seat")
+	var tea := _room("sh_tea_1")   # elsewhere seats are walked to, slid onto and spread as before
 	await get_tree().process_frame
 	assert_bool(tea._may_overlap("seat_table1_1")).is_false()
+	tea.actor.teleport(tea.anchor("seat_table1_1").global_position + Vector3(2, 0, 0))
+	tea._sit_down("seat_table1_1")
+	assert_float(float(tea._glide.dur)).is_equal(tea.SIT_GLIDE_S)
 
 ## spread's ①: buttons that may overlap stay on each other; the door and any other button still push them off.
 func test_pew_icons_overlap_but_keep_off_the_door() -> void:

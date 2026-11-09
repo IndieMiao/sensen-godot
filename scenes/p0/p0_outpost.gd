@@ -330,7 +330,9 @@ func _pews() -> bool: return PEW_KITS.has(str(outpost.get("art", "")))
 func _walk_point(n: String, target: Node3D) -> Vector3:
 	var appr = anchor_data(n).get("approach", null)
 	if _pews() and appr is Array and (appr as Array).size() == 3 and _lone_seats().has(n):
-		return (target.get_parent() as Node3D).to_global(Vector3(float(appr[0]), float(appr[1]), float(appr[2])))
+		var at := (target.get_parent() as Node3D).to_global(Vector3(float(appr[0]), float(appr[1]), float(appr[2])))
+		var floor_at := reachable(at)   # the floor the door reaches (a layout moved: never slide on from afar, 周瑜)
+		return floor_at if floor_at != Vector3.INF else super(n, target)
 	return super(n, target)
 
 func _may_overlap(n: String) -> bool: return _pews() and _lone_seats().has(n)
@@ -339,6 +341,10 @@ func _may_overlap(n: String) -> bool: return _pews() and _lone_seats().has(n)
 func _near_point(n: String) -> Vector3:
 	if _pews() and _lone_seats().has(n) and anchor(n): return _walk_point(n, anchor(n))
 	return super(n)
+
+## Standing, and done getting up: the seat prompts come back once the player is out of the pew (不知火舞 on #925: as
+## they go the moment one sits, not while one still slides out past them).
+func _on_feet() -> bool: return seat == "" and _standing.is_empty()
 
 ## A seat's anchor, or for an older client's seat q(304) took off, its pew's own.
 func _seat_anchor(s: String) -> Marker3D:
@@ -522,9 +528,9 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD), talking = talking,
 			badge = mark if mark != "" else P0Guide.resident_badge(view, str(npcs[n].id), str(outpost.get("id", "")))}
 	if SEAT_GROUPS.has(n):
-		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
+		return {kind = "seat", icon = P0Logic.icon("seat")} if _on_feet() and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
 	if n.begins_with("seat_") and _lone_seats().has(n):   # a lone seat: its i-seat while it is free and the player stands
-		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(n).is_empty() else {}
+		return {kind = "seat", icon = P0Logic.icon("seat")} if _on_feet() and not _free_seats(n).is_empty() else {}
 	if n == "use_market_board":
 		var open := int(view.get("keepers", {}).get("market", {}).get("board_open", 0))
 		return {kind = "facility", icon = P0Logic.icon("board"), name = "Market Board", badge = P0Guide.target_badge(view, "button", n, "request" if open > 0 else "")}
@@ -581,7 +587,8 @@ func _sit_down(n: String) -> void:
 	_standing = {}
 	actor.lock(true)
 	var to := Vector3(m.global_position.x, seat_root_y(n), m.global_position.z)
-	_glide_to(to, maxf(SIT_GLIDE_S, _flat_distance(actor.position, to) / SIT_SLIDE_MPS))
+	var along := _pews() and _lone_seats().has(n)   # along a pew it takes as long as the slide; elsewhere 0.3 s as ever
+	_glide_to(to, maxf(SIT_GLIDE_S, _flat_distance(actor.position, to) / SIT_SLIDE_MPS) if along else SIT_GLIDE_S)
 	actor.face(actor.position + yaw_dir(float(anchor_data(n).get("yaw_degrees", 0))))
 	_play_seated(actor.rig, true)
 
