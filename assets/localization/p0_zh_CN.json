@@ -2701,8 +2701,8 @@
  "Nob Hill is steep. You've earned the quiet in here.": "Nob Hill 的坡很陡，进来安静一会儿吧。",
  "Twin Catch": "双倍渔获",
  "Swift Growth": "加速生长",
- "%s · %d min · every fish lands ×2": "%s · %d 分钟 · 每条鱼都 ×2",
- "%s · %d min · crops sown now grow 2× faster": "%s · %d 分钟 · 现在种下的作物长得快一倍",
+ "%s · %d min · every fish lands ×2": "%s · %d 分钟 · \n每条鱼都 ×2",
+ "%s · %d min · crops sown now grow 2× faster": "%s · %d 分钟 · \n现在种下的作物长得快一倍",
  "%s has worn off": "%s结束了",
  "Pray": "祈祷",
  "%s · back to 20 min": "%s · 重新计时 20 分钟",
@@ -2713,5 +2713,6 @@
  "%d new · %d to do": "新 %d · 待办 %d",
  "%d XP to go · %s": "还差 %d 经验 · %s",
  "Space taken · clear it first": "位置已被占用 · 先清空",
- "Homestead Lv%d · Space taken": "家园 Lv%d · 位置已被占用"
+ "Homestead Lv%d · Space taken": "家园 Lv%d · 位置已被占用",
+ "+%d %s": "+%d %s"
 }
