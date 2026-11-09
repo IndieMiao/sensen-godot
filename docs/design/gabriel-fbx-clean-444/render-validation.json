@@ -1,0 +1,62 @@
+{
+	"captures": [
+		{
+			"camera_size": 2.01999998092651,
+			"camera_transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.999783, -0.020829), Z: (0.0, 0.020829, 0.999783), O: (0.0, 0.93, 2.4)]",
+			"file": "before-full.png",
+			"fresh_imported_mesh_skin_used": true,
+			"pose": "idle@0",
+			"rig_rotation": "(0.0, 0.0, 0.0)",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera_size": 0.579999983310699,
+			"camera_transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.998752, -0.049938), Z: (0.0, 0.049938, 0.998752), O: (0.0, 0.3, 2.4)]",
+			"file": "before-feet.png",
+			"fresh_imported_mesh_skin_used": true,
+			"pose": "idle@0",
+			"rig_rotation": "(0.0, 45.0, 0.0)",
+			"size": [
+				360,
+				320
+			]
+		},
+		{
+			"camera_size": 2.01999998092651,
+			"camera_transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.999783, -0.020829), Z: (0.0, 0.020829, 0.999783), O: (0.0, 0.93, 2.4)]",
+			"file": "after-full.png",
+			"fresh_imported_mesh_skin_used": true,
+			"pose": "idle@0",
+			"rig_rotation": "(0.0, 0.0, 0.0)",
+			"size": [
+				360,
+				800
+			]
+		},
+		{
+			"camera_size": 0.579999983310699,
+			"camera_transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.998752, -0.049938), Z: (0.0, 0.049938, 0.998752), O: (0.0, 0.3, 2.4)]",
+			"file": "after-feet.png",
+			"fresh_imported_mesh_skin_used": true,
+			"pose": "idle@0",
+			"rig_rotation": "(0.0, 45.0, 0.0)",
+			"size": [
+				360,
+				320
+			]
+		}
+	],
+	"engine": "4.7.2-stable (official)",
+	"fresh_mesh_skin_equal_current_runtime_part": true,
+	"gpu": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"renderer": "mobile",
+	"slots": {
+		"cloth": "cloth36_npc_gabriel",
+		"glass": "glass0",
+		"hairHat": "hairhat0_npc_gabriel",
+		"shoes": "shoes3_npc_gabriel"
+	}
+}
