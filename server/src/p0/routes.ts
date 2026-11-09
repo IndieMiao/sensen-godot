@@ -65,7 +65,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   // q(272): the keepers' local requests wear map marks only for a client that shows them (`locals`): an older one would
   // write a keeper's ! as the Market Board's count
   const view = (st: P0State, at: number, headers: Record<string, unknown>) =>
-    viewOf(c, st, at, { online: townOnline(st), locals: features(headers).includes('locals') });
+    viewOf(c, st, at, { online: townOnline(st), locals: features(headers).includes('locals'), wing8: features(headers).includes('wing8') });
 
   app.get('/v1/p0/state', async (req, reply) => {
     const player = playerOf(req.headers);
@@ -158,7 +158,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
     const s = stateOf(player, req.headers);
     const now = clock(s.clock_ms);
-    const result = applyP0(c, s, (req.body ?? {}) as P0Command, now);
+    const result = applyP0(c, s, (req.body ?? {}) as P0Command, now, { wing8: features(req.headers).includes('wing8') });   // q(303)
     if (result.ok) store.put(result.state);   // saved before the log line: the log can never cost a command
     else if (result.code === 'new_day' && result.state) store.put(result.state);
     // Energy before = the stored value with natural recovery up to now, as the command saw it (a refusal: both the same).

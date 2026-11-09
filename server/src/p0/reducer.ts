@@ -95,7 +95,9 @@ export type P0Result =
 
 const fail = (code: string, detail?: Record<string, unknown>): P0Result => ({ ok: false, code, detail });
 
-export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: number): P0Result {
+/** opts.wing8: the client draws Lv8's Kitchen Wing (feature `wing8`, q(303)): its cells are the house's from Lv8 and an
+ * upgrade into it waits until they are clear (SGODOT-450). */
+export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: number, opts: { wing8?: boolean } = {}): P0Result {
   if (cmd.expect_seq !== undefined && cmd.expect_seq !== input.seq) {
     return fail('stale_state', { seq: input.seq, expected: cmd.expect_seq });
   }
@@ -362,13 +364,13 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'place_decor': case 'move_decor': case 'store_decor': {   // Decorate (SGODOT-284): at home only
       if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
-      const refusal = cmd.type === 'place_decor' ? placeDecor(c, s, cmd, events) : cmd.type === 'move_decor' ? moveDecor(c, s, cmd, events)
+      const refusal = cmd.type === 'place_decor' ? placeDecor(c, s, cmd, events, !!opts.wing8) : cmd.type === 'move_decor' ? moveDecor(c, s, cmd, events, !!opts.wing8)
         : storeDecor(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'homestead_upgrade': {
-      const refusal = upgradeHomestead(c, s, now, events);
+      const refusal = upgradeHomestead(c, s, now, events, !!opts.wing8);
       if (refusal) return fail(refusal.code, refusal.detail);
       // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
@@ -386,7 +388,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'place': case 'move_facility': {
-      const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH) : moveFacility(c, s, cmd, now, events, growH);
+      const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH, !!opts.wing8) : moveFacility(c, s, cmd, now, events, growH, !!opts.wing8);
       if (refusal) return fail(refusal.code, refusal.detail);
       openBeds(events);   // a sprinkler on a bed opens the next one (SGODOT-355 b1); a greenhouse or a yard bin opens none
       break;
