@@ -47,6 +47,24 @@ func test_a_failed_load_left_over_from_a_timeout_is_cleared_too() -> void:
 	await get_tree().process_frame
 	DirAccess.remove_absolute(path)
 
+## 0.3.3 h1 (李元芳 on gs66, 11-09): under the Compatibility renderer the threaded loads never finished; there the
+## router loads on the main thread — no threaded request left behind — and a scene that cannot load still gives the card.
+func test_sync_loads_open_without_a_threaded_request_and_still_fail_with_the_card() -> void:
+	var keep := AppRouter.sync_loads
+	AppRouter.sync_loads = true
+	var path := OS.get_user_data_dir().path_join("router_sync_probe.tscn")
+	FileAccess.open(path, FileAccess.WRITE).store_string('[gd_scene format=3]\n\n[node name="X" type="Node"]\n')
+	assert_object(await AppRouter._load_with_feedback(path)).is_not_null()
+	assert_int(ResourceLoader.load_threaded_get_status(path)).is_equal(ResourceLoader.THREAD_LOAD_INVALID_RESOURCE)
+	AppRouter._clear_transition()
+	await get_tree().process_frame
+	assert_object(await AppRouter._load_with_feedback(path.get_basename() + "_missing.tscn")).is_null()
+	assert_bool(AppRouter._loading.close_button.visible).is_true()   # the card's way out
+	AppRouter._clear_transition()
+	for i in 3: await get_tree().process_frame   # the card and its overlay freed
+	AppRouter.sync_loads = keep
+	DirAccess.remove_absolute(path)
+
 func after_test() -> void:
 	while AppRouter.instance_depth() > 0:
 		AppRouter.pop_instance()

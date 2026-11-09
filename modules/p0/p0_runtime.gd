@@ -1481,7 +1481,9 @@ func _open_home_flow(type: String, change_from: String, done: Callable, back := 
 	_home_flow = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, ui.safe_top(), ui.safe_bottom(), change_from)
 	_home_flow.open_map = _open_pick_map
 	_home_flow.close_map = close_pick_map
-	ResourceLoader.load_threaded_request(MAP_SCENE)   # the pin page's map, warm by the time a city is picked (亚瑟)
+	# the pin page's map, warm by the time a city is picked (亚瑟); not under Compatibility, where threaded loads never
+	# finished (0.3.3 h1): _open_pick_map loads it then
+	if not AppRouter.sync_loads: ResourceLoader.load_threaded_request(MAP_SCENE)
 	_home_done = done
 	if back.is_valid(): _home_flow.left.connect(back)
 	_home_flow.chose.connect(func(cluster: String, lat: float, lng: float):

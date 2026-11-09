@@ -24,6 +24,8 @@ var loading_overlay_factory := Callable()
 ## A scene's threaded load: given up after this long, and tried this many times when it fails (not when it is slow).
 const LOAD_TIMEOUT_MS := 30000
 const LOAD_TRIES := 2
+## _load_with_feedback loads on the main thread rather than threaded: under the Compatibility renderer (0.3.3 h1).
+var sync_loads := RenderingServer.get_current_rendering_method() == "gl_compatibility"
 ## 实例栈（PRD §3.2 第二层空间）：地图常驻为底，农场/地点/换装房压在上面。
 var _stack: Array[Node] = []
 
@@ -168,6 +170,18 @@ func _load_with_feedback(scene_path: String, args := {}) -> PackedScene:
 	if _loading == null: _loading = preload("res://modules/ui/loading_overlay.gd").new()
 	add_child(_loading)
 	await _render_frame()
+	# Compatibility (OpenGL ES: a phone or emulator without Vulkan): there 0.3.3's threaded loads never finished — every
+	# place opened from the map or a door gave up after LOAD_TIMEOUT_MS, while push_instance's load opened the same
+	# scenes at once (李元芳 on gs66, 11-09). Loaded on this thread instead, under the overlay already drawn.
+	if sync_loads:
+		var packed := load(scene_path) as PackedScene
+		if packed != null:
+			if _loading.has_method(&"progress"): _loading.call(&"progress", 1.0)
+			return packed
+		push_warning("AppRouter: loading %s failed" % scene_path)
+		_loading.failed()
+		_loading.close_button.pressed.connect(_clear_transition, CONNECT_ONE_SHOT)
+		return null
 	var started := Time.get_ticks_msec()
 	# A load that failed stays in ResourceLoader until load_threaded_get takes it: left there, every later request of the
 	# path fails at once (李元芳 on 0.3.0's farmhouse, 11-06: once, then again 3 s after Go back, until the app restarted).

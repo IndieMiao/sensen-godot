@@ -105,3 +105,17 @@ func test_shared_res_path_per_part_id() -> void:
 
 	# Cleanup
 	DirAccess.remove_absolute(manifest_path)
+
+## 0.3.3 h1: under Compatibility (AppRouter.sync_loads) a part loads on the main thread — no threaded request — and is
+## delivered on the next frame, as a cache hit is.
+func test_sync_loads_deliver_without_a_threaded_request() -> void:
+	var keep := AppRouter.sync_loads
+	AppRouter.sync_loads = true
+	var rid := loader.request_part("fx_cloth_a")
+	assert_int(finished.size()).is_equal(0)   # never in the same call
+	assert_bool(loader._by_path.is_empty()).is_true()
+	await _pump()
+	AppRouter.sync_loads = keep
+	assert_int(finished.size()).is_equal(1)
+	assert_int(finished[0][0]).is_equal(rid)
+	assert_object(finished[0][2]).is_not_null()
