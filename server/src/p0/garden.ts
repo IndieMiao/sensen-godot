@@ -17,7 +17,7 @@ import type { P0Event } from './progress.js';
 import { skillLevel, untilRollover } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
 import { add, count, room, take } from './bag.js';
-import { cellsOf, yardBlock } from './decor.js';
+import { cellsOf, wingUp, yardBlock } from './decor.js';
 import { cropById, quickCrop, fastCrop } from './content.js';
 import { missing, putInStorage, takeStorageFirst } from './storage.js';
 
@@ -161,7 +161,7 @@ export function bedCells(c: P0Content, s: P0State): Set<string> {
 /** What stood where beds were just added (Homestead Lv7's 40–47, q(172)) makes way: a piece goes back to Farm Storage,
  * said as a piece stored (`Wooden Bench · back in Farm Storage`, q(120)); a yard facility (the Compost Bin), which has
  * no storage, moves beside the workbench (`Compost Bin · moved beside the Workbench`, q(172) ③ 甲). */
-export function clearNewBeds(c: P0Content, s: P0State, added: number[], events: P0Event[]): void {
+export function clearNewBeds(c: P0Content, s: P0State, added: number[], events: P0Event[], wing = false): void {
   const cells = new Set(added.map(id => plotYardCell(c, id)).filter(at => at).map(at => `${at![0]},${at![1]}`));
   if (cells.size === 0) return;
   if (s.decor) s.decor.placed = s.decor.placed.filter(p => {
@@ -173,7 +173,7 @@ export function clearNewBeds(c: P0Content, s: P0State, added: number[], events: 
   for (const f of s.facilities ?? []) {
     if (!f.cell || !cells.has(`${f.cell[0]},${f.cell[1]}`)) continue;
     const def = c.facilities.kinds[f.kind];
-    const to = nearestYardCell(c, s, def?.start ?? [17, 16], def?.start_span ?? 0, f.id);
+    const to = nearestYardCell(c, s, def?.start ?? [17, 16], def?.start_span ?? 0, f.id, wing);
     if (!to) continue;   // no free yard cell at all: it stays (never on a real farm)
     f.cell = to;
     events.push({ kind: 'facility', action: 'moved', facility: f.id, facility_kind: f.kind, plot: -1, covered: 0, started: [],
@@ -184,14 +184,15 @@ export function clearNewBeds(c: P0Content, s: P0State, added: number[], events: 
 /** The legal yard cell nearest `from` for a yard facility, as the client's first preview picks it (P0FarmFacilities.
  * nearest_yard_cell): `span` cells either side count as `from` (the workbench's three), beside it first, then in front,
  * behind last. null when none is legal. */
-export function nearestYardCell(c: P0Content, s: P0State, from: [number, number], span: number, facility?: number): [number, number] | null {
+export function nearestYardCell(c: P0Content, s: P0State, from: [number, number], span: number, facility?: number,
+    wing = false): [number, number] | null {
   const walk = (c as P0Content & { decor?: { yard: { walk: [number, number, number, number] } } }).decor?.yard.walk;
   if (!walk) return null;
   let best: [number, number] | null = null, bestD = Infinity;
   for (let y = walk[1]; y < walk[1] + walk[3]; y++) for (let x = walk[0]; x < walk[0] + walk[2]; x++) {
     const dx = Math.max(0, Math.abs(x - from[0]) - span), dy = y - from[1];
     const d = dx * dx + dy * dy + (dy !== 0 ? 0.25 : 0) + (dy > 0 ? 0.5 : 0);
-    if (d >= bestD || yardBlock(c, s, [[x, y]], { x, y }, { facility })) continue;
+    if (d >= bestD || yardBlock(c, s, [[x, y]], { x, y }, { facility }, wing)) continue;
     bestD = d;
     best = [x, y];
   }
@@ -296,14 +297,14 @@ function waterCovered(c: P0Content, s: P0State, now: number, grow: (id: string, 
 /** Build a facility in place (q(22)): on a plot, over a block of plots (greenhouse), or on a yard cell (x, y: the
  * Compost Bin, q(118) ③ — the decor yard's rules, never on the field). */
 export function place(c: P0Content, s: P0State, cmd: { recipe?: unknown; plot?: unknown; x?: unknown; y?: unknown; space?: string }, now: number,
-    events: P0Event[], grow: (id: string, plot: Plot) => number): Refusal | null {
+    events: P0Event[], grow: (id: string, plot: Plot) => number, wing8 = false): Refusal | null {
   if (cmd.space !== undefined && cmd.space !== 'home') return { code: 'not_home' };
   const r = c.workbench.recipes.find(x => x.id === String(cmd.recipe ?? '') && x.to === 'field');
   if (!r || !r.facility || !c.facilities.kinds[r.facility]) return { code: 'bad_recipe' };
   const cell = isYard(c, r.facility) ? yardCell(cmd) : null;
   if (isYard(c, r.facility) && !cell) return { code: 'bad_spot' };
   const block = placeBlock(c, s, r)
-    ?? (cell ? yardBlock(c, s, [cell], { x: cell[0], y: cell[1] }) : spotBlock(c, s, cmd.plot, undefined, r.facility));
+    ?? (cell ? yardBlock(c, s, [cell], { x: cell[0], y: cell[1] }, {}, wingUp(c, s, wing8)) : spotBlock(c, s, cmd.plot, undefined, r.facility));
   if (block) return block;
   for (const [item, qty] of r.cost) { takeStorageFirst(s, item, qty); events.push({ kind: 'item', id: item, delta: -qty }); }
   if (r.coins) { s.coins -= r.coins; events.push({ kind: 'coins', delta: -r.coins }); }
@@ -323,7 +324,7 @@ export function place(c: P0Content, s: P0State, cmd: { recipe?: unknown; plot?: 
 /** Move a facility to another empty plot for free; the old plot is tilled ground again. Crops already growing keep
  * their time (it was locked when they started); sown plots the new spot covers start growing. */
 export function moveFacility(c: P0Content, s: P0State, cmd: { facility?: unknown; plot?: unknown; x?: unknown; y?: unknown; space?: string }, now: number,
-    events: P0Event[], grow: (id: string, plot: Plot) => number): Refusal | null {
+    events: P0Event[], grow: (id: string, plot: Plot) => number, wing8 = false): Refusal | null {
   if (cmd.space !== undefined && cmd.space !== 'home') return { code: 'not_home' };
   const f = (s.facilities ?? []).find(x => x.id === Number(cmd.facility));
   if (!f) return { code: 'bad_facility' };
@@ -331,7 +332,7 @@ export function moveFacility(c: P0Content, s: P0State, cmd: { facility?: unknown
     const cell = yardCell(cmd);
     if (!cell) return { code: 'bad_spot' };
     if (cell[0] === f.cell[0] && cell[1] === f.cell[1]) return { code: 'same_plot' };
-    const block = yardBlock(c, s, [cell], { x: cell[0], y: cell[1] }, { facility: f.id });
+    const block = yardBlock(c, s, [cell], { x: cell[0], y: cell[1] }, { facility: f.id }, wingUp(c, s, wing8));
     if (block) return block;
     f.cell = cell;
     events.push({ kind: 'facility', action: 'moved', facility: f.id, facility_kind: f.kind, plot: -1, x: cell[0], y: cell[1], covered: 0, started: [] });

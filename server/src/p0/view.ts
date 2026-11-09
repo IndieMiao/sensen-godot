@@ -33,7 +33,7 @@ import { trapsView } from './fish_trap.js';
 import { sureBite } from './fishing.js';
 import { homeOf } from './travel.js';
 import { homeFacts } from './home.js';
-import { decorView } from './decor.js';
+import { decorView, wingOf, wingTaken } from './decor.js';
 import { titlesView } from './titles.js';
 import { guideView } from './guide.js';
 import { blackjackView } from './blackjack.js';
@@ -41,7 +41,7 @@ import { isWild, near3Sites, siteFor, wildById, wildNear3 } from './wild.js';
 
 /** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
  * answer; null when not known. */
-export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean } = {}) {
+export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean; wing8?: boolean } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
@@ -121,7 +121,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     first_dig: firstDigView(c, s), pip_line: pipLine(c, s),
     gather: gatherView(c, s, now),
     workbench: workbenchView(c, s),
-    homestead: homesteadView(c, s),
+    homestead: homesteadView(c, s, !!opts.wing8),
     profile: { name: c.profile.name, city: homeFacts(c, s).name, climate: homeFacts(c, s).climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
     titles: titlesView(c, s),   // q(180): {list: title ids in the fixed order, wearing: the one worn or null} (titles.ts)
@@ -318,8 +318,14 @@ function queuedView(s: P0State, stove: Pot | null, queue: Pot | null, now: numbe
 
 /** HOME-1 facts (§8.6.1; v4q(1), 哪吒's A view contract): what the next level needs — each skill, the travel gate from
  * Lv16, materials (storage and bag apart), coins — what it brings, and what is unlocked. */
-function homesteadView(c: P0Content, s: P0State) {
+function homesteadView(c: P0Content, s: P0State, wing8 = false) {
   const next = nextLevel(c, s);
+  // q(303) (SGODOT-450), for a client that draws the wing: what holds its cells — before Lv8 the upgrade's last gap
+  // (next.blocked), from it the reason the wing is not drawn yet (wing_blocked); absent when clear
+  const wing = wingOf(c), taken = wing8 && wing ? wingTaken(c, s) : null;
+  const blocked = taken && next && next.level === wing!.homestead ? taken : null;
+  const wingBlocked = taken && s.homestead.level >= wing!.homestead ? taken : null;
+  const block = upgradeBlock(c, s) ?? (blocked ? { code: 'homestead_blocked', detail: blocked } : null);
   const upgrade = c.bag_upgrades[0];
   const bagTier = (id: string) => s.owned.includes(id) ? 'owned' : unlocked(c, s, id) ? 'for_sale' : 'locked';
   const plotsAt = (level: number) => stepAt(c.homestead.plots, level, c.start.tilled_plots + c.start.wild_plots);
@@ -339,9 +345,11 @@ function homesteadView(c: P0Content, s: P0State) {
       energy_gain: next.energy,                                 // what the upgrade gives back (Lv2–15 50, Lv16 on 0)
       plots: plotsAt(next.level),
       unlocks: next.unlocks,
-      can_upgrade: upgradeBlock(c, s) === null,
-      block: upgradeBlock(c, s),
+      can_upgrade: block === null,
+      block,
+      ...(blocked ? { blocked } : {}),
     },
+    ...(wingBlocked ? { wing_blocked: wingBlocked } : {}),
     unlocks: {
       spice_rack: unlocked(c, s, 'spice_rack'),
       warming_cabinet: unlocked(c, s, 'warming_cabinet'),
