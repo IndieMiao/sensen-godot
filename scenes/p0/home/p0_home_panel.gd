@@ -185,7 +185,9 @@ static func _add_button(ui: P0Ui, col: Control, panel: Control, model: Dictionar
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.activated.connect(func(): ui.command.emit({"type": "homestead_upgrade"}))
 	var tap := str(model.get("tap", ""))   # away from home: `Upgrade at home · Going home is free`, else the gap itself
-	button.unavailable_pressed.connect(func(reason: String): ui.toast(tap if tap != "" else reason))
+	if bool(model.get("blocked", false)):   # q(303): the Kitchen Wing's cells held — `Space taken · clear it first`, Decorate ›
+		button.unavailable_pressed.connect(func(_reason: String): ui.toast_error(tap, P0Ui.DECORATE_ACTION))
+	else: button.unavailable_pressed.connect(func(reason: String): ui.toast(tap if tap != "" else reason))
 	col.add_child(button)
 	panel.set_meta(&"toast_above", button)   # q(16): a toast over the sheet's fixed decision area, 8 above the button
 

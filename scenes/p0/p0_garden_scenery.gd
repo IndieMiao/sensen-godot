@@ -10,6 +10,28 @@ const FarmScenery = preload("res://modules/farm/farm_scenery.gd")
 var field_rect := Rect2()   # world xz rect covering every bed, for scatter exclusion
 var rock_points: Array = []  # scattered rocks; the farm makes their cells solid
 var _sand: Node3D            # the sand under the field
+## The dressing on the Kitchen Wing's cells and the bush beside them (6, 17) (q(303), 后裔): drawn on its own, out of
+## sight while the wing's model stands there (show_wing) — the same points as ever, the random scatter's draws unchanged.
+var _wing_dress: Node3D
+
+static func wing_dress_cells() -> Array: return P0Decor.wing_cells() + [Vector2i(6, 17)]
+
+## The wing's model on its cells (P0Looks.wing_model_shown): its grass, flowers and bush not drawn; gone, back again.
+func show_wing(on: bool) -> void:
+	if _wing_dress and _wing_dress.visible == on: _wing_dress.visible = not on
+
+## [kept, on the wing's cells] of a layer's transforms.
+static func _split(bp: FarmBlueprint, xfs: Array) -> Array:
+	var cells := wing_dress_cells()
+	var kept: Array = []
+	var wing: Array = []
+	for xf in xfs: (wing if cells.has(bp.world_to_cell((xf as Transform3D).origin)) else kept).append(xf)
+	return [kept, wing]
+
+func _add_split(bp: FarmBlueprint, asset: String, xfs: Array, shadows := true) -> void:
+	var parts := _split(bp, xfs)
+	add_child(Art.batch(asset, parts[0], shadows))
+	if not (parts[1] as Array).is_empty(): _wing_dress.add_child(Art.batch(asset, parts[1], shadows))
 
 ## The sand under the beds open now (SGODOT-355 b1: the first `count` of the grid's order), one patch over them and the
 ## walkways between (不知火舞 282 bf7c124b); the beds still to open stay grass.
@@ -21,6 +43,9 @@ func fit_sand(bp: FarmBlueprint, count: int) -> void:
 
 func build(bp: FarmBlueprint, style: String) -> void:
 	name = "GardenScenery"
+	_wing_dress = Node3D.new()
+	_wing_dress.name = "WingDressing"
+	add_child(_wing_dress)
 	field_rect = beds_rect(bp, P0Garden.max_plots())   # the whole grid: kept clear of scatter, stones lead to it
 	# Sandy garden path under the beds, a little wider than the field (the old 9-plot garden used 3.1×).
 	_sand = Art.instance("path_tile", Vector3.ZERO)
@@ -55,7 +80,7 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	for p in [Vector3(house.x - 1.75, 0, house.z - 0.9), Vector3(house.x + 1.85, 0, house.z - 1.0), Vector3(12.2, 0, -6.3),
 		Vector3(12.7, 0, -1.4)]:
 		shrubs.append(_xf(p, p.x, 0.72))
-	add_child(Art.batch("bush", shrubs))
+	_add_split(bp, "bush", shrubs)
 	# The yard's west edge and the west end of its front (SGODOT-371, 不知火舞 59ea8ecc): a loose hedge just outside the
 	# walk line (x 0.65 / z +1.3) and the Lv3+ ring (x 0.38), every level the same — it shows the edge, the walk rect stops you.
 	for layer in [["bush", true, [
@@ -132,12 +157,12 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		elif i % 13 == 0: asset = "blue_flower"
 		layers[asset].append(_xf(point, rng.randf_range(0, TAU), rng.randf_range(0.55, 1.05)))
 	for xf in layers.rock: rock_points.append((xf as Transform3D).origin)
-	for asset in layers: add_child(Art.batch(asset, layers[asset], asset == "rock"))
+	for asset in layers: _add_split(bp, asset, layers[asset], asset == "rock")
 	var flowers: Array = []
 	for i in 12:
 		flowers.append(_xf(house + Vector3(0.86 + sin(i * 2.4) * 0.22, 0.013, 0.48 + cos(i * 2.4) * 0.51), i, 0.64))
 		flowers.append(_xf(house + Vector3(-0.95 + sin(i * 1.9) * 0.2, 0.013, 0.52 + cos(i * 1.9) * 0.45), i * 2, 0.6))
-	add_child(Art.batch("daisy", flowers, false))
+	_add_split(bp, "daisy", flowers, false)
 	# Chimney smoke: the old scenery's own five GPU puffs.
 	var smoke := FarmScenery.new()
 	add_child(smoke)

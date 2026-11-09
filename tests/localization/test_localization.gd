@@ -547,3 +547,16 @@ func test_p0_a_back_keys_words_are_translated_after_its_arrow() -> void:
 	assert_str(zh.call("‹  Zorb quarks")).is_empty()
 	assert_str(zh.call("‹")).is_empty()
 
+## q(303) (SGODOT-450, 李白): the Kitchen Wing's held cells — the two new lines, and Today's line past Lv8 read from its
+## two parts (`Kitchen Wing` · `Space taken`); the toast's Decorate › is the existing word.
+func test_p0_the_held_wings_lines() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t._get_message(s, &""))
+	assert_str(zh.call(P0Logic.HOME_BLOCKED_TAP)).is_equal("位置已被占用 · 先清空")
+	assert_str(zh.call("Homestead Lv8 · Space taken")).is_equal("家园 Lv8 · 位置已被占用")
+	assert_str(zh.call("Kitchen Wing · Space taken")).is_equal("灶房扩建 · 位置已被占用")
+	assert_str(zh.call("Master Farmhouse · Space taken")).is_equal("大师农舍 · 位置已被占用")
+	assert_str(zh.call("Lv8 look · Kitchen Wing")).is_equal("Lv8 外观 · 灶房扩建")
+	assert_str(zh.call(P0Ui.DECORATE_ACTION)).is_equal("布置")
+

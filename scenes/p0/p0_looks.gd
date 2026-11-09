@@ -5,12 +5,19 @@ extends Node3D
 ## until the wing clears the bench) — each stage a (timber) or b (stone), as the view says (homestead.looks) or as
 ## LOOK-PICK previews it. A stage reached or swapped while the farm is up pops its parts in with dust (P0Fence.pop_in);
 ## a save already there shows them at once. The Fence & Mailbox stage (Lv3) is the fence's own (p0_fence.gd).
+## A save past Lv8 whose wing's cells are held (q(303) ⑨, homestead.wing_blocked) has no wing, old or new, and the old
+## house as WING_WAITS has it; cleared, the wing (or the Master Farmhouse) pops in and wing_cleared says which.
 ## Placements: P0Garden.look_parts / look_house.
 
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const STAGES := ["porch", "kitchen_extension"]
 const HOUSE_STAGE := "master_farmhouse"
+const WING_STAGE := "kitchen_extension"
+
+## The wing came up as its cells cleared (homestead.wing_blocked gone between two views): the stage now on show, its
+## level and name for the farm's `Lv8 look · Kitchen Wing` (q(303) ⑨).
+signal wing_cleared(stage: Dictionary)
 
 var _bp: FarmBlueprint
 var _house: MeshInstance3D     # the farm's house prop: its mesh changes at Lv15
@@ -24,6 +31,7 @@ var _ui: P0Ui
 ## The farm's path grid (p0_farm sets it once built): the cells a shown model stands on are solid (亚瑟 on #896).
 var grid: BlueprintGrid
 var _solid: Array[Vector2i] = []
+var _wing_held := false        # homestead.wing_blocked as last synced
 
 ## ui: the P0Ui whose LOOK-PICK previews this farm (none in tests that drive preview() themselves).
 func build(bp: FarmBlueprint, house: MeshInstance3D, style: String, fence: Node3D, ui: P0Ui = null) -> void:
@@ -52,11 +60,17 @@ func preview(stage: String, look: String) -> void:
 ## Every frame with the projected view: cheap until a stage's look changes.
 func sync(view: Dictionary) -> void:
 	var changed := false
+	var held := not P0Decor.wing_blocked(view).is_empty()
+	var held_changed := held != _wing_held
+	_wing_held = held
 	for stage in STAGES + [HOUSE_STAGE]:
 		var have := P0Logic.look_of(view, stage)
 		if previews.get(stage, "") == have and _seen: previews.erase(stage)   # the reply landed (or nothing to preview)
 		var want: String = previews.get(stage, have)
-		if want == _shown.get(stage, ""): continue
+		if stage == WING_STAGE and held: want = ""   # q(303) ⑨: no wing while its cells are held
+		# the Master Farmhouse (and the porch before it) changes with the wing's hold too, the old house while it waits;
+		# below Lv15 the house is the farm's own either way — its porch stays as it stands (周瑜 on #916)
+		if want == _shown.get(stage, "") and not (held_changed and stage == HOUSE_STAGE and want != ""): continue
 		_shown[stage] = want
 		changed = true
 		if stage == HOUSE_STAGE:
@@ -64,8 +78,11 @@ func sync(view: Dictionary) -> void:
 			# the porch that goes with this house (P0Garden.look_parts: the old barn keeps the old Timber Porch)
 			if _parts.has("porch"): _set_parts("porch", shown("porch"), _seen)
 		else: _set_parts(stage, want, _seen)
+	if held_changed and not held and _seen:
+		var up := HOUSE_STAGE if shown(HOUSE_STAGE) != "" else WING_STAGE
+		if shown(up) != "": wing_cleared.emit(P0Logic.look_stage(up))
 	# the Master Farmhouse has the porch and the wing in it: the standalone ones stand down while it is up
-	var whole := P0Garden.whole_house(shown(HOUSE_STAGE))
+	var whole := P0Garden.whole_house(shown(HOUSE_STAGE), waits())
 	for stage in STAGES:
 		var root: Node3D = _parts.get(stage)
 		if root and root.visible == whole: root.visible = not whole
@@ -77,10 +94,10 @@ func sync(view: Dictionary) -> void:
 func _block(whole: bool) -> void:
 	if grid == null: return
 	var models: Array = []
-	if whole: models.append(P0Garden.look_house(shown(HOUSE_STAGE)))
+	if whole: models.append(P0Garden.look_house(shown(HOUSE_STAGE), _style, waits()))
 	else:
 		for stage in STAGES:
-			for p in P0Garden.look_parts(_bp, stage, shown(stage), shown(HOUSE_STAGE)):
+			for p in P0Garden.look_parts(_bp, stage, shown(stage), shown(HOUSE_STAGE), waits()):
 				var model := str(p.asset)
 				if model.begins_with("porch_") or model.begins_with("kitchen_wing_"): models.append(model)
 	var now: Array[Vector2i] = []
@@ -102,6 +119,14 @@ func solid_cells() -> Array[Vector2i]: return _solid
 
 func shown(stage: String) -> String: return str(_shown.get(stage, ""))
 
+## The old wing and house: WING_WAITS, or this save's wing cells held (q(303) ⑨).
+func waits() -> bool: return P0Garden.WING_WAITS or _wing_held
+
+## The Kitchen Wing's own model stands on its cells (the new wing, or the Master Farmhouse with it built in): the grass
+## and flowers there are not drawn (q(303), P0GardenScenery.show_wing).
+func wing_model_shown() -> bool:
+	return not waits() and (shown(WING_STAGE) != "" or shown(HOUSE_STAGE) != "")
+
 func _set_parts(stage: String, look: String, animate: bool) -> void:
 	var old: Node3D = _parts.get(stage)
 	if old: old.queue_free()
@@ -111,7 +136,7 @@ func _set_parts(stage: String, look: String, animate: bool) -> void:
 	root.name = "Look_%s_%s" % [stage, look]
 	add_child(root)
 	_parts[stage] = root
-	for p in P0Garden.look_parts(_bp, stage, look, shown(HOUSE_STAGE)):
+	for p in P0Garden.look_parts(_bp, stage, look, shown(HOUSE_STAGE), waits()):
 		var m := FarmArt.instance(str(p.asset))
 		m.transform = Transform3D(Basis(Vector3.UP, float(p.yaw)) * Basis.from_scale(p.scale), p.pos)
 		root.add_child(m)
@@ -119,7 +144,7 @@ func _set_parts(stage: String, look: String, animate: bool) -> void:
 
 func _set_house(look: String, animate: bool) -> void:
 	if _house == null: return
-	_house.mesh = FarmArt.mesh_for(P0Garden.look_house(look, _style))
+	_house.mesh = FarmArt.mesh_for(P0Garden.look_house(look, _style, waits()))
 	if animate and look != "": Fence.pop_in(self, [_house])
 
 ## The parts on show for a stage (tests, shots).

@@ -1761,10 +1761,12 @@ static func _today_rows(view: Dictionary) -> Array:
 	if not home_row.is_empty():
 		var hr: Dictionary = home_row.row
 		hr.home_request = true   # a tap off its Show opens HOME-1, this request's card
-		if str(hr.dot).begins_with("homestead:"): rows.append(hr)
+		if str(hr.dot).begins_with("homestead:") or bool(home_row.get("blocked", false)): rows.append(hr)   # q(303): no dot
 		else:
 			hr.dot = PIP_HOME_DOT   # lights once, the first time it is there (the guide just over), never each level
 			pip.append(hr)
+	var wing := wing_row(view)   # q(303) ⑨: a save past Lv8 whose wing waits on its cells, with the rows to do now
+	if not wing.is_empty(): rows.append(wing)
 	# Pip's order (q(284) spec ③ v3): First Dig, vein, then the Homestead gap; not sorted by request acceptance time.
 	var vein := vein_row(view)
 	if not vein.is_empty(): pip.push_front(vein)
@@ -1886,7 +1888,20 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 	var short_coins := int(coins.get("need", 0)) - int(coins.get("have", 0))
 	if short_coins > 0:
 		return {"row": _row("Homestead Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
+	# q(303) ③: the wing's cells held, the last gap — to do now, Show into Decorate, no red dot
+	if not P0Decor.next_blocked(view).is_empty():
+		return {"row": _row("Homestead Lv%d · %s" % [lv, HOME_BLOCKED], "deco_planter", DECORATE_GO), "now": true, "blocked": true}
 	return {"row": _row("Upgrade to Homestead Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
+
+## Today's row while a save past Lv8 has the Kitchen Wing's cells held (q(303) ⑨, homestead.wing_blocked): `Kitchen
+## Wing · Space taken` (the Master Farmhouse's name from Lv15), Show into Decorate, no red dot. {} when nothing holds them.
+const DECORATE_GO := "decorate"
+static func wing_row(view: Dictionary) -> Dictionary:
+	if P0Decor.wing_blocked(view).is_empty(): return {}
+	var level := int(view.get("homestead", {}).get("level", 1))
+	var master := look_stage("master_farmhouse")
+	var stage := master if not master.is_empty() and level >= int(master.level) else look_stage("kitchen_extension")
+	return _row("%s · %s" % [str(stage.get("name", "Kitchen Wing")), HOME_BLOCKED], "deco_planter", DECORATE_GO)
 
 ## Where a Homestead material's Show goes (q(255) ②, 355 C2; 李白's v4q(4) / (5) addendum eb1d7c20) — {go, now}, now = it
 ## can be had there at once. A gathered material: the spot gather_spot_for picks (`gather:<id>`), now when it is ready.
@@ -2381,6 +2396,11 @@ static func rest_state(view: Dictionary) -> Dictionary:
 
 ## HOME-1 away from home: the toast for a tap on the grey `At home` button, and for an upgrade refused not_home.
 const HOME_AWAY_TAP := "Upgrade at home · Going home is free"
+## q(303) (SGODOT-450, 不知火舞 450 v1.2 ②): what stands on the Kitchen Wing's cells stops the upgrade into it — the key
+## grey with the existing `Space taken`, a tap says this and offers `Decorate ›` (P0Ui), as does the server's
+## homestead_blocked; a save already past Lv8 with its cells held (wing_blocked) says it each launch (P0Farm).
+const HOME_BLOCKED := "Space taken"
+const HOME_BLOCKED_TAP := "Space taken · clear it first"
 
 ## HOME-1 "What changes" rows and the level-up banner lines for the P1 kitchen and Homestead unlocks (§8.3.1, §8.7
 ## copy; SGODOT-282). Travel tiers, looks and room tiers are announced by their own lines, not here.
@@ -2566,6 +2586,10 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 			_ when str(t.id).begins_with("skill_"): out.reason = home_gate_gap(str(t.id).trim_prefix("skill_"), int(t.need), int(t.have))
 			_: out.reason = "Need %d more %s" % [short, str(t.name)]
 		break
+	if out.reason == "" and not P0Decor.next_blocked(view).is_empty():   # the last gap (q(303) ①)
+		out.reason = HOME_BLOCKED
+		out.tap = HOME_BLOCKED_TAP
+		out.blocked = true
 	return out
 
 ## The one-line source for a HOME-1 tile (NeedSource, guide only): coins, skill levels, or a material's places, the

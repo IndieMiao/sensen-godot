@@ -114,6 +114,7 @@ func frame(v: Dictionary, dt := 0.0) -> void:
 			_pending = left
 			if not placing.is_empty() and str(placing.mode) != "idle": _show()
 	if not placing.is_empty() and str(placing.mode) != "idle" and farm.placement_edge(_finger, dt): _snap(_finger)
+	if _held_on: _paint_held()
 
 func _sync(list: Array) -> void:
 	_list = list
@@ -393,9 +394,12 @@ func _start() -> void:
 	else: rt.ui.set_placement(spec)
 	var idle := str(placing.mode) == "idle"
 	var at: Vector3 = yard_centre() if idle or placing.at == P0Decor.NONE else centre(str(placing.id), placing.at, int(placing.rot))
+	var held_in := idle and bool(placing.get("held", false))   # q(303) ④: in close over the held cells
+	if held_in: at = held_centre(held(_view()))
 	if first:
-		farm.placement_camera_begin(at, YARD_PX if idle else PICK_PX)
-		_held = not idle
+		farm.placement_camera_begin(at, HELD_PX if held_in else YARD_PX if idle else PICK_PX)
+		_held = not idle or held_in
+	elif held_in: farm.placement_camera_focus(at, HELD_PX)
 	elif not idle:
 		farm.placement_camera_focus(at, 0.0 if _held else PICK_PX)   # into the piece once; then follow it at this zoom
 		_held = true
@@ -490,6 +494,7 @@ func _end() -> void:
 	_paint([], false)
 	_paint_idle(false)
 	_select({})
+	_held_off()
 	rt.ui.end_placement()
 
 ## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Classic lamp`, Move, Store); on the
@@ -569,8 +574,10 @@ func open_bin_card(f: Dictionary) -> void:
 	var card := rt.ui.open_facility_card({"title": name, "lead": "1×1", "icon": P0Logic.icon("facility_" + kind),
 		"button": "Move", "kind": &"primary", "close": true},
 		func():
+			var back := _held_on   # q(303): the bin moved off the wing's cells, Decorate on them again
 			_end()
-			farm._facilities.begin_move(fid))
+			farm._facilities.begin_move(fid)
+			if back: farm._facilities.after_end = begin_held)
 	card.tree_exited.connect(func(): if is_inside_tree(): _select({}))
 
 func open_card(p: Dictionary) -> void:
@@ -588,6 +595,113 @@ func _select(p: Dictionary) -> void:
 	var cs: Array = [] if p.is_empty() else P0Decor.cells(str(p.id), Vector2i(int(p.x), int(p.y)), int(p.get("rot", 0)))
 	_squares(_glow, cs.map(func(c): return [c, GLOW]), false, 0.034, 1.25)
 	_squares(_sel, cs.map(func(c): return [c, Color.WHITE]), true, 0.036)
+
+# ---------------------------------------------------------------- the Kitchen Wing's held cells (q(303), SGODOT-450)
+## Decorate on what holds the Kitchen Wing's cells (不知火舞 450 v1.2 ④, frame B2): in close over them (HELD_PX), the
+## wing's cells red as a spot that may not take a piece (BAD_FILL with its edge) and grid lines round them fading out
+## over HALO_R cells as round a piece picked, each piece or facility on them in a red edge
+## 1.25 × its cells (the white selection's texture, no fill), the first of them picked — a piece before a facility
+## (后裔). Moved off, its edge goes; all clear, the red cells fade out in HELD_FADE_S. The view says what holds them
+## (homestead.next.blocked, or wing_blocked past Lv8); a homestead_blocked refusal's detail stands in until the view moves.
+const HELD_PX := 52.0
+const HELD_FADE_S := 0.25
+var _held_on := false           # Decorate came in on the held cells: they stay marked while it lasts
+var _held_detail := {}          # a refusal's {cells, pieces, facilities}, until the view changes
+var _held_detail_sig := 0
+var _held_sig := ""
+var _held_fills: Array = []
+var _held_edges: Array = []
+var _held_frames: Array = []
+var _held_halo: Array = []
+var _held_fade: Tween
+
+## What holds the wing's cells now: the view's, or a refusal's while the view has not caught up; {} when nothing does.
+func held(v: Dictionary) -> Dictionary:
+	var b := P0Decor.next_blocked(v)
+	if b.is_empty(): b = P0Decor.wing_blocked(v)
+	if b.is_empty() and not _held_detail.is_empty() and _held_detail_sig == _sig: b = _held_detail
+	return b
+
+## Into Decorate on the held cells: `Space taken · clear it first`'s Decorate ›, Today's Show, homestead_blocked.
+## detail: the refusal's. Nothing held (already cleared): Decorate as HOME-1 opens it.
+func begin_held(detail := {}) -> void:
+	if not detail.is_empty():
+		_held_detail = detail
+		_held_detail_sig = _sig
+	var b := held(_view())
+	if b.is_empty():
+		begin_decorate()
+		return
+	if not placing.is_empty() and str(placing.mode) != "idle": _end()
+	_held_on = true
+	_held_sig = ""
+	placing = {mode = "idle", held = true}
+	_start()
+	_paint_held()
+	for p in b.get("pieces", []):
+		var piece := _piece(int(p.get("uid", 0)))
+		if not piece.is_empty():
+			open_card(piece)
+			return
+	for f in b.get("facilities", []):
+		for g in _view().get("facilities", []):
+			if int(g.get("id", 0)) == int(f.get("id", -1)):
+				open_bin_card(g)
+				return
+
+## The middle of the wing's cells on the ground (all of them: the red block the frame centres on).
+func held_centre(b: Dictionary) -> Vector3:
+	var cs := P0Decor.wing_cells() if not b.is_empty() else []
+	if cs.is_empty(): return yard_centre()
+	var sum := Vector3.ZERO
+	for c in cs: sum += farm.bp.cell_to_world(c)
+	return sum / cs.size()
+
+## The held cells red and what stands on them edged red, as the view has them; cheap while nothing changes.
+func _paint_held() -> void:
+	var b := held(_view())
+	var sig := JSON.stringify(b) + str(_hidden)
+	if sig == _held_sig: return
+	var had := _held_sig != "" and not _held_fills.is_empty() and (_held_fills[0] as MeshInstance3D).visible
+	_held_sig = sig
+	var frames: Array = []
+	for p in b.get("pieces", []):
+		if int(p.get("uid", 0)) == _hidden: continue   # lifted by its Move: its edge goes with it
+		for c in P0Decor.cells(str(p.get("item", "")), Vector2i(int(p.get("x", 0)), int(p.get("y", 0))), int(p.get("rot", 0))):
+			frames.append([c, UiTokens.COLOR_DANGER])
+	for f in b.get("facilities", []): frames.append([Vector2i(int(f.get("x", 0)), int(f.get("y", 0))), UiTokens.COLOR_DANGER])
+	_squares(_held_frames, frames, true, 0.038, 1.25)
+	if b.is_empty():
+		if had: _fade_held()
+		else: _held_cells([])
+		return
+	if _held_fade and _held_fade.is_valid(): _held_fade.kill()
+	_held_cells(P0Decor.wing_cells())
+
+func _held_cells(cells: Array) -> void:
+	_squares(_held_fills, cells.map(func(c): return [c, BAD_FILL]), false, 0.029)
+	_squares(_held_edges, cells.map(func(c): return [c, Color(BAD_FILL, 1.0)]), true, 0.031)
+	var lines: Array = []
+	for h in halo_cells(_view(), cells): lines.append([h[0], Color(1, 1, 1, HALO_A * (1.0 - float(int(h[1]) - 1) / float(HALO_R)))])
+	_squares(_held_halo, lines, true, 0.027)
+
+## All clear: the red cells fade out (HELD_FADE_S), then hide.
+func _fade_held() -> void:
+	if _held_fade and _held_fade.is_valid(): _held_fade.kill()
+	_held_fade = create_tween().set_parallel()
+	for q in _held_fills + _held_edges + _held_halo:
+		if not (q as MeshInstance3D).visible: continue
+		var m := (q as MeshInstance3D).material_override as StandardMaterial3D
+		_held_fade.tween_property(m, "albedo_color:a", 0.0, HELD_FADE_S)
+	_held_fade.chain().tween_callback(func(): _held_cells([]))
+
+func _held_off() -> void:
+	_held_on = false
+	_held_detail = {}
+	_held_sig = ""
+	if _held_fade and _held_fade.is_valid(): _held_fade.kill()
+	_held_cells([])
+	_squares(_held_frames, [], true, 0.038, 1.25)
 
 # ---------------------------------------------------------------- the preview
 func _show() -> void:

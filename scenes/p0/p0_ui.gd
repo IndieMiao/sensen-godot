@@ -1944,9 +1944,16 @@ func toast_text() -> String: return _toasts.current_text() if _toasts else ""
 func clear_toast() -> void:
 	if _toasts: _toasts.dismiss()
 
+## `Space taken · clear it first`'s action (q(303), SGODOT-450): into Decorate on what holds the Kitchen Wing's cells.
+const DECORATE_ACTION := "Decorate"
+
 func _on_toast_action(action: String) -> void:
 	match action:
 		"Open bag": open_bag("", "bag" if _toast_bag_tab != "" else "", _toast_bag_tab)
+		DECORATE_ACTION:
+			if space_here() != "home": return
+			close_modal()
+			show_spot.emit(P0Logic.DECORATE_GO)   # in the farmhouse, out to the yard first (P0Runtime._show_spot)
 		"Place now":
 			if _toast_decor == "" or space_here() != "home": return
 			close_modal()
@@ -3111,7 +3118,7 @@ func _show_today_row(i: int) -> void:
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button. In an outpost, a
 ## target at that very outpost (`outpost:<its id>`, a resident's request handed in there; q(204) ⑨: Ivo's in his Mine
 ## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign", "decorate"]   # decorate: q(303), into Decorate at the wing
 
 ## A target on the homestead: the fixed ones and the Homestead sign (q(255)). The mine mouth left the farm in 355 b1,
 ## the gathering spots with v4q(4) ①.

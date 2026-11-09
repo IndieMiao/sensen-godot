@@ -1155,6 +1155,10 @@ static func wrong_city_line(view: Dictionary, request: String, city: String) -> 
 	var name := str(P0Clusters.get_cluster(city).get("name", "")) if city != "" else ""
 	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
 
+## The last homestead_blocked refusal's {cells, pieces, facilities} (q(303)): Decorate › marks them until the view
+## says what holds the Kitchen Wing's cells itself; taken by the farm as it opens Decorate.
+var held_detail := {}
+
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "mine_drink":
 		if code == "potion_cooldown":
@@ -1248,6 +1252,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast_error("Rest used today")
+		"homestead_blocked":
+			# q(303) ⑤ (SGODOT-450): the Kitchen Wing's cells held — HOME-1's words and Decorate › on them, the refusal's own
+			# {cells, pieces, facilities} marked in case the view has not caught up (held_detail, P0Farm)
+			held_detail = detail
+			ui.toast_error(P0Logic.HOME_BLOCKED_TAP, P0Ui.DECORATE_ACTION)
 		"not_home":
 			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
 			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")
@@ -1660,15 +1669,19 @@ func _end_arrival() -> void:
 	if had: _flush_arrival_toast()
 
 ## A toast for the place being opened (Go home's `Welcome home`, 司空震 on 286): said once its loading cover is gone, not
-## under it. Without a trip on its way it shows now; one that never arrives drops it after ARRIVE_FAIL_S.
+## under it. Without a trip on its way it shows now; one that never arrives drops it after ARRIVE_FAIL_S. An Error with
+## its action too (`action` set: the held Kitchen Wing's `Space taken · clear it first` with Decorate ›, q(303) — under
+## the launch cover it ran its whole time unseen, 不知火舞 on #916 B5a).
 var _arrival_toast := {}
-func toast_on_arrival(text: String) -> void:
-	_arrival_toast = {text = text, t0 = Time.get_ticks_msec()}
+func toast_on_arrival(text: String, action := "") -> void:
+	_arrival_toast = {text = text, action = action, t0 = Time.get_ticks_msec()}
 	_flush_arrival_toast.call_deferred()   # after this frame's open_instance has set its cover (or not)
 
 func _flush_arrival_toast() -> void:
 	if _arrival_toast.is_empty() or not _arrive.is_empty() or _launch_s >= 0.0: return
-	if Time.get_ticks_msec() - int(_arrival_toast.t0) <= int(ARRIVE_FAIL_S * 1000.0): ui.toast(str(_arrival_toast.text))
+	if Time.get_ticks_msec() - int(_arrival_toast.t0) <= int(ARRIVE_FAIL_S * 1000.0):
+		if str(_arrival_toast.get("action", "")) != "": ui.toast_error(str(_arrival_toast.text), str(_arrival_toast.action))
+		else: ui.toast(str(_arrival_toast.text))
 	_arrival_toast = {}
 
 ## Couldn't get there (q(78)): an error, a 5xx without the maintenance code, or 20 s without an answer.

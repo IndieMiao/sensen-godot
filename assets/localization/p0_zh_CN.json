@@ -2711,5 +2711,7 @@
  "%s · %s left": "%s · 还剩 %s",
  "Decor %d/%d · Store one to place this": "摆件 %d/%d · 先收起一件再摆",
  "%d new · %d to do": "新 %d · 待办 %d",
- "%d XP to go · %s": "还差 %d 经验 · %s"
+ "%d XP to go · %s": "还差 %d 经验 · %s",
+ "Space taken · clear it first": "位置已被占用 · 先清空",
+ "Homestead Lv%d · Space taken": "家园 Lv%d · 位置已被占用"
 }

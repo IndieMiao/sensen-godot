@@ -53,6 +53,35 @@ static func _in_any(cell: Vector2i, rects: Array) -> bool:
 		if _rect(r).has_point(cell): return true
 	return false
 
+## Homestead Lv8's Kitchen Wing (q(303), SGODOT-450; content decor.yard.wing, the server's own list): from that level its
+## cells are the house's, `Space taken` as an object's; below it they take pieces, and what holds them stops the upgrade
+## into it (homestead.next.blocked) or, on a save already past it, keeps the wing undrawn (homestead.wing_blocked).
+static func wing() -> Dictionary: return yard().get("wing", {}) if yard().get("wing", null) is Dictionary else {}
+
+static func wing_cells() -> Array:
+	return (wing().get("cells", []) as Array).map(func(c): return Vector2i(int(c[0]), int(c[1])))
+
+## The wing's cells are the house's: the Homestead is at the wing's level or past it.
+static func wing_up(view: Dictionary) -> bool:
+	return not wing().is_empty() and int(view.get("homestead", {}).get("level", 1)) >= int(wing().get("homestead", 8))
+
+## What holds the wing's cells as the server says it (wing8): {cells, pieces [{uid, item, x, y, rot}], facilities [{id,
+## kind, x, y}]}, pieces first — before the upgrade into the wing (`next`), or on a save already past it. {} for none.
+static func next_blocked(view: Dictionary) -> Dictionary:
+	var next = view.get("homestead", {}).get("next", null)
+	return _held(next.get("blocked", null)) if next is Dictionary else {}
+
+static func wing_blocked(view: Dictionary) -> Dictionary:
+	return _held(view.get("homestead", {}).get("wing_blocked", null))
+
+static func _held(b) -> Dictionary:
+	if not b is Dictionary or ((b as Dictionary).get("pieces", []) as Array).is_empty() and ((b as Dictionary).get("facilities", []) as Array).is_empty(): return {}
+	return b
+
+## The held cells as Vector2i (`cells` of next_blocked / wing_blocked, or of a homestead_blocked refusal's detail).
+static func held_cells(b: Dictionary) -> Array:
+	return (b.get("cells", []) as Array).map(func(c): return Vector2i(int(c[0]), int(c[1])))
+
 static func placed(view: Dictionary) -> Array: return view.get("decor", {}).get("placed", []) if view.get("decor", null) is Dictionary else []
 
 ## Cells the yard's pieces take ("x,y" → uid), but the one being moved; and the yard's facilities' (the Compost
@@ -79,8 +108,9 @@ static func reason_cells(view: Dictionary, cs: Array, t: Dictionary) -> String:
 		if not _rect(y.get("walk", [0, 0, 0, 0])).has_point(c) or _in_any(c, y.get("field", [])): return REASONS.decor_outside
 		var bed := P0Garden.id_of(c)
 		if bed >= 0 and bed < beds: return REASONS.decor_outside
+	var house := wing_cells() if wing_up(view) else []   # the Kitchen Wing's from Lv8 (q(303))
 	for c in cs:
-		if _in_any(c, y.get("objects", [])) or t.has("%d,%d" % [c.x, c.y]): return REASONS.decor_overlap
+		if _in_any(c, y.get("objects", [])) or t.has("%d,%d" % [c.x, c.y]) or house.has(c): return REASONS.decor_overlap
 	for c in cs:
 		if _in_any(c, y.get("paths", [])): return REASONS.decor_path
 	return ""

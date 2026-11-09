@@ -76,6 +76,9 @@ var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldB
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
 var _scenery: Node3D   # p0_garden_scenery.gd: the sand under the field grows over Lv7's front row
+## q(303) ⑨: a save past Lv8 whose wing's cells are held says so once a launch, on the first farm view (the app's run).
+static var _wing_said := false
+var _held_wanted := false
 var _chef_sign := Vector3.ZERO   # the Chef's Sign's post foot (Homestead Lv10), left of the door path: P0Garden.CHEF_SIGN_CELL
 var _chef_sign_node: Node3D
 var _chef_sign_look := ""        # the model shown: "a" timber / "b" stone
@@ -243,6 +246,7 @@ func _build_world() -> void:
 	_looks = Looks.new()   # the Homestead looks beside and as the farmhouse (LOOK-PICK, SGODOT-282)
 	add_child(_looks)
 	_looks.build(bp, house, _style, _fence, P0Runtime.ensure().ui)   # before rt is set (_ready builds the world first)
+	_looks.wing_cleared.connect(_on_wing_cleared)
 	# The Homestead sign: its own tap target beside the door, not the door (LOCK-11 / LOCK-07).
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
@@ -653,9 +657,30 @@ func placement_grid(at: Vector3, radius := GRID_RADIUS) -> void:
 
 ## Decorate's entries (SGODOT-284): Farm Storage's Place and the stall toast's Place now pick a piece; HOME-1's
 ## Decorate › ("") opens the mode with nothing picked.
+## q(303) ④: `Space taken · clear it first`'s Decorate ›, Today's Show and the server's homestead_blocked (P0Logic.
+## DECORATE_GO) open it on what holds the Kitchen Wing's cells.
 func _on_decor_requested(item: String) -> void:
 	if item == "": _decor.begin_decorate()
+	elif item == P0Logic.DECORATE_GO: _decor.begin_held(_take_held_detail())
 	else: _decor.begin_place(item)
+
+## q(303) ⑨ (SGODOT-450): on the first farm view of this launch, a save past Lv8 whose wing's cells are held is told
+## (Error, with Decorate ›); not again until the app opens anew.
+func _say_wing(v: Dictionary) -> void:
+	if _wing_said or v.get("homestead", null) == null: return
+	_wing_said = true
+	# once the launch's cover is gone: under it the toast ran out unseen (不知火舞 on #916 B5a)
+	if not P0Decor.wing_blocked(v).is_empty(): rt.toast_on_arrival(P0Logic.HOME_BLOCKED_TAP, P0Ui.DECORATE_ACTION)
+
+## The last homestead_blocked's detail, once (P0Runtime.held_detail).
+func _take_held_detail() -> Dictionary:
+	var d: Dictionary = rt.held_detail
+	rt.held_detail = {}
+	return d
+
+## The wing came up as its cells cleared (P0Looks.wing_cleared): `Lv8 look · Kitchen Wing` (q(303) ⑨, LOOK-PICK's title).
+func _on_wing_cleared(stage: Dictionary) -> void:
+	if not stage.is_empty(): rt.ui.toast_success("Lv%d look · %s" % [int(stage.level), str(stage.name)])
 
 ## Move the focus by a ground delta (edge pan, two-finger pan), kept in the yard.
 func placement_pan(d: Vector3) -> void:
@@ -721,6 +746,10 @@ func p0_recenter() -> void:
 	_cam_follow.held = false
 
 func p0_show_spot(where: String) -> void:
+	if where == P0Logic.DECORATE_GO:   # q(303): Today's `Homestead Lv8 · Space taken` Show
+		if _decor != null: _decor.begin_held(_take_held_detail())
+		else: _held_wanted = true   # just out of the farmhouse: once Decorate is up (p0_frame)
+		return
 	var at := _bench if where == "bench" else (_house if where in ["stove", "home"] else actor.position)
 	if where == "stall": at = _stall
 	elif where == "sign": at = _sign   # Upgrade to Homestead LvN (q(255))
@@ -770,6 +799,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_sync_plots(v, dt)
 	_fence.sync(v)
 	_looks.sync(v)
+	_scenery.show_wing(_looks.wing_model_shown())   # q(303): no grass or flowers through the wing's floor
+	_say_wing(v)
 	if _facilities == null and bp != null and cam != null and actor != null:
 		_facilities = P0FarmFacilities.new().setup(self)
 		add_child(_facilities)
@@ -778,6 +809,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		_decor = P0FarmDecor.new().setup(self)
 		add_child(_decor)
 		rt.ui.decor_requested.connect(_on_decor_requested)
+		if _held_wanted: _decor.begin_held.call_deferred(_take_held_detail())
+		_held_wanted = false
 	_decor.frame(v, dt)
 	if not _facilities.placing.is_empty() or not _decor.placing.is_empty():   # placement mode: no bed, key, card or prompt (q(23))
 		_hi.visible = false   # the preview's green / red square is the one outline on a bed meanwhile
