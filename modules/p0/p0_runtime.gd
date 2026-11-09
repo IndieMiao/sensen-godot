@@ -2160,6 +2160,7 @@ func _dev_shot(dt: float) -> void:
 					var m: Marker3D = world.call("anchor", step[1])
 					world.actor.teleport(m.global_position)
 					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
+				else: _call("p0_dev", [step])   # goto:x:z — the pond's own teleport (P0Pond.p0_dev), which this case kept from it
 			"at":   # at:x:z — the player stood at that world point (the stick-slide recordings: up to a wall, then walk:)
 				if is_instance_valid(world) and world.get("actor") is P0Actor:
 					(world.actor as P0Actor).teleport(Vector3(float(step[1]), (world.actor as P0Actor).position.y, float(step[2])))

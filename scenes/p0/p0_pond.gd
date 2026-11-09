@@ -742,6 +742,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"zoom":   # zoom:0.8 — a pinch to that zoom, fingers lifted (the whole-pond shot)
 			p0_zoom(_pinch.value / float(step[1]))
 			p0_zoom_end()
+		"rinfo":   # this frame's triangles and draw calls (scene art budgets, SGODOT-422)
+			print("P0_RINFO ", JSON.stringify({"prims": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
+				"draws": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)}))
 		"nofoam":   # SGODOT-272's before shots: the shore foam off
 			for w in find_children("*", "FishingWater", true, false): w.water_material.set_shader_parameter("has_foam_contact", false)
 		_: return false
