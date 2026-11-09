@@ -1,3 +1,4 @@
+import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { wingOf, wingTaken } from '../../src/p0/decor.js';
@@ -5,6 +6,8 @@ import { nearestYardCell } from '../../src/p0/garden.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { registerP0Routes } from '../../src/p0/routes.js';
+import { P0Store } from '../../src/p0/store.js';
 
 // q(303), SGODOT-450: Homestead Lv8's Kitchen Wing stands on seven yard cells. For a client that draws it (feature
 // wing8): the upgrade into Lv8 waits until nothing holds them (homestead_blocked, next.blocked), from Lv8 they are the
@@ -169,5 +172,33 @@ describe('from Lv8 the cells are the house\'s (wing8)', () => {
     expect(nearestYardCell(c, s, from, 0)).toEqual(from);
     const to = nearestYardCell(c, s, from, 0, undefined, true)!;
     expect(WING.some(([x, y]) => x === to[0] && y === to[1])).toBe(false);
+  });
+});
+
+describe('the routes (x-p0-features: wing8; 周瑜 on #914)', () => {
+  it('read the feature off the request: the view\'s next.blocked and the upgrade\'s homestead_blocked only with wing8', async () => {
+    const s = lv7();
+    piece(s, 'deco_planter', 7, 16);
+    const store = new P0Store(c);
+    store.put(s);
+    const app = Fastify();
+    registerP0Routes(app, { content: c, store, now: () => T0, dev: false });
+    const headers = (f: string) => ({ 'x-p0-player': s.player, 'x-p0-features': f });
+    const state = async (f: string) => (await app.inject({ method: 'GET', url: '/v1/p0/state', headers: headers(f) })).json().state;
+    expect((await state('choose_home,guide_v3,wing8')).homestead.next.blocked.pieces).toHaveLength(1);
+    expect('blocked' in (await state('choose_home,guide_v3')).homestead.next).toBe(false);
+    const upgrade = async (f: string) => (await app.inject({ method: 'POST', url: '/v1/p0/commands', headers: headers(f),
+      payload: { type: 'homestead_upgrade', space: 'home' } })).json();
+    const refused = await upgrade('choose_home,guide_v3,wing8');
+    expect(refused.ok).toBe(false);
+    expect(refused.code).toBe('homestead_blocked');
+    expect(refused.detail.cells).toEqual([[7, 16]]);
+    expect(store.get(s.player, T0).homestead.level).toBe(7);
+    const old = await upgrade('choose_home,guide_v3');   // an older client: as before
+    expect(old.ok).toBe(true);
+    expect(old.state.homestead.level).toBe(8);
+    expect('wing_blocked' in old.state.homestead).toBe(false);
+    expect((await state('choose_home,guide_v3,wing8')).homestead.wing_blocked.cells).toEqual([[7, 16]]);   // the save it left
+    await app.close();
   });
 });
