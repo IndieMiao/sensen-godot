@@ -141,6 +141,26 @@ func test_its_projection_is_the_cameras() -> void:
 		for p in [Vector3(6.125, 0, -1.625), Vector3(9.0, 1.8, -3.0), Vector3(0.5, 0.4, -12.0)]:
 			assert_vector(P0Pond.project(p, focus, cam.size, PHONE)).is_equal_approx(cam.unproject_position(p), Vector2.ONE * 0.01)
 
+## 奕星 / 盘古 on #906: the wild's dressing is judged on one reference screen, the same on every phone — the pond's
+## camera band and action keys as P0Ui lays them out at 360 × 800 (so a change to the HUD shows here).
+func test_the_dressings_reference_screen_is_the_huds_at_360_by_800() -> void:
+	var vp := SubViewport.new()
+	vp.size = Vector2i(P0Pond.REF_VIEW)
+	add_child(auto_free(vp))
+	var ui := P0Ui.new()
+	ui.quick_store = "user://test_pond_ref_screen.json"
+	vp.add_child(ui)
+	await get_tree().process_frame
+	ui.set_mode("fish", "Fern Pond")
+	ui.set_surface("pond")
+	ui.set_view({"energy": {"value": 200, "max": 200, "next_in": null, "regen_ms": 240000}, "coins": 40, "skills": {},
+		"bag": {"capacity": 25, "free": 24, "slots": []}, "plots": [], "names": {}})
+	for i in 3: await get_tree().process_frame
+	assert_object(ui.camera_band()).is_equal(P0Pond.REF_BAND)
+	assert_array(ui.key_rects()).is_equal(P0Pond.REF_KEYS)
+	assert_object(ui.key_column()).is_equal(P0Pond.REF_COLUMN)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_pond_ref_screen.json"))
+
 ## The whole pond in one view at the farthest zoom (美术总监 / 奕星): every shape's water is narrower than the screen and
 ## shallower than the band's ground there.
 func test_every_pond_fits_the_band_at_the_farthest_zoom() -> void:

@@ -116,4 +116,10 @@ func test_on_the_keys_only_low_pieces_by_their_box() -> void:
 		for c in corners: if Rect2(10.5, -7.0, 3.0, 4.0).has_point(Vector2(c.x, c.z)): return true
 		return false
 	assert_bool(PondScenery.tree_points([], wide).has(Vector3(12.1, 0, -5.5))).is_false()   # under them: it does not stand
-	assert_dict(_layout(SF[0], [])).is_equal(_layout(SF[0], []))   # no camera yet: the old KEY_COLUMN, as before
+	for id in SF:   # no camera: the old rule, no tall piece standing in KEY_COLUMN
+		var l := _layout(id, [])
+		for asset in l:
+			if not asset in TALL or asset in ["wild_log_moss", "wild_fern"]: continue
+			for t in l[asset]:
+				var at: Vector3 = (t as Transform3D).origin
+				assert_bool(PondWildProps.KEY_COLUMN.has_point(Vector2(at.x, at.z))).override_failure_message("%s %s at %s" % [id, asset, at]).is_false()

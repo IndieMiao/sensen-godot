@@ -41,7 +41,7 @@ var _gather_marked := "" # the point the guide's `!` is on
 var _scenery: Node3D
 var _trees: Array = []   # the walk's cells the bank's trees block (PondWalk.set_trees), freed when they move
 var _scenery_clear: Array = []   # the points the bank's scenery was built keeping off
-var _scenery_keys := Callable()   # … and the opening screen's action keys (_opening_keys), empty before the HUD laid out
+var _scenery_keys := Callable()   # … and the opening screen's action keys (_opening_keys)
 ## The farthest pinch: the farm's 0.8 widened so the open-water ponds (SGODOT-374, 不知火舞: up to 9.7 m across) still
 ## fit one view whole; the opening and the walk stay at 1.0, the farm's player scale.
 const FAR_ZOOM := 0.68
@@ -147,16 +147,18 @@ func _ready() -> void:
 	cam.far = 80
 	add_child(cam)
 	cam.make_current()
-	_build_scenery(PondGather.clear_points(P0Runtime.ensure().session.current()))   # 410: the bank keeps off the points
+	# the walk and the gathering points first: the dressing's opening screen needs the spawn and the nearest point, so it
+	# is built once, as the player first sees it (盘古 on #906: not again a frame later)
+	bp = PondWalk.blueprint(entry)   # q(297): the whole meadow but its edges, not the template's 12 × 16 m
+	grid = BlueprintGrid.new(bp)
 	gather = PondGather.new()
 	gather.name = "Gather"
+	gather.sync(P0Runtime.ensure().session.current())
+	_build_scenery(PondGather.clear_points(P0Runtime.ensure().session.current()))   # 410: the bank keeps off the points
 	add_child(gather)
 	var water := FishingWater.build(str(entry.id), site_spec)
 	water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
 	add_child(water)
-	bp = PondWalk.blueprint(entry)   # q(297): the whole meadow but its edges, not the template's 12 × 16 m
-	grid = BlueprintGrid.new(bp)
-	_trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(_scenery_clear, _scenery_keys))
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
@@ -437,7 +439,6 @@ func _update_camera(dt := -1.0) -> void:
 	var view := get_viewport().get_visible_rect().size
 	cam.size = view_size(view, _zoom)
 	var band := _camera_band(rt.ui if rt != null else null)
-	if band.has_area() and not _scenery_keys.is_valid() and _opening_keys().is_valid(): _build_scenery(_scenery_clear)   # the keys known now
 	if band.has_area() and not _parked:
 		if _opening: _focus = opening_focus(actor.position, cam.size, view, band, _water_at(), _nearest_piece())
 		var target := clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW, actor.position, _key_column())
@@ -494,24 +495,29 @@ static func project(p: Vector3, focus: Vector3, size: float, view: Vector2) -> V
 	var d := p - focus
 	return Vector2(view.x * 0.5 + d.dot(right_axis()) * px, view.y * 0.5 - (d.dot(ahead_axis()) * sin(pitch) + d.y * cos(pitch)) * px)
 
+## The opening screen the wild's dressing is judged on (盘古 / 奕星 on #906): the phone's 360 × 800 as P0Ui lays the
+## pond out — its camera band and its action keys (P0Ui.key_rects, 8 px out) — the same on every device, so every
+## player at a pond sees the same pieces where (who has what beside them, and the pieces that block, agree).
+const REF_VIEW := Vector2(360, 800)
+const REF_BAND := Rect2(0, 98, 360, 422)
+const REF_KEYS := [Rect2(268, 512, 64, 64), Rect2(241, 566, 44, 44), Rect2(248, 572, 104, 104)]   # switch, tool badge, key
+const REF_COLUMN := Rect2(249, 520, 95, 148)
+
 ## The opening screen's test for the wild's dressing (盘古 on 422; PondWildProps.layout's `in_key`): whether points in the
-## world, seen by the opening camera at the spawn (opening_focus, clamp_focus — as the player first sees the pond),
-## have a box on the screen that touches the action keys (P0Ui.key_rects, 8 px out). Empty until the HUD has laid out
-## (the dressing then keeps PondWildProps.KEY_COLUMN, and is built again once it has, _update_camera).
+## world, seen by the opening camera at the spawn on the reference screen (opening_focus, clamp_focus — as the player
+## first sees the pond), have a box on the screen that touches the action keys. Empty before the walk's blueprint.
 func _opening_keys() -> Callable:
-	if rt == null or rt.ui == null or not rt.ui.is_node_ready() or bp == null: return Callable()
-	var band := _camera_band(rt.ui)
-	var keys: Array = rt.ui.key_rects()
-	if not band.has_area() or keys.is_empty(): return Callable()
-	var view := get_viewport().get_visible_rect().size
-	var size := view_size(view, 1.0)
-	var spawn := bp.cell_to_world(bp.anchor("spawn"))
-	var focus := clamp_focus(opening_focus(spawn, size, view, band, _water_at(), _nearest_piece_to(spawn)), size, view, band,
-		PondScenery.MEADOW, spawn, _key_column())
+	if bp == null: return Callable()
+	return opening_keys(bp.cell_to_world(bp.anchor("spawn")), _water_at(), _nearest_piece_to(bp.cell_to_world(bp.anchor("spawn"))))
+
+static func opening_keys(spawn: Vector3, water: Vector3, piece: Vector3) -> Callable:
+	var size := view_size(REF_VIEW, 1.0)
+	var focus := clamp_focus(opening_focus(spawn, size, REF_VIEW, REF_BAND, water, piece), size, REF_VIEW, REF_BAND,
+		PondScenery.MEADOW, spawn, REF_COLUMN)
 	return func(corners: PackedVector3Array) -> bool:
-		var r := Rect2(project(corners[0], focus, size, view), Vector2.ZERO)
-		for c in corners: r = r.expand(project(c, focus, size, view))
-		return keys.any(func(k): return r.intersects(k))
+		var r := Rect2(project(corners[0], focus, size, REF_VIEW), Vector2.ZERO)
+		for c in corners: r = r.expand(project(c, focus, size, REF_VIEW))
+		return REF_KEYS.any(func(k): return r.intersects(k))
 
 ## The action group's column on the screen (P0Ui.key_column), empty without the UI or with it hidden.
 func _key_column() -> Rect2:
