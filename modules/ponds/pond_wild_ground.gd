@@ -7,6 +7,7 @@ extends RefCounted
 ## on three sides with a trail's mouth into the south wood. Seeded from the pond: the same pond, the same ground.
 
 const PondWalk := preload("res://modules/ponds/pond_walk.gd")
+const PondWildGroundBake := preload("res://modules/ponds/pond_wild_ground_bake.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const AREA := Rect2(-26, -46, 66, 64)
 const CELL_M := 0.7
@@ -33,7 +34,7 @@ const COLOURS := {"grass": Color("86a74b"), "grass_far": Color("749543"), "plate
 	"sand": Color("dcc79a"), "wet": Color("efe4c6"), "path_colour": Color("d2b98a"), "dapple_warm": Color("a3b54e"),
 	"dapple_cool": Color("6f9b52"), "soft_grass": Color("a8b46b")}
 
-const CACHE_MAX := 4   # a rebuild and the last few ponds reuse it; the memory stays bounded
+const CACHE_MAX := 4   # a rebuild and the last few ponds reuse it; the memory stays bounded (under 1 MB each)
 ## gl_compatibility draws a shadowed sun as a pass of its own, added on top of the sRGB-encoded ambient (周瑜 on 422
 ## 43fdd5fe), so this light ground burned near white there (不知火舞) while the darker pieces did not (上官婉儿: the
 ## sun stays as it is for them). This ground takes only GLES_SUN_K of the sun there — in its ambient-only 99 the sun's
@@ -48,6 +49,7 @@ static func look_for(method: String) -> Dictionary:
 	look["shadow_cool_sand"] = Vector3.ZERO
 	return look
 static var _CACHE := {}   # "shape hash|seed" -> [ground mesh, water distance texture], shared and never edited
+# (the ground's baked textures, ~14 MB, are kept apart and only one: PondWildGroundBake)
 ## `trees`: the bank's tree points (the ground deepens to blue-green under them).
 static func build(entry: Dictionary, spec: Dictionary, clear: Array = [], trees: Array = []) -> Node3D:
 	var seed_value := int(entry.decoration_seed)
@@ -95,6 +97,13 @@ static func build(entry: Dictionary, spec: Dictionary, clear: Array = [], trees:
 	material.set_shader_parameter("centre", centre / maxf(polygon.size(), 1.0) if not polygon.is_empty() else Vector2(6, -8))
 	ground.material_override = material
 	root.add_child(ground)
+	# the ground baked into textures once it is in the tree (#917: GLES frame rate); this material until then / headless
+	var bake := PondWildGroundBake.new()
+	bake.name = "GroundBake"
+	bake.ground = ground
+	bake.shape_key = shape_key
+	bake.area = AREA
+	root.add_child(bake)
 	root.add_child(_bank_rocks(entry, polygon, clear))
 	return root
 
