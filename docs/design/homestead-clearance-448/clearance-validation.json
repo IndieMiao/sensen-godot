@@ -1,0 +1,448 @@
+{
+  "author": "赵云",
+  "checks": [
+    {
+      "passed": true,
+      "check": "porch_a: original UID preserved"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: root_script + shadow meshes"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: single surface"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: vertex-paint static prop only"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: original UID preserved"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: root_script + shadow meshes"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: single surface"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: vertex-paint static prop only"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: original UID preserved"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: root_script + shadow meshes"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: single surface"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: vertex-paint static prop only"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: entire bench +0.5m buffer clear"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: bench front-row cells clear"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: regression reproduces original penetration"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: original UID preserved"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: root_script + shadow meshes"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: single surface"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: vertex-paint static prop only"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: entire bench +0.5m buffer clear"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: bench front-row cells clear"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: regression reproduces original penetration"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: original UID preserved"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: root_script + shadow meshes"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: single surface"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: vertex-paint static prop only"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: entire bench +0.5m buffer clear"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: bench front-row cells clear"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: regression reproduces original penetration"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: original UID preserved"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: root_script + shadow meshes"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: single surface"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: vertex-paint static prop only"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: entire bench +0.5m buffer clear"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: bench front-row cells clear"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: regression reproduces original penetration"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: source wing exactly embedded"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_a: every non-wing position/normal/colour unchanged"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: source wing exactly embedded"
+    },
+    {
+      "passed": true,
+      "check": "master_farmhouse_b: every non-wing position/normal/colour unchanged"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: no cottage-roof intersection"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: no cottage-roof intersection"
+    },
+    {
+      "passed": true,
+      "check": "roof regression reproduces old porch crest above main roof"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: measured wall-edge roof gap about0.10m"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: measured wall-edge roof gap about0.10m"
+    },
+    {
+      "passed": true,
+      "check": "roof orange: value -15%, hue preserved within8-bit rounding"
+    },
+    {
+      "passed": true,
+      "check": "roof orange_light: value -15%, hue preserved within8-bit rounding"
+    }
+  ],
+  "assets": {
+    "porch_a": {
+      "triangles": 840,
+      "before_triangles": 1104,
+      "uid": "uid://dx0yqj4mccb0a",
+      "sha256": "eda32433eec161ea9f1d35644c108f0b3eb8b0e473463cdc99f90005f2b48d50"
+    },
+    "porch_b": {
+      "triangles": 952,
+      "before_triangles": 652,
+      "uid": "uid://b087gv2anatoy",
+      "sha256": "f67e090eb523a64abbcb59b879ca41c936f551fc71bf4feec2bb06d8b2e07e49"
+    },
+    "kitchen_wing_a": {
+      "triangles": 1072,
+      "before_triangles": 1056,
+      "uid": "uid://cea5idchwb8wf",
+      "sha256": "2da45e3e3a8c223c5e7e34b26fec5ca220bd61326a874a8eb70a84b2632f5ba3",
+      "protected_triangle_hits": 0,
+      "before_hits": 453,
+      "front_row_hits": 0
+    },
+    "kitchen_wing_b": {
+      "triangles": 1448,
+      "before_triangles": 1480,
+      "uid": "uid://f18rfwxksle3",
+      "sha256": "192a068f196e183f21a2b9edffd1a5b244fa8b6911cf62e1fbfd4fc34948866a",
+      "protected_triangle_hits": 0,
+      "before_hits": 587,
+      "front_row_hits": 0
+    },
+    "master_farmhouse_a": {
+      "triangles": 7630,
+      "before_triangles": 7614,
+      "uid": "uid://dy5i2yyq4uqdj",
+      "sha256": "bd9a231a01ee8965f96d7e1ce2144195b4e033f3c0e68bb8beccd817e039dc7b",
+      "protected_triangle_hits": 0,
+      "before_hits": 453,
+      "front_row_hits": 0
+    },
+    "master_farmhouse_b": {
+      "triangles": 7812,
+      "before_triangles": 7844,
+      "uid": "uid://c1741x3kxf8pr",
+      "sha256": "b547a546a8bd53068635492aaee3c98a233441c056b9ae5b09a3b21492cf4fa9",
+      "protected_triangle_hits": 0,
+      "before_hits": 587,
+      "front_row_hits": 0
+    }
+  },
+  "cells": {
+    "kitchen_wing_a": {
+      "all_geometry": [
+        [
+          5,
+          17
+        ],
+        [
+          5,
+          18
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          6,
+          18
+        ],
+        [
+          7,
+          16
+        ],
+        [
+          7,
+          17
+        ],
+        [
+          7,
+          18
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          8,
+          18
+        ]
+      ],
+      "wall_geometry": [
+        [
+          5,
+          17
+        ],
+        [
+          5,
+          18
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          6,
+          18
+        ],
+        [
+          7,
+          16
+        ],
+        [
+          7,
+          17
+        ],
+        [
+          7,
+          18
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          8,
+          18
+        ]
+      ]
+    },
+    "kitchen_wing_b": {
+      "all_geometry": [
+        [
+          5,
+          17
+        ],
+        [
+          5,
+          18
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          6,
+          18
+        ],
+        [
+          7,
+          16
+        ],
+        [
+          7,
+          17
+        ],
+        [
+          7,
+          18
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          8,
+          18
+        ]
+      ],
+      "wall_geometry": [
+        [
+          5,
+          18
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          6,
+          18
+        ],
+        [
+          7,
+          16
+        ],
+        [
+          7,
+          17
+        ],
+        [
+          7,
+          18
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          8,
+          18
+        ]
+      ]
+    }
+  },
+  "roof": {
+    "porch_a": {
+      "intersecting_triangles": 0,
+      "before": 0,
+      "wall_edge_gap_range_m": [
+        0.10503949600902641,
+        0.11878760022178007
+      ]
+    },
+    "porch_b": {
+      "intersecting_triangles": 0,
+      "before": 0,
+      "wall_edge_gap_range_m": [
+        0.10503949600902641,
+        0.11878760022178007
+      ]
+    },
+    "old_porch_a_top_m": 2.4125001430511475,
+    "main_roof_top_m": 2.0950002670288086
+  },
+  "roof_paint": {
+    "orange": {
+      "before": "e7954e",
+      "after": "c47f42",
+      "value_ratio": 0.8484848484848485,
+      "hue_delta_degrees": 0.3107088989441886
+    },
+    "orange_light": {
+      "before": "f4ad60",
+      "after": "cf9352",
+      "value_ratio": 0.8483606557377049,
+      "hue_delta_degrees": 0.01621621621623104
+    }
+  },
+  "passed": true
+}

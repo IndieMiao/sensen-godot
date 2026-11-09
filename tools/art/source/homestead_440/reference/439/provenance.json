@@ -28,19 +28,28 @@
     },
     "kitchen_wing_a.glb": {
       "git_path": "assets/farm/art/kitchen_wing_a.glb",
-      "sha256": "7d5f99832e17c8ce79b619b8a9fa513b173ca2e12af0021059f7eed15b680e6b"
+      "sha256": "2da45e3e3a8c223c5e7e34b26fec5ca220bd61326a874a8eb70a84b2632f5ba3",
+      "source_ref": "same PR / SGODOT-448",
+      "editable_source": "tools/art/source/homestead_looks_439/homestead_looks.blend (same PR / SGODOT-448)"
     },
     "kitchen_wing_a.glb.import": {
       "git_path": "assets/farm/art/kitchen_wing_a.glb.import",
-      "sha256": "f359684813cd8b89578eae46f384ed023041d7454cf52a8a48671c35236296b7"
+      "sha256": "42bd1fb31f1ba2b310d1533e28683e8be3a50e2e531512fff810a381e5596a61",
+      "source_ref": "same PR / SGODOT-448"
     },
     "kitchen_wing_b.glb": {
       "git_path": "assets/farm/art/kitchen_wing_b.glb",
-      "sha256": "a1686921bece7d62b0cf8d7c883ab1e92799492ddfe36595b1052e5339f65116"
+      "sha256": "192a068f196e183f21a2b9edffd1a5b244fa8b6911cf62e1fbfd4fc34948866a",
+      "source_ref": "same PR / SGODOT-448",
+      "editable_source": "tools/art/source/homestead_looks_439/homestead_looks.blend (same PR / SGODOT-448)"
     },
     "kitchen_wing_b.glb.import": {
       "git_path": "assets/farm/art/kitchen_wing_b.glb.import",
-      "sha256": "a1430f8eb24494d082b4cf5f56d6cd08214b4b6397b7332db78e35db3fac3310"
+      "sha256": "d4dc4500b14f2efedbea0da88e8c26ba42ca84ce7cf92101184a695725dcafe2",
+      "source_ref": "same PR / SGODOT-448"
     }
-  }
+  },
+  "revision_note": "SGODOT-448: kitchen wings updated in the same PR; porch snapshots remain #858 262533a7.",
+  "revision_author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554"
 }

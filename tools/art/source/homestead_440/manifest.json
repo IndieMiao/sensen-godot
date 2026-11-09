@@ -4,12 +4,12 @@
   "units": "m",
   "assets": {
     "master_farmhouse_a": {
-      "triangles": 7614,
+      "triangles": 7630,
       "surfaces": 1,
-      "bytes": 602556,
+      "bytes": 602208,
       "bounds": [
         [
-          -2.425,
+          -2.3975,
           -0.0,
           -1.5375
         ],
@@ -19,7 +19,7 @@
           1.92
         ]
       ],
-      "sha256": "91d245ca64a19aff29229f3f0a59544f95c064cdd7a5433ac2f7533a2efec27f",
+      "sha256": "bd9a231a01ee8965f96d7e1ce2144195b4e033f3c0e68bb8beccd817e039dc7b",
       "generator": "tools/art/build_homestead_lv15.py",
       "triangle_limit": 9000,
       "pivot": "Identical cottage anchor at ground (0,0,0)",
@@ -52,6 +52,7 @@
           "name": "porch_a",
           "owner": "赵云",
           "commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+          "source_ref": "262533a76cf8cef31d52782698f5837611aea6dd",
           "sha256": "a9c28bdd0be686293c3d3fa9dcb3702769c48ffa0b675edff13f44e21b002571",
           "triangles": 1104,
           "transform": "identity / house anchor / no offset",
@@ -60,11 +61,12 @@
         {
           "name": "kitchen_wing_a",
           "owner": "赵云",
-          "commit": "262533a76cf8cef31d52782698f5837611aea6dd",
-          "sha256": "7d5f99832e17c8ce79b619b8a9fa513b173ca2e12af0021059f7eed15b680e6b",
-          "triangles": 1056,
+          "commit": null,
+          "source_ref": "same PR / SGODOT-448",
+          "sha256": "2da45e3e3a8c223c5e7e34b26fec5ca220bd61326a874a8eb70a84b2632f5ba3",
+          "triangles": 1072,
           "transform": "identity / house anchor / no offset",
-          "editable_source": "https://github.com/IndieMiao/sensen-godot/blob/262533a76cf8cef31d52782698f5837611aea6dd/tools/art/source/homestead_looks_439/homestead_looks.blend"
+          "editable_source": "tools/art/source/homestead_looks_439/homestead_looks.blend (same PR / SGODOT-448)"
         }
       ],
       "components": {
@@ -101,16 +103,16 @@
           ]
         },
         "kitchen_wing": {
-          "triangles": 1056,
+          "triangles": 1072,
           "source_parts": 1,
           "bounds": [
             [
-              -2.425,
+              -2.3975,
               0.0,
               -1.5375
             ],
             [
-              -0.813167,
+              -0.7925,
               1.81,
               0.2375
             ]
@@ -119,12 +121,12 @@
       }
     },
     "master_farmhouse_b": {
-      "triangles": 7844,
+      "triangles": 7812,
       "surfaces": 1,
-      "bytes": 629920,
+      "bytes": 625612,
       "bounds": [
         [
-          -2.425,
+          -2.3975,
           0.0,
           -1.5375
         ],
@@ -134,7 +136,7 @@
           1.928
         ]
       ],
-      "sha256": "0c6cfb2481d82cc943ccdffe733000fe2f61e93c0e2dad5f62638703504a3432",
+      "sha256": "b547a546a8bd53068635492aaee3c98a233441c056b9ae5b09a3b21492cf4fa9",
       "generator": "tools/art/build_homestead_lv15.py",
       "triangle_limit": 9000,
       "pivot": "Identical cottage anchor at ground (0,0,0)",
@@ -167,6 +169,7 @@
           "name": "porch_b",
           "owner": "赵云",
           "commit": "262533a76cf8cef31d52782698f5837611aea6dd",
+          "source_ref": "262533a76cf8cef31d52782698f5837611aea6dd",
           "sha256": "e162a2d4f4d2852e6c89fa64d5a73f087686e344a13b65d6dd4a97e1869bb71e",
           "triangles": 652,
           "transform": "identity / house anchor / no offset",
@@ -175,11 +178,12 @@
         {
           "name": "kitchen_wing_b",
           "owner": "赵云",
-          "commit": "262533a76cf8cef31d52782698f5837611aea6dd",
-          "sha256": "a1686921bece7d62b0cf8d7c883ab1e92799492ddfe36595b1052e5339f65116",
-          "triangles": 1480,
+          "commit": null,
+          "source_ref": "same PR / SGODOT-448",
+          "sha256": "192a068f196e183f21a2b9edffd1a5b244fa8b6911cf62e1fbfd4fc34948866a",
+          "triangles": 1448,
           "transform": "identity / house anchor / no offset",
-          "editable_source": "https://github.com/IndieMiao/sensen-godot/blob/262533a76cf8cef31d52782698f5837611aea6dd/tools/art/source/homestead_looks_439/homestead_looks.blend"
+          "editable_source": "tools/art/source/homestead_looks_439/homestead_looks.blend (same PR / SGODOT-448)"
         }
       ],
       "components": {
@@ -216,16 +220,16 @@
           ]
         },
         "kitchen_wing": {
-          "triangles": 1480,
+          "triangles": 1448,
           "source_parts": 1,
           "bounds": [
             [
-              -2.425,
+              -2.3975,
               0.0,
               -1.5375
             ],
             [
-              -0.813167,
+              -0.7925,
               2.36,
               0.13
             ]
@@ -265,7 +269,9 @@
     0.495,
     0.855
   ],
-  "status": "Exact 439 components reused from #858 head 262533a76cf8cef31d52782698f5837611aea6dd; geometry / normals / vertex colours independently compared",
+  "status": "SGODOT-448 kitchen wings with bench setback; porch snapshots remain #858 262533a7; main house unchanged",
+  "revision_author": "赵云",
+  "revision_virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
   "module_contract": {
     "house_anchor": [
       9,
@@ -284,18 +290,46 @@
       0,
       0
     ],
+    "wing_reference_center": [
+      -1.63,
+      0,
+      -0.75
+    ],
     "porch_ground_max_z": 0.975,
     "porch_floor_max_y": 0.05,
     "porch_clearance_min_y": 2.0,
     "attachments_placement": "All four at house anchor with identity transform; no legacy offsets",
     "lv8_combined_x_envelope": [
-      -2.4250001907348633,
+      -2.3975,
       1.6349704265594482
     ],
-    "wing_reference_center": [
-      -1.63,
-      0,
-      -0.75
+    "bench_protected_local_xz": [
+      [
+        -2.925,
+        -0.825
+      ],
+      [
+        -1.625,
+        0.825
+      ]
+    ],
+    "bench_and_front_row_cells": [
+      [
+        5,
+        16
+      ],
+      [
+        6,
+        16
+      ],
+      [
+        5,
+        15
+      ],
+      [
+        6,
+        15
+      ]
     ]
   },
   "palette_sampled_linear": {

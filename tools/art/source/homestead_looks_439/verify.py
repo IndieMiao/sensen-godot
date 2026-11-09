@@ -2,7 +2,7 @@
 from pathlib import Path
 import json,hashlib,subprocess,sys,re
 import numpy as np
-ROOT=Path(__file__).resolve().parents[4];SRC=Path(__file__).resolve().parent;KIT=ROOT/'assets/farm/art';QA=ROOT/'output/homestead-439'
+ROOT=Path(__file__).resolve().parents[4];SRC=Path(__file__).resolve().parent;KIT=ROOT/'assets/farm/art';QA=ROOT/'output/homestead-439';QA.mkdir(parents=True,exist_ok=True)
 sys.path.insert(0,str(ROOT/'tools/art'));from verify_chef_sign import load_glb,accessor
 spec=json.loads((SRC/'asset_stats.json').read_text());report={'checks':[],'assets':{},'author':'赵云'}
 def check(ok,label):
@@ -46,12 +46,14 @@ for name,e in spec['assets'].items():
   overhead=x[(x[:,2]>.975)&(x[:,1]>.2)]
   if len(overhead):check(overhead[:,1].min()>=1.99999,name+': >=2m forward canopy clearance')
  text=(KIT/(name+'.glb.import')).read_text();uid=re.search(r'^uid="(uid://[^"]+)"$',text,re.M)
- check(uid is not None and all(s in text.splitlines() for s in ['nodes/root_script=null','gltf/texture_map_mode=1','meshes/light_baking=1','meshes/generate_lods=false']),name+': generated UID and complete import settings')
+ check(uid is not None and all(s in text.splitlines() for s in ['nodes/root_script=null','gltf/texture_map_mode=1','meshes/light_baking=1','meshes/generate_lods=false','meshes/create_shadow_meshes=true']),name+': generated UID and complete import settings')
  digest=hashlib.sha256(path.read_bytes()).hexdigest();check(digest==e['sha256'],name+': export SHA matches stats')
  report['assets'][name]={'triangles':len(ids),'surfaces':1,'sha256':digest,'uid':uid.group(1) if uid else None,'bounds':e['bounds'],'blocked_row14_triangles':blocked}
-base=json.loads(subprocess.check_output(['git','show','5585f325:assets/farm/art/manifest.json'],cwd=ROOT));current=json.loads((KIT/'manifest.json').read_text())
-check(all(current['assets'].get(k)==v for k,v in base['assets'].items()) and list(current['assets'])[:len(base['assets'])]==list(base['assets']),'farm manifest retains all prior entries and order')
+base_ref=subprocess.check_output(['git','merge-base','HEAD','origin/wp-3d-scene'],cwd=ROOT,text=True).strip()
+base=json.loads(subprocess.check_output(['git','show',base_ref+':assets/farm/art/manifest.json'],cwd=ROOT));current=json.loads((KIT/'manifest.json').read_text())
+mutable=set(spec['assets'])|{'master_farmhouse_a','master_farmhouse_b'}
+check(all(current['assets'].get(k)==v for k,v in base['assets'].items() if k not in mutable) and list(current['assets'])[:len(base['assets'])]==list(base['assets']),'farm manifest retains all prior entries and order')
 check(hashlib.sha256((KIT/'house_cottage.glb').read_bytes()).hexdigest()==spec['house_sha256'],'original cottage unchanged')
-check(not subprocess.check_output(['git','diff','5585f325','--name-only','--','modules','scenes'],cwd=ROOT,text=True),'no game code / navigation edits')
+check(not subprocess.check_output(['git','diff',base_ref,'--name-only','--','modules','scenes'],cwd=ROOT,text=True),'no game code / navigation edits')
 report['triangles_total']=sum(e['triangles'] for e in report['assets'].values());report['passed']=all(c['passed'] for c in report['checks']);(QA/'asset-validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print('HOMESTEAD_GEOMETRY',report['passed'],len(report['checks']),report['triangles_total'],'triangles');raise SystemExit(0 if report['passed'] else 1)

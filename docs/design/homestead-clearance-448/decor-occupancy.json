@@ -1,0 +1,549 @@
+{
+  "base": "b46c6ea7",
+  "yard": {
+    "walk": [
+      1,
+      -2,
+      18,
+      21
+    ],
+    "field": [
+      [
+        1,
+        -2,
+        19,
+        15
+      ]
+    ],
+    "objects": [
+      [
+        8,
+        15,
+        4,
+        3
+      ],
+      [
+        14,
+        15,
+        1,
+        1
+      ],
+      [
+        5,
+        16,
+        2,
+        1
+      ],
+      [
+        16,
+        16,
+        3,
+        1
+      ],
+      [
+        15,
+        13,
+        1,
+        1
+      ],
+      [
+        17,
+        8,
+        1,
+        1
+      ],
+      [
+        17,
+        12,
+        1,
+        1
+      ],
+      [
+        18,
+        4,
+        1,
+        1
+      ],
+      [
+        6,
+        13,
+        2,
+        1
+      ],
+      [
+        11,
+        13,
+        2,
+        1
+      ],
+      [
+        11,
+        14,
+        1,
+        1
+      ],
+      [
+        7,
+        14,
+        1,
+        1
+      ],
+      [
+        5,
+        14,
+        1,
+        1
+      ],
+      [
+        4,
+        14,
+        1,
+        1
+      ],
+      [
+        15,
+        15,
+        1,
+        1
+      ],
+      [
+        12,
+        16,
+        1,
+        1
+      ],
+      [
+        7,
+        -1,
+        1,
+        1
+      ],
+      [
+        3,
+        19,
+        1,
+        1
+      ],
+      [
+        10,
+        19,
+        1,
+        1
+      ],
+      [
+        16,
+        18,
+        1,
+        2
+      ],
+      [
+        17,
+        19,
+        1,
+        1
+      ],
+      [
+        19,
+        16,
+        1,
+        1
+      ],
+      [
+        1,
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        6,
+        1,
+        1
+      ],
+      [
+        1,
+        19,
+        1,
+        1
+      ],
+      [
+        6,
+        17,
+        1,
+        1
+      ],
+      [
+        12,
+        18,
+        1,
+        1
+      ]
+    ],
+    "paths": [
+      [
+        9,
+        -2,
+        1,
+        4
+      ],
+      [
+        8,
+        13,
+        3,
+        2
+      ],
+      [
+        13,
+        13,
+        2,
+        2
+      ],
+      [
+        16,
+        13,
+        2,
+        3
+      ],
+      [
+        6,
+        15,
+        2,
+        1
+      ]
+    ]
+  },
+  "levels": {
+    "8": {
+      "kitchen_wing_a": [
+        {
+          "cell": [
+            5,
+            17
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            5,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            6,
+            17
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            6,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            16
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            17
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            8,
+            16
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            8,
+            17
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            8,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        }
+      ],
+      "kitchen_wing_b": [
+        {
+          "cell": [
+            5,
+            17
+          ],
+          "wall": false,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            5,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            6,
+            17
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            6,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            16
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            17
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            8,
+            16
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            8,
+            17
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            8,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        }
+      ]
+    },
+    "15": {
+      "kitchen_wing_a": [
+        {
+          "cell": [
+            5,
+            17
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            5,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            6,
+            17
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            6,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            16
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            17
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            8,
+            16
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            8,
+            17
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            8,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        }
+      ],
+      "kitchen_wing_b": [
+        {
+          "cell": [
+            5,
+            17
+          ],
+          "wall": false,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            5,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            6,
+            17
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            6,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            16
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            17
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            7,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        },
+        {
+          "cell": [
+            8,
+            16
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            8,
+            17
+          ],
+          "wall": true,
+          "current_server_block": "decor_overlap"
+        },
+        {
+          "cell": [
+            8,
+            18
+          ],
+          "wall": true,
+          "current_server_block": null
+        }
+      ]
+    }
+  }
+}

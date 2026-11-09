@@ -1,0 +1,313 @@
+{
+  "checks": [
+    {
+      "passed": true,
+      "check": "porch_a: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: identity root at the shared house anchor"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: no lights, cameras, rig, animation or bitmap"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: actual triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: grounded and recorded bounds"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: no degenerate or reversed shading faces"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: farm matte material"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: house/farm palette with only original 0.62–1 vertex AO factor"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: protected row 14 has no fixtures between .05 and 2.0 m"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: flat <=.05m new landing"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: generated UID and complete import settings"
+    },
+    {
+      "passed": true,
+      "check": "porch_a: export SHA matches stats"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: identity root at the shared house anchor"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: no lights, cameras, rig, animation or bitmap"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: actual triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: grounded and recorded bounds"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: no degenerate or reversed shading faces"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: farm matte material"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: house/farm palette with only original 0.62–1 vertex AO factor"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: protected row 14 has no fixtures between .05 and 2.0 m"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: flat <=.05m new landing"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: generated UID and complete import settings"
+    },
+    {
+      "passed": true,
+      "check": "porch_b: export SHA matches stats"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: identity root at the shared house anchor"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: no lights, cameras, rig, animation or bitmap"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: actual triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: grounded and recorded bounds"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: no degenerate or reversed shading faces"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: farm matte material"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: house/farm palette with only original 0.62–1 vertex AO factor"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: protected row 14 has no fixtures between .05 and 2.0 m"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: generated UID and complete import settings"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_a: export SHA matches stats"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: single mobile mesh / surface"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: identity root at the shared house anchor"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: no lights, cameras, rig, animation or bitmap"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: actual triangle budget"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: finite attributes"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: grounded and recorded bounds"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: unit normals"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: no degenerate or reversed shading faces"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: farm matte material"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: house/farm palette with only original 0.62–1 vertex AO factor"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: protected row 14 has no fixtures between .05 and 2.0 m"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: generated UID and complete import settings"
+    },
+    {
+      "passed": true,
+      "check": "kitchen_wing_b: export SHA matches stats"
+    },
+    {
+      "passed": true,
+      "check": "farm manifest retains all prior entries and order"
+    },
+    {
+      "passed": true,
+      "check": "original cottage unchanged"
+    },
+    {
+      "passed": true,
+      "check": "no game code / navigation edits"
+    }
+  ],
+  "assets": {
+    "porch_a": {
+      "triangles": 840,
+      "surfaces": 1,
+      "sha256": "eda32433eec161ea9f1d35644c108f0b3eb8b0e473463cdc99f90005f2b48d50",
+      "uid": "uid://dx0yqj4mccb0a",
+      "bounds": [
+        [
+          -1.2449703216552734,
+          0.0,
+          0.2749999761581421
+        ],
+        [
+          1.6349704265594482,
+          1.805402159690857,
+          1.9200000762939453
+        ]
+      ],
+      "blocked_row14_triangles": []
+    },
+    "porch_b": {
+      "triangles": 952,
+      "surfaces": 1,
+      "sha256": "f67e090eb523a64abbcb59b879ca41c936f551fc71bf4feec2bb06d8b2e07e49",
+      "uid": "uid://b087gv2anatoy",
+      "bounds": [
+        [
+          -1.2449703216552734,
+          0.0,
+          0.5
+        ],
+        [
+          1.2450000047683716,
+          1.805402159690857,
+          1.9279999732971191
+        ]
+      ],
+      "blocked_row14_triangles": []
+    },
+    "kitchen_wing_a": {
+      "triangles": 1072,
+      "surfaces": 1,
+      "sha256": "2da45e3e3a8c223c5e7e34b26fec5ca220bd61326a874a8eb70a84b2632f5ba3",
+      "uid": "uid://cea5idchwb8wf",
+      "bounds": [
+        [
+          -2.3975000381469727,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          -0.7925000190734863,
+          1.809999942779541,
+          0.23749999701976776
+        ]
+      ],
+      "blocked_row14_triangles": []
+    },
+    "kitchen_wing_b": {
+      "triangles": 1448,
+      "surfaces": 1,
+      "sha256": "192a068f196e183f21a2b9edffd1a5b244fa8b6911cf62e1fbfd4fc34948866a",
+      "uid": "uid://f18rfwxksle3",
+      "bounds": [
+        [
+          -2.3975000381469727,
+          0.0,
+          -1.537500262260437
+        ],
+        [
+          -0.7925000190734863,
+          2.3600001335144043,
+          0.12999999523162842
+        ]
+      ],
+      "blocked_row14_triangles": []
+    }
+  },
+  "author": "赵云",
+  "triangles_total": 4312,
+  "passed": true
+}

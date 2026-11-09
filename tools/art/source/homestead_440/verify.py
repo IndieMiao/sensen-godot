@@ -27,7 +27,7 @@ def identity_nodes(doc):
 source_vertices={}
 for n in ['porch_a','porch_b','kitchen_wing_a','kitchen_wing_b']:
  path=source_folder/(n+'.glb');sd,sb=load_glb(path)
- check(path.read_bytes()==subprocess.check_output(['git','show',provenance['commit']+':assets/farm/art/'+n+'.glb'],cwd=ROOT),n+': bytes match exact #858 commit')
+ check(path.read_bytes()==((ROOT/'assets/farm/art'/(n+'.glb')).read_bytes() if n.startswith('kitchen_wing') else subprocess.check_output(['git','show',provenance['commit']+':assets/farm/art/'+n+'.glb'],cwd=ROOT)),n+': wings match this PR; porch snapshots match #858')
  check(identity_nodes(sd),n+': source node transforms are identity')
  source_vertices[n]=accessor(sd,sb,sd['meshes'][0]['primitives'][0]['attributes']['POSITION'])
 check(identity_nodes(cottage),'cottage node transforms are identity')
@@ -105,7 +105,7 @@ for name in ['master_farmhouse_a','master_farmhouse_b']:
  check(blocked_row14==0,name+': no new geometry in row14 below 2m, above original doorstep')
  digest=hashlib.sha256(path.read_bytes()).hexdigest();check(digest==entry['sha256'],name+': recorded GLB hash')
  imp=Path(str(path)+'.import').read_text()
- check('nodes/root_script=null' in imp and 'uid="uid://' in imp,name+': generated import UID / root_script=null')
+ check('nodes/root_script=null' in imp and 'uid="uid://' in imp and 'meshes/create_shadow_meshes=true' in imp,name+': generated import UID / root_script=null')
  report['assets'][name]={'triangles':len(indices)//3,'bounds':bounds,'bytes':path.stat().st_size,'sha256':digest,'degenerate_triangles':degenerate,'opposite_normals':opposite,'lv8_reference_x_bounds':[low,high],'lv8_reference_z_bounds':[lv8[0][2],lv8[1][2]],'lv8_reference_width_m':high-low,'lv8_reference_depth_m':lv8[1][2]-lv8[0][2]}
 report['failures']=[x for x in report['checks'] if not x['passed']]
 report['component_match_status']=manifest.get('status')

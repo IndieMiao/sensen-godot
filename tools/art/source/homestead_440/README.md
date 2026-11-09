@@ -1,5 +1,7 @@
 # SGODOT-440 制作与复拍
 
+> **2026-11-09 SGODOT-448 覆盖说明**：本文件下方保留439/440历史接入记录。当前长凳保持(5,16)两格，禁止沿用“挪到(3,16)”或旧QA里的移Bench操作；左翼已改L形凹口让位。Lv5两套改贴墙瓦檐；Lv15仅替换左翼，其内置门廊仍锁原#858。当前门罩高度豁免、面数、7个可摆格依赖及全套复现见 [448说明](../../../../docs/design/homestead-clearance-448/README.md)，拍本轮请用 `homestead_clearance_448` 工具。
+
 `homestead_lv15.blend` 保留两个独立集合、命名主楼部件和 porch / kitchen_wing 组件。`build_homestead_lv15.py` 生成主楼，四个挂件固定取自439 / #858头262533a7，来源与原GLB在 `reference/439/`。每栋只导出一个合并 mesh/surface，GLB没有文字、灯、相机或贴图。详见 [接口合同](contract.md) 与 [审阅说明](../../../../docs/design/homestead-440/README.md)。
 
 固定原设定、原屋资产与程序版本见 `reference/provenance.json`。结构颜色从未改动的 `house_cottage.glb` 的实际 COLOR_0 取最近样本，花叶沿用农场套件色板；目标色与实际线性样本分别记录在 `manifest.json`。各GLB的 hash、预算、组件包围盒及烟口也在该文件。

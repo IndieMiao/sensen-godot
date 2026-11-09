@@ -201,9 +201,10 @@ def source_component(name,component):
  mesh.color_attributes.active_color=attr;mesh.color_attributes.render_color_index=0
  mesh.materials.append(bpy.data.materials['Farm vertex paint'])
  obj=bpy.data.objects.new('439 / '+name+' / original geometry and vertex colour',mesh);kit.CURRENT.objects.link(obj)
- obj['component']=component;obj['source_commit']=meta['commit'];obj['source_sha256']=digest
+ source_ref=meta['files'][path.name].get('source_ref',meta['commit'])
+ obj['component']=component;obj['source_commit']=source_ref;obj['source_sha256']=digest
  obj['source_file']=str(path.relative_to(ROOT))
- return {'name':name,'owner':'赵云','commit':meta['commit'],'sha256':digest,'triangles':len(indices)//3,'transform':'identity / house anchor / no offset','editable_source':meta['editable_source']}
+ return {'name':name,'owner':'赵云','commit':source_ref if not source_ref.startswith('same PR') else None,'source_ref':source_ref,'sha256':digest,'triangles':len(indices)//3,'transform':'identity / house anchor / no offset','editable_source':meta['files'][path.name].get('editable_source',meta['editable_source'])}
 
 def main_house(variant):
  name='master_farmhouse_'+variant
@@ -288,7 +289,7 @@ def main():
  shader=material.node_tree.nodes['Principled BSDF'];shader.inputs['Roughness'].default_value=.9;shader.inputs['Specular IOR Level'].default_value=.18
  color=material.node_tree.nodes.new('ShaderNodeVertexColor');color.layer_name='Color';material.node_tree.links.new(color.outputs['Color'],shader.inputs['Base Color'])
  for variant in ['a','b']:main_house(variant)
- manifest={'author':'刘备','task':'SGODOT-440','units':'m','assets':{},'palette_target_srgb':PALETTE,'door_center':[-.35,.495,.855],'status':'Exact 439 components reused from #858 head 262533a76cf8cef31d52782698f5837611aea6dd; geometry / normals / vertex colours independently compared','module_contract':{'house_anchor':[9,16],'house_footprint':[8,15,4,3],'grid_m':.65,'house_front_m':1.13,'wing_anchor':[0,0,0],'wing_reference_center':[-1.63,0,-.75],'porch_ground_max_z':.975,'porch_floor_max_y':.05,'porch_clearance_min_y':2.0,'attachments_placement':'All four at house anchor with identity transform; no legacy offsets','lv8_combined_x_envelope':[-2.4250001907348633,1.6349704265594482]}}
+ manifest={'author':'刘备','task':'SGODOT-440','units':'m','assets':{},'palette_target_srgb':PALETTE,'door_center':[-.35,.495,.855],'status':'SGODOT-448 kitchen wings with bench setback; porch snapshots remain #858 262533a7; main house unchanged', 'revision_author':'赵云','revision_virtual_user_id':'8ea32e40-c0ba-4a31-864f-374a6bcbc554','module_contract':{'house_anchor':[9,16],'house_footprint':[8,15,4,3],'grid_m':.65,'house_front_m':1.13,'wing_anchor':[0,0,0],'wing_reference_center':[-1.63,0,-.75],'porch_ground_max_z':.975,'porch_floor_max_y':.05,'porch_clearance_min_y':2.0,'attachments_placement':'All four at house anchor with identity transform; no legacy offsets','lv8_combined_x_envelope':[-2.3975000381469727,1.6349704265594482],'bench_protected_local_xz':[[-2.925,-.825],[-1.625,.825]],'bench_and_front_row_cells':[[5,16],[6,16],[5,15],[6,15]]}}
  manifest['palette_sampled_linear']=samples
  manifest['structural_palette_keys']=sorted(structural)
  manifest['cottage_palette_sha256']=hashlib.sha256((ROOT/'assets/farm/art/house_cottage.glb').read_bytes()).hexdigest()
