@@ -18,7 +18,6 @@ const CLEAR_M := 1.5      # the bank's trees and bushes keep this far off a poin
 ## The pieces by kind (上官婉儿, 410 924d6611); the four new ones are farm-kit glbs (Art.instance), the rest are built.
 const PIECES := {"wood": "grove", "stone": "rock_pile", "herb": "herb_patch", "reed": "reed_bank", "clay": "clay_pit",
 	"hardwood": "hardwood_grove", "flax": "flax_patch"}
-const GROVE_TREES := [[Vector3(0.5, 0, -0.35), "tree_1", 0.78], [Vector3(-0.35, 0, 0.2), "tree_2", 0.7], [Vector3(0.55, 0, 0.6), "tree_1", 0.66]]
 
 var pond := ""
 var points: Array = []
@@ -37,12 +36,10 @@ func _piece(p: Dictionary) -> Node3D:
 	root.name = "Gather_" + str(p.get("slot", p.id))
 	root.position = Vector3(float(p.get("x", 0)), 0, float(p.get("z", 0)))
 	add_child(root)
-	match str(PIECES.get(str(p.get("kind", "")), "")):
-		"grove":
-			for t in GROVE_TREES:
-				var tree := Art.instance(str(t[1]), t[0], float(t[2]))
-				tree.rotation.y = float(t[0].x) * 2.1
-				root.add_child(tree)
+	var kind := str(PIECES.get(str(p.get("kind", "")), ""))
+	match kind:
+		"grove": _grove(root)
+		"hardwood_grove": _hardwood(root)
 		"rock_pile": _rocks(root)
 		"herb_patch":
 			root.add_child(Art.instance("bush", Vector3(0.0, 0, -0.35), 0.62))
@@ -56,7 +53,58 @@ func _piece(p: Dictionary) -> Node3D:
 				root.add_child(h)
 		var asset:
 			if asset != "": root.add_child(Art.instance(asset))
+	if kind in ["grove", "hardwood_grove", "rock_pile"]: _feet(root, kind)
 	return root
+
+## Timber (SGODOT-422 v7; the user 11-09: "树木换掉素材", on v5 530: "这个树换掉"): still three trees in a clump — the
+## Pandazole pack's layered pines (_g: +10 % saturation, they read as timber), about the old 2.1 m — opened toward the
+## camera round the stand side (上官婉儿: no crown over the player at the stand — farm-dev's grove hid them whole at
+## Fern's C1, (−0.12, −0.72) off the point): two to the right, one behind left; the one nearest the stand a little
+## left-back and 10 % smaller (air by the player).
+const GROVE := [[Vector3(0.85, 0, -0.45), 0.44], [Vector3(-0.9, 0, -1.3), 0.4], [Vector3(1.15, 0, 0.55), 0.42]]   # the trunks' spots (their feet's blades too)
+static func _grove(root: Node3D) -> void:
+	for t in GROVE:
+		var s := float(t[1]) / 0.44 * 0.58
+		var at: Vector3 = t[0]
+		if at.z > 0.0:
+			at += Vector3(-0.25, 0, -0.2)
+			s *= 0.9
+		var tree := Art.instance("wild_pz_pine_01_g", at, s)
+		tree.rotation.y = float(t[0].x) * 2.1
+		root.add_child(tree)
+
+## Hardwood (SGODOT-422 v7): still a tree, a stump and a stack of logs — the pack's Tree_20 (a broadleaf, _g), Log_05,
+## Log_01 / 02, about the old size.
+static func _hardwood(root: Node3D) -> void:
+	var tree := Art.instance("wild_pz_tree_20_g", Vector3(0.1, 0, -0.25), 0.52)
+	tree.rotation.y = 0.8
+	root.add_child(tree)
+	var stump := Art.instance("wild_pz_log_05", Vector3(-0.5, 0, 0.3), 0.28)
+	root.add_child(stump)
+	for l in [[Vector3(0.35, 0, 0.42), "wild_pz_log_01", 0.0], [Vector3(0.33, 0.13, 0.4), "wild_pz_log_02", 0.25]]:
+		var log := Art.instance(str(l[1]), l[0], 0.24)
+		log.rotation = Vector3(0, PI * 0.5 + float(l[2]), 0)
+		root.add_child(log)
+
+## Grass where things meet the ground (the user on v5: the stones' and trees' feet most): blades round each trunk and
+## round the stone pile, one MultiMesh a blade kind (上官婉儿: draw calls).
+static func _feet(root: Node3D, kind: String) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(root.name)
+	var bases: Array = []
+	if kind == "grove":
+		for t in GROVE: bases.append([t[0], 0.35])
+	elif kind == "hardwood_grove": bases = [[Vector3(0.1, 0, -0.25), 0.4], [Vector3(-0.5, 0, 0.3), 0.3], [Vector3(0.35, 0, 0.42), 0.35]]
+	else: bases = [[Vector3.ZERO, 0.6]]
+	var blades := ["wild_pz_foot_leafy"]   # mid green, short, round (上官婉儿 on v5)
+	var by := {}
+	for b in bases:
+		for k in rng.randi_range(4, 6):
+			var at: Vector3 = b[0] + Vector3.FORWARD.rotated(Vector3.UP, rng.randf() * TAU) * float(b[1]) * rng.randf_range(0.8, 1.25)
+			var kind_b: String = blades[rng.randi() % blades.size()]
+			if not by.has(kind_b): by[kind_b] = []
+			by[kind_b].append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.45, 0.7)), Vector3(at.x, -0.02, at.z)))
+	for kind_b in by: root.add_child(Art.batch(kind_b, by[kind_b], false))
 
 static func _rocks(root: Node3D) -> void:
 	for r in [[Vector3(0, 0, 0), 1.55, 0.0], [Vector3(0.38, 0, 0.22), 1.2, 1.7], [Vector3(-0.32, 0, 0.18), 1.05, 3.1],

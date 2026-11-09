@@ -7,6 +7,7 @@ extends RefCounted
 ## in front, PondScenery._in_front). Seeded from the pond: the same pond dresses the same way.
 
 const Art = preload("res://modules/farm/farm_art.gd")
+const PondWildGround := preload("res://modules/ponds/pond_wild_ground.gd")
 const TREES := ["wild_tree_pine", "wild_tree_round"]
 const CLUSTER := ["wild_flower_white", "wild_flower_yellow", "wild_flower_lilac", "wild_clover", "wild_pebbles_a",
 	"wild_pebbles_b", "wild_bush_dark", "wild_bush_olive"]
@@ -168,9 +169,10 @@ static func build(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arra
 	var root := Node3D.new()
 	root.name = "WildProps"
 	var l := layout(entry, spec, clear, trees, in_key)
+	l = PondWildGround.regroup(l, entry, spec, clear)   # SGODOT-422 v7: the crumbs into clumps, the packs' plants, the woods
 	for asset in l:
 		if not ResourceLoader.exists(Art.ROOT + asset + ".glb"): continue   # #799's pieces not in this build yet
-		var batch := Art.batch(asset, l[asset], asset.begins_with("wild_tree") or asset.begins_with("wild_bush"))
+		var batch := Art.batch(asset, l[asset], asset.begins_with("wild_pz_") or asset.begins_with("wild_tree") or asset.begins_with("wild_bush"))
 		batch.name = "Wild_" + asset   # the lower clusters' grass beside PondScenery's own grass_clump batch
 		root.add_child(batch)
 	return root
