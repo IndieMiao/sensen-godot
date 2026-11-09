@@ -7,7 +7,7 @@ var _points := PackedVector3Array()
 var _steam_material: ShaderMaterial
 
 func _ready() -> void:
-	if not visible: set_process(false); return   # Steam ships off in b1 (蒸汽待补开): no lid reads, no per-frame unproject
+	if not visible: set_process(false); return   # Steam hidden: no lid reads, no per-frame unproject
 	_lid_mesh = get_parent().get_node_or_null("lid_mesh") as MeshInstance3D
 	if _lid_mesh == null or draw_pass_1 == null: return
 	_steam_material = draw_pass_1.material.duplicate() as ShaderMaterial
