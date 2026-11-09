@@ -1,0 +1,92 @@
+{
+  "source_ref": "6151fef82a16e822367ee076dacc5eef85c19002",
+  "source_sha256": "fc8ea72a89c6f0d9b53842c066963af64fd0a3c617c3ed43f5c282ca596c5310",
+  "output_sha256": "42afc8efdd1909af71cbebfc555085b2f87be36a668a01814c18a36681f55164",
+  "source_bytes": 1127424,
+  "output_bytes": 1116240,
+  "method": "FBX 7500 source-document re-export; retained property payloads byte-identical",
+  "unedited_roundtrip_byte_identical": true,
+  "removed_objects": [
+    {
+      "type": "Material",
+      "id": 2198287308000,
+      "name": "eyes_mat"
+    },
+    {
+      "type": "Material",
+      "id": 2198287303200,
+      "name": "body_mat"
+    },
+    {
+      "type": "Material",
+      "id": 2198287306400,
+      "name": "cloth_mat"
+    },
+    {
+      "type": "Material",
+      "id": 2198287310800,
+      "name": "hairHat_mat"
+    },
+    {
+      "type": "Video",
+      "id": 2197820244080,
+      "name": "pasted__pasted__file4"
+    },
+    {
+      "type": "Video",
+      "id": 2197820292080,
+      "name": "pasted__pasted__file2"
+    },
+    {
+      "type": "Video",
+      "id": 2197820287760,
+      "name": "file2"
+    },
+    {
+      "type": "Video",
+      "id": 2197820274800,
+      "name": "file1"
+    },
+    {
+      "type": "Texture",
+      "id": 2197820258480,
+      "name": "pasted__pasted__file4"
+    },
+    {
+      "type": "Texture",
+      "id": 2197820243120,
+      "name": "pasted__pasted__file2"
+    },
+    {
+      "type": "Texture",
+      "id": 2197820262320,
+      "name": "file2"
+    },
+    {
+      "type": "Texture",
+      "id": 2197820242160,
+      "name": "file1"
+    }
+  ],
+  "removed_connections": 12,
+  "retained_objects": 636,
+  "retained_object_payloads_byte_identical": true,
+  "preserved_object_counts": {
+    "Geometry": 5,
+    "Model": 68,
+    "NodeAttribute": 63,
+    "Deformer": 89,
+    "Pose": 5,
+    "AnimationStack": 1,
+    "AnimationLayer": 1,
+    "AnimationCurveNode": 401
+  },
+  "remaining_materials": [
+    "shoes_mat"
+  ],
+  "remaining_image": "T_skin03_shoes_D.png",
+  "shoe_material_slot_name_unchanged": true,
+  "all_geometry_skin_weights_uv_transforms_animations_byte_identical": true,
+  "other_root_payloads_and_footer_metadata_unchanged": true,
+  "footer_alignment_padding_recomputed": true
+}

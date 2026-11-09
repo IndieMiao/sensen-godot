@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "rebuilt_four_files_match_delivery": {
+    "assets/avatar/source/shoes3_npc_gabriel/SK_dt_skin03.fbx": "42afc8efdd1909af71cbebfc555085b2f87be36a668a01814c18a36681f55164",
+    "assets/avatar/source/shoes3_npc_gabriel/SK_dt_skin03.fbx.import": "832bb41be18c6ff1693be64b20beeb212ffaef956689cf1c6f3e805e40121b27",
+    "assets/avatar/source/shoes3_npc_gabriel/T_skin03_shoes_D.png": "7b831c7b61497c4b4439d433e51acba1de370dc3ddfdaf4c8e4c89eb649a4504",
+    "assets/avatar/source/shoes3_npc_gabriel/T_skin03_shoes_D.png.import": "0b3630db15dea9f7e1ccfe0395639fe77500a8dbc1553ed989952b339e426f3a"
+  },
+  "shared_donor_files_unchanged": true,
+  "final_native_import_structure_matches_rendered_snapshot": true
+}
