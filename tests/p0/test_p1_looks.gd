@@ -208,10 +208,9 @@ func test_a_shown_model_stands_on_its_cells() -> void:
 		var cells := P0Garden.look_cells(bp, asset)
 		for c in cells:
 			assert_bool(P0Garden.FOOTPRINTS.house.has_point(c) or P0Garden.DOOR_PATH.has_point(c)).is_false()
-	# the wing's walls and the room they close, on the house's left and back (亚瑟 counted (5..7, 17..18), (7, 16),
-	# (8, 18) from its box; (5, 18) its set-back corner does not reach); the porch's left post; the whole house both
-	var wing: Array[Vector2i] = [Vector2i(5, 17), Vector2i(6, 17), Vector2i(6, 18), Vector2i(7, 16), Vector2i(7, 17),
-		Vector2i(7, 18), Vector2i(8, 18)]
+	# the wing's walls and the room they close, on the house's left and back; its front-left corner set back behind the
+	# bench since 赵云's #902 (448): (5, 17) and (6, 17) open, sat in from the bench; the porch's left post; the whole house both
+	var wing: Array[Vector2i] = [Vector2i(6, 18), Vector2i(7, 16), Vector2i(7, 17), Vector2i(7, 18), Vector2i(8, 18)]
 	for look in ["a", "b"]:
 		assert_array(P0Garden.look_cells(bp, "kitchen_wing_" + look)).contains_exactly_in_any_order(wing)
 		assert_array(P0Garden.look_cells(bp, "porch_" + look)).contains_exactly([Vector2i(7, 15)])
