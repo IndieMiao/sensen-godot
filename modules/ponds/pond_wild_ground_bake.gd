@@ -35,6 +35,8 @@ var _key := ""
 var _t0 := 0
 
 static func headless() -> bool: return DisplayServer.get_name() == "headless"
+## Off: the full shader throughout (dev before / after shots: P0_WILD_NO_BAKE=1; a test run in a window, 周瑜 on #918).
+static var enabled := OS.get_environment("P0_WILD_NO_BAKE") == ""
 
 ## What the bake depends on: the pond's shape and seed, and every setting of the full material but the water's distance
 ## texture (built from the shape), so the plants' feet and the bank's trees (they move with the gathering points) too.
@@ -65,7 +67,7 @@ static func _with_mips(w: int, h: int) -> int:
 
 func _ready() -> void:
 	if headless(): return   # no SubViewport draws headless: the full shader stays (the tests)
-	if OS.get_environment("P0_WILD_NO_BAKE") != "": return   # dev: the full shader throughout (before / after shots)
+	if not enabled: return   # dev (P0_WILD_NO_BAKE) or a test: the full shader throughout
 	_start.call_deferred()   # the scenery has set the plants' feet by now; the same frame, before it is drawn
 
 func _start() -> void:

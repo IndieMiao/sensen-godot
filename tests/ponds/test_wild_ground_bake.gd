@@ -11,13 +11,17 @@ const SF := ["pond_san_francisco_01", "pond_san_francisco_02", "pond_san_francis
 
 func _painted(scene: Node) -> MeshInstance3D: return scene.find_child("PaintedGround", true, false) as MeshInstance3D
 
-func test_headless_keeps_the_full_shader_and_does_not_wait() -> void:
+## Headless (CI) a SubViewport never draws, so the bake is skipped; run in a window (周瑜's runtest.sh on #918) the same
+## is checked with the bake switched off, as P0_WILD_NO_BAKE does.
+func test_without_a_bake_the_full_shader_stays_and_nothing_waits() -> void:
 	PondWildGroundBake.clear_cache()
+	var was := PondWildGroundBake.enabled
+	if not PondWildGroundBake.headless(): PondWildGroundBake.enabled = false
 	var scene: Node3D = auto_free(PondScenery.build(P0Ponds.location(SF[2])))
 	add_child(scene)
 	for i in 3: await get_tree().process_frame
+	PondWildGroundBake.enabled = was
 	var ground := _painted(scene)
-	assert_bool(PondWildGroundBake.headless()).is_true()
 	assert_object((ground.material_override as ShaderMaterial).shader).is_equal(FULL)
 	assert_object(scene.find_child("GroundBake", true, false)).is_not_null()
 	assert_int(scene.find_children("*", "SubViewport", true, false).size()).is_equal(0)   # nothing waits on a draw
