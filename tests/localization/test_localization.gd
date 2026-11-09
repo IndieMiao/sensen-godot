@@ -606,6 +606,12 @@ func test_p0_a_plus_count_and_its_item_reads_in_chinese() -> void:
 		assert_str(zh.call("+5 " + str(name))).override_failure_message(str(name)).is_equal("+5 " + cn)
 		checked += 1
 	assert_int(checked).is_greater(30)
+	# a count taken (`−2 Radish`, a batch's ingredients): P0Ui._flush_floats writes its minus as U+2212, so does the
+	# template (李白); the ones with their own templates read as before
+	var taken := {"−2 Radish": "−2 小萝卜", "−1 Carrot Seeds": "−1 胡萝卜种子", "−2 Timber": "−2 木材", "−3 Friendship": "−3 好感",
+		"−5 Energy": "−5 体力", "−30 coins": "−30 金币", "−10 XP": "−10经验"}
+	for en in taken: assert_str(zh.call(en)).override_failure_message(en).is_equal(str(taken[en]))
+	assert_str(zh.call("-2 Radish")).is_empty()   # an ASCII hyphen is not the floats' minus: no template for it
 
 
 ## A toast broken at its ` · ` (P0Ui._break_at_dot) under 中文: the whole line is looked up first, then broken as it
@@ -618,10 +624,12 @@ func test_p0_a_toast_is_translated_before_it_breaks_at_its_dot() -> void:
 	var ui: P0Ui = auto_free(P0Ui.new())
 	add_child(ui)
 	var line := "Fish from a pond · open one from the map"
+	var was := TranslationServer.get_locale()
 	TranslationServer.set_locale("zh_CN")
 	var zh := ui._break_at_dot(line)
 	TranslationServer.set_locale("en")
 	var en := ui._break_at_dot(line)
+	TranslationServer.set_locale(was)   # as the run had it (周瑜 on #921)
 	TranslationServer.remove_translation(t)
 	assert_bool(zh.contains("Fish") or zh.contains("open one")).override_failure_message(zh).is_false()
 	assert_str(zh.replace("\n", " · ")).is_equal("去鱼塘钓鱼 · 从地图上打开一个")

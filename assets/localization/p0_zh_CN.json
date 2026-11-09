@@ -2714,5 +2714,6 @@
  "%d XP to go · %s": "还差 %d 经验 · %s",
  "Space taken · clear it first": "位置已被占用 · 先清空",
  "Homestead Lv%d · Space taken": "家园 Lv%d · 位置已被占用",
- "+%d %s": "+%d %s"
+ "+%d %s": "+%d %s",
+ "−%d %s": "−%d %s"
 }
