@@ -1767,6 +1767,11 @@ func toast(text: String, seconds := 0.0, break_at_dot := false) -> void:
 	_aim_toast()
 	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.INFO, "", seconds)
 
+## For a toast whose Chinese breaks at its " · " while its English wraps by words as it always has (SGODOT-452, 李白:
+## q(275) ⑦ is the Chinese rule; breaking the English is a new way of writing the player sees, not approved): `toast`'s
+## `break_at_dot` under 中文 only.
+static func break_in_chinese() -> bool: return TranslationServer.get_locale().begins_with("zh")
+
 ## The width the toast's text gets: ToastLayer's panel (its width, never wider than the layer less SPACE_PAGE each
 ## side, as _place sizes it) less the panel padding, the glyph and the gap after it. This reads ToastLayer's own
 ## layout (its _width, _ICON_GAP and the toast tokens), so a change there must come here too (哪吒 on #188);

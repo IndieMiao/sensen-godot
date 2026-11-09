@@ -189,7 +189,7 @@ func open(tab := "cookbook", page_id := "") -> void:
 	drawer.ingredient_tapped.connect(_on_ingredient)
 	drawer.cook_requested.connect(_on_cook)
 	drawer.info_requested.connect(func(): rt.ui.toast("Mix 1–%d ingredients · unknown mixes may become a Mystery Dish" % P0KitchenLogic.slots(rt.session.current()),
-		0.0, true))   # broken at a " · " (452)
+		0.0, P0Ui.break_in_chinese()))   # 中文 broken at a " · " (452)
 	_wrap.add_child(drawer)
 	_overlay = _build_overlay()
 	_wrap.add_child(_overlay)

@@ -655,11 +655,10 @@ func test_p0_homestead_reads_home_and_both_keys_keep_their_chinese() -> void:
 	assert_str(str(table["Home city only"])).is_equal("仅限家城鱼塘")
 	assert_str(str(preload("res://modules/p0/p0_clusters.gd").get_cluster("gn-4159050").get("name", ""))).is_equal("Homestead")   # Florida's, untouched
 
-## SGODOT-452 (李白): the Spice Rack's and the Mix's Info toasts lost the "\n" their Chinese had set by hand; they opt in
-## to P0Ui._break_at_dot, so under 中文 each breaks after a ` · ` — the dot dropped, both lines inside the toast's width,
-## no word cut. English breaks after its first part that fits and the label wraps the rest by words: three lines at
-## 182 px, as many as it wrapped to before.
-func test_p0_the_spice_rack_and_mix_toasts_break_at_their_dot() -> void:
+## SGODOT-452 (李白): the Spice Rack's and the Mix's Info toasts lost the "\n" their Chinese had set by hand. Under 中文
+## they opt in to P0Ui._break_at_dot (P0Ui.break_in_chinese) and break after a ` · ` — the dot dropped, both lines inside
+## the toast's width, no word cut; English does not opt in and wraps by words as before (李白: its breaking is unapproved).
+func test_p0_the_spice_rack_and_mix_toasts_break_at_their_dot_in_chinese_only() -> void:
 	var t := Localization.P0Translation.new()
 	t.load_table("res://assets/localization/p0_zh_CN.json")
 	TranslationServer.add_translation(t)
@@ -668,21 +667,20 @@ func test_p0_the_spice_rack_and_mix_toasts_break_at_their_dot() -> void:
 	var lines := ["Spice Rack · seasonings off your bag · Home Lv2", "Mix 1–3 ingredients · unknown mixes may become a Mystery Dish"]
 	var was := TranslationServer.get_locale()
 	TranslationServer.set_locale("zh_CN")
+	var zh_opts := P0Ui.break_in_chinese()
 	var zh: Array = lines.map(func(l): return ui._break_at_dot(l))
 	TranslationServer.set_locale("en")
-	var en: Array = lines.map(func(l): return ui._break_at_dot(l))
+	var en_opts := P0Ui.break_in_chinese()
 	TranslationServer.set_locale(was)
 	TranslationServer.remove_translation(t)
+	assert_bool(zh_opts).is_true()
+	assert_bool(en_opts).is_false()   # English: the line as it was, the label wrapping it by words
 	var label: Label = ui._toasts._label
 	var font := label.get_theme_font(&"font")
 	var size := label.get_theme_font_size(&"font_size")
-	var fits := func(t: String) -> bool: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= ui.toast_text_width()
 	for broken in zh:
-		for part in (broken as String).split("\n"): assert_bool(fits.call(part)).override_failure_message(broken).is_true()
-	for broken in en:
-		assert_bool(fits.call((broken as String).split("\n")[0])).override_failure_message(broken).is_true()
-	for broken in zh + en:
 		for part in (broken as String).split("\n"):
+			assert_bool(font.get_string_size(part, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= ui.toast_text_width()).override_failure_message(broken).is_true()
 			assert_bool(part.ends_with("·") or part.begins_with("·")).override_failure_message(broken).is_false()
 	assert_str(zh[0]).is_equal("调味架 · 调味料不占背包\n家园 Lv2")
 	assert_str(zh[1]).is_equal("放 1–3 样食材\n新搭配可能做出黑暗料理")
