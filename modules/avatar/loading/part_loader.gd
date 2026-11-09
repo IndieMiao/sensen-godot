@@ -31,6 +31,14 @@ func request_part(part_id: String) -> int:
 	if _by_path.has(meta.res_path):
 		_by_path[meta.res_path].waiters.append({"rid": rid, "part_id": part_id})
 		return rid
+	if AppRouter.sync_loads:   # Compatibility: threaded loads never finished there (0.3.3 h1); loaded here, delivered as one
+		var res := load(meta.res_path)
+		if res == null:
+			call_deferred("_fail", rid, part_id, ERR_CANT_ACQUIRE_RESOURCE)
+			return rid
+		if cache: cache.put(part_id, res, PartCache.estimate_resource_bytes(meta.res_path))
+		call_deferred("_deliver", rid, part_id, res)
+		return rid
 	var err := ResourceLoader.load_threaded_request(meta.res_path)
 	if err != OK:
 		call_deferred("_fail", rid, part_id, err)

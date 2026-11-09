@@ -61,7 +61,7 @@ func test_sync_loads_open_without_a_threaded_request_and_still_fail_with_the_car
 	assert_object(await AppRouter._load_with_feedback(path.get_basename() + "_missing.tscn")).is_null()
 	assert_bool(AppRouter._loading.close_button.visible).is_true()   # the card's way out
 	AppRouter._clear_transition()
-	await get_tree().process_frame
+	for i in 3: await get_tree().process_frame   # the card and its overlay freed
 	AppRouter.sync_loads = keep
 	DirAccess.remove_absolute(path)
 

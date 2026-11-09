@@ -19,6 +19,9 @@ static func wanted() -> String:
 	return s if s != "" else "farm"
 
 func _ready() -> void:
+	# which renderer a phone fell back to, for the log (0.3.3 h1: loads on the main thread under gl_compatibility)
+	print("P0 renderer: %s / %s, sync loads %s" % [RenderingServer.get_current_rendering_method(),
+		RenderingServer.get_current_rendering_driver_name(), AppRouter.sync_loads])
 	_go.call_deferred(wanted())
 
 func _go(target: String) -> void:
@@ -43,7 +46,8 @@ func _go(target: String) -> void:
 	elif target == "farm" or not ResourceLoader.exists(MAP):
 		# SGODOT-303: a new save waits for its home to be picked, before any world (the server plays nothing else
 		# meanwhile). The farm loads behind the cover while the first state is read.
-		ResourceLoader.load_threaded_request(FARM)
+		# not under Compatibility, where threaded loads never finished (0.3.3 h1): _enter_farm loads it then
+		if not AppRouter.sync_loads: ResourceLoader.load_threaded_request(FARM)
 		rt.when_first_view(func(v: Dictionary):
 			if P0Runtime.home_pending(v): rt.pick_home(_enter_farm)
 			else: _enter_farm())
