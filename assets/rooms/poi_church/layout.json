@@ -853,7 +853,9 @@
     "shadow_bias": 0.065,
     "shadow_normal_bias": 0.65,
     "shadow_distance": 25,
-    "gles_sun_scale": 0.4
+    "gles_sun_scale": 0.4,
+    "gles_shadow_bias": 0.25,
+    "gles_shadow_normal_bias": 1.5
   },
   "anchors": [
     {
