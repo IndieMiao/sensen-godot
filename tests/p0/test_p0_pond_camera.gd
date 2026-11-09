@@ -132,6 +132,15 @@ func test_by_the_keys_the_feet_keep_clear_of_the_switch() -> void:
 		assert_vector(P0Pond.clamp_focus(left, cam.size, PHONE, BAND, PondScenery.MEADOW, left, KEYS)).is_equal(
 			P0Pond.clamp_focus(left, cam.size, PHONE, BAND, PondScenery.MEADOW, left))   # the left as before
 
+## 盘古 on 422: the pond's own projection (for the opening screen before its camera stands there) is the camera's.
+func test_its_projection_is_the_cameras() -> void:
+	for zoom in [1.0, P0Pond.FAR_ZOOM]:
+		var cam := _phone_camera(zoom)
+		var focus := Vector3(5.3, 0.1, -4.2)
+		P0Pond.place(cam, focus)
+		for p in [Vector3(6.125, 0, -1.625), Vector3(9.0, 1.8, -3.0), Vector3(0.5, 0.4, -12.0)]:
+			assert_vector(P0Pond.project(p, focus, cam.size, PHONE)).is_equal_approx(cam.unproject_position(p), Vector2.ONE * 0.01)
+
 ## The whole pond in one view at the farthest zoom (美术总监 / 奕星): every shape's water is narrower than the screen and
 ## shallower than the band's ground there.
 func test_every_pond_fits_the_band_at_the_farthest_zoom() -> void:

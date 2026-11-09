@@ -13,7 +13,12 @@ const CLUSTER := ["wild_flower_white", "wild_flower_yellow", "wild_flower_lilac"
 const LOW := ["wild_flower_white", "wild_flower_yellow", "wild_flower_lilac", "wild_clover", "wild_pebbles_a", "wild_pebbles_b"]
 const CORNER := ["wild_log_moss", "wild_mushrooms", "wild_fern"]
 ## The main key's column on the opening screen (world xz; spawn (6.125, -1.625), 43°, 6.72 m wide): low pieces only.
+## Kept for a dressing built before the HUD has laid out; with the opening camera known, `in_key` (P0Pond._opening_keys)
+## tells instead whether a piece's box on the opening screen touches the action keys (盘古 on 422: the tool badge, the
+## switch and the main key, 8 px out — its whole box, a crown over them too, not only where it stands).
 const KEY_COLUMN := Rect2(7.6, -6.0, 3.2, 6.6)
+const MOVE_TRIES := 6       # a piece under the keys is moved this many times before a low one stands in for it
+const MOVE_M := 1.6         # … this far at most
 ## The opening screen's dry ground (world xz round the spawn): the first clusters go here, so it opens with 10–15 pieces.
 const OPENING := Rect2(2.8, -9.0, 6.7, 10.0)
 const OPENING_CLUSTERS := 5
@@ -29,8 +34,11 @@ const FEET_CLEAR_M := 1.0
 const PATH_HALF_M := 1.4   # the path up from the spawn (PondScenery's own keep-off): nothing on it
 const SHALLOW_M := 0.6     # a cattail stands in water this near the bank
 
-## {asset: [Transform3D]} for this pond. `trees`: the bank's six tree points, those PondScenery keeps.
-static func layout(entry: Dictionary, spec: Dictionary, clear: Array, trees: Array) -> Dictionary:
+## {asset: [Transform3D]} for this pond. `trees`: the bank's six tree points, those PondScenery keeps. `in_key`:
+## (corners: PackedVector3Array) -> bool, whether points in the world fall on the opening screen's action keys; empty,
+## the old KEY_COLUMN. Only LOW pieces stand there: the others move off first (盘古: moved before replaced, so the
+## column does not fill up), else a low one stands in; a corner's group goes to another corner; a cattail elsewhere.
+static func layout(entry: Dictionary, spec: Dictionary, clear: Array, trees: Array, in_key := Callable()) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(entry.decoration_seed) ^ 422
 	var out := {}
@@ -39,12 +47,28 @@ static func layout(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arr
 		out[asset].append(Transform3D(Basis(Vector3.UP, rng.randf_range(0, TAU)).scaled(Vector3.ONE * scale), at))
 	for t in trees: put.call(TREES[rng.randi() % TREES.size()], t, rng.randf_range(0.9, 1.1))
 	var id := str(entry.id)
+	var keyed := in_key.is_valid()
+	# under the keys: by its box on the opening screen, else (no camera yet) a tall piece standing in KEY_COLUMN
+	var under_keys := func(asset: String, p: Vector3, scale: float) -> bool:
+		if not keyed: return KEY_COLUMN.has_point(Vector2(p.x, p.z))
+		return bool(in_key.call(box_corners(asset, p, scale)))
 	var free := func(p: Vector3, tall: bool) -> bool:
 		if FishingModel.contains(id, p, 0.45, spec): return false
 		if p.z > -3.0 and p.z < -0.75 and absf(p.x - 6.0) < PATH_HALF_M: return false   # the path, to the walk's edge
 		if PondScenery._near(p, clear): return false
-		if tall and (KEY_COLUMN.has_point(Vector2(p.x, p.z)) or PondScenery._in_front(p, clear)): return false
+		if tall and ((not keyed and KEY_COLUMN.has_point(Vector2(p.x, p.z))) or PondScenery._in_front(p, clear)): return false
 		return true
+	# a piece other than LOW under the keys: moved off (MOVE_TRIES, MOVE_M), else a low one there; `p` where it stands
+	var place := func(asset: String, p: Vector3, scale: float, tall: bool) -> void:
+		if keyed and not asset in LOW and under_keys.call(asset, p, scale):
+			for k in MOVE_TRIES:
+				var q: Vector3 = p + Vector3(rng.randf_range(-MOVE_M, MOVE_M), 0, rng.randf_range(-MOVE_M, MOVE_M))
+				if not under_keys.call(asset, q, scale) and free.call(q, tall):
+					put.call(asset, q, scale)
+					return
+			asset = LOW[rng.randi() % LOW.size()]
+			tall = false
+		if free.call(p, tall): put.call(asset, p, scale)
 	# clusters, 3–5 pieces each: first OPENING_CLUSTERS on the opening screen's dry ground, then on the bank (within 1.6 m
 	# of the water) and down both sides
 	var centres: Array = []
@@ -68,6 +92,9 @@ static func layout(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arr
 			var p: Vector3 = c + Vector3(rng.randf_range(-0.7, 0.7), 0, rng.randf_range(-0.7, 0.7))
 			var asset: String = CLUSTER[rng.randi() % CLUSTER.size()]
 			var tall := asset.begins_with("wild_bush")
+			if keyed:
+				place.call(asset, p, rng.randf_range(1.0, 1.3), tall)
+				continue
 			if tall and KEY_COLUMN.has_point(Vector2(p.x, p.z)): asset = LOW[rng.randi() % LOW.size()]
 			if free.call(p, tall): put.call(asset, p, rng.randf_range(1.0, 1.3))
 	# below the player: LOWER_CLUSTERS more, low pieces only, the spawn's front metre clear
@@ -82,7 +109,9 @@ static func layout(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arr
 		for k in rng.randi_range(3, 5):
 			var p: Vector3 = c + Vector3(rng.randf_range(-0.55, 0.55), 0, rng.randf_range(-0.55, 0.55))
 			if Vector2(p.x - SPAWN.x, p.z - (SPAWN.z + FEET_CLEAR_M * 0.5)).length() < FEET_CLEAR_M: continue
-			if free.call(p, false): put.call(LOWER_PIECES[rng.randi() % LOWER_PIECES.size()], p, rng.randf_range(1.0, 1.3))
+			var piece: String = LOWER_PIECES[rng.randi() % LOWER_PIECES.size()]
+			if keyed: place.call(piece, p, rng.randf_range(1.0, 1.3), false)
+			elif free.call(p, false): put.call(piece, p, rng.randf_range(1.0, 1.3))
 	# the open middle and the path's sides: a few low pieces, far apart
 	for k in 6:
 		var p := Vector3(rng.randf_range(2.0, 10.0), 0.01, rng.randf_range(-10.0, 0.0))
@@ -94,8 +123,13 @@ static func layout(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arr
 		var swap = corners[i]
 		corners[i] = corners[j]
 		corners[j] = swap
-	for c in corners.slice(0, rng.randi_range(2, 3)):
-		var group := [[CORNER[0], Vector3(0, 0, 0)], [CORNER[1], Vector3(0.45, 0, 0.3)], [CORNER[2], Vector3(-0.5, 0, 0.25)]]
+	var group := [[CORNER[0], Vector3(0, 0, 0)], [CORNER[1], Vector3(0.45, 0, 0.3)], [CORNER[2], Vector3(-0.5, 0, 0.25)]]
+	var wanted := rng.randi_range(2, 3)
+	var used := 0
+	for c in corners:   # shuffled: the first `wanted` the keys leave alone (all three pieces are tall but the mushrooms)
+		if used == wanted: break
+		if keyed and group.any(func(g): return under_keys.call(g[0], c + g[1], 1.1)): continue
+		used += 1
 		for g in group:
 			var p: Vector3 = c + g[1]
 			if free.call(p, g[0] != "wild_mushrooms"): put.call(g[0], p, rng.randf_range(0.9, 1.1))
@@ -111,15 +145,29 @@ static func layout(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arr
 			var d := Vector3(cos(a * TAU / 8.0), 0, sin(a * TAU / 8.0)) * SHALLOW_M
 			if not FishingModel.contains(id, p + d, 0.0, spec): edge = true
 		if not edge or PondScenery._near(p, clear): continue
-		put.call("wild_cattail_water", p, rng.randf_range(0.85, 1.1))
+		var reed := rng.randf_range(0.85, 1.1)
+		if keyed and under_keys.call("wild_cattail_water", p, reed): continue   # tall: another spot in the shallows
+		put.call("wild_cattail_water", p, reed)
 		reeds += 1
 	return out
 
+## A piece's box in the world, whatever way it turns (its mesh's own vertices' box, swept round its axis): the 8 corners.
+static func box_corners(asset: String, at: Vector3, scale: float) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	var mesh := Art.mesh_for(asset) if ResourceLoader.exists(Art.ROOT + asset + ".glb") else null
+	var box := mesh.get_aabb() if mesh else AABB(Vector3(-0.3, 0, -0.3), Vector3(0.6, 1.0, 0.6))
+	var r := 0.0
+	for k in 4: r = maxf(r, Vector2(box.position.x if k % 2 == 0 else box.end.x, box.position.z if k < 2 else box.end.z).length())
+	r *= scale
+	for k in 8:
+		out.append(at + Vector3(r if k & 1 else -r, (box.end.y if k & 2 else box.position.y) * scale, r if k & 4 else -r))
+	return out
+
 ## The layout as batched meshes under one node.
-static func build(entry: Dictionary, spec: Dictionary, clear: Array, trees: Array) -> Node3D:
+static func build(entry: Dictionary, spec: Dictionary, clear: Array, trees: Array, in_key := Callable()) -> Node3D:
 	var root := Node3D.new()
 	root.name = "WildProps"
-	var l := layout(entry, spec, clear, trees)
+	var l := layout(entry, spec, clear, trees, in_key)
 	for asset in l:
 		if not ResourceLoader.exists(Art.ROOT + asset + ".glb"): continue   # #799's pieces not in this build yet
 		var batch := Art.batch(asset, l[asset], asset.begins_with("wild_tree") or asset.begins_with("wild_bush"))

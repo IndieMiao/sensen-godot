@@ -89,3 +89,31 @@ func test_the_ground_overlay_on_its_shapes_channel() -> void:
 	other.shader = preload("res://modules/ponds/pond_ground.gdshader")
 	PondScenery._wild_ground(other, "lagoon")
 	assert_object(other.get_shader_parameter("dry_channel")).is_equal(Vector3.ZERO)   # another shape: the ground as it was
+
+## 盘古 on 422: with the opening camera known, `in_key` says what falls on the action keys — here the ground x 8–11,
+## z −5–0 (as the bottom-right keys at the spawn), by any corner of a piece's box. Only LOW pieces have a box there;
+## the others moved off or stood in for; trees under them do not stand; the dressing stays rich (10+ on the opening).
+func test_on_the_keys_only_low_pieces_by_their_box() -> void:
+	var zone := Rect2(8.0, -5.0, 3.0, 5.0)
+	var in_key := func(corners: PackedVector3Array) -> bool:
+		for c in corners: if zone.has_point(Vector2(c.x, c.z)): return true
+		return false
+	for id in SF:
+		var e := _entry(id)
+		var trees := PondScenery.tree_points([], in_key)
+		var l := PondWildProps.layout(e, SystemPonds.site(e), [], trees, in_key)
+		var n := 0
+		for asset in l:
+			for t in l[asset]:
+				var at: Vector3 = (t as Transform3D).origin
+				var s := (t as Transform3D).basis.get_scale().x
+				if not asset in PondWildProps.LOW:
+					assert_bool(in_key.call(PondWildProps.box_corners(asset, at, s))).override_failure_message("%s %s at %s" % [id, asset, at]).is_false()
+				if PondWildProps.OPENING.has_point(Vector2(at.x, at.z)): n += 1
+		assert_int(n).override_failure_message(id).is_greater_equal(10)
+	assert_bool(PondScenery.tree_points([], in_key).has(Vector3(12.1, 0, -5.5))).is_true()   # its crown short of the zone
+	var wide := func(corners: PackedVector3Array) -> bool:
+		for c in corners: if Rect2(10.5, -7.0, 3.0, 4.0).has_point(Vector2(c.x, c.z)): return true
+		return false
+	assert_bool(PondScenery.tree_points([], wide).has(Vector3(12.1, 0, -5.5))).is_false()   # under them: it does not stand
+	assert_dict(_layout(SF[0], [])).is_equal(_layout(SF[0], []))   # no camera yet: the old KEY_COLUMN, as before

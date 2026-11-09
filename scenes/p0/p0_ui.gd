@@ -1148,6 +1148,8 @@ func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int, id := "") -
 ## keeps off them as off the screen's edge (不知火舞 442 a9474fa3, 197: the pond's camera turned 14.5°, a gathering
 ## point by the ⇄ showed its strip as `St`). Empty while the group is hidden (rooms' facilities, a panel up).
 const KEY_CLEAR_PX := 8.0
+## The same for a world's camera (P0Pond: the wild's pieces kept off them on the opening screen, 盘古 on 422).
+func key_rects() -> Array: return _key_rects()
 func _key_rects() -> Array:
 	var out := []
 	if _keys == null or not _keys.is_visible_in_tree(): return out
