@@ -2701,5 +2701,7 @@
  "%d left today": "今日还剩 %d 次",
  "%s · %d min": "%s · %d 分钟",
  "%s · %s left": "%s · 还剩 %s",
- "Decor %d/%d · Store one to place this": "摆件 %d/%d · 收起一件才能摆放这个"
+ "Decor %d/%d · Store one to place this": "摆件 %d/%d · 收起一件才能摆放这个",
+ "%d new · %d to do": "新 %d · 待办 %d",
+ "%d XP to go · %s": "还差 %d 经验 · %s"
 }
