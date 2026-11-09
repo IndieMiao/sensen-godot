@@ -103,6 +103,9 @@ var _spread_off := {}     # anchor name → {from, to, t}: each button's drawn o
 
 func setup(_args: Dictionary) -> void: pass
 
+## The art's options before it enters the tree and builds itself (the market plaza's city_variant, SGODOT-218).
+func _art_options(_kit: Node) -> void: pass
+
 ## Room kit art by id (SGODOT-227 scene integration): "basic_room" (the default) or a Scene_design kit such as
 ## "coffee_shop", read from scenes/<id>/<id>_art.tscn and assets/rooms/<id>/layout.json. A kit that is missing
 ## keeps the Basic Room, so a space never opens empty.
@@ -129,6 +132,7 @@ func _ready() -> void:
 	add_child(room)
 	_build_hearth_glow()   # before the art: the Basic Room's particle fire (SGODOT-236) takes ../HearthGlow
 	art = art_scene.instantiate()
+	_art_options(art)
 	room.add_child(art)
 	_dress_art()
 	_hide_art()

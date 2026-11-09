@@ -61,6 +61,16 @@ func test_roster_feeds_the_crowd_without_ourselves_and_frames_skip_us() -> void:
 	online._message(JSON.stringify({"t": "left", "id": 4, "count": 1}))
 	assert_bool(crowd.rosters[-1].is_empty()).is_true()
 
+## SGODOT-218: the join names the kit drawn there (the market plaza's own instances); none set, the join is as before.
+func test_the_join_names_the_kit_drawn_there() -> void:
+	online.outpost = "sh_market_1"
+	online.spawn_at = Vector2(1, 2)
+	assert_dict(online.join_message()).is_equal({"t": "join", "outpost": "sh_market_1", "at": [1.0, 2.0]})
+	online.layout = "market_plaza"
+	online.appearance = {"hair": "h1"}
+	assert_dict(online.join_message()).is_equal({"t": "join", "outpost": "sh_market_1", "at": [1.0, 2.0],
+		"appearance": {"hair": "h1"}, "layout": "market_plaza"})
+
 func test_joined_reports_room_and_rejoin() -> void:
 	var got := []
 	online.joined.connect(func(info): got.append(info))

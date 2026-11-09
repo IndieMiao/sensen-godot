@@ -14,9 +14,19 @@ export interface OutpostSpec {
   bounds: [number, number, number, number];
   /** Anchor names of the seats (seat_table1_1 …); empty when the space has none. */
   seats: string[];
+  /** The room kit this spec's walls and seats are (p0_outposts.json `art`). */
+  art?: string;
+  /** The room older clients still draw while a newer kit takes its place (the market plaza over the fruit shop,
+   * SGODOT-218): its kit, walls and seats. Those clients name no layout and stay in its instances; a client that names
+   * `art` gets the new walls and seats in instances of its own, so neither sees the other through the other's walls. */
+  before?: { art: string; bounds: [number, number, number, number]; seats: string[] };
+  /** Set on a layout's own spec (`art`, over a `before`): '' for the room older clients have. */
+  layout?: string;
 }
 export interface Occupant {
   player: string; outpost: string; room: number;
+  /** The layout group (OutpostSpec.before): '' for the room older clients have, else the newer kit the client named. */
+  layout: string;
   /** Small id within the instance, used in snapshot frames (lowest free, from 1). */
   id: number;
   x: number; z: number; yaw: number; action: string; seat: string;
@@ -39,46 +49,54 @@ export class OutpostRooms {
   private specs = new Map<string, OutpostSpec>();
   private rooms = new Map<string, Map<number, Map<string, Occupant>>>();
   private byPlayer = new Map<string, Occupant>();
-  private recent = new Map<string, { outpost: string; room: number; until: number }>();
+  private recent = new Map<string, { outpost: string; layout: string; room: number; until: number }>();
 
   /** Generated outposts (SGODOT-280, `gn-…~market0`) are not in the table: `resolve` gives their spec on first join, and
    * it is dropped again once their last room empties, so only places someone is in are kept (12,490 cities). */
   private fixed = new Set<string>();
-  constructor(specs: OutpostSpec[], private now: () => number = Date.now, private resolve?: (outpost: string) => OutpostSpec | undefined) {
+  constructor(specs: OutpostSpec[], private now: () => number = Date.now,
+    private resolve?: (outpost: string, layout: string) => OutpostSpec | undefined) {
     for (const spec of specs) {
       if (!Number.isInteger(spec.capacity) || spec.capacity < 1) throw new Error('BAD_CAPACITY');
-      this.specs.set(spec.id, spec);
-      this.fixed.add(spec.id);
+      for (const one of layouts(spec)) {
+        this.specs.set(groupOf(spec.id, one.layout ?? ''), one);
+        this.fixed.add(groupOf(spec.id, one.layout ?? ''));
+      }
     }
   }
 
-  spec(outpost: string): OutpostSpec | undefined { return this.specs.get(outpost); }
+  /** The spec of an outpost's room older clients have, or of the layout a newer client named. */
+  spec(outpost: string, layout = ''): OutpostSpec | undefined { return this.specs.get(groupOf(outpost, layout)); }
 
-  private specFor(outpost: string): OutpostSpec | undefined {
-    const known = this.specs.get(outpost);
+  private specFor(outpost: string, layout: string): OutpostSpec | undefined {
+    const known = this.specs.get(groupOf(outpost, layout));
     if (known || !this.resolve) return known;
-    const made = this.resolve(outpost);
-    if (!made || made.id !== outpost || !Number.isInteger(made.capacity) || made.capacity < 1) return undefined;
-    this.specs.set(outpost, made);
+    const made = this.resolve(outpost, layout);
+    if (!made || made.id !== outpost || (made.layout ?? '') !== layout || !Number.isInteger(made.capacity) || made.capacity < 1) return undefined;
+    this.specs.set(groupOf(outpost, layout), made);
     return made;
   }
   occupant(player: string): Occupant | undefined { return this.byPlayer.get(player); }
 
   /** Occupants of one instance, for rosters and snapshot frames. */
-  members(outpost: string, room: number): Occupant[] {
-    return [...(this.rooms.get(outpost)?.get(room)?.values() ?? [])];
+  members(outpost: string, room: number, layout = ''): Occupant[] {
+    return [...(this.rooms.get(groupOf(outpost, layout))?.get(room)?.values() ?? [])];
   }
 
-  /** Lowest-numbered instance with a free place, or the one this player just left. */
-  join(player: string, outpost: string, at: [number, number] = [0, 0]): Placement {
-    const spec = this.specFor(outpost);
+  /** Lowest-numbered instance with a free place, or the one this player just left. `layout`: the room kit the client
+   * draws — a newer kit of the outpost's (OutpostSpec.before) puts it in that layout's instances; any other, or none
+   * (every client before SGODOT-218), in the instances of the room older clients have, as before. */
+  join(player: string, outpost: string, at: [number, number] = [0, 0], layout = ''): Placement {
+    if (layout && !this.specFor(outpost, layout)) layout = '';
+    const spec = this.specFor(outpost, layout);
     if (!spec) throw new Error('UNKNOWN_OUTPOST');
     this.leave(player, false);
-    const rooms = this.rooms.get(outpost) ?? new Map<number, Map<string, Occupant>>();
-    this.rooms.set(outpost, rooms);
+    const group = groupOf(outpost, layout);
+    const rooms = this.rooms.get(group) ?? new Map<number, Map<string, Occupant>>();
+    this.rooms.set(group, rooms);
     const free = (n: number) => (rooms.get(n)?.size ?? 0) < spec.capacity;
     const back = this.recent.get(player);
-    let room = back && back.outpost === outpost && back.until >= this.now() && free(back.room) ? back.room : 0;
+    let room = back && back.outpost === outpost && back.layout === layout && back.until >= this.now() && free(back.room) ? back.room : 0;
     const rejoined = room > 0;
     for (let n = 1; !room && n <= MAX_ROOMS; n++) if (free(n)) room = n;
     if (!room) throw new Error('SERVER_FULL');
@@ -89,7 +107,7 @@ export class OutpostRooms {
     let id = 1;
     while (taken.has(id)) id++;
     const [x, z] = clamp(spec, at);
-    const occupant: Occupant = { player, outpost, room, id, x, z, yaw: 0, action: 'idle', seat: '', seq: -1, at: this.now() };
+    const occupant: Occupant = { player, outpost, layout, room, id, x, z, yaw: 0, action: 'idle', seat: '', seq: -1, at: this.now() };
     members.set(player, occupant);
     this.byPlayer.set(player, occupant);
     return { outpost, room, capacity: spec.capacity, rejoined };
@@ -100,12 +118,13 @@ export class OutpostRooms {
     const o = this.byPlayer.get(player);
     if (!o) return undefined;
     this.byPlayer.delete(player);
-    const rooms = this.rooms.get(o.outpost)!;
+    const group = groupOf(o.outpost, o.layout);
+    const rooms = this.rooms.get(group)!;
     const members = rooms.get(o.room)!;
     members.delete(player);
     if (!members.size) rooms.delete(o.room);
-    if (remember) this.recent.set(player, { outpost: o.outpost, room: o.room, until: this.now() + REJOIN_MS });
-    if (!rooms.size && !this.fixed.has(o.outpost)) { this.rooms.delete(o.outpost); this.specs.delete(o.outpost); }   // made again on the next join
+    if (remember) this.recent.set(player, { outpost: o.outpost, layout: o.layout, room: o.room, until: this.now() + REJOIN_MS });
+    if (!rooms.size && !this.fixed.has(group)) { this.rooms.delete(group); this.specs.delete(group); }   // made again on the next join
     return o;
   }
 
@@ -115,7 +134,7 @@ export class OutpostRooms {
     if (!o) return undefined;
     const now = this.now();
     const reach = MAX_SPEED * Math.max(0, now - o.at) / 1000 + SLACK;
-    let [nx, nz] = clamp(this.specs.get(o.outpost)!, [x, z]);
+    let [nx, nz] = clamp(this.specs.get(groupOf(o.outpost, o.layout))!, [x, z]);
     const d = Math.hypot(nx - o.x, nz - o.z);
     if (d > reach) { nx = o.x + (nx - o.x) * reach / d; nz = o.z + (nz - o.z) * reach / d; }
     if (o.seat && Math.hypot(nx - o.x, nz - o.z) > STAND_DISTANCE) o.seat = '';
@@ -128,8 +147,8 @@ export class OutpostRooms {
   canSit(player: string, seat: string): 'ok' | 'SEAT_TAKEN' | 'NO_SEAT' | 'NOT_IN_ROOM' {
     const o = this.byPlayer.get(player);
     if (!o) return 'NOT_IN_ROOM';
-    if (!this.specs.get(o.outpost)!.seats.includes(seat)) return 'NO_SEAT';
-    if (this.members(o.outpost, o.room).some(m => m.seat === seat && m.player !== player)) return 'SEAT_TAKEN';
+    if (!this.specs.get(groupOf(o.outpost, o.layout))!.seats.includes(seat)) return 'NO_SEAT';
+    if (this.members(o.outpost, o.room, o.layout).some(m => m.seat === seat && m.player !== player)) return 'SEAT_TAKEN';
     return 'ok';
   }
 
@@ -149,12 +168,13 @@ export class OutpostRooms {
   }
 
   /** Online count per outpost across its instances, for the map pins ("Lotus Tea House · 5 online"): every
-   * hand-written outpost, and a generated one while someone is in it. */
+   * hand-written outpost, and a generated one while someone is in it — its layouts' instances together. */
   presence(): Record<string, { online: number; rooms: number }> {
     const out: Record<string, { online: number; rooms: number }> = {};
-    for (const id of this.specs.keys()) {
-      const rooms = this.rooms.get(id);
-      out[id] = { online: [...(rooms?.values() ?? [])].reduce((sum, m) => sum + m.size, 0), rooms: rooms?.size ?? 0 };
+    for (const [group, spec] of this.specs) {
+      const rooms = this.rooms.get(group);
+      const sum = out[spec.id] ?? { online: 0, rooms: 0 };
+      out[spec.id] = { online: sum.online + [...(rooms?.values() ?? [])].reduce((n, m) => n + m.size, 0), rooms: sum.rooms + (rooms?.size ?? 0) };
     }
     return out;
   }
@@ -167,6 +187,16 @@ export class OutpostRooms {
     const now = this.now();
     for (const [player, r] of this.recent) if (r.until < now) this.recent.delete(player);
   }
+}
+
+/** The instances an outpost's layout lives in: the outpost id itself for the room older clients have. */
+const groupOf = (outpost: string, layout: string) => layout ? `${outpost}@${layout}` : outpost;
+
+/** An outpost's specs by layout: one, or with a `before` the room older clients have ('') and its newer kit's. */
+export function layouts(spec: OutpostSpec): OutpostSpec[] {
+  if (!spec.before) return [spec];
+  const { before, ...now } = spec;
+  return [{ ...now, art: before.art, bounds: before.bounds, seats: before.seats, layout: '' }, { ...now, layout: spec.art ?? '' }];
 }
 
 function clamp(spec: OutpostSpec, [x, z]: [number, number]): [number, number] {

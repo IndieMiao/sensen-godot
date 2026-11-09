@@ -239,3 +239,37 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     expect((await join(c, 'sh_tea_1')).room).toBe(1);
   });
 });
+
+describe('the market plaza\'s own instances on the wire (SGODOT-218)', () => {
+  it('a plaza client and an older one in Mission Market Square: no roster, peer, seat or frame of the other; same-layout players see each other', async () => {
+    const { port } = await server();
+    const old = await connect(port, 'p0-old-client-0001');
+    const plaza = await connect(port, 'p0-new-client-0001');
+    const plaza2 = await connect(port, 'p0-new-client-0002');
+    await join(old, 'sh_market_1', [1, 1]);
+    await new Promise(r => setTimeout(r, 1000));   // long enough for the fruit shop's walk-speed cap to reach its wall
+    const from = plaza.json.length;
+    send(plaza, { t: 'join', outpost: 'sh_market_1', at: [5, 5], layout: 'market_plaza' });
+    const joined = await until(msg(plaza, 'joined', from));
+    expect(joined).toMatchObject({ outpost: 'sh_market_1', room: 1, spawn: [5, 5] });   // the plaza's walls: ±8 m
+    expect((await until(msg(plaza, 'roster'))).count).toBe(1);   // only itself, not the fruit shop's player
+    const before = old.json.length;
+    const p2 = plaza2.json.length;
+    send(plaza2, { t: 'join', outpost: 'sh_market_1', layout: 'market_plaza' });
+    const j2 = await until(msg(plaza2, 'joined', p2));
+    await until(msg(plaza, 'peer'));   // the second plaza client: seen by the first
+    send(plaza2, { t: 'act', action: 'sit', node: 'seat_1', at: [0, 0], seq: 1, epoch: j2.epoch });
+    expect(await until(msg(plaza2, 'result'))).toMatchObject({ ok: true });   // the plaza's bench (the fruit shop has none)
+    await until(msg(plaza, 'seat'));
+    await new Promise(r => setTimeout(r, 200));
+    expect(old.json.slice(before).filter(m => ['peer', 'seat', 'left'].includes(m.t))).toEqual([]);
+    for (const f of old.frames.slice(-3)) expect(decode(f).members.length).toBe(1);   // only itself in the fruit shop's frames
+    expect(decode(plaza.frames[plaza.frames.length - 1]).members.length).toBe(2);   // the plaza's: both plaza clients
+    // the older client still has the fruit shop's walls (an older join, no layout: unchanged)
+    const j0 = old.json.find(m => m.t === 'joined')!;
+    send(old, { t: 'input', x: 7, z: 7, yaw: 0, action: 'walk', seq: 1, epoch: j0.epoch });
+    await new Promise(r => setTimeout(r, 150));
+    const last = decode(old.frames[old.frames.length - 1]).members[0];
+    expect([last.x, last.z].map(v => Math.round(v * 100) / 100)).toEqual([3.05, 2.8]);
+  });
+});

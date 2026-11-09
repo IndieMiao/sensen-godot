@@ -9,6 +9,7 @@ extends P0Room
 const P0Locals := preload("res://modules/p0/p0_locals.gd")   # the keeper's local requests (q(272))
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 var voice_room: Node   # P0VoiceRoom: this room's voice (SGODOT-383; Market Square's too since q(286)), for the HUD's mic key and drawer
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
 ## Drawn in the art but without a P0 use: no finger card, no tap (§17.2.1; SGODOT-227 5a63a8ec).
@@ -88,6 +89,7 @@ func _go_online(session: P0Session) -> void:
 	o.version = session.version
 	o.features = session.features()
 	o.appearance = OnlineAppearance.payload(Avatar.load_outfit())
+	o.layout = str(outpost.get("art", ""))   # the kit drawn here: the market plaza has instances of its own (SGODOT-218)
 	attach_online(o)
 	voice_room = P0VoiceRoom.new()
 	add_child(voice_room)
@@ -96,6 +98,29 @@ func _go_online(session: P0Session) -> void:
 	var door := anchor_data("spawn")
 	var at := P0RoomAnchors.vec(door.get("position", [0, 0, 0]))
 	online.start(str(outpost.id), Vector2(at.x, at.z))
+
+## 不知火舞 on #895 (SGODOT-218): the market plaza opens framed on its own, as the pond does — the player's feet at this row
+## of the 800 px frame, so the stalls, Mei's counter and the row houses' ground floor show above under the HUD (its 16 m
+## square left the lower third bare when centred). Across, as the room's opening shot has it. Other rooms: no entry.
+const OPENING_FEET_Y := {"market_plaza": 600.0}
+
+func opening_focus(right: Vector3, up: Vector3, forward: Vector3) -> Vector3:
+	var base := super.opening_focus(right, up, forward)
+	var feet_y := float(OPENING_FEET_Y.get(str(outpost.get("art", "")), -1.0))
+	if feet_y < 0.0: return base
+	var view := _view()
+	var m := cam.size / maxf(view.x, 1.0)   # metres per px
+	var q := Vector2(base.dot(right), base.dot(up))
+	q.y = actor.position.dot(up) - (view.y * 0.5 - feet_y / 800.0 * view.y) * m   # the screen's centre that far above the feet
+	return _on_floor(right, up, forward, q)
+
+## The market plaza's row houses and far city by city (SGODOT-218, layout.json facade_variants): San Francisco's
+## pastel Victorians in San Francisco (Mission Market Square), the plain set in every other city's square.
+func _art_options(kit: Node) -> void:
+	if "city_variant" in kit: kit.set("city_variant", city_variant(outpost))
+
+static func city_variant(o: Dictionary) -> String:
+	return "san_francisco" if str(o.get("cluster", "")) == P0Clusters.cluster_of_region("san_francisco") else "generic"
 
 ## Wires a room connection to this room: the crowd, our position in room metres, joins and seat results.
 func attach_online(o: P0Online) -> void:

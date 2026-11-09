@@ -145,12 +145,14 @@ export class P0OnlineHub {
     const refused = this.deps.rooms.occupant(c.player)?.outpost === b.outpost ? null : this.deps.pass?.(c.player, b.outpost);
     if (refused) throw new Error(refused);
     this.depart(c, false);
-    const placed = this.deps.rooms.join(c.player, b.outpost, at);
+    // SGODOT-218: the room kit this client draws; a newer kit of the outpost's puts it in that layout's instances.
+    const layout = typeof b.layout === 'string' && /^[a-z0-9_]{1,40}$/.test(b.layout) ? b.layout : '';
+    const placed = this.deps.rooms.join(c.player, b.outpost, at, layout);
     const me = this.deps.rooms.occupant(c.player)!;
     c.epoch++;
     this.send(c, { t: 'joined', protocol: 1, outpost: placed.outpost, room: placed.room, capacity: placed.capacity,
       rejoined: placed.rejoined, self: me.id, epoch: c.epoch, spawn: [me.x, me.z], snapshot_hz: 1000 / LIMITS.snapshot_ms });
-    const members = this.deps.rooms.members(me.outpost, me.room), mine = this.seenBy(c.player, members);
+    const members = this.deps.rooms.members(me.outpost, me.room, me.layout), mine = this.seenBy(c.player, members);
     this.send(c, { t: 'roster', count: mine.length, members: mine.map(m => this.view(m)) });
     for (const m of members) if (m.player !== c.player && this.sees(m.player, c.player))
       this.toPlayer(m.player, { t: 'peer', count: this.seenBy(m.player, members).length, member: this.view(me) });
@@ -163,7 +165,7 @@ export class P0OnlineHub {
     const left = this.deps.rooms.leave(c.player, remember);
     if (!left) return;
     this.deps.departed?.(left);
-    const members = this.deps.rooms.members(left.outpost, left.room);
+    const members = this.deps.rooms.members(left.outpost, left.room, left.layout);
     for (const m of members) if (this.sees(m.player, left.player))
       this.toPlayer(m.player, { t: 'left', id: left.id, count: this.seenBy(m.player, members).length });
   }
@@ -209,7 +211,7 @@ export class P0OnlineHub {
     this.send(c, { t: 'appearance_result', ok: true });
     const me = this.deps.rooms.occupant(c.player);
     if (!me) return;
-    const members = this.deps.rooms.members(me.outpost, me.room);
+    const members = this.deps.rooms.members(me.outpost, me.room, me.layout);
     for (const m of members) if (m.player !== c.player && this.sees(m.player, c.player))
       this.toPlayer(m.player, { t: 'peer', count: this.seenBy(m.player, members).length, member: this.view(me) });
   }
@@ -224,7 +226,7 @@ export class P0OnlineHub {
     const phase = FISH_PHASES.find(p => p === b.phase);
     if (!phase) throw new Error('SCHEMA');
     const now = Date.now();
-    const [x0, x1, z0, z1] = this.deps.rooms.spec(me.outpost)!.bounds;
+    const [x0, x1, z0, z1] = this.deps.rooms.spec(me.outpost, me.layout)!.bounds;
     const target = Array.isArray(b.target) && b.target.length === 2 && b.target.every(v => typeof v === 'number' && Number.isFinite(v))
       ? [Math.min(x1, Math.max(x0, Number(b.target[0]))), Math.min(z1, Math.max(z0, Number(b.target[1])))] as [number, number] : undefined;
     const was = c.fishing;
@@ -257,7 +259,7 @@ export class P0OnlineHub {
 
   /** Seat changes go to everyone in the instance (the frame's action says sit; this says which seat). */
   private seat(me: Occupant): void {
-    for (const m of this.deps.rooms.members(me.outpost, me.room))
+    for (const m of this.deps.rooms.members(me.outpost, me.room, me.layout))
       if (this.sees(m.player, me.player)) this.toPlayer(m.player, { t: 'seat', id: me.id, seat: me.seat });
   }
 
@@ -271,8 +273,8 @@ export class P0OnlineHub {
    * or comes back into it (peer). */
   seenChanged(a: string, b: string): void {
     const oa = this.deps.rooms.occupant(a), ob = this.deps.rooms.occupant(b);
-    if (!oa || !ob || oa.outpost !== ob.outpost || oa.room !== ob.room) return;
-    const members = this.deps.rooms.members(oa.outpost, oa.room);
+    if (!oa || !ob || oa.outpost !== ob.outpost || oa.layout !== ob.layout || oa.room !== ob.room) return;
+    const members = this.deps.rooms.members(oa.outpost, oa.room, oa.layout);
     for (const [to, other] of [[oa, ob], [ob, oa]] as const) {
       const count = this.seenBy(to.player, members).length;
       this.toPlayer(to.player, this.sees(to.player, other.player) ? { t: 'peer', count, member: this.view(other) } : { t: 'left', id: other.id, count });
@@ -292,8 +294,8 @@ export class P0OnlineHub {
     for (const c of this.conns) {
       const me = this.deps.rooms.occupant(c.player);
       if (!me || this.byPlayer.get(c.player) !== c) continue;
-      const key = me.outpost + ':' + me.room;
-      if (!groups.has(key)) groups.set(key, this.deps.rooms.members(me.outpost, me.room));
+      const key = me.outpost + '@' + me.layout + ':' + me.room;
+      if (!groups.has(key)) groups.set(key, this.deps.rooms.members(me.outpost, me.room, me.layout));
       if (c.ws.bufferedAmount > LIMITS.close_bytes) { c.ws.close(1013, 'SLOW_CLIENT'); continue; }
       if (c.ws.bufferedAmount > LIMITS.skip_bytes || c.ws.readyState !== WebSocket.OPEN) continue;
       c.ws.send(snapshotFrame(this.tick, c.epoch, this.seenBy(c.player, groups.get(key)!)));

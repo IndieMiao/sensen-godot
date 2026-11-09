@@ -21,7 +21,8 @@ const resolve = generatedOutpostSpec(table, detailOf);
 describe('generated outpost rooms (SGODOT-280)', () => {
   it('a Tokyo square gets its room on first join, sized by the generator, walled like the placeholder room', () => {
     const market = cityPlaces(c, TOKYO)!.detail.outposts.find(o => o.role === 'market')!;
-    const placeholder = table.find(o => o.art === market.art)!;
+    // the fruit shop is the room older clients still draw under Mission Market Square's plaza (SGODOT-218, `before`)
+    const placeholder = table.find(o => o.art === market.art) ?? table.find(o => o.before?.art === market.art)!.before!;
     const rooms = new OutpostRooms(table, Date.now, resolve);
     expect(rooms.spec(market.id)).toBeUndefined();
     const placed = rooms.join('player-gen-01', market.id);

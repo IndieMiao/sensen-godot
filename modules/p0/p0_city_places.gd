@@ -146,6 +146,10 @@ static func outpost_entry(cluster: String, o: Dictionary) -> Dictionary:
 		if o.has(k): entry[k] = o[k]
 	entry["cluster"] = cluster
 	entry["anchors"] = str(o.get("anchors", room.get("anchors", "")))
+	# A kit this client draws over the server's (client_art): the anchors of the hand-written room on that kit, which are
+	# the kit's — the market plaza's own layout.json (SGODOT-218), where the fruit shop's file would move its counter and
+	# benches; the tackle shop's are the file the server names anyway.
+	if art != str(o.get("art", "")) and str(room.get("art", "")) == art: entry["anchors"] = str(room.get("anchors", ""))
 	# This client's own anchors for the room kind where they differ from the ones the server names (world.room[kind]
 	# .client_anchors): the S-tier trading post's cabin.anchors.json, which 0.2.5 and older do not have — the server
 	# keeps naming the tea house's for them, so it can go out before or after this client (周瑜 on #404).

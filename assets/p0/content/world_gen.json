@@ -1086,6 +1086,7 @@
    },
    "market": {
     "art": "fruit_shop",
+    "client_art": "market_plaza",
     "anchors": "res://assets/p0/outposts/market.anchors.json",
     "category": "Market square · Requests"
    },
