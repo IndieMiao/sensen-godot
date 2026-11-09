@@ -60,9 +60,9 @@ static func layout(entry: Dictionary, spec: Dictionary, wild: Dictionary, clear:
 	var out := {}
 	for kind in ["dragonfly", "bee", "butterfly"]:   # the water's few first: the bank's plants are many
 		out[kind] = []
-		var want: int = floori(COUNT[kind] / 2.0) if gles else COUNT[kind]
+		var want: int = COUNT[kind]
 		var reeds: Array = wild.get("reeds", [])
-		var points := _water_points(id, spec, reeds, rng) if kind == "dragonfly" \
+		var points := _water_points(id, spec, int(entry.decoration_seed), reeds) if kind == "dragonfly" \
 			else _shuffled(wild.get("flowers", []), rng) + _shuffled(wild.get("leafy", []), rng)
 		if kind == "butterfly": points += _shuffled(reeds, rng)   # last, a pond opening on water (Fern)
 		# the opening's share from the plants nearest the player (上官婉儿 on #929: a bee and a butterfly on the clumps
@@ -84,6 +84,9 @@ static func layout(entry: Dictionary, spec: Dictionary, wild: Dictionary, clear:
 				out[kind].append(a)
 				taken.append(a.at)
 			if not screen.is_valid(): break
+		# gl_compatibility: the first half of the same draw (the opening's share first), so a GLES phone shows some of the
+		# very insects a Vulkan one does (周瑜 on #929)
+		if gles: out[kind] = (out[kind] as Array).slice(0, floori(COUNT[kind] / 2.0))
 	return out
 
 ## `grass`: over the meadow's plants (not a cattail in the water), where a white butterfly may fly.
@@ -128,12 +131,27 @@ static func _shuffled(points: Array, rng: RandomNumberGenerator) -> Array:
 	return out
 
 ## Points over the water SHORE off its edge, those beside the cattails first.
-static func _water_points(id: String, spec: Dictionary, reeds: Array, rng: RandomNumberGenerator) -> Array:
-	var r := FishingModel.water_rect(id, spec)
+static func _water_points(id: String, spec: Dictionary, seed_value: int, reeds: Array) -> Array:
 	var near: Array = []
 	var far: Array = []
-	if not r.has_area(): return near
-	for k in 800:
+	for p in _water_band(id, spec, seed_value):
+		if reeds.any(func(q): return Vector2(q.x - p.x, q.z - p.z).length() < 1.5): near.append(p)
+		else: far.append(p)
+	return near + far
+
+## The water's band SHORE off its edge, sampled from the pond's seed: up to 80 points. Some 15–19 ms on an M4 (800 tries,
+## 17 FishingModel.contains each), so kept per pond — the scenery is built again as the gathering points come or change
+## (周瑜 on #929), and the band depends on neither.
+const BAND_CACHE_MAX := 8
+static var _bands := {}
+static func _water_band(id: String, spec: Dictionary, seed_value: int) -> Array:
+	var key := "%s|%d" % [id, seed_value]
+	if _bands.has(key): return _bands[key]
+	var out: Array = []
+	var r := FishingModel.water_rect(id, spec)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value ^ 4541
+	for k in (800 if r.has_area() else 0):
 		var p := Vector3(rng.randf_range(r.position.x, r.end.x), 0, rng.randf_range(r.position.y, r.end.y))
 		if not FishingModel.contains(id, p, 0.0, spec): continue
 		var inside := true
@@ -142,11 +160,11 @@ static func _water_points(id: String, spec: Dictionary, reeds: Array, rng: Rando
 			var d := Vector3(cos(a * TAU / 8.0), 0, sin(a * TAU / 8.0))
 			if not FishingModel.contains(id, p + d * SHORE.x, 0.0, spec): inside = false
 			if not FishingModel.contains(id, p + d * SHORE.y, 0.0, spec): reaches = true
-		if not inside or not reaches: continue
-		if reeds.any(func(q): return Vector2(q.x - p.x, q.z - p.z).length() < 1.5): near.append(p)
-		else: far.append(p)
-		if near.size() + far.size() >= 80: break
-	return near + far
+		if inside and reaches: out.append(p)
+		if out.size() >= 80: break
+	if _bands.size() >= BAND_CACHE_MAX: _bands.clear()
+	_bands[key] = out
+	return out
 
 ## Where a built PondScenery's plants stand (PondWildProps' layout, kept on its node): {flowers: the flowers' and
 ## bushes', leafy: the pale leafy clumps' (on the opening screen the bushes became these, PondWildGround._opening_leafy;

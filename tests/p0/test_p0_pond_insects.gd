@@ -54,6 +54,19 @@ func test_counts_and_half_under_gl_compatibility() -> void:
 		for kind in PondInsects.COUNT:
 			assert_int(full[kind].size()).override_failure_message("%s %s" % [id, kind]).is_equal(PondInsects.COUNT[kind])
 			assert_int(half[kind].size()).override_failure_message("%s %s gles" % [id, kind]).is_equal(floori(PondInsects.COUNT[kind] / 2.0))
+			# the same insects as the full draw's first half: a GLES phone and a Vulkan one show some of the same
+			assert_array(half[kind]).override_failure_message("%s %s subset" % [id, kind]).is_equal((full[kind] as Array).slice(0, half[kind].size()))
+
+## The water's band is sampled once a pond (周瑜 on #929: 15–19 ms a build, built again as the points come): the
+## scenery's rebuild takes it from the cache, and the same points either way.
+func test_the_water_band_is_kept_per_pond() -> void:
+	var entry := P0Ponds.location(SF[0])
+	var spec := SystemPonds.site(entry)
+	PondInsects._bands.clear()
+	var first := PondInsects._water_band(str(entry.id), spec, int(entry.decoration_seed))
+	var again := PondInsects._water_band(str(entry.id), spec, int(entry.decoration_seed))
+	assert_array(again).is_same(first)
+	assert_int(first.size()).is_greater(20)
 
 func test_anchors_keep_off_the_points_and_the_spawn_at_their_heights() -> void:
 	for id in SF:
@@ -97,6 +110,9 @@ func test_the_opening_shows_three_to_six_none_over_the_keys_the_player_or_the_po
 		assert_int(seen).override_failure_message(id).is_between(3, 6)
 		# 1–2 bees or yellow butterflies near the player (上官婉儿 on #929: over the grass and flowers 3–5 m off)
 		assert_int(near).override_failure_message(id).is_greater_equal(1)
+
+func after_test() -> void:   # a failed marker test must not leave the desktop without insects (周瑜 on #929)
+	if FileAccess.file_exists(PondInsects.OFF_FILE): DirAccess.remove_absolute(ProjectSettings.globalize_path(PondInsects.OFF_FILE))
 
 ## One build timed with and without them (李元芳 on gs66): a user://p0_no_insects marker leaves them out.
 func test_a_marker_file_leaves_them_out() -> void:
