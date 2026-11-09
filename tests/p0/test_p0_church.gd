@@ -70,7 +70,10 @@ func test_the_cathedral_room_on_its_kit() -> void:
 	assert_object(r.get_node_or_null("Room").find_child("SignText", true, false)).is_null()
 	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("spawn").global_position)).is_less(0.2)
 	assert_str(r.exit_to).is_equal("Map")
-	for n in P0Outposts.find(CHURCH_ID).seats: assert_object(r.anchor(str(n))).override_failure_message(str(n)).is_not_null()
+	# q(304): six pews, one seat each; the table keeps the two second seats for older clients, which have no anchor here
+	assert_int(P0Outposts.find(CHURCH_ID).seats.size()).is_equal(8)
+	assert_array(Array(r._lone_seats())).is_equal(["seat_left_1", "seat_left_2", "seat_left_3", "seat_right_1", "seat_right_2", "seat_right_3"])
+	for n in r.LEGACY_SEATS: assert_object(r.anchor(str(n))).override_failure_message(str(n)).is_null()
 	assert_vector(r.opening_subjects()[0][0]).is_equal(r.npcs.npc_keeper.root.global_position)   # the opening frames him
 
 func test_an_unknown_place_falls_back() -> void:
@@ -95,7 +98,8 @@ func test_an_unknown_place_falls_back() -> void:
 func test_each_pew_seat_is_its_own_prompt() -> void:
 	var r := _room(CHURCH_ID)
 	await get_tree().process_frame
-	var seats: Array = P0Outposts.find(CHURCH_ID).seats
+	var seats: Array = Array(r._lone_seats())
+	assert_int(seats.size()).is_equal(6)
 	for n in seats:
 		assert_array(Array(r._tappable())).override_failure_message(str(n)).contains([n])
 		assert_str(str(r._marker(str(n), {}).get("kind", ""))).override_failure_message(str(n)).is_equal("seat")
@@ -154,14 +158,14 @@ func test_up_from_every_pew_onto_the_floor_the_door_reaches() -> void:
 		var c := P0RoomNav.nearest_reachable(r.bp, p, door)
 		return r.bp.world_to_cell(c) == r.bp.world_to_cell(p)
 	assert_bool(on_door_floor.call(r.actor.position)).override_failure_message("spawn %s" % r.actor.position).is_true()
-	for n in P0Outposts.find(CHURCH_ID).seats:
+	for n in r._lone_seats():
 		r._sit_down(str(n))
 		r._stand_up()
 		for i in 30: r.p0_frame({}, 1.0 / 30.0)
 		assert_str(r.seat).is_empty()
 		assert_bool(on_door_floor.call(r.actor.position)).override_failure_message("%s up at %s" % [n, r.actor.position]).is_true()
-		var at: Vector3 = r.anchor(str(n)).global_position
-		assert_float(Vector2(r.actor.position.x - at.x, r.actor.position.z - at.z).length()).override_failure_message(str(n)).is_less(1.6)   # beside it
+		var at: Vector3 = r._walk_point(str(n), r.anchor(str(n)))   # q(304): up at its pew's aisle end, where it was slid in from
+		assert_float(Vector2(r.actor.position.x - at.x, r.actor.position.z - at.z).length()).override_failure_message(str(n)).is_less(0.6)
 		assert_bool(P0RoomNav._open(r.bp, r.bp.world_to_cell(r.actor.position), 2)).override_failure_message("%s in the open" % n).is_true()   # not at a pew's end between rows
 
 ## 不知火舞 on #850: the tea house's stools stand up beside them on the door's floor (no open-ground rule there, the
@@ -261,3 +265,73 @@ func test_gabriel_prays() -> void:
 	assert_str(count.text).is_equal("Limit reached · resets in 5h 12m")
 	assert_str(pray.reason).is_equal("Limit reached · resets in 5h 12m")
 	assert_str(pray.label).is_equal("Pray")
+
+# ---------------------------------------------------------------- q(304): one seat in each pew's middle
+## The user on 0.3.5 (q(304), 李白 / 不知火舞): each pew seats one, its icon in the pew's middle; the icons are not pushed
+## apart from each other (overlapping is fine), still off the door and the open name strip. One walks to the pew's aisle
+## end and slides along it to the middle, as long as the slide takes.
+func test_one_seat_in_each_pews_middle() -> void:
+	var r := _room(CHURCH_ID)
+	await get_tree().process_frame
+	var pews := {}
+	for a in r.layout.get("instances", []): if str(a.name).begins_with("pew_"): pews[str(a.name)] = a
+	assert_int(pews.size()).is_equal(6)
+	for n in r._lone_seats():
+		var pew: Dictionary = pews[str(r.anchor_data(n).module)]
+		var at: Vector3 = r.anchor(n).position
+		assert_float(at.x).override_failure_message(n).is_equal_approx(float(pew.position[0]), 0.001)   # its middle
+		assert_float(at.z).override_failure_message(n).is_equal_approx(float(pew.position[2]), 0.03)
+		# walked to from the aisle end of its pew (the layout's approach), not the floor nearest the middle
+		var appr: Array = r.anchor_data(n).approach
+		var want: Vector3 = (r.anchor(n).get_parent() as Node3D).to_global(Vector3(float(appr[0]), float(appr[1]), float(appr[2])))
+		assert_float(P0Room._flat_distance(r._walk_point(n, r.anchor(n)), want)).override_failure_message(n).is_less(0.2)   # on the floor by it
+		assert_bool(r._may_overlap(n)).is_true()
+	# from the aisle the slide to the middle takes longer than the 0.3 s onto a stool
+	r.actor.teleport(r._walk_point("seat_left_2", r.anchor("seat_left_2")))
+	r._sit_down("seat_left_2")
+	assert_float(float(r._glide.dur)).is_greater(r.SIT_GLIDE_S)
+	assert_float(float(r._glide.dur)).is_equal_approx(P0Room._flat_distance(r._glide.from, r._glide.to) / r.SIT_SLIDE_MPS, 0.01)
+	r._glide = {}
+	r._stand_up()   # getting up: no seat prompts while sliding out, back once on the aisle (不知火舞 on #925)
+	assert_dict(r._marker("seat_left_1", {})).is_empty()
+	for i in 60: r.p0_frame({}, 1.0 / 30.0)
+	assert_str(str(r._marker("seat_left_1", {}).get("kind", ""))).is_equal("seat")
+	var tea := _room("sh_tea_1")   # elsewhere seats are walked to, slid onto and spread as before
+	await get_tree().process_frame
+	assert_bool(tea._may_overlap("seat_table1_1")).is_false()
+	tea.actor.teleport(tea.anchor("seat_table1_1").global_position + Vector3(2, 0, 0))
+	tea._sit_down("seat_table1_1")
+	assert_float(float(tea._glide.dur)).is_equal(tea.SIT_GLIDE_S)
+
+## spread's ①: buttons that may overlap stay on each other; the door and any other button still push them off.
+func test_pew_icons_overlap_but_keep_off_the_door() -> void:
+	var screen := Rect2(0, 0, 360, 800)
+	var spots := {"seat_left_1": Vector2(100, 400), "seat_left_2": Vector2(110, 410), "exit": Vector2(200, 600), "seat_right_1": Vector2(205, 605)}
+	var pews := {"seat_left_1": true, "seat_left_2": true, "seat_right_1": true}
+	var out: Dictionary = P0Room.spread(spots, spots.keys(), Rect2(), screen, 60.0, {}, {}, pews).spots
+	assert_vector(out.seat_left_1).is_equal(spots.seat_left_1)   # the two seats stay where they are, on each other
+	assert_vector(out.seat_left_2).is_equal(spots.seat_left_2)
+	assert_float((out.seat_right_1 as Vector2).distance_to(out.exit)).is_greater_equal(P0Room.SPREAD_GAP - 0.01)   # off the door
+	var apart: Dictionary = P0Room.spread(spots, spots.keys(), Rect2(), screen, 60.0).spots   # without: as before
+	assert_float((apart.seat_left_2 as Vector2).distance_to(apart.seat_left_1)).is_greater_equal(P0Room.SPREAD_GAP - 0.01)
+	spots["use_x"] = Vector2(130, 400)   # another button among them: kept off both seats
+	out = P0Room.spread(spots, spots.keys(), Rect2(), screen, 60.0, {}, {}, pews).spots
+	for n in ["seat_left_1", "seat_left_2"]:
+		assert_float((out.use_x as Vector2).distance_to(out[n])).override_failure_message(n).is_greater_equal(P0Room.SPREAD_GAP - 0.01)
+
+## While older clients are about (q(304), 不知火舞): one sitting on a second seat taken off its pew makes that pew taken —
+## no icon, no seat for us — and is drawn at that pew's seat height where it sat.
+func test_an_older_clients_second_seat_takes_its_pew() -> void:
+	var r := _room(CHURCH_ID)
+	await get_tree().process_frame
+	assert_bool(r._free_seats("seat_left_2").is_empty()).is_false()
+	r.online = P0Online.new()
+	add_child(auto_free(r.online))
+	r.online.self_id = 1
+	r.online.members = {1: {"seat": ""}, 7: {"seat": "seat_left_4"}}
+	assert_bool(r._free_seats("seat_left_2").is_empty()).is_true()
+	assert_dict(r._marker("seat_left_2", {})).is_empty()
+	assert_bool(r._free_seats("seat_left_1").is_empty()).is_false()   # the other pews as they were
+	assert_float(r.seat_root_y("seat_left_4")).is_equal_approx(r.seat_root_y("seat_left_2"), 0.001)
+	assert_float(r._crowd_height(7)).is_equal_approx(r.seat_root_y("seat_left_2") - r.room.position.y, 0.001)
+

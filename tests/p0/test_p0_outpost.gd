@@ -55,7 +55,10 @@ func test_the_outpost_table_and_anchor_files_agree() -> void:
 		var anchors := _anchors_of(o)
 		var names := anchors.map(func(a): return str(a.name))
 		assert_array(names).override_failure_message(str(o.id) + " spawn / exit").contains(["spawn", "exit"])
-		assert_array(names.filter(func(n): return n.begins_with("seat_"))).override_failure_message(str(o.id) + " seats").is_equal(o.seats)
+		# Grace Cathedral's two second seats (q(304)) stay in the table for older clients, off its pews here
+		var legacy: Array = OutpostScript.LEGACY_SEATS.keys() if str(o.art) == "poi_church" else []
+		assert_array(names.filter(func(n): return n.begins_with("seat_"))).override_failure_message(str(o.id) + " seats").is_equal(
+			(o.seats as Array).filter(func(n): return not legacy.has(n)))
 		assert_int(int(o.capacity)).is_equal(30 if str(o.role) == "market" else 12)
 		# The keeper's finger card has its own badge_ point, clear above the door's card (安其拉's review of #14)
 		if (o.keeper as Dictionary).is_empty(): continue

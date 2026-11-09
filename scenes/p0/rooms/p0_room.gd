@@ -797,13 +797,18 @@ func reachable(at: Vector3, clear := 0, avoid: Array = []) -> Vector3:
 func walk_to(n: String, done := Callable()) -> void:
 	var target := anchor(n)
 	if target == null: return
-	var stand := P0RoomAnchors.stand_for(n, _anchors.keys())
-	var point := anchor(stand).global_position if stand != "" and anchor(stand) else reachable(target.global_position)
+	var point := _walk_point(n, target)
 	if point == Vector3.INF: return
 	point.y = 0.0
 	_walk = {name = n, point = point, done = done}
 	if _flat_distance(actor.position, point) <= REACH_M or not actor.mover.set_target_position(point):
 		_arrive()
+
+## Where a walk to `n` ends: its stand_ anchor, else the floor nearest it (a room may say otherwise: Grace Cathedral's
+## pew seats, from the aisle).
+func _walk_point(n: String, target: Node3D) -> Vector3:
+	var stand := P0RoomAnchors.stand_for(n, _anchors.keys())
+	return anchor(stand).global_position if stand != "" and anchor(stand) else reachable(target.global_position)
 
 func _arrive() -> void:
 	var w := _walk
@@ -1062,8 +1067,11 @@ static func spread_rank(n: String) -> int:
 ## Where the folded buttons are drawn (pure, tested): `spots` {name: point}, `buttons` the names drawn as buttons (not the
 ## open one, which is its strip), `strip` the open strip's rect (empty: none), `screen` the screen, `top` the HUD's bottom,
 ## `in_row` last frame's row, `keep` the buttons a room laid out itself this frame (the farmhouse's stove grid over its
-## open stove strip, #634), left out of the row over the strip. Returns {spots, row: {name: true}}.
-static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect2, top: float, in_row := {}, keep := {}) -> Dictionary:
+## open stove strip, #634), left out of the row over the strip; `overlap` the buttons ① leaves on each other (Grace
+## Cathedral's pew seats, q(304): each on its pew's middle, overlapping is fine) — still kept off the others and the
+## strip. Returns {spots, row: {name: true}}.
+static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect2, top: float, in_row := {}, keep := {},
+		overlap := {}) -> Dictionary:
 	var out := spots.duplicate()
 	# a button off the screen is not drawn (P0Ui.world_icon): left where it is, out of both rules
 	var order := buttons.filter(func(n): return screen.has_point(spots[n]))
@@ -1098,15 +1106,17 @@ static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect
 				out[under[k]] = Vector2(minf(x, hi), strip.get_center().y)
 		for n in under: row[n] = true
 	# ① two too close: the later one moves out along the line, to 44
-	var placed: Array = []
+	var placed: Array = []   # [point, name]
 	for n in order:
 		if spread_rank(str(n)) <= 1 and not row.has(n):   # the door and the stoves' row stay as laid out
-			placed.append(out[n])
+			placed.append([out[n], n])
 	for n in under + order.filter(func(m): return spread_rank(str(m)) > 1 and not row.has(m)):
 		var p: Vector2 = out[n]
 		for _pass in 8:
 			var clash := false
-			for q: Vector2 in placed:
+			for pq in placed:
+				if overlap.has(n) and overlap.has(pq[1]): continue
+				var q: Vector2 = pq[0]
 				var d := p.distance_to(q)
 				if d >= SPREAD_GAP - 0.01: continue
 				var dir: Vector2 = (p - q) / d if d > 0.01 else Vector2.UP
@@ -1115,7 +1125,7 @@ static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect
 				clash = true
 			if not clash: break
 		out[n] = p
-		placed.append(p)
+		placed.append([p, n])
 	return {spots = out, row = row}
 
 func _spread_markers(marks: Dictionary, spots: Dictionary) -> Dictionary:
@@ -1123,8 +1133,10 @@ func _spread_markers(marks: Dictionary, spots: Dictionary) -> Dictionary:
 	for n in marks:
 		var kind := str(marks[n].get("kind", ""))
 		if (kind == "facility" or kind == "seat") and n != _card: buttons.append(n)
+	var overlap := {}
+	for n in buttons: if _may_overlap(n): overlap[n] = true
 	var screen := get_viewport().get_visible_rect()
-	var laid := spread(spots, buttons, _card_rect, screen, _safe_top() + HUD_BOTTOM, _in_row, _laid_out)
+	var laid := spread(spots, buttons, _card_rect, screen, _safe_top() + HUD_BOTTOM, _in_row, _laid_out, overlap)
 	_in_row = laid.row
 	var out: Dictionary = laid.spots
 	for n in _spread_off.keys():   # a button gone from the screen starts afresh when it returns
@@ -1139,6 +1151,10 @@ func _spread_markers(marks: Dictionary, spots: Dictionary) -> Dictionary:
 		_spread_off[n] = e
 		out[n] = raw + _eased(e)
 	return out
+
+## Prompts left on each other by spread's ① (still kept off the rest and the open strip): Grace Cathedral's pew seats
+## (the user, 0.3.5: an icon in the middle of each pew, overlapping is fine; 不知火舞 on q(304)).
+func _may_overlap(_n: String) -> bool: return false
 
 static func _eased(e: Dictionary) -> Vector2:
 	var t := float(e.t)
