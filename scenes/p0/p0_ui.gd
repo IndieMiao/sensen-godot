@@ -1679,6 +1679,10 @@ func show_screen(kind: P0SysScreen.Kind, detail := {}) -> void:
 		_screen.primary_pressed.connect(func(k: P0SysScreen.Kind): screen_action.emit(k))
 		_screen.secondary_pressed.connect(func(k: P0SysScreen.Kind): screen_back.emit(k))
 		_screen_layer.add_child(_screen)
+	_screen.status_top = safe_top()   # q(290): the fitted splash keeps its wordmark under the status bar
+	if not is_inside_tree():   # a cold start: 0 until the screen is in the tree, then the status bar it really has
+		var shown := _screen
+		shown.tree_entered.connect(func(): if is_instance_valid(shown): shown.status_top = safe_top(), CONNECT_ONE_SHOT)
 	_screen.show_kind(kind, detail)
 	if test_accounts.is_test() and kind == P0SysScreen.Kind.FAIL:
 		_screen.set_return_main(func(): test_account_requested.emit("main"))

@@ -8,9 +8,7 @@ config/icon="res://icon.svg"
 config/quit_on_go_back=false
 run/main_scene="res://scenes/city_select/city_select.tscn"
 boot_splash/bg_color=Color(0.380392, 0.733333, 0.980392, 1)
-boot_splash/show_image=true
-boot_splash/stretch_mode=3
-boot_splash/image="res://assets/p0/ui/launch_splash.png"
+boot_splash/show_image=false
 
 [autoload]
 Localization="*res://modules/ui/localization.gd"

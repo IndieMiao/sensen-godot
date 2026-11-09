@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dup4wy24e0dcn"
-path="res://.godot/imported/adaptive_background_432x432.png-38cafa5414701bb9c0a855b9361c6cc6.ctex"
+uid="uid://cubs8bfnf1hp7"
+path="res://.godot/imported/splash_blur.png-91cf25e14f9c440ae537eccecb82909a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://tools/app_icon/android/adaptive_background_432x432.png"
-dest_files=["res://.godot/imported/adaptive_background_432x432.png-38cafa5414701bb9c0a855b9361c6cc6.ctex"]
+source_file="res://assets/p0/ui/splash_blur.png"
+dest_files=["res://.godot/imported/splash_blur.png-91cf25e14f9c440ae537eccecb82909a.ctex"]
 
 [params]
 

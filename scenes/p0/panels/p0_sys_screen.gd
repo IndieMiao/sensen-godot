@@ -2,10 +2,10 @@ class_name P0SysScreen
 extends Control
 ## Whole-screen system states (WP6 E-03, §10.7.1; SGODOT-233). Each takes the whole screen and every touch; no HUD,
 ## no ✕. Laid out on the 360 × 800 frame of page 14:
-##   LAUNCH      the launch splash (q(290); SGODOT-420, 不知火舞's boot-splash spec v1.1): the screen's height, centred
-##               (splash_layout) — the engine's boot splash draws the same image the same way (Keep Height), so the hand
-##               over from it is not seen; no wordmark over it (the art has one). Whole from its first frame; after 8 s the
-##               spinner and `Taking longer than usual…` on a small card above the art's Gensen mark (SYS-LOADING-2)
+##   LAUNCH      the splash art (q(290), 不知火舞's spec v1, 302 c9986a33): its bottom on the screen's, cut only from the sky
+##               at the top, or on a wider screen fitted under the status bar over its own blurred copy (splash_layout);
+##               no wordmark over it (the art has one). It fades in from the sky colour; after 8 s the spinner and
+##               `Taking longer than usual…` on a small card above the art's Gensen mark (SYS-LOADING-2)
 ##   FAIL        the same art under the modal scrim, SystemCard `Can't connect` · Retry (SYS-LOADING-FAIL, no wordmark)
 ##   MAINT       SYS-MAINT 1245:87657 — `Down for maintenance` · `We'll be back around 14:30.` · Check again
 ##   UPDATE      SYS-UPDATE 1245:87698 — `Update to keep playing` · `This version is out of date.` · Update
@@ -24,23 +24,24 @@ signal secondary_pressed(kind: Kind)
 enum Kind { LAUNCH, FAIL, MAINT, UPDATE, SCENE, PLACE_FAIL }
 
 const BACKDROP := preload("res://assets/p0/ui/sys_backdrop_farm.jpg")
-## The launch splash (SGODOT-420, 1214 × 1618): q(290)'s art (the user's v2, 747 × 1618) unchanged in the middle at
-## x 233, its blurred copy baked into the sides (radius about 20 px, 6 % darker). Also project.godot's boot splash
-## image (stretch Keep Height) and the iOS launch screen's (tools/ios): keep the three the same file.
-const SPLASH := preload("res://assets/p0/ui/launch_splash.png")
-const SPLASH_SKY := Color("61bbfa")   # the art's sky at its top: the sides past a 3:4 screen, as the boot splash's
-## The splash in the art's 812 rows (the art read as 375 × 812, so its wordmark and marks keep their rows).
-const SPLASH_SIZE := Vector2(1214.0 * 812.0 / 1618.0, 812.0)
-## The Gen Sen wordmark's top (its spark too), in the 812 rows: measured on the v2 art (79 on v1; 周瑜 / 不知火舞 on
+## q(290): the splash art (the user's v2, 747 × 1618; the formula reads it as 375 × 812) and its pre-rendered
+## blurred copy (radius about 20 px, 6 % darker, half size) for the sides a wide screen shows.
+const SPLASH := preload("res://assets/p0/ui/splash.jpg")
+const SPLASH_BLUR := preload("res://assets/p0/ui/splash_blur.png")
+const SPLASH_SKY := Color("61bbfa")   # the art's sky at its top: the system splash and the engine's first frames too
+const SPLASH_SIZE := Vector2(375, 812)
+## The Gen Sen wordmark's top (its spark too), in the 375-wide rows: measured on the v2 art (79 on v1; 周瑜 / 不知火舞 on
 ## #767) — measure again with a new art.
 const SPLASH_MARK_TOP := 85.0
+const SPLASH_MARK_GAP := 8.0     # … kept this far under the status bar
 const SPLASH_LOGO_TOP := 752.0   # the small Gensen mark at the bottom: the slow card ends 16 above it
 const SPLASH_CARD_GAP := 16.0
 const SPLASH_CARD_PAD := Vector2(16, 12)
 const SPLASH_CARD_ALPHA := 0.9
 const SPLASH_CARD_RADIUS := 16
+const SPLASH_FADE_IN := 0.2      # from the sky colour, the first time it shows
 const SPLASH_FADE_OUT := 0.3     # into the first scene
-const SPLASH_MIN_S := 0.8        # shown at least this long: a quick launch does not flash it
+const SPLASH_MIN_S := 0.8        # shown at least this long, the fade-in in it: a quick launch does not flash it
 const CLOCK := preload("res://assets/p0/icons/clock.svg")
 const WIFI_OFF := preload("res://assets/ui/kit_icons/wifi_off.svg")
 const SLOW_TEXT := "Taking longer than usual…"
@@ -89,10 +90,18 @@ var progress := 0.0:
 		progress = clampf(v, 0.0, 1.0)
 		if _bar_fill: _bar_fill.size.x = roundf(SCENE_BAR.x * progress)
 
+## The status bar's height (P0Ui.safe_top): the fitted splash keeps the wordmark under it. Laid out again when it
+## changes (a cold start reads it only once the screen is in the tree).
+var status_top := 0.0:
+	set(v):
+		status_top = v
+		_layout()
+
 var _bg: ColorRect
 var _art: TextureRect
 var _fade: TextureRect
 var _splash: TextureRect
+var _splash_blur: TextureRect
 var _slow_card: Panel
 var _splash_since := -1   # msec the splash first showed, -1 before
 var _shot: TextureRect
@@ -119,6 +128,14 @@ func _init() -> void:
 	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_bg)
+	_splash_blur = TextureRect.new()
+	_splash_blur.name = "SplashBlur"
+	_splash_blur.texture = SPLASH_BLUR
+	_splash_blur.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_splash_blur.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_splash_blur.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_splash_blur.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_splash_blur)
 	_splash = TextureRect.new()
 	_splash.name = "Splash"
 	_splash.texture = SPLASH
@@ -256,8 +273,14 @@ func show_kind(k: Kind, d := {}) -> void:
 	var splash := k in [Kind.LAUNCH, Kind.FAIL]   # q(290): the splash art in place of the farm backdrop and wordmark
 	_bg.color = SPLASH_SKY if splash else UiTokens.COLOR_SURFACE
 	_splash.visible = splash
-	# Whole from its first frame (420): it takes over from the boot splash's same image, a fade would flash the sky.
-	if splash and _splash_since < 0: _splash_since = Time.get_ticks_msec()
+	if splash and _splash_since < 0:   # the first time: in from the sky colour
+		_splash_since = Time.get_ticks_msec()
+		for t in [_splash, _splash_blur]: (t as CanvasItem).modulate.a = 0.0
+		if is_inside_tree():
+			var tw := create_tween().set_parallel()
+			for t in [_splash, _splash_blur]: tw.tween_property(t, ^"modulate:a", 1.0, SPLASH_FADE_IN)
+		else:
+			for t in [_splash, _splash_blur]: (t as CanvasItem).modulate.a = 1.0
 	_art.visible = not scene and not splash
 	_fade.visible = not scene and not splash
 	_map.visible = scene
@@ -326,13 +349,15 @@ func drop_pin() -> void:
 	var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_method(func(v: float): _pin_drop = v; _layout(), SCENE_PIN_DROP, 0.0, SCENE_PIN_DROP_S)
 
-## The boot splash's Keep Height (420, spec v1.1 §2): s = h ÷ 812, the splash's top and bottom on the screen's, centred —
-## a narrow screen (20:9, 19.5:9, 21:9) cuts its blurred sides and a little of the art, a wide one (18:9, 16:9) shows
-## them; the art's wordmark well under the status bar either way. Not rounded: the engine's isn't. {scale, origin (the
-## splash's top-left on screen)}.
-static func splash_layout(screen: Vector2) -> Dictionary:
-	var s := screen.y / SPLASH_SIZE.y
-	return {"scale": s, "origin": Vector2((screen.x - SPLASH_SIZE.x * s) * 0.5, 0.0)}
+## q(290)'s one formula: the art's bottom on the screen's, centred. Covering (s = the larger of the two fits) while the
+## wordmark's top still sits SPLASH_MARK_GAP under the status bar — only the sky and the sides are cut (20:9, 19.5:9,
+## 21:9); else (a wider screen: 18:9, 16:9, an iPad) s = (h − status − gap) ÷ (812 − mark top), the wordmark right there and
+## the sides showing the blurred copy. {scale, origin (the art's top-left on screen), fit}.
+static func splash_layout(screen: Vector2, status := 0.0) -> Dictionary:
+	var s := maxf(screen.x / SPLASH_SIZE.x, screen.y / SPLASH_SIZE.y)
+	var fit := screen.y - SPLASH_SIZE.y * s + SPLASH_MARK_TOP * s < status + SPLASH_MARK_GAP
+	if fit: s = (screen.y - status - SPLASH_MARK_GAP) / (SPLASH_SIZE.y - SPLASH_MARK_TOP)
+	return {"scale": s, "origin": Vector2((screen.x - SPLASH_SIZE.x * s) * 0.5, screen.y - SPLASH_SIZE.y * s), "fit": fit}
 
 ## Takes a launch splash down into the scene under it: at least SPLASH_MIN_S after it first showed, then a 300 ms fade;
 ## the layer it is on goes with it. It takes no more touches from now (the caller has already let go of it).
@@ -352,9 +377,10 @@ func _layout() -> void:
 	var w := size.x
 	var h := size.y if size.y > 0.0 else _FRAME_H
 	var k := h / _FRAME_H   # the frame's heights on a taller or shorter screen
-	var sl := splash_layout(Vector2(w, h))
-	_splash.position = sl.origin
-	_splash.size = SPLASH_SIZE * float(sl.scale)
+	var sl := splash_layout(Vector2(w, h), status_top)
+	_splash.position = (sl.origin as Vector2).round()
+	_splash.size = (SPLASH_SIZE * float(sl.scale)).round()
+	_splash_blur.visible = _splash.visible and bool(sl.fit)
 	_art.position = Vector2(0, roundf(_ART_TOP * k))
 	_art.size = Vector2(w, h)
 	var mark_size := _mark.get_combined_minimum_size()
