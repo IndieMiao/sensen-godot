@@ -722,3 +722,14 @@ func test_a_door_without_a_badge_point_is_picked_over_the_threshold() -> void:
 	var r := _room()
 	assert_object(r.anchor("badge_exit")).is_null()
 	assert_vector(r.pick_point("exit")).is_equal(r.anchor("exit").global_position + Vector3(0, 1.0, 0))
+
+## 上官婉儿's 0.3.5 cathedral plan: a kit's review_lighting.gles_sun_scale scales its sun under the Compatibility
+## renderer only (OpenGL ES washed the pale floor out); Mobile / Forward+ and every kit without it keep the sun as is.
+func test_the_gles_sun_scale_applies_only_under_compatibility_and_only_where_set() -> void:
+	var review := {"sun": 1.35, "gles_sun_scale": 0.4}
+	assert_float(P0Room.gles_sun_scale(review, "gl_compatibility")).is_equal_approx(0.4, 0.0001)
+	assert_float(P0Room.gles_sun_scale(review, "mobile")).is_equal_approx(1.0, 0.0001)
+	assert_float(P0Room.gles_sun_scale(review, "forward_plus")).is_equal_approx(1.0, 0.0001)
+	assert_float(P0Room.gles_sun_scale({"sun": 1.35}, "gl_compatibility")).is_equal_approx(1.0, 0.0001)
+	var church := P0RoomAnchors.read_json("res://assets/rooms/poi_church/layout.json")
+	assert_float(float(church.review_lighting.gles_sun_scale)).is_equal_approx(0.4, 0.0001)
