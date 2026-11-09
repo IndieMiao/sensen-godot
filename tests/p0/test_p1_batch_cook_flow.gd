@@ -414,6 +414,21 @@ func test_the_watched_pot_is_a_layer_in_the_middle() -> void:
 	assert_int(layer.view.render_target_update_mode).is_equal(SubViewport.UPDATE_DISABLED)   # hidden: not drawn (周瑜)
 	assert_bool(pot.visible).is_true()
 
+## The steam's lid mask (黄忠's steam_clear_lid.gdshader, 449 v1.2) places the layer on screen by its own two uniforms:
+## they are P0WaitPot.BOX's, written twice — a box moved here and not there masks the steam in the wrong place (周瑜 on #911).
+func test_the_steam_masks_box_is_the_wait_pots() -> void:
+	var src := FileAccess.get_file_as_string("res://assets/props/cooking_pot_wait/steam_clear_lid.gdshader")
+	assert_vector(_uniform_vec2(src, "steam_layer_logical_origin")).is_equal(P0WaitPot.BOX.position)
+	assert_vector(_uniform_vec2(src, "steam_layer_logical_size")).is_equal(P0WaitPot.BOX.size)
+
+## A `uniform vec2 <name> = vec2(x, y);` default from a shader's source.
+func _uniform_vec2(src: String, uniform: String) -> Vector2:
+	var re := RegEx.new()
+	re.compile("uniform\\s+vec2\\s+%s\\s*=\\s*vec2\\(\\s*([-0-9.]+)\\s*,\\s*([-0-9.]+)\\s*\\)" % uniform)
+	var m := re.search(src)
+	assert_object(m).override_failure_message("no vec2 uniform " + uniform).is_not_null()
+	return Vector2(float(m.get_string(1)), float(m.get_string(2))) if m else Vector2(-1, -1)
+
 ## The pot layer's flight (in or back, P0WaitPot.FLY_S) run to its end at once: the tests never race its clock.
 func _land(k: P0Kitchen) -> void:
 	var layer: P0WaitPot = k.get("_wait_pot")
