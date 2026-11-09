@@ -1,3 +1,5 @@
+当前交检： [native_v1.2](native_v1.2/README.md)，按449新验收意见增强可读性；原尺寸Common图和3秒录像。以下为历史版本记录。
+
 当前正式交检： [native_v1.1](native_v1.1/README.md)，宿主5d50bf0c、真实33° Common叠层。下文为此前隔离候选记录。
 
 # SGODOT-449 · 蒸汽候选 v1 · 等真实叠层复核

@@ -15,9 +15,9 @@ The temporary host comes from the pinned farm-dev revision in reference/base.jso
 
 Earlier isolated diagnostics are retained for the alpha-composition comparison; they no longer certify final sizes. The current validation entry point and the native delivery are below.
 
-## Native delivery v1.1
+## Native delivery v1.2
 
-Native captures now use programmer branch feat/449-steam-box at5d50bf0c with the supplied cookreal save and shoot449.sh. The real camera is33°, not the earlier43° fixture: emitter localY=.150, velocity=.098m/s, growth1→1.52. The pot/animations/mask/texture are unchanged from the candidate.
+Native captures now use programmer branch feat/449-steam-box at5d50bf0c with the supplied cookreal save and shoot449.sh. The real camera is33°, not the earlier43° fixture: emitter localY=.150, velocity=.098m/s, initial quad0.055m, growth1→1.48, drift±0.012m. The pot/animations/lid mask stay unchanged. v1.2 raises upper steam alpha, increases puff size and strengthens the same cool rim colour.
 
 `prepare_native.py --out <out> --fixture <cookreal.base.json> --shot-script <shoot449.sh> [--cache <verified-cache>]` stages the pinned runtime/server and this prop. Install the local server dependencies with `pnpm --dir <out>/project --filter farm-server... install --frozen-lockfile`. Import under the shared render lock. The supplied fixture remains outside the repository; the run uses a copy and private client userdata.
 
@@ -25,4 +25,4 @@ Source the normal gs66 environment, then run the supplied shoot script with `REP
 
 The observer keeps the primary view unchanged, and uses a second transparent viewport sharing `host.view.find_world_3d()` and exactly the native camera to read onlySteam render layer19. This avoids accidentally counting opaque pot MSAA alpha as steam. It records all pixels asRGBA16F, without a spatial crop hiding failures. A separate `STEAM_NATIVE_SINGLE=1` control measures one puff's life; never use that control's image as the official3-puff view.
 
-`analyze_native.py <capture-dir>` handles the ordinary or single-puff control. Then `verify.py --out <out> --live <common-dir> --single <single-dir>` checks immutable art/animations/mask plus those actual native results. Encode by the recordedwall_ms timestamps, trimming3.000s and resampling to30fps; no speed-up. Final delivery isdocs/design/steam-449-2026-11-09/native_v1.1. The older isolated images remain historical diagnostics.
+`analyze_native.py <capture-dir> --revision v1.2` handles the ordinary or single-puff control. Then `verify.py --out <out> --live <common-dir> --single <single-dir>` checks immutable art/animations/mask plus those actual native results. Encode by the recordedwall_ms timestamps, trimming3.000s and resampling to30fps; no speed-up. Final delivery isdocs/design/steam-449-2026-11-09/native_v1.2. The older isolated images remain historical diagnostics.

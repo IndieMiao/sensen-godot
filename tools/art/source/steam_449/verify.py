@@ -24,15 +24,22 @@ check(mask in shader and mask in baseline and '* above_lid' in shader,'Original 
 check('amount = 3' in scene and 'lifetime = 1.8' in scene and 'local_coords = true' in scene,'Three particles,1.8s lifetime,local coords')
 check('initial_velocity_min = 0.098' in scene and 'initial_velocity_max = 0.098' in scene,'Fixed0.098m/s rise')
 check('gravity = Vector3(0, 0, 0)' in scene and 'spread = 0.0' in scene,'No extra ballistic drift or spread')
-check('size = Vector2(0.050, 0.050)' in scene,'Initial25px quad at500px/m')
+check('size = Vector2(0.055, 0.055)' in scene,'Initial27.5px quad at500px/m (v1.2 ~28px)')
 texture=Image.open(KIT/'steam_puff.png');check(texture.size==(128,128) and texture.mode=='RGBA','Single128x128RGBA texture')
 uid=re.search('uid="(uid://[a-y0-8]+)"',(KIT/'steam_puff.png.import').read_text());check(uid is not None,'Texture Godot-generated UID')
+# v1.2 must preserve all emission/motion timing and the accepted below-ring cap.
+v11=subprocess.check_output(['git','show','daa845518:assets/props/cooking_pot_wait/cooking_pot_wait.tscn'],cwd=ROOT,text=True)
+def block(s,header):return next(b for b in re.split(r'(?=^\[)',s,flags=re.M) if b.startswith(header))
+check(block(scene,'[node name="Steam"')==block(v11,'[node name="Steam"'),'Steam node position/cadence/lifetime/seed unchanged fromv1.1')
+check(block(scene,'[sub_resource type="ParticleProcessMaterial"')==block(v11,'[sub_resource type="ParticleProcessMaterial"'),'Velocity/direction/spread unchanged fromv1.1')
+check('mix(0.75,0.38,smoothstep(166.0,170.0,px.y))' in shader,'Upper cap0.75; below-ring0.38 cap unchanged')
+check(texture.getpixel((64,64))[:3]==(255,248,240),'Warm white centre exactFFF8F0 unchanged')
 # Native host5d50bf0c measurement, authoritative over the previous43deg fixture.
 native=json.loads((args.live/'native-validation.json').read_text());single=json.loads((args.single/'single-validation.json').read_text())
 for c in native['checks']:check(c['passed'],'Native: '+c['check'],c.get('evidence'))
-check(single['passed'],'Native single-puff dimensions22–26→34–40px',{'initial':single['initial_width_px'],'grown_max':single['grown_max_px']})
+check(single['passed'],'Native single-puff dimensions~28→40–42px',{'initial':single['initial_width_px'],'grown_max':single['grown_max_px']})
 travel=.098*1.8*500*math.cos(math.radians(33));check(60<=travel<=80,'Native33deg projected rise60–80px',travel)
-check(.016*500<=10,'Authored lateral drift<=10px',.016*500)
+check(.012*500<=10,'Authored lateral drift<=10px',.012*500)
 check(abs(1.8/3-.6)<1e-7,'Emission every0.6s',1.8/3)
 rows=native['frames']
 report={'task':'SGODOT-449','status':'native Common overlay verified; ready for art review','checks':checks,'passed':all(x['passed'] for x in checks),'pixel_frames':rows,'texture_sha256':hashlib.sha256((KIT/'steam_puff.png').read_bytes()).hexdigest(),'texture_uid':uid.group(1) if uid else None,'extra_particle_triangles':6,'extra_texture_count':1,'reference_ppm':500,'reference_pitch':33}

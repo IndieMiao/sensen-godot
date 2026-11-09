@@ -2,7 +2,7 @@ from pathlib import Path
 import json,argparse,hashlib
 import numpy as np
 from PIL import Image
-ap=argparse.ArgumentParser();ap.add_argument('captures',type=Path);a=ap.parse_args();P=a.captures;r=json.loads((P/'native-measurements.json').read_text());checks=[];metrics=[]
+ap=argparse.ArgumentParser();ap.add_argument('captures',type=Path);ap.add_argument('--revision',choices=['v1.1','v1.2'],default='v1.1');a=ap.parse_args();P=a.captures;r=json.loads((P/'native-measurements.json').read_text());checks=[];metrics=[]
 def check(ok,label,evidence=None):checks.append({'check':label,'passed':bool(ok),'evidence':evidence})
 def srgb(c):return np.where(c<=.0031308,c*12.92,1.055*np.maximum(c,0)**(1/2.4)-.055)
 for f in r['frames']:
@@ -28,7 +28,8 @@ check(all(np.allclose(f['mouth'],[180,235],atol=.1) for f in r['frames']),'Pot m
 check(all(np.allclose(f['layer_position'],[80,110],atol=.1) and f['layer_size']==[200,220] for f in r['frames']),'Native expanded frame80,110/200x220')
 check(all(m['bounds_xyxy'] and m['bounds_xyxy'][0]>=130 and m['bounds_xyxy'][1]>=120 and m['bounds_xyxy'][2]<=230 and m['bounds_xyxy'][3]<=195 for m in metrics),'Steam stays within allowed strip and fades beforey120')
 check(max(m['ring_peak_alpha'] for m in metrics)<=.5,'Composite alpha<=0.5 over ring',max(m['ring_peak_alpha'] for m in metrics))
-check(max(m['peak_alpha'] for m in metrics)<=.605,'Composite upper alpha about0.6',max(m['peak_alpha'] for m in metrics))
+upper_limit=.755 if a.revision=='v1.2' else .605
+check((.72 if a.revision=='v1.2' else .55)<=max(m['peak_alpha'] for m in metrics)<=upper_limit,'Composite upper alpha about'+('0.75' if a.revision=='v1.2' else '0.6'),max(m['peak_alpha'] for m in metrics))
 check(sum(m['warm_core_pixels_within_3rgb'] for m in metrics)>90,'Warm core matchesFFF8F0 in native target')
 check(sum(m['cool_edge_pixels_within_3rgb'] for m in metrics)>90,'Cool edge matchesD9DEE3 in native target')
 report={'host_head':r['host_head'],'renderer':r['renderer'],'gpu':r['gpu'],'scope':'native Common wait overlay, no host/camera changes','checks':checks,'passed':all(x['passed'] for x in checks),'frames':metrics}
@@ -39,7 +40,7 @@ if r['frames'][0]['particle_count']==1:
   widths.append({'frame':f['frame'],'wall_ms':f['wall_ms'],'width':int(np.ptp(coords[:,1])+1) if len(coords) else 0})
  births=[i for i in range(1,len(widths)) if widths[i-1]['width']==0 and widths[i]['width']>0]
  initial=[widths[j]['width'] for i in births for j in range(i,min(len(widths),i+6))]
- single={'single_particle_control':True,'host_head':r['host_head'],'frames':widths,'initial_width_px':initial,'grown_max_px':max(x['width'] for x in widths),'passed':bool(initial) and min(initial)>=22 and max(initial)<=26 and 34<=max(x['width'] for x in widths)<=40}
+ single={'single_particle_control':True,'host_head':r['host_head'],'frames':widths,'initial_width_px':initial,'grown_max_px':max(x['width'] for x in widths),'revision':a.revision,'passed':bool(initial) and min(initial)>=(27 if a.revision=='v1.2' else 22) and max(initial)<=(29 if a.revision=='v1.2' else 26) and (40 if a.revision=='v1.2' else 34)<=max(x['width'] for x in widths)<=(42 if a.revision=='v1.2' else 40)}
  (P/'single-validation.json').write_text(json.dumps(single,indent=2)+'\n');print('Native single-puff dimensions:',single['initial_width_px'],'max',single['grown_max_px']);raise SystemExit(0 if single['passed'] else 1)
 (P/'native-validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 for c in checks:print(c)

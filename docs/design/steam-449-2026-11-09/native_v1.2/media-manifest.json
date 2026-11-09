@@ -1,0 +1,42 @@
+[
+  {
+    "file": "SGODOT-449_steam_v1.2_asset_validation.json",
+    "sha256": "0d29efb4ad507cfcc06ffc295d225d6597347caf28edaae3556520076328cc4f",
+    "bytes": 51146
+  },
+  {
+    "file": "SGODOT-449_steam_v1.2_cold_import.json",
+    "sha256": "13c9fc555619f55dd8b3d9b969918325e85a31dde4d233e350cbbcac0f0a47d5",
+    "bytes": 206
+  },
+  {
+    "file": "SGODOT-449_steam_v1.2_common.png",
+    "sha256": "8a5be9c9ce365916ceed5a0c51027748ca0a0705e3ec0a44d67336f24b225730",
+    "bytes": 260785
+  },
+  {
+    "file": "SGODOT-449_steam_v1.2_common_3s.mp4",
+    "sha256": "3bc85c6cf8b283c3181f0fe29fa32a6fe63f1f9ccbd24ee6a7825673876356fa",
+    "bytes": 158393
+  },
+  {
+    "file": "SGODOT-449_steam_v1.2_native_validation.json",
+    "sha256": "67136d582875e8646921d5dc3eba1c6679785adfbe73d0ae2cc544dad1fbd330",
+    "bytes": 46866
+  },
+  {
+    "file": "SGODOT-449_steam_v1.2_notes.md",
+    "sha256": "c5547b79dca580a96fdeae3cdc54794d4a53139b794fdd1b948f79c5ead4ab77",
+    "bytes": 2031
+  },
+  {
+    "file": "SGODOT-449_steam_v1.2_provenance.json",
+    "sha256": "95cee1dbadaf3bfb4815829cd1d32f0c66a34a1a71ffd23d85d82d7793cad622",
+    "bytes": 3451
+  },
+  {
+    "file": "SGODOT-449_steam_v1.2_single_validation.json",
+    "sha256": "21facaca62ffd52fdf760df7d0436e4b2632cf28f404e5d4e272f884237ef244",
+    "bytes": 7023
+  }
+]

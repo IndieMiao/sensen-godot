@@ -13,8 +13,8 @@ uniform float lid_top_uv = 0.0;
 void vertex() {
 	vec3 scale = vec3(length(MODEL_MATRIX[0].xyz), length(MODEL_MATRIX[1].xyz), length(MODEL_MATRIX[2].xyz));
 	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
-	VERTEX *= scale * mix(1.0, 1.52, smoothstep(0.10, 0.78, INSTANCE_CUSTOM.y));
-	MODELVIEW_MATRIX[3].x += 0.016 * sin(float(INSTANCE_ID)*2.094395 + INSTANCE_CUSTOM.y*3.2);
+	VERTEX *= scale * mix(1.0, 1.48, smoothstep(0.10, 0.78, INSTANCE_CUSTOM.y));
+	MODELVIEW_MATRIX[3].x += 0.012 * sin(float(INSTANCE_ID)*2.094395 + INSTANCE_CUSTOM.y*3.2);
 }
 
 void fragment() {
@@ -23,7 +23,7 @@ void fragment() {
 	float upper_fade = smoothstep(120.0, 133.0, px.y);
 	float region = smoothstep(130.0, 134.0, px.x) * (1.0-smoothstep(226.0,230.0,px.x))
 		* (1.0-smoothstep(191.0,195.0,px.y));
-	float ring_cap = mix(0.56,0.38,smoothstep(166.0,170.0,px.y));
+	float ring_cap = mix(0.75,0.38,smoothstep(166.0,170.0,px.y));
 	float above_lid = smoothstep(0.0, 0.003, lid_top_uv - SCREEN_UV.y);
 	ALBEDO = puff.rgb;
 	ALPHA = min(COLOR.a, ring_cap) * puff.a * above_lid * upper_fade * region;
