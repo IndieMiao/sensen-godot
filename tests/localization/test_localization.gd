@@ -459,7 +459,12 @@ func test_p0_a_toasts_no_break_space_is_looked_up_as_a_space() -> void:
 	assert_str(zh.call("Request complete · +20 coins")).is_equal(ToastLayer.keep_units("委托完成 · +20 金币"))   # still kept together
 	# the priest's two (q(300) v1.2)
 	assert_str(plain.call(zh.call("Twin Catch · back to 20 min"))).is_equal("双倍渔获 · 重新计时 20 分钟")
-	assert_str(plain.call(zh.call("Swift Growth · 20 min · crops sown now grow 2× faster"))).is_equal("加速生长 · 20 分钟 · 现在种下的作物长得快一倍")
+	# broken after their second ` · ` (SGODOT-452, 李白): the toast's 182 px broke 「种下」 and left 「×2」 alone
+	assert_str(plain.call(zh.call("Swift Growth · 20 min · crops sown now grow 2× faster"))).is_equal("加速生长 · 20 分钟 · \n现在种下的作物长得快一倍")
+	assert_str(plain.call(zh.call("Twin Catch · 20 min · every fish lands ×2"))).is_equal("双倍渔获 · 20 分钟 · \n每条鱼都 ×2")
+	# two Info toasts that broke a word at 182 px (李白's list, shot under 中文): broken after a ` · ` too, the second shorter
+	assert_str(zh.call("Spice Rack · seasonings off your bag · Homestead Lv2")).is_equal("调味架 · 调味料不占背包 · \n家园 Lv2")
+	assert_str(plain.call(zh.call("Mix 1–3 ingredients · unknown mixes may become a Mystery Dish"))).is_equal("放 1–3 样食材 · \n新搭配可能做出黑暗料理")
 	# part by part along ` · `: the known part in Chinese, the unknown one English with its no-break space kept
 	assert_str(zh.call("Twin Catch · 20 zorbs")).is_equal("双倍渔获 · 20" + char(0xa0) + "zorbs")
 	# no part known: "" (English mode and an untranslated line show the source, no-break space and all)
@@ -560,3 +565,72 @@ func test_p0_the_held_wings_lines() -> void:
 	assert_str(zh.call("Lv8 look · Kitchen Wing")).is_equal("Lv8 外观 · 灶房扩建")
 	assert_str(zh.call(P0Ui.DECORATE_ACTION)).is_equal("布置")
 
+## SGODOT-453 (李白): `+%d %s` — a reward or a gather's float (`+5 Carrot Seeds` on a skill's level-up card, `+2 Timber`)
+## had no template and stayed English. Every `+N` line the game draws, as its code builds it, reads as before or now in
+## Chinese; the longer templates still take theirs (as #909's sweep: a short template takes only what nothing else does).
+func test_p0_a_plus_count_and_its_item_reads_in_chinese() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t._get_message(s, &""))
+	var lines := {
+		"+5 Carrot Seeds": "+5 胡萝卜种子",                         # P0Logic.level_up_card's gifts (p0_logic.gd)
+		"+2 Timber": "+2 木材",                                      # a gather's / the workbench's float (p0_runtime, p0_farm_materials)
+		"+20 Energy": "+20 体力",
+		"+30 coins": "+30 金币",
+		"+1,200 coins": "+1,200 金币",                               # `+%s coins`
+		"+12 Fishing XP": "+12 钓鱼经验",
+		"+5 Carrot Seeds · Stored": "+5 胡萝卜种子 · 已入库",
+		"+5 bag slots": "背包 +5 格",
+		"+3 Friendship": "+3 好感",
+		"+10 HP": "+10 生命",
+		"+20 Energy back": "返还 20 体力",
+		"+20 Energy · Meals today 1/3": "+20 体力 · 今日饭量 1/3",
+		"+2 more": "还有 2 条",
+		"+4h": "+4 小时",
+	}
+	for en in lines: assert_str(zh.call(en)).override_failure_message(en).is_equal(str(lines[en]))
+	# (the lines after `+5 Carrot Seeds · Stored` are their own longer templates' still, not `+%d %s`'s)
+	assert_str(zh.call("+20 XP")).is_equal("+20 经验")   # `%d XP` before it, as before
+	assert_str(zh.call("+3")).is_empty()   # a bare figure: nothing to translate
+	# every item the game names, after a count: its own Chinese
+	var names := {}
+	for list in ["crops", "fish", "dishes", "materials", "items", "seeds", "bait"]:
+		var rows = P0Logic.content().get(list, [])
+		if rows is Dictionary: rows = (rows as Dictionary).values()
+		if not rows is Array: continue
+		for r in rows: if r is Dictionary and str(r.get("name", "")) != "": names[str(r.name)] = true
+	var checked := 0
+	for name in names:
+		var cn: String = zh.call(str(name))
+		if cn == "": continue
+		assert_str(zh.call("+5 " + str(name))).override_failure_message(str(name)).is_equal("+5 " + cn)
+		checked += 1
+	assert_int(checked).is_greater(30)
+	# a count taken (`−2 Radish`, a batch's ingredients): P0Ui._flush_floats writes its minus as U+2212, so does the
+	# template (李白); the ones with their own templates read as before
+	var taken := {"−2 Radish": "−2 小萝卜", "−1 Carrot Seeds": "−1 胡萝卜种子", "−2 Timber": "−2 木材", "−3 Friendship": "−3 好感",
+		"−5 Energy": "−5 体力", "−30 coins": "−30 金币", "−10 XP": "−10经验"}
+	for en in taken: assert_str(zh.call(en)).override_failure_message(en).is_equal(str(taken[en]))
+	assert_str(zh.call("-2 Radish")).is_empty()   # an ASCII hyphen is not the floats' minus: no template for it
+
+
+## A toast broken at its ` · ` (P0Ui._break_at_dot) under 中文: the whole line is looked up first, then broken as it
+## reads — broken in English first, `Fish from a pond` / `open one from the map` were looked up apart and stayed English
+## (李白's 452 list, 哪吒's shots). English breaks as before.
+func test_p0_a_toast_is_translated_before_it_breaks_at_its_dot() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var ui: P0Ui = auto_free(P0Ui.new())
+	add_child(ui)
+	var line := "Fish from a pond · open one from the map"
+	var was := TranslationServer.get_locale()
+	TranslationServer.set_locale("zh_CN")
+	var zh := ui._break_at_dot(line)
+	TranslationServer.set_locale("en")
+	var en := ui._break_at_dot(line)
+	TranslationServer.set_locale(was)   # as the run had it (周瑜 on #921)
+	TranslationServer.remove_translation(t)
+	assert_bool(zh.contains("Fish") or zh.contains("open one")).override_failure_message(zh).is_false()
+	assert_str(zh.replace("\n", " · ")).is_equal("去鱼塘钓鱼 · 从地图上打开一个")
+	assert_bool(en.begins_with("Fish from a pond")).is_true()   # English as it was, broken or not by its own width

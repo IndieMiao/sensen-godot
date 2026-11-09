@@ -1423,7 +1423,7 @@
  "Mission Market Square": "Mission 集市广场",
  "Mission Tackle Shop": "Mission 渔具铺",
  "Mito": "水户",
- "Mix 1–%d ingredients · unknown mixes may become a Mystery Dish": "放 1–%d 样食材 · 没试过的搭配可能做出黑暗料理",
+ "Mix 1–%d ingredients · unknown mixes may become a Mystery Dish": "放 1–%d 样食材 · \n新搭配可能做出黑暗料理",
  "Modesto": "莫德斯托",
  "Moldova": "摩尔多瓦",
  "Mongolia": "蒙古",
@@ -2089,7 +2089,7 @@
  "Spain": "西班牙",
  "Spice Rack": "调味架",
  "Spice Rack · seasonings off your bag": "调味架 · 调味料不占背包",
- "Spice Rack · seasonings off your bag · Homestead Lv2": "调味架 · 调味料不占背包 · 家园 Lv2",
+ "Spice Rack · seasonings off your bag · Homestead Lv2": "调味架 · 调味料不占背包 · \n家园 Lv2",
  "Spinner Lure": "亮片",
  "Spins in wind": "迎风转动",
  "Split": "分牌",
@@ -2701,8 +2701,8 @@
  "Nob Hill is steep. You've earned the quiet in here.": "Nob Hill 的坡很陡，进来安静一会儿吧。",
  "Twin Catch": "双倍渔获",
  "Swift Growth": "加速生长",
- "%s · %d min · every fish lands ×2": "%s · %d 分钟 · 每条鱼都 ×2",
- "%s · %d min · crops sown now grow 2× faster": "%s · %d 分钟 · 现在种下的作物长得快一倍",
+ "%s · %d min · every fish lands ×2": "%s · %d 分钟 · \n每条鱼都 ×2",
+ "%s · %d min · crops sown now grow 2× faster": "%s · %d 分钟 · \n现在种下的作物长得快一倍",
  "%s has worn off": "%s结束了",
  "Pray": "祈祷",
  "%s · back to 20 min": "%s · 重新计时 20 分钟",
@@ -2713,5 +2713,7 @@
  "%d new · %d to do": "新 %d · 待办 %d",
  "%d XP to go · %s": "还差 %d 经验 · %s",
  "Space taken · clear it first": "位置已被占用 · 先清空",
- "Homestead Lv%d · Space taken": "家园 Lv%d · 位置已被占用"
+ "Homestead Lv%d · Space taken": "家园 Lv%d · 位置已被占用",
+ "+%d %s": "+%d %s",
+ "−%d %s": "−%d %s"
 }
