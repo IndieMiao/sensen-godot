@@ -113,7 +113,8 @@ void fragment() {
     c *= 1.0 - stroke * detail * 2.2 * (1.0 - smoothstep(0.0, 6.0, outside));
     if (contact > 0.0) {
         float touch = 0.0;
-        for (int k = 0; k < 64; k++) touch = max(touch, 1.0 - smoothstep(0.06, 0.24, length(p - contact_points[k]) + (noise(p * 9.0) - 0.5) * 0.06));
+        float wobble = (noise(p * 9.0) - 0.5) * 0.06;   // the same for every foot: once, not 64 times a pixel (GLES, 李元芳 on #917)
+        for (int k = 0; k < 64; k++) touch = max(touch, 1.0 - smoothstep(0.06, 0.24, length(p - contact_points[k]) + wobble));
         c *= 1.0 - contact * touch;
     }
     // the terraces' tops and their sides (steep: warm rock)
