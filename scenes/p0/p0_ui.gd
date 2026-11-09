@@ -1776,11 +1776,13 @@ func toast_text_width() -> float:
 	return panel - UiTokens.SIZE_TOAST_PAD_LEFT - UiTokens.SIZE_TOAST_PAD_RIGHT - UiTokens.SIZE_TOAST_ICON - ToastLayer._ICON_GAP
 
 ## A toast that opts in breaks its two lines at a " · " (UiKit.break_at_dot), measured with the toast's own label font
-## at its current width; the toast itself still wraps by words.
+## at its current width; the toast itself still wraps by words. Measured and broken as it will read: under 中文 the
+## whole line's Chinese (the table's) — broken in English first, its halves were looked up apart, and a half the table
+## has no line for stayed English (`Fish from a pond` / `open one from the map`; 哪吒's shots for 李白's 452 list).
 func _break_at_dot(text: String) -> String:
 	var l: Label = _toasts._label
 	if l == null: return text
-	return UiKit.break_at_dot(text, l.get_theme_font(&"font"), l.get_theme_font_size(&"font_size"), toast_text_width())
+	return UiKit.break_at_dot(tr(text), l.get_theme_font(&"font"), l.get_theme_font_size(&"font_size"), toast_text_width())
 
 ## Where the toast sits (WP2 D-01, q(16)): over the quick bar's top edge, in the scene or docked in the bag; over a
 ## drawer without the bar (the workbench, a counter), just above the drawer's top edge — clear of its rows and of the
