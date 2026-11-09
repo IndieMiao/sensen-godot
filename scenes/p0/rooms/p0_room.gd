@@ -337,9 +337,10 @@ func _build_lights() -> void:
 	var sun := DirectionalLight3D.new()
 	sun.name = "RoomSun"
 	sun.light_color = Color(str(review.get("sun_color", "ffe6c2")))
-	sun.light_energy = float(review.get("sun", 1.05))
+	sun.light_energy = float(review.get("sun", 1.05)) * gles_sun_scale(review)
 	sun.shadow_enabled = true
 	_set_sun_shadow(sun, review)
+	_set_gles_shadow(sun, review)
 	sun.light_angular_distance = float((layout.get("lighting", {}) as Dictionary).get("angular_distance", 1.4))
 	room.add_child(sun)
 	sun.position = sun_direction()
@@ -358,6 +359,20 @@ func _build_lights() -> void:
 		light.shadow_enabled = false
 		room.add_child(light)
 		i += 1
+
+## The sun's energy factor under the Compatibility renderer (OpenGL ES): there the shadowed sun is added over sRGB
+## values and washes a pale floor out (the wild's #920 outdoors). Only a kit whose review_lighting sets gles_sun_scale
+## takes it (the cathedral, 上官婉儿's 0.3.5 plan: GLES within ±16 of Metal at the same spots); 1 everywhere else.
+static func gles_sun_scale(review: Dictionary, method := RenderingServer.get_current_rendering_method()) -> float:
+	return float(review.get("gles_sun_scale", 1.0)) if method == "gl_compatibility" else 1.0
+
+## The sun's shadow biases under the Compatibility renderer, where a kit's review_lighting sets gles_shadow_bias /
+## gles_shadow_normal_bias: its lower shadow precision streaked the cathedral's lawn under a 40° sun (上官婉儿 on #924);
+## the bias that clears it there would shift Mobile's shadows, so it is GLES only, and only where set.
+static func _set_gles_shadow(sun: DirectionalLight3D, review: Dictionary, method := RenderingServer.get_current_rendering_method()) -> void:
+	if method != "gl_compatibility": return
+	if review.has("gles_shadow_bias"): sun.shadow_bias = float(review.gles_shadow_bias)
+	if review.has("gles_shadow_normal_bias"): sun.shadow_normal_bias = float(review.gles_shadow_normal_bias)
 
 ## Where the room's sun shines from (room metres, towards the room origin): the kit's review sun (review_lighting.
 ## sun_position − sun_target, as signed), else layout.sun_direction (the Basic Room's), else the benchmark. Farm Tools

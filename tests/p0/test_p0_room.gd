@@ -722,3 +722,35 @@ func test_a_door_without_a_badge_point_is_picked_over_the_threshold() -> void:
 	var r := _room()
 	assert_object(r.anchor("badge_exit")).is_null()
 	assert_vector(r.pick_point("exit")).is_equal(r.anchor("exit").global_position + Vector3(0, 1.0, 0))
+
+## 上官婉儿's 0.3.5 cathedral plan: a kit's review_lighting.gles_sun_scale scales its sun under the Compatibility
+## renderer only (OpenGL ES washed the pale floor out); Mobile / Forward+ and every kit without it keep the sun as is.
+func test_the_gles_sun_scale_applies_only_under_compatibility_and_only_where_set() -> void:
+	var review := {"sun": 1.35, "gles_sun_scale": 0.4}
+	assert_float(P0Room.gles_sun_scale(review, "gl_compatibility")).is_equal_approx(0.4, 0.0001)
+	assert_float(P0Room.gles_sun_scale(review, "mobile")).is_equal_approx(1.0, 0.0001)
+	assert_float(P0Room.gles_sun_scale(review, "forward_plus")).is_equal_approx(1.0, 0.0001)
+	assert_float(P0Room.gles_sun_scale({"sun": 1.35}, "gl_compatibility")).is_equal_approx(1.0, 0.0001)
+	var church := P0RoomAnchors.read_json("res://assets/rooms/poi_church/layout.json")
+	assert_float(float(church.review_lighting.gles_sun_scale)).is_equal_approx(0.4, 0.0001)
+
+## 上官婉儿 on #924: review_lighting.gles_shadow_bias / gles_shadow_normal_bias replace the sun's shadow biases under the
+## Compatibility renderer only (the cathedral's lawn streaked there under its 40° sun); Mobile keeps the review's own.
+func test_the_gles_shadow_biases_apply_only_under_compatibility_and_only_where_set() -> void:
+	var review := {"shadow_bias": 0.065, "shadow_normal_bias": 0.65, "gles_shadow_bias": 0.25, "gles_shadow_normal_bias": 1.5}
+	for method in ["gl_compatibility", "mobile"]:
+		var sun := DirectionalLight3D.new()
+		P0Room._set_sun_shadow(sun, review)
+		P0Room._set_gles_shadow(sun, review, method)
+		var gles: bool = method == "gl_compatibility"
+		assert_float(sun.shadow_bias).override_failure_message(method).is_equal_approx(0.25 if gles else 0.065, 0.0001)
+		assert_float(sun.shadow_normal_bias).override_failure_message(method).is_equal_approx(1.5 if gles else 0.65, 0.0001)
+		sun.free()
+	var plain := DirectionalLight3D.new()
+	P0Room._set_sun_shadow(plain, {"shadow_bias": 0.065})
+	P0Room._set_gles_shadow(plain, {"shadow_bias": 0.065}, "gl_compatibility")
+	assert_float(plain.shadow_bias).is_equal_approx(0.065, 0.0001)   # a kit without them keeps its own under GLES too
+	plain.free()
+	var church := P0RoomAnchors.read_json("res://assets/rooms/poi_church/layout.json")
+	assert_float(float(church.review_lighting.gles_shadow_bias)).is_equal_approx(0.25, 0.0001)
+	assert_float(float(church.review_lighting.gles_shadow_normal_bias)).is_equal_approx(1.5, 0.0001)
