@@ -127,6 +127,8 @@ func test_thumbnail_cell_height_matches_the_drawer_budget() -> void:
 	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
 		push_warning("转换产物缺失，跳过")
 		return
+	# 缩略图靠 SubViewport 渲染，headless 下不出图、格子量不到高度（冻结全量 --headless，SGODOT-460）。
+	if DisplayServer.get_name() == "headless": return
 	var s := _instantiate()
 	var panel = s.get_node("UI/SafeArea/VBox/Drawer/VBox")
 	var grid := s.get_node("UI/SafeArea/VBox/Drawer/VBox/PartsScroll/PartsGrid") as GridContainer

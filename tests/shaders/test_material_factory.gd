@@ -3,7 +3,10 @@ extends GdUnitTestSuite
 func test_shader_loads_and_compiles() -> void:
 	var shader: Shader = load("res://modules/avatar/shaders/avatar_toon.gdshader")
 	assert_object(shader).is_not_null()
-	assert_str(RenderingServer.shader_get_code(shader.get_rid())).is_not_empty()
+	assert_str(shader.code).is_not_empty()
+	# The dummy headless renderer keeps no shader code (the freeze's --headless run, SGODOT-460).
+	if DisplayServer.get_name() != "headless":
+		assert_str(RenderingServer.shader_get_code(shader.get_rid())).is_not_empty()
 
 func test_factory_sets_params() -> void:
 	# Test all factory keys: texture (Texture2D) + all float params + ao_tex (String path)

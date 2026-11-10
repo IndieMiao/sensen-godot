@@ -273,10 +273,11 @@ func test_party_backdrop_dismisses_on_release_without_clicking_underlying_world(
 func test_invite_copy_shows_localized_timed_toast_but_drag_does_not_copy() -> void:
 	var online := await _party()
 	var copy := online.panel.find_child("CopyInviteCode", true, false) as Button
+	var clipboard := DisplayServer.get_name() != "headless"   # headless has no clipboard: it always reads "" (SGODOT-460)
 	var previous_clipboard := DisplayServer.clipboard_get()
 	DisplayServer.clipboard_set("before-copy")
 	await _drag(copy, Vector2(0, -85))
-	assert_str(DisplayServer.clipboard_get()).is_equal("before-copy")
+	if clipboard: assert_str(DisplayServer.clipboard_get()).is_equal("before-copy")
 	assert_object(online._copy_toast).is_null()
 	var scroll := online.panel.find_child("PartyScroll", true, false) as ScrollContainer
 	scroll.scroll_vertical = 0
@@ -284,7 +285,7 @@ func test_invite_copy_shows_localized_timed_toast_but_drag_does_not_copy() -> vo
 	var point := copy.get_global_rect().get_center()
 	_mouse(point, true)
 	_mouse(point, false)
-	assert_str(DisplayServer.clipboard_get()).is_equal("COPY-QA")
+	if clipboard: assert_str(DisplayServer.clipboard_get()).is_equal("COPY-QA")
 	DisplayServer.clipboard_set(previous_clipboard)
 	assert_bool(online._copy_toast.visible).is_true()
 	assert_str((online._copy_toast.get_child(0) as Label).text).is_equal(L10n.text("Invite code copied"))

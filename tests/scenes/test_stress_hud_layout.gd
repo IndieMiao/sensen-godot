@@ -87,6 +87,6 @@ func test_hud_resolves_current_design_tokens_and_semantic_variations() -> void:
 	assert_bool(badge.get_theme_color(&"font_color").is_equal_approx(
 		DesignTokens.INK_SUB)).is_true()
 	assert_bool(stats.get_theme_color(&"font_color").is_equal_approx(
-		DesignTokens.INK)).is_true()
+		GameUi.INK)).is_true()   # theme Label ink, GameUi.INK since c1d0d261 (09-23 restyle)
 	assert_bool(count_value.get_theme_color(&"font_color").is_equal_approx(
 		DesignTokens.ACCENT_DEEP)).is_true()

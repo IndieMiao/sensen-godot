@@ -18,7 +18,7 @@ func test_offline_list_shows_the_curated_cities() -> void:
 	var s := _scene()
 	await get_tree().process_frame
 	var ids: Array = s.region_buttons().map(func(b): return str(b.get_meta("city_id")))
-	assert_array(ids).contains_exactly(["shanghai", "los_angeles"])
+	assert_array(ids).contains_exactly(["shanghai", "los_angeles", "san_francisco"])   # SF curated since SGODOT-270
 
 func test_no_location_permission_entry_point() -> void:
 	var s := _scene()
