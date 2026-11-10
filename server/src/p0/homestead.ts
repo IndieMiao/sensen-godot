@@ -5,7 +5,7 @@ import { maxEnergy, skillLevel } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, takeStorageFirst } from './storage.js';
 import { addPlots, clearNewBeds } from './garden.js';
-import { wingOf, wingTaken, wingUp } from './decor.js';
+import { wingOf, wingTaken, type YardFeatures } from './decor.js';
 import type { Refusal } from './fishing.js';
 import { cityStamps, climatesVisited } from './travel.js';
 
@@ -88,11 +88,11 @@ export function wingBlock(c: P0Content, s: P0State, wing8: boolean): Refusal | n
   return taken ? { code: 'homestead_blocked', detail: taken } : null;
 }
 
-export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: P0Event[], wing8 = false): Refusal | null {
+export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: P0Event[], yard: YardFeatures = {}): Refusal | null {
   // §8.1.1 前置 ①: only at home. The command's space (SGODOT-228 q(41)) has already moved presence; "away" =
   // pond / outpost / mine. A command from the map leaves it as it was, so a map tap after leaving still refuses.
   if (s.presence.space === 'away') return { code: 'not_home' };
-  const block = upgradeBlock(c, s) ?? wingBlock(c, s, wing8);
+  const block = upgradeBlock(c, s) ?? wingBlock(c, s, !!yard.wing8);
   if (block) return block;
   const next = nextLevel(c, s)!;
   for (const [item, qty] of next.materials) {
@@ -112,7 +112,7 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   // the level's beds (homestead.plots: Lv1 8 … Lv17 41, tilled, SGODOT-355 b1), dropped in with the level's look.
   const added = addPlots(c, s);
   if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'homestead' });
-  clearNewBeds(c, s, added, events, wingUp(c, s, wing8));   // Lv7's beds on the field's edge: pieces standing there go back to storage (q(172))
+  clearNewBeds(c, s, added, events, yard);   // Lv7's beds on the field's edge: pieces standing there go back to storage (q(172))
   return null;
 }
 

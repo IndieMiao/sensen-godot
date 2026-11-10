@@ -106,6 +106,19 @@ describe('placing in the yard', () => {
       expect(spotBlock(c, s, 'deco_planter', x, y, 0), what).toMatchObject({ code: 'decor_outside' });
   });
 
+  it('yard2 (v4q(12)): paths2 — the way to the bench past the porch and to the mailbox — kept clear for that client alone', () => {
+    const s = stocked();
+    for (const [x, y] of [[6, 14], [12, 14], [12, 15]]) {
+      expect(applyP0(c, s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME } as P0Command, T0, { wing8: true, yard2: true }), `${x},${y}`)
+        .toMatchObject({ ok: false, code: 'decor_path', detail: { x, y } });
+      expect(applyP0(c, s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME } as P0Command, T0, { wing8: true }).ok, `${x},${y} older`).toBe(true);
+    }
+    const r = step(s, { type: 'place_decor', item: 'deco_planter', x: 13, y: 15, ...HOME });
+    expect(applyP0(c, r.s, { type: 'move_decor', uid: 1, x: 12, y: 15, ...HOME } as P0Command, T0, { yard2: true })).toMatchObject({ ok: false, code: 'decor_path' });
+    expect(spotBlock(c, s, 'deco_pergola', 11, 13, 0, undefined, { yard2: true })).toMatchObject({ code: 'decor_overlap' });   // objects come first, as before
+    expect(spotBlock(c, s, 'deco_planter', 12, 16, 0, undefined, { yard2: true })).toMatchObject({ code: 'decor_overlap' });   // the mailbox itself
+  });
+
   it('the cap is 20 + 4 per Homestead level above 1 (§8.3.2)', () => {
     const s = stocked();
     expect(decorCap(c, s)).toBe(20);

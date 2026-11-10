@@ -170,7 +170,7 @@ describe('from Lv8 the cells are the house\'s (wing8)', () => {
     s.homestead.level = 8;
     const from: [number, number] = [6, 18];
     expect(nearestYardCell(c, s, from, 0)).toEqual(from);
-    const to = nearestYardCell(c, s, from, 0, undefined, true)!;
+    const to = nearestYardCell(c, s, from, 0, undefined, { wing8: true })!;
     expect(WING.some(([x, y]) => x === to[0] && y === to[1])).toBe(false);
   });
 });
@@ -199,6 +199,20 @@ describe('the routes (x-p0-features: wing8; 周瑜 on #914)', () => {
     expect(old.state.homestead.level).toBe(8);
     expect('wing_blocked' in old.state.homestead).toBe(false);
     expect((await state('choose_home,guide_v3,wing8')).homestead.wing_blocked.cells).toEqual([[7, 16]]);   // the save it left
+    await app.close();
+  });
+
+  it('yard2 (v4q(12)) the same way: paths2 kept clear for a client that says it, an older one as before', async () => {
+    const s = lv7();
+    s.storage.deco_planter = 2;
+    const store = new P0Store(c);
+    store.put(s);
+    const app = Fastify();
+    registerP0Routes(app, { content: c, store, now: () => T0, dev: false });
+    const place = async (f: string) => (await app.inject({ method: 'POST', url: '/v1/p0/commands', headers: { 'x-p0-player': s.player, 'x-p0-features': f },
+      payload: { type: 'place_decor', item: 'deco_planter', x: 12, y: 15, space: 'home' } })).json();
+    expect(await place('choose_home,guide_v3,wing8,yard2')).toMatchObject({ ok: false, code: 'decor_path' });
+    expect(await place('choose_home,guide_v3,wing8')).toMatchObject({ ok: true });
     await app.close();
   });
 });

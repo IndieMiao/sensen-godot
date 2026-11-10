@@ -339,7 +339,9 @@ const GUIDE_V3_READY := true
 ## wing8: this client draws Homestead Lv8's Kitchen Wing on its cells (content decor.yard.wing; q(303), SGODOT-450):
 ## the server keeps pieces off them from Lv8, refuses an upgrade they would block and sends homestead.next.blocked /
 ## wing_blocked. A switch only, like locals: an older build is served as before.
-const FEATURES := "choose_home,guide_v3,locals,save_v7,wing8" if GUIDE_V3_READY else "choose_home,locals,save_v7,wing8"
+## yard2: yard v2 (v4q(12)): this client keeps decor.yard.paths2 clear as well (the rest bench's and the mailbox's ways),
+## and the server holds them too. A switch only.
+const FEATURES := "choose_home,guide_v3,locals,save_v7,wing8,yard2" if GUIDE_V3_READY else "choose_home,locals,save_v7,wing8,yard2"
 
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
@@ -351,7 +353,7 @@ func _headers() -> PackedStringArray:
 ## The x-p0-features this build sends, on its requests and the online handshake alike (P0Online.features).
 func features() -> String:
 	if not test_accounts.is_test(): return FEATURES
-	return "choose_home,guide_v3,locals,save_v7,wing8" if test_accounts.guide_enabled() else "choose_home,locals,save_v7,wing8"
+	return "choose_home,guide_v3,locals,save_v7,wing8,yard2" if test_accounts.guide_enabled() else "choose_home,locals,save_v7,wing8,yard2"
 
 ## The internal demo APK (tools/p0/build_demo_apk.sh) carries DEMO_CONFIG; no other build does, the file is
 ## written for that export only. The demo is exported as a debug build, so OS.is_debug_build() alone can't tell it
