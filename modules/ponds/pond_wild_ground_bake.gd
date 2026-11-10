@@ -16,7 +16,7 @@ const NEAR_PX_M := 50.0   # 1300 × 1850 px
 const FAR_PX_M := 8.0     # the whole ground (PondWildGround.AREA, 66 × 64 m): 528 × 512 px, mostly under the woods
 const FAR_SUPER := 2      # … drawn at twice that and halved, so its fine grain averages out instead of aliasing
 ## The live material's settings, from the full one's.
-const LIVE_KEYS := ["sun_k", "walk", "grass", "grass_far", "plateau", "rock", "gradient", "centre", "south_dark", "vignette", "seed_off", "detail",
+const LIVE_KEYS := ["walk", "grass", "grass_far", "plateau", "rock", "gradient", "centre", "south_dark", "vignette", "seed_off", "detail",
 	"shadow_tint", "shadow_tint_sand", "shadow_cool", "shadow_cool_sand"]
 ## One bake kept (≈ 14.3 MB of textures, see bytes()) while in a pond: a rebuild with the same plants takes it as it is;
 ## the gathering points coming bake anew and let the old one go. Leaving the pond lets it go too (P0Pond._exit_tree,

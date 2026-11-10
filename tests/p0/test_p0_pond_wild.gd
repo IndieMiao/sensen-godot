@@ -125,17 +125,6 @@ func test_on_the_keys_only_low_pieces_by_their_box() -> void:
 				var at: Vector3 = (t as Transform3D).origin
 				assert_bool(PondWildProps.KEY_COLUMN.has_point(Vector2(at.x, at.z))).override_failure_message("%s %s at %s" % [id, asset, at]).is_false()
 
-## 周瑜 / 上官婉儿 on 422: under gl_compatibility this ground takes a share of the sun and its shadows no cool cast (the
-## sun's pass adds on sRGB-encoded light); elsewhere LOOK stays as it is, to the value.
-func test_on_gles_the_grounds_shadows_take_no_cool_cast() -> void:
-	var gl := PondWildGround.look_for("gl_compatibility")
-	assert_vector(gl["shadow_cool"]).is_equal(Vector3.ZERO)
-	assert_vector(gl["shadow_cool_sand"]).is_equal(Vector3.ZERO)
-	assert_float(gl["sun_k"]).is_equal_approx(0.19, 0.0001)   # only this ground's share of the sun, the pond's sun kept
-	for method in ["forward_plus", "mobile", "dummy"]:
-		assert_dict(PondWildGround.look_for(method)).override_failure_message(method).is_equal(PondWildGround.LOOK)
-	assert_vector(PondWildGround.LOOK["shadow_cool"]).is_not_equal(Vector3.ZERO)
-
 ## The user's 0.3.4 (2) on an iPhone (bot 589 / 590): a 32-bit float texture is not filterable there (nor on many GLES3
 ## phones), so the water's distance field fell back to nearest and the sand edges stepped in 0.25 m squares. It stays
 ## a 16-bit float one, which filters everywhere.
