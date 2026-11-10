@@ -168,6 +168,10 @@ func wall_normal(at: Vector3, radius_cells: float, world_scale := 1.0) -> Vector
 func _blocked(c: Vector2i) -> bool:
 	return not bp.is_walkable(c) or astar.is_point_solid(c)
 
+## A cell the walk cannot stand on: off the blueprint's walkable mask, or made solid at runtime (trees, pieces).
+func is_blocked(c: Vector2i) -> bool:
+	return _blocked(c)
+
 ## Keep grid distances for blueprint validation; movement skips every visible waypoint.
 func point_path(from: Vector3, to: Vector3, world_scale := 1.0) -> Array[Vector3]:
 	var end := Vector3(to.x, 0, to.z)
