@@ -127,13 +127,15 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 ## nothing is written there once, for the translators.
 class P0Translation extends Translation:
 	var _exact := {}
-	var _templates: Array = []   # [RegEx, Chinese, literal length, %s count, has ` · `] — the longest literal tried first
+	var _templates: Array = []   # [RegEx, Chinese, literal length, %s count, has ` · `, a place name] — the longest literal tried first
 	var _cache := {}
 	const CACHE_MAX := 4096
 	const PLURAL_ENDINGS := ["s", "es"]   # `%d dish%s`: English's plural, nothing in Chinese (李白's notes, q(275))
 	const LINK := " ›"   # a row or key that opens something: the arrow stays, the words before it are translated
 	const BACK := "‹"   # a back key (P0BackPill `‹  Change city`): the arrow and its spaces stay, the words after it translated
 	const LIST_LAST := {" and ": "和", " or ": "或"}   # a list's last item: `Carrot and Herb` 胡萝卜和香草
+	## The server's generated places, `<word> <kind>` (world.ts named(), SGODOT-469): only the kind is translated (q(275) ⑤).
+	const PLACE_KINDS := ["Market Square", "Travel Post", "Tea House", "Tackle Shop", "Trading Post", "Mine Hut"]
 	var _misses := {}
 	var _miss_file: FileAccess
 	static var SPEC := _spec_re()
@@ -167,7 +169,8 @@ class P0Translation extends Translation:
 			if SPEC.search(en) != null and not en.contains("@"):   # a context key (`%d@trip`) is Localization.ctx's, whole
 				var re := RegEx.new()
 				if re.compile(_pattern(en)) == OK:
-					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length(), en.count("%s"), en.contains(" · ")])
+					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length(), en.count("%s"), en.contains(" · "),
+						en.begins_with("%s ") and en.substr(3) in PLACE_KINDS])
 			else:
 				_exact[en] = str(zh)
 		# as long: the one with fewer %s first — `%d XP` takes `+20 XP` (「+20 经验」), `%s XP` the skill's `Farming XP`
@@ -307,6 +310,9 @@ class P0Translation extends Translation:
 			# a template with no ` · ` of its own is one part: `%s XP` does not take `Common · First cook +10 XP` whole,
 			# the line's parts go one by one (`First cook +%d XP` the second) — #649 第二批 ⑦
 			if not bool(entry[4]) and s.contains(" · "): continue
+			# a place's `%s Market Square` takes a name, not a line ending in one: `Deliver at Acorn Market Square` is
+			# `Deliver at %s`'s (「到 Acorn 集市广场 交付」), though its words are fewer (SGODOT-469)
+			if bool(entry[5]) and _template(m.get_string(1)) != "": continue
 			var values: Array = []
 			for g in range(1, m.get_group_count() + 1):
 				var v := m.get_string(g)
