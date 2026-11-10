@@ -82,6 +82,33 @@ func test_the_card_reads_who_likes_it_under_the_rarity_line() -> void:
 	await await_idle_frame()
 	assert_bool(line.visible).is_false()
 
+## SGODOT-468: under 中文's fonts (Noto SC behind Nunito) the ♥ is drawn by Noto SC, a pixel over Nunito's line: every
+## mark keeps the tallest line, so `♥ +2` and `−2` stand the same height on the same baseline, 2 above their cells.
+func test_the_gift_marks_stand_level_under_chinese_fonts() -> void:
+	var locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("zh_CN")
+	Localization.set_cjk_fonts(true)
+	var ui: P0Ui = auto_free(P0Ui.new())
+	ui.quick_store = STORE
+	ui.tips_path = TIPS
+	add_child(ui)
+	ui.set_view(_view())
+	await await_idle_frame()
+	ui.open_gift("res_pip")
+	await await_idle_frame()
+	var d: P0BagDrawer = ui.find_children("*", "P0BagDrawer", true, false)[0]
+	var th := UiKit.theme()
+	var line_h := UiKit.line_height(th.get_font(&"font", UiTokens.STYLE_C10_XB), th.get_font_size(&"font_size", UiTokens.STYLE_C10_XB))
+	assert_float(line_h).is_greater(15.0)   # the fallback's line, over Nunito's 15
+	var marks := {}
+	for it in d.grid.shown_items():
+		var c := d.grid.cell_for(str(it.id))
+		var g := c.find_child("Gain", true, false) as PanelContainer
+		marks[(g.get_child(0) as Label).text] = [g.get_global_rect().end.y - c.get_global_rect().position.y, g.size.y]
+	assert_dict(marks).is_equal({"♥ +2": [-2.0, line_h + 2.0], "♥ +1": [-2.0, line_h + 2.0], "−2": [-2.0, line_h + 2.0]})
+	Localization.set_cjk_fonts(false)
+	TranslationServer.set_locale(locale)
+
 ## RESIDENT-GIFT: `♥ +2` green on the tint where Pip loves or likes it, any other on white (`♥ +2` / `♥ +1`), `−2` on the grey keys' fill; 17 high, 2 above the cell;
 ## the rows 31 apart and the first 22 down; the key `Gift · +2`; no ♥ on the cells. Before Lv7: no marks, rows 12 apart, `Gift`.
 func test_the_gift_drawer_marks_what_each_dish_adds() -> void:

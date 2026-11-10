@@ -623,6 +623,15 @@ func _paint_gain(empty: bool) -> void:
 	_gain.add_theme_stylebox_override(&"panel", UiStyleBox.make(bg, 8.0, _GAIN_OUTLINE, UiTokens.STROKE_DEFAULT).with_margins(5.0, 1.0, 5.0, 1.0))
 	_gain_label.add_theme_color_override(&"font_color", UiTokens.COLOR_PRIMARY if hit else UiTokens.COLOR_SECONDARY)
 	_gain_label.text = ("♥ +%d" % n) if n >= 0 else ("−%d" % -n)
+	_size_gain()
+
+## Every mark keeps the tallest line its font can draw: under 中文 Noto SC draws the ♥ a pixel over Nunito's line, and
+## `♥ +2` stood a pixel off the `−2` beside it (SGODOT-468). English: 15 + 1 + 1, GAIN_H.
+func _size_gain() -> void:
+	var th := UiKit.theme()   # the style's own font (as P0Logic.text_width): the label may not have the theme yet
+	var line_h := UiKit.line_height(th.get_font(&"font", UiTokens.STYLE_C10_XB), th.get_font_size(&"font_size", UiTokens.STYLE_C10_XB))
+	_gain_label.custom_minimum_size.y = line_h
+	_gain.offset_top = -GAIN_GAP - maxf(GAIN_H, line_h + 2.0)
 
 ## Kitchen/Cell: DEFAULT keeps the plain cell (status label); the other
 ## kitchen states draw the main's marks and their own labels.

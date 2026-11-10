@@ -186,6 +186,29 @@ func test_city_bubbles_say_their_state() -> void:
 	assert_float((count.get_parent() as Control).custom_minimum_size.y).is_less_equal(count.get_minimum_size().y + 0.5)
 	rt.session.view = saved
 
+## SGODOT-468: under 中文's fonts the count line (「1 人在线」, Noto SC behind Nunito) stands a pixel over the font's own
+## height; the line keeps that height with the glyph alone too, so the bubble still keeps its size (不知火舞 on #238).
+func test_a_bubble_keeps_its_size_under_chinese_fonts() -> void:
+	var locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("zh_CN")
+	Localization.set_cjk_fonts(true)
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var said := [""]
+	m.city_map.bubble_state = func(_id: String) -> Dictionary: return {text = said[0], icon = "house"}
+	_look(m, 37.55, -122.0, 7.0)
+	m.city_map._update_bubbles()
+	var node: Control = m.city_map.bubbles["san_francisco"].node
+	var empty_size := node.size
+	said[0] = "1 人在线"
+	m.city_map._update_bubbles()
+	var count: Label = m.city_map.bubbles["san_francisco"].count
+	assert_float(count.get_minimum_size().y).is_greater(count.get_theme_font("font").get_height(count.get_theme_font_size("font_size")))
+	assert_float(node.size.y).is_equal(empty_size.y)
+	Localization.set_cjk_fonts(false)
+	TranslationServer.set_locale(locale)
+
 ## 李元芳 / 司空震 (SGODOT-275): a bubble the last list had and this one does not is hidden with its dot, never left
 ## frozen where it was drawn (Northern California's bubbles over Los Angeles after flying there).
 func test_bubbles_the_list_no_longer_has_hide() -> void:
