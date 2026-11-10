@@ -71,6 +71,7 @@ static func open(ui: P0Ui, at_home := true) -> void:
 			var tile_name := Localization.ctx(str(t.name), "skill") if id.begins_with("skill_") else str(t.name)
 			var tile := HomeNeedTile.new(tile_name, int(t.have), int(t.need), UiNeedTile.Size.L, P0Logic.icon(str(t.icon)))
 			tile.pressed.connect(func(): _source(ui, tile, id))
+			tile.set_meta(&"need_id", id)   # P0Runtime's `hometile` shot step finds it by this
 			groups[1 if id.begins_with("skill_") else 2 if id in ["stamps", "climates"] else 0].append(tile)
 		for tiles in groups:
 			if not tiles.is_empty(): needs.add_child(_needs_grid(tiles))

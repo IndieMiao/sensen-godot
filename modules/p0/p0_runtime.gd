@@ -2140,6 +2140,13 @@ func _dev_shot(dt: float) -> void:
 			"breakfloat":   # breakfloat:8 — a gate fish breaking free again, its float (q(278) shots)
 				ui.float_text(P0Logic.break_free_float(session.current(), {"rarity": 4, "need_level": int(step[1]), "refund": 3}),
 					anchor(), UiFloatText.Tone.ENERGY_GAIN)
+			"hometile":   # hometile:clay — taps HOME-1's need tile of that item: its NeedSource line (U2 shots)
+				for t in ui.root.find_children("*", "", true, false):
+					if t is BaseButton and t.get_meta(&"need_id", "") == step[1]: (t as BaseButton).pressed.emit()
+			"noponds":   # U2 shots only (奕星 / 不知火舞 11-10): the view without view.gather.ponds, as no city in reach had any
+				var v := session.view.duplicate(true)
+				if v.get("gather") is Dictionary: v.gather.ponds = {}
+				session.view = v
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
