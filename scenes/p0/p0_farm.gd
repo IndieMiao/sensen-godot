@@ -1115,6 +1115,7 @@ func _exit_piece() -> void:
 	# its red and yellow are vertex colours (赵云's #862): its glTF materials have no albedo of their own (上官婉儿 /
 	# 不知火舞 on 443: white in the game), so the farm art's vertex-colour material on the pin and the ring alike
 	_exit_pin_mat = FarmArt.material().duplicate() as StandardMaterial3D   # the pin's own, to fade it (_exit_fade)
+	_exit_pin_mat.set_meta(GlesAlbedo.KEEP, true)   # faded here (_exit_fade): the GLES swap leaves it (SGODOT-458)
 	var pin := piece.find_child(EXIT_PIN_NODE, true, false) as Node3D
 	_exit_pin_meshes.clear()
 	for m: MeshInstance3D in piece.find_children("*", "MeshInstance3D", true, false):
