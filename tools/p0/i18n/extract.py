@@ -27,10 +27,14 @@ import json, re, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-DIRS = ['modules/p0', 'scenes/p0', 'scenes/ui_kit', 'modules/ui', 'scenes/map', 'modules/map']
+## The fishing panel and the pond scene P0 opens are older code outside the P0 folders (scenes/fishing, modules/fishing,
+## modules/ponds; 奕星 11-11). Other folders P0 reaches (the farm, inventory, net, place, account …) are the older app's
+## screens P0 does not show: scanning them lists over 1,200 lines no player sees.
+DIRS = ['modules/p0', 'scenes/p0', 'scenes/ui_kit', 'modules/ui', 'scenes/map', 'modules/map',
+        'scenes/fishing', 'modules/fishing', 'modules/ponds']
 LIT = re.compile(r'"((?:[^"\\]|\\.)*)"')
 SKIP_LINE = re.compile(r'^\s*(#|class_name|extends|const [A-Z_]+ := preload|signal |@export)')
-NOT_COPY = re.compile(r'res://|user://|\.(png|svg|glb|tscn|tres|gd|json|ogg|wav)$|^[A-Za-z_]+[:/][A-Za-z_]|^[a-z_0-9]+$|^%[a-z]$|^#')
+NOT_COPY = re.compile(r'res://|user://|\.(png|svg|glb|tscn|tres|gd|json|ogg|wav)$|^[A-Za-z_]+[:/][A-Za-z_]|^[a-z_0-9]+$|^%[a-z]$|^#|^[A-Z][A-Z0-9]*(_[A-Z0-9]+)+$')   # … an error code (FISHING_TIMING)
 SPEC = re.compile(r'%[+-]?\d*(?:\.\d+)?[dsf]')
 ## A template that is a key, a path, a header or a cache key, not a line (`%s:regional:%s:1`, `%s%s_%d.webp`,
 ## `x-p0-version: %d`, `%.1f|%d|…`, `%s?longitude=…`, `P0_AIM %d %s`).
