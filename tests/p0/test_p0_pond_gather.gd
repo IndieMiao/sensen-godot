@@ -74,8 +74,10 @@ func test_pieces_built_by_kind_and_the_bank_kept_off() -> void:
 	g.sync(v)
 	assert_int(g.nodes.size()).is_equal(2)
 	var grove := g.nodes[POND + "#L2"] as Node3D
-	assert_int(grove.get_child_count()).is_equal(4)   # the grove's three trees and their feet's blades (SGODOT-422 v7)
-	assert_bool(grove.get_child(3) is MultiMeshInstance3D).is_true()
+	# the grove's three trees (SGODOT-422 v7) in its Live layer, its gathered look beside it (C67), their feet's blades under both
+	assert_int(grove.get_child_count()).is_equal(3)
+	assert_int(grove.get_node("Live").get_child_count()).is_equal(3)
+	assert_bool(grove.get_child(2) is MultiMeshInstance3D).is_true()
 	assert_vector((g.nodes[POND + "#R1"] as Node3D).position).is_equal(Vector3(9.0, 0, -1.0))
 	assert_array(PondGather.clear_points(v)).is_equal([Vector3(3.1, 0, -0.4), Vector3(9.0, 0, -1.0)])
 	assert_bool(PondScenery._near(Vector3(3.5, 0, 0.3), PondGather.clear_points(v))).is_true()
@@ -98,14 +100,19 @@ func test_the_new_kinds_are_782s_pieces() -> void:
 	v.gather.pond.points = list
 	g.sync(v)
 	for k in ["reed", "clay", "flax"]:
-		var piece := g.nodes[POND + "#" + k] as Node3D
-		assert_int(piece.get_child_count()).is_equal(1)
-		assert_object((piece.get_child(0) as MeshInstance3D).mesh).is_same(Art.mesh_for(str(PondGather.PIECES[k])))
+		var live := (g.nodes[POND + "#" + k] as Node3D).get_node("Live")
+		assert_int(live.get_child_count()).is_equal(1)
+		assert_object((live.get_child(0) as MeshInstance3D).mesh).is_same(Art.mesh_for(str(PondGather.PIECES[k])))
 		assert_object(Art.mesh_for(str(PondGather.PIECES[k]))).is_not_null()
-	# Hardwood in the wild (SGODOT-422 v7): the pack's Tree_20, a stump, two logs and their feet's blades
+		# C67: its gathered look, 黄忠's <piece>_gathered.glb (417)
+		var done := (g.nodes[POND + "#" + k] as Node3D).get_node("Gathered")
+		assert_object((done.get_child(0) as MeshInstance3D).mesh).is_same(Art.mesh_for(str(PondGather.PIECES[k]) + "_gathered"))
+		assert_object(Art.mesh_for(str(PondGather.PIECES[k]) + "_gathered")).is_not_null()
+	# Hardwood in the wild (SGODOT-422 v7): the pack's Tree_20, a stump, two logs; their feet's blades beside the layers
 	var hardwood := g.nodes[POND + "#hardwood"] as Node3D
-	assert_int(hardwood.get_child_count()).is_equal(5)
-	assert_object((hardwood.get_child(0) as MeshInstance3D).mesh).is_same(Art.mesh_for("wild_pz_tree_20_g"))
+	assert_int(hardwood.get_node("Live").get_child_count()).is_equal(4)
+	assert_object((hardwood.get_node("Live").get_child(0) as MeshInstance3D).mesh).is_same(Art.mesh_for("wild_pz_tree_20_g"))
+	assert_bool(hardwood.get_child(2) is MultiMeshInstance3D).is_true()
 	assert_object(Art.mesh_for("wild_pz_tree_20_g")).is_not_null()
 
 ## The Energy card the amber key opens says what was pressed — `Gather needs 3 Energy` at a point, `Cast` elsewhere

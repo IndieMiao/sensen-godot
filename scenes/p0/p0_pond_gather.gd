@@ -21,15 +21,44 @@ const PIECES := {"wood": "grove", "stone": "rock_pile", "herb": "herb_patch", "r
 
 var pond := ""
 var points: Array = []
-var nodes := {}   # point id → its piece
+var nodes := {}   # point id → its piece: a Live layer, a Gathered layer, the feet's blades under both
+## C67 (SGODOT-417; the user 11-10 bot 682 "C67 ok"): a point cooling shows its gathered look — 410 924d6611: the piece
+## hidden, its gathered one shown, back when it is ready, no transition; the name bar, the tap and the stand unchanged;
+## the feet's blades stay. Reeds, Clay, Flax and Stone are 黄忠's <kind>_gathered.glb (417, wp-3d-scene 431fb759);
+## Timber, Hardwood and Wild Herb are built here from the pack pieces they are made of (上官婉儿 / 不知火舞, 417
+## af31871a, a956cb00). Dev (shots): P0_GATHER_COOL = all | kinds or slots, comma-separated, reads those points as
+## cooling COOL_MS, in the editor binary only (cool_switch: an exported build ignores it, as P0BlackjackMock).
+const COOL_MS := 11520000.0   # 3h 12m: 不知火舞's frame
+var _cool := cool_switch(OS.has_feature, OS.get_environment("P0_GATHER_COOL"))
+
+static func cool_switch(has_feature: Callable, env: String) -> PackedStringArray:
+	return env.split(",", false) if env != "" and bool(has_feature.call("editor")) else PackedStringArray()
 
 ## The pond's points as the view has them now (ready_in counted down by P0Logic.project); the pieces built once.
 func sync(view: Dictionary) -> void:
 	var g = view.get("gather", {}).get("pond", null) if view.get("gather") is Dictionary else null
 	points = (g.get("points", []) as Array) if g is Dictionary and g.get("points") is Array else []
 	pond = str(g.get("pond", "")) if g is Dictionary else ""
+	if not _cool.is_empty(): points = points.map(func(p): return cooled(p, _cool))
 	for p in points:
 		if not nodes.has(str(p.id)): nodes[str(p.id)] = _piece(p)
+		show_cooling(nodes[str(p.id)], float(p.get("ready_in", 0)) > 0.0)
+
+## The piece as it stands: its gathered look while cooling (the Gathered layer has one for every kind).
+static func show_cooling(root: Node3D, cooling: bool) -> void:
+	var live := root.get_node_or_null("Live") as Node3D
+	var done := root.get_node_or_null("Gathered") as Node3D
+	if live == null or done == null or done.get_child_count() == 0: return
+	live.visible = not cooling
+	done.visible = cooling
+
+## A point the dev switch names, read as cooling COOL_MS (its own ready_in kept when it has one).
+static func cooled(p: Dictionary, names: PackedStringArray) -> Dictionary:
+	if not ("all" in names or str(p.get("kind", "")) in names or str(p.get("slot", "")) in names): return p
+	if float(p.get("ready_in", 0)) > 0.0: return p
+	var q := p.duplicate()
+	q["ready_in"] = COOL_MS
+	return q
 
 func _piece(p: Dictionary) -> Node3D:
 	var root := Node3D.new()
@@ -37,12 +66,24 @@ func _piece(p: Dictionary) -> Node3D:
 	root.position = Vector3(float(p.get("x", 0)), 0, float(p.get("z", 0)))
 	add_child(root)
 	var kind := str(PIECES.get(str(p.get("kind", "")), ""))
+	var live := Node3D.new()
+	live.name = "Live"
+	root.add_child(live)
+	var done := Node3D.new()
+	done.name = "Gathered"
+	done.visible = false
+	root.add_child(done)
 	match kind:
-		"grove": _grove(root)
-		"hardwood_grove": _hardwood(root)
-		"rock_pile": _rocks(root)
+		"grove": _grove_gathered(done, stand_of(p) - root.position)
+		"hardwood_grove": _hardwood_gathered(done)
+		"herb_patch": _herb_gathered(done)
+		_: if kind != "": done.add_child(Art.instance(kind + "_gathered"))
+	match kind:
+		"grove": _grove(live)
+		"hardwood_grove": _hardwood(live)
+		"rock_pile": _rocks(live)
 		"herb_patch":
-			root.add_child(Art.instance("bush", Vector3(0.0, 0, -0.35), 0.62))
+			live.add_child(Art.instance("bush", Vector3(0.0, 0, -0.35), 0.62))
 			var herb := CropMesh.build("B", CropMesh.LEAF)
 			for at in [Vector3(-0.28, 0, 0.12), Vector3(0.24, 0, 0.18), Vector3(0.02, 0, 0.36)]:
 				var h := MeshInstance3D.new()
@@ -50,9 +91,9 @@ func _piece(p: Dictionary) -> Node3D:
 				h.material_override = Art.material()
 				h.position = at
 				h.scale = Vector3.ONE * 1.25
-				root.add_child(h)
+				live.add_child(h)
 		var asset:
-			if asset != "": root.add_child(Art.instance(asset))
+			if asset != "": live.add_child(Art.instance(asset))
 	if kind in ["grove", "hardwood_grove", "rock_pile"]: _feet(root, kind)
 	return root
 
@@ -85,6 +126,104 @@ static func _hardwood(root: Node3D) -> void:
 		var log := Art.instance(str(l[1]), l[0], 0.24)
 		log.rotation = Vector3(0, PI * 0.5 + float(l[2]), 0)
 		root.add_child(log)
+
+## Timber gathered (C67, 417 af31871a): the two pines nearest the stand stumps their size (log_05), the farthest left
+## standing at 0.4 — well under a pine that can be gathered — two regrowth sprouts; no ground disc.
+static func _grove_gathered(root: Node3D, stand: Vector3) -> void:
+	var far := 0
+	for i in GROVE.size(): if flat(GROVE[i][0], stand) > flat(GROVE[far][0], stand): far = i
+	for i in GROVE.size():
+		var t: Array = GROVE[i]
+		var s := float(t[1]) / 0.44 * 0.58   # as _grove stands them
+		var at: Vector3 = t[0]
+		if at.z > 0.0:
+			at += Vector3(-0.25, 0, -0.2)
+			s *= 0.9
+		var m := Art.instance("wild_pz_pine_01_g" if i == far else "wild_pz_log_05", at, s * (0.4 if i == far else 0.55))
+		m.rotation.y = float(t[0].x) * (2.1 if i == far else 1.3)
+		root.add_child(m)
+	for at in [Vector3(0.3, 0, 0.05), Vector3(-0.4, 0, -0.75)]: root.add_child(_sprout(at))
+
+## Hardwood gathered (C67): the Tree_20 a stump one size up (log_05 ×0.45) a walnut darker — #8B6842 → #78472F, apart
+## from Timber's pale stumps (不知火舞) — the small stump and the log stack as they are, two regrowth sprouts.
+static var _walnut: StandardMaterial3D
+static func _hardwood_gathered(root: Node3D) -> void:
+	if _walnut == null:
+		_walnut = Art.material().duplicate() as StandardMaterial3D
+		_walnut.albedo_color = Color(0.73, 0.45, 0.52).linear_to_srgb()   # on log_05's vertex colour, linear
+	var big := Art.instance("wild_pz_log_05", Vector3(0.1, 0, -0.25), 0.45)
+	big.material_override = _walnut
+	big.rotation.y = 0.8
+	root.add_child(big)
+	root.add_child(Art.instance("wild_pz_log_05", Vector3(-0.5, 0, 0.3), 0.28))
+	for l in [[Vector3(0.35, 0, 0.42), "wild_pz_log_01", 0.0], [Vector3(0.33, 0.13, 0.4), "wild_pz_log_02", 0.25]]:
+		var log := Art.instance(str(l[1]), l[0], 0.24)
+		log.rotation = Vector3(0, PI * 0.5 + float(l[2]), 0)
+		root.add_child(log)
+	for at in [Vector3(-0.2, 0, -0.05), Vector3(0.55, 0, -0.45)]: root.add_child(_sprout(at))
+
+## Wild Herb gathered (C67, 417 a956cb00; 上官婉儿 + 不知火舞): no ground — the piece has none — but one clump: the piece's
+## own leaves cut low (0.55 high) and closed in, a shade darker, dark leafy blades at its foot, two sprouts; no bush.
+static var _herb_dim: StandardMaterial3D
+static var _herb_foot: StandardMaterial3D
+static func _herb_gathered(root: Node3D) -> void:
+	if _herb_dim == null:
+		_herb_dim = Art.material().duplicate() as StandardMaterial3D
+		_herb_dim.albedo_color = Color(0.8, 0.8, 0.8)
+		_herb_foot = Art.material().duplicate() as StandardMaterial3D
+		_herb_foot.albedo_color = Color(0.72, 0.72, 0.72)
+	var c := Vector3(0.0, 0, 0.15)   # the three herbs' middle
+	var herb := CropMesh.build("B", CropMesh.LEAF)
+	for at in [Vector3(-0.28, 0, 0.12), Vector3(0.24, 0, 0.18), Vector3(0.02, 0, 0.36)]:
+		var h := MeshInstance3D.new()
+		h.mesh = herb
+		h.material_override = _herb_dim
+		h.position = c + (at - c) * 0.55
+		h.scale = Vector3(1.25 * 0.85, 1.25 * 0.55, 1.25 * 0.85)
+		root.add_child(h)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 417
+	for i in 9:
+		var b := Art.instance("wild_pz_foot_leafy", c + Vector3.FORWARD.rotated(Vector3.UP, TAU * float(i) / 9.0 + rng.randf_range(-0.2, 0.2)) * rng.randf_range(0.2, 0.3), rng.randf_range(0.5, 0.7))
+		b.position.y = -0.02
+		b.rotation.y = rng.randf() * TAU
+		b.material_override = _herb_foot
+		root.add_child(b)
+	for at in [Vector3(-0.32, 0, -0.12), Vector3(0.36, 0, -0.05)]: root.add_child(_sprout(at))
+
+## 417's one regrowth sprout (gathered_417 build.py sprout()): a 0.105 m stem, two oval leaves in a V, #8FA46B.
+static var _sprout_mat: StandardMaterial3D
+static func _sprout(at: Vector3) -> Node3D:
+	if _sprout_mat == null:
+		_sprout_mat = StandardMaterial3D.new()
+		_sprout_mat.albedo_color = Color("8FA46B")
+		_sprout_mat.roughness = 0.9
+	var n := Node3D.new()
+	n.name = "Sprout"
+	n.position = at
+	var stem := MeshInstance3D.new()
+	var c := CylinderMesh.new()
+	c.top_radius = 0.010
+	c.bottom_radius = 0.012
+	c.height = 0.105
+	c.radial_segments = 4
+	c.rings = 1
+	stem.mesh = c
+	stem.position.y = 0.0525
+	stem.material_override = _sprout_mat
+	n.add_child(stem)
+	for side in [-1.0, 1.0]:
+		var leaf := MeshInstance3D.new()
+		var sp := SphereMesh.new()
+		sp.radial_segments = 6
+		sp.rings = 3
+		leaf.mesh = sp
+		leaf.scale = Vector3(0.15, 0.08, 0.06)   # SphereMesh is 1 m across
+		leaf.position = Vector3(side * 0.055, 0.14, 0)
+		leaf.rotation.z = side * 0.55
+		leaf.material_override = _sprout_mat
+		n.add_child(leaf)
+	return n
 
 ## Grass where things meet the ground (the user on v5: the stones' and trees' feet most): blades round each trunk and
 ## round the stone pile, one MultiMesh a blade kind (上官婉儿: draw calls).

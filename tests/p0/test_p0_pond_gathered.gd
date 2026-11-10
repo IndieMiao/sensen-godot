@@ -1,0 +1,92 @@
+extends GdUnitTestSuite
+## C67 (SGODOT-417; the user 11-10 bot 682): a pond point cooling shows its gathered look (410 924d6611) — the piece
+## hidden, its gathered one shown, back when it is ready; every kind has one; none wider than its piece (the bank keeps
+## 1.5 m off the piece, not off something wider); the feet's blades under both. The dev switch is the editor's only.
+
+const PondGather := preload("res://scenes/p0/p0_pond_gather.gd")
+const POND := "gn-1850147~pond0"
+const KINDS := ["wood", "stone", "herb", "reed", "clay", "hardwood", "flax"]
+
+func _point(kind: String, ready := 0.0) -> Dictionary:
+	return {"id": POND + "#" + kind, "slot": "L2", "kind": kind, "name": kind, "yield": [[kind, 2]], "energy": 3,
+		"x": 0.0, "z": 0.0, "stand": [-0.1, -0.8], "ready_in": ready}
+
+func _view(points: Array) -> Dictionary:
+	return {"energy": {"value": 50, "max": 200}, "bag": {"free": 5, "slots": []},
+		"gather": {"pond": {"pond": POND, "shape": "crescent", "points": points}}}
+
+func _gather(points: Array) -> Node3D:
+	var g: Node3D = auto_free(PondGather.new())
+	add_child(g)
+	g.sync(_view(points))
+	return g
+
+## The farthest any part of a layer reaches from the point, across the ground (x–z), metres.
+static func _reach(layer: Node3D) -> float:
+	var r := 0.0
+	for m: GeometryInstance3D in layer.find_children("*", "GeometryInstance3D", true, false):
+		var box: AABB = (layer.global_transform.affine_inverse() * m.global_transform) * m.get_aabb()
+		for i in 8:
+			var e := box.get_endpoint(i)
+			r = maxf(r, Vector2(e.x, e.z).length())
+	return r
+
+func test_every_kind_has_a_gathered_look_shown_while_cooling() -> void:
+	var points: Array = KINDS.map(func(k): return _point(k))
+	var g := _gather(points)
+	for k in KINDS:
+		var root: Node3D = g.nodes[POND + "#" + k]
+		var live := root.get_node("Live") as Node3D
+		var done := root.get_node("Gathered") as Node3D
+		assert_int(done.get_child_count()).override_failure_message(k).is_greater(0)
+		assert_bool(live.visible and not done.visible).override_failure_message(k).is_true()
+	g.sync(_view(KINDS.map(func(k): return _point(k, 3600000.0))))   # gathered: cooling an hour
+	for k in KINDS:
+		var root: Node3D = g.nodes[POND + "#" + k]
+		assert_bool((root.get_node("Gathered") as Node3D).visible and not (root.get_node("Live") as Node3D).visible).override_failure_message(k).is_true()
+	g.sync(_view(points))   # ready again
+	for k in KINDS:
+		var root: Node3D = g.nodes[POND + "#" + k]
+		assert_bool((root.get_node("Live") as Node3D).visible and not (root.get_node("Gathered") as Node3D).visible).override_failure_message(k).is_true()
+
+func test_no_gathered_look_is_wider_than_its_piece() -> void:
+	var g := _gather(KINDS.map(func(k): return _point(k)))
+	for k in KINDS:
+		var root: Node3D = g.nodes[POND + "#" + k]
+		var live := _reach(root.get_node("Live") as Node3D)
+		var done := _reach(root.get_node("Gathered") as Node3D)
+		assert_float(done).override_failure_message("%s: gathered %.2f m, piece %.2f m" % [k, done, live]).is_less_equal(live + 0.001)
+
+func test_the_feet_stay_under_both() -> void:
+	var g := _gather([_point("stone"), _point("wood"), _point("hardwood")])
+	for k in ["stone", "wood", "hardwood"]:
+		var root: Node3D = g.nodes[POND + "#" + k]
+		var outside := root.get_children().filter(func(n): return n.name != "Live" and n.name != "Gathered")
+		assert_bool(outside.any(func(n): return n is MultiMeshInstance3D)).override_failure_message(k).is_true()
+
+## Timber's stand-side pines are stumps, the farthest a small pine — well under a pine that can be gathered.
+func test_timber_leaves_one_small_pine() -> void:
+	var g := _gather([_point("wood", 3600000.0)])
+	var done := (g.nodes[POND + "#wood"] as Node3D).get_node("Gathered") as Node3D
+	var Art = preload("res://modules/farm/farm_art.gd")
+	var pines := done.get_children().filter(func(n): return n is MeshInstance3D and n.mesh == Art.mesh_for("wild_pz_pine_01_g"))
+	var stumps := done.get_children().filter(func(n): return n is MeshInstance3D and n.mesh == Art.mesh_for("wild_pz_log_05"))
+	assert_int(pines.size()).is_equal(1)
+	assert_int(stumps.size()).is_equal(2)
+	var live := (g.nodes[POND + "#wood"] as Node3D).get_node("Live") as Node3D
+	var tallest := 0.0
+	for m: MeshInstance3D in live.get_children(): tallest = maxf(tallest, m.scale.y)
+	assert_float((pines[0] as MeshInstance3D).scale.y).is_less_equal(tallest * 0.45)
+
+func test_the_dev_switch_is_the_editors_only() -> void:
+	var editor := func(f): return f == "editor"
+	var exported := func(_f): return false
+	assert_array(Array(PondGather.cool_switch(editor, "all"))).is_equal(["all"])
+	assert_array(Array(PondGather.cool_switch(editor, "wood,C1"))).is_equal(["wood", "C1"])
+	assert_array(Array(PondGather.cool_switch(exported, "all"))).is_empty()   # an exported build, debug or release
+	assert_array(Array(PondGather.cool_switch(editor, ""))).is_empty()
+	var p := _point("clay")
+	assert_float(float(PondGather.cooled(p, PackedStringArray(["clay"])).ready_in)).is_equal(PondGather.COOL_MS)
+	assert_float(float(PondGather.cooled(p, PackedStringArray(["wood"])).ready_in)).is_equal(0.0)
+	assert_float(float(PondGather.cooled(_point("clay", 60000.0), PackedStringArray(["all"])).ready_in)).is_equal(60000.0)
+	assert_float(float(p.ready_in)).is_equal(0.0)   # the view's own point untouched
