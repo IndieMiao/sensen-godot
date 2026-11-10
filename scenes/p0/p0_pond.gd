@@ -5,6 +5,7 @@ extends Node3D
 ## driven by P0FishingPanel. Movement, HUD and results follow the new UI flow from P0Runtime.
 
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
+const StripClear = preload("res://modules/p0/p0_strip_clear.gd")
 
 ## Pond shapes → P0 fishing sites, kept only for the cast command's old `site` field. The server ignores it and
 ## takes the template from its own table for the pond the player is at (p0_place, q(36): Reed Pond is a Pond).
@@ -39,6 +40,7 @@ const PondGather := preload("res://scenes/p0/p0_pond_gather.gd")   # the pond's 
 const PondInsects := preload("res://modules/ponds/pond_insects.gd")   # the wild's insects (SGODOT-454)
 var gather: Node3D       # PondGather: the pieces, their name bar and the Gather key
 var _gather_tag := ""    # the point whose name bar is up
+var _tag_clear := StripClear.new()   # its strip clear of the player (SGODOT-473)
 var _gather_marked := "" # the point the guide's `!` is on
 var _scenery: Node3D
 var _trees: Array = []   # the walk's cells the bank's trees block (PondWalk.set_trees), freed when they move
@@ -254,7 +256,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	var near: Dictionary = PondGather.nearest(gather.points, actor.position)
 	var reach := _plan.is_empty() and PondGather.in_reach(near, actor.position)
 	rt.ui.set_action(PondGather.key(v, near, gather.pond) if reach else _action_state(v))   # 410: Gather at a point, else Cast
-	_gather_marks(v, near)
+	_gather_marks(v, near, dt)
 	_trap_frame(v)
 	rt.ui.set_trap_slots(P0Trap.slots_line(v) if rt.ui.selected_bait == TRAP_ID else "")   # TRAP-2 (B7 on 286)
 	# At the pond: "Your creel is your bag…" (§14.2 minute 5–9); "Casting uses 5 Energy" comes with the first cast (P0Guide).
@@ -335,13 +337,17 @@ func _apply_foam() -> void:
 	# the bank's froth near white (上官婉儿 11-10: as white as the old mask's at the bank); the old ponds keep 0.60
 	if tex: _water.water_material.set_shader_parameter("contact_foam_opacity", PondScenery.PondWildFoam.CONTACT_OPACITY)
 
-func _gather_marks(v: Dictionary, near: Dictionary) -> void:
+func _gather_marks(v: Dictionary, near: Dictionary, dt := 0.0) -> void:
 	var id := str(near.get("id", "")) if not near.is_empty() and PondGather.flat(PondGather.stand_of(near), actor.position) <= PondGather.TAG_M else ""
 	if _gather_tag != "" and _gather_tag != id: rt.ui.name_bar("gather:" + _gather_tag, null, "", "", Vector2.ZERO, false)
+	if _gather_tag != id: _tag_clear.reset()
 	_gather_tag = id
 	if id != "":
 		var t := PondGather.tag(v, near)
-		rt.ui.name_bar("gather:" + id, P0Logic.icon(str(t.icon)), str(t.text), str(t.fact), _gather_screen(near), true, -1, bool(t.dimmed))
+		# the one strip up kept clear of the player (SGODOT-473: a cooling point's `Ready in 3h 12m` grows over the head)
+		var at := _gather_screen(near)
+		at.y += _tag_clear.step(dt, rt.ui.name_bar_rect("gather:" + id), at.y, func(): return actor.screen_box(cam))
+		rt.ui.name_bar("gather:" + id, P0Logic.icon(str(t.icon)), str(t.text), str(t.fact), at, true, -1, bool(t.dimmed))
 	var target = v.get("guide", {}).get("target", null) if v.get("guide") is Dictionary else null
 	var marked := str(target.get("spot", "")) if target is Dictionary and str(target.get("kind", "")) == "gather" else ""
 	if gather.point(marked).is_empty(): marked = ""
