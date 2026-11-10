@@ -1105,6 +1105,11 @@ func _raise_marker(m: Control) -> void:
 			if (other as Node).get_parent() == _kit: top = maxi(top, (other as Node).get_index())
 	if top > m.get_index(): _kit.move_child(m, top)
 
+## An open name strip's full extent on screen (empty when it is not open): for a world that keeps it off the player.
+func name_bar_rect(id: String) -> Rect2:
+	var bar: UiWorldNameBar = _name_bars.get(id)
+	return bar.full_rect() if bar != null and bar.visible else Rect2()
+
 func _fold_name_bar(bar: UiWorldNameBar) -> void:
 	if bar.get_meta("folding", false): return
 	bar.set_meta("folding", true)

@@ -6,6 +6,7 @@ extends GdUnitTestSuite
 
 const STORE := "user://test_p0_farm_exit.json"
 const P0Farm := preload("res://scenes/p0/p0_farm.gd")
+const FarmCamera := preload("res://modules/farm/farm_camera.gd")
 
 var rt: P0Runtime
 
@@ -74,7 +75,7 @@ func test_the_joystick_or_a_panel_stops_the_walk_where_it_is() -> void:
 func test_landing_and_standing_still_never_leaves() -> void:
 	var farm := _farm()
 	var spawn: Vector3 = farm.bp.cell_to_world(farm.bp.anchor("spawn"))
-	assert_float(P0FarmMaterials.flat(spawn, farm._exit)).is_greater(P0Farm.EXIT_ARM_M)   # 4.6 m: no two steps out (bot 389)
+	assert_float(P0FarmMaterials.flat(spawn, farm._exit)).is_greater(P0Farm.EXIT_ARM_M)   # 5.4 m: no two steps out (bot 389)
 	farm.actor.teleport(spawn)   # back from the map
 	_run(farm, 1.0)
 	assert_int(farm.left).is_equal(0)
@@ -111,8 +112,12 @@ func test_the_exit_stands_on_the_farms_walk() -> void:
 	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))   # the yard fence, as the farm blocks it
 	var exit := P0Farm.EXIT_AT
 	assert_bool(bp.is_walkable(bp.world_to_cell(exit))).is_true()
-	for d in [Vector3(-0.6, 0, 0), Vector3(0.6, 0, 0), Vector3(0, 0, -0.6), Vector3(0, 0, 0.6)]:   # the whole ring on the walk
-		assert_bool(bp.is_walkable(bp.world_to_cell(exit + d))).override_failure_message(str(d)).is_true()
+	# the ring drawn inside the Lv3 fence ring (C7: its west and front stretches beside it); the cells under its edge are
+	# the fence's on the walk grid, the trigger's middle cell is not
+	var r := P0Farm.EXIT_RING_R
+	var f := P0Garden.FENCE_RING
+	assert_float(exit.x - r).is_greater(f.west)
+	assert_float(exit.z + r).is_less(f.front)
 	var grid := BlueprintGrid.new(bp)
 	assert_bool(grid.path(bp.anchor("spawn"), bp.world_to_cell(exit)).is_empty()).is_false()
 
@@ -136,3 +141,117 @@ func test_the_pin_and_its_ring_keep_their_colours() -> void:
 		var mat := (m as MeshInstance3D).material_override as BaseMaterial3D
 		assert_object(mat).override_failure_message(str(m.name)).is_not_null()
 		assert_bool(mat.vertex_color_use_as_albedo).override_failure_message(str(m.name)).is_true()
+
+## V4 review C7 (0.3.6): the ring and its trigger clear every bed, the last to open (62, Lv17) too — its edge 0.21 m
+## off the trigger — and the drawn ring is inside the trigger.
+func test_the_ring_clears_every_bed() -> void:
+	var bp := P0Garden.blueprint()
+	var half := bp.cell_m * 0.5
+	var nearest := INF
+	for id in P0Garden.max_plots():
+		var c := bp.cell_to_world(P0Garden.cell_of(id))
+		var off := Vector2(maxf(0.0, absf(P0Farm.EXIT_AT.x - c.x) - half), maxf(0.0, absf(P0Farm.EXIT_AT.z - c.z) - half))
+		nearest = minf(nearest, off.length())
+	assert_float(nearest - P0Farm.EXIT_RADIUS_M).is_greater_equal(0.2)
+	assert_float(P0Farm.EXIT_RING_R).is_less_equal(P0Farm.EXIT_RADIUS_M)
+
+## C7: the ring drawn EXIT_RING_R round on the ground; the pin as 赵云 made it.
+func test_the_ring_is_drawn_smaller_and_the_pin_is_not() -> void:
+	if not ResourceLoader.exists(P0Farm.EXIT_PIECE): return
+	var farm := _farm()
+	farm._exit_piece()
+	var piece: Node3D = farm.get_node("ExitPin")
+	var ring := piece.find_child(P0Farm.EXIT_RING_NODE, true, false) as MeshInstance3D
+	assert_object(ring).is_not_null()
+	assert_float(ring.mesh.get_aabb().size.x * 0.5 * ring.scale.x).is_equal_approx(P0Farm.EXIT_RING_R, 0.005)
+	assert_float(ring.mesh.get_aabb().size.z * 0.5 * ring.scale.z).is_equal_approx(P0Farm.EXIT_RING_R, 0.005)
+	var pin := piece.find_child(P0Farm.EXIT_PIN_NODE, true, false) as Node3D
+	assert_vector(pin.scale).is_equal(Vector3.ONE)
+
+## C7: a tap by the exit is the exit's, but on bed 62 beside it (open at Lv17) the bed's, though within EXIT_TAP_PX.
+func test_a_tap_on_the_bed_beside_it_is_not_the_exits() -> void:
+	var farm := _farm()
+	rt.session.view = {"garden": {"plots": P0Garden.max_plots()}}
+	farm.cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	farm.cam.keep_aspect = Camera3D.KEEP_WIDTH
+	farm.cam.size = get_viewport().get_visible_rect().size.x / 30.0   # 30 px a metre: the bed within the exit's 40 px
+	farm.cam.current = true
+	FarmCamera.place(farm.cam, P0Farm.EXIT_AT + Vector3.UP * 0.7)
+	var exit_px: Vector2 = farm.cam.unproject_position(P0Farm.EXIT_AT + P0Farm.EXIT_HIT)
+	var bed_px: Vector2 = farm.cam.unproject_position(farm.bp.cell_to_world(P0Garden.cell_of(62)))
+	assert_float(bed_px.distance_to(exit_px)).is_less(P0Farm.EXIT_TAP_PX)
+	assert_bool(farm._exit_tapped(exit_px)).is_true()
+	assert_bool(farm._exit_tapped(bed_px)).is_false()
+	assert_bool(farm._exit_tapped(exit_px + Vector2(P0Farm.EXIT_TAP_PX + 1.0, 0))).is_false()   # past its 40 px
+
+## 不知火舞 on #943: the player within EXIT_FADE_M, the pin fades out (seen behind it); away, back and opaque again; the
+## ring never fades.
+func test_near_the_exit_its_pin_fades() -> void:
+	if not ResourceLoader.exists(P0Farm.EXIT_PIECE): return
+	var farm := _farm()
+	farm._exit_piece()
+	var piece: Node3D = farm.get_node("ExitPin")
+	var pin := piece.find_child(P0Farm.EXIT_PIN_NODE, true, false) as MeshInstance3D
+	var ring := piece.find_child(P0Farm.EXIT_RING_NODE, true, false) as MeshInstance3D
+	var pin_mat := pin.material_override as StandardMaterial3D
+	assert_object(ring.material_override).is_not_same(pin_mat)
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -0.8))   # behind the pin, outside the trigger
+	farm._exit_fade(1.0)
+	assert_float(pin_mat.albedo_color.a).is_equal(0.0)   # out (不知火舞 443 d3ff5572: 0.3 read pink on the player)
+	assert_int(pin_mat.transparency).is_equal(BaseMaterial3D.TRANSPARENCY_ALPHA)
+	assert_int(pin.cast_shadow).is_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)   # no shadow while faded (上官婉儿)
+	assert_int(ring.cast_shadow).is_not_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
+	assert_float((ring.material_override as StandardMaterial3D).albedo_color.a).is_equal(1.0)
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -2.0))
+	farm._exit_fade(1.0)
+	assert_float(pin_mat.albedo_color.a).is_equal(1.0)
+	assert_int(pin_mat.transparency).is_equal(BaseMaterial3D.TRANSPARENCY_DISABLED)
+	assert_int(pin.cast_shadow).is_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_ON)
+
+## 上官婉儿 443 190fa019: the Lv3 ring's front stretch opens either side of the exit (the ring in the opening, no rail
+## across it), the stone wall on the same run; the way in still open, the rest of the front closed.
+func test_the_fence_opens_at_the_exit() -> void:
+	var bp := P0Garden.blueprint()
+	var f := P0Garden.FENCE_RING
+	var front := P0Garden.fence_ring(bp).filter(func(seg): return absf(seg.pos.z - f.front) < 0.01)
+	var half := P0Garden.FENCE_SEG * 0.5
+	for seg in front:
+		var lo: float = seg.pos.x - half * seg.stretch
+		var hi: float = seg.pos.x + half * seg.stretch
+		assert_bool(hi <= P0Farm.EXIT_AT.x - P0Farm.EXIT_RING_R or lo >= P0Farm.EXIT_AT.x + P0Farm.EXIT_RING_R) \
+			.override_failure_message("rail %.2f–%.2f across the ring" % [lo, hi]).is_true()
+	assert_float(front.map(func(seg): return seg.pos.x).min() - half * front[0].stretch).is_greater_equal(P0Farm.EXIT_AT.x + P0Farm.EXIT_RING_R)   # west of the ring: no rail
+	assert_int(P0Garden.stone_wall(front).size()).is_equal(front.size() * P0Garden.STONE_PER_SEG)
+
+## 不知火舞 / 上官婉儿 443: its `Map` strip, open at its mark over the player's head or upper body on screen (any distance),
+## rises clear of the head (its bottom EXIT_STRIP_HEAD_PX over the head's top) at once; once it would not be, it eases
+## back over EXIT_STRIP_BACK_S.
+func _strip_open(farm: Node3D) -> void:
+	rt.ui.name_bar("exit", null, "Map", "", farm.cam.unproject_position(farm._exit + P0Farm.EXIT_MARK), true)
+
+func test_its_strip_clears_the_head_and_eases_back() -> void:
+	var farm := _farm()
+	farm.cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	farm.cam.keep_aspect = Camera3D.KEEP_WIDTH
+	farm.cam.size = 8.0
+	farm.cam.current = true
+	FarmCamera.place(farm.cam, P0Farm.EXIT_AT + Vector3.UP * 0.7)
+	_strip_open(farm)
+	assert_bool(rt.ui.name_bar_rect("exit").has_area()).is_true()
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -0.8))   # behind the pin: the strip over the head
+	farm._exit_strip_lift(1.0 / 30.0)
+	var centre: float = farm.cam.unproject_position(farm._exit + P0Farm.EXIT_MARK).y + farm._exit_lift
+	var head: float = farm.actor.screen_box(farm.cam).position.y
+	assert_float(farm._exit_lift).is_less(0.0)
+	assert_float(centre + UiWorldNameBar._H * 0.5).is_less_equal(head - P0Farm.EXIT_STRIP_HEAD_PX + 0.01)
+	var up: float = farm._exit_lift
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -1.2))   # past 1 m, still under the strip: still clear
+	farm._exit_strip_lift(1.0)
+	assert_float(farm._exit_lift).is_less(0.0)
+	up = farm._exit_lift
+	farm.actor.teleport(farm._exit + Vector3(2.0, 0, 0.0))   # off to its side: easing back, not at once
+	farm._exit_strip_lift(P0Farm.EXIT_STRIP_BACK_S * 0.5)
+	assert_float(farm._exit_lift).is_greater(up)
+	assert_float(farm._exit_lift).is_less(0.0)
+	farm._exit_strip_lift(P0Farm.EXIT_STRIP_BACK_S * 0.6)
+	assert_float(farm._exit_lift).is_equal(0.0)

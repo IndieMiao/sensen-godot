@@ -129,12 +129,17 @@ static func blueprint() -> FarmBlueprint:
 
 ## Homestead fence (plan §8.3, q(35); 不知火舞 on SGODOT-228 7e1db1f8), one fence.glb kit:
 ## Lv1–2 only the stretch in front of the farmhouse, either side of the door path with a 2 m opening;
-## Lv3 adds the ring round the field and yard, open only at the way out to the map (its west stretch closed where the
-## mine mouth stood, 355 b1).
+## Lv3 adds the ring round the field and yard, open at the way in and at the map exit (MAP_EXIT; its west stretch
+## closed where the mine mouth stood, 355 b1).
 ## Each segment is {pos: Vector3, yaw: float, stretch: float} (stretch scales fence.glb along its length).
 const FENCE_SEG := 1.24              # fence.glb length (m)
 const FENCE_FRONT_ROW := 13          # the yard row between the field and the farmhouse
 const FENCE_RING := {"west": 0.38, "east": 12.95, "back": -12.35, "front": 1.4}   # front 0.1 → 1.4: two rows nearer (q(172) A)
+## The farm's way out to the map (P0Farm.EXIT_AT; V4 review C7, 0.3.6): the ring's front stretch opens MAP_EXIT_GAP either
+## side of it (上官婉儿 443 190fa019: the ring stands in the opening, no rail across it on screen; the end posts of
+## fence.glb stand as its posts, as at the way in; the walk's edge is the yard's as before).
+const MAP_EXIT := Vector3(0.8, 0, 1.0)
+const MAP_EXIT_GAP := 0.5
 
 static func fence_front(bp: FarmBlueprint) -> Array:
 	var door := bp.cell_to_world(ANCHORS.house)
@@ -149,7 +154,8 @@ static func fence_ring(bp: FarmBlueprint) -> Array:
 	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.east, r.back), []))
 	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.west, r.front), []))
 	out.append_array(_fence_run(Vector2(r.east, r.back), Vector2(r.east, r.front), []))
-	out.append_array(_fence_run(Vector2(r.west, r.front), Vector2(r.east, r.front), [Vector2(exit.x - 1.0, exit.x + 1.0)]))
+	out.append_array(_fence_run(Vector2(r.west, r.front), Vector2(r.east, r.front),
+		[Vector2(exit.x - 1.0, exit.x + 1.0), Vector2(MAP_EXIT.x - MAP_EXIT_GAP, MAP_EXIT.x + MAP_EXIT_GAP)]))
 	return out
 
 ## Segments along a → b (xz), evenly stretched to fill it; gaps are [from, to] on the axis the run follows.
