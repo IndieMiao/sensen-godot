@@ -3268,11 +3268,11 @@
   "quotas": {
     "dish": {
       "cap": 120,
-      "scope": "Homestead Stall"
+      "scope": "Home Stall"
     },
     "material": {
       "cap": 30,
-      "scope": "Homestead Stall"
+      "scope": "Home Stall"
     },
     "request_bonus": {
       "cap": 100,
@@ -3419,7 +3419,7 @@
     "region": "san_francisco",
     "climate": "Temperate",
     "timezone": "America/Los_Angeles",
-    "farm_name": "Farmer's Homestead",
+    "farm_name": "Farmer's Home",
     "farm_at": [
       37.7558,
       -122.4345
