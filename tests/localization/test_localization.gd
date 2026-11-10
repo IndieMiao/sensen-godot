@@ -408,6 +408,29 @@ func test_p0_pieced_lines_read_whole_under_chinese() -> void:
 	assert_str(P0Logic._count_word(3)).is_equal("three")
 	TranslationServer.remove_translation(t)
 
+## SGODOT-466 (不知火舞, 李白's key): the pond card's Biting more, the condition tags (Details, the Bite Board's pond rows)
+## carry a factor like ×1.5 — the table's `%s ×%d` took only whole ones, so `Common Carp ×1.5` stayed English. `%s ×%.1f`
+## takes both; Biting now's names joined by `, ` read item by item, an uncaught regional fish's `?` kept (its own key).
+func test_p0_bite_factors_and_names_read_in_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	var rain := {"time": "Day", "weather": "rain", "fish": ["fish_carp"]}
+	assert_str(BiteBoardScript.biting_more(rain, 1, {})).is_equal("Common Carp ×1.5")
+	assert_str(zh.call(BiteBoardScript.biting_more(rain, 1, {}))).is_equal("鲤鱼 ×1.5")   # a decimal factor
+	var night := {"time": "Night", "weather": "rain", "fish": ["fish_carp", "fish_catfish", "fish_eel", "fish_snakehead"]}
+	assert_str(BiteBoardScript.biting_more(night, 9, {})).is_equal("? ×4 · Catfish ×3 · +2")
+	assert_str(zh.call(BiteBoardScript.biting_more(night, 9, {}))).is_equal("? ×4 · 鲇鱼 ×3 · +2")   # whole ones, as before
+	var catfish := {"time": {"night": 2.0}, "weather": {"rain": 1.5}}
+	assert_str(BiteBoardScript.tags(catfish)).is_equal("Night ×2 · Rain ×1.5")
+	assert_str(zh.call(BiteBoardScript.tags(catfish))).is_equal("夜晚 ×2 · 雨天 ×1.5")   # with its ` · `
+	assert_str(zh.call(BiteBoardScript.details_line(catfish.merged({"level": 4}), false))).is_equal("钓鱼 Lv4 · 夜晚 ×2 · 雨天 ×1.5")
+	assert_str(zh.call(" · " + BiteBoardScript.tags(catfish, "rain"))).is_equal(" · 夜晚 ×2 · 雨天 ×1.5")   # a Bite Board row's tags
+	assert_str(zh.call("Common Carp, Catfish · +2 more")).is_equal("鲤鱼、鲇鱼 · 还有 2 条")   # Biting now (Fishing Lv8+)
+	assert_str(zh.call("Sea Bass, ? · +2 more")).is_equal("海鲈、? · 还有 2 条")
+	TranslationServer.remove_translation(t)
+
 ## 0.2.23 (不知火舞 385 fd216262): a Nearby row's name and ` · state` are measured as they show — 「费尔菲尔德」 was cut at
 ## Fairfield's English width and the gap before 「· 加州」 followed the English.
 const CityRowScript := preload("res://scenes/p0/panels/p0_city_row.gd")

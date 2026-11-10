@@ -2755,5 +2755,7 @@
  "Homestead Lv%d · Space taken": "家园 Lv%d · 位置已被占用",
  "Home Lv%d · Space taken": "家园 Lv%d · 位置已被占用",
  "+%d %s": "+%d %s",
- "−%d %s": "−%d %s"
+ "−%d %s": "−%d %s",
+ "%s ×%.1f": "%s ×%.1f",
+ "?": "?"
 }
