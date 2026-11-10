@@ -79,6 +79,21 @@ describe('first-catch guarantee (q(219))', () => {
     expect(again.s.fishing.bites).toBe(1);
   });
 
+  // SGODOT-463 (Pixel, Fern Pond): a line whose reel never came stayed in the save; the client greys its key while the
+  // view shows a cast, and only a new cast settled a stale one, so the key held `Fishing…` for good, reinstalls too.
+  it('a line left in past stale_ms is no longer in the view; the next cast settles it and a new line goes out', () => {
+    const cast = step(fresh(), { type: 'cast' }, T0).s;
+    expect(viewOf(c, cast, T0 + S).fishing.cast).not.toBeNull();
+    expect(viewOf(c, cast, T0 + c.fishing.stale_ms - S).fishing.cast).not.toBeNull();   // a long reel keeps its line
+    const late = T0 + c.fishing.stale_ms + S;
+    expect(viewOf(c, cast, late).fishing.cast).toBeNull();   // the key casts again
+    expect(cast.cast).not.toBeNull();                        // nothing written by a read
+    const again = step(cast, { type: 'cast' }, late);
+    expect(catchOf(again.ev)).toMatchObject({ result: 'escaped' });   // the old line, as before (q(219) ②)
+    expect(again.s.cast?.at).toBe(late);
+    expect(viewOf(c, again.s, late + S).fishing.cast).not.toBeNull();
+  });
+
   it('a bag that cannot take the fish: landed is refused, escaped settles as got away (no bag_full loop)', () => {
     const cast = step(fresh(), { type: 'cast' }, T0).s;
     while (cast.bag.length < c.bag.capacity) cast.bag.push({ id: `crop_radish`, qty: 1 });
