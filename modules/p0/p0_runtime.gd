@@ -1204,7 +1204,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error(str(P0Decor.REASONS[code]))
 			return
 		if code == "decor_cap":
-			ui.toast(P0Decor.cap_line(session.view))
+			ui.toast(P0Decor.cap_line(session.view), 0.0, true)   # two lines at the dot, never mid-phrase (不知火舞 11-10)
 			return
 	var trap_said = P0Logic.P0Trap.refusal_text(cmd, code, detail)   # Fish Trap (SGODOT-283)
 	if trap_said != null:

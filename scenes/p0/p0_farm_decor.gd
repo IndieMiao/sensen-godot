@@ -359,7 +359,7 @@ static func _mat(c: Color, unshaded := false) -> StandardMaterial3D:
 func begin_place(id: String, stay := false) -> bool:
 	var v := _view()
 	if P0Decor.full(v):
-		rt.ui.toast(P0Decor.cap_line(v))
+		rt.ui.toast(P0Decor.cap_line(v), 0.0, true)   # two lines at the dot, never mid-phrase (不知火舞 11-10)
 		return false
 	if P0Decor.stored(v, id) - _pending_of(id) < 1: return false
 	var rot := 0

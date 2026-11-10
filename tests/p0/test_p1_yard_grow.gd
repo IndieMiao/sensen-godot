@@ -150,3 +150,20 @@ func test_the_farm_opens_the_grown_yard_as_the_level_comes() -> void:
 	fresh._sync_yard(_v(14))
 	assert_array(first).is_equal([[14, false]])   # a farm opened at Lv14: there at once
 	assert_bool(fresh.bp.is_walkable(Vector2i(2, 19))).is_true()
+
+## The cap's toast breaks at its dot, never mid-phrase (不知火舞 11-10: `Decor 48/48 · Home` / `Lv13 adds 13` before): the
+## server's refusal and Farm Storage's Place alike.
+func test_the_cap_toast_breaks_at_the_dot() -> void:
+	var r: P0Runtime = auto_free(P0Runtime.new())
+	add_child(r)
+	await get_tree().process_frame
+	var d := {"placed": [], "cap": 48, "stored": {"deco_planter": 1}, "grows": {"level": 13, "adds": 13}}
+	for i in 48: (d.placed as Array).append({"uid": i + 1, "id": "deco_planter", "x": 0, "y": 0})
+	r.session.view = _v(9, d)
+	r._on_refused("decor_cap", {"cap": 48, "used": 48}, {"type": "place_decor", "item": "deco_planter"})
+	assert_str(r.ui.toast_text()).is_equal("Decor 48/48\nHome Lv13 adds 13")
+	var none := d.duplicate(true)   # the session's view is read-only once set
+	none.grows = null
+	r.session.view = _v(9, none)
+	r._on_refused("decor_cap", {"cap": 48, "used": 48}, {"type": "place_decor", "item": "deco_planter"})
+	assert_str(r.ui.toast_text()).is_equal("Decor 48/48\nStore one to place this")
