@@ -99,3 +99,25 @@ func test_the_open_marker_area_is_the_marker_area_with_the_hud_up() -> void:
 	assert_that(ui.open_marker_area()).is_equal(shown)   # its place, not where the drawer holds it (int12-pre shot)
 	ui.undock_bar()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_p0_farm_opening.json"))
+
+## 农场林地 A (上官婉儿, pending the user's pick): the farm rests at REST_ZOOM 0.8 — the opening starts there and zooms out
+## only as far as its beds need, walking eases a zoomed-out opening back to it, never past it, and a pinch is the player's
+## (walking no longer pulls it back); the first pinch picks up at the rest zoom, not at 1.0.
+func test_the_farm_rests_at_the_woodland_zoom_and_a_pinch_picks_up_there() -> void:
+	var farm = P0Farm.new()
+	assert_float(farm._zoom).is_equal(P0Farm.REST_ZOOM)
+	assert_float(P0Farm.REST_ZOOM).is_equal(0.8)
+	assert_float(farm._pinch.value).is_equal_approx(P0Farm.REST_ZOOM, 0.0001)
+	farm.free()
+
+func test_walking_eases_a_wide_opening_back_to_the_rest_zoom_and_a_pinch_stays() -> void:
+	var z := 0.53   # Lv8's 22 beds
+	for i in 120: z = P0Farm.ease_to_rest(z, 1.0 / 60.0)
+	assert_float(z).is_equal(P0Farm.REST_ZOOM)   # there in 2 s, not on to 1.0
+	assert_float(P0Farm.ease_to_rest(P0Farm.REST_ZOOM, 1.0)).is_equal(P0Farm.REST_ZOOM)
+	var farm = P0Farm.new()
+	farm._opening_zoom = true
+	farm.p0_zoom(0.9)
+	assert_bool(farm._opening_zoom).is_false()   # the player's zoom from here
+	farm.free()
+

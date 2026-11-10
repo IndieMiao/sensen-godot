@@ -59,9 +59,16 @@ var _strip_side := UiWorldNameBar.Dir.RIGHT   # the side the strip opens to: the
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _opening := false   # the opening shot waits for the HUD's area to keep the farmhouse mark clear of it (_fit_opening)
-var _zoom := 1.0
+## The farm's resting zoom (农场林地 A, 上官婉儿 on the woodland board, pending the user's pick): 0.8 — wide enough that the
+## woods round a small yard show. The opening starts here and zooms out only as far as its beds need (min(fit, 0.8):
+## Lv1's 8 beds open at it, more beds wider — Lv3 ~0.62, Lv8 ~0.53); walking eases back to it; a pinch is the player's
+## until they next come in.
+const REST_ZOOM := 0.8
+var _zoom := REST_ZOOM
+## A step of the walk back from a zoomed-out opening: toward REST_ZOOM at 1.5 a second, never past it.
+static func ease_to_rest(zoom: float, dt: float) -> float: return move_toward(zoom, REST_ZOOM, dt * 1.5)
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
-var _pinch = ElasticZoom.new(0.8, 1.4)   # rubber band past 0.8 / 1.4
+var _pinch = ElasticZoom.new(0.8, 1.4, REST_ZOOM)   # rubber band past 0.8 / 1.4; a first pinch picks up at the rest zoom
 var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _dev_yaw := -1.0
 var _hold_until := 0.0
@@ -410,7 +417,7 @@ func _fit_opening() -> void:
 
 const OPEN_SIDE_PX := 16.0
 const ISLAND_RECT := Rect2i(0, -3, 21, 23)   # the yard (WALK_RECT) and a cell's margin round it: the farthest the opening zooms out
-var _opening_zoom := false   # the opening zoomed out; walking eases the follow camera back to zoom 1
+var _opening_zoom := false   # the opening zoomed out; walking eases the follow camera back to REST_ZOOM
 
 ## Zoom out (never in) until every point fits `inner`, at most to the island and its margin, then centre them in it.
 func _frame_opening(points: Array[Vector3], inner: Rect2) -> void:
@@ -465,8 +472,8 @@ static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
 func _follow(dt: float) -> void:
 	_fit_opening()
 	if _opening_zoom and not _cam_follow.held:   # walking: back to the follow camera's own scale (SGODOT-355 b1)
-		_zoom = move_toward(_zoom, 1.0, dt * 1.5)
-		_opening_zoom = _zoom < 1.0
+		_zoom = ease_to_rest(_zoom, dt)
+		_opening_zoom = _zoom < REST_ZOOM
 	_step_actor_fade(dt)
 	if _top_left > 0.0:   # turning into / out of the top-down view
 		_top_left = maxf(0.0, _top_left - dt)
@@ -735,6 +742,7 @@ func p0_zoom(f: float, at := Vector2.INF) -> void:
 		if d != Vector3.ZERO: _focus = _yard_clamp(_focus + d)
 		return
 	_opening = false
+	_opening_zoom = false   # the player's own zoom from here, walking does not ease it back (上官婉儿, 农场林地 A)
 	_zoom_at = at
 	_pinch.pinch(f)
 	_cam_follow.hold()   # the pinched framing stays until the player walks (the safe box takes over then)
