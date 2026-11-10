@@ -99,14 +99,20 @@ static func boxes_under(root: Node, skip_roots: Array[Node] = []) -> Array[AABB]
 		out.append((g as Node3D).global_transform * (g as MeshInstance3D).mesh.get_aabb())
 	return out
 
+## Drawn as it enters the tree; off where the owner draws it itself once its pieces stand (the farm, on its first view:
+## each drawing is a GPU read-back, about 15.5 ms — 周瑜 on #967).
+var draw_on_ready := true
+
 func _ready() -> void:
-	if not enabled or DisplayServer.get_name() == "headless": return
+	if not enabled or DisplayServer.get_name() == "headless" or not draw_on_ready: return
 	_draw_mask.call_deferred()
 
 ## Another root of standing pieces: its pieces cast too, and a piece added there draws the mask again (once a frame).
 func watch(root: Node) -> void:
 	more_roots.append(root)
 	root.child_entered_tree.connect(func(_n: Node): redraw(), CONNECT_DEFERRED)
+	# a root whose pieces turn in place (the pond's gathering points: gathered looks, C67) says so: drawn again once
+	if root.has_signal("looks_changed"): root.connect("looks_changed", redraw, CONNECT_DEFERRED)
 	redraw()
 
 func redraw() -> void:
