@@ -113,14 +113,15 @@ export function gatherView(c: P0Content, s: P0State, now: number) {
 }
 
 /** pond (SGODOT-409): the pond the player is in — its shape and its points: where they stand (pond scene metres), what
- * they give, how long until ready (0: now) — or null out of a pond; the client draws them from this alone.
+ * they give, how long until ready (0: now) and the whole cooldown (cooldown_h, hours: how far a point has grown back,
+ * 不知火舞's gather-compact spec v1, 亚瑟) — or null out of a pond; the client draws them from this alone.
  * ponds: every pond of the home city and of the city the player is in, in or out of one: its name and its points' id,
  * kind and ready_in (亚瑟's map and Today: the source line's nearest ready pond, its pin's Show, the pond card's kinds). */
 function pondView(c: P0Content, s: P0State, now: number) {
   const ready = (id: string) => Math.max(0, (s.gather.ready_at[id] ?? 0) - now);
   const here = s.presence.place, inPond = here ? pondPoints(c, here) : [];
   const pond = here && inPond.length ? { pond: here, shape: pondShape(c, here), points: inPond.map(p => ({ id: p.id, slot: p.slot, kind: p.kind,
-    name: p.name, yield: p.yield, energy: p.energy, x: p.x, z: p.z, stand: p.stand, ready_in: ready(p.id) })) } : null;
+    name: p.name, yield: p.yield, energy: p.energy, x: p.x, z: p.z, stand: p.stand, ready_in: ready(p.id), cooldown_h: p.cooldown_h })) } : null;
   const ponds: Record<string, { name: string; cluster: string; points: { id: string; kind: string; ready_in: number }[] }> = {};
   for (const cluster of new Set([s.travel.home, s.travel.here])) {
     for (const [id, pts] of cityPondPoints(c, cluster)) {
