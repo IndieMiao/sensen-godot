@@ -12,8 +12,10 @@ func _entries() -> Array:
 func _cells_payload(cells: Dictionary) -> Dictionary:
 	return {"version": 2, "catalog_revision": SystemPonds.revision(), "available": true, "cell_deg": 0.5, "cells": cells}
 
+## A server-only pond under an id no bundled or P0 pond has: SystemPonds keeps what it accepts for the run, and a fake
+## pond_san_francisco_01 here took the real one's place in the suites after it (周瑜 on #929).
 func _server_only(overrides := {}) -> Dictionary:
-	var row := {"id": "pond_san_francisco_01", "region_id": "gn-5391959", "name": "Willow Pond", "kind": "pond",
+	var row := {"id": "pond_testville_01", "region_id": "gn-5391959", "name": "Willow Pond", "kind": "pond",
 		"category": "Fishing pond", "lat": 37.7695, "lng": -122.4863, "template_id": "gourd", "decoration_seed": 12345,
 		"layout_revision": 1, "generation_version": 1, "enabled": true}
 	row.merge(overrides, true)
@@ -62,7 +64,7 @@ func test_tampered_or_unhostable_records_are_rejected() -> void:
 		assert_bool(SystemPonds.location(id).is_empty()).is_true()
 
 func test_party_ticket_carries_a_server_only_pond() -> void:
-	var sf := _server_only({"id": "pond_san_francisco_04", "template_id": "crescent"})
+	var sf := _server_only({"id": "pond_testville_02", "template_id": "crescent"})
 	var args := PartyTravel.scene_args({"kind": "pond", "ticket": "t", "farm_id": sf.id, "channel": 2,
 		"pond_id": sf.id, "catalog_revision": SystemPonds.revision(), "pond": sf}, null)
 	assert_str(str(args.get("pond_id", ""))).is_equal(sf.id)

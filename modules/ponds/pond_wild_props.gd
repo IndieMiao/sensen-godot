@@ -174,6 +174,7 @@ static func build(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arra
 	for t in l.get("wild_cattail_water", []):
 		reeds.append(Vector3(t.origin.x, t.origin.z, PondWildGround.footprint("wild_cattail_water") * 0.7 * t.basis.get_scale().x))
 	root.set_meta("reeds", reeds)
+	root.set_meta("layout", l)   # what stands where, for the insects that fly round it (PondInsects, SGODOT-454)
 	for asset in l:
 		if not ResourceLoader.exists(Art.ROOT + asset + ".glb"): continue   # #799's pieces not in this build yet
 		var batch := Art.batch(asset, l[asset], asset.begins_with("wild_pz_") or asset.begins_with("wild_tree") or asset.begins_with("wild_bush"))

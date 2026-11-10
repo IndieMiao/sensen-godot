@@ -36,6 +36,7 @@ const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
 const PondWalk := preload("res://modules/ponds/pond_walk.gd")
 const PondWildGroundBake := preload("res://modules/ponds/pond_wild_ground_bake.gd")   # the wild's baked ground (#917)
 const PondGather := preload("res://scenes/p0/p0_pond_gather.gd")   # the pond's gathering points (SGODOT-410)
+const PondInsects := preload("res://modules/ponds/pond_insects.gd")   # the wild's insects (SGODOT-454)
 var gather: Node3D       # PondGather: the pieces, their name bar and the Gather key
 var _gather_tag := ""    # the point whose name bar is up
 var _gather_marked := "" # the point the guide's `!` is on
@@ -306,6 +307,11 @@ func _build_scenery(clear: Array) -> void:
 	_scenery_clear = clear
 	_scenery_keys = _opening_keys()
 	_scenery = PondScenery.build(entry, clear, _scenery_keys)
+	if bp and PondInsects.wanted():   # SGODOT-454: the bees, butterflies and dragonflies, with the scenery they fly round
+		var spawn := bp.cell_to_world(bp.anchor("spawn"))
+		var opening := insects_opening(spawn, _water_at(), _nearest_piece_to(spawn), clear)
+		_scenery.add_child(PondInsects.build(entry, site_spec, _scenery, clear, spawn, opening,
+			RenderingServer.get_current_rendering_method() == "gl_compatibility"))
 	if grid: _trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(clear, _scenery_keys), _trees, actor.position if actor else Vector3.INF)   # the trees that stand now
 	add_child(_scenery)
 	move_child(_scenery, cam.get_index() + 1)
@@ -557,13 +563,43 @@ func _opening_keys() -> Callable:
 	return opening_keys(bp.cell_to_world(bp.anchor("spawn")), _water_at(), _nearest_piece_to(bp.cell_to_world(bp.anchor("spawn"))))
 
 static func opening_keys(spawn: Vector3, water: Vector3, piece: Vector3) -> Callable:
+	var screen := opening_screen(spawn, water, piece)
+	return func(corners: PackedVector3Array) -> bool:
+		var r: Rect2 = screen.call(corners)
+		return REF_KEYS.any(func(k): return r.intersects(k))
+
+## (corners: PackedVector3Array) -> Rect2: the box points in the world make on that opening screen.
+static func opening_screen(spawn: Vector3, water: Vector3, piece: Vector3) -> Callable:
 	var size := view_size(REF_VIEW, 1.0)
 	var focus := clamp_focus(opening_focus(spawn, size, REF_VIEW, REF_BAND, water, piece), size, REF_VIEW, REF_BAND,
 		PondScenery.MEADOW, spawn, REF_COLUMN)
-	return func(corners: PackedVector3Array) -> bool:
+	return func(corners: PackedVector3Array) -> Rect2:
 		var r := Rect2(project(corners[0], focus, size, REF_VIEW), Vector2.ZERO)
 		for c in corners: r = r.expand(project(c, focus, size, REF_VIEW))
-		return REF_KEYS.any(func(k): return r.intersects(k))
+		return r
+
+## The wild's insects on that opening screen (SGODOT-454, PondInsects.layout's `opening`): their flights keep off the
+## action keys, the player at the spawn (feet to HEAD_M, PLAYER_HALF_M a side), the gathering points' pieces, and the
+## name bar the nearest one (`piece`) opens there (UiWorldNameBar, 32 px tall, its strip out to either side of its icon
+## at _gather_screen's height, a point's or a tree's) and the quick bar (P0Ui: its top at 708). `shown`: the world on that
+## screen between the HUD's rows and the quick bar, the lower grass too (不知火舞 on #929: some near the player there).
+const NAME_BAR_REACH := Vector2(150, 16)
+const REF_QUICK_BAR := Rect2(0, 708, 360, 92)
+const REF_SHOWN := Rect2(0, 98, 360, 610)
+static func insects_opening(spawn: Vector3, water: Vector3, piece: Vector3, clear: Array) -> Dictionary:
+	var screen := opening_screen(spawn, water, piece)
+	var upright := func(at: Vector3, half: float, tall: float) -> PackedVector3Array:
+		var out := PackedVector3Array()
+		for k in 8: out.append(at + Vector3(half if k & 1 else -half, tall if k & 2 else 0.0, half if k & 4 else -half))
+		return out
+	var keep_off: Array = REF_KEYS + [REF_QUICK_BAR]
+	keep_off.append(screen.call(upright.call(spawn, PLAYER_HALF_M, HEAD_M)))
+	for c in clear: keep_off.append(screen.call(upright.call(c, 0.5, 1.2)))
+	if piece.is_finite():
+		for tall in [1.0, 2.2]:
+			var icon: Vector2 = (screen.call(PackedVector3Array([piece + Vector3(0, tall, 0)])) as Rect2).position
+			keep_off.append(Rect2(icon - NAME_BAR_REACH, NAME_BAR_REACH * 2.0))
+	return {"screen": screen, "keep_off": keep_off, "shown": REF_SHOWN}
 
 ## The action group's column on the screen (P0Ui.key_column), empty without the UI or with it hidden.
 func _key_column() -> Rect2:
