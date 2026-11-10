@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_ROOMS, OutpostRooms, REJOIN_MS, type OutpostSpec } from '../../src/p0/online/rooms.js';
+import { MAX_ROOMS, OutpostRooms, REJOIN_MS, SEAT_REACH_M, SIT_SETTLE_MS, type OutpostSpec } from '../../src/p0/online/rooms.js';
 
 const TEA: OutpostSpec = { id: 'outpost_tea_1', role: 'tea', capacity: 12, bounds: [0, 10, -10, 0], seats: ['seat_table1_1', 'seat_table1_2'] };
 const MARKET: OutpostSpec = { id: 'outpost_market_1', role: 'market', capacity: 30, bounds: [0, 20, -20, 0], seats: [] };
@@ -81,12 +81,50 @@ describe('P0 outpost rooms (SGODOT-227)', () => {
     expect(r.sit('b', 'seat_table1_1')).toBe('SEAT_TAKEN');
     expect(r.sit('b', 'seat_nowhere')).toBe('NO_SEAT');
     expect(r.occupant('a')).toMatchObject({ seat: 'seat_table1_1', action: 'sit' });
-    clock.t += 1000;
+    clock.t += SIT_SETTLE_MS + 100;   // settled on it (SGODOT-478)
     r.move('a', 3, -1, 0, 'run');
     expect(r.occupant('a')!.seat).toBe('');
     expect(r.sit('b', 'seat_table1_1')).toBe('ok');
     r.leave('b');
     expect(r.sit('a', 'seat_table1_1')).toBe('ok');
+  });
+
+  // SGODOT-478 (the user 11-11: sitting did not show in the church, nor anywhere): every sit stood up one input later,
+  // the glide onto the seat (0.3 s, a pew's 1.9 m) reported as walking away. A sit puts the player on its spot at once
+  // (within SEAT_REACH_M) and the inputs of the next SIT_SETTLE_MS leave it there.
+  it('a sit puts the player on the seat at once, and the glide onto it does not stand them up', () => {
+    const { r, clock } = rooms();
+    r.join('a', TEA.id, [1, -1]);
+    expect(r.sitAt('a', 'seat_table1_1', [2.9, -1])).toBe('ok');   // a pew's 1.9 m: past walking speed at dt 0
+    expect(r.occupant('a')).toMatchObject({ x: 2.9, z: -1, seat: 'seat_table1_1', action: 'sit' });
+    for (const x of [1.2, 1.6, 2.1, 2.6, 2.9]) {   // the glide, a frame every 0.1 s from the aisle end
+      clock.t += 100;
+      r.move('a', x, -1, 0.5, 'idle');
+      expect(r.occupant('a')).toMatchObject({ x: 2.9, seat: 'seat_table1_1', action: 'sit', yaw: 0.5 });
+    }
+    clock.t += SIT_SETTLE_MS;
+    r.move('a', 2.9, -1, 0.5, 'idle');   // settled where it sat
+    expect(r.occupant('a')!.seat).toBe('seat_table1_1');
+    clock.t += 100;
+    r.move('a', 3.5, -1, 0.5, 'walk');   // then walking off stands up, as ever
+    expect(r.occupant('a')).toMatchObject({ seat: '', action: 'walk' });
+  });
+
+  it('a seat further than SEAT_REACH_M is refused and nobody moves; one player per seat as before', () => {
+    const { r } = rooms();
+    r.join('a', TEA.id, [1, -1]);
+    r.join('b', TEA.id, [1, -2]);
+    expect(r.sitAt('a', 'seat_table1_1', [1 + SEAT_REACH_M + 0.5, -1])).toBe('TOO_FAR');
+    expect(r.occupant('a')).toMatchObject({ x: 1, z: -1, seat: '' });
+    expect(r.sitAt('a', 'seat_table1_1', [1 + SEAT_REACH_M - 0.5, -1])).toBe('ok');
+    expect(r.sitAt('b', 'seat_table1_1', [1 + SEAT_REACH_M - 0.5, -1])).toBe('SEAT_TAKEN');
+    expect(r.sitAt('b', 'seat_nowhere', [2, -2])).toBe('NO_SEAT');
+    expect(r.occupant('b')).toMatchObject({ x: 1, z: -2, seat: '' });
+    expect(r.sitAt('b', 'seat_table1_2', [99, -2])).toBe('TOO_FAR');   // clamped to the wall (10, -2) first: still 9 m
+    r.stand('a');
+    expect(r.occupant('a')!.seat).toBe('');
+    r.move('a', 3, -1, 0, 'walk');   // standing up ends the settle at once: its inputs are its own
+    expect(r.occupant('a')!.x).not.toBeCloseTo(1 + SEAT_REACH_M - 0.5);
   });
 
   it('member ids are small and reused within an instance', () => {

@@ -175,6 +175,36 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     expect(rooms.occupant('player-aaaa')!.z).toBeCloseTo(0.62);
   });
 
+  // SGODOT-478: the sitter's glide onto the seat (its inputs from the aisle end) no longer stands it up for the others —
+  // they see the seat taken and the sit action throughout, and a late joiner finds it seated.
+  it('the others see a player sit and stay seated through the glide onto the seat; a late joiner sees it seated', async () => {
+    const { port, rooms } = await server();
+    const a = await connect(port, 'player-aaaa');
+    const b = await connect(port, 'player-bbbb');
+    const { epoch } = await join(a, 'sf_church_1', [0.2, 2.1]);
+    await join(b, 'sf_church_1', [0.5, 3.2]);
+    await new Promise(r => setTimeout(r, 100));
+    send(a, { t: 'act', seq: 1, epoch, action: 'sit', node: 'seat_left_3', at: [-1.7, 1.93] });   // about 1.9 m along the pew
+    expect(await until(msg(a, 'result'))).toMatchObject({ ok: true });
+    expect(await until(msg(b, 'seat'))).toEqual({ t: 'seat', id: 1, seat: 'seat_left_3' });
+    expect(rooms.occupant('player-aaaa')!.x).toBeCloseTo(-1.7);   // on the pew's middle at once, not at walking speed
+    let seq = 0;
+    for (const x of [-0.1, -0.5, -1.0, -1.4, -1.7]) {
+      send(a, { t: 'input', seq: ++seq, epoch, x, z: 1.95, yaw: -1.57, action: 'idle' });
+      await new Promise(r => setTimeout(r, 100));
+    }
+    await until(() => rooms.occupant('player-aaaa')!.seq === seq);
+    expect(b.json.filter(m => m.t === 'seat')).toEqual([{ t: 'seat', id: 1, seat: 'seat_left_3' }]);   // never stood up
+    expect(rooms.occupant('player-aaaa')).toMatchObject({ seat: 'seat_left_3', action: 'sit' });
+    const frame = await until(() => b.frames.map(decode).find(f => f.members.some(m => m.id === 1 && m.seq === seq)));
+    expect(frame.members.find(m => m.id === 1)).toMatchObject({ action: 'sit' });
+    expect(frame.members.find(m => m.id === 1)!.x).toBeCloseTo(-1.7);   // drawn on the seat, not along the glide
+    const c = await connect(port, 'player-cccc');
+    await join(c, 'sf_church_1');
+    const roster = await until(msg(c, 'roster'));
+    expect(roster.members.find((m: { id: number }) => m.id === 1)).toMatchObject({ seat: 'seat_left_3' });
+  });
+
   it('a dropped connection that comes back within a minute returns to its room, flagged rejoined', async () => {
     const { port, rooms } = await server();
     const clients = await Promise.all(Array.from({ length: 13 }, (_, i) => connect(port, `player-${String(i).padStart(4, '0')}`)));

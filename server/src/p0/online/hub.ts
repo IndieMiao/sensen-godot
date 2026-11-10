@@ -192,12 +192,11 @@ export class P0OnlineHub {
     let code: string = 'ok';
     if (b.action === 'stand') this.deps.rooms.stand(c.player);
     else {
-      // Check the seat first; only then step onto it (the move from the stand point onto the chair is not
-      // "walking away"), so a refused sit never moves the player.
-      code = this.deps.rooms.canSit(c.player, node);
-      if (code === 'ok' && Array.isArray(b.at) && b.at.length === 2 && b.at.every(v => typeof v === 'number' && Number.isFinite(v)))
-        this.deps.rooms.move(c.player, Number(b.at[0]), Number(b.at[1]), me.yaw, 'idle');
-      if (code === 'ok') code = this.deps.rooms.sit(c.player, node);
+      // The seat checked first, then the player put on its spot at once (SGODOT-478: not at walking speed, so the
+      // glide onto it that follows is not "walking away"); a refused sit never moves the player.
+      const at = Array.isArray(b.at) && b.at.length === 2 && b.at.every(v => typeof v === 'number' && Number.isFinite(v))
+        ? [Number(b.at[0]), Number(b.at[1])] as [number, number] : undefined;
+      code = this.deps.rooms.sitAt(c.player, node, at);
     }
     this.send(c, { t: 'result', seq: b.seq, ok: code === 'ok', code: code === 'ok' ? '' : code });
     if (me.seat !== before) this.seat(me);
