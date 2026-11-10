@@ -222,13 +222,15 @@ func test_the_dressing_on_the_wings_cells_hides_with_the_wing() -> void:
 	for s in scenery.split:
 		if not (s[2] as Array).is_empty(): drawn.append((s[2] as Array).size())
 	# a fact of its own, not _split's test again (周瑜 on #928): the bush left of the house, 1.75 m west and 0.9 m back of
-	# its anchor, stands on (6, 17) and goes with the wing; the yard's other three bushes stay
+	# its anchor, stands on (6, 17) and goes with the wing; the yard's other three bushes stay — two here, the one on Lv14's
+	# field edge (19, 2) drawn apart, gone from that level (yard v2, v4q(12) ④)
 	var bush: Array = scenery.split.filter(func(s): return s[0] == "bush")
 	assert_int(bush.size()).is_equal(1)
 	var by_house: Vector3 = bp.cell_to_world(bp.anchor("house")) + Vector3(-1.75, 0, -0.9)
 	assert_object(bp.world_to_cell(by_house)).is_equal(Vector2i(6, 17))
 	assert_array((bush[0][2] as Array).map(func(xf): return (xf as Transform3D).origin)).is_equal([by_house])
-	assert_int((bush[0][1] as Array).size()).is_equal(3)
+	assert_int((bush[0][1] as Array).size()).is_equal(2)
+	assert_int(scenery.dressing.filter(func(d): return int(d[1]) == 14).size()).is_equal(1)
 	# what the wing's node draws is those points: one batch for each layer with any, as many instances
 	assert_array(dress.get_children().map(func(mm): return (mm as MultiMeshInstance3D).multimesh.instance_count)).is_equal(drawn)
 	# with a renderer, the batches drawn straight onto the scenery (the hedges) keep off the cells too

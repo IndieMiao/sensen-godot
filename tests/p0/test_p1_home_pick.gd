@@ -247,7 +247,7 @@ func test_a_pending_save_and_the_feature_header() -> void:
 	assert_bool(P0Runtime.home_taken(false, {"home": {"pending": true}})).is_false()
 	assert_bool(P0Runtime.home_taken(false, {})).is_false()
 	var session := P0Session.new()
-	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home,guide_v3,locals,save_v7,wing8"])   # 0.2.14: the guide is open to new saves (341)
+	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home,guide_v3,locals,save_v7,wing8,yard2"])   # 0.2.14: the guide is open to new saves (341)
 	session.free()
 
 func _welcome_flow(near: Variant) -> Array:

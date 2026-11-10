@@ -42,6 +42,52 @@ var _wing_dress: Node3D
 
 static func wing_dress_cells() -> Array: return P0Decor.wing_cells() + [Vector2i(6, 17)]
 
+## Yard v2 (v4q(12) ③ ④): the grass and flowers of the strips a grown yard takes in — Lv13 behind the old back fence,
+## Lv14 past the old east one — drawn on their own and shown from that level (show_strips). They are the scatter's own
+## points, drawn as ever and once left out under the woods, so Lv1–12 look as they did.
+var _strips := {}   # Homestead level → Node3D
+## And the dressing on cells a grown yard takes (its shrub at (19, 2), on Lv14's field edge: no hedge on the new grass,
+## v4q(12) ④), drawn on its own and gone from that level.
+var _gives_way := {}   # Homestead level → Node3D
+## The dressing that stands on a cell (shrubs, stepping stones, the entrance sign): [point, the level it gives way at
+## (0: never)] — what Decorate must keep off (the test reads this, not the batches: headless they may not say where).
+var dressing: Array = []
+
+func show_strips(level: int) -> void:
+	for lv in _strips: (_strips[lv] as Node3D).visible = level >= int(lv)
+	for lv in _gives_way: (_gives_way[lv] as Node3D).visible = level < int(lv)
+
+## The level whose grown yard takes this cell (0: the Lv1 yard's, or none's).
+static func grown_at(c: Vector2i) -> int:
+	if P0Garden.WALK_RECT.has_point(c): return 0
+	for g in P0Decor.yard().get("grow", []):
+		var lv := int(g.get("homestead", 0))
+		if P0Garden.yard_at(lv).walk.has_point(c): return lv
+	return 0
+
+## Of a layer's transforms, those on cells a grown yard takes go to that level's give-way node; the rest come back.
+func _give_way(bp: FarmBlueprint, asset: String, xfs: Array) -> Array:
+	var kept: Array = []
+	var by := {}
+	for xf in xfs:
+		var lv := grown_at(bp.world_to_cell((xf as Transform3D).origin))
+		dressing.append([(xf as Transform3D).origin, lv])
+		if lv == 0: kept.append(xf)
+		else: (by.get_or_add(lv, []) as Array).append(xf)
+	for lv in by:
+		if not _gives_way.has(lv):
+			var n := Node3D.new()
+			n.name = "GivesWay%d" % int(lv)
+			add_child(n)
+			_gives_way[lv] = n
+		(_gives_way[lv] as Node3D).add_child(Art.batch(asset, by[lv]))
+	return kept
+
+## The fence ring of a level as a world xz rect.
+static func ring_rect(level: int) -> Rect2:
+	var r: Dictionary = P0Garden.yard_at(level).ring
+	return Rect2(float(r.west), float(r.back), float(r.east) - float(r.west), float(r.front) - float(r.back))
+
 ## The wing's model on its cells (P0Looks.wing_model_shown): its grass, flowers and bush not drawn; gone, back again.
 func show_wing(on: bool) -> void:
 	if _wing_dress and _wing_dress.visible == on: _wing_dress.visible = not on
@@ -87,16 +133,17 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		stones.append(_xf(Vector3(house.x - 0.05 + sin(i * 2.3) * 0.07, 0.011, field_rect.position.y - 0.25 - i * 0.26), 0.11 * sin(i), 1.0))
 	for i in 3:
 		stones.append(_xf(Vector3(spawn.x + sin(i * 1.7) * 0.06, 0.011, spawn.z - 0.15 - i * 0.27), 0.2 * i, 0.95))
-	add_child(Art.batch("stepping_stone", stones, false))
+	add_child(Art.batch("stepping_stone", _give_way(bp, "stepping_stone", stones), false))
 	# The trees round the yard: p0_farm_woods.gd (the pine woods, SGODOT-422 0.3.5), no tree line here.
 	# The fence depends on the Homestead level: p0_fence.gd (SGODOT-228).
 	# the entrance sign left of the way in, by the spawn: (7, −1) since the yard's front moved (q(172) A); Decorate's objects hold it
 	add_child(Art.instance("sign", Vector3(spawn.x - 1.35, 0, spawn.z + 0.25), 0.93))
+	dressing.append([Vector3(spawn.x - 1.35, 0, spawn.z + 0.25), 0])
 	var shrubs: Array = []
 	for p in [Vector3(house.x - 1.75, 0, house.z - 0.9), Vector3(house.x + 1.85, 0, house.z - 1.0), Vector3(12.2, 0, -6.3),
 		Vector3(12.7, 0, -1.4)]:
 		shrubs.append(_xf(p, p.x, 0.72))
-	_add_split(bp, "bush", shrubs)
+	_add_split(bp, "bush", _give_way(bp, "bush", shrubs))
 	# The yard's west edge and the west end of its front (SGODOT-371, 不知火舞 59ea8ecc): a loose hedge just outside the
 	# walk line (x 0.65 / z +1.3) and the Lv3+ ring (x 0.38), every level the same — it shows the edge, the walk rect stops you.
 	for layer in [["bush", true, WEST_HEDGE],
@@ -127,6 +174,9 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 910
 	var layers := {"grass_clump": [], "daisy": [], "pink_flower": [], "blue_flower": [], "rock": []}
+	var grown := {}   # yard v2: level → {asset: [xf]} for the points the old ring left under the woods
+	var rings: Array = []
+	for g in P0Decor.yard().get("grow", []): rings.append([int(g.get("homestead", 0)), ring_rect(int(g.get("homestead", 0)))])
 	var keep_clear := [Rect2(field_rect.position - Vector2(0.45, 0.45), field_rect.size + Vector2(0.9, 0.9)),
 		Rect2(Vector2(house.x - 0.6, field_rect.position.y - 1.8), Vector2(1.2, 1.9)),
 		Rect2(Vector2(spawn.x - 0.7, spawn.z - 1.4), Vector2(1.4, 2.2))]
@@ -152,10 +202,23 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		elif i % 13 == 0: asset = "blue_flower"
 		var xf := _xf(point, rng.randf_range(0, TAU), rng.randf_range(0.55, 1.05))
 		# the grass and flowers outside the fence ring are under the woods (p0_farm_woods.gd); the rocks stay: they block
-		if asset != "rock" and not Rect2(0.38, -12.35, 12.57, 13.75).has_point(flat): continue
+		if asset != "rock" and not Rect2(0.38, -12.35, 12.57, 13.75).has_point(flat):
+			for lr in rings:   # in a grown yard's strip: shown from its level
+				if not (lr[1] as Rect2).has_point(flat): continue
+				var at: Dictionary = grown.get_or_add(lr[0], {})
+				(at.get_or_add(asset, []) as Array).append(xf)
+				break
+			continue
 		layers[asset].append(xf)
 	for xf in layers.rock: rock_points.append((xf as Transform3D).origin)
 	for asset in layers: _add_split(bp, asset, layers[asset], asset == "rock")
+	for lv in grown:
+		var strip := Node3D.new()
+		strip.name = "YardStrip%d" % int(lv)
+		strip.visible = false
+		for asset in grown[lv]: strip.add_child(Art.batch(asset, grown[lv][asset], false))
+		add_child(strip)
+		_strips[lv] = strip
 	var flowers: Array = []
 	for i in 12:
 		flowers.append(_xf(house + Vector3(0.86 + sin(i * 2.4) * 0.22, 0.013, 0.48 + cos(i * 2.4) * 0.51), i, 0.64))

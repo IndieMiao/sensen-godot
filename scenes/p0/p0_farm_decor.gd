@@ -101,6 +101,9 @@ func _exit_tree() -> void:
 	if not placing.is_empty(): rt.ui.end_placement()
 
 # ---------------------------------------------------------------- the view → art and solid cells
+## The yard grew (yard v2, P0Farm._sync_yard): pieces on cells just opened to walking are made solid at the next frame.
+func walk_changed() -> void: _sig = 0
+
 func frame(v: Dictionary, dt := 0.0) -> void:
 	var list := P0Decor.placed(v)
 	var sig := list.hash()
@@ -407,7 +410,8 @@ func _start() -> void:
 
 ## The middle of the yard (the walk rect), where Decorate with nothing picked looks from.
 func yard_centre() -> Vector3:
-	var w: Array = P0Decor.yard().get("walk", [0, 0, 1, 1])
+	var r := P0Decor.walk_of(_view())
+	var w: Array = [r.position.x, r.position.y, r.size.x, r.size.y]
 	var a: Vector3 = farm.bp.cell_to_world(Vector2i(int(w[0]), int(w[1])))
 	var b: Vector3 = farm.bp.cell_to_world(Vector2i(int(w[0]) + int(w[2]) - 1, int(w[1]) + int(w[3]) - 1))
 	return (a + b) * 0.5
@@ -769,11 +773,12 @@ func _paint_idle(on: bool) -> void:
 	var sand: Array = []
 	var y := P0Decor.yard()
 	if on:
-		for r in y.get("paths", []):
+		for r in y.get("paths", []) + y.get("paths2", []):   # yard v2's three too (v4q(12) ②)
 			for dy in int(r[3]):
 				for dx in int(r[2]): sand.append([Vector2i(int(r[0]) + dx, int(r[1]) + dy), SAND])
 	if on or not placing.is_empty(): _squares(_sand, sand, false, 0.024)
-	var segs: Array = yard_dashes(farm.bp, y.get("walk", [0, 0, 0, 0])) if on else []
+	var walk := P0Decor.walk_of(_view())
+	var segs: Array = yard_dashes(farm.bp, [walk.position.x, walk.position.y, walk.size.x, walk.size.y]) if on else []
 	while _dashes.size() < segs.size():
 		var q := _quad(Vector2.ONE)
 		farm.add_child(q)

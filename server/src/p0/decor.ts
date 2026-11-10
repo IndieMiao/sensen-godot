@@ -19,8 +19,9 @@ type Rect = [number, number, number, number];
  * clear for a client that says `yard2` (yard v2, v4q(12): the way to the rest bench past the porch, and to the mailbox —
  * a yard full of decor walled both off, 后裔's walk check 11-10). */
 export interface DecorYard { walk: Rect; field: Rect[]; objects: Rect[]; paths: Rect[]; wing?: DecorWing; paths2?: Rect[]; grow?: DecorGrow[] }
-/** yard2 (v4q(12) ③ ④): the walk rect from a Homestead level on — Lv13 row 19, Lv14 columns 19–20. */
-export interface DecorGrow { homestead: number; walk: Rect }
+/** yard2 (v4q(12) ③ ④): the walk rect from a Homestead level on — Lv13 row 19, Lv14 columns 19–20; fence: the ring's
+ * stretches that move with it (metres, P0Garden.FENCE_RING's keys; the client's alone). */
+export interface DecorGrow { homestead: number; walk: Rect; fence?: Record<string, number> }
 /** What the client draws of the yard (x-p0-features): wing8 — Lv8's Kitchen Wing (q(303)); yard2 — yard v2 (v4q(12)).
  * An older client keeps the yard as it knows it. */
 export interface YardFeatures { wing8?: boolean; yard2?: boolean }

@@ -73,6 +73,10 @@ func _exit_tree() -> void:
 	if not placing.is_empty(): rt.ui.end_placement()
 
 # ---------------------------------------------------------------- the view → art
+## The yard grew (yard v2, P0Farm._sync_yard): a yard facility on a cell just opened to walking is made solid at the
+## next frame.
+func walk_changed() -> void: _sig = ""
+
 func frame(v: Dictionary, dt := 0.0) -> void:
 	_edge_pan(v, dt)
 	var list: Array = v.get("facilities", [])
@@ -323,7 +327,8 @@ static func yard_reason(view: Dictionary, cell: Vector2i, moving := -1) -> Strin
 ## `span`: cells either side of `from` that count as its footprint (the workbench's three: 1). Beside it comes first,
 ## then in front; behind it last, where the 43° view would hide a low box behind the bench.
 static func nearest_yard_cell(view: Dictionary, from: Vector2i, moving := -1, span := 0) -> Vector2i:
-	var walk = P0Decor.yard().get("walk", [0, 0, 0, 0])
+	var r := P0Decor.walk_of(view)
+	var walk := [r.position.x, r.position.y, r.size.x, r.size.y]
 	var best := P0Decor.NONE
 	var best_d := INF
 	for y in range(int(walk[1]), int(walk[1]) + int(walk[3])):

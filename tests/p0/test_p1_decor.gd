@@ -110,17 +110,21 @@ func test_today_offers_a_free_row_while_decor_waits_in_storage() -> void:
 ## top of the yard too (后裔's walk check 11-10, v4q(12)): Lv12 with the porch and the Kitchen Wing standing (either look),
 ## the Notice Board and the Chef's Sign up; paths2 keeps the way to the bench past the porch's (7, 15) and to the mailbox.
 func test_a_yard_full_of_decor_walls_nothing_off() -> void:
-	for look in ["a", "b"]: _full_yard(look)
+	for look in ["a", "b"]:
+		for level in [12, 13, 14]: _full_yard(look, level)   # yard v2: Lv13's row 19, Lv14's columns 19–20 too (v4q(12) ③ ④)
 
-func _full_yard(look: String) -> void:
+func _full_yard(look: String, level: int) -> void:
 	var bp := P0Garden.blueprint()
+	var walk: Rect2i = P0Garden.yard_at(level).walk
+	for c in P0Farm.yard_cells_between(P0Garden.WALK_RECT, walk):   # as P0Farm._sync_yard opens it
+		P0Garden.set_walkable(bp, c, not P0Garden._in_footprint(c))
 	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))
 	P0Garden.block_points(bp, [P0Garden.sign_point(bp), P0Garden.mailbox_point(bp)])
 	var grid := BlueprintGrid.new(bp)
 	for asset in ["porch_" + look, "kitchen_wing_" + look]:   # P0Looks: the cells a look stands on
 		for c in P0Garden.look_cells(bp, asset): grid.set_solid(c, true)
 	for c in [P0Garden.NOTICE_BOARD_CELL, P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]: grid.set_solid(c, true)
-	var v := {"decor": {"placed": [], "cap": 999, "stored": {}}, "homestead": {"level": 12}}
+	var v := {"decor": {"placed": [], "cap": 999, "stored": {}}, "homestead": {"level": level}}
 	var n := 0
 	var o := bp.grid_origin   # rows from −2: the yard's front (q(172) A)
 	for y in range(o.y, o.y + bp.grid.y):
@@ -144,9 +148,12 @@ func _full_yard(look: String) -> void:
 	assert_bool(reach.call(cell.call(Vector2i(14, 14)), 0.1)).override_failure_message("the stall").is_true()
 	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.workbench), P0FarmMaterials.SPOT_REACH - 0.3)).override_failure_message("the workbench").is_true()
 	# the cell before the rest bench, where its finger card is the nearest (不知火舞 on #629): one walks onto it
-	assert_bool(reach.call(cell.call(Vector2i(6, 15)), 0.1)).override_failure_message("before the bench " + look).is_true()
+	assert_bool(reach.call(cell.call(Vector2i(6, 15)), 0.1)).override_failure_message("before the bench %s Lv%d" % [look, level]).is_true()
 	# the mailbox: a cell beside it, where its card is the nearest (the sign's is nearer from the door's row)
-	assert_bool(reach.call(cell.call(Vector2i(12, 15)), 0.1)).override_failure_message("beside the mailbox " + look).is_true()
+	assert_bool(reach.call(cell.call(Vector2i(12, 15)), 0.1)).override_failure_message("beside the mailbox %s Lv%d" % [look, level]).is_true()
+	# every bed, the east column (x 18) too with Lv14's columns 19–20 full (v4q(12) ④)
+	for id in P0Garden.max_plots():
+		assert_bool(reach.call(cell.call(P0Garden.cell_of(id)), 0.1)).override_failure_message("bed %d Lv%d" % [id, level]).is_true()
 	assert_str(P0Garden.pick_card([["sign", P0Garden.sign_point(bp), 2.6], ["mailbox", P0Garden.mailbox_point(bp), 2.6]],
 		cell.call(Vector2i(12, 15)), "")).is_equal("mailbox")
 
@@ -348,15 +355,11 @@ func test_the_garden_dressing_is_off_the_placeable_cells() -> void:
 	var scenery: Node3D = auto_free(load("res://scenes/p0/p0_garden_scenery.gd").new())
 	add_child(scenery)
 	scenery.build(bp, "cottage")
-	var walk: Array = _yard().walk
-	var yard := Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))
-	var free := func(c: Vector2i) -> bool: return yard.has_point(c) and not _in("field", c) and not _in("objects", c) and not _in("paths", c)
+	var yard: Rect2i = P0Garden.yard_at(14).walk   # the largest yard (v4q(12) ③ ④: Lv13 row 19, Lv14 columns 19–20)
+	var free := func(c: Vector2i) -> bool: return yard.has_point(c) and not _in("field", c) and not _in("objects", c) and not _in("paths", c) and not _in("paths2", c)
 	var points: Array = scenery.rock_points.duplicate()
-	for n in scenery.find_children("*", "", true, false):
-		if n is MultiMeshInstance3D and str(n.name) in ["Bush", "SteppingStone", "Tree0"]:
-			var mm: MultiMesh = n.multimesh
-			for i in mm.instance_count: points.append(mm.get_instance_transform(i).origin)
-		elif n is MeshInstance3D and n.name == "Sign": points.append(n.position)
+	# the shrubs, the stepping stones and the sign (scenery.dressing), but what gives way to a grown yard (v4q(12) ④)
+	for d in scenery.dressing: if int(d[1]) == 0: points.append(d[0])
 	assert_int(points.size()).is_greater(20)
 	var on: Array = points.map(func(p): return bp.world_to_cell(p)).filter(free)
 	assert_array(on).is_empty()

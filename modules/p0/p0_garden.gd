@@ -47,8 +47,10 @@ const FOOTPRINTS := {
 	"workbench": Rect2i(16, 16, 3, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints. The yard ends inside the Homestead fence
-## ring (FENCE_RING: its back stretch between rows 18 and 19, its east one in column 19), whatever the level — a wall
-## one sees is never walked through or on (q(145)); the same rect as Decorate's (decor.yard.walk).
+## ring (FENCE_RING: its back stretch between rows 18 and 19, its east one in column 19) — a wall one sees is never walked
+## through or on (q(145) ①); the same rect as Decorate's (decor.yard.walk). It is the yard up to Lv12: yard v2 grows it
+## at Lv13 and Lv14 (v4q(12) ③ ④, yard_at; P0Farm opens the new cells as the level comes). The scatter is laid out by this
+## one, so Lv1–12 look as they did.
 const WALK_RECT := Rect2i(1, -2, 18, 21)   # x 1–18, y −2–18 (q(172) A: from y 0 before)
 const CROP_CODES := {
 	"crop_radish": "R", "crop_lettuce": "L", "crop_carrot": "C", "crop_chamomile": "H",
@@ -135,6 +137,21 @@ static func blueprint() -> FarmBlueprint:
 const FENCE_SEG := 1.24              # fence.glb length (m)
 const FENCE_FRONT_ROW := 13          # the yard row between the field and the farmhouse
 const FENCE_RING := {"west": 0.38, "east": 12.95, "back": -12.35, "front": 1.4}   # front 0.1 → 1.4: two rows nearer (q(172) A)
+
+## The yard at a Homestead level (yard v2, v4q(12) ③ ④; content decor.yard.grow, the server's own): walk, where the
+## player walks and decor may stand; ring, the fence ring (FENCE_RING with the stretches grow's `fence` moves). Lv13: row
+## 19, the back fence to z −13.0; Lv14: columns 19–20, the east fence to x 13.65. Below Lv13 the content's walk and
+## FENCE_RING. The woods give way by the same numbers (盘古, P0Farm.yard_grown).
+static func yard_at(level: int) -> Dictionary:
+	var y: Dictionary = P0Logic.content().get("decor", {}).get("yard", {})
+	var w: Array = y.get("walk", [WALK_RECT.position.x, WALK_RECT.position.y, WALK_RECT.size.x, WALK_RECT.size.y])
+	var ring := FENCE_RING.duplicate()
+	for g in y.get("grow", []):
+		if level < int(g.get("homestead", 0)): continue
+		w = g.get("walk", w)
+		var f: Dictionary = g.get("fence", {})
+		for k in f: ring[k] = float(f[k])
+	return {"walk": Rect2i(int(w[0]), int(w[1]), int(w[2]), int(w[3])), "ring": ring}
 ## The farm's way out to the map (P0Farm.EXIT_AT; V4 review C7, 0.3.6): the ring's front stretch opens MAP_EXIT_GAP either
 ## side of it (上官婉儿 443 190fa019: the ring stands in the opening, no rail across it on screen; the end posts of
 ## fence.glb stand as its posts, as at the way in; the walk's edge is the yard's as before).
@@ -147,8 +164,8 @@ static func fence_front(bp: FarmBlueprint) -> Array:
 	return [{"pos": Vector3(door.x - 1.0 - FENCE_SEG * 0.5, 0, z), "yaw": 0.0, "stretch": 1.0},
 		{"pos": Vector3(door.x + 1.0 + FENCE_SEG * 0.5, 0, z), "yaw": 0.0, "stretch": 1.0}]
 
-static func fence_ring(bp: FarmBlueprint) -> Array:
-	var r := FENCE_RING
+static func fence_ring(bp: FarmBlueprint, level := 1) -> Array:
+	var r: Dictionary = yard_at(level).ring
 	var exit := bp.cell_to_world(ANCHORS.exit)
 	var out: Array = []
 	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.east, r.back), []))
@@ -388,12 +405,14 @@ static func pick_card(cands: Array, at: Vector3, current: String) -> String:
 
 ## Mark scenery rocks solid: each rock blocks the cell it stands in (trees already stand outside the yard).
 static func block_points(bp: FarmBlueprint, points: Array) -> void:
-	for p in points:
-		var c := bp.world_to_cell(p)
-		if not bp.in_bounds(c): continue
-		var r := c - bp.grid_origin
-		var row: String = bp.masks.walkable[r.y]
-		bp.masks.walkable[r.y] = row.substr(0, r.x) + "0" + row.substr(r.x + 1)
+	for p in points: set_walkable(bp, bp.world_to_cell(p), false)
+
+## One cell of the plan's walk mask (yard v2: the cells a grown yard opens, P0Farm._sync_yard).
+static func set_walkable(bp: FarmBlueprint, c: Vector2i, on: bool) -> void:
+	if not bp.in_bounds(c): return
+	var r := c - bp.grid_origin
+	var row: String = bp.masks.walkable[r.y]
+	bp.masks.walkable[r.y] = row.substr(0, r.x) + ("1" if on else "0") + row.substr(r.x + 1)
 
 ## True when a world point stands on a bed (the player steps up onto it): one of the beds the view has (哪吒 on #215:
 ## where a bed is still to open is plain ground, no step up); no view = any of the grid's.
