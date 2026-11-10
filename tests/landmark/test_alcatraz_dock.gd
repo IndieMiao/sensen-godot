@@ -73,6 +73,42 @@ func test_the_dock_still_leads_everywhere() -> void:
 	for at in Q311:
 		assert_bool(_on_nav(scene, at.x, at.y)).override_failure_message("q(311) place %s" % at).is_true()
 
+## The railed nook east of the dock's land end (x −20 … −18.25, z 10.75 … 12.5): its one way in was through planter_001,
+## so it is out of the navigation altogether, not an island of it (上官婉儿 on 474). A tap on it walks the player to the
+## nearest place they can reach, and they stop there: not in the nook, not in a prop, the walk ended.
+const NOOK := Rect2(-20.0, 10.75, 1.75, 1.75)
+
+func test_a_tap_on_the_closed_nook_stops_at_the_edge() -> void:
+	var scene := await _alcatraz()
+	var x := NOOK.position.x + 0.1
+	while x < NOOK.end.x:
+		var z := NOOK.position.y + 0.1
+		while z < NOOK.end.y:
+			assert_bool(_on_nav(scene, x, z)).override_failure_message("nook walkable at %s" % Vector2(x, z)).is_false()
+			z += 0.25
+		x += 0.25
+	scene._player.position = NavigationServer3D.map_get_closest_point(scene._nav_map, Vector3(-20.6, 1, 13.6))
+	scene._focus = scene._follow_target()
+	scene._update_camera()
+	var cam: Camera3D = scene._camera
+	var at := cam.unproject_position(Vector3(NOOK.get_center().x, 1, NOOK.get_center().y))
+	assert_bool(Rect2(Vector2.ZERO, Vector2(360, 800)).has_point(at)).override_failure_message("nook off screen at %s" % at).is_true()
+	scene.walk_to_screen(at)
+	assert_bool(scene.walking()).is_true()
+	var goal: Vector3 = scene._path[-1]
+	for frame in 300:   # 10 s at 30 fps
+		scene._step_walk(1.0 / 30.0)
+		if not scene.walking(): break
+	var stood: Vector3 = scene.player_position()
+	print("ALC nook tap ", at, " goal ", goal, " stood ", stood)
+	assert_bool(scene.walking()).override_failure_message("still walking at %s" % stood).is_false()
+	assert_float(stood.distance_to(goal)).is_less(0.01)
+	assert_bool(NOOK.has_point(Vector2(stood.x, stood.z))).is_false()
+	assert_float(NavigationServer3D.map_get_closest_point(scene._nav_map, stood).distance_to(stood)).is_less(0.01)   # on the terrace's slope
+	var solids: Array = PROPS.map(func(n): return _footprint(scene, n))
+	for r in solids + [SHELTER_SOLID]:
+		assert_bool((r as Rect2).has_point(Vector2(stood.x, stood.z))).override_failure_message("in %s" % r).is_false()
+
 ## The stick pushed at the crates, then at the bollard and the shelter from the walkway: the player stops short of each.
 func test_the_stick_stops_at_the_props() -> void:
 	var scene := await _alcatraz()
