@@ -542,7 +542,9 @@ func _rebuild_floor() -> void:
 		_add_target("elevator", L10n.format_text("Elevator to floor %d", 5 if number == 1 else 1) if unlocked else L10n.text("Clear floor 5 to unlock the elevator"), "", Layout.ELEVATOR + Vector3(0, 1.75, 0), Layout.ELEVATOR, scenery.get_node("MineElevator"))
 	_sync_markers()
 
-func _add_target(id: String, caption: String, icon: String, world: Vector3, body: Vector3, model: MeshInstance3D = null) -> void:
+## `model`: what a tap picks the target by — a mesh, or a shell of them (the 355 kit's elevator station is a Node3D with
+## its glb, plate and lamp under it; SGODOT-459).
+func _add_target(id: String, caption: String, icon: String, world: Vector3, body: Vector3, model: Node3D = null) -> void:
 	var button := GameUi.button(icon, "", caption)
 	button.name = "Target_" + id
 	button.size = Vector2(44, 44)
@@ -563,9 +565,23 @@ func _sync_markers() -> void:
 		button.visible = target.marker_visible and not cam.is_position_behind(target.world) and area.encloses(Rect2(point - Vector2(22, 22), Vector2(44, 44)))
 		button.disabled = busy or not _dig_target.is_empty()
 
-func _project_model_rect(model: MeshInstance3D) -> Rect2:
+## A target model's box in its own space: a mesh's own, or a shell's drawn parts' boxes merged (geometry only: a light
+## under the shell would stretch it; 周瑜 on #931); empty with none.
+static func _model_box(model: Node3D) -> AABB:
+	if model is GeometryInstance3D: return (model as GeometryInstance3D).get_aabb()
+	var box := AABB()
+	var found := false
+	var to_model := model.global_transform.affine_inverse()
+	for child in model.find_children("*", "GeometryInstance3D", true, false):
+		var part := to_model * (child as GeometryInstance3D).global_transform * (child as GeometryInstance3D).get_aabb()
+		box = part if not found else box.merge(part)
+		found = true
+	return box
+
+func _project_model_rect(model: Node3D) -> Rect2:
 	if not is_instance_valid(model) or not model.is_visible_in_tree(): return Rect2()
-	var bounds := model.get_aabb()
+	var bounds := _model_box(model)
+	if bounds.size == Vector3.ZERO: return Rect2()   # none; a flat mesh still has a box to tap
 	var rect := Rect2()
 	for corner in 8:
 		var world := model.global_transform * bounds.get_endpoint(corner)
@@ -574,7 +590,7 @@ func _project_model_rect(model: MeshInstance3D) -> Rect2:
 		rect = Rect2(point, Vector2.ZERO) if corner == 0 else rect.expand(point)
 	return rect
 
-func _model_pick_rect(model: MeshInstance3D) -> Rect2:
+func _model_pick_rect(model: Node3D) -> Rect2:
 	var rect := _project_model_rect(model)
 	if not rect.has_area(): return rect
 	# Keep small models comfortable to tap without letting padding hide a nearer model.
@@ -595,10 +611,10 @@ func _pick_target(point: Vector2) -> String:
 		if button.disabled: continue
 		var candidate: Variant = target.model
 		if not is_instance_valid(candidate): continue
-		var model := candidate as MeshInstance3D
+		var model := candidate as Node3D
 		if not _model_pick_rect(model).has_point(point): continue
 		var inverse := model.global_transform.affine_inverse()
-		var hit: Variant = model.get_aabb().intersects_ray(inverse * origin, (inverse.basis * direction).normalized())
+		var hit: Variant = _model_box(model).intersects_ray(inverse * origin, (inverse.basis * direction).normalized())
 		if hit is Vector3:
 			var distance := origin.distance_squared_to(model.global_transform * hit)
 			if distance < nearest:
