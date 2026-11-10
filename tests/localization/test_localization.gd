@@ -853,6 +853,8 @@ func test_p0_ordinals_and_the_unlock_rows_read_in_chinese() -> void:
 	assert_str(zh.call("No XP · %s today" % P0KitchenLogic.ordinal(3))).is_equal("无经验 · 今日第 3 次")
 	assert_str(zh.call("No XP · %s today" % P0KitchenLogic.ordinal(1))).is_equal("无经验 · 今日第 1 次")
 	assert_str(zh.call(P0KitchenLogic.ordinal(2))).is_equal("第 2")   # Cooks today's fact
+	assert_str(zh.call("No XP · %s today" % P0KitchenLogic.ordinal(4))).is_equal("无经验 · 今日第 4 次")   # %dth on (李白)
+	assert_str(zh.call(P0KitchenLogic.ordinal(4))).is_equal("第 4")
 	var want := {"2nd Greenhouse": "第 2 个温室", "2nd Fish Trap": "第 2 个鱼笼", "3rd Fish Trap": "第 3 个鱼笼"}
 	var rows: Array = []
 	for skill in ["farming", "fishing"]:
