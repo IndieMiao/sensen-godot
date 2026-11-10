@@ -339,15 +339,21 @@ func _apply_foam() -> void:
 
 func _gather_marks(v: Dictionary, near: Dictionary, dt := 0.0) -> void:
 	var id := str(near.get("id", "")) if not near.is_empty() and PondGather.flat(PondGather.stand_of(near), actor.position) <= PondGather.TAG_M else ""
-	if _gather_tag != "" and _gather_tag != id: rt.ui.name_bar("gather:" + _gather_tag, null, "", "", Vector2.ZERO, false)
+	if _gather_tag != "" and _gather_tag != id:
+		rt.ui.name_bar("gather:" + _gather_tag, null, "", "", Vector2.ZERO, false)
+		rt.ui.world_icon("gather:" + _gather_tag, null, Vector2.ZERO, false)
 	if _gather_tag != id: _tag_clear.reset()
 	_gather_tag = id
 	if id != "":
-		var t := PondGather.tag(v, near)
-		# the one strip up kept clear of the player (SGODOT-473: a cooling point's `Ready in 3h 12m` grows over the head)
+		# SGODOT-475: its icon button (cooling: the part grown back), opening to its name only when the player stands at it
+		# and it is ready; kept clear of the player either way (SGODOT-473)
+		var m := PondGather.mark(v, near, actor.position)
+		var card := "gather:" + id
 		var at := _gather_screen(near)
-		at.y += _tag_clear.step(dt, rt.ui.name_bar_rect("gather:" + id), at.y, func(): return actor.screen_box(cam))
-		rt.ui.name_bar("gather:" + id, P0Logic.icon(str(t.icon)), str(t.text), str(t.fact), at, true, -1, bool(t.dimmed))
+		var shown := rt.ui.name_bar_rect(card) if bool(m.open) else rt.ui.world_icon_rect(card)
+		at.y += _tag_clear.step(dt, shown, at.y, func(): return actor.screen_box(cam))
+		if bool(m.open): rt.ui.name_bar(card, P0Logic.icon(str(m.icon)), str(m.text), "", at, true)
+		else: rt.ui.world_icon(card, P0Logic.icon(str(m.icon)), at, true, false, -1, Vector2.INF, "", float(m.progress))
 	var target = v.get("guide", {}).get("target", null) if v.get("guide") is Dictionary else null
 	var marked := str(target.get("spot", "")) if target is Dictionary and str(target.get("kind", "")) == "gather" else ""
 	if gather.point(marked).is_empty(): marked = ""

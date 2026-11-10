@@ -1016,10 +1016,12 @@ func fab_state() -> Dictionary: return _fab_state
 # ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
 ## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
 ## coordinates, like tag()). `near` grows a seat 1.1× with a primary edge; `status` (a UiStatusBadge.State, -1 none)
-## turns the whole button into the StatusBadge; `count` hangs its small count tag ("" none). A tap on it is a tap on
+## turns the whole button into the StatusBadge; `count` hangs its small count tag ("" none); `progress` (0..1, -1 none)
+## draws it cooling (SGODOT-475). A tap on it is a tap on
 ## `hit` (default `screen`), with tapped_card = id. Call it every frame for each shown facility that is not the open one; it folds that facility's name strip if
 ## it was open. Hidden under a card or drawer, and outside the band between the HUD and the quick bar.
-func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF, count := "") -> void:
+func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF, count := "",
+		progress := -1.0) -> void:
 	var b: UiWorldIconButton = _icons.get(id)
 	if b == null:
 		b = UiWorldIconButton.new()
@@ -1036,6 +1038,7 @@ func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near :
 	b.near = near
 	b.status = status
 	b.count = count
+	b.progress = progress   # a pond's gathering point cooling (SGODOT-475), -1 none
 	b.place_at(screen)
 	_keep_off_sides(b, b.drawn_rect())
 	# Over the action group: lifted KEY_CLEAR_PX over its top as a strip is (不知火舞 on 441, LOCK-07 38239b9a: the farm's
@@ -1104,6 +1107,13 @@ func _raise_marker(m: Control) -> void:
 			if not m.get_meta("above_name_bars", false) and other.get_meta("above_name_bars", false): continue
 			if (other as Node).get_parent() == _kit: top = maxi(top, (other as Node).get_index())
 	if top > m.get_index(): _kit.move_child(m, top)
+
+## A shown icon button's drawn extent on screen (empty when it is hidden): for a world that keeps it off the player.
+func world_icon_rect(id: String) -> Rect2:
+	var b: UiWorldIconButton = _icons.get(id)
+	if b == null or not b.visible: return Rect2()
+	var drawn := b.drawn_rect()
+	return Rect2(b.position + drawn.position, drawn.size)
 
 ## An open name strip's full extent on screen (empty when it is not open): for a world that keeps it off the player.
 func name_bar_rect(id: String) -> Rect2:
