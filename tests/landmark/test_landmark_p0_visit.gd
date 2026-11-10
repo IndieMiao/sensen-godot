@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 ## q(295): Alcatraz and Griffith Observatory opened from the P0 map are P0 worlds that only walk (P0LandmarkVisit) —
 ## P0's HUD over them, no Journey chrome, the stick and taps walk, nothing sent; Alcatraz's taps reach the island
-## through its invisible boundary walls.
+## through its invisible boundary walls. SGODOT-462: each is an online room with voice, as a pond is.
 
 const P0LandmarkVisit := preload("res://modules/p0/p0_landmark_visit.gd")
 const ALCATRAZ := "res://scenes/landmark/alcatraz_island.tscn"
@@ -95,6 +95,46 @@ func test_what_blocks_the_way_stays_drawn_when_zoomed_out() -> void:
 	scene._update_camera()
 	for n in scene.batch_nodes:
 		if str(n.name) == "AlcFlowerbedBatch": assert_bool((n as Node3D).visible).is_true()
+
+## SGODOT-462 / q(307) (the user, 11-10: 「恶魔岛无法多人,无法语音」): the landmark is an online room, `landmark:<id>`, as a
+## pond is — the others drawn on the island, our position, facing and walk sent, the room's voice the scene's for the HUD.
+func test_a_landmark_is_an_online_room_with_voice() -> void:
+	var scene := await _alcatraz()
+	var visit: P0LandmarkVisit = scene.p0_visit
+	for frame in 30:
+		if visit.online != null: break
+		await get_tree().process_frame
+	assert_object(visit.online).is_not_null()
+	assert_str(visit.room_id()).is_equal("landmark:alcatraz_island")
+	assert_str(visit.online.outpost).is_equal("landmark:alcatraz_island")
+	assert_object(visit.online.crowd).is_same(visit.crowd)
+	assert_object(visit.crowd.get_parent()).is_same(scene)   # the scene's own metres
+	assert_object(scene.get("voice_room")).is_same(visit.voice_room)
+	assert_bool(bool(visit.voice_room.get("here"))).is_true()   # a room with voice (not a church's)
+	var sent: Dictionary = visit.online.source.call()
+	assert_object(sent.position).is_equal(scene.player_position())
+	assert_str(str(sent.action)).is_equal("idle")
+	# facing: the way the stick last walked them (their -Z), as a rig turned by the yaw faces it
+	var player: Node3D = scene.get("_player")
+	var f := -player.global_basis.z
+	assert_float(float(sent.yaw)).is_equal_approx(atan2(f.x, f.z), 0.001)
+	visit.clear()
+	assert_bool(bool(visit.online.get("_stopped"))).is_true()   # leaving the island leaves its room
+
+## The room sends x / z only: another player stands on the island's ground where they are — up on the hillside too.
+func test_the_others_stand_on_the_ground() -> void:
+	var scene := await _alcatraz()
+	var visit: P0LandmarkVisit = scene.p0_visit
+	for frame in 30:
+		if visit.crowd != null: break
+		await get_tree().process_frame
+	var hill: Vector3 = scene.dev_point("mid_hill")
+	visit.crowd.actors[7] = {"position": Vector3(hill.x, 0.0, hill.z)}
+	var y := visit._height_of(7)
+	assert_float(y).is_greater(4.0)
+	var ground := NavigationServer3D.map_get_closest_point(scene.nav_map(), Vector3(hill.x, y, hill.z))
+	assert_float(absf(ground.y - y)).is_less(0.05)
+	visit.clear()
 
 func _alcatraz() -> Node3D:
 	var viewport := SubViewport.new()

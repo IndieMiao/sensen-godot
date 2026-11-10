@@ -6,6 +6,9 @@ extends RefCounted
 ## Where the scene has a way out on the ground (Alcatraz's dock, layout `exit`) it wears the rooms' door prompt — i-door,
 ## and Map as its strip once near (SGODOT-250) — and walking onto it leaves, as a room's door does.
 ## The scene holds one of these from setup(args) and hands it its p0_* calls.
+## SGODOT-462 / q(307) (the user, 11-10: 「恶魔岛无法多人,无法语音」, 「都是现成代码的复用」): the landmark is an online room of
+## 8, `landmark:<id>`, as a pond is (SGODOT-383) — the others walk round it too, on its ground, and the room has voice (the
+## HUD's mic key and people drawer read the scene's voice_room). Nothing else is sent: q(295) ④ stands.
 
 const EXIT_ID := "landmark:exit"
 ## The door strip opens within this of the dock (a room's CARD_NEAR_M is for a room; the dock is out in the open).
@@ -17,7 +20,12 @@ const EXIT_RADIUS_M := 0.8
 
 var scene: Node3D
 var chip := ""
+var landmark := ""   # its id: the room is `landmark:<id>`
 var rt: P0Runtime
+var crowd: Node3D   # an OnlineCrowd: the others, in the scene's own metres
+var online: P0Online
+var voice_room: Node   # P0VoiceRoom, also the scene's (P0Runtime hands it the HUD)
+var _heights := {}   # peer id → the ground last found under them (the next ask starts there: a stair's level)
 var stick := Vector2.ZERO
 var _armed := false
 var _to_exit := false
@@ -41,6 +49,7 @@ var _dev := {}   # P0_SCENE's landmark:<id>:<point>:<zoom> (dev_point, dev_zoom)
 func _init(s: Node3D, args: Dictionary) -> void:
 	scene = s
 	chip = str(args.get("chip", ""))
+	landmark = str(args.get("landmark", ""))
 	for k in ["dev_point", "dev_zoom"]:
 		if args.has(k): _dev[k] = args[k]
 
@@ -50,9 +59,80 @@ func start() -> void:
 	rt.attach(scene)
 	rt.ui.set_place(chip)
 	_armed = false
-	if exit_at() != Vector3.INF: _step_off_the_door.call_deferred()
+	# into the room from where the player stands once off the door: the room takes a jump after the join as none (a
+	# teleport), so the others would see them where they landed (SGODOT-462)
+	if exit_at() != Vector3.INF: _step_off_then_online.call_deferred()
+	else: _go_online()
 	if _dev.has("dev_point"): _stand_when_ready.call_deferred(str(_dev.dev_point))
 	if _dev.has("dev_zoom"): scene.call("p0_zoom", float(_dev.dev_zoom))
+
+func _step_off_then_online() -> void:
+	await _step_off_the_door()
+	_go_online()
+
+# ---------------------------------------------------------------- the landmark's online room (SGODOT-462, as a pond's)
+const OnlineCrowd := preload("res://modules/net/online_crowd.gd")
+const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
+
+## The landmark's room on the server: `landmark:<landmark id>`.
+func room_id() -> String: return "landmark:" + landmark
+
+func _go_online() -> void:
+	var session := rt.session
+	if session == null or landmark == "": return
+	if not session.is_node_ready(): await session.ready   # a landmark booted first (dev) makes the runtime this frame
+	if _leaving or not scene.is_inside_tree(): return
+	var c := OnlineCrowd.new()
+	c.show_health = false
+	c.height_of = _height_of
+	crowd = c
+	scene.add_child(crowd)   # the scene's metres, as the server's room keeps them
+	var o := P0Online.new()
+	o.url = P0Online.ws_url(session.base_url)
+	o.player_id = session.player_id
+	o.access_key = session.access_key
+	o.version = session.version
+	o.features = session.features()
+	o.appearance = OnlineAppearance.payload(Avatar.load_outfit())
+	o.crowd = crowd
+	o.source = func(): return {"position": scene.call("player_position"), "yaw": _yaw(), "action": "run" if _moving() else "idle"}
+	scene.add_child(o)
+	online = o
+	o.joined.connect(_on_joined)
+	voice_room = P0VoiceRoom.new()
+	scene.add_child(voice_room)
+	voice_room.setup(session, o, "landmark")
+	scene.set("voice_room", voice_room)
+	o.joined.connect(func(_i): if voice_room.age == "unknown" and not voice_room.available: voice_room.fetch_status(), CONNECT_ONE_SHOT)
+	var at: Vector3 = scene.call("player_position")
+	o.start(room_id(), Vector2(at.x, at.z))
+
+## Layer 2 and later say so once, as an outpost's and a pond's do (P0Online.layer_notice).
+func _on_joined(info: Dictionary) -> void:
+	var said := P0Online.layer_notice(info)
+	if said != "" and rt: rt.ui.toast(said, 0.0, true)
+
+## The way the player faces (their -Z, as the stick and a walk turn them), as the room's yaw: a rig turned by it faces there.
+func _yaw() -> float:
+	var p = scene.get("_player")
+	if not (p is Node3D): return 0.0
+	var f := -(p as Node3D).global_basis.z
+	return atan2(f.x, f.z)
+
+func _moving() -> bool: return bool(scene.call("walking")) or bool(scene.get("stick_moving"))
+
+## The ground under another player (the room sends x / z only; the island has steps and levels): the navigation's, asked
+## from where they last stood (at first the player's height).
+func _height_of(id: int) -> float:
+	var a = crowd.get("actors").get(id, null) if crowd else null
+	if not (a is Dictionary): return 0.0
+	var p: Vector3 = a.position
+	var nav: RID = scene.call("nav_map")
+	if not nav.is_valid() or not bool(scene.call("navigation_ready")): return p.y
+	var guess := float(_heights.get(id, (scene.call("player_position") as Vector3).y))
+	var y := _ground(nav, Vector3(p.x, guess, p.z)).y
+	_heights[id] = y
+	return y
 
 ## Landed by the way out (Alcatraz's spawn is 1.1 m from its dock), the Map strip would touch the player (不知火舞 on
 ## #870: ≥ 8 px between them, as in the cathedral): the player starts START_FROM_EXIT_M from it, on the same side.
@@ -91,6 +171,7 @@ func frame(dt: float) -> void:
 	# popped (the chip, Back) before the map below takes the world back: nothing of it is left to drive
 	if _leaving or rt == null or not scene.is_inside_tree(): return
 	scene.call("step_stick", stick, dt)   # let go: the run stops (unless a tap's walk goes on)
+	if crowd: crowd.call("step", dt, scene.call("player_position"))   # the others, between their frames
 	var exit := exit_at()
 	if exit == Vector3.INF: return
 	var d := _flat(scene.call("player_position"), exit)
@@ -121,8 +202,9 @@ func leave() -> void:
 	clear()
 	if rt: rt.leave_world()
 
-## The door prompt goes with the scene (a world's prompts are the HUD's).
+## The door prompt goes with the scene (a world's prompts are the HUD's); so does the room.
 func clear() -> void:
+	if online: online.stop()
 	if rt == null: return
 	rt.ui.name_bar(EXIT_ID, null, "", "", Vector2.ZERO, false)
 	rt.ui.world_icon(EXIT_ID, null, Vector2.ZERO, false)
@@ -260,6 +342,13 @@ func dev(step: Array) -> bool:
 			var cam := scene.get_viewport().get_camera_3d()
 			var p: Vector3 = scene.call("player_position")
 			print("P0_LM_WHERE screen=", cam.unproject_position(p + Vector3.UP * 0.8), " at=", p, " vp=", scene.get_viewport().get_visible_rect().size)
+		"lmcrowd":   # the others in the room (SGODOT-462): each one's id, where the room has them, the ground found, on screen
+			var cam := scene.get_viewport().get_camera_3d()
+			if online: print("P0_LM_ROOM ", room_id(), " layer=", online.room, " self=", online.self_id, " members=", online.members.keys())
+			for id in (crowd.get("actors") if crowd else {}):
+				var p: Vector3 = crowd.actors[id].position
+				var y := _height_of(int(id))
+				print("P0_LM_CROWD id=", id, " at=", p, " ground=", y, " screen=", cam.unproject_position(Vector3(p.x, y + 0.8, p.z)))
 		"lmexit":
 			_to_exit = true
 			_armed = true

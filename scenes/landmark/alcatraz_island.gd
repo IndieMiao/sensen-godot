@@ -46,6 +46,8 @@ var tree_batches: Array[Dictionary] = []
 var _detail_groups: Array[MeshInstance3D] = []
 ## Opened from the P0 map (q(295)): P0's HUD, stick and door prompt instead of this scene's own controls.
 var p0_visit: P0LandmarkVisit
+## The landmark's voice (SGODOT-462): P0LandmarkVisit's, read by P0Runtime for the HUD's mic key and people drawer.
+var voice_room: Node
 var _boundary_rids: Array[RID] = []
 ## The P0 stick is walking the player: the run plays on (_step_walk without a path would set it idle each frame, and
 ## play_motion starts a clip over from its first frame, so the player slid; 用户 0.3.2, 424 da2e9368).
@@ -748,6 +750,8 @@ func dev_stand(at: Vector3) -> void:
 	_focus = _follow_target()
 
 func player_position() -> Vector3: return _player.position
+## The walkable ground (P0LandmarkVisit: the others stood on it, SGODOT-462).
+func nav_map() -> RID: return _nav_map
 func exit_position() -> Vector3: return _vec(layout.exit)
 func walking() -> bool: return _path_i < _path.size()
 

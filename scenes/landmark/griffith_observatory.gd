@@ -58,6 +58,8 @@ var _saved_environment: Environment
 var _camera_recenter: Tween
 ## Opened from the P0 map (q(295)): P0's HUD and stick instead of this scene's own controls; the camera follows.
 var p0_visit: P0LandmarkVisit
+## The landmark's voice (SGODOT-462): P0LandmarkVisit's, read by P0Runtime for the HUD's mic key and people drawer.
+var voice_room: Node
 ## The P0 stick is walking the player: the run plays on (as Alcatraz's; 用户 0.3.2, 424 da2e9368).
 var stick_moving := false
 var _stick_still := 0.0   # seconds the stick has pushed without moving the player
@@ -480,6 +482,8 @@ func dev_stand(at: Vector3) -> void:
 	_focus = _player.position
 
 func player_position() -> Vector3: return _player.position
+## The walkable ground (P0LandmarkVisit: the others stood on it, SGODOT-462).
+func nav_map() -> RID: return _nav_map
 ## The way out (q(295) ④: a door prompt and Map, 不知火舞 on #870): on the path south of the spawn, where the visit
 ## came up; snapped to the walkable ground once the navigation is ready.
 const EXIT := Vector3(-1.34, 0.0, 9.6)
