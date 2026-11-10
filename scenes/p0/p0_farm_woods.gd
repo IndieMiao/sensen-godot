@@ -20,15 +20,15 @@ const DOWN := Vector2(0.250380, 0.968148)     # the screen's down on the ground,
 ## front row is at z 0.325 (half a cell more: 0.65), the spawn at (6.175, 0.325), the entrance sign at (4.8, 0.575); the
 ## strip 0.9…1.4 to the front fence is grass the crowns may cover — but for the exit's corner (EXIT below).
 const KEEP := Rect2(0.2, -12.55, 12.95, 13.45)
-## The farm's exit pin at the yard's front-left corner (C7, P0Farm.EXIT_AT, #943; its ring 0.38 m, the pin 1.4 m, its strip
+## The farm's exit pin at the yard's front-left corner (C7, P0Garden.MAP_EXIT, #943; its ring 0.38 m, the pin 1.4 m, its strip
 ## 2.1 m — those stand over KEEP on screen): no trunk within EXIT_R of it and no crown over it or its ring on screen.
 ## Cleared after the woods are made (_clear_exit), so only the pieces there change and the rest stand as approved.
-const EXIT := Vector2(0.8, 1.0)
+const EXIT := Vector2(P0Garden.MAP_EXIT.x, P0Garden.MAP_EXIT.z)
 const EXIT_R := 1.2   # the ring 0.38 and 0.3 m clear round it (不知火舞 on #943) well inside
 ## 上官婉儿's rule for the exit's column (443 190fa019): a piece in front of the ring whose x ± its radius meets x EXIT_COL stands far enough
 ## out that its top clears the ring's front edge on screen with 5 cm to spare — z − h / tan 43° ≥ EXIT_FRONT. It keeps the
 ## gap the front fence opens there from Lv3 (x 0.38–1.64) a patch of clean grass outside as well.
-const EXIT_COL := Vector2(0.2, 1.4)
+const EXIT_COL := Vector2(0.2, 1.64)   # 上官婉儿's 0.2–1.4, out to the fence gap's east end (P0Garden.MAP_EXIT_GAP)
 const EXIT_FRONT := 1.45
 const COT_PITCH := 1.07
 ## Where the woods stand: outside OUT (the ring and 1 m), inside AREA.

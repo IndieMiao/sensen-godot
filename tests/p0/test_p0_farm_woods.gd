@@ -106,5 +106,25 @@ func test_the_exit_column_rule() -> void:
 			if str(e[0]).begins_with(str(kind)):
 				var s := t.basis.get_scale().x
 				var r := float(FarmWoods.RADIUS[kind]) * s
-				if t.origin.z > 1.0 and t.origin.x + r >= 0.2 and t.origin.x - r <= 1.4:
+				if t.origin.z > 1.0 and t.origin.x + r >= FarmWoods.EXIT_COL.x and t.origin.x - r <= FarmWoods.EXIT_COL.y:
 					assert_float(t.origin.z - 1.07 * float(FarmWoods.HEIGHT[kind]) * s).is_greater_equal(1.45)
+
+## The west hedge (SGODOT-371, 不知火舞 59ea8ecc ③) after four moved for the exit (371 dd50e433): still a hedge —
+## next clumps 0.3–1.1 m apart, no gap over 1.2 m between them; and none on the exit's ring: 0.3 m clear of it on the
+## ground, and in front of it z − 1.07 × h ≥ 1.45 (the bush is 0.6 m tall, 0.87 m across, at scale 1).
+const Scenery = preload("res://scenes/p0/p0_garden_scenery.gd")
+func test_the_west_hedge_stays_a_hedge_and_clears_the_exit() -> void:
+	var h: Array = Scenery.WEST_HEDGE
+	var exit := Vector2(P0Garden.MAP_EXIT.x, P0Garden.MAP_EXIT.z)
+	for i in h.size():
+		var a: Vector3 = h[i][0]
+		var r := 0.4335 * float(h[i][2])
+		if i + 1 < h.size():
+			var b: Vector3 = h[i + 1][0]
+			var d := Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
+			assert_float(d).override_failure_message("%s → %s" % [a, b]).is_between(0.3, 1.1)
+			assert_float(d - r - 0.4335 * float(h[i + 1][2])).is_less_equal(1.2)
+		var p := Vector2(a.x, a.z)
+		assert_float(p.distance_to(exit) - r - 0.38).override_failure_message("%s on the ring" % p).is_greater_equal(0.3)
+		if p.y > exit.y and p.x + r >= FarmWoods.EXIT_COL.x and p.x - r <= FarmWoods.EXIT_COL.y:
+			assert_float(p.y - 1.07 * 0.6 * float(h[i][2])).override_failure_message("%s in front of the ring" % p).is_greater_equal(1.45)
