@@ -774,3 +774,37 @@ func test_p0_the_spice_rack_and_mix_toasts_break_at_their_dot_in_chinese_only() 
 			assert_bool(part.ends_with("·") or part.begins_with("·")).override_failure_message(broken).is_false()
 	assert_str(zh[0]).is_equal("调味架 · 调味料不占背包\n家园 Lv2")
 	assert_str(zh[1]).is_equal("放 1–3 样食材\n新搭配可能做出黑暗料理")
+
+## SGODOT-469 (李白 b, q(275) ⑤): a generated place (world.ts named(): `<word> <kind>`) keeps its word and translates its
+## kind — every word of the pools by every kind, the word as it was (Orchard by keys of its own: alone it is 果园); a
+## satellite town by its Chinese name where it has one; the lines it ends, whole (`Deliver at %s` though its words are
+## fewer than `%s Market Square`'s); the kind's other lines as they were.
+func test_p0_generated_place_names_translate_only_their_kind() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	var w: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/content/world_gen.json")).world
+	var words: Array = []
+	for band in w.tea_words: words.append_array(w.tea_words[band])
+	for band in w.ponds.words:
+		if band != "_note": words.append_array(w.ponds.words[band])
+	assert_int(words.size()).is_greater(100)
+	for kind in LocalizationScript.P0Translation.PLACE_KINDS:
+		var kind_zh: String = zh.call(kind)
+		assert_str(kind_zh).is_not_empty()
+		for word in words:
+			assert_str(zh.call("%s %s" % [word, kind])).is_equal("%s %s" % [word, kind_zh])
+	assert_str(zh.call("Orchard")).is_equal("果园")
+	assert_str(zh.call("Brighton Market Square")).is_equal("布莱顿 集市广场")   # a town with a Chinese name
+	assert_str(zh.call("Oakland Travel Post")).is_equal("Oakland 驿站")
+	assert_str(zh.call("Union Square Travel Post")).is_equal("联合广场驿站")   # its own key, as before
+	assert_str(zh.call("Deliver at Acorn Market Square")).is_equal("到 Acorn 集市广场 交付")
+	assert_str(zh.call("Deliver to Magnolia Travel Post")).is_equal("交给 Magnolia 驿站")
+	assert_str(zh.call("near Willow Tea House")).is_equal("Willow 茶馆附近")
+	assert_str(zh.call("Too close to Fern Tackle Shop")).is_equal("离 Fern 渔具铺 太近")
+	assert_str(zh.call("Visit Pine Trading Post first")).is_equal("先去 Pine 小木屋")
+	assert_str(zh.call("Deliver at Acorn Market Square · Ready to deliver")).is_equal("到 Acorn 集市广场 交付 · 可交付")
+	assert_str(zh.call("12 coins at Tackle Shop")).is_equal("渔具铺售价 12 金币")
+	assert_str(zh.call("Fishing Lv3 · Tackle Shop")).is_equal("钓鱼 Lv3 · 渔具铺")
+	TranslationServer.remove_translation(t)
