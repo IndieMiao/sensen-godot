@@ -7,7 +7,7 @@ import { placeOf } from './world.js';
 import { firstXp, energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { draw, maxEnergy, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { P0State } from './state.js';
-import { fishTwin } from './buffs.js';
+import { fishTwin, twinQty } from './buffs.js';
 
 export type Refusal = { code: string; detail?: Record<string, unknown> };
 export type FishCommand =
@@ -127,9 +127,9 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
   if ((outcome === 'landed' || sure) && !cast.breaks) {
     const fish = fishById(c, cast.fish)!;
     if (room(c, s, fish.id) < 1) return { code: 'bag_full' };
-    // a cast under the priest's fish buff lands fish_qty (2) of it, as many as the bag takes (one at least, checked
-    // above); the XP, the firsts and the dex count the fish once
-    const qty = cast.twin ? Math.max(1, Math.min(c.buffs?.fish_qty ?? 1, room(c, s, fish.id))) : 1;
+    // a cast under the priest's fish buff lands fish_qty (2) of it — a Legendary one from 11-15 on (q(305)) — as many as
+    // the bag takes (one at least, checked above); the XP, the firsts and the dex count the fish once
+    const qty = cast.twin ? Math.max(1, Math.min(twinQty(c, s, fish.rarity, cast.at), room(c, s, fish.id))) : 1;
     s.cast = null;
     s.fishing.bites += 1;
     useBait(s, cast.bait, events);

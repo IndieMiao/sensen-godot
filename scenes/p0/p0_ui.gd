@@ -1882,7 +1882,16 @@ func toast_success(text: String, break_at_dot := false, action := "") -> void:
 ## no catch-up, spec §4).
 const BUFF_RENEW_MS := 5000.0
 const BUFF_RENEWED := "%s · back to 20 min"   # the spec's words, as the translation table keys them (李白)
-const BUFF_LINES := {"fish": "%s · %d min · every fish lands ×2", "farm": "%s · %d min · crops sown now grow 2× faster"}
+const BUFF_LINES := {"fish": "%s · %d min · every fish lands ×2", "farm": "%s · %d min · sow now, grow 2× faster"}
+## q(305): from 11-15 a Legendary under the fish buff lands one, and the toast says so — the line for a take while the day's
+## limit is on (view.buff_takes.limit set, home city 11-15 04:00 on); the demo week keeps BUFF_LINES' (不知火舞 (ii)).
+const BUFF_LINE_FISH_LIMITED := "%s · %d min · fish ×2, Legendary ×1"
+
+## The toast for a buff just taken, as `v` (the view of that moment: a buff that runs past 04:00 keeps what it said).
+static func buff_line(id: String, v: Dictionary) -> String:
+	var takes = v.get("buff_takes", null)
+	if id == "fish" and takes is Dictionary and takes.get("limit", null) != null: return BUFF_LINE_FISH_LIMITED
+	return BUFF_LINES[id]
 var _buffs_seen = null   # {id: ms left} at the last view; null before the first
 
 func _watch_buffs(v: Dictionary) -> void:
@@ -1891,7 +1900,7 @@ func _watch_buffs(v: Dictionary) -> void:
 		var minutes := int(P0Logic.content().get("buffs", {}).get("minutes", 20))
 		for id in P0Logic.BUFF_ORDER:
 			if now.has(id) and not _buffs_seen.has(id):
-				toast_success(BUFF_LINES[id] % [P0Logic.BUFF_NAMES[id], minutes])
+				toast_success(buff_line(id, v) % [P0Logic.BUFF_NAMES[id], minutes], true)   # two lines after a ` · ` (q(305), 452)
 			elif now.has(id) and float(now[id]) > float(_buffs_seen[id]) + BUFF_RENEW_MS:   # Pray drew one on (v1.2 §4)
 				toast_success(BUFF_RENEWED % P0Logic.BUFF_NAMES[id])
 			elif _buffs_seen.has(id) and not now.has(id) and float(_buffs_seen[id]) <= BUFF_RENEW_MS:

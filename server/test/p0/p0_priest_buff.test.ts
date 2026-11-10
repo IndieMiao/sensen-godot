@@ -180,6 +180,25 @@ describe('the fish buff: a cast under it lands two', () => {
     expect(r.state.fishing.caught.fish_crucian).toBe(1);
   });
 
+  // q(305) (the user, bot 613): from player day 11-15 (content.buffs.limit_from) a Legendary under the buff lands one; the
+  // day the line went in decides (cast.at, as q(300)'s cast does)
+  describe('q(305): a Legendary lands one from 11-15', () => {
+    const LIMIT = Date.parse('2026-11-15T12:01:00Z');      // San Francisco 04:01, player day 11-15
+    const EVE = Date.parse('2026-11-15T11:58:00Z');        // 03:58, still player day 11-14
+    const land = (now: number, fish: string, castAt = now) => {
+      let s = save(DEMO);
+      s = ok(at(s)({ type: 'buff', buff: 'fish', ...CHURCH }, castAt - M)).state;
+      s = castFixed(s, castAt, fish);
+      const r = ok(at(s)({ type: 'reel', outcome: 'landed', space: 'pond', place: FERN }, Math.max(now, castAt + s.cast!.bite_ms + 1000)));
+      return (r.events.find(e => e.kind === 'catch') as unknown as { qty: number }).qty;
+    };
+    it('the demo week: a Legendary lands two', () => expect(land(DEMO, 'fish_sturgeon')).toBe(2));
+    it('from 11-15: a Legendary lands one', () => expect(land(LIMIT, 'fish_sturgeon')).toBe(1));
+    it('from 11-15: any other fish still lands two', () => expect(land(LIMIT, 'fish_crucian')).toBe(2));
+    it('cast on 11-14 and landed after 04:00 on 11-15: two, the cast decides', () =>
+      expect(land(LIMIT + 5 * M, 'fish_sturgeon', EVE)).toBe(2));
+  });
+
   it('the cast decides: thrown under it, two even if it ended before the bite; the view marks the cast', () => {
     let s = save();
     s = ok(at(s)({ type: 'buff', buff: 'fish', ...CHURCH }, DEMO)).state;
