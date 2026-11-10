@@ -51,7 +51,7 @@ func test_toasts_on_taking_renewing_and_running_out() -> void:
 	ui.set_view(_view([{"id": "fish", "left": 600000}]))   # the first view after launch: nothing said
 	assert_str(ui.toast_text()).is_empty()
 	ui.set_view(_view([{"id": "fish", "left": 599000}, {"id": "farm", "left": 1200000}]))   # farm taken
-	assert_str(ui.toast_text()).is_equal("Swift Growth · 20 min · crops sown now grow 2× faster")
+	assert_str(_one_line(ui.toast_text())).is_equal("Swift Growth · 20 min · crops sown now grow 2× faster")
 	ui.set_view(_view([{"id": "fish", "left": 1200000}, {"id": "farm", "left": 1199000}]))   # fish renewed (Pray drew it, v1.2 §4)
 	assert_str(ui.toast_text()).is_equal("Twin Catch · back to 20 min")
 	ui.set_view(_view([{"id": "fish", "left": 1199500}, {"id": "farm", "left": 1198600}]))   # a server answer: no toast
@@ -61,6 +61,23 @@ func test_toasts_on_taking_renewing_and_running_out() -> void:
 	assert_str(ui.toast_text()).is_equal("Swift Growth has worn off")
 	ui.set_view(_view([]))   # fish gone at a jump (back from the background): nothing
 	assert_str(ui.toast_text()).is_equal("Swift Growth has worn off")
+
+## A toast broken after a ` · ` (break_at_dot) read back as the one line it was.
+func _one_line(t: String) -> String: return t.replace("\n", " · ")
+
+## q(305) (不知火舞 (ii)): the fish toast for a take in the demo week (view.buff_takes.limit null) says every fish lands
+## ×2; from 11-15 (the limit set) that a Legendary lands one. The farm one is the same either way. Both break after a ` · `.
+func test_the_fish_toast_says_the_legendary_rule_once_the_limit_is_on() -> void:
+	assert_str(P0Ui.buff_line("fish", {"buff_takes": {"used": 0, "limit": null}})).is_equal("%s · %d min · every fish lands ×2")
+	assert_str(P0Ui.buff_line("fish", {})).is_equal("%s · %d min · every fish lands ×2")   # a server before #865
+	assert_str(P0Ui.buff_line("fish", {"buff_takes": {"used": 1, "limit": 2}})).is_equal("%s · %d min · fish ×2, Legendary ×1")
+	assert_str(P0Ui.buff_line("farm", {"buff_takes": {"used": 1, "limit": 2}})).is_equal("%s · %d min · crops sown now grow 2× faster")
+	var v := _view([])
+	v["buff_takes"] = {"used": 0, "limit": 2, "resets_in": 3600000}
+	ui.set_view(v)
+	v = v.duplicate(); v["buffs"] = [{"id": "fish", "left": 1200000}]
+	ui.set_view(v)
+	assert_str(_one_line(ui.toast_text())).is_equal("Twin Catch · 20 min · fish ×2, Legendary ×1")
 
 func test_a_twin_catch_card_says_x2() -> void:
 	ui.set_view(_view([]))

@@ -21,6 +21,13 @@ export function buffLeft(c: P0Content, s: P0State, id: BuffId, now: number): num
   return c.buffs ? Math.max(0, (s.buffs?.[id] ?? 0) - now) : 0;
 }
 
+/** q(305): how many of a fish a cast under the fish buff lands — content.buffs.fish_qty, but one of a Legendary (rarity 4)
+ * from the player day content.buffs.limit_from on. The day the line went in decides (cast.at, as q(300)'s cast does). */
+export function twinQty(c: P0Content, s: P0State, rarity: number, castAt: number): number {
+  if (!c.buffs) return 1;
+  return rarity === 4 && dayKey(c, s, castAt) >= c.buffs.limit_from ? 1 : c.buffs.fish_qty;
+}
+
 /** The day's limit: null before content.buffs.limit_from (the demo week), else `daily`. */
 const limitOf = (c: P0Content, s: P0State, now: number): number | null =>
   c.buffs && dayKey(c, s, now) >= c.buffs.limit_from ? c.buffs.daily : null;
