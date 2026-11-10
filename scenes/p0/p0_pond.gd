@@ -307,15 +307,21 @@ func _build_scenery(clear: Array) -> void:
 	_scenery_clear = clear
 	_scenery_keys = _opening_keys()
 	_scenery = PondScenery.build(entry, clear, _scenery_keys)
+	var insects: Node = null
 	if bp and PondInsects.wanted():   # SGODOT-454: the bees, butterflies and dragonflies, with the scenery they fly round
 		var spawn := bp.cell_to_world(bp.anchor("spawn"))
 		var opening := insects_opening(spawn, _water_at(), _nearest_piece_to(spawn), clear)
-		_scenery.add_child(PondInsects.build(entry, site_spec, _scenery, clear, spawn, opening,
-			RenderingServer.get_current_rendering_method() == "gl_compatibility"))
+		insects = PondInsects.build(entry, site_spec, _scenery, clear, spawn, opening,
+			RenderingServer.get_current_rendering_method() == "gl_compatibility")
+		_scenery.add_child(insects)
 	if grid: _trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(clear, _scenery_keys), _trees, actor.position if actor else Vector3.INF)   # the trees that stand now
 	add_child(_scenery)
 	move_child(_scenery, cam.get_index() + 1)
 	_apply_foam()   # the rocks keep off the points too: the foam follows them
+	var shade := _scenery.get_node_or_null("GroundShade")   # SGODOT-457: the gathering points' pieces shade too, the insects never
+	if shade:
+		if insects: shade.skip_roots.append(insects)
+		if gather: shade.watch(gather)
 
 ## The water's shore foam from the bank as it is built now (SGODOT-422, the user's 0.3.5: the baked mask's foam stood
 ## where the old round stones were); none until the water is there (the opening builds the bank first).

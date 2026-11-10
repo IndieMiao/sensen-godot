@@ -12,6 +12,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const FarmWoods = preload("res://scenes/p0/p0_farm_woods.gd")
+const GroundShade = preload("res://modules/render/ground_shade.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const FarmGuide = preload("res://scenes/p0/p0_farm_guide.gd")
 const Looks = preload("res://scenes/p0/p0_looks.gd")
@@ -109,6 +110,8 @@ var _badge_number: Label3D
 var _badge_level := -1   # the level the badge shows (its tier and number are set when this changes)
 var _scenery: Node3D   # p0_garden_scenery.gd: the sand under the field grows over Lv7's front row
 var _woods: FarmWoods  # p0_farm_woods.gd: woods round the yard, clumps on the beds still to open
+var _shade: GroundShade   # the shade under Compatibility (SGODOT-457)
+var _shade_key := ""   # the level and the looks on show the shade was last drawn for
 ## q(303) ⑨: a save past Lv8 whose wing's cells are held says so once a launch, on the first farm view (the app's run).
 static var _wing_said := false
 var _held_wanted := false
@@ -306,6 +309,17 @@ func _build_world() -> void:
 	add_child(_looks)
 	_looks.build(bp, house, _style, _fence, P0Runtime.ensure().ui)   # before rt is set (_ready builds the world first)
 	_looks.wing_cleared.connect(_on_wing_cleared)
+	# the trees' and the farmhouse's shade under Compatibility (SGODOT-457): 2 m and up only, so no facility, fence or player;
+	# the exit's ring kept clear (上官婉儿 on 457); drawn again when the house changes with the level (_sync_shade)
+	_shade = GroundShade.new()
+	_shade.name = "GroundShade"
+	_shade.ground = ground
+	_shade.casters_root = props
+	for r: Node in [_woods, _scenery]: _shade.more_roots.append(r)
+	for r: Node in [house, _looks]: _shade.box_roots.append(r)   # the farmhouse's shade is a box's, its whole side (上官婉儿 on 457)
+	_shade.rect = FarmWoods.AREA
+	_shade.clear_spots = [[Vector2(EXIT_AT.x, EXIT_AT.z), 0.7]]
+	add_child(_shade)
 	# The Homestead sign: its own tap target beside the door, not the door (LOCK-11 / LOCK-07).
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
@@ -912,6 +926,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_sync_yard(v)
 	_fence.sync(v)
 	_looks.sync(v)
+	_sync_shade(v)
 	_scenery.show_wing(_looks.wing_model_shown())   # q(303): no grass or flowers through the wing's floor
 	_say_wing(v)
 	if _facilities == null and bp != null and cam != null and actor != null:
@@ -959,6 +974,17 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	_scenery.fit_sand(bp, P0Garden.plot_count(v))   # the field's sand under the open beds only
 	if _woods: _woods.fit(bp, P0Garden.plot_count(v), _decor.taken_cells() if _decor else [])   # the clumps on beds still to open, none next to an open one or under a piece
 	_sync_trees(v)
+
+## The shade drawn again when the farmhouse changes (the level, the looks on show, the wing waiting): at once the first
+## time (the looks a save has come up with the first view), after a look's pop-in (P0Fence.POP_S) later.
+func _sync_shade(v: Dictionary) -> void:
+	if _shade == null: return
+	var level := int(v.get("homestead", {}).get("level", 0)) if v.get("homestead") is Dictionary else 0
+	var key := "%d %s %s %s %s" % [level, _looks.shown("porch"), _looks.shown(Looks.WING_STAGE), _looks.shown(Looks.HOUSE_STAGE), _looks.waits()]
+	if key == _shade_key: return
+	if _shade_key == "": _shade.redraw()
+	else: get_tree().create_timer(Fence.POP_S + 0.1).timeout.connect(_shade.redraw)
+	_shade_key = key
 
 ## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
 ## the path grid is never rebuilt for it. A tree planted on the bed the player stands on blocks once they step off it

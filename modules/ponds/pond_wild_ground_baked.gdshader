@@ -17,6 +17,8 @@ uniform vec3 shadow_cool = vec3(0.0);        // added straight into the shadow o
 uniform vec3 shadow_cool_sand = vec3(0.0);   // ... on the sand: a cool, slightly violet beige
 varying vec3 world;
 varying vec3 world_normal;
+#include "res://modules/render/ground_shade.gdshaderinc"
+varying float shade;   // the trees' shade under Compatibility (ground_shade.gdshaderinc)
 varying float sandy;   // 1 on sand / path, 0 on grass: the shadows take their colour by it
 
 void vertex() {
@@ -38,15 +40,17 @@ void fragment() {
     vec3 c = from_srgb(b.rgb) * mix(vec3(1.0), wild_light(p) * wild_plateau(up) * wild_stroke(p), b.a);
     ALBEDO = mix(c, rock, steep);
     sandy = clamp(1.0 - b.a / w_soft, 0.0, 1.0);
+    shade = ground_shade(p);
     ROUGHNESS = 1.0;
     SPECULAR = 0.08;
 }
 
 void light() {
     float ndl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
-    DIFFUSE_LIGHT += ndl * ATTENUATION * LIGHT_COLOR / PI;
+    float att = shade_att(ATTENUATION, shade);
+    DIFFUSE_LIGHT += ndl * att * LIGHT_COLOR / PI;
     // the shadow side coloured by what it falls on (上官婉儿 on v3): grass deeper and blue-green, sand a cool violet beige
-    float shadowed = ndl * (1.0 - ATTENUATION);
+    float shadowed = ndl * (1.0 - att);
     DIFFUSE_LIGHT += shadowed * mix(shadow_tint, shadow_tint_sand, sandy) * LIGHT_COLOR / PI;   // how dark
     // the cool cast itself goes in un-multiplied by the ground's colour (grass and sand have almost no blue to tint)
     SPECULAR_LIGHT += shadowed * mix(shadow_cool, shadow_cool_sand, sandy);
