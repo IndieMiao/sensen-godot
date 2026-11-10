@@ -170,6 +170,10 @@ static func build(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arra
 	root.name = "WildProps"
 	var l := layout(entry, spec, clear, trees, in_key)
 	l = PondWildGround.regroup(l, entry, spec, clear)   # SGODOT-422 v7: the crumbs into clumps, the packs' plants, the woods
+	var reeds: Array = []   # Vector3(x, z, radius) a cattail: a small ring of shore foam at its foot (PondWildFoam)
+	for t in l.get("wild_cattail_water", []):
+		reeds.append(Vector3(t.origin.x, t.origin.z, PondWildGround.footprint("wild_cattail_water") * 0.7 * t.basis.get_scale().x))
+	root.set_meta("reeds", reeds)
 	for asset in l:
 		if not ResourceLoader.exists(Art.ROOT + asset + ".glb"): continue   # #799's pieces not in this build yet
 		var batch := Art.batch(asset, l[asset], asset.begins_with("wild_pz_") or asset.begins_with("wild_tree") or asset.begins_with("wild_bush"))

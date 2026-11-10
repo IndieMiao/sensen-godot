@@ -21,22 +21,39 @@ static func build(entry: Dictionary, clear: Array = [], in_key := Callable()) ->
 	var spec := SystemPonds.site(entry)
 	# the wild's painted ground and its bank rocks (SGODOT-422 v7, 盘古); the ground deepens under the bank's trees
 	var trees := tree_points(clear, in_key)
-	scene.add_child(PondWildGround.build(entry, spec, clear, trees))
+	var ground := PondWildGround.build(entry, spec, clear, trees)
+	scene.add_child(ground)
 	# The bank's six trees are the wild's single pines and round trees (SGODOT-422 ⑥), placed with the rest of the wild's
 	# pieces (PondWildProps, PondWildGround.regroup turns them into the pack's trees); their trunks block the P0 walk
 	# (PondWalk.set_trees), which reaches them since q(297). The old soft grass tufts are not drawn on the painted ground
 	# (the user on the v1 sample: no grass piles back), nor the turf pile and the spawn's crumbs.
-	scene.add_child(PondWildProps.build(entry, spec, clear, trees, in_key))
+	var props := PondWildProps.build(entry, spec, clear, trees, in_key)
+	scene.add_child(props)
+	var rocks := ground.find_child("BankRockGroups", false, false)
+	scene._foam = {"extent": Vector2(spec.extent[0], spec.extent[1]) if spec.has("extent") else Vector2.ZERO,
+		"distances": ground.get_meta("water_distances", PackedFloat32Array()), "rocks": rocks.get_meta("contacts", []) if rocks else [],
+		"reeds": props.get_meta("reeds", []), "seed": int(entry.decoration_seed)}
 	var painted := scene.find_child("PaintedGround", true, false) as MeshInstance3D
 	if painted:   # the ground darkens a little under the plants' feet, now that they are placed
 		(painted.material_override as ShaderMaterial).set_shader_parameter("contact_points", PondWildGround.contact_points())
 		(painted.material_override as ShaderMaterial).set_shader_parameter("contact", 0.10)
 	return scene
 
+## The water's shore foam (pond_water.gdshader's foam_contact) for this bank as it stands — its waterline, rock groups
+## and cattails (PondWildFoam; SGODOT-422, the user's 0.3.5: the old mask's foam stood where the round stones were).
+## Made on the first ask (a preview never asks), the same texture after; null when the pond has no outline.
+var _foam := {}
+var _foam_texture: ImageTexture
+func foam_contact() -> ImageTexture:
+	if _foam_texture == null and _foam.get("extent", Vector2.ZERO) != Vector2.ZERO and not (_foam.distances as PackedFloat32Array).is_empty():
+		_foam_texture = PondWildFoam.build(_foam.extent, _foam.distances, _foam.rocks, _foam.reeds, _foam.seed)
+	return _foam_texture
+
 ## The wild ground (SGODOT-422, 刘备 #791 / #798): the meadow's colour over the bank's dry ground, the pond's shape's
 ## layout (crescent / gourd / meander; another shape: none) and its channel of the shared dry-ground mask.
 const PondWildProps := preload("res://modules/ponds/pond_wild_props.gd")
 const PondWildGround := preload("res://modules/ponds/pond_wild_ground.gd")
+const PondWildFoam := preload("res://modules/ponds/pond_wild_foam.gd")
 const GROUND_DIR := "res://assets/ponds/ground/"
 const DRY_CHANNEL := {"crescent": Vector3(1, 0, 0), "gourd": Vector3(0, 1, 0), "meander": Vector3(0, 0, 1)}
 static func _wild_ground(material: ShaderMaterial, shape: String) -> void:
