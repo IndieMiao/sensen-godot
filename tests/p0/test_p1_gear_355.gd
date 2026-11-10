@@ -51,7 +51,7 @@ func test_weapon_reuses_the_combat_slot_and_shows_the_unowned_recipe_gate() -> v
 	assert_array(rows.map(func(r): return r.state)).is_equal([&"equipped", &"owned", &"Workbench"])
 	assert_str(rows[1].effect).is_equal("Attack 7")
 	assert_str(rows[1].action.id).is_equal("equip")
-	assert_str(rows[2].action.label).is_equal("Homestead Lv9")
+	assert_str(rows[2].action.label).is_equal("Home Lv9")
 	assert_str(rows[2].action.kind).is_equal("unavailable")
 	v.homestead = {level = 9}
 	assert_str(P0BagDrawer.gear_rows(v, "combat")[2].action.label).is_equal("Craft at Workbench")
@@ -141,7 +141,7 @@ func test_workbench_weapon_uses_craft_equip_and_equipped_states() -> void:
 	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Equipped")
 	r.owned = false
 	r.block = {code = "homestead_level", detail = {level = 9}}
-	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Homestead Lv9")
+	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Home Lv9")
 	r.block = {code = "no_coins", detail = {need = 23}}
 	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Need 23 more coins")
 	r.block = {code = "need_material", detail = {item = "coal", need = 3, have = 1}}
@@ -375,7 +375,7 @@ func test_weapon_recipe_reads_server_homestead_need_and_coin_price() -> void:
 	var v := _view()
 	v.workbench = {recipes = [{id = "craft_test", item = IRON, name = "Iron Sword", to = "weapon", tab = "tools", cost = [], coins = 211,
 		block = {code = "homestead_level", detail = {need = 9}}}]}
-	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Homestead Lv9")
+	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Home Lv9")
 	v.workbench.recipes[0].block = null
 	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Craft · 211 coins")
 
@@ -387,7 +387,7 @@ func test_potions_never_offer_or_send_farm_storage_in_either_build() -> void:
 		assert_bool(P0ItemInfo.spec(v, POTION, &"bag", {place = "home"}).buttons.any(func(b): return b.id == &"store")).is_false()
 		assert_bool(Gear.command_allowed({type = "store", item = POTION})).is_false()
 	for id in ["healing_potion", POTION]:
-		assert_str(P0Logic.P1_UNLOCKS[id].note).is_equal("at the Homestead Stall")
+		assert_str(P0Logic.P1_UNLOCKS[id].note).is_equal("at the Home Stall")
 
 func test_first_dig_with_taken_requests_follows_limit_and_precedes_newest_progress() -> void:
 	var v := _view()

@@ -24,32 +24,32 @@ static func _lines(v: Dictionary) -> Array: return P0Logic.today_rows(v).map(fun
 
 static func _home(v: Dictionary) -> Dictionary:
 	for r in P0Logic.today_rows(v):
-		if str(r.line).contains("Homestead"): return r
+		if str(r.line).contains("Home"): return r
 	return {}
 
 func test_the_first_material_in_order_leads_with_no_show_yet() -> void:
 	var v := _view()
 	var row := _home(v)
-	assert_str(str(row.line)).is_equal("Homestead Lv2 · Timber 6 to go")   # Timber before Reeds and Stone, whatever the server's order
+	assert_str(str(row.line)).is_equal("Home Lv2 · Timber 6 to go")   # Timber before Reeds and Stone, whatever the server's order
 	assert_str(str(row.icon)).is_equal("level_up")
 	assert_str(str(row.go)).is_empty()    # no farm spot to show (v4q(4) ①); a city's point is C's
 	assert_str(str(row.dot)).is_equal(P0Logic.PIP_HOME_DOT)   # Pip's request: lights once, the first time (spec ③ v3)
 	assert_bool(bool(row.get("home_request", false))).is_true()   # a tap opens HOME-1
 	assert_bool(P0Logic.homestead_row(v).now).is_false()
 	v.homestead.next.materials[1].have = 6
-	assert_str(str(_home(v).line)).is_equal("Homestead Lv2 · Stone 4 to go")
+	assert_str(str(_home(v).line)).is_equal("Home Lv2 · Stone 4 to go")
 
 func test_no_countdown_comes_with_it() -> void:
 	var v := _view()
 	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
-	assert_array(_lines(v)).is_equal(["Homestead Lv2 · Timber 6 to go"])   # the crop's countdown is the field's
+	assert_array(_lines(v)).is_equal(["Home Lv2 · Timber 6 to go"])   # the crop's countdown is the field's
 
 func test_coins_short_points_at_the_stall_and_lights_nothing() -> void:
 	var v := _view()
 	v.homestead.next.materials = []
 	v.homestead.next.coins = {"need": 160, "have": 120}   # HOME-1's coin tile: the 40-coin floor is in `need`
 	var row := _home(v)
-	assert_str(str(row.line)).is_equal("Homestead Lv2 · 40 coins to go")
+	assert_str(str(row.line)).is_equal("Home Lv2 · 40 coins to go")
 	assert_str(str(row.go)).is_equal("stall")
 	assert_array(P0Logic.today_dots(P0Logic.today_rows(v))).is_equal([P0Logic.PIP_HOME_DOT])   # the same key at every gap
 
@@ -57,7 +57,7 @@ func test_only_skills_short_shows_homestead_and_deduplicates_the_skill() -> void
 	var v := _view()
 	v.homestead.next.materials = []
 	v.homestead.next.skills = [{"skill": "fishing", "need": 3, "have": 2}]
-	assert_str(_home(v).line).is_equal("Homestead Lv2 · Fishing Lv3 needed")
+	assert_str(_home(v).line).is_equal("Home Lv2 · Fishing Lv3 needed")
 	assert_bool(_lines(v).has("Fishing Lv2 · 30 XP to go")).is_false()
 
 func test_upgrade_follows_the_hand_ins_and_lights_the_dot() -> void:
@@ -68,7 +68,7 @@ func test_upgrade_follows_the_hand_ins_and_lights_the_dot() -> void:
 	v.plots = [{"state": "ready", "crop": "crop_radish"}]
 	var rows := P0Logic.today_rows(v)
 	assert_str(str(rows[0].dot)).is_equal("deliver:" + KAI)   # hand-ins first (bbdef20e)
-	assert_str(str(rows[1].line)).is_equal("Upgrade to Homestead Lv2")
+	assert_str(str(rows[1].line)).is_equal("Upgrade to Home Lv2")
 	assert_str(str(rows[1].go)).is_equal("sign")
 	assert_bool(bool(rows[1].get("home_request", false))).is_true()
 	assert_int(rows.size()).is_equal(2)   # no Harvest row (A 包反馈 1)
@@ -77,7 +77,7 @@ func test_upgrade_follows_the_hand_ins_and_lights_the_dot() -> void:
 func test_the_gap_row_leads_the_short_ones() -> void:
 	var v := _tracked(_view())
 	v.plots = [{"state": "ready", "crop": "crop_radish"}]
-	assert_array(_lines(v)).is_equal(["Homestead Lv2 · Timber 6 to go", "Dusk Supper · Grilled dishes 0/1"])
+	assert_array(_lines(v)).is_equal(["Home Lv2 · Timber 6 to go", "Dusk Supper · Grilled dishes 0/1"])
 
 func test_none_during_the_guide_but_later_levels_keep_the_row() -> void:
 	var v := _view()
@@ -86,10 +86,10 @@ func test_none_during_the_guide_but_later_levels_keep_the_row() -> void:
 	v.erase("guide")
 	v.homestead.level = 3
 	v.homestead.next.level = 4
-	assert_str(str(P0Logic.homestead_row(v).row.line)).is_equal("Homestead Lv4 · Timber 6 to go")
+	assert_str(str(P0Logic.homestead_row(v).row.line)).is_equal("Home Lv4 · Timber 6 to go")
 	v.homestead.level = 2
 	v.homestead.next.level = 3
-	assert_str(str(P0Logic.homestead_row(v).row.line)).is_equal("Homestead Lv3 · Timber 6 to go")
+	assert_str(str(P0Logic.homestead_row(v).row.line)).is_equal("Home Lv3 · Timber 6 to go")
 
 ## The mine mouth left the farm in 355 b1, the gathering spots with v4q(4) ①: no longer homestead targets.
 func test_the_sign_is_shown_on_the_farm() -> void:
@@ -114,7 +114,7 @@ func test_upgrade_follows_the_first_sessions_hand_in_too() -> void:
 	var at_upgrade := -1
 	for i in rows.size():
 		if str(rows[i].dot).begins_with("deliver:"): at_deliver = i
-		if str(rows[i].line) == "Upgrade to Homestead Lv2": at_upgrade = i
+		if str(rows[i].line) == "Upgrade to Home Lv2": at_upgrade = i
 	assert_int(at_deliver).is_greater_equal(0)
 	assert_int(at_upgrade).is_greater(at_deliver)
 
@@ -131,5 +131,5 @@ func test_upgrade_comes_with_the_hand_ins_here_before_the_short_ones() -> void:
 	v.boards = {"stall": {"slots": [
 		{"id": "a", "title": "Crate A", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2, "ready": true, "status": "accepted", "accepted_at": 1},
 		{"id": "b", "title": "Crate B", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2, "ready": true, "status": "accepted", "accepted_at": 2}]}}
-	assert_array(_lines(v)).is_equal(["Crate A · Deliver at the Stall", "Crate B · Deliver at the Stall", "Upgrade to Homestead Lv2",
+	assert_array(_lines(v)).is_equal(["Crate A · Deliver at the Stall", "Crate B · Deliver at the Stall", "Upgrade to Home Lv2",
 		"Dusk Supper · Grilled dishes 0/1"])

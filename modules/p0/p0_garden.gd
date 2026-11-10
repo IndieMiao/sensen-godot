@@ -95,7 +95,7 @@ static func blueprint() -> FarmBlueprint:
 	var bp := FarmBlueprint.new()
 	bp.layout_patch_id = "p0_garden"
 	bp.revision = 1
-	bp.display_name = "Homestead"
+	bp.display_name = "Home"
 	bp.grid = GRID
 	bp.grid_origin = GRID_ORIGIN
 	bp.cell_mm = CELL_MM

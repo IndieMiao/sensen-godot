@@ -71,10 +71,10 @@ func test_a_full_field_greys_sow_with_the_plots_count() -> void:
 	v["homestead"] = {"level": 1}
 	v["garden"] = {"plots": 12, "fields": {"used": 8, "cap": 8}}
 	var a := P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish")
-	assert_that([a.verb, a.sub, a.enabled, a.toast]).is_equal(["Sow", "Plots 8/8", false, "Plots 8/8 · Homestead Lv2 adds 2"])
+	assert_that([a.verb, a.sub, a.enabled, a.toast]).is_equal(["Sow", "Plots 8/8", false, "Plots 8/8 · Home Lv2 adds 2"])
 	v.homestead.level = 15
 	v.garden.fields = {"used": 36, "cap": 36}
-	assert_str(str(P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish").toast)).is_equal("Plots 36/36 · Homestead Lv16 adds 3")
+	assert_str(str(P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish").toast)).is_equal("Plots 36/36 · Home Lv16 adds 3")
 	v.homestead.level = 17
 	v.garden.fields = {"used": 41, "cap": 41}
 	var top := P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish")

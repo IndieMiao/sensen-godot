@@ -366,7 +366,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		grow = grow_time(crop),
 		stored = str(_stored(view, item_id)) if _stored(view, item_id) > 0 else "",
 		take_some = "Take %d" % _TAKE_SOME,
-		homestead_gate = ("Homestead Lv%d needed" % int(offer.homestead)) if offer.get("homestead", null) != null else "",
+		homestead_gate = ("Home Lv%d needed" % int(offer.homestead)) if offer.get("homestead", null) != null else "",
 		xp_hint = "",
 		fert_use = fert_use(item_id) if kind == "fert" else "",   # the bag card's line 1 (NPC-2)
 		# A buy row's line 2 (FARM-6 482:46): what the item does, in a few words.

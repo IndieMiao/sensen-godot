@@ -35,7 +35,7 @@ func test_settings_lists_home_first_and_opens_the_change_while_it_is_open() -> v
 	var page: P0SettingsPage = auto_free(P0SettingsPage.settings("dev", 0.0, 0.0, P0HomePick.settings_row(_view(true, NOW + 5 * DAY), NOW)))
 	add_child(page)
 	await await_idle_frame()
-	assert_array(_labels(page.body).slice(0, 4)).is_equal(["Home", "Home city · San Francisco", "Change once · 5 days left", "›"])
+	assert_array(_labels(page.body).slice(0, 3)).is_equal(["Home city · San Francisco", "Change once · 5 days left", "›"])   # no group title (SGODOT-461)
 	var said := []
 	page.open_pressed.connect(func(w): said.append(w))
 	(page.body.find_child("HomeCity", true, false).find_child("Hit", true, false) as Button).pressed.emit()

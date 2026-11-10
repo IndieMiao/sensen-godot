@@ -17,7 +17,7 @@ func _view() -> Dictionary:
 
 func test_hud_state_carries_energy_regen_skills_and_the_today_dots() -> void:
 	var v := _view()
-	var h := P0Logic.hud_state(v, {"next_cost": 2, "place": {"city": "San Francisco", "space": "Homestead"}})
+	var h := P0Logic.hud_state(v, {"next_cost": 2, "place": {"city": "San Francisco", "space": "Home"}})
 	assert_int(int(h.energy)).is_equal(142)
 	assert_str(str(h.regen)).is_equal("+1 in 2:40")
 	assert_int(int(h.next_cost)).is_equal(2)
@@ -27,7 +27,7 @@ func test_hud_state_carries_energy_regen_skills_and_the_today_dots() -> void:
 	assert_bool(h.has("today")).is_false()
 	assert_array(h.today_dots).is_equal(P0Logic.today_dots(P0Logic.today_rows(v)))
 	assert_array(h.today_dots).is_empty()
-	assert_str(str(h.place.space)).is_equal("Homestead")
+	assert_str(str(h.place.space)).is_equal("Home")
 	v.energy = {"value": 200, "max": 200, "next_in": null}
 	assert_str(str(P0Logic.hud_state(v).regen)).is_equal("Full")
 	v.energy = {"value": 214, "max": 200, "next_in": null}
@@ -39,7 +39,7 @@ func test_place_info_reads_the_scene_place_and_the_farmhouse_override() -> void:
 	assert_str(str(p.city)).is_equal("San Francisco")
 	assert_str(str(p.space)).is_equal("Willow Pond")
 	assert_int(int(p.kind)).is_equal(UiHud.PlaceKind.HOME)
-	assert_str(str(P0Logic.place_info("San Francisco · Homestead", "Farmhouse").space)).is_equal("Farmhouse")
+	assert_str(str(P0Logic.place_info("San Francisco · Home", "Farmhouse").space)).is_equal("Farmhouse")
 
 ## Pip's Homestead request at Upgrade (A 包 spec ③ v3): the row Today shows with a Show to the sign.
 static func _with_upgrade(v: Dictionary) -> Dictionary:
@@ -50,7 +50,7 @@ func test_today_rows_keep_the_lines_and_add_icons_and_show_targets() -> void:
 	var v := _with_upgrade(_view())
 	var rows := P0Logic.today_rows(v)
 	assert_that(rows.map(func(r): return r.line)).is_equal(P0Logic.today_lines(v))
-	assert_that(rows.map(func(r): return r.line)).is_equal(["Upgrade to Homestead Lv2"])   # no crop or skill row (spec ①)
+	assert_that(rows.map(func(r): return r.line)).is_equal(["Upgrade to Home Lv2"])   # no crop or skill row (spec ①)
 	assert_str(str(rows[0].icon)).is_equal("level_up")
 	assert_str(str(rows[0].go)).is_equal("sign")
 
@@ -82,7 +82,7 @@ func test_energy_panel_lists_today_use_and_the_blessing() -> void:
 
 func test_need_source_is_one_line_with_a_camera_only_target() -> void:
 	var v := _view()
-	assert_that(P0Logic.need_source(v, "seed_radish")).is_equal({"text": "Radish Seeds · Homestead Stall", "go": "stall"})
+	assert_that(P0Logic.need_source(v, "seed_radish")).is_equal({"text": "Radish Seeds · Home Stall", "go": "stall"})
 	assert_that(P0Logic.need_source(v, "crop_radish")).is_equal({"text": "Radish · Grow it on your plots", "go": "plots"})
 	assert_that(P0Logic.need_source(v, "fish_crucian")).is_equal({"text": "Pond Crucian · Ponds on the map", "go": ""})
 	assert_that(P0Logic.need_source(v, "dish_grilled_crucian")).is_equal({"text": "Grilled Crucian · Cook it at the stove", "go": "stove"})

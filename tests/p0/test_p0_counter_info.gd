@@ -40,7 +40,7 @@ func test_the_chevron_opens_the_items_card_over_the_counter() -> void:
 	var sheet: UiInfoSheet = sheets[0]
 	var spec := sheet.spec()
 	assert_that([spec.title, spec.rarity_text, spec.facts]).is_equal(["Bag Upgrade I", "+5 bag slots", ["150 coins"]])
-	assert_array(spec.buttons.map(func(b): return [str(b.kind), str(b.label)])).is_equal([["unavailable", "Homestead Lv3 needed"]])
+	assert_array(spec.buttons.map(func(b): return [str(b.kind), str(b.label)])).is_equal([["unavailable", "Home Lv3 needed"]])
 	# the materials, gate or not: NeedTile M with the count
 	var tiles := sheet.find_child("Needs", true, false).find_children("*", "UiNeedTile", true, false)
 	assert_array(tiles.map(func(t): return [(t as UiNeedTile).item_name, (t as UiNeedTile).size_class])).is_equal(

@@ -55,7 +55,7 @@ func _ready() -> void:
 	if picking():
 		_ready_pick()
 		return
-	own_farm_name = "Homestead"   # the player's own pin (不知火舞 on 234: My Farm → Homestead)
+	own_farm_name = "Home"   # the player's own pin (不知火舞 on 234: My Farm → Homestead)
 	CityMapData.set_region_provider(P0Clusters.region)   # every cluster is a city of the map (SGODOT-275)
 	super._ready()
 	# No real-time shadows on the map (perf plan 10-16 Q4): nothing here takes one — the avatars cast none (BlobShadow
@@ -113,7 +113,7 @@ func _fly_home() -> void:
 	if not hr.is_empty(): _switch_city(hr)
 	if rt.ui.has_modal(): rt.ui.close_modal()   # no card stays over the flight (周瑜 on #341)
 	_travel_fly({lat = home.x, lng = home.y, zoom = SHOW_ZOOM, bearing = bearing}, _origin(), held, P0Travel.home(_view()),
-		"Homestead", km, func():
+		"Home", km, func():
 		# landed with another scene over the map (it was suspended) or another way out under way: not home yet — the
 		# player is where they were, and goes home again from there (周瑜 on #341)
 		if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
@@ -362,7 +362,7 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 				"rank": PIN_RANK.beginner if beginner else PIN_RANK.pond}
 		"place":
 			# The homestead keeps its plate and its whole name (q(137) leaves it as it was), first after the always-in pins.
-			if str(entry.get("id", "")) == HOME_PIN: return {"icon": P0Logic.icon("home"), "plate": true, "label": "Homestead",
+			if str(entry.get("id", "")) == HOME_PIN: return {"icon": P0Logic.icon("home"), "plate": true, "label": "Home",
 				"rank": PIN_RANK.beginner}
 			var o := P0Outposts.find(str(entry.get("id", "")))
 			if not o.is_empty():
@@ -638,7 +638,7 @@ func avatar_shift() -> Vector2:
 ## with its own card (host_card), so no art or action of the city view's: `filter` "pond" only keeps it with the
 ## outposts if the map's filter were ever Ponds (P0 shows no filters).
 func home_entry() -> Dictionary:
-	return {"id": HOME_PIN, "kind": "place", "name": "Homestead", "category": "Your farm", "lat": home_lat,
+	return {"id": HOME_PIN, "kind": "place", "name": "Home", "category": "Your farm", "lat": home_lat,
 		"lng": home_lng, "filter": "pond", "tag": ""}
 
 ## The avatar stands where the player is (the place chip, P0Runtime.here) and the farm wears its pin while away.
@@ -669,7 +669,7 @@ func place_card(entry: Dictionary) -> Dictionary:
 	var to := Vector2(float(entry.get("lat", 0.0)), float(entry.get("lng", 0.0)))
 	var distance := ["Distance", P0PlaceSheet.distance_text(P0PlaceSheet.km_between(_origin(), to))]
 	if id == HOME_PIN:
-		return P0PlaceSheet.for_here({"title": "Homestead", "subtitle": "Your farm", "reason": PinReason.reason(_view(), id),
+		return P0PlaceSheet.for_here({"title": "Home", "subtitle": "Your farm", "reason": PinReason.reason(_view(), id),
 			"facts": [distance], "primary": "Go home"}, not away())   # a 0-Energy action is the verb alone (q(122))
 	var o := P0Outposts.find(id)
 	if o.is_empty(): return {}

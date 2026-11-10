@@ -82,7 +82,7 @@ func test_need_source_pops_above_the_tile_and_show_only_runs_the_guide() -> void
 	_host(host)
 	var shown := []
 	var anchor := Rect2(Vector2(140, 400), Vector2(78, 86))
-	var layer := UiNeedSource.popup(host, anchor, "Radish Seeds · Homestead Stall", func(): shown.append(true))
+	var layer := UiNeedSource.popup(host, anchor, "Radish Seeds · Home Stall", func(): shown.append(true))
 	await _settle()
 	var pill: UiNeedSource = layer.get_child(0)
 	assert_float(pill.get_global_rect().end.y).is_less_equal(anchor.position.y)
@@ -171,7 +171,7 @@ func test_hud_rows_read_the_today_dot_and_the_actual_place() -> void:
 	hud.apply({place = {city = "San Francisco", space = "Farmhouse", kind = UiHud.PlaceKind.HOME, day_pass = ""}})
 	await _settle()
 	assert_str(space.text).is_equal("Farmhouse")   # room again: the whole space comes back
-	assert_str(UiHud.place_text({city = "San Francisco", space = "Homestead"})).is_equal("San Francisco · Homestead")
+	assert_str(UiHud.place_text({city = "San Francisco", space = "Home"})).is_equal("San Francisco · Home")
 
 func test_hud_badge_buff_and_balances() -> void:
 	var hud: UiHud = _host(UiHud.new())

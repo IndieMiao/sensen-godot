@@ -27,14 +27,14 @@ func test_the_key_sets_a_trap_or_says_why_not() -> void:
 func test_the_key_greys_at_a_pond_outside_the_home_city() -> void:
 	var tokyo_pond := "gn-1850147~pond0"
 	var away := P0Trap.set_key(_view([]), tokyo_pond)   # no travel block: home is the written city, San Francisco
-	assert_that([away.verb, away.sub, away.enabled, away.toast, away.cmd]).is_equal(["Set Trap", "Home ponds only", false,
+	assert_that([away.verb, away.sub, away.enabled, away.toast, away.cmd]).is_equal(["Set Trap", "Home city only", false,
 		"Traps go in your home city's ponds", {}])
-	assert_str(str(P0Trap.set_key(_view([_trap(BLOSSOM)]), tokyo_pond).sub)).is_equal("Home ponds only")   # before the slots
+	assert_str(str(P0Trap.set_key(_view([_trap(BLOSSOM)]), tokyo_pond).sub)).is_equal("Home city only")   # before the slots
 	var v := _view([])
 	v["travel"] = {"home": "gn-1850147", "here": "gn-1850147"}
 	var home := P0Trap.set_key(v, tokyo_pond)
 	assert_that([home.sub, home.enabled]).is_equal(["Free", true])
-	assert_str(str(P0Trap.set_key(v, FERN).sub)).is_equal("Home ponds only")
+	assert_str(str(P0Trap.set_key(v, FERN).sub)).is_equal("Home city only")
 	assert_bool(P0Trap.home_pond(_view([]), FERN)).is_true()
 	assert_str(str(P0Trap.refusal_text({"type": "set_trap"}, "home_ponds_only", {}))).is_equal("Traps go in your home city's ponds")
 

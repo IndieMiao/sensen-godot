@@ -139,7 +139,7 @@ func test_name_bar_opens_from_the_icon_and_dims_when_used() -> void:
 func test_name_bar_status_takes_the_icons_place_at_22() -> void:
 	var bar := _host(UiWorldNameBar.new()) as UiWorldNameBar
 	bar.icon = HOME
-	bar.text = "Homestead Stall"
+	bar.text = "Home Stall"
 	bar.status = UiStatusBadge.State.REQUEST
 	assert_object(bar._row.get_child(0)).is_same(bar._glyph)
 	assert_bool(bar._glyph.visible).is_false()

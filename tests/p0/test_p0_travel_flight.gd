@@ -493,7 +493,7 @@ func test_going_home_from_another_city_flies_first() -> void:
 	rt.session.sent.connect(func(cmd): sent.append(str(cmd.get("type", ""))))
 	m.p0_return("farm")   # the place chip's way home
 	assert_bool(m.travelling()).is_true()
-	assert_str(_cover(m).title.text).is_equal("Homestead")
+	assert_str(_cover(m).title.text).is_equal("Home")
 	assert_array(sent).is_empty()
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")   # the city left, until it lands
 	m.open_farm = func(): pass   # the farm opens as far as this: the test stays on the map

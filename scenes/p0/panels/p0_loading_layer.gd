@@ -119,7 +119,7 @@ static func icon_for(path: String, args: Dictionary) -> Texture2D:
 ## "" for a scene that is not a P0 world (AppRouter keeps its own overlay).
 static func destination(path: String, args: Dictionary) -> String:
 	match path.get_file():
-		"p0_farm.tscn": return P0City.chip("Homestead")
+		"p0_farm.tscn": return P0City.chip("Home")
 		"p0_pond.tscn": return P0City.chip_for(str(P0Ponds.location(str(args.get("pond_id", ""))).get("name", "Pond")), str(args.get("pond_id", "")))
 		"p0_outpost.tscn": return P0City.chip_for(str(P0Outposts.find(str(args.get("outpost_id", ""))).get("name", "Outpost")), str(args.get("outpost_id", "")))
 		"p0_mine.tscn": return P0City.chip("Mine · Floor %d" % int(args.get("floor", 1)))

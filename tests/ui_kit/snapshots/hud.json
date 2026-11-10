@@ -202,16 +202,16 @@
                                                   "rect": [
                                                     133,
                                                     118,
-                                                    49,
+                                                    26,
                                                     14
                                                   ],
                                                   "variation": "C10B",
-                                                  "text": "Homestead"
+                                                  "text": "Home"
                                                 },
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    182,
+                                                    159,
                                                     118,
                                                     1,
                                                     14

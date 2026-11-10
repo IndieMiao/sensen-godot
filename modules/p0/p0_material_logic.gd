@@ -438,9 +438,9 @@ static func refusal_text(code: String, detail: Dictionary, cmd: Dictionary) -> V
 		"not_here", "unknown_place":   # mine_enter away from its site, or a site gone: the mouth card shows why (C)
 			return ""
 		"not_open":   # a mine's type not open yet, or a vein before its Homestead level (v4 2.7)
-			return "Homestead Lv%d" % int(detail.homestead) if detail.has("homestead") else "Not open yet"
+			return "Home Lv%d" % int(detail.homestead) if detail.has("homestead") else "Not open yet"
 		"homestead_level":
-			return "Homestead Lv%d" % int(detail.get("need", 2))
+			return "Home Lv%d" % int(detail.get("need", 2))
 		"not_ready":
 			return "Ready in %s" % P0Logic.span(float(detail.get("ready_in", 0)))
 	return null
@@ -619,7 +619,7 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 	var d: Dictionary = block.get("detail", {})
 	match str(block.get("code", "")):
 		"homestead_level":
-			return {"label": "Homestead Lv%d" % int(d.get("need", d.get("level", 1))), "kind": "unavailable", "cmd": {}}
+			return {"label": "Home Lv%d" % int(d.get("need", d.get("level", 1))), "kind": "unavailable", "cmd": {}}
 		"locked":
 			return {"label": "%s Lv%d" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
 		"skill_level_required":   # q(59) §5: `Farming Lv6 needed`
@@ -628,7 +628,7 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 			# `Sprinklers 6/6 · Homestead Lv4 adds 1` / `Greenhouses 1/1 · Farming Lv10 adds 1`; at the top both only count
 			var label := "%ss %d/%d" % [str(r.get("name", "")), int(d.get("used", 0)), int(d.get("cap", 0))]
 			var toast := label
-			if d.get("homestead_next", null) != null: toast += " · Homestead Lv%d adds 1" % int(d.homestead_next)
+			if d.get("homestead_next", null) != null: toast += " · Home Lv%d adds 1" % int(d.homestead_next)
 			if d.get("farming_next", null) != null: toast += " · Farming Lv%d adds 1" % int(d.farming_next)
 			return {"label": label, "kind": "unavailable", "cmd": {}, "toast": toast}
 		"no_coins":   # LOCK-10 (the greenhouse's 300 coins with the 40 floor)

@@ -32,8 +32,8 @@ func _view(tackle_distance = HOME, market_distance = HOME) -> Dictionary:
 				{"kind": "fish", "rate": float(market_distance.factor), "quota": null, "regional": true, "items": ["fish_arctic_char"]}],
 				"distance": market_distance},
 		},
-		"quotas": {"dish": {"used": 96, "cap": 120, "resets_in": 33120000, "scope": "Homestead Stall"},
-			"material": {"used": 0, "cap": 30, "resets_in": 33120000, "scope": "Homestead Stall"}},
+		"quotas": {"dish": {"used": 96, "cap": 120, "resets_in": 33120000, "scope": "Home Stall"},
+			"material": {"used": 0, "cap": 30, "resets_in": 33120000, "scope": "Home Stall"}},
 		"keepers": {"market": {}},
 		"rarity_names": ["Common", "Fine", "Rare", "Legendary"],
 	}
@@ -62,8 +62,8 @@ func test_the_price_line_says_home_price_at_home_and_how_far_away() -> void:
 func test_the_homestead_stall_says_home_price_and_keeps_its_dish_and_material_quotas() -> void:
 	assert_str(P0CounterDrawer.quota_text(_view(), "homestead")).is_equal("Home price")
 	assert_str(P0CounterDrawer.quota_text(_view(), "homestead", "crop_pumpkin")).is_equal("Home price")
-	assert_str(P0CounterDrawer.quota_text(_view(), "homestead", "dish_grilled_crucian")).is_equal("Dish buy-back today 96/120\nHomestead Stall · resets in 9h 12m")
-	assert_str(P0CounterDrawer.quota_text(_view(), "homestead", "timber")).is_equal("Material buy-back today 0/30\nHomestead Stall · resets in 9h 12m")
+	assert_str(P0CounterDrawer.quota_text(_view(), "homestead", "dish_grilled_crucian")).is_equal("Dish buy-back today 96/120\nHome Stall · resets in 9h 12m")
+	assert_str(P0CounterDrawer.quota_text(_view(), "homestead", "timber")).is_equal("Material buy-back today 0/30\nHome Stall · resets in 9h 12m")
 
 func test_an_older_server_keeps_its_quota_lines() -> void:
 	assert_str(P0CounterDrawer.quota_text(_old_view(), "tackle")).is_equal("Fish buy-back today 30/80\nany Tackle Shop · resets in 9h 12m")

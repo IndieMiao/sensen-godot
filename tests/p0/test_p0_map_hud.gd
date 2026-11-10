@@ -39,7 +39,7 @@ func test_the_maps_own_chrome_gives_way_to_the_hud_and_bag() -> void:
 	assert_float(city.recenter.position.x + city.recenter.size.x).is_equal_approx(city.size.x - 12.0, 0.5)
 	assert_float(city.recenter.position.y + city.recenter.size.y).is_equal_approx(bag_top - 12.0, 0.5)
 	assert_float(city.content_bottom()).is_equal_approx(bag_top, 0.5)
-	assert_str(m.own_farm_name).is_equal("Homestead")
+	assert_str(m.own_farm_name).is_equal("Home")
 
 func test_recenter_brings_the_camera_home_at_the_locate_zoom() -> void:
 	var m := _map()
@@ -69,7 +69,7 @@ func test_place_cards_follow_q80() -> void:
 	assert_bool(city.entries.any(func(e): return str(e.get("id", "")) == "home")).is_false()   # no Homestead pin
 	m._own_pin_pressed()
 	assert_str(rt.ui.modal_kind).is_equal("place_card")
-	assert_str(_primary(rt)).is_equal("Back to Homestead")
+	assert_str(_primary(rt)).is_equal("Back to Home")
 	assert_array(_facts(rt)).is_empty()
 	m.p0_frame(rt.session.view, 0.0)
 	assert_bool(city.recenter.visible).is_false()   # the recenter key gives way to the sheet (不知火舞 on 234 A2)

@@ -36,7 +36,7 @@ static func set_key(view: Dictionary, place: String) -> Dictionary:
 	var used: int = (t.get("traps", []) as Array).size()
 	var slots := int(t.get("slots", 0))
 	if place != "" and not home_pond(view, place):
-		return _grey("Set Trap", "Home ponds only", HOME_PONDS_ONLY)
+		return _grey("Set Trap", "Home city only", HOME_PONDS_ONLY)
 	if not at(view, place).is_empty():
 		return _grey("Set Trap", "Trap already here")
 	if used >= slots:

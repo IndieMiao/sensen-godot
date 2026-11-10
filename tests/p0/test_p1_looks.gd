@@ -26,7 +26,7 @@ func _ui(v: Dictionary) -> P0Ui:
 func test_looks_rows_name_the_look_on_reached_stages_and_grey_the_rest() -> void:
 	var rows := P0Logic.look_rows(_view(4))
 	assert_array(rows.map(func(r): return "%s … %s" % [r.name, r.value])).is_equal(
-		["Fence & Mailbox … Timber Fence ›", "Porch … Homestead Lv5", "Kitchen Wing … Homestead Lv8", "Master Farmhouse … Homestead Lv15"])
+		["Fence & Mailbox … Timber Fence ›", "Porch … Home Lv5", "Kitchen Wing … Home Lv8", "Master Farmhouse … Home Lv15"])
 	assert_array(rows.map(func(r): return [r.reached, r.open])).is_equal([[true, true], [false, false], [false, false], [false, false]])
 	assert_array(rows.map(func(r): return str(r.icon))).is_equal(["mailbox", "door", "kitchen", "home"])
 	assert_array(P0Logic.look_rows(_view(2))).is_empty()   # no stage yet: no Looks section
@@ -44,7 +44,7 @@ func test_the_next_look_level_lists_its_stage_timber_or_stone() -> void:
 	assert_str("%s · %s" % [row.text, row.note]).is_equal("Porch · Timber or Stone · pick one")
 	assert_str(str(row.icon)).is_equal("door")
 	var board: Dictionary = p.changes.filter(func(c): return str(c.text) == "Notice Board")[0]
-	assert_str(str(board.note)).is_equal("at the Homestead Stall")   # §9, Figma HOME-1-LV5 (不知火舞 on #250)
+	assert_str(str(board.note)).is_equal("at the Home Stall")   # §9, Figma HOME-1-LV5 (不知火舞 on #250)
 
 func test_a_reached_looks_row_opens_the_card_with_the_current_look() -> void:
 	var ui := _ui(_view(5, {"porch": "b"}))

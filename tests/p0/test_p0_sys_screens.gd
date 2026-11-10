@@ -170,7 +170,7 @@ func test_opening_a_p0_world_names_where_the_player_is_going() -> void:
 	# the city in full (q(107): the Today icon leaves the place chip 300 wide, so SF is no longer needed)
 	assert_str(pond.screen._place.text).is_equal("San Francisco · Fern Pond")
 	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_mine.tscn", {"floor": 3})).is_equal("San Francisco · Mine · Floor 3")
-	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("San Francisco · Homestead")
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("San Francisco · Home")
 	assert_object(rt._scene_overlay("res://scenes/farm/farm.tscn", {})).is_null()   # not a P0 world: AppRouter's own
 	pond.free()
 

@@ -118,7 +118,7 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 			str(home.get("line", "")))
 		row.name = "HomeCity"
 		row.pressed.connect(func(): page.open_pressed.emit("home"))
-		page._group("Home", [row])
+		page._group("", [row])   # no group title: bare `Home` reads as the homestead now (SGODOT-461, 不知火舞: its own group)
 	if notifications != "":
 		var notif := UiSettingRow.new(UiSettingRow.Kind.LINK, "Notifications", "", notifications)
 		notif.name = "Notifications"

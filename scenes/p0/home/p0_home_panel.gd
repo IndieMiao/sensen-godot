@@ -262,7 +262,7 @@ static func plaque(ui: P0Ui) -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 8)
 	panel.add_child(col)
-	col.add_child(UiObjectHeader.new({"title": "Upgrade Plaque", "state": "Homestead Lv%d" % int(view.get("homestead", {}).get("level", 1))}))
+	col.add_child(UiObjectHeader.new({"title": "Upgrade Plaque", "state": "Home Lv%d" % int(view.get("homestead", {}).get("level", 1))}))
 	for line in P0Logic.plaque_lines(view): col.add_child(UiFactRow.new(str(line.label), str(line.value)))
 	holder.add_child(panel)
 	var close := UiCloseButton.new()   # floats 6 above the sheet's top-right corner

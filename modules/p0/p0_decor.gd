@@ -173,7 +173,7 @@ static func cap_line(view: Dictionary, m: Dictionary = {}) -> String:
 	var head := "Decor %d/%d" % [used(view), cap(view)]
 	var adds := cap_at(level + 1, m) - cap_at(level, m)
 	if level >= P0Logic.homestead_max(view) or adds <= 0: return head + " · Store one to place this"
-	return head + " · Homestead Lv%d adds %d" % [level + 1, adds]
+	return head + " · Home Lv%d adds %d" % [level + 1, adds]
 
 ## Today's free row while pieces wait in Farm Storage (q(111), 29e28d3f): `Place Flower Planter · in storage`, several
 ## kinds `Place 2 decor · in storage`; no red dot (q(107)). {} when nothing waits or the yard is full.

@@ -66,7 +66,7 @@ func test_the_open_name_bar_stands_in_for_its_button_and_folds_back() -> void:
 func test_the_name_bar_flips_at_the_screen_edge() -> void:
 	var a := ui._marker_area()
 	var right_edge := Vector2(a.end.x - 30, a.get_center().y)
-	ui.name_bar("stall", HOME, "Homestead Stall", "", right_edge, true)
+	ui.name_bar("stall", HOME, "Home Stall", "", right_edge, true)
 	assert_int(ui._name_bars.stall.side).is_equal(UiWorldNameBar.Dir.LEFT)
 	var left_edge := Vector2(a.position.x + 30, a.get_center().y)
 	ui.name_bar("plaque", HOME, "Upgrade Plaque", "", left_edge, true, UiWorldNameBar.Dir.LEFT)
@@ -105,7 +105,7 @@ func test_the_open_name_bar_draws_over_badges_and_icon_buttons() -> void:
 func test_a_strip_over_a_name_tag_opens_the_other_way() -> void:
 	var at := _mid()
 	ui.npc_tag("ama", "Ama", at + Vector2(70, 10), true)
-	ui.name_bar("stall", HOME, "Homestead Stall", "", at, true, UiWorldNameBar.Dir.RIGHT)
+	ui.name_bar("stall", HOME, "Home Stall", "", at, true, UiWorldNameBar.Dir.RIGHT)
 	assert_int(ui._name_bars.stall.side).is_equal(UiWorldNameBar.Dir.LEFT)
 	ui.name_bar("cabinet", HOME, "Warming Cabinet", "", at + Vector2(-60, 120), true, UiWorldNameBar.Dir.RIGHT)   # left of the keys (442)
 	assert_int(ui._name_bars.cabinet.side).is_equal(UiWorldNameBar.Dir.RIGHT)   # nothing in the way
@@ -121,7 +121,7 @@ func test_a_name_tag_the_strip_covers_fades_until_it_folds() -> void:
 		ui.npc_tag("ama", "Ama", at + Vector2(60, 10), true)
 		ui.npc_tag("pip", "Pip", at + Vector2(-60, 10), true)
 	tags.call()
-	ui.name_bar("stall", HOME, "Homestead Stall", "", at, true, UiWorldNameBar.Dir.RIGHT)
+	ui.name_bar("stall", HOME, "Home Stall", "", at, true, UiWorldNameBar.Dir.RIGHT)
 	assert_int(ui._name_bars.stall.side).is_equal(UiWorldNameBar.Dir.RIGHT)   # both sides covered: keeps its side
 	tags.call()
 	await get_tree().create_timer(0.2).timeout

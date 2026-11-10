@@ -11,8 +11,8 @@ func test_the_city_comes_from_the_content() -> void:
 	assert_str(P0City.region()).is_equal(str(profile.region))
 	assert_str(P0City.short_name()).is_equal(str(profile.get("city_short", profile.city)))
 	assert_that(P0City.farm_at()).is_equal(Vector2(float(profile.farm_at[0]), float(profile.farm_at[1])))
-	assert_str(P0City.chip("Homestead")).is_equal("%s · Homestead" % profile.get("chip_city", profile.city))
-	assert_str(P0City.chip("Homestead", true)).is_equal("%s · Homestead" % P0City.short_name())
+	assert_str(P0City.chip("Home")).is_equal("%s · Home" % profile.get("chip_city", profile.city))
+	assert_str(P0City.chip("Home", true)).is_equal("%s · Home" % P0City.short_name())
 
 ## The beginner pond is fishing.places' beginner one (周瑜 on 270: one source with the server's markers), and every
 ## place that names it reads it.
@@ -38,7 +38,7 @@ func test_no_p0_script_spells_the_city_out() -> void:
 
 ## The loading cover says where the player is going in the same words as the chip there.
 func test_the_loading_cover_names_the_city() -> void:
-	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal(P0City.chip("Homestead"))
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal(P0City.chip("Home"))
 	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_mine.tscn", {"floor": 2})).is_equal(P0City.chip("Mine · Floor 2"))
 
 ## With profile.chip_city set (李白 5965ec02: SF on every chip), the homestead, a room and the loading cover all write it.
@@ -46,13 +46,13 @@ func test_every_chip_writes_chip_city_when_the_content_sets_it() -> void:
 	var profile: Dictionary = P0Logic.content().profile
 	var had = profile.get("chip_city", null)
 	profile["chip_city"] = "XY"
-	assert_str(P0City.chip("Homestead")).is_equal("XY · Homestead")
-	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("XY · Homestead")
+	assert_str(P0City.chip("Home")).is_equal("XY · Home")
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("XY · Home")
 	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_outpost.tscn", {"outpost_id": "sh_tea_1"})) \
 		.is_equal("XY · " + str(P0Outposts.find("sh_tea_1").name))
 	var room := FileAccess.get_file_as_string("res://scenes/p0/rooms/p0_room.gd")
 	assert_bool(room.contains("set_place(P0City.chip_for(place_name")).is_true()   # the rooms' chip goes through P0City too
-	assert_str(P0City.chip_for("Homestead", "")).is_equal("XY · Homestead")   # a home place: chip()
+	assert_str(P0City.chip_for("Home", "")).is_equal("XY · Home")   # a home place: chip()
 	# another city's place (a generated id, SGODOT-280) names its own city
 	assert_str(P0City.chip_for("Tokyo Market Square", "gn-1850147~market0")).is_equal("Tokyo · Tokyo Market Square")
 	assert_bool(room.contains('" · " + place_name')).is_false()

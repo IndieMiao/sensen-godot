@@ -75,7 +75,7 @@ func test_fish_dex_silhouettes_gate_on_level_then_rod() -> void:
 
 func test_a_homestead_gate_counts_levels() -> void:
 	var s := P0Logic.gate_spec(_view(), {"homestead": 3, "what": "Bag Upgrade I", "after": "opens Bag Upgrade I", "guide": {}})
-	assert_str(s.lead).is_equal("Homestead Lv3 opens Bag Upgrade I")
+	assert_str(s.lead).is_equal("Home Lv3 opens Bag Upgrade I")
 	assert_that([s.need.have, s.need.need, s.need.note]).is_equal([2, 3, "1 level to go"])
 	assert_bool(s.buttons.is_empty()).is_true()
 

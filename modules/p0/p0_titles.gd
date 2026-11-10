@@ -7,7 +7,7 @@ extends RefCounted
 
 ## Ids to their P0Logic.TITLE_NAMES key and their source line.
 const _NAMED := {
-	"homestead": ["title_homestead_master", "Homestead Lv10"],
+	"homestead": ["title_homestead_master", "Home Lv10"],
 	"level:farming": ["title_master_gardener", "Farming Lv10"],
 	"level:fishing": ["title_master_angler", "Fishing Lv10"],
 	"level:cooking": ["title_chef", "Cooking Lv10"],

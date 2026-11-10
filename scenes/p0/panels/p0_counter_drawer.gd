@@ -149,7 +149,7 @@ func _build_head() -> void:
 		titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		titles.alignment = BoxContainer.ALIGNMENT_CENTER
 		titles.add_theme_constant_override(&"separation", 0)
-		var title := UiKit.label("Homestead Stall", UiTokens.STYLE_C14_XB)
+		var title := UiKit.label("Home Stall", UiTokens.STYLE_C14_XB)
 		titles.add_child(title)
 		_decor_line = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
 		_decor_line.visible = false

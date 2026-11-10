@@ -42,7 +42,7 @@ static func weapon_gate(view: Dictionary, id: String) -> String:
 	var recipe := weapon_recipe(id)
 	if recipe.is_empty(): return ""
 	var lv := int(recipe.get("homestead", 0))
-	return "Homestead Lv%d" % lv if int(view.get("homestead", {}).get("level", 1)) < lv else "Craft at Workbench"
+	return "Home Lv%d" % lv if int(view.get("homestead", {}).get("level", 1)) < lv else "Craft at Workbench"
 
 static func weapon_source(view: Dictionary, id: String) -> String:
 	if (view.get("gear", {}).get("weapons", []) as Array).has(id): return ""
@@ -70,7 +70,7 @@ static func drink_action(view: Dictionary, id: String, cooldown_ms: float) -> Di
 		k.sub = "In the mine only"
 		return k
 	if P0Logic.bag_count(view, id) <= 0:
-		k.sub = "Buy at Homestead Stall"
+		k.sub = "Buy at Home Stall"
 		return k
 	var hp := int(at.get("hp", 0))
 	var cap := int(mine.get("hp_max", 0))

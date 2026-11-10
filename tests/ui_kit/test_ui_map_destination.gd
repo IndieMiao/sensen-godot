@@ -11,7 +11,7 @@ func _pin(text := "Oak Tea House", plate := false) -> UiMapDestination:
 
 func test_disc_icon_and_the_short_name_under_it() -> void:
 	var d := _pin("Oak")
-	var home := _pin("Homestead", true)
+	var home := _pin("Home", true)
 	await get_tree().process_frame
 	assert_that(d._disc.size).is_equal(Vector2(40, 40))
 	assert_that(d._icon.size).is_equal(Vector2(24, 24))
@@ -39,7 +39,7 @@ func test_disc_icon_and_the_short_name_under_it() -> void:
 
 func test_only_the_homestead_has_a_plate() -> void:
 	var plain := _pin()
-	var home := _pin("Homestead", true)
+	var home := _pin("Home", true)
 	await get_tree().process_frame
 	assert_that((plain._label_box.get_theme_stylebox(&"panel") as UiStyleBox).bg_color.a).is_equal(0.0)
 	assert_that((home._label_box.get_theme_stylebox(&"panel") as UiStyleBox).bg_color).is_equal(UiTokens.COLOR_SURFACE)
@@ -61,12 +61,12 @@ func test_a_mark_hangs_a_status_badge_on_the_top_left() -> void:
 ## The city map packs pins by label_size_for before any pin exists: it measures what a built pin draws, in its own
 ## style token and padding (刘邦 on #100): the homestead's plate, the others' short name (q(137)).
 func test_the_static_name_size_is_the_built_one() -> void:
-	var names := ["Homestead", "Oak", "Union Square", "Hummingbird Kingfisher Frangipani"]
-	var pins: Array = names.map(func(n): return _pin(n, n == "Homestead"))
+	var names := ["Home", "Oak", "Union Square", "Hummingbird Kingfisher Frangipani"]
+	var pins: Array = names.map(func(n): return _pin(n, n == "Home"))
 	await get_tree().process_frame
 	for i in names.size():
 		assert_that((pins[i] as UiMapDestination).label_size()).append_failure_message(names[i]) \
-			.is_equal(UiMapDestination.label_size_for(names[i], names[i] == "Homestead"))
+			.is_equal(UiMapDestination.label_size_for(names[i], names[i] == "Home"))
 	assert_that(UiMapDestination.label_size_for("")).is_equal(Vector2.ZERO)
 
 ## q(137) ③: who is in is the top-right count, a person and the number; none at 0.

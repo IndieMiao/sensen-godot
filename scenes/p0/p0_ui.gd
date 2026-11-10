@@ -93,7 +93,7 @@ var view: Dictionary = {}
 var root: Control
 var pad: Control
 var hud: UiHud                   # two-row HUD (SGODOT-222, LOCK-06)
-var _place_text := P0City.chip("Homestead")
+var _place_text := P0City.chip("Home")
 var _fab_state: Dictionary = {}
 var fab_held := false            # §14.2: hold the main action to keep sowing along a row
 var fab_verb := ""
@@ -755,7 +755,7 @@ func _on_slot_tapped(id: String) -> void:
 	# has no vibrate permission (PR #12 re-review). The copy is the slot's refill hint (§10.3.3).
 	if P0Logic.bag_count(view, id) <= 0 and id != selected_seed and id != selected_bait:
 		if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(10)
-		toast("Craft at Workbench" if bar_mode == "mine" else "Buy at Homestead Stall")   # q(44) refill hints
+		toast("Craft at Workbench" if bar_mode == "mine" else "Buy at Home Stall")   # q(44) refill hints
 		return
 	if bar_mode == "fish" and id.begins_with("trap_"):
 		# The Fish Trap (SGODOT-283): selecting it turns the key into Set Trap; tap again for the rod. No toast.
@@ -4545,7 +4545,7 @@ func open_passport(back := Callable(), page := "cities") -> UiDrawer:
 	var spec := P0Travel.passport(view)
 	for r in spec.rows:
 		r["icon"] = load(str(r.stamp)) if str(r.get("stamp", "")) != "" else P0Logic.icon(str(r.icon))
-		if str(r.state) != "Home":
+		if str(r.cluster) != P0Travel.home(view):   # the home city's row opens nothing (its cluster, not its wording)
 			var cluster := str(r.cluster)
 			r["pressed"] = func(): open_city_page(cluster, func(): open_passport(back))
 	var d: UiDrawer = PassportDrawer.new(spec, view, page)

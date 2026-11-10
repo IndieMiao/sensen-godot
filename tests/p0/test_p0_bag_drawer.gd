@@ -225,7 +225,7 @@ func test_profile_data_reads_the_view_and_hides_what_is_missing() -> void:
 	v["skills"] = {"farming": {"level": 2, "xp": 70, "floor": 50, "next": 100}, "fishing": {"level": 1, "xp": 0, "floor": 0, "next": 40},
 		"cooking": {"level": 10, "xp": 999, "floor": 900, "next": null}}
 	v["profile"] = {"name": "Farmer", "city": "San Francisco", "climate": "Temperate", "since_ms": 1791000000000.0,
-		"farm": {"name": "Farmer's Homestead", "level": 1}}
+		"farm": {"name": "Farmer's Home", "level": 1}}
 	v["plots"] = [{"state": "growing", "crop": "crop_radish", "ready_in": 12720000}, {"state": "tilled"}]
 	v["fishing"] = {"dex": [{"id": "fish_crucian", "caught": 2}, {"id": "fish_perch", "caught": 0}, {"id": "fish_bass", "caught": 1}]}
 	# S5: 1 page discovered (cooked) of the 48 shown; a known page not cooked yet (a recipe card's) is not counted (q(100))
@@ -237,7 +237,7 @@ func test_profile_data_reads_the_view_and_hides_what_is_missing() -> void:
 	assert_that(d.skills.map(func(s): return [s.key, s.level])).is_equal([["farming", 2], ["fishing", 1], ["cooking", 10]])
 	assert_float(float(d.skills[0].progress)).is_equal_approx(0.4, 0.0001)
 	assert_float(float(d.skills[2].progress)).is_equal(1.0)   # top level: full ring
-	assert_str(str(d.farm.name)).is_equal("Farmer's Homestead")
+	assert_str(str(d.farm.name)).is_equal("Farmer's Home")
 	assert_str(str(d.farm.level_line)).is_equal("Level 1")
 	assert_str(str(d.farm.status)).is_equal("Radishes ready in 3h 32m")
 	# Cities (PROFILE-1, SGODOT-275): cities reached by travel toward the next Explorer medal (3 / 10 / 30 / 100)
@@ -381,7 +381,7 @@ func test_full_bag_shows_where_more_room_comes_from() -> void:
 	v.bag.slots = [{"id": "seed_radish", "qty": 5}, {"id": "fish_crucian", "qty": 1}]
 	v["homestead"] = {"unlocks": {"bag_upgrade_1": "locked"}}
 	var up: Dictionary = P0Logic.content().bag_upgrades[0]
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots at Homestead Lv%d" % [P0Logic.bag_tier_slots(str(up.id)), int(up.homestead)])   # its own +5 (q(194))
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots at Home Lv%d" % [P0Logic.bag_tier_slots(str(up.id)), int(up.homestead)])   # its own +5 (q(194))
 	v.homestead.unlocks.bag_upgrade_1 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots · %s" % [P0Logic.bag_tier_slots(str(up.id)), str(up.name)])
 	v.homestead.unlocks.bag_upgrade_1 = "owned"
@@ -398,13 +398,13 @@ func test_full_bag_points_at_the_next_upgrade_after_the_first() -> void:
 	v.bag.slots = []
 	for i in 30: v.bag.slots.append({"id": "seed_radish", "qty": 1})
 	v["homestead"] = {"unlocks": {"bag_upgrade_1": "owned", "bag_upgrade_2": "locked", "bag_upgrade_3": "locked"}}
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv7")
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Home Lv7")
 	v.homestead.unlocks.bag_upgrade_2 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade II")
 	v.homestead.unlocks.bag_upgrade_2 = "owned"
 	v.bag.capacity = 35
 	for i in 5: v.bag.slots.append({"id": "seed_radish", "qty": 1})
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv11")
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Home Lv11")
 	v.homestead.unlocks.bag_upgrade_3 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade III")
 	v.homestead.unlocks.bag_upgrade_3 = "owned"
