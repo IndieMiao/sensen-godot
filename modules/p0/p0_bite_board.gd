@@ -20,14 +20,16 @@ const QUIET := "Quiet day. Any pond will do."
 const QUIET_CLAUSE := "Quiet day"   # the Notice Board's, without the advice (as CLAUSE)
 const TIME_WORDS := {"dawn_dusk": "at dawn and dusk", "night": "at night"}
 const WEATHER_WORDS := {"rain": "in the rain", "wind": "in the wind", "sun": "in the sun"}
-## The keeper's line as whole sentences, so a translation can order them (SGODOT-385): the fish, up to two conditions
-## (its best time, the weather) or its only time and the weather, then the bait's own sentence — by how many conditions.
-const LINE := ["%s bite. %s", "%s bite %s. %s", "%s bite %s %s. %s"]
-const LINE_ONLY := ["%s only bite %s. %s", "%s only bite %s %s. %s"]
+## The keeper's line as whole sentences, so a translation can order them (SGODOT-385): the fish, its conditions (its
+## best time, the weather; or its only time and the weather) as one phrase, then the bait's own sentence — by whether it
+## has conditions. Two conditions are one `%s` (`at night in the rain`, a key of its own): two `%s` with only a space
+## between were cut at the first space when translated, `鲇鱼at且night in the rain咬钩` (SGODOT-467).
+const LINE := ["%s bite. %s", "%s bite %s. %s"]
+const LINE_ONLY := "%s only bite %s. %s"
 ## Without the bait (the Notice Board's pond line, q(119)): whole clauses too, never a sentence cut at its dot (0.2.23,
 ## 不知火舞 385 15f1d114: `Common Carp bite` stayed English).
-const CLAUSE := ["%s bite", "%s bite %s", "%s bite %s %s"]
-const CLAUSE_ONLY := ["%s only bite %s", "%s only bite %s %s"]
+const CLAUSE := ["%s bite", "%s bite %s"]
+const CLAUSE_ONLY := "%s only bite %s"
 
 ## The board's section titles at this Fishing level (Forecast from Lv3, as the pond card's Forecast row).
 static func titles(level: int) -> Array:
@@ -77,10 +79,12 @@ static func line(fish_ids: Array, weather: String, level: int, caught: Dictionar
 		if key != "": conds.append(str(TIME_WORDS[key]))
 	if bool(p.weather_match) and WEATHER_WORDS.has(weather): conds.append(str(WEATHER_WORDS[weather]))
 	var bait := "Try a Spinner Lure." if regional and level >= LURE_LEVEL else "Bring worms."
+	var when := " ".join(PackedStringArray(([only] if t is String else []) + conds))   # `at night in the rain`
 	if not bait_too:
-		return str(CLAUSE_ONLY[conds.size()]) % ([name, only] + conds) if t is String else str(CLAUSE[conds.size()]) % ([name] + conds)
-	if t is String: return str(LINE_ONLY[conds.size()]) % ([name, only] + conds + [bait])
-	return str(LINE[conds.size()]) % ([name] + conds + [bait])
+		if t is String: return CLAUSE_ONLY % [name, when]
+		return str(CLAUSE[0]) % name if when == "" else str(CLAUSE[1]) % [name, when]
+	if t is String: return LINE_ONLY % [name, when, bait]
+	return str(LINE[0]) % [name, bait] if when == "" else str(LINE[1]) % [name, when, bait]
 
 ## As shown, in curly quotes (the frames' 2255:32861): `“Rainbow Trout bite in the rain. Bring worms.” — Finn`. The space
 ## after the dash does not break, so a line that wraps keeps `— Finn` together (不知火舞 on #262).
@@ -171,7 +175,11 @@ static func biting_now(place: Dictionary, level: int, caught: Dictionary) -> Str
 ## The Forecast fact (Lv3+): [[day, weather icon]] × 3, from the view's place.forecast; [] below Lv3.
 static func forecast(place: Dictionary, level: int) -> Array:
 	if level < FORECAST_LEVEL: return []
-	return (place.get("forecast", []) as Array).map(func(d): return [str(d.get("day", "")), str(WEATHER_ICON.get(str(d.get("weather", "")), "clear"))])
+	return (place.get("forecast", []) as Array).map(func(d): return [weekday(str(d.get("day", ""))), str(WEATHER_ICON.get(str(d.get("weather", "")), "clear"))])
+
+## A forecast's day (`Tue`) as shown: 中文 by its `Tue@weekday` key (周二), never the bare word — a city is called Mon
+## (gn-1262824) and city names read the same table (李白 on SGODOT-467).
+static func weekday(day: String) -> String: return Localization.ctx(day, "weekday")
 
 ## A Bite Board pond row: {id, name, sub `River · 1.6 km`, fish (id or ""), line `Catfish · Night ×2 · Rain ×1.5`}; the
 ## fish is the landable one with the highest factor today over 1 (any time today × today's weather; Biting more's rule,
@@ -265,7 +273,7 @@ static func model(view: Dictionary, outpost: Dictionary) -> Dictionary:
 	if level >= FORECAST_LEVEL:
 		for d in today.get("forecast", []):
 			var w := str(d.get("weather", ""))
-			days.append({"day": str(d.get("day", "")), "icon": str(WEATHER_ICON.get(w, "clear")), "word": str(WEATHER_WORD.get(w, w)),
+			days.append({"day": weekday(str(d.get("day", ""))), "icon": str(WEATHER_ICON.get(w, "clear")), "word": str(WEATHER_WORD.get(w, w)),
 				"fish": forecast_fish(fish, w, level, caught)})
 	var keeper := str(outpost.get("keeper", {}).get("name", ""))
 	return {
