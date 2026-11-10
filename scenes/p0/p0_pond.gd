@@ -539,16 +539,28 @@ func _update_camera(dt := -1.0) -> void:
 			_settling = false
 	place(cam, _focus + right_axis() * (_piece_shift_step(dt, view) / (view.x / cam.size)))
 
-## The marked point's shift this frame (piece_want, eased over PIECE_EASE_S); 0 under Show and before the band.
+## The marked point's shift this frame (piece_want, eased over PIECE_EASE_S); 0 under Show and before the band. Which
+## point it is on and how much: piece_hold.
 var _piece_shift := 0.0
 var _piece_want := 0.0
+var _piece_on := {}
+var _piece_log := false   # shots: every frame's shift printed (piecelog)
 func _piece_shift_step(dt: float, view: Vector2) -> float:
 	var p := _piece_point()
 	var keys := _key_column()
-	var held := _show_held or p.is_empty() or not keys.has_area()
-	_piece_want = 0.0 if held else piece_want(_focus, actor.position, PondGather.piece_box(p), cam.size, view, keys, _piece_want)
+	if _show_held or not keys.has_area():
+		_piece_want = 0.0
+		_piece_on = {}
+	else:
+		var hold := piece_hold(p, _piece_on, _piece_want, actor.position, not actor.mover.is_moving(), gather_goal,
+			func(q: Dictionary, held: float) -> float:
+				return piece_want(_focus, actor.position, PondGather.piece_box(q), cam.size, view, keys, held))
+		_piece_want = hold[0]
+		_piece_on = hold[1]
 	_piece_shift = _piece_want if dt < 0.0 else lerpf(_piece_shift, _piece_want, 1.0 - exp(-dt * 3.0 / PIECE_EASE_S))
 	if absf(_piece_shift - _piece_want) < 0.05: _piece_shift = _piece_want
+	if _piece_log: print("P0_PIECE f=%d x=%.2f z=%.2f mark=%s on=%s want=%.1f shift=%.1f" % [Engine.get_frames_drawn(),
+		actor.position.x, actor.position.z, p.get("id", "-"), _piece_on.get("id", "-"), _piece_want, _piece_shift])
 	return _piece_shift
 
 ## Fishing frames the cast from where the camera is: the marked point's shift goes into the focus (no jump at the
@@ -558,6 +570,7 @@ func _fold_piece_shift(view: Vector2) -> void:
 	_focus += right_axis() * (_piece_shift / (view.x / cam.size))
 	_piece_shift = 0.0
 	_piece_want = 0.0
+	_piece_on = {}
 
 ## The point whose piece the camera clears: the one a tap walks to (gather_goal, v4q(13) ②), else the one wearing the
 ## icon button (the nearest within TAG_M, ready or cooling); {} for none.
@@ -800,6 +813,25 @@ static func piece_want(focus: Vector3, player: Vector3, piece: PackedVector3Arra
 	if held <= 0.0: return need
 	return maxf(need, minf(held, piece_need(focus, player, piece, size, view, keys, KEY_GAP_PX + PIECE_HYST_PX)))
 
+## Which point the shift is on and how much, this frame: [want, point]. `p` is the marked point, `on` the one it was on
+## with `held`; `want_of(point, held)` is piece_want for it. A point starts it only with the player stopped within
+## PIECE_NEAR_M of its stand, or as the one a tap walks to (`goal`): walking by — a piece the camera scrolls through the
+## keys — starts none. Once on, it keeps it by the hysteresis while within TAG_M, walking off too and after the icon
+## moves on to the next point — the larger of the two: never handed back and forth along the bank (上官婉儿 on 475,
+## the re-shot's 6.4 s: shifted for a piece behind the player, let go 0.3 s later as the icon moved on).
+const PIECE_NEAR_M := 2.5
+static func piece_hold(p: Dictionary, on: Dictionary, held: float, player: Vector3, still: bool, goal: String,
+		want_of: Callable) -> Array:
+	var same := not p.is_empty() and not on.is_empty() and str(p.get("id", "")) == str(on.get("id", ""))
+	var near := not p.is_empty() and (str(p.get("id", "")) == goal
+		or (still and PondGather.flat(PondGather.stand_of(p), player) <= PIECE_NEAR_M))
+	var now: float = want_of.call(p, held if same else 0.0) if same or near else 0.0
+	var kept := 0.0
+	if not same and not on.is_empty() and held > 0.0 and PondGather.flat(PondGather.stand_of(on), player) <= PondGather.TAG_M:
+		kept = want_of.call(on, held)
+	var want := maxf(now, kept)
+	return [want, {} if want <= 0.0 else (on if kept > now else p)]
+
 ## The piece's box and its icon's disc on the screen for a camera at `focus`.
 const ICON_PX := 28.0
 static func piece_rects(focus: Vector3, piece: PackedVector3Array, icon: Vector3, size: float, view: Vector2) -> Array:
@@ -910,6 +942,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 				_reopen()
 		"cast": _go_cast(Vector3.INF)
 		"castat": _go_cast(Vector3(float(step[1]), 0, float(step[2])))   # castat:x:z — a cast at that water point
+		"piecelog": _piece_log = true   # shots: the marked point's shift every frame (475 ④ re-shot)
 		"stick": p0_joystick(Vector2(float(step[1]), float(step[2])))   # stick:x:y — held until stick:0:0 (Cast on the move)
 		"tapwater": p0_tap(cam.unproject_position(FishingModel.default_target(str(entry.id), actor.position, site_spec)))   # a tap on the water in front: nothing (q(45))
 		# Fish Trap shots (SGODOT-283): picktrap selects it on the bar; settrap sets it; traptap walks to it and opens
