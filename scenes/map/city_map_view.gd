@@ -1399,8 +1399,9 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		if marker.has("count"):   # SGODOT-479: none at 0; kept clear of like the art, never tapped (the art takes the tap)
 			var pill: PanelContainer = marker.count
 			UiMapDestination.show_online(pill, int(pin_online.call(entry)) if pin_online.is_valid() else int(entry.get("online", 0)))
-			pill.position = count_at(marker.sprite.texture, float(c.art_side))
-			if pill.visible: occupied.append(Rect2(c.point + pill.position * float(c.k), pill.get_combined_minimum_size() * float(c.k)))
+			if pill.visible:   # the art's corner only for a pin someone is at (周瑜 on #983: no texture read back for the rest)
+				pill.position = count_at(marker.sprite.texture, float(c.art_side))
+				occupied.append(Rect2(c.point + pill.position * float(c.k), pill.get_combined_minimum_size() * float(c.k)))
 		# A marker comes and goes with the view: the draw rule follows it (the selected pin keeps its front priority).
 		marker.sprite.no_depth_test = _over_avatar(entry)
 		if not is_selected: marker.sprite.render_priority = PLACE_PRIORITY if _over_avatar(entry) else 0
