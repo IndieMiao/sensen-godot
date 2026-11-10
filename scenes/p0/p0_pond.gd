@@ -388,6 +388,7 @@ func p0_show_spot(where: String) -> void:
 	if p.is_empty(): return
 	_focus = Vector3(float(p.x), 0, float(p.z))
 	_cam_follow.hold()
+	_show_held = true
 	rt.ui.pulse_marker("gather:" + str(p.id))
 
 func _open_panel(plan: Dictionary) -> void:
@@ -505,7 +506,9 @@ func over_head() -> Vector2:
 func _follow(_dt: float) -> void:
 	var before := _focus
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), _dt)
-	if not _cam_follow.held: _opening = false   # walking: the safe box follows from where the opening left it
+	if not _cam_follow.held:
+		_opening = false   # walking: the safe box follows from where the opening left it
+		_show_held = false
 	if _parked and not _focus.is_equal_approx(before):   # the safe box moved the camera: the clamp comes back, eased
 		_parked = false
 		_settling = true
@@ -534,7 +537,59 @@ func _update_camera(dt := -1.0) -> void:
 		else:
 			_focus = target
 			_settling = false
-	place(cam, _focus)
+	place(cam, _focus + right_axis() * (_piece_shift_step(dt, view) / (view.x / cam.size)))
+
+## The marked point's shift this frame (piece_want, eased over PIECE_EASE_S); 0 under Show and before the band. Which
+## point it is on and how much: piece_hold.
+var _piece_shift := 0.0
+var _piece_want := 0.0
+var _piece_on := {}
+var _piece_log := false   # shots: every frame's shift printed (piecelog)
+var _still_s := 0.0   # how long the player has stood and the camera rested (PIECE_STILL_S)
+var _rest_focus := Vector3.INF
+func _piece_shift_step(dt: float, view: Vector2) -> float:
+	# the camera still settling after a stop (the safe box centring the player) sweeps a piece through the keys' corner:
+	# it started and let go again within half a second (the v3 approach shot), so the stop counts from the camera's rest
+	var resting := not actor.mover.is_moving() and _rest_focus.is_finite() and _focus.distance_to(_rest_focus) < 0.002
+	_rest_focus = _focus
+	_still_s = _still_s + maxf(dt, 0.0) if resting else 0.0
+	var p := _piece_point()
+	var keys := _key_column()
+	if _show_held or not keys.has_area():
+		_piece_want = 0.0
+		_piece_on = {}
+	else:
+		var hold := piece_hold(p, _piece_on, _piece_want, _still_s >= PIECE_STILL_S, gather_goal,
+			func(q: Dictionary, held: float) -> float:
+				return piece_want(_focus, actor.position, PondGather.piece_box(q), cam.size, view, keys, held, PondGather.icon_at(q)))
+		_piece_want = hold[0]
+		_piece_on = hold[1]
+	_piece_shift = _piece_want if dt < 0.0 else lerpf(_piece_shift, _piece_want, 1.0 - exp(-dt * 3.0 / PIECE_EASE_S))
+	if absf(_piece_shift - _piece_want) < 0.05: _piece_shift = _piece_want
+	if _piece_log: print("P0_PIECE f=%d x=%.2f z=%.2f mark=%s on=%s want=%.1f shift=%.1f" % [Engine.get_frames_drawn(),
+		actor.position.x, actor.position.z, p.get("id", "-"), _piece_on.get("id", "-"), _piece_want, _piece_shift])
+	return _piece_shift
+
+## Fishing frames the cast from where the camera is: the marked point's shift goes into the focus (no jump at the
+## cast), and back from fishing it eases in again from none (no jump at the reel-in either; 周瑜 on #973).
+func _fold_piece_shift(view: Vector2) -> void:
+	if _piece_shift == 0.0: return
+	_focus += right_axis() * (_piece_shift / (view.x / cam.size))
+	_piece_shift = 0.0
+	_piece_want = 0.0
+	_piece_on = {}
+
+## The point whose piece the camera clears: the one a tap walks to (gather_goal, v4q(13) ②), else the one wearing the
+## icon button (the nearest within TAG_M, ready or cooling); {} for none.
+var gather_goal := ""
+var _show_held := false   # Show framed a point: the camera is Show's until the player moves (LOCK-08)
+func _piece_point() -> Dictionary:
+	if gather == null or actor == null: return {}
+	if gather_goal != "":
+		var g: Dictionary = gather.point(gather_goal)
+		if not g.is_empty(): return g
+	var p: Dictionary = PondGather.nearest(gather.points, actor.position)
+	return p if not p.is_empty() and PondGather.flat(PondGather.stand_of(p), actor.position) <= PondGather.TAG_M else {}
 
 static func view_size(view: Vector2, zoom: float) -> float:
 	return FarmCamera.player_scale_size(view, PITCH_DEG) / zoom
@@ -697,6 +752,7 @@ func _fishing_band() -> Rect2:
 
 func _frame_fishing(dt: float) -> void:
 	var view := get_viewport().get_visible_rect().size
+	_fold_piece_shift(view)
 	var band := _fishing_band()
 	var target := fishing_focus(actor.position, panel.landing, _focus.y, cam.size, view, band)
 	target = clamp_focus(target, cam.size, view, band, PondScenery.MEADOW, actor.position)
@@ -735,6 +791,63 @@ static func clamp_focus(focus: Vector3, size: float, view: Vector2, band: Rect2,
 	var f := Vector3(clamp_or_centre(focus.x, lo.x, hi.x), focus.y, clamp_or_centre(focus.z, lo.y, hi.y))
 	if player.is_finite(): f = keep_on_screen(f, player, size, view, band, keys)
 	return f
+
+## The marked point's piece kept KEY_GAP_PX off the action keys (上官婉儿 on 475 3bee65ba / 8804d489, 不知火舞's four;
+## 奕星: by the piece): Fern's R2, at the meadow's right edge, sat under the main key and v4q(13)'s tap could not reach
+## it. The point is the one wearing the icon button (the nearest within TAG_M, cooling too) or the one a tap walks to;
+## the camera moves right — the piece left — by `piece_need`, the least that clears it, never taking the player nearer
+## than PLAYER_SAFE_PX to the screen's left side (the player first; across only, so the HUD and the quick bar keep
+## off them as before). Its icon, if the camera could not clear it, lifts over the keys itself (P0Ui.world_icon).
+## The move is a shift on top of the clamped focus, never the focus itself (the safe box would walk off with it): it
+## starts once the piece or its icon is within KEY_GAP_PX with the player stopped (piece_hold), lets go only once it
+## would be KEY_GAP_PX + PIECE_HYST_PX clear without it, and eases over about PIECE_EASE_S either way. None while Show holds the camera (LOCK-08) or while fishing.
+const PIECE_HYST_PX := 4.0
+const PIECE_EASE_S := 0.3
+static func piece_need(focus: Vector3, player: Vector3, piece: PackedVector3Array, size: float, view: Vector2, keys: Rect2,
+		gap := KEY_GAP_PX, icon := Vector3.INF) -> float:
+	if not keys.has_area() or piece.is_empty(): return 0.0
+	var rects := piece_rects(focus, piece, icon, size, view)
+	var box: Rect2 = rects[0] if rects.size() < 2 else (rects[0] as Rect2).merge(rects[1])   # the piece or its icon (不知火舞)
+	var zone := keys.grow(gap)
+	if not box.intersects(zone): return 0.0
+	var px := view.x / size
+	var room := project(player, focus, size, view).x - PLAYER_HALF_M * px - PLAYER_SAFE_PX
+	return minf(box.end.x - zone.position.x, maxf(0.0, room))
+
+## The shift (px) wanted now: `held` the one on now (its hysteresis).
+static func piece_want(focus: Vector3, player: Vector3, piece: PackedVector3Array, size: float, view: Vector2, keys: Rect2,
+		held: float, icon := Vector3.INF) -> float:
+	var need := piece_need(focus, player, piece, size, view, keys, KEY_GAP_PX, icon)
+	if held <= 0.0: return need
+	return maxf(need, minf(held, piece_need(focus, player, piece, size, view, keys, KEY_GAP_PX + PIECE_HYST_PX, icon)))
+
+## Which point the shift is on and how much, this frame: [want, point] (不知火舞 on 475 ④, with 上官婉儿 after the
+## re-shot's 6.4 s: shifted for a piece behind the player, let go 0.3 s later as the icon moved on). `p` is the marked
+## point, `on` the one it is on with `held`, `want_of(point, held)` piece_want for it (its piece or its icon).
+## - Stopped PIECE_STILL_S (`still`): the marked point's want, from where the camera is — none needed (or no point
+##   marked), none; on to another point, straight to its want (eased by the caller), never back to none first.
+## - Walking: nothing added; what is on comes back by the hysteresis only (never more than `held`) — walking by, a
+##   piece the camera scrolls through the keys starts nothing.
+## - The point a tap walks to (`goal`, v4q(13) ②): its want on the way too.
+const PIECE_STILL_S := 0.25
+static func piece_hold(p: Dictionary, on: Dictionary, held: float, still: bool, goal: String, want_of: Callable) -> Array:
+	var same := not p.is_empty() and not on.is_empty() and str(p.get("id", "")) == str(on.get("id", ""))
+	if not p.is_empty() and (still or str(p.get("id", "")) == goal):
+		var want: float = want_of.call(p, held if same else 0.0)
+		return [want, p if want > 0.0 else {}]
+	if still: return [0.0, {}]   # stopped with no icon on: nothing to clear
+	if on.is_empty() or held <= 0.0: return [0.0, {}]
+	var kept: float = minf(held, want_of.call(on, held))
+	return [kept, on if kept > 0.0 else {}]
+
+## The piece's box and its icon's disc on the screen for a camera at `focus`.
+const ICON_PX := 28.0
+static func piece_rects(focus: Vector3, piece: PackedVector3Array, icon: Vector3, size: float, view: Vector2) -> Array:
+	var box := Rect2(project(piece[0], focus, size, view), Vector2.ZERO)
+	for c in piece: box = box.expand(project(c, focus, size, view))
+	var out := [box]
+	if icon.is_finite(): out.append(Rect2(project(icon, focus, size, view) - Vector2.ONE * ICON_PX * 0.5, Vector2.ONE * ICON_PX))
+	return out
 
 ## `focus` moved the least that brings `player` — feet to HEAD_M, PLAYER_HALF_M a side — PLAYER_SAFE_PX inside the
 ## screen's sides and inside `band` top to bottom; on the side of `keys` (the action group's column), KEY_GAP_PX over it.
@@ -837,6 +950,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 				_reopen()
 		"cast": _go_cast(Vector3.INF)
 		"castat": _go_cast(Vector3(float(step[1]), 0, float(step[2])))   # castat:x:z — a cast at that water point
+		"piecelog": _piece_log = true   # shots: the marked point's shift every frame (475 ④ re-shot)
 		"stick": p0_joystick(Vector2(float(step[1]), float(step[2])))   # stick:x:y — held until stick:0:0 (Cast on the move)
 		"tapwater": p0_tap(cam.unproject_position(FishingModel.default_target(str(entry.id), actor.position, site_spec)))   # a tap on the water in front: nothing (q(45))
 		# Fish Trap shots (SGODOT-283): picktrap selects it on the bar; settrap sets it; traptap walks to it and opens
