@@ -37,6 +37,13 @@ static func build(entry: Dictionary, clear: Array = [], in_key := Callable()) ->
 	if painted:   # the ground darkens a little under the plants' feet, now that they are placed
 		(painted.material_override as ShaderMaterial).set_shader_parameter("contact_points", PondWildGround.contact_points())
 		(painted.material_override as ShaderMaterial).set_shader_parameter("contact", 0.10)
+		# the trees' shade under Compatibility (SGODOT-457): drawn once the pieces stand, kept by the bake's swap
+		var shade := GroundShade.new()
+		shade.name = "GroundShade"
+		shade.ground = painted
+		shade.casters_root = scene
+		shade.rect = PondWildGroundBake.NEAR
+		scene.add_child(shade)
 	return scene
 
 ## The water's shore foam (pond_water.gdshader's foam_contact) for this bank as it stands — its waterline, rock groups
@@ -57,6 +64,8 @@ func foam_contact() -> ImageTexture:
 const PondWildProps := preload("res://modules/ponds/pond_wild_props.gd")
 const PondWildGround := preload("res://modules/ponds/pond_wild_ground.gd")
 const PondWildFoam := preload("res://modules/ponds/pond_wild_foam.gd")
+const GroundShade := preload("res://modules/render/ground_shade.gd")
+const PondWildGroundBake := preload("res://modules/ponds/pond_wild_ground_bake.gd")
 const GROUND_DIR := "res://assets/ponds/ground/"
 const DRY_CHANNEL := {"crescent": Vector3(1, 0, 0), "gourd": Vector3(0, 1, 0), "meander": Vector3(0, 0, 1)}
 static func _wild_ground(material: ShaderMaterial, shape: String) -> void:

@@ -17,7 +17,7 @@ const FAR_PX_M := 8.0     # the whole ground (PondWildGround.AREA, 66 × 64 m): 
 const FAR_SUPER := 2      # … drawn at twice that and halved, so its fine grain averages out instead of aliasing
 ## The live material's settings, from the full one's.
 const LIVE_KEYS := ["walk", "grass", "grass_far", "plateau", "rock", "gradient", "centre", "south_dark", "vignette", "seed_off", "detail",
-	"shadow_tint", "shadow_tint_sand", "shadow_cool", "shadow_cool_sand"]
+	"shadow_tint", "shadow_tint_sand", "shadow_cool", "shadow_cool_sand", "shade_mask", "shade_rect", "shade_opacity"]   # the shade: SGODOT-457
 ## One bake kept (≈ 14.3 MB of textures, see bytes()) while in a pond: a rebuild with the same plants takes it as it is;
 ## the gathering points coming bake anew and let the old one go. Leaving the pond lets it go too (P0Pond._exit_tree,
 ## clear_cache — 上官婉儿: the 14 MB not kept outside the wild), so a later visit bakes again (~46 ms on the desktop).

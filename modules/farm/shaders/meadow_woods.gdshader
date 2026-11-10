@@ -22,6 +22,8 @@ uniform float strokes = 0.13;   // a dark dash darkens by strokes × 2.2, a ligh
 uniform vec3 shadow_tint = vec3(0.0, 0.05, 0.12);
 uniform vec3 shadow_cool = vec3(0.0, 0.012, 0.03);
 varying vec2 world_uv;
+#include "res://modules/render/ground_shade.gdshaderinc"
+varying float shade;   // the trees' shade under Compatibility (SGODOT-457)
 
 void vertex() {
 	world_uv = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
@@ -71,6 +73,7 @@ void fragment() {
 	float light_stroke = step(0.75, hash12(lcell + 37.0)) * (1.0 - smoothstep(0.03, 0.045, length(ldash)));
 	c *= 1.0 + light_stroke * strokes * 1.4 * in_yard;
 	c *= mix(vec3(1.0), floor_tint, smoothstep(0.2, 4.0, outside + (grain - 0.5) * 0.8));
+	shade = ground_shade(world_uv);
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
 	ALBEDO = albedo_out(ALBEDO);
@@ -78,8 +81,9 @@ void fragment() {
 
 void light() {
 	float ndl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
-	DIFFUSE_LIGHT += ndl * ATTENUATION * LIGHT_COLOR / PI;
-	float shadowed = ndl * (1.0 - ATTENUATION);
+	float att = shade_att(ATTENUATION, shade);
+	DIFFUSE_LIGHT += ndl * att * LIGHT_COLOR / PI;
+	float shadowed = ndl * (1.0 - att);
 	DIFFUSE_LIGHT += shadowed * shadow_tint * LIGHT_COLOR / PI;
 	SPECULAR_LIGHT += shadowed * shadow_cool;
 }
