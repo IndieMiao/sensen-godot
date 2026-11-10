@@ -71,3 +71,16 @@ func test_a_building_root_counts_itself_and_its_parts() -> void:
 	assert_int(GroundShade.boxes_under(house).size()).is_equal(2)
 	# and as a building, not a tree as well: casters_under leaves it to boxes_under
 	assert_int(GroundShade.casters_under(r, null, [house]).size()).is_equal(0)
+
+## A watched root whose pieces turn in place (the pond's gathering points cooling, C67) is read again when it says so.
+class _Turning extends Node3D:
+	signal looks_changed
+
+func test_a_watched_root_that_turns_its_pieces_is_drawn_again() -> void:
+	var shade: Node = auto_free(GroundShade.new())
+	var root: _Turning = auto_free(_Turning.new())
+	var plain: Node3D = auto_free(Node3D.new())
+	shade.watch(root)
+	shade.watch(plain)
+	assert_bool(root.is_connected("looks_changed", shade.redraw)).is_true()
+	assert_array(shade.more_roots).contains([root, plain])

@@ -111,6 +111,8 @@ func _ready() -> void:
 func watch(root: Node) -> void:
 	more_roots.append(root)
 	root.child_entered_tree.connect(func(_n: Node): redraw(), CONNECT_DEFERRED)
+	# a root whose pieces turn in place (the pond's gathering points: gathered looks, C67) says so: drawn again once
+	if root.has_signal("looks_changed"): root.connect("looks_changed", redraw, CONNECT_DEFERRED)
 	redraw()
 
 func redraw() -> void:
