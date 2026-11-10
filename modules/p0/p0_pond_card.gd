@@ -7,7 +7,8 @@ extends RefCounted
 ##   P1 (SGODOT-283; 不知火舞 e61cda10 ②, Figma POND-CARD-WX-V2 2255:143053): the template's thumbnail left of the title,
 ##   the condition line now (`Dusk · Windy`, from view.fishing.places[id]), Biting more (now, hidden when none),
 ##   Forecast (Fishing Lv3+) and Your trap (q(109) ⑦), in that order after Recommended.
-##   U2 (不知火舞's spec v1.2 §2, v4q(11) ⑧): Gather, what the pond has, after Distance (and the map's Online now).
+##   U2 (不知火舞's spec v1.3 §2, v4q(11) ⑧; 安其拉's frames v2, 302 93131a2f): Gather, what the pond has, after
+##   Recommended and before Biting more.
 
 const Board := preload("res://modules/p0/p0_bite_board.gd")
 const Trap := preload("res://modules/p0/p0_trap.gd")
@@ -21,10 +22,9 @@ static func info(view: Dictionary, pond_id: String, km: float) -> Dictionary:
 	var template := template_of(pond_id)
 	var beginner := bool(place.get("beginner", false))
 	var distance := P0PlaceSheet.distance_text(km)
-	var facts: Array = [["Distance", distance]]
+	var facts: Array = [["Distance", distance], ["Recommended", "Outleveled" if outleveled(view, pond_id) else str(RECOMMENDED.get(template, ""))]]
 	var gather := gather_fact(view, pond_id)
 	if not gather.is_empty(): facts.append(gather)
-	facts.append(["Recommended", "Outleveled" if outleveled(view, pond_id) else str(RECOMMENDED.get(template, ""))])
 	var now: Dictionary = view.get("fishing", {}).get("places", {}).get(pond_id, {})
 	var level := int(view.get("skills", {}).get("fishing", {}).get("level", 1))
 	var caught: Dictionary = view.get("fishing", {}).get("caught", {})
@@ -48,7 +48,7 @@ static func info(view: Dictionary, pond_id: String, km: float) -> Dictionary:
 		"tag": "%s · %s" % ["Beginner pond" if beginner else template, distance],
 	}
 
-## U2: the pond's `Gather` fact (不知火舞's spec v1.2 §2) — the items its points give first (view.gather.ponds, the home city's
+## U2: the pond's `Gather` fact (不知火舞's spec v1.3 §2) — the items its points give first (view.gather.ponds, the home city's
 ## and the one the player is in), each once, in P0Logic.GATHERED's order (Timber, Stone, Reeds, Clay, Wild Herb, Hardwood,
 ## Flax; any other after), joined by ` · `, no counts; cooling ones too (what is here, not what is ready). [] for a pond
 ## with none or one the view does not send (another city's: no row, no `?`).

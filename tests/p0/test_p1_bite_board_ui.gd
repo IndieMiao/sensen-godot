@@ -119,8 +119,9 @@ func test_pond_card_rows_in_order() -> void:
 	assert_bool(labels.has("Biting now") and not labels.has("Biting more")).is_true()
 	assert_str(str(lv8[labels.find("Biting now")][1])).is_equal("?, Sea Bass · +3 more")   # the uncaught regional smelt first
 
-## U2 (不知火舞's spec v1.2 §2): Gather after Distance — the pond's kinds once each in the fixed order (Timber, Stone,
-## Reeds, Clay, …), cooling ones too, no counts; no row for a pond with none or one view.gather.ponds does not send.
+## U2 (不知火舞's spec v1.3 §2, 安其拉's frames v2): Gather after Recommended, before Biting more — the pond's kinds once
+## each in the fixed order (Timber, Stone, Reeds, Clay, …), cooling ones too, no counts; no row for a pond with none or one
+## view.gather.ponds does not send.
 func test_pond_card_gather_row() -> void:
 	var v := _view(5)
 	v["names"] = {"wood": "Timber", "stone": "Stone", "fiber": "Reeds", "clay": "Clay"}
@@ -129,11 +130,12 @@ func test_pond_card_gather_row() -> void:
 		{"id": FERN + "#2", "kind": "wood", "item": "wood", "ready_in": 60000}, {"id": FERN + "#3", "kind": "wood", "item": "wood", "ready_in": 0},
 		{"id": FERN + "#4", "kind": "stone", "item": "stone", "ready_in": 0}]}}}
 	var fern: Array = PondCard.info(v, FERN, 0.8).facts
-	assert_array(fern.slice(0, 3)).is_equal([["Distance", "0.8 km"], ["Gather", "Timber · Stone · Reeds · Clay"], ["Recommended", "Lv1–3"]])
+	assert_array(fern.slice(0, 3)).is_equal([["Distance", "0.8 km"], ["Recommended", "Lv1–3"], ["Gather", "Timber · Stone · Reeds · Clay"]])
+	assert_str(str(fern[3][0])).is_equal("Biting more")   # then the fishing rows
 	var clover: Array = PondCard.info(v, CLOVER, 2.4).facts   # not in view.gather.ponds: no row
 	assert_bool(clover.any(func(f): return str(f[0]) == "Gather")).is_false()
-	var here := P0PlaceSheet.for_here({"title": "Fern Pond", "facts": fern}, true)   # at the pond: no Distance, Gather first
-	assert_str(str(here.facts[0][0])).is_equal("Gather")
+	var here := P0PlaceSheet.for_here({"title": "Fern Pond", "facts": fern}, true)   # at the pond: no Distance, Recommended → Gather
+	assert_array((here.facts as Array).slice(0, 2).map(func(f): return str(f[0]))).is_equal(["Recommended", "Gather"])
 
 func test_details_lines_and_the_45_percent() -> void:
 	var rows := PondCard.fish_rows(_view(5, {"fish_catfish": 1}, "Dusk", "rain"), "pond_san_francisco_06")
