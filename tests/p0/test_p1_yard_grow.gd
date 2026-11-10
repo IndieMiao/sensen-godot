@@ -167,3 +167,11 @@ func test_the_cap_toast_breaks_at_the_dot() -> void:
 	r.session.view = _v(9, none)
 	r._on_refused("decor_cap", {"cap": 48, "used": 48}, {"type": "place_decor", "item": "deco_planter"})
 	assert_str(r.ui.toast_text()).is_equal("Decor 48/48\nStore one to place this")
+
+## The zh table reads them as v4q(12) note 1 has them (李白 11-10): the yard's line, and the cap's two lines.
+func test_the_yard_lines_in_chinese() -> void:
+	var t = preload("res://modules/ui/localization.gd").P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	assert_str(t.translate_line("Decor 61 · Yard +13 spaces")).is_equal("摆件 61 · 院子 +13 格")
+	assert_str(t.translate_line("Decor 72 · Yard +41 spaces")).is_equal("摆件 72 · 院子 +41 格")
+	assert_str(t.translate_line("Decor 48/48\nHome Lv13 adds 13")).is_equal("摆件 48/48\n家园 Lv13 时 +13")
