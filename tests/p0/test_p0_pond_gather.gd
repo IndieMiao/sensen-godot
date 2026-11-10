@@ -22,8 +22,10 @@ func test_the_key_at_a_point() -> void:
 	assert_bool(a.enabled).is_true()
 	assert_dict(a.cmd).is_equal({"type": "gather", "spot": POND + "#L2", "space": "pond", "place": POND})
 	var cooling := PondGather.key(_view(), _point("wood", 3.0 * 3600000.0 + 12 * 60000.0), POND)
-	assert_str(str(cooling.sub)).is_equal("Ready in 3h 12m")
+	assert_str(str(cooling.sub)).is_equal("3h 12m")   # the key's line: `Ready in 3h 12m` ran past 80 px (q(44); 奕星 11-10)
 	assert_bool(cooling.enabled).is_false()
+	assert_str(str(PondGather.key(_view(), _point("wood", 4.0 * 3600000.0), POND).sub)).is_equal("Ready in 4h")   # one unit
+	assert_str(str(PondGather.key(_view(), _point("wood", 125000.0), POND).sub)).is_equal("Ready in 2:05")   # the last five minutes tick
 	var tired := PondGather.key(_view(2), _point(), POND)
 	assert_str(str(tired.sub)).is_equal("Need 3 Energy")
 	assert_bool(tired.amber).is_true()

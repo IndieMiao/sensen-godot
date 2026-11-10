@@ -146,7 +146,7 @@ static func key(view: Dictionary, p: Dictionary, pond_id: String) -> Dictionary:
 		"cmd": {"type": "gather", "spot": str(p.get("id", "")), "space": "pond", "place": pond_id}, "need": cost}
 	var ready := float(p.get("ready_in", 0))
 	if ready > 0.0:
-		a.sub = "Ready in %s" % P0Logic.span(ready)
+		a.sub = P0Logic.key_ready(ready)   # the round key's ≤ 80 px (q(44)): `3h 12m`, `Ready in 4h`, as a growing plot's
 		a.enabled = false
 		a.cmd = {}
 	elif int(view.get("energy", {}).get("value", 0)) < cost:
