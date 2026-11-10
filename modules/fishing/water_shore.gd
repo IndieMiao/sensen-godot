@@ -64,9 +64,12 @@ static func _cacheable(spec: Dictionary) -> bool:
 static func _cache_key(id: String, spec: Dictionary) -> String:
 	return "%s:%d:%d" % [id, int(spec.get("decoration_seed", 0)), FishingModel._polygon(spec).size()]
 
-## Start generating a pond's bank on a worker thread (e.g. when its map pin is selected).
+## Start generating a pond's bank on a worker thread (e.g. when its map pin is selected). Every WorkerThreadPool task
+## must be waited on once, and soon: the pool keeps a task's lambda until then, and one it still held as the app ended
+## was freed after the script languages had gone — a crash on the way out (iOS 0.3.6 (2) on a 14 Pro, 蒙恬's log; any
+## quit after the map, which prewarms the nearest pond). A finished one is waited on at once on the main thread
+## (_collect); one still running as the tree goes, by finish_all.
 static func prewarm(id: String, site_override: Dictionary = {}) -> void:
-	_reap()
 	_prepare_units()
 	var spec := FishingModel.site(id, site_override)
 	if not _cacheable(spec): return
@@ -75,14 +78,21 @@ static func prewarm(id: String, site_override: Dictionary = {}) -> void:
 	var known := _cache.has(key) or _pending.has(key)
 	_lock.unlock()
 	if known: return
-	_pending[key] = WorkerThreadPool.add_task(func(): _store(key, _generate(id, spec)), false, "WaterShore " + id)
+	_pending[key] = WorkerThreadPool.add_task(func():
+		_store(key, _generate(id, spec))
+		Callable(WaterShore, "_collect").call_deferred(key), false, "WaterShore " + id)
 
-## Every WorkerThreadPool task must be waited on once; collect the finished ones.
-static func _reap() -> void:
-	for key in _pending.keys():
-		if WorkerThreadPool.is_task_completed(_pending[key]):
-			WorkerThreadPool.wait_for_task_completion(_pending[key])
-			_pending.erase(key)
+## A prewarm done (main thread, deferred from its task): waited on, out of _pending. Gone already when the pond was
+## entered meanwhile (_pond_arrays waited on it).
+static func _collect(key: String) -> void:
+	if not _pending.has(key): return
+	WorkerThreadPool.wait_for_task_completion(_pending[key])
+	_pending.erase(key)
+
+## Every prewarm still out, waited on: as the tree goes (P0Runtime._exit_tree), while the scripts are still there.
+static func finish_all() -> void:
+	for key in _pending.keys(): WorkerThreadPool.wait_for_task_completion(_pending[key])
+	_pending.clear()
 
 static func _store(key: String, arrays: Dictionary) -> void:
 	_lock.lock()
