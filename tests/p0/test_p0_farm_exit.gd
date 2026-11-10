@@ -223,15 +223,21 @@ func test_the_fence_opens_at_the_exit() -> void:
 	assert_float(front.map(func(seg): return seg.pos.x).min() - half * front[0].stretch).is_greater_equal(P0Farm.EXIT_AT.x + P0Farm.EXIT_RING_R)   # west of the ring: no rail
 	assert_int(P0Garden.stone_wall(front).size()).is_equal(front.size() * P0Garden.STONE_PER_SEG)
 
-## 不知火舞 443 d3ff5572: near the exit, its `Map` strip rises clear of the player's head (its bottom EXIT_STRIP_HEAD_PX over
-## the head's top on screen) at once; away, it eases back over EXIT_STRIP_BACK_S.
-func test_near_the_exit_its_strip_clears_the_head_and_eases_back() -> void:
+## 不知火舞 / 上官婉儿 443: its `Map` strip, open at its mark over the player's head or upper body on screen (any distance),
+## rises clear of the head (its bottom EXIT_STRIP_HEAD_PX over the head's top) at once; once it would not be, it eases
+## back over EXIT_STRIP_BACK_S.
+func _strip_open(farm: Node3D) -> void:
+	rt.ui.name_bar("exit", null, "Map", "", farm.cam.unproject_position(farm._exit + P0Farm.EXIT_MARK), true)
+
+func test_its_strip_clears_the_head_and_eases_back() -> void:
 	var farm := _farm()
 	farm.cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	farm.cam.keep_aspect = Camera3D.KEEP_WIDTH
 	farm.cam.size = 8.0
 	farm.cam.current = true
 	FarmCamera.place(farm.cam, P0Farm.EXIT_AT + Vector3.UP * 0.7)
+	_strip_open(farm)
+	assert_bool(rt.ui.name_bar_rect("exit").has_area()).is_true()
 	farm.actor.teleport(farm._exit + Vector3(0, 0, -0.8))   # behind the pin: the strip over the head
 	farm._exit_strip_lift(1.0 / 30.0)
 	var centre: float = farm.cam.unproject_position(farm._exit + P0Farm.EXIT_MARK).y + farm._exit_lift
@@ -239,7 +245,11 @@ func test_near_the_exit_its_strip_clears_the_head_and_eases_back() -> void:
 	assert_float(farm._exit_lift).is_less(0.0)
 	assert_float(centre + UiWorldNameBar._H * 0.5).is_less_equal(head - P0Farm.EXIT_STRIP_HEAD_PX + 0.01)
 	var up: float = farm._exit_lift
-	farm.actor.teleport(farm._exit + Vector3(0, 0, -2.0))   # away: easing back, not at once
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -1.2))   # past 1 m, still under the strip: still clear
+	farm._exit_strip_lift(1.0)
+	assert_float(farm._exit_lift).is_less(0.0)
+	up = farm._exit_lift
+	farm.actor.teleport(farm._exit + Vector3(2.0, 0, 0.0))   # off to its side: easing back, not at once
 	farm._exit_strip_lift(P0Farm.EXIT_STRIP_BACK_S * 0.5)
 	assert_float(farm._exit_lift).is_greater(up)
 	assert_float(farm._exit_lift).is_less(0.0)

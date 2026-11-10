@@ -132,9 +132,10 @@ const EXIT_RING_NODE := "ring"   # the piece's ring (0.6 m round as drawn), scal
 const EXIT_RING_R := 0.38
 ## 不知火舞 443 d3ff5572 (上官婉儿 agreeing): the player within EXIT_FADE_M of the exit (behind its pin, at the front row's
 ## west end), the pin fades out over EXIT_FADE_S (as ACTOR_FADE_S), its shadow off while faded — at 0.3 its red read
-## pink on the player; the strip and the ring tell the exit near. Its `Map` strip never fades: it rises clear of the
-## player's head, its bottom EXIT_STRIP_HEAD_PX over the head's top on screen, and eases back over EXIT_STRIP_BACK_S
-## once the player is away.
+## pink on the player; the strip and the ring tell the exit near. Its `Map` strip never fades: open at its mark over the
+## player's head and upper body on screen (at any distance), it rises clear of the head, its bottom EXIT_STRIP_HEAD_PX
+## over the head's top, and eases back to its mark over EXIT_STRIP_BACK_S once it would not be (不知火舞 / 上官婉儿 443;
+## LOCK-07 note: this strip only for now).
 const EXIT_FADE_M := 1.0
 const EXIT_FADE_ALPHA := 0.0
 const EXIT_FADE_S := 0.2
@@ -1159,12 +1160,17 @@ func _exit_fade(dt: float) -> void:
 	for m in _exit_pin_meshes:
 		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if a < 1.0 else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
-## The exit's strip clear of the player's head while near (at once), eased back once away.
+## The exit's strip clear of the player's head while, at its mark, it would cover their head or upper body on screen
+## (at once); eased back once it would not.
 func _exit_strip_lift(dt: float) -> void:
 	var want := 0.0
-	if _exit.is_finite() and P0FarmMaterials.flat(actor.position, _exit) < EXIT_FADE_M:
+	var strip := rt.ui.name_bar_rect("exit") if rt != null and _exit.is_finite() else Rect2()
+	if strip.has_area():
 		var centre := cam.unproject_position(_exit + EXIT_MARK).y
-		want = minf(0.0, actor.screen_box(cam).position.y - EXIT_STRIP_HEAD_PX - UiWorldNameBar._H * 0.5 - centre)
+		strip.position.y = centre - strip.size.y * 0.5   # where it is at its mark
+		var body := actor.screen_box(cam)
+		var upper := Rect2(body.position, Vector2(body.size.x, body.size.y * 0.5))   # the head and the upper body
+		if strip.intersects(upper): want = minf(0.0, body.position.y - EXIT_STRIP_HEAD_PX - UiWorldNameBar._H * 0.5 - centre)
 	if want <= _exit_lift:
 		_exit_lift = want
 		_exit_lift_t = -1.0
