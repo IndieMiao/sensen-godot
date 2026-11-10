@@ -5,6 +5,8 @@ extends Control
 ## mic icon, white on the primary disc. Right, 8 apart, the people pill: the map pins' person, secondary as the frame
 ## has it (383 V1), and how many others are in this layer (q(137) ③), the Creel pill's look (UiCreelBadge); a tap opens
 ## the layer's people drawer. The key, the pill and the Creel pill share one middle line (383 V1).
+## q(309) (不知火舞's spec v1 ①②): the pill shows in any room with people in it, voice or not; the mic key only with
+## voice (P0VoiceRoom.offered) — without it its place stays empty, the pill where it always is (Android and iOS alike).
 
 signal mic_pressed
 signal people_pressed
@@ -52,6 +54,10 @@ func set_mic(on: bool) -> void:
 	var tint := Color.WHITE if on else UiTokens.COLOR_SECONDARY
 	for c in [&"icon_normal_color", &"icon_hover_color", &"icon_pressed_color", &"icon_focus_color", &"icon_hover_pressed_color"]:
 		mic.add_theme_color_override(c, tint)
+
+## The mic key shown or not (no voice on this phone: iOS, a 13+ no, the server's voice off); the pill stays put.
+func show_mic(on: bool) -> void:
+	mic.visible = on
 
 ## Others in the layer (not counting the player).
 func set_count(n: int) -> void:

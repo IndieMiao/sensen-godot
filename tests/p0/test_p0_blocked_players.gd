@@ -1,6 +1,7 @@
 extends GdUnitTestSuite
 ## Settings › Blocked players (SGODOT-384; q(28) §12.1.6; 不知火舞's spec 383, BP1–BP3 row 127): the Privacy group
-## before Legal with `Blocked players` and how many, while anyone is blocked (or voice is offered here); the page lists
+## before Legal with `Blocked players` and how many, always — a Block is made in any room, voice or not (q(309): an
+## iPhone too); the page lists
 ## them by name with `Unblock`, a tap takes the row away at once and lifts the block; none: `No one blocked`.
 
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
@@ -71,8 +72,9 @@ func test_the_privacy_group_comes_before_legal_while_anyone_is_blocked() -> void
 	blocks = []
 	ui.open_settings()
 	await await_millis(50)
-	assert_object(_page(ui).body.find_child("BlockedPlayers", true, false)).is_null()   # no voice here, nobody blocked
-	assert_bool(_labels(_page(ui).body).has("Privacy")).is_false()
+	# no voice here, nobody blocked: still there, 0 (q(309) ⑤: an iPhone blocks from the drawer and lifts it here)
+	assert_array(_labels(_page(ui).body.find_child("BlockedPlayers", true, false))).is_equal(["Blocked players", "0", "›"])
+	assert_bool(_labels(_page(ui).body).has("Privacy")).is_true()
 
 func test_the_list_unblocks_at_a_tap_with_no_card_and_ends_on_no_one_blocked() -> void:
 	var ui := await _ui()
@@ -96,7 +98,7 @@ func test_the_list_unblocks_at_a_tap_with_no_card_and_ends_on_no_one_blocked() -
 	_page(ui).back_pressed.emit()
 	await await_millis(50)
 	assert_str(ui.modal_kind).is_equal("settings")
-	assert_object(_page(ui).body.find_child("BlockedPlayers", true, false)).is_null()   # nobody left and no voice here: no group
+	assert_array(_labels(_page(ui).body.find_child("BlockedPlayers", true, false))).is_equal(["Blocked players", "0", "›"])   # nobody left: 0 (q(309))
 
 func test_an_unblock_that_did_not_go_through_puts_the_row_back() -> void:
 	var ui := await _ui()
@@ -132,8 +134,8 @@ func test_a_list_never_read_shows_retry_and_a_read_one_stays() -> void:
 	await await_millis(50)
 	assert_array(_labels(_page(ui).body)).is_equal(["Traveller 5dd4", "Unblock", "Traveller e57e", "Unblock"])
 
-## Settings while the list was never read: the row without a number while voice is offered; no group when the status
-## is not read either (不知火舞 384 6e014af3).
+## Settings while the list was never read: the row without a number (不知火舞 384 6e014af3), voice or not and with the
+## status not read either (q(309): always there).
 func test_settings_without_a_read_list() -> void:
 	var page := P0SettingsPage.settings("dev", 0.0, 0.0, {}, "", P0SettingsPage.BLOCKED_UNREAD)
 	add_child(auto_free(page))
@@ -143,7 +145,8 @@ func test_settings_without_a_read_list() -> void:
 	status_ok = false
 	ui.open_settings()
 	await await_millis(50)
-	assert_object(_page(ui).body.find_child("BlockedPlayers", true, false)).is_null()
+	assert_array(_labels(_page(ui).body.find_child("BlockedPlayers", true, false))).is_equal(["Blocked players", "›"])
+	assert_bool(_labels(_page(ui).body).has("Voice chat")).is_false()
 
 ## A list read before an Unblock answers after it: dropped, the row does not come back (周瑜 on #667).
 func test_a_list_read_before_an_unblock_is_dropped() -> void:
