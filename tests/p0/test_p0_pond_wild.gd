@@ -131,7 +131,7 @@ func test_on_gles_the_grounds_shadows_take_no_cool_cast() -> void:
 	var gl := PondWildGround.look_for("gl_compatibility")
 	assert_vector(gl["shadow_cool"]).is_equal(Vector3.ZERO)
 	assert_vector(gl["shadow_cool_sand"]).is_equal(Vector3.ZERO)
-	assert_float(gl["sun_k"]).is_equal_approx(0.206, 0.0001)   # only this ground's share of the sun, the pond's sun kept
+	assert_float(gl["sun_k"]).is_equal_approx(0.19, 0.0001)   # only this ground's share of the sun, the pond's sun kept
 	for method in ["forward_plus", "mobile", "dummy"]:
 		assert_dict(PondWildGround.look_for(method)).override_failure_message(method).is_equal(PondWildGround.LOOK)
 	assert_vector(PondWildGround.LOOK["shadow_cool"]).is_not_equal(Vector3.ZERO)
