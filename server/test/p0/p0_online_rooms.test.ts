@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { MAX_ROOMS, OutpostRooms, REJOIN_MS, SEAT_REACH_M, SIT_SETTLE_MS, type OutpostSpec } from '../../src/p0/online/rooms.js';
 
@@ -147,14 +148,16 @@ describe('P0 outpost rooms (SGODOT-227)', () => {
   });
 });
 
+// The fixture is the client's (tests/fixtures), in the repo but not in the server image (server/deploy/p0/Dockerfile copies
+// server/ and the content tables): there the check is skipped, not failed (蒙恬, each rehearsal's one known failure).
+const FRAME_V1 = new URL('../../../tests/fixtures/p0/frame_v1.hex', import.meta.url);
 describe('P0 snapshot frame v1 fixture (shared with tests/p0/test_p0_online.gd)', () => {
-  it('encodes exactly the bytes the Godot client test decodes', async () => {
-    const { readFileSync } = await import('node:fs');
+  it.skipIf(!existsSync(FRAME_V1))('encodes exactly the bytes the Godot client test decodes', async () => {
     const { snapshotFrame } = await import('../../src/p0/online/frame.js');
     const m = (id: number, x: number, z: number, yaw: number, action: string, seq: number) =>
       ({ player: 'p' + id, outpost: 'o', layout: '', room: 1, id, x, z, yaw, action, seat: '', seq, at: 0 });
     const frame = snapshotFrame(42, 3, [m(1, 1.25, -2.5, 0.75, 'walk', 7), m(4, -1, 2, 3.0, 'sit', 9)]);
-    expect(frame.toString('hex')).toBe(readFileSync(new URL('../../../tests/fixtures/p0/frame_v1.hex', import.meta.url), 'utf8').trim());
+    expect(frame.toString('hex')).toBe(readFileSync(FRAME_V1, 'utf8').trim());
   });
 });
 
