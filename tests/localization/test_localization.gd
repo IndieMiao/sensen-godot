@@ -461,7 +461,7 @@ func test_p0_a_toasts_no_break_space_is_looked_up_as_a_space() -> void:
 	assert_str(plain.call(zh.call("Twin Catch · back to 20 min"))).is_equal("双倍渔获 · 重新计时 20 分钟")
 	# one line each in the table: the toast breaks them after their second ` · ` itself (break_at_dot, q(305); was a "\n"
 	# in the table, SGODOT-452) — the demo week's fish line, the line from 11-15, and the farm one
-	assert_str(plain.call(zh.call("Swift Growth · 20 min · crops sown now grow 2× faster"))).is_equal("加速生长 · 20 分钟 · 现在种下的作物长得快一倍")
+	assert_str(plain.call(zh.call("Swift Growth · 20 min · sow now, grow 2× faster"))).is_equal("加速生长 · 20 分钟 · 现在种下的作物长得快一倍")
 	assert_str(plain.call(zh.call("Twin Catch · 20 min · every fish lands ×2"))).is_equal("双倍渔获 · 20 分钟 · 每条鱼都 ×2")
 	assert_str(plain.call(zh.call("Twin Catch · 20 min · fish ×2, Legendary ×1"))).is_equal("双倍渔获 · 20 分钟 · 每条鱼 ×2，传说鱼 ×1")
 	# two Info toasts that broke a word at 182 px (李白's list, shot under 中文): broken after a ` · ` too, the second shorter

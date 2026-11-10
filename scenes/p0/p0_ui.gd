@@ -1882,7 +1882,7 @@ func toast_success(text: String, break_at_dot := false, action := "") -> void:
 ## no catch-up, spec §4).
 const BUFF_RENEW_MS := 5000.0
 const BUFF_RENEWED := "%s · back to 20 min"   # the spec's words, as the translation table keys them (李白)
-const BUFF_LINES := {"fish": "%s · %d min · every fish lands ×2", "farm": "%s · %d min · crops sown now grow 2× faster"}
+const BUFF_LINES := {"fish": "%s · %d min · every fish lands ×2", "farm": "%s · %d min · sow now, grow 2× faster"}
 ## q(305): from 11-15 a Legendary under the fish buff lands one, and the toast says so — the line for a take while the day's
 ## limit is on (view.buff_takes.limit set, home city 11-15 04:00 on); the demo week keeps BUFF_LINES' (不知火舞 (ii)).
 const BUFF_LINE_FISH_LIMITED := "%s · %d min · fish ×2, Legendary ×1"

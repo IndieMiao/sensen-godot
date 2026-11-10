@@ -51,7 +51,7 @@ func test_toasts_on_taking_renewing_and_running_out() -> void:
 	ui.set_view(_view([{"id": "fish", "left": 600000}]))   # the first view after launch: nothing said
 	assert_str(ui.toast_text()).is_empty()
 	ui.set_view(_view([{"id": "fish", "left": 599000}, {"id": "farm", "left": 1200000}]))   # farm taken
-	assert_str(_one_line(ui.toast_text())).is_equal("Swift Growth · 20 min · crops sown now grow 2× faster")
+	assert_str(_one_line(ui.toast_text())).is_equal("Swift Growth · 20 min · sow now, grow 2× faster")
 	ui.set_view(_view([{"id": "fish", "left": 1200000}, {"id": "farm", "left": 1199000}]))   # fish renewed (Pray drew it, v1.2 §4)
 	assert_str(ui.toast_text()).is_equal("Twin Catch · back to 20 min")
 	ui.set_view(_view([{"id": "fish", "left": 1199500}, {"id": "farm", "left": 1198600}]))   # a server answer: no toast
@@ -71,7 +71,7 @@ func test_the_fish_toast_says_the_legendary_rule_once_the_limit_is_on() -> void:
 	assert_str(P0Ui.buff_line("fish", {"buff_takes": {"used": 0, "limit": null}})).is_equal("%s · %d min · every fish lands ×2")
 	assert_str(P0Ui.buff_line("fish", {})).is_equal("%s · %d min · every fish lands ×2")   # a server before #865
 	assert_str(P0Ui.buff_line("fish", {"buff_takes": {"used": 1, "limit": 2}})).is_equal("%s · %d min · fish ×2, Legendary ×1")
-	assert_str(P0Ui.buff_line("farm", {"buff_takes": {"used": 1, "limit": 2}})).is_equal("%s · %d min · crops sown now grow 2× faster")
+	assert_str(P0Ui.buff_line("farm", {"buff_takes": {"used": 1, "limit": 2}})).is_equal("%s · %d min · sow now, grow 2× faster")
 	var v := _view([])
 	v["buff_takes"] = {"used": 0, "limit": 2, "resets_in": 3600000}
 	ui.set_view(v)
