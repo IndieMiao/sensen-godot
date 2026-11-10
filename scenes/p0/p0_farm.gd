@@ -1424,8 +1424,10 @@ func p0_near_resident() -> String:
 	return str(_guide.near_resident()) if _guide != null else ""
 
 ## A word on the badge's face, as its review renders wrote it: Nunito ExtraBold, flat ink, no outline, unshaded, one
-## sided, never turning to the camera; `cap` metres of cap height (0.705 of the font size at pixel_size 0.002).
+## sided, never turning to the camera; `cap` metres of cap height (0.705 of the font size at pixel_size 0.002). null with
+## no socket (a renamed one in a later model): the badge then shows no number, never a null read (iOS Release would crash).
 static func badge_label(socket: Node3D, text: String, cap: float) -> Label3D:
+	if socket == null: return null
 	var l := Label3D.new()
 	l.text = text
 	l.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # `Lv` and digits, as everywhere
@@ -1449,7 +1451,7 @@ func _show_badge(level: int) -> void:
 	for t in ["wood", "bronze", "silver", "gold"]:
 		var face := _plaque_node.find_child("Tier_" + t, true, false) as Node3D
 		if face: face.visible = t == tier
-	_badge_number.text = str(level)
+	if _badge_number: _badge_number.text = str(level)
 
 ## The sign itself (its icon button and strip arrive by id, _tap_card); small, so the door beside it stays the house.
 ## Nothing above the board: with the button hidden (beyond 8 m) that spot is not the sign's (苏烈 on #59).
