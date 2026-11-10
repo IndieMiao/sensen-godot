@@ -130,12 +130,16 @@ const EXIT_ARM_M := 2.5
 const EXIT_RADIUS_M := 0.4
 const EXIT_RING_NODE := "ring"   # the piece's ring (0.6 m round as drawn), scaled on the ground to EXIT_RING_R; the pin as it is
 const EXIT_RING_R := 0.38
-## 不知火舞 / 上官婉儿 on #943: the player within EXIT_FADE_M of the exit (behind its pin, at the front row's west end), the
-## pin fades to EXIT_FADE_ALPHA over EXIT_FADE_S (as ACTOR_FADE_S), its shadow off while faded, the player seen through
-## it; its `Map` strip and the ring as they are.
+## 不知火舞 443 d3ff5572 (上官婉儿 agreeing): the player within EXIT_FADE_M of the exit (behind its pin, at the front row's
+## west end), the pin fades out over EXIT_FADE_S (as ACTOR_FADE_S), its shadow off while faded — at 0.3 its red read
+## pink on the player; the strip and the ring tell the exit near. Its `Map` strip never fades: it rises clear of the
+## player's head, its bottom EXIT_STRIP_HEAD_PX over the head's top on screen, and eases back over EXIT_STRIP_BACK_S
+## once the player is away.
 const EXIT_FADE_M := 1.0
-const EXIT_FADE_ALPHA := 0.3
+const EXIT_FADE_ALPHA := 0.0
 const EXIT_FADE_S := 0.2
+const EXIT_STRIP_HEAD_PX := 6.0
+const EXIT_STRIP_BACK_S := 0.12
 const EXIT_PIN_NODE := "pin"   # the piece's pin, bobbed when the piece has no `bob` loop
 const EXIT_BOB_M := 0.1   # either way of where it stands (0.2 m in all; 不知火舞)
 const EXIT_BOB_S := 1.6
@@ -147,6 +151,9 @@ var _exit_armed := false
 var _exit_walk := false   # walking there after a tap on its prompt
 var _exit_pin_mat: StandardMaterial3D   # the pin's own copy of the farm art material, faded near the exit
 var _exit_pin_meshes: Array[MeshInstance3D] = []
+var _exit_lift := 0.0        # px the exit's strip is raised now (≤ 0, screen up)
+var _exit_lift_from := 0.0   # … where it was when the player left, easing back from there
+var _exit_lift_t := -1.0     # s into easing back (< 0: not easing)
 var _door_armed := false
 var _inside := false          # the farmhouse is open above this farm
 
@@ -1143,6 +1150,7 @@ func _exit_tapped(screen: Vector2) -> bool:
 
 ## The pin faded while the player is near the exit (EXIT_FADE_M), back when away; blended only while faded.
 func _exit_fade(dt: float) -> void:
+	_exit_strip_lift(dt)
 	if _exit_pin_mat == null or not _exit.is_finite(): return
 	var to := EXIT_FADE_ALPHA if P0FarmMaterials.flat(actor.position, _exit) < EXIT_FADE_M else 1.0
 	var a := move_toward(_exit_pin_mat.albedo_color.a, to, dt * (1.0 - EXIT_FADE_ALPHA) / EXIT_FADE_S)
@@ -1150,6 +1158,24 @@ func _exit_fade(dt: float) -> void:
 	_exit_pin_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if a < 1.0 else BaseMaterial3D.TRANSPARENCY_DISABLED
 	for m in _exit_pin_meshes:
 		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if a < 1.0 else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+
+## The exit's strip clear of the player's head while near (at once), eased back once away.
+func _exit_strip_lift(dt: float) -> void:
+	var want := 0.0
+	if _exit.is_finite() and P0FarmMaterials.flat(actor.position, _exit) < EXIT_FADE_M:
+		var centre := cam.unproject_position(_exit + EXIT_MARK).y
+		want = minf(0.0, actor.screen_box(cam).position.y - EXIT_STRIP_HEAD_PX - UiWorldNameBar._H * 0.5 - centre)
+	if want <= _exit_lift:
+		_exit_lift = want
+		_exit_lift_t = -1.0
+		return
+	if _exit_lift_t < 0.0:
+		_exit_lift_from = _exit_lift
+		_exit_lift_t = 0.0
+	_exit_lift_t += dt
+	var k := clampf(_exit_lift_t / EXIT_STRIP_BACK_S, 0.0, 1.0)
+	_exit_lift = lerpf(_exit_lift_from, want, ease(k, -2.0))
+	if k >= 1.0: _exit_lift_t = -1.0
 
 ## The walk out stopped where the player is (the joystick, a tap elsewhere, a panel).
 func stop_exit_walk() -> void:
@@ -1276,15 +1302,15 @@ func _prompts(v: Dictionary) -> void:
 	world_prompt("notice_board", P0WorldPrompts.notice_board(v), _notice, NOTICE_MARK, NOTICE_HIT, _notice_node.visible)
 	world_prompt("bench", P0WorldPrompts.bench(v), _bench, Vector3(0, 0.95, 0), Vector3(0, 0.35, 0))
 	world_prompt("mailbox", P0WorldPrompts.mailbox(v), _mailbox, MAILBOX_MARK, MAILBOX_HIT)
-	world_prompt("exit", P0WorldPrompts.farm_exit(EXIT_ICON), _exit, EXIT_MARK, EXIT_HIT, _exit.is_finite())
+	world_prompt("exit", P0WorldPrompts.farm_exit(EXIT_ICON), _exit, EXIT_MARK, EXIT_HIT, _exit.is_finite(), -1, _exit_lift)
 	if _facilities: _facilities.prompts(v)
 
 ## One facility's prompt at `at` + `mark` (the former finger card's / mark's anchor): its strip when it is the open
 ## one, else its icon button (P0WorldPrompts.show). The button and strip forward their taps to `at` + `hit` by id.
 ## `side`: the strip's way, the character's facing when −1; a facility strip opens right, its icon on the left, as
 ## the Fish Trap's (不知火舞 on 241 ba9359df).
-func world_prompt(id: String, prompt: Dictionary, at: Vector3, mark: Vector3, hit: Vector3, present := true, side := -1) -> void:
-	var screen := cam.unproject_position(at + mark)
+func world_prompt(id: String, prompt: Dictionary, at: Vector3, mark: Vector3, hit: Vector3, present := true, side := -1, lift := 0.0) -> void:
+	var screen := cam.unproject_position(at + mark) + Vector2(0.0, lift)
 	var tap := cam.unproject_position(at + hit)
 	var show := P0WorldPrompts.show(id, _card, P0FarmMaterials.flat(actor.position, at), prompt) \
 		if present and not rt.ui.has_modal() else P0WorldPrompts.Show.NONE

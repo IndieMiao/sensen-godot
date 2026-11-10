@@ -184,8 +184,8 @@ func test_a_tap_on_the_bed_beside_it_is_not_the_exits() -> void:
 	assert_bool(farm._exit_tapped(bed_px)).is_false()
 	assert_bool(farm._exit_tapped(exit_px + Vector2(P0Farm.EXIT_TAP_PX + 1.0, 0))).is_false()   # past its 40 px
 
-## 不知火舞 on #943: the player within EXIT_FADE_M, the pin fades to EXIT_FADE_ALPHA (seen behind it); away, back and
-## opaque again; the ring never fades.
+## 不知火舞 on #943: the player within EXIT_FADE_M, the pin fades out (seen behind it); away, back and opaque again; the
+## ring never fades.
 func test_near_the_exit_its_pin_fades() -> void:
 	if not ResourceLoader.exists(P0Farm.EXIT_PIECE): return
 	var farm := _farm()
@@ -197,7 +197,7 @@ func test_near_the_exit_its_pin_fades() -> void:
 	assert_object(ring.material_override).is_not_same(pin_mat)
 	farm.actor.teleport(farm._exit + Vector3(0, 0, -0.8))   # behind the pin, outside the trigger
 	farm._exit_fade(1.0)
-	assert_float(pin_mat.albedo_color.a).is_equal_approx(P0Farm.EXIT_FADE_ALPHA, 0.001)
+	assert_float(pin_mat.albedo_color.a).is_equal(0.0)   # out (不知火舞 443 d3ff5572: 0.3 read pink on the player)
 	assert_int(pin_mat.transparency).is_equal(BaseMaterial3D.TRANSPARENCY_ALPHA)
 	assert_int(pin.cast_shadow).is_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)   # no shadow while faded (上官婉儿)
 	assert_int(ring.cast_shadow).is_not_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
@@ -222,3 +222,26 @@ func test_the_fence_opens_at_the_exit() -> void:
 			.override_failure_message("rail %.2f–%.2f across the ring" % [lo, hi]).is_true()
 	assert_float(front.map(func(seg): return seg.pos.x).min() - half * front[0].stretch).is_greater_equal(P0Farm.EXIT_AT.x + P0Farm.EXIT_RING_R)   # west of the ring: no rail
 	assert_int(P0Garden.stone_wall(front).size()).is_equal(front.size() * P0Garden.STONE_PER_SEG)
+
+## 不知火舞 443 d3ff5572: near the exit, its `Map` strip rises clear of the player's head (its bottom EXIT_STRIP_HEAD_PX over
+## the head's top on screen) at once; away, it eases back over EXIT_STRIP_BACK_S.
+func test_near_the_exit_its_strip_clears_the_head_and_eases_back() -> void:
+	var farm := _farm()
+	farm.cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	farm.cam.keep_aspect = Camera3D.KEEP_WIDTH
+	farm.cam.size = 8.0
+	farm.cam.current = true
+	FarmCamera.place(farm.cam, P0Farm.EXIT_AT + Vector3.UP * 0.7)
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -0.8))   # behind the pin: the strip over the head
+	farm._exit_strip_lift(1.0 / 30.0)
+	var centre: float = farm.cam.unproject_position(farm._exit + P0Farm.EXIT_MARK).y + farm._exit_lift
+	var head: float = farm.actor.screen_box(farm.cam).position.y
+	assert_float(farm._exit_lift).is_less(0.0)
+	assert_float(centre + UiWorldNameBar._H * 0.5).is_less_equal(head - P0Farm.EXIT_STRIP_HEAD_PX + 0.01)
+	var up: float = farm._exit_lift
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -2.0))   # away: easing back, not at once
+	farm._exit_strip_lift(P0Farm.EXIT_STRIP_BACK_S * 0.5)
+	assert_float(farm._exit_lift).is_greater(up)
+	assert_float(farm._exit_lift).is_less(0.0)
+	farm._exit_strip_lift(P0Farm.EXIT_STRIP_BACK_S * 0.6)
+	assert_float(farm._exit_lift).is_equal(0.0)
