@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
-import { decorCap, decorOf, spotBlock } from '../../src/p0/decor.js';
+import { decorCap, decorOf, spotBlock, yardRoom } from '../../src/p0/decor.js';
 import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -142,5 +142,56 @@ describe('placing in the yard', () => {
     expect(decorCap(c, s)).toBe(52);   // the content's own max
     delete (capped.homestead as { decor_max?: { max?: number } }).decor_max!.max;
     expect(decorCap(capped, s)).toBe(84);   // no max: the formula alone
+  });
+});
+
+describe('yard2: the yard grows with the Home level (v4q(12), the user 11-10 bot 655)', () => {
+  const NEW = { wing8: true, yard2: true };
+  const at = (lv: number) => { const s = fresh(); s.homestead.level = lv; s.storage = { deco_planter: 9 }; return s; };
+  const place = (s: P0State, x: number, y: number, f: object = NEW) => applyP0(c, s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME } as P0Command, T0, f);
+
+  it('① the cap is min(20 + 4 per level, the cells the yard can take), no 52: the cells as 后裔 counted them (v4q(12) ① table, ④ taken)', () => {
+    const want: [number, number, number][] = [[1, 55, 20], [7, 55, 44], [8, 48, 48], [9, 48, 48], [12, 48, 48], [13, 61, 61], [14, 102, 72], [15, 102, 76], [16, 102, 80], [17, 102, 84]];
+    for (const [lv, room, cap] of want) {
+      expect(yardRoom(c, at(lv), NEW), `Lv${lv} cells`).toBe(room);
+      expect(decorCap(c, at(lv), NEW), `Lv${lv} cap`).toBe(cap);
+    }
+    // an older client: as before, 52 from Lv9 (⑦)
+    expect(decorCap(c, at(9), { wing8: true })).toBe(52);
+    expect(decorCap(c, at(17))).toBe(52);
+  });
+
+  it('① the Compost Bin takes a cell, so one less; pieces already placed are not taken from it, and over the cap they stay', () => {
+    const s = at(9);
+    s.facilities = [{ id: 1, kind: 'compost_bin', plot: -1, cell: [4, 15] }];
+    expect(decorCap(c, s, NEW)).toBe(47);
+    const full = at(9), free: [number, number][] = [];
+    for (let y = 13; y < 19; y++) for (let x = 1; x < 19; x++) if (!spotBlock(c, full, 'deco_planter', x, y, 0, undefined, NEW)) free.push([x, y]);
+    expect(free).toHaveLength(48);
+    // 48 on every free cell and 2 more an older client put on the new paths (q(303): not taken back)
+    full.decor = { placed: [...free, [6, 14], [12, 15]].map(([x, y], i) => ({ uid: i + 1, id: 'deco_planter', x, y, rot: 0 as const })), count: 50 };
+    expect(decorCap(c, full, NEW)).toBe(48);   // the pieces' own cells still count as cells the yard can take
+    expect(place(full, 2, 18)).toMatchObject({ ok: false, code: 'decor_cap', detail: { cap: 48, used: 50 } });
+    expect(viewOf(c, full, T0, NEW).decor).toMatchObject({ cap: 48, used: 50 });
+  });
+
+  it('③ ④ Lv13 opens row 19, Lv14 columns 19–20 (the field\'s two east columns too, its rocks off); an older client\'s yard never grows', () => {
+    expect(place(at(12), 2, 19)).toMatchObject({ ok: false, code: 'decor_outside' });
+    expect(place(at(13), 2, 19).ok).toBe(true);
+    expect(place(at(13), 3, 19)).toMatchObject({ ok: false, code: 'decor_overlap' });   // a rock, registered
+    expect(place(at(13), 19, 14)).toMatchObject({ ok: false, code: 'decor_outside' });
+    for (const [x, y] of [[19, 14], [20, 19], [19, -2], [20, 12]]) expect(place(at(14), x, y).ok, `${x},${y}`).toBe(true);
+    expect(place(at(14), 20, 4)).toMatchObject({ ok: false, code: 'decor_overlap' });    // the rocks in the field's edge
+    expect(place(at(14), 18, 11)).toMatchObject({ ok: false, code: 'decor_outside' });   // the field still ends at x 18
+    expect(place(at(17), 2, 19, { wing8: true })).toMatchObject({ ok: false, code: 'decor_outside' });
+    expect(place(at(17), 19, 14, { wing8: true })).toMatchObject({ ok: false, code: 'decor_outside' });
+  });
+
+  it('the view says the next level\'s cap with the yard counted (`Home Lv13 adds 13`); none at the top, none for an older client', () => {
+    expect(viewOf(c, at(8), T0, NEW).decor).toMatchObject({ cap: 48, next_cap: 48 });
+    expect(viewOf(c, at(12), T0, NEW).decor).toMatchObject({ cap: 48, next_cap: 61 });
+    expect(viewOf(c, at(13), T0, NEW).decor).toMatchObject({ cap: 61, next_cap: 72 });
+    expect(viewOf(c, at(17), T0, NEW).decor).toMatchObject({ cap: 84, next_cap: null });
+    expect('next_cap' in viewOf(c, at(12), T0, { wing8: true }).decor!).toBe(false);
   });
 });

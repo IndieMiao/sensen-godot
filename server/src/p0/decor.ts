@@ -18,7 +18,9 @@ type Rect = [number, number, number, number];
  * wing: the cells Homestead Lv8's Kitchen Wing stands on from its level (q(303), SGODOT-450); paths2: more cells kept
  * clear for a client that says `yard2` (yard v2, v4q(12): the way to the rest bench past the porch, and to the mailbox —
  * a yard full of decor walled both off, 后裔's walk check 11-10). */
-export interface DecorYard { walk: Rect; field: Rect[]; objects: Rect[]; paths: Rect[]; wing?: DecorWing; paths2?: Rect[] }
+export interface DecorYard { walk: Rect; field: Rect[]; objects: Rect[]; paths: Rect[]; wing?: DecorWing; paths2?: Rect[]; grow?: DecorGrow[] }
+/** yard2 (v4q(12) ③ ④): the walk rect from a Homestead level on — Lv13 row 19, Lv14 columns 19–20. */
+export interface DecorGrow { homestead: number; walk: Rect }
 /** What the client draws of the yard (x-p0-features): wing8 — Lv8's Kitchen Wing (q(303)); yard2 — yard v2 (v4q(12)).
  * An older client keeps the yard as it knows it. */
 export interface YardFeatures { wing8?: boolean; yard2?: boolean }
@@ -32,10 +34,32 @@ export const isDecor = (c: P0Content, id: string) => !!decorOf(c)?.items[id];
 
 /** §8.3.2: 20 + 4 × (Homestead level − 1), at most decor_max.max when the content sets one (SGODOT-355 b1: the yard has
  * 58 free cells since the field took the whole grid, the mine mouth left and the bench kept its cell; 52 from Lv9, 6
- * cells to walk on — the user, 11-02, 丁22, v4q(1) ⑤). */
-export function decorCap(c: P0Content, s: P0State): number {
+ * cells to walk on — the user, 11-02, 丁22, v4q(1) ⑤). yard2 (v4q(12) ①, overturns 丁22): no max — at most the cells
+ * the yard can take now (yardRoom); the paths keep the ways open, not the cap. Pieces over it stay (q(303)). */
+export function decorCap(c: P0Content, s: P0State, f: YardFeatures = {}): number {
   const m = (c.homestead as { decor_max?: { base: number; per_level: number; max?: number } }).decor_max ?? { base: 20, per_level: 4 };
-  return Math.min(m.base + m.per_level * Math.max(0, s.homestead.level - 1), m.max ?? Infinity);
+  const byLevel = m.base + m.per_level * Math.max(0, s.homestead.level - 1);
+  return Math.min(byLevel, f.yard2 ? yardRoom(c, s, f) : m.max ?? Infinity);
+}
+
+/** The yard's walk rect for this client: yard2 (v4q(12) ③ ④) grows it with the Homestead level (decor.yard.grow, the
+ * last one reached); else the content's walk, whatever the level. */
+export function yardWalk(c: P0Content, s: P0State, f: YardFeatures = {}): Rect {
+  const yard = decorOf(c)!.yard;
+  let walk = yard.walk;
+  if (f.yard2) for (const g of yard.grow ?? []) if (s.homestead.level >= g.homestead) walk = g.walk;
+  return walk;
+}
+
+/** The cells the yard can take now (v4q(12) ①): every cell of the walk a 1 × 1 piece may stand on, the pieces already
+ * placed not counted against it — so off the field, the beds, objects, paths, the wing and the yard's facilities (the
+ * Compost Bin: placing one lowers the cap by one). */
+export function yardRoom(c: P0Content, s: P0State, f: YardFeatures = {}): number {
+  const bare = { ...s, decor: undefined };
+  const [x0, y0, w, h] = yardWalk(c, s, f);
+  let n = 0;
+  for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) if (!yardBlock(c, bare, [[x, y]], { x, y }, {}, f)) n++;
+  return n;
 }
 
 /** The cells a piece covers at x, y. */
@@ -97,8 +121,8 @@ export function yardBlock(c: P0Content, s: P0State, cells: [number, number][], a
     ignore: { uid?: number; facility?: number } = {}, f: YardFeatures = {}): Refusal | null {
   const yard = decorOf(c)!.yard;
   // off the field, and off the beds the homestead has beyond it (Homestead Lv7's 40–47 on the field's edge, q(172))
-  const beds = bedCells(c, s);
-  if (cells.some(cell => !inRect(cell, yard.walk) || yard.field.some(r => inRect(cell, r)) || beds.has(`${cell[0]},${cell[1]}`)))
+  const beds = bedCells(c, s), walk = yardWalk(c, s, f);
+  if (cells.some(cell => !inRect(cell, walk) || yard.field.some(r => inRect(cell, r)) || beds.has(`${cell[0]},${cell[1]}`)))
     return { code: 'decor_outside', detail: at };
   const taken = new Set<string>();
   for (const p of s.decor?.placed ?? []) if (p.uid !== ignore.uid) for (const [px, py] of cellsOf(c, p.id, p.x, p.y, p.rot)) taken.add(`${px},${py}`);
@@ -125,7 +149,8 @@ export function placeDecor(c: P0Content, s: P0State, cmd: { item?: unknown; x?: 
   if (!at) return { code: 'bad_spot' };
   if (stored(s, id) < 1) return { code: 'not_stored', detail: { item: id } };
   s.decor ??= { placed: [], count: 0 };
-  if (s.decor.placed.length >= decorCap(c, s)) return { code: 'decor_cap', detail: { cap: decorCap(c, s), used: s.decor.placed.length } };
+  const cap = decorCap(c, s, f);
+  if (s.decor.placed.length >= cap) return { code: 'decor_cap', detail: { cap, used: s.decor.placed.length } };
   const block = spotBlock(c, s, id, at.x, at.y, at.rot, undefined, f);
   if (block) return block;
   s.storage[id] -= 1;
@@ -160,12 +185,16 @@ export function storeDecor(c: P0Content, s: P0State, cmd: { uid?: unknown }, eve
   return null;
 }
 
-/** view.decor: the yard's pieces, what storage holds, the cap, and the catalog facts the Decor page needs. */
-export function decorView(c: P0Content, s: P0State) {
+/** view.decor: the yard's pieces, what storage holds, the cap, and the catalog facts the Decor page needs. yard2:
+ * next_cap, the cap at the next Homestead level (null at the top) — the yard's cells count in it, so the client's
+ * `Home LvN adds N` reads it rather than the level's formula (v4q(12) 画面). */
+export function decorView(c: P0Content, s: P0State, f: YardFeatures = {}) {
   const d = decorOf(c);
   if (!d) return null;
+  const top = Math.max(...c.homestead.levels.map(l => l.level));
+  const next = f.yard2 ? { next_cap: s.homestead.level < top ? decorCap(c, { ...s, homestead: { ...s.homestead, level: s.homestead.level + 1 } }, f) : null } : {};
   return {
-    placed: s.decor?.placed ?? [], cap: decorCap(c, s), used: s.decor?.placed.length ?? 0,
+    placed: s.decor?.placed ?? [], cap: decorCap(c, s, f), used: s.decor?.placed.length ?? 0, ...next,
     stored: Object.fromEntries(Object.keys(d.items).filter(id => stored(s, id) > 0).map(id => [id, stored(s, id)])),
   };
 }

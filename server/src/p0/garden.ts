@@ -17,7 +17,7 @@ import type { P0Event } from './progress.js';
 import { skillLevel, untilRollover } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
 import { add, count, room, take } from './bag.js';
-import { cellsOf, yardBlock, type YardFeatures } from './decor.js';
+import { cellsOf, decorOf, yardBlock, yardWalk, type YardFeatures } from './decor.js';
 import { cropById, quickCrop, fastCrop } from './content.js';
 import { missing, putInStorage, takeStorageFirst } from './storage.js';
 
@@ -186,8 +186,8 @@ export function clearNewBeds(c: P0Content, s: P0State, added: number[], events: 
  * behind last. null when none is legal. */
 export function nearestYardCell(c: P0Content, s: P0State, from: [number, number], span: number, facility?: number,
     yard: YardFeatures = {}): [number, number] | null {
-  const walk = (c as P0Content & { decor?: { yard: { walk: [number, number, number, number] } } }).decor?.yard.walk;
-  if (!walk) return null;
+  if (!decorOf(c)) return null;
+  const walk = yardWalk(c, s, yard);
   let best: [number, number] | null = null, bestD = Infinity;
   for (let y = walk[1]; y < walk[1] + walk[3]; y++) for (let x = walk[0]; x < walk[0] + walk[2]; x++) {
     const dx = Math.max(0, Math.abs(x - from[0]) - span), dy = y - from[1];
