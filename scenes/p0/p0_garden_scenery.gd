@@ -7,6 +7,32 @@ extends Node3D
 const Art = preload("res://modules/farm/farm_art.gd")
 const FarmScenery = preload("res://modules/farm/farm_scenery.gd")
 
+## The yard's west hedge (SGODOT-371, 不知火舞 59ea8ecc): [foot, turn, scale], from the front row's east end round the
+## south-west corner and up the west edge. Four moved for the map exit (C7, 443 190fa019 / 371 dd50e433, moved not
+## dropped): the front three out to z 1.99–2.07 (clear of the ring on screen), the corner one 0.29 m west (0.3 m off it).
+const WEST_HEDGE := [
+	[Vector3(3.5, 0, 1.97), 2.57, 0.7],
+	[Vector3(2.62, 0, 1.88), 6.03, 0.94],
+	[Vector3(1.58, 0, 2.07), 0.26, 0.96],
+	[Vector3(0.73, 0, 2.03), 4.27, 0.81],
+	[Vector3(0.08, 0, 1.99), 6.1, 0.84],
+	[Vector3(-0.27, 0, 1.08), 0.11, 0.87],
+	[Vector3(0.08, 0, 0.14), 1.88, 0.83],
+	[Vector3(0.02, 0, -0.62), 1.06, 0.93],
+	[Vector3(0.1, 0, -0.98), 0.42, 0.71],
+	[Vector3(0.05, 0, -1.99), 6.27, 0.98],
+	[Vector3(0.01, 0, -3.08), 2.35, 0.9],
+	[Vector3(0.01, 0, -4.06), 2.15, 0.89],
+	[Vector3(0.01, 0, -4.9), 1.84, 0.86],
+	[Vector3(0.08, 0, -5.83), 2.29, 0.82],
+	[Vector3(0.01, 0, -6.87), 3.49, 0.81],
+	[Vector3(0.03, 0, -7.93), 3.78, 0.84],
+	[Vector3(0.09, 0, -8.29), 2.58, 0.71],
+	[Vector3(-0.0, 0, -9.3), 2.04, 0.84],
+	[Vector3(0.09, 0, -10.36), 0.41, 0.89],
+	[Vector3(0.04, 0, -11.21), 5.48, 0.75],
+	[Vector3(0.1, 0, -12.22), 6.22, 0.79]]
+
 var field_rect := Rect2()   # world xz rect covering every bed, for scatter exclusion
 var rock_points: Array = []  # scattered rocks; the farm makes their cells solid
 var _sand: Node3D            # the sand under the field
@@ -73,28 +99,7 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	_add_split(bp, "bush", shrubs)
 	# The yard's west edge and the west end of its front (SGODOT-371, 不知火舞 59ea8ecc): a loose hedge just outside the
 	# walk line (x 0.65 / z +1.3) and the Lv3+ ring (x 0.38), every level the same — it shows the edge, the walk rect stops you.
-	for layer in [["bush", true, [
-		[Vector3(3.5, 0, 1.97), 2.57, 0.7],
-		[Vector3(2.62, 0, 1.88), 6.03, 0.94],
-		[Vector3(1.58, 0, 1.92), 0.26, 0.96],
-		[Vector3(0.73, 0, 1.89), 4.27, 0.81],
-		[Vector3(0.08, 0, 1.92), 6.1, 0.84],
-		[Vector3(0.02, 0, 1.06), 0.11, 0.87],
-		[Vector3(0.08, 0, 0.14), 1.88, 0.83],
-		[Vector3(0.02, 0, -0.62), 1.06, 0.93],
-		[Vector3(0.1, 0, -0.98), 0.42, 0.71],
-		[Vector3(0.05, 0, -1.99), 6.27, 0.98],
-		[Vector3(0.01, 0, -3.08), 2.35, 0.9],
-		[Vector3(0.01, 0, -4.06), 2.15, 0.89],
-		[Vector3(0.01, 0, -4.9), 1.84, 0.86],
-		[Vector3(0.08, 0, -5.83), 2.29, 0.82],
-		[Vector3(0.01, 0, -6.87), 3.49, 0.81],
-		[Vector3(0.03, 0, -7.93), 3.78, 0.84],
-		[Vector3(0.09, 0, -8.29), 2.58, 0.71],
-		[Vector3(-0.0, 0, -9.3), 2.04, 0.84],
-		[Vector3(0.09, 0, -10.36), 0.41, 0.89],
-		[Vector3(0.04, 0, -11.21), 5.48, 0.75],
-		[Vector3(0.1, 0, -12.22), 6.22, 0.79]]],
+	for layer in [["bush", true, WEST_HEDGE],
 		["daisy", false, [
 		[Vector3(2.5, 0.01, 1.69), 0.0, 0.82],
 		[Vector3(0.3, 0.01, -0.08), 2.6, 0.82],
