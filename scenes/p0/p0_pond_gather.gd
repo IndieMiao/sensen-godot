@@ -166,6 +166,7 @@ static func _hardwood_gathered(root: Node3D) -> void:
 ## own leaves cut low (0.55 high) and closed in, a shade darker, dark leafy blades at its foot, two sprouts; no bush.
 static var _herb_dim: StandardMaterial3D
 static var _herb_foot: StandardMaterial3D
+static var _herb_cut: ArrayMesh
 static func _herb_gathered(root: Node3D) -> void:
 	if _herb_dim == null:
 		_herb_dim = Art.material().duplicate() as StandardMaterial3D
@@ -173,56 +174,56 @@ static func _herb_gathered(root: Node3D) -> void:
 		_herb_foot = Art.material().duplicate() as StandardMaterial3D
 		_herb_foot.albedo_color = Color(0.72, 0.72, 0.72)
 	var c := Vector3(0.0, 0, 0.15)   # the three herbs' middle
-	var herb := CropMesh.build("B", CropMesh.LEAF)
-	for at in [Vector3(-0.28, 0, 0.12), Vector3(0.24, 0, 0.18), Vector3(0.02, 0, 0.36)]:
-		var h := MeshInstance3D.new()
-		h.mesh = herb
-		h.material_override = _herb_dim
-		h.position = c + (at - c) * 0.55
-		h.scale = Vector3(1.25 * 0.85, 1.25 * 0.55, 1.25 * 0.85)
-		root.add_child(h)
+	if _herb_cut == null:   # the three cut herbs one mesh (上官婉儿 on #969: a gathered piece ≤ 6 draws)
+		var herb := CropMesh.build("B", CropMesh.LEAF)
+		var st := SurfaceTool.new()
+		for at in [Vector3(-0.28, 0, 0.12), Vector3(0.24, 0, 0.18), Vector3(0.02, 0, 0.36)]:
+			st.append_from(herb, 0, Transform3D(Basis.from_scale(Vector3(1.25 * 0.85, 1.25 * 0.55, 1.25 * 0.85)), c + (at - c) * 0.55))
+		_herb_cut = st.commit()
+	var cut := MeshInstance3D.new()
+	cut.name = "CutHerbs"
+	cut.mesh = _herb_cut
+	cut.material_override = _herb_dim
+	root.add_child(cut)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 417
+	var blades: Array = []   # dark leafy blades at its foot, one batch as _feet's
 	for i in 9:
-		var b := Art.instance("wild_pz_foot_leafy", c + Vector3.FORWARD.rotated(Vector3.UP, TAU * float(i) / 9.0 + rng.randf_range(-0.2, 0.2)) * rng.randf_range(0.2, 0.3), rng.randf_range(0.5, 0.7))
-		b.position.y = -0.02
-		b.rotation.y = rng.randf() * TAU
-		b.material_override = _herb_foot
-		root.add_child(b)
+		var at := c + Vector3.FORWARD.rotated(Vector3.UP, TAU * float(i) / 9.0 + rng.randf_range(-0.2, 0.2)) * rng.randf_range(0.2, 0.3)
+		blades.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.5, 0.7)), Vector3(at.x, -0.02, at.z)))
+	var foot := Art.batch("wild_pz_foot_leafy", blades, false)
+	foot.material_override = _herb_foot
+	root.add_child(foot)
 	for at in [Vector3(-0.32, 0, -0.12), Vector3(0.36, 0, -0.05)]: root.add_child(_sprout(at))
 
-## 417's one regrowth sprout (gathered_417 build.py sprout()): a 0.105 m stem, two oval leaves in a V, #8FA46B.
+## 417's one regrowth sprout (gathered_417 build.py sprout()): a 0.105 m stem, two oval leaves in a V, #8FA46B — one
+## mesh, built once (one draw a sprout).
 static var _sprout_mat: StandardMaterial3D
-static func _sprout(at: Vector3) -> Node3D:
-	if _sprout_mat == null:
+static var _sprout_mesh: ArrayMesh
+static func _sprout(at: Vector3) -> MeshInstance3D:
+	if _sprout_mesh == null:
 		_sprout_mat = StandardMaterial3D.new()
 		_sprout_mat.albedo_color = Color("8FA46B")
 		_sprout_mat.roughness = 0.9
-	var n := Node3D.new()
+		var stem := CylinderMesh.new()
+		stem.top_radius = 0.010
+		stem.bottom_radius = 0.012
+		stem.height = 0.105
+		stem.radial_segments = 4
+		stem.rings = 1
+		var leaf := SphereMesh.new()   # 1 m across: scaled to 417's leaf 0.15 × 0.08 × 0.06
+		leaf.radial_segments = 6
+		leaf.rings = 3
+		var st := SurfaceTool.new()
+		st.append_from(stem, 0, Transform3D(Basis(), Vector3(0, 0.0525, 0)))
+		for side in [-1.0, 1.0]:
+			st.append_from(leaf, 0, Transform3D(Basis(Vector3.BACK, side * 0.55) * Basis.from_scale(Vector3(0.15, 0.08, 0.06)), Vector3(side * 0.055, 0.14, 0)))
+		_sprout_mesh = st.commit()
+	var n := MeshInstance3D.new()
 	n.name = "Sprout"
+	n.mesh = _sprout_mesh
+	n.material_override = _sprout_mat
 	n.position = at
-	var stem := MeshInstance3D.new()
-	var c := CylinderMesh.new()
-	c.top_radius = 0.010
-	c.bottom_radius = 0.012
-	c.height = 0.105
-	c.radial_segments = 4
-	c.rings = 1
-	stem.mesh = c
-	stem.position.y = 0.0525
-	stem.material_override = _sprout_mat
-	n.add_child(stem)
-	for side in [-1.0, 1.0]:
-		var leaf := MeshInstance3D.new()
-		var sp := SphereMesh.new()
-		sp.radial_segments = 6
-		sp.rings = 3
-		leaf.mesh = sp
-		leaf.scale = Vector3(0.15, 0.08, 0.06)   # SphereMesh is 1 m across
-		leaf.position = Vector3(side * 0.055, 0.14, 0)
-		leaf.rotation.z = side * 0.55
-		leaf.material_override = _sprout_mat
-		n.add_child(leaf)
 	return n
 
 ## Grass where things meet the ground (the user on v5: the stones' and trees' feet most): blades round each trunk and

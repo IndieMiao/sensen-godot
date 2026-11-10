@@ -90,3 +90,20 @@ func test_the_dev_switch_is_the_editors_only() -> void:
 	assert_float(float(PondGather.cooled(p, PackedStringArray(["wood"])).ready_in)).is_equal(0.0)
 	assert_float(float(PondGather.cooled(_point("clay", 60000.0), PackedStringArray(["all"])).ready_in)).is_equal(60000.0)
 	assert_float(float(p.ready_in)).is_equal(0.0)   # the view's own point untouched
+
+## Draws a gathered look costs (上官婉儿 on #969: a pond all cooling adds no more than a few tens on GLES): a mesh's
+## surfaces, a batch's once; Wild Herb at most 6 — its cut herbs one mesh, its foot's blades one batch, a sprout one.
+static func _draws(layer: Node3D) -> int:
+	var n := 0
+	for g in layer.find_children("*", "GeometryInstance3D", true, false):
+		if g is MeshInstance3D and (g as MeshInstance3D).mesh: n += (g as MeshInstance3D).mesh.get_surface_count()
+		elif g is MultiMeshInstance3D and (g as MultiMeshInstance3D).multimesh.mesh: n += (g as MultiMeshInstance3D).multimesh.mesh.get_surface_count()
+	return n
+
+func test_a_gathered_look_is_a_few_draws() -> void:
+	var g := _gather(KINDS.map(func(k): return _point(k)))
+	for k in KINDS:
+		var done := (g.nodes[POND + "#" + k] as Node3D).get_node("Gathered") as Node3D
+		assert_int(_draws(done)).override_failure_message("%s: %d draws" % [k, _draws(done)]).is_less_equal(6)
+	var herb := (g.nodes[POND + "#herb"] as Node3D).get_node("Gathered") as Node3D
+	assert_int(_draws(herb)).is_equal(4)   # cut herbs, the foot's batch, two sprouts
