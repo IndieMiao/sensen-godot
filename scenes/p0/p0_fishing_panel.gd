@@ -69,6 +69,9 @@ func _hold_for_tip() -> void:
 func _refresh_button() -> void:
 	super._refresh_button()
 	_hold_for_tip()
+	# SGODOT-480: the Hook key stands out while a fish is on; a sure bite (q(219), its window never closing) pops again
+	# now and then — the same look as any bite otherwise, no word or mark of it
+	if _primary: _primary.call("hook", phase == "hook" and visible, _sure)
 
 ## +1: the gauge goes right of the float, -1 left (the pond frames the float with room on that side). A float beside
 ## the player's box points away from it; one above or below it takes the side with more room.
