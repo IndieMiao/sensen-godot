@@ -684,10 +684,16 @@ static func cabinet_actions(view: Dictionary, id: String) -> Dictionary:
 
 # ---------------------------------------------------------------- Cook Again (COOK-P0-7 / P0-8, Cooking Lv2)
 const TAG_NAMES := {"W": "Fish", "F": "Vegetable", "O": "Fruit", "S": "Seasoning"}
-const ORDINALS := ["1st", "2nd", "3rd"]
-
-## 1st, 2nd, 3rd, 4th … (Cooks today, and the XP float's `· 2nd today` / `No XP · 3rd today`).
-static func ordinal(n: int) -> String: return ORDINALS[n - 1] if n >= 1 and n <= 3 else "%dth" % n
+## 1st, 2nd, 3rd, 4th … 11th, 12th, 13th … 21st, 22nd, 23rd (Cooks today, the XP float's `No XP · 3rd today`, the
+## level-up rows' `2nd Fish Trap`); Chinese reads each 第 n (the table's `%dst` / `%dnd` / `%drd` / `%dth`).
+static func ordinal(n: int) -> String:
+	var last := absi(n) % 10
+	var suffix := "th"
+	if absi(n) % 100 < 11 or absi(n) % 100 > 13:
+		if last == 1: suffix = "st"
+		elif last == 2: suffix = "nd"
+		elif last == 3: suffix = "rd"
+	return "%d%s" % [n, suffix]
 
 ## Cooking Lv2's Cook Again is unlocked (S5 conveniences).
 static func cook_again_on(view: Dictionary) -> bool:

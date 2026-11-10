@@ -864,3 +864,18 @@ func test_p0_ordinals_and_the_unlock_rows_read_in_chinese() -> void:
 	assert_array(rows).contains_exactly_in_any_order(want.keys())
 	for row in rows: assert_str(zh.call(row)).is_equal(want[row])
 	TranslationServer.remove_translation(t)
+
+## English ordinals by the usual rule (周瑜 on #975: 21th / 22th / 23th) — 11th, 12th, 13th whatever their last digit,
+## else 1st / 2nd / 3rd by it — and each reads 第 n in Chinese, the XP float's whole line too.
+func test_p0_ordinals_take_their_english_suffix_and_read_di_n() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	var want := {1: "1st", 2: "2nd", 3: "3rd", 4: "4th", 10: "10th", 11: "11th", 12: "12th", 13: "13th", 21: "21st",
+		22: "22nd", 23: "23rd", 24: "24th", 101: "101st", 111: "111th", 112: "112th", 113: "113th", 122: "122nd"}
+	for n in want:
+		assert_str(P0KitchenLogic.ordinal(n)).is_equal(want[n])
+		assert_str(zh.call(P0KitchenLogic.ordinal(n))).is_equal("第 %d" % n)
+		assert_str(zh.call("No XP · %s today" % P0KitchenLogic.ordinal(n))).is_equal("无经验 · 今日第 %d 次" % n)
+	TranslationServer.remove_translation(t)
