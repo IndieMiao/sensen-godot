@@ -1531,10 +1531,13 @@ func _dev_mem(dt: float) -> void:
 	_mem_left -= dt
 	if _mem_left > 0.0: return
 	_mem_left = 2.0
-	print("P0_MEM static=%d video=%d nodes=%d stack=%d pick=%s fps=%d frame_ms=%.1f" % [Performance.get_monitor(Performance.MEMORY_STATIC),
+	# draws / prims: the frame's draw calls and primitives, beside frame_ms (_process) — before / after a scene's change
+	# on one emulator, same spot (奕星 11-10, the yard v2's numbers; the church's lesson)
+	print("P0_MEM static=%d video=%d nodes=%d stack=%d pick=%s fps=%d frame_ms=%.1f draws=%d prims=%d" % [Performance.get_monitor(Performance.MEMORY_STATIC),
 		Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED), Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
 		AppRouter.instance_depth(), str(is_instance_valid(_pick_map)), Performance.get_monitor(Performance.TIME_FPS),
-		Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0])
+		Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+		Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)])
 
 ## Every way off the pin page pops its map (亚瑟 ②: a first pick's change_scene never touches AppRouter's stack), and
 ## only it: something else on top stays, the map then left for the stack's own unwinding.
