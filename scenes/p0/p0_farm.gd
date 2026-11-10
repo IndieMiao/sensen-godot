@@ -11,6 +11,7 @@ const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
+const FarmWoods = preload("res://scenes/p0/p0_farm_woods.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const FarmGuide = preload("res://scenes/p0/p0_farm_guide.gd")
 const Looks = preload("res://scenes/p0/p0_looks.gd")
@@ -76,6 +77,7 @@ var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldB
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
 var _scenery: Node3D   # p0_garden_scenery.gd: the sand under the field grows over Lv7's front row
+var _woods: FarmWoods  # p0_farm_woods.gd: woods round the yard, clumps on the beds still to open
 ## q(303) ⑨: a save past Lv8 whose wing's cells are held says so once a launch, on the first farm view (the app's run).
 static var _wing_said := false
 var _held_wanted := false
@@ -238,6 +240,10 @@ func _build_world() -> void:
 	_scenery = GardenScenery.new()
 	add_child(_scenery)
 	_scenery.build(bp, _style)
+	_woods = FarmWoods.new()   # the farm ringed by pine woods (the user 11-09, SGODOT-422 0.3.5): nothing in it collides
+	add_child(_woods)
+	_woods.build(bp)
+	grass.shader = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 	P0Garden.block_points(bp, _scenery.rock_points)   # rocks collide; crops and bushes don't
 	_fence = Fence.new()
 	add_child(_fence)
@@ -844,6 +850,7 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	# the beds open now (the view's garden.plots, in the order they open: SGODOT-355 b1); the rest stay grass
 	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
 	_scenery.fit_sand(bp, P0Garden.plot_count(v))   # the field's sand under the open beds only
+	if _woods: _woods.fit(bp, P0Garden.plot_count(v), _decor.taken_cells() if _decor else [])   # the clumps on beds still to open, none next to an open one or under a piece
 	_sync_trees(v)
 
 ## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
@@ -1453,6 +1460,42 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var piece := get_node_or_null("ExitPin") as Node3D
 			if piece: piece.position = _exit
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		"edges":   # the ground (y 0) under the screen's corners and edge middles (scene art: where the picture ends)
+			var view := get_viewport().get_visible_rect().size
+			var out := {"zoom": snappedf(_zoom, 0.001), "size": snappedf(cam.size, 0.01)}
+			var at := {"tl": Vector2(0, 0), "tr": Vector2(1, 0), "bl": Vector2(0, 1), "br": Vector2(1, 1), "top": Vector2(0.5, 0),
+					"bottom": Vector2(0.5, 1), "left": Vector2(0, 0.5), "right": Vector2(1, 0.5)}
+			for key in at:
+				var px: Vector2 = at[key] * view
+				var o := cam.project_ray_origin(px)
+				var n := cam.project_ray_normal(px)
+				var g := o + n * (-o.y / n.y)
+				out[key] = [snappedf(g.x, 0.01), snappedf(g.z, 0.01)]
+			print("P0_EDGES ", JSON.stringify(out))
+		"rinfo":   # this frame's triangles and draw calls (scene art budgets)
+			print("P0_RINFO ", JSON.stringify({"prims": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
+				"draws": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
+				"objects": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME)}))
+		"batches":   # every batch on the farm: instances × triangles, shadows (scene art budgets)
+			var rows: Array = []
+			var total := 0
+			for m: MultiMeshInstance3D in find_children("*", "MultiMeshInstance3D", true, false):
+				var mesh := m.multimesh.mesh
+				if mesh == null: continue
+				var tris := 0
+				for si in mesh.get_surface_count():
+					var a := mesh.surface_get_arrays(si)
+					tris += (a[Mesh.ARRAY_INDEX].size() if a[Mesh.ARRAY_INDEX] != null else a[Mesh.ARRAY_VERTEX].size()) / 3
+				var n := m.multimesh.visible_instance_count if m.multimesh.visible_instance_count >= 0 else m.multimesh.instance_count
+				total += n * tris
+				rows.append("%s|%s|%d|%d|%d|%d" % [str(m.get_parent().name), str(m.name), n, tris, n * tris, int(m.cast_shadow != GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)])
+			print("P0_BATCHES total=%d n=%d\n%s" % [total, rows.size(), "\n".join(rows)])
+		"walkhash":   # the walk mask and the path grid's solid cells as built (a scenery change must leave both alone)
+			var solid: Array = []
+			for y in range(bp.grid_origin.y, bp.grid_origin.y + bp.grid.y):
+				for x in range(bp.grid_origin.x, bp.grid_origin.x + bp.grid.x):
+					if grid.astar.is_in_boundsv(Vector2i(x, y)) and grid.astar.is_point_solid(Vector2i(x, y)): solid.append(Vector2i(x, y))
+			print("P0_WALKHASH ", JSON.stringify({"mask": str(bp.masks.walkable).hash(), "solid": str(solid).hash(), "solid_n": solid.size()}))
 		"island":   # the whole island in the picture, as far as the opening may zoom out (#624 walkthrough: a farm end to end)
 			var corners: Array[Vector3] = []
 			for c in [ISLAND_RECT.position, ISLAND_RECT.end, Vector2i(ISLAND_RECT.position.x, ISLAND_RECT.end.y), Vector2i(ISLAND_RECT.end.x, ISLAND_RECT.position.y)]:
