@@ -1268,6 +1268,9 @@ func p0_tap(screen: Vector2) -> void:
 var _tap_walk := false
 var _tap_face := Vector3.INF   # the bed the walk ends facing, INF for open ground
 func _walk_tap(screen: Vector2) -> void:
+	# Not before the first p0_frame has built the facilities and Decorate (the server's view in): a new account's tap
+	# while its farm was still coming crashed iOS 0.3.6 on the null (Release has no null check; 蒙恬's crash log).
+	if _facilities == null or _decor == null: return
 	if not _facilities.placing.is_empty() or not _decor.placing.is_empty(): return   # Decorate: its taps place
 	var origin := cam.project_ray_origin(screen)
 	var dir := cam.project_ray_normal(screen)
