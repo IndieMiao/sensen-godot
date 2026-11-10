@@ -13,6 +13,7 @@ const FarmArt = preload("res://modules/farm/farm_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const FarmWoods = preload("res://scenes/p0/p0_farm_woods.gd")
 const GroundShade = preload("res://modules/render/ground_shade.gd")
+const StripClear = preload("res://modules/p0/p0_strip_clear.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const FarmGuide = preload("res://scenes/p0/p0_farm_guide.gd")
 const Looks = preload("res://scenes/p0/p0_looks.gd")
@@ -166,8 +167,8 @@ const EXIT_RING_R := 0.38
 const EXIT_FADE_M := 1.0
 const EXIT_FADE_ALPHA := 0.0
 const EXIT_FADE_S := 0.2
-const EXIT_STRIP_HEAD_PX := 6.0
-const EXIT_STRIP_BACK_S := 0.12
+const EXIT_STRIP_HEAD_PX := StripClear.HEAD_PX
+const EXIT_STRIP_BACK_S := StripClear.BACK_S
 const EXIT_PIN_NODE := "pin"   # the piece's pin, bobbed when the piece has no `bob` loop
 const EXIT_BOB_M := 0.1   # either way of where it stands (0.2 m in all; 不知火舞)
 const EXIT_BOB_S := 1.6
@@ -180,8 +181,7 @@ var _exit_walk := false   # walking there after a tap on its prompt
 var _exit_pin_mat: StandardMaterial3D   # the pin's own copy of the farm art material, faded near the exit
 var _exit_pin_meshes: Array[MeshInstance3D] = []
 var _exit_lift := 0.0        # px the exit's strip is raised now (≤ 0, screen up)
-var _exit_lift_from := 0.0   # … where it was when the player left, easing back from there
-var _exit_lift_t := -1.0     # s into easing back (< 0: not easing)
+var _exit_clear := StripClear.new()
 var _door_armed := false
 var _inside := false          # the farmhouse is open above this farm
 
@@ -1271,25 +1271,9 @@ func _exit_fade(dt: float) -> void:
 ## The exit's strip clear of the player's head while, at its mark, it would cover their head or upper body on screen
 ## (at once); eased back once it would not.
 func _exit_strip_lift(dt: float) -> void:
-	var want := 0.0
 	var strip := rt.ui.name_bar_rect("exit") if rt != null and _exit.is_finite() else Rect2()
-	if strip.has_area():
-		var centre := cam.unproject_position(_exit + EXIT_MARK).y
-		strip.position.y = centre - strip.size.y * 0.5   # where it is at its mark
-		var body := actor.screen_box(cam)
-		var upper := Rect2(body.position, Vector2(body.size.x, body.size.y * 0.5))   # the head and the upper body
-		if strip.intersects(upper): want = minf(0.0, body.position.y - EXIT_STRIP_HEAD_PX - UiWorldNameBar._H * 0.5 - centre)
-	if want <= _exit_lift:
-		_exit_lift = want
-		_exit_lift_t = -1.0
-		return
-	if _exit_lift_t < 0.0:
-		_exit_lift_from = _exit_lift
-		_exit_lift_t = 0.0
-	_exit_lift_t += dt
-	var k := clampf(_exit_lift_t / EXIT_STRIP_BACK_S, 0.0, 1.0)
-	_exit_lift = lerpf(_exit_lift_from, want, ease(k, -2.0))
-	if k >= 1.0: _exit_lift_t = -1.0
+	_exit_lift = _exit_clear.step(dt, strip, cam.unproject_position(_exit + EXIT_MARK).y if _exit.is_finite() else 0.0,
+		func(): return actor.screen_box(cam))
 
 ## The walk out stopped where the player is (the joystick, a tap elsewhere, a panel).
 func stop_exit_walk() -> void:
