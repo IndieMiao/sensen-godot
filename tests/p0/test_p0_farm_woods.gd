@@ -1,0 +1,84 @@
+extends GdUnitTestSuite
+## The farm's woods (SGODOT-422 0.3.5; the user 11-09): the same every time, no trunk in the yard, no crown
+## over the yard on screen, the clumps off the beds that are open and their neighbours.
+
+const FarmWoods = preload("res://scenes/p0/p0_farm_woods.gd")
+
+func _woods() -> FarmWoods:
+	var w: FarmWoods = auto_free(FarmWoods.new())
+	w.build(P0Garden.blueprint())
+	return w
+
+func _trees(w: FarmWoods) -> Array:   # [asset, Transform3D] of every tree
+	return w.trees_placed
+
+func test_the_same_woods_every_build() -> void:
+	var a := _trees(_woods())
+	var b := _trees(_woods())
+	assert_int(a.size()).is_greater(100)
+	assert_str(str(a).sha256_text()).is_equal(str(b).sha256_text())
+
+func test_no_trunk_in_the_yard_and_no_crown_over_it() -> void:
+	for e in _trees(_woods()):
+		var t: Transform3D = e[1]
+		var p := Vector2(t.origin.x, t.origin.z)
+		assert_bool(FarmWoods.OUT.has_point(p)).is_false()
+		for kind in FarmWoods.HEIGHT:
+			if str(e[0]).begins_with(str(kind)):
+				var s := t.basis.get_scale().x
+				assert_bool(FarmWoods.hides(p, float(FarmWoods.HEIGHT[kind]) * s, float(FarmWoods.RADIUS[kind]) * s)).is_false()
+
+## Nothing in the woods collides: the walk mask and the path grid are the farm's as built without them.
+func test_the_walk_mask_is_untouched() -> void:
+	var bp := P0Garden.blueprint()
+	var before := str(bp.masks.walkable).hash()
+	var w: FarmWoods = auto_free(FarmWoods.new())
+	w.build(bp)
+	assert_int(str(bp.masks.walkable).hash()).is_equal(before)
+
+func test_clumps_leave_the_open_beds_and_their_neighbours() -> void:
+	var bp := P0Garden.blueprint()
+	var w := _woods()
+	w.fit(bp, 8)
+	var at8 := w.shown_bed_clumps()
+	assert_int(at8).is_greater(0)
+	w.fit(bp, 40)
+	assert_int(w.shown_bed_clumps()).is_less(at8)
+	w.fit(bp, P0Garden.max_plots())
+	assert_int(w.shown_bed_clumps()).is_equal(0)
+
+## 上官婉儿 11-10 b: on the beds still to open only flat little flowers and grass — no stone, nothing over LOW.
+func test_bed_clumps_are_low_and_stoneless() -> void:
+	var w := _woods()
+	for key in w.counts:
+		if str(key).begins_with("bed:"): assert_bool(str(key).contains("rock")).is_false()
+	for e in w._beds:   # [bed, MultiMesh, index, Transform3D] (the batches hold them on the GPU only)
+		var h: float = (e[1] as MultiMesh).mesh.get_aabb().size.y
+		assert_float((e[3] as Transform3D).basis.get_scale().y * h).is_less_equal(FarmWoods.LOW + 0.005)
+	assert_int(w._beds.size()).is_greater(50)
+
+## 奕星 11-09: a cell a Decorate piece stands on shows no blade or flower.
+func test_no_clump_under_a_decor_piece() -> void:
+	var bp := P0Garden.blueprint()
+	var w := _woods()
+	w.fit(bp, 8)
+	var shown := w.shown_bed_clumps()
+	var taken: Array = []
+	for e in w._beds:
+		if w._shown.get(w._beds.find(e), false): taken.append(bp.world_to_cell((e[3] as Transform3D).origin))
+		if taken.size() >= 5: break
+	w.fit(bp, 8, taken)
+	assert_int(w.shown_bed_clumps()).is_less(shown)
+	for k in w._beds.size():
+		if w._shown.get(k, false): assert_bool(taken.has(bp.world_to_cell((w._beds[k][3] as Transform3D).origin))).is_false()
+
+## 上官婉儿 11-10: no light round crown on the farm; the Lv1 opening's tall pines on the left stand.
+func test_no_light_crown_behind_and_the_left_pines() -> void:
+	var w := _woods()
+	var left := 0
+	for e in w.trees_placed:
+		var o: Vector3 = (e[1] as Transform3D).origin
+		assert_str(str(e[0])).is_not_equal("wild_pz_tree_20_lt")
+		for lp in FarmWoods.LEFT_PINES:
+			if Vector2(o.x, o.z).distance_to(Vector2(lp[1], lp[2])) < 0.01: left += 1
+	assert_int(left).is_equal(FarmWoods.LEFT_PINES.size())

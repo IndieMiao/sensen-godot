@@ -62,17 +62,7 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	for i in 3:
 		stones.append(_xf(Vector3(spawn.x + sin(i * 1.7) * 0.06, 0.011, spawn.z - 0.15 - i * 0.27), 0.2 * i, 0.95))
 	add_child(Art.batch("stepping_stone", stones, false))
-	# Tree line behind the house and on the yard edges (outside the walkable yard).
-	var tree_points := [Vector3(1.2, 0, -12.9), Vector3(3.5, 0, -13.6), Vector3(9.2, 0, -13.5), Vector3(11.6, 0, -12.8),
-		Vector3(13.8, 0, -11.2), Vector3(-0.4, 0, -10.6), Vector3(-0.6, 0, -6.4), Vector3(13.9, 0, -6.9),
-		Vector3(-0.5, 0, -2.6), Vector3(14.1, 0, -2.4), Vector3(6.6, 0, -14.6)]
-	var trees: Array = []
-	var tints := PackedColorArray()
-	for i in tree_points.size():
-		var p: Vector3 = tree_points[i]
-		trees.append(_xf(p, i * 1.7, 0.92 + float(i % 3) * 0.08))
-		tints.append(Color.WHITE.lerp(Color(0.58, 0.75, 0.80), smoothstep(10.0, 14.0, -p.z)))
-	add_child(Art.batch("tree_0", trees, true, tints))
+	# The trees round the yard: p0_farm_woods.gd (the pine woods, SGODOT-422 0.3.5), no tree line here.
 	# The fence depends on the Homestead level: p0_fence.gd (SGODOT-228).
 	# the entrance sign left of the way in, by the spawn: (7, −1) since the yard's front moved (q(172) A); Decorate's objects hold it
 	add_child(Art.instance("sign", Vector3(spawn.x - 1.35, 0, spawn.z + 0.25), 0.93))
@@ -155,7 +145,10 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		elif i % 5 == 0: asset = "daisy"
 		elif i % 9 == 0: asset = "pink_flower"
 		elif i % 13 == 0: asset = "blue_flower"
-		layers[asset].append(_xf(point, rng.randf_range(0, TAU), rng.randf_range(0.55, 1.05)))
+		var xf := _xf(point, rng.randf_range(0, TAU), rng.randf_range(0.55, 1.05))
+		# the grass and flowers outside the fence ring are under the woods (p0_farm_woods.gd); the rocks stay: they block
+		if asset != "rock" and not Rect2(0.38, -12.35, 12.57, 13.75).has_point(flat): continue
+		layers[asset].append(xf)
 	for xf in layers.rock: rock_points.append((xf as Transform3D).origin)
 	for asset in layers: _add_split(bp, asset, layers[asset], asset == "rock")
 	var flowers: Array = []
