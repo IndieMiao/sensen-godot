@@ -347,6 +347,32 @@ func test_p0_the_gear_rod_line_reads_as_one_sentence() -> void:
 
 ## #649 第二批 ⑤ (zh-01 「小萝卜种子」 past the slot): a quick slot's name under 中文 is broken by the character over the
 ## slot's 52, two lines at most; past two a last 「种子」 goes. English as before.
+## SGODOT-468: UiKit.line_height is a line as a Label draws it — under 中文's fonts the tallest of Nunito and Noto SC
+## (a Chinese glyph or a ♥ in it), in English Font.get_height(), GameUi's font (its Chinese fallback kept) too.
+func test_p0_line_height_counts_the_chinese_fallback() -> void:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	add_child(host)
+	for cjk in [false, true]:
+		Localization.set_cjk_fonts(cjk)
+		for style in [UiTokens.STYLE_C10_XB, UiTokens.STYLE_C13_B]:
+			var tallest := 0.0
+			for text in ["−2", "♥ +2", "1 人在线", "12 online"]:
+				var l := UiKit.label(text, style)
+				host.add_child(l)
+				tallest = maxf(tallest, l.get_combined_minimum_size().y)
+				l.free()
+			var f := host.get_theme_font(&"font", style)
+			var size := host.get_theme_font_size(&"font_size", style)
+			assert_float(UiKit.line_height(f, size)).is_equal(tallest)
+			if not cjk: assert_float(UiKit.line_height(f, size)).is_equal(f.get_height(size))
+	Localization.set_cjk_fonts(false)
+	host.free()
+	var game: Font = GameUi.theme().default_font
+	assert_float(UiKit.line_height(game, 9)).is_equal(game.get_string_size("1 人在线", HORIZONTAL_ALIGNMENT_LEFT, -1, 9).y)
+	TranslationServer.set_locale("en")
+	assert_float(UiKit.line_height(game, 9)).is_equal(game.get_string_size("1 online", HORIZONTAL_ALIGNMENT_LEFT, -1, 9).y)
+
 func test_p0_a_quick_slots_chinese_name_breaks_by_the_character() -> void:
 	var t: Translation = LocalizationScript.P0Translation.new()
 	t.locale = "zh_CN"

@@ -44,6 +44,19 @@ static func label(text: String, style: StringName, color := UiTokens.COLOR_TEXT)
 	if color != UiTokens.COLOR_TEXT: l.add_theme_color_override(&"font_color", color)
 	return l
 
+## A line's height in `font` at `size` as a Label draws it. Under 中文 the lines have Chinese in them, drawn by the
+## fallback (Noto Sans SC behind Nunito, Localization.set_cjk_fonts), and stand a pixel or so over Font.get_height(),
+## which knows the font alone (SGODOT-468): the tallest ascent and descent of the font and its fallbacks. English:
+## get_height() — GameUi's font keeps its Chinese fallback in English too, never drawn there.
+static func line_height(f: Font, size: int) -> float:
+	if not TranslationServer.get_locale().begins_with("zh"): return f.get_height(size)
+	var up := f.get_ascent(size)
+	var down := f.get_descent(size)
+	for fallback in f.fallbacks:
+		up = maxf(up, fallback.get_ascent(size))
+		down = maxf(down, fallback.get_descent(size))
+	return up + down
+
 ## Interactive controls keep a 44 px hit area even when the drawn box is smaller (UiStyleBox.inset).
 static func ensure_hit_area(c: Control, min_side: float = UiTokens.SIZE_TOUCH) -> void:
 	c.custom_minimum_size = Vector2(maxf(c.custom_minimum_size.x, min_side), maxf(c.custom_minimum_size.y, min_side))
