@@ -369,10 +369,15 @@ func p0_event(ev: Dictionary, _v: Dictionary) -> bool:
 	match str(ev.get("kind", "")):
 		"cast":
 			if panel.visible: panel.on_cast(ev)
+			# no panel to watch it (closed before the reply came): reel it straight in, or the server keeps the line and
+			# the key greys at `Fishing…` until stale_ms (SGODOT-463, Pixel at Fern Pond)
+			else: rt.session.send({"type": "reel", "outcome": "cancel"})
 		"cast_refused":
 			if panel.visible: panel.on_refused()
 		"catch":
-			if panel.visible:
+			# while casting, a catch is the stale line the new cast settled (SGODOT-463): the runtime says it; the panel keeps
+			# the new line, as closing it on the old one's delay would cancel the new
+			if panel.visible and panel.phase != "casting":
 				_settle(ev, panel.on_catch(ev), rt.last_first_catch_xp)
 				return true
 		"fish_abort":

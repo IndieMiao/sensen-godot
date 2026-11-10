@@ -165,7 +165,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       hook_bonus_ms: (rodById(c, s.gear.rod) ?? f.rods[0]).hook_bonus_ms, band_bonus: (rodById(c, s.gear.rod) ?? f.rods[0]).band_bonus,
       loss_mult: (rodById(c, s.gear.rod) ?? f.rods[0]).loss_mult ?? 1,   // Carbon Rod 0.9: the minigame's out-of-band loss
       cast_energy: f.cast_energy,
-      cast: s.cast ? { rarity: fishById(c, s.cast.fish)!.rarity, site: s.cast.site, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
+      // SGODOT-463: a line left in past stale_ms is not shown — the client greys its key while a cast is open and the
+      // server settles a stale one only on the next cast, so a line whose reel never came (the app killed, a reply lost)
+      // held the key at `Fishing…` for good, across reinstalls; shown as none, the key casts and castLine settles it.
+      cast: s.cast && now - s.cast.at < f.stale_ms ? { rarity: fishById(c, s.cast.fish)!.rarity, site: s.cast.site, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
         hook_ms: f.hook_window_ms + (rodById(c, s.gear.rod)?.hook_bonus_ms ?? 0), breaks: s.cast.breaks, bait: s.cast.bait,
         sure: sureBite(s) && !s.cast.breaks, ...(s.cast.twin ? { twin: true } : {}) } : null,   // twin: cast under the priest's fish buff, lands two   // q(219): one of the first two bites — the hook window stays open, the reel can't fail
       protection_left: fishingLevel <= f.protect_max_level ? Math.max(0, f.protect_fails - s.day.fails) : null,
