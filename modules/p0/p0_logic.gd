@@ -2640,6 +2640,27 @@ static func yard_change(view: Dictionary) -> Dictionary:
 	if gained <= 0: return {}
 	return {"icon": "wood", "text": YARD_LINE % [int(d.next_cap), gained], "note": "now %d" % int(d.get("cap", 0))}
 
+## The Home Badge (q(287), the user 11-04 「C63 A」; v4.1 2.5a; q(306) ⑦: `Home`): four tiers, one ring each, the same
+## tier only changing its number — wood Lv2–4, bronze Lv5–9, silver Lv10–14, gold Lv15–17. "" at Lv1 (no badge yet).
+const BADGE_TIERS := [[15, "gold"], [10, "silver"], [5, "bronze"], [2, "wood"]]
+static func badge_tier(level: int) -> String:
+	for t in BADGE_TIERS: if level >= int(t[0]): return str(t[1])
+	return ""
+
+## The badge's card (replaces PLAQUE-READ; 安其拉 D1 / D2, 不知火舞 401 d00b439b): the badge, `Home LvN`, at the top level
+## `Highest level for now`, then what this level brings, as HOME-1's What changes rows — the day's Max Energy and Meals
+## (one number: 200 + the level's Energy steps, v4q(1) ⑦; never the Newcomer Blessing's extra meals) and the plots. No
+## next level, no button, no dates. {level, tier, title, subtitle, rows: [{icon, text}]}
+static func badge_card(view: Dictionary) -> Dictionary:
+	var h: Dictionary = view.get("homestead", {})
+	var level := int(h.get("level", 1))
+	var max_e := int(view.get("energy", {}).get("max", 0))
+	var meals := int(content().get("cooking", {}).get("food_cap", 200)) + max_e - int(content().get("energy", {}).get("max_base", 200))
+	var rows: Array = [{"icon": "energy", "text": "Max Energy %d · Meals %d a day" % [max_e, meals]}]
+	if h.get("plots") is Dictionary: rows.append({"icon": "field", "text": "Plots %d" % int(h.plots.get("now", 0))})
+	return {"level": level, "tier": badge_tier(level), "title": "Home Lv%d" % level,
+		"subtitle": MAX_LEVEL_LINE if level >= homestead_max(view) else "", "rows": rows}
+
 ## HOME-2 MomentBanner (Figma 482:154 / 1228:108620) from the server's homestead event: level disc, title,
 ## what changed (the event's actual Energy gain at any level) and one line of consequences.
 static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:

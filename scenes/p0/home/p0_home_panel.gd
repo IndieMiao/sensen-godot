@@ -247,8 +247,34 @@ static func _source(ui: P0Ui, tile: Control, id: String) -> void:
 
 ## PLAQUE-READ (Figma 1510:97745): read-only, only ×. ObjectHeader "Upgrade Plaque" / "Homestead LvN", one fact per
 ## upgrade with its date. TODO(224): swap for the InfoSheet once it lands; the content stays the same.
+## The Home Badge's card (q(287) ②; 安其拉 D1 / D2, 不知火舞 401 d00b439b), in PLAQUE-READ's place and sheet (full width at
+## the bottom, only the ✕ floating outside, no scroll): the badge at 72 centred, `Home LvN`, `Highest level for now` at
+## the top level, then what this level brings as What changes rows (P0Logic.badge_card). No button, no dates.
+## The badge in 2D is the one in the yard: its tier's face inside its ring (homestead_badge.glb's colours; the frames'
+## silver was a stand-in), the number as HOME-2's level disc, one and a half times.
+const BADGE_DISC := 72.0
+const BADGE_RING := 7.0   # the model's ring: (0.80 − 0.65) / 2 of its 0.80 m, at 72
+const BADGE_NUMBER := 33   # HOME-2's disc number (22) × 1.5
+const BADGE_COLORS := {"wood": ["AA713D", "F6E6CB"], "bronze": ["D68A47", "F9E8CC"], "silver": ["ABB3BC", "F9F8F3"],
+	"gold": ["D9AC36", "F0D45A"]}   # [ring, face], sRGB, 赵云's README
+
+static func badge_disc(tier: String, level: int) -> Control:
+	var colors: Array = BADGE_COLORS.get(tier, BADGE_COLORS.wood)
+	var disc := PanelContainer.new()
+	disc.name = "BadgeDisc"
+	disc.custom_minimum_size = Vector2(BADGE_DISC, BADGE_DISC)
+	disc.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	disc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	disc.add_theme_stylebox_override(&"panel", UiStyleBox.make(Color(str(colors[1])), BADGE_DISC * 0.5, Color(str(colors[0])), BADGE_RING))
+	var number := UiKit.label(str(level), UiTokens.STYLE_TITLE_XB20)
+	number.add_theme_font_size_override(&"font_size", BADGE_NUMBER)
+	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	disc.add_child(number)
+	return disc
+
 static func plaque(ui: P0Ui) -> void:
-	var view: Dictionary = ui.view
+	var card := P0Logic.badge_card(ui.view)
 	var holder := Control.new()
 	holder.theme = UiKit.theme()
 	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -262,8 +288,13 @@ static func plaque(ui: P0Ui) -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 8)
 	panel.add_child(col)
-	col.add_child(UiObjectHeader.new({"title": "Upgrade Plaque", "state": "Home Lv%d" % int(view.get("homestead", {}).get("level", 1))}))
-	for line in P0Logic.plaque_lines(view): col.add_child(UiFactRow.new(str(line.label), str(line.value)))
+	col.add_child(badge_disc(str(card.tier), int(card.level)))
+	var head := VBoxContainer.new()
+	head.add_theme_constant_override(&"separation", 2)
+	head.add_child(UiKit.label(str(card.title), UiTokens.STYLE_TITLE_XB20))
+	if str(card.subtitle) != "": head.add_child(UiKit.label(str(card.subtitle), UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))
+	col.add_child(head)
+	for r in card.rows: col.add_child(_change_row({"icon": r.icon, "text": r.text, "note": ""}))
 	holder.add_child(panel)
 	var close := UiCloseButton.new()   # floats 6 above the sheet's top-right corner
 	close.pressed.connect(ui.close_modal)

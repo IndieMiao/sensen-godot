@@ -51,9 +51,10 @@ static func sign(view: Dictionary) -> Dictionary:
 	var lit: bool = nxt is Dictionary and bool(nxt.get("can_upgrade", false)) and (not P0Guide.guide_on(view) or marked)
 	return _p("level_up", "Home Lv%d" % int(h.get("level", 1)), "", UiStatusBadge.State.READY if lit else -1)
 
-## Upgrade Plaque: no mark; only the strip when it is the nearest (PLAQUE-READ).
+## The Home Badge (q(287) ③, q(306) ⑦; it was the Upgrade Plaque): no mark, no button — only its strip when it is the
+## nearest; a tap opens its card.
 static func plaque(_view: Dictionary) -> Dictionary:
-	return _p("board", "Upgrade Plaque", "", -1, false, false)
+	return _p("board", "Home Badge", "", -1, false, false)
 
 ## The Chef's Sign (Homestead Lv10; 不知火舞 on 282): its name strip `Chef's Sign`, no fact.
 static func chef_sign(_view: Dictionary) -> Dictionary:
