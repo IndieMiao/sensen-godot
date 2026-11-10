@@ -1110,6 +1110,12 @@ func name_bar_rect(id: String) -> Rect2:
 	var bar: UiWorldNameBar = _name_bars.get(id)
 	return bar.full_rect() if bar != null and bar.visible else Rect2()
 
+## A shown status badge's rect (this UI's coordinates), empty when hidden: a badge takes no tap of its own (display
+## only), so a scene that wants one tapped hit-tests it (the pond's guide `!` on a gathering point, SGODOT-475 ②).
+func badge_rect(id: String) -> Rect2:
+	var b: UiStatusBadge = _badges.get(id)
+	return Rect2(b.position, b.size) if b != null and b.visible else Rect2()
+
 func _fold_name_bar(bar: UiWorldNameBar) -> void:
 	if bar.get_meta("folding", false): return
 	bar.set_meta("folding", true)

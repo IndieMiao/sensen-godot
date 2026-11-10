@@ -75,6 +75,7 @@ const DISTANCE := 40.0
 const OPENING_LIFT := 0.0
 var _plan: Dictionary = {}
 var _tap_gather := ""   # SGODOT-475 ②: the point a tap is walking to, gathered once on arrival ("" none)
+var _gather_focus := ""   # … and once there, the point the key and marks are for while in its reach (not the nearest)
 var _gather_told := {}   # the cooling point last told (id, msec): a second tap within GATHER_TELL_MS says nothing
 # Fish Trap (SGODOT-283, q(109) ⑦): the player's trap here is a float on the water at a fixed spot; its prompt follows
 # the facility rules (icon button, the strip near it, Ready with fish), a tap walks to its bank spot and opens its
@@ -248,6 +249,7 @@ func p0_tap(screen: Vector2) -> void:
 ## once). The stick, a tap elsewhere or any panel stops it. Every member it reads may still be missing on the first
 ## frames (#947's iOS crash); the floor search runs once, on the tap.
 const GATHER_TAP_PX := 36.0
+const GATHER_MARK_SLOP_PX := 8.0   # the `!` badge's touch area past its drawn edge (28 drawn, 44 touched)
 const GATHER_TELL_MS := 2000
 const GATHER_NEAR_CELLS := 8
 
@@ -274,11 +276,14 @@ func _gather_tap(screen: Vector2) -> bool:
 	elif not actor.mover.set_target_position(PondGather.stand_of(p)): _gather_walk_near(PondGather.stand_of(p))
 	return true
 
-## The point a tap names: its mark (tapped_card `gather:<id>`, 亚瑟's ①), else the piece nearest the tap within
-## GATHER_TAP_PX of its middle (half its mark's height: a grove 1.1 m, the rest 0.5 m), {} for none.
+## The point a tap names: its mark (tapped_card `gather:<id>`, 亚瑟's ①), the guide's `!` over it (a badge takes no tap
+## of its own; S6a's newcomer taps it first, 奕星 v4q(13) ⑤), else the piece nearest the tap within GATHER_TAP_PX of its
+## middle (half its mark's height: a grove 1.1 m, the rest 0.5 m), {} for none.
 func _gather_hit(screen: Vector2) -> Dictionary:
 	var card := str(rt.ui.tapped_card)
 	if card.begins_with("gather:"): return gather.point(card.trim_prefix("gather:"))
+	if _gather_marked != "" and rt.ui.badge_rect("gather_mark:" + _gather_marked).grow(GATHER_MARK_SLOP_PX).has_point(screen):
+		return gather.point(_gather_marked)
 	var best := {}
 	var best_d := GATHER_TAP_PX
 	for p in gather.points:
@@ -314,11 +319,19 @@ func _tap_gather_check(v: Dictionary) -> void:
 	_tap_gather = ""
 	actor.face(Vector3(float(p.get("x", 0)), actor.position.y, float(p.get("z", 0))))
 	if not PondGather.in_reach(p, actor.position): return   # walked as near as it could: no gather, the key as it is
+	_gather_focus = str(p.get("id", ""))   # the key and marks follow it, not a nearer point beside it (奕星 v4q(13) 16)
 	var key := PondGather.key(v, p, gather.pond)
-	if str(key.get("cmd", {}).get("type", "")) == "gather":
-		rt.ui.set_action(key)
-		rt.ui._fab_pressed()   # as the key: the same command, clip and float
+	var cmd: Dictionary = key.get("cmd", {})
+	if str(cmd.get("type", "")) == "gather":
+		if P0Logic.GearLogic.command_allowed(cmd): p0_action(cmd)   # the key's own command for this point: clip, float
 	elif key.has("toast"): rt.ui.toast(str(key.toast))   # the bag full: once (short of Energy: the key's amber only)
+
+## The point the key and marks are for: the tapped one while the player is in its reach, else the nearest.
+func _gather_current() -> Dictionary:
+	var p: Dictionary = gather.point(_gather_focus) if _gather_focus != "" else {}
+	if not p.is_empty() and PondGather.in_reach(p, actor.position): return p
+	_gather_focus = ""
+	return PondGather.nearest(gather.points, actor.position)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
 	_trap_hidden_s = maxf(0.0, _trap_hidden_s - dt)
@@ -338,7 +351,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	gather.sync(v)
 	var clear := PondGather.clear_points(v)
 	if not clear.is_empty() and clear != _scenery_clear: _build_scenery(clear)   # the points came with the reply after the scene was built
-	var near: Dictionary = PondGather.nearest(gather.points, actor.position)
+	var near := _gather_current()
 	var reach := _plan.is_empty() and PondGather.in_reach(near, actor.position)
 	rt.ui.set_action(PondGather.key(v, near, gather.pond) if reach else _action_state(v))   # 410: Gather at a point, else Cast
 	if _tap_gather != "": _tap_gather_check(v)
@@ -367,6 +380,7 @@ func p0_action(cmd: Dictionary) -> void:
 		"set_trap", "collect_trap": rt.session.send(cmd, P0Session.ui_key(cmd))
 
 func _go_cast(point: Vector3) -> void:
+	_tap_gather = ""   # the key's cast takes over a tapped gather, walked to the bank or cast where the player stands
 	var plan := FishingModel.plan(str(entry.id), actor.position, point, grid, site_spec)
 	if plan.is_empty():
 		rt.ui.toast("Can't reach the water from here")
@@ -375,7 +389,6 @@ func _go_cast(point: Vector3) -> void:
 		_open_panel(plan)
 	elif actor.mover.set_target_position(plan.origin):
 		_plan = plan
-		_tap_gather = ""   # the key's walk to the bank takes over a tapped gather
 	else:
 		rt.ui.toast("Can't reach that spot")
 
@@ -990,6 +1003,9 @@ func _near_trap() -> bool:
 ## A tap on the trap's button / strip, or on its open card. True when it was the trap's.
 func _trap_tap(screen: Vector2) -> bool:
 	if str(rt.ui.tapped_card) == TRAP_ID:
+		if _tap_gather != "":   # SGODOT-475 ② 5: the trap takes over a tapped gather (奕星 v4q(13) 14)
+			_tap_gather = ""
+			actor.mover.stop()
 		if _near_trap(): _trap_open = true
 		else: _walk_to_trap()
 		return true

@@ -21,6 +21,7 @@ func before_test() -> void:
 	await get_tree().process_frame
 	rt.session.busy = false
 	rt.ui.action_pressed.connect(func(cmd): pressed.append(cmd))
+	rt.session.sent.connect(func(cmd): pressed.append(cmd))   # arrived, the point's own command goes straight out
 
 func after_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
@@ -146,3 +147,64 @@ func test_a_tap_on_a_point_takes_over_the_walk_to_cast() -> void:
 	pond.p0_tap(_piece(pond))
 	assert_dict(pond._plan).is_empty()
 	assert_str(pond._tap_gather).is_equal("pt#1")
+
+## 奕星 v4q(13) 14: a tap on the trap on the way drops the tapped gather — there, it does not turn to the piece or gather.
+func test_a_tap_on_the_trap_drops_a_tapped_gather() -> void:
+	var pond := _pond()
+	pond.p0_tap(_piece(pond))
+	assert_str(pond._tap_gather).is_equal("pt#1")
+	rt.ui.tapped_card = P0Pond.TRAP_ID
+	pond.p0_tap(Vector2(10, 10))
+	assert_str(pond._tap_gather).is_equal("")
+	_arrive(pond)
+	assert_array(pressed).is_empty()
+
+## 奕星 v4q(13) 15: the key's cast drops a tapped gather however it goes — also when the player already stands on the
+## cast origin and the panel opens at once.
+func test_the_keys_cast_drops_a_tapped_gather_even_where_it_stands() -> void:
+	var pond := _pond()
+	pond.p0_tap(_piece(pond))
+	var plan := FishingModel.plan(str(pond.entry.id), pond.actor.position, Vector3.INF, pond.grid, pond.site_spec)
+	pond.actor.mover.stop()
+	pond.actor.teleport(plan.origin)
+	pond._go_cast(Vector3.INF)
+	assert_str(pond._tap_gather).is_equal("")
+
+## 奕星 v4q(13) 16: arrived, the tapped point is the one gathered — its own command — and the key and marks stay on it
+## while the player is in its reach, though another point's stand is as near; out of its reach the nearest again.
+func test_arrived_the_tapped_point_is_gathered_and_stays_the_keys() -> void:
+	var pond := _pond()
+	var other: Dictionary = (pond.gather.points[0] as Dictionary).duplicate()
+	other.id = "pt#2"
+	other.x = float(other.x) - 1.6   # another piece, its stand where pt#1's is and listed first: the nearest by stand
+	pond.gather.points = [other, pond.gather.points[0]]
+	assert_str(str(PondGather.nearest(pond.gather.points, PondGather.stand_of(other)).id)).is_equal("pt#2")
+	rt.ui.tapped_card = "gather:pt#1"
+	pond.p0_tap(Vector2(10, 10))
+	rt.ui.tapped_card = ""
+	pond.actor.mover.stop()
+	pond.actor.teleport(PondGather.stand_of(other))
+	pond._tap_gather_check(rt.session.view)
+	assert_array(pressed).is_equal([{"type": "gather", "spot": "pt#1", "space": "pond", "place": str(pond.entry.id)}])
+	assert_str(str(pond._gather_current().id)).is_equal("pt#1")
+	pond.actor.teleport(PondGather.stand_of(other) + Vector3(-4, 0, 0))
+	assert_str(str(pond._gather_current().get("id", ""))).is_not_equal("pt#1")
+
+## 奕星 v4q(13) ⑤: the guide's `!` takes no tap of its own; a tap on it is a tap on the point it hangs over (S6a).
+func test_a_tap_on_the_guides_mark_is_a_tap_on_its_point() -> void:
+	var pond := _pond()
+	var v := rt.session.view.merged({"guide": {"target": {"kind": "gather", "spot": "pt#1"}}})
+	pond._gather_marks(v, {})
+	var mark := rt.ui.badge_rect("gather_mark:pt#1")
+	assert_bool(mark.has_area()).is_true()
+	assert_float(mark.get_center().distance_to(_piece(pond))).is_greater(P0Pond.GATHER_TAP_PX)   # not the piece's 36 px
+	pond.p0_tap(mark.get_center())
+	assert_str(pond._tap_gather).is_equal("pt#1")
+
+## 奕星 v4q(13) ⑥: a tap on a cooling point stops a walk on the way somewhere else.
+func test_a_tap_on_a_cooling_point_stops_the_walk() -> void:
+	var pond := _pond(50, 5, 3600 * 1000.0)
+	pond.p0_tap(pond.cam.unproject_position(pond.actor.position + Vector3(-1.0, 0, 0.5)))   # the ground: walking
+	assert_bool(pond.actor.mover.is_moving()).is_true()
+	pond.p0_tap(_piece(pond))
+	assert_bool(pond.actor.mover.is_moving()).is_false()
