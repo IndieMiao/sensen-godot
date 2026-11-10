@@ -4,7 +4,7 @@
  */
 
 /** Outpost roles, the same ids as the counter entries (open_keeper_greeting(role), SGODOT-224). */
-export type OutpostRole = 'tackle' | 'tea' | 'post' | 'market' | 'mine_hut' | 'casino' | 'church' | 'pond';   // casino: San Francisco's card room only (SGODOT-351); church: Grace Cathedral, a place to see (11-06); pond: a pond's room, `pond:<id>` (outposts.ts pondRoomSpec)
+export type OutpostRole = 'tackle' | 'tea' | 'post' | 'market' | 'mine_hut' | 'casino' | 'church' | 'pond' | 'landmark';   // casino: San Francisco's card room only (SGODOT-351); church: Grace Cathedral, a place to see (11-06); pond: a pond's room, `pond:<id>` (outposts.ts pondRoomSpec); landmark: `landmark:<id>` (landmarkRoomSpec, SGODOT-462)
 export interface OutpostSpec {
   id: string;
   role: OutpostRole;

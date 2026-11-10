@@ -17,7 +17,7 @@ import { catalogue, parseBbox, viewport } from './wild.js';
 import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus, pinArea } from './home_city.js';
 import type { IpNear } from './ip_city.js';
 import type { OutpostRooms } from './online/rooms.js';
-import { pondOfRoom } from './online/outposts.js';
+import { landmarkOfRoom, pondOfRoom } from './online/outposts.js';
 import { placeOf } from './world.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 import { guideKeys, settleGuide, setGuide } from './guide.js';
@@ -56,7 +56,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (!deps.rooms) return null;
     const here = st.travel.here;
     let n = 0;
-    for (const [id, p] of Object.entries(deps.rooms.presence())) if (!pondOfRoom(id) && clusterOf(c, id) === here) n += p.online;   // its outposts' rooms, not its ponds'
+    for (const [id, p] of Object.entries(deps.rooms.presence())) if (!pondOfRoom(id) && !landmarkOfRoom(id) && clusterOf(c, id) === here) n += p.online;   // its outposts' rooms, not its ponds' nor landmarks'
     const entered = st.presence.entered;
     // an outpost of this town, not a pond (presence.entered keeps either; 周瑜 on #448)
     if (!deps.rooms.occupant(st.player) && entered && !placeOf(c, entered) && clusterOf(c, entered) === here) n += 1;
