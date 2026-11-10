@@ -183,3 +183,42 @@ func test_a_tap_on_the_bed_beside_it_is_not_the_exits() -> void:
 	assert_bool(farm._exit_tapped(exit_px)).is_true()
 	assert_bool(farm._exit_tapped(bed_px)).is_false()
 	assert_bool(farm._exit_tapped(exit_px + Vector2(P0Farm.EXIT_TAP_PX + 1.0, 0))).is_false()   # past its 40 px
+
+## 不知火舞 on #943: the player within EXIT_FADE_M, the pin fades to EXIT_FADE_ALPHA (seen behind it); away, back and
+## opaque again; the ring never fades.
+func test_near_the_exit_its_pin_fades() -> void:
+	if not ResourceLoader.exists(P0Farm.EXIT_PIECE): return
+	var farm := _farm()
+	farm._exit_piece()
+	var piece: Node3D = farm.get_node("ExitPin")
+	var pin := piece.find_child(P0Farm.EXIT_PIN_NODE, true, false) as MeshInstance3D
+	var ring := piece.find_child(P0Farm.EXIT_RING_NODE, true, false) as MeshInstance3D
+	var pin_mat := pin.material_override as StandardMaterial3D
+	assert_object(ring.material_override).is_not_same(pin_mat)
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -0.8))   # behind the pin, outside the trigger
+	farm._exit_fade(1.0)
+	assert_float(pin_mat.albedo_color.a).is_equal_approx(P0Farm.EXIT_FADE_ALPHA, 0.001)
+	assert_int(pin_mat.transparency).is_equal(BaseMaterial3D.TRANSPARENCY_ALPHA)
+	assert_int(pin.cast_shadow).is_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)   # no shadow while faded (上官婉儿)
+	assert_int(ring.cast_shadow).is_not_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
+	assert_float((ring.material_override as StandardMaterial3D).albedo_color.a).is_equal(1.0)
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -2.0))
+	farm._exit_fade(1.0)
+	assert_float(pin_mat.albedo_color.a).is_equal(1.0)
+	assert_int(pin_mat.transparency).is_equal(BaseMaterial3D.TRANSPARENCY_DISABLED)
+	assert_int(pin.cast_shadow).is_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_ON)
+
+## 上官婉儿 443 190fa019: the Lv3 ring's front stretch opens either side of the exit (the ring in the opening, no rail
+## across it), the stone wall on the same run; the way in still open, the rest of the front closed.
+func test_the_fence_opens_at_the_exit() -> void:
+	var bp := P0Garden.blueprint()
+	var f := P0Garden.FENCE_RING
+	var front := P0Garden.fence_ring(bp).filter(func(seg): return absf(seg.pos.z - f.front) < 0.01)
+	var half := P0Garden.FENCE_SEG * 0.5
+	for seg in front:
+		var lo: float = seg.pos.x - half * seg.stretch
+		var hi: float = seg.pos.x + half * seg.stretch
+		assert_bool(hi <= P0Farm.EXIT_AT.x - P0Farm.EXIT_RING_R or lo >= P0Farm.EXIT_AT.x + P0Farm.EXIT_RING_R) \
+			.override_failure_message("rail %.2f–%.2f across the ring" % [lo, hi]).is_true()
+	assert_float(front.map(func(seg): return seg.pos.x).min() - half * front[0].stretch).is_greater_equal(P0Farm.EXIT_AT.x + P0Farm.EXIT_RING_R)   # west of the ring: no rail
+	assert_int(P0Garden.stone_wall(front).size()).is_equal(front.size() * P0Garden.STONE_PER_SEG)

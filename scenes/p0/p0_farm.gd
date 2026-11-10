@@ -123,13 +123,19 @@ var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
 ## front z 1.4), its trigger EXIT_RADIUS_M. EXIT_ICON: its prompt's icon, 安其拉's pin in its ring (d9e7a52a); EXIT_PIECE:
 ## 赵云's pin and ring, its origin the ring's middle — its `bob` loop played from the start, always (the user: "it
 ## floats"), else its pin bobbed the same way here.
-const EXIT_AT := Vector3(0.8, 0, 1.0)
+const EXIT_AT := P0Garden.MAP_EXIT   # (0.8, 0, 1.0): the Lv3 fence opens there (P0Garden.fence_ring)
 const EXIT_ICON := "exit_pin"
 const EXIT_PIECE := "res://assets/farm/art/farm_exit_pin.glb"
 const EXIT_ARM_M := 2.5
 const EXIT_RADIUS_M := 0.4
 const EXIT_RING_NODE := "ring"   # the piece's ring (0.6 m round as drawn), scaled on the ground to EXIT_RING_R; the pin as it is
 const EXIT_RING_R := 0.38
+## 不知火舞 / 上官婉儿 on #943: the player within EXIT_FADE_M of the exit (behind its pin, at the front row's west end), the
+## pin fades to EXIT_FADE_ALPHA over EXIT_FADE_S (as ACTOR_FADE_S), its shadow off while faded, the player seen through
+## it; its `Map` strip and the ring as they are.
+const EXIT_FADE_M := 1.0
+const EXIT_FADE_ALPHA := 0.3
+const EXIT_FADE_S := 0.2
 const EXIT_PIN_NODE := "pin"   # the piece's pin, bobbed when the piece has no `bob` loop
 const EXIT_BOB_M := 0.1   # either way of where it stands (0.2 m in all; 不知火舞)
 const EXIT_BOB_S := 1.6
@@ -139,6 +145,8 @@ const EXIT_TAP_PX := 40.0
 var _exit := Vector3.INF
 var _exit_armed := false
 var _exit_walk := false   # walking there after a tap on its prompt
+var _exit_pin_mat: StandardMaterial3D   # the pin's own copy of the farm art material, faded near the exit
+var _exit_pin_meshes: Array[MeshInstance3D] = []
 var _door_armed := false
 var _inside := false          # the farmhouse is open above this farm
 
@@ -813,6 +821,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_door_check()
 	_exit_check()
 	if not is_inside_tree(): return   # out to the map through the exit this frame: nothing left to draw
+	_exit_fade(dt)
 	_follow(dt)
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
@@ -1097,7 +1106,13 @@ func _exit_piece() -> void:
 	piece.position = _exit
 	# its red and yellow are vertex colours (赵云's #862): its glTF materials have no albedo of their own (上官婉儿 /
 	# 不知火舞 on 443: white in the game), so the farm art's vertex-colour material on the pin and the ring alike
-	for m in piece.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = FarmArt.material()
+	_exit_pin_mat = FarmArt.material().duplicate() as StandardMaterial3D   # the pin's own, to fade it (_exit_fade)
+	var pin := piece.find_child(EXIT_PIN_NODE, true, false) as Node3D
+	_exit_pin_meshes.clear()
+	for m: MeshInstance3D in piece.find_children("*", "MeshInstance3D", true, false):
+		var of_pin := pin != null and (m == pin or pin.is_ancestor_of(m))
+		m.material_override = _exit_pin_mat if of_pin else FarmArt.material()
+		if of_pin: _exit_pin_meshes.append(m)
 	var ring := piece.find_child(EXIT_RING_NODE, true, false) as MeshInstance3D
 	if ring and ring.mesh:
 		var k := EXIT_RING_R / maxf(0.01, ring.mesh.get_aabb().size.x * 0.5)
@@ -1109,7 +1124,6 @@ func _exit_piece() -> void:
 		ap.play("bob")
 		return
 	# no loop of its own: its pin bobs EXIT_BOB_M either way every EXIT_BOB_S, eased (the user 11-07: "it floats"); the ring stays
-	var pin := piece.find_child(EXIT_PIN_NODE, true, false) as Node3D
 	if pin == null: return
 	var y := pin.position.y
 	pin.position.y = y - EXIT_BOB_M
@@ -1126,6 +1140,16 @@ func _exit_tapped(screen: Vector2) -> bool:
 	for id in P0Garden.plot_count(rt.session.view if rt != null and rt.session != null else null):
 		if cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(id))).distance_to(screen) < d: return false
 	return true
+
+## The pin faded while the player is near the exit (EXIT_FADE_M), back when away; blended only while faded.
+func _exit_fade(dt: float) -> void:
+	if _exit_pin_mat == null or not _exit.is_finite(): return
+	var to := EXIT_FADE_ALPHA if P0FarmMaterials.flat(actor.position, _exit) < EXIT_FADE_M else 1.0
+	var a := move_toward(_exit_pin_mat.albedo_color.a, to, dt * (1.0 - EXIT_FADE_ALPHA) / EXIT_FADE_S)
+	_exit_pin_mat.albedo_color = Color(1, 1, 1, a)
+	_exit_pin_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if a < 1.0 else BaseMaterial3D.TRANSPARENCY_DISABLED
+	for m in _exit_pin_meshes:
+		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if a < 1.0 else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
 ## The walk out stopped where the player is (the joystick, a tap elsewhere, a panel).
 func stop_exit_walk() -> void:
