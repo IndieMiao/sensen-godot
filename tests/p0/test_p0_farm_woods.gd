@@ -3,6 +3,7 @@ extends GdUnitTestSuite
 ## over the yard on screen, the clumps off the beds that are open and their neighbours.
 
 const FarmWoods = preload("res://scenes/p0/p0_farm_woods.gd")
+const Fence = preload("res://scenes/p0/p0_fence.gd")
 
 func _woods() -> FarmWoods:
 	var w: FarmWoods = auto_free(FarmWoods.new())
@@ -137,3 +138,66 @@ func test_the_exit_corner_in_numbers() -> void:
 		var o: Vector3 = (e[1] as Transform3D).origin
 		assert_float(Vector2(o.x, o.z).distance_to(Vector2(0.8, 1.0))).override_failure_message("%s at %s" % [e[0], o]).is_greater_equal(1.2)
 	assert_vector(Vector2(P0Garden.MAP_EXIT.x, P0Garden.MAP_EXIT.z)).is_equal(Vector2(0.8, 1.0))
+
+## The yard growing (v4q(12) ⑤; the v2 plan's numbers): Lv13's back row moves three pieces, Lv14's east columns one log,
+## each away from the yard and clear of it, moved only (no smaller, none dropped); nothing for Lv1–12.
+func test_the_woods_give_way_to_lv13_and_lv14_as_planned() -> void:
+	var w := _woods()
+	var plan := {13: [["wild_pz_pine_01", Vector2(0.85, -13.61), Vector2(0.26, -14.42)], ["wild_pz_tree_20", Vector2(4.04, -13.54), Vector2(3.72, -14.48)],
+		["wild_pz_bush_05", Vector2(10.43, -13.45), Vector2(10.65, -13.90)]], 14: [["wild_pz_log_02", Vector2(14.32, 2.27), Vector2(14.66, 2.63)]]}
+	assert_array(w.yard_moves.keys()).contains_exactly([13, 14])
+	for lv in plan:
+		var got: Array = w.yard_moves[lv]
+		assert_int(got.size()).is_equal(plan[lv].size())
+		for k in got.size():
+			var m: Array = got[k]
+			var from := Vector2((m[3] as Transform3D).origin.x, (m[3] as Transform3D).origin.z)
+			var to := Vector2((m[4] as Transform3D).origin.x, (m[4] as Transform3D).origin.z)
+			assert_str(m[1]).is_equal(plan[lv][k][0])
+			assert_vector(from).is_equal_approx(plan[lv][k][1], Vector2(0.01, 0.01))
+			assert_vector(to).is_equal_approx(plan[lv][k][2], Vector2(0.01, 0.01))
+			assert_bool((m[4] as Transform3D).basis.is_equal_approx((m[3] as Transform3D).basis)).is_true()   # moved only
+			assert_bool(FarmWoods.yard_rect(lv).has_point(to)).is_false()
+
+func test_the_grown_strips_are_the_back_row_then_the_east_columns() -> void:
+	assert_array(FarmWoods.grown_strips(12)).is_empty()
+	var back := FarmWoods.grown_strips(13)
+	assert_int(back.size()).is_equal(1)
+	assert_float(back[0].position.y).is_equal_approx(-13.0, 1e-4)
+	assert_float(back[0].end.y).is_equal_approx(-12.35, 1e-4)
+	var east := FarmWoods.grown_strips(14)
+	assert_int(east.size()).is_equal(1)
+	assert_float(east[0].position.x).is_equal_approx(12.95, 1e-4)
+	assert_float(east[0].end.x).is_equal_approx(13.65, 1e-4)
+
+## Where they stand by level: as built through Lv12, Lv13's three from Lv13 (the log still as built), all four from
+## Lv14; the trees' record follows (trees_placed), so the shade and the tests see where they are.
+func test_give_way_by_level() -> void:
+	var w := _woods()
+	var keys := {}
+	for lv in w.yard_moves:
+		for m in w.yard_moves[lv]: keys["%s|%s|%d" % [m[0], m[1], m[2]]] = [lv, m[3], m[4]]
+	var placed_before := str(w.trees_placed)
+	w.give_way(12)
+	assert_str(str(w.trees_placed)).is_equal(placed_before)
+	for k in keys: assert_bool(w.shown_at(k, keys[k][1]).is_equal_approx(keys[k][1])).is_true()
+	for level in [13, 14]:
+		w.give_way(level)
+		for k in keys:
+			var want: Transform3D = keys[k][2] if level >= int(keys[k][0]) else keys[k][1]
+			assert_bool(w.shown_at(k, keys[k][1]).is_equal_approx(want)).override_failure_message("%s at Lv%d" % [k, level]).is_true()
+	for k in keys:
+		if not str(k).begins_with("tree|"): continue
+		var to: Transform3D = keys[k][2]
+		assert_bool(w.trees_placed.any(func(e): return (e[1] as Transform3D).is_equal_approx(to))).override_failure_message(k).is_true()
+
+## Reached in the farm: the pieces pop in where they go (not sliding from where they stood), at full size after POP_S.
+func test_give_way_animated_ends_where_it_goes() -> void:
+	var w: FarmWoods = auto_free(FarmWoods.new())
+	add_child(w)
+	w.build(P0Garden.blueprint())
+	w.give_way(13, true)
+	for m in w.yard_moves[13]:
+		assert_bool(w.shown_at("%s|%s|%d" % [m[0], m[1], m[2]]).is_equal_approx(m[4])).is_true()
+	await await_millis(int(Fence.POP_S * 1000.0) + 100)
+	assert_int(w.yard_level).is_equal(13)

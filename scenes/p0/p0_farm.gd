@@ -279,6 +279,7 @@ func _build_world() -> void:
 	_woods = FarmWoods.new()   # the farm ringed by pine woods (the user 11-09, SGODOT-422 0.3.5): nothing in it collides
 	add_child(_woods)
 	_woods.build(bp)
+	yard_grown.connect(_woods.give_way)   # the pieces in the way of a grown yard move with the fence (v4q(12) ⑤)
 	grass.shader = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 	_block(_scenery.rock_points)   # rocks collide; crops and bushes don't
 	_fence = Fence.new()
@@ -1656,6 +1657,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var piece := get_node_or_null("ExitPin") as Node3D
 			if piece: piece.position = _exit
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		"noui": if rt: rt.ui.visible = false   # the world alone (as P0Room's): a level-up's banner over the woods giving way
 		"edges":   # the ground (y 0) under the screen's corners and edge middles (scene art: where the picture ends)
 			var view := get_viewport().get_visible_rect().size
 			var out := {"zoom": snappedf(_zoom, 0.001), "size": snappedf(cam.size, 0.01)}

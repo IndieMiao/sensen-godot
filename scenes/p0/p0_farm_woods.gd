@@ -13,6 +13,7 @@ extends Node3D
 ## Deterministic: world coordinates and a fixed seed only — no screen, no device, no save — so a visitor sees the same.
 
 const Art = preload("res://modules/farm/farm_art.gd")
+const Fence = preload("res://scenes/p0/p0_fence.gd")
 const SEED := 4221109
 const RIGHT := Vector2(0.968148, -0.250380)   # the screen's right on the ground (yaw 14.5°)
 const DOWN := Vector2(0.250380, 0.968148)     # the screen's down on the ground, toward the camera
@@ -64,6 +65,14 @@ var trees_placed: Array = []   # [asset, Transform3D] of every tree (tests: the 
 var _shown := {}          # index into _beds → shown now
 var _beds: Array = []     # [bed id, MultiMesh, index, Transform3D] of the clumps on beds still to open
 var _bed_key := ""
+## The yard growing (v4q(12) ⑤, the user 11-10 bot 655; P0Farm.yard_grown): the few pieces in the way of the yard at
+## GIVE_WAY levels, worked out at build — level → [[where, asset, index, from, to]] (where "tree" / "small": in that
+## asset's list as built; the woods are not made again, so Lv1–12 stay as approved). yard_level is the level shown.
+const GIVE_WAY := [13, 14]
+var yard_moves := {}
+var yard_level := 0
+var _shown_at := {}   # key → where give_way last put it
+var _at := {}   # "tree|asset|index" / "small|asset|index" → [MultiMesh, instance, trees_placed index or -1]
 
 func build(bp: FarmBlueprint, seed_value := SEED) -> void:
 	name = "FarmWoods"
@@ -75,13 +84,15 @@ func build(bp: FarmBlueprint, seed_value := SEED) -> void:
 	_left_pines(trees)
 	_edge(trees, small, rng)
 	_clear_exit(trees, small)
+	_plan_give_way(trees, small)
 	var chunks := {}
 	for asset in trees:
-		for e in trees[asset]:
+		for i in (trees[asset] as Array).size():
+			var e: Array = trees[asset][i]
 			var o: Vector3 = (e[0] as Transform3D).origin
 			var key := "%s|%s" % [asset, _side(Vector2(o.x, o.z))]
 			if not chunks.has(key): chunks[key] = []
-			chunks[key].append(e)
+			chunks[key].append([e, i, trees_placed.size()])
 			trees_placed.append([asset, e[0]])
 			counts[asset] = int(counts.get(asset, 0)) + 1
 	for key in chunks:
@@ -89,18 +100,21 @@ func build(bp: FarmBlueprint, seed_value := SEED) -> void:
 		var xfs: Array = []
 		var tints := PackedColorArray()
 		var shade := false
-		for e in chunks[key]:
+		for c in chunks[key]:
+			var e: Array = c[0]
 			xfs.append(e[0])
 			tints.append(e[1])
 			if (e[1] as Color).r > 0.9: shade = true   # only the near trees cast (the far ones' shadows fall off screen)
 		var mm := Art.batch(asset, xfs, shade, tints)
 		mm.name = "Wood_" + str(key).replace("|", "_")
 		add_child(mm)
+		for j in chunks[key].size(): _at["tree|%s|%d" % [asset, chunks[key][j][1]]] = [mm.multimesh, j, chunks[key][j][2]]
 	for asset in small:
 		var mm := Art.batch(asset, small[asset], asset.begins_with("wild_pz_bush") or asset.begins_with("wild_pz_log") or asset == "wild_pz_rock_27")
 		mm.name = "Edge_" + asset
 		add_child(mm)
 		counts[asset] = int(counts.get(asset, 0)) + (small[asset] as Array).size()
+		for i in (small[asset] as Array).size(): _at["small|%s|%d" % [asset, i]] = [mm.multimesh, i, -1]
 	_bed_clumps(bp, rng)
 
 ## Does a crown h m tall, r m round, its trunk at p, cover the kept yard on screen? (43° pitch: a metre up covers
@@ -186,6 +200,99 @@ func _clear_exit(trees: Dictionary, small: Dictionary) -> void:
 			else:
 				exit_changes.append("%s (%.2f, %.2f) → gone" % [asset, t.origin.x, t.origin.z])
 		small[asset] = kept
+
+## The yard's rect at a level (P0Garden.yard_at's fence ring), x–z.
+static func yard_rect(level: int) -> Rect2:
+	var r: Dictionary = P0Garden.yard_at(level).ring
+	return Rect2(float(r.west), float(r.back), float(r.east) - float(r.west), float(r.front) - float(r.back))
+
+## Does a round r m at p reach over the rect?
+static func over(rect: Rect2, p: Vector2, r: float) -> bool:
+	var q := Vector2(clampf(p.x, rect.position.x, rect.end.x), clampf(p.y, rect.position.y, rect.end.y))
+	return rect.has_point(p) or p.distance_to(q) < r
+
+## What the yard gains at a level over the one before: the strips of the new rect outside the old (back, front, west,
+## east), each as a rect.
+static func grown_strips(level: int) -> Array[Rect2]:
+	var a := yard_rect(level - 1)
+	var b := yard_rect(level)
+	var out: Array[Rect2] = []
+	if b.position.y < a.position.y: out.append(Rect2(b.position.x, b.position.y, b.size.x, a.position.y - b.position.y))
+	if b.end.y > a.end.y: out.append(Rect2(b.position.x, a.end.y, b.size.x, b.end.y - a.end.y))
+	if b.position.x < a.position.x: out.append(Rect2(b.position.x, b.position.y, a.position.x - b.position.x, b.size.y))
+	if b.end.x > a.end.x: out.append(Rect2(a.end.x, b.position.y, b.end.x - a.end.x, b.size.y))
+	return out
+
+## The pieces in the way of what the yard gains at each GIVE_WAY level (a tree's crown, an edge piece's own round over
+## the new strip; the low leafy ground stays under the fence as it does now) each move 0.5–1 m away from the yard's
+## middle till clear of the whole new yard — moved only, none dropped and none smaller (v2 plan ⑤); a level's moves
+## start from the one before's. The woods' own make-up (its seed, the lines of sight) is not touched.
+func _plan_give_way(trees: Dictionary, small: Dictionary) -> void:
+	var now := {}   # "where|asset|index" → its transform at the level being worked out
+	for level in GIVE_WAY:
+		var strips := grown_strips(level)
+		var yard := yard_rect(level)
+		var moves: Array = []
+		var fit := func(t: Transform3D, r: float) -> Transform3D:   # Transform3D() when nothing fits
+			var p := Vector2(t.origin.x, t.origin.z)
+			var away := (p - Vector2(6.6, -5.8)).normalized()
+			for m in [0.5, 0.75, 1.0, 1.25, 1.5]:
+				var q: Vector2 = p + away * m
+				if not over(yard, q, r): return Transform3D(t.basis, Vector3(q.x, t.origin.y, q.y))
+			return Transform3D()
+		for where in ["tree", "small"]:
+			var lists: Dictionary = trees if where == "tree" else small
+			for asset in lists:
+				if where == "small" and (str(asset).contains("leafy") or str(asset).contains("grass")): continue
+				var size := Art.mesh_for(asset).get_aabb().size if where == "small" else Vector3.ZERO
+				for i in (lists[asset] as Array).size():
+					var key := "%s|%s|%d" % [where, asset, i]
+					var built: Transform3D = lists[asset][i][0] if where == "tree" else lists[asset][i]
+					var t: Transform3D = now.get(key, built)
+					var sc := t.basis.get_scale().x
+					var r := float(RADIUS[str(asset).trim_suffix("_dk").trim_suffix("_lt")]) * sc if where == "tree" else maxf(size.x, size.z) * 0.5 * sc
+					var p := Vector2(t.origin.x, t.origin.z)
+					if not strips.any(func(s: Rect2): return over(s, p, r)): continue
+					var to: Transform3D = fit.call(t, r)
+					if to == Transform3D():
+						push_warning("FarmWoods: %s at (%.2f, %.2f) finds no room off the Lv%d yard" % [asset, p.x, p.y, level])
+						continue
+					now[key] = to
+					moves.append([where, asset, i, built, to])
+		yard_moves[level] = moves
+
+## The woods at a Homestead level: the pieces in the way of its yard where they stand from GIVE_WAY's levels up, the
+## others as built. animate (the level reached here, P0Farm.yard_grown): a piece that moves pops in at its new place
+## with the fence's drop (Fence.POP_S, a little dust), not sliding; else (the farm opened at it) it just stands there.
+func give_way(level: int, animate := false) -> void:
+	if level == yard_level: return
+	yard_level = level
+	var want := {}   # key → [as built, where it stands at this level]
+	for lv in GIVE_WAY:
+		for m in yard_moves.get(lv, []):
+			var key := "%s|%s|%d" % [m[0], m[1], m[2]]
+			if not want.has(key): want[key] = [m[3], m[3]]
+			if level >= lv: want[key][1] = m[4]
+	for key in want:
+		var at: Array = _at.get(key, [])
+		var to: Transform3D = want[key][1]
+		if at.is_empty() or shown_at(key, want[key][0]).is_equal_approx(to): continue
+		var mm: MultiMesh = at[0]
+		var i: int = at[1]
+		if int(at[2]) >= 0: trees_placed[at[2]][1] = to
+		_shown_at[key] = to
+		if not animate:
+			mm.set_instance_transform(i, to)
+			continue
+		mm.set_instance_transform(i, Transform3D(to.basis.scaled(Vector3.ONE * 0.01), to.origin))
+		var tw := create_tween()
+		tw.tween_method(func(k: float): mm.set_instance_transform(i, Transform3D(to.basis.scaled(Vector3.ONE * k), to.origin)), 0.01, 1.0, Fence.POP_S).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		Fence.dust(self, to.origin)
+
+## Where a piece that moves for the yard stands now ("tree|asset|index" / "small|asset|index"), or `built` if it has not
+## moved (give_way's own record: headless, a MultiMesh keeps no transforms — tests and shots read this).
+func shown_at(key: String, built := Transform3D()) -> Transform3D:
+	return _shown_at.get(key, built)
 
 static func _hash(i: int, j: int, seed_value: int) -> float:
 	return float(hash(Vector3i(i, j, seed_value)) % 10007) / 10006.0
