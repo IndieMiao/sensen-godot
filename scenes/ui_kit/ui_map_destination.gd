@@ -91,21 +91,10 @@ func _init(icon_: Texture2D = null, text_ := "", plate_ := false) -> void:
 	_icon = UiKit.icon(null, ICON)
 	_icon.position = Vector2.ONE * (DISC - ICON) * 0.5
 	_pin.add_child(_icon)
-	_count = PanelContainer.new()
-	_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_count.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY, 8.0).with_margins(4.0, 1.0, 4.0, 1.0))
+	_count = count_pill()
 	_count.position = _COUNT_AT
-	var count_row := HBoxContainer.new()
-	count_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	count_row.add_theme_constant_override(&"separation", 2)
-	_count.add_child(count_row)
-	_count_person = UiKit.icon(null, _PERSON_SIDE)
-	_count_person.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_count_person.visible = false
-	count_row.add_child(_count_person)
-	_count_label = UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_SURFACE_RAISED)
-	count_row.add_child(_count_label)
-	_count.visible = false
+	_count_person = _count.get_child(0).get_child(0)
+	_count_label = _count.get_child(0).get_child(1)
 	_pin.add_child(_count)
 	_label_box = PanelContainer.new()
 	_label_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -292,6 +281,36 @@ func set_focus(v: float) -> void:
 	focus = v
 	_pin.pivot_offset = Vector2(DISC * 0.5, DISC)
 	_pin.scale = Vector2.ONE * maxf(0.001, v)
+
+## The count pill (q(137) ③): a person and the number on the primary capsule, hidden — this pin's top-right one, and a
+## landmark art pin's on the city map (SGODOT-479, 不知火舞's spec v1), so the two are one piece. show_online fills it.
+static func count_pill() -> PanelContainer:
+	var pill := PanelContainer.new()
+	pill.name = "Count"
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY, 8.0).with_margins(4.0, 1.0, 4.0, 1.0))
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override(&"separation", 2)
+	pill.add_child(row)
+	var person := UiKit.icon(null, _PERSON_SIDE)
+	person.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	person.visible = false
+	row.add_child(person)
+	row.add_child(UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_SURFACE_RAISED))
+	pill.visible = false
+	return pill
+
+## A count pill (count_pill) saying who is in: the person and `n`, none at 0.
+static func show_online(pill: PanelContainer, n: int) -> void:
+	if n <= 0:
+		pill.visible = false
+		return
+	var person: TextureRect = pill.get_child(0).get_child(0)
+	if person.texture == null: person.texture = load(_PERSON)
+	person.visible = true
+	(pill.get_child(0).get_child(1) as Label).text = str(n)
+	pill.visible = true
 
 func set_count(v: String) -> void:
 	if v == count and _count_label.text == v: return
