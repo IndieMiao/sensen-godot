@@ -464,9 +464,10 @@ func test_p0_a_toasts_no_break_space_is_looked_up_as_a_space() -> void:
 	assert_str(plain.call(zh.call("Swift Growth · 20 min · sow now, grow 2× faster"))).is_equal("加速生长 · 20 分钟 · 现在种下的作物长得快一倍")
 	assert_str(plain.call(zh.call("Twin Catch · 20 min · every fish lands ×2"))).is_equal("双倍渔获 · 20 分钟 · 每条鱼都 ×2")
 	assert_str(plain.call(zh.call("Twin Catch · 20 min · fish ×2, Legendary ×1"))).is_equal("双倍渔获 · 20 分钟 · 每条鱼 ×2，传说鱼 ×1")
-	# two Info toasts that broke a word at 182 px (李白's list, shot under 中文): broken after a ` · ` too, the second shorter
-	assert_str(zh.call("Spice Rack · seasonings off your bag · Home Lv2")).is_equal("调味架 · 调味料不占背包 · \n家园 Lv2")
-	assert_str(plain.call(zh.call("Mix 1–3 ingredients · unknown mixes may become a Mystery Dish"))).is_equal("放 1–3 样食材 · \n新搭配可能做出黑暗料理")
+	# two Info toasts that broke a word at 182 px (李白's list, shot under 中文): whole sentences in the table, their toasts
+	# break at a ` · ` as they read (P0Ui._break_at_dot; test_p0_the_spice_rack_and_mix_toasts_break_at_their_dot)
+	assert_str(zh.call("Spice Rack · seasonings off your bag · Home Lv2")).is_equal("调味架 · 调味料不占背包 · 家园 Lv2")
+	assert_str(plain.call(zh.call("Mix 1–3 ingredients · unknown mixes may become a Mystery Dish"))).is_equal("放 1–3 样食材 · 新搭配可能做出黑暗料理")
 	# part by part along ` · `: the known part in Chinese, the unknown one English with its no-break space kept
 	assert_str(zh.call("Twin Catch · 20 zorbs")).is_equal("双倍渔获 · 20" + char(0xa0) + "zorbs")
 	# no part known: "" (English mode and an untranslated line show the source, no-break space and all)
@@ -653,3 +654,33 @@ func test_p0_homestead_reads_home_and_both_keys_keep_their_chinese() -> void:
 	assert_str(str(table["Home city"])).is_equal("家城")
 	assert_str(str(table["Home city only"])).is_equal("仅限家城鱼塘")
 	assert_str(str(preload("res://modules/p0/p0_clusters.gd").get_cluster("gn-4159050").get("name", ""))).is_equal("Homestead")   # Florida's, untouched
+
+## SGODOT-452 (李白): the Spice Rack's and the Mix's Info toasts lost the "\n" their Chinese had set by hand. Under 中文
+## they opt in to P0Ui._break_at_dot (P0Ui.break_in_chinese) and break after a ` · ` — the dot dropped, both lines inside
+## the toast's width, no word cut; English does not opt in and wraps by words as before (李白: its breaking is unapproved).
+func test_p0_the_spice_rack_and_mix_toasts_break_at_their_dot_in_chinese_only() -> void:
+	var t := Localization.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var ui: P0Ui = auto_free(P0Ui.new())
+	add_child(ui)
+	var lines := ["Spice Rack · seasonings off your bag · Home Lv2", "Mix 1–3 ingredients · unknown mixes may become a Mystery Dish"]
+	var was := TranslationServer.get_locale()
+	TranslationServer.set_locale("zh_CN")
+	var zh_opts := P0Ui.break_in_chinese()
+	var zh: Array = lines.map(func(l): return ui._break_at_dot(l))
+	TranslationServer.set_locale("en")
+	var en_opts := P0Ui.break_in_chinese()
+	TranslationServer.set_locale(was)
+	TranslationServer.remove_translation(t)
+	assert_bool(zh_opts).is_true()
+	assert_bool(en_opts).is_false()   # English: the line as it was, the label wrapping it by words
+	var label: Label = ui._toasts._label
+	var font := label.get_theme_font(&"font")
+	var size := label.get_theme_font_size(&"font_size")
+	for broken in zh:
+		for part in (broken as String).split("\n"):
+			assert_bool(font.get_string_size(part, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= ui.toast_text_width()).override_failure_message(broken).is_true()
+			assert_bool(part.ends_with("·") or part.begins_with("·")).override_failure_message(broken).is_false()
+	assert_str(zh[0]).is_equal("调味架 · 调味料不占背包\n家园 Lv2")
+	assert_str(zh[1]).is_equal("放 1–3 样食材\n新搭配可能做出黑暗料理")

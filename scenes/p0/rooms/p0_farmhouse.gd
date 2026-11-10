@@ -516,7 +516,7 @@ func open_sheet(kind: String) -> void:
 	_sheet.open_experiment.connect(func():
 		rt.ui.close_modal()
 		p0_open_kitchen("experiment"))
-	_sheet.details.connect(func(): rt.ui.toast("Spice Rack · seasonings off your bag · Home Lv2"))
+	_sheet.details.connect(func(): rt.ui.toast("Spice Rack · seasonings off your bag · Home Lv2", 0.0, P0Ui.break_in_chinese()))   # 中文 broken at a " · " (452)
 	rt.ui._open_modal(_sheet, 0.0, true)
 	rt.ui.modal_kind = "storage"
 	_sheet.tree_exited.connect(func():
