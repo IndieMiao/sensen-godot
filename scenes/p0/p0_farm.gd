@@ -811,7 +811,9 @@ func p0_show_spot(where: String) -> void:
 
 # ---------------------------------------------------------------- frame
 func p0_joystick(v: Vector2) -> void:
-	if v != Vector2.ZERO: stop_exit_walk()   # the joystick takes over the walk out (SGODOT-443)
+	if v != Vector2.ZERO:
+		stop_exit_walk()   # the joystick takes over the walk out (SGODOT-443)
+		_tap_walk = false   # … and a tapped walk: let go, the player does not turn to the bed (周瑜 on #947)
 	if actor: actor.set_input(v)
 
 var _dev_aim := Vector3.INF   # aimcell (shots): steer the joystick straight at this point, logging the player each frame
@@ -1259,7 +1261,7 @@ func p0_tap(screen: Vector2) -> void:
 
 ## A tap on the open ground walks there (SGODOT-465; the user 11-10, bot 641 「农场点地 ok」; 不知火舞's spec v1, q(310)), as
 ## at the pond: the exit, the guide, the cards and every facility above take their taps first. On one of the open beds
-## the walk ends on the path in front of it, facing it, and sows nothing (the main key only, LOCK-02); past the walk
+## the walk ends on the walkway behind it, facing it across the bed (plotface's stand), and sows nothing (the main key only, LOCK-02); past the walk
 ## (the woods, outside the fence) it ends at the nearest place it can reach. The joystick (the mover drops its path),
 ## another tap (p0_tap) or any panel (_tap_walk_check) stops it; Decorate keeps its taps; no marker where it goes.
 var _tap_walk := false
@@ -1275,15 +1277,17 @@ func _walk_tap(screen: Vector2) -> void:
 	_tap_walk = actor.mover.set_target_position(to)
 	if not _tap_walk: _tap_walk = _walk_near(to)
 
-## Past the walk: the reachable cell nearest `to`, ring by ring out to NEAR_CELLS.
+## Past the walk: the reachable cell nearest `to`, ring by ring out to NEAR_CELLS from the blueprint cell nearest it (a
+## tap far into the woods starts at the grid's edge, 周瑜 on #947).
 const NEAR_CELLS := 12
 func _walk_near(to: Vector3) -> bool:
 	var at := bp.world_to_cell(to)
+	at = Vector2i(clampi(at.x, bp.grid_origin.x, bp.grid_origin.x + bp.grid.x - 1), clampi(at.y, bp.grid_origin.y, bp.grid_origin.y + bp.grid.y - 1))
 	for r in range(1, NEAR_CELLS + 1):
 		var ring: Array[Vector2i] = []
 		for dx in range(-r, r + 1):
 			for dy in range(-r, r + 1):
-				if maxi(absi(dx), absi(dy)) == r and not grid._blocked(at + Vector2i(dx, dy)): ring.append(at + Vector2i(dx, dy))
+				if maxi(absi(dx), absi(dy)) == r and not grid.is_blocked(at + Vector2i(dx, dy)): ring.append(at + Vector2i(dx, dy))
 		ring.sort_custom(func(c1, c2): return bp.cell_to_world(c1).distance_to(to) < bp.cell_to_world(c2).distance_to(to))
 		for c in ring:
 			if actor.mover.set_target_position(bp.cell_to_world(c)): return true
@@ -1299,14 +1303,14 @@ func _tap_walk_check() -> void:
 		_tap_walk = false
 		if _tap_face.is_finite(): actor.face(_tap_face)
 
-## Where a tap on the ground at `point` walks to: there, or for one of the `open` beds, the path cell in front of it
-## (camera side); a bed not open yet is grass to the player.
+## Where a tap on the ground at `point` walks to: there, or for one of the `open` beds, the walkway cell behind it (away
+## from the camera, as plotface stands: the bed stays in sight in front of the player); a bed not open yet is grass.
 static func tap_target(blueprint: FarmBlueprint, point: Vector3, open: int) -> Vector3:
 	var cell := blueprint.world_to_cell(point)
 	var id := P0Garden.id_of(cell)
 	if id < 0 or id >= open: return point
 	return blueprint.cell_to_world(cell + BED_FRONT)
-const BED_FRONT := Vector2i(0, -1)
+const BED_FRONT := Vector2i(0, 1)
 
 ## A finger card's tap goes to its own facility by id, never through the point test: the point of one facility can
 ## sit under another's mark (the farmhouse card's point under the sign's caption, PR #21 review).
