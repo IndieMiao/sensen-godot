@@ -359,7 +359,19 @@ func _gather_marks(v: Dictionary, near: Dictionary, dt := 0.0) -> void:
 	if gather.point(marked).is_empty(): marked = ""
 	if _gather_marked != "" and _gather_marked != marked: rt.ui.badge("gather_mark:" + _gather_marked, UiStatusBadge.State.REQUEST, Vector2.ZERO, false)
 	_gather_marked = marked
-	if marked != "": rt.ui.badge("gather_mark:" + marked, UiStatusBadge.State.REQUEST, _gather_screen(gather.point(marked)) + Vector2(0, -28), true)
+	if marked != "": rt.ui.badge("gather_mark:" + marked, UiStatusBadge.State.REQUEST, _gather_mark_at(marked), true)
+
+## The guide's `!` over a point: 28 px over its mark — and with its icon button or name strip where they were moved to
+## (off the player's head, SGODOT-473; over the action keys, P0Ui) when it wears one (v4q(13) review, 奕星 11-10).
+const GUIDE_MARK_UP := 28.0
+func _gather_mark_at(id: String) -> Vector2:
+	var at := _gather_screen(gather.point(id))
+	if id == _gather_tag:
+		var card := "gather:" + id
+		var shown := rt.ui.world_icon_rect(card)
+		if not shown.has_area(): shown = rt.ui.name_bar_rect(card)
+		if shown.has_area(): at.y = shown.get_center().y
+	return at - Vector2(0, GUIDE_MARK_UP)
 
 ## A point's mark on the screen: over its piece (a grove stands tall).
 func _gather_screen(p: Dictionary) -> Vector2:
