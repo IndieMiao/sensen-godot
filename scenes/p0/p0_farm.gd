@@ -18,6 +18,20 @@ const Looks = preload("res://scenes/p0/p0_looks.gd")
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const SIGN_BADGE := Vector3(0, 1.15, 0)   # the Homestead sign's mark, just above the board
 const SIGN_NEAR := 2.6                    # metres: the sign's and the plaque's finger cards show this close
+## The Home Badge (q(287); 赵云's homestead_badge.glb, its README's contract): its four tier faces under BadgeFace, the
+## number and `Lv` written by Label3Ds on its BadgeNumber / BadgeLv sockets (tilted with the face), the root turned
+## 14.5° on the farm. The tap at the face's centre (1.0 m up); the strip above the badge's top (1.38 m).
+const BADGE := preload("res://assets/farm/art/homestead_badge.glb")
+const BADGE_YAW := 14.5
+## The whole badge 1.1 times the model, so its number stays ≥ 14 px on the 0.8 follow camera (q(287): it measured 13;
+## 上官婉儿 401 60e493d5, 不知火舞 b3d362ee: the font fills the face already, the badge grows, not the number).
+const BADGE_SCALE := 1.1
+const BADGE_HIT := Vector3(0, 1.0 * BADGE_SCALE, 0)
+const BADGE_MARK := Vector3(0, 1.95 * BADGE_SCALE, 0)   # the strip clear above the face's top (1.4 m), not over its number
+const BADGE_NUMBER_CAP := 0.315   # metres of a digit's cap height (the model's review renders)
+const BADGE_LV_CAP := 0.080
+const BADGE_INK := Color("3B2F25")
+const BADGE_FONT := preload("res://assets/ui/fonts/nunito_w800.tres")
 const FARMHOUSE := "res://scenes/p0/rooms/p0_farmhouse.tscn"
 ## Walking into the doorway goes in (mirror of a room's door): inside the walkway cell in front of the door
 ## (DOOR_HALF either side; the camera-relative joystick drifts sideways), pushing towards the house, after
@@ -89,8 +103,10 @@ var _yard_seen := false                        # a view has been read: a later g
 var _fixed_blocks := {}                        # cells shut at build (rocks, the front fence, sign, mailbox): a grown yard never opens them
 var _looks: Node3D   # p0_looks.gd: Porch, Kitchen Wing and the Lv10 house by the view's looks
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
-var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
-var _plaque_node: Node3D
+var _plaque := Vector3.ZERO   # the Home Badge left of the door (where the Upgrade Plaque stood), from Lv2: its card
+var _plaque_node: Node3D   # the Home Badge (homestead_badge.glb, whole: its tiers and number sockets)
+var _badge_number: Label3D
+var _badge_level := -1   # the level the badge shows (its tier and number are set when this changes)
 var _scenery: Node3D   # p0_garden_scenery.gd: the sand under the field grows over Lv7's front row
 var _woods: FarmWoods  # p0_farm_woods.gd: woods round the yard, clumps on the beds still to open
 ## q(303) ⑨: a save past Lv8 whose wing's cells are held says so once a launch, on the first farm view (the app's run).
@@ -294,13 +310,18 @@ func _build_world() -> void:
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
 	_block([_sign])
-	# The Upgrade Plaque: art placeholder (a smaller sign.glb) until its model lands. Not solid: it appears only after
-	# the first upgrade, and an invisible block before then would stop the player for no visible reason.
+	# The Home Badge (q(287), 赵云's model, 401): where the Upgrade Plaque stood. Not solid: it appears only after the
+	# first upgrade, and an invisible block before then would stop the player for no visible reason.
 	_plaque = P0Garden.plaque_point(bp)
-	_plaque_node = FarmArt.instance("sign", _plaque, 0.6)
-	_plaque_node.rotation.y = 0.35
+	_plaque_node = BADGE.instantiate()   # whole, not FarmArt.instance's meshes: BadgeNumber / BadgeLv are its Marker3Ds
+	_plaque_node.name = "HomeBadge"
+	_plaque_node.position = _plaque
+	_plaque_node.rotation.y = deg_to_rad(BADGE_YAW)
+	_plaque_node.scale = Vector3.ONE * BADGE_SCALE
 	_plaque_node.visible = false
 	props.add_child(_plaque_node)
+	_badge_number = badge_label(_plaque_node.find_child("BadgeNumber", true, false), "", BADGE_NUMBER_CAP)
+	badge_label(_plaque_node.find_child("BadgeLv", true, false), "Lv", BADGE_LV_CAP)
 	# The Chef's Sign (Homestead Lv10): its model put in by the look it shows (_chef_sign_model).
 	_chef_sign = P0Garden.chef_sign_point(bp) + CHEF_SIGN_SHIFT
 	_chef_sign_node = Node3D.new()
@@ -1287,7 +1308,7 @@ func p0_tap(screen: Vector2) -> void:
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)
-	elif _plaque_node.visible and cam.unproject_position(_plaque + Vector3(0, 0.35, 0)).distance_to(screen) < 34:
+	elif _plaque_node.visible and cam.unproject_position(_plaque + BADGE_HIT).distance_to(screen) < 34:
 		actor.face(_plaque)
 		HomePanel.plaque(rt.ui)
 	# The Mailbox and the bench stand beside the house: before the stall and the house, so the house's wider radius
@@ -1402,6 +1423,36 @@ func _tap_card(id: String) -> bool:
 func p0_near_resident() -> String:
 	return str(_guide.near_resident()) if _guide != null else ""
 
+## A word on the badge's face, as its review renders wrote it: Nunito ExtraBold, flat ink, no outline, unshaded, one
+## sided, never turning to the camera; `cap` metres of cap height (0.705 of the font size at pixel_size 0.002). null with
+## no socket (a renamed one in a later model): the badge then shows no number, never a null read (iOS Release would crash).
+static func badge_label(socket: Node3D, text: String, cap: float) -> Label3D:
+	if socket == null: return null
+	var l := Label3D.new()
+	l.text = text
+	l.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # `Lv` and digits, as everywhere
+	l.font = BADGE_FONT
+	l.pixel_size = 0.002
+	l.font_size = roundi(cap / (0.705 * l.pixel_size))
+	l.outline_size = 0
+	l.modulate = BADGE_INK
+	l.shaded = false
+	l.double_sided = false
+	l.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+	socket.add_child(l)
+	return l
+
+## The badge from Lv2 (the first upgrade; none at Lv1): its tier's face and the level's number, set when the level changes.
+func _show_badge(level: int) -> void:
+	_plaque_node.visible = level >= 2
+	if level == _badge_level: return
+	_badge_level = level
+	var tier := P0Logic.badge_tier(level)
+	for t in ["wood", "bronze", "silver", "gold"]:
+		var face := _plaque_node.find_child("Tier_" + t, true, false) as Node3D
+		if face: face.visible = t == tier
+	if _badge_number: _badge_number.text = str(level)
+
 ## The sign itself (its icon button and strip arrive by id, _tap_card); small, so the door beside it stays the house.
 ## Nothing above the board: with the button hidden (beyond 8 m) that spot is not the sign's (苏烈 on #59).
 func _sign_hit(screen: Vector2) -> bool:
@@ -1416,8 +1467,8 @@ func _prompts(v: Dictionary) -> void:
 	world_prompt("stall", P0WorldPrompts.stall(v, rt.ui.stall_has_new()), _stall, Vector3(0, 1.05, 0), Vector3(0, 0.4, 0))
 	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, home_mark(), Vector3(0, 1.0, 0.6))
 	world_prompt("sign", P0WorldPrompts.sign(v), _sign, SIGN_BADGE, Vector3(0, 0.45, 0))
-	_plaque_node.visible = not v.get("homestead", {}).get("plaque", []).is_empty()
-	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, Vector3(0, 0.85, 0), Vector3(0, 0.35, 0), _plaque_node.visible)
+	_show_badge(int(v.get("homestead", {}).get("level", 1)))
+	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, BADGE_MARK, BADGE_HIT, _plaque_node.visible)
 	_show_chef_sign(bool(v.get("homestead", {}).get("unlocks", {}).get("chefs_sign", false)))
 	if _chef_sign_node.visible: _chef_sign_model(_looks.shown(Looks.HOUSE_STAGE) if _looks else "")
 	world_prompt("chef_sign", P0WorldPrompts.chef_sign(v), _chef_sign, CHEF_SIGN_MARK, CHEF_SIGN_HIT, _chef_sign_node.visible)
@@ -1634,7 +1685,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_plot_sig = "frozen"
 			_sync_t = 9999.0
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
-		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
+		"plaque": p0_tap(cam.unproject_position(_plaque + BADGE_HIT))   # the Home Badge's card
 		"pip":   # a tap on the guide's Pip where he is now (SGODOT-411 shots: he stops and turns to the player)
 			if _guide != null and _guide.pip_root != null: p0_tap(cam.unproject_position(_guide.pip_root.to_global(Vector3(0, 0.8, 0))))
 		"topip":   # walk straight up to 1.2 m short of where Pip is now (SGODOT-411 shots: near him he stands and turns)

@@ -14,7 +14,7 @@ func test_the_open_one_strips_the_rest_show_buttons_within_8_m_or_with_a_state()
 	var plaque := P0WorldPrompts.plaque({})
 	assert_int(P0WorldPrompts.show("plaque", "", 1.0, plaque)).is_equal(P0WorldPrompts.Show.NONE)   # no mark, ever
 	assert_int(P0WorldPrompts.show("plaque", "plaque", 1.0, plaque)).is_equal(P0WorldPrompts.Show.BAR)
-	assert_str(plaque.text).is_equal("Upgrade Plaque")
+	assert_str(plaque.text).is_equal("Home Badge")   # q(287) ③, q(306) ⑦
 
 func test_the_stall_is_homestead_stall_with_its_board_state() -> void:
 	var v := _view()

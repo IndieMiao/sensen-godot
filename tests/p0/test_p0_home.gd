@@ -231,13 +231,23 @@ func test_plaque_lines_date_each_upgrade() -> void:
 	assert_array(P0Logic.plaque_lines(v, 8 * 60).map(func(l): return l.value)).is_equal(["Oct 5", "Oct 9"])   # Shanghai
 	assert_array(P0Logic.plaque_lines(_view(1))).is_empty()
 
-func test_plaque_read_is_a_read_only_sheet_with_only_close() -> void:
+## q(287) ② (安其拉 D1 / D2): the Home Badge's card in PLAQUE-READ's sheet — the badge, `Home LvN`, what this level brings
+## as What changes rows; no dates (the server still keeps them), no button, only the ✕.
+func test_the_badge_card_is_a_read_only_sheet_with_only_close() -> void:
 	var v := _view(3)
 	v.homestead["plaque"] = [{"level": 2, "at": 1791158400000.0}, {"level": 3, "at": 1791504000000.0}]
+	v.homestead["plots"] = {"now": 12, "max": 41}
+	v.energy.max = 220
 	var ui := _ui(v)
 	HomePanel.plaque(ui)
 	assert_str(ui.modal_kind).is_equal("plaque")
-	assert_array(ui.find_children("*", "UiFactRow", true, false).map(func(f): return (f as UiFactRow).label)).is_equal(["Lv2", "Lv3"])
+	var texts := ui.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+	assert_array(texts).contains(["3", "Home Lv3", "Max Energy 220 · Meals 220 a day", "Plots 12"])
+	assert_array(texts).not_contains(["Highest level for now", "Lv2", "Oct 5"])
+	assert_array(ui.find_children("*", "UiFactRow", true, false)).is_empty()
+	var disc := ui.find_child("BadgeDisc", true, false) as PanelContainer
+	assert_float(disc.custom_minimum_size.x).is_equal(HomePanel.BADGE_DISC)
+	assert_str((disc.get_theme_stylebox(&"panel") as UiStyleBox).bg_color.to_html(false)).is_equal("f6e6cb")   # wood
 	assert_array(ui.find_children("*", "UiCommandButton", true, false)).is_empty()
 	# The × floats above the sheet's corner where the main key stands: the key and quick bar hide, as in the frame.
 	assert_bool(ui._keys.visible).is_false()
@@ -246,6 +256,25 @@ func test_plaque_read_is_a_read_only_sheet_with_only_close() -> void:
 	assert_bool(ui.has_modal()).is_false()
 	assert_bool(ui._keys.visible).is_true()
 	assert_bool(ui._bar.visible).is_true()
+
+## Lv10 silver (D1); at the top level gold with `Highest level for now` (D2). The day's Meals is the level's (200 + its
+## Energy steps), never the Newcomer Blessing's extra.
+func test_the_badge_card_at_lv10_and_the_top_level() -> void:
+	var v := _view(10)
+	v.homestead["plots"] = {"now": 26, "max": 41}
+	v.homestead["max"] = 17
+	v.energy.max = 290
+	v["meals"] = {"cap": 390}   # blessed: not what the badge says
+	var c := P0Logic.badge_card(v)
+	assert_dict(c).is_equal({"level": 10, "tier": "silver", "title": "Home Lv10", "subtitle": "",
+		"rows": [{"icon": "energy", "text": "Max Energy 290 · Meals 290 a day"}, {"icon": "field", "text": "Plots 26"}]})
+	v.homestead.level = 17
+	v.homestead.plots.now = 41
+	v.energy.max = 325
+	c = P0Logic.badge_card(v)
+	assert_str(str(c.tier)).is_equal("gold")
+	assert_str(str(c.subtitle)).is_equal(P0Logic.MAX_LEVEL_LINE)
+	assert_array(c.rows.map(func(r): return r.text)).is_equal(["Max Energy 325 · Meals 325 a day", "Plots 41"])
 
 func test_the_plaque_stands_left_of_the_door_apart_from_the_sign() -> void:
 	var bp := P0Garden.blueprint()
