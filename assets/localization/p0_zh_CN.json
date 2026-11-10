@@ -724,6 +724,7 @@
  "Decor": "摆件",
  "Decor %d/%d": "摆件 %d/%d",
  "Decor %d/%d · Goes to Farm Storage": "摆件 %d/%d · 放入仓库",
+ "Decor %d · Yard +%d spaces": "摆件 %d · 院子 +%d 格",
  "Decorate": "布置",
  "Deliver": "交付",
  "Deliver %d %s · Stall": "交付 %d 条%s · 摊位",

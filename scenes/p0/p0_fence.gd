@@ -5,6 +5,9 @@ extends Node3D
 ## already Lv3 shows it at once. Layout data lives in P0Garden (fence_front / fence_ring).
 ## From Lv3 the whole fence is the Fence & Mailbox look (LOOK-PICK, SGODOT-282): a = this timber fence, b = a Stone Wall
 ## on the same run (P0Garden.stone_wall); a change pops the new one in with dust (pop_in, as the other looks).
+## Yard v2 (v4q(12) ③ ④): the ring stands round the yard of its level (P0Garden.yard_at: Lv13 the back stretch to
+## z −13.0, Lv14 the east one to x 13.65); a level that moves it rebuilds the ring, dropped in again as at Lv3 when it
+## comes in this session (set_level), at once otherwise.
 
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 const DROP_H := 1.4
@@ -22,6 +25,7 @@ var _shown := false
 var look := "a"           # the Fence & Mailbox look on show
 var preview := ""         # LOOK-PICK's preview ("" = the view's look)
 var _bp: FarmBlueprint
+var level := 1              # the yard level the ring stands round (P0Garden.yard_at)
 
 func build(bp: FarmBlueprint) -> void:
 	name = "Fence"
@@ -30,12 +34,38 @@ func build(bp: FarmBlueprint) -> void:
 	for seg in P0Garden.fence_front(bp): front.append(_xf(seg))
 	_front = FarmArt.batch("fence", front)
 	add_child(_front)
-	for seg in P0Garden.fence_ring(bp):
+	_build_ring()
+
+func _build_ring() -> void:
+	for seg in P0Garden.fence_ring(_bp, level):
 		var m := FarmArt.instance("fence")
 		m.transform = _xf(seg)
 		m.visible = false
 		add_child(m)
 		_ring.append(m)
+
+## The ring round the yard of Homestead `lv` (yard v2): nothing when it stands where it is; else the old one goes and the
+## new one is built — dropped in (timber) or popped in with dust (Stone Wall) when `animate`, shown at once otherwise.
+func set_level(lv: int, animate: bool) -> void:
+	if P0Garden.yard_at(lv).ring == P0Garden.yard_at(level).ring:
+		level = lv
+		return
+	level = lv
+	for m in _ring: m.queue_free()
+	_ring.clear()
+	_build_ring()
+	if _stone != null:
+		_stone.queue_free()
+		_stone = null
+		_ring_dust.clear()
+	var stone := look == "b"
+	if stone: _stone = _build_stone()
+	for m in _ring: m.visible = _shown and not stone
+	if not _shown or not animate: return
+	if stone:
+		pop_in(self, _stone.get_children().filter(func(n): return n is MeshInstance3D))
+		for at in _ring_dust: dust(self, at)
+	else: drop_in()
 
 ## Call every frame with the projected view (cheap until the unlock or the look flips).
 func sync(view: Dictionary) -> void:
@@ -75,7 +105,7 @@ func _build_stone() -> Node3D:
 		var m := FarmArt.instance(str(p.asset))
 		m.transform = _part_xf(p)
 		root.add_child(m)
-	var ring := P0Garden.stone_wall(P0Garden.fence_ring(_bp))
+	var ring := P0Garden.stone_wall(P0Garden.fence_ring(_bp, level))
 	var batch := FarmArt.batch("rock", ring.map(_part_xf))
 	batch.name = "Ring"
 	root.add_child(batch)

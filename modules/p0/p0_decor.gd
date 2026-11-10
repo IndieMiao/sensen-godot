@@ -48,6 +48,10 @@ static func solid_cells(id: String, at: Vector2i, rot := 0) -> Array:
 
 static func _rect(r) -> Rect2i: return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))
 
+## The yard's walk rect at the view's Homestead level (yard v2, v4q(12) ③ ④: Lv13 row 19, Lv14 columns 19–20).
+static func walk_of(view: Dictionary) -> Rect2i:
+	return P0Garden.yard_at(int(view.get("homestead", {}).get("level", 1))).walk
+
 static func _in_any(cell: Vector2i, rects: Array) -> bool:
 	for r in rects:
 		if _rect(r).has_point(cell): return true
@@ -103,9 +107,10 @@ static func reason(view: Dictionary, id: String, at: Vector2i, rot := 0, ignore 
 ## The same for any cells against `t` (taken()): what a yard facility (the Compost Bin) is judged by too.
 static func reason_cells(view: Dictionary, cs: Array, t: Dictionary) -> String:
 	var y := yard()
+	var walk := walk_of(view)
 	var beds := P0Garden.plot_count(view)   # off the beds the homestead has beyond the field too (q(172))
 	for c in cs:
-		if not _rect(y.get("walk", [0, 0, 0, 0])).has_point(c) or _in_any(c, y.get("field", [])): return REASONS.decor_outside
+		if not walk.has_point(c) or _in_any(c, y.get("field", [])): return REASONS.decor_outside
 		var bed := P0Garden.id_of(c)
 		if bed >= 0 and bed < beds: return REASONS.decor_outside
 	var house := wing_cells() if wing_up(view) else []   # the Kitchen Wing's from Lv8 (q(303))
@@ -117,7 +122,7 @@ static func reason_cells(view: Dictionary, cs: Array, t: Dictionary) -> String:
 
 ## The legal top-left cell nearest `from` (the preview starts there, q(59) §4 as the sprinkler), NONE when none is.
 static func nearest_spot(view: Dictionary, id: String, rot: int, from: Vector2i, ignore := NO_PIECE) -> Vector2i:
-	var walk := _rect(yard().get("walk", [0, 0, 0, 0]))
+	var walk := walk_of(view)
 	var t := taken(view, ignore)
 	var best := NONE
 	var best_d := INF
@@ -167,10 +172,17 @@ static func cap_at(level: int, m: Dictionary = {}) -> int:
 	return mini(n, int(m.max)) if m.has("max") else n
 
 ## The cap reached, said where Decorate is entered (q(113) ①): `Decor 24/24 · Homestead Lv3 adds 4`; at the top level, or
-## once the next level adds none (decor_max.max), `Decor 56/56 · Store one to place this`.
+## once no level adds any, `Decor 48/48 · Store one to place this`. Yard v2 (v4q(12) ①; 不知火舞's spec v1 三): the
+## server's view.decor.grows, the first level whose cap is more, the yard's cells counted (`Decor 48/48 · Home Lv13
+## adds 13` from Lv8 to Lv12); the next level's formula only when the view has none.
 static func cap_line(view: Dictionary, m: Dictionary = {}) -> String:
 	var level := int(view.get("homestead", {}).get("level", 1))
 	var head := "Decor %d/%d" % [used(view), cap(view)]
+	var d = view.get("decor", null)
+	if d is Dictionary and (d as Dictionary).has("grows"):
+		var g = d.grows
+		if not g is Dictionary or int(g.get("adds", 0)) <= 0: return head + " · Store one to place this"
+		return head + " · Home Lv%d adds %d" % [int(g.level), int(g.adds)]
 	var adds := cap_at(level + 1, m) - cap_at(level, m)
 	if level >= P0Logic.homestead_max(view) or adds <= 0: return head + " · Store one to place this"
 	return head + " · Home Lv%d adds %d" % [level + 1, adds]

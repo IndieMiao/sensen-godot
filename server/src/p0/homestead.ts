@@ -5,7 +5,7 @@ import { maxEnergy, skillLevel } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, takeStorageFirst } from './storage.js';
 import { addPlots, clearNewBeds } from './garden.js';
-import { wingOf, wingTaken, type YardFeatures } from './decor.js';
+import { decorCap, wingOf, wingTaken, yardRoom, type YardFeatures } from './decor.js';
 import type { Refusal } from './fishing.js';
 import { cityStamps, climatesVisited } from './travel.js';
 
@@ -95,6 +95,7 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   const block = upgradeBlock(c, s) ?? wingBlock(c, s, !!yard.wing8);
   if (block) return block;
   const next = nextLevel(c, s)!;
+  const cellsBefore = yard.yard2 ? yardRoom(c, s, yard) : 0;
   for (const [item, qty] of next.materials) {
     takeStorageFirst(s, item, qty);
     events.push({ kind: 'item', id: item, delta: -qty });
@@ -108,7 +109,10 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   const gain = gainEnergy(c, s, now, Math.min(next.energy, room), events, 'homestead');
   // look: the stage this level opens (LOOK-PICK, SGODOT-282) — the client offers its two looks after HOME-2's banner.
   const look = lookStageAt(c, next.level);
-  events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks, ...(look ? { look: look.id } : {}) });
+  // yard2 (v4q(12); 不知火舞's spec v1 二): the level that grows the yard says so on HOME-2 (`Decor 61 · Yard +13 spaces`)
+  const grew = yard.yard2 ? yardRoom(c, s, yard) - cellsBefore : 0;
+  events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks, ...(look ? { look: look.id } : {}),
+    ...(grew > 0 ? { yard: { cap: decorCap(c, s, yard), spaces: grew } } : {}) });
   // the level's beds (homestead.plots: Lv1 8 … Lv17 41, tilled, SGODOT-355 b1), dropped in with the level's look.
   const added = addPlots(c, s);
   if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'homestead' });

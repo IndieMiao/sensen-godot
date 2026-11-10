@@ -41,7 +41,7 @@ import { isWild, near3Sites, siteFor, wildById, wildNear3 } from './wild.js';
 
 /** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
  * answer; null when not known. */
-export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean; wing8?: boolean } = {}) {
+export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean; wing8?: boolean; yard2?: boolean } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
@@ -87,7 +87,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       // q(208) ①: the row's second part as shown (cityRegion: state in the US, else the country, none when it is the
       // city's own name); `admins` stays for clients from before
       regions: Object.fromEntries(s.travel.fallback.near10.map(id => [id, cityRegion(c, id)])) },
-    decor: decorView(c, s),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
+    decor: decorView(c, s, { wing8: !!opts.wing8, yard2: !!opts.yard2 }),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
     skills,
     plots: s.plots.map(p => ({
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,

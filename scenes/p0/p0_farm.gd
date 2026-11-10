@@ -79,6 +79,14 @@ var _front_cell := Vector2i(-1, -1)
 var _plot_sig := ""
 var _sync_t := 0.0
 var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestead Lv3
+## Yard v2 (v4q(12) ③ ④): the yard grew to the level's (P0Garden.yard_at: Lv13 row 19, Lv14 columns 19–20) — the walk
+## grid, the fence ring and the ground's yard have moved this frame. animate: the level came in this session (the
+## fence drops in again); false for the level the farm was opened at. 盘古's woods give way with it.
+signal yard_grown(level: int, animate: bool)
+var _yard_walk := P0Garden.WALK_RECT          # the walk the grid has open (the plan's own until the first view)
+var _yard_ring: Dictionary = P0Garden.FENCE_RING
+var _yard_seen := false                        # a view has been read: a later grow is this session's
+var _fixed_blocks := {}                        # cells shut at build (rocks, the front fence, sign, mailbox): a grown yard never opens them
 var _looks: Node3D   # p0_looks.gd: Porch, Kitchen Wing and the Lv10 house by the view's looks
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
@@ -272,11 +280,11 @@ func _build_world() -> void:
 	add_child(_woods)
 	_woods.build(bp)
 	grass.shader = preload("res://modules/farm/shaders/meadow_woods.gdshader")
-	P0Garden.block_points(bp, _scenery.rock_points)   # rocks collide; crops and bushes don't
+	_block(_scenery.rock_points)   # rocks collide; crops and bushes don't
 	_fence = Fence.new()
 	add_child(_fence)
 	_fence.build(bp)
-	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))   # the yard fence in front of the house collides
+	_block(P0Garden.fence_block_points(bp))   # the yard fence in front of the house collides
 	_looks = Looks.new()   # the Homestead looks beside and as the farmhouse (LOOK-PICK, SGODOT-282)
 	add_child(_looks)
 	_looks.build(bp, house, _style, _fence, P0Runtime.ensure().ui)   # before rt is set (_ready builds the world first)
@@ -284,7 +292,7 @@ func _build_world() -> void:
 	# The Homestead sign: its own tap target beside the door, not the door (LOCK-11 / LOCK-07).
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
-	P0Garden.block_points(bp, [_sign])
+	_block([_sign])
 	# The Upgrade Plaque: art placeholder (a smaller sign.glb) until its model lands. Not solid: it appears only after
 	# the first upgrade, and an invisible block before then would stop the player for no visible reason.
 	_plaque = P0Garden.plaque_point(bp)
@@ -306,7 +314,7 @@ func _build_world() -> void:
 	props.add_child(_notice_node)
 	_mailbox = P0Garden.mailbox_point(bp)
 	props.add_child(_mailbox_prop(_mailbox))
-	P0Garden.block_points(bp, [_mailbox])
+	_block([_mailbox])
 	grid = BlueprintGrid.new(bp)
 	_looks.grid = grid   # a shown porch, wing or whole house stands on cells one walks round (亚瑟 on #896)
 	# One thick soil bed per plot (plot.glb), tinted per state (watered beds read darker).
@@ -444,6 +452,48 @@ func _fit_opening() -> void:
 
 const OPEN_SIDE_PX := 16.0
 const ISLAND_RECT := Rect2i(0, -3, 21, 23)   # the yard (WALK_RECT) and a cell's margin round it: the farthest the opening zooms out
+
+## Shut the cells under these points in the plan (P0Garden.block_points) and keep them shut when the yard grows.
+func _block(points: Array) -> void:
+	P0Garden.block_points(bp, points)
+	for p in points: _fixed_blocks[bp.world_to_cell(p)] = true
+
+## The yard at the view's level (yard v2): when its walk is not the one open, the cells between are opened (or shut),
+## the fence ring and the ground follow, pieces and yard facilities on opened cells turn solid, and yard_grown says so.
+func _sync_yard(v: Dictionary) -> void:
+	var lv := int(v.get("homestead", {}).get("level", 1))
+	var yard := P0Garden.yard_at(lv)
+	var walk: Rect2i = yard.walk
+	var animate := _yard_seen
+	_yard_seen = true
+	if walk == _yard_walk: return
+	for c in yard_cells_between(_yard_walk, walk):
+		var on := walk.has_point(c) and not P0Garden._in_footprint(c) and not _fixed_blocks.has(c)
+		P0Garden.set_walkable(bp, c, on)
+		grid.set_solid(c, not on)
+	_yard_walk = walk
+	_yard_ring = yard.ring
+	_fence.set_level(lv, animate)
+	_scenery.show_strips(lv)
+	if ground != null and ground.material_override is ShaderMaterial:
+		(ground.material_override as ShaderMaterial).set_shader_parameter("yard", Vector4(float(_yard_ring.west), float(_yard_ring.back), float(_yard_ring.east), float(_yard_ring.front)))
+	if _decor != null: _decor.walk_changed()
+	if _facilities != null: _facilities.walk_changed()
+	yard_grown.emit(lv, animate)
+
+## The cells in one walk rect and not the other.
+static func yard_cells_between(a: Rect2i, b: Rect2i) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	var all := a.merge(b)
+	for y in range(all.position.y, all.end.y):
+		for x in range(all.position.x, all.end.x):
+			var c := Vector2i(x, y)
+			if a.has_point(c) != b.has_point(c): out.append(c)
+	return out
+
+## The island at the yard's level now (yard v2: as much bigger as the yard grew, ISLAND_RECT up to Lv12).
+func island_rect() -> Rect2i:
+	return ISLAND_RECT.grow_individual(0, 0, _yard_walk.end.x - P0Garden.WALK_RECT.end.x, _yard_walk.end.y - P0Garden.WALK_RECT.end.y)
 var _opening_zoom := false   # the opening zoomed out; walking eases the follow camera back to REST_ZOOM
 
 ## Zoom out (never in) until every point fits `inner`, at most to the island and its margin, then centre them in it.
@@ -451,7 +501,8 @@ func _frame_opening(points: Array[Vector3], inner: Rect2) -> void:
 	var span := _screen_bounds(points)
 	var need := maxf(span.size.x / maxf(inner.size.x, 1.0), span.size.y / maxf(inner.size.y, 1.0))
 	var island: Array[Vector3] = []
-	for c in [ISLAND_RECT.position, Vector2i(ISLAND_RECT.end.x, ISLAND_RECT.position.y)]: island.append(bp.cell_to_world(c))
+	var isle := island_rect()
+	for c in [isle.position, Vector2i(isle.end.x, isle.position.y)]: island.append(bp.cell_to_world(c))
 	var most := maxf(1.0, _screen_bounds(island).size.x / maxf(inner.size.x, 1.0))
 	var k := clampf(need, 1.0, most)
 	if k > 1.0:
@@ -756,7 +807,7 @@ func placement_drag(px: Vector2, at: Vector2) -> void:
 	if a is Vector3 and b is Vector3: placement_pan(a - b)
 
 func _yard_clamp(f: Vector3) -> Vector3:
-	var r := P0Garden.FENCE_RING
+	var r := _yard_ring
 	var pad := bp.cell_m
 	return Vector3(clampf(f.x, r.west - pad, r.east + pad), f.y, clampf(f.z, r.back - pad, r.front + pad))
 
@@ -836,6 +887,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_follow(dt)
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
+	_sync_yard(v)
 	_fence.sync(v)
 	_looks.sync(v)
 	_scenery.show_wing(_looks.wing_model_shown())   # q(303): no grass or flowers through the wing's floor
@@ -1645,7 +1697,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 			print("P0_WALKHASH ", JSON.stringify({"mask": str(bp.masks.walkable).hash(), "solid": str(solid).hash(), "solid_n": solid.size()}))
 		"island":   # the whole island in the picture, as far as the opening may zoom out (#624 walkthrough: a farm end to end)
 			var corners: Array[Vector3] = []
-			for c in [ISLAND_RECT.position, ISLAND_RECT.end, Vector2i(ISLAND_RECT.position.x, ISLAND_RECT.end.y), Vector2i(ISLAND_RECT.end.x, ISLAND_RECT.position.y)]:
+			var isle := island_rect()
+			for c in [isle.position, isle.end, Vector2i(isle.position.x, isle.end.y), Vector2i(isle.end.x, isle.position.y)]:
 				corners.append(bp.cell_to_world(c))
 			_frame_opening(corners, rt.ui.open_marker_area())
 		"actorhide": _actor_fade_to = 1.0   # the yard's pieces alone, the player faded out (上官婉儿 on #276's shots)
