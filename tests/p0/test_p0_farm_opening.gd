@@ -136,6 +136,25 @@ func test_a_ground_tap_walks_there_and_a_bed_tap_to_the_path_in_front() -> void:
 	var shut := bp.cell_to_world(P0Garden.cell_of(32))   # not open at Lv1: grass to the player
 	assert_vector(P0Farm.tap_target(bp, shut, 8)).is_equal(shut)
 
+## iOS 0.3.6 (2) (蒙恬's crash log, a new account making its farm): a ground tap before the first p0_frame — the server's
+## view not in yet, the facilities and Decorate not built — read `_facilities.placing` on a null and crashed the Release
+## build. Now it walks nowhere and says nothing.
+func test_a_ground_tap_before_the_farm_is_up_does_nothing() -> void:
+	var stub := GDScript.new()
+	stub.source_code = "extends \"res://scenes/p0/p0_farm.gd\"\nfunc _ready() -> void: pass\nfunc _exit_tree() -> void: pass\nfunc _process(_d) -> void: pass\n"
+	stub.reload()
+	var farm: Node3D = load("res://scenes/p0/p0_farm.tscn").instantiate()
+	farm.set_script(stub)
+	add_child(auto_free(farm))
+	farm.bp = P0Garden.blueprint()
+	farm.grid = BlueprintGrid.new(farm.bp)
+	farm.actor = P0Actor.new()
+	farm.add_child(farm.actor)
+	assert_object(farm._facilities).is_null()
+	assert_object(farm._decor).is_null()
+	farm._walk_tap(Vector2(180, 400))
+	assert_bool(farm._tap_walk).is_false()
+
 ## 周瑜 on #947: the joystick takes over a tapped walk, so letting go does not turn the player to the bed.
 func test_the_joystick_ends_a_tapped_walk() -> void:
 	var farm = P0Farm.new()
