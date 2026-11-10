@@ -4,7 +4,8 @@ extends Button
 ## fish is on (hook, set by the panel) the key turns solid primary with white words and fish, pops once (POP_SCALE over
 ## POP_S, the fish swinging ±SWING_DEG twice), breathes (BREATH_SCALE, BREATH_S) and sends a primary ring RING_PX out at
 ## each breath's top; a bite whose window never closes (q(219)'s sure bite) pops again every REPOP_S with a REPOP_BUZZ_MS
-## buzz. The look only: the key's place, size and tap area stay (_has_point is the unscaled key), the ring takes no taps,
+## buzz. The ring (v1.1, 不知火舞 after the first recording: a primary one alone went unseen on the woods' green) is
+## RING_WIDTH of surface with a RING_EDGE primary outline outside it, both fading. The look only: the key's place, size and tap area stay (_has_point is the unscaled key), the ring takes no taps,
 ## and it is the plain key again the moment the fish is hooked, gets away or the panel closes.
 
 var progress := 0.0
@@ -17,7 +18,8 @@ const SWING_DEG := 10.0
 const BREATH_SCALE := 1.06
 const BREATH_S := 0.6
 const RING_PX := 18.0
-const RING_WIDTH := 3.0
+const RING_WIDTH := 3.0   # surface
+const RING_EDGE := 1.0    # primary, round its outside
 const RING_ALPHA := 0.8
 const REPOP_S := 2.5
 const REPOP_BUZZ_MS := 40
@@ -46,7 +48,7 @@ func _ready() -> void:
 	_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ring.visible = false
 	add_child(_ring)
-	set_process(false)
+	set_process(hooking)   # hooking already only if hook() came before the tree (哪吒 on #979)
 	visibility_changed.connect(func(): if not is_visible_in_tree(): hook(false))
 
 ## The fish on or off (the panel, each time it refreshes the key): on, the key stands out and pops; off, it is the plain
@@ -178,7 +180,8 @@ class SwingIcon extends Texture2D:
 		base.draw_rect_region(to_canvas_item, rect, src_rect, modulate, transpose, clip_uv)
 		RenderingServer.canvas_item_add_set_transform(to_canvas_item, Transform2D())
 
-## The ring behind the key: its rounded edge grown `grow` px, primary at `alpha`, RING_WIDTH wide.
+## The ring behind the key: its rounded edge grown `grow` px — RING_WIDTH of surface inside, RING_EDGE of primary
+## round it (v1.1: the cream shows on the woods, the green edge on the sand), both at `alpha`.
 class _Ring extends Control:
 	var grow := 0.0
 	var alpha := 0.0
@@ -186,10 +189,12 @@ class _Ring extends Control:
 	func _draw() -> void:
 		var key := get_parent() as Control
 		var base := key.get_theme_stylebox(&"normal") as StyleBoxFlat if key else null
-		var sb := StyleBoxFlat.new()
-		sb.draw_center = false
-		sb.set_border_width_all(int(RING_WIDTH))
-		sb.border_color = Color(UiTokens.COLOR_PRIMARY, alpha)
-		sb.set_corner_radius_all(int((base.corner_radius_top_left if base else 16) + grow))
-		sb.anti_aliasing = true
-		sb.draw(get_canvas_item(), Rect2(Vector2.ZERO, size).grow(grow))
+		var radius := float(base.corner_radius_top_left) if base else 16.0
+		for band in [[UiTokens.COLOR_SURFACE, RING_WIDTH, 0.0], [UiTokens.COLOR_PRIMARY, RING_EDGE, RING_EDGE]]:
+			var sb := StyleBoxFlat.new()
+			sb.draw_center = false
+			sb.set_border_width_all(int(band[1]))
+			sb.border_color = Color(band[0], alpha)
+			sb.set_corner_radius_all(int(radius + grow + float(band[2])))
+			sb.anti_aliasing = true
+			sb.draw(get_canvas_item(), Rect2(Vector2.ZERO, size).grow(grow + float(band[2])))
