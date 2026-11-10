@@ -12,9 +12,13 @@ const UNKNOWN := {"id": "sf_unknown_1", "role": "chapel", "name": "Test Chapel",
 	"art": "poi_chapel", "anchors": "res://assets/p0/outposts/chapel.anchors.json", "keeper": {}, "residents": []}
 
 class Room extends "res://scenes/p0/p0_outpost.gd":
+	var searches := 0   # floor searches (reachable), counted for the frame cost test
 	func setup(a: Dictionary) -> void:
 		super.setup(a)
 		use_runtime = false
+	func reachable(at: Vector3, clear := 0, avoid: Array = []) -> Vector3:
+		searches += 1
+		return super(at, clear, avoid)
 
 func before_test() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())
@@ -218,6 +222,26 @@ func test_gabriel_opens_at_his_talking_spot() -> void:
 	r._card = ""
 	r.actor.teleport(r.room.position + Vector3(-0.375, r.floor_y, 1.03))   # the aisle beside the second left pew
 	assert_str(r.card_pick(marks)).is_equal("seat_left_2")
+
+## 0.3.6 r2 (the user on 0.3.5: the church's frame rate was low, 22 fps on a vivo): the pew seats' near points are found
+## once — card_pick, every frame, searched the floor for each of the eight seats, about 9 ms a frame on an M4. Picking
+## again searches nothing, and the points are the ones a search finds.
+func test_picking_a_card_does_not_search_the_floor_every_frame() -> void:
+	var r := _room(CHURCH_ID)
+	await get_tree().process_frame
+	var marks := {}
+	for n in r._tappable():
+		var m: Dictionary = r._marker(n, {})
+		if not m.is_empty(): marks[n] = m
+	r.actor.teleport(r.room.position + Vector3(-0.375, r.floor_y, 1.03))
+	assert_str(r.card_pick(marks)).is_equal("seat_left_2")
+	var after_first := r.searches
+	for i in 10: r.card_pick(marks)
+	assert_int(r.searches).is_equal(after_first)
+	for n in r._lone_seats():
+		var appr: Array = r.anchor_data(n).approach
+		var at := (r.anchor(n).get_parent() as Node3D).to_global(Vector3(float(appr[0]), float(appr[1]), float(appr[2])))
+		assert_vector(r._near_point(n)).is_equal(r.reachable(at))
 
 ## q(300) v1.2, SGODOT-445 (the user 11-08; 不知火舞 priest-buff ui-spec v1.2 §2): one full-width `Pray` over
 ## `Any stories?`; each tap draws Twin Catch or Swift Growth half and half and sends the buff command, the card stays up.

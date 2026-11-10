@@ -332,13 +332,18 @@ func _lone_seats() -> PackedStringArray:
 func _pews() -> bool: return PEW_KITS.has(str(outpost.get("art", "")))
 
 ## A pew's seat: from the aisle end of its pew (the layout's `approach`, in the anchors' own space), slid along it to
-## the middle (_sit_down).
+## the middle (_sit_down). Found once a seat: card_pick asks for every prompt's near point every frame, and a floor
+## search for each of the eight seats each frame held Grace Cathedral at 22 fps on a phone (0.3.5, the user's vivo;
+## about 9 ms a frame on an M4). The room and its pews do not move.
+var _pew_points := {}
 func _walk_point(n: String, target: Node3D) -> Vector3:
+	if _pew_points.has(n): return _pew_points[n]
 	var appr = anchor_data(n).get("approach", null)
 	if _pews() and appr is Array and (appr as Array).size() == 3 and _lone_seats().has(n):
 		var at := (target.get_parent() as Node3D).to_global(Vector3(float(appr[0]), float(appr[1]), float(appr[2])))
 		var floor_at := reachable(at)   # the floor the door reaches (a layout moved: never slide on from afar, 周瑜)
-		return floor_at if floor_at != Vector3.INF else super(n, target)
+		_pew_points[n] = floor_at if floor_at != Vector3.INF else super(n, target)
+		return _pew_points[n]
 	return super(n, target)
 
 func _may_overlap(n: String) -> bool: return _pews() and _lone_seats().has(n)
