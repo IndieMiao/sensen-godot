@@ -841,3 +841,24 @@ func test_p0_fill_closes_only_chinese_to_chinese_gaps() -> void:
 	assert_str(P._fill("%s · %s", ["石料", "木材"])).is_equal("石料 · 木材")
 	assert_str(P._fill("已按 80%% 折成 %s", ["金币"])).is_equal("已按 80% 折成金币")
 	assert_str(P._fill("%s 「%s」", ["送你", "茶"])).is_equal("送你「茶」")
+
+## #975 (李白): the ordinals the code builds read in Chinese — the third cook's XP float `No XP · 3rd today`
+## 「无经验 · 今日第 3 次」 (not 「今日3rd 次」), and the level-up unlock rows for another facility, taken from the real
+## level_unlocks: 2nd Greenhouse, 2nd and 3rd Fish Trap. With #974's _fill: only spaces beside Chinese ever go.
+func test_p0_ordinals_and_the_unlock_rows_read_in_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	assert_str(zh.call("No XP · %s today" % P0KitchenLogic.ordinal(3))).is_equal("无经验 · 今日第 3 次")
+	assert_str(zh.call("No XP · %s today" % P0KitchenLogic.ordinal(1))).is_equal("无经验 · 今日第 1 次")
+	assert_str(zh.call(P0KitchenLogic.ordinal(2))).is_equal("第 2")   # Cooks today's fact
+	var want := {"2nd Greenhouse": "第 2 个温室", "2nd Fish Trap": "第 2 个鱼笼", "3rd Fish Trap": "第 3 个鱼笼"}
+	var rows: Array = []
+	for skill in ["farming", "fishing"]:
+		for lv in range(1, 21):
+			for row in P0Logic.level_unlocks({}, skill, lv):
+				if str(row).begins_with("2nd ") or str(row).begins_with("3rd "): rows.append(str(row))
+	assert_array(rows).contains_exactly_in_any_order(want.keys())
+	for row in rows: assert_str(zh.call(row)).is_equal(want[row])
+	TranslationServer.remove_translation(t)
