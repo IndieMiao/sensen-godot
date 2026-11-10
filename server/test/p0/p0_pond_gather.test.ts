@@ -63,9 +63,13 @@ describe('pond gathering points (409)', () => {
     expect(count(s.bag, 'fiber')).toBe(4);
     expect(r.events).toContainEqual(expect.objectContaining({ kind: 'gather', spot: `${FERN}#L3`, ready_in: 4 * H }));
     expect(at({ type: 'gather', spot: `${FERN}#L3` }, T + H)).toMatchObject({ ok: false, code: 'not_ready' });
-    const v = viewOf(c, s, T + H).gather as { pond: { pond: string; shape: string; points: { id: string; ready_in: number }[] }; city_ready: Record<string, number> };
+    const v = viewOf(c, s, T + H).gather as { pond: { pond: string; shape: string; points: { id: string; ready_in: number; cooldown_h: number }[] };
+      city_ready: Record<string, number>; ponds: Record<string, { points: Record<string, unknown>[] }> };
     expect(v.pond).toMatchObject({ pond: FERN, shape: 'crescent' });
     expect(v.pond.points.find(p => p.id === `${FERN}#L3`)!.ready_in).toBe(3 * H);
+    // the whole cooldown beside it (不知火舞's gather-compact spec v1): grown back 1 − 3 / 4; the far ponds' points need none
+    expect(v.pond.points.every(p => p.cooldown_h === 4)).toBe(true);
+    expect('cooldown_h' in v.ponds[FERN].points[0]).toBe(false);
     expect(v.city_ready[`${FERN}#L3`]).toBe(3 * H);
     const elsewhere = applyP0(c, s, { type: 'gather', spot: `${FERN}#L2`, space: 'pond', place: 'pond_san_francisco_04' } as unknown as P0Command, T + 2 * H);
     expect(elsewhere).toMatchObject({ ok: false, code: 'not_here' });
