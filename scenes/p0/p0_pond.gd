@@ -41,6 +41,8 @@ var _gather_tag := ""    # the point whose name bar is up
 var _gather_marked := "" # the point the guide's `!` is on
 var _scenery: Node3D
 var _trees: Array = []   # the walk's cells the bank's trees block (PondWalk.set_trees), freed when they move
+var _water: FishingWater
+var foam_usecs: Array[int] = []   # each shore foam's making, µs (SGODOT-422's budget: 30 ms)
 var _scenery_clear: Array = []   # the points the bank's scenery was built keeping off
 var _scenery_keys := Callable()   # … and the opening screen's action keys (_opening_keys)
 ## The farthest pinch: the farm's 0.8 widened so the open-water ponds (SGODOT-374, 不知火舞: up to 9.7 m across) still
@@ -163,9 +165,12 @@ func _ready() -> void:
 	gather.sync(P0Runtime.ensure().session.current())
 	_build_scenery(PondGather.clear_points(P0Runtime.ensure().session.current()))   # 410: the bank keeps off the points
 	add_child(gather)
+	site_spec["foam"] = "runtime"   # not the baked mask (the old round stones'): the bank's own, below
 	var water := FishingWater.build(str(entry.id), site_spec)
 	water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
 	add_child(water)
+	_water = water
+	_apply_foam()
 	var bank := water.find_child("NaturalWaterBank", true, false)
 	if bank: bank.visible = false   # SGODOT-422 v7: the wild ground's sand band and rock groups are the bank, not the round stones
 	actor = P0Actor.new()
@@ -304,6 +309,19 @@ func _build_scenery(clear: Array) -> void:
 	if grid: _trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(clear, _scenery_keys), _trees, actor.position if actor else Vector3.INF)   # the trees that stand now
 	add_child(_scenery)
 	move_child(_scenery, cam.get_index() + 1)
+	_apply_foam()   # the rocks keep off the points too: the foam follows them
+
+## The water's shore foam from the bank as it is built now (SGODOT-422, the user's 0.3.5: the baked mask's foam stood
+## where the old round stones were); none until the water is there (the opening builds the bank first).
+func _apply_foam() -> void:
+	if _water == null or not (_scenery is PondScenery): return
+	var started := Time.get_ticks_usec()
+	var tex := (_scenery as PondScenery).foam_contact()
+	if tex: foam_usecs.append(Time.get_ticks_usec() - started)
+	_water.water_material.set_shader_parameter("foam_contact", tex)
+	_water.water_material.set_shader_parameter("has_foam_contact", tex != null)
+	# the bank's froth near white (上官婉儿 11-10: as white as the old mask's at the bank); the old ponds keep 0.60
+	if tex: _water.water_material.set_shader_parameter("contact_foam_opacity", PondScenery.PondWildFoam.CONTACT_OPACITY)
 
 func _gather_marks(v: Dictionary, near: Dictionary) -> void:
 	var id := str(near.get("id", "")) if not near.is_empty() and PondGather.flat(PondGather.stand_of(near), actor.position) <= PondGather.TAG_M else ""
@@ -773,6 +791,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"rinfo":   # this frame's triangles and draw calls (scene art budgets, SGODOT-422)
 			print("P0_RINFO ", JSON.stringify({"prims": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
 				"draws": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)}))
+		"foaminfo":   # the shore foam's making times so far, µs (SGODOT-422: the first, then each rebuild)
+			print("P0_FOAM ", JSON.stringify(foam_usecs))
 		"nofoam":   # SGODOT-272's before shots: the shore foam off
 			for w in find_children("*", "FishingWater", true, false): w.water_material.set_shader_parameter("has_foam_contact", false)
 		_: return false

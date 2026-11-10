@@ -82,8 +82,9 @@ static func build(site_id: String, site_override: Dictionary = {}) -> FishingWat
 		material.set_shader_parameter("caustics", preload("res://assets/ponds/art/caustic_web.png"))
 		material.set_shader_parameter("ripple_field", preload("res://assets/ponds/art/pond_ripple_field.png"))
 		material.set_shader_parameter("foam_pattern", preload("res://assets/ponds/art/foam/foam_pattern.png"))
+		# the P0 wild pond (spec.foam "runtime") sets its own, made from its bank as it stands (PondScenery.foam_contact)
 		var foam_contact_path := (art + "foam/" if art != "" else "res://assets/ponds/art/foam/") + "%s.png" % site_id
-		if ResourceLoader.exists(foam_contact_path):
+		if str(spec.get("foam", "")) != "runtime" and ResourceLoader.exists(foam_contact_path):
 			material.set_shader_parameter("foam_contact", load(foam_contact_path))
 			material.set_shader_parameter("has_foam_contact", true)
 		material.set_shader_parameter("fish_paths", _pond_fish_paths(spec))

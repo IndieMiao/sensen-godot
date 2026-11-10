@@ -51,8 +51,10 @@ static func build(entry: Dictionary, spec: Dictionary, clear: Array = [], trees:
 	var shape_key := "%s|%d" % [str(polygon).hash(), seed_value]
 	if not _CACHE.has(shape_key):
 		if _CACHE.size() >= CACHE_MAX: _CACHE.erase(_CACHE.keys()[0])   # the oldest (a Dictionary keeps insertion order)
-		_CACHE[shape_key] = [_mesh(polygon, TERRACE_M, seed_value), _water_sdf(polygon)]
+		var distances := _water_distances(polygon)
+		_CACHE[shape_key] = [_mesh(polygon, TERRACE_M, seed_value), _sdf_texture(distances), distances]
 	ground.mesh = _CACHE[shape_key][0]
+	root.set_meta("water_distances", _CACHE[shape_key][2])   # the shore foam's too (PondWildFoam, via PondScenery)
 	var material := ShaderMaterial.new()
 	material.shader = preload("res://modules/ponds/pond_wild_ground.gdshader")
 	material.set_shader_parameter("water_sdf", _CACHE[shape_key][1])
@@ -125,6 +127,25 @@ static func _mesh(polygon: PackedVector2Array, terrace: float, seed_value: int) 
 
 ## Metres to the water's edge on a 0.25 m grid (<0 in the water), for the shader's rounded sand band.
 static func _water_sdf(polygon: PackedVector2Array) -> ImageTexture:
+	return _sdf_texture(_water_distances(polygon))
+
+## The same distances, row by row (SDF_EXTENT / SDF_PX cells): the ground's texture and the shore foam both read them.
+static func _water_distances(polygon: PackedVector2Array) -> PackedFloat32Array:
+	var w := int(SDF_EXTENT.x / SDF_PX)
+	var h := int(SDF_EXTENT.y / SDF_PX)
+	var out := PackedFloat32Array()
+	out.resize(w * h)
+	for y in h:
+		for x in w:
+			var p := SDF_ORIGIN + (Vector2(x, y) + Vector2(0.5, 0.5)) * SDF_PX
+			var d := 99.0
+			if not polygon.is_empty():
+				d = p.distance_to(_nearest(p, polygon))
+				if Geometry2D.is_point_in_polygon(p, polygon): d = -d
+			out[y * w + x] = d
+	return out
+
+static func _sdf_texture(distances: PackedFloat32Array) -> ImageTexture:
 	var w := int(SDF_EXTENT.x / SDF_PX)
 	var h := int(SDF_EXTENT.y / SDF_PX)
 	# half float, not FORMAT_RF: 32-bit float textures are not filterable on iOS (Metal) and on many GLES3 phones (no
@@ -133,12 +154,7 @@ static func _water_sdf(polygon: PackedVector2Array) -> ImageTexture:
 	var img := Image.create_empty(w, h, false, Image.FORMAT_RH)
 	for y in h:
 		for x in w:
-			var p := SDF_ORIGIN + (Vector2(x, y) + Vector2(0.5, 0.5)) * SDF_PX
-			var d := 99.0
-			if not polygon.is_empty():
-				d = p.distance_to(_nearest(p, polygon))
-				if Geometry2D.is_point_in_polygon(p, polygon): d = -d
-			img.set_pixel(x, y, Color(d, 0, 0))
+			img.set_pixel(x, y, Color(distances[y * w + x], 0, 0))
 	return ImageTexture.create_from_image(img)
 
 static func _nearest(p: Vector2, polygon: PackedVector2Array) -> Vector2:
@@ -183,6 +199,7 @@ static func _bank_rocks(entry: Dictionary, polygon: PackedVector2Array, clear: A
 		picked.append(at)
 		if picked.size() >= 4: break
 	var out := {}
+	var contacts: Array = []   # Vector3(x, z, radius) a rock: where the shore foam rings (PondWildFoam)
 	for at in picked:
 		var k := 0
 		for i in n:
@@ -209,8 +226,18 @@ static func _bank_rocks(entry: Dictionary, polygon: PackedVector2Array, clear: A
 				out[g].append(Transform3D(Basis(Vector3.UP, rng.randf_range(0, TAU)).scaled(Vector3.ONE * rng.randf_range(0.5, 0.8)), Vector3(f.x, -0.02, f.y)))
 			if not out.has(asset): out[asset] = []
 			out[asset].append(Transform3D(Basis(Vector3.UP, yaw + rng.randf_range(-0.4, 0.4)).scaled(Vector3(s, s, s)), Vector3(p.x, sink, p.y)))
+			contacts.append(Vector3(p.x, p.y, footprint(asset) * s))
 	for asset in out: root.add_child(Art.batch(asset, out[asset]))
+	root.set_meta("contacts", contacts)
 	return root
+
+## A piece's radius on the ground at scale 1: its mesh's box, the mean of its half sizes, a little in from the box's
+## corners (the pack's rocks are rounded); 0.3 m when the piece is not in this build.
+static func footprint(asset: String) -> float:
+	var mesh: Mesh = Art.mesh_for(asset) if ResourceLoader.exists(Art.ROOT + asset + ".glb") else null
+	if mesh == null: return 0.3
+	var box := mesh.get_aabb()
+	return (box.size.x + box.size.z) * 0.25 * 0.9
 
 static func _hash2(i: int, j: int, seed_value: int) -> float:
 	return float(hash([i, j, seed_value]) & 0xffff) / 65535.0
