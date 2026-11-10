@@ -610,7 +610,7 @@
  },
  "%s for %s": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:864"
+   "modules/p0/p0_kitchen_logic.gd:868"
   ],
   "kind": "template",
   "done": true
@@ -866,6 +866,12 @@
   ],
   "kind": "template",
   "done": true
+ },
+ "%s · %s +1\nSell value: %d coins": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:347"
+  ],
+  "kind": "template"
  },
  "%s · %s cooking": {
   "where": [
@@ -1201,14 +1207,14 @@
  },
  "%s, %s +%d more": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:996"
+   "modules/p0/p0_kitchen_logic.gd:1000"
   ],
   "kind": "template",
   "done": true
  },
  "%s, %s and %s": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:995"
+   "modules/p0/p0_kitchen_logic.gd:999"
   ],
   "kind": "template",
   "done": true
@@ -1296,7 +1302,7 @@
    "modules/p0/p0_kitchen_logic.gd:274",
    "modules/p0/p0_kitchen_logic.gd:485",
    "modules/p0/p0_kitchen_logic.gd:656",
-   "modules/p0/p0_kitchen_logic.gd:1028",
+   "modules/p0/p0_kitchen_logic.gd:1032",
    "modules/p0/p0_logic.gd:1440"
   ],
   "kind": "template",
@@ -1340,7 +1346,7 @@
  },
  "+%d coins": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:1033",
+   "modules/p0/p0_kitchen_logic.gd:1037",
    "scenes/p0/p0_ui.gd:2837",
    "scenes/p0/panels/p0_fish_dex.gd:158",
    "scenes/p0/panels/p0_fish_dex.gd:174",
@@ -1360,7 +1366,7 @@
   "where": [
    "modules/p0/p0_bite_board.gd:172",
    "modules/p0/p0_item_info.gd:522",
-   "modules/p0/p0_kitchen_logic.gd:963",
+   "modules/p0/p0_kitchen_logic.gd:967",
    "modules/p0/p0_logic.gd:401",
    "modules/p0/p0_logic.gd:554"
   ],
@@ -1459,7 +1465,7 @@
  },
  "2nd pot today · half XP": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:888"
+   "modules/p0/p0_kitchen_logic.gd:892"
   ],
   "kind": "line",
   "done": true
@@ -1487,7 +1493,7 @@
  },
  "3rd pot today · no XP": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:889"
+   "modules/p0/p0_kitchen_logic.gd:893"
   ],
   "kind": "line",
   "done": true
@@ -1606,6 +1612,7 @@
  },
  "A bite! Tap to hook the fish!": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:310",
    "scenes/p0/p0_fishing_panel.gd:224"
   ],
   "kind": "line",
@@ -1774,7 +1781,7 @@
  },
  "Add %s to cook this recipe again.": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:754"
+   "modules/p0/p0_kitchen_logic.gd:758"
   ],
   "kind": "template",
   "done": true
@@ -1789,6 +1796,13 @@
  "Afternoon Tea": {
   "where": [
    "assets/p0/content/requests_p1.json#title"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Again": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:193"
   ],
   "kind": "line",
   "done": true
@@ -2298,6 +2312,13 @@
   "kind": "line",
   "done": true
  },
+ "Bag full: your fish is safe in overflow.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:348"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Bag ×%d": {
   "where": [
    "modules/p0/p0_item_info.gd:565"
@@ -2473,7 +2494,7 @@
  },
  "Big Pot": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:768",
+   "modules/p0/p0_kitchen_logic.gd:772",
    "scenes/p0/rooms/p0_farmhouse.gd:487"
   ],
   "kind": "line",
@@ -2879,12 +2900,6 @@
   "kind": "line",
   "done": true
  },
- "CITY_POI": {
-  "where": [
-   "scenes/map/city_map_view.gd:990"
-  ],
-  "kind": "line"
- },
  "Cabbage": {
   "where": [
    "assets/p0/content/farm_crops.json#name"
@@ -2958,7 +2973,7 @@
  },
  "Can cook again": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:753"
+   "modules/p0/p0_kitchen_logic.gd:757"
   ],
   "kind": "line",
   "done": true
@@ -3098,14 +3113,23 @@
    "modules/p0/p0_logic.gd:1280",
    "modules/p0/p0_logic.gd:1287",
    "modules/p0/p0_runtime.gd:1243",
-   "scenes/p0/p0_pond.gd:267",
-   "scenes/p0/p0_pond.gd:298"
+   "scenes/fishing/fishing_panel.gd:192",
+   "scenes/fishing/fishing_panel.gd:192"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Cast line": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:193"
   ],
   "kind": "line",
   "done": true
  },
  "Cast when you are ready.": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:176",
+   "scenes/fishing/fishing_panel.gd:218",
    "scenes/p0/p0_fishing_panel.gd:178",
    "scenes/p0/p0_fishing_panel.gd:310"
   ],
@@ -3121,6 +3145,7 @@
  },
  "Casting...": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:261",
    "scenes/p0/p0_fishing_panel.gd:149"
   ],
   "kind": "line",
@@ -3311,6 +3336,13 @@
    "scenes/p0/panels/p0_settings_page.gd:49",
    "scenes/p0/panels/p0_sys_screen.gd:295",
    "scenes/p0/panels/p0_sys_screen.gd:305"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Checking your catch": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:380"
   ],
   "kind": "line",
   "done": true
@@ -3829,6 +3861,13 @@
   "kind": "line",
   "done": true
  },
+ "Connection interrupted. Tap Retry to check this cast.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:380"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Connection lost": {
   "where": [
    "scenes/p0/p0_fishing_panel.gd:303"
@@ -3874,7 +3913,7 @@
  },
  "Cook Again": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:757",
+   "modules/p0/p0_kitchen_logic.gd:761",
    "modules/p0/p0_logic.gd:1406"
   ],
   "kind": "line",
@@ -3911,7 +3950,7 @@
  },
  "Cook with %s?": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:949"
+   "modules/p0/p0_kitchen_logic.gd:953"
   ],
   "kind": "template",
   "done": true
@@ -3941,8 +3980,8 @@
  },
  "Cookbook %d/%d": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:1029",
-   "modules/p0/p0_kitchen_logic.gd:1039",
+   "modules/p0/p0_kitchen_logic.gd:1033",
+   "modules/p0/p0_kitchen_logic.gd:1043",
    "modules/p0/p0_titles.gd:28",
    "modules/p0/p0_titles.gd:32"
   ],
@@ -3968,7 +4007,7 @@
    "modules/p0/p0_kitchen_logic.gd:74",
    "modules/p0/p0_kitchen_logic.gd:92",
    "modules/p0/p0_kitchen_logic.gd:167",
-   "modules/p0/p0_kitchen_logic.gd:749",
+   "modules/p0/p0_kitchen_logic.gd:753",
    "scenes/p0/rooms/p0_farmhouse.gd:494"
   ],
   "kind": "line",
@@ -3998,7 +4037,7 @@
  },
  "Cooking XP": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:751"
+   "modules/p0/p0_kitchen_logic.gd:755"
   ],
   "kind": "line",
   "done": true
@@ -4012,7 +4051,7 @@
  },
  "Cooks today": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:750"
+   "modules/p0/p0_kitchen_logic.gd:754"
   ],
   "kind": "line",
   "done": true
@@ -4281,6 +4320,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Crescent pond": {
+  "where": [
+   "modules/ponds/system_ponds.gd:6"
+  ],
+  "kind": "line"
  },
  "Cress": {
   "where": [
@@ -5125,6 +5170,7 @@
  },
  "Equip a fishing rod on the character page first.": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:425",
    "scenes/map/journey_street.gd:673"
   ],
   "kind": "line",
@@ -5504,6 +5550,12 @@
   "kind": "line",
   "done": true
  },
+ "Finger2_": {
+  "where": [
+   "modules/fishing/fishing_presentation.gd:379"
+  ],
+  "kind": "line"
+ },
  "Finish or drop a request first": {
   "where": [
    "modules/p0/p0_logic.gd:1710"
@@ -5696,10 +5748,20 @@
   "kind": "line",
   "done": true
  },
+ "Fish caught!": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:370"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Fish escaped": {
   "where": [
-   "scenes/p0/p0_fishing_panel.gd:219",
-   "scenes/p0/p0_fishing_panel.gd:258"
+   "scenes/fishing/fishing_panel.gd:337",
+   "scenes/fishing/fishing_panel.gd:356",
+   "scenes/fishing/fishing_panel.gd:374",
+   "scenes/fishing/fishing_panel.gd:382",
+   "scenes/p0/p0_fishing_panel.gd:219"
   ],
   "kind": "line",
   "done": true
@@ -5852,8 +5914,16 @@
   "kind": "line",
   "done": true
  },
+ "Fishing did not finish": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:383"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Fishing interrupted": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:358",
    "scenes/p0/p0_fishing_panel.gd:318"
   ],
   "kind": "line",
@@ -5862,10 +5932,18 @@
  "Fishing pond": {
   "where": [
    "modules/p0/p0_city_places.gd:117",
+   "modules/ponds/system_ponds.gd:51",
    "scenes/map/city_map_view.gd:710",
    "assets/p0/p0_ponds.json#category",
-   "assets/p0/p0_ponds.json#category",
    "assets/p0/p0_ponds.json#category"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Fishing stopped. Your saved catches are safe.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:359",
+   "scenes/fishing/fishing_panel.gd:372"
   ],
   "kind": "line",
   "done": true
@@ -6205,7 +6283,7 @@
  "Full": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:671",
-   "modules/p0/p0_kitchen_logic.gd:751",
+   "modules/p0/p0_kitchen_logic.gd:755",
    "modules/p0/p0_logic.gd:971",
    "modules/p0/p0_trap.gd:101",
    "scenes/ui_kit/ui_hud.gd:70"
@@ -6329,6 +6407,7 @@
  },
  "GeometryInstance3D": {
   "where": [
+   "modules/fishing/fishing_water.gd:118",
    "scenes/p0/p0_farm.gd:695",
    "scenes/p0/p0_farm_materials.gd:66",
    "scenes/p0/p0_mine.gd:613",
@@ -6504,7 +6583,7 @@
  },
  "Gold frame": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:1036"
+   "modules/p0/p0_kitchen_logic.gd:1040"
   ],
   "kind": "line",
   "done": true
@@ -6752,7 +6831,7 @@
  },
  "Half": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:751"
+   "modules/p0/p0_kitchen_logic.gd:755"
   ],
   "kind": "line",
   "done": true
@@ -7052,6 +7131,13 @@
   "kind": "line",
   "done": true
  },
+ "Hold to reel · release to ease": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:198"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Home": {
   "where": [
    "modules/p0/p0_garden.gd:100",
@@ -7072,7 +7158,7 @@
  },
  "Home Cook": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:1014"
+   "modules/p0/p0_kitchen_logic.gd:1018"
   ],
   "kind": "line",
   "done": true
@@ -7216,6 +7302,13 @@
  "Home price": {
   "where": [
    "modules/p0/p0_item_info.gd:611"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Hook": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:192"
   ],
   "kind": "line",
   "done": true
@@ -7392,7 +7485,7 @@
  },
  "Ingredients": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:864"
+   "modules/p0/p0_kitchen_logic.gd:868"
   ],
   "kind": "line",
   "done": true
@@ -7414,7 +7507,7 @@
  },
  "Ingredients · %d/%d": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:755"
+   "modules/p0/p0_kitchen_logic.gd:759"
   ],
   "kind": "template",
   "done": true
@@ -7535,6 +7628,13 @@
  "Keep seasonings ready for cooking.": {
   "where": [
    "scenes/p0/kitchen/p0_storage_sheet.gd:78"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Keep the fish inside the green bar.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:291"
   ],
   "kind": "line",
   "done": true
@@ -7803,7 +7903,7 @@
  },
  "Legendary dishes make 1": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:766"
+   "modules/p0/p0_kitchen_logic.gd:770"
   ],
   "kind": "line",
   "done": true
@@ -8194,12 +8294,6 @@
   ],
   "kind": "line"
  },
- "MICROPHONE_DENIED": {
-  "where": [
-   "scenes/p0/p0_ui.gd:4897"
-  ],
-  "kind": "line"
- },
  "Mackerel": {
   "where": [
    "assets/p0/p0_content.json#name"
@@ -8405,7 +8499,7 @@
  },
  "Mastered %d": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:1039",
+   "modules/p0/p0_kitchen_logic.gd:1043",
    "modules/p0/p0_titles.gd:32"
   ],
   "kind": "template",
@@ -8429,7 +8523,7 @@
  },
  "Materials short": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:753"
+   "modules/p0/p0_kitchen_logic.gd:757"
   ],
   "kind": "line",
   "done": true
@@ -8510,11 +8604,11 @@
  },
  "MeshInstance3D": {
   "where": [
+   "modules/fishing/fishing_water.gd:130",
    "scenes/p0/p0_farm.gd:1228",
    "scenes/p0/p0_farm.gd:1555",
    "scenes/p0/p0_farm.gd:1632",
-   "scenes/p0/p0_farm.gd:1647",
-   "scenes/p0/p0_farm_decor.gd:341"
+   "scenes/p0/p0_farm.gd:1647"
   ],
   "kind": "line"
  },
@@ -8595,6 +8689,7 @@
  },
  "Missed the bite. Tap Hook when the float dips.": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:356",
    "scenes/p0/p0_fishing_panel.gd:219"
   ],
   "kind": "line",
@@ -8893,7 +8988,7 @@
  "Need %d more %s": {
   "where": [
    "modules/p0/p0_board.gd:71",
-   "modules/p0/p0_kitchen_logic.gd:758",
+   "modules/p0/p0_kitchen_logic.gd:762",
    "modules/p0/p0_logic.gd:2178",
    "modules/p0/p0_logic.gd:2183",
    "modules/p0/p0_logic.gd:2184"
@@ -9151,7 +9246,7 @@
  },
  "New title": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:1015",
+   "modules/p0/p0_kitchen_logic.gd:1019",
    "modules/p0/p0_logic.gd:1523",
    "scenes/p0/p0_ui.gd:3709"
   ],
@@ -9404,6 +9499,13 @@
   "kind": "line",
   "done": true
  },
+ "No fish this time. Tap Again to try another cast.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:374"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "No fish to cook": {
   "where": [
    "modules/p0/p0_logic.gd:874"
@@ -9558,7 +9660,7 @@
  },
  "None": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:751"
+   "modules/p0/p0_kitchen_logic.gd:755"
   ],
   "kind": "line",
   "done": true
@@ -9884,7 +9986,7 @@
  },
  "Only enough for 1": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:767"
+   "modules/p0/p0_kitchen_logic.gd:771"
   ],
   "kind": "line",
   "done": true
@@ -10140,107 +10242,9 @@
   ],
   "kind": "line"
  },
- "P0_AUTO": {
-  "where": [
-   "modules/p0/p0_runtime.gd:209"
-  ],
-  "kind": "line"
- },
- "P0_BJ_MOCK": {
-  "where": [
-   "modules/p0/p0_blackjack_mock.gd:14"
-  ],
-  "kind": "line"
- },
- "P0_CALIB": {
-  "where": [
-   "scenes/p0/rooms/p0_room.gd:1329"
-  ],
-  "kind": "line"
- },
- "P0_CALIB3D": {
-  "where": [
-   "scenes/p0/rooms/p0_room.gd:1329",
-   "scenes/p0/rooms/p0_room.gd:1331"
-  ],
-  "kind": "line"
- },
- "P0_CALIBMESH": {
-  "where": [
-   "scenes/p0/rooms/p0_room.gd:1327"
-  ],
-  "kind": "line"
- },
- "P0_CALIBPX": {
-  "where": [
-   "scenes/p0/rooms/p0_room.gd:1331"
-  ],
-  "kind": "line"
- },
- "P0_CARD_RECTS": {
-  "where": [
-   "scenes/p0/rooms/p0_farmhouse.gd:771"
-  ],
-  "kind": "line"
- },
- "P0_CHEFSIGN": {
-  "where": [
-   "scenes/p0/p0_farm.gd:1730"
-  ],
-  "kind": "line"
- },
- "P0_DEV_SAFE_TOP": {
-  "where": [
-   "scenes/p0/p0_ui.gd:568",
-   "scenes/p0/p0_ui.gd:568"
-  ],
-  "kind": "line"
- },
- "P0_EDGES": {
-  "where": [
-   "scenes/p0/p0_farm.gd:1756"
-  ],
-  "kind": "line"
- },
- "P0_FOAM": {
-  "where": [
-   "scenes/p0/p0_pond.gd:837"
-  ],
-  "kind": "line"
- },
- "P0_GLES_LEFT": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1911"
-  ],
-  "kind": "line"
- },
- "P0_GLES_ON": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1910"
-  ],
-  "kind": "line"
- },
  "P0_HEAT_REMIND stove=": {
   "where": [
    "scenes/p0/rooms/p0_farmhouse.gd:622"
-  ],
-  "kind": "line"
- },
- "P0_I18N_MISSES": {
-  "where": [
-   "modules/ui/localization.gd:228"
-  ],
-  "kind": "line"
- },
- "P0_KITCHEN_RECTS": {
-  "where": [
-   "scenes/p0/rooms/p0_farmhouse.gd:784"
-  ],
-  "kind": "line"
- },
- "P0_LINE": {
-  "where": [
-   "modules/p0/p0_line.gd:39"
   ],
   "kind": "line"
  },
@@ -10250,77 +10254,9 @@
   ],
   "kind": "line"
  },
- "P0_LM_ROOM": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:347"
-  ],
-  "kind": "line"
- },
  "P0_LM_WHERE screen=": {
   "where": [
    "modules/p0/p0_landmark_visit.gd:344"
-  ],
-  "kind": "line"
- },
- "P0_LOOKS": {
-  "where": [
-   "scenes/p0/p0_farm.gd:1811"
-  ],
-  "kind": "line"
- },
- "P0_LOOK_UI": {
-  "where": [
-   "modules/p0/p0_runtime.gd:2169"
-  ],
-  "kind": "line"
- },
- "P0_MEASURE": {
-  "where": [
-   "modules/p0/p0_runtime.gd:2187"
-  ],
-  "kind": "line"
- },
- "P0_PATHCELLS": {
-  "where": [
-   "scenes/p0/p0_farm.gd:1697"
-  ],
-  "kind": "line"
- },
- "P0_PROMPT_RECTS": {
-  "where": [
-   "scenes/p0/rooms/p0_room.gd:1367"
-  ],
-  "kind": "line"
- },
- "P0_RINFO": {
-  "where": [
-   "scenes/p0/p0_farm.gd:1758",
-   "scenes/p0/p0_pond.gd:834"
-  ],
-  "kind": "line"
- },
- "P0_ROOM_KIND": {
-  "where": [
-   "scenes/p0/rooms/p0_farmhouse.gd:790"
-  ],
-  "kind": "line"
- },
- "P0_SCENE": {
-  "where": [
-   "scenes/p0/p0_boot.gd:16"
-  ],
-  "kind": "line"
- },
- "P0_SERVER_URL": {
-  "where": [
-   "modules/p0/p0_session.gd:79"
-  ],
-  "kind": "line"
- },
- "P0_SHOT": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1862",
-   "scenes/p0/rooms/p0_farmhouse.gd:622"
   ],
   "kind": "line"
  },
@@ -10333,58 +10269,6 @@
  "P0_SHOT: unknown step": {
   "where": [
    "modules/p0/p0_runtime.gd:2272"
-  ],
-  "kind": "line"
- },
- "P0_SHOT_FRAMES": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1869",
-   "scenes/p0/p0_map.gd:1441",
-   "scenes/p0/p0_map.gd:1547"
-  ],
-  "kind": "line"
- },
- "P0_SHOT_LIMIT_MS": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1872"
-  ],
-  "kind": "line"
- },
- "P0_SHOT_STEPS": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1864"
-  ],
-  "kind": "line"
- },
- "P0_STOVE": {
-  "where": [
-   "scenes/p0/rooms/p0_farmhouse.gd:734"
-  ],
-  "kind": "line"
- },
- "P0_UI_RECTS": {
-  "where": [
-   "scenes/p0/rooms/p0_farmhouse.gd:745"
-  ],
-  "kind": "line"
- },
- "P0_UI_TEXTS": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1918",
-   "scenes/p0/rooms/p0_farmhouse.gd:752"
-  ],
-  "kind": "line"
- },
- "P0_WALKHASH": {
-  "where": [
-   "scenes/p0/p0_farm.gd:1780"
-  ],
-  "kind": "line"
- },
- "P0_WILD_MOCK": {
-  "where": [
-   "modules/p0/p0_wild_sites.gd:73",
-   "modules/p0/p0_wild_sites.gd:73"
   ],
   "kind": "line"
  },
@@ -11424,8 +11308,23 @@
   "kind": "line",
   "done": true
  },
+ "Reel": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:193"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Reeling in": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:194"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Reeling in the empty line…": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:337",
    "scenes/p0/p0_fishing_panel.gd:258"
   ],
   "kind": "line",
@@ -11516,7 +11415,7 @@
  },
  "Repeat this recipe with the shown ingredients.": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:754"
+   "modules/p0/p0_kitchen_logic.gd:758"
   ],
   "kind": "line",
   "done": true
@@ -11682,11 +11581,11 @@
  },
  "Retry": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:190",
+   "scenes/fishing/fishing_panel.gd:193",
    "scenes/p0/panels/p0_home_pick_page.gd:181",
    "scenes/p0/panels/p0_home_pin_page.gd:252",
-   "scenes/p0/panels/p0_settings_page.gd:275",
-   "scenes/p0/panels/p0_sys_screen.gd:295",
-   "scenes/p0/panels/p0_sys_screen.gd:305"
+   "scenes/p0/panels/p0_settings_page.gd:275"
   ],
   "kind": "line",
   "done": true
@@ -11709,6 +11608,7 @@
  },
  "Return to the water and cast again.": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:358",
    "scenes/p0/p0_fishing_panel.gd:318"
   ],
   "kind": "line",
@@ -11888,9 +11788,15 @@
   "kind": "line",
   "done": true
  },
+ "Rod": {
+  "where": [
+   "modules/fishing/fishing_presentation.gd:136"
+  ],
+  "kind": "line"
+ },
  "Room": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:864"
+   "modules/p0/p0_kitchen_logic.gd:868"
   ],
   "kind": "line",
   "done": true
@@ -11950,19 +11856,6 @@
   ],
   "kind": "line",
   "done": true
- },
- "SENSEN_LANGUAGE": {
-  "where": [
-   "modules/ui/localization.gd:26",
-   "modules/ui/localization.gd:52"
-  ],
-  "kind": "line"
- },
- "SENSEN_P0": {
-  "where": [
-   "modules/p0/p0_session.gd:326"
-  ],
-  "kind": "line"
  },
  "Salad": {
   "where": [
@@ -12040,8 +11933,16 @@
   "kind": "line",
   "done": true
  },
+ "Saving": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:193"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Saving...": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:338",
    "scenes/p0/p0_fishing_panel.gd:254",
    "scenes/p0/p0_fishing_panel.gd:259"
   ],
@@ -12075,6 +11976,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Scenery": {
+  "where": [
+   "modules/fishing/fishing_water.gd:115"
+  ],
+  "kind": "line"
  },
  "Scrim": {
   "where": [
@@ -12945,6 +12852,13 @@
   "kind": "line",
   "done": true
  },
+ "Stand near the water and reconnect to the area before casting.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:426"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Start": {
   "where": [
    "scenes/p0/p0_ui.gd:4024"
@@ -13149,6 +13063,13 @@
   ],
   "kind": "line"
  },
+ "Stop fishing": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:57"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Stop walking": {
   "where": [
    "scenes/map/journey_street.gd:528"
@@ -13298,7 +13219,7 @@
  },
  "Swap pots when the stove is empty": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:765"
+   "modules/p0/p0_kitchen_logic.gd:769"
   ],
   "kind": "line",
   "done": true
@@ -13349,20 +13270,6 @@
    "modules/p0/p0_item_info.gd:419"
   ],
   "kind": "template"
- },
- "TRAVEL_REQUIRED": {
-  "where": [
-   "scenes/p0/p0_outpost.gd:150",
-   "scenes/p0/p0_pond.gd:1055"
-  ],
-  "kind": "line"
- },
- "TRIP_EXPIRED": {
-  "where": [
-   "scenes/p0/p0_outpost.gd:150",
-   "scenes/p0/p0_pond.gd:1055"
-  ],
-  "kind": "line"
  },
  "Tackle": {
   "where": [
@@ -13494,6 +13401,14 @@
  "Tap or drag chips onto the circle, then tap Deal.": {
   "where": [
    "scenes/p0/panels/p0_blackjack_page.gd:293"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Tap to cast · tap again when a fish bites": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:175",
+   "scenes/fishing/fishing_panel.gd:198"
   ],
   "kind": "line",
   "done": true
@@ -13743,6 +13658,14 @@
   "kind": "line",
   "done": true
  },
+ "The fish escaped. Try another cast.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:345",
+   "scenes/fishing/fishing_panel.gd:427"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "The fishmonger is short today. A crate of Fine fish.": {
   "where": [
    "assets/p0/content/requests_p1.json#text"
@@ -13880,6 +13803,20 @@
  "Third-party components": {
   "where": [
    "modules/p0/p0_legal.gd:65"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "This cast has ended. Check the result, then cast again.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:428"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "This cast timed out. Cast again.": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:382"
   ],
   "kind": "line",
   "done": true
@@ -14439,6 +14376,12 @@
   "kind": "line",
   "done": true
  },
+ "Trunk": {
+  "where": [
+   "modules/ponds/pond_trees.gd:10"
+  ],
+  "kind": "line"
+ },
  "Trusted": {
   "where": [
    "assets/p0/p0_content.json#stages",
@@ -14506,6 +14449,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Twin-bay pond": {
+  "where": [
+   "modules/ponds/system_ponds.gd:6"
+  ],
+  "kind": "line"
  },
  "Two Fine dishes. I want a new special.": {
   "where": [
@@ -14769,14 +14718,14 @@
  },
  "Uses %s for %s%s.": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:999"
+   "modules/p0/p0_kitchen_logic.gd:1003"
   ],
   "kind": "template",
   "done": true
  },
  "Uses %s saved for %s": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:962"
+   "modules/p0/p0_kitchen_logic.gd:966"
   ],
   "kind": "template",
   "done": true
@@ -14794,12 +14743,6 @@
   ],
   "kind": "line",
   "done": true
- },
- "VOICE_UNAVAILABLE": {
-  "where": [
-   "modules/p0/p0_voice_room.gd:169"
-  ],
-  "kind": "line"
  },
  "Vegetable": {
   "where": [
@@ -15003,6 +14946,13 @@
   "kind": "line",
   "done": true
  },
+ "Wait": {
+  "where": [
+   "scenes/fishing/fishing_panel.gd:192"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Wait · Full in %s": {
   "where": [
    "modules/p0/p0_logic.gd:895"
@@ -15080,7 +15030,7 @@
  },
  "Warming Cabinet +%d": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:1035"
+   "modules/p0/p0_kitchen_logic.gd:1039"
   ],
   "kind": "template",
   "done": true
@@ -15094,6 +15044,7 @@
  },
  "Watch the float. Tap when a fish bites!": {
   "where": [
+   "scenes/fishing/fishing_panel.gd:271",
    "scenes/p0/p0_fishing_panel.gd:171"
   ],
   "kind": "line",
@@ -15348,6 +15299,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Winding pond": {
+  "where": [
+   "modules/ponds/system_ponds.gd:6"
+  ],
+  "kind": "line"
  },
  "Windmill": {
   "where": [
@@ -15789,7 +15746,7 @@
  },
  "a request": {
   "where": [
-   "modules/p0/p0_kitchen_logic.gd:962"
+   "modules/p0/p0_kitchen_logic.gd:966"
   ],
   "kind": "line",
   "done": true
