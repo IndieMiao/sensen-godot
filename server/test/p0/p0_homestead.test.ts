@@ -194,7 +194,7 @@ describe('Homestead batch 1 (v4q(1)): Lv1–3', () => {
     const s = fresh();
     s.homestead.level = 2;
     expect(viewOf(c, s, T0).profile).toEqual({ name: 'Farmer', city: 'San Francisco', climate: 'Temperate', since_ms: s.created_at,
-      farm: { name: "Farmer's Homestead", level: 2 } });
+      farm: { name: "Farmer's Home", level: 2 } });   // SGODOT-461
   });
 
   it('v2 saves gain Homestead Lv1, storage and the boards; the tutorial request keeps its status', () => {

@@ -142,8 +142,8 @@ describe('the main line (§14.2)', () => {
       { page: 'dish_fish_soup', button: 'cook', pulse: true }]);
     r.cook(['fish_crucian', 'crop_radish']); note();
     // S7a (v4q(4) ⑥): after the soup, before Nadia has it; the sign's !
-    expect(r.view).toMatchObject({ step: 't_upgrade', row: { line: 'Upgrade to Homestead Lv2', icon: 'level_up', go: 'sign' },
-      marks: [{ place: 'home', object: 'sign', kind: 'request' }], pip: { line: "You've got everything! Tap the Homestead sign by the door." } });
+    expect(r.view).toMatchObject({ step: 't_upgrade', row: { line: 'Upgrade to Home Lv2', icon: 'level_up', go: 'sign' },
+      marks: [{ place: 'home', object: 'sign', kind: 'request' }], pip: { line: "You've got everything! Tap the Home sign by the door." } });
     r.upgrade(); note();
     expect(r.s.homestead.level).toBe(2);
     expect(r.view.marks.find((m: any) => m.resident)).toEqual({ resident: 'res_nadia', kind: 'gift' });

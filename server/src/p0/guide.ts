@@ -442,7 +442,7 @@ export function guidePlace(c: P0Content, s: P0State, place: string): string | nu
 
 /** A place's display name: a pond's, an outpost's (the written table or the generated city's). */
 function placeName(c: P0Content, id: string): string {
-  if (id === 'home') return 'Homestead';
+  if (id === 'home') return 'Home';   // SGODOT-461: Homestead is Home in English
   const pond = placeOf(c, id);
   if (pond) return pond.name;
   const own = (c.outposts ?? []).find(o => o.id === id);

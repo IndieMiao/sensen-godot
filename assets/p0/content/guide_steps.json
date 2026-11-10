@@ -437,7 +437,7 @@
           ]
         },
         "row": {
-          "line": "Upgrade to Homestead Lv2",
+          "line": "Upgrade to Home Lv2",
           "icon": "level_up",
           "go": "sign"
         },
@@ -448,7 +448,7 @@
             "kind": "request"
           }
         ],
-        "pip": "You've got everything! Tap the Homestead sign by the door."
+        "pip": "You've got everything! Tap the Home sign by the door."
       },
       {
         "id": "t_gift",
