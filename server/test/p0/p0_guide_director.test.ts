@@ -486,6 +486,23 @@ describe('off the path', () => {
     expect(spots).toHaveLength(4);
     expect(r.view.row.go).toBe(pond);   // S7: catching fish in the same pond
   });
+  it('U2 (pond_guide): Pip\'s S5 line sends that client to the beginner pond for timber; an older one keeps the town\'s line', () => {
+    const r = new Run('director-u2-pip').pick();
+    const quick = r.sowQuick();
+    r.lettuce();
+    r.now += 46 * S;
+    const town = 'They\'re ready! Take one to Nadia at the market, and grab some timber while you\'re in town.';
+    const pond = 'They\'re ready! Take one to Nadia at the market, then grab some timber at Fern Pond.';
+    expect(r.step).toBe('t_harvest_quick');
+    expect(r.view.pip.line).toBe(town);
+    r.ponds = true;
+    expect(r.view.pip.line).toBe(pond);
+    r.harvest(quick);
+    expect(r.step).toBe('t_nadia_1');
+    expect(r.view.pip.line).toBe(pond);
+    r.ponds = false;
+    expect(r.view.pip.line).toBe(town);
+  });
   it('U2 (pond_guide): the beginner pond\'s points cooling down give way to the next material; none ready, the step passes', () => {
     const r = new Run('director-u2-cooling').pick();
     r.ponds = true;

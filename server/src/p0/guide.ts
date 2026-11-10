@@ -77,7 +77,9 @@ export interface GuideMark { place?: string; resident?: string; plot?: string; b
  * entry's own). row.countdown (a crop id): view adds ready_in (ms to that crop's soonest ripening, null if none grows),
  * count (its plots growing: one or more) and format (`mss` for a Quick Radish, q(217) ④; else `minutes`, q(97)); the
  * client writes `<line> in <time>`. */
-export interface GuideShow { row?: Record<string, unknown>; tip?: string; marks?: GuideMark[]; pip?: string }
+/** pip_pond: Pip's line for a client that gathers in the ponds alone (`pond_guide`, U2: v4q(11) note 5), in place of
+ * pip; an older one keeps pip (its town's points are still there). */
+export interface GuideShow { row?: Record<string, unknown>; tip?: string; marks?: GuideMark[]; pip?: string; pip_pond?: string }
 export interface GuideStep extends GuideShow {
   id: string; phase?: string;
   optional?: boolean;   // a suggestion that never holds the player up: it also passes once the step after it is done (339's t_sow_rest)
@@ -535,7 +537,8 @@ export function guideView(c: P0Content, s: P0State, now: number, ponds = false) 
   if (row && typeof row.go === 'string') row.go = guidePlace(c, s, row.go);
   if (row && typeof row.countdown === 'string') Object.assign(row, countdown(c, s, row.countdown, now));
   const ready = resendReady(c, s), r = c.guide?.resend;
-  const pipLine = ready && r ? r.line : shown.pip ?? st.pip;
+  const pipOf = (x: GuideShow) => (ponds ? x.pip_pond ?? x.pip : x.pip);
+  const pipLine = ready && r ? r.line : pipOf(shown) ?? pipOf(st);
   return {
     step: st.id, phase: st.phase ?? null, recover: rec, at: g.at, progress: count,
     row, tip: shown.tip ?? null,
