@@ -121,3 +121,17 @@ func test_walking_eases_a_wide_opening_back_to_the_rest_zoom_and_a_pinch_stays()
 	assert_bool(farm._opening_zoom).is_false()   # the player's zoom from here
 	farm.free()
 
+
+## SGODOT-465 (the user 11-10, bot 641 「农场点地 ok」): a tap on the open ground walks there; on an open bed it walks to the
+## path in front of it (camera side) and sows nothing; a bed not open yet is grass.
+func test_a_ground_tap_walks_there_and_a_bed_tap_to_the_path_in_front() -> void:
+	var bp := P0Garden.blueprint()
+	var grass := bp.cell_to_world(Vector2i(12, 8)) + Vector3(0.1, 0, 0.1)
+	assert_vector(P0Farm.tap_target(bp, grass, 8)).is_equal(grass)
+	var bed := P0Garden.cell_of(5)   # Lv1's eight beds: 0–7
+	var front := bp.cell_to_world(bed + P0Farm.BED_FRONT)
+	assert_vector(P0Farm.tap_target(bp, bp.cell_to_world(bed), 8)).is_equal(front)
+	assert_float(front.z).is_greater(bp.cell_to_world(bed).z)   # nearer the camera
+	assert_bool(bp.is_walkable(bed + P0Farm.BED_FRONT)).is_true()   # the path between the rows
+	var shut := bp.cell_to_world(P0Garden.cell_of(32))   # not open at Lv1: grass to the player
+	assert_vector(P0Farm.tap_target(bp, shut, 8)).is_equal(shut)
