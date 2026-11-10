@@ -59,7 +59,7 @@ func _init() -> void:
 	_glyph.size = Vector2(_ICON, _ICON)
 	_glyph.position = (_disc.size - _glyph.size) * 0.5
 	_disc.add_child(_glyph)
-	_ring = _ProgressRing.new()
+	_ring = _ProgressRing.new(self)
 	_ring.size = _disc.size
 	_disc.add_child(_ring)
 	_disc.move_child(_ring, 0)   # under the icon
@@ -180,11 +180,15 @@ func _refresh() -> void:
 
 ## The cooling ring: the border track all round, the part grown back from 12 o'clock clockwise.
 class _ProgressRing extends Control:
-	func _init() -> void:
+	var host: UiWorldIconButton   # given at birth, not looked up through the tree (a Release build's null, 周瑜 on #973)
+
+	func _init(host_: UiWorldIconButton = null) -> void:
+		host = host_
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	func _draw() -> void:
-		var p := float((get_parent().get_parent() as UiWorldIconButton).progress)
+		if host == null: return
+		var p := float(host.progress)
 		var c := size * 0.5
 		var r := size.x * 0.5 - PROGRESS_STROKE * 0.5
 		draw_arc(c, r, 0.0, TAU, 64, UiTokens.COLOR_BORDER, PROGRESS_STROKE, true)
