@@ -111,7 +111,7 @@ static func reason_cells(view: Dictionary, cs: Array, t: Dictionary) -> String:
 	var house := wing_cells() if wing_up(view) else []   # the Kitchen Wing's from Lv8 (q(303))
 	for c in cs:
 		if _in_any(c, y.get("objects", [])) or t.has("%d,%d" % [c.x, c.y]) or house.has(c): return REASONS.decor_overlap
-	for c in cs:   # paths2: yard v2's too (v4q(12), feature yard2: this build sends it)
+	for c in cs:   # paths2: yard v2's too (v4q(12)), kept clear here before the build says yard2 (the server holds them then)
 		if _in_any(c, y.get("paths", [])) or _in_any(c, y.get("paths2", [])): return REASONS.decor_path
 	return ""
 
