@@ -44,9 +44,11 @@ func test_the_keys_come_with_voice_and_the_first_mic_asks_the_age_then_says_who_
 	var f := _room()
 	var room: P0VoiceRoom = f[0]
 	ui.set_voice_room(room)
-	assert_object(ui._voice_keys).is_null()   # the server not asked yet: nothing shown
+	assert_bool(ui._voice_keys.visible).is_true()   # the people pill in any room (q(309))
+	assert_bool(ui._voice_keys.mic.visible).is_false()   # the server not asked yet: no mic
 	await room.fetch_status()
 	assert_bool(ui._voice_keys.visible).is_true()
+	assert_bool(ui._voice_keys.mic.visible).is_true()
 	assert_str(ui._voice_keys.people.text).is_equal("3")   # the player and the others (q(289), SGODOT-415)
 	await await_idle_frame()
 	var keys = ui._voice_keys   # on the Creel pill's line (V1 / V6), its top, shown or not; the mic on the pill's middle
@@ -88,7 +90,8 @@ func test_a_child_s_answer_hides_voice() -> void:
 	card.go.activated.emit()
 	await await_idle_frame()
 	assert_str(ui.toast_text()).is_equal("Voice chat isn't available")
-	assert_bool(ui._voice_keys.visible).is_false()
+	assert_bool(ui._voice_keys.mic.visible).is_false()   # no mic …
+	assert_bool(ui._voice_keys.people.visible and ui._voice_keys.visible).is_true()   # … the people pill stays (q(309))
 
 func test_the_people_drawer_mutes_blocks_after_its_card_and_reports() -> void:
 	var ui := await _ui()
@@ -257,3 +260,49 @@ func test_the_drawer_lists_the_player_first_and_counts_them() -> void:
 	assert_object(two.list.find_child("Empty", false, false)).is_null()
 	assert_float(two.height).is_equal(Drawer.height_for(2))
 	assert_str(two.all_key.label).is_equal("Unmute all")   # the other one muted: the player does not count
+
+
+## q(309) (the user, 11-10: 「iOS 人数 ok」; 不知火舞's spec v1): a phone with no voice (iOS: Voice not supported) has the
+## people pill where an Android has it, the mic's place empty; the drawer has no Mute all and no row Mute, Block and
+## Report stay; a room with no voice at all (the cathedral) has neither.
+class NoVoice extends "res://tests/p0/test_p0_voice_room.gd".FakeVoice:
+	func supported() -> bool: return false
+
+func test_with_no_voice_the_pill_stays_where_it_is_and_the_mic_is_not_there() -> void:
+	var ui := await _ui()
+	var with_voice := _room()
+	ui.set_voice_room(with_voice[0])
+	await with_voice[0].fetch_status()
+	await await_idle_frame()
+	var at: Vector2 = ui._voice_keys.people.get_global_rect().position
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	room.voice = auto_free(NoVoice.new())
+	ui.set_voice_room(room)
+	await room.fetch_status()
+	await await_idle_frame()
+	assert_bool(room.offered()).is_false()
+	assert_bool(ui._voice_keys.visible).is_true()
+	assert_bool(ui._voice_keys.mic.visible).is_false()
+	assert_str(ui._voice_keys.people.text).is_equal("3")
+	assert_vector(ui._voice_keys.people.get_global_rect().position).is_equal_approx(at, Vector2(0.5, 0.5))   # the same place
+	ui._voice_keys.people.pressed.emit()
+	assert_str(ui.modal_kind).is_equal("people")
+	var d = ui._people
+	assert_bool(d.all_key.visible).is_false()
+	var row: Control = d.list.find_child("Person_4", true, false)
+	assert_bool((row.find_child("Mute", true, false) as Control).visible).is_false()
+	assert_bool((row.find_child("Block", true, false) as Control).visible).is_true()
+	assert_bool((row.find_child("Report", true, false) as Control).visible).is_true()
+
+func test_a_room_with_no_voice_has_no_pill_either() -> void:
+	var ui := await _ui()
+	var online: P0Online = auto_free(P0Online.new())
+	online.transport = func(_m): pass
+	var room: P0VoiceRoom = auto_free(P0VoiceRoom.new())
+	room.voice = auto_free(FakeVoice.new())
+	room.request = func(_m: int, _p: String, _b: Dictionary) -> Dictionary: return {"ok": true, "json": {"available": true, "age": "ok"}}
+	room.setup(null, online, "church")
+	ui.set_voice_room(room)
+	await room.fetch_status()
+	assert_bool(ui._voice_keys == null or not ui._voice_keys.visible).is_true()

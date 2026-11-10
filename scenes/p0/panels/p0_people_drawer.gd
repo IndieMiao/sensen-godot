@@ -13,6 +13,9 @@ extends UiDrawer
 ## Today's do — a 16 px fade at an edge with rows past it, a 3 px bar at the right while they overflow.
 ## q(289) (SGODOT-415; 不知火舞 415 89764920): the player's own row first, scrolling with the rest — their name as their
 ## name tag writes it and a grey `You` at the keys' right edge, no keys, not tappable; alone, `No one else here` under it.
+## q(309) (the user, 11-10: 「iOS 人数 ok」; 不知火舞's spec v1 ④): with no voice on this phone (iOS, a 13+ no, the server's
+## voice off) `Mute all` and each row's `Mute` are not there — not greyed: they would do nothing; Block and Report stay
+## (a Block hides the two from each other in a room, a Report is the server's line: neither needs voice).
 
 signal mute_pressed(peer: int, on: bool)
 signal mute_all_pressed(on: bool)
@@ -41,9 +44,11 @@ var _fade_bottom: TextureRect
 var _bar: Panel
 var _raw_title := ""
 var _two := false           # the title in two lines
+var voice := true           # this phone has voice in this room: the Mute keys (q(309))
 
-func _init(title_: String = "", rows_: Array = []) -> void:
+func _init(title_: String = "", rows_: Array = [], voice_ := true) -> void:
 	super(height_for(rows_.size() + (0 if rows_.any(func(r): return not bool(r.get("self", false))) else 1)))
+	voice = voice_
 	pad = UiTokens.SPACE_PAGE
 	var head := HBoxContainer.new()
 	head.name = "Head"
@@ -115,7 +120,7 @@ func refresh(rows_: Array) -> void:
 		none.custom_minimum_size.y = ROW_H
 		none.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		list.add_child(none)
-	all_key.visible = not _others().is_empty()
+	all_key.visible = voice and not _others().is_empty()
 	all_key.label = "Unmute all" if _all_muted() else "Mute all"
 	_size_rows()
 
@@ -209,6 +214,7 @@ func _row(r: Dictionary) -> HBoxContainer:
 	mute.name = "Mute"
 	mute.disabled = blocked   # blocked: nothing to hear either way
 	mute.pressed.connect(func(): mute_pressed.emit(peer, not muted))
+	mute.visible = voice
 	row.add_child(mute)
 	var block := _key("Unblock" if blocked else "Block")
 	block.name = "Block"

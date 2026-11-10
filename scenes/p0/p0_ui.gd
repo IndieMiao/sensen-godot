@@ -3864,7 +3864,7 @@ func open_settings(back := Callable(), read := true) -> void:
 	var page := P0SettingsPage.settings(version,
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
 		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
-		(_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD) if _privacy_shown else P0SettingsPage.BLOCKED_NONE,
+		_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD,   # q(309): always, voice or not (iOS too)
 		_voice_offered, LANGUAGE_NAMES.get(TranslationServer.get_locale(), "English"),   # the language on screen (不知火舞 A6), not a pick for the next start
 		P0Legal.privacy_url(OS.get_name()), P0Legal.support_code(str(player_of.call())))   # q(281) (SGODOT-390)
 	page.theme = UiKit.theme()
@@ -3889,13 +3889,13 @@ func open_settings(back := Callable(), read := true) -> void:
 
 ## Settings › Blocked players (SGODOT-384; q(28) §12.1.6; 不知火舞's spec 383, BP1–BP3 row 127): the account's voice
 ## away from any room (P0Runtime's P0VoiceRoom without one): whether this phone is offered voice, and whom it blocked —
-## now that the two never see each other in a room, the only place a block is lifted. The Privacy group shows while
-## voice is offered here, or while anyone is blocked (a block outlives the switch going off, and an iPhone has none).
+## now that the two never see each other in a room, the only place a block is lifted. The Privacy group and its
+## `Blocked players ›` always show: a Block is made in any room's drawer, voice or not (q(309) ⑤: an iPhone too);
+## `Voice chat ›` only while voice is offered (q(277)).
 var voice_account: Node
 var _blocked: Array = []        # [{handle, name}] as last read, the server's order
 var _blocked_read := false      # read once at least this launch: before that an empty list is not `No one blocked`
 var _blocked_failed := false    # and the last try failed: the Blocked page's empty state and Retry
-var _privacy_shown := false
 var _voice_offered := false     # this phone is offered voice (status read): Privacy's `Voice chat ›` (q(277))
 var _unblocks := 0              # Unblocks sent and answered: a read overlapping one is dropped (it may hold them, 周瑜 #667)
 
@@ -3912,15 +3912,14 @@ func _privacy_read(then: Callable) -> void:
 	var phone = get_node_or_null("/root/Voice")
 	var offered: bool = bool(voice_account.get("available")) and str(voice_account.get("age")) != "no" \
 		and phone != null and bool(phone.call("supported"))
-	var was := [_privacy_shown, _blocked, _blocked_read, _blocked_failed, _voice_offered]
+	var was := [_blocked, _blocked_read, _blocked_failed, _voice_offered]
 	_voice_offered = offered   # a status not read reads as not offered: no `Voice chat` row (不知火舞)
 	if got is Array:
 		_blocked = got
 		_blocked_read = true
 		_blocked_failed = false
 	elif not _blocked_read: _blocked_failed = true
-	_privacy_shown = offered or not _blocked.is_empty()
-	if was != [_privacy_shown, _blocked, _blocked_read, _blocked_failed, _voice_offered]: then.call()
+	if was != [_blocked, _blocked_read, _blocked_failed, _voice_offered]: then.call()
 
 ## Settings › Privacy › Voice chat (q(277)): where voice goes, as the Licenses' text pages (PageHeader, Regular 13).
 func open_voice_chat_info(back: Callable) -> void:
@@ -4859,8 +4858,11 @@ func _mic_on() -> bool:
 	return v != null and bool(v.call("active")) and bool(v.get("microphone"))
 
 ## The keys shown or not, the mic's state, the count, an open drawer's rows; a first mic on says who hears.
+## q(309) (the user, 11-10: 「iOS 人数 ok」; 不知火舞's spec v1): the people pill and its drawer in any room that has
+## voice (not the cathedral's), voice on this phone or not; the mic key, and all it does, only while offered.
 func _voice_refresh() -> void:
-	var shown := voice_room != null and bool(voice_room.call("offered")) and surface != "map"
+	var shown := voice_room != null and bool(voice_room.get("here")) and surface != "map"
+	var offered := shown and bool(voice_room.call("offered"))
 	if shown and _voice_keys == null:
 		_voice_keys = VoiceKeys.new()
 		_voice_keys.theme = UiKit.theme()
@@ -4872,7 +4874,8 @@ func _voice_refresh() -> void:
 	if not shown: return
 	var v := _voice()
 	if v != null and str(v.get("error")) == "MICROPHONE_DENIED": _mic_denied = true
-	var on := _mic_on()
+	_voice_keys.show_mic(offered)
+	var on := offered and _mic_on()
 	_voice_keys.set_mic(on)
 	var rows: Array = voice_room.call("people")
 	_voice_keys.set_count(rows.size())
@@ -4901,7 +4904,7 @@ func open_people() -> void:
 	var layer := int(voice_room.get("online").get("room")) if voice_room.get("online") else 0
 	var space := place_text().get_slice(" · ", 1) if place_text().contains(" · ") else place_text()
 	var d: UiDrawer = PeopleDrawer.new("%s · Layer %d" % [space, maxi(1, layer)] if space != "" else "Layer %d" % maxi(1, layer),
-		voice_room.call("people"))
+		voice_room.call("people"), bool(voice_room.call("offered")))   # no voice: no Mute keys (q(309))
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(close_layer)
