@@ -80,3 +80,26 @@ export function pondRoomSpec(known: (pond: string) => boolean) {
     return { id: room, role: 'pond', capacity: POND_CAPACITY, bounds: POND_BOUNDS, seats: [] };
   };
 }
+
+/** A landmark's online room (SGODOT-462; the user, 11-10: 「恶魔岛无法多人,无法语音」): `landmark:<landmark id>`, one for
+ * each landmark with a scene on the P0 map (content landmark_scenes: Alcatraz Island, Griffith Observatory). Until then a
+ * landmark was a place to walk round alone (q(295) ④); now the others walk there too and talk, as in a pond. */
+export const LANDMARK_ROOM = 'landmark:';
+/** Players per landmark room (奕星 11-10, the pond's 8 until the user says otherwise; a full one opens another layer). */
+export const LANDMARK_CAPACITY = 8;
+/** The scene's own metres, x / z: wider than either landmark's walkable ground (Alcatraz's camera keeps to ±50 / ±40), so
+ * the clamp only stops a position no scene could send. */
+export const LANDMARK_BOUNDS: [number, number, number, number] = [-150, 150, -150, 150];
+
+/** The landmark a `landmark:<id>` room is for, or "" when the id is no landmark room's. */
+export const landmarkOfRoom = (room: string): string => room.startsWith(LANDMARK_ROOM) ? room.slice(LANDMARK_ROOM.length) : '';
+
+/** The room spec of a landmark the content opens (`known`: landmark_scenes on), no seats; undefined for any other id. Made
+ * on first join and dropped once its last room empties, as a pond's is. */
+export function landmarkRoomSpec(known: (landmark: string) => boolean) {
+  return (room: string): OutpostSpec | undefined => {
+    const landmark = landmarkOfRoom(room);
+    if (!landmark || !known(landmark)) return undefined;
+    return { id: room, role: 'landmark', capacity: LANDMARK_CAPACITY, bounds: LANDMARK_BOUNDS, seats: [] };
+  };
+}

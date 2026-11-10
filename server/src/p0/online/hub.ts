@@ -14,7 +14,7 @@ import { defaultAppearance, type Appearance, type AppearanceCatalog } from './ap
 import { upgradeRefusal, type P0Gate } from '../gate.js';
 import { P0_ACTIONS, snapshotFrame } from './frame.js';
 import { OutpostRooms, type Occupant } from './rooms.js';
-import { POND_ROOM, pondOfRoom } from './outposts.js';
+import { landmarkOfRoom, POND_ROOM, pondOfRoom } from './outposts.js';
 
 export const PATH = '/v1/p0/online';
 export const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
@@ -347,15 +347,17 @@ export function registerP0Online(app: FastifyInstance, deps: P0OnlineDeps): P0On
   app.server.on('upgrade', (req, socket, head) => {
     if (req.url?.split('?')[0] === PATH) hub.upgrade(req, socket, head);
   });
-  // Ponds' rooms count apart (`ponds`, by pond id): an older client reads `outposts` only (亚瑟 on the 11-02 plan)
+  // Ponds' rooms count apart (`ponds`, by pond id): an older client reads `outposts` only (亚瑟 on the 11-02 plan);
+  // landmarks' too (`landmarks`, by landmark id, SGODOT-462), never among the outposts an older client looks up
   app.get('/v1/p0/presence', async () => {
-    const outposts: Record<string, { online: number; rooms: number }> = {}, ponds: typeof outposts = {};
+    const outposts: Record<string, { online: number; rooms: number }> = {}, ponds: typeof outposts = {}, landmarks: typeof outposts = {};
     for (const [id, p] of Object.entries(deps.rooms.presence())) {
-      const pond = pondOfRoom(id);
+      const pond = pondOfRoom(id), landmark = landmarkOfRoom(id);
       if (pond) ponds[pond] = p;
+      else if (landmark) landmarks[landmark] = p;
       else outposts[id] = p;
     }
-    return { ok: true, outposts, ponds };
+    return { ok: true, outposts, ponds, landmarks };
   });
   app.addHook('preClose', async () => hub.close());
   return hub;
