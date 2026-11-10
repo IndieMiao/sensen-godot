@@ -32,6 +32,8 @@ export interface Occupant {
   x: number; z: number; yaw: number; action: string; seat: string;
   /** Last accepted input sequence and its time. */
   seq: number; at: number;
+  /** When the player took its seat (ms; 0 or absent standing): SIT_SETTLE_MS on, its inputs are its own again. */
+  satAt?: number;
 }
 /** `rejoined`: back in the instance this player just left (no "Room 2" notice on a reconnect). */
 export interface Placement { outpost: string; room: number; capacity: number; rejoined: boolean }
@@ -44,6 +46,13 @@ export const MAX_SPEED = 6;
 const SLACK = 0.5;
 /** Moving this far from a seat stands the player up. */
 const STAND_DISTANCE = 0.3;
+/** SGODOT-478: a sit puts the player on the seat's spot (the client's `at`) at once, past walking speed, when it is this
+ * near — a pew's middle is about 1.9 m along it from its aisle end (q(304)); further is TOO_FAR, nothing changes. */
+export const SEAT_REACH_M = 3;
+/** SGODOT-478: for this long after sitting the client's inputs leave the player on the seat — it is still gliding there
+ * (0.3 s onto a chair, about 0.8 s along a pew) and each frame of the glide is further than STAND_DISTANCE from it, which
+ * stood every sitter up one frame later (since the glide came, 10-08). After it, moving away stands up as ever. */
+export const SIT_SETTLE_MS = 1500;
 
 export class OutpostRooms {
   private specs = new Map<string, OutpostSpec>();
@@ -137,6 +146,10 @@ export class OutpostRooms {
     let [nx, nz] = clamp(this.specs.get(groupOf(o.outpost, o.layout))!, [x, z]);
     const d = Math.hypot(nx - o.x, nz - o.z);
     if (d > reach) { nx = o.x + (nx - o.x) * reach / d; nz = o.z + (nz - o.z) * reach / d; }
+    if (o.seat && now - (o.satAt ?? 0) < SIT_SETTLE_MS) {   // still gliding onto the seat: it stays there
+      o.yaw = yaw; o.at = now; o.action = 'sit';
+      return o;
+    }
     if (o.seat && Math.hypot(nx - o.x, nz - o.z) > STAND_DISTANCE) o.seat = '';
     o.x = nx; o.z = nz; o.yaw = yaw; o.at = now;
     o.action = o.seat ? 'sit' : action;
@@ -159,12 +172,25 @@ export class OutpostRooms {
     const o = this.byPlayer.get(player)!;
     o.seat = seat;
     o.action = 'sit';
+    o.satAt = this.now();
     return 'ok';
+  }
+
+  /** A sit with the seat's spot (room metres, the client's): the seat checked first, then the player put there at once
+   * (inside the room, within SEAT_REACH_M, else TOO_FAR) and seated. A refused sit never moves the player. */
+  sitAt(player: string, seat: string, at?: [number, number]): 'ok' | 'SEAT_TAKEN' | 'NO_SEAT' | 'NOT_IN_ROOM' | 'TOO_FAR' {
+    const code = this.canSit(player, seat);
+    if (code !== 'ok' || !at) return code === 'ok' ? this.sit(player, seat) : code;
+    const o = this.byPlayer.get(player)!;
+    const [x, z] = clamp(this.specs.get(groupOf(o.outpost, o.layout))!, at);
+    if (Math.hypot(x - o.x, z - o.z) > SEAT_REACH_M) return 'TOO_FAR';
+    o.x = x; o.z = z; o.at = this.now();
+    return this.sit(player, seat);
   }
 
   stand(player: string): void {
     const o = this.byPlayer.get(player);
-    if (o?.seat) { o.seat = ''; o.action = 'idle'; }
+    if (o?.seat) { o.seat = ''; o.action = 'idle'; o.satAt = 0; }
   }
 
   /** Online count per outpost across its instances, for the map pins ("Lotus Tea House · 5 online"): every
