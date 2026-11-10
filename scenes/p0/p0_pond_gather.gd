@@ -30,6 +30,13 @@ var nodes := {}   # point id → its piece: a Live layer, a Gathered layer, the 
 ## cooling COOL_MS, in the editor binary only (cool_switch: an exported build ignores it, as P0BlackjackMock).
 const COOL_MS := 11520000.0   # 3h 12m: 不知火舞's frame
 var _cool := cool_switch(OS.has_feature, OS.get_environment("P0_GATHER_COOL"))
+## P0_GATHER_COOL_MS (with the switch): the cooling counted down from the first sync, so a shot sees it grow back.
+var _cool_ms := float(OS.get_environment("P0_GATHER_COOL_MS")) if OS.get_environment("P0_GATHER_COOL_MS").is_valid_float() else COOL_MS
+var _cool_t0 := -1
+var _cooling := {}   # point id → whether its gathered look shows
+## A point's look turned (gathered, or grown back) in this sync — once however many turned: what reads the pieces
+## (GroundShade.watch: the trees' shade under Compatibility, SGODOT-457) reads them again (周瑜 on #969).
+signal looks_changed
 
 static func cool_switch(has_feature: Callable, env: String) -> PackedStringArray:
 	return env.split(",", false) if env != "" and bool(has_feature.call("editor")) else PackedStringArray()
@@ -39,10 +46,19 @@ func sync(view: Dictionary) -> void:
 	var g = view.get("gather", {}).get("pond", null) if view.get("gather") is Dictionary else null
 	points = (g.get("points", []) as Array) if g is Dictionary and g.get("points") is Array else []
 	pond = str(g.get("pond", "")) if g is Dictionary else ""
-	if not _cool.is_empty(): points = points.map(func(p): return cooled(p, _cool))
+	if not _cool.is_empty():
+		if _cool_t0 < 0: _cool_t0 = Time.get_ticks_msec()
+		var left := maxf(0.0, _cool_ms - float(Time.get_ticks_msec() - _cool_t0))
+		points = points.map(func(p): return cooled(p, _cool, left))
+	var turned := false
 	for p in points:
-		if not nodes.has(str(p.id)): nodes[str(p.id)] = _piece(p)
-		show_cooling(nodes[str(p.id)], float(p.get("ready_in", 0)) > 0.0)
+		var id := str(p.id)
+		var cooling := float(p.get("ready_in", 0)) > 0.0
+		if not nodes.has(id): nodes[id] = _piece(p)
+		elif bool(_cooling.get(id, false)) != cooling: turned = true
+		_cooling[id] = cooling
+		show_cooling(nodes[id], cooling)
+	if turned: looks_changed.emit()
 
 ## The piece as it stands: its gathered look while cooling (the Gathered layer has one for every kind).
 static func show_cooling(root: Node3D, cooling: bool) -> void:
@@ -52,12 +68,12 @@ static func show_cooling(root: Node3D, cooling: bool) -> void:
 	live.visible = not cooling
 	done.visible = cooling
 
-## A point the dev switch names, read as cooling COOL_MS (its own ready_in kept when it has one).
-static func cooled(p: Dictionary, names: PackedStringArray) -> Dictionary:
+## A point the dev switch names, read as cooling `left` (its own ready_in kept when it has one; none left: ready).
+static func cooled(p: Dictionary, names: PackedStringArray, left := COOL_MS) -> Dictionary:
 	if not ("all" in names or str(p.get("kind", "")) in names or str(p.get("slot", "")) in names): return p
-	if float(p.get("ready_in", 0)) > 0.0: return p
+	if float(p.get("ready_in", 0)) > 0.0 or left <= 0.0: return p
 	var q := p.duplicate()
-	q["ready_in"] = COOL_MS
+	q["ready_in"] = left
 	return q
 
 func _piece(p: Dictionary) -> Node3D:
@@ -189,10 +205,11 @@ static func _herb_gathered(root: Node3D) -> void:
 	rng.seed = 417
 	var blades: Array = []   # dark leafy blades at its foot, one batch as _feet's
 	for i in 9:
-		var at := c + Vector3.FORWARD.rotated(Vector3.UP, TAU * float(i) / 9.0 + rng.randf_range(-0.2, 0.2)) * rng.randf_range(0.2, 0.3)
+		var at := c + Vector3.FORWARD.rotated(Vector3.UP, TAU * float(i) / 9.0 + rng.randf_range(-0.2, 0.2)) * rng.randf_range(0.17, 0.26)
 		blades.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.5, 0.7)), Vector3(at.x, -0.02, at.z)))
 	var foot := Art.batch("wild_pz_foot_leafy", blades, false)
 	foot.material_override = _herb_foot
+	foot.set_meta("placed", blades)   # its instances where they stand: a MultiMesh keeps none headless (tests)
 	root.add_child(foot)
 	for at in [Vector3(-0.32, 0, -0.12), Vector3(0.36, 0, -0.05)]: root.add_child(_sprout(at))
 

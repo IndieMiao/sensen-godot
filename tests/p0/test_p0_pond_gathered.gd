@@ -25,10 +25,16 @@ func _gather(points: Array) -> Node3D:
 static func _reach(layer: Node3D) -> float:
 	var r := 0.0
 	for m: GeometryInstance3D in layer.find_children("*", "GeometryInstance3D", true, false):
-		var box: AABB = (layer.global_transform.affine_inverse() * m.global_transform) * m.get_aabb()
-		for i in 8:
-			var e := box.get_endpoint(i)
-			r = maxf(r, Vector2(e.x, e.z).length())
+		var to_layer := layer.global_transform.affine_inverse() * m.global_transform
+		var boxes: Array[AABB] = []
+		if m is MultiMeshInstance3D:   # its placements as recorded: a MultiMesh's own box is empty headless
+			var mesh_box := (m as MultiMeshInstance3D).multimesh.mesh.get_aabb()
+			for t: Transform3D in m.get_meta("placed", []): boxes.append((to_layer * t) * mesh_box)
+		else: boxes.append(to_layer * m.get_aabb())
+		for box in boxes:
+			for i in 8:
+				var e := box.get_endpoint(i)
+				r = maxf(r, Vector2(e.x, e.z).length())
 	return r
 
 func test_every_kind_has_a_gathered_look_shown_while_cooling() -> void:
@@ -55,7 +61,7 @@ func test_no_gathered_look_is_wider_than_its_piece() -> void:
 		var root: Node3D = g.nodes[POND + "#" + k]
 		var live := _reach(root.get_node("Live") as Node3D)
 		var done := _reach(root.get_node("Gathered") as Node3D)
-		assert_float(done).override_failure_message("%s: gathered %.2f m, piece %.2f m" % [k, done, live]).is_less_equal(live + 0.001)
+		assert_float(done).override_failure_message("%s: gathered %.3f m, piece %.3f m" % [k, done, live]).is_less_equal(live + 0.001)
 
 func test_the_feet_stay_under_both() -> void:
 	var g := _gather([_point("stone"), _point("wood"), _point("hardwood")])
@@ -107,3 +113,36 @@ func test_a_gathered_look_is_a_few_draws() -> void:
 		assert_int(_draws(done)).override_failure_message("%s: %d draws" % [k, _draws(done)]).is_less_equal(6)
 	var herb := (g.nodes[POND + "#herb"] as Node3D).get_node("Gathered") as Node3D
 	assert_int(_draws(herb)).is_equal(4)   # cut herbs, the foot's batch, two sprouts
+
+## A batch in a gathered look says where its instances stand (the width above reads them, not the MultiMesh's box).
+func test_wild_herb_gathered_keeps_inside_its_piece() -> void:
+	var g := _gather([_point("herb")])
+	var root := g.nodes[POND + "#herb"] as Node3D
+	assert_float(_reach(root.get_node("Gathered") as Node3D)).is_less_equal(0.74)   # 上官婉儿 on #969: the piece reaches 0.75
+
+func test_a_gathered_batch_records_its_placements() -> void:
+	var g := _gather(KINDS.map(func(k): return _point(k)))
+	for k in KINDS:
+		var done := (g.nodes[POND + "#" + k] as Node3D).get_node("Gathered") as Node3D
+		for m in done.find_children("*", "MultiMeshInstance3D", true, false):
+			assert_int((m.get_meta("placed", []) as Array).size()).override_failure_message(k).is_equal((m as MultiMeshInstance3D).multimesh.instance_count)
+
+## Turning a look (gathered, or grown back) says so once a sync, however many turned; none turned, nothing said
+## (GroundShade.watch reads the pieces again: the shade follows, 周瑜 on #969).
+func test_turning_looks_says_so_once_a_sync() -> void:
+	var g := _gather(KINDS.map(func(k): return _point(k)))
+	var said := [0]
+	g.looks_changed.connect(func(): said[0] += 1)
+	g.sync(_view(KINDS.map(func(k): return _point(k))))
+	assert_int(said[0]).is_equal(0)
+	g.sync(_view(KINDS.map(func(k): return _point(k, 3600000.0))))
+	assert_int(said[0]).is_equal(1)
+	g.sync(_view(KINDS.map(func(k): return _point(k, 3500000.0))))   # still cooling
+	assert_int(said[0]).is_equal(1)
+	g.sync(_view(KINDS.map(func(k): return _point(k))))   # grown back
+	assert_int(said[0]).is_equal(2)
+
+func test_the_dev_cooling_counts_down() -> void:
+	var p := _point("wood")
+	assert_float(float(PondGather.cooled(p, PackedStringArray(["wood"]), 5000.0).ready_in)).is_equal(5000.0)
+	assert_float(float(PondGather.cooled(p, PackedStringArray(["wood"]), 0.0).ready_in)).is_equal(0.0)   # grown back
