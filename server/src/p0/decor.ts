@@ -54,13 +54,32 @@ export function yardWalk(c: P0Content, s: P0State, f: YardFeatures = {}): Rect {
 
 /** The cells the yard can take now (v4q(12) ①): every cell of the walk a 1 × 1 piece may stand on, the pieces already
  * placed not counted against it — so off the field, the beds, objects, paths, the wing and the yard's facilities (the
- * Compost Bin: placing one lowers the cap by one). */
+ * Compost Bin: placing one lowers the cap by one). The cells with no facility on them depend only on the walk, the wing,
+ * yard2 and the beds, so they are worked out once per content and kept (周瑜 on #954: every view asks a dozen times, each
+ * walking some 400 cells); the facilities standing on them are taken off each time. */
 export function yardRoom(c: P0Content, s: P0State, f: YardFeatures = {}): number {
-  const bare = { ...s, decor: undefined };
-  const [x0, y0, w, h] = yardWalk(c, s, f);
-  let n = 0;
-  for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) if (!yardBlock(c, bare, [[x, y]], { x, y }, {}, f)) n++;
+  const free = freeYardCells(c, s, f);
+  const held = new Set((s.facilities ?? []).filter(x => x.cell).map(x => `${x.cell![0]},${x.cell![1]}`));
+  let n = free.size;
+  for (const k of held) if (free.has(k)) n--;
   return n;
+}
+
+const freeCache = new WeakMap<P0Content, Map<string, Set<string>>>();
+/** The walk's cells a 1 × 1 piece may stand on with no piece nor facility anywhere (yardRoom's part that never changes
+ * for one yard): keyed by the walk, the wing standing, yard2 and the bed count. */
+function freeYardCells(c: P0Content, s: P0State, f: YardFeatures): Set<string> {
+  const walk = yardWalk(c, s, f), wing = wingUp(c, s, !!f.wing8), beds = bedCells(c, s).size;
+  const key = `${walk.join(',')}|${wing ? 1 : 0}|${f.yard2 ? 1 : 0}|${beds}`;
+  let byContent = freeCache.get(c);
+  if (!byContent) freeCache.set(c, byContent = new Map());
+  const hit = byContent.get(key);
+  if (hit) return hit;
+  const bare = { ...s, decor: undefined, facilities: [] };
+  const [x0, y0, w, h] = walk, out = new Set<string>();
+  for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) if (!yardBlock(c, bare, [[x, y]], { x, y }, {}, f)) out.add(`${x},${y}`);
+  byContent.set(key, out);
+  return out;
 }
 
 /** The cells a piece covers at x, y. */
