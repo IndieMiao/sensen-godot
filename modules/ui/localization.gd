@@ -140,10 +140,16 @@ class P0Translation extends Translation:
 	var _miss_file: FileAccess
 	static var SPEC := _spec_re()
 	static var COUNT := _count_re()
+	static var PLACE_SPEC := _place_spec_re()
 
 	static func _spec_re() -> RegEx:
 		var re := RegEx.new()
 		re.compile("%[+-]?[0-9]*(\\.[0-9]+)?[dsf]")
+		return re
+
+	static func _place_spec_re() -> RegEx:   # `{1}`…`{9}`: a value by its place
+		var re := RegEx.new()
+		re.compile("\\{([1-9])\\}")
 		return re
 
 	static func _count_re() -> RegEx:
@@ -325,13 +331,13 @@ class P0Translation extends Translation:
 		return ""
 
 	## The Chinese template filled: `{1}`…`{n}` by position when it has them (any may be left out — a plural's ending),
-	## else its format specs in order; `%%` is a percent sign either way.
+	## else its format specs in order; `%%` is a percent sign either way. The space the table keeps beside a value for an
+	## English name goes where the value's own end is Chinese and so is the other side of the space (q(275) ⑦: no space
+	## between Chinese and Chinese) — `去 %s 的` with 布莱顿 「去布莱顿的」, with Mill 驿站 「去 Mill 驿站的」 (SGODOT-476).
 	static func _fill(zh: String, values: Array) -> String:
-		if zh.contains("{1}") or zh.contains("{2}"):
-			var out := zh
-			for i in values.size(): out = out.replace("{%d}" % (i + 1), str(values[i]))
-			return out.replace("%%", "%")
+		var by_place := zh.contains("{1}") or zh.contains("{2}")
 		var out := ""
+		var spans: Array = []   # [start, end) of each value in out
 		var k := 0
 		var i := 0
 		while i < zh.length():
@@ -339,16 +345,46 @@ class P0Translation extends Translation:
 				out += "%"
 				i += 2
 				continue
-			if zh[i] == "%" and k < values.size():
-				var m := SPEC.search(zh, i)
-				if m != null and m.get_start() == i:
-					out += str(values[k])
-					k += 1
+			var m: RegExMatch = null
+			if by_place and zh[i] == "{": m = PLACE_SPEC.search(zh, i)
+			elif not by_place and zh[i] == "%" and k < values.size(): m = SPEC.search(zh, i)
+			if m != null and m.get_start() == i:
+				var at := int(m.get_string(1)) - 1 if by_place else k
+				k += 1
+				if at >= 0 and at < values.size():
+					spans.append([out.length(), out.length() + str(values[at]).length()])
+					out += str(values[at])
 					i = m.get_end()
 					continue
 			out += zh[i]
 			i += 1
-		return out
+		return _close_cjk_gaps(out, spans)
+
+	## The spaces beside the values that stand between Chinese and Chinese, taken out (see _fill).
+	static func _close_cjk_gaps(out: String, spans: Array) -> String:
+		var drop := {}
+		for sp in spans:
+			var a := int(sp[0])
+			var b := int(sp[1])
+			if b <= a: continue
+			if a >= 2 and out[a - 1] == " " and _han(out[a]) and _cjk(out[a - 2]): drop[a - 1] = true
+			if b + 1 < out.length() and out[b] == " " and _han(out[b - 1]) and _cjk(out[b + 1]): drop[b] = true
+		if drop.is_empty(): return out
+		var kept := ""
+		for j in out.length():
+			if not drop.has(j): kept += out[j]
+		return kept
+
+	## A Chinese character (the CJK ideographs).
+	static func _han(c: String) -> bool:
+		var u := c.unicode_at(0)
+		return (u >= 0x3400 and u <= 0x9fff) or (u >= 0xf900 and u <= 0xfaff)
+
+	## Chinese or its punctuation (，。、：？！「」（）…), not the middle dot `·` nor Latin letters or digits.
+	static func _cjk(c: String) -> bool:
+		var u := c.unicode_at(0)
+		return _han(c) or (u >= 0x3000 and u <= 0x303f) or (u >= 0xff01 and u <= 0xff0f) or (u >= 0xff1a and u <= 0xff20) \
+			or (u >= 0xff3b and u <= 0xff40) or (u >= 0xff5b and u <= 0xff65)
 
 	static func _letters(s: String) -> bool:
 		for c in s:

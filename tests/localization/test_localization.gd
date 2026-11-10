@@ -407,7 +407,7 @@ func test_p0_a_list_reads_its_last_and_or_or() -> void:
 	assert_str(String(t.get_message("Next: Carrot and Herb"))).is_equal("下一级：胡萝卜和香草")
 	assert_str(String(t.get_message("Carrot, Herb and Potato"))).is_equal("胡萝卜、香草和土豆")
 	assert_str(String(t.get_message("Grilled or Soup dishes"))).is_equal("烤物或汤品类料理")
-	assert_str(String(t.get_message("Try Carrot or Herb"))).is_equal("试试 胡萝卜 或 香草")   # the template's own
+	assert_str(String(t.get_message("Try Carrot or Herb"))).is_equal("试试胡萝卜或香草")   # the template's own (its spaces by Chinese values gone, SGODOT-476)
 	assert_str(String(t.get_message("Carrot, Herb"))).is_equal("胡萝卜、香草")
 	assert_str(String(t.get_message("Salt and pepper"))).is_equal("")   # not every item known: English
 	t.set_table({"Rods and bait": "鱼竿和鱼饵", "Herb": "香草", "Carrot": "胡萝卜"})
@@ -796,15 +796,48 @@ func test_p0_generated_place_names_translate_only_their_kind() -> void:
 		for word in words:
 			assert_str(zh.call("%s %s" % [word, kind])).is_equal("%s %s" % [word, kind_zh])
 	assert_str(zh.call("Orchard")).is_equal("果园")
-	assert_str(zh.call("Brighton Market Square")).is_equal("布莱顿 集市广场")   # a town with a Chinese name
+	assert_str(zh.call("Brighton Market Square")).is_equal("布莱顿集市广场")   # a town with a Chinese name (no space beside Chinese, SGODOT-476)
 	assert_str(zh.call("Oakland Travel Post")).is_equal("Oakland 驿站")
 	assert_str(zh.call("Union Square Travel Post")).is_equal("联合广场驿站")   # its own key, as before
-	assert_str(zh.call("Deliver at Acorn Market Square")).is_equal("到 Acorn 集市广场 交付")
+	assert_str(zh.call("Deliver at Acorn Market Square")).is_equal("到 Acorn 集市广场交付")
 	assert_str(zh.call("Deliver to Magnolia Travel Post")).is_equal("交给 Magnolia 驿站")
 	assert_str(zh.call("near Willow Tea House")).is_equal("Willow 茶馆附近")
-	assert_str(zh.call("Too close to Fern Tackle Shop")).is_equal("离 Fern 渔具铺 太近")
+	assert_str(zh.call("Too close to Fern Tackle Shop")).is_equal("离 Fern 渔具铺太近")
 	assert_str(zh.call("Visit Pine Trading Post first")).is_equal("先去 Pine 小木屋")
-	assert_str(zh.call("Deliver at Acorn Market Square · Ready to deliver")).is_equal("到 Acorn 集市广场 交付 · 可交付")
+	assert_str(zh.call("Deliver at Acorn Market Square · Ready to deliver")).is_equal("到 Acorn 集市广场交付 · 可交付")
 	assert_str(zh.call("12 coins at Tackle Shop")).is_equal("渔具铺售价 12 金币")
 	assert_str(zh.call("Fishing Lv3 · Tackle Shop")).is_equal("钓鱼 Lv3 · 渔具铺")
 	TranslationServer.remove_translation(t)
+
+## SGODOT-476 (不知火舞's plan A, 李白's sentences; q(275) ⑦): the space the table keeps beside a value for an English
+## name goes where the value's own end is Chinese and so is the other side — a Chinese city or item; an English place,
+## a person, a number keep it; the spaces inside a value, the template's other spaces and ` · ` stay.
+func test_p0_a_chinese_value_takes_no_space_beside_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	assert_str(zh.call("Visit Mill Travel Post, then come back to Brighton.")).is_equal("去 Mill 驿站，再回到布莱顿。")
+	assert_str(zh.call("Brighton Market Square")).is_equal("布莱顿集市广场")   # 469's space with it
+	assert_str(zh.call("Oakland Market Square")).is_equal("Oakland 集市广场")
+	assert_str(zh.call("Too close to Fern Tackle Shop")).is_equal("离 Fern 渔具铺太近")
+	assert_str(zh.call("3 fish not found in Brighton")).is_equal("3 条布莱顿没有的鱼")
+	assert_str(zh.call("3 fish not found in Oakland")).is_equal("3 条 Oakland 没有的鱼")
+	assert_str(zh.call("Pip's Best Friend")).is_equal("Pip 的挚友")
+	assert_str(zh.call("Deliver at Acorn Market Square")).is_equal("到 Acorn 集市广场交付")
+	assert_str(zh.call("Back to San Francisco")).is_equal("返回旧金山")
+	assert_str(zh.call("Stone · Ready in 3h 12m")).is_equal("石料 · 3 小时 12 分后可采")   # ` · ` and the value's own spaces
+	assert_str(zh.call("Stone · Ready in 3h 12m")).contains(" · ")
+	TranslationServer.remove_translation(t)
+
+## The filling itself: by place (`{1}`) and in order (`%s`), a value at the line's ends, `%%`, a value left out.
+func test_p0_fill_closes_only_chinese_to_chinese_gaps() -> void:
+	var P := LocalizationScript.P0Translation
+	assert_str(P._fill("去 {2} 的 {1}，再回到 {3}。", ["Mill 驿站", "布莱顿", "旧金山"])).is_equal("去布莱顿的 Mill 驿站，再回到旧金山。")
+	assert_str(P._fill("%s 的挚友", ["Pip"])).is_equal("Pip 的挚友")
+	assert_str(P._fill("%s 的挚友", ["阿福"])).is_equal("阿福的挚友")
+	assert_str(P._fill("这里 %s 金币", ["120"])).is_equal("这里 120 金币")
+	assert_str(P._fill("{2} 后 +{1}", ["1", "3 小时"])).is_equal("3 小时后 +1")
+	assert_str(P._fill("%s · %s", ["石料", "木材"])).is_equal("石料 · 木材")
+	assert_str(P._fill("已按 80%% 折成 %s", ["金币"])).is_equal("已按 80% 折成金币")
+	assert_str(P._fill("%s 「%s」", ["送你", "茶"])).is_equal("送你「茶」")
