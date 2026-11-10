@@ -34,6 +34,7 @@ import { homeSetOf } from './home_city.js';
 import { homeFacts, homeOf } from './home.js';
 import { gatherPointsOf, type GatherPoint } from './gather_points.js';
 import { upgradeBlock } from './homestead.js';
+import { pondName, pondPoints } from './pond_gather.js';
 import { cityPlaces, placeOf } from './world.js';
 import type { HomeSet } from './travel.js';
 import type { P0Event } from './progress.js';
@@ -53,7 +54,7 @@ export interface GuidePred {
   coins?: number;
   level?: Partial<Record<Skill, number>>;
   energy_full?: boolean;              // Energy at its maximum (q(215) S8: a full bar cannot eat, so the meal step passes)
-  gather?: Record<string, number>;    // S6a (v4q(4) ⑥): a home-city point can be gathered now for one of these still short
+  gather?: Record<string, number>;    // S6a (v4q(11) ⑦): a beginner pond's point can be gathered now for one of these still short
   homestead?: number;                 // Homestead at least this level
   can_upgrade?: boolean;              // the next Homestead level can be bought now (S7a: else the step passes)
   fish?: number;                      // cookable fish held, any kind (S8–S10: enough fish to cook)
@@ -84,8 +85,9 @@ export interface GuideStep extends GuideShow {
   done_if?: GuidePred;
   /** In order: the first whose `if` fails shows a recover entry — the first of `else` whose `when` holds (the last has none). */
   needs?: { if: GuidePred; else: string[] }[];
-  /** S6a (v4q(4) ⑥ t_gather): the materials to gather and how many, in the order Today asks for them; view.guide.target
-   * names the point (gatherTarget) and the row's `{gather_item}` / `{gather_spot}` / icon `{gather}` are filled from it. */
+  /** S6a (v4q(11) ⑦ t_gather): the materials to gather and how many, in the order Today asks for them; view.guide.target
+   * names the point (gatherTarget) and the row's `{gather_item}` / `{gather_spot}` (its pond's name) / icon `{gather}`
+   * are filled from it. */
   gather?: Record<string, number>;
 }
 /** progress.fish: the entry's own count, cookable fish held against `fish` (339 2e08a1a1: `Catch 2 fish · 1/2`). */
@@ -217,27 +219,38 @@ const inboxHolds = (s: P0State, id: string) => [...s.inbox.parcels, ...s.inbox.w
 const pots = (s: P0State) => [s.stove, s.queue, ...(s.burners ?? []).flatMap(b => [b.stove, b.queue])].filter(p => p !== null);
 
 /**
- * S6a's point (v4q(4) ⑥; 亚瑟's view.guide.target): the first material of `need` still short (held anywhere, as `have`),
- * whose home-city point is ready (none cooling down) and, away from the farm, fits the bag (gathering on the farm puts it
- * in storage); of those, the one nearest the farm, the table's order breaking a tie, so the same save always gets the
- * same point. A material whose points all cool down (or do not fit) gives way to the next; null: none can be gathered.
+ * S6a's point (亚瑟's view.guide.target): the first material of `need` still short (held anywhere, as `have`) with a point
+ * ready (none cooling down) that fits the bag; null: none can be gathered (a material whose points all cool down, or do
+ * not fit, gives way to the next), and the step passes by its done_if. The same save always gets the same point.
+ * - `ponds` (feature `pond_guide`, U2: the town's points are gone for that client, v4q(11) ⑦): the home set's beginner
+ *   pond's (Timber 2, Stone 2, Reeds 1, Clay 1, pond_gather.ts: one trip gathers all S6a asks), the first in its order
+ *   (a pond's point always gathers to the bag). `pond` names it.
+ * - else (an older client, which looks the point up among the town's points; v4q(4) ⑥): a home-city town point, the one
+ *   nearest the farm, the table's order breaking a tie; on the farm the bag is not asked (gathering there puts it in
+ *   storage).
  */
-export function gatherTarget(c: P0Content, s: P0State, need: Record<string, number>, now: number): { spot: GatherPoint; item: string; left: number } | null {
+export function gatherTarget(c: P0Content, s: P0State, need: Record<string, number>, now: number, ponds = false):
+    { spot: { id: string; name: string }; pond?: string; item: string; left: number } | null {
+  const short = Object.entries(need).map(([item, n]) => ({ item, left: n - held(s, item) })).filter(x => x.left > 0);
+  const ready = (id: string) => (s.gather.ready_at[id] ?? 0) <= now;
+  if (ponds) {
+    const pond = guidePlace(c, s, 'home:pond'), points = pond ? pondPoints(c, pond) : [];
+    for (const { item, left } of short) {
+      const spot = points.find(p => p.yield[0]?.[0] === item && ready(p.id) && room(c, s, item) >= p.yield[0][1]);
+      if (spot) return { spot: { id: spot.id, name: pondName(c, spot.pond) }, pond: spot.pond, item, left };
+    }
+    return null;
+  }
   const points = gatherPointsOf(c, homeOf(c, s)), farm = homeFacts(c, s).farm;
   const far = (p: GatherPoint) => (farm ? (p.lat - farm.lat) ** 2 + ((p.lng - farm.lng) * Math.cos(farm.lat * Math.PI / 180)) ** 2 : 0);
-  for (const [item, n] of Object.entries(need)) {
-    const left = n - held(s, item);
-    if (left <= 0) continue;
-    const open = points.filter(p => p.yield[0]?.[0] === item && (s.gather.ready_at[p.id] ?? 0) <= now
-      && (s.presence.space === 'home' || room(c, s, item) >= p.yield[0][1]));
-    if (!open.length) continue;
-    const spot = open.reduce((a, b) => (far(b) < far(a) ? b : a));
-    return { spot, item, left };
+  for (const { item, left } of short) {
+    const open = points.filter(p => p.yield[0]?.[0] === item && ready(p.id) && (s.presence.space === 'home' || room(c, s, item) >= p.yield[0][1]));
+    if (open.length) return { spot: open.reduce((a, b) => (far(b) < far(a) ? b : a)), item, left };
   }
   return null;
 }
 
-export function guidePred(c: P0Content, s: P0State, p: GuidePred | undefined, now: number): boolean {
+export function guidePred(c: P0Content, s: P0State, p: GuidePred | undefined, now: number, ponds = false): boolean {
   if (!p) return true;
   const g = s.guide;
   const plotsOf = (crop: string, ripe: boolean) => s.plots.filter(pl => pl.crop === crop && (pl.state === 'sown' || pl.state === 'growing')
@@ -256,16 +269,16 @@ export function guidePred(c: P0Content, s: P0State, p: GuidePred | undefined, no
   if (p.dish !== undefined && heldWhere(s, id => isEdibleDish(c, id)) < p.dish) return false;
   if (p.common_crop !== undefined && heldWhere(s, id => isCommonCrop(c, id)) < p.common_crop) return false;
   if (p.parcel !== undefined && !inboxHolds(s, p.parcel)) return false;
-  if (p.gather !== undefined && !gatherTarget(c, s, p.gather, now)) return false;
+  if (p.gather !== undefined && !gatherTarget(c, s, p.gather, now, ponds)) return false;
   if (p.homestead !== undefined && s.homestead.level < p.homestead) return false;
   if (p.can_upgrade !== undefined && (upgradeBlock(c, s) === null) !== p.can_upgrade) return false;
   if (p.meal !== undefined) {
     const m = mealPick(c, s, now);
     if (!m || (p.meal !== true && m.where !== p.meal)) return false;
   }
-  if (p.all && !p.all.every(q => guidePred(c, s, q, now))) return false;
-  if (p.any && !p.any.some(q => guidePred(c, s, q, now))) return false;
-  if (p.not && guidePred(c, s, p.not, now)) return false;
+  if (p.all && !p.all.every(q => guidePred(c, s, q, now, ponds))) return false;
+  if (p.any && !p.any.some(q => guidePred(c, s, q, now, ponds))) return false;
+  if (p.not && guidePred(c, s, p.not, now, ponds)) return false;
   return true;
 }
 
@@ -277,10 +290,10 @@ function progress(st: GuideStep, g: GuideState): { have: number; need: number } 
   return { have: Math.max(0, Math.min(have, need)), need };
 }
 
-function stepDone(c: P0Content, s: P0State, st: GuideStep, now: number): boolean {
+function stepDone(c: P0Content, s: P0State, st: GuideStep, now: number, ponds: boolean): boolean {
   const p = progress(st, s.guide!);
   if (p && p.have >= p.need) return true;
-  return st.done_if !== undefined && guidePred(c, s, st.done_if, now);
+  return st.done_if !== undefined && guidePred(c, s, st.done_if, now, ponds);
 }
 
 /** What a command (or a state read) did, as guide keys with counts. `before` is the save as it was before it. */
@@ -337,7 +350,7 @@ export function guideKeys(c: P0Content, before: P0State, s: P0State, cmd: { type
 /** Count what was done and pass every step now done. Runs after each command and on every state read (a read with no
  * keys still passes a step whose result came by itself: Quick Radishes ripe while the player only watched, 341 c6f3189a
  * ③). `events` (a command's) gets the step changes (`guide`, for the observation log, plan §14.8.1) and Pip's resend. */
-export function settleGuide(c: P0Content, s: P0State, keys: Map<string, number>, now: number, events: P0Event[] = []): void {
+export function settleGuide(c: P0Content, s: P0State, keys: Map<string, number>, now: number, events: P0Event[] = [], ponds = false): void {
   const g = s.guide;
   const refill = c.guide?.stall_refill_on;
   if (g && refill && keys.has(refill)) releaseFirstStallSlot(c, s, now + c.requests.done_refill_h * H);
@@ -353,8 +366,8 @@ export function settleGuide(c: P0Content, s: P0State, keys: Map<string, number>,
   const from = g.step;
   for (;;) {
     // an optional step whose next step is done (counted from the optional one's start) passes with it: both go
-    const pass = stepDone(c, s, steps[i], now) ? 1
-      : steps[i].optional && i + 1 < steps.length && stepDone(c, s, steps[i + 1], now) ? 2 : 0;
+    const pass = stepDone(c, s, steps[i], now, ponds) ? 1
+      : steps[i].optional && i + 1 < steps.length && stepDone(c, s, steps[i + 1], now, ponds) ? 2 : 0;
     if (!pass) break;
     i += pass;
     if (i >= steps.length) { endGuide(c, s, now, events); return; }
@@ -415,11 +428,11 @@ function endGuide(c: P0Content, s: P0State, now: number, events: P0Event[] = [],
 }
 
 /** The current step's recover entry when its needs fail, else null. */
-export function guideRecover(c: P0Content, s: P0State, now: number): string | null {
+export function guideRecover(c: P0Content, s: P0State, now: number, ponds = false): string | null {
   const st = currentStep(c, s);
   for (const need of st?.needs ?? []) {
-    if (guidePred(c, s, need.if, now)) continue;
-    const pick = need.else.find(id => guidePred(c, s, recoverOf(c, id)?.when, now));
+    if (guidePred(c, s, need.if, now, ponds)) continue;
+    const pick = need.else.find(id => guidePred(c, s, recoverOf(c, id)?.when, now, ponds));
     return pick ?? need.else[need.else.length - 1] ?? null;
   }
   return null;
@@ -502,18 +515,18 @@ function shownProgress(c: P0Content, s: P0State, st: GuideStep, rec: string | nu
  * whichever is shown — Today's row (names filled, `go` a real place or `home`), the marks resolved, Pip on the farm
  * ({here, bang: his `!`, line, resend_left}). {step: null, end, ended_at} once there is none.
  */
-export function guideView(c: P0Content, s: P0State, now: number) {
+export function guideView(c: P0Content, s: P0State, now: number, ponds = false) {
   const g = s.guide;
   const st = currentStep(c, s);
   if (!g || !st) return { step: null, end: g?.end ?? (g?.step ? 'done' : 'legacy'), ended_at: g?.ended_at ?? null, pip: { here: false } };
-  const rec = guideRecover(c, s, now);
+  const rec = guideRecover(c, s, now, ponds);
   const shown: GuideShow = rec ? recoverOf(c, rec) ?? {} : st;
   const count = shownProgress(c, s, st, rec);
   const row = shown.row ? { ...shown.row } : null;
   const meal = rec ? mealPick(c, s, now) : null;   // only a `{dish}` in what is shown takes it (S8's eat entries)
   const dish = (x: string) => (meal ? x.replace(/\{dish\}/g, m => (x === m ? meal.dish : itemName(c, meal.dish))) : x);   // alone: the id
   if (row) for (const k of ['line', 'icon'] as const) if (typeof row[k] === 'string') row[k] = dish(row[k] as string);
-  const target = !rec && st.gather ? gatherTarget(c, s, st.gather, now) : null;
+  const target = !rec && st.gather ? gatherTarget(c, s, st.gather, now, ponds) : null;
   if (row && target) {
     if (typeof row.line === 'string') row.line = row.line.replace('{gather_item}', itemName(c, target.item)).replace('{gather_spot}', target.spot.name);
     if (row.icon === '{gather}') row.icon = target.item;
@@ -526,7 +539,8 @@ export function guideView(c: P0Content, s: P0State, now: number) {
   return {
     step: st.id, phase: st.phase ?? null, recover: rec, at: g.at, progress: count,
     row, tip: shown.tip ?? null,
-    target: target ? { kind: 'gather' as const, spot: target.spot.id, item: target.item } : undefined,   // absent in JSON when none
+    // absent in JSON when none; pond (pond_guide): the point's pond (亚瑟: away from it Show opens the map at it, in it marks the spot)
+    target: target ? { kind: 'gather' as const, spot: target.spot.id, item: target.item, pond: target.pond } : undefined,
     marks: resolveMarks(c, s, shown.marks, count).map(m => (meal && typeof m.item === 'string' ? { ...m, item: dish(m.item) } : m)),
     pip: { here: true, bang: (g.n['talk:res_pip'] ?? 0) === 0 || ready, line: pipLine ? fill(c, s, dish(pipLine)) : null,
       resend_left: r ? Math.max(0, r.max - (g.n.resend ?? 0)) : 0 },
@@ -535,10 +549,10 @@ export function guideView(c: P0Content, s: P0State, now: number) {
 }
 
 /** The map pins of the step shown (or its recover entry), tracked; while the guide is on they are the only ones (markers.ts). */
-export function guideMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
+export function guideMarkers(c: P0Content, s: P0State, now: number, ponds = false): MapMarker[] {
   const st = currentStep(c, s);
   if (!st) return [];
-  const rec = guideRecover(c, s, now);
+  const rec = guideRecover(c, s, now, ponds);
   const shown: GuideShow = rec ? recoverOf(c, rec) ?? {} : st;
   return resolveMarks(c, s, shown.marks, shownProgress(c, s, st, rec)).filter(m => m.place)
     .map(m => ({ place: m.place!, kind: (m.kind === 'gift' ? 'request' : m.kind ?? 'request') as MarkerKind,
