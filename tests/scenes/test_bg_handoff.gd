@@ -31,6 +31,8 @@ func test_farm_background_renders_opaque_after_a_transparent_map_surface() -> vo
 	viewport.add_child(farm)
 	farm.set_process(false)
 	await get_tree().process_frame
+	# The pixel reads below need a renderer that draws: headless frame_post_draw never comes (SGODOT-460).
+	if DisplayServer.get_name() == "headless": return
 	await RenderingServer.frame_post_draw
 	var rendered := viewport.get_texture().get_image()
 	assert_bool(rendered.is_empty()).is_false()

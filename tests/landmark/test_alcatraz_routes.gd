@@ -12,6 +12,11 @@ const END_FLIGHTS := [[Vector3(-22, 1, 12), Vector3(-22, 3.25, 7.5)], [Vector3(8
 ## −3.5 … 1, landings −4.75 … 2.25).
 const MID_X := Vector2(-5.0, 2.5)
 
+## The scene's setup asks for a P0 visit, so its start brings up the P0Runtime singleton with its full-screen HUD; left
+## up, it took the mouse from later suites (test_panels_2b's drawer drags, SGODOT-460). It goes with the suite.
+func after() -> void:
+	P0Runtime.free_instance_for_tests()
+
 static func _v(a) -> Vector3: return Vector3(float(a[0]), float(a[1]), float(a[2]))
 
 ## The way the scene walks a tap (find_path: every polygon of the island searched, not Godot's default 4096).
