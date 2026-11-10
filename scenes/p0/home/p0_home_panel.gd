@@ -231,7 +231,7 @@ static func _look_row(ui: P0Ui, r: Dictionary) -> Control:
 static func _source(ui: P0Ui, tile: Control, id: String) -> void:
 	var src := P0Logic.home_source(ui.view, id)
 	var go := str(src.go)
-	# 355 C2: a city's spot or a wild mine (`gather:` / `mine:`) is a map pin, as Today's rows go (P0Ui.show_label)
+	# 355 C2 / U2: a pond's point or a wild mine (`gather:` / `mine:`) is a map pin, as Today's rows go (P0Ui.show_label)
 	var pin := go.begins_with("gather:") or go.begins_with("mine:")
 	var label := P0Ui.show_label(go, ui.space_here(), ui.spot_reachable(), ui.place) if pin else ""
 	if not (go == "skills" or (label != "" if pin else ui.spot_reachable())): go = ""
@@ -240,7 +240,7 @@ static func _source(ui: P0Ui, tile: Control, id: String) -> void:
 		if go == "skills": ui.open_skills(func(): ui.open_home_panel(home_back))
 		else:
 			ui.close_modal()
-			if pin and label != "Show": ui.show_on_map.emit(go)
+			if pin and label != "Show": ui.show_on_map.emit(P0Ui.map_target(go))   # a pond's point: its pond's pin (U2)
 			else: ui.show_spot.emit(go)
 	var layer := UiNeedSource.popup(ui.root, tile.get_global_rect(), str(src.text), on_show)
 	layer.theme = UiKit.theme()

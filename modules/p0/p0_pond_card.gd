@@ -7,6 +7,7 @@ extends RefCounted
 ##   P1 (SGODOT-283; 不知火舞 e61cda10 ②, Figma POND-CARD-WX-V2 2255:143053): the template's thumbnail left of the title,
 ##   the condition line now (`Dusk · Windy`, from view.fishing.places[id]), Biting more (now, hidden when none),
 ##   Forecast (Fishing Lv3+) and Your trap (q(109) ⑦), in that order after Recommended.
+##   U2 (不知火舞's spec v1.2 §2, v4q(11) ⑧): Gather, what the pond has, after Distance (and the map's Online now).
 
 const Board := preload("res://modules/p0/p0_bite_board.gd")
 const Trap := preload("res://modules/p0/p0_trap.gd")
@@ -20,7 +21,10 @@ static func info(view: Dictionary, pond_id: String, km: float) -> Dictionary:
 	var template := template_of(pond_id)
 	var beginner := bool(place.get("beginner", false))
 	var distance := P0PlaceSheet.distance_text(km)
-	var facts: Array = [["Distance", distance], ["Recommended", "Outleveled" if outleveled(view, pond_id) else str(RECOMMENDED.get(template, ""))]]
+	var facts: Array = [["Distance", distance]]
+	var gather := gather_fact(view, pond_id)
+	if not gather.is_empty(): facts.append(gather)
+	facts.append(["Recommended", "Outleveled" if outleveled(view, pond_id) else str(RECOMMENDED.get(template, ""))])
 	var now: Dictionary = view.get("fishing", {}).get("places", {}).get(pond_id, {})
 	var level := int(view.get("skills", {}).get("fishing", {}).get("level", 1))
 	var caught: Dictionary = view.get("fishing", {}).get("caught", {})
@@ -43,6 +47,23 @@ static func info(view: Dictionary, pond_id: String, km: float) -> Dictionary:
 		"facts": facts,
 		"tag": "%s · %s" % ["Beginner pond" if beginner else template, distance],
 	}
+
+## U2: the pond's `Gather` fact (不知火舞's spec v1.2 §2) — the items its points give first (view.gather.ponds, the home city's
+## and the one the player is in), each once, in P0Logic.GATHERED's order (Timber, Stone, Reeds, Clay, Wild Herb, Hardwood,
+## Flax; any other after), joined by ` · `, no counts; cooling ones too (what is here, not what is ready). [] for a pond
+## with none or one the view does not send (another city's: no row, no `?`).
+static func gather_fact(view: Dictionary, pond_id: String) -> Array:
+	var ponds = view.get("gather", {}).get("ponds", {}) if view.get("gather") is Dictionary else {}
+	var pond = ponds.get(pond_id, null) if ponds is Dictionary else null
+	if not pond is Dictionary: return []
+	var items: Array = []
+	for pt in pond.get("points", []):
+		var id := str(pt.get("item", "")) if pt is Dictionary else ""
+		if id != "" and not items.has(id): items.append(id)
+	if items.is_empty(): return []
+	var rank := func(id: String) -> int: return P0Logic.GATHERED.find(id) if P0Logic.GATHERED.has(id) else P0Logic.GATHERED.size()
+	items.sort_custom(func(a, b): return rank.call(a) < rank.call(b))
+	return ["Gather", " · ".join(items.map(func(id): return P0Logic.item_name(view, id)))]
 
 ## Every fish of the site pays 0 XP at the player's Fishing level (the server's xpPercent: a gap past the
 ## xp_multiplier table is "outleveled").

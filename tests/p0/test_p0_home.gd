@@ -208,18 +208,18 @@ func test_material_source_breaks_only_before_or() -> void:
 	var v := _view()
 	v["names"] = {"clay": "Clay", "rock_salt": "Rock Salt"}
 	# every space within a part a no-break one: the card breaks only at a ` · ` (eb1d7c20, UiNeedSource.fit_to)
-	assert_str(str(P0MaterialLogic.material_source(v, "clay").text)).is_equal("Clay · Clay\u00a0Pits\u00a0in\u00a0town · or\u00a0Quarries")
+	assert_str(str(P0MaterialLogic.material_source(v, "clay").text)).is_equal("Clay · Ponds\u00a0in\u00a0some\u00a0towns · or\u00a0Quarries")
 	assert_str(str(P0MaterialLogic.material_source(v, "rock_salt").text)).is_equal("Rock\u00a0Salt · Quarries")
 
 func test_material_sources_name_the_mine() -> void:
-	# HOME-1 uses the workbench's line (P0MaterialLogic.material_source, Li Bai q(65)): the city's spots and the mines
-	# (355 3b2c6a43); Show where Today points (no spots read, no free sites in this view: none)
+	# HOME-1 uses the workbench's line (P0MaterialLogic.material_source, Li Bai q(65)): the ponds and the mines (355
+	# 3b2c6a43, U2); Show where Today points (no ponds in view.gather, no free sites: none, `Ponds in some towns`)
 	var v := _view()
 	v["names"] = {"wood": "Timber", "stone": "Stone", "fiber": "Reeds", "clay": "Clay", "rock_salt": "Rock Salt", "bait_worm": "Worm Bait"}
-	assert_that(_plain(P0Logic.home_source(v, "stone"))).is_equal({"text": "Stone · Rocks in town · or any mine", "go": ""})
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Clay Pits in town · or Quarries", "go": ""})
+	assert_that(_plain(P0Logic.home_source(v, "stone"))).is_equal({"text": "Stone · Ponds in some towns · or any mine", "go": ""})
+	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Ponds in some towns · or Quarries", "go": ""})
 	assert_that(_plain(P0Logic.home_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarries", "go": ""})
-	assert_that(_plain(P0Logic.home_source(v, "wood"))).is_equal({"text": "Timber · Groves in town", "go": ""})
+	assert_that(_plain(P0Logic.home_source(v, "wood"))).is_equal({"text": "Timber · Ponds in some towns", "go": ""})
 	# Coins and skills keep their own lines.
 	assert_str(str(P0Logic.home_source(v, "coins").go)).is_equal("stall")
 	assert_str(str(P0Logic.home_source(v, "skills").go)).is_equal("")

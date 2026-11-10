@@ -56,10 +56,10 @@ func _plain(src: Dictionary) -> Dictionary:
 
 func test_material_sources_name_the_mine_type() -> void:
 	var v := _view()
-	# 355 3b2c6a43: the city's spots and the mines; Show where Today points (none in this view: no free sites read)
+	# 355 3b2c6a43 / U2: the ponds and the mines; Show where Today points (none in this view: no ponds, no free sites read)
 	assert_that(_plain(P0MaterialLogic.material_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Quarries", "go": ""})
-	assert_str(_plain(P0MaterialLogic.material_source(v, "wood")).text).ends_with(" · Groves in town")
-	assert_that(_plain(P0MaterialLogic.material_source(v, "clay"))).is_equal({"text": "Clay · Clay Pits in town · or Quarries", "go": ""})
+	assert_str(_plain(P0MaterialLogic.material_source(v, "wood")).text).ends_with(" · Ponds in some towns")
+	assert_that(_plain(P0MaterialLogic.material_source(v, "clay"))).is_equal({"text": "Clay · Ponds in some towns · or Quarries", "go": ""})
 	assert_that(_plain(P0MaterialLogic.material_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarries", "go": ""})
 	# Not materials: bait also comes from the tackle shop, seeds from the stall; the other rules say those.
 	assert_that(P0MaterialLogic.material_source(v, "bait_worm")).is_empty()
