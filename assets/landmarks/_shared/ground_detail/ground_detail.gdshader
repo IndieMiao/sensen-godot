@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode diffuse_burley, specular_schlick_ggx;
 
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 // Packed linear DATA, not source_color. Opaque, static, no additional pass.
 uniform sampler2D fields : filter_linear_mipmap, repeat_enable;
 uniform sampler2D surfaces : filter_linear_mipmap, repeat_enable;
@@ -99,28 +101,28 @@ void fragment() {
     vec2 p = ground_position;
     int kind = finish_kind;
     if (kind == 0) {
-        if (near_key(base, grass_key.rgb) || near_key(base, grass_dark_key.rgb) || near_key(base, grass_light_key.rgb)) kind = 1;
-        else if (near_key(base, paving_key.rgb)) kind = 2;
-        else if (near_key(base, wood_key.rgb) || near_key(base, wood_light_key.rgb) || near_key(base, wood_dark_key.rgb)) kind = 3;
-        else if (near_key(base, sand_key.rgb)) kind = 4;
-        else if (near_key(base, wet_sand_key.rgb)) kind = 5;
+        if (near_key(base, src_linear4(grass_key).rgb) || near_key(base, src_linear4(grass_dark_key).rgb) || near_key(base, src_linear4(grass_light_key).rgb)) kind = 1;
+        else if (near_key(base, src_linear4(paving_key).rgb)) kind = 2;
+        else if (near_key(base, src_linear4(wood_key).rgb) || near_key(base, src_linear4(wood_light_key).rgb) || near_key(base, src_linear4(wood_dark_key).rgb)) kind = 3;
+        else if (near_key(base, src_linear4(sand_key).rgb)) kind = 4;
+        else if (near_key(base, src_linear4(wet_sand_key).rgb)) kind = 5;
     }
     float wet = 0.0;
     if (kind == 1) {
         float broad = texture(fields, p / max(grass_patch_repeat_m, 0.001)).r;
         float second = texture(fields, (p.yx + grass_secondary_offset_m) / max(grass_patch_repeat_m * grass_secondary_ratio, 0.001)).r;
         float patch = mix(broad, second, grass_secondary_mix);
-        vec3 grass = mix(grass_deep_color.rgb, grass_base_color.rgb, smoothstep(grass_deep_transition.x, grass_deep_transition.y, patch));
-        grass = mix(grass, grass_sun_color.rgb, smoothstep(grass_sun_transition.x, grass_sun_transition.y, patch));
+        vec3 grass = mix(src_linear4(grass_deep_color).rgb, src_linear4(grass_base_color).rgb, smoothstep(grass_deep_transition.x, grass_deep_transition.y, patch));
+        grass = mix(grass, src_linear4(grass_sun_color).rgb, smoothstep(grass_sun_transition.x, grass_sun_transition.y, patch));
         float leaf = texture(fields, p / max(grass_detail_repeat_m, 0.001)).g;
         detailed = grass * (1.0 + (leaf - 0.5) * grass_detail_strength * 2.0);
     } else if (kind == 2) {
         vec2 stone = texture(surfaces, p / max(paving_repeat_m, vec2(0.001))).rg;
-        detailed = paving_color.rgb * (1.0 - stone.r * paving_joint_strength + (stone.g - 0.5) * paving_tone_strength);
+        detailed = src_linear4(paving_color).rgb * (1.0 - stone.r * paving_joint_strength + (stone.g - 0.5) * paving_tone_strength);
     } else if (kind == 3) {
-        vec3 wood = wood_color.rgb;
-        if (near_key(base, wood_light_key.rgb)) wood = wood_light_color.rgb;
-        else if (near_key(base, wood_dark_key.rgb)) wood = wood_dark_color.rgb;
+        vec3 wood = src_linear4(wood_color).rgb;
+        if (near_key(base, src_linear4(wood_light_key).rgb)) wood = src_linear4(wood_light_color).rgb;
+        else if (near_key(base, src_linear4(wood_dark_key).rgb)) wood = src_linear4(wood_dark_color).rgb;
         float grain = texture(surfaces, p / max(wood_repeat_m, vec2(0.001))).b;
         detailed = wood * (1.0 + (grain - 0.5) * wood_grain_strength * 2.0);
         // Metric boards run along projected X. Alternate rows shift the end joints.
@@ -136,7 +138,7 @@ void fragment() {
             vec2(wood_joint_width_m * 0.5) + aa, edge_m);
         float seam = wood_joint_width_m > 0.0 ? max(joints.x, joints.y) : 0.0;
         detailed *= 1.0 + (board_tone(cell) - 0.5) * wood_board_tone_strength * 2.0;
-        detailed = mix(detailed, wood_joint_color.rgb, seam);
+        detailed = mix(detailed, src_linear4(wood_joint_color).rgb, seam);
     } else if (kind == 4 || kind == 5) {
         // Two reads, both existing packed channels; no ripple/normal/water sampling.
         float broad = texture(fields, p / max(sand_macro_repeat_m, 0.001)).r;
@@ -148,8 +150,8 @@ void fragment() {
             wet = tide_enabled ? smoothstep(-tide_transition_m * 0.5, tide_transition_m * 0.5, shore) : 1.0;
             band = tide_enabled ? (1.0 - smoothstep(0.0, max(tide_band_width_m, 0.001), abs(shore - tide_band_offset_m))) * tide_band_strength : 0.0;
         }
-        detailed = mix(sand_color.rgb, wet_sand_color.rgb, wet);
-        detailed = mix(detailed, tide_color.rgb, band);
+        detailed = mix(src_linear4(sand_color).rgb, src_linear4(wet_sand_color).rgb, wet);
+        detailed = mix(detailed, src_linear4(tide_color).rgb, band);
         detailed *= 1.0 + (broad - 0.5) * sand_macro_strength * 2.0 + (grain - 0.5) * sand_grain_strength * 2.0;
     }
     float coverage = strength * up_facing;
@@ -158,4 +160,5 @@ void fragment() {
     ROUGHNESS = mix(surface_roughness, wet_roughness, wet * coverage);
     SPECULAR = surface_specular;
     METALLIC = 0.0;
+	ALBEDO = albedo_out(ALBEDO);
 }

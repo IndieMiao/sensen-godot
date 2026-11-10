@@ -17,3 +17,5 @@ vec3 albedo_out(vec3 c) {
 vec3 src_linear(vec3 c) { return c; }
 vec3 albedo_out(vec3 c) { return c; }
 #endif
+// A source_color vec4 (a texture's sample, an RGBA colour): its colour to linear, its alpha as it is.
+vec4 src_linear4(vec4 c) { return vec4(src_linear(c.rgb), c.a); }

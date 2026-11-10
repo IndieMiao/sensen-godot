@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode unshaded, cull_disabled, blend_mix, depth_draw_never;
 
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 // Same camera-facing far-depth projection as the Alcatraz cards.
 uniform float depth_fraction : hint_range(0.5,0.999) = 0.96;
 uniform vec4 base_color : source_color = vec4(0.90980,0.85490,0.79216,1.0);
@@ -17,11 +19,12 @@ void vertex() {
     vec3 view_position = vec3(center.xy + VERTEX.xy * axis_scale, far_plane.z / far_plane.w * depth_fraction);
     POSITION = PROJECTION_MATRIX * vec4(view_position,1.0);
     // GLB RGB is palette weight, not sRGB paint. Fog changes colour, not opacity.
-    vec3 paint = COLOR.r * base_color.rgb + COLOR.g * accent_color.rgb + COLOR.b * shadow_color.rgb;
-    card_color = mix(paint,fog_color.rgb,fog_amount);
+    vec3 paint = COLOR.r * src_linear4(base_color).rgb + COLOR.g * src_linear4(accent_color).rgb + COLOR.b * src_linear4(shadow_color).rgb;
+    card_color = mix(paint,src_linear4(fog_color).rgb,fog_amount);
 }
 
 void fragment() {
     ALBEDO = card_color;
     ALPHA = 1.0;
+	ALBEDO = albedo_out(ALBEDO);
 }

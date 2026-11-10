@@ -521,13 +521,17 @@ func _backdrop() -> MeshInstance3D:
 	return plate
 
 ## Screen-space vertical two-colour plate (SGODOT-227 美术决定 2b53b84d): linear inputs reversed from the screen colours.
+## top_input / bottom_input are linear (aces_input's), no source_color: on GLES they go out through albedo_out, else the
+## room's ground took a second sRGB-to-linear there and read darker (SGODOT-458, 周瑜: the tea house (221,232,231) on Mobile,
+## (154,188,185) on GLES).
 const BACKDROP_SHADER := """shader_type spatial;
 render_mode unshaded, fog_disabled, shadows_disabled, cull_disabled;
+#include "res://modules/render/gles_colour.gdshaderinc"
 uniform vec3 top_input;
 uniform vec3 bottom_input;
 uniform vec2 blend = vec2(0.5, 0.85);
 void fragment() {
-	ALBEDO = mix(top_input, bottom_input, smoothstep(blend.x, blend.y, SCREEN_UV.y));
+	ALBEDO = albedo_out(mix(top_input, bottom_input, smoothstep(blend.x, blend.y, SCREEN_UV.y)));
 }
 """
 func _backdrop_gradient() -> ShaderMaterial:

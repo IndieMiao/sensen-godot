@@ -1,5 +1,7 @@
 shader_type spatial;
 render_mode cull_disabled;
+// GLES (SGODOT-458): the linear vertex colour and its grain worked out in linear, handed over as GLES wants it.
+#include "res://modules/render/gles_colour.gdshaderinc"
 varying vec3 world;
 void vertex() {
     world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -12,7 +14,7 @@ void fragment() {
     float vein = pow(max(cos(angle * 9.0 + sin(r * 4.0) * 0.24), 0.0), 32.0);
     float central_dimple = 1.0 - smoothstep(0.025, 0.10, r);
     float grain = sin(world.x * 171.0) * sin(world.z * 139.0) * 0.009;
-    ALBEDO = COLOR.rgb * (0.98 + vein * 0.035 - central_dimple * 0.10 + grain);
+    ALBEDO = albedo_out(COLOR.rgb * (0.98 + vein * 0.035 - central_dimple * 0.10 + grain));
     ROUGHNESS = 0.74;
     SPECULAR = 0.14;
 }

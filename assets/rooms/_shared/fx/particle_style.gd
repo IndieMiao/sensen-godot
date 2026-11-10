@@ -8,9 +8,16 @@ static func curve(points: Array) -> CurveTexture:
  result.curve = data
  return result
 
+## The particles' colour over their life, drawn as a linear vertex colour (the sprite's vertex_color_use_as_albedo). On
+## Compatibility (GLES3) the material reads it as sRGB, a second decode: the ramp is given there sRGB-encoded, so it
+## reads as it does on Mobile (SGODOT-458). Alpha as it is.
 static func ramp(colors: PackedColorArray, offsets: PackedFloat32Array) -> GradientTexture1D:
  var texture := GradientTexture1D.new()
  var gradient := Gradient.new()
+ if RenderingServer.get_current_rendering_method() == "gl_compatibility":
+  var encoded := PackedColorArray()
+  for c in colors: encoded.append(Color(c.linear_to_srgb(), c.a))
+  colors = encoded
  gradient.colors = colors
  gradient.offsets = offsets
  texture.gradient = gradient
