@@ -57,7 +57,7 @@ func test_kept_ahead_of_the_homestead_gap_that_points_at_the_same_mine() -> void
 	assert_str(str(home.row.go)).is_equal("mine:wd-254-115")
 	assert_str(str(P0Logic.vein_row(v).go)).is_equal("mine:wd-254-115")
 	var lines: Array = P0Logic.today_rows(v).map(func(r): return str(r.line))
-	assert_array(lines).is_equal(["Ironvale Vein · Floor 0/10", "Homestead Lv6 · Iron Ore 4 to go"])
+	assert_array(lines).is_equal(["Ironvale Vein · Floor 0/10", "Home Lv6 · Iron Ore 4 to go"])
 
 func test_in_today_it_is_pips_request_before_the_other_short_ones() -> void:
 	var v := _view(5, {}, {"plots": [{"state": "ready", "crop": "crop_radish"}, {"state": "sown", "crop": "crop_radish"}],

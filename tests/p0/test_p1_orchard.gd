@@ -16,7 +16,7 @@ func test_a_sapling_plants_on_an_empty_plot_one_press_one_tree() -> void:
 		assert_that([a.verb, a.sub, a.enabled, a.need, a.get("once", false)]).is_equal(["Plant", "6 Energy", true, 6, true])
 		assert_that(a.cmd).is_equal({"type": "sow", "plot": 4, "seed": "seed_apple"})   # no Row Hoe for trees
 	var full := P0Logic.main_action(_view(3, 3), {"id": 4, "state": "tilled"}, "seed_apple")
-	assert_that([full.verb, full.sub, full.enabled, full.toast]).is_equal(["Plant", "Orchard 3/3", false, "Orchard 3/3 · Homestead Lv3 adds 1"])
+	assert_that([full.verb, full.sub, full.enabled, full.toast]).is_equal(["Plant", "Orchard 3/3", false, "Orchard 3/3 · Home Lv3 adds 1"])
 	var tired := P0Logic.main_action(_view(2, 3, 4), {"id": 4, "state": "tilled"}, "seed_apple")
 	assert_that([tired.verb, tired.sub, tired.amber, tired.cmd]).is_equal(["Plant", "Need 6 Energy", true, {"type": "energy_card"}])
 

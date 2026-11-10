@@ -463,7 +463,7 @@ func test_p0_a_toasts_no_break_space_is_looked_up_as_a_space() -> void:
 	assert_str(plain.call(zh.call("Swift Growth · 20 min · crops sown now grow 2× faster"))).is_equal("加速生长 · 20 分钟 · \n现在种下的作物长得快一倍")
 	assert_str(plain.call(zh.call("Twin Catch · 20 min · every fish lands ×2"))).is_equal("双倍渔获 · 20 分钟 · \n每条鱼都 ×2")
 	# two Info toasts that broke a word at 182 px (李白's list, shot under 中文): broken after a ` · ` too, the second shorter
-	assert_str(zh.call("Spice Rack · seasonings off your bag · Homestead Lv2")).is_equal("调味架 · 调味料不占背包 · \n家园 Lv2")
+	assert_str(zh.call("Spice Rack · seasonings off your bag · Home Lv2")).is_equal("调味架 · 调味料不占背包 · \n家园 Lv2")
 	assert_str(plain.call(zh.call("Mix 1–3 ingredients · unknown mixes may become a Mystery Dish"))).is_equal("放 1–3 样食材 · \n新搭配可能做出黑暗料理")
 	# part by part along ` · `: the known part in Chinese, the unknown one English with its no-break space kept
 	assert_str(zh.call("Twin Catch · 20 zorbs")).is_equal("双倍渔获 · 20" + char(0xa0) + "zorbs")
@@ -488,7 +488,7 @@ func test_p0_the_decor_cap_line_reads_as_one_sentence() -> void:
 	v.decor.cap = 24
 	v.decor.placed.resize(24)
 	var below := P0Decor.cap_line(v)
-	assert_str(below).is_equal("Decor 24/24 · Homestead Lv3 adds 4")
+	assert_str(below).is_equal("Decor 24/24 · Home Lv3 adds 4")
 	assert_str(zh.call(below)).is_equal("摆件 24/24 · 家园 Lv3 时 +4")
 	v.decor.placed.resize(12)
 	var head := P0Decor.header_line(v)
@@ -559,7 +559,7 @@ func test_p0_the_held_wings_lines() -> void:
 	t.load_table("res://assets/localization/p0_zh_CN.json")
 	var zh := func(s: String) -> String: return String(t._get_message(s, &""))
 	assert_str(zh.call(P0Logic.HOME_BLOCKED_TAP)).is_equal("位置已被占用 · 先清空")
-	assert_str(zh.call("Homestead Lv8 · Space taken")).is_equal("家园 Lv8 · 位置已被占用")
+	assert_str(zh.call("Home Lv8 · Space taken")).is_equal("家园 Lv8 · 位置已被占用")
 	assert_str(zh.call("Kitchen Wing · Space taken")).is_equal("灶房扩建 · 位置已被占用")
 	assert_str(zh.call("Master Farmhouse · Space taken")).is_equal("大师农舍 · 位置已被占用")
 	assert_str(zh.call("Lv8 look · Kitchen Wing")).is_equal("Lv8 外观 · 灶房扩建")
@@ -634,3 +634,20 @@ func test_p0_a_toast_is_translated_before_it_breaks_at_its_dot() -> void:
 	assert_bool(zh.contains("Fish") or zh.contains("open one")).override_failure_message(zh).is_false()
 	assert_str(zh.replace("\n", " · ")).is_equal("去鱼塘钓鱼 · 从地图上打开一个")
 	assert_bool(en.begins_with("Fish from a pond")).is_true()   # English as it was, broken or not by its own width
+
+## SGODOT-461 (the user, 11-10: "把homestead换成home"; 不知火舞's spec, 李白's q(306)): the English says Home where it said
+## Homestead, its Chinese still 家园. The table keeps every old Homestead key beside its new one (a new build against
+## an old server, and the server's own lines until it is deployed after 0.3.5, still read in Chinese); bare `Home` is the
+## homestead now and the home city is `Home city`; Homestead, Florida (a real city in the clusters) keeps its name.
+func test_p0_homestead_reads_home_and_both_keys_keep_their_chinese() -> void:
+	var table: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/localization/p0_zh_CN.json"))
+	var olds := table.keys().filter(func(k): return str(k).contains("Homestead"))
+	assert_int(olds.size()).is_greater(30)
+	for old in olds:
+		var new_key: String = "Back Home" if old == "Back to Homestead" else str(old).replace("Homestead", "Home")
+		assert_bool(table.has(new_key)).override_failure_message(new_key).is_true()
+		if new_key != "Home": assert_str(str(table[new_key])).override_failure_message(new_key).is_equal(str(table[old]))
+	assert_str(str(table["Home"])).is_equal("家园")
+	assert_str(str(table["Home city"])).is_equal("家城")
+	assert_str(str(table["Home city only"])).is_equal("仅限家城鱼塘")
+	assert_str(str(preload("res://modules/p0/p0_clusters.gd").get_cluster("gn-4159050").get("name", ""))).is_equal("Homestead")   # Florida's, untouched

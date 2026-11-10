@@ -78,7 +78,7 @@ func test_rows_cards_and_lines_read_like_q111_and_q113() -> void:
 	for i in 12: v.decor.placed.append({"uid": i + 1, "id": "deco_planter", "x": 99, "y": i, "rot": 0})
 	assert_str(P0Decor.header_line(v)).is_equal("Decor 12/24 · Goes to Farm Storage")
 	for i in 12: v.decor.placed.append({"uid": i + 13, "id": "deco_planter", "x": 98, "y": i, "rot": 0})
-	assert_str(P0Decor.cap_line(v)).is_equal("Decor 24/24 · Homestead Lv3 adds 4")
+	assert_str(P0Decor.cap_line(v)).is_equal("Decor 24/24 · Home Lv3 adds 4")
 	v.homestead.level = 17   # the top level since v4q(1) (Lv10 before)
 	v.decor.cap = 24
 	assert_str(P0Decor.cap_line(v)).is_equal("Decor 24/24 · Store one to place this")
@@ -90,7 +90,7 @@ func test_rows_cards_and_lines_read_like_q111_and_q113() -> void:
 	v.decor.cap = 48
 	v.decor.placed.resize(0)
 	for i in 48: v.decor.placed.append({"uid": i + 1, "id": "deco_planter", "x": 99, "y": i, "rot": 0})
-	assert_str(P0Decor.cap_line(v, m)).is_equal("Decor 48/48 · Homestead Lv9 adds 4")
+	assert_str(P0Decor.cap_line(v, m)).is_equal("Decor 48/48 · Home Lv9 adds 4")
 	v.homestead.level = 9
 	v.decor.cap = 52
 	for i in 4: v.decor.placed.append({"uid": i + 49, "id": "deco_planter", "x": 98, "y": i, "rot": 0})
@@ -164,7 +164,7 @@ func test_the_stall_decor_page_lists_the_pieces_in_their_states() -> void:
 	assert_array(row.call("deco_scarecrow")).is_equal([["1×1 · Keeps watch"], ["secondary:Buy"]])
 	assert_array(row.call("deco_fence")).is_equal([["6 pieces", "In storage ×6"], ["unavailable:Bought today · 9h 12m"]])
 	assert_array(row.call("deco_birdbath")).is_equal([["1×1 · Bluebird perch"], ["unavailable:Need 40 more coins"]])
-	assert_array(row.call("deco_windmill")).is_equal([["2×2 · Spins in wind", "1 level to go"], ["unavailable:Homestead Lv3 needed"]])
+	assert_array(row.call("deco_windmill")).is_equal([["2×2 · Spins in wind", "1 level to go"], ["unavailable:Home Lv3 needed"]])
 
 ## Spec v2 (284 6a751a9a): a piece taps as at least 44 × 44 at any zoom (the whole yard is about 17 px a cell); the nearest
 ## centre wins where two grown boxes overlap.

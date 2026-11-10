@@ -35,7 +35,7 @@ static func stall(view: Dictionary, fresh := false) -> Dictionary:
 	if board == "deliver": status = UiStatusBadge.State.DELIVERABLE
 	elif board != "": status = UiStatusBadge.State.REQUEST
 	elif fresh and not P0Guide.guide_on(view): status = UiStatusBadge.State.NEW
-	return _p("homestead_stall", "Homestead Stall", "", status)
+	return _p("homestead_stall", "Home Stall", "", status)
 
 ## Farmhouse: the guide's ! while a cookable fish waits for the stove (A-03, P0Guide.door_badge; 不知火舞 on 232).
 static func farmhouse(view: Dictionary) -> Dictionary:
@@ -49,7 +49,7 @@ static func sign(view: Dictionary) -> Dictionary:
 	# While the guide is on the sign is lit only by S7a's mark (v4q(4) ⑥ t_upgrade: `Tap the Homestead sign by the door.`)
 	var marked := P0Guide.guide_marks(view).any(func(m): return m is Dictionary and str(m.get("object", "")) == "sign")
 	var lit: bool = nxt is Dictionary and bool(nxt.get("can_upgrade", false)) and (not P0Guide.guide_on(view) or marked)
-	return _p("level_up", "Homestead Lv%d" % int(h.get("level", 1)), "", UiStatusBadge.State.READY if lit else -1)
+	return _p("level_up", "Home Lv%d" % int(h.get("level", 1)), "", UiStatusBadge.State.READY if lit else -1)
 
 ## Upgrade Plaque: no mark; only the strip when it is the nearest (PLAQUE-READ).
 static func plaque(_view: Dictionary) -> Dictionary:

@@ -30,13 +30,13 @@ func test_a_running_day_pass_covers_its_city_and_shows_on_the_chip() -> void:
 	assert_str(P0Travel.fog(v, TOKYO)).is_equal("explored")
 	assert_int(P0Travel.visits(v, TOKYO)).is_equal(1)
 	assert_str(P0Travel.pass_text(v, TOKYO)).is_equal("23h")
-	var chip := P0Travel.place(v, {city = "San Francisco", space = "Homestead", kind = UiHud.PlaceKind.HOME, day_pass = ""})
+	var chip := P0Travel.place(v, {city = "San Francisco", space = "Home", kind = UiHud.PlaceKind.HOME, day_pass = ""})
 	# q(257) ⑤ (q(108) ③'s free version showed none): Tokyo · Arrived · Day Pass 23h
 	assert_dict(chip).is_equal({city = "Tokyo", space = "Arrived", kind = UiHud.PlaceKind.FOREIGN, day_pass = "23h"})
 	v.travel.passes[TOKYO].until = now + 47 * 60000.0
 	assert_str(P0Travel.pass_text(v, TOKYO)).is_equal("47m")
 	# the homestead's own spaces are home whatever `here` still says (李元芳's cold start, SGODOT-278)
-	var farm := {city = "San Francisco", space = "Homestead", kind = UiHud.PlaceKind.HOME, day_pass = ""}
+	var farm := {city = "San Francisco", space = "Home", kind = UiHud.PlaceKind.HOME, day_pass = ""}
 	assert_dict(P0Travel.place(v, farm, "home")).is_equal(farm)
 	# a mine is a wild site (355 b1): its own chip, foreign, no Day Pass (E1 / E2)
 	var mine := {city = "Ironvale Vein", space = "Floor 3", kind = UiHud.PlaceKind.HOME, day_pass = ""}
@@ -51,7 +51,7 @@ func test_an_expired_pass_covers_nothing_and_the_home_chip_is_untouched() -> voi
 	assert_str(P0Travel.pass_text(v, TOKYO)).is_empty()
 	assert_str(P0Travel.fog(v, TOKYO)).is_equal("explored")   # once visited, stays explored
 	var home := _view({home = SF, here = SF})
-	var info := {city = "San Francisco", space = "Homestead", kind = UiHud.PlaceKind.HOME, day_pass = ""}
+	var info := {city = "San Francisco", space = "Home", kind = UiHud.PlaceKind.HOME, day_pass = ""}
 	assert_dict(P0Travel.place(home, info)).is_equal(info)
 
 func test_the_browse_tier_matches_the_server_rule() -> void:
@@ -101,7 +101,7 @@ func test_the_passport_lists_home_and_the_cities_reached_newest_first() -> void:
 	assert_str(str(p.title)).is_equal("Passport")
 	assert_array(p.facts).is_equal([["Cities visited", "3"], ["First visits today", "1/2"]])
 	assert_array(p.rows.map(func(r): return [str(r.title), str(r.state)])).is_equal(
-		[["San Francisco", "Home"], ["Los Angeles", "Regular"], ["Tijuana", "Visited"]])
+		[["San Francisco", "Home city"], ["Los Angeles", "Regular"], ["Tijuana", "Visited"]])
 	assert_str(str(p.rows[1].stamp)).is_equal("res://assets/p0/stamps/stamp_los_angeles.png")   # a landmark stamp (表 11-18)
 	assert_str(str(p.rows[2].stamp)).is_equal("")   # a climate stamp: the passport icon
 	var page := P0Travel.city_page(v, TIJUANA)

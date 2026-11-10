@@ -113,7 +113,7 @@ func test_a_wild_travel_card_is_free_for_the_nearest_three_and_says_the_fare_els
 func test_the_place_chip_at_a_wild_site_names_it_with_its_day_pass() -> void:
 	var v := _view({"now": 1000.0, "travel": {"home": SF, "here": "wd-254-115", "passes": {"wd-254-115": {"until": 1000.0 + 23 * 3600000.0}}},
 		"wild": {"here": {"id": "wd-254-115", "name": "Ironvale Vein"}}})
-	var chip: Dictionary = P0Travel.place(v, {"city": "San Francisco", "space": "Homestead"})
+	var chip: Dictionary = P0Travel.place(v, {"city": "San Francisco", "space": "Home"})
 	assert_str(str(chip.city)).is_equal("Ironvale Vein")
 	assert_str(str(chip.space)).is_equal("")
 	assert_str(str(chip.day_pass)).is_equal("23h")

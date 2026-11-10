@@ -26,7 +26,7 @@ static func _lv7() -> Dictionary:
 
 static func _home_row(v: Dictionary) -> Dictionary:
 	for r in P0Logic.today_rows(v):
-		if str(r.line).begins_with("Homestead") or str(r.line).begins_with("Upgrade to Homestead"): return r
+		if str(r.line).begins_with("Home") or str(r.line).begins_with("Upgrade to Home"): return r
 	return {}
 
 func test_the_wing_cells_are_the_contents_and_the_houses_from_lv8() -> void:
@@ -72,10 +72,10 @@ func test_home1_greys_upgrade_with_space_taken_as_the_last_gap() -> void:
 
 func test_today_says_space_taken_to_do_now_without_a_dot() -> void:
 	var v := _lv7()
-	assert_str(str(_home_row(v).line)).is_equal("Upgrade to Homestead Lv8")
+	assert_str(str(_home_row(v).line)).is_equal("Upgrade to Home Lv8")
 	v.homestead.next.blocked = _held()
 	var row := _home_row(v)
-	assert_str(str(row.line)).is_equal("Homestead Lv8 · Space taken")
+	assert_str(str(row.line)).is_equal("Home Lv8 · Space taken")
 	assert_str(str(row.icon)).is_equal("deco_planter")
 	assert_str(str(row.go)).is_equal(P0Logic.DECORATE_GO)
 	assert_str(str(row.dot)).is_empty()
@@ -83,7 +83,7 @@ func test_today_says_space_taken_to_do_now_without_a_dot() -> void:
 	assert_bool(bool(P0Logic.homestead_row(v).now)).is_true()
 	assert_array(P0Logic.today_dots(P0Logic.today_rows(v))).is_empty()
 	v.homestead.next.coins.have = 500   # coins first, as on HOME-1
-	assert_str(str(_home_row(v).line)).is_equal("Homestead Lv8 · 100 coins to go")
+	assert_str(str(_home_row(v).line)).is_equal("Home Lv8 · 100 coins to go")
 
 func test_a_save_past_lv8_says_its_look_waits_on_the_cells() -> void:
 	var v := _lv7()

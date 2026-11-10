@@ -25,7 +25,7 @@ const DOOR_HALF := Vector2(0.6, 0.4)
 const DOOR_ARM_M := 1.5
 
 var _style := "cottage"   # the home band's template style (P0FarmTemplate): every band wears the orange-roof cottage for now
-var PLACE := P0City.chip("Homestead")
+var PLACE := P0City.chip("Home")
 const BENCH_TAP_PX := 44.0   # a 44 px touch target around the bench seat (engineering default)
 const BENCH_NEAR_M := 2.6    # the bench's finger card shows within this distance (stall 3.2, house 4.2)
 const LABOUR_CLIP := {"till": "till", "sow": "sow", "water": "water", "harvest": "harvest"}
@@ -1308,7 +1308,7 @@ func open_chef_sign() -> void:
 
 static func chef_sign_card() -> Dictionary:
 	var note := str(P0Logic.P1_UNLOCKS.chefs_sign.note)
-	return {"title": "Chef's Sign", "lead": "Homestead Lv10", "icon": P0Logic.icon("kitchen"),
+	return {"title": "Chef's Sign", "lead": "Home Lv10", "icon": P0Logic.icon("kitchen"),
 		"facts": [note.left(1).to_upper() + note.substr(1)], "button": ""}
 
 ## The Chef's Sign's model after the Master Farmhouse look it came with at Lv10 (上官婉儿 on 282: it follows Lv10's a / b),

@@ -94,6 +94,6 @@ func test_the_tea_host_names_the_city_the_player_is_in() -> void:
 
 func test_the_place_chip_names_the_generated_home() -> void:
 	var v := _tokyo_home()
-	var farm := {city = "San Francisco", space = "Homestead", kind = UiHud.PlaceKind.HOME, day_pass = ""}
-	assert_dict(P0Travel.place(v, farm, "home")).is_equal({city = "Tokyo", space = "Homestead", kind = UiHud.PlaceKind.HOME, day_pass = ""})
+	var farm := {city = "San Francisco", space = "Home", kind = UiHud.PlaceKind.HOME, day_pass = ""}
+	assert_dict(P0Travel.place(v, farm, "home")).is_equal({city = "Tokyo", space = "Home", kind = UiHud.PlaceKind.HOME, day_pass = ""})
 	assert_dict(P0Travel.place({"travel": {"home": SF}}, farm, "home")).is_equal(farm)   # San Francisco's own chip, as before

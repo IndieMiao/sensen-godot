@@ -68,7 +68,8 @@ func test_settings_groups_run_home_notifications_test_options_legal() -> void:
 	add_child(page)
 	await await_idle_frame()
 	# "": the read-only Home row's empty value (a VALUE row always has one)
-	assert_array(_labels(page.body)).is_equal(["Home", "Home city · Tokyo", "Set for good", "", "Notifications", "On", "›",
+	# no title over the home city's group: `Home` alone is the homestead (SGODOT-461, 不知火舞)
+	assert_array(_labels(page.body)).is_equal(["Home city · Tokyo", "Set for good", "", "Notifications", "On", "›",
 		"Test options", "›", "Legal", "Licenses", "›", "Version", "0.2.1 (2026101001)"])
 	var notif: UiSettingRow = page.body.find_child("Notifications", true, false)
 	var tests: UiSettingRow = page.body.find_child("TestOptions", true, false)

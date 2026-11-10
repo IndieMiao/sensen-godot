@@ -292,8 +292,8 @@ static func passport(view: Dictionary) -> Dictionary:
 	var visits: Dictionary = view.get("travel", {}).get("visits", {})
 	var order: Array = visits.keys()
 	order.sort_custom(func(a, b): return float(visits[a].get("first_at", 0)) > float(visits[b].get("first_at", 0)))
-	var rows: Array = [{cluster = h, icon = "home", title = str(P0Clusters.get_cluster(h).get("name", "")), state = "Home",
-		effect = "Your home city"}]
+	var rows: Array = [{cluster = h, icon = "home", title = str(P0Clusters.get_cluster(h).get("name", "")), state = "Home city",
+		effect = "Your home city"}]   # `Home` alone is the homestead (SGODOT-461)
 	for c in order:
 		if c == h or P0Clusters.get_cluster(str(c)).is_empty(): continue   # a closed country's city is not shown or counted (q(189))
 		var t := tier(view, c)

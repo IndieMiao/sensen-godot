@@ -30,7 +30,7 @@ func test_unrelated_business_facts_and_mail_stay_visible_during_the_guide() -> v
 	var v := _guide()
 	v.homestead = {level = 1, next = {can_upgrade = true}}
 	assert_int(P0WorldPrompts.sign(v).status).is_equal(-1)
-	assert_str(P0WorldPrompts.sign(v).text).is_equal("Homestead Lv1")
+	assert_str(P0WorldPrompts.sign(v).text).is_equal("Home Lv1")
 	assert_int(P0WorldPrompts.stall(v, true).status).is_equal(-1)
 	assert_str(P0WorldPrompts.workbench().text).is_equal("Workbench")
 	v.guide.marks = [{place = "home", object = "farmhouse", kind = "request"}]

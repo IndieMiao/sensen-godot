@@ -81,7 +81,7 @@ func test_max_and_decor_cap_follow_authoritative_cap_not_level_ten_or_seventeen(
 	assert_array(p.tiles).is_empty()
 	v.homestead.max=19
 	assert_str(P0Logic.home_panel(v).subtitle).is_empty()
-	assert_str(P0Decor.cap_line(v, {base=20,per_level=4,max=120})).contains("Homestead Lv18")
+	assert_str(P0Decor.cap_line(v, {base=20,per_level=4,max=120})).contains("Home Lv18")
 	v.homestead.level=19
 	assert_str(P0Decor.cap_line(v)).contains("Store one to place this")
 	assert_bool(P0Logic.home_panel(v).button).is_false()
@@ -120,19 +120,19 @@ func test_unlock_ids_use_existing_icons_and_removed_or_no_row_ids_stay_hidden() 
 func test_today_at_every_level_shows_skill_travel_gaps_and_deduplicates_skill_row() -> void:
 	var v := view(1)
 	v.homestead.next.materials=[]
-	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Homestead Lv2 · Fishing Lv3 needed")
+	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Home Lv2 · Fishing Lv3 needed")
 	v.skills.fishing.next=80
 	assert_bool(P0Logic.today_rows(v).any(func(r): return str(r.line).begins_with("Fishing Lv"))).is_false()
 	for s in v.homestead.next.skills:s.have=s.need
 	assert_str(P0Logic.homestead_row(v).row.go).is_equal("sign")
 	v=view(8)
 	v.homestead.next.skills=[{skill="fishing",have=4,need=5}]
-	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Homestead Lv9 · Fishing Lv5 needed")
+	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Home Lv9 · Fishing Lv5 needed")
 	v=view(16)
 	for s in v.homestead.next.skills:s.have=s.need
-	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Homestead Lv17 · 2 stamps to go")
+	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Home Lv17 · 2 stamps to go")
 	v.homestead.next.travel.stamps.have=6
-	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Homestead Lv17 · 1 climate to go")
+	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Home Lv17 · 1 climate to go")
 	assert_str(P0Logic.homestead_row(v).row.dot).is_empty()
 	assert_dict(P0Logic.homestead_row(view(17))).is_empty()
 	v.homestead.next.skills={have=3,need=4}
@@ -144,7 +144,7 @@ func _ui(v: Dictionary) -> P0Ui:
 	ui.tips_path="user://test_355_home_tips.json"
 	add_child(ui)
 	ui.set_view(v)
-	ui.set_place("San Francisco · Homestead")
+	ui.set_place("San Francisco · Home")
 	ui.set_surface("farm")
 	return ui
 

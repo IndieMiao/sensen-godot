@@ -181,7 +181,7 @@ func test_going_home_from_another_city_sends_return_home_and_welcomes_home() -> 
 	assert_str(await _toast_within(rt.ui, 1.0)).is_equal("Welcome home")
 	# 司空震 on 286: going home opens the farm behind a loading cover; the welcome waits for it to go
 	rt.ui.clear_toast()
-	rt._arrive = {path = "res://scenes/p0/p0_farm.tscn", place = "Homestead", shot = null, t0 = Time.get_ticks_msec()}
+	rt._arrive = {path = "res://scenes/p0/p0_farm.tscn", place = "Home", shot = null, t0 = Time.get_ticks_msec()}
 	rt.toast_on_arrival("Welcome home")
 	for i in 3: await get_tree().process_frame
 	assert_str(rt.ui.toast_text()).is_empty()   # not under the cover
@@ -212,7 +212,7 @@ func test_away_the_home_citys_bubble_goes_home_not_a_trip() -> void:
 	assert_bool(m.travelling()).is_true()
 	assert_array(sent).is_empty()   # nothing in the air (苏烈: a flight cut short leaves the player where they are)
 	var cover: P0TravelCover = m.find_children("*", "P0TravelCover", true, false)[0]
-	assert_str(cover.title.text).is_equal("Homestead")
+	assert_str(cover.title.text).is_equal("Home")
 	m.open_farm = func(): pass   # the farm opens as far as this: the test stays on the map
 	await get_tree().create_timer(3.3).timeout   # landed
 	assert_bool(m.travelling()).is_false()

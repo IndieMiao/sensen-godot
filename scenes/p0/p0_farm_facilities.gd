@@ -432,7 +432,7 @@ func _begin(p: Dictionary) -> void:
 	_show_spot(v, int(placing.plot))
 	# no whole block open on the grid yet (不知火舞 on the grid, SGODOT-355 b1): an Info toast on entering, over the caption;
 	# the cells in the way still go red as q(130) ④ has it
-	if is_block(str(p.kind)) and not has_open_block(v, str(p.kind)): rt.ui.toast("More plots open as your Homestead grows")
+	if is_block(str(p.kind)) and not has_open_block(v, str(p.kind)): rt.ui.toast("More plots open as your Home grows")
 
 ## A yard facility: the preview starts on the free cell nearest the workbench (a moved one: nearest where it stands).
 ## No free cell in the yard: Info `Store one to place this` (不知火舞 450 v1.2 ⑩) — a piece stored makes room.

@@ -195,7 +195,7 @@ static func profile_data(view: Dictionary, pending := {}) -> Dictionary:
 		title = P0Titles.worn_name(view, pending),   # "" with none: no title, no › (q(180) ④)
 		home_line = " · ".join(home),
 		skills = skills,
-		farm = {name = str(farm.get("name", "Your Homestead")),
+		farm = {name = str(farm.get("name", "Your Home")),
 			level_line = "Level %d" % int(farm.level) if farm.has("level") else "",
 			status = _farm_status(view)},
 		collections = [

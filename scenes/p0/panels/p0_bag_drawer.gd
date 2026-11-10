@@ -239,7 +239,7 @@ static func bag_full_text(view: Dictionary) -> String:
 		if state == "": return ""
 		var more := P0Logic.bag_tier_slots(str(up.get("id", "")))   # this tier's own +5 (q(194))
 		if more <= 0: return ""
-		if state == "locked": return "Bag full · +%d slots at Homestead Lv%d" % [more, int(up.get("homestead", 0))]
+		if state == "locked": return "Bag full · +%d slots at Home Lv%d" % [more, int(up.get("homestead", 0))]
 		return "Bag full · +%d slots · %s" % [more, str(up.get("name", ""))]
 	return ""
 

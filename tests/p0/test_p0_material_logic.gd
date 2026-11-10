@@ -273,8 +273,8 @@ func test_material_refusals_are_quiet_or_say_why() -> void:
 	assert_str(str(P0MaterialLogic.refusal_text("floor_locked", {"left": 2}, {"type": "mine_floor", "to": 4}))).is_equal("Floor 4 · Clear Floor 3 first")
 	assert_str(str(P0MaterialLogic.refusal_text("bad_floor", {"max": 40, "not_open": true}, {"type": "mine_floor", "to": 41}))).is_equal("Floor 41 · Not open yet")
 	assert_str(str(P0MaterialLogic.refusal_text("bad_floor", {"max": 40}, {"type": "mine_floor", "to": 7}))).is_empty()
-	assert_str(str(P0MaterialLogic.refusal_text("not_open", {"homestead": 8}, {"type": "mine_enter", "mine": "wd-1-1"}))).is_equal("Homestead Lv8")
-	assert_str(str(P0MaterialLogic.refusal_text("homestead_level", {"need": 2}, {"type": "gather", "spot": "gn-5391959~clay0"}))).is_equal("Homestead Lv2")
+	assert_str(str(P0MaterialLogic.refusal_text("not_open", {"homestead": 8}, {"type": "mine_enter", "mine": "wd-1-1"}))).is_equal("Home Lv8")
+	assert_str(str(P0MaterialLogic.refusal_text("homestead_level", {"need": 2}, {"type": "gather", "spot": "gn-5391959~clay0"}))).is_equal("Home Lv2")
 	assert_str(str(P0MaterialLogic.refusal_text("tempo", {}, {"type": "gather"}))).is_empty()
 	# need_energy and other commands keep the runtime's own handling.
 	assert_object(P0MaterialLogic.refusal_text("need_energy", {"need": 2}, rock)).is_null()

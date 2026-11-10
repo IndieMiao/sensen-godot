@@ -139,7 +139,7 @@
     "price": {},
     "quota": {
       "have": 0,
-      "note": "Homestead Stall · resets in 9h 12m",
+      "note": "Home Stall · resets in 9h 12m",
       "text": "Dish buy-back today 0/120",
       "total": 120
     }
@@ -405,7 +405,7 @@
     "price": {},
     "quota": {
       "have": 0,
-      "note": "Homestead Stall · resets in 9h 12m",
+      "note": "Home Stall · resets in 9h 12m",
       "text": "Material buy-back today 0/30",
       "total": 30
     }

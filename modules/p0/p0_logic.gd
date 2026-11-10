@@ -174,9 +174,9 @@ static func gate_spec(view: Dictionary, gate: Dictionary) -> Dictionary:
 	elif gate.has("homestead"):
 		var lv := int(gate.homestead)
 		var have := int(view.get("homestead", {}).get("level", 1))
-		spec.lead = ("Homestead Lv%d %s" % [lv, str(gate.get("after", ""))]).strip_edges()
+		spec.lead = ("Home Lv%d %s" % [lv, str(gate.get("after", ""))]).strip_edges()
 		var left := maxi(0, lv - have)
-		spec.need = {name = "Homestead", have = have, need = lv, icon = icon("home"),
+		spec.need = {name = "Home", have = have, need = lv, icon = icon("home"),
 			note = "%d level%s to go" % [left, "" if left == 1 else "s"]}
 		guide = {label = "Skills", go = "skills"}
 	else:
@@ -703,7 +703,7 @@ static func fields_full_action(view: Dictionary) -> Dictionary:
 	for step in ladder:
 		if int(step[0]) <= level: now = int(step[1])
 		elif int(step[0]) == level + 1: next = int(step[1])
-	if now >= 0 and next > now: toast += " · Homestead Lv%d adds %d" % [level + 1, next - now]
+	if now >= 0 and next > now: toast += " · Home Lv%d adds %d" % [level + 1, next - now]
 	return {"icon": "sow", "verb": "Sow", "sub": label, "enabled": false, "amber": false, "cmd": {}, "need": 0, "toast": toast,
 		"toast_break": true}   # too long for a line, it breaks at its « · » (不知火舞 on #624)
 
@@ -741,7 +741,7 @@ static func _plant_action(view: Dictionary, plot_id: int, seed_id: String) -> Di
 	if used >= cap:
 		var nxt = o.get("homestead_next", null)
 		return {"icon": "sow", "verb": "Plant", "sub": "Orchard %d/%d" % [used, cap], "enabled": false, "amber": false, "cmd": {},
-			"need": 0, "toast": "Orchard %d/%d" % [used, cap] + (" · Homestead Lv%d adds 1" % int(nxt) if nxt != null else "")}
+			"need": 0, "toast": "Orchard %d/%d" % [used, cap] + (" · Home Lv%d adds 1" % int(nxt) if nxt != null else "")}
 	if int(view.get("energy", {}).get("value", 0)) < cost:
 		return {"icon": "sow", "verb": "Plant", "sub": "Need %d Energy" % cost, "enabled": true, "amber": true,
 			"cmd": {"type": "energy_card"}, "need": cost}
@@ -1019,7 +1019,7 @@ static func place_info(text: String, space_override := "") -> Dictionary:
 ## camera-only Show target ("" hides Show). Never a jump (LOCK-08).
 static func need_source(view: Dictionary, id: String) -> Dictionary:
 	var label := item_name(view, id)
-	if id.begins_with("seed_"): return {"text": "%s · Homestead Stall" % label, "go": "stall"}
+	if id.begins_with("seed_"): return {"text": "%s · Home Stall" % label, "go": "stall"}
 	if id.begins_with("crop_"): return {"text": "%s · Grow it on your plots" % label, "go": "plots"}
 	if id.begins_with("fish_"): return {"text": "%s · Ponds on the map" % label, "go": ""}
 	if id.begins_with("dish_"): return {"text": "%s · Cook it at the stove" % label, "go": "stove"}
@@ -1396,7 +1396,7 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 		"farming":
 			for c in view.get("crops", []):
 				if int(c.get("level", 0)) == level: names.append(plural(item_name(view, str(c.id))))
-			if not names.is_empty(): return "New seeds at the Homestead Stall: " + ", ".join(names)
+			if not names.is_empty(): return "New seeds at the Home Stall: " + ", ".join(names)
 		"cooking":
 			if level == 4: return "A 3rd pot slot · three-family dishes"
 	return ""
@@ -1504,7 +1504,7 @@ static func _without_time(item: String) -> String:
 ## 10); the level's line names it here, and its card follows the level banner (title_card).
 ## Homestead Lv10's and the Explorer medals' titles (§11.9.2) are named here too, for the Titles drawer (q(180), P0Titles).
 const TITLE_NAMES := {"title_master_gardener": "Master Gardener", "title_master_angler": "Master Angler", "title_chef": "Chef",
-	"title_homestead_master": "Homestead Master", "title_wanderer": "Wanderer", "title_globetrotter": "Globetrotter"}
+	"title_homestead_master": "Home Master", "title_wanderer": "Wanderer", "title_globetrotter": "Globetrotter"}
 
 ## A level's line for its title, after the level's other unlocks: `Chef title`, `Master Gardener title` (不知火舞 on 282).
 static func title_line(id: String) -> String: return "%s title" % str(TITLE_NAMES.get(id, id))
@@ -1864,7 +1864,7 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 	for key in ["farming", "fishing", "cooking"]:
 		for skill in next.get("skills", []):
 			if str(skill.get("skill", "")) == key and int(skill.get("have", 0)) < int(skill.get("need", 0)):
-				return {row = _row("Homestead Lv%d · %s Lv%d needed" % [lv, key.capitalize(), int(skill.need)], str(GATE_SKILL_ICONS[key]), ""), now = false, skill = key}
+				return {row = _row("Home Lv%d · %s Lv%d needed" % [lv, key.capitalize(), int(skill.need)], str(GATE_SKILL_ICONS[key]), ""), now = false, skill = key}
 	var travel = next.get("travel", null)
 	if travel is Dictionary:
 		for key in ["stamps", "climates"]:
@@ -1872,7 +1872,7 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 			var short := maxi(0, int(travel[key].need) - int(travel[key].have))
 			if short > 0:
 				var noun := "stamp" if key == "stamps" else "climate"
-				return {row = _row("Homestead Lv%d · %d %s%s to go" % [lv, short, noun, "" if short == 1 else "s"], "stamp" if key == "stamps" else "globe", "map"), now = false}
+				return {row = _row("Home Lv%d · %d %s%s to go" % [lv, short, noun, "" if short == 1 else "s"], "stamp" if key == "stamps" else "globe", "map"), now = false}
 	var mats := {}
 	for m in next.get("materials", []): mats[str(m.get("id", ""))] = m
 	var ids: Array = HOME_MATERIAL_ORDER.filter(func(id): return mats.has(id))
@@ -1882,16 +1882,16 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 		var short := int(m.get("need", 0)) - int(m.get("have", 0))
 		if short <= 0: continue
 		var src := _home_material_go(view, str(id))
-		return {"row": _row("Homestead Lv%d · %s %d to go" % [lv, str(m.get("name", item_name(view, str(id)))), short], "level_up", str(src.go)),
+		return {"row": _row("Home Lv%d · %s %d to go" % [lv, str(m.get("name", item_name(view, str(id)))), short], "level_up", str(src.go)),
 			"now": bool(src.now)}
 	var coins: Dictionary = next.get("coins", {})
 	var short_coins := int(coins.get("need", 0)) - int(coins.get("have", 0))
 	if short_coins > 0:
-		return {"row": _row("Homestead Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
+		return {"row": _row("Home Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
 	# q(303) ③: the wing's cells held, the last gap — to do now, Show into Decorate, no red dot
 	if not P0Decor.next_blocked(view).is_empty():
-		return {"row": _row("Homestead Lv%d · %s" % [lv, HOME_BLOCKED], "deco_planter", DECORATE_GO), "now": true, "blocked": true}
-	return {"row": _row("Upgrade to Homestead Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
+		return {"row": _row("Home Lv%d · %s" % [lv, HOME_BLOCKED], "deco_planter", DECORATE_GO), "now": true, "blocked": true}
+	return {"row": _row("Upgrade to Home Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
 
 ## Today's row while a save past Lv8 has the Kitchen Wing's cells held (q(303) ⑨, homestead.wing_blocked): `Kitchen
 ## Wing · Space taken` (the Master Farmhouse's name from Lv15), Show into Decorate, no red dot. {} when nothing holds them.
@@ -2406,18 +2406,18 @@ const HOME_BLOCKED_TAP := "Space taken · clear it first"
 ## copy; SGODOT-282). Travel tiers, looks and room tiers are announced by their own lines, not here.
 const P1_UNLOCKS := {
 	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
-	"notice_board": {"icon": "board", "text": "Notice Board", "note": "at the Homestead Stall"},   # §9: the stall's board (Figma HOME-1-LV5)
+	"notice_board": {"icon": "board", "text": "Notice Board", "note": "at the Home Stall"},   # §9: the stall's board (Figma HOME-1-LV5)
 	"big_pot": {"icon": "big_pot", "text": "Big Pot · 2 servings on any stove", "note": ""},   # q(201): a stove switched to it
 	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II"},   # price and note come from the content tier
 	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "three dishes at once"},
 	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III"},
 	"bag_upgrade_4": {"icon": "bag", "text": "Bag Upgrade IV"},
 	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
-	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
-	"healing_potion": {"icon": "star", "text": "Healing Potion", "note": "at the Homestead Stall"},
-	"potion_heal": {"icon": "star", "text": "Healing Potion", "note": "at the Homestead Stall"},
-	"decor_set_1": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
-	"decor_set_2": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
+	"title_homestead_master": {"icon": "star", "text": "Home Master", "note": "title"},
+	"healing_potion": {"icon": "star", "text": "Healing Potion", "note": "at the Home Stall"},
+	"potion_heal": {"icon": "star", "text": "Healing Potion", "note": "at the Home Stall"},
+	"decor_set_1": {"icon": "wood", "text": "New decor", "note": "at the Home Stall"},
+	"decor_set_2": {"icon": "wood", "text": "New decor", "note": "at the Home Stall"},
 	"orchard_10": {"icon": "crop_apple", "text": "Orchard 10/10", "note": "+1 slot"},
 	"sprinklers_12": {"icon": "facility_sprinkler", "text": "Sprinklers 12/12", "note": "+1 sprinkler"},
 	"fourth_stove": {"icon": "kitchen", "text": "Fourth Stove", "note": "four dishes at once"},
@@ -2507,7 +2507,7 @@ static func look_rows(view: Dictionary, at_home := true) -> Array:
 		var reached := look != ""
 		out.append({"id": id, "icon": str(LOOK_ICONS.get(id, "home")), "name": str(l.name), "reached": reached,
 			"open": reached and at_home,
-			"value": (str(l.get(look, "")) + (" ›" if at_home else "")) if reached else "Homestead Lv%d" % int(l.level)})
+			"value": (str(l.get(look, "")) + (" ›" if at_home else "")) if reached else "Home Lv%d" % int(l.level)})
 	return out if out.any(func(r): return bool(r.reached)) else []
 
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
@@ -2517,7 +2517,7 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var h: Dictionary = view.get("homestead", {})
 	var level := int(h.get("level", 1))
 	var next = h.get("next", null)
-	var out := {"title": "Homestead Lv%d" % level, "look": "", "tiles": [], "changes": [], "label": "Upgrade",
+	var out := {"title": "Home Lv%d" % level, "look": "", "tiles": [], "changes": [], "label": "Upgrade",
 		"reason": "", "tap": "", "footer": "Upgrading is free of Energy", "max": next == null,
 		"subtitle": "", "button": true, "looks": look_rows(view, at_home)}
 	if next == null:
@@ -2527,7 +2527,7 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 		else:
 			out.reason = "Highest level for now"
 		return out
-	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
+	out.title = "Home Lv%d → Lv%d" % [level, int(next.level)]
 	var unlocks: Array = next.get("unlocks", [])
 	for u in unlocks:   # look stages and their levels come from content, never inferred from the current cap
 		var stage := look_stage(str(u))
@@ -2608,7 +2608,7 @@ static func home_source(view: Dictionary, id: String) -> Dictionary:
 				return {"text": "%s Lv%d · %s" % [key.capitalize(), int(skill.need), HOME_SKILL_HOW.get(key, "")], "go": "skills"}
 		return {"text": "", "go": ""}
 	match id:
-		"coins": return {"text": "Coins · sell crops and fish at the Homestead Stall", "go": "stall"}
+		"coins": return {"text": "Coins · sell crops and fish at the Home Stall", "go": "stall"}
 		# no Show on the travel gates (A3b / A3c: only a skill's line has one), so they fit as drawn
 		"stamps": return {"text": "Stamps · First visit to a city · up to 2 a day", "go": ""}
 		"climates": return {"text": "Climates · Visit a city or wild site in another climate", "go": ""}
@@ -2642,5 +2642,5 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 				if not line.is_empty(): lines.append(str(line.text))
 	var gain := maxi(0, int(ev.get("energy", 0)))
 	var energy := " · +%d Energy" % gain if gain > 0 else ""
-	return {"level": str(level), "title": "Homestead Lv%d" % level, "subtitle": "Max Energy %d" % max_e + energy,
+	return {"level": str(level), "title": "Home Lv%d" % level, "subtitle": "Max Energy %d" % max_e + energy,
 		"detail": "\n".join(lines)}

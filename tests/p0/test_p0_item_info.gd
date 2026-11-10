@@ -34,8 +34,8 @@ func _view() -> Dictionary:
 				{"kind": "dish", "rate": 1, "quota": "dish"}, {"kind": "material", "rate": 1, "quota": "material"}]},
 			"tackle": {"sell": [{"kind": "fish", "rate": 0.8, "quota": "fish_tackle"}]}},
 		"quotas": {"fish_tackle": {"used": 0, "cap": 80, "resets_in": 33120000, "scope": "any Tackle Shop"},
-			"dish": {"used": 0, "cap": 120, "resets_in": 33120000, "scope": "Homestead Stall"},
-			"material": {"used": 0, "cap": 30, "resets_in": 33120000, "scope": "Homestead Stall"}},
+			"dish": {"used": 0, "cap": 120, "resets_in": 33120000, "scope": "Home Stall"},
+			"material": {"used": 0, "cap": 30, "resets_in": 33120000, "scope": "Home Stall"}},
 		"rarity_names": ["Common", "Fine", "Rare", "Legendary"],
 	}
 
@@ -354,7 +354,7 @@ func test_buy_rows_use_the_server_wallet_need_and_homestead_gate() -> void:
 		{"id": "seed_radish", "price": 4, "need": 44, "skill": "farming", "gate": 1, "unlocked": true, "homestead": null, "homestead_ok": true, "left": null},
 		{"id": "bait_worm", "price": 2, "need": 42, "skill": "fishing", "gate": 1, "unlocked": true, "homestead": 2, "homestead_ok": false, "left": 30}]}}
 	assert_array(_labels(P0ItemInfo.spec(v, "seed_radish", &"counter_buy"))).is_equal(["unavailable:Need 4 more coins"])   # 40 coins, needs 44
-	assert_array(_labels(P0ItemInfo.spec(v, "bait_worm", &"counter_buy"))).is_equal(["unavailable:Homestead Lv2 needed"])
+	assert_array(_labels(P0ItemInfo.spec(v, "bait_worm", &"counter_buy"))).is_equal(["unavailable:Home Lv2 needed"])
 
 func test_torches_read_as_materials() -> void:
 	var v := _view()

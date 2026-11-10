@@ -121,7 +121,7 @@ func test_at_home_the_home_key_brings_the_homestead_card() -> void:
 	m.fly_to(float(tea.lat), float(tea.lng))   # looking elsewhere in the city
 	assert_float(await _fly_home(m)).is_greater(0.0)
 	_at_home(m)
-	assert_str(_primary(rt)).is_equal("Back to Homestead")
+	assert_str(_primary(rt)).is_equal("Back to Home")
 	await _close(rt)
 
 ## 0.35 s per unit of path between 0.6 and 1.2 s (不知火舞 on 267): across the city it still lands within 1.2 s, and a
@@ -199,5 +199,5 @@ func test_over_the_homestead_the_card_opens_at_once() -> void:
 	m._set_zoom(m.SHOW_ZOOM)
 	m.city_map.home_key.pressed.emit()
 	assert_str(rt.ui.modal_kind).is_equal("place_card")
-	assert_str(_primary(rt)).is_equal("Back to Homestead")
+	assert_str(_primary(rt)).is_equal("Back to Home")
 	await _close(rt)

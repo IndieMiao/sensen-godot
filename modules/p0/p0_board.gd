@@ -204,7 +204,7 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 		# hangs in (§9.6.5; q(270): the board's city, home's when the view names none).
 		var board_city := str(from.get("city", "")) if board == "market" else ""
 		if board_city == "": board_city = load("res://modules/p0/p0_travel.gd").home_name(view)
-		var where := "the Homestead Stall" if board == "stall" else "any %s market" % board_city
+		var where := "the Home Stall" if board == "stall" else "any %s market" % board_city
 		var d := {title = c.title, state = c.status, needs = c.needs, delivery = c.reward, next = {}, item = item,
 			tracked = str(r.get("status", "")) == "accepted", noun = noun, go = _go(view, r, str(items[0]) if not items.is_empty() else ""), example = "",
 			effect = "Bring the required %s to %s." % [noun, where]}

@@ -17,7 +17,7 @@ func _view(level := 2) -> Dictionary:
 
 func test_home_panel_matches_the_page_14_sample() -> void:
 	var p := P0Logic.home_panel(_view())
-	assert_str(str(p.title)).is_equal("Homestead Lv2 → Lv3")
+	assert_str(str(p.title)).is_equal("Home Lv2 → Lv3")
 	assert_str(str(p.look)).is_equal("Lv3 look · Fence & Mailbox")   # q(115): the stage's name, never Look A / B
 	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Fishing"])
 	assert_int(int(p.tiles[5].need)).is_equal(440)   # price + the 40-coin floor (q(10))
@@ -54,7 +54,7 @@ func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
 	v.homestead.next.level = 6
 	v.homestead.next.unlocks = ["big_pot", "bag_upgrade_2"]
 	var p := P0Logic.home_panel(v)
-	assert_str(str(p.title)).is_equal("Homestead Lv5 → Lv6")
+	assert_str(str(p.title)).is_equal("Home Lv5 → Lv6")
 	assert_array(p.changes.slice(1).map(func(c): return [c.text, c.note])).is_equal(
 		[["Big Pot · 2 servings on any stove", ""], ["Bag Upgrade II · 150 coins", "Bag 35 · after Upgrade I"]])   # q(201)
 	assert_str(str(p.changes[1].icon)).is_equal("big_pot")
@@ -64,7 +64,7 @@ func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
 	v.homestead.next.unlocks = ["notice_board", "trip_7", "porch", "standard_room"]
 	assert_str(str(P0Logic.home_panel(v).look)).is_equal("Lv5 look · Porch")
 	var m := P0Logic.home_moment(v, {"level": 10, "unlocks": ["chefs_sign", "master_farmhouse", "deluxe_room", "title_homestead_master"]})
-	assert_str(str(m.detail)).is_equal("Chef's Sign\nHomestead Master")
+	assert_str(str(m.detail)).is_equal("Chef's Sign\nHome Master")
 
 func test_lv1_to_lv2_lists_the_spice_rack_and_no_look_line() -> void:
 	var v := _view(1)
@@ -82,7 +82,7 @@ func test_p0_stops_at_lv3() -> void:
 	v.homestead.next = null
 	var p := P0Logic.home_panel(v)
 	assert_bool(bool(p.max)).is_true()
-	assert_str(str(p.title)).is_equal("Homestead Lv3")
+	assert_str(str(p.title)).is_equal("Home Lv3")
 	assert_array(p.tiles).is_empty()
 
 ## The content cap has no next level: neutral copy under the title, no Upgrade, and the Looks rows.
@@ -93,7 +93,7 @@ func test_lv17_says_max_level_and_keeps_the_looks() -> void:
 	v.homestead["looks"] = [{"id": "fence", "level": 3, "look": "a"}, {"id": "porch", "level": 5, "look": "b"},
 		{"id": "kitchen_extension", "level": 8, "look": "a"}, {"id": "master_farmhouse", "level": 15, "look": "b"}]
 	var p := P0Logic.home_panel(v)
-	assert_str(str(p.title)).is_equal("Homestead Lv17")
+	assert_str(str(p.title)).is_equal("Home Lv17")
 	assert_str(str(p.subtitle)).is_equal("Highest level for now")
 	assert_bool(bool(p.button)).is_false()
 	assert_array(p.looks.map(func(r): return "%s … %s" % [r.name, r.value])).is_equal(
@@ -105,7 +105,7 @@ func test_lv17_says_max_level_and_keeps_the_looks() -> void:
 
 func test_home_moment_matches_the_page_14_banner() -> void:
 	var m := P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "energy": 40, "unlocks": ["warming_cabinet", "bag_upgrade_1", "board_slot_3", "fence"]})
-	assert_str(str(m.title)).is_equal("Homestead Lv3")
+	assert_str(str(m.title)).is_equal("Home Lv3")
 	assert_str(str(m.subtitle)).is_equal("Max Energy 220 · +40 Energy")
 	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I · 60 coins")
 
@@ -276,12 +276,12 @@ func test_a_refused_sow_on_a_full_field_says_the_plots() -> void:
 	rt.session.view = v
 	rt._on_refused("plots_full", {"used": 8, "cap": 8}, {"type": "sow", "plot": 8, "seed": "seed_lettuce"})
 	# a line too long breaks at its « · », the dot dropped as every such break (UiKit.break_at_dot, 不知火舞 on #201 / #624)
-	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8\nHomestead Lv2 adds 2")
+	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8\nHome Lv2 adds 2")
 	# the grey Sow key's tap says the same
 	rt.ui.set_action(P0Logic.fields_full_action({"homestead": {"level": 1}, "garden": {"fields": {"used": 8, "cap": 8}}}))
 	rt.ui.clear_toast()
 	rt.ui._fab_pressed()
-	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8\nHomestead Lv2 adds 2")
+	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8\nHome Lv2 adds 2")
 
 ## A refused upgrade (后裔 on #150): away from home it says what HOME-1's grey button says; when the fresh view shows no gap
 ## any more (it changed under the tap) the server's detail names it instead of an empty toast.
@@ -313,7 +313,7 @@ func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
 func test_the_sign_prompt_reads_its_level_and_lights_ready() -> void:
 	# WORLD-HINT-5 (228 64c75e54, SGODOT-250): the house mark, Ready once the Needs are met; open: `Homestead LvN`.
 	var p := P0WorldPrompts.sign(_view())
-	assert_str(p.text).is_equal("Homestead Lv2")
+	assert_str(p.text).is_equal("Home Lv2")
 	assert_str(p.fact).is_empty()
 	assert_int(p.status).is_equal(-1)
 	assert_object(p.icon).is_same(P0Logic.icon("level_up"))   # its own mark; the farmhouse keeps i-home

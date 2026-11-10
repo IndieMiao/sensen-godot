@@ -190,7 +190,7 @@ func test_a_pond_pin_says_who_is_in() -> void:
 func test_a_short_name_is_the_place_without_its_type() -> void:
 	for pair in [["Willow Pond", "Willow"], ["Reed Creek", "Reed"], ["Elm Cove", "Elm"], ["Maple Market Square", "Maple"],
 			["Oak Tea House", "Oak"], ["Tundra Trading Post", "Tundra"], ["Union Square Travel Post", "Union Square"],
-			["Mission Tackle Shop", "Mission"], ["Barbary Card Room", "Barbary"], ["Homestead", "Homestead"], ["Pond", "Pond"]]:
+			["Mission Tackle Shop", "Mission"], ["Barbary Card Room", "Barbary"], ["Home", "Home"], ["Pond", "Pond"]]:
 		assert_str(P0Map.short_name(pair[0])).is_equal(pair[1])
 
 ## An outpost pin drawn over the player's avatar takes the tap (蒙恬 on C30): it is selected, not the avatar. Since 269

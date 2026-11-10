@@ -69,7 +69,7 @@ func test_a_delivered_slot_shows_its_row_done() -> void:
 func test_the_request_sheet_knows_where_and_what_comes_next() -> void:
 	var d := P0Board.detail(_view(), "stall", "req_pond_catch")
 	assert_array([d.title, d.state, d.effect, d.delivery, d.tracked, d.go]).is_equal(["Pond Catch", "Tracked",
-		"Bring the required fish to the Homestead Stall.", "14 coins", true, "pond:" + P0Guide.BEGINNER_POND])
+		"Bring the required fish to the Home Stall.", "14 coins", true, "pond:" + P0Guide.BEGINNER_POND])
 	assert_dict(d.next).is_empty()   # slot 2 is held (q(99)): no "next" countdown for it
 	var refilling := _view()
 	refilling.boards.stall.slots[1] = {"empty": true, "refill_in": 8 * 3600000}   # e.g. after a drop
@@ -84,7 +84,7 @@ func test_the_request_sheet_knows_where_and_what_comes_next() -> void:
 	timber.names["wood"] = "Timber"
 	timber.boards.stall.slots[0] = {"id": "t1", "title": "Timber Run", "kind": "material", "items": ["wood"], "qty": 10,
 		"have": 0, "ready": false, "coins": 30, "status": "accepted"}
-	assert_str(P0Board.detail(timber, "stall", "t1").effect).is_equal("Bring the required timber to the Homestead Stall.")
+	assert_str(P0Board.detail(timber, "stall", "t1").effect).is_equal("Bring the required timber to the Home Stall.")
 	assert_dict(P0Board.detail(_view(), "market", "gone")).is_empty()
 
 # ---------------------------------------------------------------- P0Ui

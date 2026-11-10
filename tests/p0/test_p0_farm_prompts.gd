@@ -19,7 +19,7 @@ func test_the_open_one_strips_the_rest_show_buttons_within_8_m_or_with_a_state()
 func test_the_stall_is_homestead_stall_with_its_board_state() -> void:
 	var v := _view()
 	var p := P0WorldPrompts.stall(v)
-	assert_str(p.text).is_equal("Homestead Stall")
+	assert_str(p.text).is_equal("Home Stall")
 	assert_object(p.icon).is_same(P0Logic.icon("homestead_stall"))
 	assert_int(p.status).is_equal(-1)
 	v.stall.board.requests = [{"id": "r1", "qty": 2, "have": 0, "status": "open"}]

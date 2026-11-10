@@ -20,7 +20,7 @@ func test_every_title_has_its_name_and_where_it_came_from() -> void:
 		"kindred:res_pip", "req:req_res_pip_5", "req:req_res_kai_3"]
 	var v := _view(ids)
 	assert_array(ids.map(func(id): var t := P0Titles.info(v, id); return "%s (%s)" % [t.name, t.source])).is_equal([
-		"Homestead Master (Homestead Lv10)", "Master Gardener (Farming Lv10)", "Master Angler (Fishing Lv10)", "Chef (Cooking Lv10)",
+		"Home Master (Home Lv10)", "Master Gardener (Farming Lv10)", "Master Angler (Fishing Lv10)", "Chef (Cooking Lv10)",
 		"Master Chef (Cookbook 48/48)", "Head Chef (Cookbook 36/48)", "Line Cook (Cookbook 20/48)", "Home Cook (Cookbook 8/48)",
 		"Muscle Memory (Mastered 10)", "Globetrotter (Explorer Platinum)", "Wanderer (Explorer Bronze)",
 		"Pip's Best Friend (Kindred · Pip)", "Route Buddy (Request · Pip's Big Route)", "Harbor Hand (Request · The Smoker's Secret)"])

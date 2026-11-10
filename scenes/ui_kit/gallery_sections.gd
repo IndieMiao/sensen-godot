@@ -515,7 +515,7 @@ static func _need_tiles() -> Control:
 static func _need_sources() -> Control:
 	var v := _column()
 	v.add_child(UiNeedSource.new("Copper Ore · The mine, floors 1–4"))
-	v.add_child(UiNeedSource.new("Radish Seeds · Homestead Stall"))
+	v.add_child(UiNeedSource.new("Radish Seeds · Home Stall"))
 	return v
 
 static func _hud_sample(state: Dictionary) -> UiHud:
@@ -528,7 +528,7 @@ static func _huds() -> Control:
 	col.add_theme_constant_override(&"separation", 0)
 	# The Today icon with its red dot on and off (q(107), SGODOT-271); the place chip in the rest of the row writes the
 	# city in full, the longest P0 place included (不知火舞 76ebeaad: 189 of its 261 px).
-	var home := {city = "San Francisco", space = "Homestead", kind = UiHud.PlaceKind.HOME}
+	var home := {city = "San Francisco", space = "Home", kind = UiHud.PlaceKind.HOME}
 	var samples := [
 		{energy = 142, energy_max = 200, regen = "+1 in 2:40", skills = {farming = 0.6, fishing = 0.4}, coins = 230,
 			today_dot = false, place = home},
@@ -582,7 +582,7 @@ static func _energy_cards() -> Control:
 
 static func _energy_panels() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
-	var facts := {max = 200, level = "Homestead Lv1", uses = [
+	var facts := {max = 200, level = "Home Lv1", uses = [
 		{name = "Meals", have = 100, need = 300, icon = _tex("dish_grilled_fish")},
 		{name = "Tea", have = 1, need = 3, icon = _tex("dish_fruit_tea")},
 		{name = "Rest", have = 0, need = 1, icon = _tex("rest")},
@@ -762,9 +762,9 @@ static func _profile_parts() -> Control:
 ## opens HOME-1 (int11; 亚瑟 on #148).
 static func _farm_cards() -> Control:
 	var v := _column(UiTokens.SPACE_ROW)
-	var farm := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
+	var farm := UiFarmCard.new("Farmer's Home", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
 	v.add_child(_captioned(_at_336(farm), "farm overview"))
-	var own := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
+	var own := UiFarmCard.new("Farmer's Home", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
 	own.chevron = true
 	v.add_child(_captioned(_at_336(own), "your profile · › opens HOME-1"))
 	return v
@@ -831,7 +831,7 @@ static func _resident_profiles() -> Control:
 	return _captioned(sheet, "Details hidden in P0 (no page behind it) · Back returns to the bar")
 
 static func _notice_rows() -> Control:
-	return _captioned(_at_336(UiNoticeRow.new("Bag full · +5 slots at Homestead Lv3")), "Bag full · navigation only (LOCK-08)")
+	return _captioned(_at_336(UiNoticeRow.new("Bag full · +5 slots at Home Lv3")), "Bag full · navigation only (LOCK-08)")
 
 static func _float_texts() -> Control:
 	var v := _column(UiTokens.SPACE_ROW)
@@ -1205,7 +1205,7 @@ static func _world_prompts() -> Control:
 		[_tex("home"), "Farmhouse", "", D.RIGHT, false, -1, 1.0],
 		[_tex("home"), "Farmhouse", "", D.LEFT, false, -1, 1.0],
 		[_tex("pot"), "Stove 1/1", "Empty", D.RIGHT, false, -1, 1.0],
-		[_tex("homestead_stall"), "Homestead Stall", "", D.RIGHT, false, UiStatusBadge.State.REQUEST, 1.0],
+		[_tex("homestead_stall"), "Home Stall", "", D.RIGHT, false, UiStatusBadge.State.REQUEST, 1.0],
 		[_tex("rest"), "+60 Energy", "", D.RIGHT, false, -1, 1.0],
 		[_tex("rest"), "Rested today", "", D.RIGHT, true, -1, 1.0],
 		[_tex("door"), "Map", "", D.RIGHT, false, -1, 1.0],

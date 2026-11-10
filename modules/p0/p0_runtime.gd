@@ -23,7 +23,7 @@ const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map 
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # a local request's hand-in row for wrong_place (q(272))
-static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
+static var HOME_PLACE := P0City.chip("Home")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
 
@@ -1168,7 +1168,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("HP full")
 			return
 		if code == "no_potion":
-			ui.toast("Buy at Homestead Stall")
+			ui.toast("Buy at Home Stall")
 			return
 	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
 		ui.blackjack_refused(code, detail)
@@ -1343,7 +1343,7 @@ static func harvest_result(got: int, of: int) -> Dictionary:
 ## The bag filled: the Error toast to the stall with `Open bag ›`, and the held key lets go.
 func _harvest_stopped(v: Dictionary) -> void:
 	var bag: Dictionary = v.get("bag", {})
-	ui.toast_error("Bag %d/%d · Sell at Homestead Stall" % [(bag.get("slots", []) as Array).size(), int(bag.get("capacity", 25))], "Open bag")
+	ui.toast_error("Bag %d/%d · Sell at Home Stall" % [(bag.get("slots", []) as Array).size(), int(bag.get("capacity", 25))], "Open bag")
 	ui.fab_held = false
 	_held_plants = 0
 

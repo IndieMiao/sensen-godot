@@ -705,9 +705,9 @@ func test_skill_card_ring_floors_to_ten_percent_and_reads_the_level() -> void:
 	assert_int(hits[0]).is_equal(1)
 
 func test_farm_card_lines() -> void:
-	var f: UiFarmCard = _host(UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg")))
+	var f: UiFarmCard = _host(UiFarmCard.new("Farmer's Home", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg")))
 	await _settle()
-	assert_array(_texts(f)).contains(["Farmer's Homestead", "Level 1", "Radishes ready in 3h 32m"])
+	assert_array(_texts(f)).contains(["Farmer's Home", "Level 1", "Radishes ready in 3h 32m"])
 	f.status = ""
 	assert_array(_texts(f)).not_contains(["Radishes ready in 3h 32m"])
 	assert_float(f.size.y).is_equal(76.0)
@@ -874,10 +874,10 @@ func test_a_plain_state_badge_keeps_its_own_tone() -> void:
 	assert_object(_ink(ready, "Ready")).is_equal(UiTokens.COLOR_PRIMARY)
 
 func test_notice_row_reads_one_line_with_a_chevron() -> void:
-	var r: UiNoticeRow = _host(UiNoticeRow.new("Bag full · +5 slots at Homestead Lv3"))
+	var r: UiNoticeRow = _host(UiNoticeRow.new("Bag full · +5 slots at Home Lv3"))
 	r.size = Vector2(336, 44)
 	await _settle()
-	assert_str(r.notice()).is_equal("Bag full · +5 slots at Homestead Lv3")
+	assert_str(r.notice()).is_equal("Bag full · +5 slots at Home Lv3")
 	assert_float(r.size.y).is_equal(44.0)
 
 func test_float_text_affinity_has_the_heart_and_rose_ink() -> void:

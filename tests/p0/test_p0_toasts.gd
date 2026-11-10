@@ -42,7 +42,7 @@ func test_a_refusal_replaces_the_info_toast_in_the_error_tone() -> void:
 	assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.SUCCESS)
 
 func test_it_sits_on_the_quick_bar_left_of_the_main_action_key() -> void:
-	ui.toast("Buy at Homestead Stall")
+	ui.toast("Buy at Home Stall")
 	await await_idle_frame()
 	var bar := ui._bar.get_global_rect()
 	var r := _panel().get_global_rect()
@@ -196,7 +196,7 @@ func test_a_harvest_all_row_the_bag_took_in_part_says_how_far_it_got() -> void:
 	var top: UiFloatText = lines.reduce(func(a, b): return a if a.position.y < b.position.y else b)
 	assert_str(top.text).is_equal("Harvest 3 of 5 · bag full")   # the result is the top line
 	assert_array(texts).contains(["+6 XP · 3 plants"])   # one plant per XP event, not the reply's three each
-	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25\nSell at Homestead Stall")
+	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25\nSell at Home Stall")
 	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")
 	assert_bool(rt.ui.fab_held).is_false()
 
@@ -223,7 +223,7 @@ func test_a_harvest_that_fills_the_bag_says_how_far_it_got() -> void:
 	await get_tree().process_frame
 	var texts := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
 	assert_array(texts).contains(["Harvest 12 of 14 · bag full"])
-	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25\nSell at Homestead Stall")
+	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25\nSell at Home Stall")
 	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")
 	assert_bool(rt.ui.fab_held).is_false()
 

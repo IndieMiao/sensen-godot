@@ -304,7 +304,7 @@ func test_a_seed_sown_to_zero_is_deselected_and_a_zero_slot_cannot_be_picked() -
 	assert_str(ui.selected_seed).is_empty()
 	ui._on_slot_tapped("seed_radish")
 	assert_str(ui.selected_seed).is_empty()   # a 0 slot can't be picked
-	assert_str(ui.toast_text()).is_equal("Buy at Homestead Stall")
+	assert_str(ui.toast_text()).is_equal("Buy at Home Stall")
 
 func test_a_bar_without_the_action_family_shows_its_ghost_in_the_first_empty_slot() -> void:
 	# A-08: Seeds on the farm, Bait at the pond; a tap opens the Bag.
