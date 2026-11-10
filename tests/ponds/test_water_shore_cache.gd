@@ -24,6 +24,32 @@ func test_cached_and_prewarmed_banks_match_a_fresh_build() -> void:
 	assert_int(warmed[1]).is_equal((direct.plants[Mesh.ARRAY_VERTEX] as PackedVector3Array).size())
 	assert_bool(WaterShore._cache.has(key)).is_true()
 
+## iOS 0.3.6 (2) on a 14 Pro (蒙恬's log, on the way out): a prewarm the pool still held as the app ended freed its
+## lambda after the script languages had gone. A finished one is waited on by itself — no pond entered, no next
+## prewarm — and finish_all waits on one still running.
+func test_a_finished_prewarm_is_collected_on_its_own() -> void:
+	var a := SystemPonds.location("pond_shanghai_04")
+	var spec := SystemPonds.site(a)
+	var key := WaterShore._cache_key(str(a.id), FishingModel.site(str(a.id), spec))
+	WaterShore._cache.erase(key)
+	WaterShore.prewarm(str(a.id), spec)
+	assert_bool(WaterShore._pending.has(key)).is_true()
+	var until := Time.get_ticks_msec() + 15000
+	while WaterShore._pending.has(key) and Time.get_ticks_msec() < until: await get_tree().process_frame
+	assert_bool(WaterShore._pending.has(key)).override_failure_message("the finished task is never waited on").is_false()
+	assert_bool(WaterShore._cache.has(key)).is_true()
+
+func test_finish_all_waits_on_a_prewarm_still_running() -> void:
+	var a := SystemPonds.location("pond_shanghai_05")
+	var spec := SystemPonds.site(a)
+	var key := WaterShore._cache_key(str(a.id), FishingModel.site(str(a.id), spec))
+	WaterShore._cache.erase(key)
+	WaterShore.prewarm(str(a.id), spec)
+	WaterShore.finish_all()
+	assert_bool(WaterShore._pending.is_empty()).is_true()
+	assert_bool(WaterShore._cache.has(key)).is_true()
+	await get_tree().process_frame   # its own _collect comes after: nothing left to wait on, nothing said
+
 func test_local_primitives_match_place_scenery() -> void:
 	WaterShore._prepare_units()
 	var basis := Basis(Vector3.UP, 0.7)
