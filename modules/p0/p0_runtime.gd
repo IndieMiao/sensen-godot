@@ -2140,6 +2140,10 @@ func _dev_shot(dt: float) -> void:
 			"breakfloat":   # breakfloat:8 — a gate fish breaking free again, its float (q(278) shots)
 				ui.float_text(P0Logic.break_free_float(session.current(), {"rarity": 4, "need_level": int(step[1]), "refund": 3}),
 					anchor(), UiFloatText.Tone.ENERGY_GAIN)
+			"nodev":   # shots only (不知火舞 on 475 / C67): the test builds' +1h / +4h / Legend keys gone — a release has none
+				if ui._dev_box != null:
+					ui._dev_box.queue_free()
+					ui._dev_box = null
 			"notips":   # shots only (不知火舞 on 475): every TipCard seen and the one up closed — in memory, nothing saved
 				if ui.tips != null:
 					for k in P0Guide.TIPS: ui.tips.seen[k] = true
