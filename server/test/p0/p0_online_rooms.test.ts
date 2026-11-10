@@ -149,10 +149,13 @@ describe('P0 outpost rooms (SGODOT-227)', () => {
 });
 
 // The fixture is the client's (tests/fixtures), in the repo but not in the server image (server/deploy/p0/Dockerfile copies
-// server/ and the content tables): there the check is skipped, not failed (蒙恬, each rehearsal's one known failure).
-const FRAME_V1 = new URL('../../../tests/fixtures/p0/frame_v1.hex', import.meta.url);
+// server/ and the content tables, never tests/): skipped where the client's tests are not there at all (蒙恬, each
+// rehearsal's one known failure), failed in the repo when the fixture alone is gone — it is the only file in its folder,
+// so the whole tests/ is what tells the image apart (哪吒 on #984).
+const CLIENT_TESTS = new URL('../../../tests/', import.meta.url);
+const FRAME_V1 = new URL('fixtures/p0/frame_v1.hex', CLIENT_TESTS);
 describe('P0 snapshot frame v1 fixture (shared with tests/p0/test_p0_online.gd)', () => {
-  it.skipIf(!existsSync(FRAME_V1))('encodes exactly the bytes the Godot client test decodes', async () => {
+  it.skipIf(!existsSync(CLIENT_TESTS))('encodes exactly the bytes the Godot client test decodes', async () => {
     const { snapshotFrame } = await import('../../src/p0/online/frame.js');
     const m = (id: number, x: number, z: number, yaw: number, action: string, seq: number) =>
       ({ player: 'p' + id, outpost: 'o', layout: '', room: 1, id, x, z, yaw, action, seat: '', seq, at: 0 });
