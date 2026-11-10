@@ -47,6 +47,11 @@ func test_none_at_lv1_then_the_tier_and_number_of_the_level() -> void:
 ## As the model's review renders wrote them (its README): Nunito ExtraBold, 0.002 m a pixel, the number's cap 0.315 m
 ## (font size 223) and `Lv`'s 0.08 m (57), ink #3B2F25, no outline, unshaded, one sided, never turning to the camera;
 ## on the sockets, so they tilt with the face; never translated.
+## 上官婉儿 401 60e493d5 / 不知火舞 b3d362ee: 1.1 times the model, its proportions kept (the number ≥ 14 px at 0.8).
+func test_the_badge_is_a_tenth_larger_than_the_model() -> void:
+	assert_float(P0Farm.BADGE_SCALE).is_equal_approx(1.1, 1e-6)
+	assert_vector(P0Farm.BADGE_HIT).is_equal_approx(Vector3(0, 1.1, 0), Vector3.ONE * 1e-6)
+
 func test_the_number_is_written_as_the_review_renders() -> void:
 	var farm := _farm()
 	var number: Label3D = farm._badge_number

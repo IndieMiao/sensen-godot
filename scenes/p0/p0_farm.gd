@@ -20,11 +20,14 @@ const SIGN_BADGE := Vector3(0, 1.15, 0)   # the Homestead sign's mark, just abov
 const SIGN_NEAR := 2.6                    # metres: the sign's and the plaque's finger cards show this close
 ## The Home Badge (q(287); 赵云's homestead_badge.glb, its README's contract): its four tier faces under BadgeFace, the
 ## number and `Lv` written by Label3Ds on its BadgeNumber / BadgeLv sockets (tilted with the face), the root turned
-## 14.5° on the farm. The tap and the strip from the face's centre (1.0 m up) and above its top (1.38 m).
+## 14.5° on the farm. The tap at the face's centre (1.0 m up); the strip above the badge's top (1.38 m).
 const BADGE := preload("res://assets/farm/art/homestead_badge.glb")
 const BADGE_YAW := 14.5
-const BADGE_HIT := Vector3(0, 1.0, 0)
-const BADGE_MARK := Vector3(0, 1.5, 0)
+## The whole badge 1.1 times the model, so its number stays ≥ 14 px on the 0.8 follow camera (q(287): it measured 13;
+## 上官婉儿 401 60e493d5, 不知火舞 b3d362ee: the font fills the face already, the badge grows, not the number).
+const BADGE_SCALE := 1.1
+const BADGE_HIT := Vector3(0, 1.0 * BADGE_SCALE, 0)
+const BADGE_MARK := Vector3(0, 1.95 * BADGE_SCALE, 0)   # the strip clear above the face's top (1.4 m), not over its number
 const BADGE_NUMBER_CAP := 0.315   # metres of a digit's cap height (the model's review renders)
 const BADGE_LV_CAP := 0.080
 const BADGE_INK := Color("3B2F25")
@@ -314,6 +317,7 @@ func _build_world() -> void:
 	_plaque_node.name = "HomeBadge"
 	_plaque_node.position = _plaque
 	_plaque_node.rotation.y = deg_to_rad(BADGE_YAW)
+	_plaque_node.scale = Vector3.ONE * BADGE_SCALE
 	_plaque_node.visible = false
 	props.add_child(_plaque_node)
 	_badge_number = badge_label(_plaque_node.find_child("BadgeNumber", true, false), "", BADGE_NUMBER_CAP)
