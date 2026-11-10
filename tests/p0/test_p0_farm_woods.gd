@@ -128,3 +128,12 @@ func test_the_west_hedge_stays_a_hedge_and_clears_the_exit() -> void:
 		assert_float(p.distance_to(exit) - r - 0.38).override_failure_message("%s on the ring" % p).is_greater_equal(0.3)
 		if p.y > exit.y and p.x + r >= FarmWoods.EXIT_COL.x and p.x - r <= FarmWoods.EXIT_COL.y:
 			assert_float(p.y - 1.07 * 0.6 * float(h[i][2])).override_failure_message("%s in front of the ring" % p).is_greater_equal(1.45)
+
+## The same, in plain numbers (周瑜 on #945: not covers_exit against itself): no trunk within 1.2 m of the exit, and
+## the exit is where these numbers say, (0.8, 1.0).
+func test_the_exit_corner_in_numbers() -> void:
+	var w := _woods()
+	for e in w.trees_placed:
+		var o: Vector3 = (e[1] as Transform3D).origin
+		assert_float(Vector2(o.x, o.z).distance_to(Vector2(0.8, 1.0))).override_failure_message("%s at %s" % [e[0], o]).is_greater_equal(1.2)
+	assert_vector(Vector2(P0Garden.MAP_EXIT.x, P0Garden.MAP_EXIT.z)).is_equal(Vector2(0.8, 1.0))
