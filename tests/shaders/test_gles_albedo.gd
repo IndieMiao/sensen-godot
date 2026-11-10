@@ -3,8 +3,13 @@ extends GdUnitTestSuite
 ## a vcol_matte with its parameters, on the instance's own slots (the shared Mesh keeps its material); one marked KEEP,
 ## or anything a vcol_matte does not draw, stays. The rendering method is injected: no renderer is needed (headless too).
 
+var _hook: Node   # a hook a test connected, let go here whatever the test did
+
 func after_test() -> void:
 	GlesAlbedo.method = ""
+	if is_instance_valid(_hook):
+		if get_tree().node_added.is_connected(_hook._added): get_tree().node_added.disconnect(_hook._added)
+		_hook.free()
 
 static func _vcol(roughness := 0.9, specular := 0.18) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
@@ -24,6 +29,11 @@ func test_only_a_plain_linear_vertex_colour_material_is_swapped() -> void:
 		"a texture": func(m): m.albedo_texture = PlaceholderTexture2D.new(),
 		"emission": func(m): m.emission_enabled = true,
 		"billboard": func(m): m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED,
+		"no depth test": func(m): m.no_depth_test = true,
+		"no shadows on it": func(m): m.disable_receive_shadows = true,
+		"no fog": func(m): m.disable_fog = true,
+		"additive": func(m): m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD,
+		"depth always": func(m): m.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS,
 		"kept": func(m): m.set_meta(GlesAlbedo.KEEP, true),
 	}
 	for name in cases:
@@ -93,17 +103,15 @@ func test_the_hook_runs_on_gles_only() -> void:
 	add_child(off)
 	assert_bool(get_tree().node_added.is_connected(off._added)).is_false()
 	GlesAlbedo.method = "gl_compatibility"
-	var hook: Node = GlesAlbedo.new()
-	add_child(hook)
-	assert_bool(get_tree().node_added.is_connected(hook._added)).is_true()
+	_hook = GlesAlbedo.new()
+	add_child(_hook)
+	assert_bool(get_tree().node_added.is_connected(_hook._added)).is_true()
 	var late := MeshInstance3D.new()
 	late.mesh = BoxMesh.new()
 	add_child(late)
 	late.material_override = _vcol()   # after add_child
 	await get_tree().process_frame
 	assert_object(late.material_override).is_instanceof(ShaderMaterial)
-	get_tree().node_added.disconnect(hook._added)
-	hook.free()
 	late.free()
 
 func test_on_follows_the_renderer() -> void:

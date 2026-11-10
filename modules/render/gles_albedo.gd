@@ -7,7 +7,8 @@ extends Node
 ## node comes into the tree (and the whole tree once, as the hook connects), a frame later too for code that sets the
 ## material after add_child. Only the instance's own slots change (material_override, a surface's override); the shared
 ## Mesh resources keep theirs. A material some code reads back as a BaseMaterial3D to change it (a flash, a fade) is
-## marked KEEP and left as it is. The RD renderers never get here.
+## marked KEEP and left as it is. Code that gives a node its material later than the frame after add_child calls
+## fix(node) itself (the hook looks twice, no more). The RD renderers never get here.
 
 const SHADER := preload("res://modules/render/vcol_matte.gdshader")
 static var _both: Shader   # vcol_matte with both faces drawn, for a material with CULL_DISABLED (the pond's bank flowers)
@@ -17,6 +18,7 @@ const KEEP := &"gles_albedo_keep"
 ## The rendering method the swap is for: "" = the running one; tests inject theirs ("gl_compatibility", "mobile").
 static var method := ""
 static var _cache := {}   # parameters → the ShaderMaterial made for them (one per look, shared like the originals)
+static var _plain: StandardMaterial3D   # a StandardMaterial3D as made: the flags and modes a swapped one must keep
 
 static func on() -> bool:
 	return (method if method != "" else RenderingServer.get_current_rendering_method()) == "gl_compatibility"
@@ -33,6 +35,12 @@ static func swaps(m: Material) -> bool:
 	if b.albedo_texture != null or b.next_pass != null: return false
 	for f in BaseMaterial3D.FEATURE_MAX:
 		if b.get_feature(f): return false
+	# every flag (depth test, receive shadows, fog, point size, triplanar …) and mode as a StandardMaterial3D has them
+	# made, but the vertex colour's own (周瑜 on #944): what vcol_matte does not draw differently stays
+	if _plain == null: _plain = StandardMaterial3D.new()
+	for f in BaseMaterial3D.FLAG_MAX:
+		if f != BaseMaterial3D.FLAG_ALBEDO_FROM_VERTEX_COLOR and b.get_flag(f) != _plain.get_flag(f): return false
+	if b.blend_mode != _plain.blend_mode or b.depth_draw_mode != _plain.depth_draw_mode or b.grow != _plain.grow: return false
 	return true
 
 ## The vcol_matte for a swapped material, made once for its parameters.
