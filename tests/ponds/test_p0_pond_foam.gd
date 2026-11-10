@@ -145,3 +145,23 @@ func test_the_p0_water_skips_the_baked_mask() -> void:
 	var water := auto_free(FishingWater.build(str(e.id), spec)) as FishingWater
 	assert_bool(water.water_material.get_shader_parameter("has_foam_contact") == true).is_false()
 	assert_object(water.water_material.get_shader_parameter("foam_contact")).is_null()
+
+## Whatever SPREAD is, a rock's or a cattail's ring starts at the bank (周瑜 on #942: the rocks reach 0.10 m into the
+## water at most, the cattails 0.58 m on the six SF ponds): no centre further than 0.8 m out, so no ring of froth far
+## off the bank (no white island).
+func test_the_rocks_and_reeds_stand_at_the_bank() -> void:
+	for id in SF:
+		var e: Dictionary = P0Ponds.location(id)
+		var scene := auto_free(PondScenery.build(e)) as PondScenery
+		var polygon := _polygon(e)
+		for r in scene._foam.rocks + scene._foam.reeds:
+			var at := Vector2(r.x, r.y)
+			if Geometry2D.is_point_in_polygon(at, polygon):
+				assert_float(_shore(at, polygon)).override_failure_message("%s: %s %.2f m out in the water" % [id, at, _shore(at, polygon)]).is_less_equal(0.8)
+
+## A pond with no outline makes no foam texture (it would be froth all over).
+func test_no_outline_no_foam() -> void:
+	var scene := auto_free(PondScenery.build(P0Ponds.location(SF[0]))) as PondScenery
+	scene._foam["outline"] = 0
+	scene._foam_texture = null
+	assert_object(scene.foam_contact()).is_null()

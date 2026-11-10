@@ -32,7 +32,7 @@ static func build(entry: Dictionary, clear: Array = [], in_key := Callable()) ->
 	var rocks := ground.find_child("BankRockGroups", false, false)
 	scene._foam = {"extent": Vector2(spec.extent[0], spec.extent[1]) if spec.has("extent") else Vector2.ZERO,
 		"distances": ground.get_meta("water_distances", PackedFloat32Array()), "rocks": rocks.get_meta("contacts", []) if rocks else [],
-		"reeds": props.get_meta("reeds", []), "seed": int(entry.decoration_seed)}
+		"reeds": props.get_meta("reeds", []), "seed": int(entry.decoration_seed), "outline": (spec.get("polygon", []) as Array).size()}
 	var painted := scene.find_child("PaintedGround", true, false) as MeshInstance3D
 	if painted:   # the ground darkens a little under the plants' feet, now that they are placed
 		(painted.material_override as ShaderMaterial).set_shader_parameter("contact_points", PondWildGround.contact_points())
@@ -41,11 +41,14 @@ static func build(entry: Dictionary, clear: Array = [], in_key := Callable()) ->
 
 ## The water's shore foam (pond_water.gdshader's foam_contact) for this bank as it stands — its waterline, rock groups
 ## and cattails (PondWildFoam; SGODOT-422, the user's 0.3.5: the old mask's foam stood where the round stones were).
-## Made on the first ask (a preview never asks), the same texture after; null when the pond has no outline.
+## Made on the first ask (a preview never asks), the same texture after; null when the pond has no outline (fewer than
+## FOAM_OUTLINE points: no water to measure from, and the texture would be froth all over — 周瑜 on #942).
+const FOAM_OUTLINE := 8
 var _foam := {}
 var _foam_texture: ImageTexture
 func foam_contact() -> ImageTexture:
-	if _foam_texture == null and _foam.get("extent", Vector2.ZERO) != Vector2.ZERO and not (_foam.distances as PackedFloat32Array).is_empty():
+	if _foam_texture == null and _foam.get("extent", Vector2.ZERO) != Vector2.ZERO and not (_foam.distances as PackedFloat32Array).is_empty() \
+			and int(_foam.get("outline", 0)) >= FOAM_OUTLINE:
 		_foam_texture = PondWildFoam.build(_foam.extent, _foam.distances, _foam.rocks, _foam.reeds, _foam.seed)
 	return _foam_texture
 
