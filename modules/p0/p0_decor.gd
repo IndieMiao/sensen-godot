@@ -172,15 +172,18 @@ static func cap_at(level: int, m: Dictionary = {}) -> int:
 	return mini(n, int(m.max)) if m.has("max") else n
 
 ## The cap reached, said where Decorate is entered (q(113) ①): `Decor 24/24 · Homestead Lv3 adds 4`; at the top level, or
-## once the next level adds none, `Decor 48/48 · Store one to place this`. Yard v2 (v4q(12) ①): the next level's cap is the
-## server's view.decor.next_cap, the yard's cells counted (`Decor 48/48 · Home Lv13 adds 13`); the level's formula only
-## when the view has none.
+## once no level adds any, `Decor 48/48 · Store one to place this`. Yard v2 (v4q(12) ①; 不知火舞's spec v1 三): the
+## server's view.decor.grows, the first level whose cap is more, the yard's cells counted (`Decor 48/48 · Home Lv13
+## adds 13` from Lv8 to Lv12); the next level's formula only when the view has none.
 static func cap_line(view: Dictionary, m: Dictionary = {}) -> String:
 	var level := int(view.get("homestead", {}).get("level", 1))
 	var head := "Decor %d/%d" % [used(view), cap(view)]
 	var d = view.get("decor", null)
-	var next = (d as Dictionary).get("next_cap", null) if d is Dictionary and (d as Dictionary).has("next_cap") else cap_at(level + 1, m)
-	var adds := int(next) - cap(view) if next != null else 0
+	if d is Dictionary and (d as Dictionary).has("grows"):
+		var g = d.grows
+		if not g is Dictionary or int(g.get("adds", 0)) <= 0: return head + " · Store one to place this"
+		return head + " · Home Lv%d adds %d" % [int(g.level), int(g.adds)]
+	var adds := cap_at(level + 1, m) - cap_at(level, m)
 	if level >= P0Logic.homestead_max(view) or adds <= 0: return head + " · Store one to place this"
 	return head + " · Home Lv%d adds %d" % [level + 1, adds]
 

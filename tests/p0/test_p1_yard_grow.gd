@@ -58,19 +58,32 @@ func test_decor_may_stand_where_the_level_s_yard_reaches() -> void:
 	assert_str(P0Decor.reason(_v(14), "deco_planter", Vector2i(18, 11))).is_equal(outside)   # the field ends at x 18
 	assert_that(P0Decor.nearest_spot(_v(14), "deco_planter", 0, Vector2i(21, 16))).is_equal(Vector2i(20, 16))
 
-## v4q(12) 画面: `Home LvN adds N` from the server's next_cap, the yard's cells counted; the level's formula without one.
-func test_the_cap_line_reads_the_next_cap() -> void:
-	var at := func(lv: int, cap: int, next) -> Dictionary:
-		var d := {"placed": [], "cap": cap, "stored": {}, "next_cap": next}
+## 不知火舞's spec v1 三: `Home LvN adds N` points at the first level that adds (view.decor.grows, the server's, the yard's
+## cells counted) — Lv8–12 all at Lv13; none above, `Store one to place this`; the next level's formula without it.
+func test_the_cap_line_points_at_the_first_level_that_adds() -> void:
+	var at := func(lv: int, cap: int, grows) -> Dictionary:
+		var d := {"placed": [], "cap": cap, "stored": {}, "grows": grows}
 		for i in cap: (d.placed as Array).append({"uid": i + 1, "id": "deco_planter", "x": 0, "y": 0})
 		return _v(lv, d)
-	assert_str(P0Decor.cap_line(at.call(9, 48, 48))).is_equal("Decor 48/48 · Store one to place this")
-	assert_str(P0Decor.cap_line(at.call(12, 48, 61))).is_equal("Decor 48/48 · Home Lv13 adds 13")
-	assert_str(P0Decor.cap_line(at.call(13, 61, 72))).is_equal("Decor 61/61 · Home Lv14 adds 11")
+	assert_str(P0Decor.cap_line(at.call(9, 48, {"level": 13, "adds": 13}))).is_equal("Decor 48/48 · Home Lv13 adds 13")
+	assert_str(P0Decor.cap_line(at.call(13, 61, {"level": 14, "adds": 11}))).is_equal("Decor 61/61 · Home Lv14 adds 11")
 	assert_str(P0Decor.cap_line(at.call(17, 84, null))).is_equal("Decor 84/84 · Store one to place this")
-	var older := _v(3, {"placed": [], "cap": 28, "stored": {}})   # no next_cap: the formula
+	var older := _v(3, {"placed": [], "cap": 28, "stored": {}})   # no grows: the next level's formula
 	for i in 28: (older.decor.placed as Array).append({"uid": i + 1, "id": "deco_planter", "x": 0, "y": 0})
 	assert_str(P0Decor.cap_line(older)).is_equal("Decor 28/28 · Home Lv4 adds 4")
+
+## 不知火舞's spec v1 一 / 二: the What changes row and the HOME-2 line of the level that grows the yard, the server's numbers.
+func test_the_level_that_grows_the_yard_says_so() -> void:
+	var v := _v(12, {"placed": [], "cap": 48, "stored": {}, "next_cap": 61, "room": 48, "next_room": 61})
+	assert_dict(P0Logic.yard_change(v)).is_equal({"icon": "wood", "text": "Decor 61 · Yard +13 spaces", "note": "now 48"})
+	v.decor = {"placed": [], "cap": 61, "stored": {}, "next_cap": 72, "room": 61, "next_room": 102}
+	assert_str(str(P0Logic.yard_change(v).text)).is_equal("Decor 72 · Yard +41 spaces")
+	v.decor = {"placed": [], "cap": 48, "stored": {}, "next_cap": 48, "room": 48, "next_room": 48}
+	assert_dict(P0Logic.yard_change(v)).is_empty()                      # Lv9–11: the yard stays
+	assert_dict(P0Logic.yard_change(_v(12))).is_empty()                 # an older server's view
+	var m := P0Logic.home_moment(_v(14), {"level": 14, "energy": 0, "unlocks": ["fruit_trees"], "yard": {"cap": 72, "spaces": 41}})
+	assert_str(str(m.detail).split("\n")[0]).is_equal("Decor 72 · Yard +41 spaces")   # first, before the level's other lines
+	assert_bool(str(P0Logic.home_moment(_v(12), {"level": 12, "energy": 0, "unlocks": []}).detail).contains("Yard")).is_false()
 
 func test_the_cells_between_two_walks() -> void:
 	var lv13 := P0Farm.yard_cells_between(P0Garden.WALK_RECT, P0Garden.yard_at(13).walk)

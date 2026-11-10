@@ -2551,6 +2551,8 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var plots_now := int(h.get("plots", {}).get("now", 0))
 	if h.get("plots") is Dictionary and int(next.get("plots", plots_now)) > plots_now:
 		out.changes.append({"icon": "field", "text": "Plots %d" % int(next.plots), "note": "now %d" % plots_now})
+	var yard := yard_change(view)
+	if not yard.is_empty(): out.changes.append(yard)
 	var board_now := int(h.get("unlocks", {}).get("board_slots", 2))
 	for u in unlocks:
 		match str(u):
@@ -2626,12 +2628,27 @@ static func plaque_lines(view: Dictionary, bias_min := 999999) -> Array:
 		out.append({"label": "Lv%d" % int(p.get("level", 1)), "value": "%s %d" % [MONTHS[int(d.month) - 1], int(d.day)]})
 	return out
 
+## Yard v2 (v4q(12); 不知火舞's spec v1 一): the What changes row of the level that grows the yard — the next cap and the
+## spaces the yard gains (view.decor next_cap, room, next_room: the server's, the yard's cells counted), note the cap now.
+## {} when the next level does not grow it, or for a view without them (an older server, or a client not saying yard2).
+const YARD_LINE := "Decor %d · Yard +%d spaces"
+
+static func yard_change(view: Dictionary) -> Dictionary:
+	var d = view.get("decor", null)
+	if not d is Dictionary or d.get("next_room", null) == null or d.get("next_cap", null) == null: return {}
+	var gained := int(d.next_room) - int(d.get("room", 0))
+	if gained <= 0: return {}
+	return {"icon": "wood", "text": YARD_LINE % [int(d.next_cap), gained], "note": "now %d" % int(d.get("cap", 0))}
+
 ## HOME-2 MomentBanner (Figma 482:154 / 1228:108620) from the server's homestead event: level disc, title,
 ## what changed (the event's actual Energy gain at any level) and one line of consequences.
 static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 	var level := int(ev.get("level", 1))
 	var max_e := int(view.get("energy", {}).get("max", 0))
 	var lines: Array = []
+	# yard v2 (v4q(12); 不知火舞's spec v1 二): the level that grows the yard says it first, the server's numbers
+	var yard = ev.get("yard", null)
+	if yard is Dictionary: lines.append(YARD_LINE % [int(yard.get("cap", 0)), int(yard.get("spaces", 0))])
 	for u in ev.get("unlocks", []):
 		match str(u):
 			"spice_rack": lines.append("Spice Rack · seasonings off your bag")

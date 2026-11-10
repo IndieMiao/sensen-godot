@@ -41,7 +41,7 @@ export type P0Event =
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number;
       paid: { energy: number; coins: number }; renewed: boolean; wild?: true }   // wild: a wild site (v4q(3)), stamp null and no +10
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
-  | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // energy: actual gain after the new cap (q247); look: the stage it opens
+  | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string; yard?: { cap: number; spaces: number } }   // energy: actual gain after the new cap (q247); look: the stage it opens; yard: the yard grew (yard2, v4q(12)): the cap now and the spaces it gained
   | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
   | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string; first?: boolean }

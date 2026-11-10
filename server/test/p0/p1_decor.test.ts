@@ -194,4 +194,32 @@ describe('yard2: the yard grows with the Home level (v4q(12), the user 11-10 bot
     expect(viewOf(c, at(17), T0, NEW).decor).toMatchObject({ cap: 84, next_cap: null });
     expect('next_cap' in viewOf(c, at(12), T0, { wing8: true }).decor!).toBe(false);
   });
+
+  it('the view says the cells now and next (What changes: `Decor 61 · Yard +13 spaces`) and the first level that adds (不知火舞 spec v1)', () => {
+    expect(viewOf(c, at(12), T0, NEW).decor).toMatchObject({ room: 48, next_room: 61, grows: { level: 13, adds: 13 } });
+    expect(viewOf(c, at(13), T0, NEW).decor).toMatchObject({ room: 61, next_room: 102, grows: { level: 14, adds: 11 } });
+    expect(viewOf(c, at(8), T0, NEW).decor).toMatchObject({ grows: { level: 13, adds: 13 } });   // Lv8–12: Lv13 is the next that adds
+    expect(viewOf(c, at(7), T0, NEW).decor).toMatchObject({ grows: { level: 8, adds: 4 } });
+    expect(viewOf(c, at(17), T0, NEW).decor).toMatchObject({ room: 102, next_room: null, grows: null });
+    expect('grows' in viewOf(c, at(12), T0, { wing8: true }).decor!).toBe(false);
+  });
+
+  it('the upgrade that grows the yard says the cap and the spaces it gained on HOME-2 (yard2 only)', () => {
+    const up = (lv: number, f: object) => {
+      const s = at(lv);
+      const next = c.homestead.levels.find(l => l.level === lv + 1)!;
+      for (const [id, qty] of next.materials) s.storage[id] = qty;
+      s.coins = next.coins + 1000;
+      for (const [skill, n] of Object.entries(next.skills)) s.skills[skill as 'farming'] = (c.skills as Record<string, number[]>)[skill][(n as number) - 1];
+      for (const sk of ['farming', 'fishing', 'cooking'] as const) s.skills[sk] = Math.max(s.skills[sk], (c.skills as Record<string, number[]>)[sk][9]);
+      if (next.travel) { s.travel.stamps = Array.from({ length: 20 }, (_, i) => `x${i}`) as never; }
+      const r = applyP0(c, s, { type: 'homestead_upgrade', ...HOME } as P0Command, T0, f);
+      if (!r.ok) throw new Error(`Lv${lv}: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
+      return r.events.find(e => e.kind === 'homestead') as { yard?: object };
+    };
+    expect(up(12, NEW).yard).toEqual({ cap: 61, spaces: 13 });
+    expect(up(13, NEW).yard).toEqual({ cap: 72, spaces: 41 });
+    expect(up(11, NEW).yard).toBeUndefined();
+    expect(up(12, { wing8: true }).yard).toBeUndefined();
+  });
 });

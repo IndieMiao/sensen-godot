@@ -186,16 +186,27 @@ export function storeDecor(c: P0Content, s: P0State, cmd: { uid?: unknown }, eve
   return null;
 }
 
-/** view.decor: the yard's pieces, what storage holds, the cap, and the catalog facts the Decor page needs. yard2:
- * next_cap, the cap at the next Homestead level (null at the top) — the yard's cells count in it, so the client's
- * `Home LvN adds N` reads it rather than the level's formula (v4q(12) 画面). */
+/** view.decor: the yard's pieces, what storage holds, the cap, and the catalog facts the Decor page needs. yard2
+ * (v4q(12); 不知火舞's spec v1), the yard's cells counted in each, so the client never works them out from the level's
+ * formula: next_cap, the cap at the next Homestead level; room / next_room, the cells the yard can take now and then
+ * (What changes: `Decor 61 · Yard +13 spaces` · `now 48`); grows, the first level above whose cap is more than this one's
+ * ({level, adds}: `Home Lv13 adds 13` from Lv8 on). Each null at the top / when none. */
 export function decorView(c: P0Content, s: P0State, f: YardFeatures = {}) {
   const d = decorOf(c);
   if (!d) return null;
   const top = Math.max(...c.homestead.levels.map(l => l.level));
-  const next = f.yard2 ? { next_cap: s.homestead.level < top ? decorCap(c, { ...s, homestead: { ...s.homestead, level: s.homestead.level + 1 } }, f) : null } : {};
+  const at = (level: number) => ({ ...s, homestead: { ...s.homestead, level } });
+  const cap = decorCap(c, s, f);
+  let grows: { level: number; adds: number } | null = null;
+  for (let lv = s.homestead.level + 1; f.yard2 && lv <= top && !grows; lv++) {
+    const more = decorCap(c, at(lv), f) - cap;
+    if (more > 0) grows = { level: lv, adds: more };
+  }
+  const up = s.homestead.level < top;
+  const next = f.yard2 ? { next_cap: up ? decorCap(c, at(s.homestead.level + 1), f) : null, room: yardRoom(c, s, f),
+    next_room: up ? yardRoom(c, at(s.homestead.level + 1), f) : null, grows } : {};
   return {
-    placed: s.decor?.placed ?? [], cap: decorCap(c, s, f), used: s.decor?.placed.length ?? 0, ...next,
+    placed: s.decor?.placed ?? [], cap, used: s.decor?.placed.length ?? 0, ...next,
     stored: Object.fromEntries(Object.keys(d.items).filter(id => stored(s, id) > 0).map(id => [id, stored(s, id)])),
   };
 }
