@@ -1321,6 +1321,14 @@ func _home_gap() -> String:
 	return str(hp.tap) if str(hp.tap) != "" else str(hp.reason)
 
 ## P0_SHOT counters away from the outposts: the keeper ctx the outpost would pass (assets/p0/p0_outposts.json, SGODOT-227).
+## A shot's keeper ctx: inside that role's outpost room its own (a generated city's market keeps its own name and
+## keeper — not home's Mission Market Square, 不知火舞 on 469), else the home outpost's (_dev_ctx).
+func _shot_ctx(role: String) -> Dictionary:
+	if world != null and world.has_method("keeper_ctx") and str(world.get("role")) == role:
+		var own: Dictionary = world.call("keeper_ctx")
+		if str(own.get("keeper", "")) != "": return own   # a room whose outpost data never came: home's, as before
+	return _dev_ctx(role)
+
 static func _dev_ctx(role: String) -> Dictionary:
 	var o := P0Outposts.by_role(role)
 	if o.is_empty(): return {}
@@ -1880,7 +1888,7 @@ func _dev_shot(dt: float) -> void:
 				ui._fab_pressed()
 			"release": ui.fab_held = false
 			"stall": ui.open_stall(step[1] if step.size() > 1 else "")
-			"counter": ui.open_counter(step[1], {"section": step[2] if step.size() > 2 else "buy", "ctx": _dev_ctx(step[1])})
+			"counter": ui.open_counter(step[1], {"section": step[2] if step.size() > 2 else "buy", "ctx": _shot_ctx(step[1])})
 			"boardreq": ui.open_board_request(step[1], step[2])   # boardreq:<role>:<request id> — BOARD-1
 			"dropconfirm": P0BoardRequest.confirm_drop(ui, step[1], step[2])   # dropconfirm:<role>:<request id> — BOARD-3
 			"boardinfo": P0BoardRequest.info(ui, step[1])   # boardinfo:<item> — Details over the open request sheet
@@ -1888,7 +1896,7 @@ func _dev_shot(dt: float) -> void:
 				if ui._modal != null:
 					for b in ui._modal.find_children("*", "UiCommandButton", true, false):
 						if step.size() < 2 or (b as UiCommandButton).text == step[1]: (b as UiCommandButton).activated.emit()
-			"greet": ui.open_keeper_greeting(step[1], _dev_ctx(step[1]))
+			"greet": ui.open_keeper_greeting(step[1], _shot_ctx(step[1]))
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
 			"bagcat":   # bag drawer on one category tab, e.g. bagcat:Materials (SGODOT-225 storage stacks)
 				if ui._bag != null and is_instance_valid(ui._bag):
