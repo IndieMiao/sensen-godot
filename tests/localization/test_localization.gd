@@ -431,6 +431,47 @@ func test_p0_bite_factors_and_names_read_in_chinese() -> void:
 	assert_str(zh.call("Sea Bass, ? · +2 more")).is_equal("海鲈、? · 还有 2 条")
 	TranslationServer.remove_translation(t)
 
+## SGODOT-467 (李白): the keeper's line with two conditions read `鲇鱼at且night in the rain咬钩` — `%s bite %s %s. %s` was
+## cut at the first space. The conditions go as one phrase with a key of its own: every time × weather, bite and only
+## bite, the keeper's sentence and the Notice Board's clause, the English as it was; a forecast's day by its `@weekday`
+## key, a city called Mon still Mon; Clear 晴天.
+func test_p0_bite_lines_with_two_conditions_read_whole_in_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	# each pair its own Chinese, not A且B (李白 on #952, 6759640313)
+	var pairs := {"at night in the rain": "在下雨的夜里", "at night in the wind": "在刮风的夜里", "at night in the sun": "在晴朗的夜里",
+		"at dawn and dusk in the rain": "在下雨天的清晨和黄昏", "at dawn and dusk in the wind": "在刮风天的清晨和黄昏",
+		"at dawn and dusk in the sun": "在晴天的清晨和黄昏"}
+	for tw in BiteBoardScript.TIME_WORDS.values():
+		for ww in BiteBoardScript.WEATHER_WORDS.values():
+			var when := "%s %s" % [tw, ww]
+			var both: String = pairs[when]
+			assert_str(zh.call(BiteBoardScript.LINE[1] % ["Catfish", when, "Bring worms."])).is_equal("鲇鱼%s咬钩。带上蚯蚓。" % both)
+			assert_str(zh.call(BiteBoardScript.LINE_ONLY % ["River Eels", when, "Bring worms."])).is_equal("河鳗只%s咬钩。带上蚯蚓。" % both)
+			assert_str(zh.call(BiteBoardScript.CLAUSE[1] % ["Catfish", when])).is_equal("鲇鱼%s咬钩" % both)
+			assert_str(zh.call(BiteBoardScript.CLAUSE_ONLY % ["River Eels", when])).is_equal("河鳗只%s咬钩" % both)
+	# the lines as P0BiteBoard builds them: the English unchanged, one condition and none as before
+	var line := func(ids: Array, weather: String, bait := true) -> String: return BiteBoardScript.line(ids, weather, 9, {}, bait)
+	assert_str(line.call(["fish_catfish"], "rain")).is_equal("Catfish bite at night in the rain. Bring worms.")
+	assert_str(zh.call(line.call(["fish_catfish"], "rain"))).is_equal("鲇鱼在下雨的夜里咬钩。带上蚯蚓。")
+	assert_str(line.call(["fish_eel"], "rain", false)).is_equal("River Eels only bite at night in the rain")
+	assert_str(zh.call(line.call(["fish_eel"], "rain", false))).is_equal("河鳗只在下雨的夜里咬钩")
+	assert_str(zh.call(line.call(["fish_catfish"], "sun"))).is_equal("鲇鱼在夜里咬钩。带上蚯蚓。")
+	assert_str(zh.call(line.call(["fish_eel"], "sun"))).is_equal("河鳗只在夜里咬钩。带上蚯蚓。")
+	assert_str(zh.call(line.call(["fish_carp"], "sun", false))).is_equal("鲤鱼正在咬钩")
+	assert_str(zh.call("Clear")).is_equal("晴天")
+	var kept = Localization.p0_translation
+	Localization.p0_translation = t
+	var place := {"forecast": [{"day": "Mon", "weather": "sun"}, {"day": "Tue", "weather": "rain"}, {"day": "Sun", "weather": "wind"}]}
+	assert_array(BiteBoardScript.forecast(place, 3).map(func(d): return d[0])).contains_exactly(["周一", "周二", "周日"])
+	assert_str(zh.call("Mon")).is_equal("")   # the city called Mon keeps its name
+	TranslationServer.set_locale("en")
+	assert_array(BiteBoardScript.forecast(place, 3).map(func(d): return d[0])).contains_exactly(["Mon", "Tue", "Sun"])
+	Localization.p0_translation = kept
+	TranslationServer.remove_translation(t)
+
 ## 0.2.23 (不知火舞 385 fd216262): a Nearby row's name and ` · state` are measured as they show — 「费尔菲尔德」 was cut at
 ## Fairfield's English width and the gap before 「· 加州」 followed the English.
 const CityRowScript := preload("res://scenes/p0/panels/p0_city_row.gd")
