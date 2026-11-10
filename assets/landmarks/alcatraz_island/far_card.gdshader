@@ -1,5 +1,7 @@
 shader_type spatial;
 render_mode unshaded, cull_disabled, blend_mix, depth_draw_never;
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 uniform float depth_fraction = 0.94;
 uniform vec4 tint : source_color = vec4(1.0);
 uniform bool use_texture = false;
@@ -12,8 +14,9 @@ void vertex() {
     POSITION = PROJECTION_MATRIX * vec4(view_position,1.0);
 }
 void fragment() {
-    vec4 color = COLOR * tint;
-    if (use_texture) { color *= texture(card_texture,UV); }
+    vec4 color = COLOR * src_linear4(tint);
+    if (use_texture) { color *= src_linear4(texture(card_texture,UV)); }
     ALBEDO = color.rgb;
     ALPHA = color.a;
+	ALBEDO = albedo_out(ALBEDO);
 }

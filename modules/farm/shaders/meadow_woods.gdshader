@@ -1,5 +1,7 @@
 shader_type spatial;
 render_mode specular_disabled;
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 // The farm's meadow with the woods round it (P0FarmWoods, SGODOT-422 0.3.5; meadow.gdshader is the meadow before them):
 // the same painted meadow and its cooler woodland behind the house, plus the wild ground's language at a few ALU —
 // big yellow-green / blue-green patches and a faint light wander (value noise: no extra texture, no data texture), the
@@ -40,14 +42,14 @@ float vnoise(vec2 p) {
 }
 
 void fragment() {
-	vec3 paint = texture(meadow_texture, world_uv * 0.075).rgb;
-	paint = mix(clearing_color.rgb, paint, 0.50);
-	float grain = texture(meadow_texture, world_uv * 0.73 + vec2(0.31, 0.17)).g;
+	vec3 paint = src_linear4(texture(meadow_texture, world_uv * 0.075)).rgb;
+	paint = mix(src_linear4(clearing_color).rgb, paint, 0.50);
+	float grain = src_linear4(texture(meadow_texture, world_uv * 0.73 + vec2(0.31, 0.17))).g;
 	float woodland = smoothstep(woodland_start, woodland_start + 4.5, -world_uv.y + (grain - 0.45) * 1.2);
 	vec3 woodland_tint = mix(vec3(1.0), vec3(0.50, 0.72, 0.76), woodland);
 	vec3 c = paint * (0.94 + grain * 0.12) * woodland_tint;
 	float n = vnoise(world_uv / 6.5 + vec2(3.7, 1.3)) * 0.65 + vnoise(world_uv / 2.4 + vec2(11.0, 7.0)) * 0.35;
-	vec3 hue = mix(mottle_cool, mottle_warm, smoothstep(0.36, 0.64, n));
+	vec3 hue = mix(src_linear(mottle_cool), src_linear(mottle_warm), smoothstep(0.36, 0.64, n));
 	const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
 	c = mix(c, hue * dot(c, LUMA) / max(dot(hue, LUMA), 0.001), mottle);
 	c *= 1.0 + (n - 0.5) * 2.0 * wander;
@@ -71,6 +73,7 @@ void fragment() {
 	c *= mix(vec3(1.0), floor_tint, smoothstep(0.2, 4.0, outside + (grain - 0.5) * 0.8));
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
+	ALBEDO = albedo_out(ALBEDO);
 }
 
 void light() {

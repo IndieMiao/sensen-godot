@@ -41,6 +41,7 @@ func _run(farm: Node3D, seconds: float) -> void:
 		t += 1.0 / 30.0
 
 func after_test() -> void:
+	GlesAlbedo.method = ""
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
 
 func test_its_prompt_is_the_ringed_pin_and_map_and_shows_from_anywhere() -> void:
@@ -255,3 +256,21 @@ func test_its_strip_clears_the_head_and_eases_back() -> void:
 	assert_float(farm._exit_lift).is_less(0.0)
 	farm._exit_strip_lift(P0Farm.EXIT_STRIP_BACK_S * 0.6)
 	assert_float(farm._exit_lift).is_equal(0.0)
+
+## SGODOT-458 (周瑜 on #943): on GLES the swap (GlesAlbedo) leaves the pin's own material — it is faded here, as a
+## StandardMaterial3D — while the ring's, the shared farm art material, is swapped as any.
+func test_on_gles_the_pin_keeps_its_own_material_and_still_fades() -> void:
+	if not ResourceLoader.exists(P0Farm.EXIT_PIECE): return
+	GlesAlbedo.method = "gl_compatibility"
+	var farm := _farm()
+	farm._exit_piece()
+	var piece: Node3D = farm.get_node("ExitPin")
+	var pin := piece.find_child(P0Farm.EXIT_PIN_NODE, true, false) as MeshInstance3D
+	var ring := piece.find_child(P0Farm.EXIT_RING_NODE, true, false) as MeshInstance3D
+	GlesAlbedo.sweep(piece)
+	assert_object(pin.material_override).is_same(farm._exit_pin_mat)
+	assert_object(ring.material_override).is_instanceof(ShaderMaterial)
+	farm.actor.teleport(farm._exit + Vector3(0, 0, -0.8))
+	farm._exit_fade(1.0)
+	assert_float(farm._exit_pin_mat.albedo_color.a).is_equal(0.0)
+	assert_object(pin.material_override).is_same(farm._exit_pin_mat)

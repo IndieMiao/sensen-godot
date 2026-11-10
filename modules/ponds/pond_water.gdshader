@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode cull_disabled;
 
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 uniform sampler2D pond_shore : filter_linear, repeat_disable;
 uniform vec2 pond_extent = vec2(12.0, 16.0);
 uniform sampler2D pebble_bed : source_color, repeat_enable, filter_linear_mipmap;
@@ -107,11 +109,11 @@ void fragment() {
     NORMAL = normalize(mat3(VIEW_MATRIX) * normal_world);
 
     vec2 refracted = pond_uv + vec2(slope.x, -slope.y) * 0.010 * smoothstep(0.0, 0.4, shore);
-    vec4 bed_sample = texture(basin_bed, refracted);
+    vec4 bed_sample = src_linear4(texture(basin_bed, refracted));
     float depth = bed_sample.a * 2.5;
     vec3 transmission = exp(-depth * depth_absorption * vec3(4.0, 1.05, 0.68));
-    vec3 volume = mix(shallow_color, middle_color, smoothstep(0.0, 0.80, depth));
-    volume = mix(volume, deep_color, smoothstep(0.85, 2.25, depth));
+    vec3 volume = mix(src_linear(shallow_color), src_linear(middle_color), smoothstep(0.0, 0.80, depth));
+    volume = mix(volume, src_linear(deep_color), smoothstep(0.85, 2.25, depth));
     // Sunlit neutral minerals transmit cyan/blue light. The old green-grey
     // bed suppressed blue and flattened the shallow-to-deep luminance range.
     vec3 bed = bed_sample.rgb * vec3(1.10, 1.65, 2.15);
@@ -202,8 +204,8 @@ void fragment() {
                        * (1.0 - smoothstep(0.50, 0.95, foam_distance)) * surface_foam_opacity;
     // Let the active float disturb small free patches around it.
     surface_froth *= 1.0 - (1.0 - smoothstep(0.15, 0.45, distance_to_float)) * clamp(interaction.w * 4.0, 0.0, 1.0);
-    float foam_alpha = clamp(max(contact_froth, surface_froth) * foam_strength * foam_color.a, 0.0, 1.0);
-    color = mix(color, foam_color.rgb, foam_alpha);
+    float foam_alpha = clamp(max(contact_froth, surface_froth) * foam_strength * src_linear4(foam_color).a, 0.0, 1.0);
+    color = mix(color, src_linear4(foam_color).rgb, foam_alpha);
     water_sparkle *= 1.0 - foam_alpha;
     float far_bank = smoothstep(7.5, 11.7, -p.y + (p.x - 6.0) * 0.18);
     color *= 1.0 - far_bank * (1.0 - smoothstep(0.08, 0.85, shore)) * 0.30;
@@ -217,6 +219,8 @@ void fragment() {
     ROUGHNESS = mix(ROUGHNESS, 0.70, foam_alpha);
     SPECULAR = mix(SPECULAR, 0.12, foam_alpha);
     METALLIC = 0.0;
+	ALBEDO = albedo_out(ALBEDO);
+	EMISSION = albedo_out(EMISSION);
 }
 
 void light() {

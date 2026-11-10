@@ -1,5 +1,7 @@
 shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_opaque, cull_back;
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 uniform vec4 water : source_color = vec4(0.26275,0.60784,0.69020,1.0);
 uniform vec4 deep_water : source_color = vec4(0.19216,0.51765,0.62353,1.0);
 uniform bool false_horizon = true;
@@ -14,6 +16,7 @@ void fragment() {
     float ripple = sin(sea_world.y*1.7 + sea_world.x*.30 + .65*sin(sea_world.x*.24+TIME*.09) + TIME*.15);
     float breakup = smoothstep(-.15,.55,sin(sea_world.x*.73-sea_world.y*.16+TIME*.06));
     float light_ridge = smoothstep(.96,1.0,ripple)*breakup*.018;
-    ALBEDO = mix(deep_water.rgb,water.rgb,.35+.40*broad) + vec3(light_ridge);
+    ALBEDO = mix(src_linear4(deep_water).rgb,src_linear4(water).rgb,.35+.40*broad) + vec3(light_ridge);
     ALPHA = false_horizon ? smoothstep(0.12,0.24,SCREEN_UV.y) : 1.0;
+	ALBEDO = albedo_out(ALBEDO);
 }

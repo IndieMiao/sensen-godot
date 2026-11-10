@@ -1,5 +1,7 @@
 shader_type spatial;
 render_mode cull_disabled;
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 uniform sampler2D stone_detail : source_color, repeat_enable, filter_linear_mipmap;
 uniform sampler2D surface_flow : repeat_enable, filter_linear_mipmap;
 varying vec3 world;
@@ -11,9 +13,9 @@ void vertex() {
 void fragment() {
     vec3 weights = pow(abs(world_normal), vec3(4.0));
     weights /= max(dot(weights, vec3(1.0)), 0.001);
-    vec3 mineral = texture(stone_detail, world.yz * 1.6).rgb * weights.x
-                 + texture(stone_detail, world.xz * 1.6).rgb * weights.y
-                 + texture(stone_detail, world.xy * 1.6).rgb * weights.z;
+    vec3 mineral = src_linear4(texture(stone_detail, world.yz * 1.6)).rgb * weights.x
+                 + src_linear4(texture(stone_detail, world.xz * 1.6)).rgb * weights.y
+                 + src_linear4(texture(stone_detail, world.xy * 1.6)).rgb * weights.z;
     float detail = dot(mineral, vec3(0.3333));
     // Fine mineral relief follows the real curved/cut surface in world space.
     vec3 n = normalize(world_normal);
@@ -30,4 +32,5 @@ void fragment() {
     ALBEDO = COLOR.rgb * (0.85 + detail * 0.40 + (mottling - 0.5) * 0.10) * mix(1.0, 0.76, wet);
     ROUGHNESS = mix(0.94, 0.67, wet);
     SPECULAR = 0.15;
+	ALBEDO = albedo_out(ALBEDO);
 }

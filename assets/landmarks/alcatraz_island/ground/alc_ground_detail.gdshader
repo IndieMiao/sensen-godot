@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode diffuse_burley, specular_schlick_ggx;
 
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 // Optional finishes for #792 bf0c31b1. COLOR is the imported LINEAR palette.
 // DATA samplers deliberately have no source_color hint. No UV dependency.
 uniform sampler2D fields : filter_linear_mipmap, repeat_enable;
@@ -49,15 +51,15 @@ void fragment() {
     vec3 base = COLOR.rgb;
     vec3 detailed = base;
     if (finish_kind == 0) {
-        bool grass = near_palette(base, garden.rgb) || near_palette(base, garden_dark.rgb) || near_palette(base, garden_light.rgb);
-        bool path = near_palette(base, road.rgb);
+        bool grass = near_palette(base, src_linear4(garden).rgb) || near_palette(base, src_linear4(garden_dark).rgb) || near_palette(base, src_linear4(garden_light).rgb);
+        bool path = near_palette(base, src_linear4(road).rgb);
         if (grass) {
             // Two incommensurate repeats reduce obvious macro repetition across the island.
             float broad = texture(fields, world_position.xz / grass_patch_repeat_m).r;
             float second = texture(fields, (world_position.zx + vec2(11.7, -4.3)) / (grass_patch_repeat_m * 1.618)).r;
             float patch = broad * 0.80 + second * 0.20;
-            vec3 grass_color = mix(grass_deep_color.rgb, grass_base_color.rgb, smoothstep(0.41, 0.46, patch));
-            grass_color = mix(grass_color, grass_sun_color.rgb, smoothstep(0.54, 0.60, patch));
+            vec3 grass_color = mix(src_linear4(grass_deep_color).rgb, src_linear4(grass_base_color).rgb, smoothstep(0.41, 0.46, patch));
+            grass_color = mix(grass_color, src_linear4(grass_sun_color).rgb, smoothstep(0.54, 0.60, patch));
             float leaf = texture(fields, world_position.xz / grass_detail_repeat_m).g;
             detailed = grass_color * (1.0 + (leaf - 0.5) * grass_detail_strength * 2.0);
         } else if (path) {
@@ -65,7 +67,7 @@ void fragment() {
             detailed = base * (1.0 - stone.r * paving_joint_strength + (stone.g - 0.5) * paving_tone_strength);
         }
     } else {
-        bool board = near_palette(base, wood.rgb) || near_palette(base, wood_light.rgb) || near_palette(base, wood_dark.rgb);
+        bool board = near_palette(base, src_linear4(wood).rgb) || near_palette(base, src_linear4(wood_light).rgb) || near_palette(base, src_linear4(wood_dark).rgb);
         // Only original deck top faces: do not paint pile caps, piles or side faces.
         if (board && abs(object_position.y) < 0.015) {
             float grain = texture(surfaces, object_position.xz / wood_repeat_m).b;
@@ -76,4 +78,5 @@ void fragment() {
     ROUGHNESS = surface_roughness;
     SPECULAR = surface_specular;
     METALLIC = 0.0;
+	ALBEDO = albedo_out(ALBEDO);
 }

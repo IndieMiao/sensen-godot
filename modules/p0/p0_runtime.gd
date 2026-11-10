@@ -1893,6 +1893,10 @@ func _dev_shot(dt: float) -> void:
 			"counterpick":  # counterpick[:id] selects a stack in the counter's bag half: its Sell card shows (q(16) shots)
 				if ui._counter != null and is_instance_valid(ui._counter) and ui._counter.grid != null and not ui._counter.grid.shown_items().is_empty():
 					ui._counter.grid.select(step[1] if step.size() > 1 else str(ui._counter.grid.shown_items().front().id))
+			"glesleft":   # SGODOT-458: what still draws a linear vertex colour through a BaseMaterial3D (GLES checks)
+				var hook := get_tree().root.get_node_or_null("GlesColour")
+				print("P0_GLES_ON ", GlesAlbedo.on(), " method=", RenderingServer.get_current_rendering_method(), " hook=", hook != null and get_tree().node_added.is_connected(hook._added))
+				print("P0_GLES_LEFT ", GlesAlbedo.left(get_tree().root))
 			"uitexts":   # every visible label / button text on screen (shots: check a frame by its words)
 				var out: Array = []
 				for c in ui.root.find_children("*", "Control", true, false):

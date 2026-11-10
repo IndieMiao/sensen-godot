@@ -1,5 +1,7 @@
 shader_type spatial;
 render_mode cull_disabled;
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 varying vec3 world;
 void vertex() {
     world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -13,4 +15,5 @@ void fragment() {
     BACKLIGHT = COLOR.rgb * 0.20;
     ROUGHNESS = 0.76;
     SPECULAR = 0.15;
+	ALBEDO = albedo_out(ALBEDO);
 }

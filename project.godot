@@ -13,6 +13,7 @@ boot_splash/stretch_mode=3
 boot_splash/image="res://assets/p0/ui/launch_splash.png"
 
 [autoload]
+GlesColour="*res://modules/render/gles_albedo.gd"
 Localization="*res://modules/ui/localization.gd"
 Avatar="*res://modules/avatar/avatar_service.gd"
 AppRouter="*res://modules/ui/app_router.gd"

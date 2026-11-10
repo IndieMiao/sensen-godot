@@ -1,6 +1,8 @@
 shader_type spatial;
 render_mode unshaded, shadows_disabled;
 
+// GLES (SGODOT-458): source_color inputs to linear where read, ALBEDO / EMISSION handed over as GLES wants them.
+#include "res://modules/render/gles_colour.gdshaderinc"
 varying float opacity;
 
 void vertex() {
@@ -13,4 +15,5 @@ void vertex() {
 void fragment() {
 	ALBEDO = vec3(0.98, 0.98, 0.94);
 	ALPHA = opacity * 0.72;
+	ALBEDO = albedo_out(ALBEDO);
 }
