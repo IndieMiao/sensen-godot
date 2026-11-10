@@ -440,12 +440,14 @@ func test_p0_bite_lines_with_two_conditions_read_whole_in_chinese() -> void:
 	t.load_table("res://assets/localization/p0_zh_CN.json")
 	TranslationServer.add_translation(t)
 	var zh := func(s: String) -> String: return String(t.get_message(s))
-	var times := {"at dawn and dusk": "在清晨和黄昏", "at night": "在夜里"}
-	var weathers := {"in the rain": "在雨天", "in the wind": "在大风天", "in the sun": "在晴天"}
-	for tw in times:
-		for ww in weathers:
+	# each pair its own Chinese, not A且B (李白 on #952, 6759640313)
+	var pairs := {"at night in the rain": "在下雨的夜里", "at night in the wind": "在刮风的夜里", "at night in the sun": "在晴朗的夜里",
+		"at dawn and dusk in the rain": "在下雨天的清晨和黄昏", "at dawn and dusk in the wind": "在刮风天的清晨和黄昏",
+		"at dawn and dusk in the sun": "在晴天的清晨和黄昏"}
+	for tw in BiteBoardScript.TIME_WORDS.values():
+		for ww in BiteBoardScript.WEATHER_WORDS.values():
 			var when := "%s %s" % [tw, ww]
-			var both := "%s且%s" % [times[tw], weathers[ww]]
+			var both: String = pairs[when]
 			assert_str(zh.call(BiteBoardScript.LINE[1] % ["Catfish", when, "Bring worms."])).is_equal("鲇鱼%s咬钩。带上蚯蚓。" % both)
 			assert_str(zh.call(BiteBoardScript.LINE_ONLY % ["River Eels", when, "Bring worms."])).is_equal("河鳗只%s咬钩。带上蚯蚓。" % both)
 			assert_str(zh.call(BiteBoardScript.CLAUSE[1] % ["Catfish", when])).is_equal("鲇鱼%s咬钩" % both)
@@ -453,9 +455,9 @@ func test_p0_bite_lines_with_two_conditions_read_whole_in_chinese() -> void:
 	# the lines as P0BiteBoard builds them: the English unchanged, one condition and none as before
 	var line := func(ids: Array, weather: String, bait := true) -> String: return BiteBoardScript.line(ids, weather, 9, {}, bait)
 	assert_str(line.call(["fish_catfish"], "rain")).is_equal("Catfish bite at night in the rain. Bring worms.")
-	assert_str(zh.call(line.call(["fish_catfish"], "rain"))).is_equal("鲇鱼在夜里且在雨天咬钩。带上蚯蚓。")
+	assert_str(zh.call(line.call(["fish_catfish"], "rain"))).is_equal("鲇鱼在下雨的夜里咬钩。带上蚯蚓。")
 	assert_str(line.call(["fish_eel"], "rain", false)).is_equal("River Eels only bite at night in the rain")
-	assert_str(zh.call(line.call(["fish_eel"], "rain", false))).is_equal("河鳗只在夜里且在雨天咬钩")
+	assert_str(zh.call(line.call(["fish_eel"], "rain", false))).is_equal("河鳗只在下雨的夜里咬钩")
 	assert_str(zh.call(line.call(["fish_catfish"], "sun"))).is_equal("鲇鱼在夜里咬钩。带上蚯蚓。")
 	assert_str(zh.call(line.call(["fish_eel"], "sun"))).is_equal("河鳗只在夜里咬钩。带上蚯蚓。")
 	assert_str(zh.call(line.call(["fish_carp"], "sun", false))).is_equal("鲤鱼正在咬钩")
