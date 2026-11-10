@@ -46,6 +46,9 @@ describe('the Compost Bin on the yard (q(118) ③)', () => {
     const s = f7();
     expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', x: 5, y: 5 }).code).toBe('decor_outside');   // the field
     expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', x: 13, y: 14 }).code).toBe('decor_path');   // the stall's path
+    // yard2 (v4q(12)): paths2 too, for that client alone
+    expect(applyP0(c, s, { type: 'place', recipe: 'craft_compost_bin', x: 12, y: 15, space: 'home' }, T0, { yard2: true })).toMatchObject({ ok: false, code: 'decor_path' });
+    expect(applyP0(c, s, { type: 'place', recipe: 'craft_compost_bin', x: 12, y: 15, space: 'home' }, T0).ok).toBe(true);
     expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', x: 8, y: 15 }).code).toBe('decor_overlap');
     expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', plot: 3 } as P0Command).code).toBe('bad_spot');
     const one = build(s);

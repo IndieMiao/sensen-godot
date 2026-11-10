@@ -15,8 +15,13 @@ import { bedCells } from './garden.js';
 export interface DecorItem { name: string; blurb?: string; price: number; size: [number, number]; pieces: number; homestead: number; buy: boolean }
 type Rect = [number, number, number, number];
 /** The yard on the garden grid: walk (the yard), field (not yard), objects (what stands there), paths (kept clear);
- * wing: the cells Homestead Lv8's Kitchen Wing stands on from its level (q(303), SGODOT-450). */
-export interface DecorYard { walk: Rect; field: Rect[]; objects: Rect[]; paths: Rect[]; wing?: DecorWing }
+ * wing: the cells Homestead Lv8's Kitchen Wing stands on from its level (q(303), SGODOT-450); paths2: more cells kept
+ * clear for a client that says `yard2` (yard v2, v4q(12): the way to the rest bench past the porch, and to the mailbox —
+ * a yard full of decor walled both off, 后裔's walk check 11-10). */
+export interface DecorYard { walk: Rect; field: Rect[]; objects: Rect[]; paths: Rect[]; wing?: DecorWing; paths2?: Rect[] }
+/** What the client draws of the yard (x-p0-features): wing8 — Lv8's Kitchen Wing (q(303)); yard2 — yard v2 (v4q(12)).
+ * An older client keeps the yard as it knows it. */
+export interface YardFeatures { wing8?: boolean; yard2?: boolean }
 export interface DecorWing { homestead: number; cells: [number, number][] }
 /** A placed piece: x, y = its top-left cell; rot 1 turns a w × h piece to h × w. */
 export interface PlacedDecor { uid: number; id: string; x: number; y: number; rot: 0 | 1 }
@@ -81,15 +86,15 @@ export function wingTaken(c: P0Content, s: P0State): { cells: [number, number][]
 /** Why a piece can't stand there — `Outside your yard` (decor_outside), `Space taken` (decor_overlap: an object or
  * another piece), `Keep the path clear` (decor_path, q(120)) — or null when it can. */
 export function spotBlock(c: P0Content, s: P0State, id: string, x: number, y: number, rot: number, ignore?: number,
-    wing = false): Refusal | null {
-  return yardBlock(c, s, cellsOf(c, id, x, y, rot), { x, y }, { uid: ignore }, wing);
+    f: YardFeatures = {}): Refusal | null {
+  return yardBlock(c, s, cellsOf(c, id, x, y, rot), { x, y }, { uid: ignore }, f);
 }
 
 /** The same judgement for any cells in the yard: decor pieces and the yard's facilities (the Compost Bin, 刘邦,
- * q(118) ③) keep out of each other's cells; `ignore` leaves out the one being moved; `wing`: the Kitchen Wing stands
- * (wingUp), its cells taken. */
+ * q(118) ③) keep out of each other's cells; `ignore` leaves out the one being moved; `f`: the client's yard — wing8,
+ * the Kitchen Wing's cells taken once it stands (wingUp); yard2, paths2 kept clear too. */
 export function yardBlock(c: P0Content, s: P0State, cells: [number, number][], at: { x: number; y: number },
-    ignore: { uid?: number; facility?: number } = {}, wing = false): Refusal | null {
+    ignore: { uid?: number; facility?: number } = {}, f: YardFeatures = {}): Refusal | null {
   const yard = decorOf(c)!.yard;
   // off the field, and off the beds the homestead has beyond it (Homestead Lv7's 40–47 on the field's edge, q(172))
   const beds = bedCells(c, s);
@@ -97,10 +102,11 @@ export function yardBlock(c: P0Content, s: P0State, cells: [number, number][], a
     return { code: 'decor_outside', detail: at };
   const taken = new Set<string>();
   for (const p of s.decor?.placed ?? []) if (p.uid !== ignore.uid) for (const [px, py] of cellsOf(c, p.id, p.x, p.y, p.rot)) taken.add(`${px},${py}`);
-  for (const f of s.facilities ?? []) if (f.cell && f.id !== ignore.facility) taken.add(`${f.cell[0]},${f.cell[1]}`);
-  if (wing) for (const [x, y] of yard.wing?.cells ?? []) taken.add(`${x},${y}`);
+  for (const x of s.facilities ?? []) if (x.cell && x.id !== ignore.facility) taken.add(`${x.cell[0]},${x.cell[1]}`);
+  if (wingUp(c, s, !!f.wing8)) for (const [x, y] of yard.wing?.cells ?? []) taken.add(`${x},${y}`);
   if (cells.some(cell => yard.objects.some(r => inRect(cell, r)) || taken.has(`${cell[0]},${cell[1]}`))) return { code: 'decor_overlap', detail: at };
-  if (cells.some(cell => yard.paths.some(r => inRect(cell, r)))) return { code: 'decor_path', detail: at };
+  const paths = f.yard2 ? [...yard.paths, ...yard.paths2 ?? []] : yard.paths;
+  if (cells.some(cell => paths.some(r => inRect(cell, r)))) return { code: 'decor_path', detail: at };
   return null;
 }
 
@@ -112,7 +118,7 @@ function spotArgs(cmd: { x?: unknown; y?: unknown; rot?: unknown }): { x: number
 
 /** place_decor {item, x, y, rot?}: one from Farm Storage onto the yard. */
 export function placeDecor(c: P0Content, s: P0State, cmd: { item?: unknown; x?: unknown; y?: unknown; rot?: unknown }, events: P0Event[],
-    wing8 = false): Refusal | null {
+    f: YardFeatures = {}): Refusal | null {
   const id = String(cmd.item ?? '');
   if (!isDecor(c, id)) return { code: 'bad_item' };
   const at = spotArgs(cmd);
@@ -120,7 +126,7 @@ export function placeDecor(c: P0Content, s: P0State, cmd: { item?: unknown; x?: 
   if (stored(s, id) < 1) return { code: 'not_stored', detail: { item: id } };
   s.decor ??= { placed: [], count: 0 };
   if (s.decor.placed.length >= decorCap(c, s)) return { code: 'decor_cap', detail: { cap: decorCap(c, s), used: s.decor.placed.length } };
-  const block = spotBlock(c, s, id, at.x, at.y, at.rot, undefined, wingUp(c, s, wing8));
+  const block = spotBlock(c, s, id, at.x, at.y, at.rot, undefined, f);
   if (block) return block;
   s.storage[id] -= 1;
   if (s.storage[id] <= 0) delete s.storage[id];
@@ -132,12 +138,12 @@ export function placeDecor(c: P0Content, s: P0State, cmd: { item?: unknown; x?: 
 
 /** move_decor {uid, x, y, rot?}: free (§9.11.6). */
 export function moveDecor(c: P0Content, s: P0State, cmd: { uid?: unknown; x?: unknown; y?: unknown; rot?: unknown }, events: P0Event[],
-    wing8 = false): Refusal | null {
+    f: YardFeatures = {}): Refusal | null {
   const piece = s.decor?.placed.find(p => p.uid === Number(cmd.uid));
   if (!piece) return { code: 'bad_decor' };
   const at = spotArgs(cmd);
   if (!at) return { code: 'bad_spot' };
-  const block = spotBlock(c, s, piece.id, at.x, at.y, at.rot, piece.uid, wingUp(c, s, wing8));
+  const block = spotBlock(c, s, piece.id, at.x, at.y, at.rot, piece.uid, f);
   if (block) return block;
   Object.assign(piece, at);
   events.push({ kind: 'decor', action: 'moved', uid: piece.uid, item: piece.id, x: at.x, y: at.y, rot: at.rot });

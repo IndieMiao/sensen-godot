@@ -6,7 +6,7 @@ import { settleCards } from './cards.js';
 import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
 import { isLocal, localCommand, pruneCities, settleLocals } from './locals.js';
-import { moveDecor, placeDecor, storeDecor } from './decor.js';
+import { moveDecor, placeDecor, storeDecor, type YardFeatures } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteHarvested, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { setLook, upgradeHomestead } from './homestead.js';
@@ -96,8 +96,10 @@ export type P0Result =
 const fail = (code: string, detail?: Record<string, unknown>): P0Result => ({ ok: false, code, detail });
 
 /** opts.wing8: the client draws Lv8's Kitchen Wing (feature `wing8`, q(303)): its cells are the house's from Lv8 and an
- * upgrade into it waits until they are clear (SGODOT-450). */
-export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: number, opts: { wing8?: boolean } = {}): P0Result {
+ * upgrade into it waits until they are clear (SGODOT-450). opts.yard2: yard v2 (feature `yard2`, v4q(12)): decor.yard's
+ * paths2 kept clear too. */
+export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: number, opts: YardFeatures = {}): P0Result {
+  const yard: YardFeatures = { wing8: !!opts.wing8, yard2: !!opts.yard2 };
   if (cmd.expect_seq !== undefined && cmd.expect_seq !== input.seq) {
     return fail('stale_state', { seq: input.seq, expected: cmd.expect_seq });
   }
@@ -364,13 +366,13 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'place_decor': case 'move_decor': case 'store_decor': {   // Decorate (SGODOT-284): at home only
       if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
-      const refusal = cmd.type === 'place_decor' ? placeDecor(c, s, cmd, events, !!opts.wing8) : cmd.type === 'move_decor' ? moveDecor(c, s, cmd, events, !!opts.wing8)
+      const refusal = cmd.type === 'place_decor' ? placeDecor(c, s, cmd, events, yard) : cmd.type === 'move_decor' ? moveDecor(c, s, cmd, events, yard)
         : storeDecor(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'homestead_upgrade': {
-      const refusal = upgradeHomestead(c, s, now, events, !!opts.wing8);
+      const refusal = upgradeHomestead(c, s, now, events, yard);
       if (refusal) return fail(refusal.code, refusal.detail);
       // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
@@ -388,7 +390,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'place': case 'move_facility': {
-      const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH, !!opts.wing8) : moveFacility(c, s, cmd, now, events, growH, !!opts.wing8);
+      const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH, yard) : moveFacility(c, s, cmd, now, events, growH, yard);
       if (refusal) return fail(refusal.code, refusal.detail);
       openBeds(events);   // a sprinkler on a bed opens the next one (SGODOT-355 b1); a greenhouse or a yard bin opens none
       break;

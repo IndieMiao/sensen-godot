@@ -106,13 +106,21 @@ func test_today_offers_a_free_row_while_decor_waits_in_storage() -> void:
 	v.decor.cap = 0   # the yard is full: nothing to place
 	assert_dict(P0Decor.today_row(v)).is_empty()
 
-## A yard filled with 1 × 1 pieces wherever one may stand: every place the player walks to is still reachable.
+## A yard filled with 1 × 1 pieces wherever one may stand: every place the player walks to is still reachable — at the
+## top of the yard too (后裔's walk check 11-10, v4q(12)): Lv12 with the porch and the Kitchen Wing standing (either look),
+## the Notice Board and the Chef's Sign up; paths2 keeps the way to the bench past the porch's (7, 15) and to the mailbox.
 func test_a_yard_full_of_decor_walls_nothing_off() -> void:
+	for look in ["a", "b"]: _full_yard(look)
+
+func _full_yard(look: String) -> void:
 	var bp := P0Garden.blueprint()
 	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))
 	P0Garden.block_points(bp, [P0Garden.sign_point(bp), P0Garden.mailbox_point(bp)])
 	var grid := BlueprintGrid.new(bp)
-	var v := {"decor": {"placed": [], "cap": 999, "stored": {}}}
+	for asset in ["porch_" + look, "kitchen_wing_" + look]:   # P0Looks: the cells a look stands on
+		for c in P0Garden.look_cells(bp, asset): grid.set_solid(c, true)
+	for c in [P0Garden.NOTICE_BOARD_CELL, P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]: grid.set_solid(c, true)
+	var v := {"decor": {"placed": [], "cap": 999, "stored": {}}, "homestead": {"level": 12}}
 	var n := 0
 	var o := bp.grid_origin   # rows from −2: the yard's front (q(172) A)
 	for y in range(o.y, o.y + bp.grid.y):
@@ -121,7 +129,7 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 			n += 1
 			v.decor.placed.append({"uid": n, "id": "deco_planter", "x": x, "y": y, "rot": 0})
 			grid.set_solid(Vector2i(x, y), true)
-	assert_int(n).is_greater(50)   # plenty of yard is left to decorate (53 once the field took the whole grid; 58 with the mine mouth gone and the bench's cell kept, SGODOT-355 b1)
+	assert_int(n).is_greater(45)   # plenty of yard is left to decorate (58 at Lv1, SGODOT-355 b1; the wing's 7 and paths2's 3 off at Lv12)
 	var from: Vector2i = P0Garden.ANCHORS.spawn
 	var reach := func(target: Vector3, within: float) -> bool:
 		for y in range(o.y, o.y + bp.grid.y):
@@ -136,7 +144,11 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	assert_bool(reach.call(cell.call(Vector2i(14, 14)), 0.1)).override_failure_message("the stall").is_true()
 	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.workbench), P0FarmMaterials.SPOT_REACH - 0.3)).override_failure_message("the workbench").is_true()
 	# the cell before the rest bench, where its finger card is the nearest (不知火舞 on #629): one walks onto it
-	assert_bool(reach.call(cell.call(Vector2i(6, 15)), 0.1)).override_failure_message("before the bench").is_true()
+	assert_bool(reach.call(cell.call(Vector2i(6, 15)), 0.1)).override_failure_message("before the bench " + look).is_true()
+	# the mailbox: a cell beside it, where its card is the nearest (the sign's is nearer from the door's row)
+	assert_bool(reach.call(cell.call(Vector2i(12, 15)), 0.1)).override_failure_message("beside the mailbox " + look).is_true()
+	assert_str(P0Garden.pick_card([["sign", P0Garden.sign_point(bp), 2.6], ["mailbox", P0Garden.mailbox_point(bp), 2.6]],
+		cell.call(Vector2i(12, 15)), "")).is_equal("mailbox")
 
 ## FARM-6-DECOR (Figma 2187:33369): the stall's Decor page — its tab, its fact line, the rows' four states.
 func test_the_stall_decor_page_lists_the_pieces_in_their_states() -> void:
