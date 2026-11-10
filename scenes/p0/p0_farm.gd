@@ -319,6 +319,7 @@ func _build_world() -> void:
 	for r: Node in [house, _looks]: _shade.box_roots.append(r)   # the farmhouse's shade is a box's, its whole side (上官婉儿 on 457)
 	_shade.rect = FarmWoods.AREA
 	_shade.clear_spots = [[Vector2(EXIT_AT.x, EXIT_AT.z), 0.7]]
+	_shade.draw_on_ready = false   # drawn once, on the first view, with the looks the save has (_sync_shade): one read-back
 	add_child(_shade)
 	# The Homestead sign: its own tap target beside the door, not the door (LOCK-11 / LOCK-07).
 	_sign = P0Garden.sign_point(bp)
@@ -975,8 +976,11 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	if _woods: _woods.fit(bp, P0Garden.plot_count(v), _decor.taken_cells() if _decor else [])   # the clumps on beds still to open, none next to an open one or under a piece
 	_sync_trees(v)
 
-## The shade drawn again when the farmhouse changes (the level, the looks on show, the wing waiting): at once the first
-## time (the looks a save has come up with the first view), after a look's pop-in (P0Fence.POP_S) later.
+## The shade drawn when the farmhouse changes (the level, the looks on show, the wing waiting): at once the first time
+## (the farm's only drawing on entering: the looks a save has come up with the first view), after a look's pop-in
+## (P0Fence.POP_S) later. The woods giving way to the yard (FarmWoods.give_way on yard_grown, Lv13 / Lv14) are drawn by
+## the same key: they move only when the level changes, in the same frame, and pop in over the same POP_S — a key
+## without the level would leave their shade where they stood (周瑜 on #967).
 func _sync_shade(v: Dictionary) -> void:
 	if _shade == null: return
 	var level := int(v.get("homestead", {}).get("level", 0)) if v.get("homestead") is Dictionary else 0
