@@ -80,5 +80,31 @@ func test_no_light_crown_behind_and_the_left_pines() -> void:
 		var o: Vector3 = (e[1] as Transform3D).origin
 		assert_str(str(e[0])).is_not_equal("wild_pz_tree_20_lt")
 		for lp in FarmWoods.LEFT_PINES:
-			if Vector2(o.x, o.z).distance_to(Vector2(lp[1], lp[2])) < 0.01: left += 1
+			if Vector2(o.x, o.z).distance_to(Vector2(lp[1], lp[2])) < 1.05: left += 1   # the exit may move one up to 1 m
 	assert_int(left).is_equal(FarmWoods.LEFT_PINES.size())
+
+## 上官婉儿 11-10: the exit pin at (0.8, 1.0) — no trunk within EXIT_R, no crown over it on screen; the rest as before.
+func test_the_exit_pin_stays_clear() -> void:
+	for e in _woods().trees_placed:
+		var t: Transform3D = e[1]
+		var p := Vector2(t.origin.x, t.origin.z)
+		for kind in FarmWoods.HEIGHT:
+			if str(e[0]).begins_with(str(kind)):
+				var s := t.basis.get_scale().x
+				assert_bool(FarmWoods.covers_exit(p, float(FarmWoods.HEIGHT[kind]) * s, float(FarmWoods.RADIUS[kind]) * s)).is_false()
+
+## The woods clear the exit where the farm puts it (C7, #943): one place, two constants — a move of one moves both.
+func test_the_woods_clear_the_farms_exit() -> void:
+	var at: Vector3 = preload("res://scenes/p0/p0_farm.gd").EXIT_AT
+	assert_vector(FarmWoods.EXIT).is_equal(Vector2(at.x, at.z))
+
+## 上官婉儿's column rule (443 190fa019), checked on what stands: in x 0.2–1.4 (± a piece's radius) z − 1.07 × h ≥ 1.45.
+func test_the_exit_column_rule() -> void:
+	for e in _woods().trees_placed:
+		var t: Transform3D = e[1]
+		for kind in FarmWoods.HEIGHT:
+			if str(e[0]).begins_with(str(kind)):
+				var s := t.basis.get_scale().x
+				var r := float(FarmWoods.RADIUS[kind]) * s
+				if t.origin.z > 1.0 and t.origin.x + r >= 0.2 and t.origin.x - r <= 1.4:
+					assert_float(t.origin.z - 1.07 * float(FarmWoods.HEIGHT[kind]) * s).is_greater_equal(1.45)

@@ -17,9 +17,20 @@ const SEED := 4221109
 const RIGHT := Vector2(0.968148, -0.250380)   # the screen's right on the ground (yaw 14.5°)
 const DOWN := Vector2(0.250380, 0.968148)     # the screen's down on the ground, toward the camera
 ## The ground kept in sight: the fence ring (P0Garden.FENCE_RING) and a margin, but at the front only to 0.9 — the beds'
-## front row is at z 0.325 (half a cell more: 0.65), the spawn at (6.175, 0.325), the exit pin at (1.6, 0), the entrance
-## sign at (4.8, 0.575); the strip 0.9…1.4 to the front fence is grass the crowns may cover.
+## front row is at z 0.325 (half a cell more: 0.65), the spawn at (6.175, 0.325), the entrance sign at (4.8, 0.575); the
+## strip 0.9…1.4 to the front fence is grass the crowns may cover — but for the exit's corner (EXIT below).
 const KEEP := Rect2(0.2, -12.55, 12.95, 13.45)
+## The farm's exit pin at the yard's front-left corner (C7, P0Farm.EXIT_AT, #943; its ring 0.38 m, the pin 1.4 m, its strip
+## 2.1 m — those stand over KEEP on screen): no trunk within EXIT_R of it and no crown over it or its ring on screen.
+## Cleared after the woods are made (_clear_exit), so only the pieces there change and the rest stand as approved.
+const EXIT := Vector2(0.8, 1.0)
+const EXIT_R := 1.2   # the ring 0.38 and 0.3 m clear round it (不知火舞 on #943) well inside
+## 上官婉儿's rule for the exit's column (443 190fa019): a piece in front of the ring whose x ± its radius meets x EXIT_COL stands far enough
+## out that its top clears the ring's front edge on screen with 5 cm to spare — z − h / tan 43° ≥ EXIT_FRONT. It keeps the
+## gap the front fence opens there from Lv3 (x 0.38–1.64) a patch of clean grass outside as well.
+const EXIT_COL := Vector2(0.2, 1.4)
+const EXIT_FRONT := 1.45
+const COT_PITCH := 1.07
 ## Where the woods stand: outside OUT (the ring and 1 m), inside AREA.
 const OUT := Rect2(-0.8, -13.4, 14.8, 15.9)
 const AREA := Rect2(-8.0, -22.0, 29.0, 39.0)   # x −8…21, z −22…17: the farthest zoom from any yard point, and the high levels' opening
@@ -63,6 +74,7 @@ func build(bp: FarmBlueprint, seed_value := SEED) -> void:
 	_woods(trees, small, rng, seed_value)
 	_left_pines(trees)
 	_edge(trees, small, rng)
+	_clear_exit(trees, small)
 	var chunks := {}
 	for asset in trees:
 		for e in trees[asset]:
@@ -103,6 +115,77 @@ static func hides(p: Vector2, h: float, r: float) -> bool:
 			if KEEP.has_point(q): return true
 		t += 0.3
 	return false
+
+## Does a piece h m tall, r m round at p break the exit's column rule, or cover the exit's circle on screen (hides()'s
+## test, the camera's 14.5° turn and all)?
+static func covers_exit(p: Vector2, h: float, r: float) -> bool:
+	if p.y > EXIT.y and p.x + r >= EXIT_COL.x and p.x - r <= EXIT_COL.y and p.y - COT_PITCH * h < EXIT_FRONT: return true   # in front of the ring only
+	if p.distance_to(EXIT) < EXIT_R: return true
+	var reach := (h * 0.731 + 0.4) / 0.682
+	var t := 0.0
+	while t <= reach:
+		for k in 5:
+			if (p - DOWN * t + RIGHT * (r + 0.4) * (float(k) / 2.0 - 1.0)).distance_to(EXIT) < EXIT_R: return true
+		t += 0.3
+	return false
+
+## The exit pin's ground (上官婉儿 11-10: keep the woods round it, no hole): a piece over it comes in one size smaller,
+## else moves 0.5–1 m away from the pin, else (a tree) stands as a bush there; a stone or log that cannot move goes; the
+## low leafy ground stays. exit_changes says what changed (review shots).
+var exit_changes: Array = []
+func _clear_exit(trees: Dictionary, small: Dictionary) -> void:
+	var placed := func(t: Transform3D, h: float, r: float) -> Transform3D:   # Transform3D() when nothing fits
+		var p := Vector2(t.origin.x, t.origin.z)
+		var away := (p - EXIT).normalized() if p != EXIT else Vector2.DOWN
+		# [size, metres away]: one size smaller where it stands, then moved out as it is, then both
+		for c in [[0.92, 0.0], [1.0, 0.5], [1.0, 0.75], [1.0, 1.0], [0.92, 0.5], [0.92, 0.75], [0.92, 1.0]]:
+			var k: float = c[0]
+			var q: Vector2 = p + away * float(c[1])
+			if OUT.has_point(q) or hides(q, h * k, r * k) or covers_exit(q, h * k, r * k): continue
+			return Transform3D(t.basis.scaled(Vector3.ONE * k), Vector3(q.x, t.origin.y, q.y))
+		return Transform3D()
+	for asset in trees:
+		var base := str(asset).trim_suffix("_dk").trim_suffix("_lt")
+		var kept: Array = []
+		for e in trees[asset]:
+			var t: Transform3D = e[0]
+			var s := t.basis.get_scale().x
+			var h := float(HEIGHT[base]) * s
+			var r := float(RADIUS[base]) * s
+			if not covers_exit(Vector2(t.origin.x, t.origin.z), h, r):
+				kept.append(e)
+				continue
+			var to: Transform3D = placed.call(t, h, r)
+			if to != Transform3D():
+				kept.append([to] + (e as Array).slice(1))
+				exit_changes.append("%s (%.2f, %.2f) → %s" % [asset, t.origin.x, t.origin.z, "smaller" if to.origin == t.origin else "moved to (%.2f, %.2f)%s" % [to.origin.x, to.origin.z, " smaller" if to.basis.get_scale().x < s - 0.001 else ""]])
+				continue
+			var bush := "wild_pz_bush_05"
+			var bt := Transform3D(Basis(Vector3.UP, t.basis.get_euler().y).scaled(Vector3.ONE * 0.9), t.origin)
+			var bp: Transform3D = placed.call(bt, 1.05 * 0.9, 0.6 * 0.9)
+			if bp != Transform3D():
+				if not small.has(bush): small[bush] = []
+				small[bush].append(bp)
+				exit_changes.append("%s (%.2f, %.2f) → bush at (%.2f, %.2f)" % [asset, t.origin.x, t.origin.z, bp.origin.x, bp.origin.z])
+			else:
+				exit_changes.append("%s (%.2f, %.2f) → gone" % [asset, t.origin.x, t.origin.z])
+		trees[asset] = kept
+	for asset in small:
+		if str(asset).contains("leafy") or str(asset).contains("grass"): continue
+		var kept: Array = []
+		for t: Transform3D in small[asset]:
+			var h := 1.05 * t.basis.get_scale().y
+			var r := 0.6 * t.basis.get_scale().x
+			if not covers_exit(Vector2(t.origin.x, t.origin.z), h, r):
+				kept.append(t)
+				continue
+			var to: Transform3D = placed.call(t, h, r)
+			if to != Transform3D():
+				kept.append(to)
+				exit_changes.append("%s (%.2f, %.2f) → (%.2f, %.2f)" % [asset, t.origin.x, t.origin.z, to.origin.x, to.origin.z])
+			else:
+				exit_changes.append("%s (%.2f, %.2f) → gone" % [asset, t.origin.x, t.origin.z])
+		small[asset] = kept
 
 static func _hash(i: int, j: int, seed_value: int) -> float:
 	return float(hash(Vector3i(i, j, seed_value)) % 10007) / 10006.0
