@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 ## Gathering at a pond (SGODOT-410; 后裔's 409 interface, 不知火舞's words on 410): the main key at a point's stand — `Gather ·
-## 3 Energy`, grey `Ready in …`, amber `Need 3 Energy`, grey `Bag full` with its toast; the nearest point's name bar; the
+## 3 Energy`, grey `Ready in …`, amber `Need 3 Energy`, grey `Bag full` with its toast; the nearest point's mark (475); the
 ## cooldown counted down with the view; the bank's trees and bushes kept off the points.
 
 const PondGather := preload("res://scenes/p0/p0_pond_gather.gd")
@@ -35,12 +35,21 @@ func test_the_key_at_a_point() -> void:
 	assert_bool(full.enabled).is_false()
 	assert_str(str(full.toast)).is_equal("No room · free a slot first")
 
-func test_the_name_bar_is_the_items_name_dimmed_while_cooling() -> void:
+## SGODOT-475 (不知火舞's gather-compact spec ①): the nearest point's mark is its item's icon button; at its stand and ready
+## it opens to the item's name alone; cooling it stays a button with the part grown back (of cooldown_h, 4 h without it).
+func test_the_mark_is_a_button_opening_to_the_name_only_at_the_point_and_ready() -> void:
 	var v := _view()
-	assert_dict(PondGather.tag(v, _point())).is_equal({"icon": "wood", "text": P0Logic.item_name(v, "wood"), "fact": "", "dimmed": false})
-	var t := PondGather.tag(v, _point("wood", 4.0 * 3600000.0))
-	assert_str(str(t.fact)).is_equal("Ready in 4h")
-	assert_bool(t.dimmed).is_true()
+	var p := _point()
+	var away := PondGather.mark(v, p, Vector3(10, 0, 10))
+	assert_dict(away).is_equal({"icon": "wood", "text": P0Logic.item_name(v, "wood"), "progress": -1.0, "open": false})
+	assert_bool(bool(PondGather.mark(v, p, PondGather.stand_of(p)).open)).is_true()   # at its stand: the name strip
+	var cooling := _point("wood", 3.0 * 3600000.0)   # 1 h of 4 grown back
+	var at := PondGather.mark(v, cooling, PondGather.stand_of(cooling))
+	assert_bool(bool(at.open)).is_false()   # cooling: never opens, the key says how long
+	assert_float(float(at.progress)).is_equal_approx(0.25, 0.0001)
+	cooling["cooldown_h"] = 6.0
+	assert_float(PondGather.progress(cooling)).is_equal_approx(0.5, 0.0001)   # the server's cooldown_h when it sends one
+	assert_float(PondGather.progress(_point("wood", 99.0 * 3600000.0))).is_equal(0.0)   # never below 0
 
 ## 李元芳 on 422: Pebble Pond's reeds (C1 (4, -2.4), its stand (3.88, -3.12) on the water's side) gather from the front too.
 func test_a_point_is_reached_at_its_stand_or_its_piece() -> void:
