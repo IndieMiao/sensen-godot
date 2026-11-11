@@ -202,7 +202,9 @@ func _unseen(collider: Node, at: Vector3, walls: Array) -> bool:
 				box = b if box.size == Vector3.ZERO else box.merge(b)
 		_piece_boxes[id] = box
 	var drawn: AABB = _piece_boxes[id]
-	return drawn.size == Vector3.ZERO or not drawn.grow(0.05).has_point(at)
+	# no drawn mesh of its own (the card room's FrontTerracottaMonstera, drawn in the tavern's plant batch; 周瑜 on #988):
+	# seen, as it stands in the way
+	return drawn.size != Vector3.ZERO and not drawn.grow(0.05).has_point(at)
 
 ## A place left out, and why (tests, the review's table): false.
 static func _no(why: Dictionary, p: Vector3, reason: String) -> bool:
