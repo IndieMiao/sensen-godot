@@ -5911,7 +5911,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 
 所有物品名 ≤ 18 字符（最长 Grapevine Cutting 17）。
 
-**账号几页的文案注意**（q(312)–q(317)，2026-11-11 已批）：Apple、Google 是品牌名，**不进翻译**（中文表里 `Apple` 是水果「苹果」）——带登录方式的句子一律用整句（`Signed in with Apple`、`Linked with Google`、`This Apple account already has a farm` 等），不用 `%s` 拼；单独显示的值 `Apple` / `Google` 不过翻译。联系客服的邮件主题 `Gensen support · %s` 和正文三行标签 `Support code:` / `Version:` / `Phone:` 是发给客服看的，不翻。删号第 2 页的列表照整句模板拼（`Your Home Lv%d will be gone.` / `Your Home Lv%d and %s will be gone.` / `Your Home Lv%d, %s and %s will be gone.`，`%s` 是 `%d coins`、`%d bag items` / `1 bag item`）。中文同步在 `p0_zh_CN.json`。
+**账号几页的文案注意**（q(312)–q(317)，2026-11-11 已批）：Apple、Google 是品牌名，**不进翻译**（中文表里 `Apple` 是水果「苹果」）——带登录方式的句子一律用整句（`Signed in with Apple`、`Linked with Google`、`This Apple account already has a farm` 等），不用 `%s` 拼；单独显示的值 `Apple` / `Google` 不过翻译。**玩家自己起的名字也不过翻译**：撞上表里的词会被翻掉（如名字叫 Carrot，`Report %s` 会成「举报胡萝卜」，现有的 `Block %s?` 也一样），名字要原样插进已经翻好的句子（周瑜 #999 审核）。**日期**（`Blocked %s`、`Voice chat is off for you until %s.`、`You can play again on %s.`）一律用 `P0Logic.month_day` 出，不传英文 `Oct 7`（不然中文成「Oct 7屏蔽」）。联系客服的邮件主题 `Gensen support · %s` 和正文三行标签 `Support code:` / `Version:` / `Phone:` 是发给客服看的，不翻。删号第 2 页的列表照整句模板拼（`Your Home Lv%d will be gone.` / `Your Home Lv%d and %s will be gone.` / `Your Home Lv%d, %s and %s will be gone.`，`%s` 是 `%d coins` / `1 coin`、`%d bag items` / `1 bag item`）。中文同步在 `p0_zh_CN.json`。
 
 
 ---
@@ -10086,7 +10086,7 @@ V1 / V2 已经看到三件事：重度玩家第 5 天看完 P0 内容；首周�
 
 所有物品类名字 ≤ 18 字符（最长：Grapevine Cutting 17、Long-haul Ticket 16、Copper Pickaxe 14、Starter Pickaxe 15）；另外名字里**每个词**在 C9 下 ≤ 52 px（快捷栏格宽，q(197)；客户端有测试，超过算命名问题，改名不改格子）。已废弃不再使用：Tool Rack / Tool Rack full · 12/12 / Tools（Tab）/ Add to Bar / Pin to Bar / Remove from Bar / Unequip / Field · Water · Mine · Kitchen（场景芯片）/ Pick an ingredient / Sow 14 now / Sow 6 now / Bag full · free a slot to mine / Tap a seed, then tap your plots. Drag to sow a row. / Enter mine · 10 Energy / Enter mine · Need 10 Energy / Elevator · Floor 5 / Start new run · 2 Energy / Spice Rack · 3rd slot / Tea Stand / Home Outposts / Visit the Travel Post；第四轮起再退役：Outpost Group / Tea Counter / Home Outpost / Pudong Market（据点名改为 "<区名> Tackle Shop" 等）。
 
-**账号几页的文案注意**（q(312)–q(317)，2026-11-11 已批）：Apple、Google 是品牌名，**不进翻译**（中文表里 `Apple` 是水果「苹果」）——带登录方式的句子一律用整句（`Signed in with Apple`、`Linked with Google`、`This Apple account already has a farm` 等），不用 `%s` 拼；单独显示的值 `Apple` / `Google` 不过翻译。联系客服的邮件主题 `Gensen support · %s` 和正文三行标签 `Support code:` / `Version:` / `Phone:` 是发给客服看的，不翻。删号第 2 页的列表照整句模板拼（`Your Home Lv%d will be gone.` / `Your Home Lv%d and %s will be gone.` / `Your Home Lv%d, %s and %s will be gone.`，`%s` 是 `%d coins`、`%d bag items` / `1 bag item`）。中文同步在 `p0_zh_CN.json`。
+**账号几页的文案注意**（q(312)–q(317)，2026-11-11 已批）：Apple、Google 是品牌名，**不进翻译**（中文表里 `Apple` 是水果「苹果」）——带登录方式的句子一律用整句（`Signed in with Apple`、`Linked with Google`、`This Apple account already has a farm` 等），不用 `%s` 拼；单独显示的值 `Apple` / `Google` 不过翻译。**玩家自己起的名字也不过翻译**：撞上表里的词会被翻掉（如名字叫 Carrot，`Report %s` 会成「举报胡萝卜」，现有的 `Block %s?` 也一样），名字要原样插进已经翻好的句子（周瑜 #999 审核）。**日期**（`Blocked %s`、`Voice chat is off for you until %s.`、`You can play again on %s.`）一律用 `P0Logic.month_day` 出，不传英文 `Oct 7`（不然中文成「Oct 7屏蔽」）。联系客服的邮件主题 `Gensen support · %s` 和正文三行标签 `Support code:` / `Version:` / `Phone:` 是发给客服看的，不翻。删号第 2 页的列表照整句模板拼（`Your Home Lv%d will be gone.` / `Your Home Lv%d and %s will be gone.` / `Your Home Lv%d, %s and %s will be gone.`，`%s` 是 `%d coins` / `1 coin`、`%d bag items` / `1 bag item`）。中文同步在 `p0_zh_CN.json`。
 
 
 ## B.11 旅行、迷雾与成就（原 §11.11）
