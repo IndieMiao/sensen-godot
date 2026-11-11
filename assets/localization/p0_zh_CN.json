@@ -2819,5 +2819,15 @@
  "Griffith Observatory": "格里菲斯天文台",
  "Day Pass %s": "日票剩 %s",
  "Bought today · %s": "今日已买 · %s后补货",
- "Sold out · %s": "已售罄 · %s后补货"
+ "Sold out · %s": "已售罄 · %s后补货",
+ "Garden": "花园",
+ "Island": "岛屿",
+ "Landmark": "地标",
+ "Observatory": "天文台",
+ "Pier": "码头",
+ "Temple": "寺庙",
+ "Theme park": "主题乐园",
+ "Tower": "塔",
+ "Waterfront": "滨水区",
+ "Bridge · %s": "桥 · %s"
 }
