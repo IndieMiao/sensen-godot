@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { MAX_ROOMS, OutpostRooms, REJOIN_MS, SEAT_REACH_M, SIT_SETTLE_MS, type OutpostSpec } from '../../src/p0/online/rooms.js';
+import { MAX_ROOMS, OutpostRooms, REJOIN_MS, SEAT_REACH_M, SIT_SETTLE_MS, SPAWN_CANDIDATES_MAX, SPAWN_FREE_M, type OutpostSpec } from '../../src/p0/online/rooms.js';
 
 const TEA: OutpostSpec = { id: 'outpost_tea_1', role: 'tea', capacity: 12, bounds: [0, 10, -10, 0], seats: ['seat_table1_1', 'seat_table1_2'] };
 const MARKET: OutpostSpec = { id: 'outpost_market_1', role: 'market', capacity: 30, bounds: [0, 20, -20, 0], seats: [] };
@@ -186,5 +186,73 @@ describe('the tea house on its own kit (SGODOT-216)', () => {
     expect(r.occupant('tea-client-001')).toMatchObject({ seat: 'seat_bench_1' });
     expect(r.sit('tea-client-001', 'seat_table4_1')).toBe('NO_SEAT');
     expect(x1).toBeGreaterThan(0);
+  });
+});
+
+/** q(311): a newer client sends its places in order (the spawn, then the rings round it) on its first join of a visit; the
+ * server puts it on the first nobody in the room stands within SPAWN_FREE_M of. */
+describe('P0 room places for newcomers (q(311), SGODOT-470)', () => {
+  const SPAWN: [number, number] = [5, -5];
+  const RING: [number, number][] = [SPAWN, [5.75, -5], [4.25, -5], [5.5, -4.35], [4.5, -4.35], [5.5, -5.65], [4.5, -5.65]];
+  const at = (r: OutpostRooms, p: string) => { const o = r.occupant(p)!; return [o.x, o.z]; };
+
+  it('one after another, each on the first free place: nobody on another', () => {
+    const { r } = rooms();
+    for (let i = 0; i < RING.length; i++) {
+      r.join(`p${i}`, TEA.id, SPAWN, '', RING);
+      expect(at(r, `p${i}`)).toEqual(RING[i]);
+    }
+    for (let i = 0; i < RING.length; i++) for (let j = 0; j < i; j++) {
+      const [a, b] = [at(r, `p${i}`), at(r, `p${j}`)];
+      expect(Math.hypot(a[0] - b[0], a[1] - b[1])).toBeGreaterThanOrEqual(SPAWN_FREE_M);
+    }
+  });
+
+  it('a place someone stands near is taken by them, whoever they are; a place left is free again', () => {
+    const { r, clock } = rooms();
+    r.join('first', TEA.id, SPAWN, '', RING);
+    clock.t += 1000;
+    r.move('first', 5.6, -5, 0, 'walk');   // walked over to the right one's place (within 0.45 m of it)
+    r.join('second', TEA.id, SPAWN, '', RING);
+    expect(at(r, 'second')).toEqual(SPAWN);   // the spawn is free again
+    r.join('third', TEA.id, SPAWN, '', RING);
+    expect(at(r, 'third')).toEqual(RING[2]);   // the right is taken by 'first' standing near it: the left
+    r.leave('second');
+    r.join('fourth', TEA.id, SPAWN, '', RING);
+    expect(at(r, 'fourth')).toEqual(SPAWN);
+  });
+
+  it('no place free: at the spawn as before; places outside the room are clamped into it', () => {
+    const { r } = rooms();
+    r.join('a', TEA.id, SPAWN, '', [SPAWN]);
+    r.join('b', TEA.id, SPAWN, '', [SPAWN]);
+    expect(at(r, 'b')).toEqual(SPAWN);
+    r.join('c', TEA.id, SPAWN, '', [SPAWN, [99, -5]]);
+    expect(at(r, 'c')).toEqual([10, -5]);   // TEA's box ends at x 10
+  });
+
+  it('only the first SPAWN_CANDIDATES_MAX places are read', () => {
+    const { r } = rooms();
+    const many: [number, number][] = Array.from({ length: SPAWN_CANDIDATES_MAX }, () => SPAWN);
+    r.join('a', TEA.id, SPAWN);
+    r.join('b', TEA.id, SPAWN, '', [...many, [1, -1]]);
+    expect(at(r, 'b')).toEqual(SPAWN);   // the 14th, free, is not looked at
+  });
+
+  it('without places (an older client, a reconnect) the join stands where it says, as ever', () => {
+    const { r } = rooms();
+    r.join('a', TEA.id, SPAWN, '', RING);
+    r.join('old', TEA.id, SPAWN);
+    expect(at(r, 'old')).toEqual(SPAWN);
+    r.join('empty', TEA.id, SPAWN, '', []);
+    expect(at(r, 'empty')).toEqual(SPAWN);
+  });
+
+  it('places are per instance: Room 2 starts again at its spawn', () => {
+    const { r } = rooms();
+    fill(r, TEA.id, TEA.capacity);
+    r.join('next', TEA.id, SPAWN, '', RING);
+    expect(r.occupant('next')!.room).toBe(2);
+    expect(at(r, 'next')).toEqual(SPAWN);
   });
 });
