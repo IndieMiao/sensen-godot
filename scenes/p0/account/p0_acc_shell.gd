@@ -4,7 +4,9 @@ extends Control
 ## NAME, Sign in — as the original ONB-AGE-2 9:119318 / ONB-CONSENT 9:119341 / ONB-NAME 9:119537 have it, and the new
 ## system pages (§6) too, as SYS-SESSION 9:119672. On the 360 × 800 frame: the surface; the farm art (the SYS screens'
 ## sys_backdrop_farm) from y 330, fading in from the top; the `Gensen` wordmark at y 84; and a card 16 from the sides
-## (328 wide), its top at y 170, radius 20, 20 in, surface + border + shadow as HOME-WELCOME's. In the card a page puts
+## (328 wide), its top at y 170, radius 24, surface + border + shadow as HOME-WELCOME's — as 安其拉's frames have it
+## (row 155 633:197011; 不知火舞: radius 24, not the spec's 20): 24 in at the top, 20 at the sides and the bottom, inside
+## its 1 px edge (PAD, from the card's outer edge). In the card a page puts
 ## its title (XB20), its line (Body 14, secondary), what it asks and its primary key (48): add_title, add_body, add_gap,
 ## add_primary, or its own nodes into `col`. No HUD, no ✕: it takes every touch. A page made of it sits on its own
 ## layer before there is a world (tech plan §2.3: no viewport is read till it is in the tree).
@@ -12,8 +14,10 @@ extends Control
 const BACKDROP := P0SysScreen.BACKDROP
 const SIDE := 16.0
 const CARD_TOP := 170.0
-const PAD := 20
-const RADIUS := 20.0
+## Left, top, right, bottom from the card's outer edge: the frame's 20 / 24 / 20 / 20 plus its 1 px edge (ACC-AGE
+## 633:197016: the title at x 21, y 25; the key's bottom 21 above the card's).
+const PAD := Vector4(21, 25, 21, 21)
+const RADIUS := 24.0
 const KEY_H := 48.0
 const _FRAME_H := 800.0
 const _ART_TOP := 330.0    # as the SYS screens': the art at y 330 of the frame, cropped by the screen
@@ -52,7 +56,7 @@ func _init() -> void:
 	add_child(mark)
 	card = PanelContainer.new()
 	card.name = "Card"
-	var sb := UiStyleBox.make(UiTokens.COLOR_SURFACE, RADIUS, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(PAD, PAD, PAD, PAD)
+	var sb := UiStyleBox.make(UiTokens.COLOR_SURFACE, RADIUS, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(PAD.x, PAD.y, PAD.z, PAD.w)
 	sb.shadow_color = Color(0.18, 0.231, 0.2, 0.14)   # HOME-WELCOME's card
 	sb.shadow_size = 28.0
 	sb.shadow_offset = Vector2(0, 10)
@@ -66,11 +70,12 @@ func _init() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	resized.connect(_layout)
 
-## The card's title: Title ExtraBold 20, wrapping.
-func add_title(text: String) -> Label:
+## The card's title: Title ExtraBold 20, wrapping; centred where the frame has it so (AGE, NOFARM), NAME's on the left.
+func add_title(text: String, centred := false) -> Label:
 	var l := UiKit.label(text, UiTokens.STYLE_TITLE_XB20)
 	l.name = "Title"
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if centred: l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(l)
 	return l
 

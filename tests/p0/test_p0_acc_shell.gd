@@ -21,7 +21,9 @@ func test_the_frame_s_places() -> void:
 	assert_float(s.mark.position.x + s.mark.size.x * 0.5).is_equal_approx(180.0, 1.0)
 	assert_float((s.find_child("Backdrop", false, false) as Control).position.y).is_equal(330.0)
 	assert_float(key.size.y).is_equal(48.0)
-	assert_float(key.size.x).is_equal(328.0 - 40.0)   # 20 in each side
+	assert_float(key.size.x).is_equal(286.0)   # ACC-AGE 633:197016: 21 in each side
+	assert_float(s.col.position.y + key.position.y + key.size.y + 21.0).is_equal(s.card.size.y)   # the key's bottom 21 above the card's
+	assert_float(s.col.position.y).is_equal(25.0)   # the title at y 25
 	assert_int(s.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
 
 func test_the_card_grows_with_what_is_in_it_and_the_art_keeps_to_the_screen() -> void:
