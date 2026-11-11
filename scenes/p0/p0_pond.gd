@@ -1026,8 +1026,8 @@ func _go_online(session: P0Session) -> void:
 	if not is_inside_tree(): return
 	var at := actor.position
 	var mine := places(at)
-	landing.begin(o, mine, at)
 	online.start(room_id(), Vector2(at.x, at.z), mine)
+	landing.begin(o, mine, at)   # after start: its room's name, and the socket opens a frame or more later
 
 # ---------------------------------------------------------------- q(311): where a newcomer stands (SGODOT-470)
 ## The visit's landing on the room's pick (P0Landing; the arrival cover waits for it, P0Runtime).

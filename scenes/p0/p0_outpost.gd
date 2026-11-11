@@ -110,8 +110,8 @@ func _go_online(session: P0Session) -> void:
 	await get_tree().process_frame   # frame_all: the opening's camera; the art's bodies in the physics space
 	if not is_inside_tree(): return
 	var mine := places(at)
-	landing.begin(o, mine, to_room(actor.position))
 	online.start(str(outpost.id), Vector2(at.x, at.z), mine)
+	landing.begin(o, mine, to_room(actor.position))   # after start: its room's name; the socket opens later
 
 # ---------------------------------------------------------------- q(311): where a newcomer stands (SGODOT-470)
 ## The visit's landing on the room's pick (P0Landing; the arrival cover waits for it, P0Runtime).

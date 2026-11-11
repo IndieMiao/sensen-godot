@@ -61,6 +61,7 @@ func start() -> void:
 	_armed = false
 	# into the room from where the player stands once off the door: the room takes a jump after the join as none (a
 	# teleport), so the others would see them where they landed (SGODOT-462)
+	landing.expect()   # q(311): the cover waits for the room's pick (the places need the ground first)
 	if exit_at() != Vector3.INF: _step_off_then_online.call_deferred()
 	else: _go_online()
 	if _dev.has("dev_point"): _stand_when_ready.call_deferred(str(_dev.dev_point))
@@ -104,11 +105,18 @@ func _go_online() -> void:
 	voice_room.setup(session, o, "landmark")
 	scene.set("voice_room", voice_room)
 	o.joined.connect(func(_i): if voice_room.age == "unknown" and not voice_room.available: voice_room.fetch_status(), CONNECT_ONE_SHOT)
+	# the places need the ground: on a slow first load (gs66) it may come in after the step off's wait (NAV_WAIT_MS)
+	var t0 := Time.get_ticks_msec()
+	while not bool(scene.call("navigation_ready")) and Time.get_ticks_msec() - t0 < NAV_WAIT_MS and scene.is_inside_tree():
+		await scene.get_tree().physics_frame
+	if _leaving or not scene.is_inside_tree(): return
 	var at: Vector3 = scene.call("player_position")
 	var mine := places(at)
-	landing.begin(o, mine, at)
 	o.start(room_id(), Vector2(at.x, at.z), mine)
+	landing.begin(o, mine, at)   # after start: its room's name, and the socket opens a frame or more later
 
+## How long the places wait for the ground before going out with the spawn alone (P0Landing.EXPECT_MS covers it).
+const NAV_WAIT_MS := 3000
 ## q(311) (SGODOT-470): the visit's landing — the server's pick from `places`, waited for under the arrival cover.
 var landing := P0Landing.new()
 
@@ -118,7 +126,9 @@ var landing := P0Landing.new()
 func places(at: Vector3, why := {}) -> Array[Vector2]:
 	var nav: RID = scene.call("nav_map")
 	var cam := scene.get_viewport().get_camera_3d() if scene.is_inside_tree() else null
-	if cam == null or not nav.is_valid() or not bool(scene.call("navigation_ready")): return [Vector2(at.x, at.z)]
+	if cam == null or not nav.is_valid() or not bool(scene.call("navigation_ready")):
+		print("P0 q311 %s: the ground is not in yet, the spawn alone" % room_id())
+		return [Vector2(at.x, at.z)]
 	if scene.has_method("_update_camera"): scene.call("_update_camera")   # the opening's framing, on the player now
 	var axes := P0SpawnRing.axes(cam)
 	var exit := exit_at()
