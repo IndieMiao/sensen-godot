@@ -439,6 +439,25 @@ func test_fact_and_cost_rows_use_their_value_styles() -> void:
 	fact.free()
 	cost.free()
 
+## q(318) v3 (the user's bot 746): a fact row may lead with a 16 glyph, 4 off its label and centred on it; without one
+## the row is as it was (the glyph hidden, the label from the row's left edge).
+func test_a_fact_row_leads_with_its_glyph_only_when_given_one() -> void:
+	var plain: UiFactRow = _host(UiFactRow.new("Distance", "95 km"))
+	var coins: UiFactRow = _host(UiFactRow.new("Coins", "−60"))
+	coins.icon = P0Logic.icon("coin")
+	await _settle()
+	var glyph := coins.find_child("Icon", true, false) as TextureRect
+	assert_bool(glyph.visible).is_true()
+	assert_vector(glyph.size).is_equal(Vector2(16, 16))
+	var label := coins.find_children("*", "Label", true, false)[0] as Label
+	assert_float(label.global_position.x - glyph.global_position.x - 16.0).is_equal(4.0)
+	assert_float(absf(glyph.get_global_rect().get_center().y - label.get_global_rect().get_center().y)).is_less_equal(0.5)
+	assert_bool((plain.find_child("Icon", true, false) as TextureRect).visible).is_false()
+	var bare := plain.find_children("*", "Label", true, false)[0] as Label
+	assert_float(bare.global_position.x).is_equal(plain.global_position.x)
+	coins.icon = null
+	assert_bool(glyph.visible).is_false()
+
 func test_empty_state_navigation_row_is_optional() -> void:
 	var e: UiEmptyState = _host(UiEmptyState.new("No fish yet"))
 	var hits := []

@@ -2928,5 +2928,6 @@
   "Account suspended": "账号已停用",
   "You can play again on %s.": "%s 起可以再玩。",
   "This account can't be used anymore.": "这个账号已不能再使用。",
- "1 coin": "1 金币"
+ "1 coin": "1 金币",
+ "Need %d coins · keep %d after the trip": "需要 %d 金币 · 付完还要留 %d"
 }

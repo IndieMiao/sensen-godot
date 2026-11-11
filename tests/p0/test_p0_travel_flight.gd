@@ -1173,8 +1173,9 @@ func test_the_fares_floats_come_with_the_landing_in_order() -> void:
 	rt.ui.set_view(saved)
 	await get_tree().process_frame
 
-## q(261) ⑤: a fare the server would not take (another device spent the coins) calls the flight back and says the gap
-## in the button's own words (q(257) ③), not the runtime's fallback, and opens no Energy card.
+## q(261) ⑤: a fare the server would not take (another device spent the coins) calls the flight back and says what a
+## tap on Fly says (q(318): the fare, the coins' with the 40 the wallet keeps; Info, not the runtime's fallback), and
+## opens no Energy card.
 func test_a_refused_fare_calls_it_back_and_says_the_gap() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -1187,20 +1188,81 @@ func test_a_refused_fare_calls_it_back_and_says_the_gap() -> void:
 		state = rt.session.view}).to_utf8_buffer()
 	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, _wire.pop_front())
 	_assert_called_back(m, was)
-	assert_str(rt.ui.toast_text()).is_equal("Need 10 more coins")
+	assert_str(rt.ui.toast_text()).is_equal("Need 120 coins\nkeep 40 after the trip")   # two lines at its ` · `
+	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.INFO)
 	assert_str(rt.ui.modal_kind).is_not_equal("energy_card")
 	rt.ui.clear_toast()
 	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
 	body = JSON.stringify({ok = false, code = "not_enough_energy", detail = {need = 11, have = 19, cost = 30}, state = rt.session.view}).to_utf8_buffer()
 	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, _wire.pop_front())
 	assert_bool(m.travelling()).is_false()
-	assert_str(rt.ui.toast_text()).is_equal("Need 30 Energy")   # the fare, as Fly's amber key says it
+	assert_str(rt.ui.toast_text()).is_equal("Need 30 Energy")   # the fare
+	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.INFO)
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
 	await get_tree().process_frame
 
 const FARES := {energy = [0, 10, 20, 30, 40, 50, 60], coins = [0, 20, 60, 120, 200, 300, 500]}
+
+## q(318) (李元芳 0.3.8; the user's bot 740 / 741): Fly on the travel card is always lit. Short of the fare a tap keeps
+## the card and says so in an Info toast 8 over the card's top edge, not over its rows (the coins first, the fare with
+## the 40 the wallet keeps, two lines at its ` · `), nothing sent; with enough, the same tap flies.
+func test_fly_short_of_the_fare_stays_on_the_card_and_says_so() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)   # a return to Los Angeles: the half fare
+	var v: Dictionary = rt.session.view.duplicate(true)
+	v.travel.fares = FARES
+	v.coins = 60
+	v.energy = {value = 200, max = 200}
+	rt.session.view = v
+	rt.ui.set_view(v)
+	_hold_wire(rt)
+	rt.ui.clear_toast()
+	m.open_travel(LA)
+	var f: Dictionary = load("res://modules/p0/p0_travel.gd").fare(v, LA)
+	assert_int(int(f.coins)).is_equal(60)
+	var rows := {}
+	for r in m._travel_card.find_children("*", "UiFactRow", true, false): rows[str(r.label)] = [str(r.value), (r as UiFactRow).icon]
+	assert_array(rows.Coins).is_equal(["−60", P0Logic.icon("coin")])   # the spend, its glyph ahead of the label (v3 / v4)
+	assert_array(rows.Energy).is_equal(["−%d" % int(f.energy), P0Logic.icon("energy")])
+	var fly := m._travel_card.find_child("Primary", true, false) as UiCommandButton
+	assert_str(fly.label).is_equal("Fly")
+	assert_str(fly.reason).is_empty()   # lit: no gap on it
+	fly.activated.emit()
+	assert_str(rt.ui.modal_kind).is_equal("travel_card")   # stays
+	assert_str(rt.ui.toast_text()).is_equal("Need 60 coins\nkeep 40 after the trip")
+	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.INFO)
+	var card := m._travel_card.get_meta(&"toast_over_card") as Control
+	assert_object(rt.ui._toasts._anchor.get_ref()).is_same(card)   # over the card, not the quick bar's spot
+	var toast: Control = rt.ui._toasts._panel
+	assert_float(toast.position.y + toast.size.y).is_equal_approx(rt.ui._toasts.anchor_top() - 8.0, 0.5)
+	assert_float(toast.position.x).is_equal(16.0)
+	assert_bool(m.travelling()).is_false()
+	assert_array(_wire).is_empty()
+	# both short: the coins' only
+	rt.ui.clear_toast()
+	var both := v.duplicate(true)
+	both.energy = {value = 5, max = 200}
+	rt.session.view = both
+	fly.activated.emit()
+	assert_str(rt.ui.toast_text()).is_equal("Need 60 coins\nkeep 40 after the trip")
+	# coins from elsewhere while it is open: the same tap flies
+	var rich := v.duplicate(true)
+	rich.coins = 100
+	rt.session.view = rich
+	rt.ui.set_view(rich)
+	rt.ui.clear_toast()
+	fly.activated.emit()
+	assert_str(rt.ui.toast_text()).is_empty()
+	assert_bool(m.travelling()).is_true()
+	_answer(rt, _moved(rich, LA), [{kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}])
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame
 
 ## q(257) ⑤ (SGODOT-367): in Los Angeles, its pass running out says so once with its return fare; at home, or once
 ## said, nothing.

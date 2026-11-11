@@ -169,15 +169,26 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "HBoxContainer",
                                   "rect": [
                                     16,
                                     282,
                                     144,
                                     18
                                   ],
-                                  "variation": "CaptionB12",
-                                  "text": "Friendship"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        16,
+                                        282,
+                                        144,
+                                        18
+                                      ],
+                                      "variation": "CaptionB12",
+                                      "text": "Friendship"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "Label",

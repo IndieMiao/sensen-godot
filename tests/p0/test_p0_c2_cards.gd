@@ -99,16 +99,21 @@ func test_a_wild_travel_card_is_free_for_the_nearest_three_and_says_the_fare_els
 	var free := P0Map.wild_travel_card(_view(), VEIN, 48.0)
 	assert_str(str(free.title)).is_equal("Ironvale Vein")
 	assert_str(str(free.subtitle)).is_equal("Vein mine · Floors 1–40 · near San Jose")
-	assert_array(free.facts).is_equal([["Distance", "48 km"], ["Energy", "Free"], ["Coins", "Free"]])
+	assert_array(free.facts.map(func(f): return f.slice(0, 2))).is_equal([["Distance", "48 km"], ["Energy", "Free"], ["Coins", "Free"]])
+	assert_array(free.facts.map(func(f): return f[2] if f.size() > 2 else null)).is_equal([null, P0Logic.icon("energy"), P0Logic.icon("coin")])
 	assert_str(str(free.primary)).is_equal("Fly")
-	assert_str(str(free.blocked)).is_equal("")
+	assert_bool(free.has("blocked")).is_false()
 	assert_str(str(free.footer)).is_equal("Return home is always free")
 	var priced := VEIN.duplicate(true)
 	priced.cost = {"energy": 20, "coins": 60}
 	var card := P0Map.wild_travel_card(_view(), priced, 95.0)
-	assert_array(card.facts).is_equal([["Distance", "95 km"], ["Energy", "20 → 100 left"], ["Coins", "60 → 240 left"]])
+	assert_array(card.facts.map(func(f): return f.slice(0, 2))).is_equal([["Distance", "95 km"], ["Energy", "−20"], ["Coins", "−60"]])
+	assert_object(card.facts[2][2]).is_same(P0Logic.icon("coin"))
 	var poor := P0Map.wild_travel_card(_view({"coins": 80}), priced, 95.0)
-	assert_str(str(poor.blocked)).is_equal("Need 20 more coins")   # fare + the 40 floor − the wallet
+	assert_array(poor.facts[2].slice(0, 2)).is_equal(["Coins", "−60"])   # short or not, the spend (q(318) v4)
+	assert_str(str(poor.primary)).is_equal("Fly")
+	assert_bool(poor.has("blocked")).is_false()
+	assert_str(str(P0Travel.fare_gap(_view({"coins": 80}), poor.fare).text)).is_equal("Need 60 coins · keep 40 after the trip")   # Fly's tap
 
 func test_the_place_chip_at_a_wild_site_names_it_with_its_day_pass() -> void:
 	var v := _view({"now": 1000.0, "travel": {"home": SF, "here": "wd-254-115", "passes": {"wd-254-115": {"until": 1000.0 + 23 * 3600000.0}}},

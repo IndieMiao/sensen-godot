@@ -57,15 +57,26 @@
               ],
               "children": [
                 {
-                  "type": "Label",
+                  "type": "HBoxContainer",
                   "rect": [
                     0,
                     59,
                     160,
                     18
                   ],
-                  "variation": "CaptionB12",
-                  "text": "Progress"
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        0,
+                        59,
+                        160,
+                        18
+                      ],
+                      "variation": "CaptionB12",
+                      "text": "Progress"
+                    }
+                  ]
                 },
                 {
                   "type": "Label",
@@ -101,15 +112,26 @@
               ],
               "children": [
                 {
-                  "type": "Label",
+                  "type": "HBoxContainer",
                   "rect": [
                     0,
                     91,
                     160,
                     18
                   ],
-                  "variation": "CaptionB12",
-                  "text": "Grows in"
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        0,
+                        91,
+                        160,
+                        18
+                      ],
+                      "variation": "CaptionB12",
+                      "text": "Grows in"
+                    }
+                  ]
                 },
                 {
                   "type": "Label",
@@ -145,15 +167,26 @@
               ],
               "children": [
                 {
-                  "type": "Label",
+                  "type": "HBoxContainer",
                   "rect": [
                     0,
                     124,
                     160,
                     18
                   ],
-                  "variation": "CaptionB12",
-                  "text": "Cost"
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        0,
+                        124,
+                        160,
+                        18
+                      ],
+                      "variation": "CaptionB12",
+                      "text": "Cost"
+                    }
+                  ]
                 },
                 {
                   "type": "Label",
