@@ -71,6 +71,35 @@ func test_the_join_names_the_kit_drawn_there() -> void:
 	assert_dict(online.join_message()).is_equal({"t": "join", "outpost": "sh_market_1", "at": [1.0, 2.0],
 		"appearance": {"hair": "h1"}, "layout": "market_plaza"})
 
+## q(311) ③ ④ ⑥: the visit's places go on its joins until the first `joined` (the server stood us on one), then never
+## again on this visit — a reconnect or a rejoin after maintenance says where we stand now, without places; a new visit
+## (start) sends its own. forget_spawns (the landing's wait over) drops them before any `joined`.
+func test_places_go_on_the_visits_first_join_only() -> void:
+	var places: Array[Vector2] = [Vector2(1, 2), Vector2(1.75, 2), Vector2(0.25, 2)]
+	var here := [Vector3(1, 0, 2)]   # a lambda keeps its locals' values: the position goes in an array
+	online.source = func(): return {"position": here[0], "yaw": 0.0, "action": "idle"}
+	online.transport = Callable()   # start() opens no socket in a test: only the messages matter
+	online.outpost = "sh_tea_1"
+	online.spawn_at = Vector2(1, 2)
+	online.spawns = places
+	assert_array(online.join_message().spawns).is_equal([[1.0, 2.0], [1.75, 2.0], [0.25, 2.0]])
+	assert_array(online.join_message().at).is_equal([1.0, 2.0])   # a join that got no answer goes again with them
+	var got := []
+	online.joined.connect(func(info): got.append(info))
+	_join()
+	assert_bool(got[0].first).is_true()
+	here[0] = Vector3(3.5, 0, -1.25)   # walked off
+	var again := online.join_message()   # the reconnect's
+	assert_bool(again.has("spawns")).is_false()
+	assert_array(again.at).is_equal([3.5, -1.25])
+	_join(4)
+	assert_bool(got[1].first).is_false()
+	online.spawns = places   # a new visit's start sets them again (start() itself opens a socket)
+	online._visit_joined = false
+	online.forget_spawns()
+	assert_bool(online.join_message().has("spawns")).is_false()
+	assert_array(online.join_message().at).is_equal([1.0, 2.0])
+
 func test_joined_reports_room_and_rejoin() -> void:
 	var got := []
 	online.joined.connect(func(info): got.append(info))
