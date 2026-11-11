@@ -118,7 +118,8 @@ static func forecast_row(label: String, days: Array) -> MarginContainer:
 ## the caller decides); details: Details › (none when empty); closed: called once the sheet leaves the tree.
 ## spec.blocked: the primary's gap in LOCK-10's unavailable look (`Need 10 more coins`, still tappable: a tap calls
 ## spec.on_blocked, never `go`; spec.blocked_energy: in need-energy's amber, an Energy gap); spec.footer: a caption
-## under it (MAP-5: `Return home is always free`).
+## under it (MAP-5: `Return home is always free`); spec.toast_over_card: a toast sits over the card's top edge, not
+## over its rows (q(318), the travel cards; P0Ui._aim_toast).
 ## Returns the holder.
 static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable(), closed := Callable(), kind := "place_card") -> Control:
 	var holder := Control.new()
@@ -189,6 +190,7 @@ static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable()
 		foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(foot)
 	holder.add_child(panel)
+	if bool(spec.get("toast_over_card", false)): holder.set_meta(&"toast_over_card", panel)
 	var close := UiCloseButton.new()   # floats 6 above the sheet's top-right corner
 	close.pressed.connect(ui.close_modal)
 	holder.add_child(close)

@@ -1220,7 +1220,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_enough_coins", "not_enough_energy":   # a fare the server would not take (q(261) ⑤), once called back
 			# q(318): what a tap on Fly says — the fare (the coins' with the floor kept), Info, no Energy card
 			if str(cmd.get("type", "")) == "travel":
-				ui.toast(P0Travel.short_text(code, int(detail.get("cost", 0))), 0.0, P0Ui.break_in_chinese())
+				ui.toast(P0Travel.short_text(code, int(detail.get("cost", 0))), 0.0, true)   # at its ` · `, English too
 			else: ui.toast_error("Can't do that (%s)" % code)
 		# SGODOT-275: a place in a city without a pass — its travel card (q(108)); travel_required (q(256) ④): a pass,
 		# but the player is not in that city — the same card, at the return fare

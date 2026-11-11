@@ -1814,6 +1814,14 @@ func _aim_toast() -> void:
 	if placing():   # placement: over its caption pill (or its card), never on it (不知火舞 on #624)
 		_toasts.anchor_above(_place_bar.toast_dock())
 		return
+	# q(318) (不知火舞 11-11, q(16)'s exception for the travel cards only): a sheet that names its card (meta
+	# "toast_over_card", P0PlaceSheet) has the toast 8 over the card's top edge, on the map under the HUD, not over the
+	# rows it says what the trip costs in — when there is room there
+	var sheet: Control = _modal.get_child(1) if _modal != null and _modal.get_child_count() > 1 else null
+	var card = sheet.get_meta(&"toast_over_card") if sheet != null and sheet.has_meta(&"toast_over_card") else null
+	if card is Control and is_instance_valid(card) and (card as Control).is_visible_in_tree() and _room_above(card):
+		_toasts.anchor_above(card)
+		return
 	if _bar != null and _bar.is_visible_in_tree():   # the scene's quick bar, or the bar docked in the bag (q(16))
 		_toasts.anchor_above(_bar)
 		return
@@ -1832,13 +1840,16 @@ func _aim_toast() -> void:
 		if dock is Control and is_instance_valid(dock) and (dock as Control).is_visible_in_tree():
 			_toasts.anchor_above(dock)
 			return
-	if content != null and content.is_visible_in_tree():
-		var top := content.get_global_rect().position.y - root.global_position.y
-		var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
-		if top - UiTokens.SPACE_OVERLAY_BODY - UiTokens.SIZE_TOAST_MIN_H >= hud_bottom:
-			_toasts.anchor_above(content)   # a card or sheet that leaves room above it
-			return
+	if content != null and content.is_visible_in_tree() and _room_above(content):
+		_toasts.anchor_above(content)   # a card or sheet that leaves room above it
+		return
 	_toasts.anchor_above(_bar)
+
+## Whether a toast fits between the HUD and `c`'s top edge (8 over it, at least its minimum height).
+func _room_above(c: Control) -> bool:
+	var top := c.get_global_rect().position.y - root.global_position.y
+	var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
+	return top - UiTokens.SPACE_OVERLAY_BODY - UiTokens.SIZE_TOAST_MIN_H >= hud_bottom
 
 ## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
 ## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08). Two lines break at a " · ", the dot

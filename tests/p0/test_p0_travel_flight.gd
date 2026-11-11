@@ -1188,7 +1188,7 @@ func test_a_refused_fare_calls_it_back_and_says_the_gap() -> void:
 		state = rt.session.view}).to_utf8_buffer()
 	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, _wire.pop_front())
 	_assert_called_back(m, was)
-	assert_str(rt.ui.toast_text()).is_equal("Need 120 coins · keep 40 after the trip")
+	assert_str(rt.ui.toast_text()).is_equal("Need 120 coins\nkeep 40 after the trip")   # two lines at its ` · `
 	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.INFO)
 	assert_str(rt.ui.modal_kind).is_not_equal("energy_card")
 	rt.ui.clear_toast()
@@ -1206,8 +1206,9 @@ func test_a_refused_fare_calls_it_back_and_says_the_gap() -> void:
 const FARES := {energy = [0, 10, 20, 30, 40, 50, 60], coins = [0, 20, 60, 120, 200, 300, 500]}
 
 ## q(318) (李元芳 0.3.8; the user's bot 740 / 741): Fly on the travel card is always lit. Short of the fare a tap keeps
-## the card and says so in an Info toast (the coins first, the fare with the 40 the wallet keeps), nothing sent; the
-## card's `You have` follows the HUD while it is open; with enough, the same tap flies.
+## the card and says so in an Info toast 8 over the card's top edge, not over its rows (the coins first, the fare with
+## the 40 the wallet keeps, two lines at its ` · `), nothing sent; the card's `You have` follows the HUD while it is
+## open; with enough, the same tap flies.
 func test_fly_short_of_the_fare_stays_on_the_card_and_says_so() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -1234,8 +1235,13 @@ func test_fly_short_of_the_fare_stays_on_the_card_and_says_so() -> void:
 	assert_str(fly.reason).is_empty()   # lit: no gap on it
 	fly.activated.emit()
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")   # stays
-	assert_str(rt.ui.toast_text()).is_equal("Need 60 coins · keep 40 after the trip")
+	assert_str(rt.ui.toast_text()).is_equal("Need 60 coins\nkeep 40 after the trip")
 	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.INFO)
+	var card := m._travel_card.get_meta(&"toast_over_card") as Control
+	assert_object(rt.ui._toasts._anchor.get_ref()).is_same(card)   # over the card, not the quick bar's spot
+	var toast: Control = rt.ui._toasts._panel
+	assert_float(toast.position.y + toast.size.y).is_equal_approx(rt.ui._toasts.anchor_top() - 8.0, 0.5)
+	assert_float(toast.position.x).is_equal(16.0)
 	assert_bool(m.travelling()).is_false()
 	assert_array(_wire).is_empty()
 	# both short: the coins' only
@@ -1244,7 +1250,7 @@ func test_fly_short_of_the_fare_stays_on_the_card_and_says_so() -> void:
 	both.energy = {value = 5, max = 200}
 	rt.session.view = both
 	fly.activated.emit()
-	assert_str(rt.ui.toast_text()).is_equal("Need 60 coins · keep 40 after the trip")
+	assert_str(rt.ui.toast_text()).is_equal("Need 60 coins\nkeep 40 after the trip")
 	# coins from elsewhere while it is open: `You have` follows, then the same tap flies
 	var rich := v.duplicate(true)
 	rich.coins = 100

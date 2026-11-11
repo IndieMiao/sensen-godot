@@ -512,7 +512,7 @@ static func wild_travel_card(view: Dictionary, site: Dictionary, km: float) -> D
 	var facts: Array = [["Distance", P0PlaceSheet.distance_text(km)]]
 	facts.append_array(cost_rows(view, f))
 	return {"title": str(card.title), "subtitle": str(card.subtitle), "facts": facts, "primary": "Fly",
-		"footer": "Return home is always free", "fare": f}
+		"footer": "Return home is always free", "fare": f, "toast_over_card": true}
 
 func open_wild_travel(id: String) -> void:
 	if rt == null or not P0WildSites.has_site(id): return
@@ -1223,7 +1223,7 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	if bool(f.revisit) and float(f.pass_ms) > 0.0: facts.append(["Day Pass", "%s left" % P0Travel.pass_text(view, cluster)])
 	return {
 		"title": str(c.get("name", "")), "subtitle": " · ".join(parts.filter(func(p): return str(p) != "")),
-		"facts": facts, "primary": "Fly", "footer": "Return home is always free",
+		"facts": facts, "primary": "Fly", "footer": "Return home is always free", "toast_over_card": true,
 	}
 
 ## q(318) (the user's bot 740 / 741; 不知火舞's spec travel-cost-only-spec.md §1): a travel card's Energy and Coins rows —
@@ -1270,12 +1270,12 @@ func open_travel(cluster: String, preview := {}) -> void:
 var _travel_card: Control   # the travel card open now (its holder): a city's or a wild site's
 var _have_rows: Array = []   # its Energy / Coins rows with a `You have` ([UiFactRow, "Energy" / "Coins"]), found once
 
-## q(318): Fly with a fare the wallet or the Energy cannot pay — the card stays, an Info toast says what the trip needs
-## (P0Travel.fare_gap: the coins first; no Energy card); true when it said so.
+## q(318): Fly with a fare the wallet or the Energy cannot pay — the card stays, an Info toast over its top edge says
+## what the trip needs (P0Travel.fare_gap: the coins first; no Energy card); true when it said so.
 func _fare_short(f: Dictionary) -> bool:
 	var gap := P0Travel.fare_gap(rt.session.current(), f)
 	if gap.is_empty(): return false
-	rt.ui.toast(str(gap.text), 0.0, P0Ui.break_in_chinese())   # 中文 broken at its ` · ` when a line cannot hold it (452)
+	rt.ui.toast(str(gap.text), 0.0, true)   # two lines at its ` · `, English too (不知火舞: this sentence only)
 	return true
 
 ## The travel card just opened (from the view now): its rows that say what the player has (cost_rows), for

@@ -437,6 +437,17 @@ func test_p0_pieced_lines_read_whole_under_chinese() -> void:
 ## SGODOT-466 (不知火舞, 李白's key): the pond card's Biting more, the condition tags (Details, the Bite Board's pond rows)
 ## carry a factor like ×1.5 — the table's `%s ×%d` took only whole ones, so `Common Carp ×1.5` stayed English. `%s ×%.1f`
 ## takes both; Biting now's names joined by `, ` read item by item, an uncaught regional fish's `?` kept (its own key).
+## q(318) (李白 libai-q318 cbb535b3): the travel cards' lines in the real table — the label with what the player has by
+## its parts (`You have %d` is the table's 已有), the coins' toast whole, its ` · ` kept for the two-line break.
+func test_p0_travel_card_lines_read_in_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	assert_str(zh.call("Energy · You have 200")).is_equal("体力 · 已有 200")
+	assert_str(zh.call("Coins · You have 1,230")).is_equal("金币 · 已有 1,230")
+	assert_str(zh.call("Need 60 coins · keep 40 after the trip")).is_equal("需要 60 金币 · 付完还要留 40")
+	assert_str(zh.call("Need 15 Energy")).is_equal("需要 15 体力")
+
 func test_p0_bite_factors_and_names_read_in_chinese() -> void:
 	var t: Translation = LocalizationScript.P0Translation.new()
 	t.load_table("res://assets/localization/p0_zh_CN.json")
