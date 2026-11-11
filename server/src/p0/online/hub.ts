@@ -13,7 +13,7 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { defaultAppearance, type Appearance, type AppearanceCatalog } from './appearance.js';
 import { upgradeRefusal, type P0Gate } from '../gate.js';
 import { P0_ACTIONS, snapshotFrame } from './frame.js';
-import { OutpostRooms, type Occupant } from './rooms.js';
+import { OutpostRooms, SPAWN_CANDIDATES_MAX, type Occupant } from './rooms.js';
 import { landmarkOfRoom, POND_ROOM, pondOfRoom } from './outposts.js';
 
 export const PATH = '/v1/p0/online';
@@ -147,7 +147,11 @@ export class P0OnlineHub {
     this.depart(c, false);
     // SGODOT-218: the room kit this client draws; a newer kit of the outpost's puts it in that layout's instances.
     const layout = typeof b.layout === 'string' && /^[a-z0-9_]{1,40}$/.test(b.layout) ? b.layout : '';
-    const placed = this.deps.rooms.join(c.player, b.outpost, at, layout);
+    // q(311): the newcomer's places in order (a newer client's first join of a visit); the pairs that are not two
+    // finite numbers are dropped, at most SPAWN_CANDIDATES_MAX read (OutpostRooms.join clamps each to the room).
+    const spawns = Array.isArray(b.spawns) ? (b.spawns as unknown[]).slice(0, SPAWN_CANDIDATES_MAX).filter((p): p is [number, number] =>
+      Array.isArray(p) && p.length === 2 && p.every(v => typeof v === 'number' && Number.isFinite(v))) : undefined;
+    const placed = this.deps.rooms.join(c.player, b.outpost, at, layout, spawns);
     const me = this.deps.rooms.occupant(c.player)!;
     c.epoch++;
     this.send(c, { t: 'joined', protocol: 1, outpost: placed.outpost, room: placed.room, capacity: placed.capacity,

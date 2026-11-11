@@ -53,6 +53,11 @@ export const SEAT_REACH_M = 3;
  * (0.3 s onto a chair, about 0.8 s along a pew) and each frame of the glide is further than STAND_DISTANCE from it, which
  * stood every sitter up one frame later (since the glide came, 10-08). After it, moving away stands up as ever. */
 export const SIT_SETTLE_MS = 1500;
+/** q(311): a newcomer's places, in the client's order (the spawn first, then the two rings of six round it): at most this
+ * many are read (1 + 6 + 6); each is clamped to the room like any position. */
+export const SPAWN_CANDIDATES_MAX = 13;
+/** q(311): a place is free when nobody in the room stands this near it (about twice a body's radius). */
+export const SPAWN_FREE_M = 0.45;
 
 export class OutpostRooms {
   private specs = new Map<string, OutpostSpec>();
@@ -94,8 +99,11 @@ export class OutpostRooms {
 
   /** Lowest-numbered instance with a free place, or the one this player just left. `layout`: the room kit the client
    * draws — a newer kit of the outpost's (OutpostSpec.before) puts it in that layout's instances; any other, or none
-   * (every client before SGODOT-218), in the instances of the room older clients have, as before. */
-  join(player: string, outpost: string, at: [number, number] = [0, 0], layout = ''): Placement {
+   * (every client before SGODOT-218), in the instances of the room older clients have, as before. `spawns` (q(311)): the
+   * newcomer's places in order, from a client that sends them on its first join of a visit — it stands on the first
+   * nobody in the room stands within SPAWN_FREE_M of (all of them, those who block each other too), or at `at` when none
+   * is free; without them (older clients, a reconnect) at `at` as ever. */
+  join(player: string, outpost: string, at: [number, number] = [0, 0], layout = '', spawns?: [number, number][]): Placement {
     if (layout && !this.specFor(outpost, layout)) layout = '';
     const spec = this.specFor(outpost, layout);
     if (!spec) throw new Error('UNKNOWN_OUTPOST');
@@ -115,7 +123,7 @@ export class OutpostRooms {
     const taken = new Set([...members.values()].map(m => m.id));
     let id = 1;
     while (taken.has(id)) id++;
-    const [x, z] = clamp(spec, at);
+    const [x, z] = spawns?.length ? freePlace(spec, [...members.values()], spawns, at) : clamp(spec, at);
     const occupant: Occupant = { player, outpost, layout, room, id, x, z, yaw: 0, action: 'idle', seat: '', seq: -1, at: this.now() };
     members.set(player, occupant);
     this.byPlayer.set(player, occupant);
@@ -223,6 +231,16 @@ export function layouts(spec: OutpostSpec): OutpostSpec[] {
   if (!spec.before) return [spec];
   const { before, ...now } = spec;
   return [{ ...now, art: before.art, bounds: before.bounds, seats: before.seats, layout: '' }, { ...now, layout: spec.art ?? '' }];
+}
+
+/** q(311): the first of `spawns` (at most SPAWN_CANDIDATES_MAX, each clamped to the room) nobody in `others` stands
+ * within SPAWN_FREE_M of; `at` clamped when none is. */
+function freePlace(spec: OutpostSpec, others: Occupant[], spawns: [number, number][], at: [number, number]): [number, number] {
+  for (const p of spawns.slice(0, SPAWN_CANDIDATES_MAX)) {
+    const [x, z] = clamp(spec, p);
+    if (others.every(o => Math.hypot(o.x - x, o.z - z) >= SPAWN_FREE_M)) return [x, z];
+  }
+  return clamp(spec, at);
 }
 
 function clamp(spec: OutpostSpec, [x, z]: [number, number]): [number, number] {
