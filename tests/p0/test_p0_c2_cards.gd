@@ -109,6 +109,8 @@ func test_a_wild_travel_card_is_free_for_the_nearest_three_and_says_the_fare_els
 	assert_array(card.facts).is_equal([["Distance", "95 km"], ["Energy", "20 → 100 left"], ["Coins", "60 → 240 left"]])
 	var poor := P0Map.wild_travel_card(_view({"coins": 80}), priced, 95.0)
 	assert_str(str(poor.blocked)).is_equal("Need 20 more coins")   # fare + the 40 floor − the wallet
+	assert_array(poor.facts[2]).is_equal(["Coins", "60"])   # 20 would be left, under the floor: the fare alone (q(318))
+	assert_array(P0Map.wild_travel_card(_view({"coins": 100}), priced, 95.0).facts[2]).is_equal(["Coins", "60 → 40 left"])
 
 func test_the_place_chip_at_a_wild_site_names_it_with_its_day_pass() -> void:
 	var v := _view({"now": 1000.0, "travel": {"home": SF, "here": "wd-254-115", "passes": {"wd-254-115": {"until": 1000.0 + 23 * 3600000.0}}},

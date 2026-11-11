@@ -510,7 +510,7 @@ static func wild_travel_card(view: Dictionary, site: Dictionary, km: float) -> D
 	var card := P0MaterialLogic.mine_card(view, site, false)
 	var facts: Array = [["Distance", P0PlaceSheet.distance_text(km)]]
 	facts.append(["Energy", "Free" if int(f.energy) == 0 else _fare_left(int(f.energy), int(view.get("energy", {}).get("value", 0)))])
-	facts.append(["Coins", "Free" if int(f.coins) == 0 else _fare_left(int(f.coins), int(view.get("coins", 0)))])
+	facts.append(["Coins", "Free" if int(f.coins) == 0 else _fare_left(int(f.coins), int(view.get("coins", 0)), P0Travel.WALLET_FLOOR)])
 	var gap := P0Travel.fare_gap(view, f)
 	return {"title": str(card.title), "subtitle": str(card.subtitle), "facts": facts, "primary": "Fly",
 		"blocked": str(gap.get("text", "")), "gap": gap, "blocked_energy": str(gap.get("short", "")) == "energy",
@@ -1202,10 +1202,11 @@ static func local_time(view: Dictionary, offset) -> String:
 
 ## MAP-5 (q(257) ②, Figma 9:125580 / MAP-5-RETURN 243:176049 / MAP-5-SHORT 243:176287; 不知火舞 on 367 ec5f2daa), pure:
 ## the city, `United States · 08:12 local · 14 online` (the local time once its preview is in, the online part only when
-## some are), then Distance, Energy and Coins (`30 → 112 left`: what is left once paid) — or `Cost · Free` for a free
-## trip (Trip 1, the 3 nearest cities) — Fish here, Visit (none on a free return), and on a return with a running pass `Day Pass · 7h left` (it
-## is not renewed). Short of the fare, Fly reads the gap (coins first, LOCK-10). `view` is the projected view (its
-## Energy now); `preview` the server's (its km and trip win), {} before it is in; `online` the city's players online.
+## some are), then Distance, Energy and Coins (`30 → 112 left`: what is left once paid; the fare alone when it cannot be
+## paid, _fare_left) — or `Cost · Free` for a free trip (Trip 1, the 3 nearest cities) — Fish here, Visit (none on a
+## free return), and on a return with a running pass `Day Pass · 7h left` (it is not renewed). Short of the fare, Fly
+## reads the gap (coins first, LOCK-10). `view` is the projected view (its Energy now); `preview` the server's (its km
+## and trip win), {} before it is in; `online` the city's players online.
 static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, online: int) -> Dictionary:
 	var c := P0Clusters.get_cluster(cluster)
 	var trip := P0Travel.trip(view, cluster)
@@ -1218,7 +1219,7 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	if bool(f.free): facts.append(["Cost", "Free"])
 	else:
 		facts.append(["Energy", _fare_left(int(f.energy), int(view.get("energy", {}).get("value", 0)))])
-		facts.append(["Coins", _fare_left(int(f.coins), int(view.get("coins", 0)))])
+		facts.append(["Coins", _fare_left(int(f.coins), int(view.get("coins", 0)), P0Travel.WALLET_FLOOR)])
 	var regional := P0FishWorld.regional_fish(cluster).size()
 	var crucian := P0Logic.item_name(view, "fish_crucian")
 	facts.append(["Fish here", "%s + %d regional" % [crucian, regional] if regional > 0 else crucian])
@@ -1233,9 +1234,11 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 		"footer": "Return home is always free",
 	}
 
-## `30 → 112 left`; the fare alone (`30`) when what is left would be under 0 (q(264), 不知火舞 on 367, Figma 266:178479).
-static func _fare_left(fare: int, have: int) -> String:
-	return "%d → %d left" % [fare, have - fare] if have >= fare else str(fare)
+## `30 → 112 left`; the fare alone (`30`) when what is left would be under 0 (q(264), 不知火舞 on 367, Figma 266:178479)
+## or under `keep`, what the wallet keeps after a coin spend (q(318), 李元芳 0.3.8: `60 → 0 left` beside Fly's
+## `Need 40 more coins`): Fly reads the gap then, the row the fare.
+static func _fare_left(fare: int, have: int, keep := 0) -> String:
+	return "%d → %d left" % [fare, have - fare] if have - fare >= (keep if fare > 0 else 0) else str(fare)
 
 func open_travel(cluster: String, preview := {}) -> void:
 	var c := P0Clusters.get_cluster(cluster)

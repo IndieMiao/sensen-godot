@@ -97,6 +97,27 @@ func test_map_5_short_of_coins_fly_reads_the_gap() -> void:
 	assert_str(str(spec.blocked)).ends_with(" more coins")
 	assert_str(str(spec.gap.short)).is_equal("coins")
 
+## q(318) (李元芳 0.3.8: a return to Los Angeles with 60 coins read `60 → 0 left` beside `Need 40 more coins`): the
+## Coins row says what is left only when the wallet keeps its 40 after paying, else the fare alone, as Fly reads the
+## gap; the Energy row has no floor.
+func test_map_5_coins_row_says_what_is_left_only_above_the_wallet_floor() -> void:
+	var trip := int(P0Travel.trip(_view(), LA).trip)
+	var c := int(FARES.coins[trip - 1])
+	var e := int(FARES.energy[trip - 1])
+	var short := P0Map.travel_card(_view({}, {}, SF, c + 30), LA, {}, 0)   # MAP-5-SHORT's state: 30 left, 10 short
+	assert_str(str(short.facts[2][1])).is_equal(str(c))
+	assert_str(str(short.blocked)).is_equal("Need 10 more coins")
+	var kept := P0Map.travel_card(_view({}, {}, SF, c + 40), LA, {}, 0)
+	assert_str(str(kept.facts[2][1])).is_equal("%d → 40 left" % c)
+	assert_str(str(kept.blocked)).is_empty()
+	var back := _view({LA: {n = 1}}, {LA: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 23 * 3_600_000.0}}, SF, ceili(c / 2.0))
+	var ret := P0Map.travel_card(back, LA, {}, 0)   # the half fare, all of the wallet
+	assert_str(str(ret.facts[2][1])).is_equal(str(ceili(c / 2.0)))
+	assert_str(str(ret.blocked)).is_equal("Need 40 more coins")
+	var all_energy := P0Map.travel_card(_view({}, {}, SF, 230, e), LA, {}, 0)
+	assert_str(str(all_energy.facts[1][1])).is_equal("%d → 0 left" % e)   # Energy: no floor
+	assert_str(str(all_energy.blocked)).is_empty()
+
 ## q(257) ① (FARE-BOARD 9:133836): the board's rows say each tier's first-visit fare on two lines, Trip 1 `Free`.
 func test_the_fare_board_says_the_real_fares() -> void:
 	var rows := P0Travel.fares(_view())
