@@ -545,16 +545,23 @@ var _piece_shift := 0.0
 var _piece_want := 0.0
 var _piece_on := {}
 var _piece_log := false   # shots: every frame's shift printed (piecelog)
+var _still_s := 0.0   # how long the player has stood and the camera rested (PIECE_STILL_S)
+var _rest_focus := Vector3.INF
 func _piece_shift_step(dt: float, view: Vector2) -> float:
+	# the camera still settling after a stop (the safe box centring the player) sweeps a piece through the keys' corner:
+	# it started and let go again within half a second (the v3 approach shot), so the stop counts from the camera's rest
+	var resting := not actor.mover.is_moving() and _rest_focus.is_finite() and _focus.distance_to(_rest_focus) < 0.002
+	_rest_focus = _focus
+	_still_s = _still_s + maxf(dt, 0.0) if resting else 0.0
 	var p := _piece_point()
 	var keys := _key_column()
 	if _show_held or not keys.has_area():
 		_piece_want = 0.0
 		_piece_on = {}
 	else:
-		var hold := piece_hold(p, _piece_on, _piece_want, actor.position, not actor.mover.is_moving(), gather_goal,
+		var hold := piece_hold(p, _piece_on, _piece_want, _still_s >= PIECE_STILL_S, gather_goal,
 			func(q: Dictionary, held: float) -> float:
-				return piece_want(_focus, actor.position, PondGather.piece_box(q), cam.size, view, keys, held))
+				return piece_want(_focus, actor.position, PondGather.piece_box(q), cam.size, view, keys, held, PondGather.icon_at(q)))
 		_piece_want = hold[0]
 		_piece_on = hold[1]
 	_piece_shift = _piece_want if dt < 0.0 else lerpf(_piece_shift, _piece_want, 1.0 - exp(-dt * 3.0 / PIECE_EASE_S))
@@ -792,14 +799,15 @@ static func clamp_focus(focus: Vector3, size: float, view: Vector2, band: Rect2,
 ## than PLAYER_SAFE_PX to the screen's left side (the player first; across only, so the HUD and the quick bar keep
 ## off them as before). Its icon, if the camera could not clear it, lifts over the keys itself (P0Ui.world_icon).
 ## The move is a shift on top of the clamped focus, never the focus itself (the safe box would walk off with it): it
-## starts once the piece comes within KEY_GAP_PX, lets go only once it would be KEY_GAP_PX + PIECE_HYST_PX clear
-## without it, and eases over about PIECE_EASE_S either way. None while Show holds the camera (LOCK-08) or while fishing.
+## starts once the piece or its icon is within KEY_GAP_PX with the player stopped (piece_hold), lets go only once it
+## would be KEY_GAP_PX + PIECE_HYST_PX clear without it, and eases over about PIECE_EASE_S either way. None while Show holds the camera (LOCK-08) or while fishing.
 const PIECE_HYST_PX := 4.0
 const PIECE_EASE_S := 0.3
 static func piece_need(focus: Vector3, player: Vector3, piece: PackedVector3Array, size: float, view: Vector2, keys: Rect2,
-		gap := KEY_GAP_PX) -> float:
+		gap := KEY_GAP_PX, icon := Vector3.INF) -> float:
 	if not keys.has_area() or piece.is_empty(): return 0.0
-	var box: Rect2 = piece_rects(focus, piece, Vector3.INF, size, view)[0]
+	var rects := piece_rects(focus, piece, icon, size, view)
+	var box: Rect2 = rects[0] if rects.size() < 2 else (rects[0] as Rect2).merge(rects[1])   # the piece or its icon (不知火舞)
 	var zone := keys.grow(gap)
 	if not box.intersects(zone): return 0.0
 	var px := view.x / size
@@ -808,29 +816,29 @@ static func piece_need(focus: Vector3, player: Vector3, piece: PackedVector3Arra
 
 ## The shift (px) wanted now: `held` the one on now (its hysteresis).
 static func piece_want(focus: Vector3, player: Vector3, piece: PackedVector3Array, size: float, view: Vector2, keys: Rect2,
-		held: float) -> float:
-	var need := piece_need(focus, player, piece, size, view, keys)
+		held: float, icon := Vector3.INF) -> float:
+	var need := piece_need(focus, player, piece, size, view, keys, KEY_GAP_PX, icon)
 	if held <= 0.0: return need
-	return maxf(need, minf(held, piece_need(focus, player, piece, size, view, keys, KEY_GAP_PX + PIECE_HYST_PX)))
+	return maxf(need, minf(held, piece_need(focus, player, piece, size, view, keys, KEY_GAP_PX + PIECE_HYST_PX, icon)))
 
-## Which point the shift is on and how much, this frame: [want, point]. `p` is the marked point, `on` the one it was on
-## with `held`; `want_of(point, held)` is piece_want for it. A point starts it only with the player stopped within
-## PIECE_NEAR_M of its stand, or as the one a tap walks to (`goal`): walking by — a piece the camera scrolls through the
-## keys — starts none. Once on, it keeps it by the hysteresis while within TAG_M, walking off too and after the icon
-## moves on to the next point — the larger of the two: never handed back and forth along the bank (上官婉儿 on 475,
-## the re-shot's 6.4 s: shifted for a piece behind the player, let go 0.3 s later as the icon moved on).
-const PIECE_NEAR_M := 2.5
-static func piece_hold(p: Dictionary, on: Dictionary, held: float, player: Vector3, still: bool, goal: String,
-		want_of: Callable) -> Array:
+## Which point the shift is on and how much, this frame: [want, point] (不知火舞 on 475 ④, with 上官婉儿 after the
+## re-shot's 6.4 s: shifted for a piece behind the player, let go 0.3 s later as the icon moved on). `p` is the marked
+## point, `on` the one it is on with `held`, `want_of(point, held)` piece_want for it (its piece or its icon).
+## - Stopped PIECE_STILL_S (`still`): the marked point's want, from where the camera is — none needed (or no point
+##   marked), none; on to another point, straight to its want (eased by the caller), never back to none first.
+## - Walking: nothing added; what is on comes back by the hysteresis only (never more than `held`) — walking by, a
+##   piece the camera scrolls through the keys starts nothing.
+## - The point a tap walks to (`goal`, v4q(13) ②): its want on the way too.
+const PIECE_STILL_S := 0.25
+static func piece_hold(p: Dictionary, on: Dictionary, held: float, still: bool, goal: String, want_of: Callable) -> Array:
 	var same := not p.is_empty() and not on.is_empty() and str(p.get("id", "")) == str(on.get("id", ""))
-	var near := not p.is_empty() and (str(p.get("id", "")) == goal
-		or (still and PondGather.flat(PondGather.stand_of(p), player) <= PIECE_NEAR_M))
-	var now: float = want_of.call(p, held if same else 0.0) if same or near else 0.0
-	var kept := 0.0
-	if not same and not on.is_empty() and held > 0.0 and PondGather.flat(PondGather.stand_of(on), player) <= PondGather.TAG_M:
-		kept = want_of.call(on, held)
-	var want := maxf(now, kept)
-	return [want, {} if want <= 0.0 else (on if kept > now else p)]
+	if not p.is_empty() and (still or str(p.get("id", "")) == goal):
+		var want: float = want_of.call(p, held if same else 0.0)
+		return [want, p if want > 0.0 else {}]
+	if still: return [0.0, {}]   # stopped with no icon on: nothing to clear
+	if on.is_empty() or held <= 0.0: return [0.0, {}]
+	var kept: float = minf(held, want_of.call(on, held))
+	return [kept, on if kept > 0.0 else {}]
 
 ## The piece's box and its icon's disc on the screen for a camera at `focus`.
 const ICON_PX := 28.0

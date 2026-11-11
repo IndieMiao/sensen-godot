@@ -40,7 +40,7 @@ func test_every_slot_at_its_stand_keeps_its_piece_and_icon_off_the_keys() -> voi
 			var corner := POND.REF_VIEW * 0.5 + Vector2(POND.REF_VIEW.x * 0.2, POND.REF_VIEW.y * 0.225)   # the safe box's bottom right
 			for frame in [["settled", player], ["walking", _focus_with(player, corner, size)]]:
 				var before: Vector3 = POND.clamp_focus(frame[1], size, POND.REF_VIEW, POND.REF_BAND, PondScenery.MEADOW, player, POND.REF_COLUMN)
-				var moved: float = POND.piece_need(before, player, box, size, POND.REF_VIEW, POND.REF_COLUMN)
+				var moved: float = POND.piece_need(before, player, box, size, POND.REF_VIEW, POND.REF_COLUMN, POND.KEY_GAP_PX, icon)
 				var after: Vector3 = before + POND.right_axis() * (moved / (POND.REF_VIEW.x / size))
 				var g0 := _gap([POND.piece_rects(before, box, icon, size, POND.REF_VIEW)[0]], POND.REF_COLUMN)
 				var g1 := _gap([POND.piece_rects(after, box, icon, size, POND.REF_VIEW)[0]], POND.REF_COLUMN)
@@ -73,55 +73,79 @@ func test_the_shift_holds_until_the_piece_is_clear_by_the_hysteresis() -> void:
 	var clear: Vector3 = focus + POND.right_axis() * ((need + POND.PIECE_HYST_PX + 1.0) / px)
 	assert_float(POND.piece_want(clear, player, box, size, POND.REF_VIEW, POND.REF_COLUMN, need)).is_equal(0.0)
 
-## 上官婉儿 on 475 (the re-shot's 6.4 s): walking by a point starts no shift — the camera scrolling a piece through the
-## keys behind the player shifted it, and the icon moving on let it go 0.3 s later. Fern's right bank, R2 at z −7.6:
-## the piece in the keys from 6 m past it on (as the recording); a fake piece_want by the player's z.
-func test_walking_by_a_point_starts_no_shift_and_one_stopped_at_keeps_it_by_the_hysteresis() -> void:
+## 不知火舞 on 475 ④ (with 上官婉儿, after the re-shot's 6.4 s: shifted for a piece behind the player, let go 0.3 s
+## later as the icon moved on): walking adds nothing — walking by starts no shift, what is on only comes back by the
+## hysteresis; stopped PIECE_STILL_S, the marked point's want from where the camera is, on to the next point straight.
+## Fern's right bank, R1 / R2 3.4 m apart; fake piece_wants.
+func test_walking_adds_nothing_and_a_stop_goes_straight_to_the_marked_points_want() -> void:
+	var r1 := {"id": "R1", "x": 12.0, "z": -3.4, "stand": [11.12, -3.38]}
 	var r2 := {"id": "R2", "x": 12.0, "z": -7.6, "stand": [11.12, -7.62]}
-	var r3 := {"id": "R3", "x": 12.0, "z": -9.9, "stand": [11.12, -9.88]}
-	var at := Vector3(11.12, 0, -1.6)
-	var now := [at]   # the lambda reads the player through this (it captures a Vector3 by value)
-	var want_of := func(q: Dictionary, held: float) -> float:
-		var past: float = float(q.stand[1]) - (now[0] as Vector3).z   # metres the player is north of the point
-		return 0.0 if past < 6.0 and held <= 0.0 else 60.0
-	# walking north from R1 past R2 to R4 and on, the icon on R2 then gone: never on
-	var hold := [0.0, {}]
-	var top := 0.0
-	for k in 70:
-		at.z = -1.6 - 0.2 * k
-		now[0] = at
-		var p: Dictionary = r2 if absf(at.z - float(r2.stand[1])) <= PondGather.TAG_M else {}
-		hold = POND.piece_hold(p, hold[1], hold[0], at, false, "", want_of)
-		top = maxf(top, hold[0])
-	assert_float(top).is_equal(0.0)
-	assert_float(want_of.call(r2, 0.0)).is_equal(60.0)   # the fake bites by then (the walk ended 12 m past R2)
+	var wants := {"R1": 0.0, "R2": 60.0}   # what each point's piece / icon needs now
+	var want_of := func(q: Dictionary, _held: float) -> float: return wants[q.id]
+	# walking by R2 with its piece in the keys: nothing
+	assert_float(float(POND.piece_hold(r2, {}, 0.0, false, "", want_of)[0])).is_equal(0.0)
+	# stopped at R2: on, 60
+	var hold: Array = POND.piece_hold(r2, {}, 0.0, true, "", want_of)
+	assert_float(float(hold[0])).is_equal(60.0)
+	assert_str(str(hold[1].id)).is_equal("R2")
+	# walking on, the piece deeper in the keys (wants more): never more than held
+	wants.R2 = 90.0
+	hold = POND.piece_hold(r2, hold[1], hold[0], false, "", want_of)
+	assert_float(float(hold[0])).is_equal(60.0)
+	# the icon moved on to R1 while walking: R2 keeps it by its hysteresis, not handed back
+	hold = POND.piece_hold(r1, hold[1], hold[0], false, "", want_of)
+	assert_float(float(hold[0])).is_equal(60.0)
+	assert_str(str(hold[1].id)).is_equal("R2")
+	# stopped at R1, which needs 40: straight from 60 to 40, never back to 0 first
+	wants.R1 = 40.0
+	hold = POND.piece_hold(r1, hold[1], hold[0], true, "", want_of)
+	assert_float(float(hold[0])).is_equal(40.0)
+	assert_str(str(hold[1].id)).is_equal("R1")
+	# walking again, R1's piece clear by the hysteresis: back to 0
+	wants.R1 = 0.0
+	hold = POND.piece_hold(r1, hold[1], hold[0], false, "", want_of)
+	assert_float(float(hold[0])).is_equal(0.0)
+	assert_bool((hold[1] as Dictionary).is_empty()).is_true()
+	# stopped with no icon on (past TAG_M of every point), something still held: 0
+	hold = POND.piece_hold({}, r2, 60.0, true, "", want_of)
+	assert_float(float(hold[0])).is_equal(0.0)
 
-	# stopped at R2 with its piece under the keys: on
-	at = Vector3(11.12, 0, -7.62)
-	var keys := func(_q: Dictionary, _held: float) -> float: return 40.0
-	hold = POND.piece_hold(r2, {}, 0.0, at, true, "", keys)
-	assert_float(hold[0]).is_equal(40.0)
-	assert_str(str(hold[1].id)).is_equal("R2")
-	# walking on to R3, the icon moved there (R3's own piece clear of the keys): R2 keeps it, not handed back
-	at = Vector3(11.12, 0, -9.0)
-	var r3_clear := func(q: Dictionary, held: float) -> float: return 0.0 if q.id == "R3" else held
-	hold = POND.piece_hold(r3, hold[1], hold[0], at, false, "", r3_clear)
-	assert_float(hold[0]).is_equal(40.0)
-	assert_str(str(hold[1].id)).is_equal("R2")
-	# R3 wanting more once stopped there: the larger, on R3
-	var r3_more := func(q: Dictionary, held: float) -> float: return 55.0 if q.id == "R3" else held
-	hold = POND.piece_hold(r3, hold[1], hold[0], Vector3(11.12, 0, -9.88), true, "", r3_more)
-	assert_float(hold[0]).is_equal(55.0)
-	assert_str(str(hold[1].id)).is_equal("R3")
-	# past TAG_M of the point it is on (no icon left): let go
-	hold = POND.piece_hold({}, hold[1], hold[0], Vector3(11.12, 0, -9.88 - PondGather.TAG_M - 0.5), false, "", r3_more)
-	assert_float(hold[0]).is_equal(0.0)
-	assert_bool(hold[1].is_empty()).is_true()
+## A walk along the bank, the shift eased as the pond does: while walking it never turns back by more than the
+## hysteresis (上官婉儿's check on the curve), whatever the pieces do.
+func test_along_the_bank_the_shift_never_turns_back_while_walking() -> void:
+	var pts := [{"id": "R1", "stand": [11.12, -3.38]}, {"id": "R2", "stand": [11.12, -7.62]}]
+	var hold := [0.0, {}]
+	var shift := 0.0
+	var last_dir := 0.0
+	var turned := 0.0
+	var plan := []   # [z, walking]: walk R1 → stop 1 s → walk past R2 → stop
+	for k in 15: plan.append([-1.6 - 0.12 * k, true])
+	for k in 30: plan.append([-3.4, false])
+	for k in 75: plan.append([-3.4 - 0.12 * k, true])
+	for k in 30: plan.append([-12.4, false])
+	var still_s := 0.0
+	for step in plan:
+		var z: float = step[0]
+		var near := {}
+		for q in pts:
+			if absf(float(q.stand[1]) - z) <= PondGather.TAG_M and (near.is_empty() or absf(float(q.stand[1]) - z) < absf(float(near.stand[1]) - z)): near = q
+		var want_of := func(q: Dictionary, _held: float) -> float:   # a piece scrolls into the keys 5–8 m past its stand
+			var past: float = float(q.stand[1]) - z
+			return 70.0 if past > 5.0 else (30.0 if absf(past) < 1.0 else 0.0)
+		still_s = 0.0 if step[1] else still_s + 1.0 / 30.0
+		hold = POND.piece_hold(near, hold[1], hold[0], still_s >= POND.PIECE_STILL_S, "", want_of)
+		var before := shift
+		shift = lerpf(shift, hold[0], 1.0 - exp(-(1.0 / 30.0) * 3.0 / POND.PIECE_EASE_S))
+		if step[1] and absf(shift - before) > 0.01:
+			var dir := signf(shift - before)
+			if last_dir != 0.0 and dir != last_dir: turned = maxf(turned, absf(shift - before))
+			last_dir = dir
+		if not step[1]: last_dir = 0.0
+	assert_float(turned).is_less_equal(POND.PIECE_HYST_PX)
 
 ## The point a tap walks to (gather_goal, v4q(13) ②) starts it on the way, before the player stops.
 func test_the_point_a_tap_walks_to_starts_it_on_the_way() -> void:
 	var r2 := {"id": "R2", "x": 12.0, "z": -7.6, "stand": [11.12, -7.62]}
 	var keys := func(_q: Dictionary, _held: float) -> float: return 30.0
-	var far := Vector3(11.12, 0, -1.0)
-	assert_float(POND.piece_hold(r2, {}, 0.0, far, false, "", keys)[0]).is_equal(0.0)
-	assert_float(POND.piece_hold(r2, {}, 0.0, far, false, "R2", keys)[0]).is_equal(30.0)
+	assert_float(float(POND.piece_hold(r2, {}, 0.0, false, "", keys)[0])).is_equal(0.0)
+	assert_float(float(POND.piece_hold(r2, {}, 0.0, false, "R2", keys)[0])).is_equal(30.0)
