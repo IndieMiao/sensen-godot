@@ -38,6 +38,10 @@ LIT = re.compile(r'"((?:[^"\\]|\\.)*)"')
 SKIP_LINE = re.compile(r'^\s*(#|class_name|extends|const [A-Z_]+ := preload|signal |@export|const MONTHS\b)')
 NOT_COPY = re.compile(r'res://|user://|\.(png|svg|glb|tscn|tres|gd|json|ogg|wav)$|^[A-Za-z_]+[:/][A-Za-z_]|^[a-z_0-9]+$|^%[a-z]$|^#|^[A-Z][A-Z0-9]*(_[A-Z0-9]+)+$')   # … an error code (FISHING_TIMING)
 SPEC = re.compile(r'%[+-]?\d*(?:\.\d+)?[dsf]')
+## Inside a call no player reads: the log (`print`, `printerr`, `push_warning`, `push_error`; P0Landing's `P0 q311` lines)
+## and a place's reason in a why table (`_no(why, p, "off the ground")`, q(311)'s tests and log) — #988's eleven
+## literals came in by them (哪吒 on #996).
+DEBUG_CALL = re.compile(r'\b(print|printerr|push_warning|push_error|_no)\(')
 ## A template that is a key, a path, a header or a cache key, not a line (`%s:regional:%s:1`, `%s%s_%d.webp`,
 ## `x-p0-version: %d`, `%.1f|%d|…`, `%s?longitude=…`, `P0_AIM %d %s`).
 TEMPLATE_JUNK = re.compile(r'[|={}\\_<>]|\?[a-z]+=|:[A-Za-z%]|^[a-z]+-[a-z0-9]|^[a-z]+%|\bP0[A-Za-z]*\b|^[A-Z0-9_]{3,}\b|https?:|\.[a-z]{3,4}\b')
@@ -92,8 +96,9 @@ def main() -> None:
             for m in LIT.finditer(code):
                 before = code[:m.start()].rstrip()
                 if before.endswith(('find_child(', '.name =', 'has_method(', 'call(', 'emit(', 'get(', 'has(', 'connect(', '==', 'in [',
-                        'get_node(')):
+                        'get_node(', 'get_slice(')):
                     continue
+                if DEBUG_CALL.search(before): continue   # debug output, a why table's reason: no player reads them
                 add(m.group(1), f'{f}:{n}', bool(UI_PLACE.search(before)), bool(UNIT_PLACE.search(before)))
         for const in CAPITALIZED.get(f, []):
             m = re.search(r'const %s\b[^=]*=\s*\[([^\]]*)\]' % const, text)
@@ -128,11 +133,14 @@ def main() -> None:
     for src, e in out.items():
         # … or by a key with a context (`Dawn@daypart`, `Orchard@family`: Localization.ctx reads them, the bare word left
         # to the names the world makes, SGODOT-492)
-        if src in done or src in ctx_srcs: e["done"] = True
+        # — marked "ctx", not true: the word itself has no line of its own, and a place showing it bare would read it in
+        # English (哪吒 on #996): 李白 checks those
+        if src in done: e["done"] = True
+        elif src in ctx_srcs: e["done"] = "ctx"
     dest = ROOT / 'tools/p0/i18n/p0_strings_en.json'
     dest.write_text(json.dumps(dict(sorted(out.items())), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     kinds = {k: sum(1 for e in out.values() if e["kind"] == k) for k in ("line", "template")}
-    print(f'{len(out)} lines ({kinds["line"]} lines, {kinds["template"]} templates), {sum(1 for e in out.values() if e.get("done"))} done → {dest.relative_to(ROOT)}')
+    print(f'{len(out)} lines ({kinds["line"]} lines, {kinds["template"]} templates), {sum(1 for e in out.values() if e.get("done"))} done ({sum(1 for e in out.values() if e.get("done") == "ctx")} by a context key) → {dest.relative_to(ROOT)}')
     cities(out, done)
 
 def cities(lines: dict, done: dict) -> None:

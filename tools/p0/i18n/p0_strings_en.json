@@ -636,12 +636,6 @@
   "kind": "template",
   "done": true
  },
- "%s hidden by %s": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:168"
-  ],
-  "kind": "template"
- },
  "%s is closest.": {
   "where": [
    "modules/p0/p0_logic.gd:2278"
@@ -1431,12 +1425,6 @@
   "kind": "line",
   "done": true
  },
- ", waiting": {
-  "where": [
-   "modules/p0/p0_landing.gd:52"
-  ],
-  "kind": "line"
- },
  "--qa-scene=": {
   "where": [
    "modules/ui/app_router.gd:351",
@@ -1935,30 +1923,6 @@
   ],
   "kind": "line",
   "done": true
- },
- "AppRouter 无法加载实例场景 %s": {
-  "where": [
-   "modules/ui/app_router.gd:112"
-  ],
-  "kind": "template"
- },
- "AppRouter 无法打开场景 %s（错误 %d）": {
-  "where": [
-   "modules/ui/app_router.gd:317"
-  ],
-  "kind": "template"
- },
- "AppRouter: loading %s failed": {
-  "where": [
-   "modules/ui/app_router.gd:181"
-  ],
-  "kind": "template"
- },
- "AppRouter: loading %s failed (try %d of %d)": {
-  "where": [
-   "modules/ui/app_router.gd:207"
-  ],
-  "kind": "template"
  },
  "Apple": {
   "where": [
@@ -4459,7 +4423,7 @@
    "modules/p0/p0_fish_world.gd:12"
   ],
   "kind": "line",
-  "done": true
+  "done": "ctx"
  },
  "Dawn & dusk": {
   "where": [
@@ -5329,12 +5293,6 @@
   ],
   "kind": "line",
   "done": true
- },
- "FarmWoods: %s at (%.2f, %.2f) finds no room off the Lv%d yard": {
-  "where": [
-   "scenes/p0/p0_farm_woods.gd:258"
-  ],
-  "kind": "template"
  },
  "Farmer": {
   "where": [
@@ -9948,7 +9906,7 @@
    "modules/p0/p0_board.gd:161"
   ],
   "kind": "line",
-  "done": true
+  "done": "ctx"
  },
  "Orchard %d/%d": {
   "where": [
@@ -10092,18 +10050,6 @@
   "kind": "line",
   "done": true
  },
- "P0 pond: unknown pond id": {
-  "where": [
-   "scenes/p0/p0_pond.gd:118"
-  ],
-  "kind": "line"
- },
- "P0 test-account main identity backup could not be verified": {
-  "where": [
-   "modules/p0/p0_session.gd:85"
-  ],
-  "kind": "line"
- },
  "P0CounterDrawer": {
   "where": [
    "modules/p0/p0_runtime.gd:2159"
@@ -10137,12 +10083,6 @@
   ],
   "kind": "line"
  },
- "P0Runtime: the pick map is not on top; left to the stack": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1566"
-  ],
-  "kind": "line"
- },
  "P0StorageSheet": {
   "where": [
    "scenes/p0/p0_ui.gd:283",
@@ -10153,36 +10093,6 @@
  "P0TravelCover": {
   "where": [
    "scenes/p0/p0_travel_cover.gd:44"
-  ],
-  "kind": "line"
- },
- "P0_HEAT_REMIND stove=": {
-  "where": [
-   "scenes/p0/rooms/p0_farmhouse.gd:622"
-  ],
-  "kind": "line"
- },
- "P0_LM_CROWD id=": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:452"
-  ],
-  "kind": "line"
- },
- "P0_LM_WHERE screen=": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:445"
-  ],
-  "kind": "line"
- },
- "P0_SHOT saved": {
-  "where": [
-   "modules/p0/p0_runtime.gd:2291"
-  ],
-  "kind": "line"
- },
- "P0_SHOT: unknown step": {
-  "where": [
-   "modules/p0/p0_runtime.gd:2284"
   ],
   "kind": "line"
  },
@@ -15732,12 +15642,6 @@
   "kind": "line",
   "done": true
  },
- "behind someone": {
-  "where": [
-   "scenes/p0/p0_outpost.gd:154"
-  ],
-  "kind": "line"
- },
  "big pot": {
   "where": [
    "scenes/p0/kitchen/p0_kitchen_drawer.gd:758"
@@ -15831,13 +15735,6 @@
   "kind": "template",
   "done": true
  },
- "hidden by": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:122",
-   "scenes/p0/p0_outpost.gd:161"
-  ],
-  "kind": "line"
- },
  "in the rain": {
   "where": [
    "modules/p0/p0_bite_board.gd:22"
@@ -15879,12 +15776,6 @@
   ],
   "kind": "line",
   "done": true
- },
- "landed at (%.2f, %.2f)": {
-  "where": [
-   "modules/p0/p0_landing.gd:103"
-  ],
-  "kind": "template"
  },
  "liked it": {
   "where": [
@@ -15950,25 +15841,6 @@
   ],
   "kind": "template",
   "done": true
- },
- "off screen": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:169",
-   "scenes/p0/p0_outpost.gd:163"
-  ],
-  "kind": "line"
- },
- "off the ground": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:156"
-  ],
-  "kind": "line"
- },
- "on the spawn": {
-  "where": [
-   "modules/p0/p0_landing.gd:103"
-  ],
-  "kind": "line"
  },
  "or %s": {
   "where": [
@@ -16120,12 +15992,6 @@
   "kind": "line",
   "done": true
  },
- "the Map key": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:170"
-  ],
-  "kind": "line"
- },
  "the market": {
   "where": [
    "modules/p0/p0_pin_reason.gd:153",
@@ -16138,12 +16004,6 @@
   "where": [
    "modules/p0/p0_line.gd:169",
    "modules/p0/p0_line.gd:188"
-  ],
-  "kind": "line"
- },
- "the way out": {
-  "where": [
-   "modules/p0/p0_landmark_visit.gd:159"
   ],
   "kind": "line"
  },
@@ -16167,12 +16027,6 @@
   ],
   "kind": "line",
   "done": true
- },
- "walled in": {
-  "where": [
-   "scenes/p0/p0_outpost.gd:151"
-  ],
-  "kind": "line"
  },
  "{energy} Energy per plot · Ready in {grow}": {
   "where": [
