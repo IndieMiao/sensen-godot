@@ -108,8 +108,10 @@ func _go_online() -> void:
 	# the places need the ground — the player's own zone's too, which joins the navigation a sync or two after it reads
 	# ready (gs66 11-11: a quicker load went out with the spawn alone, every ring place "off the ground"): up to NAV_WAIT_MS
 	var t0 := Time.get_ticks_msec()
-	while not _on_own_ground() and Time.get_ticks_msec() - t0 < NAV_WAIT_MS and scene.is_inside_tree():
+	var frames := 0   # and NAV_WAIT_FRAMES physics frames at least (周瑜 on #988: one 4 s frame is one, as P0Landing's waits)
+	while not _on_own_ground() and (Time.get_ticks_msec() - t0 < NAV_WAIT_MS or frames < NAV_WAIT_FRAMES) and scene.is_inside_tree():
 		await scene.get_tree().physics_frame
+		frames += 1
 	if _leaving or not scene.is_inside_tree(): return
 	var at: Vector3 = scene.call("player_position")
 	var why := {}
@@ -131,6 +133,7 @@ func _on_own_ground() -> bool:
 
 ## How long the places wait for the ground before going out with the spawn alone (P0Landing.EXPECT_MS covers it).
 const NAV_WAIT_MS := 3000
+const NAV_WAIT_FRAMES := 20
 ## q(311) (SGODOT-470): the visit's landing — the server's pick from `places`, waited for under the arrival cover.
 var landing := P0Landing.new()
 
