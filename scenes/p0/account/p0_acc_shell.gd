@@ -1,19 +1,21 @@
 class_name P0AccShell
 extends Control
-## ACC-SHELL (SGODOT-491; 不知火舞's account spec v1 §0.1): the one look the first launch's pages share — AGE, TERMS,
-## NAME, Sign in — as the original ONB-AGE-2 9:119318 / ONB-CONSENT 9:119341 / ONB-NAME 9:119537 have it, and the new
-## system pages (§6) too, as SYS-SESSION 9:119672. On the 360 × 800 frame: the surface; the farm art (the SYS screens'
-## sys_backdrop_farm) from y 330, fading in from the top; the `Gensen` wordmark at y 84; and a card 16 from the sides
-## (328 wide), its top at y 170, radius 24, surface + border + shadow as HOME-WELCOME's — as 安其拉's frames have it
-## (row 155 633:197011; 不知火舞: radius 24, not the spec's 20): 24 in at the top, 20 at the sides and the bottom, inside
-## its 1 px edge (PAD, from the card's outer edge). In the card a page puts
-## its title (XB20), its line (Body 14, secondary), what it asks and its primary key (48): add_title, add_body, add_gap,
-## add_primary, or its own nodes into `col`. No HUD, no ✕: it takes every touch. A page made of it sits on its own
-## layer before there is a world (tech plan §2.3: no viewport is read till it is in the tree).
+## ACC-SHELL (SGODOT-491; 不知火舞's account spec v1.1 §0.1, C): the one look the first launch's pages share — AGE, AGE-BLOCK,
+## NAME, Sign in, No farm found, the old account's consent card, Signed out — and the account's system pages (§6:
+## SYS-SESSION, CLAIMED, DELETED, SUSPENDED). On the 360 × 800 frame: the brand cream (scheme 3, the user 11-11 bot 728;
+## row 159 661:199003 / 661:199027 / 661:199048) — #F6F4EA with a faint green in its last fifth, the art the screen's
+## width and on its bottom, the cream on up past it on a tall screen; the `Gensen` wordmark at y 84; and a card 16 from
+## the sides (328 wide), its top at y 170, radius 24, surface + border + shadow as HOME-WELCOME's — as 安其拉's frames
+## have it (row 155 633:197011): 24 in at the top, 20 at the sides and the bottom, inside its 1 px edge (PAD, from the
+## card's outer edge). In the card a page puts its title (XB20), its line (Body 14, secondary), what it asks and its
+## primary key (48): add_title, add_body, add_gap, add_primary, or its own nodes into `col`. No HUD, no ✕: it takes
+## every touch. A page made of it sits on its own layer before there is a world (tech plan §2.3: no viewport is read till
+## it is in the tree).
+## The game's other system screens (P0SysScreen: Can't connect, maintenance, update) keep their farm art (奕星 11-11:
+## the user's word was the sign-up's art); a page here may still take another (`backdrop`).
 
-## The art under the card: the SYS screens' farm for now. The user (11-11, via 奕星) wants the first launch's art
-## changed (上官婉儿's proposal to come): a new one goes here, or a page sets `backdrop`; nothing else reads the file.
-const BACKDROP := P0SysScreen.BACKDROP
+const BACKDROP := preload("res://assets/p0/ui/acc_backdrop_cream.png")   # 1080 × 2400, the 360 × 800 frame ×3
+const GROUND := Color("F6F4EA")   # the art's cream, on up past its top (as HOME-WELCOME's land)
 const SIDE := 16.0
 const CARD_TOP := 170.0
 ## Left, top, right, bottom from the card's outer edge: the frame's 20 / 24 / 20 / 20 plus its 1 px edge (ACC-AGE
@@ -21,26 +23,25 @@ const CARD_TOP := 170.0
 const PAD := Vector4(21, 25, 21, 21)
 const RADIUS := 24.0
 const KEY_H := 48.0
-const _FRAME_H := 800.0
-const _ART_TOP := 330.0    # as the SYS screens': the art at y 330 of the frame, cropped by the screen
 const _MARK_TOP := 84.0
 
 var backdrop: Texture2D = BACKDROP:
 	set(t):
 		backdrop = t
-		if _art: _art.texture = t
+		if _art:
+			_art.texture = t
+			_layout()
 var card: PanelContainer
 var col: VBoxContainer
 var mark: UiWordmark
 var _art: TextureRect
-var _fade: TextureRect
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	theme = UiKit.theme()
 	var bg := ColorRect.new()
 	bg.name = "Surface"
-	bg.color = UiTokens.COLOR_SURFACE
+	bg.color = GROUND
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
@@ -48,16 +49,9 @@ func _init() -> void:
 	_art.name = "Backdrop"
 	_art.texture = backdrop
 	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_art.stretch_mode = TextureRect.STRETCH_SCALE
 	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_art)
-	_fade = TextureRect.new()
-	_fade.texture = P0SysScreen._fade_texture()
-	_fade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_fade.stretch_mode = TextureRect.STRETCH_SCALE
-	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_fade)
 	mark = UiWordmark.new()
 	add_child(mark)
 	card = PanelContainer.new()
@@ -111,9 +105,11 @@ func add_primary(text: String) -> UiCommandButton:
 
 func _layout() -> void:
 	var w := size.x
-	var h := size.y if size.y > 0.0 else _FRAME_H
-	_art.position = Vector2(0, roundf(_ART_TOP * h / _FRAME_H))
-	_art.size = Vector2(w, h)
+	var h := size.y
+	# the screen's width, on its bottom: a tall screen shows the cream above it, a short one loses some of its cream top
+	var art_h := roundf(w * backdrop.get_height() / backdrop.get_width()) if backdrop else 0.0
+	_art.position = Vector2(0, h - art_h)
+	_art.size = Vector2(w, art_h)
 	var m := mark.get_combined_minimum_size()
 	mark.position = Vector2(roundf((w - m.x) * 0.5), _MARK_TOP)
 	mark.size = m
