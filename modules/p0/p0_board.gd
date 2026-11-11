@@ -172,8 +172,11 @@ static func _any(view: Dictionary, r: Dictionary) -> String:
 static func _kinds(kind: String) -> String:
 	return {"fish": "fish", "crop": "crops", "dish": "dishes", "material": "materials"}.get(kind, kind + "s")
 
+## The item's name for `"%d %s"`: under 中文 its Chinese already (no plural; the line after its count matches no template,
+## so it stayed `2 Pond Crucian` — 0.3.7's smoke, 李白 #989), else the English, plural past one but for a fish.
 static func _name(view: Dictionary, id: String, qty: int) -> String:
 	var n := P0Logic.item_name(view, id)
+	if P0Logic.shown(n) != n: return P0Logic.shown(n)
 	return P0Logic.plural(n) if qty > 1 and not id.begins_with("fish_") else n
 
 # ---------------------------------------------------------------- one request (BOARD-1 / BOARD-3 / BOARD-DROPPED)

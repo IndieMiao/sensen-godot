@@ -879,3 +879,31 @@ func test_p0_ordinals_take_their_english_suffix_and_read_di_n() -> void:
 		assert_str(zh.call(P0KitchenLogic.ordinal(n))).is_equal("第 %d" % n)
 		assert_str(zh.call("No XP · %s today" % P0KitchenLogic.ordinal(n))).is_equal("无经验 · 今日第 %d 次" % n)
 	TranslationServer.remove_translation(t)
+
+## 0.3.7's smoke (李白 #989, 奕星): a count and an item put together in code (`"%d %s"`) matched no template, so under 中文
+## the whole line stayed English — the Market Board's `2 Pond Crucian`, a buy row's `10 Reeds`, a gathering spot's
+## `Gives 2 Timber`, coming home's `Stored · 12 Stone`. The item's name goes in already in Chinese; English as it was.
+func test_p0_a_count_and_its_item_put_together_in_code_read_in_chinese() -> void:
+	var journey: Translation = Localization.get("_journey")   # P0's 中文 takes the older app's table off (use_p0)
+	if journey: TranslationServer.remove_translation(journey)
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	var view := {"names": {"fish_crucian": "Pond Crucian", "crop_radish": "Radish", "wood": "Timber", "stone": "Stone",
+		"copper_ore": "Copper Ore"}, "storage": {"auto": {"at": 5.0, "items": [["stone", 12], ["copper_ore", 3]]}}}
+	var spot := {"name": "Badger Grove", "energy": 3, "yield": [["wood", 2], ["stone", 1]]}
+	var line := func() -> Array: return [
+		P0Board._what(view, {"items": ["fish_crucian"], "qty": 2}),
+		P0Board._what(view, {"items": ["crop_radish"], "qty": 3}),
+		P0ItemInfo._materials_short({"materials": [{"name": "Reeds", "need": 10, "have": 0}]}),
+		str(P0MaterialLogic.gather_card(view, spot, true, 0.0).facts[0][1]),
+		P0MaterialLogic.stored_notice(view, 0.0)]
+	assert_array(line.call()).is_equal(["2 池塘鲫鱼", "3 小萝卜", "10 芦苇", "2 木材 · Stone", "Stored · 12 石料 · 3 铜矿石"])
+	# as drawn: the rest of the line by its parts as before (`Stone` 石料, `Stored` 已入库), the count with its item kept
+	assert_str(zh.call("2 木材 · Stone")).is_equal("2 木材 · 石料")
+	assert_str(zh.call("Stored · 12 石料 · 3 铜矿石")).is_equal("已入库 · 12 石料 · 3 铜矿石")
+	TranslationServer.set_locale("en")
+	assert_array(line.call()).is_equal(["2 Pond Crucian", "3 Radishes", "10 Reeds", "2 Timber · Stone", "Stored · 12 Stone · 3 Copper Ore"])
+	TranslationServer.remove_translation(t)
+	if journey: TranslationServer.add_translation(journey)
