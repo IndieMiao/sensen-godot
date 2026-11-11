@@ -9,7 +9,8 @@ player="${1:?player id}"; day="${2:-$(date -u +%Y-%m-%d)}"; c="${3:-p0-p0-1}"
 [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }
 [[ "$day" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "bad day: $day"; exit 2; }
 tmp=$(mktemp)
-trap 'rm -f "$tmp"' EXIT
+# The day's lines for one player carry their IPs: drop the copy inside the container too, not only the host one.
+trap 'rm -f "$tmp"; docker exec "$c" rm -f /tmp/report.jsonl >/dev/null 2>&1 || true' EXIT
 docker exec "$c" cat "/data/events/p0-events-$day.jsonl" | grep -F "\"player\":\"$player\"" > "$tmp" || true
 echo "player $player · $day (UTC) · $(wc -l < "$tmp") log lines"
 [ -s "$tmp" ] || exit 0
