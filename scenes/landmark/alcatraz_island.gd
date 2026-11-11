@@ -721,6 +721,20 @@ func _exit_tree() -> void:
 
 # ---------------------------------------------------------------- P0 world (P0LandmarkVisit, q(295))
 func p0_surface() -> String: return "visit"
+## q(311) ② (不知火舞 on #988): what can hide a person on the island from the camera — every placement that stands in
+## the way (collision: the dock's props since 474, rails, benches, lamps …; not the dock's own deck) as its mesh's box
+## in its own space, with its transform and name: [Transform3D, AABB, name]. Read once.
+var _occluders: Array = []
+func occluders() -> Array:
+	if _occluders.is_empty():
+		for p in layout.placements:
+			if not bool(p.get("collision", false)) or str(p.asset) == "dock" or str(p.zone) == "FarZone": continue
+			var m := _mesh(str(p.asset))
+			if m == null: continue
+			_occluders.append([_transform_of(p), m.get_aabb(), str(p.name)])   # as drawn (a sloped rail's basis too)
+	return _occluders
+## q(311) ④: the arrival cover waits for the room to say where the player stands (P0LandmarkVisit.landing).
+func p0_landing_pending() -> bool: return p0_visit != null and p0_visit.landing_pending()
 func p0_frame(_v: Dictionary, dt: float) -> void: p0_visit.frame(dt)
 func p0_tap(screen: Vector2) -> void: p0_visit.tap(screen)
 func p0_recenter() -> void: recenter_on_player()

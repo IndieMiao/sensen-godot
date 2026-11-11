@@ -13,6 +13,7 @@ signal connection_changed(connected: bool)
 signal fishing(states: Array)            # a pond room's lines of the others (11-02): OnlineCrowd.fishing_snapshot's shape
 signal roster_changed                    # members changed (P0VoiceRoom puts this phone's mutes on the new peers)
 signal voice_blocks(peers: Array)        # the server's blocked peers, either way, in this room (P0Voice, SGODOT-383)
+signal unreachable                       # a connection attempt ended before the socket opened (refused, unreachable, closed)
 
 const PROTOCOL := 1
 const SEND_S := 0.1
@@ -34,6 +35,13 @@ var outpost := ""
 ## draws a kit which took a room's place (the market plaza) in that layout's instances, apart from older clients'.
 var layout := ""
 var spawn_at := Vector2.ZERO
+## q(311) (SGODOT-470): this visit's places for its first join, in order (the spawn, then the rings round it, x / z): the
+## server stands us on the first one nobody is near and says where in `joined.spawn`. Sent until the first `joined` (or
+## forget_spawns, when the landing's wait is over); a reconnect or a rejoin after maintenance never sends them (⑥).
+var spawns: Array[Vector2] = []
+## A `joined` came on this visit: later joins (a reconnect, after maintenance) report where we stand now, not spawn_at,
+## and send no places (q(311) ⑥).
+var _visit_joined := false
 var appearance: Dictionary = {}
 ## () -> {position: Vector3, yaw: float, action: String}; read at the send rate.
 var source := Callable()
@@ -87,17 +95,33 @@ static func decode_frame(data: PackedByteArray, for_epoch: int) -> Array:
 static func frame_tick(data: PackedByteArray) -> int:
 	return int(data.decode_u32(2)) if data.size() >= FRAME_HEADER else -1
 
-## Opens the socket and joins this outpost at our door position (room metres, x / z).
-func start(outpost_id: String, at: Vector2) -> void:
+## Opens the socket and joins this outpost at our door position (room metres, x / z): a visit. `places` (q(311)): where
+## we may stand instead, in order, the door position first (P0SpawnRing.places).
+func start(outpost_id: String, at: Vector2, places: Array[Vector2] = []) -> void:
 	outpost = outpost_id
 	spawn_at = at
+	spawns = places
+	_visit_joined = false
+	_open()
+
+func _open() -> void:
 	_stopped = false
 	_attempt = 0
 	_connect()
 
-## The join sent once the socket opens: the outpost, our door position, our look and the kit we draw there.
+## The landing's wait is over (q(311) ④): no places on a later join of this visit.
+func forget_spawns() -> void:
+	spawns = []
+
+## The join sent once the socket opens: the outpost, our door position, our look and the kit we draw there. On the
+## visit's first join our places too (q(311)); on a later one (a reconnect, after maintenance) where we stand now.
 func join_message() -> Dictionary:
-	var join := {"t": "join", "outpost": outpost, "at": [spawn_at.x, spawn_at.y]}
+	var at := spawn_at
+	if _visit_joined and source.is_valid():
+		var p: Vector3 = (source.call() as Dictionary).get("position", Vector3(spawn_at.x, 0, spawn_at.y))
+		at = Vector2(p.x, p.z)
+	var join := {"t": "join", "outpost": outpost, "at": [at.x, at.y]}
+	if not _visit_joined and not spawns.is_empty(): join.spawns = spawns.map(func(v: Vector2): return [v.x, v.y])
 	if not appearance.is_empty(): join.appearance = appearance
 	if layout != "": join.layout = layout
 	return join
@@ -123,7 +147,7 @@ func hold() -> void:
 func release() -> void:
 	if not _held: return
 	_held = false
-	start(outpost, spawn_at)
+	_open()
 
 ## Claims a seat; `at` is its position in room metres (the server moves us onto it before seating us).
 func sit(seat: String, at := Vector2.INF) -> int:
@@ -158,7 +182,9 @@ func _connect() -> void:
 	if version > 0: headers.append("x-p0-version: %d" % version)
 	if features != "": headers.append("x-p0-features: " + features)
 	socket.handshake_headers = headers
-	if socket.connect_to_url(url) != OK: _retry()
+	if socket.connect_to_url(url) != OK:
+		unreachable.emit()
+		_retry()
 
 func _reset() -> void:
 	if connected: connection_changed.emit(false)
@@ -203,6 +229,7 @@ func _process(dt: float) -> void:
 			var code := socket.get_close_code()
 			if not connected and _attempt == 0:   # the handshake failed: a wrong demo key (401) looks like this too
 				push_warning("P0Online: %s refused the connection or is unreachable (a demo server needs the right x-p0-key)" % url)
+			if not connected: unreachable.emit()
 			socket = null
 			if code == 4001: failed.emit("SESSION_REPLACED")   # another device took over: no reconnect
 			if code == 4001 or code == 4002:
@@ -236,6 +263,9 @@ func _message(text: String) -> void:
 			room = int(m.room)
 			_last = {}
 			_last_tick = -1
+			m["first"] = not _visit_joined   # q(311) ④: the visit's first, the only one a landing may follow
+			_visit_joined = true
+			spawns = []
 			joined.emit(m)
 		"roster":
 			members.clear()

@@ -191,6 +191,7 @@ func _ready() -> void:
 	c.show_health = false
 	crowd = c
 	add_child(crowd)   # pond metres: the scene's own, no room offset
+	landing.expect()   # q(311): the cover waits for the room's pick (the places need the day's points first)
 	_go_online(rt.session)
 
 const GLES_SCALE_3D := 0.8
@@ -1021,7 +1022,53 @@ func _go_online(session: P0Session) -> void:
 	add_child(voice_room)
 	voice_room.setup(session, o, "pond")
 	o.joined.connect(func(_i): if voice_room.age == "unknown" and not voice_room.available: voice_room.fetch_status(), CONNECT_ONE_SHOT)
-	online.start(room_id(), Vector2(actor.position.x, actor.position.z))
+	await _points_in(session)
+	if not is_inside_tree(): return
+	var at := actor.position
+	var mine: Array[Vector2] = [Vector2(at.x, at.z)] if landing.ended() else places(at)   # the cover went: no jump
+	online.start(room_id(), Vector2(at.x, at.z), mine)
+	landing.begin(o, mine, at)   # after start: its room's name, and the socket opens a frame or more later
+
+# ---------------------------------------------------------------- q(311): where a newcomer stands (SGODOT-470)
+## The visit's landing on the room's pick (P0Landing; the arrival cover waits for it, P0Runtime).
+var landing := P0Landing.new()
+func p0_landing_pending() -> bool: return landing.pending()
+## The day's gathering points and the trees that keep off them come with the pond's first read after the scene stands:
+## wait for it (POINTS_WAIT_S at most), then build the bank as the frame would, so the places know both.
+const POINTS_WAIT_S := 2.0
+func _points_in(session: P0Session) -> void:
+	if gather.pond != p0_place() or gather.points.is_empty():
+		var got := [false]
+		var done := func(_v = null, _e = null): got[0] = true
+		session.state_changed.connect(done, CONNECT_ONE_SHOT)
+		var timer := get_tree().create_timer(POINTS_WAIT_S)
+		while not got[0] and timer.time_left > 0.0 and is_inside_tree(): await get_tree().process_frame
+		if session.state_changed.is_connected(done): session.state_changed.disconnect(done)
+	if not is_inside_tree(): return
+	var v := session.current()
+	gather.sync(v)
+	var clear := PondGather.clear_points(v)
+	if not clear.is_empty() and clear != _scenery_clear: _build_scenery(clear)
+
+## Where the player may stand on coming in, `at` (the spawn) first (P0SpawnRing): on the walk (off the water and the
+## trees' trunks), not hidden behind a tree, out of each gathering point's reach (or the key there is Gather, v4.1
+## 4.1.3), and whole on the opening's screen 8 px from the nearest point's icon as drawn (q(311) ②; its strip does not
+## open out of its reach, 不知火舞 on #988).
+func places(at: Vector3) -> Array[Vector2]:
+	var trees: Array = PondScenery.tree_points(_scenery_clear, _scenery_keys)
+	var toward := -ahead_axis()   # towards the camera, on the ground
+	var ok := func(p: Vector3) -> bool:
+		var c := bp.world_to_cell(p)
+		if not bp.in_bounds(c) or not bp.is_walkable(c) or P0RoomNav.hidden(p, trees, toward): return false
+		for point in gather.points:
+			if PondGather.in_reach(point, p): return false
+		var keys := []
+		var near: Dictionary = PondGather.nearest(gather.points, p)
+		if not near.is_empty() and PondGather.flat(PondGather.stand_of(near), p) <= PondGather.TAG_M:
+			keys.append(P0SpawnRing.icon_rect(_gather_screen(near)))
+		return P0SpawnRing.clear_of(cam, p, keys)
+	_update_camera()   # the opening's framing on the player now
+	return P0SpawnRing.places(at, right_axis(), ahead_axis(), ok)
 
 ## The pond's room on the server: `pond:<pond id>`.
 func room_id() -> String: return "pond:" + p0_place()
@@ -1036,8 +1083,13 @@ func attach_online(o: P0Online) -> void:
 	o.joined.connect(_on_joined)
 	o.failed.connect(_on_online_failed)
 
-## Layer 2 and later say so once, as an outpost's do (奕星 on #646; P0Online.layer_notice).
+## Layer 2 and later say so once, as an outpost's do (奕星 on #646; P0Online.layer_notice). The visit's first `joined`
+## first stands the player where the room put them (q(311) ④), the opening reframed on them, before the first input.
 func _on_joined(info: Dictionary) -> void:
+	var to := landing.target(info, actor.position)
+	if to != Vector3.INF and bp.is_walkable(bp.world_to_cell(to)):
+		actor.teleport(to)
+		_reopen()
 	_line_sent = {"phase": "none"}   # a new join (a reconnect too) has no line of ours: the one out goes again next frame (周瑜 on #646)
 	_line_left = 0.0
 	var said := P0Online.layer_notice(info)

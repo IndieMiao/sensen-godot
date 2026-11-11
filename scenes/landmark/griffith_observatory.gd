@@ -449,6 +449,28 @@ func _exit_tree() -> void:
 
 # ---------------------------------------------------------------- P0 world (P0LandmarkVisit, q(295))
 func p0_surface() -> String: return "visit"
+## q(311) ② (不知火舞 on #988): what can hide a person from the camera — the props (telescopes, benches, lamps, fence
+## posts, trees, bushes, rocks; not the grass clumps and flowers) and the buildings, each its mesh's box in its own space: [Transform3D, AABB, name]. Read once.
+const _NOT_IN_THE_WAY := ["terrain", "lawns", "plaza", "terrace", "city", "grass_clump", "flowers"]   # ground, and what is too low to hide anyone
+var _occluders: Array = []
+func occluders() -> Array:
+	if _occluders.is_empty():
+		for asset in layout.unique:
+			if str(asset) in _NOT_IN_THE_WAY: continue
+			var m := _mesh(str(asset))
+			if m != null: _occluders.append([Transform3D.IDENTITY, m.get_aabb(), str(asset)])
+		for asset in layout.props:
+			if str(asset) in _NOT_IN_THE_WAY: continue
+			var m := _mesh(str(asset))
+			if m == null: continue
+			for i in (layout.props[asset] as Array).size():
+				var q: Array = layout.props[asset][i]
+				var basis := Basis(Vector3.UP, float(q[3]))
+				basis = basis.scaled(Vector3(float(q[4]), 1, 1) if asset == "rope" else Vector3.ONE * float(q[4]))
+				_occluders.append([Transform3D(basis, Vector3(q[0], q[1], q[2])), m.get_aabb(), "%s_%d" % [asset, i]])
+	return _occluders
+## q(311) ④: the arrival cover waits for the room to say where the player stands (P0LandmarkVisit.landing).
+func p0_landing_pending() -> bool: return p0_visit != null and p0_visit.landing_pending()
 func p0_frame(_v: Dictionary, dt: float) -> void: p0_visit.frame(dt)
 func p0_tap(screen: Vector2) -> void: p0_visit.tap(screen)
 func p0_recenter() -> void: recenter_on_player()
