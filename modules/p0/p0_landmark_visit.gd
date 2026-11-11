@@ -115,25 +115,62 @@ var landing := P0Landing.new()
 ## Where the player may stand on coming in, the spawn `at` first (P0SpawnRing): on the ground (the navigation, which keeps
 ## the props' clearance, 474), outside the way out's reach, and on the opening's screen whole and 8 px from the door key
 ## as drawn — its Map strip within NEAR_M of the dock, its icon further (q(311) ②; P0SpawnRing.strip_rect). Just `at` while the navigation is not in.
-func places(at: Vector3) -> Array[Vector2]:
+func places(at: Vector3, why := {}) -> Array[Vector2]:
 	var nav: RID = scene.call("nav_map")
 	var cam := scene.get_viewport().get_camera_3d() if scene.is_inside_tree() else null
 	if cam == null or not nav.is_valid() or not bool(scene.call("navigation_ready")): return [Vector2(at.x, at.z)]
 	if scene.has_method("_update_camera"): scene.call("_update_camera")   # the opening's framing, on the player now
 	var axes := P0SpawnRing.axes(cam)
 	var exit := exit_at()
+	var boxes: Array = scene.call("occluders") if scene.has_method("occluders") else []
+	var toward := cam.global_basis.z   # from the ground to the camera (orthographic: one direction for every point)
 	var ok := func(p: Vector3) -> bool:
 		var g := _on_nav(nav, p)
-		if g == Vector3.INF: return false
+		if g == Vector3.INF: return _no(why, p, "off the ground")
 		var keys := []
 		if exit != Vector3.INF:
-			if _flat(g, exit) <= EXIT_RADIUS_M: return false
+			if _flat(g, exit) <= EXIT_RADIUS_M: return _no(why, p, "the way out")
 			if not cam.is_position_behind(exit):
 				var c := cam.unproject_position(exit + Vector3.UP * 0.6)
 				# as drawn (不知火舞 on #988): the Map strip within NEAR_M (either way), its icon further
 				keys.append(P0SpawnRing.strip_rect(c, P0Logic.icon("door"), "Map") if _flat(g, exit) <= NEAR_M else P0SpawnRing.icon_rect(c))
-		return P0SpawnRing.clear_of(cam, g, keys)
+		# seen whole: the legs, the middle and the head, each with nothing in the way from the camera (as an outpost's)
+		for h in SEEN_AT:
+			var to: Vector3 = g + Vector3.UP * float(h[0])
+			for b in boxes:
+				if _crosses(b[0], b[1], to + toward * 40.0, to): return _no(why, p, "%s hidden by %s" % [h[1], b[2]])
+		if not P0SpawnRing.clear_of(cam, g, []): return _no(why, p, "off screen")
+		return P0SpawnRing.clear_of(cam, g, keys) or _no(why, p, "the Map key")
 	return P0SpawnRing.places(at, axes[0], axes[1], ok)
+
+## The heights a person is looked at for things in the way (P0Outpost.SEEN_AT_M), and what each is called in `why`.
+const SEEN_AT := [[0.3, "legs"], [0.9, "middle"], [1.55, "head"]]
+
+## Whether the segment `a` → `b` (world) passes through `box`, a mesh's box in the space `xf` puts in the world.
+static func _crosses(xf: Transform3D, box: AABB, a: Vector3, b: Vector3) -> bool:
+	var inv := xf.affine_inverse()
+	var la := inv * a
+	var lb := inv * b
+	var d := lb - la
+	var t0 := 0.0
+	var t1 := 1.0
+	for i in 3:
+		var lo := box.position[i]
+		var hi := box.end[i]
+		if absf(d[i]) < 0.000001:
+			if la[i] < lo or la[i] > hi: return false
+			continue
+		var u := (lo - la[i]) / d[i]
+		var v := (hi - la[i]) / d[i]
+		t0 = maxf(t0, minf(u, v))
+		t1 = minf(t1, maxf(u, v))
+		if t0 > t1: return false
+	return t0 < 1.0 - 0.0001   # not just touching it at the person's own point
+
+## A place left out, and why (tests, the review's table): false.
+static func _no(why: Dictionary, p: Vector3, reason: String) -> bool:
+	why[Vector2(snappedf(p.x, 0.01), snappedf(p.z, 0.01))] = reason
+	return false
 
 ## The world's ask (P0Runtime._landing_pending): the arrival cover waits while this is true.
 func landing_pending() -> bool: return landing.pending()

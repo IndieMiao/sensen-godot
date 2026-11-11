@@ -17,8 +17,9 @@ func after() -> void:
 func test_alcatraz_places_are_on_the_ground_and_off_the_door() -> void:
 	var scene := await _scene(ALCATRAZ, "alcatraz_island", "Alcatraz Island")
 	var visit: P0LandmarkVisit = scene.p0_visit
-	var places := visit.places(scene.player_position())   # (the visit's own may have gone out before the navigation was in)
-	print("Q311 alcatraz places ", places)
+	var why := {}
+	var places := visit.places(scene.player_position(), why)   # (the visit's own may have gone out before the navigation was in)
+	print("Q311 alcatraz places ", places, " left out ", why)
 	_check(scene, visit, places)
 	assert_bool(scene.p0_landing_pending()).is_equal(visit.landing_pending())
 	assert_array(visit.places(scene.player_position())).is_equal(places)   # the same again
@@ -26,8 +27,9 @@ func test_alcatraz_places_are_on_the_ground_and_off_the_door() -> void:
 func test_griffith_places_are_on_the_ground() -> void:
 	var scene := await _scene(GRIFFITH, "griffith_observatory", "Griffith Observatory")
 	var visit: P0LandmarkVisit = scene.p0_visit
-	var places := visit.places(scene.player_position())
-	print("Q311 griffith places ", places)
+	var why := {}
+	var places := visit.places(scene.player_position(), why)
+	print("Q311 griffith places ", places, " left out ", why)
 	_check(scene, visit, places)
 	assert_int(places.size()).is_greater(4)   # an open lawn: most of the first ring
 
