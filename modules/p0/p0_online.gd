@@ -13,6 +13,7 @@ signal connection_changed(connected: bool)
 signal fishing(states: Array)            # a pond room's lines of the others (11-02): OnlineCrowd.fishing_snapshot's shape
 signal roster_changed                    # members changed (P0VoiceRoom puts this phone's mutes on the new peers)
 signal voice_blocks(peers: Array)        # the server's blocked peers, either way, in this room (P0Voice, SGODOT-383)
+signal unreachable                       # a connection attempt ended before the socket opened (refused, unreachable, closed)
 
 const PROTOCOL := 1
 const SEND_S := 0.1
@@ -181,7 +182,9 @@ func _connect() -> void:
 	if version > 0: headers.append("x-p0-version: %d" % version)
 	if features != "": headers.append("x-p0-features: " + features)
 	socket.handshake_headers = headers
-	if socket.connect_to_url(url) != OK: _retry()
+	if socket.connect_to_url(url) != OK:
+		unreachable.emit()
+		_retry()
 
 func _reset() -> void:
 	if connected: connection_changed.emit(false)
@@ -226,6 +229,7 @@ func _process(dt: float) -> void:
 			var code := socket.get_close_code()
 			if not connected and _attempt == 0:   # the handshake failed: a wrong demo key (401) looks like this too
 				push_warning("P0Online: %s refused the connection or is unreachable (a demo server needs the right x-p0-key)" % url)
+			if not connected: unreachable.emit()
 			socket = null
 			if code == 4001: failed.emit("SESSION_REPLACED")   # another device took over: no reconnect
 			if code == 4001 or code == 4002:

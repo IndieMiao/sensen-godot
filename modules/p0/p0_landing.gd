@@ -45,6 +45,15 @@ func begin(o: P0Online, places: Array[Vector2], at: Vector3) -> void:
 	print("P0 q311 %s: %d place%s%s" % [room, places.size(), "" if places.size() == 1 else "s", ", waiting" if places.size() > 1 else ""])
 	if places.size() > 1 and not o.connection_changed.is_connected(_on_connection):
 		o.connection_changed.connect(_on_connection)
+		o.unreachable.connect(_on_no_room)
+		o.failed.connect(_on_no_room.unbind(1))
+
+## The room refused us or cannot be reached (不知火舞 on #988: no waiting then — only a socket still opening, no answer
+## yet, waits CONNECT_MS): the cover goes at once, the player stays on the spawn.
+func _on_no_room() -> void:
+	if _until < 0: return
+	print("P0 q311 %s: connection failed (refused or unreachable) after %d ms, stays on the spawn" % [room, Time.get_ticks_msec() - _t0])
+	over()
 
 func _on_connection(up: bool) -> void:
 	if not up or _until < 0: return

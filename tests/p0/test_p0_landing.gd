@@ -52,3 +52,35 @@ func test_only_the_spawn_waits_for_nothing() -> void:
 	var places: Array[Vector2] = [Vector2(0, 0)]
 	l.begin(_online(), places, Vector3.ZERO)
 	assert_bool(l.pending()).is_false()
+
+## A refused or unreachable room (the socket closed before opening), or a join the room refuses: no waiting at all
+## (不知火舞 on #988) — only a socket still opening with no answer yet waits CONNECT_MS.
+func test_a_refused_or_unreachable_room_ends_the_wait_at_once() -> void:
+	var places: Array[Vector2] = [Vector2(0, 0), Vector2(0.75, 0)]
+	for how in ["unreachable", "failed"]:
+		var o := _online()
+		o.spawns = places
+		var l := P0Landing.new()
+		l.begin(o, places, Vector3.ZERO)
+		assert_bool(l.pending()).is_true()
+		if how == "unreachable": o.unreachable.emit()
+		else: o.failed.emit("PASS_REQUIRED")
+		assert_bool(l.pending()).override_failure_message(how).is_false()
+		assert_bool(o.spawns.is_empty()).is_true()
+
+## P0Online says so when the socket closes before it opened.
+func test_online_says_unreachable_when_the_socket_closes_unopened() -> void:
+	var o := _online()
+	var said := [0]
+	o.unreachable.connect(func(): said[0] += 1)
+	o.url = "ws://127.0.0.1:1/v1/p0/online"   # nothing listens there
+	o.player_id = "p0-testunreachable01"
+	o.transport = Callable()
+	add_child(o)
+	o._open()
+	for i in 120:
+		await get_tree().process_frame
+		if said[0] > 0: break
+	assert_int(said[0]).is_greater(0)
+	o.stop()
+
