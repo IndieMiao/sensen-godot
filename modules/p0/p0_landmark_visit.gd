@@ -105,10 +105,50 @@ func _go_online() -> void:
 	scene.set("voice_room", voice_room)
 	o.joined.connect(func(_i): if voice_room.age == "unknown" and not voice_room.available: voice_room.fetch_status(), CONNECT_ONE_SHOT)
 	var at: Vector3 = scene.call("player_position")
-	o.start(room_id(), Vector2(at.x, at.z))
+	var mine := places(at)
+	landing.begin(o, mine, at)
+	o.start(room_id(), Vector2(at.x, at.z), mine)
 
-## Layer 2 and later say so once, as an outpost's and a pond's do (P0Online.layer_notice).
+## q(311) (SGODOT-470): the visit's landing — the server's pick from `places`, waited for under the arrival cover.
+var landing := P0Landing.new()
+## The Map strip as wide as it opens, either way from its icon (UiWorldNameBar: 5 + the 22 icon + 6 + `Map` + 12; a
+## little over, for other languages' word).
+const MAP_STRIP_W := 76.0
+
+## Where the player may stand on coming in, the spawn `at` first (P0SpawnRing): on the ground (the navigation, which keeps
+## the props' clearance, 474), outside the way out's reach, and on the opening's screen whole and 8 px from the door key —
+## its Map strip within NEAR_M of the dock, its icon further (q(311) ②). Just `at` while the navigation is not in.
+func places(at: Vector3) -> Array[Vector2]:
+	var nav: RID = scene.call("nav_map")
+	var cam := scene.get_viewport().get_camera_3d() if scene.is_inside_tree() else null
+	if cam == null or not nav.is_valid() or not bool(scene.call("navigation_ready")): return [Vector2(at.x, at.z)]
+	if scene.has_method("_update_camera"): scene.call("_update_camera")   # the opening's framing, on the player now
+	var axes := P0SpawnRing.axes(cam)
+	var exit := exit_at()
+	var ok := func(p: Vector3) -> bool:
+		var g := _on_nav(nav, p)
+		if g == Vector3.INF: return false
+		var keys := []
+		if exit != Vector3.INF:
+			if _flat(g, exit) <= EXIT_RADIUS_M: return false
+			if not cam.is_position_behind(exit):
+				var c := cam.unproject_position(exit + Vector3.UP * 0.6)
+				var w := MAP_STRIP_W - 16.0 if _flat(g, exit) <= NEAR_M else 14.0   # the strip either way, or the icon
+				keys.append(Rect2(c.x - w, c.y - 16.0, w * 2.0, 32.0))
+		return P0SpawnRing.clear_of(cam, g, keys)
+	return P0SpawnRing.places(at, axes[0], axes[1], ok)
+
+## The world's ask (P0Runtime._landing_pending): the arrival cover waits while this is true.
+func landing_pending() -> bool: return landing.pending()
+
+## Layer 2 and later say so once, as an outpost's and a pond's do (P0Online.layer_notice). The visit's first `joined`
+## first stands the player where the room put them (q(311) ④), before the first position goes out.
 func _on_joined(info: Dictionary) -> void:
+	var to := landing.target(info, scene.call("player_position"))
+	if to != Vector3.INF:
+		var nav: RID = scene.call("nav_map")
+		var g := _on_nav(nav, to) if nav.is_valid() else Vector3.INF
+		scene.call("dev_stand", g if g != Vector3.INF else to)
 	var said := P0Online.layer_notice(info)
 	if said != "" and rt: rt.ui.toast(said, 0.0, true)
 

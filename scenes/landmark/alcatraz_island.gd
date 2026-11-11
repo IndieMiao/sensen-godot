@@ -721,6 +721,8 @@ func _exit_tree() -> void:
 
 # ---------------------------------------------------------------- P0 world (P0LandmarkVisit, q(295))
 func p0_surface() -> String: return "visit"
+## q(311) ④: the arrival cover waits for the room to say where the player stands (P0LandmarkVisit.landing).
+func p0_landing_pending() -> bool: return p0_visit != null and p0_visit.landing_pending()
 func p0_frame(_v: Dictionary, dt: float) -> void: p0_visit.frame(dt)
 func p0_tap(screen: Vector2) -> void: p0_visit.tap(screen)
 func p0_recenter() -> void: recenter_on_player()
