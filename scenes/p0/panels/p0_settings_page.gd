@@ -129,10 +129,11 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		lang.name = "Language"
 		lang.pressed.connect(func(): page.open_pressed.emit("language"))
 		page._group("General", [lang])
-	var tests := UiSettingRow.new(UiSettingRow.Kind.LINK, "Test options")
-	tests.name = "TestOptions"
-	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
-	page._group("", [tests])
+	if not P0Build.store():   # SGODOT-483: no test accounts in the store build (App Review 2.2 / 2.3.1)
+		var tests := UiSettingRow.new(UiSettingRow.Kind.LINK, "Test options")
+		tests.name = "TestOptions"
+		tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
+		page._group("", [tests])
 	var privacy: Array = []
 	if blocked != BLOCKED_NONE:
 		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, "Blocked players", "", str(blocked) if blocked >= 0 else "")

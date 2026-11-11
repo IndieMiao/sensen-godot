@@ -26,6 +26,7 @@ static func cards_icon() -> Texture2D:
 ## a player past the gate walks in there too; only Play asks whether the table is open (P0Ui._play_blackjack).
 static func shown(o: Dictionary, view: Dictionary) -> bool:
 	if str(o.get("role", "")) != "casino": return true
+	if P0Build.store(): return false   # SGODOT-483: no card room in the store build (simulated gambling; the user D6)
 	var h = view.get("homestead", {})
 	return h is Dictionary and int(h.get("level", 1)) >= 2 and not P0Guide.guide_on(view)
 
