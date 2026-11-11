@@ -200,6 +200,12 @@ func test_the_pill_goes_when_the_room_it_shows_is_freed() -> void:
 	online.free()
 	ui.set_voice_room(null)   # the runtime's next frame, on the map
 	assert_bool(ui._voice_keys.visible).is_false()
+	ui.set_voice_room(null)   # every frame on the map after: still nothing
+	assert_bool(ui._voice_keys.visible).is_false()
+	var again: Array = _room()   # into a room again (不知火舞 on #992): the pill is back, with its count
+	ui.set_voice_room(again[0])
+	assert_bool(ui._voice_keys.visible).is_true()
+	assert_str(ui._voice_keys.people.text).is_equal("3")
 
 func test_no_room_no_keys() -> void:
 	var ui := await _ui()
