@@ -37,3 +37,12 @@ func test_the_card_grows_with_what_is_in_it_and_the_art_keeps_to_the_screen() ->
 	assert_float(s.card.size.y).is_greater(one + 8.0 + 30.0)   # the line wraps to two rows or more
 	assert_float((s.find_child("Backdrop", false, false) as Control).position.y).is_equal(roundf(330.0 * 900.0 / 800.0))
 	assert_float(s.card.position.y).is_equal(170.0)   # the card's top stays where the frame has it
+
+## The art is one to swap (the user 11-11: the first launch's art to change): `backdrop` takes another.
+func test_the_backdrop_can_be_swapped() -> void:
+	var s := _shell()
+	var art := s.find_child("Backdrop", false, false) as TextureRect
+	assert_object(art.texture).is_same(P0AccShell.BACKDROP)
+	var other := GradientTexture2D.new()
+	s.backdrop = other
+	assert_object(art.texture).is_same(other)

@@ -11,6 +11,8 @@ extends Control
 ## add_primary, or its own nodes into `col`. No HUD, no ✕: it takes every touch. A page made of it sits on its own
 ## layer before there is a world (tech plan §2.3: no viewport is read till it is in the tree).
 
+## The art under the card: the SYS screens' farm for now. The user (11-11, via 奕星) wants the first launch's art
+## changed (上官婉儿's proposal to come): a new one goes here, or a page sets `backdrop`; nothing else reads the file.
 const BACKDROP := P0SysScreen.BACKDROP
 const SIDE := 16.0
 const CARD_TOP := 170.0
@@ -23,6 +25,10 @@ const _FRAME_H := 800.0
 const _ART_TOP := 330.0    # as the SYS screens': the art at y 330 of the frame, cropped by the screen
 const _MARK_TOP := 84.0
 
+var backdrop: Texture2D = BACKDROP:
+	set(t):
+		backdrop = t
+		if _art: _art.texture = t
 var card: PanelContainer
 var col: VBoxContainer
 var mark: UiWordmark
@@ -40,7 +46,7 @@ func _init() -> void:
 	add_child(bg)
 	_art = TextureRect.new()
 	_art.name = "Backdrop"
-	_art.texture = BACKDROP
+	_art.texture = backdrop
 	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
