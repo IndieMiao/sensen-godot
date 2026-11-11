@@ -1,9 +1,9 @@
 extends GdUnitTestSuite
 ## q(256) / q(257) (SGODOT-367, 不知火舞 on 367 ec5f2daa): the fare to a city from view.travel.fares — the trip tier's,
 ## half (rounded up) on a return, free for Trip 1 (the 3 nearest cities) and where the player already is with a pass —
-## and MAP-5's rows: Distance, Energy and Coins (the fare, what the player has after the label; or Cost · Free), Fish
-## here, Visit, a running pass's Day Pass; Fly always lit, short of the fare its tap says so (q(318): coins first, the
-## fare with the 40 the wallet keeps).
+## and MAP-5's rows: Distance, Energy and Coins (the spend, `−30`; or Cost · Free), Fish here, Visit, a running pass's
+## Day Pass; Fly always lit, short of the fare its tap says so (q(318): coins first, the fare with the 40 the wallet
+## keeps).
 
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
 const P0Map := preload("res://scenes/p0/p0_map.gd")
@@ -65,9 +65,9 @@ func test_map_5_first_visit_rows() -> void:
 	var trip := int(P0Travel.trip(_view(), LA).trip)
 	var e := int(FARES.energy[trip - 1])
 	var c := int(FARES.coins[trip - 1])
-	assert_array((spec.facts as Array).map(func(f): return str(f[0]))).is_equal(["Distance", "Energy · You have 142", "Coins · You have 230", "Fish here", "Visit"])
-	assert_str(str(spec.facts[1][1])).is_equal(str(e))   # the fare only (q(318)): no `→ N left`
-	assert_str(str(spec.facts[2][1])).is_equal(str(c))
+	assert_array((spec.facts as Array).map(func(f): return str(f[0]))).is_equal(["Distance", "Energy", "Coins", "Fish here", "Visit"])
+	assert_str(str(spec.facts[1][1])).is_equal("−%d" % e)   # the spend (q(318) v4, U+2212): no `→ N left`, no `You have`
+	assert_str(str(spec.facts[2][1])).is_equal("−%d" % c)
 	assert_object(spec.facts[1][2]).is_same(P0Logic.icon("energy"))   # v3 (bot 746): their glyphs ahead of the labels
 	assert_object(spec.facts[2][2]).is_same(P0Logic.icon("coin"))
 	assert_int((spec.facts[0] as Array).size()).is_equal(2)   # no other row has one
@@ -81,7 +81,7 @@ func test_map_5_return_with_a_pass_and_no_online_or_local_time() -> void:
 	var spec := P0Map.travel_card(v, LA, {}, 0)
 	assert_str(str(spec.subtitle)).is_equal("United States")   # the local time before its preview, no `0 online`
 	var labels: Array = (spec.facts as Array).map(func(f): return str(f[0]))
-	assert_array(labels).is_equal(["Distance", "Energy · You have 142", "Coins · You have 230", "Fish here", "Visit", "Day Pass"])
+	assert_array(labels).is_equal(["Distance", "Energy", "Coins", "Fish here", "Visit", "Day Pass"])
 	assert_str(str(spec.facts[4][1])).is_equal("Return visit · half price")
 	assert_str(str(spec.facts[5][1])).is_equal("7h left")
 	# the pass ran out: no Day Pass row
@@ -97,21 +97,21 @@ func test_map_5_trip_1_is_one_cost_free_row() -> void:
 	assert_array((P0Map.travel_card(back, SALINAS, {}, 0).facts as Array).map(func(f): return str(f[0]))).is_equal(["Distance", "Cost", "Fish here", "Day Pass"])
 
 ## q(318) (李元芳 0.3.8: a return to Los Angeles with 60 coins read `60 → 0 left` beside a grey `Need 40 more coins`;
-## the user's bot 740 / 741): short of the fare or not, the card says the same — the fare on the right, what the player
-## has after the label — and Fly stays lit, no gap on it.
-func test_map_5_short_or_not_says_the_fare_and_what_the_player_has() -> void:
+## the user's bot 740 / 741 / 756): short of the fare or not, the card says the same — the spend, `−60` — and Fly stays
+## lit, no gap on it.
+func test_map_5_short_or_not_says_the_spend() -> void:
 	var trip := int(P0Travel.trip(_view(), LA).trip)
 	var half := ceili(int(FARES.coins[trip - 1]) / 2.0)
 	var back := {LA: {n = 1}}
 	var day_pass := {LA: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 23 * 3_600_000.0}}
 	for coins in [half, half + 20, half + 40]:
 		var spec := P0Map.travel_card(_view(back, day_pass, SF, coins), LA, {}, 0)
-		assert_array([spec.facts[1].slice(0, 2), spec.facts[2].slice(0, 2)]).is_equal([["Energy · You have 142", str(ceili(int(FARES.energy[trip - 1]) / 2.0))],
-			["Coins · You have %d" % coins, str(half)]])
+		assert_array([spec.facts[1].slice(0, 2), spec.facts[2].slice(0, 2)]).is_equal([["Energy", "−%d" % ceili(int(FARES.energy[trip - 1]) / 2.0)],
+			["Coins", "−%d" % half]])
 		assert_str(str(spec.primary)).is_equal("Fly")
 		assert_bool(spec.has("blocked")).is_false()
 	var tired := P0Map.travel_card(_view({}, {}, SF, 230, 10), LA, {}, 0)
-	assert_array(tired.facts[1].slice(0, 2)).is_equal(["Energy · You have 10", str(FARES.energy[trip - 1])])
+	assert_array(tired.facts[1].slice(0, 2)).is_equal(["Energy", "−%d" % FARES.energy[trip - 1]])
 	assert_bool(tired.has("blocked")).is_false()
 
 ## q(257) ① (FARE-BOARD 9:133836): the board's rows say each tier's first-visit fare on two lines, Trip 1 `Free`.

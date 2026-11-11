@@ -1207,8 +1207,7 @@ const FARES := {energy = [0, 10, 20, 30, 40, 50, 60], coins = [0, 20, 60, 120, 2
 
 ## q(318) (李元芳 0.3.8; the user's bot 740 / 741): Fly on the travel card is always lit. Short of the fare a tap keeps
 ## the card and says so in an Info toast 8 over the card's top edge, not over its rows (the coins first, the fare with
-## the 40 the wallet keeps, two lines at its ` · `), nothing sent; the card's `You have` follows the HUD while it is
-## open; with enough, the same tap flies.
+## the 40 the wallet keeps, two lines at its ` · `), nothing sent; with enough, the same tap flies.
 func test_fly_short_of_the_fare_stays_on_the_card_and_says_so() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -1227,9 +1226,9 @@ func test_fly_short_of_the_fare_stays_on_the_card_and_says_so() -> void:
 	var f: Dictionary = load("res://modules/p0/p0_travel.gd").fare(v, LA)
 	assert_int(int(f.coins)).is_equal(60)
 	var rows := {}
-	for r in m._travel_card.find_children("*", "UiFactRow", true, false): rows[str(r.label).get_slice(" · ", 0)] = [str(r.label), str(r.value)]
-	assert_array(rows.Coins).is_equal(["Coins · You have 60", "60"])
-	assert_array(rows.Energy).is_equal(["Energy · You have 200", str(f.energy)])
+	for r in m._travel_card.find_children("*", "UiFactRow", true, false): rows[str(r.label)] = [str(r.value), (r as UiFactRow).icon]
+	assert_array(rows.Coins).is_equal(["−60", P0Logic.icon("coin")])   # the spend, its glyph ahead of the label (v3 / v4)
+	assert_array(rows.Energy).is_equal(["−%d" % int(f.energy), P0Logic.icon("energy")])
 	var fly := m._travel_card.find_child("Primary", true, false) as UiCommandButton
 	assert_str(fly.label).is_equal("Fly")
 	assert_str(fly.reason).is_empty()   # lit: no gap on it
@@ -1251,15 +1250,11 @@ func test_fly_short_of_the_fare_stays_on_the_card_and_says_so() -> void:
 	rt.session.view = both
 	fly.activated.emit()
 	assert_str(rt.ui.toast_text()).is_equal("Need 60 coins\nkeep 40 after the trip")
-	# coins from elsewhere while it is open: `You have` follows, then the same tap flies
+	# coins from elsewhere while it is open: the same tap flies
 	var rich := v.duplicate(true)
 	rich.coins = 100
 	rt.session.view = rich
 	rt.ui.set_view(rich)
-	m.p0_frame(rich, 0.0)
-	var coins_row: UiFactRow = null
-	for r in m._travel_card.find_children("*", "UiFactRow", true, false): if str(r.label).begins_with("Coins"): coins_row = r
-	assert_str(coins_row.label).is_equal("Coins · You have 100")
 	rt.ui.clear_toast()
 	fly.activated.emit()
 	assert_str(rt.ui.toast_text()).is_empty()

@@ -107,10 +107,10 @@ func test_a_wild_travel_card_is_free_for_the_nearest_three_and_says_the_fare_els
 	var priced := VEIN.duplicate(true)
 	priced.cost = {"energy": 20, "coins": 60}
 	var card := P0Map.wild_travel_card(_view(), priced, 95.0)
-	assert_array(card.facts.map(func(f): return f.slice(0, 2))).is_equal([["Distance", "95 km"], ["Energy · You have 120", "20"], ["Coins · You have 300", "60"]])
+	assert_array(card.facts.map(func(f): return f.slice(0, 2))).is_equal([["Distance", "95 km"], ["Energy", "−20"], ["Coins", "−60"]])
 	assert_object(card.facts[2][2]).is_same(P0Logic.icon("coin"))
 	var poor := P0Map.wild_travel_card(_view({"coins": 80}), priced, 95.0)
-	assert_array(poor.facts[2].slice(0, 2)).is_equal(["Coins · You have 80", "60"])   # short or not, the fare (q(318))
+	assert_array(poor.facts[2].slice(0, 2)).is_equal(["Coins", "−60"])   # short or not, the spend (q(318) v4)
 	assert_str(str(poor.primary)).is_equal("Fly")
 	assert_bool(poor.has("blocked")).is_false()
 	assert_str(str(P0Travel.fare_gap(_view({"coins": 80}), poor.fare).text)).is_equal("Need 60 coins · keep 40 after the trip")   # Fly's tap

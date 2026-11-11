@@ -501,7 +501,7 @@ func _mine_go(id: String) -> void:
 			rt.enter_mine(id)
 
 ## C3 354:186011 (安其拉 d17dfb13): a wild site's travel card — its name, the mouth card's type line, Distance, Energy and
-## Coins (`Free` for the nearest three; else what the trip costs and what the player has, as a city's: cost_rows), Fly
+## Coins (`Free` for the nearest three; else what the trip costs, as a city's: cost_rows), Fly
 ## (always lit: a fare that cannot be paid is said on the tap, q(318)), `Return home is always free`. The fare is the
 ## viewport's `cost` (#706: fareOf's, what travel takes).
 static func wild_travel_card(view: Dictionary, site: Dictionary, km: float) -> Dictionary:
@@ -510,7 +510,7 @@ static func wild_travel_card(view: Dictionary, site: Dictionary, km: float) -> D
 	f["free"] = int(f.energy) == 0 and int(f.coins) == 0
 	var card := P0MaterialLogic.mine_card(view, site, false)
 	var facts: Array = [["Distance", P0PlaceSheet.distance_text(km)]]
-	facts.append_array(cost_rows(view, f))
+	facts.append_array(cost_rows(f))
 	return {"title": str(card.title), "subtitle": str(card.subtitle), "facts": facts, "primary": "Fly",
 		"footer": "Return home is always free", "fare": f, "toast_over_card": true}
 
@@ -522,7 +522,6 @@ func open_wild_travel(id: String) -> void:
 		if _fare_short(spec.fare): return
 		rt.ui.close_modal()
 		_fly_to_wild(id), Callable(), Callable(), "travel_card")
-	_find_have_rows()
 	# v4q(4) ⑥ 丁21: a travel card that costs Energy or coins teaches travel once (the guide holds it, P0Guide.tip_allowed)
 	if not bool(spec.fare.free): rt.ui.teach("travel")
 
@@ -1198,7 +1197,7 @@ static func local_time(view: Dictionary, offset) -> String:
 
 ## MAP-5 (q(257) ②, Figma 9:125580 / MAP-5-RETURN 243:176049 / MAP-5-SHORT 243:176287; 不知火舞 on 367 ec5f2daa), pure:
 ## the city, `United States · 08:12 local · 14 online` (the local time once its preview is in, the online part only when
-## some are), then Distance, Energy and Coins (what the trip costs and what the player has, cost_rows) — or `Cost ·
+## some are), then Distance, Energy and Coins (what the trip costs, cost_rows) — or `Cost ·
 ## Free` for a free trip (Trip 1, the 3 nearest cities) — Fish here, Visit (none on a free return), and on a return with a
 ## running pass `Day Pass · 7h left` (it is not renewed). Fly is always lit: short of the fare its tap says so (q(318),
 ## _fare_short). `view` is the projected view (its Energy now); `preview` the server's (its km and trip win), {} before
@@ -1213,7 +1212,7 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	parts.append("%d online" % online if online > 0 else "")
 	var facts: Array = [["Distance", "%s · Trip %d" % [P0PlaceSheet.distance_text(float(trip.get("km", 0))), int(trip.get("trip", 1))]]]
 	if bool(f.free): facts.append(["Cost", "Free"])
-	else: facts.append_array(cost_rows(view, f))
+	else: facts.append_array(cost_rows(f))
 	var regional := P0FishWorld.regional_fish(cluster).size()
 	var crucian := P0Logic.item_name(view, "fish_crucian")
 	facts.append(["Fish here", "%s + %d regional" % [crucian, regional] if regional > 0 else crucian])
@@ -1226,26 +1225,16 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 		"facts": facts, "primary": "Fly", "footer": "Return home is always free", "toast_over_card": true,
 	}
 
-## q(318) (the user's bot 740 / 741 / 746; 不知火舞's spec travel-cost-only-spec.md §1, v3): a travel card's Energy and
-## Coins rows — the Energy / coin glyph ahead of the label, what the trip costs on the right (`15`, `60`; no `→ N left`,
-## no gap), what the player has now after the label (`Energy · You have 200`: the HUD's numbers, kept up while the card
-## is open, _refresh_travel_card); `Free` for a row with nothing to pay (a wild site of the nearest three), no `You
-## have` there. [label, value, glyph] (P0PlaceSheet).
-static func cost_rows(view: Dictionary, f: Dictionary) -> Array:
+## q(318) (the user's bot 740 / 741 / 746 / 756; 不知火舞's spec travel-cost-only-spec.md v4): a travel card's Energy
+## and Coins rows — the Energy / coin glyph ahead of the label, the spend on the right as `−15` / `−60` (U+2212, as the
+## floats' `−30 Energy`; no `→ N left`, no gap, not what the player has: the HUD says that); `Free` for a row with
+## nothing to pay (a wild site of the nearest three). [label, value, glyph] (P0PlaceSheet).
+static func cost_rows(f: Dictionary) -> Array:
 	var rows: Array = []
 	for res in ["Energy", "Coins"]:
 		var cost := int(f.energy) if res == "Energy" else int(f.coins)
-		var glyph := P0Logic.icon("energy" if res == "Energy" else "coin")
-		rows.append([res, "Free", glyph] if cost == 0 else [have_label(res, have_of(view, res)), str(cost), glyph])
+		rows.append([res, "Free" if cost == 0 else "−%d" % cost, P0Logic.icon("energy" if res == "Energy" else "coin")])
 	return rows
-
-## What the player has of `res` (`Energy` / `Coins`) as the HUD says it: the Energy with any bonus over the cap, the wallet.
-static func have_of(view: Dictionary, res: String) -> int:
-	return int(view.get("energy", {}).get("value", 0)) if res == "Energy" else int(view.get("coins", 0))
-
-## `Energy · You have 200` / `Coins · You have 230` (q(318)): the label's part in the table is `You have %d`.
-static func have_label(res: String, n: int) -> String:
-	return "%s · You have %d" % [res, n]
 
 func open_travel(cluster: String, preview := {}) -> void:
 	var c := P0Clusters.get_cluster(cluster)
@@ -1265,12 +1254,10 @@ func open_travel(cluster: String, preview := {}) -> void:
 		if _fare_short(P0Travel.fare(rt.session.current(), cluster)): return
 		rt.ui.close_modal()
 		_take_off(cluster, int(P0Travel.trip(_view(), cluster).get("km", 0)) if not preview.has("km") else int(preview.km)), Callable(), Callable(), "travel_card")
-	_find_have_rows()
 	# v4q(4) ⑥ 丁21: a travel card that costs Energy or coins teaches travel once (the guide holds it, P0Guide.tip_allowed)
 	if not bool(P0Travel.fare(rt.session.current(), cluster).free): rt.ui.teach("travel")
 
 var _travel_card: Control   # the travel card open now (its holder): a city's or a wild site's
-var _have_rows: Array = []   # its Energy / Coins rows with a `You have` ([UiFactRow, "Energy" / "Coins"]), found once
 
 ## q(318): Fly with a fare the wallet or the Energy cannot pay — the card stays, an Info toast over its top edge says
 ## what the trip needs (P0Travel.fare_gap: the coins first; no Energy card); true when it said so.
@@ -1280,23 +1267,6 @@ func _fare_short(f: Dictionary) -> bool:
 	rt.ui.toast(str(gap.text), 0.0, true)   # two lines at its ` · `, English too (不知火舞: this sentence only)
 	return true
 
-## The travel card just opened (from the view now): its rows that say what the player has (cost_rows), for
-## _refresh_travel_card.
-func _find_have_rows() -> void:
-	_have_rows.clear()
-	if _travel_card == null: return
-	var v := rt.session.current()
-	for row in _travel_card.find_children("*", "UiFactRow", true, false):
-		for res in ["Energy", "Coins"]:
-			if (row as UiFactRow).label == have_label(res, have_of(v, res)): _have_rows.append([row, res])
-
-## q(318): the open travel card's `You have` follows the HUD (Energy coming back, coins from another device): only the
-## two labels, only when a number moved.
-func _refresh_travel_card(view: Dictionary) -> void:
-	if _have_rows.is_empty() or _travel_card == null or not is_instance_valid(_travel_card) or rt.ui.modal_kind != "travel_card": return
-	for r in _have_rows:
-		var text := have_label(str(r[1]), have_of(view, str(r[1])))
-		if (r[0] as UiFactRow).label != text: (r[0] as UiFactRow).label = text
 
 ## Fly (SGODOT-361, 不知火舞 on 361 9146d012; 299 v1 ⑤ and q(75) changed for this one place): the flight takes off as Fly
 ## is pressed and `travel` goes with it. q(147)'s fixed 3 s (SGODOT-299): up from where the camera is until the city left
@@ -2196,7 +2166,6 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map.home_key.visible != key_shown: city_map.home_key.visible = key_shown   # the home key with it
 	_place_nearby_key(key_shown)
 	_refresh_live_card()
-	_refresh_travel_card(view)
 	P0WildSites.remember(view)   # the site the player is at, with the view's own fields (contract C §5)
 	if P0WildSites.count() != _wild_count: _set_outpost_places()
 	var list := _marks_now(view)

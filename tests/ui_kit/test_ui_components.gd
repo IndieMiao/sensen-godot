@@ -443,7 +443,7 @@ func test_fact_and_cost_rows_use_their_value_styles() -> void:
 ## the row is as it was (the glyph hidden, the label from the row's left edge).
 func test_a_fact_row_leads_with_its_glyph_only_when_given_one() -> void:
 	var plain: UiFactRow = _host(UiFactRow.new("Distance", "95 km"))
-	var coins: UiFactRow = _host(UiFactRow.new("Coins · You have 80", "60"))
+	var coins: UiFactRow = _host(UiFactRow.new("Coins", "−60"))
 	coins.icon = P0Logic.icon("coin")
 	await _settle()
 	var glyph := coins.find_child("Icon", true, false) as TextureRect
