@@ -33,7 +33,9 @@ ROOT = Path(__file__).resolve().parents[3]
 DIRS = ['modules/p0', 'scenes/p0', 'scenes/ui_kit', 'modules/ui', 'scenes/map', 'modules/map',
         'scenes/fishing', 'modules/fishing', 'modules/ponds']
 LIT = re.compile(r'"((?:[^"\\]|\\.)*)"')
-SKIP_LINE = re.compile(r'^\s*(#|class_name|extends|const [A-Z_]+ := preload|signal |@export)')
+## … and the months (P0Logic.MONTHS): English date parts, never words of the table — under 中文 a date is written whole
+## (P0Logic.month_day), and a bare `Jun` there read a keeper the world names Jun as 「6 月」 (SGODOT-492).
+SKIP_LINE = re.compile(r'^\s*(#|class_name|extends|const [A-Z_]+ := preload|signal |@export|const MONTHS\b)')
 NOT_COPY = re.compile(r'res://|user://|\.(png|svg|glb|tscn|tres|gd|json|ogg|wav)$|^[A-Za-z_]+[:/][A-Za-z_]|^[a-z_0-9]+$|^%[a-z]$|^#|^[A-Z][A-Z0-9]*(_[A-Z0-9]+)+$')   # … an error code (FISHING_TIMING)
 SPEC = re.compile(r'%[+-]?\d*(?:\.\d+)?[dsf]')
 ## A template that is a key, a path, a header or a cache key, not a line (`%s:regional:%s:1`, `%s%s_%d.webp`,
@@ -122,8 +124,11 @@ def main() -> None:
         walk(data)
     table = ROOT / 'assets/localization/p0_zh_CN.json'
     done = json.loads(table.read_text(encoding='utf-8')) if table.exists() else {}
+    ctx_srcs = {k.rsplit('@', 1)[0] for k in done if '@' in k and not k.startswith('_')}
     for src, e in out.items():
-        if src in done: e["done"] = True
+        # … or by a key with a context (`Dawn@daypart`, `Orchard@family`: Localization.ctx reads them, the bare word left
+        # to the names the world makes, SGODOT-492)
+        if src in done or src in ctx_srcs: e["done"] = True
     dest = ROOT / 'tools/p0/i18n/p0_strings_en.json'
     dest.write_text(json.dumps(dict(sorted(out.items())), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     kinds = {k: sum(1 for e in out.values() if e["kind"] == k) for k in ("line", "template")}

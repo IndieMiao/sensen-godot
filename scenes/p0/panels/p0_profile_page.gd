@@ -29,7 +29,6 @@ signal voice_pressed
 const P0Titles := preload("res://modules/p0/p0_titles.gd")
 const SKILLS := ["farming", "fishing", "cooking"]
 const _SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
-const _MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 # PROFILE-1-P0 layout (WP1b, not exported as tokens yet; see UiTokens.PENDING "wp1b"):
 const _TOP := 38.0              # top bar y
 const _LOOK := Vector2(360, 210)  # outfit area under the top bar (y 84)
@@ -226,11 +225,10 @@ static func since_text(ms: float, now_ms := -1.0, bias_min := 999999) -> String:
 	var bias := bias_min if bias_min != 999999 else int(Time.get_time_zone_from_system().get("bias", 0))
 	var d := Time.get_datetime_dict_from_unix_time(int(ms / 1000.0) + bias * 60)
 	var now := Time.get_datetime_dict_from_unix_time(int((now_ms if now_ms >= 0.0 else Time.get_unix_time_from_system() * 1000.0) / 1000.0) + bias * 60)
-	if TranslationServer.get_locale() == "zh_CN":   # the language on screen, not the pick for the next start (#649 第二批 ③)
-		var zh := "%d 月 %d 日" % [int(d.month), int(d.day)]
-		return zh if int(d.year) == int(now.year) else "%d 年 %s" % [int(d.year), zh]
-	var text := "%s %d" % [_MONTHS[int(d.month) - 1], int(d.day)]
-	return text if int(d.year) == int(now.year) else "%s, %d" % [text, int(d.year)]
+	var text := P0Logic.month_day(int(d.month), int(d.day))
+	if int(d.year) == int(now.year): return text
+	# the language on screen, not the pick for the next start (#649 第二批 ③)
+	return "%d 年 %s" % [int(d.year), text] if TranslationServer.get_locale() == "zh_CN" else "%s, %d" % [text, int(d.year)]
 
 ## The earliest crop on the plots: `Radishes ready in 3h 32m` (as Today says it; int12), or the first thing to do there.
 static func _farm_status(view: Dictionary) -> String:

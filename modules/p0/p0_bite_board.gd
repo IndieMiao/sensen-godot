@@ -102,7 +102,9 @@ static func conditions(place: Dictionary) -> Array:
 	var time := str(place.get("time", ""))
 	var weather := str(place.get("weather", ""))
 	if time == "" or weather == "": return []
-	return [[str(TIME_ICON.get(time, "day")), time], [str(WEATHER_ICON.get(weather, "clear")), str(WEATHER_WORD.get(weather, weather))]]
+	# the time word by its daypart key (`Dawn@daypart` 清晨, not the bare Dawn a wild site is named by; SGODOT-492)
+	return [[str(TIME_ICON.get(time, "day")), Localization.ctx(time, "daypart")], [str(WEATHER_ICON.get(weather, "clear")),
+		str(WEATHER_WORD.get(weather, weather))]]
 
 ## A fish's condition tags (Details, the Bite Board's fish line): `Night ×2 · Rain ×1.5`, `Night only`; "" for an
 ## all-day, any-weather fish. `weather` set: only that weather's tag (the board writes today's only when it matches).

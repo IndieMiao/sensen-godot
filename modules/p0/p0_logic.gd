@@ -2616,16 +2616,22 @@ static func home_source(view: Dictionary, id: String) -> Dictionary:
 		"climates": return {"text": "Climates · Visit a city or wild site in another climate", "go": ""}
 	return need_source(view, id)
 
-## PLAQUE-READ (Figma 1510:97745): the Upgrade Plaque's lines, one per Homestead upgrade, "Lv2" / "Oct 5" in the
-## device's time zone. Empty until the first upgrade (the plaque appears in the yard with its first line).
+## A day of the month as the screen says it: `Oct 5`; under 中文 `10 月 5 日` (as the profile's since_text had it). The
+## months are English only, never words of the table: `Jun` there read a keeper the world names Jun as 「6 月」
+## (SGODOT-492, q(275) ⑤), and alone a month was never shown — a date went out whole, and stayed English under 中文.
 const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+static func month_day(month: int, day: int) -> String:
+	if TranslationServer.get_locale() == "zh_CN": return "%d 月 %d 日" % [month, day]
+	return "%s %d" % [MONTHS[clampi(month, 1, 12) - 1], day]
 
+## PLAQUE-READ (Figma 1510:97745): the Upgrade Plaque's lines, one per Homestead upgrade, "Lv2" / "Oct 5" (month_day) in
+## the device's time zone. Empty until the first upgrade (the plaque appears in the yard with its first line).
 static func plaque_lines(view: Dictionary, bias_min := 999999) -> Array:
 	var bias := bias_min if bias_min != 999999 else int(Time.get_time_zone_from_system().get("bias", 0))
 	var out: Array = []
 	for p in view.get("homestead", {}).get("plaque", []):
 		var d := Time.get_datetime_dict_from_unix_time(int(float(p.get("at", 0)) / 1000.0) + bias * 60)
-		out.append({"label": "Lv%d" % int(p.get("level", 1)), "value": "%s %d" % [MONTHS[int(d.month) - 1], int(d.day)]})
+		out.append({"label": "Lv%d" % int(p.get("level", 1)), "value": month_day(int(d.month), int(d.day))})
 	return out
 
 ## Yard v2 (v4q(12); 不知火舞's spec v1 一): the What changes row of the level that grows the yard — the next cap and the

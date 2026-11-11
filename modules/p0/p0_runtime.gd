@@ -1733,8 +1733,9 @@ static func back_at_text(iso: String, now := -1, bias_min := 100000) -> String:
 	var today := Time.get_datetime_dict_from_unix_time(t_now + shift)
 	var clock := "%02d:%02d" % [int(d.hour), int(d.minute)]
 	if [d.year, d.month, d.day] == [today.year, today.month, today.day]: return clock
-	const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-	return "%s %d, %s" % [MONTHS[int(d.month) - 1], int(d.day), clock]
+	# another day: `Oct 10, 14:30`; under 中文 `10 月 10 日 14:30` (P0Logic.month_day; it stayed English, SGODOT-492)
+	var day := P0Logic.month_day(int(d.month), int(d.day))
+	return ("%s %s" if TranslationServer.get_locale() == "zh_CN" else "%s, %s") % [day, clock]
 
 ## Desktop shots of the Inbox (234): a made-up inbox over the current view, as the INBOX-PARCELS / PARCEL-3 /
 ## PARCEL-5 frames show it (the next server answer replaces it).
