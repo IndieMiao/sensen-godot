@@ -1387,8 +1387,7 @@ func _net_failed(msg: String, cmd := {}) -> void:
 func _net_ok() -> void:
 	_net_fails = 0
 	_end_resume()
-	if _landing_pending(): _arrive_answered = true   # q(311) ④: the cover waits for the room's first `joined` too
-	else: _end_arrival()
+	_end_arrival()
 	_unblock()
 	_end_launch()
 	if ui.offline:
@@ -1416,12 +1415,6 @@ var _resume_ms := -1          # a state read on return to the foreground is in f
 const ARRIVE_FAIL_S := 20.0
 var _arrive := {}
 var _arrive_s := -1.0
-## The trip's read has answered while the world still waited for its room to say where the player stands (q(311) ④).
-var _arrive_answered := false
-
-## Whether the world waits to stand the player where its room put them (P0Landing.pending, at most 1.5 s).
-func _landing_pending() -> bool:
-	return world != null and world.has_method("p0_landing_pending") and bool(world.call("p0_landing_pending"))
 
 ## The first session's launch cover (SYS-LOADING, from p0_boot): the wordmark over the farm backdrop until the first
 ## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer
@@ -1452,7 +1445,6 @@ func _tick_screens(dt: float) -> void:
 		if _maint_left <= 0.0:
 			_maint_left = MAINT_CHECK_S
 			if not session.busy: session.refresh()
-	if _arrive_s >= 0.0 and _arrive_answered and not _landing_pending(): _end_arrival()   # landed, or 1.5 s gone
 	if _arrive_s >= 0.0:
 		_arrive_s += dt
 		# Shown once the trip has taken MOTION_PENDING_DELAY_MS since it started: right away when AppRouter's cover
@@ -1631,7 +1623,6 @@ func _on_blocked(code: String, detail: Dictionary) -> void:
 	_end_resume()
 	_arrive = {}   # SYS-MAINT / SYS-UPDATE take over from getting there (q(78))
 	_arrive_s = -1.0
-	_arrive_answered = false
 	_blocked = code
 	_hold_rooms(true)
 	if code == "update_required":
@@ -1679,13 +1670,11 @@ func _begin_arrival(w: Node) -> void:
 		_end_arrival()
 		return
 	_arrive_s = 0.0
-	_arrive_answered = false
 
 func _end_arrival() -> void:
 	var had := not _arrive.is_empty()
 	_arrive = {}
 	_arrive_s = -1.0
-	_arrive_answered = false
 	# the covers go whatever is left of the trip: Go back on a Couldn't get there whose trip was already dropped must
 	# still close it (SGODOT-382: it stayed up over the map, Back and Go back dead)
 	ui.hide_screen([P0SysScreen.Kind.SCENE, P0SysScreen.Kind.PLACE_FAIL])
