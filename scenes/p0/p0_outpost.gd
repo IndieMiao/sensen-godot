@@ -263,9 +263,8 @@ func _on_joined(info: Dictionary) -> void:
 		w.y = floor_y
 		if bp.is_walkable(bp.world_to_cell(w)):
 			var facing := actor.facing()
-			actor.teleport(w)
-			actor.face(w + facing)
-			frame_all()
+			actor.teleport(w)   # the opening's framing stays (q(311) ④: the first screen as it was; 不知火舞 on #988 ⑥ —
+			actor.face(w + facing)   # framing again on the landed player pulled the post's door and spawn off its left edge)
 	var said := P0Online.layer_notice(info)
 	if said != "" and rt: rt.ui.toast(said, 0.0, true)   # Layer 1 is full / you're in Layer 2 (不知火舞 on #646)
 	if seat != "": _stand_up()   # a new connection starts standing

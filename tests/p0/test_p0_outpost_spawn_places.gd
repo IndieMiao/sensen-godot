@@ -61,9 +61,12 @@ func test_the_first_joined_lands_the_player_in_room_metres() -> void:
 	r.landing.begin(o, places, r.to_room(r.actor.position))
 	assert_bool(r.p0_landing_pending()).is_true()
 	var pick: Vector2 = places[1]
+	var framed: Vector3 = r.cam.global_position
 	o._message(JSON.stringify({"t": "joined", "outpost": "sh_market_1", "room": 1, "capacity": 30, "rejoined": false,
 		"self": 2, "epoch": 4, "spawn": [pick.x, pick.y]}))
 	var now := r.to_room(r.actor.position)
 	assert_float(Vector2(now.x - pick.x, now.z - pick.y).length()).is_less(0.01)
 	assert_bool(r.p0_landing_pending()).is_false()
 	assert_float(r.actor.position.y).is_equal_approx(r.floor_y, 0.001)
+	for i in 3: r._update_camera()   # the frames after: the opening's framing held (q(311) ④), not framed on them again
+	assert_vector(r.cam.global_position).is_equal_approx(framed, Vector3.ONE * 0.001)
