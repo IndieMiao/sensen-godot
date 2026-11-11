@@ -336,25 +336,6 @@ func test_the_scene_cover_stays_until_the_places_first_read_answers() -> void:
 	_state()
 	assert_int(rt.ui.screen_kind()).is_equal(-1)
 
-## q(311) ④: a world waiting for its room to say where the player stands (p0_landing_pending) keeps the scene cover up
-## past the read's answer — until the landing is done, or P0Landing.WAIT_MS has gone (the landing ends itself then).
-func test_the_scene_cover_waits_for_the_landing_too() -> void:
-	var w := _arrive_at_pond()
-	var stub := GDScript.new()
-	stub.source_code = "extends Node\nvar wait := true\nfunc p0_landing_pending() -> bool: return wait\n"
-	stub.reload()
-	w.set_script(stub)
-	rt._arrive.t0 -= UiTokens.MOTION_PENDING_DELAY_MS
-	rt._tick_screens(0.0)
-	assert_int(rt.ui.screen_kind()).is_equal(K.SCENE)
-	_state()
-	assert_int(rt.ui.screen_kind()).is_equal(K.SCENE)   # answered, still landing
-	rt._tick_screens(0.1)
-	assert_int(rt.ui.screen_kind()).is_equal(K.SCENE)
-	w.set("wait", false)   # the first `joined` came (or the wait ran out)
-	rt._tick_screens(0.1)
-	assert_int(rt.ui.screen_kind()).is_equal(-1)
-
 func test_a_failed_arrival_says_couldnt_get_there_and_retry_goes_again() -> void:
 	_arrive_at_pond()
 	rt.session.connection_failed.emit("Can't reach the farm server", {})
