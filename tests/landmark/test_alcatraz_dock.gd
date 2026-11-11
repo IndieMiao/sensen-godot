@@ -70,6 +70,9 @@ func test_the_dock_still_leads_everywhere() -> void:
 	for goal in [_v(scene.layout.exit), Vector3(-22.4, 1, 12.1), _v(scene.layout.walk_goals[-1])]:
 		var p: PackedVector3Array = scene.find_path(SPAWN, goal)
 		assert_bool(not p.is_empty() and p[-1].distance_to(goal) < 0.6).override_failure_message("to %s" % goal).is_true()
+	# the way between the two planters to the stairs: 1.25 m of navigation across (planter_001 0.4 m east, 上官婉儿 on #985)
+	for x in [-22.65, -22.1, -21.6]:
+		assert_bool(_on_nav(scene, x, 12.5)).override_failure_message("the way off the dock at x %s" % x).is_true()
 	for at in Q311:
 		assert_bool(_on_nav(scene, at.x, at.y)).override_failure_message("q(311) place %s" % at).is_true()
 
@@ -127,6 +130,25 @@ func test_the_stick_stops_at_the_props() -> void:
 		var at: Vector3 = scene.player_position()
 		assert_bool(solid.grow(0.2).has_point(Vector2(at.x, at.z))).override_failure_message("into %s at %s" % [solid, at]).is_false()
 		scene.step_stick(Vector2.ZERO, 1.0 / 30.0)
+
+## The stick from where the player lands, held up the dock (north): through the way between the planters and onto the
+## west flight to the first terrace, not stopped at the dock's end (周瑜's probe on #985, kept).
+func test_the_stick_goes_off_the_dock() -> void:
+	var scene := await _alcatraz()
+	var cam: Camera3D = scene._camera
+	var right := Vector3(cam.global_basis.x.x, 0, cam.global_basis.x.z).normalized()
+	var ahead := Vector3(-cam.global_basis.z.x, 0, -cam.global_basis.z.z).normalized()
+	scene._player.position = NavigationServer3D.map_get_closest_point(scene._nav_map, SPAWN)
+	var way := Vector3(-0.03, 0, -1).normalized()
+	var stick := Vector2(way.dot(right), -way.dot(ahead))
+	for frame in 300:   # 10 s at 30 fps
+		scene.step_stick(stick, 1.0 / 30.0)
+		if scene.player_position().y > 2.0: break
+	var at: Vector3 = scene.player_position()
+	print("ALC stick off the dock to ", at)
+	assert_float(at.z).override_failure_message("stopped at %s" % at).is_less(11.5)
+	assert_float(at.y).override_failure_message("stopped at %s" % at).is_greater(2.0)
+	scene.step_stick(Vector2.ZERO, 1.0 / 30.0)
 
 func _alcatraz() -> Node3D:
 	var viewport := SubViewport.new()
