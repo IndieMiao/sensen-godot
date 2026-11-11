@@ -47,6 +47,7 @@ func test_the_first_joined_lands_the_player_and_a_later_one_does_not() -> void:
 	var visit: P0LandmarkVisit = scene.p0_visit
 	var places: Array = visit.places(scene.player_position())
 	assert_int(places.size()).is_greater(1)
+	visit.landing = P0Landing.new()   # the visit's own ran out (no server here): a fresh one, as on a visit that connects
 	visit.landing.begin(visit.online, places, scene.player_position())
 	visit.online._visit_joined = false
 	var sent := []
@@ -72,6 +73,7 @@ func test_a_player_who_walked_is_not_landed() -> void:
 	var visit: P0LandmarkVisit = scene.p0_visit
 	var places: Array = visit.places(scene.player_position())
 	var start: Vector3 = scene.player_position()
+	visit.landing = P0Landing.new()
 	visit.landing.begin(visit.online, places, start)
 	scene.dev_stand(start + Vector3(0.4, 0, 0.4))
 	var walked: Vector3 = scene.player_position()

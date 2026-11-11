@@ -1025,7 +1025,7 @@ func _go_online(session: P0Session) -> void:
 	await _points_in(session)
 	if not is_inside_tree(): return
 	var at := actor.position
-	var mine := places(at)
+	var mine: Array[Vector2] = [Vector2(at.x, at.z)] if landing.ended() else places(at)   # the cover went: no jump
 	online.start(room_id(), Vector2(at.x, at.z), mine)
 	landing.begin(o, mine, at)   # after start: its room's name, and the socket opens a frame or more later
 

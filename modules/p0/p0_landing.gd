@@ -24,6 +24,7 @@ var _until := -1   # Time.get_ticks_msec() the wait ends at; -1 none
 var _t0 := 0       # when the places went out (or were expected)
 var _from := Vector3.INF
 var _frame0 := 0   # Engine.get_process_frames() the current wait began at
+var _ended := false   # a wait of this visit ran out (or was ended): no later one (the cover is gone, they would jump)
 
 ## A world that works its places out once its first read is in (a pond: the day's gathering points and trees) or its
 ## ground is in (a landmark's navigation) expects the join: the cover waits for it too, EXPECT_MS at most, until begin.
@@ -33,14 +34,20 @@ func expect() -> void:
 	_until = _t0 + EXPECT_MS
 	_frame0 = Engine.get_process_frames()
 
+## Whether this visit's wait is over already (expect ran out before the places were ready, 周瑜 on #988): the world then
+## sends the spawn alone — a pick landed after the cover went would be a jump.
+func ended() -> bool:
+	if _until >= 0: pending()   # an expect past its time ends here
+	return _ended
+
 ## The visit's join is going out with `places` while the player stands at `at` (world): a wait when there is anywhere
-## but the spawn to go.
+## but the spawn to go, and no wait of the visit ran out before.
 func begin(o: P0Online, places: Array[Vector2], at: Vector3) -> void:
 	online = o
 	room = o.outpost
 	_from = at
 	_t0 = Time.get_ticks_msec()
-	_until = _t0 + CONNECT_MS if places.size() > 1 else -1
+	_until = _t0 + CONNECT_MS if places.size() > 1 and not _ended else -1
 	_frame0 = Engine.get_process_frames()
 	print("P0 q311 %s: %d place%s%s" % [room, places.size(), "" if places.size() == 1 else "s", ", waiting" if places.size() > 1 else ""])
 	if places.size() > 1 and not o.connection_changed.is_connected(_on_connection):
@@ -73,6 +80,7 @@ func pending() -> bool:
 ## No more waiting: the player stays where they are, and no later join of the visit sends places.
 func over() -> void:
 	_until = -1
+	_ended = true
 	if online: online.forget_spawns()
 
 ## On a `joined`: where to stand the player now standing at `now` (room coordinates as the server's, the height kept),

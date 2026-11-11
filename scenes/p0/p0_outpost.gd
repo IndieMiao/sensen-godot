@@ -109,7 +109,7 @@ func _go_online(session: P0Session) -> void:
 	var at := P0RoomAnchors.vec(door.get("position", [0, 0, 0]))
 	await get_tree().process_frame   # frame_all: the opening's camera; the art's bodies in the physics space
 	if not is_inside_tree(): return
-	var mine := places(at)
+	var mine: Array[Vector2] = [Vector2(at.x, at.z)] if landing.ended() else places(at)   # the cover went: no jump
 	online.start(str(outpost.id), Vector2(at.x, at.z), mine)
 	landing.begin(o, mine, to_room(actor.position))   # after start: its room's name; the socket opens later
 

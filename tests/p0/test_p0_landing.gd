@@ -84,3 +84,17 @@ func test_online_says_unreachable_when_the_socket_closes_unopened() -> void:
 	assert_int(said[0]).is_greater(0)
 	o.stop()
 
+## An expect that ran out before the places were ready (周瑜 on #988): the cover is gone, so the visit's places are the
+## spawn alone and no new wait opens — a landing then would be a jump in sight.
+func test_after_an_expect_ran_out_no_new_wait_opens() -> void:
+	var l := P0Landing.new()
+	l.expect()
+	assert_bool(l.ended()).is_false()
+	l._until = Time.get_ticks_msec() - 1
+	l._frame0 -= P0Landing.MIN_FRAMES
+	assert_bool(l.ended()).is_true()   # ran out
+	var places: Array[Vector2] = [Vector2(0, 0), Vector2(0.75, 0)]
+	l.begin(_online(), places, Vector3.ZERO)
+	assert_bool(l.pending()).is_false()
+	assert_vector(l.target({"first": true, "spawn": [0.75, 0.0]}, Vector3.ZERO)).is_equal(Vector3.INF)
+

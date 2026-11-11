@@ -115,7 +115,7 @@ func _go_online() -> void:
 	if _leaving or not scene.is_inside_tree(): return
 	var at: Vector3 = scene.call("player_position")
 	var why := {}
-	var mine := places(at, why)
+	var mine: Array[Vector2] = [Vector2(at.x, at.z)] if landing.ended() else places(at, why)   # the cover went: no jump
 	if mine.size() < 3 and not why.is_empty():   # few: why, for the log
 		var counts := {}
 		for r in why.values():
