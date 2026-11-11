@@ -79,6 +79,7 @@ func _room_ready() -> void:
 	# a server without the card room (no view.blackjack, 0.2.12 ahead of it) has no room for it either: offline there
 	if use_runtime and not outpost.is_empty() and not (str(outpost.get("role", "")) == "casino"
 			and not P0Runtime.ensure().session.view.has("blackjack")):
+		landing.expect()   # q(311): the cover waits for the room's pick (the places need the opening's camera first)
 		_go_online(P0Runtime.ensure().session)
 
 func _exit_tree() -> void:
@@ -106,7 +107,77 @@ func _go_online(session: P0Session) -> void:
 	o.joined.connect(func(_i): if voice_room.here and not voice_room.available: voice_room.fetch_status(), CONNECT_ONE_SHOT)
 	var door := anchor_data("spawn")
 	var at := P0RoomAnchors.vec(door.get("position", [0, 0, 0]))
-	online.start(str(outpost.id), Vector2(at.x, at.z))
+	await get_tree().process_frame   # frame_all: the opening's camera; the art's bodies in the physics space
+	if not is_inside_tree(): return
+	var mine := places(at)
+	landing.begin(o, mine, to_room(actor.position))
+	online.start(str(outpost.id), Vector2(at.x, at.z), mine)
+
+# ---------------------------------------------------------------- q(311): where a newcomer stands (SGODOT-470)
+## The visit's landing on the room's pick (P0Landing; the arrival cover waits for it, P0Runtime).
+var landing := P0Landing.new()
+func p0_landing_pending() -> bool: return landing.pending()
+## Off a seat by this much (the server's free radius: a person on it would be on this one).
+const SEAT_CLEAR_M := 0.45
+## The door's strip as wide as it opens, either way from its icon (`Map`; P0LandmarkVisit.MAP_STRIP_W).
+const DOOR_STRIP_W := 76.0
+## Heights a person is looked at from the camera for furniture in the way: the legs, the middle, the head.
+const SEEN_AT_M: Array[float] = [0.3, 0.9, 1.55]
+
+## Where the player may stand on coming in, in room metres, the spawn anchor `at` first (P0SpawnRing, round where the
+## player stands): reachable on the floor, out of the door's reach, off the seats, not behind a keeper or a resident,
+## seen whole past the furniture (a ray from the camera to the legs, the middle and the head; the room's unseen walls
+## let through), and on the opening's screen 8 px from the door's key (its strip within CARD_NEAR_M of
+## the door, either way), the facilities' and the seats' keys — their icons' touch areas (q(311) ②; LOCK-34 v2).
+func places(at: Vector3, why := {}) -> Array[Vector2]:
+	var view: Dictionary = P0Runtime.ensure().session.current() if use_runtime else {}
+	var exit := anchor("exit")
+	var seats: Array = []
+	for n in _anchors.keys(): if str(n).begins_with("seat_") and anchor(n) != null: seats.append(anchor(n).global_position)
+	var people: Array = npcs.values().map(func(e): return (e.root as Node3D).global_position)
+	var keys: Array = []   # [anchor name, screen point, kind]
+	for n in _tappable():
+		var m := _marker(n, view)
+		if m.is_empty() or not str(m.get("kind", "")) in ["seat", "facility"]: continue
+		var badge := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))
+		keys.append([n, cam.unproject_position(badge.global_position if badge else anchor(n).global_position + _hit_lift(n) * 1.1)])
+	var space := get_world_3d().direct_space_state
+	var walls: Array = (layout.get("boundaries", []) as Array).map(func(b): return StringName(str(b.get("name", ""))))   # unseen
+	var ok := func(p: Vector3) -> bool:
+		var w := Vector3(p.x, floor_y, p.z)
+		var c := bp.world_to_cell(w)
+		if not bp.in_bounds(c) or not bp.is_walkable(c): return _no(why, p, "floor")
+		if bp.world_to_cell(reachable(w)) != c: return _no(why, p, "walled in")   # walled in (a counter's inside): not from the door
+		if exit and _flat(w, exit.global_position) <= EXIT_RADIUS_M: return _no(why, p, "door")
+		for s in seats: if _flat(w, s) < SEAT_CLEAR_M: return _no(why, p, "seat")
+		if P0RoomNav.hidden(w, people, _cam_dir): return _no(why, p, "behind someone")
+		for h in SEEN_AT_M:
+			var to := w + Vector3.UP * h
+			var ray := PhysicsRayQueryParameters3D.create(to + _cam_dir * 30.0, to, ~CALIB_LAYER)
+			for i in 8:   # through the room's unseen walls (layout `boundaries`), stopped by what is drawn
+				var hit := space.intersect_ray(ray)
+				if hit.is_empty(): break
+				if not (hit.collider as Node).name in walls: return _no(why, p, "hidden by " + str((hit.collider as Node).get_parent().name))
+				ray.exclude = ray.exclude + [hit.rid]
+		if not P0SpawnRing.clear_of(cam, w, []): return _no(why, p, "off screen")
+		for k in keys:
+			var half := UiTokens.SIZE_TOUCH * 0.5
+			var wide: float = DOOR_STRIP_W - 16.0 if k[0] == "exit" and exit and _flat(w, exit.global_position) <= CARD_NEAR_M else half
+			if not P0SpawnRing.clear_of(cam, w, [Rect2(k[1].x - wide, k[1].y - half, wide * 2.0, half * 2.0)]): return _no(why, p, "key " + str(k[0]))
+		return true
+	var axes := P0SpawnRing.axes(cam)
+	var out: Array[Vector2] = [Vector2(at.x, at.z)]
+	for p in P0SpawnRing.places(actor.position, axes[0], axes[1], ok).slice(1):
+		var r := to_room(Vector3(p.x, floor_y, p.y))
+		out.append(Vector2(r.x, r.z))
+	return out
+
+static func _flat(a: Vector3, b: Vector3) -> float: return Vector2(a.x - b.x, a.z - b.z).length()
+
+## A place left out, and why (tests, the review's table): false.
+static func _no(why: Dictionary, p: Vector3, reason: String) -> bool:
+	why[Vector2(snappedf(p.x, 0.01), snappedf(p.z, 0.01))] = reason
+	return false
 
 ## 不知火舞 on #895 (SGODOT-218): the market plaza opens framed on its own, as the pond does — the player's feet at this row
 ## of the 800 px frame, so the stalls, Mei's counter and the row houses' ground floor show above under the HUD (its 16 m
@@ -154,6 +225,15 @@ func _on_online_failed(code: String) -> void:
 
 ## Layer 2 and later say so once; Layer 1 and a reconnect to the same layer say nothing (P0Online.layer_notice).
 func _on_joined(info: Dictionary) -> void:
+	var to := landing.target(info, to_room(actor.position))   # the visit's first: onto the room's pick (q(311) ④)
+	if to != Vector3.INF:
+		var w := room.position + Vector3(to.x, 0, to.z)
+		w.y = floor_y
+		if bp.is_walkable(bp.world_to_cell(w)):
+			var facing := actor.facing()
+			actor.teleport(w)
+			actor.face(w + facing)
+			frame_all()
 	var said := P0Online.layer_notice(info)
 	if said != "" and rt: rt.ui.toast(said, 0.0, true)   # Layer 1 is full / you're in Layer 2 (不知火舞 on #646)
 	if seat != "": _stand_up()   # a new connection starts standing
