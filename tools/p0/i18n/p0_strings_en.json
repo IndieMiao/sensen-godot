@@ -4542,7 +4542,7 @@
  },
  "Decor %d · Yard +%d spaces": {
   "where": [
-   "modules/p0/p0_logic.gd:2641"
+   "modules/p0/p0_logic.gd:2640"
   ],
   "kind": "template",
   "done": true
@@ -7159,8 +7159,8 @@
    "modules/p0/p0_gear_logic.gd:45",
    "modules/p0/p0_logic.gd:2510",
    "modules/p0/p0_logic.gd:2520",
-   "modules/p0/p0_logic.gd:2668",
-   "modules/p0/p0_logic.gd:2690"
+   "modules/p0/p0_logic.gd:2667",
+   "modules/p0/p0_logic.gd:2689"
   ],
   "kind": "template",
   "done": true
@@ -8191,7 +8191,7 @@
    "modules/p0/p0_kitchen_logic.gd:164",
    "modules/p0/p0_kitchen_logic.gd:218",
    "modules/p0/p0_kitchen_logic.gd:233",
-   "modules/p0/p0_logic.gd:2635"
+   "modules/p0/p0_logic.gd:2634"
   ],
   "kind": "template"
  },
@@ -8478,7 +8478,7 @@
  },
  "Max Energy %d": {
   "where": [
-   "modules/p0/p0_logic.gd:2690"
+   "modules/p0/p0_logic.gd:2689"
   ],
   "kind": "template",
   "done": true
@@ -8486,7 +8486,7 @@
  "Max Energy %d · Meals %d a day": {
   "where": [
    "modules/p0/p0_logic.gd:2549",
-   "modules/p0/p0_logic.gd:2666"
+   "modules/p0/p0_logic.gd:2665"
   ],
   "kind": "template",
   "done": true
@@ -10586,7 +10586,7 @@
  "Plots %d": {
   "where": [
    "modules/p0/p0_logic.gd:2553",
-   "modules/p0/p0_logic.gd:2667"
+   "modules/p0/p0_logic.gd:2666"
   ],
   "kind": "template",
   "done": true
@@ -12618,7 +12618,7 @@
  },
  "Spice Rack · seasonings off your bag": {
   "where": [
-   "modules/p0/p0_logic.gd:2682"
+   "modules/p0/p0_logic.gd:2681"
   ],
   "kind": "line",
   "done": true
@@ -14920,7 +14920,7 @@
  "Warming Cabinet": {
   "where": [
    "modules/p0/p0_logic.gd:2560",
-   "modules/p0/p0_logic.gd:2683",
+   "modules/p0/p0_logic.gd:2682",
    "scenes/p0/kitchen/p0_storage_sheet.gd:90",
    "scenes/p0/rooms/p0_farmhouse.gd:472"
   ],
@@ -15946,7 +15946,7 @@
    "modules/p0/p0_logic.gd:2550",
    "modules/p0/p0_logic.gd:2553",
    "modules/p0/p0_logic.gd:2563",
-   "modules/p0/p0_logic.gd:2648"
+   "modules/p0/p0_logic.gd:2647"
   ],
   "kind": "template",
   "done": true
