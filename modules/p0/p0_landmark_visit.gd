@@ -105,15 +105,29 @@ func _go_online() -> void:
 	voice_room.setup(session, o, "landmark")
 	scene.set("voice_room", voice_room)
 	o.joined.connect(func(_i): if voice_room.age == "unknown" and not voice_room.available: voice_room.fetch_status(), CONNECT_ONE_SHOT)
-	# the places need the ground: on a slow first load (gs66) it may come in after the step off's wait (NAV_WAIT_MS)
+	# the places need the ground — the player's own zone's too, which joins the navigation a sync or two after it reads
+	# ready (gs66 11-11: a quicker load went out with the spawn alone, every ring place "off the ground"): up to NAV_WAIT_MS
 	var t0 := Time.get_ticks_msec()
-	while not bool(scene.call("navigation_ready")) and Time.get_ticks_msec() - t0 < NAV_WAIT_MS and scene.is_inside_tree():
+	while not _on_own_ground() and Time.get_ticks_msec() - t0 < NAV_WAIT_MS and scene.is_inside_tree():
 		await scene.get_tree().physics_frame
 	if _leaving or not scene.is_inside_tree(): return
 	var at: Vector3 = scene.call("player_position")
-	var mine := places(at)
+	var why := {}
+	var mine := places(at, why)
+	if mine.size() < 3 and not why.is_empty():   # few: why, for the log
+		var counts := {}
+		for r in why.values():
+			var k := str(r).get_slice(" hidden by", 0)
+			counts[k] = int(counts.get(k, 0)) + 1
+		print("P0 q311 %s: left out %s" % [room_id(), counts])
 	o.start(room_id(), Vector2(at.x, at.z), mine)
 	landing.begin(o, mine, at)   # after start: its room's name, and the socket opens a frame or more later
+
+## Whether the navigation is in under the player (their zone's region joined, not just the map ready).
+func _on_own_ground() -> bool:
+	if not bool(scene.call("navigation_ready")): return false
+	var nav: RID = scene.call("nav_map")
+	return nav.is_valid() and _on_nav(nav, scene.call("player_position")) != Vector3.INF
 
 ## How long the places wait for the ground before going out with the spawn alone (P0Landing.EXPECT_MS covers it).
 const NAV_WAIT_MS := 3000
