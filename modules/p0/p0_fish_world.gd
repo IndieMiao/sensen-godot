@@ -95,4 +95,5 @@ static func now_line(place: Dictionary) -> String:
 	var part := str(place.get("daypart", ""))
 	var weather := str(place.get("weather", ""))
 	if part == "" or weather == "": return ""
-	return "%s · %s" % [DAYPART_NAMES.get(part, part), WEATHER_NAMES.get(weather, weather)]
+	# the daypart by its own key (`Dawn@daypart` 清晨): a wild site the world names Dawn keeps its word (SGODOT-492)
+	return "%s · %s" % [Localization.ctx(str(DAYPART_NAMES.get(part, part)), "daypart"), WEATHER_NAMES.get(weather, weather)]

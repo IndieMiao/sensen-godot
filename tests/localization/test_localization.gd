@@ -776,7 +776,8 @@ func test_p0_the_spice_rack_and_mix_toasts_break_at_their_dot_in_chinese_only() 
 	assert_str(zh[1]).is_equal("放 1–3 样食材\n新搭配可能做出黑暗料理")
 
 ## SGODOT-469 (李白 b, q(275) ⑤): a generated place (world.ts named(): `<word> <kind>`) keeps its word and translates its
-## kind — every word of the pools by every kind, the word as it was (Orchard by keys of its own: alone it is 果园); a
+## kind — every word of the pools by every kind, the word as it was (Orchard alone too, the short name a pin and a sign
+## show — SGODOT-492: the crop family's 果园 is `Orchard@family`, no word of the table is a word of the pools); a
 ## satellite town by its Chinese name where it has one; the lines it ends, whole (`Deliver at %s` though its words are
 ## fewer than `%s Market Square`'s); the kind's other lines as they were.
 func test_p0_generated_place_names_translate_only_their_kind() -> void:
@@ -795,7 +796,7 @@ func test_p0_generated_place_names_translate_only_their_kind() -> void:
 		assert_str(kind_zh).is_not_empty()
 		for word in words:
 			assert_str(zh.call("%s %s" % [word, kind])).is_equal("%s %s" % [word, kind_zh])
-	assert_str(zh.call("Orchard")).is_equal("果园")
+	assert_str(zh.call("Orchard")).is_empty()   # the short name: English as it is (SGODOT-492)
 	assert_str(zh.call("Brighton Market Square")).is_equal("布莱顿集市广场")   # a town with a Chinese name (no space beside Chinese, SGODOT-476)
 	assert_str(zh.call("Oakland Travel Post")).is_equal("Oakland 驿站")
 	assert_str(zh.call("Union Square Travel Post")).is_equal("联合广场驿站")   # its own key, as before
@@ -808,6 +809,62 @@ func test_p0_generated_place_names_translate_only_their_kind() -> void:
 	assert_str(zh.call("12 coins at Tackle Shop")).is_equal("渔具铺售价 12 金币")
 	assert_str(zh.call("Fishing Lv3 · Tackle Shop")).is_equal("钓鱼 Lv3 · 渔具铺")
 	TranslationServer.remove_translation(t)
+
+## SGODOT-492 (李元芳's 0.3.8 shots; q(275) ⑤ names stay English): a name the world makes — a keeper (keeper_names), a
+## place's word (tea_words, ponds.words), a wild site's (wild.words) — is no word of the table, or the line it is in reads
+## it as one: the Harbor market's keeper Jun was 「6 月」 on her plate, card and stall, an Orchard tea house's pin and sign
+## 「果园」, a wild Dawn 「清晨」. The words the game itself means go by keys with a context (`Orchard@family` the crop
+## family, `Dawn@daypart`), and a date is written whole (P0Logic.month_day), the months no words of the table at all.
+## A name written by hand that the table has keeps the name in its Chinese (`Old Kai` 老 Kai).
+func test_p0_generated_names_are_no_words_of_the_table() -> void:
+	var table: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/localization/p0_zh_CN.json"))
+	var w: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/content/world_gen.json")).world
+	var pools := {"keeper_names": w.keeper_names, "tea_words": w.tea_words, "ponds.words": w.ponds.words, "wild.words": w.wild.words}
+	var hits: Array = []
+	var count := 0
+	for pool in pools:
+		for band in pools[pool]:
+			if str(band).begins_with("_"): continue
+			for word in pools[pool][band]:
+				count += 1
+				if table.has(str(word)): hits.append("%s %s → %s" % [pool, word, table[word]])
+	assert_int(count).is_greater(400)
+	assert_array(hits).override_failure_message("world_gen names that are words of the table: %s" % [hits]).is_empty()
+	for m in P0Logic.MONTHS: assert_bool(table.has(m)).override_failure_message(m).is_false()
+	# names written by hand: kept in their Chinese where the table has them (a title around them, 老 Kai / Wu 婆婆)
+	var people: Array = []
+	for o in P0Outposts.all():
+		var k = o.get("keeper", null)
+		if k is Dictionary and str(k.get("name", "")) != "": people.append(str(k.name))
+	for id in P0Logic.content().get("residents", {}):
+		var r = P0Logic.content().residents[id]
+		if r is Dictionary and str(r.get("name", "")) != "": people.append(str(r.name))
+	assert_int(people.size()).is_greater(10)
+	for name in people:
+		if table.has(name): assert_str(str(table[name])).override_failure_message(name).contains(name.split(" ")[-1])
+	# the shots' lines, as they read now
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	TranslationServer.add_translation(t)
+	var zh := func(s: String) -> String: return String(t.get_message(s))
+	assert_str(zh.call("Market Keeper · Jun")).is_equal("集市掌柜 · Jun")   # the greeting card (was 集市掌柜 · 6 月)
+	assert_str(zh.call("Jun's Stall")).is_equal("Jun 的摊位")              # the stall's title (was 6 月的摊位)
+	assert_str(zh.call("Jun")).is_empty()                                  # her plate: English as it is
+	assert_str(zh.call("Orchard")).is_empty()                              # a pin's short name, a shop sign (was 果园)
+	assert_str(zh.call("Orchard · Tea House")).is_equal("Orchard · 茶馆")
+	assert_str(zh.call("Orchard Tea House")).is_equal("Orchard 茶馆")
+	assert_str(zh.call("Dawn")).is_empty()                                 # a wild site's word (was 清晨)
+	assert_str(t.exact("Orchard@family")).is_equal("果园")                  # P0Board.FAMILY_NAMES `O`, by Localization.ctx
+	assert_str(t.exact("Dawn@daypart")).is_equal("清晨")                    # P0FishWorld.now_line, P0BiteBoard.conditions
+	assert_str(zh.call("Dawn & dusk")).is_equal("清晨与黄昏")
+	TranslationServer.remove_translation(t)
+	# a date whole: 中文 `6 月 3 日`; the maintenance screen's time on another day too (it stayed `Oct 10, 02:30`)
+	assert_str(P0Logic.month_day(6, 3)).is_equal("6 月 3 日")
+	var now := int(Time.get_unix_time_from_datetime_string("2026-10-09T05:00:00"))
+	assert_str(P0Runtime.back_at_text("2026-10-09T18:30:00Z", now, 480)).is_equal("10 月 10 日 02:30")
+	TranslationServer.set_locale("en")
+	assert_str(P0Logic.month_day(6, 3)).is_equal("Jun 3")
+	assert_str(P0Runtime.back_at_text("2026-10-09T18:30:00Z", now, 480)).is_equal("Oct 10, 02:30")
 
 ## SGODOT-476 (不知火舞's plan A, 李白's sentences; q(275) ⑦): the space the table keeps beside a value for an English
 ## name goes where the value's own end is Chinese and so is the other side — a Chinese city or item; an English place,
