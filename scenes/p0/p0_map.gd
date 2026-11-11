@@ -2105,7 +2105,10 @@ func place_for(target: String) -> Dictionary:
 		# role: the player's home-set outpost of it
 		var o := P0Outposts.find(key)
 		if o.is_empty(): o = P0Outposts.home(_view(), key)
-		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
+		# a place the map does not show has no card to open either (the card room in the store build, SGODOT-483; before
+		# its gate): no Show lands on a pin that is not there
+		if o.is_empty() or not P0Outposts.shown(o, _view()): return {}
+		return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
 	if target.begins_with("gather:"):
 		var g := P0CityPlaces.gather_spot(target.trim_prefix("gather:"))
 		return {} if g.is_empty() else gather_entry(g)
