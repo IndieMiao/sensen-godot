@@ -484,7 +484,7 @@ static func gather_card(view: Dictionary, spot: Dictionary, here: bool, ready_ms
 	var yields: Array = spot.get("yield", [])
 	var main: Array = yields[0] if not yields.is_empty() else ["", 0]
 	var main_name := P0Logic.item_name(view, str(main[0]))
-	var gives := "%d %s" % [int(main[1]), main_name]
+	var gives := "%d %s" % [int(main[1]), P0Logic.shown(main_name)]   # its Chinese under 中文 (`2 木材`): no template takes `%d %s`
 	for y in yields.slice(1): gives += " · " + P0Logic.item_name(view, str(y[0]))
 	var facts: Array = [["Gives", gives]]
 	if not here and km >= 0.0: facts.append(["Distance", P0PlaceSheet.distance_text(km)])
@@ -511,7 +511,7 @@ static func stored_notice(view: Dictionary, shown_at: float) -> String:
 	var auto = view.get("storage", {}).get("auto", null)
 	if auto == null or float(auto.get("at", 0)) <= shown_at: return ""
 	var parts: Array = []
-	for it in auto.get("items", []): parts.append("%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
+	for it in auto.get("items", []): parts.append("%d %s" % [int(it[1]), P0Logic.shown(P0Logic.item_name(view, str(it[0])))])
 	return "Stored · " + " · ".join(parts)
 
 # --- Material sources (NeedSource) ---

@@ -525,7 +525,7 @@ static func _materials_line(offer: Dictionary) -> String:
 static func _materials_short(offer: Dictionary) -> String:
 	for m in offer.get("materials", []):
 		var short := int(m.get("need", 0)) - int(m.get("have", 0))
-		if short > 0: return "%d %s" % [short, str(m.get("name", ""))]
+		if short > 0: return "%d %s" % [short, P0Logic.shown(str(m.get("name", "")))]   # its Chinese under 中文: `10 芦苇`
 	return ""
 
 static func _sell_all_label(count: int, sellable: int, each: int) -> String:
