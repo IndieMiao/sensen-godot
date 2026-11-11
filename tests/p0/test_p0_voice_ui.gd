@@ -182,6 +182,31 @@ func test_a_speaker_s_name_tag_and_row_go_green() -> void:
 	assert_dict(crowd.speaking).is_empty()
 	await await_idle_frame()   # the drawer's rows it refreshed away are queue_free'd: gone a frame on, not orphans
 
+## 李元芳 on q(311) (gs66, 11-11): back on the map from Alcatraz, the people pill stayed (`👤 4`). The landmark and its
+## voice room are freed before the runtime hands the HUD null — and a freed object is == null, so set_voice_room took
+## it for the room it had and never refreshed. Now the pill goes.
+func test_the_pill_goes_when_the_room_it_shows_is_freed() -> void:
+	var ui := await _ui()
+	var online: P0Online = P0Online.new()
+	online.transport = func(_m): pass
+	var room: P0VoiceRoom = P0VoiceRoom.new()
+	room.voice = FakeVoice.new()
+	room.request = func(_m: int, _p: String, _b: Dictionary) -> Dictionary: return {"ok": true, "json": {}}
+	room.setup(null, online, "landmark")
+	ui.set_voice_room(room)
+	assert_bool(ui._voice_keys.visible).is_true()
+	room.voice.free()
+	room.free()   # the landmark goes, its voice room with it
+	online.free()
+	ui.set_voice_room(null)   # the runtime's next frame, on the map
+	assert_bool(ui._voice_keys.visible).is_false()
+	ui.set_voice_room(null)   # every frame on the map after: still nothing
+	assert_bool(ui._voice_keys.visible).is_false()
+	var again: Array = _room()   # into a room again (不知火舞 on #992): the pill is back, with its count
+	ui.set_voice_room(again[0])
+	assert_bool(ui._voice_keys.visible).is_true()
+	assert_str(ui._voice_keys.people.text).is_equal("3")
+
 func test_no_room_no_keys() -> void:
 	var ui := await _ui()
 	ui.set_voice_room(null)

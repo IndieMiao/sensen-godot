@@ -4838,12 +4838,19 @@ var _people: UiDrawer
 var _mic_was_on := false
 var _mic_denied := false   # the system said no once: the key only says why from then on (§2)
 
+## Whether voice_room was a live room when last set: one freed with its world (a landmark left for the map) is == null,
+## so `r == voice_room` alone kept it, and the people pill stayed on the map (李元芳 on q(311), 11-11).
+var _has_voice_room := false
+
 func set_voice_room(r: Node) -> void:
-	if r == voice_room: return
+	var live := is_instance_valid(r)
+	if live and r == voice_room: return
+	if not live and not _has_voice_room: return
 	if is_instance_valid(voice_room):
 		for s in [[&"changed", _voice_refresh], [&"age_needed", open_age_card]]:
 			if voice_room.is_connected(s[0], s[1]): voice_room.disconnect(s[0], s[1])
-	voice_room = r if is_instance_valid(r) else null
+	voice_room = r if live else null
+	_has_voice_room = live
 	_mic_was_on = false
 	if voice_room:
 		voice_room.connect(&"changed", _voice_refresh)
