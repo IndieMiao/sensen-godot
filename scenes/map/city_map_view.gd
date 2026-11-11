@@ -1078,6 +1078,10 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 		shadow.render_priority = -1 # 永远垫在建筑贴图之下
 		_art_parent().add_child(shadow)
 		result.shadow = shadow
+		if entry.kind == "landmark":   # who is in (SGODOT-479): the pins' count pill on the art's top-right
+			var pill := UiMapDestination.count_pill()
+			node.add_child(pill)
+			result.count = pill
 	var label := GameUi.label(_name(entry), 10, INK)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -1392,6 +1396,12 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		marker.portrait.position = Vector2(-18, -38)
 	else:
 		_place_art(marker, c)
+		if marker.has("count"):   # SGODOT-479: none at 0; kept clear of like the art, never tapped (the art takes the tap)
+			var pill: PanelContainer = marker.count
+			UiMapDestination.show_online(pill, int(pin_online.call(entry)) if pin_online.is_valid() else int(entry.get("online", 0)))
+			if pill.visible:   # the art's corner only for a pin someone is at (周瑜 on #983: no texture read back for the rest)
+				pill.position = count_at(marker.sprite.texture, float(c.art_side))
+				occupied.append(Rect2(c.point + pill.position * float(c.k), pill.get_combined_minimum_size() * float(c.k)))
 		# A marker comes and goes with the view: the draw rule follows it (the selected pin keeps its front priority).
 		marker.sprite.no_depth_test = _over_avatar(entry)
 		if not is_selected: marker.sprite.render_priority = PLACE_PRIORITY if _over_avatar(entry) else 0
@@ -1703,8 +1713,53 @@ func _pin_metrics(entry: Dictionary, is_sel := false) -> Dictionary:
 func pin_footprint(entry: Dictionary) -> Rect2:
 	var pm := _pin_metrics(entry)
 	var side := maxf(float(pm.width), float(pm.art_side))
-	return Rect2(-side * 0.5, -float(pm.top), side, float(pm.top)).merge(
+	var out := Rect2(-side * 0.5, -float(pm.top), side, float(pm.top)).merge(
 		Rect2(-float(pm.label_w) * 0.5, 3.0, float(pm.label_w), float(pm.label_h)))
+	# a landmark's count pill when someone is in (SGODOT-479)
+	if entry.kind == "landmark" and pin_online.is_valid() and int(pin_online.call(entry)) > 0:
+		var tex := CityMapData.art_texture(entry)
+		if tex != null: out = out.merge(Rect2(count_at(tex, float(pm.art_side)), COUNT_PILL_SIZE))
+	return out
+
+## A landmark art pin's count pill (SGODOT-479, 不知火舞's spec v1): on the top-right of what the art shows, as a
+## MapDestination's is on its disc — its left edge 14 px into the art's right edge, its top 4 px over the art's right side
+## — from the anchor, the art art_side tall (its top 0.94 of it above the anchor, _make_marker). The art's opaque corner
+## is read off the texture once (art_corner).
+const COUNT_PILL_SIZE := Vector2(28.0, 14.0)   # about the pill with one or two digits: what a footprint keeps for it
+static func count_at(texture: Texture2D, art_side: float) -> Vector2:
+	var corner := art_corner(texture)
+	var w := art_side * float(texture.get_width()) / maxf(1.0, float(texture.get_height())) if texture != null else art_side
+	return Vector2((corner.x - 0.5) * w - 14.0, (corner.y - 0.94) * art_side - 4.0)
+
+## Of a texture's opaque part (alpha over half): its right edge, and its highest point in the texture's right 40 %, each
+## a fraction of the texture's width / height (不知火舞's measure). Worked out once per texture.
+static var _corners := {}
+static func art_corner(texture: Texture2D) -> Vector2:
+	if texture == null: return Vector2(1.0, 0.0)
+	var key := texture.resource_path if texture.resource_path != "" else str(texture.get_instance_id())
+	if _corners.has(key): return _corners[key]
+	var img := texture.get_image()
+	var out := Vector2(1.0, 0.0)
+	if img != null and not img.is_empty():
+		if img.is_compressed(): img.decompress()
+		var w := img.get_width()
+		var h := img.get_height()
+		var x1 := -1
+		for y in range(0, h, 2):
+			for x in range(w - 1, x1, -1):
+				if img.get_pixel(x, y).a > 0.5:
+					x1 = x
+					break
+		if x1 >= 0:
+			var top := h
+			for x in range(int(w * 0.6), x1 + 1, 2):
+				for y in range(0, h, 2):
+					if img.get_pixel(x, y).a > 0.5:
+						top = mini(top, y)
+						break
+			out = Vector2(float(x1 + 1) / w, float(top) / h)
+	_corners[key] = out
+	return out
 
 ## How far a place is from home (degrees, the latitude scaled to the longitude's length): only ever compared.
 func _home_distance(entry: Dictionary) -> float:

@@ -186,6 +186,38 @@ func test_a_pond_pin_says_who_is_in() -> void:
 	assert_bool(pin._count.visible).is_false()
 	assert_bool(m._pond_info(pond).facts.any(func(f): return f[0] == "Online now")).is_false()
 
+## SGODOT-479 (不知火舞's spec v1): /presence's `landmarks` (by the landmark's id, the map entry's own, SGODOT-462) — a
+## landmark's art pin wears the pins' count pill on the art's top-right (Alcatraz: about (+21, −57) from the anchor at 88
+## px; Griffith's (+25, −47)), kept clear of in the pin's footprint; none at 0 or from a server without `landmarks`.
+func test_a_landmark_pin_says_who_is_in() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	var hit: Array = city.entries.filter(func(e): return str(e.get("kind", "")) == "landmark" and str(e.get("name", "")).begins_with("Alcatraz"))
+	assert_array(hit).is_not_empty()
+	var rock: Dictionary = hit[0]
+	var at := Vector2(float(rock.lat), float(rock.lng))
+	var quiet := city.pin_footprint(rock)
+	var body := JSON.stringify({"ok": true, "outposts": {}, "landmarks": {str(rock.id): {"online": 2, "rooms": 1}}})
+	m._on_presence(HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), body.to_utf8_buffer())
+	_look_fresh(m, at, 15.0)
+	var pill: PanelContainer = city.markers[str(rock.id)].count
+	assert_bool(pill.visible).is_true()
+	assert_str((pill.get_child(0).get_child(1) as Label).text).is_equal("2")
+	assert_float(pill.position.x).is_equal_approx(21.0, 1.0)
+	assert_float(pill.position.y).is_equal_approx(-57.0, 1.0)
+	assert_int(pill.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)   # the art takes the tap
+	assert_bool(city.pin_footprint(rock).encloses(Rect2(pill.position, CityMapView.COUNT_PILL_SIZE))).is_true()
+	assert_bool(quiet.encloses(Rect2(pill.position, CityMapView.COUNT_PILL_SIZE))).is_false()
+	var griffith: Texture2D = load("res://assets/map/poi/griffith_observatory.png")
+	assert_float(CityMapView.count_at(griffith, 88.0).x).is_equal_approx(25.0, 1.0)
+	assert_float(CityMapView.count_at(griffith, 88.0).y).is_equal_approx(-47.0, 1.0)
+	body = JSON.stringify({"ok": true, "outposts": {}})   # an older server, or nobody in: no pill
+	m._on_presence(HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), body.to_utf8_buffer())
+	_look_fresh(m, at, 15.0)
+	assert_bool(pill.visible).is_false()
+
 ## q(137) ①: the short name drops the type word; a name that is only one stays whole.
 func test_a_short_name_is_the_place_without_its_type() -> void:
 	for pair in [["Willow Pond", "Willow"], ["Reed Creek", "Reed"], ["Elm Cove", "Elm"], ["Maple Market Square", "Maple"],
