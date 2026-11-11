@@ -11,8 +11,8 @@ extends Control
 ## primary key (48): add_title, add_body, add_gap, add_primary, or its own nodes into `col`. No HUD, no ✕: it takes
 ## every touch. A page made of it sits on its own layer before there is a world (tech plan §2.3: no viewport is read till
 ## it is in the tree).
-## The game's other system screens (P0SysScreen: Can't connect, maintenance, update) keep their farm art (奕星 11-11:
-## the user's word was the sign-up's art); a page here may still take another (`backdrop`).
+## The maintenance and update screens (P0SysScreen) stand on the same cream (the user 11-11 bot 733); a page here may
+## still take another art (`backdrop`).
 
 const BACKDROP := preload("res://assets/p0/ui/acc_backdrop_cream.png")   # 1080 × 2400, the 360 × 800 frame ×3
 const GROUND := Color("F6F4EA")   # the art's cream, on up past its top (as HOME-WELCOME's land)

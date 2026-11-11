@@ -23,7 +23,10 @@ signal secondary_pressed(kind: Kind)
 
 enum Kind { LAUNCH, FAIL, MAINT, UPDATE, SCENE, PLACE_FAIL }
 
-const BACKDROP := preload("res://assets/p0/ui/sys_backdrop_farm.jpg")
+## MAINT and UPDATE's ground: the account shell's brand cream (the user 11-11 bot 733, 「系统页也换」, as the sign-up's
+## scheme 3 bot 728): #F6F4EA, the art the screen's width on its foot, the cream on up past it. The farm art it replaces
+## is gone.
+const BACKDROP := P0AccShell.BACKDROP
 ## The launch splash (SGODOT-420, 1214 × 1618): q(290)'s art (the user's v2, 747 × 1618) unchanged in the middle at
 ## x 233, its blurred copy baked into the sides (radius about 20 px, 6 % darker). Also project.godot's boot splash
 ## image (stretch Keep Height) and the iOS launch screen's (tools/ios): keep the three the same file.
@@ -69,7 +72,6 @@ const SCENE_SLOW_PAD := 12.0
 const SCENE_SHADOW := Color(0, 0, 0, 0.12)
 
 const _FRAME_H := 800.0
-const _ART_TOP := 330.0          # Scene art · farm (backdrop) at y 330, 360 × 800, cropped by the screen
 const _MARK_TOP_LAUNCH := 330.0  # the wordmark alone, a little above the middle
 const _MARK_TOP := 84.0          # over a SystemCard
 const _SPINNER_BELOW := 66.0     # spinner at y 396 under the launch wordmark at 330
@@ -91,7 +93,6 @@ var progress := 0.0:
 
 var _bg: ColorRect
 var _art: TextureRect
-var _fade: TextureRect
 var _splash: TextureRect
 var _slow_card: Panel
 var _splash_since := -1   # msec the splash first showed, -1 before
@@ -129,16 +130,9 @@ func _init() -> void:
 	_art = TextureRect.new()
 	_art.texture = BACKDROP
 	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_art.stretch_mode = TextureRect.STRETCH_SCALE
 	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_art)
-	_fade = TextureRect.new()
-	_fade.texture = _fade_texture()
-	_fade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_fade.stretch_mode = TextureRect.STRETCH_SCALE
-	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_fade)
 	_map = TextureRect.new()
 	_map.name = "SceneMap"
 	_map.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -230,20 +224,6 @@ func _scene_panel(id: String, radius: float, edge := UiTokens.COLOR_BORDER, widt
 	add_child(p)
 	return p
 
-## Surface at the top fading out toward the art at the bottom (Backdrop fade: 100 % to the middle, 35 % at 72 %, 0).
-static func _fade_texture() -> GradientTexture2D:
-	var g := Gradient.new()
-	var s := UiTokens.COLOR_SURFACE
-	g.offsets = PackedFloat32Array([0.0, 0.5, 0.72, 1.0])
-	g.colors = PackedColorArray([s, s, Color(s, 0.35), Color(s, 0.0)])
-	var t := GradientTexture2D.new()
-	t.gradient = g
-	t.fill_from = Vector2(0, 0)
-	t.fill_to = Vector2(0, 1)
-	t.width = 4
-	t.height = 256
-	return t
-
 ## kind: the state; detail: {back_at (MAINT, "HH:MM" local or ""), place (SCENE), icon (SCENE: the destination pin's
 ## Texture2D), progress (SCENE, 0–1), card ({…} for PLACE_FAIL)}.
 func show_kind(k: Kind, d := {}) -> void:
@@ -254,12 +234,11 @@ func show_kind(k: Kind, d := {}) -> void:
 	# launch backdrop or wordmark (不知火舞 233 walkthrough).
 	var scene := k in [Kind.SCENE, Kind.PLACE_FAIL]
 	var splash := k in [Kind.LAUNCH, Kind.FAIL]   # q(290): the splash art in place of the farm backdrop and wordmark
-	_bg.color = SPLASH_SKY if splash else UiTokens.COLOR_SURFACE
+	_bg.color = SPLASH_SKY if splash else (P0AccShell.GROUND if k in [Kind.MAINT, Kind.UPDATE] else UiTokens.COLOR_SURFACE)
 	_splash.visible = splash
 	# Whole from its first frame (420): it takes over from the boot splash's same image, a fade would flash the sky.
 	if splash and _splash_since < 0: _splash_since = Time.get_ticks_msec()
 	_art.visible = not scene and not splash
-	_fade.visible = not scene and not splash
 	_map.visible = scene
 	if scene and _map.texture == null: _map.texture = load(SCENE_MAP)
 	_haze.visible = scene
@@ -355,8 +334,9 @@ func _layout() -> void:
 	var sl := splash_layout(Vector2(w, h))
 	_splash.position = sl.origin
 	_splash.size = SPLASH_SIZE * float(sl.scale)
-	_art.position = Vector2(0, roundf(_ART_TOP * k))
-	_art.size = Vector2(w, h)
+	var art_h := roundf(w * BACKDROP.get_height() / BACKDROP.get_width())   # on the screen's foot, as the account shell's
+	_art.position = Vector2(0, h - art_h)
+	_art.size = Vector2(w, art_h)
 	var mark_size := _mark.get_combined_minimum_size()
 	var mark_top := roundf(_MARK_TOP_LAUNCH * k) if kind == Kind.LAUNCH else _MARK_TOP
 	_mark.position = Vector2(roundf((w - mark_size.x) * 0.5), mark_top)

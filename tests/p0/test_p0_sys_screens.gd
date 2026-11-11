@@ -494,7 +494,11 @@ func test_the_launch_and_cant_connect_show_the_splash_and_nothing_over_it() -> v
 	s.show_kind(K.MAINT)
 	await get_tree().process_frame
 	assert_that([s._splash.visible, s._mark.visible, s._art.visible]).is_equal([false, true, true])
-	assert_that(s._bg.color).is_equal(UiTokens.COLOR_SURFACE)
+	# the account shell's brand cream (the user 11-11 bot 733): #F6F4EA, the art the screen's width on its foot
+	assert_that(s._bg.color).is_equal(P0AccShell.GROUND)
+	assert_object(s._art.texture).is_same(P0AccShell.BACKDROP)
+	assert_vector(s._art.size).is_equal(Vector2(360, 800))
+	assert_float(s._art.position.y + s._art.size.y).is_equal(720.0)
 
 ## 8 s in: the spinner and `Taking longer than usual…` on a 90 % surface card, centred, ending 16 above the art's small
 ## Gensen mark (row 752) — not over a face.

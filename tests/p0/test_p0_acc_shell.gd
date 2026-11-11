@@ -55,4 +55,4 @@ func test_the_backdrop_can_be_swapped() -> void:
 	s.backdrop = other
 	assert_object(art.texture).is_same(other)
 	assert_vector(art.size).is_equal(Vector2(360, 360))   # laid out by its own shape
-	assert_object(P0SysScreen.BACKDROP).is_not_same(P0AccShell.BACKDROP)   # the game's other system screens keep the farm
+	assert_object(P0SysScreen.BACKDROP).is_same(P0AccShell.BACKDROP)   # maintenance and update on the same cream (bot 733)
