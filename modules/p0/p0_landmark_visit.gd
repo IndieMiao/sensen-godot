@@ -111,13 +111,10 @@ func _go_online() -> void:
 
 ## q(311) (SGODOT-470): the visit's landing — the server's pick from `places`, waited for under the arrival cover.
 var landing := P0Landing.new()
-## The Map strip as wide as it opens, either way from its icon (UiWorldNameBar: 5 + the 22 icon + 6 + `Map` + 12; a
-## little over, for other languages' word); its touch area's height (UiTokens.SIZE_TOUCH) is what keeps the 8 px.
-const MAP_STRIP_W := 76.0
 
 ## Where the player may stand on coming in, the spawn `at` first (P0SpawnRing): on the ground (the navigation, which keeps
-## the props' clearance, 474), outside the way out's reach, and on the opening's screen whole and 8 px from the door key —
-## its Map strip within NEAR_M of the dock, its icon further (q(311) ②). Just `at` while the navigation is not in.
+## the props' clearance, 474), outside the way out's reach, and on the opening's screen whole and 8 px from the door key
+## as drawn — its Map strip within NEAR_M of the dock, its icon further (q(311) ②; P0SpawnRing.strip_rect). Just `at` while the navigation is not in.
 func places(at: Vector3) -> Array[Vector2]:
 	var nav: RID = scene.call("nav_map")
 	var cam := scene.get_viewport().get_camera_3d() if scene.is_inside_tree() else null
@@ -133,9 +130,8 @@ func places(at: Vector3) -> Array[Vector2]:
 			if _flat(g, exit) <= EXIT_RADIUS_M: return false
 			if not cam.is_position_behind(exit):
 				var c := cam.unproject_position(exit + Vector3.UP * 0.6)
-				# the strip either way, or the icon; as tall as its touch area (安其拉's measure on 474, 不知火舞's check)
-				var w := MAP_STRIP_W - 16.0 if _flat(g, exit) <= NEAR_M else UiTokens.SIZE_TOUCH * 0.5
-				keys.append(Rect2(c.x - w, c.y - UiTokens.SIZE_TOUCH * 0.5, w * 2.0, UiTokens.SIZE_TOUCH))
+				# as drawn (不知火舞 on #988): the Map strip within NEAR_M (either way), its icon further
+				keys.append(P0SpawnRing.strip_rect(c, P0Logic.icon("door"), "Map") if _flat(g, exit) <= NEAR_M else P0SpawnRing.icon_rect(c))
 		return P0SpawnRing.clear_of(cam, g, keys)
 	return P0SpawnRing.places(at, axes[0], axes[1], ok)
 

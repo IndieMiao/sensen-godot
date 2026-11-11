@@ -1052,8 +1052,8 @@ func _points_in(session: P0Session) -> void:
 
 ## Where the player may stand on coming in, `at` (the spawn) first (P0SpawnRing): on the walk (off the water and the
 ## trees' trunks), not hidden behind a tree, out of each gathering point's reach (or the key there is Gather, v4.1
-## 4.1.3), and whole on the opening's screen 8 px from the nearest point's key — its icon's touch area: which way its
-## strip opens is the HUD's to say once it shows, and either way at once would leave hardly a place (q(311) ②).
+## 4.1.3), and whole on the opening's screen 8 px from the nearest point's icon as drawn (q(311) ②; its strip does not
+## open out of its reach, 不知火舞 on #988).
 func places(at: Vector3) -> Array[Vector2]:
 	var trees: Array = PondScenery.tree_points(_scenery_clear, _scenery_keys)
 	var toward := -ahead_axis()   # towards the camera, on the ground
@@ -1065,8 +1065,7 @@ func places(at: Vector3) -> Array[Vector2]:
 		var keys := []
 		var near: Dictionary = PondGather.nearest(gather.points, p)
 		if not near.is_empty() and PondGather.flat(PondGather.stand_of(near), p) <= PondGather.TAG_M:
-			var half := UiTokens.SIZE_TOUCH * 0.5
-			keys.append(Rect2(_gather_screen(near) - Vector2(half, half), Vector2(half, half) * 2.0))
+			keys.append(P0SpawnRing.icon_rect(_gather_screen(near)))
 		return P0SpawnRing.clear_of(cam, p, keys)
 	_update_camera()   # the opening's framing on the player now
 	return P0SpawnRing.places(at, right_axis(), ahead_axis(), ok)

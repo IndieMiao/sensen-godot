@@ -51,6 +51,25 @@ static func person_rect(cam: Camera3D, feet: Vector3) -> Rect2:
 	for p in pts.slice(1): r = r.expand(cam.unproject_position(p))
 	return r
 
+## The keys measured as drawn (不知火舞 on #988, 470 b833da96; not their touch areas): an icon button's 28 px disc, 1.1×
+## for the near one (UiWorldIconButton); a name strip at its full width, 32 tall, either way from its icon (it opens
+## to whichever side fits once it shows).
+const ICON_PX := 28.0
+const NEAR_SCALE := 1.1
+static func icon_rect(center: Vector2, near := false) -> Rect2:
+	var half := ICON_PX * 0.5 * (NEAR_SCALE if near else 1.0)
+	return Rect2(center - Vector2(half, half), Vector2(half, half) * 2.0)
+
+static func strip_rect(icon_center: Vector2, icon: Texture2D, text: String, fact := "") -> Rect2:
+	var bar := UiWorldNameBar.new()
+	bar.icon = icon
+	bar.text = text
+	bar.fact = fact
+	var right := bar.rect_for(icon_center, UiWorldNameBar.Dir.RIGHT)
+	var out := right.merge(bar.rect_for(icon_center, UiWorldNameBar.Dir.LEFT))
+	bar.free()
+	return out
+
 ## Whether a person at `feet` keeps CLEAR_PX (on a 360-wide screen) from each of `rects` (screen px), and is on screen.
 static func clear_of(cam: Camera3D, feet: Vector3, rects: Array) -> bool:
 	var view := cam.get_viewport().get_visible_rect().size

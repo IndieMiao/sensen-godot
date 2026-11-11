@@ -119,28 +119,29 @@ var landing := P0Landing.new()
 func p0_landing_pending() -> bool: return landing.pending()
 ## Off a seat by this much (the server's free radius: a person on it would be on this one).
 const SEAT_CLEAR_M := 0.45
-## The door's strip as wide as it opens, either way from its icon (`Map`; P0LandmarkVisit.MAP_STRIP_W).
-const DOOR_STRIP_W := 76.0
 ## Heights a person is looked at from the camera for furniture in the way: the legs, the middle, the head.
 const SEEN_AT_M: Array[float] = [0.3, 0.9, 1.55]
 
 ## Where the player may stand on coming in, in room metres, the spawn anchor `at` first (P0SpawnRing, round where the
 ## player stands): reachable on the floor, out of the door's reach, off the seats, not behind a keeper or a resident,
 ## seen whole past the furniture (a ray from the camera to the legs, the middle and the head; the room's unseen walls
-## let through), and on the opening's screen 8 px from the door's key (its strip within CARD_NEAR_M of
-## the door, either way), the facilities' and the seats' keys — their icons' touch areas (q(311) ②; LOCK-34 v2).
+## and fences let through, _unseen), and on the opening's screen 8 px from the keys as drawn — the nearest within
+## CARD_NEAR_M open (a facility's or the door's strip either way, a seat's icon near), the others' 28 px icons (q(311) ②;
+## LOCK-34 v2; 不知火舞 on #988).
 func places(at: Vector3, why := {}) -> Array[Vector2]:
 	var view: Dictionary = P0Runtime.ensure().session.current() if use_runtime else {}
 	var exit := anchor("exit")
 	var seats: Array = []
 	for n in _anchors.keys(): if str(n).begins_with("seat_") and anchor(n) != null: seats.append(anchor(n).global_position)
 	var people: Array = npcs.values().map(func(e): return (e.root as Node3D).global_position)
-	var keys: Array = []   # [anchor name, screen point, kind]
+	var keys: Array = []   # {n, at (the anchor, world), screen, kind, icon, name, fact}
 	for n in _tappable():
 		var m := _marker(n, view)
 		if m.is_empty() or not str(m.get("kind", "")) in ["seat", "facility"]: continue
 		var badge := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))
-		keys.append([n, cam.unproject_position(badge.global_position if badge else anchor(n).global_position + _hit_lift(n) * 1.1)])
+		keys.append({n = n, at = anchor(n).global_position, kind = str(m.kind), icon = m.get("icon", null), name = str(m.get("name", "")),
+			fact = str(m.get("fact", "")),
+			screen = cam.unproject_position(badge.global_position if badge else anchor(n).global_position + _hit_lift(n) * 1.1)})
 	var space := get_world_3d().direct_space_state
 	var walls: Array = (layout.get("boundaries", []) as Array).map(func(b): return StringName(str(b.get("name", ""))))   # unseen
 	var ok := func(p: Vector3) -> bool:
@@ -154,16 +155,25 @@ func places(at: Vector3, why := {}) -> Array[Vector2]:
 		for h in SEEN_AT_M:
 			var to := w + Vector3.UP * h
 			var ray := PhysicsRayQueryParameters3D.create(to + _cam_dir * 30.0, to, ~CALIB_LAYER)
-			for i in 8:   # through the room's unseen walls (layout `boundaries`), stopped by what is drawn
+			for i in 8:   # through the room's unseen walls, stopped by what is drawn
 				var hit := space.intersect_ray(ray)
 				if hit.is_empty(): break
-				if not (hit.collider as Node).name in walls: return _no(why, p, "hidden by " + str((hit.collider as Node).get_parent().name))
+				if not _unseen(hit.collider as Node, hit.position, walls): return _no(why, p, "hidden by " + str((hit.collider as Node).get_parent().name))
 				ray.exclude = ray.exclude + [hit.rid]
 		if not P0SpawnRing.clear_of(cam, w, []): return _no(why, p, "off screen")
+		# as drawn (不知火舞 on #988): the nearest key within CARD_NEAR_M is the open one — a facility's (the door's) strip
+		# either way, a seat's icon near (1.1×); the others their 28 px icons
+		var card := ""
+		var best := CARD_NEAR_M
 		for k in keys:
-			var half := UiTokens.SIZE_TOUCH * 0.5
-			var wide: float = DOOR_STRIP_W - 16.0 if k[0] == "exit" and exit and _flat(w, exit.global_position) <= CARD_NEAR_M else half
-			if not P0SpawnRing.clear_of(cam, w, [Rect2(k[1].x - wide, k[1].y - half, wide * 2.0, half * 2.0)]): return _no(why, p, "key " + str(k[0]))
+			var d := _flat(w, k.at)
+			if d <= best:
+				best = d
+				card = k.n
+		for k in keys:
+			var r := P0SpawnRing.icon_rect(k.screen, k.n == card)
+			if k.n == card and k.kind == "facility": r = P0SpawnRing.strip_rect(k.screen, k.icon, k.name, k.fact)
+			if not P0SpawnRing.clear_of(cam, w, [r]): return _no(why, p, "key " + str(k.n))
 		return true
 	var axes := P0SpawnRing.axes(cam)
 	var out: Array[Vector2] = [Vector2(at.x, at.z)]
@@ -173,6 +183,26 @@ func places(at: Vector3, why := {}) -> Array[Vector2]:
 	return out
 
 static func _flat(a: Vector3, b: Vector3) -> float: return Vector2(a.x - b.x, a.z - b.z).length()
+
+## A collider the camera sees through: one of the layout's `boundaries`, or hit outside the drawn meshes of the piece it
+## belongs to (周瑜 on #988: the tackle shop's and the post's room_shell is a floor with an unseen fence 1.5 m high on its
+## two camera sides, and their layouts list no boundaries).
+var _piece_boxes := {}   # collider instance id → its piece's drawn box (world), AABB() for none
+func _unseen(collider: Node, at: Vector3, walls: Array) -> bool:
+	if collider.name in walls: return true
+	var id := collider.get_instance_id()
+	if not _piece_boxes.has(id):
+		var box := AABB()
+		var piece := collider.get_parent()
+		if piece != null and piece != self:
+			for m in piece.find_children("*", "MeshInstance3D", true, false):
+				var mi := m as MeshInstance3D
+				if not mi.is_visible_in_tree() or mi.mesh == null: continue
+				var b := mi.global_transform * mi.get_aabb()
+				box = b if box.size == Vector3.ZERO else box.merge(b)
+		_piece_boxes[id] = box
+	var drawn: AABB = _piece_boxes[id]
+	return drawn.size == Vector3.ZERO or not drawn.grow(0.05).has_point(at)
 
 ## A place left out, and why (tests, the review's table): false.
 static func _no(why: Dictionary, p: Vector3, reason: String) -> bool:
