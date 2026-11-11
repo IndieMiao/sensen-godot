@@ -1226,15 +1226,17 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 		"facts": facts, "primary": "Fly", "footer": "Return home is always free", "toast_over_card": true,
 	}
 
-## q(318) (the user's bot 740 / 741; 不知火舞's spec travel-cost-only-spec.md §1): a travel card's Energy and Coins rows —
-## what the trip costs on the right (`15`, `60`; no `→ N left`, no gap), what the player has now after the label
-## (`Energy · You have 200`: the HUD's numbers, kept up while the card is open, _refresh_travel_card); `Free` for a row
-## with nothing to pay (a wild site of the nearest three), no `You have` there.
+## q(318) (the user's bot 740 / 741 / 746; 不知火舞's spec travel-cost-only-spec.md §1, v3): a travel card's Energy and
+## Coins rows — the Energy / coin glyph ahead of the label, what the trip costs on the right (`15`, `60`; no `→ N left`,
+## no gap), what the player has now after the label (`Energy · You have 200`: the HUD's numbers, kept up while the card
+## is open, _refresh_travel_card); `Free` for a row with nothing to pay (a wild site of the nearest three), no `You
+## have` there. [label, value, glyph] (P0PlaceSheet).
 static func cost_rows(view: Dictionary, f: Dictionary) -> Array:
 	var rows: Array = []
 	for res in ["Energy", "Coins"]:
 		var cost := int(f.energy) if res == "Energy" else int(f.coins)
-		rows.append([res, "Free"] if cost == 0 else [have_label(res, have_of(view, res)), str(cost)])
+		var glyph := P0Logic.icon("energy" if res == "Energy" else "coin")
+		rows.append([res, "Free", glyph] if cost == 0 else [have_label(res, have_of(view, res)), str(cost), glyph])
 	return rows
 
 ## What the player has of `res` (`Energy` / `Coins`) as the HUD says it: the Energy with any bonus over the cap, the wallet.

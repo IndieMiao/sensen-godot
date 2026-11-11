@@ -156,8 +156,13 @@ static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable()
 	if not why.is_empty(): col.add_child(reason_row(why))
 	# a state said, not a fact: secondary grey (E4 329:182456 `Not open yet`, 不知火舞 355 850d2fc2)
 	if str(spec.get("line", "")) != "": col.add_child(UiKit.label(str(spec.line), UiTokens.STYLE_C14_B, UiTokens.COLOR_SECONDARY))
-	for f in spec.get("facts", []):
-		col.add_child(forecast_row(str(f[0]), f[1]) if f[1] is Array else UiFactRow.new(str(f[0]), str(f[1])))
+	for f in spec.get("facts", []):   # [label, value] or [label, value, its glyph] (q(318) v3)
+		if f[1] is Array:
+			col.add_child(forecast_row(str(f[0]), f[1]))
+			continue
+		var fact := UiFactRow.new(str(f[0]), str(f[1]))
+		if f.size() > 2 and f[2] is Texture2D: fact.icon = f[2]
+		col.add_child(fact)
 	if details.is_valid():
 		var link := Button.new()
 		link.name = "Details"
