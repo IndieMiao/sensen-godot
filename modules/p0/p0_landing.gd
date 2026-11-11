@@ -14,6 +14,12 @@ var online: P0Online
 var _until := -1   # Time.get_ticks_msec() the wait ends at; -1 none
 var _from := Vector3.INF
 
+## A world that works its places out once its first read is in (a pond: the day's gathering points and trees) expects
+## the join: the cover waits for it too, EXPECT_MS at most, until begin.
+const EXPECT_MS := 3000
+func expect() -> void:
+	_until = Time.get_ticks_msec() + EXPECT_MS
+
 ## The visit's join is going out with `places` while the player stands at `at` (world): a wait when there is anywhere
 ## but the spawn to go.
 func begin(o: P0Online, places: Array[Vector2], at: Vector3) -> void:
