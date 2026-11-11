@@ -1,8 +1,9 @@
 extends GdUnitTestSuite
 ## q(256) / q(257) (SGODOT-367, 不知火舞 on 367 ec5f2daa): the fare to a city from view.travel.fares — the trip tier's,
 ## half (rounded up) on a return, free for Trip 1 (the 3 nearest cities) and where the player already is with a pass —
-## and MAP-5's rows: Distance, Energy and Coins left once paid (or Cost · Free), Fish here, Visit, a running pass's Day
-## Pass; short of it, Fly reads the gap (coins first: fare + the 40 floor − the wallet).
+## and MAP-5's rows: Distance, Energy and Coins (the fare, what the player has after the label; or Cost · Free), Fish
+## here, Visit, a running pass's Day Pass; Fly always lit, short of the fare its tap says so (q(318): coins first, the
+## fare with the 40 the wallet keeps).
 
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
 const P0Map := preload("res://scenes/p0/p0_map.gd")
@@ -44,14 +45,17 @@ func test_trip_1_home_and_already_there_are_free() -> void:
 	old.travel.erase("fares")
 	assert_bool(P0Travel.fare(old, TOKYO).free).is_true()
 
+## q(318) (the user's bot 740 / 741): what Fly's tap says short of the fare — the fare, never a difference; the coins
+## with the 40 the wallet keeps after the trip, first when both are short.
 func test_the_gap_says_coins_first_with_the_40_floor() -> void:
 	var f := {energy = 30, coins = 120}
 	assert_dict(P0Travel.fare_gap(_view({}, {}, SF, 160, 142), f)).is_empty()   # 160 − 120 = 40: the floor kept
-	assert_str(str(P0Travel.fare_gap(_view({}, {}, SF, 150, 142), f).text)).is_equal("Need 10 more coins")
-	var short := P0Travel.fare_gap(_view({}, {}, SF, 230, 19), f)
-	assert_str(str(short.text)).is_equal("Fly · Need 30 Energy")   # the fare, in amber (不知火舞 on 367 e0efcc15)
-	assert_int(int(short.need)).is_equal(11)   # the Energy card's gap
-	assert_str(str(P0Travel.fare_gap(_view({}, {}, SF, 150, 19), f).text)).is_equal("Need 10 more coins")   # both: coins
+	assert_dict(P0Travel.fare_gap(_view({}, {}, SF, 150, 142), f)).is_equal({text = "Need 120 coins · keep 40 after the trip", short = "coins"})
+	assert_dict(P0Travel.fare_gap(_view({}, {}, SF, 230, 19), f)).is_equal({text = "Need 30 Energy", short = "energy"})
+	assert_dict(P0Travel.fare_gap(_view({}, {}, SF, 230, 30), f)).is_empty()   # the Energy has no floor
+	assert_str(str(P0Travel.fare_gap(_view({}, {}, SF, 150, 19), f).text)).is_equal("Need 120 coins · keep 40 after the trip")   # both: coins
+	assert_str(P0Travel.short_text("not_enough_coins", 60)).is_equal("Need 60 coins · keep 40 after the trip")
+	assert_str(P0Travel.short_text("not_enough_energy", 15)).is_equal("Need 15 Energy")
 
 func test_map_5_first_visit_rows() -> void:
 	var spec := P0Map.travel_card(_view(), LA, {utc_offset_min = -420}, 14)
@@ -61,12 +65,12 @@ func test_map_5_first_visit_rows() -> void:
 	var trip := int(P0Travel.trip(_view(), LA).trip)
 	var e := int(FARES.energy[trip - 1])
 	var c := int(FARES.coins[trip - 1])
-	assert_array((spec.facts as Array).map(func(f): return str(f[0]))).is_equal(["Distance", "Energy", "Coins", "Fish here", "Visit"])
-	assert_str(str(spec.facts[1][1])).is_equal("%d → %d left" % [e, 142 - e])
-	assert_str(str(spec.facts[2][1])).is_equal("%d → %d left" % [c, 230 - c])
+	assert_array((spec.facts as Array).map(func(f): return str(f[0]))).is_equal(["Distance", "Energy · You have 142", "Coins · You have 230", "Fish here", "Visit"])
+	assert_str(str(spec.facts[1][1])).is_equal(str(e))   # the fare only (q(318)): no `→ N left`
+	assert_str(str(spec.facts[2][1])).is_equal(str(c))
 	assert_str(str(spec.facts[4][1])).is_equal("First visit · stamp + 10 Energy")
 	assert_str(str(spec.primary)).is_equal("Fly")
-	assert_str(str(spec.blocked)).is_empty()
+	assert_bool(spec.has("blocked")).is_false()
 	assert_str(str(spec.footer)).is_equal("Return home is always free")
 
 func test_map_5_return_with_a_pass_and_no_online_or_local_time() -> void:
@@ -74,7 +78,7 @@ func test_map_5_return_with_a_pass_and_no_online_or_local_time() -> void:
 	var spec := P0Map.travel_card(v, LA, {}, 0)
 	assert_str(str(spec.subtitle)).is_equal("United States")   # the local time before its preview, no `0 online`
 	var labels: Array = (spec.facts as Array).map(func(f): return str(f[0]))
-	assert_array(labels).is_equal(["Distance", "Energy", "Coins", "Fish here", "Visit", "Day Pass"])
+	assert_array(labels).is_equal(["Distance", "Energy · You have 142", "Coins · You have 230", "Fish here", "Visit", "Day Pass"])
 	assert_str(str(spec.facts[4][1])).is_equal("Return visit · half price")
 	assert_str(str(spec.facts[5][1])).is_equal("7h left")
 	# the pass ran out: no Day Pass row
@@ -89,34 +93,23 @@ func test_map_5_trip_1_is_one_cost_free_row() -> void:
 	var back := _view({SALINAS: {n = 1}}, {SALINAS: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 7 * 3_600_000.0}})
 	assert_array((P0Map.travel_card(back, SALINAS, {}, 0).facts as Array).map(func(f): return str(f[0]))).is_equal(["Distance", "Cost", "Fish here", "Day Pass"])
 
-func test_map_5_short_of_coins_fly_reads_the_gap() -> void:
-	var spec := P0Map.travel_card(_view({}, {}, SF, 50), LA, {}, 0)
+## q(318) (李元芳 0.3.8: a return to Los Angeles with 60 coins read `60 → 0 left` beside a grey `Need 40 more coins`;
+## the user's bot 740 / 741): short of the fare or not, the card says the same — the fare on the right, what the player
+## has after the label — and Fly stays lit, no gap on it.
+func test_map_5_short_or_not_says_the_fare_and_what_the_player_has() -> void:
 	var trip := int(P0Travel.trip(_view(), LA).trip)
-	assert_str(str(spec.facts[2][1])).is_equal(str(FARES.coins[trip - 1]))   # nothing left to write: the fare alone (q(264))
-	assert_str(str(spec.blocked)).starts_with("Need ")
-	assert_str(str(spec.blocked)).ends_with(" more coins")
-	assert_str(str(spec.gap.short)).is_equal("coins")
-
-## q(318) (李元芳 0.3.8: a return to Los Angeles with 60 coins read `60 → 0 left` beside `Need 40 more coins`): the
-## Coins row says what is left only when the wallet keeps its 40 after paying, else the fare alone, as Fly reads the
-## gap; the Energy row has no floor.
-func test_map_5_coins_row_says_what_is_left_only_above_the_wallet_floor() -> void:
-	var trip := int(P0Travel.trip(_view(), LA).trip)
-	var c := int(FARES.coins[trip - 1])
-	var e := int(FARES.energy[trip - 1])
-	var short := P0Map.travel_card(_view({}, {}, SF, c + 30), LA, {}, 0)   # MAP-5-SHORT's state: 30 left, 10 short
-	assert_str(str(short.facts[2][1])).is_equal(str(c))
-	assert_str(str(short.blocked)).is_equal("Need 10 more coins")
-	var kept := P0Map.travel_card(_view({}, {}, SF, c + 40), LA, {}, 0)
-	assert_str(str(kept.facts[2][1])).is_equal("%d → 40 left" % c)
-	assert_str(str(kept.blocked)).is_empty()
-	var back := _view({LA: {n = 1}}, {LA: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 23 * 3_600_000.0}}, SF, ceili(c / 2.0))
-	var ret := P0Map.travel_card(back, LA, {}, 0)   # the half fare, all of the wallet
-	assert_str(str(ret.facts[2][1])).is_equal(str(ceili(c / 2.0)))
-	assert_str(str(ret.blocked)).is_equal("Need 40 more coins")
-	var all_energy := P0Map.travel_card(_view({}, {}, SF, 230, e), LA, {}, 0)
-	assert_str(str(all_energy.facts[1][1])).is_equal("%d → 0 left" % e)   # Energy: no floor
-	assert_str(str(all_energy.blocked)).is_empty()
+	var half := ceili(int(FARES.coins[trip - 1]) / 2.0)
+	var back := {LA: {n = 1}}
+	var day_pass := {LA: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 23 * 3_600_000.0}}
+	for coins in [half, half + 20, half + 40]:
+		var spec := P0Map.travel_card(_view(back, day_pass, SF, coins), LA, {}, 0)
+		assert_array([spec.facts[1], spec.facts[2]]).is_equal([["Energy · You have 142", str(ceili(int(FARES.energy[trip - 1]) / 2.0))],
+			["Coins · You have %d" % coins, str(half)]])
+		assert_str(str(spec.primary)).is_equal("Fly")
+		assert_bool(spec.has("blocked")).is_false()
+	var tired := P0Map.travel_card(_view({}, {}, SF, 230, 10), LA, {}, 0)
+	assert_array(tired.facts[1]).is_equal(["Energy · You have 10", str(FARES.energy[trip - 1])])
+	assert_bool(tired.has("blocked")).is_false()
 
 ## q(257) ① (FARE-BOARD 9:133836): the board's rows say each tier's first-visit fare on two lines, Trip 1 `Free`.
 func test_the_fare_board_says_the_real_fares() -> void:
@@ -153,7 +146,7 @@ func test_welcome_back_says_the_pass_left() -> void:
 func test_trip_1_flies_with_a_wallet_under_the_floor() -> void:
 	var v := _view({}, {}, SF, 30, 0)
 	assert_dict(P0Travel.fare_gap(v, P0Travel.fare(v, SALINAS))).is_empty()
-	assert_str(str(P0Map.travel_card(v, SALINAS, {}, 0).blocked)).is_empty()
+	assert_bool(P0Map.travel_card(v, SALINAS, {}, 0).has("blocked")).is_false()
 
 ## 周瑜 on #569: the view's clock moves on between reads — a Day Pass's time left runs down with it.
 func test_projecting_the_view_moves_its_clock_on() -> void:

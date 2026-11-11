@@ -203,20 +203,22 @@ static func fare(view: Dictionary, cluster: String) -> Dictionary:
 static func fare_text(f: Dictionary) -> String:
 	return "Free" if bool(f.get("free", true)) else "%d Energy · %d coins" % [int(f.energy), int(f.coins)]
 
-## q(257) ③ (LOCK-10; 不知火舞 on 367 e0efcc15): what Fly says when the fare cannot be paid — the coins first, grey
-## (`Need 10 more coins`: fare + the 40 floor − the wallet), else the Energy in need-energy's amber with the fare
-## (`Fly · Need 30 Energy`, as the main key and the mine's entry card write it); {} when it can. {text, short ("coins"
-## / "energy"), need (what is missing: the Energy card's)}.
+## q(318) (the user's bot 740 / 741; 不知火舞's spec travel-cost-only-spec.md §2): what a tap on Fly says when the fare
+## cannot be paid — Fly stays lit and the card open, an Info toast: the coins first (the fare's, the wallet keeping its
+## 40 after it), else the Energy (the fare's); {} when it can. {text (short_text), short ("coins" / "energy")}.
 static func fare_gap(view: Dictionary, f: Dictionary) -> Dictionary:
-	var coins := int(view.get("coins", 0))
-	if int(f.coins) > 0 and coins < int(f.coins) + WALLET_FLOOR:
-		var need := int(f.coins) + WALLET_FLOOR - coins
-		return {text = "Need %d more coins" % need, short = "coins", need = need}
-	var energy := int(view.get("energy", {}).get("value", 0))
-	if int(f.energy) > energy:
-		var need := int(f.energy) - energy
-		return {text = "Fly · Need %d Energy" % int(f.energy), short = "energy", need = need}
+	if int(f.coins) > 0 and int(view.get("coins", 0)) < int(f.coins) + WALLET_FLOOR:
+		return {text = short_text("not_enough_coins", int(f.coins)), short = "coins"}
+	if int(f.energy) > int(view.get("energy", {}).get("value", 0)):
+		return {text = short_text("not_enough_energy", int(f.energy)), short = "energy"}
 	return {}
+
+## q(318): a fare short of coins or Energy in words — `Need 60 coins · keep 40 after the trip` (the fare and the floor,
+## never a difference), `Need 15 Energy` — as Fly's tap and the server's not_enough_coins / not_enough_energy, called
+## back (P0Runtime), say it. `cost` the fare's coins or Energy.
+static func short_text(code: String, cost: int) -> String:
+	if code == "not_enough_coins": return "Need %d coins · keep %d after the trip" % [cost, WALLET_FLOOR]
+	return "Need %d Energy" % cost
 
 # ---------------------------------------------------------------- the Travel Post's Fare Board (q(165))
 ## q(165) Trip fares (§9.11.4 / §17.3.1, read only): the seven tiers in order, each {title `Trip 1 · Local`, line its
