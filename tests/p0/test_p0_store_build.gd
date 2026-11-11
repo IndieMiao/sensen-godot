@@ -7,6 +7,9 @@ extends GdUnitTestSuite
 func after_test() -> void:
 	P0Build.store_override = null
 
+func after() -> void:
+	P0Runtime.free_instance_for_tests()   # the map test's runtime, not left to the next suite
+
 func _test_options(store: bool) -> Object:
 	P0Build.store_override = store
 	var page: P0SettingsPage = auto_free(P0SettingsPage.settings("0.3.8 (2026111100)"))
@@ -39,3 +42,20 @@ func test_the_voice_profile_is_androids_outside_the_store_build_only() -> void:
 
 func test_a_development_run_is_not_the_store_build() -> void:
 	assert_bool(P0Build.store()).is_false()   # no `store` feature here: the OSS build's rows and places, as before
+
+## Nothing lands on the card room the store build does not show: a Show on map for it opens no card (the pin is not
+## there), though none points at it today — a later one would be a dead link (奕星 on 483).
+func test_a_show_on_map_for_the_card_room_opens_nothing_in_the_store_build() -> void:
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(360, 800)
+	add_child(auto_free(viewport))
+	var m := (load("res://scenes/p0/p0_map.tscn") as PackedScene).instantiate() as Node
+	viewport.add_child(m)
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	m.rt.session.view = {"homestead": {"level": 3}}
+	P0Build.store_override = false
+	assert_dict(m.place_for("outpost:sf_card_room_1")).is_not_empty()
+	P0Build.store_override = true
+	assert_dict(m.place_for("outpost:sf_card_room_1")).is_empty()
+	assert_dict(m.place_for("outpost:sh_tea_1")).is_not_empty()   # the other places as ever
