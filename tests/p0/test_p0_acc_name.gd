@@ -103,3 +103,13 @@ func test_skip_sign_in_and_an_old_account_without_the_row() -> void:
 	old.prefill("Mira")
 	assert_str(old.field.text).is_equal("Mira")
 	assert_str(old.go.label).is_equal("Continue")
+
+## 不知火舞 on 491: `Already have a farm?` and `Sign in` 4 apart in English, none under 中文 (the ？ brings its own space).
+func test_the_sign_in_row_has_no_gap_in_chinese() -> void:
+	var en := _page()
+	assert_int((en.find_child("Words", true, false) as HBoxContainer).get_theme_constant(&"separation")).is_equal(4)
+	TranslationServer.set_locale("zh_CN")
+	var zh := _page()
+	var gap := (zh.find_child("Words", true, false) as HBoxContainer).get_theme_constant(&"separation")
+	TranslationServer.set_locale("en")
+	assert_int(gap).is_equal(0)

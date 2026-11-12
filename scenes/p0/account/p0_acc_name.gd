@@ -31,6 +31,7 @@ const SIGN_IN := "Sign in"
 const MIN_LETTERS := 2
 const MAX_LETTERS := 16
 const GAP := 12.0
+const WORDS_GAP := 4
 ## The helper line's red, by the server's reasons (name_rejected's `reason`).
 const WHY := {"length": HELPER, "chars": "That character can't be used", "blocked": "That name isn't allowed"}
 ## What cannot be in a name, caught as it is typed (account plan v2 §名字: no emoji, `@` `#` `/` `:`, nothing unseen —
@@ -133,8 +134,17 @@ func _on_go() -> void:
 			_refresh()
 			failed.emit(str(r.get("code", "network"))))
 
-## `Already have a farm? Sign in`: the question secondary, Sign in info, Bold 14, 4 apart, centred; the whole row the
-## key (44), under a 1 px line.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and sign_in_row != null:
+		_space_words(sign_in_row.find_child("Words", true, false) as HBoxContainer)
+
+## The question and Sign in 4 apart in English; under 中文 none (不知火舞 on 491: the full-width ？ brings its own half
+## a square, and no space between Chinese and Chinese, q(275) ⑦).
+static func _space_words(words: HBoxContainer) -> void:
+	if words: words.add_theme_constant_override(&"separation", 0 if TranslationServer.get_locale() == "zh_CN" else WORDS_GAP)
+
+## `Already have a farm? Sign in`: the question secondary, Sign in info, Bold 14, 4 apart (none in 中文), centred; the
+## whole row the key (44), under a 1 px line.
 func _sign_in_row() -> Control:
 	var box := VBoxContainer.new()
 	box.name = "SignInRow"
@@ -156,8 +166,9 @@ func _sign_in_row() -> Control:
 		row.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	row.pressed.connect(func(): if not _checking: sign_in_pressed.emit())
 	var words := HBoxContainer.new()
+	words.name = "Words"
 	words.alignment = BoxContainer.ALIGNMENT_CENTER
-	words.add_theme_constant_override(&"separation", 4)
+	_space_words(words)
 	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	words.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for part in [[HAVE_FARM, UiTokens.COLOR_SECONDARY], [SIGN_IN, UiTokens.COLOR_INFO]]:
