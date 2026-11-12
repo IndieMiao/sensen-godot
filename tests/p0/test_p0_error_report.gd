@@ -87,8 +87,19 @@ func test_it_takes_errors_not_warnings() -> void:
 	var mine: Array = r._pending.filter(func(e): return e[0] == "c67 probe error")
 	assert_str(str(mine[0][1])).contains("test_it_takes_errors_not_warnings")
 
-## A runtime not in the tree adds no logger (tests); one in it does, and takes it away on leaving.
-func test_the_runtime_holds_the_logger_while_it_is_up() -> void:
+## A runtime starts with its reporter and the account's gate closed (it adds the logger only once in the tree).
+func test_a_runtime_starts_with_its_reporter_and_the_gate_closed() -> void:
 	var rt: P0Runtime = auto_free(P0Runtime.new())
 	assert_object(rt.errors).is_not_null()
 	assert_bool(rt.session.identity_ready).is_false()
+
+## A release export finds its scripts' call stacks only when the project tracks them (486 8847765d).
+func test_the_project_tracks_call_stacks() -> void:
+	assert_bool(bool(ProjectSettings.get_setting("debug/settings/gdscript/always_track_call_stacks", false))).is_true()
+
+func test_an_empty_queue_drains_to_nothing() -> void:
+	var r = ErrorReport.new()
+	session.identity_ready = true
+	r.drain(session, "P0Farm", 0)
+	assert_array(_reported()).is_empty()
+	assert_int(r.sent).is_equal(0)
