@@ -6,6 +6,7 @@ extends GdUnitTestSuite
 
 func after_test() -> void:
 	P0Build.store_override = null
+	P0ProfilePage.voice_profile_enabled = false   # off in every build; a test that turned it on leaves it off (周瑜 on #1007)
 
 func after() -> void:
 	P0Runtime.free_instance_for_tests()   # the map test's runtime, not left to the next suite
@@ -47,7 +48,6 @@ func test_the_voice_profile_is_androids_outside_the_store_build_only() -> void:
 	assert_bool(P0ProfilePage.voice_profile_shown("iOS", false)).is_false()
 	P0Build.store_override = true
 	assert_bool(P0ProfilePage.voice_profile_shown("Android")).is_false()   # its default reads the build
-	P0ProfilePage.voice_profile_enabled = false
 
 func test_a_development_run_is_not_the_store_build() -> void:
 	assert_bool(P0Build.store()).is_false()   # no `store` feature here: the OSS build's rows and places, as before

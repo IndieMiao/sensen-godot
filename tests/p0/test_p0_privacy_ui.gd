@@ -12,6 +12,9 @@ const VECTORS := {
 	"玩家-一": "T2ZBB-SGCZ1",
 }
 
+func after_test() -> void:
+	P0ProfilePage.voice_profile_enabled = false   # off in every build; a test that turned it on leaves it off (周瑜 on #1007)
+
 func test_the_support_code_is_the_shared_function_of_the_id() -> void:
 	for id in VECTORS: assert_str(P0Legal.support_code(id)).override_failure_message(id).is_equal(VECTORS[id])
 	assert_str(P0Legal.support_code("")).is_equal("")
@@ -58,7 +61,6 @@ func test_voice_profile_is_androids_and_goes_by_voices_age_answer() -> void:
 	P0ProfilePage.voice_profile_enabled = true
 	assert_bool(P0ProfilePage.voice_profile_shown("iOS")).is_false()
 	assert_bool(P0ProfilePage.voice_profile_shown("Android")).is_true()
-	P0ProfilePage.voice_profile_enabled = false
 	assert_array(["ok", "no", "unknown"].map(func(a): return P0Ui.voice_profile_step(a))).is_equal(["open", "refuse", "ask"])
 	var card = auto_free(P0Ui.AgeCard.new(2026, "Voice Profile"))
 	assert_bool(card.find_children("*", "Label", true, false).any(func(l): return l.text == "Voice Profile")).is_true()
