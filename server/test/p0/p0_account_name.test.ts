@@ -1,0 +1,121 @@
+/** Player names (q(313) ① ②; 后裔's account contract 11-13): the server's rule, its four reasons, the rename wait. */
+import { describe, expect, it } from 'vitest';
+import { checkName, nameList, NAME_MAX, normalizeName, renameAt, RENAME_COOLDOWN_MS, skeleton, type NameList } from '../../src/p0/accounts/name.js';
+
+const LIST: NameList = {
+  severe: ['fuck', 'nigger', '傻逼'], words: ['ass', 'cunt'], impersonation: ['gm', 'admin', 'support'],
+  impersonation_anywhere: ['gensen', '官方'], allow: ['scunthorpe'],
+};
+const check = (s: unknown) => checkName(s, LIST);
+const ok = (s: string) => expect(check(s)).toEqual({ ok: true, name: normalizeName(s) });
+const no = (s: unknown, reason: string, rule: string) => expect(check(s)).toEqual({ ok: false, reason, rule });
+
+describe('player names (q(313))', () => {
+  it('is kept normalized: NFKC, one space between words, none at either end', () => {
+    expect(normalizeName('  Ｍｅｉ　  Lin ')).toBe('Mei Lin');
+    expect(normalizeName('Ann Lee')).toBe('Ann Lee');
+    ok('Mei Lin');
+    expect(check('  Mei   Lin ')).toEqual({ ok: true, name: 'Mei Lin' });
+  });
+
+  it('is 2–16 graphemes: a Chinese character or a letter with its tone mark counts one', () => {
+    no('', 'empty', 'empty');
+    no('   ', 'empty', 'empty');
+    no(null, 'empty', 'empty');
+    no('A', 'length', 'too_short');
+    ok('Li');
+    ok('小明');
+    ok('Nguyễn Thị Ánh');                                 // tone marks: one grapheme each
+    ok('Nguŷ̃n');                           // the same with combining marks
+    ok('x'.repeat(NAME_MAX));
+    no('x'.repeat(NAME_MAX + 1), 'length', 'too_long');
+    ok('张'.repeat(16));
+    no('张'.repeat(17), 'length', 'too_long');
+  });
+
+  it("takes the drawn scripts, digits, spaces and -_.' only", () => {
+    for (const s of ['Ana-Maria', "O'Neil", 'mei_lin', 'J.R.', 'Player 42', 'Ζωή', 'Анна', 'さくら', 'カタカナー', '김민지', '佐々木'])
+      ok(s);
+    for (const s of ['Mei😀', 'a@b', '#tag', 'http://x', 'a:b', 'a/b', 'محمد', 'שלום', 'สมชาย', 'नमस्ते', 'Ann\tLee', 'A​B', 'Ab‮'])
+      no(s, 'chars', 'bad_char');
+    no('Zá̂̃̄lgo', 'chars', 'bad_char');   // a stack of marks, not a letter's accents
+  });
+
+  it('does not mix Latin with Cyrillic or Greek, but Latin goes with CJK', () => {
+    no('Pаul', 'chars', 'mixed_script');   // Cyrillic а
+    no('Pαul', 'chars', 'mixed_script');   // Greek α
+    ok('小明Tom');
+    ok('Ana 김');
+  });
+
+  it('meets a severe word anywhere, repeated letters and look-alike digits too, not a near word', () => {
+    no('fuck', 'blocked', 'blocked');
+    no('BigFuckTom', 'blocked', 'blocked');
+    no('fuuuck', 'blocked', 'blocked');
+    no('f.u.c.k', 'blocked', 'blocked');
+    no('Fück', 'blocked', 'blocked');
+    no('n1gger', 'blocked', 'blocked');
+    no('我是傻逼', 'blocked', 'blocked');
+    ok('Niger');                            // a letter dropped is another word
+  });
+
+  it('takes an allowed word out before the severe ones are looked for', () => {
+    const severe = { ...LIST, severe: [...LIST.severe, 'cunt'] };
+    expect(checkName('Scunthorpe', severe)).toEqual({ ok: true, name: 'Scunthorpe' });
+    expect(checkName('Scunthorpe', { ...severe, allow: [] })).toEqual({ ok: false, reason: 'blocked', rule: 'blocked' });
+    expect(checkName('ScunthorpeCunt', severe)).toEqual({ ok: false, reason: 'blocked', rule: 'blocked' });
+  });
+
+  it('meets a plain word only as the whole name or one of its words', () => {
+    no('Ass', 'blocked', 'blocked');
+    no('Big Ass', 'blocked', 'blocked');
+    no('BigAss', 'blocked', 'blocked');      // a capital starts a word
+    ok('Cassandra');
+    ok('Bass Player');
+    no('cunt', 'blocked', 'blocked');
+  });
+
+  it('refuses staff-looking names, in Cyrillic and with digits too; the brand anywhere', () => {
+    no('Admin', 'blocked', 'impersonation');
+    no('GM Tom', 'blocked', 'impersonation');
+    no('AdminBob', 'blocked', 'impersonation');
+    no('Admin1', 'blocked', 'impersonation');
+    no('4dm1n', 'blocked', 'impersonation');
+    no('аԁміп', 'blocked', 'impersonation');   // all Cyrillic, read as Latin
+    no('GensenTeam', 'blocked', 'impersonation');
+    no('gensen_official', 'blocked', 'impersonation');
+    no('官方小助手', 'blocked', 'impersonation');
+    ok('Ogma');                             // gm inside a word
+    ok('Supporter');                        // not the word itself
+    ok('Gemma');
+  });
+
+  it("reads `1` as `i` and as `l`", () => {
+    expect(skeleton('4dm1n')).toBe('admin');
+    expect(skeleton('a1l', 'l')).toBe('all');
+    const list: NameList = { ...LIST, words: ['lol'] };
+    expect(checkName('1o1', list)).toEqual({ ok: false, reason: 'blocked', rule: 'blocked' });
+  });
+
+  it("the shipped list loads and holds the q(313) staff words", () => {
+    const l = nameList();
+    for (const w of ['gensen', 'gm', 'admin', 'moderator', 'staff', 'official', 'support', 'system'])
+      expect([...l.impersonation, ...l.impersonation_anywhere]).toContain(w);
+    expect(checkName('Moderator').ok).toBe(false);
+    expect(checkName('Traveller 8c3f')).toEqual({ ok: true, name: 'Traveller 8c3f' });   // the default name
+  });
+});
+
+describe('the rename wait (q(313) ②)', () => {
+  const T = Date.parse('2026-11-13T00:00:00Z');
+  it('is 7 days from the last name; a first launch Skip waits for nothing', () => {
+    expect(renameAt(undefined)).toBe(0);
+    expect(renameAt({ name: 'Traveller 8c3f', name_set_at: null })).toBe(0);
+    expect(renameAt({ name: 'Mei', name_set_at: T })).toBe(T + RENAME_COOLDOWN_MS);
+  });
+  it("a moderator's lock wins when it ends later", () => {
+    expect(renameAt({ name_set_at: T, name_locked_until: T + 10 * 86_400_000 })).toBe(T + 10 * 86_400_000);
+    expect(renameAt({ name_set_at: T, name_locked_until: T + 86_400_000 })).toBe(T + RENAME_COOLDOWN_MS);
+    expect(renameAt({ name_set_at: null, name_locked_until: T + RENAME_COOLDOWN_MS })).toBe(T + RENAME_COOLDOWN_MS);
+  });
+});

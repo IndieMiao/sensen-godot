@@ -1,0 +1,9 @@
+{
+  "_note": "Player names (q(313) ①), read by server/src/p0/accounts/name.ts. A base list to run on (周瑜 11-12); the real one is 李白's, checked by 不知火舞. Words written plainly: the matcher folds case, accents, Cyrillic / Greek look-alikes and 0 1 3 4 5 @ $ itself, lets each letter repeat (fuuuck) and drops spaces and - _ . ' — so write `fuck`, not its spellings. severe: anywhere in the name, inside another word too. words: the whole name or one of its words (as in `Big Ass`, not `Cassandra`). impersonation: the same, for staff-looking names. impersonation_anywhere: anywhere. allow: real words that contain a severe one (Scunthorpe), taken out first. Chinese / Japanese / Korean entries are met anywhere; traditional and simplified are separate entries. A new word needs a server deploy, not a client release.",
+  "severe": ["fuck", "nigger", "nigga", "faggot", "hitler", "nazi", "porn",
+    "傻逼", "傻屄", "煞笔", "操你", "肏你", "草泥马", "鸡巴", "雞巴", "婊子", "妈逼", "媽逼", "强奸", "強姦", "日你妈", "日你媽"],
+  "words": ["ass", "asshole", "bitch", "cock", "cunt", "dick", "dildo", "pedo", "piss", "rape", "rapist", "sex", "shit", "slut", "whore", "kys"],
+  "impersonation": ["gm", "admin", "administrator", "moderator", "staff", "official", "support", "system", "developer"],
+  "impersonation_anywhere": ["gensen", "官方", "管理员", "管理員", "客服", "系统", "系統"],
+  "allow": ["scunthorpe", "penistone"]
+}
