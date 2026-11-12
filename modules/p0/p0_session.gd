@@ -31,6 +31,10 @@ var access_key := ""
 ## test builds are never turned away for their version).
 var version := 0
 var player_id := ""
+## The account's gate (后裔's PR-A sets it: true once a token is held or a claim is done, false again on a 401
+## session_replaced / account_deleted or a deletion): until then nothing about this install leaves but its commands —
+## P0ErrorReport (SGODOT-486) sends no error while it is false, nor keeps any for later.
+var identity_ready := false
 ## The server's view. SGODOT-260 Q3: current() shares its unchanged parts with every caller, so nothing writes into it:
 ## in the editor and the tests it is made read-only (a write is an error there; exported builds skip the walk).
 var view: Dictionary = {}:

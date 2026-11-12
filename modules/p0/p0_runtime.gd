@@ -28,6 +28,7 @@ static var HOME_PLACE := P0City.chip("Home")   # the farm's place chip (p0_farm 
 static var _instance: P0Runtime
 
 var session: P0Session
+var errors = preload("res://modules/p0/p0_error_report.gd").new()   # P0ErrorReport: the engine's errors, queued
 ## Where the player last was (the place chip's place, LOCK-06): browsing the map keeps it. {space, place};
 ## the map's pond card measures Distance from here (q(48)).
 var here := {"space": "home", "place": ""}
@@ -411,9 +412,11 @@ func _call(method: String, args: Array):
 
 func _enter_tree() -> void:
 	AppRouter.loading_overlay_factory = _scene_overlay   # SYS-LOADING-SCENE for the P0 worlds AppRouter opens
+	OS.add_logger(errors)   # GDScript errors to the server, once the account's gate is open (SGODOT-486)
 
 func _exit_tree() -> void:
 	if AppRouter.loading_overlay_factory == Callable(self, &"_scene_overlay"): AppRouter.loading_overlay_factory = Callable()
+	OS.remove_logger(errors)
 	WaterShore.finish_all()   # the app ending: no pond bank's task left to the pool past the scripts (WaterShore.prewarm)
 
 func _notification(what: int) -> void:
@@ -430,6 +433,7 @@ func _notification(what: int) -> void:
 				int(Time.get_time_zone_from_system().get("bias", 0)))
 
 func _process(dt: float) -> void:
+	errors.drain(session, str(world.name) if is_instance_valid(world) else "", Time.get_ticks_msec())
 	_dev_shot(dt)
 	_dev_mem(dt)
 	_tick_screens(dt)
