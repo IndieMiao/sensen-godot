@@ -37,7 +37,7 @@ const REASON: Record<NameRule, NameReason> = {
  * not `Cassandra`); `impersonation`: the same, for the names a player could pass as staff by (`Admin`, `GM`);
  * `impersonation_anywhere`: the brand, anywhere (`GensenTeam`); `allow`: names or words that only look like a severe
  * one (`Scunthorpe`), taken out before the severe words are looked for. Each letter may be repeated (`fuuuck`), never
- * dropped (`niger` is not `nigger`). Words in Chinese, Japanese or Korean are met anywhere: those names have no spaces
+ * dropped (`niger` is not `nigger`); a whole word may take a plural's `s` / `es`. Words in Chinese, Japanese or Korean are met anywhere: those names have no spaces
  * between their words; traditional and simplified are separate entries.
  */
 export interface NameList {
@@ -111,12 +111,13 @@ function words(name: string): string[] {
 const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u;
 
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-/** An entry as a pattern on skeletons: each of its letters once or more (`fuuuck`), its spaces and `-_.'` gone. */
+/** An entry as a pattern on skeletons: each of its letters once or more (`fuuuck`), its spaces and `-_.'` gone; a whole
+ *  word may end in an English plural's `s` / `es` (`Cunts`, `Bitches`, `Admins`; 不知火舞's probe 11-12, 李白). */
 const pattern = (entry: string, anchored: boolean): RegExp | null => {
   const k = skeleton(entry.split(SEP).join(''));
   if (k === '') return null;
   const body = graphemes(k).map(g => `(?:${escape(g)})+`).join('');
-  return new RegExp(anchored ? `^${body}$` : body, 'u');
+  return new RegExp(anchored ? `^${body}(?:e?s)?$` : body, 'u');
 };
 
 /** Which list rule a name meets, or null. The name is read twice, its `1` as `i` and as `l`. */

@@ -1,4 +1,5 @@
 /** Player names (q(313) ① ②; 后裔's account contract 11-13): the server's rule, its four reasons, the rename wait. */
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { checkName, nameList, NAME_MAX, normalizeName, renameAt, RENAME_COOLDOWN_MS, skeleton, type NameList } from '../../src/p0/accounts/name.js';
 
@@ -90,6 +91,13 @@ describe('player names (q(313))', () => {
     ok('Gemma');
   });
 
+  it("takes a whole word's English plural, not a longer word (不知火舞's probe 11-12)", () => {
+    no('Asses', 'blocked', 'blocked');
+    no('Cunts', 'blocked', 'blocked');
+    no('Admins', 'blocked', 'impersonation');
+    for (const s of ['Bass', 'Glass', 'Pass', 'Assess', 'Classes']) ok(s);
+  });
+
   it("reads `1` as `i` and as `l`", () => {
     expect(skeleton('4dm1n')).toBe('admin');
     expect(skeleton('a1l', 'l')).toBe('all');
@@ -103,6 +111,19 @@ describe('player names (q(313))', () => {
       expect([...l.impersonation, ...l.impersonation_anywhere]).toContain(w);
     expect(checkName('Moderator').ok).toBe(false);
     expect(checkName('Traveller 8c3f')).toEqual({ ok: true, name: 'Traveller 8c3f' });   // the default name
+    for (const s of ['Bitches', 'Whores', 'GMs', 'f4gs']) expect(checkName(s).ok).toBe(false);
+    // names that hold a listed word's letters (李白 and 不知火舞's probe 11-12)
+    for (const s of ['Farm Owner', 'Smooth Operator', 'Scunthorpe', 'Penistone', 'Shiitake', 'Matsushita', 'Pornthip',
+      'Assess', 'Cassandra', 'Dickens', 'Hancock', 'Cockburn', 'Sussex', 'Essex', 'Therapist', 'Grape', 'Peacock', 'Niger'])
+      expect(checkName(s)).toEqual({ ok: true, name: s });
+  });
+
+  it("the game's own names and place words all pass the shipped list", () => {
+    const w = JSON.parse(readFileSync(new URL('../../../assets/p0/content/world_gen.json', import.meta.url), 'utf8')).world;
+    const pools = [w.keeper_names, w.tea_words, w.wild.words, w.ponds.words] as Record<string, string[]>[];
+    const all = pools.flatMap(p => Object.values(p).flatMap(v => (Array.isArray(v) ? v : [])));
+    expect(all.length).toBeGreaterThan(300);
+    expect(all.filter(n => !checkName(n).ok)).toEqual([]);
   });
 });
 
