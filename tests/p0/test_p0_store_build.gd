@@ -33,12 +33,21 @@ func test_the_card_room_is_on_the_map_only_outside_the_store_build() -> void:
 func test_no_resident_lives_in_the_card_room() -> void:
 	assert_array(P0Outposts.by_role("casino").get("residents", [])).is_empty()
 
+## The user 11-12 (second batch #7): no Voice Profile in any build, the Android test build too.
+func test_no_build_shows_the_voice_profile() -> void:
+	for os_name in ["Android", "iOS", "macOS"]:
+		for store in [false, true]:
+			assert_bool(P0ProfilePage.voice_profile_shown(os_name, store)).override_failure_message("%s %s" % [os_name, store]).is_false()
+
+## Were it on again: Android's, outside the store build only.
 func test_the_voice_profile_is_androids_outside_the_store_build_only() -> void:
+	P0ProfilePage.voice_profile_enabled = true
 	assert_bool(P0ProfilePage.voice_profile_shown("Android", false)).is_true()
 	assert_bool(P0ProfilePage.voice_profile_shown("Android", true)).is_false()
 	assert_bool(P0ProfilePage.voice_profile_shown("iOS", false)).is_false()
 	P0Build.store_override = true
 	assert_bool(P0ProfilePage.voice_profile_shown("Android")).is_false()   # its default reads the build
+	P0ProfilePage.voice_profile_enabled = false
 
 func test_a_development_run_is_not_the_store_build() -> void:
 	assert_bool(P0Build.store()).is_false()   # no `store` feature here: the OSS build's rows and places, as before
