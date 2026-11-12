@@ -23,6 +23,7 @@ const CARD_TOP := 170.0
 const PAD := Vector4(21, 25, 21, 21)
 const RADIUS := 24.0
 const KEY_H := 48.0
+const LINK_SIZE := 15
 const _MARK_TOP := 84.0
 
 var backdrop: Texture2D = BACKDROP:
@@ -31,6 +32,11 @@ var backdrop: Texture2D = BACKDROP:
 		if _art:
 			_art.texture = t
 			_layout()
+## The card's top on the frame: 170 (AGE, NAME, …); a page with a short card sits lower (AGE-BLOCK's 220).
+var card_top := CARD_TOP:
+	set(v):
+		card_top = v
+		if card: _layout()
 var card: PanelContainer
 var col: VBoxContainer
 var mark: UiWordmark
@@ -95,6 +101,20 @@ func add_gap(h: float) -> Control:
 	col.add_child(g)
 	return g
 
+## A text link in the card, centred, 44 high: info blue, Bold 15 (`Privacy Policy ›`, AGE-BLOCK; q(281)'s link).
+func add_link(text: String) -> UiDismissButton:
+	var b := UiDismissButton.new(text)
+	b.name = "Link"
+	b.custom_minimum_size.y = UiTokens.SIZE_TOUCH
+	b.add_theme_font_override(&"font", UiKit.font(&"bold"))
+	b.add_theme_font_size_override(&"font_size", LINK_SIZE)
+	for state in [&"font_color", &"font_hover_color", &"font_pressed_color", &"font_focus_color", &"font_hover_pressed_color"]:
+		b.add_theme_color_override(state, UiTokens.COLOR_INFO)
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]:
+		b.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	col.add_child(b)
+	return b
+
 ## The page's primary key, the card's width, 48 high.
 func add_primary(text: String) -> UiCommandButton:
 	var b := UiCommandButton.new(text)
@@ -113,5 +133,5 @@ func _layout() -> void:
 	var m := mark.get_combined_minimum_size()
 	mark.position = Vector2(roundf((w - m.x) * 0.5), _MARK_TOP)
 	mark.size = m
-	card.position = Vector2(SIDE, CARD_TOP)
+	card.position = Vector2(SIDE, card_top)
 	card.size = Vector2(w - SIDE * 2.0, 0.0)   # as tall as what is in it
