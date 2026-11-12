@@ -16,7 +16,7 @@
 #   server/deploy/p0/deploy-hk.sh rollback             # compose down (data kept), Caddyfile back in place, reload
 #   server/deploy/p0/deploy-hk.sh clean-devserver <sha> # remove the build directory and image on the devserver
 # Observer tools for the playtest (SGODOT-150, q(53)), through docker exec to 127.0.0.1:3111 inside the container:
-#   server/deploy/p0/deploy-hk.sh players                       # player ids by join time (the name ↔ id table)
+#   server/deploy/p0/deploy-hk.sh players [--ids]               # player counts; --ids: ids by join time, terminal only
 #   server/deploy/p0/deploy-hk.sh energy <player id> <value>     # F1: set one player's Energy (day-4 revisit, ~80)
 #   server/deploy/p0/deploy-hk.sh report <player id> [YYYY-MM-DD] # F2: that player's session report + the day's lines
 # SYS-MAINT / SYS-UPDATE (gate.ts; kept in the data volume, so a restart keeps them; healthz and admin stay open):
@@ -305,7 +305,8 @@ PY
       player="${1:?report <player id> [YYYY-MM-DD]}"; day="${2:-$(date -u +%Y-%m-%d)}"
       [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ && "$day" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "bad player id or day"; exit 2; }
       say "F2: $player on $day (UTC) — session report, then the day's command and refusal counts"
-      hk "bash -s -- '$player' '$day' '$US_SERVICE'" < "$here/p0-report.sh" | tee "$out/report-$player-$day.txt"
+      # Terminal only (data B, 11-12): one player's day stays on the US host, nothing of it is kept on this Mac
+      hk "bash -s -- '$player' '$day' '$US_SERVICE'" < "$here/p0-report.sh"
       exit 0 ;;
   esac
 fi
@@ -450,15 +451,29 @@ PY
     health rollback
     ;;
   players)
-    say "players by join time (admin, loopback inside $US_SERVICE)"
-    admin /admin/players | tee "$out/players.json"; echo
+    # Data B (the user, 11-11): no copy of the live players on this Mac. By default only counts, kept in players.txt;
+    # with --ids the list by join time goes to the terminal only (matching an install to an id), never to a file.
+    if [ "${1:-}" = "--ids" ]; then
+      say "players by join time (admin, loopback inside $US_SERVICE) — terminal only, not saved"
+      admin /admin/players; echo
+    else
+      say "player counts (admin, loopback inside $US_SERVICE); the ids stay on the server (--ids to see them, not saved)"
+      admin /admin/players | python3 -c '
+import json, sys, time
+p = json.load(sys.stdin)["players"]; now = time.time() * 1000; day = 86400000
+seen = lambda d: sum(1 for x in p if (x.get("last_at") or 0) >= now - d * day)
+joined = sum(1 for x in p if (x.get("created_at") or 0) >= now - day)
+print(f"players {len(p)}; joined in 24 h {joined}; seen in 24 h {seen(1)}, 7 days {seen(7)}")' \
+        | tee -a "$out/players.txt"
+    fi
     ;;
   energy)
     player="${1:?energy <player id> <value>}"; value="${2:?energy <player id> <value>}"
     [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }   # the server's PLAYER_RE
     [[ "$value" =~ ^[0-9]{1,4}$ ]] || { echo "value must be a whole number: $value"; exit 2; }
     say "F1: Energy of $player → $value (logged in the container log as an admin line)"
-    admin /admin/energy "{\"player\":\"$player\",\"value\":$value}" | tee -a "$out/admin.txt"; echo
+    admin /admin/energy "{\"player\":\"$player\",\"value\":$value}"; echo
+    echo "$(date -u +%FT%TZ) energy …${player: -6} → $value" >> "$out/admin.txt"   # data B: the full id is not kept here
     ;;
   maint-on)
     back="${1:-}"
@@ -488,7 +503,7 @@ PY
     player="${1:?report <player id> [YYYY-MM-DD]}"; day="${2:-$(date -u +%Y-%m-%d)}"
     [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ && "$day" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "bad player id or day"; exit 2; }
     say "F2: $player on $day (UTC) — session report, then the day's command and refusal counts"
-    hk "$REMOTE/p0-report.sh '$player' '$day'" | tee "$out/report-$player-$day.txt"
+    hk "$REMOTE/p0-report.sh '$player' '$day'"   # terminal only (data B, 11-12)
     ;;
   clean-devserver)
     sha="${1:?clean-devserver <sha>}"
