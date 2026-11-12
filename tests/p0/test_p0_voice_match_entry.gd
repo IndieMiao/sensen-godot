@@ -18,6 +18,7 @@ func _view() -> Dictionary:
 	}
 
 func before_test() -> void:
+	P0ProfilePage.voice_profile_enabled = true   # off in every build (second batch #7); its row and page kept, tested on
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TIPS))
 	ui = P0Ui.new()
 	ui.quick_store = STORE
@@ -28,6 +29,7 @@ func before_test() -> void:
 	ui.set_surface("farm")
 
 func after_test() -> void:
+	P0ProfilePage.voice_profile_enabled = false
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TIPS))
 
@@ -36,6 +38,11 @@ func _page() -> P0ProfilePage:
 	await await_idle_frame()
 	await await_idle_frame()
 	return ui._profile
+
+func test_no_row_while_it_is_off() -> void:
+	P0ProfilePage.voice_profile_enabled = false
+	var page := await _page()
+	assert_object(page.find_child("VoiceProfileRow", true, false)).is_null()
 
 func test_the_row_sits_16_under_collections_as_a_farm_card_navigation_row() -> void:
 	var page := await _page()

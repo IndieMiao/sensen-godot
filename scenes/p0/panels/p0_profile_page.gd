@@ -144,7 +144,11 @@ func refresh(view_: Dictionary) -> void:
 
 ## q(281) ③ (SGODOT-390): no Voice Profile on an iPhone (the card is not there at all); Android keeps it (the user) — but
 ## for the store build (SGODOT-483, Google Play: an AI reading of a recording sent abroad), which has none either.
-static func voice_profile_shown(os_name: String, store := P0Build.store()) -> bool: return os_name != "iOS" and not store
+## Now none in any build (the user 11-12, the store's second batch #7 via 奕星: the Android test build too): off till
+## the user says otherwise; the row and its page stay in the code, and tests turn it on to keep them working.
+static var voice_profile_enabled := false
+static func voice_profile_shown(os_name: String, store := P0Build.store()) -> bool:
+	return voice_profile_enabled and os_name != "iOS" and not store
 
 ## `Voice Profile ›` under Collections (SGODOT-349, 不知火舞 2ca37b44): the NavigationRow main (9:99743, 49 high,
 ## label and ›, no icon) on a full-width card that looks like the farm card (radius 12, the raised surface, no stroke);

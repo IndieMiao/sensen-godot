@@ -54,8 +54,11 @@ func _names_last(page: P0SettingsPage) -> Array:
 	return card.find_children("*", "UiSettingRow", true, false).map(func(r): return str(r.name))
 
 func test_voice_profile_is_androids_and_goes_by_voices_age_answer() -> void:
+	assert_bool(P0ProfilePage.voice_profile_shown("Android")).is_false()   # off in every build (second batch #7)
+	P0ProfilePage.voice_profile_enabled = true
 	assert_bool(P0ProfilePage.voice_profile_shown("iOS")).is_false()
 	assert_bool(P0ProfilePage.voice_profile_shown("Android")).is_true()
+	P0ProfilePage.voice_profile_enabled = false
 	assert_array(["ok", "no", "unknown"].map(func(a): return P0Ui.voice_profile_step(a))).is_equal(["open", "refuse", "ask"])
 	var card = auto_free(P0Ui.AgeCard.new(2026, "Voice Profile"))
 	assert_bool(card.find_children("*", "Label", true, false).any(func(l): return l.text == "Voice Profile")).is_true()
