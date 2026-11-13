@@ -12,15 +12,14 @@ import plistlib
 import re
 import subprocess
 
-LOCATION_USAGE = (
-    "Your location helps Gensen select a nearby city and center the map "
-    "when you use location features."
-)
-# The sentence before the app was Gensen (0.2.23 and earlier still carried it): an Xcode project copied from then has it
-# in its Info.plist, so it is replaced like an empty one. Any other wording someone wrote there is kept.
-RETIRED_LOCATION_USAGE = (
-    "Your location helps Journey select a nearby city and center the map "
-    "when you use location features."
+# q(319) (user, bot 783): P0 never asks for location; the key is there only because the Mapbox binary references the
+# foreground location APIs (inject_store_config.py writes the same sentence and its zh-Hans one).
+LOCATION_USAGE = "Gensen doesn't ask for your location. The map component requires this description."
+# Sentences an older copied project may still carry (Journey's, 0.2.23 and earlier; Gensen's, until q(319)): replaced
+# like an empty one. Any other wording someone wrote there is kept.
+RETIRED_LOCATION_USAGES = (
+    "Your location helps Journey select a nearby city and center the map when you use location features.",
+    "Your location helps Gensen select a nearby city and center the map when you use location features.",
 )
 
 
@@ -85,7 +84,7 @@ def main():
         # purpose string even while the Godot iOS location bridge is inactive.
         location_key = "NSLocationWhenInUseUsageDescription"
         location_added = not str(content.get(location_key, "")).strip()
-        location_replaced = content.get(location_key) == RETIRED_LOCATION_USAGE
+        location_replaced = content.get(location_key) in RETIRED_LOCATION_USAGES
         if location_added or location_replaced:
             content[location_key] = LOCATION_USAGE
             (added_usage_keys if location_added else replaced_usage_keys).append(location_key)
