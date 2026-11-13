@@ -427,6 +427,15 @@ static func account_refusal(result: int, code: int, raw: PackedByteArray) -> Dic
 	var data = JSON.parse_string(raw.get_string_from_utf8())
 	return data if data is Dictionary and str(data.get("code", "")) in ACCOUNT_CODES else {}
 
+## A reply to a request outside the queue (the voice room's own HTTP, SGODOT-488): an account refusal there stops this
+## session as one to a read would (account_state); whether it was one.
+func take_account_refusal(result: int, code: int, raw: PackedByteArray) -> bool:
+	var refusal := account_refusal(result, code, raw) if accounts else {}
+	if refusal.is_empty(): return false
+	identity_ready = false
+	account_state.emit(str(refusal.code), refusal)
+	return true
+
 static func blocked_reply(result: int, code: int, raw: PackedByteArray) -> Dictionary:
 	if result != HTTPRequest.RESULT_SUCCESS or not code in [426, 503]: return {}
 	var data = JSON.parse_string(raw.get_string_from_utf8())

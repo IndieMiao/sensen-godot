@@ -27,7 +27,8 @@ interface TokenRow { player: string; kind: TokenKind; at: number; expires_at?: n
 interface FileShape { v: 1; players: Record<string, AccountRow>; tokens: Record<string, TokenRow>; identities: Record<string, string>;
   deleted: Record<string, number> }
 
-export const hashToken = (token: string): string => createHash('sha256').update(token).digest('hex');
+/** A token's hash, the hex read as one case (a token is hex: AB and ab are the same bytes; 周瑜 on PR-A). */
+export const hashToken = (token: string): string => createHash('sha256').update(token.toLowerCase()).digest('hex');
 /** A token as the contract has it: hex, at least TOKEN_MIN_BYTES. */
 export const tokenShapeOk = (token: unknown): token is string =>
   typeof token === 'string' && /^[0-9a-f]+$/i.test(token) && token.length >= TOKEN_MIN_BYTES * 2 && token.length <= 256;
@@ -144,7 +145,7 @@ export class P0Accounts {
   private flush(): void {
     if (!this.file) return;
     const tmp = `${this.file}.tmp`;
-    writeFileSync(tmp, JSON.stringify(this.d));
+    writeFileSync(tmp, JSON.stringify(this.d), { mode: 0o600 });   // tokens' hashes and sealed refresh tokens: the server's only (周瑜 on PR-A)
     renameSync(tmp, this.file);
   }
 }

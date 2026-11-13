@@ -1,6 +1,6 @@
 /** accounts.json (SGODOT-488; contract-accounts.md §4): tokens by hash, links one-to-one, deleted ids for 30 days, the
  * Apple refresh token sealed on disk. */
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -93,5 +93,15 @@ describe('P0Accounts', () => {
     expect(tokenShapeOk('ab'.repeat(31))).toBe(false);
     expect(tokenShapeOk('zz'.repeat(32))).toBe(false);
     expect(tokenShapeOk(42)).toBe(false);
+  });
+});
+
+describe('P0Accounts files and case', () => {
+  it('reads a token in either case as the same, and keeps accounts.json to the server alone', () => {
+    const f = file();
+    const a = new P0Accounts(f, KEY);
+    a.issue('p0-a', T(10).toUpperCase());
+    expect(a.byToken(T(10))?.player).toBe('p0-a');
+    expect(statSync(f).mode & 0o777).toBe(0o600);
   });
 });
