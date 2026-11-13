@@ -1,5 +1,6 @@
 /** P0 HTTP surface: GET state, POST command, plus dev-only time skip and reset (local playtests only). */
 import type { FastifyInstance, FastifyReply } from 'fastify';
+import { accountView } from './accounts/view.js';
 import { identify, isRefusal, type IdentifyDeps } from './accounts/identify.js';
 import type { P0Content } from './content.js';
 import { applyP0, type P0Command } from './reducer.js';
@@ -83,9 +84,11 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   };
   // q(272): the keepers' local requests wear map marks only for a client that shows them (`locals`): an older one would
   // write a keeper's ! as the Market Board's count
-  const view = (st: P0State, at: number, headers: Record<string, unknown>) =>
-    viewOf(c, st, at, { online: townOnline(st), locals: features(headers).includes('locals'), wing8: features(headers).includes('wing8'),
+  const view = (st: P0State, at: number, headers: Record<string, unknown>) => {
+    const v = viewOf(c, st, at, { online: townOnline(st), locals: features(headers).includes('locals'), wing8: features(headers).includes('wing8'),
       yard2: features(headers).includes('yard2') });
+    return deps.identify ? { ...v, account: accountView(st, deps.identify.accounts.linked(st.player), deps.now()) } : v;
+  };
 
   app.get('/v1/p0/state', async (req, reply) => {
     const player = who(req.headers, reply);

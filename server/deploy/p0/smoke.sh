@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # P0 server smoke test (SGODOT-232 D1): P0_BASE=https://host/preview/p0 P0_KEY=… server/deploy/p0/smoke.sh
-# Checks: health, a request without the key refused (also by an encoded path), state read with the key, one command
+# Checks: health (and P0_LEGACY_ID off, SGODOT-488), a request without the key refused (also by an encoded path), state read with the key, one command
 # round trip, dev routes absent, a UI moment accepted; with the wipe's second guard on (healthz require_features, SGODOT-396
 # ①) a request without those features refused with 426. Every keyed request carries save_v7 alone (FEATURES): the other
 # features a client sends change how a new save starts (choose_home: a home to pick first; guide_v3: the guide), which a
@@ -14,6 +14,9 @@ c() { curl --noproxy '*' -s -o /tmp/p0_smoke_body -w '%{http_code}' "$@"; }
 fail() { echo "FAIL: $1"; cat /tmp/p0_smoke_body; echo; exit 1; }
 [ "$(c "$BASE/v1/healthz")" = 200 ] || fail healthz
 REQUIRED=$(grep -o '"require_features":\[[^]]*\]' /tmp/p0_smoke_body || true)
+# SGODOT-488: P0_LEGACY_ID takes any player by its id alone — never on the live server. A devserver run that means to
+# have it on says so with P0_SMOKE_ALLOW_LEGACY=1.
+if grep -q '"legacy_id":true' /tmp/p0_smoke_body && [ "${P0_SMOKE_ALLOW_LEGACY:-0}" != 1 ]; then fail "P0_LEGACY_ID is on (healthz legacy_id true)"; fi
 [ "$(c -H "x-p0-player: $PLAYER" "$BASE/v1/p0/state")" = 401 ] || fail "no key should be 401"
 [ "$(c -H "x-p0-player: $PLAYER" -H "x-p0-key: $KEY" -H "x-p0-features: $FEATURES" "$BASE/v1/p0/state")" = 200 ] || fail "state with key"
 if [ -n "$REQUIRED" ] && [ "$REQUIRED" != '"require_features":[]' ]; then   # the second guard is on: a pre-wipe build is turned away

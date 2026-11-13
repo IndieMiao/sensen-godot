@@ -119,3 +119,22 @@ describe('account/consent', () => {
     expect(store.peek('p0-old00001')).toMatchObject({ consent: { ...V, at: T0 }, age_ok: true });
   });
 });
+
+describe('view.account', () => {
+  it('says the name, the links, when it may change and the terms agreed; nothing of it without accounts', async () => {
+    const { app, accounts } = setup();
+    const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest() })).json();
+    accounts.link(r.player, 'apple', { sub: 's', aud: 'app.gensen.maps' });
+    const v = (await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { authorization: `Bearer ${T(1)}` } })).json().state;
+    expect(v.account).toEqual({ name: 'Mia', linked: ['apple'], rename_at: T0 + 7 * 86_400_000, consent: V });
+    const plain = Fastify();
+    registerP0Routes(plain, { content: c, store: new P0Store(c), now: () => T0, dev: false });
+    expect((await plain.inject({ method: 'GET', url: '/v1/p0/state', headers: { 'x-p0-player': 'p0-plain0001' } })).json().state.account).toBeUndefined();
+  });
+  it('a skipped name may change now', async () => {
+    const { app } = setup();
+    await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ name: undefined, skip: true }) });
+    const v = (await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { authorization: `Bearer ${T(1)}` } })).json().state;
+    expect(v.account).toEqual({ name: null, linked: [], rename_at: 0, consent: V });
+  });
+});
