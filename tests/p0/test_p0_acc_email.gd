@@ -184,7 +184,7 @@ func test_the_flow_goes_email_then_code_and_back() -> void:
 	var signs: Array = []
 	f.sign_in.connect(func(p: String): signs.append(p))
 	assert_object(f.page).is_instanceof(P0AccSignIn)
-	(f.page as P0AccSignIn).provider_pressed.emit("email")
+	((f.page as P0AccSignIn).find_child("Email", true, false) as Button).pressed.emit()   # 哪吒's key (edb237927)
 	assert_array(signs).is_empty()   # not the host's sheet: the email page here
 	assert_object(f.page).is_instanceof(P0AccEmail)
 	_type(f.page as P0AccEmail, "lin.z@icloud.com")
