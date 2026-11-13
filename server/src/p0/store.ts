@@ -45,9 +45,12 @@ export class P0Store {
   }
   /** The account's save gone (deleteAccount, contract-accounts §4): whether there was one. */
   remove(player: string): boolean {
-    const had = this.players.delete(player);
-    if (had) this.flush();
-    return had;
+    const saved = this.players.get(player);
+    if (!saved) return false;
+    this.players.delete(player);
+    try { this.flush(); }
+    catch (error) { this.players.set(player, saved); throw error; } // A failed write must remain retryable in this process.
+    return true;
   }
   size(): number { return this.players.size; }
   /** A stored player, without creating one (admin tools). */

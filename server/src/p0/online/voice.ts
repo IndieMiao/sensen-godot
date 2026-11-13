@@ -109,7 +109,12 @@ export class P0Voice {
     const mine = this.leases.get(player);
     const others = [...this.leases.values()].filter(l => l.room === room && l.player !== player).length;
     if (!(mine?.room === room) && others >= spec.capacity) return refuse('VOICE_ROOM_FULL', 409);
-    if (mine && mine.room !== room) await this.release(mine);
+    if (mine && mine.room !== room) {
+      await this.release(mine);
+      const current = this.gate(player);
+      if ('code' in current) return current;
+      if (current.o !== o) return refuse('LEASE_EXPIRED', 410);
+    }
     const lease: Lease = mine?.room === room && mine.peer === o.id ? mine : { id: randomUUID(), player, room, peer: o.id, expires: 0 };
     lease.expires = now + VOICE_LEASE_MS;
     this.leases.set(player, lease);
@@ -119,7 +124,11 @@ export class P0Voice {
       metadata: lease.id });
     token.addGrant({ roomJoin: true, room, canPublish: true, canPublishSources: [TrackSource.MICROPHONE], canSubscribe: true,
       canPublishData: false, canUpdateOwnMetadata: false });
-    return { ok: true, url: this.config!.url, token: await token.toJwt(), lease_id: lease.id, room, capacity: Math.max(2, spec.capacity),
+    const signed = await token.toJwt();
+    // Deletion / departure may run while JWT signing is pending. Do not hand out a grant for the removed lease.
+    if (this.leases.get(player) !== lease || this.rooms.occupant(player) !== o || this.ages[player] !== true)
+      return refuse('LEASE_EXPIRED', 410);
+    return { ok: true, url: this.config!.url, token: signed, lease_id: lease.id, room, capacity: Math.max(2, spec.capacity),
       lease_ms: VOICE_LEASE_MS, self: String(o.id), blocked: this.phoneBlocks(player) };
   }
 
@@ -135,6 +144,28 @@ export class P0Voice {
   async leave(player: string, leaseId: string): Promise<void> {
     const lease = this.leases.get(player);
     if (lease && lease.id === leaseId) await this.release(lease);
+  }
+
+  /** Account deletion: release voice, remove age and both sides of saved blocks, but retain the one-year report log.
+   * Starts releasing the lease before awaiting; the caller can kick the WS immediately while blocks still hide it. */
+  async removePlayer(player: string): Promise<void> {
+    await this.drop(player);
+    const ages = { ...this.ages }, blocks = { ...this.blocks };
+    const hadAge = Object.hasOwn(ages, player), hadBlocks = Object.hasOwn(blocks, player);
+    delete ages[player]; delete blocks[player];
+    let changedBlocks = hadBlocks;
+    for (const [other, list] of Object.entries(blocks)) {
+      const next = list.filter(id => id !== player);
+      if (next.length === list.length) continue;
+      changedBlocks = true;
+      if (next.length) blocks[other] = next; else delete blocks[other];
+    }
+    // Publish the new memory state only after both writes; a partial disk failure can then be retried.
+    if (hadAge) writeJson(this.files?.ages, ages);
+    if (changedBlocks) writeJson(this.files?.blocks, blocks);
+    this.ages = ages; this.blocks = blocks;
+    this.refused.delete(player);
+    for (const key of this.reported) if (key.startsWith(player + ' ') || key.endsWith(' ' + player)) this.reported.delete(key);
   }
 
   /** Block (or unblock) someone in this player's room by their peer id; the blocker hears the new list at once (their
