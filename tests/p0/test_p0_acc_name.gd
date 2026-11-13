@@ -39,10 +39,12 @@ func test_the_key_says_what_is_missing() -> void:
 ## stricter than the server (full-width as half-width, as NFKC); Latin mixed with Cyrillic or Greek is not allowed.
 func test_what_a_name_may_be_made_of() -> void:
 	var bad := ["a@b", "a#b", "a/b", "a:b", "ab!", "a&b", "ab" + String.chr(0x1F44D), "a%sb" % String.chr(0x200B),
-		"a%sb" % String.chr(0x202E), "ab%s" % String.chr(0xFE0F), "مرحبا", "a" + String.chr(0x0301).repeat(3)]
+		"a%sb" % String.chr(0x202E), "ab%s" % String.chr(0xFE0F), "مرحبا", "a" + String.chr(0x0301).repeat(3),
+		"Tom" + String.chr(0x3164), "Tom" + String.chr(0x115F), "Tom" + String.chr(0x180B), "Tom" + String.chr(0x17B4),
+		"Mi" + String.chr(0x00AD) + "ra", "Mi" + String.chr(0xFEFF) + "ra"]   # the unseen ones name.ts refuses (周瑜 a395c320a)
 	for n in bad: assert_str(P0AccName.local_reason(n)).override_failure_message(n).is_equal("chars")
 	var good := ["Mira", "Ana María", "田中花子", "Ζωή", "Борис", "O'Neil", "Jean-Luc", "R2D2", "mi_ra.", "コーヒー", "김민지",
-		"Ｍｉｒａ", "田中%s花子" % String.chr(0x3000), "Nguyê" + String.chr(0x0303)]
+		"Ｍｉｒａ", "田中%s花子" % String.chr(0x3000), "Nguyê" + String.chr(0x0303), "ミア" + String.chr(0x309A)]
 	for n in good: assert_str(P0AccName.local_reason(n)).override_failure_message(n).is_empty()
 	for n in [String.chr(0x0410) + "dmin", "G" + String.chr(0x0435) + "nsen", "Zeta" + String.chr(0x03B6)]:
 		assert_str(P0AccName.local_reason(n)).override_failure_message(n).is_equal("blocked")

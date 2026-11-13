@@ -42,9 +42,10 @@ const WHY := {"empty": HELPER, "length": HELPER, "chars": "That character can't 
 ## is fine, and the mix is how a name passes for staff). Words and impersonation are the server's alone.
 const LETTER := "^[\\p{scx:Latin}\\p{scx:Greek}\\p{scx:Cyrillic}\\p{scx:Han}\\p{scx:Hiragana}\\p{scx:Katakana}\\p{scx:Hangul}]$"
 const MARKS_MAX := 2
-## A letter's marks — not the unseen ones that count as marks too: variation selectors (an emoji's U+FE0F) and the
-## combining grapheme joiner (the spec's "nothing invisible"; told to 周瑜 for name.ts, 11-13).
-const MARKS := "^(?:(?![\\x{FE00}-\\x{FE0F}\\x{E0100}-\\x{E01EF}\\x{034F}])\\p{M})+$"
+## Nothing unseen anywhere in a name: Unicode's default-ignorable code points, as name.ts refuses them (周瑜 a395c320a,
+## after 11-13: variation selectors, the joiners, Hangul fillers, Mongolian selectors, Khmer's two, the bidi marks …),
+## listed (Godot's RegEx has no \p{DI}).
+const UNSEEN := "[\\x{00AD}\\x{034F}\\x{061C}\\x{115F}\\x{1160}\\x{17B4}\\x{17B5}\\x{180B}-\\x{180F}\\x{200B}-\\x{200F}\\x{202A}-\\x{202E}\\x{2060}-\\x{206F}\\x{3164}\\x{FE00}-\\x{FE0F}\\x{FEFF}\\x{FFA0}\\x{FFF0}-\\x{FFF8}\\x{1BCA0}-\\x{1BCA3}\\x{1D173}-\\x{1D17A}\\x{E0000}-\\x{E0FFF}]"
 
 ## The host's name check: check.call(name, done) and done.call({ok: true} | {ok: false, code, reason?}).
 var check := Callable()
@@ -102,6 +103,7 @@ static func letters(n: String) -> int: return UiTextField.graphemes(n)
 ## alphabets). LETTER.
 static func local_reason(n: String) -> String:
 	n = fold(n)
+	if _is(n, UNSEEN): return "chars"
 	var latin := false
 	var other := false   # Greek or Cyrillic
 	var from := 0
@@ -114,7 +116,7 @@ static func local_reason(n: String) -> String:
 			if _is(base, "^[\\p{scx:Greek}\\p{scx:Cyrillic}]$"): other = true
 		elif not _is(base, "^[0-9 \\-_.']$"): return "chars"
 		var marks := g.substr(1)
-		if marks.length() > MARKS_MAX or (marks != "" and not _is(marks, MARKS)): return "chars"
+		if marks.length() > MARKS_MAX or (marks != "" and not _is(marks, "^\\p{M}+$")): return "chars"
 	return "blocked" if latin and other else ""
 
 ## Full-width ASCII and the ideographic space as their half-width selves (what NFKC makes of them).
@@ -181,6 +183,12 @@ func _notification(what: int) -> void:
 ## a square, and no space between Chinese and Chinese, q(275) ⑦).
 static func _space_words(words: HBoxContainer) -> void:
 	if words: words.add_theme_constant_override(&"separation", 0 if TranslationServer.get_locale() == "zh_CN" else WORDS_GAP)
+
+## A no from after the check (guest's name_rejected): why, in red, as the check's own no.
+func refuse(reason: String) -> void:
+	_rejected = true
+	field.set_error(str(WHY.get(reason, WHY.blocked)))
+	_refresh()
 
 ## `Already have a farm? Sign in`: the question secondary, Sign in info, Bold 14, 4 apart (none in 中文), centred; the
 ## whole row the key (44), under a 1 px line.
