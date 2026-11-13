@@ -33,10 +33,18 @@ const MAX_LETTERS := 16
 const GAP := 12.0
 const WORDS_GAP := 4
 ## The helper line's red, by the server's reasons (name_rejected's `reason`).
-const WHY := {"length": HELPER, "chars": "That character can't be used", "blocked": "That name isn't allowed"}
-## What cannot be in a name, caught as it is typed (account plan v2 §名字: no emoji, `@` `#` `/` `:`, nothing unseen —
-## control, format, zero-width and bidi marks); the server's name/check decides last and alone on words and alphabets.
-const BAD_CHARS := "[@#/:\\p{Cc}\\p{Cf}\\p{So}\\p{Sk}\\p{Co}\\p{Cn}\\x{200B}-\\x{200F}\\x{2028}-\\x{202F}\\x{2060}-\\x{206F}\\x{FE00}-\\x{FE0F}]"
+const WHY := {"empty": HELPER, "length": HELPER, "chars": "That character can't be used", "blocked": "That name isn't allowed"}
+## What a name may be made of, as the server's name.ts has it (周瑜, q(313) ① ②): each letter as the eye counts it starts
+## with a letter of the scripts the fonts draw (Latin, Greek, Cyrillic, Han, kana, Hangul), a digit, a space or `-_.'`,
+## and carries at most two marks. Caught here as it is typed, never stricter than the server: full-width letters,
+## digits and spaces (a Chinese keyboard's) are read as their half-width selves first, as the server's NFKC does. Latin
+## with Greek or Cyrillic in one name reads as not allowed, not as a bad character (不知火舞 on 491: each letter alone
+## is fine, and the mix is how a name passes for staff). Words and impersonation are the server's alone.
+const LETTER := "^[\\p{scx:Latin}\\p{scx:Greek}\\p{scx:Cyrillic}\\p{scx:Han}\\p{scx:Hiragana}\\p{scx:Katakana}\\p{scx:Hangul}]$"
+const MARKS_MAX := 2
+## A letter's marks — not the unseen ones that count as marks too: variation selectors (an emoji's U+FE0F) and the
+## combining grapheme joiner (the spec's "nothing invisible"; told to 周瑜 for name.ts, 11-13).
+const MARKS := "^(?:(?![\\x{FE00}-\\x{FE0F}\\x{E0100}-\\x{E01EF}\\x{034F}])\\p{M})+$"
 
 ## The host's name check: check.call(name, done) and done.call({ok: true} | {ok: false, code, reason?}).
 var check := Callable()
@@ -46,7 +54,7 @@ var skip: UiDismissButton
 var sign_in_row: Control
 var _rejected := false
 var _checking := false
-static var _bad: RegEx
+static var _re := {}
 
 func _init(with_sign_in := true) -> void:
 	super()
@@ -81,24 +89,55 @@ func prefill(n: String) -> void:
 	field.text = n
 	_on_typed(n)
 
-## The name as it goes out: spaces at its ends dropped, a run of them one (the server's normalising does the rest).
+## The name as it goes out: full-width spaces and ASCII half-width, spaces at its ends dropped, a run of them one (the
+## server's normalising does the rest). All spaces is no name: `Enter a name`, nothing sent.
 func entered() -> String:
-	var n := field.text.strip_edges()
+	var n := fold(field.text).strip_edges()
 	while n.contains("  "): n = n.replace("  ", " ")
 	return n
 
 static func letters(n: String) -> int: return UiTextField.graphemes(n)
 
-## A character no name may have (BAD_CHARS).
-static func bad_chars(n: String) -> bool:
-	if _bad == null:
-		_bad = RegEx.new()
-		_bad.compile(BAD_CHARS)
-	return _bad.search(n) != null
+## What this phone can tell of a name before the server does: "" (nothing wrong here), "chars" or "blocked" (mixed
+## alphabets). LETTER.
+static func local_reason(n: String) -> String:
+	n = fold(n)
+	var latin := false
+	var other := false   # Greek or Cyrillic
+	var from := 0
+	for end in TextServerManager.get_primary_interface().string_get_character_breaks(n):
+		var g := n.substr(from, end - from)
+		from = end
+		var base := g.substr(0, 1)
+		if _is(base, "^\\p{L}$") and _is(base, LETTER):
+			if _is(base, "^\\p{scx:Latin}$"): latin = true
+			if _is(base, "^[\\p{scx:Greek}\\p{scx:Cyrillic}]$"): other = true
+		elif not _is(base, "^[0-9 \\-_.']$"): return "chars"
+		var marks := g.substr(1)
+		if marks.length() > MARKS_MAX or (marks != "" and not _is(marks, MARKS)): return "chars"
+	return "blocked" if latin and other else ""
+
+## Full-width ASCII and the ideographic space as their half-width selves (what NFKC makes of them).
+static func fold(n: String) -> String:
+	var out := ""
+	for i in n.length():
+		var c := n.unicode_at(i)
+		if c >= 0xFF01 and c <= 0xFF5E: c -= 0xFEE0
+		elif c == 0x3000: c = 0x20
+		out += String.chr(c)
+	return out
+
+static func _is(s: String, pattern: String) -> bool:
+	if not _re.has(pattern):
+		var r := RegEx.new()
+		r.compile(pattern)
+		_re[pattern] = r
+	return (_re[pattern] as RegEx).search(s) != null
 
 func _on_typed(t: String) -> void:
-	_rejected = bad_chars(t)
-	if _rejected: field.set_error(WHY.chars)
+	var why := local_reason(t)
+	_rejected = why != ""
+	if _rejected: field.set_error(str(WHY[why]))
 	_refresh()
 
 func _refresh() -> void:

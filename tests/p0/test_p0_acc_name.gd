@@ -35,11 +35,33 @@ func test_the_key_says_what_is_missing() -> void:
 	assert_str(p.go.label).is_equal("Continue")
 	assert_str(p.field.helper_line.text).is_equal("2–16 letters or numbers")
 
-func test_characters_no_name_may_have() -> void:
-	for n in ["a@b", "a#b", "a/b", "a:b", "ab" + String.chr(0x1F44D), "a%sb" % String.chr(0x200B), "a%sb" % String.chr(0x202E), "ab%s" % String.chr(0xFE0F)]:
-		assert_bool(P0AccName.bad_chars(n)).override_failure_message(n).is_true()
-	for n in ["Mira", "Ana María", "田中花子", "Ζωή", "Борис", "O'Neil", "Jean-Luc", "R2D2"]:
-		assert_bool(P0AccName.bad_chars(n)).override_failure_message(n).is_false()
+## As the server's name.ts (q(313)): the drawn scripts, digits, single spaces and `-_.'`, two marks at most; never
+## stricter than the server (full-width as half-width, as NFKC); Latin mixed with Cyrillic or Greek is not allowed.
+func test_what_a_name_may_be_made_of() -> void:
+	var bad := ["a@b", "a#b", "a/b", "a:b", "ab!", "a&b", "ab" + String.chr(0x1F44D), "a%sb" % String.chr(0x200B),
+		"a%sb" % String.chr(0x202E), "ab%s" % String.chr(0xFE0F), "مرحبا", "a" + String.chr(0x0301).repeat(3)]
+	for n in bad: assert_str(P0AccName.local_reason(n)).override_failure_message(n).is_equal("chars")
+	var good := ["Mira", "Ana María", "田中花子", "Ζωή", "Борис", "O'Neil", "Jean-Luc", "R2D2", "mi_ra.", "コーヒー", "김민지",
+		"Ｍｉｒａ", "田中%s花子" % String.chr(0x3000), "Nguyê" + String.chr(0x0303)]
+	for n in good: assert_str(P0AccName.local_reason(n)).override_failure_message(n).is_empty()
+	for n in [String.chr(0x0410) + "dmin", "G" + String.chr(0x0435) + "nsen", "Zeta" + String.chr(0x03B6)]:
+		assert_str(P0AccName.local_reason(n)).override_failure_message(n).is_equal("blocked")
+
+func test_mixed_alphabets_say_not_allowed_and_all_spaces_is_no_name() -> void:
+	var p := _page()
+	_type(p, String.chr(0x0410) + "dmin")   # Cyrillic А, Latin dmin
+	assert_str(p.field.helper_line.text).is_equal("That name isn't allowed")
+	assert_str(p.go.label).is_equal("Try another name")
+	_type(p, "   " + String.chr(0x3000) + "  ")
+	assert_str(p.go.label).is_equal("Enter a name")
+	p.go.activated.emit()
+	assert_array(_pending).is_empty()   # nothing sent
+	p.check.call("x", func(_r): pass)
+	_pending.clear()
+	_type(p, "Mira")
+	p.go.activated.emit()
+	(_pending[0][1] as Callable).call({"ok": false, "code": "name_rejected", "reason": "empty"})
+	assert_str(p.field.helper_line.text).is_equal("2–16 letters or numbers")
 
 func test_continue_checks_and_a_yes_says_the_name() -> void:
 	var p := _page()
