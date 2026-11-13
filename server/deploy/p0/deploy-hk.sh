@@ -432,8 +432,18 @@ PY
     else
       pkey="$(key)"
     fi
-    say "public smoke at $SITE$PREFIX"
-    P0_BASE="$SITE$PREFIX" P0_KEY="$pkey" "$here/smoke.sh" | tee "$out/smoke.txt"
+    # SGODOT-488 (奕星 11-13): the fixed smoke account made afresh with an hour's token (admin port, loopback in the
+    # container) — the token stays in this shell and goes to smoke.sh in its environment, never to a file or the output.
+    # An image before /admin/smoke answers 404: smoke.sh runs a throwaway id alone then, as before.
+    sresp=$(admin /admin/smoke '{}' 2>/dev/null) || sresp=""
+    stoken=$(printf '%s' "$sresp" | python3 -c 'import json, sys
+try: print(json.load(sys.stdin)["token"])
+except Exception: pass') || stoken=""
+    splayer=$(printf '%s' "$sresp" | python3 -c 'import json, sys
+try: print(json.load(sys.stdin)["player"])
+except Exception: pass') || splayer=""
+    say "public smoke at $SITE$PREFIX${stoken:+ as the smoke account $splayer (its token, an hour)}"
+    P0_BASE="$SITE$PREFIX" P0_KEY="$pkey" P0_SMOKE_TOKEN="$stoken" P0_SMOKE_PLAYER="$splayer" "$here/smoke.sh" | tee "$out/smoke.txt"
     say "Journey and farm healthz after"
     health after
     ;;
