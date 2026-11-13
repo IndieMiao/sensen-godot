@@ -113,7 +113,9 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
     });
 
     /** A test code (contract v1.4 §4, v1.6 ④): for `player`, or for an account made here — a new player's fresh save (its
-     *  home to pick, the guide), not marked test: a reviewer goes the real way — the save marked login: code. One code an
+     *  home to pick, the guide), as any new player's: a reviewer goes the real way — the save marked login: code, and test
+     *  when the note is a store review's (q(322) ②, 奕星 11-13 A: the counts leave it out; test changes no way in the
+     *  game, nothing reads it but the counts, and it is not the OSS test page's accounts). One code an
      *  account: a new one replaces the old, whose tokens go. Not for an account linked to Apple or Google: their sign-in
      *  would sign every code device out. A code makes its account claimed (isClaimed): its old id alone gets 426. The code
      *  is in this answer only, never in the log. */
@@ -133,8 +135,12 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
         player = p; s = store.peek(p)!;
       }
       s.login = 'code';
+      if (/(^|[-_.])review([-_.]|$)/i.test(b.note)) s.test = true;   // q(322) ②: left out of the counts, nothing else; review a word of its own (not preview-…)
       store.put(s);
-      accounts.ensure(player);
+      // claimed for good (亚瑟 11-13): an old account a code is handed to, a Google-less tester's own farm, turns its old
+      // build's id-only requests away (426) from now, and still once the code is withdrawn — the code's presence alone
+      // (isClaimed) would lapse with it, letting the old build back in beside the code's phones
+      accounts.markClaimed(player);
       const code = newCode();
       accounts.setCode(player, code, b.note);
       log(JSON.stringify({ admin: 'code', player: player.slice(-6), note: b.note, made: b.player === undefined, at: now }));

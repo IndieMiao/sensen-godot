@@ -7,6 +7,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { registerP0Admin } from '../../src/p0/admin.js';
 import { CODE_PER_MINUTE, newCode, noteOk, registerCodeRoutes } from '../../src/p0/accounts/codes.js';
+import { identify } from '../../src/p0/accounts/identify.js';
 import { normalizeCode, P0Accounts } from '../../src/p0/accounts/store.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { P0Store } from '../../src/p0/store.js';
@@ -74,11 +75,24 @@ describe('test codes (contract v1.4 §4)', () => {
     expect((await signIn(code, tok(1))).json()).toEqual({ ok: true, player });   // the same token again: the same answer
   });
 
-  it("a store review's account is not marked test: the reviewer goes the real way (contract v1.6 ④)", async () => {
-    const { store, adm } = setup();
-    const { player } = (await adm('/admin/code', { note: 'review-play' })).json();
-    expect(store.peek(player)!.test).toBeUndefined();
-    expect(store.peek(player)!.login).toBe('code');
+  it("a store review's account is marked test for the counts only (q(322) ②, 奕星 A): the same start as any new player, no way in without its code", async () => {
+    const { store, accounts, adm, signIn } = setup();
+    const review = (await adm('/admin/code', { note: 'review-play' })).json();
+    const tester = (await adm('/admin/code', { note: 'cn-tester-07' })).json();
+    const r = store.peek(review.player)!, t = store.peek(tester.player)!;
+    expect(r.test).toBe(true);
+    expect(t.test).toBeUndefined();
+    for (const note of ['review-appstore', 'Review.apple', 'review', 'cn-review', 'play_review_2']) expect(store.peek((await adm('/admin/code', { note })).json().player)!.test).toBe(true);
+    for (const note of ['preview-01', 'reviewer2', 'cn-reviews']) expect(store.peek((await adm('/admin/code', { note })).json().player)!.test).toBeUndefined();
+    for (const s of [r, t]) {   // the start is a new player's either way: its home to pick, the guide, login: code
+      expect(s.travel.pending).toBe(true);
+      expect(s.guide).toBeTruthy();
+      expect(s.login).toBe('code');
+    }
+    expect(Object.keys(r).filter(k => k !== 'test').sort()).toEqual(Object.keys(t).sort());   // no other field: test alone
+    // test is not the OSS test page's accounts: no sign-in skipped — its id alone is turned away (claimed: a code)
+    expect(identify({ 'x-p0-player': review.player }, { accounts, legacyId: false })).toMatchObject({ status: 426 });
+    expect((await signIn(review.code, tok(8))).json()).toEqual({ ok: true, player: review.player });
   });
 
   it('refuses: a wrong code as bad_code, nothing said of why; a token shape; a token of another account', async () => {
@@ -124,6 +138,18 @@ describe('test codes (contract v1.4 §4)', () => {
     expect(accounts.byToken(tok(9))?.player).toBe(first.player);
     expect((await signIn(second.code, tok(4), '192.0.2.12')).json().code).toBe('bad_code');
     expect((await adm('/admin/code/revoke', { player: first.player })).json()).toEqual({ ok: false, code: 'no_code' });
+  });
+
+  it("an old account's own code (a Google-less tester's farm): its old build's id alone is turned away from then on, the code withdrawn too", async () => {
+    const { store, accounts, adm } = setup();
+    store.get('old-farm-player-01', T0);   // an old account never claimed: its id alone still reads it in the changeover
+    const who = () => identify({ 'x-p0-player': 'old-farm-player-01' }, { accounts, legacyId: false });
+    expect(who()).toEqual({ player: 'old-farm-player-01', via: 'legacy' });
+    expect((await adm('/admin/code', { player: 'old-farm-player-01', note: 'cn-tester-08' })).json().ok).toBe(true);
+    expect(who()).toMatchObject({ status: 426 });   // from the code's issue, before it is ever used
+    await adm('/admin/code/revoke', { player: 'old-farm-player-01' });
+    expect(who()).toMatchObject({ status: 426 });   // and after it is withdrawn
+    expect(store.peek('old-farm-player-01')!.travel.pending).toBeUndefined();   // its own farm, not made anew
   });
 
   it('not for an unknown or deleted account, nor one linked to Apple or Google; a deleted account\'s code signs in nowhere', async () => {
