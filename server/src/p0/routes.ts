@@ -20,20 +20,22 @@ import type { IpNear } from './ip_city.js';
 import type { OutpostRooms } from './online/rooms.js';
 import { landmarkOfRoom, pondOfRoom } from './online/outposts.js';
 import { placeOf } from './world.js';
-import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
+import { commandFields, errorRecord, uiEvent, type ErrorRecord, type P0EventLog } from './telemetry.js';
 import { guideKeys, settleGuide, setGuide } from './guide.js';
 import { settleFirstDig } from './first_dig.js';
 
 /** rooms: who is in the outpost rooms right now (SGODOT-227 OutpostRooms), for the Tea Host's count by town (q(206));
- * log: the observation log (S7). */
+ * log: the observation log (S7); errors: the client errors' own files (SGODOT-486), tied to no player. */
 export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean;
-  rooms?: Pick<OutpostRooms, 'presence' | 'occupant'>; log?: P0EventLog;
+  rooms?: Pick<OutpostRooms, 'presence' | 'occupant'>; log?: P0EventLog; errors?: P0EventLog<ErrorRecord>;
   /** The address → nearest open home city for the home pick's `Near you` (ip_city.ts); none: no guess. */
   ipNear?: IpNear;
   /** SGODOT-488: who a request is (accounts/identify.ts); absent, the x-p0-player header as before. */
   identify?: IdentifyDeps }
 
 const UI_BATCH = 20, UI_PER_MINUTE = 120, UI_ALL_PER_MINUTE = 3_000;
+// Client errors (SGODOT-486): 10 a minute per player, counted in memory only — the player never reaches the file.
+const ERR_PER_MINUTE = 10, ERR_ALL_PER_MINUTE = 600;
 
 const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
@@ -189,19 +191,28 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     return reply.send({ ok: true, events: result.events, state: view(result.state, now, req.headers) });
   });
 
-  /** UI moments for the observation log (S7): known kinds only, a few a minute per player; nothing in the game changes. */
-  // Counts are per minute: the map starts over each minute, and a total cap stops new player ids getting around it.
-  const uiSeen = new Map<string, number>();
-  let uiMinute = -1, uiTotal = 0;
+  /** UI moments for the observation log (S7): known kinds only, a few a minute per player; nothing in the game changes.
+   * A client error goes to its own file instead (SGODOT-486), its line without the player or the address. */
+  // Counts are per minute: the maps start over each minute, and a total cap stops new player ids getting around it.
+  const uiSeen = new Map<string, number>(), errSeen = new Map<string, number>();
+  let uiMinute = -1, uiTotal = 0, errTotal = 0;
   app.post('/v1/p0/telemetry', async (req, reply) => {
     const player = who(req.headers, reply);
     if (!player) return reply;
     const list = (req.body as { events?: unknown } | undefined)?.events;
     if (!Array.isArray(list) || list.length > UI_BATCH) return reply.code(400).send({ ok: false, code: 'bad_events' });
     const t = deps.now(), minute = Math.floor(t / 60_000);
-    if (minute !== uiMinute) { uiSeen.clear(); uiMinute = minute; uiTotal = 0; }
+    if (minute !== uiMinute) { uiSeen.clear(); errSeen.clear(); uiMinute = minute; uiTotal = 0; errTotal = 0; }
     let accepted = 0;
     for (const raw of list) {
+      const error = errorRecord(raw, t, req.headers);
+      if (error) {
+        const n = errSeen.get(player) ?? 0;
+        if (n >= ERR_PER_MINUTE || errTotal >= ERR_ALL_PER_MINUTE) continue;
+        errSeen.set(player, n + 1); errTotal += 1; accepted += 1;
+        deps.errors?.write(error);
+        continue;
+      }
       const event = uiEvent(raw);
       const n = uiSeen.get(player) ?? 0;
       if (!event || n >= UI_PER_MINUTE || uiTotal >= UI_ALL_PER_MINUTE) continue;

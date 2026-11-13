@@ -8,6 +8,9 @@
  * Files: <dir>/p0-events-YYYY-MM-DD.jsonl (UTC wall-clock day); no dir = nothing written (tests pass a sink).
  * Kept: P0_EVENT_KEEP_DAYS=N removes day files older than N days when a new day's first line is written; unset keeps
  * every file, as before.
+ * Client errors (SGODOT-486, kind client_error) never go into that log: its lines carry the player and the IP, and the
+ * privacy policy says error reports are tied to no player. They go to their own day files, p0-errors-YYYY-MM-DD.jsonl
+ * beside it, a line holding only t, version, platform, message, stack and scene (ErrorRecord), kept 30 days.
  */
 import { appendFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
@@ -44,44 +47,73 @@ export interface CommandRecord {
 }
 export interface UiRecord { kind: 'ui'; t: number; player: string; ip?: string; event: Record<string, unknown> }   // ip: C25-4; absent in lines written before it
 export type LogRecord = CommandRecord | UiRecord;
+/** One client error: no player, no IP, no channel, no device (奕星 / 李白 11-12; the policy's §2 / §6 list these six). */
+export interface ErrorRecord { t: number; version?: string; platform?: string; message: string; stack: string; scene: string }
+
+export const ERROR_KIND = 'client_error';
+const ERR_MESSAGE = 500, ERR_STACK_LINES = 20, ERR_STACK_LINE = 200, ERR_SCENE = 64, ERR_HEADER = 16;
+const ERR_PLATFORMS = new Set(['android', 'ios', 'desktop']);   // contract-accounts.md §0
+// A run of 32+ hex digits (a token, a key) never reaches the file, should an error ever print one (#1013 周瑜).
+const LONG_HEX = /[0-9a-fA-F]{32,}/g;
+const scrub = (s: string) => s.replace(LONG_HEX, '…');
+
+/** A reported client error as its file line: message, stack (first 20 lines, each cut to 200) and scene, cut short;
+ * version and platform from the request headers when it sends them (an older client sends no platform; only android /
+ * ios / desktop kept). Long hex runs are cut out of message and stack. Every other field the client sent is dropped. Null when it is not a client error or has no message. */
+export function errorRecord(raw: unknown, t: number, headers: Record<string, unknown>): ErrorRecord | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const e = raw as Record<string, unknown>;
+  if (e.kind !== ERROR_KIND || typeof e.message !== 'string' || e.message === '') return null;
+  const stack = typeof e.stack === 'string' ? e.stack.split('\n').slice(0, ERR_STACK_LINES).map(l => scrub(l).slice(0, ERR_STACK_LINE)).join('\n') : '';
+  const header = (name: string) => { const v = headers[name]; return typeof v === 'string' && v !== '' ? v.slice(0, ERR_HEADER) : undefined; };
+  const version = header('x-p0-version'), platform = ERR_PLATFORMS.has(String(headers['x-p0-platform'])) ? String(headers['x-p0-platform']) : undefined;
+  return { t, ...(version ? { version } : {}), ...(platform ? { platform } : {}), message: scrub(e.message).slice(0, ERR_MESSAGE), stack,
+    scene: typeof e.scene === 'string' ? e.scene.slice(0, ERR_SCENE) : '' };
+}
 
 /**
  * The log never affects the game (PR #23 review): a write that fails (folder removed mid-playtest, disk full, no
  * permission) is retried once after recreating the folder, then the log warns once and stops writing.
  */
-export class P0EventLog {
+export class P0EventLog<R extends { t: number } = LogRecord> {
   private broken = false;
   private day = '';
-  constructor(private dir?: string, private sink?: (r: LogRecord) => void, private warn: (msg: string) => void = m => console.warn(m),
-    private keepDays?: number) {
+  /** prefix: the day files' name, p0-events (the observation log) or p0-errors (client errors). */
+  constructor(private dir?: string, private sink?: (r: R) => void, private warn: (msg: string) => void = m => console.warn(m),
+    private keepDays?: number, private prefix = 'p0-events') {
     if (dir) {
       try { mkdirSync(dir, { recursive: true }); } catch (err) { this.stop(err); }
     }
   }
-  write(record: LogRecord): void {
+  write(record: R): void {
     try { this.sink?.(record); } catch { /* a test sink never breaks a command either */ }
     if (!this.dir || this.broken) return;
     const day = new Date(record.t).toISOString().slice(0, 10);
-    if (day !== this.day) { this.day = day; if (this.keepDays) this.prune(day); }
-    const file = path.join(this.dir, `p0-events-${day}.jsonl`);
+    if (day !== this.day) { this.day = day; this.pruneBefore(day); }
+    const file = path.join(this.dir, `${this.prefix}-${day}.jsonl`);
     const line = JSON.stringify(record) + '\n';
     try { appendFileSync(file, line); return; } catch { /* the folder may be gone: recreate it once */ }
     try { mkdirSync(this.dir, { recursive: true }); appendFileSync(file, line); } catch (err) { this.stop(err); }
   }
   get stopped(): boolean { return this.broken; }
+  /** Remove the day files older than keepDays as of `now`, though nothing is being written (#1013 后裔: a log with no
+   * new line for weeks — client errors — must not keep files past its days). The server calls it at start and every
+   * 6 hours; write() also does it on a new day's first line. */
+  prune(now: number): void { this.pruneBefore(new Date(now).toISOString().slice(0, 10)); }
   /** Day files older than keepDays before `today`; never this log's other files. A failure here never stops the log. */
-  private prune(today: string): void {
+  private pruneBefore(today: string): void {
+    if (!this.dir || !this.keepDays) return;
     const oldest = new Date(Date.parse(today + 'T00:00:00Z') - this.keepDays! * 86_400_000).toISOString().slice(0, 10);
     try {
       for (const f of readdirSync(this.dir!)) {
-        const m = /^p0-events-(\d{4}-\d{2}-\d{2})\.jsonl$/.exec(f);
-        if (m && m[1] < oldest) rmSync(path.join(this.dir!, f), { force: true });
+        const m = /^(.+)-(\d{4}-\d{2}-\d{2})\.jsonl$/.exec(f);
+        if (m && m[1] === this.prefix && m[2] < oldest) rmSync(path.join(this.dir!, f), { force: true });
       }
     } catch { /* the folder may be gone: write() recreates it */ }
   }
   private stop(err: unknown): void {
     this.broken = true;
-    this.warn(`[p0] observation log stopped (${this.dir}): ${err instanceof Error ? err.message : String(err)}`);
+    this.warn(`[p0] ${this.prefix} log stopped (${this.dir}): ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
