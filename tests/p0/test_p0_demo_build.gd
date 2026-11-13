@@ -76,3 +76,25 @@ func test_every_p0_preset_ships_the_mines_json() -> void:
 			assert_bool(filters.any(func(f: String) -> bool: return f != "" and rel.matchn(f))) \
 				.override_failure_message("%s is not in the %s include_filter" % [rel, cfg.get_value(s, "name", s)]).is_true()
 	assert_int(p0_presets).is_greater_equal(2)
+
+## The Play build (上架, 蒙恬 11-13): preset "Android Play" is the only Android one with the custom feature `store`
+## (P0Build.store(): no test accounts, card room or Voice Profile), package app.gensen.maps, exported as an AAB. The
+## OSS presets never carry `store`. The upload key never sits in this file: the path, alias and password come from the
+## GODOT_ANDROID_KEYSTORE_RELEASE_* variables at export time (the keystore and its password stay on the build Mac).
+func test_only_the_play_preset_is_the_store_build() -> void:
+	var cfg := ConfigFile.new()
+	assert_int(cfg.load("res://export_presets.cfg")).is_equal(OK)
+	var store: Array[String] = []
+	for s in cfg.get_sections():
+		var features := Array(str(cfg.get_value(s, "custom_features", "")).split(",")).map(func(f: String) -> String: return f.strip_edges())
+		if not s.ends_with(".options") and "store" in features: store.append(str(cfg.get_value(s, "name", s)))
+		if s.ends_with(".options") and str(cfg.get_value(s, "package/unique_name", "")) == "app.gensen.maps":
+			assert_int(int(cfg.get_value(s, "gradle_build/export_format", 0))).is_equal(1)
+		for k in cfg.get_section_keys(s):
+			if k.begins_with("keystore/"): assert_str(str(cfg.get_value(s, k))).override_failure_message("%s %s is set" % [s, k]).is_empty()
+	assert_that(store).is_equal(["Android Play"])
+	var section := ""
+	for s in cfg.get_sections():
+		if str(cfg.get_value(s, "name", "")) == "Android Play": section = s
+	assert_str(str(cfg.get_value(section + ".options", "package/unique_name", ""))).is_equal("app.gensen.maps")
+	assert_str(str(cfg.get_value(section, "custom_features", ""))).is_equal("p0,store")
