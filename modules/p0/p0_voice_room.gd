@@ -170,6 +170,9 @@ func _call(method: int, action: String, body: Dictionary) -> Dictionary:
 	var done: Array = await http.request_completed
 	http.queue_free()
 	var json = JSON.parse_string((done[3] as PackedByteArray).get_string_from_utf8()) if done[0] == HTTPRequest.RESULT_SUCCESS else null
+	# SGODOT-488: the voice routes answer identify's own codes (session_replaced, account_deleted …, lower case): the
+	# session takes it as any account refusal (its page), and voice ends on UNAUTHENTICATED, one of its final codes
+	if session.take_account_refusal(int(done[0]), int(done[1]), done[3]): json = {"code": "UNAUTHENTICATED"}
 	return {"ok": done[0] == HTTPRequest.RESULT_SUCCESS and int(done[1]) >= 200 and int(done[1]) < 300, "json": json if json is Dictionary else {}}
 
 func _load_mutes() -> Array:

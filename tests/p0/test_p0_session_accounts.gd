@@ -60,3 +60,14 @@ func test_demo_accounts_reads_the_channel_and_the_switch() -> void:
 	assert_dict(P0Session.demo_accounts('{"channel": "appstore"}')).is_equal({"channel": "appstore", "accounts": true})
 	assert_dict(P0Session.demo_accounts('{"channel": "nope", "accounts": false}')).is_equal({"channel": "", "accounts": false})
 	assert_dict(P0Session.demo_accounts("")).is_equal({"channel": "", "accounts": true})
+
+func test_a_voice_reply_with_an_account_code_stops_the_session_too() -> void:
+	var s := _session()
+	s.identity_ready = true
+	var states: Array = []
+	s.account_state.connect(func(k, _d): states.append(k))
+	var raw := JSON.stringify({"ok": false, "code": "account_deleted"}).to_utf8_buffer()
+	assert_bool(s.take_account_refusal(HTTPRequest.RESULT_SUCCESS, 401, raw)).is_true()
+	assert_bool(s.identity_ready).is_false()
+	assert_array(states).contains_exactly(["account_deleted"])
+	assert_bool(s.take_account_refusal(HTTPRequest.RESULT_SUCCESS, 403, JSON.stringify({"code": "AGE_GATE"}).to_utf8_buffer())).is_false()
