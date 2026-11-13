@@ -91,10 +91,15 @@ func _send(path := "/v1/p0/commands", body := "{}") -> Error:
 	return line.send(mini.url(path), PackedStringArray(["content-type: application/json"]), HTTPClient.METHOD_POST, body,
 		func(result, code, headers, data): replies.append({result = result, code = code, headers = headers, body = data.get_string_from_utf8()}))
 
+## Until `count` replies are in, for at least 600 frames and 5 s of the clock: the line's waits are seconds (wait_s), and a
+## headless run's frames are not capped — 600 of them passed in 85 ms, before a 0.3 s wait_s ran out (蒙恬's 0.3.10 run).
 func _wait(count: int) -> void:
-	for i in 600:
+	var until := Time.get_ticks_msec() + 5000
+	var frames := 0
+	while frames < 600 or Time.get_ticks_msec() < until:
 		mini.step()
 		if replies.size() >= count: return
+		frames += 1
 		await get_tree().process_frame
 
 func test_requests_share_one_connection() -> void:
