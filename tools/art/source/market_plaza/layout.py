@@ -21,9 +21,10 @@ for side in ['south','east']:
 for side in ['north','west']:
  for i,t in enumerate([-6,-2,2,6]):
   sf_index=(i+4) if side=='north' else (3-i)
+  generic_index=i if side=='north' else (i+1)%4
   asset(f'facade_{side}_{i}',f'facade_sf_{sf_index}.glb',[t,F,-9.25] if side=='north' else [-9.25,F,t],0 if side=='north' else 90,
    [box('FacadeBarrier',[4,6.5,2.5],[0,3.25,0]),box('DecorativeDoorSteps',[1.36,.32,.85],[0,.16,1.55])],group='FarFacades',
-   variants={'san_francisco':f'facade_sf_{sf_index}.glb','generic':f'facade_generic_{i}.glb'})
+   variants={'san_francisco':f'facade_sf_{sf_index}.glb','generic':f'facade_generic_{generic_index}.glb'})
 for side in ['south','east']:
  for i,t in enumerate([-6.8,-4.6,-2.4,-.2,2,4.2]):
   at=[t,F,7.77] if side=='south' else [7.77,F,t]

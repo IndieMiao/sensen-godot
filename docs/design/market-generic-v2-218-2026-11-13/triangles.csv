@@ -1,0 +1,9 @@
+placement,generic_file,generic_triangles,surface,sf_file,sf_triangles,difference
+facade_north_0,facade_generic_0.glb,4589,1,facade_sf_4.glb,5125,-536
+facade_west_3,facade_generic_0.glb,4589,1,facade_sf_0.glb,5125,-536
+facade_north_1,facade_generic_1.glb,4844,1,facade_sf_5.glb,5292,-448
+facade_west_0,facade_generic_1.glb,4844,1,facade_sf_3.glb,5292,-448
+facade_north_2,facade_generic_2.glb,4588,1,facade_sf_6.glb,5125,-537
+facade_west_1,facade_generic_2.glb,4588,1,facade_sf_2.glb,5125,-537
+facade_north_3,facade_generic_3.glb,4756,1,facade_sf_7.glb,5292,-536
+facade_west_2,facade_generic_3.glb,4756,1,facade_sf_1.glb,5292,-536
