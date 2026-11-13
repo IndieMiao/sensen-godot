@@ -1795,6 +1795,8 @@ func _shot_sign_in(step: PackedStringArray) -> void:
 	else: r = await sign_in.google()
 	if r.has("id_token"): r.id_token = str(r.id_token).left(12) + "…"
 	print("P0_SIGNIN ", JSON.stringify(r))
+	var f := FileAccess.open("user://p0_signin_%s.json" % provider, FileAccess.WRITE)   # a Release build's stdout is not always kept (iOS simulator)
+	if f: f.store_string(JSON.stringify(r))
 
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
 ## Generic UI steps live here; world steps (goto, stove, until:bite …) go to world.p0_dev / p0_until.
