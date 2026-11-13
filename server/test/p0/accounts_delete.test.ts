@@ -195,6 +195,36 @@ describe('account deletion (contract-accounts §4)', () => {
     expect(new P0Store(content, files.save).peek(PLAYER)).toBeUndefined();
   });
 
+  it.each([false, true])('retries only accounts.remove failing after token revocation and tombstone persisted (restart=%s)', async restart => {
+    const { deps, files } = setup();
+    const saved = readFileSync(files.save, 'utf8'), ages = readFileSync(files.ages, 'utf8');
+    const remove = deps.accounts.remove.bind(deps.accounts);
+    const spy = vi.spyOn(deps.accounts, 'remove').mockImplementationOnce(player => {
+      const persisted = new P0Accounts(files.accounts, KEY, deps.now);
+      expect(persisted.byToken(USER_TOKEN)).toBeUndefined();
+      expect(persisted.isDeleted(PLAYER)).toBe(true);
+      mkdirSync(files.accounts + '.tmp'); // Only the final remove write fails, not revokeAll or markDeleted.
+      remove(player);
+    });
+    await expect(deleteAccount(deps, PLAYER)).rejects.toThrow();
+    expect(readFileSync(files.save, 'utf8')).toBe(saved);
+    expect(readFileSync(files.ages, 'utf8')).toBe(ages);
+    expect(deps.hub.kick).not.toHaveBeenCalled();
+    expect(deps.revokeApple).not.toHaveBeenCalled();
+    rmSync(files.accounts + '.tmp', { recursive: true });
+    spy.mockRestore();
+    const next = restart ? { ...deps, accounts: new P0Accounts(files.accounts, KEY, deps.now) } : deps;
+    await deleteAccount(next, PLAYER);
+    const persisted = new P0Accounts(files.accounts, KEY, deps.now);
+    expect(persisted.find(PLAYER)).toBeUndefined();
+    expect(persisted.byToken(ADMIN_TOKEN)).toBeUndefined();
+    expect(persisted.byToken(OTHER_TOKEN)?.player).toBe(OTHER);
+    expect(persisted.byIdentity('apple', 'apple-test-sub')).toBeUndefined();
+    expect(json(files.accounts).deleted[PLAYER]).toBe(T0);
+    expect(new P0Store(content, files.save).peek(PLAYER)).toBeUndefined();
+    expect(json(files.ages)).toEqual({ [OTHER]: false });
+  });
+
   it.each([false, true])('retries a failed save write (restart=%s) while still removing voice and WS', async restart => {
     const { deps, files } = setup();
     vi.spyOn(console, 'warn').mockImplementation(() => {});
