@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import type { FastifyInstance } from 'fastify';
 import type { P0Store } from '../store.js';
 import { identify, isRefusal, type IdentifyDeps } from './identify.js';
+import { NameLimiter, nameForGuest, registerNameRoutes, setName, type NameList } from './name.js';
 import { tokenShapeOk, type P0Accounts } from './store.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
@@ -20,17 +21,6 @@ export function legalVersions(file = path.join(ROOT, 'assets/p0/legal/versions.j
   return { terms: String(v.terms), privacy: String(v.privacy) };
 }
 
-/** A name for a new save: {name, name_set_at?} or the refusal's reason (周瑜's nameForGuest plugs in here). */
-export type GuestName = (body: Record<string, unknown>, now: number) => { name?: string; name_set_at?: number } | { reason: string };
-/** Until 周瑜's rules are in: skip keeps no name, a name is taken trimmed if 1–16 characters. */
-const plainName: GuestName = (body, now) => {
-  if (body.skip === true) return {};
-  const name = typeof body.name === 'string' ? body.name.trim() : '';
-  if (name === '') return { reason: 'empty' };
-  if ([...name].length > 16) return { reason: 'length' };
-  return { name, name_set_at: now };
-};
-
 export interface AccountRouteDeps {
   store: P0Store; accounts: P0Accounts; identify: IdentifyDeps; now: () => number;
   versions?: { terms: string; privacy: string };
@@ -38,7 +28,10 @@ export interface AccountRouteDeps {
   voiceAge?: (player: string) => boolean | null;
   /** A new save's options from the request (choose_home / guide_v3, as routes.ts newSave). */
   newSave?: (headers: Record<string, unknown>) => { pending?: boolean; guide?: boolean };
-  guestName?: GuestName;
+  /** The names' bucket (周瑜's name.ts), shared by name/check, account/name and a guest with a name; one made here when none. */
+  limiter?: NameLimiter;
+  /** The word list (tests); server/data/name_blocklist.json when absent. */
+  nameList?: () => NameList;
   /** Saves made per address per hour, at most (a script making saves; 后裔 on contract v1.2). */
   guestsPerHour?: number;
 }
@@ -48,7 +41,9 @@ const bad = (code: string, status: number, extra: Record<string, unknown> = {}) 
 export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDeps): void {
   const { store, accounts } = deps;
   const versions = deps.versions ?? legalVersions();
-  const nameOf = deps.guestName ?? plainName;
+  const limiter = deps.limiter ?? new NameLimiter();
+  registerNameRoutes(app, { store, now: deps.now, limiter, list: deps.nameList,
+    identify: (req, reply) => { const w = identify(req.headers, deps.identify); if (isRefusal(w)) { reply.code(w.status).send(w.body); return null; } return w.player; } });
   const made = new Map<string, number>();   // address → saves made this hour
   let hour = -1;
   const body = (b: unknown) => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}) as Record<string, unknown>;
@@ -67,8 +62,8 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if (b.age_ok !== true) return send(bad('schema', 400));
     if (!consentOk(b)) return send(outdated());
     const now = deps.now();
-    const named = nameOf(b, now);
-    if ('reason' in named) return send(bad('name_rejected', 400, { reason: named.reason }));
+    const named = nameForGuest(b, { limiter, ip: req.ip, now, list: deps.nameList?.() });
+    if (!named.ok) return reply.code(named.status).send(named.body);
     if (b.pending !== undefined) return send(bad('pending_expired', 410));   // PR-B: the pending sign-in is taken here
     const h = Math.floor(now / 3_600_000);
     if (h !== hour) { made.clear(); hour = h; }
@@ -80,7 +75,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     const s = store.get(player, now, deps.newSave?.(req.headers) ?? {});
     s.consent = { terms: versions.terms, privacy: versions.privacy, at: now };
     s.age_ok = true;
-    if (named.name !== undefined) s.profile = { ...s.profile, name: named.name, ...(named.name_set_at !== undefined ? { name_set_at: named.name_set_at } : {}) };
+    if (named.name !== undefined) setName(s, named.name, named.name_set_at ?? now);
     store.put(s);                    // the save first (§1.3) …
     accounts.ensure(player);
     accounts.issue(player, token);   // … then who holds it
