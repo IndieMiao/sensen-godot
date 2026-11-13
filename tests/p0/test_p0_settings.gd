@@ -269,7 +269,7 @@ func test_the_back_sits_where_the_profile_back_is() -> void:
 func test_mapbox_and_godot_texts_come_from_the_sdk_and_the_engine() -> void:
 	# the tracked source of the Android build's Mapbox version (android/ is laid out from it and not in the repo; 刘邦 on #292)
 	var gradle := FileAccess.get_file_as_string("res://tools/android/overlay/build.gradle")
-	var m := RegEx.create_from_string("com\\.mapbox\\.maps:android:([0-9.]+)").search(gradle)
+	var m := RegEx.create_from_string("com\\.mapbox\\.maps:android(?:-ndk27)?:([0-9.]+)").search(gradle)
 	assert_object(m).is_not_null()
 	var mapbox := P0Legal.full_text(P0Legal.row("mapbox"))
 	assert_str(mapbox).contains("Mapbox Maps for Android version %s" % m.get_string(1))   # bump the SDK: run the tool

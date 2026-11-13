@@ -49,7 +49,8 @@ dependencies {
     implementation "androidx.documentfile:documentfile:$versions.documentfileVersion"
 
     // G1 PoC：Mapbox Maps SDK（垫底地图，GodotMapPlugin 使用）
-    implementation "com.mapbox.maps:android:11.29.0"
+    // -ndk27：同版本的 NDK 27 构件，.so 按 16 KB 页对齐（Play 要求；默认构件 libmapbox-maps / libmapbox-common 只有 4 KB）
+    implementation "com.mapbox.maps:android-ndk27:11.29.0"
 
     if (rootProject.findProject(":lib")) {
         implementation project(":lib")
