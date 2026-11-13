@@ -135,7 +135,7 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
         player = p; s = store.peek(p)!;
       }
       s.login = 'code';
-      if (/review/i.test(b.note)) s.test = true;   // q(322) ②: left out of the counts, nothing else
+      if (/(^|[-_.])review([-_.]|$)/i.test(b.note)) s.test = true;   // q(322) ②: left out of the counts, nothing else; review a word of its own (not preview-…)
       store.put(s);
       // claimed for good (亚瑟 11-13): an old account a code is handed to, a Google-less tester's own farm, turns its old
       // build's id-only requests away (426) from now, and still once the code is withdrawn — the code's presence alone

@@ -82,6 +82,8 @@ describe('test codes (contract v1.4 §4)', () => {
     const r = store.peek(review.player)!, t = store.peek(tester.player)!;
     expect(r.test).toBe(true);
     expect(t.test).toBeUndefined();
+    for (const note of ['review-appstore', 'Review.apple', 'review', 'cn-review', 'play_review_2']) expect(store.peek((await adm('/admin/code', { note })).json().player)!.test).toBe(true);
+    for (const note of ['preview-01', 'reviewer2', 'cn-reviews']) expect(store.peek((await adm('/admin/code', { note })).json().player)!.test).toBeUndefined();
     for (const s of [r, t]) {   // the start is a new player's either way: its home to pick, the guide, login: code
       expect(s.travel.pending).toBe(true);
       expect(s.guide).toBeTruthy();
