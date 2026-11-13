@@ -2,7 +2,8 @@
 //
 // 与 MapUnderlay 相同的进程内 UDP 回环，但独立端口 46465，地图桥坏了也不影响登录。
 // 协议（UTF-8，一行一条，字段以 | 分隔）：
-//   Godot → 原生  APPLE|<nonce_sha256_hex>
+//   Godot → 原生  APPLE|<nonce_sha256_hex>[|none]
+//                 第三个字段 none：不要名字和邮箱（P0 只存账号编号，SGODOT-487 / q(312)）；没有它照旧要（Journey）
 //   原生 → Godot  APPLE_OK|<identity_token>|<given_name>|<family_name>|<email>|<authorization_code>
 //                 APPLE_ERR|<code>      code: canceled | failed | not_handled | unknown | no_token | busy
 // nonce 由 Godot 生成原文、这边只收它的 SHA-256（Apple 要求 request.nonce 放哈希），原文随后发给服务端比对。
@@ -97,7 +98,7 @@ final class AppleSignIn: NSObject, ASAuthorizationControllerDelegate, ASAuthoriz
         }
         pending = conn
         let request = ASAuthorizationAppleIDProvider().createRequest()
-        request.requestedScopes = [.fullName, .email]
+        request.requestedScopes = parts.count >= 3 && parts[2] == "none" ? [] : [.fullName, .email]
         request.nonce = parts[1]
         let c = ASAuthorizationController(authorizationRequests: [request])
         c.delegate = self

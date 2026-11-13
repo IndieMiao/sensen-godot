@@ -29,12 +29,16 @@ static func parse_reply(line: String) -> Dictionary:
 		return {"ok": false, "code": "APPLE_" + p[1].to_upper()}
 	return {"ok": false, "code": "APPLE_UNKNOWN"}
 
+## 发给原生桥的那一行。minimal：不要名字和邮箱（P0 只存账号编号，SGODOT-487），桥收到 |none 就不要这两项。
+static func request_line(nonce: String, minimal := false) -> String:
+	return "APPLE|" + nonce.sha256_text() + ("|none" if minimal else "")
+
 ## 调起系统授权。transport 可注入：func(nonce_hash: String) -> String（测试替身，返回原生回包）。
-static func authorize(nonce: String, transport: Callable = Callable()) -> Dictionary:
+static func authorize(nonce: String, transport: Callable = Callable(), minimal := false) -> Dictionary:
 	if transport.is_valid(): return parse_reply(await transport.call(nonce.sha256_text()))
 	var udp := PacketPeerUDP.new()
 	if udp.connect_to_host("127.0.0.1", PORT) != OK: return {"ok": false, "code": "APPLE_UNAVAILABLE"}
-	udp.put_packet(("APPLE|" + nonce.sha256_text()).to_utf8_buffer())
+	udp.put_packet(request_line(nonce, minimal).to_utf8_buffer())
 	var tree := Engine.get_main_loop() as SceneTree
 	var waited := 0.0
 	while waited < TIMEOUT_S:
