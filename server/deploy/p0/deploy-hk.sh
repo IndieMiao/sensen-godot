@@ -19,6 +19,10 @@
 #   server/deploy/p0/deploy-hk.sh players [--ids]               # player counts; --ids: ids by join time, terminal only
 #   server/deploy/p0/deploy-hk.sh energy <player id> <value>     # F1: set one player's Energy (day-4 revisit, ~80)
 #   server/deploy/p0/deploy-hk.sh report <player id> [YYYY-MM-DD] # F2: that player's session report + the day's lines
+# Accounts (SGODOT-488, contract-accounts §4.1; on the live server only 83 runs these, and asks 奕星 first):
+#   server/deploy/p0/deploy-hk.sh token <player id>            # an admin token for a test device (30 days, kept through
+#                                                                #   other devices' sign-ins): printed once, terminal only
+#   server/deploy/p0/deploy-hk.sh claim-reset <player id>      # clear its claim and revoke every token, admin ones too
 # SYS-MAINT / SYS-UPDATE (gate.ts; kept in the data volume, so a restart keeps them; healthz and admin stay open):
 #   server/deploy/p0/deploy-hk.sh maint-on [back at]             # every /v1/p0 request answers 503 maintenance; back at =
 #                                                                #   any time, e.g. 2026-10-09T23:30+08:00 (sent as UTC ISO)
@@ -187,7 +191,7 @@ health() {   # $1 = label: Journey and farm healthz, saved for the before / afte
 step="${1:-}"; shift || true
 if [ "$TARGET" = hk ] && [ -z "$HK_OVERRIDE" ]; then
   case "$step" in
-    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version)
+    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version|token|claim-reset)
       echo "$step writes to Hong Kong, the frozen fallback (P0 stopped, data frozen) until 2026-11-01 16:00 +08:00: refused."
       echo "The live P0 is US West: deploy-hk.sh --target us $step …"
       echo "Only for a fallback the PM has called: deploy-hk.sh --target hk --confirm-hk-frozen-override $step …"
@@ -463,7 +467,10 @@ import json, sys, time
 p = json.load(sys.stdin)["players"]; now = time.time() * 1000; day = 86400000
 seen = lambda d: sum(1 for x in p if (x.get("last_at") or 0) >= now - d * day)
 joined = sum(1 for x in p if (x.get("created_at") or 0) >= now - day)
-print(f"players {len(p)}; joined in 24 h {joined}; seen in 24 h {seen(1)}, 7 days {seen(7)}")' \
+print(f"players {len(p)}; joined in 24 h {joined}; seen in 24 h {seen(1)}, 7 days {seen(7)}")
+t = sorted(a["expires_at"] for x in p for a in x.get("admin_tokens", []))   # SGODOT-488: given to test devices
+end = time.strftime("%Y-%m-%d", time.gmtime(t[0] / 1000)) if t else ""
+if t: print(f"admin tokens in force {len(t)}, the first ends {end} (--ids: whose)")' \
         | tee -a "$out/players.txt"
     fi
     ;;
@@ -474,6 +481,24 @@ print(f"players {len(p)}; joined in 24 h {joined}; seen in 24 h {seen(1)}, 7 day
     say "F1: Energy of $player → $value (logged in the container log as an admin line)"
     admin /admin/energy "{\"player\":\"$player\",\"value\":$value}"; echo
     echo "$(date -u +%FT%TZ) energy …${player: -6} → $value" >> "$out/admin.txt"   # data B: the full id is not kept here
+    ;;
+  token)
+    # A test account on a test device (tech-plan §2.5): the token is that account's key, so it goes to this terminal
+    # once and nowhere else — no file, no tee; admin.txt keeps the id's tail and the end only.
+    player="${1:?token <player id>}"
+    [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }   # the server's PLAYER_RE
+    say "admin token for …${player: -6} (30 days): printed once below, terminal only — write it into the test device"
+    resp=$(admin /admin/session "{\"player\":\"$player\"}") || { echo "$resp"; exit 1; }
+    echo "$resp"
+    ends=$(printf '%s' "$resp" | python3 -c 'import json, sys, time; print(time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime(json.load(sys.stdin)["expires_at"] / 1000)))')
+    echo "$(date -u +%FT%TZ) token …${player: -6} ends $ends" >> "$out/admin.txt"   # data B: no full id, never the token
+    ;;
+  claim-reset)
+    player="${1:?claim-reset <player id>}"
+    [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }
+    say "claim reset for …${player: -6}: its claim cleared, every token revoked (admin ones too); its old id can claim again"
+    admin /admin/claim/reset "{\"player\":\"$player\"}"; echo
+    echo "$(date -u +%FT%TZ) claim-reset …${player: -6}" >> "$out/admin.txt"
     ;;
   maint-on)
     back="${1:-}"
