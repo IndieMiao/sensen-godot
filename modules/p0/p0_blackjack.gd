@@ -107,14 +107,27 @@ static func need_text(n: int) -> String: return "Need %s more coins" % comma(n)
 static func low_on_coins(view: Dictionary) -> bool:
 	return coins_of(view) - min_bet_of(view) < floor_of(view)
 
-## A chip can go on the bet only if the wallet still keeps the floor (7cdf40a9 ③).
-static func can_add(view: Dictionary, bet: int, value: int) -> bool:
-	return coins_of(view) - bet - value >= floor_of(view)
+## q(320) (the user 11-13, v3 丙): the most this deal may stake, the server's view.blackjack.max_deal — what the day's
+## loss of 50 has left; -1 when there is no cap (none sent: an older server, or no cap set).
+static func max_deal(view: Dictionary) -> int:
+	var m = info(view).get("max_deal", null)
+	return -1 if m == null else int(m)
 
-## The bet `Deal again` puts down (§3): the last bet, or the most the wallet allows above the floor, in steps of 5;
-## it does not climb back on its own. 0 when not even the smallest bet fits.
+## Whether `stake` stays inside what the day's loss has left.
+static func within_day(view: Dictionary, stake: int) -> bool:
+	var m := max_deal(view)
+	return m < 0 or stake <= m
+
+## A chip can go on the bet only if the wallet still keeps the floor (7cdf40a9 ③) and the day's loss is not passed by
+## it (q(320): the same grey, no words — 不知火舞 11-13).
+static func can_add(view: Dictionary, bet: int, value: int) -> bool:
+	return coins_of(view) - bet - value >= floor_of(view) and within_day(view, bet + value)
+
+## The bet `Deal again` puts down (§3): the last bet, or the most the wallet allows above the floor and the day's loss
+## has left (q(320)), in steps of 5; it does not climb back on its own. 0 when not even the smallest bet fits.
 static func deal_again_bet(view: Dictionary, last_bet: int) -> int:
 	var b := mini(last_bet, coins_of(view) - floor_of(view))
+	if max_deal(view) >= 0: b = mini(b, max_deal(view))   # q(320): no more than the day's loss has left
 	b -= posmod(b, step_of(view))
 	return b if b >= min_bet_of(view) else 0
 

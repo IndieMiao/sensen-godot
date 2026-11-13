@@ -48,6 +48,32 @@ func test_deal_key() -> void:
 	assert_dict(P0Blackjack.deal_key(_view(300), 120)).is_equal({"label": "Deal · 120", "reason": ""})
 	assert_dict(P0Blackjack.deal_key(_view(5000), 1250)).is_equal({"label": "Deal · 1,250", "reason": ""})
 
+## q(320) (the user 11-13, v3 丙): the server's max_deal — what the day's loss of 50 has left — greys the chips over it
+## as the floor does (no words, 不知火舞 11-13) and caps the rebet; none sent (an older server): no cap.
+func test_chips_and_the_rebet_keep_inside_the_days_loss() -> void:
+	assert_int(P0Blackjack.max_deal(_view(300))).is_equal(-1)
+	assert_bool(P0Blackjack.can_add(_view(300), 120, 100)).is_true()   # no max_deal: the wallet alone
+	var v := _view(300, null, {"max_deal": 10})
+	assert_bool(P0Blackjack.can_add(v, 5, 5)).is_true()
+	assert_bool(P0Blackjack.can_add(v, 10, 5)).is_false()
+	assert_bool(P0Blackjack.can_add(v, 0, 50)).is_false()
+	assert_int(P0Blackjack.deal_again_bet(v, 120)).is_equal(10)
+	assert_int(P0Blackjack.deal_again_bet(_view(300, null, {"max_deal": 0}), 120)).is_equal(0)
+	assert_int(P0Blackjack.deal_again_bet(_view(142, null, {"max_deal": 250}), 120)).is_equal(100)   # the wallet the lower
+
+func test_mock_keeps_the_days_loss_when_set() -> void:
+	var m := P0BlackjackMock.new(1)
+	m.day_loss = 50
+	m.day_net = -38
+	var st := {"coins": 1000}
+	var r := m.command({"type": "bj_deal", "bet": 15}, st)
+	assert_str(str(r.get("code", ""))).is_equal("bj_day_cap")
+	assert_int(int((r.detail as Dictionary).left)).is_equal(10)
+	var bj: Dictionary = m.decorate(st.duplicate()).blackjack
+	assert_int(int(bj.max_deal)).is_equal(10)
+	m.day_net = -46
+	assert_str(str(m.decorate(st.duplicate()).blackjack.day.capped)).is_equal("loss")
+
 func test_deal_again_steps_down_to_what_keeps_40() -> void:
 	assert_int(P0Blackjack.deal_again_bet(_view(300), 120)).is_equal(120)
 	assert_int(P0Blackjack.deal_again_bet(_view(142), 120)).is_equal(100)   # 102 → 100

@@ -18,6 +18,11 @@ static func allowed(has_feature: Callable, switched_on: bool) -> bool:
 	return switched_on and bool(has_feature.call("editor"))
 
 var floor_coins := 40
+## q(320) (the user 11-13, v3 丙) as the server holds it, when set (50): no deal past the day's loss by its own stake;
+## this run's net stands for the day's (the mock keeps no day). -1, the default: no cap — the page's other states are
+## built and shot with larger stakes; a test or a shot of the cap sets it.
+var day_loss := -1
+var day_net := 0
 var intro := false
 var n := 0
 var last_bet := 0
@@ -72,6 +77,8 @@ func command(cmd: Dictionary, state: Dictionary) -> Dictionary:
 			if typeof(bet) != TYPE_INT and typeof(bet) != TYPE_FLOAT or int(bet) < 5 or int(bet) % 5 != 0:
 				return _refuse(state, "bj_bad_bet", {})
 			if not _hand.is_empty(): return _refuse(state, "bj_in_hand", {})
+			if day_loss >= 0 and int(bet) > _max_deal():
+				return _refuse(state, "bj_day_cap", {"cap": "loss", "net": day_net, "loss": day_loss, "win": null, "left": _max_deal()})
 			if coins - int(bet) < floor_coins:
 				return _refuse(state, "bj_no_coins", {"need": int(bet) + floor_coins - coins, "have": coins, "floor": floor_coins})
 			events.append_array(_deal(int(bet)))
@@ -238,6 +245,7 @@ func _settle(why: String, coins: int) -> Array:
 		net += payout - bet
 		out.append({"cards": h.cards.duplicate(), "result": result, "bet": bet, "payout": payout, "net": payout - bet})
 	delta += paid
+	day_net += net
 	if paid > 0: events.append({"kind": "coins", "delta": paid})
 	var result := {"n": n, "why": why, "dealer": dealer.duplicate(), "dealer_total": d, "hands": out, "net": net,
 		"coins_after": coins + paid}
@@ -247,9 +255,17 @@ func _settle(why: String, coins: int) -> Array:
 
 # ---------------------------------------------------------------- view
 
+## What a deal may stake now: what the day's loss has left, in fives (0 under the minimum: the table is closed).
+func _max_deal() -> int:
+	var room := maxi(0, day_loss + day_net)
+	return room - room % 5
+
 func _view(coins: int) -> Dictionary:
+	var capped := day_loss >= 0
 	return {"open": true, "intro": intro, "floor": floor_coins, "min_bet": 5, "step": 5,
-		"chips": P0Blackjack.CHIPS, "last_bet": last_bet, "hand": null if _hand.is_empty() else _hand_view(coins),
+		"chips": P0Blackjack.CHIPS, "max_bet": null, "max_deal": _max_deal() if capped else null,
+		"day": {"net": day_net, "loss": day_loss if capped else null, "win": null, "capped": "loss" if capped and _max_deal() < 5 else null},
+		"last_bet": mini(last_bet, _max_deal()) if capped else last_bet, "hand": null if _hand.is_empty() else _hand_view(coins),
 		"last": last}
 
 func _hand_view(coins := -1) -> Dictionary:
