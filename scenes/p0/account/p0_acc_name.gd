@@ -3,8 +3,9 @@ extends P0AccShell
 ## ACC-NAME (SGODOT-491; 不知火舞's account spec §1.5, q(313); 安其拉's 635:197051 / -ERR 635:197082): the first launch's
 ## name, on ACC-SHELL, 12 between its parts. `What should we call you?` (left), `Shown to other players. You can change
 ## it every 7 days.` (Bold 14, secondary), the Name field (UiTextField: `Your name`, `2–16 letters or numbers`, at most 16
-## letters as the eye counts them), the key, `Skip for now`, a 1 px line, and `Already have a farm? Sign in` (the whole
-## row the key; not for an old account, `sign_in_row` false). No ‹: nothing before it to go back to.
+## letters as the eye counts them), the key, `Skip for now`, and for a new player a 1 px line and `Try another account`
+## (info Bold 14, centred, 44: back to the sign-in page; spec v2 §2, 720:201600) — not after an old farm's claim or a
+## test code (`fresh` false). No ‹: nothing before it to go back to.
 ## The key says what is missing (q(28)): `Enter a name` (grey) under 2 letters; `Try another name` (grey) while the
 ## name is refused; `Continue`. Continue (or the keyboard's return) asks `check` (the host's: P0Session's name/check,
 ## nothing made yet) — grey meanwhile, its words kept, no spinner — and a yes says it (named). A no says why in red on
@@ -14,7 +15,7 @@ extends P0AccShell
 ## free (the server's). A failed check (the network, rate_limited) says so (failed) and the page stays.
 
 signal named(name: String, skip: bool)
-signal sign_in_pressed
+signal try_another_pressed   # a new player's `Try another account` (spec v2 §2): back to the sign-in page
 signal failed(code: String)
 
 const TITLE := "What should we call you?"
@@ -26,12 +27,10 @@ const ENTER := "Enter a name"
 const RETRY := "Try another name"
 const CONTINUE := "Continue"
 const SKIP := "Skip for now"
-const HAVE_FARM := "Already have a farm?"
-const SIGN_IN := "Sign in"
+const ANOTHER := "Try another account"
 const MIN_LETTERS := 2
 const MAX_LETTERS := 16
 const GAP := 12.0
-const WORDS_GAP := 4
 ## The helper line's red, by the server's reasons (name_rejected's `reason`).
 const WHY := {"empty": HELPER, "length": HELPER, "chars": "That character can't be used", "blocked": "That name isn't allowed"}
 ## What a name may be made of, as the server's name.ts has it (周瑜, q(313) ① ②): each letter as the eye counts it starts
@@ -52,12 +51,12 @@ var check := Callable()
 var field: UiTextField
 var go: UiCommandButton
 var skip: UiDismissButton
-var sign_in_row: Control
+var another_row: Control
 var _rejected := false
 var _checking := false
 static var _re := {}
 
-func _init(with_sign_in := true) -> void:
+func _init(fresh := true) -> void:
 	super()
 	name = "AccName"
 	add_title(TITLE)
@@ -79,9 +78,9 @@ func _init(with_sign_in := true) -> void:
 	skip.custom_minimum_size.y = UiTokens.SIZE_TOUCH
 	skip.pressed.connect(func(): if not _checking: named.emit("", true))
 	col.add_child(skip)
-	sign_in_row = _sign_in_row()
-	sign_in_row.visible = with_sign_in
-	col.add_child(sign_in_row)
+	another_row = _another_row()
+	another_row.visible = fresh
+	col.add_child(another_row)
 	_refresh()
 
 ## A name typed before (pending_expired: back from Sign in, spec v1.1): in the field as it was.
@@ -174,28 +173,18 @@ func _on_go() -> void:
 			_refresh()
 			failed.emit(str(r.get("code", "network"))))
 
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_TRANSLATION_CHANGED and sign_in_row != null:
-		_space_words(sign_in_row.find_child("Words", true, false) as HBoxContainer)
-
-## The question and Sign in 4 apart in English; under 中文 none (不知火舞 on 491: the full-width ？ brings its own half
-## a square, and no space between Chinese and Chinese, q(275) ⑦).
-static func _space_words(words: HBoxContainer) -> void:
-	if words: words.add_theme_constant_override(&"separation", 0 if TranslationServer.get_locale() == "zh_CN" else WORDS_GAP)
-
 ## A no from after the check (guest's name_rejected): why, in red, as the check's own no.
 func refuse(reason: String) -> void:
 	_rejected = true
 	field.set_error(str(WHY.get(reason, WHY.blocked)))
 	_refresh()
 
-## `Already have a farm? Sign in`: the question secondary, Sign in info, Bold 14, 4 apart (none in 中文), centred; the
-## whole row the key (44), under a 1 px line.
-func _sign_in_row() -> Control:
+## The new player's way back: 12 under Skip a 1 px line, 12, `Try another account` (info Bold 14, centred, 44).
+func _another_row() -> Control:
 	var box := VBoxContainer.new()
-	box.name = "SignInRow"
+	box.name = "AnotherRow"
 	box.add_theme_constant_override(&"separation", int(GAP))
-	var above := Control.new()   # 12 under Skip, gone with the row (an old account's NAME)
+	var above := Control.new()   # 12 under Skip, gone with the row (an old farm's or a test code's NAME)
 	above.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(above)
 	var rule := ColorRect.new()
@@ -203,25 +192,13 @@ func _sign_in_row() -> Control:
 	rule.custom_minimum_size.y = 1
 	rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(rule)
-	var row := Button.new()
-	row.name = "SignIn"
-	row.flat = true
-	row.focus_mode = Control.FOCUS_NONE
-	row.custom_minimum_size.y = UiTokens.SIZE_TOUCH
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"hover_pressed"]:
-		row.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	row.pressed.connect(func(): if not _checking: sign_in_pressed.emit())
-	var words := HBoxContainer.new()
-	words.name = "Words"
-	words.alignment = BoxContainer.ALIGNMENT_CENTER
-	_space_words(words)
-	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	words.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for part in [[HAVE_FARM, UiTokens.COLOR_SECONDARY], [SIGN_IN, UiTokens.COLOR_INFO]]:
-		var l := UiKit.label(str(part[0]), UiTokens.STYLE_BODY_B14, part[1])
-		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		words.add_child(l)
-	row.add_child(words)
-	box.add_child(row)
+	var key := UiDismissButton.new(ANOTHER)
+	key.name = "TryAnother"
+	key.custom_minimum_size.y = UiTokens.SIZE_TOUCH
+	key.add_theme_font_override(&"font", UiKit.font(&"bold"))
+	key.add_theme_font_size_override(&"font_size", 14)
+	for state in [&"font_color", &"font_hover_color", &"font_pressed_color", &"font_focus_color", &"font_hover_pressed_color"]:
+		key.add_theme_color_override(state, UiTokens.COLOR_INFO)
+	key.pressed.connect(func(): if not _checking: try_another_pressed.emit())
+	box.add_child(key)
 	return box

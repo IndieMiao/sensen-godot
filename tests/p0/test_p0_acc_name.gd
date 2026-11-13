@@ -112,28 +112,18 @@ func test_a_failed_check_says_so_and_an_answer_for_an_old_name_is_dropped() -> v
 	(_pending[1][1] as Callable).call({"ok": true})
 	assert_array(said).is_empty()
 
-func test_skip_sign_in_and_an_old_account_without_the_row() -> void:
+func test_skip_try_another_and_an_old_farm_without_the_row() -> void:
 	var p := _page()
 	var said: Array = []
-	var signs: Array[int] = []
+	var backs: Array[int] = []
 	p.named.connect(func(n: String, s: bool): said.append([n, s]))
-	p.sign_in_pressed.connect(func(): signs.append(1))
+	p.try_another_pressed.connect(func(): backs.append(1))
 	p.skip.pressed.emit()
-	(p.find_child("SignIn", true, false) as Button).pressed.emit()
+	(p.find_child("TryAnother", true, false) as Button).pressed.emit()
 	assert_array(said).is_equal([["", true]])
-	assert_array(signs).is_equal([1])
+	assert_array(backs).is_equal([1])
 	var old := _page(false)
-	assert_bool(old.sign_in_row.visible).is_false()
+	assert_bool(old.another_row.visible).is_false()
 	old.prefill("Mira")
 	assert_str(old.field.text).is_equal("Mira")
 	assert_str(old.go.label).is_equal("Continue")
-
-## 不知火舞 on 491: `Already have a farm?` and `Sign in` 4 apart in English, none under 中文 (the ？ brings its own space).
-func test_the_sign_in_row_has_no_gap_in_chinese() -> void:
-	var en := _page()
-	assert_int((en.find_child("Words", true, false) as HBoxContainer).get_theme_constant(&"separation")).is_equal(4)
-	TranslationServer.set_locale("zh_CN")
-	var zh := _page()
-	var gap := (zh.find_child("Words", true, false) as HBoxContainer).get_theme_constant(&"separation")
-	TranslationServer.set_locale("en")
-	assert_int(gap).is_equal(0)

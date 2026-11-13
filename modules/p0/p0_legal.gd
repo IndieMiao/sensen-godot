@@ -20,6 +20,10 @@ static func privacy_url(os_name: String, live := PRIVACY_LIVE) -> String:
 	if not live: return ""
 	return PRIVACY_IOS if os_name == "iOS" else PRIVACY_ANDROID
 
+## Where a player writes to us (the user 11-12: this address, no support@ — 李白's q(314)): Help and feedback's Contact
+## us, its no-mail-app toast, the no-Google-services page (SGODOT-491).
+const SUPPORT_EMAIL := "shaojie@gensen.app"
+
 ## q(281) ② (后裔's privacy-server-2026-11-03 ①): the support code a player sends with a request about their data —
 ## SHA-256 of `p0-support/v1/` + the player id (UTF-8), its first 50 bits as 10 Crockford Base32 characters (0–9 and
 ## the letters but I L O U), `XXXXX-XXXXX`. Worked out here, so it shows offline; the server has the same function to
