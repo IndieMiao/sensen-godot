@@ -125,9 +125,12 @@ final class GoogleSignInIOS: NSObject, ASWebAuthenticationPresentationContextPro
         pending = conn
         let s = ASWebAuthenticationSession(url: auth.url!, callbackURLScheme: scheme) { [weak self] url, error in
             guard let self else { return }
+            // 取消 in the system's confirm box or the sheet, or Cancel / Deny on Google's own page (it comes back as
+            // error=access_denied): all are the player backing out — the card again, nothing said (不知火舞 on 1.6)
             if let e = error as? ASWebAuthenticationSessionError, e.code == .canceledLogin { self.finish("GOOGLE_ERR|canceled"); return }
-            guard error == nil, let url,
-                  let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+            let items = url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false)?.queryItems }
+            if items?.first(where: { $0.name == "error" })?.value == "access_denied" { self.finish("GOOGLE_ERR|canceled"); return }
+            guard error == nil, let items,
                   items.first(where: { $0.name == "state" })?.value == state,
                   let code = items.first(where: { $0.name == "code" })?.value else {
                 self.finish("GOOGLE_ERR|failed")
