@@ -93,7 +93,11 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
      *  test, left out of the counts, so the same check runs each time — and a token of its own for an hour, its earlier
      *  ones revoked. No other save is touched; no id made up per run (a forced update leaves no id-only client to make
      *  one). The token is in this answer only, never in the log. */
-    app.post('/admin/smoke', async () => {
+    app.post('/admin/smoke', async (req, reply) => {
+      // that one account only (奕星 11-13: the reset runs with every deploy, so no id may be passed to it — any other
+      // is refused, never reset)
+      const asked = (req.body && typeof req.body === 'object' ? (req.body as { player?: unknown }).player : undefined);
+      if (asked !== undefined && asked !== SMOKE_PLAYER) return reply.code(400).send({ ok: false, code: 'smoke_only', player: SMOKE_PLAYER });
       const now = deps.now();
       const s = store.reset(SMOKE_PLAYER, now);
       s.test = true;

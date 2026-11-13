@@ -124,6 +124,22 @@ describe("the deploy's smoke account (奕星 11-13)", () => {
     expect(accounts.byToken(second.token)).toBeUndefined();
   });
 
+  it('resets the smoke account only: any other id is refused, its save and tokens untouched (奕星 11-13)', async () => {
+    const { store, accounts, lines, post } = setup();
+    const real = store.get('a-real-player-01', T0);
+    real.coins = 777;
+    accounts.issue('a-real-player-01', USER_TOKEN);
+    for (const player of ['a-real-player-01', 'p0-smoke-check2', '', 7, null]) {
+      const r = await post('/admin/smoke', { player });
+      expect([r.statusCode, r.json()]).toEqual([400, { ok: false, code: 'smoke_only', player: SMOKE_PLAYER }]);
+    }
+    expect(store.peek('a-real-player-01')!.coins).toBe(777);
+    expect(accounts.byToken(USER_TOKEN)?.player).toBe('a-real-player-01');
+    expect(store.peek(SMOKE_PLAYER)).toBeUndefined();
+    expect(lines).toEqual([]);
+    expect((await post('/admin/smoke', { player: SMOKE_PLAYER })).json()).toMatchObject({ ok: true, player: SMOKE_PLAYER });
+  });
+
   it('needs the admin key; without accounts there is no such route', async () => {
     expect((await setup().post('/admin/smoke', {}, 'wrong')).statusCode).toBe(401);
     expect((await setup(false).post('/admin/smoke', {})).statusCode).toBe(404);
