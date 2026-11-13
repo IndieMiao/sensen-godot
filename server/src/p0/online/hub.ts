@@ -100,15 +100,19 @@ export class P0OnlineHub {
     this.wss.close();
   }
 
-  /** A token revoked (signed in elsewhere) or the account deleted (SGODOT-488): this player's socket goes as a second
-   * phone's join sends it — 4001, which the client takes as no reconnect (P0Online). Whether one was open. */
+  /** Account deletion / session invalidation: leave immediately, forget reconnect state and stop queued inputs.
+   * Keep A1's return value (whether a socket was open) and the client's no-reconnect close code. */
   kick(player: string): boolean {
     const c = this.byPlayer.get(player);
-    if (!c) return false;
-    this.byPlayer.delete(player);
-    this.depart(c, true);
-    c.ws.close(4001, 'SESSION_REPLACED');
-    return true;
+    if (c) {
+      this.byPlayer.delete(player);
+      this.conns.delete(c);
+      this.depart(c, false);
+      c.ws.close(4001, 'SESSION_REPLACED');
+    }
+    const orphan = this.deps.rooms.forget(player);
+    if (orphan) this.deps.departed?.(orphan);
+    return !!c;
   }
 
   private accept(ws: WebSocket, player: string): void {
@@ -128,6 +132,7 @@ export class P0OnlineHub {
   }
 
   private message(c: Conn, raw: Buffer, binary: boolean): void {
+    if (this.byPlayer.get(c.player) !== c) return;
     const now = Date.now();
     c.tokens = Math.min(LIMITS.burst, c.tokens + (now - c.tokenAt) / 1000 * LIMITS.refill_per_s);
     c.tokenAt = now;
