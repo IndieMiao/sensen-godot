@@ -3,8 +3,9 @@
  * against the dealer, dealt and settled here, bets in coins (the table only draws them as chips). Four decks shuffled
  * afresh each hand; the dealer stands on all 17s; with an Ace or a ten up it peeks first; a blackjack pays 3 to 2,
  * half a coin rounded down; double on any first two cards; one split of a pair (10 / J / Q / K alike), split Aces take
- * one card each. After every stake the wallet keeps content.wallet_floor (40). Test phase: no bet or daily caps; the
- * day's net (day.bj_net) is kept for the observation log only, never in any economy.
+ * one card each. After every stake the wallet keeps content.wallet_floor (40). The store builds keep the room (the user
+ * 11-13, 「牌室 C」, D6 undone) with a cap on a deal's stake and on the day's net, lost or won (q(320), pending: the
+ * numbers below are placeholders); the day's net is day.bj_net, hands begun today, and it starts over at the rollover.
  * A hand left a day (its start's day key, day_hold included) or 24 h untouched is settled as stood on the next command,
  * whatever it is (settleBlackjack, in applyP0's settle chain); a result no blackjack command carried back waits in
  * blackjack.last for bj_open.
@@ -13,7 +14,7 @@ import { createHmac, randomBytes } from 'node:crypto';
 import type { P0Content } from './content.js';
 import type { Refusal } from './fishing.js';
 import type { P0Event } from './progress.js';
-import { dayKey } from './rules.js';
+import { dayKey, rolloverAfter } from './rules.js';
 import type { P0State } from './state.js';
 
 export const BJ_DECKS = 4;
@@ -21,6 +22,12 @@ export const BJ_CHIPS = [5, 10, 50, 100, 500, 1000];
 export const BJ_MIN_BET = 5;
 export const BJ_STEP = 5;
 export const BJ_EXPIRE_MS = 24 * 3_600_000;
+/** q(320) (the user's numbers pending; placeholders until then, 奕星 11-13): a deal's stake at most — Double and Split
+ * take it to twice by the rules — and the day's net at which no new hand is dealt, lost or won. Every build alike: the
+ * server takes no channel header for a boundary. */
+export const BJ_MAX_BET = 1000;
+export const BJ_DAY_LOSS = 2000;
+export const BJ_DAY_WIN = 2000;
 const RANKS = 'A23456789TJQK';
 const SUITS = 'SHDC';
 
@@ -95,6 +102,14 @@ const atTable = (c: P0Content, space: unknown, place: unknown) =>
 const expired = (c: P0Content, s: P0State, h: BjHand, now: number) => h.day !== dayKey(c, s, now) || now - h.last_at >= BJ_EXPIRE_MS;
 const coinsShort = (c: P0Content, s: P0State, stake: number) => Math.max(0, stake + c.wallet_floor - s.coins);
 const refuse = (code: string, detail?: Record<string, unknown>): Refusal => ({ code, detail });
+/** The day's net the caps read: hands begun today (day.bj_net). Both callers have rolled the day first (applyP0's
+ *  rollDay, viewOf), so a new day's is 0. */
+const dayNet = (s: P0State) => s.day.bj_net ?? 0;
+/** Why no new hand is dealt today (null: one may be): the day's loss or win reached (q(320)). The hand in play plays on. */
+function dayCap(s: P0State): 'loss' | 'win' | null {
+  const net = dayNet(s);
+  return net <= -BJ_DAY_LOSS ? 'loss' : net >= BJ_DAY_WIN ? 'win' : null;
+}
 
 /** The dealer draws to 17 (stands on soft 17); not when every hand of the player's has bust. Then each hand is paid:
  * a natural 3 to 2 rounded down, a win or a dealer bust 1 to 1, a push its stake back. */
@@ -192,6 +207,10 @@ export function blackjackCommand(c: P0Content, s: P0State, cmd: BjCommand & { sp
       const bet = cmd.bet;
       if (!Number.isInteger(bet) || bet < BJ_MIN_BET || bet % BJ_STEP !== 0) return refuse('bj_bad_bet', { min: BJ_MIN_BET, step: BJ_STEP });
       if (bj.hand) return refuse('bj_in_hand', { n: bj.hand.n });
+      if (bet > BJ_MAX_BET) return refuse('bj_max_bet', { max: BJ_MAX_BET });
+      const cap = dayCap(s);
+      if (cap) return refuse('bj_day_cap', { cap, net: dayNet(s), loss: BJ_DAY_LOSS, win: BJ_DAY_WIN,
+        resets_at: rolloverAfter(c, s, dayKey(c, s, now)) });
       const need = coinsShort(c, s, bet);
       if (need) return refuse('bj_no_coins', { need, have: s.coins, floor: c.wallet_floor });
       const n = bj.n + 1, salt = bjSalt.next();
@@ -275,6 +294,10 @@ export function blackjackView(c: P0Content, s: P0State, now: number) {
   const bj = s.blackjack;
   return {
     open: bjOpen(s), intro: !!bj?.intro, floor: c.wallet_floor, min_bet: BJ_MIN_BET, step: BJ_STEP, chips: BJ_CHIPS,
+    max_bet: BJ_MAX_BET,
+    // q(320): today's net and its caps; `capped` loss / win once no new hand is dealt till the rollover (resets_at)
+    day: { net: dayNet(s), loss: BJ_DAY_LOSS, win: BJ_DAY_WIN, capped: dayCap(s),
+      resets_at: rolloverAfter(c, s, dayKey(c, s, now)) },
     last_bet: bj?.last_bet ?? 0,
     hand: bj?.hand ? handView(c, s, bj.hand, now) : null,
     last: bj?.last ?? null,
