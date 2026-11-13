@@ -10,6 +10,8 @@ sys.path.insert(0,str(ROOT/'tools/art'))
 from landmark_kit import Kit, reset_scene
 OUT=ROOT/'assets/rooms/market_plaza'
 SOURCE=Path(__file__).resolve().parent
+sys.path.insert(0,str(SOURCE))
+from generic_facades import PALETTE as GENERIC_PALETTE, SPECS as GENERIC_SPECS, build_house
 reset_scene()
 PALETTE={'stone':'D9C4A3','cream':'F0E1C2','cream_light':'FFF0D2','pave':'DFCBA7',
  'gray':'B7B9B3','gray_top':'D3D5CF','pot':'C39E73','soil':'78644B',
@@ -20,6 +22,7 @@ PALETTE={'stone':'D9C4A3','cream':'F0E1C2','cream_light':'FFF0D2','pave':'DFCBA7
  'sf_trim':'F5ECD9','sf_roof_blue':'85786D','sf_roof_pink':'98766D','sf_roof_cream':'A18B6C','sf_roof_yellow':'9B825E','sf_roof_mint':'6F8579',
  'generic_sage':'B9C5BA','generic_sand':'D8CBB2','generic_ivory':'D9D6C7','generic_clay':'C6B9A5',
  'glass':'8DAEAC','door':'6F8A75','slate':'748B9C','petal_white':'F4E6C9','petal_lilac':'BBA9CC','petal_yellow':'E6C778'}
+PALETTE.update(GENERIC_PALETTE)
 kit=Kit(OUT,PALETTE)
 kit.begin('mp_ground',ao=False)
 kit.box('Paving slab',(0,-.075,0),(16,.25,16),'pave',.015)
@@ -161,7 +164,7 @@ def sf_house(index,paint,roof_color):
 
 SF_COLORS=['blue','pink','cream','yellow','mint','blue','pink','cream']
 for i,col in enumerate(SF_COLORS):sf_house(i,'sf_'+col,'sf_roof_'+col)
-for i,col in enumerate(['generic_sage','generic_sand','generic_ivory','generic_clay']):facade('facade_generic_'+str(i),col,False)
+for spec in GENERIC_SPECS:build_house(kit,spec)
 
 kit.begin('mp_keeper_flowerbed')
 # Room-diagonal garden band between the basin and keeper stall, physically filled
@@ -244,9 +247,10 @@ for obj in bpy.data.objects:
 bpy.ops.wm.save_as_mainfile(filepath=str(SOURCE/'market_plaza.blend'))
 # Incremental SF export keeps the accepted generic/ground/props byte-identical.
 sf_only='--sf-only' in sys.argv
+generic_only='--generic-only' in sys.argv
 old_stats=OUT/'shell_asset_stats.json'
-stats=json.loads(old_stats.read_text())['assets'] if sf_only and old_stats.exists() else {}
+stats=json.loads(old_stats.read_text())['assets'] if (sf_only or generic_only) and old_stats.exists() else {}
 for name in kit.assets:
- if not sf_only or name.startswith('facade_sf_'):stats[name]=kit.export(name)
+ if (sf_only and name.startswith('facade_sf_')) or (generic_only and name.startswith('facade_generic_')) or not(sf_only or generic_only):stats[name]=kit.export(name)
 (OUT/'shell_asset_stats.json').write_text(json.dumps({'generator':str(Path(__file__).relative_to(ROOT)),'author':'马可波罗','assets':stats},indent=2)+'\n')
 print('MARKET_SHELL_EXPORT',json.dumps(stats),flush=True)

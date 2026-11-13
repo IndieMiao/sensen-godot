@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-11-13" name="report_2" tests="52" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="test_p0_outpost" package="tests/p0" timestamp="2026-11-13T06:53:12" hostname="localhost" tests="52" failures="0" errors="0" skipped="0" flaky="0" time="16.122">
+		<testcase name="test_the_outpost_table_and_anchor_files_agree" classname="test_p0_outpost" time="0.013">
+		</testcase>
+		<testcase name="test_each_outpost_opens_with_its_keeper_and_residents" classname="test_p0_outpost" time="0.662">
+		</testcase>
+		<testcase name="test_near_resident_is_a_resident_within_card_reach_never_the_keeper" classname="test_p0_outpost" time="0.135">
+		</testcase>
+		<testcase name="test_decor_is_not_tappable_and_counters_are" classname="test_p0_outpost" time="0.142">
+		</testcase>
+		<testcase name="test_tapping_the_counter_walks_there_and_reaches_the_keeper_entry" classname="test_p0_outpost" time="0.074">
+		</testcase>
+		<testcase name="test_tapping_the_keeper_stops_in_front_of_them_not_inside" classname="test_p0_outpost" time="0.500">
+		</testcase>
+		<testcase name="test_tapping_the_tea_table_sits_on_the_nearest_free_seat_and_the_joystick_stands_up" classname="test_p0_outpost" time="0.091">
+		</testcase>
+		<testcase name="test_other_players_on_seats_are_lifted_onto_them" classname="test_p0_outpost" time="0.075">
+		</testcase>
+		<testcase name="test_seats_other_players_hold_are_skipped" classname="test_p0_outpost" time="0.083">
+		</testcase>
+		<testcase name="test_back_while_seated_stands_up_and_walks_out" classname="test_p0_outpost" time="0.089">
+		</testcase>
+		<testcase name="test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data" classname="test_p0_outpost" time="0.648">
+		</testcase>
+		<testcase name="test_back_while_standing_up_from_the_joystick_walks_out_once_standing" classname="test_p0_outpost" time="0.083">
+		</testcase>
+		<testcase name="test_npcs_wear_their_npc_only_parts" classname="test_p0_outpost" time="0.067">
+		</testcase>
+		<testcase name="test_npc_outfits_name_real_parts_and_stay_distinct" classname="test_p0_outpost" time="0.007">
+		</testcase>
+		<testcase name="test_handwritten_room_residents_wear_different_clothes_from_their_keeper" classname="test_p0_outpost" time="0.005">
+		</testcase>
+		<testcase name="test_the_second_batch_npcs_wear_their_npc_only_parts" classname="test_p0_outpost" time="0.004">
+		</testcase>
+		<testcase name="test_only_the_nearest_card_shows_in_a_room" classname="test_p0_outpost" time="0.071">
+		</testcase>
+		<testcase name="test_room_prompts_are_names_and_icons_only" classname="test_p0_outpost" time="0.476">
+		</testcase>
+		<testcase name="test_the_npc_the_room_opened_a_talk_for_is_talking_until_it_closes" classname="test_p0_outpost" time="0.108">
+		</testcase>
+		<testcase name="test_a_resident_bar_reached_from_the_bag_lights_their_name" classname="test_p0_outpost" time="0.223">
+		</testcase>
+		<testcase name="test_a_tap_on_an_npc_name_tag_is_that_npc" classname="test_p0_outpost" time="0.604">
+		</testcase>
+		<testcase name="test_overlapping_name_tags_give_the_tap_to_the_nearer_one" classname="test_p0_outpost" time="0.024">
+		</testcase>
+		<testcase name="test_an_open_counter_pushes_in_on_the_keeper_above_the_drawer" classname="test_p0_outpost" time="2.189">
+		</testcase>
+		<testcase name="test_the_tea_house_opens_on_its_own_kit" classname="test_p0_outpost" time="0.096">
+		</testcase>
+		<testcase name="test_every_tea_seat_is_walked_to_from_the_door" classname="test_p0_outpost" time="0.960">
+		</testcase>
+		<testcase name="test_a_tea_table_seats_on_its_nearest_free_stool" classname="test_p0_outpost" time="0.107">
+		</testcase>
+		<testcase name="test_the_tea_house_door_is_at_the_front_and_leaves" classname="test_p0_outpost" time="0.112">
+		</testcase>
+		<testcase name="test_the_front_door_prompt_sits_on_the_steps_clear_of_the_player" classname="test_p0_outpost" time="0.103">
+		</testcase>
+		<testcase name="test_a_tapped_prompt_goes_to_its_own_anchor" classname="test_p0_outpost" time="0.124">
+		</testcase>
+		<testcase name="test_the_tea_house_lights_as_its_kit_was_signed" classname="test_p0_outpost" time="0.103">
+		</testcase>
+		<testcase name="test_the_market_plaza_camera_keeps_to_its_reach" classname="test_p0_outpost" time="0.403">
+		</testcase>
+		<testcase name="test_the_market_plaza_opens_low_on_the_player" classname="test_p0_outpost" time="0.394">
+		</testcase>
+		<testcase name="test_the_market_plaza_dresses_by_city" classname="test_p0_outpost" time="0.387">
+		</testcase>
+		<testcase name="test_every_outpost_opens_on_its_kit" classname="test_p0_outpost" time="0.626">
+		</testcase>
+		<testcase name="test_residents_facilities_and_doors_are_walked_to" classname="test_p0_outpost" time="1.634">
+		</testcase>
+		<testcase name="test_every_outpost_marker_is_a_world_prompt" classname="test_p0_outpost" time="0.852">
+		</testcase>
+		<testcase name="test_the_opening_shot_shows_the_player_and_the_keeper_with_the_whole_name_tag" classname="test_p0_outpost" time="0.773">
+		</testcase>
+		<testcase name="test_the_opening_shot_shows_every_resident_with_the_whole_name_tag" classname="test_p0_outpost" time="0.907">
+		</testcase>
+		<testcase name="test_the_card_room_opens_between_the_player_and_lou" classname="test_p0_outpost" time="0.092">
+		</testcase>
+		<testcase name="test_the_card_room_hides_the_tavern_sign" classname="test_p0_outpost" time="0.495">
+		</testcase>
+		<testcase name="test_a_generated_keeper_wears_their_look_preset" classname="test_p0_outpost" time="0.100">
+		</testcase>
+		<testcase name="test_a_generated_keeper_gives_way_to_a_residents_hair" classname="test_p0_outpost" time="0.009">
+		</testcase>
+		<testcase name="test_the_keeper_sets_leave_the_residents_their_looks" classname="test_p0_outpost" time="0.010">
+		</testcase>
+		<testcase name="test_no_npc_wears_the_players_default_outfit" classname="test_p0_outpost" time="0.007">
+		</testcase>
+		<testcase name="test_the_cabin_shows_pip_and_its_second_resident" classname="test_p0_outpost" time="0.173">
+		</testcase>
+		<testcase name="test_a_generated_square_opens_on_the_market_plaza" classname="test_p0_outpost" time="0.374">
+		</testcase>
+		<testcase name="test_a_generated_tackle_shop_opens_on_its_own_kit" classname="test_p0_outpost" time="0.093">
+		</testcase>
+		<testcase name="test_every_placed_resident_has_a_look_and_a_spot_in_its_rooms" classname="test_p0_outpost" time="0.034">
+		</testcase>
+		<testcase name="test_a_kits_camera_planes_come_from_its_layout" classname="test_p0_outpost" time="0.005">
+		</testcase>
+		<testcase name="test_the_name_sign_is_written_on_its_board" classname="test_p0_outpost" time="0.170">
+		</testcase>
+		<testcase name="test_a_trading_post_keeps_the_coffee_shop_and_a_tea_house_its_own_kit" classname="test_p0_outpost" time="0.006">
+		</testcase>
+		<testcase name="test_keepers_and_residents_stay_awake_at_the_rooms_camera_distance" classname="test_p0_outpost" time="0.394">
+		</testcase>
+	</testsuite>
+</testsuites>

@@ -1,0 +1,9 @@
+{
+  "project": "isolated market art and referenced dependencies, initially no .godot cache",
+  "input_files": 247,
+  "changed_files": [],
+  "errors": [],
+  "godot": "4.7.2",
+  "log_sha256": "b29448ef0a0ee39f1435fdf840a4874eea0f2bc7642a923e57da8e33841b8010",
+  "import_uids": "existing Godot generated generic UIDs preserved; no new runtime filenames"
+}

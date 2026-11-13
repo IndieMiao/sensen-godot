@@ -43,20 +43,20 @@
       "bytes": 381236
     },
     "facade_generic_0": {
-      "triangles": 4860,
-      "bytes": 345780
+      "triangles": 4589,
+      "bytes": 320740
     },
     "facade_generic_1": {
-      "triangles": 4860,
-      "bytes": 345780
+      "triangles": 4844,
+      "bytes": 344456
     },
     "facade_generic_2": {
-      "triangles": 4860,
-      "bytes": 345780
+      "triangles": 4588,
+      "bytes": 320616
     },
     "facade_generic_3": {
-      "triangles": 4860,
-      "bytes": 345780
+      "triangles": 4756,
+      "bytes": 336248
     },
     "mp_keeper_flowerbed": {
       "triangles": 5072,
