@@ -1,8 +1,8 @@
-/** The card room's cap (q(320): the user 11-13, via 奕星 — v3 丙, the day's loss alone; the user 11-13 「牌室 C」 kept the
- *  room in the store builds): no deal that could take the day's net past −50 by its own stake, Double and Split
- *  unchecked; under the table minimum left the table closes till the rollover; no cap on a stake or the day's win. */
+/** The card room's day loss (q(320), approved and set as written: the user 11-13 「上限不做限制, 输到50 按照丙」): a deal
+ *  may not take the day's net below −50 by its own stake (bj_day_cap); under the table minimum left the table closes till
+ *  the rollover; Double and Split are not held to it; no cap on a stake or the day's win; every build. */
 import { afterEach, describe, expect, it } from 'vitest';
-import { BJ_CHIPS, bjCaps, bjShoe, shuffleShoe } from '../../src/p0/blackjack.js';
+import { BJ_CHIPS, BJ_DAY_LOSS, bjShoe, shuffleShoe } from '../../src/p0/blackjack.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { dayKey, rolloverAfter } from '../../src/p0/rules.js';
@@ -13,7 +13,6 @@ const c = loadP0Content();
 const T0 = Date.UTC(2026, 9, 28, 2, 0, 0);
 const H = 3_600_000;
 const AT = { space: 'outpost', place: 'sf_card_room_1' } as const;
-const shipped = { ...bjCaps };
 
 const card = (code: string) => 'SHDC'.indexOf(code[1]) * 13 + 'A23456789TJQK'.indexOf(code[0]);
 /** The shoe in dealing order (player, dealer up, player, dealer hole), then 2S 3H 2D 3C … of the second deck. */
@@ -21,7 +20,7 @@ function stack(...codes: string[]) {
   const top = codes.map(card);
   bjShoe.make = () => [...top, ...Array.from({ length: 60 }, (_, i) => card(['2S', '3H', '2D', '3C'][i % 4]) + 52)];
 }
-afterEach(() => { Object.assign(bjCaps, shipped); bjShoe.make = (p, n, salt) => shuffleShoe(p, n, salt); });
+afterEach(() => { bjShoe.make = (p, n, salt) => shuffleShoe(p, n, salt); });
 
 /** A player at the table with `coins`, today's card-room net already `net`. */
 function player(net = 0, coins = 2000): P0State {
@@ -39,69 +38,68 @@ function ok(s: P0State, cmd: Record<string, unknown>, now = T0): P0State {
   if (!r.ok) throw new Error(`${String(cmd.type)}: ${r.code}`);
   return r.state;
 }
+const opens = (s: P0State) => rolloverAfter(c, s, dayKey(c, s, T0));
 
-describe('the card room cap (q(320) v3 丙, the day\'s loss of 50)', () => {
-  it('ships as the user set it: no stake cap, 50 a day lost, no win cap, the deal kept inside the day', () => {
-    expect(shipped).toEqual({ maxBet: null, dayLoss: 50, dayWin: null, mode: 'mid' });
-    expect(viewOf(c, player(), T0).blackjack).toMatchObject({ chips: BJ_CHIPS, max_bet: null, max_deal: 50,
-      day: { net: 0, loss: 50, win: null, capped: null } });
+describe("the card room's day loss (q(320))", () => {
+  it('the view: the six chips, today\'s net, the limit, what is left, closed or not, when it opens', () => {
+    expect(BJ_DAY_LOSS).toBe(50);
+    const s = player();
+    expect(viewOf(c, s, T0).blackjack).toMatchObject({ chips: BJ_CHIPS, day: { net: 0, limit: 50, left: 50, closed: false, opens_at: opens(s) } });
+    expect(viewOf(c, player(-20), T0).blackjack.day).toMatchObject({ net: -20, left: 30 });
+    expect(viewOf(c, player(-38), T0).blackjack.day.left).toBe(10);   // 12 left, in fives
   });
 
-  it("a deal may stake what the day's loss has left, in fives: 50 at the day's start, 10 at −38; over it bj_day_cap with what is left", () => {
+  it("a deal may stake what is left — 50 at the day's start, 10 at −38; over it bj_day_cap {cap, net, resets_at}", () => {
     stack('TS', '7H', '9S', '9D');
     expect(ok(player(), { type: 'bj_deal', bet: 50 }).blackjack?.hand?.seats[0].bet).toBe(50);
-    expect(run(player(), { type: 'bj_deal', bet: 55 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { cap: 'loss', net: 0, left: 50 } });
-    expect(viewOf(c, player(-38), T0).blackjack.max_deal).toBe(10);
-    expect(run(player(-38), { type: 'bj_deal', bet: 15 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { cap: 'loss', net: -38, left: 10 } });
+    const s = player();
+    expect(run(s, { type: 'bj_deal', bet: 55 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { cap: 'loss', net: 0, resets_at: opens(s) } });
+    expect(run(player(-38), { type: 'bj_deal', bet: 15 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { cap: 'loss', net: -38 } });
     stack('TS', '7H', '9S', '9D');
     expect(run(player(-38), { type: 'bj_deal', bet: 10 }).ok).toBe(true);
   });
 
-  it('ahead on the day, more may be staked: +200 leaves 250; no win closes the table', () => {
-    expect(viewOf(c, player(200), T0).blackjack.max_deal).toBe(250);
+  it('no cap on a stake or the win: ahead +500, 550 may go down; however far ahead, the table stays open', () => {
+    expect(viewOf(c, player(500), T0).blackjack.day.left).toBe(550);
     stack('TS', '7H', '9S', '9D');
-    expect(run(player(200), { type: 'bj_deal', bet: 250 }).ok).toBe(true);
-    expect(viewOf(c, player(10_000), T0).blackjack.day.capped).toBeNull();
+    expect(run(player(500), { type: 'bj_deal', bet: 550 }).ok).toBe(true);
+    expect(viewOf(c, player(100_000), T0).blackjack.day.closed).toBe(false);
   });
 
-  it('Double and Split stay unchecked: 50 split and lost twice at the day\'s start is −100; then the table is closed', () => {
+  it('Double and Split are not held to it: 50 split and lost twice is −100, both hands counted at once; then closed', () => {
     stack('8S', 'TH', '8D', '9C');   // 8 8 against T 9: split, the hands take 2 and 3 (10 and 11), both stand, both lose
     let s = ok(player(), { type: 'bj_deal', bet: 50 });
     s = ok(s, { type: 'bj_act', action: 'split' });
     s = ok(s, { type: 'bj_act', action: 'stand' });
     s = ok(s, { type: 'bj_act', action: 'stand' });
     expect(s.day.bj_net).toBe(-100);
-    expect(run(s, { type: 'bj_deal', bet: 5 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { cap: 'loss', net: -100 } });
+    expect(run(s, { type: 'bj_deal', bet: 5 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { net: -100 } });
+    stack('TS', '7H', '5S', '9D');   // 15 against 7: a double at −45 on a 5 stake goes, past what is left
+    const d = ok(player(-45), { type: 'bj_deal', bet: 5 });
+    expect(run(d, { type: 'bj_act', action: 'double' }).ok).toBe(true);
   });
 
-  it('under the table minimum left the table closes, before the coins are looked at, with when it opens again', () => {
-    const at = player(-46, 41);
-    const resets = rolloverAfter(c, at, dayKey(c, at, T0));
-    expect(run(at, { type: 'bj_deal', bet: 5 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { cap: 'loss', net: -46, resets_at: resets } });
-    expect(viewOf(c, at, T0).blackjack.day).toMatchObject({ capped: 'loss', resets_at: resets });
-    expect(viewOf(c, at, T0).blackjack.max_deal).toBe(0);
-    expect(viewOf(c, player(-45), T0).blackjack.day.capped).toBeNull();
+  it('down 46 (under 5 left) the table closes — the day\'s limit before the coins short; down 45 it does not', () => {
+    const at = player(-46, 41);   // 1 over the floor too: the day's limit is what is said
+    expect(run(at, { type: 'bj_deal', bet: 5 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { cap: 'loss', net: -46 } });
+    expect(viewOf(c, at, T0).blackjack.day).toMatchObject({ left: 0, closed: true, opens_at: opens(at) });
+    expect(viewOf(c, player(-45), T0).blackjack.day).toMatchObject({ left: 5, closed: false });
+    expect(viewOf(c, player(-60), T0).blackjack.day.closed).toBe(true);   // an account already past it on the update's day
   });
 
-  it("the last bet comes back at what is left; the hand in play plays on; the rollover starts the day over", () => {
+  it("the last bet comes back at what is left; the hand in play plays on; a hand of yesterday's counts nowhere; the rollover opens", () => {
     const s = player(-30);
     s.blackjack = { n: 9, last_bet: 500 };
     expect(viewOf(c, s, T0).blackjack.last_bet).toBe(20);
     stack('TS', '9H', '6S', '9D');
     const playing = ok(player(-45), { type: 'bj_deal', bet: 5 });
-    playing.day.bj_net = -50;   // reached while this hand is out: the cap guards new hands only
+    playing.day.bj_net = -50;   // reached while this hand is out: the limit guards new hands only
     expect(run(playing, { type: 'bj_act', action: 'stand' }).ok).toBe(true);
-    const lost = player(-60);
-    const tomorrow = rolloverAfter(c, lost, dayKey(c, lost, T0)) + 60_000;
-    expect(viewOf(c, lost, tomorrow).blackjack).toMatchObject({ max_deal: 50, day: { net: 0, capped: null } });
-  });
-
-  it('the switches still hold: a stake cap drops the chips over it; `line` looks at the net only; a win cap closes the table', () => {
-    Object.assign(bjCaps, { maxBet: 20, dayLoss: 50, dayWin: 50, mode: 'line' });
-    expect(viewOf(c, player(), T0).blackjack).toMatchObject({ chips: [5, 10], max_bet: 20, max_deal: 20 });
-    expect(run(player(), { type: 'bj_deal', bet: 25 })).toMatchObject({ ok: false, code: 'bj_max_bet', detail: { max: 20 } });
-    stack('TS', '7H', '9S', '9D');
-    expect(run(player(-45), { type: 'bj_deal', bet: 20 }).ok).toBe(true);   // line: −45 may stake 20
-    expect(run(player(50), { type: 'bj_deal', bet: 5 })).toMatchObject({ ok: false, code: 'bj_day_cap', detail: { cap: 'win' } });
+    stack('TS', '9H', '6S', '9D');
+    const late = ok(player(0), { type: 'bj_deal', bet: 50 });   // begun today, played out after the rollover: lost
+    const tomorrow = opens(late) + 60_000;
+    const after = ok(late, { type: 'bj_act', action: 'stand' }, tomorrow);
+    expect(after.day.bj_net ?? 0).toBe(0);
+    expect(viewOf(c, player(-60), tomorrow).blackjack.day).toMatchObject({ net: 0, left: 50, closed: false });
   });
 });
