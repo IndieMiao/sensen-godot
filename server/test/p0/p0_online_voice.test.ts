@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import { AccessToken } from 'livekit-server-sdk';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -43,6 +44,43 @@ function setup(config: typeof CONFIG | null = CONFIG) {
 const jwt = (token: string) => JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
 
 describe('P0 voice (SGODOT-383)', () => {
+  it('does not return a voice grant when the account is removed while JWT signing is pending', async () => {
+    const { voice, enter, rooms } = setup();
+    voice.setAge('player-delete', true);
+    enter('player-delete');
+    let signed!: (value: string) => void;
+    const signing = new Promise<string>(resolve => { signed = resolve; });
+    const jwtSpy = vi.spyOn(AccessToken.prototype, 'toJwt').mockReturnValue(signing);
+    try {
+      const pending = voice.join('player-delete');
+      await voice.removePlayer('player-delete');
+      rooms.forget('player-delete');
+      signed('fake-signed-token');
+      await expect(pending).resolves.toMatchObject({ code: 'LEASE_EXPIRED', status: 410 });
+    } finally { jwtSpy.mockRestore(); }
+  });
+
+  it('account deletion releases a live lease and age while retaining reports and the other participant', async () => {
+    const { voice, enter, files, inLiveKit, removed } = setup();
+    for (const p of ['player-delete', 'player-kept']) voice.setAge(p, true);
+    enter('player-delete');
+    const other = enter('player-kept');
+    const grant = await voice.join('player-delete') as Record<string, any>;
+    const kept = await voice.join('player-kept') as Record<string, any>;
+    inLiveKit(grant); inLiveKit(kept);
+    voice.block('player-delete', other.id, true);
+    voice.report('player-delete', other.id, 'harassment');
+    const reports = readFileSync(files.reports, 'utf8');
+    await voice.removePlayer('player-delete');
+    expect(removed).toEqual([[grant.room, grant.self]]);
+    expect(voice.status('player-delete').age).toBe('unknown');
+    expect(voice.status('player-kept').age).toBe('ok');
+    expect(voice.heartbeat('player-delete', grant.lease_id)).toMatchObject({ code: 'LEASE_EXPIRED' });
+    expect(voice.heartbeat('player-kept', kept.lease_id)).toMatchObject({ ok: true });
+    expect(JSON.parse(readFileSync(files.blocks, 'utf8'))).toEqual({});
+    expect(readFileSync(files.reports, 'utf8')).toBe(reports);
+  });
+
   it('is off without P0_VOICE=on, and on needs the LiveKit keys', () => {
     expect(p0VoiceFromEnv({})).toBeNull();
     expect(p0VoiceFromEnv({ P0_VOICE: 'off', LIVEKIT_URL: 'ws://x', LIVEKIT_API_KEY: 'k', LIVEKIT_API_SECRET: 's' })).toBeNull();

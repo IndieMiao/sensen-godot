@@ -1012,6 +1012,7 @@ func _go_online(session: P0Session) -> void:
 	var o := P0Online.new()
 	o.url = P0Online.ws_url(session.base_url)
 	o.player_id = session.player_id
+	o.token = session.auth_token()
 	o.access_key = session.access_key
 	o.version = session.version
 	o.features = session.features()

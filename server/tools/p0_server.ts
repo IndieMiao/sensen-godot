@@ -7,7 +7,7 @@
  * Outpost rooms on the same port: ws://…/v1/p0/online (x-p0-player header), GET /v1/p0/presence.
  */
 import { accountsConfig } from '../src/p0/accounts/config.js';
-import { identify } from '../src/p0/accounts/identify.js';
+import { identify, isRefusal } from '../src/p0/accounts/identify.js';
 import { registerAccountRoutes } from '../src/p0/accounts/routes.js';
 import { P0Accounts } from '../src/p0/accounts/store.js';
 import Fastify from 'fastify';
@@ -107,7 +107,12 @@ const accountsFile = path.join(path.dirname(stateFile), 'accounts.json');
 const accounts = new P0Accounts(accountsFile, accountsCfg.refreshKey);
 if (accountsCfg.legacyId) console.warn(JSON.stringify({ warn: 'P0_LEGACY_ID=1: an x-p0-player alone is taken for any player (never on the live server)' }));
 const identifyDeps = { accounts, legacyId: accountsCfg.legacyId, updateUrl: () => gate.state().update_url || undefined };
-const identifyReq = (h: Record<string, unknown>) => identify(h, identifyDeps);
+// The voice routes and the room's upgrade: identify, and a token's player must have a save, as the routes hold it.
+const identifyReq = (h: Record<string, unknown>) => {
+  const w = identify(h, identifyDeps);
+  if (isRefusal(w) || w.via !== 'token' || store.find(w.player, Date.now())) return w;
+  return { status: 401, body: { ok: false as const, code: 'unauthenticated' } };
+};
 registerP0Routes(app, { content, store, now: Date.now, dev, log, errors, rooms, ipNear, identify: identifyDeps });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).

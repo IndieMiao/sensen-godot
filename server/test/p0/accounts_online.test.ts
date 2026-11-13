@@ -56,6 +56,14 @@ describe('the voice routes with accounts', () => {
     const { app } = await setup();
     expect((await app.inject({ method: 'GET', url: '/v1/p0/voice/status', headers: { authorization: `Bearer ${T(1)}` } })).statusCode).toBe(200);
     const no = await app.inject({ method: 'GET', url: '/v1/p0/voice/status', headers: { authorization: `Bearer ${T(3)}` } });
-    expect([no.statusCode, no.json().code]).toEqual([401, 'UNAUTHENTICATED']);
+    expect([no.statusCode, no.json().code]).toEqual([401, 'unauthenticated']);   // identify's own answer, as the routes give it
+  });
+  it('send identify\'s refusal as it is: session_replaced, update_required', async () => {
+    const { app, accounts } = await setup();
+    const replaced = await app.inject({ method: 'POST', url: '/v1/p0/voice/join', headers: { authorization: `Bearer ${T(9)}`, 'x-p0-player': 'p0-alpha0001' } });
+    expect([replaced.statusCode, replaced.json().code]).toEqual([401, 'session_replaced']);
+    accounts.markClaimed('p0-alpha0001');
+    const old = await app.inject({ method: 'GET', url: '/v1/p0/voice/blocks', headers: { 'x-p0-player': 'p0-alpha0001' } });
+    expect([old.statusCode, old.json().code]).toEqual([426, 'update_required']);
   });
 });

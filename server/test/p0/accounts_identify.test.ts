@@ -49,6 +49,12 @@ describe('identify', () => {
     expect(isRefusal(r) && r.body.code).toBe('update_required');
   });
 
+  it('a deleted id alone is refused even under P0_LEGACY_ID (a read would make its save anew)', () => {
+    const a = new P0Accounts(); a.markDeleted('p0-gone00001', Date.now());
+    const r = identify({ 'x-p0-player': 'p0-gone00001' }, deps(a, { legacyId: true }));
+    expect(isRefusal(r) && [r.status, r.body.code]).toEqual([401, 'account_deleted']);
+  });
+
   it('P0_LEGACY_ID takes any id alone, claimed or not (devserver, shots, tests)', () => {
     const a = new P0Accounts(); a.markClaimed('p0-old00001'); a.issue('p0-old00001', T(3));
     expect(identify({ 'x-p0-player': 'p0-old00001' }, deps(a, { legacyId: true }))).toEqual({ player: 'p0-old00001', via: 'legacy' });

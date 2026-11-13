@@ -27,6 +27,7 @@ const ACTIONS := ["idle", "run", "walk", "labour_sow", "labour_water", "labour_h
 var url := ""
 var player_id := ""
 var access_key := ""   # the demo server's key (P0Session.access_key, SGODOT-232 D1); "" for local playtests
+var token := ""        # SGODOT-488: the account's session token (P0Session.auth_token); "" on a legacy server
 var version := 0       # P0Session.version, sent as x-p0-version: an old build's handshake gets 426 like its requests (q(74))
 var features := ""     # P0Session.features(), sent as x-p0-features: without save_v7 the handshake gets 426 (SGODOT-397)
 var outpost := ""
@@ -154,6 +155,7 @@ func _connect() -> void:
 	_reset()
 	socket = WebSocketPeer.new()
 	var headers := PackedStringArray(["x-p0-player: " + player_id])
+	if token != "": headers.append("authorization: Bearer " + token)   # SGODOT-488: the session's (P0Session.auth_token)
 	if access_key != "": headers.append("x-p0-key: " + access_key)
 	if version > 0: headers.append("x-p0-version: %d" % version)
 	if features != "": headers.append("x-p0-features: " + features)
