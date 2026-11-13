@@ -57,6 +57,9 @@ func _want(name: String) -> bool: return only.is_empty() or name in only
 
 func _run() -> void:
 	await process_frame
+	# P0's language as P0Runtime sets it: SENSEN_LANGUAGE=zh_CN shoots the 中文 build (English otherwise)
+	var loc := root.get_node_or_null("Localization")
+	if loc != null: loc.use_p0("user://p0_bj_shots_no_language")
 	if OS.has_environment("VIDEO"):
 		if OS.get_environment("VIDEO_KIND") == "settle": await _video_settle(OS.get_environment("VIDEO"))
 		elif OS.get_environment("VIDEO_KIND") == "settle-low": await _video_settle(OS.get_environment("VIDEO"), true)
