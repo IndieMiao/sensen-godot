@@ -36,6 +36,19 @@ export class P0Store {
     if (settleParcels(this.c, s, now + s.clock_ms)) this.flush();
     return s;
   }
+  /** A stored player, without creating one (SGODOT-488: a token's player whose save is gone is turned away, never made
+   * anew); expired parcels settle as on get. */
+  find(player: string, now: number): P0State | undefined {
+    const s = this.players.get(player);
+    if (s && settleParcels(this.c, s, now + s.clock_ms)) this.flush();
+    return s;
+  }
+  /** The account's save gone (deleteAccount, contract-accounts §4): whether there was one. */
+  remove(player: string): boolean {
+    const had = this.players.delete(player);
+    if (had) this.flush();
+    return had;
+  }
   size(): number { return this.players.size; }
   /** A stored player, without creating one (admin tools). */
   peek(player: string): P0State | undefined { return this.players.get(player); }
