@@ -30,6 +30,7 @@ function setup(opts: { legacyId?: boolean; ages?: Record<string, boolean>; guest
     voiceAge: p => (opts.ages && p in opts.ages ? opts.ages[p] : null), guestsPerHour: opts.guestsPerHour, guestOk: opts.guestOk ?? true,
     verify: fakeVerify, kick: p => { kicked.push(p); },
     pending: { take: (id: unknown) => { const p = opts.pendings?.[String(id)]; if (p) delete opts.pendings![String(id)]; return p as never; },
+      peek: (id: unknown) => opts.pendings?.[String(id)] as never,
       create: (provider: string, link: { sub: string }) => { (opts.pendings ??= {})[`again-${link.sub}`] = { provider: provider as Pend['provider'], link }; return `again-${link.sub}`; } } });
   registerP0Routes(app, { content: c, store, now: () => T0, dev: false, identify: identifyDeps });
   return { app, store, accounts, kicked };
@@ -162,6 +163,14 @@ describe('session/pending (v1.6 ①)', () => {
     expect(kicked).toEqual(['p0-new00001']);
     const again = await pend(app, 'p1', T(2));
     expect([again.statusCode, again.json().code]).toEqual([410, 'pending_expired']);
+  });
+  it("a token another player holds is refused and the ticket stays for the right one (周瑜 on #1033)", async () => {
+    const { app, store, accounts } = setup({ pendings: { p1: { provider: 'google', link: { sub: 'g1' } } } });
+    store.get('p0-new00001', T0); accounts.ensure('p0-new00001'); accounts.link('p0-new00001', 'google', { sub: 'g1' });
+    store.get('p0-other0001', T0); accounts.ensure('p0-other0001'); accounts.issue('p0-other0001', T(5));
+    const wrong = await pend(app, 'p1', T(5));
+    expect([wrong.statusCode, wrong.json().code]).toEqual([400, 'schema']);
+    expect((await pend(app, 'p1', T(1))).json()).toMatchObject({ ok: true, player: 'p0-new00001' });
   });
   it('no farm: no_farm with a new pending one, for guest', async () => {
     const { app } = setup({ guestOk: false, pendings: { p1: { provider: 'google', link: { sub: 'g7' } } } });

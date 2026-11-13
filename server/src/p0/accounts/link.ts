@@ -27,6 +27,11 @@ export class PendingSignIns {
     this.by.set(id, { provider, link, at: this.now() });
     return id;
   }
+  /** The pending sign-in, left in place (a request checked before it spends it); undefined as take would be. */
+  peek(id: unknown): PendingInfo | undefined {
+    this.sweep();
+    return typeof id === 'string' ? this.by.get(id) : undefined;
+  }
   /** The pending sign-in, once: a second take, an unknown id or one past PENDING_MS is undefined. */
   take(id: unknown): PendingInfo | undefined {
     this.sweep();
@@ -60,6 +65,22 @@ export function liveOwner(store: P0Store, accounts: P0Accounts, provider: Provid
 export function conflictFarm(store: P0Store, player: string, now: number): { name: string | null; home_level: number; last_played_at: number } {
   const s = store.find(player, now);
   return { name: s?.profile?.name ?? null, home_level: s?.homestead.level ?? 1, last_played_at: s?.presence.last_at ?? 0 };
+}
+
+/**
+ * What a pending sign-in left unused does at its end (PendingSignIns' `expired`): an Apple one's authorization is
+ * withdrawn — unless that Apple ID is linked to a farm. Withdrawing a refresh token withdraws the app's whole
+ * authorization for that Apple ID, so a sign-in refused with has_farm (claim's conflict, guest's race) and then left
+ * would otherwise sign its own farm out of Apple for good (周瑜 on #1033).
+ */
+export function expiredSignIn(accounts: Pick<P0Accounts, 'byIdentity'>, revoke: ((aud: string, refresh: string) => Promise<void>) | null,
+    warn: (line: string) => void = l => console.warn(l)): (info: PendingInfo) => void {
+  return info => {
+    if (info.provider !== 'apple' || !revoke) return;
+    const link = info.link as AppleLink;
+    if (!link.refresh || !link.aud || accounts.byIdentity('apple', link.sub)) return;
+    revoke(link.aud, link.refresh).catch(e => warn(JSON.stringify({ apple: 'revoke_failed', error: e instanceof Error ? e.message : typeof e })));
+  };
 }
 
 export interface SignInDeps { accounts: P0Accounts; kick?: (player: string) => void }

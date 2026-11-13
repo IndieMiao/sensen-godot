@@ -42,6 +42,7 @@ export interface AccountRouteDeps {
   /** v1.4 (必须注册): a new farm needs a sign-in — guest takes the pending one (PR-B's PendingSignIns) and links it;
    * without one, sign_in_required, unless P0_GUEST_OK (devserver, shots) or a test account. */
   pending?: { take(id: unknown): { provider: Provider; link: AppleLink | GoogleLink } | undefined;
+    peek?(id: unknown): { provider: Provider; link: AppleLink | GoogleLink } | undefined;
     create?(provider: Provider, link: AppleLink | GoogleLink): string };
   guestOk?: boolean;
   /** A sign-in's credentials checked (PR-B: appleVerifier / googleVerifier by provider): its link, or the refusal
@@ -198,12 +199,13 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     const send = (r: ReturnType<typeof bad>) => reply.code(r.status).send(r.body);
     if (!tokenShapeOk(b.token)) return send(bad(typeof b.token === 'string' ? 'token_too_short' : 'schema', 400));
     const token = String(b.token).toLowerCase();
-    const p = deps.pending?.take(b.pending);
+    const p = deps.pending?.peek ? deps.pending.peek(b.pending) : undefined;
     if (!p) return send(bad('pending_expired', 410));
     const player = liveOwner(store, accounts, p.provider, p.link.sub, deps.now());
-    if (!player) return send(bad('no_farm', 404, { pending: deps.pending!.create!(p.provider, p.link) }));
     const owner = accounts.tokenOwner(token);
-    if (owner && owner !== player) return send(bad('schema', 400));
+    if (player && owner && owner !== player) return send(bad('schema', 400));   // a token is one player's only; the ticket kept
+    deps.pending!.take(b.pending);
+    if (!player) return send(bad('no_farm', 404, { pending: deps.pending!.create!(p.provider, p.link) }));
     if (p.provider === 'apple' && (p.link as AppleLink).refresh) accounts.link(player, 'apple', p.link);   // the newest authorization
     return signIn({ accounts, kick: deps.kick }, player, token);
   });

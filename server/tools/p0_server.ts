@@ -10,7 +10,7 @@ import { APPLE_JWKS_URL, AppleClient, appleVerifier, registerAppleRoutes } from 
 import { accountsConfig, applePrivateKey } from '../src/p0/accounts/config.js';
 import { GOOGLE_JWKS_URL, googleVerifier, registerGoogleRoutes } from '../src/p0/accounts/google.js';
 import { CachedJwks, jwksFetcher } from '../src/p0/accounts/jwt.js';
-import { PendingSignIns } from '../src/p0/accounts/link.js';
+import { expiredSignIn, PendingSignIns } from '../src/p0/accounts/link.js';
 import { identify, isRefusal } from '../src/p0/accounts/identify.js';
 import { registerAccountRoutes } from '../src/p0/accounts/routes.js';
 import { registerCodeRoutes } from '../src/p0/accounts/codes.js';
@@ -141,16 +141,11 @@ registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
   joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq });
 // Sign in with Apple / Google (SGODOT-489 PR-B; contract v1.4–v1.6.3): the keys fetched and cached, the pending
-// sign-ins in memory (an Apple one left unused has its authorization withdrawn), and one check per provider shared by
+// sign-ins in memory (an Apple one left unused has its authorization withdrawn, unless that Apple ID has a farm), and one check per provider shared by
 // session/apple|google and claim. No switch, no link in the first version.
 const appleCfg = accountsCfg.apple;
 const appleClient = appleCfg ? new AppleClient(appleCfg, () => applePrivateKey(appleCfg)) : null;
-const pendingSignIns = new PendingSignIns(Date.now, p => {
-  const link = p.link as { aud?: string; refresh?: string };
-  if (p.provider === 'apple' && link.refresh && link.aud && appleClient) {
-    appleClient.revoke(link.aud, link.refresh).catch(e => console.warn(JSON.stringify({ apple: 'revoke_failed', error: e instanceof Error ? e.message : typeof e })));
-  }
-});
+const pendingSignIns = new PendingSignIns(Date.now, expiredSignIn(accounts, appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : null));
 setInterval(() => pendingSignIns.sweep(), 60_000).unref();
 const appleJwks = new CachedJwks(jwksFetcher(APPLE_JWKS_URL)), googleJwks = new CachedJwks(jwksFetcher(GOOGLE_JWKS_URL));
 const kickPlayer = (p: string) => { hub.kick(p); };

@@ -1,6 +1,6 @@
 /** Sign-in's shared parts (SGODOT-489; contract-accounts.md §2, §4). */
 import { describe, expect, it } from 'vitest';
-import { conflictFarm, liveOwner, PENDING_MS, PendingSignIns, signIn } from '../../src/p0/accounts/link.js';
+import { conflictFarm, expiredSignIn, liveOwner, PENDING_MS, PendingSignIns, signIn } from '../../src/p0/accounts/link.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { P0Store } from '../../src/p0/store.js';
@@ -22,6 +22,34 @@ describe('PendingSignIns', () => {
     expect(p.take(b)).toBeUndefined();
     expect(gone).toEqual(['g1']);
     expect(p.take(42)).toBeUndefined();
+  });
+});
+
+describe('expiredSignIn (周瑜 on #1033)', () => {
+  it("an unused Apple sign-in's authorization is withdrawn at its end — never one whose Apple ID has a farm", async () => {
+    let now = 0;
+    const accounts = new P0Accounts();
+    const revoked: string[] = [];
+    const p = new PendingSignIns(() => now, expiredSignIn(accounts, async (aud, refresh) => { revoked.push(`${aud} ${refresh}`); }));
+    accounts.ensure('p0-farm00001'); accounts.link('p0-farm00001', 'apple', { sub: 'linked', aud: 'app.gensen.maps' });
+    p.create('apple', { sub: 'free', aud: 'app.gensen.maps', refresh: 'r-free' });       // no farm: withdrawn
+    p.create('apple', { sub: 'linked', aud: 'app.gensen.maps', refresh: 'r-linked' });   // claim's conflict left: kept
+    p.create('apple', { sub: 'nocode', aud: 'app.gensen.maps' });                        // no refresh token: nothing to withdraw
+    p.create('google', { sub: 'g1' });
+    expect(p.peek('nobody')).toBeUndefined();
+    now = PENDING_MS;
+    p.sweep();
+    await Promise.resolve();
+    expect(revoked).toEqual(['app.gensen.maps r-free']);
+    expect(p.size()).toBe(0);
+  });
+  it('no Apple client (Apple off): nothing to withdraw; a failed withdrawal is a warning only', async () => {
+    const accounts = new P0Accounts();
+    expect(() => expiredSignIn(accounts, null)({ provider: 'apple', link: { sub: 's', aud: 'a', refresh: 'r' }, at: 0 })).not.toThrow();
+    const warned: string[] = [];
+    expiredSignIn(accounts, async () => { throw new Error('APPLE_REVOKE_500'); }, l => { warned.push(l); })({ provider: 'apple', link: { sub: 's', aud: 'a', refresh: 'r' }, at: 0 });
+    await new Promise(r => setTimeout(r, 0));
+    expect(warned).toEqual([JSON.stringify({ apple: 'revoke_failed', error: 'APPLE_REVOKE_500' })]);
   });
 });
 
