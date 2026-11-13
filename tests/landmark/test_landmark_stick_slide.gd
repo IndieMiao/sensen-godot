@@ -38,11 +38,13 @@ func _nav(polys: Array, heights := {}) -> RID:
 func _square() -> RID:
 	return _nav([[Vector2(0, 0), Vector2(0, 10), Vector2(10, 10), Vector2(10, 0)]])
 
-## Until the region is in the map (a sync or two after it is set): a point on it is its own nearest.
+## Until the region is in the map (a sync or two after it is set): a point on it is its own nearest. The map syncs on
+## physics frames, so those are waited for (2 s of them): a headless run's process frames are not capped, and 120 of
+## them passed before the map synced (蒙恬's 0.3.10 run).
 func _synced(map: RID, inside := Vector3(2, 0, 2)) -> void:
 	for i in 120:
 		if NavigationServer3D.map_get_closest_point(map, inside).distance_to(inside) < 0.01: return
-		await get_tree().process_frame
+		await get_tree().physics_frame
 	fail("the navigation never synced")
 
 ## A step of `length` at `deg` off square-on into the north edge (z = 0), turned toward +x.
