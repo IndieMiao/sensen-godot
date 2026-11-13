@@ -6,13 +6,21 @@
  * environment, so the key is in no process's arguments (host ps sees container processes too).
  * Each change is printed as one JSON line ({admin, player, from, to, at}) to the container log.
  */
+import { randomBytes } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
+import type { P0Accounts } from './accounts/store.js';
 import type { P0Content } from './content.js';
 import { isoMinute, type P0Gate } from './gate.js';
 import { maxEnergy, settleEnergy } from './rules.js';
 import type { P0Store } from './store.js';
 
-export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => number; key: string; log?: (line: string) => void; gate?: P0Gate }
+/** accounts (SGODOT-488): the tokens, for a test device's admin token and a claim reset (contract-accounts §4.1). */
+export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => number; key: string; log?: (line: string) => void; gate?: P0Gate;
+  accounts?: P0Accounts }
+
+/** An admin token lasts 30 days (tech-plan §2.5): a test device's, kept through other devices' sign-ins, never forgotten. */
+export const ADMIN_TOKEN_MS = 30 * 86_400_000;
+const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
 export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
   if (!deps.key) throw new Error('P0 admin needs P0_ADMIN_KEY');
@@ -23,11 +31,18 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
   });
 
   /** Players with when they joined and were last seen: the observer matches them to names by install time. */
-  app.get('/admin/players', async () => ({
-    ok: true,
-    players: store.all().map(s => ({ player: s.player, created_at: s.created_at, last_at: s.presence.last_at, seq: s.seq,
-      energy: s.energy.value, skills: s.skills, homestead: s.homestead.level })).sort((a, b) => a.created_at - b.created_at),
-  }));
+  /** With accounts, each player's admin tokens still in force ({tail, expires_at}), so one given to a test device is not
+   *  forgotten there (tech-plan §2.5). */
+  app.get('/admin/players', async () => {
+    const admin = new Map<string, { tail: string; expires_at: number }[]>();
+    for (const t of deps.accounts?.adminTokens() ?? []) admin.set(t.player, [...(admin.get(t.player) ?? []), { tail: t.tail, expires_at: t.expires_at }]);
+    return {
+      ok: true,
+      players: store.all().map(s => ({ player: s.player, created_at: s.created_at, last_at: s.presence.last_at, seq: s.seq,
+        energy: s.energy.value, skills: s.skills, homestead: s.homestead.level,
+        ...(deps.accounts ? { admin_tokens: admin.get(s.player) ?? [] } : {}) })).sort((a, b) => a.created_at - b.created_at),
+    };
+  });
 
   /** F1: set a player's Energy once (day-4 revisit at about 80 / max). Only an existing player; the clock offset counts. */
   app.post('/admin/energy', async (req, reply) => {
@@ -47,6 +62,39 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
     log(JSON.stringify({ admin: 'energy', player: s.player, from, to: value, max: maxEnergy(c, s), at: deps.now() }));
     return { ok: true, player: s.player, from, to: value, max: maxEnergy(c, s) };
   });
+
+  const accounts = deps.accounts;
+  if (accounts) {
+    const playerOf = (body: unknown) => {
+      const p = (body && typeof body === 'object' ? (body as { player?: unknown }).player : undefined);
+      return typeof p === 'string' && PLAYER_RE.test(p) ? p : null;
+    };
+
+    /** A test account on a test device (tech-plan §2.5, contract §4.1): a token the server makes, 32 bytes, its plain text
+     *  in this answer only; kind admin, 30 days, kept through other devices' sign-ins. Not a claim: an unclaimed test
+     *  account still takes its x-p0-player. The log line has no token. */
+    app.post('/admin/session', async (req, reply) => {
+      const player = playerOf(req.body);
+      if (!player || !store.peek(player) || accounts.isDeleted(player)) return reply.code(404).send({ ok: false, code: 'unknown_player' });
+      const token = randomBytes(32).toString('hex');
+      const expires_at = deps.now() + ADMIN_TOKEN_MS;
+      accounts.ensure(player);
+      accounts.issue(player, token, 'admin', expires_at);
+      log(JSON.stringify({ admin: 'session', player, expires_at, at: deps.now() }));
+      return { ok: true, player, token, expires_at };
+    });
+
+    /** The claim undone (contract §4.1): claimed_at cleared and every token revoked, admin ones too — the account's old id
+     *  can claim again, on a reinstalled test phone say. */
+    app.post('/admin/claim/reset', async (req, reply) => {
+      const player = playerOf(req.body);
+      if (!player || (!store.peek(player) && !accounts.find(player))) return reply.code(404).send({ ok: false, code: 'unknown_player' });
+      accounts.clearClaimed(player);
+      const revoked = accounts.revokeAll(player, undefined, { admin: true }).length;
+      log(JSON.stringify({ admin: 'claim_reset', player, revoked, at: deps.now() }));
+      return { ok: true, revoked };
+    });
+  }
 
   const gate = deps.gate;
   if (!gate) return;
