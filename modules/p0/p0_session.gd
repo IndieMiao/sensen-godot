@@ -18,9 +18,10 @@ signal sent(cmd: Dictionary)
 ## The server turned every request away (q(74), SGODOT-233): "update_required" (HTTP 426, {url}) or "maintenance"
 ## (HTTP 503, {back_at}: UTC ISO, absent when unknown). Not a network failure: no Didn't go through, no Offline.
 signal blocked(code: String, detail: Dictionary)
-## SGODOT-488 accounts (contract-accounts.md §1): the first launch needs its pages — new / old_age / old_consent /
-## old_blocked / blocked / claimed / offline (P0Runtime opens 哪吒's P0AccFlow, or the offline screen); and an account
-## refusal stopped every request — session_replaced / account_deleted / unauthenticated / suspended (detail: until).
+## SGODOT-488 accounts (contract-accounts v1.4–v1.6.3): the first launch needs its pages — new / old_age / old_consent /
+## old_signin / old_blocked / blocked / signed_out / offline (P0Runtime opens 哪吒's P0AccFlow, or the offline screen);
+## and an account refusal stopped every request — session_replaced / account_deleted / unauthenticated (its token
+## dropped here: Sign in again) / suspended (detail: until).
 signal first_run_needed(kind: String)
 signal account_state(kind: String, detail: Dictionary)
 signal identity_changed(ready: bool)
@@ -159,15 +160,28 @@ func hello(done: Callable) -> void:
 	identity.hello(func(k: String):
 		_on_first_run(k)
 		done.call({"ok": true, "kind": k}))
-func claim(done: Callable) -> void:
-	identity.claim(func(r: Dictionary):
-		if identity.first_run() == "ready": _identity_ready()
-		done.call(r))
+## The sign-ins (contract v1.4–v1.6): each done.call(reply); an ok one has the world's first read out.
+func sign_in(provider: String, creds: Dictionary, done: Callable) -> void:
+	identity.sign_in(provider, creds, _ready_on_ok.bind(done))
+func claim(provider: String, creds: Dictionary, done: Callable) -> void:
+	identity.claim(provider, creds, _ready_on_ok.bind(done))
+func sign_in_pending(done: Callable) -> void:
+	identity.sign_in_pending(_ready_on_ok.bind(done))
+## A test code's account: signed in, but the world waits for the runtime — the age and terms to report first
+## (account/consent), as an old account's (contract v1.4 §4); it calls consent, or identity_settled.
+func sign_in_code(code: String, done: Callable) -> void:
+	identity.sign_in_code(code, done)
+func logout(done: Callable) -> void:
+	identity_ready = false
+	identity.logout(done)
 func name_check(name: String, done: Callable) -> void: identity.name_check(name, done)
 func guest(body: Dictionary, done: Callable) -> void:
-	identity.guest(body, func(r: Dictionary):
-		if bool(r.get("ok", false)): _identity_ready()
-		done.call(r))
+	identity.guest(body, _ready_on_ok.bind(done))
+func identity_settled() -> void: _identity_ready()
+
+func _ready_on_ok(r: Dictionary, done: Callable) -> void:
+	if bool(r.get("ok", false)): _identity_ready()
+	done.call(r)
 func consent(body: Dictionary, done: Callable) -> void:
 	identity.consent(body, func(r: Dictionary):
 		if bool(r.get("ok", false)): _identity_ready()
@@ -382,8 +396,7 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	var refusal := account_refusal(result, code, raw) if accounts else {}
 	if not refusal.is_empty():
 		# SGODOT-488: not a lost connection — no Offline, no probing: every request stops and the runtime shows its page
-		identity_ready = false
-		account_state.emit(str(refusal.code), refusal)
+		_refused(refusal)
 		return {ok = false, code = str(refusal.code), network = true}
 	if result != HTTPRequest.RESULT_SUCCESS or code >= 500 or code == 0:
 		connection_failed.emit("Can't reach the farm server", cmd)
@@ -432,9 +445,15 @@ static func account_refusal(result: int, code: int, raw: PackedByteArray) -> Dic
 func take_account_refusal(result: int, code: int, raw: PackedByteArray) -> bool:
 	var refusal := account_refusal(result, code, raw) if accounts else {}
 	if refusal.is_empty(): return false
-	identity_ready = false
-	account_state.emit(str(refusal.code), refusal)
+	_refused(refusal)
 	return true
+
+## Every request stops; unauthenticated (contract v1.4 ⑮: the key withdrawn — Apple stopped, a code withdrawn, an
+## unknown token) drops the token here: its page is Sign in, never the replaced one's line.
+func _refused(refusal: Dictionary) -> void:
+	identity_ready = false
+	if str(refusal.code) == "unauthenticated": identity.drop()
+	account_state.emit(str(refusal.code), refusal)
 
 static func blocked_reply(result: int, code: int, raw: PackedByteArray) -> Dictionary:
 	if result != HTTPRequest.RESULT_SUCCESS or not code in [426, 503]: return {}

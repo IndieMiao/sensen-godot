@@ -130,14 +130,7 @@ func _switch_test_account(action: String) -> void:
 		_switching_test_account = false
 		ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
 		return
-	var tree := get_tree()
-	set_process(false)
-	session.set_process(false)
-	while AppRouter.instance_depth() > 0: AppRouter._discard_top()
-	_instance = null
-	UiCommandButton.offline = false
-	tree.change_scene_to_file("res://scenes/p0/p0_boot.tscn")
-	queue_free()
+	_reboot()
 
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
@@ -1413,21 +1406,47 @@ func _launch_read() -> void:
 	else: session.refresh()
 
 # ---------------------------------------------------------------- the first launch and the account (SGODOT-488 A2)
-## 哪吒's first-launch pages (scenes/p0/account/p0_acc_flow.gd, contract-accounts §1): a Control on its own layer over
-## everything, its signals answered here. A path, so a build without them still runs (and the tests put in a fake).
+## 哪吒's first-launch pages (scenes/p0/account/p0_acc_flow.gd; contract-accounts v1.4–v1.6.3): a Control on its own
+## layer over everything, its signals answered here — AGE, then a sign-in, then NAME when that account has no farm. A
+## path, so a build without them still runs (and the tests put in a fake).
 var acc_flow_path := "res://scenes/p0/account/p0_acc_flow.gd"
+## 亚瑟's P0SignIn (SGODOT-487): the phone's own sheet. A path for the same reason; the tests stand in with
+## native_sign_in: func(provider) -> P0SignIn's result ({result: ok | cancelled | failed, id_token, nonce, auth_code?}).
+const SIGN_IN_PATH := "res://modules/p0/p0_sign_in.gd"
+var native_sign_in := _native_sign_in
 var _acc_flow: Node
 var _acc_layer: CanvasLayer
+## NAME's answer: "guest" makes the save (a sign-in with no farm); "rename" names the account just signed in (an old one
+## claimed, a code's — 哪吒's no_farm(false), no Try another account).
+var _naming := "guest"
+var _provider := ""   # the last sign-in's account: the conflict card's
+var _signing := false   # a sheet is up: a second tap waits for it
+## The player a world was built for when the pages came up over it (signed out, the key withdrawn, replaced): signing in
+## again restarts the launch, so no reply of that farm draws on another.
+var _world_player := ""
 
-## hello's answer is not `ready`: no world yet. offline keeps the launch cover and asks again; claimed is its account
-## page; any other opens the pages in place of the cover (no HUD meanwhile: the world is not built).
+## hello's answer is not `ready`: no world yet. offline keeps the launch cover and asks again; any other opens the pages
+## in place of the cover (no HUD meanwhile: the world is not built).
 func _on_first_run_needed(kind: String) -> void:
 	match kind:
 		"offline":
 			if _launch_s < 0.0: cover_launch()
 			_launch_retry_left = LAUNCH_RETRY_S
-		"claimed": _on_account_state("claimed", session.identity.claim_reply)
 		_: _open_acc_flow(kind)
+
+## An Android phone without Google's services, the email way off: NO-GMS (v1.4 ⑮) in place of the Sign in page.
+func _no_google(kind: String) -> bool:
+	return not kind in ["blocked", "old_blocked"] and OS.get_name() == "Android" and not GoogleSignIn.available() \
+		and not session.identity.email
+
+## Sign in's keys on this phone: P0SignIn's (iOS Apple and Google, Android Google), Google gone without its services;
+## email last when the server offers it.
+func _sign_in_providers() -> Array:
+	var script = load(SIGN_IN_PATH) if ResourceLoader.exists(SIGN_IN_PATH) else null
+	var p: Array = script.providers() if script != null else []
+	if OS.get_name() == "Android" and not GoogleSignIn.available(): p.erase("google")
+	if session.identity.email: p.append("email")
+	return p
 
 func _open_acc_flow(kind: String) -> void:
 	_launch_s = -1.0
@@ -1437,15 +1456,19 @@ func _open_acc_flow(kind: String) -> void:
 	if script == null:
 		push_warning("P0 accounts: no first-launch pages in this build (%s)" % acc_flow_path)
 		return
-	# sign-in buttons only once PR-B's routes and the native sign-in are in (an empty list hides them)
-	_acc_flow = script.new(kind, session.name_check, [], 0)
+	_naming = "guest"
+	_acc_flow = script.new("no_google" if _no_google(kind) else kind, session.name_check, _sign_in_providers(),
+		session.identity.hints(), 0)
 	_acc_layer = CanvasLayer.new()
 	_acc_layer.layer = 120   # over the HUD, the toasts and the system screens
 	add_child(_acc_layer)
 	_acc_layer.add_child(_acc_flow)
 	_acc_flow.connect("agreed", _on_acc_agreed.bind(kind))
-	_acc_flow.connect("named", _on_acc_named.bind(kind))
-	_acc_flow.connect("failed", func(_code: String): ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S))
+	_acc_flow.connect("named", _on_acc_named)
+	_acc_flow.connect("sign_in", _on_acc_sign_in)
+	_acc_flow.connect("failed", func(_code: String): _acc_failed({}))
+	for pair in [["sign_in_again", _on_acc_sign_in_again], ["switch_farm", _on_acc_switch], ["code_entered", _on_acc_code]]:
+		if _acc_flow.has_signal(pair[0]): _acc_flow.connect(pair[0], pair[1])   # the pages of 11-15 / 11-19 on
 
 func _close_acc_flow() -> void:
 	if is_instance_valid(_acc_layer): _acc_layer.queue_free()
@@ -1456,17 +1479,92 @@ func _close_acc_flow() -> void:
 func _consent_body() -> Dictionary:
 	return {"age_ok": true, "terms": session.identity.terms_version, "privacy": session.identity.privacy_version}
 
-## AGE passed (age_ok false sends nothing: the page itself turns into AGE-BLOCK, q(312) ⑨ C). An old account records
-## its consent now; a new install has nothing to send until NAME.
+## AGE passed, or the consent card's Continue: nothing sent now — an old account's go with its claim (it has no token
+## yet), a new one's with guest. age_ok false sends nothing ever (q(312) ⑨ C: the page turns into AGE-BLOCK).
 func _on_acc_agreed(age_ok: bool, kind: String) -> void:
-	if not age_ok or not kind.begins_with("old_"): return
-	session.consent(_consent_body(), func(r: Dictionary):
-		if not bool(r.get("ok", false)): _acc_failed(r))
+	if age_ok: session.identity.agree(kind != "old_consent")
 
-## NAME's Save / Skip: a new install's save made (guest), an old account's name given (rename; Skip keeps its name);
-## then the world comes up under the launch cover, as any launch.
-func _on_acc_named(name: String, skip: bool, kind: String) -> void:
-	if kind.begins_with("old_"):
+## A sign-in key: the phone's sheet, then the server — claim for an old install's id (the claim and the link in one
+## step), session/apple | google otherwise. Email is 亚瑟's glue (SGODOT-497): its pages call sign_in / claim themselves.
+func _on_acc_sign_in(provider: String) -> void:
+	if provider == "email" or _signing: return
+	_signing = true
+	var r: Dictionary = await native_sign_in.call(provider)
+	_signing = false
+	if not is_instance_valid(_acc_flow) or str(r.get("result", "")) == "cancelled": return   # closed: nothing said
+	if str(r.get("result", "")) != "ok":
+		_acc_failed({})
+		return
+	_provider = provider
+	var creds := {"id_token": str(r.get("id_token", "")), "nonce": str(r.get("nonce", "")), "auth_code": str(r.get("auth_code", ""))}
+	if session.identity.first_run().begins_with("old_"): session.claim(provider, creds, _on_signed_in.bind("claim"))
+	else: session.sign_in(provider, creds, _on_signed_in.bind("sign_in"))
+
+static func _native_sign_in(provider: String) -> Dictionary:
+	var script = load(SIGN_IN_PATH) if ResourceLoader.exists(SIGN_IN_PATH) else null
+	if script == null: return {"result": "failed", "provider": provider, "reason": "no_native"}
+	return await (script.apple() if provider == "apple" else script.google())
+
+## A sign-in's answer (a sheet's, session/pending's, a test code's). `how`: sign_in / claim / pending / code.
+func _on_signed_in(r: Dictionary, how: String) -> void:
+	if not is_instance_valid(_acc_flow): return
+	if bool(r.get("ok", false)):
+		match how:
+			"claim": _name_signed_in()
+			"code": _code_signed_in()
+			_: _acc_done()
+		return
+	match str(r.get("code", "")):
+		"no_farm":
+			_naming = "guest"
+			_acc_flow.call("no_farm")
+		"conflict": _acc_flow.call("conflict", session.identity.conflict_farm, _provider)
+		"claimed": _acc_flow.call("claimed", session.identity.legacy_linked)
+		"unknown_player":
+			# the server has no farm of this id (v1.6 ①): a new install — that sign-in's farm, or NAME
+			if session.identity.has_farm: session.sign_in_pending(_on_signed_in.bind("pending"))
+			else:
+				_naming = "guest"
+				_acc_flow.call("no_farm")
+		"pending_expired":
+			ui.toast("Sign-in expired. Please sign in again.")
+			_acc_flow.call("name_refused", r)
+		"bad_code", "rate_limited" when how == "code":
+			if _acc_flow.has_method("code_refused"): _acc_flow.call("code_refused", r)
+		_: _acc_failed(r)
+
+## An old account claimed (v3.3 §3.3): NAME without Try another account; Skip keeps its name.
+func _name_signed_in() -> void:
+	_naming = "rename"
+	_acc_flow.call("no_farm", false)
+
+## A test code's account (contract v1.4 §4): this phone's AGE answer reported (its voice age set too), then NAME as an
+## old account's. Not passed on this phone (a code typed before any AGE page): the world comes as it is, unreported.
+func _code_signed_in() -> void:
+	var kept = _acc_flow.call("kept") if _acc_flow.has_method("kept") else {}
+	if not (kept is Dictionary and bool(kept.get("age_ok", false))):
+		session.identity_settled()
+		_name_signed_in()
+		return
+	session.consent(_consent_body(), func(c: Dictionary):
+		if bool(c.get("ok", false)): _name_signed_in()
+		else: _acc_failed(c))
+
+## Try another account (NAME's, or the conflict card's second key): the ticket dropped; the page goes back to Sign in.
+func _on_acc_sign_in_again() -> void:
+	session.identity.pending = ""
+
+## Switch to that farm (the conflict card): the sign-in already checked, its farm entered — no second sheet (v1.6 ①).
+func _on_acc_switch() -> void:
+	session.sign_in_pending(_on_signed_in.bind("pending"))
+
+func _on_acc_code(code: String) -> void:
+	session.sign_in_code(code, _on_signed_in.bind("code"))
+
+## NAME's Save / Skip: a new account's save made (guest, the sign-in's ticket in it), or the account just signed in
+## named (rename; Skip keeps its name); then the world comes up under the launch cover, as any launch.
+func _on_acc_named(name: String, skip: bool) -> void:
+	if _naming == "rename":
 		if skip:
 			_acc_done()
 			return
@@ -1481,7 +1579,11 @@ func _on_acc_named(name: String, skip: bool, kind: String) -> void:
 	session.guest(body, func(r: Dictionary):
 		var code := str(r.get("code", ""))
 		if bool(r.get("ok", false)): _acc_done()
-		elif code in ["name_rejected", "pending_expired"] and is_instance_valid(_acc_flow):
+		elif not is_instance_valid(_acc_flow): return
+		elif code == "conflict":
+			# the account was given a farm on another phone meanwhile (v1.6.2): the same card, from NAME
+			_acc_flow.call("conflict", session.identity.conflict_farm, _provider)
+		elif code in ["name_rejected", "pending_expired"]:
 			if code == "pending_expired": ui.toast("Sign-in expired. Please sign in again.")
 			_acc_flow.call("name_refused", r)
 		else: _acc_failed(r))
@@ -1495,31 +1597,62 @@ func _acc_failed(r: Dictionary) -> void:
 	ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
 
 ## The account is settled: the pages go, the launch cover comes up and the world's first read is already out
-## (P0Session._identity_ready); p0_boot's when_first_view brings the farm (or the home pick) as on any launch.
+## (P0Session._identity_ready); p0_boot's when_first_view brings the farm (or the home pick) as on any launch. Over a
+## world built for a farm before (signed out, the key withdrawn): the launch again, from the start.
 func _acc_done() -> void:
 	_close_acc_flow()
+	if _world_player != "":
+		_world_player = ""
+		_reboot()
+		return
 	if _launch_s < 0.0: cover_launch()
 
-## An account refusal (P0Session.account_state): every request has stopped; the page says which (哪吒's account pages).
-## unauthenticated (a token the server does not know, after a restore say) reads as session_replaced: sign in again.
+## An account refusal (P0Session.account_state): every request has stopped. unauthenticated is the Sign in page again
+## (v1.4 ⑮: the key withdrawn — Apple stopped, a code withdrawn; P0Session dropped the token), never the replaced
+## one's line; the others are their pages (哪吒's account pages).
 func _on_account_state(kind: String, detail: Dictionary) -> void:
 	_launch_s = -1.0
-	var page := "session_replaced" if kind == "unauthenticated" else kind
-	if ui.has_method("show_account_state"): ui.call("show_account_state", page, detail)
-	else: push_warning("P0 accounts: %s (no account pages in this build)" % page)
+	if kind == "unauthenticated":
+		_sign_in_again()
+		return
+	if ui.has_method("show_account_state"): ui.call("show_account_state", kind, detail)
+	else: push_warning("P0 accounts: %s (no account pages in this build)" % kind)
 
-## A key on an account page (P0Ui.account_action). sign_in waits for PR-B's sign-in; start_new drops this install's
-## session and starts as a new one; retry asks the claim again; contact is the page's own (the support address).
+## The Sign in page over whatever is up (the token already gone): signed_out, the world restarted once signed in.
+func _sign_in_again() -> void:
+	if not session.view.is_empty(): _world_player = session.player_id
+	_open_acc_flow(session.identity.first_run())
+
+## A key on an account page (P0Ui.account_action): sign_in (replaced) drops this phone's token for the Sign in page;
+## start_new (deleted) starts as a new install; sign_out (Settings › Account) is session/logout, then Sign in; contact
+## is the page's own (the support address).
 func _on_account_action(kind: String, action: String) -> void:
 	match action:
+		"sign_in":
+			if ui.has_method("hide_account_state"): ui.call("hide_account_state")
+			session.identity.drop()
+			_sign_in_again()
 		"start_new":
 			if ui.has_method("hide_account_state"): ui.call("hide_account_state")
 			session.identity.forget()
+			_world_player = session.player_id if not session.view.is_empty() else ""
 			session.hello(func(_r): pass)
-		"retry": session.claim(func(_r): pass)
+		"sign_out":
+			session.logout(func(_r): _sign_in_again())
 		"contact":
 			if ui.has_method("open_support"): ui.call("open_support")
-		"sign_in": push_warning("P0 accounts: sign in from %s comes with PR-B" % kind)
+		_: push_warning("P0 accounts: %s on %s" % [action, kind])
+
+## The launch from the start (p0_boot): this runtime and its session go, the new one says hello again.
+func _reboot() -> void:
+	var tree := get_tree()
+	set_process(false)
+	session.set_process(false)
+	while AppRouter.instance_depth() > 0: AppRouter._discard_top()
+	_instance = null
+	UiCommandButton.offline = false
+	tree.change_scene_to_file("res://scenes/p0/p0_boot.tscn")
+	queue_free()
 
 # ---------------------------------------------------------------- whole-screen system states (SGODOT-233)
 const LAUNCH_SLOW_S := 8.0    # SYS-LOADING-2: `Taking longer than usual…`
