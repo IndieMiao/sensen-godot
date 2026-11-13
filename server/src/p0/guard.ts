@@ -5,6 +5,8 @@
  * The outpost rooms' WebSocket (/v1/p0/online, SGODOT-227) upgrades on the raw server and never reaches these hooks;
  * it checks the same keys itself (registerP0Online deps.keys) and limits its own messages.
  */
+import { bearerOf } from './accounts/identify.js';
+import { hashToken } from './accounts/store.js';
 import rateLimit from '@fastify/rate-limit';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
@@ -81,7 +83,8 @@ export async function registerP0Guard(app: FastifyInstance, opts: P0GuardOptions
     max: opts.perMinute,
     timeWindow: '1 minute',
     allowList: req => !isP0Request(req),
-    keyGenerator: req => `${req.ip}|${String(req.headers['x-p0-player'] ?? '')}`,
+    // SGODOT-488: a token's request counts by its token (its hash's head), an id's by the id as before
+    keyGenerator: req => { const t = bearerOf(req.headers); return t ? `${req.ip}|t:${hashToken(t).slice(0, 16)}` : `${req.ip}|${String(req.headers['x-p0-player'] ?? '')}`; },
     errorResponseBuilder: () => ({ ok: false, code: 'rate_limited', statusCode: 429 }),
   });
 }

@@ -284,8 +284,14 @@ function writeJson(file: string | undefined, value: object): void {
 
 /** POST /v1/p0/voice/{age,join,heartbeat,leave,block,report} and GET /v1/p0/voice/status, behind the P0 guard as every
  * route. A refusal is an HTTP error with {ok: false, code} (PartyVoiceSession reads a non-2xx as one). */
-export function registerP0Voice(app: FastifyInstance, voice: P0Voice): void {
-  const playerOf = (h: Record<string, unknown>) => { const id = String(h['x-p0-player'] ?? ''); return PLAYER_RE.test(id) ? id : null; };
+export function registerP0Voice(app: FastifyInstance, voice: P0Voice,
+  identify?: (headers: Record<string, unknown>) => { player: string } | { status: number; body: object }): void {
+  // SGODOT-488: the routes' identify when there are accounts (a refusal reads as UNAUTHENTICATED here, as before); the
+  // x-p0-player header as before when not.
+  const playerOf = (h: Record<string, unknown>) => {
+    if (identify) { const w = identify(h); return 'status' in w ? null : w.player; }
+    const id = String(h['x-p0-player'] ?? ''); return PLAYER_RE.test(id) ? id : null;
+  };
   const answer = (reply: { code(n: number): { send(b: object): unknown } }, r: Refusal | Record<string, unknown>) =>
     'status' in r && typeof r.status === 'number' && 'code' in r ? reply.code(r.status).send({ ok: false, code: r.code }) : reply.code(200).send(r);
   const body = (b: unknown) => (b && typeof b === 'object' ? b : {}) as Record<string, unknown>;

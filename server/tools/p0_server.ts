@@ -1,11 +1,15 @@
 /**
- * P0 server (no Postgres, no accounts): `node --import tsx tools/p0_server.ts`. Local playtests by default; the
+ * P0 server (no Postgres; accounts in accounts.json beside the save, SGODOT-488): `node --import tsx tools/p0_server.ts`. Local playtests by default; the
  * deployed image (server/deploy/p0) runs the same file with P0_DEV=0 and P0_ACCESS_KEYS (SGODOT-232 D1).
  * Port P0_PORT (default 3110) on P0_HOST (default 0.0.0.0); state persisted to P0_STATE_FILE (default output/p0/p0-state.json);
  * observation log beside it in events/ (P0_EVENT_DIR, empty to turn it off).
  * Android emulator: `adb reverse tcp:3110 tcp:3110`, client base URL http://127.0.0.1:3110/v1.
  * Outpost rooms on the same port: ws://…/v1/p0/online (x-p0-player header), GET /v1/p0/presence.
  */
+import { accountsConfig } from '../src/p0/accounts/config.js';
+import { identify } from '../src/p0/accounts/identify.js';
+import { registerAccountRoutes } from '../src/p0/accounts/routes.js';
+import { P0Accounts } from '../src/p0/accounts/store.js';
 import Fastify from 'fastify';
 import { mkdirSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
@@ -87,7 +91,16 @@ if (process.env.P0_IP_NEAR_TABLE) {
   try { ipNear = openIpNear(process.env.P0_IP_NEAR_TABLE); }
   catch (e) { console.error(JSON.stringify({ ip_near: 'unavailable', error: String((e as Error).message ?? e).slice(0, 200) })); }
 }
-registerP0Routes(app, { content, store, now: Date.now, dev, log, rooms, ipNear });
+// SGODOT-488 accounts (contract-accounts.md): accounts.json beside the save, who a request is (identify) for the
+// routes, the voice routes, the room's WebSocket and the request limits alike. P0_LEGACY_ID=1 takes an id alone
+// (devserver, shots): the live server never has it — its healthz says legacy_id and the deploy's smoke checks false.
+const accountsCfg = accountsConfig();
+const accountsFile = path.join(path.dirname(stateFile), 'accounts.json');
+const accounts = new P0Accounts(accountsFile, accountsCfg.refreshKey);
+if (accountsCfg.legacyId) console.warn(JSON.stringify({ warn: 'P0_LEGACY_ID=1: an x-p0-player alone is taken for any player (never on the live server)' }));
+const identifyDeps = { accounts, legacyId: accountsCfg.legacyId, updateUrl: () => gate.state().update_url || undefined };
+const identifyReq = (h: Record<string, unknown>) => identify(h, identifyDeps);
+registerP0Routes(app, { content, store, now: Date.now, dev, log, rooms, ipNear, identify: identifyDeps });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).
 // A pond's room checks the pond's city as entering the pond does (its city from the pond, never `pond:…`; home's are free).
@@ -105,19 +118,22 @@ const pass = (player: string, room: string) => {
 const voiceDir = path.dirname(stateFile);
 const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.join(voiceDir, 'voice_blocks.json'),
   ages: path.join(voiceDir, 'voice_ages.json'), reports: path.join(voiceDir, 'voice_reports.jsonl') });
-registerP0Voice(app, voice);
+registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
-  joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b) });
+  joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq });
+registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now,
+  voiceAge: p => { const a = voice.status(p).age; return a === 'ok' ? true : a === 'no' ? false : null; },
+  newSave: h => { const f = String(h['x-p0-features'] ?? '').split(',').map(x => x.trim()); return { pending: f.includes('choose_home'), guide: f.includes('guide_v3') }; } });
 voice.tell = (player, payload) => hub.tell(player, payload);
 voice.seen = (a, b) => hub.seenChanged(a, b);
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
-  return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000),
+  return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000), legacy_id: accountsCfg.legacyId,
     maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0, require_features: g.features_on ? g.features : [] };
 });
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');
-setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
+setInterval(() => snapshotState(stateFile, snapshots, 48, Date.now(), accountsFile), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
 console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config, dev_sites: devSitesFromEnv(process.env) }));

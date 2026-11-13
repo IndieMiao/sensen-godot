@@ -52,7 +52,9 @@ export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCat
   pass?: (player: string, outpost: string) => string | null;
   joined?: (o: Occupant) => void; departed?: (o: Occupant) => void;
   /** hides(a, b): a and b never see each other in a room — a Block either way (P0Voice; q(28), 383 V3, 奕星 11-02). */
-  hides?: (a: string, b: string) => boolean }
+  hides?: (a: string, b: string) => boolean;
+  /** SGODOT-488: who the upgrade is (accounts/identify.ts), the routes' own answer; absent, x-p0-player as before. */
+  identify?: (headers: Record<string, unknown>) => { player: string } | { status: number; body: object } }
 
 export class P0OnlineHub {
   readonly conns = new Set<Conn>();
@@ -75,8 +77,16 @@ export class P0OnlineHub {
     // SYS-UPDATE / SYS-MAINT (gate.ts): the same 426 / 503 and JSON body as the routes, and no upgrade.
     const refused = this.deps.gate?.check(req.headers);
     if (refused) { socket.end(upgradeRefusal(refused)); return; }
-    const player = String(req.headers['x-p0-player'] ?? '');
-    if (!PLAYER_RE.test(player)) { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); return; }
+    let player = String(req.headers['x-p0-player'] ?? '');
+    if (this.deps.identify) {
+      const w = this.deps.identify(req.headers);
+      if ('status' in w) {
+        const body = JSON.stringify(w.body);
+        socket.end(`HTTP/1.1 ${w.status} Refused\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(body)}\r\nConnection: close\r\n\r\n${body}`);
+        return;
+      }
+      player = w.player;
+    } else if (!PLAYER_RE.test(player)) { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); return; }
     if (this.conns.size >= LIMITS.connections) { socket.end('HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\n\r\n'); return; }
     this.wss.handleUpgrade(req, socket, head, ws => this.accept(ws, player));
   }
@@ -88,6 +98,17 @@ export class P0OnlineHub {
     this.conns.clear();
     this.byPlayer.clear();
     this.wss.close();
+  }
+
+  /** A token revoked (signed in elsewhere) or the account deleted (SGODOT-488): this player's socket goes as a second
+   * phone's join sends it — 4001, which the client takes as no reconnect (P0Online). Whether one was open. */
+  kick(player: string): boolean {
+    const c = this.byPlayer.get(player);
+    if (!c) return false;
+    this.byPlayer.delete(player);
+    this.depart(c, true);
+    c.ws.close(4001, 'SESSION_REPLACED');
+    return true;
   }
 
   private accept(ws: WebSocket, player: string): void {
