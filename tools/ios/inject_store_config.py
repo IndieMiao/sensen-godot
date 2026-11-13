@@ -95,20 +95,46 @@ def zh_strings(app_dir: Path) -> str:
     return "written"
 
 
+ZH_PATH = "zh-Hans.lproj/InfoPlist.strings"
+KNOWN_REGIONS = re.compile(r"knownRegions = \(([^)]*)\);")
+DEVICE_FAMILY = re.compile(r"TARGETED_DEVICE_FAMILY = [^;]*;")
+
+
 def pbxproj(path: Path) -> str:
     t = path.read_text()
     before = t
-    if ZH_REF not in t:
+    if ZH_REF not in t and ZH_PATH not in t:   # the zh-Hans strings once, whatever id an earlier copy gave them
         for anchor in (EN_REF, EN_CHILD):
             if anchor not in t:
                 raise SystemExit("InfoPlist.strings variant group (en) not found in the project")
         t = t.replace(EN_REF, EN_REF + f"\n\t\t{ZH_REF} /* zh-Hans */ = {{isa = PBXFileReference; lastKnownFileType = "
-                      "text.plist.strings; name = zh-Hans; path = zh-Hans.lproj/InfoPlist.strings; sourceTree = \"<group>\"; };", 1)
+                      f"text.plist.strings; name = zh-Hans; path = {ZH_PATH}; sourceTree = \"<group>\"; }};", 1)
         t = t.replace(EN_CHILD, EN_CHILD + f"\n\t\t\t\t{ZH_REF} /* zh-Hans */,", 1)
-    t = re.sub(r"(knownRegions = \(\n)((?:\t+[^\n]*\n)*?)(\t+\);)",
-               lambda m: m.group(0) if "zh-Hans" in m.group(2) else m.group(1) + m.group(2) + "\t\t\t\t\"zh-Hans\",\n" + m.group(3),
-               t, count=1)
-    t = re.sub(r'TARGETED_DEVICE_FAMILY = "1,2";', "TARGETED_DEVICE_FAMILY = 1;", t)
+
+    def regions(m):   # one entry a line (Xcode's) or all on one line
+        body = m.group(1)
+        if "zh-Hans" in body:
+            return m.group(0)
+        if "\n" in body:
+            indent = re.search(r"\n(\t+)\S", body)
+            return "knownRegions = (" + body.rstrip("\t") + (indent.group(1) if indent else "\t\t\t\t") + '"zh-Hans",\n' + \
+                body[len(body.rstrip("\t")):] + ");"
+        return "knownRegions = (" + body.rstrip().rstrip(",") + ', "zh-Hans", );'
+    t = KNOWN_REGIONS.sub(regions, t, count=1)
+    t = DEVICE_FAMILY.sub("TARGETED_DEVICE_FAMILY = 1;", t)   # "1,2", 1,2, 2 …: iPhone only
+
+    # 周瑜 on #1016: what could not be patched stops the pack rather than passing unchanged
+    problems = []
+    region = KNOWN_REGIONS.search(t)
+    if not region or "zh-Hans" not in region.group(1):
+        problems.append("zh-Hans not in knownRegions")
+    if t.count(ZH_PATH) != 1:
+        problems.append(f"{ZH_PATH} referenced {t.count(ZH_PATH)} times")
+    families = DEVICE_FAMILY.findall(t)
+    if not families or any(f != "TARGETED_DEVICE_FAMILY = 1;" for f in families):
+        problems.append("TARGETED_DEVICE_FAMILY is not 1 everywhere")
+    if problems:
+        raise SystemExit("project.pbxproj: " + "; ".join(problems))
     if t == before:
         return "up to date"
     path.write_text(t)
