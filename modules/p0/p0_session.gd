@@ -18,6 +18,12 @@ signal sent(cmd: Dictionary)
 ## The server turned every request away (q(74), SGODOT-233): "update_required" (HTTP 426, {url}) or "maintenance"
 ## (HTTP 503, {back_at}: UTC ISO, absent when unknown). Not a network failure: no Didn't go through, no Offline.
 signal blocked(code: String, detail: Dictionary)
+## SGODOT-488 accounts (contract-accounts.md §1): the first launch needs its pages — new / old_age / old_consent /
+## old_blocked / blocked / claimed / offline (P0Runtime opens 哪吒's P0AccFlow, or the offline screen); and an account
+## refusal stopped every request — session_replaced / account_deleted / unauthenticated / suspended (detail: until).
+signal first_run_needed(kind: String)
+signal account_state(kind: String, detail: Dictionary)
+signal identity_changed(ready: bool)
 
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
 const DEMO_CONFIG := "res://assets/p0/demo_server.json"
@@ -34,7 +40,19 @@ var player_id := ""
 ## The account's gate (后裔's PR-A sets it: true once a token is held or a claim is done, false again on a 401
 ## session_replaced / account_deleted or a deletion): until then nothing about this install leaves but its commands —
 ## P0ErrorReport (SGODOT-486) sends no error while it is false, nor keeps any for later.
-var identity_ready := false
+var identity_ready := false:
+	set(v):
+		if v == identity_ready: return
+		identity_ready = v
+		identity_changed.emit(v)
+## Who this install is to an accounts server (P0Identity: the token, the first launch's way). `accounts` is whether
+## this launch talks to one — a store / demo build (demo_server.json, unless it says accounts: false) or P0_ACCOUNTS=1;
+## desktop runs and the tests stay on the install's own id, as before, unless they ask. An older server (hello without
+## terms_version) turns it off again: legacy.
+var identity := P0Identity.new()
+var accounts := false
+## The build's channel (x-p0-channel: oss / play / appstore), from demo_server.json; "" sends none.
+var channel := ""
 ## The server's view. SGODOT-260 Q3: current() shares its unchanged parts with every caller, so nothing writes into it:
 ## in the editor and the tests it is made read-only (a write is an error there; exported builds skip the walk).
 var view: Dictionary = {}:
@@ -88,6 +106,17 @@ func _ready() -> void:
 	if not test_accounts.restore_missing_main():
 		push_error("P0 test-account main identity backup could not be verified")
 		return
+	var extra := demo_accounts(FileAccess.get_file_as_string(DEMO_CONFIG) if FileAccess.file_exists(DEMO_CONFIG) else "")
+	channel = str(extra.channel)
+	accounts = OS.get_environment("P0_ACCOUNTS") == "1" or (is_demo_build() and bool(extra.accounts))
+	identity.send = _account_request
+	if accounts:
+		# no id made here (周瑜 on tech-plan §2: an install stopped on the AGE page must not come back as an old one):
+		# hello first, then the way it says (_on_first_run)
+		player_id = identity.player
+		Avatar.user_id = test_accounts.avatar_id(Avatar.user_id)
+		identity.hello.call_deferred(_on_first_run)
+		return
 	player_id = _read_line("user://p0_player.txt", "")
 	if player_id == "":
 		var bytes := Crypto.new().generate_random_bytes(10)
@@ -96,9 +125,73 @@ func _ready() -> void:
 		if f: f.store_line(player_id)
 	if test_accounts.is_test(): player_id = test_accounts.active_id()
 	Avatar.user_id = test_accounts.avatar_id(Avatar.user_id)
+	identity_ready = true
 	report({"kind": "session_start"})
 	# Deferred: P0Runtime adds the session before P0Ui, and an immediate failure would toast on a UI not built yet.
 	refresh.call_deferred()
+
+## hello's answer (an old install has claimed inside it): ready plays on; legacy is an older server — the install's own
+## id, as before; any other is the first launch's pages (P0Runtime).
+func _on_first_run(kind: String) -> void:
+	match kind:
+		"ready": _identity_ready()
+		"legacy":
+			accounts = false
+			player_id = _read_line("user://p0_player.txt", "")
+			if player_id == "":
+				player_id = "p0-" + Crypto.new().generate_random_bytes(10).hex_encode()
+				var f := FileAccess.open("user://p0_player.txt", FileAccess.WRITE)
+				if f: f.store_line(player_id)
+			if test_accounts.is_test(): player_id = test_accounts.active_id()
+			_identity_ready()
+		_: first_run_needed.emit(kind)
+
+## Who we are is settled: the world's first read goes out.
+func _identity_ready() -> void:
+	if accounts: player_id = identity.player
+	identity_ready = true
+	report({"kind": "session_start"})
+	refresh()
+
+## The first launch's requests (contract-accounts.md §1; 哪吒's pages call these through the runtime). done.call(reply).
+func first_run() -> String: return identity.first_run() if accounts else "legacy"
+func hello(done: Callable) -> void:
+	identity.hello(func(k: String):
+		_on_first_run(k)
+		done.call({"ok": true, "kind": k}))
+func claim(done: Callable) -> void:
+	identity.claim(func(r: Dictionary):
+		if identity.first_run() == "ready": _identity_ready()
+		done.call(r))
+func name_check(name: String, done: Callable) -> void: identity.name_check(name, done)
+func guest(body: Dictionary, done: Callable) -> void:
+	identity.guest(body, func(r: Dictionary):
+		if bool(r.get("ok", false)): _identity_ready()
+		done.call(r))
+func consent(body: Dictionary, done: Callable) -> void:
+	identity.consent(body, func(r: Dictionary):
+		if bool(r.get("ok", false)): _identity_ready()
+		done.call(r))
+func rename(name: String, done: Callable) -> void: identity.rename(name, done)
+## The token for the room's WebSocket (P0Online.token): "" off accounts.
+func auth_token() -> String: return identity.token if accounts and identity.has_token() else ""
+
+## An account request (P0Identity.send): straight to the server with this build's headers, outside the command queue;
+## done.call(reply) — the server's JSON, or {ok: false, code: "network"}.
+func _account_request(method: int, path: String, body: Dictionary, done: Callable) -> void:
+	if not is_inside_tree():
+		done.call({"ok": false, "code": "network"})
+		return
+	var http := P0HttpRequest.new()
+	add_child(http)
+	http.request_completed.connect(func(result: int, code: int, _h, raw: PackedByteArray):
+		http.queue_free()
+		var data = JSON.parse_string(raw.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS and code > 0 else null
+		if code == 404 and not data is Dictionary: data = {"ok": false, "code": "not_found"}
+		done.call(data if data is Dictionary else {"ok": false, "code": "network"}))
+	if http.send(base_url + path, _headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body)) != OK:
+		http.queue_free()
+		done.call({"ok": false, "code": "network"})
 
 func _process(dt: float) -> void:
 	_ui_flush_left -= dt
@@ -166,6 +259,7 @@ func refresh_after() -> void:
 ## The read also says where the player is, so entering a space counts even before the first command (q(41)).
 func refresh() -> void:
 	_refresh_left = REFRESH_S
+	if accounts and not identity_ready: return   # SGODOT-488: nothing about this install leaves before it knows who it is
 	_refresh_queued = false
 	var query := ("?space=" + space.uri_encode() if space != "" else "") + ("&place=" + place.uri_encode() if space != "" and place != "" else "")
 	_request(HTTPClient.METHOD_GET, "/p0/state" + query, {}, {})
@@ -200,13 +294,14 @@ func _post(entry: Dictionary) -> void:
 
 ## A UI moment for the observation log: {kind = "tip_shown", key = "sow"} and the like (server keeps known kinds only).
 func report(event: Dictionary) -> void:
+	if accounts and not identity_ready: return   # not kept for later either (an install that never passes the AGE page sends none)
 	_ui_events.append(event)
 	if _ui_events.size() >= UI_BATCH: _flush_ui()
 
 ## Fire and forget: the log never blocks or reorders commands, and a failed send is simply dropped.
 func _flush_ui() -> void:
 	_ui_flush_left = UI_FLUSH_S
-	if _ui_events.is_empty(): return
+	if _ui_events.is_empty() or (accounts and not identity_ready): return
 	var body := {"events": _ui_events.slice(0, UI_BATCH)}
 	_ui_events = _ui_events.slice(UI_BATCH)
 	if transport.is_valid():
@@ -284,6 +379,12 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	if not block.is_empty():
 		blocked.emit(str(block.code), block)
 		return {ok = false, code = str(block.code), network = true}   # what waits behind it is dropped, like a failure
+	var refusal := account_refusal(result, code, raw) if accounts else {}
+	if not refusal.is_empty():
+		# SGODOT-488: not a lost connection — no Offline, no probing: every request stops and the runtime shows its page
+		identity_ready = false
+		account_state.emit(str(refusal.code), refusal)
+		return {ok = false, code = str(refusal.code), network = true}
 	if result != HTTPRequest.RESULT_SUCCESS or code >= 500 or code == 0:
 		connection_failed.emit("Can't reach the farm server", cmd)
 		return {ok = false, code = "network", network = true}
@@ -318,6 +419,14 @@ static func save_too_old(state) -> bool:
 
 ## The server's whole-screen refusals (q(74)): 426 {code: "update_required", url} and 503 {code: "maintenance",
 ## back_at}. Both the status and the body's code must match, so a proxy's plain 503 stays a network failure.
+## An account refusal (contract §0): 401 session_replaced / account_deleted / unauthenticated, 403 suspended; {} for
+## anything else.
+const ACCOUNT_CODES := ["session_replaced", "account_deleted", "unauthenticated", "suspended"]
+static func account_refusal(result: int, code: int, raw: PackedByteArray) -> Dictionary:
+	if result != HTTPRequest.RESULT_SUCCESS or not code in [401, 403]: return {}
+	var data = JSON.parse_string(raw.get_string_from_utf8())
+	return data if data is Dictionary and str(data.get("code", "")) in ACCOUNT_CODES else {}
+
 static func blocked_reply(result: int, code: int, raw: PackedByteArray) -> Dictionary:
 	if result != HTTPRequest.RESULT_SUCCESS or not code in [426, 503]: return {}
 	var data = JSON.parse_string(raw.get_string_from_utf8())
@@ -350,13 +459,25 @@ const FEATURES := "choose_home,guide_v3,locals,save_v7,wing8,yard2" if GUIDE_V3_
 
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
+	# SGODOT-488: the token beside the id (both until a rollback is ruled out, 周瑜 on tech-plan §2.4)
+	if auth_token() != "": headers.append("authorization: Bearer " + auth_token())
 	if access_key != "": headers.append("x-p0-key: " + access_key)
 	if version > 0: headers.append("x-p0-version: %d" % version)
 	headers.append("x-p0-features: " + features())
+	headers.append("x-p0-platform: " + platform())
+	if channel != "": headers.append("x-p0-channel: " + channel)
 	return headers
+
+## x-p0-platform: android / ios / desktop.
+static func platform() -> String:
+	return "android" if OS.has_feature("android") else "ios" if OS.has_feature("ios") else "desktop"
 
 ## The x-p0-features this build sends, on its requests and the online handshake alike (P0Online.features).
 func features() -> String:
+	if accounts: return _features_test() + ",accounts"
+	return _features_test()
+
+func _features_test() -> String:
 	if not test_accounts.is_test(): return FEATURES
 	return "choose_home,guide_v3,locals,save_v7,wing8,yard2" if test_accounts.guide_enabled() else "choose_home,locals,save_v7,wing8,yard2"
 
@@ -375,6 +496,14 @@ static func demo_config(text: String) -> Dictionary:
 	if not (url.begins_with("http://") or url.begins_with("https://")): url = ""
 	return {"url": url, "key": str(parsed.get("key", "")).strip_edges(), "version": int(parsed.get("version", 0)),
 		"name": str(parsed.get("name", "")).strip_edges()}   # the version name, for Settings › Version (q(129))
+
+## demo_server.json's account fields (SGODOT-488): channel (oss / play / appstore; "" when absent) and accounts (false
+## turns the accounts way off for that build, whatever the server can do).
+static func demo_accounts(text: String) -> Dictionary:
+	var parsed = JSON.parse_string(text) if text != "" else null
+	if not parsed is Dictionary: return {"channel": "", "accounts": true}
+	var ch := str(parsed.get("channel", "")).strip_edges()
+	return {"channel": ch if ch in ["oss", "play", "appstore"] else "", "accounts": parsed.get("accounts", true) != false}
 
 static func _read_line(path: String, fallback: String) -> String:
 	if FileAccess.file_exists(path):
