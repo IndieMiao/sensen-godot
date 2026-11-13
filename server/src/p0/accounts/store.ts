@@ -108,9 +108,11 @@ export class P0Accounts {
     for (const [h, t] of Object.entries(this.d.tokens)) if (t.player === player) delete this.d.tokens[h];
     this.flush();
   }
-  adminTokens(): { player: string; tail: string; expires_at: number }[] {
-    return Object.values(this.d.tokens).filter(t => t.kind === 'admin' && (t.expires_at ?? Infinity) > this.now())
-      .map(t => ({ player: t.player, tail: t.player.slice(-4), expires_at: t.expires_at ?? 0 }));
+  /** The admin tokens still in force: the player, its id's tail, the token's own (its hash's last 6, which tells two of
+   * one player apart — two test devices) and the end. */
+  adminTokens(): { player: string; tail: string; token_tail: string; expires_at: number }[] {
+    return Object.entries(this.d.tokens).filter(([, t]) => t.kind === 'admin' && (t.expires_at ?? Infinity) > this.now())
+      .map(([h, t]) => ({ player: t.player, tail: t.player.slice(-4), token_tail: h.slice(-6), expires_at: t.expires_at ?? 0 }));
   }
   players(): string[] { return Object.keys(this.d.players); }
 

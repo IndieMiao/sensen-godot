@@ -43,7 +43,7 @@ describe('P0Accounts', () => {
     let now = 1_000;
     const a = new P0Accounts(undefined, KEY, () => now);
     a.issue('p0-tester-9a3f', T(5), 'admin', 2_000);
-    expect(a.adminTokens()).toEqual([{ player: 'p0-tester-9a3f', tail: '9a3f', expires_at: 2_000 }]);
+    expect(a.adminTokens()).toEqual([{ player: 'p0-tester-9a3f', tail: '9a3f', token_tail: hashToken(T(5)).slice(-6), expires_at: 2_000 }]);
     now = 2_000;
     expect(a.byToken(T(5))).toBeUndefined();
     expect(a.adminTokens()).toEqual([]);

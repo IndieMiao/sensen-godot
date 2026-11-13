@@ -16,7 +16,9 @@ import type { P0Store } from './store.js';
 
 /** accounts (SGODOT-488): the tokens, for a test device's admin token and a claim reset (contract-accounts §4.1). */
 export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => number; key: string; log?: (line: string) => void; gate?: P0Gate;
-  accounts?: P0Accounts }
+  accounts?: P0Accounts;
+  /** The room hub's kick (SGODOT-488): a claim reset closes the player's open socket at once. */
+  kick?: (player: string) => void }
 
 /** An admin token lasts 30 days (tech-plan §2.5): a test device's, kept through other devices' sign-ins, never forgotten. */
 export const ADMIN_TOKEN_MS = 30 * 86_400_000;
@@ -34,8 +36,8 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
   /** With accounts, each player's admin tokens still in force ({tail, expires_at}), so one given to a test device is not
    *  forgotten there (tech-plan §2.5). */
   app.get('/admin/players', async () => {
-    const admin = new Map<string, { tail: string; expires_at: number }[]>();
-    for (const t of deps.accounts?.adminTokens() ?? []) admin.set(t.player, [...(admin.get(t.player) ?? []), { tail: t.tail, expires_at: t.expires_at }]);
+    const admin = new Map<string, { tail: string; token_tail: string; expires_at: number }[]>();
+    for (const t of deps.accounts?.adminTokens() ?? []) admin.set(t.player, [...(admin.get(t.player) ?? []), { tail: t.tail, token_tail: t.token_tail, expires_at: t.expires_at }]);
     return {
       ok: true,
       players: store.all().map(s => ({ player: s.player, created_at: s.created_at, last_at: s.presence.last_at, seq: s.seq,
@@ -80,7 +82,7 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       const expires_at = deps.now() + ADMIN_TOKEN_MS;
       accounts.ensure(player);
       accounts.issue(player, token, 'admin', expires_at);
-      log(JSON.stringify({ admin: 'session', player, expires_at, at: deps.now() }));
+      log(JSON.stringify({ admin: 'session', player: player.slice(-6), expires_at, at: deps.now() }));   // the id's tail: the log outlives a deletion
       return { ok: true, player, token, expires_at };
     });
 
@@ -91,7 +93,8 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       if (!player || (!store.peek(player) && !accounts.find(player))) return reply.code(404).send({ ok: false, code: 'unknown_player' });
       accounts.clearClaimed(player);
       const revoked = accounts.revokeAll(player, undefined, { admin: true }).length;
-      log(JSON.stringify({ admin: 'claim_reset', player, revoked, at: deps.now() }));
+      deps.kick?.(player);   // its open room socket goes now (4001), not at its next reconnect
+      log(JSON.stringify({ admin: 'claim_reset', player: player.slice(-6), revoked, at: deps.now() }));
       return { ok: true, revoked };
     });
   }

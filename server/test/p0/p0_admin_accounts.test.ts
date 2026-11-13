@@ -16,11 +16,11 @@ function setup(withAccounts = true) {
   let t = T0;
   const store = new P0Store(c);
   const accounts = new P0Accounts(undefined, null, () => t);
-  const lines: string[] = [];
+  const lines: string[] = [], kicked: string[] = [];
   const admin = Fastify();
-  registerP0Admin(admin, { content: c, store, now: () => t, key: KEY, log: l => lines.push(l), ...(withAccounts ? { accounts } : {}) });
+  registerP0Admin(admin, { content: c, store, now: () => t, key: KEY, log: l => lines.push(l), ...(withAccounts ? { accounts, kick: p => kicked.push(p) } : {}) });
   const post = (url: string, payload: unknown, key = KEY) => admin.inject({ method: 'POST', url, headers: { 'x-p0-admin': key }, payload: payload as object });
-  return { store, accounts, admin, lines, post, tick: (ms: number) => { t += ms; } };
+  return { store, accounts, admin, lines, kicked, post, tick: (ms: number) => { t += ms; } };
 }
 
 describe('admin tokens and claim reset (contract §4.1)', () => {
@@ -32,7 +32,7 @@ describe('admin tokens and claim reset (contract §4.1)', () => {
     expect(r.token).toMatch(/^[0-9a-f]{64}$/);
     expect(accounts.byToken(r.token)).toEqual({ player: 'test-phone-0001', kind: 'admin' });
     expect(accounts.find('test-phone-0001')?.claimed_at).toBeUndefined();
-    expect(lines.map(l => JSON.parse(l))).toEqual([{ admin: 'session', player: 'test-phone-0001', expires_at: T0 + ADMIN_TOKEN_MS, at: T0 }]);
+    expect(lines.map(l => JSON.parse(l))).toEqual([{ admin: 'session', player: 'e-0001', expires_at: T0 + ADMIN_TOKEN_MS, at: T0 }]);
     expect(lines.join('')).not.toContain(r.token);
     const again = (await post('/admin/session', { player: 'test-phone-0001' })).json();
     expect(again.token).not.toBe(r.token);   // each call its own; both hold
@@ -62,7 +62,7 @@ describe('admin tokens and claim reset (contract §4.1)', () => {
   });
 
   it('/admin/claim/reset: claimed_at cleared, every token revoked, admin ones too; the count back, no id', async () => {
-    const { store, accounts, lines, post } = setup();
+    const { store, accounts, lines, post, kicked } = setup();
     store.get('test-phone-0005', T0);
     accounts.markClaimed('test-phone-0005');
     accounts.issue('test-phone-0005', USER_TOKEN);
@@ -71,7 +71,8 @@ describe('admin tokens and claim reset (contract §4.1)', () => {
     expect(accounts.find('test-phone-0005')?.claimed_at).toBeUndefined();
     expect(accounts.byToken(USER_TOKEN)).toBeUndefined();
     expect(accounts.byToken(token)).toBeUndefined();
-    expect(JSON.parse(lines.at(-1)!)).toEqual({ admin: 'claim_reset', player: 'test-phone-0005', revoked: 2, at: T0 });
+    expect(JSON.parse(lines.at(-1)!)).toEqual({ admin: 'claim_reset', player: 'e-0005', revoked: 2, at: T0 });
+    expect(kicked).toEqual(['test-phone-0005']);   // its open room socket goes now
     expect((await post('/admin/claim/reset', { player: 'nobody-here-02' })).json()).toEqual({ ok: false, code: 'unknown_player' });
   });
 
@@ -84,7 +85,11 @@ describe('admin tokens and claim reset (contract §4.1)', () => {
     await post('/admin/session', { player: 'test-phone-0006' });
     const players = (await admin.inject({ method: 'GET', url: '/admin/players', headers: { 'x-p0-admin': KEY } })).json().players;
     const by = Object.fromEntries(players.map((p: { player: string; admin_tokens: unknown }) => [p.player, p.admin_tokens]));
-    expect(by['test-phone-0006']).toEqual([{ tail: '0006', expires_at: T0 + ADMIN_TOKEN_MS }, { tail: '0006', expires_at: T0 + 1000 + ADMIN_TOKEN_MS }]);
+    expect(by['test-phone-0006'].map((a: { tail: string; expires_at: number }) => [a.tail, a.expires_at]))
+      .toEqual([['0006', T0 + ADMIN_TOKEN_MS], ['0006', T0 + 1000 + ADMIN_TOKEN_MS]]);
+    const tails = by['test-phone-0006'].map((a: { token_tail: string }) => a.token_tail);
+    expect(tails[0]).toMatch(/^[0-9a-f]{6}$/);
+    expect(tails[0]).not.toBe(tails[1]);   // two test devices of one player told apart
     expect(by['test-phone-0007']).toEqual([]);
     const bare = setup(false);
     bare.store.get('test-phone-0008', T0);
