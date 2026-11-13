@@ -1,7 +1,8 @@
 /**
- * The first launch's routes (SGODOT-488 A1; contract-accounts.md §1): hello, session/guest, session/claim, account/consent.
- * hello and guest need no player; claim takes the old x-p0-player once, with the client's new token; consent needs the
- * token. Only guest makes a save (§1.3: the save first, then accounts.json — a crash between leaves a save no token
+ * The first launch's routes (SGODOT-488 A1, 489; contract-accounts v1.4–v1.6.3): hello, session/guest, session/claim,
+ * session/pending, session/logout, account/consent. hello, guest and pending need no player; claim takes the old
+ * x-p0-player once with a sign-in (the claim and the link in one step), and the client's new token; consent and logout
+ * need the token. Only guest makes a save (§1.3: the save first, then accounts.json — a crash between leaves a save no token
  * reaches, which the 12-month clean-up takes).
  */
 import { randomBytes } from 'node:crypto';
@@ -11,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import type { FastifyInstance } from 'fastify';
 import type { P0Store } from '../store.js';
 import { identify, isRefusal, type IdentifyDeps } from './identify.js';
+import { conflictFarm, liveOwner, signIn } from './link.js';
 import { NameLimiter, nameForGuest, registerNameRoutes, setName, type NameList } from './name.js';
 import { tokenShapeOk, type AppleLink, type GoogleLink, type P0Accounts, type Provider } from './store.js';
 
@@ -42,6 +44,11 @@ export interface AccountRouteDeps {
   pending?: { take(id: unknown): { provider: Provider; link: AppleLink | GoogleLink } | undefined;
     create?(provider: Provider, link: AppleLink | GoogleLink): string };
   guestOk?: boolean;
+  /** A sign-in's credentials checked (PR-B: appleVerifier / googleVerifier by provider): its link, or the refusal
+   * (bad_token, provider_unavailable). An unknown provider is undefined. claim needs it; none, and claim is off (503). */
+  verify?: (provider: string, b: Record<string, unknown>) => Promise<{ link: AppleLink | GoogleLink } | { status: number; body: { ok: false; code: string } } | undefined>;
+  /** The room hub's kick: a sign-in closes the account's open socket elsewhere (link.ts signIn). */
+  kick?: (player: string) => void;
 }
 
 const bad = (code: string, status: number, extra: Record<string, unknown> = {}) => ({ status, body: { ok: false as const, code, ...extra } });
@@ -132,6 +139,11 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     return { ok: true, player, ...(signedIn ? { linked: signedIn.provider } : {}) };
   });
 
+  /** POST /v1/p0/session/claim {provider, id_token, nonce, auth_code? | email, code, token, consent?, age_ok?} with the
+   * old x-p0-player (v1.4): the sign-in checked first, then — after the last await — the old farm claimed and linked to
+   * it, unless that account has another farm still there (conflict, its line) or this farm is claimed already (claimed,
+   * its links). The same farm's own account signs in. Every refusal after the check carries the sign-in as a pending
+   * one and has_farm (v1.6 ①: Apple's code and the email code are spent; the client never asks for a second sheet). */
   app.post('/v1/p0/session/claim', async (req, reply) => {
     const b = body(req.body);
     const send = (r: ReturnType<typeof bad>) => reply.code(r.status).send(r.body);
@@ -139,24 +151,71 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if (!/^[A-Za-z0-9_-]{8,64}$/.test(id)) return send(bad('bad_player', 400));
     if (!tokenShapeOk(b.token)) return send(bad(typeof b.token === 'string' ? 'token_too_short' : 'schema', 400));
     const token = String(b.token).toLowerCase();
+    if (accounts.tokenOwner(token) === id) return claimed(id, b);   // the same claim again: a retry after a lost answer
+    if (!deps.verify || !deps.pending?.create) return send(bad('provider_unavailable', 503));
+    const checked = await deps.verify(String(b.provider ?? ''), b);
+    if (!checked) return send(bad('schema', 400));
+    if ('status' in checked) return reply.code(checked.status).send(checked.body);
+    // after the last await: the checks and the writes below in one stretch (§1.3)
+    const now = deps.now();
+    const provider = b.provider as Provider;
     const owner = accounts.tokenOwner(token);
     if (owner && owner !== id) return send(bad('schema', 400));   // a token is one player's only
-    if (accounts.isDeleted(id) || !store.find(id, deps.now())) return send(bad('unknown_player', 404));
-    if (owner !== id) {
-      if (accounts.isClaimed(id)) return send(bad('claimed', 409, { linked: accounts.linked(id) }));
-      accounts.markClaimed(id);
-      accounts.issue(id, token);
+    const other = liveOwner(store, accounts, provider, checked.link.sub, now);
+    const ticket = () => ({ pending: deps.pending!.create!(provider, checked.link), has_farm: other !== undefined });
+    if (accounts.isDeleted(id) || !store.find(id, now)) return send(bad('unknown_player', 404, ticket()));
+    if (other === id) {
+      // this farm's own account (claimed on another phone before): signed in, as session/apple|google would
+      if (provider === 'apple' && (checked.link as AppleLink).refresh) accounts.link(id, 'apple', checked.link);
+      signIn({ accounts, kick: deps.kick }, id, token);
+      return claimed(id, b);
     }
-    const s = store.find(id, deps.now())!;
+    if (accounts.isClaimed(id)) return send(bad('claimed', 409, { linked: accounts.linked(id), ...ticket() }));
+    if (other) return send(bad('conflict', 409, { farm: conflictFarm(store, other, now), ...ticket() }));
+    accounts.markClaimed(id);
+    accounts.link(id, provider, checked.link);
+    accounts.issue(id, token);
     // v1.4 ⑦b: the consent given on the pages before sign-in comes with the claim (no token then for account/consent)
+    const s = store.find(id, now)!;
     const c = body(b.consent);
-    if (owner !== id && c.terms === versions.terms && c.privacy === versions.privacy) {
-      s.consent = { terms: versions.terms, privacy: versions.privacy, at: deps.now() };
+    if (c.terms === versions.terms && c.privacy === versions.privacy) {
+      s.consent = { terms: versions.terms, privacy: versions.privacy, at: now };
       s.age_ok = true;
       store.put(s);
     }
-    if (owner !== id && b.age_ok === true && deps.voiceAge?.(id) === null) deps.voiceAgeOk?.(id);   // v1.4 ⑬: never asked, now passed
-    return { ok: true, player: id, age: deps.voiceAge?.(id) ?? null, consent: s.consent ?? null };
+    if (b.age_ok === true && deps.voiceAge?.(id) === null) deps.voiceAgeOk?.(id);   // v1.4 ⑬: never asked, now passed
+    return claimed(id, b);
+  });
+  const claimed = (id: string, _b: Record<string, unknown>) => {
+    const s = store.find(id, deps.now());
+    return { ok: true, player: id, linked: accounts.linked(id), age: deps.voiceAge?.(id) ?? null, consent: s?.consent ?? null };
+  };
+
+  /** POST /v1/p0/session/pending {pending, token}, no identity (v1.6 ①): a sign-in a claim or guest already checked —
+   * its farm signed in (its other phones' tokens revoked), or no_farm with a new pending one. */
+  app.post('/v1/p0/session/pending', async (req, reply) => {
+    const b = body(req.body);
+    const send = (r: ReturnType<typeof bad>) => reply.code(r.status).send(r.body);
+    if (!tokenShapeOk(b.token)) return send(bad(typeof b.token === 'string' ? 'token_too_short' : 'schema', 400));
+    const token = String(b.token).toLowerCase();
+    const p = deps.pending?.take(b.pending);
+    if (!p) return send(bad('pending_expired', 410));
+    const player = liveOwner(store, accounts, p.provider, p.link.sub, deps.now());
+    if (!player) return send(bad('no_farm', 404, { pending: deps.pending!.create!(p.provider, p.link) }));
+    const owner = accounts.tokenOwner(token);
+    if (owner && owner !== player) return send(bad('schema', 400));
+    if (p.provider === 'apple' && (p.link as AppleLink).refresh) accounts.link(player, 'apple', p.link);   // the newest authorization
+    return signIn({ accounts, kick: deps.kick }, player, token);
+  });
+
+  /** POST /v1/p0/session/logout (v1.4): this phone's token alone withdrawn; the account's other phones keep theirs. */
+  app.post('/v1/p0/session/logout', async (req, reply) => {
+    const w = identify(req.headers, deps.identify);
+    if (isRefusal(w)) return reply.code(w.status).send(w.body);
+    if (w.via !== 'token') return reply.code(401).send({ ok: false, code: 'unauthenticated' });
+    const auth = String(req.headers.authorization ?? '').replace(/^Bearer\s+/i, '').toLowerCase();
+    accounts.revoke(auth);
+    return { ok: true };
   });
 
   app.post('/v1/p0/account/consent', async (req, reply) => {

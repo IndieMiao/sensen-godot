@@ -88,16 +88,16 @@ export interface AppleRouteDeps {
   warn?: (line: string) => void;
 }
 
-type Refused = { status: number; body: { ok: false; code: string } };
+export type Refused = { status: number; body: { ok: false; code: string } };
 const refused = (status: number, code: string): Refused => ({ status, body: { ok: false, code } });
+export const bodyOf = (b: unknown) => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}) as Record<string, unknown>;
 
-export function registerAppleRoutes(app: FastifyInstance, deps: AppleRouteDeps): void {
-  const { store, accounts } = deps;
+/** The Apple link a sign-in brings — the account number, its aud, and a refresh token when a code came and was good —
+ *  or the refusal. session/apple's, and claim's for provider apple (v1.4). */
+export function appleVerifier(deps: Pick<AppleRouteDeps, 'apple' | 'client' | 'keys' | 'refreshKeys' | 'now' | 'warn'>):
+    (b: Record<string, unknown>) => Promise<AppleLink | Refused> {
   const warn = deps.warn ?? ((line: string) => console.warn(line));
-  const bodyOf = (b: unknown) => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}) as Record<string, unknown>;
-
-  /** The Apple link a sign-in brings: the account number, its aud, and a refresh token when a code came and was good. */
-  const verify = async (b: Record<string, unknown>): Promise<AppleLink | Refused> => {
+  return async b => {
     if (!deps.apple) return refused(503, 'provider_unavailable');
     let id: { sub: string; aud: string };
     try {
@@ -114,6 +114,11 @@ export function registerAppleRoutes(app: FastifyInstance, deps: AppleRouteDeps):
     }
     return { sub: id.sub, aud: id.aud, ...(refresh ? { refresh } : {}) };
   };
+}
+
+export function registerAppleRoutes(app: FastifyInstance, deps: AppleRouteDeps): void {
+  const { store, accounts } = deps;
+  const verify = appleVerifier(deps);
 
   /** POST /v1/p0/session/apple {id_token, nonce, auth_code?, token}, no identity: the linked farm signed in on this phone
    *  (its other phones' tokens revoked), or no_farm {pending} for NAME's new farm. A new refresh token replaces the kept

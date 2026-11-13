@@ -84,6 +84,14 @@ export class P0Accounts {
     if (gone.length) this.flush();
     return gone;
   }
+  /** One token gone (session/logout: this phone only); whether it was there. */
+  revoke(token: string): boolean {
+    const h = hashToken(token);
+    if (!this.d.tokens[h]) return false;
+    delete this.d.tokens[h];
+    this.flush();
+    return true;
+  }
   /** The player's user tokens (a claim checks one against them). */
   userTokenCount(player: string): number { return Object.values(this.d.tokens).filter(t => t.player === player && t.kind === 'user').length; }
 

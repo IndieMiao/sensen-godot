@@ -57,7 +57,8 @@ describe('account deletion (contract-accounts §4)', () => {
     const hub = registerP0Online(app, { rooms, identify: who, departed: o => voice.departed(o) });
     registerP0Voice(app, voice, who);
     registerP0Routes(app, { content, store: deps.store, now: deps.now, dev: false, identify: identity });
-    registerAccountRoutes(app, { ...deps, identify: identity, versions: { terms: 'test', privacy: 'test' } });
+    registerAccountRoutes(app, { ...deps, identify: identity, versions: { terms: 'test', privacy: 'test' },
+      verify: async () => ({ link: { sub: 'g-deleted' } }), pending: { take: () => undefined, create: () => 'pend' } });
     await app.listen({ port: 0, host: '127.0.0.1' });
     const url = `ws://127.0.0.1:${(app.server.address() as { port: number }).port}/v1/p0/online`;
     const headers = { authorization: `Bearer ${USER_TOKEN}`, 'x-p0-player': PLAYER };
@@ -81,7 +82,7 @@ describe('account deletion (contract-accounts §4)', () => {
         const r = await app.inject({ method: 'GET', url: '/v1/p0/state', headers: auth });
         expect([r.statusCode, r.json().code]).toEqual([401, 'account_deleted']);
       }
-      const claim = await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': PLAYER }, payload: { token: '4'.repeat(64) } });
+      const claim = await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': PLAYER }, payload: { provider: 'google', id_token: 'x', nonce: 'n', token: '4'.repeat(64) } });
       expect([claim.statusCode, claim.json().code]).toEqual([404, 'unknown_player']);
       const voiceRead = await app.inject({ method: 'GET', url: '/v1/p0/voice/status', headers });
       expect(voiceRead.statusCode).toBe(401);

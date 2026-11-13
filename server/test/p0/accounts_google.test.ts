@@ -5,7 +5,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { registerGoogleRoutes } from '../../src/p0/accounts/google.js';
+import { registerGoogleLinkRoute, registerGoogleRoutes } from '../../src/p0/accounts/google.js';
 import { sha256Hex } from '../../src/p0/accounts/jwt.js';
 import { PendingSignIns } from '../../src/p0/accounts/link.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
@@ -30,7 +30,7 @@ const idToken = (over: Record<string, unknown> = {}, keys = k) => {
 const dirs: string[] = [];
 afterEach(() => { for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true }); });
 
-function setup(over: { audiences?: string[]; keys?: () => Promise<Map<string, import('node:crypto').KeyObject>> } = {}) {
+function setup(over: { audiences?: string[]; link?: boolean; keys?: () => Promise<Map<string, import('node:crypto').KeyObject>> } = {}) {
   const dir = mkdtempSync(path.join(tmpdir(), 'p0-google-'));
   dirs.push(dir);
   const file = path.join(dir, 'accounts.json');
@@ -39,8 +39,10 @@ function setup(over: { audiences?: string[]; keys?: () => Promise<Map<string, im
   const pending = new PendingSignIns(() => T0);
   const kicked: string[] = [], warned: string[] = [];
   const app = Fastify();
-  registerGoogleRoutes(app, { store, accounts, identify: { accounts, legacyId: false }, now: () => T0, pending,
-    audiences: over.audiences ?? [WEB, IOS], keys: over.keys ?? k.keys, kick: p => kicked.push(p), warn: l => warned.push(l) });
+  const deps = { store, accounts, identify: { accounts, legacyId: false }, now: () => T0, pending,
+    audiences: over.audiences ?? [WEB, IOS], keys: over.keys ?? k.keys, kick: (p: string) => { kicked.push(p); }, warn: (l: string) => { warned.push(l); } };
+  registerGoogleRoutes(app, deps);
+  if (over.link !== false) registerGoogleLinkRoute(app, deps);   // kept for a later version; p0_server leaves it out (v1.4)
   const post = (url: string, payload: unknown, headers: Record<string, string> = {}) =>
     app.inject({ method: 'POST', url, payload: payload as object, headers });
   /** A farm with a user token, as a guest or a claim leaves it. */
@@ -104,6 +106,13 @@ describe('session/google (contract §2)', () => {
     expect(down.warned.join('')).not.toContain(t.split('.')[1]);
     const off = setup({ audiences: [] });
     expect((await off.post('/v1/p0/session/google', { id_token: t, nonce: NONCE, token: TOKEN })).json().code).toBe('provider_unavailable');
+  });
+});
+
+describe('the first version leaves link out (contract v1.4)', () => {
+  it('registerGoogleRoutes alone has no account/link/google', async () => {
+    const { post } = setup({ link: false });
+    expect((await post('/v1/p0/account/link/google', { id_token: idToken(), nonce: NONCE })).statusCode).toBe(404);
   });
 });
 

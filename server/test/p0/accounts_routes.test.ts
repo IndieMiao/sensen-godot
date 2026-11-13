@@ -1,4 +1,5 @@
-/** The first launch's routes (SGODOT-488 A1; contract-accounts.md §1): hello, guest, claim, consent. */
+/** The first launch's routes (SGODOT-488 A1, 489; contract-accounts v1.4–v1.6.3): hello, guest, claim with a sign-in,
+ * session/pending, session/logout, consent. A sign-in's id_token stands for its account number here (fakeVerify). */
 import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
 import { registerAccountRoutes } from '../../src/p0/accounts/routes.js';
@@ -13,16 +14,25 @@ const V = { terms: '2026-11-13', privacy: '2026-11-13' };
 const T = (n: number) => n.toString(16).padStart(64, '0');
 
 type Pend = { provider: 'apple' | 'google'; link: { sub: string; aud?: string } };
+/** The sign-in check, faked: id_token is the account number; 'bad' a token that does not check out. */
+const fakeVerify = async (provider: string, b: Record<string, unknown>) => {
+  if (provider !== 'apple' && provider !== 'google') return undefined;
+  if (b.id_token === 'bad') return { status: 401, body: { ok: false as const, code: 'bad_token' } };
+  return { link: { sub: String(b.id_token), ...(provider === 'apple' ? { aud: 'app.gensen.maps' } : {}) } };
+};
+const signed = (sub: string, extra: Record<string, unknown> = {}) => ({ provider: 'google', id_token: sub, nonce: 'n', ...extra });
 function setup(opts: { legacyId?: boolean; ages?: Record<string, boolean>; guestsPerHour?: number; guestOk?: boolean; pendings?: Record<string, Pend> } = {}) {
   const store = new P0Store(c), accounts = new P0Accounts();
+  const kicked: string[] = [];
   const identifyDeps = { accounts, legacyId: !!opts.legacyId, warn: () => {} };
   const app = Fastify();
   registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: () => T0, versions: V,
     voiceAge: p => (opts.ages && p in opts.ages ? opts.ages[p] : null), guestsPerHour: opts.guestsPerHour, guestOk: opts.guestOk ?? true,
+    verify: fakeVerify, kick: p => { kicked.push(p); },
     pending: { take: (id: unknown) => { const p = opts.pendings?.[String(id)]; if (p) delete opts.pendings![String(id)]; return p as never; },
-      create: (_p: string, link: { sub: string }) => `again-${link.sub}` } });
+      create: (provider: string, link: { sub: string }) => { (opts.pendings ??= {})[`again-${link.sub}`] = { provider: provider as Pend['provider'], link }; return `again-${link.sub}`; } } });
   registerP0Routes(app, { content: c, store, now: () => T0, dev: false, identify: identifyDeps });
-  return { app, store, accounts };
+  return { app, store, accounts, kicked };
 }
 const guest = (extra: Record<string, unknown> = {}) => ({ age_ok: true, ...V, name: 'Mia', token: T(1), request_id: T(9), ...extra });
 
@@ -79,34 +89,99 @@ describe('session/guest', () => {
   });
 });
 
-describe('session/claim', () => {
-  const claim = (app: ReturnType<typeof Fastify>, player: string, token: string) =>
-    app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': player }, payload: { token } });
-  it('gives an old player its token once, with the voice gate answer and its consent; again with the same token is ok', async () => {
-    const { app, store } = setup({ ages: { 'p0-old00001': true } });
+describe('session/claim (v1.4: with a sign-in; v1.6 ①: every refusal carries the sign-in)', () => {
+  const claim = (app: ReturnType<typeof Fastify>, player: string, token: string, sign: Record<string, unknown> = signed('g1')) =>
+    app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': player }, payload: { ...sign, token } });
+  it('claims an old farm and links the sign-in in one step, with the voice gate answer and its consent; the same token again is ok', async () => {
+    const { app, store, accounts } = setup({ ages: { 'p0-old00001': true } });
     store.get('p0-old00001', T0);
-    expect((await claim(app, 'p0-old00001', T(1))).json()).toEqual({ ok: true, player: 'p0-old00001', age: true, consent: null });
-    expect((await claim(app, 'p0-old00001', T(1))).json().ok).toBe(true);
-    const other = await claim(app, 'p0-old00001', T(2));
-    expect([other.statusCode, other.json()]).toEqual([409, { ok: false, code: 'claimed', linked: [] }]);
+    expect((await claim(app, 'p0-old00001', T(1))).json()).toEqual({ ok: true, player: 'p0-old00001', linked: ['google'], age: true, consent: null });
+    expect(accounts.byIdentity('google', 'g1')).toBe('p0-old00001');
+    expect((await claim(app, 'p0-old00001', T(1), signed('ignored'))).json().ok).toBe(true);   // a lost answer retried
     // and the old build on it now updates
     const old = await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { 'x-p0-player': 'p0-old00001' } });
     expect([old.statusCode, old.json().code]).toEqual([426, 'update_required']);
   });
+  it('the farm\'s own account on another phone signs in to it (that phone\'s token revoked); another account is claimed, with the sign-in kept', async () => {
+    const { app, store, accounts, kicked } = setup();
+    store.get('p0-old00001', T0);
+    await claim(app, 'p0-old00001', T(1));
+    const again = (await claim(app, 'p0-old00001', T(2))).json();
+    expect(again).toMatchObject({ ok: true, player: 'p0-old00001', linked: ['google'] });
+    expect(accounts.tokenOwner(T(1))).toBeUndefined();
+    expect(kicked).toEqual(['p0-old00001']);
+    const other = await claim(app, 'p0-old00001', T(3), signed('g2'));
+    expect([other.statusCode, other.json()]).toEqual([409, { ok: false, code: 'claimed', linked: ['google'], pending: 'again-g2', has_farm: false }]);
+  });
+  it('conflict when the sign-in has another farm still there: that farm\'s line, nothing claimed, the sign-in kept', async () => {
+    const { app, store, accounts } = setup();
+    store.get('p0-old00001', T0);
+    const s = store.get('p0-new00001', T0); s.profile = { name: 'Ann' }; s.homestead.level = 3; store.put(s);
+    accounts.ensure('p0-new00001'); accounts.link('p0-new00001', 'google', { sub: 'g1' });
+    const r = await claim(app, 'p0-old00001', T(1));
+    expect(r.statusCode).toBe(409);
+    expect(r.json()).toMatchObject({ ok: false, code: 'conflict', farm: { name: 'Ann', home_level: 3 }, pending: 'again-g1', has_farm: true });
+    expect(accounts.isClaimed('p0-old00001')).toBe(false);
+    expect(accounts.tokenOwner(T(1))).toBeUndefined();
+  });
+  it('unknown_player for an id the server has not or has deleted, with the sign-in and whether it has a farm', async () => {
+    const { app, store, accounts } = setup();
+    expect((await claim(app, 'p0-nobody001', T(1))).json()).toEqual({ ok: false, code: 'unknown_player', pending: 'again-g1', has_farm: false });
+    store.get('p0-gone00001', T0); accounts.markDeleted('p0-gone00001', T0);
+    store.get('p0-new00001', T0); accounts.ensure('p0-new00001'); accounts.link('p0-new00001', 'google', { sub: 'g5' });
+    expect((await claim(app, 'p0-gone00001', T(1), signed('g5'))).json()).toMatchObject({ code: 'unknown_player', has_farm: true });
+  });
+  it('refuses: a sign-in that does not check out, an unknown provider, a token of another\'s, no sign-in at all', async () => {
+    const { app, store } = setup();
+    store.get('p0-a00000001', T0); store.get('p0-b00000001', T0);
+    expect((await claim(app, 'p0-a00000001', T(1), signed('bad'))).json()).toEqual({ ok: false, code: 'bad_token' });
+    expect((await claim(app, 'p0-a00000001', T(1), { provider: 'yahoo', id_token: 'g1' })).json().code).toBe('schema');
+    await claim(app, 'p0-a00000001', T(3));
+    expect((await claim(app, 'p0-b00000001', T(3), signed('g8'))).json().code).toBe('schema');
+    const off = Fastify();
+    registerAccountRoutes(off, { store, accounts: new P0Accounts(), identify: { accounts: new P0Accounts(), legacyId: false }, now: () => T0, versions: V });
+    const r = await off.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-b00000001' }, payload: { ...signed('g1'), token: T(4) } });
+    expect([r.statusCode, r.json().code]).toEqual([503, 'provider_unavailable']);
+  });
   it('age false and never asked come through as they are', async () => {
     const { app, store } = setup({ ages: { 'p0-old00002': false } });
     store.get('p0-old00002', T0); store.get('p0-old00003', T0);
-    expect((await claim(app, 'p0-old00002', T(1))).json().age).toBe(false);
-    expect((await claim(app, 'p0-old00003', T(2))).json().age).toBeNull();
+    expect((await claim(app, 'p0-old00002', T(1), signed('g2'))).json().age).toBe(false);
+    expect((await claim(app, 'p0-old00003', T(2), signed('g3'))).json().age).toBeNull();
   });
-  it('unknown_player for an id the server has not or has deleted; a token already another\'s is refused', async () => {
-    const { app, store, accounts } = setup();
-    expect((await claim(app, 'p0-nobody001', T(1))).json().code).toBe('unknown_player');
-    store.get('p0-gone00001', T0); accounts.markDeleted('p0-gone00001', T0);
-    expect((await claim(app, 'p0-gone00001', T(1))).json().code).toBe('unknown_player');
-    store.get('p0-a00000001', T0); store.get('p0-b00000001', T0);
-    await claim(app, 'p0-a00000001', T(3));
-    expect((await claim(app, 'p0-b00000001', T(3))).json().code).toBe('schema');
+});
+
+describe('session/pending (v1.6 ①)', () => {
+  const pend = (app: ReturnType<typeof Fastify>, pending: string, token: string) =>
+    app.inject({ method: 'POST', url: '/v1/p0/session/pending', payload: { pending, token } });
+  it('the farm of a sign-in already checked, signed in (its other phone out); once only', async () => {
+    const { app, store, accounts, kicked } = setup({ pendings: { p1: { provider: 'google', link: { sub: 'g1' } } } });
+    store.get('p0-new00001', T0); accounts.ensure('p0-new00001'); accounts.link('p0-new00001', 'google', { sub: 'g1' }); accounts.issue('p0-new00001', T(9));
+    expect((await pend(app, 'p1', T(1))).json()).toEqual({ ok: true, player: 'p0-new00001', linked: ['google'] });
+    expect(accounts.tokenOwner(T(9))).toBeUndefined();
+    expect(kicked).toEqual(['p0-new00001']);
+    const again = await pend(app, 'p1', T(2));
+    expect([again.statusCode, again.json().code]).toEqual([410, 'pending_expired']);
+  });
+  it('no farm: no_farm with a new pending one, for guest', async () => {
+    const { app } = setup({ guestOk: false, pendings: { p1: { provider: 'google', link: { sub: 'g7' } } } });
+    const r = await pend(app, 'p1', T(1));
+    expect([r.statusCode, r.json()]).toEqual([404, { ok: false, code: 'no_farm', pending: 'again-g7' }]);
+    const made = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'again-g7' }) })).json();
+    expect(made).toMatchObject({ ok: true, linked: 'google' });
+  });
+});
+
+describe('session/logout (v1.4)', () => {
+  it('withdraws this phone\'s token alone; an id alone is not signed out', async () => {
+    const { app, store, accounts } = setup({ legacyId: true });
+    store.get('p0-old00001', T0); accounts.ensure('p0-old00001'); accounts.issue('p0-old00001', T(1)); accounts.issue('p0-old00001', T(2));
+    const r = await app.inject({ method: 'POST', url: '/v1/p0/session/logout', headers: { authorization: `Bearer ${T(1)}` } });
+    expect(r.json()).toEqual({ ok: true });
+    expect(accounts.tokenOwner(T(1))).toBeUndefined();
+    expect(accounts.tokenOwner(T(2))).toBe('p0-old00001');
+    const legacy = await app.inject({ method: 'POST', url: '/v1/p0/session/logout', headers: { 'x-p0-player': 'p0-legacy001' } });
+    expect([legacy.statusCode, legacy.json().code]).toEqual([401, 'unauthenticated']);
   });
 });
 
@@ -114,7 +189,7 @@ describe('account/consent', () => {
   it('records an old player\'s consent and age; 「没过」 is never taken, old versions are outdated', async () => {
     const { app, store } = setup();
     store.get('p0-old00001', T0);
-    await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-old00001' }, payload: { token: T(1) } });
+    await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-old00001' }, payload: { ...signed('g1'), token: T(1) } });
     const h = { authorization: `Bearer ${T(1)}` };
     expect((await app.inject({ method: 'POST', url: '/v1/p0/account/consent', headers: h, payload: { age_ok: false, ...V } })).json().code).toBe('schema');
     expect((await app.inject({ method: 'POST', url: '/v1/p0/account/consent', headers: h, payload: { age_ok: true, terms: 'x', privacy: V.privacy } })).json().code).toBe('consent_outdated');
@@ -201,7 +276,7 @@ describe('v1.4 必须注册', () => {
   it('claim takes the consent given on the pages before the sign-in', async () => {
     const { app, store } = setup();
     store.get('p0-old00001', T0);
-    const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-old00001' }, payload: { token: T(1), consent: V } })).json();
+    const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-old00001' }, payload: { ...signed('g1'), token: T(1), consent: V } })).json();
     expect(r.consent).toEqual({ ...V, at: T0 });
     expect(store.peek('p0-old00001')!.age_ok).toBe(true);
   });
@@ -215,17 +290,18 @@ describe('v1.6 (奕星 on v3.2)', () => {
     expect((await app.inject({ method: 'GET', url: '/v1/p0/hello', headers: { 'x-p0-player': r.player } })).json().legacy).toEqual({ claimed: true, linked: ['google'] });
     const old = await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { 'x-p0-player': r.player } });
     expect([old.statusCode, old.json().code]).toEqual([426, 'update_required']);
-    expect((await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': r.player }, payload: { token: T(7) } })).json().code).toBe('claimed');
+    expect((await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': r.player }, payload: { ...signed('g9'), token: T(7) } })).json().code).toBe('claimed');
   });
   it('the AGE page passed is written to the voice gate (claim\'s age_ok, consent), only for one never asked', async () => {
     const ages: Record<string, boolean> = {};
     const store = new P0Store(c), accounts = new P0Accounts();
     const ident = { accounts, legacyId: false, warn: () => {} };
     const app = Fastify();
-    registerAccountRoutes(app, { store, accounts, identify: ident, now: () => T0, versions: V, guestOk: true,
+    registerAccountRoutes(app, { store, accounts, identify: ident, now: () => T0, versions: V, guestOk: true, verify: fakeVerify,
+      pending: { take: () => undefined, create: () => 'p' },
       voiceAge: p => (p in ages ? ages[p] : null), voiceAgeOk: p => { ages[p] = true; } });
     store.get('p0-old00001', T0);
-    await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-old00001' }, payload: { token: T(1), age_ok: true } });
+    await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-old00001' }, payload: { ...signed('g1'), token: T(1), age_ok: true } });
     expect(ages['p0-old00001']).toBe(true);
     store.get('p0-old00002', T0); accounts.issue('p0-old00002', T(2));
     await app.inject({ method: 'POST', url: '/v1/p0/account/consent', headers: { authorization: `Bearer ${T(2)}` }, payload: { age_ok: true, ...V } });

@@ -6,7 +6,11 @@
  * Android emulator: `adb reverse tcp:3110 tcp:3110`, client base URL http://127.0.0.1:3110/v1.
  * Outpost rooms on the same port: ws://…/v1/p0/online (x-p0-player header), GET /v1/p0/presence.
  */
-import { accountsConfig } from '../src/p0/accounts/config.js';
+import { APPLE_JWKS_URL, AppleClient, appleVerifier, registerAppleRoutes } from '../src/p0/accounts/apple.js';
+import { accountsConfig, applePrivateKey } from '../src/p0/accounts/config.js';
+import { GOOGLE_JWKS_URL, googleVerifier, registerGoogleRoutes } from '../src/p0/accounts/google.js';
+import { CachedJwks, jwksFetcher } from '../src/p0/accounts/jwt.js';
+import { PendingSignIns } from '../src/p0/accounts/link.js';
 import { identify, isRefusal } from '../src/p0/accounts/identify.js';
 import { registerAccountRoutes } from '../src/p0/accounts/routes.js';
 import { registerCodeRoutes } from '../src/p0/accounts/codes.js';
@@ -136,7 +140,33 @@ const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.joi
 registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
   joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq });
+// Sign in with Apple / Google (SGODOT-489 PR-B; contract v1.4–v1.6.3): the keys fetched and cached, the pending
+// sign-ins in memory (an Apple one left unused has its authorization withdrawn), and one check per provider shared by
+// session/apple|google and claim. No switch, no link in the first version.
+const appleCfg = accountsCfg.apple;
+const appleClient = appleCfg ? new AppleClient(appleCfg, () => applePrivateKey(appleCfg)) : null;
+const pendingSignIns = new PendingSignIns(Date.now, p => {
+  const link = p.link as { aud?: string; refresh?: string };
+  if (p.provider === 'apple' && link.refresh && link.aud && appleClient) {
+    appleClient.revoke(link.aud, link.refresh).catch(e => console.warn(JSON.stringify({ apple: 'revoke_failed', error: e instanceof Error ? e.message : typeof e })));
+  }
+});
+setInterval(() => pendingSignIns.sweep(), 60_000).unref();
+const appleJwks = new CachedJwks(jwksFetcher(APPLE_JWKS_URL)), googleJwks = new CachedJwks(jwksFetcher(GOOGLE_JWKS_URL));
+const kickPlayer = (p: string) => { hub.kick(p); };
+const appleDeps = { store, accounts, now: Date.now, pending: pendingSignIns, apple: appleCfg, client: appleClient,
+  keys: appleJwks.keys, refreshKeys: appleJwks.refresh, kick: kickPlayer };
+const googleDeps = { store, accounts, identify: identifyDeps, now: Date.now, pending: pendingSignIns,
+  audiences: accountsCfg.google?.audiences ?? [], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, kick: kickPlayer };
+registerAppleRoutes(app, appleDeps);
+registerGoogleRoutes(app, googleDeps);
+const verifyApple = appleVerifier(appleDeps), verifyGoogle = googleVerifier(googleDeps);
 registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now, guestOk: accountsCfg.guestOk,
+  pending: pendingSignIns, kick: kickPlayer,
+  verify: async (provider, b) => {
+    const v = provider === 'apple' ? await verifyApple(b) : provider === 'google' ? await verifyGoogle(b) : undefined;
+    return v === undefined || 'status' in v ? v : { link: v };
+  },
   voiceAge: p => { const a = voice.status(p).age; return a === 'ok' ? true : a === 'no' ? false : null; },
   voiceAgeOk: p => { voice.setAge(p, true); },
   newSave: h => { const f = String(h['x-p0-features'] ?? '').split(',').map(x => x.trim()); return { pending: f.includes('choose_home'), guide: f.includes('guide_v3') }; } });

@@ -15,7 +15,7 @@ import type { P0Store } from '../store.js';
 import { identify, isRefusal, type IdentifyDeps } from './identify.js';
 import { conflictFarm, liveOwner, signIn, type PendingSignIns } from './link.js';
 import { IdTokenError, sha256Hex, verifyRs256, type KeySource } from './jwt.js';
-import { tokenShapeOk, type P0Accounts } from './store.js';
+import { tokenShapeOk, type GoogleLink, type P0Accounts } from './store.js';
 
 export const GOOGLE_JWKS_URL = 'https://www.googleapis.com/oauth2/v3/certs';
 const GOOGLE_ISSUERS = ['accounts.google.com', 'https://accounts.google.com'];
@@ -52,14 +52,14 @@ export interface GoogleRouteDeps {
 
 type Refused = { status: number; body: { ok: false; code: string } };
 const refused = (status: number, code: string): Refused => ({ status, body: { ok: false, code } });
+const bodyOf = (b: unknown) => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}) as Record<string, unknown>;
 
-export function registerGoogleRoutes(app: FastifyInstance, deps: GoogleRouteDeps): void {
-  const { store, accounts } = deps;
+/** The token's account number, or the refusal: the rest of what it carries goes no further than here. session/google's,
+ *  and claim's for provider google (v1.4). */
+export function googleVerifier(deps: Pick<GoogleRouteDeps, 'audiences' | 'keys' | 'refreshKeys' | 'now' | 'warn'>):
+    (b: Record<string, unknown>) => Promise<GoogleLink | Refused> {
   const warn = deps.warn ?? ((line: string) => console.warn(line));
-  const bodyOf = (b: unknown) => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}) as Record<string, unknown>;
-
-  /** The token's account number, or the refusal: the rest of what it carries goes no further than here. */
-  const verify = async (b: Record<string, unknown>): Promise<{ sub: string } | Refused> => {
+  return async b => {
     if (deps.audiences.length === 0) return refused(503, 'provider_unavailable');
     try {
       const id = await verifyGoogleIdToken(b.id_token, b.nonce,
@@ -71,6 +71,11 @@ export function registerGoogleRoutes(app: FastifyInstance, deps: GoogleRouteDeps
       return refused(503, 'provider_unavailable');
     }
   };
+}
+
+export function registerGoogleRoutes(app: FastifyInstance, deps: GoogleRouteDeps): void {
+  const { store, accounts } = deps;
+  const verify = googleVerifier(deps);
 
   /** POST /v1/p0/session/google {id_token, nonce, token}, no identity: the linked farm signed in on this phone (its
    *  other phones' tokens revoked, contract §2), or no_farm {pending} for NAME's `Start a new farm` (guest takes it). */
@@ -91,6 +96,13 @@ export function registerGoogleRoutes(app: FastifyInstance, deps: GoogleRouteDeps
     }
     return reply.code(404).send({ ok: false, code: 'no_farm', pending: deps.pending.create('google', { sub: v.sub }) });
   });
+}
+
+/** Not registered in the first version (contract v1.4: switch and link cut — 「换个账号」 is sign out, sign in again); kept
+ *  for a later one. */
+export function registerGoogleLinkRoute(app: FastifyInstance, deps: GoogleRouteDeps): void {
+  const { store, accounts } = deps;
+  const verify = googleVerifier(deps);
 
   /** POST /v1/p0/account/link/google {id_token, nonce}: the farm in hand linked to this Google account; its token only
    *  (an old id alone could otherwise tie someone's farm to a stranger's Google for good). The same account again is
