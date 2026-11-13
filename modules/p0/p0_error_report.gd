@@ -7,6 +7,9 @@ extends Logger
 ## at most once an hour, 20 a session. Only once P0Session.identity_ready (the account's gate, 后裔's PR-A: a token or a
 ## claim, past the age gate): before that, or after it closes again, an error is dropped, never kept to send later.
 ## The engine calls _log_error from any thread: it only queues (under a mutex); drain() sends, on the main thread.
+## A release export reports push_error and the engine's own errors, not GDScript's runtime errors (it does not check
+## them: a missing key goes silently, a call on null crashes — the stores' crash pages see those). Its call stacks are
+## there because the project tracks them (debug/settings/gdscript/always_track_call_stacks; 486 8847765d: < 2 %).
 
 const KIND := "client_error"
 const MESSAGE_MAX := 500
@@ -58,10 +61,13 @@ static func event_of(message: String, stack: String, scene: String) -> Dictionar
 ## the hour, up to SESSION_MAX.
 func drain(session: P0Session, scene: String, now_ms: int) -> void:
 	_mutex.lock()
+	if _pending.is_empty():   # most frames: nothing queued, nothing made (周瑜 on #1006)
+		_mutex.unlock()
+		return
 	var batch := _pending
 	_pending = []
 	_mutex.unlock()
-	if batch.is_empty() or session == null or not session.identity_ready: return
+	if session == null or not session.identity_ready: return
 	for e in batch:
 		if sent >= SESSION_MAX: return
 		var key := str(e[0]) + "|" + str(e[1]).get_slice("\n", 0)

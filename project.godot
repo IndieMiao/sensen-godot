@@ -21,6 +21,10 @@ Net="*res://modules/net/net_service.gd"
 Voice="*res://modules/net/voice_session.gd"
 GlesSunShadows="*res://modules/ui/gles_sun_shadows.gd"
 
+[debug]
+
+settings/gdscript/always_track_call_stacks=true
+
 [display]
 
 window/size/viewport_width=360
