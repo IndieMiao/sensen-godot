@@ -48,31 +48,75 @@ func test_deal_key() -> void:
 	assert_dict(P0Blackjack.deal_key(_view(300), 120)).is_equal({"label": "Deal · 120", "reason": ""})
 	assert_dict(P0Blackjack.deal_key(_view(5000), 1250)).is_equal({"label": "Deal · 1,250", "reason": ""})
 
-## q(320) (the user 11-13, v3 丙): the server's max_deal — what the day's loss of 50 has left — greys the chips over it
-## as the floor does (no words, 不知火舞 11-13) and caps the rebet; none sent (an older server): no cap.
+## q(320) (the user 11-13, 丙): the server's view.blackjack.day {net, limit, left, closed, opens_at}, at the view's clock.
+const NOW := 1_800_000_000_000.0
+const OPENS := NOW + (5 * 60 + 12) * 60000.0
+
+func _day_view(coins: int, net: int, now := NOW) -> Dictionary:
+	var left := maxi(0, 50 + net)
+	left -= left % 5
+	var v := _view(coins, null, {"day": {"net": net, "limit": 50, "left": left, "closed": left < 5, "opens_at": OPENS}})
+	v["now"] = now
+	return v
+
+## What is left to lose greys the chips over it as the floor does (no words, 不知火舞 11-13) and caps the rebet; an older
+## server sends no day: no limit.
 func test_chips_and_the_rebet_keep_inside_the_days_loss() -> void:
-	assert_int(P0Blackjack.max_deal(_view(300))).is_equal(-1)
-	assert_bool(P0Blackjack.can_add(_view(300), 120, 100)).is_true()   # no max_deal: the wallet alone
-	var v := _view(300, null, {"max_deal": 10})
+	assert_int(P0Blackjack.day_left(_view(300))).is_equal(-1)
+	assert_bool(P0Blackjack.can_add(_view(300), 120, 100)).is_true()   # no day: the wallet alone
+	assert_bool(P0Blackjack.day_closed(_view(300))).is_false()
+	var v := _day_view(300, -38)   # 10 left
 	assert_bool(P0Blackjack.can_add(v, 5, 5)).is_true()
 	assert_bool(P0Blackjack.can_add(v, 10, 5)).is_false()
 	assert_bool(P0Blackjack.can_add(v, 0, 50)).is_false()
 	assert_int(P0Blackjack.deal_again_bet(v, 120)).is_equal(10)
-	assert_int(P0Blackjack.deal_again_bet(_view(300, null, {"max_deal": 0}), 120)).is_equal(0)
-	assert_int(P0Blackjack.deal_again_bet(_view(142, null, {"max_deal": 250}), 120)).is_equal(100)   # the wallet the lower
+	assert_bool(P0Blackjack.day_closed(v)).is_false()
+	var shut := _day_view(300, -46)
+	assert_bool(P0Blackjack.day_closed(shut)).is_true()
+	assert_int(P0Blackjack.deal_again_bet(shut, 120)).is_equal(0)
+	assert_bool(P0Blackjack.can_add(shut, 0, 5)).is_false()
+	assert_int(P0Blackjack.deal_again_bet(_day_view(142, 200), 120)).is_equal(100)   # 250 left: the wallet the lower
+	assert_bool(P0Blackjack.can_add(_day_view(2000, 500), 0, 500)).is_true()   # up 500: the 500 lights (q(320) risk)
+
+## `Today −20` / `Today +35` under the pill (U+2212, none at 0); `Opens in 5h 12m` to the day change; past it (the page
+## left open over 04:00) a new day: nothing lost, the table open, as the next command finds it.
+func test_today_and_the_day_change() -> void:
+	assert_str(P0Blackjack.today_text(_day_view(300, -20))).is_equal("Today \u221220")
+	assert_str(P0Blackjack.today_text(_day_view(300, 35))).is_equal("Today +35")
+	assert_str(P0Blackjack.today_text(_day_view(5000, 1300))).is_equal("Today +1,300")
+	assert_str(P0Blackjack.today_text(_day_view(300, 0))).is_equal("")
+	assert_str(P0Blackjack.today_text(_view(300))).is_equal("")
+	assert_str(P0Blackjack.opens_in(_day_view(300, -46))).is_equal("Opens in 5h 12m")
+	assert_str(P0Blackjack.opens_in(_day_view(300, -46, OPENS - 30 * 1000.0))).is_equal("Opens in 1m")
+	assert_str(P0Blackjack.opens_in(_view(300))).is_equal("")
+	var next := _day_view(300, -46, OPENS)
+	assert_bool(P0Blackjack.day_closed(next)).is_false()
+	assert_int(P0Blackjack.day_left(next)).is_equal(50)
+	assert_str(P0Blackjack.today_text(next)).is_equal("")
+	assert_int(P0Blackjack.deal_again_bet(next, 20)).is_equal(20)
+
+## Lou's opening line with the table closed for the day (9.18.7 ⑤), over the short-of-coins one when both hold.
+func test_lou_says_the_table_is_done_for_the_day() -> void:
+	var v := _day_view(300, -46)
+	assert_str(str(P0Logic.keeper_lines(v, "casino").greet)).is_equal("That's enough cards for one day. Table opens in 5h 12m.")
+	assert_str(str(P0Logic.keeper_lines(_day_view(43, -46), "casino").greet)).is_equal("That's enough cards for one day. Table opens in 5h 12m.")
+	assert_str(str(P0Logic.keeper_lines(_day_view(300, -45), "casino").greet)).is_equal("Pull up a chair. Care for a hand?")
+	assert_str(str(P0Logic.keeper_lines(_day_view(43, -45), "casino").greet)).is_equal("Keep those coins for seeds. Come back with a few more.")
 
 func test_mock_keeps_the_days_loss_when_set() -> void:
 	var m := P0BlackjackMock.new(1)
+	assert_that(m.decorate({"coins": 1000}).blackjack.day).is_null()   # unset: no limit, as an older server
+	m = P0BlackjackMock.new(1)
 	m.day_loss = 50
 	m.day_net = -38
-	var st := {"coins": 1000}
+	var st := {"coins": 1000, "now": NOW}
 	var r := m.command({"type": "bj_deal", "bet": 15}, st)
 	assert_str(str(r.get("code", ""))).is_equal("bj_day_cap")
-	assert_int(int((r.detail as Dictionary).left)).is_equal(10)
-	var bj: Dictionary = m.decorate(st.duplicate()).blackjack
-	assert_int(int(bj.max_deal)).is_equal(10)
+	assert_dict(r.detail).is_equal({"cap": "loss", "net": -38, "resets_at": OPENS})   # the server's shape
+	var day: Dictionary = m.decorate(st.duplicate()).blackjack.day
+	assert_dict(day).is_equal({"net": -38, "limit": 50, "left": 10, "closed": false, "opens_at": OPENS})
 	m.day_net = -46
-	assert_str(str(m.decorate(st.duplicate()).blackjack.day.capped)).is_equal("loss")
+	assert_bool(bool(m.decorate(st.duplicate()).blackjack.day.closed)).is_true()
 
 func test_deal_again_steps_down_to_what_keeps_40() -> void:
 	assert_int(P0Blackjack.deal_again_bet(_view(300), 120)).is_equal(120)

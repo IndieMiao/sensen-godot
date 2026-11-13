@@ -3,9 +3,11 @@ extends RefCounted
 ## What the Barbary Card Room's Blackjack page shows, from the P0 server view (SGODOT-351; plan v4.3 §3 / §6,
 ## 不知火舞 on 351 7cdf40a9; server contract 后裔 on 351 b610f98a). Pure functions, unit-tested; P0BlackjackPage only
 ## draws them. Bets are coins drawn as chips (no chip currency); after a bet, a double or a split the wallet keeps at
-## least the floor (40), so a wallet under floor + 5 cannot open a hand. Test phase: no bet or daily limit.
+## least the floor (40), so a wallet under floor + 5 cannot open a hand. No cap on a bet; a new bet may not take the
+## day's net past −50 (q(320), the server's view.blackjack.day).
 ## Cards are two characters, rank A 2–9 T J Q K and suit S H D C ("TH", "QS"); a face-down card is "".
 
+const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the view's clock (now_ms)
 const CHIPS := [5, 10, 50, 100, 500, 1000]
 const FLOOR := 40
 const MIN_BET := 5
@@ -107,16 +109,44 @@ static func need_text(n: int) -> String: return "Need %s more coins" % comma(n)
 static func low_on_coins(view: Dictionary) -> bool:
 	return coins_of(view) - min_bet_of(view) < floor_of(view)
 
-## q(320) (the user 11-13, v3 丙): the most this deal may stake, the server's view.blackjack.max_deal — what the day's
-## loss of 50 has left; -1 when there is no cap (none sent: an older server, or no cap set).
-static func max_deal(view: Dictionary) -> int:
-	var m = info(view).get("max_deal", null)
-	return -1 if m == null else int(m)
+## q(320) (the user 11-13, 丙): the day's loss, the server's view.blackjack.day {net, limit, left, closed, opens_at};
+## {} from an older server (no limit). Past opens_at (the page left open over the day change) it is a new day — nothing
+## won or lost, the whole limit left — as the next command finds it on the server.
+static func day(view: Dictionary) -> Dictionary:
+	var d = info(view).get("day", null)
+	if not d is Dictionary: return {}
+	if d.get("opens_at", null) != null and P0Travel.now_ms(view) >= float(d.opens_at):
+		return {"net": 0, "limit": int(d.get("limit", 0)), "left": int(d.get("limit", 0)), "closed": false, "opens_at": null}
+	return d
+
+## What is left to lose today and so the most a deal may stake; -1 with no limit.
+static func day_left(view: Dictionary) -> int:
+	var d := day(view)
+	return -1 if d.is_empty() else int(d.get("left", 0))
 
 ## Whether `stake` stays inside what the day's loss has left.
 static func within_day(view: Dictionary, stake: int) -> bool:
-	var m := max_deal(view)
+	var m := day_left(view)
 	return m < 0 or stake <= m
+
+## The table closed for the day (less than the smallest bet left to lose, 9.18.7 ⑤).
+static func day_closed(view: Dictionary) -> bool: return bool(day(view).get("closed", false))
+
+## Under the coins pill (q(320)): `Today −20` / `Today +35`, the day's net with U+2212; "" at 0 or with no limit.
+static func today_text(view: Dictionary) -> String:
+	var net := int(day(view).get("net", 0))
+	if net == 0: return ""
+	return "Today %s" % (("+" if net > 0 else "−") + comma(absi(net)))
+
+## How long until the day change, as a sentence says it (`5h 12m`, P0Logic.span); "" with no limit.
+static func opens_span(view: Dictionary) -> String:
+	var at = day(view).get("opens_at", null)
+	return P0Logic.span(float(at) - P0Travel.now_ms(view)) if at != null else ""
+
+## Under `Daily limit reached`: `Opens in 5h 12m`.
+static func opens_in(view: Dictionary) -> String:
+	var t := opens_span(view)
+	return "Opens in %s" % t if t != "" else ""
 
 ## A chip can go on the bet only if the wallet still keeps the floor (7cdf40a9 ③) and the day's loss is not passed by
 ## it (q(320): the same grey, no words — 不知火舞 11-13).
@@ -127,7 +157,7 @@ static func can_add(view: Dictionary, bet: int, value: int) -> bool:
 ## has left (q(320)), in steps of 5; it does not climb back on its own. 0 when not even the smallest bet fits.
 static func deal_again_bet(view: Dictionary, last_bet: int) -> int:
 	var b := mini(last_bet, coins_of(view) - floor_of(view))
-	if max_deal(view) >= 0: b = mini(b, max_deal(view))   # q(320): no more than the day's loss has left
+	if day_left(view) >= 0: b = mini(b, day_left(view))   # q(320): no more than the day's loss has left
 	b -= posmod(b, step_of(view))
 	return b if b >= min_bet_of(view) else 0
 

@@ -8,6 +8,7 @@ extends RefCounted
 ## it moved over the real view. Rules as §3: 4 decks reshuffled each hand, S17, peek on A / 10, 3:2 rounded down,
 ## double on the first two, one split (split aces one card each). Never ships enabled: nothing here is persisted.
 
+const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the view's clock (now_ms)
 const FILE := "user://p0_bj_mock"
 
 static func wanted() -> bool:
@@ -18,11 +19,13 @@ static func allowed(has_feature: Callable, switched_on: bool) -> bool:
 	return switched_on and bool(has_feature.call("editor"))
 
 var floor_coins := 40
-## q(320) (the user 11-13, v3 丙) as the server holds it, when set (50): no deal past the day's loss by its own stake;
-## this run's net stands for the day's (the mock keeps no day). -1, the default: no cap — the page's other states are
-## built and shot with larger stakes; a test or a shot of the cap sets it.
+## q(320) (the user 11-13, 丙) as the server holds it, when set (50): no deal past the day's loss by its own stake;
+## this run's net stands for the day's (the mock keeps no day). -1, the default: no limit and no view.blackjack.day —
+## the page's other states are built and shot with larger stakes; a test or a shot of the limit sets it.
 var day_loss := -1
 var day_net := 0
+## How far off the day change is, for `Opens in 5h 12m` (the frames' figure).
+var day_change_in_ms := (5 * 60 + 12) * 60000.0
 var intro := false
 var n := 0
 var last_bet := 0
@@ -45,7 +48,7 @@ func _init(seed_ := 0) -> void:
 func decorate(state: Dictionary) -> Dictionary:
 	if state.get("_bj_mock", false): return state
 	state["coins"] = int(state.get("coins", seed_coins)) + delta
-	state["blackjack"] = _view(int(state.coins))
+	state["blackjack"] = _view(state)
 	state["_bj_mock"] = true
 	return state
 
@@ -77,8 +80,8 @@ func command(cmd: Dictionary, state: Dictionary) -> Dictionary:
 			if typeof(bet) != TYPE_INT and typeof(bet) != TYPE_FLOAT or int(bet) < 5 or int(bet) % 5 != 0:
 				return _refuse(state, "bj_bad_bet", {})
 			if not _hand.is_empty(): return _refuse(state, "bj_in_hand", {})
-			if day_loss >= 0 and int(bet) > _max_deal():
-				return _refuse(state, "bj_day_cap", {"cap": "loss", "net": day_net, "loss": day_loss, "win": null, "left": _max_deal()})
+			if day_loss >= 0 and int(bet) > _day_left():
+				return _refuse(state, "bj_day_cap", {"cap": "loss", "net": day_net, "resets_at": _day_change(state)})
 			if coins - int(bet) < floor_coins:
 				return _refuse(state, "bj_no_coins", {"need": int(bet) + floor_coins - coins, "have": coins, "floor": floor_coins})
 			events.append_array(_deal(int(bet)))
@@ -255,18 +258,20 @@ func _settle(why: String, coins: int) -> Array:
 
 # ---------------------------------------------------------------- view
 
-## What a deal may stake now: what the day's loss has left, in fives (0 under the minimum: the table is closed).
-func _max_deal() -> int:
+## What a deal may stake now: what the day's loss has left, in fives (under the minimum: the table is closed).
+func _day_left() -> int:
 	var room := maxi(0, day_loss + day_net)
 	return room - room % 5
 
-func _view(coins: int) -> Dictionary:
+func _day_change(state: Dictionary) -> float: return P0Travel.now_ms(state) + day_change_in_ms
+
+func _view(state: Dictionary) -> Dictionary:
 	var capped := day_loss >= 0
-	return {"open": true, "intro": intro, "floor": floor_coins, "min_bet": 5, "step": 5,
-		"chips": P0Blackjack.CHIPS, "max_bet": null, "max_deal": _max_deal() if capped else null,
-		"day": {"net": day_net, "loss": day_loss if capped else null, "win": null, "capped": "loss" if capped and _max_deal() < 5 else null},
-		"last_bet": mini(last_bet, _max_deal()) if capped else last_bet, "hand": null if _hand.is_empty() else _hand_view(coins),
-		"last": last}
+	return {"open": true, "intro": intro, "floor": floor_coins, "min_bet": 5, "step": 5, "chips": P0Blackjack.CHIPS,
+		"day": {"net": day_net, "limit": day_loss, "left": _day_left(), "closed": _day_left() < 5,
+			"opens_at": _day_change(state)} if capped else null,
+		"last_bet": mini(last_bet, _day_left()) if capped else last_bet,
+		"hand": null if _hand.is_empty() else _hand_view(int(state.coins)), "last": last}
 
 func _hand_view(coins := -1) -> Dictionary:
 	var i := int(_hand.active)
