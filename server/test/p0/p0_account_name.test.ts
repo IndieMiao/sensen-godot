@@ -42,6 +42,16 @@ describe('player names (q(313))', () => {
     no('Zá̂̃̄lgo', 'chars', 'bad_char');   // a stack of marks, not a letter's accents
   });
 
+  it("refuses what draws as nothing, and marks of scripts the fonts don't draw (哪吒 11-13)", () => {
+    // variation selectors, the grapheme joiner, Mongolian and Khmer ones (marks); the Hangul fillers (letters)
+    for (const c of ['\uFE0F', '\uFE00', '\u{E0100}', '\u034F', '\u180B', '\u17B4', '\u3164', '\u1160', '\u115F', '\uFFA0'])
+      no(`Tom${c}`, 'chars', 'bad_char');
+    no('Tom\u0E31', 'chars', 'bad_char');   // a Thai mark on a Latin letter
+    no('Tom\u093F', 'chars', 'bad_char');   // a Devanagari one
+    for (const s of ['Rene\u0301', 'Nguyễn Thị', 'Nguye\u0302\u0303n', 'ガギ', 'ミア\u309A', '한글'])
+      ok(s);   // accents written apart, Vietnamese's two, a kana voicing mark with no composed form
+  });
+
   it('does not mix Latin with Cyrillic or Greek, but Latin goes with CJK; a mix reads blocked (spec v1.1 §1.5)', () => {
     no('Pаul', 'blocked', 'mixed_script');   // Cyrillic а
     no('Pαul', 'blocked', 'mixed_script');   // Greek α

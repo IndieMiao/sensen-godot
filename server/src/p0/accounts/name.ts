@@ -66,13 +66,20 @@ export function normalizeName(raw: string): string {
 const segmenter = new Intl.Segmenter('und', { granularity: 'grapheme' });
 export const graphemes = (s: string): string[] => [...segmenter.segment(s)].map(g => g.segment);
 
-const LETTER = /^[\p{Script_Extensions=Latin}\p{Script_Extensions=Greek}\p{Script_Extensions=Cyrillic}\p{Script_Extensions=Han}\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Hangul}]$/u;
-const MARK = /^\p{M}$/u;
+const DRAWN = '\\p{Script_Extensions=Latin}\\p{Script_Extensions=Greek}\\p{Script_Extensions=Cyrillic}\\p{Script_Extensions=Han}' +
+  '\\p{Script_Extensions=Hiragana}\\p{Script_Extensions=Katakana}\\p{Script_Extensions=Hangul}';
+const LETTER = new RegExp(`^[${DRAWN}]$`, 'u');
+/** A mark of the drawn scripts or a shared one (the accents); a Thai or Devanagari mark draws as a box like its letters. */
+const MARK = new RegExp(`^(?=\\p{M})[${DRAWN}\\p{Script_Extensions=Inherited}]$`, 'u');
+/** Drawn as nothing (哪吒 11-13): the variation selectors and the grapheme joiner are marks, the Hangul fillers letters,
+ *  and none of them goes away in NFKC — Unicode's Default_Ignorable_Code_Point, refused wherever it stands. */
+const INVISIBLE = /\p{Default_Ignorable_Code_Point}/u;
 const OTHER = /^[0-9 \-_.']$/;
 const MARKS_MAX = 2;   // a letter's own accents (Vietnamese needs two), never a stack of them
 
 /** Every grapheme starts with a letter of the drawn scripts, a digit, a space or `-_.'`, and carries at most two marks. */
 function charsOk(name: string): boolean {
+  if (INVISIBLE.test(name)) return false;
   for (const g of graphemes(name)) {
     const cps = [...g];
     const base = cps[0];
