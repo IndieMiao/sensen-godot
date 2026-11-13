@@ -63,7 +63,7 @@
 - OSS：`https://oss2.sensenjoy.cn/p0/demo/releases/p0-demo-20261113-6ef956f04a74/sensen-p0-demo-0.3.10.apk`。发布脚本已经上传，但最后一步整包下载回读两次都在 600 s 超时（当天出包机到美西的下载很慢）。改用等价的核对方法：OSS 的 `x-oss-hash-crc64ecma`（4541581189220147071）等于本地 APK 的 CRC-64；线上 `SHA256SUMS`、`release.json` 和本地生成的逐字节一致（`backend_image` `p0-server:6076ac2c7`、源码 `88a1afe2`）；Range 206 正常。
 - 源码：farm-dev `88a1afe2`（tag `p0-v7-0.3.10-client`）。证书 `38771d94…`，和 0.3.9 一致。导出预设 `Android P0` 的 custom_features 只有 `p0`（是 OSS 包）。
 - 服务端：不变，不部署。镜像打包的全部输入路径和 `6076ac2c7` 比，只差运维脚本 `deploy-hk.sh`（#1005）和 `p0-report.sh`（#998），都不进运行时。
-- 测试（`88a1afe2`，出包机 headless）：ui_kit 340、localization 49、net 116、ui 95、scenes 61、shaders 17、assembly 27、ponds 32、mining 66 全过。p0 2143 例里有 1 例 error（`test_p0_line.gd` › `test_no_answer_waits_its_live_seconds`），landmark 30 例里有 7 处 failure（都在 `test_landmark_stick_slide.gd`，「the navigation never synced」）。两条都是测试本身计时不稳：按帧数去等墙钟时间或物理帧，headless 不封帧率、帧跑得快时就会超时，在 0.3.9 的冻结头上同样能复现，被测代码也没改过（审核者结论）。用窗口模式重跑这两个文件，4/4、16/16 全过，按「测试计时不稳」放行；测试的修法另开 PR。
+- 测试（`88a1afe2`，出包机 headless）：ui_kit 340、localization 49、net 116、ui 95、scenes 61、shaders 17、assembly 27、ponds 32、mining 66 全过。p0 2143 例里有 1 例 error（`test_p0_line.gd` › `test_no_answer_waits_its_live_seconds`），landmark 33 例里，`test_landmark_stick_slide.gd` 的第一条出了 7 处 failure（「the navigation never synced」），同文件另外 3 条因此没跑，报告只计到 30 例。两条都是测试本身计时不稳：按帧数去等墙钟时间或物理帧，headless 不封帧率、帧跑得快时就会超时，在 0.3.9 的冻结头上同样能复现，被测代码也没改过（审核者结论）。用窗口模式重跑这两个文件，4/4（补上了没跑的 3 条）、16/16 全过，按「测试计时不稳」放行；测试的修法见 #1010。
 - 冒烟（连 devserver 上和正式服同镜像的空数据服）：个人页没有 Voice Profile 那一行，其余几行布局正常（英文、中文都看了）；旅行卡金币不够时显示正常（中文）；Release 冷启动两次没有报错；正式服上用已有测试号从 0.3.9 覆盖安装到 0.3.10，存档不变。报错上报（#1006）在客户端没看到发出请求；测试服不逐条记请求，服务端那头核不了。按代码，要等玩家身份就绪（账号 PR-A，还没合）才会发。
 
 iOS（SGODOT-356）：
