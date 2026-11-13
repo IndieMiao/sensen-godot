@@ -22,12 +22,17 @@ export const BJ_CHIPS = [5, 10, 50, 100, 500, 1000];
 export const BJ_MIN_BET = 5;
 export const BJ_STEP = 5;
 export const BJ_EXPIRE_MS = 24 * 3_600_000;
-/** q(320) (the user's numbers pending; placeholders until then, 奕星 11-13): a deal's stake at most — Double and Split
- * take it to twice by the rules — and the day's net at which no new hand is dealt, lost or won. Every build alike: the
- * server takes no channel header for a boundary. */
-export const BJ_MAX_BET = 1000;
-export const BJ_DAY_LOSS = 2000;
-export const BJ_DAY_WIN = 2000;
+/**
+ * q(320) (the user's numbers pending; placeholders until then — 奕星's review recommends 20 / 50 / 50): a deal's stake
+ * at most, and the day's net at which no new hand is dealt, lost or won. `line` (q(320) v3 甲): the day's net is looked
+ * at before a deal only, so a hand may end past it (Double and Split take a stake to twice by the rules: −89 at worst,
+ * −85 as a rule). `mid` (v3 丙, 奕星 recommends it): the deal's own stake may not take the day past its loss either —
+ * bj_day_cap, the chips over what is left grey — Double and Split still unchecked (−70 at worst); under the table
+ * minimum left, the table closes. Every build
+ * alike: the server takes no channel header for a boundary. An object, so a test sets the numbers it is about.
+ */
+export const bjCaps: { maxBet: number; dayLoss: number; dayWin: number; mode: 'line' | 'mid' } =
+  { maxBet: 1000, dayLoss: 2000, dayWin: 2000, mode: 'line' };
 const RANKS = 'A23456789TJQK';
 const SUITS = 'SHDC';
 
@@ -105,10 +110,15 @@ const refuse = (code: string, detail?: Record<string, unknown>): Refusal => ({ c
 /** The day's net the caps read: hands begun today (day.bj_net). Both callers have rolled the day first (applyP0's
  *  rollDay, viewOf), so a new day's is 0. */
 const dayNet = (s: P0State) => s.day.bj_net ?? 0;
-/** Why no new hand is dealt today (null: one may be): the day's loss or win reached (q(320)). The hand in play plays on. */
+/** The most a deal may stake now: the cap, and in `mid` no more than the day's loss has left (in fives). */
+const maxDeal = (s: P0State) => bjCaps.mode === 'mid'
+  ? Math.min(bjCaps.maxBet, Math.max(0, Math.floor((bjCaps.dayLoss + dayNet(s)) / BJ_STEP) * BJ_STEP)) : bjCaps.maxBet;
+/** Why no new hand is dealt today (null: one may be): the day's loss or win reached (q(320)), or in `mid` less than the
+ * table minimum left to lose. The hand in play plays on. */
 function dayCap(s: P0State): 'loss' | 'win' | null {
   const net = dayNet(s);
-  return net <= -BJ_DAY_LOSS ? 'loss' : net >= BJ_DAY_WIN ? 'win' : null;
+  if (net <= -bjCaps.dayLoss || maxDeal(s) < BJ_MIN_BET) return 'loss';
+  return net >= bjCaps.dayWin ? 'win' : null;
 }
 
 /** The dealer draws to 17 (stands on soft 17); not when every hand of the player's has bust. Then each hand is paid:
@@ -207,10 +217,14 @@ export function blackjackCommand(c: P0Content, s: P0State, cmd: BjCommand & { sp
       const bet = cmd.bet;
       if (!Number.isInteger(bet) || bet < BJ_MIN_BET || bet % BJ_STEP !== 0) return refuse('bj_bad_bet', { min: BJ_MIN_BET, step: BJ_STEP });
       if (bj.hand) return refuse('bj_in_hand', { n: bj.hand.n });
-      if (bet > BJ_MAX_BET) return refuse('bj_max_bet', { max: BJ_MAX_BET });
+      // the day's cap before the deal's (both before the coins short, 奕星's review): a closed table says so, whatever the bet
       const cap = dayCap(s);
-      if (cap) return refuse('bj_day_cap', { cap, net: dayNet(s), loss: BJ_DAY_LOSS, win: BJ_DAY_WIN,
+      if (cap) return refuse('bj_day_cap', { cap, net: dayNet(s), loss: bjCaps.dayLoss, win: bjCaps.dayWin,
         resets_at: rolloverAfter(c, s, dayKey(c, s, now)) });
+      if (bet > bjCaps.maxBet) return refuse('bj_max_bet', { max: bjCaps.maxBet });
+      // mid (丙): within the cap but over what the day's loss has left — the day's cap, with what is left
+      if (bet > maxDeal(s)) return refuse('bj_day_cap', { cap: 'loss', net: dayNet(s), loss: bjCaps.dayLoss, win: bjCaps.dayWin,
+        left: maxDeal(s), resets_at: rolloverAfter(c, s, dayKey(c, s, now)) });
       const need = coinsShort(c, s, bet);
       if (need) return refuse('bj_no_coins', { need, have: s.coins, floor: c.wallet_floor });
       const n = bj.n + 1, salt = bjSalt.next();
@@ -293,12 +307,14 @@ export function handView(c: P0Content, s: P0State, h: BjHand, now: number) {
 export function blackjackView(c: P0Content, s: P0State, now: number) {
   const bj = s.blackjack;
   return {
-    open: bjOpen(s), intro: !!bj?.intro, floor: c.wallet_floor, min_bet: BJ_MIN_BET, step: BJ_STEP, chips: BJ_CHIPS,
-    max_bet: BJ_MAX_BET,
-    // q(320): today's net and its caps; `capped` loss / win once no new hand is dealt till the rollover (resets_at)
-    day: { net: dayNet(s), loss: BJ_DAY_LOSS, win: BJ_DAY_WIN, capped: dayCap(s),
+    open: bjOpen(s), intro: !!bj?.intro, floor: c.wallet_floor, min_bet: BJ_MIN_BET, step: BJ_STEP,
+    // q(320): the chips up to the cap (20: 5 and 10, two stacks make every bet), the cap, and what this deal may stake —
+    // the cap in `line`, what the day's loss has left in `mid` (the chips over it grey)
+    chips: BJ_CHIPS.filter(x => x <= bjCaps.maxBet), max_bet: bjCaps.maxBet, max_deal: maxDeal(s),
+    // today's net and its caps; `capped` loss / win once no new hand is dealt till the rollover (resets_at)
+    day: { net: dayNet(s), loss: bjCaps.dayLoss, win: bjCaps.dayWin, capped: dayCap(s),
       resets_at: rolloverAfter(c, s, dayKey(c, s, now)) },
-    last_bet: bj?.last_bet ?? 0,
+    last_bet: Math.min(bj?.last_bet ?? 0, maxDeal(s)),   // the next deal's first bet: a test-phase 50–1000 comes back at the cap
     hand: bj?.hand ? handView(c, s, bj.hand, now) : null,
     last: bj?.last ?? null,
   };
