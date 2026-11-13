@@ -74,6 +74,11 @@ const log = new P0EventLog(eventDir === '' ? undefined : eventDir, undefined, un
 // SGODOT-486: client errors in their own day files beside it (p0-errors-YYYY-MM-DD.jsonl), no player, no IP; kept 30 days
 // unless P0_EVENT_KEEP_DAYS says fewer.
 const errors = new P0EventLog<ErrorRecord>(eventDir === '' ? undefined : eventDir, undefined, undefined, Math.min(eventKeepDays ?? 30, 30), 'p0-errors');
+// Old day files go at start and every 6 hours too, not only on a new day's first line: a quiet log keeps no file past
+// its days (#1013 后裔; the error file may see no line for weeks).
+const pruneLogs = () => { log.prune(Date.now()); errors.prune(Date.now()); };
+pruneLogs();
+setInterval(pruneLogs, 6 * 3_600_000).unref();
 // Outpost rooms (SGODOT-227): WebSocket /v1/p0/online and GET /v1/p0/presence, in memory only. The same rooms
 // give the Tea Host's "N online" in the state view (SGODOT-228).
 // Generated outposts (SGODOT-280) get a room on first join, sized and walled like the room their art stands in for.

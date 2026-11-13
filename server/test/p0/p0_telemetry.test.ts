@@ -299,4 +299,18 @@ describe('client errors (SGODOT-486)', () => {
       expect(JSON.parse(readFileSync(path.join(dir, 'p0-errors-2026-10-08.jsonl'), 'utf8'))).toEqual({ t: T0, message: 'boom', stack: '', scene: 'farm' });
     } finally { rmSync(dir, { recursive: true, force: true }); }
   });
+
+  it('prune(now): with no new error a file older than 30 days still goes; without keep days nothing does (#1013 后裔)', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'p0-errors-'));
+    try {
+      for (const f of ['p0-errors-2026-09-07.jsonl', 'p0-errors-2026-09-08.jsonl', 'p0-events-2026-09-01.jsonl']) writeFileSync(path.join(dir, f), '');
+      new P0EventLog<ErrorRecord>(dir, undefined, undefined, undefined, 'p0-errors').prune(T0);
+      expect(readdirSync(dir)).toHaveLength(3);
+      const errors = new P0EventLog<ErrorRecord>(dir, undefined, undefined, 30, 'p0-errors');
+      errors.prune(T0);   // 2026-10-08: 09-07 is 31 days old
+      expect(readdirSync(dir).sort()).toEqual(['p0-errors-2026-09-08.jsonl', 'p0-events-2026-09-01.jsonl']);
+      errors.prune(T0 + 86_400_000);
+      expect(readdirSync(dir)).toEqual(['p0-events-2026-09-01.jsonl']);   // the events file is the other log's
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
 });

@@ -85,15 +85,20 @@ export class P0EventLog<R extends { t: number } = LogRecord> {
     try { this.sink?.(record); } catch { /* a test sink never breaks a command either */ }
     if (!this.dir || this.broken) return;
     const day = new Date(record.t).toISOString().slice(0, 10);
-    if (day !== this.day) { this.day = day; if (this.keepDays) this.prune(day); }
+    if (day !== this.day) { this.day = day; this.pruneBefore(day); }
     const file = path.join(this.dir, `${this.prefix}-${day}.jsonl`);
     const line = JSON.stringify(record) + '\n';
     try { appendFileSync(file, line); return; } catch { /* the folder may be gone: recreate it once */ }
     try { mkdirSync(this.dir, { recursive: true }); appendFileSync(file, line); } catch (err) { this.stop(err); }
   }
   get stopped(): boolean { return this.broken; }
+  /** Remove the day files older than keepDays as of `now`, though nothing is being written (#1013 后裔: a log with no
+   * new line for weeks — client errors — must not keep files past its days). The server calls it at start and every
+   * 6 hours; write() also does it on a new day's first line. */
+  prune(now: number): void { this.pruneBefore(new Date(now).toISOString().slice(0, 10)); }
   /** Day files older than keepDays before `today`; never this log's other files. A failure here never stops the log. */
-  private prune(today: string): void {
+  private pruneBefore(today: string): void {
+    if (!this.dir || !this.keepDays) return;
     const oldest = new Date(Date.parse(today + 'T00:00:00Z') - this.keepDays! * 86_400_000).toISOString().slice(0, 10);
     try {
       for (const f of readdirSync(this.dir!)) {
