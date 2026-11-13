@@ -28,10 +28,14 @@ class Rig:
 		if bool(r.ok): page.on_events(r.events)
 		else: page.refused(str(r.code), r.get("detail", {}))
 
-func _rig(coins: int, intro := true, last_bet := 0, safe_top := 0.0) -> Rig:
+## `day_net`: the day's loss of 50 set on the mock with this net (q(320)); null: no limit, the other states' stakes.
+func _rig(coins: int, intro := true, last_bet := 0, safe_top := 0.0, day_net = null) -> Rig:
 	var m := P0BlackjackMock.new(11)
 	m.intro = intro
 	m.last_bet = last_bet
+	if day_net != null:
+		m.day_loss = 50
+		m.day_net = int(day_net)
 	var page := P0BlackjackPage.new(m.decorate({"coins": coins}), safe_top, 0.0)
 	page.theme = UiKit.theme()
 	page.animate = OS.get_environment("MOVIE") == "1"
@@ -53,6 +57,9 @@ func _want(name: String) -> bool: return only.is_empty() or name in only
 
 func _run() -> void:
 	await process_frame
+	# P0's language as P0Runtime sets it: SENSEN_LANGUAGE=zh_CN shoots the 中文 build (English otherwise)
+	var loc := root.get_node_or_null("Localization")
+	if loc != null: loc.use_p0("user://p0_bj_shots_no_language")
 	if OS.has_environment("VIDEO"):
 		if OS.get_environment("VIDEO_KIND") == "settle": await _video_settle(OS.get_environment("VIDEO"))
 		elif OS.get_environment("VIDEO_KIND") == "settle-low": await _video_settle(OS.get_environment("VIDEO"), true)
@@ -62,7 +69,7 @@ func _run() -> void:
 	var states := ["bj-bet", "bj-bet-empty", "bj-bet-cap", "bj-drag", "bj-low", "bj-act", "bj-act-grey", "bj-split",
 		"bj-result-blackjack", "bj-result-lose", "bj-result-bust", "bj-result-push", "bj-rules", "bj-intro", "bj-settled",
 		"bj-tall", "bj-short", "bj-result-win", "bj-result-dealer-busts", "bj-result-win-float", "bj-result-blackjack-float",
-		"bj-safe-top"]
+		"bj-safe-top", "q320-bet", "q320-closed", "q320-rules", "q320-intro"]
 	for s in states:
 		if not _want(s): continue
 		var rig: Rig = await call("_state_" + s.replace("-", "_"))
@@ -193,6 +200,28 @@ func _state_bj_rules() -> Rig:
 	_bet(r, [100, 10, 10])
 	await _settle()   # a tap comes after the page is laid out: the rules wrap to its width
 	r.page.open_rules()
+	return r
+
+## q(320) (Figma page 14 row 161): Today −35 with 10 on, only the 5 lit (706:199547); down 50, closed for the day
+## (706:199591); the rules sheet's new lines over Today −20 (706:199683); the first-open card's third paragraph (706:199748).
+func _state_q320_bet() -> Rig:
+	var r := _rig(250, true, 0, 0.0, -35)
+	_bet(r, [10])
+	return r
+
+func _state_q320_closed() -> Rig:
+	return _rig(250, true, 10, 0.0, -50)
+
+func _state_q320_rules() -> Rig:
+	var r := _rig(250, true, 0, 0.0, -20)
+	_bet(r, [10])
+	await _settle()
+	r.page.open_rules()
+	return r
+
+func _state_q320_intro() -> Rig:
+	var r := _rig(250, false, 0, 0.0, 0)
+	r.page.opened()
 	return r
 
 func _state_bj_intro() -> Rig:

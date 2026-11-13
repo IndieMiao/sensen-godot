@@ -7,10 +7,15 @@ var bj: P0BlackjackMock
 var sent: Array = []
 var toasts: Array = []
 
-func _open(coins: int, intro := true, last_bet := 0) -> void:
+## `day_net`: the day's loss of 50 set on the mock (q(320)) with this net; null: unset (no limit), as most tests stake
+## past it.
+func _open(coins: int, intro := true, last_bet := 0, day_net = null) -> void:
 	bj = P0BlackjackMock.new(5)
 	bj.intro = intro
 	bj.last_bet = last_bet
+	if day_net != null:
+		bj.day_loss = 50
+		bj.day_net = int(day_net)
 	sent = []
 	toasts = []
 	page = auto_free(P0BlackjackPage.new(bj.decorate({"coins": coins})))
@@ -225,6 +230,106 @@ func test_low_on_coins_is_the_closed_table() -> void:
 	assert_bool(page.deal_key.enabled).is_false()
 	for c in page.stacks: assert_int((c as UiChipStack).state).is_equal(UiChipToken.State.DISABLED)
 
+## A line's width in a label's own font (does it fit one line).
+func _text_w(l: Label, text: String) -> float:
+	return l.get_theme_font(&"font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x
+
+## q(320) (9.18.7 ⑤, 706:199591): less than 5 left to lose closes the table till the day change — in the circle's place
+## `Daily limit reached` / `Opens in 5h 12m`, every stack grey, `Deal` faded; said over Low on coins when both hold.
+func test_the_days_limit_closes_the_table() -> void:
+	for coins in [300, 43]:
+		_open(coins, true, 20, -46)
+		var why := "wallet %d" % coins
+		assert_bool(page.low_label.visible).append_failure_message(why).is_true()
+		assert_str(page.low_label.text).append_failure_message(why).is_equal("Daily limit reached")
+		assert_str(page.low_need.text).append_failure_message(why).is_equal("Opens in 5h 12m")
+		assert_bool(page.circle.visible).is_false()
+		assert_bool(page.empty_label.visible).is_false()
+		assert_int(page.bet).append_failure_message(why).is_equal(0)   # last bet 20 does not set itself
+		assert_bool(page.deal_key.enabled).is_false()
+		for c in page.stacks: assert_int((c as UiChipStack).state).is_equal(UiChipToken.State.DISABLED)
+		page.tap_chip(0)
+		assert_int(page.bet).is_equal(0)
+	_open(300, true, 0, -45)   # 5 left: open
+	assert_bool(page.low_label.visible).is_false()
+	assert_bool(page.circle.visible).is_true()
+
+## Chips over what is left grey like the floor's (no words); the rebet steps down to it; `Today −35` sits centred under
+## the coins pill (706:199547 / 706:202503) and shows the net however the day stands, none at 0.
+func test_whats_left_greys_the_chips_and_today_sits_under_the_pill() -> void:
+	_open(300, true, 120, -35)   # 15 left
+	assert_int(page.bet).is_equal(15)   # last bet 120 stepped down to what is left
+	page.circle.tapped.emit()
+	assert_int(page.stacks[0].state).is_equal(UiChipToken.State.DEFAULT)
+	assert_int(page.stacks[1].state).is_equal(UiChipToken.State.DEFAULT)
+	for i in range(2, 6): assert_int(page.stacks[i].state).is_equal(UiChipToken.State.DISABLED)
+	page.tap_chip(1)
+	page.tap_chip(0)
+	assert_int(page.bet).is_equal(15)
+	assert_int(page.stacks[0].state).is_equal(UiChipToken.State.DISABLED)   # 20 would pass it
+	assert_bool(page.deal_key.enabled).is_true()
+	assert_str(page.deal_key.reason).is_equal("")
+	assert_bool(page.today_label.visible).is_true()
+	assert_str(page.today_label.text).is_equal("Today \u221235")
+	await _frames()
+	var pill := page.coins_pill.get_global_rect()
+	var today := page.today_label.get_global_rect()
+	assert_float(today.get_center().x).is_equal_approx(pill.get_center().x, 0.5)
+	assert_float(today.position.y).is_equal_approx(pill.end.y + 2.0, 0.5)
+	_open(300, true, 0, 0)
+	assert_bool(page.today_label.visible).is_false()
+	_open(300)   # no limit (an older server): no line
+	assert_bool(page.today_label.visible).is_false()
+
+## Losing into the limit: the hand plays out, then the table closes for the day and Today reads the new net.
+func test_a_loss_into_the_limit_closes_the_table_after_the_result() -> void:
+	_open(500, true, 0, -30)   # 20 left
+	await _deal(["9S", "KD", "8H", "TC"], 20)   # 17 against 20: lose
+	page.act("stand")
+	await _frames()
+	assert_str((page._hands[0].tag as UiBadge).text).is_equal("You lose")
+	assert_str(page.today_label.text).is_equal("Today \u221250")
+	assert_bool(page.low_label.visible).is_true()
+	assert_str(page.low_label.text).is_equal("Daily limit reached")
+	assert_int(page.bet).is_equal(0)
+
+## A deal past the limit (a view behind the server's) comes back bj_day_cap: no toast, the table laid out as the view
+## the refusal carries says — here closed for the day.
+func test_a_day_cap_refusal_says_nothing_and_lays_out_the_view() -> void:
+	_open(300, true, 0, -40)   # 10 left
+	page.tap_chip(1)
+	bj.day_net = -46   # meanwhile lost elsewhere (another device)
+	page.deal(page.bet)
+	await _frames()
+	assert_str(str(sent[-1].type)).is_equal("bj_deal")
+	assert_array(toasts).is_empty()
+	assert_str(page.low_label.text).is_equal("Daily limit reached")
+	assert_int(page.bet).is_equal(0)
+
+## Open over the day change: past opens_at by the view's clock the table opens again with nothing lost (the server rolls
+## its day on the next command); `Opens in` counts down with the clock till then.
+func test_the_closed_table_counts_down_and_opens_at_the_day_change() -> void:
+	_open(300, true, 0, -46)
+	var v: Dictionary = page.view.duplicate(true)
+	var opens := float(v.blackjack.day.opens_at)
+	v["now"] = opens - 10 * 60000.0
+	page.refresh(v)
+	await _frames()
+	assert_str(page.low_need.text).is_equal("Opens in 10m")
+	v = v.duplicate(true)
+	v["now"] = opens - 90 * 1000.0   # the clock alone moved on
+	page.refresh(v)
+	await _frames()
+	assert_str(page.low_need.text).is_equal("Opens in 2m")
+	var after := v.duplicate(true)
+	after["now"] = opens + 1000.0
+	page.refresh(after)
+	await _frames()
+	assert_bool(page.low_label.visible).is_false()
+	assert_bool(page.circle.visible).is_true()
+	assert_bool(page.today_label.visible).is_false()
+	assert_int(page.stacks[2].state).is_equal(UiChipToken.State.DEFAULT)   # 50 fits a new day
+
 func test_a_hand_in_play_comes_back_as_it_was() -> void:
 	bj = P0BlackjackMock.new(5)
 	bj.next_deck = ["9S", "7D", "8H", "TC"]
@@ -265,6 +370,13 @@ func test_first_open_shows_the_card_and_got_it_records_it() -> void:
 	assert_str(page.intro_card.body.text).is_equal("Tap or drag chips onto the circle, then tap Deal.")
 	assert_str(page.intro_floor.text).ends_with("least" + P0BlackjackPage.NBSP + "40.")
 	assert_object(page.intro_floor.get_parent()).is_same(page.intro_card.body.get_parent())
+	# q(320) note 2 (706:199748): a third paragraph after the floor's, in two lines broken at `50 coins / down for the day.`
+	assert_str(page.intro_limit.text).is_equal("A new bet can't go past 50\u00a0coins down\u00a0for\u00a0the\u00a0day.")
+	assert_int(page.intro_limit.get_index()).is_equal(page.intro_floor.get_index() + 1)
+	assert_str(str(page.intro_limit.theme_type_variation)).is_equal(str(UiTokens.STYLE_BODY_R14))
+	await _frames()
+	assert_int(page.intro_limit.get_line_count()).is_equal(2)
+	assert_float(_text_w(page.intro_limit, "A new bet can't go past 50 coins")).is_less_equal(page.intro_limit.size.x)
 	page.intro_card.primary_pressed.emit()
 	assert_bool(page.intro_layer.visible).is_false()
 	assert_dict(sent[-1]).is_equal({"type": "bj_intro"})
@@ -279,6 +391,17 @@ func test_rules_sheet_and_back() -> void:
 	assert_float(page.rules_sheet.height).is_between(300.0, 560.0)
 	var texts: Array = page.rules_sheet.body.get_children().filter(func(c): return c is Label).map(func(l): return l.text)
 	assert_str(str(texts[1])).starts_with("1. Get closer to 21")
+	# q(320) note 2 (706:199683): under the footer, the new bet's rule then (U+2028) `Doubles and splits aren't limited.`,
+	# each a line of its own
+	assert_str(str(texts[-2])).is_equal("Bets are coins. You always keep at least 40 coins.")
+	assert_str(str(texts[-1])).is_equal("A new bet can't go past 50\u00a0coins down for the day.\u2028Doubles and splits aren't limited.")
+	var lim := page.rules_limit
+	assert_int(lim.get_line_count()).is_equal(2)
+	var para := TextParagraph.new()   # U+2028 breaks the line however wide: Godot's mandatory break, not a wrap
+	para.add_string(lim.text, lim.get_theme_font(&"font"), lim.get_theme_font_size(&"font_size"))
+	para.width = 4000.0
+	assert_int(para.get_line_count()).is_equal(2)
+	assert_float(_text_w(lim, "A new bet can't go past 50 coins down for the day.")).is_less_equal(lim.size.x)
 	var close := page.rules_sheet.body.get_children().filter(func(c): return c is UiDismissButton)[0] as UiDismissButton
 	assert_str(close.text).is_equal("Close")
 	close.pressed.emit()
