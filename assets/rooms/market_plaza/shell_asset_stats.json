@@ -27,36 +27,36 @@
       "bytes": 25876
     },
     "facade_sf_0": {
-      "triangles": 5125,
-      "bytes": 365728
+      "triangles": 5149,
+      "bytes": 367796
     },
     "facade_sf_1": {
-      "triangles": 5292,
-      "bytes": 381236
+      "triangles": 5316,
+      "bytes": 383300
     },
     "facade_sf_2": {
-      "triangles": 5125,
-      "bytes": 365732
+      "triangles": 5149,
+      "bytes": 367796
     },
     "facade_sf_3": {
-      "triangles": 5292,
-      "bytes": 381236
+      "triangles": 5316,
+      "bytes": 383300
     },
     "facade_generic_0": {
-      "triangles": 4589,
-      "bytes": 320740
+      "triangles": 4613,
+      "bytes": 322808
     },
     "facade_generic_1": {
-      "triangles": 4844,
-      "bytes": 344456
+      "triangles": 4868,
+      "bytes": 346520
     },
     "facade_generic_2": {
-      "triangles": 4588,
-      "bytes": 320616
+      "triangles": 4612,
+      "bytes": 322680
     },
     "facade_generic_3": {
-      "triangles": 4756,
-      "bytes": 336248
+      "triangles": 4780,
+      "bytes": 338316
     },
     "mp_keeper_flowerbed": {
       "triangles": 5072,
@@ -91,20 +91,20 @@
       "bytes": 17568
     },
     "facade_sf_4": {
-      "triangles": 5125,
-      "bytes": 365732
+      "triangles": 5149,
+      "bytes": 367796
     },
     "facade_sf_5": {
-      "triangles": 5292,
-      "bytes": 381236
+      "triangles": 5316,
+      "bytes": 383300
     },
     "facade_sf_6": {
-      "triangles": 5125,
-      "bytes": 365732
+      "triangles": 5149,
+      "bytes": 367796
     },
     "facade_sf_7": {
-      "triangles": 5292,
-      "bytes": 381236
+      "triangles": 5316,
+      "bytes": 383300
     }
   }
 }

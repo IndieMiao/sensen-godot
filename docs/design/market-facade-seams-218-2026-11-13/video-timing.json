@@ -1,0 +1,26 @@
+{
+  "opening": {},
+  "seams": {},
+  "video": {
+    "generic": {
+      "frames": 360,
+      "pitch": 33,
+      "seconds": 12,
+      "target_speed_mps": 2.23333333333333,
+      "width": 7.70607471466064,
+      "world_path_m": 26.8,
+      "yaw": 45
+    },
+    "san_francisco": {
+      "frames": 360,
+      "pitch": 33,
+      "seconds": 12,
+      "target_speed_mps": 2.23333333333333,
+      "width": 7.70607471466064,
+      "world_path_m": 26.8,
+      "yaw": 45
+    }
+  },
+  "video_end_frame": 900,
+  "video_start_frame": 120
+}

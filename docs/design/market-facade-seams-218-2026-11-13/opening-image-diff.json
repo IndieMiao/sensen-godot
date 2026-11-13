@@ -1,0 +1,14 @@
+{
+  "san_francisco": {
+    "threshold_rgb255": 2,
+    "changed_pixels": 13,
+    "fraction": 4.513888888888889e-05,
+    "mean_absolute_rgb255": 0.00038310185185185186
+  },
+  "generic": {
+    "threshold_rgb255": 2,
+    "changed_pixels": 1104,
+    "fraction": 0.003833333333333333,
+    "mean_absolute_rgb255": 0.07677083333333333
+  }
+}

@@ -1,0 +1,567 @@
+{
+  "opening": {
+    "generic_after": {
+      "actor": [
+        13.875,
+        0.0499999970197678,
+        -2.17499995231628
+      ],
+      "position": [
+        24.8965950012207,
+        15.2998933792114,
+        8.8965950012207
+      ],
+      "variant": "generic",
+      "width": 7.70607471466064
+    },
+    "generic_before": {
+      "actor": [
+        13.875,
+        0.0499999970197678,
+        -2.17499995231628
+      ],
+      "position": [
+        24.8965950012207,
+        15.2998933792114,
+        8.8965950012207
+      ],
+      "variant": "generic",
+      "width": 7.70607471466064
+    },
+    "san_francisco_after": {
+      "actor": [
+        13.875,
+        0.0499999970197678,
+        -2.17499995231628
+      ],
+      "position": [
+        24.8965950012207,
+        15.2998933792114,
+        8.8965950012207
+      ],
+      "variant": "san_francisco",
+      "width": 7.70607471466064
+    },
+    "san_francisco_before": {
+      "actor": [
+        13.875,
+        0.0499999970197678,
+        -2.17499995231628
+      ],
+      "position": [
+        24.8965950012207,
+        15.2998933792114,
+        8.8965950012207
+      ],
+      "variant": "san_francisco",
+      "width": 7.70607471466064
+    }
+  },
+  "seams": {
+    "generic_after_corner": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_after_north_-4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        12.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -4.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_after_north_0": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        16.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        0.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_after_north_4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        20.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        4.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_after_west_-4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        12.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        -4.0
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_after_west_0": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        16.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        0.0
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_after_west_4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        20.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        4.0
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_before_corner": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_before_north_-4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        12.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -4.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_before_north_0": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        16.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        0.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_before_north_4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        20.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        4.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_before_west_-4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        12.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        -4.0
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_before_west_0": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        16.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        0.0
+      ],
+      "width": 7.70607471466064
+    },
+    "generic_before_west_4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        20.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        4.0
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_after_corner": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_after_north_-4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        12.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -4.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_after_north_0": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        16.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        0.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_after_north_4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        20.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        4.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_after_west_-4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        12.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        -4.0
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_after_west_0": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        16.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        0.0
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_after_west_4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        20.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        4.0
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_before_corner": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_before_north_-4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        12.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -4.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_before_north_0": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        16.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        0.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_before_north_4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        20.604829788208,
+        18.6498928070068,
+        8.70483016967773
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        4.0,
+        3.40000009536743,
+        -7.90000009536743
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_before_west_-4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        12.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        -4.0
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_before_west_0": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        16.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        0.0
+      ],
+      "width": 7.70607471466064
+    },
+    "san_francisco_before_west_4": {
+      "magnification": "2x native portrait pixel dimensions; same yaw/pitch and world width",
+      "position": [
+        8.70483016967773,
+        18.6498928070068,
+        20.604829788208
+      ],
+      "resolution": [
+        720,
+        1600
+      ],
+      "target": [
+        -7.90000009536743,
+        3.40000009536743,
+        4.0
+      ],
+      "width": 7.70607471466064
+    }
+  },
+  "video": {}
+}
