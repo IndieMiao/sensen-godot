@@ -105,6 +105,15 @@ export class P0Accounts {
     delete row[provider];
     this.flush();
   }
+  /** Whether the account is anyone's to sign in to and no longer an old id's to take (奕星 on v3.2 ⑥): it was claimed,
+   * or is linked to an Apple / Google account, or has a test code, or holds a user token. A farm made by a sign-in and
+   * signed out is all of this but the last — its id alone must not open it again, nor offer it to claim. */
+  isClaimed(player: string): boolean {
+    const r = this.d.players[player];
+    return !!r && (r.claimed_at !== undefined || !!r.apple || !!r.google)
+      || Object.values(this.d.codes).some(c => c.player === player)
+      || this.userTokenCount(player) > 0;
+  }
   linked(player: string): Provider[] { const r = this.d.players[player]; return r ? (['apple', 'google'] as const).filter(p => r[p]) : []; }
 
   markDeleted(player: string, at: number): void { this.d.deleted[player] = at; this.flush(); }

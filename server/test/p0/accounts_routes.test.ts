@@ -204,3 +204,29 @@ describe('v1.4 必须注册', () => {
     expect(store.peek('p0-old00001')!.age_ok).toBe(true);
   });
 });
+
+describe('v1.6 (奕星 on v3.2)', () => {
+  it('a farm made by a sign-in and signed out is claimed: hello says so, its id alone is sent to update, claim refuses', async () => {
+    const { app, accounts } = setup({ guestOk: false, pendings: { p1: { provider: 'google', link: { sub: 'g1' } } } });
+    const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'p1' }) })).json();
+    accounts.revokeAll(r.player);   // signed out
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/hello', headers: { 'x-p0-player': r.player } })).json().legacy).toEqual({ claimed: true, linked: ['google'] });
+    const old = await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { 'x-p0-player': r.player } });
+    expect([old.statusCode, old.json().code]).toEqual([426, 'update_required']);
+    expect((await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': r.player }, payload: { token: T(7) } })).json().code).toBe('claimed');
+  });
+  it('the AGE page passed is written to the voice gate (claim\'s age_ok, consent), only for one never asked', async () => {
+    const ages: Record<string, boolean> = {};
+    const store = new P0Store(c), accounts = new P0Accounts();
+    const ident = { accounts, legacyId: false, warn: () => {} };
+    const app = Fastify();
+    registerAccountRoutes(app, { store, accounts, identify: ident, now: () => T0, versions: V, guestOk: true,
+      voiceAge: p => (p in ages ? ages[p] : null), voiceAgeOk: p => { ages[p] = true; } });
+    store.get('p0-old00001', T0);
+    await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-old00001' }, payload: { token: T(1), age_ok: true } });
+    expect(ages['p0-old00001']).toBe(true);
+    store.get('p0-old00002', T0); accounts.issue('p0-old00002', T(2));
+    await app.inject({ method: 'POST', url: '/v1/p0/account/consent', headers: { authorization: `Bearer ${T(2)}` }, payload: { age_ok: true, ...V } });
+    expect(ages['p0-old00002']).toBe(true);
+  });
+});

@@ -50,7 +50,7 @@ export function identify(headers: Record<string, unknown>, deps: IdentifyDeps): 
   // a deleted id first, P0_LEGACY_ID or not: a read by it would make its save anew (周瑜 / 奕星 on PR-A 27e54099e)
   if (deps.accounts.isDeleted(legacy)) return refuse(401, 'account_deleted');
   if (deps.legacyId) return { player: legacy, via: 'legacy' };
-  if (deps.accounts.find(legacy)?.claimed_at !== undefined || deps.accounts.userTokenCount(legacy) > 0) {
+  if (deps.accounts.isClaimed(legacy)) {
     const url = deps.updateUrl?.();
     return refuse(426, 'update_required', url ? { url } : {});
   }

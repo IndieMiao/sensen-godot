@@ -137,6 +137,7 @@ const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appeara
   joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq });
 registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now, guestOk: accountsCfg.guestOk,
   voiceAge: p => { const a = voice.status(p).age; return a === 'ok' ? true : a === 'no' ? false : null; },
+  voiceAgeOk: p => { voice.setAge(p, true); },
   newSave: h => { const f = String(h['x-p0-features'] ?? '').split(',').map(x => x.trim()); return { pending: f.includes('choose_home'), guide: f.includes('guide_v3') }; } });
 voice.tell = (player, payload) => hub.tell(player, payload);
 voice.seen = (a, b) => hub.seenChanged(a, b);

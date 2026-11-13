@@ -26,6 +26,9 @@ export interface AccountRouteDeps {
   versions?: { terms: string; privacy: string };
   /** The 13+ answer the voice gate kept (voice_ages.json): true, false, or null when never asked. */
   voiceAge?: (player: string) => boolean | null;
+  /** The AGE page passed (claim's or consent's age_ok: true) written to the voice gate too, so the mic is not held back
+   * later (q(312) ⑪; a code account's reviewer, 奕星 on v3.2 ⑤). Never a 「没过」: that is never sent. */
+  voiceAgeOk?: (player: string) => void;
   /** A new save's options from the request (choose_home / guide_v3, as routes.ts newSave). */
   newSave?: (headers: Record<string, unknown>) => { pending?: boolean; guide?: boolean };
   /** The names' bucket (周瑜's name.ts), shared by name/check, account/name and a guest with a name; one made here when none. */
@@ -61,7 +64,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     let legacy: Record<string, unknown> | undefined;
     if (/^[A-Za-z0-9_-]{8,64}$/.test(id) && !accounts.isDeleted(id)) {
       const s = store.find(id, deps.now());
-      if (accounts.find(id)?.claimed_at !== undefined || accounts.userTokenCount(id) > 0) legacy = { claimed: true, linked: accounts.linked(id) };
+      if (accounts.isClaimed(id)) legacy = { claimed: true, linked: accounts.linked(id) };
       else if (s) legacy = { age: deps.voiceAge?.(id) ?? null, consent: s.consent ? { terms: s.consent.terms, privacy: s.consent.privacy } : null };
     }
     return { ok: true, terms_version: versions.terms, privacy_version: versions.privacy, legacy_id: deps.identify.legacyId,
@@ -135,7 +138,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if (owner && owner !== id) return send(bad('schema', 400));   // a token is one player's only
     if (accounts.isDeleted(id) || !store.find(id, deps.now())) return send(bad('unknown_player', 404));
     if (owner !== id) {
-      if (accounts.find(id)?.claimed_at !== undefined || accounts.userTokenCount(id) > 0) return send(bad('claimed', 409, { linked: accounts.linked(id) }));
+      if (accounts.isClaimed(id)) return send(bad('claimed', 409, { linked: accounts.linked(id) }));
       accounts.markClaimed(id);
       accounts.issue(id, token);
     }
@@ -147,6 +150,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
       s.age_ok = true;
       store.put(s);
     }
+    if (owner !== id && b.age_ok === true && deps.voiceAge?.(id) === null) deps.voiceAgeOk?.(id);   // v1.4 ⑬: never asked, now passed
     return { ok: true, player: id, age: deps.voiceAge?.(id) ?? null, consent: s.consent ?? null };
   });
 
@@ -161,6 +165,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     s.consent = { terms: versions.terms, privacy: versions.privacy, at: deps.now() };
     s.age_ok = true;
     store.put(s);
+    if (deps.voiceAge?.(w.player) === null) deps.voiceAgeOk?.(w.player);
     return { ok: true };
   });
 }
