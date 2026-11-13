@@ -69,6 +69,8 @@ textures/vram_compression/import_etc2_astc=true
 
 [sensen]
 
+auth/google_ios_client_id="870347303349-3lmi6ghlhuon2t1idp3mdbnqknj8ug2i.apps.googleusercontent.com"
+auth/google_web_client_id="870347303349-bkbtvblhsj7epud9cm2ma2ia9r0blj5i.apps.googleusercontent.com"
 network/base_url="https://farm.sensenjoy.cn/v1"
 network/mobile_base_url="https://farm.sensenjoy.cn/preview/journey/v1"
 
