@@ -5,9 +5,9 @@
  *   compared — the token wins, a mismatch is logged.
  * - A token not (or no longer) known: `session_replaced` when that player has tokens of others (signed in on another
  *   phone), `account_deleted` when the id is a deleted one, else `unauthenticated`.
- * - `x-p0-player` alone: P0_LEGACY_ID takes it as it is (devserver, shots, tests). Otherwise a player who has claimed is
- *   sent to update (426 update_required: an old build on a claimed account), a deleted one is refused, and anyone else
- *   is taken as before (the transition: old builds keep playing until the forced update).
+ * - `x-p0-player` alone: a deleted one is refused, P0_LEGACY_ID or not. P0_LEGACY_ID takes any other as it is
+ *   (devserver, shots, tests). Otherwise a player who has claimed is sent to update (426 update_required: an old build on
+ *   a claimed account), and anyone else is taken as before (the transition: old builds keep playing until the forced update).
  */
 import type { P0Accounts } from './store.js';
 
@@ -47,8 +47,9 @@ export function identify(headers: Record<string, unknown>, deps: IdentifyDeps): 
     return refuse(401, 'unauthenticated');
   }
   if (!legacy) return refuse(400, 'bad_player');
-  if (deps.legacyId) return { player: legacy, via: 'legacy' };
+  // a deleted id first, P0_LEGACY_ID or not: a read by it would make its save anew (周瑜 / 奕星 on PR-A 27e54099e)
   if (deps.accounts.isDeleted(legacy)) return refuse(401, 'account_deleted');
+  if (deps.legacyId) return { player: legacy, via: 'legacy' };
   if (deps.accounts.find(legacy)?.claimed_at !== undefined || deps.accounts.userTokenCount(legacy) > 0) {
     const url = deps.updateUrl?.();
     return refuse(426, 'update_required', url ? { url } : {});

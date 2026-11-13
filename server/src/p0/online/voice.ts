@@ -317,11 +317,17 @@ function writeJson(file: string | undefined, value: object): void {
  * route. A refusal is an HTTP error with {ok: false, code} (PartyVoiceSession reads a non-2xx as one). */
 export function registerP0Voice(app: FastifyInstance, voice: P0Voice,
   identify?: (headers: Record<string, unknown>) => { player: string } | { status: number; body: object }): void {
-  // SGODOT-488: the routes' identify when there are accounts (a refusal reads as UNAUTHENTICATED here, as before); the
-  // x-p0-player header as before when not.
+  // SGODOT-488: the routes' identify when there are accounts, its refusal sent as it is (session_replaced,
+  // account_deleted, 426 update_required … as the routes, the room and the limits answer it); the x-p0-player header as
+  // before when not, refused UNAUTHENTICATED.
+  const refusals = new WeakMap<object, { status: number; body: object }>();
   const playerOf = (h: Record<string, unknown>) => {
-    if (identify) { const w = identify(h); return 'status' in w ? null : w.player; }
+    if (identify) { const w = identify(h); if ('status' in w) { refusals.set(h, w); return null; } return w.player; }
     const id = String(h['x-p0-player'] ?? ''); return PLAYER_RE.test(id) ? id : null;
+  };
+  const deny = (reply: { code(n: number): { send(b: object): unknown } }, h: Record<string, unknown>) => {
+    const r = refusals.get(h);
+    return r ? reply.code(r.status).send(r.body) : reply.code(401).send({ ok: false, code: 'UNAUTHENTICATED' });
   };
   const answer = (reply: { code(n: number): { send(b: object): unknown } }, r: Refusal | Record<string, unknown>) =>
     'status' in r && typeof r.status === 'number' && 'code' in r ? reply.code(r.status).send({ ok: false, code: r.code }) : reply.code(200).send(r);
@@ -329,53 +335,52 @@ export function registerP0Voice(app: FastifyInstance, voice: P0Voice,
   // a peer id as the grant and voice_blocks write it ("2", LiveKit's identity) or as a number: both (蒙恬 on #647)
   const peerOf = (v: unknown): number | null => typeof v === 'number' ? (Number.isInteger(v) ? v : null)
     : typeof v === 'string' && /^\d{1,5}$/.test(v) ? Number(v) : null;
-  const unauth = { code: 'UNAUTHENTICATED', status: 401 };
   app.get('/v1/p0/voice/status', async (req, reply) => {
     const p = playerOf(req.headers);
-    return p ? voice.status(p) : answer(reply, unauth);
+    return p ? voice.status(p) : deny(reply, req.headers);
   });
   app.post('/v1/p0/voice/age', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);
-    if (!p) return answer(reply, unauth);
+    if (!p) return deny(reply, req.headers);
     if (typeof b.ok !== 'boolean') return answer(reply, { code: 'SCHEMA', status: 400 });
     return answer(reply, voice.setAge(p, b.ok) ?? voice.status(p));
   });
   app.post('/v1/p0/voice/join', async (req, reply) => {
     const p = playerOf(req.headers);
-    if (!p) return answer(reply, unauth);
+    if (!p) return deny(reply, req.headers);
     try { return answer(reply, await voice.join(p)); }
     catch { return answer(reply, { code: 'VOICE_UNAVAILABLE', status: 503 }); }
   });
   app.post('/v1/p0/voice/heartbeat', async (req, reply) => {
     const p = playerOf(req.headers);
-    return p ? answer(reply, voice.heartbeat(p, String(body(req.body).lease_id ?? ''))) : answer(reply, unauth);
+    return p ? answer(reply, voice.heartbeat(p, String(body(req.body).lease_id ?? ''))) : deny(reply, req.headers);
   });
   app.post('/v1/p0/voice/leave', async (req, reply) => {
     const p = playerOf(req.headers);
-    if (!p) return answer(reply, unauth);
+    if (!p) return deny(reply, req.headers);
     await voice.leave(p, String(body(req.body).lease_id ?? ''));
     return { ok: true };
   });
   app.post('/v1/p0/voice/block', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);
-    if (!p) return answer(reply, unauth);
+    if (!p) return deny(reply, req.headers);
     const peer = peerOf(b.peer);
     if (peer === null || typeof b.on !== 'boolean') return answer(reply, { code: 'SCHEMA', status: 400 });
     return answer(reply, voice.block(p, peer, b.on));
   });
   app.get('/v1/p0/voice/blocks', async (req, reply) => {
     const p = playerOf(req.headers);
-    return p ? { ok: true, blocked: voice.blockedList(p) } : answer(reply, unauth);
+    return p ? { ok: true, blocked: voice.blockedList(p) } : deny(reply, req.headers);
   });
   app.post('/v1/p0/voice/unblock', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);
-    if (!p) return answer(reply, unauth);
+    if (!p) return deny(reply, req.headers);
     if (typeof b.handle !== 'string' || !/^[0-9a-f]{16}$/.test(b.handle)) return answer(reply, { code: 'SCHEMA', status: 400 });
     return answer(reply, voice.unblock(p, b.handle));
   });
   app.post('/v1/p0/voice/report', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);
-    if (!p) return answer(reply, unauth);
+    if (!p) return deny(reply, req.headers);
     const peer = peerOf(b.peer);
     if (peer === null) return answer(reply, { code: 'SCHEMA', status: 400 });
     return answer(reply, voice.report(p, peer, typeof b.reason === 'string' ? b.reason : ''));
