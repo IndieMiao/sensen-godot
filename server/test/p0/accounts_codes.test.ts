@@ -51,7 +51,7 @@ describe('test codes (contract v1.4 §4)', () => {
     expect(r.player).toMatch(/^p0-[0-9a-f]{20}$/);
     const s = store.peek(r.player)!;
     expect(s.login).toBe('code');
-    expect(s.test).toBeUndefined();   // a tester counts; a review does not (below)
+    expect(s.test).toBeUndefined();
     expect(s.travel.pending).toBe(true);   // a new player's start: its home to pick, then the guide
     expect(s.guide).toBeTruthy();
     expect(accounts.codeOf(r.player)).toEqual({ note: 'cn-tester-03', at: T0 });
@@ -74,10 +74,11 @@ describe('test codes (contract v1.4 §4)', () => {
     expect((await signIn(code, tok(1))).json()).toEqual({ ok: true, player });   // the same token again: the same answer
   });
 
-  it('a store review\'s account is marked test, left out of the counts', async () => {
+  it("a store review's account is not marked test: the reviewer goes the real way (contract v1.6 ④)", async () => {
     const { store, adm } = setup();
     const { player } = (await adm('/admin/code', { note: 'review-play' })).json();
-    expect(store.peek(player)!.test).toBe(true);
+    expect(store.peek(player)!.test).toBeUndefined();
+    expect(store.peek(player)!.login).toBe('code');
   });
 
   it('refuses: a wrong code as bad_code, nothing said of why; a token shape; a token of another account', async () => {

@@ -112,10 +112,11 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       return { ok: true, player: SMOKE_PLAYER, token, expires_at };
     });
 
-    /** A test code (contract v1.4 §4): for `player`, or for an account made here — a new player's fresh save (its home to
-     *  pick, the guide) — the save marked login: code, and test when the note is a store review's (left out of the
-     *  counts). One code an account: a new one replaces the old, whose tokens go. Not for an account linked to Apple or
-     *  Google: their sign-in would sign every code device out. The code is in this answer only, never in the log. */
+    /** A test code (contract v1.4 §4, v1.6 ④): for `player`, or for an account made here — a new player's fresh save (its
+     *  home to pick, the guide), not marked test: a reviewer goes the real way — the save marked login: code. One code an
+     *  account: a new one replaces the old, whose tokens go. Not for an account linked to Apple or Google: their sign-in
+     *  would sign every code device out. A code makes its account claimed (isClaimed): its old id alone gets 426. The code
+     *  is in this answer only, never in the log. */
     app.post('/admin/code', async (req, reply) => {
       if (!accounts.codesOn()) return reply.code(503).send({ ok: false, code: 'codes_off' });
       const b = (req.body && typeof req.body === 'object' ? req.body : {}) as { player?: unknown; note?: unknown };
@@ -132,7 +133,6 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
         player = p; s = store.peek(p)!;
       }
       s.login = 'code';
-      if (/review/i.test(b.note)) s.test = true;
       store.put(s);
       accounts.ensure(player);
       const code = newCode();
