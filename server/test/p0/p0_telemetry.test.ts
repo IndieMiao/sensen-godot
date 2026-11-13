@@ -8,7 +8,7 @@ import { loadP0Content } from '../../src/p0/content.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { P0Store } from '../../src/p0/store.js';
 import { settleEnergy } from '../../src/p0/rules.js';
-import { commandFields, P0EventLog, uiEvent, type LogRecord } from '../../src/p0/telemetry.js';
+import { commandFields, errorRecord, P0EventLog, uiEvent, type ErrorRecord, type LogRecord } from '../../src/p0/telemetry.js';
 import { trustProxyFromEnv } from '../../src/p0/guard.js';
 import { parseRecords, sessionReport } from '../../tools/p0_session_report.js';
 
@@ -225,6 +225,92 @@ describe('reading the log (PR #23 review)', () => {
       new P0EventLog(events, undefined, undefined, 30).write({ kind: 'ui', t: T0, player: 'p', event: { kind: 'screen' } });   // T0 is 2026-10-08
       expect(readdirSync(events).sort()).toEqual(['notes.txt', 'p0-events-2026-09-08.jsonl', 'p0-events-2026-10-08.jsonl']);
       expect(existsSync(path.join(events, 'p0-events-2026-09-07.jsonl'))).toBe(false);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+});
+// SGODOT-486: client errors in their own files, tied to no player (奕星 / 李白 11-12; privacy policy §2 / §6).
+describe('client errors (SGODOT-486)', () => {
+  async function withErrors(fn: (app: ReturnType<typeof Fastify>, errors: ErrorRecord[], records: LogRecord[], tick: (ms: number) => void) => Promise<void>) {
+    const errors: ErrorRecord[] = [], records: LogRecord[] = [];
+    let now = T0;
+    const app = Fastify();
+    registerP0Routes(app, { content: c, store: new P0Store(c), now: () => now, dev: false,
+      log: new P0EventLog(undefined, r => records.push(r)), errors: new P0EventLog<ErrorRecord>(undefined, r => errors.push(r), undefined, 30, 'p0-errors') });
+    try { await fn(app, errors, records, ms => { now += ms; }); } finally { await app.close(); }
+  }
+  const stack = Array.from({ length: 25 }, (_, i) => `f${i} res://a.gd:${i}` + (i === 0 ? 'x'.repeat(300) : '')).join('\n');
+
+  it('writes t, version, platform, message, stack and scene only — never the player, the IP or other fields', async () => {
+    await withErrors(async (app, errors, records) => {
+      const r = await app.inject({ method: 'POST', url: '/v1/p0/telemetry',
+        headers: { ...headers, 'x-p0-version': '310', 'x-p0-platform': 'android', 'x-p0-channel': 'play' },
+        payload: { events: [{ kind: 'client_error', message: 'm'.repeat(600), stack, scene: 's'.repeat(100), model: 'Pixel 7', player: 'x' },
+          { kind: 'screen', name: 'farm' }] } });
+      expect(r.json()).toEqual({ ok: true, accepted: 2 });
+      expect(errors).toHaveLength(1);
+      const e = errors[0];
+      expect(Object.keys(e)).toEqual(['t', 'version', 'platform', 'message', 'stack', 'scene']);
+      expect(e).toMatchObject({ t: T0, version: '310', platform: 'android', message: 'm'.repeat(500), scene: 's'.repeat(64) });
+      const lines = e.stack.split('\n');
+      expect(lines).toHaveLength(20);
+      expect(lines[0]).toHaveLength(200);
+      expect(lines[19]).toBe('f19 res://a.gd:19');
+      expect(JSON.stringify(e)).not.toMatch(/telemetry-player|127\.0\.0\.1|play|Pixel/);
+      // the observation log gets the UI moment but not the error
+      expect(records.map(x => x.kind === 'ui' && x.event.kind)).toEqual(['screen']);
+    });
+  });
+
+  it('no platform header (clients before PR-A): the field is left out, no error', async () => {
+    await withErrors(async (app, errors) => {
+      await app.inject({ method: 'POST', url: '/v1/p0/telemetry', headers, payload: { events: [{ kind: 'client_error', message: 'boom', stack: 'f a.gd:1', scene: 'farm' }] } });
+      expect(errors).toEqual([{ t: T0, message: 'boom', stack: 'f a.gd:1', scene: 'farm' }]);
+    });
+  });
+
+  it('drops an error without a message; a missing stack or scene is written empty', () => {
+    expect(errorRecord({ kind: 'client_error', stack: 'x' }, T0, {})).toBeNull();
+    expect(errorRecord({ kind: 'client_error', message: 7 }, T0, {})).toBeNull();
+    expect(errorRecord({ kind: 'screen', message: 'x' }, T0, {})).toBeNull();
+    expect(errorRecord({ kind: 'client_error', message: 'x', stack: ['a'], scene: 3 }, T0, {})).toEqual({ t: T0, message: 'x', stack: '', scene: '' });
+  });
+
+  it('at most 10 a minute per player, counted apart from UI moments; a new minute starts over', async () => {
+    await withErrors(async (app, errors, records, tick) => {
+      const err = { kind: 'client_error', message: 'boom' };
+      const r = await app.inject({ method: 'POST', url: '/v1/p0/telemetry', headers, payload: { events: [...Array(15).fill(err), { kind: 'screen' }] } });
+      expect(r.json()).toEqual({ ok: true, accepted: 11 });
+      expect(errors).toHaveLength(10);
+      expect(records).toHaveLength(1);
+      await app.inject({ method: 'POST', url: '/v1/p0/telemetry', headers: { 'x-p0-player': 'telemetry-player-2' }, payload: { events: [err] } });
+      expect(errors).toHaveLength(11);   // another player has their own 10
+      tick(60_000);
+      await app.inject({ method: 'POST', url: '/v1/p0/telemetry', headers, payload: { events: [err] } });
+      expect(errors).toHaveLength(12);
+    });
+  });
+
+  it('files: p0-errors-YYYY-MM-DD.jsonl beside the events, its own 30 days; the events files untouched', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'p0-errors-'));
+    try {
+      for (const f of ['p0-errors-2026-09-07.jsonl', 'p0-errors-2026-09-08.jsonl', 'p0-events-2026-09-01.jsonl']) writeFileSync(path.join(dir, f), '');
+      new P0EventLog<ErrorRecord>(dir, undefined, undefined, 30, 'p0-errors').write({ t: T0, message: 'boom', stack: '', scene: 'farm' });   // T0 is 2026-10-08
+      expect(readdirSync(dir).sort()).toEqual(['p0-errors-2026-09-08.jsonl', 'p0-errors-2026-10-08.jsonl', 'p0-events-2026-09-01.jsonl']);
+      expect(JSON.parse(readFileSync(path.join(dir, 'p0-errors-2026-10-08.jsonl'), 'utf8'))).toEqual({ t: T0, message: 'boom', stack: '', scene: 'farm' });
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it('prune(now): with no new error a file older than 30 days still goes; without keep days nothing does (#1013 后裔)', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'p0-errors-'));
+    try {
+      for (const f of ['p0-errors-2026-09-07.jsonl', 'p0-errors-2026-09-08.jsonl', 'p0-events-2026-09-01.jsonl']) writeFileSync(path.join(dir, f), '');
+      new P0EventLog<ErrorRecord>(dir, undefined, undefined, undefined, 'p0-errors').prune(T0);
+      expect(readdirSync(dir)).toHaveLength(3);
+      const errors = new P0EventLog<ErrorRecord>(dir, undefined, undefined, 30, 'p0-errors');
+      errors.prune(T0);   // 2026-10-08: 09-07 is 31 days old
+      expect(readdirSync(dir).sort()).toEqual(['p0-errors-2026-09-08.jsonl', 'p0-events-2026-09-01.jsonl']);
+      errors.prune(T0 + 86_400_000);
+      expect(readdirSync(dir)).toEqual(['p0-events-2026-09-01.jsonl']);   // the events file is the other log's
     } finally { rmSync(dir, { recursive: true, force: true }); }
   });
 });
