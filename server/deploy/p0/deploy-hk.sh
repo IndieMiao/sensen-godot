@@ -324,7 +324,7 @@ case "$step" in
     say "build context of $ref ($sha) → $DEV:~/$dir"
     git -C "$repo" archive --format=tar "$ref" package.json pnpm-lock.yaml pnpm-workspace.yaml packages/blueprint-core server \
       assets/p0/p0_content.json assets/p0/content assets/p0/p0_outposts.json assets/p0/p0_ponds.json assets/ponds/catalog.json \
-      assets/p0/city_clusters.json assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json | gzip | dev "rm -rf ~/$dir && mkdir -p ~/$dir && tar -C ~/$dir -xzf -"
+      assets/p0/city_clusters.json assets/p0/legal/versions.json assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json | gzip | dev "rm -rf ~/$dir && mkdir -p ~/$dir && tar -C ~/$dir -xzf -"
     # q(188) ① Near you: the pinned DB-IP City Lite month from the devserver's cache (DB-IP keeps only the last two
     # months online; 周瑜 on #447) into the context's dbip/, read by the Dockerfile through a bind mount (no layer).
     month=$(git -C "$repo" show "$ref:server/deploy/p0/Dockerfile" | sed -n 's/^ARG DBIP_MONTH=//p')
