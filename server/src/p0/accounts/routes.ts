@@ -12,7 +12,7 @@ import type { FastifyInstance } from 'fastify';
 import type { P0Store } from '../store.js';
 import { identify, isRefusal, type IdentifyDeps } from './identify.js';
 import { NameLimiter, nameForGuest, registerNameRoutes, setName, type NameList } from './name.js';
-import { tokenShapeOk, type P0Accounts } from './store.js';
+import { tokenShapeOk, type AppleLink, type GoogleLink, type P0Accounts, type Provider } from './store.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
 /** The terms' and privacy's versions: the one place they are written, the client's own copy of the same file. */
@@ -34,6 +34,10 @@ export interface AccountRouteDeps {
   nameList?: () => NameList;
   /** Saves made per address per hour, at most (a script making saves; 后裔 on contract v1.2). */
   guestsPerHour?: number;
+  /** v1.4 (必须注册): a new farm needs a sign-in — guest takes the pending one (PR-B's PendingSignIns) and links it;
+   * without one, sign_in_required, unless P0_GUEST_OK (devserver, shots) or a test account. */
+  pending?: { take(id: unknown): { provider: Provider; link: AppleLink | GoogleLink } | undefined };
+  guestOk?: boolean;
 }
 
 const bad = (code: string, status: number, extra: Record<string, unknown> = {}) => ({ status, body: { ok: false as const, code, ...extra } });
@@ -50,7 +54,19 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
   const consentOk = (b: Record<string, unknown>) => b.terms === versions.terms && b.privacy === versions.privacy;
   const outdated = () => bad('consent_outdated', 409, { terms_version: versions.terms, privacy_version: versions.privacy });
 
-  app.get('/v1/p0/hello', async () => ({ ok: true, terms_version: versions.terms, privacy_version: versions.privacy, legacy_id: deps.identify.legacyId }));
+  /** hello (v1.4 ⑦b): with an x-p0-player the server has, that old account's way before any sign-in — unclaimed, its
+   * voice gate's answer and its consent; claimed, which sign-in it has. Read only: no token, no save. */
+  app.get('/v1/p0/hello', async req => {
+    const id = String(req.headers['x-p0-player'] ?? '');
+    let legacy: Record<string, unknown> | undefined;
+    if (/^[A-Za-z0-9_-]{8,64}$/.test(id) && !accounts.isDeleted(id)) {
+      const s = store.find(id, deps.now());
+      if (accounts.find(id)?.claimed_at !== undefined || accounts.userTokenCount(id) > 0) legacy = { claimed: true, linked: accounts.linked(id) };
+      else if (s) legacy = { age: deps.voiceAge?.(id) ?? null, consent: s.consent ? { terms: s.consent.terms, privacy: s.consent.privacy } : null };
+    }
+    return { ok: true, terms_version: versions.terms, privacy_version: versions.privacy, legacy_id: deps.identify.legacyId,
+      guest_ok: !!deps.guestOk, ...(legacy ? { legacy } : {}) };
+  });
 
   app.post('/v1/p0/session/guest', async (req, reply) => {
     const b = body(req.body);
@@ -73,9 +89,16 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
       if (b.age_ok !== true) return send(bad('schema', 400));
       if (!consentOk(b)) return send(outdated());
     }
+    if (!main && b.pending === undefined && !deps.guestOk) return send(bad('sign_in_required', 400));
     const named = main ? { ok: true as const } : nameForGuest(b, { limiter, ip: req.ip, now, list: deps.nameList?.() });
     if (!named.ok) return reply.code(named.status).send(named.body);
-    if (b.pending !== undefined) return send(bad('pending_expired', 410));   // PR-B: the pending sign-in is taken here
+    const signedIn = b.pending !== undefined ? deps.pending?.take(b.pending) : undefined;
+    if (b.pending !== undefined && !signedIn) return send(bad('pending_expired', 410));
+    if (signedIn) {
+      // the account linked meanwhile to a farm that is there (another phone made one): never taken from it
+      const was = accounts.byIdentity(signedIn.provider, signedIn.link.sub);
+      if (was && !accounts.isDeleted(was) && store.find(was, now)) return send(bad('conflict', 409));
+    }
     const h = Math.floor(now / 3_600_000);
     if (h !== hour) { made.clear(); hour = h; }
     const n = made.get(req.ip) ?? 0;
@@ -91,8 +114,14 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if ('name' in named && named.name !== undefined) setName(s, named.name, named.name_set_at ?? now);
     store.put(s);                    // the save first (§1.3) …
     accounts.ensure(player);
+    if (signedIn) {
+      // a link left on a farm gone goes first, so the sign-in is this farm's alone (liveOwner's rule)
+      const was = accounts.byIdentity(signedIn.provider, signedIn.link.sub);
+      if (was) accounts.unlink(was, signedIn.provider);
+      accounts.link(player, signedIn.provider, signedIn.link);
+    }
     accounts.issue(player, token);   // … then who holds it
-    return { ok: true, player };
+    return { ok: true, player, ...(signedIn ? { linked: signedIn.provider } : {}) };
   });
 
   app.post('/v1/p0/session/claim', async (req, reply) => {
@@ -111,6 +140,13 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
       accounts.issue(id, token);
     }
     const s = store.find(id, deps.now())!;
+    // v1.4 ⑦b: the consent given on the pages before sign-in comes with the claim (no token then for account/consent)
+    const c = body(b.consent);
+    if (owner !== id && c.terms === versions.terms && c.privacy === versions.privacy) {
+      s.consent = { terms: versions.terms, privacy: versions.privacy, at: deps.now() };
+      s.age_ok = true;
+      store.put(s);
+    }
     return { ok: true, player: id, age: deps.voiceAge?.(id) ?? null, consent: s.consent ?? null };
   });
 

@@ -105,6 +105,7 @@ if (process.env.P0_IP_NEAR_TABLE) {
 const accountsCfg = accountsConfig();
 const accountsFile = path.join(path.dirname(stateFile), 'accounts.json');
 const accounts = new P0Accounts(accountsFile, accountsCfg.refreshKey);
+if (accountsCfg.guestOk) console.warn(JSON.stringify({ warn: 'P0_GUEST_OK=1: a new farm without a sign-in (never on the live server)' }));
 if (accountsCfg.legacyId) console.warn(JSON.stringify({ warn: 'P0_LEGACY_ID=1: an x-p0-player alone is taken for any player (never on the live server)' }));
 const identifyDeps = { accounts, legacyId: accountsCfg.legacyId, updateUrl: () => gate.state().update_url || undefined };
 // The voice routes and the room's upgrade: identify, and a token's player must have a save, as the routes hold it.
@@ -134,7 +135,7 @@ const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.joi
 registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
   joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq });
-registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now,
+registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now, guestOk: accountsCfg.guestOk,
   voiceAge: p => { const a = voice.status(p).age; return a === 'ok' ? true : a === 'no' ? false : null; },
   newSave: h => { const f = String(h['x-p0-features'] ?? '').split(',').map(x => x.trim()); return { pending: f.includes('choose_home'), guide: f.includes('guide_v3') }; } });
 voice.tell = (player, payload) => hub.tell(player, payload);
@@ -142,7 +143,7 @@ voice.seen = (a, b) => hub.seenChanged(a, b);
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
-  return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000), legacy_id: accountsCfg.legacyId,
+  return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000), legacy_id: accountsCfg.legacyId, guest_ok: accountsCfg.guestOk,
     maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0, require_features: g.features_on ? g.features : [] };
 });
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');

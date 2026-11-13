@@ -12,12 +12,14 @@ const T0 = Date.UTC(2026, 10, 13, 4);
 const V = { terms: '2026-11-13', privacy: '2026-11-13' };
 const T = (n: number) => n.toString(16).padStart(64, '0');
 
-function setup(opts: { legacyId?: boolean; ages?: Record<string, boolean>; guestsPerHour?: number } = {}) {
+type Pend = { provider: 'apple' | 'google'; link: { sub: string; aud?: string } };
+function setup(opts: { legacyId?: boolean; ages?: Record<string, boolean>; guestsPerHour?: number; guestOk?: boolean; pendings?: Record<string, Pend> } = {}) {
   const store = new P0Store(c), accounts = new P0Accounts();
   const identifyDeps = { accounts, legacyId: !!opts.legacyId, warn: () => {} };
   const app = Fastify();
   registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: () => T0, versions: V,
-    voiceAge: p => (opts.ages && p in opts.ages ? opts.ages[p] : null), guestsPerHour: opts.guestsPerHour });
+    voiceAge: p => (opts.ages && p in opts.ages ? opts.ages[p] : null), guestsPerHour: opts.guestsPerHour, guestOk: opts.guestOk ?? true,
+    pending: { take: (id: unknown) => { const p = opts.pendings?.[String(id)]; if (p) delete opts.pendings![String(id)]; return p as never; } } });
   registerP0Routes(app, { content: c, store, now: () => T0, dev: false, identify: identifyDeps });
   return { app, store, accounts };
 }
@@ -26,7 +28,7 @@ const guest = (extra: Record<string, unknown> = {}) => ({ age_ok: true, ...V, na
 describe('hello', () => {
   it('says the versions and whether ids alone are taken', async () => {
     const { app } = setup({ legacyId: true });
-    expect((await app.inject({ method: 'GET', url: '/v1/p0/hello' })).json()).toEqual({ ok: true, terms_version: V.terms, privacy_version: V.privacy, legacy_id: true });
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/hello' })).json()).toEqual({ ok: true, terms_version: V.terms, privacy_version: V.privacy, legacy_id: true, guest_ok: true });
   });
 });
 
@@ -63,7 +65,7 @@ describe('session/guest', () => {
     expect(await code(guest({ terms: 'old' }))).toEqual({ ok: false, code: 'consent_outdated', terms_version: V.terms, privacy_version: V.privacy });
     expect(await code(guest({ name: '  ' }))).toEqual({ ok: false, code: 'name_rejected', reason: 'empty' });
     expect((await code(guest({ token: 'ab'.repeat(31) }))).code).toBe('token_too_short');
-    expect((await code(guest({ pending: 'x' }))).code).toBe('pending_expired');
+    expect((await code(guest({ pending: 'x' }))).code).toBe('pending_expired');   // unknown, spent or gone with a restart
     expect((await code(guest())).ok).toBe(true);
     expect((await code(guest({ token: T(2) }))).code).toBe('rate_limited');
   });
@@ -157,5 +159,48 @@ describe('a test account (tech-plan §2.5)', () => {
     expect(r.statusCode).toBe(400);   // no id at all: bad_player
     const r2 = await app.inject({ method: 'POST', url: '/v1/p0/session/guest', headers: { authorization: `Bearer ${T(9)}` }, payload: { test: true, token: T(2) } });
     expect([r2.statusCode, r2.json().code]).toEqual([401, 'unauthenticated']);
+  });
+});
+
+describe('v1.4 必须注册', () => {
+  it('a new farm needs a sign-in: sign_in_required without a pending one (unless P0_GUEST_OK or a test account)', async () => {
+    const { app } = setup({ guestOk: false });
+    const r = await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest() });
+    expect([r.statusCode, r.json().code]).toEqual([400, 'sign_in_required']);
+  });
+  it('guest with the pending sign-in makes the farm and links it; a pending one is spent once', async () => {
+    const { app, accounts } = setup({ guestOk: false, pendings: { p1: { provider: 'apple', link: { sub: 'apple-sub', aud: 'app.gensen.maps' } } } });
+    const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'p1' }) })).json();
+    expect(r).toMatchObject({ ok: true, linked: 'apple' });
+    expect(accounts.byIdentity('apple', 'apple-sub')).toBe(r.player);
+    expect((await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'p1', token: T(2) }) })).json().code).toBe('pending_expired');
+  });
+  it('the account linked meanwhile to a farm that is there is a conflict, never taken from it; one left on a farm gone moves', async () => {
+    const { app, accounts, store } = setup({ guestOk: false, pendings: { p1: { provider: 'google', link: { sub: 'g1' } }, p2: { provider: 'google', link: { sub: 'g2' } } } });
+    store.get('p0-live00001', T0); accounts.link('p0-live00001', 'google', { sub: 'g1' });
+    expect((await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'p1' }) })).json().code).toBe('conflict');
+    expect(accounts.byIdentity('google', 'g1')).toBe('p0-live00001');
+    accounts.link('p0-gone00001', 'google', { sub: 'g2' });   // no save
+    const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'p2', token: T(3) }) })).json();
+    expect(accounts.byIdentity('google', 'g2')).toBe(r.player);
+    expect(accounts.find('p0-gone00001')?.google).toBeUndefined();
+  });
+  it('hello with an old id says its way before any sign-in: unclaimed its age and consent, claimed its links, else nothing', async () => {
+    const { app, store, accounts } = setup({ ages: { 'p0-old00001': true } });
+    store.get('p0-old00001', T0);
+    const hello = async (id: string) => (await app.inject({ method: 'GET', url: '/v1/p0/hello', headers: { 'x-p0-player': id } })).json().legacy;
+    expect(await hello('p0-old00001')).toEqual({ age: true, consent: null });
+    accounts.markClaimed('p0-old00001'); accounts.link('p0-old00001', 'apple', { sub: 's', aud: 'a' });
+    expect(await hello('p0-old00001')).toEqual({ claimed: true, linked: ['apple'] });
+    expect(await hello('p0-nobody001')).toBeUndefined();
+    accounts.markDeleted('p0-old00001', T0);
+    expect(await hello('p0-old00001')).toBeUndefined();
+  });
+  it('claim takes the consent given on the pages before the sign-in', async () => {
+    const { app, store } = setup();
+    store.get('p0-old00001', T0);
+    const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-old00001' }, payload: { token: T(1), consent: V } })).json();
+    expect(r.consent).toEqual({ ...V, at: T0 });
+    expect(store.peek('p0-old00001')!.age_ok).toBe(true);
   });
 });

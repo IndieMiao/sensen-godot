@@ -17,6 +17,7 @@ REQUIRED=$(grep -o '"require_features":\[[^]]*\]' /tmp/p0_smoke_body || true)
 # SGODOT-488: P0_LEGACY_ID takes any player by its id alone — never on the live server. A devserver run that means to
 # have it on says so with P0_SMOKE_ALLOW_LEGACY=1.
 if grep -q '"legacy_id":true' /tmp/p0_smoke_body && [ "${P0_SMOKE_ALLOW_LEGACY:-0}" != 1 ]; then fail "P0_LEGACY_ID is on (healthz legacy_id true)"; fi
+if grep -q '"guest_ok":true' /tmp/p0_smoke_body && [ "${P0_SMOKE_ALLOW_LEGACY:-0}" != 1 ]; then fail "P0_GUEST_OK is on (healthz guest_ok true)"; fi
 [ "$(c -H "x-p0-player: $PLAYER" "$BASE/v1/p0/state")" = 401 ] || fail "no key should be 401"
 [ "$(c -H "x-p0-player: $PLAYER" -H "x-p0-key: $KEY" -H "x-p0-features: $FEATURES" "$BASE/v1/p0/state")" = 200 ] || fail "state with key"
 if [ -n "$REQUIRED" ] && [ "$REQUIRED" != '"require_features":[]' ]; then   # the second guard is on: a pre-wipe build is turned away
