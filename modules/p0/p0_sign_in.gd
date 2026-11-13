@@ -54,7 +54,7 @@ static func google(transport: Callable = Callable(), os_name := OS.get_name()) -
 		return from_google(await GoogleSignIn.authorize(nonce, transport), nonce)
 	var client := ios_client_id()
 	if client.is_empty(): return {"result": "failed", "provider": GOOGLE, "reason": "GOOGLE_CONFIG"}
-	var line := "GOOGLE|%s|%s" % [client, nonce.sha256_text()]
+	var line := "GOOGLE|%s|%s|key=%s" % [client, nonce.sha256_text(), AppleSignIn.bridge_key()]
 	var reply := str(await transport.call(line)) if transport.is_valid() else await _google_bridge(line)
 	return from_google(parse_google_line(reply), nonce)
 
@@ -85,5 +85,6 @@ static func _google_bridge(line: String) -> String:
 			var reply := udp.get_packet().get_string_from_utf8()
 			udp.close()
 			return reply
+	udp.put_packet(("GOOGLE_CANCEL|key=" + AppleSignIn.bridge_key()).to_utf8_buffer())   # the sheet goes too (周瑜 on #1014)
 	udp.close()
 	return "GOOGLE_ERR|timeout"

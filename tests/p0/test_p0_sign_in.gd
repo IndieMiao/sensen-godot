@@ -14,9 +14,25 @@ func _bridge(line: String, seen: Array) -> Callable:
 		return line
 
 func test_apple_asks_for_no_name_and_no_email() -> void:
-	var line := AppleSignIn.request_line("abc", true)
-	assert_str(line).is_equal("APPLE|" + "abc".sha256_text() + "|none")
-	assert_str(AppleSignIn.request_line("abc")).is_equal("APPLE|" + "abc".sha256_text())   # Journey's, unchanged
+	var line := AppleSignIn.request_line("abc", true, "k3y")
+	assert_str(line).is_equal("APPLE|" + "abc".sha256_text() + "|none|key=k3y")
+	assert_str(AppleSignIn.request_line("abc")).is_equal("APPLE|" + "abc".sha256_text() + "|full|key=")   # Journey's scopes
+
+## 周瑜 on #1014: every bridge line ends with this launch's key, read from where the native side wrote it.
+func test_bridge_lines_carry_the_launch_key_the_native_side_wrote() -> void:
+	var f := FileAccess.open("user://.native_bridge_key", FileAccess.WRITE)
+	f.store_string("abcdef0123\n")
+	f.close()
+	assert_str(AppleSignIn.bridge_key()).is_equal("abcdef0123")
+	ProjectSettings.set_setting(P0SignIn.IOS_CLIENT_SETTING, "1-a.apps.googleusercontent.com")
+	var seen := []
+	await P0SignIn.google(func(line: String) -> String:
+		seen.append(line)
+		return "GOOGLE_ERR|key", "iOS")
+	ProjectSettings.set_setting(P0SignIn.IOS_CLIENT_SETTING, "")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://.native_bridge_key"))
+	assert_bool(str(seen[0]).ends_with("|key=abcdef0123")).is_true()
+	assert_str(AppleSignIn.bridge_key()).is_empty()
 
 func test_an_apple_token_comes_back_with_its_raw_nonce_and_nothing_else() -> void:
 	var seen := []
@@ -57,7 +73,7 @@ func test_ios_google_sends_the_client_id_and_the_nonce_hash_and_keeps_the_raw_no
 	assert_str(str(r.result)).is_equal("ok")
 	assert_str(str(r.provider)).is_equal("google")
 	assert_str(str(r.id_token)).is_equal("g.tok")
-	assert_str(str(seen[0])).is_equal("GOOGLE|123-abc.apps.googleusercontent.com|" + str(r.nonce).sha256_text())
+	assert_str(str(seen[0])).is_equal("GOOGLE|123-abc.apps.googleusercontent.com|" + str(r.nonce).sha256_text() + "|key=" + AppleSignIn.bridge_key())
 
 func test_ios_google_without_a_client_id_fails_without_opening_a_sheet() -> void:
 	ProjectSettings.set_setting(P0SignIn.IOS_CLIENT_SETTING, "")

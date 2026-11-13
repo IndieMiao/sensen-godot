@@ -2,8 +2,10 @@
 //
 // 与 MapUnderlay 相同的进程内 UDP 回环，但独立端口 46465，地图桥坏了也不影响登录。
 // 协议（UTF-8，一行一条，字段以 | 分隔）：
-//   Godot → 原生  APPLE|<nonce_sha256_hex>[|none]
-//                 第三个字段 none：不要名字和邮箱（P0 只存账号编号，SGODOT-487 / q(312)）；没有它照旧要（Journey）
+//   Godot → 原生  APPLE|<nonce_sha256_hex>|none 或 full|key=<bridge key>
+//                 none：不要名字和邮箱（P0 只存账号编号，SGODOT-487 / q(312)）；full：照旧要（Journey）
+//                 key=：本次启动的口令（NativeBridgeKey，GoogleSignInIOS.swift；Godot 从 user://.native_bridge_key 读），
+//                 对不上回 APPLE_ERR|key——别的 App 往这个回环端口发，拿不到玩家刚登录的令牌（周瑜 on #1014）
 //   原生 → Godot  APPLE_OK|<identity_token>|<given_name>|<family_name>|<email>|<authorization_code>
 //                 APPLE_ERR|<code>      code: canceled | failed | not_handled | unknown | no_token | busy
 // nonce 由 Godot 生成原文、这边只收它的 SHA-256（Apple 要求 request.nonce 放哈希），原文随后发给服务端比对。
@@ -23,6 +25,7 @@ final class AppleSignIn: NSObject, ASAuthorizationControllerDelegate, ASAuthoriz
     private var retryScheduled = false
 
     @objc class func setup() {
+        _ = NativeBridgeKey.value   // written before Godot can ask (G3Spike sets this bridge up first)
         shared.startListener()
     }
 
@@ -91,14 +94,16 @@ final class AppleSignIn: NSObject, ASAuthorizationControllerDelegate, ASAuthoriz
 
     private func handle(_ msg: String, from conn: NWConnection) {
         let parts = msg.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: "|", omittingEmptySubsequences: false).map(String.init)
-        guard parts.first == "APPLE", parts.count >= 2, !parts[1].isEmpty else { return }
+        guard parts.first == "APPLE" else { return }
+        guard parts.count >= 4, !parts[1].isEmpty else { send("APPLE_ERR|failed", to: conn); return }   // no 300 s wait on a bad line
+        guard NativeBridgeKey.accepts(parts) else { send("APPLE_ERR|key", to: conn); return }
         if controller != nil {
             send("APPLE_ERR|busy", to: conn)
             return
         }
         pending = conn
         let request = ASAuthorizationAppleIDProvider().createRequest()
-        request.requestedScopes = parts.count >= 3 && parts[2] == "none" ? [] : [.fullName, .email]
+        request.requestedScopes = parts[2] == "none" ? [] : [.fullName, .email]
         request.nonce = parts[1]
         let c = ASAuthorizationController(authorizationRequests: [request])
         c.delegate = self
@@ -116,10 +121,16 @@ final class AppleSignIn: NSObject, ASAuthorizationControllerDelegate, ASAuthoriz
         (s ?? "").replacingOccurrences(of: "|", with: " ").replacingOccurrences(of: "\n", with: " ")
     }
 
+    /// The answer, then that sender's connection closed (one per sign-in otherwise stays open; 周瑜 on #1014).
     private func finish(_ line: String) {
-        send(line, to: pending)
+        let conn = pending
         pending = nil
         controller = nil
+        guard let conn else { return }
+        conn.send(content: line.data(using: .utf8), completion: .contentProcessed { [weak self] _ in
+            conn.cancel()
+            self?.drop(conn)
+        })
     }
 
     // MARK: - ASAuthorizationControllerDelegate

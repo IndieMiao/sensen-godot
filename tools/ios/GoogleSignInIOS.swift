@@ -3,9 +3,13 @@
 // never sees the player's Google password, and asks for `openid` only: the account number, no email, no name (q(312)).
 //
 // The same in-process loopback UDP as AppleSignIn, on a port of its own (46468). One line per packet, | between fields:
-//   Godot → native  GOOGLE|<iOS client id>|<nonce_sha256_hex>
+//   Godot → native  GOOGLE|<iOS client id>|<nonce_sha256_hex>|key=<bridge key>
+//                   GOOGLE_CANCEL|key=<bridge key>          Godot gave up waiting: the sheet goes
 //   native → Godot  GOOGLE_OK|<id_token>
-//                   GOOGLE_ERR|<code>     code: canceled | failed | no_token | busy | config
+//                   GOOGLE_ERR|<code>     code: canceled | failed | no_token | busy | config | key
+// The bridge key (NativeBridgeKey, below): another app on the phone could send to this loopback port and be handed a
+// token the player signed in for; only a sender that read the key from this app's own container is served (周瑜 on
+// #1014). AppleSignIn checks the same key.
 // The nonce goes into the request as its SHA-256, as on Android (GodotGoogleSignInPlugin); Godot keeps the raw one
 // and sends it to the server with the token (verifyGoogleIdToken, server/src/accounts/google_token.ts).
 // The redirect is the client id reversed (`com.googleusercontent.apps.<…>:/oauthredirect`, Google's iOS client rule);
@@ -15,6 +19,23 @@ import CryptoKit
 import Foundation
 import Network
 import UIKit
+
+/// A key made once per launch and written to the app's Documents (Godot's user://, `.native_bridge_key`): only this
+/// app can read it there, so a loopback request carrying it comes from this app's Godot.
+enum NativeBridgeKey {
+    static let value: String = {
+        var b = [UInt8](repeating: 0, count: 32)
+        _ = SecRandomCopyBytes(kSecRandomDefault, b.count, &b)
+        let key = b.map { String(format: "%02x", $0) }.joined()
+        if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let url = dir.appendingPathComponent(".native_bridge_key")
+            try? Data(key.utf8).write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        }
+        return key
+    }()
+    /// Whether a request line's last field is this launch's key.
+    static func accepts(_ parts: [String]) -> Bool { parts.last == "key=" + value }
+}
 
 @objc(GoogleSignInIOS)
 final class GoogleSignInIOS: NSObject, ASWebAuthenticationPresentationContextProviding {
@@ -27,7 +48,10 @@ final class GoogleSignInIOS: NSObject, ASWebAuthenticationPresentationContextPro
     private var session: ASWebAuthenticationSession?
     private var retryScheduled = false
 
-    @objc class func setup() { shared.startListener() }
+    @objc class func setup() {
+        _ = NativeBridgeKey.value   // written before Godot can ask
+        shared.startListener()
+    }
 
     private func startListener() {
         guard listener == nil else { return }
@@ -93,16 +117,27 @@ final class GoogleSignInIOS: NSObject, ASWebAuthenticationPresentationContextPro
         conn?.send(content: line.data(using: .utf8), completion: .contentProcessed { _ in })
     }
 
+    /// The answer, then that sender's connection closed (one per sign-in otherwise stays open; 周瑜 on #1014).
     private func finish(_ line: String) {
         let conn = pending
         pending = nil
         session = nil
-        send(line, to: conn)
+        guard let conn else { return }
+        conn.send(content: line.data(using: .utf8), completion: .contentProcessed { [weak self] _ in
+            conn.cancel()
+            self?.drop(conn)
+        })
     }
 
     private func handle(_ msg: String, from conn: NWConnection) {
         let parts = msg.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: "|", omittingEmptySubsequences: false).map(String.init)
-        guard parts.first == "GOOGLE", parts.count >= 3, !parts[2].isEmpty else { return }
+        if parts.first == "GOOGLE_CANCEL" {
+            if NativeBridgeKey.accepts(parts) { session?.cancel(); finish("GOOGLE_ERR|canceled") }
+            return
+        }
+        guard parts.first == "GOOGLE" else { return }
+        guard parts.count >= 4, !parts[2].isEmpty else { send("GOOGLE_ERR|failed", to: conn); return }   // no 300 s wait on a bad line
+        guard NativeBridgeKey.accepts(parts) else { send("GOOGLE_ERR|key", to: conn); return }
         if session != nil { send("GOOGLE_ERR|busy", to: conn); return }
         let clientId = parts[1]
         guard clientId.hasSuffix(".apps.googleusercontent.com") else { send("GOOGLE_ERR|config", to: conn); return }
@@ -124,23 +159,28 @@ final class GoogleSignInIOS: NSObject, ASWebAuthenticationPresentationContextPro
         ]
         pending = conn
         let s = ASWebAuthenticationSession(url: auth.url!, callbackURLScheme: scheme) { [weak self] url, error in
-            guard let self else { return }
-            // 取消 in the system's confirm box or the sheet, or Cancel / Deny on Google's own page (it comes back as
-            // error=access_denied): all are the player backing out — the card again, nothing said (不知火舞 on 1.6)
-            if let e = error as? ASWebAuthenticationSessionError, e.code == .canceledLogin { self.finish("GOOGLE_ERR|canceled"); return }
-            let items = url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false)?.queryItems }
-            if items?.first(where: { $0.name == "error" })?.value == "access_denied" { self.finish("GOOGLE_ERR|canceled"); return }
-            guard error == nil, let items,
-                  items.first(where: { $0.name == "state" })?.value == state,
-                  let code = items.first(where: { $0.name == "code" })?.value else {
-                self.finish("GOOGLE_ERR|failed")
-                return
-            }
-            self.exchange(code: code, clientId: clientId, redirect: redirect, verifier: verifier)
+            DispatchQueue.main.async { self?.completed(url: url, error: error, state: state, clientId: clientId, redirect: redirect, verifier: verifier) }
         }
         s.presentationContextProvider = self
         session = s
         if !s.start() { finish("GOOGLE_ERR|failed") }
+    }
+
+    /// The sheet's answer, on the main queue whatever queue the system called back on (周瑜 on #1014).
+    private func completed(url: URL?, error: Error?, state: String, clientId: String, redirect: String, verifier: String) {
+            guard session != nil else { return }   // cancelled meanwhile (GOOGLE_CANCEL): already answered
+            // 取消 in the system's confirm box or the sheet, or Cancel / Deny on Google's own page (it comes back as
+            // error=access_denied): all are the player backing out — the card again, nothing said (不知火舞 on 1.6)
+            if let e = error as? ASWebAuthenticationSessionError, e.code == .canceledLogin { finish("GOOGLE_ERR|canceled"); return }
+            let items = url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false)?.queryItems }
+            if items?.first(where: { $0.name == "error" })?.value == "access_denied" { finish("GOOGLE_ERR|canceled"); return }
+            guard error == nil, let items,
+                  items.first(where: { $0.name == "state" })?.value == state,
+                  let code = items.first(where: { $0.name == "code" })?.value else {
+                finish("GOOGLE_ERR|failed")
+                return
+            }
+            exchange(code: code, clientId: clientId, redirect: redirect, verifier: verifier)
     }
 
     /// The authorization code for the ID token at Google's token endpoint (an iOS client has no secret: PKCE stands in).

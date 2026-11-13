@@ -30,15 +30,20 @@ static func parse_reply(line: String) -> Dictionary:
 	return {"ok": false, "code": "APPLE_UNKNOWN"}
 
 ## 发给原生桥的那一行。minimal：不要名字和邮箱（P0 只存账号编号，SGODOT-487），桥收到 |none 就不要这两项。
-static func request_line(nonce: String, minimal := false) -> String:
-	return "APPLE|" + nonce.sha256_text() + ("|none" if minimal else "")
+## 末尾带本次启动的口令（原生写在 user://.native_bridge_key；周瑜 on #1014：别的 App 往回环端口发拿不到令牌）。
+static func request_line(nonce: String, minimal := false, key := "") -> String:
+	return "APPLE|" + nonce.sha256_text() + ("|none" if minimal else "|full") + "|key=" + key
+
+## 原生桥本次启动写下的口令；读不到就是空串（桥会回 APPLE_ERR|key，算失败）。
+static func bridge_key() -> String:
+	return FileAccess.get_file_as_string("user://.native_bridge_key").strip_edges() if FileAccess.file_exists("user://.native_bridge_key") else ""
 
 ## 调起系统授权。transport 可注入：func(nonce_hash: String) -> String（测试替身，返回原生回包）。
 static func authorize(nonce: String, transport: Callable = Callable(), minimal := false) -> Dictionary:
 	if transport.is_valid(): return parse_reply(await transport.call(nonce.sha256_text()))
 	var udp := PacketPeerUDP.new()
 	if udp.connect_to_host("127.0.0.1", PORT) != OK: return {"ok": false, "code": "APPLE_UNAVAILABLE"}
-	udp.put_packet(request_line(nonce, minimal).to_utf8_buffer())
+	udp.put_packet(request_line(nonce, minimal, bridge_key()).to_utf8_buffer())
 	var tree := Engine.get_main_loop() as SceneTree
 	var waited := 0.0
 	while waited < TIMEOUT_S:
