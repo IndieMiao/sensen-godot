@@ -14,6 +14,8 @@
  *
  * To the client a refusal is `{ok: false, code: "name_rejected", reason}`, reason one of empty / length / chars /
  * blocked (后裔 and 哪吒's contract): never which word it met. The finer rule stays on the server, for its log and tests.
+ * Mixed scripts read `blocked`, not `chars` (account spec v1.1 §1.5, 不知火舞 11-13): each character is fine on its
+ * own, so `That character can't be used` would send the player looking for one; and a mix is mostly a disguise.
  */
 import { readFileSync } from 'node:fs';
 
@@ -27,7 +29,7 @@ export type NameRule = 'empty' | 'too_short' | 'too_long' | 'bad_char' | 'mixed_
 export type NameCheck = { ok: true; name: string } | { ok: false; reason: NameReason; rule: NameRule };
 
 const REASON: Record<NameRule, NameReason> = {
-  empty: 'empty', too_short: 'length', too_long: 'length', bad_char: 'chars', mixed_script: 'chars',
+  empty: 'empty', too_short: 'length', too_long: 'length', bad_char: 'chars', mixed_script: 'blocked',
   blocked: 'blocked', impersonation: 'blocked',
 };
 

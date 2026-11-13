@@ -42,9 +42,10 @@ describe('player names (q(313))', () => {
     no('Zá̂̃̄lgo', 'chars', 'bad_char');   // a stack of marks, not a letter's accents
   });
 
-  it('does not mix Latin with Cyrillic or Greek, but Latin goes with CJK', () => {
-    no('Pаul', 'chars', 'mixed_script');   // Cyrillic а
-    no('Pαul', 'chars', 'mixed_script');   // Greek α
+  it('does not mix Latin with Cyrillic or Greek, but Latin goes with CJK; a mix reads blocked (spec v1.1 §1.5)', () => {
+    no('Pаul', 'blocked', 'mixed_script');   // Cyrillic а
+    no('Pαul', 'blocked', 'mixed_script');   // Greek α
+    no('Farmer Јoe', 'blocked', 'mixed_script');   // Cyrillic Ј, every character fine alone
     ok('小明Tom');
     ok('Ana 김');
   });
