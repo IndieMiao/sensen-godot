@@ -59,10 +59,21 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     const token = String(b.token).toLowerCase();
     const mine = accounts.tokenOwner(token);
     if (mine) return { ok: true, player: mine };   // the same token again: a retry after a lost answer, the same save
-    if (b.age_ok !== true) return send(bad('schema', 400));
-    if (!consentOk(b)) return send(outdated());
     const now = deps.now();
-    const named = nameForGuest(b, { limiter, ip: req.ip, now, list: deps.nameList?.() });
+    // §2.5: a test account (Test options, the OSS build) is made by its phone's main account — its token in authorization
+    // — and takes that account's consent; no name (the default). Anyone else's test:true is refused: a test account is a
+    // plain guest with no rights, but its consent must be a real one.
+    let main: ReturnType<typeof store.find> | undefined;
+    if (b.test === true) {
+      const w = identify(req.headers, deps.identify);
+      if (isRefusal(w)) return reply.code(w.status).send(w.body);
+      main = w.via === 'token' ? store.find(w.player, now) : undefined;
+      if (!main?.consent) return send(bad('unauthenticated', 401));
+    } else {
+      if (b.age_ok !== true) return send(bad('schema', 400));
+      if (!consentOk(b)) return send(outdated());
+    }
+    const named = main ? { ok: true as const } : nameForGuest(b, { limiter, ip: req.ip, now, list: deps.nameList?.() });
     if (!named.ok) return reply.code(named.status).send(named.body);
     if (b.pending !== undefined) return send(bad('pending_expired', 410));   // PR-B: the pending sign-in is taken here
     const h = Math.floor(now / 3_600_000);
@@ -71,11 +82,13 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if (n >= (deps.guestsPerHour ?? 10)) return send(bad('rate_limited', 429));
     made.set(req.ip, n + 1);
     let player = '';
-    do player = 'p0-' + randomBytes(10).toString('hex'); while (store.peek(player) || accounts.find(player) || accounts.isDeleted(player));
+    const make = () => (main ? 'g3test-' + randomBytes(16).toString('hex') : 'p0-' + randomBytes(10).toString('hex'));   // the test ids as P0TestAccounts writes them
+    do player = make(); while (store.peek(player) || accounts.find(player) || accounts.isDeleted(player));
     const s = store.get(player, now, deps.newSave?.(req.headers) ?? {});
-    s.consent = { terms: versions.terms, privacy: versions.privacy, at: now };
+    s.consent = main?.consent ? { ...main.consent } : { terms: versions.terms, privacy: versions.privacy, at: now };
     s.age_ok = true;
-    if (named.name !== undefined) setName(s, named.name, named.name_set_at ?? now);
+    if (main) s.test = true;
+    if ('name' in named && named.name !== undefined) setName(s, named.name, named.name_set_at ?? now);
     store.put(s);                    // the save first (§1.3) …
     accounts.ensure(player);
     accounts.issue(player, token);   // … then who holds it

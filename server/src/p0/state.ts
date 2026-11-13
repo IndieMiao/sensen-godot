@@ -250,6 +250,7 @@ export interface P0State {
   profile?: { name?: string; name_set_at?: number; name_locked_until?: number };
   consent?: { terms: string; privacy: string; at: number };
   age_ok?: true;
+  test?: true;                   // SGODOT-488 §2.5: a test account (Test options' Start new test account), left out of the counts
   rng: number;
   seq: number;
 }

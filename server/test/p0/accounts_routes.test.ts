@@ -138,3 +138,24 @@ describe('view.account', () => {
     expect(v.account).toEqual({ name: null, linked: [], rename_at: 0, consent: V });
   });
 });
+
+describe('a test account (tech-plan §2.5)', () => {
+  it('is made by the phone\'s main account, takes its consent, has a g3test- id and no name', async () => {
+    const { app, store } = setup();
+    const main = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest() })).json().player;
+    const r = await app.inject({ method: 'POST', url: '/v1/p0/session/guest', headers: { authorization: `Bearer ${T(1)}` }, payload: { test: true, token: T(2) } });
+    const id = r.json().player;
+    expect(id).toMatch(/^g3test-[0-9a-f]{32}$/);
+    const s = store.peek(id)!;
+    expect([s.test, s.age_ok, s.profile]).toEqual([true, true, undefined]);
+    expect(s.consent).toEqual(store.peek(main)!.consent);
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { authorization: `Bearer ${T(2)}` } })).statusCode).toBe(200);
+  });
+  it('without the main account\'s token it is refused', async () => {
+    const { app } = setup();
+    const r = await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: { test: true, token: T(2) } });
+    expect(r.statusCode).toBe(400);   // no id at all: bad_player
+    const r2 = await app.inject({ method: 'POST', url: '/v1/p0/session/guest', headers: { authorization: `Bearer ${T(9)}` }, payload: { test: true, token: T(2) } });
+    expect([r2.statusCode, r2.json().code]).toEqual([401, 'unauthenticated']);
+  });
+});
