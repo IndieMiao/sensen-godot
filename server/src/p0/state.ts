@@ -251,6 +251,7 @@ export interface P0State {
   consent?: { terms: string; privacy: string; at: number };
   age_ok?: true;
   test?: true;                   // SGODOT-488 §2.5: a test account (Test options' Start new test account), left out of the counts
+  login?: 'code';                // contract v1.4 §4: an account a test code signs into (a reviewer's, a tester's without Google)
   rng: number;
   seq: number;
 }

@@ -23,6 +23,11 @@
 #   server/deploy/p0/deploy-hk.sh token <player id>            # an admin token for a test device (30 days, kept through
 #                                                                #   other devices' sign-ins): printed once, terminal only
 #   server/deploy/p0/deploy-hk.sh claim-reset <player id>      # clear its claim and revoke every token, admin ones too
+#   server/deploy/p0/deploy-hk.sh code <player id|new> <note>  # a test code (contract v1.4 §4) for that account or a new one;
+#                                                                #   note an id such as review-play / cn-tester-03, never a name
+#   server/deploy/p0/deploy-hk.sh code-batch <count> <prefix>   # that many new accounts' codes, notes <prefix>-01 …
+#   server/deploy/p0/deploy-hk.sh code-revoke <player id>      # withdraw its code and the tokens it gave
+#                                                                # codes are printed once, terminal only, never saved
 # SYS-MAINT / SYS-UPDATE (gate.ts; kept in the data volume, so a restart keeps them; healthz and admin stay open):
 #   server/deploy/p0/deploy-hk.sh maint-on [back at]             # every /v1/p0 request answers 503 maintenance; back at =
 #                                                                #   any time, e.g. 2026-10-09T23:30+08:00 (sent as UTC ISO)
@@ -191,7 +196,7 @@ health() {   # $1 = label: Journey and farm healthz, saved for the before / afte
 step="${1:-}"; shift || true
 if [ "$TARGET" = hk ] && [ -z "$HK_OVERRIDE" ]; then
   case "$step" in
-    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version|token|claim-reset)
+    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version|token|claim-reset|code|code-batch|code-revoke)
       echo "$step writes to Hong Kong, the frozen fallback (P0 stopped, data frozen) until 2026-11-01 16:00 +08:00: refused."
       echo "The live P0 is US West: deploy-hk.sh --target us $step …"
       echo "Only for a fallback the PM has called: deploy-hk.sh --target hk --confirm-hk-frozen-override $step …"
@@ -432,8 +437,18 @@ PY
     else
       pkey="$(key)"
     fi
-    say "public smoke at $SITE$PREFIX"
-    P0_BASE="$SITE$PREFIX" P0_KEY="$pkey" "$here/smoke.sh" | tee "$out/smoke.txt"
+    # SGODOT-488 (奕星 11-13): the fixed smoke account made afresh with an hour's token (admin port, loopback in the
+    # container) — the token stays in this shell and goes to smoke.sh in its environment, never to a file or the output.
+    # An image before /admin/smoke answers 404: smoke.sh runs a throwaway id alone then, as before.
+    sresp=$(admin /admin/smoke '{}' 2>/dev/null) || sresp=""
+    stoken=$(printf '%s' "$sresp" | python3 -c 'import json, sys
+try: print(json.load(sys.stdin)["token"])
+except Exception: pass') || stoken=""
+    splayer=$(printf '%s' "$sresp" | python3 -c 'import json, sys
+try: print(json.load(sys.stdin)["player"])
+except Exception: pass') || splayer=""
+    say "public smoke at $SITE$PREFIX${stoken:+ as the smoke account $splayer (its token, an hour)}"
+    P0_BASE="$SITE$PREFIX" P0_KEY="$pkey" P0_SMOKE_TOKEN="$stoken" P0_SMOKE_PLAYER="$splayer" "$here/smoke.sh" | tee "$out/smoke.txt"
     say "Journey and farm healthz after"
     health after
     ;;
@@ -492,6 +507,38 @@ if t: print(f"admin tokens in force {len(t)}, the first ends {end} (--ids: whose
     echo "$resp"
     ends=$(printf '%s' "$resp" | python3 -c 'import json, sys, time; print(time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime(json.load(sys.stdin)["expires_at"] / 1000)))')
     echo "$(date -u +%FT%TZ) token …${player: -6} ends $ends" >> "$out/admin.txt"   # data B: no full id, never the token
+    ;;
+  code)
+    # A test code (contract v1.4 §4): the code is that account's key, so it goes to this terminal once and nowhere else;
+    # admin.txt keeps the note and the id's tail. Notes are ids (review-play, cn-tester-03), never a person's anything.
+    who="${1:?code <player id|new> <note>}"; note="${2:?code <player id|new> <note>}"
+    [[ "$note" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$ ]] || { echo "the note is an id such as review-play or cn-tester-03, no names: $note"; exit 2; }
+    if [ "$who" = new ]; then body="{\"note\":\"$note\"}"
+    else [[ "$who" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $who"; exit 2; }; body="{\"player\":\"$who\",\"note\":\"$note\"}"; fi
+    say "test code ($note) for $([ "$who" = new ] && echo 'a new account' || echo "…${who: -6}"): printed once below, terminal only"
+    resp=$(admin /admin/code "$body") || { echo "$resp"; exit 1; }
+    echo "$resp"
+    tail=$(printf '%s' "$resp" | python3 -c 'import json, sys; print(json.load(sys.stdin)["player"][-6:])')
+    echo "$(date -u +%FT%TZ) code $note …$tail" >> "$out/admin.txt"   # never the code
+    ;;
+  code-batch)
+    count="${1:?code-batch <count> <note prefix>}"; prefix="${2:?code-batch <count> <note prefix>}"
+    [[ "$count" =~ ^[0-9]{1,2}$ ]] && [ "$count" -ge 1 ] && [ "$count" -le 50 ] || { echo "count 1–50: $count"; exit 2; }
+    [[ "$prefix" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]{0,35}$ ]] || { echo "the prefix is an id such as cn-tester, no names: $prefix"; exit 2; }
+    say "$count test codes for new accounts, notes $prefix-01 …: printed once below, terminal only"
+    for i in $(seq 1 "$count"); do
+      note="$prefix-$(printf '%02d' "$i")"
+      resp=$(admin /admin/code "{\"note\":\"$note\"}") || { echo "$note: $resp"; exit 1; }
+      printf '%s' "$resp" | python3 -c 'import json, sys; r = json.load(sys.stdin); print(r["note"], r["code"], "…" + r["player"][-6:], sep="\t")'
+      echo "$(date -u +%FT%TZ) code $note …$(printf '%s' "$resp" | python3 -c 'import json, sys; print(json.load(sys.stdin)["player"][-6:])')" >> "$out/admin.txt"
+    done
+    ;;
+  code-revoke)
+    player="${1:?code-revoke <player id>}"
+    [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }
+    say "withdraw the test code of …${player: -6} and the tokens it gave (its other sign-ins stay)"
+    admin /admin/code/revoke "{\"player\":\"$player\"}"; echo
+    echo "$(date -u +%FT%TZ) code-revoke …${player: -6}" >> "$out/admin.txt"
     ;;
   claim-reset)
     player="${1:?claim-reset <player id>}"

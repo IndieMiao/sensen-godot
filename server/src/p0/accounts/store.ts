@@ -7,7 +7,7 @@
  * One process, one thread: a check and the write after it run in one synchronous stretch (the caller keeps every await
  * before it, §1.3).
  */
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 
 export type Provider = 'apple' | 'google';
@@ -23,22 +23,28 @@ export const DELETED_KEEP_MS = 30 * 86_400_000;
 /** Bytes a token has at least (32: 64 hex). */
 export const TOKEN_MIN_BYTES = 32;
 
-interface TokenRow { player: string; kind: TokenKind; at: number; expires_at?: number }
+interface TokenRow { player: string; kind: TokenKind; at: number; expires_at?: number; via?: string /* the code's key it came by */ }
+/** A test code (contract v1.4 §4): its player, when made, and a note such as `review-play` (never a person). */
+interface CodeRow { player: string; at: number; note: string }
 interface FileShape { v: 1; players: Record<string, AccountRow>; tokens: Record<string, TokenRow>; identities: Record<string, string>;
-  deleted: Record<string, number> }
+  deleted: Record<string, number>; codes: Record<string, CodeRow> }
 
 /** A token's hash, the hex read as one case (a token is hex: AB and ab are the same bytes; 周瑜 on PR-A). */
+/** A code as typed, as kept: Crockford base32 — case, spaces and dashes dropped, I / L read as 1, O as 0. */
+export const normalizeCode = (code: string): string =>
+  code.toUpperCase().replace(/[\s-]+/g, '').replace(/[IL]/g, '1').replace(/O/g, '0');
 export const hashToken = (token: string): string => createHash('sha256').update(token.toLowerCase()).digest('hex');
 /** A token as the contract has it: hex, at least TOKEN_MIN_BYTES. */
 export const tokenShapeOk = (token: unknown): token is string =>
   typeof token === 'string' && /^[0-9a-f]+$/i.test(token) && token.length >= TOKEN_MIN_BYTES * 2 && token.length <= 256;
 
 export class P0Accounts {
-  private d: FileShape = { v: 1, players: {}, tokens: {}, identities: {}, deleted: {} };
+  private d: FileShape = { v: 1, players: {}, tokens: {}, identities: {}, deleted: {}, codes: {} };
   constructor(private file?: string, private key?: Buffer | null, private now: () => number = Date.now) {
     if (file && existsSync(file)) {
       const saved = JSON.parse(readFileSync(file, 'utf8')) as Partial<FileShape>;
-      this.d = { v: 1, players: saved.players ?? {}, tokens: saved.tokens ?? {}, identities: saved.identities ?? {}, deleted: saved.deleted ?? {} };
+      this.d = { v: 1, players: saved.players ?? {}, tokens: saved.tokens ?? {}, identities: saved.identities ?? {}, deleted: saved.deleted ?? {},
+        codes: saved.codes ?? {} };
     }
     if (this.prune()) this.flush();
   }
@@ -63,8 +69,10 @@ export class P0Accounts {
   }
   /** Whether the hash is someone's already (a token is one player's only, contract §1 claim). */
   tokenOwner(token: string): string | undefined { return this.d.tokens[hashToken(token)]?.player; }
-  issue(player: string, token: string, kind: TokenKind = 'user', expiresAt?: number): void {
-    this.d.tokens[hashToken(token)] = { player, kind, at: this.now(), ...(expiresAt !== undefined ? { expires_at: expiresAt } : {}) };
+  /** `via`: the code it came by (codeKey), so revoking the code revokes exactly the tokens it gave. */
+  issue(player: string, token: string, kind: TokenKind = 'user', expiresAt?: number, via?: string): void {
+    this.d.tokens[hashToken(token)] = { player, kind, at: this.now(), ...(expiresAt !== undefined ? { expires_at: expiresAt } : {}),
+      ...(via ? { via } : {}) };
     this.flush();
   }
   /** Every user token of the player but `keep` (a token in hand, not a hash); admin ones only with `admin`. The hashes revoked. */
@@ -97,12 +105,22 @@ export class P0Accounts {
     delete row[provider];
     this.flush();
   }
+  /** Whether the account is anyone's to sign in to and no longer an old id's to take (奕星 on v3.2 ⑥): it was claimed,
+   * or is linked to an Apple / Google account, or has a test code, or holds a user token. A farm made by a sign-in and
+   * signed out is all of this but the last — its id alone must not open it again, nor offer it to claim. */
+  isClaimed(player: string): boolean {
+    const r = this.d.players[player];
+    return !!r && (r.claimed_at !== undefined || !!r.apple || !!r.google)
+      || Object.values(this.d.codes).some(c => c.player === player)
+      || this.userTokenCount(player) > 0;
+  }
   linked(player: string): Provider[] { const r = this.d.players[player]; return r ? (['apple', 'google'] as const).filter(p => r[p]) : []; }
 
   markDeleted(player: string, at: number): void { this.d.deleted[player] = at; this.flush(); }
   isDeleted(player: string): boolean { const at = this.d.deleted[player]; return at !== undefined && this.now() - at < DELETED_KEEP_MS; }
   /** This player's row, links and every token (accounts.json only; the save is P0Store.remove). */
   remove(player: string): void {
+    for (const [k, c] of Object.entries(this.d.codes)) if (c.player === player) delete this.d.codes[k];   // its test code too
     const row = this.d.players[player];
     for (const p of ['apple', 'google'] as const) if (row?.[p]) delete this.d.identities[`${p}:${row[p]!.sub}`];
     delete this.d.players[player];
@@ -116,6 +134,46 @@ export class P0Accounts {
       .map(([h, t]) => ({ player: t.player, tail: t.player.slice(-4), token_tail: h.slice(-6), expires_at: t.expires_at ?? 0 }));
   }
   players(): string[] { return Object.keys(this.d.players); }
+
+  // ---------------------------------------------------------------- test codes (contract v1.4 §4)
+  /** Whether codes can be kept: they are keyed by HMAC under P0_ACCOUNTS_KEY (a backup leaked cannot be tried offline
+   * against a plain sha256), so without the key the code routes stay off. */
+  codesOn(): boolean { return !!this.key; }
+  /** A code's key: HMAC-SHA256 under P0_ACCOUNTS_KEY of the code as typed once normalized (normalizeCode). */
+  codeKey(code: string): string {
+    if (!this.key) throw new Error('P0Accounts: codes need P0_ACCOUNTS_KEY');
+    return createHmac('sha256', this.key).update(normalizeCode(code)).digest('hex');
+  }
+  /** One code per player: a new one replaces the old (whose tokens go with it). The key of the new one. */
+  setCode(player: string, code: string, note: string): string {
+    this.revokeCode(player);
+    const k = this.codeKey(code);
+    this.d.codes[k] = { player, at: this.now(), note: note.slice(0, 64) };
+    this.flush();
+    return k;
+  }
+  /** The player a code stands for, and its key; undefined for none (or with no key). */
+  codeOwner(code: string): { player: string; key: string } | undefined {
+    if (!this.key) return undefined;
+    const k = this.codeKey(code), c = this.d.codes[k];
+    return c ? { player: c.player, key: k } : undefined;
+  }
+  /** The player's code withdrawn, and exactly the tokens it gave (an Apple / Google sign-in of that player stays). The
+   * number of tokens revoked; -1 when there was no code. */
+  revokeCode(player: string): number {
+    const keys = Object.entries(this.d.codes).filter(([, c]) => c.player === player).map(([k]) => k);
+    if (!keys.length) return -1;
+    for (const k of keys) delete this.d.codes[k];
+    const gone = Object.entries(this.d.tokens).filter(([, t]) => t.via && keys.includes(t.via)).map(([h]) => h);
+    for (const h of gone) delete this.d.tokens[h];
+    this.flush();
+    return gone.length;
+  }
+  /** The player's code's note and when it was made (admin listing); never the code. */
+  codeOf(player: string): { note: string; at: number } | undefined {
+    const c = Object.values(this.d.codes).find(x => x.player === player);
+    return c ? { note: c.note, at: c.at } : undefined;
+  }
 
   /** The file as it is now, for the hourly snapshot beside the save's (§1.3). */
   path(): string | undefined { return this.file; }

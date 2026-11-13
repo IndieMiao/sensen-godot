@@ -105,3 +105,43 @@ describe('P0Accounts files and case', () => {
     expect(statSync(f).mode & 0o777).toBe(0o600);
   });
 });
+
+describe('test codes (contract v1.4 §4)', () => {
+  it('keeps a code as HMAC under the key, finds it as typed in any form, one code per player', () => {
+    const f = file();
+    const a = new P0Accounts(f, KEY);
+    a.setCode('p0-review001', 'AB12-CD34-EF56', 'review-play');
+    expect(readFileSync(f, 'utf8')).not.toContain('AB12CD34EF56');
+    expect(a.codeOwner('ab12 cd34 ef56')?.player).toBe('p0-review001');
+    expect(a.codeOwner('AB12CD34EF56')?.player).toBe('p0-review001');
+    expect(a.codeOwner('AB12-CD34-EF57')).toBeUndefined();
+    expect(new P0Accounts(f, Buffer.alloc(32, 9)).codeOwner('AB12-CD34-EF56')).toBeUndefined();   // another key: not found
+    expect(a.codeOf('p0-review001')).toEqual({ note: 'review-play', at: expect.any(Number) });
+    a.setCode('p0-review001', 'ZZ99-ZZ99-ZZ99', 'review-play');
+    expect(a.codeOwner('AB12-CD34-EF56')).toBeUndefined();   // the old one replaced
+  });
+  it('reads I / L as 1 and O as 0', () => {
+    const a = new P0Accounts(undefined, KEY);
+    a.setCode('p0-tester001', '1100-0000-1111', 'cn-tester-01');
+    expect(a.codeOwner('ILOO-oooo-lIl1')?.player).toBe('p0-tester001');
+  });
+  it('revoking the code revokes exactly the tokens it gave; a deletion takes the code too', () => {
+    const a = new P0Accounts(undefined, KEY);
+    const key = a.setCode('p0-review001', 'AB12-CD34-EF56', 'review-play');
+    a.issue('p0-review001', T(1), 'user', undefined, key);
+    a.issue('p0-review001', T(2), 'user', undefined, key);
+    a.issue('p0-review001', T(3));   // an Apple sign-in of the same player
+    expect(a.revokeCode('p0-review001')).toBe(2);
+    expect([a.byToken(T(1)), a.byToken(T(2)), a.byToken(T(3))?.player]).toEqual([undefined, undefined, 'p0-review001']);
+    expect(a.revokeCode('p0-review001')).toBe(-1);
+    a.setCode('p0-review001', 'AB12-CD34-EF56', 'x');
+    a.remove('p0-review001');
+    expect(a.codeOwner('AB12-CD34-EF56')).toBeUndefined();
+  });
+  it('without a key, no codes: off, found nowhere', () => {
+    const a = new P0Accounts(undefined, null);
+    expect(a.codesOn()).toBe(false);
+    expect(a.codeOwner('AB12-CD34-EF56')).toBeUndefined();
+    expect(() => a.setCode('p', 'AB12-CD34-EF56', 'x')).toThrow();
+  });
+});

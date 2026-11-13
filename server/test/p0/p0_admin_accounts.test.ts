@@ -2,7 +2,7 @@
  *  claim reset, and the admin tokens in force on /admin/players. */
 import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
-import { ADMIN_TOKEN_MS, registerP0Admin } from '../../src/p0/admin.js';
+import { ADMIN_TOKEN_MS, registerP0Admin, SMOKE_PLAYER, SMOKE_TOKEN_MS } from '../../src/p0/admin.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { P0Store } from '../../src/p0/store.js';
@@ -96,5 +96,52 @@ describe('admin tokens and claim reset (contract §4.1)', () => {
     const one = (await bare.admin.inject({ method: 'GET', url: '/admin/players', headers: { 'x-p0-admin': KEY } })).json().players[0];
     expect(one).not.toHaveProperty('admin_tokens');
     expect((await bare.post('/admin/session', { player: 'test-phone-0008' })).statusCode).toBe(404);   // no such route without accounts
+  });
+});
+
+describe("the deploy's smoke account (奕星 11-13)", () => {
+  it('/admin/smoke: the fixed account made afresh, marked test; an hour-long token, the earlier one revoked; no token logged', async () => {
+    const { store, accounts, lines, post, tick } = setup();
+    store.get('a-real-player-01', T0);
+    const first = (await post('/admin/smoke', {})).json();
+    expect(first).toMatchObject({ ok: true, player: SMOKE_PLAYER, expires_at: T0 + SMOKE_TOKEN_MS });
+    expect(first.token).toMatch(/^[0-9a-f]{64}$/);
+    expect(accounts.byToken(first.token)).toEqual({ player: SMOKE_PLAYER, kind: 'admin' });
+    const s = store.peek(SMOKE_PLAYER)!;
+    expect(s.test).toBe(true);
+    s.plots[0].crop = 'radish';   // a run's sow
+    s.coins = 3;
+    tick(60_000);
+    const second = (await post('/admin/smoke', {})).json();
+    expect(accounts.byToken(first.token)).toBeUndefined();
+    expect(accounts.byToken(second.token)?.player).toBe(SMOKE_PLAYER);
+    expect(store.peek(SMOKE_PLAYER)!.plots[0].crop).not.toBe('radish');   // afresh: the same check each time
+    expect(store.peek(SMOKE_PLAYER)!.coins).not.toBe(3);
+    expect(store.peek('a-real-player-01')).toBeDefined();
+    expect(lines.map(l => JSON.parse(l))).toEqual([{ admin: 'smoke', expires_at: T0 + SMOKE_TOKEN_MS, at: T0 },
+      { admin: 'smoke', expires_at: T0 + 60_000 + SMOKE_TOKEN_MS, at: T0 + 60_000 }]);
+    tick(SMOKE_TOKEN_MS);
+    expect(accounts.byToken(second.token)).toBeUndefined();
+  });
+
+  it('resets the smoke account only: any other id is refused, its save and tokens untouched (奕星 11-13)', async () => {
+    const { store, accounts, lines, post } = setup();
+    const real = store.get('a-real-player-01', T0);
+    real.coins = 777;
+    accounts.issue('a-real-player-01', USER_TOKEN);
+    for (const player of ['a-real-player-01', 'p0-smoke-check2', '', 7, null]) {
+      const r = await post('/admin/smoke', { player });
+      expect([r.statusCode, r.json()]).toEqual([400, { ok: false, code: 'smoke_only', player: SMOKE_PLAYER }]);
+    }
+    expect(store.peek('a-real-player-01')!.coins).toBe(777);
+    expect(accounts.byToken(USER_TOKEN)?.player).toBe('a-real-player-01');
+    expect(store.peek(SMOKE_PLAYER)).toBeUndefined();
+    expect(lines).toEqual([]);
+    expect((await post('/admin/smoke', { player: SMOKE_PLAYER })).json()).toMatchObject({ ok: true, player: SMOKE_PLAYER });
+  });
+
+  it('needs the admin key; without accounts there is no such route', async () => {
+    expect((await setup().post('/admin/smoke', {}, 'wrong')).statusCode).toBe(401);
+    expect((await setup(false).post('/admin/smoke', {})).statusCode).toBe(404);
   });
 });

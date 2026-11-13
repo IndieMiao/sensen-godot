@@ -8,6 +8,7 @@
  */
 import { randomBytes } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
+import { newCode, noteOk } from './accounts/codes.js';
 import type { P0Accounts } from './accounts/store.js';
 import type { P0Content } from './content.js';
 import { isoMinute, type P0Gate } from './gate.js';
@@ -22,6 +23,9 @@ export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => nu
 
 /** An admin token lasts 30 days (tech-plan §2.5): a test device's, kept through other devices' sign-ins, never forgotten. */
 export const ADMIN_TOKEN_MS = 30 * 86_400_000;
+/** The deploy's smoke account (SGODOT-488, 奕星 11-13): one fixed id, never a player's, and its token's hour. */
+export const SMOKE_PLAYER = 'p0-smoke-check';
+export const SMOKE_TOKEN_MS = 3_600_000;
 const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
 export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
@@ -42,7 +46,8 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       ok: true,
       players: store.all().map(s => ({ player: s.player, created_at: s.created_at, last_at: s.presence.last_at, seq: s.seq,
         energy: s.energy.value, skills: s.skills, homestead: s.homestead.level,
-        ...(deps.accounts ? { admin_tokens: admin.get(s.player) ?? [] } : {}) })).sort((a, b) => a.created_at - b.created_at),
+        ...(deps.accounts ? { admin_tokens: admin.get(s.player) ?? [] } : {}),
+        ...(deps.accounts?.codesOn() ? { code: deps.accounts.codeOf(s.player) ?? null } : {}) })).sort((a, b) => a.created_at - b.created_at),
     };
   });
 
@@ -84,6 +89,74 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       accounts.issue(player, token, 'admin', expires_at);
       log(JSON.stringify({ admin: 'session', player: player.slice(-6), expires_at, at: deps.now() }));   // the id's tail: the log outlives a deletion
       return { ok: true, player, token, expires_at };
+    });
+
+    /** The deploy's smoke (smoke.sh through deploy-hk.sh smoke): the fixed smoke account made afresh — a new save marked
+     *  test, left out of the counts, so the same check runs each time — and a token of its own for an hour, its earlier
+     *  ones revoked. No other save is touched; no id made up per run (a forced update leaves no id-only client to make
+     *  one). The token is in this answer only, never in the log. */
+    app.post('/admin/smoke', async (req, reply) => {
+      // that one account only (奕星 11-13: the reset runs with every deploy, so no id may be passed to it — any other
+      // is refused, never reset)
+      const asked = (req.body && typeof req.body === 'object' ? (req.body as { player?: unknown }).player : undefined);
+      if (asked !== undefined && asked !== SMOKE_PLAYER) return reply.code(400).send({ ok: false, code: 'smoke_only', player: SMOKE_PLAYER });
+      const now = deps.now();
+      const s = store.reset(SMOKE_PLAYER, now);
+      s.test = true;
+      store.put(s);
+      accounts.ensure(SMOKE_PLAYER);
+      accounts.revokeAll(SMOKE_PLAYER, undefined, { admin: true });
+      const token = randomBytes(32).toString('hex'), expires_at = now + SMOKE_TOKEN_MS;
+      accounts.issue(SMOKE_PLAYER, token, 'admin', expires_at);
+      log(JSON.stringify({ admin: 'smoke', expires_at, at: now }));
+      return { ok: true, player: SMOKE_PLAYER, token, expires_at };
+    });
+
+    /** A test code (contract v1.4 §4, v1.6 ④): for `player`, or for an account made here — a new player's fresh save (its
+     *  home to pick, the guide), as any new player's: a reviewer goes the real way — the save marked login: code, and test
+     *  when the note is a store review's (q(322) ②, 奕星 11-13 A: the counts leave it out; test changes no way in the
+     *  game, nothing reads it but the counts, and it is not the OSS test page's accounts). One code an
+     *  account: a new one replaces the old, whose tokens go. Not for an account linked to Apple or Google: their sign-in
+     *  would sign every code device out. A code makes its account claimed (isClaimed): its old id alone gets 426. The code
+     *  is in this answer only, never in the log. */
+    app.post('/admin/code', async (req, reply) => {
+      if (!accounts.codesOn()) return reply.code(503).send({ ok: false, code: 'codes_off' });
+      const b = (req.body && typeof req.body === 'object' ? req.body : {}) as { player?: unknown; note?: unknown };
+      if (!noteOk(b.note)) return reply.code(400).send({ ok: false, code: 'bad_note' });
+      const now = deps.now();
+      let player: string, s;
+      if (b.player === undefined) {
+        do player = 'p0-' + randomBytes(10).toString('hex'); while (store.peek(player) || accounts.find(player) || accounts.isDeleted(player));
+        s = store.get(player, now, { pending: true, guide: true });
+      } else {
+        const p = playerOf(b);
+        if (!p || !store.peek(p) || accounts.isDeleted(p)) return reply.code(404).send({ ok: false, code: 'unknown_player' });
+        if (accounts.linked(p).length) return reply.code(409).send({ ok: false, code: 'linked', linked: accounts.linked(p) });
+        player = p; s = store.peek(p)!;
+      }
+      s.login = 'code';
+      if (/(^|[-_.])review([-_.]|$)/i.test(b.note)) s.test = true;   // q(322) ②: left out of the counts, nothing else; review a word of its own (not preview-…)
+      store.put(s);
+      // claimed for good (亚瑟 11-13): an old account a code is handed to, a Google-less tester's own farm, turns its old
+      // build's id-only requests away (426) from now, and still once the code is withdrawn — the code's presence alone
+      // (isClaimed) would lapse with it, letting the old build back in beside the code's phones
+      accounts.markClaimed(player);
+      const code = newCode();
+      accounts.setCode(player, code, b.note);
+      log(JSON.stringify({ admin: 'code', player: player.slice(-6), note: b.note, made: b.player === undefined, at: now }));
+      return { ok: true, player, code, note: b.note };
+    });
+
+    /** A test code withdrawn: exactly the tokens it gave go, and the account's open room socket (its Apple / Google
+     *  sign-in, had it one, would stay). */
+    app.post('/admin/code/revoke', async (req, reply) => {
+      if (!accounts.codesOn()) return reply.code(503).send({ ok: false, code: 'codes_off' });
+      const player = playerOf(req.body);
+      const revoked = player ? accounts.revokeCode(player) : -1;
+      if (!player || revoked < 0) return reply.code(404).send({ ok: false, code: 'no_code' });
+      deps.kick?.(player);
+      log(JSON.stringify({ admin: 'code_revoke', player: player.slice(-6), revoked, at: deps.now() }));
+      return { ok: true, revoked };
     });
 
     /** The claim undone (contract §4.1): claimed_at cleared and every token revoked, admin ones too — the account's old id
