@@ -39,7 +39,8 @@ export interface AccountRouteDeps {
   guestsPerHour?: number;
   /** v1.4 (必须注册): a new farm needs a sign-in — guest takes the pending one (PR-B's PendingSignIns) and links it;
    * without one, sign_in_required, unless P0_GUEST_OK (devserver, shots) or a test account. */
-  pending?: { take(id: unknown): { provider: Provider; link: AppleLink | GoogleLink } | undefined };
+  pending?: { take(id: unknown): { provider: Provider; link: AppleLink | GoogleLink } | undefined;
+    create?(provider: Provider, link: AppleLink | GoogleLink): string };
   guestOk?: boolean;
 }
 
@@ -100,7 +101,11 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if (signedIn) {
       // the account linked meanwhile to a farm that is there (another phone made one): never taken from it
       const was = accounts.byIdentity(signedIn.provider, signedIn.link.sub);
-      if (was && !accounts.isDeleted(was) && store.find(was, now)) return send(bad('conflict', 409));
+      // v1.6 ②: the sign-in handed back as a new pending one, so 「进那个农场」 needs no second system sign-in
+      if (was && !accounts.isDeleted(was) && store.find(was, now)) {
+        const again = deps.pending?.create?.(signedIn.provider, signedIn.link);
+        return send(bad('conflict', 409, again ? { pending: again } : {}));
+      }
     }
     const h = Math.floor(now / 3_600_000);
     if (h !== hour) { made.clear(); hour = h; }

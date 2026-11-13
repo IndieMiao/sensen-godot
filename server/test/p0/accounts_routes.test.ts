@@ -19,7 +19,8 @@ function setup(opts: { legacyId?: boolean; ages?: Record<string, boolean>; guest
   const app = Fastify();
   registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: () => T0, versions: V,
     voiceAge: p => (opts.ages && p in opts.ages ? opts.ages[p] : null), guestsPerHour: opts.guestsPerHour, guestOk: opts.guestOk ?? true,
-    pending: { take: (id: unknown) => { const p = opts.pendings?.[String(id)]; if (p) delete opts.pendings![String(id)]; return p as never; } } });
+    pending: { take: (id: unknown) => { const p = opts.pendings?.[String(id)]; if (p) delete opts.pendings![String(id)]; return p as never; },
+      create: (_p: string, link: { sub: string }) => `again-${link.sub}` } });
   registerP0Routes(app, { content: c, store, now: () => T0, dev: false, identify: identifyDeps });
   return { app, store, accounts };
 }
@@ -178,7 +179,8 @@ describe('v1.4 必须注册', () => {
   it('the account linked meanwhile to a farm that is there is a conflict, never taken from it; one left on a farm gone moves', async () => {
     const { app, accounts, store } = setup({ guestOk: false, pendings: { p1: { provider: 'google', link: { sub: 'g1' } }, p2: { provider: 'google', link: { sub: 'g2' } } } });
     store.get('p0-live00001', T0); accounts.link('p0-live00001', 'google', { sub: 'g1' });
-    expect((await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'p1' }) })).json().code).toBe('conflict');
+    const conflict = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'p1' }) })).json();
+    expect(conflict).toEqual({ ok: false, code: 'conflict', pending: 'again-g1' });   // v1.6 ②: a new pending one for 「进那个农场」
     expect(accounts.byIdentity('google', 'g1')).toBe('p0-live00001');
     accounts.link('p0-gone00001', 'google', { sub: 'g2' });   // no save
     const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'p2', token: T(3) }) })).json();
