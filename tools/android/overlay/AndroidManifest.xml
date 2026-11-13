@@ -19,10 +19,15 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- 定位：Android 12+（targetSdk≥31）必须同时声明 FINE 与 COARSE，并在同一次
-         运行时请求中提交；只声明/只请求 FINE 会被系统直接忽略（无弹窗无回调）。 -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- 上架清权限（蒙恬 11-13，审计 G8；隐私政策写的是不申请定位、相机）。定位：P0 地图一进来就是街区模式，从不调
+         start_location（map_bridge_android.gd）；Journey 的 map_poc 要定位时没有权限，照旧走 3 秒超时回落。
+         相机、前台服务、录屏服务：LiveKit 库的 manifest 自带（屏幕共享 / 视频用），我们只用麦克风、退到后台就断开，
+         这里用 tools:node="remove" 从合并后的 manifest 里去掉。build_demo_apk.sh 出包后核这些都不在。 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.CAMERA" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" tools:node="remove" />
 
     <application
         android:label="@string/godot_project_name_string"
@@ -55,6 +60,11 @@
             android:configChanges="layoutDirection|locale|orientation|keyboardHidden|screenSize|smallestScreenSize|density|keyboard|navigation|screenLayout|uiMode"
             android:resizeableActivity="false"
             tools:ignore="UnusedAttribute" />
+        <!-- LiveKit 屏幕共享的前台服务（mediaProjection），我们不用：同上，去掉。 -->
+        <service
+            android:name="io.livekit.android.room.track.screencapture.ScreenCaptureService"
+            tools:node="remove" />
+
         <activity-alias
             android:name=".GodotAppLauncher"
             android:targetActivity=".GodotApp"
