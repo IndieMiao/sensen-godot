@@ -8,6 +8,7 @@
  */
 import { randomBytes } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
+import { newCode, noteOk } from './accounts/codes.js';
 import type { P0Accounts } from './accounts/store.js';
 import type { P0Content } from './content.js';
 import { isoMinute, type P0Gate } from './gate.js';
@@ -45,7 +46,8 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       ok: true,
       players: store.all().map(s => ({ player: s.player, created_at: s.created_at, last_at: s.presence.last_at, seq: s.seq,
         energy: s.energy.value, skills: s.skills, homestead: s.homestead.level,
-        ...(deps.accounts ? { admin_tokens: admin.get(s.player) ?? [] } : {}) })).sort((a, b) => a.created_at - b.created_at),
+        ...(deps.accounts ? { admin_tokens: admin.get(s.player) ?? [] } : {}),
+        ...(deps.accounts?.codesOn() ? { code: deps.accounts.codeOf(s.player) ?? null } : {}) })).sort((a, b) => a.created_at - b.created_at),
     };
   });
 
@@ -108,6 +110,47 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       accounts.issue(SMOKE_PLAYER, token, 'admin', expires_at);
       log(JSON.stringify({ admin: 'smoke', expires_at, at: now }));
       return { ok: true, player: SMOKE_PLAYER, token, expires_at };
+    });
+
+    /** A test code (contract v1.4 §4, v1.6 ④): for `player`, or for an account made here — a new player's fresh save (its
+     *  home to pick, the guide), not marked test: a reviewer goes the real way — the save marked login: code. One code an
+     *  account: a new one replaces the old, whose tokens go. Not for an account linked to Apple or Google: their sign-in
+     *  would sign every code device out. A code makes its account claimed (isClaimed): its old id alone gets 426. The code
+     *  is in this answer only, never in the log. */
+    app.post('/admin/code', async (req, reply) => {
+      if (!accounts.codesOn()) return reply.code(503).send({ ok: false, code: 'codes_off' });
+      const b = (req.body && typeof req.body === 'object' ? req.body : {}) as { player?: unknown; note?: unknown };
+      if (!noteOk(b.note)) return reply.code(400).send({ ok: false, code: 'bad_note' });
+      const now = deps.now();
+      let player: string, s;
+      if (b.player === undefined) {
+        do player = 'p0-' + randomBytes(10).toString('hex'); while (store.peek(player) || accounts.find(player) || accounts.isDeleted(player));
+        s = store.get(player, now, { pending: true, guide: true });
+      } else {
+        const p = playerOf(b);
+        if (!p || !store.peek(p) || accounts.isDeleted(p)) return reply.code(404).send({ ok: false, code: 'unknown_player' });
+        if (accounts.linked(p).length) return reply.code(409).send({ ok: false, code: 'linked', linked: accounts.linked(p) });
+        player = p; s = store.peek(p)!;
+      }
+      s.login = 'code';
+      store.put(s);
+      accounts.ensure(player);
+      const code = newCode();
+      accounts.setCode(player, code, b.note);
+      log(JSON.stringify({ admin: 'code', player: player.slice(-6), note: b.note, made: b.player === undefined, at: now }));
+      return { ok: true, player, code, note: b.note };
+    });
+
+    /** A test code withdrawn: exactly the tokens it gave go, and the account's open room socket (its Apple / Google
+     *  sign-in, had it one, would stay). */
+    app.post('/admin/code/revoke', async (req, reply) => {
+      if (!accounts.codesOn()) return reply.code(503).send({ ok: false, code: 'codes_off' });
+      const player = playerOf(req.body);
+      const revoked = player ? accounts.revokeCode(player) : -1;
+      if (!player || revoked < 0) return reply.code(404).send({ ok: false, code: 'no_code' });
+      deps.kick?.(player);
+      log(JSON.stringify({ admin: 'code_revoke', player: player.slice(-6), revoked, at: deps.now() }));
+      return { ok: true, revoked };
     });
 
     /** The claim undone (contract §4.1): claimed_at cleared and every token revoked, admin ones too — the account's old id

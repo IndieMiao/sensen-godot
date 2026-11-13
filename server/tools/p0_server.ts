@@ -9,6 +9,7 @@
 import { accountsConfig } from '../src/p0/accounts/config.js';
 import { identify, isRefusal } from '../src/p0/accounts/identify.js';
 import { registerAccountRoutes } from '../src/p0/accounts/routes.js';
+import { registerCodeRoutes } from '../src/p0/accounts/codes.js';
 import { P0Accounts } from '../src/p0/accounts/store.js';
 import Fastify from 'fastify';
 import { mkdirSync } from 'node:fs';
@@ -139,6 +140,8 @@ registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.
   voiceAge: p => { const a = voice.status(p).age; return a === 'ok' ? true : a === 'no' ? false : null; },
   voiceAgeOk: p => { voice.setAge(p, true); },
   newSave: h => { const f = String(h['x-p0-features'] ?? '').split(',').map(x => x.trim()); return { pending: f.includes('choose_home'), guide: f.includes('guide_v3') }; } });
+// Test codes (contract v1.4 §4): the reviewers' and Google-less testers' sign-in; none without P0_ACCOUNTS_KEY.
+registerCodeRoutes(app, { store, accounts, now: Date.now });
 voice.tell = (player, payload) => hub.tell(player, payload);
 voice.seen = (a, b) => hub.seenChanged(a, b);
 const startedAt = Date.now();
