@@ -1,14 +1,20 @@
 /** SGODOT-484 PR1: isolated files only; no real provider or production deletion. */
+import Fastify from 'fastify';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import WebSocket from 'ws';
 import { deleteAccount, previewAccountDeletion } from '../../src/p0/accounts/delete.js';
+import { identify } from '../../src/p0/accounts/identify.js';
+import { registerAccountRoutes } from '../../src/p0/accounts/routes.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { loadOutposts } from '../../src/p0/online/outposts.js';
+import { registerP0Online } from '../../src/p0/online/hub.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
-import { P0Voice } from '../../src/p0/online/voice.js';
+import { P0Voice, registerP0Voice } from '../../src/p0/online/voice.js';
+import { registerP0Routes } from '../../src/p0/routes.js';
 import { P0Store } from '../../src/p0/store.js';
 import { supportCode } from '../../src/p0/support.js';
 
@@ -42,6 +48,56 @@ function setup() {
 const json = (file: string) => JSON.parse(readFileSync(file, 'utf8'));
 
 describe('account deletion (contract-accounts §4)', () => {
+  it('integrates A1: revoked tokens and legacy ids cannot read, claim or rejoin, nor can queued WS messages recreate presence', async () => {
+    const { deps, files } = setup();
+    const app = Fastify(), rooms = new OutpostRooms(loadOutposts());
+    const voice = new P0Voice(null, rooms, files, deps.now);
+    const identity = { accounts: deps.accounts, legacyId: false, warn: () => {} };
+    const who = (headers: Record<string, unknown>) => identify(headers, identity);
+    const hub = registerP0Online(app, { rooms, identify: who, departed: o => voice.departed(o) });
+    registerP0Voice(app, voice, who);
+    registerP0Routes(app, { content, store: deps.store, now: deps.now, dev: false, identify: identity });
+    registerAccountRoutes(app, { ...deps, identify: identity, versions: { terms: 'test', privacy: 'test' } });
+    await app.listen({ port: 0, host: '127.0.0.1' });
+    const url = `ws://127.0.0.1:${(app.server.address() as { port: number }).port}/v1/p0/online`;
+    const headers = { authorization: `Bearer ${USER_TOKEN}`, 'x-p0-player': PLAYER };
+    const ws = new WebSocket(url, { headers });
+    try {
+      await new Promise<void>((resolve, reject) => { ws.once('open', resolve); ws.once('error', reject); });
+      const joined = new Promise<void>(resolve => ws.on('message', data => {
+        if (String(data).startsWith('{') && JSON.parse(String(data)).t === 'joined') resolve();
+      }));
+      ws.send(JSON.stringify({ t: 'join', outpost: 'sh_tea_1' }));
+      await joined;
+      const old = [...hub.conns][0];
+      const closed = new Promise<number>(resolve => ws.once('close', resolve));
+      const deleting = deleteAccount({ ...deps, voice, hub }, PLAYER);
+      old.ws.emit('message', Buffer.from(JSON.stringify({ t: 'join', outpost: 'sh_tea_1' })), false);
+      await deleting;
+      expect(await closed).toBe(4001);
+      expect(rooms.total()).toBe(0);
+      expect(hub.conns.size).toBe(0);
+      for (const auth of [headers, { 'x-p0-player': PLAYER }, { authorization: `Bearer ${ADMIN_TOKEN}`, 'x-p0-player': PLAYER }]) {
+        const r = await app.inject({ method: 'GET', url: '/v1/p0/state', headers: auth });
+        expect([r.statusCode, r.json().code]).toEqual([401, 'account_deleted']);
+      }
+      const claim = await app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': PLAYER }, payload: { token: '4'.repeat(64) } });
+      expect([claim.statusCode, claim.json().code]).toEqual([404, 'unknown_player']);
+      const voiceRead = await app.inject({ method: 'GET', url: '/v1/p0/voice/status', headers });
+      expect(voiceRead.statusCode).toBe(401);
+      const refused = await new Promise<number>((resolve, reject) => {
+        const again = new WebSocket(url, { headers });
+        again.once('unexpected-response', (_req, res) => { res.resume(); res.once('end', () => resolve(res.statusCode!)); });
+        again.once('open', () => { again.terminate(); reject(new Error('deleted account rejoined')); });
+        again.once('error', reject);
+      });
+      expect(refused).toBe(401);
+      expect(deps.store.peek(PLAYER)).toBeUndefined();
+      expect(deps.store.size()).toBe(2);
+      expect((await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { authorization: `Bearer ${OTHER_TOKEN}` } })).statusCode).toBe(200);
+    } finally { ws.terminate(); await app.close(); }
+  });
+
   it('matches the client support code vectors without exposing the player id', () => {
     expect(supportCode('p0-shot-nezha')).toBe('WKRW4-9CH60');
     expect(supportCode('test-1')).toBe('55YF1-3C0J8');

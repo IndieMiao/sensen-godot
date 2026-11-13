@@ -5,7 +5,8 @@
 不执行真实账号操作。接口依据共享 `store-readiness/contract-accounts.md` §4。
 
 依赖后裔 `feat/accounts-pr-a` 的 `P0Accounts`、`P0Store.find/remove`（开发基座 `59d7d5c0d`）。
-账号鉴权、旧 token / 旧 ID 防止重新建档由 PR-A 接入并联调；不能仅凭本模块单测通过就部署删除入口。
+已用 PR-A 鉴权做本地 HTTP/WS 联调：删后普通/admin token、旧 ID、claim、WS 和语音入口均拒绝，
+旧 socket 排队消息不再重建在线状态，其他账号照常访问。真实部署仍不能仅凭本地测试通过就开启删除入口。
 
 ## 顺序和失败处理
 
