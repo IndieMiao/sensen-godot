@@ -1,6 +1,6 @@
 /** Sign-in's shared parts (SGODOT-489; contract-accounts.md §2, §4). */
 import { describe, expect, it } from 'vitest';
-import { conflictFarm, PENDING_MS, PendingSignIns, signIn } from '../../src/p0/accounts/link.js';
+import { conflictFarm, liveOwner, PENDING_MS, PendingSignIns, signIn } from '../../src/p0/accounts/link.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { P0Store } from '../../src/p0/store.js';
@@ -45,5 +45,18 @@ describe('signIn', () => {
     expect(accounts.byToken(T(2))?.player).toBe('p0-a0000001');
     expect(accounts.byToken(T(3))?.kind).toBe('admin');
     expect(kicked).toEqual(['p0-a0000001']);
+  });
+});
+
+describe('liveOwner', () => {
+  it('is the linked farm while it is there; a link left on a farm gone is dropped as found', () => {
+    const store = new P0Store(c), accounts = new P0Accounts();
+    store.get('p0-live00001', 0);
+    accounts.link('p0-live00001', 'google', { sub: 'g-live' });
+    accounts.link('p0-gone00001', 'google', { sub: 'g-gone' });   // no save: lost
+    expect(liveOwner(store, accounts, 'google', 'g-live', 0)).toBe('p0-live00001');
+    expect(liveOwner(store, accounts, 'google', 'g-gone', 0)).toBeUndefined();
+    expect(accounts.byIdentity('google', 'g-gone')).toBeUndefined();   // free to link again
+    expect(liveOwner(store, accounts, 'google', 'nobody', 0)).toBeUndefined();
   });
 });

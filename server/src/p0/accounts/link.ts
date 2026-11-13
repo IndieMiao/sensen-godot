@@ -42,6 +42,20 @@ export class PendingSignIns {
   size(): number { return this.by.size; }
 }
 
+/**
+ * The farm an Apple / Google account is linked to, if that farm is still there: not deleted and with its save. A link
+ * left on a farm that is gone (its save lost, a deletion half done) is dropped here, as found — no conflict card for a
+ * farm that does not exist, and the account free to link again (奕星 on PR-A, tech-plan §2.4: checked at link time, no
+ * reconciling pass over accounts.json at start).
+ */
+export function liveOwner(store: P0Store, accounts: P0Accounts, provider: Provider, sub: string, now: number): string | undefined {
+  const player = accounts.byIdentity(provider, sub);
+  if (!player) return undefined;
+  if (!accounts.isDeleted(player) && store.find(player, now)) return player;
+  accounts.unlink(player, provider);
+  return undefined;
+}
+
 /** The conflict card's line (q(306): `Home Lv%d · Last played %s`): the other farm's name, home level and last play. */
 export function conflictFarm(store: P0Store, player: string, now: number): { name: string | null; home_level: number; last_played_at: number } {
   const s = store.find(player, now);

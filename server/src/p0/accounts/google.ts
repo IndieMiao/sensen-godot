@@ -13,7 +13,7 @@
 import type { FastifyInstance } from 'fastify';
 import type { P0Store } from '../store.js';
 import { identify, isRefusal, type IdentifyDeps } from './identify.js';
-import { conflictFarm, signIn, type PendingSignIns } from './link.js';
+import { conflictFarm, liveOwner, signIn, type PendingSignIns } from './link.js';
 import { IdTokenError, sha256Hex, verifyRs256, type KeySource } from './jwt.js';
 import { tokenShapeOk, type P0Accounts } from './store.js';
 
@@ -83,8 +83,8 @@ export function registerGoogleRoutes(app: FastifyInstance, deps: GoogleRouteDeps
     const token = String(b.token).toLowerCase();
     const v = await verify(b);
     if ('status' in v) return reply.code(v.status).send(v.body);
-    const player = accounts.byIdentity('google', v.sub);
-    if (player && !accounts.isDeleted(player) && store.find(player, deps.now())) {
+    const player = liveOwner(store, accounts, 'google', v.sub, deps.now());
+    if (player) {
       const owner = accounts.tokenOwner(token);
       if (owner && owner !== player) return reply.code(400).send({ ok: false, code: 'schema' });   // a token is one player's only
       return signIn({ accounts, kick: deps.kick }, player, token);
@@ -107,8 +107,8 @@ export function registerGoogleRoutes(app: FastifyInstance, deps: GoogleRouteDeps
       if (mine.sub === v.sub) return { ok: true, linked: accounts.linked(w.player) };
       return reply.code(409).send({ ok: false, code: 'already_linked' });
     }
-    const other = accounts.byIdentity('google', v.sub);
-    if (other && other !== w.player && !accounts.isDeleted(other)) {
+    const other = liveOwner(store, accounts, 'google', v.sub, deps.now());
+    if (other && other !== w.player) {
       return reply.code(409).send({ ok: false, code: 'conflict', pending: deps.pending.create('google', { sub: v.sub }),
         farm: conflictFarm(store, other, deps.now()) });
     }
