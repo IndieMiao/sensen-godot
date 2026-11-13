@@ -203,6 +203,10 @@ func _init() -> void:
 		if not cmd.is_empty(): _call("p0_event", [{"kind": "send_failed", "cmd": cmd}, session.current()]))
 	ui.sys_retry.connect(_probe)
 	session.blocked.connect(_on_blocked)
+	# SGODOT-488 accounts: the first launch's pages (哪吒's P0AccFlow) and the account's own refusals (his account pages)
+	session.first_run_needed.connect(_on_first_run_needed)
+	session.account_state.connect(_on_account_state)
+	if ui.has_signal("account_action"): ui.connect("account_action", _on_account_action)
 	ui.screen_action.connect(_on_screen_action)
 	ui.screen_back.connect(_on_screen_back)
 	ui.lifecycle.watch(session)
@@ -1400,7 +1404,122 @@ func _net_ok() -> void:
 ## Retry, and the check every PROBE_S while offline: one state read.
 func _probe() -> void:
 	_probe_left = PROBE_S
-	if not session.busy: session.refresh()
+	if not session.busy: _launch_read()
+
+## The launch's read: the state — or, while an accounts server has not said who this install is, hello again (a state
+## read would not leave: P0Session's gate). Its retries and Can't connect's Retry both come here.
+func _launch_read() -> void:
+	if session.accounts and not session.identity_ready: session.hello(func(_r): pass)
+	else: session.refresh()
+
+# ---------------------------------------------------------------- the first launch and the account (SGODOT-488 A2)
+## 哪吒's first-launch pages (scenes/p0/account/p0_acc_flow.gd, contract-accounts §1): a Control on its own layer over
+## everything, its signals answered here. A path, so a build without them still runs (and the tests put in a fake).
+var acc_flow_path := "res://scenes/p0/account/p0_acc_flow.gd"
+var _acc_flow: Node
+var _acc_layer: CanvasLayer
+
+## hello's answer is not `ready`: no world yet. offline keeps the launch cover and asks again; claimed is its account
+## page; any other opens the pages in place of the cover (no HUD meanwhile: the world is not built).
+func _on_first_run_needed(kind: String) -> void:
+	match kind:
+		"offline":
+			if _launch_s < 0.0: cover_launch()
+			_launch_retry_left = LAUNCH_RETRY_S
+		"claimed": _on_account_state("claimed", session.identity.claim_reply)
+		_: _open_acc_flow(kind)
+
+func _open_acc_flow(kind: String) -> void:
+	_launch_s = -1.0
+	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
+	_close_acc_flow()
+	var script = load(acc_flow_path) if ResourceLoader.exists(acc_flow_path) else null
+	if script == null:
+		push_warning("P0 accounts: no first-launch pages in this build (%s)" % acc_flow_path)
+		return
+	# sign-in buttons only once PR-B's routes and the native sign-in are in (an empty list hides them)
+	_acc_flow = script.new(kind, session.name_check, [], 0)
+	_acc_layer = CanvasLayer.new()
+	_acc_layer.layer = 120   # over the HUD, the toasts and the system screens
+	add_child(_acc_layer)
+	_acc_layer.add_child(_acc_flow)
+	_acc_flow.connect("agreed", _on_acc_agreed.bind(kind))
+	_acc_flow.connect("named", _on_acc_named.bind(kind))
+	_acc_flow.connect("failed", func(_code: String): ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S))
+
+func _close_acc_flow() -> void:
+	if is_instance_valid(_acc_layer): _acc_layer.queue_free()
+	_acc_layer = null
+	_acc_flow = null
+
+## The terms and privacy as agreed: this server's versions (hello's).
+func _consent_body() -> Dictionary:
+	return {"age_ok": true, "terms": session.identity.terms_version, "privacy": session.identity.privacy_version}
+
+## AGE passed (age_ok false sends nothing: the page itself turns into AGE-BLOCK, q(312) ⑨ C). An old account records
+## its consent now; a new install has nothing to send until NAME.
+func _on_acc_agreed(age_ok: bool, kind: String) -> void:
+	if not age_ok or not kind.begins_with("old_"): return
+	session.consent(_consent_body(), func(r: Dictionary):
+		if not bool(r.get("ok", false)): _acc_failed(r))
+
+## NAME's Save / Skip: a new install's save made (guest), an old account's name given (rename; Skip keeps its name);
+## then the world comes up under the launch cover, as any launch.
+func _on_acc_named(name: String, skip: bool, kind: String) -> void:
+	if kind.begins_with("old_"):
+		if skip:
+			_acc_done()
+			return
+		session.rename(name, func(r: Dictionary):
+			if bool(r.get("ok", false)): _acc_done()
+			elif str(r.get("code", "")) in ["name_rejected", "rate_limited"] and is_instance_valid(_acc_flow): _acc_flow.call("name_refused", r)
+			else: _acc_failed(r))
+		return
+	var body := _consent_body()
+	if skip: body["skip"] = true
+	else: body["name"] = name
+	session.guest(body, func(r: Dictionary):
+		var code := str(r.get("code", ""))
+		if bool(r.get("ok", false)): _acc_done()
+		elif code in ["name_rejected", "pending_expired"] and is_instance_valid(_acc_flow):
+			if code == "pending_expired": ui.toast("Sign-in expired. Please sign in again.")
+			_acc_flow.call("name_refused", r)
+		else: _acc_failed(r))
+
+func _acc_failed(r: Dictionary) -> void:
+	var code := str(r.get("code", ""))
+	if code == "consent_outdated":
+		# the server's terms moved on while the pages were up: its versions, agreed again from the AGE page
+		session.identity.terms_version = str(r.get("terms_version", session.identity.terms_version))
+		session.identity.privacy_version = str(r.get("privacy_version", session.identity.privacy_version))
+	ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
+
+## The account is settled: the pages go, the launch cover comes up and the world's first read is already out
+## (P0Session._identity_ready); p0_boot's when_first_view brings the farm (or the home pick) as on any launch.
+func _acc_done() -> void:
+	_close_acc_flow()
+	if _launch_s < 0.0: cover_launch()
+
+## An account refusal (P0Session.account_state): every request has stopped; the page says which (哪吒's account pages).
+## unauthenticated (a token the server does not know, after a restore say) reads as session_replaced: sign in again.
+func _on_account_state(kind: String, detail: Dictionary) -> void:
+	_launch_s = -1.0
+	var page := "session_replaced" if kind == "unauthenticated" else kind
+	if ui.has_method("show_account_state"): ui.call("show_account_state", page, detail)
+	else: push_warning("P0 accounts: %s (no account pages in this build)" % page)
+
+## A key on an account page (P0Ui.account_action). sign_in waits for PR-B's sign-in; start_new drops this install's
+## session and starts as a new one; retry asks the claim again; contact is the page's own (the support address).
+func _on_account_action(kind: String, action: String) -> void:
+	match action:
+		"start_new":
+			if ui.has_method("hide_account_state"): ui.call("hide_account_state")
+			session.identity.forget()
+			session.hello(func(_r): pass)
+		"retry": session.claim(func(_r): pass)
+		"contact":
+			if ui.has_method("open_support"): ui.call("open_support")
+		"sign_in": push_warning("P0 accounts: sign in from %s comes with PR-B" % kind)
 
 # ---------------------------------------------------------------- whole-screen system states (SGODOT-233)
 const LAUNCH_SLOW_S := 8.0    # SYS-LOADING-2: `Taking longer than usual…`
@@ -1438,7 +1557,7 @@ func _tick_screens(dt: float) -> void:
 					_launch_retry_left -= dt
 					if _launch_retry_left <= 0.0 and not session.busy:
 						_launch_retry_left = -1.0
-						session.refresh()
+						_launch_read()
 				if _launch_s >= LAUNCH_FAIL_S and session.view.is_empty(): _launch_failed()
 			P0SysScreen.Kind.FAIL:
 				_probe_left -= dt
