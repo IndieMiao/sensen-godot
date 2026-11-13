@@ -4,8 +4,9 @@
 The release project is copied from build/ios-release and only patched, never re-exported, so what export_presets.cfg
 says about Info.plist never reaches it (compliance audit A4 / A10 / A12 / A16). This patches, every pack:
   - PrivacyInfo.xcprivacy: the UserDefaults required-reason API (CA92.1: the app's own defaults; MapUnderlay.swift uses
-    UserDefaults), kept beside the reasons already there. Data types collected stay as they are: they must match the
-    App Privacy answers in App Store Connect, which the forms owner fills (李白 / 奕星).
+    UserDefaults), kept beside the reasons already there; the data types the game itself collects, as the App Privacy
+    answers in App Store Connect (李白 store-forms-1113.md §2, 奕星 ◆A / ◆B; Mapbox's own are in Mapbox's manifest);
+    NSPrivacyTracking false, no tracking domains.
   - Info.plist: the location purpose string as q(319) (user, bot 783: P0 never asks for location; the key stays only
     because the Mapbox binary references foreground location APIs, without it the upload is refused, ITMS-90683),
     CFBundleLocalizations en + zh-Hans, ITSAppUsesNonExemptEncryption false.
@@ -23,6 +24,27 @@ LOCATION_USAGE = "Gensen doesn't ask for your location. The map component requir
 LOCATION_USAGE_ZH = "Gensen 不会获取你的位置。这句说明是地图组件要求写的。"
 USER_DEFAULTS = "NSPrivacyAccessedAPICategoryUserDefaults"
 USER_DEFAULTS_REASON = "CA92.1"
+_FN = "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+_AN = "NSPrivacyCollectedDataTypePurposeAnalytics"
+# (type, linked to the player, purposes); tracking is false for all. Change only with the ASC answers.
+COLLECTED = [
+    ("CoarseLocation", True, [_FN]),        # the home city (and the city guessed from the address)
+    ("PreciseLocation", True, [_FN]),       # the farm's spot the player pins on the map (◆A: both stores report it)
+    ("UserID", True, [_FN]),                # the player id, the Apple / Google account number, the screen name
+    ("GameplayContent", True, [_FN]),       # the save
+    ("ProductInteraction", True, [_FN, _AN]),   # the command / UI log; reports (reasons picked from a list)
+    ("PerformanceData", True, [_FN, _AN]),  # scene load times, device model / GPU
+    ("OtherDiagnosticData", False, [_FN]),  # client_error: script errors, no player id, no IP (◆B: not CrashData)
+    ("OtherDataTypes", True, [_FN]),        # the age check's pass / fail and the terms consent record
+]
+
+
+def collected_types() -> list:
+    return [{"NSPrivacyCollectedDataType": "NSPrivacyCollectedDataType" + t, "NSPrivacyCollectedDataTypeLinked": linked,
+             "NSPrivacyCollectedDataTypeTracking": False, "NSPrivacyCollectedDataTypePurposes": purposes}
+            for t, linked, purposes in COLLECTED]
+
+
 ZH_REF = "AA00000000000000000000BB"
 EN_CHILD = "\t\t\t\tD0BCFE4518AEBDA2004A7AAE /* en */,"
 EN_REF = ("\t\tD0BCFE4518AEBDA2004A7AAE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; "
@@ -31,16 +53,24 @@ EN_REF = ("\t\tD0BCFE4518AEBDA2004A7AAE /* en */ = {isa = PBXFileReference; last
 
 def privacy_manifest(path: Path) -> str:
     content = plistlib.loads(path.read_bytes())
+    done = []
     apis = content.setdefault("NSPrivacyAccessedAPITypes", [])
     entry = next((a for a in apis if a.get("NSPrivacyAccessedAPIType") == USER_DEFAULTS), None)
     if entry is None:
         apis.append({"NSPrivacyAccessedAPIType": USER_DEFAULTS, "NSPrivacyAccessedAPITypeReasons": [USER_DEFAULTS_REASON]})
+        done.append("UserDefaults (CA92.1)")
     elif USER_DEFAULTS_REASON not in entry.setdefault("NSPrivacyAccessedAPITypeReasons", []):
         entry["NSPrivacyAccessedAPITypeReasons"].append(USER_DEFAULTS_REASON)
-    else:
+        done.append("UserDefaults (CA92.1)")
+    for key, value in (("NSPrivacyCollectedDataTypes", collected_types()), ("NSPrivacyTracking", False),
+                       ("NSPrivacyTrackingDomains", [])):
+        if content.get(key) != value:
+            content[key] = value
+            done.append(key)
+    if not done:
         return "up to date"
     path.write_bytes(plistlib.dumps(content, sort_keys=False))
-    return "UserDefaults (CA92.1) added"
+    return "set " + ", ".join(done)
 
 
 def info_plist(path: Path) -> str:
