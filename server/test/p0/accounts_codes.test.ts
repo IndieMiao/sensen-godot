@@ -138,6 +138,18 @@ describe('test codes (contract v1.4 §4)', () => {
     expect((await adm('/admin/code/revoke', { player: first.player })).json()).toEqual({ ok: false, code: 'no_code' });
   });
 
+  it("an old account's own code (a Google-less tester's farm): its old build's id alone is turned away from then on, the code withdrawn too", async () => {
+    const { store, accounts, adm } = setup();
+    store.get('old-farm-player-01', T0);   // an old account never claimed: its id alone still reads it in the changeover
+    const who = () => identify({ 'x-p0-player': 'old-farm-player-01' }, { accounts, legacyId: false });
+    expect(who()).toEqual({ player: 'old-farm-player-01', via: 'legacy' });
+    expect((await adm('/admin/code', { player: 'old-farm-player-01', note: 'cn-tester-08' })).json().ok).toBe(true);
+    expect(who()).toMatchObject({ status: 426 });   // from the code's issue, before it is ever used
+    await adm('/admin/code/revoke', { player: 'old-farm-player-01' });
+    expect(who()).toMatchObject({ status: 426 });   // and after it is withdrawn
+    expect(store.peek('old-farm-player-01')!.travel.pending).toBeUndefined();   // its own farm, not made anew
+  });
+
   it('not for an unknown or deleted account, nor one linked to Apple or Google; a deleted account\'s code signs in nowhere', async () => {
     const { store, accounts, adm, signIn } = setup();
     expect((await adm('/admin/code', { player: 'nobody-here-01', note: 'x1' })).json()).toEqual({ ok: false, code: 'unknown_player' });

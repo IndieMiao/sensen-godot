@@ -137,7 +137,10 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       s.login = 'code';
       if (/review/i.test(b.note)) s.test = true;   // q(322) ②: left out of the counts, nothing else
       store.put(s);
-      accounts.ensure(player);
+      // claimed for good (亚瑟 11-13): an old account a code is handed to, a Google-less tester's own farm, turns its old
+      // build's id-only requests away (426) from now, and still once the code is withdrawn — the code's presence alone
+      // (isClaimed) would lapse with it, letting the old build back in beside the code's phones
+      accounts.markClaimed(player);
       const code = newCode();
       accounts.setCode(player, code, b.note);
       log(JSON.stringify({ admin: 'code', player: player.slice(-6), note: b.note, made: b.player === undefined, at: now }));
