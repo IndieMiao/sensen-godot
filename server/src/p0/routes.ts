@@ -1,5 +1,6 @@
 /** P0 HTTP surface: GET state, POST command, plus dev-only time skip and reset (local playtests only). */
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyReply } from 'fastify';
+import { identify, isRefusal, type IdentifyDeps } from './accounts/identify.js';
 import type { P0Content } from './content.js';
 import { applyP0, type P0Command } from './reducer.js';
 import { dayKey, settleEnergy } from './rules.js';
@@ -28,7 +29,9 @@ import { settleFirstDig } from './first_dig.js';
 export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean;
   rooms?: Pick<OutpostRooms, 'presence' | 'occupant'>; log?: P0EventLog;
   /** The address → nearest open home city for the home pick's `Near you` (ip_city.ts); none: no guess. */
-  ipNear?: IpNear }
+  ipNear?: IpNear;
+  /** SGODOT-488: who a request is (accounts/identify.ts); absent, the x-p0-player header as before. */
+  identify?: IdentifyDeps }
 
 const UI_BATCH = 20, UI_PER_MINUTE = 120, UI_ALL_PER_MINUTE = 3_000;
 
@@ -39,6 +42,20 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   const playerOf = (headers: Record<string, unknown>): string | null => {
     const id = String(headers['x-p0-player'] ?? '');
     return PLAYER_RE.test(id) ? id : null;
+  };
+  /** The request's player, or null with the refusal sent. With accounts (SGODOT-488) it is identify's answer, and a
+   * token's player must have a save — never made anew here (contract §1: only session/guest makes one); without, the
+   * x-p0-player header as before (tests, tools). */
+  const who = (headers: Record<string, unknown>, reply: FastifyReply): string | null => {
+    if (!deps.identify) {
+      const id = playerOf(headers);
+      if (!id) reply.code(400).send({ ok: false, code: 'bad_player' });
+      return id;
+    }
+    const w = identify(headers, deps.identify);
+    if (isRefusal(w)) { reply.code(w.status).send(w.body); return null; }
+    if (w.via === 'token' && !store.find(w.player, deps.now())) { reply.code(401).send({ ok: false, code: 'unauthenticated' }); return null; }
+    return w.player;
   };
   // A new save asks to pick a home only when the client says it can offer the pick (SGODOT-303, q(163) ⑤): an older
   // client's new player is San Francisco's, as every save before.
@@ -69,8 +86,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       yard2: features(headers).includes('yard2') });
 
   app.get('/v1/p0/state', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const s = stateOf(player, req.headers);
     const { space, place } = (req.query ?? {}) as { space?: unknown; place?: unknown };
     if (typeof space === 'string' && space !== '') {   // the read a client makes on entering a space (q(41))
@@ -96,8 +113,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
 
   /** A city's places and silhouette card (note §4): home returns the hand-written tables; others come from the generator. */
   app.get('/v1/p0/city/:cluster', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const cluster = String((req.params as { cluster?: unknown }).cluster ?? '');
     if (!/^gn-\d{1,12}$/.test(cluster) || (!clusterById(c, cluster) && cluster !== writtenCluster(c))) return reply.code(404).send({ ok: false, code: 'unknown_city' });
     const s = stateOf(player, req.headers);
@@ -111,8 +128,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
    * player (free, visited, Trip, a pass, and `cost` — the fare as travel takes it now, the travel card's own (fareOf),
    * so the card needs no second read; 亚瑟, C part 2); none below the continent zoom. The catalogue's revision rides along. */
   app.get('/v1/p0/wild', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const { bbox, zoom } = (req.query ?? {}) as { bbox?: unknown; zoom?: unknown };
     // below the pins' zoom nothing is drawn: an empty list whatever the box (周瑜 on #616), before the box is read
     const cat = catalogue(c);
@@ -127,7 +144,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
 
   /** The home pick page (SGODOT-303, q(160) ④): the open cities, and with ?q= the cities by name with why one is grey. */
   app.get('/v1/p0/home/cities', async (req, reply) => {
-    if (!playerOf(req.headers)) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    if (!who(req.headers, reply)) return reply;
     const { q } = (req.query ?? {}) as { q?: unknown };
     // q(188) ①: `Near you` — the open city nearest the address, guessed once for the page and kept nowhere
     const list = homeCities(c, typeof q === 'string' ? q.slice(0, 64) : ''), near = deps.ipNear?.(req.ip) ?? null;
@@ -136,8 +153,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
 
   /** The 3 farm spots this player is offered in a city (q(160) ②), the same every time for the same player. */
   app.get('/v1/p0/home/spots/:cluster', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const cluster = String((req.params as { cluster?: unknown }).cluster ?? '');
     const status = /^gn-\d{1,12}$/.test(cluster) ? homeStatus(c, cluster) : null;
     if (!status) return reply.code(404).send({ ok: false, code: 'unknown_city' });
@@ -155,8 +172,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   });
 
   app.post('/v1/p0/commands', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const s = stateOf(player, req.headers);
     const now = clock(s.clock_ms);
     const result = applyP0(c, s, (req.body ?? {}) as P0Command, now, { wing8: features(req.headers).includes('wing8'), yard2: features(req.headers).includes('yard2') });   // q(303); v4q(12)
@@ -177,8 +194,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   const uiSeen = new Map<string, number>();
   let uiMinute = -1, uiTotal = 0;
   app.post('/v1/p0/telemetry', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const list = (req.body as { events?: unknown } | undefined)?.events;
     if (!Array.isArray(list) || list.length > UI_BATCH) return reply.code(400).send({ ok: false, code: 'bad_events' });
     const t = deps.now(), minute = Math.floor(t / 60_000);
@@ -196,8 +213,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
 
   if (!deps.dev) return;
   app.post('/v1/p0/dev/skip', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const minutes = Number((req.body as { minutes?: number } | undefined)?.minutes ?? 0);
     if (!Number.isFinite(minutes) || minutes <= 0 || minutes > 7 * 24 * 60) return reply.code(400).send({ ok: false, code: 'bad_minutes' });
     const s = stateOf(player, req.headers);
@@ -207,8 +224,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   });
   /** Playtests only: set the stored energy (eating, Energy Card and zero-energy states need a low bar). */
   app.post('/v1/p0/dev/energy', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const value = Number((req.body as { value?: number } | undefined)?.value);
     if (!Number.isInteger(value) || value < 0 || value > 1000) return reply.code(400).send({ ok: false, code: 'bad_value' });
     const s = stateOf(player, req.headers);
@@ -219,8 +236,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   });
   /** Playtests only: fill every free bag slot with one item (the creel-full state, FISH-4). */
   app.post('/v1/p0/dev/fill', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const id = String((req.body as { id?: string } | undefined)?.id ?? 'fish_crucian');
     if (!c.fish.some(f => f.id === id)) return reply.code(400).send({ ok: false, code: 'bad_item' });
     const s = stateOf(player, req.headers);
@@ -230,8 +247,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   });
   /** Playtests only: put items in the bag or the farm storage (materials have no P0 source until the mine / gathering land). */
   app.post('/v1/p0/dev/grant', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const body = (req.body ?? {}) as { id?: string; qty?: number; to?: string };
     const id = String(body.id ?? ''), qty = Number(body.qty ?? 1), to = body.to === 'storage' ? 'storage' : 'bag';
     if (!/^[a-z0-9_@]{2,48}$/.test(id) || itemName(c, id) === id) return reply.code(400).send({ ok: false, code: 'bad_item' });
@@ -243,15 +260,15 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
   app.post('/v1/p0/dev/reset', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const s = store.reset(player, deps.now(), newSave(req.headers));
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
   /** Playtests only (SGODOT-351): the card room's table for a save — its Homestead level (the gate, Lv2) and coins. */
   app.post('/v1/p0/dev/blackjack', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const body = (req.body ?? {}) as { homestead?: number; coins?: number };
     const level = body.homestead, coins = body.coins;
     if (level !== undefined && (!Number.isInteger(level) || level < 1 || level > c.homestead.levels.length)) return reply.code(400).send({ ok: false, code: 'bad_level' });
@@ -264,8 +281,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   });
   /** Playtests only (SGODOT-341): put this save's guide on a step — `first`, `end` or a step id — counts cleared. */
   app.post('/v1/p0/dev/guide', async (req, reply) => {
-    const player = playerOf(req.headers);
-    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const player = who(req.headers, reply);
+    if (!player) return reply;
     const s = stateOf(player, req.headers);
     const refusal = setGuide(c, s, String((req.body as { step?: string } | undefined)?.step ?? ''), clock(s.clock_ms));
     if (refusal) return reply.code(400).send({ ok: false, code: refusal.code });

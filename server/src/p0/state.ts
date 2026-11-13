@@ -245,6 +245,11 @@ export interface P0State {
   blackjack?: import('./blackjack.js').BjState;   // SGODOT-351 the card room: intro seen, hand count, the hand in play, a result not yet seen (no version of its own)
   buffs?: { farm?: number; fish?: number };   // the priest's buffs (buffs.ts): each one's end, real time; one gone by is dropped at the next take
   title?: string;                // q(180): the title worn, a stable id (titles.ts); absent until the player picks one, never filled in
+  // SGODOT-488 accounts (q(312)–q(317); optional, an older server ignores them, no save version): the name the player
+  // gave (absent when they skipped it), the terms and privacy versions they agreed to and when, and the age gate passed.
+  profile?: { name?: string; name_set_at?: number; name_locked_until?: number };
+  consent?: { terms: string; privacy: string; at: number };
+  age_ok?: true;
   rng: number;
   seq: number;
 }
