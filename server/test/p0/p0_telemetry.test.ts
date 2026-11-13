@@ -275,6 +275,14 @@ describe('client errors (SGODOT-486)', () => {
     expect(errorRecord({ kind: 'client_error', message: 'x', stack: ['a'], scene: 3 }, T0, {})).toEqual({ t: T0, message: 'x', stack: '', scene: '' });
   });
 
+  it('platform only android / ios / desktop; 32+ hex digits cut out of message and stack (#1013 周瑜)', () => {
+    const hex = 'a1B2c3D4'.repeat(4);   // 32
+    const e = errorRecord({ kind: 'client_error', message: `bad token ${hex}ff here, sha ${hex.slice(0, 31)}`, stack: `f a.gd:1 ${hex}` }, T0,
+      { 'x-p0-platform': 'windows' });
+    expect(e).toEqual({ t: T0, message: `bad token … here, sha ${hex.slice(0, 31)}`, stack: 'f a.gd:1 …', scene: '' });
+    expect(errorRecord({ kind: 'client_error', message: 'x' }, T0, { 'x-p0-platform': 'ios' })?.platform).toBe('ios');
+  });
+
   it('at most 10 a minute per player, counted apart from UI moments; a new minute starts over', async () => {
     await withErrors(async (app, errors, records, tick) => {
       const err = { kind: 'client_error', message: 'boom' };

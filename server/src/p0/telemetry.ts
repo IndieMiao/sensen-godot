@@ -52,18 +52,22 @@ export interface ErrorRecord { t: number; version?: string; platform?: string; m
 
 export const ERROR_KIND = 'client_error';
 const ERR_MESSAGE = 500, ERR_STACK_LINES = 20, ERR_STACK_LINE = 200, ERR_SCENE = 64, ERR_HEADER = 16;
+const ERR_PLATFORMS = new Set(['android', 'ios', 'desktop']);   // contract-accounts.md §0
+// A run of 32+ hex digits (a token, a key) never reaches the file, should an error ever print one (#1013 周瑜).
+const LONG_HEX = /[0-9a-fA-F]{32,}/g;
+const scrub = (s: string) => s.replace(LONG_HEX, '…');
 
 /** A reported client error as its file line: message, stack (first 20 lines, each cut to 200) and scene, cut short;
- * version and platform from the request headers when it sends them (an older client sends no platform). Every other
- * field the client sent is dropped. Null when it is not a client error or has no message. */
+ * version and platform from the request headers when it sends them (an older client sends no platform; only android /
+ * ios / desktop kept). Long hex runs are cut out of message and stack. Every other field the client sent is dropped. Null when it is not a client error or has no message. */
 export function errorRecord(raw: unknown, t: number, headers: Record<string, unknown>): ErrorRecord | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const e = raw as Record<string, unknown>;
   if (e.kind !== ERROR_KIND || typeof e.message !== 'string' || e.message === '') return null;
-  const stack = typeof e.stack === 'string' ? e.stack.split('\n').slice(0, ERR_STACK_LINES).map(l => l.slice(0, ERR_STACK_LINE)).join('\n') : '';
+  const stack = typeof e.stack === 'string' ? e.stack.split('\n').slice(0, ERR_STACK_LINES).map(l => scrub(l).slice(0, ERR_STACK_LINE)).join('\n') : '';
   const header = (name: string) => { const v = headers[name]; return typeof v === 'string' && v !== '' ? v.slice(0, ERR_HEADER) : undefined; };
-  const version = header('x-p0-version'), platform = header('x-p0-platform');
-  return { t, ...(version ? { version } : {}), ...(platform ? { platform } : {}), message: e.message.slice(0, ERR_MESSAGE), stack,
+  const version = header('x-p0-version'), platform = ERR_PLATFORMS.has(String(headers['x-p0-platform'])) ? String(headers['x-p0-platform']) : undefined;
+  return { t, ...(version ? { version } : {}), ...(platform ? { platform } : {}), message: scrub(e.message).slice(0, ERR_MESSAGE), stack,
     scene: typeof e.scene === 'string' ? e.scene.slice(0, ERR_SCENE) : '' };
 }
 
