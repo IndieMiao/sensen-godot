@@ -22,6 +22,9 @@ export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => nu
 
 /** An admin token lasts 30 days (tech-plan §2.5): a test device's, kept through other devices' sign-ins, never forgotten. */
 export const ADMIN_TOKEN_MS = 30 * 86_400_000;
+/** The deploy's smoke account (SGODOT-488, 奕星 11-13): one fixed id, never a player's, and its token's hour. */
+export const SMOKE_PLAYER = 'p0-smoke-check';
+export const SMOKE_TOKEN_MS = 3_600_000;
 const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
 export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
@@ -84,6 +87,23 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
       accounts.issue(player, token, 'admin', expires_at);
       log(JSON.stringify({ admin: 'session', player: player.slice(-6), expires_at, at: deps.now() }));   // the id's tail: the log outlives a deletion
       return { ok: true, player, token, expires_at };
+    });
+
+    /** The deploy's smoke (smoke.sh through deploy-hk.sh smoke): the fixed smoke account made afresh — a new save marked
+     *  test, left out of the counts, so the same check runs each time — and a token of its own for an hour, its earlier
+     *  ones revoked. No other save is touched; no id made up per run (a forced update leaves no id-only client to make
+     *  one). The token is in this answer only, never in the log. */
+    app.post('/admin/smoke', async () => {
+      const now = deps.now();
+      const s = store.reset(SMOKE_PLAYER, now);
+      s.test = true;
+      store.put(s);
+      accounts.ensure(SMOKE_PLAYER);
+      accounts.revokeAll(SMOKE_PLAYER, undefined, { admin: true });
+      const token = randomBytes(32).toString('hex'), expires_at = now + SMOKE_TOKEN_MS;
+      accounts.issue(SMOKE_PLAYER, token, 'admin', expires_at);
+      log(JSON.stringify({ admin: 'smoke', expires_at, at: now }));
+      return { ok: true, player: SMOKE_PLAYER, token, expires_at };
     });
 
     /** The claim undone (contract §4.1): claimed_at cleared and every token revoked, admin ones too — the account's old id
