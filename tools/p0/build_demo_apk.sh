@@ -191,6 +191,14 @@ native_missing = [n for n in NATIVE if n not in entries]
 # only through the preset's include_filter; one left out reads blank on the phone (a QA export, 10-11).
 LEGAL = "assets/assets/p0/legal/licenses.json"
 legal_missing = [] if LEGAL in entries else [LEGAL]
+# 上架清权限 (蒙恬 11-13, audit G8): the overlay manifest removes what LiveKit and the old map PoC declared and the game never
+# uses — location, camera, foreground / screen-capture service — and nothing may bring back the advertising ID (Play's
+# Advertising ID form says no). Read from the APK's own manifest: a library update that adds one again stops the build.
+manifest = open(f"{logs}/manifest.txt").read()
+BANNED = ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION", "android.permission.CAMERA",
+          "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION",
+          "com.google.android.gms.permission.AD_ID", "io.livekit.android.room.track.screencapture.ScreenCaptureService"]
+banned_present = [n for n in BANNED if f'="{n}"' in manifest]
 if LEGAL in entries:
     with zipfile.ZipFile(apk) as z:
         index = json.loads(z.read(LEGAL))
@@ -207,6 +215,7 @@ result = {
     "source_commit": commit, "source_dirty": dirty != "",
     "native_ok": not native_missing, "native_missing": native_missing,
     "legal_ok": not legal_missing, "legal_missing": legal_missing,
+    "permissions_ok": not banned_present, "banned_present": banned_present,
     "untracked_exported": untracked[:200], "untracked_exported_count": len(untracked),
     # P0_DEV_CLEARTEXT: the host let through for this export (an internal voice test), else null; whether the APK's
     # manifest names a network security config at all
@@ -216,6 +225,7 @@ result = {
 json.dump(result, open(f"{logs}/build.json", "w"), indent=2)
 print(json.dumps(result, indent=2))
 ok = result["package"] == os.environ["P0_PACKAGE"] and result["server_matches"] and result["version_baked"] == result["version_code"] \
-    and result["native_ok"] and result["legal_ok"] and result["network_security_config"] == bool(dev_cleartext)
+    and result["native_ok"] and result["legal_ok"] and result["permissions_ok"] \
+    and result["network_security_config"] == bool(dev_cleartext)
 sys.exit(0 if ok else 1)
 PY
