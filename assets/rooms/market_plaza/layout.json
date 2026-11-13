@@ -663,7 +663,7 @@
       "cast_shadow": true,
       "variants": {
         "san_francisco": "facade_sf_3.glb",
-        "generic": "facade_generic_0.glb"
+        "generic": "facade_generic_1.glb"
       }
     },
     {
@@ -708,7 +708,7 @@
       "cast_shadow": true,
       "variants": {
         "san_francisco": "facade_sf_2.glb",
-        "generic": "facade_generic_1.glb"
+        "generic": "facade_generic_2.glb"
       }
     },
     {
@@ -753,7 +753,7 @@
       "cast_shadow": true,
       "variants": {
         "san_francisco": "facade_sf_1.glb",
-        "generic": "facade_generic_2.glb"
+        "generic": "facade_generic_3.glb"
       }
     },
     {
@@ -798,7 +798,7 @@
       "cast_shadow": true,
       "variants": {
         "san_francisco": "facade_sf_0.glb",
-        "generic": "facade_generic_3.glb"
+        "generic": "facade_generic_0.glb"
       }
     },
     {
