@@ -1,8 +1,8 @@
 extends GdUnitTestSuite
 ## SGODOT-483 (上架; the user 11-11): the store build (its export preset's custom feature `store`, P0Build.store()) has no
-## Test options in Settings, no card room on the map (nor so its blackjack), and no Voice Profile on the profile; the OSS
-## test build keeps all three. The card room's pin is its only way in (no resident lives there, no request, postcard,
-## Today row or guide step names it, and generated cities have none), so nothing else is left pointing at it.
+## Test options in Settings and no Voice Profile on the profile (none in any build since the second batch #7); the OSS
+## test build keeps Test options. The card room is in both (the user 11-13, 「牌室 C」, D6 undone): its pin past its gate,
+## its Show on map opening it.
 
 func after_test() -> void:
 	P0Build.store_override = null
@@ -20,14 +20,14 @@ func test_settings_has_test_options_only_outside_the_store_build() -> void:
 	assert_object(_test_options(false)).is_not_null()
 	assert_object(_test_options(true)).is_null()
 
-func test_the_card_room_is_on_the_map_only_outside_the_store_build() -> void:
+func test_the_card_room_is_on_the_map_in_every_build() -> void:
 	var view := {"homestead": {"level": 3}}   # past its gate (Homestead Lv2, the guide over)
 	var room := P0Outposts.by_role("casino")
 	assert_bool(room.is_empty()).is_false()
-	P0Build.store_override = false
-	assert_bool(P0Outposts.shown(room, view)).is_true()
-	P0Build.store_override = true
-	assert_bool(P0Outposts.shown(room, view)).is_false()
+	for store in [false, true]:
+		P0Build.store_override = store
+		assert_bool(P0Outposts.shown(room, view)).override_failure_message("store %s" % store).is_true()
+		assert_bool(P0Outposts.shown(room, {"homestead": {"level": 1}})).is_false()   # before its gate, as ever
 	for o in P0Outposts.all():   # the other places as ever
 		if str(o.get("role", "")) != "casino": assert_bool(P0Outposts.shown(o, view)).override_failure_message(str(o.id)).is_true()
 
@@ -52,9 +52,9 @@ func test_the_voice_profile_is_androids_outside_the_store_build_only() -> void:
 func test_a_development_run_is_not_the_store_build() -> void:
 	assert_bool(P0Build.store()).is_false()   # no `store` feature here: the OSS build's rows and places, as before
 
-## Nothing lands on the card room the store build does not show: a Show on map for it opens no card (the pin is not
-## there), though none points at it today — a later one would be a dead link (奕星 on 483).
-func test_a_show_on_map_for_the_card_room_opens_nothing_in_the_store_build() -> void:
+## A Show on map for the card room opens it in the store build too; one for a place not shown yet (before its gate)
+## opens no card — the pin is not there, a dead link (奕星 on 483).
+func test_a_show_on_map_for_the_card_room_opens_it_in_every_build() -> void:
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(360, 800)
 	add_child(auto_free(viewport))
@@ -63,8 +63,10 @@ func test_a_show_on_map_for_the_card_room_opens_nothing_in_the_store_build() -> 
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	m.rt.session.view = {"homestead": {"level": 3}}
-	P0Build.store_override = false
-	assert_dict(m.place_for("outpost:sf_card_room_1")).is_not_empty()
-	P0Build.store_override = true
+	for store in [false, true]:
+		P0Build.store_override = store
+		assert_dict(m.place_for("outpost:sf_card_room_1")).override_failure_message("store %s" % store).is_not_empty()
+	m.rt.session.view = {"homestead": {"level": 1}}   # not past its gate: not shown, so nothing opens
 	assert_dict(m.place_for("outpost:sf_card_room_1")).is_empty()
+	m.rt.session.view = {"homestead": {"level": 3}}
 	assert_dict(m.place_for("outpost:sh_tea_1")).is_not_empty()   # the other places as ever

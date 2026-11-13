@@ -78,7 +78,7 @@ func test_every_p0_preset_ships_the_mines_json() -> void:
 	assert_int(p0_presets).is_greater_equal(2)
 
 ## The Play build (上架, 蒙恬 11-13): preset "Android Play" is the only Android one with the custom feature `store`
-## (P0Build.store(): no test accounts, card room or Voice Profile), package app.gensen.maps, exported as an AAB. The
+## (P0Build.store(): no test accounts; the card room kept since 11-13), package app.gensen.maps, exported as an AAB. The
 ## OSS presets never carry `store`. The upload key never sits in this file: the path, alias and password come from the
 ## GODOT_ANDROID_KEYSTORE_RELEASE_* variables at export time (the keystore and its password stay on the build Mac).
 func test_only_the_play_preset_is_the_store_build() -> void:
