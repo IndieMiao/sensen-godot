@@ -42,17 +42,22 @@ func _init(providers: Array = ["google"]) -> void:
 		if not KEYS.has(str(p)): continue
 		add_gap(GAP)
 		col.add_child(_key(str(p)))
-	back_key = Button.new()
+	back_key = Button.new()   # no text of its own: a glyph's line would stretch the button past 44 (不知火舞 on 491: 44 × 52)
 	back_key.name = "Back"
-	back_key.text = "‹"
 	back_key.focus_mode = Control.FOCUS_NONE
+	back_key.custom_minimum_size = Vector2(BACK_SIDE, BACK_SIDE)
 	back_key.size = Vector2(BACK_SIDE, BACK_SIDE)
-	back_key.add_theme_font_override(&"font", UiKit.font(&"extrabold"))
-	back_key.add_theme_font_size_override(&"font_size", 24)
-	for state in [&"font_color", &"font_hover_color", &"font_pressed_color", &"font_focus_color"]:
-		back_key.add_theme_color_override(state, UiTokens.COLOR_TEXT)
-	var round := UiStyleBox.make(UiTokens.COLOR_SURFACE, BACK_SIDE * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"hover_pressed"]: back_key.add_theme_stylebox_override(state, round)
+	var round := UiStyleBox.make(UiTokens.COLOR_SURFACE, BACK_SIDE * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(0, 0, 0, 0)
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"hover_pressed", &"disabled"]: back_key.add_theme_stylebox_override(state, round)
+	var glyph := UiKit.label("‹", UiTokens.STYLE_TITLE_XB20)
+	glyph.name = "Glyph"
+	glyph.add_theme_font_size_override(&"font_size", 24)
+	glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	glyph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	glyph.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	glyph.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	back_key.add_child(glyph)
 	back_key.pressed.connect(func(): back_pressed.emit())
 	add_child(back_key)
 

@@ -85,9 +85,10 @@ func add_title(text: String, centred := false) -> Label:
 	col.add_child(l)
 	return l
 
-## A line under it: Body 14, secondary, wrapping.
-func add_body(text: String) -> Label:
-	var l := UiKit.label(text, UiTokens.STYLE_BODY_R14, UiTokens.COLOR_SECONDARY)
+## A line under it: Body Bold 14 (the frames' body on every page: NAME, AGE-BLOCK, No farm found; 不知火舞 on 491),
+## secondary unless `color` says, wrapping.
+func add_body(text: String, color := UiTokens.COLOR_SECONDARY) -> Label:
+	var l := UiKit.label(text, UiTokens.STYLE_BODY_B14, color)
 	l.name = "Body"
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(l)

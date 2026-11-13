@@ -19,7 +19,7 @@ func _init() -> void:
 	name = "AccConsent"
 	add_title(TITLE)
 	add_gap(GAP)
-	add_body(P0AccAge.ZERO_TOLERANCE)
+	add_body(P0AccAge.ZERO_TOLERANCE, UiTokens.COLOR_TEXT)   # the text colour here, not secondary (659:198931)
 	add_gap(GAP)
 	consent = UiCheckbox.new(P0AccAge.AGREE, P0AccAge.LINKS)
 	consent.name = "Consent"

@@ -62,8 +62,7 @@ func _init(with_sign_in := true) -> void:
 	name = "AccName"
 	add_title(TITLE)
 	add_gap(GAP)
-	var body := add_body(BODY)
-	body.theme_type_variation = UiTokens.STYLE_BODY_B14
+	add_body(BODY)
 	add_gap(GAP)
 	field = UiTextField.new(FIELD, PLACEHOLDER, HELPER)
 	field.max_graphemes = MAX_LETTERS

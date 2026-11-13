@@ -21,7 +21,6 @@ func _init() -> void:
 	add_title(TITLE, true)
 	add_gap(GAP)
 	var body := add_body(BODY)
-	body.theme_type_variation = UiTokens.STYLE_BODY_B14
 	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_gap(GAP)
 	add_link(LINK).pressed.connect(func(): link_pressed.emit("privacy"))
