@@ -18,6 +18,8 @@
  * own, so `That character can't be used` would send the player looking for one; and a mix is mostly a disguise.
  */
 import { readFileSync } from 'node:fs';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { P0State } from '../state.js';
 
 export const NAME_MIN = 2;
 export const NAME_MAX = 16;
@@ -176,4 +178,106 @@ export interface NameProfile { name?: string; name_set_at?: number | null; name_
 export function renameAt(profile: NameProfile | undefined): number {
   const set = profile?.name_set_at ?? 0;
   return Math.max(set ? set + RENAME_COOLDOWN_MS : 0, profile?.name_locked_until ?? 0);
+}
+
+// ── The routes (contract-accounts §1; 后裔's routes.ts calls registerNameRoutes, his session/guest nameForGuest, his
+// view.account accountNameView) ──
+
+export const NAME_PER_MINUTE = 20;
+
+/**
+ * One bucket for name/check, account/name and a session/guest with a name (contract §1): 20 a minute per address, so
+ * none of the three can be used to try names against the list faster than the others. In memory, started over each
+ * minute; the guard's total per address comes before it.
+ */
+export class NameLimiter {
+  private seen = new Map<string, number>();
+  private minute = -1;
+  constructor(private perMinute = NAME_PER_MINUTE) {}
+  /** Counts one name from `ip`: whether it is within the minute's 20. */
+  take(ip: string, now: number): boolean {
+    const minute = Math.floor(now / 60_000);
+    if (minute !== this.minute) { this.seen.clear(); this.minute = minute; }
+    const n = (this.seen.get(ip) ?? 0) + 1;
+    this.seen.set(ip, n);
+    return n <= this.perMinute;
+  }
+}
+
+/** A refusal as the route sends it: its status and body (contract §0). */
+export interface NameRefusal { ok: false; status: 400 | 401 | 409 | 429; body: { ok: false; code: string; [k: string]: unknown } }
+const refuse = (status: NameRefusal['status'], code: string, more: Record<string, unknown> = {}): NameRefusal =>
+  ({ ok: false, status, body: { ok: false, code, ...more } });
+
+/** The save's name, set by session/guest with a name or by account/name: the 7 days count from `at`. */
+export function setName(s: P0State, name: string, at: number): void {
+  s.profile = { ...s.profile, name, name_set_at: at };
+}
+
+/**
+ * view.account's name fields: the name (null when none was chosen — a Skip, or a moderator's reset: the client writes the
+ * default `Traveller 8c3f`) and rename_at, 0 once it has passed by the server's clock (contract §1).
+ */
+export function accountNameView(s: P0State, now: number): { name: string | null; rename_at: number } {
+  const at = renameAt(s.profile);
+  return { name: s.profile?.name ?? null, rename_at: at > now ? at : 0 };
+}
+
+/**
+ * session/guest's name (contract §1: `name` or `skip: true`, never both): Skip keeps the default name and starts no wait;
+ * a name is held to the rule from the shared bucket, and its 7 days start at the save's creation (q(313) ②). The guest
+ * route makes the save, then setName(s, name, name_set_at) when a name came back.
+ */
+export function nameForGuest(body: unknown, ctx: { limiter: NameLimiter; ip: string; now: number; list?: NameList }):
+  { ok: true; name?: string; name_set_at?: number } | NameRefusal {
+  const b = (body && typeof body === 'object' ? body : {}) as { name?: unknown; skip?: unknown };
+  if (b.skip === true && b.name === undefined) return { ok: true };
+  if (b.skip !== undefined || typeof b.name !== 'string') return refuse(400, 'schema');
+  if (!ctx.limiter.take(ctx.ip, ctx.now)) return refuse(429, 'rate_limited');
+  const r = checkName(b.name, ctx.list ?? nameList());
+  return r.ok ? { ok: true, name: r.name, name_set_at: ctx.now } : refuse(400, 'name_rejected', { reason: r.reason });
+}
+
+export interface NameRouteDeps {
+  store: { find(player: string, now: number): P0State | undefined; put(state: P0State): void };
+  now: () => number;
+  limiter: NameLimiter;
+  /** The player the request stands for (后裔's identify), or null once it has sent the refusal itself. */
+  identify: (req: FastifyRequest, reply: FastifyReply) => string | null;
+  list?: () => NameList;
+}
+
+/**
+ * POST /v1/p0/name/check {name} — no identity, before NAME's Save: `{ok: true}` or name_rejected {reason}.
+ * POST /v1/p0/account/name {name} — the profile's Edit: `{ok: true, name, rename_at}`; rename_too_soon {rename_at} while
+ * the 7 days (or a moderator's lock) run, name_rejected, rate_limited. The same name again changes nothing and starts no
+ * new wait. Times are the save's clock (the dev time skip moves it; 0 on the live server).
+ */
+export function registerNameRoutes(app: FastifyInstance, deps: NameRouteDeps): void {
+  const list = () => deps.list?.() ?? nameList();
+  const send = (reply: FastifyReply, r: NameRefusal) => reply.code(r.status).send(r.body);
+  const nameOf = (body: unknown): unknown => (body && typeof body === 'object' ? (body as { name?: unknown }).name : undefined);
+
+  app.post('/v1/p0/name/check', async (req, reply) => {
+    if (!deps.limiter.take(req.ip, deps.now())) return send(reply, refuse(429, 'rate_limited'));
+    const r = checkName(nameOf(req.body), list());
+    return r.ok ? reply.send({ ok: true }) : send(reply, refuse(400, 'name_rejected', { reason: r.reason }));
+  });
+
+  app.post('/v1/p0/account/name', async (req, reply) => {
+    const player = deps.identify(req, reply);
+    if (player === null) return reply;
+    const raw = nameOf(req.body);
+    if (typeof raw !== 'string') return send(reply, refuse(400, 'schema'));
+    if (!deps.limiter.take(req.ip, deps.now())) return send(reply, refuse(429, 'rate_limited'));
+    const s = deps.store.find(player, deps.now());
+    if (!s) return send(reply, refuse(401, 'unauthenticated'));
+    const now = deps.now() + s.clock_ms;
+    const at = renameAt(s.profile);
+    if (at > now) return send(reply, refuse(409, 'rename_too_soon', { rename_at: at }));
+    const r = checkName(raw, list());
+    if (!r.ok) return send(reply, refuse(400, 'name_rejected', { reason: r.reason }));
+    if (r.name !== s.profile?.name) { setName(s, r.name, now); deps.store.put(s); }
+    return reply.send({ ok: true, name: r.name, rename_at: accountNameView(s, now).rename_at });
+  });
 }
