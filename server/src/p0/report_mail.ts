@@ -8,14 +8,17 @@ export const REPORT_MAIL_REASONS = [
 ] as const; // Public labels from the account UI specification §7; not HTTP reason IDs.
 
 export interface ReportMailNotice {
+  id: string;
   reporter_support: string;
   reported_support: string;
   reason: typeof REPORT_MAIL_REASONS[number];
   place: string;
   room: number;
   at: string;
-  channel: 'oss' | 'play' | 'appstore';
+  channel: 'oss' | 'play' | 'appstore' | '';
 }
+/** 后裔 484 / 550d0c5d: the authoritative writer owns this stable UTC-day + Crockford identifier. */
+export const REPORT_ID = /^R-\d{8}-[0-9A-HJKMNP-TV-Z]{8}$/;
 export interface ReportSmtpConfig {
   host: string; port: number; security: 'ssl' | 'starttls';
   from: string; to: string; user: string; password: string;
@@ -61,14 +64,14 @@ export function reportSmtpFromEnv(env: Record<string, string | undefined>): Repo
 
 /** Only approved public fields enter the message, even if the caller passes an internal record with extra keys. */
 export function reportMailText(notice: ReportMailNotice): string {
-  if (!supportCode.test(notice.reporter_support) || !supportCode.test(notice.reported_support)
+  if (typeof notice.id !== 'string' || !REPORT_ID.test(notice.id) || !supportCode.test(notice.reporter_support) || !supportCode.test(notice.reported_support)
     || !REPORT_MAIL_REASONS.includes(notice.reason)
     || typeof notice.place !== 'string' || !notice.place.trim() || notice.place.length > 160 || /[\r\n\x00]/.test(notice.place)
     || !Number.isSafeInteger(notice.room) || notice.room < 1
     || typeof notice.at !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(notice.at)
-    || !Number.isFinite(Date.parse(notice.at)) || !['oss', 'play', 'appstore'].includes(notice.channel))
+    || !Number.isFinite(Date.parse(notice.at)) || !['oss', 'play', 'appstore', ''].includes(notice.channel))
     throw new Error('REPORT_MAIL_INVALID_NOTICE');
-  return `Reporter support code: ${notice.reporter_support}\nReported support code: ${notice.reported_support}\n`
+  return `Report: ${notice.id}\nReporter support code: ${notice.reporter_support}\nReported support code: ${notice.reported_support}\n`
     + `Reason: ${notice.reason}\nPlace: ${notice.place}\nLayer: ${notice.room}\n`
     + `Time: ${new Date(notice.at).toISOString()}\nChannel: ${notice.channel}\n`;
 }
@@ -83,7 +86,8 @@ export function createReportMailer(config: ReportSmtpConfig,
     logger: false, debug: false, disableFileAccess: true, disableUrlAccess: true });
   return {
     async send(notice: ReportMailNotice): Promise<void> {
-      const message = { from, to, subject: 'Gensen player report', text: reportMailText(notice) };
+      const text = reportMailText(notice);
+      const message = { from, to, subject: `Gensen player report ${notice.id}`, text };
       try { await transport.sendMail(message); }
       catch { throw new Error('REPORT_MAIL_DELIVERY_FAILED'); } // SMTP errors can contain addresses, auth data or body fragments.
     },

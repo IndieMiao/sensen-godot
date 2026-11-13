@@ -7,8 +7,8 @@ import type { ReportMailNotice } from '../../src/p0/report_mail.js';
 
 const dirs: string[] = [];
 afterEach(() => { vi.restoreAllMocks(); for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
-const ID = '11111111-1111-4111-8111-111111111111', OTHER = '22222222-2222-4222-8222-222222222222';
-const notice: ReportMailNotice = { reporter_support: 'WKRW4-9CH60', reported_support: '55YF1-3C0J8',
+const ID = 'R-20261113-0123ABCD', OTHER = 'R-20261113-4567EFGH';
+const notice: ReportMailNotice = { id: ID, reporter_support: 'WKRW4-9CH60', reported_support: '55YF1-3C0J8',
   reason: 'Harassment', place: 'sh_tea_1', room: 1, at: '2026-11-13T00:00:00.000Z', channel: 'play' };
 const policy: ReportOutboxPolicy = { gapMs: 100, retryMs: 1000, maxRetryMs: 4000, dailyAttempts: 3 };
 function setup() {
@@ -56,7 +56,8 @@ describe('484 durable report outbox (fake delivery only)', () => {
     expect(queue.enqueue(ID, { ...notice })).toBe(false);
     expect(() => queue.enqueue(ID, { ...notice, room: 2 })).toThrow('REPORT_OUTBOX_ID_CONFLICT');
     expect(() => queue.enqueue('player-secret', notice)).toThrow('REPORT_OUTBOX_INVALID_ID');
-    expect(() => queue.enqueue(OTHER, { ...notice, reason: 'private free text' } as unknown as ReportMailNotice)).toThrow('REPORT_MAIL_INVALID_NOTICE');
+    expect(() => queue.enqueue(OTHER, notice)).toThrow('REPORT_OUTBOX_INVALID_ID');
+    expect(() => queue.enqueue(OTHER, { ...notice, id: OTHER, reason: 'private free text' } as unknown as ReportMailNotice)).toThrow('REPORT_MAIL_INVALID_NOTICE');
   });
 
   it('persists the attempt budget before SMTP and exponentially backs off across restart, without logging provider errors', async () => {
@@ -79,7 +80,7 @@ describe('484 durable report outbox (fake delivery only)', () => {
 
   it('one failed report does not block another due report; limits are shared by all reports', async () => {
     const { load, send, tick } = setup(), queue = load();
-    queue.enqueue(ID, notice); queue.enqueue(OTHER, { ...notice, room: 2 });
+    queue.enqueue(ID, notice); queue.enqueue(OTHER, { ...notice, id: OTHER, room: 2 });
     send.mockRejectedValueOnce(new Error('offline'));
     await queue.tick();
     expect(await queue.tick()).toBe(false);
@@ -105,7 +106,7 @@ describe('484 durable report outbox (fake delivery only)', () => {
     queue.enqueue(ID, notice);
     const a = queue.tick(), b = queue.tick();
     expect(send).toHaveBeenCalledTimes(1);
-    queue.enqueue(OTHER, { ...notice, room: 2 });
+    queue.enqueue(OTHER, { ...notice, id: OTHER, room: 2 });
     done();
     await expect(a).resolves.toBe(true); await expect(b).resolves.toBe(true);
     expect(disk(file).entries.map((e: { id: string; sent: boolean }) => [e.id, e.sent])).toEqual([[ID, true], [OTHER, false]]);

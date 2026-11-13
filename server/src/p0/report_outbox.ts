@@ -1,7 +1,7 @@
 /** SGODOT-484: durable, single-process report delivery. The authoritative report writer must commit first, then
- * enqueue its stable UUID; a replay uses that same UUID. No routes, timers or real SMTP are enabled by this module. */
+ * enqueue its stable report id; a replay uses that same id. No routes, timers or real SMTP are enabled by this module. */
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
-import { reportMailText, type ReportMailNotice } from './report_mail.js';
+import { REPORT_ID, reportMailText, type ReportMailNotice } from './report_mail.js';
 
 export interface ReportDelivery { send(notice: ReportMailNotice): Promise<void> }
 export interface ReportOutboxPolicy { gapMs: number; retryMs: number; maxRetryMs: number; dailyAttempts: number }
@@ -10,14 +10,13 @@ export const REPORT_OUTBOX_POLICY: Readonly<ReportOutboxPolicy> = Object.freeze(
 });
 interface Entry { id: string; notice: ReportMailNotice; attempts: number; next: number; sent: boolean }
 interface State { v: 1; entries: Entry[]; day: number; used: number; next: number }
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const integer = (n: unknown): n is number => Number.isSafeInteger(n) && Number(n) >= 0;
 const DAY = 86_400_000;
 
 /** Projection is deliberate: internal name snapshots, IDs, IPs and tokens never enter this separate file. */
 function publicNotice(n: ReportMailNotice): ReportMailNotice {
   reportMailText(n);
-  return { reporter_support: n.reporter_support, reported_support: n.reported_support, reason: n.reason,
+  return { id: n.id, reporter_support: n.reporter_support, reported_support: n.reported_support, reason: n.reason,
     place: n.place, room: n.room, at: new Date(n.at).toISOString(), channel: n.channel };
 }
 
@@ -38,7 +37,7 @@ export class ReportOutbox {
       if (s.v !== 1 || !Array.isArray(s.entries) || !integer(s.day) || !integer(s.used) || !integer(s.next)) throw 0;
       const seen = new Set<string>();
       const entries = s.entries.map(e => {
-        if (!UUID.test(e.id) || seen.has(e.id) || !integer(e.attempts) || !integer(e.next) || typeof e.sent !== 'boolean') throw 0;
+        if (!REPORT_ID.test(e.id) || e.notice?.id !== e.id || seen.has(e.id) || !integer(e.attempts) || !integer(e.next) || typeof e.sent !== 'boolean') throw 0;
         seen.add(e.id);
         return { id: e.id, notice: publicNotice(e.notice), attempts: e.attempts, next: e.next, sent: e.sent };
       });
@@ -49,7 +48,7 @@ export class ReportOutbox {
   /** Idempotent after restart, including sent receipts. A caller must replay after an enqueue I/O failure. */
   enqueue(id: string, notice: ReportMailNotice): boolean {
     if (this.closed) throw new Error('REPORT_OUTBOX_CLOSED');
-    if (!UUID.test(id)) throw new Error('REPORT_OUTBOX_INVALID_ID');
+    if (!REPORT_ID.test(id) || notice.id !== id) throw new Error('REPORT_OUTBOX_INVALID_ID');
     const clean = publicNotice(notice), old = this.state.entries.find(e => e.id === id);
     if (old) {
       if (JSON.stringify(old.notice) !== JSON.stringify(clean)) throw new Error('REPORT_OUTBOX_ID_CONFLICT');

@@ -5,7 +5,7 @@ const config: ReportSmtpConfig = { host: 'smtpdm-us-east-1.aliyuncs.com', port: 
   from: 'reports@notify.gensen.app', to: 'moderator@example.test', user: 'reports@notify.gensen.app', password: 'test-only-password' };
 const env = { P0_REPORT_MAIL: 'on', SMTP_HOST: config.host, SMTP_PORT: '465', SMTP_SECURITY: 'ssl',
   SMTP_USER: config.user, SMTP_PASS: config.password, MAIL_FROM: config.from, MAIL_TO: config.to };
-const notice: ReportMailNotice = { reporter_support: 'WKRW4-9CH60', reported_support: '55YF1-3C0J8',
+const notice: ReportMailNotice = { id: 'R-20261112-0123ABCD', reporter_support: 'WKRW4-9CH60', reported_support: '55YF1-3C0J8',
   reason: 'Offensive name or bio', place: 'sh_tea_1', room: 2, at: '2026-11-12T11:00:00.000Z', channel: 'appstore' };
 
 describe('484 Direct Mail configuration and isolated fake delivery', () => {
@@ -48,14 +48,14 @@ describe('484 Direct Mail configuration and isolated fake delivery', () => {
       disableFileAccess: true, disableUrlAccess: true });
     await mailer.send({ ...notice, reported_name: 'PRIVATE_NAME', reporter: 'private-player-a', reported: 'private-player-b',
       ip: '192.0.2.123', token: 'private-session', to: 'other@example.test', html: 'PRIVATE_HTML' } as ReportMailNotice);
-    expect(sendMail).toHaveBeenCalledWith({ from: config.from, to: 'moderator@example.test', subject: 'Gensen player report',
-      text: 'Reporter support code: WKRW4-9CH60\nReported support code: 55YF1-3C0J8\nReason: Offensive name or bio\n'
+    expect(sendMail).toHaveBeenCalledWith({ from: config.from, to: 'moderator@example.test', subject: 'Gensen player report R-20261112-0123ABCD',
+      text: 'Report: R-20261112-0123ABCD\nReporter support code: WKRW4-9CH60\nReported support code: 55YF1-3C0J8\nReason: Offensive name or bio\n'
         + 'Place: sh_tea_1\nLayer: 2\nTime: 2026-11-12T11:00:00.000Z\nChannel: appstore\n' });
     mailer.close(); expect(close).toHaveBeenCalledOnce();
   });
 
-  it('takes the recipient from MAIL_TO, without choosing either pending production address as a default', async () => {
-    for (const to of ['support@gensen.app', 'shaojie@gensen.app']) {
+  it('takes the recipient from MAIL_TO without a hardcoded default', async () => {
+    for (const to of ['moderator@example.test', 'shaojie@gensen.app']) {
       const sendMail = vi.fn(async () => ({}));
       const mailer = createReportMailer(reportSmtpFromEnv({ ...env, MAIL_TO: to })!, () => ({ sendMail, close() {} }));
       await mailer.send(notice);
@@ -67,6 +67,7 @@ describe('484 Direct Mail configuration and isolated fake delivery', () => {
   it.each([
     { reason: 'free text PRIVATE_NAME' }, { reporter_support: 'private-player-a' },
     { room: 0 }, { place: 'sh_tea_1\nBcc: other@example.test' }, { at: 'not a date' }, { channel: 'unrecognized' },
+    { id: 'R-20261112-0123ABCI' }, { id: 'R-20261112-0123ABCD\r\nBcc: other@example.test' },
   ])('rejects invalid public notice before invoking the SMTP transport: %j', async patch => {
     const sendMail = vi.fn(async () => ({}));
     const mailer = createReportMailer(config, () => ({ sendMail, close() {} }));
