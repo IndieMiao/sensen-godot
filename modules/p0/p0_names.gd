@@ -31,10 +31,15 @@ static func fit(text: String, font: Font, size: int, width: float) -> String:
 		best = head
 	return best if best != "" else ELLIPSIS
 
-## The name tag's room: the widest default name as drawn (in the language on screen: `旅人 wwww` under 中文).
+## The name tag's room: the widest default name as drawn (in the language on screen: `旅人 wwww` under 中文), measured
+## once per font, size and language.
+static var _tag_widths := {}
 static func tag_width(font: Font, size: int) -> float:
 	if font == null: return INF
-	return font.get_string_size(Localization.with_names(DEFAULT, ["wwww"]), HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+	var key := "%d|%d|%s" % [font.get_instance_id(), size, TranslationServer.get_locale()]
+	if not _tag_widths.has(key):
+		_tag_widths[key] = font.get_string_size(Localization.with_names(DEFAULT, ["wwww"]), HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+	return float(_tag_widths[key])
 
 ## A one-line title with a name in it (`Block <name>?`, `Report <name>`): only the name gives way, the rest stays whole
 ## (as P0Titles.fit leaves the title: the frame's own words first). `template` takes the name as its one %s.
