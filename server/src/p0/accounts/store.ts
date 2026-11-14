@@ -10,11 +10,16 @@
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 
-export type Provider = 'apple' | 'google';
+export type Provider = 'apple' | 'google' | 'email';
+/** Every sign-in a player may be linked to, in the order `linked` lists them. */
+export const PROVIDERS: readonly Provider[] = ['apple', 'google', 'email'];
 /** `refresh` is the token as Apple gave it on the way in and out; on disk it is sealed. */
 export interface AppleLink { sub: string; aud: string; refresh?: string }
 export interface GoogleLink { sub: string }
-export interface Linked { apple?: AppleLink; google?: GoogleLink }
+/** An email sign-in (contract v1.5): `sub` is the address's emailId — HMAC under P0_ACCOUNTS_KEY — never the address. */
+export interface EmailLink { sub: string }
+export type AnyLink = AppleLink | GoogleLink | EmailLink;
+export interface Linked { apple?: AppleLink; google?: GoogleLink; email?: EmailLink }
 export interface AccountRow extends Linked { player: string; created_at: number; claimed_at?: number }
 export type TokenKind = 'user' | 'admin';
 
@@ -96,13 +101,13 @@ export class P0Accounts {
   userTokenCount(player: string): number { return Object.values(this.d.tokens).filter(t => t.player === player && t.kind === 'user').length; }
 
   byIdentity(provider: Provider, sub: string): string | undefined { return this.d.identities[`${provider}:${sub}`]; }
-  link(player: string, provider: Provider, info: AppleLink | GoogleLink): void {
+  link(player: string, provider: Provider, info: AnyLink): void {
     const row = this.d.players[player] ?? (this.d.players[player] = { player, created_at: this.now() });
     const was = row[provider];
     if (was) delete this.d.identities[`${provider}:${was.sub}`];
     this.d.identities[`${provider}:${info.sub}`] = player;
     if (provider === 'apple') { const a = info as AppleLink; row.apple = { sub: a.sub, aud: a.aud, ...(a.refresh ? { refresh: this.seal(a.refresh) } : {}) }; }
-    else row.google = { sub: info.sub };
+    else row[provider] = { sub: info.sub };
     this.flush();
   }
   unlink(player: string, provider: Provider): void {
@@ -118,11 +123,11 @@ export class P0Accounts {
    * signed out is all of this but the last — its id alone must not open it again, nor offer it to claim. */
   isClaimed(player: string): boolean {
     const r = this.d.players[player];
-    return !!r && (r.claimed_at !== undefined || !!r.apple || !!r.google)
+    return !!r && (r.claimed_at !== undefined || PROVIDERS.some(p => !!r[p]))
       || Object.values(this.d.codes).some(c => c.player === player)
       || this.userTokenCount(player) > 0;
   }
-  linked(player: string): Provider[] { const r = this.d.players[player]; return r ? (['apple', 'google'] as const).filter(p => r[p]) : []; }
+  linked(player: string): Provider[] { const r = this.d.players[player]; return r ? PROVIDERS.filter(p => r[p]) : []; }
 
   markDeleted(player: string, at: number): void { this.d.deleted[player] = at; this.flush(); }
   isDeleted(player: string): boolean { const at = this.d.deleted[player]; return at !== undefined && this.now() - at < DELETED_KEEP_MS; }
@@ -130,7 +135,7 @@ export class P0Accounts {
   remove(player: string): void {
     for (const [k, c] of Object.entries(this.d.codes)) if (c.player === player) delete this.d.codes[k];   // its test code too
     const row = this.d.players[player];
-    for (const p of ['apple', 'google'] as const) if (row?.[p]) delete this.d.identities[`${p}:${row[p]!.sub}`];
+    for (const p of PROVIDERS) if (row?.[p]) delete this.d.identities[`${p}:${row[p]!.sub}`];
     delete this.d.players[player];
     for (const [h, t] of Object.entries(this.d.tokens)) if (t.player === player) delete this.d.tokens[h];
     this.flush();
@@ -151,6 +156,12 @@ export class P0Accounts {
   codeKey(code: string): string {
     if (!this.key) throw new Error('P0Accounts: codes need P0_ACCOUNTS_KEY');
     return createHmac('sha256', this.key).update(normalizeCode(code)).digest('hex');
+  }
+  /** An email address's identity (contract v1.5): HMAC-SHA256 under P0_ACCOUNTS_KEY of the address normalized (trim,
+   * lower case; Gmail's dots and + kept) — the only form it is kept in. Its own prefix keeps it apart from codeKey. */
+  emailId(email: string): string {
+    if (!this.key) throw new Error('P0Accounts: email sign-in needs P0_ACCOUNTS_KEY');
+    return createHmac('sha256', this.key).update('p0-email:' + email.trim().toLowerCase()).digest('hex');
   }
   /** One code per player: a new one replaces the old (whose tokens go with it). The key of the new one. */
   setCode(player: string, code: string, note: string): string {

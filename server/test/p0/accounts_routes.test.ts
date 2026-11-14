@@ -40,7 +40,7 @@ const guest = (extra: Record<string, unknown> = {}) => ({ age_ok: true, ...V, na
 describe('hello', () => {
   it('says the versions and whether ids alone are taken', async () => {
     const { app } = setup({ legacyId: true });
-    expect((await app.inject({ method: 'GET', url: '/v1/p0/hello' })).json()).toEqual({ ok: true, terms_version: V.terms, privacy_version: V.privacy, legacy_id: true, guest_ok: true });
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/hello' })).json()).toEqual({ ok: true, terms_version: V.terms, privacy_version: V.privacy, legacy_id: true, guest_ok: true, email: false });   // email: contract v1.5 (on only with P0_EMAIL_LOGIN, a key and a mail)
   });
 });
 

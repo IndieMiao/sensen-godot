@@ -12,6 +12,7 @@ export interface AccountsConfig {
   google: { audiences: string[] } | null;
   legacyId: boolean;                  // P0_LEGACY_ID=1: any player by x-p0-player alone (devserver, shots, tests; never live)
   guestOk: boolean;                   // P0_GUEST_OK=1: session/guest without a sign-in (devserver, shots; never live — v1.4 ⑪)
+  emailLogin: boolean;                // P0_EMAIL_LOGIN=1: sign in with an emailed code (contract v1.5; off by default — one switch, no client release)
   refreshKey: Buffer | null;          // P0_ACCOUNTS_KEY (64 hex): AES-GCM for the stored Apple refresh tokens
 }
 
@@ -30,6 +31,7 @@ export function accountsConfig(env: Record<string, string | undefined> = process
     google: audiences.length ? { audiences } : null,
     legacyId: env.P0_LEGACY_ID === '1',
     guestOk: env.P0_GUEST_OK === '1',
+    emailLogin: env.P0_EMAIL_LOGIN === '1',
     refreshKey: /^[0-9a-f]{64}$/i.test(key) ? Buffer.from(key, 'hex') : null,
   };
 }

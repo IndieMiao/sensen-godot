@@ -9,6 +9,7 @@
 import { APPLE_JWKS_URL, AppleClient, appleVerifier, registerAppleRoutes } from '../src/p0/accounts/apple.js';
 import { accountsConfig, applePrivateKey } from '../src/p0/accounts/config.js';
 import { GOOGLE_JWKS_URL, googleVerifier, registerGoogleRoutes } from '../src/p0/accounts/google.js';
+import { alertMailerFromEnv, EmailCodes, emailReady, emailVerifier, registerEmailRoutes, signInMailerFromEnv } from '../src/p0/accounts/email.js';
 import { CachedJwks, jwksFetcher } from '../src/p0/accounts/jwt.js';
 import { expiredSignIn, PendingSignIns } from '../src/p0/accounts/link.js';
 import { identify, isRefusal } from '../src/p0/accounts/identify.js';
@@ -155,11 +156,22 @@ const googleDeps = { store, accounts, identify: identifyDeps, now: Date.now, pen
   audiences: accountsCfg.google?.audiences ?? [], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, kick: kickPlayer };
 registerAppleRoutes(app, appleDeps);
 registerGoogleRoutes(app, googleDeps);
-const verifyApple = appleVerifier(appleDeps), verifyGoogle = googleVerifier(googleDeps);
+// Sign in with an emailed code (SGODOT-497; contract v1.5 / v1.6.4): off unless P0_EMAIL_LOGIN=1. The mail goes by
+// P0_SIGNIN_SMTP_URL / P0_SIGNIN_MAIL_FROM (signin@), the cap's alert by P0_ALERT_SMTP_URL / P0_ALERT_MAIL_TO /
+// P0_ALERT_MAIL_FROM (reports@); neither URL is ever logged. Switched on without a key or a mail: a warning, and the
+// routes answer provider_unavailable / email_unavailable — the server runs on.
+const signInMailer = signInMailerFromEnv();
+const emailDeps = { store, accounts, now: Date.now, pending: pendingSignIns, on: accountsCfg.emailLogin, codes: new EmailCodes(),
+  mailer: signInMailer, kick: kickPlayer, alert: alertMailerFromEnv() };
+if (accountsCfg.emailLogin && !emailReady(emailDeps))
+  console.warn(JSON.stringify({ warn: 'P0_EMAIL_LOGIN=1 but email sign-in cannot run', accounts_key: accounts.codesOn(), signin_smtp: !!signInMailer }));
+registerEmailRoutes(app, emailDeps);
+const verifyApple = appleVerifier(appleDeps), verifyGoogle = googleVerifier(googleDeps), verifyEmail = emailVerifier(emailDeps);
 registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now, guestOk: accountsCfg.guestOk,
-  pending: pendingSignIns, kick: kickPlayer,
+  pending: pendingSignIns, kick: kickPlayer, email: emailReady(emailDeps),
   verify: async (provider, b) => {
-    const v = provider === 'apple' ? await verifyApple(b) : provider === 'google' ? await verifyGoogle(b) : undefined;
+    const v = provider === 'apple' ? await verifyApple(b) : provider === 'google' ? await verifyGoogle(b)
+      : provider === 'email' ? await verifyEmail(b) : undefined;
     return v === undefined || 'status' in v ? v : { link: v };
   },
   voiceAge: p => { const a = voice.status(p).age; return a === 'ok' ? true : a === 'no' ? false : null; },
@@ -179,7 +191,7 @@ const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFil
 setInterval(() => snapshotState(stateFile, snapshots, 48, Date.now(), accountsFile), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config, dev_sites: devSitesFromEnv(process.env) }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config, dev_sites: devSitesFromEnv(process.env), email_login: emailReady(emailDeps) }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;
