@@ -41,9 +41,17 @@ async function removeAccount(deps: DeleteDeps, player: string): Promise<void> {
   if (!row && !store.peek(player) && !deleted) return;
   // A1 find() returns the decrypted refresh. Keep it only in this call, before removing the account row.
   const apple = row?.apple;
-  accounts.revokeAll(player);
-  if (!deleted) accounts.markDeleted(player, deps.now());
-  accounts.remove(player); // Also removes admin tokens and identity indexes; finish this synchronous phase before the save.
+  try {
+    accounts.revokeAll(player);
+    if (!deleted) accounts.markDeleted(player, deps.now());
+    accounts.remove(player); // Also removes admin tokens and identity indexes; finish this synchronous phase before the save.
+  } catch (e) {
+    // a write that failed here may have taken the row out of memory already: the next call (it resumes) would find no
+    // refresh token, and the next write would drop it from disk too — so Apple's authorization goes now, while the
+    // token is in hand (后裔 on 苏烈's 484 8c4a62d5)
+    await revokeAppleOf(deps, player, apple);
+    throw e;
+  }
 
   let incomplete = false;
   const failed = (stage: string) => {
@@ -57,15 +65,19 @@ async function removeAccount(deps: DeleteDeps, player: string): Promise<void> {
   try { hub.kick(player); } catch { failed('hub'); }
   try { await cleanup; } catch { failed('voice'); }
 
-  if (apple) {
-    if (apple.refresh && deps.revokeApple) {
-      try { await deps.revokeApple(apple.aud, apple.refresh); }
-      catch { console.warn(JSON.stringify({ account: 'apple_revoke_failed', support_code: supportCode(player) })); }
-    } else {
-      console.warn(JSON.stringify({ account: 'apple_revoke_skipped', support_code: supportCode(player) }));
-    }
-  }
+  await revokeAppleOf(deps, player, apple);
   if (incomplete) throw new Error('ACCOUNT_DELETE_INCOMPLETE');
+}
+
+/** The account's Apple authorization withdrawn with its refresh token; a failure or no token is a log line only. */
+async function revokeAppleOf(deps: Pick<DeleteDeps, 'revokeApple'>, player: string, apple: { aud: string; refresh?: string } | undefined): Promise<void> {
+  if (!apple) return;
+  if (apple.refresh && deps.revokeApple) {
+    try { await deps.revokeApple(apple.aud, apple.refresh); }
+    catch { console.warn(JSON.stringify({ account: 'apple_revoke_failed', support_code: supportCode(player) })); }
+  } else {
+    console.warn(JSON.stringify({ account: 'apple_revoke_skipped', support_code: supportCode(player) }));
+  }
 }
 
 /**
@@ -81,16 +93,19 @@ export function registerAccountDeleteRoute(app: FastifyInstance, deps: DeleteDep
     const w = identify(req.headers, deps.identify, { evenSuspended: true });
     if (isRefusal(w)) return reply.code(w.status).send(w.body);
     if (w.via !== 'token') return reply.code(401).send({ ok: false, code: 'unauthenticated' });
-    try { await deleteAccount(deps, w.player); }
-    catch (e) {
-      // the first, synchronous stretch (tokens, the deleted list, the account row) failed to write: nothing is deleted —
-      // the farm is still there and the player must not be told otherwise (周瑜 on #1048)
-      if (!(e instanceof Error && e.message === 'ACCOUNT_DELETE_INCOMPLETE')) {
-        console.warn(JSON.stringify({ account: 'delete_failed_app', support_code: supportCode(w.player) }));
-        return reply.code(500).send({ ok: false, code: 'delete_failed' });
-      }
-      console.warn(JSON.stringify({ account: 'delete_incomplete_app', support_code: supportCode(w.player) }));
+    const attempt = () => deleteAccount(deps, w.player).then(() => null, (e: unknown) => e);
+    const incomplete = (e: unknown) => e instanceof Error && e.message === 'ACCOUNT_DELETE_INCOMPLETE';
+    let e = await attempt();
+    // deleteAccount resumes from wherever it stopped (each step can run again): a first stretch that failed to write
+    // is tried once more at once — a passing disk error — before the player hears Didn't go through
+    if (e && !incomplete(e)) e = await attempt();
+    if (e && !incomplete(e)) {
+      // the first, synchronous stretch (tokens, the deleted list, the account row) still failed: the farm is still there
+      // and the player must not be told otherwise (周瑜 on #1048); the admin's delete finishes it (苏烈, 484)
+      console.warn(JSON.stringify({ account: 'delete_failed_app', support_code: supportCode(w.player) }));
+      return reply.code(500).send({ ok: false, code: 'delete_failed' });
     }
+    if (e) console.warn(JSON.stringify({ account: 'delete_incomplete_app', support_code: supportCode(w.player) }));
     return { ok: true };
   });
 }
