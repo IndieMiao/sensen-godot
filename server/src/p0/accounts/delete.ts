@@ -74,6 +74,7 @@ async function removeAccount(deps: DeleteDeps, player: string): Promise<void> {
  * every account). {ok: true} once the account is gone for every request (its tokens revoked, on the deleted list) —
  * also when a later step failed (the save's file, voice): this phone's token is spent, so the App cannot ask again;
  * deleteAccount has logged delete_incomplete with the support code, and the admin's run of it on the tombstone finishes.
+ * The first stretch failing to write (nothing deleted) is 500 delete_failed: the App says Didn't go through.
  */
 export function registerAccountDeleteRoute(app: FastifyInstance, deps: DeleteDeps & { identify: IdentifyDeps }): void {
   app.delete('/v1/p0/account', async (req, reply) => {
@@ -81,7 +82,15 @@ export function registerAccountDeleteRoute(app: FastifyInstance, deps: DeleteDep
     if (isRefusal(w)) return reply.code(w.status).send(w.body);
     if (w.via !== 'token') return reply.code(401).send({ ok: false, code: 'unauthenticated' });
     try { await deleteAccount(deps, w.player); }
-    catch { console.warn(JSON.stringify({ account: 'delete_incomplete_app', support_code: supportCode(w.player) })); }
+    catch (e) {
+      // the first, synchronous stretch (tokens, the deleted list, the account row) failed to write: nothing is deleted —
+      // the farm is still there and the player must not be told otherwise (周瑜 on #1048)
+      if (!(e instanceof Error && e.message === 'ACCOUNT_DELETE_INCOMPLETE')) {
+        console.warn(JSON.stringify({ account: 'delete_failed_app', support_code: supportCode(w.player) }));
+        return reply.code(500).send({ ok: false, code: 'delete_failed' });
+      }
+      console.warn(JSON.stringify({ account: 'delete_incomplete_app', support_code: supportCode(w.player) }));
+    }
     return { ok: true };
   });
 }

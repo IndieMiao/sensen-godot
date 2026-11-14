@@ -50,7 +50,9 @@ export function appleClientSecret(c: Pick<AppleConfig, 'teamId' | 'keyId'>, key:
 /** A form POST to Apple (Node's fetch; a test's stand-in), its JSON or null. */
 export type ApplePost = (url: string, form: Record<string, string>) => Promise<{ status: number; json: Record<string, unknown> | null }>;
 export const applePost: ApplePost = async (url, form) => {
-  const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(form) });
+  // 10 s at most (周瑜 on #1048): a sign-in's code exchange or a deletion's revoke never hangs its request on Apple
+  const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(form),
+    signal: AbortSignal.timeout(10_000) });
   const text = await res.text();
   let json: Record<string, unknown> | null = null;
   try { json = text ? JSON.parse(text) as Record<string, unknown> : null; } catch { json = null; }

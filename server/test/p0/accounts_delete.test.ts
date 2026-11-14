@@ -293,4 +293,15 @@ describe('DELETE /v1/p0/account (SGODOT-488; contract §4, v1.6.6)', () => {
     await deleteAccount(deps, PLAYER);
     expect(deps.store.peek(PLAYER)).toBeUndefined();
   });
+  it('the first stretch failing to write is 500 delete_failed — nothing deleted, never told it was (周瑜 on #1048)', async () => {
+    const { deps, del } = route();
+    vi.spyOn(deps.accounts, 'markDeleted').mockImplementationOnce(() => { throw new Error('EIO'); });
+    const warned: string[] = [];
+    vi.spyOn(console, 'warn').mockImplementation((l: string) => { warned.push(l); });
+    const r = await del({ authorization: `Bearer ${USER_TOKEN}` });
+    expect([r.statusCode, r.json()]).toEqual([500, { ok: false, code: 'delete_failed' }]);
+    expect(deps.accounts.isDeleted(PLAYER)).toBe(false);
+    expect(deps.store.peek(PLAYER)).toBeDefined();
+    expect(warned).toContain(JSON.stringify({ account: 'delete_failed_app', support_code: supportCode(PLAYER) }));
+  });
 });
