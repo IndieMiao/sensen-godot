@@ -6,12 +6,12 @@
  */
 import { randomBytes } from 'node:crypto';
 import type { P0Store } from '../store.js';
-import type { AppleLink, GoogleLink, P0Accounts, Provider } from './store.js';
+import type { AnyLink, AppleLink, P0Accounts, Provider } from './store.js';
 
 /** A pending sign-in lasts this long (tech-plan §2.1: Apple's code is spent once and its refresh token in hand). */
 export const PENDING_MS = 10 * 60_000;
 
-export interface PendingInfo { provider: Provider; link: AppleLink | GoogleLink; at: number }
+export interface PendingInfo { provider: Provider; link: AnyLink; at: number }
 
 /**
  * Pending sign-ins, in memory only: a restart forgets them and the client asks to sign in again (pending_expired). Each
@@ -21,7 +21,7 @@ export interface PendingInfo { provider: Provider; link: AppleLink | GoogleLink;
 export class PendingSignIns {
   private by = new Map<string, PendingInfo>();
   constructor(private now: () => number = Date.now, private expired?: (info: PendingInfo) => void) {}
-  create(provider: Provider, link: AppleLink | GoogleLink): string {
+  create(provider: Provider, link: AnyLink): string {
     this.sweep();
     const id = randomBytes(32).toString('hex');
     this.by.set(id, { provider, link, at: this.now() });

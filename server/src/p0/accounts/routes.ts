@@ -14,7 +14,7 @@ import type { P0Store } from '../store.js';
 import { identify, isRefusal, type IdentifyDeps } from './identify.js';
 import { conflictFarm, liveOwner, signIn } from './link.js';
 import { NameLimiter, nameForGuest, registerNameRoutes, setName, type NameList } from './name.js';
-import { tokenShapeOk, type AppleLink, type GoogleLink, type P0Accounts, type Provider } from './store.js';
+import { tokenShapeOk, type AnyLink, type AppleLink, type P0Accounts, type Provider } from './store.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
 /** The terms' and privacy's versions: the one place they are written, the client's own copy of the same file. */
@@ -41,15 +41,18 @@ export interface AccountRouteDeps {
   guestsPerHour?: number;
   /** v1.4 (必须注册): a new farm needs a sign-in — guest takes the pending one (PR-B's PendingSignIns) and links it;
    * without one, sign_in_required, unless P0_GUEST_OK (devserver, shots) or a test account. */
-  pending?: { take(id: unknown): { provider: Provider; link: AppleLink | GoogleLink } | undefined;
-    peek?(id: unknown): { provider: Provider; link: AppleLink | GoogleLink } | undefined;
-    create?(provider: Provider, link: AppleLink | GoogleLink): string };
+  pending?: { take(id: unknown): { provider: Provider; link: AnyLink } | undefined;
+    peek?(id: unknown): { provider: Provider; link: AnyLink } | undefined;
+    create?(provider: Provider, link: AnyLink): string };
   guestOk?: boolean;
   /** A sign-in's credentials checked (PR-B: appleVerifier / googleVerifier by provider): its link, or the refusal
    * (bad_token, provider_unavailable). An unknown provider is undefined. claim needs it; none, and claim is off (503). */
-  verify?: (provider: string, b: Record<string, unknown>) => Promise<{ link: AppleLink | GoogleLink } | { status: number; body: { ok: false; code: string } } | undefined>;
+  verify?: (provider: string, b: Record<string, unknown>) => Promise<{ link: AnyLink } | { status: number; body: { ok: false; code: string } } | undefined>;
   /** The room hub's kick: a sign-in closes the account's open socket elsewhere (link.ts signIn). */
   kick?: (player: string) => void;
+  /** Email sign-in usable (contract v1.5: P0_EMAIL_LOGIN, P0_ACCOUNTS_KEY and the sign-in mail all there): hello says so,
+   * and the client shows `Continue with email`. */
+  email?: boolean;
 }
 
 const bad = (code: string, status: number, extra: Record<string, unknown> = {}) => ({ status, body: { ok: false as const, code, ...extra } });
@@ -77,7 +80,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
       else if (s) legacy = { age: deps.voiceAge?.(id) ?? null, consent: s.consent ? { terms: s.consent.terms, privacy: s.consent.privacy } : null };
     }
     return { ok: true, terms_version: versions.terms, privacy_version: versions.privacy, legacy_id: deps.identify.legacyId,
-      guest_ok: !!deps.guestOk, ...(legacy ? { legacy } : {}) };
+      guest_ok: !!deps.guestOk, email: !!deps.email, ...(legacy ? { legacy } : {}) };
   });
 
   app.post('/v1/p0/session/guest', async (req, reply) => {

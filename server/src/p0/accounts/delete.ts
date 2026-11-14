@@ -3,7 +3,7 @@
 import type { P0Store } from '../store.js';
 import type { P0Voice } from '../online/voice.js';
 import { supportCode } from '../support.js';
-import type { P0Accounts } from './store.js';
+import { PROVIDERS, type P0Accounts } from './store.js';
 
 export interface DeleteDeps {
   store: P0Store; accounts: P0Accounts; voice: P0Voice;
@@ -15,7 +15,7 @@ export interface DeleteDeps {
 export function previewAccountDeletion(deps: Pick<DeleteDeps, 'store' | 'accounts'>, player: string) {
   const save = deps.store.peek(player), account = deps.accounts.find(player);
   return { support_code: supportCode(player), found: !!(save || account), deleted: deps.accounts.isDeleted(player),
-    linked: (['apple', 'google'] as const).filter(provider => !!account?.[provider]),
+    linked: PROVIDERS.filter(provider => !!account?.[provider]),
     save: save ? { home: save.travel.home, level: save.homestead.level,
       created_at: save.created_at, last_at: save.presence.last_at } : null };
 }
