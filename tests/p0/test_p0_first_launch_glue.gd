@@ -225,17 +225,49 @@ func test_a_rename_goes_to_the_server() -> void:
 	rt._on_rename("Mia")
 	assert_dict(_sent("/p0/account/name")[0][1]).is_equal({"name": "Mia"})
 
-func test_outdated_terms_are_never_swapped_for_the_player() -> void:
+func test_outdated_terms_on_save_are_the_card_then_the_same_save_with_what_was_agreed() -> void:
 	rt.session.identity.kind = "new"
 	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
 	replies["/p0/session/google"] = {"ok": false, "code": "no_farm", "pending": "pend-1"}
 	await rt._on_acc_sign_in("google")
 	replies["/p0/session/guest"] = {"ok": false, "code": "consent_outdated", "terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
-	rt._acc_flow.named.emit("Mia", false)
-	assert_str(rt.session.identity.terms_version).is_equal("2026-11-13")   # not agreed for them (奕星 11-14)
-	assert_str(rt.session.identity.privacy_version).is_equal("2026-11-13")
-	assert_object(rt._acc_flow).is_not_null()   # stays on the page
-	assert_bool(rt.session.identity_ready).is_false()
+	flow.named.emit("Mia", false)
+	assert_array(flow.calls[-1]).is_equal(["consent_outdated", "2026-12-01"])
+	assert_str(rt.session.identity.terms_version).is_equal("2026-11-13")   # nothing agreed for them yet (奕星 11-14)
+	flow.record = {"age_ok": true, "terms": "2026-12-01", "privacy": "2026-12-01"}   # the card's Continue: kept
+	replies["/p0/session/guest"] = {"ok": true, "player": "p0-hhhhhhhhhhhhhhhhhhhh", "linked": "google"}
+	flow.consent_renewed.emit()
+	var saves := _sent("/p0/session/guest")
+	assert_dict(saves[-1][1]).contains_key_value("terms", "2026-12-01").contains_key_value("name", "Mia").contains_key_value("pending", "pend-1")
+	assert_array(flow.calls).contains([["consent_settled", true]])
+	assert_bool(rt.session.identity_ready).is_true()
+
+func test_a_sign_in_into_a_farm_without_today_s_consent_waits_for_the_card() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	replies["/p0/session/apple"] = {"ok": true, "player": "p0-iiiiiiiiiiiiiiiiiiii", "linked": ["apple"], "consent_outdated": true,
+		"terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(flow.calls[-1]).is_equal(["consent_outdated", "2026-12-01"])
+	assert_object(rt._acc_flow).is_not_null()   # not into the farm before the consent is on record
+	flow.record = {"age_ok": true, "terms": "2026-12-01", "privacy": "2026-12-01"}
+	replies["/p0/account/consent"] = {"ok": false, "code": "network"}
+	flow.consent_renewed.emit()
+	assert_array(flow.calls[-1]).is_equal(["consent_settled", false])   # the key back, a toast
+	assert_object(rt._acc_flow).is_not_null()
+	replies["/p0/account/consent"] = {"ok": true}
+	flow.consent_renewed.emit()
+	assert_dict(_sent("/p0/account/consent")[-1][1]).contains_key_value("terms", "2026-12-01")
+	assert_object(rt._acc_flow).is_null()   # on record: into the farm
+
+func test_failures_are_said_on_the_flow_s_own_layer() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	sheet = {"result": "failed", "reason": "APPLE_UNKNOWN"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(rt._acc_flow.said).contains_exactly([["Didn't go through · try again", true]])
 
 func test_no_on_the_age_page_sends_nothing() -> void:
 	rt.session.identity.kind = "old_age"

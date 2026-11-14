@@ -7,6 +7,7 @@ signal sign_in(provider: String)
 signal sign_in_again()
 signal switch_farm()
 signal code_entered(code: String)
+signal consent_renewed()
 signal blocked()
 signal failed(code: String)
 var kind := ""
@@ -25,6 +26,10 @@ func conflict(farm: Dictionary, provider: String) -> void: calls.append(["confli
 func claimed(linked: Array) -> void: calls.append(["claimed", linked])
 func kept() -> Dictionary: return record
 func sign_in_settled() -> void: calls.append(["settled"])
+func consent_outdated(r: Dictionary) -> void: calls.append(["consent_outdated", str(r.get("terms_version", ""))])
+func consent_settled(ok: bool) -> void: calls.append(["consent_settled", ok])
+var said: Array = []
+func say(text: String, error := false) -> void: said.append([text, error])
 ## 哪吒's static entry (11-14): NO-GMS where Google cannot sign in and email is off; Sign in's keys.
 static var google_ok := true
 static func entry(k: String, email_on: bool) -> Dictionary:
