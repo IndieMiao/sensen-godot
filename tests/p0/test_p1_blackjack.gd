@@ -95,13 +95,22 @@ func test_today_and_the_day_change() -> void:
 	assert_str(P0Blackjack.today_text(next)).is_equal("")
 	assert_int(P0Blackjack.deal_again_bet(next, 20)).is_equal(20)
 
-## Lou's opening line with the table closed for the day (9.18.7 ⑤), over the short-of-coins one when both hold.
+## Lou's opening line with the table closed for the day (9.18.7 ⑤), over the short-of-coins one when both hold; the time
+## kept whole by a no-break space (不知火舞 on 351 95d20d3e).
 func test_lou_says_the_table_is_done_for_the_day() -> void:
 	var v := _day_view(300, -46)
-	assert_str(str(P0Logic.keeper_lines(v, "casino").greet)).is_equal("That's enough cards for one day. Table opens in 5h 12m.")
-	assert_str(str(P0Logic.keeper_lines(_day_view(43, -46), "casino").greet)).is_equal("That's enough cards for one day. Table opens in 5h 12m.")
+	assert_str(str(P0Logic.keeper_lines(v, "casino").greet)).is_equal("That's enough cards for one day. Table opens in 5h\u00a012m.")
+	assert_str(str(P0Logic.keeper_lines(_day_view(43, -46), "casino").greet)).is_equal("That's enough cards for one day. Table opens in 5h\u00a012m.")
 	assert_str(str(P0Logic.keeper_lines(_day_view(300, -45), "casino").greet)).is_equal("Pull up a chair. Care for a hand?")
 	assert_str(str(P0Logic.keeper_lines(_day_view(43, -45), "casino").greet)).is_equal("Keep those coins for seeds. Come back with a few more.")
+
+## 中文 (李白's line, #1038's space): each figure stays with its unit — `5 小时` / `12 分` never split across lines (the
+## bubble broke `牌桌 5 / 小时 12 分后再开。` before, 351 95d20d3e).
+func test_lous_closing_line_keeps_its_time_whole_in_chinese() -> void:
+	var t = load("res://modules/ui/localization.gd").P0Translation.new()
+	t.load_table("res://assets/localization/p0_zh_CN.json")
+	var line := str(P0Logic.keeper_lines(_day_view(300, -46), "casino").greet)
+	assert_str(String(t._get_message(line, &""))).is_equal("今天的牌就打到这儿吧。牌桌 5\u00a0小时 12\u00a0分后再开。")
 
 func test_mock_keeps_the_days_loss_when_set() -> void:
 	var m := P0BlackjackMock.new(1)
