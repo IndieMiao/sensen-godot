@@ -2963,7 +2963,7 @@
  "Sign in with email": "用邮箱登录",
  "We'll email you a 6-digit code.": "我们会给你的邮箱发一个 6 位验证码。",
  "Enter a valid email": "请输入有效的邮箱",
- "Too many codes requested. Try again in %s.": "请求验证码太频繁了，请%s后再试。",
+ "Too many codes requested. Try again in %s.": "请求验证码太频繁了，请 %s后再试。",
  "We can't send codes right now. Please try again later.": "现在发不了验证码，请稍后再试。",
  "Check your email": "查看你的邮箱",
  "We sent a 6-digit code to %s.": "我们已把 6 位验证码发到 %s。",
@@ -2988,5 +2988,7 @@
  "Signed in with a test code": "已通过测试码登录",
  "You can sign in again with your test code.": "之后可以用你的测试码重新登录。",
  "Signed in with email": "已通过邮箱登录",
- "You can sign in again with email.": "之后可以用邮箱重新登录。"
+ "You can sign in again with email.": "之后可以用邮箱重新登录。",
+ "Too many tries. Try again in %s.": "试错太多次，请 %s后再试。",
+ "We've updated our terms": "我们更新了条款"
 }
