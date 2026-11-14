@@ -227,16 +227,10 @@ func _lines_on_top() -> void:
 func banner_over_mark() -> bool:
 	return banner != null and banner.visible and safe_top + BANNER_TOP + UiSysBanner.HEIGHT > P0AccShell._MARK_TOP - MARK_CLEAR
 
-## The page's wordmark out while the banner would touch it, back in after (250 ms).
+## The page's wordmark out while the banner would touch it, back in after (250 ms; the shell's, with the keyboard's).
 func _fade_mark() -> void:
 	var shell := page as P0AccShell
-	if shell == null or shell.mark == null: return
-	var to := 0.0 if banner_over_mark() else 1.0
-	if is_equal_approx(shell.mark.modulate.a, to): return
-	if not is_inside_tree():
-		shell.mark.modulate.a = to
-		return
-	create_tween().tween_property(shell.mark, ^"modulate:a", to, MARK_FADE_S)
+	if shell != null and shell.mark != null: shell.hide_mark("banner", banner_over_mark())
 
 ## The host's, when a sign-in ended with nothing to show here: the sheet closed (cancelled) or it failed (its toast is
 ## the host's) — the sign-in page's keys back. no_farm / conflict / claimed do it themselves (后裔 11-14).
