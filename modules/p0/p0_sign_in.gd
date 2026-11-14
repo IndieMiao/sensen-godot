@@ -20,6 +20,16 @@ static func providers(os_name := OS.get_name()) -> Array:
 	if os_name == "Android": return [GOOGLE]
 	return []
 
+## Whether this phone can sign in with Google at all — asked before AGE, so a phone without it gets 诸葛亮 v3's NO-GMS
+## page up front rather than after the questions. iOS always can: its sheet is the system's web one, no Play services.
+## Android needs Google Play services (GoogleSignIn.available(), the plugin's GoogleApiAvailability, cached). A phone
+## that has them but can't reach Google (mainland China) still answers true here and fails at the sheet.
+static func google_ready(os_name := OS.get_name()) -> bool:
+	if not force.is_empty(): return GOOGLE in force
+	if os_name == "iOS": return true
+	if os_name == "Android": return GoogleSignIn.available()
+	return false
+
 static func new_nonce() -> String: return AppleSignIn.new_nonce()
 
 ## Sign in with Apple through tools/ios/AppleSignIn.swift (loopback UDP 46465). `transport` stands in for the bridge in

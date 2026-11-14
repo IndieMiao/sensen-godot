@@ -62,6 +62,20 @@ func test_providers_by_platform() -> void:
 	P0SignIn.force = ["apple"]
 	assert_array(P0SignIn.providers("Android")).is_equal(["apple"])
 
+## 诸葛亮 v3: a phone that can't sign in with Google is told so before AGE. iOS's Google is the system's web sheet (no
+## Play services), so only Android asks the plugin; with no plugin (here) Android can't.
+func test_google_ready_by_platform() -> void:
+	assert_bool(P0SignIn.google_ready("iOS")).is_true()
+	assert_bool(P0SignIn.google_ready("Android")).is_false()   # no GodotGoogleSignIn singleton off a phone
+	assert_bool(P0SignIn.google_ready("macOS")).is_false()
+	GoogleSignIn.force_available = true
+	assert_bool(P0SignIn.google_ready("Android")).is_true()
+	GoogleSignIn.force_available = false
+	P0SignIn.force = ["google"]
+	assert_bool(P0SignIn.google_ready("macOS")).is_true()
+	P0SignIn.force = ["apple"]
+	assert_bool(P0SignIn.google_ready("iOS")).is_false()
+
 func test_ios_google_sends_the_client_id_and_the_nonce_hash_and_keeps_the_raw_nonce() -> void:
 	ProjectSettings.set_setting(P0SignIn.IOS_CLIENT_SETTING, "123-abc.apps.googleusercontent.com")
 	var seen := []
