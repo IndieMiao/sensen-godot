@@ -1660,7 +1660,9 @@ func _consent_answered(c: Dictionary, next: Callable) -> void:
 	_consent_settled(_card_done(c))
 	if bool(c.get("ok", false)): next.call()
 	elif code == "consent_outdated": _renew(c, func(): session.consent(_consent_body(), _consent_answered.bind(next)))
-	else: _acc_failed(c)
+	else:
+		_acc_failed(c)
+		if _card_done(c): _settle()   # the card closed on a failure no retry mends (周瑜 on #1056): Sign in's keys back under it
 
 ## The account is settled: the pages go, the launch cover comes up and the world's first read is already out
 ## (P0Session._identity_ready); p0_boot's when_first_view brings the farm (or the home pick) as on any launch. Over a
