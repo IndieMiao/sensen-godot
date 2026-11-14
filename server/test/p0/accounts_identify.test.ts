@@ -76,6 +76,8 @@ describe('a suspension (SGODOT-484)', () => {
     expect(identify(bearer(1), d)).toEqual({ status: 403, body: { ok: false, code: 'suspended', until: new Date(until).toISOString() } });
     expect(identify({ 'x-p0-player': 'p0-legacy01' }, d)).toEqual({ status: 403, body: { ok: false, code: 'suspended', until: null } });
     expect(identify({ 'x-p0-player': 'p0-other0001' }, d)).toEqual({ player: 'p0-other0001', via: 'legacy' });
+    // deletion stays open to a suspended account (App Store 5.1.1(v), Play): its route asks evenSuspended
+    expect(identify(bearer(1), d, { evenSuspended: true })).toEqual({ player: 'p0-alpha001', via: 'token' });
     a.markDeleted('p0-legacy01', Date.now());
     expect((identify({ 'x-p0-player': 'p0-legacy01' }, d) as { body: { code: string } }).body.code).toBe('account_deleted');
   });

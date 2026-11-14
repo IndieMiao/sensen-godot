@@ -40,9 +40,11 @@ export function bearerOf(headers: Record<string, unknown>): string {
   return m ? m[1].toLowerCase() : '';
 }
 
-export function identify(headers: Record<string, unknown>, deps: IdentifyDeps): Who | Refusal {
+/** `evenSuspended`: the one way a suspended player still has — deleting the account (DELETE /v1/p0/account; App Store
+ *  5.1.1(v) and Play want deletion open to every account, 周瑜 on #1043). Every other caller leaves it out. */
+export function identify(headers: Record<string, unknown>, deps: IdentifyDeps, opts: { evenSuspended?: boolean } = {}): Who | Refusal {
   const w = whoIs(headers, deps);
-  if (isRefusal(w)) return w;
+  if (isRefusal(w) || opts.evenSuspended) return w;
   const s = deps.suspended?.(w.player);
   return s ? refuse(403, 'suspended', { until: s.until === null ? null : new Date(s.until).toISOString() }) : w;
 }
