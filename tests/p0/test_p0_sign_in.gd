@@ -6,6 +6,7 @@ const P0SignIn := preload("res://modules/p0/p0_sign_in.gd")
 
 func after_test() -> void:
 	P0SignIn.force = []
+	GoogleSignIn.force_available = false
 
 ## A bridge double: answers `line`, keeping the nonce hash it was sent.
 func _bridge(line: String, seen: Array) -> Callable:
