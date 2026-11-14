@@ -44,6 +44,7 @@ var record_path := RECORD
 var _check := Callable()
 var _this_year := 0
 var _provider := ""
+var _toasts: ToastLayer           # the flow's own: P0Ui's banner and toasts are on a layer under this one
 
 ## `check`: NAME's name check (P0Session.name_check). `providers_`: the sign-in page's keys (P0AccSignIn). `hints_`:
 ## {line: "farm_uses" | "last_time", with: …} for the sign-in page's line.
@@ -121,6 +122,7 @@ func _show(p: Control) -> void:
 		else: page.queue_free()
 	page = p
 	if p.get_parent() == null: add_child(p)
+	if _toasts != null: move_child(_toasts, -1)
 
 func _open_sign_in() -> void:
 	if sign_in_page == null:
@@ -158,6 +160,7 @@ func conflict(farm: Dictionary, provider := "") -> void:
 		switch_farm.emit())
 	choose.cancelled.connect(_try_another)
 	add_child(choose)
+	if _toasts != null: move_child(_toasts, -1)
 
 ## The host's: this phone's old farm was claimed elsewhere — the sign-in page's line, by the way it is bound
 ## (`linked`: ["google"]; [] a test code's).
@@ -165,6 +168,22 @@ func claimed(linked: Array) -> void:
 	_open_sign_in()
 	sign_in_settled()
 	sign_in_page.set_hint("farm_uses", str(linked[0]) if not linked.is_empty() else "code")
+
+## A line for the player while the flow is up — a failed sign-in or check (`Didn't go through · try again`), `Sign-in
+## expired. Please sign in again.` — as the toast P0Ui would show (Toast R1, Info; Error for a failure), on this flow's
+## own layer: P0Ui's banner and toasts sit under the flow's layer and would not be seen (哪吒 on PR-A, 11-14). Over the
+## page, at the foot, one at a time.
+func say(text: String, error := false) -> void:
+	if _toasts == null:
+		_toasts = ToastLayer.new()
+		_toasts.name = "Toasts"
+		_toasts.theme = UiKit.theme()
+		add_child(_toasts)
+	move_child(_toasts, -1)   # over the page and any card
+	_toasts.show_toast(text, ToastLayer.Severity.ERROR if error else ToastLayer.Severity.INFO)
+
+## What say() shows now ("" none).
+func said() -> String: return _toasts.current_text() if _toasts != null else ""
 
 ## The host's, when a sign-in ended with nothing to show here: the sheet closed (cancelled) or it failed (its toast is
 ## the host's) — the sign-in page's keys back. no_farm / conflict / claimed do it themselves (后裔 11-14).

@@ -1727,6 +1727,12 @@ func show_account_state(kind: String, detail := {}) -> void:
 		d = {until = suspended_until_text(detail.get("until", null)), code = P0Legal.support_code(str(player_of.call()))}
 	show_screen(k, d)
 
+## Takes an account state down (the host's, after its Sign in: the sign-in page goes up over no world). Nothing else
+## does — a launch's LAUNCH ranks under SESSION / DELETED, so a state that came during the first read would stay over
+## the new sign-in otherwise (周瑜 on #1052). Not another kind on screen.
+func hide_account_state() -> void:
+	hide_screen(ACCOUNT_KINDS.values())
+
 ## SYS-SUSPENDED's end, `Nov 20` (P0Logic.month_day) on the player's own calendar; "" for null or an unreadable time
 ## (the no-end line). `bias_min` (minutes east of UTC) is for tests.
 static func suspended_until_text(until: Variant, bias_min := 100000) -> String:

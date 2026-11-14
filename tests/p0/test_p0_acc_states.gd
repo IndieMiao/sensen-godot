@@ -121,3 +121,18 @@ func test_the_account_states_keys_do_not_reach_screen_action() -> void:
 func test_the_no_gms_mail_has_no_code() -> void:
 	var url := P0Legal.support_mail_url("", "0.3.11 (2026111401)", "Android 14").uri_decode()
 	assert_str(url).is_equal("mailto:shaojie@gensen.app?subject=Gensen support&body=Version: 0.3.11 (2026111401)\nPhone: Android 14\n\n")
+
+func test_the_host_takes_an_account_state_down_after_sign_in() -> void:
+	ui.show_screen(K.LAUNCH)
+	ui.show_account_state("session_replaced")   # during the first read: over the launch cover
+	assert_int(ui.screen_kind()).is_equal(K.SESSION)
+	ui.show_screen(K.LAUNCH)   # a launch again cannot cover it …
+	assert_int(ui.screen_kind()).is_equal(K.SESSION)
+	ui.hide_account_state()   # … the host takes it down
+	assert_int(ui.screen_kind()).is_equal(-1)
+	ui.show_account_state("account_deleted")
+	ui.hide_account_state()
+	assert_int(ui.screen_kind()).is_equal(-1)
+	ui.show_screen(K.MAINT)
+	ui.hide_account_state()   # another kind stays
+	assert_int(ui.screen_kind()).is_equal(K.MAINT)

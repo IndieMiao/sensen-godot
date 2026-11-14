@@ -186,3 +186,15 @@ func test_the_keys_are_grey_while_the_sheet_is_up_till_the_host_answers() -> voi
 	(s.keys.get_node("Google") as Button).pressed.emit()
 	f.no_farm()
 	assert_bool(s.busy).is_false()
+
+func test_the_flow_says_its_own_lines_over_the_page() -> void:
+	var f := _flow("old_signin")
+	assert_str(f.said()).is_equal("")
+	f.say("Didn't go through · try again", true)
+	assert_str(f.said()).is_equal("Didn't go through · try again")
+	var t := f.get_node("Toasts")
+	assert_int(t.get_index()).is_equal(f.get_child_count() - 1)   # over the page
+	f.no_farm()   # a page on top later: the toast layer goes back over it
+	f.say("Sign-in expired. Please sign in again.")
+	assert_int(t.get_index()).is_equal(f.get_child_count() - 1)
+	assert_str(f.said()).is_equal("Sign-in expired. Please sign in again.")
