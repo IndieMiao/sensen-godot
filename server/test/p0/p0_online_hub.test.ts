@@ -17,10 +17,10 @@ afterEach(async () => {
   app = undefined;
 });
 
-async function server(keys?: string[]) {
+async function server(keys?: string[], names?: Record<string, string>) {
   app = Fastify({ logger: false });
   const rooms = new OutpostRooms(loadOutposts());
-  const hub = registerP0Online(app, { rooms, keys });
+  const hub = registerP0Online(app, { rooms, keys, ...(names ? { nameOf: (p: string) => names[p] ?? null } : {}) });
   await app.listen({ port: 0, host: '127.0.0.1' });
   const address = app.server.address();
   const port = typeof address === 'object' && address ? address.port : 0;
@@ -61,6 +61,27 @@ function decode(frame: Buffer) {
 }
 
 describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
+  it("the roster carries a player's name when they gave one (哪吒 491); a rename reaches the room at once", async () => {
+    const names: Record<string, string> = { 'player-named': 'Mia' };
+    const { port, hub } = await server(undefined, names);
+    const a = await connect(port, 'player-named'), b = await connect(port, 'player-plain');
+    await join(a, 'sh_tea_1');
+    const from = b.json.length;
+    await join(b, 'sh_tea_1');
+    const roster = await until(msg(b, 'roster', from));
+    const byHandle = Object.fromEntries(roster.members.map((m: Record<string, unknown>) => [m.player, m]));
+    expect(byHandle[publicPlayer('player-named')].name).toBe('Mia');
+    expect(byHandle[publicPlayer('player-plain')]).not.toHaveProperty('name');   // none: Traveller + the handle's 4
+    const seenByA = await until(() => a.json.find(m => m.t === 'peer' && m.member.player === publicPlayer('player-plain')));
+    expect(seenByA.member).not.toHaveProperty('name');
+    names['player-plain'] = 'Ann';
+    const at = a.json.length;
+    hub.renamed('player-plain');
+    const renamed = await until(() => a.json.slice(at).find(m => m.t === 'peer'));
+    expect(renamed.member).toMatchObject({ player: publicPlayer('player-plain'), name: 'Ann' });
+    expect(b.json.slice(from).filter(m => m.t === 'peer' && m.member.player === publicPlayer('player-plain'))).toEqual([]);   // not to themself
+  });
+
   it('account deletion kicks only that socket with 4001, announces departure and forgets reconnect placement', async () => {
     const { port, rooms, hub } = await server();
     const a = await connect(port, 'player-delete'), b = await connect(port, 'player-kept');

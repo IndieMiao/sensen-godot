@@ -228,6 +228,20 @@ describe("a sign-in into a farm says whether it has today's consent (spec v2 §9
   });
 });
 
+describe('a rename tells the room (哪吒 491)', () => {
+  it('account/name calls renamed once the name is changed', async () => {
+    const store = new P0Store(c), accounts = new P0Accounts();
+    const told: string[] = [];
+    const app = Fastify();
+    registerAccountRoutes(app, { store, accounts, identify: { accounts, legacyId: false, warn: () => {} }, now: () => T0, versions: V,
+      renamed: p => { told.push(p); } });
+    store.get('p0-rename0001', T0); accounts.ensure('p0-rename0001'); accounts.issue('p0-rename0001', T(1));
+    const rename = (name: string) => app.inject({ method: 'POST', url: '/v1/p0/account/name', payload: { name }, headers: { authorization: `Bearer ${T(1)}` } });
+    expect((await rename('Mia')).json().ok).toBe(true);
+    expect(told).toEqual(['p0-rename0001']);
+  });
+});
+
 describe('session/logout (v1.4)', () => {
   it('withdraws this phone\'s token alone; an id alone is not signed out', async () => {
     const { app, store, accounts } = setup({ legacyId: true });

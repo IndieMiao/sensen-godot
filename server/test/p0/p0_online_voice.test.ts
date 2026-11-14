@@ -279,6 +279,11 @@ describe('P0 voice (SGODOT-383)', () => {
     expect(voice.blockedList('player-bbbb')).toEqual([]);   // the blocked one's own list says nothing of it
     rooms.leave('player-bbbb');   // apart now: still unblocked from the list
     expect(voice.unblock('player-aaaa', 'ffffffffffffffff')).toMatchObject({ code: 'NOT_BLOCKED', status: 404 });
+    voice.nameOf = p => (p === 'player-bbbb' ? 'Mia' : null);
+    voice.block('player-aaaa', 2, true);
+    expect(voice.blockedList('player-aaaa')).toEqual([{ handle: publicPlayer('player-bbbb'), name: 'Mia' }]);   // the Blocked list's name (491)
+    voice.nameOf = () => null;
+    expect(voice.blockedList('player-aaaa')).toEqual([{ handle: publicPlayer('player-bbbb') }]);
     expect(voice.unblock('player-aaaa', publicPlayer('player-bbbb'))).toEqual({ ok: true, blocked: [] });
     expect(voice.hides('player-aaaa', 'player-bbbb')).toBe(false);
     expect(seen).toEqual([['player-aaaa', 'player-bbbb'], ['player-aaaa', 'player-bbbb']]);

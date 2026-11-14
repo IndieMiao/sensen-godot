@@ -54,7 +54,9 @@ export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCat
   /** hides(a, b): a and b never see each other in a room — a Block either way (P0Voice; q(28), 383 V3, 奕星 11-02). */
   hides?: (a: string, b: string) => boolean;
   /** SGODOT-488: who the upgrade is (accounts/identify.ts), the routes' own answer; absent, x-p0-player as before. */
-  identify?: (headers: Record<string, unknown>) => { player: string } | { status: number; body: object } }
+  identify?: (headers: Record<string, unknown>) => { player: string } | { status: number; body: object };
+  /** SGODOT-488 / 491: a player's name as their save has it (absent: never given, or reset) — the roster's `name`. */
+  nameOf?: (player: string) => string | null | undefined }
 
 export class P0OnlineHub {
   readonly conns = new Set<Conn>();
@@ -311,7 +313,19 @@ export class P0OnlineHub {
   }
 
   private view(m: Occupant) {
-    return { id: m.id, player: publicPlayer(m.player), seat: m.seat, appearance: this.byPlayer.get(m.player)?.appearance ?? defaultAppearance() };
+    const name = this.deps.nameOf?.(m.player);
+    return { id: m.id, player: publicPlayer(m.player), seat: m.seat, appearance: this.byPlayer.get(m.player)?.appearance ?? defaultAppearance(),
+      ...(name ? { name } : {}) };   // the name tag's (哪吒 491); none, and the client writes Traveller + the handle's first 4
+  }
+
+  /** A player renamed (account/name, or a moderator's reset): the others in their room see the new name now — the same
+   * `peer` a change of outfit sends (members replaced by id). */
+  renamed(player: string): void {
+    const me = this.deps.rooms.occupant(player);
+    if (!me) return;
+    const members = this.deps.rooms.members(me.outpost, me.room, me.layout);
+    for (const m of members) if (m.player !== player && this.sees(m.player, player))
+      this.toPlayer(m.player, { t: 'peer', count: this.seenBy(m.player, members).length, member: this.view(me) });
   }
 
   private step(): void {
