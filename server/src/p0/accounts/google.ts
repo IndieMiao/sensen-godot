@@ -38,6 +38,8 @@ export async function verifyGoogleIdToken(token: unknown, rawNonce: unknown, o: 
 }
 
 export interface GoogleRouteDeps {
+  /** The sign-in answer's consent note (link.ts consentNote; spec v2 §9): absent, none. */
+  consent?: import('./link.js').ConsentNote;
   store: P0Store; accounts: P0Accounts; identify: IdentifyDeps; now: () => number;
   /** The one PendingSignIns of p0_server (后裔's link.ts): no_farm's and conflict's pending sign-ins. */
   pending: PendingSignIns;
@@ -92,7 +94,7 @@ export function registerGoogleRoutes(app: FastifyInstance, deps: GoogleRouteDeps
     if (player) {
       const owner = accounts.tokenOwner(token);
       if (owner && owner !== player) return reply.code(400).send({ ok: false, code: 'schema' });   // a token is one player's only
-      return signIn({ accounts, kick: deps.kick }, player, token);
+      return signIn({ accounts, kick: deps.kick, consent: deps.consent }, player, token);
     }
     return reply.code(404).send({ ok: false, code: 'no_farm', pending: deps.pending.create('google', { sub: v.sub }) });
   });

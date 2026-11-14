@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import type { FastifyInstance } from 'fastify';
 import type { P0Store } from '../store.js';
 import { identify, isRefusal, type IdentifyDeps } from './identify.js';
-import { conflictFarm, liveOwner, signIn } from './link.js';
+import { conflictFarm, consentNote, liveOwner, signIn } from './link.js';
 import { NameLimiter, nameForGuest, registerNameRoutes, setName, type NameList } from './name.js';
 import { tokenShapeOk, type AnyLink, type AppleLink, type P0Accounts, type Provider } from './store.js';
 
@@ -68,6 +68,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
   const body = (b: unknown) => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}) as Record<string, unknown>;
   const consentOk = (b: Record<string, unknown>) => b.terms === versions.terms && b.privacy === versions.privacy;
   const outdated = () => bad('consent_outdated', 409, { terms_version: versions.terms, privacy_version: versions.privacy });
+  const consentOf = consentNote(store, versions);
 
   /** hello (v1.4 ⑦b): with an x-p0-player the server has, that old account's way before any sign-in — unclaimed, its
    * voice gate's answer and its consent; claimed, which sign-in it has. Read only: no token, no save. */
@@ -174,7 +175,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if (other === id) {
       // this farm's own account (claimed on another phone before): signed in, as session/apple|google would
       if (provider === 'apple' && (checked.link as AppleLink).refresh) accounts.link(id, 'apple', checked.link);
-      signIn({ accounts, kick: deps.kick }, id, token);
+      signIn({ accounts, kick: deps.kick, consent: consentOf }, id, token);
       return claimed(id, b);
     }
     if (accounts.isClaimed(id)) return send(bad('claimed', 409, { linked: accounts.linked(id), ...ticket() }));
@@ -193,9 +194,12 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if (b.age_ok === true && deps.voiceAge?.(id) === null) deps.voiceAgeOk?.(id);   // v1.4 ⑬: never asked, now passed
     return claimed(id, b);
   });
+  // no consent to these terms on record (the pages' agreed to older ones, or none came): the claim stands — its sign-in
+  // is spent — and the App shows `We've updated our terms` in place, then account/consent (不知火舞 spec v2 §9)
   const claimed = (id: string, _b: Record<string, unknown>) => {
     const s = store.find(id, deps.now());
-    return { ok: true, player: id, linked: accounts.linked(id), age: deps.voiceAge?.(id) ?? null, consent: s?.consent ?? null };
+    return { ok: true, player: id, linked: accounts.linked(id), age: deps.voiceAge?.(id) ?? null, consent: s?.consent ?? null,
+      ...consentOf(id) };
   };
 
   /** POST /v1/p0/session/pending {pending, token}, no identity (v1.6 ①): a sign-in a claim or guest already checked —
@@ -213,7 +217,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     deps.pending!.take(b.pending);
     if (!player) return send(bad('no_farm', 404, { pending: deps.pending!.create!(p.provider, p.link) }));
     if (p.provider === 'apple' && (p.link as AppleLink).refresh) accounts.link(player, 'apple', p.link);   // the newest authorization
-    return signIn({ accounts, kick: deps.kick }, player, token);
+    return signIn({ accounts, kick: deps.kick, consent: consentOf }, player, token);
   });
 
   /** POST /v1/p0/session/logout (v1.4): this phone's token alone withdrawn; the account's other phones keep theirs. */

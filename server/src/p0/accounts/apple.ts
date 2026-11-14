@@ -80,6 +80,8 @@ export class AppleClient {
 }
 
 export interface AppleRouteDeps {
+  /** The sign-in answer's consent note (link.ts consentNote; spec v2 §9): absent, none. */
+  consent?: import('./link.js').ConsentNote;
   store: P0Store; accounts: P0Accounts; now: () => number;
   pending: PendingSignIns;
   /** config.apple (null: Apple sign-in off, provider_unavailable). */
@@ -140,7 +142,7 @@ export function registerAppleRoutes(app: FastifyInstance, deps: AppleRouteDeps):
       const owner = accounts.tokenOwner(token);
       if (owner && owner !== player) return reply.code(400).send({ ok: false, code: 'schema' });   // a token is one player's only
       if (v.refresh) accounts.link(player, 'apple', v);
-      return signIn({ accounts, kick: deps.kick }, player, token);
+      return signIn({ accounts, kick: deps.kick, consent: deps.consent }, player, token);
     }
     return reply.code(404).send({ ok: false, code: 'no_farm', pending: deps.pending.create('apple', v) });
   });

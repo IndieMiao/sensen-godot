@@ -83,7 +83,18 @@ export function expiredSignIn(accounts: Pick<P0Accounts, 'byIdentity'>, revoke: 
   };
 }
 
-export interface SignInDeps { accounts: P0Accounts; kick?: (player: string) => void }
+/** The sign-in answer's note when the farm has no consent to these terms on record (不知火舞 spec v2 §9): the sign-in
+ *  stands — its credential is spent — and the App shows `We've updated our terms` in place, then account/consent. */
+export type ConsentNote = (player: string) => { consent_outdated?: true; terms_version?: string; privacy_version?: string };
+export function consentNote(store: Pick<P0Store, 'peek'>, versions: { terms: string; privacy: string }): ConsentNote {
+  return player => {
+    const c = store.peek(player)?.consent;
+    return c?.terms === versions.terms && c?.privacy === versions.privacy ? {}
+      : { consent_outdated: true, terms_version: versions.terms, privacy_version: versions.privacy };
+  };
+}
+
+export interface SignInDeps { accounts: P0Accounts; kick?: (player: string) => void; consent?: ConsentNote }
 
 /**
  * A sign-in to `player` with the client's new token (contract §2): every other user token of the account revoked (the
@@ -94,5 +105,5 @@ export function signIn(deps: SignInDeps, player: string, token: string): { ok: t
   deps.accounts.revokeAll(player, token);
   deps.kick?.(player);
   deps.accounts.issue(player, token);
-  return { ok: true, player, linked: deps.accounts.linked(player) };
+  return { ok: true, player, linked: deps.accounts.linked(player), ...(deps.consent?.(player) ?? {}) };
 }
