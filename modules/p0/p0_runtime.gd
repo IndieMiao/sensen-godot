@@ -200,6 +200,7 @@ func _init() -> void:
 	session.first_run_needed.connect(_on_first_run_needed)
 	session.account_state.connect(_on_account_state)
 	if ui.has_signal("account_action"): ui.connect("account_action", _on_account_action)
+	_connect_account_ui()
 	ui.screen_action.connect(_on_screen_action)
 	ui.screen_back.connect(_on_screen_back)
 	ui.lifecycle.watch(session)
@@ -1649,6 +1650,32 @@ func _on_account_action(kind: String, action: String) -> void:
 		"contact":
 			if ui.has_method("open_support"): ui.call("open_support")
 		_: push_warning("P0 accounts: %s on %s" % [action, kind])
+
+## 哪吒's Settings and profile (491 da392e6d0): which sign-in the Account group names, Sign out, Delete account (both
+## steps confirmed) and a rename. Each only where P0Ui has it, so a build without those pages runs as before.
+func _connect_account_ui() -> void:
+	if "account_of" in ui: ui.set("account_of", account_of)
+	for pair in [["sign_out_requested", func(): _on_account_action("settings", "sign_out")],
+			["delete_account_requested", _on_delete_account], ["rename_requested", _on_rename]]:
+		if ui.has_signal(pair[0]): ui.connect(pair[0], pair[1])
+
+## The Account group's sign-in: apple / google / email, "code" for a test code's account, "" off accounts or signed out
+## (no Account group, no Sign out, no Delete account).
+func account_of() -> String:
+	if not session.accounts or not session.identity.has_token(): return ""
+	return str(session.identity.linked[0]) if not session.identity.linked.is_empty() else "code"
+
+## Delete my account (both steps): gone, then Sign in over the world (restarted once signed in); refused, the page says.
+func _on_delete_account() -> void:
+	session.delete_account(func(r: Dictionary):
+		if session.identity.first_run() == "signed_out": _sign_in_again()
+		elif ui.has_method("delete_account_failed"): ui.call("delete_account_failed"))
+
+## Edit name's Save: account/name, its answer to the page as it came; the new name with the next read (view.account).
+func _on_rename(name: String) -> void:
+	session.rename(name, func(r: Dictionary):
+		if bool(r.get("ok", false)): session.refresh_after()
+		if ui.has_method("rename_answer"): ui.call("rename_answer", r))
 
 ## The launch from the start (p0_boot): this runtime and its session go, the new one says hello again.
 func _reboot() -> void:

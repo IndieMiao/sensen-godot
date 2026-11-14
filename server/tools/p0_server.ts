@@ -15,6 +15,7 @@ import { expiredSignIn, PendingSignIns } from '../src/p0/accounts/link.js';
 import { identify, inForce, isRefusal } from '../src/p0/accounts/identify.js';
 import { registerAccountRoutes } from '../src/p0/accounts/routes.js';
 import { registerCodeRoutes } from '../src/p0/accounts/codes.js';
+import { registerAccountDeleteRoute } from '../src/p0/accounts/delete.js';
 import { P0Accounts } from '../src/p0/accounts/store.js';
 import Fastify from 'fastify';
 import { mkdirSync } from 'node:fs';
@@ -183,6 +184,10 @@ registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.
 // Test codes (contract v1.4 §4): the reviewers' and Google-less testers' sign-in; none without P0_ACCOUNTS_KEY.
 registerCodeRoutes(app, { store, accounts, now: Date.now });
 voice.tell = (player, payload) => hub.tell(player, payload);
+// App deletion (SGODOT-488, contract §4 / v1.6.6): the token's own account, a suspended one too; Apple's authorization
+// withdrawn with it when a refresh token is kept.
+registerAccountDeleteRoute(app, { store, accounts, voice, hub, now: Date.now, identify: identifyDeps,
+  revokeApple: appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : undefined });
 voice.seen = (a, b) => hub.seenChanged(a, b);
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {

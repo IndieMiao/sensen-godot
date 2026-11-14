@@ -39,7 +39,7 @@ var email := false      # hello's email: Continue with email is offered
 ## hello's legacy for this install's id ({age, consent} or {claimed, linked}); {} when it sent none.
 var legacy := {}
 var legacy_linked: Array = []
-var signed_out_why := ""   # "claimed" (hello, claim) or "logout": which line the Sign in page shows (hints)
+var signed_out_why := ""   # "claimed" (hello, claim), "logout" or "deleted": which line the Sign in page shows (hints)
 ## The last sign-in's ticket (no_farm, conflict, claimed, unknown_player; 10 minutes, once): guest takes it, or
 ## session/pending; has_farm says whether that sign-in has a farm of its own; conflict_farm the farm it holds.
 var pending := ""
@@ -117,6 +117,7 @@ func signed_out(l, why := "claimed") -> void:
 ## email | code} — a farm linked to none is a code's.
 func hints() -> Dictionary:
 	if kind != "signed_out": return {}
+	if signed_out_why == "deleted": return {"line": "", "with": ""}
 	return {"line": "last_time" if signed_out_why == "logout" else "farm_uses",
 		"with": str(legacy_linked[0]) if not legacy_linked.is_empty() else "code"}
 
@@ -173,6 +174,15 @@ func sign_in_code(code: String, done: Callable) -> void:
 func logout(done: Callable) -> void:
 	send.call(HTTPClient.METHOD_POST, "/p0/session/logout", {}, func(r: Dictionary):
 		drop()
+		done.call(r))
+
+## DELETE /p0/account (contract §4): the account gone — or account_deleted, gone already (an answer lost before) —
+## then the session and the id with it: Sign in as a new install, no last-time line. done.call(reply).
+func delete_account(done: Callable) -> void:
+	send.call(HTTPClient.METHOD_DELETE, "/p0/account", {}, func(r: Dictionary):
+		if bool(r.get("ok", false)) or str(r.get("code", "")) == "account_deleted":
+			forget()
+			signed_out([], "deleted")
 		done.call(r))
 
 ## This phone's token gone (logout; unauthenticated — the key withdrawn; a replaced session's Sign in): signed_out with
