@@ -13,7 +13,8 @@ extends Control
 ##                    sign-in (`Sign in to play`, `hints`' line)
 ##   "no_google"      email sign-in off and no Google Play services: ACC-NO-GMS
 ## After sign-in the host answers: in (it takes the flow down), no_farm(fresh) → NAME, conflict(farm, provider) → the
-## choose card, claimed(linked) → the sign-in page's line. AGE's answer is kept on this phone (user://p0_first_run.json:
+## choose card, claimed(linked) → the sign-in page's line, sign_in_settled() for a cancelled or failed one (the keys are
+## grey from the tap till one of these). AGE's answer is kept on this phone (user://p0_first_run.json:
 ## {age_ok, terms, privacy, agreed_at}; a no is only {age_ok: false}); the year is never kept, a no never sent. Back
 ## (back()): the choose card or Born in …? closed, NAME → sign-in for a new player; anything else is the host's (the
 ## launch's own: to the home screen).
@@ -55,6 +56,19 @@ func _init(kind_ := "new", check := Callable(), providers_: Array = [], hints_ :
 	name = "AccFlow"
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+
+## What the host (后裔's glue) builds the flow with after hello, Google Play services asked before AGE (诸葛亮 v3;
+## 亚瑟's P0SignIn.google_ready(), #1042): {kind, providers}. A phone that can't do Google gets NO-GMS up front in place
+## of any page leading to sign-in when the server has no email sign-in (`email_on`: hello.email) — AGE-BLOCK stays — and
+## with email on, the sign-in page's keys lose Google: "no_google" stands in its place (the page's small line), email
+## stays. iOS always can (google_ready is true there); providers are P0SignIn.providers() plus "email" when on.
+static func entry(kind_: String, email_on: bool, google_ok := P0SignIn.google_ready(), os_providers := P0SignIn.providers()) -> Dictionary:
+	var keys: Array = []
+	for p in os_providers:
+		keys.append(p if google_ok or p != P0SignIn.GOOGLE else "no_google")
+	if email_on: keys.append("email")
+	if not google_ok and not email_on and not kind_ in ["blocked", "old_blocked"]: kind_ = "no_google"
+	return {"kind": kind_, "providers": keys}
 
 ## The first page, once in the tree (the phone's record read where record_path says by then).
 func _ready() -> void:
@@ -112,7 +126,9 @@ func _open_sign_in() -> void:
 	if sign_in_page == null:
 		sign_in_page = P0AccSignIn.new(providers, kind in OLD_KINDS, hints)
 		sign_in_page.provider_pressed.connect(func(p: String):
+			if sign_in_page.busy: return
 			_provider = p
+			sign_in_page.busy = p != "email"   # email opens its own page (盘古's), no system sheet over this one
 			sign_in.emit(p))
 		sign_in_page.test_code_pressed.connect(func(): test_code.emit())
 	_show(sign_in_page)
@@ -121,6 +137,7 @@ func _open_sign_in() -> void:
 ## old farm claimed, or a test code taken (not fresh: no way back from NAME). A new NAME each time: a name typed for
 ## one account is not another's.
 func no_farm(fresh := true) -> void:
+	sign_in_settled()
 	if is_instance_valid(name_page) and name_page.get_parent() == null: name_page.free()
 	name_page = P0AccName.new(fresh)
 	name_page.check = _check
@@ -132,6 +149,7 @@ func no_farm(fresh := true) -> void:
 ## The host's: that account already has a farm (claim's conflict on the sign-in page; guest's race on NAME). The choose
 ## card over the page: on the sign-in page an old farm is here (its neutral lines), on NAME none is.
 func conflict(farm: Dictionary, provider := "") -> void:
+	sign_in_settled()
 	_drop_choose()
 	var old_here := page == sign_in_page
 	choose = P0AccChoose.card(farm, provider if provider != "" else _provider, old_here)
@@ -145,7 +163,13 @@ func conflict(farm: Dictionary, provider := "") -> void:
 ## (`linked`: ["google"]; [] a test code's).
 func claimed(linked: Array) -> void:
 	_open_sign_in()
+	sign_in_settled()
 	sign_in_page.set_hint("farm_uses", str(linked[0]) if not linked.is_empty() else "code")
+
+## The host's, when a sign-in ended with nothing to show here: the sheet closed (cancelled) or it failed (its toast is
+## the host's) — the sign-in page's keys back. no_farm / conflict / claimed do it themselves (后裔 11-14).
+func sign_in_settled() -> void:
+	if sign_in_page != null: sign_in_page.busy = false
 
 ## The host's, after guest or a rename did not take the name: back on NAME with why (name_rejected's reason in red);
 ## pending_expired: the sign-in page again (the host toasts `Sign-in expired. Please sign in again.`).

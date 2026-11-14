@@ -6,6 +6,7 @@ const RECORD := "user://test_p0_acc_flow.json"
 
 func after_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(RECORD))
+	P0SignIn.force = []
 
 func _flow(kind := "new", providers: Array = ["apple", "google", "email"], hints := {}) -> P0AccFlow:
 	var f := P0AccFlow.new(kind, Callable(), providers, hints, 2026)
@@ -140,3 +141,48 @@ func test_no_google_services_and_email_off() -> void:
 	(f.page.find_child("TestCode", true, false) as Button).pressed.emit()
 	assert_array(codes).is_equal([1])
 	assert_bool(f.back()).is_false()
+
+func test_the_entry_asks_google_before_age() -> void:
+	var android := [P0SignIn.GOOGLE]
+	var iphone := [P0SignIn.APPLE, P0SignIn.GOOGLE]
+	# Play services there: the kind as it is, Google's key on
+	assert_dict(P0AccFlow.entry("new", false, true, android)).is_equal({"kind": "new", "providers": ["google"]})
+	assert_dict(P0AccFlow.entry("old_age", true, true, android)).is_equal({"kind": "old_age", "providers": ["google", "email"]})
+	assert_dict(P0AccFlow.entry("new", true, true, iphone)).is_equal({"kind": "new", "providers": ["apple", "google", "email"]})
+	# none and email off: NO-GMS up front for every way to sign-in; AGE-BLOCK stays
+	for k in ["new", "old_age", "old_consent", "old_signin", "signed_out"]:
+		assert_str(P0AccFlow.entry(k, false, false, android).kind).override_failure_message(k).is_equal("no_google")
+	for k in ["blocked", "old_blocked"]: assert_str(P0AccFlow.entry(k, false, false, android).kind).is_equal(k)
+	# none, email on: the sign-in page with email and the no-Google line in Google's place
+	assert_dict(P0AccFlow.entry("new", true, false, android)).is_equal({"kind": "new", "providers": ["no_google", "email"]})
+
+func test_the_entry_reads_p0_sign_in_by_default() -> void:
+	P0SignIn.force = ["apple"]   # Google not on: google_ready() false
+	assert_str(P0AccFlow.entry("new", false).kind).is_equal("no_google")
+	P0SignIn.force = ["google"]
+	assert_dict(P0AccFlow.entry("new", false)).is_equal({"kind": "new", "providers": ["google"]})
+
+func test_the_keys_are_grey_while_the_sheet_is_up_till_the_host_answers() -> void:
+	var f := _flow("old_signin")
+	var got := []
+	f.sign_in.connect(func(p): got.append(p))
+	var s := f.sign_in_page
+	(s.keys.get_node("Google") as Button).pressed.emit()
+	assert_bool(s.busy).is_true()
+	assert_bool((s.keys.get_node("Apple") as Button).disabled).is_true()
+	assert_bool((s.col.find_child("TestCode", false, false) as BaseButton).disabled).is_true()
+	(s.keys.get_node("Google") as Button).pressed.emit()   # a second tap: no second sheet
+	assert_array(got).is_equal(["google"])
+	f.sign_in_settled()   # cancelled, or failed and toasted
+	assert_bool(s.busy).is_false()
+	assert_bool((s.keys.get_node("Apple") as Button).disabled).is_false()
+	(s.keys.get_node("Apple") as Button).pressed.emit()
+	f.claimed(["google"])   # an answer gives the keys back too
+	assert_bool(s.busy).is_false()
+	(s.keys.get_node("Email") as Button).pressed.emit()   # email: its own page, nothing greyed
+	assert_bool(s.busy).is_false()
+	assert_array(got).is_equal(["google", "apple", "email"])
+	f.sign_in_settled()
+	(s.keys.get_node("Google") as Button).pressed.emit()
+	f.no_farm()
+	assert_bool(s.busy).is_false()

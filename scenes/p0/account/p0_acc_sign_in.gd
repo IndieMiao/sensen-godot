@@ -101,6 +101,15 @@ func set_hint(line: String, with: String, os_name := OS.get_name()) -> void:
 	_hint_gap.visible = hint.visible
 	_head_gap.custom_minimum_size.y = GAP if hint.visible else HEAD_GAP
 
+## While the system's sheet is up (the flow's, from a key's tap till the host answers): every key and the test code
+## greyed and deaf (no spinner: the sheet is over it), so a second tap opens no second sheet.
+var busy := false: set = set_busy
+func set_busy(v: bool) -> void:
+	busy = v
+	for b in keys.get_children() + [col.find_child("TestCode", false, false)]:
+		if b is BaseButton: (b as BaseButton).disabled = v
+	keys.modulate.a = 0.5 if v else 1.0
+
 ## A provider's key, 50 high: its mark (18 in a 20 box; email's the kit's `@`, ExtraBold 18) and its words, centred, 10
 ## apart; Apple's black with white words, Google's and email's the surface with a 1 px edge.
 func _key(provider: String) -> Button:
