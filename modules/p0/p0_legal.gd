@@ -20,6 +20,29 @@ static func privacy_url(os_name: String, live := PRIVACY_LIVE) -> String:
 	if not live: return ""
 	return PRIVACY_IOS if os_name == "iOS" else PRIVACY_ANDROID
 
+## The Terms of Service (one page for both platforms): AGE's link and, since SGODOT-491 (奕星 11-14, frame 720:201692),
+## Legal's first row before Privacy Policy, opening the system browser the same way. The row shows only once the page
+## is up, as Privacy Policy's did: /terms was still 404 on 11-14 (it goes up with the store release, 11-23) — turn
+## TERMS_LIVE on then.
+const TERMS_URL := "https://gensen.app/terms"
+const TERMS_LIVE := false
+static func terms_url(live := TERMS_LIVE) -> String: return TERMS_URL if live else ""
+
+## Where a player writes to us (the user 11-12: this address, no support@ — 李白's q(314)): Help and feedback's Contact
+## us, its no-mail-app toast, the no-Google-services page (SGODOT-491).
+const SUPPORT_EMAIL := "shaojie@gensen.app"
+
+## The mail to support (不知火舞's account spec v1.1 §2.3; SGODOT-491): subject `Gensen support · AB12C-3DE45`, the body
+## `Support code: …` / `Version: …` / `Phone: …` and two empty lines for the player. No code (no account yet: NO-GMS)
+## leaves the code out of both. `version` / `phone` default to this build and this phone.
+static func support_mail_url(code := "", version := "", phone := "") -> String:
+	if version == "": version = version_line(P0Session.demo_config(
+		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
+	if phone == "": phone = "%s %s" % [OS.get_name(), OS.get_version()]
+	var subject := "Gensen support" + ((" · " + code) if code != "" else "")
+	var body := ("Support code: %s\n" % code if code != "" else "") + "Version: %s\nPhone: %s\n\n" % [version, phone]
+	return "mailto:%s?subject=%s&body=%s" % [SUPPORT_EMAIL, subject.uri_encode(), body.uri_encode()]
+
 ## q(281) ② (后裔's privacy-server-2026-11-03 ①): the support code a player sends with a request about their data —
 ## SHA-256 of `p0-support/v1/` + the player id (UTF-8), its first 50 bits as 10 Crockford Base32 characters (0–9 and
 ## the letters but I L O U), `XXXXX-XXXXX`. Worked out here, so it shows offline; the server has the same function to

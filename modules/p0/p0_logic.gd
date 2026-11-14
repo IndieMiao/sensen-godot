@@ -2299,6 +2299,10 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 			var least := int(bj.get("floor", 40)) + int(bj.get("min_bet", 5))
 			var short := bool(bj.get("open", false)) and int(view.get("coins", 0)) < least
 			greet = "Keep those coins for seeds. Come back with a few more." if short else "Pull up a chair. Care for a hand?"
+			if bool(bj.get("open", false)) and P0Blackjack.day_closed(view):   # q(320): over Low on coins, as the table says it
+				# the time kept whole (不知火舞 on 351 95d20d3e): a no-break space in `5h 12m`, and P0Translation then binds each
+				# figure to its unit in 中文 (keep_units: `5 小时` / `12 分`), never `牌桌 5` / `小时 12 分` across two lines
+				greet = "That's enough cards for one day. Table opens in %s." % P0Blackjack.opens_span(view).replace(" ", "\u00a0")
 			answer = "Get closer to 21 than me without going over. You bet with your own coins."
 		"church":   # q(299): no counter, no requests — a welcome and his stories
 			greet = "Welcome to Grace. Sit as long as you like."

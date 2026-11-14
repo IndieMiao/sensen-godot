@@ -17,6 +17,8 @@ signal back_pressed
 signal edit_look_pressed
 signal skill_pressed(skill: String)
 signal settings_pressed
+## `Edit ›` on the name's line (SGODOT-491; spec v1.1 §3, PROFILE-1-EDIT 643:197324): only with accounts (view.account).
+signal edit_name_pressed
 ## A Collections tile was tapped: "fish" (the Fish-dex, FISH-6), "pages" (the Cookbook) or "cities" (the Passport).
 signal collection_pressed(key: String)
 ## The farm card was tapped: HOME-1 (§10.6.2, int11).
@@ -112,8 +114,9 @@ func refresh(view_: Dictionary) -> void:
 	_body.add_child(col)
 	var id := VBoxContainer.new()
 	id.add_theme_constant_override(&"separation", int(_CONTENT_GAP))
-	name_row = _NameRow.new(str(d.name), str(d.title))
+	name_row = _NameRow.new(str(d.name), str(d.title), bool(d.edit))
 	name_row.pressed.connect(func(): title_pressed.emit())
+	name_row.edit_pressed.connect(func(): edit_name_pressed.emit())
 	id.add_child(name_row)
 	if str(d.home_line) != "": id.add_child(UiKit.label(str(d.home_line), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
 	if look_saved: id.add_child(UiKit.label("Look saved", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY))   # KEEP-P0-2
@@ -190,12 +193,13 @@ static func profile_data(view: Dictionary, pending := {}) -> Dictionary:
 		var s: Dictionary = sk.get(k, {})
 		return {key = k, name = k.capitalize(), level = int(s.get("level", 1)), progress = skill_progress(s), icon = _SKILL_ICONS[k]})
 	var farm: Dictionary = p.get("farm", {})
-	var name := str(p.get("name", ""))
+	var name := str(view.get("account", {}).get("name", p.get("name", "")))   # accounts: the chosen name (contract §1)
 	var dex: Array = view.get("fishing", {}).get("dex", [])
 	var caught := dex.filter(func(f): return int(f.get("caught", 0)) > 0).size()
 	var book := P0KitchenLogic.cookbook_progress(view)   # discovered pages / the pages shown (q(100))
 	return {
 		name = name if name != "" else "You",
+		edit = view.has("account"),   # SGODOT-491: `Edit ›` once there are accounts
 		title = P0Titles.worn_name(view, pending),   # "" with none: no title, no › (q(180) ④)
 		home_line = " · ".join(home),
 		skills = skills,
@@ -254,21 +258,42 @@ static func _farm_status(view: Dictionary) -> String:
 ## -CUT 2639:135042): the name C14XB; 8 on, the title C10B secondary; 4 on, the › C13XB secondary; each centred on
 ## the name's line. The title and the › tap as one, 44 high — above and below the line, which keeps the name's height,
 ## so nothing under it moves. On a line too short the title gives way first (P0Titles.fit). No title: the name alone.
+## With accounts (SGODOT-491, PROFILE-1-EDIT 643:197324): `Edit ›` at the line's right end, info Bold 12, its right edge
+## 16 from the screen's, tapping 44 high and at least 44 wide (edit_pressed); the title's room less its width and 12.
 class _NameRow extends Control:
 	signal pressed
+	signal edit_pressed
 	const GAP := 8.0
 	const CHEVRON_GAP := 4.0
 	const CHEVRON := "›"
+	const EDIT := "Edit ›"
+	const EDIT_GAP := 12.0
+	const EDIT_RIGHT := 4.0   # the page's 12 in, plus 4: 16 from the screen's edge
 	var name_label: Label
 	var title_label: Label
 	var chevron: Label
 	var hit: Button
+	var edit_label: Label
+	var edit_hit: Button
 	var _name := ""
 	var _title := ""
 
-	func _init(name_: String, title_: String) -> void:
+	func _init(name_: String, title_: String, edit := false) -> void:
 		_name = name_
 		_title = title_
+		if edit:
+			edit_label = UiKit.label(EDIT, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_INFO)
+			edit_label.name = "Edit"
+			edit_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_child(edit_label)
+			edit_hit = Button.new()
+			edit_hit.name = "EditHit"
+			edit_hit.flat = true
+			edit_hit.focus_mode = Control.FOCUS_NONE
+			for st in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]:
+				edit_hit.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+			edit_hit.pressed.connect(func(): edit_pressed.emit())
+			add_child(edit_hit)
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		name_label = UiKit.label(name_, UiTokens.STYLE_C14_XB)
@@ -305,7 +330,15 @@ class _NameRow extends Control:
 	func _layout() -> void:
 		if not is_inside_tree() or size.x <= 0.0: return
 		var chevron_w: float = _measure(chevron).call(CHEVRON)
-		var f := P0Titles.fit(_name, _title, size.x, GAP, CHEVRON_GAP + chevron_w, _measure(name_label), _measure(title_label))
+		var room := size.x
+		if edit_label != null:
+			edit_label.size = edit_label.get_minimum_size()
+			edit_label.position = Vector2(size.x - EDIT_RIGHT - edit_label.size.x, (size.y - edit_label.size.y) * 0.5)
+			var hit_w := maxf(UiTokens.SIZE_TOUCH, edit_label.size.x + EDIT_RIGHT)
+			edit_hit.size = Vector2(hit_w, UiTokens.SIZE_TOUCH)
+			edit_hit.position = Vector2(size.x - hit_w, (size.y - UiTokens.SIZE_TOUCH) * 0.5)
+			room = edit_label.position.x - EDIT_GAP
+		var f := P0Titles.fit(_name, _title, room, GAP, CHEVRON_GAP + chevron_w, _measure(name_label), _measure(title_label))
 		name_label.text = str(f.name)
 		title_label.text = str(f.title)
 		var h := size.y

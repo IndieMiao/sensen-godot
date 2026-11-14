@@ -6,7 +6,8 @@ extends Control
 ## it lives in `table`, a 360 × 800 layer in the design's own coordinates scaled with the picture: the dealer's cards
 ## (zone 110–250), the two printed rule lines, the player's hand(s) (360–500), the bet circle (centre 570, 96 across),
 ## the printed actions (620–680) and six ChipStacks in the rail's groove (690–800). Floating over the felt: the round
-## back `‹` top-left and the coins pill top-right; `Rules` is printed on the felt left of the shoe. No panel, no buttons:
+## back `‹` top-left and the coins pill top-right, the day's net under it (`Today −20`, q(320)); `Rules` is printed on the
+## felt left of the shoe. No panel, no buttons:
 ## every action is a FeltAction printed on the felt, faded with its reason printed under it when it cannot be done.
 ##   BET    tap a stack: one chip flies into the circle (MOTION_RADIAL_PETAL_IN_MS); drag from a stack: a Dragging chip
 ##          follows the finger and the circle's ring brightens over it; let go there to add, anywhere else it flies back.
@@ -14,7 +15,8 @@ extends Control
 ##          cannot put down (it would leave under the floor) greys and takes neither. The stake sits in the circle with
 ##          its amount printed once to its right; tapping the stake takes it all back (no Clear). Empty, the circle
 ##          reads `Place a bet` and `Deal` fades with no reason. Not even 5 fits: `Low on coins` / `Need N more coins`
-##          where the circle is, every stack grey, `Deal` faded.
+##          where the circle is, every stack grey, `Deal` faded. The day's loss used up (q(320), 9.18.7 ⑤): the same, with
+##          `Daily limit reached` / `Opens in 5h 12m` — said over Low on coins when both hold.
 ##   PLAY   `Hit` / `Stand` Large, side by side, equal; `Double` / `Split` Small beside the circle, faded with the
 ##          server's reason; no amounts on any action. Split hands side by side (24 apart), the one in play outlined, the
 ##          other dimmed. An expired hand shows no actions.
@@ -94,6 +96,7 @@ var table: Control
 var back_key: Button
 var coins_pill: PanelContainer
 var coins_label: Label
+var today_label: Label       # q(320): the day's net under the coins pill
 var rules_key: UiFeltAction
 var lines: Array = []
 var circle: _Circle
@@ -114,8 +117,10 @@ var split_key: UiFeltAction
 var intro_layer: Control
 var intro_card: UiSystemCard
 var intro_floor: Label
+var intro_limit: Label
 var rules_layer: Control
 var rules_sheet: UiDrawer
+var rules_limit: Label
 
 var _dealer_cards: Array = []      # UiPlayingCard
 var _hands: Array = []             # [{cards: [UiPlayingCard], bet, badge, tag, stake, outline}]
@@ -240,6 +245,10 @@ func _build_overlay() -> void:
 	coins_pill.custom_minimum_size.y = 26
 	coins_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(coins_pill)
+	today_label = UiKit.label("", UiTokens.STYLE_C12_B, UiKit.alpha(INK, 0.75))   # caption Bold 12, cream 75% (706:202503)
+	today_label.name = "Today"
+	today_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(today_label)
 	settled_pill = PanelContainer.new()
 	var ps := StyleBoxFlat.new()
 	ps.bg_color = UiTokens.COLOR_SURFACE_RAISED
@@ -292,6 +301,10 @@ const NBSP := " "
 ## The first-open card (d835ac7e BJ-INTRO-T): how to bet, then the floor; `least 40` kept together.
 const INTRO_TEACH := "Tap or drag chips onto the circle, then tap Deal."
 const INTRO_FLOOR := "You bet coins here. You always keep at least" + NBSP + "40."
+## q(320) note 2 (不知火舞, frames 706:199748 / 706:199683): the card's third paragraph breaks only at `50 coins / down for
+## the day.`; the rules sheet's line under the footer, then `Doubles and splits aren't limited.` on a line of its own.
+const INTRO_LIMIT := "A new bet can't go past 50" + NBSP + "coins down" + NBSP + "for" + NBSP + "the" + NBSP + "day."
+const RULES_LIMIT := "A new bet can't go past 50" + NBSP + "coins down for the day.\u2028Doubles and splits aren't limited."
 
 func _build_layers() -> void:
 	intro_layer = _scrim()
@@ -305,6 +318,9 @@ func _build_layers() -> void:
 	intro_floor = intro_card.body.duplicate() as Label
 	intro_floor.text = INTRO_FLOOR
 	intro_card.body.add_sibling(intro_floor)
+	intro_limit = intro_card.body.duplicate() as Label
+	intro_limit.text = INTRO_LIMIT
+	intro_floor.add_sibling(intro_limit)
 	intro_card.primary_pressed.connect(func():
 		intro_layer.visible = false
 		command.emit({"type": "bj_intro"}))
@@ -327,6 +343,9 @@ func _build_layers() -> void:
 	var foot := UiKit.label("Bets are coins. You always keep at least 40 coins.", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_MUTED)
 	foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rules_sheet.body.add_child(foot)
+	rules_limit = UiKit.label(RULES_LIMIT, UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_MUTED)
+	rules_limit.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rules_sheet.body.add_child(rules_limit)
 	var close := UiDismissButton.new("Close")
 	close.pressed.connect(close_rules)
 	rules_sheet.body.add_child(close)
@@ -398,6 +417,10 @@ func _place(c: Control, centre: Vector2) -> void:
 func _fit_coins() -> void:
 	coins_pill.size = coins_pill.get_combined_minimum_size()
 	coins_pill.position = Vector2(on_page(Vector2(_COINS_RIGHT, 0)).x - coins_pill.size.x, safe_top + _TOP_ROW_Y - coins_pill.size.y * 0.5)
+	# 706:202503: centred under the pill, 2 below it
+	today_label.size = today_label.get_combined_minimum_size()
+	today_label.position = Vector2(coins_pill.position.x + (coins_pill.size.x - today_label.size.x) * 0.5,
+		coins_pill.position.y + coins_pill.size.y + 2.0)
 
 ## Where card i of a hand of n goes on the table: one hand centred stepping OVERLAP; split hands (BJ-SPEC-CARDS) 16
 ## in from each side and 24 apart, stepping SPLIT_OVERLAP, each from its left edge.
@@ -464,7 +487,9 @@ static func _codes(cards: Array) -> Array: return cards.map(func(c): return (c a
 ## events of the same reply arrive right after (on_events), so the work waits for the end of the frame.
 func refresh(v: Dictionary) -> void:
 	view = v
-	var key := [P0Blackjack.info(v), P0Blackjack.coins_of(v)].hash()
+	# the closed table's `Opens in` counts down with the view's clock, and past the day change it opens (P0Blackjack.day)
+	var key := [P0Blackjack.info(v), P0Blackjack.coins_of(v), P0Blackjack.opens_in(v) if P0Blackjack.day_closed(v) else "",
+		P0Blackjack.day_left(v)].hash()
 	if key == _seen: return
 	_seen = key
 	_sync.call_deferred()
@@ -546,6 +571,7 @@ func _reconcile() -> void:
 		_rebet()
 	if phase == Phase.BET and bet > 0 and not P0Blackjack.can_add(view, bet, 0): _rebet()
 	if not _running: _roll_coins(P0Blackjack.coins_of(view))
+	_set_today()
 	_lay_cards(false)
 	_refresh_keys()
 
@@ -752,6 +778,12 @@ func _set_coins_text(t: String) -> void:
 	coins_label.text = t
 	if coins_pill.is_inside_tree(): _fit_coins()
 
+## `Today −20` under the pill (q(320)), as the view has it once a reply's play is over (not ahead of its result).
+func _set_today() -> void:
+	today_label.text = P0Blackjack.today_text(view)
+	today_label.visible = today_label.text != ""
+	if coins_pill.is_inside_tree(): _fit_coins()
+
 func _roll_coins(to: int) -> void:
 	if _coins_tween != null and _coins_tween.is_valid(): _coins_tween.kill()
 	if not animate or to == _coins_shown:
@@ -839,7 +871,9 @@ func _busy() -> bool: return _waiting or _running
 
 func _refresh_keys() -> void:
 	var betting := phase == Phase.BET
-	var low := betting and P0Blackjack.low_on_coins(view) and bet == 0
+	# the day's limit and Low on coins print in the circle's place alike; both at once: the day's limit (9.18.4)
+	var closed := betting and P0Blackjack.day_closed(view)
+	var low := closed or (betting and P0Blackjack.low_on_coins(view) and bet == 0)
 	var expired := bool(P0Blackjack.hand(view).get("expired", false))
 	var playing := phase == Phase.PLAY and not expired and not _running
 	deal_key.visible = betting
@@ -848,7 +882,9 @@ func _refresh_keys() -> void:
 	empty_label.visible = betting and not low and bet == 0
 	low_label.visible = low
 	low_need.visible = low
-	low_need.text = P0Blackjack.need_text(P0Blackjack.need(P0Blackjack.coins_of(view), P0Blackjack.min_bet_of(view), P0Blackjack.floor_of(view)))
+	low_label.text = "Daily limit reached" if closed else "Low on coins"
+	low_need.text = P0Blackjack.opens_in(view) if closed else \
+		P0Blackjack.need_text(P0Blackjack.need(P0Blackjack.coins_of(view), P0Blackjack.min_bet_of(view), P0Blackjack.floor_of(view)))
 	bet_label.visible = not low and bet > 0
 	for s in stacks:
 		var st: UiChipStack = s
@@ -857,7 +893,7 @@ func _refresh_keys() -> void:
 		st.state = UiChipToken.State.DISABLED if betting and not P0Blackjack.can_add(view, bet, v) else UiChipToken.State.DEFAULT
 	if betting:
 		var dk := P0Blackjack.deal_key(view, bet)
-		deal_key.enabled = bet > 0 and str(dk.reason) == "" and not _busy()
+		deal_key.enabled = bet > 0 and str(dk.reason) == "" and not closed and not _busy()
 		deal_key.reason = str(dk.reason) if bet > 0 else ""   # empty: the circle's `Place a bet` says it; low: printed there
 	elif playing:
 		var keys := P0Blackjack.action_keys(view)

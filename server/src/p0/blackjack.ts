@@ -3,8 +3,9 @@
  * against the dealer, dealt and settled here, bets in coins (the table only draws them as chips). Four decks shuffled
  * afresh each hand; the dealer stands on all 17s; with an Ace or a ten up it peeks first; a blackjack pays 3 to 2,
  * half a coin rounded down; double on any first two cards; one split of a pair (10 / J / Q / K alike), split Aces take
- * one card each. After every stake the wallet keeps content.wallet_floor (40). Test phase: no bet or daily caps; the
- * day's net (day.bj_net) is kept for the observation log only, never in any economy.
+ * one card each. After every stake the wallet keeps content.wallet_floor (40). The store builds keep the room (the user
+ * 11-13, 「牌室 C」, D6 undone), every build with the day's loss of 50 (q(320)); the day's net is day.bj_net, hands
+ * begun today, split hands together, and it starts over at the rollover.
  * A hand left a day (its start's day key, day_hold included) or 24 h untouched is settled as stood on the next command,
  * whatever it is (settleBlackjack, in applyP0's settle chain); a result no blackjack command carried back waits in
  * blackjack.last for bj_open.
@@ -13,7 +14,7 @@ import { createHmac, randomBytes } from 'node:crypto';
 import type { P0Content } from './content.js';
 import type { Refusal } from './fishing.js';
 import type { P0Event } from './progress.js';
-import { dayKey } from './rules.js';
+import { dayKey, rolloverAfter } from './rules.js';
 import type { P0State } from './state.js';
 
 export const BJ_DECKS = 4;
@@ -21,6 +22,13 @@ export const BJ_CHIPS = [5, 10, 50, 100, 500, 1000];
 export const BJ_MIN_BET = 5;
 export const BJ_STEP = 5;
 export const BJ_EXPIRE_MS = 24 * 3_600_000;
+/**
+ * q(320) (the user 11-13, 「上限不做限制, 输到50 按照丙」, set as written): a deal may not take the day's net below −50 by
+ * its own stake — what is left to lose today is 50 + bj_net — and under the table minimum left (down 46 or more) the
+ * table closes till the rollover. Double and Split are not held to it (the 40 floor alone), so a hand may end past −50.
+ * No cap on a stake, none on the day's win. Every build alike: the server takes no channel header for a boundary.
+ */
+export const BJ_DAY_LOSS = 50;
 const RANKS = 'A23456789TJQK';
 const SUITS = 'SHDC';
 
@@ -95,6 +103,13 @@ const atTable = (c: P0Content, space: unknown, place: unknown) =>
 const expired = (c: P0Content, s: P0State, h: BjHand, now: number) => h.day !== dayKey(c, s, now) || now - h.last_at >= BJ_EXPIRE_MS;
 const coinsShort = (c: P0Content, s: P0State, stake: number) => Math.max(0, stake + c.wallet_floor - s.coins);
 const refuse = (code: string, detail?: Record<string, unknown>): Refusal => ({ code, detail });
+/** The day's net the caps read: hands begun today (day.bj_net). Both callers have rolled the day first (applyP0's
+ *  rollDay, viewOf), so a new day's is 0. */
+const dayNet = (s: P0State) => s.day.bj_net ?? 0;
+/** What is left to lose today and so the most a deal may stake (q(320)): 50 + bj_net, in fives, none below 0. */
+const dayLeft = (s: P0State) => Math.max(0, Math.floor((BJ_DAY_LOSS + dayNet(s)) / BJ_STEP) * BJ_STEP);
+/** Whether the table is closed for the day: less than the table minimum left to lose. The hand in play plays on. */
+const dayClosed = (s: P0State) => dayLeft(s) < BJ_MIN_BET;
 
 /** The dealer draws to 17 (stands on soft 17); not when every hand of the player's has bust. Then each hand is paid:
  * a natural 3 to 2 rounded down, a win or a dealer bust 1 to 1, a push its stake back. */
@@ -192,6 +207,9 @@ export function blackjackCommand(c: P0Content, s: P0State, cmd: BjCommand & { sp
       const bet = cmd.bet;
       if (!Number.isInteger(bet) || bet < BJ_MIN_BET || bet % BJ_STEP !== 0) return refuse('bj_bad_bet', { min: BJ_MIN_BET, step: BJ_STEP });
       if (bj.hand) return refuse('bj_in_hand', { n: bj.hand.n });
+      // the day's limit before the coins short (q(320): both at once read as the day's limit); a table closed for the day
+      // has under the 5 a bet is at least left, so a stake over what is left covers it
+      if (bet > dayLeft(s)) return refuse('bj_day_cap', { cap: 'loss', net: dayNet(s), resets_at: rolloverAfter(c, s, dayKey(c, s, now)) });
       const need = coinsShort(c, s, bet);
       if (need) return refuse('bj_no_coins', { need, have: s.coins, floor: c.wallet_floor });
       const n = bj.n + 1, salt = bjSalt.next();
@@ -275,7 +293,10 @@ export function blackjackView(c: P0Content, s: P0State, now: number) {
   const bj = s.blackjack;
   return {
     open: bjOpen(s), intro: !!bj?.intro, floor: c.wallet_floor, min_bet: BJ_MIN_BET, step: BJ_STEP, chips: BJ_CHIPS,
-    last_bet: bj?.last_bet ?? 0,
+    // q(320): today's net (Today −20 / +35), the day's loss, what is left to lose (the chips over it grey, as the wallet's
+    // floor greys them), whether the table is closed for the day, and when it opens again (the rollover)
+    day: { net: dayNet(s), limit: BJ_DAY_LOSS, left: dayLeft(s), closed: dayClosed(s), opens_at: rolloverAfter(c, s, dayKey(c, s, now)) },
+    last_bet: Math.min(bj?.last_bet ?? 0, dayLeft(s)),   // the next deal's first bet: one over what is left comes back to it
     hand: bj?.hand ? handView(c, s, bj.hand, now) : null,
     last: bj?.last ?? null,
   };

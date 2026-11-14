@@ -78,7 +78,7 @@ func test_every_p0_preset_ships_the_mines_json() -> void:
 	assert_int(p0_presets).is_greater_equal(2)
 
 ## The Play build (上架, 蒙恬 11-13): preset "Android Play" is the only Android one with the custom feature `store`
-## (P0Build.store(): no test accounts, card room or Voice Profile), package app.gensen.maps, exported as an AAB. The
+## (P0Build.store(): no test accounts; the card room kept since 11-13), package app.gensen.maps, exported as an AAB. The
 ## OSS presets never carry `store`. The upload key never sits in this file: the path, alias and password come from the
 ## GODOT_ANDROID_KEYSTORE_RELEASE_* variables at export time (the keystore and its password stay on the build Mac).
 func test_only_the_play_preset_is_the_store_build() -> void:
@@ -98,3 +98,17 @@ func test_only_the_play_preset_is_the_store_build() -> void:
 		if str(cfg.get_value(s, "name", "")) == "Android Play": section = s
 	assert_str(str(cfg.get_value(section + ".options", "package/unique_name", ""))).is_equal("app.gensen.maps")
 	assert_str(str(cfg.get_value(section, "custom_features", ""))).is_equal("p0,store")
+
+## 上架清权限 (蒙恬 11-13, audit G8): the Android overlay manifest removes location, camera and the foreground / screen-capture
+## service (LiveKit and the old map PoC declare them; the game uses the microphone only) with tools:node="remove", and
+## declares none of them itself. build_demo_apk.sh checks the exported APK's manifest too (permissions_ok).
+func test_the_android_manifest_removes_what_the_game_does_not_use() -> void:
+	var manifest := FileAccess.get_file_as_string("res://tools/android/overlay/AndroidManifest.xml")
+	assert_str(manifest).is_not_empty()
+	for p in ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION", "CAMERA", "FOREGROUND_SERVICE", "FOREGROUND_SERVICE_MEDIA_PROJECTION"]:
+		var line := RegEx.create_from_string('<uses-permission android:name="android\\.permission\\.%s"[^>]*>' % p).search(manifest)
+		assert_object(line).override_failure_message("%s is not in the overlay manifest" % p).is_not_null()
+		assert_str(line.get_string()).override_failure_message("%s is declared, not removed" % p).contains('tools:node="remove"')
+	var service := RegEx.create_from_string('<service\\s+android:name="io\\.livekit\\.android\\.room\\.track\\.screencapture\\.ScreenCaptureService"[^>]*>').search(manifest)
+	assert_object(service).is_not_null()
+	assert_str(service.get_string()).contains('tools:node="remove"')

@@ -23,10 +23,10 @@ static func cards_icon() -> Texture2D:
 ## The card room shows on the map once its gate is passed — Homestead Lv2 and the guide over (q(238), C11-3) — its pin
 ## hidden before, no grey card, no words (不知火舞 351 8aa69403). The client reads the gate from the view itself, not
 ## view.blackjack: 0.2.12 ships the room, Lou and his greeting to a server without the table (用户 via 奕星 on 351), so
-## a player past the gate walks in there too; only Play asks whether the table is open (P0Ui._play_blackjack).
+## a player past the gate walks in there too; only Play asks whether the table is open (P0Ui._play_blackjack). The
+## store build has it too (the user 11-13, 「牌室 C」: D6's hiding undone, more games of chance to come).
 static func shown(o: Dictionary, view: Dictionary) -> bool:
 	if str(o.get("role", "")) != "casino": return true
-	if P0Build.store(): return false   # SGODOT-483: no card room in the store build (simulated gambling; the user D6)
 	var h = view.get("homestead", {})
 	return h is Dictionary and int(h.get("level", 1)) >= 2 and not P0Guide.guide_on(view)
 

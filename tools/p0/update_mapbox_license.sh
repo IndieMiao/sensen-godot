@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 GRADLE=tools/android/overlay/build.gradle
 [ -f "$GRADLE" ] || GRADLE=android/build/build.gradle
-VERSION="$(grep -o 'com.mapbox.maps:android:[0-9.]*' "$GRADLE" | head -1 | cut -d: -f3)"
+VERSION="$(grep -Eo 'com.mapbox.maps:android(-ndk27)?:[0-9.]+' "$GRADLE" | head -1 | cut -d: -f3)"
 [ -n "$VERSION" ] || { echo "no com.mapbox.maps:android version in $GRADLE" >&2; exit 1; }
 OUT=assets/p0/legal/mapbox-maps-android-LICENSE.md
 curl -fsSL --max-time 60 -o "$OUT" "https://raw.githubusercontent.com/mapbox/mapbox-maps-android/v${VERSION}/LICENSE.md"

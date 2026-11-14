@@ -2068,6 +2068,20 @@ func _scene_overlay(path: String, args: Dictionary) -> CanvasLayer:
 	return P0LoadingLayer.new(place, null, path, args)
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
+## Shots only (SGODOT-487): opens the phone's own sign-in sheet and prints what it answered (P0_SIGNIN …), the token cut
+## short. Not awaited by the step: the sheet stays up while the next steps run.
+func _shot_sign_in(step: PackedStringArray) -> void:
+	var sign_in: GDScript = load("res://modules/p0/p0_sign_in.gd")
+	var provider := step[1] if step.size() > 1 else "apple"
+	if provider == "google" and step.size() > 2: ProjectSettings.set_setting(sign_in.IOS_CLIENT_SETTING, ":".join(step.slice(2)))
+	var r: Dictionary
+	if provider == "apple": r = await sign_in.apple()
+	else: r = await sign_in.google()
+	if r.has("id_token"): r.id_token = str(r.id_token).left(12) + "…"
+	print("P0_SIGNIN ", JSON.stringify(r))
+	var f := FileAccess.open("user://p0_signin_%s.json" % provider, FileAccess.WRITE)   # a Release build's stdout is not always kept (iOS simulator)
+	if f: f.store_string(JSON.stringify(r))
+
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
 ## Generic UI steps live here; world steps (goto, stove, until:bite …) go to world.p0_dev / p0_until.
 ## Camera unification (用户 via 奕星, 2026-10-09): how tall the player stands on screen in this world's camera — from
@@ -2473,6 +2487,7 @@ func _dev_shot(dt: float) -> void:
 					var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
 					ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
 			"measure": print("P0_MEASURE ", JSON.stringify(measure_actor()))   # the player's height on screen (camera unification)
+			"signin": _shot_sign_in(step)   # signin:apple | signin:google[:<iOS client id>] — the native sheet, its result printed (SGODOT-487)
 			"goto":   # goto:stand_lena — a room's player stood at that anchor, facing its way (SGODOT-216 shots)
 				if is_instance_valid(world) and world.has_method("anchor") and world.call("anchor", step[1]) != null:
 					var m: Marker3D = world.call("anchor", step[1])

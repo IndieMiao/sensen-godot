@@ -6,10 +6,13 @@ extends PanelContainer
 ## as wide and tall as the primary (Go back on SYS-LOADING-SCENE-FAIL 1780:103778).
 ##   Kind.BLOCKING  whole-screen system states: SYS-MAINT, SYS-UPDATE, SYS-LOADING Can't connect (primaryTint disc)
 ##   Kind.ERROR     recoverable failures: a place that would not open (disabled-grey disc)
-## show_card({icon, title, body, primary, secondary}): "" hides that part. Emits primary_pressed / secondary_pressed.
+## show_card({icon, title, body, note, primary, secondary}): "" hides that part. Emits primary_pressed / secondary_pressed;
+## `note` is the small line under the body (Caption Bold 12, secondary: ACC-SUSPENDED's `Support code AB12C-3DE45`,
+## 645:197762), the whole line a tap (note_pressed).
 
 signal primary_pressed
 signal secondary_pressed
+signal note_pressed
 
 enum Kind { BLOCKING, ERROR }
 
@@ -30,6 +33,7 @@ var kind: Kind = Kind.BLOCKING
 var icon_rect: TextureRect
 var title: Label
 var body: Label
+var note: Label
 var primary: UiCommandButton
 var secondary: UiCommandButton
 
@@ -64,6 +68,11 @@ func _init(kind_: Kind = Kind.BLOCKING) -> void:
 	col.add_child(title)
 	body = _line(UiTokens.STYLE_BODY_B14, UiTokens.COLOR_SECONDARY)
 	col.add_child(body)
+	note = _line(UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	note.name = "Note"
+	note.mouse_filter = Control.MOUSE_FILTER_STOP
+	note.gui_input.connect(func(e: InputEvent): if UiShopRow._released(e): note_pressed.emit())
+	col.add_child(note)
 	_gap = Control.new()
 	_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_gap.custom_minimum_size.y = _BUTTON_GAP - _GAP   # 6 above the button on top of the column's 10
@@ -83,7 +92,7 @@ static func _line(style: StringName, color: Color) -> Label:
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return l
 
-## Draw one card: {icon (Texture2D), icon_tint (Color, for a white glyph), title, body, primary, secondary}.
+## Draw one card: {icon (Texture2D), icon_tint (Color, for a white glyph), title, body, note, primary, secondary}.
 func show_card(d: Dictionary) -> void:
 	icon_rect.texture = d.get("icon", null)
 	icon_rect.self_modulate = d.get("icon_tint", Color.WHITE)
@@ -91,6 +100,8 @@ func show_card(d: Dictionary) -> void:
 	title.text = str(d.get("title", ""))
 	body.text = str(d.get("body", ""))
 	body.visible = body.text != ""
+	note.text = str(d.get("note", ""))
+	note.visible = note.text != ""
 	primary.label = str(d.get("primary", ""))
 	primary.visible = primary.label != ""
 	_gap.visible = primary.visible

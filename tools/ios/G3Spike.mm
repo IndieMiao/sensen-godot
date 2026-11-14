@@ -28,6 +28,12 @@
         } else {
             NSLog(@"[G3Spike] LocalNotify 类缺失（Swift 文件未编入？）");
         }
+        Class google = NSClassFromString(@"GoogleSignInIOS");   // SGODOT-487，inject_local_notify.py 编入
+        if (google) {
+            [google performSelector:@selector(setup)];
+        } else {
+            NSLog(@"[G3Spike] GoogleSignInIOS 类缺失（Swift 文件未编入？）");
+        }
     });
 }
 @end
