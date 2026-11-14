@@ -217,3 +217,19 @@ func test_back_waits_while_names_check_is_in_flight() -> void:
 	assert_bool(f.back()).is_true()   # taken, nothing freed
 	assert_object(f.name_page).is_equal(n)
 	assert_object(f.page).is_equal(n)
+
+func test_on_a_notched_phone_the_wordmark_fades_under_the_banner() -> void:
+	var f := _flow("old_signin")
+	f.safe_top = 0.0
+	f.say("Didn't go through · try again", true)
+	assert_bool(f.banner_over_mark()).is_false()   # 16–56 clears the wordmark's 84 by more than 8
+	assert_float((f.page as P0AccShell).mark.modulate.a).is_equal(1.0)
+	f.safe_top = 47.0
+	f.say("Didn't go through · try again", true)
+	assert_bool(f.banner_over_mark()).is_true()   # 63–103: into it
+	await get_tree().create_timer(P0AccFlow.MARK_FADE_S + 0.1).timeout
+	assert_float((f.page as P0AccShell).mark.modulate.a).is_equal_approx(0.0, 0.01)
+	f.banner.visible = false
+	f._fade_mark()   # the banner goes: the wordmark comes back
+	await get_tree().create_timer(P0AccFlow.MARK_FADE_S + 0.1).timeout
+	assert_float((f.page as P0AccShell).mark.modulate.a).is_equal_approx(1.0, 0.01)

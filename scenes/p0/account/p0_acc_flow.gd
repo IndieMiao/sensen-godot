@@ -176,6 +176,10 @@ func claimed(linked: Array) -> void:
 ## Info toast at the foot (`Sign-in expired. Please sign in again.`). Kept over the page and any card.
 const BANNER_TOP := 16.0
 const BANNER_S := 3.0
+## A notched phone (不知火舞 11-14): where the banner's foot would reach within 8 of the wordmark's top (y 84), the
+## page's wordmark fades out while it is up and back after, 250 ms; with no such overlap the wordmark stays.
+const MARK_CLEAR := 8.0
+const MARK_FADE_S := 0.25
 var safe_top := 0.0               # the host's (P0Ui.safe_top()): the banner sits under the status bar
 var banner: UiSysBanner
 var _banner_id := 0
@@ -198,7 +202,9 @@ func say(text: String, error := false) -> void:
 		_banner_id += 1
 		var id := _banner_id
 		if is_inside_tree(): get_tree().create_timer(BANNER_S).timeout.connect(func():
-			if id == _banner_id and is_instance_valid(banner): banner.visible = false)
+			if id == _banner_id and is_instance_valid(banner):
+				banner.visible = false
+				_fade_mark())
 	else:
 		if _toasts == null:
 			_toasts = ToastLayer.new()
@@ -215,6 +221,22 @@ func said() -> String:
 
 func _lines_on_top() -> void:
 	for n in [_toasts, banner]: if n != null: move_child(n, -1)
+	_fade_mark()
+
+## Whether the banner, up now, comes within MARK_CLEAR of the wordmark's top.
+func banner_over_mark() -> bool:
+	return banner != null and banner.visible and safe_top + BANNER_TOP + UiSysBanner.HEIGHT > P0AccShell._MARK_TOP - MARK_CLEAR
+
+## The page's wordmark out while the banner would touch it, back in after (250 ms).
+func _fade_mark() -> void:
+	var shell := page as P0AccShell
+	if shell == null or shell.mark == null: return
+	var to := 0.0 if banner_over_mark() else 1.0
+	if is_equal_approx(shell.mark.modulate.a, to): return
+	if not is_inside_tree():
+		shell.mark.modulate.a = to
+		return
+	create_tween().tween_property(shell.mark, ^"modulate:a", to, MARK_FADE_S)
 
 ## The host's, when a sign-in ended with nothing to show here: the sheet closed (cancelled) or it failed (its toast is
 ## the host's) — the sign-in page's keys back. no_farm / conflict / claimed do it themselves (后裔 11-14).
