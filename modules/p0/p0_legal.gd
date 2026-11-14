@@ -24,6 +24,17 @@ static func privacy_url(os_name: String, live := PRIVACY_LIVE) -> String:
 ## us, its no-mail-app toast, the no-Google-services page (SGODOT-491).
 const SUPPORT_EMAIL := "shaojie@gensen.app"
 
+## The mail to support (不知火舞's account spec v1.1 §2.3; SGODOT-491): subject `Gensen support · AB12C-3DE45`, the body
+## `Support code: …` / `Version: …` / `Phone: …` and two empty lines for the player. No code (no account yet: NO-GMS)
+## leaves the code out of both. `version` / `phone` default to this build and this phone.
+static func support_mail_url(code := "", version := "", phone := "") -> String:
+	if version == "": version = version_line(P0Session.demo_config(
+		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
+	if phone == "": phone = "%s %s" % [OS.get_name(), OS.get_version()]
+	var subject := "Gensen support" + ((" · " + code) if code != "" else "")
+	var body := ("Support code: %s\n" % code if code != "" else "") + "Version: %s\nPhone: %s\n\n" % [version, phone]
+	return "mailto:%s?subject=%s&body=%s" % [SUPPORT_EMAIL, subject.uri_encode(), body.uri_encode()]
+
 ## q(281) ② (后裔's privacy-server-2026-11-03 ①): the support code a player sends with a request about their data —
 ## SHA-256 of `p0-support/v1/` + the player id (UTF-8), its first 50 bits as 10 Crockford Base32 characters (0–9 and
 ## the letters but I L O U), `XXXXX-XXXXX`. Worked out here, so it shows offline; the server has the same function to

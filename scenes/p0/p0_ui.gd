@@ -1677,8 +1677,10 @@ const SCREEN_LAYER := 100   # over the fishing presentation (30), under AppRoute
 var _screen_layer: CanvasLayer
 var _screen: P0SysScreen
 
+## 不知火舞's account spec v1.1 §6.5: SYS-UPDATE > SYS-MAINT > SYS-DELETED > SYS-SUSPENDED > SYS-SESSION > the rest.
 static func _screen_rank(kind: int) -> int:
-	return {P0SysScreen.Kind.UPDATE: 3, P0SysScreen.Kind.MAINT: 2}.get(kind, 1)
+	return {P0SysScreen.Kind.UPDATE: 6, P0SysScreen.Kind.MAINT: 5, P0SysScreen.Kind.DELETED: 4,
+		P0SysScreen.Kind.SUSPENDED: 3, P0SysScreen.Kind.SESSION: 2}.get(kind, 1)
 
 func show_screen(kind: P0SysScreen.Kind, detail := {}) -> void:
 	if _screen != null and _screen_rank(_screen.kind) > _screen_rank(kind): return
@@ -1687,8 +1689,9 @@ func show_screen(kind: P0SysScreen.Kind, detail := {}) -> void:
 		_screen_layer.layer = SCREEN_LAYER
 		add_child(_screen_layer)
 		_screen = P0SysScreen.new()
-		_screen.primary_pressed.connect(func(k: P0SysScreen.Kind): screen_action.emit(k))
+		_screen.primary_pressed.connect(_screen_primary)
 		_screen.secondary_pressed.connect(func(k: P0SysScreen.Kind): screen_back.emit(k))
+		_screen.note_pressed.connect(_account_note)
 		_screen_layer.add_child(_screen)
 	_screen.show_kind(kind, detail)
 	if test_accounts.is_test() and kind == P0SysScreen.Kind.FAIL:
@@ -1705,6 +1708,57 @@ func hide_screen(kinds: Array = []) -> void:
 	_screen = null
 	if was.kind in [P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL]: was.leave(layer)
 	else: layer.queue_free()
+
+## The account's system states (SGODOT-491; 后裔's contract v1.6.3 §5: P0Session stops every request on these codes and
+## calls this — not a network failure). kind: "session_replaced" (SYS-SESSION), "account_deleted" (SYS-DELETED),
+## "suspended" (SYS-SUSPENDED; detail.until the server's ISO time or null for no end). Over everything, no way out but
+## its key: `account_action(kind, action)` — "sign_in" (SESSION, DELETED: the host clears the token and opens the sign-in
+## page) or "contact" (SUSPENDED: the mail to support with the support code is already open; nothing for the host to
+## do). The support code line copies the code here. Ranked by spec §6.5 (_screen_rank); another kind is ignored.
+signal account_action(kind: String, action: String)
+const ACCOUNT_KINDS := {"session_replaced": P0SysScreen.Kind.SESSION, "account_deleted": P0SysScreen.Kind.DELETED,
+	"suspended": P0SysScreen.Kind.SUSPENDED}
+
+func show_account_state(kind: String, detail := {}) -> void:
+	if not ACCOUNT_KINDS.has(kind): return
+	var k: P0SysScreen.Kind = ACCOUNT_KINDS[kind]
+	var d := {}
+	if k == P0SysScreen.Kind.SUSPENDED:
+		d = {until = suspended_until_text(detail.get("until", null)), code = P0Legal.support_code(str(player_of.call()))}
+	show_screen(k, d)
+
+## SYS-SUSPENDED's end, `Nov 20` (P0Logic.month_day) on the player's own calendar; "" for null or an unreadable time
+## (the no-end line). `bias_min` (minutes east of UTC) is for tests.
+static func suspended_until_text(until: Variant, bias_min := 100000) -> String:
+	if not until is String or str(until).strip_edges() == "": return ""
+	var iso := str(until).strip_edges().trim_suffix("Z")
+	if iso.contains("."): iso = iso.get_slice(".", 0)   # JavaScript's toISOString: …T10:00:00.000Z
+	var at := Time.get_unix_time_from_datetime_string(iso)
+	if at <= 0: return ""
+	var shift := (bias_min if bias_min != 100000 else int(Time.get_time_zone_from_system().get("bias", 0))) * 60
+	var d := Time.get_datetime_dict_from_unix_time(int(at) + shift)
+	return P0Logic.month_day(int(d.month), int(d.day))
+
+func _account_state_key(k: P0SysScreen.Kind) -> String:
+	for id in ACCOUNT_KINDS:
+		if ACCOUNT_KINDS[id] == k: return id
+	return ""
+
+## The card's key: an account state's goes to account_action (Contact us opens the mail first), the rest to screen_action.
+func _screen_primary(k: P0SysScreen.Kind) -> void:
+	var id := _account_state_key(k)
+	if id == "":
+		screen_action.emit(k)
+		return
+	if k == P0SysScreen.Kind.SUSPENDED:
+		ExternalLink.open(P0Legal.support_mail_url(P0Legal.support_code(str(player_of.call()))))
+		account_action.emit(id, "contact")
+	else: account_action.emit(id, "sign_in")
+
+func _account_note(k: P0SysScreen.Kind) -> void:
+	if k != P0SysScreen.Kind.SUSPENDED: return
+	DisplayServer.clipboard_set(P0Legal.support_code(str(player_of.call())))
+	toast("Support code copied")
 
 ## The state on screen, -1 for none.
 func screen_kind() -> int: return _screen.kind if _screen != null else -1

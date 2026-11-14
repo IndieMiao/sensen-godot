@@ -36,8 +36,4 @@ func _init() -> void:
 
 ## The mail: to the support address (the user 11-12), the build and the phone in its body, nothing else.
 static func mail_url(version := "", phone := "") -> String:
-	if version == "": version = P0Legal.version_line(P0Session.demo_config(
-		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
-	if phone == "": phone = "%s %s" % [OS.get_name(), OS.get_version()]
-	var body := "Version: %s\nPhone: %s\n\n" % [version, phone]
-	return "mailto:%s?subject=%s&body=%s" % [P0Legal.SUPPORT_EMAIL, "Gensen support".uri_encode(), body.uri_encode()]
+	return P0Legal.support_mail_url("", version, phone)
