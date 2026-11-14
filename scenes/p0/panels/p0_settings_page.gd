@@ -109,9 +109,23 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## Legal's first row `Privacy Policy ›` ("privacy"); `support_code` "" or `XXXXX-XXXXX` — Legal's last row after Version,
 ## `Support code` / `Tap to copy` with the code on the right and no ›, the whole row copying it ("support_code"), and
 ## under the card `Send this code with any request about your data.`
+## SGODOT-491 (不知火舞's account spec v2 §5; 720:201692): `account` — how this farm signs in, "apple" / "google" / "email"
+## / "code" ("" before accounts: none of this) — puts an `Account` group first, one info row `Signed in with …` (no ›,
+## no sub-page), and at the end, 24 under Legal, the outlined `Sign out` (48, the page's width; "sign_out") and 12
+## under it the Danger row `Delete account ›` / `Deletes your farm, items and progress` in its own card
+## ("delete_account").
+const ACCOUNT_ROW := {"apple": "Signed in with Apple", "google": "Signed in with Google", "email": "Signed in with email",
+	"code": "Signed in with a test code"}
+const _END_GAP := 8     # Legal → Sign out: 24 with the column's two 8s
+const _END_SEP := 12    # Sign out → Delete account
 static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
-		blocked := BLOCKED_NONE, voice_chat := false, language := "", privacy_url := "", support_code := "") -> P0SettingsPage:
+		blocked := BLOCKED_NONE, voice_chat := false, language := "", privacy_url := "", support_code := "",
+		account := "") -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
+	if ACCOUNT_ROW.has(account):
+		var who := UiSettingRow.new(UiSettingRow.Kind.VALUE, str(ACCOUNT_ROW[account]))
+		who.name = "SignedInWith"
+		page._group("Account", [who])
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
 		var row := UiSettingRow.new(UiSettingRow.Kind.LINK if bool(home.get("open", false)) else UiSettingRow.Kind.VALUE, title,
@@ -171,6 +185,25 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		note.name = "SupportNote"
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		page.body.add_child(note)
+	if ACCOUNT_ROW.has(account):
+		var gap := Control.new()
+		gap.custom_minimum_size.y = _END_GAP
+		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		page.body.add_child(gap)
+		var end := VBoxContainer.new()
+		end.name = "End"
+		end.add_theme_constant_override(&"separation", _END_SEP)
+		page.body.add_child(end)
+		var out := UiCommandButton.new("Sign out", UiCommandButton.Kind.SECONDARY)
+		out.name = "SignOut"
+		out.sends = false
+		out.activated.connect(func(): page.open_pressed.emit("sign_out"))
+		end.add_child(out)
+		var del := UiSettingRow.new(UiSettingRow.Kind.LINK, "Delete account", "Deletes your farm, items and progress")
+		del.name = "DeleteAccount"
+		del.set_danger()
+		del.pressed.connect(func(): page.open_pressed.emit("delete_account"))
+		end.add_child(UiSettingRow.group([del]))
 	return page
 
 ## Visible test settings (341 d559585e), retaining the approved B page layout and copy (aa0e971b).

@@ -3922,6 +3922,28 @@ func blackjack_refused(code: String, detail: Dictionary) -> void:
 ## The player id the session plays as (P0Runtime sets it): the support code's (q(281) ②).
 var player_of := func() -> String: return ""
 
+## SGODOT-491: how this farm signs in — "apple" / "google" / "email" / "code", "" before accounts (no Account group,
+## no Sign out): the host's (后裔's glue, from P0Session), read each time Settings opens.
+var account_of := func() -> String: return ""
+## Settings' Sign out, confirmed on its card: the host calls P0Session.logout and shows the sign-in page.
+signal sign_out_requested
+## Settings' Delete account › (its two steps: 11-16).
+signal delete_account_requested
+
+func _confirm_sign_out(back: Callable) -> void:
+	var confirm = preload("res://scenes/p0/account/p0_acc_sign_out.gd").card(str(account_of.call()))
+	var cancel := func():
+		confirm.queue_free()
+		modal_kind = "settings"
+		_modal_back = back
+	confirm.cancelled.connect(cancel)
+	confirm.move_pressed.connect(func():
+		confirm.queue_free()
+		sign_out_requested.emit())
+	_modal.add_child(confirm)   # over Settings, as the test account's confirmation
+	modal_kind = "sign_out_confirm"
+	_modal_back = cancel
+
 func open_settings(back := Callable(), read := true) -> void:
 	var version := P0Legal.version_line(P0Session.demo_config(
 		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
@@ -3931,7 +3953,8 @@ func open_settings(back := Callable(), read := true) -> void:
 		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
 		_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD,   # q(309): always, voice or not (iOS too)
 		_voice_offered, LANGUAGE_NAMES.get(TranslationServer.get_locale(), "English"),   # the language on screen (不知火舞 A6), not a pick for the next start
-		P0Legal.privacy_url(OS.get_name()), P0Legal.support_code(str(player_of.call())))   # q(281) (SGODOT-390)
+		P0Legal.privacy_url(OS.get_name()), P0Legal.support_code(str(player_of.call())),   # q(281) (SGODOT-390)
+		str(account_of.call()))   # SGODOT-491: Account, Sign out, Delete account
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
@@ -3946,6 +3969,8 @@ func open_settings(back := Callable(), read := true) -> void:
 		elif what == "support_code":   # q(281) ②: the whole row copies the code; the row itself stays as it is
 			DisplayServer.clipboard_set(P0Legal.support_code(str(player_of.call())))
 			toast("Support code copied")
+		elif what == "sign_out": _confirm_sign_out(back)
+		elif what == "delete_account": delete_account_requested.emit()
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
