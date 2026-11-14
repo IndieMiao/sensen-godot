@@ -5098,13 +5098,14 @@ func open_people() -> void:
 
 ## §5: `Block Traveller ab12?`, `You won't hear each other.` / `They won't be told.`, Block (red, V4) / Cancel (q(28)'s
 ## card, the confirm frame the home move uses).
+const P0Names := preload("res://modules/p0/p0_names.gd")
+const _BLOCK_TITLE_W := 294.0   # the confirm card's 328 less its 16 + 1 each side (ACC-BLOCK-LONG 652:198238)
 func _confirm_block(peer: int) -> void:
 	var who := ""
 	for r in voice_room.call("people"): if int(r.peer) == peer: who = str(r.name)
 	var confirm = load("res://scenes/p0/panels/p0_home_move_confirm.gd").new()
 	confirm.name = "BlockConfirm"
 	confirm.theme = UiKit.theme()
-	confirm.card.find_child("Title", true, false).text = "Block %s?" % who
 	confirm.card.find_child("Body", true, false).text = "You won't hear each other.\nThey won't be told."
 	confirm.move.label = "Block"
 	confirm.move.kind = UiCommandButton.Kind.DESTRUCTIVE   # V4: the red key
@@ -5118,6 +5119,12 @@ func _confirm_block(peer: int) -> void:
 		back.call()
 		voice_room.call("set_blocked", peer, true))
 	_modal.add_child(confirm)   # over the drawer, which stays behind it
+	# one line, only the name gives way, `?` kept (SGODOT-491 §4, ACC-BLOCK-LONG): measured in its theme, so once in
+	var title := confirm.card.find_child("Title", true, false) as Label
+	title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	title.text = P0Names.title("Block %s?", who, title.get_theme_font(&"font"), title.get_theme_font_size(&"font_size"),
+		_BLOCK_TITLE_W)
 	modal_kind = "block_confirm"
 	_modal_back = back
 

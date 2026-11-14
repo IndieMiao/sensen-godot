@@ -207,7 +207,7 @@ func _row(r: Dictionary) -> HBoxContainer:
 	var name_l := UiKit.label(str(r.get("name", "")), UiTokens.STYLE_ROW_TITLE_XB15)
 	name_l.name = "Name"
 	name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_l.clip_text = true
+	_as_name(name_l)
 	name_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(name_l)
 	var mute := _key("Unmute" if muted else "Mute")
@@ -225,6 +225,13 @@ func _row(r: Dictionary) -> HBoxContainer:
 	report.pressed.connect(func(): report_pressed.emit(peer))
 	row.add_child(report)
 	return row
+
+## A player's name in a row (SGODOT-491; spec v1.1 §4, ACC-DRAWER-LONG 650:198259): never translated; one line,
+## cut with `…` where the keys (or `You`) begin — they never give way (it was a hard clip).
+static func _as_name(l: Label) -> void:
+	l.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	l.clip_text = true
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
 ## The player's own row (q(289)): the dot while they speak, their name, a grey `You` at the right where the keys end.
 ## Nothing to tap.
@@ -244,7 +251,7 @@ func _self_row(r: Dictionary) -> HBoxContainer:
 	var name_l := UiKit.label(str(r.get("name", "")), UiTokens.STYLE_ROW_TITLE_XB15)
 	name_l.name = "Name"
 	name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_l.clip_text = true
+	_as_name(name_l)
 	name_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(name_l)
 	var you := UiKit.label("You", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
