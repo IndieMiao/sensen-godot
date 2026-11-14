@@ -253,7 +253,7 @@ func test_updated_terms_mid_way_ask_again_over_the_page_and_keep_the_rest() -> v
 	assert_bool(f.back()).is_true()   # no way out
 	assert_object(f.renew).is_equal(c)
 	assert_bool(c.go.disabled).is_true()   # not ticked
-	f.consent_outdated({"terms_version": "x"})   # a second refusal while it is up: the one card
+	f.consent_outdated({"terms_version": "2026-11-20", "privacy_version": "2026-11-21"})   # the same again while it is up: the one card
 	assert_int(f.find_children("AccRenew", "", false, false).size()).is_equal(1)
 	c.consent.checked = true
 	c.consent.toggled.emit(true)
@@ -273,3 +273,26 @@ func test_updated_terms_mid_way_ask_again_over_the_page_and_keep_the_rest() -> v
 	assert_str(str(k.terms)).is_equal("2026-11-20")
 	assert_str(str(k.privacy)).is_equal("2026-11-21")
 	assert_bool(bool(k.age_ok)).is_true()   # the year is not asked again
+
+## 周瑜 on #1063: the terms move on again while the card is up (the resend refused anew): the new versions are the ones
+## agreed and kept, the key back and the box unticked; and a phone that never answered AGE keeps no age answer.
+func test_terms_moving_on_again_ask_for_the_newest_and_no_age_answer_is_made_up() -> void:
+	var f := _flow("old_signin")   # an old farm past voice's gate: no AGE on this phone
+	var renewed := []
+	f.consent_renewed.connect(func(): renewed.append(f.kept().duplicate()))
+	f.consent_outdated({"terms_version": "t1", "privacy_version": "p1"})
+	var c := f.renew
+	c.consent.checked = true
+	c.consent.toggled.emit(true)
+	c.go.activated.emit()
+	assert_str(str(renewed[0].terms)).is_equal("t1")
+	f.consent_outdated({"terms_version": "t2", "privacy_version": "p2"})   # refused again: newer terms
+	assert_object(f.renew).is_equal(c)
+	assert_int(c.go.phase).is_equal(CommandLifecycle.State.IDLE)
+	assert_bool(c.consent.checked).is_false()   # agreed again, to these
+	c.consent.checked = true
+	c.consent.toggled.emit(true)
+	c.go.activated.emit()
+	assert_str(str(renewed[1].terms)).is_equal("t2")
+	assert_str(str(renewed[1].privacy)).is_equal("p2")
+	assert_bool(f.kept().has("age_ok")).is_false()   # never asked here: none made up

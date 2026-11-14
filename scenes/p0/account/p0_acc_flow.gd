@@ -47,6 +47,7 @@ var _this_year := 0
 var _provider := ""
 var _toasts: ToastLayer           # the flow's own: P0Ui's banner and toasts are on a layer under this one
 var renew: P0AccConsent          # the updated-terms card while it is up
+var _renew_versions := {}         # the versions it asks for: the latest consent_outdated's
 
 ## `check`: NAME's name check (P0Session.name_check). `providers_`: the sign-in page's keys (P0AccSignIn). `hints_`:
 ## {line: "farm_uses" | "last_time", with: …} for the sign-in page's line.
@@ -270,14 +271,19 @@ func _drop_choose() -> void:
 ## request again, or account/consent for the one that went through, and answers consent_settled(ok). The card stays
 ## till ok (§9 补: not into the farm or NAME before the consent is kept); not ok gives the key back (the host toasts).
 func consent_outdated(r: Dictionary) -> void:
-	if is_instance_valid(renew): return
+	_renew_versions = {"terms": str(r.get("terms_version", "")), "privacy": str(r.get("privacy_version", ""))}
+	if is_instance_valid(renew):   # the terms moved on again while it was up (the resend refused anew): the one card,
+		renew.go.phase = CommandLifecycle.State.IDLE   # these versions, agreed again (周瑜 on #1063)
+		renew.consent.checked = false
+		renew.consent.toggled.emit(false)
+		return
 	renew = P0AccConsent.new(true)
 	renew.name = "AccRenew"
 	renew.as_overlay()
 	renew.link_pressed.connect(open_link)
 	renew.agreed.connect(func():
 		if renew.go.phase != CommandLifecycle.State.IDLE: return
-		keep_versions({"terms": str(r.get("terms_version", "")), "privacy": str(r.get("privacy_version", ""))})
+		keep_versions(_renew_versions)
 		renew.go.phase = CommandLifecycle.State.PENDING
 		consent_renewed.emit())
 	add_child(renew)
@@ -315,10 +321,11 @@ func keep(ok: bool) -> void:
 	var f := FileAccess.open(record_path, FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(data))
 
-## The terms agreed to anew (consent_outdated): the versions and when, the age answer as it was kept.
+## The terms agreed to anew (consent_outdated): the versions and when. The age answer stays as it was kept — and stays
+## missing where this phone never asked (an old farm claimed past voice's gate): AGE still comes after a sign-out (周瑜).
 func keep_versions(v: Dictionary) -> void:
 	var data := kept()
-	data.merge({"age_ok": bool(data.get("age_ok", true)), "terms": str(v.get("terms", "")), "privacy": str(v.get("privacy", "")),
+	data.merge({"terms": str(v.get("terms", "")), "privacy": str(v.get("privacy", "")),
 		"agreed_at": Time.get_unix_time_from_system() * 1000.0}, true)
 	var f := FileAccess.open(record_path, FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(data))
