@@ -88,7 +88,9 @@ func _init(email_ := "", resend_in := RESEND_S) -> void:
 	col.add_child(red)
 	red_gap = add_gap(CELL_GAP)
 	red_gap.visible = false
-	col.add_child(_resend_row())
+	var row := _resend_row()
+	col.add_child(row)
+	keep_above_keyboard = row   # no key here: the cells, the red and Resend stay over the keyboard (不知火舞 11-14, #1057)
 	change_key = UiDismissButton.new(CHANGE)
 	change_key.name = "Change"
 	change_key.custom_minimum_size.y = UiTokens.SIZE_TOUCH

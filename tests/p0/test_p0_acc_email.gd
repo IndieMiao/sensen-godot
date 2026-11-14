@@ -85,6 +85,7 @@ func test_the_code_page_shows_the_whole_address_and_waits_60_s_to_resend() -> vo
 	assert_bool(p.wait_line.visible).is_false()
 	assert_bool(p.resend_key.visible).is_true()
 	assert_float((p.find_child("ResendRow", true, false) as Control).size.y).is_equal(row_h)   # 44 both ways: nothing jumps
+	assert_object(p.keep_above_keyboard).is_same(p.find_child("ResendRow", true, false))   # what the keyboard must not cover
 	var asked: Array = []
 	p.resend_pressed.connect(func(): asked.append(true))
 	_digits(p, "48")
