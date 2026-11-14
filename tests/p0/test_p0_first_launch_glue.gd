@@ -4,6 +4,7 @@ extends GdUnitTestSuite
 ## (with what AGE took); no_farm is NAME and guest with the ticket; a conflict is the card, its keys session/pending or
 ## the ticket dropped; a test code reports this phone's AGE answer; then the launch cover comes up and the world's first
 ## read goes. unauthenticated is the Sign in page again; an account refusal is its page.
+const P0Identity := preload("res://modules/p0/p0_identity.gd")
 const STORE := "user://test_p0_first_launch_glue.json"
 var rt: P0Runtime
 var sent: Array = []

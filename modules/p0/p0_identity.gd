@@ -1,5 +1,6 @@
-class_name P0Identity extends RefCounted
-## Who this install is to the server (SGODOT-488 A2; contract-accounts.md §1): the session token and its player, kept in
+extends RefCounted
+## P0Identity (no class_name: callers preload it — the project's rule since #764, so a machine not yet imported still
+## parses them). Who this install is to the server (SGODOT-488 A2; contract-accounts.md §1): the session token and its player, kept in
 ## user://p0_session.json (and the player in p0_player.txt too: a server rolled back still knows it, the support code
 ## reads it), and the first launch's way — first_run() after hello(). Requests go through `send` (P0Session's: the
 ## headers, the demo key, the line), so this holds no HTTP of its own and the tests drive it with a fake.
