@@ -75,17 +75,36 @@ func test_a_sign_in_with_a_farm_goes_straight_in() -> void:
 	assert_bool(rt.session.identity_ready).is_true()
 	assert_object(rt._acc_flow).is_null()
 
-func test_a_closed_or_failed_sheet_sends_nothing() -> void:
+func test_a_closed_or_failed_sheet_sends_nothing_and_gives_the_keys_back() -> void:
 	rt.session.identity.kind = "new"
 	rt.session.first_run_needed.emit("new")
 	sheet = {"result": "cancelled"}
 	await rt._on_acc_sign_in("apple")
 	assert_array(sent).is_empty()
-	assert_array(rt._acc_flow.calls).is_empty()
+	assert_array(rt._acc_flow.calls).contains_exactly([["settled"]])
 	sheet = {"result": "failed", "reason": "APPLE_UNKNOWN"}
 	await rt._on_acc_sign_in("apple")
 	assert_array(sent).is_empty()   # never read as "no farm here"
-	assert_array(rt._acc_flow.calls).is_empty()
+	assert_array(rt._acc_flow.calls).contains_exactly([["settled"], ["settled"]])
+	sheet = SHEET_OK.duplicate()
+	replies["/p0/session/apple"] = {"ok": false, "code": "provider_unavailable"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(rt._acc_flow.calls[-1]).is_equal(["settled"])
+	replies["/p0/session/apple"] = {"ok": false, "code": "no_farm", "pending": "p"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(rt._acc_flow.calls[-1]).is_equal(["no_farm", true])   # its own page brings the keys back
+
+func test_entry_picks_the_page_and_the_keys() -> void:
+	var fake = load(rt.acc_flow_path)
+	fake.google_ok = false
+	rt.session.identity.email = false
+	rt.session.first_run_needed.emit("new")
+	assert_str(rt._acc_flow.kind).is_equal("no_google")
+	rt.session.identity.email = true
+	rt.session.first_run_needed.emit("new")
+	assert_str(rt._acc_flow.kind).is_equal("new")
+	assert_array(rt._acc_flow.providers).contains_exactly(["apple", "email"])
+	fake.google_ok = true
 
 func test_an_old_account_claims_with_its_age_then_keeps_its_name() -> void:
 	rt.session.identity.player = "p0-old0000000000000001"
