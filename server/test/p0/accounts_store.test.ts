@@ -88,6 +88,38 @@ describe('P0Accounts', () => {
     expect(JSON.parse(readFileSync(f, 'utf8')).deleted['p0-a']).toBeUndefined();
   });
 
+  it('lists deletion records after rows are removed and after restart, without exposing mutable state', () => {
+    const f = file(), now = 10_000;
+    const a = new P0Accounts(f, KEY, () => now);
+    a.ensure('p0-gone'); a.ensure('p0-half'); a.ensure('p0-live');
+    a.markDeleted('p0-gone', now - 100); a.remove('p0-gone');
+    a.markDeleted('p0-half', now);
+    const expected = [{ player: 'p0-gone', at: now - 100 }, { player: 'p0-half', at: now }];
+    expect(a.players()).not.toContain('p0-gone');
+    expect(a.deletedPlayers()).toEqual(expected);
+    const copy = a.deletedPlayers();
+    copy[0].player = 'p0-live'; copy[0].at = 0; copy.pop();
+    expect(a.deletedPlayers()).toEqual(expected);
+    expect(a.isDeleted('p0-live')).toBe(false);
+    expect(new P0Accounts(f, KEY, () => now).deletedPlayers()).toEqual(expected);
+  });
+
+  it('expires deletion listings at the existing boundary without pruning or writing during a read', () => {
+    let now = 0;
+    const f = file(), a = new P0Accounts(f, KEY, () => now);
+    a.markDeleted('p0-gone', now);
+    const before = readFileSync(f), inode = statSync(f).ino;
+    now = DELETED_KEEP_MS - 1;
+    expect(a.deletedPlayers()).toEqual([{ player: 'p0-gone', at: 0 }]);
+    now = DELETED_KEEP_MS;
+    expect(a.isDeleted('p0-gone')).toBe(false);
+    expect(a.deletedPlayers()).toEqual([]);
+    expect(readFileSync(f)).toEqual(before);
+    expect(statSync(f).ino).toBe(inode);
+    new P0Accounts(f, KEY, () => now);   // only the existing startup prune removes the persisted record
+    expect(JSON.parse(readFileSync(f, 'utf8')).deleted).toEqual({});
+  });
+
   it('takes tokens of 32 bytes or more, in hex', () => {
     expect(tokenShapeOk(T(1))).toBe(true);
     expect(tokenShapeOk('ab'.repeat(31))).toBe(false);
