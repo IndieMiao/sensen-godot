@@ -20,6 +20,14 @@ static func privacy_url(os_name: String, live := PRIVACY_LIVE) -> String:
 	if not live: return ""
 	return PRIVACY_IOS if os_name == "iOS" else PRIVACY_ANDROID
 
+## The Terms of Service (one page for both platforms): AGE's link and, since SGODOT-491 (奕星 11-14, frame 720:201692),
+## Legal's first row before Privacy Policy, opening the system browser the same way. The row shows only once the page
+## is up, as Privacy Policy's did: /terms was still 404 on 11-14 (it goes up with the store release, 11-23) — turn
+## TERMS_LIVE on then.
+const TERMS_URL := "https://gensen.app/terms"
+const TERMS_LIVE := false
+static func terms_url(live := TERMS_LIVE) -> String: return TERMS_URL if live else ""
+
 ## Where a player writes to us (the user 11-12: this address, no support@ — 李白's q(314)): Help and feedback's Contact
 ## us, its no-mail-app toast, the no-Google-services page (SGODOT-491).
 const SUPPORT_EMAIL := "shaojie@gensen.app"

@@ -3848,9 +3848,59 @@ func open_profile(look_saved := false) -> void:
 	page.title_pressed.connect(func():
 		_over_profile = true
 		open_titles(func(): open_profile()))
+	page.edit_name_pressed.connect(func():   # SGODOT-491: only with accounts
+		_over_profile = true
+		open_rename(func(): open_profile()))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
+
+## The profile's `Edit ›` (SGODOT-491; spec v1.1 §3): while the 7 days run (view.account.rename_at in the future) only
+## the toast `You can change your name again in 5 days` (days rounded up, 24 h or less `1 day`); else ACC-RENAME over the
+## profile. Its Save goes to the host (rename_requested → P0Session.rename), which answers rename_answer(r).
+signal rename_requested(name: String)
+const AccRename := preload("res://scenes/p0/account/p0_acc_rename.gd")
+var _rename: UiDrawer
+
+func open_rename(back := Callable(), now_ms := -1.0) -> void:
+	var now := now_ms if now_ms >= 0.0 else Time.get_unix_time_from_system() * 1000.0
+	var at := float(view.get("account", {}).get("rename_at", 0))
+	if at > now:
+		toast(rename_wait_text(at - now))
+		return
+	var d: UiDrawer = AccRename.new(str(view.get("account", {}).get("name", "")))
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_layer)
+	d.connect(&"cancelled", close_layer)
+	d.connect(&"save_pressed", func(n: String): rename_requested.emit(n))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	modal_kind = "rename"
+	_modal_back = back
+	_rename = d
+
+## The host's answer to rename_requested: {ok, name} — the drawer goes, `Name saved` (the view brings the name);
+## name_rejected — why in red, still open; rename_too_soon {rename_at} — the drawer goes, the wait's toast; anything else
+## — Save back, Didn't go through.
+func rename_answer(r: Dictionary, now_ms := -1.0) -> void:
+	if modal_kind != "rename" or not is_instance_valid(_rename): return
+	var code := "ok" if bool(r.get("ok", false)) else str(r.get("code", ""))
+	match code:
+		"ok":
+			close_layer()
+			toast("Name saved")
+		"name_rejected": _rename.call(&"refuse", str(r.get("reason", "blocked")))
+		"rename_too_soon":
+			close_layer()
+			var now := now_ms if now_ms >= 0.0 else Time.get_unix_time_from_system() * 1000.0
+			toast(rename_wait_text(float(r.get("rename_at", now)) - now))
+		_:
+			_rename.call(&"settle")
+			show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")
+
+## `You can change your name again in 5 days`: whole days rounded up, 24 h or less `1 day` (奕星 D-4: never `tomorrow`).
+static func rename_wait_text(ms: float) -> String:
+	var days := maxi(1, ceili(ms / 86400000.0))
+	return "You can change your name again in %s" % ("1 day" if days == 1 else "%d days" % days)
 
 ## q(180) Titles (P0TitlesDrawer) from the title beside the name on the profile, over the profile, Close 44 above it as
 ## MAP-8's. A row asks the server to wear that title and goes back to the profile, which shows it at once: the pick is
@@ -3927,8 +3977,31 @@ var player_of := func() -> String: return ""
 var account_of := func() -> String: return ""
 ## Settings' Sign out, confirmed on its card: the host calls P0Session.logout and shows the sign-in page.
 signal sign_out_requested
-## Settings' Delete account › (its two steps: 11-16).
+## Settings › Delete account's two steps both confirmed (Delete my account): the host calls the delete and, deleted,
+## shows the sign-in page — or delete_account_failed() (the key back, Didn't go through).
 signal delete_account_requested
+
+## Settings › Delete account (SGODOT-491; spec v1.1 §2.6): step 1, Continue → step 2, Delete my account → the host.
+## Keep my account and ‹ go back to Settings from either step.
+func open_delete_account(step: int, back: Callable) -> void:
+	var page := P0SettingsPage.delete_account(step, str(account_of.call()) == "apple", view, safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(what: String):
+		if what == "keep": back_modal()
+		elif what == "continue": open_delete_account(2, back)
+		elif what == "delete":
+			page.set_deleting(true)
+			delete_account_requested.emit())
+	_open_modal(page, 0.0, true)
+	modal_kind = "delete_account"
+	_modal_back = back
+
+## The host's, when the delete did not go through: step 2's key back, Didn't go through (SYS-CMD-FAIL); still on it.
+func delete_account_failed() -> void:
+	if modal_kind != "delete_account" or not is_instance_valid(_modal): return
+	for p in _modal.find_children("*", "P0SettingsPage", true, false): (p as P0SettingsPage).set_deleting(false)
+	show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")
 
 func _confirm_sign_out(back: Callable) -> void:
 	var confirm = preload("res://scenes/p0/account/p0_acc_sign_out.gd").card(str(account_of.call()))
@@ -3954,7 +4027,7 @@ func open_settings(back := Callable(), read := true) -> void:
 		_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD,   # q(309): always, voice or not (iOS too)
 		_voice_offered, LANGUAGE_NAMES.get(TranslationServer.get_locale(), "English"),   # the language on screen (不知火舞 A6), not a pick for the next start
 		P0Legal.privacy_url(OS.get_name()), P0Legal.support_code(str(player_of.call())),   # q(281) (SGODOT-390)
-		str(account_of.call()))   # SGODOT-491: Account, Sign out, Delete account
+		str(account_of.call()), P0Legal.terms_url())   # SGODOT-491: Account, Sign out, Delete account; Terms of Service
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
@@ -3966,11 +4039,12 @@ func open_settings(back := Callable(), read := true) -> void:
 		elif what == "blocked_players": open_blocked_players(func(): open_settings(back))
 		elif what == "voice_chat": open_voice_chat_info(func(): open_settings(back))
 		elif what == "privacy": ExternalLink.open(P0Legal.privacy_url(OS.get_name()))   # the system browser (q(281) ①)
+		elif what == "terms": ExternalLink.open(P0Legal.TERMS_URL)
 		elif what == "support_code":   # q(281) ②: the whole row copies the code; the row itself stays as it is
 			DisplayServer.clipboard_set(P0Legal.support_code(str(player_of.call())))
 			toast("Support code copied")
 		elif what == "sign_out": _confirm_sign_out(back)
-		elif what == "delete_account": delete_account_requested.emit()
+		elif what == "delete_account": open_delete_account(1, func(): open_settings(back))
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"

@@ -30,7 +30,7 @@ signal failed(code: String)      # NAME's check failed (network, rate_limited): 
 
 const RECORD := "user://p0_first_run.json"
 const VERSIONS := "res://assets/p0/legal/versions.json"   # 后裔's: the terms and privacy versions this build carries
-const TERMS_URL := "https://gensen.app/terms"
+const TERMS_URL := P0Legal.TERMS_URL
 const OLD_KINDS := ["old_age", "old_consent", "old_signin"]
 
 var kind := "new"

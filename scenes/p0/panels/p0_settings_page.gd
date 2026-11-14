@@ -4,8 +4,8 @@ extends Control
 ## surface: a fixed PageHeader (E-12) where the profile's top bar is — its back on the profile's back, safe area included
 ## (不知火舞 on #292: pages of one path, the back never jumps) — and the page scrolling under it, 16 in, 12 below it.
 ##   SETTINGS  (SETTINGS-1-2 1252:88686, P0 subset) only rows that do something (不知火舞: no greyed rows): the
-##             `Licenses ›`, visible `Test options ›`, and read-only `Version` (`0.2.1 (2026101001)`). Terms of Service and
-##             Privacy Policy join it once they have real addresses (奕星).
+##             `Licenses ›`, visible `Test options ›`, and read-only `Version` (`0.2.1 (2026101001)`); Terms of Service
+##             and Privacy Policy with their real addresses.
 ##   LICENSES  (SET-LICENSES 1254:88796) P0Legal's groups (Software, Map data), each row › to its text.
 ##   TEXT      no frame: the row's title in the header, its full text below — Regular 13 secondary, 16 in, paragraphs
 ##             8 apart (不知火舞: long legal text is too heavy in bold), the hard-wrapped lines joined (P0Legal). A credit
@@ -34,7 +34,7 @@ signal back_pressed
 signal open_pressed(what: String)
 signal toggled(what: String, on: bool)
 
-enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS, BLOCKED, LANGUAGE }
+enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS, BLOCKED, LANGUAGE, DELETE }
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -106,7 +106,8 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## `Voice chat ›`, no value (q(277); only while this phone is offered voice, 不知火舞). Neither: no Privacy group.
 ## `language` (0.2.22 中文版): the row's value, the language in use in its own words (`English` / `中文`); "" for none.
 ## q(281) (SGODOT-390, 不知火舞's spec 302 e92f4ff9 + 18f24a30, row 131): `privacy_url` "" or the policy's address —
-## Legal's first row `Privacy Policy ›` ("privacy"); `support_code` "" or `XXXXX-XXXXX` — Legal's last row after Version,
+## Legal's first row `Privacy Policy ›` ("privacy") — after `Terms of Service ›` ("terms") when `terms_url` is given
+## (SGODOT-491, frame 720:201692, the same look); `support_code` "" or `XXXXX-XXXXX` — Legal's last row after Version,
 ## `Support code` / `Tap to copy` with the code on the right and no ›, the whole row copying it ("support_code"), and
 ## under the card `Send this code with any request about your data.`
 ## SGODOT-491 (不知火舞's account spec v2 §5; 720:201692): `account` — how this farm signs in, "apple" / "google" / "email"
@@ -120,7 +121,7 @@ const _END_GAP := 8     # Legal → Sign out: 24 with the column's two 8s
 const _END_SEP := 12    # Sign out → Delete account
 static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
 		blocked := BLOCKED_NONE, voice_chat := false, language := "", privacy_url := "", support_code := "",
-		account := "") -> P0SettingsPage:
+		account := "", terms_url := "") -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if ACCOUNT_ROW.has(account):
 		var who := UiSettingRow.new(UiSettingRow.Kind.VALUE, str(ACCOUNT_ROW[account]))
@@ -161,6 +162,11 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		privacy.append(row)
 	if not privacy.is_empty(): page._group("Privacy", privacy)
 	var legal: Array = []
+	if terms_url != "":
+		var terms := UiSettingRow.new(UiSettingRow.Kind.LINK, "Terms of Service")
+		terms.name = "TermsOfService"
+		terms.pressed.connect(func(): page.open_pressed.emit("terms"))
+		legal.append(terms)
 	if privacy_url != "":
 		var policy := UiSettingRow.new(UiSettingRow.Kind.LINK, "Privacy Policy")
 		policy.name = "PrivacyPolicy"
@@ -405,6 +411,69 @@ func _group(title: String, rows: Array) -> void:
 		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		body.add_child(gap)
 	body.add_child(UiSettingRow.group(rows))
+
+## Settings › Delete account (SGODOT-491; 不知火舞's account spec v1.1 §2.6: the design's SET-DELETE-1 / -3 without -2's
+## sign-in again; ACC-DELETE-1 641:197426 / -2 641:197438, Homestead read Home as q(318)). The header ‹ `Delete account`;
+## 12 under it the title (XB20), 8 the body (Bold 14, secondary), 24 the danger key, 8 the info NavigationRow `Keep my
+## account ›`. Step 1: `Delete your account?` / `Your farm, items, coins and progress will be deleted. This can't be
+## undone.` and, 8 under it, `Gensen will also lose access to your Apple ID.` for an Apple-bound farm / `Continue`
+## ("continue"). Step 2: `Delete your account for good?` / what this farm has (delete_summary) / `Delete my account`
+## ("delete"). Keep my account is "keep" (the header's ‹ too: back_pressed). Deleting, the key greys in its pending
+## look (set_deleting; the kit's CommandButton in flight, no spinner) till the host answers.
+const DELETE_TITLE := {1: "Delete your account?", 2: "Delete your account for good?"}
+const DELETE_BODY := "Your farm, items, coins and progress will be deleted. This can't be undone."
+const DELETE_APPLE := "Gensen will also lose access to your Apple ID."
+const DELETE_KEY := {1: "Continue", 2: "Delete my account"}
+const KEEP_ACCOUNT := "Keep my account"
+const _DELETE_KEY_GAP := 8   # body → key: 24 with the column's two 8s
+static func delete_account(step: int, apple := false, view := {}, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.DELETE, "Delete account", safe_top, safe_bottom)
+	var title := UiKit.label(str(DELETE_TITLE[step]), UiTokens.STYLE_TITLE_XB20, UiTokens.COLOR_TEXT)
+	title.name = "Title"
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	page.body.add_child(title)
+	var lines: Array = [DELETE_BODY] + ([DELETE_APPLE] if apple else []) if step == 1 else [delete_summary(view)]
+	for i in lines.size():
+		var l := UiKit.label(str(lines[i]), UiTokens.STYLE_BODY_B14, UiTokens.COLOR_SECONDARY)
+		l.name = "Line" if i == 0 else "Line%d" % (i + 1)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		page.body.add_child(l)
+	var gap := Control.new()
+	gap.custom_minimum_size.y = _DELETE_KEY_GAP
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	page.body.add_child(gap)
+	var go := UiCommandButton.new(str(DELETE_KEY[step]), UiCommandButton.Kind.DESTRUCTIVE)
+	go.name = "Go"
+	go.activated.connect(func():
+		if go.phase == CommandLifecycle.State.IDLE: page.open_pressed.emit("continue" if step == 1 else "delete"))
+	page.body.add_child(go)
+	var keep := UiNavButton.new(KEEP_ACCOUNT)
+	keep.name = "Keep"
+	keep.pressed.connect(func(): page.open_pressed.emit("keep"))
+	page.body.add_child(keep)
+	return page
+
+## ACC-DELETE-2's line, what this farm really has (the design's sentence; 0s left out, 1 in the singular): `Your Home
+## Lv6, 230 coins and 19 bag items will be gone.`; a farm with nothing else `Your Home Lv1 will be gone.` — the table's
+## three templates (李白), each %s a part it translates again (`%d coins`, `1 coin`, `%d bag items`, `1 bag item`).
+static func delete_summary(view: Dictionary) -> String:
+	var level := int(view.get("homestead", {}).get("level", 1))
+	var coins := int(view.get("coins", 0))
+	var items := 0
+	for slot in view.get("bag", {}).get("slots", []): items += int(slot.get("qty", 0))
+	var parts: Array = []
+	if coins > 0: parts.append("1 coin" if coins == 1 else "%d coins" % coins)
+	if items > 0: parts.append("1 bag item" if items == 1 else "%d bag items" % items)
+	match parts.size():
+		2: return "Your Home Lv%d, %s and %s will be gone." % [level, parts[0], parts[1]]
+		1: return "Your Home Lv%d and %s will be gone." % [level, parts[0]]
+	return "Your Home Lv%d will be gone." % level
+
+## Step 2 while the delete is in flight: the key in its pending look, deaf; false gives it back (a failure's toast is the
+## host's).
+func set_deleting(on: bool) -> void:
+	var go := body.find_child("Go", false, false) as UiCommandButton
+	if go: go.phase = CommandLifecycle.State.PENDING if on else CommandLifecycle.State.IDLE
 
 ## Settings › Language (0.2.21 中文版): `English` and `中文`, each in its own words (never translated), a ✓ on the one
 ## picked; a pick is kept for the next start — the line under says so (the user's pick: a restart applies it).
