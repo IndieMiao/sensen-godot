@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import WebSocket from 'ws';
-import { deleteAccount, previewAccountDeletion } from '../../src/p0/accounts/delete.js';
+import { deleteAccount, previewAccountDeletion, registerAccountDeleteRoute } from '../../src/p0/accounts/delete.js';
 import { identify } from '../../src/p0/accounts/identify.js';
 import { registerAccountRoutes } from '../../src/p0/accounts/routes.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
@@ -242,5 +242,55 @@ describe('account deletion (contract-accounts §4)', () => {
     await deleteAccount({ ...deps, ...(missing === 'callback' ? { revokeApple: undefined } : {}) }, PLAYER);
     expect(deps.store.peek(PLAYER)).toBeUndefined();
     expect(warn.mock.calls).toEqual([[JSON.stringify({ account: 'apple_revoke_skipped', support_code: supportCode(PLAYER) })]]);
+  });
+});
+
+describe('DELETE /v1/p0/account (SGODOT-488; contract §4, v1.6.6)', () => {
+  const route = (over: { suspended?: (p: string) => { until: number | null } | null } = {}) => {
+    const { deps } = setup();
+    const app = Fastify();
+    const identity = { accounts: deps.accounts, legacyId: false, warn: () => {}, ...over };
+    registerAccountDeleteRoute(app, { ...deps, identify: identity });
+    registerP0Routes(app, { content, store: deps.store, now: deps.now, dev: false, identify: identity });
+    const del = (headers: Record<string, string>) => app.inject({ method: 'DELETE', url: '/v1/p0/account', headers });
+    return { deps, app, del };
+  };
+  it("deletes the token's own account (Apple's authorization withdrawn with it); its token then reads account_deleted", async () => {
+    const { deps, app, del } = route();
+    expect((await del({ authorization: `Bearer ${USER_TOKEN}` })).json()).toEqual({ ok: true });
+    expect(deps.store.peek(PLAYER)).toBeUndefined();
+    expect(deps.accounts.isDeleted(PLAYER)).toBe(true);
+    expect(deps.revokeApple).toHaveBeenCalledWith('app.gensen.maps.web', 'fake-refresh-private');
+    const r = await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { authorization: `Bearer ${USER_TOKEN}`, 'x-p0-player': PLAYER } });
+    expect([r.statusCode, r.json().code]).toEqual([401, 'account_deleted']);
+    expect(deps.store.peek(OTHER)).toBeDefined();
+  });
+  it('a suspended account can still delete itself; every other route still turns it away', async () => {
+    const { deps, app, del } = route({ suspended: p => (p === PLAYER ? { until: null } : null) });
+    const read = await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { authorization: `Bearer ${USER_TOKEN}` } });
+    expect([read.statusCode, read.json().code]).toEqual([403, 'suspended']);
+    expect((await del({ authorization: `Bearer ${USER_TOKEN}` })).json()).toEqual({ ok: true });
+    expect(deps.accounts.isDeleted(PLAYER)).toBe(true);
+  });
+  it('an id alone cannot delete (an old build, or anyone who knows an id); an unknown token is unauthenticated', async () => {
+    const { deps, del } = route();
+    const legacy = await del({ 'x-p0-player': THIRD });
+    expect([legacy.statusCode, legacy.json().code]).toEqual([401, 'unauthenticated']);
+    expect(deps.store.peek(THIRD)).toBeDefined();
+    const unknown = await del({ authorization: `Bearer ${'9'.repeat(64)}` });
+    expect([unknown.statusCode, unknown.json().code]).toEqual([401, 'unauthenticated']);
+  });
+  it('a later step that fails still answers ok — the account is gone for every request; the log asks the admin to finish', async () => {
+    const { deps, del } = route();
+    vi.spyOn(deps.store, 'remove').mockImplementationOnce(() => { throw new Error('disk'); });
+    const warned: string[] = [];
+    vi.spyOn(console, 'warn').mockImplementation((l: string) => { warned.push(l); });
+    expect((await del({ authorization: `Bearer ${USER_TOKEN}` })).json()).toEqual({ ok: true });
+    expect(deps.accounts.isDeleted(PLAYER)).toBe(true);
+    expect(deps.accounts.tokenOwner(USER_TOKEN)).toBeUndefined();
+    expect(warned).toContain(JSON.stringify({ account: 'delete_incomplete_app', support_code: supportCode(PLAYER) }));
+    expect(deps.store.peek(PLAYER)).toBeDefined();   // left for the admin's run on the tombstone
+    await deleteAccount(deps, PLAYER);
+    expect(deps.store.peek(PLAYER)).toBeUndefined();
   });
 });

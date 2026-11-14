@@ -217,3 +217,18 @@ func test_forget_drops_the_session_and_keeps_the_age_record() -> void:
 	assert_bool(FileAccess.file_exists(dir + "p0_session.json")).is_false()
 	assert_bool(FileAccess.file_exists(dir + "p0_player.txt")).is_false()
 	assert_bool(FileAccess.file_exists(dir + "p0_first_run.json")).is_true()
+
+func test_deleting_the_account_drops_the_session_and_the_id() -> void:
+	_write("p0_session.json", JSON.stringify({"v": 1, "player": "p0-del0000000000000001", "token": "ab".repeat(32), "linked": ["google"]}))
+	var id := _identity()
+	replies["/p0/account"] = {"ok": false, "code": "network"}
+	id.delete_account(func(_r): pass)
+	assert_bool(id.has_token()).is_true()   # not gone: nothing dropped
+	replies["/p0/account"] = {"ok": true}
+	id.delete_account(func(_r): pass)
+	assert_int(sent[-1].method).is_equal(HTTPClient.METHOD_DELETE)
+	assert_bool(id.has_token()).is_false()
+	assert_str(id.player).is_empty()
+	assert_bool(FileAccess.file_exists(dir + "p0_player.txt")).is_false()
+	assert_str(id.first_run()).is_equal("signed_out")
+	assert_dict(id.hints()).is_equal({"line": "", "with": ""})   # no last-time line for an account gone

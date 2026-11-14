@@ -1,8 +1,11 @@
 /** SGODOT-484, contract-accounts §4. Shared by authenticated App, admin, web and Apple-notification entry points.
- * No route is enabled here. Never use a support code as proof of identity. */
+ * The App's own route is here (registerAccountDeleteRoute, SGODOT-488); the others register theirs where they live.
+ * Never use a support code as proof of identity. */
+import type { FastifyInstance } from 'fastify';
 import type { P0Store } from '../store.js';
 import type { P0Voice } from '../online/voice.js';
 import { supportCode } from '../support.js';
+import { identify, isRefusal, type IdentifyDeps } from './identify.js';
 import { PROVIDERS, type P0Accounts } from './store.js';
 
 export interface DeleteDeps {
@@ -63,4 +66,22 @@ async function removeAccount(deps: DeleteDeps, player: string): Promise<void> {
     }
   }
   if (incomplete) throw new Error('ACCOUNT_DELETE_INCOMPLETE');
+}
+
+/**
+ * DELETE /v1/p0/account (contract §4, v1.6.6; SGODOT-488): the player's own account deleted from the App — its token
+ * only (an id alone, an old build's, cannot), and a suspended account too (App Store 5.1.1(v), Play: deletion open to
+ * every account). {ok: true} once the account is gone for every request (its tokens revoked, on the deleted list) —
+ * also when a later step failed (the save's file, voice): this phone's token is spent, so the App cannot ask again;
+ * deleteAccount has logged delete_incomplete with the support code, and the admin's run of it on the tombstone finishes.
+ */
+export function registerAccountDeleteRoute(app: FastifyInstance, deps: DeleteDeps & { identify: IdentifyDeps }): void {
+  app.delete('/v1/p0/account', async (req, reply) => {
+    const w = identify(req.headers, deps.identify, { evenSuspended: true });
+    if (isRefusal(w)) return reply.code(w.status).send(w.body);
+    if (w.via !== 'token') return reply.code(401).send({ ok: false, code: 'unauthenticated' });
+    try { await deleteAccount(deps, w.player); }
+    catch { console.warn(JSON.stringify({ account: 'delete_incomplete_app', support_code: supportCode(w.player) })); }
+    return { ok: true };
+  });
 }

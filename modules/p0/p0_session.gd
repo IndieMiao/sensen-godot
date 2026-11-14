@@ -175,6 +175,11 @@ func sign_in_code(code: String, done: Callable) -> void:
 func logout(done: Callable) -> void:
 	identity_ready = false
 	identity.logout(done)
+## App deletion (contract §4): every request stops once it is done; the runtime opens Sign in.
+func delete_account(done: Callable) -> void:
+	identity.delete_account(func(r: Dictionary):
+		if identity.first_run() == "signed_out": identity_ready = false
+		done.call(r))
 func name_check(name: String, done: Callable) -> void: identity.name_check(name, done)
 func guest(body: Dictionary, done: Callable) -> void:
 	identity.guest(body, _ready_on_ok.bind(done))

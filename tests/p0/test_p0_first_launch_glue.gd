@@ -195,6 +195,36 @@ func test_unauthenticated_is_the_sign_in_page_again() -> void:
 	assert_str(rt._acc_flow.kind).is_equal("signed_out")
 	assert_dict(rt._acc_flow.hints).is_equal({"line": "last_time", "with": "apple"})
 
+func test_the_account_group_names_the_sign_in() -> void:
+	assert_str(rt.account_of()).is_empty()   # no token: no Account group
+	rt.session.identity.token = "cd".repeat(32)
+	rt.session.identity.linked = ["apple"]
+	assert_str(rt.account_of()).is_equal("apple")
+	rt.session.identity.linked = []
+	assert_str(rt.account_of()).is_equal("code")
+	rt.session.accounts = false
+	assert_str(rt.account_of()).is_empty()
+
+func test_delete_my_account_then_sign_in_or_stays_on_a_failure() -> void:
+	rt.session.identity.player = "p0-gggggggggggggggggggg"
+	rt.session.identity.token = "cd".repeat(32)
+	rt.session.identity_ready = true
+	rt._on_delete_account()   # no answer (network): nothing gone, no Sign in
+	assert_bool(rt.session.identity.has_token()).is_true()
+	assert_object(rt._acc_flow).is_null()
+	replies["/p0/account"] = {"ok": true}
+	rt._on_delete_account()
+	assert_bool(rt.session.identity.has_token()).is_false()
+	assert_bool(rt.session.identity_ready).is_false()
+	assert_str(rt._acc_flow.kind).is_equal("signed_out")
+	assert_dict(rt._acc_flow.hints).is_equal({"line": "", "with": ""})
+
+func test_a_rename_goes_to_the_server() -> void:
+	rt.session.identity.token = "cd".repeat(32)
+	replies["/p0/account/name"] = {"ok": true, "name": "Mia", "rename_at": 1}
+	rt._on_rename("Mia")
+	assert_dict(_sent("/p0/account/name")[0][1]).is_equal({"name": "Mia"})
+
 func test_no_on_the_age_page_sends_nothing() -> void:
 	rt.session.identity.kind = "old_age"
 	rt.session.first_run_needed.emit("old_age")
