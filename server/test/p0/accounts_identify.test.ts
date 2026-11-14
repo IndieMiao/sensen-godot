@@ -1,6 +1,6 @@
 /** identify (SGODOT-488; contract-accounts.md §0–§1): one answer for who a request is. */
 import { describe, expect, it } from 'vitest';
-import { identify, isRefusal, bearerOf } from '../../src/p0/accounts/identify.js';
+import { identify, inForce, isRefusal, bearerOf } from '../../src/p0/accounts/identify.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
 
 const T = (n: number) => n.toString(16).padStart(64, '0');
@@ -64,5 +64,27 @@ describe('identify', () => {
     expect(bearerOf({ authorization: `Bearer ${T(5).toUpperCase()}` })).toBe(T(5));
     expect(bearerOf({ authorization: `Bearer ${'ab'.repeat(31)}` })).toBe('');
     expect(bearerOf({ authorization: T(5) })).toBe('');
+  });
+});
+
+describe('a suspension (SGODOT-484)', () => {
+  it('turns its player away on every way in — token or id alone — with until; none past its time; a deleted id says deleted', () => {
+    const a = new P0Accounts(); a.issue('p0-alpha001', T(1));
+    const until = Date.UTC(2026, 11, 1);
+    const sanctions: Record<string, { until: number | null }> = { 'p0-alpha001': { until }, 'p0-legacy01': { until: null } };
+    const d = deps(a, { suspended: p => sanctions[p] ?? null });
+    expect(identify(bearer(1), d)).toEqual({ status: 403, body: { ok: false, code: 'suspended', until: new Date(until).toISOString() } });
+    expect(identify({ 'x-p0-player': 'p0-legacy01' }, d)).toEqual({ status: 403, body: { ok: false, code: 'suspended', until: null } });
+    expect(identify({ 'x-p0-player': 'p0-other0001' }, d)).toEqual({ player: 'p0-other0001', via: 'legacy' });
+    // deletion stays open to a suspended account (App Store 5.1.1(v), Play): its route asks evenSuspended
+    expect(identify(bearer(1), d, { evenSuspended: true })).toEqual({ player: 'p0-alpha001', via: 'token' });
+    a.markDeleted('p0-legacy01', Date.now());
+    expect((identify({ 'x-p0-player': 'p0-legacy01' }, d) as { body: { code: string } }).body.code).toBe('account_deleted');
+  });
+  it('inForce: for good, till a time to come; not past it, not absent', () => {
+    expect(inForce({ until: null }, 5)).toEqual({ until: null });
+    expect(inForce({ until: 10 }, 5)).toEqual({ until: 10 });
+    expect(inForce({ until: 5 }, 5)).toBeNull();
+    expect(inForce(undefined, 5)).toBeNull();
   });
 });

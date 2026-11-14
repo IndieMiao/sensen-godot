@@ -1434,19 +1434,12 @@ func _on_first_run_needed(kind: String) -> void:
 			_launch_retry_left = LAUNCH_RETRY_S
 		_: _open_acc_flow(kind)
 
-## An Android phone without Google's services, the email way off: NO-GMS (v1.4 ⑮) in place of the Sign in page.
-func _no_google(kind: String) -> bool:
-	return not kind in ["blocked", "old_blocked"] and OS.get_name() == "Android" and not GoogleSignIn.available() \
-		and not session.identity.email
-
-## Sign in's keys on this phone: P0SignIn's (iOS Apple and Google, Android Google), Google gone without its services;
-## email last when the server offers it.
-func _sign_in_providers() -> Array:
-	var script = load(SIGN_IN_PATH) if ResourceLoader.exists(SIGN_IN_PATH) else null
-	var p: Array = script.providers() if script != null else []
-	if OS.get_name() == "Android" and not GoogleSignIn.available(): p.erase("google")
-	if session.identity.email: p.append("email")
-	return p
+## The page a kind opens on this phone and Sign in's keys (哪吒's static P0AccFlow.entry, 11-14): NO-GMS in place of
+## the Sign in page on an Android phone without Google's services when email is off (v1.4 ⑮), Google's key gone there,
+## email's when hello offers it. A flow without entry (an older one): the kind as it is, no keys.
+func _entry(script: Script, kind: String) -> Dictionary:
+	if not script.get_script_method_list().any(func(m): return m.name == "entry"): return {"kind": kind, "providers": []}
+	return script.call("entry", kind, session.identity.email)
 
 func _open_acc_flow(kind: String) -> void:
 	_launch_s = -1.0
@@ -1457,8 +1450,8 @@ func _open_acc_flow(kind: String) -> void:
 		push_warning("P0 accounts: no first-launch pages in this build (%s)" % acc_flow_path)
 		return
 	_naming = "guest"
-	_acc_flow = script.new("no_google" if _no_google(kind) else kind, session.name_check, _sign_in_providers(),
-		session.identity.hints(), 0)
+	var e := _entry(script, kind)
+	_acc_flow = script.new(str(e.get("kind", kind)), session.name_check, e.get("providers", []), session.identity.hints(), 0)
 	_acc_layer = CanvasLayer.new()
 	_acc_layer.layer = 120   # over the HUD, the toasts and the system screens
 	add_child(_acc_layer)
@@ -1484,16 +1477,21 @@ func _consent_body() -> Dictionary:
 func _on_acc_agreed(age_ok: bool, kind: String) -> void:
 	if age_ok: session.identity.agree(kind != "old_consent")
 
-## A sign-in key: the phone's sheet, then the server — claim for an old install's id (the claim and the link in one
-## step), session/apple | google otherwise. Email is 亚瑟's glue (SGODOT-497): its pages call sign_in / claim themselves.
+## A sign-in key (apple / google): the phone's sheet, then the server — claim for an old install's id (the claim and the
+## link in one step), session/apple | google otherwise. Email never comes here: P0AccFlow opens 盘古's email pages
+## itself and 亚瑟's glue (SGODOT-497) calls email_start and sign_in / claim("email", …), its answers to _on_signed_in.
 func _on_acc_sign_in(provider: String) -> void:
-	if provider == "email" or _signing: return
+	if _signing: return
 	_signing = true
 	var r: Dictionary = await native_sign_in.call(provider)
 	_signing = false
-	if not is_instance_valid(_acc_flow) or str(r.get("result", "")) == "cancelled": return   # closed: nothing said
+	if not is_instance_valid(_acc_flow): return
+	if str(r.get("result", "")) == "cancelled":   # closed: nothing said, the keys back
+		_settle()
+		return
 	if str(r.get("result", "")) != "ok":
 		_acc_failed({})
+		_settle()
 		return
 	_provider = provider
 	var creds := {"id_token": str(r.get("id_token", "")), "nonce": str(r.get("nonce", "")), "auth_code": str(r.get("auth_code", ""))}
@@ -1532,6 +1530,15 @@ func _on_signed_in(r: Dictionary, how: String) -> void:
 		"bad_code", "rate_limited" when how == "code":
 			if _acc_flow.has_method("code_refused"): _acc_flow.call("code_refused", r)
 		_: _acc_failed(r)
+	var own_page := str(r.get("code", "")) in ["no_farm", "conflict", "claimed"] \
+		or (how == "code" and str(r.get("code", "")) in ["bad_code", "rate_limited"])
+	if not own_page: _settle()   # those bring their own page (code_refused the code page's), the keys back there
+
+## Sign in's keys back (哪吒's anti double-tap, 11-14): greyed from a tap on apple / google or a code till an answer —
+## no_farm / conflict / claimed and a code refused restore them on their own page; a sheet closed, a failure toasted or
+## anything else, here.
+func _settle() -> void:
+	if is_instance_valid(_acc_flow) and _acc_flow.has_method("sign_in_settled"): _acc_flow.call("sign_in_settled")
 
 ## An old account claimed (v3.3 §3.3): NAME without Try another account; Skip keeps its name.
 func _name_signed_in() -> void:

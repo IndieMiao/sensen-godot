@@ -7,7 +7,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadOutposts, pondRoomSpec } from '../../src/p0/online/outposts.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
 import { publicPlayer } from '../../src/p0/online/hub.js';
-import { NO_VOICE_ROLES, P0Voice, p0VoiceFromEnv, registerP0Voice, RELEASE_RETRY_MS, VOICE_LEASE_MS } from '../../src/p0/online/voice.js';
+import { NO_VOICE_ROLES, P0Voice, p0VoiceFromEnv, registerP0Voice, RELEASE_RETRY_MS, reportReason, VOICE_LEASE_MS } from '../../src/p0/online/voice.js';
+import { supportCode } from '../../src/p0/support.js';
 
 // Voice in the online rooms (SGODOT-383; the user, 11-02 via 奕星, q(274)): the voice room is the hub's room; LiveKit sees
 // the peer id, never the player id; Market Square has none; Block is both ways and kept; Report is a log line; no 13+
@@ -283,15 +284,38 @@ describe('P0 voice (SGODOT-383)', () => {
     expect(seen).toEqual([['player-aaaa', 'player-bbbb'], ['player-aaaa', 'player-bbbb']]);
   });
 
-  it('Report writes one line — who, whom, when, where — and nothing else happens', () => {
+  it('Report writes one v2 line — its id, the support codes, the name then, the reason, where, the channel — hands it on, and nothing else happens (SGODOT-484)', () => {
+    const { voice, enter, files } = setup();
+    const handed: unknown[] = [];
+    voice.onReport = l => { handed.push(l); };
+    voice.nameOf = p => (p === 'player-bbbb' ? 'Mia' : null);
+    const logged: string[] = [];
+    const log = vi.spyOn(console, 'log').mockImplementation((l: string) => { logged.push(l); });
+    try {
+      enter('player-aaaa');
+      const b = enter('player-bbbb');
+      expect(voice.report('player-aaaa', b.id, 'harassment', 'play')).toEqual({ ok: true, already: false });
+      expect(voice.report('player-aaaa', b.id, '')).toEqual({ ok: true, already: true });   // You already reported this: no second line
+      const text = readFileSync(files.reports, 'utf8');
+      const line = JSON.parse(text.trim());
+      expect(line).toEqual({ kind: 'voice_report', v: 2, id: expect.stringMatching(/^R-\d{8}-[0-9A-HJKMNP-TV-Z]{8}$/), at: expect.any(String),
+        reporter_code: supportCode('player-aaaa'), reported_code: supportCode('player-bbbb'), name: 'Mia',
+        reason: 'harassment', place: 'sh_tea_1', room: 1, channel: 'play' });
+      expect(handed).toEqual([line]);   // handed on once, after the line is written
+      for (const t of [text, ...logged]) expect(t).not.toMatch(/player-aaaa|player-bbbb/);   // no player id kept or logged (§3.2)
+      expect(logged.join('')).not.toContain('Mia');
+      expect(voice.blockedPeers('player-aaaa')).toEqual([]);
+    } finally { log.mockRestore(); }
+  });
+
+  it("a reason outside the sheet's five, and a channel not a build's, are kept as other and ''", () => {
     const { voice, enter, files } = setup();
     enter('player-aaaa');
     const b = enter('player-bbbb');
-    expect(voice.report('player-aaaa', b.id, 'shouting')).toEqual({ ok: true, already: false });
-    expect(voice.report('player-aaaa', b.id, '')).toEqual({ ok: true, already: true });   // You already reported this: no second line
-    const line = JSON.parse(readFileSync(files.reports, 'utf8').trim());
-    expect(line).toMatchObject({ kind: 'voice_report', reporter: 'player-aaaa', reported: 'player-bbbb', place: 'sh_tea_1', room: 1, reason: 'shouting' });
-    expect(voice.blockedPeers('player-aaaa')).toEqual([]);
+    voice.report('player-aaaa', b.id, 'shouting', 'evil');
+    expect(JSON.parse(readFileSync(files.reports, 'utf8').trim())).toMatchObject({ reason: 'other', channel: '', name: null });
+    expect(reportReason('offensive_voice')).toBe('offensive_voice');
+    expect(reportReason(42)).toBe('other');
   });
 
   it('routes: a refusal is an HTTP error with its code (PartyVoiceSession reads non-2xx as one); the grant is a 200', async () => {
@@ -316,7 +340,8 @@ describe('P0 voice (SGODOT-383)', () => {
     enter('player-bbbb');
     expect((await post('/v1/p0/voice/block', { peer: '2', on: true })).json()).toEqual({ ok: true, blocked: ['2'] });
     expect((await post('/v1/p0/voice/block', { peer: 2, on: false })).json()).toEqual({ ok: true, blocked: [] });
-    expect((await post('/v1/p0/voice/report', { peer: '2' })).json()).toEqual({ ok: true, already: false });
+    expect((await app.inject({ method: 'POST', url: '/v1/p0/voice/report', payload: { peer: '2', reason: 'cheating' },
+      headers: { 'x-p0-player': 'player-aaaa', 'x-p0-channel': 'appstore' } })).json()).toEqual({ ok: true, already: false });
     expect((await post('/v1/p0/voice/report', { peer: '2.5' })).statusCode).toBe(400);
     expect((await post('/v1/p0/voice/leave', { lease_id: r.json().lease_id })).json()).toEqual({ ok: true });
     await app.close();

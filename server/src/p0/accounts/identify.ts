@@ -8,23 +8,31 @@
  * - `x-p0-player` alone: a deleted one is refused, P0_LEGACY_ID or not. P0_LEGACY_ID takes any other as it is
  *   (devserver, shots, tests). Otherwise a player who has claimed is sent to update (426 update_required: an old build on
  *   a claimed account), and anyone else is taken as before (the transition: old builds keep playing until the forced update).
+ * - Whoever it is, a suspension in force (SGODOT-484, `suspended`) turns them away: 403 suspended {until: ISO | null}.
  */
 import type { P0Accounts } from './store.js';
 
 const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
 export type Who = { player: string; via: 'token' | 'legacy' };
-export type Refusal = { status: number; body: { ok: false; code: string; url?: string } };
+export type Refusal = { status: number; body: { ok: false; code: string; url?: string; until?: string | null } };
 export interface IdentifyDeps {
   accounts: P0Accounts;
   legacyId: boolean;
   /** The store's download link for update_required (the gate's), when there is one. */
   updateUrl?: () => string | undefined;
   warn?: (line: string) => void;
+  /** The player's suspension in force (SGODOT-484: the save's sanctions.suspended, past `until` none — inForce), or none. */
+  suspended?: (player: string) => { until: number | null } | null | undefined;
+}
+
+/** A sanction still in force at `now`: for good (until null) or till a time not yet come. */
+export function inForce<T extends { until: number | null }>(x: T | undefined, now: number): T | null {
+  return x && (x.until === null || x.until > now) ? x : null;
 }
 
 export const isRefusal = (w: Who | Refusal): w is Refusal => 'status' in w;
-const refuse = (status: number, code: string, extra: Record<string, string> = {}): Refusal => ({ status, body: { ok: false, code, ...extra } });
+const refuse = (status: number, code: string, extra: { url?: string; until?: string | null } = {}): Refusal => ({ status, body: { ok: false, code, ...extra } });
 
 /** The bearer token in `authorization`, or '' (not one, or not shaped like one). */
 export function bearerOf(headers: Record<string, unknown>): string {
@@ -32,7 +40,16 @@ export function bearerOf(headers: Record<string, unknown>): string {
   return m ? m[1].toLowerCase() : '';
 }
 
-export function identify(headers: Record<string, unknown>, deps: IdentifyDeps): Who | Refusal {
+/** `evenSuspended`: the one way a suspended player still has — deleting the account (DELETE /v1/p0/account; App Store
+ *  5.1.1(v) and Play want deletion open to every account, 周瑜 on #1043). Every other caller leaves it out. */
+export function identify(headers: Record<string, unknown>, deps: IdentifyDeps, opts: { evenSuspended?: boolean } = {}): Who | Refusal {
+  const w = whoIs(headers, deps);
+  if (isRefusal(w) || opts.evenSuspended) return w;
+  const s = deps.suspended?.(w.player);
+  return s ? refuse(403, 'suspended', { until: s.until === null ? null : new Date(s.until).toISOString() }) : w;
+}
+
+function whoIs(headers: Record<string, unknown>, deps: IdentifyDeps): Who | Refusal {
   const id = String(headers['x-p0-player'] ?? '');
   const legacy = PLAYER_RE.test(id) ? id : '';
   const token = bearerOf(headers);

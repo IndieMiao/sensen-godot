@@ -24,4 +24,12 @@ func no_farm(fresh := true) -> void: calls.append(["no_farm", fresh])
 func conflict(farm: Dictionary, provider: String) -> void: calls.append(["conflict", farm, provider])
 func claimed(linked: Array) -> void: calls.append(["claimed", linked])
 func kept() -> Dictionary: return record
+func sign_in_settled() -> void: calls.append(["settled"])
+## 哪吒's static entry (11-14): NO-GMS where Google cannot sign in and email is off; Sign in's keys.
+static var google_ok := true
+static func entry(k: String, email_on: bool) -> Dictionary:
+	if not google_ok and not email_on and not k in ["blocked", "old_blocked"]: return {"kind": "no_google", "providers": []}
+	var p: Array = ["apple", "google"] if google_ok else ["apple"]
+	if email_on: p.append("email")
+	return {"kind": k, "providers": p}
 func back() -> bool: return true

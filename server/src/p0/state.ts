@@ -186,6 +186,9 @@ export const SAVE_VERSION = 7;
 /** The weapon a new save holds (v7, 355 G; 周瑜's contract v0.1: weapon ids are weapon_*, the G PR adds the item). */
 export const START_WEAPON = 'weapon_wooden_sword';
 
+/** One sanction in force from `at` (SGODOT-484): till `until`, or for good when null. */
+export interface Sanction { until: number | null; at: number; report?: string }
+
 export interface P0State {
   v: 7;
   player: string;
@@ -252,6 +255,9 @@ export interface P0State {
   age_ok?: true;
   test?: true;                   // SGODOT-488 §2.5: a test account (Test options' Start new test account), left out of the counts
   login?: 'code';                // contract v1.4 §4: an account a test code signs into (a reviewer's, a tester's without Google)
+  // SGODOT-484 sanctions (苏烈's admin commands write it, through the admin port only; identify reads suspended, voice join
+  // reads voice; never in the view). until: ms, null for good; report: the report id that brought it (R-YYYYMMDD-…).
+  sanctions?: { suspended?: Sanction; voice?: Sanction; name_reset_at?: number };
   rng: number;
   seq: number;
 }
