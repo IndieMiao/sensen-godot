@@ -189,6 +189,19 @@ func _keyboard() -> float:
 	if px <= 0: return 0.0
 	return float(px) * get_viewport().get_visible_rect().size.y / maxf(1.0, float(DisplayServer.window_get_size().y))
 
+## Over the page under it instead of on its own ground (spec v2 §9's updated-terms card): no cream, no art, no wordmark —
+## the modal scrim, the card where it is. It still takes every touch.
+func as_overlay() -> void:
+	for id in ["Surface", "Backdrop"]: (get_node(id) as CanvasItem).visible = false
+	mark.visible = false
+	var scrim := ColorRect.new()
+	scrim.name = "Scrim"
+	scrim.color = UiTokens.COLOR_SCRIM_MODAL
+	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(scrim)
+	move_child(scrim, 0)
+
 func _layout() -> void:
 	var w := size.x
 	var h := size.y
