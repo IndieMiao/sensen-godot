@@ -15,15 +15,31 @@ extends Control
 ##               usual…` on its own pill under the bar. No spinner.
 ##   PLACE_FAIL  SYS-LOADING-SCENE-FAIL 1780:103778 (q(78)): getting to a place failed, over the same map under the modal
 ##               scrim; `Couldn't get there` · Retry (the same place again) · Go back (where the player came from; Back too)
+##   SESSION     SYS-SESSION 645:197668 (the design's 9:119672; 不知火舞's account spec v1.1 §6.1) — 401 session_replaced:
+##               `Signed in on another device` · `You've been signed out here.` · Sign in
+##   DELETED     SYS-DELETED 720:201839 (spec v2 §6) — 401 account_deleted: `This account was deleted` · `Sign in to start
+##               a new farm.` · Sign in
+##   SUSPENDED   ACC-SUSPENDED 645:197762 / -PERM 645:197805 (spec v1.1 §6.4) — 403 suspended: `Account suspended` · `You
+##               can play again on Nov 20.` (or `This account can't be used anymore.` with no end) · the support code line
+##               (a tap copies it) · Contact us
+##   The three account states stand on the cream as MAINT and UPDATE (the user 11-11 bot 733), the face-player icon in the
+##   disc; no other way out (P0Ui.show_account_state).
 ## show_kind(kind, detail) draws one; `primary_pressed(kind)` is its card's button.
 
 signal primary_pressed(kind: Kind)
 ## The card's secondary (PLACE_FAIL's Go back).
 signal secondary_pressed(kind: Kind)
+## The card's small line (SUSPENDED's support code).
+signal note_pressed(kind: Kind)
 
-enum Kind { LAUNCH, FAIL, MAINT, UPDATE, SCENE, PLACE_FAIL }
+enum Kind { LAUNCH, FAIL, MAINT, UPDATE, SCENE, PLACE_FAIL, SESSION, DELETED, SUSPENDED }
+## The states on the account shell's cream (the art on the screen's foot, the wordmark, the card).
+const CREAM := [Kind.MAINT, Kind.UPDATE, Kind.SESSION, Kind.DELETED, Kind.SUSPENDED]
 
-const BACKDROP := preload("res://assets/p0/ui/sys_backdrop_farm.jpg")
+## MAINT and UPDATE's ground: the account shell's brand cream (the user 11-11 bot 733, 「系统页也换」, as the sign-up's
+## scheme 3 bot 728): #F6F4EA, the art the screen's width on its foot, the cream on up past it. The farm art it replaces
+## is gone.
+const BACKDROP := P0AccShell.BACKDROP
 ## The launch splash (SGODOT-420, 1214 × 1618): q(290)'s art (the user's v2, 747 × 1618) unchanged in the middle at
 ## x 233, its blurred copy baked into the sides (radius about 20 px, 6 % darker). Also project.godot's boot splash
 ## image (stretch Keep Height) and the iOS launch screen's (tools/ios): keep the three the same file.
@@ -42,6 +58,7 @@ const SPLASH_CARD_RADIUS := 16
 const SPLASH_FADE_OUT := 0.3     # into the first scene
 const SPLASH_MIN_S := 0.8        # shown at least this long: a quick launch does not flash it
 const CLOCK := preload("res://assets/p0/icons/clock.svg")
+const FACE := preload("res://assets/p0/icons/face_player.svg")   # Gensen / Icon / i-face-player (9:956)
 const WIFI_OFF := preload("res://assets/ui/kit_icons/wifi_off.svg")
 const SLOW_TEXT := "Taking longer than usual…"
 ## The scene cover's town map (上官婉儿, Sensenjoy, 1080 × 2340, the centre left plain; 不知火舞 425), covering the screen.
@@ -69,7 +86,6 @@ const SCENE_SLOW_PAD := 12.0
 const SCENE_SHADOW := Color(0, 0, 0, 0.12)
 
 const _FRAME_H := 800.0
-const _ART_TOP := 330.0          # Scene art · farm (backdrop) at y 330, 360 × 800, cropped by the screen
 const _MARK_TOP_LAUNCH := 330.0  # the wordmark alone, a little above the middle
 const _MARK_TOP := 84.0          # over a SystemCard
 const _SPINNER_BELOW := 66.0     # spinner at y 396 under the launch wordmark at 330
@@ -91,7 +107,6 @@ var progress := 0.0:
 
 var _bg: ColorRect
 var _art: TextureRect
-var _fade: TextureRect
 var _splash: TextureRect
 var _slow_card: Panel
 var _splash_since := -1   # msec the splash first showed, -1 before
@@ -129,16 +144,9 @@ func _init() -> void:
 	_art = TextureRect.new()
 	_art.texture = BACKDROP
 	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_art.stretch_mode = TextureRect.STRETCH_SCALE
 	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_art)
-	_fade = TextureRect.new()
-	_fade.texture = _fade_texture()
-	_fade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_fade.stretch_mode = TextureRect.STRETCH_SCALE
-	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_fade)
 	_map = TextureRect.new()
 	_map.name = "SceneMap"
 	_map.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -212,6 +220,7 @@ func _init() -> void:
 	card = UiSystemCard.new()
 	card.primary_pressed.connect(func(): primary_pressed.emit(kind))
 	card.secondary_pressed.connect(func(): secondary_pressed.emit(kind))
+	card.note_pressed.connect(func(): note_pressed.emit(kind))
 	card.minimum_size_changed.connect(_layout)   # a card outside a container never shrinks on its own
 	add_child(card)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -230,22 +239,9 @@ func _scene_panel(id: String, radius: float, edge := UiTokens.COLOR_BORDER, widt
 	add_child(p)
 	return p
 
-## Surface at the top fading out toward the art at the bottom (Backdrop fade: 100 % to the middle, 35 % at 72 %, 0).
-static func _fade_texture() -> GradientTexture2D:
-	var g := Gradient.new()
-	var s := UiTokens.COLOR_SURFACE
-	g.offsets = PackedFloat32Array([0.0, 0.5, 0.72, 1.0])
-	g.colors = PackedColorArray([s, s, Color(s, 0.35), Color(s, 0.0)])
-	var t := GradientTexture2D.new()
-	t.gradient = g
-	t.fill_from = Vector2(0, 0)
-	t.fill_to = Vector2(0, 1)
-	t.width = 4
-	t.height = 256
-	return t
-
 ## kind: the state; detail: {back_at (MAINT, "HH:MM" local or ""), place (SCENE), icon (SCENE: the destination pin's
-## Texture2D), progress (SCENE, 0–1), card ({…} for PLACE_FAIL)}.
+## Texture2D), progress (SCENE, 0–1), card ({…} for PLACE_FAIL), until (SUSPENDED: `Nov 20` already in the player's
+## words, "" for no end), code (SUSPENDED: the support code, "" hides its line)}.
 func show_kind(k: Kind, d := {}) -> void:
 	kind = k
 	detail = d
@@ -254,12 +250,11 @@ func show_kind(k: Kind, d := {}) -> void:
 	# launch backdrop or wordmark (不知火舞 233 walkthrough).
 	var scene := k in [Kind.SCENE, Kind.PLACE_FAIL]
 	var splash := k in [Kind.LAUNCH, Kind.FAIL]   # q(290): the splash art in place of the farm backdrop and wordmark
-	_bg.color = SPLASH_SKY if splash else UiTokens.COLOR_SURFACE
+	_bg.color = SPLASH_SKY if splash else (P0AccShell.GROUND if k in CREAM else UiTokens.COLOR_SURFACE)
 	_splash.visible = splash
 	# Whole from its first frame (420): it takes over from the boot splash's same image, a fade would flash the sky.
 	if splash and _splash_since < 0: _splash_since = Time.get_ticks_msec()
 	_art.visible = not scene and not splash
-	_fade.visible = not scene and not splash
 	_map.visible = scene
 	if scene and _map.texture == null: _map.texture = load(SCENE_MAP)
 	_haze.visible = scene
@@ -275,7 +270,7 @@ func show_kind(k: Kind, d := {}) -> void:
 	progress = float(d.get("progress", 0.0))
 	spinner.visible = false
 	_caption.visible = false
-	card.visible = k in [Kind.FAIL, Kind.MAINT, Kind.UPDATE, Kind.PLACE_FAIL]
+	card.visible = k in [Kind.FAIL, Kind.PLACE_FAIL] or k in CREAM
 	if card.visible: card.show_card(card_spec(k, d))
 	_layout()
 
@@ -303,6 +298,16 @@ static func card_spec(k: Kind, d := {}) -> Dictionary:
 		Kind.PLACE_FAIL:   # SYS-LOADING-SCENE-FAIL 1780:103778, q(78): like Can't connect, plus the way back
 			return {icon = WIFI_OFF, icon_tint = UiTokens.COLOR_TEXT, title = "Couldn't get there",
 				body = "Check your connection and try again.", primary = "Retry", secondary = "Go back"}
+		Kind.SESSION:   # the design's own lines (LOCK-28)
+			return {icon = FACE, title = "Signed in on another device", body = "You've been signed out here.", primary = "Sign in"}
+		Kind.DELETED:   # spec v2 §6: no new farm here any more, signing in leads to one
+			return {icon = FACE, title = "This account was deleted", body = "Sign in to start a new farm.", primary = "Sign in"}
+		Kind.SUSPENDED:
+			var until := str(d.get("until", ""))
+			var code := str(d.get("code", ""))
+			return {icon = FACE, title = "Account suspended",
+				body = ("You can play again on %s." % until) if until != "" else "This account can't be used anymore.",
+				note = ("Support code %s" % code) if code != "" else "", primary = "Contact us"}
 	return {}
 
 ## 8 s in: `Taking longer than usual…` (LOADING-2) — with the spinner on a small surface card over the launch's splash
@@ -355,8 +360,9 @@ func _layout() -> void:
 	var sl := splash_layout(Vector2(w, h))
 	_splash.position = sl.origin
 	_splash.size = SPLASH_SIZE * float(sl.scale)
-	_art.position = Vector2(0, roundf(_ART_TOP * k))
-	_art.size = Vector2(w, h)
+	var art_h := roundf(w * BACKDROP.get_height() / BACKDROP.get_width())   # on the screen's foot, as the account shell's
+	_art.position = Vector2(0, h - art_h)
+	_art.size = Vector2(w, art_h)
 	var mark_size := _mark.get_combined_minimum_size()
 	var mark_top := roundf(_MARK_TOP_LAUNCH * k) if kind == Kind.LAUNCH else _MARK_TOP
 	_mark.position = Vector2(roundf((w - mark_size.x) * 0.5), mark_top)

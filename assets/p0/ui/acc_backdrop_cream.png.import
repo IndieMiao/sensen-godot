@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cbjktsgcv0o30"
-path="res://.godot/imported/sys_backdrop_farm.jpg-2fbc5d6703a46cdf6e66f30a01b77e8b.ctex"
+uid="uid://cg3hq50ivvwh3"
+path="res://.godot/imported/acc_backdrop_cream.png-b7fb60524aede641a9dc6cd3f7219094.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/p0/ui/sys_backdrop_farm.jpg"
-dest_files=["res://.godot/imported/sys_backdrop_farm.jpg-2fbc5d6703a46cdf6e66f30a01b77e8b.ctex"]
+source_file="res://assets/p0/ui/acc_backdrop_cream.png"
+dest_files=["res://.godot/imported/acc_backdrop_cream.png-b7fb60524aede641a9dc6cd3f7219094.ctex"]
 
 [params]
 

@@ -11,6 +11,7 @@ extends PanelContainer
 ##   VALUE  title and its value on the right (Bold 14 secondary), read-only without › (`Version` · `0.2.1 (…)`).
 ##   TOGGLE title, an optional line, the 48 × 28 Toggle on the right (Gensen Refactor/Toggle 1236:107861: green track
 ##          on, neutral off); the whole row switches it (q(133) v3 `Share anonymous map usage`).
+## set_danger(): Kind=Danger's red title and › (`Delete account`).
 ## group(rows) puts rows in a 16-radius card, 1 apart on the border colour (SettingRow's Group).
 ## Emits pressed (LINK), toggled(on) (TOGGLE).
 
@@ -108,6 +109,12 @@ func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "
 			toggled.emit(on)
 		else: pressed.emit())
 	add_child(hit)
+
+## SettingRow Kind=Danger (9:104929, `Delete account`): the title and its › in the danger red, the line as it was.
+func set_danger() -> void:
+	for id in ["Title", "Chevron"]:
+		var l := find_child(id, true, false) as Label
+		if l: l.add_theme_color_override(&"font_color", UiTokens.COLOR_DANGER)
 
 func set_on(v: bool) -> void:
 	on = v
