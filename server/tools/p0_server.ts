@@ -11,9 +11,9 @@ import { accountsConfig, applePrivateKey } from '../src/p0/accounts/config.js';
 import { GOOGLE_JWKS_URL, googleVerifier, registerGoogleRoutes } from '../src/p0/accounts/google.js';
 import { alertMailerFromEnv, EmailCodes, emailReady, emailVerifier, registerEmailRoutes, signInMailerFromEnv } from '../src/p0/accounts/email.js';
 import { CachedJwks, jwksFetcher } from '../src/p0/accounts/jwt.js';
-import { expiredSignIn, PendingSignIns } from '../src/p0/accounts/link.js';
+import { consentNote, expiredSignIn, PendingSignIns } from '../src/p0/accounts/link.js';
 import { identify, inForce, isRefusal } from '../src/p0/accounts/identify.js';
-import { registerAccountRoutes } from '../src/p0/accounts/routes.js';
+import { legalVersions, registerAccountRoutes } from '../src/p0/accounts/routes.js';
 import { registerCodeRoutes } from '../src/p0/accounts/codes.js';
 import { registerAccountDeleteRoute } from '../src/p0/accounts/delete.js';
 import { P0Accounts } from '../src/p0/accounts/store.js';
@@ -154,10 +154,12 @@ const pendingSignIns = new PendingSignIns(Date.now, expiredSignIn(accounts, appl
 setInterval(() => pendingSignIns.sweep(), 60_000).unref();
 const appleJwks = new CachedJwks(jwksFetcher(APPLE_JWKS_URL)), googleJwks = new CachedJwks(jwksFetcher(GOOGLE_JWKS_URL));
 const kickPlayer = (p: string) => { hub.kick(p); };
+// a sign-in into a farm with no consent to today's terms says so (spec v2 §9): the App asks for it in place
+const consentOf = consentNote(store, legalVersions());
 const appleDeps = { store, accounts, now: Date.now, pending: pendingSignIns, apple: appleCfg, client: appleClient,
-  keys: appleJwks.keys, refreshKeys: appleJwks.refresh, kick: kickPlayer };
+  keys: appleJwks.keys, refreshKeys: appleJwks.refresh, kick: kickPlayer, consent: consentOf };
 const googleDeps = { store, accounts, identify: identifyDeps, now: Date.now, pending: pendingSignIns,
-  audiences: accountsCfg.google?.audiences ?? [], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, kick: kickPlayer };
+  audiences: accountsCfg.google?.audiences ?? [], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, kick: kickPlayer, consent: consentOf };
 registerAppleRoutes(app, appleDeps);
 registerGoogleRoutes(app, googleDeps);
 // Sign in with an emailed code (SGODOT-497; contract v1.5 / v1.6.4): off unless P0_EMAIL_LOGIN=1. The mail goes by
@@ -166,7 +168,7 @@ registerGoogleRoutes(app, googleDeps);
 // routes answer provider_unavailable / email_unavailable — the server runs on.
 const signInMailer = signInMailerFromEnv();
 const emailDeps = { store, accounts, now: Date.now, pending: pendingSignIns, on: accountsCfg.emailLogin, codes: new EmailCodes(),
-  mailer: signInMailer, kick: kickPlayer, alert: alertMailerFromEnv() };
+  mailer: signInMailer, kick: kickPlayer, alert: alertMailerFromEnv(), consent: consentOf };
 if (accountsCfg.emailLogin && !emailReady(emailDeps))
   console.warn(JSON.stringify({ warn: 'P0_EMAIL_LOGIN=1 but email sign-in cannot run', accounts_key: accounts.codesOn(), signin_smtp: !!signInMailer }));
 registerEmailRoutes(app, emailDeps);

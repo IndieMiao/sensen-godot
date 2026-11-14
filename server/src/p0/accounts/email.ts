@@ -178,6 +178,8 @@ const refused = (status: number, code: string, extra: Record<string, unknown> = 
 const bodyOf = (b: unknown) => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}) as Record<string, unknown>;
 
 export interface EmailRouteDeps {
+  /** The sign-in answer's consent note (link.ts consentNote; spec v2 §9): absent, none. */
+  consent?: import('./link.js').ConsentNote;
   store: P0Store; accounts: P0Accounts; now: () => number;
   /** The one PendingSignIns of p0_server: no_farm's pending sign-in, which guest takes. */
   pending: PendingSignIns;
@@ -277,7 +279,7 @@ export function registerEmailRoutes(app: FastifyInstance, deps: EmailRouteDeps):
       const owner = accounts.tokenOwner(token);
       if (owner && owner !== player) return send(reply, refused(400, 'schema'));   // a token is one player's only; the code kept
       codes.take(email);
-      return signIn({ accounts, kick: deps.kick }, player, token);
+      return signIn({ accounts, kick: deps.kick, consent: deps.consent }, player, token);
     }
     codes.take(email);
     return reply.code(404).send({ ok: false, code: 'no_farm', pending: deps.pending.create('email', { sub }) });

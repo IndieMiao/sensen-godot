@@ -1,6 +1,6 @@
 /** Sign-in's shared parts (SGODOT-489; contract-accounts.md §2, §4). */
 import { describe, expect, it } from 'vitest';
-import { conflictFarm, expiredSignIn, liveOwner, PENDING_MS, PendingSignIns, signIn } from '../../src/p0/accounts/link.js';
+import { conflictFarm, consentNote, expiredSignIn, liveOwner, PENDING_MS, PendingSignIns, signIn } from '../../src/p0/accounts/link.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { P0Store } from '../../src/p0/store.js';
@@ -50,6 +50,21 @@ describe('expiredSignIn (周瑜 on #1033)', () => {
     expiredSignIn(accounts, async () => { throw new Error('APPLE_REVOKE_500'); }, l => { warned.push(l); })({ provider: 'apple', link: { sub: 's', aud: 'a', refresh: 'r' }, at: 0 });
     await new Promise(r => setTimeout(r, 0));
     expect(warned).toEqual([JSON.stringify({ apple: 'revoke_failed', error: 'APPLE_REVOKE_500' })]);
+  });
+});
+
+describe('consentNote (spec v2 §9)', () => {
+  it('nothing for a farm agreed to these terms; consent_outdated with them otherwise, and signIn carries it', () => {
+    const store = new P0Store(c), accounts = new P0Accounts();
+    const v = { terms: '2026-11-13', privacy: '2026-11-13' };
+    const a = store.get('p0-agree0001', 0); a.consent = { ...v, at: 0 }; store.put(a);
+    store.get('p0-never0001', 0);
+    const note = consentNote(store, v);
+    expect(note('p0-agree0001')).toEqual({});
+    expect(note('p0-never0001')).toEqual({ consent_outdated: true, terms_version: v.terms, privacy_version: v.privacy });
+    accounts.ensure('p0-never0001');
+    expect(signIn({ accounts, consent: note }, 'p0-never0001', T(1))).toMatchObject({ ok: true, consent_outdated: true });
+    expect(signIn({ accounts }, 'p0-never0001', T(2))).not.toHaveProperty('consent_outdated');
   });
 });
 

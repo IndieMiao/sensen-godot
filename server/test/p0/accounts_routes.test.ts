@@ -117,7 +117,8 @@ describe('session/claim (v1.4: with a sign-in; v1.6 ①: every refusal carries t
   it('claims an old farm and links the sign-in in one step, with the voice gate answer and its consent; the same token again is ok', async () => {
     const { app, store, accounts } = setup({ ages: { 'p0-old00001': true } });
     store.get('p0-old00001', T0);
-    expect((await claim(app, 'p0-old00001', T(1))).json()).toEqual({ ok: true, player: 'p0-old00001', linked: ['google'], age: true, consent: null });
+    expect((await claim(app, 'p0-old00001', T(1))).json()).toEqual({ ok: true, player: 'p0-old00001', linked: ['google'], age: true, consent: null,
+      consent_outdated: true, terms_version: V.terms, privacy_version: V.privacy });   // none came with it: the card, then account/consent
     expect(accounts.byIdentity('google', 'g1')).toBe('p0-old00001');
     expect((await claim(app, 'p0-old00001', T(1), signed('ignored'))).json().ok).toBe(true);   // a lost answer retried
     // and the old build on it now updates
@@ -165,6 +166,16 @@ describe('session/claim (v1.4: with a sign-in; v1.6 ①: every refusal carries t
     const r = await off.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': 'p0-b00000001' }, payload: { ...signed('g1'), token: T(4) } });
     expect([r.statusCode, r.json().code]).toEqual([503, 'provider_unavailable']);
   });
+  it("the pages' consent to older terms: the claim stands, its reply says consent_outdated with today's; to today's, nothing more (spec v2 §9)", async () => {
+    const { app, store } = setup();
+    store.get('p0-old00001', T0); store.get('p0-old00002', T0);
+    const old = (await claim(app, 'p0-old00001', T(1), signed('g1', { consent: { terms: '2026-10-01', privacy: V.privacy } }))).json();
+    expect(old).toMatchObject({ ok: true, consent: null, consent_outdated: true, terms_version: V.terms, privacy_version: V.privacy });
+    expect(store.peek('p0-old00001')!.consent).toBeUndefined();
+    const now = (await claim(app, 'p0-old00002', T(2), signed('g2', { consent: V }))).json();
+    expect(now.ok).toBe(true);
+    expect(now).not.toHaveProperty('consent_outdated');
+  });
   it('age false and never asked come through as they are', async () => {
     const { app, store } = setup({ ages: { 'p0-old00002': false } });
     store.get('p0-old00002', T0); store.get('p0-old00003', T0);
@@ -179,7 +190,8 @@ describe('session/pending (v1.6 ①)', () => {
   it('the farm of a sign-in already checked, signed in (its other phone out); once only', async () => {
     const { app, store, accounts, kicked } = setup({ pendings: { p1: { provider: 'google', link: { sub: 'g1' } } } });
     store.get('p0-new00001', T0); accounts.ensure('p0-new00001'); accounts.link('p0-new00001', 'google', { sub: 'g1' }); accounts.issue('p0-new00001', T(9));
-    expect((await pend(app, 'p1', T(1))).json()).toEqual({ ok: true, player: 'p0-new00001', linked: ['google'] });
+    expect((await pend(app, 'p1', T(1))).json()).toEqual({ ok: true, player: 'p0-new00001', linked: ['google'],
+      consent_outdated: true, terms_version: V.terms, privacy_version: V.privacy });   // that farm never agreed: the card (spec v2 §9)
     expect(accounts.tokenOwner(T(9))).toBeUndefined();
     expect(kicked).toEqual(['p0-new00001']);
     const again = await pend(app, 'p1', T(2));
@@ -199,6 +211,20 @@ describe('session/pending (v1.6 ①)', () => {
     expect([r.statusCode, r.json()]).toEqual([404, { ok: false, code: 'no_farm', pending: 'again-g7' }]);
     const made = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ pending: 'again-g7' }) })).json();
     expect(made).toMatchObject({ ok: true, linked: 'google' });
+  });
+});
+
+describe("a sign-in into a farm says whether it has today's consent (spec v2 §9)", () => {
+  it('a farm that agreed to today\'s terms signs in plain; one that has not is told consent_outdated with today\'s', async () => {
+    const { app, store, accounts } = setup({ pendings: { p1: { provider: 'google', link: { sub: 'g1' } }, p2: { provider: 'google', link: { sub: 'g2' } } } });
+    const ok = store.get('p0-agreed001', T0); ok.consent = { ...V, at: T0 }; store.put(ok);
+    accounts.ensure('p0-agreed001'); accounts.link('p0-agreed001', 'google', { sub: 'g1' });
+    const old = store.get('p0-older0001', T0); old.consent = { terms: '2026-10-01', privacy: V.privacy, at: T0 }; store.put(old);
+    accounts.ensure('p0-older0001'); accounts.link('p0-older0001', 'google', { sub: 'g2' });
+    const a = (await app.inject({ method: 'POST', url: '/v1/p0/session/pending', payload: { pending: 'p1', token: T(1) } })).json();
+    expect(a).toEqual({ ok: true, player: 'p0-agreed001', linked: ['google'] });
+    const b = (await app.inject({ method: 'POST', url: '/v1/p0/session/pending', payload: { pending: 'p2', token: T(2) } })).json();
+    expect(b).toMatchObject({ ok: true, player: 'p0-older0001', consent_outdated: true, terms_version: V.terms });
   });
 });
 
