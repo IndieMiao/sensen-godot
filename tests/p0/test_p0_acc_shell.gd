@@ -56,3 +56,37 @@ func test_the_backdrop_can_be_swapped() -> void:
 	assert_object(art.texture).is_same(other)
 	assert_vector(art.size).is_equal(Vector2(360, 360))   # laid out by its own shape
 	assert_object(P0SysScreen.BACKDROP).is_same(P0AccShell.BACKDROP)   # maintenance and update on the same cream (bot 733)
+
+## Spec v1.1 §1.5: the keyboard up for a tapped field — the wordmark out; the card up only if the primary key is
+## covered, till its foot is 12 over the keyboard; down, all back (250 ms ease-out).
+func test_the_keyboard_fades_the_wordmark_and_lifts_the_card_only_when_the_key_is_covered() -> void:
+	var page: P0AccName = auto_free(P0AccName.new(true))
+	var kb := [0.0]
+	page.keyboard_height = func() -> float: return kb[0]
+	add_child(page)
+	page.size = Vector2(360, 800)
+	await await_idle_frame()
+	var rest := page.card.position.y
+	page.field.input.grab_focus()
+	kb[0] = 120.0   # a short keyboard: the key is clear, only the wordmark goes
+	await get_tree().create_timer(P0AccShell.KEYBOARD_S + 0.15).timeout
+	assert_float(page.mark.modulate.a).is_equal_approx(0.0, 0.01)
+	assert_float(page.card.position.y).is_equal(rest)
+	kb[0] = 380.0   # a tall one covers the key: the card goes up till its foot is 12 over it
+	await get_tree().create_timer(P0AccShell.KEYBOARD_S + 0.15).timeout
+	var foot := page.go.get_global_rect().end.y - page.global_position.y
+	assert_float(foot).is_equal_approx(800.0 - 380.0 - P0AccShell.KEY_CLEAR, 1.0)
+	assert_float(page.card.position.y).is_less(rest)
+	kb[0] = 0.0   # down: all back
+	await get_tree().create_timer(P0AccShell.KEYBOARD_S + 0.15).timeout
+	assert_float(page.mark.modulate.a).is_equal_approx(1.0, 0.01)
+	assert_float(page.card.position.y).is_equal_approx(rest, 0.5)
+
+func test_a_keyboard_with_no_field_tapped_moves_nothing() -> void:
+	var page: P0AccName = auto_free(P0AccName.new(true))
+	page.keyboard_height = func() -> float: return 380.0
+	add_child(page)
+	page.size = Vector2(360, 800)
+	await get_tree().create_timer(P0AccShell.KEYBOARD_S + 0.15).timeout
+	assert_float(page.mark.modulate.a).is_equal(1.0)
+	assert_float(page.lift).is_equal(0.0)

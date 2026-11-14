@@ -42,6 +42,23 @@ var col: VBoxContainer
 var mark: UiWordmark
 var _art: TextureRect
 
+## The keyboard (spec v1.1 §1.5; the test code and email pages too): it comes up only for a tapped field; while it is up
+## the wordmark fades out, and only if it covers the page's primary key the card moves up till that key's foot is 12
+## over the keyboard's top (Skip and the card's foot may go under it); down, all back. 250 ms, ease-out. `keyboard_height`
+## stands in for the system's in tests (viewport units).
+const KEY_CLEAR := 12.0
+const KEYBOARD_S := 0.25
+var keyboard_height := Callable()
+var lift := 0.0:                      # how far up the card is now
+	set(v):
+		lift = v
+		if card: _layout()
+var _lift_to := 0.0
+var _keyboard_up := false
+var _lift_tween: Tween
+var _mark_hidden := {}                # why the wordmark is out: "keyboard", "banner" (the flow's SYS-CMD-FAIL line)
+var _mark_tween: Tween
+
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	theme = UiKit.theme()
@@ -124,6 +141,51 @@ func add_primary(text: String) -> UiCommandButton:
 	col.add_child(b)
 	return b
 
+## The wordmark out (250 ms) while any reason holds, back once none does.
+func hide_mark(why: String, on: bool) -> void:
+	if on: _mark_hidden[why] = true
+	else: _mark_hidden.erase(why)
+	var to := 0.0 if not _mark_hidden.is_empty() else 1.0
+	if is_equal_approx(mark.modulate.a, to) and (_mark_tween == null or not _mark_tween.is_running()): return
+	if _mark_tween: _mark_tween.kill()
+	if not is_inside_tree():
+		mark.modulate.a = to
+		return
+	_mark_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_mark_tween.tween_property(mark, ^"modulate:a", to, KEYBOARD_S)
+
+func _process(_delta: float) -> void:
+	var kb := _keyboard()
+	var up := kb > 0.0 and _field_focused()
+	if up != _keyboard_up:
+		_keyboard_up = up
+		hide_mark("keyboard", up)
+	var want := key_lift(kb) if up else 0.0
+	if not is_equal_approx(want, _lift_to):
+		_lift_to = want
+		if _lift_tween: _lift_tween.kill()
+		_lift_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_lift_tween.tween_property(self, ^"lift", want, KEYBOARD_S)
+
+## How far the card must go up so the primary key's foot is KEY_CLEAR over a keyboard `kb` tall; 0 when it is clear.
+func key_lift(kb: float) -> float:
+	var key := col.find_child("Primary", false, false) as Control
+	if key == null or kb <= 0.0: return 0.0
+	var foot := key.get_global_rect().end.y - global_position.y + lift   # where it sits with the card down
+	return maxf(0.0, foot - (size.y - kb - KEY_CLEAR))
+
+func _field_focused() -> bool:
+	if not is_inside_tree(): return false
+	var focus := get_viewport().gui_get_focus_owner()
+	return (focus is LineEdit or focus is TextEdit) and card.is_ancestor_of(focus)
+
+func _keyboard() -> float:
+	if keyboard_height.is_valid(): return float(keyboard_height.call())
+	if not is_inside_tree() or not DisplayServer.has_feature(DisplayServer.FEATURE_VIRTUAL_KEYBOARD): return 0.0
+	var px := DisplayServer.virtual_keyboard_get_height()
+	if px <= 0: return 0.0
+	return float(px) * get_viewport().get_visible_rect().size.y / maxf(1.0, float(DisplayServer.window_get_size().y))
+
 func _layout() -> void:
 	var w := size.x
 	var h := size.y
@@ -134,5 +196,5 @@ func _layout() -> void:
 	var m := mark.get_combined_minimum_size()
 	mark.position = Vector2(roundf((w - m.x) * 0.5), _MARK_TOP)
 	mark.size = m
-	card.position = Vector2(SIDE, card_top)
+	card.position = Vector2(SIDE, card_top - lift)
 	card.size = Vector2(w - SIDE * 2.0, 0.0)   # as tall as what is in it
