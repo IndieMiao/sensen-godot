@@ -2984,9 +2984,9 @@
  "7. Wins pay 1 to 1. A tie returns your bet.": "7. 赢了 1 赔 1。平局退还赌注。",
  "8. 4 decks, shuffled every hand.": "8. 4 副牌，每局重新洗牌。",
  "You bet coins here. You always keep at least 40.": "在这里用金币下注。你身上至少总会留下 40 金币。",
- "Sign in to start a new farm.": "登录后即可新建农场。",
- "Signed in with a test code": "已通过测试码登录",
- "You can sign in again with your test code.": "之后可以用你的测试码重新登录。",
- "Signed in with email": "已通过邮箱登录",
- "You can sign in again with email.": "之后可以用邮箱重新登录。"
+  "Sign in to start a new farm.": "登录后即可新建农场。",
+  "Signed in with a test code": "已通过测试码登录",
+  "You can sign in again with your test code.": "之后可以用你的测试码重新登录。",
+  "Signed in with email": "已通过邮箱登录",
+  "You can sign in again with email.": "之后可以用邮箱重新登录。"
 }
