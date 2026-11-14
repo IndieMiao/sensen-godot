@@ -295,7 +295,7 @@ describe('DELETE /v1/p0/account (SGODOT-488; contract §4, v1.6.6)', () => {
   });
   it('the first stretch failing to write is 500 delete_failed — nothing deleted, never told it was (周瑜 on #1048)', async () => {
     const { deps, del } = route();
-    vi.spyOn(deps.accounts, 'markDeleted').mockImplementationOnce(() => { throw new Error('EIO'); });
+    vi.spyOn(deps.accounts, 'markDeleted').mockImplementation(() => { throw new Error('EIO'); });   // both tries
     const warned: string[] = [];
     vi.spyOn(console, 'warn').mockImplementation((l: string) => { warned.push(l); });
     const r = await del({ authorization: `Bearer ${USER_TOKEN}` });
@@ -303,5 +303,56 @@ describe('DELETE /v1/p0/account (SGODOT-488; contract §4, v1.6.6)', () => {
     expect(deps.accounts.isDeleted(PLAYER)).toBe(false);
     expect(deps.store.peek(PLAYER)).toBeDefined();
     expect(warned).toContain(JSON.stringify({ account: 'delete_failed_app', support_code: supportCode(PLAYER) }));
+  });
+  it('a passing write error is tried once more at once: the second try deletes and answers ok', async () => {
+    const { deps, del } = route();
+    vi.spyOn(deps.accounts, 'markDeleted').mockImplementationOnce(() => { throw new Error('EIO'); });
+    expect((await del({ authorization: `Bearer ${USER_TOKEN}` })).json()).toEqual({ ok: true });
+    expect(deps.accounts.isDeleted(PLAYER)).toBe(true);
+    expect(deps.store.peek(PLAYER)).toBeUndefined();
+  });
+});
+
+describe('deleteAccount resumes from any step that failed to write (苏烈 on #1048, 484 8c4a62d5)', () => {
+  for (const step of ['revokeAll', 'markDeleted', 'remove', 'store.remove'] as const) {
+    it(`a failure at ${step}, then the same call again: the account deleted to the end`, async () => {
+      const { deps } = setup();
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const target = step === 'store.remove' ? deps.store : deps.accounts;
+      const name = step === 'store.remove' ? 'remove' : step;
+      vi.spyOn(target as unknown as Record<string, () => unknown>, name).mockImplementationOnce(() => { throw new Error('EIO'); });
+      await expect(deleteAccount(deps, PLAYER)).rejects.toThrow();
+      await deleteAccount(deps, PLAYER);
+      expect(deps.accounts.isDeleted(PLAYER)).toBe(true);
+      expect(deps.accounts.find(PLAYER)).toBeUndefined();
+      expect(deps.accounts.tokenOwner(USER_TOKEN)).toBeUndefined();
+      expect(deps.store.peek(PLAYER)).toBeUndefined();
+      expect(deps.store.peek(OTHER)).toBeDefined();
+      expect(deps.revokeApple).toHaveBeenCalledTimes(1);   // once, never lost on the way
+    });
+  }
+  it("the account row's write failing, retried in the same process: Apple's authorization still withdrawn", async () => {
+    const { deps } = setup();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const real = deps.accounts.remove.bind(deps.accounts);
+    // the row taken out of memory, then the write fails — what a disk error inside remove leaves
+    vi.spyOn(deps.accounts, 'remove').mockImplementationOnce((p: string) => { real(p); throw new Error('EIO'); });
+    await expect(deleteAccount(deps, PLAYER)).rejects.toThrow('EIO');
+    expect(deps.revokeApple).toHaveBeenCalledTimes(1);
+    await deleteAccount(deps, PLAYER);   // finds no row now: no second revoke, the rest done
+    expect(deps.store.peek(PLAYER)).toBeUndefined();
+    expect(deps.revokeApple).toHaveBeenCalledTimes(1);
+  });
+  it('markDeleted failing twice: 500, the farm there, and Apple not withdrawn (周瑜 on #1049)', async () => {
+    const { deps } = setup();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const app = Fastify();
+    registerAccountDeleteRoute(app, { ...deps, identify: { accounts: deps.accounts, legacyId: false, warn: () => {} } });
+    vi.spyOn(deps.accounts, 'markDeleted').mockImplementation(() => { throw new Error('EIO'); });
+    const r = await app.inject({ method: 'DELETE', url: '/v1/p0/account', headers: { authorization: `Bearer ${USER_TOKEN}` } });
+    expect([r.statusCode, r.json().code]).toEqual([500, 'delete_failed']);
+    expect(deps.store.peek(PLAYER)).toBeDefined();
+    expect(deps.accounts.find(PLAYER)?.apple).toBeDefined();
+    expect(deps.revokeApple).not.toHaveBeenCalled();
   });
 });
