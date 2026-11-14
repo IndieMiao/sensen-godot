@@ -122,7 +122,7 @@ func _show(p: Control) -> void:
 		else: page.queue_free()
 	page = p
 	if p.get_parent() == null: add_child(p)
-	if _toasts != null: move_child(_toasts, -1)
+	_lines_on_top()
 
 func _open_sign_in() -> void:
 	if sign_in_page == null:
@@ -160,7 +160,7 @@ func conflict(farm: Dictionary, provider := "") -> void:
 		switch_farm.emit())
 	choose.cancelled.connect(_try_another)
 	add_child(choose)
-	if _toasts != null: move_child(_toasts, -1)
+	_lines_on_top()
 
 ## The host's: this phone's old farm was claimed elsewhere — the sign-in page's line, by the way it is bound
 ## (`linked`: ["google"]; [] a test code's).
@@ -169,21 +169,52 @@ func claimed(linked: Array) -> void:
 	sign_in_settled()
 	sign_in_page.set_hint("farm_uses", str(linked[0]) if not linked.is_empty() else "code")
 
-## A line for the player while the flow is up — a failed sign-in or check (`Didn't go through · try again`), `Sign-in
-## expired. Please sign in again.` — as the toast P0Ui would show (Toast R1, Info; Error for a failure), on this flow's
-## own layer: P0Ui's banner and toasts sit under the flow's layer and would not be seen (哪吒 on PR-A, 11-14). Over the
-## page, at the foot, one at a time.
-func say(text: String, error := false) -> void:
-	if _toasts == null:
-		_toasts = ToastLayer.new()
-		_toasts.name = "Toasts"
-		_toasts.theme = UiKit.theme()
-		add_child(_toasts)
-	move_child(_toasts, -1)   # over the page and any card
-	_toasts.show_toast(text, ToastLayer.Severity.ERROR if error else ToastLayer.Severity.INFO)
+## A line for the player while the flow is up, on this flow's own layer: P0Ui's banner and toasts sit under the flow's
+## layer and would not be seen (哪吒 on PR-A, 11-14). `error` — a failed sign-in, check or save: the SYS-CMD-FAIL
+## SysBanner (`Didn't go through · try again`), up 3 s, 16 under the safe area's top: there is no HUD here, and its
+## in-game spot (under the HUD, y 100) would cover the wordmark (不知火舞 11-14, Q325-BEFORE 740:202370). Otherwise an
+## Info toast at the foot (`Sign-in expired. Please sign in again.`). Kept over the page and any card.
+const BANNER_TOP := 16.0
+const BANNER_S := 3.0
+var safe_top := 0.0               # the host's (P0Ui.safe_top()): the banner sits under the status bar
+var banner: UiSysBanner
+var _banner_id := 0
 
-## What say() shows now ("" none).
-func said() -> String: return _toasts.current_text() if _toasts != null else ""
+func say(text: String, error := false) -> void:
+	if error:
+		if banner == null:
+			banner = UiSysBanner.new()
+			banner.name = "Banner"
+			banner.theme = UiKit.theme()
+			banner.set_anchors_preset(Control.PRESET_CENTER_TOP)
+			banner.grow_horizontal = Control.GROW_DIRECTION_BOTH
+			add_child(banner)
+		banner.kind = UiSysBanner.Kind.CMD_FAIL
+		banner.message = text
+		banner.offset_left = -UiSysBanner.WIDTH * 0.5
+		banner.offset_right = UiSysBanner.WIDTH * 0.5
+		banner.offset_top = safe_top + BANNER_TOP
+		banner.visible = true
+		_banner_id += 1
+		var id := _banner_id
+		if is_inside_tree(): get_tree().create_timer(BANNER_S).timeout.connect(func():
+			if id == _banner_id and is_instance_valid(banner): banner.visible = false)
+	else:
+		if _toasts == null:
+			_toasts = ToastLayer.new()
+			_toasts.name = "Toasts"
+			_toasts.theme = UiKit.theme()
+			add_child(_toasts)
+		_toasts.show_toast(text)
+	_lines_on_top()
+
+## What say() shows now: the banner's while it is up, else the toast's ("" none).
+func said() -> String:
+	if banner != null and banner.visible: return banner.message
+	return _toasts.current_text() if _toasts != null else ""
+
+func _lines_on_top() -> void:
+	for n in [_toasts, banner]: if n != null: move_child(n, -1)
 
 ## The host's, when a sign-in ended with nothing to show here: the sheet closed (cancelled) or it failed (its toast is
 ## the host's) — the sign-in page's keys back. no_farm / conflict / claimed do it themselves (后裔 11-14).
@@ -221,6 +252,7 @@ func back() -> bool:
 	if page is P0AccAge and (page as P0AccAge).confirm != null:
 		(page as P0AccAge)._change()
 		return true
+	if page == name_page and name_page != null and name_page._checking: return true   # its check in flight: Back waits (周瑜 on #1052)
 	if page == name_page and name_page != null and name_page.another_row.visible:
 		_try_another()
 		return true

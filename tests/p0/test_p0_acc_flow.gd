@@ -189,12 +189,31 @@ func test_the_keys_are_grey_while_the_sheet_is_up_till_the_host_answers() -> voi
 
 func test_the_flow_says_its_own_lines_over_the_page() -> void:
 	var f := _flow("old_signin")
+	f.safe_top = 24.0
 	assert_str(f.said()).is_equal("")
-	f.say("Didn't go through · try again", true)
+	f.say("Didn't go through · try again", true)   # a failure: the CMD-FAIL banner, under the status bar, over the wordmark
 	assert_str(f.said()).is_equal("Didn't go through · try again")
-	var t := f.get_node("Toasts")
-	assert_int(t.get_index()).is_equal(f.get_child_count() - 1)   # over the page
-	f.no_farm()   # a page on top later: the toast layer goes back over it
-	f.say("Sign-in expired. Please sign in again.")
-	assert_int(t.get_index()).is_equal(f.get_child_count() - 1)
+	assert_int(f.banner.kind).is_equal(UiSysBanner.Kind.CMD_FAIL)
+	assert_float(f.banner.offset_top).is_equal(24.0 + P0AccFlow.BANNER_TOP)
+	assert_float(f.banner.offset_top + 40.0).is_less(84.0 + 24.0 + 1.0)   # its 40 end above the wordmark's top (84) on this screen
+	assert_int(f.banner.get_index()).is_equal(f.get_child_count() - 1)   # over the page
+	f.no_farm()   # a page on top later: the lines go back over it
+	assert_int(f.banner.get_index()).is_equal(f.get_child_count() - 1)
+	f.banner.visible = false
+	f.say("Sign-in expired. Please sign in again.")   # Info: the toast at the foot
 	assert_str(f.said()).is_equal("Sign-in expired. Please sign in again.")
+	assert_object(f.get_node("Toasts")).is_not_null()
+
+func test_back_waits_while_names_check_is_in_flight() -> void:
+	var f := P0AccFlow.new("new", func(_n: String, _done: Callable): pass, ["google"], {}, 2026)   # a check that never answers
+	f.record_path = RECORD
+	add_child(auto_free(f))
+	f.no_farm()
+	var n := f.name_page
+	n.field.input.text = "Mira"
+	n.field.input.text_changed.emit("Mira")
+	n.go.activated.emit()
+	assert_bool(n._checking).is_true()
+	assert_bool(f.back()).is_true()   # taken, nothing freed
+	assert_object(f.name_page).is_equal(n)
+	assert_object(f.page).is_equal(n)
