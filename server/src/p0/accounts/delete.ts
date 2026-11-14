@@ -46,10 +46,11 @@ async function removeAccount(deps: DeleteDeps, player: string): Promise<void> {
     if (!deleted) accounts.markDeleted(player, deps.now());
     accounts.remove(player); // Also removes admin tokens and identity indexes; finish this synchronous phase before the save.
   } catch (e) {
-    // a write that failed here may have taken the row out of memory already: the next call (it resumes) would find no
-    // refresh token, and the next write would drop it from disk too — so Apple's authorization goes now, while the
-    // token is in hand (后裔 on 苏烈's 484 8c4a62d5)
-    await revokeAppleOf(deps, player, apple);
+    // accounts.remove's write failing has taken the row out of memory already: the next call (it resumes) would find
+    // no refresh token, and the next write would drop it from disk too — so Apple's authorization goes now, while the
+    // token is in hand (后裔 on 苏烈's 484 8c4a62d5). The row still there (revokeAll / markDeleted failed): the next
+    // call finds it, and the farm is not deleted yet — Apple stays (周瑜 on #1049)
+    if (!accounts.find(player)) await revokeAppleOf(deps, player, apple);
     throw e;
   }
 

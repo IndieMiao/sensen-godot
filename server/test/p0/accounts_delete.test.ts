@@ -328,7 +328,7 @@ describe('deleteAccount resumes from any step that failed to write (苏烈 on #1
       expect(deps.accounts.tokenOwner(USER_TOKEN)).toBeUndefined();
       expect(deps.store.peek(PLAYER)).toBeUndefined();
       expect(deps.store.peek(OTHER)).toBeDefined();
-      expect(deps.revokeApple).toHaveBeenCalledWith('app.gensen.maps.web', 'fake-refresh-private');   // never lost on the way
+      expect(deps.revokeApple).toHaveBeenCalledTimes(1);   // once, never lost on the way
     });
   }
   it("the account row's write failing, retried in the same process: Apple's authorization still withdrawn", async () => {
@@ -342,5 +342,17 @@ describe('deleteAccount resumes from any step that failed to write (苏烈 on #1
     await deleteAccount(deps, PLAYER);   // finds no row now: no second revoke, the rest done
     expect(deps.store.peek(PLAYER)).toBeUndefined();
     expect(deps.revokeApple).toHaveBeenCalledTimes(1);
+  });
+  it('markDeleted failing twice: 500, the farm there, and Apple not withdrawn (周瑜 on #1049)', async () => {
+    const { deps } = setup();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const app = Fastify();
+    registerAccountDeleteRoute(app, { ...deps, identify: { accounts: deps.accounts, legacyId: false, warn: () => {} } });
+    vi.spyOn(deps.accounts, 'markDeleted').mockImplementation(() => { throw new Error('EIO'); });
+    const r = await app.inject({ method: 'DELETE', url: '/v1/p0/account', headers: { authorization: `Bearer ${USER_TOKEN}` } });
+    expect([r.statusCode, r.json().code]).toEqual([500, 'delete_failed']);
+    expect(deps.store.peek(PLAYER)).toBeDefined();
+    expect(deps.accounts.find(PLAYER)?.apple).toBeDefined();
+    expect(deps.revokeApple).not.toHaveBeenCalled();
   });
 });
