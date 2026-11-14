@@ -12,10 +12,11 @@
  * The 13+ gate is a yes / no per player (no birthday is kept); without a yes there is no grant. Blocks and the gate live in
  * their own small files beside the save, never in it.
  */
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { appendFileSync, existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import type { FastifyInstance } from 'fastify';
 import { AccessToken, RoomServiceClient, TrackSource } from 'livekit-server-sdk';
+import { supportCode } from '../support.js';
 import { publicPlayer } from './hub.js';
 import type { Occupant, OutpostRooms } from './rooms.js';
 
@@ -51,6 +52,31 @@ const refuse = (code: string, status: number): Refusal => ({ code, status });
 
 export interface P0VoiceFiles { blocks: string; ages: string; reports: string }
 
+/** The report sheet's reasons (q(28)'s, 不知火舞's account spec §7): Offensive name or bio / Harassment / Offensive voice
+ *  chat / Cheating or bots / Something else. Anything else (an old build's free text, nothing) is `other`. */
+export const REPORT_REASONS = ['offensive_name', 'harassment', 'offensive_voice', 'cheating', 'other'] as const;
+export type ReportReason = typeof REPORT_REASONS[number];
+export const reportReason = (r: unknown): ReportReason => (REPORT_REASONS as readonly unknown[]).includes(r) ? r as ReportReason : 'other';
+const CHANNELS = ['oss', 'play', 'appstore'];
+
+/** A report as kept (voice_reports.jsonl, a year) and handed on (onReport → 苏烈's mail queue, SGODOT-484 550d0c5d): its
+ *  own id, the two support codes (no player id: tech-plan §3.2), the reported one's name at that moment (ours alone: never
+ *  in the mail), the reason, where, and the reporter's build channel. */
+export interface ReportLine {
+  kind: 'voice_report'; v: 2; id: string; at: string;
+  reporter_code: string; reported_code: string; name: string | null;
+  reason: ReportReason; place: string; room: number; channel: string;
+}
+
+const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+/** R-YYYYMMDD-XXXXXXXX: the UTC day and 40 random bits in Crockford, made once when the line is written. */
+export function reportId(at: number): string {
+  const day = new Date(at).toISOString().slice(0, 10).replace(/-/g, '');
+  let bits = BigInt('0x' + randomBytes(5).toString('hex')), tail = '';
+  for (let i = 0; i < 8; i++) { tail = CROCKFORD[Number(bits & 31n)] + tail; bits >>= 5n; }
+  return `R-${day}-${tail}`;
+}
+
 export class P0Voice {
   private leases = new Map<string, Lease>();   // by player
   private blocks: Record<string, string[]>;    // player → the players they block
@@ -61,6 +87,10 @@ export class P0Voice {
   tell: (player: string, payload: object) => void = () => {};
   /** The hub's: a Block or Unblock between two players takes each out of (or back into) the other's view (seenChanged). */
   seen: (a: string, b: string) => void = () => {};
+  /** A player's name as their save has it now (the report's snapshot); null when they never gave one. */
+  nameOf: (player: string) => string | null = () => null;
+  /** A report kept: handed on once its line is written (SGODOT-484, 苏烈's queue takes it by id). */
+  onReport: (line: ReportLine) => void = () => {};
 
   constructor(readonly config: P0VoiceConfig | null, private rooms: OutpostRooms, private files: P0VoiceFiles | null,
     private now: () => number = Date.now, media?: P0VoiceMedia) {
@@ -203,19 +233,24 @@ export class P0Voice {
     return { ok: true, blocked: this.blockedList(player) };
   }
 
-  /** Report: one line — who, whom, when, where — for a person to read later (the user, 11-02); nothing else happens.
-   * The same person again (this server's run): `already`, no second line (You already reported this). */
-  report(player: string, peer: number, reason: string): Refusal | Record<string, unknown> {
+  /** Report: one line for a person to read later (the user, 11-02) — v2 (SGODOT-484): its id, the two support codes, the
+   * reported one's name then, the reason, where, the channel — then handed on (onReport). Nothing else happens. The
+   * same person again (this server's run): `already`, no second line (You already reported this). */
+  report(player: string, peer: number, reason: unknown, channel: unknown = ''): Refusal | Record<string, unknown> {
     const target = this.playerAt(player, peer);
     const o = this.rooms.occupant(player);
     if (!target || !o) return refuse('NOT_IN_ROOM', 404);
     const key = player + ' ' + target;
     if (this.reported.has(key)) return { ok: true, already: true };
     this.reported.add(key);
-    const line = { kind: 'voice_report', at: new Date(this.now()).toISOString(), reporter: player, reported: target,
-      place: o.outpost, room: o.room, reason: reason.slice(0, 200) };
-    console.log(JSON.stringify(line));
+    const at = this.now();
+    const line: ReportLine = { kind: 'voice_report', v: 2, id: reportId(at), at: new Date(at).toISOString(),
+      reporter_code: supportCode(player), reported_code: supportCode(target), name: this.nameOf(target),
+      reason: reportReason(reason), place: o.outpost, room: o.room, channel: CHANNELS.includes(String(channel)) ? String(channel) : '' };
+    // the docker log: the id and the codes only (tech-plan §3.2)
+    console.log(JSON.stringify({ kind: line.kind, id: line.id, reporter_code: line.reporter_code, reported_code: line.reported_code }));
     if (this.files?.reports) appendFileSync(this.files.reports, JSON.stringify(line) + '\n');
+    this.onReport(line);
     return { ok: true, already: false };
   }
 
@@ -383,6 +418,6 @@ export function registerP0Voice(app: FastifyInstance, voice: P0Voice,
     if (!p) return deny(reply, req.headers);
     const peer = peerOf(b.peer);
     if (peer === null) return answer(reply, { code: 'SCHEMA', status: 400 });
-    return answer(reply, voice.report(p, peer, typeof b.reason === 'string' ? b.reason : ''));
+    return answer(reply, voice.report(p, peer, b.reason, req.headers['x-p0-channel']));
   });
 }

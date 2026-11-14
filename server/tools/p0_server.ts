@@ -11,7 +11,7 @@ import { accountsConfig, applePrivateKey } from '../src/p0/accounts/config.js';
 import { GOOGLE_JWKS_URL, googleVerifier, registerGoogleRoutes } from '../src/p0/accounts/google.js';
 import { CachedJwks, jwksFetcher } from '../src/p0/accounts/jwt.js';
 import { expiredSignIn, PendingSignIns } from '../src/p0/accounts/link.js';
-import { identify, isRefusal } from '../src/p0/accounts/identify.js';
+import { identify, inForce, isRefusal } from '../src/p0/accounts/identify.js';
 import { registerAccountRoutes } from '../src/p0/accounts/routes.js';
 import { registerCodeRoutes } from '../src/p0/accounts/codes.js';
 import { P0Accounts } from '../src/p0/accounts/store.js';
@@ -112,7 +112,9 @@ const accountsFile = path.join(path.dirname(stateFile), 'accounts.json');
 const accounts = new P0Accounts(accountsFile, accountsCfg.refreshKey);
 if (accountsCfg.guestOk) console.warn(JSON.stringify({ warn: 'P0_GUEST_OK=1: a new farm without a sign-in (never on the live server)' }));
 if (accountsCfg.legacyId) console.warn(JSON.stringify({ warn: 'P0_LEGACY_ID=1: an x-p0-player alone is taken for any player (never on the live server)' }));
-const identifyDeps = { accounts, legacyId: accountsCfg.legacyId, updateUrl: () => gate.state().update_url || undefined };
+// SGODOT-484: a suspension in force (the save's sanctions, 苏烈's admin commands) turns every request away (403 suspended)
+const identifyDeps = { accounts, legacyId: accountsCfg.legacyId, updateUrl: () => gate.state().update_url || undefined,
+  suspended: (p: string) => inForce(store.peek(p)?.sanctions?.suspended, Date.now()) };
 // The voice routes and the room's upgrade: identify, and a token's player must have a save, as the routes hold it.
 const identifyReq = (h: Record<string, unknown>) => {
   const w = identify(h, identifyDeps);
@@ -137,6 +139,7 @@ const pass = (player: string, room: string) => {
 const voiceDir = path.dirname(stateFile);
 const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.join(voiceDir, 'voice_blocks.json'),
   ages: path.join(voiceDir, 'voice_ages.json'), reports: path.join(voiceDir, 'voice_reports.jsonl') });
+voice.nameOf = p => store.peek(p)?.profile?.name ?? null;   // a report's name at that moment (SGODOT-484)
 registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
   joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq });

@@ -1484,10 +1484,11 @@ func _consent_body() -> Dictionary:
 func _on_acc_agreed(age_ok: bool, kind: String) -> void:
 	if age_ok: session.identity.agree(kind != "old_consent")
 
-## A sign-in key: the phone's sheet, then the server — claim for an old install's id (the claim and the link in one
-## step), session/apple | google otherwise. Email is 亚瑟's glue (SGODOT-497): its pages call sign_in / claim themselves.
+## A sign-in key (apple / google): the phone's sheet, then the server — claim for an old install's id (the claim and the
+## link in one step), session/apple | google otherwise. Email never comes here: P0AccFlow opens 盘古's email pages
+## itself and 亚瑟's glue (SGODOT-497) calls email_start and sign_in / claim("email", …), its answers to _on_signed_in.
 func _on_acc_sign_in(provider: String) -> void:
-	if provider == "email" or _signing: return
+	if _signing: return
 	_signing = true
 	var r: Dictionary = await native_sign_in.call(provider)
 	_signing = false
