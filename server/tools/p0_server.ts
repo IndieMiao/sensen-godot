@@ -144,7 +144,8 @@ const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.joi
 voice.nameOf = p => store.peek(p)?.profile?.name ?? null;   // a report's name at that moment (SGODOT-484)
 registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
-  joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq });
+  joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq,
+  nameOf: p => store.peek(p)?.profile?.name ?? null });   // the roster's name (哪吒 491)
 // Sign in with Apple / Google (SGODOT-489 PR-B; contract v1.4–v1.6.3): the keys fetched and cached, the pending
 // sign-ins in memory (an Apple one left unused has its authorization withdrawn, unless that Apple ID has a farm), and one check per provider shared by
 // session/apple|google and claim. No switch, no link in the first version.
@@ -174,7 +175,7 @@ if (accountsCfg.emailLogin && !emailReady(emailDeps))
 registerEmailRoutes(app, emailDeps);
 const verifyApple = appleVerifier(appleDeps), verifyGoogle = googleVerifier(googleDeps), verifyEmail = emailVerifier(emailDeps);
 registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now, guestOk: accountsCfg.guestOk,
-  pending: pendingSignIns, kick: kickPlayer, email: emailReady(emailDeps),
+  pending: pendingSignIns, kick: kickPlayer, renamed: p => { hub.renamed(p); }, email: emailReady(emailDeps),
   verify: async (provider, b) => {
     const v = provider === 'apple' ? await verifyApple(b) : provider === 'google' ? await verifyGoogle(b)
       : provider === 'email' ? await verifyEmail(b) : undefined;

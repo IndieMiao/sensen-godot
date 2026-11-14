@@ -45,6 +45,8 @@ export interface AccountRouteDeps {
     peek?(id: unknown): { provider: Provider; link: AnyLink } | undefined;
     create?(provider: Provider, link: AnyLink): string };
   guestOk?: boolean;
+  /** A rename made (account/name): the room's roster tells the others (hub.renamed). */
+  renamed?: (player: string) => void;
   /** A sign-in's credentials checked (PR-B: appleVerifier / googleVerifier by provider): its link, or the refusal
    * (bad_token, provider_unavailable). An unknown provider is undefined. claim needs it; none, and claim is off (503). */
   verify?: (provider: string, b: Record<string, unknown>) => Promise<{ link: AnyLink } | { status: number; body: { ok: false; code: string } } | undefined>;
@@ -61,7 +63,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
   const { store, accounts } = deps;
   const versions = deps.versions ?? legalVersions();
   const limiter = deps.limiter ?? new NameLimiter();
-  registerNameRoutes(app, { store, now: deps.now, limiter, list: deps.nameList,
+  registerNameRoutes(app, { store, now: deps.now, limiter, list: deps.nameList, renamed: deps.renamed,
     identify: (req, reply) => { const w = identify(req.headers, deps.identify); if (isRefusal(w)) { reply.code(w.status).send(w.body); return null; } return w.player; } });
   const made = new Map<string, number>();   // address → saves made this hour
   let hour = -1;

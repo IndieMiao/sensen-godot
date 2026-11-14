@@ -217,8 +217,8 @@ export class P0Voice {
 
   /** Who this player blocks, as handles (the roster's public `player`, never an id): their Blocked list, which outlives a
    * room — the blocked are out of sight, so Unblock is from this list (unblock). */
-  blockedList(player: string): { handle: string }[] {
-    return (this.blocks[player] ?? []).map(p => ({ handle: publicPlayer(p) }));
+  blockedList(player: string): { handle: string; name?: string }[] {
+    return (this.blocks[player] ?? []).map(p => { const name = this.nameOf(p); return { handle: publicPlayer(p), ...(name ? { name } : {}) }; });
   }
 
   /** Unblock by handle, from the Blocked list, wherever the two are. */

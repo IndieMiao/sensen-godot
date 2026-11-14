@@ -245,6 +245,8 @@ export interface NameRouteDeps {
   /** The player the request stands for (后裔's identify), or null once it has sent the refusal itself. */
   identify: (req: FastifyRequest, reply: FastifyReply) => string | null;
   list?: () => NameList;
+  /** A rename made (the room's roster tells the others: hub.renamed). */
+  renamed?: (player: string) => void;
 }
 
 /**
@@ -277,7 +279,7 @@ export function registerNameRoutes(app: FastifyInstance, deps: NameRouteDeps): v
     if (at > now) return send(reply, refuse(409, 'rename_too_soon', { rename_at: at }));
     const r = checkName(raw, list());
     if (!r.ok) return send(reply, refuse(400, 'name_rejected', { reason: r.reason }));
-    if (r.name !== s.profile?.name) { setName(s, r.name, now); deps.store.put(s); }
+    if (r.name !== s.profile?.name) { setName(s, r.name, now); deps.store.put(s); deps.renamed?.(player); }
     return reply.send({ ok: true, name: r.name, rename_at: accountNameView(s, now).rename_at });
   });
 }
