@@ -85,3 +85,10 @@ func test_a_drawer_row_name_ends_in_an_ellipsis_and_never_translates() -> void:
 	preload("res://scenes/p0/panels/p0_people_drawer.gd")._as_name(l)
 	assert_int(l.text_overrun_behavior).is_equal(TextServer.OVERRUN_TRIM_ELLIPSIS)
 	assert_int(l.auto_translate_mode).is_equal(Node.AUTO_TRANSLATE_MODE_DISABLED)
+
+func test_the_tag_width_is_measured_once_per_language() -> void:
+	var font := UiKit.font(&"bold")
+	var w := P0Names.tag_width(font, 28)
+	assert_float(P0Names.tag_width(font, 28)).is_equal(w)
+	_chinese()
+	assert_float(P0Names.tag_width(font, 28)).is_not_equal(w)   # `旅人 wwww`: its own entry, not the English one

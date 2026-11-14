@@ -163,7 +163,11 @@ func step(delta: float, local_position: Vector3) -> void:
 			if fishing.is_empty() and animation != entry.animation:
 				entry.animation = animation
 				entry.rig.play_motion(animation)
-			entry.label.text = tag_text(actor.member, entry.label) + ("\n%d / %d" % [int(actor.hp), int(actor.max_hp)] if show_health else "")
+			var tag_key := "%s|%s|%s" % [actor.member.get("name", ""), actor.member.get("player", ""), TranslationServer.get_locale()]
+			if entry.get("tag_key", "") != tag_key:   # measured again only when the name, the handle or the language changes (周瑜 on #1059)
+				entry.tag_key = tag_key
+				entry.tag = tag_text(actor.member, entry.label)
+			entry.label.text = str(entry.tag) + ("\n%d / %d" % [int(actor.hp), int(actor.max_hp)] if show_health else "")
 			entry.label.modulate = SPEAKING_COLOR if speaking.has(id) else Color.WHITE
 			entry.label.outline_modulate = Color.WHITE if speaking.has(id) else Color.BLACK   # green on light, as 383 V1 reads
 		else:
