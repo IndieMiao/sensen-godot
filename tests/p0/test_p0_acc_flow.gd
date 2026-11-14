@@ -179,9 +179,10 @@ func test_the_keys_are_grey_while_the_sheet_is_up_till_the_host_answers() -> voi
 	(s.keys.get_node("Apple") as Button).pressed.emit()
 	f.claimed(["google"])   # an answer gives the keys back too
 	assert_bool(s.busy).is_false()
-	(s.keys.get_node("Email") as Button).pressed.emit()   # email: its own page, nothing greyed
+	(s.keys.get_node("Email") as Button).pressed.emit()   # email: its own page (#1034), nothing greyed, no sheet
 	assert_bool(s.busy).is_false()
-	assert_array(got).is_equal(["google", "apple", "email"])
+	assert_object(f.page).is_instanceof(P0AccEmail)
+	assert_array(got).is_equal(["google", "apple"])
 	f.sign_in_settled()
 	(s.keys.get_node("Google") as Button).pressed.emit()
 	f.no_farm()

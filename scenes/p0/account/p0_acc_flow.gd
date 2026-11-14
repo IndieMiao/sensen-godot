@@ -18,9 +18,17 @@ extends Control
 ## {age_ok, terms, privacy, agreed_at}; a no is only {age_ok: false}); the year is never kept, a no never sent. Back
 ## (back()): the choose card or Born in …? closed, NAME → sign-in for a new player; anything else is the host's (the
 ## launch's own: to the home screen).
+## Email (SGODOT-497, q(323); 不知火舞's email spec v1): the sign-in page's `email` opens ACC-EMAIL here, not the host's
+## sheet — the address said (email_submitted), the host's code_sent puts up ACC-EMAIL-CODE, six digits said
+## (code_submitted), `Resend code` (resend_requested); the host answers with show_error / set_busy (亚瑟 11-13) and, once
+## the code is good, as after Apple / Google (in, no_farm, conflict). Back: the code page → ACC-EMAIL (the address
+## kept), ACC-EMAIL → the sign-in page.
 
 signal agreed(age_ok: bool)      # AGE's Yes, or the consent card's Continue (true)
-signal sign_in(provider: String)  # "apple" / "google" / "email"
+signal sign_in(provider: String)  # "apple" / "google" (email: the pages here, the three below)
+signal email_submitted(email: String)                # ACC-EMAIL's Continue: the host's P0Session.email_start
+signal code_submitted(email: String, code: String)   # six digits: the host's P0Session.sign_in("email", {email, code})
+signal resend_requested(email: String)               # `Resend code`: email_start again, the same address
 signal named(name: String, skip: bool)
 signal sign_in_again             # Try another account (NAME's or the choose card's): the host drops its pending
 signal switch_farm               # the choose card's Switch to that farm
@@ -45,6 +53,7 @@ var _check := Callable()
 var _this_year := 0
 var _provider := ""
 var _toasts: ToastLayer           # the flow's own: P0Ui's banner and toasts are on a layer under this one
+var _email := ""                  # the address ACC-EMAIL said last
 
 ## `check`: NAME's name check (P0Session.name_check). `providers_`: the sign-in page's keys (P0AccSignIn). `hints_`:
 ## {line: "farm_uses" | "last_time", with: …} for the sign-in page's line.
@@ -130,10 +139,45 @@ func _open_sign_in() -> void:
 		sign_in_page.provider_pressed.connect(func(p: String):
 			if sign_in_page.busy: return
 			_provider = p
-			sign_in_page.busy = p != "email"   # email opens its own page (盘古's), no system sheet over this one
+			if p == "email":   # its own pages here (盘古's), no system sheet over this one: the keys stay live
+				_open_email()
+				return
+			sign_in_page.busy = true
 			sign_in.emit(p))
 		sign_in_page.test_code_pressed.connect(func(): test_code.emit())
 	_show(sign_in_page)
+
+func _open_email() -> void:
+	var e := P0AccEmail.new()
+	e.prefill(_email)
+	e.back_pressed.connect(_open_sign_in)
+	e.submitted.connect(func(m: String):
+		_email = m
+		email_submitted.emit(m))
+	_show(e)
+
+## The host's: a code went to the address (email_start's ok, its resend_in in seconds) — the code page, or on it (after
+## `Resend code`) the cells empty and the wait again.
+func code_sent(resend_in := P0AccEmailCode.RESEND_S) -> void:
+	if page is P0AccEmailCode:
+		(page as P0AccEmailCode).code_sent(resend_in)
+		return
+	var c := P0AccEmailCode.new(_email, resend_in)
+	c.entered.connect(func(code: String): code_submitted.emit(_email, code))
+	c.resend_pressed.connect(func(): resend_requested.emit(_email))
+	c.change_pressed.connect(_open_email)
+	c.back_pressed.connect(_open_email)
+	_show(c)
+
+## The host's: email_start's or the code's no, on the page up (contract v1.5 codes; red under the field, never a toast).
+func show_error(code: String, detail := {}) -> void:
+	if page is P0AccEmail: (page as P0AccEmail).show_error(code, detail)
+	elif page is P0AccEmailCode: (page as P0AccEmailCode).show_error(code, detail)
+
+## The host's, while a request for the email pages is out.
+func set_busy(on: bool) -> void:
+	if page is P0AccEmail: (page as P0AccEmail).set_busy(on)
+	elif page is P0AccEmailCode: (page as P0AccEmailCode).set_busy(on)
 
 ## The host's: signed in, no farm for that account yet (a new player, `fresh`: NAME with Try another account) — or an
 ## old farm claimed, or a test code taken (not fresh: no way back from NAME). A new NAME each time: a name typed for
@@ -271,6 +315,12 @@ func back() -> bool:
 	if page == name_page and name_page != null and name_page._checking: return true   # its check in flight: Back waits (周瑜 on #1052)
 	if page == name_page and name_page != null and name_page.another_row.visible:
 		_try_another()
+		return true
+	if page is P0AccEmail:
+		_open_sign_in()
+		return true
+	if page is P0AccEmailCode:
+		_open_email()
 		return true
 	return false
 
