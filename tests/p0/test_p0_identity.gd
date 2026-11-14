@@ -2,6 +2,7 @@ extends GdUnitTestSuite
 ## P0Identity (SGODOT-488 A2; contract-accounts v1.4–v1.6.3): the first launch's way after hello (legacy's ages, a claimed
 ## id signed out), the sign-ins (claim with credentials, the ticket kept for guest and session/pending, a test code,
 ## logout), one token per launch, the session files, legacy for an older server.
+const P0Identity := preload("res://modules/p0/p0_identity.gd")
 var dir: String
 var sent: Array = []
 var replies := {}   # path → the reply to give

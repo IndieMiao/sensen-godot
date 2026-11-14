@@ -26,6 +26,7 @@ signal first_run_needed(kind: String)
 signal account_state(kind: String, detail: Dictionary)
 signal identity_changed(ready: bool)
 
+const P0Identity := preload("res://modules/p0/p0_identity.gd")   # SGODOT-488: preloaded, no class_name (#764)
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
 const DEMO_CONFIG := "res://assets/p0/demo_server.json"
 const REFRESH_S := 30.0
