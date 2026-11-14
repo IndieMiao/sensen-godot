@@ -195,7 +195,7 @@ func test_the_flow_says_its_own_lines_over_the_page() -> void:
 	assert_str(f.said()).is_equal("Didn't go through · try again")
 	assert_int(f.banner.kind).is_equal(UiSysBanner.Kind.CMD_FAIL)
 	assert_float(f.banner.offset_top).is_equal(24.0 + P0AccFlow.BANNER_TOP)
-	assert_float(f.banner.offset_top + 40.0).is_less(84.0 + 24.0 + 1.0)   # its 40 end above the wordmark's top (84) on this screen
+	assert_bool(f.banner_over_mark()).is_true()   # 24 + 16 + 40 = 80 comes within 8 of the wordmark's 84: it fades (周瑜 on #1052)
 	assert_int(f.banner.get_index()).is_equal(f.get_child_count() - 1)   # over the page
 	f.no_farm()   # a page on top later: the lines go back over it
 	assert_int(f.banner.get_index()).is_equal(f.get_child_count() - 1)
