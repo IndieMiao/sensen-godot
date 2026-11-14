@@ -145,6 +145,11 @@ func test_a_claim_refused_keeps_its_ticket() -> void:
 	assert_bool(id.has_farm).is_true()
 	assert_dict(id.conflict_farm).is_equal(farm)
 	assert_str(id.first_run()).is_equal("old_consent")   # still the old account's: another claim may follow
+	replies.erase("/p0/session/pending")
+	id.sign_in_pending(func(_r): pass)   # no answer (network): the ticket and the farm stand, for the card's key again
+	assert_str(id.pending).is_equal("pend-c")
+	assert_bool(id.has_farm).is_true()
+	assert_dict(id.conflict_farm).is_equal(farm)
 	replies["/p0/session/pending"] = {"ok": true, "player": "p0-dddddddddddddddddddd", "linked": ["google"]}
 	id.sign_in_pending(func(_r): pass)
 	assert_dict(_sent("/p0/session/pending")[0].body).contains_key_value("pending", "pend-c")

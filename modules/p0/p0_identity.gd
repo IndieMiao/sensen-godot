@@ -200,6 +200,7 @@ func _took(r: Dictionary, t: String, provider: String) -> void:
 		pending = ""
 		kind = "ready"
 		return
+	if str(r.get("code", "")) == "network": return   # no answer: the last sign-in's ticket and farm stand (周瑜 on #1024)
 	if r.has("pending"): pending = str(r.pending)
 	has_farm = bool(r.get("has_farm", false))
 	conflict_farm = r.get("farm", {}) if r.get("farm") is Dictionary else {}

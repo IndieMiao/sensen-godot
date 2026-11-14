@@ -225,6 +225,18 @@ func test_a_rename_goes_to_the_server() -> void:
 	rt._on_rename("Mia")
 	assert_dict(_sent("/p0/account/name")[0][1]).is_equal({"name": "Mia"})
 
+func test_outdated_terms_are_never_swapped_for_the_player() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	replies["/p0/session/google"] = {"ok": false, "code": "no_farm", "pending": "pend-1"}
+	await rt._on_acc_sign_in("google")
+	replies["/p0/session/guest"] = {"ok": false, "code": "consent_outdated", "terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+	rt._acc_flow.named.emit("Mia", false)
+	assert_str(rt.session.identity.terms_version).is_equal("2026-11-13")   # not agreed for them (奕星 11-14)
+	assert_str(rt.session.identity.privacy_version).is_equal("2026-11-13")
+	assert_object(rt._acc_flow).is_not_null()   # stays on the page
+	assert_bool(rt.session.identity_ready).is_false()
+
 func test_no_on_the_age_page_sends_nothing() -> void:
 	rt.session.identity.kind = "old_age"
 	rt.session.first_run_needed.emit("old_age")
