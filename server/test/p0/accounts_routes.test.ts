@@ -90,6 +90,27 @@ describe('session/guest', () => {
   });
 });
 
+describe("guest's limit per address (奕星 11-14; 周瑜 on #1024 6871113269)", () => {
+  const pendings = (n: number) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`p${i}`, { provider: 'google' as const, link: { sub: `g${i}` } }]));
+  it('a sign-in is never held back: 11 saves with tickets from one address all made', async () => {
+    const { app, store } = setup({ guestOk: false, guestsPerHour: 10, pendings: pendings(11) });
+    for (let i = 0; i < 11; i++) {
+      const r = (await app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest({ token: T(100 + i), request_id: T(200 + i), pending: `p${i}` }) })).json();
+      expect(r).toMatchObject({ ok: true, linked: 'google' });
+    }
+    expect(store.size()).toBe(11);
+  });
+  it('the limit holds for saves with no sign-in — and an address past it still makes a save with its ticket, the ticket never spent by a 429', async () => {
+    const opts = { guestOk: true, guestsPerHour: 2, pendings: pendings(1) };
+    const { app } = setup(opts);
+    const post = (p: Record<string, unknown>) => app.inject({ method: 'POST', url: '/v1/p0/session/guest', payload: guest(p) });
+    expect((await post({ token: T(1) })).json().ok).toBe(true);
+    expect((await post({ token: T(2) })).json().ok).toBe(true);
+    expect((await post({ token: T(3) })).json().code).toBe('rate_limited');   // no ticket: held back
+    expect((await post({ token: T(4), pending: 'p0' })).json()).toMatchObject({ ok: true, linked: 'google' });
+  });
+});
+
 describe('session/claim (v1.4: with a sign-in; v1.6 ①: every refusal carries the sign-in)', () => {
   const claim = (app: ReturnType<typeof Fastify>, player: string, token: string, sign: Record<string, unknown> = signed('g1')) =>
     app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': player }, payload: { ...sign, token } });

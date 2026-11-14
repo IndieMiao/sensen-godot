@@ -107,6 +107,13 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     if (!main && b.pending === undefined && !deps.guestOk) return send(bad('sign_in_required', 400));
     const named = main ? { ok: true as const } : nameForGuest(b, { limiter, ip: req.ip, now, list: deps.nameList?.() });
     if (!named.ok) return reply.code(named.status).send(named.body);
+    // saves made per address per hour (a script making saves): only those with no sign-in — a sign-in's ticket (Apple,
+    // Google, email, a code) is its own proof, so many real players behind one carrier NAT are never held back (奕星
+    // 11-14); and checked before the ticket is spent, so a 429 never costs the player their sign-in (周瑜 6871113269)
+    const limited = b.pending === undefined;
+    const h = Math.floor(now / 3_600_000);
+    if (h !== hour) { made.clear(); hour = h; }
+    if (limited && (made.get(req.ip) ?? 0) >= (deps.guestsPerHour ?? 10)) return send(bad('rate_limited', 429));
     const signedIn = b.pending !== undefined ? deps.pending?.take(b.pending) : undefined;
     if (b.pending !== undefined && !signedIn) return send(bad('pending_expired', 410));
     if (signedIn) {
@@ -118,11 +125,6 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
         return send(bad('conflict', 409, again ? { pending: again } : {}));
       }
     }
-    const h = Math.floor(now / 3_600_000);
-    if (h !== hour) { made.clear(); hour = h; }
-    const n = made.get(req.ip) ?? 0;
-    if (n >= (deps.guestsPerHour ?? 10)) return send(bad('rate_limited', 429));
-    made.set(req.ip, n + 1);
     let player = '';
     const make = () => (main ? 'g3test-' + randomBytes(16).toString('hex') : 'p0-' + randomBytes(10).toString('hex'));   // the test ids as P0TestAccounts writes them
     do player = make(); while (store.peek(player) || accounts.find(player) || accounts.isDeleted(player));
@@ -140,6 +142,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
       accounts.link(player, signedIn.provider, signedIn.link);
     }
     accounts.issue(player, token);   // … then who holds it
+    if (limited) made.set(req.ip, (made.get(req.ip) ?? 0) + 1);
     return { ok: true, player, ...(signedIn ? { linked: signedIn.provider } : {}) };
   });
 
