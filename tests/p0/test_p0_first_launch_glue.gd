@@ -299,6 +299,18 @@ func test_no_card_yet_a_sign_in_without_today_s_consent_goes_in_and_a_save_stays
 	assert_object(rt._acc_flow).is_not_null()   # the Save refused: stays, a toast, versions as they were
 	assert_str(rt.session.identity.terms_version).is_equal("2026-11-13")
 
+func test_a_consent_refused_for_good_closes_the_card_and_gives_the_keys_back() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	replies["/p0/session/apple"] = {"ok": true, "player": "p0-kkkkkkkkkkkkkkkkkkkk", "linked": ["apple"], "consent_outdated": true,
+		"terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+	await rt._on_acc_sign_in("apple")
+	flow.record = {"age_ok": true, "terms": "2026-12-01", "privacy": "2026-12-01"}
+	replies["/p0/account/consent"] = {"ok": false, "code": "unauthenticated"}
+	flow.consent_renewed.emit()
+	assert_array(flow.calls).contains([["consent_settled", true], ["settled"]])   # the card gone, the keys back (周瑜 on #1056)
+
 func test_failures_are_said_on_the_flow_s_own_layer() -> void:
 	rt.session.identity.kind = "new"
 	rt.session.first_run_needed.emit("new")
