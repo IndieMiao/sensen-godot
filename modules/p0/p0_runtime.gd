@@ -1596,12 +1596,10 @@ func _on_acc_named(name: String, skip: bool) -> void:
 			_acc_flow.call("name_refused", r)
 		else: _acc_failed(r))
 
-func _acc_failed(r: Dictionary) -> void:
-	var code := str(r.get("code", ""))
-	if code == "consent_outdated":
-		# the server's terms moved on while the pages were up: its versions, agreed again from the AGE page
-		session.identity.terms_version = str(r.get("terms_version", session.identity.terms_version))
-		session.identity.privacy_version = str(r.get("privacy_version", session.identity.privacy_version))
+## A refusal toasted where the page is. consent_outdated (the server's terms moved on while the pages were up) is one
+## too: the versions are never swapped for the player — no consent they have not seen (奕星 11-14); their way back to
+## agree again is 不知火舞's to set, till then a new launch asks them anew.
+func _acc_failed(_r: Dictionary) -> void:
 	ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
 
 ## The account is settled: the pages go, the launch cover comes up and the world's first read is already out
