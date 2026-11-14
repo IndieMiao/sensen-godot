@@ -165,3 +165,20 @@ func test_the_room_says_changed_when_someone_comes_in_or_goes() -> void:
 	assert_array(said).is_equal([1])
 	online._message(JSON.stringify({"t": "left", "id": 4}))
 	assert_array(said).is_equal([1, 0])
+
+## SGODOT-491 (后裔's roster `name`, 11-14): a chosen name over the default, a rename's peer replaces it, the Blocked
+## list's current name.
+func test_people_carry_their_chosen_names_and_a_rename_replaces_it() -> void:
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	var online: P0Online = f[2]
+	online._message(JSON.stringify({"t": "roster", "count": 2, "members": [{"id": 1, "player": "aaaa1111aaaa1111", "name": "Mira"},
+		{"id": 4, "player": "bbbb2222bbbb2222"}]}))
+	var rows: Array = room.people()
+	assert_str(str(rows[0].name)).is_equal("Mira")
+	assert_str(str(rows[1].name)).is_equal("Traveller bbbb")   # none chosen: the default
+	online._message(JSON.stringify({"t": "peer", "member": {"id": 4, "player": "bbbb2222bbbb2222", "name": "Carrot"}}))   # renamed
+	assert_str(str(room.people()[1].name)).is_equal("Carrot")
+	answers["blocks"] = {"ok": true, "blocked": [{"handle": "cccc3333", "name": "Apple"}, {"handle": "dddd4444"}]}
+	var listed = await room.blocked_list()
+	assert_array(listed.map(func(b): return b.name)).is_equal(["Apple", "Traveller dddd"])
