@@ -42,14 +42,13 @@ func _init(current := "") -> void:
 	field.text_changed.connect(_on_typed)
 	field.submitted.connect(func(_t: String): _on_save())
 	body.add_child(field)
-	var gap := Control.new()
-	gap.custom_minimum_size.y = KEYS_GAP
-	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	body.add_child(gap)
+	var lift := MarginContainer.new()   # 4 on the column's 12: 16 from the helper to Save (a spacer would take two 12s)
+	lift.add_theme_constant_override(&"margin_top", KEYS_GAP)
+	body.add_child(lift)
 	var keys := VBoxContainer.new()
 	keys.name = "Keys"
 	keys.add_theme_constant_override(&"separation", KEY_SEP)
-	body.add_child(keys)
+	lift.add_child(keys)
 	save = UiCommandButton.new(SAVE)
 	save.name = "Save"
 	save.activated.connect(_on_save)
