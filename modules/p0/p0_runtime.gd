@@ -1453,6 +1453,7 @@ func _open_acc_flow(kind: String) -> void:
 	_naming = "guest"
 	var e := _entry(script, kind)
 	_acc_flow = script.new(str(e.get("kind", kind)), session.name_check, e.get("providers", []), session.identity.hints(), 0)
+	if "safe_top" in _acc_flow and ui.has_method("safe_top"): _acc_flow.set("safe_top", ui.safe_top())   # its bar under the status bar
 	_acc_layer = CanvasLayer.new()
 	_acc_layer.layer = 120   # over the HUD, the toasts and the system screens
 	add_child(_acc_layer)

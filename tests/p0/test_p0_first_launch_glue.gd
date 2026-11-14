@@ -268,6 +268,7 @@ func test_failures_are_said_on_the_flow_s_own_layer() -> void:
 	sheet = {"result": "failed", "reason": "APPLE_UNKNOWN"}
 	await rt._on_acc_sign_in("apple")
 	assert_array(rt._acc_flow.said).contains_exactly([["Didn't go through · try again", true]])
+	if rt.ui.has_method("safe_top"): assert_float(rt._acc_flow.safe_top).is_equal(float(rt.ui.safe_top()))   # set when built
 
 func test_no_on_the_age_page_sends_nothing() -> void:
 	rt.session.identity.kind = "old_age"

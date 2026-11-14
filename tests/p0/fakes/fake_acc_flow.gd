@@ -15,6 +15,7 @@ var providers: Array = []
 var hints := {}
 var calls: Array = []   # [method, args…] as the runtime made them
 var record := {}        # kept(): this phone's AGE answer
+var safe_top := -1.0
 func _init(k: String, _name_check: Callable, p: Array, h := {}, _this_year := 0) -> void:
 	kind = k
 	providers = p
