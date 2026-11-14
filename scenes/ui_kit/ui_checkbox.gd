@@ -56,7 +56,7 @@ func _init(text_ := "", links_: Array = []) -> void:
 	line.mouse_filter = Control.MOUSE_FILTER_PASS   # a link's tap is its own; the rest falls through to the row
 	line.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # translated here, once
 	line.add_theme_font_override(&"normal_font", UiKit.font(&"bold"))
-	line.add_theme_font_size_override(&"normal_font_size", 14)
+	line.add_theme_font_size_override(&"normal_font_size", UiKit.theme().get_font_size(&"font_size", UiTokens.STYLE_BODY_B14))   # Body Bold 14
 	line.add_theme_color_override(&"default_color", UiTokens.COLOR_TEXT)
 	line.meta_underlined = false
 	line.meta_clicked.connect(func(meta):
