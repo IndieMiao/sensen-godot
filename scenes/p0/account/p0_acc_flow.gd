@@ -280,6 +280,8 @@ func consent_outdated(r: Dictionary) -> void:
 	renew = P0AccConsent.new(true)
 	renew.name = "AccRenew"
 	renew.as_overlay()
+	# Q325-AFTER (740:202404): the overlay starts below NAME's title; standalone pages keep their y170.
+	renew.card_top = 265.0
 	renew.link_pressed.connect(open_link)
 	renew.agreed.connect(func():
 		if renew.go.phase != CommandLifecycle.State.IDLE: return
