@@ -28,6 +28,8 @@ const WRONG := "That code didn't work. %d tries left."
 const WRONG_ONE := "That code didn't work. 1 try left."
 const SPENT := "Too many tries. Get a new code."
 const EXPIRED := "That code has expired. Get a new code."
+## Codes tried too fast (sign_in's rate_limited, not email_start's): its own line (不知火舞 11-14; q(324), the user 11-14).
+const TOO_FAST := "Too many tries. Try again in %s."
 const DIGITS := 6
 const RESEND_S := 60.0
 const ADDRESS_MAX := 40   # letters of the address shown whole; past it the middle of its name goes (spec §3)
@@ -55,6 +57,8 @@ var left := 0.0           # seconds till `Resend code`
 var locked := false       # five tries or expired: grey and empty till a new code
 var _wrong := false       # the red on the cells: the digits kept and selected
 var _busy := false
+var _asked := ""          # what the host is answering: "code" (sign_in) or "resend" (email_start)
+var held := 0.0           # seconds the cells stay grey after codes were tried too fast; then open again
 
 func _init(email_ := "", resend_in := RESEND_S) -> void:
 	super()
@@ -123,6 +127,7 @@ func code_sent(resend_in := RESEND_S) -> void:
 	_busy = false
 	locked = false
 	_wrong = false
+	held = 0.0
 	input.text = ""
 	_set_red("")
 	left = maxf(resend_in, 0.0)
@@ -136,7 +141,8 @@ func set_busy(on: bool) -> void:
 	_paint()
 
 ## The host's: the no, by its code (contract v1.5; spec §3). `bad_code` {attempts_left} (none left: as five tries),
-## `code_expired`, `rate_limited` {retry_in: seconds} (Resend's wait from it), `email_unavailable` /
+## `code_expired`, `rate_limited` {retry_in: seconds} — after `Resend code` its wait from it, after a code the cells grey
+## and empty till then, the wait for Resend left as it was (不知火舞 11-14) — `email_unavailable` /
 ## `provider_unavailable` (Resend could not send), anything else as the network (the digits kept, one changed sends
 ## them again).
 func show_error(code: String, detail := {}) -> void:
@@ -149,8 +155,12 @@ func show_error(code: String, detail := {}) -> void:
 		"code_expired": _lock(EXPIRED)
 		"rate_limited":
 			var s := float(detail.get("retry_in", RESEND_S))
-			_set_red(P0AccEmail.RATE % P0Logic.span(s * 1000.0))
-			left = s
+			if _asked == "code":
+				_lock(TOO_FAST % P0Logic.span(s * 1000.0))
+				held = s
+			else:
+				_set_red(P0AccEmail.RATE % P0Logic.span(s * 1000.0))
+				left = s
 			set_process(true)
 		"email_unavailable", "provider_unavailable": _set_red(P0AccEmail.UNAVAILABLE)
 		_: _keep_wrong(P0AccEmail.OFFLINE)
@@ -165,9 +175,15 @@ func _process(delta: float) -> void:
 
 ## The wait running down (tests drive it).
 func tick(seconds: float) -> void:
-	if left <= 0.0: return
-	left = maxf(left - seconds, 0.0)
-	if left <= 0.0: set_process(false)
+	if held > 0.0:
+		held = maxf(held - seconds, 0.0)
+		if held <= 0.0:   # the wait over: the cells open, the red gone
+			locked = false
+			_set_red("")
+			_paint()
+			if is_inside_tree(): input.grab_focus()
+	if left > 0.0: left = maxf(left - seconds, 0.0)
+	if left <= 0.0 and held <= 0.0: set_process(false)
 	_paint_row()
 
 func _lock(why: String) -> void:
@@ -201,6 +217,7 @@ func _on_typed(t: String) -> void:
 	_paint()
 	if only.length() == DIGITS and not _busy and not locked:
 		_busy = true
+		_asked = "code"
 		_paint()
 		entered.emit(only)
 
@@ -210,7 +227,9 @@ func _on_resend() -> void:
 	_wrong = false
 	input.text = ""
 	_set_red("")
+	held = 0.0
 	_busy = true
+	_asked = "resend"
 	_paint()
 	resend_pressed.emit()
 

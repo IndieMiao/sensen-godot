@@ -167,6 +167,9 @@ func test_the_other_nos_on_the_code_page() -> void:
 	_digits(p, "48271")
 	_digits(p, "482713")
 	assert_array(said).is_equal(["482713"])
+	p.set_busy(false)   # the host's answer to that code (whatever it was)
+	p.tick(60.0)
+	p.resend_key.pressed.emit()
 	p.show_error("rate_limited", {"retry_in": 45})
 	assert_str(p.red.text).is_equal("Too many codes requested. Try again in 1m.")
 	assert_str(p.wait_line.text).is_equal("Resend code in 0:45")
@@ -208,3 +211,28 @@ func test_the_flow_goes_email_then_code_and_back() -> void:
 	assert_str((f.page as P0AccEmail).field.text).is_equal("lin.z@icloud.com")
 	assert_bool(f.back()).is_true()   # → Sign in
 	assert_object(f.page).is_instanceof(P0AccSignIn)
+
+## 不知火舞 11-14: codes tried too fast (sign_in's rate_limited) grey the cells empty till retry_in, then open them
+## again; the wait for Resend keeps its own count. After `Resend code` it is the resend wait that restarts.
+func test_codes_tried_too_fast_grey_the_cells_till_the_wait_is_over() -> void:
+	var p := _code()
+	p.tick(20.0)   # Resend in 0:40
+	_digits(p, "482719")
+	p.show_error("rate_limited", {"retry_in": 300})
+	assert_bool(p.locked).is_true()
+	assert_str(p.code()).is_equal("")
+	assert_bool(p.input.editable).is_false()
+	assert_str(p.red.text).is_equal("Too many tries. Try again in 5m.")
+	assert_str(p.wait_line.text).is_equal("Resend code in 0:40")   # not reset
+	p.tick(40.0)
+	assert_bool(p.resend_key.visible).is_true()
+	assert_bool(p.locked).is_true()
+	p.tick(260.0)
+	assert_bool(p.locked).is_false()
+	assert_bool(p.red.visible).is_false()
+	assert_bool(p.input.editable).is_true()
+	p.resend_key.pressed.emit()
+	p.show_error("rate_limited", {"retry_in": 45})   # email_start's: the resend wait, the cells open
+	assert_bool(p.locked).is_false()
+	assert_str(p.red.text).is_equal("Too many codes requested. Try again in 1m.")
+	assert_str(p.wait_line.text).is_equal("Resend code in 0:45")
