@@ -1,6 +1,7 @@
 extends GdUnitTestSuite
 ## P0Session on an accounts server (SGODOT-488 A2; contract-accounts.md §0–§1): the gate before the identity is known, the
 ## token beside the id, account refusals that stop everything without reading as a lost connection.
+const P0Identity := preload("res://modules/p0/p0_identity.gd")
 
 func _session() -> P0Session:
 	var s := P0Session.new()   # not in the tree: _ready not run, set up by hand
@@ -71,3 +72,22 @@ func test_a_voice_reply_with_an_account_code_stops_the_session_too() -> void:
 	assert_bool(s.identity_ready).is_false()
 	assert_array(states).contains_exactly(["account_deleted"])
 	assert_bool(s.take_account_refusal(HTTPRequest.RESULT_SUCCESS, 403, JSON.stringify({"code": "AGE_GATE"}).to_utf8_buffer())).is_false()
+
+## PR-A on farm-dev before its server is live (哪吒's 491 PR, 奕星 11-14): hello 404 / no terms_version is an older
+## server — the install's own id, x-p0-player alone, the world's first read; no first-launch page, no token.
+func test_an_older_server_is_the_old_way_in_with_no_pages() -> void:
+	var s := _session()
+	s.identity = P0Identity.new("user://test_488_legacy_%d/" % OS.get_process_id())
+	s.identity.send = func(_m: int, _p: String, _b: Dictionary, done: Callable): done.call({"ok": false, "code": "not_found"})
+	s.identity_ready = false
+	var sent: Array = []
+	s.transport = func(_m: int, path: String, _b: Dictionary, _c: Dictionary): sent.append(path)
+	var pages: Array = []
+	s.first_run_needed.connect(func(k): pages.append(k))
+	s.hello(func(_r): pass)
+	assert_bool(s.accounts).is_false()
+	assert_bool(s.identity_ready).is_true()
+	assert_str(s.player_id).is_not_empty()
+	assert_array(pages).is_empty()
+	assert_array(sent).contains(["/p0/state"])
+	assert_bool(Array(s._headers()).any(func(h): return str(h).begins_with("authorization"))).is_false()
