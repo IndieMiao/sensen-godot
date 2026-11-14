@@ -90,3 +90,19 @@ func test_a_keyboard_with_no_field_tapped_moves_nothing() -> void:
 	await get_tree().create_timer(P0AccShell.KEYBOARD_S + 0.15).timeout
 	assert_float(page.mark.modulate.a).is_equal(1.0)
 	assert_float(page.lift).is_equal(0.0)
+
+func test_a_page_with_no_primary_keeps_its_own_row_over_the_keyboard() -> void:
+	var s := P0AccShell.new()
+	s.keyboard_height = func() -> float: return 380.0
+	add_child(auto_free(s))
+	s.size = Vector2(360, 800)
+	s.add_title("Enter the code")
+	s.add_gap(300)   # the row sits low: the keyboard covers it
+	var field := UiTextField.new("Code")
+	s.col.add_child(field)
+	s.keep_above_keyboard = field
+	await await_idle_frame()
+	field.input.grab_focus()
+	await get_tree().create_timer(P0AccShell.KEYBOARD_S + 0.15).timeout
+	var foot := field.get_global_rect().end.y - s.global_position.y
+	assert_float(foot).is_equal_approx(800.0 - 380.0 - P0AccShell.KEY_CLEAR, 1.0)

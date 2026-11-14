@@ -49,6 +49,8 @@ var _art: TextureRect
 const KEY_CLEAR := 12.0
 const KEYBOARD_S := 0.25
 var keyboard_height := Callable()
+## What must stay over the keyboard when not the primary key (a page without one: the email code's six cells, 盘古).
+var keep_above_keyboard: Control
 var lift := 0.0:                      # how far up the card is now
 	set(v):
 		lift = v
@@ -167,9 +169,10 @@ func _process(_delta: float) -> void:
 		_lift_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		_lift_tween.tween_property(self, ^"lift", want, KEYBOARD_S)
 
-## How far the card must go up so the primary key's foot is KEY_CLEAR over a keyboard `kb` tall; 0 when it is clear.
+## How far the card must go up so the primary key's foot (or keep_above_keyboard's) is KEY_CLEAR over a keyboard `kb`
+## tall; 0 when it is clear.
 func key_lift(kb: float) -> float:
-	var key := col.find_child("Primary", false, false) as Control
+	var key := keep_above_keyboard if is_instance_valid(keep_above_keyboard) else col.find_child("Primary", false, false) as Control
 	if key == null or kb <= 0.0: return 0.0
 	var foot := key.get_global_rect().end.y - global_position.y + lift   # where it sits with the card down
 	return maxf(0.0, foot - (size.y - kb - KEY_CLEAR))
