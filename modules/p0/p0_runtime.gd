@@ -1453,6 +1453,7 @@ func _open_acc_flow(kind: String) -> void:
 	_naming = "guest"
 	var e := _entry(script, kind)
 	_acc_flow = script.new(str(e.get("kind", kind)), session.name_check, e.get("providers", []), session.identity.hints(), 0)
+	if "safe_top" in _acc_flow and ui.has_method("safe_top"): _acc_flow.set("safe_top", ui.safe_top())   # its bar under the status bar
 	_acc_layer = CanvasLayer.new()
 	_acc_layer.layer = 120   # over the HUD, the toasts and the system screens
 	add_child(_acc_layer)
@@ -1461,7 +1462,8 @@ func _open_acc_flow(kind: String) -> void:
 	_acc_flow.connect("named", _on_acc_named)
 	_acc_flow.connect("sign_in", _on_acc_sign_in)
 	_acc_flow.connect("failed", func(_code: String): _acc_failed({}))
-	for pair in [["sign_in_again", _on_acc_sign_in_again], ["switch_farm", _on_acc_switch], ["code_entered", _on_acc_code]]:
+	for pair in [["sign_in_again", _on_acc_sign_in_again], ["switch_farm", _on_acc_switch], ["code_entered", _on_acc_code],
+			["consent_renewed", _on_consent_renewed]]:
 		if _acc_flow.has_signal(pair[0]): _acc_flow.connect(pair[0], pair[1])   # the pages of 11-15 / 11-19 on
 
 func _close_acc_flow() -> void:
@@ -1508,10 +1510,14 @@ static func _native_sign_in(provider: String) -> Dictionary:
 func _on_signed_in(r: Dictionary, how: String) -> void:
 	if not is_instance_valid(_acc_flow): return
 	if bool(r.get("ok", false)):
-		match how:
-			"claim": _name_signed_in()
-			"code": _code_signed_in()
-			_: _acc_done()
+		var next: Callable = _name_signed_in if how == "claim" else _code_signed_in if how == "code" else _acc_done
+		if bool(r.get("consent_outdated", false)) and how != "code" and _has_card():
+			# in, but that farm has no consent to today's terms (spec v2 §9): the card first, account/consent, then on —
+			# never the farm nor NAME before it is on record (a code's account reports its own in _code_signed_in).
+			# No card yet (q(325) pending): in as before #1055, nothing agreed for the player (奕星 11-14)
+			_renew(r, func(): session.consent(_consent_body(), _consent_answered.bind(next)))
+			return
+		next.call()
 		return
 	match str(r.get("code", "")):
 		"no_farm":
@@ -1526,7 +1532,7 @@ func _on_signed_in(r: Dictionary, how: String) -> void:
 				_naming = "guest"
 				_acc_flow.call("no_farm")
 		"pending_expired":
-			ui.toast("Sign-in expired. Please sign in again.")
+			_say("Sign-in expired. Please sign in again.")
 			_acc_flow.call("name_refused", r)
 		"bad_code", "rate_limited" when how == "code":
 			if _acc_flow.has_method("code_refused"): _acc_flow.call("code_refused", r)
@@ -1554,9 +1560,7 @@ func _code_signed_in() -> void:
 		session.identity_settled()
 		_name_signed_in()
 		return
-	session.consent(_consent_body(), func(c: Dictionary):
-		if bool(c.get("ok", false)): _name_signed_in()
-		else: _acc_failed(c))
+	session.consent(_consent_body(), _consent_answered.bind(_name_signed_in))
 
 ## Try another account (NAME's, or the conflict card's second key): the ticket dropped; the page goes back to Sign in.
 func _on_acc_sign_in_again() -> void:
@@ -1586,21 +1590,77 @@ func _on_acc_named(name: String, skip: bool) -> void:
 	else: body["name"] = name
 	session.guest(body, func(r: Dictionary):
 		var code := str(r.get("code", ""))
+		_consent_settled(_card_done(r))
 		if bool(r.get("ok", false)): _acc_done()
 		elif not is_instance_valid(_acc_flow): return
+		elif code == "consent_outdated": _renew(r, _on_acc_named.bind(name, skip))   # the card, then the same Save again
 		elif code == "conflict":
 			# the account was given a farm on another phone meanwhile (v1.6.2): the same card, from NAME
 			_acc_flow.call("conflict", session.identity.conflict_farm, _provider)
 		elif code in ["name_rejected", "pending_expired"]:
-			if code == "pending_expired": ui.toast("Sign-in expired. Please sign in again.")
+			if code == "pending_expired": _say("Sign-in expired. Please sign in again.")
 			_acc_flow.call("name_refused", r)
 		else: _acc_failed(r))
 
-## A refusal toasted where the page is. consent_outdated (the server's terms moved on while the pages were up) is one
-## too: the versions are never swapped for the player — no consent they have not seen (奕星 11-14); their way back to
-## agree again is 不知火舞's to set, till then a new launch asks them anew.
+## A refusal toasted where the page is.
 func _acc_failed(_r: Dictionary) -> void:
-	ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
+	_say("Didn't go through · try again", true)
+
+## A line over the first-launch pages: on the flow's own layer (哪吒's say, 11-14 — P0Ui's toasts lie under its opaque
+## pages), on P0Ui's when no flow is up or it has none.
+func _say(text: String, error := false) -> void:
+	if is_instance_valid(_acc_flow) and _acc_flow.has_method("say"): _acc_flow.call("say", text, error)
+	elif error: ui.show_sys(UiSysBanner.Kind.CMD_FAIL, text, CMD_FAIL_S)
+	else: ui.toast(text)
+
+# ---- today's terms not agreed (不知火舞 spec v2 §9; 哪吒's consent_outdated / consent_renewed / consent_settled)
+## What the renewed terms redo: the request refused (guest's Save, a code's consent) or account/consent and the step
+## after a sign-in. Set while the card is up.
+var _renewed := Callable()
+var _renewing := false
+
+## Whether the flow has the card (哪吒's consent_outdated; q(325)).
+func _has_card() -> bool: return is_instance_valid(_acc_flow) and _acc_flow.has_method("consent_outdated")
+
+## Whether an answer to what the card redid closes it: anything but the terms moved again or no getting through
+## (network, rate_limited) — guest checks the consent before the name and the ticket, so name_rejected, pending_expired
+## or conflict are the page's own to show, with the card gone (周瑜 on #1056).
+static func _card_done(r: Dictionary) -> bool:
+	return bool(r.get("ok", false)) or not str(r.get("code", "")) in ["consent_outdated", "network", "rate_limited"]
+
+## The card `We've updated our terms` over the page, `redo` once agreed. A flow without it (q(325) not yet approved):
+## a toast where the page is and nothing more — never agreed for the player (奕星 11-14).
+func _renew(r: Dictionary, redo: Callable) -> void:
+	if not _has_card():
+		_say("Didn't go through · try again", true)
+		return
+	_renewed = redo
+	_acc_flow.call("consent_outdated", r)
+
+## Agreed: the versions the player saw (the flow kept them, user://p0_first_run.json) are the ones sent now.
+func _on_consent_renewed() -> void:
+	var kept = _acc_flow.call("kept") if is_instance_valid(_acc_flow) and _acc_flow.has_method("kept") else {}
+	if kept is Dictionary and str(kept.get("terms", "")) != "":
+		session.identity.terms_version = str(kept.terms)
+		session.identity.privacy_version = str(kept.get("privacy", session.identity.privacy_version))
+	_renewing = true
+	if _renewed.is_valid(): _renewed.call()   # kept till it goes through: the card's Continue again redoes it
+
+## The card's answer: closed when the request it redid went through (true); its key back otherwise (false) — a toast
+## says why, or the terms moved again and the card is asked for anew.
+func _consent_settled(ok: bool) -> void:
+	if not _renewing: return
+	_renewing = false
+	if ok: _renewed = Callable()
+	if is_instance_valid(_acc_flow) and _acc_flow.has_method("consent_settled"): _acc_flow.call("consent_settled", ok)
+
+## account/consent's answer: on to `next`; today's terms moved again meanwhile — the card again; else a toast.
+func _consent_answered(c: Dictionary, next: Callable) -> void:
+	var code := str(c.get("code", ""))
+	_consent_settled(_card_done(c))
+	if bool(c.get("ok", false)): next.call()
+	elif code == "consent_outdated": _renew(c, func(): session.consent(_consent_body(), _consent_answered.bind(next)))
+	else: _acc_failed(c)
 
 ## The account is settled: the pages go, the launch cover comes up and the world's first read is already out
 ## (P0Session._identity_ready); p0_boot's when_first_view brings the farm (or the home pick) as on any launch. Over a
