@@ -298,6 +298,7 @@ class _NameRow extends Control:
 		size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		name_label = UiKit.label(name_, UiTokens.STYLE_C14_XB)
 		name_label.name = "Name"
+		name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # a chosen name is never translated (SGODOT-491)
 		add_child(name_label)
 		title_label = UiKit.label(title_, UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
 		title_label.name = "Title"

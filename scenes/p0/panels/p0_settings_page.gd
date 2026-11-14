@@ -278,6 +278,11 @@ static func blocked_players(rows: Array, safe_top := 0.0, safe_bottom := 0.0, re
 		var handle := str(r.get("handle", ""))
 		var row := UiSettingRow.new(UiSettingRow.Kind.VALUE, str(r.get("name", "")))
 		row.name = "Blocked_" + handle
+		var who := row.find_child("Title", true, false) as Label   # their name now (SGODOT-491): untranslated, one line, `…`
+		who.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		who.autowrap_mode = TextServer.AUTOWRAP_OFF
+		who.clip_text = true
+		who.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		var none := row.find_child("Value", true, false)   # VALUE's value slot, empty here: the key takes its place
 		none.get_parent().remove_child(none)
 		none.free()

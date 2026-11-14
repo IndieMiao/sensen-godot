@@ -71,6 +71,18 @@ func ctx(src: String, context: String) -> String:
 	if p0_translation == null or TranslationServer.get_locale() != "zh_CN": return src
 	return str(p0_translation.exact("%s@%s" % [src, context], src))
 
+## A sentence with a player's name in it (SGODOT-491: a name a player chose is never translated — `Carrot`, `Apple`
+## and `Home` stay as written): under P0's 中文 the table's template, by its exact key, filled with the values as they
+## are (P0Translation._fill: `{1}` / `{2}` order, the space rule beside a value); in English, or with no such key, the
+## English template filled. Put the result in a Label that does not translate (AUTO_TRANSLATE_MODE_DISABLED), or the
+## table's own `%s` templates would take the whole line again. Every value is kept as it is: a sentence that also
+## carries a word to translate (a place beside a name) has none such yet — translate that value first if one comes.
+func with_names(template: String, values: Array) -> String:
+	if p0_translation != null and TranslationServer.get_locale() == "zh_CN":
+		var zh := str(p0_translation.template(template, p0_translation.exact(template, "")))
+		if zh != "": return P0Translation._fill(zh, values)
+	return template % values
+
 ## UiKit's three weights (nunito_w400 / 700 / 800) draw Chinese through Noto Sans SC, 700 and 800 emboldened (Journey's
 ## GameUi.theme did 0.45; 不知火舞 sets the values from shots). Only under 中文: a fallback adds its ascent and descent to
 ## every line's height, which would move the English layouts measured to the frames.
@@ -127,6 +139,7 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 ## nothing is written there once, for the translators.
 class P0Translation extends Translation:
 	var _exact := {}
+	var _by_template := {}   # English template → its Chinese, as the table writes both (with_names)
 	var _templates: Array = []   # [RegEx, Chinese, literal length, %s count, has ` · `, a place name] — the longest literal tried first
 	var _cache := {}
 	const CACHE_MAX := 4096
@@ -166,6 +179,7 @@ class P0Translation extends Translation:
 
 	func set_table(data: Dictionary) -> void:
 		_exact.clear()
+		_by_template.clear()
 		_templates.clear()
 		_cache.clear()
 		for source in data:
@@ -174,6 +188,7 @@ class P0Translation extends Translation:
 			if en.begins_with("_") or not zh is String or str(zh).is_empty(): continue
 			if SPEC.search(en) != null and not en.contains("@"):   # a context key (`%d@trip`) is Localization.ctx's, whole
 				var re := RegEx.new()
+				_by_template[en] = str(zh)
 				if re.compile(_pattern(en)) == OK:
 					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length(), en.count("%s"), en.contains(" · "),
 						en.begins_with("%s ") and en.substr(3) in PLACE_KINDS])
@@ -235,6 +250,8 @@ class P0Translation extends Translation:
 
 	## The table's own line for `s`, nothing pieced together (Localization.ctx's `<src>@<context>` keys).
 	func exact(s: String, otherwise := "") -> String: return str(_exact.get(s, otherwise))
+	## A template's Chinese by its English key as written (`Block %s?` → 「屏蔽 %s？」): Localization.with_names.
+	func template(en: String, otherwise := "") -> String: return str(_by_template.get(en, otherwise))
 
 	## The Chinese for one line, or "" when no part of it is known.
 	func translate_line(s: String) -> String:

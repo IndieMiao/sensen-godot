@@ -15,6 +15,7 @@ extends Node
 signal changed
 signal age_needed
 
+const P0Names := preload("res://modules/p0/p0_names.gd")   # a member's name (SGODOT-491)
 const MUTES := "user://p0_voice_mutes.json"
 
 var session: P0Session
@@ -98,12 +99,12 @@ func people() -> Array:
 	var out := []
 	if online.members.has(online.self_id):
 		var mine := str(online.members[online.self_id].get("player", ""))
-		out.append({"peer": online.self_id, "handle": mine, "name": "Traveller %s" % mine.substr(0, 4), "self": true,
+		out.append({"peer": online.self_id, "handle": mine, "name": P0Names.of(online.members[online.self_id]), "self": true,
 			"speaking": me_speaking or speaking.has(str(online.self_id)), "muted": false, "blocked": false})
 	for id in online.members:
 		if int(id) == online.self_id: continue
 		var handle := str(online.members[id].get("player", ""))
-		out.append({"peer": int(id), "handle": handle, "name": "Traveller %s" % handle.substr(0, 4), "speaking": speaking.has(str(id)),
+		out.append({"peer": int(id), "handle": handle, "name": P0Names.of(online.members[id]), "speaking": speaking.has(str(id)),
 			"muted": _mutes.has(handle), "blocked": blocked.has(str(id)), "self": false})
 	return out
 
@@ -130,7 +131,7 @@ func blocked_list() -> Variant:
 	var json: Dictionary = r.get("json", {}) if r.get("json") is Dictionary else {}
 	if not bool(r.get("ok", false)) or not json.get("blocked") is Array: return null
 	var rows: Array = json.blocked
-	return rows.map(func(b): return {"handle": str(b.get("handle", "")), "name": "Traveller %s" % str(b.get("handle", "")).substr(0, 4)})
+	return rows.map(func(b): return {"handle": str(b.get("handle", "")), "name": P0Names.of(b)})   # the current name (后裔: blocks' `name`)
 
 ## Unblock from the Blocked list, by handle: true when the server took it (both come back into each other's sight).
 func unblock(handle: String) -> bool:

@@ -195,7 +195,7 @@ func test_the_flow_says_its_own_lines_over_the_page() -> void:
 	assert_str(f.said()).is_equal("Didn't go through · try again")
 	assert_int(f.banner.kind).is_equal(UiSysBanner.Kind.CMD_FAIL)
 	assert_float(f.banner.offset_top).is_equal(24.0 + P0AccFlow.BANNER_TOP)
-	assert_float(f.banner.offset_top + 40.0).is_less(84.0 + 24.0 + 1.0)   # its 40 end above the wordmark's top (84) on this screen
+	assert_bool(f.banner_over_mark()).is_true()   # 24 + 16 + 40 = 80 comes within 8 of the wordmark's 84: it fades (周瑜 on #1052)
 	assert_int(f.banner.get_index()).is_equal(f.get_child_count() - 1)   # over the page
 	f.no_farm()   # a page on top later: the lines go back over it
 	assert_int(f.banner.get_index()).is_equal(f.get_child_count() - 1)
@@ -233,3 +233,66 @@ func test_on_a_notched_phone_the_wordmark_fades_under_the_banner() -> void:
 	f._fade_mark()   # the banner goes: the wordmark comes back
 	await get_tree().create_timer(P0AccFlow.MARK_FADE_S + 0.1).timeout
 	assert_float((f.page as P0AccShell).mark.modulate.a).is_equal_approx(1.0, 0.01)
+
+func test_updated_terms_mid_way_ask_again_over_the_page_and_keep_the_rest() -> void:
+	var f := _flow()
+	_answer(f, 2000)
+	f.no_farm()
+	(f.name_page.field.input as LineEdit).text = "Mira"
+	f.name_page.field.input.text_changed.emit("Mira")
+	var renewed := []
+	f.consent_renewed.connect(func(): renewed.append(true))
+	f.consent_outdated({"code": "consent_outdated", "terms_version": "2026-11-20", "privacy_version": "2026-11-21"})
+	var c := f.renew
+	assert_object(c).is_not_null()
+	assert_str((c.find_child("Title", true, false) as Label).text).is_equal("We've updated our terms")
+	assert_bool((c.get_node("Surface") as CanvasItem).visible).is_false()   # over the page: the scrim, no cream
+	assert_object(c.get_node("Scrim")).is_not_null()
+	assert_object(f.page).is_equal(f.name_page)   # the page stays under it, the name in it
+	assert_str(f.name_page.field.text).is_equal("Mira")
+	assert_bool(f.back()).is_true()   # no way out
+	assert_object(f.renew).is_equal(c)
+	assert_bool(c.go.disabled).is_true()   # not ticked
+	f.consent_outdated({"terms_version": "2026-11-20", "privacy_version": "2026-11-21"})   # the same again while it is up: the one card
+	assert_int(f.find_children("AccRenew", "", false, false).size()).is_equal(1)
+	c.consent.checked = true
+	c.consent.toggled.emit(true)
+	c.go.activated.emit()
+	assert_array(renewed).is_equal([true])
+	assert_object(f.renew).is_equal(c)   # it stays till the host's answer (§9 补)
+	assert_int(c.go.phase).is_equal(CommandLifecycle.State.PENDING)
+	c.go.activated.emit()   # in flight: deaf
+	assert_array(renewed).is_equal([true])
+	f.consent_settled(false)   # failed: the key back
+	assert_int(c.go.phase).is_equal(CommandLifecycle.State.IDLE)
+	c.go.activated.emit()
+	assert_array(renewed).is_equal([true, true])
+	f.consent_settled(true)
+	assert_object(f.renew).is_null()
+	var k := f.kept()
+	assert_str(str(k.terms)).is_equal("2026-11-20")
+	assert_str(str(k.privacy)).is_equal("2026-11-21")
+	assert_bool(bool(k.age_ok)).is_true()   # the year is not asked again
+
+## 周瑜 on #1063: the terms move on again while the card is up (the resend refused anew): the new versions are the ones
+## agreed and kept, the key back and the box unticked; and a phone that never answered AGE keeps no age answer.
+func test_terms_moving_on_again_ask_for_the_newest_and_no_age_answer_is_made_up() -> void:
+	var f := _flow("old_signin")   # an old farm past voice's gate: no AGE on this phone
+	var renewed := []
+	f.consent_renewed.connect(func(): renewed.append(f.kept().duplicate()))
+	f.consent_outdated({"terms_version": "t1", "privacy_version": "p1"})
+	var c := f.renew
+	c.consent.checked = true
+	c.consent.toggled.emit(true)
+	c.go.activated.emit()
+	assert_str(str(renewed[0].terms)).is_equal("t1")
+	f.consent_outdated({"terms_version": "t2", "privacy_version": "p2"})   # refused again: newer terms
+	assert_object(f.renew).is_equal(c)
+	assert_int(c.go.phase).is_equal(CommandLifecycle.State.IDLE)
+	assert_bool(c.consent.checked).is_false()   # agreed again, to these
+	c.consent.checked = true
+	c.consent.toggled.emit(true)
+	c.go.activated.emit()
+	assert_str(str(renewed[1].terms)).is_equal("t2")
+	assert_str(str(renewed[1].privacy)).is_equal("p2")
+	assert_bool(f.kept().has("age_ok")).is_false()   # never asked here: none made up

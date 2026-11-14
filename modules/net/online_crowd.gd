@@ -62,6 +62,16 @@ func clear() -> void:
 	if heads: heads.multimesh.visible_instance_count = 0
 	if gestures: gestures.multimesh.visible_instance_count = 0
 
+## The name over a member's head (SGODOT-491; spec v1.1 §4): the name they chose (the roster's `name`, P0 accounts) —
+## never translated, cut with `…` past the widest default name's width as drawn (`Traveller wwww`) — else the default
+## `Traveller 8c3f`, which translates as before.
+const P0Names := preload("res://modules/p0/p0_names.gd")
+static func tag_text(member: Dictionary, label: Label3D) -> String:
+	var chosen := str(member.get("name", "")).strip_edges()
+	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED if chosen != "" else Node.AUTO_TRANSLATE_MODE_INHERIT
+	if chosen == "": return L10n.format_text("Traveller %s", str(member.get("player", "")).substr(0, 4))
+	return P0Names.fit(chosen, label.font, label.font_size, P0Names.tag_width(label.font, label.font_size))
+
 func roster(members: Dictionary) -> void:
 	for id in actors.keys():
 		if not members.has(id):
@@ -153,7 +163,11 @@ func step(delta: float, local_position: Vector3) -> void:
 			if fishing.is_empty() and animation != entry.animation:
 				entry.animation = animation
 				entry.rig.play_motion(animation)
-			entry.label.text = L10n.format_text("Traveller %s", str(actor.member.player).substr(0, 4)) + ("\n%d / %d" % [int(actor.hp), int(actor.max_hp)] if show_health else "")
+			var tag_key := "%s|%s|%s" % [actor.member.get("name", ""), actor.member.get("player", ""), TranslationServer.get_locale()]
+			if entry.get("tag_key", "") != tag_key:   # measured again only when the name, the handle or the language changes (周瑜 on #1059)
+				entry.tag_key = tag_key
+				entry.tag = tag_text(actor.member, entry.label)
+			entry.label.text = str(entry.tag) + ("\n%d / %d" % [int(actor.hp), int(actor.max_hp)] if show_health else "")
 			entry.label.modulate = SPEAKING_COLOR if speaking.has(id) else Color.WHITE
 			entry.label.outline_modulate = Color.WHITE if speaking.has(id) else Color.BLACK   # green on light, as 383 V1 reads
 		else:
