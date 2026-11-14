@@ -233,3 +233,43 @@ func test_on_a_notched_phone_the_wordmark_fades_under_the_banner() -> void:
 	f._fade_mark()   # the banner goes: the wordmark comes back
 	await get_tree().create_timer(P0AccFlow.MARK_FADE_S + 0.1).timeout
 	assert_float((f.page as P0AccShell).mark.modulate.a).is_equal_approx(1.0, 0.01)
+
+func test_updated_terms_mid_way_ask_again_over_the_page_and_keep_the_rest() -> void:
+	var f := _flow()
+	_answer(f, 2000)
+	f.no_farm()
+	(f.name_page.field.input as LineEdit).text = "Mira"
+	f.name_page.field.input.text_changed.emit("Mira")
+	var renewed := []
+	f.consent_renewed.connect(func(): renewed.append(true))
+	f.consent_outdated({"code": "consent_outdated", "terms_version": "2026-11-20", "privacy_version": "2026-11-21"})
+	var c := f.renew
+	assert_object(c).is_not_null()
+	assert_str((c.find_child("Title", true, false) as Label).text).is_equal("We've updated our terms")
+	assert_bool((c.get_node("Surface") as CanvasItem).visible).is_false()   # over the page: the scrim, no cream
+	assert_object(c.get_node("Scrim")).is_not_null()
+	assert_object(f.page).is_equal(f.name_page)   # the page stays under it, the name in it
+	assert_str(f.name_page.field.text).is_equal("Mira")
+	assert_bool(f.back()).is_true()   # no way out
+	assert_object(f.renew).is_equal(c)
+	assert_bool(c.go.disabled).is_true()   # not ticked
+	f.consent_outdated({"terms_version": "x"})   # a second refusal while it is up: the one card
+	assert_int(f.find_children("AccRenew", "", false, false).size()).is_equal(1)
+	c.consent.checked = true
+	c.consent.toggled.emit(true)
+	c.go.activated.emit()
+	assert_array(renewed).is_equal([true])
+	assert_object(f.renew).is_equal(c)   # it stays till the host's answer (§9 补)
+	assert_int(c.go.phase).is_equal(CommandLifecycle.State.PENDING)
+	c.go.activated.emit()   # in flight: deaf
+	assert_array(renewed).is_equal([true])
+	f.consent_settled(false)   # failed: the key back
+	assert_int(c.go.phase).is_equal(CommandLifecycle.State.IDLE)
+	c.go.activated.emit()
+	assert_array(renewed).is_equal([true, true])
+	f.consent_settled(true)
+	assert_object(f.renew).is_null()
+	var k := f.kept()
+	assert_str(str(k.terms)).is_equal("2026-11-20")
+	assert_str(str(k.privacy)).is_equal("2026-11-21")
+	assert_bool(bool(k.age_ok)).is_true()   # the year is not asked again

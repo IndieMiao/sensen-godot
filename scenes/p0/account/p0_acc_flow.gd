@@ -27,6 +27,7 @@ signal switch_farm               # the choose card's Switch to that farm
 signal test_code                 # Use a test code (the code page: 11-19～20)
 signal blocked
 signal failed(code: String)      # NAME's check failed (network, rate_limited): the host says so (SYS-CMD-FAIL)
+signal consent_renewed           # the updated-terms card's Continue: the host sends again what consent_outdated refused
 
 const RECORD := "user://p0_first_run.json"
 const VERSIONS := "res://assets/p0/legal/versions.json"   # 后裔's: the terms and privacy versions this build carries
@@ -45,6 +46,7 @@ var _check := Callable()
 var _this_year := 0
 var _provider := ""
 var _toasts: ToastLayer           # the flow's own: P0Ui's banner and toasts are on a layer under this one
+var renew: P0AccConsent          # the updated-terms card while it is up
 
 ## `check`: NAME's name check (P0Session.name_check). `providers_`: the sign-in page's keys (P0AccSignIn). `hints_`:
 ## {line: "farm_uses" | "last_time", with: …} for the sign-in page's line.
@@ -260,8 +262,38 @@ func _drop_choose() -> void:
 	if is_instance_valid(choose): choose.queue_free()
 	choose = null
 
+## The host's, when a request mid-way came back consent_outdated (spec v2 §9; the server's {terms_version,
+## privacy_version}) — a 409 on guest / a code / a rename, or a claim / sign-in that went through with
+## `consent_outdated: true`: over whatever page is up, the old player's consent card titled `We've updated our terms`,
+## no way to close it (scrim, Back). Its Continue keeps the new versions here (the year, NAME's name and the pending
+## ticket stay as they are), greys its key in the pending look and emits consent_renewed: the host sends the refused
+## request again, or account/consent for the one that went through, and answers consent_settled(ok). The card stays
+## till ok (§9 补: not into the farm or NAME before the consent is kept); not ok gives the key back (the host toasts).
+func consent_outdated(r: Dictionary) -> void:
+	if is_instance_valid(renew): return
+	renew = P0AccConsent.new(true)
+	renew.name = "AccRenew"
+	renew.as_overlay()
+	renew.link_pressed.connect(open_link)
+	renew.agreed.connect(func():
+		if renew.go.phase != CommandLifecycle.State.IDLE: return
+		keep_versions({"terms": str(r.get("terms_version", "")), "privacy": str(r.get("privacy_version", ""))})
+		renew.go.phase = CommandLifecycle.State.PENDING
+		consent_renewed.emit())
+	add_child(renew)
+	_lines_on_top()
+
+## The host's answer after consent_renewed: ok takes the updated-terms card down; not ok gives its key back.
+func consent_settled(ok: bool) -> void:
+	if not is_instance_valid(renew): return
+	if ok:
+		renew.queue_free()
+		renew = null
+	else: renew.go.phase = CommandLifecycle.State.IDLE
+
 ## Back: true when a page here took it.
 func back() -> bool:
+	if is_instance_valid(renew): return true   # the updated-terms card: no way back (spec v2 §9)
 	if choose != null:
 		_try_another()
 		return true
@@ -280,6 +312,14 @@ func keep(ok: bool) -> void:
 	if ok:
 		var v := versions()
 		data.merge({"terms": str(v.get("terms", "")), "privacy": str(v.get("privacy", "")), "agreed_at": Time.get_unix_time_from_system() * 1000.0})
+	var f := FileAccess.open(record_path, FileAccess.WRITE)
+	if f: f.store_string(JSON.stringify(data))
+
+## The terms agreed to anew (consent_outdated): the versions and when, the age answer as it was kept.
+func keep_versions(v: Dictionary) -> void:
+	var data := kept()
+	data.merge({"age_ok": bool(data.get("age_ok", true)), "terms": str(v.get("terms", "")), "privacy": str(v.get("privacy", "")),
+		"agreed_at": Time.get_unix_time_from_system() * 1000.0}, true)
 	var f := FileAccess.open(record_path, FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(data))
 
