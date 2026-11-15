@@ -210,7 +210,8 @@ describe('account deletion (contract-accounts §4)', () => {
     expect(readFileSync(files.save, 'utf8')).toBe(saved);
     expect(readFileSync(files.ages, 'utf8')).toBe(ages);
     expect(deps.hub.kick).not.toHaveBeenCalled();
-    expect(deps.revokeApple).not.toHaveBeenCalled();
+    // #1049 revokes while the captured refresh is still available, before propagating an accounts write failure.
+    expect(deps.revokeApple).toHaveBeenCalledWith('app.gensen.maps.web', 'fake-refresh-private');
     rmSync(files.accounts + '.tmp', { recursive: true });
     spy.mockRestore();
     const next = restart ? { ...deps, accounts: new P0Accounts(files.accounts, KEY, deps.now) } : deps;
