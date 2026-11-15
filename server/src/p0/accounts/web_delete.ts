@@ -12,7 +12,7 @@ import { webDeletePage } from './web_delete_page.js';
 
 type Result = { status: number; body: Record<string, unknown> };
 type Verified = { provider: Provider; sub: string; player: string };
-interface Ticket { ip: string; nonce: string; at: number; verified?: Verified; job?: Promise<Result>; result?: Result }
+interface Ticket { ip: string; nonce: string; at: number; verified?: Verified; requestHash?: string; job?: Promise<Result>; result?: Result }
 export interface WebDeleteDeps extends DeleteDeps {
   appleWeb?: AppleVerifyOptions;
   googleWeb?: GoogleVerifyOptions;
@@ -126,11 +126,21 @@ export function registerWebDeleteRoutes(app: FastifyInstance, deps: WebDeleteDep
         || typeof body.provider !== 'string' || !['apple', 'google', 'email'].includes(body.provider)) return send(reply, failed(400, 'schema'));
       const ticket = tickets.get(body.challenge);
       if (!ticket || ticket.ip !== req.ip || deps.now() - ticket.at >= TEN_MIN) return send(reply, failed(410, 'code_expired'));
+      // A retried proof may resume its own failed deletion, never switch targets under an already-verified ticket.
+      const requestHash = sha256Hex(JSON.stringify(body.provider === 'email'
+        ? [body.provider, normalizeEmail(body.email), body.code] : [body.provider, body.id_token]));
+      if (ticket.requestHash && ticket.requestHash !== requestHash) return send(reply, failed(401, 'bad_token'));
       if (ticket.result) return send(reply, ticket.result);
-      if (!ticket.job) ticket.job = perform(ticket, body, req.ip).then(result => {
+      if (!ticket.job) {
+        ticket.requestHash = requestHash;
+        ticket.job = perform(ticket, body, req.ip).then(result => {
         if (result.status === 200) ticket.result = result;
         return result;
-      }).catch(() => failed(500, 'delete_failed')).finally(() => { ticket.job = undefined; });
+        }).catch(() => failed(500, 'delete_failed')).finally(() => {
+          ticket.job = undefined;
+          if (!ticket.verified && !ticket.result) ticket.requestHash = undefined;
+        });
+      }
       return send(reply, await ticket.job);
     });
   });

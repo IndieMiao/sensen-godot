@@ -128,6 +128,18 @@ describe('P0 browser deletion: verified identity, then real deletion', () => {
     expect(f.revokeApple).toHaveBeenCalledTimes(1);
   });
 
+  it('a verified retry cannot silently switch to another identity under the same challenge', async () => {
+    const f = await setup(), address = 'owner@example.test', other = 'other@example.test';
+    f.accounts.link(P, 'email', { sub: f.accounts.emailId(address) }); f.accounts.link(Q, 'email', { sub: f.accounts.emailId(other) });
+    const o = await f.options(); f.email.codes.put(address, '123456'); f.email.codes.put(other, '654321');
+    vi.spyOn(f.accounts, 'markDeleted').mockImplementationOnce(() => { throw new Error('disk'); });
+    const payload = { challenge: o.challenge, confirmed: true, provider: 'email', email: address, code: '123456' };
+    expect((await f.post(payload)).json().code).toBe('delete_failed');
+    expect((await f.post({ ...payload, email: other, code: '654321' })).json().code).toBe('bad_token');
+    expect(f.store.peek(P)).toBeDefined(); expect(f.store.peek(Q)).toBeDefined();
+    expect((await f.post(payload)).json()).toEqual({ ok: true }); expect(f.store.peek(Q)).toBeDefined();
+  });
+
   it('serves a real deletion form without credentials and uses bounded IP limits and precise CORS', async () => {
     const f = await setup(), page = await f.app.inject({ method: 'GET', url: '/v1/web/delete/page' });
     expect(page.statusCode).toBe(200); expect(page.headers['content-security-policy']).toContain("frame-ancestors 'none'");
