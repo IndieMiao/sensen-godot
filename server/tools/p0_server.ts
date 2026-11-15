@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
 import { P0Voice, p0VoiceFromEnv, registerP0Voice } from '../src/p0/online/voice.js';
+import { registerWebDeleteRoutes } from '../src/p0/accounts/web_delete.js';
 import { ReportDeliveryService } from '../src/p0/report_delivery.js';
 import { generatedOutpostSpec, landmarkOfRoom, landmarkRoomSpec, loadOutposts, pondOfRoom, pondRoomSpec } from '../src/p0/online/outposts.js';
 import { placeOf, roomPlace } from '../src/p0/world.js';
@@ -181,7 +182,14 @@ const emailDeps = { store, accounts, now: Date.now, pending: pendingSignIns, on:
   mailer: signInMailer, kick: kickPlayer, alert: alertMailerFromEnv(), consent: consentOf };
 if (accountsCfg.emailLogin && !emailReady(emailDeps))
   console.warn(JSON.stringify({ warn: 'P0_EMAIL_LOGIN=1 but email sign-in cannot run', accounts_key: accounts.codesOn(), signin_smtp: !!signInMailer }));
-registerEmailRoutes(app, emailDeps);
+const startEmail = registerEmailRoutes(app, emailDeps);
+const appleWebId = appleCfg?.servicesIds[0], googleWebId = accountsCfg.google?.audiences[0];
+registerWebDeleteRoutes(app, { store, accounts, voice, hub, now: Date.now,
+  revokeApple: appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : undefined,
+  appleWeb: appleWebId ? { audiences: appleCfg!.servicesIds, keys: appleJwks.keys, refreshKeys: appleJwks.refresh, now: Date.now } : undefined,
+  googleWeb: googleWebId ? { audiences: [googleWebId], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, now: Date.now } : undefined,
+  appleClientId: appleWebId, googleClientId: googleWebId, email: emailDeps, startEmail,
+  apiBase: 'https://farm.sensenjoy.cn/preview/p0/v1/web', origins: ['https://gensen.app', 'https://farm.sensenjoy.cn'] });
 const verifyApple = appleVerifier(appleDeps), verifyGoogle = googleVerifier(googleDeps), verifyEmail = emailVerifier(emailDeps);
 registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now, guestOk: accountsCfg.guestOk,
   pending: pendingSignIns, kick: kickPlayer, renamed: p => { hub.renamed(p); }, email: emailReady(emailDeps),
