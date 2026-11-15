@@ -17,7 +17,7 @@ interface Options {
   makeMailer?: (config: ReportSmtpConfig) => Mailer;
   warn?: (event: string) => void;
 }
-export interface ReplayResult { added: number; skipped: number; invalid: number }
+export interface ReplayResult { added: number; skipped: number; invalid: number; conflicts: number }
 
 export class ReportDeliveryService {
   private readonly now: () => number;
@@ -63,7 +63,7 @@ export class ReportDeliveryService {
   /** Re-read authoritative rows so an enqueue failure is recovered without needing a process restart.
    * A malformed line is counted, not logged; an I/O/queue write failure stops this scan for the next retry. */
   async replay(): Promise<ReplayResult> {
-    const result: ReplayResult = { added: 0, skipped: 0, invalid: 0 };
+    const result: ReplayResult = { added: 0, skipped: 0, invalid: 0, conflicts: 0 };
     const input = createReadStream(this.options.reports, { encoding: 'utf8' });
     const lines = createInterface({ input, crlfDelay: Infinity });
     try {
@@ -77,11 +77,21 @@ export class ReportDeliveryService {
         try { notice = reportLineNotice(parsed as Record<string, unknown>); }
         catch { result.invalid++; continue; }
         if (!notice || !this.current(notice.at)) { result.skipped++; continue; }
-        if (this.queue.enqueue(notice.id, notice)) result.added++; else result.skipped++;
+        try {
+          if (this.queue.enqueue(notice.id, notice)) result.added++; else result.skipped++;
+        } catch (e) {
+          // Preserve the first payload and the source file; one conflicting row must not starve later reports.
+          // Disk failures and all other errors still abort this scan for retry.
+          if (!(e instanceof Error && e.message === 'REPORT_OUTBOX_ID_CONFLICT')) throw e;
+          result.conflicts++;
+        }
       }
     } catch (e) {
       if ((e as NodeJS.ErrnoException)?.code !== 'ENOENT') throw new Error('REPORT_REPLAY_FAILED');
-    } finally { lines.close(); input.destroy(); }
+    } finally {
+      lines.close(); input.destroy();
+      if (result.conflicts) this.warn('conflicting_report_rows');
+    }
     if (result.invalid) this.warn('invalid_report_rows');
     return result;
   }

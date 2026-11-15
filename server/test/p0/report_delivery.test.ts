@@ -94,14 +94,32 @@ describe('484 report callback, replay and lifecycle', () => {
     expect(JSON.parse(readFileSync(f.outbox, 'utf8')).entries[0].sent).toBe(true);
   });
 
-  it('keeps scanning after malformed v2 and rejects conflicting ids without leaking rows', async () => {
+  it('counts conflicting ids and continues to later valid rows, preserving the original payload on every replay', async () => {
     const f = setup(), service = f.create();
-    writeFileSync(f.reports, [JSON.stringify({ ...line, id: 'bad-private-id' }), JSON.stringify(line),
-      JSON.stringify({ ...line, id: OTHER, name: null })].join('\n') + '\n');
-    expect(await service.replay()).toEqual({ added: 2, skipped: 0, invalid: 1 });
-    appendFileSync(f.reports, JSON.stringify({ ...line, room: 2 }) + '\n');
+    writeFileSync(f.reports, JSON.stringify(line) + '\n');
+    await service.replay(); // A was already queued before the conflicting append.
+    appendFileSync(f.reports, [JSON.stringify({ ...line, id: 'bad-private-id' }),
+      JSON.stringify({ ...line, room: 2 }), JSON.stringify({ ...line, id: OTHER, name: null })].join('\n') + '\n');
+    const originalFile = readFileSync(f.reports, 'utf8');
+    expect(await service.replay()).toEqual({ added: 1, skipped: 1, invalid: 1, conflicts: 1 });
+    const entries = JSON.parse(readFileSync(f.outbox, 'utf8')).entries;
+    expect(entries.map((e: { id: string }) => e.id)).toEqual([ID, OTHER]);
+    expect(entries[0].notice.room).toBe(1);
+    expect(await service.replay()).toEqual({ added: 0, skipped: 2, invalid: 1, conflicts: 1 });
+    expect(JSON.parse(readFileSync(f.outbox, 'utf8')).entries).toEqual(entries);
+    expect(readFileSync(f.reports, 'utf8')).toBe(originalFile);
+    expect(f.warn.mock.calls).toEqual([['conflicting_report_rows'], ['invalid_report_rows'], ['conflicting_report_rows'], ['invalid_report_rows']]);
+    expect(JSON.stringify(f.warn.mock.calls)).not.toMatch(/PRIVATE|R-20261115/);
+  });
+
+  it('still aborts replay on a genuine queue write failure and recovers both rows after repair', async () => {
+    const f = setup(), service = f.create();
+    writeFileSync(f.reports, [JSON.stringify(line), JSON.stringify({ ...line, id: OTHER })].join('\n') + '\n');
+    mkdirSync(f.outbox + '.tmp');
     await expect(service.replay()).rejects.toThrow('REPORT_REPLAY_FAILED');
-    expect(JSON.parse(readFileSync(f.outbox, 'utf8')).entries).toHaveLength(2);
+    expect(f.warn).not.toHaveBeenCalledWith('conflicting_report_rows');
+    rmSync(f.outbox + '.tmp', { recursive: true });
+    expect(await service.replay()).toEqual({ added: 2, skipped: 0, invalid: 0, conflicts: 0 });
   });
 
   it('expired reports and future timestamps are not mailed, including previously queued reports', async () => {
