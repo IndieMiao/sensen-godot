@@ -17,6 +17,7 @@ import type { P0Store } from './store.js';
 import { registerModerationRoutes, type ModerationActions } from './admin_moderation.js';
 import { registerAdminDelete } from './admin_delete.js';
 import type { DeleteDeps } from './accounts/delete.js';
+import type { ReportDeliveryService } from './report_delivery.js';
 
 /** accounts (SGODOT-488): the tokens, for a test device's admin token and a claim reset (contract-accounts §4.1). */
 export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => number; key: string; log?: (line: string) => void; gate?: P0Gate;
@@ -24,7 +25,8 @@ export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => nu
   /** The room hub's kick (SGODOT-488): a claim reset closes the player's open socket at once. */
   kick?: (player: string) => void;
   moderation?: ModerationActions;
-  deletion?: Pick<DeleteDeps, 'voice' | 'hub' | 'revokeApple'> }
+  deletion?: Pick<DeleteDeps, 'voice' | 'hub' | 'revokeApple'>;
+  reportRetention?: Pick<ReportDeliveryService, 'retention'> }
 
 /** An admin token lasts 30 days (tech-plan §2.5): a test device's, kept through other devices' sign-ins, never forgotten. */
 export const ADMIN_TOKEN_MS = 30 * 86_400_000;
@@ -42,6 +44,25 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
   });
   if (deps.moderation) registerModerationRoutes(app, { store, actions: deps.moderation, now: deps.now, log });
   if (deps.deletion && deps.accounts) registerAdminDelete(app, { ...deps.deletion, store, accounts: deps.accounts, now: deps.now }, log);
+  if (deps.reportRetention) {
+    app.get('/admin/reports/retention', async (_req, reply) => {
+      try { return { ok: true, ...deps.reportRetention!.retention(false) }; }
+      catch { return reply.code(500).send({ ok: false, code: 'retention_failed' }); }
+    });
+    app.post('/admin/reports/retention', async (req, reply) => {
+      const body = req.body as Record<string, unknown> | null;
+      if (!body || typeof body !== 'object' || Object.keys(body).length !== 1 || body.apply !== true)
+        return reply.code(400).send({ ok: false, code: 'schema' });
+      try {
+        const result = deps.reportRetention!.retention(true);
+        log(JSON.stringify({ admin: 'report_retention', at: deps.now(), ...result }));
+        return { ok: true, ...result };
+      } catch {
+        log(JSON.stringify({ admin: 'report_retention_failed', at: deps.now() }));
+        return reply.code(500).send({ ok: false, code: 'retention_failed' });
+      }
+    });
+  }
 
   /** Players with when they joined and were last seen: the observer matches them to names by install time. */
   /** With accounts, each player's admin tokens still in force ({tail, expires_at}), so one given to a test device is not

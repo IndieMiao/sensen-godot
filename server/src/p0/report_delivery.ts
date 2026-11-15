@@ -6,6 +6,7 @@ import type { P0Voice, ReportLine } from './online/voice.js';
 import { createReportMailer, reportSmtpFromEnv, type ReportSmtpConfig } from './report_mail.js';
 import { reportLineNotice } from './report_notice.js';
 import { REPORT_KEEP_MS, ReportOutbox, type ReportDelivery } from './report_outbox.js';
+import { pruneReportFile } from './report_retention.js';
 
 type Mailer = ReportDelivery & { close(): void };
 interface Options {
@@ -29,6 +30,8 @@ export class ReportDeliveryService {
   private closing?: Promise<void>;
   private stopped = false;
   private started = false;
+  private readonly retentionOn: boolean;
+  private lastRetention: number | undefined;
   private readonly previous: P0Voice['onReport'];
   private readonly receive: P0Voice['onReport'];
 
@@ -38,6 +41,9 @@ export class ReportDeliveryService {
     if (!Number.isSafeInteger(options.intervalMs ?? 30_000) || (options.intervalMs ?? 30_000) < 1)
       throw new Error('REPORT_DELIVERY_INVALID_INTERVAL');
     const config = reportSmtpFromEnv(options.env);
+    const retention = options.env.P0_REPORT_RETENTION ?? 'off';
+    if (!['on', 'off'].includes(retention)) throw new Error('REPORT_RETENTION_INVALID_CONFIG');
+    this.retentionOn = retention === 'on';
     this.mailer = config ? (options.makeMailer ?? createReportMailer)(config) : null;
     try { this.queue = new ReportOutbox(options.outbox, this.mailer, this.now); }
     catch (e) { this.mailer?.close(); throw e; }
@@ -100,12 +106,26 @@ export class ReportDeliveryService {
     if (this.stopped) return Promise.resolve();
     if (this.running) return this.running;
     this.running = (async () => {
+      const now = this.now();
+      if (this.retentionOn && (this.lastRetention === undefined || now - this.lastRetention >= 3_600_000)) {
+        try { this.retention(true); this.lastRetention = now; }
+        catch { this.warn('retention_failed'); }
+      }
       try { await this.replay(); } catch { this.warn('replay_failed'); }
       if (!this.stopped) {
         try { await this.queue.tick(); } catch { this.warn('queue_write_failed'); }
       }
     })().finally(() => { this.running = undefined; });
     return this.running;
+  }
+
+  /** Explicit admin preview/apply. Each file is atomic, and a partial pair can be safely retried. */
+  retention(apply = false) {
+    if (this.stopped) throw new Error('REPORT_DELIVERY_CLOSED');
+    const reports = pruneReportFile(this.options.reports, this.now(), apply);
+    const queue = this.queue.retention(apply);
+    if (reports.invalid) this.warn('retention_invalid_rows');
+    return { reports, queue };
   }
 
   close(): Promise<void> {
