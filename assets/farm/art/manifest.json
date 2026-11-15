@@ -4514,6 +4514,392 @@
         "stone": "New five-pebble base from approved concept A",
         "medallion": "New C63 A model; four blank vertex-colour variants"
       }
+    },
+    "rock_pile_gathered": {
+      "task": "SGODOT-417",
+      "revision": "v1",
+      "author": "黄忠",
+      "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+      "triangles": 340,
+      "triangle_limit": 600,
+      "surfaces": 1,
+      "bytes": 29868,
+      "bounds": [
+        [
+          -0.443665474653244,
+          0.0,
+          -0.4721066951751709
+        ],
+        [
+          0.4099999964237213,
+          0.15000000596046448,
+          0.40827882289886475
+        ]
+      ],
+      "dimensions_xyz": [
+        0.8536654710769653,
+        0.15000000596046448,
+        0.8803855180740356
+      ],
+      "origin": "unchanged original resource-point origin; metres; Y up; +Z front",
+      "gathered_from": "original attachment factory spot_rock_pile",
+      "original_bounds": [
+        [
+          -0.536698043346405,
+          -0.058817271143198,
+          -0.597915053367615
+        ],
+        [
+          0.565392971038818,
+          0.492817223072052,
+          0.465803503990173
+        ]
+      ],
+      "mesh": "rock_pile_gathered_mobile",
+      "gathered_variant": true,
+      "material": "Farm vertex paint / FarmArt.material(); matte .9, linear vertex colours",
+      "source": "tools/art/source/gathered_417/rock_pile_gathered.blend",
+      "generator": "tools/art/source/gathered_417/build.py",
+      "reuse_provenance": [
+        {
+          "source": "assets/farm/art/rock.glb",
+          "sha256": "57fb9355690ee13410ab318ce7a32d26bc6bbe5405c194bb75a38569d360699b",
+          "changes": "Retain rock topology; flatten to .15m high, .82m wide, .62m deep; muted fieldstone vertex colour"
+        }
+      ],
+      "source_parts_triangles": {
+        "Large remaining flat stone": 260,
+        "Tidy pebble 1": 20,
+        "Tidy pebble 2": 20,
+        "Tidy pebble 3": 20,
+        "Tidy pebble 4": 20
+      },
+      "regrowth_sprouts": [],
+      "visibility_parts": [
+        "Large remaining flat stone"
+      ],
+      "sha256": "5d70e468dbc1e5290b937dca42e3082e2e6a36882136f1b9343ebaed0995936a",
+      "main_stone_height_m": 0.15,
+      "pebble_count": 4,
+      "appearance": "Large flat remaining stone and four small pebbles; no sprouts"
+    },
+    "reed_bank_gathered": {
+      "task": "SGODOT-417",
+      "revision": "v1",
+      "author": "黄忠",
+      "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+      "triangles": 502,
+      "triangle_limit": 600,
+      "surfaces": 1,
+      "bytes": 17172,
+      "bounds": [
+        [
+          -0.6000000238418579,
+          0.0,
+          -0.5479837656021118
+        ],
+        [
+          0.6000000238418579,
+          0.33000001311302185,
+          0.556016206741333
+        ]
+      ],
+      "dimensions_xyz": [
+        1.2000000476837158,
+        0.33000001311302185,
+        1.1039999723434448
+      ],
+      "origin": "unchanged original resource-point origin; metres; Y up; +Z front",
+      "gathered_from": "assets/farm/art/reed_bank.glb",
+      "original_bounds": [
+        [
+          -0.600000023841858,
+          0.0,
+          -0.577053546905518
+        ],
+        [
+          0.600000023841858,
+          0.990000009536743,
+          0.577053546905518
+        ]
+      ],
+      "mesh": "reed_bank_gathered_mobile",
+      "gathered_variant": true,
+      "material": "Farm vertex paint / FarmArt.material(); matte .9, linear vertex colours",
+      "source": "tools/art/source/gathered_417/reed_bank_gathered.blend",
+      "generator": "tools/art/source/gathered_417/build.py",
+      "reuse_provenance": [
+        {
+          "source": "tools/art/source/reed_clay_416/reed_bank.blend",
+          "sha256": "fc37859da71526e1766372ab9eb9f549f20ed81bd61bd969bdb5e8e9cbdc53cf",
+          "parts": [
+            "Small dark wet-mud footprint",
+            "Small bank pebble 1",
+            "Small bank pebble 2"
+          ]
+        }
+      ],
+      "source_parts_triangles": {
+        "Small dark wet-mud footprint": 70,
+        "Small bank pebble 1": 24,
+        "Small bank pebble 2": 24,
+        "Even cut reed 01": 12,
+        "Even cut reed 02": 12,
+        "Even cut reed 03": 12,
+        "Even cut reed 04": 12,
+        "Even cut reed 05": 12,
+        "Even cut reed 06": 12,
+        "Even cut reed 07": 12,
+        "Even cut reed 08": 12,
+        "Even cut reed 09": 12,
+        "Even cut reed 10": 12,
+        "Even cut reed 11": 12,
+        "Even cut reed 12": 12,
+        "Even cut reed 13": 12,
+        "Even cut reed 14": 12,
+        "Even cut reed 15": 12,
+        "Even cut reed 16": 12,
+        "Even cut reed 17": 12,
+        "Even cut reed 18": 12,
+        "Even cut reed 19": 12,
+        "Even cut reed 20": 12,
+        "Even cut reed 21": 12,
+        "Even cut reed 22": 12,
+        "Regrowth sprout 1 / stem": 12,
+        "Regrowth sprout 1 / leaf -1": 24,
+        "Regrowth sprout 1 / leaf +1": 24,
+        "Regrowth sprout 2 / stem": 12,
+        "Regrowth sprout 2 / leaf -1": 24,
+        "Regrowth sprout 2 / leaf +1": 24
+      },
+      "regrowth_sprouts": [
+        {
+          "origin": [
+            -0.31,
+            0.038,
+            -0.3
+          ],
+          "parts": [
+            "Regrowth sprout 1 / stem",
+            "Regrowth sprout 1 / leaf -1",
+            "Regrowth sprout 1 / leaf +1"
+          ],
+          "template": "single pair of oval leaves / 0.012m stem / #8FA46B / scale 1"
+        },
+        {
+          "origin": [
+            0.3,
+            0.038,
+            0.24
+          ],
+          "parts": [
+            "Regrowth sprout 2 / stem",
+            "Regrowth sprout 2 / leaf -1",
+            "Regrowth sprout 2 / leaf +1"
+          ],
+          "template": "single pair of oval leaves / 0.012m stem / #8FA46B / scale 1"
+        }
+      ],
+      "visibility_parts": [
+        "Small dark wet-mud footprint"
+      ],
+      "sha256": "82184a05b338dec6e568fbb00902c46774b9d64164bceaa7461b3fed812322c9",
+      "cut_height_m": 0.33,
+      "stubble_count": 22,
+      "appearance": "Same wet mud and pebbles; neat one-third-height cuts, no cattails; shared sprouts"
+    },
+    "clay_pit_gathered": {
+      "task": "SGODOT-417",
+      "revision": "v1",
+      "author": "黄忠",
+      "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+      "triangles": 352,
+      "triangle_limit": 600,
+      "surfaces": 1,
+      "bytes": 15760,
+      "bounds": [
+        [
+          -0.5899999737739563,
+          0.0,
+          -0.5461744070053101
+        ],
+        [
+          0.5899999737739563,
+          0.1171269565820694,
+          0.5461744070053101
+        ]
+      ],
+      "dimensions_xyz": [
+        1.1799999475479126,
+        0.1171269565820694,
+        1.0923488140106201
+      ],
+      "origin": "unchanged original resource-point origin; metres; Y up; +Z front",
+      "gathered_from": "assets/farm/art/clay_pit.glb",
+      "original_bounds": [
+        [
+          -0.589999973773956,
+          0.0,
+          -0.54617440700531
+        ],
+        [
+          0.589999973773956,
+          0.483999997377396,
+          0.54617440700531
+        ]
+      ],
+      "mesh": "clay_pit_gathered_mobile",
+      "gathered_variant": true,
+      "material": "Farm vertex paint / FarmArt.material(); matte .9, linear vertex colours",
+      "source": "tools/art/source/gathered_417/clay_pit_gathered.blend",
+      "generator": "tools/art/source/gathered_417/build.py",
+      "reuse_provenance": [
+        {
+          "source": "tools/art/source/reed_clay_416/clay_pit.blend",
+          "sha256": "89196f1ffcbe5a7a826836941b8a17f12d508e7f8df514026133b4be44db5eee",
+          "parts": [
+            "Low grassy rim and shallow ochre pit"
+          ]
+        },
+        {
+          "source": "tools/art/source/reed_clay_416/clay_pit.blend",
+          "sha256": "89196f1ffcbe5a7a826836941b8a17f12d508e7f8df514026133b4be44db5eee",
+          "parts": [
+            "Thin spade blade in clay",
+            "Slender wooden spade shaft",
+            "Open wooden spade grip"
+          ]
+        }
+      ],
+      "source_parts_triangles": {
+        "Low grassy rim and shallow ochre pit": 178,
+        "Thin spade blade in clay": 44,
+        "Slender wooden spade shaft": 20,
+        "Open wooden spade grip": 64,
+        "Thin remaining red-ochre clay": 46
+      },
+      "regrowth_sprouts": [],
+      "visibility_parts": [
+        "Low grassy rim and shallow ochre pit"
+      ],
+      "sha256": "9a6f504f4bb7b3fb7b1823a5e7b68e609ee4d942058ad1277700271077aaac48",
+      "appearance": "Empty original pit, flat thin v1.1 red-ochre clay layer, original spade laid flat; no blocks or sprouts",
+      "clay_srgb": "9D674B"
+    },
+    "flax_patch_gathered": {
+      "task": "SGODOT-417",
+      "revision": "v1",
+      "author": "黄忠",
+      "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+      "triangles": 406,
+      "triangle_limit": 600,
+      "surfaces": 1,
+      "bytes": 14808,
+      "bounds": [
+        [
+          -0.6499999761581421,
+          0.0,
+          -0.6299999952316284
+        ],
+        [
+          0.6499999761581421,
+          0.23345166444778442,
+          0.6299999952316284
+        ]
+      ],
+      "dimensions_xyz": [
+        1.2999999523162842,
+        0.23345166444778442,
+        1.2599999904632568
+      ],
+      "origin": "unchanged original resource-point origin; metres; Y up; +Z front",
+      "gathered_from": "assets/farm/art/flax_patch.glb",
+      "original_bounds": [
+        [
+          -0.649999976158142,
+          0.0,
+          -0.629999995231628
+        ],
+        [
+          0.649999976158142,
+          0.686883330345154,
+          0.629999995231628
+        ]
+      ],
+      "mesh": "flax_patch_gathered_mobile",
+      "gathered_variant": true,
+      "material": "Farm vertex paint / FarmArt.material(); matte .9, linear vertex colours",
+      "source": "tools/art/source/gathered_417/flax_patch_gathered.blend",
+      "generator": "tools/art/source/gathered_417/build.py",
+      "reuse_provenance": [
+        {
+          "source": "tools/art/source/flax_408/flax_patch.blend",
+          "sha256": "0366cf2c264568a7a0cae815719c7177d1c7087714f727037a1dd1898e50412f",
+          "parts": [
+            "Soft light-brown soil border"
+          ]
+        }
+      ],
+      "source_parts_triangles": {
+        "Soft light-brown soil border": 94,
+        "Cut flax stem 01": 12,
+        "Cut flax stem 02": 12,
+        "Cut flax stem 03": 12,
+        "Cut flax stem 04": 12,
+        "Cut flax stem 05": 12,
+        "Cut flax stem 06": 12,
+        "Cut flax stem 07": 12,
+        "Cut flax stem 08": 12,
+        "Cut flax stem 09": 12,
+        "Cut flax stem 10": 12,
+        "Cut flax stem 11": 12,
+        "Cut flax stem 12": 12,
+        "Cut flax stem 13": 12,
+        "Cut flax stem 14": 12,
+        "Cut flax stem 15": 12,
+        "Cut flax stem 16": 12,
+        "Regrowth sprout 1 / stem": 12,
+        "Regrowth sprout 1 / leaf -1": 24,
+        "Regrowth sprout 1 / leaf +1": 24,
+        "Regrowth sprout 2 / stem": 12,
+        "Regrowth sprout 2 / leaf -1": 24,
+        "Regrowth sprout 2 / leaf +1": 24
+      },
+      "regrowth_sprouts": [
+        {
+          "origin": [
+            -0.27,
+            0.047,
+            -0.25
+          ],
+          "parts": [
+            "Regrowth sprout 1 / stem",
+            "Regrowth sprout 1 / leaf -1",
+            "Regrowth sprout 1 / leaf +1"
+          ],
+          "template": "single pair of oval leaves / 0.012m stem / #8FA46B / scale 1"
+        },
+        {
+          "origin": [
+            0.26,
+            0.047,
+            0.24
+          ],
+          "parts": [
+            "Regrowth sprout 2 / stem",
+            "Regrowth sprout 2 / leaf -1",
+            "Regrowth sprout 2 / leaf +1"
+          ],
+          "template": "single pair of oval leaves / 0.012m stem / #8FA46B / scale 1"
+        }
+      ],
+      "visibility_parts": [
+        "Soft light-brown soil border"
+      ],
+      "sha256": "e3f4ba4fb2df3232daf178af6456232c9871477f3da3f2ea04520fe9be145e54",
+      "cut_height_m": 0.135,
+      "stubble_count": 16,
+      "appearance": "Exact original pale-brown soil; short cut stems, no blue flowers; shared sprouts"
     }
   }
 }
