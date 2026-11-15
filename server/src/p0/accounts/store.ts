@@ -100,17 +100,11 @@ export class P0Accounts {
   /** The player's user tokens (a claim checks one against them). */
   userTokenCount(player: string): number { return Object.values(this.d.tokens).filter(t => t.player === player && t.kind === 'user').length; }
 
-  /** An Apple notification is second-precision. Do not revoke a session issued in a later second (a reauthorization
-   * since the event), including across restart. Uses the existing token timestamps; no file-shape change. */
-  userSessionAfter(player: string, throughMs: number): boolean {
-    return Object.values(this.d.tokens).some(t => t.player === player && t.kind === 'user' && t.at > throughMs);
-  }
-
   /** Notification-only invalidation: preserve the Apple binding on consent-revoked, or remove only Apple on account
    * deletion with another sign-in still linked. One write, rollback in-memory state on I/O failure; never revoke admin. */
-  invalidateApple(player: string, sub: string, throughMs: number, unlink: boolean): boolean {
+  invalidateApple(player: string, sub: string, unlink: boolean): boolean {
     const row = this.d.players[player];
-    if (!row?.apple || row.apple.sub !== sub || row.created_at > throughMs || this.userSessionAfter(player, throughMs)) return false;
+    if (!row?.apple || row.apple.sub !== sub) return false;
     const before = this.d;
     this.d = structuredClone(before);
     for (const [h, t] of Object.entries(this.d.tokens)) if (t.player === player && t.kind === 'user') delete this.d.tokens[h];

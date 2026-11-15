@@ -5,7 +5,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { APPLE_NOTIFICATION_MAX_AGE_MS, AppleNotificationJournal, registerAppleNotifications,
   verifyAppleNotification, type AppleNotificationDeps } from '../../src/p0/accounts/apple_notifications.js';
-import { appleVerifier } from '../../src/p0/accounts/apple.js';
+import { appleVerifier, registerAppleRoutes } from '../../src/p0/accounts/apple.js';
 import { sha256Hex } from '../../src/p0/accounts/jwt.js';
 import { PendingSignIns } from '../../src/p0/accounts/link.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
@@ -66,6 +66,7 @@ describe('Apple notification validation (no Apple private key or real provider)'
     { iss: 'https://attacker.invalid' }, { aud: 'wrong-client' }, { iat: NOW / 1000 + 61 },
     { iat: (NOW - APPLE_NOTIFICATION_MAX_AGE_MS) / 1000 - 1 }, { jti: '' }, { exp: NOW / 1000 - 61 },
     { events: '{bad' }, { events: [] }, { events: { type: 'consent-revoked', sub: SUB, event_time: NOW / 1000 + 61 } },
+    { iat: NOW / 1000 + 60, events: { type: 'consent-revoked', sub: SUB, event_time: NOW / 1000 + 120 } },
   ])('rejects invalid signed claims without mutating any accounts (%j)', async overrides => {
     const { post, deps } = setup();
     expect((await post(jwt('consent-revoked', overrides))).statusCode).toBe(401);
@@ -177,11 +178,66 @@ describe('Apple notification actions and recovery', () => {
     deps.accounts.link(newer, 'apple', { sub: SUB, aud: APP }); resume();
     expect((await pending).statusCode).toBe(200); expect(deps.store.peek(PLAYER)).toBeDefined(); expect(deps.store.peek(newer)).toBeDefined();
   });
+  it('revoked Apple ID tokens cannot log back in, even after restart; a newly issued token can reauthorize', async () => {
+    const { post, deps, journalFile } = setup();
+    expect((await post()).statusCode).toBe(200);
+    const journal = new AppleNotificationJournal(journalFile, deps.now);
+    const app = Fastify(); apps.push(app);
+    registerAppleRoutes(app, { store: deps.store, accounts: deps.accounts, pending: deps.pending!, now: deps.now,
+      apple: { teamId: 'synthetic', keyId: 'unused', privateKeyFile: '/not-read', bundleIds: [APP], servicesIds: [] }, client: null,
+      keys: keys.keys, authorized: journal.authorized });
+    const nonce = 'n'.repeat(43);
+    const token = (iat: number) => signToken(keys, { iss: 'https://appleid.apple.com', aud: APP, sub: SUB,
+      iat, exp: NOW / 1000 + 600, nonce: sha256Hex(nonce) });
+    const signIn = (iat: number) => app.inject({ method: 'POST', url: '/v1/p0/session/apple',
+      payload: { id_token: token(iat), nonce, token: NEXT } });
+    expect((await signIn(WHEN / 1000)).json().code).toBe('bad_token');
+    expect(deps.accounts.byToken(NEXT)).toBeUndefined();
+    expect((await signIn(NOW / 1000)).json()).toMatchObject({ ok: true, player: PLAYER });
+    expect(deps.accounts.byToken(ADMIN)).toBeDefined();
+  });
+  it('a newer game token from a pre-event Apple token is not a new Apple authorization', async () => {
+    const { post, deps } = setup();
+    deps.journal.authorized(SUB, WHEN - 1000); // verified old Apple iat, though delivered to the game after the event
+    deps.accounts.issue(PLAYER, NEXT); // session at NOW > event, not a provider reauthorization
+    expect((await post()).statusCode).toBe(200);
+    expect(deps.accounts.byToken(NEXT)).toBeUndefined(); expect(deps.accounts.byToken(USER)).toBeUndefined();
+    expect(deps.accounts.find(PLAYER)?.apple?.refresh).toBeUndefined();
+    expect(deps.accounts.byToken(ADMIN)).toBeDefined();
+  });
+  it('late delivery also invalidates pending grants received after the event without a newer Apple authorization', async () => {
+    const { post, deps } = setup();
+    const late = deps.pending!.create('apple', { sub: SUB, aud: APP });
+    expect((await post()).statusCode).toBe(200);
+    expect(deps.pending!.peek(late)).toBeUndefined();
+  });
+  it('a new farm created after a delayed deletion is preserved but its old credential is not left active', async () => {
+    const { post, deps } = setup({ unknown: true });
+    deps.store.get(PLAYER, NOW); deps.accounts.link(PLAYER, 'apple', { sub: SUB, aud: APP, refresh: 'old-proof' });
+    deps.accounts.issue(PLAYER, USER);
+    expect((await post(jwt('account-deleted'))).statusCode).toBe(200);
+    expect(deps.store.peek(PLAYER)).toBeDefined(); expect(deps.accounts.isDeleted(PLAYER)).toBe(false);
+    expect(deps.accounts.byToken(USER)).toBeUndefined(); expect(deps.accounts.find(PLAYER)?.apple?.refresh).toBeUndefined();
+  });
   it('media cleanup failure returns retryable 503 with no raw exception details', async () => {
     const { post, drop, warn } = setup(); drop.mockRejectedValueOnce(new Error('private-media-token'));
     const r = await post(); expect(r.statusCode).toBe(503); expect(r.body).not.toContain('private-media-token');
     expect(warn).toHaveBeenCalledWith(JSON.stringify({ apple_notification: 'incomplete', event: 'consent-revoked' }));
     expect((await post()).statusCode).toBe(200);
+  });
+  it('real voice release failure stays incomplete until a retry confirms the captured lease is gone', async () => {
+    const { post, deps } = setup(); vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rooms = new OutpostRooms(loadOutposts()); rooms.join(PLAYER, 'sh_tea_1');
+    let fail = true, metadata = '';
+    const remove = vi.fn(async () => {});
+    deps.voice = new P0Voice({ url: 'ws://fake.invalid', apiKey: 'fake', apiSecret: 'fake-secret-at-least-thirty-two-bytes', namespace: 'notify-test' },
+      rooms, null, deps.now, { getParticipant: async () => { if (fail) throw new Error('private-provider-error'); return { metadata }; }, removeParticipant: remove });
+    deps.voice.setAge(PLAYER, true);
+    const grant = await deps.voice.join(PLAYER) as { lease_id: string }; metadata = grant.lease_id;
+    expect((await post()).statusCode).toBe(503);
+    expect(deps.accounts.byToken(USER)).toBeUndefined(); expect(deps.store.peek(PLAYER)).toBeDefined();
+    fail = false;
+    expect((await post()).statusCode).toBe(200); expect(remove).toHaveBeenCalledOnce();
   });
   it('caps unauthenticated requests by IP without requiring the game access key', async () => {
     const { app } = setup();

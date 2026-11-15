@@ -33,7 +33,7 @@ export async function verifyAppleNotification(payload: unknown, opts: {
   let e = t.events;
   if (typeof e === 'string') { try { e = JSON.parse(e); } catch { throw new IdTokenError('BAD_EVENTS'); } }
   if (!record(e) || !nonempty(e.type, 80) || !nonempty(e.sub, 255) || !seconds(e.event_time) ||
-      e.event_time > t.iat + SKEW_S || now - e.event_time * 1000 > APPLE_NOTIFICATION_MAX_AGE_MS)
+      e.event_time > t.iat + SKEW_S || e.event_time * 1000 > now + SKEW_S * 1000 || now - e.event_time * 1000 > APPLE_NOTIFICATION_MAX_AGE_MS)
     throw new IdTokenError('BAD_EVENTS');
   const type: EventType = e.type === 'consent-revoked' ? 'consent-revoked'
     : e.type === 'account-deleted' || e.type === 'account-delete' ? 'account-deleted' : 'ignored';
@@ -49,6 +49,7 @@ interface Entry {
 export class AppleNotificationJournal {
   private entries: Record<string, Entry> = {};
   private authorizations: Record<string, number> = {};
+  private revocations: Record<string, number> = {};
   private jobs = new Map<string, Promise<void>>();
   constructor(private file?: string, private now: () => number = Date.now) {
     if (file && existsSync(file)) {
@@ -69,11 +70,18 @@ export class AppleNotificationJournal {
         if (!/^[a-f0-9]{64}$/.test(k) || typeof at !== 'number' || !Number.isFinite(at)) throw new Error('APPLE_NOTIFICATION_JOURNAL_INVALID');
         this.authorizations[k] = at;
       }
+      if (!record(d.revocations)) throw new Error('APPLE_NOTIFICATION_JOURNAL_INVALID');
+      for (const [k, at] of Object.entries(d.revocations)) {
+        if (!/^[a-f0-9]{64}$/.test(k) || typeof at !== 'number' || !Number.isFinite(at)) throw new Error('APPLE_NOTIFICATION_JOURNAL_INVALID');
+        this.revocations[k] = at;
+      }
     }
   }
   /** Verified Apple JWT iat protects renewed credentials even after the new user token logs out. */
   authorized = (sub: string, issuedAt: number): void => {
     const key = hash(sub);
+    const revoked = this.revocations[key];
+    if (revoked !== undefined && issuedAt <= revoked + 999) throw new IdTokenError('AUTHORIZATION_REVOKED');
     if ((this.authorizations[key] ?? -1) >= issuedAt) return;
     const next = { ...this.authorizations };
     for (const [k, at] of Object.entries(next)) if (at < this.now() - APPLE_NOTIFICATION_MAX_AGE_MS - 86_400_000) delete next[k];
@@ -82,9 +90,18 @@ export class AppleNotificationJournal {
     this.persist(this.entries, next); this.authorizations = next;
   };
   authorizedAfter(sub: string, throughMs: number): boolean { return (this.authorizations[hash(sub)] ?? -1) > throughMs; }
-  private persist(entries: Record<string, Entry>, authorizations = this.authorizations): void {
+  private revoked(sub: string, at: number): void {
+    const key = hash(sub);
+    if ((this.revocations[key] ?? -1) >= at) return;
+    const next = { ...this.revocations };
+    for (const [k, t] of Object.entries(next)) if (t < this.now() - APPLE_NOTIFICATION_MAX_AGE_MS - 86_400_000) delete next[k];
+    if (!next[key] && Object.keys(next).length >= 100_000) throw new Error('APPLE_NOTIFICATION_JOURNAL_FULL');
+    next[key] = at;
+    this.persist(this.entries, this.authorizations, next); this.revocations = next;
+  }
+  private persist(entries: Record<string, Entry>, authorizations = this.authorizations, revocations = this.revocations): void {
     if (!this.file) return;
-    writeFileSync(this.file + '.tmp', JSON.stringify({ v: 1, entries, authorizations }), { mode: 0o600 });
+    writeFileSync(this.file + '.tmp', JSON.stringify({ v: 1, entries, authorizations, revocations }), { mode: 0o600 });
     renameSync(this.file + '.tmp', this.file);
   }
   private write(key: string, entry: Entry): void {
@@ -107,6 +124,7 @@ export class AppleNotificationJournal {
     const run = async () => {
       const entry = current ?? { ...plan(), digest, expires: event.issued + APPLE_NOTIFICATION_MAX_AGE_MS + 86_400_000, done: false };
       if (!current) this.write(key, entry); // fail closed: no account operation if journaling fails
+      if (event.type !== 'ignored') this.revoked(event.sub, event.at); // pre-event ID tokens cannot sign in again
       await apply(entry); // failure remains pending; never mark successful before durable account cleanup
       this.write(key, { ...entry, done: true });
     };
@@ -126,24 +144,26 @@ export async function applyAppleNotification(e: AppleNotification, d: AppleNotif
   const through = e.at + 999; // event_time is seconds; a strictly later second is a newer authorization
   await d.journal.run(e, () => {
     const player = d.accounts.byIdentity('apple', e.sub), row = player ? d.accounts.find(player) : undefined;
-    if (e.type === 'ignored' || d.journal.authorizedAfter(e.sub, through) || !player || !row?.apple ||
-        row.created_at > through || d.accounts.userSessionAfter(player, through))
+    if (e.type === 'ignored' || d.journal.authorizedAfter(e.sub, through) || !player || !row?.apple)
       return { action: 'ignore', player: null, created: null };
     const others = d.accounts.linked(player).filter(p => p !== 'apple');
     return { player, created: row.created_at,
-      action: e.type === 'consent-revoked' ? 'revoke' : others.length ? 'unlink' : 'delete' };
+      // Preserve a new farm created after a delayed deletion event, but never leave its old authorization active.
+      action: e.type === 'consent-revoked' || row.created_at > through ? 'revoke' : others.length ? 'unlink' : 'delete' };
   }, async entry => {
-    if (e.type === 'ignored' || d.journal.authorizedAfter(e.sub, through)) return;
-    d.pending?.invalidateApple(e.sub, through);
+    if (e.type === 'ignored') return;
+    const renewed = d.journal.authorizedAfter(e.sub, through);
+    d.pending?.invalidateApple(e.sub, renewed ? through : Infinity);
+    if (renewed) return;
     if (entry.action === 'ignore' || !entry.player) return;
     const player = entry.player, row = d.accounts.find(player);
     // An I/O retry must never delete or invalidate a newly authorized/recreated/rebound account.
-    if (row && (row.created_at !== entry.created || d.accounts.userSessionAfter(player, through) ||
+    if (row && (row.created_at !== entry.created ||
         row.apple && row.apple.sub !== e.sub)) return;
     if (entry.action === 'delete') {
       // Recheck bindings at mutation time; a newly added alternative sign-in must preserve the farm.
       if (row && d.accounts.linked(player).some(p => p !== 'apple')) {
-        if (row.apple?.sub === e.sub) d.accounts.invalidateApple(player, e.sub, through, true);
+        if (row.apple?.sub === e.sub) d.accounts.invalidateApple(player, e.sub, true);
       } else {
         // Apple initiated deletion: no outbound revoke, no private Apple key needed.
         await deleteAccount({ ...d, revokeApple: undefined }, player);
@@ -151,7 +171,7 @@ export async function applyAppleNotification(e: AppleNotification, d: AppleNotif
         return;
       }
     } else if (row?.apple?.sub === e.sub) {
-      d.accounts.invalidateApple(player, e.sub, through, entry.action === 'unlink');
+      d.accounts.invalidateApple(player, e.sub, entry.action === 'unlink');
     }
     // For a pending unlink retry the row may no longer have Apple, but this target still needs online cleanup.
     const drop = d.voice.drop(player, { requireConfirmed: true });

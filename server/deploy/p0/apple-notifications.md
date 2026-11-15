@@ -47,13 +47,19 @@ must be writable only by the server. Include it in deployment approval and the d
   has disappeared. It does not mark the delivery completed before confirmed cleanup. No claim of distributed transaction
   atomicity: account/save/voice files can be partly changed on failure, and recovery preserves that fact.
 - In-process duplicate deliveries share one operation. Lookup happens after async signature validation. Before applying,
-  target creation, current binding, alternative sign-ins and newer user-token times are checked again.
+  target creation, current binding, alternative sign-ins and verified Apple authorization times are checked again.
 - A verified Apple ID-token **issue time** is recorded before it is used by app login/claim; receipt time is not used,
   so replaying an old ID token does not manufacture a new authorization time. Notifications predating a newer verified
-  authorization are ignored even after that newer session logs out. Existing token timestamps are a conservative extra
-  safeguard for pre-feature state and newer sign-ins through other providers.
+  authorization are ignored even after that newer session logs out. A game's newer session token by itself is not proof
+  of renewed Apple authorization: it may have been minted from a pre-event Apple token before notification delivery.
+- The journal also records a hashed-subject revocation time before applying the notification. A still-unexpired Apple
+  ID token issued at or before that event cannot sign in again or create a fresh pending grant; a strictly newer verified
+  ID token can reauthorize. This revocation floor also survives restart.
 - Apple's timestamps have second precision. A strictly later second protects a newer authorization; same-second ordering
   cannot be established and follows revocation. This limitation is explicit, not claimed as perfect event ordering.
+- A farm created after a delayed deletion event is preserved, but without a newer verified Apple authorization its user
+  sessions/refresh are still revoked. Pending grants from invalidated authorization are removed even if received after
+  the event but before delivery; already renewed authorization keeps only grants newer than the event.
 - Completed delivery records expire after their accepted issue-time window plus one day; old authorization timestamps
   are pruned on later authorization writes. Pending actions are not pruned. Cleanup is lazy on journal writes, not a new
   background retention job. Maps cap at 100,000 entries and fail closed when capacity cannot be reclaimed.
