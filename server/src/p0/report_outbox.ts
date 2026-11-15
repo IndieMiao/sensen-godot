@@ -59,6 +59,17 @@ export class ReportOutbox {
     return true;
   }
 
+  /** Physically remove pending and sent metadata at the original report's one-year cutoff, never at the retry time. */
+  retention(apply = false): { scanned: number; expired: number; retained: number; changed: boolean } {
+    if (this.closed) throw new Error('REPORT_OUTBOX_CLOSED');
+    const now = this.now();
+    if (!integer(now)) throw new Error('REPORT_OUTBOX_INVALID_TIME');
+    const kept = this.state.entries.filter(e => now - Date.parse(e.notice.at) < REPORT_KEEP_MS);
+    const expired = this.state.entries.length - kept.length;
+    if (apply && expired) this.commit({ ...this.state, entries: kept });
+    return { scanned: this.state.entries.length + (apply ? expired : 0), expired, retained: kept.length, changed: apply && expired > 0 };
+  }
+
   /** At most one SMTP attempt per tick; concurrent ticks share it. No delivery dependency means default-off. */
   tick(): Promise<boolean> {
     if (this.closed || !this.delivery) return Promise.resolve(false);

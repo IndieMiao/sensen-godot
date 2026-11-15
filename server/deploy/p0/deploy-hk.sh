@@ -25,6 +25,7 @@
 #   server/deploy/p0/deploy-hk.sh claim-reset <player id>      # clear its claim and revoke every token, admin ones too
 #   server/deploy/p0/deploy-hk.sh delete <player|support-code> [--confirm] # preview by default; live execution by 83 after PM approval
 #   server/deploy/p0/deploy-hk.sh delete-incomplete            # read-only unfinished deletion list, terminal only
+#   server/deploy/p0/deploy-hk.sh reports-retention [--confirm] # one-year active report/queue cleanup, preview by default
 #   server/deploy/p0/deploy-hk.sh code <player id|new> <note>  # a test code (contract v1.4 §4) for that account or a new one;
 #                                                                #   note an id such as review-play / cn-tester-03, never a name
 #   server/deploy/p0/deploy-hk.sh code-batch <count> <prefix>   # that many new accounts' codes, notes <prefix>-01 …
@@ -198,7 +199,7 @@ health() {   # $1 = label: Journey and farm healthz, saved for the before / afte
 step="${1:-}"; shift || true
 if [ "$TARGET" = hk ] && [ -z "$HK_OVERRIDE" ]; then
   case "$step" in
-    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version|token|claim-reset|code|code-batch|code-revoke|delete)
+    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version|token|claim-reset|code|code-batch|code-revoke|delete|reports-retention)
       echo "$step writes to Hong Kong, the frozen fallback (P0 stopped, data frozen) until 2026-11-01 16:00 +08:00: refused."
       echo "The live P0 is US West: deploy-hk.sh --target us $step …"
       echo "Only for a fallback the PM has called: deploy-hk.sh --target hk --confirm-hk-frozen-override $step …"
@@ -541,6 +542,12 @@ if t: print(f"admin tokens in force {len(t)}, the first ends {end} (--ids: whose
     say "withdraw the test code of …${player: -6} and the tokens it gave (its other sign-ins stay)"
     admin /admin/code/revoke "{\"player\":\"$player\"}"; echo
     echo "$(date -u +%FT%TZ) code-revoke …${player: -6}" >> "$out/admin.txt"
+    ;;
+  reports-retention)
+    [ "$#" -le 1 ] && { [ -z "${1:-}" ] || [ "$1" = --confirm ]; } || { echo 'use reports-retention [--confirm]'; exit 2; }
+    say 'report retention preview (counts only; active JSONL and queue, no backups)'
+    admin /admin/reports/retention; echo
+    if [ "${1:-}" = --confirm ]; then admin /admin/reports/retention '{"apply":true}'; echo; fi
     ;;
   delete-incomplete)
     say "unfinished deletion records (admin, terminal only; not all cleanup failures are in this list)"
