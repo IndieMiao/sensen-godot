@@ -115,6 +115,7 @@ class PlayBundleChecks(unittest.TestCase):
     def archive(self, path, prefix='assetPackInstallTime/assets/', extra=None):
         files = {n: elf() for n in checks.NATIVE}
         files.update({prefix + 'mapbox_token.txt': b'synthetic-map-token',
+                      prefix + 'project.binary': b'ECFG synthetic production project',
                       prefix + 'assets/p0/demo_server.json': json.dumps({'url': 'https://example.invalid/v1', 'key': 'synthetic-private-key', 'version': 2026111501, 'name': '0.3.11'}).encode(),
                       prefix + 'assets/p0/legal/licenses.json': json.dumps({'groups': [{'rows': [{'text': 'res://assets/p0/legal/license.txt'}]}]}).encode(),
                       prefix + 'assets/p0/legal/license.txt': b'license'})
@@ -231,6 +232,47 @@ class PlayBuildSafety(unittest.TestCase):
             build.parser().parse_args(['--server', 'https://example.invalid/v1', '--code', '2026111501', '--name', '0.3.11', '--upload', 'SECRET'])
         self.assertEqual(result.exception.code, 2)
         self.assertNotIn('SECRET', err.getvalue())
+
+class ReviewRegressions(unittest.TestCase):
+    def test_explicit_or_malformed_cleartext_attribute_is_rejected(self):
+        for value in ('true', 'TRUE', '1', '@bool/dev_cleartext', ''):
+            with self.subTest(value=value), self.assertRaises(checks.CheckError):
+                checks.manifest_facts(android_manifest(app_extra=f'android:usesCleartextTraffic="{value}"'), 2026111501, '0.3.11')
+        self.assertTrue(checks.manifest_facts(android_manifest(app_extra='android:usesCleartextTraffic="false"'), 2026111501, '0.3.11')['explicit_cleartext_disabled'])
+        self.assertTrue(checks.manifest_facts(android_manifest(), 2026111501, '0.3.11')['explicit_cleartext_disabled'])
+
+    def test_both_asset_roots_reject_nonentry_qa_files_and_config_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            aab = Path(tmp) / 'fake.aab'; fixture = PlayBundleChecks()
+            for root in checks.ASSET_ROOTS:
+                for relative in ('qa_accounts/qa_adapter.gdc', 'qa-review/provenance.json', 'assets/qa_accounts/input.json'):
+                    fixture.archive(aab, prefix=root, extra={root + relative: b'not-an-entry-file'})
+                    with self.subTest(root=root, file=relative), self.assertRaises(checks.CheckError):
+                        checks.check_archive(aab, 'https://example.invalid/v1', 'synthetic-private-key', 2026111501, '0.3.11')
+                for config in ('project.binary', 'project.godot'):
+                    for marker in checks.QA_MARKERS:
+                        fixture.archive(aab, prefix=root, extra={root + config: b'ECFG config-only ' + marker})
+                        with self.subTest(root=root, config=config, marker=marker), self.assertRaises(checks.CheckError):
+                            checks.check_archive(aab, 'https://example.invalid/v1', 'synthetic-private-key', 2026111501, '0.3.11')
+
+    def test_source_and_artifact_share_qa_boundary(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'project.godot').write_text('[application]\nrun/main_scene="res://scenes/p0/p0_boot.tscn"\n')
+            (root / 'export_presets.cfg').write_text(preset())
+            checks.production_clean_source(root)
+            for directory in ('qa_accounts', 'qa-review'):
+                (root / directory).mkdir()
+                with self.assertRaises(checks.CheckError):
+                    checks.production_clean_source(root)
+                (root / directory).rmdir()
+            for name in ('project.godot', 'export_presets.cfg'):
+                original = (root / name).read_bytes()
+                for marker in checks.QA_MARKERS:
+                    (root / name).write_bytes(original + b'\n' + marker)
+                    with self.assertRaises(checks.CheckError):
+                        checks.production_clean_source(root)
+                (root / name).write_bytes(original)
 
 if __name__ == '__main__':
     unittest.main()

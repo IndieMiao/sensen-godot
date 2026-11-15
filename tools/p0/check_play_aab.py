@@ -25,6 +25,9 @@ NATIVE = ['base/lib/arm64-v8a/libgodot_android.so', 'base/lib/arm64-v8a/libmapbo
           'base/lib/arm64-v8a/libmapbox-common.so', 'base/lib/arm64-v8a/liblkjingle_peerconnection_so.so']
 PLUGINS = {'org.godotengine.plugin.v2.' + n for n in ('GodotMap', 'GodotVoice', 'GodotWebView', 'GodotNotify', 'GodotGoogleSignIn')}
 ASSET_ROOTS = ('base/assets/', 'assetPackInstallTime/assets/')
+# Same boundary as the QA client's production-clean audit, including its custom-user-dir marker.
+QA_MARKERS = (b'qa_accounts', b'accounts_ui_qa', b'accountsuiqa', b'accounts-uiqa', b'qa-synthetic', b'accounts ui qa')
+QA_DIRS = {'qa_accounts', 'qa-review', 'accounts_rehearsal'}
 
 class CheckError(RuntimeError):
     pass
@@ -76,6 +79,7 @@ def manifest_facts(xml, code, name):
         require(root.get('package') == PACKAGE, 'unexpected package name')
         require(root.get(ANDROID + 'versionCode') == str(code) and root.get(ANDROID + 'versionName') == name, 'manifest version mismatch')
         require(app.get(ANDROID + 'debuggable', 'false') == 'false', 'debuggable Play bundle')
+        require(app.get(ANDROID + 'usesCleartextTraffic', 'false') == 'false', 'explicit or malformed cleartext traffic setting')
         require(ANDROID + 'networkSecurityConfig' not in app.attrib, 'development network security override')
         require(int(sdk.get(ANDROID + 'targetSdkVersion', '0')) >= 35, 'target SDK below Play baseline')
         permissions = {n.get(ANDROID + 'name') for n in root if n.tag.startswith('uses-permission')}
@@ -88,6 +92,7 @@ def manifest_facts(xml, code, name):
         require(PLUGINS <= names, 'required native plugin registration missing')
         return {'package': PACKAGE, 'version_code': code, 'version_name': name, 'permissions_ok': True,
                 'permissions': sorted(permissions), 'ad_id_absent': True, 'debuggable': False,
+                'explicit_cleartext_disabled': True,
                 'target_sdk': int(sdk.get(ANDROID + 'targetSdkVersion')), 'native_plugins_ok': True}
     except (ET.ParseError, ValueError) as e:
         raise CheckError('invalid Android manifest') from e
@@ -120,6 +125,29 @@ def asset_entry(entries, relative, required=True):
     require(len(found) <= 1 and (found or not required), 'required asset missing or duplicated across modules: ' + relative)
     return found[0] if found else None
 
+def no_qa_config(data):
+    require(not any(marker in data.lower() for marker in QA_MARKERS), 'QA configuration marker in Play project')
+
+def production_clean_source(root):
+    require(not any((root / name).exists() for name in QA_DIRS), 'QA directory in release source')
+    for name in ('project.godot', 'export_presets.cfg'):
+        no_qa_config((root / name).read_bytes())
+
+def production_clean_archive(z, entries):
+    for name in entries:
+        for prefix in ASSET_ROOTS:
+            if name.startswith(prefix):
+                relative = name[len(prefix):].lower()
+                parts = set(relative.split('/'))
+                require(not (parts & QA_DIRS) and not relative.startswith('tools/qa/') and 'qa_entry' not in relative,
+                        'QA resource or review directory in Play bundle')
+    configs = [asset_entry(entries, name, required=False) for name in ('project.binary', 'project.godot')]
+    require(any(configs), 'Godot project configuration missing')
+    for name in configs:
+        if name:
+            require(z.getinfo(name).file_size <= 16 * 1024 * 1024, 'project configuration too large to inspect')
+            no_qa_config(z.read(name))
+
 def check_archive(aab, server, key, code, name):
     with zipfile.ZipFile(aab) as z:
         infos = z.infolist()
@@ -128,7 +156,7 @@ def check_archive(aab, server, key, code, name):
         require(z.testzip() is None, 'ZIP CRC failure')
         require(set(NATIVE) <= entries, 'required native library missing')
         asset_entry(entries, 'mapbox_token.txt')
-        require(not any('/tools/qa/' in n or '/accounts_rehearsal/' in n or 'qa_entry' in n for n in entries), 'QA entry resource in Play bundle')
+        production_clean_archive(z, entries)
         config = json.loads(z.read(asset_entry(entries, 'assets/p0/demo_server.json')))
         require(config.get('url') == server and config.get('key') == key and config.get('version') == code and config.get('name') == name,
                 'baked endpoint/key/version mismatch')
@@ -154,7 +182,7 @@ def check_archive(aab, server, key, code, name):
             aligns = elf_load_alignment(native)
             libraries.append({'path': info.filename, 'load_segments': len(aligns), 'min_alignment': min(aligns)})
         require(bool(libraries), 'no native libraries inspected')
-    return {'zip_crc_ok': True, 'native_ok': True, 'elf_16kb_ok': True, 'libraries': libraries,
+    return {'zip_crc_ok': True, 'production_clean': True, 'native_ok': True, 'elf_16kb_ok': True, 'libraries': libraries,
             'server': server, 'key_matches': True, 'key_present': bool(key), 'version_baked': code,
             'legal_ok': True, 'legal_versions': versions, 'account_legal_versions_present': version_entry is not None}
 

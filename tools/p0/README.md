@@ -22,7 +22,7 @@ See the release checklist for the actual approved source and deployment evidence
   `ADB_LOCAL_TRANSPORT_MAX_PORT=5553`, and stops that private ADB server afterwards.
 - Use a committed, clean source tree. Untracked export inputs other than generated
   `.uid` files are refused; the Play preset's exclusion filters apply. Do not use a
-  QA bootstrap or project with `accounts_ui_qa` enabled.
+  QA bootstrap, `qa_accounts/` or `qa-review/` directory, or QA-marked project/export configuration.
 - Install the normal Godot Android template and refresh the native plugins:
 
   ```sh
@@ -95,7 +95,8 @@ PID before removing the lock; do not delete another active build's lock.
   install-time Godot asset module are accepted.
 - Read actual package/version, non-debuggable status, target SDK, required native
   plugins and merged permissions. Unexpected permissions, Advertising ID,
-  screen-capture service and development network overrides fail the build.
+  screen-capture service, development network overrides and explicit/malformed
+  `usesCleartextTraffic` fail the build (only absent or `false` is accepted).
 - Verify the JAR signature and its exact upload-certificate SHA-256, refusing an
   unsigned bundle, unsigned entries or the debug/another certificate.
 - Inspect **every** native ELF `PT_LOAD` segment for power-of-two alignment at least
@@ -109,6 +110,9 @@ PID before removing the lock; do not delete another active build's lock.
   logical name. Account legal-version presence is reported separately: historical
   r1 predates the accounts branch and has no `legal/versions.json`; that absence
   must not be described as submission readiness.
+- Reject QA directories and QA markers in either asset root's `project.binary` or
+  `project.godot`, including a configuration-only overlay with no `qa_entry` file.
+  This uses the QA client's production-clean boundary plus the known QA user-dir marker.
 
 ### Inspect an existing artifact without rebuilding
 

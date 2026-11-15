@@ -18,7 +18,7 @@ import tempfile
 from urllib.parse import urlsplit
 import zipfile
 
-from check_play_aab import CheckError, UPLOAD_CERT, verify, sha256
+from check_play_aab import CheckError, UPLOAD_CERT, verify, sha256, production_clean_source
 
 ROOT = Path(__file__).resolve().parents[2]
 FIRST_PLAY_CODE = 2026111401
@@ -140,7 +140,7 @@ def source_identity():
     untracked = git('ls-files', '--others', '--exclude-standard').splitlines()
     unexpected = [p for p in untracked if not p.endswith('.uid') and not any(fnmatch.fnmatch(p, pattern) for pattern in patterns)]
     require(not unexpected, 'untracked export inputs present; isolate them before building')
-    require('accounts_ui_qa' not in (ROOT / 'project.godot').read_text(), 'QA project configuration cannot build Play')
+    production_clean_source(ROOT)
     return git('rev-parse', 'HEAD')
 
 def no_phone_and_free_adb(port):
