@@ -45,6 +45,10 @@ export class PendingSignIns {
     for (const [id, p] of this.by) if (this.now() - p.at >= PENDING_MS) { this.by.delete(id); this.expired?.(p); }
   }
   size(): number { return this.by.size; }
+  /** An Apple notification invalidates unconsumed older grants too, without calling Apple's revoke again. */
+  invalidateApple(sub: string, throughMs: number): void {
+    for (const [id, p] of this.by) if (p.provider === 'apple' && p.link.sub === sub && p.at <= throughMs) this.by.delete(id);
+  }
 }
 
 /**

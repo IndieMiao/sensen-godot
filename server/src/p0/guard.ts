@@ -92,14 +92,15 @@ export async function registerP0Guard(app: FastifyInstance, opts: P0GuardOptions
 /** Copy the live save to <dir>/p0-state-<UTC hour>.json and keep the newest `keep` copies. With `accounts` (SGODOT-488,
  * tech-plan §1.3) accounts.json goes beside it as <dir>/accounts-<the same hour>.json, kept the same: a save put back
  * from an hour ago comes back with the tokens and links of that hour, never newer ones that would not match it. */
-export function snapshotState(file: string, dir: string, keep: number, now = Date.now(), accounts?: string): string | null {
+export function snapshotState(file: string, dir: string, keep: number, now = Date.now(), accounts?: string, appleNotifications?: string): string | null {
   if (!existsSync(file)) return null;
   mkdirSync(dir, { recursive: true });
   const hour = new Date(now).toISOString().slice(0, 13).replace(/[-T:]/g, '');
   const to = path.join(dir, `p0-state-${hour}.json`);
   copyFileSync(file, to);
   if (accounts && existsSync(accounts)) copyFileSync(accounts, path.join(dir, `accounts-${hour}.json`));
-  for (const kind of ['p0-state', 'accounts']) {
+  if (appleNotifications && existsSync(appleNotifications)) copyFileSync(appleNotifications, path.join(dir, `apple-notifications-${hour}.json`));
+  for (const kind of ['p0-state', 'accounts', 'apple-notifications']) {
     const all = readdirSync(dir).filter(f => new RegExp(`^${kind}-\\d{10}\\.json$`).test(f)).sort();
     for (const old of all.slice(0, Math.max(0, all.length - keep))) rmSync(path.join(dir, old));
   }

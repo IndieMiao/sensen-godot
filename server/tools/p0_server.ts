@@ -7,6 +7,7 @@
  * Outpost rooms on the same port: ws://…/v1/p0/online (x-p0-player header), GET /v1/p0/presence.
  */
 import { APPLE_JWKS_URL, AppleClient, appleVerifier, registerAppleRoutes } from '../src/p0/accounts/apple.js';
+import { AppleNotificationJournal, registerAppleNotifications } from '../src/p0/accounts/apple_notifications.js';
 import { accountsConfig, applePrivateKey } from '../src/p0/accounts/config.js';
 import { GOOGLE_JWKS_URL, googleVerifier, registerGoogleRoutes } from '../src/p0/accounts/google.js';
 import { alertMailerFromEnv, EmailCodes, emailReady, emailVerifier, registerEmailRoutes, signInMailerFromEnv } from '../src/p0/accounts/email.js';
@@ -164,11 +165,18 @@ const appleClient = appleCfg ? new AppleClient(appleCfg, () => applePrivateKey(a
 const pendingSignIns = new PendingSignIns(Date.now, expiredSignIn(accounts, appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : null));
 setInterval(() => pendingSignIns.sweep(), 60_000).unref();
 const appleJwks = new CachedJwks(jwksFetcher(APPLE_JWKS_URL)), googleJwks = new CachedJwks(jwksFetcher(GOOGLE_JWKS_URL));
+const appleNotificationsFile = path.join(path.dirname(stateFile), 'apple-notifications.json');
+const appleNotifications = new AppleNotificationJournal(appleNotificationsFile);
+registerAppleNotifications(app, { store, accounts, voice, hub, pending: pendingSignIns, now: Date.now,
+  audiences: [...new Set([process.env.APPLE_BUNDLE_IDS, process.env.APPLE_SERVICES_IDS]
+    .flatMap(x => (x ?? '').split(',').map(s => s.trim()).filter(Boolean)))],
+  keys: appleJwks.keys, refreshKeys: appleJwks.refresh,
+  journal: appleNotifications });
 const kickPlayer = (p: string) => { hub.kick(p); };
 // a sign-in into a farm with no consent to today's terms says so (spec v2 §9): the App asks for it in place
 const consentOf = consentNote(store, legalVersions());
 const appleDeps = { store, accounts, now: Date.now, pending: pendingSignIns, apple: appleCfg, client: appleClient,
-  keys: appleJwks.keys, refreshKeys: appleJwks.refresh, kick: kickPlayer, consent: consentOf };
+  keys: appleJwks.keys, refreshKeys: appleJwks.refresh, kick: kickPlayer, consent: consentOf, authorized: appleNotifications.authorized };
 const googleDeps = { store, accounts, identify: identifyDeps, now: Date.now, pending: pendingSignIns,
   audiences: accountsCfg.google?.audiences ?? [], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, kick: kickPlayer, consent: consentOf };
 registerAppleRoutes(app, appleDeps);
@@ -216,7 +224,7 @@ app.get('/v1/healthz', async () => {
     maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0, require_features: g.features_on ? g.features : [] };
 });
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');
-setInterval(() => snapshotState(stateFile, snapshots, 48, Date.now(), accountsFile), 3_600_000).unref();
+setInterval(() => snapshotState(stateFile, snapshots, 48, Date.now(), accountsFile, appleNotificationsFile), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
 console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config, dev_sites: devSitesFromEnv(process.env), email_login: emailReady(emailDeps) }));
