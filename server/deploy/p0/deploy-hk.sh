@@ -23,6 +23,8 @@
 #   server/deploy/p0/deploy-hk.sh token <player id>            # an admin token for a test device (30 days, kept through
 #                                                                #   other devices' sign-ins): printed once, terminal only
 #   server/deploy/p0/deploy-hk.sh claim-reset <player id>      # clear its claim and revoke every token, admin ones too
+#   server/deploy/p0/deploy-hk.sh delete <player|support-code> [--confirm] # preview by default; live execution by 83 after PM approval
+#   server/deploy/p0/deploy-hk.sh delete-incomplete            # read-only unfinished deletion list, terminal only
 #   server/deploy/p0/deploy-hk.sh code <player id|new> <note>  # a test code (contract v1.4 §4) for that account or a new one;
 #                                                                #   note an id such as review-play / cn-tester-03, never a name
 #   server/deploy/p0/deploy-hk.sh code-batch <count> <prefix>   # that many new accounts' codes, notes <prefix>-01 …
@@ -196,7 +198,7 @@ health() {   # $1 = label: Journey and farm healthz, saved for the before / afte
 step="${1:-}"; shift || true
 if [ "$TARGET" = hk ] && [ -z "$HK_OVERRIDE" ]; then
   case "$step" in
-    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version|token|claim-reset|code|code-batch|code-revoke)
+    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version|token|claim-reset|code|code-batch|code-revoke|delete)
       echo "$step writes to Hong Kong, the frozen fallback (P0 stopped, data frozen) until 2026-11-01 16:00 +08:00: refused."
       echo "The live P0 is US West: deploy-hk.sh --target us $step …"
       echo "Only for a fallback the PM has called: deploy-hk.sh --target hk --confirm-hk-frozen-override $step …"
@@ -539,6 +541,30 @@ if t: print(f"admin tokens in force {len(t)}, the first ends {end} (--ids: whose
     say "withdraw the test code of …${player: -6} and the tokens it gave (its other sign-ins stay)"
     admin /admin/code/revoke "{\"player\":\"$player\"}"; echo
     echo "$(date -u +%FT%TZ) code-revoke …${player: -6}" >> "$out/admin.txt"
+    ;;
+  delete-incomplete)
+    say "unfinished deletion records (admin, terminal only; not all cleanup failures are in this list)"
+    admin /admin/delete/incomplete; echo
+    ;;
+  delete)
+    selector="${1:?delete <player|support-code> [--confirm]}"
+    confirmation="${2:-}"
+    [ "$#" -le 2 ] && { [ -z "$confirmation" ] || [ "$confirmation" = --confirm ]; } || { echo 'use delete <player|support-code> [--confirm]'; exit 2; }
+    if [[ "$selector" =~ ^[0-9A-HJKMNP-TV-Z]{5}-[0-9A-HJKMNP-TV-Z]{5}$ ]]; then
+      field=support_code
+    elif [[ "$selector" =~ ^[A-Za-z0-9_-]{8,64}$ ]]; then
+      field=player
+    else
+      echo 'invalid player/support-code'; exit 2
+    fi
+    say "delete preview (terminal only; production apply is for 83 after PM approval)"
+    admin "/admin/delete/preview?$field=$selector"; echo
+    if [ "$confirmation" = --confirm ]; then
+      admin /admin/delete "{\"$field\":\"$selector\"}"; echo
+      echo "$(date -u +%FT%TZ) delete …${selector: -6}" >> "$out/admin.txt"
+    else
+      say 'preview only; --confirm applies deletion after approval'
+    fi
     ;;
   claim-reset)
     player="${1:?claim-reset <player id>}"

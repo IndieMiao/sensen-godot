@@ -15,13 +15,16 @@ import { isoMinute, type P0Gate } from './gate.js';
 import { maxEnergy, settleEnergy } from './rules.js';
 import type { P0Store } from './store.js';
 import { registerModerationRoutes, type ModerationActions } from './admin_moderation.js';
+import { registerAdminDelete } from './admin_delete.js';
+import type { DeleteDeps } from './accounts/delete.js';
 
 /** accounts (SGODOT-488): the tokens, for a test device's admin token and a claim reset (contract-accounts §4.1). */
 export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => number; key: string; log?: (line: string) => void; gate?: P0Gate;
   accounts?: P0Accounts;
   /** The room hub's kick (SGODOT-488): a claim reset closes the player's open socket at once. */
   kick?: (player: string) => void;
-  moderation?: ModerationActions }
+  moderation?: ModerationActions;
+  deletion?: Pick<DeleteDeps, 'voice' | 'hub' | 'revokeApple'> }
 
 /** An admin token lasts 30 days (tech-plan §2.5): a test device's, kept through other devices' sign-ins, never forgotten. */
 export const ADMIN_TOKEN_MS = 30 * 86_400_000;
@@ -38,6 +41,7 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
     if (req.headers['x-p0-admin'] !== deps.key) return reply.code(401).send({ ok: false, code: 'bad_admin_key' });
   });
   if (deps.moderation) registerModerationRoutes(app, { store, actions: deps.moderation, now: deps.now, log });
+  if (deps.deletion && deps.accounts) registerAdminDelete(app, { ...deps.deletion, store, accounts: deps.accounts, now: deps.now }, log);
 
   /** Players with when they joined and were last seen: the observer matches them to names by install time. */
   /** With accounts, each player's admin tokens still in force ({tail, expires_at}), so one given to a test device is not
