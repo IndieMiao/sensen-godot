@@ -1,0 +1,9 @@
+# Reviewable deployment handoff only: NOT applied by this PR.
+# Add inside the existing gensen.app site, before its catch-all, only after account-service deployment approval.
+# Keep the browser URL https://gensen.app/delete (Apple's registered Return URL); do not redirect to the API host.
+handle /delete {
+    rewrite * /preview/p0/v1/web/delete/page
+    reverse_proxy https://farm.sensenjoy.cn {
+        header_up Host farm.sensenjoy.cn
+    }
+}

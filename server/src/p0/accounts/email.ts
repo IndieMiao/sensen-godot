@@ -12,7 +12,7 @@
  * prints the address and the code.
  */
 import { createHmac, randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import nodemailer from 'nodemailer';
 import type { P0Store } from '../store.js';
 import { liveOwner, signIn, type PendingSignIns } from './link.js';
@@ -218,7 +218,7 @@ export function emailVerifier(deps: Pick<EmailRouteDeps, 'on' | 'accounts' | 'co
   };
 }
 
-export function registerEmailRoutes(app: FastifyInstance, deps: EmailRouteDeps): void {
+export function registerEmailRoutes(app: FastifyInstance, deps: EmailRouteDeps) {
   const { store, accounts, codes } = deps;
   const warn = deps.warn ?? ((line: string) => console.warn(line));
   const on = () => deps.on && accounts.codesOn();
@@ -227,7 +227,7 @@ export function registerEmailRoutes(app: FastifyInstance, deps: EmailRouteDeps):
 
   /** POST /v1/p0/session/email/start {email, lang?}, no identity: a code mailed (in lang, "zh" or "en"), and
    *  {ok: true, resend_in: 60} for any well-formed address. */
-  app.post('/v1/p0/session/email/start', async (req, reply) => {
+  const startEmail = async (req: FastifyRequest, reply: FastifyReply) => {
     if (!on()) return send(reply, refused(503, 'provider_unavailable'));
     const b = bodyOf(req.body);
     const email = normalizeEmail(b.email);
@@ -260,7 +260,8 @@ export function registerEmailRoutes(app: FastifyInstance, deps: EmailRouteDeps):
     }
     codes.put(email, code);
     return { ok: true, resend_in: RESEND_MS / 1000 };
-  });
+  };
+  app.post('/v1/p0/session/email/start', startEmail);
 
   /** POST /v1/p0/session/email {email, code, token}, no identity: the address's farm signed in on this phone (its other
    *  phones' tokens revoked), or no_farm {pending} for NAME, as session/apple|google. The code is used up by either. */
@@ -284,4 +285,6 @@ export function registerEmailRoutes(app: FastifyInstance, deps: EmailRouteDeps):
     codes.take(email);
     return reply.code(404).send({ ok: false, code: 'no_farm', pending: deps.pending.create('email', { sub }) });
   });
+  // Browser deletion registers the same handler behind its Origin/IP guard, sharing codes, quota and mailer.
+  return startEmail;
 }
