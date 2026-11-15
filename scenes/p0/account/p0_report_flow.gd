@@ -108,6 +108,11 @@ func open(peer: int) -> void:
 	ui.set("modal_kind", "report")
 	ui.set("_modal_back", _back)
 
+func handle_back() -> bool:
+	if not _showing(): return false
+	_back()
+	return true
+
 func _back() -> void:
 	if not _showing(): return
 	if bool(drawer.get("busy")):

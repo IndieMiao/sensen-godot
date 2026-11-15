@@ -1443,6 +1443,8 @@ func _account_back_action() -> int:
 		# The flow owns the screen even when its page has no internal return (AGE / Sign in / NO-GMS).
 		# Returning to Android's home is not permission for the farm below it to receive Back.
 		return AppRouter.BACK_LEAVE_APP
+	# q(315): the report drawer owns Back before navigation/stack/world handling, below account gates.
+	if ui.report_back(): return AppRouter.BACK_IGNORE
 	return AppRouter.BACK_PASS
 
 ## NAME releases its name-check flag before guest/rename; Switch removes CHOOSE before pending answers.

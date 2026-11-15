@@ -5140,6 +5140,10 @@ func _report(peer: int) -> void:
 		add_child(_report_flow)
 	_report_flow.open(peer)
 
+## The runtime calls this from AppRouter's one foreground handler after higher-priority account gates.
+func report_back() -> bool:
+	return is_instance_valid(_report_flow) and bool(_report_flow.handle_back())
+
 ## §7: the 13+ gate (14 by the year, the user 11-02) the first time the mic key is tapped. Old enough goes on to the
 ## mic (P0VoiceRoom.answer_age), not old enough hides voice on this phone with an Info toast. Nothing else is kept.
 ## q(281) ④ (SGODOT-390, 不知火舞 18f24a30): Voice Profile behind voice's 13+ gate, the one answer for both (the server's,
