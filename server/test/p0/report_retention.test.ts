@@ -19,6 +19,26 @@ const notice = (at = T) => ({ id: ID, reporter_support: 'WKRW4-9CH60', reported_
   place: 'sh_tea_1', room: 1, channel: 'oss' as const, at: new Date(at).toISOString() });
 
 describe('484 one-year physical report retention', () => {
+  it('does not silently normalize impossible dates into a deletable record', () => {
+    const file = path.join(fresh(), 'reports.jsonl');
+    const input = JSON.stringify({ kind: 'voice_report', at: '2020-02-30T00:00:00Z', name: 'PRIVATE' }) + '\n';
+    writeFileSync(file, input);
+    expect(pruneReportFile(file, T, true)).toMatchObject({ invalid: 1, expired: 0, changed: false });
+    expect(readFileSync(file, 'utf8')).toBe(input);
+  });
+
+  it('retries a partially applied file pair after the JSONL succeeded but the queue write failed', async () => {
+    const dir = fresh(), reports = path.join(dir, 'reports.jsonl'), outbox = path.join(dir, 'queue.json');
+    const queue = new ReportOutbox(outbox, null, () => T); queue.enqueue(ID, notice(T - REPORT_KEEP_MS)); await queue.close();
+    writeFileSync(reports, row(T - REPORT_KEEP_MS, 2) + '\n');
+    const service = new ReportDeliveryService({ voice: { onReport() {} }, reports, outbox, env: {}, now: () => T }); services.push(service);
+    mkdirSync(outbox + '.tmp'); expect(() => service.retention(true)).toThrow('REPORT_OUTBOX_WRITE_FAILED');
+    expect(readFileSync(reports, 'utf8')).toBe(''); expect(JSON.parse(readFileSync(outbox, 'utf8')).entries).toHaveLength(1);
+    rmSync(outbox + '.tmp', { recursive: true });
+    expect(service.retention(true).queue).toMatchObject({ expired: 1, changed: true });
+    expect(JSON.parse(readFileSync(outbox, 'utf8')).entries).toEqual([]);
+  });
+
   it('dry-run is byte-preserving; apply deletes both v1/v2 at equality and keeps fresh/future/unknown bytes', () => {
     const file = path.join(fresh(), 'reports.jsonl');
     const expired = row(T - REPORT_KEEP_MS) + '\n' + row(T - REPORT_KEEP_MS - 1, 2) + '\n';

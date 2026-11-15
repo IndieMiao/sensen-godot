@@ -20,7 +20,10 @@ export function pruneReportFile(file: string, now: number, apply = false): Repor
     const at = data?.at;
     const timestamp = typeof at === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(at) ? Date.parse(at) : NaN;
     const recognized = data?.kind === 'voice_report' && (data.v === undefined || data.v === 1 || data.v === 2);
-    if (!recognized || !Number.isFinite(timestamp)) { result.invalid++; result.retained++; kept.push(line); continue; }
+    const canonical = typeof at === 'string' ? (at.includes('.') ? at : at.replace('Z', '.000Z')) : '';
+    if (!recognized || !Number.isFinite(timestamp) || new Date(timestamp).toISOString() !== canonical) {
+      result.invalid++; result.retained++; kept.push(line); continue;
+    }
     if (timestamp <= now && now - timestamp >= REPORT_KEEP_MS) result.expired++;
     else { result.retained++; kept.push(line); }
   }
