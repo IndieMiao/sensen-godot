@@ -12,6 +12,7 @@ interface Entry { id: string; notice: ReportMailNotice; attempts: number; next: 
 interface State { v: 1; entries: Entry[]; day: number; used: number; next: number }
 const integer = (n: unknown): n is number => Number.isSafeInteger(n) && Number(n) >= 0;
 const DAY = 86_400_000;
+export const REPORT_KEEP_MS = 365 * DAY;
 
 /** Projection is deliberate: internal name snapshots, IDs, IPs and tokens never enter this separate file. */
 function publicNotice(n: ReportMailNotice): ReportMailNotice {
@@ -76,7 +77,8 @@ export class ReportOutbox {
     const s = this.state, p = this.policy, day = Math.max(s.day, Math.floor(now / DAY));
     const used = day === s.day ? s.used : 0;
     if (now < s.next || used >= p.dailyAttempts) return false;
-    const row = s.entries.find(e => !e.sent && now >= e.next);
+    const row = s.entries.find(e => !e.sent && now >= e.next
+      && Date.parse(e.notice.at) <= now && now - Date.parse(e.notice.at) < REPORT_KEEP_MS);
     if (!row) return false;
     const attempts = row.attempts + 1;
     const delay = Math.min(p.maxRetryMs, p.retryMs * 2 ** Math.min(attempts - 1, 20));
