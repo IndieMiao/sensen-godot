@@ -11,7 +11,7 @@ import type { AnyLink, AppleLink, P0Accounts, Provider } from './store.js';
 /** A pending sign-in lasts this long (tech-plan §2.1: Apple's code is spent once and its refresh token in hand). */
 export const PENDING_MS = 10 * 60_000;
 
-export interface PendingInfo { provider: Provider; link: AnyLink; at: number }
+export interface PendingInfo { provider: Provider; link: AnyLink; at: number; appleIssuedAt?: number }
 
 /**
  * Pending sign-ins, in memory only: a restart forgets them and the client asks to sign in again (pending_expired). Each
@@ -21,10 +21,14 @@ export interface PendingInfo { provider: Provider; link: AnyLink; at: number }
 export class PendingSignIns {
   private by = new Map<string, PendingInfo>();
   constructor(private now: () => number = Date.now, private expired?: (info: PendingInfo) => void) {}
-  create(provider: Provider, link: AnyLink): string {
+  create(provider: Provider, link: AnyLink, appleIssuedAt?: number): string {
     this.sweep();
     const id = randomBytes(32).toString('hex');
-    this.by.set(id, { provider, link, at: this.now() });
+    const stored = { ...link } as AnyLink & { authorizationAt?: number };
+    const issuedAt = appleIssuedAt ?? stored.authorizationAt;
+    delete stored.authorizationAt;
+    this.by.set(id, { provider, link: stored, at: this.now(),
+      ...(provider === 'apple' && typeof issuedAt === 'number' && Number.isFinite(issuedAt) ? { appleIssuedAt: issuedAt } : {}) });
     return id;
   }
   /** The pending sign-in, left in place (a request checked before it spends it); undefined as take would be. */
@@ -45,9 +49,10 @@ export class PendingSignIns {
     for (const [id, p] of this.by) if (this.now() - p.at >= PENDING_MS) { this.by.delete(id); this.expired?.(p); }
   }
   size(): number { return this.by.size; }
-  /** An Apple notification invalidates unconsumed older grants too, without calling Apple's revoke again. */
+  /** Compare verified proof issue time, NOT receipt/TTL time. A grant without provenance fails closed. */
   invalidateApple(sub: string, throughMs: number): void {
-    for (const [id, p] of this.by) if (p.provider === 'apple' && p.link.sub === sub && p.at <= throughMs) this.by.delete(id);
+    for (const [id, p] of this.by) if (p.provider === 'apple' && p.link.sub === sub &&
+      (p.appleIssuedAt === undefined || p.appleIssuedAt <= throughMs)) this.by.delete(id);
   }
 }
 

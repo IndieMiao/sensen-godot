@@ -193,6 +193,7 @@ registerEmailRoutes(app, emailDeps);
 const verifyApple = appleVerifier(appleDeps), verifyGoogle = googleVerifier(googleDeps), verifyEmail = emailVerifier(emailDeps);
 registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now, guestOk: accountsCfg.guestOk,
   pending: pendingSignIns, kick: kickPlayer, renamed: p => { hub.renamed(p); }, email: emailReady(emailDeps),
+  authorizedApple: appleNotifications.authorized,
   verify: async (provider, b) => {
     const v = provider === 'apple' ? await verifyApple(b) : provider === 'google' ? await verifyGoogle(b)
       : provider === 'email' ? await verifyEmail(b) : undefined;

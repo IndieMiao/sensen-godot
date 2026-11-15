@@ -60,6 +60,13 @@ must be writable only by the server. Include it in deployment approval and the d
 - A farm created after a delayed deletion event is preserved, but without a newer verified Apple authorization its user
   sessions/refresh are still revoked. Pending grants from invalidated authorization are removed even if received after
   the event but before delivery; already renewed authorization keeps only grants newer than the event.
+- The verified Apple `iat` travels as transient proof metadata through code exchange. Recheck the current revocation
+  watermark after the exchange and again after the route's final await, before creating pending/linking/issuing a token;
+  a completed revoke cannot be bypassed by a previously started `auth_code` request. No second remote exchange is made.
+- Pending grants keep `appleIssuedAt` separately from `at` (receipt time used only for their ten-minute TTL). Guest
+  conflicts and no-farm reissues preserve that proof time. Revocation filters by proof time even after another newer
+  authorization exists; missing proof provenance is invalidated rather than inferred from receipt time. Metadata is
+  memory-only, never persisted into the accounts binding or sent to the client.
 - Completed delivery records expire after their accepted issue-time window plus one day; old authorization timestamps
   are pruned on later authorization writes. Pending actions are not pruned. Cleanup is lazy on journal writes, not a new
   background retention job. Maps cap at 100,000 entries and fail closed when capacity cannot be reclaimed.

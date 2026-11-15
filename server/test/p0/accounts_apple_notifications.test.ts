@@ -10,6 +10,7 @@ import { sha256Hex } from '../../src/p0/accounts/jwt.js';
 import { PendingSignIns } from '../../src/p0/accounts/link.js';
 import { P0Accounts } from '../../src/p0/accounts/store.js';
 import { P0Store } from '../../src/p0/store.js';
+import { registerAccountRoutes } from '../../src/p0/accounts/routes.js';
 import { P0Voice } from '../../src/p0/online/voice.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
 import { loadOutposts } from '../../src/p0/online/outposts.js';
@@ -85,6 +86,83 @@ describe('Apple notification validation (no Apple private key or real provider)'
 });
 
 describe('Apple notification actions and recovery', () => {
+  it.each(['login', 'claim', 'pending'])('rechecks a %s proof after code exchange awaits a completed revocation', async route => {
+    const f = setup({ unknown: route === 'pending' });
+    let finish!: (refresh: string) => void;
+    const exchange = vi.fn(() => new Promise<string>(r => { finish = r; }));
+    const apple = { teamId: 'synthetic', keyId: 'unused', privateKeyFile: '/not-read', bundleIds: [APP], servicesIds: [] };
+    const ad = { ...f.deps, apple, client: { refreshFor: exchange }, pending: f.deps.pending!, authorized: f.deps.journal.authorized };
+    const nonce = 'n'.repeat(43), proof = signToken(keys, { iss: 'https://appleid.apple.com', aud: APP, sub: SUB,
+      iat: WHEN / 1000 - 1, exp: NOW / 1000 + 600, nonce: sha256Hex(nonce) });
+    if (route === 'claim') {
+      const verify = appleVerifier(ad);
+      registerAccountRoutes(f.app, { ...f.deps, identify: { accounts: f.deps.accounts, legacyId: false },
+        authorizedApple: f.deps.journal.authorized,
+        verify: async (_provider, b) => { const v = await verify(b); return 'status' in v ? v : { link: v }; } });
+    } else registerAppleRoutes(f.app, ad);
+    const signing = f.app.inject({ method: 'POST', url: route === 'claim' ? '/v1/p0/session/claim' : '/v1/p0/session/apple',
+      headers: { 'x-p0-player': PLAYER }, payload: { provider: 'apple', id_token: proof, nonce, auth_code: 'one-use', token: NEXT } });
+    await vi.waitFor(() => expect(exchange).toHaveBeenCalledOnce());
+    expect((await f.post()).statusCode).toBe(200);
+    finish('revoked-while-exchanging');
+    const response = await signing;
+    expect([response.statusCode, response.json().code]).toEqual([401, 'bad_token']);
+    expect(f.deps.accounts.byToken(NEXT)).toBeUndefined();
+    expect(f.deps.accounts.find(PLAYER)?.apple?.refresh).toBeUndefined();
+    expect(f.deps.pending!.size()).toBe(0);
+    expect(exchange).toHaveBeenCalledOnce();
+  });
+  it('late old-proof pending is invalidated after a newer authorization while its new-proof sibling survives', async () => {
+    const f = setup();
+    const verify = appleVerifier({ ...f.deps, apple: { teamId: 't', keyId: 'k', privateKeyFile: '/not-read', bundleIds: [APP], servicesIds: [] },
+      client: null, authorized: f.deps.journal.authorized });
+    const nonce = 'n'.repeat(43);
+    const get = async (iat: number) => {
+      const v = await verify({ nonce, id_token: signToken(keys, { iss: 'https://appleid.apple.com', aud: APP, sub: SUB,
+        iat, exp: NOW / 1000 + 600, nonce: sha256Hex(nonce) }) });
+      if ('status' in v) throw new Error('unexpected refusal');
+      return v;
+    };
+    const oldProof = await get(WHEN / 1000 - 1);
+    const old = f.deps.pending!.create('apple', oldProof); // received after the event, but proof itself is old
+    const freshProof = await get(NOW / 1000);
+    const fresh = f.deps.pending!.create('apple', freshProof);
+    expect((await f.post()).statusCode).toBe(200);
+    expect(f.deps.pending!.peek(old)).toBeUndefined();
+    expect(f.deps.pending!.peek(fresh)).toBeDefined();
+  });
+  it('claim rechecks after an enclosing async verifier wrapper, immediately before account writes', async () => {
+    const f = setup();
+    const verify = appleVerifier({ ...f.deps, apple: { teamId: 't', keyId: 'k', privateKeyFile: '/not-read', bundleIds: [APP], servicesIds: [] },
+      client: null, authorized: f.deps.journal.authorized });
+    registerAccountRoutes(f.app, { ...f.deps, identify: { accounts: f.deps.accounts, legacyId: false },
+      authorizedApple: f.deps.journal.authorized,
+      verify: async (_provider, b) => {
+        const v = await verify(b); if ('status' in v) return v;
+        expect((await f.post()).statusCode).toBe(200); // revocation after appleVerifier's own last check
+        return { link: v };
+      } });
+    const nonce = 'n'.repeat(43);
+    const r = await f.app.inject({ method: 'POST', url: '/v1/p0/session/claim', headers: { 'x-p0-player': PLAYER },
+      payload: { provider: 'apple', token: NEXT, nonce, id_token: signToken(keys, { iss: 'https://appleid.apple.com', aud: APP,
+        sub: SUB, iat: WHEN / 1000 - 1, exp: NOW / 1000 + 600, nonce: sha256Hex(nonce) }) } });
+    expect([r.statusCode, r.json().code]).toEqual([401, 'bad_token']);
+    expect(f.deps.accounts.byToken(NEXT)).toBeUndefined();
+  });
+  it.each(['no_farm', 'guest_conflict'])('preserves Apple proof time when %s reissues a pending ticket', async kind => {
+    const f = setup({ unknown: kind === 'no_farm' });
+    registerAccountRoutes(f.app, { ...f.deps, identify: { accounts: f.deps.accounts, legacyId: false },
+      authorizedApple: f.deps.journal.authorized });
+    const old = f.deps.pending!.create('apple', { sub: SUB, aud: APP }, WHEN - 1000);
+    const r = await f.app.inject({ method: 'POST', url: kind === 'no_farm' ? '/v1/p0/session/pending' : '/v1/p0/session/guest',
+      payload: { pending: old, token: NEXT, age_ok: true, terms: '2026-11-13', privacy: '2026-11-13', skip: true } });
+    expect(r.json().code).toBe(kind === 'no_farm' ? 'no_farm' : 'conflict');
+    const ticket = r.json().pending;
+    expect(f.deps.pending!.peek(ticket)?.appleIssuedAt).toBe(WHEN - 1000);
+    f.deps.journal.authorized(SUB, NOW); // newer proof must not promote the older ticket
+    expect((await f.post()).statusCode).toBe(200);
+    expect(f.deps.pending!.peek(ticket)).toBeUndefined();
+  });
   it('consent revocation preserves binding, farm, age/admin; clears user/refresh/pending and disconnects', async () => {
     const { post, deps, drop, kick, ticket, journalFile } = setup();
     const save = structuredClone(deps.store.peek(PLAYER));
@@ -159,7 +237,7 @@ describe('Apple notification actions and recovery', () => {
       client: null, keys: keys.keys, now: deps.now, authorized: deps.journal.authorized });
     const nonce = 'n'.repeat(43);
     const id = signToken(keys, { iss: 'https://appleid.apple.com', aud: APP, sub: SUB, iat: NOW / 1000, exp: NOW / 1000 + 600, nonce: sha256Hex(nonce) });
-    expect(await verify({ id_token: id, nonce })).toEqual({ sub: SUB, aud: APP });
+    expect(await verify({ id_token: id, nonce })).toMatchObject({ sub: SUB, aud: APP, authorizationAt: NOW });
     deps.accounts.link(PLAYER, 'apple', { sub: SUB, aud: APP, refresh: 'new-refresh' });
     deps.accounts.issue(PLAYER, NEXT); deps.accounts.revoke(NEXT); deps.accounts.revoke(USER); // logout leaves no current token timestamp
     clock(NOW + 1000); deps.journal = new AppleNotificationJournal(journalFile, deps.now);

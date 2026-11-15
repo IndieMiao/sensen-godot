@@ -15,6 +15,7 @@ import { identify, isRefusal, type IdentifyDeps } from './identify.js';
 import { conflictFarm, consentNote, liveOwner, signIn } from './link.js';
 import { NameLimiter, nameForGuest, registerNameRoutes, setName, type NameList } from './name.js';
 import { tokenShapeOk, type AnyLink, type AppleLink, type P0Accounts, type Provider } from './store.js';
+import { recheckAppleAuthorization } from './apple.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
 /** The terms' and privacy's versions: the one place they are written, the client's own copy of the same file. */
@@ -41,15 +42,17 @@ export interface AccountRouteDeps {
   guestsPerHour?: number;
   /** v1.4 (必须注册): a new farm needs a sign-in — guest takes the pending one (PR-B's PendingSignIns) and links it;
    * without one, sign_in_required, unless P0_GUEST_OK (devserver, shots) or a test account. */
-  pending?: { take(id: unknown): { provider: Provider; link: AnyLink } | undefined;
-    peek?(id: unknown): { provider: Provider; link: AnyLink } | undefined;
-    create?(provider: Provider, link: AnyLink): string };
+  pending?: { take(id: unknown): { provider: Provider; link: AnyLink; appleIssuedAt?: number } | undefined;
+    peek?(id: unknown): { provider: Provider; link: AnyLink; appleIssuedAt?: number } | undefined;
+    create?(provider: Provider, link: AnyLink, appleIssuedAt?: number): string };
   guestOk?: boolean;
   /** A rename made (account/name): the room's roster tells the others (hub.renamed). */
   renamed?: (player: string) => void;
   /** A sign-in's credentials checked (PR-B: appleVerifier / googleVerifier by provider): its link, or the refusal
    * (bad_token, provider_unavailable). An unknown provider is undefined. claim needs it; none, and claim is off (503). */
   verify?: (provider: string, b: Record<string, unknown>) => Promise<{ link: AnyLink } | { status: number; body: { ok: false; code: string } } | undefined>;
+  /** Current Apple authorization/revocation watermark, checked after the async verifier returns. */
+  authorizedApple?: (sub: string, issuedAt: number) => void;
   /** The room hub's kick: a sign-in closes the account's open socket elsewhere (link.ts signIn). */
   kick?: (player: string) => void;
   /** Email sign-in usable (contract v1.5: P0_EMAIL_LOGIN, P0_ACCOUNTS_KEY and the sign-in mail all there): hello says so,
@@ -120,11 +123,15 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     const signedIn = b.pending !== undefined ? deps.pending?.take(b.pending) : undefined;
     if (b.pending !== undefined && !signedIn) return send(bad('pending_expired', 410));
     if (signedIn) {
+      if (signedIn.provider === 'apple') {
+        const revoked = recheckAppleAuthorization({ ...signedIn.link, authorizationAt: signedIn.appleIssuedAt }, deps.authorizedApple);
+        if (revoked) return reply.code(revoked.status).send(revoked.body);
+      }
       // the account linked meanwhile to a farm that is there (another phone made one): never taken from it
       const was = accounts.byIdentity(signedIn.provider, signedIn.link.sub);
       // v1.6 ②: the sign-in handed back as a new pending one, so 「进那个农场」 needs no second system sign-in
       if (was && !accounts.isDeleted(was) && store.find(was, now)) {
-        const again = deps.pending?.create?.(signedIn.provider, signedIn.link);
+        const again = deps.pending?.create?.(signedIn.provider, signedIn.link, signedIn.appleIssuedAt);
         return send(bad('conflict', 409, again ? { pending: again } : {}));
       }
     }
@@ -166,6 +173,10 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     const checked = await deps.verify(String(b.provider ?? ''), b);
     if (!checked) return send(bad('schema', 400));
     if ('status' in checked) return reply.code(checked.status).send(checked.body);
+    if (b.provider === 'apple') {
+      const revoked = recheckAppleAuthorization(checked.link, deps.authorizedApple);
+      if (revoked) return reply.code(revoked.status).send(revoked.body);
+    }
     // after the last await: the checks and the writes below in one stretch (§1.3)
     const now = deps.now();
     const provider = b.provider as Provider;
@@ -213,11 +224,15 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountRouteDe
     const token = String(b.token).toLowerCase();
     const p = deps.pending?.peek ? deps.pending.peek(b.pending) : undefined;
     if (!p) return send(bad('pending_expired', 410));
+    if (p.provider === 'apple') {
+      const revoked = recheckAppleAuthorization({ ...p.link, authorizationAt: p.appleIssuedAt }, deps.authorizedApple);
+      if (revoked) { deps.pending!.take(b.pending); return reply.code(revoked.status).send(revoked.body); }
+    }
     const player = liveOwner(store, accounts, p.provider, p.link.sub, deps.now());
     const owner = accounts.tokenOwner(token);
     if (player && owner && owner !== player) return send(bad('schema', 400));   // a token is one player's only; the ticket kept
     deps.pending!.take(b.pending);
-    if (!player) return send(bad('no_farm', 404, { pending: deps.pending!.create!(p.provider, p.link) }));
+    if (!player) return send(bad('no_farm', 404, { pending: deps.pending!.create!(p.provider, p.link, p.appleIssuedAt) }));
     if (p.provider === 'apple' && (p.link as AppleLink).refresh) accounts.link(player, 'apple', p.link);   // the newest authorization
     return signIn({ accounts, kick: deps.kick, consent: consentOf }, player, token);
   });

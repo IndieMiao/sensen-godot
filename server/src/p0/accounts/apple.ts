@@ -96,20 +96,22 @@ export interface AppleRouteDeps {
 }
 
 export type Refused = { status: number; body: { ok: false; code: string } };
+/** Transient proof metadata; P0Accounts.link persists only sub/aud/refresh, never this timestamp. */
+export interface VerifiedAppleLink extends AppleLink { authorizationAt: number }
 const refused = (status: number, code: string): Refused => ({ status, body: { ok: false, code } });
 export const bodyOf = (b: unknown) => (b && typeof b === 'object' && !Array.isArray(b) ? b : {}) as Record<string, unknown>;
 
 /** The Apple link a sign-in brings — the account number, its aud, and a refresh token when a code came and was good —
  *  or the refusal. session/apple's, and claim's for provider apple (v1.4). */
 export function appleVerifier(deps: Pick<AppleRouteDeps, 'apple' | 'client' | 'keys' | 'refreshKeys' | 'now' | 'warn' | 'authorized'>):
-    (b: Record<string, unknown>) => Promise<AppleLink | Refused> {
+    (b: Record<string, unknown>) => Promise<VerifiedAppleLink | Refused> {
   const warn = deps.warn ?? ((line: string) => console.warn(line));
   return async b => {
     if (!deps.apple) return refused(503, 'provider_unavailable');
-    let id: { sub: string; aud: string };
+    let id: { sub: string; aud: string }, authorizationAt = NaN;
     try {
       id = await verifyAppleIdToken(b.id_token, b.nonce, { audiences: deps.apple.bundleIds, keys: deps.keys, refreshKeys: deps.refreshKeys, now: deps.now,
-        authorized: deps.authorized });
+        authorized: (sub, at) => { authorizationAt = at; deps.authorized?.(sub, at); } });
     } catch (e) {
       if (e instanceof IdTokenError) return refused(401, 'bad_token');
       warn(JSON.stringify({ apple: 'provider_unavailable', error: e instanceof Error ? e.name : typeof e }));
@@ -120,8 +122,18 @@ export function appleVerifier(deps: Pick<AppleRouteDeps, 'apple' | 'client' | 'k
       try { refresh = (await deps.client.refreshFor(b.auth_code, id.aud)) ?? undefined; }
       catch (e) { warn(JSON.stringify({ apple: 'code_exchange_failed', error: e instanceof Error ? e.name : typeof e })); }
     }
-    return { sub: id.sub, aud: id.aud, ...(refresh ? { refresh } : {}) };
+    const proof = { sub: id.sub, aud: id.aud, authorizationAt, ...(refresh ? { refresh } : {}) };
+    return recheckAppleAuthorization(proof, deps.authorized) ?? proof;
   };
+}
+
+/** Synchronous last-moment check after every enclosing async verifier/code-exchange boundary. */
+export function recheckAppleAuthorization(link: { sub: string; authorizationAt?: unknown },
+    authorized?: AppleRouteDeps['authorized']): Refused | undefined {
+  if (!authorized) return;
+  if (typeof link.authorizationAt !== 'number' || !Number.isFinite(link.authorizationAt)) return refused(401, 'bad_token');
+  try { authorized(link.sub, link.authorizationAt); }
+  catch (e) { return e instanceof IdTokenError ? refused(401, 'bad_token') : refused(503, 'provider_unavailable'); }
 }
 
 export function registerAppleRoutes(app: FastifyInstance, deps: AppleRouteDeps): void {
@@ -140,6 +152,8 @@ export function registerAppleRoutes(app: FastifyInstance, deps: AppleRouteDeps):
     const token = String(b.token).toLowerCase();
     const v = await verify(b);
     if ('status' in v) return reply.code(v.status).send(v.body);
+    const revoked = recheckAppleAuthorization(v, deps.authorized);
+    if (revoked) return reply.code(revoked.status).send(revoked.body);
     // after the last await: the check and the writes below in one stretch (§1.3)
     const player = liveOwner(store, accounts, 'apple', v.sub, deps.now());
     if (player) {
