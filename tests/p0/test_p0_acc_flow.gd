@@ -93,7 +93,7 @@ func test_no_farm_names_a_new_player_with_a_way_back_and_an_old_farm_without() -
 	assert_array(named).is_equal([["", true]])
 	f.no_farm(false)   # a claimed old farm, a test code: no way back
 	assert_bool(f.name_page.another_row.visible).is_false()
-	assert_bool(f.back()).is_false()
+	assert_bool(f.back()).is_true()   # consumes Back; it must not invent a hidden way to leave this gate
 
 func test_the_choose_card_on_sign_in_keeps_the_old_farm_lines_on_name_none() -> void:
 	var f := _flow("old_signin")
