@@ -21,7 +21,8 @@ export const APPLE_ISSUER = 'https://appleid.apple.com';
 export const APPLE_TOKEN_URL = 'https://appleid.apple.com/auth/token';
 export const APPLE_REVOKE_URL = 'https://appleid.apple.com/auth/revoke';
 
-export interface AppleVerifyOptions { audiences: string[]; keys: KeySource; refreshKeys?: KeySource; now: () => number; clockSkewS?: number }
+export interface AppleVerifyOptions { audiences: string[]; keys: KeySource; refreshKeys?: KeySource; now: () => number; clockSkewS?: number;
+  authorized?: (sub: string, issuedAt: number) => void }
 
 /** An Apple ID token's account number and aud, once Apple signed it for one of `audiences`, it is in date and its
  *  nonce is this raw one's hash. Nothing else in it is read. IdTokenError otherwise. */
@@ -35,6 +36,7 @@ export async function verifyAppleIdToken(token: unknown, rawNonce: unknown, o: A
   if (typeof t.aud !== 'string' || !o.audiences.includes(t.aud)) throw new IdTokenError('BAD_AUDIENCE');
   if (typeof t.nonce !== 'string' || t.nonce.toLowerCase() !== sha256Hex(rawNonce)) throw new IdTokenError('BAD_NONCE');
   if (typeof t.sub !== 'string' || t.sub.length === 0 || t.sub.length > 255) throw new IdTokenError('BAD_SUBJECT');
+  o.authorized?.(t.sub, t.iat * 1000); // verified issue time, not request receipt: replay cannot advance this watermark
   return { sub: t.sub, aud: t.aud };
 }
 
@@ -90,6 +92,7 @@ export interface AppleRouteDeps {
   keys: KeySource; refreshKeys?: KeySource;
   kick?: (player: string) => void;
   warn?: (line: string) => void;
+  authorized?: (sub: string, issuedAt: number) => void;
 }
 
 export type Refused = { status: number; body: { ok: false; code: string } };
@@ -98,14 +101,15 @@ export const bodyOf = (b: unknown) => (b && typeof b === 'object' && !Array.isAr
 
 /** The Apple link a sign-in brings — the account number, its aud, and a refresh token when a code came and was good —
  *  or the refusal. session/apple's, and claim's for provider apple (v1.4). */
-export function appleVerifier(deps: Pick<AppleRouteDeps, 'apple' | 'client' | 'keys' | 'refreshKeys' | 'now' | 'warn'>):
+export function appleVerifier(deps: Pick<AppleRouteDeps, 'apple' | 'client' | 'keys' | 'refreshKeys' | 'now' | 'warn' | 'authorized'>):
     (b: Record<string, unknown>) => Promise<AppleLink | Refused> {
   const warn = deps.warn ?? ((line: string) => console.warn(line));
   return async b => {
     if (!deps.apple) return refused(503, 'provider_unavailable');
     let id: { sub: string; aud: string };
     try {
-      id = await verifyAppleIdToken(b.id_token, b.nonce, { audiences: deps.apple.bundleIds, keys: deps.keys, refreshKeys: deps.refreshKeys, now: deps.now });
+      id = await verifyAppleIdToken(b.id_token, b.nonce, { audiences: deps.apple.bundleIds, keys: deps.keys, refreshKeys: deps.refreshKeys, now: deps.now,
+        authorized: deps.authorized });
     } catch (e) {
       if (e instanceof IdTokenError) return refused(401, 'bad_token');
       warn(JSON.stringify({ apple: 'provider_unavailable', error: e instanceof Error ? e.name : typeof e }));
