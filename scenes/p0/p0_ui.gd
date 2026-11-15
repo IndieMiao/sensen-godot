@@ -5128,13 +5128,17 @@ func _confirm_block(peer: int) -> void:
 	modal_kind = "block_confirm"
 	_modal_back = back
 
-## §6: no reason asked; the server's word in an Info toast (sent / already; a failure as the network's).
+## q(315)①: choose a protocol reason before sending; account-scoped handle cache and request ownership
+## live outside this room so reconnection/peer reuse cannot report somebody else (火舞 11-15 addendum).
+const ReportFlow := preload("res://scenes/p0/account/p0_report_flow.gd")
+var _report_flow: Node
+
 func _report(peer: int) -> void:
-	var said = await voice_room.call("report", peer)
-	match str(said):
-		"sent", "true": toast(REPORT_SENT)
-		"already": toast(REPORT_ALREADY)
-		_: show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")   # failed: as any command the network lost
+	if not is_instance_valid(_report_flow):
+		_report_flow = ReportFlow.new()
+		_report_flow.ui = self
+		add_child(_report_flow)
+	_report_flow.open(peer)
 
 ## §7: the 13+ gate (14 by the year, the user 11-02) the first time the mic key is tapped. Old enough goes on to the
 ## mic (P0VoiceRoom.answer_age), not old enough hides voice on this phone with an Info toast. Nothing else is kept.

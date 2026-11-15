@@ -116,9 +116,14 @@ func test_the_people_drawer_mutes_blocks_after_its_card_and_reports() -> void:
 	confirm.cancelled.emit()
 	assert_str(ui.modal_kind).is_equal("people")
 	d.report_pressed.emit(4)
+	assert_str(ui.modal_kind).is_equal("report")
+	var report = ui._report_flow.drawer
+	report.choose("harassment")
+	report.submit.activated.emit()
 	await await_idle_frame()
 	assert_str(ui.toast_text()).is_equal("Report sent")
-	d.close.pressed.emit()   # its own Close under the rows (V3)
+	ui.open_people()
+	ui._people.close.pressed.emit()   # its own Close under the rows (V3)
 	assert_str(ui.modal_kind).is_not_equal("people")
 
 ## §7 as V5 has it (383 50108c43): the wheel opens on this year with nothing picked; a tap on a year picks it, a drag
