@@ -13,7 +13,7 @@ import { loadP0Content } from '../../src/p0/content.js';
 import { registerP0Online } from '../../src/p0/online/hub.js';
 import { loadOutposts } from '../../src/p0/online/outposts.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
-import { P0Voice, registerP0Voice } from '../../src/p0/online/voice.js';
+import { P0Voice, registerP0Voice, RELEASE_RETRY_MS } from '../../src/p0/online/voice.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { P0Store } from '../../src/p0/store.js';
 import * as support from '../../src/p0/support.js';
@@ -32,8 +32,9 @@ async function setup() {
   accounts.issue(TARGET, TOKEN); accounts.issue(TARGET, ADMIN_TOKEN, 'admin', T0 + 86_400_000); accounts.issue(OTHER, OTHER_TOKEN);
   const rooms = new OutpostRooms(loadOutposts()), participants = new Map<string, string>();
   const removed = vi.fn(async (room: string, peer: string) => { participants.delete(room + '/' + peer); });
+  const getParticipant = vi.fn(async (room: string, peer: string) => ({ metadata: participants.get(room + '/' + peer) }));
   const voice = new P0Voice({ url: 'ws://fake.test', apiKey: 'fake', apiSecret: 'fake-only-secret-of-at-least-32-characters', namespace: 'moderation-test' }, rooms, files, now,
-    { getParticipant: async (room, peer) => ({ metadata: participants.get(room + '/' + peer) }), removeParticipant: removed });
+    { getParticipant, removeParticipant: removed });
   voice.setAge(TARGET, true); voice.setAge(OTHER, true);
   voice.voiceBanned = p => !!inForce(store.peek(p)?.sanctions?.voice, now());
   const identity = { accounts, legacyId: false, suspended: (p: string) => inForce(store.peek(p)?.sanctions?.suspended, now()) };
@@ -42,7 +43,7 @@ async function setup() {
   registerP0Routes(app, { content: C, store, now, dev: false, identify: identity });
   registerP0Voice(app, voice, who);
   const hub = registerP0Online(app, { rooms, identify: who, departed: o => voice.departed(o), nameOf: p => store.peek(p)?.profile?.name ?? null });
-  const actions = { dropVoice: vi.fn((p: string) => voice.drop(p)), kick: vi.fn((p: string) => { hub.kick(p); }), renamed: vi.fn((p: string) => hub.renamed(p)) };
+  const actions = { dropVoice: vi.fn((p: string) => voice.drop(p, { requireConfirmed: true })), kick: vi.fn((p: string) => { hub.kick(p); }), renamed: vi.fn((p: string) => hub.renamed(p)) };
   registerP0Admin(admin, { content: C, store, now, accounts, key: KEY, moderation: actions, log: l => audit.push(l) });
   await app.listen({ host: '127.0.0.1', port: 0 });
   const port = (app.server.address() as { port: number }).port;
@@ -57,10 +58,55 @@ async function setup() {
   const grant = async (p: string) => { const g = await voice.join(p) as Record<string, any>; participants.set(g.room + '/' + g.self, g.lease_id); return g; };
   const post = (payload: object) => admin.inject({ method: 'POST', url: '/admin/moderate', headers: { 'x-p0-admin': KEY }, payload });
   return { app, admin, store, accounts, save, files, now, advance: (ms: number) => { time += ms; }, voice, rooms, hub,
-    audit, actions, removed, headers, port, connect, grant, post };
+    audit, actions, removed, getParticipant, headers, port, connect, grant, post };
 }
 
 describe('484 admin-only manual moderation', () => {
+  it.each(['get', 'remove'] as const)('real drop reports %s media failure as applied-but-incomplete, and background retry can finish', async stage => {
+    const f = await setup(), ws = await f.connect(), grant = await f.grant(TARGET);
+    const ages = readFileSync(f.files.ages, 'utf8');
+    const closed = new Promise<number>(resolve => ws.once('close', resolve));
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const fault = stage === 'get' ? f.getParticipant : f.removed;
+    fault.mockRejectedValueOnce(new Error('PRIVATE_MEDIA_FAILURE'));
+    try {
+      const r = await f.post({ player: TARGET, action: 'suspended', until: null });
+      expect([r.statusCode, r.json()]).toEqual([500, { ok: false, code: 'moderation_incomplete', applied: true }]);
+      expect(await closed).toBe(4001);
+      expect(new P0Store(C, f.save).peek(TARGET)?.sanctions?.suspended).toEqual({ at: T0, until: null });
+      expect(f.actions.kick).toHaveBeenCalledWith(TARGET);
+      expect(JSON.parse(f.audit.at(-1)!)).toMatchObject({ incomplete: true });
+      expect(JSON.stringify(f.audit)).not.toContain('PRIVATE_MEDIA_FAILURE');
+      await vi.waitFor(() => expect(f.getParticipant).toHaveBeenCalledTimes(2), { timeout: RELEASE_RETRY_MS + 1500 });
+      expect(f.removed).toHaveBeenCalledWith(grant.room, grant.self);
+      await expect(f.voice.drop(TARGET, { requireConfirmed: true })).resolves.toBeUndefined();
+      expect(readFileSync(f.files.ages, 'utf8')).toBe(ages);
+    } finally {
+      f.getParticipant.mockResolvedValue({ metadata: undefined });
+      await f.voice.drop(TARGET, { requireConfirmed: true });
+    }
+  });
+
+  it('an exhausted real drop remains unconfirmed on another admin request until media removal succeeds', async () => {
+    const f = await setup(); await f.connect(); await f.grant(TARGET);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.getParticipant.mockRejectedValue(new Error('media down'));
+    try {
+      const payload = { player: TARGET, action: 'voice', until: null };
+      expect((await f.post(payload)).statusCode).toBe(500);
+      await expect(f.voice.drop(TARGET)).resolves.toBeUndefined();
+      expect(f.getParticipant).toHaveBeenCalledTimes(1); // Automatic callers must not bypass the retry backoff.
+      await vi.waitFor(() => expect(f.getParticipant).toHaveBeenCalledTimes(3), { timeout: RELEASE_RETRY_MS * 2 + 1500 });
+      // The live lease is already gone, but this must not silently become ok on another management call.
+      expect((await f.post(payload)).json()).toMatchObject({ code: 'moderation_incomplete', applied: true });
+      f.getParticipant.mockResolvedValue({ metadata: undefined }); // Provider confirms it is no longer this lease.
+      expect((await f.post(payload)).json()).toMatchObject({ ok: true });
+    } finally {
+      f.getParticipant.mockResolvedValue({ metadata: undefined });
+      await f.voice.drop(TARGET, { requireConfirmed: true });
+    }
+  }, 10_000);
+
   it('requires the management key and never registers on the public game listener', async () => {
     const f = await setup(), payload = { player: TARGET, action: 'suspended', until: null };
     expect((await f.admin.inject({ method: 'POST', url: '/admin/moderate', payload })).statusCode).toBe(401);

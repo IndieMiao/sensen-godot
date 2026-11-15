@@ -19,7 +19,10 @@
 
 使用 clone 后 `store.put`，写成功再影响在线连接；put写失败恢复旧内存映射，回500 `moderation_write_failed`，
 不执行drop/kick。写盘成功但通知/drop/kick失败回500 `moderation_incomplete` 且 `applied:true`，
-说明存档已生效、即时副作用需检查/重试，不冒称未处罚。现有LiveKit有限重试沿用，不能保证第三方故障时即时移除。
+说明存档已生效、即时副作用需检查/重试，不冒称未处罚。管理接线使用voice.drop(player,{requireConfirmed:true})；
+真实媒体首轮失败抛固定VOICE_RELEASE_UNCONFIRMED，转上述管理失败，原有限后台重试继续。未确认租约保留在进程内，
+管理重复调用不能因为活跃租约已移除就误报完成；确认已离开/peer已复用后才清除。其他drop/leave/后台调用仍正常resolve，
+不制造未处理拒绝。此是本进程即时释放确认，不是跨进程持久任务，不能保证第三方故障时即时移除。
 每次调用都视为新的人工命令；重新调用reset_name会按该次时间锁7天，操作者须先确认已生效结果再重试。
 
 审计只写支持码、动作、时间、期限、来源编号和是否 incomplete；不写姓名、原始player ID、token或底层异常。

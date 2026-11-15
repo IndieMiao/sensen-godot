@@ -209,7 +209,7 @@ const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;
 if (admin) {
   registerP0Admin(admin, { content, store, now: Date.now, key: process.env.P0_ADMIN_KEY!, gate, accounts, kick: p => { hub.kick(p); },
-    moderation: { dropVoice: p => voice.drop(p), kick: p => { hub.kick(p); }, renamed: p => hub.renamed(p) } });
+    moderation: { dropVoice: p => voice.drop(p, { requireConfirmed: true }), kick: p => { hub.kick(p); }, renamed: p => hub.renamed(p) } });
   await admin.listen({ port: adminPort, host: '127.0.0.1' });
 }
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => { void Promise.all([app.close(), admin?.close()]).then(() => process.exit(0)); });
