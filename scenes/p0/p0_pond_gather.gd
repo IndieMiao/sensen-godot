@@ -318,12 +318,43 @@ static func key(view: Dictionary, p: Dictionary, pond_id: String) -> Dictionary:
 	return a
 
 ## The name bar of a point: the item's name; cooling, dimmed with `Ready in …` (不知火舞 on 410: `Timber · Ready in 3h 12m`).
-static func tag(view: Dictionary, p: Dictionary) -> Dictionary:
+## A point's piece on the ground as the camera keeps it off the action keys (上官婉儿 on 475 3bee65ba): the slot's
+## footprint (pond_slots: about 1.5 × 1.5 m) to its height — a grove or hardwood TALL_M, the low pieces LOW_M, as their
+## marks hang (p0_pond.gather_screen) — its eight corners; and where its icon button centres.
+const FOOT_HALF_M := 0.75
+const TALL_M := 2.2
+const LOW_M := 1.0
+static func height_of(p: Dictionary) -> float:
+	return TALL_M if str(p.get("kind", "")) in ["wood", "hardwood"] else LOW_M
+
+static func piece_box(p: Dictionary) -> PackedVector3Array:
+	var at := Vector3(float(p.get("x", 0)), 0, float(p.get("z", 0)))
+	var tall := height_of(p)
+	var out := PackedVector3Array()
+	for k in 8: out.append(at + Vector3(FOOT_HALF_M if k & 1 else -FOOT_HALF_M, tall if k & 2 else 0.0, FOOT_HALF_M if k & 4 else -FOOT_HALF_M))
+	return out
+
+static func icon_at(p: Dictionary) -> Vector3:
+	return Vector3(float(p.get("x", 0)), height_of(p), float(p.get("z", 0)))
+
+## The nearest point's mark (SGODOT-475; 不知火舞's gather-compact spec ①, the user bot 682: the tag took too much of the
+## screen): its item's icon button, cooling with the part grown back (`progress`, no words: the key's second line and a
+## tap say how long); `open` once the player stands at it and it is ready — the button opens to its name strip, the
+## item's name alone. A point the view sends without its cooldown (an older server) counts COOLDOWN_H.
+const COOLDOWN_H := 4.0
+static func mark(view: Dictionary, p: Dictionary, at: Vector3) -> Dictionary:
 	var yields: Array = p.get("yield", [])
 	var main := str(yields[0][0]) if not yields.is_empty() else ""
 	var ready := float(p.get("ready_in", 0))
-	return {"icon": main, "text": P0Logic.item_name(view, main), "fact": "Ready in %s" % P0Logic.span(ready) if ready > 0.0 else "",
-		"dimmed": ready > 0.0}
+	return {"icon": main, "text": P0Logic.item_name(view, main), "progress": progress(p),
+		"open": ready <= 0.0 and in_reach(p, at)}
+
+## How far a cooling point has grown back, 0..1; -1 when it is ready.
+static func progress(p: Dictionary) -> float:
+	var ready := float(p.get("ready_in", 0))
+	if ready <= 0.0: return -1.0
+	var whole := maxf(1.0, float(p.get("cooldown_h", COOLDOWN_H)) * 3_600_000.0)
+	return clampf(1.0 - ready / whole, 0.0, 1.0)
 
 ## The points the bank's trees and bushes keep clear of (world xz), for PondScenery.build.
 static func clear_points(view: Dictionary) -> Array:

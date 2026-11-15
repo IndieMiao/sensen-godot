@@ -10,12 +10,19 @@ extends Control
 ## badge too (the cooking stove's +1 while a pot is queued, q(71)). At least the pill's 24;
 ## a wider word grows it to the left, its right edge kept (Count tag: right-anchored, padding 4 — the Mailbox's
 ## `Parcel`, WORLD-HINT-6a 1822:123663, 不知火舞 on 234).
+## Progress (a pond's gathering point cooling, SGODOT-475; 不知火舞's gather-compact spec ① 1): the same disc, the icon
+## at PROGRESS_ICON and dimmed as a name strip's, a PROGRESS_STROKE arc on the border track from 12 o'clock clockwise
+## for the part grown back, in NEED-TILE's green — the HUD buff circle's drawing, filling instead of running down. No
+## words; full, the host shows the plain button again.
 
 const _VISUAL := 28.0
 const _ICON := 22.0
 const _NEAR_SCALE := 1.1
 const _COUNT_AT := Vector2(14, 20)   # the count tag in the 28 disc, overhanging its bottom right
 const _COUNT_PAD := 4.0              # the tag's text inset either side once it is wider than the pill
+const PROGRESS_ICON := 16.0
+const PROGRESS_STROKE := 2.5
+const PROGRESS_DIM := 0.45   # UiWorldNameBar's dimmed icon
 
 ## The facility icon (i-home, i-stall, i-seat …).
 var icon: Texture2D: set = set_icon
@@ -27,6 +34,8 @@ var status := -1: set = set_status
 var count := "": set = set_count
 ## A one-off nudge on top of the near scale (the kitchen's heat reminder, b84a5e01 ④): pulse() animates it.
 var pulse_k := 1.0: set = set_pulse_k
+## 0..1 grown back while cooling, or -1 for none (the plain button).
+var progress := -1.0: set = set_progress
 var _pulse_tween: Tween
 
 var _disc: Panel
@@ -34,6 +43,7 @@ var _glyph: TextureRect
 var _badge: UiStatusBadge
 var _count: Panel
 var _count_label: Label
+var _ring: _ProgressRing
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -49,6 +59,10 @@ func _init() -> void:
 	_glyph.size = Vector2(_ICON, _ICON)
 	_glyph.position = (_disc.size - _glyph.size) * 0.5
 	_disc.add_child(_glyph)
+	_ring = _ProgressRing.new(self)
+	_ring.size = _disc.size
+	_disc.add_child(_ring)
+	_disc.move_child(_ring, 0)   # under the icon
 	_count = Panel.new()
 	_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_count.position = _COUNT_AT
@@ -77,6 +91,14 @@ func set_status(v: int) -> void:
 func set_count(v: String) -> void:
 	if v == count: return
 	count = v; _refresh()
+
+func set_progress(v: float) -> void:
+	v = clampf(v, 0.0, 1.0) if v >= 0.0 else -1.0
+	if v == progress: return
+	var was := progress >= 0.0
+	progress = v
+	if (progress >= 0.0) != was: _refresh()
+	else: _ring.queue_redraw()   # only the arc moves
 
 func set_pulse_k(v: float) -> void:
 	pulse_k = v
@@ -117,13 +139,22 @@ func _fit_count() -> void:
 
 func _refresh() -> void:
 	if _disc == null: return
+	var cooling := progress >= 0.0
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _VISUAL * 0.5,
-		UiTokens.COLOR_PRIMARY if near else UiTokens.COLOR_BORDER, UiTokens.STROKE_SELECTED if near else UiTokens.STROKE_DEFAULT)
+		UiTokens.COLOR_PRIMARY if near else UiTokens.COLOR_BORDER,
+		0 if cooling else (UiTokens.STROKE_SELECTED if near else UiTokens.STROKE_DEFAULT))   # the ring is its edge
 	box.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
 	box.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
 	box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
 	_disc.add_theme_stylebox_override(&"panel", box)
 	_glyph.texture = icon
+	var side := PROGRESS_ICON if cooling else _ICON
+	_glyph.custom_minimum_size = Vector2(side, side)
+	_glyph.size = Vector2(side, side)
+	_glyph.position = (_disc.size - _glyph.size) * 0.5
+	_glyph.modulate.a = PROGRESS_DIM if cooling else 1.0
+	_ring.visible = cooling
+	_ring.queue_redraw()
 	_count.visible = count != ""
 	_count_label.text = count
 	_fit_count()
@@ -146,3 +177,20 @@ func _refresh() -> void:
 		_badge.position = (size - Vector2(b, b)) * 0.5
 	elif _badge != null:
 		_badge.visible = false
+
+## The cooling ring: the border track all round, the part grown back from 12 o'clock clockwise.
+class _ProgressRing extends Control:
+	var host: UiWorldIconButton   # given at birth, not looked up through the tree (a Release build's null, 周瑜 on #973)
+
+	func _init(host_: UiWorldIconButton = null) -> void:
+		host = host_
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		if host == null: return
+		var p := float(host.progress)
+		var c := size * 0.5
+		var r := size.x * 0.5 - PROGRESS_STROKE * 0.5
+		draw_arc(c, r, 0.0, TAU, 64, UiTokens.COLOR_BORDER, PROGRESS_STROKE, true)
+		if p > 0.0:
+			draw_arc(c, r, -PI * 0.5, -PI * 0.5 + TAU * p, maxi(8, int(64 * p)), UiTokens.COLOR_PRIMARY, PROGRESS_STROKE, true)
