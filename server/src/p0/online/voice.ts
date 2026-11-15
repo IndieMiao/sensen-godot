@@ -91,6 +91,8 @@ export class P0Voice {
   nameOf: (player: string) => string | null = () => null;
   /** A report kept: handed on once its line is written (SGODOT-484, 苏烈's queue takes it by id). */
   onReport: (line: ReportLine) => void = () => {};
+  /** SGODOT-484: server-owned moderation, independent of the age check and saved blocks. */
+  voiceBanned: (player: string) => boolean = () => false;
 
   constructor(readonly config: P0VoiceConfig | null, private rooms: OutpostRooms, private files: P0VoiceFiles | null,
     private now: () => number = Date.now, media?: P0VoiceMedia) {
@@ -122,6 +124,7 @@ export class P0Voice {
 
   private gate(player: string): { o: Occupant; spec: NonNullable<ReturnType<OutpostRooms['spec']>> } | Refusal {
     if (!this.config) return refuse('VOICE_OFF', 403);
+    if (this.voiceBanned(player)) { void this.drop(player); return refuse('VOICE_BANNED', 403); }
     if (this.ages[player] !== true) return refuse('AGE_GATE', 403);
     const o = this.rooms.occupant(player);
     if (!o) return refuse('NOT_IN_ROOM', 403);
@@ -155,6 +158,7 @@ export class P0Voice {
     token.addGrant({ roomJoin: true, room, canPublish: true, canPublishSources: [TrackSource.MICROPHONE], canSubscribe: true,
       canPublishData: false, canUpdateOwnMetadata: false });
     const signed = await token.toJwt();
+    if (this.voiceBanned(player)) { await this.release(lease); return refuse('VOICE_BANNED', 403); }
     // Deletion / departure may run while JWT signing is pending. Do not hand out a grant for the removed lease.
     if (this.leases.get(player) !== lease || this.rooms.occupant(player) !== o || this.ages[player] !== true)
       return refuse('LEASE_EXPIRED', 410);
@@ -163,6 +167,7 @@ export class P0Voice {
   }
 
   heartbeat(player: string, leaseId: string): Refusal | Record<string, unknown> {
+    if (this.voiceBanned(player)) { void this.drop(player); return refuse('VOICE_BANNED', 403); }
     const lease = this.leases.get(player);
     if (!lease || lease.id !== leaseId || lease.expires < this.now()) return refuse('LEASE_EXPIRED', 410);
     const o = this.rooms.occupant(player);
@@ -305,7 +310,8 @@ export class P0Voice {
     return this.rooms.members(o.outpost, o.room, o.layout).find(m => m.id === peer && m.player !== player)?.player;
   }
 
-  private async drop(player: string): Promise<void> {
+  /** End only the live lease (moderation / session revocation). Keep age, blocks, reports and room occupancy. */
+  async drop(player: string): Promise<void> {
     const lease = this.leases.get(player);
     if (lease) await this.release(lease);
   }
