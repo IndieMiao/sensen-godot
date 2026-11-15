@@ -299,9 +299,11 @@ func consent_settled(ok: bool) -> void:
 		renew = null
 	else: renew.go.phase = CommandLifecycle.State.IDLE
 
-## Back: true when a page here took it.
+## Back matrix (491 / 7f0e0cf5, 不知火舞 11-15): only AGE without its confirmation, idle Sign in and NO-GMS
+## return false for Android home. Every other gate consumes Back; the runtime also guards complete HTTP operations.
 func back() -> bool:
 	if is_instance_valid(renew): return true   # the updated-terms card: no way back (spec v2 §9)
+	if sign_in_page != null and page == sign_in_page and sign_in_page.busy: return true
 	if choose != null:
 		_try_another()
 		return true
@@ -312,7 +314,7 @@ func back() -> bool:
 	if page == name_page and name_page != null and name_page.another_row.visible:
 		_try_another()
 		return true
-	return false
+	return not (page is P0AccAge or page is P0AccSignIn or page is P0AccNoGms)
 
 ## AGE's answer on this phone (q(312)): yes with the versions agreed to, a no alone.
 func keep(ok: bool) -> void:

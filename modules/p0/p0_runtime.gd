@@ -409,10 +409,13 @@ func _call(method: String, args: Array):
 	return null
 
 func _enter_tree() -> void:
+	AppRouter.foreground_back_action = _account_back_action
 	AppRouter.loading_overlay_factory = _scene_overlay   # SYS-LOADING-SCENE for the P0 worlds AppRouter opens
 	OS.add_logger(errors)   # GDScript errors to the server, once the account's gate is open (SGODOT-486)
 
 func _exit_tree() -> void:
+	if AppRouter.foreground_back_action == _account_back_action:
+		AppRouter.foreground_back_action = Callable()
 	if AppRouter.loading_overlay_factory == Callable(self, &"_scene_overlay"): AppRouter.loading_overlay_factory = Callable()
 	OS.remove_logger(errors)
 	WaterShore.finish_all()   # the app ending: no pond bank's task left to the pool past the scripts (WaterShore.prewarm)
@@ -1422,9 +1425,35 @@ var _acc_layer: CanvasLayer
 var _naming := "guest"
 var _provider := ""   # the last sign-in's account: the conflict card's
 var _signing := false   # a sheet is up: a second tap waits for it
+var _acc_requests := 0   # HTTP after the sheet/name check is also in flight (491 Back matrix, 11-15).
+var _acc_generation := 0
 ## The player a world was built for when the pages came up over it (signed out, the key withdrawn, replaced): signing in
 ## again restarts the launch, so no reply of that farm draws on another.
 var _world_player := ""
+
+## AppRouter asks this before any world/navigation lock, including a world already loaded behind first launch.
+## Keep one Android notification owner (AppRouter); another _notification here would process the same Back twice.
+func _account_back_action() -> int:
+	if ui.screen_kind() in [P0SysScreen.Kind.SESSION, P0SysScreen.Kind.DELETED, P0SysScreen.Kind.SUSPENDED,
+			P0SysScreen.Kind.MAINT, P0SysScreen.Kind.UPDATE]:
+		return AppRouter.BACK_IGNORE
+	if is_instance_valid(_acc_flow):
+		if _signing or _acc_requests > 0: return AppRouter.BACK_IGNORE
+		if _acc_flow.has_method("back") and bool(_acc_flow.call("back")): return AppRouter.BACK_IGNORE
+		# The flow owns the screen even when its page has no internal return (AGE / Sign in / NO-GMS).
+		# Returning to Android's home is not permission for the farm below it to receive Back.
+		return AppRouter.BACK_LEAVE_APP
+	return AppRouter.BACK_PASS
+
+## NAME releases its name-check flag before guest/rename; Switch removes CHOOSE before pending answers.
+## Count these complete host operations, not just the visible card/check flag. A failure/timeout unlocks Back;
+## an older flow's late answer must not subtract from a new flow's count. No request or response is changed here.
+func _acc_reply(done: Callable) -> Callable:
+	_acc_requests += 1
+	var generation := _acc_generation
+	return func(r: Dictionary):
+		if generation == _acc_generation: _acc_requests = maxi(0, _acc_requests - 1)
+		done.call(r)
 
 ## hello's answer is not `ready`: no world yet. offline keeps the launch cover and asks again; any other opens the pages
 ## in place of the cover (no HUD meanwhile: the world is not built).
@@ -1467,6 +1496,8 @@ func _open_acc_flow(kind: String) -> void:
 		if _acc_flow.has_signal(pair[0]): _acc_flow.connect(pair[0], pair[1])   # the pages of 11-15 / 11-19 on
 
 func _close_acc_flow() -> void:
+	_acc_generation += 1
+	_acc_requests = 0
 	if is_instance_valid(_acc_layer): _acc_layer.queue_free()
 	_acc_layer = null
 	_acc_flow = null
@@ -1498,8 +1529,8 @@ func _on_acc_sign_in(provider: String) -> void:
 		return
 	_provider = provider
 	var creds := {"id_token": str(r.get("id_token", "")), "nonce": str(r.get("nonce", "")), "auth_code": str(r.get("auth_code", ""))}
-	if session.identity.first_run().begins_with("old_"): session.claim(provider, creds, _on_signed_in.bind("claim"))
-	else: session.sign_in(provider, creds, _on_signed_in.bind("sign_in"))
+	if session.identity.first_run().begins_with("old_"): session.claim(provider, creds, _acc_reply(_on_signed_in.bind("claim")))
+	else: session.sign_in(provider, creds, _acc_reply(_on_signed_in.bind("sign_in")))
 
 static func _native_sign_in(provider: String) -> Dictionary:
 	var script = load(SIGN_IN_PATH) if ResourceLoader.exists(SIGN_IN_PATH) else null
@@ -1515,7 +1546,7 @@ func _on_signed_in(r: Dictionary, how: String) -> void:
 			# in, but that farm has no consent to today's terms (spec v2 §9): the card first, account/consent, then on —
 			# never the farm nor NAME before it is on record (a code's account reports its own in _code_signed_in).
 			# No card yet (q(325) pending): in as before #1055, nothing agreed for the player (奕星 11-14)
-			_renew(r, func(): session.consent(_consent_body(), _consent_answered.bind(next)))
+			_renew(r, func(): session.consent(_consent_body(), _acc_reply(_consent_answered.bind(next))))
 			return
 		next.call()
 		return
@@ -1527,7 +1558,7 @@ func _on_signed_in(r: Dictionary, how: String) -> void:
 		"claimed": _acc_flow.call("claimed", session.identity.legacy_linked)
 		"unknown_player":
 			# the server has no farm of this id (v1.6 ①): a new install — that sign-in's farm, or NAME
-			if session.identity.has_farm: session.sign_in_pending(_on_signed_in.bind("pending"))
+			if session.identity.has_farm: session.sign_in_pending(_acc_reply(_on_signed_in.bind("pending")))
 			else:
 				_naming = "guest"
 				_acc_flow.call("no_farm")
@@ -1560,7 +1591,7 @@ func _code_signed_in() -> void:
 		session.identity_settled()
 		_name_signed_in()
 		return
-	session.consent(_consent_body(), _consent_answered.bind(_name_signed_in))
+	session.consent(_consent_body(), _acc_reply(_consent_answered.bind(_name_signed_in)))
 
 ## Try another account (NAME's, or the conflict card's second key): the ticket dropped; the page goes back to Sign in.
 func _on_acc_sign_in_again() -> void:
@@ -1568,10 +1599,10 @@ func _on_acc_sign_in_again() -> void:
 
 ## Switch to that farm (the conflict card): the sign-in already checked, its farm entered — no second sheet (v1.6 ①).
 func _on_acc_switch() -> void:
-	session.sign_in_pending(_on_signed_in.bind("pending"))
+	session.sign_in_pending(_acc_reply(_on_signed_in.bind("pending")))
 
 func _on_acc_code(code: String) -> void:
-	session.sign_in_code(code, _on_signed_in.bind("code"))
+	session.sign_in_code(code, _acc_reply(_on_signed_in.bind("code")))
 
 ## NAME's Save / Skip: a new account's save made (guest, the sign-in's ticket in it), or the account just signed in
 ## named (rename; Skip keeps its name); then the world comes up under the launch cover, as any launch.
@@ -1580,15 +1611,15 @@ func _on_acc_named(name: String, skip: bool) -> void:
 		if skip:
 			_acc_done()
 			return
-		session.rename(name, func(r: Dictionary):
+		session.rename(name, _acc_reply(func(r: Dictionary):
 			if bool(r.get("ok", false)): _acc_done()
 			elif str(r.get("code", "")) in ["name_rejected", "rate_limited"] and is_instance_valid(_acc_flow): _acc_flow.call("name_refused", r)
-			else: _acc_failed(r))
+			else: _acc_failed(r)))
 		return
 	var body := _consent_body()
 	if skip: body["skip"] = true
 	else: body["name"] = name
-	session.guest(body, func(r: Dictionary):
+	session.guest(body, _acc_reply(func(r: Dictionary):
 		var code := str(r.get("code", ""))
 		_consent_settled(_card_done(r))
 		if bool(r.get("ok", false)): _acc_done()
@@ -1600,7 +1631,7 @@ func _on_acc_named(name: String, skip: bool) -> void:
 		elif code in ["name_rejected", "pending_expired"]:
 			if code == "pending_expired": _say("Sign-in expired. Please sign in again.")
 			_acc_flow.call("name_refused", r)
-		else: _acc_failed(r))
+		else: _acc_failed(r)))
 
 ## A refusal toasted where the page is.
 func _acc_failed(_r: Dictionary) -> void:
@@ -1659,7 +1690,7 @@ func _consent_answered(c: Dictionary, next: Callable) -> void:
 	var code := str(c.get("code", ""))
 	_consent_settled(_card_done(c))
 	if bool(c.get("ok", false)): next.call()
-	elif code == "consent_outdated": _renew(c, func(): session.consent(_consent_body(), _consent_answered.bind(next)))
+	elif code == "consent_outdated": _renew(c, func(): session.consent(_consent_body(), _acc_reply(_consent_answered.bind(next))))
 	else:
 		_acc_failed(c)
 		if _card_done(c): _settle()   # the card closed on a failure no retry mends (周瑜 on #1056): Sign in's keys back under it
