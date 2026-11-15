@@ -100,6 +100,22 @@ export class P0Accounts {
   /** The player's user tokens (a claim checks one against them). */
   userTokenCount(player: string): number { return Object.values(this.d.tokens).filter(t => t.player === player && t.kind === 'user').length; }
 
+  /** Notification-only invalidation: preserve the Apple binding on consent-revoked, or remove only Apple on account
+   * deletion with another sign-in still linked. One write, rollback in-memory state on I/O failure; never revoke admin. */
+  invalidateApple(player: string, sub: string, unlink: boolean): boolean {
+    const row = this.d.players[player];
+    if (!row?.apple || row.apple.sub !== sub) return false;
+    const before = this.d;
+    this.d = structuredClone(before);
+    for (const [h, t] of Object.entries(this.d.tokens)) if (t.player === player && t.kind === 'user') delete this.d.tokens[h];
+    if (unlink) {
+      delete this.d.identities[`apple:${sub}`];
+      delete this.d.players[player].apple;
+    } else delete this.d.players[player].apple!.refresh;
+    try { this.flush(); } catch (e) { this.d = before; throw e; }
+    return true;
+  }
+
   byIdentity(provider: Provider, sub: string): string | undefined { return this.d.identities[`${provider}:${sub}`]; }
   link(player: string, provider: Provider, info: AnyLink): void {
     const row = this.d.players[player] ?? (this.d.players[player] = { player, created_at: this.now() });

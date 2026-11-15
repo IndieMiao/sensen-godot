@@ -86,7 +86,8 @@ describe('session/apple (contract §2)', () => {
     const { post, pending, file } = setup();
     const r = await post({ id_token: idToken(), nonce: NONCE, auth_code: 'c1', token: TOKEN });
     expect([r.statusCode, r.json().code]).toEqual([404, 'no_farm']);
-    expect(pending.take(r.json().pending)).toEqual({ provider: 'apple', link: { sub: SUB, aud: APP, refresh: 'r.secret' }, at: T0 });
+    expect(pending.take(r.json().pending)).toEqual({ provider: 'apple', link: { sub: SUB, aud: APP, refresh: 'r.secret' }, at: T0,
+      appleIssuedAt: T0 - 5000 });
     expect(existsSync(file) ? readFileSync(file, 'utf8') : '').not.toMatch(/privaterelay|x7c9/);   // nothing written for a pending one
   });
   it('a linked farm is signed in here: the other phones\' tokens revoked, its socket kicked, a new refresh kept sealed', async () => {
@@ -98,6 +99,7 @@ describe('session/apple (contract §2)', () => {
     expect(kicked).toEqual(['p0-apple00001']);
     expect(accounts.find('p0-apple00001')?.apple?.refresh).toBe('r.secret');
     expect(readFileSync(file, 'utf8')).not.toContain('r.secret');
+    expect(readFileSync(file, 'utf8')).not.toMatch(/authorizationAt|appleIssuedAt/); // proof time is transient, not a save change
   });
   it('a link left on a farm gone is no farm (liveOwner), and a bad token or nonce is bad_token', async () => {
     const { post, accounts } = setup();
