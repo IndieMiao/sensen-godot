@@ -56,7 +56,15 @@ export class P0Store {
   /** A stored player, without creating one (admin tools). */
   peek(player: string): P0State | undefined { return this.players.get(player); }
   all(): P0State[] { return [...this.players.values()]; }
-  put(state: P0State): void { this.players.set(state.player, state); this.flush(); }
+  put(state: P0State): void {
+    const previous = this.players.get(state.player);
+    this.players.set(state.player, state);
+    try { this.flush(); }
+    catch (error) {
+      if (previous) this.players.set(state.player, previous); else this.players.delete(state.player);
+      throw error;
+    }
+  }
   reset(player: string, now: number, opts: { pending?: boolean; guide?: boolean } = {}): P0State { const s = freshState(this.c, player, now, undefined, opts); this.put(s); return s; }
   private flush(): void {
     if (!this.file) return;

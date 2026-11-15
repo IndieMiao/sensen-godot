@@ -79,6 +79,9 @@ export function reportId(at: number): string {
 
 export class P0Voice {
   private leases = new Map<string, Lease>();   // by player
+  private pendingReleases = new Map<string, Lease>(); // Also retain exhausted retries for an explicit management retry.
+  private releaseTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private releaseCalls = new Map<string, Promise<boolean>>();
   private blocks: Record<string, string[]>;    // player → the players they block
   private ages: Record<string, boolean>;       // player → 13+ (true) or not (false); absent: not asked yet
   private reported = new Set<string>();        // "reporter reported": a second report says so (不知火舞's spec §6), not a second line
@@ -311,26 +314,55 @@ export class P0Voice {
   }
 
   /** End only the live lease (moderation / session revocation). Keep age, blocks, reports and room occupancy. */
-  async drop(player: string): Promise<void> {
+  async drop(player: string, options: { requireConfirmed?: boolean } = {}): Promise<void> {
     const lease = this.leases.get(player);
-    if (lease) await this.release(lease);
+    const targets = new Map(options.requireConfirmed
+      ? [...this.pendingReleases.values()].filter(l => l.player === player).map(l => [l.id, l]) : []);
+    if (lease) targets.set(lease.id, lease);
+    const results = await Promise.all([...targets.values()].map(l => this.release(l)));
+    if (options.requireConfirmed && results.some(confirmed => !confirmed)) throw new Error('VOICE_RELEASE_UNCONFIRMED');
   }
 
   /** Ends a lease: out of the server's books at once, and out of LiveKit if that participant is still this lease's — never
    * whoever took the peer id since. A failure is logged and tried again (RELEASE_TRIES); one gone already is done. */
-  private async release(lease: Lease, attempt = 1): Promise<void> {
+  private release(lease: Lease, attempt = 1): Promise<boolean> {
+    const running = this.releaseCalls.get(lease.id);
+    if (running) return running;
+    const job = this.releaseOnce(lease, attempt).finally(() => this.releaseCalls.delete(lease.id));
+    this.releaseCalls.set(lease.id, job);
+    return job;
+  }
+
+  private async releaseOnce(lease: Lease, attempt: number): Promise<boolean> {
     if (this.leases.get(lease.player) === lease) this.leases.delete(lease.player);
-    if (!this.media) return;
+    this.pendingReleases.set(lease.id, lease);
+    const confirmed = () => {
+      this.pendingReleases.delete(lease.id);
+      const timer = this.releaseTimers.get(lease.id);
+      if (timer) clearTimeout(timer);
+      this.releaseTimers.delete(lease.id);
+      return true;
+    };
+    if (!this.media) return confirmed();
     const identity = String(lease.peer);
     try {
       const p = await this.media.getParticipant(lease.room, identity);
-      if (p.metadata !== lease.id) return;   // someone else is that peer id now
+      if (p.metadata !== lease.id) return confirmed();   // someone else is that peer id now
       await this.media.removeParticipant(lease.room, identity);
+      return confirmed();
     } catch (error) {
       const e = error as { status?: number; code?: string; message?: string };
-      if (e?.status === 404 || e?.code === 'not_found') return;   // left LiveKit already
+      if (e?.status === 404 || e?.code === 'not_found') return confirmed();   // left LiveKit already
       console.warn(JSON.stringify({ voice: 'release_failed', room: lease.room, peer: identity, attempt, error: String(e?.message ?? error).slice(0, 200) }));
-      if (attempt < RELEASE_TRIES) setTimeout(() => { void this.release(lease, attempt + 1); }, RELEASE_RETRY_MS).unref?.();
+      if (attempt < RELEASE_TRIES && !this.releaseTimers.has(lease.id)) {
+        const timer = setTimeout(() => {
+          this.releaseTimers.delete(lease.id);
+          void this.release(lease, attempt + 1);
+        }, RELEASE_RETRY_MS);
+        timer.unref?.();
+        this.releaseTimers.set(lease.id, timer);
+      }
+      return false; // Ordinary callers still resolve; management can distinguish unconfirmed cleanup.
     }
   }
 
