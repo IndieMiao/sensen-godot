@@ -41,7 +41,9 @@ func test_a_new_phone_answers_age_then_signs_in() -> void:
 	assert_bool(f.kept().age_ok).is_true()
 	(f.page.find_child("Google", true, false) as Button).pressed.emit()
 	assert_array(ways).is_equal(["google"])
-	assert_bool(f.back()).is_false()   # no ‹ on the sign-in page: Back is the launch's (the home screen)
+	assert_bool(f.back()).is_true()   # the provider request is in flight (491 Back matrix, 11-15)
+	f.sign_in_settled()
+	assert_bool(f.back()).is_false()   # idle Sign in has no ‹: the host takes Back to Android home
 
 func test_too_young_stops_at_age_block_and_keeps_only_the_no() -> void:
 	var f := _flow()

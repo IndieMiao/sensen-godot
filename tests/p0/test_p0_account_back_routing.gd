@@ -20,6 +20,16 @@ class RouterProbe extends Router:
 
 class FarmProbe extends Farm:
 	# Preserve the actual farm's Back method; skip 3D art/network startup in this routing regression.
+	func _init() -> void:
+		var camera := Camera3D.new()
+		camera.name = "Camera3D"
+		add_child(camera)
+		var floor_mesh := MeshInstance3D.new()
+		floor_mesh.name = "Ground"
+		add_child(floor_mesh)
+		var environment := WorldEnvironment.new()
+		environment.name = "WorldEnvironment"
+		add_child(environment)
 	func _ready() -> void: pass
 	func _process(_dt: float) -> void: pass
 	func _exit_tree() -> void: pass
@@ -44,6 +54,8 @@ var old_env := ""
 var swaps := 0
 var requests: Array = []
 var replies: Array[Callable] = []
+var silent_server: TCPServer
+var silent_peer: StreamPeerTCP
 
 func before_test() -> void:
 	old_scene = get_tree().current_scene
@@ -81,10 +93,19 @@ func before_test() -> void:
 	requests.clear()
 
 func after_test() -> void:
+	if silent_peer != null:
+		silent_peer.disconnect_from_host()
+		silent_peer = null
+	if silent_server != null:
+		silent_server.stop()
+		silent_server = null
 	get_tree().current_scene = old_scene
-	farm.queue_free()
+	farm.free()
 	router._stack.clear()
 	router._loading = null
+	rt._close_acc_flow()
+	rt.free()
+	await get_tree().process_frame
 	AppRouter.foreground_back_action = old_handler
 	P0SignIn.force = old_force
 	OS.set_environment("P0_ACCOUNTS", old_env)
@@ -116,20 +137,23 @@ func _hold_requests() -> void:
 		replies.append(done)
 
 func test_android_notification_with_real_card_does_not_call_the_farms_back() -> void:
-	var flow := _open()
-	_renew(flow)
-	var card := flow.renew
-	router._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
-	_no_background_action()
-	assert_object(flow.renew).is_same(card)
-	assert_object(get_tree().current_scene).is_same(farm)
-	assert_array(requests).is_empty()
-	assert_dict(flow.kept()).is_empty()   # Back is not consent, never writes age/versions.
+	# QA93 reproduced both Claim's Keep your farm and Login's Sign in to play (Back-only).
+	for kind in ["old_signin", "new"]:
+		var flow := _open(kind)
+		flow._open_sign_in()
+		_renew(flow)
+		var card := flow.renew
+		router._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+		_no_background_action()
+		assert_object(flow.renew).is_same(card)
+		assert_object(get_tree().current_scene).is_same(farm)
+		assert_array(requests).is_empty()
+		assert_dict(flow.kept()).is_empty()   # Back is not consent, never writes age/versions.
 
 func test_card_blocks_stack_pop_and_pending_transition_close_too() -> void:
 	var flow := _open()
 	_renew(flow)
-	var below := auto_free(SceneProbe.new())
+	var below: SceneProbe = auto_free(SceneProbe.new())
 	router._stack.append(below)
 	router.handle_back()
 	_no_background_action()
@@ -356,6 +380,47 @@ func test_success_releases_host_wait_and_keeps_back_on_the_resulting_account_pag
 	assert_object(flow.page).is_same(flow.sign_in_page)
 	assert_str(rt.session.identity.pending).is_empty()
 
+func test_real_http_timeout_releases_back_after_the_native_sheet_has_finished() -> void:
+	# One ephemeral loopback socket in this test process, no game server or synthetic HTTP answer.
+	silent_server = TCPServer.new()
+	assert_int(silent_server.listen(0, "127.0.0.1")).is_equal(OK)
+	var port := silent_server.get_local_port()
+	assert_bool(port > 0).is_true()
+	var flow := _open("old_signin")
+	flow.sign_in_page.busy = true
+	rt.session.base_url = "http://127.0.0.1:%d" % port
+	rt.session.identity.send = rt.session._account_request
+	rt.native_sign_in = func(_provider): return {"result": "ok", "id_token": "unit-token", "nonce": "unit-nonce"}
+	await rt._on_acc_sign_in("google")
+	var results: Array = []
+	var request: P0HttpRequest
+	for node in rt.session.get_children():
+		if node is P0HttpRequest: request = node
+	assert_object(request).is_not_null()
+	assert_float(request.wait_s).is_equal(8.0)
+	request.request_completed.connect(func(result, _code, _headers, _body): results.append(result))
+	var start := Time.get_ticks_msec()
+	while not silent_server.is_connection_available() and Time.get_ticks_msec() - start < 2000:
+		await get_tree().process_frame
+	assert_bool(silent_server.is_connection_available()).is_true()
+	silent_peer = silent_server.take_connection()
+	router.handle_back()
+	_no_background_action()
+	assert_int(rt._acc_requests).is_equal(1)
+	while results.is_empty() and Time.get_ticks_msec() - start < 15000:
+		await get_tree().process_frame
+	assert_array(results).is_equal([HTTPRequest.RESULT_TIMEOUT])
+	assert_int(rt._acc_requests).is_equal(0)
+	assert_bool(flow.sign_in_page.busy).is_false()
+	router.handle_back()
+	assert_int(router.homes).is_equal(1)
+	assert_int(swaps).is_equal(0)
+	silent_peer.disconnect_from_host()
+	silent_peer = null
+	silent_server.stop()
+	assert_bool(silent_server.is_listening()).is_false()
+	print("ACCOUNT_BACK_REAL_TIMEOUT result=TIMEOUT wait_s=8 released=true loopback_closed=true")
+
 func test_account_system_screens_block_back_even_during_scene_navigation() -> void:
 	for kind in [P0SysScreen.Kind.SESSION, P0SysScreen.Kind.DELETED, P0SysScreen.Kind.SUSPENDED,
 			P0SysScreen.Kind.MAINT, P0SysScreen.Kind.UPDATE]:
@@ -374,7 +439,7 @@ func test_account_system_screens_block_back_even_during_scene_navigation() -> vo
 func test_no_account_layer_preserves_the_farms_existing_back_and_stack_pop() -> void:
 	router.handle_back()
 	assert_int(swaps).is_equal(1)  # Actual P0Farm back method -> runtime.root_back.
-	var below := auto_free(SceneProbe.new())
+	var below: SceneProbe = auto_free(SceneProbe.new())
 	router._stack.append(below)
 	router.handle_back()
 	assert_int(below.back_calls).is_equal(1)
