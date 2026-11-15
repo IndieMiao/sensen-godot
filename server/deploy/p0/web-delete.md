@@ -8,6 +8,7 @@
 - 服务端页面：`GET /v1/web/delete/page`，公网服务已有前缀为`/preview/p0`。
 - 运维批准后把`https://gensen.app/delete` **内部反代**到
   `https://farm.sensenjoy.cn/preview/p0/v1/web/delete/page`；保持浏览器URL为gensen.app/delete，不用302，Apple Return URL仍是它。
+  待审配置片段见同目录Caddyfile.web-delete.snippet，本PR没有应用它。
 - 页面API基址固定为`https://farm.sensenjoy.cn/preview/p0/v1/web`；Caddy已有剥前缀规则，不把新接口塞到/v1/p0。
 - 允许浏览器Origin仅`https://gensen.app`与`https://farm.sensenjoy.cn`；不使用Cookie、不把x-p0-key写进网页。
   TLS/代理可信IP配置需运维核实，API按Fastify req.ip限流，不能把不可信转发头当真实用户。
