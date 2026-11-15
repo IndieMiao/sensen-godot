@@ -247,14 +247,14 @@ export class P0Voice {
     if (!target || !o) return refuse('NOT_IN_ROOM', 404);
     const key = player + ' ' + target;
     if (this.reported.has(key)) return { ok: true, already: true };
-    this.reported.add(key);
     const at = this.now();
     const line: ReportLine = { kind: 'voice_report', v: 2, id: reportId(at), at: new Date(at).toISOString(),
       reporter_code: supportCode(player), reported_code: supportCode(target), name: this.nameOf(target),
       reason: reportReason(reason), place: o.outpost, room: o.room, channel: CHANNELS.includes(String(channel)) ? String(channel) : '' };
+    if (this.files?.reports) appendFileSync(this.files.reports, JSON.stringify(line) + '\n');
+    this.reported.add(key); // A failed append must remain retryable; no callback/mail until the report is kept.
     // the docker log: the id and the codes only (tech-plan §3.2)
     console.log(JSON.stringify({ kind: line.kind, id: line.id, reporter_code: line.reporter_code, reported_code: line.reported_code }));
-    if (this.files?.reports) appendFileSync(this.files.reports, JSON.stringify(line) + '\n');
     this.onReport(line);
     return { ok: true, already: false };
   }
