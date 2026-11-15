@@ -1908,7 +1908,7 @@ static func wing_row(view: Dictionary) -> Dictionary:
 ## Iron Ore / Quartz: the free vein of that main (view.wild.near3_sites, from home); Copper Ore / Coal / Rock Salt: the
 ## free quarry (`mine:<id>`), now while the player is down it. Clay: a ready Clay Pit, else (every pit cooling) the
 ## quarry, else the pit. A spot cooling down still points (now false: q(255) ⑥ lists it with what is still to go); the
-## city's spots not read yet (P0Runtime._read_home_places), or no such site: no target.
+## no pond in reach with it (view.gather.ponds), or no such site: no target.
 const GATHERED := ["wood", "stone", "fiber", "clay", "wild_herb", "hardwood", "flax"]   # the yields of world_gen gather_points
 const VEIN_ORES := ["iron_ore", "quartz"]
 const QUARRY_ORES := ["copper_ore", "coal", "rock_salt"]
@@ -1924,37 +1924,67 @@ static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
 	if not spot.is_empty(): return {"go": "gather:" + str(spot.id), "now": false}
 	return {"go": "", "now": false}
 
-## The gathering spot for `item` (eb1d7c20): in the city the player is in when it has one (another town's spots first),
-## else in the home city — of the spots whose first yield is it, the nearest that can be gathered now (not in
-## view.gather.city_ready) {id, ready: true}; every one cooling: the nearest {id, ready: false}. Nearest to the city's
-## base point (P0Clusters; the farm when the city is not in the table), the table's order breaking a tie. {} when no
-## spot of it is read.
+## The pond point for `item` (U2, the user 644 / 648; v4q(11) ⑧, 不知火舞's spec v1.2 §4: the source line names the
+## pond its Show goes to): of view.gather.ponds' points that give it first (`item`), in the city the player is in when one
+## of its ponds has it (another town's first), else in the home city — the nearest pond's point that can be gathered now
+## (not in view.gather.city_ready) {id, pond, ready: true}; every one cooling: the nearest {id, pond, ready: false}.
+## Nearest to the pond the player is in, else to the city's base point (P0Clusters; the farm when the city is not in the
+## table); the server's order (the city table's) breaking a tie. {} when no pond in reach has it.
 static func gather_spot_for(view: Dictionary, item: String) -> Dictionary:
-	var places = load("res://modules/p0/p0_city_places.gd")
+	var gv = view.get("gather", {})
+	var ponds: Dictionary = gv.get("ponds", {}) if gv is Dictionary and gv.get("ponds") is Dictionary else {}
 	var home := str(load("res://modules/p0/p0_travel.gd").home(view))
 	var here := str(view.get("travel", {}).get("here", ""))
-	var yields := func(p: Dictionary) -> bool:
-		var y: Array = p.get("yield", [])
-		return not y.is_empty() and str(y[0][0]) == item
+	var of_city := func(city: String) -> Array:
+		var out: Array = []
+		for pid in ponds:
+			if str(ponds[pid].get("cluster", "")) != city: continue
+			for pt in ponds[pid].get("points", []):
+				if pt is Dictionary and str(pt.get("item", "")) == item: out.append({"id": str(pt.id), "pond": str(pid)})
+		return out
 	var city := home
-	var spots: Array = (places.gather(here) as Array).filter(yields) if here != "" and here != home else []
-	if spots.is_empty(): spots = (places.gather(home) as Array).filter(yields)
+	var spots: Array = of_city.call(here) if here != "" and here != home else []
+	if spots.is_empty(): spots = of_city.call(home)
 	else: city = here
 	if spots.is_empty(): return {}
-	var cl := P0Clusters.get_cluster(city)
-	var farm: Dictionary = view.get("home", {}).get("farm", {}) if view.get("home", {}).get("farm") is Dictionary else {}
-	var base := Vector2(float(cl.lat), float(cl.lng)) if not cl.is_empty() else (Vector2(float(farm.get("lat", 0.0)), float(farm.get("lng", 0.0))) if not farm.is_empty() else Vector2.INF)
-	var far := func(p: Dictionary) -> float:
-		if base == Vector2.INF: return 0.0
-		return pow(float(p.lat) - base.x, 2.0) + pow((float(p.lng) - base.y) * cos(deg_to_rad(base.x)), 2.0)
-	var cooling: Dictionary = view.get("gather", {}).get("city_ready", {}) if view.get("gather", {}).get("city_ready") is Dictionary else {}
+	var base := _gather_base(view, city)
+	var far := func(s: Dictionary) -> float:
+		var at := _pond_at(str(s.pond))
+		if base == Vector2.INF or at == Vector2.INF: return 0.0
+		return pow(at.x - base.x, 2.0) + pow((at.y - base.y) * cos(deg_to_rad(base.x)), 2.0)
+	var cooling: Dictionary = gv.get("city_ready", {}) if gv is Dictionary and gv.get("city_ready") is Dictionary else {}
 	var best := {}
 	var any := {}
-	for p in spots:
-		if any.is_empty() or float(far.call(p)) < float(far.call(any)): any = p
-		if int(cooling.get(str(p.id), 0)) > 0: continue
-		if best.is_empty() or float(far.call(p)) < float(far.call(best)): best = p
-	return {"id": str(best.id), "ready": true} if not best.is_empty() else {"id": str(any.id), "ready": false}
+	for s in spots:
+		if any.is_empty() or float(far.call(s)) < float(far.call(any)): any = s
+		if int(cooling.get(str(s.id), 0)) > 0: continue
+		if best.is_empty() or float(far.call(s)) < float(far.call(best)): best = s
+	return best.merged({"ready": true}) if not best.is_empty() else any.merged({"ready": false})
+
+## Where "nearest" is measured from for gather_spot_for: the pond the player is in (view.gather.pond), else `city`'s base
+## point, else the farm; INF when none is known.
+static func _gather_base(view: Dictionary, city: String) -> Vector2:
+	var gv = view.get("gather", {})
+	var inside = gv.get("pond", null) if gv is Dictionary else null
+	if inside is Dictionary:
+		var at := _pond_at(str(inside.get("pond", "")))
+		if at != Vector2.INF: return at
+	var cl := P0Clusters.get_cluster(city)
+	if not cl.is_empty(): return Vector2(float(cl.lat), float(cl.lng))
+	var farm = view.get("home", {}).get("farm", null)
+	return Vector2(float(farm.get("lat", 0.0)), float(farm.get("lng", 0.0))) if farm is Dictionary else Vector2.INF
+
+## A pond's lat / lng: the home set's from the pond table, another city's (`<cluster>~…`) from its city read; INF unknown.
+static func _pond_at(id: String) -> Vector2:
+	var p: Dictionary = load("res://modules/p0/p0_city_places.gd").pond(id) if id.find("~") > 0 else load("res://modules/p0/p0_ponds.gd").location(id)
+	return Vector2(float(p.lat), float(p.lng)) if p.has("lat") and p.has("lng") else Vector2.INF
+
+## The pond a `gather:<pond>#<slot>` target is in ("" for anything else).
+static func gather_pond(go: String) -> String:
+	if not go.begins_with("gather:"): return ""
+	var id := go.trim_prefix("gather:")
+	var at := id.find("#")
+	return id.substr(0, at) if at > 0 else ""
 
 ## One of the free three wild sites (view.wild.near3_sites, nearest first) of `type` — a vein of `main`, or the quarry —
 ## its id, "" when none.

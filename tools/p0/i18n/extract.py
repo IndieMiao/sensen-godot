@@ -53,7 +53,7 @@ HEX = re.compile(r'[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?')
 ## Constant lists of keys a panel shows capitalized (String.capitalize): file → constant names.
 CAPITALIZED = {'scenes/p0/panels/p0_bag_drawer.gd': ['GEAR_SLOTS']}
 
-TEXT_KEYS = re.compile(r'^(name|title|text|line|lines|pip|blurb|word|desc|description|subtitle|label|note|hint|greeting|'
+TEXT_KEYS = re.compile(r'^(name|title|text|line|lines|pip|pip_pond|blurb|word|desc|description|subtitle|label|note|hint|greeting|'
                        r'toast|caption|short|body|message|reason|tip|seed_name|category|badge|a|b|'
                        # SGODOT-385 round 2: a resident's job and favourite, stage names, dish styles, climate bands,
                        # plurals and plant names, request lines, the farm's name, guide marks, facts

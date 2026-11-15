@@ -531,9 +531,21 @@ const SOURCES := {
 	"copper_ore": ["Quarries"], "coal": ["Quarries"], "rock_salt": ["Quarries"],
 	"iron_ore": ["Iron veins from Floor 10"], "quartz": ["Quartz veins from Floor 10"],
 }
+## U2 (the user 644 / 648; 不知火舞's spec v1.2 §4, this client gathers in the ponds alone): a gathered material names the
+## pond its Show goes to (P0Logic.gather_spot_for: the city the player is in first, the nearest that can be gathered now,
+## else the nearest) — `Timber · Fern Pond`, `Stone · Fern Pond · or any mine`, `Clay · Fern Pond · or Quarries`; no pond
+## of the two cities has it: `Hardwood · Ponds in some towns`, no Show. SOURCES' town words stay for the older builds'
+## table (their keys are kept); ores as they were.
+const POND_EXTRA := {"stone": ["any mine"], "clay": ["Quarries"]}
+const NO_POND := "Ponds in some towns"
 static func material_source(view: Dictionary, id: String) -> Dictionary:
 	var parts: Array = SOURCES.get(id, [])
 	if parts.is_empty(): return {}
+	if id in P0Logic.GATHERED:
+		var spot := P0Logic.gather_spot_for(view, id)
+		var ponds = view.get("gather", {}).get("ponds", {}) if view.get("gather") is Dictionary else {}
+		var pond := str(ponds.get(str(spot.pond), {}).get("name", "")) if not spot.is_empty() and ponds is Dictionary else ""
+		parts = [pond if pond != "" else NO_POND] + POND_EXTRA.get(id, [])
 	var text := _nowrap(P0Logic.item_name(view, id)) + " · " + _nowrap(parts[0])
 	for i in range(1, parts.size()): text += " · " + _nowrap("or %s" % parts[i])   # UiNeedSource breaks only at a ` · `
 	return {"text": text, "go": str(P0Logic._home_material_go(view, id).go)}   # Show: the spot or mine Today points at (355 C2)

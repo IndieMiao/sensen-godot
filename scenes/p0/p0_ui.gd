@@ -3224,6 +3224,9 @@ static func show_label(go: String, here: String, camera_here: bool, here_place :
 	# 355 C2: a wild mine (`mine:<site>`) the player is down: nothing to show (the row stays, without a button); a
 	# gathering spot (`gather:<id>`) or another mine is a map pin as any (Show on the map, Show on map elsewhere)
 	if here == "mine" and here_place != "" and go == "mine:" + here_place: return ""
+	# U2: a pond's point (`gather:<pond>#<slot>`) in that very pond is Show (the camera goes to it, p0_pond.p0_show_spot);
+	# from anywhere else its pond is the pin (map_target)
+	if here == "pond" and here_place != "" and P0Logic.gather_pond(go) == here_place: return "Show" if camera_here else ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
 	if home_target(go) and here in ["home", "farm"]: return "Show" if camera_here else ""
@@ -3238,9 +3241,11 @@ func space_here() -> String:
 	if space != "": return space
 	return "home" if surface in ["farm", "room"] else ("pond" if surface == "busy" else surface)
 
-## The map pin for a target elsewhere: the homestead for farm targets, else the target itself.
+## The map pin for a target elsewhere: the homestead for farm targets, a pond's point's pond (U2), else the target itself.
 static func map_target(go: String) -> String:
-	return "home" if home_target(go) else go
+	if home_target(go): return "home"
+	var pond := P0Logic.gather_pond(go)
+	return "pond:" + pond if pond != "" else go
 
 ## Whether a Show can move the camera in the current world (the pond has no camera targets yet).
 func spot_reachable() -> bool:

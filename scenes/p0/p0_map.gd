@@ -2181,11 +2181,13 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	city_map.set_marks(list)
 	if farm_markers: farm_markers.set_mark("self", CityMapView.status_badge(home) if home != "" and not away() else null)
 
-## The gathering spot the guide sends the player to (view.guide.target, absent when none), "" for none.
+## The pin the guide's gathering target wears its ! on (view.guide.target, absent when none), "" for none: a pond's
+## point's pond (U2: target.pond; the point's own ! is the pond scene's, p0_pond._gather_marks), an older town spot itself.
 static func guide_spot(view: Dictionary) -> String:
 	var g = view.get("guide", null)
 	var t = g.get("target", null) if g is Dictionary else null
-	return str(t.get("spot", "")) if t is Dictionary and str(t.get("kind", "")) == "gather" else ""
+	if not (t is Dictionary and str(t.get("kind", "")) == "gather"): return ""
+	return str(t.pond) if str(t.get("pond", "")) != "" else str(t.get("spot", ""))
 
 ## The server's kinds → UiStatusBadge states; the event venue's purple ★ (§9.3.3) last.
 const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new", "event": "event"}

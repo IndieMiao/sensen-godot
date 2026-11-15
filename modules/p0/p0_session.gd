@@ -346,7 +346,10 @@ const GUIDE_V3_READY := true
 ## yard2: yard v2 (v4q(12)): this client draws the yard of its Home level (P0Garden.yard_at: Lv13 row 19, Lv14 columns
 ## 19–20) and keeps decor.yard.paths2 clear; the server grows its yard, lifts the 52 cap to the yard's cells and holds the
 ## paths too. Said only by a build that draws the whole of it (奕星 11-10). A switch only.
-const FEATURES := "choose_home,guide_v3,locals,save_v7,wing8,yard2" if GUIDE_V3_READY else "choose_home,locals,save_v7,wing8,yard2"
+## pond_guide: this client gathers in the ponds alone (U2, the user 644 / 648, v4q(11) note 5): the city read sends it no
+## town points and a town point's gather is refused; S6a points into the home set's beginner pond (view.guide.target.pond)
+## and Pip's S5 line names that pond (pip_pond). An older build keeps the town's points as before.
+const FEATURES := "choose_home,guide_v3,locals,pond_guide,save_v7,wing8,yard2" if GUIDE_V3_READY else "choose_home,locals,pond_guide,save_v7,wing8,yard2"
 
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
@@ -358,7 +361,7 @@ func _headers() -> PackedStringArray:
 ## The x-p0-features this build sends, on its requests and the online handshake alike (P0Online.features).
 func features() -> String:
 	if not test_accounts.is_test(): return FEATURES
-	return "choose_home,guide_v3,locals,save_v7,wing8,yard2" if test_accounts.guide_enabled() else "choose_home,locals,save_v7,wing8,yard2"
+	return "choose_home,guide_v3,locals,pond_guide,save_v7,wing8,yard2" if test_accounts.guide_enabled() else "choose_home,locals,pond_guide,save_v7,wing8,yard2"
 
 ## The internal demo APK (tools/p0/build_demo_apk.sh) carries DEMO_CONFIG; no other build does, the file is
 ## written for that export only. The demo is exported as a debug build, so OS.is_debug_build() alone can't tell it
