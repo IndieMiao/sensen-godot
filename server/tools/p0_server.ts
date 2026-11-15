@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
 import { P0Voice, p0VoiceFromEnv, registerP0Voice } from '../src/p0/online/voice.js';
+import { ReportDeliveryService } from '../src/p0/report_delivery.js';
 import { generatedOutpostSpec, landmarkOfRoom, landmarkRoomSpec, loadOutposts, pondOfRoom, pondRoomSpec } from '../src/p0/online/outposts.js';
 import { placeOf, roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
@@ -144,6 +145,12 @@ const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.joi
 voice.nameOf = p => store.peek(p)?.profile?.name ?? null;   // a report's name at that moment (SGODOT-484)
 // Pass the stored record, not a boolean or an expiry-filtered value: voice validates it before the shared projection.
 voice.voiceBan = p => store.peek(p)?.sanctions?.voice;
+// Reports are already on disk before onReport runs. Replaying JSONL covers a crash or an enqueue write failure.
+// P0_REPORT_MAIL defaults off: SMTP variables alone never enable mail or construct an SMTP transport.
+const reportDelivery = new ReportDeliveryService({ voice, reports: path.join(voiceDir, 'voice_reports.jsonl'),
+  outbox: path.join(voiceDir, 'report_outbox.json'), env: process.env });
+app.addHook('onClose', async () => { await reportDelivery.close(); });
+await reportDelivery.start();
 registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
   joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq,
