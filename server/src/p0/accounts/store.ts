@@ -131,6 +131,12 @@ export class P0Accounts {
 
   markDeleted(player: string, at: number): void { this.d.deleted[player] = at; this.flush(); }
   isDeleted(player: string): boolean { const at = this.d.deleted[player]; return at !== undefined && this.now() - at < DELETED_KEEP_MS; }
+  /** Retained deletion records for admin recovery (SGODOT-484), even after the account row is gone. Copies only;
+   * the same 30-day limit as isDeleted, without pruning or writing. Not a list of all unfinished deletions. */
+  deletedPlayers(): { player: string; at: number }[] {
+    const now = this.now();
+    return Object.entries(this.d.deleted).filter(([, at]) => now - at < DELETED_KEEP_MS).map(([player, at]) => ({ player, at }));
+  }
   /** This player's row, links and every token (accounts.json only; the save is P0Store.remove). */
   remove(player: string): void {
     for (const [k, c] of Object.entries(this.d.codes)) if (c.player === player) delete this.d.codes[k];   // its test code too
