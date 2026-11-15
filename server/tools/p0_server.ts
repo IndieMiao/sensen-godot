@@ -142,7 +142,8 @@ const voiceDir = path.dirname(stateFile);
 const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.join(voiceDir, 'voice_blocks.json'),
   ages: path.join(voiceDir, 'voice_ages.json'), reports: path.join(voiceDir, 'voice_reports.jsonl') });
 voice.nameOf = p => store.peek(p)?.profile?.name ?? null;   // a report's name at that moment (SGODOT-484)
-voice.voiceBanned = p => !!inForce(store.peek(p)?.sanctions?.voice, Date.now());
+// Pass the stored record, not a boolean or an expiry-filtered value: voice validates it before the shared projection.
+voice.voiceBan = p => store.peek(p)?.sanctions?.voice;
 registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
   joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq,

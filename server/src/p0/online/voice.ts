@@ -47,7 +47,8 @@ export function p0VoiceFromEnv(env: Record<string, string | undefined>): P0Voice
 }
 
 interface Lease { id: string; player: string; room: string; peer: number; expires: number }
-type Refusal = { code: string; status: number };
+type Refusal = { code: string; status: number; until?: string | null };
+export type VoiceBan = { until: string | null } | null;
 const refuse = (code: string, status: number): Refusal => ({ code, status });
 
 export interface P0VoiceFiles { blocks: string; ages: string; reports: string }
@@ -95,7 +96,7 @@ export class P0Voice {
   /** A report kept: handed on once its line is written (SGODOT-484, 苏烈's queue takes it by id). */
   onReport: (line: ReportLine) => void = () => {};
   /** SGODOT-484: server-owned moderation, independent of the age check and saved blocks. */
-  voiceBanned: (player: string) => boolean = () => false;
+  voiceBan: (player: string) => { until: number | null } | null | undefined = () => null;
 
   constructor(readonly config: P0VoiceConfig | null, private rooms: OutpostRooms, private files: P0VoiceFiles | null,
     private now: () => number = Date.now, media?: P0VoiceMedia) {
@@ -113,7 +114,27 @@ export class P0Voice {
   }
 
   status(player: string) {
-    return { ok: true, available: !!this.config, age: player in this.ages ? (this.ages[player] ? 'ok' : 'no') : 'unknown' };
+    return { ok: true, available: !!this.config, age: player in this.ages ? (this.ages[player] ? 'ok' : 'no') : 'unknown',
+      ban: this.currentBan(player) };
+  }
+
+  /** Validate the stored millisecond value before testing expiry. A malformed record is neither absent nor permanent.
+   * Return a fresh minimal projection; no caller/older reply can mutate or cache the stored sanction. */
+  private currentBan(player: string): VoiceBan {
+    const record = this.voiceBan(player);
+    if (record === null || record === undefined) return null;
+    const until = record.until;
+    if (until === null) return { until: null };
+    if (typeof until !== 'number' || !Number.isSafeInteger(until) || Math.abs(until) > 8_640_000_000_000_000)
+      throw new Error('VOICE_BAN_INVALID');
+    return until <= this.now() ? null : { until: new Date(until).toISOString() };
+  }
+
+  private banRefusal(player: string): Refusal | null {
+    try {
+      const ban = this.currentBan(player);
+      return ban ? { code: 'VOICE_BANNED', status: 403, until: ban.until } : null;
+    } catch { return refuse('VOICE_UNAVAILABLE', 503); }
   }
 
   /** The 13+ gate's answer, once: a no stays a no on this server (a yes after a no is refused). */
@@ -126,8 +147,9 @@ export class P0Voice {
   }
 
   private gate(player: string): { o: Occupant; spec: NonNullable<ReturnType<OutpostRooms['spec']>> } | Refusal {
+    const ban = this.banRefusal(player);
+    if (ban) { void this.drop(player); return ban; }
     if (!this.config) return refuse('VOICE_OFF', 403);
-    if (this.voiceBanned(player)) { void this.drop(player); return refuse('VOICE_BANNED', 403); }
     if (this.ages[player] !== true) return refuse('AGE_GATE', 403);
     const o = this.rooms.occupant(player);
     if (!o) return refuse('NOT_IN_ROOM', 403);
@@ -161,7 +183,8 @@ export class P0Voice {
     token.addGrant({ roomJoin: true, room, canPublish: true, canPublishSources: [TrackSource.MICROPHONE], canSubscribe: true,
       canPublishData: false, canUpdateOwnMetadata: false });
     const signed = await token.toJwt();
-    if (this.voiceBanned(player)) { await this.release(lease); return refuse('VOICE_BANNED', 403); }
+    const ban = this.banRefusal(player);
+    if (ban) { await this.release(lease); return ban; }
     // Deletion / departure may run while JWT signing is pending. Do not hand out a grant for the removed lease.
     if (this.leases.get(player) !== lease || this.rooms.occupant(player) !== o || this.ages[player] !== true)
       return refuse('LEASE_EXPIRED', 410);
@@ -170,7 +193,8 @@ export class P0Voice {
   }
 
   heartbeat(player: string, leaseId: string): Refusal | Record<string, unknown> {
-    if (this.voiceBanned(player)) { void this.drop(player); return refuse('VOICE_BANNED', 403); }
+    const ban = this.banRefusal(player);
+    if (ban) { void this.drop(player); return ban; }
     const lease = this.leases.get(player);
     if (!lease || lease.id !== leaseId || lease.expires < this.now()) return refuse('LEASE_EXPIRED', 410);
     const o = this.rooms.occupant(player);
@@ -402,21 +426,35 @@ export function registerP0Voice(app: FastifyInstance, voice: P0Voice,
     const r = refusals.get(h);
     return r ? reply.code(r.status).send(r.body) : reply.code(401).send({ ok: false, code: 'UNAUTHENTICATED' });
   };
-  const answer = (reply: { code(n: number): { send(b: object): unknown } }, r: Refusal | Record<string, unknown>) =>
-    'status' in r && typeof r.status === 'number' && 'code' in r ? reply.code(r.status).send({ ok: false, code: r.code }) : reply.code(200).send(r);
+  const answer = (reply: { code(n: number): { send(b: object): unknown } }, r: Refusal | Record<string, unknown>) => {
+    if ('status' in r && typeof r.status === 'number' && 'code' in r) {
+      // Keep only the contractual field, never spread internal sanctions or provider details into a refusal.
+      if (r.code === 'VOICE_BANNED') {
+        if (!Object.hasOwn(r, 'until') || !(r.until === null || (typeof r.until === 'string'
+          && Number.isFinite(Date.parse(r.until)) && new Date(r.until).toISOString() === r.until)))
+          return reply.code(503).send({ ok: false, code: 'VOICE_UNAVAILABLE' });
+        return reply.code(r.status).send({ ok: false, code: r.code, until: r.until });
+      }
+      return reply.code(r.status).send({ ok: false, code: r.code });
+    }
+    return reply.code(200).send(r);
+  };
+  const status = (player: string) => {
+    try { return voice.status(player); } catch { return refuse('VOICE_UNAVAILABLE', 503); }
+  };
   const body = (b: unknown) => (b && typeof b === 'object' ? b : {}) as Record<string, unknown>;
   // a peer id as the grant and voice_blocks write it ("2", LiveKit's identity) or as a number: both (蒙恬 on #647)
   const peerOf = (v: unknown): number | null => typeof v === 'number' ? (Number.isInteger(v) ? v : null)
     : typeof v === 'string' && /^\d{1,5}$/.test(v) ? Number(v) : null;
   app.get('/v1/p0/voice/status', async (req, reply) => {
     const p = playerOf(req.headers);
-    return p ? voice.status(p) : deny(reply, req.headers);
+    return p ? answer(reply, status(p)) : deny(reply, req.headers);
   });
   app.post('/v1/p0/voice/age', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);
     if (!p) return deny(reply, req.headers);
     if (typeof b.ok !== 'boolean') return answer(reply, { code: 'SCHEMA', status: 400 });
-    return answer(reply, voice.setAge(p, b.ok) ?? voice.status(p));
+    return answer(reply, voice.setAge(p, b.ok) ?? status(p));
   });
   app.post('/v1/p0/voice/join', async (req, reply) => {
     const p = playerOf(req.headers);
