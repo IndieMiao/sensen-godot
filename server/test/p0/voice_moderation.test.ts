@@ -3,7 +3,6 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { AccessToken } from 'livekit-server-sdk';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { inForce } from '../../src/p0/accounts/identify.js';
 import { P0Voice } from '../../src/p0/online/voice.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
 import { loadOutposts } from '../../src/p0/online/outposts.js';
@@ -23,7 +22,7 @@ function setup() {
   const removeParticipant = vi.fn(async (room: string, peer: string) => { participants.delete(room + '/' + peer); });
   const media = { getParticipant: async (room: string, peer: string) => ({ metadata: participants.get(room + '/' + peer) }), removeParticipant };
   const voice = new P0Voice({ url: 'ws://fake-voice.test', apiKey: 'fake', apiSecret: 'fake-only-secret-at-least-32-characters', namespace: 'test-ban' }, rooms, files, () => now, media);
-  voice.voiceBanned = p => p === 'player-target' && !!inForce(sanction, now);
+  voice.voiceBan = p => p === 'player-target' ? sanction : null;
   const enter = (p: string) => { rooms.join(p, 'sh_tea_1'); };
   enter('player-target'); enter('player-other');
   const grant = async (p: string) => {
@@ -38,7 +37,7 @@ describe('484 voice moderation without deleting account/age/blocks', () => {
   it('refuses new grants, allows expiry on real time, and preserves room/age/blocks/report', async () => {
     const f = setup(), before = Object.values(f.files).map(p => readFileSync(p, 'utf8'));
     f.ban(f.now() + 1000);
-    await expect(f.voice.join('player-target')).resolves.toEqual({ code: 'VOICE_BANNED', status: 403 });
+    await expect(f.voice.join('player-target')).resolves.toEqual({ code: 'VOICE_BANNED', status: 403, until: new Date(f.now() + 1000).toISOString() });
     await expect(f.voice.join('player-other')).resolves.toMatchObject({ ok: true });
     f.tick(1000);
     await expect(f.voice.join('player-target')).resolves.toMatchObject({ ok: true });
@@ -50,7 +49,7 @@ describe('484 voice moderation without deleting account/age/blocks', () => {
     const f = setup(), target = await f.grant('player-target'), other = await f.grant('player-other');
     const before = Object.values(f.files).map(p => readFileSync(p, 'utf8'));
     f.ban(); const dropping = f.voice.drop('player-target');
-    expect(f.voice.heartbeat('player-target', target.lease_id)).toEqual({ code: 'VOICE_BANNED', status: 403 });
+    expect(f.voice.heartbeat('player-target', target.lease_id)).toEqual({ code: 'VOICE_BANNED', status: 403, until: null });
     await dropping;
     expect(f.removeParticipant).toHaveBeenCalledWith(target.room, target.self);
     expect(f.voice.heartbeat('player-other', other.lease_id)).toMatchObject({ ok: true });
@@ -61,7 +60,7 @@ describe('484 voice moderation without deleting account/age/blocks', () => {
   it('heartbeat detects a stored ban even if the management drop was interrupted', async () => {
     const f = setup(), target = await f.grant('player-target');
     f.ban();
-    expect(f.voice.heartbeat('player-target', target.lease_id)).toEqual({ code: 'VOICE_BANNED', status: 403 });
+    expect(f.voice.heartbeat('player-target', target.lease_id)).toEqual({ code: 'VOICE_BANNED', status: 403, until: null });
     await vi.waitFor(() => expect(f.removeParticipant).toHaveBeenCalledWith(target.room, target.self));
   });
 
@@ -69,7 +68,7 @@ describe('484 voice moderation without deleting account/age/blocks', () => {
     const f = setup(); let finish!: (v: string) => void;
     vi.spyOn(AccessToken.prototype, 'toJwt').mockReturnValue(new Promise<string>(resolve => { finish = resolve; }));
     const joining = f.voice.join('player-target'); f.ban(); finish('fake-token');
-    await expect(joining).resolves.toEqual({ code: 'VOICE_BANNED', status: 403 });
+    await expect(joining).resolves.toEqual({ code: 'VOICE_BANNED', status: 403, until: null });
   });
 
   it('drop is idempotent and never kicks a different lease that reused the same peer id', async () => {

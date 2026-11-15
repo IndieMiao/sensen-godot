@@ -118,7 +118,7 @@ describe('P0 voice (SGODOT-383)', () => {
     expect(voice.status('player-aaaa').age).toBe('unknown');
     expect(voice.setAge('player-aaaa', false)).toBeNull();
     expect(voice.setAge('player-aaaa', true)).toMatchObject({ code: 'AGE_GATE' });
-    expect(voice.status('player-aaaa')).toEqual({ ok: true, available: true, age: 'no' });
+    expect(voice.status('player-aaaa')).toEqual({ ok: true, available: true, age: 'no', ban: null });
     expect(JSON.parse(readFileSync(files.ages, 'utf8'))).toEqual({ 'player-aaaa': false });
   });
 
@@ -330,7 +330,7 @@ describe('P0 voice (SGODOT-383)', () => {
     const post = (url: string, payload: object, player = 'player-aaaa') => app.inject({ method: 'POST', url, payload, headers: { 'x-p0-player': player } });
     expect((await app.inject({ method: 'POST', url: '/v1/p0/voice/join', payload: {} })).statusCode).toBe(401);
     expect((await app.inject({ method: 'GET', url: '/v1/p0/voice/status', headers: { 'x-p0-player': 'player-aaaa' } })).json())
-      .toEqual({ ok: true, available: true, age: 'unknown' });
+      .toEqual({ ok: true, available: true, age: 'unknown', ban: null });
     let r = await post('/v1/p0/voice/join', {});
     expect([r.statusCode, r.json()]).toEqual([403, { ok: false, code: 'AGE_GATE' }]);
     expect((await post('/v1/p0/voice/age', { ok: true })).json()).toMatchObject({ age: 'ok' });

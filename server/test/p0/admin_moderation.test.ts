@@ -36,7 +36,7 @@ async function setup() {
   const voice = new P0Voice({ url: 'ws://fake.test', apiKey: 'fake', apiSecret: 'fake-only-secret-of-at-least-32-characters', namespace: 'moderation-test' }, rooms, files, now,
     { getParticipant, removeParticipant: removed });
   voice.setAge(TARGET, true); voice.setAge(OTHER, true);
-  voice.voiceBanned = p => !!inForce(store.peek(p)?.sanctions?.voice, now());
+  voice.voiceBan = p => store.peek(p)?.sanctions?.voice;
   const identity = { accounts, legacyId: false, suspended: (p: string) => inForce(store.peek(p)?.sanctions?.suspended, now()) };
   const who = (h: Record<string, unknown>) => identify(h, identity);
   const app = Fastify(), admin = Fastify(), audit: string[] = [], sockets: WebSocket[] = [];
