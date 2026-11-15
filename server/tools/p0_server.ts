@@ -194,7 +194,8 @@ const startEmail = registerEmailRoutes(app, emailDeps);
 const appleWebId = appleCfg?.servicesIds[0], googleWebId = accountsCfg.google?.audiences[0];
 registerWebDeleteRoutes(app, { store, accounts, voice, hub, now: Date.now,
   revokeApple: appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : undefined,
-  appleWeb: appleWebId ? { audiences: appleCfg!.servicesIds, keys: appleJwks.keys, refreshKeys: appleJwks.refresh, now: Date.now } : undefined,
+  appleWeb: appleWebId ? { audiences: appleCfg!.servicesIds, keys: appleJwks.keys, refreshKeys: appleJwks.refresh, now: Date.now,
+    authorized: appleNotifications.authorized } : undefined,
   googleWeb: googleWebId ? { audiences: [googleWebId], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, now: Date.now } : undefined,
   appleClientId: appleWebId, googleClientId: googleWebId, email: emailDeps, startEmail,
   apiBase: 'https://farm.sensenjoy.cn/preview/p0/v1/web', origins: ['https://gensen.app', 'https://farm.sensenjoy.cn'] });

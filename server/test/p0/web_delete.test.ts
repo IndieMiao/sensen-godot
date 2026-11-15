@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -14,6 +14,7 @@ import { OutpostRooms } from '../../src/p0/online/rooms.js';
 import { loadOutposts } from '../../src/p0/online/outposts.js';
 import { guardOptionsFromEnv, registerP0Guard } from '../../src/p0/guard.js';
 import { makeKeys, signToken } from '../fixtures/firebase_tokens.js';
+import { AppleNotificationJournal, registerAppleNotifications } from '../../src/p0/accounts/apple_notifications.js';
 
 const T = Date.UTC(2026, 10, 15), P = 'web-delete-player', Q = 'web-delete-kept', ORIGIN = 'https://gensen.app';
 const APP = 'app.gensen.maps', WEB = 'app.gensen.maps.web', GOOGLE = 'fake-web.apps.googleusercontent.com';
@@ -31,9 +32,13 @@ async function setup(emailOn = true) {
     on: emailOn, codes: new EmailCodes(() => now), mailer: { send: async (to, mail) => { mails.push({ to, text: mail.text }); } }, warn };
   const app = Fastify(); await registerP0Guard(app, guardOptionsFromEnv({ P0_ACCESS_KEYS: 'fake-game-key' }));
   const startEmail = registerEmailRoutes(app, email);
+  const journalFile = path.join(dir, 'apple-notifications.json');
+  const journal = new AppleNotificationJournal(journalFile, () => now);
+  registerAppleNotifications(app, { store, accounts, voice, hub, now: () => now, pending: email.pending,
+    audiences: [APP, WEB], keys: keys.keys, journal, warn });
   registerWebDeleteRoutes(app, { store, accounts, voice, hub, now: () => now, revokeApple, email, startEmail,
     apiBase: 'https://farm.sensenjoy.cn/preview/p0/v1/web', origins: [ORIGIN], appleClientId: WEB, googleClientId: GOOGLE,
-    appleWeb: { audiences: [WEB], keys: keys.keys, now: () => now }, googleWeb: { audiences: [GOOGLE], keys: keys.keys, now: () => now }, warn });
+    appleWeb: { audiences: [WEB], keys: keys.keys, now: () => now, authorized: journal.authorized }, googleWeb: { audiences: [GOOGLE], keys: keys.keys, now: () => now }, warn });
   cleanup.push(async () => { await app.close(); rmSync(dir, { recursive: true, force: true }); });
   const headers = { origin: ORIGIN };
   const options = async () => (await app.inject({ method: 'GET', url: '/v1/web/delete/options', headers })).json();
@@ -43,10 +48,93 @@ async function setup(emailOn = true) {
     iss: provider === 'apple' ? 'https://appleid.apple.com' : 'https://accounts.google.com', aud: provider === 'apple' ? WEB : GOOGLE,
     sub: provider + '-subject', iat: Math.floor(now / 1000) - 1, exp: Math.floor(now / 1000) + 600, nonce: o.nonce_hash,
     email: 'private-provider@example.test', name: 'PRIVATE_NAME', ...extra });
-  return { app, store, accounts, save, file, voice, hub, revokeApple, warn, mails, email, options, post, start, token, tick: (ms: number) => { now += ms; } };
+  const revoke = async () => {
+    const seconds = Math.floor(now / 1000);
+    return app.inject({ method: 'POST', url: '/v1/apple/notifications', payload: { payload: signToken(keys, {
+      iss: 'https://appleid.apple.com', aud: APP, iat: seconds, jti: 'revocation-' + now,
+      events: { type: 'consent-revoked', sub: 'apple-subject', event_time: seconds },
+    }) } });
+  };
+  return { app, store, accounts, save, file, voice, hub, revokeApple, warn, mails, email, options, post, start, token, revoke,
+    journal, journalFile, now: () => now, tick: (ms: number) => { now += ms; } };
 }
 
 describe('P0 browser deletion: verified identity, then real deletion', () => {
+  it.each(['unlinked', 'rebound', 'moved', 'recreated', 'reset_save'] as const)('an old verified challenge cannot delete a live target after %s', async change => {
+    const f = await setup(), address = 'owner@example.test', other = 'other@example.test';
+    const sub = f.accounts.emailId(address);
+    f.accounts.link(P, 'email', { sub }); f.email.codes.put(address, '123456');
+    const o = await f.options(), payload = { challenge: o.challenge, provider: 'email', confirmed: true, email: address, code: '123456' };
+    vi.spyOn(f.accounts, 'markDeleted').mockImplementationOnce(() => { throw new Error('disk'); });
+    expect((await f.post(payload)).json().code).toBe('delete_failed');
+    f.tick(1);
+    if (change === 'unlinked') f.accounts.unlink(P, 'email');
+    if (change === 'rebound') { f.accounts.unlink(P, 'email'); f.accounts.link(P, 'email', { sub: f.accounts.emailId(other) }); }
+    if (change === 'moved') { f.accounts.unlink(P, 'email'); f.accounts.link(Q, 'email', { sub }); }
+    if (change === 'recreated') { f.accounts.remove(P); f.accounts.ensure(P); f.accounts.link(P, 'email', { sub }); f.store.reset(P, f.now()); }
+    if (change === 'reset_save') f.store.reset(P, f.now());
+    const accountBefore = readFileSync(f.file, 'utf8'), saveBefore = readFileSync(f.save, 'utf8');
+    const result = await f.post(payload);
+    expect([result.statusCode, result.json().code]).toEqual([401, 'bad_token']);
+    expect(readFileSync(f.file, 'utf8')).toBe(accountBefore); expect(readFileSync(f.save, 'utf8')).toBe(saveBefore);
+    expect(f.store.peek(P)).toBeDefined(); expect(f.store.peek(Q)).toBeDefined();
+  });
+
+  it('resumes its own persisted tombstone after accounts.remove write failure, even though the email code is spent', async () => {
+    const f = await setup(), address = 'owner@example.test'; f.accounts.link(P, 'email', { sub: f.accounts.emailId(address) });
+    f.email.codes.put(address, '123456'); const o = await f.options();
+    const remove = f.accounts.remove.bind(f.accounts);
+    vi.spyOn(f.accounts, 'remove').mockImplementationOnce(player => { mkdirSync(f.file + '.tmp'); remove(player); });
+    const payload = { challenge: o.challenge, confirmed: true, provider: 'email', email: address, code: '123456' };
+    expect((await f.post(payload)).json().code).toBe('delete_failed');
+    expect(f.accounts.isDeleted(P)).toBe(true); expect(f.accounts.find(P)).toBeUndefined(); expect(f.store.peek(P)).toBeDefined();
+    rmSync(f.file + '.tmp', { recursive: true }); f.tick(10);
+    expect((await f.post(payload)).json()).toEqual({ ok: true });
+    expect(f.store.peek(P)).toBeUndefined(); expect(f.store.peek(Q)).toBeDefined();
+    expect(f.accounts.deletedPlayers().find(p => p.player === P)?.at).toBe(T);
+  });
+
+  it('does not claim a tombstone created by a different operation as this challenge’s authorization to resume', async () => {
+    const f = await setup(), address = 'owner@example.test'; f.accounts.link(P, 'email', { sub: f.accounts.emailId(address) });
+    f.email.codes.put(address, '123456'); const o = await f.options();
+    vi.spyOn(f.accounts, 'markDeleted').mockImplementationOnce(() => { throw new Error('disk'); });
+    const payload = { challenge: o.challenge, confirmed: true, provider: 'email', email: address, code: '123456' };
+    expect((await f.post(payload)).json().code).toBe('delete_failed');
+    f.tick(1); f.accounts.markDeleted(P, f.now()); f.accounts.remove(P);
+    expect((await f.post(payload)).json().code).toBe('bad_token'); expect(f.store.peek(P)).toBeDefined();
+  });
+
+  it('its own tombstone does not authorize deleting a target rebound or rebuilt after the failed remove', async () => {
+    const f = await setup(), address = 'owner@example.test'; f.accounts.link(P, 'email', { sub: f.accounts.emailId(address) });
+    f.email.codes.put(address, '123456'); const o = await f.options();
+    const remove = f.accounts.remove.bind(f.accounts);
+    vi.spyOn(f.accounts, 'remove').mockImplementationOnce(player => { mkdirSync(f.file + '.tmp'); remove(player); });
+    const payload = { challenge: o.challenge, confirmed: true, provider: 'email', email: address, code: '123456' };
+    expect((await f.post(payload)).json().code).toBe('delete_failed');
+    rmSync(f.file + '.tmp', { recursive: true }); f.tick(1);
+    f.accounts.ensure(P); f.accounts.link(P, 'email', { sub: f.accounts.emailId('new-owner@example.test') });
+    const before = readFileSync(f.file, 'utf8');
+    expect((await f.post(payload)).json().code).toBe('bad_token');
+    expect(readFileSync(f.file, 'utf8')).toBe(before); expect(f.store.peek(P)).toBeDefined();
+  });
+
+  it('shares PR1077 revocation floor: revoked Apple proof cannot delete via web, including a cached retry', async () => {
+    const f = await setup(); f.accounts.link(P, 'apple', { sub: 'apple-subject', aud: APP, refresh: 'fake-refresh' });
+    const o = await f.options(), payload = { challenge: o.challenge, confirmed: true, provider: 'apple', id_token: f.token(o) };
+    vi.spyOn(f.accounts, 'markDeleted').mockImplementationOnce(() => { throw new Error('disk'); });
+    expect((await f.post(payload)).json().code).toBe('delete_failed');
+    f.tick(2000); expect((await f.revoke()).json()).toEqual({ ok: true });
+    expect(f.accounts.find(P)?.apple?.sub).toBe('apple-subject'); // Revocation intentionally keeps binding/farm.
+    expect((await f.post(payload)).json().code).toBe('bad_token'); expect(f.store.peek(P)).toBeDefined();
+    const another = await f.options();
+    expect((await f.post({ ...payload, challenge: another.challenge, id_token: f.token(another, 'apple', { iat: Math.floor(T / 1000) - 1 }) })).json().code).toBe('bad_token');
+    const reloaded = new AppleNotificationJournal(f.journalFile, f.now);
+    expect(() => reloaded.authorized('apple-subject', T - 1000)).toThrow('AUTHORIZATION_REVOKED');
+    f.tick(3000); const fresh = await f.options();
+    expect((await f.post({ ...payload, challenge: fresh.challenge, id_token: f.token(fresh) })).json()).toEqual({ ok: true });
+    expect(f.store.peek(P)).toBeUndefined();
+  });
+
   it.each(['apple', 'google'])('%s proof deletes only its bound farm and every repeat returns success without new sign-in tokens', async provider => {
     const f = await setup();
     if (provider === 'apple') f.accounts.link(P, 'apple', { sub: 'apple-subject', aud: APP, refresh: 'fake-refresh' });

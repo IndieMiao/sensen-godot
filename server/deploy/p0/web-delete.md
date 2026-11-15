@@ -24,6 +24,10 @@ Apple JS popup和Google Identity Services拿nonce_hash申请ID token；服务端
 挑战绑定请求IP，随机256位、总量上限2000；每IP整个网页API每分钟30次，邮箱另用共享每地址/IP/全局限额。
 挑战与限流记录按期回收，重启失效；没有token、邮箱、验证码存浏览器localStorage或服务端文件。
 
+依赖 #1077 固定头3499069d的Apple撤销journal：网页Apple验签也接同一个authorized水位钩子。
+初次证明记录已验证JWT的iat，活账号失败重试时再次检查水位；撤销前旧证明不可借网页缓存绕过，
+新的真实Apple证明按同一水位规则重新授权。不以收到请求的时间替代JWT签发时间。
+
 `POST /v1/web/email/start {email,lang?}` 是App发码handler的另一注册点，经过网页Origin/IP检查；不暴露邮箱有无账号。
 这不是另一个码表或额度池。邮件服务短暂处理收件明文；身份查找用既有HMAC(email)，本服务不打印邮箱或验证码。
 
@@ -35,6 +39,11 @@ Apple JS popup和Google Identity Services拿nonce_hash申请ID token；服务端
 不收player/support_code代替身份证明，不建档、不发游戏session。身份不存在回no_farm。
 同challenge并发共用操作，成功结果短时幂等；本地写失败时保留已验目标供同challenge重试，避免邮箱码已消费后无法续删。
 更换身份或IP不能用原挑战；过期需重新验证。账号被停用仍能依法删除。
+
+缓存证明同时保存账号/存档created_at代次，重试先核当前双向绑定及代次。活账号原绑定被移除、换绑、
+转移到另一号或目标重建，旧挑战返回bad_token，必须重新证明，不能因为owner为空就放行。
+仅本次deleteAccount同步阶段从无到有产生且时间仍相同的tombstone允许已花验证码的续删；
+外部操作的墓碑、不一致的新账号/绑定/存档不能被旧挑战接管。重启后挑战失效，跨进程补删交管理口。
 
 删除复用deleteAccount：正常或ACCOUNT_DELETE_INCOMPLETE回ok（后者脱敏告警，交管理补删）；其他异常500 delete_failed。
 Apple撤销使用存档已有的aud/refresh回调，不将网页Services ID硬编码到原令牌的client_id；没有refresh时沿共用逻辑记录skip，

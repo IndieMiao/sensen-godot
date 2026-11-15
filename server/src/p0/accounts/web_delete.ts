@@ -11,7 +11,8 @@ import { supportCode } from '../support.js';
 import { webDeletePage } from './web_delete_page.js';
 
 type Result = { status: number; body: Record<string, unknown> };
-type Verified = { provider: Provider; sub: string; player: string };
+type Verified = { provider: Provider; sub: string; player: string; accountCreated: number; saveCreated?: number;
+  deletionAt?: number; appleIssuedAt?: number };
 interface Ticket { ip: string; nonce: string; at: number; verified?: Verified; requestHash?: string; job?: Promise<Result>; result?: Result }
 export interface WebDeleteDeps extends DeleteDeps {
   appleWeb?: AppleVerifyOptions;
@@ -47,10 +48,15 @@ export function registerWebDeleteRoutes(app: FastifyInstance, deps: WebDeleteDep
     if (!ticket.verified) {
       const provider = b.provider;
       let sub: string;
+      let appleIssuedAt: number | undefined;
       try {
         if (provider === 'apple') {
           if (!deps.appleWeb || !deps.appleClientId) return failed(503, 'provider_unavailable');
-          sub = (await verifyAppleIdToken(b.id_token, ticket.nonce, deps.appleWeb)).sub;
+          sub = (await verifyAppleIdToken(b.id_token, ticket.nonce, { ...deps.appleWeb,
+            authorized: (subject, issuedAt) => {
+              deps.appleWeb!.authorized?.(subject, issuedAt);
+              appleIssuedAt = issuedAt;
+            } })).sub;
         } else if (provider === 'google') {
           if (!deps.googleWeb || !deps.googleClientId) return failed(503, 'provider_unavailable');
           sub = (await verifyGoogleIdToken(b.id_token, ticket.nonce, deps.googleWeb)).sub;
@@ -70,14 +76,35 @@ export function registerWebDeleteRoutes(app: FastifyInstance, deps: WebDeleteDep
       if (deps.now() - ticket.at >= TEN_MIN) return failed(410, 'code_expired');
       // The identity may have changed while JWKS was fetched: resolve its owner only after the last verification await.
       const player = deps.accounts.byIdentity(provider, sub);
-      if (!player || deps.accounts.isDeleted(player) || !deps.accounts.find(player)) return failed(404, 'no_farm');
-      ticket.verified = { provider, sub, player };
+      const row = player ? deps.accounts.find(player) : undefined;
+      if (!player || deps.accounts.isDeleted(player) || !row || row[provider]?.sub !== sub) return failed(404, 'no_farm');
+      ticket.verified = { provider, sub, player, accountCreated: row.created_at,
+        saveCreated: deps.store.peek(player)?.created_at, appleIssuedAt };
     }
     const verified = ticket.verified;
     if (b.provider !== verified.provider) return failed(400, 'schema');
     const owner = deps.accounts.byIdentity(verified.provider, verified.sub);
-    if (owner && owner !== verified.player) return failed(401, 'bad_token');
-    try { await deleteAccount(deps, verified.player); }
+    const row = deps.accounts.find(verified.player), save = deps.store.peek(verified.player);
+    const tombstoneAt = deps.accounts.deletedPlayers().find(p => p.player === verified.player)?.at;
+    const ownTombstone = verified.deletionAt !== undefined && tombstoneAt === verified.deletionAt;
+    const sameBinding = row?.created_at === verified.accountCreated && row[verified.provider]?.sub === verified.sub;
+    if ((tombstoneAt !== undefined && !ownTombstone)
+      || (row && row.created_at !== verified.accountCreated) || (save && save.created_at !== verified.saveCreated)
+      || !(owner === verified.player && sameBinding
+        || ownTombstone && owner === undefined && (!row || sameBinding))) return failed(401, 'bad_token');
+    // A live account still needs a currently valid Apple authorization, even if a prior web proof was cached.
+    // Only this operation's own tombstone permits finishing an already-started deletion without spending proof again.
+    if (verified.provider === 'apple' && !ownTombstone) {
+      try { deps.appleWeb?.authorized?.(verified.sub, verified.appleIssuedAt!); }
+      catch (e) { return e instanceof IdTokenError ? failed(401, 'bad_token') : failed(503, 'provider_unavailable'); }
+    }
+    try {
+      const operation = deleteAccount(deps, verified.player);
+      // deleteAccount runs its accounts writes synchronously before the first await. Do not claim a pre-existing marker.
+      const after = deps.accounts.deletedPlayers().find(p => p.player === verified.player)?.at;
+      if (tombstoneAt === undefined && after !== undefined) verified.deletionAt = after;
+      await operation;
+    }
     catch (e) {
       if (e instanceof Error && e.message === 'ACCOUNT_DELETE_INCOMPLETE') {
         warn('delete_incomplete:' + supportCode(verified.player)); // Same App contract: identity gone, admin finishes residuals.
