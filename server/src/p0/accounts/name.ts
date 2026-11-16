@@ -272,14 +272,22 @@ export function registerNameRoutes(app: FastifyInstance, deps: NameRouteDeps): v
     const raw = nameOf(req.body);
     if (typeof raw !== 'string') return send(reply, refuse(400, 'schema'));
     if (!deps.limiter.take(req.ip, deps.now())) return send(reply, refuse(429, 'rate_limited'));
-    const s = deps.store.find(player, deps.now());
+    let s = deps.store.find(player, deps.now());
     if (!s) return send(reply, refuse(401, 'unauthenticated'));
     const now = deps.now() + s.clock_ms;
     const at = renameAt(s.profile);
     if (at > now) return send(reply, refuse(409, 'rename_too_soon', { rename_at: at }));
     const r = checkName(raw, list());
     if (!r.ok) return send(reply, refuse(400, 'name_rejected', { reason: r.reason }));
-    if (r.name !== s.profile?.name) { setName(s, r.name, now); deps.store.put(s); deps.renamed?.(player); }
+    if (r.name !== s.profile?.name) {
+      // Do not mutate the live store object: put must be able to restore the previous name AND completion fact
+      // if its file write fails, so code sign-in cannot observe a Save that never committed.
+      const next = structuredClone(s);
+      setName(next, r.name, now);
+      deps.store.put(next);
+      s = next;
+      deps.renamed?.(player);
+    }
     return reply.send({ ok: true, name: r.name, rename_at: accountNameView(s, now).rename_at });
   });
 }

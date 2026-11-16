@@ -9,6 +9,7 @@
 import { randomInt } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import type { P0Store } from '../store.js';
+import type { P0State } from '../state.js';
 import { tokenShapeOk, type P0Accounts } from './store.js';
 
 /** Crockford base32 without I, L, O and U: none to mistake for 1 or 0 when copied by hand. */
@@ -33,9 +34,25 @@ export interface CodeRouteDeps {
   warn?: (line: string) => void;
 }
 
+/** Contract v1.6.11: pre-created saves already exist, but may still need NAME and home selection.
+ * Skip has no persisted completion marker. A committed Save (including timestamp 0) resumes home selection;
+ * a completed home never goes back to NAME, even with a default or moderator-reset name. */
+function codeNextStep(state: P0State): 'name' | 'continue' {
+  // A missing optional profile (including historical null) is not a malformed parent object.
+  // Validate parents before reading fields: arrays and primitives otherwise look like absent progress.
+  const object = (value: unknown): boolean => value !== null && typeof value === 'object' && !Array.isArray(value);
+  if (!object(state.travel) || (state.profile != null && !object(state.profile)))
+    throw new Error('Invalid test-code account state');
+  const pending = state.travel?.pending, namedAt = state.profile?.name_set_at;
+  if (!state.travel || (pending !== undefined && typeof pending !== 'boolean')
+    || (namedAt != null && (typeof namedAt !== 'number' || !Number.isSafeInteger(namedAt) || namedAt < 0)))
+    throw new Error('Invalid test-code account state'); // Fixed message; never include a code, token or save.
+  return pending === true && namedAt == null ? 'name' : 'continue';
+}
+
 /**
  * POST /v1/p0/session/code {code, token}, no identity: the code's account signed in on this phone with the client's
- * token — `{ok: true, player}` — its other devices kept. A code unknown, withdrawn, or of an account gone: 401
+ * token — `{ok: true, player, next_step}` — its other devices kept. A code unknown, withdrawn, or of an account gone: 401
  * bad_code. Five tries a minute from an address (429 rate_limited); a tenth refused in a minute is logged, without the
  * address. The account's first time in has no consent: the client takes it through AGE as an old account (old_consent).
  * Not registered without P0_ACCOUNTS_KEY.
@@ -60,10 +77,12 @@ export function registerCodeRoutes(app: FastifyInstance, deps: CodeRouteDeps): v
     if (!tokenShapeOk(b.token)) return reply.code(400).send({ ok: false, code: typeof b.token === 'string' ? 'token_too_short' : 'schema' });
     const token = String(b.token).toLowerCase();
     const owner = typeof b.code === 'string' && b.code.length <= 32 ? accounts.codeOwner(b.code) : undefined;
-    if (!owner || accounts.isDeleted(owner.player) || !store.find(owner.player, now)) return reply.code(401).send({ ok: false, code: 'bad_code' });
+    const state = owner && !accounts.isDeleted(owner.player) ? store.peek(owner.player) : undefined;
+    if (!owner || !state) return reply.code(401).send({ ok: false, code: 'bad_code' });
     const held = accounts.tokenOwner(token);
     if (held && held !== owner.player) return reply.code(400).send({ ok: false, code: 'schema' });   // a token is one player's only
+    const next_step = codeNextStep(state); // Validate the current authoritative facts before issuing a token.
     if (!held) accounts.issue(owner.player, token, 'user', undefined, owner.key);   // no signIn: its other devices stay
-    return { ok: true, player: owner.player };
+    return { ok: true, player: owner.player, next_step };
   });
 }
