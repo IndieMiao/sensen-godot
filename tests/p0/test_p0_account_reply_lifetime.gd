@@ -87,6 +87,7 @@ func test_terminal_refusal_while_already_false_expires_older_consent_success() -
 		rt.session.identity.token = "ab".repeat(32)
 		rt.session.identity_ready = false
 		states.clear()
+		outcomes.clear()   # each refusal variant is independent, including the unfixed negative control
 		rt.session._ui_events.clear()
 		var consent := _consent()
 		var room: Room = auto_free(Room.new())
