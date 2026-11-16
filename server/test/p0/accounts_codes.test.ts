@@ -69,10 +69,10 @@ describe('test codes (contract v1.4 §4)', () => {
     const { player, code } = (await adm('/admin/code', { note: 'review-play' })).json();
     accounts.issue(player, tok(9));   // were it signed in another way: kept
     const r1 = await signIn(code, tok(1));
-    expect(r1.json()).toEqual({ ok: true, player });
-    expect((await signIn(` ${code.toLowerCase().replace(/-/g, ' ')} `, tok(2), '203.0.113.9')).json()).toEqual({ ok: true, player });
+    expect(r1.json()).toEqual({ ok: true, player, next_step: 'name' });
+    expect((await signIn(` ${code.toLowerCase().replace(/-/g, ' ')} `, tok(2), '203.0.113.9')).json()).toEqual({ ok: true, player, next_step: 'name' });
     for (const t of [tok(1), tok(2), tok(9)]) expect(accounts.byToken(t)).toEqual({ player, kind: 'user' });
-    expect((await signIn(code, tok(1))).json()).toEqual({ ok: true, player });   // the same token again: the same answer
+    expect((await signIn(code, tok(1))).json()).toEqual({ ok: true, player, next_step: 'name' });   // the same token again: the same answer
   });
 
   it("a store review's account is marked test for the counts only (q(322) ②, 奕星 A): the same start as any new player, no way in without its code", async () => {
@@ -92,7 +92,7 @@ describe('test codes (contract v1.4 §4)', () => {
     expect(Object.keys(r).filter(k => k !== 'test').sort()).toEqual(Object.keys(t).sort());   // no other field: test alone
     // test is not the OSS test page's accounts: no sign-in skipped — its id alone is turned away (claimed: a code)
     expect(identify({ 'x-p0-player': review.player }, { accounts, legacyId: false })).toMatchObject({ status: 426 });
-    expect((await signIn(review.code, tok(8))).json()).toEqual({ ok: true, player: review.player });
+    expect((await signIn(review.code, tok(8))).json()).toEqual({ ok: true, player: review.player, next_step: 'name' });
   });
 
   it('refuses: a wrong code as bad_code, nothing said of why; a token shape; a token of another account', async () => {
