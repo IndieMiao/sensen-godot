@@ -5019,16 +5019,23 @@ func set_voice_room(r: Node) -> void:
 	if is_instance_valid(voice_room):
 		for s in [[&"changed", _voice_refresh], [&"age_needed", open_age_card]]:
 			if voice_room.is_connected(s[0], s[1]): voice_room.disconnect(s[0], s[1])
+		if voice_room.has_signal("notice") and voice_room.is_connected("notice", _voice_notice):
+			voice_room.disconnect("notice", _voice_notice)
 	voice_room = r if live else null
 	_has_voice_room = live
 	_mic_was_on = false
 	if voice_room:
 		voice_room.connect(&"changed", _voice_refresh)
 		voice_room.connect(&"age_needed", open_age_card)
+		if voice_room.has_signal("notice"): voice_room.connect("notice", _voice_notice)
 	if modal_kind == "people": close_modal()
 	_voice_refresh()
 
 func _voice() -> Node: return voice_room.get("voice") if voice_room else null
+
+func _voice_notice(text: String, failed: bool) -> void:
+	if failed: show_sys(UiSysBanner.Kind.CMD_FAIL, text)
+	else: toast(text)
 
 func _mic_on() -> bool:
 	var v := _voice()
@@ -5053,7 +5060,8 @@ func _voice_refresh() -> void:
 	if v != null and str(v.get("error")) == "MICROPHONE_DENIED": _mic_denied = true
 	_voice_keys.show_mic(offered)
 	var on := offered and _mic_on()
-	_voice_keys.set_mic(on)
+	var blocked := voice_room.has_method("mic_blocked") and bool(voice_room.call("mic_blocked"))
+	_voice_keys.set_mic(on, blocked)
 	var rows: Array = voice_room.call("people")
 	_voice_keys.set_count(rows.size())
 	var crowd = voice_room.get("online").get("crowd") if voice_room.get("online") else null
@@ -5070,6 +5078,9 @@ func _voice_refresh() -> void:
 
 func _on_mic_pressed() -> void:
 	if voice_room == null: return
+	if voice_room.has_method("mic_blocked") and bool(voice_room.call("mic_blocked")):
+		voice_room.call("toggle_mic")
+		return
 	if _mic_denied:   # the system box comes only the first time (§2): from then on the key says why and stays off
 		toast(PartyVoiceSession.error_text("MICROPHONE_DENIED"))
 		return

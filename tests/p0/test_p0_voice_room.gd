@@ -41,7 +41,7 @@ func after_test() -> void:
 
 func _room(role := "tea") -> Array:
 	asked = []
-	answers = {"status": {"ok": true, "available": true, "age": "unknown"}, "age": {"ok": true, "available": true, "age": "ok"}}
+	answers = {"status": {"ok": true, "available": true, "age": "unknown", "ban": null}, "age": {"ok": true, "available": true, "age": "ok", "ban": null}}
 	var online: P0Online = auto_free(P0Online.new())
 	online.transport = func(_m): pass
 	online._message(JSON.stringify({"t": "joined", "outpost": "sh_tea_1", "room": 1, "capacity": 12, "rejoined": false, "self": 1, "epoch": 2}))
@@ -78,11 +78,11 @@ func test_a_no_hides_voice_and_market_square_has_it_since_q286() -> void:
 	var f := _room()
 	var room: P0VoiceRoom = f[0]
 	await room.fetch_status()
-	answers["age"] = {"ok": true, "available": true, "age": "no"}
+	answers["age"] = {"ok": true, "available": true, "age": "no", "ban": null}
 	await room.answer_age(false)
 	assert_bool(room.offered()).is_false()
 	var m := _room("market")
-	answers["status"] = {"ok": true, "available": true, "age": "ok"}
+	answers["status"] = {"ok": true, "available": true, "age": "ok", "ban": null}
 	await m[0].fetch_status()
 	assert_bool(m[0].offered()).is_true()   # q(286): Market Square's whole layer has voice (SGODOT-415)
 
@@ -90,7 +90,7 @@ func test_a_no_hides_voice_and_market_square_has_it_since_q286() -> void:
 ## answering yes or not.
 func test_the_cathedral_has_no_voice() -> void:
 	var c := _room("church")
-	answers["status"] = {"ok": true, "available": true, "age": "ok"}
+	answers["status"] = {"ok": true, "available": true, "age": "ok", "ban": null}
 	await c[0].fetch_status()
 	assert_bool(c[0].here).is_false()
 	assert_bool(c[0].offered()).is_false()

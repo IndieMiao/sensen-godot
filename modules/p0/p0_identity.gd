@@ -12,6 +12,8 @@ const SESSION := "p0_session.json"
 const PLAYER := "p0_player.txt"
 const FIRST_RUN := "p0_first_run.json"   # the AGE page's record (哪吒's P0AccFlow writes it)
 const TOKEN_BYTES := 32
+## In-memory login lifetime, including forgetting/re-entering the same player. Never a network/save field.
+var generation := 0
 
 ## send.call(method: int, path: String, body: Dictionary, done: Callable): done.call(reply: Dictionary) — a reply is the
 ## server's JSON, or {ok: false, code: "network"} when none came. P0Session's _account_request.
@@ -246,6 +248,7 @@ static func new_token() -> String:
 
 ## The session kept: p0_session.json, and the player in p0_player.txt too.
 func _keep(p: String, t: String, l: Array) -> void:
+	generation += 1
 	player = p
 	token = t
 	linked = l
@@ -256,6 +259,7 @@ func _keep(p: String, t: String, l: Array) -> void:
 ## Gone (account_deleted, a deletion, or Sign in from a replaced session): the token and the session file; the player's
 ## id file too unless `keep_id`. The AGE page's 「没过」 stays (p0_first_run.json is not this one's).
 func forget(keep_id := false) -> void:
+	generation += 1
 	token = ""
 	linked = []
 	_launch_token = ""

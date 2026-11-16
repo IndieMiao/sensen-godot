@@ -358,10 +358,12 @@ func test_rename_http_and_native_sheet_are_both_guards_and_release_on_answer() -
 
 func test_a_late_old_flow_reply_cannot_unlock_a_new_flow_request() -> void:
 	_open()
-	var old_reply := rt._acc_reply(func(_r): pass)
+	var old_calls := []
+	var old_reply := rt._acc_reply(func(_r): old_calls.append(true))
 	_open()
 	var new_reply := rt._acc_reply(func(_r): pass)
 	old_reply.call({"ok": false, "code": "network"})
+	assert_array(old_calls).is_empty()   # retired UI callbacks cannot alter the new flow either
 	assert_int(rt._acc_requests).is_equal(1)
 	new_reply.call({"ok": false, "code": "network"})
 	assert_int(rt._acc_requests).is_equal(0)

@@ -25,7 +25,7 @@ func _room() -> Array:
 	var v: FakeVoice = auto_free(FakeVoice.new())
 	var room: P0VoiceRoom = auto_free(P0VoiceRoom.new())
 	room.voice = v
-	var answers := {"status": {"available": true, "age": "unknown"}, "age": {"age": "ok"}, "report": {"result": "sent"}}
+	var answers := {"status": {"available": true, "age": "unknown", "ban": null}, "age": {"age": "ok"}, "report": {"result": "sent"}}
 	room.request = func(_m: int, path: String, _b: Dictionary) -> Dictionary:
 		return {"ok": true, "json": answers.get(path.get_file(), {})}
 	room.setup(null, online, "tea")
@@ -81,7 +81,7 @@ func test_a_child_s_answer_hides_voice() -> void:
 	var f := _room()
 	var room: P0VoiceRoom = f[0]
 	room.request = func(_m: int, path: String, b: Dictionary) -> Dictionary:
-		return {"ok": true, "json": {"available": true, "age": "unknown"} if path.get_file() == "status" else {"age": "ok" if b.get("ok") else "no"}}
+		return {"ok": true, "json": {"available": true, "age": "unknown", "ban": null} if path.get_file() == "status" else {"age": "ok" if b.get("ok") else "no"}}
 	ui.set_voice_room(room)
 	await room.fetch_status()
 	ui._voice_keys.mic.pressed.emit()
@@ -331,7 +331,7 @@ func test_a_room_with_no_voice_has_no_pill_either() -> void:
 	online.transport = func(_m): pass
 	var room: P0VoiceRoom = auto_free(P0VoiceRoom.new())
 	room.voice = auto_free(FakeVoice.new())
-	room.request = func(_m: int, _p: String, _b: Dictionary) -> Dictionary: return {"ok": true, "json": {"available": true, "age": "ok"}}
+	room.request = func(_m: int, _p: String, _b: Dictionary) -> Dictionary: return {"ok": true, "json": {"available": true, "age": "ok", "ban": null}}
 	room.setup(null, online, "church")
 	ui.set_voice_room(room)
 	await room.fetch_status()

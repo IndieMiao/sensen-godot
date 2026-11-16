@@ -26,7 +26,7 @@ var _p0 := false
 ## Refusals a retry cannot mend: the session ends with the code (Journey's, and P0's voice/join — 后裔 on #645: voice off,
 ## not in a room, a room without voice such as Market Square, the voice room full, the age gate, no player key).
 const FINAL_CODES := ["UNAUTHENTICATED", "VOICE_NO_PARTY", "VOICE_FULL", "MICROPHONE_DENIED",
-	"VOICE_OFF", "NOT_IN_ROOM", "VOICE_NOT_HERE", "VOICE_ROOM_FULL", "AGE_GATE"]
+	"VOICE_OFF", "NOT_IN_ROOM", "VOICE_NOT_HERE", "VOICE_ROOM_FULL", "AGE_GATE", "VOICE_BANNED"]
 var _wanted := false
 var _request_id := ""
 var _native_id := ""
@@ -106,6 +106,8 @@ func _start(request: Callable, p0: bool) -> void:
 	_request = request
 	_p0 = p0
 	_generation += 1
+	_joining = false
+	_polling = false
 	_request_id = _id()
 	_native_id = _id()
 	_wanted = true
@@ -115,6 +117,8 @@ func _start(request: Callable, p0: bool) -> void:
 
 func leave() -> void:
 	_generation += 1
+	_joining = false
+	_polling = false
 	_wanted = false
 	_desired_microphone = false
 	_desired_listening = true
@@ -140,6 +144,8 @@ func _release(request: Callable, lease: String) -> void:
 func invalidate_membership() -> void:
 	if not _wanted: return
 	_generation += 1
+	_joining = false
+	_polling = false
 	# Stop receiving from a retired room before requesting a fresh grant.
 	_drop_native()
 	state = "reconnecting"
@@ -228,10 +234,14 @@ func _connect_voice() -> void:
 	var generation := _generation
 	var request := _request
 	var started := Time.get_ticks_msec()
+	_heartbeat_at = started + 3000   # pace another attempt even if this completion becomes obsolete
 	var result: Dictionary = await request.call("join", {"request_id": _request_id})
-	_joining = false
 	var json: Dictionary = result.get("json", {}) if result.get("json") is Dictionary else {}
 	if generation != _generation or not _wanted or not _foreground:
+		if bool(result.get("ok", false)) and json.has("lease_id"): _release(request, str(json.lease_id))
+		return
+	_joining = false
+	if bool(result.get("stale", false)):
 		if bool(result.get("ok", false)) and json.has("lease_id"): _release(request, str(json.lease_id))
 		return
 	if not bool(result.get("ok", false)):
@@ -270,9 +280,11 @@ func _heartbeat() -> void:
 	var generation := _generation
 	var lease := _lease_id
 	var started := Time.get_ticks_msec()
+	_heartbeat_at = started + 4500   # an obsolete reply must not cause an every-frame retry or extend the lease
 	var result: Dictionary = await _request.call("heartbeat", {"lease_id": lease})
-	_polling = false
 	if generation != _generation or not _wanted: return
+	_polling = false
+	if bool(result.get("stale", false)): return
 	var json: Dictionary = result.get("json", {}) if result.get("json") is Dictionary else {}
 	var ok := bool(result.get("ok", false))
 	_heartbeat_at = Time.get_ticks_msec() + (4500 if ok else 1500)
