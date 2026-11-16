@@ -1502,6 +1502,7 @@ func _close_acc_flow() -> void:
 	_acc_generation += 1
 	_acc_requests = 0
 	_signing = false
+	session.invalidate_account_requests()
 	if is_instance_valid(_acc_layer): _acc_layer.queue_free()
 	_acc_layer = null
 	_acc_flow = null
