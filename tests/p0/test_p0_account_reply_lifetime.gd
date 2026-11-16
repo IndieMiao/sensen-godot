@@ -172,3 +172,153 @@ func test_old_code_success_after_new_authorization_cannot_persist_identity() -> 
 	assert_str(rt.session.identity.player).is_equal("p0-context-original")
 	assert_str(rt.session.identity.token).is_equal("ab".repeat(32))
 	assert_bool(FileAccess.file_exists(DIR + "p0_session.json")).is_false()
+
+## Real loopback HTTP control: accept the actual bytes emitted by P0HttpRequest, then choose response order.
+## No production callback signal is emitted by this fixture; no external server or real credentials are used.
+class Loopback extends Node:
+	var server := TCPServer.new()
+	var connections: Array = []
+	var requests: Array = []
+
+	func start() -> Error: return server.listen(0, "127.0.0.1")
+
+	func _process(_dt: float) -> void:
+		while server.is_connection_available():
+			connections.append({"peer": server.take_connection(), "raw": PackedByteArray(), "received": false})
+		for c in connections:
+			var peer: StreamPeerTCP = c.peer
+			peer.poll()
+			if c.received or peer.get_available_bytes() == 0: continue
+			var chunk := peer.get_data(peer.get_available_bytes())
+			if chunk[0] != OK: continue
+			c.raw.append_array(chunk[1])
+			var raw: String = c.raw.get_string_from_utf8()
+			var end := raw.find("\r\n\r\n")
+			if end < 0: continue
+			var length := 0
+			for header in raw.substr(0, end).split("\r\n"):
+				if header.to_lower().begins_with("content-length:"): length = int(header.split(":", true, 1)[1])
+			if c.raw.size() < end + 4 + length: continue
+			var line := raw.get_slice("\r\n", 0).split(" ")
+			c.received = true
+			requests.append({"peer": peer, "method": line[0], "path": line[1], "claimed": false})
+			c.raw = PackedByteArray()   # do not retain/log headers containing the synthetic token
+			print("LIFETIME HTTP received ", line[0], " ", line[1])
+
+	func respond(row: Dictionary, code: int, body: Dictionary) -> Error:
+		var payload := JSON.stringify(body).to_utf8_buffer()
+		var headers := ("HTTP/1.1 %d Test\r\nContent-Type: application/json\r\nContent-Length: %d\r\nConnection: close\r\n\r\n" % [code, payload.size()]).to_utf8_buffer()
+		headers.append_array(payload)
+		print("LIFETIME HTTP reply ", code, " ", row.path)
+		return row.peer.put_data(headers)
+
+	func close() -> void:
+		for c in connections: c.peer.disconnect_from_host()
+		server.stop()
+		connections.clear()
+		requests.clear()
+
+	func _exit_tree() -> void: close()
+
+func _wire() -> Loopback:
+	var wire: Loopback = auto_free(Loopback.new())
+	add_child(wire)
+	assert_int(wire.start()).is_equal(OK)
+	rt.session.base_url = "http://127.0.0.1:%d" % wire.server.get_local_port()
+	return wire
+
+func _received(wire: Loopback, path: String) -> Dictionary:
+	var deadline := Time.get_ticks_msec() + 3000
+	while Time.get_ticks_msec() < deadline:
+		for row in wire.requests:
+			if row.path == path and not row.claimed:
+				row.claimed = true
+				return row
+		await get_tree().process_frame
+	assert_bool(false).override_failure_message("Real HTTP request missing: " + path).is_true()
+	return {}
+
+func _wire_answer(wire: Loopback, row: Dictionary, http: P0HttpRequest, status: int, body: Dictionary) -> void:
+	var completed := []
+	http.request_completed.connect(func(result, code, _headers, _raw): completed.append([result, code]))
+	assert_int(wire.respond(row, status, body)).is_equal(OK)
+	var deadline := Time.get_ticks_msec() + 3000
+	while completed.is_empty() and Time.get_ticks_msec() < deadline: await get_tree().process_frame
+	assert_array(completed).contains_exactly([[HTTPRequest.RESULT_SUCCESS, status]])
+
+func test_real_http_terminal_refusal_before_old_consent_200() -> void:
+	var wire := _wire()
+	for code in ["session_replaced", "account_deleted", "suspended", "unauthenticated"]:
+		_open("old_signin")
+		rt.ui.hide_screen()
+		rt.session.identity.token = "ab".repeat(32)
+		rt.session.identity_ready = false
+		states.clear()
+		outcomes.clear()
+		rt.session._ui_events.clear()
+		var consent := _consent()
+		var consent_request := await _received(wire, "/p0/account/consent")
+		assert_str(consent_request.method).is_equal("POST")
+		var room: Room = auto_free(Room.new())
+		room.session = rt.session
+		add_child(room)
+		room.set_process(false)
+		room.fetch_status()
+		var status_http := _last_http(room)
+		var status_request := await _received(wire, "/p0/voice/status")
+		var context := rt.session.request_context()
+		await _wire_answer(wire, status_request, status_http, 403 if code == "suspended" else 401,
+			{"ok": false, "code": code, "until": null})
+		assert_bool(rt.session.request_is_current(context)).override_failure_message(code + " retires context before old HTTP success").is_false()
+		await _wire_answer(wire, consent_request, consent, 200, {"ok": true})
+		_assert_not_released()
+	wire.close()
+	assert_bool(wire.server.is_listening()).is_false()
+
+func test_real_http_flow_replacement_before_old_consent_200() -> void:
+	var wire := _wire()
+	var consent := _consent()
+	var row := await _received(wire, "/p0/account/consent")
+	var context := rt.session.request_context()
+	# Production first-run signal replaces only the flow: no _begin_login or token mutation can mask this guard.
+	rt.session.first_run_needed.emit("new")
+	rt._acc_flow.record_path = RECORD
+	var replacement: Node = rt._acc_flow
+	assert_bool(rt.session.request_is_current(context)).is_true()
+	await _wire_answer(wire, row, consent, 200, {"ok": true})
+	_assert_not_released()
+	assert_object(rt._acc_flow).is_same(replacement)
+	wire.close()
+
+func test_real_http_flow_close_before_old_consent_200() -> void:
+	var wire := _wire()
+	var consent := _consent()
+	var row := await _received(wire, "/p0/account/consent")
+	rt._close_acc_flow()   # lifecycle interruption; not an assertion that pending Back is allowed by the UI
+	await _wire_answer(wire, row, consent, 200, {"ok": true})
+	_assert_not_released()
+	assert_object(rt._acc_flow).is_null()
+	wire.close()
+
+func test_real_http_success_closes_flow_and_new_state_still_completes() -> void:
+	var wire := _wire()
+	rt.session.transport = Callable()   # state must also traverse the real HTTP transport and Session._on_done
+	rt.session.use_line = false
+	var delivered := []
+	rt.session.state_changed.connect(func(_view, _events): delivered.append(true))
+	var consent := _consent(rt._acc_reply(func(r):
+		outcomes.append(r)
+		if bool(r.get("ok", false)): rt._acc_done()))
+	await _wire_answer(wire, await _received(wire, "/p0/account/consent"), consent, 200, {"ok": true})
+	assert_bool(rt.session.identity_ready).is_true()
+	assert_object(rt._acc_flow).is_null()
+	assert_int(outcomes.size()).is_equal(1)
+	assert_bool(rt.session.busy).is_true()
+	var state_http := _last_http(rt.session)
+	var row := await _received(wire, "/p0/state")
+	assert_str(row.method).is_equal("GET")
+	await _wire_answer(wire, row, state_http, 200, {"ok": true})
+	assert_array(delivered).contains_exactly([true])
+	assert_bool(rt.session.busy).is_false()
+	assert_bool(rt.session.identity_ready).is_true()
+	wire.close()
