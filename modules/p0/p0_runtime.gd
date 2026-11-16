@@ -1454,7 +1454,8 @@ func _acc_reply(done: Callable) -> Callable:
 	_acc_requests += 1
 	var generation := _acc_generation
 	return func(r: Dictionary):
-		if generation == _acc_generation: _acc_requests = maxi(0, _acc_requests - 1)
+		if generation != _acc_generation: return   # the result belongs to an account page that has gone
+		_acc_requests = maxi(0, _acc_requests - 1)
 		done.call(r)
 
 ## hello's answer is not `ready`: no world yet. offline keeps the launch cover and asks again; any other opens the pages
@@ -1500,6 +1501,7 @@ func _open_acc_flow(kind: String) -> void:
 func _close_acc_flow() -> void:
 	_acc_generation += 1
 	_acc_requests = 0
+	_signing = false
 	if is_instance_valid(_acc_layer): _acc_layer.queue_free()
 	_acc_layer = null
 	_acc_flow = null
@@ -1519,7 +1521,10 @@ func _on_acc_agreed(age_ok: bool, kind: String) -> void:
 func _on_acc_sign_in(provider: String) -> void:
 	if _signing: return
 	_signing = true
+	var generation := _acc_generation
+	var context := session.request_context()
 	var r: Dictionary = await native_sign_in.call(provider)
+	if generation != _acc_generation or not session.request_is_current(context): return
 	_signing = false
 	if not is_instance_valid(_acc_flow): return
 	if str(r.get("result", "")) == "cancelled":   # closed: nothing said, the keys back

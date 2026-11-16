@@ -25,6 +25,7 @@ signal blocked(code: String, detail: Dictionary)
 signal first_run_needed(kind: String)
 signal account_state(kind: String, detail: Dictionary)
 signal identity_changed(ready: bool)
+signal login_context_changed
 
 const P0Identity := preload("res://modules/p0/p0_identity.gd")   # SGODOT-488: preloaded, no class_name (#764)
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
@@ -46,6 +47,7 @@ var identity_ready := false:
 	set(v):
 		if v == identity_ready: return
 		identity_ready = v
+		if not v: _retire_context()
 		identity_changed.emit(v)
 ## Who this install is to an accounts server (P0Identity: the token, the first launch's way). `accounts` is whether
 ## this launch talks to one — a store / demo build (demo_server.json, unless it says accounts: false) or P0_ACCOUNTS=1;
@@ -53,6 +55,27 @@ var identity_ready := false:
 ## terms_version) turns it off again: legacy.
 var identity := P0Identity.new()
 var accounts := false
+var _session_generation := 0
+
+## Local request ownership only. Never log or send this snapshot (it includes the current token).
+func request_context() -> Array:
+	return [_session_generation, identity.get_instance_id(), identity.generation, player_id, auth_token(), base_url, accounts]
+
+func request_is_current(context: Array) -> bool: return context == request_context()
+
+func _retire_context() -> void:
+	_session_generation += 1
+	_queue.clear()
+	_inflight = {}
+	_refresh_queued = false
+	busy = false
+	if is_instance_valid(line): line.queue_free()
+	line = null
+	login_context_changed.emit()
+
+func _begin_login() -> void:
+	if identity_ready: identity_ready = false
+	else: _retire_context()
 ## The build's channel (x-p0-channel: oss / play / appstore), from demo_server.json; "" sends none.
 var channel := ""
 ## The server's view. SGODOT-260 Q3: current() shares its unchanged parts with every caller, so nothing writes into it:
@@ -152,6 +175,7 @@ func _on_first_run(kind: String) -> void:
 func _identity_ready() -> void:
 	if accounts: player_id = identity.player
 	identity_ready = true
+	login_context_changed.emit()
 	report({"kind": "session_start"})
 	refresh()
 
@@ -163,17 +187,20 @@ func hello(done: Callable) -> void:
 		done.call({"ok": true, "kind": k}))
 ## The sign-ins (contract v1.4–v1.6): each done.call(reply); an ok one has the world's first read out.
 func sign_in(provider: String, creds: Dictionary, done: Callable) -> void:
+	_begin_login()
 	identity.sign_in(provider, creds, _ready_on_ok.bind(done))
 func claim(provider: String, creds: Dictionary, done: Callable) -> void:
+	_begin_login()
 	identity.claim(provider, creds, _ready_on_ok.bind(done))
 func sign_in_pending(done: Callable) -> void:
 	identity.sign_in_pending(_ready_on_ok.bind(done))
 ## A test code's account: signed in, but the world waits for the runtime — the age and terms to report first
 ## (account/consent), as an old account's (contract v1.4 §4); it calls consent, or identity_settled.
 func sign_in_code(code: String, done: Callable) -> void:
+	_begin_login()
 	identity.sign_in_code(code, done)
 func logout(done: Callable) -> void:
-	identity_ready = false
+	_begin_login()
 	identity.logout(done)
 ## App deletion (contract §4): every request stops once it is done; the runtime opens Sign in.
 func delete_account(done: Callable) -> void:
@@ -203,9 +230,11 @@ func _account_request(method: int, path: String, body: Dictionary, done: Callabl
 		done.call({"ok": false, "code": "network"})
 		return
 	var http := P0HttpRequest.new()
+	var context := request_context()
 	add_child(http)
 	http.request_completed.connect(func(result: int, code: int, _h, raw: PackedByteArray):
 		http.queue_free()
+		if not request_is_current(context): return   # before P0Identity can keep/drop a token or invoke UI callbacks
 		var data = JSON.parse_string(raw.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS and code > 0 else null
 		if code == 404 and not data is Dictionary: data = {"ok": false, "code": "not_found"}
 		done.call(data if data is Dictionary else {"ok": false, "code": "network"}))
@@ -338,12 +367,13 @@ func dev_skip(minutes: int) -> void:
 	_request(HTTPClient.METHOD_POST, "/p0/dev/skip", {"minutes": minutes}, {})
 
 func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> void:
+	var context := request_context()
 	busy = true
 	_sent_ms = Time.get_ticks_msec()
 	if bj_mock != null and method == HTTPClient.METHOD_POST and str(cmd.get("type", "")).begins_with("bj_"):
 		var raw := JSON.stringify(bj_mock.command(cmd, view)).to_utf8_buffer()
-		if is_inside_tree(): get_tree().create_timer(_BJ_MOCK_MS / 1000.0).timeout.connect(_finish.bind(HTTPRequest.RESULT_SUCCESS, 200, raw, cmd))
-		else: _finish.call_deferred(HTTPRequest.RESULT_SUCCESS, 200, raw, cmd)
+		if is_inside_tree(): get_tree().create_timer(_BJ_MOCK_MS / 1000.0).timeout.connect(_finish.bind(HTTPRequest.RESULT_SUCCESS, 200, raw, cmd, context))
+		else: _finish.call_deferred(HTTPRequest.RESULT_SUCCESS, 200, raw, cmd, context)
 		return
 	if transport.is_valid():
 		transport.call(method, path, body, cmd)
@@ -353,27 +383,30 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 		line = P0Line.new()
 		add_child(line)
 	if use_line and line != null and line.send(base_url + path, _headers(), method, payload, func(r: int, c: int, _h, raw: PackedByteArray):
+			if not request_is_current(context): return
 			_via = line.last_via if r == HTTPRequest.RESULT_SUCCESS else "line"
-			_finish(r, c, raw, cmd)) == OK:
+			_finish(r, c, raw, cmd, context)) == OK:
 		return
 	_via = "http"
 	var http := P0HttpRequest.new()   # SGODOT-370: 8 s of live time, a world loading is not the server being slow
 	add_child(http)
-	http.request_completed.connect(_on_done.bind(http, cmd))
+	http.request_completed.connect(_on_done.bind(http, cmd, context))
 	var err := http.send(base_url + path, _headers(), method, payload)
 	if err != OK:
 		http.queue_free()
-		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd)
+		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd, context)
 
-func _on_done(result: int, code: int, headers: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary) -> void:
+func _on_done(result: int, code: int, headers: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary, context: Array = []) -> void:
 	http.queue_free()
+	if not context.is_empty() and not request_is_current(context): return
 	# an answer the old way: the line, off after failures, may come back (P0Line.old_way_answered)
 	if line != null and result == HTTPRequest.RESULT_SUCCESS and code > 0: line.old_way_answered(headers)
-	_finish(result, code, raw, cmd)
+	_finish(result, code, raw, cmd, context)
 
 ## One response, in order: handle it while still busy (so commands sent from signal handlers queue behind
 ## the ones already waiting), settle its key, then send the next queued command with the fresh seq.
-func _finish(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> void:
+func _finish(result: int, code: int, raw: PackedByteArray, cmd: Dictionary, context: Array = []) -> void:
+	if not context.is_empty() and not request_is_current(context): return
 	var entry := _inflight
 	_inflight = {}
 	var ms := Time.get_ticks_msec() - _sent_ms   # the line's time, not the handlers' below
@@ -448,7 +481,8 @@ static func account_refusal(result: int, code: int, raw: PackedByteArray) -> Dic
 
 ## A reply to a request outside the queue (the voice room's own HTTP, SGODOT-488): an account refusal there stops this
 ## session as one to a read would (account_state); whether it was one.
-func take_account_refusal(result: int, code: int, raw: PackedByteArray) -> bool:
+func take_account_refusal(result: int, code: int, raw: PackedByteArray, context: Array = []) -> bool:
+	if not context.is_empty() and not request_is_current(context): return false
 	var refusal := account_refusal(result, code, raw) if accounts else {}
 	if refusal.is_empty(): return false
 	_refused(refusal)
