@@ -24,7 +24,10 @@ signal sign_in(provider: String)  # "apple" / "google" / "email"
 signal named(name: String, skip: bool)
 signal sign_in_again             # Try another account (NAME's or the choose card's): the host drops its pending
 signal switch_farm               # the choose card's Switch to that farm
-signal test_code                 # Use a test code (the code page: 11-19～20)
+signal test_code                 # Compatibility notification; the flow now opens ACC-TESTCODE itself.
+signal code_entered(code: String) # Host calls P0Session.sign_in_code, then code_refused on failure.
+signal code_consent_agreed       # Existing age is trusted; only consent was answered now.
+signal code_left(authenticated: bool)
 signal blocked
 signal failed(code: String)      # NAME's check failed (network, rate_limited): the host says so (SYS-CMD-FAIL)
 signal consent_renewed           # the updated-terms card's Continue: the host sends again what consent_outdated refused
@@ -41,6 +44,11 @@ var page: Control                 # the page up now
 var sign_in_page: P0AccSignIn     # kept: the choose card and NAME's way back find it as it was
 var name_page: P0AccName
 var choose: Control               # the choose card while it is up
+const TestCode := preload("res://scenes/p0/account/p0_acc_test_code.gd")
+var code_page: TestCode
+## Current hello policy/legacy facts, supplied by the host before ready; not a fabricated local AGE answer.
+var code_context := {}
+var _code_origin := ""
 var record_path := RECORD
 var _check := Callable()
 var _this_year := 0
@@ -79,10 +87,7 @@ func _ready() -> void:
 	if page != null: return
 	match kind:
 		"old_blocked", "blocked": _show(_block())
-		"no_google":
-			var n := P0AccNoGms.new()
-			n.test_code_pressed.connect(func(): test_code.emit())
-			_show(n)
+		"no_google": _open_no_google()
 		"old_consent":
 			var c := P0AccConsent.new()
 			c.link_pressed.connect(open_link)
@@ -101,13 +106,15 @@ func _notification(what: int) -> void:
 	for p in [sign_in_page, name_page]:   # kept off the tree while another page is up
 		if is_instance_valid(p) and p.get_parent() == null: p.free()
 
-func _age() -> P0AccAge:
+func _age(after := Callable()) -> P0AccAge:
 	var a := P0AccAge.new(_this_year)
 	a.link_pressed.connect(open_link)
 	a.agreed.connect(func(ok: bool):
 		keep(ok)
 		agreed.emit(ok)
-		if ok: _open_sign_in()
+		if ok:
+			if after.is_valid(): after.call()
+			else: _open_sign_in()
 		else:
 			_show(_block())
 			blocked.emit())
@@ -135,8 +142,65 @@ func _open_sign_in() -> void:
 			_provider = p
 			sign_in_page.busy = p != "email"   # email opens its own page (盘古's), no system sheet over this one
 			sign_in.emit(p))
-		sign_in_page.test_code_pressed.connect(func(): test_code.emit())
+		sign_in_page.test_code_pressed.connect(_test_code_pressed)
 	_show(sign_in_page)
+
+func _open_no_google() -> void:
+	var n := P0AccNoGms.new()
+	n.test_code_pressed.connect(_test_code_pressed)
+	_show(n)
+
+func _test_code_pressed() -> void:
+	_code_origin = "no_google" if page is P0AccNoGms else "sign_in"
+	test_code.emit()
+	match code_gate():
+		"blocked": _show(_block())
+		"age": _show(_age(_open_code_page))
+		"consent":
+			var c := P0AccConsent.new()
+			c.link_pressed.connect(open_link)
+			c.agreed.connect(func():
+				keep_versions(code_versions())   # preserve the existing age or its absence; never invent a birth answer
+				code_consent_agreed.emit()
+				_open_code_page())
+			_show(c)
+		_: _open_code_page()
+
+func code_versions() -> Dictionary:
+	return code_context.get("versions", versions())
+
+func code_gate() -> String:
+	var local := kept()
+	var age = code_context.get("age", null)
+	var local_age = local.get("age_ok", null)
+	if (local_age is bool and not local_age) or (age is bool and not age) or kind in ["blocked", "old_blocked"]: return "blocked"
+	if not (local_age is bool and local_age) and not (age is bool and age): return "age"
+	var required := code_versions()
+	for consent in [local, code_context.get("consent", null)]:
+		if consent is Dictionary and str(required.get("terms", "")) != "" and str(required.get("privacy", "")) != "" \
+			and consent.get("terms") == required.terms and consent.get("privacy") == required.privacy: return "ready"
+	return "consent"
+
+func _open_code_page() -> void:
+	code_page = TestCode.new()
+	code_page.submitted.connect(func(code: String): code_entered.emit(code))
+	code_page.back_pressed.connect(_code_back)
+	_show(code_page)
+
+func _code_back() -> void:
+	if not is_instance_valid(code_page) or page != code_page or code_page.busy: return
+	code_left.emit(code_page.authenticated)
+	code_page = null
+	var origin := _code_origin
+	_code_origin = ""
+	if origin == "no_google": _open_no_google()
+	else: _open_sign_in()
+
+func code_authenticated() -> void:
+	if is_instance_valid(code_page) and page == code_page: code_page.mark_authenticated()
+
+func code_refused(reply: Dictionary) -> void:
+	if is_instance_valid(code_page) and page == code_page: code_page.refuse(reply)
 
 ## The host's: signed in, no farm for that account yet (a new player, `fresh`: NAME with Try another account) — or an
 ## old farm claimed, or a test code taken (not fresh: no way back from NAME). A new NAME each time: a name typed for
@@ -239,6 +303,7 @@ func _fade_mark() -> void:
 ## the host's) — the sign-in page's keys back. no_farm / conflict / claimed do it themselves (后裔 11-14).
 func sign_in_settled() -> void:
 	if sign_in_page != null: sign_in_page.busy = false
+	if is_instance_valid(code_page) and page == code_page: code_page.set_busy(false)
 
 ## The host's, after guest or a rename did not take the name: back on NAME with why (name_rejected's reason in red);
 ## pending_expired: the sign-in page again (the host toasts `Sign-in expired. Please sign in again.`).
@@ -303,6 +368,9 @@ func consent_settled(ok: bool) -> void:
 ## return false for Android home. Every other gate consumes Back; the runtime also guards complete HTTP operations.
 func back() -> bool:
 	if is_instance_valid(renew): return true   # the updated-terms card: no way back (spec v2 §9)
+	if is_instance_valid(code_page) and page == code_page:
+		_code_back()
+		return true
 	if sign_in_page != null and page == sign_in_page and sign_in_page.busy: return true
 	if choose != null:
 		_try_another()
@@ -320,7 +388,7 @@ func back() -> bool:
 func keep(ok: bool) -> void:
 	var data := {"age_ok": ok}
 	if ok:
-		var v := versions()
+		var v := code_versions() if _code_origin != "" else versions()
 		data.merge({"terms": str(v.get("terms", "")), "privacy": str(v.get("privacy", "")), "agreed_at": Time.get_unix_time_from_system() * 1000.0})
 	var f := FileAccess.open(record_path, FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(data))

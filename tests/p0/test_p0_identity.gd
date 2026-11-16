@@ -179,7 +179,7 @@ func test_a_test_code_signs_in_and_logout_keeps_the_id() -> void:
 	replies["/p0/hello"] = HELLO
 	var id := _identity()
 	_hello(id)
-	replies["/p0/session/code"] = {"ok": true, "player": "p0-eeeeeeeeeeeeeeeeeeee"}
+	replies["/p0/session/code"] = {"ok": true, "player": "p0-eeeeeeeeeeeeeeeeeeee", "next_step": "name"}
 	id.sign_in_code("ABCD-EFGH-JKMN", func(_r): pass)
 	assert_dict(_sent("/p0/session/code")[0].body).contains_key_value("code", "ABCD-EFGH-JKMN").contains_keys(["token"])
 	assert_bool(id.has_token()).is_true()
@@ -237,3 +237,48 @@ func test_deleting_the_account_drops_the_session_and_the_id() -> void:
 	assert_bool(FileAccess.file_exists(dir + "p0_player.txt")).is_false()
 	assert_str(id.first_run()).is_equal("signed_out")
 	assert_dict(id.hints()).is_equal({"line": "", "with": ""})   # no last-time line for an account gone
+
+func test_test_code_unknown_success_route_does_not_replace_a_previous_identity() -> void:
+	var id := _identity()
+	id._keep("p0-previous", "ab".repeat(32), ["google"])
+	var previous := FileAccess.get_file_as_bytes(dir + "p0_session.json")
+	for route in [null, "unknown", 42, true, {}]:
+		replies["/p0/session/code"] = {"ok": true, "player": "p0-new", "next_step": route}
+		var got: Array = []
+		id.sign_in_code("ABCD-EFGH-JKMN", func(r): got.append(r))
+		assert_str(got[0].code).is_equal("service_contract")
+		assert_str(id.player).is_equal("p0-previous")
+		assert_array(Array(FileAccess.get_file_as_bytes(dir + "p0_session.json"))).is_equal(Array(previous))
+
+func test_test_code_retry_keeps_unconfirmed_token_but_changed_code_uses_a_new_one() -> void:
+	var id := _identity()
+	id.sign_in_code("ABCD-EFGH-JKMN", func(_r): pass)   # network: no success known
+	var first: String = _sent("/p0/session/code")[-1].body.token
+	id.sign_in_code("abcd efgh jkmn", func(_r): pass)
+	assert_str(_sent("/p0/session/code")[-1].body.token).is_equal(first)
+	id.sign_in_code("0123-4567-89AB", func(_r): pass)
+	assert_str(_sent("/p0/session/code")[-1].body.token).is_not_equal(first)
+
+func test_code_attempts_refuse_late_success_before_any_identity_side_effect() -> void:
+	var id := _identity()
+	var callbacks: Array[Callable] = []
+	id.send = func(_m,_p,_b,done): callbacks.append(done)
+	id.sign_in_code("ABCD-EFGH-JKMN",func(_r):pass)
+	id.sign_in_code("0123-4567-89AB",func(_r):pass)
+	callbacks[1].call({"ok":true,"player":"p0-new-code","next_step":"continue"})
+	var stored := FileAccess.get_file_as_bytes(dir+"p0_session.json")
+	callbacks[0].call({"ok":true,"player":"p0-old-code","next_step":"name"})
+	assert_str(id.player).is_equal("p0-new-code")
+	assert_array(Array(FileAccess.get_file_as_bytes(dir+"p0_session.json"))).is_equal(Array(stored))
+	callbacks.clear()   # each stored reply captures this identity; break the fixture-only reference cycle
+	id.send = Callable()
+
+func test_unconfirmed_provider_authorization_never_supplies_a_code_request_token() -> void:
+	var id := _identity()
+	id.sign_in("google",CREDS,func(_r):pass)   # network/uncertain server acceptance
+	var provider_token: String = _sent("/p0/session/google")[-1].body.token
+	id.sign_in_code("ABCD-EFGH-JKMN",func(_r):pass)
+	var code_token: String = _sent("/p0/session/code")[-1].body.token
+	assert_str(code_token).is_not_equal(provider_token)
+	id.sign_in_code("abcd efgh jkmn",func(_r):pass)
+	assert_str(_sent("/p0/session/code")[-1].body.token).is_equal(code_token)
