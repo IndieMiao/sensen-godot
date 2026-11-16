@@ -53,7 +53,7 @@ function fixture() {
       accounts: new P0Accounts(accountFile, KEY, () => NOW), now: () => NOW });
     return freshApp.inject({ method: 'POST', url: '/v1/p0/session/code', payload: { code, token: t } });
   };
-  return { store, accounts, stateFile, issue, signIn, save, renamed, reloadedSignIn,
+  return { store, accounts, stateFile, accountFile, issue, signIn, save, renamed, reloadedSignIn,
     loseNameResponse: () => { discardNameResponse = true; } };
 }
 
@@ -130,5 +130,40 @@ describe('test-code routing from committed state', () => {
     f.store.remove(fresh.player);
     expect((await f.signIn(fresh.code, token(3))).json()).toEqual({ ok: false, code: 'bad_code' });
     expect(f.store.peek(fresh.player)).toBeUndefined(); expect(f.accounts.byToken(token(3))).toBeUndefined();
+  });
+
+  it.each([[], 'broken', 1, false, null, undefined])('rejects malformed travel parent %j before issuing a token', async travel => {
+    const f = fixture(), { player, code } = await f.issue();
+    (f.store.peek(player)! as unknown as { travel: unknown }).travel = travel;
+    const beforeState = readFileSync(f.stateFile, 'utf8'), beforeAccounts = readFileSync(f.accountFile, 'utf8');
+    const r = await f.signIn(code);
+    expect(r.statusCode).toBe(500); expect(r.json().next_step).toBeUndefined();
+    expect(f.accounts.byToken(token(1))).toBeUndefined();
+    expect(readFileSync(f.stateFile, 'utf8')).toBe(beforeState);
+    expect(readFileSync(f.accountFile, 'utf8')).toBe(beforeAccounts);
+  });
+
+  it.each(['broken', [], 1, false])('rejects malformed profile parent %j both live and after real disk reload', async profile => {
+    const f = fixture(), { player, code } = await f.issue();
+    const s = structuredClone(f.store.peek(player)!);
+    (s as unknown as { profile: unknown }).profile = profile;
+    f.store.put(s);
+    const beforeState = readFileSync(f.stateFile, 'utf8'), beforeAccounts = readFileSync(f.accountFile, 'utf8');
+    for (const r of [await f.signIn(code), await f.reloadedSignIn(code, token(2))]) {
+      expect(r.statusCode).toBe(500); expect(r.json().next_step).toBeUndefined();
+    }
+    expect(f.accounts.byToken(token(1))).toBeUndefined();
+    expect(new P0Accounts(f.accountFile, KEY, () => NOW).byToken(token(2))).toBeUndefined();
+    expect(readFileSync(f.stateFile, 'utf8')).toBe(beforeState);
+    expect(readFileSync(f.accountFile, 'utf8')).toBe(beforeAccounts);
+  });
+
+  it.each([undefined, null])('keeps optional profile %j compatible after disk reload', async profile => {
+    const f = fixture(), { player, code } = await f.issue();
+    const s = structuredClone(f.store.peek(player)!);
+    (s as unknown as { profile: unknown }).profile = profile;
+    f.store.put(s);
+    expect((await f.signIn(code)).json()).toEqual({ ok: true, player, next_step: 'name' });
+    expect((await f.reloadedSignIn(code, token(2))).json()).toEqual({ ok: true, player, next_step: 'name' });
   });
 });

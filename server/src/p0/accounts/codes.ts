@@ -38,6 +38,11 @@ export interface CodeRouteDeps {
  * Skip has no persisted completion marker. A committed Save (including timestamp 0) resumes home selection;
  * a completed home never goes back to NAME, even with a default or moderator-reset name. */
 function codeNextStep(state: P0State): 'name' | 'continue' {
+  // A missing optional profile (including historical null) is not a malformed parent object.
+  // Validate parents before reading fields: arrays and primitives otherwise look like absent progress.
+  const object = (value: unknown): boolean => value !== null && typeof value === 'object' && !Array.isArray(value);
+  if (!object(state.travel) || (state.profile != null && !object(state.profile)))
+    throw new Error('Invalid test-code account state');
   const pending = state.travel?.pending, namedAt = state.profile?.name_set_at;
   if (!state.travel || (pending !== undefined && typeof pending !== 'boolean')
     || (namedAt != null && (typeof namedAt !== 'number' || !Number.isSafeInteger(namedAt) || namedAt < 0)))
