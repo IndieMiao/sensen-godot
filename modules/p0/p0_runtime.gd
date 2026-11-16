@@ -1427,6 +1427,8 @@ var _provider := ""   # the last sign-in's account: the conflict card's
 var _signing := false   # a sheet is up: a second tap waits for it
 var _acc_requests := 0   # HTTP after the sheet/name check is also in flight (491 Back matrix, 11-15).
 var _acc_generation := 0
+var _code_retry := Callable()
+var _code_retry_page := 0
 ## The player a world was built for when the pages came up over it (signed out, the key withdrawn, replaced): signing in
 ## again restarts the launch, so no reply of that farm draws on another.
 var _world_player := ""
@@ -1484,12 +1486,23 @@ func _open_acc_flow(kind: String) -> void:
 	_naming = "guest"
 	var e := _entry(script, kind)
 	_acc_flow = script.new(str(e.get("kind", kind)), session.name_check, e.get("providers", []), session.identity.hints(), 0)
+	if "code_context" in _acc_flow:
+		_acc_flow.set("code_context", {"age": session.identity.legacy.get("age", null),
+			"consent": session.identity.legacy.get("consent", null),
+			"versions": {"terms": session.identity.terms_version, "privacy": session.identity.privacy_version}})
 	if "safe_top" in _acc_flow and ui.has_method("safe_top"): _acc_flow.set("safe_top", ui.safe_top())   # its bar under the status bar
 	_acc_layer = CanvasLayer.new()
 	_acc_layer.layer = 120   # over the HUD, the toasts and the system screens
 	add_child(_acc_layer)
 	_acc_layer.add_child(_acc_flow)
 	_acc_flow.connect("agreed", _on_acc_agreed.bind(kind))
+	if _acc_flow.has_signal("code_consent_agreed"):
+		_acc_flow.connect("code_consent_agreed", func(): session.identity.agree(false))
+	if _acc_flow.has_signal("code_left"):
+		_acc_flow.connect("code_left", func(authenticated: bool):
+			_code_retry = Callable()
+			_code_retry_page = 0
+			if authenticated: session.identity.end_code_attempt())
 	_acc_flow.connect("named", _on_acc_named)
 	_acc_flow.connect("sign_in", _on_acc_sign_in)
 	_acc_flow.connect("failed", func(_code: String): _acc_failed({}))
@@ -1498,6 +1511,9 @@ func _open_acc_flow(kind: String) -> void:
 		if _acc_flow.has_signal(pair[0]): _acc_flow.connect(pair[0], pair[1])   # the pages of 11-15 / 11-19 on
 
 func _close_acc_flow() -> void:
+	session.identity.invalidate_code_attempt()   # an old code reply must not persist its identity after this flow ends
+	_code_retry = Callable()
+	_code_retry_page = 0
 	_acc_generation += 1
 	_acc_requests = 0
 	if is_instance_valid(_acc_layer): _acc_layer.queue_free()
@@ -1542,8 +1558,14 @@ static func _native_sign_in(provider: String) -> Dictionary:
 ## A sign-in's answer (a sheet's, session/pending's, a test code's). `how`: sign_in / claim / pending / code.
 func _on_signed_in(r: Dictionary, how: String) -> void:
 	if not is_instance_valid(_acc_flow): return
+	if how == "code":
+		if not bool(r.get("ok", false)):
+			_code_refused(r)
+		elif r.get("next_step") in ["name", "continue"]: _code_signed_in(str(r.next_step))
+		else: _code_refused({"ok": false, "code": "service_contract"})
+		return
 	if bool(r.get("ok", false)):
-		var next: Callable = _name_signed_in if how == "claim" else _code_signed_in if how == "code" else _acc_done
+		var next: Callable = _name_signed_in if how == "claim" else _acc_done
 		if bool(r.get("consent_outdated", false)) and how != "code" and _has_card():
 			# in, but that farm has no consent to today's terms (spec v2 §9): the card first, account/consent, then on —
 			# never the farm nor NAME before it is on record (a code's account reports its own in _code_signed_in).
@@ -1567,11 +1589,8 @@ func _on_signed_in(r: Dictionary, how: String) -> void:
 		"pending_expired":
 			_say("Sign-in expired. Please sign in again.")
 			_acc_flow.call("name_refused", r)
-		"bad_code", "rate_limited" when how == "code":
-			if _acc_flow.has_method("code_refused"): _acc_flow.call("code_refused", r)
 		_: _acc_failed(r)
-	var own_page := str(r.get("code", "")) in ["no_farm", "conflict", "claimed"] \
-		or (how == "code" and str(r.get("code", "")) in ["bad_code", "rate_limited"])
+	var own_page := str(r.get("code", "")) in ["no_farm", "conflict", "claimed"]
 	if not own_page: _settle()   # those bring their own page (code_refused the code page's), the keys back there
 
 ## Sign in's keys back (哪吒's anti double-tap, 11-14): greyed from a tap on apple / google or a code till an answer —
@@ -1585,15 +1604,50 @@ func _name_signed_in() -> void:
 	_naming = "rename"
 	_acc_flow.call("no_farm", false)
 
-## A test code's account (contract v1.4 §4): this phone's AGE answer reported (its voice age set too), then NAME as an
-## old account's. Not passed on this phone (a code typed before any AGE page): the world comes as it is, unreported.
-func _code_signed_in() -> void:
+## Test-code entry has already obtained real age and current consent (including NO-GMS). Both server-directed
+## next steps wait for account/consent; no old view, name or mere existence of a save can decide where it goes.
+func _code_signed_in(next_step: String) -> void:
 	var kept = _acc_flow.call("kept") if _acc_flow.has_method("kept") else {}
-	if not (kept is Dictionary and bool(kept.get("age_ok", false))):
-		session.identity_settled()
-		_name_signed_in()
+	var ready: bool = str(_acc_flow.call("code_gate")) == "ready" if _acc_flow.has_method("code_gate") \
+		else kept is Dictionary and kept.get("age_ok") == true
+	if not ready or next_step not in ["name", "continue"]:
+		_code_refused({"code": "service_contract"})
 		return
-	session.consent(_consent_body(), _acc_reply(_consent_answered.bind(_name_signed_in)))
+	var generation := _acc_generation
+	var next := func():
+		if generation != _acc_generation or not is_instance_valid(_acc_flow): return
+		if next_step == "name": _name_signed_in()
+		else: _acc_done()
+	var player := session.identity.player
+	var token := session.identity.token
+	_code_retry_page = _code_page_id()
+	_code_retry = func():
+		if generation != _acc_generation: return
+		if player != session.identity.player or token != session.identity.token:
+			_code_retry = Callable()
+			_code_refused({"code": "service_contract"})
+			return
+		session.consent(_consent_body(), _acc_reply(func(r: Dictionary):
+			if generation == _acc_generation and player == session.identity.player and token == session.identity.token:
+				_code_consent_answered(r, next)))
+	if _acc_flow.has_method("code_authenticated"): _acc_flow.call("code_authenticated")
+	_code_retry.call()
+
+func _code_page_id() -> int:
+	if not is_instance_valid(_acc_flow): return 0
+	var p = _acc_flow.get("code_page") if "code_page" in _acc_flow else _acc_flow
+	return p.get_instance_id() if is_instance_valid(p) else 0
+
+func _code_refused(reply: Dictionary) -> void:
+	if str(reply.get("code", "")) in ["unauthenticated", "account_deleted", "session_replaced", "suspended"]:
+		session._refused(reply)   # existing higher-priority account gate, never an input error
+	elif is_instance_valid(_acc_flow) and _acc_flow.has_method("code_refused"):
+		_acc_flow.call("code_refused", reply)
+
+func _code_consent_answered(reply: Dictionary, next: Callable) -> void:
+	if not bool(reply.get("ok", false)) and str(reply.get("code", "")) != "consent_outdated" and not _renewing:
+		_code_refused(reply)   # no updated-terms card yet: failure is red on the test-code page
+	else: _consent_answered(reply, next)   # keep the established q(325) update-card / retry behavior
 
 ## Try another account (NAME's, or the conflict card's second key): the ticket dropped; the page goes back to Sign in.
 func _on_acc_sign_in_again() -> void:
@@ -1603,8 +1657,16 @@ func _on_acc_sign_in_again() -> void:
 func _on_acc_switch() -> void:
 	session.sign_in_pending(_acc_reply(_on_signed_in.bind("pending")))
 
+
 func _on_acc_code(code: String) -> void:
-	session.sign_in_code(code, _acc_reply(_on_signed_in.bind("code")))
+	if not is_instance_valid(_acc_flow) or _acc_requests > 0: return
+	if _code_retry.is_valid() and _code_retry_page == _code_page_id():
+		_code_retry.call()
+		return
+	_code_retry = Callable()
+	var generation := _acc_generation
+	session.sign_in_code(code, _acc_reply(func(r: Dictionary):
+		if generation == _acc_generation: _on_signed_in(r, "code")))
 
 ## NAME's Save / Skip: a new account's save made (guest, the sign-in's ticket in it), or the account just signed in
 ## named (rename; Skip keeps its name); then the world comes up under the launch cover, as any launch.

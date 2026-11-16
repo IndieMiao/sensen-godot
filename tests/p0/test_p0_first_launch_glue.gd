@@ -174,7 +174,7 @@ func test_a_test_code_reports_this_phone_s_age_then_name() -> void:
 	replies["/p0/session/code"] = {"ok": false, "code": "bad_code"}
 	flow.code_entered.emit("ABCD-EFGH-JKMN")
 	assert_array(flow.calls).contains_exactly([["code_refused", {"ok": false, "code": "bad_code"}]])
-	replies["/p0/session/code"] = {"ok": true, "player": "p0-eeeeeeeeeeeeeeeeeeee"}
+	replies["/p0/session/code"] = {"ok": true, "player": "p0-eeeeeeeeeeeeeeeeeeee", "next_step": "name"}
 	replies["/p0/account/consent"] = {"ok": true}
 	flow.code_entered.emit("ABCD-EFGH-JKMN")
 	assert_dict(_sent("/p0/account/consent")[0][1]).contains_key_value("age_ok", true).contains_key_value("terms", "2026-11-13")
