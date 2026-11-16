@@ -234,12 +234,16 @@ func _connect_voice() -> void:
 	var generation := _generation
 	var request := _request
 	var started := Time.get_ticks_msec()
+	_heartbeat_at = started + 3000   # pace another attempt even if this completion becomes obsolete
 	var result: Dictionary = await request.call("join", {"request_id": _request_id})
 	var json: Dictionary = result.get("json", {}) if result.get("json") is Dictionary else {}
 	if generation != _generation or not _wanted or not _foreground:
 		if bool(result.get("ok", false)) and json.has("lease_id"): _release(request, str(json.lease_id))
 		return
 	_joining = false
+	if bool(result.get("stale", false)):
+		if bool(result.get("ok", false)) and json.has("lease_id"): _release(request, str(json.lease_id))
+		return
 	if not bool(result.get("ok", false)):
 		_failed(str(json.get("code", "VOICE_UNAVAILABLE")))
 		return
@@ -276,9 +280,11 @@ func _heartbeat() -> void:
 	var generation := _generation
 	var lease := _lease_id
 	var started := Time.get_ticks_msec()
+	_heartbeat_at = started + 4500   # an obsolete reply must not cause an every-frame retry or extend the lease
 	var result: Dictionary = await _request.call("heartbeat", {"lease_id": lease})
 	if generation != _generation or not _wanted: return
 	_polling = false
+	if bool(result.get("stale", false)): return
 	var json: Dictionary = result.get("json", {}) if result.get("json") is Dictionary else {}
 	var ok := bool(result.get("ok", false))
 	_heartbeat_at = Time.get_ticks_msec() + (4500 if ok else 1500)

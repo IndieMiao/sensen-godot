@@ -3,6 +3,7 @@ const Ban := preload("res://modules/p0/p0_voice_ban.gd")
 const Room := preload("res://modules/p0/p0_voice_room.gd")
 const Identity := preload("res://modules/p0/p0_identity.gd")
 const FakeVoice := preload("res://tests/p0/test_p0_voice_room.gd").FakeVoice
+const Backend := preload("res://tests/net/test_voice_session.gd").Backend
 const DIR := "user://test_voice_ban_identity/"
 var old_locale := ""
 
@@ -43,6 +44,39 @@ func _room(session: P0Session = null) -> Room:
 	room.voice = auto_free(FakeVoice.new())
 	room.setup(session, online, "tea")
 	return room
+
+func _grant() -> Dictionary:
+	return {"ok": true, "json": {"url": "wss://example.test", "token": "unit-only", "room": "room-1",
+		"self": "1", "blocked": [], "lease_id": "lease-unit", "capacity": 12, "lease_ms": 20000}}
+
+func _real_voice_room(connected := true) -> Array:
+	var backend := Backend.new()
+	var voice: PartyVoiceSession = auto_free(PartyVoiceSession.new())
+	add_child(voice)
+	voice.set_process(false)
+	voice.set_backend(backend)
+	var room: Room = auto_free(Room.new())
+	room.voice = voice
+	var online: P0Online = auto_free(P0Online.new())
+	room.setup(null, online, "tea")
+	room.request = func(_m, path, _body):
+		if path.ends_with("status"): return {"ok": true, "json": {"available": true, "age": "ok", "ban": null}}
+		return _grant()
+	await room.fetch_status()
+	if connected:
+		await room.toggle_mic()
+		voice._on_native_event(JSON.stringify({"event": "permission", "session": voice._native_id, "granted": true}))
+		await get_tree().process_frame
+		voice._on_native_event(JSON.stringify({"event": "connected", "session": voice._native_id, "microphone": true}))
+		assert_str(voice.state).is_equal("connected")
+		assert_bool(voice.microphone).is_true()
+	backend.calls.clear()
+	return [room, voice, backend]
+
+func _media_state(voice: PartyVoiceSession) -> Dictionary:
+	return {"wanted": voice.active(), "state": voice.state, "microphone": voice.microphone,
+		"listening": voice.listening, "lease": voice._lease_id, "deadline": voice._lease_deadline,
+		"native": voice._native_id, "generation": voice._generation, "error": voice.error}
 
 func test_missing_malformed_and_explicit_null_are_different() -> void:
 	var b := Ban.new()
@@ -163,6 +197,111 @@ func test_old_heartbeat_ban_cannot_replace_a_newer_clear_status() -> void:
 	heartbeat.replied.emit({"ok": false, "json": {"code": "VOICE_BANNED", "until": null}})
 	assert_int(room.ban.kind).is_equal(Ban.CLEAR)
 	assert_bool(room.mic_blocked()).is_false()
+
+func test_real_voice_ignores_old_heartbeat_refusal_and_success_after_newer_status() -> void:
+	for success in [false, true]:
+		var f: Array = await _real_voice_room()
+		var room: Room = f[0]
+		var voice: PartyVoiceSession = f[1]
+		var heartbeat := Deferred.new()
+		var requests := [0]
+		room.request = func(_m, path, _body):
+			if path.ends_with("heartbeat"):
+				requests[0] += 1
+				return await heartbeat.wait()
+			return {"ok": true, "json": {"available": true, "age": "ok", "ban": null}}
+		voice._lease_deadline = Time.get_ticks_msec() + 12000
+		var before := _media_state(voice)
+		voice._heartbeat()
+		assert_bool(voice._polling).is_true()
+		await room.fetch_status()
+		heartbeat.replied.emit({"ok": true, "json": {"room": "room-1", "lease_ms": 20000}} if success \
+			else {"ok": false, "json": {"code": "VOICE_BANNED", "until": null}})
+		assert_int(room.ban.kind).is_equal(Ban.CLEAR)
+		assert_bool(voice._polling).is_false()
+		assert_dict(_media_state(voice)).is_equal(before)  # no leave, mic change, new lease deadline or error
+		voice._process(0.0)
+		assert_int(requests[0]).is_equal(1)                 # no immediate retry loop
+		assert_array(f[2].calls).is_empty()                # no native disconnect, reconnect, renew or mic call
+
+func test_real_voice_ignores_obsolete_join_and_releases_an_unused_grant() -> void:
+	for success in [false, true]:
+		var f: Array = await _real_voice_room(false)
+		var room: Room = f[0]
+		var voice: PartyVoiceSession = f[1]
+		var join := Deferred.new()
+		var joins := [0]
+		var releases := []
+		room.request = func(_m, path, body):
+			if path.ends_with("join"):
+				joins[0] += 1
+				return await join.wait()
+			if path.ends_with("leave"):
+				releases.append(body.lease_id)
+				return {"ok": true, "json": {}}
+			return {"ok": true, "json": {"available": true, "age": "ok", "ban": null}}
+		await room.toggle_mic()
+		voice._on_native_event(JSON.stringify({"event": "permission", "session": voice._native_id, "granted": true}))
+		assert_bool(voice._joining).is_true()
+		var before := _media_state(voice)
+		f[2].calls.clear()
+		await room.fetch_status()
+		join.replied.emit(_grant() if success else {"ok": false, "json": {"code": "VOICE_BANNED", "until": null}})
+		assert_bool(voice._joining).is_false()
+		assert_dict(_media_state(voice)).is_equal(before)
+		assert_array(releases).is_equal(["lease-unit"] if success else [])
+		voice._process(0.0)
+		assert_int(joins[0]).is_equal(1)
+		assert_array(f[2].calls).is_empty()
+
+func test_status_overtaken_by_voice_success_releases_own_busy_and_can_refresh_again() -> void:
+	for action in ["heartbeat", "join"]:
+		var f: Array = await _real_voice_room(action == "heartbeat")
+		var room: Room = f[0]
+		var voice: PartyVoiceSession = f[1]
+		var status := Deferred.new()
+		var requests := [0]
+		room.request = func(_m, path, _body):
+			if path.ends_with("status"):
+				requests[0] += 1
+				if requests[0] == 1: return await status.wait()
+				return {"ok": true, "json": {"available": true, "age": "ok", "ban": null}}
+			return _grant()
+		room.fetch_status()
+		if action == "heartbeat": await voice._heartbeat()
+		else:
+			await room.toggle_mic()
+			voice._on_native_event(JSON.stringify({"event": "permission", "session": voice._native_id, "granted": true}))
+		# Newer successful Voice reply advances applied sequence but does not own status's busy flag.
+		assert_bool(room._status_busy).is_true()
+		status.replied.emit({"ok": true, "json": {"available": true, "age": "ok", "ban": {"until": null}}})
+		assert_bool(room._status_busy).is_false()
+		assert_int(room.ban.kind).is_equal(Ban.CLEAR)
+		room._next_status = 0     # throttle elapsed; no force escape hatch
+		var refreshed := await room.fetch_status(false)
+		assert_bool(refreshed).is_true()
+		assert_int(requests[0]).is_equal(2)
+		assert_bool(room._status_busy).is_false()
+
+func test_old_status_epoch_must_not_release_busy_owned_by_newer_status() -> void:
+	var room := _room()
+	var first := Deferred.new()
+	var second := Deferred.new()
+	var requests := [0]
+	room.request = func(_m, _path, _body):
+		requests[0] += 1
+		if requests[0] == 1: return await first.wait()
+		return await second.wait()
+	room.fetch_status()
+	room.fetch_status()
+	first.replied.emit({"ok": true, "json": {"available": true, "age": "ok", "ban": null}})
+	assert_bool(room._status_busy).is_true()
+	room._next_status = 0
+	var blocked := await room.fetch_status(false)
+	assert_bool(blocked).is_false()
+	assert_int(requests[0]).is_equal(2)
+	second.replied.emit({"ok": true, "json": {"available": true, "age": "ok", "ban": null}})
+	assert_bool(room._status_busy).is_false()
 
 func test_older_status_refusal_cannot_override_a_newer_status_in_the_same_login() -> void:
 	var s := _session()

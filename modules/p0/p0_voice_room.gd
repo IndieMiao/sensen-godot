@@ -114,8 +114,9 @@ func fetch_status(force := true) -> bool:
 	_status_busy = true
 	_next_status = Time.get_ticks_msec() + STATUS_RETRY_MS
 	var r: Dictionary = await _call(HTTPClient.METHOD_GET, "status", {}, epoch)
-	if epoch != _status_epoch or bool(r.get("stale", false)): return false
+	if epoch != _status_epoch: return false   # only the current status request owns this busy flag
 	_status_busy = false
+	if bool(r.get("stale", false)): return false
 	var json: Dictionary = r.get("json", {}) if r.get("json") is Dictionary else {}
 	if not bool(r.get("ok", false)):
 		ban.stale = true
@@ -165,7 +166,7 @@ func toggle_mic() -> void:
 		return
 	voice.call("join_with", func(action: String, body: Dictionary) -> Dictionary:
 		if not context.is_empty() and (not is_instance_valid(session) or not session.request_is_current(context)):
-			return {"ok": false, "stale": true, "json": {"code": "UNAUTHENTICATED"}}
+			return {"ok": false, "stale": true, "json": {}}
 		return await _call(HTTPClient.METHOD_POST, action, body))
 	voice.call("set_microphone", true)
 
@@ -276,10 +277,9 @@ func _call(method: int, action: String, body: Dictionary, status_epoch := -1) ->
 		return {"ok": false, "stale": true, "json": {}}
 	var json: Dictionary = result.get("json", {}) if result.get("json") is Dictionary else {}
 	if ban_sequence >= 0 and ban_sequence < _ban_applied:
-		# Preserve no stale status/refusal side effect; an already-valid grant still belongs to Voice's own generation.
-		if action == "status" or not bool(result.get("ok", false)):
-			return {"ok": false, "stale": true, "json": {"code": "UNAUTHENTICATED"}}
-		return result
+		# A stale completion is not a current authentication failure (nor permission to renew a lease).
+		# Keep a returned grant only so Voice can release its unused lease, never adopt it.
+		return result.merged({"stale": true}, true)
 	if ban_sequence >= 0 and (bool(result.get("ok", false)) or str(json.get("code", "")) == "VOICE_BANNED"):
 		_ban_applied = ban_sequence
 	if owner != null and result.has("status") and owner.take_account_refusal(HTTPRequest.RESULT_SUCCESS,
