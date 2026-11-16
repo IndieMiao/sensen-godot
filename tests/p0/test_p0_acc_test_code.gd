@@ -196,3 +196,19 @@ func test_flow_code_refused_releases_busy_and_keeps_page_and_then_back() -> void
 	assert_bool(p.go.disabled).is_false()
 	flow.back()
 	assert_object(flow.page).is_same(flow.sign_in_page)
+
+func test_age_entered_for_code_keeps_current_hello_versions_even_from_normal_signin() -> void:
+	var flow = _flow("old_signin")
+	flow.code_context = {"versions":{"terms":"2099-11-14","privacy":"2099-11-14"}}
+	_enter(flow)
+	assert_object(flow.page).is_instanceof(P0AccAge)
+	var age = flow.page
+	age.wheel.animate = false
+	age.wheel.pick(2000)
+	age.consent.checked = true
+	age.consent.toggled.emit(true)
+	age.go.activated.emit()
+	age.confirm.move.activated.emit()
+	assert_str(flow.kept().terms).is_equal("2099-11-14")
+	assert_str(flow.code_gate()).is_equal("ready")
+	assert_object(flow.page).is_instanceof(Page)

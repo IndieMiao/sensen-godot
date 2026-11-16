@@ -48,7 +48,7 @@ const TestCode := preload("res://scenes/p0/account/p0_acc_test_code.gd")
 var code_page: TestCode
 ## Current hello policy/legacy facts, supplied by the host before ready; not a fabricated local AGE answer.
 var code_context := {}
-var _code_origin := "sign_in"
+var _code_origin := ""
 var record_path := RECORD
 var _check := Callable()
 var _this_year := 0
@@ -191,7 +191,9 @@ func _code_back() -> void:
 	if not is_instance_valid(code_page) or page != code_page or code_page.busy: return
 	code_left.emit(code_page.authenticated)
 	code_page = null
-	if _code_origin == "no_google": _open_no_google()
+	var origin := _code_origin
+	_code_origin = ""
+	if origin == "no_google": _open_no_google()
 	else: _open_sign_in()
 
 func code_authenticated() -> void:
@@ -386,7 +388,7 @@ func back() -> bool:
 func keep(ok: bool) -> void:
 	var data := {"age_ok": ok}
 	if ok:
-		var v := code_versions() if _code_origin == "no_google" else versions()
+		var v := code_versions() if _code_origin != "" else versions()
 		data.merge({"terms": str(v.get("terms", "")), "privacy": str(v.get("privacy", "")), "agreed_at": Time.get_unix_time_from_system() * 1000.0})
 	var f := FileAccess.open(record_path, FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(data))
