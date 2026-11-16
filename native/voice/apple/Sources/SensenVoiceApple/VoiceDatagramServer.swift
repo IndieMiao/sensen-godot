@@ -84,8 +84,14 @@ final class VoiceDatagramServer {
                     if case .failed = state { self.listenerFailed() }
                 }
             }
-            next.newConnectionHandler = { [weak self] peer in
-                Task { @MainActor in self?.accept(peer) ?? peer.cancel() }
+            next.newConnectionHandler = { [weak self, weak next] peer in
+                Task { @MainActor in
+                    guard let self else { peer.cancel(); return }
+                    // Keep the emitting listener's identity across the actor hop. A peer queued by an old
+                    // listener is not in connections yet and must be cancelled even if a new round is running.
+                    VoiceListenerHandoff.deliver(running: self.running, current: self.listener, source: next,
+                                                peer: peer, accept: self.accept, cancel: { $0.cancel() })
+                }
             }
             next.start(queue: .main)
         } catch { listenerFailed() }

@@ -10,6 +10,8 @@ launch key produced by `NativeBridgeKey` into this transport; the transport neve
   reply, no command and no event-client replacement. New untrusted connections are bounded and expire after 1 s.
 - Keep one authenticated event client; retry failed listeners after 2 s, detach callbacks on stop/replacement, and
   report transport faults to the media owner. The owner must close its room/microphone on these faults.
+  The queued new-connection callback also checks its originating listener on MainActor; peers delivered after
+  stop/start or during listener-retry wait are cancelled before registration, even when `running` is true.
 - Snapshots use event ID 0. Permission/connected/reconnecting/disconnected/error use a process-lifetime counter,
   including across bridge/outbox recreation; ACK removes only that event. Retry exact bytes at 250 ms, at most 20
   retransmissions after the initial send. Bound pending events to 64, surface exhaustion/expiry as a fault, and do
@@ -22,6 +24,8 @@ Run `bash tools/ios/check_voice_transport.sh` from the repository root. It compi
 protocol checks, then typechecks the Network adapter against host, iOS simulator and iOS device SDKs. It does **not**
 start a listener, resolve LiveKit, open audio, build an app or use a device. Reserve compiler time with the resource
 coordinator. The final 11-16 results and limitations are in `docs/qa/ios-voice-transport-2026-11-16.md`.
+`--listener-only` runs just the delayed-listener handoff regression and SDK typechecks, without repeating the
+unchanged 90 decoder/outbox checks.
 
 This first segment is deliberately **not wired into G3Spike or an exported application**. The legacy media bridge
 below still lacks the complete iOS Block/audio/packaging contract. Next: integrate the typed commands and event

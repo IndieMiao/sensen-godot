@@ -54,3 +54,28 @@ test service, LiveKit connection, production setting or deployment was used.
 
 No runtime voice acceptance, Release executable build, SDK integration, device performance or release is claimed.
 The 11-21 first-release decision remains with the project director; normal 0.3.11 release remains paused.
+
+## Listener ownership follow-up (review 6910704086 / 387 b6fc2c07)
+
+The first version queued `newConnectionHandler` onto MainActor without retaining the emitting listener's identity.
+An unregistered L1 peer could therefore arrive after stop/start L2 or while listener failure awaited a retry.
+The fix captures L1 weakly and checks `running` and `current === source` **inside** the actor task. Rejected peers
+are cancelled, not just ignored. An owner already released also cancels its orphaned peer. Registration and command
+dispatch still happen only after this gate and the existing authentication checks.
+
+`VoiceListenerHandoffChecks` deterministically holds back delivery: L1 is queued, stop/start L2 occurs, a normal L2
+client is accepted, then L1 is delivered. It must not register, replace the client or dispatch. It also covers a failed
+listener's retry wait, a stopped owner, deallocated listener/owner, and successful new-listener delivery.
+
+大乔 Q1116-12 compiler-only window, completed at 16:01 CST:
+
+- Vulnerable running-only handoff model (temporary test source, not a real UDP reproduction): **6 of 11 assertions
+  fail**, exit 1 as expected, including both requested delayed-delivery negatives.
+- Actual shared handoff gate: **11/11 pass**, exit 0. Production's MainActor Task uses this same gate.
+- Host + arm64 iOS simulator/device SDK typechecks with warnings as errors: pass.
+- Command: `bash tools/ios/check_voice_transport.sh --listener-only`. The original 90 protocol/outbox checks were
+  not rerun or added to the new count; those sources did not change. No listener, socket, audio or device was opened.
+- Recorded PIDs 38380/38385/38386 exited; temporary negative-control files and binaries were removed; window released.
+
+The regression uses stub listeners and explicit queued-delivery order. It establishes the ownership gate's behavior,
+not real Network.framework bind/reconnect, iOS execution, or media integration; those remain next-segment tests.
