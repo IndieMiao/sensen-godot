@@ -49,6 +49,7 @@ var conflict_farm := {}
 ## the AGE page passed by an account never asked (age_ok).
 var agreed_now := false
 var age_passed_now := false
+var _code_token := ""        # separate from provider/guest authorization; never inherit an uncertain provider token
 var _code_attempt := 0      # code-only attempt ownership; independent of the shared request-context work
 var _code_fingerprint := ""   # in-memory only: a changed credential starts a different code request
 var _launch_token := ""   # one per launch: a retried request sends the same, so a lost answer makes no second save
@@ -169,16 +170,16 @@ func sign_in_code(code: String, done: Callable) -> void:
 	var fingerprint := code.to_upper().replace("-", "").replace(" ", "").replace("\t", "").replace("\n", "").replace("\r", "").replace("I", "1").replace("L", "1").replace("O", "0").sha256_text()
 	# Retry an unconfirmed identical request with its token; a different code (or a new login after success) must
 	# not reuse a token already owned by the previous code's account. Consent retries never call this method.
-	if (_code_fingerprint != "" and _code_fingerprint != fingerprint) or (has_token() and token == _launch_token):
-		_launch_token = new_token()
+	if _code_token == "" or _code_fingerprint != fingerprint or (has_token() and token == _code_token):
+		_code_token = new_token()
 	_code_fingerprint = fingerprint
-	var t := _token_for_launch()
+	var t := _code_token
 	_code_attempt += 1
 	var attempt := _code_attempt
 	var before_player := player
 	var before_token := token
 	send.call(HTTPClient.METHOD_POST, "/p0/session/code", {"code": code, "token": t}, func(r: Dictionary):
-		if attempt != _code_attempt or t != _launch_token or player != before_player or token != before_token:
+		if attempt != _code_attempt or t != _code_token or player != before_player or token != before_token:
 			done.call({"ok": false, "code": "stale_response"})
 			return
 		# A code may name an empty pre-created save. Only the server knows its next step; fail before saving a token.
@@ -188,13 +189,14 @@ func sign_in_code(code: String, done: Callable) -> void:
 		_took(r, t, "")
 		done.call(r))
 
-## Leaving an already-verified code page before finishing consent starts a fresh later authorization. Preserve
+## Leaving the code page, whether confirmed or uncertain, starts a fresh later authorization. Preserve
 ## the stored identity; only the retry token is retired, so a different provider/code cannot reuse its owner.
 func invalidate_code_attempt() -> void:
 	_code_attempt += 1
 
 func end_code_attempt() -> void:
 	invalidate_code_attempt()
+	_code_token = ""
 	_launch_token = ""
 	_code_fingerprint = ""
 

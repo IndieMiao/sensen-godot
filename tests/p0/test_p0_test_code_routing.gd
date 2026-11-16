@@ -261,3 +261,18 @@ func test_a_late_code_success_after_flow_replacement_never_persists_old_identity
 	_answer(_ok("continue"))
 	_answer({"ok":true})
 	assert_object(rt._acc_flow).is_null()
+
+func test_unknown_code_result_then_back_retires_request_token_without_clearing_old_identity() -> void:
+	for reply in [{"ok":false,"code":"network"},{"ok":true,"player":"p0-server-accepted-without-route"}]:
+		var p = _open()
+		rt.session.identity._keep("p0-previous","ef".repeat(32),["google"])
+		var previous := FileAccess.get_file_as_bytes(ID_DIR+"p0_session.json")
+		_submit(p)
+		var attempted: String = requests[-1].body.token
+		_answer(reply)   # server may own the token, but neither reply permits local adoption
+		p.back_key.pressed.emit()
+		assert_object(rt._acc_flow.page).is_instanceof(P0AccSignIn)
+		rt.session.identity.sign_in("google",{"id_token":"unit-only","nonce":"unit"},func(_r):pass)
+		assert_str(requests[-1].body.token).is_not_equal(attempted)
+		assert_array(Array(FileAccess.get_file_as_bytes(ID_DIR+"p0_session.json"))).is_equal(Array(previous))
+		_answer({"ok":false,"code":"network"})

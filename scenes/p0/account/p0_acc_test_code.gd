@@ -31,6 +31,7 @@ func _init() -> void:
 	add_gap(20)
 	field = UiTextField.new("", PLACEHOLDER, "")
 	field.input.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_DEFAULT
+	field.input.add_theme_color_override(&"font_uneditable_color", UiTokens.COLOR_TEXT)   # verified code stays readable while consent retries
 	field.text_changed.connect(_typed)
 	field.submitted.connect(func(_s: String): _submit())
 	col.add_child(field)

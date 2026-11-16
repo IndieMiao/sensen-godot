@@ -1499,10 +1499,10 @@ func _open_acc_flow(kind: String) -> void:
 	if _acc_flow.has_signal("code_consent_agreed"):
 		_acc_flow.connect("code_consent_agreed", func(): session.identity.agree(false))
 	if _acc_flow.has_signal("code_left"):
-		_acc_flow.connect("code_left", func(authenticated: bool):
+		_acc_flow.connect("code_left", func(_authenticated: bool):
 			_code_retry = Callable()
 			_code_retry_page = 0
-			if authenticated: session.identity.end_code_attempt())
+			session.identity.end_code_attempt())
 	_acc_flow.connect("named", _on_acc_named)
 	_acc_flow.connect("sign_in", _on_acc_sign_in)
 	_acc_flow.connect("failed", func(_code: String): _acc_failed({}))

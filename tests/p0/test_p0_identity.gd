@@ -272,3 +272,13 @@ func test_code_attempts_refuse_late_success_before_any_identity_side_effect() ->
 	assert_array(Array(FileAccess.get_file_as_bytes(dir+"p0_session.json"))).is_equal(Array(stored))
 	callbacks.clear()   # each stored reply captures this identity; break the fixture-only reference cycle
 	id.send = Callable()
+
+func test_unconfirmed_provider_authorization_never_supplies_a_code_request_token() -> void:
+	var id := _identity()
+	id.sign_in("google",CREDS,func(_r):pass)   # network/uncertain server acceptance
+	var provider_token: String = _sent("/p0/session/google")[-1].body.token
+	id.sign_in_code("ABCD-EFGH-JKMN",func(_r):pass)
+	var code_token: String = _sent("/p0/session/code")[-1].body.token
+	assert_str(code_token).is_not_equal(provider_token)
+	id.sign_in_code("abcd efgh jkmn",func(_r):pass)
+	assert_str(_sent("/p0/session/code")[-1].body.token).is_equal(code_token)
