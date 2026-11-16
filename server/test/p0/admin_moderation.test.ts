@@ -25,9 +25,9 @@ afterEach(async () => { vi.restoreAllMocks(); for (const fn of cleanup.splice(0)
 async function setup() {
   const dir = mkdtempSync(path.join(tmpdir(), 'admin-moderation-'));
   const save = path.join(dir, 'state.json'), files = { ages: path.join(dir, 'ages.json'), blocks: path.join(dir, 'blocks.json'), reports: path.join(dir, 'reports.jsonl') };
-  const store = new P0Store(C, save), accounts = new P0Accounts();
   let time = T0;
   const now = () => time;
+  const store = new P0Store(C, save), accounts = new P0Accounts(undefined, undefined, now);
   for (const p of [TARGET, OTHER]) { store.get(p, now()); accounts.ensure(p); }
   accounts.issue(TARGET, TOKEN); accounts.issue(TARGET, ADMIN_TOKEN, 'admin', T0 + 86_400_000); accounts.issue(OTHER, OTHER_TOKEN);
   const rooms = new OutpostRooms(loadOutposts()), participants = new Map<string, string>();
