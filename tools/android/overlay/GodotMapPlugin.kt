@@ -67,6 +67,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     private var container: FrameLayout? = null
     private var mapView: MapView? = null
+    private var parcelController: ParcelMapController? = null
     private var mapLocale: Locale = Locale.SIMPLIFIED_CHINESE
     private var mapSceneVisible = true
     private var cityStyle = false
@@ -103,6 +104,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     override fun getPluginSignals() = setOf(
         SignalInfo("map_ready"),
+        SignalInfo("parcel_ready", Long::class.javaObjectType, Long::class.javaObjectType, String::class.java),
+        SignalInfo("parcel_query_result", Long::class.javaObjectType, Long::class.javaObjectType, Long::class.javaObjectType, String::class.java),
+        SignalInfo("parcel_error", Long::class.javaObjectType, Long::class.javaObjectType, String::class.java),
         SignalInfo("pois_received", Long::class.javaObjectType, String::class.java),
         SignalInfo(
             "location_update",
@@ -184,6 +188,10 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
                     .zoom(zoom)
                     .build()
             )
+            parcelController = ParcelMapController(mv,
+                ready = { generation, style, json -> emitSignal("parcel_ready", generation, style, json) },
+                result = { request, generation, style, json -> emitSignal("parcel_query_result", request, generation, style, json) },
+                error = { generation, style, code -> emitSignal("parcel_error", generation, style, code) })
             mv.mapboxMap.loadStyle(Style.MAPBOX_STREETS) { style ->
                 styleIsReady = true
                 // Streets v12 在低 zoom 默认 globe：Godot 叠加层按 Web Mercator 投影标记，
@@ -204,6 +212,36 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             mapView = mv
             Log.i(TAG, "MapView created @($lat,$lng) z=$zoom")
         }
+    }
+
+    /** GeoFarm demo: normalized points are relative to the full native MapView, not a Godot panel. */
+    @UsedByGodot
+    fun setParcelSources(generation: Long, configJson: String) {
+        runOnUiThread {
+            val parcels = parcelController
+            if (parcels == null) emitSignal("parcel_error", generation, 0L, "map_not_ready")
+            else parcels.setSources(generation, configJson)
+        }
+    }
+
+    @UsedByGodot
+    fun queryParcelAt(requestId: Long, generation: Long, xNormalized: Double, yNormalized: Double) {
+        runOnUiThread { parcelController?.queryAt(requestId, generation, xNormalized, yNormalized) }
+    }
+
+    @UsedByGodot
+    fun setParcelStates(generation: Long, batchJson: String) {
+        runOnUiThread { parcelController?.setStates(generation, batchJson) }
+    }
+
+    @UsedByGodot
+    fun setParcelClaims(generation: Long, claimsJson: String) {
+        runOnUiThread { parcelController?.setClaims(generation, claimsJson) }
+    }
+
+    @UsedByGodot
+    fun clearParcelLayers(generation: Long) {
+        runOnUiThread { parcelController?.clear(generation) }
     }
 
     @UsedByGodot
@@ -496,6 +534,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     override fun onMainDestroy() {
         runOnUiThread {
+            parcelController?.close(); parcelController = null
             try {
                 locationManager?.removeUpdates(locationListener)
             } catch (e: Exception) {
