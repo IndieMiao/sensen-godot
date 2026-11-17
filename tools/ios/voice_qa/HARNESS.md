@@ -75,7 +75,7 @@ CODE_SIGN_IDENTITY. It has no provisioning/update, archive, export/upload or dev
 checked for signing commands and output for embedded.mobileprovision. No Apple registration is performed by this tool.
 The copied SDK archives were referenced from previously verified local inputs; those library bytes were not edited.
 
-Actual 00:17–00:41 Q1117-28 results: Python19/19; Godot18 final checks,0 failures (fake transport); actual QA PCK export;
+Actual chain results (Q1117-28 initial run; Q1117-29 follow-up below): Python19/19; Godot18 final checks,0 failures (fake transport); actual QA PCK export;
 actual arm64 iPhoneOS Release App build; packed main3-frame host smoke with Dummy audio and no backend, no script error.
 App/PCK/scope/English+Chinese mic/local-network purpose/three voice frameworks were read back. codesign -dv reports
 code object is not signed at all; no profile/signing command, no install, simulator, microphone or SFU session.
