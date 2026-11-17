@@ -33,6 +33,7 @@ var errors = preload("res://modules/p0/p0_error_report.gd").new()   # P0ErrorRep
 ## the map's pond card measures Distance from here (q(48)).
 var here := {"space": "home", "place": ""}
 var ui: P0Ui
+var name_notices = preload("res://scenes/p0/account/p0_name_reset_flow.gd").new()
 var world: Node
 var _shot_t := 0.0
 var _shot_script: Array = []
@@ -204,6 +205,8 @@ func _init() -> void:
 	ui.screen_action.connect(_on_screen_action)
 	ui.screen_back.connect(_on_screen_back)
 	ui.lifecycle.watch(session)
+	name_notices.setup(self)
+	add_child(name_notices)
 	session.command_started.connect(ui.track_pressed)
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
 		P0FishingPanel.auto_play = true
@@ -268,6 +271,7 @@ static func scene_load_event(scene: String, place: String, attach_ms: int, first
 
 func detach(w: Node) -> void:
 	if world == w:
+		name_notices.interrupt()
 		_call("p0_joystick", [Vector2.ZERO])
 		ui.end_stick()
 		world = null
@@ -421,6 +425,8 @@ func _exit_tree() -> void:
 	WaterShore.finish_all()   # the app ending: no pond bank's task left to the pool past the scripts (WaterShore.prewarm)
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_PAUSED: name_notices.set_background(true)
+	elif what == NOTIFICATION_APPLICATION_RESUMED: name_notices.set_background(false)
 	if what == NOTIFICATION_APPLICATION_RESUMED:
 		_on_resumed()
 		if ui.notify != null:   # what was set for the background goes; the phone's settings may have changed meanwhile
@@ -1445,6 +1451,7 @@ func _account_back_action() -> int:
 		# The flow owns the screen even when its page has no internal return (AGE / Sign in / NO-GMS).
 		# Returning to Android's home is not permission for the farm below it to receive Back.
 		return AppRouter.BACK_LEAVE_APP
+	if name_notices.handle_back(): return AppRouter.BACK_IGNORE
 	# q(315): the report drawer owns Back before navigation/stack/world handling, below account gates.
 	if ui.report_back(): return AppRouter.BACK_IGNORE
 	return AppRouter.BACK_PASS
@@ -1477,6 +1484,7 @@ func _entry(script: Script, kind: String) -> Dictionary:
 	return script.call("entry", kind, session.identity.email)
 
 func _open_acc_flow(kind: String) -> void:
+	name_notices.interrupt()
 	_launch_s = -1.0
 	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
 	_close_acc_flow()
