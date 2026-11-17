@@ -19,10 +19,11 @@ def fixture(root: Path) -> Path:
  objectVersion = 46;
  objects = {
   A00000000000000000000001 = {isa = PBXProject; targets = (A00000000000000000000002,); packageReferences = (); };
-  A00000000000000000000002 = {isa = PBXNativeTarget; name = sensen; productType = "com.apple.product-type.application"; buildPhases = (A00000000000000000000004,A00000000000000000000005,); packageProductDependencies = (); };
+  A00000000000000000000002 = {isa = PBXNativeTarget; name = sensen; productType = "com.apple.product-type.application"; buildPhases = (A00000000000000000000004,A00000000000000000000005,A00000000000000000000006,); packageProductDependencies = (); };
   A00000000000000000000003 = {isa = PBXGroup; path = sensen; sourceTree = "<group>"; children = (); };
   A00000000000000000000004 = {isa = PBXSourcesBuildPhase; files = (); };
   A00000000000000000000005 = {isa = PBXFrameworksBuildPhase; files = (); };
+  A00000000000000000000006 = {isa = PBXCopyFilesBuildPhase; dstSubfolderSpec = 10; files = (); };
 	};
 	rootObject = A00000000000000000000001;
 }
@@ -57,6 +58,16 @@ class VoiceInjectionTests(unittest.TestCase):
         self.assertEqual(after["objects"][voice.IDS["package"]]["relativePath"], voice.PACKAGE_PATH)
         self.assertEqual(after["objects"]["A00000000000000000000004"]["files"], [voice.IDS["compile"]])
         self.assertEqual(after["objects"]["A00000000000000000000005"]["files"], [voice.IDS["link"]])
+        self.assertEqual(after["objects"]["A00000000000000000000006"]["files"], [voice.IDS["embed"]])
+        self.assertEqual(after["objects"][voice.IDS["embed"]]["settings"]["ATTRIBUTES"],
+                         ["CodeSignOnCopy", "RemoveHeadersOnCopy"])
+
+    def test_missing_embed_phase_refused_before_writes(self):
+        path = self.project / "project.pbxproj"
+        path.write_text(path.read_text().replace("dstSubfolderSpec = 10", "dstSubfolderSpec = 7"))
+        before = self.snapshot()
+        with self.assertRaisesRegex(ValueError, "Embed Frameworks"): voice.inject(self.project)
+        self.assertEqual(before, self.snapshot())
 
     def test_snapshot_is_exact_pinned_sources_and_keeps_capabilities_false(self):
         report = voice.inject(self.project)

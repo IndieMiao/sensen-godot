@@ -20,7 +20,7 @@ PACKAGE_PATH = "Packages/SensenVoiceApple"
 MICROPHONE_USAGE = "Gensen uses the microphone only for voice chat, while your mic is on. Your voice goes live to people in the same place and isn't recorded."
 MICROPHONE_USAGE_ZH = "Gensen 只在语音聊天、你开麦时使用麦克风。你的声音会实时传给同一地点的人，不会被录下来。"
 IDS = {name: hashlib.sha1(("gensen.voice." + name).encode()).hexdigest()[:24].upper()
-       for name in ["package", "product", "link", "source", "compile"]}
+       for name in ["package", "product", "link", "source", "compile", "embed"]}
 
 
 def metadata(text: str) -> dict:
@@ -79,6 +79,14 @@ def add_object(text: str, section: str, oid: str, label: str, fields: str) -> st
     return text[:end.start()] + section_text + text[end.start():]
 
 
+def pbx_value(value) -> str:
+    if isinstance(value, dict):
+        return "{" + " ".join(f"{key} = {pbx_value(item)};" for key, item in value.items()) + "}"
+    if isinstance(value, list):
+        return "(" + ", ".join(pbx_value(item) for item in value) + ",)"
+    return json.dumps(value)
+
+
 def project_text(text: str) -> str:
     data = metadata(text)
     objects = data["objects"]
@@ -91,12 +99,17 @@ def project_text(text: str) -> str:
     sources = [p for p in target["buildPhases"] if objects[p]["isa"] == "PBXSourcesBuildPhase"]
     frameworks = [p for p in target["buildPhases"] if objects[p]["isa"] == "PBXFrameworksBuildPhase"]
     if len(sources) != 1 or len(frameworks) != 1: raise ValueError("Ambiguous sources/frameworks phase")
+    embeds = [p for p in target["buildPhases"] if objects[p]["isa"] == "PBXCopyFilesBuildPhase"
+              and str(objects[p].get("dstSubfolderSpec")) == "10"]
+    if len(embeds) != 1: raise ValueError("Expected one Embed Frameworks phase")
     expected = {
         "package": ("XCLocalSwiftPackageReference", "SensenVoiceApple", {"isa": "XCLocalSwiftPackageReference", "relativePath": PACKAGE_PATH}),
         "product": ("XCSwiftPackageProductDependency", "SensenVoiceApple", {"isa": "XCSwiftPackageProductDependency", "productName": "SensenVoiceApple"}),
         "link": ("PBXBuildFile", "SensenVoiceApple in Frameworks", {"isa": "PBXBuildFile", "productRef": IDS["product"]}),
         "source": ("PBXFileReference", "VoiceBootstrap.swift", {"isa": "PBXFileReference", "lastKnownFileType": "sourcecode.swift", "path": "VoiceBootstrap.swift", "sourceTree": "<group>"}),
         "compile": ("PBXBuildFile", "VoiceBootstrap.swift in Sources", {"isa": "PBXBuildFile", "fileRef": IDS["source"]}),
+        "embed": ("PBXBuildFile", "SensenVoiceApple in Embed Frameworks", {"isa": "PBXBuildFile", "productRef": IDS["product"],
+                  "settings": {"ATTRIBUTES": ["CodeSignOnCopy", "RemoveHeadersOnCopy"]}}),
     }
     for name, (section, label, props) in expected.items():
         oid = IDS[name]
@@ -107,7 +120,7 @@ def project_text(text: str) -> str:
             if name in ["package", "product", "source"] and any(
                 all(o.get(k) == v for k, v in props.items()) for o in objects.values()
             ): raise ValueError("Voice already registered with another ID: " + name)
-            fields = " ".join(f"{k} = {json.dumps(v)};" for k, v in props.items())
+            fields = " ".join(f"{k} = {pbx_value(v)};" for k, v in props.items())
             text = add_object(text, section, oid, label, fields)
     for oid, key, ref, label in [
         (data["rootObject"], "packageReferences", IDS["package"], "SensenVoiceApple"),
@@ -115,10 +128,12 @@ def project_text(text: str) -> str:
         (frameworks[0], "files", IDS["link"], "SensenVoiceApple in Frameworks"),
         (groups[0], "children", IDS["source"], "VoiceBootstrap.swift"),
         (sources[0], "files", IDS["compile"], "VoiceBootstrap.swift in Sources"),
+        (embeds[0], "files", IDS["embed"], "SensenVoiceApple in Embed Frameworks"),
     ]: text = append_reference(text, oid, key, ref, label)
     after = metadata(text)["objects"]
     for oid, key, ref in [(target_id, "packageProductDependencies", IDS["product"]),
-                           (sources[0], "files", IDS["compile"]), (frameworks[0], "files", IDS["link"])]:
+                           (sources[0], "files", IDS["compile"]), (frameworks[0], "files", IDS["link"]),
+                           (embeds[0], "files", IDS["embed"])]:
         if after[oid][key].count(ref) != 1: raise ValueError("Voice registration must occur exactly once")
     return text
 
