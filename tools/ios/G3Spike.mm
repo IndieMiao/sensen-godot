@@ -34,6 +34,12 @@
         } else {
             NSLog(@"[G3Spike] GoogleSignInIOS 类缺失（Swift 文件未编入？）");
         }
+        Class voice = NSClassFromString(@"VoiceIOS");   // SGODOT-387, inject_voice.py + the pinned Swift package.
+        if (voice) {
+            [voice performSelector:@selector(setup)];
+        } else {
+            NSLog(@"[G3Spike] VoiceIOS unavailable (voice package not injected)");
+        }
     });
 }
 @end
