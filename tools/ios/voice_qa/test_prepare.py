@@ -105,6 +105,13 @@ class VoiceQAPreparationTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.prepare()
         self.assertFalse(self.output.exists())
 
+    def test_clock_only_delivery_copy_is_rejected_even_without_sentinel_comment(self):
+        self.prepare()
+        relative = "Packages/SensenVoiceApple/Sources/SensenVoiceApple/VoiceEventDelivery.swift"
+        text = (self.output / relative).read_text().replace("GENSEN_VOICE_MEDIA_QA_V1", "removed-marker")
+        (self.project.parent / relative).write_text(text)
+        with self.assertRaises(ValueError):guard.check_export(self.project.parent)
+
     def test_existing_output_and_nested_destination_are_refused(self):
         self.output.mkdir(); keep = self.output / "keep"; keep.write_text("foreign")
         with self.assertRaises(ValueError):self.prepare()
