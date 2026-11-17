@@ -27,18 +27,37 @@ coordinator. The final 11-16 results and limitations are in `docs/qa/ios-voice-t
 `--listener-only` runs just the delayed-listener handoff regression and SDK typechecks, without repeating the
 unchanged 90 decoder/outbox checks.
 
-This first segment is deliberately **not wired into G3Spike or an exported application**. The legacy media bridge
-below still lacks the complete iOS Block/audio/packaging contract. Next: integrate the typed commands and event
-delivery with LiveKit 2.19.0, default-off subscriptions and both Block directions; then add AVAudioSession,
-permission/background handling and the launch-key/bootstrap/SPM/plist injection. Do not claim `supported=true` or
-real iOS voice from this transport alone.
+The bridge is deliberately **not wired into G3Spike or an exported application**. `VoiceBridge.releaseValidated`
+stays false. App integration must pass `NativeBridgeKey.value` to `VoiceBridge.shared.start(launchKey:)`, then
+complete Release/UDP/audio/Block validation and the SPM/plist/permission injection before enabling capabilities.
+Do not infer `supported=true` or real iOS voice from controller tests.
 
-## Existing media prototype (not yet integrated with the transport)
+## 2026-11-17: media controller and LiveKit 2.19 integration
 
-`VoiceBridge.swift` implements the shared JSON command/event protocol using LiveKit Swift 2.17.0, with microphone permission, main-actor room lifecycle, serialized microphone changes, listening/speaker control and a native lease watchdog. Callback registration/unregistration is synchronous so a future Godot adapter can safely detach.
+`VoiceMediaController` owns synchronous intent/session changes on MainActor. A replacement room waits for retired
+connect/control tasks and SDK disconnect, preventing a late completion or audio-session teardown from affecting
+the replacement. Leases use monotonic time. Background, interruption and transport faults retire the room; returning
+to foreground or the end of an interruption never reuses an old grant. Pending permission replies are tied to a
+request generation, and a valid result waits until foreground before delivery.
 
-The C ABI exports `sensen_voice_command` and `sensen_voice_set_event_callback`. A Godot iOS adapter exposing `GodotVoice`, main-thread event draining, export packaging, microphone usage description and real audio/device testing are still required. This package alone does not make the game support iOS voice.
+`LiveKitVoiceRoom` connects with `autoSubscribe=false`. Subscription and volume controls use the peer identity;
+Swift's publication-permission API requires current participant SIDs, rebuilt from identity policies on membership
+changes/reconnect. Policies are applied before microphone publication. Block updates silence existing playback
+immediately, then reconcile SDK subscriptions; control errors terminate the room rather than silently keep media.
+Track arrival/mute/subscription events update Android-shaped snapshots. Actual race-free silence/SFU behavior
+still requires two-client real-audio validation; fake SDK tests are not media/SFU evidence.
 
-Build with `swift build --package-path native/voice/apple`. `SENSEN_LIVEKIT_SWIFT_SOURCE` optionally points to a local checkout. On 2026-09-16 macOS and arm64 iOS Simulator compilation passed using official SDK sources and XCFramework archives verified against upstream SHA-256 checksums. GitHub release download routing required fetching archives through the GitHub releases API and using local package dependencies for the build; those temporary dependency edits are under ignored output, not the shipped package.
+`AppleVoiceAudio` uses iOS 17's permission API with an older-system fallback, PlayAndRecord/voiceChat/defaultToSpeaker
+while joined, and Ambient on leave. It temporarily disables LiveKit's automatic audio-session configuration to
+avoid two category owners. Route/accessory/interruption and Godot game-audio behavior need actual Release devices.
 
-No API secret belongs in this library. It accepts only short-lived per-player grants from the game backend. Future UI must call `capabilities()` and keep unsupported platforms disabled until the Godot adapter is installed and validated.
+`bash tools/ios/check_voice_media.sh` runs deterministic controller tests with fake SDK/audio implementations and
+explicitly suspended async operations. `--interruption-only` runs just the interruption follow-up cases. Neither opens
+audio, sockets or devices. Build the actual SDK separately with `swift build --package-path native/voice/apple -j 2`;
+`SENSEN_LIVEKIT_SWIFT_SOURCE` optionally points to a verified local SDK checkout. Public dependency-download failures
+are not a reason to alter global proxy/TLS settings or to substitute unverified binaries.
+
+The pinned 2.19.0 revision is `43c1c0870e51eedbfd95b20b1b5c43a767886786`. Its actual dependencies are WebRTC
+150.7871.04 (SPM canonical version 150.7871.4) and LiveKit FFI 0.13.1; the old 2.17/uniffi 0.1.9 lock is replaced.
+No API secret belongs in this library. Only short-lived backend grants remain in memory. The legacy callback ABI
+remains for in-process consumers, but unvalidated legacy media commands do not bypass the UDP readiness gate.
