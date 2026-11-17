@@ -53,7 +53,7 @@ func _run() -> void:
 	verify(t[0].evidence[0].get("granted")==false and not t[0].evidence[0].has("code"),"permission evidence records denial without a synthetic error code");done(t)
 	t=setup();grant(t[0],t[1])
 	verify(t[0].state=="connecting" and t[1].calls.any(func(c):return c[0]=="connect"),"valid grant reaches real backend interface")
-	verify(t[1].calls.any(func(c):return c[0]=="lease" and c[2]==19500),"normal native lease below 20s server lease")
+	verify(t[1].calls.any(func(c):return c[0]=="lease" and c[2]>19000 and c[2]<=19500),"normal native lease below 20s server lease")
 	t[1].voice_event.emit(JSON.stringify({"event":"connected","session":t[0]._sid,"participants":[],"microphone":false,"listening":true}))
 	verify(t[0].evidence.any(func(row):return row.get("event")=="connected" and not row.has("code") and not row.has("reason")),"successful native events do not acquire false failure fields")
 	t[0].set_blocked("qa-android-b",true)
@@ -66,6 +66,12 @@ func _run() -> void:
 	t[0].foreground(false)
 	verify(t[0].state=="idle" and t[0]._sid=="","background leaves without automatic fresh grant")
 	t[0].foreground(true);verify(t[0].state=="idle","foreground stays idle until user joins");done(t)
+	t=setup();grant(t[0],t[1]);t[2].hold_heartbeat=true;t[0]._heartbeat()
+	var wait_until := Time.get_ticks_msec()+60
+	while Time.get_ticks_msec()<wait_until: await process_frame
+	t[2].released=true;await process_frame;await process_frame
+	verify(t[1].calls[-1][0]=="lease" and t[1].calls[-1][2]<19460,"slow heartbeat response reduces native lease budget")
+	verify(t[0].lease_budget(Time.get_ticks_msec()-21000)==0,"expired response has no renewable budget");done(t)
 	t=setup();t[2].hold_join=true;grant(t[0],t[1]);t[0].leave();t[2].released=true
 	await process_frame;await process_frame
 	verify(not t[1].calls.any(func(c):return c[0]=="connect") and t[2].calls.any(func(c):return c[0]=="leave"),"late grant after Leave is released without native connect");done(t)

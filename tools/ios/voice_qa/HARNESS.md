@@ -75,13 +75,13 @@ CODE_SIGN_IDENTITY. It has no provisioning/update, archive, export/upload or dev
 checked for signing commands and output for embedded.mobileprovision. No Apple registration is performed by this tool.
 The copied SDK archives were referenced from previously verified local inputs; those library bytes were not edited.
 
-Actual chain results (Q1117-28 initial run; Q1117-29 follow-up below): Python19/19; Godot18 final checks,0 failures (fake transport); actual QA PCK export;
+Actual chain results (Q1117-28 initial run; Q1117-29 follow-up below): Python19/19; Godot20 final checks,0 failures (fake transport); actual QA PCK export;
 actual arm64 iPhoneOS Release App build; packed main3-frame host smoke with Dummy audio and no backend, no script error.
 App/PCK/scope/English+Chinese mic/local-network purpose/three voice frameworks were read back. codesign -dv reports
 code object is not signed at all; no profile/signing command, no install, simulator, microphone or SFU session.
 
 Executable SHA abe0af4f1e856a6ef9f625af341f406f467e98976883d05b222818942c6bd17d;
-PCK SHA 085b49db261c4b88e4a634125847fbbf9aebefbcb1776338239a58b84bfd42bb;
+PCK SHA 1a39133e86167ac806ebbfb734e9e8f65861a181cc7cfce87309f8d2dcd9a200;
 executable/dSYM UUID BECB9F00-544D-3091-8338-9BEE30BEE67B (arm64).
 Evidence: /Volumes/ACASIS/tmp/yase-ios-harness-1117. All recorded command/ADB PIDs exited;5085 is free.
 
@@ -93,3 +93,11 @@ and permission granted is retained as a Boolean. Two targeted checks brought the
 to the initial16). Q1117-29 covered the re-export/unsigned resource rebuild. The final extra3-frame host/Dummy smoke
 finished at00:58:37, about37 seconds after the00:58 deadline; this overrun was reported to大乔, not rewritten as
 on-time. All PIDs exited. Native/SDK code and executable SHA/UUID remained unchanged; the final PCK SHA above changed.
+
+Lease-budget follow-up (Q1117-30): join/heartbeat renewal deducts elapsed HTTP time plus the existing500ms margin,
+matching the production session's conservative budget. An expired response cannot connect/renew; the native5s diagnostic
+also refuses when the fresh server lease has insufficient remaining separation. Final20 fake-transport checks passed,
+including slow response/expired budget; first fixture's frame-timer wait was shorter than wall elapsed and was corrected
+to a monotonic-clock wait. Failure retained. Final build ended01:17:19 within01:13–01:18; only read-only PID verification
+followed at01:18:25. No native/SDK code change, signature, device or media execution. Final PCK SHA above is updated;
+the packaged-main smoke evidence remains the prior unchanged main scene (no iOS backend), not device acceptance.

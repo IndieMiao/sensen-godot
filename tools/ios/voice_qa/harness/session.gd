@@ -116,6 +116,7 @@ func _join_grant() -> void:
 	var generation := _generation
 	var code := _code
 	var client := str(config.get("client", ""))
+	var started := Time.get_ticks_msec()
 	var response: Dictionary = await broker.call("request", "join", {"client": client, "request_id": _sid}, code)
 	_inflight = false
 	var data: Dictionary = response.get("json", {}) if response.get("json") is Dictionary else {}
@@ -126,12 +127,15 @@ func _join_grant() -> void:
 	if not bool(response.get("ok", false)) or not valid_grant(data):
 		if response.get("ok", false) and data.get("lease_id") is String: _release(str(data.lease_id), code)
 		leave(false); error = safe_code(str(data.get("code", "BAD_GRANT"))); changed.emit(); return
+	var budget := lease_budget(started)
+	if budget <= 0:
+		_release(str(data.lease_id), code); leave(false); error = "LEASE_EXPIRED"; changed.emit(); return
 	_lease = str(data.lease_id); _room = str(data.room); self_id = str(data.self)
 	state = "connecting"
 	_next_heartbeat = Time.get_ticks_msec() + 4500
 	backend.call("connect_voice", _sid, str(data.url), str(data.token))
 	_apply_people()
-	backend.call("renew_lease", _sid, 19500)
+	backend.call("renew_lease", _sid, budget)
 	changed.emit()
 
 func valid_grant(data: Dictionary) -> bool:
@@ -143,13 +147,16 @@ func _heartbeat() -> void:
 	_inflight = true
 	var generation := _generation
 	var lease := _lease
+	var started := Time.get_ticks_msec()
 	var response: Dictionary = await broker.call("request", "heartbeat", {"client": config.client, "lease_id": lease}, _code)
 	_inflight = false
 	_next_heartbeat = Time.get_ticks_msec() + 4500
 	if generation != _generation or _sid.is_empty() or lease != _lease or not renew_enabled: return
 	var data: Dictionary = response.get("json", {}) if response.get("json") is Dictionary else {}
 	if response.get("ok", false) == true and int(data.get("lease_ms", 0)) == 20000 and str(data.get("room", "")) == _room:
-		backend.call("renew_lease", _sid, 19500)
+		var budget := lease_budget(started)
+		if budget > 0: backend.call("renew_lease", _sid, budget)
+		else: leave(false); error = "LEASE_EXPIRED"
 	else:
 		error = safe_code(str(data.get("code", "HEARTBEAT_FAILED")))
 		# No forged renewal. Native monotonic lease expiry remains authoritative.
@@ -202,16 +209,22 @@ func test_native_expiry() -> void:
 	_inflight = true
 	var generation := _generation
 	var lease := _lease
+	var started := Time.get_ticks_msec()
 	var response: Dictionary = await broker.call("request", "heartbeat", {"client": config.client, "lease_id": lease}, _code)
 	_inflight = false
 	if generation != _generation or lease != _lease or _sid.is_empty(): return
 	var data: Dictionary = response.get("json", {}) if response.get("json") is Dictionary else {}
 	if response.get("ok", false) == true and int(data.get("lease_ms", 0)) == 20000 and str(data.get("room", "")) == _room:
+		if lease_budget(started) <= 5500:
+			leave(false); error = "HEARTBEAT_TOO_SLOW"; changed.emit(); return
 		renew_enabled = false
 		_record("native_expiry_test_start", {"native_lease_ms": 5000, "server_lease_ms": 20000})
 		backend.call("renew_lease", _sid, 5000)
 	else: error = "HEARTBEAT_FAILED"
 	changed.emit()
+
+func lease_budget(started: int) -> int:
+	return maxi(0, 19500 - (Time.get_ticks_msec() - started))
 
 func _record(kind: String, fields: Dictionary) -> void:
 	var row := {"kind": kind, "client": str(config.get("client", "")), "client_uptime_ms": Time.get_ticks_msec(), "client_wall_seconds": Time.get_unix_time_from_system()}
