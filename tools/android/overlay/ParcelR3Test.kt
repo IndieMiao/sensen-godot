@@ -11,6 +11,15 @@ import kotlin.test.assertNull
 import kotlin.test.assertNotNull
 
 class ParcelR3Test {
+    @Test fun officialStarIdentifierIsLiteralAndSeparatorsRemainForbidden() {
+        val id = "p-4591A011*"
+        assertEquals(true, ParcelPayload.validId(id))
+        val row = """[{"block_id":"p-4591A011*","selected":true,"claimed":false,"own":false}]"""
+        assertEquals(setOf(id), ParcelPayload.states(row).keys)
+        val props = JsonParser.parseString("""{"block_id":"p-4591A011*","parcel_id":"4591A011*"}""").asJsonObject
+        assertEquals(id, ParcelPayload.publicProperties(props)!!.get("block_id").asString)
+        for (bad in listOf("p-a/b", "p-a\\b", "p-a|b", "p-a b", "p-a\nb", "p-a?b", "p-a#b")) assertFalse(ParcelPayload.validId(bad))
+    }
     private val common = """"source_type":"vector","parcel_source_layer":"parcels","promote_id":"block_id","source_minzoom":15,"source_maxzoom":18,"min_zoom":16,"address_min_zoom":18,"building_source":"mapbox","mapbox_building_layers":["building"]"""
     @Test fun vectorTileJsonUsesDeclaredSourceLayerAndZoom() {
         val cfg = ParcelPayload.config("""{$common,"parcel_url":"https://demo.example/tilejson.json"}""")
