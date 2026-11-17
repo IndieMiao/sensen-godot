@@ -111,6 +111,7 @@ func _build_ui() -> void:
 			if i>0 and i<=_examples.size():_jump_to(_examples[i-1])
 			jump.select(0))
 		column.add_child(jump)
+		jump.select(0) # Adding the first enabled address auto-selects it; restore the prompt.
 	var zooms:=VBoxContainer.new();zooms.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT);zooms.position=Vector2(-60,-50);zooms.size=Vector2(48,104);_overlay.add_child(zooms)
 	zooms.add_child(_button("+",func():map_canvas.change_zoom(.5)))
 	zooms.add_child(_button("−",func():map_canvas.change_zoom(-.5)))
@@ -193,6 +194,7 @@ func _query_result(request_id:int,generation:int,style_generation:int,payload:Di
 		if p.is_empty() or not payload.parcel_ids.has(p.block_id) or seen.has(p.block_id):continue
 		seen[p.block_id]=true;candidates.append(p)
 	if candidates.is_empty():_message.text="No parcel here. Zoom in and tap inside a boundary.";return
+	_map_hint()
 	if candidates.size()==1:_select(candidates[0]);return
 	var col:=_dialog_shell("Choose a parcel")
 	col.add_child(_label("Several parcels meet here. Choose an address or zoom in.",14))
