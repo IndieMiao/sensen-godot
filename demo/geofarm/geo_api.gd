@@ -8,7 +8,7 @@ var transport := Callable() # unit fixture; production uses HTTPRequest
 static func valid_base(url: String) -> bool:
 	return url.begins_with("https://") and url.length()>8 and not "@" in url and not "?" in url and not "#" in url
 
-func request(path: String, body: Dictionary = {}) -> Dictionary:
+func request(path: String, body: Dictionary = {}, expected_sha256: String = "") -> Dictionary:
 	if transport.is_valid(): return await transport.call(path, body)
 	if not valid_base(base_url): return {"ok":false,"code":"configuration"}
 	if not path.begins_with("/") or ".." in path or "?" in path: return {"ok":false,"code":"invalid_path"}
@@ -31,6 +31,10 @@ func request(path: String, body: Dictionary = {}) -> Dictionary:
 	var reply: Array = await http.request_completed
 	http.queue_free()
 	if int(reply[0]) != HTTPRequest.RESULT_SUCCESS: return {"ok":false,"code":"network"}
+	var bytes:PackedByteArray=reply[3]
+	if not expected_sha256.is_empty():
+		var hash:=HashingContext.new();hash.start(HashingContext.HASH_SHA256);hash.update(bytes)
+		if hash.finish().hex_encode()!=expected_sha256:return {"ok":false,"code":"integrity"}
 	var parser := JSON.new() # avoid printing response fragments (claim responses must never log identity)
 	if parser.parse((reply[3] as PackedByteArray).get_string_from_utf8()) != OK or not parser.data is Dictionary:
 		return {"ok":false,"code":"invalid_response","status":int(reply[1])}
@@ -39,4 +43,5 @@ func request(path: String, body: Dictionary = {}) -> Dictionary:
 		value["ok"] = false
 		if not value.has("code"): value["code"] = "network"
 	value["_http_status"] = int(reply[1])
+	value["_byte_count"] = bytes.size()
 	return value

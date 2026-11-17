@@ -1,4 +1,55 @@
 {
-  "base_url": "https://mission-lang-resumes-fever.trycloudflare.com",
-  "dataset_version": "sf-20261117-v1"
+  "base_url": "https://inventory-managing-arthur-ministry.trycloudflare.com",
+  "dataset_version": "sf-parcel-20261117-v2",
+  "manifest_sha256": "318d4e27405ae879226d1672c0253b3930e119cf878115bd71d559fc932e40db",
+  "examples": [
+    {
+      "block_id": "p-3139019",
+      "parcel_id": "3139019",
+      "selection_unit": "parcel",
+      "name": "328 FRIDA KAHLO WAY",
+      "address": "328 FRIDA KAHLO WAY",
+      "address_count": 1,
+      "center": [
+        -122.452182,
+        37.7295073
+      ],
+      "bbox": [
+        -122.4523504,
+        37.7294654,
+        -122.4520134,
+        37.7295491
+      ],
+      "source_area_m2": 271.16,
+      "inset_area_m2": 271.16,
+      "inset_m": 0,
+      "cell_count": 795,
+      "farm_path": "farms/p-3139019.json",
+      "building_count": 2
+    },
+    {
+      "block_id": "p-3139010",
+      "parcel_id": "3139010",
+      "selection_unit": "parcel",
+      "name": "424 STAPLES AVE",
+      "address": "424 STAPLES AVE",
+      "address_count": 1,
+      "center": [
+        -122.4516233,
+        37.7293138
+      ],
+      "bbox": [
+        -122.4516676,
+        37.7291592,
+        -122.4515791,
+        37.7294685
+      ],
+      "source_area_m2": 261.133,
+      "inset_area_m2": 261.133,
+      "inset_m": 0,
+      "cell_count": 809,
+      "farm_path": "farms/p-3139010.json",
+      "building_count": 1
+    }
+  ]
 }

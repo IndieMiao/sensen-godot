@@ -1,1 +1,5 @@
-{"base_url":"","dataset_version":"sf-20261117-v1"}
+{
+  "base_url": "",
+  "dataset_version": "sf-parcel-20261117-v2",
+  "manifest_sha256": "318d4e27405ae879226d1672c0253b3930e119cf878115bd71d559fc932e40db"
+}
