@@ -44,7 +44,7 @@ func _request(method: int, path: String, body: Dictionary, done: Callable) -> vo
 		var data = JSON.parse_string(raw.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS else null
 		if not data is Dictionary:
 			done.call({"ok": false, "code": "network"})
-		elif code >= 200 and code < 300 and data.get("ok") is bool and data.ok == true:
+		elif code == 200 and data.get("ok") is bool and data.ok == true:
 			done.call(data)
 		else:
 			done.call({"ok": false, "code": str(data.get("code", "network"))}))

@@ -283,12 +283,24 @@ func test_current_refusal_still_retires_login_and_suppresses_notice() -> void:
 	assert_int(rt.ui.screen_kind()).is_equal(P0SysScreen.Kind.SUSPENDED)
 	assert_bool(flow.showing()).is_false()
 
-func test_non_2xx_even_with_ok_true_is_not_server_confirmation() -> void:
-	await _show()
-	_ok()
-	await _answer(await _request(Api.PATH + "/ack"), _http(), 500, {"ok": true})
-	assert_int(flow._pending[flow._owner]).is_equal(1)
-	assert_bool(flow.showing()).is_false()
+func test_non_200_even_with_ok_true_is_not_server_confirmation() -> void:
+	for code in [201, 202, 204, 500]:
+		flow._loaded = false
+		await _show(code)
+		_ok()
+		await _answer(await _request(Api.PATH + "/ack"), _http(), code, {"ok": true})
+		assert_int(flow._pending[flow._owner]).is_equal(code)
+		assert_bool(flow.showing()).is_false()
+		assert_str(rt.ui.sys_text()).is_empty()
+
+func test_non_200_get_cannot_claim_authoritative_null_or_version() -> void:
+	for code in [201, 202, 204]:
+		var received := []
+		flow.api.read(func(r): received.append(r))
+		await _answer(await _request(), _http(), code, {"ok": true, "name_reset": null})
+		assert_int(received.size()).is_equal(1)
+		assert_bool(received[0].get("ok", true)).is_false()
+		assert_int(Api.unread(received[0])).is_equal(-1)
 
 func test_conflict_requeries_without_acknowledging_unseen_version() -> void:
 	await _show(1)
