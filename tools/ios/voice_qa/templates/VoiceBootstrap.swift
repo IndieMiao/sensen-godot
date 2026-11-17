@@ -28,6 +28,7 @@ private final class VoiceQAControls: NSObject {
     init(window: UIWindow, scope: Data) {
         self.scope = scope
         super.init()
+        writeState(armed: false)
         let stack = UIStackView(arrangedSubviews: [label, startButton, stopButton])
         stack.axis = .vertical; stack.backgroundColor = .systemYellow; stack.spacing = 4
         stack.isLayoutMarginsRelativeArrangement = true; stack.directionalLayoutMargins = .init(top: 6, leading: 12, bottom: 6, trailing: 12)
@@ -56,11 +57,22 @@ private final class VoiceQAControls: NSObject {
             label.text = VoiceQAScope.marker + "\nQA scope rejected. Restart after correcting the QA configuration."
             return
         }
+        writeState(armed: true)
         label.text = VoiceQAScope.marker + "\nQA armed for up to 10 minutes. Use the approved QA harness."
         stopButton.isEnabled = true
     }
     @objc private func stop() { VoiceBridge.shared.stop(); stopped() }
+    private func writeState(armed: Bool) {
+        guard let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let config = (try? JSONSerialization.jsonObject(with: scope)) as? [String: Any]
+        let expiry = min(config?["expires_at"] as? Double ?? 0, Date().timeIntervalSince1970 + 600)
+        let state: [String: Any] = ["marker": VoiceQAScope.marker, "armed": armed, "expires_at": armed ? expiry : 0]
+        if let data = try? JSONSerialization.data(withJSONObject: state) {
+            try? data.write(to: directory.appendingPathComponent(".voice_qa_state.json"), options: .atomic)
+        }
+    }
     private func stopped() {
+        writeState(armed: false)
         startButton.isEnabled = false; stopButton.isEnabled = false
         label.text = VoiceQAScope.marker + "\nQA stopped. Restart the app for another run."
     }

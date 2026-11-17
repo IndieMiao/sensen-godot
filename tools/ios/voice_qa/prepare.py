@@ -87,6 +87,11 @@ def patch_bridge(text):
         qaPermit?.disarm(); qaPermit = nil
         NotificationCenter.default.post(name: Notification.Name(VoiceQAScope.marker), object: nil)
         lifecycle &+= 1''')
+    text = replace_once(text, "    private func emit(_ data: [String: Any]) {\n        guard let bytes = try? JSONSerialization.data(withJSONObject: data)", """    private func emit(_ data: [String: Any]) {
+        var stamped = data
+        stamped["qa_native_uptime_ms"] = ProcessInfo.processInfo.systemUptime * 1000
+        stamped["qa_native_wall_seconds"] = Date().timeIntervalSince1970
+        guard let bytes = try? JSONSerialization.data(withJSONObject: stamped)""")
     return text
 
 
@@ -117,13 +122,14 @@ def prepare(source_project, output, scope, now=None):
     pbx, count = re.subn(r'(\bPRODUCT_BUNDLE_IDENTIFIER\s*=\s*)[^;]+;', r'\1"app.gensen.voiceqa";', pbx)
     if count == 0:
         raise ValueError("Missing Xcode bundle setting")
+    pbx = re.sub(r'(\bINFOPLIST_KEY_CFBundleDisplayName\s*=\s*)[^;]+;', r'\1"Gensen Voice Media QA";', pbx)
     pbx = re.sub(r'\bCODE_SIGN_ENTITLEMENTS\s*=\s*[^;]+;', 'CODE_SIGN_ENTITLEMENTS = "";', pbx)
     pbx = re.sub(r'\bCODE_SIGNING_(?:ALLOWED|REQUIRED)\s*=\s*[^;]+;', '', pbx)
     pbx, builds = re.subn(r'(\bbuildSettings\s*=\s*\{)', r'\1\n CODE_SIGNING_ALLOWED = NO;\n CODE_SIGNING_REQUIRED = NO;', pbx)
     if builds == 0:
         raise ValueError("Missing Xcode build settings")
     info = plistlib.loads((app / "sensen-Info.plist").read_bytes())
-    info.update(CFBundleIdentifier=QA_BUNDLE, CFBundleDisplayName="Gensen Voice Media QA", SensenVoiceQAScope=scope)
+    info.update(CFBundleIdentifier=QA_BUNDLE, CFBundleDisplayName="Gensen Voice Media QA", SensenVoiceQAScope=scope, NSLocalNetworkUsageDescription="This QA build connects to the isolated voice test service on your local network.")
     if "NSMicrophoneUsageDescription" not in info:
         raise ValueError("Microphone purpose must come from the production injector")
     # This is a native patch preparation, not an executable game package or a signing/export operation.
@@ -144,7 +150,11 @@ def prepare(source_project, output, scope, now=None):
         out_bridge.write_text(patched)
         shutil.copyfile(HERE / "templates/VoiceQAPolicy.swift", out_package / "Sources/SensenVoiceApple/VoiceQAPolicy.swift")
         shutil.copyfile(HERE / "templates/VoiceBootstrap.swift", output / "sensen/VoiceBootstrap.swift")
+        shutil.copyfile(HERE / "templates/G3Spike.mm", output / "sensen/G3Spike.mm")
         (output / "sensen/sensen-Info.plist").write_bytes(plistlib.dumps(info, sort_keys=False))
+        from inject_voice import set_usage_string
+        set_usage_string(output / "sensen/en.lproj/InfoPlist.strings", "NSLocalNetworkUsageDescription", info["NSLocalNetworkUsageDescription"])
+        set_usage_string(output / "sensen/zh-Hans.lproj/InfoPlist.strings", "NSLocalNetworkUsageDescription", "此测试版本连接您所在局域网中的隔离语音测试服务。")
         (output / "sensen.xcodeproj/project.pbxproj").write_text(pbx)
         patch = "".join(difflib.unified_diff(bridge.read_text().splitlines(True), patched.splitlines(True), fromfile="production/VoiceBridge.swift", tofile="qa-copy/VoiceBridge.swift"))
         (output / "voice-media-qa.patch").write_text(patch)
@@ -153,6 +163,7 @@ def prepare(source_project, output, scope, now=None):
                   "production_bridge_sha256": digest(bridge), "qa_bridge_sha256": digest(out_bridge),
                   "policy_sha256": digest(out_package / "Sources/SensenVoiceApple/VoiceQAPolicy.swift"),
                   "bootstrap_sha256": digest(output / "sensen/VoiceBootstrap.swift"),
+                  "g3spike_sha256": digest(output / "sensen/G3Spike.mm"),
                   "production_capability": False, "qa_capability": "manual-scoped-maximum-600-seconds",
                   "signing_enabled": False, "game_pck_included": False, "requires_separately_reviewed_qa_harness": True}
         (output / MANIFEST).write_text(json.dumps(report, indent=2))

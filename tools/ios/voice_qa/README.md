@@ -105,3 +105,9 @@ Send this branch plus exact source hashes, source patch and test evidence to 周
 Do not register `app.gensen.voiceqa`, create a profile/certificate, use a physical device, upload to TestFlight,
 or touch any production service/LiveKit environment without the applicable explicit approval. 大乔 owns build,
 Godot, simulator and device windows. GeoFarm native issues preempt this work. Its r1/r2 services remain untouched.
+
+## 11-18 harness extension
+
+A separately frozen minimal harness and unsigned build chain are now provided in [HARNESS.md](HARNESS.md).
+The native preparation itself still never carries a game PCK; the following pack step binds only reviewed QA sources
+to the same scope. The actual unsigned build does not establish media/device acceptance.
