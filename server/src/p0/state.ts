@@ -258,6 +258,9 @@ export interface P0State {
   // SGODOT-484 sanctions (苏烈's admin commands write it, through the admin port only; identify reads suspended, voice join
   // reads voice; never in the view). until: ms, null for good; report: the report id that brought it (R-YYYYMMDD-…).
   sanctions?: { suspended?: Sanction; voice?: Sanction; name_reset_at?: number };
+  // SGODOT-484 v1.6.10: account-level confirmation of the latest name reset, stored atomically with the save.
+  // Optional; old name_reset_at is read logically as 1/0, never backfilled by a GET. Not part of the game view.
+  account_notices?: { name_reset: { version: number; ack_version: number } };
   rng: number;
   seq: number;
 }

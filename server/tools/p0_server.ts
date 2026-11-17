@@ -17,6 +17,7 @@ import { identify, inForce, isRefusal } from '../src/p0/accounts/identify.js';
 import { legalVersions, registerAccountRoutes } from '../src/p0/accounts/routes.js';
 import { registerCodeRoutes } from '../src/p0/accounts/codes.js';
 import { registerAccountDeleteRoute } from '../src/p0/accounts/delete.js';
+import { registerAccountNoticeRoutes } from '../src/p0/accounts/notices.js';
 import { P0Accounts } from '../src/p0/accounts/store.js';
 import Fastify from 'fastify';
 import { mkdirSync } from 'node:fs';
@@ -218,6 +219,7 @@ voice.tell = (player, payload) => hub.tell(player, payload);
 // withdrawn with it when a refresh token is kept.
 registerAccountDeleteRoute(app, { store, accounts, voice, hub, now: Date.now, identify: identifyDeps,
   revokeApple: appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : undefined });
+registerAccountNoticeRoutes(app, { store, identify: identifyDeps });
 voice.seen = (a, b) => hub.seenChanged(a, b);
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {

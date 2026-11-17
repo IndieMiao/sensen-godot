@@ -2,6 +2,7 @@
 import type { FastifyInstance } from 'fastify';
 import type { P0Store } from './store.js';
 import { supportCode } from './support.js';
+import { nextNameReset } from './accounts/notices.js';
 
 export interface ModerationActions {
   dropVoice(player: string): Promise<void>;
@@ -49,9 +50,15 @@ export function registerModerationRoutes(app: FastifyInstance, deps: {
     }
     const saved = deps.store.peek(player);
     if (!saved) return reply.code(404).send({ ok: false, code: 'unknown_player' });
+    let nameReset: ReturnType<typeof nextNameReset> | undefined;
+    if (action === 'reset_name') {
+      try { nameReset = nextNameReset(saved); }
+      catch { return reply.code(500).send({ ok: false, code: 'notice_failed' }); }
+    }
     const next = structuredClone(saved);
     next.sanctions ??= {};
     if (action === 'reset_name') {
+      next.account_notices = { ...next.account_notices, name_reset: nameReset! };
       next.profile ??= {};
       delete next.profile.name;
       next.profile.name_locked_until = now + WEEK;
