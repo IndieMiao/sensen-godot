@@ -23,11 +23,30 @@ private final class FakeRoom: VoiceMediaRoom {
     var operations: [String] = []
     var connectGate: CheckedContinuation<Void, Never>?
     var microphoneGate: CheckedContinuation<Void, Never>?
+    var subscriptionGate: CheckedContinuation<Void, Never>?
     var holdConnect = false
     var holdMicrophone = false
     var failPermissions = false
     var permissionGate: CheckedContinuation<Void, Never>?
     var holdPermissions = false
+    var holdSubscriptions = false
+    var captureAvailable = false
+    var outputAvailable = false
+    var micRequested = false
+    var stopFailures = false
+    var retirements = 0
+    var lateTransmitAttempts = 0
+    let captureGate = VoiceCaptureGate()
+    var sending: Bool {
+        var syntheticFrame: Float = 1
+        captureGate.filter { syntheticFrame = 0 }
+        return micRequested && syntheticFrame != 0
+    }
+    lazy var transmit = VoiceTransmitFence { [unowned self] input, output in
+        if !input && !output && self.stopFailures { throw Failure.refused }
+        if output { try self.captureGate.setEnabled(input) } else { self.captureGate.retire() }
+        self.captureAvailable = input; self.outputAvailable = output
+    }
     var disconnects = 0
     var microphoneValues: [Bool] = []
     var permissionsDenied: [Set<String>] = []
@@ -36,23 +55,41 @@ private final class FakeRoom: VoiceMediaRoom {
     var lastBlocked: Set<String> = []
     var lastListening = true
     func connect(url: String, token: String) async throws {
+        try transmit.prepare()
         operations.append("connect")
         if holdConnect { await withCheckedContinuation { connectGate = $0 } }
+        if transmit.retired { await disconnect() }
+        try transmit.checkActive()
     }
-    func disconnect() async { disconnects += 1; operations.append("disconnect") }
+    @discardableResult
+    func retire() -> Bool { retirements += 1; event = nil; return transmit.retire() }
+    func disconnect() async { disconnects += 1; micRequested = false; operations.append("disconnect") }
     func microphone(_ enabled: Bool) async throws {
+        try transmit.microphone(enabled)
         operations.append("microphone:\(enabled)")
         if holdMicrophone { holdMicrophone = false; await withCheckedContinuation { microphoneGate = $0 } }
+        // A badly-timed SDK completion still tries to publish; capture fence, not Task cancellation, prevents it.
+        micRequested = enabled
+        if transmit.retired && sending { lateTransmitAttempts += 1 }
         microphoneValues.append(enabled)
         participants[0] = VoiceParticipantState(identity: "self", name: "Me", local: true, speaking: false,
                                                 microphone: enabled, subscribedAudio: false)
+        if transmit.retired { await disconnect() }
+        try transmit.checkActive()
     }
     func permissions(denied: Set<String>) async throws {
+        try transmit.checkActive()
         operations.append("permissions"); permissionsDenied.append(denied)
         if holdPermissions { holdPermissions = false; await withCheckedContinuation { permissionGate = $0 } }
+        try transmit.checkActive()
         if failPermissions { throw Failure.refused }
     }
-    func subscriptions(blocked: Set<String>) async throws { operations.append("subscriptions"); subscriptionsBlocked.append(blocked) }
+    func subscriptions(blocked: Set<String>) async throws {
+        try transmit.checkActive()
+        operations.append("subscriptions"); subscriptionsBlocked.append(blocked)
+        if holdSubscriptions { holdSubscriptions = false; await withCheckedContinuation { subscriptionGate = $0 } }
+        try transmit.checkActive()
+    }
     func volumes(listening: Bool, values: [String: Double], blocked: Set<String>) {
         lastListening = listening; lastVolumes = values; lastBlocked = blocked
     }
@@ -74,6 +111,10 @@ struct VoiceMediaControllerChecks {
         check(false, "asynchronous state did not settle")
     }
     @MainActor static func main() async {
+        if CommandLine.arguments.contains("--retirement-only") {
+            await retirementOnly()
+            return
+        }
         if CommandLine.arguments.contains("--interruption-only") {
             await interruptionOnly()
             return
@@ -135,7 +176,7 @@ struct VoiceMediaControllerChecks {
         now = 19; controller.command(.lease(session: "s1", milliseconds: 20_000))
         now = 21; controller.tick(); check(first.disconnects == 0, "renewed lease stays connected")
         now = 40; controller.tick()
-        await settle { first.disconnects == 1 }
+        await settle { first.disconnects == 1 && audio.deactivations == 1 }
         check(events.last(where: { $0["event"] as? String == "disconnected" })?["reason"] as? String == "VOICE_EXPIRED", "lease expires with explicit reason")
         check(audio.deactivations == 1, "expired room restores audio")
 
@@ -149,12 +190,12 @@ struct VoiceMediaControllerChecks {
         check(new.connectGate == nil, "replacement waits for old media teardown")
         old.connectGate?.resume(); old.connectGate = nil
         await settle { new.connectGate != nil }
-        check(old.disconnects == 1, "cancelled late connect still disconnects its old room")
+        check(old.disconnects >= 1 && !old.sending, "cancelled late connect stays retired and disconnected")
         lateEvent?(.disconnected)
         check(new.disconnects == 0, "retired room callback cannot disconnect replacement")
         controller.background()
         new.connectGate?.resume(); new.connectGate = nil
-        await settle { new.disconnects == 1 }
+        await settle { new.disconnects >= 1 }
         check(!events.contains { $0["event"] as? String == "connected" && $0["session"] as? String == "new" }, "background ignores late connected event")
         check(events.last(where: { $0["event"] as? String == "disconnected" })?["reason"] as? String == "BACKGROUND", "background disconnect reason")
         controller.command(.connect(session: "away", url: "wss://example.test", token: "grant"))
@@ -258,6 +299,111 @@ struct VoiceMediaControllerChecks {
         check(room !== retired, "new bridge lifetime does not inherit stale interruption")
         controller.shutdown()
         print("VOICE_INTERRUPTION_CHECKS \(count) passed=\(count-failures) failed=\(failures); fake audio/SDK, no sockets")
+        if failures > 0 { exit(1) }
+    }
+
+    @MainActor static func retirementOnly() async {
+        let capture = VoiceCaptureGate()
+        var synthetic = [Float](repeating: 0.75, count: 8)
+        capture.filter { synthetic = synthetic.map { _ in 0 } }
+        check(synthetic.allSatisfy { $0 == 0 }, "capture processor starts closed")
+        try! capture.setEnabled(true)
+        synthetic = [Float](repeating: 0.75, count: 8)
+        capture.filter { synthetic = synthetic.map { _ in 0 } }
+        check(synthetic.allSatisfy { $0 == 0.75 }, "live capture processor preserves frame")
+        capture.retire()
+        capture.filter { synthetic = synthetic.map { _ in 0 } }
+        check(synthetic.allSatisfy { $0 == 0 }, "retired capture processor zeros outgoing frame in place")
+        var refused = false
+        do { try capture.setEnabled(true) } catch { refused = true }
+        check(refused && capture.retired, "retired processor cannot be reopened by late SDK completion")
+        for trigger in ["lease", "background", "transport"] {
+            let audio = FakeAudio()
+            var room: FakeRoom!
+            var events: [[String: Any]] = []
+            var now: TimeInterval = 0
+            let controller = VoiceMediaController(audio: audio, makeRoom: { let r = FakeRoom(); room = r; return r },
+                                                   emit: { events.append($0) }, clock: { now })
+            controller.command(.connect(session: trigger, url: "wss://example.test", token: "grant"))
+            controller.command(.microphone(session: trigger, enabled: true))
+            await settle { events.contains { $0["event"] as? String == "connected" } }
+            check(room.sending, "precondition: microphone already sending before \(trigger)")
+            let lateCallback = room.event
+            if trigger == "background" {
+                room.holdSubscriptions = true
+                controller.command(.subscribed(session: trigger, identity: "p", enabled: false))
+                await settle { room.subscriptionGate != nil }
+            } else {
+                room.holdPermissions = true
+                controller.command(.publishAllowed(session: trigger, identity: "p", enabled: false))
+                await settle { room.permissionGate != nil }
+            }
+            if trigger == "lease" { now = 21; controller.tick() }
+            else if trigger == "background" { controller.background() }
+            else { controller.transportFailed() }
+            // No await and no gate.resume between termination and this stop assertion.
+            check(room.retirements == 1 && room.transmit.retired && !room.captureAvailable && !room.sending,
+                  "\(trigger) synchronously stops capture despite held SDK operation")
+            check(room.permissionGate != nil || room.subscriptionGate != nil, "old SDK operation is still held at stop proof")
+            await settle { room.disconnects >= 1 }
+            check(room.permissionGate != nil || room.subscriptionGate != nil, "disconnect starts without waiting for held operation")
+            let connectedBefore = events.filter { $0["event"] as? String == "connected" }.count
+            lateCallback?(.reconnected)
+            controller.command(.lease(session: trigger, milliseconds: 20_000))
+            controller.command(.microphone(session: trigger, enabled: true))
+            check(!room.sending && events.filter { $0["event"] as? String == "connected" }.count == connectedBefore,
+                  "late callback/lease/mic cannot revive retired session")
+            room.permissionGate?.resume(); room.permissionGate = nil
+            room.subscriptionGate?.resume(); room.subscriptionGate = nil
+            await settle { audio.deactivations == 1 }
+            check(room.lateTransmitAttempts == 0 && !room.sending, "held SDK completion leaves capture shut")
+            controller.shutdown()
+        }
+
+        // A mic-on await itself can finish AFTER retirement; the driver's shared fence must still suppress capture.
+        let audio = FakeAudio()
+        var rooms: [FakeRoom] = []
+        var events: [[String: Any]] = []
+        let controller = VoiceMediaController(audio: audio, makeRoom: { let r = FakeRoom(); rooms.append(r); return r },
+                                               emit: { events.append($0) })
+        controller.command(.connect(session: "old", url: "wss://example.test", token: "grant"))
+        let old = rooms[0]
+        await settle { events.contains { $0["event"] as? String == "connected" } }
+        old.holdMicrophone = true
+        controller.command(.microphone(session: "old", enabled: true))
+        await settle { old.microphoneGate != nil }
+        let late = old.event
+        controller.command(.connect(session: "replacement", url: "wss://example.test", token: "grant"))
+        controller.command(.microphone(session: "replacement", enabled: true))
+        let replacement = rooms[1]
+        check(old.transmit.retired && !old.sending, "replacement first closes old capture fence")
+        for _ in 0..<5 { await Task.yield() }
+        check(replacement.operations.isEmpty, "replacement waits for full old task cleanup before audio enable")
+        old.microphoneGate?.resume(); old.microphoneGate = nil
+        await settle { events.contains { $0["event"] as? String == "connected" && $0["session"] as? String == "replacement" } }
+        check(old.lateTransmitAttempts == 0 && !old.sending, "late mic-on never transmitted after retirement")
+        check(replacement.sending, "replacement begins normally after old cleanup")
+        late?(.reconnected); old.retire()
+        check(replacement.sending && replacement.retirements == 0, "old callback/second retirement cannot stop new room")
+        controller.command(.disconnect("replacement"))
+        check(!replacement.sending, "normal exit also stops synchronously")
+        await settle { replacement.disconnects == 1 && audio.deactivations == 1 }
+        check(replacement.disconnects == 1 && audio.deactivations == 1, "normal exit cleans room/audio exactly once")
+
+        // Never turn an unconfirmed SDK stop into a successful disconnected claim or enable a replacement.
+        controller.command(.connect(session: "stop-error", url: "wss://example.test", token: "grant"))
+        let broken = rooms[2]
+        await settle { events.contains { $0["event"] as? String == "connected" && $0["session"] as? String == "stop-error" } }
+        broken.stopFailures = true
+        controller.transportFailed()
+        check(events.last?["code"] as? String == "VOICE_STOP_FAILED", "SDK stop failure reported explicitly")
+        controller.command(.connect(session: "unsafe-replacement", url: "wss://example.test", token: "grant"))
+        check(rooms.count == 3, "unconfirmed stop latches replacement refusal")
+        check(!events.contains { $0["event"] as? String == "disconnected" && $0["session"] as? String == "stop-error" },
+              "unconfirmed stop is not reported as disconnected success")
+        await settle { broken.disconnects >= 1 }
+        controller.shutdown()
+        print("VOICE_RETIREMENT_CHECKS \(count) passed=\(count-failures) failed=\(failures); held SDK seams, no audio/sockets")
         if failures > 0 { exit(1) }
     }
 }

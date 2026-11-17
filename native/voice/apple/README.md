@@ -47,6 +47,14 @@ immediately, then reconcile SDK subscriptions; control errors terminate the room
 Track arrival/mute/subscription events update Android-shaped snapshots. Actual race-free silence/SFU behavior
 still requires two-client real-audio validation; fake SDK tests are not media/SFU evidence.
 
+Retirement closes a preinstalled capture-postprocessing gate synchronously, before waiting for any SDK operation.
+It zeros subsequent outgoing microphone frames in place (no copy/retention/logging), and marks the driver retired.
+An independent disconnect task starts immediately; full task/room reclamation is a separate barrier that a replacement
+must await. The gate stays attached and closed while a late mic/connect operation drains, and driver guards reject
+late operations/callbacks. This stops microphone content without relying on a potentially blocked SDK worker; it
+does not claim to retract already-processed/network-buffered frames or to stop all silent transport packets instantly.
+An unexpected capture-processor owner or an unconfirmed gate stop fails closed instead of reporting disconnect success.
+
 `AppleVoiceAudio` uses iOS 17's permission API with an older-system fallback, PlayAndRecord/voiceChat/defaultToSpeaker
 while joined, and Ambient on leave. It temporarily disables LiveKit's automatic audio-session configuration to
 avoid two category owners. Route/accessory/interruption and Godot game-audio behavior need actual Release devices.

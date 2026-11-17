@@ -15,6 +15,9 @@ enum VoiceRoomEvent { case reconnected, reconnecting, participantsChanged, snaps
 protocol VoiceMediaRoom: AnyObject {
     var event: ((VoiceRoomEvent) -> Void)? { get set }
     var participants: [VoiceParticipantState] { get }
+    /// Synchronous outgoing-audio gate + permanent driver retirement; must NOT wait for SDK/worker operations.
+    /// False means the stop could not be confirmed, so no successful-disconnected report or replacement is allowed.
+    @discardableResult func retire() -> Bool
     func connect(url: String, token: String) async throws
     func disconnect() async
     func microphone(_ enabled: Bool) async throws
@@ -68,6 +71,7 @@ final class VoiceMediaController {
     private var permissionResult: Bool?
     private var foreground = true
     private var audioInterrupted = false
+    private var stopUnconfirmed = false
 
     init(audio: VoicePlatformAudio, makeRoom: @escaping () -> VoiceMediaRoom,
          emit: @escaping ([String: Any]) -> Void, resetEvents: @escaping () -> Void = {},
@@ -166,6 +170,7 @@ final class VoiceMediaController {
         resetEvents()
         guard foreground else { send("disconnected", id: id, values: ["reason": "BACKGROUND"]); return }
         guard !audioInterrupted else { send("disconnected", id: id, values: ["reason": "AUDIO_INTERRUPTED"]); return }
+        guard !stopUnconfirmed else { send("error", id: id, values: ["code": "VOICE_STOP_FAILED"]); return }
         let s = Session(id: id, room: makeRoom(), now: clock())
         current = s // Allow Block/Mute/lease commands immediately, while connect is still waiting.
         s.room.event = { [weak self, weak s] event in
@@ -273,6 +278,10 @@ final class VoiceMediaController {
 
     private func finish(_ reason: String, send: Bool = true) {
         guard let old = current else { return }
+        // Stop outgoing microphone content first. Task cancellation or remote-volume mute cannot provide this barrier.
+        // This closes a preinstalled capture-frame gate without entering the SDK, even if a control call never returns.
+        let stopped = old.room.retire()
+        if !stopped { stopUnconfirmed = true }
         current = nil
         old.connected = false; old.desiredMic = false
         old.room.event = nil
@@ -283,19 +292,21 @@ final class VoiceMediaController {
         retirementTurn &+= 1
         let turn = retirementTurn
         let connecting = old.connecting, controlling = old.controlling
+        // Begin SDK room cleanup independently too; do not enqueue it behind the very operation being cancelled.
+        let disconnecting = Task { @MainActor in await old.room.disconnect() }
         retiring = Task { @MainActor [weak self] in
             await prior?.value
             await connecting?.value
             await controlling?.value
-            // SDK disconnect owns publication/track cleanup, even if a cancelled microphone await completed late.
-            await old.room.disconnect()
+            await disconnecting.value
             if let self, self.current == nil {
                 do { try self.audio.deactivate() }
                 catch { self.send("error", id: old.id, values: ["code": "AUDIO_SESSION_FAILED"]) }
             }
             if let self, self.retirementTurn == turn { self.retiring = nil }
         }
-        if send { self.send("disconnected", id: old.id, values: ["reason": reason]) }
+        if !stopped { self.send("error", id: old.id, values: ["code": "VOICE_STOP_FAILED"]) }
+        else if send { self.send("disconnected", id: old.id, values: ["reason": reason]) }
     }
 
     private func send(_ kind: String, id: String, values: [String: Any] = [:]) {
