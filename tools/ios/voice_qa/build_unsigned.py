@@ -35,7 +35,7 @@ def check_inputs(export, harness, pck):
     for name,field in [('VoiceBootstrap.swift','bootstrap_sha256'),('G3Spike.mm','g3spike_sha256')]:
         if hashlib.sha256((export/'sensen'/name).read_bytes()).hexdigest()!=report.get(field):raise ValueError('Native bootstrap changed')
     package=export/'Packages/SensenVoiceApple/Sources/SensenVoiceApple'
-    for name,field in [('VoiceBridge.swift','qa_bridge_sha256'),('VoiceQAPolicy.swift','policy_sha256')]:
+    for name,field in [('VoiceBridge.swift','qa_bridge_sha256'),('VoiceQAPolicy.swift','policy_sha256'),('VoiceEventDelivery.swift','qa_delivery_sha256')]:
         if hashlib.sha256((package/name).read_bytes()).hexdigest()!=report.get(field):raise ValueError('QA native policy changed')
     if not pck.is_file() or pck.stat().st_size<16:raise ValueError('Export the frozen QA PCK first')
     pck_sha=hashlib.sha256(pck.read_bytes()).hexdigest()

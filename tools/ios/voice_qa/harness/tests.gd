@@ -1,5 +1,6 @@
 extends SceneTree
 const Session = preload("res://session.gd")
+const IOS = preload("res://modules/net/voice_backend_ios.gd")
 var checks := 0
 var failures := 0
 class FakeNative extends RefCounted:
@@ -56,6 +57,8 @@ func _run() -> void:
 	verify(t[1].calls.any(func(c):return c[0]=="lease" and c[2]>19000 and c[2]<=19500),"normal native lease below 20s server lease")
 	t[1].voice_event.emit(JSON.stringify({"event":"connected","session":t[0]._sid,"participants":[],"microphone":false,"listening":true}))
 	verify(t[0].evidence.any(func(row):return row.get("event")=="connected" and not row.has("code") and not row.has("reason")),"successful native events do not acquire false failure fields")
+	t[1].voice_event.emit(JSON.stringify({"event":"microphone","session":t[0]._sid,"microphone":false,"qa_native_uptime_ms":1234.5,"qa_native_wall_seconds":1794936000.25}))
+	verify(t[0].evidence[-1].get("qa_native_uptime_ms")==1234.5 and t[0].evidence[-1].get("qa_native_wall_seconds")==1794936000.25,"harness preserves both numeric native clocks from wire events")
 	t[0].set_blocked("qa-android-b",true)
 	verify(t[1].calls.any(func(c):return c[0]=="subscribe" and c[2]==false) and t[1].calls.any(func(c):return c[0]=="publish" and c[2]==false),"Block affects both native directions")
 	t[0].set_blocked("qa-android-b",false)
@@ -84,5 +87,24 @@ func _run() -> void:
 	verify(not JSON.stringify(t[0].evidence).contains("SENSITIVE_FIXTURE"),"event evidence never retains arbitrary body strings")
 	verify(not JSON.stringify(t[0].evidence).contains("fixture-code") and not JSON.stringify(t[0].evidence).contains("fixture-not-real"),"evidence excludes code and JWT")
 	done(t);await process_frame
+	var wire_path := ""
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--wire-fixture="): wire_path = arg.trim_prefix("--wire-fixture=")
+	verify(not wire_path.is_empty() and FileAccess.file_exists(wire_path),"actual emitter/outbox wire fixture supplied")
+	if not wire_path.is_empty() and FileAccess.file_exists(wire_path):
+		var parser := JSON.new(); parser.parse(FileAccess.get_file_as_string(wire_path))
+		var fixture: Dictionary = parser.data
+		var sent: Array[String] = []; var emitted: Array[String] = []
+		var real_backend = IOS.new(func(line: String):sent.append(line),func():return "0".repeat(64))
+		var transport := FakeBroker.new();root.add_child(transport)
+		var client = Session.new();client.configure({"validation_only":false,"client":"ios-a","media_origin":"wss://qa.test"},real_backend,transport,true);root.add_child(client)
+		client._sid="qa-fixture";client.state="connected"
+		real_backend.voice_event.connect(func(raw: String):emitted.append(raw))
+		real_backend.receive(str(fixture.initial));real_backend.receive(str(fixture.retry))
+		var expected_parser:=JSON.new();expected_parser.parse(str(fixture.initial).split("|",true,2)[2])
+		var expected: Dictionary=expected_parser.data
+		verify(client.evidence.size()==1 and client.evidence[0].get("qa_native_uptime_ms")==expected.get("qa_native_uptime_ms") and client.evidence[0].get("qa_native_wall_seconds")==expected.get("qa_native_wall_seconds"),"real backend preserves clocks from actual native emit and outbox bytes")
+		verify(emitted.size()==1 and sent.filter(func(line):return line.begins_with("VOICE_ACK|")).size()==2,"real backend ACKs retry twice but emits event once")
+		client.leave();client.queue_free();transport.queue_free();await process_frame
 	print("QA_HARNESS ",checks," checks, ",failures," failures; fake transport only")
 	quit(1 if failures else 0)

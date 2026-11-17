@@ -75,13 +75,13 @@ CODE_SIGN_IDENTITY. It has no provisioning/update, archive, export/upload or dev
 checked for signing commands and output for embedded.mobileprovision. No Apple registration is performed by this tool.
 The copied SDK archives were referenced from previously verified local inputs; those library bytes were not edited.
 
-Actual chain results (Q1117-28 initial run; Q1117-29 follow-up below): Python19/19; Godot20 final checks,0 failures (fake transport); actual QA PCK export;
+Actual chain results (Q1117-28 initial run; Q1117-29 follow-up below): Python19/19; Godot24 final checks,0 failures (fake transport); actual QA PCK export;
 actual arm64 iPhoneOS Release App build; packed main3-frame host smoke with Dummy audio and no backend, no script error.
 App/PCK/scope/English+Chinese mic/local-network purpose/three voice frameworks were read back. codesign -dv reports
 code object is not signed at all; no profile/signing command, no install, simulator, microphone or SFU session.
 
-Executable SHA abe0af4f1e856a6ef9f625af341f406f467e98976883d05b222818942c6bd17d;
-PCK SHA 1a39133e86167ac806ebbfb734e9e8f65861a181cc7cfce87309f8d2dcd9a200;
+Executable SHA fa27bc4e51b281b6fa98eb44a6ac304bd4b63e882a1fde1a9a9870e25ef305ad;
+PCK SHA 6a3452a980f5d8c4faefdc03a638c8dba2a21bf9cad902ea913614ebd08bcf20;
 executable/dSYM UUID BECB9F00-544D-3091-8338-9BEE30BEE67B (arm64).
 Evidence: /Volumes/ACASIS/tmp/yase-ios-harness-1117. All recorded command/ADB PIDs exited;5085 is free.
 
@@ -101,3 +101,23 @@ including slow response/expired budget; first fixture's frame-timer wait was sho
 to a monotonic-clock wait. Failure retained. Final build ended01:17:19 within01:13–01:18; only read-only PID verification
 followed at01:18:25. No native/SDK code change, signature, device or media execution. Final PCK SHA above is updated;
 the packaged-main smoke evidence remains the prior unchanged main scene (no iOS backend), not device acceptance.
+
+## Native clock publish review fix (387/ce5ca62d)
+
+The first timestamp patch serialized stamped events for the legacy C callback but passed the original dictionary
+to UDP. The QA copy now publishes the SAME stamped dictionary, and its copied VoiceEventDelivery explicitly accepts
+only the two finite nonnegative Double clock fields; missing/non-numeric clocks and credential fields are refused.
+Production VoiceBridge/VoiceEventDelivery stay unchanged. The release exclusion scan also recognizes these QA clock
+field names, so copying only the modified delivery code still leaves an exclusion marker.
+
+check_emit.py extracts the exact generated emit method (only test visibility changes), calls spy transport.publish,
+and uses the real copied delivery enqueue/poll. Its12 checks pass: both paths have identical clocks; real retry keeps
+original bytes; ACK stops retry; strings/booleans/negative/NaN clocks and credential fields fail. Restoring old
+publish(data) produces the expected negative failure. The generated initial/retry bytes are then read by the real
+production VoiceBackendIOS with an in-memory sender/key (no socket), proving two ACKs/one emission and harness clock
+retention. Final Godot count24 is not added to previous16/18/20 runs.
+
+New Q1117-31 actual window01:48–01:58 was used; the earlier misdated01:33–01:43 window was NOT used. Rebuilt unsigned
+arm64 App/PCK/three voice frameworks/scope were read back; codesign still reports not signed. All recorded PIDs and5085
+were released before01:53. No registration, provisioning, signature, device, simulator, audio or SFU execution.
+The final executable/PCK hashes above reflect this fix; native module changed, UUID/dSYM remain paired.

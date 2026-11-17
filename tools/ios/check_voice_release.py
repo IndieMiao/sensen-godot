@@ -8,7 +8,7 @@ import plistlib
 import re
 import sys
 
-MARKERS = (b"GENSEN_VOICE_MEDIA_QA_V1", b"SensenVoiceQAScope", b"startMediaQA", b"VoiceQAPolicy", b"VoiceQAScope", b"VoiceQAPermit")
+MARKERS = (b"GENSEN_VOICE_MEDIA_QA_V1", b"SensenVoiceQAScope", b"startMediaQA", b"VoiceQAPolicy", b"VoiceQAScope", b"VoiceQAPermit", b"qa_native_uptime_ms", b"qa_native_wall_seconds")
 QA_BUNDLE = "app.gensen.voiceqa"
 MANIFEST = ".gensen-voice-media-qa.json"
 

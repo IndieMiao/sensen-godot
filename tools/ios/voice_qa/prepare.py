@@ -92,6 +92,21 @@ def patch_bridge(text):
         stamped["qa_native_uptime_ms"] = ProcessInfo.processInfo.systemUptime * 1000
         stamped["qa_native_wall_seconds"] = Date().timeIntervalSince1970
         guard let bytes = try? JSONSerialization.data(withJSONObject: stamped)""")
+    text = replace_once(text, "        transport?.publish(data)", "        transport?.publish(stamped)")
+    return text
+
+
+def patch_delivery(text):
+    text = replace_once(text, '"granted", "code", "reason"]),', '"granted", "code", "reason", "qa_native_uptime_ms", "qa_native_wall_seconds"]),\n              Self.qaClockFields(event),')
+    text = replace_once(text, '    private var pending: [Int64: Pending] = [:]', '''    // GENSEN_VOICE_MEDIA_QA_V1: only the copied QA delivery path accepts these numeric diagnostics.
+    private static func qaClockFields(_ event: [String: Any]) -> Bool {
+        for key in ["qa_native_uptime_ms", "qa_native_wall_seconds"] {
+            guard let raw = event[key], type(of: raw) == Double.self,
+                  let number = raw as? Double, number.isFinite, number >= 0 else { return false }
+        }
+        return true
+    }
+    private var pending: [Int64: Pending] = [:]''')
     return text
 
 
@@ -148,6 +163,9 @@ def prepare(source_project, output, scope, now=None):
         out_package = output / "Packages/SensenVoiceApple"
         out_bridge = out_package / "Sources/SensenVoiceApple/VoiceBridge.swift"
         out_bridge.write_text(patched)
+        delivery = package / "Sources/SensenVoiceApple/VoiceEventDelivery.swift"
+        out_delivery = out_package / "Sources/SensenVoiceApple/VoiceEventDelivery.swift"
+        out_delivery.write_text(patch_delivery(delivery.read_text()))
         shutil.copyfile(HERE / "templates/VoiceQAPolicy.swift", out_package / "Sources/SensenVoiceApple/VoiceQAPolicy.swift")
         shutil.copyfile(HERE / "templates/VoiceBootstrap.swift", output / "sensen/VoiceBootstrap.swift")
         shutil.copyfile(HERE / "templates/G3Spike.mm", output / "sensen/G3Spike.mm")
@@ -161,6 +179,7 @@ def prepare(source_project, output, scope, now=None):
         report = {"marker": MARKER, "environment": ENVIRONMENT, "namespace": NAMESPACE,
                   "scope_sha256": hashlib.sha256(json.dumps(scope, sort_keys=True).encode()).hexdigest(),
                   "production_bridge_sha256": digest(bridge), "qa_bridge_sha256": digest(out_bridge),
+                  "qa_delivery_sha256": digest(out_delivery),
                   "policy_sha256": digest(out_package / "Sources/SensenVoiceApple/VoiceQAPolicy.swift"),
                   "bootstrap_sha256": digest(output / "sensen/VoiceBootstrap.swift"),
                   "g3spike_sha256": digest(output / "sensen/G3Spike.mm"),
