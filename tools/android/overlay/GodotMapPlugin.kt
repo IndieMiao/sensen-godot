@@ -240,6 +240,11 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     @UsedByGodot
+    fun setParcelBuildingHighlight(generation: Long, key: String) {
+        runOnUiThread { parcelController?.setBuildingHighlight(generation, key) }
+    }
+
+    @UsedByGodot
     fun clearParcelLayers(generation: Long) {
         runOnUiThread { parcelController?.clear(generation) }
     }
