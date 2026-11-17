@@ -45,10 +45,18 @@ The retrieved official HTML/DocC JSON and hashes are retained with the 387 build
 
 ## Remaining before submission
 
+The user decided on 2026-11-17 that the first release excludes France (relayed by 奕星; submission blockers S8).
+The first release therefore does not require a French encryption declaration. France availability and that document
+are no longer pending user decisions. This records the distribution decision, not a claim that store settings have
+already been saved or that the complete app's encryption classification is approved.
+
 The old A7 note “standard DTLS-SRTP is usually exempt” is insufficient to close the new linked-library decision by
-itself. The submission owner / legal-copy owner must confirm the actual country availability (including France)
-and App Store Connect questionnaire classification for this SDK configuration, then record the final Boolean and
-any required documentation/code. Do not report the QA plist's preserved false as that decision being approved.
+itself. After the first-release contents are fixed, including the 11-21 voice inclusion decision, the submission
+owner / legal-copy owner must complete the App Store Connect questionnaire using the final app's full encryption
+inventory, then record ITSAppUsesNonExemptEncryption and any other documentation/code actually required. The technical
+inventory above remains input to that questionnaire on SGODOT-387; it is not a complete final-IPA audit. Disabling
+voice while retaining linked WebRTC does not remove that library from the inventory. Do not report the QA plist's
+preserved false as that decision being approved. TestFlight also requires the applicable compliance declaration.
 
 This pending classification does not block local Release/UDP validation with voice capability disabled. It does
 remain a submission checklist item if the voice SDK is included in the final candidate, even before enabling its UI.

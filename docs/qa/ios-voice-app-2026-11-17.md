@@ -6,7 +6,7 @@ Author: 亚瑟 / virtual_user_id 0c011aa8-80fc-456a-835a-b5afc9f3ea72
 
 PR #1084 extends the reviewed 076537f90 media implementation with G3Spike → VoiceIOS → VoiceBridge startup, using the existing NativeBridgeKey. The Godot export injector snapshots the fixed LiveKit 2.19.0 Swift package and registers its product in the copied app project. Voice capability remains false.
 
-The exact q319 microphone purpose is installed in the app plist and English/Simplified Chinese localization. Store configuration preserves those keys and any explicit encryption Boolean. The submission owner still needs to confirm third-party WebRTC export classification, country availability and any App Store Connect documents; the isolated QA false is not a submission approval.
+The exact q319 microphone purpose is installed in the app plist and English/Simplified Chinese localization. Store configuration preserves those keys and any explicit encryption Boolean. The user decided on 11-17 that the first release excludes France, so no French encryption declaration is required for it. After the 11-21 voice inclusion decision fixes the first-release contents, the submission owner must complete the final app's full encryption questionnaire and determine ITSAppUsesNonExemptEncryption; the isolated QA false is not a submission approval.
 
 ## Validation ledger
 
