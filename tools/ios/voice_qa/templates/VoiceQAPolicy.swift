@@ -36,8 +36,9 @@ public struct VoiceQAScope: Decodable {
         Self.origin(mediaOrigin) != nil
     }
     static func origin(_ text: String) -> String? {
-        guard let url = URLComponents(string: text), url.scheme == "wss", let host = url.host?.lowercased(),
-              !host.isEmpty, !host.hasSuffix(".livekit.cloud"), host != "livekit.cloud",
+        guard text.utf8.allSatisfy({ $0 >= 33 && $0 != 127 }), let url = URLComponents(string: text), url.scheme == "wss", let host = url.host?.lowercased(),
+              host.range(of: "^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$", options: .regularExpression) == (host.startIndex..<host.endIndex),
+              !host.contains(".."), !host.hasSuffix(".livekit.cloud"), host != "livekit.cloud",
               url.user == nil, url.password == nil, url.query == nil, url.fragment == nil,
               url.path.isEmpty || url.path == "/", (1...65535).contains(url.port ?? 443) else { return nil }
         return "wss://\(host):\(url.port ?? 443)"
@@ -56,7 +57,7 @@ public struct VoiceQAScope: Decodable {
               expiry > now, expiry > issued, expiry - issued <= 90,
               let video = claims["video"] as? [String: Any], video["roomJoin"] as? Bool == true,
               let room = video["room"] as? String,
-              room.range(of: "^" + Self.roomNamespace + "-[0-9a-f]{12}-[0-9]+$", options: .regularExpression) != nil else { return false }
+              room.range(of: "^" + Self.roomNamespace + "-[0-9a-f]{12}-[0-9]+$", options: .regularExpression) == (room.startIndex..<room.endIndex) else { return false }
         if let notBefore = claims["nbf"] as? Double, !notBefore.isFinite || notBefore > now + 5 { return false }
         return true
     }

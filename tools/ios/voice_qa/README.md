@@ -12,7 +12,7 @@ preparation/templates into farm-dev, PR-A or #1084. The reviewed production base
 - Namespace: **p0-ios-voice-qa-1118**. Use separately created test identities and a separate issuer secret held by
   the test-service operator. No issuer secret or JWT is embedded in the app or included in evidence.
 - The actual self-hosted WSS origin, issuer's SHA256 and a maximum 24-hour scope must be frozen with the operator
-  before execution. No origin is guessed here, no DNS/TLS settings are changed, and `*.livekit.cloud` is rejected.
+  before execution. No origin is guessed here, no DNS/TLS settings are changed, and `*.livekit.cloud` is rejected. Hosts must use canonical ASCII DNS/IP names without a trailing dot or empty label; Unicode separators and literal IPv6 hosts are not accepted by this QA scope.
   The origin must terminate TLS normally and not redirect to another service. This preparation is not approval
   to create/start that environment; the current authorization is code/docs only.
 - Scope JSON fields (no extra fields): `schema:1`, `environment`, `namespace`, `media_origin`, `issuer_digest`,

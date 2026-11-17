@@ -46,17 +46,19 @@ struct PolicyChecks {
         check(try load(["expires_at": now + 90000]) == nil, "scope over 24 hours rejected")
         check(try load(["namespace": "p0-prod"]) == nil, "production namespace rejected")
         check(try load(["environment": "production"]) == nil, "production environment rejected")
-        for bad in ["wss://prod.livekit.cloud", "ws://devserver:17887", "wss://user:pass@devserver", "wss://devserver/path", "wss://devserver?next=prod", "wss://devserver#fragment", "wss://devserver:0"] {
+        for bad in ["wss://livekit.cloud", "wss://livekit.cloud.", "wss://Tenant.LIVEKIT.CLOUD", "wss://Tenant.LIVEKIT.CLOUD.", "wss://prod.livekit.cloud", "wss://prod.livekit.cloud.", "wss://prod.livekit。cloud", "ws://devserver:17887", "wss://user:pass@devserver", "wss://devserver/path", "wss://devserver?next=prod", "wss://devserver#fragment", "wss://devserver:0", "wss://qa-\nallowed.test"] {
             check(try load(["media_origin": bad]) == nil, "invalid or non-isolated origin rejected")
         }
         check(try load(["issuer_digest": String(repeating: "0", count: 64)]) == nil, "placeholder issuer rejected")
         check(try load(["override": true]) == nil, "unknown scope override rejected")
         check(scope.permits(url: origin, token: goodToken, now: now), "scoped short grant passes restrictions only")
+        check(scope.permits(url: "wss://QA387.DEVSERVER.TEST:17887", token: goodToken, now: now), "approved host case is equivalent")
         check(scope.permits(url: origin + "/", token: goodToken, now: now), "equivalent origin slash accepted")
         check(!scope.permits(url: "wss://other.devserver.test:17887", token: goodToken, now: now), "other origin rejected")
         check(!scope.permits(url: origin, token: try token(["iss": "production-issuer"]), now: now), "other issuer rejected")
         check(!scope.permits(url: origin, token: try token(["video": ["roomJoin": true, "room": "p0-prod-0123456789ab-1"]]), now: now), "other room namespace rejected")
         check(!scope.permits(url: origin, token: try token(["video": ["roomJoin": true, "room": VoiceQAScope.roomNamespace + "evil-0123456789ab-1"]]), now: now), "namespace-prefix spoof rejected")
+        check(!scope.permits(url: origin, token: try token(["video": ["roomJoin": true, "room": room + "\n"]]), now: now), "room trailing newline rejected")
         check(!scope.permits(url: origin, token: try token(["exp": now - 1]), now: now), "expired grant rejected")
         check(!scope.permits(url: origin, token: try token(["exp": now + 600]), now: now), "long-lived grant rejected")
         check(!scope.permits(url: origin, token: try token(["iat": now + 60]), now: now), "future issued grant rejected")

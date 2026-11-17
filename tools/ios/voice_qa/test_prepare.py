@@ -109,14 +109,18 @@ class VoiceQAPreparationTests(unittest.TestCase):
 
     def test_production_namespace_environment_cloud_and_unsafe_urls_are_refused(self):
         variants = [("namespace", "p0-prod"), ("environment", "production"),
-                    ("media_origin", "wss://p0-prod.livekit.cloud"), ("media_origin", "ws://devserver:17887"),
-                    ("media_origin", "wss://user:secret@devserver"), ("media_origin", "wss://devserver/path"), ("media_origin", "wss://devserver:0"),
+                    ("media_origin", "wss://livekit.cloud"), ("media_origin", "wss://livekit.cloud."), ("media_origin", "wss://Tenant.LIVEKIT.CLOUD"), ("media_origin", "wss://Tenant.LIVEKIT.CLOUD."), ("media_origin", "wss://p0-prod.livekit.cloud"), ("media_origin", "wss://p0-prod.livekit.cloud."), ("media_origin", "wss://p0-prod.livekit。cloud"), ("media_origin", "ws://devserver:17887"),
+                    ("media_origin", "wss://user:secret@devserver"), ("media_origin", "wss://devserver/path"), ("media_origin", "wss://devserver:0"), ("media_origin", "wss://qa-\nallowed.test"),
                     ("media_origin", "wss://devserver?redirect=prod"), ("issuer_digest", "0" * 64)]
         for key, value in variants:
             with self.subTest(key=key, value=value):
                 candidate = scope(); candidate[key] = value
                 with self.assertRaises(ValueError):prepare.prepare(self.project, self.output, candidate)
         self.assertFalse(self.output.exists())
+
+    def test_approved_host_case_is_allowed(self):
+        candidate = scope(); candidate["media_origin"] = "wss://QA387.DEVSERVER.TEST:17887"
+        self.assertEqual(candidate, prepare.validate_scope(candidate))
 
     def test_expired_future_and_overlong_scope_are_refused(self):
         now = time.time()

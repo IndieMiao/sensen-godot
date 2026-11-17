@@ -34,12 +34,15 @@ def validate_scope(scope, now=None):
     if type(scope["schema"]) is not int or scope["schema"] != 1 or scope["environment"] != ENVIRONMENT or scope["namespace"] != NAMESPACE:
         raise ValueError("Only the named devserver isolation and namespace are allowed")
     try:
-        url = urlsplit(scope["media_origin"])
+        raw_origin = scope["media_origin"]
+        if not isinstance(raw_origin, str) or any(ord(c) < 33 or ord(c) == 127 for c in raw_origin):
+            raise ValueError("Control characters in origin")
+        url = urlsplit(raw_origin)
         valid_url = url.scheme == "wss" and url.hostname and url.path in ("", "/") and not url.query and not url.fragment and url.username is None and url.password is None and 1 <= (url.port if url.port is not None else 443) <= 65535
         host = (url.hostname or "").lower()
     except (TypeError, ValueError):
         raise ValueError("Invalid QA media origin") from None
-    if not valid_url or host == "livekit.cloud" or host.endswith(".livekit.cloud"):
+    if not valid_url or not re.fullmatch(r"[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?", host) or ".." in host or host == "livekit.cloud" or host.endswith(".livekit.cloud"):
         raise ValueError("An exact isolated self-hosted WSS origin is required; Cloud projects are excluded")
     issuer = scope["issuer_digest"]
     if not isinstance(issuer, str) or not re.fullmatch(r"[0-9a-f]{64}", issuer) or issuer == "0" * 64:
