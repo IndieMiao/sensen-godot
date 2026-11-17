@@ -13,7 +13,7 @@ internal data class ParcelSourceConfig(
 )
 internal object ParcelPayload {
     const val EMPTY_COLLECTION = "{\"type\":\"FeatureCollection\",\"features\":[]}"
-    private val idPattern = Regex("p-[A-Za-z0-9._:-]{1,126}")
+    private val idPattern = Regex("p-[A-Za-z0-9._:*-]{1,126}")
     val propertyKeys = setOf("block_id", "parcel_id", "selection_unit", "name", "address", "address_count", "center", "center_lon", "center_lat", "bbox", "cell_count", "farm_path", "source_area_m2", "inset_area_m2", "building_count")
     fun validId(id: String): Boolean = idPattern.matches(id)
     fun config(raw: String): ParcelSourceConfig {
