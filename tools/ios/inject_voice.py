@@ -151,6 +151,9 @@ def set_usage_string(path: Path, key: str, value: str) -> None:
 
 def inject(project: Path) -> dict:
     project = project.resolve()
+    from check_voice_release import check_repo, check_export
+    check_repo(HERE.parents[1])
+    check_export(project.parent)  # Before overwriting anything: never silently clean/re-sign a QA export.
     root, app = project.parent, project.parent / "sensen"
     pbx = project / "project.pbxproj"
     text = project_text(pbx.read_text()) # All structural checks before touching the project.

@@ -1,0 +1,15 @@
+name: iOS voice QA exclusion
+on:
+  pull_request:
+    paths: ['native/voice/apple/**', 'tools/ios/**', '.github/workflows/ios-voice-qa-guard.yml']
+  push:
+    paths: ['native/voice/apple/**', 'tools/ios/**', '.github/workflows/ios-voice-qa-guard.yml']
+jobs:
+  release-exclusion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python3 tools/ios/check_voice_release.py --repo .
+      - run: python3 -m unittest discover -s tools/ios -p 'test_voice_release.py' -v
