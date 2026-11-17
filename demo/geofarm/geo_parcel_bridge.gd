@@ -19,7 +19,7 @@ static func _decode(raw:String) -> Dictionary:
 	if parser.parse(raw)!=OK or not parser.data is Dictionary:return {"error":"invalid_native_response"}
 	return parser.data
 func is_parcel_capable() -> bool:
-	for method in ["setParcelSources","queryParcelAt","setParcelStates","setParcelClaims","clearParcelLayers"]:
+	for method in ["setParcelSources","queryParcelAt","setParcelStates","setParcelClaims","clearParcelLayers","setParcelBuildingHighlight"]:
 		if not _supports(method):return false
 	return true
 func configure(generation:int,config:Dictionary) -> void:
@@ -32,3 +32,6 @@ func set_claims(generation:int,rows:Array) -> void:
 	if is_parcel_capable():_plugin.setParcelClaims(generation,JSON.stringify(rows))
 func clear(generation:int) -> void:
 	if is_parcel_capable():_plugin.clearParcelLayers(generation)
+
+func set_building_highlight(generation:int,key:String) -> void:
+	if is_parcel_capable():_plugin.setParcelBuildingHighlight(generation,key)

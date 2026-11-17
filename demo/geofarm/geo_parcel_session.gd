@@ -5,6 +5,7 @@ const Geo := preload("res://demo/geofarm/geo_math.gd")
 const Identity := preload("res://demo/geofarm/geo_identity.gd")
 var api: Node
 var identity: RefCounted
+var dataset_version:=Contract.DATASET
 var busy := false
 var claims: Dictionary = {}
 var _claim_revision := 0
@@ -24,7 +25,7 @@ func refresh_claims() -> Dictionary:
 	var revision:=_claim_revision
 	var result:Dictionary=await api.request("/claims")
 	if revision!=_claim_revision:return {"ok":false,"code":"superseded"}
-	if result.get("ok")!=true or result.get("dataset_version")!=Contract.DATASET or not result.get("claims") is Array:
+	if result.get("ok")!=true or result.get("dataset_version")!=dataset_version or not result.get("claims") is Array:
 		return {"ok":false,"code":"claims_unavailable"}
 	var next:={}
 	for raw in result.claims:
@@ -36,7 +37,7 @@ func refresh_claims() -> Dictionary:
 
 func claim(id:String,nickname:String) -> Dictionary:
 	if busy:return {"ok":false,"code":"busy"}
-	if identity==null or identity.data.get("dataset_version")!=Contract.DATASET:
+	if identity==null or identity.data.get("dataset_version")!=dataset_version:
 		return {"ok":false,"code":"identity"}
 	if not Contract.valid_id(id) or not Identity.valid_nickname(nickname):
 		return {"ok":false,"code":"schema"}
@@ -67,5 +68,5 @@ func fetch_farm(id:String) -> Dictionary:
 	var path:=Contract.farm_path(id)
 	if path.is_empty():return {"ok":false,"code":"schema"}
 	var result:Dictionary=await api.request(path)
-	if not Contract.farm_matches(result,id):return {"ok":false,"code":"invalid_farm"}
+	if not Contract.farm_matches(result,id,dataset_version):return {"ok":false,"code":"invalid_farm"}
 	return {"ok":true,"farm":result}

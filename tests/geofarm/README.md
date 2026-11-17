@@ -1,71 +1,59 @@
-# GeoFarm parcel r2 client
+# GeoFarm r3 integration
 
-This branch targets only the 1322-parcel screenshot area. Data schema 2,
-`sf-parcel-20261117-v2`. Main scene remains
-`res://demo/geofarm/geofarm_main.tscn`. `config.json` pins the r2 HTTPS endpoint,
-manifest hash and two address shortcuts; no r1 server fallback.
+R3 keeps the farm and claim unit as the whole parcel. A tap first selects a visible
+building and uses the **same pixel/query snapshot** to find our parcel; a successful
+empty building hit falls back to parcel selection. A building without a selectable
+parcel never creates a claim. Mapbox building geometry stays transient inside the
+native highlight controller; Godot stores only an opaque UI key, never building
+geometry in identity/claim/farm data. `building_source` can be `mapbox` or `datasf`.
 
-Mapbox owns all map geometry, fill/line/building/address/claim-name layers and
-picking. Godot downloads only the manifest, public claims and individual farms;
-`geo_native_camera.gd` handles gestures and coalesces camera updates once per frame.
-It never scans/reprojects/draws polygons. This version uses native **GeoJSON**,
-not MVT or Standard 3D. MapView remains the existing SurfaceView.
+Full city: `sf-parcel-20261117-v3`, native vector source / source-layer `parcels`,
+promoteId `block_id`, source zoom 15–18, parcel display from 16, addresses from 18.
+Above 18 Mapbox overzooms instead of requesting nonexistent tiles. Small fallback:
+`sf-parcel-small-20261117-v3`, separate GeoJSON source and claim data.
+Manifest schema is 3; individual farms remain schema 2. Phones read a compact
+`client-manifest.json`, claims and single farms, never the full catalog/hash table.
+The complete deployment manifest remains for server verification.
 
-Copy the four runtime Kotlin files into Android `src/main/java/com/sensen/map/`:
-`GodotMapPlugin.kt`, `ParcelMapController.kt`, `ParcelLayerState.kt`, `ParcelPayload.kt`.
-Do not put `*Test.kt` into the app. Preserve SDK android-ndk27 11.29.0 and the
-existing build-controlled Mapbox token. Export all demo scripts and dynamically
-loaded `scenes/geo_farm_demo/farm_view.tscn`/farm_* dependencies plus config.json.
-Use a separate package/user directory, no game autoloads or location/audio
-permissions. No production accounts, services, or saves are used.
+`config.json` pins full-city URL/client SHA and `config.small.example.json` pins
+the fallback. Change URL, dataset AND matching client SHA together. Each version
+has its own `geo_farm_identity_<dataset>.json` under user://. Only the installation
+credential is reused from earlier files; own/pending claims never migrate between
+r1/r2/full-v3/small-v3. Literal official ID `p-4591A011*` stays intact in IDs and
+farm paths; separators, traversal, query/fragment characters are refused.
 
-`block_id` is `p-3139019`; `parcel_id` is canonical `3139019`. Native promoteId,
-query results, state updates and claim bodies use **block_id**. Only public
-whitelisted metadata crosses the native bridge, never geometry or device IDs.
-Callbacks check request ID, scene/data generation, style generation and camera
-revision. `source_ready` gates picking on parcel data; building readiness is
-separate because buildings are hidden below zoom 18. Failed building/claim
-markers show a retry warning; failed parcel data disables picking.
+Main scene is still `res://demo/geofarm/geofarm_main.tscn`. Export the same standalone
+package `com.sensen.geofarmdemo`, versionCode 2026111703, with the existing custom
+user directory `gensen-geofarm-demo-1117`, no game autoloads or location/mic permission.
+Copy five Kotlin runtime files from the SAME integration commit:
+GodotMapPlugin.kt, ParcelMapController.kt, ParcelLayerState.kt, ParcelPayload.kt,
+ParcelBuildingSelection.kt. Do not export *Test.kt or tests/. Include config and
+the dynamically loaded farm_view.tscn/farm_*; preserve the build-controlled token.
 
-The v2 identity file is `user://geo_farm_identity_sf-parcel-20261117-v2.json`.
-On update, it may read the original private 64-hex installation credential from
-`user://geo_farm_identity.json`; it never writes that file or migrates its
-census ownership/pending claim. New v2 ownership/pending are version checked.
-Never log/upload real identity files. Unknown claim results retain the original
-ID/nickname for an idempotent retry. A late claims GET cannot erase a committed
-claim. The HTTP adapter pins the manifest hash before accepting its JSON.
+The two UI fixes are included: the shortcut initializes to its prompt and a
+successful query clears Finding parcel…. The shortcut menu moves to 328/424 at
+zoom19.5 and preselects its parcel; native building picking must still be tested
+by tapping the real building after navigation. Demo area resets to the screenshot
+center [-122.45190271843384,37.729419227] /17.5. MapView is SurfaceView, not TextureView.
 
-Find an example parcel… opens a menu with 328 FRIDA KAHLO WAY / 424 STAPLES AVE;
-choosing one moves to its center at zoom 19.5 and selects it, without claiming.
-Demo area resets to [-122.45190271843384,37.729419227], zoom 17.5.
-Parcel layers start at 17; addresses/buildings at 18; pinch range 13–21.
+## Verification boundaries
 
-## Verification
+Get a NEW resource grant before any Godot run; an expired or released grant cannot
+be reused. `prepare_isolated.py` creates a separate no-autoload QA project without
+real endpoint config/token. Use private adb -P 5113 only and record/clean owned PIDs.
 
-Obtain a new Godot resource window before running. Preparation creates an
-isolated no-autoload project outside the repository and deliberately omits the
-real endpoint config/token. Use a dedicated user directory for r2 QA.
+- test_parcel_contract.gd: 20 contract/identity checks, including full/fallback isolation.
+- test_r3_map_config.gd: 12 source/provider/version checks. An initial old fixture still
+  contained a DataSF URL; correcting that fixture made the missing-source case pass.
+- test_parcel_flow.gd: 50 actual-main-scene checks with injected native/HTTP callbacks,
+  including building priority, ground fallback, stale results and the two UI fixes.
+- test_r3_catalog_ids.gd takes the actual catalog path; 154444/154444 IDs accepted,
+  including the literal-star ID, while separators/traversal were rejected.
+- test_parcel_public_http.gd takes base URL, dataset and client SHA; it is read-only.
+  Small-v3 HTTP passed 8 checks, but that run exceeded the prior resource window;
+  its timing correction is retained separately. No full-city Godot HTTP pass is claimed.
 
-```sh
-python3 tests/geofarm/prepare_isolated.py /absolute/temporary/qa
-adb -P 5113 start-server
-ANDROID_ADB_SERVER_PORT=5113 godot --headless --path /absolute/temporary/qa --editor --import
-ANDROID_ADB_SERVER_PORT=5113 godot --headless --path /absolute/temporary/qa --script res://tests/geofarm/test_parcel_contract.gd
-ANDROID_ADB_SERVER_PORT=5113 godot --headless --path /absolute/temporary/qa --script res://tests/geofarm/test_parcel_flow.gd
-ANDROID_ADB_SERVER_PORT=5113 godot --headless --path /absolute/temporary/qa --script res://tests/geofarm/test_parcel_public_http.gd -- https://approved-r2-endpoint
-adb -P 5113 kill-server
-```
-
-The first suite checks 14 contract/identity boundaries; the second exercises the
-real main scene using injected native/HTTP callbacks (36 checks). The third does
-8 **read-only real HTTPS** checks for the pinned manifest, claims and both real
-795/809-cell farms. These do not prove native Mapbox drawing, picking alignment,
-labels, hardware keyboard behavior or device frame rate. The original r1 map
-script is retained only under tests as `baseline_r1_map.gd`; its prior tests and
-captures live at git b6b0f6eae. Exclude tests from the product export.
-
-Native bridge author separately compiled Kotlin and ran 21 JVM tests at
-606609075731ef93850ec63945c334f3af2a0029. Farm author ran their component suites
-at 0ac4b1753131784349a6d5e5bfa4482860323c33. Do not add those numbers to the client
-suites or call them combined APK acceptance. Record owned PIDs and release each
-window; no extra runs after release without a new grant.
+Native author separately ran 28 JVM checks, then one targeted star compatibility
+check; do not add these to client counts or call them APK acceptance. Native
+Streets/whole-city MVT picking, highlight alignment, cross-tile behavior, hardware
+keyboard, map performance and final upgrade/two-identity flows require APK smoke.

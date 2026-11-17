@@ -3,7 +3,7 @@ const C:=preload("res://demo/geofarm/geo_contract.gd")
 static func metadata(id:="p-A") -> Dictionary:
 	return {"block_id":id,"parcel_id":id.trim_prefix("p-"),"selection_unit":"parcel","name":"328 TEST WAY" if id=="p-A" else "424 TEST AVE","address":"328 TEST WAY" if id=="p-A" else "424 TEST AVE","address_count":1,"center":[-122.452182,37.7295073],"bbox":[-122.45235,37.729465,-122.452013,37.72955],"cell_count":4,"source_area_m2":271.16,"inset_area_m2":271.16,"farm_path":"farms/"+id+".json","building_count":1}
 static func manifest() -> Dictionary:
-	return {"schema":2,"dataset_version":C.DATASET,"selection_unit":"parcel","parcel_count":1322,"native_map":{"type":"geojson","promote_id":"block_id","parcel_url_path":"index.geojson","buildings_url_path":"buildings.geojson","minzoom":17,"address_minzoom":18,"center":[-122.45190271843384,37.729419227],"initial_zoom":17.5}}
+	return {"schema":3,"dataset_version":C.DATASET,"selection_unit":"parcel","parcel_count":154000,"native_map":{"type":"vector","promote_id":"block_id","parcel_url_path":"tilejson.json","parcel_source_layer":"parcels","source_minzoom":15,"source_maxzoom":18,"minzoom":16,"address_minzoom":18,"center":[-122.45190271843384,37.729419227],"initial_zoom":17.5}}
 static func claim(id:="p-A",nickname:="Tester A") -> Dictionary:
 	return {"block_id":id,"nickname":nickname,"claimed_at":"2026-11-17T10:00:00.000Z","center":[-122.452182,37.7295073]}
 static func farm(id:="p-A") -> Dictionary:

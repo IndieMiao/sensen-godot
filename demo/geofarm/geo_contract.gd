@@ -1,16 +1,26 @@
 extends RefCounted
 ## Wire identity is block_id for compatibility; parcel_id is the public canonical parcel number.
-const SCHEMA := 2
-const DATASET := "sf-parcel-20261117-v2"
+const SCHEMA := 3
+const FARM_SCHEMA := 2
+const DATASET := "sf-parcel-20261117-v3"
+const SMALL_DATASET := "sf-parcel-small-20261117-v3"
 const UNIT := "parcel"
 
 static func valid_id(value:Variant) -> bool:
 	if not value is String or not value.begins_with("p-") or value.length()<3 or value.length()>100:
 		return false
-	return value.uri_encode()==value and not "/" in value and not "." in value
+	for c in value:
+		if not c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-*":return false
+	return true
 
-static func envelope(value:Dictionary) -> bool:
-	return value.get("schema")==SCHEMA and value.get("dataset_version")==DATASET and value.get("selection_unit")==UNIT
+static func valid_dataset(value:Variant) -> bool:
+	return value in [DATASET,SMALL_DATASET]
+
+static func identity_path(version:String) -> String:
+	return "user://geo_farm_identity_"+version+".json" if valid_dataset(version) else ""
+
+static func envelope(value:Dictionary,version:=DATASET) -> bool:
+	return valid_dataset(version) and value.get("schema")==SCHEMA and value.get("dataset_version")==version and value.get("selection_unit")==UNIT
 
 static func parcel_identity(value:Dictionary) -> bool:
 	var id=value.get("block_id")
@@ -20,5 +30,5 @@ static func parcel_identity(value:Dictionary) -> bool:
 static func farm_path(id:String) -> String:
 	return "/farms/"+id+".json" if valid_id(id) else ""
 
-static func farm_matches(value:Dictionary,id:String) -> bool:
-	return envelope(value) and parcel_identity(value) and value.block_id==id
+static func farm_matches(value:Dictionary,id:String,version:=DATASET) -> bool:
+	return valid_dataset(version) and value.get("schema")==FARM_SCHEMA and value.get("dataset_version")==version and value.get("selection_unit")==UNIT and parcel_identity(value) and value.block_id==id

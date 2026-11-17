@@ -3,6 +3,7 @@ const Api:=preload("res://demo/geofarm/geo_api.gd")
 const Identity:=preload("res://demo/geofarm/geo_parcel_identity.gd")
 const Contract:=preload("res://demo/geofarm/geo_contract.gd")
 const Geo:=preload("res://demo/geofarm/geo_math.gd")
+const MapConfig:=preload("res://demo/geofarm/geo_map_config.gd")
 const Session:=preload("res://demo/geofarm/geo_parcel_session.gd")
 const CameraInput:=preload("res://demo/geofarm/geo_native_camera.gd")
 const ParcelBridge:=preload("res://demo/geofarm/geo_parcel_bridge.gd")
@@ -21,6 +22,11 @@ var _default_center:=PackedFloat64Array([-122.45190271843384,37.729419227])
 var _default_zoom:=17.5
 var _min_zoom:=17.0
 var _selected:=""
+var _dataset:=Contract.DATASET
+var _selection_kind:="parcel"
+var _building_source:="mapbox"
+var _building_key:=""
+var _sent_building_key:=""
 var _busy:=false
 var _manifest_busy:=false
 var _claims_busy:=false
@@ -52,13 +58,14 @@ var _stage:="select"
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	get_tree().quit_on_go_back=false
-	_identity_ok=identity.load_parcel()
 	api=Api.new();add_child(api)
 	session=Session.new();session.api=api;session.identity=identity;add_child(session)
 	var parser:=JSON.new()
 	if FileAccess.file_exists(CONFIG) and parser.parse(FileAccess.get_file_as_string(CONFIG))==OK and parser.data is Dictionary:
 		config=parser.data
-	if config.get("dataset_version")==Contract.DATASET:
+	if Contract.valid_dataset(config.get("dataset_version",Contract.DATASET)):
+		_dataset=str(config.get("dataset_version",Contract.DATASET));session.dataset_version=_dataset
+		_identity_ok=identity.load_parcel("",Identity.PATH,_dataset)
 		api.base_url=str(config.get("base_url","")).trim_suffix("/")
 	for raw in config.get("examples",[]):
 		var p:=_metadata(raw)
@@ -87,9 +94,13 @@ static func _metadata(raw:Variant) -> Dictionary:
 			raw[key]=parser.data
 	if raw.get("selection_unit",Contract.UNIT)!=Contract.UNIT:return {}
 	if raw.get("farm_path")!=Contract.farm_path(raw.block_id).trim_prefix("/"):return {}
-	if not Geo.valid_point(raw.get("center")) or not Geo.valid_bbox(raw.get("bbox")):return {}
-	for key in ["cell_count","source_area_m2","inset_area_m2"]:
-		if not (raw.get(key) is int or raw.get(key) is float) or not is_finite(float(raw[key])) or float(raw[key])<=0:return {}
+	if not raw.has("center") and (raw.get("center_lon") is int or raw.get("center_lon") is float) and (raw.get("center_lat") is int or raw.get("center_lat") is float):
+		raw["center"]=[float(raw.center_lon),float(raw.center_lat)]
+	if not Geo.valid_point(raw.get("center")):return {}
+	if raw.has("bbox") and not Geo.valid_bbox(raw.bbox):return {}
+	if not (raw.get("cell_count") is int or raw.get("cell_count") is float) or not is_finite(float(raw.cell_count)) or raw.cell_count<=0:return {}
+	for key in ["source_area_m2","inset_area_m2"]:
+		if raw.has(key) and (not (raw[key] is int or raw[key] is float) or not is_finite(float(raw[key])) or float(raw[key])<=0):return {}
 	var result:Dictionary={}
 	for key in ["block_id","parcel_id","name","address","address_count","center","bbox","cell_count","farm_path","source_area_m2","inset_area_m2","building_count"]:
 		if raw.has(key):result[key]=raw[key]
@@ -99,7 +110,7 @@ func _build_ui() -> void:
 	_overlay=Control.new();_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(_overlay)
 	var top:=_panel(_overlay,Vector4(12,30,-12,0),false)
 	var column:=VBoxContainer.new();column.add_theme_constant_override("separation",5);top.add_child(column)
-	column.add_child(_label("San Francisco · Parcel DEMO",18))
+	column.add_child(_label("San Francisco · Farm DEMO",18))
 	_message=_label("Loading parcel map…",12);column.add_child(_message)
 	var row:=HBoxContainer.new();column.add_child(row)
 	_refresh=_button("Refresh",_refresh_pressed);row.add_child(_refresh)
@@ -126,15 +137,18 @@ func _build_ui() -> void:
 
 func _bootstrap() -> void:
 	if _manifest_busy or _busy or not _identity_ok:return
+	if config.get("manifest_path","client-manifest.json") not in ["client-manifest.json","manifest.json"]:_message.text="Demo configuration is invalid.";return
 	_manifest_busy=true;_refresh.disabled=true;_native_ready=false;_map_warning="";_needs_map_retry=false
 	_message.text="Loading demo area…"
-	var result:Dictionary=await api.request("/manifest.json",{},str(config.get("manifest_sha256","")))
+	var result:Dictionary=await api.request("/"+str(config.get("manifest_path","client-manifest.json")),{},str(config.get("manifest_sha256","")))
 	_manifest_busy=false;_refresh.disabled=false
-	if not Contract.envelope(result) or not result.get("native_map") is Dictionary:
+	if not Contract.envelope(result,_dataset) or not result.get("native_map") is Dictionary:
 		_message.text="Could not load this demo area. Tap Refresh to retry.";return
 	var native:Dictionary=result.native_map
-	if native.get("type")!="geojson" or native.get("promote_id")!="block_id" or native.get("parcel_url_path")!="index.geojson" or native.get("buildings_url_path")!="buildings.geojson" or not Geo.valid_point(native.get("center")):
+	var native_config:=MapConfig.build(result,api.base_url,config)
+	if native_config.is_empty():
 		_message.text="This map version is not supported. Use the latest demo.";return
+	_building_source=str(native_config.building_source)
 	var first_load:=manifest.is_empty()
 	manifest=result
 	_default_center=PackedFloat64Array(native.center);_default_zoom=float(native.get("initial_zoom",17.5));_min_zoom=float(native.get("minzoom",17))
@@ -142,8 +156,8 @@ func _bootstrap() -> void:
 	await _load_claims()
 	if bridge==null or not bridge.is_parcel_capable():
 		_message.text="Native parcel map requires the latest Android demo.";return
-	_generation+=1;_style_generation=-1;_pending_query={};_sent_states={};_has_sent_claim_labels=false
-	bridge.configure(_generation,{"parcel_url":api.base_url+"/index.geojson","buildings_url":api.base_url+"/buildings.geojson","min_zoom":_min_zoom,"address_min_zoom":float(native.get("address_minzoom",18)),"promote_id":"block_id"})
+	_generation+=1;_style_generation=-1;_pending_query={};_sent_states={};_has_sent_claim_labels=false;_building_key="";_sent_building_key="";_selection_kind="parcel"
+	bridge.configure(_generation,native_config)
 	_message.text="Loading parcel boundaries…"
 	_restore_pending()
 func _refresh_pressed() -> void:
@@ -152,7 +166,12 @@ func _refresh_pressed() -> void:
 	else:_load_claims()
 func _native_loaded(generation:int,style_generation:int,payload:Dictionary) -> void:
 	if generation!=_generation or style_generation<_style_generation:return
-	var reinitialize:=style_generation!=_style_generation or not _native_ready
+	var style_changed:=style_generation!=_style_generation
+	if style_changed and _style_generation>=0:
+		if _selection_kind=="building":
+			_close_dialog();_selected=""
+		_building_key="";_sent_building_key="";_selection_kind="parcel";_pending_query={}
+	var reinitialize:=style_changed or not _native_ready
 	_style_generation=style_generation
 	_native_ready=payload.get("source_ready")==true and str(payload.get("error",""))==""
 	if _native_ready:
@@ -176,18 +195,26 @@ func _camera_changed() -> void:
 	if _native_ready:_map_hint()
 func _map_hint() -> void:
 	if not _map_warning.is_empty():_message.text=_map_warning;return
-	_message.text="Zoom in to choose a parcel." if map_canvas.zoom<_min_zoom else "%d parcels · tap inside a boundary"%int(manifest.get("parcel_count",0))
+	_message.text="Zoom in to choose a farm." if map_canvas.zoom<_min_zoom else "Tap a building or an open part of a parcel."
 func _map_tapped(point:Vector2) -> void:
 	if not _native_ready or map_canvas.zoom<_min_zoom or _busy or is_instance_valid(_dialog) or is_instance_valid(_farm):return
 	_request_id+=1;_pending_query={"request_id":_request_id,"camera":_camera_serial,"style":_style_generation};_query_time=0
-	_selected="";_update_selection();_push_states();_message.text="Finding parcel…"
+	_selected="";_selection_kind="parcel";_building_key="";_update_selection();_push_states();_message.text="Finding parcel…"
 	bridge.query(_request_id,_generation,point)
 func _query_result(request_id:int,generation:int,style_generation:int,payload:Dictionary) -> void:
 	if generation!=_generation or style_generation!=_style_generation or request_id!=int(_pending_query.get("request_id",-1)) or int(_pending_query.get("camera",-1))!=_camera_serial:return
 	_pending_query={}
 	if is_instance_valid(_farm) or is_instance_valid(_dialog) or _busy:return
-	if str(payload.get("error",""))!="" or not payload.get("parcel_ids") is Array or not payload.get("properties") is Array:
-		_message.text="Could not check this parcel. Tap again.";return
+	var error:=str(payload.get("error",""))
+	if error!="" or not payload.get("parcel_ids") is Array or not payload.get("properties") is Array:
+		_message.text={"loading":"Map is still loading. Let it settle, then tap again.","building_without_parcel":"This building has no selectable parcel here.","too_many_candidates":"Zoom in to choose a location."}.get(error,"Could not check this location. Tap again.");return
+	var kind:=str(payload.get("kind",""))
+	var key:=str(payload.get("building_key",""))
+	var provider:=str(payload.get("building_source",""))
+	if kind=="none" and payload.parcel_ids.is_empty() and payload.properties.is_empty() and key.is_empty():
+		_message.text="No selectable parcel here. Try another location.";return
+	if kind not in ["building","parcel"] or (kind=="building" and (key.is_empty() or key.length()>512 or provider!=_building_source)) or (kind=="parcel" and not key.is_empty()):
+		_message.text="Could not check this location. Tap again.";return
 	var candidates:Array=[];var seen:={}
 	for raw in payload.properties:
 		var p:=_metadata(raw)
@@ -195,21 +222,21 @@ func _query_result(request_id:int,generation:int,style_generation:int,payload:Di
 		seen[p.block_id]=true;candidates.append(p)
 	if candidates.is_empty():_message.text="No parcel here. Zoom in and tap inside a boundary.";return
 	_map_hint()
-	if candidates.size()==1:_select(candidates[0]);return
+	if candidates.size()==1:_select(candidates[0],kind,key);return
 	var col:=_dialog_shell("Choose a parcel")
 	col.add_child(_label("Several parcels meet here. Choose an address or zoom in.",14))
-	for p in candidates.slice(0,6):col.add_child(_button(str(p.name),func():_close_dialog();_select(p)))
+	for p in candidates.slice(0,6):col.add_child(_button(str(p.name),func():_close_dialog();_select(p,kind,key)))
 	col.add_child(_button("Cancel",_close_dialog))
-func _select(p:Dictionary) -> void:
+func _select(p:Dictionary,kind:="parcel",building_key:="") -> void:
 	if _busy:return
 	if not Contract.parcel_identity(p):return
-	_selected=str(p.block_id);by_id[_selected]=p
+	_selected=str(p.block_id);by_id[_selected]=p;_selection_kind=kind;_building_key=building_key if kind=="building" else ""
 	_update_selection();_push_states()
 func _update_selection() -> void:
 	if not by_id.has(_selected):
 		_selection.text="Tap inside a parcel to choose your farm.";_action.text="Select a parcel";_action.disabled=true;return
 	var p:Dictionary=by_id[_selected]
-	_selection.text=str(p.get("name","Your previous parcel"))
+	_selection.text=("Building · " if _selection_kind=="building" else "")+str(p.get("name","Your previous parcel"))
 	if p.has("cell_count"):_selection.text+=" · %d cells"%int(p.cell_count)
 	if p.has("inset_area_m2"):_selection.text+=" · %.0f m²"%float(p.inset_area_m2)
 	if int(p.get("address_count",1))>1:_selection.text+="\n%d listed addresses"%int(p.address_count)
@@ -223,9 +250,9 @@ func _update_selection() -> void:
 func _push_states() -> void:
 	if not _native_ready or bridge==null:return
 	var next:={};var own:=str(identity.data.get("own_block_id",""))
-	for id in session.claims:next[id]={"block_id":id,"selected":id==_selected,"claimed":true,"own":id==own}
+	for id in session.claims:next[id]={"block_id":id,"selected":id==_selected and _selection_kind=="parcel","claimed":true,"own":id==own}
 	for id in [_selected,own]:
-		if Contract.valid_id(id) and not next.has(id):next[id]={"block_id":id,"selected":id==_selected,"claimed":id==own,"own":id==own}
+		if Contract.valid_id(id) and not next.has(id):next[id]={"block_id":id,"selected":id==_selected and _selection_kind=="parcel","claimed":id==own,"own":id==own}
 	var changed:Array=[]
 	for id in next:
 		if _sent_states.get(id)!=next[id]:changed.append(next[id])
@@ -233,6 +260,8 @@ func _push_states() -> void:
 		if not next.has(id):changed.append({"block_id":id,"selected":false,"claimed":false,"own":false})
 	_sent_states=next
 	if not changed.is_empty():bridge.set_states(_generation,changed)
+	if _building_key!=_sent_building_key:
+		_sent_building_key=_building_key;bridge.set_building_highlight(_generation,_building_key)
 	var labels:Array=[]
 	for id in session.claims:
 		var row:Dictionary=session.claims[id];var center_point=row.get("center",by_id.get(id,{}).get("center"))
@@ -310,7 +339,10 @@ func _confirm() -> void:
 	_stage="confirm"
 	var p:Dictionary=by_id[_selected]
 	var col:=_dialog_shell("Choose this parcel?")
-	col.add_child(_label("%s\n%d generated cells · %.0f m² parcel area\nOne farm per installation." % [str(p.name),int(p.cell_count),float(p.inset_area_m2)],14))
+	var details:="%s\n%d generated cells"%[str(p.name),int(p.cell_count)]
+	if p.has("inset_area_m2"):details+=" · %.0f m² parcel area"%float(p.inset_area_m2)
+	details+="\nYour farm includes the whole parcel.\nOne farm per installation."
+	col.add_child(_label(details,14))
 	col.add_child(_button("Continue",_nickname))
 	col.add_child(_button("Cancel",_close_dialog))
 func _nickname() -> void:
@@ -334,6 +366,7 @@ func _claim(id:String,nickname:String) -> void:
 	_busy=false;map_canvas.input_enabled=true
 	if result.get("ok")==true:
 		_message.text="Farm claimed." if result.get("local_saved")==true else "Farm claimed, but local save failed. Keep this demo open."
+		if _selected!=str(result.claim.block_id):_building_key="";_selection_kind="parcel"
 		_selected=str(result.claim.block_id);_update_selection();_push_states();_load_claims();_open_farm(_selected)
 	else:
 		_message.text={"block_taken":"Someone else claimed this parcel. Pick another.","unknown_block":"This parcel is not available.","schema":"Check your nickname and try again.","rate_limited":"Too many requests. Please wait and retry.","persistence":"Could not save claim recovery. Please restart.","pending_claim":"Retry your previous claim first."}.get(str(result.get("code","")),"Could not confirm the claim. Retry this same parcel.")

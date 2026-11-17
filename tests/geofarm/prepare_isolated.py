@@ -28,7 +28,7 @@ for path in paths:
 [application]
 config/name="GeoFarm Map QA"
 config/use_custom_user_dir=true
-config/custom_user_dir_name="pangu-geofarm-parcel-qa-1117"
+config/custom_user_dir_name="pangu-geofarm-r3-qa-1117"
 run/main_scene="res://demo/geofarm/geofarm_main.tscn"
 [display]
 window/size/viewport_width=360

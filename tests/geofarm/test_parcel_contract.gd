@@ -36,6 +36,24 @@ func _run() -> void:
 	verify(identity.remember_claim({"block_id":"p-0039101","nickname":"Tester"}),"parcel claim records own farm")
 	identity.data.dataset_version="sf-20261117-v1";identity.save()
 	verify(not reloaded.load_parcel(new_path,legacy_path),"unexpected dataset in v2 identity fails closed")
+	# New full-city and fallback identities share only the installation credential, never ownership.
+	var v2_path:="user://parcel-contract-v2-prior.json"
+	var full_path:="user://parcel-contract-city.json"
+	var small_path:="user://parcel-contract-small.json"
+	for path in [v2_path,full_path,small_path]:
+		if FileAccess.file_exists(path):DirAccess.remove_absolute(path)
+	var old_v2:={"dataset_version":"sf-parcel-20261117-v2","device_id":"b".repeat(64),"own_block_id":"p-0039101","pending":{"block_id":"p-0039102","nickname":"Old v2"}}
+	f=FileAccess.open(v2_path,FileAccess.WRITE);f.store_string(JSON.stringify(old_v2));f.close()
+	var v2_hash:=FileAccess.get_sha256(v2_path)
+	var full=Identity.new();verify(full.load_parcel(full_path,v2_path,Contract.DATASET),"r3 full initializes from a valid r2 credential")
+	verify(full.data.device_id==old_v2.device_id and full.data.own_block_id=="" and full.data.pending.is_empty(),"r2 ownership and pending are not imported into r3")
+	full.remember_claim({"block_id":"p-0039101","nickname":"City owner"})
+	var city_hash:=FileAccess.get_sha256(full_path)
+	var small=Identity.new();verify(small.load_parcel(small_path,full_path,Contract.SMALL_DATASET),"fallback gets a separate valid dataset identity")
+	verify(small.data.device_id==full.data.device_id and small.data.own_block_id=="","fallback preserves credential but not full-city ownership")
+	verify(FileAccess.get_sha256(v2_path)==v2_hash and FileAccess.get_sha256(full_path)==city_hash,"older dataset identity files remain byte-identical")
+	verify(not small.load_parcel(full_path,v2_path,Contract.SMALL_DATASET),"fallback cannot load full-city own/pending file")
+	for path in [v2_path,full_path,small_path]:DirAccess.remove_absolute(path)
 	for path in [legacy_path,new_path]:DirAccess.remove_absolute(path)
 	print("PARCEL CONTRACT ",checked-failed,"/",checked)
 	quit(1 if failed else 0)

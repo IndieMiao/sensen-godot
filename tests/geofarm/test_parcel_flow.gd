@@ -11,12 +11,14 @@ class Native extends MapBridge:
 	var queries:Array=[]
 	var states:Array=[]
 	var labels:Array=[]
+	var highlights:Array=[]
 	var visible:=true
 	func is_parcel_capable() -> bool:return true
 	func configure(g:int,c:Dictionary) -> void:sources.append({"generation":g,"config":c})
 	func query(r:int,g:int,p:Vector2) -> void:queries.append({"request":r,"generation":g,"point":p})
 	func set_states(_g:int,rows:Array) -> void:states.append(rows.duplicate(true))
 	func set_claims(_g:int,rows:Array) -> void:labels.append(rows.duplicate(true))
+	func set_building_highlight(_g:int,key:String) -> void:highlights.append(key)
 	func clear(_g:int) -> void:pass
 	func set_map_visible(value:bool) -> void:visible=value
 var page:Control
@@ -40,7 +42,7 @@ func verify(ok:bool,label:String) -> void:
 	print("PASS " if ok else "FAIL ",label)
 func transport(path:String,body:Dictionary) -> Dictionary:
 	calls.append({"path":path,"body":body.duplicate(true)})
-	if path=="/manifest.json":return Fixture.manifest()
+	if path in ["/manifest.json","/client-manifest.json"]:return Fixture.manifest()
 	if path=="/claims":
 		var snapshot:=server_claims.duplicate(true)
 		if hold_claims:await release_claims
@@ -54,25 +56,37 @@ func transport(path:String,body:Dictionary) -> Dictionary:
 		if hold_farm:await release_farm
 		return Fixture.farm(path.get_file().get_basename())
 	return {"ok":false,"code":"network"}
-func select_reply(p:Array) -> void:
+func select_reply(p:Array,kind:="parcel",key:="",source:="") -> void:
 	page._map_tapped(Vector2(.5,.5))
 	var q:Dictionary=native.queries[-1]
-	native.parcel_query_result.emit(q.request,q.generation,page._style_generation,{"parcel_ids":p.map(func(x:Dictionary):return x.block_id),"properties":p,"error":""})
+	native.parcel_query_result.emit(q.request,q.generation,page._style_generation,{"parcel_ids":p.map(func(x:Dictionary):return x.block_id),"properties":p,"error":"","kind":kind,"building_key":key,"building_source":source})
 func reset_identity() -> void:
 	page.identity.data={"dataset_version":Contract.DATASET,"device_id":"a".repeat(64),"nickname":"","own_block_id":"","pending":{}}
 	page.identity.path="user://test-parcel-flow.json";page.identity.save()
 	server_claims=[];page.session.claims={};reply={};calls=[];claims_fail=false
 	if is_instance_valid(page._farm):page._back_to_map()
 	page._select(Fixture.metadata())
+func _option(node:Node) -> OptionButton:
+	if node is OptionButton:return node
+	for child in node.get_children():
+		var found:=_option(child)
+		if found:return found
+	return null
 func _run() -> void:
 	root.size=Vector2i(360,800);root.content_scale_size=Vector2i(360,800)
-	page=Main.instantiate();root.add_child(page)
+	page=Main.instantiate();page.config={"dataset_version":Contract.DATASET,"examples":[Fixture.metadata(),Fixture.metadata("p-B")]};root.add_child(page)
 	page.set_process(false);page.api.transport=transport;page.api.base_url="https://demo.invalid"
 	native=Native.new();page.bridge=native
 	native.parcel_ready.connect(page._native_loaded);native.parcel_query_result.connect(page._query_result);native.parcel_error.connect(page._native_error)
 	reset_identity()
+	var option:=_option(page)
+	verify(option!=null and option.selected==0 and option.text=="Find an example parcel…","shortcut starts at its prompt, not an unvisited address")
+	option.get_popup().index_pressed.emit(1)
+	verify(page._selected=="p-A" and page.map_canvas.zoom==19.5 and option.selected==0,"first address selection jumps and resets the prompt")
+	page._selected="";option.get_popup().index_pressed.emit(1)
+	verify(page._selected=="p-A","repeating the first shortcut still triggers navigation")
 	await page._bootstrap()
-	verify(native.sources.size()==1 and native.sources[0].config.parcel_url=="https://demo.invalid/index.geojson","native receives URL instead of Godot geometry")
+	verify(native.sources.size()==1 and native.sources[0].config.parcel_url=="https://demo.invalid/tilejson.json","native receives TileJSON URL instead of Godot geometry")
 	verify(native.sources[0].config.promote_id=="block_id","native promoteId matches prefixed wire identity")
 	verify(not calls.any(func(c:Dictionary):return c.path in ["/index.geojson","/buildings.geojson","/parcel-catalog.json"]),"Godot bootstrap never downloads geometry or full catalog")
 	verify(not page._native_ready,"parcel selection waits for source readiness")
@@ -90,6 +104,26 @@ func _run() -> void:
 	select_reply([Fixture.metadata()])
 	verify(page._selected=="p-A" and page.by_id["p-A"].parcel_id=="A","query metadata selects prefixed ID and retains canonical identity")
 	verify(not page.by_id["p-A"].has("geometry"),"selection metadata cache contains no geometry")
+	verify(page._message.text!="Finding parcel…","successful query clears the pending hint")
+	var mvt:=Fixture.metadata();mvt.center_lon=mvt.center[0];mvt.center_lat=mvt.center[1]
+	for key in ["center","bbox","source_area_m2","inset_area_m2"]:mvt.erase(key)
+	verify(not page._metadata(mvt).is_empty(),"MVT scalar centers and optional area/bbox are accepted")
+	select_reply([mvt],"building","opaque-roof-token","mapbox")
+	verify(page._selection_kind=="building" and page._selected=="p-A" and native.highlights[-1]=="opaque-roof-token","building hit highlights native object while selecting its same-point parcel")
+	verify(not page._sent_states["p-A"].selected,"building hit does not yellow-highlight the whole parcel")
+	verify(not JSON.stringify(page.identity.data).contains("opaque-roof-token"),"native building key never enters persistent identity")
+	page._action_pressed()
+	verify(is_instance_valid(page._dialog),"MVT parcel without area can open confirmation")
+	page._close_dialog()
+	select_reply([Fixture.metadata("p-B")])
+	verify(page._selection_kind=="parcel" and native.highlights[-1]=="" and page._sent_states["p-B"].selected,"open ground clears building highlight and selects parcel")
+	select_reply([],"building","roof-without-parcel","mapbox")
+	verify(page._selected=="" and not is_instance_valid(page._dialog),"building without a selectable same-point parcel cannot claim")
+	select_reply([],"none")
+	verify(page._message.text.begins_with("No selectable parcel") and page._selected=="","successful empty native hit reports no selectable parcel")
+	select_reply([Fixture.metadata()],"building","wrong-provider","datasf")
+	verify(page._selected=="","unexpected building provider is rejected")
+	select_reply([Fixture.metadata()])
 	var encoded:=Fixture.metadata();encoded.center=JSON.stringify(encoded.center);encoded.bbox=JSON.stringify(encoded.bbox)
 	verify(not page._metadata(encoded).is_empty(),"native string-encoded array properties normalize safely")
 	page._map_tapped(Vector2(.5,.5));var current:Dictionary=native.queries[-1]
@@ -116,8 +150,9 @@ func _run() -> void:
 	verify(page.is_back_navigation_locked() and not is_instance_valid(page._farm) and native.visible,"Back resumes native map from farm")
 	reset_identity();reply={"ok":false,"code":"block_taken"};await page._claim("p-A","Tester A")
 	verify(page.identity.data.own_block_id=="" and page.identity.data.pending.is_empty(),"competing claim does not grant ownership")
-	reset_identity();reply={"ok":false,"code":"already_claimed","claim":Fixture.claim("p-B")};await page._claim("p-A","Tester A")
+	reset_identity();select_reply([Fixture.metadata()],"building","roof-A","mapbox");reply={"ok":false,"code":"already_claimed","claim":Fixture.claim("p-B")};await page._claim("p-A","Tester A")
 	verify(page.identity.data.own_block_id=="p-B" and is_instance_valid(page._farm),"already_claimed opens server-owned parcel without global index")
+	verify(page._building_key=="" and page._selection_kind=="parcel","different authoritative parcel cannot retain the clicked building highlight")
 	reset_identity();reply={"ok":false,"code":"network"};await page._claim("p-A","Tester A")
 	verify(page.identity.data.pending.block_id=="p-A" and page.identity.data.own_block_id=="","unknown response leaves recoverable pending claim")
 	server_claims=[Fixture.claim()];await page._load_claims()
