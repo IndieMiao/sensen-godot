@@ -77,13 +77,16 @@ func _event(raw: String) -> void:
 	var event: Dictionary = parser.data
 	if _sid.is_empty() or str(event.get("session", "")) != _sid: return
 	var event_name := str(event.get("event", ""))
-	var facts := {"event": event_name if event_name in ["permission","connected","participants","microphone","listening","reconnecting","disconnected","error"] else "unknown", "reason": safe_code(str(event.get("reason", ""))), "code": safe_code(str(event.get("code", "")))}
+	var facts := {"event": event_name if event_name in ["permission","connected","participants","microphone","listening","reconnecting","disconnected","error"] else "unknown"}
+	for field in ["reason", "code"]:
+		if event.has(field): facts[field] = safe_code(str(event[field]))
 	for field in ["qa_native_uptime_ms", "qa_native_wall_seconds"]:
 		var stamp: Variant = event.get(field)
 		if typeof(stamp) in [TYPE_FLOAT,TYPE_INT] and float(stamp) >= 0 and float(stamp) < 1.0e15: facts[field] = stamp
 	if event_name != "participants":
 		if typeof(event.get("microphone")) == TYPE_BOOL: facts["microphone"] = event.microphone
 		if typeof(event.get("listening")) == TYPE_BOOL: facts["listening"] = event.listening
+		if typeof(event.get("granted")) == TYPE_BOOL: facts["granted"] = event.granted
 		_record("native_event", facts)
 	match str(event.get("event", "")):
 		"permission":
