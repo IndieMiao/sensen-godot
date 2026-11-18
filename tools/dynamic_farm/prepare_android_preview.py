@@ -97,9 +97,10 @@ def prepare(repo,commit,output,main_scene,code):
     def blob(name):return subprocess.check_output(['git','-C',str(repo),'show',commit+':'+name])
     original=blob('project.godot').decode();project,check=preview_project(original,main_scene)
     scene_path=main_scene.removeprefix('res://');blob(scene_path)
-    net=blob('modules/net/net_service.gd').decode()
-    # Refuse a changed autoload contract for separate review instead of assuming the setting still works.
-    if 'ProjectSettings.get_setting("sensen/network/online_qa", false)' not in net or 'if not is_test_process() and not OS.has_feature("p0"):' not in net:raise ValueError('Net offline contract changed; review required')
+    net_raw=blob('modules/net/net_service.gd');net=net_raw.decode()
+    # Pin the reviewed Net implementation, not merely a matching comment or setting name.
+    base_net=subprocess.check_output(['git','-C',str(repo),'show',BASE+':modules/net/net_service.gd'])
+    if net_raw!=base_net:raise ValueError('Net source differs from reviewed base; review offline contract before repinning')
     native={name:sha(blob('tools/android/overlay/'+name)) for name in NATIVE}
     preset=preview_preset(blob('export_presets.cfg').decode(),code)
     output.parent.mkdir(parents=True,exist_ok=True)
