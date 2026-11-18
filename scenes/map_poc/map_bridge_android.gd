@@ -15,6 +15,10 @@ const PERMISSION_POLL_LIMIT := 600
 const PERMISSION_POLL_EVERY := 15
 
 var _plugin: Object
+var _parcel_generation: int = -1
+var _parcel_style: int = -1
+var _parcel_request: int = -1
+var _parcel_active := false
 var _awaiting_permission := false
 var _poll_frames := 0
 
@@ -24,6 +28,7 @@ func _init() -> void:
 	_plugin = Engine.get_singleton("GodotMap")
 	if not is_instance_valid(_plugin):
 		return
+	_connect_parcel_signals()
 	# 插件在 Android UI 线程 emitSignal，必须 deferred 回主循环再碰场景树
 	_plugin.connect("map_ready", func(): map_ready.emit(), CONNECT_DEFERRED)
 	if _plugin.has_signal("pois_received"):
@@ -43,6 +48,8 @@ func set_camera(lat: float, lng: float, zoom: float, bearing: float, pitch: floa
 	_plugin.setCamera(lat, lng, zoom, bearing, pitch)
 
 func set_map_visible(visible: bool) -> void:
+	if not visible and _parcel_active:
+		clear_parcel_layers(_parcel_generation)
 	# Android can dispose the native singleton before the scene's exit cleanup.
 	if not is_instance_valid(_plugin):
 		return
@@ -121,3 +128,87 @@ func _has_location_permission() -> bool:
 		if granted.has(p):
 			return true
 	return false
+
+
+func supports_parcels() -> bool:
+	for method in ["setParcelSources", "queryParcelAt", "setParcelStates", "setParcelClaims",
+			"setParcelBuildingHighlight", "clearParcelLayers"]:
+		if not _supports(method): return false
+	for event in ["parcel_ready", "parcel_query_result", "parcel_error"]:
+		if not _plugin.has_signal(event): return false
+	return true
+
+func _connect_parcel_signals() -> void:
+	if not supports_parcels(): return
+	_plugin.connect("parcel_ready", _on_parcel_ready, CONNECT_DEFERRED)
+	_plugin.connect("parcel_query_result", _on_parcel_result, CONNECT_DEFERRED)
+	_plugin.connect("parcel_error", _on_parcel_error, CONNECT_DEFERRED)
+
+func set_parcel_sources(generation: int, config_json: String) -> void:
+	if not supports_parcels():
+		super.set_parcel_sources(generation, config_json)
+		return
+	# Every source/dataset/scene replacement gets a new generation, including retries.
+	if generation <= _parcel_generation or generation <= 0:
+		parcel_error.emit(generation, 0, "invalid_generation")
+		return
+	_parcel_generation = generation
+	_parcel_style = -1
+	_parcel_request = -1
+	_parcel_active = true
+	_plugin.setParcelSources(generation, config_json)
+
+func query_parcel_at(request_id: int, generation: int, point: Vector2) -> void:
+	if not supports_parcels():
+		super.query_parcel_at(request_id, generation, point)
+		return
+	if not _parcel_active or generation != _parcel_generation: return
+	if request_id <= _parcel_request:
+		parcel_error.emit(generation, maxi(_parcel_style, 0), "invalid_request_id")
+		return
+	_parcel_request = request_id
+	_plugin.queryParcelAt(request_id, generation, point.x, point.y)
+
+func set_parcel_states(generation: int, batch_json: String) -> void:
+	if not supports_parcels():
+		super.set_parcel_states(generation, batch_json)
+	elif _parcel_active and generation == _parcel_generation:
+		_plugin.setParcelStates(generation, batch_json)
+
+func set_parcel_claims(generation: int, claims_json: String) -> void:
+	if not supports_parcels():
+		super.set_parcel_claims(generation, claims_json)
+	elif _parcel_active and generation == _parcel_generation:
+		_plugin.setParcelClaims(generation, claims_json)
+
+func set_parcel_building_highlight(generation: int, key: String) -> void:
+	if not supports_parcels():
+		super.set_parcel_building_highlight(generation, key)
+	elif _parcel_active and generation == _parcel_generation:
+		_plugin.setParcelBuildingHighlight(generation, key)
+
+func clear_parcel_layers(generation: int) -> void:
+	if not _parcel_active or generation != _parcel_generation: return
+	# Invalidate before touching Java: queued deferred results must not revive the departed scene.
+	_parcel_active = false
+	_parcel_request = -1
+	if _supports("clearParcelLayers"):
+		_plugin.clearParcelLayers(generation)
+
+func _accept_parcel_event(generation: int, style_generation: int) -> bool:
+	if not _parcel_active or generation != _parcel_generation or style_generation < _parcel_style:
+		return false
+	_parcel_style = style_generation
+	return true
+
+func _on_parcel_ready(generation: int, style_generation: int, payload: String) -> void:
+	if _accept_parcel_event(generation, style_generation):
+		parcel_ready.emit(generation, style_generation, payload)
+
+func _on_parcel_result(request_id: int, generation: int, style_generation: int, payload: String) -> void:
+	if request_id == _parcel_request and _accept_parcel_event(generation, style_generation):
+		parcel_query_result.emit(request_id, generation, style_generation, payload)
+
+func _on_parcel_error(generation: int, style_generation: int, code: String) -> void:
+	if _accept_parcel_event(generation, style_generation):
+		parcel_error.emit(generation, style_generation, code)
