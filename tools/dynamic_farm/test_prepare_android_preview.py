@@ -79,6 +79,13 @@ class PreviewGateChecks(unittest.TestCase):
         self.assertEqual(settings['launcher_icons/main_192x192'],'"res://'+ICON_PATH+'"')
         self.assertEqual(settings['launcher_icons/adaptive_foreground_432x432'],'"res://'+ICON_PATH+'"')
         self.assertEqual(settings['launcher_icons/adaptive_monochrome_432x432'],'""')
+    def test_dynamic_json_included_without_truncating_full_resources(self):
+        original='[preset.2]\nname="Android P0"\ninclude_filter="mapbox_token.txt,assets/p0/*.json"\nexport_filter="selected_resources"\nscript_export_mode=2\n[preset.2.options]\npackage/unique_name="com.sensen.p0demo"\n'
+        settings=parse_settings(preview_preset(original,2026111901))['preset.0']
+        include=json.loads(settings['include_filter']).split(',')
+        self.assertTrue(set(['mapbox_token.txt','assets/p0/*.json','assets/dynamic_farm/*.json','modules/dynamic_farm/map/config.json']).issubset(include))
+        self.assertEqual(settings['export_filter'],'"all_resources"')
+        self.assertEqual(settings['script_export_mode'],'0')
     def test_unique_isolated_export_preset(self):
         original='''[preset.2]
 name="Android P0"

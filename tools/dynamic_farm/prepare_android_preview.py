@@ -93,9 +93,16 @@ def preview_preset(original,code):
     next_preset=re.search(r'(?m)^\[preset\.\d+\]\s*$',rest[len('['+name+']'):])
     if next_preset:rest=rest[:len('['+name+']')+next_preset.start()]
     rest=rest.replace('['+name,'[preset.0')
+    inherited=parse_settings(rest).get('preset.0',{}).get('include_filter','""')
+    include=json.loads(inherited)
+    required=['modules/dynamic_farm/map/config.json','assets/dynamic_farm/*.json']
+    include=','.join(dict.fromkeys([x for x in include.split(',') if x]+required))
+    rest=set_setting(rest,'preset.0','include_filter',json.dumps(include))
     for section,key,value in [
         ('preset.0','name','"Android Dynamic Farm QA"'),('preset.0','custom_features','"dynamic_farm_preview"'),
         ('preset.0','export_path','"build/dynamic-farm-qa.apk"'),
+        ('preset.0','export_filter','"all_resources"'),
+        ('preset.0','script_export_mode','0'),
         ('preset.0.options','package/unique_name',json.dumps(PACKAGE)),
         ('preset.0.options','package/name','"Dynamic Farm 3D QA"'),
         ('preset.0.options','version/code',str(code)),('preset.0.options','version/name','"0.0.1-dynamicqa"'),
