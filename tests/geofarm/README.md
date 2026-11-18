@@ -15,15 +15,20 @@ The shared `modules/dynamic_farm/farm_data.gd` decoder validates RLE, permission
 counts, budgets and walking reserves. The 2D view shows both zones. Extension is
 local walking space, never a change to the geographic parcel or claim boundary.
 
-`config.json` deliberately has no endpoint/client pin until reviewed city data
-is deployed. Do not package this intermediate state. Freeze URL, dataset and
-client manifest SHA together in source; the packager must not silently replace
-them. The compact manifest does not contain files or per-farm cell totals.
-No r3 small fallback remains active in r4. Historical versions/services stay intact.
+`config.json` and its example now pin the deployed r4 root, dataset and 918-byte
+client manifest together. Deployment receipt: `dynamic-farm/PUBLIC-ENDPOINT-r4.json`.
+Client SHA: `645df3530b5617bb7e5a8cfb0d070e0e82b74337db47f83a542df1e90c3ae1cf`.
+The compact client binds full deployment manifest
+`6559392b147b0f21e97d522d0cdeab428f5ace7eb69a359dc75c19955ed6a88f`.
+Do not substitute the author's pre-deployment client hash. The packager must read
+exact source config and must not silently replace the URL/hash. Shortcut metadata
+for 328, 424 and the literal-star parcel comes from the reviewed catalog; counts
+are cross-checked with the deployed farm files. No city geometry is embedded.
+Historical r1/r2/r3 services and evidence stay intact.
 
 Package/signature/userdir stay `com.sensen.geofarmdemo` and
-`gensen-geofarm-demo-1117`; display name is Dynamic Farm DEMO. Reserved version is
-2026111801 / 0.0.4-demo, subject to coordinated build-date changes. Identity file
+`gensen-geofarm-demo-1117`; display name is Dynamic Farm DEMO. The coordinated r4 build version is
+2026111901 / 0.0.4-demo (November 19); the earlier 2026111801 reservation is retired. Identity file
 is `user://geo_farm_identity_sf-dynamic-farm-20261118-r4.json`. Only the installation
 credential may be read from earlier versions; ownership/pending claims never migrate.
 
@@ -45,7 +50,9 @@ Use an absolute window deadline, private adb5113 and recorded-PID cleanup.
 - Actual main scene with injected HTTP/native callbacks: 53/53.
 - Shared decoder/view with seven author samples: 67 checks, zero failures.
   This run omitted the author's two extra synthetic JSON inputs; do not label it 69.
-- Public HTTP runner updated for schema4; not run against a real r4 endpoint yet.
+- Real deployed HTTPS reads: 13/13 in Q1117-53 (pinned client manifest, claims,
+  328/424/literal-star schema4 farms and their two-zone views). No POST or device
+  rendering was performed.
 
 The seven author samples are not deployment data. Native transparent-layer hits,
 yellow-only highlight, claimant names, A-to-B/B-to-A visits and dataset upgrades

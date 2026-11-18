@@ -1,8 +1,75 @@
 {
-  "base_url": "",
+  "base_url": "https://lonely-window-barely-sheriff.trycloudflare.com",
   "dataset_version": "sf-dynamic-farm-20261118-r4",
-  "manifest_sha256": "",
-  "examples": [],
+  "manifest_sha256": "645df3530b5617bb7e5a8cfb0d070e0e82b74337db47f83a542df1e90c3ae1cf",
+  "examples": [
+    {
+      "block_id": "p-3139019",
+      "parcel_id": "3139019",
+      "name": "328 FRIDA KAHLO WAY",
+      "address": "328 FRIDA KAHLO WAY",
+      "center": [
+        -122.45218198162672,
+        37.729507282
+      ],
+      "bbox": [
+        -122.452350392,
+        37.729465412,
+        -122.452013395,
+        37.72954915
+      ],
+      "cell_count": 804,
+      "core_cell_count": 804,
+      "extension_cell_count": 1091,
+      "total_cell_count": 1895,
+      "farm_path": "farms/p-3139019.json",
+      "source_area_m2": 271.160446230397
+    },
+    {
+      "block_id": "p-3139010",
+      "parcel_id": "3139010",
+      "name": "424 STAPLES AVE",
+      "address": "424 STAPLES AVE",
+      "center": [
+        -122.451623336752,
+        37.729313834500005
+      ],
+      "bbox": [
+        -122.451667617,
+        37.729159181,
+        -122.451579057,
+        37.729468487
+      ],
+      "cell_count": 805,
+      "core_cell_count": 805,
+      "extension_cell_count": 1190,
+      "total_cell_count": 1995,
+      "farm_path": "farms/p-3139010.json",
+      "source_area_m2": 261.1329428736387
+    },
+    {
+      "block_id": "p-4591A011*",
+      "parcel_id": "4591A011*",
+      "name": "100 JERROLD AVE",
+      "address": "100 JERROLD AVE",
+      "center": [
+        -122.3715200158172,
+        37.7289456825
+      ],
+      "bbox": [
+        -122.372531224,
+        37.728292059,
+        -122.370304313,
+        37.729783275
+      ],
+      "cell_count": 802,
+      "core_cell_count": 802,
+      "extension_cell_count": 1514,
+      "total_cell_count": 2316,
+      "farm_path": "farms/p-4591A011*.json",
+      "source_area_m2": 10326.126732097986
+    }
+  ],
   "building_source": "mapbox",
   "manifest_path": "client-manifest.json"
 }
