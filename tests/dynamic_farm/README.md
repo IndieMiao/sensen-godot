@@ -12,7 +12,9 @@ uses the shared MapBridge JSON-string API and global generation allocator.
 A building hit selects the parcel returned from the same native query; open
 ground falls back to parcel. Metadata is whitelisted, counts are separate, and
 opaque building keys never enter the farm payload. Multi-hit selection is explicit.
-The native layer draws no visible parcel frames, retaining building highlights.
+Decision 1C hides standing parcel frames but shows a yellow outline for the
+selected open-ground parcel. Building selection keeps only its building highlight.
+The controller clears an old parcel selection before another tap or style reload.
 
 Pause/Back retires HTTP and query epochs, clears this generation's native layers
 and hides the map. Return gets a new global generation and restores the camera.

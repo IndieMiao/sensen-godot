@@ -6,12 +6,14 @@ class Native extends MapBridge:
 	var sources: Array = []
 	var queries: Array = []
 	var highlights: Array = []
+	var states: Array = []
 	var cleared: Array = []
 	var visible := true
 	func supports_parcels() -> bool: return true
 	func set_parcel_sources(gen: int, config: String) -> void: sources.append([gen, config])
 	func query_parcel_at(id: int, gen: int, point: Vector2) -> void: queries.append([id, gen, point])
 	func set_parcel_building_highlight(gen: int, key: String) -> void: highlights.append([gen, key])
+	func set_parcel_states(gen: int, batch: String) -> void: states.append([gen, JSON.parse_string(batch)])
 	func clear_parcel_layers(gen: int) -> void: cleared.append(gen)
 	func set_map_visible(value: bool) -> void: visible = value
 var controller: Node
@@ -65,6 +67,7 @@ func _run() -> void:
 	check(controller.selection.is_empty(), "camera change invalidates old hit")
 	reply("building", [Fixture.metadata()], "opaque")
 	check(controller.selection.block_id == "p-A" and native.highlights.back()[1] == "opaque", "building highlights opaque key and selects its same-point parcel")
+	check(native.states.is_empty(), "building selection does not enable a parcel frame")
 	check(not controller.selection.has("building_key") and not controller.selection.has("geometry"), "selection metadata stores no native building key or geometry")
 	check(controller.message != "Finding parcel…", "successful hit clears pending hint")
 	await controller.open_farm()
@@ -74,13 +77,17 @@ func _run() -> void:
 	wrong_farm = false
 	reply("parcel", [Fixture.metadata()])
 	check(native.highlights.back()[1] == "", "open-ground fallback clears the building highlight")
+	check(native.states.back()[1][0].block_id == "p-A" and native.states.back()[1][0].selected, "1C open ground enables only its selected parcel frame")
 	reply("building", [Fixture.metadata()], "foreign", "datasf")
 	check(controller.selection.is_empty(), "unexpected building provider cannot select")
+	check(not native.states.back()[1][0].selected, "new tap clears previous ground frame even when next hit is rejected")
 	reply("parcel", [Fixture.metadata(), Fixture.metadata("p-B")])
 	check(controller.selection.is_empty() and options.size() == 2, "multiple candidates await explicit user choice")
 	controller.choose("p-B"); check(controller.selection.block_id == "p-B", "explicit choice picks one canonical parcel")
+	check(native.states.back()[1][0].block_id == "p-B" and native.states.back()[1][0].selected, "explicit ground candidate receives the parcel frame")
 	controller.choose("p-forged"); check(controller.selection.block_id == "p-B", "choice outside current result cannot replace selection")
 	ready_signal(2); check(controller.selection.is_empty(), "style reload invalidates selection and opaque keys")
+	check(not native.states.back()[1][0].selected, "style reload clears the invalidated ground frame state")
 	reply("parcel", [Fixture.metadata()])
 	hold = true; controller.open_farm(); await process_frame
 	var generation: int = controller.generation

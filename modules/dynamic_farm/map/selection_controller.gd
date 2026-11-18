@@ -24,10 +24,12 @@ var _pending := -1
 var _query_left := 0.0
 var _kind := "parcel"
 var _key := ""
+var _highlighted_parcel := ""
 var _options: Array = []
 var _connected := false
 
 func activate() -> void:
+	_clear_parcel_selection()
 	suspended = false
 	_epoch += 1
 	var epoch := _epoch
@@ -58,6 +60,7 @@ func activate() -> void:
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; map_ready = false; busy = false
 	selection = {}; _options = []; _key = ""
+	_highlighted_parcel = ""
 	if api != null: api.cancel_all()
 	if bridge != null:
 		if generation > 0: bridge.clear_parcel_layers(generation)
@@ -67,6 +70,7 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 	if suspended or gen != generation or style < style_generation: return
 	var data := _parse(payload)
 	if style != style_generation:
+		_clear_parcel_selection()
 		_pending = -1; selection = {}; _options = []; _key = ""
 	style_generation = style
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
@@ -88,6 +92,7 @@ func tap(point: Vector2, zoom: float) -> void:
 	if zoom < float(manifest.native_map.get("minzoom", 16)):
 		message = "Zoom in to choose a farm."; changed.emit(); return
 	_request += 1; _pending = _request; _query_left = 8.0
+	_clear_parcel_selection()
 	selection = {}; _options = []; _key = ""
 	bridge.set_parcel_building_highlight(generation, "")
 	message = "Finding parcel…"; changed.emit()
@@ -121,9 +126,18 @@ func choose(id: String) -> void:
 	if suspended or not map_ready or busy: return
 	for row in _options:
 		if row.block_id != id: continue
+		_clear_parcel_selection()
 		selection = row.duplicate(true)
+		if _kind == "parcel":
+			_highlighted_parcel = id
+			bridge.set_parcel_states(generation, JSON.stringify([{"block_id": id, "selected": true, "claimed": false, "own": false}]))
 		bridge.set_parcel_building_highlight(generation, _key if _kind == "building" else "")
 		message = "Ready to preview this farm."; changed.emit(); return
+
+func _clear_parcel_selection() -> void:
+	if not _highlighted_parcel.is_empty() and bridge != null and generation > 0:
+		bridge.set_parcel_states(generation, JSON.stringify([{"block_id": _highlighted_parcel, "selected": false, "claimed": false, "own": false}]))
+	_highlighted_parcel = ""
 
 func open_farm() -> void:
 	if suspended or not map_ready or busy or selection.is_empty(): return
