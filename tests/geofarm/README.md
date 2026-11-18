@@ -1,8 +1,10 @@
 # Dynamic Farm r4 integration
 
 The demo selects a parcel through its building or open ground. Mapbox parcel fill
-and line opacity are zero; the source and hit layer remain enabled. Only the
-selected building has a yellow highlight. Claim names/dots remain visible and
+opacity is zero; the source and hit layer remain enabled. Per decision 1C,
+parcel line opacity follows selected state: ground/courtyard selection shows
+a yellow 2.5px outline, while unselected/claimed/owned parcels have no frame.
+Building selection keeps its separate yellow highlight and no parcel frame. Claim names/dots remain visible and
 claim ownership semantics do not change. Transparent fill picking requires real
 Android Mapbox verification; isolated callbacks do not establish that result.
 

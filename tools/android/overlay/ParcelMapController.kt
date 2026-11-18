@@ -120,11 +120,11 @@ internal class ParcelMapController(
             parcelSource["promoteId"] = Value("block_id")
         }
         val sourceLayer = if (cfg.sourceType == "vector") ",\"source-layer\":\"${cfg.sourceLayer}\"" else ""
-        // R4: parcel geometry remains queryable, but only a selected building is visibly outlined.
+        // R4 / decision 1C: no standing parcel frame; ground selection alone gets a yellow outline.
         // Do not set visibility:none or remove FILL: queryAt still uses its feature index.
         var ok = !style.addStyleSource(parcel, Value(parcelSource)).isError && geoSource(points, value(claims)) && geoSource(highlight, value(ParcelPayload.EMPTY_COLLECTION)) &&
             layer("""{"id":"$FILL","type":"fill","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"fill-color":"#3B7757","fill-opacity":0.0}}""") &&
-            layer("""{"id":"$LINE","type":"line","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"line-color":"#3B7757","line-width":1.2,"line-opacity":0.0}}""")
+            layer("""{"id":"$LINE","type":"line","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"line-color":"#ED9F18","line-width":2.5,"line-opacity":["case",["boolean",["feature-state","selected"],false],1.0,0.0]}}""")
         if (ok && cfg.buildingSource == "datasf") {
             val buildings = sources.getValue("buildings")
             ok = geoSource(buildings, Value(cfg.buildingsUrl)) &&
