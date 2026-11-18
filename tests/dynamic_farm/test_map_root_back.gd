@@ -38,7 +38,7 @@ func _run() -> void:
 	var router := Router.new(); router.name = "AppRouter"; root.add_child(router)
 	var page := Preview.new(); root.add_child(page); page._bridge = bridge
 	page.is_back_navigation_locked(); page.is_back_navigation_locked(); await process_frame
-	verify(wrapper.queries == ["moveTaskToBack"], "root Back consults Java-wrapper capability once")
+	verify(wrapper.queries.count("moveTaskToBack") == 1, "root Back consults Java-wrapper capability once")
 	verify(wrapper.calls == 1 and router.pops == 0 and page.quits == 0, "root Back dispatches native background exactly once")
 	verify(page.resumes == 0 and page._suspended and page._selector.pauses == 1, "root Back stays paused instead of reloading map")
 	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)

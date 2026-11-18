@@ -6,6 +6,7 @@ const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.g
 const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
+const OCCLUSION_COLOR := "#E7F0DF" # Existing scene BG_COLOR(.906, .941, .875), opaque RGB.
 var _selector: Node
 var _camera: Control
 var _bridge: MapBridge
@@ -20,6 +21,7 @@ var _framed := false
 var _leaving := false
 var _opening := false
 var _suspended := false
+var _presentation_epoch := 0
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -124,6 +126,9 @@ func _preview() -> void:
 
 func _open_host(farm: Dictionary) -> void:
 	if _leaving or _suspended or _opening: return
+	if _bridge == null or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):
+		_render()
+		_message.text = "Use the latest Dynamic Farm preview build."; return
 	var router := get_node_or_null("/root/AppRouter")
 	if router == null or not router.has_method("open_instance"):
 		_message.text = "This preview is missing its scene router."; return
@@ -135,15 +140,36 @@ func _open_host(farm: Dictionary) -> void:
 
 func suspend() -> void:
 	_suspended = true
+	_presentation_epoch += 1
+	get_viewport().transparent_bg = false
+	if _bridge != null: _bridge.set_map_occlusion_color(OCCLUSION_COLOR)
 	if _selector != null: _selector.pause()
 	_hud.hide(); process_mode = Node.PROCESS_MODE_DISABLED
+	_record_presentation("covered", _presentation_epoch)
 
 func resume() -> void:
 	if _leaving: return
 	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT; _hud.show()
+	_presentation_epoch += 1
 	if _bridge != null:
 		get_viewport().transparent_bg = true; _bridge.set_map_visible(true); _camera._changed()
 	if _selector != null: _selector.activate()
+	_record_presentation("map", _presentation_epoch)
+
+func _record_presentation(stage: String, epoch: int) -> void:
+	if _bridge == null: return
+	_bridge.map_visibility_state() # Ask UI thread to refresh; its old return value is not an ACK.
+	await get_tree().create_timer(0.2).timeout
+	if not is_inside_tree() or epoch != _presentation_epoch: return
+	var parser := JSON.new()
+	var native: Dictionary = {}
+	if parser.parse(_bridge.map_visibility_state()) == OK and parser.data is Dictionary: native = parser.data
+	var state := {"stage": stage, "viewport_transparent": get_viewport().transparent_bg, "native": native}
+	var router := get_node_or_null("/root/AppRouter")
+	var top = router.top_instance() if router != null else null
+	if is_instance_valid(top) and top.has_method("presentation_state"): state["host"] = top.presentation_state()
+	# No parcel, player, credential or coordinates. Snapshot freshness is sample_uptime_ms, not a frame guarantee.
+	print("DYNAMIC_MAP_PRESENTATION ", JSON.stringify(state))
 
 func _leave() -> void:
 	if _leaving or _opening: return
@@ -171,3 +197,4 @@ func _notification(what: int) -> void:
 	elif what == NOTIFICATION_APPLICATION_RESUMED and _suspended:
 		var router := get_node_or_null("/root/AppRouter")
 		if router == null or router.top_instance() in [null, self]: resume()
+		else: _record_presentation("covered_foreground", _presentation_epoch)

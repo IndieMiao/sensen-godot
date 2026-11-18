@@ -29,6 +29,14 @@ func set_map_visible(_visible: bool) -> void:
 func move_task_to_back() -> bool:
 	return false
 
+## Opaque fallback behind the Godot surface when an independent 3D preview covers the map.
+func set_map_occlusion_color(_rgb: String) -> bool:
+	return false
+
+## UI-thread cached diagnostics, never a render-completion acknowledgement.
+func map_visibility_state() -> String:
+	return "{}"
+
 func set_language(_locale: String) -> void:
 	pass
 

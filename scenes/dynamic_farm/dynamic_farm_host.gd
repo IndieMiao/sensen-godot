@@ -105,5 +105,13 @@ func _drop_view() -> void:
 	if _view.is_inside_tree() and _view.has_method("suspend"):_view.suspend()
 	if _view.get_parent()==self:remove_child(_view)
 	_view.queue_free();_view=null
+func presentation_state() -> Dictionary:
+	var result:={"state":_state,"viewport_transparent":get_viewport().transparent_bg}
+	if is_instance_valid(_view):
+		for child in _view.get_children():
+			if child is WorldEnvironment and child.environment != null:
+				result["environment_mode"]=child.environment.background_mode
+				result["background_rgba"]=child.environment.background_color.to_html(true)
+	return result
 func _exit_tree() -> void:
 	_leaving=true;_epoch+=1

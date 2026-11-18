@@ -79,6 +79,14 @@ func move_task_to_back() -> bool:
 	_plugin.moveTaskToBack()
 	return true
 
+func set_map_occlusion_color(rgb: String) -> bool:
+	if not _supports("setMapOcclusionColor") or not _supports("getMapVisibilityState"): return false
+	_plugin.setMapOcclusionColor(rgb)
+	return true
+
+func map_visibility_state() -> String:
+	return str(_plugin.getMapVisibilityState()) if _supports("getMapVisibilityState") else "{}"
+
 func camera_info() -> String:
 	if not is_instance_valid(_plugin):
 		return ""
