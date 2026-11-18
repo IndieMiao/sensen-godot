@@ -1,6 +1,7 @@
 package com.sensen.map
 
 import java.util.Locale
+import android.graphics.PixelFormat
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -75,5 +76,32 @@ class GodotMapPluginTest {
     @Test fun occlusionColorNeverAcceptsTransparentOrMalformedInput() {
         assertEquals(0xffe7f0df.toInt(), NativeMapPresentation.opaqueRgb("#E7F0DF"))
         for (raw in listOf("", "transparent", "#00E7F0DF", "#FFF", " E7F0DF", "#GG0000")) assertNull(NativeMapPresentation.opaqueRgb(raw))
+    }
+    @Test fun surfaceModeUsesRgbxWithoutReducingColorDepthAndRestoresTransparency() {
+        val mode = NativeGodotSurfaceMode()
+        assertEquals(PixelFormat.TRANSLUCENT, mode.format())
+        mode.request(true)
+        assertEquals(PixelFormat.RGBX_8888, mode.format())
+        assertEquals(2, mode.format()) // Never PixelFormat.OPAQUE (-1), mapped by Android to RGB565.
+        mode.request(false)
+        assertEquals(PixelFormat.TRANSLUCENT, mode.format())
+    }
+    @Test fun queuedTransitionReadsLatestModeInsteadOfCapturedOldMode() {
+        val mode = NativeGodotSurfaceMode()
+        val queue = mutableListOf<() -> Int>()
+        mode.request(true); queue.add { mode.format() }
+        mode.request(false); queue.add { mode.format() }
+        mode.request(true); queue.add { mode.format() }
+        assertEquals(listOf(2, 2, 2), queue.map { it() })
+        assertEquals(7L, mode.snapshot())
+    }
+    @Test fun surfaceRecreationAndForegroundDoNotInventNewMode() {
+        val mode = NativeGodotSurfaceMode()
+        mode.request(true)
+        val before = mode.snapshot()
+        repeat(3) { assertEquals(PixelFormat.RGBX_8888, mode.format()) }
+        assertEquals(before, mode.snapshot())
+        mode.request(false)
+        repeat(3) { assertEquals(PixelFormat.TRANSLUCENT, mode.format()) }
     }
 }
