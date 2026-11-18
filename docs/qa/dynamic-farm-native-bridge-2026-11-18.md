@@ -34,7 +34,7 @@ Evidence: `/Volumes/ACASIS/tmp/yase-dynamic-native-check-1118`. Original logs, t
 
 ## Remaining integration
 
-Pangu owns r4's parcel visual change and the stage-two entry/route; this branch still has the r3 visual policy until that reviewed patch is supplied. Do not delete the query fill/source to hide its outline. Houyi's actual schema-r4 included/MVT samples and hosting are needed for real point selection, and Liubang supplies the 3D scene handoff. Real rendered-query behavior, nickname styling, return-from-3D, foreground recovery, and frame timing require the integrated candidate and a new resource window. iOS parcel support is not implemented by this Android change.
+Pangu owns r4's parcel visual change and the stage-two entry/route. The supplied r4 paint patch is now integrated as described below; actual transparent-layer hit testing remains pending. Do not delete the query fill/source to hide its outline. Houyi's actual schema-r4 included/MVT samples and hosting are needed for real point selection, and Liubang supplies the 3D scene handoff. Real rendered-query behavior, nickname styling, return-from-3D, foreground recovery, and frame timing require the integrated candidate and a new resource window. iOS parcel support is not implemented by this Android change.
 
 ## Deferred delivery lifecycle fix (review 207f2374)
 
@@ -43,3 +43,9 @@ The first implementation invalidated only pending native tickets. A result alrea
 The wrapper snapshots the watermark when submitting each query and compares it again immediately before final deferred delivery. This does not depend on a later deferred invalidation signal. The six commands/three signal signatures are unchanged; the new wrapper deliberately reports unsupported if the watermark getter is absent from the packaged plugin.
 
 Q1117-39 fix validation: real Kotlin compilation and the related 11 lifecycle JVM tests passed. The new Godot test first queues a completed native result, changes only the synchronous watermark (no scene/source/request clear and no invalidation signal), then flushes the queue and issues a fresh query. The previous wrapper fails this one test case with two assertion failures (XML failures=2); the fixed wrapper passes all 13 tests, 0 failures. Old/fixed wrappers, logs and both XML reports are retained under `p2-fix/`. All recorded PIDs exited and 5085 was free at 21:12:44; the window was released. No actual device/background reproduction is claimed by these controlled tests.
+
+## R4 visual patch integration
+
+Cherry-picked Pangu's `e0ca7bef7e7d5968ec4eab8b72a25be170d38deb` with provenance as `afe88a776`. The three zone-count metadata fields were already identical, so the effective code change is only ParcelMapController: parcel fill/line opacity is zero, their layers/source remain present, and the building highlight plus claim nickname/dot layers are unchanged. The previous feature-state-dependent parcel tint expression is removed; business claimed/own/selected state is retained.
+
+Static checks parsed both generated layer JSON shapes, verified opacity/visibility, compared the paint block byte-for-byte with the author commit, and confirmed the lifecycle watermark/guards, payload allowlist and downstream layers/query code are unchanged. No Kotlin build or Mapbox runtime was repeated for this paint-only integration. The author likewise has not yet validated SDK hit testing. Integrated-candidate QA must prove Mapbox 11.29 loads and queries the transparent fill for buildings, empty parcels, style reload and claim updates before this behavior is accepted.
