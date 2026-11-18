@@ -2,6 +2,7 @@ extends RefCounted
 ## Mesh assembly from frozen masks; missing cells and holes are never filled.
 const CHUNK := 32
 const Edges = preload("res://modules/dynamic_farm/farm_edges.gd")
+const Bank = preload("res://modules/dynamic_farm/farm_bank.gd")
 const GROUND_SHADER = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 const MEADOW = preload("res://assets/farm/art/meadow.png")
 
@@ -15,6 +16,9 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 	rim.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var edges := {}
 	var half: float = data.cell_m * 0.5
+	var exterior := Bank.exterior(data) if soften else {}
+	var seed_phase := Bank.phase(data)
+	var soil_colour := Color(recipe.surface.core_warm_surface_srgb).lerp(Color(recipe.surface.grass_far_srgb),0.35).darkened(0.12)
 	for cell: Dictionary in data.cells:
 		var at := Vector2i(cell.x, cell.y)
 		var chunk := Vector2i(at.x / CHUNK, at.y / CHUNK)
@@ -33,23 +37,30 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 			var a: Vector3 = corners[edge]
 			var b: Vector3 = corners[(edge+1)%4]
 			if not data.by_cell.has(at + directions[edge]):
+				var rolled := soften and Bank.is_exterior(exterior,at+directions[edge])
 				var outside_a := a
 				var outside_b := b
 				if soften:
 					var pad: float = data.cell_m * Edges.PAD_CELLS
 					outside_a = Edges.endpoint(data,at,edge,(edge+3)%4,a,pad)
 					outside_b = Edges.endpoint(data,at,edge,(edge+1)%4,b,pad)
-					_quad(top,a,b,outside_b,outside_a,Vector3.UP,data.palette[cell.kind])
+					if not rolled: _quad(top,a,b,outside_b,outside_a,Vector3.UP,data.palette[cell.kind])
 				var normal := (outside_b-outside_a).cross(Vector3.UP).normalized()
-				_quad(rim,outside_a,outside_b,outside_b-Vector3.UP*0.7,outside_a-Vector3.UP*0.7,normal,Color("958665"))
+				if rolled:
+					Bank.append(top,rim,a,b,outside_a,outside_b,normal,seed_phase,soil_colour)
+				else:
+					_quad(rim,outside_a,outside_b,outside_b-Vector3.UP*0.7,outside_a-Vector3.UP*0.7,normal,Color("958665"))
 				if soften and Edges.convex(data,at,edge):
 					var pad: float = data.cell_m * Edges.PAD_CELLS
 					var previous := Edges.normal((edge+3)%4)
 					var last: Vector3 = a+previous*pad
 					for step in range(1,5):
 						var next: Vector3 = a+(Edges.normal(edge) if step==4 else previous.rotated(Vector3.UP,float(step)*PI/8.0))*pad
-						_triangle(top,a,last,next,Vector3.UP,data.palette[cell.kind])
-						_quad(rim,last,next,next-Vector3.UP*0.7,last-Vector3.UP*0.7,(next-last).cross(Vector3.UP).normalized(),Color("958665"))
+						if rolled:
+							Bank.append(top,rim,a,a,last,next,(next-last).cross(Vector3.UP).normalized(),seed_phase,soil_colour,1)
+						else:
+							_triangle(top,a,last,next,Vector3.UP,data.palette[cell.kind])
+							_quad(rim,last,next,next-Vector3.UP*0.7,last-Vector3.UP*0.7,(next-last).cross(Vector3.UP).normalized(),Color("958665"))
 						last=next
 			if cell.zone == "core":
 				if not grids.has(chunk):
