@@ -4,7 +4,7 @@ This independent branch starts at farm-dev `99a853f7c75e917394a3f1f229bce9a82a38
 
 ## Integration contract
 
-`MapBridge.supports_parcels()` detects all six native methods and three signals. Unsupported platforms, including the current iOS bridge, report `unsupported`; Android adds:
+`MapBridge.supports_parcels()` detects all six native commands, the synchronous lifecycle-watermark getter, and three signals. Unsupported platforms, including the current iOS bridge, report `unsupported`; Android adds:
 
 - `set_parcel_sources(generation, config_json)`
 - `query_parcel_at(request_id, generation, normalized_point)`
@@ -35,3 +35,11 @@ Evidence: `/Volumes/ACASIS/tmp/yase-dynamic-native-check-1118`. Original logs, t
 ## Remaining integration
 
 Pangu owns r4's parcel visual change and the stage-two entry/route; this branch still has the r3 visual policy until that reviewed patch is supplied. Do not delete the query fill/source to hide its outline. Houyi's actual schema-r4 included/MVT samples and hosting are needed for real point selection, and Liubang supplies the 3D scene handoff. Real rendered-query behavior, nickname styling, return-from-3D, foreground recovery, and frame timing require the integrated candidate and a new resource window. iOS parcel support is not implemented by this Android change.
+
+## Deferred delivery lifecycle fix (review 207f2374)
+
+The first implementation invalidated only pending native tickets. A result already emitted into Godot's deferred queue could cross a pause/resume boundary and still reach the scene. `onMainPause`, `setMapVisible(false)`, and `onMainDestroy` now increment an `AtomicLong` synchronously, before any queued UI work. The read-only `getParcelLifecycleEpoch()` exposes that watermark without accessing Mapbox from the Godot thread.
+
+The wrapper snapshots the watermark when submitting each query and compares it again immediately before final deferred delivery. This does not depend on a later deferred invalidation signal. The six commands/three signal signatures are unchanged; the new wrapper deliberately reports unsupported if the watermark getter is absent from the packaged plugin.
+
+Q1117-39 fix validation: real Kotlin compilation and the related 11 lifecycle JVM tests passed. The new Godot test first queues a completed native result, changes only the synchronous watermark (no scene/source/request clear and no invalidation signal), then flushes the queue and issues a fresh query. The previous wrapper fails this one test case with two assertion failures (XML failures=2); the fixed wrapper passes all 13 tests, 0 failures. Old/fixed wrappers, logs and both XML reports are retained under `p2-fix/`. All recorded PIDs exited and 5085 was free at 21:12:44; the window was released. No actual device/background reproduction is claimed by these controlled tests.

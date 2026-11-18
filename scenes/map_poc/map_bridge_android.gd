@@ -18,6 +18,7 @@ var _plugin: Object
 var _parcel_generation: int = -1
 var _parcel_style: int = -1
 var _parcel_request: int = -1
+var _parcel_request_epoch: int = -1
 var _parcel_active := false
 var _awaiting_permission := false
 var _poll_frames := 0
@@ -132,7 +133,7 @@ func _has_location_permission() -> bool:
 
 func supports_parcels() -> bool:
 	for method in ["setParcelSources", "queryParcelAt", "setParcelStates", "setParcelClaims",
-			"setParcelBuildingHighlight", "clearParcelLayers"]:
+			"setParcelBuildingHighlight", "clearParcelLayers", "getParcelLifecycleEpoch"]:
 		if not _supports(method): return false
 	for event in ["parcel_ready", "parcel_query_result", "parcel_error"]:
 		if not _plugin.has_signal(event): return false
@@ -167,6 +168,7 @@ func query_parcel_at(request_id: int, generation: int, point: Vector2) -> void:
 		parcel_error.emit(generation, maxi(_parcel_style, 0), "invalid_request_id")
 		return
 	_parcel_request = request_id
+	_parcel_request_epoch = int(_plugin.getParcelLifecycleEpoch())
 	_plugin.queryParcelAt(request_id, generation, point.x, point.y)
 
 func set_parcel_states(generation: int, batch_json: String) -> void:
@@ -206,6 +208,10 @@ func _on_parcel_ready(generation: int, style_generation: int, payload: String) -
 		parcel_ready.emit(generation, style_generation, payload)
 
 func _on_parcel_result(request_id: int, generation: int, style_generation: int, payload: String) -> void:
+	# Native may already have emitted this result before Android paused. Reading its
+	# atomic watermark here also rejects results already queued in Godot's deferred queue.
+	if not _supports("getParcelLifecycleEpoch"): return
+	if _parcel_request_epoch != int(_plugin.getParcelLifecycleEpoch()): return
 	if request_id == _parcel_request and _accept_parcel_event(generation, style_generation):
 		parcel_query_result.emit(request_id, generation, style_generation, payload)
 
