@@ -17,7 +17,7 @@ func _run() -> void:
 	var packed := load(SCENE_PATH) as PackedScene
 	scene = packed.instantiate()
 	scene.setup({"farm":raw,"dataset":raw.dataset_version,"block_id":raw.block_id,"preview_only":true,
-		"edge_decor_preview":args.has("--edge-decor")})
+		"edge_decor_preview":args.has("--edge-decor"),"original_slope_material":args.has("--original-slope")})
 	scene.preview_error.connect(func(message):
 		push_error(message)
 		finished=true
@@ -61,6 +61,19 @@ func _capture(folder: String, summary: Dictionary) -> void:
 	summary.draw_calls=Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
 	summary.render_objects=Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)
 	summary.source="desktop, real-time idle samples after warm-up; not phone performance"
+	var material_rows:Array=[]
+	for node in scene._ground.get_children():
+		if not node is MeshInstance3D or not node.material_override is ShaderMaterial:continue
+		var material:ShaderMaterial=node.material_override
+		var color:Color=material.get_shader_parameter("clearing_color")
+		var original:Color=material.get_meta("original_clearing_color",color)
+		var shade_rect:Vector4=material.get_shader_parameter("shade_rect") if material.get_shader_parameter("shade_rect") is Vector4 else Vector4.ZERO
+		var mask=material.get_shader_parameter("shade_mask")
+		material_rows.append({"mesh":node.name,"material_id":material.get_instance_id(),"shader_path":material.shader.resource_path,
+			"clearing_color":[color.r,color.g,color.b,color.a],"original_clearing_color":[original.r,original.g,original.b,original.a],
+			"linear_gain":material.get_meta("clearing_linear_gain",1.0),"shade_rect":[shade_rect.x,shade_rect.y,shade_rect.z,shade_rect.w],
+			"shade_mask_id":mask.get_instance_id() if mask!=null else 0,"shade_opacity":material.get_shader_parameter("shade_opacity")})
+	summary.ground_materials=material_rows
 	var output := FileAccess.open(folder.path_join(id+"-metrics.json"),FileAccess.WRITE)
 	output.store_string(JSON.stringify(summary,"\t"))
 	var records: Array = []
