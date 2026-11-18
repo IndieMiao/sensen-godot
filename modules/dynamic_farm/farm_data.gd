@@ -165,6 +165,26 @@ static func _reserve(raw: Variant, size: Vector2i, by_cell: Dictionary) -> Dicti
 		if not by_cell.has(at) or not protected.has(at):
 			return invalid("Dynamic farm entry has no protected ground.")
 		anchors[key] = at
+	for at: Vector2i in by_cell:
+		if by_cell[at].zone != "core": continue
+		if not protected.has(at):
+			return invalid("The farm core is missing its walking reserve.")
+		for dy in range(-2,3):
+			for dx in range(-2,3):
+				var distance := Vector2(maxf(absf(dx)-0.5,0),maxf(absf(dy)-0.5,0)).length_squared()
+				var near := at + Vector2i(dx,dy)
+				if distance <= 4.0 and by_cell.has(near) and not protected.has(near):
+					return invalid("The farm core corridor is incomplete.")
+	if by_cell[anchors.spawn_cell].zone != "core" or by_cell[anchors.entry_cell].zone != "extension":
+		return invalid("The farm entry and spawn zones are invalid.")
+	for anchor: Vector2i in [anchors.spawn_cell,anchors.entry_cell]:
+		for dy in range(-2,3):
+			for dx in range(-2,3):
+				var near := anchor + Vector2i(dx,dy)
+				if dx*dx+dy*dy <= 4 and by_cell.has(near) and not protected.has(near):
+					return invalid("The farm arrival clearance is incomplete.")
+	if not _connected(protected):
+		return invalid("The farm walking reserve is disconnected.")
 	return {"ok": true, "protected": protected, "spawn": anchors.spawn_cell, "entry": anchors.entry_cell}
 
 static func _boundaries_valid(raw: Variant, size: Vector2i) -> bool:
