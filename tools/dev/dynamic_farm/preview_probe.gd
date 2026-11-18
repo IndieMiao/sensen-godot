@@ -31,6 +31,8 @@ func _run() -> void:
 		quit(1)
 
 func _capture(folder: String, summary: Dictionary) -> void:
+	await RenderingServer.frame_post_draw
+	summary.first_complete_draw_ms = Time.get_ticks_msec()-scene._started_ms
 	for i in 5: await process_frame
 	await RenderingServer.frame_post_draw
 	var id: String = scene._data.block_id.replace("*","_star")
