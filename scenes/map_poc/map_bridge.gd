@@ -46,3 +46,36 @@ func start_location() -> void:
 ## 每帧调用（收异步消息/重发）；无事可做的实现留空。
 func poll() -> void:
 	pass
+
+
+# Dynamic-farm selection. All generations share one allocator across scene/bridge instances.
+signal parcel_ready(generation: int, style_generation: int, payload: String)
+signal parcel_query_result(request_id: int, generation: int, style_generation: int, payload: String)
+signal parcel_error(generation: int, style_generation: int, code: String)
+static var _next_parcel_generation: int = 0
+
+static func next_parcel_generation() -> int:
+	_next_parcel_generation += 1
+	return _next_parcel_generation
+
+func supports_parcels() -> bool:
+	return false
+
+func set_parcel_sources(generation: int, _config_json: String) -> void:
+	parcel_error.emit(generation, 0, "unsupported")
+
+func query_parcel_at(request_id: int, generation: int, _point: Vector2) -> void:
+	parcel_query_result.emit(request_id, generation, 0,
+		'{"parcel_ids":[],"properties":[],"kind":"none","building_key":"","building_source":"","error":"unsupported"}')
+
+func set_parcel_states(generation: int, _batch_json: String) -> void:
+	parcel_error.emit(generation, 0, "unsupported")
+
+func set_parcel_claims(generation: int, _claims_json: String) -> void:
+	parcel_error.emit(generation, 0, "unsupported")
+
+func set_parcel_building_highlight(generation: int, _key: String) -> void:
+	parcel_error.emit(generation, 0, "unsupported")
+
+func clear_parcel_layers(_generation: int) -> void:
+	pass

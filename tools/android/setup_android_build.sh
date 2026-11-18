@@ -31,9 +31,13 @@ printf '4.7.2.stable\n' > "$REPO_ROOT/android/.build_version"
 cp "$OVERLAY/build.gradle" "$BUILD_DIR/build.gradle"
 cp "$OVERLAY/AndroidManifest.xml" "$BUILD_DIR/src/main/AndroidManifest.xml"
 mkdir -p "$BUILD_DIR/src/main/java/com/sensen/map"
-cp "$OVERLAY/GodotMapPlugin.kt" "$BUILD_DIR/src/main/java/com/sensen/map/GodotMapPlugin.kt"
+for name in GodotMapPlugin ParcelMapController ParcelLayerState ParcelPayload ParcelBuildingSelection; do
+    cp "$OVERLAY/$name.kt" "$BUILD_DIR/src/main/java/com/sensen/map/$name.kt"
+done
 mkdir -p "$BUILD_DIR/src/test/java/com/sensen/map"
-cp "$OVERLAY/GodotMapPluginTest.kt" "$BUILD_DIR/src/test/java/com/sensen/map/GodotMapPluginTest.kt"
+for name in GodotMapPluginTest ParcelLayerStateTest ParcelPayloadTest ParcelR3Test; do
+    cp "$OVERLAY/$name.kt" "$BUILD_DIR/src/test/java/com/sensen/map/$name.kt"
+done
 
 echo "android/build 已就绪（模板 4.7.2 + GodotMap 插件覆盖层）"
 echo "别忘了在仓库根放 mapbox_token.txt（pk token，勿提交）"
