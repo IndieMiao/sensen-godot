@@ -1,11 +1,13 @@
 extends Node
 const GroundShade = preload("res://modules/render/ground_shade.gd")
 const CHUNK := 32
+const Edges = preload("res://modules/dynamic_farm/farm_edges.gd")
 const MAX_MASKS := 64
 const SUN_DEGREES := Vector3(-51,-38,0)
 var entries: Array = []
 var complete := false
-var metrics := {"mask_count":0,"mask_r8_bytes":0,"mode":"hardware"}
+var _started_us := 0
+var metrics := {"mask_count":0,"mask_r8_bytes":0,"mode":"hardware","chunks":[],"mask_ready_ms":0.0}
 
 static func _chunks(data: Dictionary, walk: RefCounted) -> Dictionary:
 	var out := {}
@@ -14,7 +16,7 @@ static func _chunks(data: Dictionary, walk: RefCounted) -> Dictionary:
 		if out.has(chunk): continue
 		var low: Vector2 = Vector2(chunk*CHUNK)-walk.center_grid
 		var high: Vector2 = Vector2((chunk+Vector2i.ONE)*CHUNK).min(Vector2(data.grid_size))-walk.center_grid
-		out[chunk] = Rect2(Vector2(low.x,-high.y)*data.cell_m,(high-low)*data.cell_m)
+		out[chunk] = Rect2(Vector2(low.x,-high.y)*data.cell_m,(high-low)*data.cell_m).grow(data.cell_m*Edges.PAD_CELLS)
 	return out
 
 static func affected(layout: Array, chunks: Dictionary) -> Dictionary:
@@ -56,6 +58,7 @@ static func enforce_budget(plan: Dictionary, data: Dictionary, walk: RefCounted)
 	plan.layout_sha256 = "\n".join(signature).sha256_text()
 
 func setup(ground_root: Node3D, props: Node3D, plan: Dictionary, data: Dictionary, walk: RefCounted) -> void:
+	_started_us = Time.get_ticks_usec()
 	if DisplayServer.get_name() == "headless":
 		metrics.mode = "headless-no-render"
 		complete = true
@@ -66,14 +69,7 @@ func setup(ground_root: Node3D, props: Node3D, plan: Dictionary, data: Dictionar
 	metrics.mode = "ground_shade"
 	var selected := affected(plan.layout,_chunks(data,walk))
 	for chunk: Dictionary in ground_root.get_meta("shade_chunks",[]):
-		# Match the frozen ground chunk by its position, not an old pond rectangle.
-		var matching := false
-		for key: Vector2i in selected:
-			var low: Vector2 = Vector2(key*CHUNK)-walk.center_grid
-			if is_equal_approx(chunk.rect.position.x,low.x*data.cell_m) and is_equal_approx(chunk.rect.end.y,-low.y*data.cell_m):
-				matching = true
-				break
-		if not matching: continue
+		if not selected.has(chunk.key): continue
 		var shade := GroundShade.new()
 		shade.ground = chunk.meshes[0]
 		shade.casters_root = props
@@ -100,5 +96,9 @@ func _process(_dt: float) -> void:
 			material.set_shader_parameter("shade_mask",shade.mask)
 			material.set_shader_parameter("shade_rect",Vector4(shade.rect.position.x,shade.rect.position.y,shade.rect.size.x,shade.rect.size.y))
 			material.set_shader_parameter("shade_opacity",shade.opacity)
+		metrics.chunks.append({"width":shade.mask.get_width(),"height":shade.mask.get_height(),
+			"r8_bytes":shade.mask.get_width()*shade.mask.get_height(),
+			"rect":[shade.rect.position.x,shade.rect.position.y,shade.rect.size.x,shade.rect.size.y]})
 		entry.applied = true
 	complete = done
+	if complete: metrics.mask_ready_ms = (Time.get_ticks_usec()-_started_us)/1000.0

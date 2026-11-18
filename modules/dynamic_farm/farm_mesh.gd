@@ -1,10 +1,11 @@
 extends RefCounted
 ## Mesh assembly from frozen masks; missing cells and holes are never filled.
 const CHUNK := 32
+const Edges = preload("res://modules/dynamic_farm/farm_edges.gd")
 const GROUND_SHADER = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 const MEADOW = preload("res://assets/farm/art/meadow.png")
 
-static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary) -> Node3D:
+static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften := true) -> Node3D:
 	var root := Node3D.new()
 	root.name = "DynamicGround"
 	var tops := {}
@@ -27,21 +28,36 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary) -> Nod
 		var corners := [center + Vector3(-half,0,half), center + Vector3(half,0,half),
 			center + Vector3(half,0,-half), center + Vector3(-half,0,-half)]
 		_quad(top, corners[0],corners[3],corners[2],corners[1],Vector3.UP,data.palette[cell.kind])
-		var directions := [Vector2i.DOWN,Vector2i.RIGHT,Vector2i.UP,Vector2i.LEFT]
+		var directions: Array = Edges.NEIGHBORS
 		for edge in 4:
 			var a: Vector3 = corners[edge]
 			var b: Vector3 = corners[(edge+1)%4]
 			if not data.by_cell.has(at + directions[edge]):
-				var normal := Vector3(directions[edge].x, 0, -directions[edge].y)
-				_quad(rim,a,b,b-Vector3.UP*0.7,a-Vector3.UP*0.7,normal,Color("958665"))
+				var outside_a := a
+				var outside_b := b
+				if soften:
+					var pad: float = data.cell_m * Edges.PAD_CELLS
+					outside_a = Edges.endpoint(data,at,edge,(edge+3)%4,a,pad)
+					outside_b = Edges.endpoint(data,at,edge,(edge+1)%4,b,pad)
+					_quad(top,a,b,outside_b,outside_a,Vector3.UP,data.palette[cell.kind])
+				var normal := (outside_b-outside_a).cross(Vector3.UP).normalized()
+				_quad(rim,outside_a,outside_b,outside_b-Vector3.UP*0.7,outside_a-Vector3.UP*0.7,normal,Color("958665"))
+				if soften and Edges.convex(data,at,edge):
+					var pad: float = data.cell_m * Edges.PAD_CELLS
+					var previous := Edges.normal((edge+3)%4)
+					var last: Vector3 = a+previous*pad
+					for step in range(1,5):
+						var next: Vector3 = a+(Edges.normal(edge) if step==4 else previous.rotated(Vector3.UP,float(step)*PI/8.0))*pad
+						_triangle(top,a,last,next,Vector3.UP,data.palette[cell.kind])
+						_quad(rim,last,next,next-Vector3.UP*0.7,last-Vector3.UP*0.7,(next-last).cross(Vector3.UP).normalized(),Color("958665"))
+						last=next
 			if cell.zone == "core":
 				if not grids.has(chunk):
 					var st := SurfaceTool.new()
 					st.begin(Mesh.PRIMITIVE_TRIANGLES)
 					grids[chunk] = st
 				var grid: SurfaceTool = grids[chunk]
-				var other: Vector2i = at + directions[edge]
-				var edge_key := "%d,%d:%d,%d" % [at.x,at.y,other.x,other.y] if at < other else "%d,%d:%d,%d" % [other.x,other.y,at.x,at.y]
+				var edge_key := Edges.vertex_key(at+Edges.CORNERS[edge],at+Edges.CORNERS[(edge+1)%4])
 				if not edges.has(edge_key):
 					edges[edge_key] = true
 					var perpendicular := (b-a).cross(Vector3.UP).normalized() * 0.005
@@ -64,21 +80,26 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary) -> Nod
 		var low: Vector2 = Vector2(chunk * CHUNK) - walk.center_grid
 		var high: Vector2 = Vector2((chunk + Vector2i.ONE) * CHUNK).min(Vector2(data.grid_size)) - walk.center_grid
 		var rect := Rect2(Vector2(low.x,-high.y)*data.cell_m, (high-low)*data.cell_m)
-		chunks.append({"rect":rect,"meshes":shaded[chunk]})
+		chunks.append({"key":chunk,"rect":rect.grow(data.cell_m*Edges.PAD_CELLS) if soften else rect,"meshes":shaded[chunk]})
 	root.set_meta("shade_chunks",chunks)
 	root.set_meta("cell_count",data.cells.size())
 	root.set_meta("core_count",data.counts.core)
+	root.set_meta("visual_pad_cells",Edges.PAD_CELLS if soften else 0.0)
+	root.set_meta("maximum_corner_offset_cells",sqrt(2.0)*Edges.PAD_CELLS if soften else 0.0)
 	return root
 
-static func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, normal: Vector3, color: Color) -> void:
-	# Fix winding from the supplied normal instead of depending on an outline's orientation.
-	var points: Array[Vector3] = [a,b,c,a,c,d]
-	if (b-a).cross(c-a).dot(normal) > 0:
-		points = [a,c,b,a,d,c]
-	for p in points:
+static func _triangle(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, normal: Vector3, color: Color) -> void:
+	if (b-a).cross(c-a).length_squared() < 0.000000000001: return
+	var points: Array[Vector3] = [a,b,c]
+	if (b-a).cross(c-a).dot(normal)>0: points=[a,c,b]
+	for point in points:
 		st.set_normal(normal)
 		st.set_color(color)
-		st.add_vertex(p)
+		st.add_vertex(point)
+
+static func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, normal: Vector3, color: Color) -> void:
+	_triangle(st,a,b,c,normal,color)
+	_triangle(st,a,c,d,normal,color)
 
 static func _add(parent: Node3D, st: SurfaceTool, node_name: String, shadows: bool) -> MeshInstance3D:
 	st.index()

@@ -9,6 +9,7 @@ import shutil
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', required=True)
 parser.add_argument('--cache-root', required=True)
+parser.add_argument('--copy-tests', action='store_true')
 args = parser.parse_args()
 repo = Path(__file__).resolve().parents[3]
 out = Path(args.output).resolve()
@@ -18,6 +19,10 @@ if out == repo or repo in out.parents:
 out.mkdir(parents=True, exist_ok=True)
 for name in ['modules', 'scenes', 'assets', 'tests', 'tools']:
     link = out / name
+    if name == 'tests' and args.copy_tests:
+        if link.is_symlink(): link.unlink()
+        shutil.copytree(repo / name, link, dirs_exist_ok=True, ignore=shutil.ignore_patterns('__pycache__'))
+        continue
     if not link.exists():
         link.symlink_to(repo / name, target_is_directory=True)
     elif link.resolve() != repo / name:
@@ -51,6 +56,8 @@ config/features=PackedStringArray("4.7", "Mobile")
 config/use_custom_user_dir=true
 config/custom_user_dir_name="SensenDynamicFarmQA"
 [autoload]
+GlesColour="*res://modules/render/gles_albedo.gd"
+GlesSunShadows="*res://modules/ui/gles_sun_shadows.gd"
 AppRouter="*res://qa_router.gd"
 Avatar="*res://modules/avatar/avatar_service.gd"
 [display]
