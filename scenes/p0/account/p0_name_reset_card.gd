@@ -1,8 +1,8 @@
 extends RefCounted
-## q(313)④ / 653:198694: one OK, centered confirm card. q(326)'s shorter copy is still awaiting approval.
+## q(326), approved 2026-11-18: one OK, centered confirm card; report the reset without promising a new lock period.
 const Confirm := preload("res://scenes/p0/panels/p0_home_move_confirm.gd")
 const TITLE := "Your name was reset"
-const BODY := "It didn't follow our rules. You can choose a new name on your profile in 7 days."
+const BODY := "It didn't follow our rules."
 
 static func card() -> Control:
 	var c = Confirm.new()
