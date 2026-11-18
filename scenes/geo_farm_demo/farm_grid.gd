@@ -10,6 +10,7 @@ const COLORS := {
 	"unknown": Color("aab2ae"), "path": Color("d9cdb5"),
 	"building": Color("bb7d63"),
 }
+const ZONE_COLORS := {"core": Color("bc6953"), "extension": Color("5c8c9a")}
 const MIN_ZOOM := 1.0
 const MAX_ZOOM := 4.0
 const DRAG_THRESHOLD := 8.0
@@ -18,6 +19,7 @@ var _cells: Array = []
 var _bounds := Rect2()
 var _selected := -1
 var _buildings := {}
+var _zones := {}
 var _zoom := 1.0
 var _pan := Vector2.ZERO
 var _touches := {}
@@ -39,6 +41,7 @@ func set_cells(cells: Array, palette: Dictionary = {}) -> void:
 	_cells = cells
 	_selected = -1
 	_buildings.clear()
+	_zones.clear()
 	_bounds = Rect2()
 	if not cells.is_empty():
 		var first: Dictionary = cells[0]
@@ -47,6 +50,8 @@ func set_cells(cells: Array, palette: Dictionary = {}) -> void:
 		for cell: Dictionary in cells:
 			low = low.min(Vector2(cell.x, cell.y))
 			high = high.max(Vector2(cell.x + 1, cell.y + 1))
+			if cell.has("zone"):
+				_zones[Vector2i(cell.x, cell.y)] = cell.zone
 			if cell.kind == "building":
 				_buildings[Vector2i(cell.x, cell.y)] = true
 		_bounds = Rect2(low, high - low)
@@ -112,8 +117,10 @@ func _draw() -> void:
 		if not Rect2(Vector2.ZERO, size).intersects(rect):
 			continue
 		draw_rect(rect, _palette.get(cell.kind, COLORS.unknown))
-		if rect.size.x >= 3.0:
+		if rect.size.x >= 3.0 and cell.get("zone", "core") == "core":
 			draw_rect(rect, Color(0.16, 0.23, 0.19, 0.20), false, 0.6)
+		if cell.has("zone"):
+			_draw_zone_edge(rect, Vector2i(cell.x, cell.y), cell.zone)
 		if cell.kind == "building":
 			_draw_building_edge(rect, Vector2i(cell.x, cell.y))
 	if _selected >= 0:
@@ -130,7 +137,7 @@ func _select_at(point: Vector2) -> void:
 	for i in _cells.size():
 		if cell_rect(i).has_point(point):
 			_selected = i
-			cell_selected.emit(str(_cells[i].kind))
+			cell_selected.emit("zone:" + str(_cells[i].zone) if _cells[i].has("zone") else str(_cells[i].kind))
 			queue_redraw()
 			return
 
@@ -186,3 +193,11 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventMagnifyGesture:
 		zoom_at(_zoom * event.factor, event.position)
 		accept_event()
+
+func _draw_zone_edge(rect: Rect2, coordinate: Vector2i, zone: String) -> void:
+	var corners := [rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]
+	var neighbors := [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]
+	for edge in 4:
+		var adjacent: String = _zones.get(coordinate + neighbors[edge], "")
+		if (zone == "core" and adjacent != "core") or (zone == "extension" and adjacent.is_empty()):
+			draw_line(corners[edge], corners[(edge + 1) % 4], ZONE_COLORS[zone], 1.5, true)

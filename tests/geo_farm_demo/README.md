@@ -26,3 +26,11 @@ godot --headless --path /Volumes/ACASIS/tmp/geo-farm-demo-1117/liubang-view-qa -
 支持schema2/Building8/零内缩及公开地址缺省，兼容r1数据。r2增加房屋/院子/水/路分计数、屋顶轮廓、1–4倍缩放、双指/单指拖动、Fit；测试检查输入事件不误选格、切块清缩放、房屋材质来自服务器。
 
 r2隔离项目可用 `/Volumes/ACASIS/tmp/geo-farm-demo-1117/liubang-view-qa-r2`；同一test脚本追加328/424真实样本时为89项。截图脚本 `capture_parcel_view.gd -- <输出目录> <farm1.json> <farm2.json>`；加`--motion`并用Godot Movie Maker固定12FPS可录制8.4秒输入回放。该视频是实际Godot画面、脚本注入的触摸/按钮事件，不代表手机实测或实时性能。
+
+## Dynamic farm r4
+
+`test_dynamic_farm.gd` covers schema4 RLE, origin, separate zone counts/capabilities, duplicate/cross-zone/invalid rows, outside cells, protected spawn, connectivity, budgets and three portrait sizes. Optional JSON arguments are real producer samples or explicitly labelled synthetic geometry samples; do not count them as a full-city release.
+
+The shared `modules/dynamic_farm/farm_data.gd` decoder is also the stage-two 3D input model. It only describes eligibility; `permits()` does not implement a farming command. The scene host owns dataset/block identity checks and network/claims. Schema1/2 remain supported by the demo facade for regression; schema4 never guesses legacy material8 as a building or material5 as water.
+
+RLE, permission, cell budget and mask errors clear the old view rather than showing partly decoded data. Boundaries are structurally checked but their geometric agreement/IoU with the authoritative masks is the producer validator's job; navigation and 2D edges consume masks. The default 2D view does not claim north-up for source-rotated parcels.

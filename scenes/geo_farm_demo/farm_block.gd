@@ -1,10 +1,13 @@
 extends RefCounted
 ## Decoder for the generated schemas v1/v2. Never creates cells or guesses land use.
+const DynamicFarmData = preload("res://modules/dynamic_farm/farm_data.gd")
 const KINDS := ["unknown", "residential", "mixed", "public", "green", "water", "path", "commercial", "building"]
 const MAX_AXIS := 256
 const MAX_CELLS := 4096
 
 static func decode(data: Dictionary) -> Dictionary:
+	if data.get("schema") == 4:
+		return DynamicFarmData.decode(data)
 	var schema = data.get("schema")
 	if not _integer(schema) or int(schema) not in [1, 2]:
 		return _invalid("Unsupported farm data version.")
