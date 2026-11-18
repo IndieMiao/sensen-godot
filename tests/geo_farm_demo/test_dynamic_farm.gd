@@ -124,6 +124,17 @@ func _run() -> void:
 	bad.counts.extension_cell_count += 16 * 544
 	bad.counts.total_cell_count += 16 * 544
 	_check(not Model.decode(bad).ok, "8192 total cell budget enforced")
+	bad = data.duplicate(true)
+	bad.walk_reserve.no_solid_decor_runs[20] = [20,0,10]
+	bad.walk_reserve.no_solid_decor_runs.insert(21,[20,11,17])
+	_check(not Model.decode(bad).ok, "all core cells must be reserved")
+	bad = data.duplicate(true)
+	bad.walk_reserve.no_solid_decor_runs[4] = [4,0,3]
+	bad.walk_reserve.no_solid_decor_runs.insert(5,[4,4,24])
+	_check(not Model.decode(bad).ok, "core-adjacent corridor cannot be removed")
+	bad = data.duplicate(true)
+	bad.walk_reserve.entry_cell = bad.walk_reserve.spawn_cell.duplicate()
+	_check(not Model.decode(bad).ok, "entry must be in extension, not spoofed as spawn")
 	var hole := data.duplicate(true)
 	# Remove a full outside corner cell, retaining the occupied shape and declared counts.
 	hole.zones.extension.runs[0] = [0,1,27,1]
