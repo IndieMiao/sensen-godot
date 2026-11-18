@@ -1,6 +1,6 @@
 from pathlib import Path
 import unittest,json
-from prepare_android_preview import preview_project,verify_preview,parse_settings,preview_preset,USER_DIR,verify_data_config,DATASET,ICON_PATH,ICON_SVG,PACKAGE
+from prepare_android_preview import preview_project,verify_preview,parse_settings,preview_preset,USER_DIR,verify_data_config,DATASET,ICON_PATH,ICON_SVG,PACKAGE,ICON_MONO_PATH,ICON_MONO_SVG
 
 PROJECT='''config_version=5
 [application]
@@ -72,13 +72,15 @@ class PreviewGateChecks(unittest.TestCase):
         self.assertEqual(parse_settings(text)['application']['config/icon'],'"res://'+ICON_PATH+'"')
         bad=text.replace('res://'+ICON_PATH,'res://icon.svg')
         self.assertRaisesRegex(ValueError,'distinct QA icon',verify_preview,bad,ENTRY,parse_settings(PROJECT)['autoload'])
-        self.assertIn('3D QA',ICON_SVG)
+        self.assertNotIn('<text',ICON_SVG)
+        self.assertIn('<path',ICON_SVG)
+        self.assertNotIn('<text',ICON_MONO_SVG)
         self.assertNotIn(PACKAGE,['com.sensen.p0demo','com.sensen.geofarmdemo','com.sensen.journeypreview'])
         preset='[preset.2]\nname="Android P0"\n[preset.2.options]\npackage/unique_name="com.sensen.p0demo"\n'
         settings=parse_settings(preview_preset(preset,2026111901))['preset.0.options']
         self.assertEqual(settings['launcher_icons/main_192x192'],'"res://'+ICON_PATH+'"')
         self.assertEqual(settings['launcher_icons/adaptive_foreground_432x432'],'"res://'+ICON_PATH+'"')
-        self.assertEqual(settings['launcher_icons/adaptive_monochrome_432x432'],'""')
+        self.assertEqual(settings['launcher_icons/adaptive_monochrome_432x432'],'"res://'+ICON_MONO_PATH+'"')
     def test_dynamic_json_included_without_truncating_full_resources(self):
         original='[preset.2]\nname="Android P0"\ninclude_filter="mapbox_token.txt,assets/p0/*.json"\nexport_filter="selected_resources"\nscript_export_mode=2\n[preset.2.options]\npackage/unique_name="com.sensen.p0demo"\n'
         settings=parse_settings(preview_preset(original,2026111901))['preset.0']

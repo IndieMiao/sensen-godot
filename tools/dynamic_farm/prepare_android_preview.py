@@ -11,7 +11,10 @@ BASE='99a853f7c75e917394a3f1f229bce9a82a38235c'
 PACKAGE='com.sensen.dynamicfarmqa'
 USER_DIR='gensen-dynamic-farm-preview-499'
 ICON_PATH='assets/dynamic_farm_qa/icon.svg'
-ICON_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="38" fill="#152f49"/><path d="M96 22 154 55 96 88 38 55z" fill="#91d68c"/><path d="M38 55 96 88v61l-58-34z" fill="#417f6a"/><path d="M96 88 154 55v60l-58 34z" fill="#64ab83"/><rect x="16" y="138" width="160" height="40" rx="10" fill="#ffcd54"/><text x="96" y="166" text-anchor="middle" font-family="sans-serif" font-size="26" font-weight="bold" fill="#152f49">3D QA</text></svg>'
+ICON_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="38" fill="#152f49"/><path d="M96 22 154 55 96 88 38 55z" fill="#91d68c"/><path d="M38 55 96 88v61l-58-34z" fill="#417f6a"/><path d="M96 88 154 55v60l-58 34z" fill="#64ab83"/><rect x="16" y="138" width="160" height="40" rx="10" fill="#ffcd54"/><path d="M44 148H59V158H48M59 158V168H44 M73 168V148H81L88 154V162L81 168Z M105 148H119V168H105Z M114 162L124 172 M134 168L141 148L149 168 M137 160H146" fill="none" stroke="#152f49" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+ICON_MONO_PATH='assets/dynamic_farm_qa/mono.svg'
+ICON_MONO_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><path d="M96 38 139 63 96 88 53 63z M53 69 91 91V132L53 110z M101 91 139 69V110L101 132z" fill="white"/><path d="M51 143H63V151H55M63 151V160H51 M75 160V143H82L88 149V155L82 160Z M104 143H116V160H104Z M112 155L121 163 M132 160L138 143L145 160 M134 153H142" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+
 
 OFFLINE_URL='https://offline.invalid/v1'
 ENTRY='res://scenes/dynamic_farm/dynamic_farm_map.tscn'
@@ -110,7 +113,7 @@ def preview_preset(original,code):
         ('preset.0.options','launcher_icons/main_192x192',json.dumps('res://'+ICON_PATH)),
         ('preset.0.options','launcher_icons/adaptive_foreground_432x432',json.dumps('res://'+ICON_PATH)),
         ('preset.0.options','launcher_icons/adaptive_background_432x432','""'),
-        ('preset.0.options','launcher_icons/adaptive_monochrome_432x432','""'),
+        ('preset.0.options','launcher_icons/adaptive_monochrome_432x432',json.dumps('res://'+ICON_MONO_PATH)),
     ]:rest=set_setting(rest,section,key,value)
     return rest
 
@@ -161,10 +164,11 @@ def prepare(repo,commit,output,main_scene,code,data_origin,client_sha):
         # These writes happen before any engine/import process exists.
         (stage/'project.godot').write_text(project);(stage/'export_presets.cfg').write_text(preset)
         icon=stage/ICON_PATH;icon.parent.mkdir(parents=True,exist_ok=True);icon.write_text(ICON_SVG)
+        (stage/ICON_MONO_PATH).write_text(ICON_MONO_SVG)
         verify_preview((stage/'project.godot').read_text(),main_scene,parse_settings(original)['autoload'])
         receipt={'schema':1,'source_commit':commit,'source_base':BASE,'source_tree':subprocess.check_output(['git','-C',str(repo),'rev-parse',commit+'^{tree}'],text=True).strip(),
                  'package':PACKAGE,'version_code':code,'data_config_path':DATA_CONFIG,'data_config_sha256':sha(data_raw),'data_origin':data_origin,'dataset_version':DATASET,'client_manifest_sha256':client_sha,'original_project_sha256':sha(original.encode()),'prepared_project_sha256':sha(project.encode()),
-                 'export_presets_sha256':sha(preset.encode()),'qa_icon_path':ICON_PATH,'qa_icon_sha256':sha(ICON_SVG.encode()),'net_source_sha256':sha(net.encode()),'native_five_sources':native,'settings_check':check,
+                 'export_presets_sha256':sha(preset.encode()),'qa_icon_path':ICON_PATH,'qa_icon_sha256':sha(ICON_SVG.encode()),'qa_monochrome_icon_path':ICON_MONO_PATH,'qa_monochrome_icon_sha256':sha(ICON_MONO_SVG.encode()),'net_source_sha256':sha(net.encode()),'native_five_sources':native,'settings_check':check,
                  'engine_started':False,'native_template_prepared':False,'runtime_media_or_gameplay_tested':False,'reviewed':False}
         (stage/'.dynamic-farm-preview-prepared.json').write_text(json.dumps(receipt,indent=2)+'\n')
         if output.exists() or output.is_symlink():raise ValueError('output appeared concurrently')
