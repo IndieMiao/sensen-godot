@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.SurfaceView
+import android.view.SurfaceHolder
 import android.os.SystemClock
 import android.widget.FrameLayout
 import java.util.Locale
@@ -73,6 +74,33 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     private var container: FrameLayout? = null
     private var mapView: MapView? = null
     private var mapPresentation: NativeMapPresentation? = null
+    private val godotSurfaceMode = NativeGodotSurfaceMode()
+    private var godotFormatHolder: SurfaceHolder? = null
+    private var godotRequestedFormat = Int.MIN_VALUE
+    private var godotObservedFormat = Int.MIN_VALUE
+    private var godotSurfaceGeneration = 0L
+    private var godotFormatError = ""
+    private var presentationDestroyed = false
+    private val godotSurfaceCallbacks = object : SurfaceHolder.Callback {
+        override fun surfaceCreated(holder: SurfaceHolder) {
+            if (holder !== godotFormatHolder || presentationDestroyed) return
+            godotSurfaceGeneration++
+            godotObservedFormat = Int.MIN_VALUE
+            // Do not change Surface format reentrantly from its creation callback.
+            godot.renderView?.view?.post { applyGodotSurfaceMode() }
+            cacheMapVisibility()
+        }
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            if (holder !== godotFormatHolder || presentationDestroyed) return
+            godotObservedFormat = format
+            cacheMapVisibility()
+        }
+        override fun surfaceDestroyed(holder: SurfaceHolder) {
+            if (holder !== godotFormatHolder || presentationDestroyed) return
+            godotObservedFormat = Int.MIN_VALUE
+            cacheMapVisibility()
+        }
+    }
     private var mapOcclusionColor = 0xff202020.toInt()
     @Volatile private var mapVisibilityCache = "{\"created\":false}"
     private var parcelController: ParcelMapController? = null
@@ -137,6 +165,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             Log.w(TAG, "Godot renderView 为空，z-order 未设置（G1 失败信号之一）")
         }
         container = FrameLayout(act)
+        applyGodotSurfaceMode()
         return container
     }
 
@@ -159,7 +188,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     override fun onMainResume() {
-        runOnUiThread { parcelActivityResumed = true; applyMapPresentation() }
+        runOnUiThread { parcelActivityResumed = true; applyGodotSurfaceMode(); applyMapPresentation() }
         if (renderPausedEarly) {
             // onResume can follow a translucent activity without another onStart.
             godot.renderView?.onActivityStarted()
@@ -453,6 +482,39 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         runOnUiThread { mapOcclusionColor = color; applyMapPresentation() }
     }
 
+    /** Explicit 3D-only mode; it is independent of Activity pause and MapView visibility. */
+    @UsedByGodot
+    fun setGodotSurfaceOpaque(opaque: Boolean) {
+        godotSurfaceMode.request(opaque)
+        // Read current intent when executed: a queued old transition cannot restore transparency.
+        runOnUiThread { applyGodotSurfaceMode() }
+    }
+
+    private fun applyGodotSurfaceMode() {
+        if (presentationDestroyed) return
+        val surface = godot.renderView?.view ?: run { godotFormatError = "surface_unavailable"; return }
+        val holder = surface.holder
+        if (holder !== godotFormatHolder) {
+            godotFormatHolder?.removeCallback(godotSurfaceCallbacks)
+            godotFormatHolder = holder
+            godotRequestedFormat = Int.MIN_VALUE
+            godotObservedFormat = Int.MIN_VALUE
+            holder.addCallback(godotSurfaceCallbacks)
+        }
+        val format = godotSurfaceMode.format()
+        if (godotRequestedFormat != format) {
+            godotRequestedFormat = format // Set before callbacks; same-format recreation must not loop.
+            try {
+                holder.setFormat(format)
+                godotFormatError = ""
+            } catch (error: RuntimeException) {
+                godotRequestedFormat = Int.MIN_VALUE
+                godotFormatError = error.javaClass.simpleName
+            }
+        }
+        cacheMapVisibility()
+    }
+
     /** Cached UI-thread snapshot only. Poll again to observe the refresh queued by this call. */
     @UsedByGodot
     fun getMapVisibilityState(): String {
@@ -494,6 +556,11 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             put("backdrop_argb", (container?.background as? ColorDrawable)?.color ?: 0)
             put("container_visibility", container?.visibility ?: -1)
             put("godot_surface_visibility", godot.renderView?.view?.visibility ?: -1)
+            put("godot_surface_mode", godotSurfaceMode.snapshot())
+            put("godot_requested_format", godotRequestedFormat)
+            put("godot_observed_format", godotObservedFormat)
+            put("godot_surface_generation", godotSurfaceGeneration)
+            put("godot_format_error", godotFormatError)
             put("epoch", parcelLifecycleEpoch.get()); put("sample_uptime_ms", SystemClock.uptimeMillis())
             put("surfaces", surfaces)
         }.toString()
@@ -615,6 +682,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     override fun onMainDestroy() {
         parcelLifecycleEpoch.incrementAndGet()
         runOnUiThread {
+            presentationDestroyed = true
+            godotFormatHolder?.removeCallback(godotSurfaceCallbacks)
+            godotFormatHolder = null
             mapPresentation?.apply(false, false, mapOcclusionColor)
             mapPresentation = null
             parcelController?.close(); parcelController = null
@@ -657,4 +727,15 @@ internal class NativeMapPresentation(
         fun opaqueRgb(value: String): Int? =
             if (Regex("#[0-9a-fA-F]{6}").matches(value)) (value.drop(1).toLong(16) or 0xff000000L).toInt() else null
     }
+}
+
+
+/** Packed atomic intent: bit zero is opaque, upper bits are the request sequence. */
+internal class NativeGodotSurfaceMode {
+    private val intent = AtomicLong(0L)
+    fun request(opaque: Boolean) {
+        intent.updateAndGet { old -> (((old ushr 1) + 1) shl 1) or (if (opaque) 1L else 0L) }
+    }
+    fun snapshot(): Long = intent.get()
+    fun format(): Int = if ((intent.get() and 1L) != 0L) PixelFormat.RGBX_8888 else PixelFormat.TRANSLUCENT
 }
