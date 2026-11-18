@@ -7,6 +7,9 @@ class ParcelPlugin extends Node:
 	signal parcel_query_result(request_id: int, generation: int, style_generation: int, payload: String)
 	signal parcel_error(generation: int, style_generation: int, code: String)
 	var calls: Array = []
+	var lifecycle_epoch: int = 0
+	func getParcelLifecycleEpoch() -> int: return lifecycle_epoch
+	func pause_and_resume() -> void: lifecycle_epoch += 1
 	func setParcelSources(g: int, config: String) -> void: calls.append(["sources", g, config])
 	func queryParcelAt(r: int, g: int, x: float, y: float) -> void: calls.append(["query", r, g, x, y])
 	func setParcelStates(g: int, batch: String) -> void: calls.append(["states", g, batch])
@@ -117,3 +120,18 @@ func test_base_capability_and_process_generation_allocator() -> void:
 	assert_bool(base.supports_parcels()).is_false()
 	var first := MapBridge.next_parcel_generation()
 	assert_int(MapBridge.next_parcel_generation()).is_greater(first)
+
+
+func test_already_emitted_result_dies_across_pause_resume_but_new_query_works() -> void:
+	bridge.set_parcel_sources(10, "config")
+	bridge.query_parcel_at(1, 10, Vector2.ZERO)
+	# Callback completed natively; its payload is now queued for deferred Godot delivery.
+	plugin.parcel_query_result.emit(1, 10, 1, "retired-building-key")
+	# Deliberately do NOT clear sources/scene/request IDs or enqueue an invalidation signal.
+	plugin.pause_and_resume()
+	await get_tree().process_frame
+	assert_that(received).is_empty()
+	bridge.query_parcel_at(2, 10, Vector2.ONE)
+	plugin.parcel_query_result.emit(2, 10, 1, "new-building-key")
+	await get_tree().process_frame
+	assert_that(received).is_equal([[2, 10, 1, "new-building-key"]])

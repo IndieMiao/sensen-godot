@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicLong
 import org.json.JSONArray
 import org.json.JSONObject
 import com.mapbox.bindgen.Value
@@ -69,6 +70,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     private var mapView: MapView? = null
     private var parcelController: ParcelMapController? = null
     private var parcelActivityResumed = true
+    private val parcelLifecycleEpoch = AtomicLong(0)
     private var mapLocale: Locale = Locale.SIMPLIFIED_CHINESE
     private var mapSceneVisible = true
     private var cityStyle = false
@@ -139,6 +141,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     override fun onMainPause() {
+        parcelLifecycleEpoch.incrementAndGet() // Before scheduling UI work or stopping Godot.
         runOnUiThread { parcelActivityResumed = false; parcelController?.setInteractive(false) }
         val renderView = godot.renderView ?: return
         if (mainLoopStarted) {
@@ -217,6 +220,10 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             Log.i(TAG, "MapView created @($lat,$lng) z=$zoom")
         }
     }
+
+    /** Cross-thread watermark: Godot reads this again immediately before deferred delivery. */
+    @UsedByGodot
+    fun getParcelLifecycleEpoch(): Long = parcelLifecycleEpoch.get()
 
     /** Dynamic farms: normalized points are relative to the full native MapView, not a Godot panel. */
     @UsedByGodot
@@ -418,6 +425,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     /** Pause the map under opaque Godot scenes, retaining its last composed buffer. */
     @UsedByGodot
     fun setMapVisible(visible: Boolean) {
+        if (!visible) parcelLifecycleEpoch.incrementAndGet()
         runOnUiThread {
             updateMapSceneVisibility(visible)
         }
@@ -548,6 +556,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     override fun onMainDestroy() {
+        parcelLifecycleEpoch.incrementAndGet()
         runOnUiThread {
             parcelController?.close(); parcelController = null
             try {
