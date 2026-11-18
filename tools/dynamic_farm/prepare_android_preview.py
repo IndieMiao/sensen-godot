@@ -14,6 +14,11 @@ OFFLINE_URL='https://offline.invalid/v1'
 ENTRY='res://scenes/dynamic_farm/dynamic_farm_map.tscn'
 DATA_CONFIG='modules/dynamic_farm/map/config.json'
 DATASET='sf-dynamic-farm-20261118-r4'
+REQUIRED_AUTOLOADS={
+    'Net':'"*res://modules/net/net_service.gd"',
+    'Avatar':'"*res://modules/avatar/avatar_service.gd"',
+    'AppRouter':'"*res://modules/ui/app_router.gd"',
+}
 NATIVE=['GodotMapPlugin.kt','ParcelMapController.kt','ParcelLayerState.kt','ParcelPayload.kt','ParcelBuildingSelection.kt']
 
 def sha(data):return hashlib.sha256(data).hexdigest()
@@ -53,8 +58,9 @@ def verify_preview(text,main_scene,original_autoload):
     if application.get('run/main_scene')!=json.dumps(main_scene):raise ValueError('wrong preview entry')
     if application.get('config/use_custom_user_dir')!='true' or application.get('config/custom_user_dir_name')!=json.dumps(USER_DIR):raise ValueError('shared user data prohibited')
     if settings.get('autoload')!=original_autoload:raise ValueError('original autoload symbols changed')
-    for name in ('Net','Avatar','AppRouter'):
+    for name,declaration in REQUIRED_AUTOLOADS.items():
         if name not in original_autoload:raise ValueError('missing required autoload '+name)
+        if settings['autoload'].get(name)!=declaration:raise ValueError('autoload binding differs from reviewed singleton/path: '+name)
     return {'offline_gate_before_autoload':True,'game_network_endpoints':OFFLINE_URL,'autoload_symbols':sorted(original_autoload),'user_dir':USER_DIR,'main_scene':main_scene}
 
 def preview_project(original,main_scene):

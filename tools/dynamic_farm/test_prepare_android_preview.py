@@ -51,6 +51,22 @@ class PreviewGateChecks(unittest.TestCase):
                 bad={**config,key:value};self.assertRaises(ValueError,verify_data_config,json.dumps(bad),origin,pin)
         duplicate=json.dumps(config)[:-1]+',"base_url":"https://other.trycloudflare.com"}'
         self.assertRaisesRegex(ValueError,'duplicate',verify_data_config,duplicate,origin,pin)
+    def test_autoload_binding_rejects_wrong_paths_and_non_singleton(self):
+        cases=[
+            ('Net="*res://modules/net/net_service.gd"','Net="*res://modules/net/other_net.gd"'),
+            ('Net="*res://modules/net/net_service.gd"','Net="res://modules/net/net_service.gd"'),
+            ('Avatar="*res://modules/avatar/avatar_service.gd"','Avatar="*res://modules/avatar/other.gd"'),
+            ('AppRouter="*res://modules/ui/app_router.gd"','AppRouter="*res://modules/ui/other.gd"'),
+        ]
+        for old,new in cases:
+            with self.subTest(declaration=new):
+                candidate=PROJECT.replace(old,new)
+                self.assertRaisesRegex(ValueError,'autoload binding',preview_project,candidate,ENTRY)
+    def test_autoload_binding_accepts_original_and_preserves_other_symbols(self):
+        original=PROJECT.replace('[sensen]','Helper="*res://modules/isolated_helper.gd"\n[sensen]')
+        text,facts=preview_project(original,ENTRY)
+        self.assertEqual(parse_settings(text)['autoload'],parse_settings(original)['autoload'])
+        self.assertIn('Helper',facts['autoload_symbols'])
     def test_unique_isolated_export_preset(self):
         original='''[preset.2]
 name="Android P0"
