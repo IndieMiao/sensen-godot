@@ -27,4 +27,3 @@ static func decode(raw:Variant) -> Dictionary:
 	for key in ["block_id","parcel_id","name","address","address_count","center","bbox","cell_count","core_cell_count","extension_cell_count","total_cell_count","farm_path","source_area_m2","inset_area_m2","building_count"]:
 		if raw.has(key):result[key]=raw[key]
 	return result
-

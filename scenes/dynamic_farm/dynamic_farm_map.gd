@@ -148,18 +148,19 @@ func resume() -> void:
 func _leave() -> void:
 	if _leaving or _opening: return
 	_leaving = true
-	if _selector != null: _selector.pause()
+	suspend()
 	_finish_leave.call_deferred()
 
 func _finish_leave() -> void:
 	var router := get_node_or_null("/root/AppRouter")
 	if router != null and router.top_instance() == self: router.pop_instance()
-	elif OS.get_name() == "Android" and Engine.has_singleton("GodotMap"):
-		var plugin := Engine.get_singleton("GodotMap")
-		if plugin.has_method("moveTaskToBack"): plugin.moveTaskToBack()
+	elif _bridge != null and _bridge.move_task_to_back():
 		_leaving = false
-		resume()
-	else: get_tree().quit()
+		# Remain paused until APPLICATION_RESUMED, rather than reloading behind the departing task.
+	else: _quit_preview()
+
+func _quit_preview() -> void:
+	get_tree().quit()
 
 func is_back_navigation_locked() -> bool:
 	_leave(); return true

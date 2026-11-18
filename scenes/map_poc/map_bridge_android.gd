@@ -74,6 +74,11 @@ func _supports(method: String) -> bool:
 	if _plugin.has_method("has_java_method"): return _plugin.has_java_method(method)
 	return _plugin.has_method(method)
 
+func move_task_to_back() -> bool:
+	if not _supports("moveTaskToBack"): return false
+	_plugin.moveTaskToBack()
+	return true
+
 func camera_info() -> String:
 	if not is_instance_valid(_plugin):
 		return ""

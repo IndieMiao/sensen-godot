@@ -25,6 +25,10 @@ func set_camera(_lat: float, _lng: float, _zoom: float, _bearing: float, _pitch:
 func set_map_visible(_visible: bool) -> void:
 	pass
 
+## Request the Android task to move to background; false means the host must use its exit fallback.
+func move_task_to_back() -> bool:
+	return false
+
 func set_language(_locale: String) -> void:
 	pass
 
