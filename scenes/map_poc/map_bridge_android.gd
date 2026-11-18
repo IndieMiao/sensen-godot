@@ -87,6 +87,14 @@ func set_map_occlusion_color(rgb: String) -> bool:
 func map_visibility_state() -> String:
 	return str(_plugin.getMapVisibilityState()) if _supports("getMapVisibilityState") else "{}"
 
+func supports_surface_opacity() -> bool:
+	return _supports("setGodotSurfaceOpaque")
+
+func set_godot_surface_opaque(opaque: bool) -> bool:
+	if not supports_surface_opacity(): return false
+	_plugin.setGodotSurfaceOpaque(opaque)
+	return true
+
 func camera_info() -> String:
 	if not is_instance_valid(_plugin):
 		return ""

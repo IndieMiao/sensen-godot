@@ -37,6 +37,13 @@ func set_map_occlusion_color(_rgb: String) -> bool:
 func map_visibility_state() -> String:
 	return "{}"
 
+func supports_surface_opacity() -> bool:
+	return false
+
+## Explicit preview scene intent; ordinary Activity pause must not choose the format.
+func set_godot_surface_opaque(_opaque: bool) -> bool:
+	return false
+
 func set_language(_locale: String) -> void:
 	pass
 

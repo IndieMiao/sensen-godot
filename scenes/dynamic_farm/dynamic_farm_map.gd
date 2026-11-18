@@ -22,6 +22,7 @@ var _leaving := false
 var _opening := false
 var _suspended := false
 var _presentation_epoch := 0
+var _surface_opaque_requested := false
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -36,6 +37,7 @@ func _ready() -> void:
 	if not Engine.has_singleton("GodotMap") or token.is_empty():
 		_message.text = "This preview needs the Android parcel map."; return
 	_bridge = AndroidBridge.new()
+	_bridge.set_godot_surface_opaque(false) # A fresh map scene always requests the transparent mode.
 	_camera = CameraInput.new(); add_child(_camera); move_child(_camera, 0)
 	_selector = Selection.new(); _selector.config = parser.data; _selector.bridge = _bridge
 	var api := Api.new(); add_child(api); _selector.api = api; add_child(_selector)
@@ -126,7 +128,7 @@ func _preview() -> void:
 
 func _open_host(farm: Dictionary) -> void:
 	if _leaving or _suspended or _opening: return
-	if _bridge == null or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):
+	if _bridge == null or not _bridge.supports_surface_opacity() or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):
 		_render()
 		_message.text = "Use the latest Dynamic Farm preview build."; return
 	var router := get_node_or_null("/root/AppRouter")
@@ -136,13 +138,18 @@ func _open_host(farm: Dictionary) -> void:
 	await router.open_instance(HOST, {"farm": farm, "dataset": farm.dataset_version, "block_id": farm.block_id,
 		"preview_only": true, "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
 	_opening = false
-	if not _suspended: _render()
+	if not _suspended:
+		# Loading cancelled/failed before a host became top, or Back already returned here.
+		_restore_surface_mode()
+		_render()
 
 func suspend() -> void:
 	_suspended = true
 	_presentation_epoch += 1
 	get_viewport().transparent_bg = false
 	if _bridge != null: _bridge.set_map_occlusion_color(OCCLUSION_COLOR)
+	if _opening and _bridge != null:
+		_surface_opaque_requested = _bridge.set_godot_surface_opaque(true)
 	if _selector != null: _selector.pause()
 	_hud.hide(); process_mode = Node.PROCESS_MODE_DISABLED
 	_record_presentation("covered", _presentation_epoch)
@@ -152,9 +159,16 @@ func resume() -> void:
 	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT; _hud.show()
 	_presentation_epoch += 1
 	if _bridge != null:
-		get_viewport().transparent_bg = true; _bridge.set_map_visible(true); _camera._changed()
+		get_viewport().transparent_bg = true
+		_restore_surface_mode()
+		_bridge.set_map_visible(true); _camera._changed()
 	if _selector != null: _selector.activate()
 	_record_presentation("map", _presentation_epoch)
+
+func _restore_surface_mode() -> void:
+	if _surface_opaque_requested and _bridge != null:
+		_bridge.set_godot_surface_opaque(false)
+	_surface_opaque_requested = false
 
 func _record_presentation(stage: String, epoch: int) -> void:
 	if _bridge == null: return
@@ -164,7 +178,7 @@ func _record_presentation(stage: String, epoch: int) -> void:
 	var parser := JSON.new()
 	var native: Dictionary = {}
 	if parser.parse(_bridge.map_visibility_state()) == OK and parser.data is Dictionary: native = parser.data
-	var state := {"stage": stage, "viewport_transparent": get_viewport().transparent_bg, "native": native}
+	var state := {"stage": stage, "viewport_transparent": get_viewport().transparent_bg, "surface_opaque_requested": _surface_opaque_requested, "native": native}
 	var router := get_node_or_null("/root/AppRouter")
 	var top = router.top_instance() if router != null else null
 	if is_instance_valid(top) and top.has_method("presentation_state"): state["host"] = top.presentation_state()

@@ -2,11 +2,16 @@ extends SceneTree
 const Android := preload("res://scenes/map_poc/map_bridge_android.gd")
 class Plugin extends Node:
 	var supported := true
+	var surface_supported := true
 	var calls: Array = []
 	var shown := true
+	var opaque := false
 	func has_java_method(method: String) -> bool:
+		if method == "setGodotSurfaceOpaque": return supported and surface_supported
 		return supported and method in ["setMapOcclusionColor", "getMapVisibilityState", "setMapVisible"]
 	func setMapOcclusionColor(rgb: String) -> void: calls.append(["color", rgb])
+	func setGodotSurfaceOpaque(value: bool) -> void:
+		opaque = value; calls.append(["surface", value])
 	func setMapVisible(value: bool) -> void:
 		shown = value; calls.append(["visible", value])
 	func getMapVisibilityState() -> String:
@@ -53,22 +58,37 @@ func _run() -> void:
 	await page._open_host(farm)
 	verify(plugin.calls == [["color", "#E7F0DF"]] and router.opened == 1, "opaque scene color is supplied before Router may suspend the map")
 	verify(router.received.preview_only and router.received.farm == farm, "preview payload keeps identity and presentation-only semantics")
+	verify(not plugin.opaque, "cancelled loading before Router suspension never makes the still-visible map opaque")
 	plugin.calls.clear(); root.transparent_bg = true
+	page._opening = true # Router is now committing the 3D transition.
 	page.suspend()
-	verify(plugin.calls == [["color", "#E7F0DF"], ["visible", false]], "suspend sets scene color before native hide")
+	page._opening = false
+	verify(plugin.calls == [["color", "#E7F0DF"], ["surface", true], ["visible", false]], "3D suspension sets scene color and opaque Surface before native hide")
 	verify(not root.transparent_bg and page._suspended, "Godot viewport becomes opaque while map is covered")
+	verify(plugin.opaque and page._surface_opaque_requested, "3D transition explicitly requests the no-alpha Surface mode")
 	verify(not plugin.shown, "native hide request reaches the existing visibility API")
 	router.top = Node3D.new(); root.add_child(router.top)
 	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 	verify(not plugin.shown and selector.activations == 0, "foreground while 3D is top cannot reactivate the map")
+	verify(plugin.opaque, "3D foreground preserves the explicit opaque mode")
 	await create_timer(0.25).timeout
 	verify(not plugin.shown, "diagnostic cache polling never changes presentation state")
 	router.top.queue_free(); router.top = null
 	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 	verify(plugin.shown and root.transparent_bg and selector.activations == 1, "foreground root map restores native visibility and transparent viewport")
+	verify(not plugin.opaque and not page._surface_opaque_requested, "returning map restores the transparent native Surface mode")
 	verify(page._camera.updates == 1, "restored map reapplies its saved camera")
 	var snapshot: Dictionary = JSON.parse_string(bridge.map_visibility_state())
 	verify(snapshot.scene_visible and snapshot.sample_uptime_ms == 123, "bridge preserves snapshot freshness fields without treating cache as an ACK")
+	plugin.calls.clear()
+	page.suspend()
+	verify(not plugin.opaque and not plugin.calls.any(func(call: Array): return call[0] == "surface"), "ordinary map Activity pause does not request a 3D Surface format")
+	page.resume()
+	plugin.surface_supported = false
+	var before_missing := router.opened
+	await page._open_host(farm)
+	verify(router.opened == before_missing and not plugin.opaque, "a native build without the Surface-mode API cannot enter 3D")
+	plugin.surface_supported = true
 	plugin.supported = false
 	var calls := plugin.calls.size()
 	await page._open_host(farm)
