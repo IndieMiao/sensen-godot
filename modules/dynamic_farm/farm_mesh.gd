@@ -6,10 +6,11 @@ const Bank = preload("res://modules/dynamic_farm/farm_bank.gd")
 const GROUND_SHADER = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 const MEADOW = preload("res://assets/farm/art/meadow.png")
 
-static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften := true, widen := false) -> Node3D:
+static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften := true, widen := false, slope_gain := 0.65) -> Node3D:
 	var root := Node3D.new()
 	root.name = "DynamicGround"
 	var tops := {}
+	var slopes := {}
 	var grids := {}
 	var shaded := {}
 	var rim := SurfaceTool.new()
@@ -48,7 +49,8 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 					if not rolled: _quad(top,a,b,outside_b,outside_a,Vector3.UP,data.palette[cell.kind])
 				var normal := (outside_b-outside_a).cross(Vector3.UP).normalized()
 				if rolled:
-					bank_spans.append({"top":top,"soil":rim,"a":a,"b":b,"oa":outside_a,"ob":outside_b,
+					var slope_top:=_slope_tool(slopes,key,chunk,cell.surface_id,top,slope_gain)
+					bank_spans.append({"top":slope_top,"soil":rim,"a":a,"b":b,"oa":outside_a,"ob":outside_b,
 						"normal":normal,"phase":seed_phase,"colour":soil_colour,"segments":Bank.SEGMENTS})
 				else:
 					_quad(rim,outside_a,outside_b,outside_b-Vector3.UP*0.7,outside_a-Vector3.UP*0.7,normal,Color("958665"))
@@ -59,7 +61,8 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 					for step in range(1,5):
 						var next: Vector3 = a+(Edges.normal(edge) if step==4 else previous.rotated(Vector3.UP,float(step)*PI/8.0))*pad
 						if rolled:
-							bank_spans.append({"top":top,"soil":rim,"a":a,"b":a,"oa":last,"ob":next,
+							var slope_top:=_slope_tool(slopes,key,chunk,cell.surface_id,top,slope_gain)
+							bank_spans.append({"top":slope_top,"soil":rim,"a":a,"b":a,"oa":last,"ob":next,
 								"normal":(next-last).cross(Vector3.UP).normalized(),"phase":seed_phase,"colour":soil_colour,"segments":1})
 						else:
 							_triangle(top,a,last,next,Vector3.UP,data.palette[cell.kind])
@@ -88,6 +91,21 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 		mesh.material_override = _ground_material(part.surface, data, recipe)
 		if not shaded.has(part.chunk): shaded[part.chunk] = []
 		shaded[part.chunk].append(mesh)
+	for key:String in slopes:
+		var part:Dictionary=slopes[key]
+		var mesh:=_add(root,part.tool,"Slope_"+key.replace(":","_"),false)
+		var material:=_ground_material(part.surface,data,recipe)
+		var base:Color=material.get_shader_parameter("clearing_color")
+		material.set_meta("original_clearing_color",base)
+		material.set_meta("clearing_linear_gain",slope_gain)
+		var linear:=base.srgb_to_linear()
+		linear.r*=slope_gain
+		linear.g*=slope_gain
+		linear.b*=slope_gain
+		linear.a=1.0
+		material.set_shader_parameter("clearing_color",linear.linear_to_srgb())
+		mesh.material_override=material
+		shaded[part.chunk].append(mesh)
 	for chunk: Vector2i in grids:
 		var mesh := _add(root,grids[chunk],"CoreGrid_%d_%d" % [chunk.x,chunk.y],false)
 		mesh.material_override = _ground_material(3, data, recipe)
@@ -104,7 +122,17 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 	root.set_meta("core_count",data.counts.core)
 	root.set_meta("visual_pad_cells",Edges.PAD_CELLS if soften else 0.0)
 	root.set_meta("maximum_corner_offset_cells",sqrt(2.0)*Edges.PAD_CELLS if soften else 0.0)
+	root.set_meta("slope_material_linear_gain",slope_gain)
+	root.set_meta("slope_batches",slopes.size())
 	return root
+
+static func _slope_tool(slopes: Dictionary, key: String, chunk: Vector2i, surface: int, original: SurfaceTool, gain: float) -> SurfaceTool:
+	if is_equal_approx(gain,1.0):return original
+	if not slopes.has(key):
+		var tool:=SurfaceTool.new()
+		tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+		slopes[key]={"tool":tool,"chunk":chunk,"surface":surface}
+	return slopes[key].tool
 
 static func _triangle(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, normal: Vector3, color: Color) -> void:
 	if (b-a).cross(c-a).length_squared() < 0.000000000001: return

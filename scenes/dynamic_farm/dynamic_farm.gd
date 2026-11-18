@@ -73,7 +73,8 @@ func _ready() -> void:
 		_fail(_plan.error)
 		return
 	Shade.enforce_budget(_plan,_data,_walk)
-	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk))
+	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk),
+		1.0 if bool(_args.get("original_slope_material",false)) else 0.65)
 	add_child(_ground)
 	var art := Scenery.build(_plan,_data.cell_m)
 	if not art.ok:
@@ -127,6 +128,8 @@ func _ready() -> void:
 		"camera":{"pitch":43.0,"yaw":14.5,"keep_width":true},
 		"source_origin":[_data.origin.x,_data.origin.y]}
 	_summary.bank = _ground.get_meta("bank_metrics",{})
+	_summary.slope_material={"clearing_linear_gain":_ground.get_meta("slope_material_linear_gain"),
+		"batches":_ground.get_meta("slope_batches")}
 	_summary.edge_decor={"enabled":not _edge_plan.is_empty(),"instances":_edge_plan.get("layout",[]).size(),
 		"triangles":_edge_plan.get("triangles",0),"batches":_edge_plan.get("batches",0),
 		"layout_sha256":_edge_plan.get("layout_sha256",""),"covered_cells":_edge_plan.get("covered_cells",0),
