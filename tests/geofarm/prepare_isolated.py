@@ -15,8 +15,10 @@ target.mkdir(parents=True, exist_ok=True)
 marker.touch()
 paths = list((repo / 'demo/geofarm').glob('*.gd*')) + list((repo / 'demo/geofarm').glob('*.tscn'))
 paths += list((repo / 'scenes/geo_farm_demo').glob('farm_*'))
+paths += list((repo / 'modules/dynamic_farm').glob('farm_data.gd*'))
 paths += [repo / 'scenes/map_poc' / name for name in ['map_bridge.gd','map_bridge_android.gd']]
 paths += list((repo / 'tests/geofarm').glob('*.gd*'))
+paths += list((repo / 'tests/geo_farm_demo').glob('test_dynamic_farm.gd*'))
 manifest = {}
 for path in paths:
     rel = path.relative_to(repo)
@@ -28,7 +30,7 @@ for path in paths:
 [application]
 config/name="GeoFarm Map QA"
 config/use_custom_user_dir=true
-config/custom_user_dir_name="pangu-geofarm-r3-qa-1117"
+config/custom_user_dir_name="pangu-dynamic-r4-qa-1118"
 run/main_scene="res://demo/geofarm/geofarm_main.tscn"
 [display]
 window/size/viewport_width=360

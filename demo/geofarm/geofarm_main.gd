@@ -98,11 +98,15 @@ static func _metadata(raw:Variant) -> Dictionary:
 		raw["center"]=[float(raw.center_lon),float(raw.center_lat)]
 	if not Geo.valid_point(raw.get("center")):return {}
 	if raw.has("bbox") and not Geo.valid_bbox(raw.bbox):return {}
-	if not (raw.get("cell_count") is int or raw.get("cell_count") is float) or not is_finite(float(raw.cell_count)) or raw.cell_count<=0:return {}
+	for key in ["core_cell_count","extension_cell_count","total_cell_count"]:
+		if not (raw.get(key) is int or raw.get(key) is float) or not is_finite(float(raw[key])) or float(raw[key])!=floorf(float(raw[key])) or raw[key]<0:return {}
+	if raw.core_cell_count<760 or raw.core_cell_count>840 or raw.extension_cell_count<=0 or raw.total_cell_count!=raw.core_cell_count+raw.extension_cell_count or raw.total_cell_count>8192:return {}
+	if raw.has("cell_count") and raw.cell_count!=raw.core_cell_count:return {}
+	raw["cell_count"]=raw.core_cell_count
 	for key in ["source_area_m2","inset_area_m2"]:
 		if raw.has(key) and (not (raw[key] is int or raw[key] is float) or not is_finite(float(raw[key])) or float(raw[key])<=0):return {}
 	var result:Dictionary={}
-	for key in ["block_id","parcel_id","name","address","address_count","center","bbox","cell_count","farm_path","source_area_m2","inset_area_m2","building_count"]:
+	for key in ["block_id","parcel_id","name","address","address_count","center","bbox","cell_count","core_cell_count","extension_cell_count","total_cell_count","farm_path","source_area_m2","inset_area_m2","building_count"]:
 		if raw.has(key):result[key]=raw[key]
 	return result
 
@@ -110,7 +114,7 @@ func _build_ui() -> void:
 	_overlay=Control.new();_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(_overlay)
 	var top:=_panel(_overlay,Vector4(12,30,-12,0),false)
 	var column:=VBoxContainer.new();column.add_theme_constant_override("separation",5);top.add_child(column)
-	column.add_child(_label("San Francisco · Farm DEMO",18))
+	column.add_child(_label("Dynamic Farm DEMO",18))
 	_message=_label("Loading parcel map…",12);column.add_child(_message)
 	var row:=HBoxContainer.new();column.add_child(row)
 	_refresh=_button("Refresh",_refresh_pressed);row.add_child(_refresh)
@@ -237,7 +241,7 @@ func _update_selection() -> void:
 		_selection.text="Tap inside a parcel to choose your farm.";_action.text="Select a parcel";_action.disabled=true;return
 	var p:Dictionary=by_id[_selected]
 	_selection.text=("Building · " if _selection_kind=="building" else "")+str(p.get("name","Your previous parcel"))
-	if p.has("cell_count"):_selection.text+=" · %d cells"%int(p.cell_count)
+	if p.has("core_cell_count"):_selection.text+="\n%d core · %d walk-only extension cells"%[int(p.core_cell_count),int(p.extension_cell_count)]
 	if p.has("inset_area_m2"):_selection.text+=" · %.0f m²"%float(p.inset_area_m2)
 	if int(p.get("address_count",1))>1:_selection.text+="\n%d listed addresses"%int(p.address_count)
 	var pending:Dictionary=identity.data.get("pending",{})
@@ -339,9 +343,9 @@ func _confirm() -> void:
 	_stage="confirm"
 	var p:Dictionary=by_id[_selected]
 	var col:=_dialog_shell("Choose this parcel?")
-	var details:="%s\n%d generated cells"%[str(p.name),int(p.cell_count)]
+	var details:="%s\n%d core cells · %d walk-only extension cells"%[str(p.name),int(p.core_cell_count),int(p.extension_cell_count)]
 	if p.has("inset_area_m2"):details+=" · %.0f m² parcel area"%float(p.inset_area_m2)
-	details+="\nYour farm includes the whole parcel.\nOne farm per installation."
+	details+="\nThe outer area is for walking.\nEditing the core comes in future gameplay.\nOne demo farm per installation."
 	col.add_child(_label(details,14))
 	col.add_child(_button("Continue",_nickname))
 	col.add_child(_button("Cancel",_close_dialog))

@@ -1,6 +1,8 @@
 extends "res://demo/geofarm/geo_identity.gd"
 const Contract := preload("res://demo/geofarm/geo_contract.gd")
-const PARCEL_PATH := "user://geo_farm_identity_sf-parcel-20261117-v3.json"
+const PARCEL_PATH := "user://geo_farm_identity_sf-dynamic-farm-20261118-r4.json"
+const V3_PATH := "user://geo_farm_identity_sf-parcel-20261117-v3.json"
+const V3_SMALL_PATH := "user://geo_farm_identity_sf-parcel-small-20261117-v3.json"
 const V2_PATH := "user://geo_farm_identity_sf-parcel-20261117-v2.json"
 func load_parcel(at:="",legacy_at:=PATH,version:=Contract.DATASET) -> bool:
 	if not Contract.valid_dataset(version):return false
@@ -22,7 +24,7 @@ func load_parcel(at:="",legacy_at:=PATH,version:=Contract.DATASET) -> bool:
 		# Read only the old credential; never rewrite/migrate r1 claims or its pending action.
 		var previous:Array=[legacy_at]
 		if legacy_at==PATH:
-			previous=[Contract.identity_path(Contract.DATASET),Contract.identity_path(Contract.SMALL_DATASET),V2_PATH,PATH]
+			previous=[V3_PATH,V3_SMALL_PATH,V2_PATH,PATH]
 		for candidate in previous:
 			if candidate==path or str(candidate).is_empty() or not FileAccess.file_exists(candidate):continue
 			var legacy:=JSON.new()

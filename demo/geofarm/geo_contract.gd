@@ -1,9 +1,8 @@
 extends RefCounted
 ## Wire identity is block_id for compatibility; parcel_id is the public canonical parcel number.
-const SCHEMA := 3
-const FARM_SCHEMA := 2
-const DATASET := "sf-parcel-20261117-v3"
-const SMALL_DATASET := "sf-parcel-small-20261117-v3"
+const SCHEMA := 4
+const FARM_SCHEMA := 4
+const DATASET := "sf-dynamic-farm-20261118-r4"
 const UNIT := "parcel"
 
 static func valid_id(value:Variant) -> bool:
@@ -14,7 +13,7 @@ static func valid_id(value:Variant) -> bool:
 	return true
 
 static func valid_dataset(value:Variant) -> bool:
-	return value in [DATASET,SMALL_DATASET]
+	return value==DATASET
 
 static func identity_path(version:String) -> String:
 	return "user://geo_farm_identity_"+version+".json" if valid_dataset(version) else ""

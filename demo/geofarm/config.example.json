@@ -1,6 +1,6 @@
 {
   "base_url": "",
-  "dataset_version": "sf-parcel-20261117-v3",
+  "dataset_version": "sf-dynamic-farm-20261118-r4",
   "manifest_sha256": "",
   "building_source": "mapbox",
   "manifest_path": "client-manifest.json"

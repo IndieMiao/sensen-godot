@@ -104,6 +104,11 @@ func _run() -> void:
 	select_reply([Fixture.metadata()])
 	verify(page._selected=="p-A" and page.by_id["p-A"].parcel_id=="A","query metadata selects prefixed ID and retains canonical identity")
 	verify(not page.by_id["p-A"].has("geometry"),"selection metadata cache contains no geometry")
+	verify(page.by_id["p-A"].cell_count==800 and page.by_id["p-A"].total_cell_count==1344,"map metadata separates core and total counts")
+	var bad_counts:=Fixture.metadata();bad_counts.cell_count=1344
+	verify(page._metadata(bad_counts).is_empty(),"legacy cell_count cannot silently become total cells")
+	bad_counts=Fixture.metadata();bad_counts.total_cell_count=800
+	verify(page._metadata(bad_counts).is_empty(),"inconsistent zone totals are rejected")
 	verify(page._message.text!="Finding parcel…","successful query clears the pending hint")
 	var mvt:=Fixture.metadata();mvt.center_lon=mvt.center[0];mvt.center_lat=mvt.center[1]
 	for key in ["center","bbox","source_area_m2","inset_area_m2"]:mvt.erase(key)
@@ -146,7 +151,7 @@ func _run() -> void:
 	verify(page.is_back_navigation_locked(),"Back remains blocked during authoritative claim")
 	hold_claim=false;release_claim.emit();await process_frame
 	verify(page.identity.data.own_block_id=="p-A" and page.identity.data.pending.is_empty(),"server success persists v2 parcel ownership")
-	verify(is_instance_valid(page._farm) and page._farm._grid._cells.size()==4 and not native.visible,"claim loads shared Building8 farm and pauses native map")
+	verify(is_instance_valid(page._farm) and page._farm._grid._cells.size()==1344 and not native.visible,"claim loads both dynamic zones and pauses native map")
 	verify(page.is_back_navigation_locked() and not is_instance_valid(page._farm) and native.visible,"Back resumes native map from farm")
 	reset_identity();reply={"ok":false,"code":"block_taken"};await page._claim("p-A","Tester A")
 	verify(page.identity.data.own_block_id=="" and page.identity.data.pending.is_empty(),"competing claim does not grant ownership")

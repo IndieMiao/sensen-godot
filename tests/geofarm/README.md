@@ -1,59 +1,51 @@
-# GeoFarm r3 integration
+# Dynamic Farm r4 integration
 
-R3 keeps the farm and claim unit as the whole parcel. A tap first selects a visible
-building and uses the **same pixel/query snapshot** to find our parcel; a successful
-empty building hit falls back to parcel selection. A building without a selectable
-parcel never creates a claim. Mapbox building geometry stays transient inside the
-native highlight controller; Godot stores only an opaque UI key, never building
-geometry in identity/claim/farm data. `building_source` can be `mapbox` or `datasf`.
+The demo selects a parcel through its building or open ground. Mapbox parcel fill
+and line opacity are zero; the source and hit layer remain enabled. Only the
+selected building has a yellow highlight. Claim names/dots remain visible and
+claim ownership semantics do not change. Transparent fill picking requires real
+Android Mapbox verification; isolated callbacks do not establish that result.
 
-Full city: `sf-parcel-20261117-v3`, native vector source / source-layer `parcels`,
-promoteId `block_id`, source zoom 15–18, parcel display from 16, addresses from 18.
-Above 18 Mapbox overzooms instead of requesting nonexistent tiles. Small fallback:
-`sf-parcel-small-20261117-v3`, separate GeoJSON source and claim data.
-Manifest schema is 3; individual farms remain schema 2. Phones read a compact
-`client-manifest.json`, claims and single farms, never the full catalog/hash table.
-The complete deployment manifest remains for server verification.
+Dataset: `sf-dynamic-farm-20261118-r4`. Client manifest, catalog and farms use
+schema4. Native feature metadata carries `core_cell_count`,
+`extension_cell_count`, `total_cell_count`; the legacy `cell_count` equals core.
+The shared `modules/dynamic_farm/farm_data.gd` decoder validates RLE, permissions,
+counts, budgets and walking reserves. The 2D view shows both zones. Extension is
+local walking space, never a change to the geographic parcel or claim boundary.
 
-`config.json` pins full-city URL/client SHA and `config.small.example.json` pins
-the fallback. Change URL, dataset AND matching client SHA together. Each version
-has its own `geo_farm_identity_<dataset>.json` under user://. Only the installation
-credential is reused from earlier files; own/pending claims never migrate between
-r1/r2/full-v3/small-v3. Literal official ID `p-4591A011*` stays intact in IDs and
-farm paths; separators, traversal, query/fragment characters are refused.
+`config.json` deliberately has no endpoint/client pin until reviewed city data
+is deployed. Do not package this intermediate state. Freeze URL, dataset and
+client manifest SHA together in source; the packager must not silently replace
+them. The compact manifest does not contain files or per-farm cell totals.
+No r3 small fallback remains active in r4. Historical versions/services stay intact.
 
-Main scene is still `res://demo/geofarm/geofarm_main.tscn`. Export the same standalone
-package `com.sensen.geofarmdemo`, versionCode 2026111703, with the existing custom
-user directory `gensen-geofarm-demo-1117`, no game autoloads or location/mic permission.
-Copy five Kotlin runtime files from the SAME integration commit:
-GodotMapPlugin.kt, ParcelMapController.kt, ParcelLayerState.kt, ParcelPayload.kt,
-ParcelBuildingSelection.kt. Do not export *Test.kt or tests/. Include config and
-the dynamically loaded farm_view.tscn/farm_*; preserve the build-controlled token.
+Package/signature/userdir stay `com.sensen.geofarmdemo` and
+`gensen-geofarm-demo-1117`; display name is Dynamic Farm DEMO. Reserved version is
+2026111801 / 0.0.4-demo, subject to coordinated build-date changes. Identity file
+is `user://geo_farm_identity_sf-dynamic-farm-20261118-r4.json`. Only the installation
+credential may be read from earlier versions; ownership/pending claims never migrate.
 
-The two UI fixes are included: the shortcut initializes to its prompt and a
-successful query clears Finding parcel…. The shortcut menu moves to 328/424 at
-zoom19.5 and preselects its parcel; native building picking must still be tested
-by tapping the real building after navigation. Demo area resets to the screenshot
-center [-122.45190271843384,37.729419227] /17.5. MapView is SurfaceView, not TextureView.
+Main scene: `res://demo/geofarm/geofarm_main.tscn`. Export all five runtime Kotlin
+sources from the same integration head: GodotMapPlugin, ParcelMapController,
+ParcelLayerState, ParcelPayload and ParcelBuildingSelection. Exclude *Test.kt.
+Include dynamic farm_data plus dynamically loaded farm_view/farm_* and config;
+use the build-controlled Mapbox token and no game autoloads/location permission.
 
-## Verification boundaries
+## Verification
 
-Get a NEW resource grant before any Godot run; an expired or released grant cannot
-be reused. `prepare_isolated.py` creates a separate no-autoload QA project without
-real endpoint config/token. Use private adb -P 5113 only and record/clean owned PIDs.
+A new explicit resource window is required before Godot, device or build work.
+`prepare_isolated.py` makes a no-autoload project without real endpoint/token.
+Use an absolute window deadline, private adb5113 and recorded-PID cleanup.
 
-- test_parcel_contract.gd: 20 contract/identity checks, including full/fallback isolation.
-- test_r3_map_config.gd: 12 source/provider/version checks. An initial old fixture still
-  contained a DataSF URL; correcting that fixture made the missing-source case pass.
-- test_parcel_flow.gd: 50 actual-main-scene checks with injected native/HTTP callbacks,
-  including building priority, ground fallback, stale results and the two UI fixes.
-- test_r3_catalog_ids.gd takes the actual catalog path; 154444/154444 IDs accepted,
-  including the literal-star ID, while separators/traversal were rejected.
-- test_parcel_public_http.gd takes base URL, dataset and client SHA; it is read-only.
-  Small-v3 HTTP passed 8 checks, but that run exceeded the prior resource window;
-  its timing correction is retained separately. No full-city Godot HTTP pass is claimed.
+- Contract/identity: 22/22.
+- Source/provider configuration: 12/12.
+- Metadata counts: 10/10.
+- Actual main scene with injected HTTP/native callbacks: 53/53.
+- Shared decoder/view with seven author samples: 67 checks, zero failures.
+  This run omitted the author's two extra synthetic JSON inputs; do not label it 69.
+- Public HTTP runner updated for schema4; not run against a real r4 endpoint yet.
 
-Native author separately ran 28 JVM checks, then one targeted star compatibility
-check; do not add these to client counts or call them APK acceptance. Native
-Streets/whole-city MVT picking, highlight alignment, cross-tile behavior, hardware
-keyboard, map performance and final upgrade/two-identity flows require APK smoke.
+The seven author samples are not deployment data. Native transparent-layer hits,
+yellow-only highlight, claimant names, A-to-B/B-to-A visits and dataset upgrades
+still need actual APK smoke. Separate host lifecycle fixtures passed 12 checks;
+that does not validate the 3D scene, navigation, appearance or device performance.
