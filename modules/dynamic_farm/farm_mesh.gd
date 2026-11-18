@@ -6,7 +6,7 @@ const Bank = preload("res://modules/dynamic_farm/farm_bank.gd")
 const GROUND_SHADER = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 const MEADOW = preload("res://assets/farm/art/meadow.png")
 
-static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften := true) -> Node3D:
+static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften := true, widen := false) -> Node3D:
 	var root := Node3D.new()
 	root.name = "DynamicGround"
 	var tops := {}
@@ -19,6 +19,7 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 	var exterior := Bank.exterior(data) if soften else {}
 	var seed_phase := Bank.phase(data)
 	var soil_colour := Color(recipe.surface.core_warm_surface_srgb).lerp(Color(recipe.surface.grass_far_srgb),0.35).darkened(0.12)
+	var bank_spans: Array=[]
 	for cell: Dictionary in data.cells:
 		var at := Vector2i(cell.x, cell.y)
 		var chunk := Vector2i(at.x / CHUNK, at.y / CHUNK)
@@ -47,7 +48,8 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 					if not rolled: _quad(top,a,b,outside_b,outside_a,Vector3.UP,data.palette[cell.kind])
 				var normal := (outside_b-outside_a).cross(Vector3.UP).normalized()
 				if rolled:
-					Bank.append(top,rim,a,b,outside_a,outside_b,normal,seed_phase,soil_colour)
+					bank_spans.append({"top":top,"soil":rim,"a":a,"b":b,"oa":outside_a,"ob":outside_b,
+						"normal":normal,"phase":seed_phase,"colour":soil_colour,"segments":Bank.SEGMENTS})
 				else:
 					_quad(rim,outside_a,outside_b,outside_b-Vector3.UP*0.7,outside_a-Vector3.UP*0.7,normal,Color("958665"))
 				if soften and Edges.convex(data,at,edge):
@@ -57,7 +59,8 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 					for step in range(1,5):
 						var next: Vector3 = a+(Edges.normal(edge) if step==4 else previous.rotated(Vector3.UP,float(step)*PI/8.0))*pad
 						if rolled:
-							Bank.append(top,rim,a,a,last,next,(next-last).cross(Vector3.UP).normalized(),seed_phase,soil_colour,1)
+							bank_spans.append({"top":top,"soil":rim,"a":a,"b":a,"oa":last,"ob":next,
+								"normal":(next-last).cross(Vector3.UP).normalized(),"phase":seed_phase,"colour":soil_colour,"segments":1})
 						else:
 							_triangle(top,a,last,next,Vector3.UP,data.palette[cell.kind])
 							_quad(rim,last,next,next-Vector3.UP*0.7,last-Vector3.UP*0.7,(next-last).cross(Vector3.UP).normalized(),Color("958665"))
@@ -75,6 +78,10 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 					a.y = 0.008
 					b.y = 0.008
 					_quad(grid,a-perpendicular,b-perpendicular,b+perpendicular,a+perpendicular,Vector3.UP,Color("bda677"))
+	var bank_metrics:=Bank.emit(bank_spans,data,walk.center_grid,widen)
+	var padding:float=Bank.LOWER_CELLS if bank_metrics.expanded_pieces>0 else Edges.PAD_CELLS
+	root.set_meta("bank_metrics",bank_metrics)
+	root.set_meta("shade_padding_cells",padding)
 	for key: String in tops:
 		var part: Dictionary = tops[key]
 		var mesh := _add(root,part.tool,"Surface_" + key.replace(":","_"),false)
@@ -91,7 +98,7 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 		var low: Vector2 = Vector2(chunk * CHUNK) - walk.center_grid
 		var high: Vector2 = Vector2((chunk + Vector2i.ONE) * CHUNK).min(Vector2(data.grid_size)) - walk.center_grid
 		var rect := Rect2(Vector2(low.x,-high.y)*data.cell_m, (high-low)*data.cell_m)
-		chunks.append({"key":chunk,"rect":rect.grow(data.cell_m*Edges.PAD_CELLS) if soften else rect,"meshes":shaded[chunk]})
+		chunks.append({"key":chunk,"rect":rect.grow(data.cell_m*padding) if soften else rect,"meshes":shaded[chunk]})
 	root.set_meta("shade_chunks",chunks)
 	root.set_meta("cell_count",data.cells.size())
 	root.set_meta("core_count",data.counts.core)

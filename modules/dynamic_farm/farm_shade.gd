@@ -2,6 +2,7 @@ extends Node
 const GroundShade = preload("res://modules/render/ground_shade.gd")
 const CHUNK := 32
 const Edges = preload("res://modules/dynamic_farm/farm_edges.gd")
+const Bank = preload("res://modules/dynamic_farm/farm_bank.gd")
 const MAX_MASKS := 64
 const SUN_DEGREES := Vector3(-51,-38,0)
 var entries: Array = []
@@ -9,15 +10,20 @@ var complete := false
 var _started_us := 0
 var metrics := {"mask_count":0,"mask_r8_bytes":0,"mode":"hardware","chunks":[],"mask_ready_ms":0.0}
 
-static func _chunks(data: Dictionary, walk: RefCounted) -> Dictionary:
+static func _chunks(data: Dictionary, walk: RefCounted, padding := Edges.PAD_CELLS) -> Dictionary:
 	var out := {}
 	for cell: Dictionary in data.cells:
 		var chunk := Vector2i(int(cell.x)/CHUNK,int(cell.y)/CHUNK)
 		if out.has(chunk): continue
 		var low: Vector2 = Vector2(chunk*CHUNK)-walk.center_grid
 		var high: Vector2 = Vector2((chunk+Vector2i.ONE)*CHUNK).min(Vector2(data.grid_size))-walk.center_grid
-		out[chunk] = Rect2(Vector2(low.x,-high.y)*data.cell_m,(high-low)*data.cell_m).grow(data.cell_m*Edges.PAD_CELLS)
+		out[chunk] = Rect2(Vector2(low.x,-high.y)*data.cell_m,(high-low)*data.cell_m).grow(data.cell_m*padding)
 	return out
+
+static func can_widen(plan: Dictionary, data: Dictionary, walk: RefCounted) -> bool:
+	# Keep the already-approved layout: if wider shadow coverage would exceed the
+	# existing allocation cap, retain the small visual envelope instead of removing props.
+	return affected(plan.layout,_chunks(data,walk,Bank.LOWER_CELLS)).size() <= MAX_MASKS
 
 static func affected(layout: Array, chunks: Dictionary) -> Dictionary:
 	var selected := {}
@@ -67,7 +73,7 @@ func setup(ground_root: Node3D, props: Node3D, plan: Dictionary, data: Dictionar
 		complete = true
 		return
 	metrics.mode = "ground_shade"
-	var selected := affected(plan.layout,_chunks(data,walk))
+	var selected := affected(plan.layout,_chunks(data,walk,float(ground_root.get_meta("shade_padding_cells",Edges.PAD_CELLS))))
 	for chunk: Dictionary in ground_root.get_meta("shade_chunks",[]):
 		if not selected.has(chunk.key): continue
 		var shade := GroundShade.new()

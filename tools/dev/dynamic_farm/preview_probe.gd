@@ -16,7 +16,8 @@ func _run() -> void:
 	var raw = JSON.parse_string(FileAccess.get_file_as_string(args[0]))
 	var packed := load(SCENE_PATH) as PackedScene
 	scene = packed.instantiate()
-	scene.setup({"farm":raw,"dataset":raw.dataset_version,"block_id":raw.block_id,"preview_only":true})
+	scene.setup({"farm":raw,"dataset":raw.dataset_version,"block_id":raw.block_id,"preview_only":true,
+		"edge_decor_preview":args.has("--edge-decor")})
 	scene.preview_error.connect(func(message):
 		push_error(message)
 		finished=true
@@ -79,6 +80,23 @@ func _capture(folder: String, summary: Dictionary) -> void:
 	audit.store_string(JSON.stringify({"dataset":scene._data.dataset_version,"block_id":id,
 		"seed_hex":scene._data.seed_hex,"art_version":scene._plan.art_version,
 		"layout_sha256":scene._plan.layout_sha256,"protected":protected,"blocked":blocked,"instances":records},"\t"))
+	if not scene._edge_plan.is_empty():
+		var extra:Array=[]
+		for item:Dictionary in scene._edge_plan.layout:
+			var tr:Transform3D=item.transform
+			var box:AABB=item.box
+			var cells:Array=[]
+			for cell:Vector2i in item.cells:cells.append([cell.x,cell.y])
+			extra.append({"asset":item.asset,"position":[tr.origin.x,tr.origin.y,tr.origin.z],
+				"basis":[[tr.basis.x.x,tr.basis.x.y,tr.basis.x.z],[tr.basis.y.x,tr.basis.y.y,tr.basis.y.z],[tr.basis.z.x,tr.basis.z.y,tr.basis.z.z]],
+				"bounds":[[box.position.x,box.position.y,box.position.z],[box.end.x,box.end.y,box.end.z]],
+				"cells":cells,"shadow":item.shadow,"solid":item.solid,"triangles":item.triangles})
+		var clusters:Array=[]
+		for cluster:Dictionary in scene._edge_plan.clusters:
+			clusters.append({"ring":cluster.ring,"interval":[cluster.interval.x,cluster.interval.y],"instances":cluster.instances})
+		var extra_file:=FileAccess.open(folder.path_join(id+"-edge-decor.json"),FileAccess.WRITE)
+		extra_file.store_string(JSON.stringify({"layer":"edge_decor_v2","instances":extra,"clusters":clusters,
+			"hash":scene._edge_plan.layout_sha256,"metrics":summary.edge_decor},"\t"))
 	print("PROBE_COMPLETE ",id)
 	finished=true
 	scene.queue_free()

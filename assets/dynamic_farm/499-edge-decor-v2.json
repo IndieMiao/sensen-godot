@@ -1,0 +1,80 @@
+{
+  "format": "dynamic_farm_edge_decor_v2",
+  "status": "approved_collaboration_input_not_visual_acceptance",
+  "supersedes": "all B in 620ec024 / 499-V1-next-step-q58.md",
+  "A_unchanged": true,
+  "layer": "edge_decor_v2",
+  "allowed_assets": [
+    {
+      "id": "wild_pz_grass_24",
+      "scale": [
+        0.85,
+        1.0
+      ],
+      "triangles": 128
+    },
+    {
+      "id": "wild_pz_foot_leafy",
+      "scale": [
+        0.85,
+        1.0
+      ],
+      "triangles": 64
+    }
+  ],
+  "placement": {
+    "ground_y_m": 0,
+    "region": "zones.extension minus walk_reserve.no_solid_decor_runs",
+    "entire_transformed_footprint_required": true,
+    "outside_slope_allowed": false,
+    "retain_source_pivot": true,
+    "hole_point_touch_narrow_opposing_edges_allowed": false,
+    "min_bare_arclength_between_clusters_cells": 6,
+    "max_outer_perimeter_coverage_fraction": 0.2,
+    "seed_inputs": [
+      "seed_hex",
+      "art_version",
+      "edge_decor_v2"
+    ],
+    "camera_dependent_or_hardcoded_points": false
+  },
+  "cluster_max": {
+    "grass24": 1,
+    "foot_leafy": 2
+  },
+  "sample_caps": {
+    "p-5402049": {
+      "clusters": 2,
+      "instances": 6,
+      "triangles": 512
+    },
+    "p-4591A011*": {
+      "clusters": 4,
+      "instances": 12,
+      "triangles": 1024
+    }
+  },
+  "render": {
+    "collision": false,
+    "cast_shadow": false,
+    "interaction": false,
+    "edit": false,
+    "max_new_batches_per_sample": 4,
+    "max_surfaces_per_batch": 1,
+    "new_texture_shader_material": false
+  },
+  "preservation": [
+    "core",
+    "extension",
+    "protected",
+    "blocked",
+    "original_layout"
+  ],
+  "diagnostics": [
+    "new_layer_hash",
+    "transforms_bounds",
+    "accepted_rejected_count",
+    "bare_edge_and_coverage",
+    "A_only_vs_A_B_frame_ms_ready_memory"
+  ]
+}
