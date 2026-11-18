@@ -36,8 +36,12 @@ needed Avatar/AppRouter symbols, and use an isolated package/userdir. The scene'
 setting check is only an additional guard, not a replacement for build isolation.
 No stage-two APK or 3D-scene acceptance is claimed here.
 
-`modules/dynamic_farm/map/config.json` intentionally has blank URL/pin until the
-reviewed r4 deployment is ready. The packager must take exact source config, not
+`modules/dynamic_farm/map/config.json` pins the reviewed r4 read-only dataset:
+`https://lonely-window-barely-sheriff.trycloudflare.com`,
+`sf-dynamic-farm-20261118-r4`, client SHA
+`645df3530b5617bb7e5a8cfb0d070e0e82b74337db47f83a542df1e90c3ae1cf`.
+The service is ready; the complete 3D candidate still requires its own reviewed
+scene integration and actual package verification. The packager must take exact source config, not
 silently replace URL/hash. Include five native runtime Kotlin files (no *Test),
 map/farm code from the same precise integration tree and the build-managed token.
 Android first; unsupported platforms show a clear message, without a fake map.
