@@ -120,10 +120,11 @@ internal class ParcelMapController(
             parcelSource["promoteId"] = Value("block_id")
         }
         val sourceLayer = if (cfg.sourceType == "vector") ",\"source-layer\":\"${cfg.sourceLayer}\"" else ""
-        val color = """["case",["boolean",["feature-state","selected"],false],"#ED9F18",["boolean",["feature-state","own"],false],"#B66324",["boolean",["feature-state","claimed"],false],"#496CAD","#3B7757"]"""
+        // R4: parcel geometry remains queryable, but only a selected building is visibly outlined.
+        // Do not set visibility:none or remove FILL: queryAt still uses its feature index.
         var ok = !style.addStyleSource(parcel, Value(parcelSource)).isError && geoSource(points, value(claims)) && geoSource(highlight, value(ParcelPayload.EMPTY_COLLECTION)) &&
-            layer("""{"id":"$FILL","type":"fill","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"fill-color":$color,"fill-opacity":0.16}}""") &&
-            layer("""{"id":"$LINE","type":"line","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"line-color":$color,"line-width":["case",["boolean",["feature-state","selected"],false],2.5,1.2]}}""")
+            layer("""{"id":"$FILL","type":"fill","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"fill-color":"#3B7757","fill-opacity":0.0}}""") &&
+            layer("""{"id":"$LINE","type":"line","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"line-color":"#3B7757","line-width":1.2,"line-opacity":0.0}}""")
         if (ok && cfg.buildingSource == "datasf") {
             val buildings = sources.getValue("buildings")
             ok = geoSource(buildings, Value(cfg.buildingsUrl)) &&
