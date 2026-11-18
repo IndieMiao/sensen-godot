@@ -37,7 +37,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_20",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_tree_20_g",
@@ -72,7 +79,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_20",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_pine_01",
@@ -107,7 +121,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_01",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_pine_03",
@@ -142,7 +163,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_03",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_bush_05",
@@ -177,7 +205,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Bush_05",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_bush_07",
@@ -212,7 +247,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Bush_07",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_rock_08",
@@ -247,7 +289,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_08",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_rock_13",
@@ -282,7 +331,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_13",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_softrock_10",
@@ -317,7 +373,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / SoftRock_10",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "conservative full visual XZ AABB; exact bounds above; not trunk-only radius"
     },
     {
       "id": "wild_pz_flower_20",
@@ -352,7 +415,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Flower_20",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "none"
     },
     {
       "id": "wild_pz_flower_23",
@@ -387,7 +457,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Flower_23",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "none"
     },
     {
       "id": "wild_pz_grass_24",
@@ -422,7 +499,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Grass_24",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "none"
     },
     {
       "id": "wild_pz_foot_leafy",
@@ -457,7 +541,14 @@
       "material_provider": "res://modules/farm/farm_art.gd::material",
       "external_image_dependencies": [],
       "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Grass_41",
-      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库",
+      "pivot": {
+        "node_transform": "identity",
+        "origin": "source origin retained, Y=0 ground plane",
+        "ground_y_m": 0,
+        "do_not_recenter_xz": true
+      },
+      "collision_recommendation": "none"
     }
   ]
 }

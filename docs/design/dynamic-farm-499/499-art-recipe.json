@@ -1,19 +1,36 @@
 {
-  "format": "dynamic_farm_art_recipe_v1",
+  "format": "dynamic_farm_art_recipe_v2",
   "status": "integration_input_not_render_accepted",
   "inventory": "499-art-inventory.json",
   "scope": "stage2_visual_only",
   "geometry_authority": "schema-r4; never derive gameplay permissions from art",
-  "schema_mapping_status": "owner_confirmation_required",
-  "seed_inputs": ["dataset_version", "parcel_id", "generation_version", "art_version"],
-  "art_version": "499-v1",
-  "seed_contract": "Use a documented stable hash and PRNG, a stable candidate order and per-role streams; do not use wall time or process-dependent hash.",
-  "required_semantic_inputs": [
-    "local_metric_transform", "cell_size_m", "core_mask", "extension_mask",
-    "walkable_mask", "spawn", "reserved_corridors", "decoration_allowed_mask",
-    "local_water_mask_if_any", "local_height_if_any"
+  "schema_mapping_status": "mapped_to_SCHEMA-r4_with_walk_reserve",
+  "seed_inputs": [
+    "seed_hex",
+    "art_version",
+    "role"
   ],
-  "camera": {"pitch_deg": 43.0, "yaw_deg": 14.5, "transform_grid_and_geometry_together": true},
+  "art_version": "499-v2-schema4",
+  "seed_contract": "SHA256(seed_hex + \"|\" + art_version + \"|\" + role), feed a documented fixed PRNG; stable y,x candidate order; do not turn 64 hex digits into JSON uint64.",
+  "required_semantic_inputs": [
+    "schema",
+    "dataset_version",
+    "block_id",
+    "generator_version",
+    "seed_hex",
+    "game_cell_m",
+    "grid",
+    "zones",
+    "walk_reserve",
+    "boundaries",
+    "capabilities",
+    "counts"
+  ],
+  "camera": {
+    "pitch_deg": 43.0,
+    "yaw_deg": 14.5,
+    "transform_grid_and_geometry_together": true
+  },
   "surface": {
     "grass_srgb": "86a74b",
     "grass_far_srgb": "749543",
@@ -30,32 +47,105 @@
   "placement": {
     "blocking_props_in_core": false,
     "blocking_props_require_explicit_decoration_permission": true,
-    "missing_decoration_permission": "omit_blocking_props_and_report_missing_semantics",
+    "missing_decoration_permission": "reject missing or invalid schema4 walk_reserve; never guess a narrower band",
     "preserve_spawn_and_corridors": true,
-    "core_visual_clearance_cells": 1.0,
+    "core_visual_clearance_cells": 2.0,
     "spawn_visual_clearance_cells": 2.0,
     "clearance_measure": "transformed full vertex bounds/radial extent plus clearance; never use average AABB radius as containment proof",
-    "collision_measure": "separate conservative collision shape; no art-inferred walkable subtraction",
-    "validity": "entire footprint in allowed region; no crossing holes/water/reserved routes; recheck all promised reachable cells after blocking placement",
-    "geographic_road_neighbor_clip": "only when final schema explicitly maps it into the local scene; no extra geographic clipping for a local-only extension",
+    "collision_measure": "v2 conservative full-mesh XZ AABB for trees/shrubs/rocks, rotated/scaled with the prop; rasterize touched cells and include avatar clearance; this is not a measured trunk-only collider",
+    "validity": "Full transformed visual footprint and solid occupancy stay in extension minus protected; post-placement flood fill with actual avatar clearance retains spawn, entry, all core and all protected cells reachable; reject offending prop, never repair by editing zone masks",
+    "geographic_road_neighbor_clip": false,
     "narrow_space_fallback": "drop_the_prop_keep_the_ground_and_connectivity",
     "foreground": "prefer low cover; tall props require screen-space player/core/HUD occlusion review",
-    "uniform_scale_range": [0.85, 1.0],
+    "uniform_scale_range": [
+      0.85,
+      1.0
+    ],
     "rotation": "seeded yaw variation; cluster axes oblique, never rotate authoritative core independently",
     "max_candidate_attempts_per_role": 512,
-    "maximum_counts_are_not_placement_targets": true
+    "maximum_counts_are_not_placement_targets": true,
+    "protected_mask_is_authoritative": true,
+    "all_decor_in_core_or_protected_mask": false
   },
   "roles": {
-    "tree": {"ids": ["wild_pz_tree_20", "wild_pz_tree_20_g", "wild_pz_pine_01", "wild_pz_pine_03"], "cap_per_farm": 24, "placement": "outer permitted edge, broadleaf primary, sparse pine accents; groups of 2-3 only if bounds fit"},
-    "shrub": {"ids": ["wild_pz_bush_05", "wild_pz_bush_07"], "cap_per_farm": 32, "placement": "between tree clusters, not a continuous blocking hedge"},
-    "rock": {"ids": ["wild_pz_rock_08", "wild_pz_rock_13", "wild_pz_softrock_10"], "cap_per_farm": 18, "placement": "one main rock with at most two lower companions in permitted pockets"},
-    "flower": {"ids": ["wild_pz_flower_20", "wild_pz_flower_23"], "cap_per_farm": 48, "placement": "small clusters beside tree/rock groups; leave core and reserved corridors clear"},
-    "groundcover": {"ids": ["wild_pz_grass_24", "wild_pz_foot_leafy"], "cap_per_farm": 64, "placement": "sparse cluster foot cover; no full-field random noise"}
+    "tree": {
+      "ids": [
+        "wild_pz_tree_20",
+        "wild_pz_tree_20_g",
+        "wild_pz_pine_01",
+        "wild_pz_pine_03"
+      ],
+      "cap_per_farm": 24,
+      "placement": "outer permitted edge, broadleaf primary, sparse pine accents; groups of 2-3 only if bounds fit",
+      "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
+      "cells_per_candidate": 48,
+      "solid_collision": true,
+      "cast_shadow_flag": true,
+      "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
+    },
+    "shrub": {
+      "ids": [
+        "wild_pz_bush_05",
+        "wild_pz_bush_07"
+      ],
+      "cap_per_farm": 32,
+      "placement": "between tree clusters, not a continuous blocking hedge",
+      "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
+      "cells_per_candidate": 32,
+      "solid_collision": true,
+      "cast_shadow_flag": true,
+      "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
+    },
+    "rock": {
+      "ids": [
+        "wild_pz_rock_08",
+        "wild_pz_rock_13",
+        "wild_pz_softrock_10"
+      ],
+      "cap_per_farm": 18,
+      "placement": "one main rock with at most two lower companions in permitted pockets",
+      "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
+      "cells_per_candidate": 64,
+      "solid_collision": true,
+      "cast_shadow_flag": true,
+      "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
+    },
+    "flower": {
+      "ids": [
+        "wild_pz_flower_20",
+        "wild_pz_flower_23"
+      ],
+      "cap_per_farm": 48,
+      "placement": "small clusters beside tree/rock groups; leave core and reserved corridors clear",
+      "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
+      "cells_per_candidate": 16,
+      "solid_collision": false,
+      "cast_shadow_flag": false,
+      "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
+    },
+    "groundcover": {
+      "ids": [
+        "wild_pz_grass_24",
+        "wild_pz_foot_leafy"
+      ],
+      "cap_per_farm": 64,
+      "placement": "sparse cluster foot cover; no full-field random noise",
+      "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
+      "cells_per_candidate": 12,
+      "solid_collision": false,
+      "cast_shadow_flag": false,
+      "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
+    }
   },
   "budget": {
     "caps_status": "conservative first-scene art caps, not measured mobile performance limits",
     "cap_applies_to_entire_generated_farm_not_each_chunk": true,
-    "batch_by": ["asset_id", "material", "shadow_policy", "spatial_chunk"],
+    "batch_by": [
+      "asset_id",
+      "material",
+      "shadow_policy",
+      "spatial_chunk"
+    ],
     "count_unique_and_placed_triangles_separately": true,
     "count_ground_water_shadow_avatar_and_ui_separately": true,
     "large_parcel_policy": "keep caps, preserve core geometry and scale; increase open grass, never shrink player/grid to fit"
@@ -66,15 +156,76 @@
     "existing_pond_masks_reusable_on_new_shapes": false,
     "new_geometry_requires_matching_shore_distance_foam_and_shadow_inputs": true,
     "cliff_must_not_consume_promised_walkable_surface": true,
-    "no_water_or_height_semantics": "complete dry-ground view, report omitted optional water/cliff",
-    "missing_art_requires_report_to_yixing": true
+    "no_water_or_height_semantics": "dry-ground first sample; optional outer scenery needs its own explicit geometry; no internal water/canyon",
+    "missing_art_requires_report_to_yixing": true,
+    "placement_region": "outside core union extension, beyond boundaries.outer; optional non-navigable scenery only",
+    "derive_internal_water_from_geo_hints": false,
+    "first_batch_internal_water_or_cliff": false,
+    "must_not_clip_or_flood_walkable_surface": true
   },
   "review": {
-    "required_samples": ["ordinary", "narrow", "concave_neck", "holes_or_multiparts", "road_neighbor_context", "water_context", "maximum_extent"],
-    "required_evidence": ["schema_seed_commit", "core_extension_walk_decor_masks", "full_scene_with_avatar", "boundary_closeups", "normal_speed_walk", "instance_and_triangle_counts", "platform_frametimes", "same_seed_reentry_and_A_B_layout"],
+    "required_samples": [
+      "ordinary",
+      "narrow",
+      "concave_neck",
+      "holes_or_multiparts",
+      "road_neighbor_context",
+      "water_context",
+      "maximum_extent"
+    ],
+    "required_evidence": [
+      "schema_seed_commit",
+      "core_extension_walk_decor_masks",
+      "full_scene_with_avatar",
+      "boundary_closeups",
+      "normal_speed_walk",
+      "instance_and_triangle_counts",
+      "platform_frametimes",
+      "same_seed_reentry_and_A_B_layout"
+    ],
     "technical_review": "shangguan",
     "screen_visual_review": "huowu",
     "data_generation_review": "zhouyu",
     "new_or_changed_shader_requires_physical_device_check": true
+  },
+  "schema_source": {
+    "path": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/SCHEMA-r4.md",
+    "sha256": "3e7deaa7c7ff5e5a45ceb32cd714263c2a655104223a6745036519e0adad15dd",
+    "scene_contract_sha256": "dbb91d372216efd14cdd01cebc355a2baa6f1002e3b4749cdced33f66da07dd9"
+  },
+  "schema_mapping": {
+    "schema": 4,
+    "dataset": "dataset_version",
+    "parcel": "block_id",
+    "generation": "generator_version",
+    "seed": "seed_hex",
+    "cell_m": "game_cell_m",
+    "origin": "grid.origin_cell",
+    "core": "zones.core.runs",
+    "extension": "zones.extension.runs",
+    "protected": "walk_reserve.no_solid_decor_runs",
+    "spawn": "walk_reserve.spawn_cell",
+    "entry": "walk_reserve.entry_cell",
+    "outer": "boundaries.outer",
+    "source_hints": "geo_hints",
+    "permissions": "capabilities",
+    "walkable": "decoded core union decoded extension",
+    "decoration_allowed": "decoded extension minus decoded protected; full footprint check required"
+  },
+  "coordinates": {
+    "cell_m": 0.8,
+    "cell_center": "X=(origin_cell[0]+x+0.5)*game_cell_m; Z=-(origin_cell[1]+y+0.5)*game_cell_m",
+    "boundary_vertex": "X=(origin_cell[0]+x)*game_cell_m; Z=-(origin_cell[1]+y)*game_cell_m",
+    "boundary_rings": "Use explicit outer and holes; do not fill bounding rectangle.",
+    "shared_scene_transform": "Apply identical translation/rotation to ground, mask lookup, occupancy, props and avatar."
+  },
+  "shadows": {
+    "material_provider": "FarmArt.material(): vertex_color_use_as_albedo=true, vertex_color_is_srgb=false",
+    "mobile": "Keep existing scene sun/shadow quality; trees/shrubs/rocks cast, small flowers/grass do not.",
+    "compatibility": "Retain existing GLES sun-shadow disable. GroundShade may consume tree caster flags; do NOT disable mesh cast_shadow on trees before GroundShade scans.",
+    "ground_shade_source": "res://modules/render/ground_shade.gd",
+    "ground_shade_scope": "Existing MIN_H=2m means only tall pieces enter its mask; preserve it, no extra full-field shrub shadow pass.",
+    "ground_shade_integration": "After final placement, use actual dynamic ground rect/chunks and a ground material supporting shade uniforms; old pond NEAR rect/masks are invalid. Bound mask allocation for maximum extent; record bytes and first-frame cost. If unsupported, report missing shadow integration rather than mark visual acceptance passed.",
+    "rebuild": "Once after assembled placements; rebuild only when art version/layout changes, never every frame."
   }
 }

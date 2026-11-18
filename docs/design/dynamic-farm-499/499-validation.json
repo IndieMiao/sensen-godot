@@ -1,6 +1,7 @@
 {
   "source_commit": "99a853f7c75e917394a3f1f229bce9a82a38235c",
-  "checks": {
+  "art_version": "499-v2-schema4",
+  "asset_checks": {
     "glb_vertex_bounds_and_manifest": 13,
     "glb_sha256_and_manifest": 13,
     "unique_import_uids": 13,
@@ -9,16 +10,211 @@
     "total_instance_cap": 186,
     "worst_case_prop_triangles_at_caps": 46904
   },
+  "asset_check_scope": "Original GLB byte audit at pinned source retained; v2 changes only metadata, rules and documentation, no GLB/import bytes.",
+  "schema_sha256": "3e7deaa7c7ff5e5a45ceb32cd714263c2a655104223a6745036519e0adad15dd",
+  "scene_contract_sha256": "dbb91d372216efd14cdd01cebc355a2baa6f1002e3b4749cdced33f66da07dd9",
+  "schema_sample_checks": [
+    {
+      "file": "p-0204020.json",
+      "sha256": "a962959c9329b2dd20bb6249eea8eef880316b207a069dd38824c002b0a77cba",
+      "block_id": "p-0204020",
+      "grid": [
+        58,
+        58
+      ],
+      "core": 798,
+      "extension": 1397,
+      "protected": 1293,
+      "eligible_candidate_cells": 902,
+      "target_counts_before_footprint_rejection": {
+        "tree": 18,
+        "shrub": 28,
+        "rock": 14,
+        "flower": 48,
+        "groundcover": 64
+      },
+      "base_mask_connected": true
+    },
+    {
+      "file": "p-0409003.json",
+      "sha256": "0769e1796cdb0e151952fd2a9c10240b1a6b5cd80d5866a7a32a3de84a698438",
+      "block_id": "p-0409003",
+      "grid": [
+        117,
+        46
+      ],
+      "core": 800,
+      "extension": 1807,
+      "protected": 1391,
+      "eligible_candidate_cells": 1216,
+      "target_counts_before_footprint_rejection": {
+        "tree": 24,
+        "shrub": 32,
+        "rock": 18,
+        "flower": 48,
+        "groundcover": 64
+      },
+      "base_mask_connected": true
+    },
+    {
+      "file": "p-1345001.json",
+      "sha256": "a47dd57d331cd84abacde8d3893958caa6a5bb1e29c538f90d04931dfae97bcb",
+      "block_id": "p-1345001",
+      "grid": [
+        93,
+        43
+      ],
+      "core": 802,
+      "extension": 1533,
+      "protected": 1273,
+      "eligible_candidate_cells": 1062,
+      "target_counts_before_footprint_rejection": {
+        "tree": 22,
+        "shrub": 32,
+        "rock": 16,
+        "flower": 48,
+        "groundcover": 64
+      },
+      "base_mask_connected": true
+    },
+    {
+      "file": "p-3139010.json",
+      "sha256": "02fdfbb724af26a1033ee7d2cb99872373ba33f108ec6abd336fe9547faba180",
+      "block_id": "p-3139010",
+      "grid": [
+        34,
+        80
+      ],
+      "core": 805,
+      "extension": 1190,
+      "protected": 1140,
+      "eligible_candidate_cells": 855,
+      "target_counts_before_footprint_rejection": {
+        "tree": 17,
+        "shrub": 26,
+        "rock": 13,
+        "flower": 48,
+        "groundcover": 64
+      },
+      "base_mask_connected": true
+    },
+    {
+      "file": "p-3139019.json",
+      "sha256": "9a5fc8eb10fcc5139a148eecfb6fce0eb64d0a8142b15facd62cbb9eb2323e94",
+      "block_id": "p-3139019",
+      "grid": [
+        71,
+        36
+      ],
+      "core": 804,
+      "extension": 1091,
+      "protected": 1111,
+      "eligible_candidate_cells": 784,
+      "target_counts_before_footprint_rejection": {
+        "tree": 16,
+        "shrub": 24,
+        "rock": 12,
+        "flower": 48,
+        "groundcover": 64
+      },
+      "base_mask_connected": true
+    },
+    {
+      "file": "p-4591A011*.json",
+      "sha256": "9826615f8a23c56338a366a6c9d2be74244c38f41264a8f7503af186972b447b",
+      "block_id": "p-4591A011*",
+      "grid": [
+        74,
+        66
+      ],
+      "core": 802,
+      "extension": 1514,
+      "protected": 1389,
+      "eligible_candidate_cells": 927,
+      "target_counts_before_footprint_rejection": {
+        "tree": 19,
+        "shrub": 28,
+        "rock": 14,
+        "flower": 48,
+        "groundcover": 64
+      },
+      "base_mask_connected": true
+    },
+    {
+      "file": "p-5402049.json",
+      "sha256": "c0c7f444f66985a24ae1c404945af308160a0580047f539c845d8f72d1d82a17",
+      "block_id": "p-5402049",
+      "grid": [
+        287,
+        23
+      ],
+      "core": 799,
+      "extension": 4010,
+      "protected": 1918,
+      "eligible_candidate_cells": 2891,
+      "target_counts_before_footprint_rejection": {
+        "tree": 24,
+        "shrub": 32,
+        "rock": 18,
+        "flower": 48,
+        "groundcover": 64
+      },
+      "base_mask_connected": true
+    },
+    {
+      "file": "synthetic-concave.json",
+      "sha256": "7b3377ccd2e0868f749de251728ea3736d2e6186b9f8e68b5fa79a58b514f811",
+      "block_id": "p-synthetic-concave",
+      "grid": [
+        57,
+        57
+      ],
+      "core": 819,
+      "extension": 1278,
+      "protected": 1159,
+      "eligible_candidate_cells": 938,
+      "target_counts_before_footprint_rejection": {
+        "tree": 19,
+        "shrub": 29,
+        "rock": 14,
+        "flower": 48,
+        "groundcover": 64
+      },
+      "base_mask_connected": true
+    },
+    {
+      "file": "synthetic-hole.json",
+      "sha256": "4dd90ec4de13dd1f4086b3094bc7e9dbab87d2e2c7133eb3866262d0da17b0ee",
+      "block_id": "p-synthetic-hole",
+      "grid": [
+        50,
+        50
+      ],
+      "core": 800,
+      "extension": 1011,
+      "protected": 1139,
+      "eligible_candidate_cells": 672,
+      "target_counts_before_footprint_rejection": {
+        "tree": 14,
+        "shrub": 21,
+        "rock": 10,
+        "flower": 42,
+        "groundcover": 56
+      },
+      "base_mask_connected": true
+    }
+  ],
   "limits": [
-    "Caps are initial art limits, not performance measurements.",
-    "Triangle estimate excludes ground, water, shadow passes, avatar, UI.",
-    "No Godot import/render, schema-r4 integration, navigation or physical device tests.",
-    "Approval is an inherited manifest record, not newly fetched original chat."
+    "9 local author samples only (7 real, 2 synthetic); not full-city validation.",
+    "Eligible cells and count targets do not prove a prop fits. No placements or avatar-radius obstacle flood fill were run.",
+    "No Godot, render, actual collision, shader or frame-time validation.",
+    "Shadow policy and density are initial implementation inputs, still require technical and visual review."
   ],
   "sha256": {
-    "499-art-recipe.json": "766911f1ee9a7f91dec627766d933854ba2ea45cf8914473a8e07dc30ada2829",
-    "README.md": "8d6055b31f7884fa47f47ba4909af79c06e48b3b6ae2fcc349206017b86a4ffc",
+    "499-liubang-handoff-v2.md": "6abddb4a5a48eb3a3a33908c2ef1675c4dc179122046dfc6627711495a871c66",
+    "499-art-recipe.json": "91ee6fb0018e8af512b6c3a404865092982e4ba3e9859f934f631f7d689f057d",
+    "README.md": "eeb4168314f5bfc4b224888ef2313bc126a00321bd545bfcbfa0ff253b7e2f17",
     "499-r4-art-contract.md": "a28e672489f8f1f8c4940b8ee1e41c6b6150e430cb5040b0278078fa9ae1ba3c",
-    "499-art-inventory.json": "aea08d6f2cb213eff3d2e54ef1b34787802566485fe2d4bb65db4bf6a2be658d"
+    "499-art-inventory.json": "b9ae217ebf87225acda138cae644364034cbb6093f2c396c82202224b618930b"
   }
 }
