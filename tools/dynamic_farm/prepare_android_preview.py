@@ -11,6 +11,9 @@ BASE='99a853f7c75e917394a3f1f229bce9a82a38235c'
 PACKAGE='com.sensen.dynamicfarmqa'
 USER_DIR='gensen-dynamic-farm-preview-499'
 OFFLINE_URL='https://offline.invalid/v1'
+ENTRY='res://scenes/dynamic_farm/dynamic_farm_map.tscn'
+DATA_CONFIG='modules/dynamic_farm/map/config.json'
+DATASET='sf-dynamic-farm-20261118-r4'
 NATIVE=['GodotMapPlugin.kt','ParcelMapController.kt','ParcelLayerState.kt','ParcelPayload.kt','ParcelBuildingSelection.kt']
 
 def sha(data):return hashlib.sha256(data).hexdigest()
@@ -55,7 +58,7 @@ def verify_preview(text,main_scene,original_autoload):
     return {'offline_gate_before_autoload':True,'game_network_endpoints':OFFLINE_URL,'autoload_symbols':sorted(original_autoload),'user_dir':USER_DIR,'main_scene':main_scene}
 
 def preview_project(original,main_scene):
-    if not re.fullmatch(r'res://scenes/dynamic_farm/[A-Za-z0-9_/-]+\.tscn',main_scene) or '..' in main_scene:raise ValueError('explicit dynamic-farm entry required')
+    if main_scene!=ENTRY:raise ValueError('the frozen selection-map entry is required; 3D host is not main')
     autoload=parse_settings(original).get('autoload',{})
     changes={
         ('sensen','network/online_qa'):'true',
@@ -89,14 +92,32 @@ def preview_preset(original,code):
     ]:rest=set_setting(rest,section,key,value)
     return rest
 
-def prepare(repo,commit,output,main_scene,code):
+def verify_data_config(raw,origin,client_sha):
+    if not re.fullmatch(r'https://[a-z0-9-]+\.trycloudflare\.com',origin):raise ValueError('fixed data HTTPS origin required')
+    if not re.fullmatch('[0-9a-f]{64}',client_sha):raise ValueError('exact client manifest hash required')
+    def unique(pairs):
+        result={}
+        for key,value in pairs:
+            if key in result:raise ValueError('duplicate data config field')
+            result[key]=value
+        return result
+    config=json.loads(raw,object_pairs_hook=unique)
+    if not isinstance(config,dict) or config.get('base_url')!=origin or config.get('dataset_version')!=DATASET or config.get('manifest_sha256')!=client_sha:raise ValueError('source data config does not match frozen public inputs')
+    if config.get('building_source')!='mapbox':raise ValueError('unexpected building source')
+    if config.get('manifest_path','client-manifest.json')!='client-manifest.json':raise ValueError('full manifest is not the mobile entry')
+    return config
+
+
+def prepare(repo,commit,output,main_scene,code,data_origin,client_sha):
     repo=Path(repo).resolve();output=Path(output).absolute()
     if not re.fullmatch('[0-9a-f]{40}',commit):raise ValueError('full immutable commit required')
     if output.exists() or output.is_symlink() or output.is_relative_to(repo):raise ValueError('new output outside source required')
     subprocess.run(['git','-C',str(repo),'merge-base','--is-ancestor',BASE,commit],check=True,capture_output=True)
     def blob(name):return subprocess.check_output(['git','-C',str(repo),'show',commit+':'+name])
     original=blob('project.godot').decode();project,check=preview_project(original,main_scene)
-    scene_path=main_scene.removeprefix('res://');blob(scene_path)
+    scene_path=main_scene.removeprefix('res://');scene=blob(scene_path).decode()
+    if not re.search(r'(?m)^\[node name="[^"]+" type="Control"\]$',scene):raise ValueError('selection-map root must be Control')
+    data_raw=blob(DATA_CONFIG);data_config=verify_data_config(data_raw,data_origin,client_sha)
     net_raw=blob('modules/net/net_service.gd');net=net_raw.decode()
     # Pin the reviewed Net implementation, not merely a matching comment or setting name.
     base_net=subprocess.check_output(['git','-C',str(repo),'show',BASE+':modules/net/net_service.gd'])
@@ -119,7 +140,7 @@ def prepare(repo,commit,output,main_scene,code):
         (stage/'project.godot').write_text(project);(stage/'export_presets.cfg').write_text(preset)
         verify_preview((stage/'project.godot').read_text(),main_scene,parse_settings(original)['autoload'])
         receipt={'schema':1,'source_commit':commit,'source_base':BASE,'source_tree':subprocess.check_output(['git','-C',str(repo),'rev-parse',commit+'^{tree}'],text=True).strip(),
-                 'package':PACKAGE,'version_code':code,'original_project_sha256':sha(original.encode()),'prepared_project_sha256':sha(project.encode()),
+                 'package':PACKAGE,'version_code':code,'data_config_path':DATA_CONFIG,'data_config_sha256':sha(data_raw),'data_origin':data_origin,'dataset_version':DATASET,'client_manifest_sha256':client_sha,'original_project_sha256':sha(original.encode()),'prepared_project_sha256':sha(project.encode()),
                  'export_presets_sha256':sha(preset.encode()),'net_source_sha256':sha(net.encode()),'native_five_sources':native,'settings_check':check,
                  'engine_started':False,'native_template_prepared':False,'runtime_media_or_gameplay_tested':False,'reviewed':False}
         (stage/'.dynamic-farm-preview-prepared.json').write_text(json.dumps(receipt,indent=2)+'\n')
@@ -129,5 +150,5 @@ def prepare(repo,commit,output,main_scene,code):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--source-repo',type=Path,required=True);p.add_argument('--source-commit',required=True)
-    p.add_argument('--output',type=Path,required=True);p.add_argument('--main-scene',required=True);p.add_argument('--version-code',type=int,required=True);a=p.parse_args()
-    print(json.dumps(prepare(a.source_repo,a.source_commit,a.output,a.main_scene,a.version_code)))
+    p.add_argument('--output',type=Path,required=True);p.add_argument('--main-scene',required=True);p.add_argument('--version-code',type=int,required=True);p.add_argument('--data-origin',required=True);p.add_argument('--client-manifest-sha256',required=True);a=p.parse_args()
+    print(json.dumps(prepare(a.source_repo,a.source_commit,a.output,a.main_scene,a.version_code,a.data_origin,a.client_manifest_sha256)))

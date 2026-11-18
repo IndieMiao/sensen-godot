@@ -1,6 +1,6 @@
 from pathlib import Path
-import unittest
-from prepare_android_preview import preview_project,verify_preview,parse_settings,preview_preset,USER_DIR
+import unittest,json
+from prepare_android_preview import preview_project,verify_preview,parse_settings,preview_preset,USER_DIR,verify_data_config,DATASET
 
 PROJECT='''config_version=5
 [application]
@@ -15,7 +15,7 @@ Voice="*res://modules/net/voice_session.gd"
 network/base_url="https://production.invalid/v1"
 network/mobile_base_url="https://production.invalid/preview/v1"
 '''
-ENTRY='res://scenes/dynamic_farm/selection_preview.tscn'
+ENTRY='res://scenes/dynamic_farm/dynamic_farm_map.tscn'
 
 class PreviewGateChecks(unittest.TestCase):
     def test_offline_flag_preexists_and_autoloads_preserved(self):
@@ -40,6 +40,17 @@ class PreviewGateChecks(unittest.TestCase):
         self.assertRaisesRegex(ValueError,'duplicate setting',parse_settings,text+'network/online_qa=false\n')
     def test_invalid_entry_rejected(self):
         self.assertRaises(ValueError,preview_project,PROJECT,'res://scenes/p0/p0_boot.tscn')
+    def test_3d_host_is_not_main(self):
+        self.assertRaisesRegex(ValueError,'3D host',preview_project,PROJECT,'res://scenes/dynamic_farm/dynamic_farm_host.tscn')
+    def test_readonly_data_config_pins(self):
+        origin='https://synthetic-only.trycloudflare.com';pin='a'*64
+        config={'base_url':origin,'dataset_version':DATASET,'manifest_sha256':pin,'building_source':'mapbox'}
+        self.assertEqual(verify_data_config(json.dumps(config),origin,pin),config)
+        for key,value in [('base_url','https://other.trycloudflare.com'),('dataset_version','sf-parcel-20261117-v3'),('manifest_sha256','b'*64),('building_source','unexpected'),('manifest_path','manifest.json')]:
+            with self.subTest(key=key):
+                bad={**config,key:value};self.assertRaises(ValueError,verify_data_config,json.dumps(bad),origin,pin)
+        duplicate=json.dumps(config)[:-1]+',"base_url":"https://other.trycloudflare.com"}'
+        self.assertRaisesRegex(ValueError,'duplicate',verify_data_config,duplicate,origin,pin)
     def test_unique_isolated_export_preset(self):
         original='''[preset.2]
 name="Android P0"
