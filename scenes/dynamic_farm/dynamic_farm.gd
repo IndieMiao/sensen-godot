@@ -9,6 +9,7 @@ const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
 const Ground = preload("res://modules/dynamic_farm/farm_mesh.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
+const EdgeDecor = preload("res://modules/dynamic_farm/farm_edge_decor.gd")
 const CameraRules = preload("res://modules/farm/farm_camera.gd")
 const Controls = preload("res://scenes/dynamic_farm/dynamic_controls.gd")
 const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.gd")
@@ -20,6 +21,7 @@ var _walk: RefCounted
 var _ground: Node3D
 var _props: Node3D
 var _plan := {}
+var _edge_plan := {}
 var _shade: Node
 var _actor: Node3D
 var _rig: Node3D
@@ -71,7 +73,7 @@ func _ready() -> void:
 		_fail(_plan.error)
 		return
 	Shade.enforce_budget(_plan,_data,_walk)
-	_ground = Ground.build(_data,_walk,_plan.recipe)
+	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk))
 	add_child(_ground)
 	var art := Scenery.build(_plan,_data.cell_m)
 	if not art.ok:
@@ -83,6 +85,14 @@ func _ready() -> void:
 	_shade = Shade.new()
 	add_child(_shade)
 	_shade.setup(_ground,_props,_plan,_data,_walk)
+	if bool(_args.get("edge_decor_preview",false)):
+		_edge_plan=EdgeDecor.plan(_data,_walk,_plan)
+		var edge_art:=Scenery.build(_edge_plan,_data.cell_m)
+		if not edge_art.ok:
+			_fail(edge_art.error)
+			return
+		edge_art.root.name="EdgeDecorPreview"
+		add_child(edge_art.root)
 	_actor = Node3D.new()
 	_actor.name = "PreviewPlayer"
 	_actor.position = _walk.position
@@ -116,6 +126,11 @@ func _ready() -> void:
 		"seed_hex":_data.seed_hex,"generator_version":_data.generator_version,
 		"camera":{"pitch":43.0,"yaw":14.5,"keep_width":true},
 		"source_origin":[_data.origin.x,_data.origin.y]}
+	_summary.bank = _ground.get_meta("bank_metrics",{})
+	_summary.edge_decor={"enabled":not _edge_plan.is_empty(),"instances":_edge_plan.get("layout",[]).size(),
+		"triangles":_edge_plan.get("triangles",0),"batches":_edge_plan.get("batches",0),
+		"layout_sha256":_edge_plan.get("layout_sha256",""),"covered_cells":_edge_plan.get("covered_cells",0),
+		"perimeter_cells":_edge_plan.get("perimeter_cells",0),"clusters":_edge_plan.get("clusters",[]).size()}
 
 func _setup_world() -> void:
 	var env := Environment.new()
