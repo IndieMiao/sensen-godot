@@ -33,13 +33,16 @@ class MapPage extends "res://scenes/dynamic_farm/dynamic_farm_map.gd":
 		_camera = TestCamera.new(); add_child(_camera)
 	func _render() -> void: pass
 class Router extends Node:
+	signal load_failed
 	var bridge: MapBridge
 	var top: Node
 	var opened := 0
 	var received: Dictionary = {}
+	var hold_loading := false
 	func top_instance() -> Node: return top
 	func open_instance(_path: String, args: Dictionary) -> void:
 		opened += 1; received = args
+		if hold_loading: await load_failed
 var checks := 0
 var failures := 0
 func _initialize() -> void: _run.call_deferred()
@@ -59,6 +62,20 @@ func _run() -> void:
 	verify(plugin.calls == [["color", "#E7F0DF"]] and router.opened == 1, "opaque scene color is supplied before Router may suspend the map")
 	verify(router.received.preview_only and router.received.farm == farm, "preview payload keeps identity and presentation-only semantics")
 	verify(not plugin.opaque, "cancelled loading before Router suspension never makes the still-visible map opaque")
+	plugin.calls.clear()
+	router.hold_loading = true
+	page._open_host(farm)
+	await process_frame
+	verify(page._opening, "actual open-host coroutine remains pending while Router loads")
+	page._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	verify(not plugin.opaque and not page._surface_opaque_requested, "Activity pause during pending 3D load does not commit opaque mode")
+	verify(not plugin.calls.any(func(call: Array): return call[0] == "surface"), "pending-load pause makes no native format request")
+	router.load_failed.emit() # Loading failed/cancelled without ever pushing a host.
+	await process_frame
+	router.hold_loading = false
+	verify(not page._opening and router.top_instance() == null, "failed loading retires the actual pending coroutine without a host")
+	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	verify(not plugin.opaque and plugin.shown, "failed or cancelled background load returns to a transparent map")
 	plugin.calls.clear(); root.transparent_bg = true
 	page._opening = true # Router is now committing the 3D transition.
 	page.suspend()
@@ -68,16 +85,17 @@ func _run() -> void:
 	verify(plugin.opaque and page._surface_opaque_requested, "3D transition explicitly requests the no-alpha Surface mode")
 	verify(not plugin.shown, "native hide request reaches the existing visibility API")
 	router.top = Node3D.new(); root.add_child(router.top)
+	var previous_activations := selector.activations
 	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
-	verify(not plugin.shown and selector.activations == 0, "foreground while 3D is top cannot reactivate the map")
+	verify(not plugin.shown and selector.activations == previous_activations, "foreground while 3D is top cannot reactivate the map")
 	verify(plugin.opaque, "3D foreground preserves the explicit opaque mode")
 	await create_timer(0.25).timeout
 	verify(not plugin.shown, "diagnostic cache polling never changes presentation state")
 	router.top.queue_free(); router.top = null
 	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
-	verify(plugin.shown and root.transparent_bg and selector.activations == 1, "foreground root map restores native visibility and transparent viewport")
+	verify(plugin.shown and root.transparent_bg and selector.activations == previous_activations + 1, "foreground root map restores native visibility and transparent viewport")
 	verify(not plugin.opaque and not page._surface_opaque_requested, "returning map restores the transparent native Surface mode")
-	verify(page._camera.updates == 1, "restored map reapplies its saved camera")
+	verify(page._camera.updates == previous_activations + 1, "restored map reapplies its saved camera")
 	var snapshot: Dictionary = JSON.parse_string(bridge.map_visibility_state())
 	verify(snapshot.scene_visible and snapshot.sample_uptime_ms == 123, "bridge preserves snapshot freshness fields without treating cache as an ACK")
 	plugin.calls.clear()
@@ -92,7 +110,7 @@ func _run() -> void:
 	plugin.supported = false
 	var calls := plugin.calls.size()
 	await page._open_host(farm)
-	verify(router.opened == 1 and plugin.calls.size() == calls, "old native capability cannot enter 3D with unsupported hiding")
+	verify(router.opened == before_missing and plugin.calls.size() == calls, "old native capability cannot enter 3D with unsupported hiding")
 	verify(page._message.text.contains("latest"), "missing native capability gives actionable update feedback")
 	verify(bridge.map_visibility_state() == "{}", "unsupported diagnostics returns empty data")
 	var host = load("res://scenes/dynamic_farm/dynamic_farm_host.tscn").instantiate(); root.add_child(host)

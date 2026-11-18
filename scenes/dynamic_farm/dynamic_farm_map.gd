@@ -144,11 +144,15 @@ func _open_host(farm: Dictionary) -> void:
 		_render()
 
 func suspend() -> void:
+	# AppRouter invokes this when it actually pushes another scene.
+	_suspend_map(_opening)
+
+func _suspend_map(committing_preview: bool) -> void:
 	_suspended = true
 	_presentation_epoch += 1
 	get_viewport().transparent_bg = false
 	if _bridge != null: _bridge.set_map_occlusion_color(OCCLUSION_COLOR)
-	if _opening and _bridge != null:
+	if committing_preview and _bridge != null:
 		_surface_opaque_requested = _bridge.set_godot_surface_opaque(true)
 	if _selector != null: _selector.pause()
 	_hud.hide(); process_mode = Node.PROCESS_MODE_DISABLED
@@ -207,7 +211,7 @@ func is_back_navigation_locked() -> bool:
 
 func _notification(what: int) -> void:
 	if not is_node_ready() or _selector == null: return
-	if what == NOTIFICATION_APPLICATION_PAUSED and not _suspended: suspend()
+	if what == NOTIFICATION_APPLICATION_PAUSED and not _suspended: _suspend_map(false)
 	elif what == NOTIFICATION_APPLICATION_RESUMED and _suspended:
 		var router := get_node_or_null("/root/AppRouter")
 		if router == null or router.top_instance() in [null, self]: resume()
