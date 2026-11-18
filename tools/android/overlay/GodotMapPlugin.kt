@@ -6,11 +6,15 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.PixelFormat
+import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.view.SurfaceView
+import android.os.SystemClock
 import android.widget.FrameLayout
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicLong
@@ -68,6 +72,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     private var container: FrameLayout? = null
     private var mapView: MapView? = null
+    private var mapPresentation: NativeMapPresentation? = null
+    private var mapOcclusionColor = 0xff202020.toInt()
+    @Volatile private var mapVisibilityCache = "{\"created\":false}"
     private var parcelController: ParcelMapController? = null
     private var parcelActivityResumed = true
     private val parcelLifecycleEpoch = AtomicLong(0)
@@ -142,7 +149,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     override fun onMainPause() {
         parcelLifecycleEpoch.incrementAndGet() // Before scheduling UI work or stopping Godot.
-        runOnUiThread { parcelActivityResumed = false; parcelController?.setInteractive(false) }
+        runOnUiThread { parcelActivityResumed = false; applyMapPresentation() }
         val renderView = godot.renderView ?: return
         if (mainLoopStarted) {
             // Godot 4.7 pauses Vulkan only onStop, after Android can retire the window surface.
@@ -152,7 +159,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     override fun onMainResume() {
-        runOnUiThread { parcelActivityResumed = true; parcelController?.setInteractive(mapSceneVisible) }
+        runOnUiThread { parcelActivityResumed = true; applyMapPresentation() }
         if (renderPausedEarly) {
             // onResume can follow a translucent activity without another onStart.
             godot.renderView?.onActivityStarted()
@@ -217,6 +224,16 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
                 )
             }
             mapView = mv
+            mapPresentation = NativeMapPresentation(
+                background = { color -> parent.setBackgroundColor(color) },
+                visibility = { shown ->
+                    mv.visibility = if (shown) View.VISIBLE else View.INVISIBLE
+                    mv.isEnabled = shown
+                    mv.compass.enabled = shown
+                },
+                render = { running -> if (running) mv.onStart() else mv.onStop() },
+            )
+            applyMapPresentation()
             Log.i(TAG, "MapView created @($lat,$lng) z=$zoom")
         }
     }
@@ -422,24 +439,64 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         return ctx.resources.displayMetrics.density.toDouble()
     }
 
-    /** Pause the map under opaque Godot scenes, retaining its last composed buffer. */
+    /** Hide the actual native view tree and its Surface; onStop alone retains a visible buffer. */
     @UsedByGodot
     fun setMapVisible(visible: Boolean) {
         if (!visible) parcelLifecycleEpoch.incrementAndGet()
-        runOnUiThread {
-            updateMapSceneVisibility(visible)
-        }
+        runOnUiThread { updateMapSceneVisibility(visible) }
+    }
+
+    /** Scene-supplied opaque fallback behind the translucent Godot SurfaceView. */
+    @UsedByGodot
+    fun setMapOcclusionColor(rgb: String) {
+        val color = NativeMapPresentation.opaqueRgb(rgb) ?: return
+        runOnUiThread { mapOcclusionColor = color; applyMapPresentation() }
+    }
+
+    /** Cached UI-thread snapshot only. Poll again to observe the refresh queued by this call. */
+    @UsedByGodot
+    fun getMapVisibilityState(): String {
+        runOnUiThread { cacheMapVisibility() }
+        return mapVisibilityCache
     }
 
     private fun updateMapSceneVisibility(visible: Boolean) {
-        parcelController?.setInteractive(visible && parcelActivityResumed)
-        val mv = mapView ?: return
-        if (mapSceneVisible == visible) return
-        mapSceneVisible = visible
-        // Removing the SurfaceView reveals the launcher while Godot submits its first opaque frame.
-        // onStop pauses rendering without removing that surface from Android's compositor.
-        mv.compass.enabled = visible   // the logo and ⓘ stay off: the game draws its own credit line (q(133) v3)
-        if (visible) mv.onStart() else mv.onStop()
+        mapSceneVisible = visible // Retain an early hide even before MapView creation.
+        applyMapPresentation()
+    }
+
+    private fun applyMapPresentation() {
+        val shown = mapSceneVisible && parcelActivityResumed
+        parcelController?.setInteractive(shown)
+        mapPresentation?.apply(mapSceneVisible, parcelActivityResumed, mapOcclusionColor)
+        // Before creation, the same opaque fallback prevents exposing the Activity/launcher.
+        if (mapView == null) container?.setBackgroundColor(if (shown) 0 else mapOcclusionColor)
+        cacheMapVisibility()
+    }
+
+    private fun cacheMapVisibility() {
+        val mv = mapView
+        val surfaces = JSONArray()
+        fun inspect(view: View) {
+            if (view is SurfaceView && surfaces.length() < 16) surfaces.put(JSONObject().apply {
+                put("visibility", view.visibility); put("shown", view.isShown)
+                put("surface_valid", view.holder.surface.isValid)
+            })
+            if (view is ViewGroup) for (index in 0 until view.childCount) inspect(view.getChildAt(index))
+        }
+        if (mv != null) inspect(mv)
+        mapVisibilityCache = JSONObject().apply {
+            put("created", mv != null); put("scene_visible", mapSceneVisible)
+            put("activity_resumed", parcelActivityResumed)
+            put("map_visibility", mv?.visibility ?: -1); put("map_shown", mv?.isShown ?: false)
+            put("occlusion_color", String.format(Locale.US, "#%08X", mapOcclusionColor))
+            put("backdrop_requested_opaque", !(mapSceneVisible && parcelActivityResumed))
+            put("backdrop_argb", (container?.background as? ColorDrawable)?.color ?: 0)
+            put("container_visibility", container?.visibility ?: -1)
+            put("godot_surface_visibility", godot.renderView?.view?.visibility ?: -1)
+            put("epoch", parcelLifecycleEpoch.get()); put("sample_uptime_ms", SystemClock.uptimeMillis())
+            put("surfaces", surfaces)
+        }.toString()
     }
 
     /**
@@ -558,6 +615,8 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     override fun onMainDestroy() {
         parcelLifecycleEpoch.incrementAndGet()
         runOnUiThread {
+            mapPresentation?.apply(false, false, mapOcclusionColor)
+            mapPresentation = null
             parcelController?.close(); parcelController = null
             try {
                 locationManager?.removeUpdates(locationListener)
@@ -571,4 +630,31 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     /** HUD 调试用：当前相机状态（UI 线程写入的缓存，任意线程可读）。 */
     @UsedByGodot
     fun getCameraInfo(): String = cameraInfoCache
+}
+
+
+/** Ordered UI effects, separated so delayed lifecycle transitions can be checked without a device. */
+internal class NativeMapPresentation(
+    private val background: (Int) -> Unit,
+    private val visibility: (Boolean) -> Unit,
+    private val render: (Boolean) -> Unit,
+) {
+    private var rendering: Boolean? = null
+    fun apply(sceneVisible: Boolean, resumed: Boolean, color: Int) {
+        val shown = sceneVisible && resumed
+        if (shown) {
+            if (rendering != true) render(true)
+            visibility(true)
+            background(0) // Map supplies the background again only after it is visible.
+        } else {
+            background(color or 0xff000000.toInt())
+            visibility(false) // Remove the composed map/labels before stopping its render loop.
+            if (rendering != false) render(false)
+        }
+        rendering = shown
+    }
+    companion object {
+        fun opaqueRgb(value: String): Int? =
+            if (Regex("#[0-9a-fA-F]{6}").matches(value)) (value.drop(1).toLong(16) or 0xff000000L).toInt() else null
+    }
 }
