@@ -1,0 +1,80 @@
+{
+  "format": "dynamic_farm_art_recipe_v1",
+  "status": "integration_input_not_render_accepted",
+  "inventory": "499-art-inventory.json",
+  "scope": "stage2_visual_only",
+  "geometry_authority": "schema-r4; never derive gameplay permissions from art",
+  "schema_mapping_status": "owner_confirmation_required",
+  "seed_inputs": ["dataset_version", "parcel_id", "generation_version", "art_version"],
+  "art_version": "499-v1",
+  "seed_contract": "Use a documented stable hash and PRNG, a stable candidate order and per-role streams; do not use wall time or process-dependent hash.",
+  "required_semantic_inputs": [
+    "local_metric_transform", "cell_size_m", "core_mask", "extension_mask",
+    "walkable_mask", "spawn", "reserved_corridors", "decoration_allowed_mask",
+    "local_water_mask_if_any", "local_height_if_any"
+  ],
+  "camera": {"pitch_deg": 43.0, "yaw_deg": 14.5, "transform_grid_and_geometry_together": true},
+  "surface": {
+    "grass_srgb": "86a74b",
+    "grass_far_srgb": "749543",
+    "core_warm_surface_srgb": "dcc79a",
+    "colour_source": "PondWildGround.COLOURS at inventory source commit; initial visual recipe, not approved dynamic-farm rendering",
+    "ground_texture": "res://assets/farm/art/meadow.png",
+    "continuous_ground": true,
+    "visible_random_triangle_colours": false,
+    "grid_visible_only_in_core": true,
+    "grid_does_not_set_cultivated_state": true,
+    "geometry_does_not_fill_core_holes": true,
+    "red_blue_reference_lines_in_3d": false
+  },
+  "placement": {
+    "blocking_props_in_core": false,
+    "blocking_props_require_explicit_decoration_permission": true,
+    "missing_decoration_permission": "omit_blocking_props_and_report_missing_semantics",
+    "preserve_spawn_and_corridors": true,
+    "core_visual_clearance_cells": 1.0,
+    "spawn_visual_clearance_cells": 2.0,
+    "clearance_measure": "transformed full vertex bounds/radial extent plus clearance; never use average AABB radius as containment proof",
+    "collision_measure": "separate conservative collision shape; no art-inferred walkable subtraction",
+    "validity": "entire footprint in allowed region; no crossing holes/water/reserved routes; recheck all promised reachable cells after blocking placement",
+    "geographic_road_neighbor_clip": "only when final schema explicitly maps it into the local scene; no extra geographic clipping for a local-only extension",
+    "narrow_space_fallback": "drop_the_prop_keep_the_ground_and_connectivity",
+    "foreground": "prefer low cover; tall props require screen-space player/core/HUD occlusion review",
+    "uniform_scale_range": [0.85, 1.0],
+    "rotation": "seeded yaw variation; cluster axes oblique, never rotate authoritative core independently",
+    "max_candidate_attempts_per_role": 512,
+    "maximum_counts_are_not_placement_targets": true
+  },
+  "roles": {
+    "tree": {"ids": ["wild_pz_tree_20", "wild_pz_tree_20_g", "wild_pz_pine_01", "wild_pz_pine_03"], "cap_per_farm": 24, "placement": "outer permitted edge, broadleaf primary, sparse pine accents; groups of 2-3 only if bounds fit"},
+    "shrub": {"ids": ["wild_pz_bush_05", "wild_pz_bush_07"], "cap_per_farm": 32, "placement": "between tree clusters, not a continuous blocking hedge"},
+    "rock": {"ids": ["wild_pz_rock_08", "wild_pz_rock_13", "wild_pz_softrock_10"], "cap_per_farm": 18, "placement": "one main rock with at most two lower companions in permitted pockets"},
+    "flower": {"ids": ["wild_pz_flower_20", "wild_pz_flower_23"], "cap_per_farm": 48, "placement": "small clusters beside tree/rock groups; leave core and reserved corridors clear"},
+    "groundcover": {"ids": ["wild_pz_grass_24", "wild_pz_foot_leafy"], "cap_per_farm": 64, "placement": "sparse cluster foot cover; no full-field random noise"}
+  },
+  "budget": {
+    "caps_status": "conservative first-scene art caps, not measured mobile performance limits",
+    "cap_applies_to_entire_generated_farm_not_each_chunk": true,
+    "batch_by": ["asset_id", "material", "shadow_policy", "spatial_chunk"],
+    "count_unique_and_placed_triangles_separately": true,
+    "count_ground_water_shadow_avatar_and_ui_separately": true,
+    "large_parcel_policy": "keep caps, preserve core geometry and scale; increase open grass, never shrink player/grid to fit"
+  },
+  "water_and_cliff": {
+    "automatic_water_for_every_parcel": false,
+    "only_from_explicit_local_scene_semantics": true,
+    "existing_pond_masks_reusable_on_new_shapes": false,
+    "new_geometry_requires_matching_shore_distance_foam_and_shadow_inputs": true,
+    "cliff_must_not_consume_promised_walkable_surface": true,
+    "no_water_or_height_semantics": "complete dry-ground view, report omitted optional water/cliff",
+    "missing_art_requires_report_to_yixing": true
+  },
+  "review": {
+    "required_samples": ["ordinary", "narrow", "concave_neck", "holes_or_multiparts", "road_neighbor_context", "water_context", "maximum_extent"],
+    "required_evidence": ["schema_seed_commit", "core_extension_walk_decor_masks", "full_scene_with_avatar", "boundary_closeups", "normal_speed_walk", "instance_and_triangle_counts", "platform_frametimes", "same_seed_reentry_and_A_B_layout"],
+    "technical_review": "shangguan",
+    "screen_visual_review": "huowu",
+    "data_generation_review": "zhouyu",
+    "new_or_changed_shader_requires_physical_device_check": true
+  }
+}

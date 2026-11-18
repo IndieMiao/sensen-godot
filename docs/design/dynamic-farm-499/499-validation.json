@@ -1,0 +1,24 @@
+{
+  "source_commit": "99a853f7c75e917394a3f1f229bce9a82a38235c",
+  "checks": {
+    "glb_vertex_bounds_and_manifest": 13,
+    "glb_sha256_and_manifest": 13,
+    "unique_import_uids": 13,
+    "single_identity_static_mesh_no_external_images": 13,
+    "recipe_inventory_role_coverage": true,
+    "total_instance_cap": 186,
+    "worst_case_prop_triangles_at_caps": 46904
+  },
+  "limits": [
+    "Caps are initial art limits, not performance measurements.",
+    "Triangle estimate excludes ground, water, shadow passes, avatar, UI.",
+    "No Godot import/render, schema-r4 integration, navigation or physical device tests.",
+    "Approval is an inherited manifest record, not newly fetched original chat."
+  ],
+  "sha256": {
+    "499-art-recipe.json": "766911f1ee9a7f91dec627766d933854ba2ea45cf8914473a8e07dc30ada2829",
+    "README.md": "8d6055b31f7884fa47f47ba4909af79c06e48b3b6ae2fcc349206017b86a4ffc",
+    "499-r4-art-contract.md": "a28e672489f8f1f8c4940b8ee1e41c6b6150e430cb5040b0278078fa9ae1ba3c",
+    "499-art-inventory.json": "aea08d6f2cb213eff3d2e54ef1b34787802566485fe2d4bb65db4bf6a2be658d"
+  }
+}

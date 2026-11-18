@@ -1,0 +1,463 @@
+{
+  "format": "dynamic_farm_art_inventory_v1",
+  "source_commit": "99a853f7c75e917394a3f1f229bce9a82a38235c",
+  "units": "meters; Godot X/Y/Z; Y up; +Z front",
+  "validation": "Read GLB POSITION bytes, identity node transform, triangle counts, SHA256 and .import UID. No Godot render/import or phone validation.",
+  "assets": [
+    {
+      "id": "wild_pz_tree_20",
+      "role": "tree",
+      "path": "res://assets/farm/art/wild_pz_tree_20.glb",
+      "uid": "uid://ckwu51p2d4jir",
+      "sha256": "a30af983454d6163612d3de167ee9ac234eb004ed64a04a234134aff6ba9d88f",
+      "import_sha256": "06a8562ac39e324e2c797bf87e0df9d77c5458453a068d33a6ce1c42a6141d59",
+      "triangles": 381,
+      "surfaces": 1,
+      "bytes": 32456,
+      "bounds_godot_m": [
+        [
+          -1.6550438404083252,
+          0.0,
+          -1.425561785697937
+        ],
+        [
+          1.6550438404083252,
+          4.455929279327393,
+          1.425561785697937
+        ]
+      ],
+      "dimensions_m": [
+        3.3100876808166504,
+        4.455929279327393,
+        2.851123571395874
+      ],
+      "visual_radial_extent_m": 1.8960730225412963,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 2.793273923273887e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_20",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_tree_20_g",
+      "role": "tree",
+      "path": "res://assets/farm/art/wild_pz_tree_20_g.glb",
+      "uid": "uid://dr5hufggmox1j",
+      "sha256": "1438c49507379eea567ed8df30558069c71ddc6f3567cc8ae428b36a35378be5",
+      "import_sha256": "f138c8483204c1fd52f9bac031518b45bf1b9de6afab90afad6494b021da95dc",
+      "triangles": 381,
+      "surfaces": 1,
+      "bytes": 32460,
+      "bounds_godot_m": [
+        [
+          -1.6550438404083252,
+          0.0,
+          -1.425561785697937
+        ],
+        [
+          1.6550438404083252,
+          4.455929279327393,
+          1.425561785697937
+        ]
+      ],
+      "dimensions_m": [
+        3.3100876808166504,
+        4.455929279327393,
+        2.851123571395874
+      ],
+      "visual_radial_extent_m": 1.8960730225412963,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 2.793273923273887e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_20",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_pine_01",
+      "role": "tree",
+      "path": "res://assets/farm/art/wild_pz_pine_01.glb",
+      "uid": "uid://b81lmlkvmtv0j",
+      "sha256": "f143f38380e35f9ec1bd3b044a111d017a271c0304be85d1d3e17acbf81c3af9",
+      "import_sha256": "ab318db9c12493332e456fd6fdd867cc00098bc30f708b1b7936e6f69815f0bb",
+      "triangles": 1162,
+      "surfaces": 1,
+      "bytes": 90556,
+      "bounds_godot_m": [
+        [
+          -1.5239200592041016,
+          0.0,
+          -1.5239205360412598
+        ],
+        [
+          1.5239200592041016,
+          3.5990872383117676,
+          1.5239205360412598
+        ]
+      ],
+      "dimensions_m": [
+        3.047840118408203,
+        3.5990872383117676,
+        3.0478410720825195
+      ],
+      "visual_radial_extent_m": 1.5418635126442948,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 4.6395874031546214e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_01",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_pine_03",
+      "role": "tree",
+      "path": "res://assets/farm/art/wild_pz_pine_03.glb",
+      "uid": "uid://b5klxo05y8q60",
+      "sha256": "f5e8ac236021137aa6a2da7128ae449fd3f96ef1d7ffb3c70614ef88a99cf52e",
+      "import_sha256": "8efa9740727b0a54213b07ef82bf4f67953f955f047249030c183574eef6d472",
+      "triangles": 477,
+      "surfaces": 1,
+      "bytes": 35916,
+      "bounds_godot_m": [
+        [
+          -1.0479722023010254,
+          0.0,
+          -1.007651925086975
+        ],
+        [
+          1.0479722023010254,
+          4.695980548858643,
+          1.007651925086975
+        ]
+      ],
+      "dimensions_m": [
+        2.095944404602051,
+        4.695980548858643,
+        2.01530385017395
+      ],
+      "visual_radial_extent_m": 1.0881226570358844,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 4.5114135716062265e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Tree_03",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_bush_05",
+      "role": "shrub",
+      "path": "res://assets/farm/art/wild_pz_bush_05.glb",
+      "uid": "uid://tg5atieqh6av",
+      "sha256": "d8891d9378401caa5ebff4ebd1c6012f7a6021e290b06f6f2044ac35173b306a",
+      "import_sha256": "5f6357b6e4c41a2281279da6083a44c236ce6e7405e733732a73ed7a4f2292ad",
+      "triangles": 62,
+      "surfaces": 1,
+      "bytes": 6892,
+      "bounds_godot_m": [
+        [
+          -0.6444588899612427,
+          0.0,
+          -0.6430765986442566
+        ],
+        [
+          0.6444588899612427,
+          1.0714725255966187,
+          0.6430765986442566
+        ]
+      ],
+      "dimensions_m": [
+        1.2889177799224854,
+        1.0714725255966187,
+        1.2861531972885132
+      ],
+      "visual_radial_extent_m": 0.6732454496329706,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 4.7440338124538073e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Bush_05",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_bush_07",
+      "role": "shrub",
+      "path": "res://assets/farm/art/wild_pz_bush_07.glb",
+      "uid": "uid://cboqt841wvfo8",
+      "sha256": "58872470ecee92329bf46a2b49b34b8496947b19e5cc5ffe59300d02bfd6d598",
+      "import_sha256": "dc2a4a72d3d4f1199efb3764814d7fa4e4e6c3dbedec76081c11531392becbcb",
+      "triangles": 78,
+      "surfaces": 1,
+      "bytes": 8072,
+      "bounds_godot_m": [
+        [
+          -0.6370148658752441,
+          0.0,
+          -0.63272625207901
+        ],
+        [
+          0.6370148658752441,
+          1.4519132375717163,
+          0.63272625207901
+        ]
+      ],
+      "dimensions_m": [
+        1.2740297317504883,
+        1.4519132375717163,
+        1.26545250415802
+      ],
+      "visual_radial_extent_m": 0.6636752105050452,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 2.520790099991288e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Bush_07",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_rock_08",
+      "role": "rock",
+      "path": "res://assets/farm/art/wild_pz_rock_08.glb",
+      "uid": "uid://bar64oijwqrx",
+      "sha256": "348588e4b748736aa8bdf5a82309110a941791172d80849f71454b7ba5b39bcc",
+      "import_sha256": "1a4b22597e36579da6cb6540144dd22315c481a9666f425fec5c1c4cd475e792",
+      "triangles": 80,
+      "surfaces": 1,
+      "bytes": 6072,
+      "bounds_godot_m": [
+        [
+          -0.6790360808372498,
+          0.0,
+          -0.42422908544540405
+        ],
+        [
+          0.6790360808372498,
+          1.261006474494934,
+          0.42422908544540405
+        ]
+      ],
+      "dimensions_m": [
+        1.3580721616744995,
+        1.261006474494934,
+        0.8484581708908081
+      ],
+      "visual_radial_extent_m": 0.7428450047595696,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 4.744949340107496e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_08",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_rock_13",
+      "role": "rock",
+      "path": "res://assets/farm/art/wild_pz_rock_13.glb",
+      "uid": "uid://dbaoce0tcps11",
+      "sha256": "08ef039456e137bd8c24e8ac3259e4fb32443e15898104965f0de0de421688f2",
+      "import_sha256": "35210918e311586561ba63463c581d065c09eb4a85649a34e20ae3666004cb25",
+      "triangles": 68,
+      "surfaces": 1,
+      "bytes": 4876,
+      "bounds_godot_m": [
+        [
+          -0.4633747339248657,
+          0.0,
+          -0.4624354839324951
+        ],
+        [
+          0.4633747339248657,
+          0.8185584545135498,
+          0.4624354839324951
+        ]
+      ],
+      "dimensions_m": [
+        0.9267494678497314,
+        0.8185584545135498,
+        0.9248709678649902
+      ],
+      "visual_radial_extent_m": 0.4925582723038273,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 4.839324951322332e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / HardRock_13",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_softrock_10",
+      "role": "rock",
+      "path": "res://assets/farm/art/wild_pz_softrock_10.glb",
+      "uid": "uid://crarrbk5w8yod",
+      "sha256": "fa3819e63d3c7d841f24675822864fd98abcdf60b0959ec2abfe2e6f8df87035",
+      "import_sha256": "592f437a19032d52d1c3f65e0408128b90e0400f788a111ea0fe36b4bc49700d",
+      "triangles": 100,
+      "surfaces": 1,
+      "bytes": 10964,
+      "bounds_godot_m": [
+        [
+          -0.4942721724510193,
+          0.0,
+          -0.5005013942718506
+        ],
+        [
+          0.4942721724510193,
+          0.44117653369903564,
+          0.5005013942718506
+        ]
+      ],
+      "dimensions_m": [
+        0.9885443449020386,
+        0.44117653369903564,
+        1.0010027885437012
+      ],
+      "visual_radial_extent_m": 0.6324960187475761,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 4.663009643413041e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / SoftRock_10",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_flower_20",
+      "role": "flower",
+      "path": "res://assets/farm/art/wild_pz_flower_20.glb",
+      "uid": "uid://0yg35qtydj4b",
+      "sha256": "a233121c0889392800398ff37d3dce27beb2275ac876c400b6cfae2581a12835",
+      "import_sha256": "bf403cccaecb902908771037d4c9169df1c928089970783746c7c4df493bb3cd",
+      "triangles": 136,
+      "surfaces": 1,
+      "bytes": 10092,
+      "bounds_godot_m": [
+        [
+          -0.23133288323879242,
+          0.0,
+          -0.17387038469314575
+        ],
+        [
+          0.23133288323879242,
+          0.6398371458053589,
+          0.17387038469314575
+        ]
+      ],
+      "dimensions_m": [
+        0.46266576647758484,
+        0.6398371458053589,
+        0.3477407693862915
+      ],
+      "visual_radial_extent_m": 0.27260876538778217,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 3.846931457551772e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Flower_20",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_flower_23",
+      "role": "flower",
+      "path": "res://assets/farm/art/wild_pz_flower_23.glb",
+      "uid": "uid://d4hnpxvskp8vl",
+      "sha256": "90d2c7ca7fcfaba3a25b27986d87c5e715c7f5caa99c0b35476021093a6e5aca",
+      "import_sha256": "5265e4b43dde1cf4b58a0b9eb0529c50c8bc5c025f3f7712797aaff2b8d58e64",
+      "triangles": 112,
+      "surfaces": 1,
+      "bytes": 8220,
+      "bounds_godot_m": [
+        [
+          -0.22907063364982605,
+          0.0,
+          -0.18665319681167603
+        ],
+        [
+          0.22907063364982605,
+          0.6142145991325378,
+          0.18665319681167603
+        ]
+      ],
+      "dimensions_m": [
+        0.4581412672996521,
+        0.6142145991325378,
+        0.37330639362335205
+      ],
+      "visual_radial_extent_m": 0.24467315570935255,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 4.008674621136521e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Flower_23",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_grass_24",
+      "role": "groundcover",
+      "path": "res://assets/farm/art/wild_pz_grass_24.glb",
+      "uid": "uid://cwxl6m41pjd0o",
+      "sha256": "820ffada31eff20b8a0abd2a49d76a7cfd0bd2c2e5458d8907bf7519e94bec69",
+      "import_sha256": "d81fc9082439406148588de0a12adadb0198bdca7eb3e63bfa446191b8030803",
+      "triangles": 128,
+      "surfaces": 1,
+      "bytes": 9976,
+      "bounds_godot_m": [
+        [
+          -0.5594002604484558,
+          0.0,
+          -0.5254457592964172
+        ],
+        [
+          0.5594002604484558,
+          0.4592190384864807,
+          0.5254457592964172
+        ]
+      ],
+      "dimensions_m": [
+        1.1188005208969116,
+        0.4592190384864807,
+        1.0508915185928345
+      ],
+      "visual_radial_extent_m": 0.6325070396606022,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 2.60448455802198e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Grass_24",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    },
+    {
+      "id": "wild_pz_foot_leafy",
+      "role": "groundcover",
+      "path": "res://assets/farm/art/wild_pz_foot_leafy.glb",
+      "uid": "uid://e7av08qwug54",
+      "sha256": "91e8fd4d0907a00d812b8bd87456b350033de79472f04aea07a4383bcffed284",
+      "import_sha256": "41f48e5dec974de6b23a9b694f1ada96b351a6ea4732f82b25e5bd08c9d3829c",
+      "triangles": 64,
+      "surfaces": 1,
+      "bytes": 5504,
+      "bounds_godot_m": [
+        [
+          -0.21347080171108246,
+          0.0,
+          -0.24373774230480194
+        ],
+        [
+          0.21347080171108246,
+          0.1862044334411621,
+          0.24373774230480194
+        ]
+      ],
+      "dimensions_m": [
+        0.4269416034221649,
+        0.1862044334411621,
+        0.4874754846096039
+      ],
+      "visual_radial_extent_m": 0.24632381377704451,
+      "radial_extent_is_collision_radius": false,
+      "manifest_bounds_max_error_m": 4.3344116210097816e-07,
+      "material_provider": "res://modules/farm/farm_art.gd::material",
+      "external_image_dependencies": [],
+      "source": "Pandazole - Nature Environment Low poly Pack 1.0.0 / Grass_41",
+      "approval_record_in_manifest": "Unity Asset Store（Pandazole - Nature Environment Low poly Pack 1.0.0），用户 11-09 14:38 bot 579 确认入库"
+    }
+  ]
+}
