@@ -10,6 +10,9 @@ import argparse, hashlib, json, re, shutil, subprocess, tarfile, tempfile
 BASE='99a853f7c75e917394a3f1f229bce9a82a38235c'
 PACKAGE='com.sensen.dynamicfarmqa'
 USER_DIR='gensen-dynamic-farm-preview-499'
+ICON_PATH='assets/dynamic_farm_qa/icon.svg'
+ICON_SVG='<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="38" fill="#152f49"/><path d="M96 22 154 55 96 88 38 55z" fill="#91d68c"/><path d="M38 55 96 88v61l-58-34z" fill="#417f6a"/><path d="M96 88 154 55v60l-58 34z" fill="#64ab83"/><rect x="16" y="138" width="160" height="40" rx="10" fill="#ffcd54"/><text x="96" y="166" text-anchor="middle" font-family="sans-serif" font-size="26" font-weight="bold" fill="#152f49">3D QA</text></svg>'
+
 OFFLINE_URL='https://offline.invalid/v1'
 ENTRY='res://scenes/dynamic_farm/dynamic_farm_map.tscn'
 DATA_CONFIG='modules/dynamic_farm/map/config.json'
@@ -57,6 +60,7 @@ def verify_preview(text,main_scene,original_autoload):
         if network.get(key)!=json.dumps(OFFLINE_URL):raise ValueError('unexpected game network endpoint')
     if application.get('run/main_scene')!=json.dumps(main_scene):raise ValueError('wrong preview entry')
     if application.get('config/use_custom_user_dir')!='true' or application.get('config/custom_user_dir_name')!=json.dumps(USER_DIR):raise ValueError('shared user data prohibited')
+    if application.get('config/icon')!=json.dumps('res://'+ICON_PATH):raise ValueError('distinct QA icon required')
     if settings.get('autoload')!=original_autoload:raise ValueError('original autoload symbols changed')
     for name,declaration in REQUIRED_AUTOLOADS.items():
         if name not in original_autoload:raise ValueError('missing required autoload '+name)
@@ -72,6 +76,7 @@ def preview_project(original,main_scene):
         ('sensen','network/mobile_base_url'):json.dumps(OFFLINE_URL),
         ('application','run/main_scene'):json.dumps(main_scene),
         ('application','config/name'):json.dumps('Dynamic Farm 3D QA'),
+        ('application','config/icon'):json.dumps('res://'+ICON_PATH),
         ('application','config/use_custom_user_dir'):'true',
         ('application','config/custom_user_dir_name'):json.dumps(USER_DIR),
     }
@@ -95,6 +100,10 @@ def preview_preset(original,code):
         ('preset.0.options','package/name','"Dynamic Farm 3D QA"'),
         ('preset.0.options','version/code',str(code)),('preset.0.options','version/name','"0.0.1-dynamicqa"'),
         ('preset.0.options','user_data_backup/allow','false'),
+        ('preset.0.options','launcher_icons/main_192x192',json.dumps('res://'+ICON_PATH)),
+        ('preset.0.options','launcher_icons/adaptive_foreground_432x432',json.dumps('res://'+ICON_PATH)),
+        ('preset.0.options','launcher_icons/adaptive_background_432x432','""'),
+        ('preset.0.options','launcher_icons/adaptive_monochrome_432x432','""'),
     ]:rest=set_setting(rest,section,key,value)
     return rest
 
@@ -144,10 +153,11 @@ def prepare(repo,commit,output,main_scene,code,data_origin,client_sha):
             with tarfile.open(fileobj=archive,mode='r:') as tf:tf.extractall(stage,filter='data')
         # These writes happen before any engine/import process exists.
         (stage/'project.godot').write_text(project);(stage/'export_presets.cfg').write_text(preset)
+        icon=stage/ICON_PATH;icon.parent.mkdir(parents=True,exist_ok=True);icon.write_text(ICON_SVG)
         verify_preview((stage/'project.godot').read_text(),main_scene,parse_settings(original)['autoload'])
         receipt={'schema':1,'source_commit':commit,'source_base':BASE,'source_tree':subprocess.check_output(['git','-C',str(repo),'rev-parse',commit+'^{tree}'],text=True).strip(),
                  'package':PACKAGE,'version_code':code,'data_config_path':DATA_CONFIG,'data_config_sha256':sha(data_raw),'data_origin':data_origin,'dataset_version':DATASET,'client_manifest_sha256':client_sha,'original_project_sha256':sha(original.encode()),'prepared_project_sha256':sha(project.encode()),
-                 'export_presets_sha256':sha(preset.encode()),'net_source_sha256':sha(net.encode()),'native_five_sources':native,'settings_check':check,
+                 'export_presets_sha256':sha(preset.encode()),'qa_icon_path':ICON_PATH,'qa_icon_sha256':sha(ICON_SVG.encode()),'net_source_sha256':sha(net.encode()),'native_five_sources':native,'settings_check':check,
                  'engine_started':False,'native_template_prepared':False,'runtime_media_or_gameplay_tested':False,'reviewed':False}
         (stage/'.dynamic-farm-preview-prepared.json').write_text(json.dumps(receipt,indent=2)+'\n')
         if output.exists() or output.is_symlink():raise ValueError('output appeared concurrently')

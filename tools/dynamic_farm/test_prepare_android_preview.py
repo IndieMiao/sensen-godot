@@ -1,6 +1,6 @@
 from pathlib import Path
 import unittest,json
-from prepare_android_preview import preview_project,verify_preview,parse_settings,preview_preset,USER_DIR,verify_data_config,DATASET
+from prepare_android_preview import preview_project,verify_preview,parse_settings,preview_preset,USER_DIR,verify_data_config,DATASET,ICON_PATH,ICON_SVG,PACKAGE
 
 PROJECT='''config_version=5
 [application]
@@ -67,6 +67,18 @@ class PreviewGateChecks(unittest.TestCase):
         text,facts=preview_project(original,ENTRY)
         self.assertEqual(parse_settings(text)['autoload'],parse_settings(original)['autoload'])
         self.assertIn('Helper',facts['autoload_symbols'])
+    def test_distinct_icon_gate_and_launcher_references(self):
+        text,_=preview_project(PROJECT,ENTRY)
+        self.assertEqual(parse_settings(text)['application']['config/icon'],'"res://'+ICON_PATH+'"')
+        bad=text.replace('res://'+ICON_PATH,'res://icon.svg')
+        self.assertRaisesRegex(ValueError,'distinct QA icon',verify_preview,bad,ENTRY,parse_settings(PROJECT)['autoload'])
+        self.assertIn('3D QA',ICON_SVG)
+        self.assertNotIn(PACKAGE,['com.sensen.p0demo','com.sensen.geofarmdemo','com.sensen.journeypreview'])
+        preset='[preset.2]\nname="Android P0"\n[preset.2.options]\npackage/unique_name="com.sensen.p0demo"\n'
+        settings=parse_settings(preview_preset(preset,2026111901))['preset.0.options']
+        self.assertEqual(settings['launcher_icons/main_192x192'],'"res://'+ICON_PATH+'"')
+        self.assertEqual(settings['launcher_icons/adaptive_foreground_432x432'],'"res://'+ICON_PATH+'"')
+        self.assertEqual(settings['launcher_icons/adaptive_monochrome_432x432'],'""')
     def test_unique_isolated_export_preset(self):
         original='''[preset.2]
 name="Android P0"
