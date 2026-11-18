@@ -8,6 +8,8 @@ target = pathlib.Path(sys.argv[1]).resolve()
 if target == repo or repo in target.parents:
     raise SystemExit("Use a separate temporary project outside the repository")
 (target / "scenes").mkdir(parents=True, exist_ok=True)
+(target / "modules").mkdir(parents=True, exist_ok=True)
+shutil.copytree(repo / "modules/dynamic_farm", target / "modules/dynamic_farm", dirs_exist_ok=True)
 shutil.copytree(repo / "scenes/geo_farm_demo", target / "scenes/geo_farm_demo", dirs_exist_ok=True)
 (target / "tests/geo_farm_demo").mkdir(parents=True, exist_ok=True)
 for path in pathlib.Path(__file__).parent.glob("*.gd*"):

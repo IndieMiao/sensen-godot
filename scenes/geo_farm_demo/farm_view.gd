@@ -7,6 +7,7 @@ const BlockData = preload("res://scenes/geo_farm_demo/farm_block.gd")
 const INK := Color("243d32")
 const MUTED := Color("596b61")
 const NAMES := {"water": "Water", "residential": "Residential", "public": "Public", "green": "Green space", "mixed": "Mixed use", "commercial": "Commercial", "unknown": "Unknown", "path": "Path", "building": "House"}
+var _tag: Label
 var _title: Label
 var _stats: Label
 var _status: Label
@@ -42,8 +43,8 @@ func _build() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 6)
 	margins.add_child(column)
-	var tag := _label("SAN FRANCISCO · FARM DEMO", 12, MUTED)
-	column.add_child(tag)
+	_tag = _label("SAN FRANCISCO · FARM DEMO", 12, MUTED)
+	column.add_child(_tag)
 	_title = _label("Parcel farm", 22, INK)
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_title.max_lines_visible = 2
@@ -126,8 +127,11 @@ func _show_prepared(decoded: Dictionary) -> void:
 	var cells: Array = decoded.cells
 	var palette: Dictionary = decoded.palette
 	_title.text = decoded.address if not decoded.address.strip_edges().is_empty() else decoded.name
-	var area_label := "parcel area" if decoded.schema == 2 else "inset area"
+	_tag.text = "SAN FRANCISCO · DYNAMIC FARM" if decoded.schema == 4 else "SAN FRANCISCO · FARM DEMO"
+	var area_label := "parcel area" if decoded.schema in [2, 4] else "inset area"
 	_stats.text = "%d cells · %.0f m² %s" % [cells.size(), decoded.area_m2, area_label]
+	if decoded.schema == 4:
+		_stats.text = "Core %d · Extension %d\n%d cells total · %.0f m² parcel area" % [decoded.counts.core, decoded.counts.extension, cells.size(), decoded.area_m2]
 	if decoded.schema == 2:
 		_stats.text += "\nHouse %d · Yard %d · Water %d · Path %d" % [decoded.counts.house, decoded.counts.yard, decoded.counts.water, decoded.counts.path]
 	_grid.set_cells(cells, palette)
@@ -135,22 +139,27 @@ func _show_prepared(decoded: Dictionary) -> void:
 	var present := {}
 	for cell: Dictionary in cells:
 		present[cell.kind] = true
-	for kind: String in NAMES:
-		if not present.has(kind):
+	var legend_names: Dictionary = {"core": "Core", "extension": "Extension · Walk only"} if decoded.schema == 4 else NAMES
+	var legend_palette: Dictionary = GridView.ZONE_COLORS if decoded.schema == 4 else palette
+	for kind: String in legend_names:
+		if decoded.schema != 4 and not present.has(kind):
 			continue
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 5)
 		var swatch := ColorRect.new()
-		swatch.color = palette[kind]
+		swatch.color = legend_palette[kind]
 		swatch.custom_minimum_size = Vector2(12, 12)
 		swatch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(swatch)
-		row.add_child(_label(NAMES[kind], 12, MUTED))
+		row.add_child(_label(legend_names[kind], 12, MUTED))
 		_legend.add_child(row)
 	_status.text = "North ↑"
 	if decoded.schema == 2 and decoded.counts.house == 0:
 		_status.text = "North ↑\nHouse footprint not mapped"
 	_source.text = "Pinch to zoom · Drag to move\nDataSF / SF Planning · PDDL / CC0" if decoded.schema == 2 else "Mapped land use, not a ground survey.\nData: US Census / DataSF / SF Planning · PDDL / CC0"
+	if decoded.schema == 4:
+		_status.text = "Tap a zone"
+		_source.text = "Core: future farming and placement.\nExtension: walk only. DataSF / SF Planning."
 
 func _clear_legend() -> void:
 	for child in _legend.get_children():
@@ -158,7 +167,10 @@ func _clear_legend() -> void:
 		child.queue_free()
 
 func _on_cell_selected(kind: String) -> void:
-	_status.text = "North ↑ · " + str(NAMES.get(kind, "Unknown"))
+	if kind.begins_with("zone:"):
+		_status.text = "Core · Future editable area" if kind == "zone:core" else "Extension · Walk only"
+	else:
+		_status.text = "North ↑ · " + str(NAMES.get(kind, "Unknown"))
 
 func _label(text: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
