@@ -40,11 +40,15 @@ func digest(bytes: PackedByteArray) -> String:
 func _run() -> void:
 	var api := make_api([{ "result":HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR,"status":0}, {"result":0,"status":503}, success()])
 	var attempts: Array = []
+	var events: Array = []
+	api.diagnostic.connect(func(row: Dictionary): events.append(row))
 	api.attempt_finished.connect(func(row: Dictionary): attempts.append(row))
 	var result: Dictionary = await api.request("/client-manifest.json", digest('{"value":7}'.to_utf8_buffer()))
 	verify(result.get("value") == 7 and api.urls.size() == 3, "TLS then 503 recover within three total attempts with pin enforced")
 	verify(attempts.size() == 3 and attempts[0].retry and attempts[1].retry and not attempts[2].retry, "attempt evidence records transient decisions and final success")
 	verify(attempts[0].result == HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR and attempts[1].status == 503, "TLS result and HTTP status remain distinct")
+	verify(events.size() == 6 and events[0].phase == "start" and events[1].outcome == "tls" and events[3].outcome == "server", "diagnostics distinguish starting from TLS and HTTP outcomes")
+	verify(events.all(func(row: Dictionary): return row.elapsed_ms >= 0 and not row.has("url") and not row.has("body") and not row.has("path")), "diagnostics expose monotonic elapsed time without payload or location")
 	api.queue_free()
 	for path in ["/client-manifest.json", "/catalog.json", "/parcel-catalog.json", "/farms/p-4591A011*.json"]:
 		api = make_api([{ "result":HTTPRequest.RESULT_TIMEOUT,"status":0}, {"result":HTTPRequest.RESULT_CONNECTION_ERROR,"status":0}, {"result":0,"status":502}, success()])
@@ -83,8 +87,11 @@ func _run() -> void:
 	api = make_api([success(JSON.stringify(wrong_contract)), success(JSON.stringify(Fixture.manifest()))])
 	var controller := Controller.new(); controller.api = api; controller.bridge = Native.new()
 	controller.config = {"dataset_version":Fixture.C.DATASET,"base_url":"https://fixture.invalid","manifest_sha256":digest(JSON.stringify(wrong_contract).to_utf8_buffer())}
+	var validation: Array = []
+	controller.load_diagnostic.connect(func(row: Dictionary): validation.append(row))
 	root.add_child(controller); await controller.activate()
 	verify(api.urls.size() == 1 and not controller.map_ready and controller.message.contains("Could not load"), "a pinned but invalid manifest contract is rejected once by the real caller")
+	verify(validation.size() == 2 and validation[0].stage == "request" and validation[1].stage == "validation_rejected" and validation[1].elapsed_ms >= 0, "caller logs the contract gate separately from parsed HTTP success")
 	controller.queue_free(); await process_frame; api.queue_free()
 	api = make_api([{ "result":0,"status":503}, success()])
 	api.delay = 0.2

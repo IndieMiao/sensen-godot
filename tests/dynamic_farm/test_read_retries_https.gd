@@ -33,7 +33,11 @@ func _run() -> void:
 	verify(attempts.map(func(row: Dictionary): return row.status) == [503, 503, 200], "actual HTTP status evidence matches the server sequence")
 	var backoff_ms: int = attempts[0].delay_ms + attempts[1].delay_ms
 	verify(attempts[0].delay_ms >= 375 and attempts[0].delay_ms <= 625 and attempts[1].delay_ms >= 750 and attempts[1].delay_ms <= 1250 and Time.get_ticks_msec() - started >= backoff_ms - 60, "real HTTPS recovery waits through production exponential jitter intervals")
+	verify(attempts.all(func(row: Dictionary): return row.elapsed_ms >= 0), "actual HTTPS attempts carry elapsed milliseconds")
 	api.fast_backoff = true
+	for status in [401, 403, 404, 429]:
+		attempts.clear(); result = await api.request("/farms/p-short-%d.json" % status)
+		verify(attempts.size() == 1 and result.get("code") == "http" and attempts[0].status == status and attempts[0].result == HTTPRequest.RESULT_CHUNKED_BODY_SIZE_MISMATCH, "real short-body HTTP %d stays terminal with transport error preserved" % status)
 	attempts.clear(); result = await api.request("/parcel-catalog.json")
 	verify(result.get("code") == "http" and attempts.size() == 1 and attempts[0].status == 404, "private catalog 404 is terminal over actual HTTPS")
 	attempts.clear(); result = await api.request("/farms/p-hash.json", '{"value":"ok"}'.sha256_text())

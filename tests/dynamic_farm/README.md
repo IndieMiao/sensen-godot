@@ -96,3 +96,25 @@ window with owned-PID and private-adb cleanup.
 Q78 final same-source verification: cancellation reentry old 4/6 (two intended
 failures) → fixed 6/6; policy 47/47, actual loopback HTTPS 14/14 and selector
 26/26 passed again. Earlier rounds are not added to these totals.
+
+1904 follow-up: `test_retry_http_precedence.gd` uses the same eight cases against
+20ead and its replacement. Known 301/401/403/404/429 responses stay terminal even
+with a body-size mismatch; status 0/200/503 truncation retains the retry budget.
+The real TLS suite also sends short Content-Length bodies for four 4xx statuses.
+
+Diagnostic interpretation:
+- `DYNAMIC_LOAD request` means the real selector reached the API call; it is not a socket/server ACK.
+- `DYNAMIC_HTTP_ATTEMPT phase=start` means an HTTP attempt is about to be started.
+  `phase=result` contains the actual HTTPRequest result, HTTP status and setup error,
+  fixed outcome label, monotonic `elapsed_ms`, retry decision and backoff delay.
+  `cancelled` / `backoff_cancelled` retire old attempts without retrying.
+- `DYNAMIC_LOAD validation_accepted/validation_rejected` is the caller's contract
+  gate. Pair it with the preceding HTTP result: `json_received` followed by
+  rejection distinguishes schema/data mismatch from transport/hash/JSON errors.
+  `superseded` marks an old flow, and configuration/bridge rejection means no API call.
+- No URL, path, parcel, credentials, coordinates, headers or body are logged.
+  Local request sequence, resource category and selector epoch are correlation metadata.
+  Elapsed time is per HTTP attempt or caller load, not a claimed server duration.
+
+These logs cannot reconstruct absent HTTP evidence from the old Q76 APK. They
+also do not change Mapbox SDK MVT/TileJSON retries or prove device Surface behavior.

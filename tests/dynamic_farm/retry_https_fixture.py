@@ -19,6 +19,7 @@ lock = threading.Lock()
 
 
 class Handler(BaseHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
     def log_message(self, *_args):
         pass
 
@@ -27,6 +28,9 @@ class Handler(BaseHTTPRequestHandler):
             counts[self.path] += 1
             attempt = counts[self.path]
         status, body, delay = 200, b'{"value":"ok"}', 0
+        short = self.path.startswith('/farms/p-short-')
+        if short:
+            status = int(self.path.rsplit('-', 1)[1].split('.')[0])
         if self.path == '/client-manifest.json':
             status = 503 if attempt < 3 else 200
         elif self.path == '/parcel-catalog.json':
@@ -48,9 +52,15 @@ class Handler(BaseHTTPRequestHandler):
         try:
             self.send_response(status)
             self.send_header('Content-Type', 'application/json')
-            self.send_header('Content-Length', str(len(body)))
+            self.send_header('Content-Length', str(len(body) + (40 if short else 0)))
+            if short:
+                # Deliberately contradictory framing: a complete chunk stream whose
+                # decoded body is shorter than Content-Length. Keep TLS open so the
+                # engine reports its retained HTTP status, not a separate TLS EOF.
+                self.send_header('Transfer-Encoding', 'chunked')
             self.end_headers()
-            self.wfile.write(body)
+            self.wfile.write((('%x\r\n' % len(body)).encode() + body + b'\r\n0\r\n\r\n') if short else body)
+            self.wfile.flush()
         except (BrokenPipeError, ConnectionResetError, ssl.SSLError):
             pass  # Intentional cancelled/timeout clients.
 

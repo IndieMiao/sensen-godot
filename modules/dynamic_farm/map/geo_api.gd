@@ -1,6 +1,7 @@
 extends Node
 ## Read-only preview transport. No installation credentials, POST or production fallback.
 signal attempt_finished(details: Dictionary)
+signal diagnostic(details: Dictionary)
 const MAX_ATTEMPTS := 3 # Includes the initial request.
 const REQUEST_TIMEOUT_SECONDS := 12.0
 var base_url := ""
@@ -26,22 +27,57 @@ func request(path: String, expected_sha256 := "") -> Dictionary:
 	var limit := MAX_ATTEMPTS if _retry_resource(path) != "other" else 1
 	for attempt in range(1, limit + 1):
 		if epoch != _epoch: return {"ok":false,"code":"superseded"}
+		var started := Time.get_ticks_msec()
+		_record({"phase":"start", "request":request_id, "resource":_retry_resource(path), "attempt":attempt, "elapsed_ms":0})
+		if epoch != _epoch: return {"ok":false,"code":"superseded"}
 		var reply: Dictionary = await _perform_http_request(origin + path, epoch)
-		if epoch != _epoch or reply.get("cancelled", false): return {"ok":false,"code":"superseded"}
+		if epoch != _epoch or reply.get("cancelled", false):
+			_record({"phase":"cancelled", "request":request_id, "resource":_retry_resource(path), "attempt":attempt,
+				"elapsed_ms":Time.get_ticks_msec() - started})
+			return {"ok":false,"code":"superseded"}
 		var decoded := _decode_reply(reply, expected_sha256)
 		var retry: bool = decoded.retryable and attempt < limit
 		var delay := _retry_delay(attempt) if retry else 0.0
-		var details := {"request": request_id, "resource": _retry_resource(path), "attempt": attempt,
+		var details := {"phase":"result", "elapsed_ms":Time.get_ticks_msec() - started,
+			"outcome":_outcome(reply, decoded), "request": request_id, "resource": _retry_resource(path), "attempt": attempt,
 			"result": int(reply.get("result", -1)), "status": int(reply.get("status", 0)),
 			"start_error": int(reply.get("start_error", OK)),
 			"code": decoded.code, "retry": retry, "delay_ms": int(delay * 1000)}
 		# Bounded diagnostics: no URL, parcel ID, response body, credentials or coordinates.
-		print("DYNAMIC_HTTP_ATTEMPT ", JSON.stringify(details))
+		_record(details)
 		attempt_finished.emit(details.duplicate(true))
 		if epoch != _epoch: return {"ok":false,"code":"superseded"}
 		if not retry: return decoded.value
-		if not await _wait_backoff(delay, epoch): return {"ok":false,"code":"superseded"}
+		var backoff_started := Time.get_ticks_msec()
+		if not await _wait_backoff(delay, epoch):
+			_record({"phase":"backoff_cancelled", "request":request_id, "resource":_retry_resource(path), "attempt":attempt,
+				"elapsed_ms":Time.get_ticks_msec() - backoff_started})
+			return {"ok":false,"code":"superseded"}
 	return {"ok":false,"code":"network"}
+
+func _record(details: Dictionary) -> void:
+	print("DYNAMIC_HTTP_ATTEMPT ", JSON.stringify(details))
+	diagnostic.emit(details.duplicate(true))
+
+static func _outcome(reply: Dictionary, decoded: Dictionary) -> String:
+	# Fixed labels only. HTTP status and transport result are retained separately.
+	if decoded.code == "invalid_response":
+		match int(reply.get("result", -1)):
+			HTTPRequest.RESULT_SUCCESS: return "invalid_json"
+			HTTPRequest.RESULT_BODY_SIZE_LIMIT_EXCEEDED: return "body_limit"
+			HTTPRequest.RESULT_BODY_DECOMPRESS_FAILED: return "body_decode"
+			HTTPRequest.RESULT_REDIRECT_LIMIT_REACHED: return "redirect"
+		return "invalid_response"
+	if decoded.code != "network": return str(decoded.code)
+	match int(reply.get("result", -1)):
+		HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR: return "tls"
+		HTTPRequest.RESULT_TIMEOUT: return "timeout"
+		HTTPRequest.RESULT_CANT_RESOLVE: return "dns"
+		HTTPRequest.RESULT_CANT_CONNECT: return "connect"
+		HTTPRequest.RESULT_CONNECTION_ERROR: return "connection"
+		HTTPRequest.RESULT_NO_RESPONSE: return "no_response"
+		HTTPRequest.RESULT_CHUNKED_BODY_SIZE_MISMATCH: return "body_truncated"
+	return "connect" if reply.get("start_error") == ERR_CANT_CONNECT else "network"
 
 static func _retry_resource(path: String) -> String:
 	if path == "/client-manifest.json": return "client_manifest"
@@ -90,6 +126,9 @@ static func _failure(code: String, retryable: bool) -> Dictionary:
 static func _decode_reply(reply: Dictionary, expected_sha256: String) -> Dictionary:
 	if reply.has("start_error"):
 		return _failure("network" if reply.start_error == ERR_CANT_CONNECT else "request_setup", reply.start_error == ERR_CANT_CONNECT)
+	var status := int(reply.get("status", 0))
+	# A received permanent HTTP response wins over a truncated/error body.
+	if status >= 300 and status < 500: return _failure("http", false)
 	var result := int(reply.get("result", HTTPRequest.RESULT_REQUEST_FAILED))
 	if result != HTTPRequest.RESULT_SUCCESS:
 		var transient := result in [HTTPRequest.RESULT_CHUNKED_BODY_SIZE_MISMATCH,
@@ -97,7 +136,6 @@ static func _decode_reply(reply: Dictionary, expected_sha256: String) -> Diction
 			HTTPRequest.RESULT_CONNECTION_ERROR, HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR,
 			HTTPRequest.RESULT_NO_RESPONSE, HTTPRequest.RESULT_TIMEOUT]
 		return _failure("network" if transient else "invalid_response", transient)
-	var status := int(reply.get("status", 0))
 	if status >= 500 and status <= 599: return _failure("server", true)
 	if status != 200: return _failure("http", false)
 	var bytes: PackedByteArray = reply.get("body", PackedByteArray())

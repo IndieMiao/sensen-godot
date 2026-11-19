@@ -3,6 +3,7 @@ extends Node
 signal changed
 signal candidates_found(rows: Array)
 signal farm_ready(farm: Dictionary)
+signal load_diagnostic(details: Dictionary)
 const Contract := preload("res://modules/dynamic_farm/map/geo_contract.gd")
 const MapConfig := preload("res://modules/dynamic_farm/map/geo_map_config.gd")
 const Metadata := preload("res://modules/dynamic_farm/map/parcel_metadata.gd")
@@ -33,7 +34,9 @@ func activate() -> void:
 	suspended = false
 	_epoch += 1
 	var epoch := _epoch
+	var started := Time.get_ticks_msec()
 	if api == null or bridge == null or not bridge.supports_parcels():
+		_record_load("client_manifest", "bridge_unavailable", epoch, started)
 		_fail("This preview needs the Android parcel map."); return
 	if not _connected:
 		bridge.parcel_ready.connect(_native_ready)
@@ -44,13 +47,18 @@ func activate() -> void:
 	message = "Loading dynamic farm map…"; changed.emit()
 	var pin := str(config.get("manifest_sha256", ""))
 	if RegEx.create_from_string("^[0-9a-f]{64}$").search(pin) == null or config.get("dataset_version") != Contract.DATASET:
+		_record_load("client_manifest", "configuration_rejected", epoch, started)
 		_fail("This preview service is not configured."); return
 	api.base_url = str(config.get("base_url", ""))
+	_record_load("client_manifest", "request", epoch, started)
 	var data: Dictionary = await api.request("/client-manifest.json", pin)
-	if epoch != _epoch or suspended: return
+	if epoch != _epoch or suspended:
+		_record_load("client_manifest", "superseded", epoch, started); return
 	var native := MapConfig.build(data, api.base_url, config)
 	if not Contract.envelope(data) or native.is_empty():
+		_record_load("client_manifest", "validation_rejected", epoch, started)
 		_fail("Could not load this farm map. Tap Retry."); return
+	_record_load("client_manifest", "validation_accepted", epoch, started)
 	manifest = data
 	if generation > 0: bridge.clear_parcel_layers(generation)
 	generation = MapBridge.next_parcel_generation(); style_generation = -1
@@ -144,12 +152,23 @@ func open_farm() -> void:
 	var id := str(selection.block_id)
 	var epoch := _epoch
 	busy = true; message = "Loading dynamic farm…"; changed.emit()
+	var started := Time.get_ticks_msec()
+	_record_load("farm", "request", epoch, started)
 	var farm: Dictionary = await api.request(Contract.farm_path(id))
-	if epoch != _epoch or suspended: return
+	if epoch != _epoch or suspended:
+		_record_load("farm", "superseded", epoch, started); return
 	busy = false
 	if not Contract.farm_matches(farm, id) or FarmData.decode(farm).get("ok") != true:
+		_record_load("farm", "validation_rejected", epoch, started)
 		_fail("This farm could not load. Please try again."); return
+	_record_load("farm", "validation_accepted", epoch, started)
 	farm_ready.emit(farm)
+
+func _record_load(resource: String, stage: String, epoch: int, started: int) -> void:
+	# validation_rejected is the caller gate, not a transport-cause claim. Read the preceding HTTP outcome.
+	var row := {"resource":resource, "stage":stage, "epoch":epoch, "elapsed_ms":Time.get_ticks_msec() - started}
+	print("DYNAMIC_LOAD ", JSON.stringify(row))
+	load_diagnostic.emit(row.duplicate(true))
 
 func _process(delta: float) -> void:
 	if _pending < 0: return
