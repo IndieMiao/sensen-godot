@@ -77,7 +77,9 @@ and caller contract rejection are terminal. No response-body field can enable
 retries. Exhaustion returns to the existing error/Retry UI.
 
 Pause/cancel retires the epoch, cancels active HTTPRequests and wakes/stops
-backoff timers; a cancelled chain cannot send another attempt. Retries retain
+backoff timers; a cancelled chain cannot send another attempt. Both old request
+and timer lists are captured before callbacks wake, so reentrant replacements
+are not cancelled with the retired cohort. Retries retain
 the original origin/path/pin. DYNAMIC_HTTP_ATTEMPT emits only local request ID,
 resource category, attempt, actual HTTPRequest result/status/setup error and
 retry delay/decision, never full paths, response bodies, credentials or location.
@@ -90,3 +92,7 @@ never disables verification. test_selection_controller.gd 26/26 retained.
 These do not establish public Quick Tunnel or device reliability. The fixture
 and all tests remain outside the APK; run only in a new registered resource
 window with owned-PID and private-adb cleanup.
+
+Q78 final same-source verification: cancellation reentry old 4/6 (two intended
+failures) → fixed 6/6; policy 47/47, actual loopback HTTPS 14/14 and selector
+26/26 passed again. Earlier rounds are not added to these totals.

@@ -113,13 +113,13 @@ static func _decode_reply(reply: Dictionary, expected_sha256: String) -> Diction
 func cancel_all() -> void:
 	_epoch += 1
 	var timers := _backoffs.duplicate()
+	var requests := _active.duplicate()
 	_backoffs.clear()
+	_active.clear()
 	for timer in timers:
 		if not is_instance_valid(timer): continue
 		timer.stop()
 		timer.timeout.emit()
-	var requests := _active.duplicate()
-	_active.clear()
 	for http in requests:
 		if not is_instance_valid(http): continue
 		http.cancel_request()
