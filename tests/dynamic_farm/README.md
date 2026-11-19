@@ -61,3 +61,32 @@ deadline cleanup. The tests use a fake scene or fake native/transport API:
 
 Real r4 HTTPS, transparent Mapbox picking, UI/3D screenshot review, navigation,
 performance and phone input remain distinct verification steps.
+
+## 1904 read retries
+
+The demo read API allows three total attempts (including the first) for
+client-manifest, catalog-shaped JSON paths and individual farms. The current
+client does not download the full catalog; the server's private catalog still
+returns 404, which is never retried. Existing origins and SHA pins stay fixed.
+
+Only connection/DNS/TLS/no-response/timeout/truncated transport failures and
+HTTP 5xx retry. The two delays are 0.5 and 1 second multiplied by independent
+0.75–1.25 jitter. Each request retains its 12-second timeout and 2 MiB limit.
+Other HTTP codes, redirect/size/decode failures, hash mismatch, malformed JSON
+and caller contract rejection are terminal. No response-body field can enable
+retries. Exhaustion returns to the existing error/Retry UI.
+
+Pause/cancel retires the epoch, cancels active HTTPRequests and wakes/stops
+backoff timers; a cancelled chain cannot send another attempt. Retries retain
+the original origin/path/pin. DYNAMIC_HTTP_ATTEMPT emits only local request ID,
+resource category, attempt, actual HTTPRequest result/status/setup error and
+retry delay/decision, never full paths, response bodies, credentials or location.
+A JSON transport success is not logged as a domain-contract success.
+
+Q77: test_read_retries.gd 47/47; test_read_retries_https.gd 14/14 using a
+loopback-only TLS fixture and a fixture-specific CA, including real production
+backoff timing. An unrelated CA intentionally produces three TLS errors and
+never disables verification. test_selection_controller.gd 26/26 retained.
+These do not establish public Quick Tunnel or device reliability. The fixture
+and all tests remain outside the APK; run only in a new registered resource
+window with owned-PID and private-adb cleanup.
