@@ -1,0 +1,340 @@
+{
+  "purpose": "Cardigan cutover preservation only; no execution/deployment",
+  "files": [
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/499-r4-data-review.md",
+      "snapshot": "499-r4-data-review.md",
+      "sha256": "5d0f4236277909c445627005914f8c7dd457f156bc3af8c1d1b55bce63ea4109"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/HOUYI-V1-VISUAL-EXCEPTION-DRAFT.md",
+      "snapshot": "HOUYI-V1-VISUAL-EXCEPTION-DRAFT.md",
+      "sha256": "986cc69f26b56225e792acc02e5dbb77aa239e79c0d015266c59254d5b01c6cc"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/REPRODUCE-r4.md",
+      "snapshot": "REPRODUCE-r4.md",
+      "sha256": "66105fbd67ad8e7ed8504ed101496999bfd16d96f34a16c3b5679957f80bf2cc"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/REQ-1118.md",
+      "snapshot": "REQ-1118.md",
+      "sha256": "de9c9ae9bc29621913b5927e2310cdc814d203b0a693fc82206bc051eb1f2d65"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/REVIEW-FIXES-r2.md",
+      "snapshot": "REVIEW-FIXES-r2.md",
+      "sha256": "644bd8892f60cb10be9d7dbde1e7121bea17d7fbadeb0c721e7cbf23c970f530"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/REVIEW-FIXES-r3.md",
+      "snapshot": "REVIEW-FIXES-r3.md",
+      "sha256": "96be07f59b56bd601ba145ea8aa91c07dbb94232bd8e16790d291cb3c847b82b"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/SCHEMA-r4.md",
+      "snapshot": "SCHEMA-r4.md",
+      "sha256": "9635307c7908ce6e4989a32c1e36f80e16a9d283114c1b262cdf462258dc0ef0"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/V1-LOWER-BANK-EXCEPTION-CONSOLIDATED-DRAFT.md",
+      "snapshot": "V1-LOWER-BANK-EXCEPTION-CONSOLIDATED-DRAFT.md",
+      "sha256": "8e31d4bc3458355498d7817d7df6ac449d2bdeaab76f34931069ebff9ed7cb9f"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/499-r4-data-review.md",
+      "snapshot": "binding-r5/499-r4-data-review.md",
+      "sha256": "6ccffddc20dbfb5d70195a4d384284775c8092adf62d96c348a7316d96b3e64f"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/BINDING-FIX-r5.md",
+      "snapshot": "binding-r5/BINDING-FIX-r5.md",
+      "sha256": "88fad9f4415cfbde0152cd6a91186ebcf7a08b198c1ca3b142c66e44c6aee6cb"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/approved-delivery.json",
+      "snapshot": "binding-r5/approved-delivery.json",
+      "sha256": "e7a319ec7ded7464a09d18fb0dadd16a05bb302e454b675f8bed47560aed6996"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/binding-input.json",
+      "snapshot": "binding-r5/binding-input.json",
+      "sha256": "0d1048edd672045e05cc8dd85e209f2bcd75caf94342fc7721ea5efc06e7fb42"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/delivery-hashes.json",
+      "snapshot": "binding-r5/delivery-hashes.json",
+      "sha256": "9eb6c7301563583a51a6c4b51f12f3b46fd6869c0c91ac38b329be2bb9a0df88"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/archive_review.py",
+      "snapshot": "binding-r5/tools/archive_review.py",
+      "sha256": "4bf4914c1e0bf2ec3a9e6eaee1e3584ee4f719ed4d8bed6378fc4b47d5f68de6"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/archive_static.py",
+      "snapshot": "binding-r5/tools/archive_static.py",
+      "sha256": "1786c3c6017120d60feafb8d258ffda8b2f0308375e2c5ab9ef46c57e00983f5"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/assemble_city.py",
+      "snapshot": "binding-r5/tools/assemble_city.py",
+      "sha256": "160ec8a7dd7bf274b9056de3390ae5f1164e8ba91b33ef0ef6511951d113e27a"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/audit_binding.py",
+      "snapshot": "binding-r5/tools/audit_binding.py",
+      "sha256": "ce574ae8cbb47034d126dd541bf046bc4019503b9237ccf6c2a5cdda6ed38dbc"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/audit_source_geometry.py",
+      "snapshot": "binding-r5/tools/audit_source_geometry.py",
+      "sha256": "6180b34716d667164781b90189b85fb6aa033bebaab9131841446638d9b99608"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/benchmark.py",
+      "snapshot": "binding-r5/tools/benchmark.py",
+      "sha256": "113dc77251e0afe996abbf7aecc707e4c876f7a133f0263ea8f35c0c251f808b"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/export_validate_tiles.py",
+      "snapshot": "binding-r5/tools/export_validate_tiles.py",
+      "sha256": "a479d7c6243a3bca1bfb25fd7c470e0dc4f6dfc54b9757d2195be54fd57d9bae"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/finalize_city.py",
+      "snapshot": "binding-r5/tools/finalize_city.py",
+      "sha256": "2489066eb6b5eb5cb832dcc45a3811ee37cc259a9b47f073504f2b38d3cdcd13"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/generate_shard.py",
+      "snapshot": "binding-r5/tools/generate_shard.py",
+      "sha256": "d11f58e7204bbda325ffdbe018eb63c42c0e7b07cea1ef9a6b071de879349fe6"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/generator.py",
+      "snapshot": "binding-r5/tools/generator.py",
+      "sha256": "5b6952a760d34c3c608c6f8034ed4f5b639512c5f7a133089bfcc59f0bac2130"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/make_samples.py",
+      "snapshot": "binding-r5/tools/make_samples.py",
+      "sha256": "46b3353664b3489ae8e0de115b97c8e80bdc0461dc016bac7b0fb0d3302d3565"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/package_samples.py",
+      "snapshot": "binding-r5/tools/package_samples.py",
+      "sha256": "41fb6edde1ab004aa80c8d7771a9e31c424b33f41a573bcbc0f9284d4db5eb28"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/prepare_binding_copy.py",
+      "snapshot": "binding-r5/tools/prepare_binding_copy.py",
+      "sha256": "7efe86505604a3b2b8b19b15dae2ae89bf4a8ad45d1bef0ba267c86b85fa7862"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/prepare_source.py",
+      "snapshot": "binding-r5/tools/prepare_source.py",
+      "sha256": "76bfa469145494c77eb4999982444f2c3009d1e6683098925cdef288c686be53"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/reconcile_topology.py",
+      "snapshot": "binding-r5/tools/reconcile_topology.py",
+      "sha256": "7723e52ac1c1a7f1bba30bc6a3e0a5a508ad1b06e23d9bde30b554bc292c96fc"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/run_binding_pipeline.py",
+      "snapshot": "binding-r5/tools/run_binding_pipeline.py",
+      "sha256": "5d6182b77ec52146da774ebaea97f42b69aea1ee9cfb0bd4dbbd0e6abad91a88"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/run_city.py",
+      "snapshot": "binding-r5/tools/run_city.py",
+      "sha256": "8f314c275929a1c251dcb2cf590e1175c345e40ce51feaccb9c53e5863c3fca7"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/run_mvt.py",
+      "snapshot": "binding-r5/tools/run_mvt.py",
+      "sha256": "39b11e8bab541286f70fbcea172778606f7080f71d5519d56c389004bf00607c"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/run_package.py",
+      "snapshot": "binding-r5/tools/run_package.py",
+      "sha256": "d5d5cccee23f89474bebff56f28df858323821620034c395abfb2e06c36c2c69"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/run_source_audit.py",
+      "snapshot": "binding-r5/tools/run_source_audit.py",
+      "sha256": "e04d44a850dbb3208a8ca64ac8a1a1120d16adb9cc37057889b2f01b5be2ce3f"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/source_manifest.py",
+      "snapshot": "binding-r5/tools/source_manifest.py",
+      "sha256": "26b4052dfbd11ab758908943d95e4bed71f1e6986ffe69418b25e2e45f371376"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/test_audit_binding.py",
+      "snapshot": "binding-r5/tools/test_audit_binding.py",
+      "sha256": "264f49ac0be54924c5c1fb3184adb88c18c4554d7770d9c1009e4d9c6e9856ff"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/test_hole_parent.py",
+      "snapshot": "binding-r5/tools/test_hole_parent.py",
+      "sha256": "f299cd676250a37683d8cafd71e86220f9634ddd066722b5d0004962f2be75df"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/test_review_fixes.py",
+      "snapshot": "binding-r5/tools/test_review_fixes.py",
+      "sha256": "45abe7fe7744c461db95ac260fcd9f661baadefd0bcd0eb46333e9dd06fc0804"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/test_single_source_fragments.py",
+      "snapshot": "binding-r5/tools/test_single_source_fragments.py",
+      "sha256": "72b58430b77d874dc692748873c72f8eef917783e34ab606cc234594abb2df9d"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/test_source_audit.py",
+      "snapshot": "binding-r5/tools/test_source_audit.py",
+      "sha256": "2118a539f5d6349b3bbae802f4702a0ed7e89de4d78e208a65a2894a8e00dabc"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/validate_farm.py",
+      "snapshot": "binding-r5/tools/validate_farm.py",
+      "sha256": "2f5f43e2ebfdb23c5e0ad32a7dc76f59b24173922c3d487ccb1cbc5dcdf6cc5f"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/verify_inventory.mjs",
+      "snapshot": "binding-r5/tools/verify_inventory.mjs",
+      "sha256": "ea3e28819cf8309fd741b01e509482c6ce6368e661eefe6f1522004a2e30e7b3"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/binding-r5/tools/write_data_report.py",
+      "snapshot": "binding-r5/tools/write_data_report.py",
+      "sha256": "d201d791fa884759bc36b5167ddd1e7777c85c60eac49b8e8aefd9878d87ab10"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/archive_review.py",
+      "snapshot": "tools/archive_review.py",
+      "sha256": "3da52006e6c409ea3f18a343b3f13a1381e10e62b091a80846d1645f17f432c3"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/archive_static.py",
+      "snapshot": "tools/archive_static.py",
+      "sha256": "1786c3c6017120d60feafb8d258ffda8b2f0308375e2c5ab9ef46c57e00983f5"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/assemble_city.py",
+      "snapshot": "tools/assemble_city.py",
+      "sha256": "160ec8a7dd7bf274b9056de3390ae5f1164e8ba91b33ef0ef6511951d113e27a"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/audit_source_geometry.py",
+      "snapshot": "tools/audit_source_geometry.py",
+      "sha256": "bb0f149589c04de347a437ba8cd7b15b10d3c315686e3c0156f84ba2fe905b41"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/benchmark.py",
+      "snapshot": "tools/benchmark.py",
+      "sha256": "113dc77251e0afe996abbf7aecc707e4c876f7a133f0263ea8f35c0c251f808b"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/export_validate_tiles.py",
+      "snapshot": "tools/export_validate_tiles.py",
+      "sha256": "a479d7c6243a3bca1bfb25fd7c470e0dc4f6dfc54b9757d2195be54fd57d9bae"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/finalize_city.py",
+      "snapshot": "tools/finalize_city.py",
+      "sha256": "0a208a08cdd7d6a5299d56c8aef503620d6f0cea60afebc215f0a62d9a2c9fea"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/generate_shard.py",
+      "snapshot": "tools/generate_shard.py",
+      "sha256": "d11f58e7204bbda325ffdbe018eb63c42c0e7b07cea1ef9a6b071de879349fe6"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/generator.py",
+      "snapshot": "tools/generator.py",
+      "sha256": "5b6952a760d34c3c608c6f8034ed4f5b639512c5f7a133089bfcc59f0bac2130"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/make_samples.py",
+      "snapshot": "tools/make_samples.py",
+      "sha256": "46b3353664b3489ae8e0de115b97c8e80bdc0461dc016bac7b0fb0d3302d3565"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/package_samples.py",
+      "snapshot": "tools/package_samples.py",
+      "sha256": "41fb6edde1ab004aa80c8d7771a9e31c424b33f41a573bcbc0f9284d4db5eb28"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/prepare_source.py",
+      "snapshot": "tools/prepare_source.py",
+      "sha256": "76bfa469145494c77eb4999982444f2c3009d1e6683098925cdef288c686be53"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/reconcile_topology.py",
+      "snapshot": "tools/reconcile_topology.py",
+      "sha256": "7723e52ac1c1a7f1bba30bc6a3e0a5a508ad1b06e23d9bde30b554bc292c96fc"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/run_city.py",
+      "snapshot": "tools/run_city.py",
+      "sha256": "8f314c275929a1c251dcb2cf590e1175c345e40ce51feaccb9c53e5863c3fca7"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/run_mvt.py",
+      "snapshot": "tools/run_mvt.py",
+      "sha256": "39b11e8bab541286f70fbcea172778606f7080f71d5519d56c389004bf00607c"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/run_package.py",
+      "snapshot": "tools/run_package.py",
+      "sha256": "d5d5cccee23f89474bebff56f28df858323821620034c395abfb2e06c36c2c69"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/run_source_audit.py",
+      "snapshot": "tools/run_source_audit.py",
+      "sha256": "e604e44e1b43c4cd65a8df3a3a56062d6519479a5873d604056f4573f5d42c4b"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/source_manifest.py",
+      "snapshot": "tools/source_manifest.py",
+      "sha256": "26b4052dfbd11ab758908943d95e4bed71f1e6986ffe69418b25e2e45f371376"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/test_hole_parent.py",
+      "snapshot": "tools/test_hole_parent.py",
+      "sha256": "f299cd676250a37683d8cafd71e86220f9634ddd066722b5d0004962f2be75df"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/test_review_fixes.py",
+      "snapshot": "tools/test_review_fixes.py",
+      "sha256": "45abe7fe7744c461db95ac260fcd9f661baadefd0bcd0eb46333e9dd06fc0804"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/test_single_source_fragments.py",
+      "snapshot": "tools/test_single_source_fragments.py",
+      "sha256": "72b58430b77d874dc692748873c72f8eef917783e34ab606cc234594abb2df9d"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/test_source_audit.py",
+      "snapshot": "tools/test_source_audit.py",
+      "sha256": "2118a539f5d6349b3bbae802f4702a0ed7e89de4d78e208a65a2894a8e00dabc"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/validate_farm.py",
+      "snapshot": "tools/validate_farm.py",
+      "sha256": "2f5f43e2ebfdb23c5e0ad32a7dc76f59b24173922c3d487ccb1cbc5dcdf6cc5f"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/verify_inventory.mjs",
+      "snapshot": "tools/verify_inventory.mjs",
+      "sha256": "ea3e28819cf8309fd741b01e509482c6ce6368e661eefe6f1522004a2e30e7b3"
+    },
+    {
+      "source": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/tools/write_data_report.py",
+      "snapshot": "tools/write_data_report.py",
+      "sha256": "63ebbc755d0bc4880b5e93b15ea5ba3ba34c303becd4c9d7860ec3cc322c42b9"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "dataset_version": "sf-dynamic-farm-20261118-r4",
+  "static_root": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/generated",
+  "archive": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/sf-dynamic-farm-20261118-r4-static.tar.gz",
+  "archive_bytes": 286698050,
+  "archive_sha256": "28b1e43028140f541a29231ea4cffd727df71c003dc5a3faf2ca059e704fd89f",
+  "author_manifest_sha256": "45f41b83b31c9a77fec4ea9c98e4b68912d6d3a8423125bf3869dc91b5807536",
+  "client_manifest_sha256": "53668b027feab0d13584e1416299e63cc17e347a22bf57aea2ba76d82a678abc",
+  "parcel_count": 154528,
+  "file_count": 166221,
+  "all_archive_member_hashes_verified": true,
+  "seconds": 61.32529562502168,
+  "reviewed": false,
+  "review_boundary": "author artifact only; reviewer approval must cite these pins; no deployment or phone/UI claims",
+  "review_root": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/review-final",
+  "review_archive": "/Volumes/ACASIS/tmp/geo-farm-demo-1117/dynamic-farm/sf-dynamic-farm-20261118-r4-review.zip",
+  "review_archive_sha256": "291379053558f6fd952a52e3ae490e8e8607477cc305256dbd41db370b8ec5c6",
+  "review_archive_bytes": 23129307,
+  "review_manifest_sha256": "81c74b2dbe5129596a649ffdfd0d377732f2249919a3831ecf5c7a8f779cb2f4",
+  "review_files": 99,
+  "review_archive_members_hash_verified": true
+}
