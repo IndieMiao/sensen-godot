@@ -44,4 +44,19 @@ describe('city gathering points (src/p0/gather_points.ts)', () => {
     expect(tokyo.city.gather.map((p: { name: string }) => p.name)).toEqual(['Plum Rocks']);
     await app.close();
   });
+
+  it('U2: a client that says pond_guide gets no town points, and gathering one is bad_spot; an older one keeps them (奕星, a)', async () => {
+    const c = loadP0Content(); content = c;
+    useGatherCatalogue(c, gatherCatalogueOf(c, table(c, [[SF, 'wood', 0, 37.76, -122.43, 'Badger']])));
+    const app = Fastify();
+    registerP0Routes(app, { content: c, store: new P0Store(c), now: () => T, dev: false });
+    const old = { 'x-p0-player': 'gather-route-u2' }, ponds = { ...old, 'x-p0-features': 'guide_v3,wing8,pond_guide' };
+    expect((await app.inject({ method: 'GET', url: `/v1/p0/city/${SF}`, headers: ponds })).json().city.gather).toEqual([]);
+    expect((await app.inject({ method: 'GET', url: `/v1/p0/city/${SF}`, headers: old })).json().city.gather).toHaveLength(1);
+    const gather = (headers: Record<string, string>) => app.inject({ method: 'POST', url: '/v1/p0/commands', headers,
+      payload: { type: 'gather', spot: `${SF}~wood0`, space: 'home' } }).then(r => r.json());
+    expect(await gather(ponds)).toMatchObject({ ok: false, code: 'bad_spot' });
+    expect(await gather(old)).toMatchObject({ ok: true });
+    await app.close();
+  });
 });

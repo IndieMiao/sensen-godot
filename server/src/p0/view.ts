@@ -41,7 +41,7 @@ import { isWild, near3Sites, siteFor, wildById, wildNear3 } from './wild.js';
 
 /** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
  * answer; null when not known. */
-export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean; wing8?: boolean; yard2?: boolean } = {}) {
+export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean; wing8?: boolean; yard2?: boolean; pond_guide?: boolean } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
@@ -68,11 +68,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     coins: s.coins,
     inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
-    map_markers: mapMarkers(c, s, now, { locals: opts.locals ?? true }),
+    map_markers: mapMarkers(c, s, now, { locals: opts.locals ?? true, pond_guide: !!opts.pond_guide }),
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
     blackjack: blackjackView(c, s, now),   // SGODOT-351 the card room's table: the gate, the hand in play, a result not yet seen
-    guide: guideView(c, s, now),   // SGODOT-341: the new-player guide's step (or the recover entry to show), {step: null, end} when off
+    guide: guideView(c, s, now, !!opts.pond_guide),   // SGODOT-341: the new-player guide's step (or the recover entry to show), {step: null, end} when off
     home: homeView(c, s, now),   // SGODOT-303: home city, pending pick, home set, the free change's window (home_city.ts)
     // v4q(3) (contract-c §5): the free 3 wild sites, and the one the player is at with all its fields (null elsewhere);
     // near3_sites the same 3 with their type, main and name, for Today's vein row (v4q(9))

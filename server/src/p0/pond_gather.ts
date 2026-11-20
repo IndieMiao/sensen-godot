@@ -12,7 +12,8 @@
  *     Hardwood, Herb) never on a `low_only` slot nor where it `blocks` a chosen one, a slot with `pieces` only those.
  *     Tried in an order of the pond's own hash, so each pond has its own layout ("每个空间适当有变化").
  * A point's id is `<pond id>#<slot>`; gathering one needs the player in that pond (gathering.ts). The town's points
- * (gather_points.ts) stay as they were until the client leaves them.
+ * (gather_points.ts) are gone for a client that says `pond_guide` (U2), kept for an older one; their table stays, as it
+ * gives each city's counts here.
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';

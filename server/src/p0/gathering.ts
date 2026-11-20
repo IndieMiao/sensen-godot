@@ -31,14 +31,16 @@ export function carried(c: P0Content, s: P0State, id: string): boolean {
 
 /** The gather command: a pond's point (`<pond>#<slot>`, SGODOT-409) or a city's point by id; anything else (a farm
  * spot's old id too) is bad_spot. A pond's point is gathered in that pond: the player's place (presence.place, set by
- * the entry read and the command's own space / place, pond and pass checked) is that pond, else not_here. */
-export function gather(c: P0Content, s: P0State, cmd: { spot?: unknown; space?: string }, now: number, events: P0Event[]): Refusal | null {
+ * the entry read and the command's own space / place, pond and pass checked) is that pond, else not_here.
+ * U2 (the user, bot 613 / 614: the town's points go): for a client that gathers in the ponds alone (`ponds`, feature
+ * `pond_guide`) a city's point is bad_spot too; an older one keeps them (奕星, a), as the city read keeps sending them. */
+export function gather(c: P0Content, s: P0State, cmd: { spot?: unknown; space?: string }, now: number, events: P0Event[], ponds = false): Refusal | null {
   const inPond = pondPointById(c, cmd.spot);
   if (inPond) {
     if (s.presence.place !== inPond.pond) return { code: 'not_here', detail: { pond: inPond.pond } };
     return collect(c, s, inPond, false, now, events);
   }
-  const point = gatherPointById(c, cmd.spot);
+  const point = ponds ? undefined : gatherPointById(c, cmd.spot);
   return point ? gatherPoint(c, s, point, cmd.space, now, events) : { code: 'bad_spot' };
 }
 
@@ -116,16 +118,17 @@ export function gatherView(c: P0Content, s: P0State, now: number) {
  * they give, how long until ready (0: now) and the whole cooldown (cooldown_h, hours: how far a point has grown back,
  * 不知火舞's gather-compact spec v1, 亚瑟) — or null out of a pond; the client draws them from this alone.
  * ponds: every pond of the home city and of the city the player is in, in or out of one: its name and its points' id,
- * kind and ready_in (亚瑟's map and Today: the source line's nearest ready pond, its pin's Show, the pond card's kinds). */
+ * kind, item (what it gives first: a reed bank's fiber; U2, 亚瑟) and ready_in (亚瑟's map and Today: the source line's
+ * nearest ready pond, its pin's Show, the pond card's kinds). */
 function pondView(c: P0Content, s: P0State, now: number) {
   const ready = (id: string) => Math.max(0, (s.gather.ready_at[id] ?? 0) - now);
   const here = s.presence.place, inPond = here ? pondPoints(c, here) : [];
   const pond = here && inPond.length ? { pond: here, shape: pondShape(c, here), points: inPond.map(p => ({ id: p.id, slot: p.slot, kind: p.kind,
     name: p.name, yield: p.yield, energy: p.energy, x: p.x, z: p.z, stand: p.stand, ready_in: ready(p.id), cooldown_h: p.cooldown_h })) } : null;
-  const ponds: Record<string, { name: string; cluster: string; points: { id: string; kind: string; ready_in: number }[] }> = {};
+  const ponds: Record<string, { name: string; cluster: string; points: { id: string; kind: string; item: string; ready_in: number }[] }> = {};
   for (const cluster of new Set([s.travel.home, s.travel.here])) {
     for (const [id, pts] of cityPondPoints(c, cluster)) {
-      ponds[id] = { name: pondName(c, id), cluster, points: pts.map(p => ({ id: p.id, kind: p.kind, ready_in: ready(p.id) })) };
+      ponds[id] = { name: pondName(c, id), cluster, points: pts.map(p => ({ id: p.id, kind: p.kind, item: p.yield[0][0], ready_in: ready(p.id) })) };
     }
   }
   return { pond, ponds };

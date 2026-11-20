@@ -97,8 +97,10 @@ const fail = (code: string, detail?: Record<string, unknown>): P0Result => ({ ok
 
 /** opts.wing8: the client draws Lv8's Kitchen Wing (feature `wing8`, q(303)): its cells are the house's from Lv8 and an
  * upgrade into it waits until they are clear (SGODOT-450). opts.yard2: yard v2 (feature `yard2`, v4q(12)): decor.yard's
- * paths2 kept clear too. */
-export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: number, opts: YardFeatures = {}): P0Result {
+ * paths2 kept clear too.
+ * opts.pond_guide: the client gathers in the ponds alone (feature `pond_guide`, U2): a town point is bad_spot, and S6a's
+ * point is the beginner pond's (guide.gatherTarget). */
+export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: number, opts: YardFeatures & { pond_guide?: boolean } = {}): P0Result {
   const yard: YardFeatures = { wing8: !!opts.wing8, yard2: !!opts.yard2 };
   if (cmd.expect_seq !== undefined && cmd.expect_seq !== input.seq) {
     return fail('stale_state', { seq: input.seq, expected: cmd.expect_seq });
@@ -401,7 +403,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'gather': case 'craft': {
-      const refusal = cmd.type === 'gather' ? gather(c, s, cmd, now, events) : craft(c, s, cmd, events);
+      const refusal = cmd.type === 'gather' ? gather(c, s, cmd, now, events, !!opts.pond_guide) : craft(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
@@ -490,7 +492,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in
   pruneGather(s, now);   // 396 ④: a cooldown gone by goes from the save
   noteProgress(c, s, counted, events);   // q(134): `Fresh Greens 3/5`, the one that fills it `done`
-  settleGuide(c, s, guideKeys(c, input, s, cmd, events), now, events);   // SGODOT-341: what this command did, against the guide's steps
+  settleGuide(c, s, guideKeys(c, input, s, cmd, events), now, events, !!opts.pond_guide);   // SGODOT-341: what this command did, against the guide's steps
   s.seq += 1;
   return { ok: true, state: s, events };
 }

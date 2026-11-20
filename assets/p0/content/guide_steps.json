@@ -118,6 +118,7 @@
           "go": "home"
         },
         "pip": "They're ready! Take one to Nadia at the market, and grab some timber while you're in town.",
+        "pip_pond": "They're ready! Take one to Nadia at the market, then grab some timber at {pond}.",
         "marks": [
           {
             "plot": "teach"
@@ -203,7 +204,8 @@
             "pulse": true
           }
         ],
-        "pip": "They're ready! Take one to Nadia at the market, and grab some timber while you're in town."
+        "pip": "They're ready! Take one to Nadia at the market, and grab some timber while you're in town.",
+        "pip_pond": "They're ready! Take one to Nadia at the market, then grab some timber at {pond}."
       },
       {
         "id": "t_gather",

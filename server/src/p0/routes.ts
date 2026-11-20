@@ -66,9 +66,12 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   };
   // q(272): the keepers' local requests wear map marks only for a client that shows them (`locals`): an older one would
   // write a keeper's ! as the Market Board's count
+  // U2: pond_guide — the client gathers in the ponds alone: no town points (the city read, the gather command) and S6a in
+  // the beginner pond; an older one keeps the town's (奕星, a)
+  const pondGuide = (headers: Record<string, unknown>) => features(headers).includes('pond_guide');
   const view = (st: P0State, at: number, headers: Record<string, unknown>) =>
     viewOf(c, st, at, { online: townOnline(st), locals: features(headers).includes('locals'), wing8: features(headers).includes('wing8'),
-      yard2: features(headers).includes('yard2') });
+      yard2: features(headers).includes('yard2'), pond_guide: pondGuide(headers) });
 
   app.get('/v1/p0/state', async (req, reply) => {
     const player = playerOf(req.headers);
@@ -84,13 +87,13 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       noteEntered(s, space, place);
       noteVisit(c, s, space, place, clock(s.clock_ms), []);   // the entry read checks in an explore request too (as noteSeenAt marks)
       settleHere(c, s, space, place, clock(s.clock_ms));
-      settleGuide(c, s, guideKeys(c, before, s, null, []), clock(s.clock_ms));   // SGODOT-341: walking into a place is a guide step too
+      settleGuide(c, s, guideKeys(c, before, s, null, []), clock(s.clock_ms), [], pondGuide(req.headers));   // SGODOT-341: walking into a place is a guide step too
       store.put(s);
     } else {
       const moved = settleHere(c, s, space, place, clock(s.clock_ms));   // a Day Pass ran out on the map: home
       // SGODOT-341: a plain read settles the guide too — a step passed by time alone (Quick Radishes ripe), the fallback end
       const was = s.guide ? JSON.stringify(s.guide) : null;
-      settleGuide(c, s, new Map(), clock(s.clock_ms));
+      settleGuide(c, s, new Map(), clock(s.clock_ms), [], pondGuide(req.headers));
       if (moved || (s.guide ? JSON.stringify(s.guide) : null) !== was) store.put(s);
     }
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
@@ -105,8 +108,10 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = stateOf(player, req.headers);
     // The generator's place details (SGODOT-280: ponds and outposts with their points and art) go out here, per city, and
     // never in the state view; the home city's hand-written places are in the client already.
-    // v4q(4) (contract-c §9): the city's gathering points, the written city's too
-    return reply.send({ ok: true, city: { ...cityInfo(c, cluster), gather: gatherPointsOf(c, cluster), preview: preview(c, s, cluster, clock(s.clock_ms)) } });
+    // v4q(4) (contract-c §9): the city's gathering points, the written city's too; none for a client that gathers in the
+    // ponds alone (U2, pond_guide)
+    const gather = pondGuide(req.headers) ? [] : gatherPointsOf(c, cluster);
+    return reply.send({ ok: true, city: { ...cityInfo(c, cluster), gather, preview: preview(c, s, cluster, clock(s.clock_ms)) } });
   });
 
   /** v4q(3) (contract-c §4): the open wild sites in the map's viewport, at most VIEWPORT_CAP, with what they are to the
@@ -161,7 +166,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
     const s = stateOf(player, req.headers);
     const now = clock(s.clock_ms);
-    const result = applyP0(c, s, (req.body ?? {}) as P0Command, now, { wing8: features(req.headers).includes('wing8'), yard2: features(req.headers).includes('yard2') });   // q(303); v4q(12)
+    const result = applyP0(c, s, (req.body ?? {}) as P0Command, now, { wing8: features(req.headers).includes('wing8'), yard2: features(req.headers).includes('yard2'),
+      pond_guide: pondGuide(req.headers) });   // q(303); v4q(12); U2
     if (result.ok) store.put(result.state);   // saved before the log line: the log can never cost a command
     else if (result.code === 'new_day' && result.state) store.put(result.state);
     // Energy before = the stored value with natural recovery up to now, as the command saw it (a refusal: both the same).

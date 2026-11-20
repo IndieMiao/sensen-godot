@@ -20,15 +20,17 @@ const ONE = 'req_res_nadia_radish', FOUR = 'req_res_nadia_six_radishes';   // Fo
 /** One player through the guide: a clock that moves on, the state, every event, and the check after each command. */
 class Run {
   s: P0State; now = T0; events: P0Event[] = [];
+  /** U2: a client that says pond_guide (S6a in the beginner pond); off, an older one (the town's points). */
+  ponds = false;
   constructor(player: string, opts: { pending?: boolean } = { pending: true }) {
     this.s = freshState(c, player, T0, 42, { guide: true, ...opts });
   }
   get step() { return this.s.guide!.step; }
-  get view() { return viewOf(c, this.s, this.now).guide as Record<string, any>; }
+  get view() { return viewOf(c, this.s, this.now, { pond_guide: this.ponds }).guide as Record<string, any>; }
   get set() { return homeSetOf(c, this.s)!; }
   do(cmd: P0Command, wait = S): this {
     this.now += wait;
-    const r = applyP0(c, this.s, cmd, this.now);
+    const r = applyP0(c, this.s, cmd, this.now, { pond_guide: this.ponds });
     if (!r.ok) throw new Error(`${cmd.type} at ${this.step}: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
     this.s = r.state; this.events.push(...r.events);
     this.check();
@@ -459,6 +461,62 @@ describe('off the path', () => {
     expect(r.view.target.item).toBe('stone');   // Timber done from storage
     for (const id of [...c.fish.map(f => f.id), ...Object.keys(c.goods)]) if (r.s.bag.length < r.s.bag_cap) r.s.bag.push({ id, qty: 1 });
     r.do({ type: 'talk', resident: 'res_nadia', ...r.market() });   // in town, the bag full
+    expect(r.step).toBe('t_fish');
+  });
+  it('U2 (pond_guide): S6a\'s point is the beginner pond\'s, named by the pond; one trip there gathers it all, a town point is bad_spot', () => {
+    const r = new Run('director-u2-pond').pick();
+    r.ponds = true;
+    r.harvest(r.sowQuick());
+    r.nadia1();
+    const pond = r.set.pond;
+    expect(r.view).toMatchObject({ step: 't_gather', row: { line: 'Gather Timber · Fern Pond', icon: 'wood', go: 'map' },
+      target: { kind: 'gather', item: 'wood', spot: `${pond}#C1`, pond }, marks: [] });   // C1: its crescent's first Timber (408 v2)
+    expect(viewOf(c, r.s, r.now).guide.target?.spot.startsWith(`${SF}~wood`)).toBe(true);   // an older client: the town's, as before
+    const town = applyP0(c, r.s, { type: 'gather', spot: gatherPointsOf(c, SF)[0].id, space: 'home' }, r.now + S, { pond_guide: true });
+    expect(town).toMatchObject({ ok: false, code: 'bad_spot' });
+    const at = { space: 'pond', place: pond }, spots: string[] = [];
+    for (let i = 0; i < 6 && r.step === 't_gather'; i++) {
+      const t = r.view.target;
+      expect(t.spot.startsWith(`${pond}#`)).toBe(true);
+      spots.push(t.spot);
+      r.do({ type: 'gather', spot: t.spot, ...at }, 2 * S);
+    }
+    expect(r.step).toBe('t_fish');
+    expect(new Set(spots).size).toBe(spots.length);   // each point once: Timber 2, Stone 1, Reeds 1 (8 Timber, 4 Stone, 4 fiber)
+    expect(spots).toHaveLength(4);
+    expect(r.view.row.go).toBe(pond);   // S7: catching fish in the same pond
+  });
+  it('U2 (pond_guide): Pip\'s S5 line sends that client to the beginner pond for timber; an older one keeps the town\'s line', () => {
+    const r = new Run('director-u2-pip').pick();
+    const quick = r.sowQuick();
+    r.lettuce();
+    r.now += 46 * S;
+    const town = 'They\'re ready! Take one to Nadia at the market, and grab some timber while you\'re in town.';
+    const pond = 'They\'re ready! Take one to Nadia at the market, then grab some timber at Fern Pond.';
+    expect(r.step).toBe('t_harvest_quick');
+    expect(r.view.pip.line).toBe(town);
+    r.ponds = true;
+    expect(r.view.pip.line).toBe(pond);
+    r.harvest(quick);
+    expect(r.step).toBe('t_nadia_1');
+    expect(r.view.pip.line).toBe(pond);
+    r.ponds = false;
+    expect(r.view.pip.line).toBe(town);
+  });
+  it('U2 (pond_guide): the beginner pond\'s points cooling down give way to the next material; none ready, the step passes', () => {
+    const r = new Run('director-u2-cooling').pick();
+    r.ponds = true;
+    r.harvest(r.sowQuick());
+    r.nadia1();
+    const ponds = viewOf(c, r.s, r.now, { pond_guide: true }).gather.ponds[r.set.pond].points as { id: string; kind: string; item: string }[];
+    expect(ponds.find(p => p.kind === 'reed')?.item).toBe('fiber');   // what a point gives first (亚瑟's source lines)
+    const cool = (kind: string) => { for (const p of ponds.filter(p => p.kind === kind)) r.s.gather.ready_at[p.id] = r.now + 3_600_000; };
+    cool('wood'); r.check();
+    expect(r.view).toMatchObject({ target: { item: 'stone' }, row: { line: 'Gather Stone · Fern Pond' } });
+    cool('stone'); r.check();
+    expect(r.view.target.item).toBe('fiber');
+    cool('reed');
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
     expect(r.step).toBe('t_fish');
   });
   it('S7a: after the soup, short of the upgrade (coins), the step passes straight to Nadia\'s soup (v4q(4) ⑥)', () => {

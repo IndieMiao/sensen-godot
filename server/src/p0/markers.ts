@@ -118,9 +118,10 @@ function landable(c: P0Content, s: P0State, fish: string[]): string[] {
 /** The tutorial request is still on the Stall Board: the first session, one goal on the map. */
 const firstSession = (c: P0Content, s: P0State) => (s.boards.stall ?? []).some(sl => sl.req?.id === c.requests.tutorial.id);
 
-/** opts.locals: the keepers' local requests' marks (q(272)), for a client that shows them (routes: `x-p0-features: locals`). */
-export function mapMarkers(c: P0Content, s: P0State, now: number, opts: { locals?: boolean } = {}): MapMarker[] {
-  const all: MapMarker[] = guideMarkers(c, s, now);   // the guide's pins first (tracked), SGODOT-341
+/** opts.locals: the keepers' local requests' marks (q(272)), for a client that shows them (routes: `x-p0-features: locals`).
+ * opts.pond_guide: the guide's step as that client sees it (U2, guide.gatherTarget). */
+export function mapMarkers(c: P0Content, s: P0State, now: number, opts: { locals?: boolean; pond_guide?: boolean } = {}): MapMarker[] {
+  const all: MapMarker[] = guideMarkers(c, s, now, !!opts.pond_guide);   // the guide's pins first (tracked), SGODOT-341
   const reason = new Map<MapMarker, string>();   // what counts as one reason for `more`: the Market Board's open slots share one
   // q(270) ⑥: the home city's boards and the Market Board of the city the player is in show all they hold; another
   // city's board only its tracked requests — a ✓ on that city's market wherever the player is, so they know where to go.
