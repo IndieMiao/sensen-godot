@@ -1,0 +1,792 @@
+{
+  "original_branch": "fix/491-q326-name-reset-copy",
+  "original_head": "2bd70d085bbf46b1b44073fd6e8670070552f63f",
+  "main_untracked": [
+    {
+      "path": "modules/map/shaders/map_fog.gdshader.uid",
+      "sha256": "092f6176d07cee6e905d1cdce1a72bb157b5cbccaa305a20e53844912511fb05"
+    },
+    {
+      "path": "modules/p0/p0_city.gd.uid",
+      "sha256": "ff44ec58657048740d83657febca5e5ee6a61fcf09b6dc39a584dd88e66ecb38"
+    },
+    {
+      "path": "modules/p0/p0_farm_template.gd.uid",
+      "sha256": "cb41373df3c5c4953f01ad0b67eec9ed46e25a1c8f0319da48d1003279b34078"
+    },
+    {
+      "path": "modules/p0/p0_fish_world.gd.uid",
+      "sha256": "eb85fb92c6bd078942949f78d7310d54ca5b2c7f2561da44c9c83141b83d7657"
+    },
+    {
+      "path": "modules/p0/p0_guide_feedback.gd.uid",
+      "sha256": "9ad1b6aab11362e17eaf03d00ad4b96fd3f8fe43341474310712a2b6120dd252"
+    },
+    {
+      "path": "modules/p0/p0_guide_pulses.gd.uid",
+      "sha256": "f836e51faceea8d1b063469c3c39dcfdbc5009189d59ada94fb4546a4d4cca21"
+    },
+    {
+      "path": "modules/p0/p0_home_pick.gd.uid",
+      "sha256": "3f8ecb20f12639cc59ddead699a4c5d95471a0cf33f92d8ded41a9556b57f918"
+    },
+    {
+      "path": "modules/p0/p0_home_pin.gd.uid",
+      "sha256": "9dfa9c377314978a91134d8c1d8546cc029ea1f8859816dce07598227a5c9db6"
+    },
+    {
+      "path": "modules/p0/p0_http_request.gd.uid",
+      "sha256": "06513ec0864b0c8d46a622aa9e76fb242f952ab99c8aa6767ef86601cec76562"
+    },
+    {
+      "path": "modules/p0/p0_kindred.gd.uid",
+      "sha256": "64c78622d70e79ef676bbb744f12b8ee417e2ae61f367bb727191c15d5c65fc9"
+    },
+    {
+      "path": "modules/p0/p0_line.gd.uid",
+      "sha256": "d813d145672a87dc61525dab624e5892db6477ef9df444a1cf74db549911a328"
+    },
+    {
+      "path": "modules/p0/p0_notice_board.gd.uid",
+      "sha256": "d27cd00636665bac04b9fcdc066c5eebd3bd7871819eacc5516d2f8447864d23"
+    },
+    {
+      "path": "modules/p0/p0_pond_card.gd.uid",
+      "sha256": "2e511e995b6957728062a2efbe3766a130154b35086a5e964ac8d211ba03627d"
+    },
+    {
+      "path": "modules/p0/p0_ponds.gd.uid",
+      "sha256": "699ecc63cd9e97873e1c154824c3fd6a30b14e35a83b89acadbfdfc1ca626177"
+    },
+    {
+      "path": "modules/p0/p0_strip_clear.gd.uid",
+      "sha256": "b4ca52a8b6d3c87576df280d65281fdf8df0f3aa6a685a417eb2bc4938e7a177"
+    },
+    {
+      "path": "modules/p0/p0_titles.gd.uid",
+      "sha256": "7d32bd97186f39df5f7234a4f4311973e0844df21f7381660a88ebb19d33b941"
+    },
+    {
+      "path": "modules/p0/p0_trap.gd.uid",
+      "sha256": "b0e63415aef8408f41735599fb4b82a072a391e422c3f64f6d9d918983a2553a"
+    },
+    {
+      "path": "modules/p0/p0_voice_room.gd.uid",
+      "sha256": "19f0c34ce51d05472d29e2137df10a3c0335a7d03c8b763680368346308b9255"
+    },
+    {
+      "path": "modules/ponds/pond_insects.gd.uid",
+      "sha256": "b376e3ba8e161f5cf9699b02ea967691c462669294b54294ea9f393581df967d"
+    },
+    {
+      "path": "modules/ponds/pond_insects.gdshader.uid",
+      "sha256": "111c06af4b80df518836ea07cb217bb01a7ecafbe042ae80e9cfe5d8eeb306aa"
+    },
+    {
+      "path": "modules/render/gles_albedo.gd.uid",
+      "sha256": "1dc0e98b110a129207db1d0554d5a1a6da539b184dbf99c1532a5853b9479c99"
+    },
+    {
+      "path": "modules/render/gles_colour.gdshaderinc.uid",
+      "sha256": "50dc6436b41efd99a36536efd019001ba62edbd09cbdbcee6a547ed73d413f8e"
+    },
+    {
+      "path": "modules/render/vcol_matte.gdshader.uid",
+      "sha256": "a51d10cbd585359cd2bb6e27e7df439a58c471c1c45e873568b8f1c9fa65e7e7"
+    },
+    {
+      "path": "modules/ui/gles_sun_shadows.gd.uid",
+      "sha256": "dab3bde87efb235e3cdaecee40e0740012c1ebef0c87d85fa4369a100fe7efee"
+    },
+    {
+      "path": "scenes/p0/kitchen/p0_cook_confirm.gd.uid",
+      "sha256": "8f9c2a938f9770061d71a6d5f5446299fdf414a0008f37046e6a8a758cfa273e"
+    },
+    {
+      "path": "scenes/p0/kitchen/p0_cook_timer.gd.uid",
+      "sha256": "2915f17be864a9e785c8015d06b024f0070b725dc19c8e31919e8c46c68255fd"
+    },
+    {
+      "path": "scenes/p0/kitchen/p0_wait_pot.gd.uid",
+      "sha256": "b70c7d94061d5dd7d13deabf05b3d0368369bd90321e6087c8200f9f31c8e3bc"
+    },
+    {
+      "path": "scenes/p0/p0_farm_guide.gd.uid",
+      "sha256": "7aee656d3cd9061b7373bf5f41b053aef8f0153e58cbd3e6055047a75edc4647"
+    },
+    {
+      "path": "scenes/p0/p0_fountain_ripples.gdshader.uid",
+      "sha256": "4b92c5a67e9046ae4c6bf810481d4f526da2b58c30660907d261ea5eae372450"
+    },
+    {
+      "path": "scenes/p0/p0_place_cell.gdshader.uid",
+      "sha256": "3e65269b8f3647a5998eb08f81f1bf9b1895f33d194e57f3d4cd2be352f65603"
+    },
+    {
+      "path": "scenes/p0/p0_placement_grid.gdshader.uid",
+      "sha256": "cd6cd5fae4b112ee927d4104d133ec1e94e45d31aba6df8349ea7e5e49b228d1"
+    },
+    {
+      "path": "scenes/p0/p0_poi_room.gd.uid",
+      "sha256": "b9d3da5e3ec6c2559cbfebe4ec367226d02b05f9fecfc4c2d84a21923de8df62"
+    },
+    {
+      "path": "scenes/p0/p0_pond_gather.gd.uid",
+      "sha256": "a707ca0b21aeb761a5b5e590a12e6498cb130e6f34da0bb17cb04944fa1166e3"
+    },
+    {
+      "path": "scenes/p0/panels/p0_age_card.gd.uid",
+      "sha256": "85fe8104a867a412f3c3f291e10db72dfd1706eef0ee131b318bdd1784136f3a"
+    },
+    {
+      "path": "scenes/p0/panels/p0_back_pill.gd.uid",
+      "sha256": "fc5bc1d58969593893bdbafb91625757be15aff4c666ffecb823cf675e4e3f6d"
+    },
+    {
+      "path": "scenes/p0/panels/p0_bite_board_drawer.gd.uid",
+      "sha256": "01ab5257161886324eecc9abb23a0ecf1ab49fb8107006727baccb8f40c3ca0f"
+    },
+    {
+      "path": "scenes/p0/panels/p0_city_row.gd.uid",
+      "sha256": "99e7248e2103be908ed3b32e48d585353392f4e09e156f687e2292154c580add"
+    },
+    {
+      "path": "scenes/p0/panels/p0_city_row_tint.gdshader.uid",
+      "sha256": "56a1e3da7dc0ac872a81e8df8f377474d406d4b60aaa4cf2dbda772adc10a3db"
+    },
+    {
+      "path": "scenes/p0/panels/p0_fare_board_drawer.gd.uid",
+      "sha256": "2953642624867990af28bdb9cf98de0f360fa8833145e11cc34b088c8c54d385"
+    },
+    {
+      "path": "scenes/p0/panels/p0_home_flow.gd.uid",
+      "sha256": "2cbd4f5ff5b841528c45a4eb6f94d862acc68775fa2f4bed74528e521a2d25ad"
+    },
+    {
+      "path": "scenes/p0/panels/p0_home_move_confirm.gd.uid",
+      "sha256": "cb00933d57a101706432d553924565094e5b5eb0a46db755200a889ef07630bb"
+    },
+    {
+      "path": "scenes/p0/panels/p0_home_pick_page.gd.uid",
+      "sha256": "38ad7d5680afa2637b5955d30eac0a9d6ff61855d7a445bb7f40d068b1555371"
+    },
+    {
+      "path": "scenes/p0/panels/p0_home_pin_page.gd.uid",
+      "sha256": "c3728f2d09f705ebd1f4c74f1fe2f92c571a55f6e629b99460a41c64a47c8b0d"
+    },
+    {
+      "path": "scenes/p0/panels/p0_home_welcome.gd.uid",
+      "sha256": "b70ed7983400ea96c63bd98f74d46b8456898e7594cb3c02e1e9d7379b9c806c"
+    },
+    {
+      "path": "scenes/p0/panels/p0_nearby_drawer.gd.uid",
+      "sha256": "a3e1212fae07b0e27be9e2fb24820dc6ed2bc518fe96a5677adf264c18041020"
+    },
+    {
+      "path": "scenes/p0/panels/p0_notice_board_drawer.gd.uid",
+      "sha256": "84f38a27cf6befad2a57f6bfe631704f77786872292242878120ade09bc1acae"
+    },
+    {
+      "path": "scenes/p0/panels/p0_passport_drawer.gd.uid",
+      "sha256": "c5ae683e284ad390809e6405c0ec4d9cd473c8985295d875feeff236138e91c3"
+    },
+    {
+      "path": "scenes/p0/panels/p0_people_drawer.gd.uid",
+      "sha256": "e352f535e6b8ecfbf223a1c9df96cb291da7ee55368ff9af9d1510a934bc935b"
+    },
+    {
+      "path": "scenes/p0/panels/p0_postcard_stamp.gd.uid",
+      "sha256": "ceed6eea1f04758c82bbd6a4df70b2d83fe4a5c35a4243940421fd42bed1af18"
+    },
+    {
+      "path": "scenes/p0/panels/p0_postcards_page.gd.uid",
+      "sha256": "c1dabe5d6fc7b049de88c03c0a6728fd77cbe4d8025865da6dc9c04dddfad64e"
+    },
+    {
+      "path": "scenes/p0/panels/p0_titles_drawer.gd.uid",
+      "sha256": "017be7d18c3305d0a3f44a6116202dcdc284303f5db774fd019d378fa8c0295a"
+    },
+    {
+      "path": "scenes/p0/panels/p0_voice_keys.gd.uid",
+      "sha256": "e14a188031951c25e1eadafde274212a10e0e565683aa808ced32e9137eaafaf"
+    },
+    {
+      "path": "scenes/ui_kit/ui_big_pot_key.gd.uid",
+      "sha256": "151b2bc88af209388e81f1660590c890acd6042a240a6a933f6b0b4625decd07"
+    },
+    {
+      "path": "server/tools/zz_nezha_grid_saves.ts",
+      "sha256": "8050558cee6b6864f94b26a672567af5cba50fa32c94c9e2017c88ac01f1fca8"
+    },
+    {
+      "path": "server/tools/zz_nezha_lv_saves.ts",
+      "sha256": "ad2442e8ad951ec02865010cb3023b91f1b4c18afd435d23d65efb767e18f565"
+    },
+    {
+      "path": "server/tools/zz_nezha_pond_points.ts",
+      "sha256": "03c1502ba67570482d655553363864a49bbdc133b5edf4953b55879ca412b9ac"
+    },
+    {
+      "path": "server/tools/zz_nezha_pond_points_all.ts",
+      "sha256": "cac4e92ebf5a8f84c54b4574281da046394b096a682ee754b81c01d6baadbc1c"
+    },
+    {
+      "path": "tests/farm/test_player_mover_slide.gd.uid",
+      "sha256": "340fb38422a938749488966ac9af5687e7f25f7af3b2f14887c0f5c02289e356"
+    },
+    {
+      "path": "tests/landmark/test_alcatraz_dock.gd.uid",
+      "sha256": "573e7c8461a73f061ef1dc7825f2ca2321de1c78cbeaa9452817f302bf229814"
+    },
+    {
+      "path": "tests/landmark/test_alcatraz_routes.gd.uid",
+      "sha256": "592007f63db77a1ba7f16e6f583df0686ef01cd0f724f66eefa6f96e598f5efa"
+    },
+    {
+      "path": "tests/landmark/test_landmark_p0_visit.gd.uid",
+      "sha256": "acdabedad87c330e11ac57885db1639dbf1e1836cbeb8d83b7c2086bfe254f43"
+    },
+    {
+      "path": "tests/landmark/test_landmark_stick_slide.gd.uid",
+      "sha256": "c11d772201b4d5295779530fc4d03f24228a28aad7ede7fbcbe95c86daa72e1c"
+    },
+    {
+      "path": "tests/p0/fakes/fake_acc_flow_no_card.gd.uid",
+      "sha256": "5a8913c5d6f0dd42623974279ff0b6ad8d1ac9acd94accd92382b7c99aa6dbab"
+    },
+    {
+      "path": "tests/p0/test_p0_account_reset.gd.uid",
+      "sha256": "3ac28e3365737d44ad0d19d9a68cd1776f32f04933480150b864c36cd5555762"
+    },
+    {
+      "path": "tests/p0/test_p0_blocked_players.gd.uid",
+      "sha256": "a144162eb8e28d4e99de3beda19dd9e5069651e72a19cfc86c15c90707a4b4e2"
+    },
+    {
+      "path": "tests/p0/test_p0_buff_hud.gd.uid",
+      "sha256": "5b4fa77e1c84301773a20cf7a998be97bb95ee3f88f22c80d841bf7f2cd987c8"
+    },
+    {
+      "path": "tests/p0/test_p0_c2_cards.gd.uid",
+      "sha256": "b31fc8436c3385d57decca622715485dfa59328ff0018cc1fc8b3b2de8e9820d"
+    },
+    {
+      "path": "tests/p0/test_p0_c2_guide.gd.uid",
+      "sha256": "9c6af2e67c9f20d3b90edffe803d7f7ea6ccf03d6db479ebe11aa9cd22e6a890"
+    },
+    {
+      "path": "tests/p0/test_p0_church.gd.uid",
+      "sha256": "f6de6b8901cf9019b1811b331814940a20da04019abf89736093b0f8901c3f4e"
+    },
+    {
+      "path": "tests/p0/test_p0_church_compat.gd.uid",
+      "sha256": "505e1abad30cb4f8ee8a86ebbd2336b3a28a410750ff8e7ac80e9b22f7609a39"
+    },
+    {
+      "path": "tests/p0/test_p0_city.gd.uid",
+      "sha256": "fce2056851789d1d0bc8c85069922fbf01d1b329caf0026ffac68cac7300c60c"
+    },
+    {
+      "path": "tests/p0/test_p0_cook_timer.gd.uid",
+      "sha256": "733d5e1939efdacf6cbfb9e0439020faf646dd987d2e5816a50bfe8bb7488979"
+    },
+    {
+      "path": "tests/p0/test_p0_counter_info.gd.uid",
+      "sha256": "57380376fad1ed42763a1363945dfd63585463d9517d30a8c763da0243487b32"
+    },
+    {
+      "path": "tests/p0/test_p0_farm_exit.gd.uid",
+      "sha256": "195f0cf005941aa5128d217f99f9743ea35c7bb178bffac4e2fc671796e1424b"
+    },
+    {
+      "path": "tests/p0/test_p0_farm_pip_wander.gd.uid",
+      "sha256": "fc019d2f8dbeff48506d430f9194d0ae0c7217a837ab7037c4eb4bc309c8ba7d"
+    },
+    {
+      "path": "tests/p0/test_p0_farm_template.gd.uid",
+      "sha256": "1ef6d5176655f9af12c6254e985035a9c20aaeacae70847cff9a3426caadb803"
+    },
+    {
+      "path": "tests/p0/test_p0_first_catch.gd.uid",
+      "sha256": "7c2b16dd2ca10c606cb3b5892d8147442c59c4ad07cc0ea4b7e565c255b49e30"
+    },
+    {
+      "path": "tests/p0/test_p0_fish_world.gd.uid",
+      "sha256": "0a2989891846d4440d28811726a588d73f5a7b0340b53d843a971abe18f6a24a"
+    },
+    {
+      "path": "tests/p0/test_p0_guide_feedback.gd.uid",
+      "sha256": "9937de0876e6840e9fec31e4812e6a1b1e261e5be5e9f1c02605a95292b078c4"
+    },
+    {
+      "path": "tests/p0/test_p0_home_badge.gd.uid",
+      "sha256": "ef8a505fc10665088f8b24af8c88a823422b46cef81e058cd7c251ae4ab82f6b"
+    },
+    {
+      "path": "tests/p0/test_p0_home_set.gd.uid",
+      "sha256": "72239efea7ddfce075632834eaf6bdf83399080c753f14fdd42f97ac747ab2d6"
+    },
+    {
+      "path": "tests/p0/test_p0_hook_key.gd.uid",
+      "sha256": "206dc274dcc7be3898d7fd4cfd8cd9e0f5ff82decf80650fa96f95ada1af517b"
+    },
+    {
+      "path": "tests/p0/test_p0_http_request.gd.uid",
+      "sha256": "95cec62c98f72f825b800488a5c4a5a248b5a0d1ebaee739652a6384eda56c5a"
+    },
+    {
+      "path": "tests/p0/test_p0_landing.gd.uid",
+      "sha256": "976bea3033bf890d0ce139f06cb33f122fef4e43df13d2643431a6999a67463f"
+    },
+    {
+      "path": "tests/p0/test_p0_legendary_reel.gd.uid",
+      "sha256": "6fbfdfc3b366d666ea30c379aae85aab6527503283b15a41487f66a0b2f47b40"
+    },
+    {
+      "path": "tests/p0/test_p0_line.gd.uid",
+      "sha256": "39e80cd935993e85e87dafac628fcbfed6710f6e368d0b277b8838c2656703f6"
+    },
+    {
+      "path": "tests/p0/test_p0_map_always_pins.gd.uid",
+      "sha256": "667fe857f4aab6c3cce0226fd4e91d772047ffcd90c45115511e992e94796a90"
+    },
+    {
+      "path": "tests/p0/test_p0_map_bubbles.gd.uid",
+      "sha256": "51ff358e958d45d98157d357dd3f974d00f5c0d0a44f313f62a86931ecde22fa"
+    },
+    {
+      "path": "tests/p0/test_p0_map_home_set.gd.uid",
+      "sha256": "9233f62419bc9b9ad07a2100eea00fd5278a3cc2d2b63ed81e4fa0893106cc31"
+    },
+    {
+      "path": "tests/p0/test_p0_map_lat_bound.gd.uid",
+      "sha256": "8d58c1c36e378121bd50834b5a84f962f83e940b768757b13cae013e6a605e10"
+    },
+    {
+      "path": "tests/p0/test_p0_map_pop.gd.uid",
+      "sha256": "dbffbc11c973da6779cb58a6987ad6079bd6271077dd4867e4842bbf469d0197"
+    },
+    {
+      "path": "tests/p0/test_p0_map_power.gd.uid",
+      "sha256": "271f000fc09152e20cb882cf36c670b72ec2673082cb18d99416f3113ffb9240"
+    },
+    {
+      "path": "tests/p0/test_p0_map_wild_gather.gd.uid",
+      "sha256": "09597a1cdf44e3621ea93048bef36d5dbda3cb47cfd6477b7cc5ff7856727dfd"
+    },
+    {
+      "path": "tests/p0/test_p0_market_per_city.gd.uid",
+      "sha256": "d7df7f8dac98fccc6e913e85f8416280005ebfa1223ab5200573d39fc7005a5b"
+    },
+    {
+      "path": "tests/p0/test_p0_mine_deep.gd.uid",
+      "sha256": "709ca0923cd4f3550cb24a798d512c4e6aeab8ded3c0bf73f8a6ff3e2caa520c"
+    },
+    {
+      "path": "tests/p0/test_p0_mine_palette.gd.uid",
+      "sha256": "d38db2bb13c35388255d52cab32731bbc8599050dcbfbda785da925e8f8f8aa2"
+    },
+    {
+      "path": "tests/p0/test_p0_mine_perf.gd.uid",
+      "sha256": "e28834878868c9a931225c9a566616a2ffd331dfdb02318bcc6a2fbb041c2105"
+    },
+    {
+      "path": "tests/p0/test_p0_mine_props.gd.uid",
+      "sha256": "0db04adf8bd60f4febe6ddc63f8817e9c413d443886478be9f025afd63a56c20"
+    },
+    {
+      "path": "tests/p0/test_p0_nadia_intro.gd.uid",
+      "sha256": "132a4566e66fbef6a27ca2d344658a76342d108ebae4981181546d3451173682"
+    },
+    {
+      "path": "tests/p0/test_p0_nearby_cities.gd.uid",
+      "sha256": "4dc6228a77a07cd9cb21a42b7cabda851cbd51f1e9617cbdd5df79a4d399a3a4"
+    },
+    {
+      "path": "tests/p0/test_p0_no_request_cooldown.gd.uid",
+      "sha256": "adf302bcee1cea020f8e5189eff4bf0ff242e1a293cfa4c0b7545a9ba1138e11"
+    },
+    {
+      "path": "tests/p0/test_p0_outpost_spawn_places.gd.uid",
+      "sha256": "a1ef5af660dd7ecabf8fdb0c192a947b5a877a9afe4d30f14b515b7064a75397"
+    },
+    {
+      "path": "tests/p0/test_p0_poi_room.gd.uid",
+      "sha256": "7005821f27022771a81090238e020b1114cfbf7b6128ad880ba839768a18635b"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_gather.gd.uid",
+      "sha256": "7a79bd72ec11b1dab314edbfa4af6828afb1bb567003e251f704123fa3607a8a"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_gather_tap.gd.uid",
+      "sha256": "c418ec7427797ea9bac68989b9f26a89b0abf1441713ac40f8b16a2158380769"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_insects.gd.uid",
+      "sha256": "342cde36c9efa566b96604111d0b3bee7e9093caea684a8a4f499b8a81298d0d"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_online.gd.uid",
+      "sha256": "e7814072a757cf76a3ce038a5e62365fc5018a7b0a52d7e492a535d45010a953"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_pin_icons.gd.uid",
+      "sha256": "4db965fc4c732b60fc7398ec9566a21073f8e4fec4dfa51fc8e3f56ab35a498f"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_spawn_places.gd.uid",
+      "sha256": "88e9c5d806e99b21dc4b995b25b4272bc8cc636fe9db40185a781940de70364c"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_stale_cast.gd.uid",
+      "sha256": "133905030ec6686131f1a111c25fe9952fd7e6b771dd31d6b0a9bd7bc891ef38"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_walk.gd.uid",
+      "sha256": "249d0aab0b22948b16fab5b60ad7fdd0be7ce6290762f9b30a3b8d66c8bb4327"
+    },
+    {
+      "path": "tests/p0/test_p0_pond_wild.gd.uid",
+      "sha256": "09049b3f7b32d6d0106f2e93772df6dfebc4b93689adcdfbeaac86bb939fbc9e"
+    },
+    {
+      "path": "tests/p0/test_p0_privacy_ui.gd.uid",
+      "sha256": "34474987427fa7fc19f9844874fd1dda1082e65b23662dfe4855e57fcecc6a99"
+    },
+    {
+      "path": "tests/p0/test_p0_push_wall.gd.uid",
+      "sha256": "2b0dd4b63c2fc72e27bbbbfe25fd80c3fd1d9574c7f303ee8ca0c0a6b93442ad"
+    },
+    {
+      "path": "tests/p0/test_p0_room_spread.gd.uid",
+      "sha256": "e96cbb5b28b7958a02be478c194918a07dff10779af06084e00ffa49f7a2d20a"
+    },
+    {
+      "path": "tests/p0/test_p0_store_build.gd.uid",
+      "sha256": "86cb60432ab9d65579a589e0946ce2e65b2e3074a12cc68124c745495dfd2079"
+    },
+    {
+      "path": "tests/p0/test_p0_strip_clear.gd.uid",
+      "sha256": "4cc5cf6d4c42a9cd6d6a6d4655c6681d5a94314533ae0a672b4303b00e4993d9"
+    },
+    {
+      "path": "tests/p0/test_p0_tip_over_dialog.gd.uid",
+      "sha256": "2c4155aea8ca2d9e9424536c78c2afdebfffec25e4972c38278684531496188c"
+    },
+    {
+      "path": "tests/p0/test_p0_tip_over_fishing_notice.gd.uid",
+      "sha256": "6044f2bdc0bab48cd7390ffb17d1bb09078e1888b13e265cfaec7ea328437015"
+    },
+    {
+      "path": "tests/p0/test_p0_today_dot.gd.uid",
+      "sha256": "7958e73642d78d19030742ee4d7c0e82b46c842256dc9c39fac81edadd53cd2f"
+    },
+    {
+      "path": "tests/p0/test_p0_today_vein.gd.uid",
+      "sha256": "570a048b51cf342188d02bfb1fd9975672259970f6422a05d624efc20095562b"
+    },
+    {
+      "path": "tests/p0/test_p0_track_full.gd.uid",
+      "sha256": "814a9771248f2c6d6adaa1d0218cc5bdb7cc49af9432f6987c4c272968450e6a"
+    },
+    {
+      "path": "tests/p0/test_p0_trap.gd.uid",
+      "sha256": "a54c407a098667307b2620370ebfd16698d938b4ad33448f66667a20d089aff1"
+    },
+    {
+      "path": "tests/p0/test_p0_travel_fares.gd.uid",
+      "sha256": "75f71f94acb2578666894988e74518d14c799dec4fc37d7c21745a7b674b9fd3"
+    },
+    {
+      "path": "tests/p0/test_p0_travel_flight.gd.uid",
+      "sha256": "69c382ded97a0ef9d5e79c981c7df8e43573326b9003a7cb4f6a158cc9693052"
+    },
+    {
+      "path": "tests/p0/test_p0_view_projection.gd.uid",
+      "sha256": "be3de8067d371076d95e27aad73d45d5912541b3dcdb36f5276380c1deb2f035"
+    },
+    {
+      "path": "tests/p0/test_p0_view_throttle.gd.uid",
+      "sha256": "c69f79189817488790932195d87e53677361969c4d82e521471831d85abedd29"
+    },
+    {
+      "path": "tests/p0/test_p0_voice_match_entry.gd.uid",
+      "sha256": "4b3b629d4962534c52537532e21626ecf21d5a7b66a7a94a901a99df11782722"
+    },
+    {
+      "path": "tests/p0/test_p0_voice_room.gd.uid",
+      "sha256": "0d87219458ff7abe1574b908a5ae3dd9eb8ce286f25a9e4986b2b22ef7382b0b"
+    },
+    {
+      "path": "tests/p0/test_p0_voice_ui.gd.uid",
+      "sha256": "8a5fc52f151765bc87e7e66b6cec9679ddf5d26aea7554652918e23ee0dece28"
+    },
+    {
+      "path": "tests/p0/test_p0_world_cards_under_hud.gd.uid",
+      "sha256": "1dae85ecc1863ea6f2a3028106c9ce34b00e967314067173036b405c9e2784e4"
+    },
+    {
+      "path": "tests/p0/test_p1_batch_cook.gd.uid",
+      "sha256": "0562c53d511c6acff562c1e9421ada890218b50d5eb466e11c998e8efd2f7c96"
+    },
+    {
+      "path": "tests/p0/test_p1_batch_cook_flow.gd.uid",
+      "sha256": "b9d49fb86ee6cf361abf11ce8752ffb87a6d299c4e4d8db4cf279a43e1f7a208"
+    },
+    {
+      "path": "tests/p0/test_p1_bite_board_ui.gd.uid",
+      "sha256": "8ca9f24d933824230ec349d53f3a35185272ae8dfec58fb4fe68fd8d601cf501"
+    },
+    {
+      "path": "tests/p0/test_p1_blackjack_page.gd.uid",
+      "sha256": "3cafda2962b112d33528a32e01bf158e8d1075203c59ebe8ede3795e662f36cd"
+    },
+    {
+      "path": "tests/p0/test_p1_chef_sign.gd.uid",
+      "sha256": "a2549aa2ffaae07c89cf1e88a9222311dbfec76ad3d3856eacc160094be633f5"
+    },
+    {
+      "path": "tests/p0/test_p1_cookbook_titles.gd.uid",
+      "sha256": "e3ec9b42149491e512d898f6dfcd8e93635a00e68d687f7fec968f98614c5a79"
+    },
+    {
+      "path": "tests/p0/test_p1_decor.gd.uid",
+      "sha256": "24266199cdfd2cb370c12e629954a710b529aca81f764f59230c509051bf9bd7"
+    },
+    {
+      "path": "tests/p0/test_p1_facilities.gd.uid",
+      "sha256": "aa0b9cb6996a7eb0b22aefd9d3b540d7f1ca4388bae07cf4121e53ec8b959dfb"
+    },
+    {
+      "path": "tests/p0/test_p1_farming_levels.gd.uid",
+      "sha256": "d25b627d3ac99e67b2e5c03d5dd333482ae541fe28a78e0b148c8b7fa3270dcb"
+    },
+    {
+      "path": "tests/p0/test_p1_fast_crops.gd.uid",
+      "sha256": "7da30b7bd1df5a5cd87b94aa3c4216e1e03ddf142e41089a41196e21c0f78882"
+    },
+    {
+      "path": "tests/p0/test_p1_fishdex_badge.gd.uid",
+      "sha256": "e89ffa846fc21993ae837d754909849af761629f7d7231b1cda95d926e9f86ad"
+    },
+    {
+      "path": "tests/p0/test_p1_fishdex_milestones.gd.uid",
+      "sha256": "dd11f2cb82e2e449c40004780edb21c341176e9729bfec6f4ebbb8d45a69163d"
+    },
+    {
+      "path": "tests/p0/test_p1_fog_cards.gd.uid",
+      "sha256": "25947d2f611a5eeecae3049f2194b363ad7c4a30287147a1c3d7d10e619cdb5c"
+    },
+    {
+      "path": "tests/p0/test_p1_gift_clues.gd.uid",
+      "sha256": "919bc26809a54b129f3d370a1075ce25412b7fc3cc9e7efec05c568a3ecbdfd3"
+    },
+    {
+      "path": "tests/p0/test_p1_greenhouse.gd.uid",
+      "sha256": "a550e6af4265ad377e1839fb289a9198bb2b2a7a74ef174d9bb30f05484ecb4f"
+    },
+    {
+      "path": "tests/p0/test_p1_guide_s8_eat.gd.uid",
+      "sha256": "fa56d3e64a2a3212b7bffa6b1960d9c5c65f98be99a4bde0844238ba5eb0f873"
+    },
+    {
+      "path": "tests/p0/test_p1_guide_test_accounts.gd.uid",
+      "sha256": "24c79c0501eebe540da3906771df095b3da5309d031425493b9e28ea3843e71a"
+    },
+    {
+      "path": "tests/p0/test_p1_guide_world.gd.uid",
+      "sha256": "6d88337ee7e2040d67d4b0271b0e4f0b0f1292c10b2ff90696fc34de179547b2"
+    },
+    {
+      "path": "tests/p0/test_p1_home_change.gd.uid",
+      "sha256": "bee588db683908c5984686a6428dbe8b7146e8333a677af161b2a3e39d2499db"
+    },
+    {
+      "path": "tests/p0/test_p1_home_lv7.gd.uid",
+      "sha256": "db7ed8402122399c9053c7ad9c689b9deec25d1c6e9fbad92c4ba79ff0a58d56"
+    },
+    {
+      "path": "tests/p0/test_p1_home_pick.gd.uid",
+      "sha256": "f4e205b3270aadfd96b31adda82af2cf7faa0289228388f599115ec0f264a030"
+    },
+    {
+      "path": "tests/p0/test_p1_home_pick_map.gd.uid",
+      "sha256": "b121fd072019e446dee27829593dac8250ef241a3d049d1a20f07571d572562a"
+    },
+    {
+      "path": "tests/p0/test_p1_home_pin.gd.uid",
+      "sha256": "46bf0887fbaf21fe6e136977277034122243a34b926b03c2eeadae13f974b2b2"
+    },
+    {
+      "path": "tests/p0/test_p1_home_pin_page.gd.uid",
+      "sha256": "314afe75f84b385497d974bdf2182c6a2d558772a4989482155d948430d60627"
+    },
+    {
+      "path": "tests/p0/test_p1_kindred.gd.uid",
+      "sha256": "9794ba44ae091808bacd418d7f3856249ff3df90de60f36f03a65f99754bef20"
+    },
+    {
+      "path": "tests/p0/test_p1_master_angler.gd.uid",
+      "sha256": "0edb379ba2dfdb94cca125dded33b545616562e3f7e62a49b87f38d79e86080c"
+    },
+    {
+      "path": "tests/p0/test_p1_master_gardener.gd.uid",
+      "sha256": "deaee55e3b3e1980f66390f81ad69a16b57aacfe8ae9200a406316f3b198994c"
+    },
+    {
+      "path": "tests/p0/test_p1_mine_hut.gd.uid",
+      "sha256": "d21c6a217c000da10b22a0c566dc3fe75cd4d25fd21f9c2d0d931c0db4793cbf"
+    },
+    {
+      "path": "tests/p0/test_p1_notice_board.gd.uid",
+      "sha256": "b51de85abae2b5e6ed84b7e0e56e42763713dc3a3bf2db2e8ec88158732c8814"
+    },
+    {
+      "path": "tests/p0/test_p1_orchard.gd.uid",
+      "sha256": "aba4ad11db1ef5248f410e12ab6ddcfb6ddfb1ed264815ef6481c5062b881a0e"
+    },
+    {
+      "path": "tests/p0/test_p1_placement_topdown.gd.uid",
+      "sha256": "002bf5f55ecd517651c1edcd1d51bb12350a7652238e4c7349bc11fa79554322"
+    },
+    {
+      "path": "tests/p0/test_p1_quick_radish.gd.uid",
+      "sha256": "fcd52ffceda7f2094e8873b7009867ea2b835ece249e7df14fad809bd302060b"
+    },
+    {
+      "path": "tests/p0/test_p1_regional_seeds.gd.uid",
+      "sha256": "cb10d51537d02f8c8affbce4ad3a83e008b3ee24de9d5d2c72d70b4d5ec2bca5"
+    },
+    {
+      "path": "tests/p0/test_p1_room_tiers.gd.uid",
+      "sha256": "8ca0a6ff8b4d922669e48ccc15255f48840992304b950f2dcd8c2e82f89ea54b"
+    },
+    {
+      "path": "tests/p0/test_p1_sell_distance.gd.uid",
+      "sha256": "d0a772f9c64207ceae10b33e9aa1838e2ebeedbc861c6711d40c2b3fdb73c559"
+    },
+    {
+      "path": "tests/p0/test_p1_titles.gd.uid",
+      "sha256": "5fb58d9d6ba2dff6b090d80fe940d37ff05c6fbbb733e4babe3af49e4c64d9c8"
+    },
+    {
+      "path": "tests/p0/test_p1_today_homestead.gd.uid",
+      "sha256": "0fa548d1cead31c1a003f833dfbb8180293f077d9792c01d858a3fac2c11335e"
+    },
+    {
+      "path": "tests/p0/test_p1_travel_post.gd.uid",
+      "sha256": "6b60380ed9d22af2f1c721e3f9bfd09321bbab6224d8f57926956ad8a154c988"
+    },
+    {
+      "path": "tests/p0/test_p1_wing_blocked.gd.uid",
+      "sha256": "351b414f8a21c99e07676ed7ba9971acbe5b7d76d0e76e6ebb5404ea906d80a5"
+    },
+    {
+      "path": "tests/p0/test_p1_yard_grow.gd.uid",
+      "sha256": "a2b29edcbceec2446e3ec2dd5079da7a6fc565b2a3fdfe11c0ef4ed217c7259d"
+    },
+    {
+      "path": "tests/ponds/test_p0_pond_foam.gd.uid",
+      "sha256": "66b620dd77b5ac6142b45f3de8fd92c6e46a33a25fca1443abfa0e891580d4c8"
+    },
+    {
+      "path": "tests/shaders/test_gles_albedo.gd.uid",
+      "sha256": "ce1fd6bf43b734a591f3f06326e97aa47f1155135ff88b9bd9d46d2502854c61"
+    },
+    {
+      "path": "tests/shaders/test_gles_colour.gd.uid",
+      "sha256": "46825ce5ed92b8cc774ebd3ae0095e2f8c4e3c54bb3d72874c3725cdad599d14"
+    },
+    {
+      "path": "tests/ui/test_gles_sun_shadows.gd.uid",
+      "sha256": "c1e3a7e0fdca71c5c46f34a4174f5017b3dd100aeb773a63141b961b2350938d"
+    },
+    {
+      "path": "tests/ui_kit/test_bold_italic.gd.uid",
+      "sha256": "2ce609f9a258eb218a9148994ef3345633e827b7e4e846058f0f20486bc079a5"
+    },
+    {
+      "path": "tests/ui_kit/test_heat_ring_mark.gd.uid",
+      "sha256": "c4e0af7c93c89eca8bcfeb79da29ce308f67fc72d3dc3ec57ea58d318bf2c14f"
+    },
+    {
+      "path": "tests/ui_kit/test_world_icon_progress.gd.uid",
+      "sha256": "73531fcf0ec22a9d93de0e12224983d828eb768e874be6151a46105ec55fb19b"
+    },
+    {
+      "path": "tools/dev/basic_room/basic_room.gd.uid",
+      "sha256": "ddb14ff7b40b0cd74e06c6a2d0056ad1f3e1139e171f1570c10d54f835615c72"
+    },
+    {
+      "path": "tools/dev/basic_room/collect_avatar_deps.gd.uid",
+      "sha256": "349926fad6053208e8d93cc539809fc4147b4a1c9d6e98fe2ae1bb8b589d0f48"
+    },
+    {
+      "path": "tools/dev/basic_room/configure_imports.gd.uid",
+      "sha256": "8104d9b7013dc19ef0d4353dfa2d933fd2183eedf1445fa062a0815c06386caf"
+    },
+    {
+      "path": "tools/dev/basic_room/frame_probe.gd.uid",
+      "sha256": "4c9022997b5c00ade952e8a3329fe451a04dd11bf3531e25d8f5201596a8cfb2"
+    },
+    {
+      "path": "tools/dev/basic_room/record_fire.gd.uid",
+      "sha256": "412c403bc413d7ede4ba6b6a630ad79c09c96f0943698efd4587a857e15cee9f"
+    },
+    {
+      "path": "tools/dev/basic_room/room_controls.gd.uid",
+      "sha256": "e6cac67376b1d1f24c5a4fcbb594480763de74a00e1f4ab24c243ab2db9f7f4d"
+    },
+    {
+      "path": "tools/dev/basic_room/test_basic_room.gd.uid",
+      "sha256": "a497fc286d8e3cc28b9a9b39b06a53dd5011bdb099870848282980cf08d2f61c"
+    },
+    {
+      "path": "tools/dev/look_thumbs.gd.uid",
+      "sha256": "e526a9662e4245c2e7124de935bddc13c9e42a09557891c9766c03fcc30727ea"
+    },
+    {
+      "path": "tools/dev/npc_lineup.gd.uid",
+      "sha256": "658b267adec9f0efc402ed819ac0274b41f3fddb4b566ed2556cd64bb374de37"
+    },
+    {
+      "path": "tools/dev/p0_notify_fake_phone.gd.uid",
+      "sha256": "2e59903a2d8d6c46cf95ad5e57cf5f5ad2a25c5630c49f248f24fa5a486564d2"
+    },
+    {
+      "path": "tools/dev/p0_sell_price_shots.gd.uid",
+      "sha256": "7a448de636359f2c4274191c3023ff39a20f1edb79eb00243e3ce22d89d930e5"
+    },
+    {
+      "path": "tools/dev/parts_contact_sheet.gd.uid",
+      "sha256": "e6345abb27797fee976c3545a5289456106695ea3e9a8024982c65970b704d70"
+    }
+  ],
+  "auxiliary_worktrees": [
+    {
+      "path": "/Volumes/ACASIS/tmp/nezha-1082-1083-combination-1116",
+      "head": "637ef5003f4ac2d459837dddd68431f53eef9a1d",
+      "patch": "nezha-1082-1083-combination-1116.patch",
+      "untracked_archive": "nezha-1082-1083-combination-1116-untracked.tar.gz",
+      "untracked_count": 178,
+      "archive_sha256": "12cf783bf73995fbf3575391c23bf7a632599293009a97d0d842dcaf959f5bf1"
+    },
+    {
+      "path": "/Volumes/ACASIS/tmp/nezha-name-reset-1117",
+      "head": "243c474332f2dbea8aafa8e49621eab3996f9d06",
+      "patch": "nezha-name-reset-1117.patch",
+      "untracked_archive": "nezha-name-reset-1117-untracked.tar.gz",
+      "untracked_count": 184,
+      "archive_sha256": "34a397a679f9c717051aa036493e9a96fb22788a15616350cb06346e43e57944"
+    },
+    {
+      "path": "/Volumes/ACASIS/tmp/nezha-review",
+      "head": "72c73a4875a22438ac4b2335f08cb7830698f00b",
+      "patch": "nezha-review.patch",
+      "untracked_archive": "nezha-review-untracked.tar.gz",
+      "untracked_count": 68,
+      "archive_sha256": "d4b850819391ff1db3071e06b53206b4a62d52b3fd49d17dcf73d6075d0e93b6"
+    }
+  ]
+}
