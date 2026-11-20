@@ -25,7 +25,7 @@ func _room() -> Array:
 	var v: FakeVoice = auto_free(FakeVoice.new())
 	var room: P0VoiceRoom = auto_free(P0VoiceRoom.new())
 	room.voice = v
-	var answers := {"status": {"available": true, "age": "unknown"}, "age": {"age": "ok"}, "report": {"result": "sent"}}
+	var answers := {"status": {"available": true, "age": "unknown", "ban": null}, "age": {"age": "ok"}, "report": {"result": "sent"}}
 	room.request = func(_m: int, path: String, _b: Dictionary) -> Dictionary:
 		return {"ok": true, "json": answers.get(path.get_file(), {})}
 	room.setup(null, online, "tea")
@@ -81,7 +81,7 @@ func test_a_child_s_answer_hides_voice() -> void:
 	var f := _room()
 	var room: P0VoiceRoom = f[0]
 	room.request = func(_m: int, path: String, b: Dictionary) -> Dictionary:
-		return {"ok": true, "json": {"available": true, "age": "unknown"} if path.get_file() == "status" else {"age": "ok" if b.get("ok") else "no"}}
+		return {"ok": true, "json": {"available": true, "age": "unknown", "ban": null} if path.get_file() == "status" else {"age": "ok" if b.get("ok") else "no"}}
 	ui.set_voice_room(room)
 	await room.fetch_status()
 	ui._voice_keys.mic.pressed.emit()
@@ -116,9 +116,14 @@ func test_the_people_drawer_mutes_blocks_after_its_card_and_reports() -> void:
 	confirm.cancelled.emit()
 	assert_str(ui.modal_kind).is_equal("people")
 	d.report_pressed.emit(4)
+	assert_str(ui.modal_kind).is_equal("report")
+	var report = ui._report_flow.drawer
+	report.choose("harassment")
+	report.submit.activated.emit()
 	await await_idle_frame()
 	assert_str(ui.toast_text()).is_equal("Report sent")
-	d.close.pressed.emit()   # its own Close under the rows (V3)
+	ui.open_people()
+	ui._people.close.pressed.emit()   # its own Close under the rows (V3)
 	assert_str(ui.modal_kind).is_not_equal("people")
 
 ## §7 as V5 has it (383 50108c43): the wheel opens on this year with nothing picked; a tap on a year picks it, a drag
@@ -326,7 +331,7 @@ func test_a_room_with_no_voice_has_no_pill_either() -> void:
 	online.transport = func(_m): pass
 	var room: P0VoiceRoom = auto_free(P0VoiceRoom.new())
 	room.voice = auto_free(FakeVoice.new())
-	room.request = func(_m: int, _p: String, _b: Dictionary) -> Dictionary: return {"ok": true, "json": {"available": true, "age": "ok"}}
+	room.request = func(_m: int, _p: String, _b: Dictionary) -> Dictionary: return {"ok": true, "json": {"available": true, "age": "ok", "ban": null}}
 	room.setup(null, online, "church")
 	ui.set_voice_room(room)
 	await room.fetch_status()

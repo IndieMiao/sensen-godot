@@ -52,7 +52,11 @@ export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCat
   pass?: (player: string, outpost: string) => string | null;
   joined?: (o: Occupant) => void; departed?: (o: Occupant) => void;
   /** hides(a, b): a and b never see each other in a room — a Block either way (P0Voice; q(28), 383 V3, 奕星 11-02). */
-  hides?: (a: string, b: string) => boolean }
+  hides?: (a: string, b: string) => boolean;
+  /** SGODOT-488: who the upgrade is (accounts/identify.ts), the routes' own answer; absent, x-p0-player as before. */
+  identify?: (headers: Record<string, unknown>) => { player: string } | { status: number; body: object };
+  /** SGODOT-488 / 491: a player's name as their save has it (absent: never given, or reset) — the roster's `name`. */
+  nameOf?: (player: string) => string | null | undefined }
 
 export class P0OnlineHub {
   readonly conns = new Set<Conn>();
@@ -75,8 +79,16 @@ export class P0OnlineHub {
     // SYS-UPDATE / SYS-MAINT (gate.ts): the same 426 / 503 and JSON body as the routes, and no upgrade.
     const refused = this.deps.gate?.check(req.headers);
     if (refused) { socket.end(upgradeRefusal(refused)); return; }
-    const player = String(req.headers['x-p0-player'] ?? '');
-    if (!PLAYER_RE.test(player)) { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); return; }
+    let player = String(req.headers['x-p0-player'] ?? '');
+    if (this.deps.identify) {
+      const w = this.deps.identify(req.headers);
+      if ('status' in w) {
+        const body = JSON.stringify(w.body);
+        socket.end(`HTTP/1.1 ${w.status} Refused\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(body)}\r\nConnection: close\r\n\r\n${body}`);
+        return;
+      }
+      player = w.player;
+    } else if (!PLAYER_RE.test(player)) { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); return; }
     if (this.conns.size >= LIMITS.connections) { socket.end('HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\n\r\n'); return; }
     this.wss.handleUpgrade(req, socket, head, ws => this.accept(ws, player));
   }
@@ -88,6 +100,21 @@ export class P0OnlineHub {
     this.conns.clear();
     this.byPlayer.clear();
     this.wss.close();
+  }
+
+  /** Account deletion / session invalidation: leave immediately, forget reconnect state and stop queued inputs.
+   * Keep A1's return value (whether a socket was open) and the client's no-reconnect close code. */
+  kick(player: string): boolean {
+    const c = this.byPlayer.get(player);
+    if (c) {
+      this.byPlayer.delete(player);
+      this.conns.delete(c);
+      this.depart(c, false);
+      c.ws.close(4001, 'SESSION_REPLACED');
+    }
+    const orphan = this.deps.rooms.forget(player);
+    if (orphan) this.deps.departed?.(orphan);
+    return !!c;
   }
 
   private accept(ws: WebSocket, player: string): void {
@@ -107,6 +134,7 @@ export class P0OnlineHub {
   }
 
   private message(c: Conn, raw: Buffer, binary: boolean): void {
+    if (this.byPlayer.get(c.player) !== c) return;
     const now = Date.now();
     c.tokens = Math.min(LIMITS.burst, c.tokens + (now - c.tokenAt) / 1000 * LIMITS.refill_per_s);
     c.tokenAt = now;
@@ -285,7 +313,19 @@ export class P0OnlineHub {
   }
 
   private view(m: Occupant) {
-    return { id: m.id, player: publicPlayer(m.player), seat: m.seat, appearance: this.byPlayer.get(m.player)?.appearance ?? defaultAppearance() };
+    const name = this.deps.nameOf?.(m.player);
+    return { id: m.id, player: publicPlayer(m.player), seat: m.seat, appearance: this.byPlayer.get(m.player)?.appearance ?? defaultAppearance(),
+      ...(name ? { name } : {}) };   // the name tag's (哪吒 491); none, and the client writes Traveller + the handle's first 4
+  }
+
+  /** A player renamed (account/name, or a moderator's reset): the others in their room see the new name now — the same
+   * `peer` a change of outfit sends (members replaced by id). */
+  renamed(player: string): void {
+    const me = this.deps.rooms.occupant(player);
+    if (!me) return;
+    const members = this.deps.rooms.members(me.outpost, me.room, me.layout);
+    for (const m of members) if (m.player !== player && this.sees(m.player, player))
+      this.toPlayer(m.player, { t: 'peer', count: this.seenBy(m.player, members).length, member: this.view(me) });
   }
 
   private step(): void {

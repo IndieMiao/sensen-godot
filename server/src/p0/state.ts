@@ -186,6 +186,9 @@ export const SAVE_VERSION = 7;
 /** The weapon a new save holds (v7, 355 G; 周瑜's contract v0.1: weapon ids are weapon_*, the G PR adds the item). */
 export const START_WEAPON = 'weapon_wooden_sword';
 
+/** One sanction in force from `at` (SGODOT-484): till `until`, or for good when null. */
+export interface Sanction { until: number | null; at: number; report?: string }
+
 export interface P0State {
   v: 7;
   player: string;
@@ -245,6 +248,19 @@ export interface P0State {
   blackjack?: import('./blackjack.js').BjState;   // SGODOT-351 the card room: intro seen, hand count, the hand in play, a result not yet seen (no version of its own)
   buffs?: { farm?: number; fish?: number };   // the priest's buffs (buffs.ts): each one's end, real time; one gone by is dropped at the next take
   title?: string;                // q(180): the title worn, a stable id (titles.ts); absent until the player picks one, never filled in
+  // SGODOT-488 accounts (q(312)–q(317); optional, an older server ignores them, no save version): the name the player
+  // gave (absent when they skipped it), the terms and privacy versions they agreed to and when, and the age gate passed.
+  profile?: { name?: string; name_set_at?: number; name_locked_until?: number };
+  consent?: { terms: string; privacy: string; at: number };
+  age_ok?: true;
+  test?: true;                   // SGODOT-488 §2.5: a test account (Test options' Start new test account), left out of the counts
+  login?: 'code';                // contract v1.4 §4: an account a test code signs into (a reviewer's, a tester's without Google)
+  // SGODOT-484 sanctions (苏烈's admin commands write it, through the admin port only; identify reads suspended, voice join
+  // reads voice; never in the view). until: ms, null for good; report: the report id that brought it (R-YYYYMMDD-…).
+  sanctions?: { suspended?: Sanction; voice?: Sanction; name_reset_at?: number };
+  // SGODOT-484 v1.6.10: account-level confirmation of the latest name reset, stored atomically with the save.
+  // Optional; old name_reset_at is read logically as 1/0, never backfilled by a GET. Not part of the game view.
+  account_notices?: { name_reset: { version: number; ack_version: number } };
   rng: number;
   seq: number;
 }

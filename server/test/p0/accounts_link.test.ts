@@ -1,0 +1,105 @@
+/** Sign-in's shared parts (SGODOT-489; contract-accounts.md §2, §4). */
+import { describe, expect, it } from 'vitest';
+import { conflictFarm, consentNote, expiredSignIn, liveOwner, PENDING_MS, PendingSignIns, signIn } from '../../src/p0/accounts/link.js';
+import { P0Accounts } from '../../src/p0/accounts/store.js';
+import { loadP0Content } from '../../src/p0/content.js';
+import { P0Store } from '../../src/p0/store.js';
+
+const c = loadP0Content();
+const T = (n: number) => n.toString(16).padStart(64, '0');
+
+describe('PendingSignIns', () => {
+  it('gives a pending sign-in back once, within 10 minutes; one past its time goes to expired', () => {
+    let now = 0;
+    const gone: string[] = [];
+    const p = new PendingSignIns(() => now, i => gone.push(i.link.sub));
+    const a = p.create('apple', { sub: 'a1', aud: 'app.gensen.maps', refresh: 'r' });
+    expect(a).toMatch(/^[0-9a-f]{64}$/);
+    expect(p.take(a)?.link.sub).toBe('a1');
+    expect(p.take(a)).toBeUndefined();
+    const b = p.create('google', { sub: 'g1' });
+    now = PENDING_MS;
+    expect(p.take(b)).toBeUndefined();
+    expect(gone).toEqual(['g1']);
+    expect(p.take(42)).toBeUndefined();
+  });
+});
+
+describe('expiredSignIn (周瑜 on #1033)', () => {
+  it("an unused Apple sign-in's authorization is withdrawn at its end — never one whose Apple ID has a farm", async () => {
+    let now = 0;
+    const accounts = new P0Accounts();
+    const revoked: string[] = [];
+    const p = new PendingSignIns(() => now, expiredSignIn(accounts, async (aud, refresh) => { revoked.push(`${aud} ${refresh}`); }));
+    accounts.ensure('p0-farm00001'); accounts.link('p0-farm00001', 'apple', { sub: 'linked', aud: 'app.gensen.maps' });
+    p.create('apple', { sub: 'free', aud: 'app.gensen.maps', refresh: 'r-free' });       // no farm: withdrawn
+    p.create('apple', { sub: 'linked', aud: 'app.gensen.maps', refresh: 'r-linked' });   // claim's conflict left: kept
+    p.create('apple', { sub: 'nocode', aud: 'app.gensen.maps' });                        // no refresh token: nothing to withdraw
+    p.create('google', { sub: 'g1' });
+    expect(p.peek('nobody')).toBeUndefined();
+    now = PENDING_MS;
+    p.sweep();
+    await Promise.resolve();
+    expect(revoked).toEqual(['app.gensen.maps r-free']);
+    expect(p.size()).toBe(0);
+  });
+  it('no Apple client (Apple off): nothing to withdraw; a failed withdrawal is a warning only', async () => {
+    const accounts = new P0Accounts();
+    expect(() => expiredSignIn(accounts, null)({ provider: 'apple', link: { sub: 's', aud: 'a', refresh: 'r' }, at: 0 })).not.toThrow();
+    const warned: string[] = [];
+    expiredSignIn(accounts, async () => { throw new Error('APPLE_REVOKE_500'); }, l => { warned.push(l); })({ provider: 'apple', link: { sub: 's', aud: 'a', refresh: 'r' }, at: 0 });
+    await new Promise(r => setTimeout(r, 0));
+    expect(warned).toEqual([JSON.stringify({ apple: 'revoke_failed', error: 'APPLE_REVOKE_500' })]);
+  });
+});
+
+describe('consentNote (spec v2 §9)', () => {
+  it('nothing for a farm agreed to these terms; consent_outdated with them otherwise, and signIn carries it', () => {
+    const store = new P0Store(c), accounts = new P0Accounts();
+    const v = { terms: '2026-11-13', privacy: '2026-11-13' };
+    const a = store.get('p0-agree0001', 0); a.consent = { ...v, at: 0 }; store.put(a);
+    store.get('p0-never0001', 0);
+    const note = consentNote(store, v);
+    expect(note('p0-agree0001')).toEqual({});
+    expect(note('p0-never0001')).toEqual({ consent_outdated: true, terms_version: v.terms, privacy_version: v.privacy });
+    accounts.ensure('p0-never0001');
+    expect(signIn({ accounts, consent: note }, 'p0-never0001', T(1))).toMatchObject({ ok: true, consent_outdated: true });
+    expect(signIn({ accounts }, 'p0-never0001', T(2))).not.toHaveProperty('consent_outdated');
+  });
+});
+
+describe('conflictFarm', () => {
+  it('says the other farm\'s name, home level and last play', () => {
+    const store = new P0Store(c);
+    const s = store.get('p0-other0001', 1_000);
+    s.profile = { name: 'Mia' }; s.homestead.level = 7; s.presence.last_at = 5_000; store.put(s);
+    expect(conflictFarm(store, 'p0-other0001', 6_000)).toEqual({ name: 'Mia', home_level: 7, last_played_at: 5_000 });
+  });
+});
+
+describe('signIn', () => {
+  it('revokes the account\'s other user tokens, keeps admin ones, kicks its socket and issues the new token', () => {
+    const accounts = new P0Accounts();
+    accounts.issue('p0-a0000001', T(1)); accounts.issue('p0-a0000001', T(3), 'admin', Date.now() + 1e6);
+    accounts.link('p0-a0000001', 'google', { sub: 'g' });
+    const kicked: string[] = [];
+    expect(signIn({ accounts, kick: p => kicked.push(p) }, 'p0-a0000001', T(2))).toEqual({ ok: true, player: 'p0-a0000001', linked: ['google'] });
+    expect(accounts.byToken(T(1))).toBeUndefined();
+    expect(accounts.byToken(T(2))?.player).toBe('p0-a0000001');
+    expect(accounts.byToken(T(3))?.kind).toBe('admin');
+    expect(kicked).toEqual(['p0-a0000001']);
+  });
+});
+
+describe('liveOwner', () => {
+  it('is the linked farm while it is there; a link left on a farm gone is dropped as found', () => {
+    const store = new P0Store(c), accounts = new P0Accounts();
+    store.get('p0-live00001', 0);
+    accounts.link('p0-live00001', 'google', { sub: 'g-live' });
+    accounts.link('p0-gone00001', 'google', { sub: 'g-gone' });   // no save: lost
+    expect(liveOwner(store, accounts, 'google', 'g-live', 0)).toBe('p0-live00001');
+    expect(liveOwner(store, accounts, 'google', 'g-gone', 0)).toBeUndefined();
+    expect(accounts.byIdentity('google', 'g-gone')).toBeUndefined();   // free to link again
+    expect(liveOwner(store, accounts, 'google', 'nobody', 0)).toBeUndefined();
+  });
+});

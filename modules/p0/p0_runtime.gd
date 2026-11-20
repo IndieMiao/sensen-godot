@@ -33,6 +33,7 @@ var errors = preload("res://modules/p0/p0_error_report.gd").new()   # P0ErrorRep
 ## the map's pond card measures Distance from here (q(48)).
 var here := {"space": "home", "place": ""}
 var ui: P0Ui
+var name_notices = preload("res://scenes/p0/account/p0_name_reset_flow.gd").new()
 var world: Node
 var _shot_t := 0.0
 var _shot_script: Array = []
@@ -130,14 +131,7 @@ func _switch_test_account(action: String) -> void:
 		_switching_test_account = false
 		ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
 		return
-	var tree := get_tree()
-	set_process(false)
-	session.set_process(false)
-	while AppRouter.instance_depth() > 0: AppRouter._discard_top()
-	_instance = null
-	UiCommandButton.offline = false
-	tree.change_scene_to_file("res://scenes/p0/p0_boot.tscn")
-	queue_free()
+	_reboot()
 
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
@@ -203,9 +197,16 @@ func _init() -> void:
 		if not cmd.is_empty(): _call("p0_event", [{"kind": "send_failed", "cmd": cmd}, session.current()]))
 	ui.sys_retry.connect(_probe)
 	session.blocked.connect(_on_blocked)
+	# SGODOT-488 accounts: the first launch's pages (哪吒's P0AccFlow) and the account's own refusals (his account pages)
+	session.first_run_needed.connect(_on_first_run_needed)
+	session.account_state.connect(_on_account_state)
+	if ui.has_signal("account_action"): ui.connect("account_action", _on_account_action)
+	_connect_account_ui()
 	ui.screen_action.connect(_on_screen_action)
 	ui.screen_back.connect(_on_screen_back)
 	ui.lifecycle.watch(session)
+	name_notices.setup(self)
+	add_child(name_notices)
 	session.command_started.connect(ui.track_pressed)
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
 		P0FishingPanel.auto_play = true
@@ -270,6 +271,7 @@ static func scene_load_event(scene: String, place: String, attach_ms: int, first
 
 func detach(w: Node) -> void:
 	if world == w:
+		name_notices.interrupt()
 		_call("p0_joystick", [Vector2.ZERO])
 		ui.end_stick()
 		world = null
@@ -411,15 +413,20 @@ func _call(method: String, args: Array):
 	return null
 
 func _enter_tree() -> void:
+	AppRouter.foreground_back_action = _account_back_action
 	AppRouter.loading_overlay_factory = _scene_overlay   # SYS-LOADING-SCENE for the P0 worlds AppRouter opens
 	OS.add_logger(errors)   # GDScript errors to the server, once the account's gate is open (SGODOT-486)
 
 func _exit_tree() -> void:
+	if AppRouter.foreground_back_action == _account_back_action:
+		AppRouter.foreground_back_action = Callable()
 	if AppRouter.loading_overlay_factory == Callable(self, &"_scene_overlay"): AppRouter.loading_overlay_factory = Callable()
 	OS.remove_logger(errors)
 	WaterShore.finish_all()   # the app ending: no pond bank's task left to the pool past the scripts (WaterShore.prewarm)
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_PAUSED: name_notices.set_background(true)
+	elif what == NOTIFICATION_APPLICATION_RESUMED: name_notices.set_background(false)
 	if what == NOTIFICATION_APPLICATION_RESUMED:
 		_on_resumed()
 		if ui.notify != null:   # what was set for the background goes; the phone's settings may have changed meanwhile
@@ -1400,7 +1407,455 @@ func _net_ok() -> void:
 ## Retry, and the check every PROBE_S while offline: one state read.
 func _probe() -> void:
 	_probe_left = PROBE_S
-	if not session.busy: session.refresh()
+	if not session.busy: _launch_read()
+
+## The launch's read: the state — or, while an accounts server has not said who this install is, hello again (a state
+## read would not leave: P0Session's gate). Its retries and Can't connect's Retry both come here.
+func _launch_read() -> void:
+	if session.accounts and not session.identity_ready: session.hello(func(_r): pass)
+	else: session.refresh()
+
+# ---------------------------------------------------------------- the first launch and the account (SGODOT-488 A2)
+## 哪吒's first-launch pages (scenes/p0/account/p0_acc_flow.gd; contract-accounts v1.4–v1.6.3): a Control on its own
+## layer over everything, its signals answered here — AGE, then a sign-in, then NAME when that account has no farm. A
+## path, so a build without them still runs (and the tests put in a fake).
+var acc_flow_path := "res://scenes/p0/account/p0_acc_flow.gd"
+## 亚瑟's P0SignIn (SGODOT-487): the phone's own sheet. A path for the same reason; the tests stand in with
+## native_sign_in: func(provider) -> P0SignIn's result ({result: ok | cancelled | failed, id_token, nonce, auth_code?}).
+const SIGN_IN_PATH := "res://modules/p0/p0_sign_in.gd"
+var native_sign_in := _native_sign_in
+var _acc_flow: Node
+var _acc_layer: CanvasLayer
+## NAME's answer: "guest" makes the save (a sign-in with no farm); "rename" names the account just signed in (an old one
+## claimed, a code's — 哪吒's no_farm(false), no Try another account).
+var _naming := "guest"
+var _provider := ""   # the last sign-in's account: the conflict card's
+var _signing := false   # a sheet is up: a second tap waits for it
+var _acc_requests := 0   # HTTP after the sheet/name check is also in flight (491 Back matrix, 11-15).
+var _acc_generation := 0
+var _code_retry := Callable()
+var _code_retry_page := 0
+## The player a world was built for when the pages came up over it (signed out, the key withdrawn, replaced): signing in
+## again restarts the launch, so no reply of that farm draws on another.
+var _world_player := ""
+
+## AppRouter asks this before any world/navigation lock, including a world already loaded behind first launch.
+## Keep one Android notification owner (AppRouter); another _notification here would process the same Back twice.
+func _account_back_action() -> int:
+	if ui.screen_kind() in [P0SysScreen.Kind.SESSION, P0SysScreen.Kind.DELETED, P0SysScreen.Kind.SUSPENDED,
+			P0SysScreen.Kind.MAINT, P0SysScreen.Kind.UPDATE]:
+		return AppRouter.BACK_IGNORE
+	if is_instance_valid(_acc_flow):
+		if _signing or _acc_requests > 0: return AppRouter.BACK_IGNORE
+		if _acc_flow.has_method("back") and bool(_acc_flow.call("back")): return AppRouter.BACK_IGNORE
+		# The flow owns the screen even when its page has no internal return (AGE / Sign in / NO-GMS).
+		# Returning to Android's home is not permission for the farm below it to receive Back.
+		return AppRouter.BACK_LEAVE_APP
+	if name_notices.handle_back(): return AppRouter.BACK_IGNORE
+	# q(315): the report drawer owns Back before navigation/stack/world handling, below account gates.
+	if ui.report_back(): return AppRouter.BACK_IGNORE
+	return AppRouter.BACK_PASS
+
+## NAME releases its name-check flag before guest/rename; Switch removes CHOOSE before pending answers.
+## Count these complete host operations, not just the visible card/check flag. A failure/timeout unlocks Back;
+## an older flow's late answer must not subtract from a new flow's count. No request or response is changed here.
+func _acc_reply(done: Callable) -> Callable:
+	_acc_requests += 1
+	var generation := _acc_generation
+	return func(r: Dictionary):
+		if generation != _acc_generation: return   # the result belongs to an account page that has gone
+		_acc_requests = maxi(0, _acc_requests - 1)
+		done.call(r)
+
+## hello's answer is not `ready`: no world yet. offline keeps the launch cover and asks again; any other opens the pages
+## in place of the cover (no HUD meanwhile: the world is not built).
+func _on_first_run_needed(kind: String) -> void:
+	match kind:
+		"offline":
+			if _launch_s < 0.0: cover_launch()
+			_launch_retry_left = LAUNCH_RETRY_S
+		_: _open_acc_flow(kind)
+
+## The page a kind opens on this phone and Sign in's keys (哪吒's static P0AccFlow.entry, 11-14): NO-GMS in place of
+## the Sign in page on an Android phone without Google's services when email is off (v1.4 ⑮), Google's key gone there,
+## email's when hello offers it. A flow without entry (an older one): the kind as it is, no keys.
+func _entry(script: Script, kind: String) -> Dictionary:
+	if not script.get_script_method_list().any(func(m): return m.name == "entry"): return {"kind": kind, "providers": []}
+	return script.call("entry", kind, session.identity.email)
+
+func _open_acc_flow(kind: String) -> void:
+	name_notices.interrupt()
+	_launch_s = -1.0
+	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
+	_close_acc_flow()
+	var script = load(acc_flow_path) if ResourceLoader.exists(acc_flow_path) else null
+	if script == null:
+		push_warning("P0 accounts: no first-launch pages in this build (%s)" % acc_flow_path)
+		return
+	_naming = "guest"
+	var e := _entry(script, kind)
+	_acc_flow = script.new(str(e.get("kind", kind)), session.name_check, e.get("providers", []), session.identity.hints(), 0)
+	if "code_context" in _acc_flow:
+		_acc_flow.set("code_context", {"age": session.identity.legacy.get("age", null),
+			"consent": session.identity.legacy.get("consent", null),
+			"versions": {"terms": session.identity.terms_version, "privacy": session.identity.privacy_version}})
+	if "safe_top" in _acc_flow and ui.has_method("safe_top"): _acc_flow.set("safe_top", ui.safe_top())   # its bar under the status bar
+	_acc_layer = CanvasLayer.new()
+	_acc_layer.layer = 120   # over the HUD, the toasts and the system screens
+	add_child(_acc_layer)
+	_acc_layer.add_child(_acc_flow)
+	_acc_flow.connect("agreed", _on_acc_agreed.bind(kind))
+	if _acc_flow.has_signal("code_consent_agreed"):
+		_acc_flow.connect("code_consent_agreed", func(): session.identity.agree(false))
+	if _acc_flow.has_signal("code_left"):
+		_acc_flow.connect("code_left", func(_authenticated: bool):
+			_code_retry = Callable()
+			_code_retry_page = 0
+			session.identity.end_code_attempt())
+	_acc_flow.connect("named", _on_acc_named)
+	_acc_flow.connect("sign_in", _on_acc_sign_in)
+	_acc_flow.connect("failed", func(_code: String): _acc_failed({}))
+	for pair in [["sign_in_again", _on_acc_sign_in_again], ["switch_farm", _on_acc_switch], ["code_entered", _on_acc_code],
+			["consent_renewed", _on_consent_renewed]]:
+		if _acc_flow.has_signal(pair[0]): _acc_flow.connect(pair[0], pair[1])   # the pages of 11-15 / 11-19 on
+
+func _close_acc_flow() -> void:
+	session.identity.invalidate_code_attempt()   # an old code reply must not persist its identity after this flow ends
+	_code_retry = Callable()
+	_code_retry_page = 0
+	_acc_generation += 1
+	_acc_requests = 0
+	_signing = false
+	session.invalidate_account_requests()
+	if is_instance_valid(_acc_layer): _acc_layer.queue_free()
+	_acc_layer = null
+	_acc_flow = null
+
+## The terms and privacy as agreed: this server's versions (hello's).
+func _consent_body() -> Dictionary:
+	return {"age_ok": true, "terms": session.identity.terms_version, "privacy": session.identity.privacy_version}
+
+## AGE passed, or the consent card's Continue: nothing sent now — an old account's go with its claim (it has no token
+## yet), a new one's with guest. age_ok false sends nothing ever (q(312) ⑨ C: the page turns into AGE-BLOCK).
+func _on_acc_agreed(age_ok: bool, kind: String) -> void:
+	if age_ok: session.identity.agree(kind != "old_consent")
+
+## A sign-in key (apple / google): the phone's sheet, then the server — claim for an old install's id (the claim and the
+## link in one step), session/apple | google otherwise. Email never comes here: P0AccFlow opens 盘古's email pages
+## itself and 亚瑟's glue (SGODOT-497) calls email_start and sign_in / claim("email", …), its answers to _on_signed_in.
+func _on_acc_sign_in(provider: String) -> void:
+	if _signing: return
+	_signing = true
+	var generation := _acc_generation
+	var context := session.request_context()
+	var r: Dictionary = await native_sign_in.call(provider)
+	if generation != _acc_generation or not session.request_is_current(context): return
+	_signing = false
+	if not is_instance_valid(_acc_flow): return
+	if str(r.get("result", "")) == "cancelled":   # closed: nothing said, the keys back
+		_settle()
+		return
+	if str(r.get("result", "")) != "ok":
+		_acc_failed({})
+		_settle()
+		return
+	_provider = provider
+	var creds := {"id_token": str(r.get("id_token", "")), "nonce": str(r.get("nonce", "")), "auth_code": str(r.get("auth_code", ""))}
+	if session.identity.first_run().begins_with("old_"): session.claim(provider, creds, _acc_reply(_on_signed_in.bind("claim")))
+	else: session.sign_in(provider, creds, _acc_reply(_on_signed_in.bind("sign_in")))
+
+static func _native_sign_in(provider: String) -> Dictionary:
+	var script = load(SIGN_IN_PATH) if ResourceLoader.exists(SIGN_IN_PATH) else null
+	if script == null: return {"result": "failed", "provider": provider, "reason": "no_native"}
+	return await (script.apple() if provider == "apple" else script.google())
+
+## A sign-in's answer (a sheet's, session/pending's, a test code's). `how`: sign_in / claim / pending / code.
+func _on_signed_in(r: Dictionary, how: String) -> void:
+	if not is_instance_valid(_acc_flow): return
+	if how == "code":
+		if not bool(r.get("ok", false)):
+			_code_refused(r)
+		elif r.get("next_step") in ["name", "continue"]: _code_signed_in(str(r.next_step))
+		else: _code_refused({"ok": false, "code": "service_contract"})
+		return
+	if bool(r.get("ok", false)):
+		var next: Callable = _name_signed_in if how == "claim" else _acc_done
+		if bool(r.get("consent_outdated", false)) and how != "code" and _has_card():
+			# in, but that farm has no consent to today's terms (spec v2 §9): the card first, account/consent, then on —
+			# never the farm nor NAME before it is on record (a code's account reports its own in _code_signed_in).
+			# No card yet (q(325) pending): in as before #1055, nothing agreed for the player (奕星 11-14)
+			_renew(r, func(): session.consent(_consent_body(), _acc_reply(_consent_answered.bind(next))))
+			return
+		next.call()
+		return
+	match str(r.get("code", "")):
+		"no_farm":
+			_naming = "guest"
+			_acc_flow.call("no_farm")
+		"conflict": _acc_flow.call("conflict", session.identity.conflict_farm, _provider)
+		"claimed": _acc_flow.call("claimed", session.identity.legacy_linked)
+		"unknown_player":
+			# the server has no farm of this id (v1.6 ①): a new install — that sign-in's farm, or NAME
+			if session.identity.has_farm: session.sign_in_pending(_acc_reply(_on_signed_in.bind("pending")))
+			else:
+				_naming = "guest"
+				_acc_flow.call("no_farm")
+		"pending_expired":
+			_say("Sign-in expired. Please sign in again.")
+			_acc_flow.call("name_refused", r)
+		_: _acc_failed(r)
+	var own_page := str(r.get("code", "")) in ["no_farm", "conflict", "claimed"]
+	if not own_page: _settle()   # those bring their own page (code_refused the code page's), the keys back there
+
+## Sign in's keys back (哪吒's anti double-tap, 11-14): greyed from a tap on apple / google or a code till an answer —
+## no_farm / conflict / claimed and a code refused restore them on their own page; a sheet closed, a failure toasted or
+## anything else, here.
+func _settle() -> void:
+	if is_instance_valid(_acc_flow) and _acc_flow.has_method("sign_in_settled"): _acc_flow.call("sign_in_settled")
+
+## An old account claimed (v3.3 §3.3): NAME without Try another account; Skip keeps its name.
+func _name_signed_in() -> void:
+	_naming = "rename"
+	_acc_flow.call("no_farm", false)
+
+## Test-code entry has already obtained real age and current consent (including NO-GMS). Both server-directed
+## next steps wait for account/consent; no old view, name or mere existence of a save can decide where it goes.
+func _code_signed_in(next_step: String) -> void:
+	var kept = _acc_flow.call("kept") if _acc_flow.has_method("kept") else {}
+	var ready: bool = str(_acc_flow.call("code_gate")) == "ready" if _acc_flow.has_method("code_gate") \
+		else kept is Dictionary and kept.get("age_ok") == true
+	if not ready or next_step not in ["name", "continue"]:
+		_code_refused({"code": "service_contract"})
+		return
+	var generation := _acc_generation
+	var next := func():
+		if generation != _acc_generation or not is_instance_valid(_acc_flow): return
+		if next_step == "name": _name_signed_in()
+		else: _acc_done()
+	var player := session.identity.player
+	var token := session.identity.token
+	_code_retry_page = _code_page_id()
+	_code_retry = func():
+		if generation != _acc_generation: return
+		if player != session.identity.player or token != session.identity.token:
+			_code_retry = Callable()
+			_code_refused({"code": "service_contract"})
+			return
+		session.consent(_consent_body(), _acc_reply(func(r: Dictionary):
+			if generation == _acc_generation and player == session.identity.player and token == session.identity.token:
+				_code_consent_answered(r, next)))
+	if _acc_flow.has_method("code_authenticated"): _acc_flow.call("code_authenticated")
+	_code_retry.call()
+
+func _code_page_id() -> int:
+	if not is_instance_valid(_acc_flow): return 0
+	var p = _acc_flow.get("code_page") if "code_page" in _acc_flow else _acc_flow
+	return p.get_instance_id() if is_instance_valid(p) else 0
+
+func _code_refused(reply: Dictionary) -> void:
+	if str(reply.get("code", "")) in ["unauthenticated", "account_deleted", "session_replaced", "suspended"]:
+		session._refused(reply)   # existing higher-priority account gate, never an input error
+	elif is_instance_valid(_acc_flow) and _acc_flow.has_method("code_refused"):
+		_acc_flow.call("code_refused", reply)
+
+func _code_consent_answered(reply: Dictionary, next: Callable) -> void:
+	if not bool(reply.get("ok", false)) and str(reply.get("code", "")) != "consent_outdated" and not _renewing:
+		_code_refused(reply)   # no updated-terms card yet: failure is red on the test-code page
+	else: _consent_answered(reply, next)   # keep the established q(325) update-card / retry behavior
+
+## Try another account (NAME's, or the conflict card's second key): the ticket dropped; the page goes back to Sign in.
+func _on_acc_sign_in_again() -> void:
+	session.identity.pending = ""
+
+## Switch to that farm (the conflict card): the sign-in already checked, its farm entered — no second sheet (v1.6 ①).
+func _on_acc_switch() -> void:
+	session.sign_in_pending(_acc_reply(_on_signed_in.bind("pending")))
+
+
+func _on_acc_code(code: String) -> void:
+	if not is_instance_valid(_acc_flow) or _acc_requests > 0: return
+	if _code_retry.is_valid() and _code_retry_page == _code_page_id():
+		_code_retry.call()
+		return
+	_code_retry = Callable()
+	var generation := _acc_generation
+	session.sign_in_code(code, _acc_reply(func(r: Dictionary):
+		if generation == _acc_generation: _on_signed_in(r, "code")))
+
+## NAME's Save / Skip: a new account's save made (guest, the sign-in's ticket in it), or the account just signed in
+## named (rename; Skip keeps its name); then the world comes up under the launch cover, as any launch.
+func _on_acc_named(name: String, skip: bool) -> void:
+	if _naming == "rename":
+		if skip:
+			_acc_done()
+			return
+		session.rename(name, _acc_reply(func(r: Dictionary):
+			if bool(r.get("ok", false)): _acc_done()
+			elif str(r.get("code", "")) in ["name_rejected", "rate_limited"] and is_instance_valid(_acc_flow): _acc_flow.call("name_refused", r)
+			else: _acc_failed(r)))
+		return
+	var body := _consent_body()
+	if skip: body["skip"] = true
+	else: body["name"] = name
+	session.guest(body, _acc_reply(func(r: Dictionary):
+		var code := str(r.get("code", ""))
+		_consent_settled(_card_done(r))
+		if bool(r.get("ok", false)): _acc_done()
+		elif not is_instance_valid(_acc_flow): return
+		elif code == "consent_outdated": _renew(r, _on_acc_named.bind(name, skip))   # the card, then the same Save again
+		elif code == "conflict":
+			# the account was given a farm on another phone meanwhile (v1.6.2): the same card, from NAME
+			_acc_flow.call("conflict", session.identity.conflict_farm, _provider)
+		elif code in ["name_rejected", "pending_expired"]:
+			if code == "pending_expired": _say("Sign-in expired. Please sign in again.")
+			_acc_flow.call("name_refused", r)
+		else: _acc_failed(r)))
+
+## A refusal toasted where the page is.
+func _acc_failed(_r: Dictionary) -> void:
+	_say("Didn't go through · try again", true)
+
+## A line over the first-launch pages: on the flow's own layer (哪吒's say, 11-14 — P0Ui's toasts lie under its opaque
+## pages), on P0Ui's when no flow is up or it has none.
+func _say(text: String, error := false) -> void:
+	if is_instance_valid(_acc_flow) and _acc_flow.has_method("say"): _acc_flow.call("say", text, error)
+	elif error: ui.show_sys(UiSysBanner.Kind.CMD_FAIL, text, CMD_FAIL_S)
+	else: ui.toast(text)
+
+# ---- today's terms not agreed (不知火舞 spec v2 §9; 哪吒's consent_outdated / consent_renewed / consent_settled)
+## What the renewed terms redo: the request refused (guest's Save, a code's consent) or account/consent and the step
+## after a sign-in. Set while the card is up.
+var _renewed := Callable()
+var _renewing := false
+
+## Whether the flow has the card (哪吒's consent_outdated; q(325)).
+func _has_card() -> bool: return is_instance_valid(_acc_flow) and _acc_flow.has_method("consent_outdated")
+
+## Whether an answer to what the card redid closes it: anything but the terms moved again or no getting through
+## (network, rate_limited) — guest checks the consent before the name and the ticket, so name_rejected, pending_expired
+## or conflict are the page's own to show, with the card gone (周瑜 on #1056).
+static func _card_done(r: Dictionary) -> bool:
+	return bool(r.get("ok", false)) or not str(r.get("code", "")) in ["consent_outdated", "network", "rate_limited"]
+
+## The card `We've updated our terms` over the page, `redo` once agreed. A flow without it (q(325) not yet approved):
+## a toast where the page is and nothing more — never agreed for the player (奕星 11-14).
+func _renew(r: Dictionary, redo: Callable) -> void:
+	if not _has_card():
+		_say("Didn't go through · try again", true)
+		return
+	_renewed = redo
+	_acc_flow.call("consent_outdated", r)
+
+## Agreed: the versions the player saw (the flow kept them, user://p0_first_run.json) are the ones sent now.
+func _on_consent_renewed() -> void:
+	var kept = _acc_flow.call("kept") if is_instance_valid(_acc_flow) and _acc_flow.has_method("kept") else {}
+	if kept is Dictionary and str(kept.get("terms", "")) != "":
+		session.identity.terms_version = str(kept.terms)
+		session.identity.privacy_version = str(kept.get("privacy", session.identity.privacy_version))
+	_renewing = true
+	if _renewed.is_valid(): _renewed.call()   # kept till it goes through: the card's Continue again redoes it
+
+## The card's answer: closed when the request it redid went through (true); its key back otherwise (false) — a toast
+## says why, or the terms moved again and the card is asked for anew.
+func _consent_settled(ok: bool) -> void:
+	if not _renewing: return
+	_renewing = false
+	if ok: _renewed = Callable()
+	if is_instance_valid(_acc_flow) and _acc_flow.has_method("consent_settled"): _acc_flow.call("consent_settled", ok)
+
+## account/consent's answer: on to `next`; today's terms moved again meanwhile — the card again; else a toast.
+func _consent_answered(c: Dictionary, next: Callable) -> void:
+	var code := str(c.get("code", ""))
+	_consent_settled(_card_done(c))
+	if bool(c.get("ok", false)): next.call()
+	elif code == "consent_outdated": _renew(c, func(): session.consent(_consent_body(), _acc_reply(_consent_answered.bind(next))))
+	else:
+		_acc_failed(c)
+		if _card_done(c): _settle()   # the card closed on a failure no retry mends (周瑜 on #1056): Sign in's keys back under it
+
+## The account is settled: the pages go, the launch cover comes up and the world's first read is already out
+## (P0Session._identity_ready); p0_boot's when_first_view brings the farm (or the home pick) as on any launch. Over a
+## world built for a farm before (signed out, the key withdrawn): the launch again, from the start.
+func _acc_done() -> void:
+	_close_acc_flow()
+	if _world_player != "":
+		_world_player = ""
+		_reboot()
+		return
+	if _launch_s < 0.0: cover_launch()
+
+## An account refusal (P0Session.account_state): every request has stopped. unauthenticated is the Sign in page again
+## (v1.4 ⑮: the key withdrawn — Apple stopped, a code withdrawn; P0Session dropped the token), never the replaced
+## one's line; the others are their pages (哪吒's account pages).
+func _on_account_state(kind: String, detail: Dictionary) -> void:
+	_launch_s = -1.0
+	if kind == "unauthenticated":
+		_sign_in_again()
+		return
+	if ui.has_method("show_account_state"): ui.call("show_account_state", kind, detail)
+	else: push_warning("P0 accounts: %s (no account pages in this build)" % kind)
+
+## The Sign in page over whatever is up (the token already gone): signed_out, the world restarted once signed in.
+func _sign_in_again() -> void:
+	if not session.view.is_empty(): _world_player = session.player_id
+	_open_acc_flow(session.identity.first_run())
+
+## A key on an account page (P0Ui.account_action): sign_in (replaced) drops this phone's token for the Sign in page;
+## start_new (deleted) starts as a new install; sign_out (Settings › Account) is session/logout, then Sign in; contact
+## is the page's own (the support address).
+func _on_account_action(kind: String, action: String) -> void:
+	match action:
+		"sign_in":
+			if ui.has_method("hide_account_state"): ui.call("hide_account_state")
+			session.identity.drop()
+			_sign_in_again()
+		"start_new":
+			if ui.has_method("hide_account_state"): ui.call("hide_account_state")
+			session.identity.forget()
+			_world_player = session.player_id if not session.view.is_empty() else ""
+			session.hello(func(_r): pass)
+		"sign_out":
+			session.logout(func(_r): _sign_in_again())
+		"contact":
+			if ui.has_method("open_support"): ui.call("open_support")
+		_: push_warning("P0 accounts: %s on %s" % [action, kind])
+
+## 哪吒's Settings and profile (491 da392e6d0): which sign-in the Account group names, Sign out, Delete account (both
+## steps confirmed) and a rename. Each only where P0Ui has it, so a build without those pages runs as before.
+func _connect_account_ui() -> void:
+	if "account_of" in ui: ui.set("account_of", account_of)
+	for pair in [["sign_out_requested", func(): _on_account_action("settings", "sign_out")],
+			["delete_account_requested", _on_delete_account], ["rename_requested", _on_rename]]:
+		if ui.has_signal(pair[0]): ui.connect(pair[0], pair[1])
+
+## The Account group's sign-in: apple / google / email, "code" for a test code's account, "" off accounts or signed out
+## (no Account group, no Sign out, no Delete account).
+func account_of() -> String:
+	if not session.accounts or not session.identity.has_token(): return ""
+	return str(session.identity.linked[0]) if not session.identity.linked.is_empty() else "code"
+
+## Delete my account (both steps): gone, then Sign in over the world (restarted once signed in); refused, the page says.
+func _on_delete_account() -> void:
+	session.delete_account(func(r: Dictionary):
+		if session.identity.first_run() == "signed_out": _sign_in_again()
+		elif ui.has_method("delete_account_failed"): ui.call("delete_account_failed"))
+
+## Edit name's Save: account/name, its answer to the page as it came; the new name with the next read (view.account).
+func _on_rename(name: String) -> void:
+	session.rename(name, func(r: Dictionary):
+		if bool(r.get("ok", false)): session.refresh_after()
+		if ui.has_method("rename_answer"): ui.call("rename_answer", r))
+
+## The launch from the start (p0_boot): this runtime and its session go, the new one says hello again.
+func _reboot() -> void:
+	var tree := get_tree()
+	set_process(false)
+	session.set_process(false)
+	while AppRouter.instance_depth() > 0: AppRouter._discard_top()
+	_instance = null
+	UiCommandButton.offline = false
+	tree.change_scene_to_file("res://scenes/p0/p0_boot.tscn")
+	queue_free()
 
 # ---------------------------------------------------------------- whole-screen system states (SGODOT-233)
 const LAUNCH_SLOW_S := 8.0    # SYS-LOADING-2: `Taking longer than usual…`
@@ -1438,7 +1893,7 @@ func _tick_screens(dt: float) -> void:
 					_launch_retry_left -= dt
 					if _launch_retry_left <= 0.0 and not session.busy:
 						_launch_retry_left = -1.0
-						session.refresh()
+						_launch_read()
 				if _launch_s >= LAUNCH_FAIL_S and session.view.is_empty(): _launch_failed()
 			P0SysScreen.Kind.FAIL:
 				_probe_left -= dt

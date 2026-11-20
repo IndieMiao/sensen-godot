@@ -45,13 +45,13 @@ func _init() -> void:
 	set_count(0)
 
 ## The mic as Voice has it now.
-func set_mic(on: bool) -> void:
+func set_mic(on: bool, blocked := false) -> void:
 	mic_on = on
 	mic.icon = MIC if on else MIC_OFF
-	var box := UiStyleBox.make(UiTokens.COLOR_PRIMARY if on else UiTokens.COLOR_SURFACE, SIDE * 0.5,
+	var box := UiStyleBox.make(UiTokens.COLOR_DISABLED if blocked else UiTokens.COLOR_PRIMARY if on else UiTokens.COLOR_SURFACE, SIDE * 0.5,
 		Color.TRANSPARENT if on else UiTokens.COLOR_BORDER, 0.0 if on else 1.0)
 	for s in [&"normal", &"hover", &"pressed", &"focus", &"hover_pressed"]: mic.add_theme_stylebox_override(s, box)
-	var tint := Color.WHITE if on else UiTokens.COLOR_SECONDARY
+	var tint := UiTokens.COLOR_DISABLED_INK if blocked else Color.WHITE if on else UiTokens.COLOR_SECONDARY
 	for c in [&"icon_normal_color", &"icon_hover_color", &"icon_pressed_color", &"icon_focus_color", &"icon_hover_pressed_color"]:
 		mic.add_theme_color_override(c, tint)
 

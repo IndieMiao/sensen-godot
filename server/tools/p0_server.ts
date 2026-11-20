@@ -1,11 +1,24 @@
 /**
- * P0 server (no Postgres, no accounts): `node --import tsx tools/p0_server.ts`. Local playtests by default; the
+ * P0 server (no Postgres; accounts in accounts.json beside the save, SGODOT-488): `node --import tsx tools/p0_server.ts`. Local playtests by default; the
  * deployed image (server/deploy/p0) runs the same file with P0_DEV=0 and P0_ACCESS_KEYS (SGODOT-232 D1).
  * Port P0_PORT (default 3110) on P0_HOST (default 0.0.0.0); state persisted to P0_STATE_FILE (default output/p0/p0-state.json);
  * observation log beside it in events/ (P0_EVENT_DIR, empty to turn it off).
  * Android emulator: `adb reverse tcp:3110 tcp:3110`, client base URL http://127.0.0.1:3110/v1.
  * Outpost rooms on the same port: ws://…/v1/p0/online (x-p0-player header), GET /v1/p0/presence.
  */
+import { APPLE_JWKS_URL, AppleClient, appleVerifier, registerAppleRoutes } from '../src/p0/accounts/apple.js';
+import { AppleNotificationJournal, registerAppleNotifications } from '../src/p0/accounts/apple_notifications.js';
+import { accountsConfig, applePrivateKey } from '../src/p0/accounts/config.js';
+import { GOOGLE_JWKS_URL, googleVerifier, registerGoogleRoutes } from '../src/p0/accounts/google.js';
+import { alertMailerFromEnv, EmailCodes, emailReady, emailVerifier, registerEmailRoutes, signInMailerFromEnv } from '../src/p0/accounts/email.js';
+import { CachedJwks, jwksFetcher } from '../src/p0/accounts/jwt.js';
+import { consentNote, expiredSignIn, PendingSignIns } from '../src/p0/accounts/link.js';
+import { identify, inForce, isRefusal } from '../src/p0/accounts/identify.js';
+import { legalVersions, registerAccountRoutes } from '../src/p0/accounts/routes.js';
+import { registerCodeRoutes } from '../src/p0/accounts/codes.js';
+import { registerAccountDeleteRoute } from '../src/p0/accounts/delete.js';
+import { registerAccountNoticeRoutes } from '../src/p0/accounts/notices.js';
+import { P0Accounts } from '../src/p0/accounts/store.js';
 import Fastify from 'fastify';
 import { mkdirSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
@@ -14,6 +27,8 @@ import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
 import { P0Voice, p0VoiceFromEnv, registerP0Voice } from '../src/p0/online/voice.js';
+import { registerWebDeleteRoutes } from '../src/p0/accounts/web_delete.js';
+import { ReportDeliveryService } from '../src/p0/report_delivery.js';
 import { generatedOutpostSpec, landmarkOfRoom, landmarkRoomSpec, loadOutposts, pondOfRoom, pondRoomSpec } from '../src/p0/online/outposts.js';
 import { placeOf, roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
@@ -95,7 +110,24 @@ if (process.env.P0_IP_NEAR_TABLE) {
   try { ipNear = openIpNear(process.env.P0_IP_NEAR_TABLE); }
   catch (e) { console.error(JSON.stringify({ ip_near: 'unavailable', error: String((e as Error).message ?? e).slice(0, 200) })); }
 }
-registerP0Routes(app, { content, store, now: Date.now, dev, log, errors, rooms, ipNear });
+// SGODOT-488 accounts (contract-accounts.md): accounts.json beside the save, who a request is (identify) for the
+// routes, the voice routes, the room's WebSocket and the request limits alike. P0_LEGACY_ID=1 takes an id alone
+// (devserver, shots): the live server never has it — its healthz says legacy_id and the deploy's smoke checks false.
+const accountsCfg = accountsConfig();
+const accountsFile = path.join(path.dirname(stateFile), 'accounts.json');
+const accounts = new P0Accounts(accountsFile, accountsCfg.refreshKey);
+if (accountsCfg.guestOk) console.warn(JSON.stringify({ warn: 'P0_GUEST_OK=1: a new farm without a sign-in (never on the live server)' }));
+if (accountsCfg.legacyId) console.warn(JSON.stringify({ warn: 'P0_LEGACY_ID=1: an x-p0-player alone is taken for any player (never on the live server)' }));
+// SGODOT-484: a suspension in force (the save's sanctions, 苏烈's admin commands) turns every request away (403 suspended)
+const identifyDeps = { accounts, legacyId: accountsCfg.legacyId, updateUrl: () => gate.state().update_url || undefined,
+  suspended: (p: string) => inForce(store.peek(p)?.sanctions?.suspended, Date.now()) };
+// The voice routes and the room's upgrade: identify, and a token's player must have a save, as the routes hold it.
+const identifyReq = (h: Record<string, unknown>) => {
+  const w = identify(h, identifyDeps);
+  if (isRefusal(w) || w.via !== 'token' || store.find(w.player, Date.now())) return w;
+  return { status: 401, body: { ok: false as const, code: 'unauthenticated' } };
+};
+registerP0Routes(app, { content, store, now: Date.now, dev, log, errors, rooms, ipNear, identify: identifyDeps });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).
 // A pond's room checks the pond's city as entering the pond does (its city from the pond, never `pond:…`; home's are free).
@@ -113,27 +145,101 @@ const pass = (player: string, room: string) => {
 const voiceDir = path.dirname(stateFile);
 const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.join(voiceDir, 'voice_blocks.json'),
   ages: path.join(voiceDir, 'voice_ages.json'), reports: path.join(voiceDir, 'voice_reports.jsonl') });
-registerP0Voice(app, voice);
+voice.nameOf = p => store.peek(p)?.profile?.name ?? null;   // a report's name at that moment (SGODOT-484)
+// Pass the stored record, not a boolean or an expiry-filtered value: voice validates it before the shared projection.
+voice.voiceBan = p => store.peek(p)?.sanctions?.voice;
+// Reports are already on disk before onReport runs. Replaying JSONL covers a crash or an enqueue write failure.
+// P0_REPORT_MAIL defaults off: SMTP variables alone never enable mail or construct an SMTP transport.
+const reportDelivery = new ReportDeliveryService({ voice, reports: path.join(voiceDir, 'voice_reports.jsonl'),
+  outbox: path.join(voiceDir, 'report_outbox.json'), env: process.env });
+app.addHook('onClose', async () => { await reportDelivery.close(); });
+await reportDelivery.start();
+registerP0Voice(app, voice, identifyReq);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
-  joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b) });
+  joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b), identify: identifyReq,
+  nameOf: p => store.peek(p)?.profile?.name ?? null });   // the roster's name (哪吒 491)
+// Sign in with Apple / Google (SGODOT-489 PR-B; contract v1.4–v1.6.3): the keys fetched and cached, the pending
+// sign-ins in memory (an Apple one left unused has its authorization withdrawn, unless that Apple ID has a farm), and one check per provider shared by
+// session/apple|google and claim. No switch, no link in the first version.
+const appleCfg = accountsCfg.apple;
+const appleClient = appleCfg ? new AppleClient(appleCfg, () => applePrivateKey(appleCfg)) : null;
+const pendingSignIns = new PendingSignIns(Date.now, expiredSignIn(accounts, appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : null));
+setInterval(() => pendingSignIns.sweep(), 60_000).unref();
+const appleJwks = new CachedJwks(jwksFetcher(APPLE_JWKS_URL)), googleJwks = new CachedJwks(jwksFetcher(GOOGLE_JWKS_URL));
+const appleNotificationsFile = path.join(path.dirname(stateFile), 'apple-notifications.json');
+const appleNotifications = new AppleNotificationJournal(appleNotificationsFile);
+registerAppleNotifications(app, { store, accounts, voice, hub, pending: pendingSignIns, now: Date.now,
+  audiences: [...new Set([process.env.APPLE_BUNDLE_IDS, process.env.APPLE_SERVICES_IDS]
+    .flatMap(x => (x ?? '').split(',').map(s => s.trim()).filter(Boolean)))],
+  keys: appleJwks.keys, refreshKeys: appleJwks.refresh,
+  journal: appleNotifications });
+const kickPlayer = (p: string) => { hub.kick(p); };
+// a sign-in into a farm with no consent to today's terms says so (spec v2 §9): the App asks for it in place
+const consentOf = consentNote(store, legalVersions());
+const appleDeps = { store, accounts, now: Date.now, pending: pendingSignIns, apple: appleCfg, client: appleClient,
+  keys: appleJwks.keys, refreshKeys: appleJwks.refresh, kick: kickPlayer, consent: consentOf, authorized: appleNotifications.authorized };
+const googleDeps = { store, accounts, identify: identifyDeps, now: Date.now, pending: pendingSignIns,
+  audiences: accountsCfg.google?.audiences ?? [], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, kick: kickPlayer, consent: consentOf };
+registerAppleRoutes(app, appleDeps);
+registerGoogleRoutes(app, googleDeps);
+// Sign in with an emailed code (SGODOT-497; contract v1.5 / v1.6.4): off unless P0_EMAIL_LOGIN=1. The mail goes by
+// P0_SIGNIN_SMTP_URL / P0_SIGNIN_MAIL_FROM (signin@), the cap's alert by P0_ALERT_SMTP_URL / P0_ALERT_MAIL_TO /
+// P0_ALERT_MAIL_FROM (reports@); neither URL is ever logged. Switched on without a key or a mail: a warning, and the
+// routes answer provider_unavailable / email_unavailable — the server runs on.
+const signInMailer = signInMailerFromEnv();
+const emailDeps = { store, accounts, now: Date.now, pending: pendingSignIns, on: accountsCfg.emailLogin, codes: new EmailCodes(),
+  mailer: signInMailer, kick: kickPlayer, alert: alertMailerFromEnv(), consent: consentOf };
+if (accountsCfg.emailLogin && !emailReady(emailDeps))
+  console.warn(JSON.stringify({ warn: 'P0_EMAIL_LOGIN=1 but email sign-in cannot run', accounts_key: accounts.codesOn(), signin_smtp: !!signInMailer }));
+const startEmail = registerEmailRoutes(app, emailDeps);
+const appleWebId = appleCfg?.servicesIds[0], googleWebId = accountsCfg.google?.audiences[0];
+registerWebDeleteRoutes(app, { store, accounts, voice, hub, now: Date.now,
+  revokeApple: appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : undefined,
+  appleWeb: appleWebId ? { audiences: appleCfg!.servicesIds, keys: appleJwks.keys, refreshKeys: appleJwks.refresh, now: Date.now,
+    authorized: appleNotifications.authorized } : undefined,
+  googleWeb: googleWebId ? { audiences: [googleWebId], keys: googleJwks.keys, refreshKeys: googleJwks.refresh, now: Date.now } : undefined,
+  appleClientId: appleWebId, googleClientId: googleWebId, email: emailDeps, startEmail,
+  apiBase: 'https://farm.sensenjoy.cn/preview/p0/v1/web', origins: ['https://gensen.app', 'https://farm.sensenjoy.cn'] });
+const verifyApple = appleVerifier(appleDeps), verifyGoogle = googleVerifier(googleDeps), verifyEmail = emailVerifier(emailDeps);
+registerAccountRoutes(app, { store, accounts, identify: identifyDeps, now: Date.now, guestOk: accountsCfg.guestOk,
+  pending: pendingSignIns, kick: kickPlayer, renamed: p => { hub.renamed(p); }, email: emailReady(emailDeps),
+  authorizedApple: appleNotifications.authorized,
+  verify: async (provider, b) => {
+    const v = provider === 'apple' ? await verifyApple(b) : provider === 'google' ? await verifyGoogle(b)
+      : provider === 'email' ? await verifyEmail(b) : undefined;
+    return v === undefined || 'status' in v ? v : { link: v };
+  },
+  voiceAge: p => { const a = voice.status(p).age; return a === 'ok' ? true : a === 'no' ? false : null; },
+  voiceAgeOk: p => { voice.setAge(p, true); },
+  newSave: h => { const f = String(h['x-p0-features'] ?? '').split(',').map(x => x.trim()); return { pending: f.includes('choose_home'), guide: f.includes('guide_v3') }; } });
+// Test codes (contract v1.4 §4): the reviewers' and Google-less testers' sign-in; none without P0_ACCOUNTS_KEY.
+registerCodeRoutes(app, { store, accounts, now: Date.now });
 voice.tell = (player, payload) => hub.tell(player, payload);
+// App deletion (SGODOT-488, contract §4 / v1.6.6): the token's own account, a suspended one too; Apple's authorization
+// withdrawn with it when a refresh token is kept.
+registerAccountDeleteRoute(app, { store, accounts, voice, hub, now: Date.now, identify: identifyDeps,
+  revokeApple: appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : undefined });
+registerAccountNoticeRoutes(app, { store, identify: identifyDeps });
 voice.seen = (a, b) => hub.seenChanged(a, b);
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
-  return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000),
+  return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000), legacy_id: accountsCfg.legacyId, guest_ok: accountsCfg.guestOk,
     maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0, require_features: g.features_on ? g.features : [] };
 });
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');
-setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
+setInterval(() => snapshotState(stateFile, snapshots, 48, Date.now(), accountsFile, appleNotificationsFile), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config, dev_sites: devSitesFromEnv(process.env) }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config, dev_sites: devSitesFromEnv(process.env), email_login: emailReady(emailDeps) }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;
 if (admin) {
-  registerP0Admin(admin, { content, store, now: Date.now, key: process.env.P0_ADMIN_KEY!, gate });
+  registerP0Admin(admin, { content, store, now: Date.now, key: process.env.P0_ADMIN_KEY!, gate, accounts, kick: p => { hub.kick(p); },
+    deletion: { voice, hub, revokeApple: appleClient ? (aud, refresh) => appleClient.revoke(aud, refresh) : undefined },
+    reportRetention: reportDelivery,
+    moderation: { dropVoice: p => voice.drop(p, { requireConfirmed: true }), kick: p => { hub.kick(p); }, renamed: p => hub.renamed(p) } });
   await admin.listen({ port: adminPort, host: '127.0.0.1' });
 }
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => { void Promise.all([app.close(), admin?.close()]).then(() => process.exit(0)); });

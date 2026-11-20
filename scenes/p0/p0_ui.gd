@@ -5019,16 +5019,23 @@ func set_voice_room(r: Node) -> void:
 	if is_instance_valid(voice_room):
 		for s in [[&"changed", _voice_refresh], [&"age_needed", open_age_card]]:
 			if voice_room.is_connected(s[0], s[1]): voice_room.disconnect(s[0], s[1])
+		if voice_room.has_signal("notice") and voice_room.is_connected("notice", _voice_notice):
+			voice_room.disconnect("notice", _voice_notice)
 	voice_room = r if live else null
 	_has_voice_room = live
 	_mic_was_on = false
 	if voice_room:
 		voice_room.connect(&"changed", _voice_refresh)
 		voice_room.connect(&"age_needed", open_age_card)
+		if voice_room.has_signal("notice"): voice_room.connect("notice", _voice_notice)
 	if modal_kind == "people": close_modal()
 	_voice_refresh()
 
 func _voice() -> Node: return voice_room.get("voice") if voice_room else null
+
+func _voice_notice(text: String, failed: bool) -> void:
+	if failed: show_sys(UiSysBanner.Kind.CMD_FAIL, text)
+	else: toast(text)
 
 func _mic_on() -> bool:
 	var v := _voice()
@@ -5053,7 +5060,8 @@ func _voice_refresh() -> void:
 	if v != null and str(v.get("error")) == "MICROPHONE_DENIED": _mic_denied = true
 	_voice_keys.show_mic(offered)
 	var on := offered and _mic_on()
-	_voice_keys.set_mic(on)
+	var blocked := voice_room.has_method("mic_blocked") and bool(voice_room.call("mic_blocked"))
+	_voice_keys.set_mic(on, blocked)
 	var rows: Array = voice_room.call("people")
 	_voice_keys.set_count(rows.size())
 	var crowd = voice_room.get("online").get("crowd") if voice_room.get("online") else null
@@ -5070,6 +5078,9 @@ func _voice_refresh() -> void:
 
 func _on_mic_pressed() -> void:
 	if voice_room == null: return
+	if voice_room.has_method("mic_blocked") and bool(voice_room.call("mic_blocked")):
+		voice_room.call("toggle_mic")
+		return
 	if _mic_denied:   # the system box comes only the first time (§2): from then on the key says why and stays off
 		toast(PartyVoiceSession.error_text("MICROPHONE_DENIED"))
 		return
@@ -5128,13 +5139,21 @@ func _confirm_block(peer: int) -> void:
 	modal_kind = "block_confirm"
 	_modal_back = back
 
-## §6: no reason asked; the server's word in an Info toast (sent / already; a failure as the network's).
+## q(315)①: choose a protocol reason before sending; account-scoped handle cache and request ownership
+## live outside this room so reconnection/peer reuse cannot report somebody else (火舞 11-15 addendum).
+const ReportFlow := preload("res://scenes/p0/account/p0_report_flow.gd")
+var _report_flow: Node
+
 func _report(peer: int) -> void:
-	var said = await voice_room.call("report", peer)
-	match str(said):
-		"sent", "true": toast(REPORT_SENT)
-		"already": toast(REPORT_ALREADY)
-		_: show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")   # failed: as any command the network lost
+	if not is_instance_valid(_report_flow):
+		_report_flow = ReportFlow.new()
+		_report_flow.ui = self
+		add_child(_report_flow)
+	_report_flow.open(peer)
+
+## The runtime calls this from AppRouter's one foreground handler after higher-priority account gates.
+func report_back() -> bool:
+	return is_instance_valid(_report_flow) and bool(_report_flow.handle_back())
 
 ## §7: the 13+ gate (14 by the year, the user 11-02) the first time the mic key is tapped. Old enough goes on to the
 ## mic (P0VoiceRoom.answer_age), not old enough hides voice on this phone with an Info toast. Nothing else is kept.

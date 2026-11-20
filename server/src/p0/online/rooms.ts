@@ -130,6 +130,12 @@ export class OutpostRooms {
     return { outpost, room, capacity: spec.capacity, rejoined };
   }
 
+  /** Account deletion: discard both a live occupant and its reconnect location. */
+  forget(player: string): Occupant | undefined {
+    this.recent.delete(player);
+    return this.leave(player, false);
+  }
+
   /** Frees the seat and the place. `remember` keeps the instance for a quick reconnect. */
   leave(player: string, remember = true): Occupant | undefined {
     const o = this.byPlayer.get(player);

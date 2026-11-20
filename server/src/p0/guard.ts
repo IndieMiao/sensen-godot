@@ -5,6 +5,8 @@
  * The outpost rooms' WebSocket (/v1/p0/online, SGODOT-227) upgrades on the raw server and never reaches these hooks;
  * it checks the same keys itself (registerP0Online deps.keys) and limits its own messages.
  */
+import { bearerOf } from './accounts/identify.js';
+import { hashToken } from './accounts/store.js';
 import rateLimit from '@fastify/rate-limit';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
@@ -81,19 +83,26 @@ export async function registerP0Guard(app: FastifyInstance, opts: P0GuardOptions
     max: opts.perMinute,
     timeWindow: '1 minute',
     allowList: req => !isP0Request(req),
-    keyGenerator: req => `${req.ip}|${String(req.headers['x-p0-player'] ?? '')}`,
+    // SGODOT-488: a token's request counts by its token (its hash's head), an id's by the id as before
+    keyGenerator: req => { const t = bearerOf(req.headers); return t ? `${req.ip}|t:${hashToken(t).slice(0, 16)}` : `${req.ip}|${String(req.headers['x-p0-player'] ?? '')}`; },
     errorResponseBuilder: () => ({ ok: false, code: 'rate_limited', statusCode: 429 }),
   });
 }
 
-/** Copy the live save to <dir>/p0-state-<UTC hour>.json and keep the newest `keep` copies. */
-export function snapshotState(file: string, dir: string, keep: number, now = Date.now()): string | null {
+/** Copy the live save to <dir>/p0-state-<UTC hour>.json and keep the newest `keep` copies. With `accounts` (SGODOT-488,
+ * tech-plan §1.3) accounts.json goes beside it as <dir>/accounts-<the same hour>.json, kept the same: a save put back
+ * from an hour ago comes back with the tokens and links of that hour, never newer ones that would not match it. */
+export function snapshotState(file: string, dir: string, keep: number, now = Date.now(), accounts?: string, appleNotifications?: string): string | null {
   if (!existsSync(file)) return null;
   mkdirSync(dir, { recursive: true });
   const hour = new Date(now).toISOString().slice(0, 13).replace(/[-T:]/g, '');
   const to = path.join(dir, `p0-state-${hour}.json`);
   copyFileSync(file, to);
-  const all = readdirSync(dir).filter(f => /^p0-state-\d{10}\.json$/.test(f)).sort();
-  for (const old of all.slice(0, Math.max(0, all.length - keep))) rmSync(path.join(dir, old));
+  if (accounts && existsSync(accounts)) copyFileSync(accounts, path.join(dir, `accounts-${hour}.json`));
+  if (appleNotifications && existsSync(appleNotifications)) copyFileSync(appleNotifications, path.join(dir, `apple-notifications-${hour}.json`));
+  for (const kind of ['p0-state', 'accounts', 'apple-notifications']) {
+    const all = readdirSync(dir).filter(f => new RegExp(`^${kind}-\\d{10}\\.json$`).test(f)).sort();
+    for (const old of all.slice(0, Math.max(0, all.length - keep))) rmSync(path.join(dir, old));
+  }
   return to;
 }

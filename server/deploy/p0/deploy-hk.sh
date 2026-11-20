@@ -19,6 +19,18 @@
 #   server/deploy/p0/deploy-hk.sh players [--ids]               # player counts; --ids: ids by join time, terminal only
 #   server/deploy/p0/deploy-hk.sh energy <player id> <value>     # F1: set one player's Energy (day-4 revisit, ~80)
 #   server/deploy/p0/deploy-hk.sh report <player id> [YYYY-MM-DD] # F2: that player's session report + the day's lines
+# Accounts (SGODOT-488, contract-accounts §4.1; on the live server only 83 runs these, and asks 奕星 first):
+#   server/deploy/p0/deploy-hk.sh token <player id>            # an admin token for a test device (30 days, kept through
+#                                                                #   other devices' sign-ins): printed once, terminal only
+#   server/deploy/p0/deploy-hk.sh claim-reset <player id>      # clear its claim and revoke every token, admin ones too
+#   server/deploy/p0/deploy-hk.sh delete <player|support-code> [--confirm] # preview by default; live execution by 83 after PM approval
+#   server/deploy/p0/deploy-hk.sh delete-incomplete            # read-only unfinished deletion list, terminal only
+#   server/deploy/p0/deploy-hk.sh reports-retention [--confirm] # one-year active report/queue cleanup, preview by default
+#   server/deploy/p0/deploy-hk.sh code <player id|new> <note>  # a test code (contract v1.4 §4) for that account or a new one;
+#                                                                #   note an id such as review-play / cn-tester-03, never a name
+#   server/deploy/p0/deploy-hk.sh code-batch <count> <prefix>   # that many new accounts' codes, notes <prefix>-01 …
+#   server/deploy/p0/deploy-hk.sh code-revoke <player id>      # withdraw its code and the tokens it gave
+#                                                                # codes are printed once, terminal only, never saved
 # SYS-MAINT / SYS-UPDATE (gate.ts; kept in the data volume, so a restart keeps them; healthz and admin stay open):
 #   server/deploy/p0/deploy-hk.sh maint-on [back at]             # every /v1/p0 request answers 503 maintenance; back at =
 #                                                                #   any time, e.g. 2026-10-09T23:30+08:00 (sent as UTC ISO)
@@ -187,7 +199,7 @@ health() {   # $1 = label: Journey and farm healthz, saved for the before / afte
 step="${1:-}"; shift || true
 if [ "$TARGET" = hk ] && [ -z "$HK_OVERRIDE" ]; then
   case "$step" in
-    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version)
+    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version|token|claim-reset|code|code-batch|code-revoke|delete|reports-retention)
       echo "$step writes to Hong Kong, the frozen fallback (P0 stopped, data frozen) until 2026-11-01 16:00 +08:00: refused."
       echo "The live P0 is US West: deploy-hk.sh --target us $step …"
       echo "Only for a fallback the PM has called: deploy-hk.sh --target hk --confirm-hk-frozen-override $step …"
@@ -324,7 +336,7 @@ case "$step" in
     say "build context of $ref ($sha) → $DEV:~/$dir"
     git -C "$repo" archive --format=tar "$ref" package.json pnpm-lock.yaml pnpm-workspace.yaml packages/blueprint-core server \
       assets/p0/p0_content.json assets/p0/content assets/p0/p0_outposts.json assets/p0/p0_ponds.json assets/ponds/catalog.json \
-      assets/p0/city_clusters.json assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json | gzip | dev "rm -rf ~/$dir && mkdir -p ~/$dir && tar -C ~/$dir -xzf -"
+      assets/p0/city_clusters.json assets/p0/legal/versions.json assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json | gzip | dev "rm -rf ~/$dir && mkdir -p ~/$dir && tar -C ~/$dir -xzf -"
     # q(188) ① Near you: the pinned DB-IP City Lite month from the devserver's cache (DB-IP keeps only the last two
     # months online; 周瑜 on #447) into the context's dbip/, read by the Dockerfile through a bind mount (no layer).
     month=$(git -C "$repo" show "$ref:server/deploy/p0/Dockerfile" | sed -n 's/^ARG DBIP_MONTH=//p')
@@ -428,8 +440,18 @@ PY
     else
       pkey="$(key)"
     fi
-    say "public smoke at $SITE$PREFIX"
-    P0_BASE="$SITE$PREFIX" P0_KEY="$pkey" "$here/smoke.sh" | tee "$out/smoke.txt"
+    # SGODOT-488 (奕星 11-13): the fixed smoke account made afresh with an hour's token (admin port, loopback in the
+    # container) — the token stays in this shell and goes to smoke.sh in its environment, never to a file or the output.
+    # An image before /admin/smoke answers 404: smoke.sh runs a throwaway id alone then, as before.
+    sresp=$(admin /admin/smoke '{}' 2>/dev/null) || sresp=""
+    stoken=$(printf '%s' "$sresp" | python3 -c 'import json, sys
+try: print(json.load(sys.stdin)["token"])
+except Exception: pass') || stoken=""
+    splayer=$(printf '%s' "$sresp" | python3 -c 'import json, sys
+try: print(json.load(sys.stdin)["player"])
+except Exception: pass') || splayer=""
+    say "public smoke at $SITE$PREFIX${stoken:+ as the smoke account $splayer (its token, an hour)}"
+    P0_BASE="$SITE$PREFIX" P0_KEY="$pkey" P0_SMOKE_TOKEN="$stoken" P0_SMOKE_PLAYER="$splayer" "$here/smoke.sh" | tee "$out/smoke.txt"
     say "Journey and farm healthz after"
     health after
     ;;
@@ -463,7 +485,10 @@ import json, sys, time
 p = json.load(sys.stdin)["players"]; now = time.time() * 1000; day = 86400000
 seen = lambda d: sum(1 for x in p if (x.get("last_at") or 0) >= now - d * day)
 joined = sum(1 for x in p if (x.get("created_at") or 0) >= now - day)
-print(f"players {len(p)}; joined in 24 h {joined}; seen in 24 h {seen(1)}, 7 days {seen(7)}")' \
+print(f"players {len(p)}; joined in 24 h {joined}; seen in 24 h {seen(1)}, 7 days {seen(7)}")
+t = sorted(a["expires_at"] for x in p for a in x.get("admin_tokens", []))   # SGODOT-488: given to test devices
+end = time.strftime("%Y-%m-%d", time.gmtime(t[0] / 1000)) if t else ""
+if t: print(f"admin tokens in force {len(t)}, the first ends {end} (--ids: whose)")' \
         | tee -a "$out/players.txt"
     fi
     ;;
@@ -474,6 +499,86 @@ print(f"players {len(p)}; joined in 24 h {joined}; seen in 24 h {seen(1)}, 7 day
     say "F1: Energy of $player → $value (logged in the container log as an admin line)"
     admin /admin/energy "{\"player\":\"$player\",\"value\":$value}"; echo
     echo "$(date -u +%FT%TZ) energy …${player: -6} → $value" >> "$out/admin.txt"   # data B: the full id is not kept here
+    ;;
+  token)
+    # A test account on a test device (tech-plan §2.5): the token is that account's key, so it goes to this terminal
+    # once and nowhere else — no file, no tee; admin.txt keeps the id's tail and the end only.
+    player="${1:?token <player id>}"
+    [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }   # the server's PLAYER_RE
+    say "admin token for …${player: -6} (30 days): printed once below, terminal only — write it into the test device"
+    resp=$(admin /admin/session "{\"player\":\"$player\"}") || { echo "$resp"; exit 1; }
+    echo "$resp"
+    ends=$(printf '%s' "$resp" | python3 -c 'import json, sys, time; print(time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime(json.load(sys.stdin)["expires_at"] / 1000)))')
+    echo "$(date -u +%FT%TZ) token …${player: -6} ends $ends" >> "$out/admin.txt"   # data B: no full id, never the token
+    ;;
+  code)
+    # A test code (contract v1.4 §4): the code is that account's key, so it goes to this terminal once and nowhere else;
+    # admin.txt keeps the note and the id's tail. Notes are ids (review-play, cn-tester-03), never a person's anything.
+    who="${1:?code <player id|new> <note>}"; note="${2:?code <player id|new> <note>}"
+    [[ "$note" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$ ]] || { echo "the note is an id such as review-play or cn-tester-03, no names: $note"; exit 2; }
+    if [ "$who" = new ]; then body="{\"note\":\"$note\"}"
+    else [[ "$who" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $who"; exit 2; }; body="{\"player\":\"$who\",\"note\":\"$note\"}"; fi
+    say "test code ($note) for $([ "$who" = new ] && echo 'a new account' || echo "…${who: -6}"): printed once below, terminal only"
+    resp=$(admin /admin/code "$body") || { echo "$resp"; exit 1; }
+    echo "$resp"
+    tail=$(printf '%s' "$resp" | python3 -c 'import json, sys; print(json.load(sys.stdin)["player"][-6:])')
+    echo "$(date -u +%FT%TZ) code $note …$tail" >> "$out/admin.txt"   # never the code
+    ;;
+  code-batch)
+    count="${1:?code-batch <count> <note prefix>}"; prefix="${2:?code-batch <count> <note prefix>}"
+    [[ "$count" =~ ^[0-9]{1,2}$ ]] && [ "$count" -ge 1 ] && [ "$count" -le 50 ] || { echo "count 1–50: $count"; exit 2; }
+    [[ "$prefix" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]{0,35}$ ]] || { echo "the prefix is an id such as cn-tester, no names: $prefix"; exit 2; }
+    say "$count test codes for new accounts, notes $prefix-01 …: printed once below, terminal only"
+    for i in $(seq 1 "$count"); do
+      note="$prefix-$(printf '%02d' "$i")"
+      resp=$(admin /admin/code "{\"note\":\"$note\"}") || { echo "$note: $resp"; exit 1; }
+      printf '%s' "$resp" | python3 -c 'import json, sys; r = json.load(sys.stdin); print(r["note"], r["code"], "…" + r["player"][-6:], sep="\t")'
+      echo "$(date -u +%FT%TZ) code $note …$(printf '%s' "$resp" | python3 -c 'import json, sys; print(json.load(sys.stdin)["player"][-6:])')" >> "$out/admin.txt"
+    done
+    ;;
+  code-revoke)
+    player="${1:?code-revoke <player id>}"
+    [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }
+    say "withdraw the test code of …${player: -6} and the tokens it gave (its other sign-ins stay)"
+    admin /admin/code/revoke "{\"player\":\"$player\"}"; echo
+    echo "$(date -u +%FT%TZ) code-revoke …${player: -6}" >> "$out/admin.txt"
+    ;;
+  reports-retention)
+    [ "$#" -le 1 ] && { [ -z "${1:-}" ] || [ "$1" = --confirm ]; } || { echo 'use reports-retention [--confirm]'; exit 2; }
+    say 'report retention preview (counts only; active JSONL and queue, no backups)'
+    admin /admin/reports/retention; echo
+    if [ "${1:-}" = --confirm ]; then admin /admin/reports/retention '{"apply":true}'; echo; fi
+    ;;
+  delete-incomplete)
+    say "unfinished deletion records (admin, terminal only; not all cleanup failures are in this list)"
+    admin /admin/delete/incomplete; echo
+    ;;
+  delete)
+    selector="${1:?delete <player|support-code> [--confirm]}"
+    confirmation="${2:-}"
+    [ "$#" -le 2 ] && { [ -z "$confirmation" ] || [ "$confirmation" = --confirm ]; } || { echo 'use delete <player|support-code> [--confirm]'; exit 2; }
+    if [[ "$selector" =~ ^[0-9A-HJKMNP-TV-Z]{5}-[0-9A-HJKMNP-TV-Z]{5}$ ]]; then
+      field=support_code
+    elif [[ "$selector" =~ ^[A-Za-z0-9_-]{8,64}$ ]]; then
+      field=player
+    else
+      echo 'invalid player/support-code'; exit 2
+    fi
+    say "delete preview (terminal only; production apply is for 83 after PM approval)"
+    admin "/admin/delete/preview?$field=$selector"; echo
+    if [ "$confirmation" = --confirm ]; then
+      admin /admin/delete "{\"$field\":\"$selector\"}"; echo
+      echo "$(date -u +%FT%TZ) delete …${selector: -6}" >> "$out/admin.txt"
+    else
+      say 'preview only; --confirm applies deletion after approval'
+    fi
+    ;;
+  claim-reset)
+    player="${1:?claim-reset <player id>}"
+    [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }
+    say "claim reset for …${player: -6}: its claim cleared, every token revoked (admin ones too); its old id can claim again"
+    admin /admin/claim/reset "{\"player\":\"$player\"}"; echo
+    echo "$(date -u +%FT%TZ) claim-reset …${player: -6}" >> "$out/admin.txt"
     ;;
   maint-on)
     back="${1:-}"

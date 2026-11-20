@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import { AccessToken } from 'livekit-server-sdk';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -6,7 +7,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadOutposts, pondRoomSpec } from '../../src/p0/online/outposts.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
 import { publicPlayer } from '../../src/p0/online/hub.js';
-import { NO_VOICE_ROLES, P0Voice, p0VoiceFromEnv, registerP0Voice, RELEASE_RETRY_MS, VOICE_LEASE_MS } from '../../src/p0/online/voice.js';
+import { NO_VOICE_ROLES, P0Voice, p0VoiceFromEnv, registerP0Voice, RELEASE_RETRY_MS, reportReason, VOICE_LEASE_MS } from '../../src/p0/online/voice.js';
+import { supportCode } from '../../src/p0/support.js';
 
 // Voice in the online rooms (SGODOT-383; the user, 11-02 via 奕星, q(274)): the voice room is the hub's room; LiveKit sees
 // the peer id, never the player id; Market Square has none; Block is both ways and kept; Report is a log line; no 13+
@@ -43,6 +45,43 @@ function setup(config: typeof CONFIG | null = CONFIG) {
 const jwt = (token: string) => JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
 
 describe('P0 voice (SGODOT-383)', () => {
+  it('does not return a voice grant when the account is removed while JWT signing is pending', async () => {
+    const { voice, enter, rooms } = setup();
+    voice.setAge('player-delete', true);
+    enter('player-delete');
+    let signed!: (value: string) => void;
+    const signing = new Promise<string>(resolve => { signed = resolve; });
+    const jwtSpy = vi.spyOn(AccessToken.prototype, 'toJwt').mockReturnValue(signing);
+    try {
+      const pending = voice.join('player-delete');
+      await voice.removePlayer('player-delete');
+      rooms.forget('player-delete');
+      signed('fake-signed-token');
+      await expect(pending).resolves.toMatchObject({ code: 'LEASE_EXPIRED', status: 410 });
+    } finally { jwtSpy.mockRestore(); }
+  });
+
+  it('account deletion releases a live lease and age while retaining reports and the other participant', async () => {
+    const { voice, enter, files, inLiveKit, removed } = setup();
+    for (const p of ['player-delete', 'player-kept']) voice.setAge(p, true);
+    enter('player-delete');
+    const other = enter('player-kept');
+    const grant = await voice.join('player-delete') as Record<string, any>;
+    const kept = await voice.join('player-kept') as Record<string, any>;
+    inLiveKit(grant); inLiveKit(kept);
+    voice.block('player-delete', other.id, true);
+    voice.report('player-delete', other.id, 'harassment');
+    const reports = readFileSync(files.reports, 'utf8');
+    await voice.removePlayer('player-delete');
+    expect(removed).toEqual([[grant.room, grant.self]]);
+    expect(voice.status('player-delete').age).toBe('unknown');
+    expect(voice.status('player-kept').age).toBe('ok');
+    expect(voice.heartbeat('player-delete', grant.lease_id)).toMatchObject({ code: 'LEASE_EXPIRED' });
+    expect(voice.heartbeat('player-kept', kept.lease_id)).toMatchObject({ ok: true });
+    expect(JSON.parse(readFileSync(files.blocks, 'utf8'))).toEqual({});
+    expect(readFileSync(files.reports, 'utf8')).toBe(reports);
+  });
+
   it('is off without P0_VOICE=on, and on needs the LiveKit keys', () => {
     expect(p0VoiceFromEnv({})).toBeNull();
     expect(p0VoiceFromEnv({ P0_VOICE: 'off', LIVEKIT_URL: 'ws://x', LIVEKIT_API_KEY: 'k', LIVEKIT_API_SECRET: 's' })).toBeNull();
@@ -79,7 +118,7 @@ describe('P0 voice (SGODOT-383)', () => {
     expect(voice.status('player-aaaa').age).toBe('unknown');
     expect(voice.setAge('player-aaaa', false)).toBeNull();
     expect(voice.setAge('player-aaaa', true)).toMatchObject({ code: 'AGE_GATE' });
-    expect(voice.status('player-aaaa')).toEqual({ ok: true, available: true, age: 'no' });
+    expect(voice.status('player-aaaa')).toEqual({ ok: true, available: true, age: 'no', ban: null });
     expect(JSON.parse(readFileSync(files.ages, 'utf8'))).toEqual({ 'player-aaaa': false });
   });
 
@@ -240,20 +279,48 @@ describe('P0 voice (SGODOT-383)', () => {
     expect(voice.blockedList('player-bbbb')).toEqual([]);   // the blocked one's own list says nothing of it
     rooms.leave('player-bbbb');   // apart now: still unblocked from the list
     expect(voice.unblock('player-aaaa', 'ffffffffffffffff')).toMatchObject({ code: 'NOT_BLOCKED', status: 404 });
+    voice.nameOf = p => (p === 'player-bbbb' ? 'Mia' : null);
+    voice.block('player-aaaa', 2, true);
+    expect(voice.blockedList('player-aaaa')).toEqual([{ handle: publicPlayer('player-bbbb'), name: 'Mia' }]);   // the Blocked list's name (491)
+    voice.nameOf = () => null;
+    expect(voice.blockedList('player-aaaa')).toEqual([{ handle: publicPlayer('player-bbbb') }]);
     expect(voice.unblock('player-aaaa', publicPlayer('player-bbbb'))).toEqual({ ok: true, blocked: [] });
     expect(voice.hides('player-aaaa', 'player-bbbb')).toBe(false);
     expect(seen).toEqual([['player-aaaa', 'player-bbbb'], ['player-aaaa', 'player-bbbb']]);
   });
 
-  it('Report writes one line — who, whom, when, where — and nothing else happens', () => {
+  it('Report writes one v2 line — its id, the support codes, the name then, the reason, where, the channel — hands it on, and nothing else happens (SGODOT-484)', () => {
+    const { voice, enter, files } = setup();
+    const handed: unknown[] = [];
+    voice.onReport = l => { handed.push(l); };
+    voice.nameOf = p => (p === 'player-bbbb' ? 'Mia' : null);
+    const logged: string[] = [];
+    const log = vi.spyOn(console, 'log').mockImplementation((l: string) => { logged.push(l); });
+    try {
+      enter('player-aaaa');
+      const b = enter('player-bbbb');
+      expect(voice.report('player-aaaa', b.id, 'harassment', 'play')).toEqual({ ok: true, already: false });
+      expect(voice.report('player-aaaa', b.id, '')).toEqual({ ok: true, already: true });   // You already reported this: no second line
+      const text = readFileSync(files.reports, 'utf8');
+      const line = JSON.parse(text.trim());
+      expect(line).toEqual({ kind: 'voice_report', v: 2, id: expect.stringMatching(/^R-\d{8}-[0-9A-HJKMNP-TV-Z]{8}$/), at: expect.any(String),
+        reporter_code: supportCode('player-aaaa'), reported_code: supportCode('player-bbbb'), name: 'Mia',
+        reason: 'harassment', place: 'sh_tea_1', room: 1, channel: 'play' });
+      expect(handed).toEqual([line]);   // handed on once, after the line is written
+      for (const t of [text, ...logged]) expect(t).not.toMatch(/player-aaaa|player-bbbb/);   // no player id kept or logged (§3.2)
+      expect(logged.join('')).not.toContain('Mia');
+      expect(voice.blockedPeers('player-aaaa')).toEqual([]);
+    } finally { log.mockRestore(); }
+  });
+
+  it("a reason outside the sheet's five, and a channel not a build's, are kept as other and ''", () => {
     const { voice, enter, files } = setup();
     enter('player-aaaa');
     const b = enter('player-bbbb');
-    expect(voice.report('player-aaaa', b.id, 'shouting')).toEqual({ ok: true, already: false });
-    expect(voice.report('player-aaaa', b.id, '')).toEqual({ ok: true, already: true });   // You already reported this: no second line
-    const line = JSON.parse(readFileSync(files.reports, 'utf8').trim());
-    expect(line).toMatchObject({ kind: 'voice_report', reporter: 'player-aaaa', reported: 'player-bbbb', place: 'sh_tea_1', room: 1, reason: 'shouting' });
-    expect(voice.blockedPeers('player-aaaa')).toEqual([]);
+    voice.report('player-aaaa', b.id, 'shouting', 'evil');
+    expect(JSON.parse(readFileSync(files.reports, 'utf8').trim())).toMatchObject({ reason: 'other', channel: '', name: null });
+    expect(reportReason('offensive_voice')).toBe('offensive_voice');
+    expect(reportReason(42)).toBe('other');
   });
 
   it('routes: a refusal is an HTTP error with its code (PartyVoiceSession reads non-2xx as one); the grant is a 200', async () => {
@@ -263,7 +330,7 @@ describe('P0 voice (SGODOT-383)', () => {
     const post = (url: string, payload: object, player = 'player-aaaa') => app.inject({ method: 'POST', url, payload, headers: { 'x-p0-player': player } });
     expect((await app.inject({ method: 'POST', url: '/v1/p0/voice/join', payload: {} })).statusCode).toBe(401);
     expect((await app.inject({ method: 'GET', url: '/v1/p0/voice/status', headers: { 'x-p0-player': 'player-aaaa' } })).json())
-      .toEqual({ ok: true, available: true, age: 'unknown' });
+      .toEqual({ ok: true, available: true, age: 'unknown', ban: null });
     let r = await post('/v1/p0/voice/join', {});
     expect([r.statusCode, r.json()]).toEqual([403, { ok: false, code: 'AGE_GATE' }]);
     expect((await post('/v1/p0/voice/age', { ok: true })).json()).toMatchObject({ age: 'ok' });
@@ -278,7 +345,8 @@ describe('P0 voice (SGODOT-383)', () => {
     enter('player-bbbb');
     expect((await post('/v1/p0/voice/block', { peer: '2', on: true })).json()).toEqual({ ok: true, blocked: ['2'] });
     expect((await post('/v1/p0/voice/block', { peer: 2, on: false })).json()).toEqual({ ok: true, blocked: [] });
-    expect((await post('/v1/p0/voice/report', { peer: '2' })).json()).toEqual({ ok: true, already: false });
+    expect((await app.inject({ method: 'POST', url: '/v1/p0/voice/report', payload: { peer: '2', reason: 'cheating' },
+      headers: { 'x-p0-player': 'player-aaaa', 'x-p0-channel': 'appstore' } })).json()).toEqual({ ok: true, already: false });
     expect((await post('/v1/p0/voice/report', { peer: '2.5' })).statusCode).toBe(400);
     expect((await post('/v1/p0/voice/leave', { lease_id: r.json().lease_id })).json()).toEqual({ ok: true });
     await app.close();

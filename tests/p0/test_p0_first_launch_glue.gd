@@ -1,0 +1,335 @@
+extends GdUnitTestSuite
+## The first launch's glue in P0Runtime (SGODOT-488 A2; contract v1.4–v1.6.3): first_run_needed opens the pages in place
+## of the launch cover; a sign-in key opens the phone's sheet, then session/apple | google, or claim for an old account
+## (with what AGE took); no_farm is NAME and guest with the ticket; a conflict is the card, its keys session/pending or
+## the ticket dropped; a test code reports this phone's AGE answer; then the launch cover comes up and the world's first
+## read goes. unauthenticated is the Sign in page again; an account refusal is its page.
+const P0Identity := preload("res://modules/p0/p0_identity.gd")
+const STORE := "user://test_p0_first_launch_glue.json"
+var rt: P0Runtime
+var sent: Array = []
+var replies := {}
+const SHEET_OK := {"result": "ok", "id_token": "eyJ.tok", "nonce": "n0nce", "auth_code": "c0de"}
+var sheet := {}   # what the phone's sheet answers
+
+func before_test() -> void:
+	sent = []
+	replies = {}
+	sheet = SHEET_OK.duplicate()
+	rt = auto_free(P0Runtime.new())
+	rt.ui.quick_store = STORE
+	rt.session.transport = func(_m, path, _b, _c): sent.append(path)
+	rt.acc_flow_path = "res://tests/p0/fakes/fake_acc_flow.gd"
+	rt.native_sign_in = func(provider: String) -> Dictionary: return sheet.merged({"provider": provider})
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.accounts = true
+	rt.session.identity_ready = false
+	rt.session.identity = P0Identity.new("user://test_p0_first_launch_glue_id/")
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://test_p0_first_launch_glue_id/"))
+	rt.session.identity.terms_version = "2026-11-13"
+	rt.session.identity.privacy_version = "2026-11-13"
+	rt.session.identity.send = func(_m: int, path: String, body: Dictionary, done: Callable):
+		sent.append([path, body])
+		done.call(replies.get(path, {"ok": false, "code": "network"}))
+	rt.session.busy = false
+	sent.clear()
+
+func after_test() -> void:
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
+	var d := DirAccess.open("user://test_p0_first_launch_glue_id/")
+	if d:
+		for n in d.get_files(): d.remove(n)
+
+func _sent(path: String) -> Array: return sent.filter(func(x): return x is Array and x[0] == path)
+
+func test_a_new_install_signs_in_names_its_farm_and_the_world_comes_up() -> void:
+	rt.cover_launch()
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	assert_object(rt._acc_flow).is_not_null()
+	assert_int(rt.ui.screen_kind()).is_equal(-1)   # the pages in place of the launch cover
+	var flow = rt._acc_flow
+	rt._acc_flow.agreed.emit(true)
+	assert_array(sent).is_empty()   # a new install's AGE goes with guest
+	replies["/p0/session/google"] = {"ok": false, "code": "no_farm", "pending": "pend-1"}
+	await rt._on_acc_sign_in("google")
+	assert_dict(_sent("/p0/session/google")[0][1]).contains_key_value("id_token", "eyJ.tok").contains_key_value("nonce", "n0nce")
+	assert_array(flow.calls).contains_exactly([["no_farm", true]])   # NAME, Try another account under it
+	replies["/p0/session/guest"] = {"ok": true, "player": "p0-bbbbbbbbbbbbbbbbbbbb", "linked": "google"}
+	flow.named.emit("Mia", false)
+	var guest: Array = _sent("/p0/session/guest")
+	assert_int(guest.size()).is_equal(1)
+	assert_dict(guest[0][1]).contains_key_value("name", "Mia").contains_key_value("terms", "2026-11-13") \
+		.contains_key_value("age_ok", true).contains_key_value("pending", "pend-1")
+	assert_bool(rt.session.identity_ready).is_true()
+	assert_object(rt._acc_flow).is_null()
+	assert_int(rt.ui.screen_kind()).is_equal(P0SysScreen.Kind.LAUNCH)
+	assert_array(sent).contains(["/p0/state"])   # the world's first read went out
+
+func test_a_sign_in_with_a_farm_goes_straight_in() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	replies["/p0/session/apple"] = {"ok": true, "player": "p0-cccccccccccccccccccc", "linked": ["apple"]}
+	await rt._on_acc_sign_in("apple")
+	assert_dict(_sent("/p0/session/apple")[0][1]).contains_key_value("auth_code", "c0de")
+	assert_bool(rt.session.identity_ready).is_true()
+	assert_object(rt._acc_flow).is_null()
+
+func test_a_closed_or_failed_sheet_sends_nothing_and_gives_the_keys_back() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	sheet = {"result": "cancelled"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(sent).is_empty()
+	assert_array(rt._acc_flow.calls).contains_exactly([["settled"]])
+	sheet = {"result": "failed", "reason": "APPLE_UNKNOWN"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(sent).is_empty()   # never read as "no farm here"
+	assert_array(rt._acc_flow.calls).contains_exactly([["settled"], ["settled"]])
+	sheet = SHEET_OK.duplicate()
+	replies["/p0/session/apple"] = {"ok": false, "code": "provider_unavailable"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(rt._acc_flow.calls[-1]).is_equal(["settled"])
+	replies["/p0/session/apple"] = {"ok": false, "code": "no_farm", "pending": "p"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(rt._acc_flow.calls[-1]).is_equal(["no_farm", true])   # its own page brings the keys back
+
+func test_entry_picks_the_page_and_the_keys() -> void:
+	var fake = load(rt.acc_flow_path)
+	fake.google_ok = false
+	rt.session.identity.email = false
+	rt.session.first_run_needed.emit("new")
+	assert_str(rt._acc_flow.kind).is_equal("no_google")
+	rt.session.identity.email = true
+	rt.session.first_run_needed.emit("new")
+	assert_str(rt._acc_flow.kind).is_equal("new")
+	assert_array(rt._acc_flow.providers).contains_exactly(["apple", "email"])
+	fake.google_ok = true
+
+func test_an_old_account_claims_with_its_age_then_keeps_its_name() -> void:
+	rt.session.identity.player = "p0-old0000000000000001"
+	rt.session.identity.kind = "old_age"
+	rt.session.first_run_needed.emit("old_age")
+	var flow = rt._acc_flow
+	flow.agreed.emit(true)
+	assert_array(sent).is_empty()   # nothing until the claim: no token yet
+	replies["/p0/session/claim"] = {"ok": true, "player": "p0-old0000000000000001", "age": true, "consent": {}}
+	await rt._on_acc_sign_in("apple")
+	assert_dict(_sent("/p0/session/claim")[0][1]).contains_key_value("provider", "apple").contains_key_value("age_ok", true) \
+		.contains_key_value("consent", {"terms": "2026-11-13", "privacy": "2026-11-13"})
+	assert_bool(rt.session.identity_ready).is_true()
+	assert_array(flow.calls).contains_exactly([["no_farm", false]])   # NAME, no Try another account
+	flow.named.emit("", true)   # Skip: its name stays, nothing sent
+	assert_array(_sent("/p0/account/name")).is_empty()
+	assert_array(_sent("/p0/session/guest")).is_empty()
+	assert_object(rt._acc_flow).is_null()
+
+func test_a_conflict_is_the_card_and_its_keys() -> void:
+	rt.session.identity.player = "p0-old0000000000000001"
+	rt.session.identity.kind = "old_signin"
+	rt.session.first_run_needed.emit("old_signin")
+	var flow = rt._acc_flow
+	var farm := {"name": "Mia", "home_level": 7, "last_played_at": 1}
+	replies["/p0/session/claim"] = {"ok": false, "code": "conflict", "pending": "pend-c", "has_farm": true, "farm": farm}
+	await rt._on_acc_sign_in("google")
+	assert_array(flow.calls).contains_exactly([["conflict", farm, "google"]])
+	flow.sign_in_again.emit()   # Try another account: the ticket dropped
+	assert_str(rt.session.identity.pending).is_empty()
+	replies["/p0/session/claim"]["pending"] = "pend-d"
+	await rt._on_acc_sign_in("google")
+	replies["/p0/session/pending"] = {"ok": true, "player": "p0-dddddddddddddddddddd", "linked": ["google"]}
+	flow.switch_farm.emit()   # Switch to that farm: no second sheet
+	assert_dict(_sent("/p0/session/pending")[0][1]).contains_key_value("pending", "pend-d")
+	assert_bool(rt.session.identity_ready).is_true()
+	assert_object(rt._acc_flow).is_null()
+
+func test_a_guest_race_is_the_same_card_from_name() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	replies["/p0/session/google"] = {"ok": false, "code": "no_farm", "pending": "pend-1"}
+	await rt._on_acc_sign_in("google")
+	var farm := {"name": "Ann", "home_level": 1, "last_played_at": 2}
+	replies["/p0/session/guest"] = {"ok": false, "code": "conflict", "pending": "pend-2", "has_farm": true, "farm": farm}
+	flow.named.emit("Mia", false)
+	assert_array(flow.calls[-1]).is_equal(["conflict", farm, "google"])
+	assert_str(rt.session.identity.pending).is_equal("pend-2")
+	assert_bool(rt.session.identity_ready).is_false()
+
+func test_a_refused_name_goes_back_to_the_page() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	replies["/p0/session/guest"] = {"ok": false, "code": "name_rejected", "reason": "blocked"}
+	flow.named.emit("Admin", false)
+	assert_array(flow.calls).contains_exactly([["name_refused", {"ok": false, "code": "name_rejected", "reason": "blocked"}]])
+	assert_bool(rt.session.identity_ready).is_false()
+
+func test_a_test_code_reports_this_phone_s_age_then_name() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	flow.record = {"age_ok": true, "terms": "2026-11-13", "privacy": "2026-11-13"}
+	replies["/p0/session/code"] = {"ok": false, "code": "bad_code"}
+	flow.code_entered.emit("ABCD-EFGH-JKMN")
+	assert_array(flow.calls).contains_exactly([["code_refused", {"ok": false, "code": "bad_code"}]])
+	replies["/p0/session/code"] = {"ok": true, "player": "p0-eeeeeeeeeeeeeeeeeeee", "next_step": "name"}
+	replies["/p0/account/consent"] = {"ok": true}
+	flow.code_entered.emit("ABCD-EFGH-JKMN")
+	assert_dict(_sent("/p0/account/consent")[0][1]).contains_key_value("age_ok", true).contains_key_value("terms", "2026-11-13")
+	assert_bool(rt.session.identity_ready).is_true()
+	assert_array(flow.calls[-1]).is_equal(["no_farm", false])
+	assert_array(_sent("/p0/session/guest")).is_empty()   # a code's account never takes guest
+
+func test_unauthenticated_is_the_sign_in_page_again() -> void:
+	rt.session.identity.player = "p0-ffffffffffffffffffff"
+	rt.session.identity.token = "cd".repeat(32)
+	rt.session.identity.linked = ["apple"]
+	rt.session.identity_ready = true
+	rt.session._refused({"ok": false, "code": "unauthenticated"})
+	assert_bool(rt.session.identity_ready).is_false()
+	assert_bool(rt.session.identity.has_token()).is_false()
+	assert_str(rt.session.identity.player).is_equal("p0-ffffffffffffffffffff")   # kept: the support code
+	assert_object(rt._acc_flow).is_not_null()
+	assert_str(rt._acc_flow.kind).is_equal("signed_out")
+	assert_dict(rt._acc_flow.hints).is_equal({"line": "last_time", "with": "apple"})
+
+func test_the_account_group_names_the_sign_in() -> void:
+	assert_str(rt.account_of()).is_empty()   # no token: no Account group
+	rt.session.identity.token = "cd".repeat(32)
+	rt.session.identity.linked = ["apple"]
+	assert_str(rt.account_of()).is_equal("apple")
+	rt.session.identity.linked = []
+	assert_str(rt.account_of()).is_equal("code")
+	rt.session.accounts = false
+	assert_str(rt.account_of()).is_empty()
+
+func test_delete_my_account_then_sign_in_or_stays_on_a_failure() -> void:
+	rt.session.identity.player = "p0-gggggggggggggggggggg"
+	rt.session.identity.token = "cd".repeat(32)
+	rt.session.identity_ready = true
+	rt._on_delete_account()   # no answer (network): nothing gone, no Sign in
+	assert_bool(rt.session.identity.has_token()).is_true()
+	assert_object(rt._acc_flow).is_null()
+	replies["/p0/account"] = {"ok": true}
+	rt._on_delete_account()
+	assert_bool(rt.session.identity.has_token()).is_false()
+	assert_bool(rt.session.identity_ready).is_false()
+	assert_str(rt._acc_flow.kind).is_equal("signed_out")
+	assert_dict(rt._acc_flow.hints).is_equal({"line": "", "with": ""})
+
+func test_a_rename_goes_to_the_server() -> void:
+	rt.session.identity.token = "cd".repeat(32)
+	replies["/p0/account/name"] = {"ok": true, "name": "Mia", "rename_at": 1}
+	rt._on_rename("Mia")
+	assert_dict(_sent("/p0/account/name")[0][1]).is_equal({"name": "Mia"})
+
+func test_outdated_terms_on_save_are_the_card_then_the_same_save_with_what_was_agreed() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	replies["/p0/session/google"] = {"ok": false, "code": "no_farm", "pending": "pend-1"}
+	await rt._on_acc_sign_in("google")
+	replies["/p0/session/guest"] = {"ok": false, "code": "consent_outdated", "terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+	flow.named.emit("Mia", false)
+	assert_array(flow.calls[-1]).is_equal(["consent_outdated", "2026-12-01"])
+	assert_str(rt.session.identity.terms_version).is_equal("2026-11-13")   # nothing agreed for them yet (奕星 11-14)
+	flow.record = {"age_ok": true, "terms": "2026-12-01", "privacy": "2026-12-01"}   # the card's Continue: kept
+	replies["/p0/session/guest"] = {"ok": true, "player": "p0-hhhhhhhhhhhhhhhhhhhh", "linked": "google"}
+	flow.consent_renewed.emit()
+	var saves := _sent("/p0/session/guest")
+	assert_dict(saves[-1][1]).contains_key_value("terms", "2026-12-01").contains_key_value("name", "Mia").contains_key_value("pending", "pend-1")
+	assert_array(flow.calls).contains([["consent_settled", true]])
+	assert_bool(rt.session.identity_ready).is_true()
+
+func test_a_sign_in_into_a_farm_without_today_s_consent_waits_for_the_card() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	replies["/p0/session/apple"] = {"ok": true, "player": "p0-iiiiiiiiiiiiiiiiiiii", "linked": ["apple"], "consent_outdated": true,
+		"terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(flow.calls[-1]).is_equal(["consent_outdated", "2026-12-01"])
+	assert_object(rt._acc_flow).is_not_null()   # not into the farm before the consent is on record
+	flow.record = {"age_ok": true, "terms": "2026-12-01", "privacy": "2026-12-01"}
+	replies["/p0/account/consent"] = {"ok": false, "code": "network"}
+	flow.consent_renewed.emit()
+	assert_array(flow.calls[-1]).is_equal(["consent_settled", false])   # the key back, a toast
+	assert_object(rt._acc_flow).is_not_null()
+	replies["/p0/account/consent"] = {"ok": true}
+	flow.consent_renewed.emit()
+	assert_dict(_sent("/p0/account/consent")[-1][1]).contains_key_value("terms", "2026-12-01")
+	assert_object(rt._acc_flow).is_null()   # on record: into the farm
+
+## 周瑜 on #1056: guest checks the consent before the name and the ticket — after the card, those are the page's own.
+func test_the_card_closes_when_the_save_it_redid_is_refused_for_something_else() -> void:
+	for refused in [{"ok": false, "code": "name_rejected", "reason": "blocked"}, {"ok": false, "code": "pending_expired"}]:
+		after_test()
+		await before_test()
+		rt.session.identity.kind = "new"
+		rt.session.first_run_needed.emit("new")
+		var flow = rt._acc_flow
+		replies["/p0/session/google"] = {"ok": false, "code": "no_farm", "pending": "pend-1"}
+		await rt._on_acc_sign_in("google")
+		replies["/p0/session/guest"] = {"ok": false, "code": "consent_outdated", "terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+		flow.named.emit("Mia", false)
+		flow.record = {"age_ok": true, "terms": "2026-12-01", "privacy": "2026-12-01"}
+		replies["/p0/session/guest"] = refused
+		flow.consent_renewed.emit()
+		assert_array(flow.calls).override_failure_message(str(refused)).contains([["consent_settled", true], ["name_refused", refused]])
+
+func test_no_card_yet_a_sign_in_without_today_s_consent_goes_in_and_a_save_stays_with_a_toast() -> void:
+	rt.acc_flow_path = "res://tests/p0/fakes/fake_acc_flow_no_card.gd"   # a flow before q(325)
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	replies["/p0/session/apple"] = {"ok": true, "player": "p0-jjjjjjjjjjjjjjjjjjjj", "linked": ["apple"], "consent_outdated": true,
+		"terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+	await rt._on_acc_sign_in("apple")
+	assert_object(rt._acc_flow).is_null()   # in, as before #1055 (奕星 11-14) — keys never left grey
+	assert_array(_sent("/p0/account/consent")).is_empty()   # nothing agreed for the player
+	rt.session.identity.kind = "new"
+	rt.session.identity.token = ""
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	replies["/p0/session/google"] = {"ok": false, "code": "no_farm", "pending": "pend-2"}
+	await rt._on_acc_sign_in("google")
+	replies["/p0/session/guest"] = {"ok": false, "code": "consent_outdated", "terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+	flow.named.emit("Mia", false)
+	assert_object(rt._acc_flow).is_not_null()   # the Save refused: stays, a toast, versions as they were
+	assert_str(rt.session.identity.terms_version).is_equal("2026-11-13")
+
+func test_a_consent_refused_for_good_closes_the_card_and_gives_the_keys_back() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	var flow = rt._acc_flow
+	replies["/p0/session/apple"] = {"ok": true, "player": "p0-kkkkkkkkkkkkkkkkkkkk", "linked": ["apple"], "consent_outdated": true,
+		"terms_version": "2026-12-01", "privacy_version": "2026-12-01"}
+	await rt._on_acc_sign_in("apple")
+	flow.record = {"age_ok": true, "terms": "2026-12-01", "privacy": "2026-12-01"}
+	replies["/p0/account/consent"] = {"ok": false, "code": "unauthenticated"}
+	flow.consent_renewed.emit()
+	assert_array(flow.calls).contains([["consent_settled", true], ["settled"]])   # the card gone, the keys back (周瑜 on #1056)
+
+func test_failures_are_said_on_the_flow_s_own_layer() -> void:
+	rt.session.identity.kind = "new"
+	rt.session.first_run_needed.emit("new")
+	sheet = {"result": "failed", "reason": "APPLE_UNKNOWN"}
+	await rt._on_acc_sign_in("apple")
+	assert_array(rt._acc_flow.said).contains_exactly([["Didn't go through · try again", true]])
+	if rt.ui.has_method("safe_top"): assert_float(rt._acc_flow.safe_top).is_equal(float(rt.ui.safe_top()))   # set when built
+
+func test_no_on_the_age_page_sends_nothing() -> void:
+	rt.session.identity.kind = "old_age"
+	rt.session.first_run_needed.emit("old_age")
+	rt._acc_flow.agreed.emit(false)
+	assert_array(sent).is_empty()
+
+func test_offline_keeps_the_launch_cover_and_asks_hello_again() -> void:
+	rt.cover_launch()
+	rt.session.first_run_needed.emit("offline")
+	assert_object(rt._acc_flow).is_null()
+	assert_int(rt.ui.screen_kind()).is_equal(P0SysScreen.Kind.LAUNCH)
+	rt._tick_screens(rt.LAUNCH_RETRY_S + 0.1)
+	assert_array(sent.filter(func(x): return x is Array and x[0] == "/p0/hello")).has_size(1)
+	assert_array(sent).not_contains(["/p0/state"])

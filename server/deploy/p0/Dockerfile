@@ -28,6 +28,8 @@ COPY assets/p0/content assets/p0/content
 COPY assets/p0/p0_outposts.json assets/p0/p0_outposts.json
 COPY assets/p0/p0_ponds.json assets/p0/p0_ponds.json
 COPY assets/p0/city_clusters.json assets/p0/city_clusters.json
+# SGODOT-488: the terms' and privacy's versions (hello, guest, consent; the client carries the same file)
+COPY assets/p0/legal/versions.json assets/p0/legal/versions.json
 COPY assets/ponds/catalog.json assets/ponds/catalog.json
 COPY assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json assets/avatar/
 # q(188) ① `Near you` (SGODOT-303): DB-IP City Lite (CC BY 4.0, credited in Settings › Licenses › Map data), one month

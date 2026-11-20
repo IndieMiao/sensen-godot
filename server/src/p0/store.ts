@@ -36,11 +36,35 @@ export class P0Store {
     if (settleParcels(this.c, s, now + s.clock_ms)) this.flush();
     return s;
   }
+  /** A stored player, without creating one (SGODOT-488: a token's player whose save is gone is turned away, never made
+   * anew); expired parcels settle as on get. */
+  find(player: string, now: number): P0State | undefined {
+    const s = this.players.get(player);
+    if (s && settleParcels(this.c, s, now + s.clock_ms)) this.flush();
+    return s;
+  }
+  /** The account's save gone (deleteAccount, contract-accounts §4): whether there was one. */
+  remove(player: string): boolean {
+    const saved = this.players.get(player);
+    if (!saved) return false;
+    this.players.delete(player);
+    try { this.flush(); }
+    catch (error) { this.players.set(player, saved); throw error; } // A failed write must remain retryable in this process.
+    return true;
+  }
   size(): number { return this.players.size; }
   /** A stored player, without creating one (admin tools). */
   peek(player: string): P0State | undefined { return this.players.get(player); }
   all(): P0State[] { return [...this.players.values()]; }
-  put(state: P0State): void { this.players.set(state.player, state); this.flush(); }
+  put(state: P0State): void {
+    const previous = this.players.get(state.player);
+    this.players.set(state.player, state);
+    try { this.flush(); }
+    catch (error) {
+      if (previous) this.players.set(state.player, previous); else this.players.delete(state.player);
+      throw error;
+    }
+  }
   reset(player: string, now: number, opts: { pending?: boolean; guide?: boolean } = {}): P0State { const s = freshState(this.c, player, now, undefined, opts); this.put(s); return s; }
   private flush(): void {
     if (!this.file) return;

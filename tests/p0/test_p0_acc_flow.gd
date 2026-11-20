@@ -41,7 +41,9 @@ func test_a_new_phone_answers_age_then_signs_in() -> void:
 	assert_bool(f.kept().age_ok).is_true()
 	(f.page.find_child("Google", true, false) as Button).pressed.emit()
 	assert_array(ways).is_equal(["google"])
-	assert_bool(f.back()).is_false()   # no ‹ on the sign-in page: Back is the launch's (the home screen)
+	assert_bool(f.back()).is_true()   # the provider request is in flight (491 Back matrix, 11-15)
+	f.sign_in_settled()
+	assert_bool(f.back()).is_false()   # idle Sign in has no ‹: the host takes Back to Android home
 
 func test_too_young_stops_at_age_block_and_keeps_only_the_no() -> void:
 	var f := _flow()
@@ -93,7 +95,7 @@ func test_no_farm_names_a_new_player_with_a_way_back_and_an_old_farm_without() -
 	assert_array(named).is_equal([["", true]])
 	f.no_farm(false)   # a claimed old farm, a test code: no way back
 	assert_bool(f.name_page.another_row.visible).is_false()
-	assert_bool(f.back()).is_false()
+	assert_bool(f.back()).is_true()   # consumes Back; it must not invent a hidden way to leave this gate
 
 func test_the_choose_card_on_sign_in_keeps_the_old_farm_lines_on_name_none() -> void:
 	var f := _flow("old_signin")

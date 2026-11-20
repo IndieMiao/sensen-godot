@@ -15,6 +15,12 @@ const P0_MAP := "res://scenes/p0/p0_map.tscn"   # P0 prototype map (feat/p0-core
 const BACK_IGNORE := 0
 const BACK_TO_MAP := 1
 const BACK_LEAVE_APP := 2
+const BACK_PASS := -1
+
+## A full-screen flow can own Back even while a world loads or is already behind it. Its host registers one
+## synchronous action: BACK_IGNORE (consumed), BACK_LEAVE_APP (home), or BACK_PASS (normal scene routing).
+## Ask before navigation/stack locks: a CanvasLayer's mouse_filter does not intercept Android's notification.
+var foreground_back_action := Callable()
 
 var _navigation_pending := false
 var _loading: CanvasLayer
@@ -283,6 +289,11 @@ func _resume(node: Node) -> void:
 
 
 func handle_back() -> void:
+	if foreground_back_action.is_valid():
+		var action := int(foreground_back_action.call())
+		if action != BACK_PASS:
+			if action == BACK_LEAVE_APP: _leave_app()
+			return
 	if _navigation_pending:
 		if _loading and _loading.close_button.visible: _clear_transition()
 		return
