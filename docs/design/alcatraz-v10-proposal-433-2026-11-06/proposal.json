@@ -1,0 +1,198 @@
+{
+  "base": "05a2c032f88cc0d39caebca05bd79df98845fbbe",
+  "lookout_head": "1ac655fd7e42a031f1bf9f0a474166ce2aa5ef3f",
+  "stage": "proposal only; post-launch v10; no production asset changes",
+  "remove": [
+    "alc_flowers_daisy_009",
+    "alc_flowers_daisy_010",
+    "alc_flowers_daisy_011",
+    "alc_flowers_poppy_006",
+    "alc_flowers_poppy_007",
+    "alc_flowers_poppy_008",
+    "alc_flowers_poppy_009",
+    "alc_flowers_poppy_010",
+    "alc_flowers_poppy_011",
+    "alc_flowers_lavender_009",
+    "alc_flowers_lavender_010",
+    "alc_flowers_lavender_011"
+  ],
+  "move": [
+    {
+      "name": "alc_ruin_arch_000",
+      "position": [
+        0.8,
+        5.5,
+        0.35
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "alc_ruin_rubble_000",
+      "position": [
+        -6,
+        5.8,
+        0.05
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        0.8
+      ]
+    },
+    {
+      "name": "alc_ruin_rubble_001",
+      "position": [
+        4.8,
+        5.8,
+        0.05
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        0.8
+      ]
+    },
+    {
+      "name": "alc_ruin_flowers_000",
+      "position": [
+        -5.15,
+        5.8,
+        0.05
+      ],
+      "yaw": 0,
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    {
+      "name": "alc_ruin_flowers_001",
+      "position": [
+        5.65,
+        5.8,
+        0.05
+      ],
+      "yaw": 0,
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    }
+  ],
+  "add": [
+    {
+      "name": "v10_shelter",
+      "asset": "lookout_sheltered_bench",
+      "position": [
+        -24.4,
+        3.25,
+        6.6
+      ],
+      "yaw": 1.5707963267948966
+    },
+    {
+      "name": "v10_telescope",
+      "asset": "lookout_telescope",
+      "position": [
+        -22.4,
+        3.25,
+        5.5
+      ],
+      "yaw": 3.141592653589793
+    },
+    {
+      "name": "v10_semicircle",
+      "asset": "lookout_semicircle_2m",
+      "position": [
+        -14,
+        3.135,
+        5.8
+      ],
+      "yaw": 0
+    },
+    {
+      "name": "v10_left_post",
+      "asset": "railing_endpost",
+      "position": [
+        -15,
+        3.255,
+        5.8
+      ],
+      "yaw": 0
+    },
+    {
+      "name": "v10_right_post",
+      "asset": "railing_endpost",
+      "position": [
+        -13,
+        3.255,
+        5.8
+      ],
+      "yaw": 0
+    },
+    {
+      "name": "v10_compass",
+      "asset": "lookout_compass_disc",
+      "position": [
+        -7.5,
+        3.28,
+        6.95
+      ],
+      "yaw": 3.141592653589793
+    }
+  ],
+  "notes": [
+    "High lookout props stay on the western side to protect the action area on later terraces.",
+    "Semicircle is a decorative inset on existing grass behind the unchanged route rail; no new walkable side deck.",
+    "Move the existing collision-free fallen arch to the middle terrace eastern garden; original structural ruins remain fixed.",
+    "Keep colliding trees, benches, flowerbeds, all terrain, route/navigation and collision entries exact.",
+    "Replace selected railing visuals with approved lookout wood/metal sections at identical transforms; preserve every original collision body. Slim view-window segments reveal the fallen arch."
+  ],
+  "rail_visual_only": [
+    "alc_rail_straight_065",
+    "alc_rail_straight_098",
+    "alc_rail_straight_099",
+    "alc_rail_straight_100",
+    "alc_rail_straight_101",
+    "alc_rail_straight_102",
+    "alc_rail_straight_103",
+    "alc_rail_straight_104",
+    "alc_rail_straight_105",
+    "alc_rail_straight_106",
+    "alc_rail_straight_107",
+    "alc_rail_straight_108",
+    "alc_rail_straight_109",
+    "alc_rail_straight_110",
+    "alc_rail_straight_111",
+    "alc_rail_straight_112",
+    "alc_rail_straight_126",
+    "alc_rail_straight_152",
+    "alc_rail_straight_153",
+    "alc_rail_straight_157",
+    "alc_rail_straight_158",
+    "alc_rail_straight_159",
+    "alc_rail_straight_160",
+    "alc_rail_straight_161",
+    "alc_rail_straight_162",
+    "alc_rail_straight_163",
+    "alc_rail_straight_164",
+    "alc_rail_straight_165",
+    "alc_rail_straight_166",
+    "alc_rail_straight_167",
+    "alc_rail_straight_168",
+    "alc_rail_straight_169",
+    "alc_rail_straight_170",
+    "alc_rail_straight_171",
+    "alc_rail_straight_178",
+    "alc_rail_straight_191"
+  ]
+}
