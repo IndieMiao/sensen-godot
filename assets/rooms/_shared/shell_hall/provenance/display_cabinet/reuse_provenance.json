@@ -1,0 +1,304 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-324",
+  "baseline_commit": "fadcaa195f5bb34229fba3995b27c5808ff34089",
+  "asset": {
+    "name": "display_cabinet",
+    "family": "display",
+    "modules": [
+      "N3 M10"
+    ],
+    "changes": [
+      "Original named cabinet / island base retained, top at 0.66H = 1.1517 m.",
+      "Bakery curved glass profile reused, resized to 0.60 m canopy height.",
+      "Added closed side/rear panes and thin brass canopy edging; Glass is the only transparent surface. No merchandise."
+    ],
+    "sources": [
+      "bakery/pastry_display",
+      "bakery/display_glass"
+    ],
+    "anchors": {},
+    "vertical_scale": 1.4218518476667175,
+    "tabletop_height_m": 1.1517000000000002,
+    "triangles": 1950,
+    "surfaces": 2,
+    "bounds": [
+      [
+        -1.2000000476837158,
+        0.0,
+        -0.5849999785423279
+      ],
+      [
+        1.2000000476837158,
+        1.760699987411499,
+        0.5890000462532043
+      ]
+    ],
+    "dimensions_xyz_m": [
+      2.4000000953674316,
+      1.760699987411499,
+      1.1740000247955322
+    ],
+    "sha256": "2c78d031503f0a9c57686fb39ae0b32967c907c029174cc7e7f3721f00fe5cea",
+    "file": "display_cabinet.glb",
+    "provenance": "provenance/display_cabinet/reuse_provenance.json",
+    "pivot": "floor Y=0, horizontal source centre",
+    "parts": [
+      {
+        "name": "Counter carcass.001",
+        "source_part": "Counter carcass",
+        "palette_slot": "sage",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter corner stile.002",
+        "source_part": "Counter corner stile",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter corner stile.003",
+        "source_part": "Counter corner stile.001",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.009",
+        "source_part": "Counter tongue groove",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.010",
+        "source_part": "Counter tongue groove.001",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.011",
+        "source_part": "Counter tongue groove.002",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.012",
+        "source_part": "Counter tongue groove.003",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.013",
+        "source_part": "Counter tongue groove.004",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.014",
+        "source_part": "Counter tongue groove.005",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.015",
+        "source_part": "Counter tongue groove.006",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.016",
+        "source_part": "Counter tongue groove.007",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter tongue groove.017",
+        "source_part": "Counter tongue groove.008",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter foot rail.001",
+        "source_part": "Counter foot rail",
+        "palette_slot": "oak_edge",
+        "export_group": "Body"
+      },
+      {
+        "name": "Counter thick oak top.001",
+        "source_part": "Counter thick oak top",
+        "palette_slot": "oak_light",
+        "export_group": "Body"
+      },
+      {
+        "name": "Continuous curved display glazing.001",
+        "source_part": "Continuous curved display glazing",
+        "palette_slot": "glass",
+        "export_group": "Glass"
+      },
+      {
+        "name": "Glass side pane",
+        "source_part": "New Glass side pane",
+        "palette_slot": "glass",
+        "export_group": "Glass"
+      },
+      {
+        "name": "Glass side pane.001",
+        "source_part": "New Glass side pane",
+        "palette_slot": "glass",
+        "export_group": "Glass"
+      },
+      {
+        "name": "Glass rear pane",
+        "source_part": "New Glass rear pane",
+        "palette_slot": "glass",
+        "export_group": "Glass"
+      },
+      {
+        "name": "Canopy brass edge",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.001",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.002",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.003",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.004",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.005",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.006",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.007",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.008",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.009",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.010",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.011",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.012",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.013",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.014",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      }
+    ]
+  },
+  "sources": {
+    "bakery/pastry_display": {
+      "glb": "assets/rooms/bakery/pastry_display.glb",
+      "triangles": 1512,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.2000000476837158,
+          -1.4901161193847656e-08,
+          -0.5849999785423279
+        ],
+        [
+          1.2000000476837158,
+          0.8100000023841858,
+          0.5849999785423279
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.4000000953674316,
+        0.810000017285347,
+        1.1699999570846558
+      ],
+      "sha256": "a9711b04e265128c2d2c12305e43b33645a3c08163e54dfb14b41b8ce952a1b4",
+      "blend": "tools/art/source/bakery/bakery.blend",
+      "blend_sha256": "98fbc59fde6f4b467090a0d6465e548b2a57131b56ac3c46dd960147227edfe8",
+      "collection": "KIT_pastry_display"
+    },
+    "bakery/display_glass": {
+      "glb": "assets/rooms/bakery/display_glass.glb",
+      "triangles": 8,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0800000429153442,
+          0.019999980926513672,
+          -0.4000000059604645
+        ],
+        [
+          1.0799999237060547,
+          1.2100000381469727,
+          0.5799999833106995
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.159999966621399,
+        1.190000057220459,
+        0.9799999892711639
+      ],
+      "sha256": "2cce52c984fd63d051766885d8707dfee9ad555102221e0fb901fa10a90695c1",
+      "blend": "tools/art/source/bakery/bakery.blend",
+      "blend_sha256": "98fbc59fde6f4b467090a0d6465e548b2a57131b56ac3c46dd960147227edfe8",
+      "collection": "KIT_display_glass"
+    }
+  },
+  "texture_change": "All runtime UVs remapped to one provisional Basic Room swatch atlas; no source atlas retained.",
+  "source_mesh_rule": "Evaluated named Blender geometry checked against source GLB dimensions and triangle count before editing."
+}

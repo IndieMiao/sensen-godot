@@ -1,0 +1,123 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-324",
+  "baseline_commit": "fadcaa195f5bb34229fba3995b27c5808ff34089",
+  "asset": {
+    "name": "frame_landscape",
+    "family": "frames",
+    "modules": [
+      "N1 M23",
+      "N3 M07"
+    ],
+    "changes": [
+      "Named backing and four frame rails retained at original dimensions.",
+      "Old botanical / landscape relief removed; independent two-triangle Artwork node with its own atlas rectangle.",
+      "Mounting back at Z=0; placeholder abstract print, pending N1/N3 artwork."
+    ],
+    "sources": [
+      "tavern/landscape_frame"
+    ],
+    "anchors": {},
+    "artwork": {
+      "node": "Artwork",
+      "size_m": [
+        0.6060000262260437,
+        0.3760000071525574
+      ],
+      "palette_slot": "print_landscape",
+      "replacement": "Replace this mesh or remap only its UV rectangle; Body unchanged."
+    },
+    "triangles": 542,
+    "surfaces": 2,
+    "bounds": [
+      [
+        -0.35600000619888306,
+        -0.2409999966621399,
+        -0.0
+      ],
+      [
+        0.35600000619888306,
+        0.2409999966621399,
+        0.07500000298023224
+      ]
+    ],
+    "dimensions_xyz_m": [
+      0.7120000123977661,
+      0.4819999933242798,
+      0.07500000298023224
+    ],
+    "sha256": "b7405a867b8624ce38616390138db1e52f6cbe572b06934a5238a3e470866d0f",
+    "file": "frame_landscape.glb",
+    "provenance": "provenance/frame_landscape/reuse_provenance.json",
+    "pivot": "back mounting plane Z=0, centre Y=0",
+    "parts": [
+      {
+        "name": "Picture backing.002",
+        "source_part": "Picture backing",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Picture vertical frame.004",
+        "source_part": "Picture vertical frame",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Picture vertical frame.005",
+        "source_part": "Picture vertical frame.001",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Picture horizontal frame.004",
+        "source_part": "Picture horizontal frame",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Picture horizontal frame.005",
+        "source_part": "Picture horizontal frame.001",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Artwork.001",
+        "source_part": "New Artwork",
+        "palette_slot": "print_landscape",
+        "export_group": "Artwork"
+      }
+    ]
+  },
+  "sources": {
+    "tavern/landscape_frame": {
+      "glb": "assets/rooms/tavern/landscape_frame.glb",
+      "triangles": 659,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.35600003600120544,
+          -0.24100005626678467,
+          -0.022500110790133476
+        ],
+        [
+          0.3560000956058502,
+          0.24100005626678467,
+          0.05249996483325958
+        ]
+      ],
+      "dimensions_xyz_m": [
+        0.7120001316070557,
+        0.48200011253356934,
+        0.07500007562339306
+      ],
+      "sha256": "1c7b9018ceefef8c0e3efcb84927a24c439a44b0952a24c8a89f575842bf54a6",
+      "blend": "tools/art/source/tavern/tavern.blend",
+      "blend_sha256": "f806b4e5da376349d630968f1da858114e597290c581ff9e5d0fed61bf3890fd",
+      "collection": "KIT_landscape_frame"
+    }
+  },
+  "texture_change": "All runtime UVs remapped to one provisional Basic Room swatch atlas; no source atlas retained.",
+  "source_mesh_rule": "Evaluated named Blender geometry checked against source GLB dimensions and triangle count before editing."
+}

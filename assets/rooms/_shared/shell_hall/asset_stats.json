@@ -1,0 +1,1626 @@
+{
+  "task": "SGODOT-324",
+  "status": "provisional_reuse_kit",
+  "families": 8,
+  "assets": [
+    {
+      "name": "sofa_three_seat",
+      "family": "sofa",
+      "modules": [
+        "N1 M13",
+        "N1 M14",
+        "N2 M15"
+      ],
+      "changes": [
+        "Named Deluxe geometry copied; seat top corrected to 0.715 m.",
+        "Two source seat cushions replaced by three copies of the same cushion geometry.",
+        "Temporary Basic Room linen/sky upholstery; source atlas and checked fabric discarded."
+      ],
+      "sources": [
+        "deluxe_room_10/sofa"
+      ],
+      "anchors": {
+        "seat_1": [
+          -0.675,
+          0.715,
+          0.22
+        ],
+        "seat_2": [
+          0,
+          0.715,
+          0.22
+        ],
+        "seat_3": [
+          0.675,
+          0.715,
+          0.22
+        ]
+      },
+      "seat_height_m": 0.715,
+      "vertical_scale": 1.0362319771518962,
+      "triangles": 2340,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.402999997138977,
+          0.0,
+          -0.45000001788139343
+        ],
+        [
+          1.402999997138977,
+          1.3263769149780273,
+          0.4399999976158142
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.805999994277954,
+        1.3263769149780273,
+        0.8900000154972076
+      ],
+      "sha256": "349930f297c891111ef23110c58b046df3a2c056755c9bdd31ce86dea9527ba6",
+      "file": "sofa_three_seat.glb",
+      "provenance": "provenance/sofa_three_seat/reuse_provenance.json",
+      "pivot": "floor Y=0, horizontal source centre",
+      "parts": [
+        {
+          "name": "Sofa continuous oak base.001",
+          "source_part": "Sofa continuous oak base",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sofa foot.004",
+          "source_part": "Sofa foot",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sofa foot.005",
+          "source_part": "Sofa foot.001",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sofa foot.006",
+          "source_part": "Sofa foot.002",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sofa foot.007",
+          "source_part": "Sofa foot.003",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Full upholstered sofa back.001",
+          "source_part": "Full upholstered sofa back",
+          "palette_slot": "sky",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed oak sofa arm support.002",
+          "source_part": "Recessed oak sofa arm support",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Clean continuous upholstered arm.002",
+          "source_part": "Clean continuous upholstered arm",
+          "palette_slot": "sky",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed oak sofa arm support.003",
+          "source_part": "Recessed oak sofa arm support.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Clean continuous upholstered arm.003",
+          "source_part": "Clean continuous upholstered arm.001",
+          "palette_slot": "sky",
+          "export_group": "Body"
+        },
+        {
+          "name": "Puffed loose cushion.002",
+          "source_part": "Puffed loose cushion",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Puffed loose cushion.003",
+          "source_part": "Puffed loose cushion.001",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Seat cushion 1",
+          "source_part": "Plump seat cushion",
+          "palette_slot": "sky",
+          "export_group": "Body"
+        },
+        {
+          "name": "Seat cushion 2",
+          "source_part": "Plump seat cushion",
+          "palette_slot": "sky",
+          "export_group": "Body"
+        },
+        {
+          "name": "Seat cushion 3",
+          "source_part": "Plump seat cushion",
+          "palette_slot": "sky",
+          "export_group": "Body"
+        }
+      ]
+    },
+    {
+      "name": "armchair",
+      "family": "armchair",
+      "modules": [
+        "N1 M12",
+        "N2 M16"
+      ],
+      "changes": [
+        "Named Deluxe geometry copied; seat top corrected to 0.715 m.",
+        "Single seat, shortened base/back; original arm thickness retained.",
+        "Temporary Basic Room linen/sky upholstery; source atlas and checked fabric discarded."
+      ],
+      "sources": [
+        "deluxe_room_10/sofa"
+      ],
+      "anchors": {
+        "seat_1": [
+          0,
+          0.715,
+          0.22
+        ]
+      },
+      "seat_height_m": 0.715,
+      "vertical_scale": 1.0362319771518962,
+      "triangles": 1776,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.7500000596046448,
+          0.0,
+          -0.45000001788139343
+        ],
+        [
+          0.7500000596046448,
+          1.3263769149780273,
+          0.4399999976158142
+        ]
+      ],
+      "dimensions_xyz_m": [
+        1.5000001192092896,
+        1.3263769149780273,
+        0.8900000154972076
+      ],
+      "sha256": "22b329539f0d85af367849719caaef67870e0a6923bb8790adc52f4fea84e2dc",
+      "file": "armchair.glb",
+      "provenance": "provenance/armchair/reuse_provenance.json",
+      "pivot": "floor Y=0, horizontal source centre",
+      "parts": [
+        {
+          "name": "Sofa continuous oak base.002",
+          "source_part": "Sofa continuous oak base",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sofa foot.008",
+          "source_part": "Sofa foot",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sofa foot.009",
+          "source_part": "Sofa foot.001",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sofa foot.010",
+          "source_part": "Sofa foot.002",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sofa foot.011",
+          "source_part": "Sofa foot.003",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Full upholstered sofa back.002",
+          "source_part": "Full upholstered sofa back",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Plump seat cushion.002",
+          "source_part": "Plump seat cushion",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed oak sofa arm support.004",
+          "source_part": "Recessed oak sofa arm support",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Clean continuous upholstered arm.004",
+          "source_part": "Clean continuous upholstered arm",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed oak sofa arm support.005",
+          "source_part": "Recessed oak sofa arm support.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Clean continuous upholstered arm.005",
+          "source_part": "Clean continuous upholstered arm.001",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Puffed loose cushion.004",
+          "source_part": "Puffed loose cushion",
+          "palette_slot": "sage",
+          "export_group": "Body"
+        }
+      ]
+    },
+    {
+      "name": "bench_three_seat",
+      "family": "bench",
+      "modules": [
+        "N3 M15"
+      ],
+      "changes": [
+        "Black leather changed to provisional sage; steel to Basic Room iron.",
+        "Width/depth retained; actual cushion surface lifted to 0.715 m."
+      ],
+      "sources": [
+        "clothing_store_a/black_tufted_bench"
+      ],
+      "anchors": {
+        "seat_1": [
+          -0.72,
+          0.715,
+          0
+        ],
+        "seat_2": [
+          0,
+          0.715,
+          0
+        ],
+        "seat_3": [
+          0.72,
+          0.715,
+          0
+        ]
+      },
+      "seat_height_m": 0.715,
+      "vertical_scale": 1.0671641525220548,
+      "triangles": 1468,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.1449999809265137,
+          0.0,
+          -0.2750000059604645
+        ],
+        [
+          1.1449999809265137,
+          0.715399980545044,
+          0.2750000059604645
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.2899999618530273,
+        0.715399980545044,
+        0.550000011920929
+      ],
+      "sha256": "ddb0151743a9e5682db3fef2afaefc0992390fd254a193c474ccca3d46587cfb",
+      "file": "bench_three_seat.glb",
+      "provenance": "provenance/bench_three_seat/reuse_provenance.json",
+      "pivot": "floor Y=0, horizontal source centre",
+      "parts": [
+        {
+          "name": "Black steel bench leg.004",
+          "source_part": "Black steel bench leg",
+          "palette_slot": "iron",
+          "export_group": "Body"
+        },
+        {
+          "name": "Black steel bench leg.005",
+          "source_part": "Black steel bench leg.001",
+          "palette_slot": "iron",
+          "export_group": "Body"
+        },
+        {
+          "name": "Bench steel end foot.002",
+          "source_part": "Bench steel end foot",
+          "palette_slot": "iron",
+          "export_group": "Body"
+        },
+        {
+          "name": "Black steel bench leg.006",
+          "source_part": "Black steel bench leg.002",
+          "palette_slot": "iron",
+          "export_group": "Body"
+        },
+        {
+          "name": "Black steel bench leg.007",
+          "source_part": "Black steel bench leg.003",
+          "palette_slot": "iron",
+          "export_group": "Body"
+        },
+        {
+          "name": "Bench steel end foot.003",
+          "source_part": "Bench steel end foot.001",
+          "palette_slot": "iron",
+          "export_group": "Body"
+        },
+        {
+          "name": "Bench black steel frame.001",
+          "source_part": "Bench black steel frame",
+          "palette_slot": "iron",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather continuous cushion.001",
+          "source_part": "Leather continuous cushion",
+          "palette_slot": "sage",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed leather cross seam.005",
+          "source_part": "Recessed leather cross seam",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.065",
+          "source_part": "Leather double stitch",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.066",
+          "source_part": "Leather double stitch.001",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.067",
+          "source_part": "Leather double stitch.002",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.068",
+          "source_part": "Leather double stitch.003",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.069",
+          "source_part": "Leather double stitch.004",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.070",
+          "source_part": "Leather double stitch.005",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.071",
+          "source_part": "Leather double stitch.006",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.072",
+          "source_part": "Leather double stitch.007",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.073",
+          "source_part": "Leather double stitch.008",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.074",
+          "source_part": "Leather double stitch.009",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.075",
+          "source_part": "Leather double stitch.010",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.076",
+          "source_part": "Leather double stitch.011",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.077",
+          "source_part": "Leather double stitch.012",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed leather cross seam.006",
+          "source_part": "Recessed leather cross seam.001",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.078",
+          "source_part": "Leather double stitch.013",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.079",
+          "source_part": "Leather double stitch.014",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.080",
+          "source_part": "Leather double stitch.015",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.081",
+          "source_part": "Leather double stitch.016",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.082",
+          "source_part": "Leather double stitch.017",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.083",
+          "source_part": "Leather double stitch.018",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.084",
+          "source_part": "Leather double stitch.019",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.085",
+          "source_part": "Leather double stitch.020",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.086",
+          "source_part": "Leather double stitch.021",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.087",
+          "source_part": "Leather double stitch.022",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.088",
+          "source_part": "Leather double stitch.023",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.089",
+          "source_part": "Leather double stitch.024",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.090",
+          "source_part": "Leather double stitch.025",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed leather cross seam.007",
+          "source_part": "Recessed leather cross seam.002",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.091",
+          "source_part": "Leather double stitch.026",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.092",
+          "source_part": "Leather double stitch.027",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.093",
+          "source_part": "Leather double stitch.028",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.094",
+          "source_part": "Leather double stitch.029",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.095",
+          "source_part": "Leather double stitch.030",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.096",
+          "source_part": "Leather double stitch.031",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.097",
+          "source_part": "Leather double stitch.032",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.098",
+          "source_part": "Leather double stitch.033",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.099",
+          "source_part": "Leather double stitch.034",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.100",
+          "source_part": "Leather double stitch.035",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.101",
+          "source_part": "Leather double stitch.036",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.102",
+          "source_part": "Leather double stitch.037",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.103",
+          "source_part": "Leather double stitch.038",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed leather cross seam.008",
+          "source_part": "Recessed leather cross seam.003",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.104",
+          "source_part": "Leather double stitch.039",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.105",
+          "source_part": "Leather double stitch.040",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.106",
+          "source_part": "Leather double stitch.041",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.107",
+          "source_part": "Leather double stitch.042",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.108",
+          "source_part": "Leather double stitch.043",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.109",
+          "source_part": "Leather double stitch.044",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.110",
+          "source_part": "Leather double stitch.045",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.111",
+          "source_part": "Leather double stitch.046",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.112",
+          "source_part": "Leather double stitch.047",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.113",
+          "source_part": "Leather double stitch.048",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.114",
+          "source_part": "Leather double stitch.049",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.115",
+          "source_part": "Leather double stitch.050",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.116",
+          "source_part": "Leather double stitch.051",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Recessed leather cross seam.009",
+          "source_part": "Recessed leather cross seam.004",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.117",
+          "source_part": "Leather double stitch.052",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.118",
+          "source_part": "Leather double stitch.053",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.119",
+          "source_part": "Leather double stitch.054",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.120",
+          "source_part": "Leather double stitch.055",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.121",
+          "source_part": "Leather double stitch.056",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.122",
+          "source_part": "Leather double stitch.057",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.123",
+          "source_part": "Leather double stitch.058",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.124",
+          "source_part": "Leather double stitch.059",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.125",
+          "source_part": "Leather double stitch.060",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.126",
+          "source_part": "Leather double stitch.061",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.127",
+          "source_part": "Leather double stitch.062",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.128",
+          "source_part": "Leather double stitch.063",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather double stitch.129",
+          "source_part": "Leather double stitch.064",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather edge stitching.002",
+          "source_part": "Leather edge stitching",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Leather edge stitching.003",
+          "source_part": "Leather edge stitching.001",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        }
+      ]
+    },
+    {
+      "name": "round_side_table",
+      "family": "table",
+      "modules": [
+        "N1 M16",
+        "N2 M17"
+      ],
+      "changes": [
+        "Coffee Shop 0 selected from three measured candidates: smallest diameter (1.10 m), 240 triangles.",
+        "Grounded at actual lowest vertex; tabletop 0.65H = 1.13425 m; diameter retained."
+      ],
+      "sources": [
+        "coffee_shop_0/round_table"
+      ],
+      "anchors": {},
+      "vertical_scale": 1.1070123041110416,
+      "tabletop_height_m": 1.1342500000000002,
+      "triangles": 240,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.550000011920929,
+          0.0,
+          -0.550000011920929
+        ],
+        [
+          0.550000011920929,
+          1.1342500448226929,
+          0.550000011920929
+        ]
+      ],
+      "dimensions_xyz_m": [
+        1.100000023841858,
+        1.1342500448226929,
+        1.100000023841858
+      ],
+      "sha256": "b029d9e19b0bc08c4466f97d991fdde8dd2aefc6beaf59503e27c1c43a0e675b",
+      "file": "round_side_table.glb",
+      "provenance": "provenance/round_side_table/reuse_provenance.json",
+      "pivot": "floor Y=0, horizontal source centre",
+      "parts": [
+        {
+          "name": "Splayed wood table leg.003",
+          "source_part": "Splayed wood table leg",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Splayed wood table leg.004",
+          "source_part": "Splayed wood table leg.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Splayed wood table leg.005",
+          "source_part": "Splayed wood table leg.002",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Ivory cafe tabletop.001",
+          "source_part": "Ivory cafe tabletop",
+          "palette_slot": "porcelain",
+          "export_group": "Body"
+        }
+      ]
+    },
+    {
+      "name": "round_stool",
+      "family": "stool",
+      "modules": [
+        "N3 M16"
+      ],
+      "changes": [
+        "Mine Hut stool geometry retained; source negative foot bound grounded.",
+        "Seat top corrected to 0.715 m; original horizontal dimensions retained."
+      ],
+      "sources": [
+        "mine_hut/round_stool"
+      ],
+      "anchors": {
+        "seat_1": [
+          0,
+          0.715,
+          0
+        ]
+      },
+      "vertical_scale": 1.0726527379220903,
+      "seat_height_m": 0.715,
+      "triangles": 176,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.2800000011920929,
+          4.656612873077393e-10,
+          -0.2800000011920929
+        ],
+        [
+          0.28076016902923584,
+          0.7149999737739563,
+          0.2800000011920929
+        ]
+      ],
+      "dimensions_xyz_m": [
+        0.5607601702213287,
+        0.714999973308295,
+        0.5600000023841858
+      ],
+      "sha256": "ed28942fc59fdb030f76fd0867cee138828fce7cb8f4285e33887e4c07407450",
+      "file": "round_stool.glb",
+      "provenance": "provenance/round_stool/reuse_provenance.json",
+      "pivot": "floor Y=0, horizontal source centre",
+      "parts": [
+        {
+          "name": "Round stool seat.001",
+          "source_part": "Round stool seat",
+          "palette_slot": "oak_light",
+          "export_group": "Body"
+        },
+        {
+          "name": "Splayed stool leg.003",
+          "source_part": "Splayed stool leg",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Splayed stool leg.004",
+          "source_part": "Splayed stool leg.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Splayed stool leg.005",
+          "source_part": "Splayed stool leg.002",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        }
+      ]
+    },
+    {
+      "name": "wall_sconce",
+      "family": "sconce",
+      "modules": [
+        "N2 M23",
+        "N3 M08"
+      ],
+      "changes": [
+        "Original 292-triangle lamp retained; mounting back moved to Z=0.",
+        "Basic Room brass / petal swatches; suggested local light belongs to room assembly."
+      ],
+      "sources": [
+        "clothing_store_b/wall_sconce"
+      ],
+      "anchors": {
+        "light": [
+          0,
+          0,
+          0.22
+        ]
+      },
+      "triangles": 292,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.07000000029802322,
+          -0.2800000011920929,
+          -0.0
+        ],
+        [
+          0.07000000029802322,
+          0.2800000011920929,
+          0.15949998795986176
+        ]
+      ],
+      "dimensions_xyz_m": [
+        0.14000000059604645,
+        0.5600000023841858,
+        0.15949998795986176
+      ],
+      "sha256": "ea46eaa935f609a8e4177c9f2be27c5e620b1031cd88d5dfdeeec39b8efaa7a1",
+      "file": "wall_sconce.glb",
+      "provenance": "provenance/wall_sconce/reuse_provenance.json",
+      "pivot": "back mounting plane Z=0, centre Y=0",
+      "parts": [
+        {
+          "name": "Wall lamp backplate.001",
+          "source_part": "Wall lamp backplate",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Opal wall sconce.001",
+          "source_part": "Opal wall sconce",
+          "palette_slot": "petal",
+          "export_group": "Body"
+        },
+        {
+          "name": "Sconce metal waist.001",
+          "source_part": "Sconce metal waist",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        }
+      ]
+    },
+    {
+      "name": "frame_portrait",
+      "family": "frames",
+      "modules": [
+        "N1 M22",
+        "N3 M06"
+      ],
+      "changes": [
+        "Named backing and four frame rails retained at original dimensions.",
+        "Old botanical / landscape relief removed; independent two-triangle Artwork node with its own atlas rectangle.",
+        "Mounting back at Z=0; placeholder abstract print, pending N1/N3 artwork."
+      ],
+      "sources": [
+        "standard_room_5/botanical_picture"
+      ],
+      "anchors": {},
+      "artwork": {
+        "node": "Artwork",
+        "size_m": [
+          0.3760000071525574,
+          0.5560000143051147
+        ],
+        "palette_slot": "print_portrait",
+        "replacement": "Replace this mesh or remap only its UV rectangle; Body unchanged."
+      },
+      "triangles": 542,
+      "surfaces": 2,
+      "bounds": [
+        [
+          -0.2409999966621399,
+          -0.3310000002384186,
+          -0.0
+        ],
+        [
+          0.2409999966621399,
+          0.3310000002384186,
+          0.07500000298023224
+        ]
+      ],
+      "dimensions_xyz_m": [
+        0.4819999933242798,
+        0.6620000004768372,
+        0.07500000298023224
+      ],
+      "sha256": "e3a38641e331388e6ae70f7479eca9deeb2ab1f655399dff8fb1dbb219122fd8",
+      "file": "frame_portrait.glb",
+      "provenance": "provenance/frame_portrait/reuse_provenance.json",
+      "pivot": "back mounting plane Z=0, centre Y=0",
+      "parts": [
+        {
+          "name": "Picture backing.001",
+          "source_part": "Picture backing",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Picture vertical frame.002",
+          "source_part": "Picture vertical frame",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Picture vertical frame.003",
+          "source_part": "Picture vertical frame.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Picture horizontal frame.002",
+          "source_part": "Picture horizontal frame",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Picture horizontal frame.003",
+          "source_part": "Picture horizontal frame.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Artwork",
+          "source_part": "New Artwork",
+          "palette_slot": "print_portrait",
+          "export_group": "Artwork"
+        }
+      ]
+    },
+    {
+      "name": "frame_landscape",
+      "family": "frames",
+      "modules": [
+        "N1 M23",
+        "N3 M07"
+      ],
+      "changes": [
+        "Named backing and four frame rails retained at original dimensions.",
+        "Old botanical / landscape relief removed; independent two-triangle Artwork node with its own atlas rectangle.",
+        "Mounting back at Z=0; placeholder abstract print, pending N1/N3 artwork."
+      ],
+      "sources": [
+        "tavern/landscape_frame"
+      ],
+      "anchors": {},
+      "artwork": {
+        "node": "Artwork",
+        "size_m": [
+          0.6060000262260437,
+          0.3760000071525574
+        ],
+        "palette_slot": "print_landscape",
+        "replacement": "Replace this mesh or remap only its UV rectangle; Body unchanged."
+      },
+      "triangles": 542,
+      "surfaces": 2,
+      "bounds": [
+        [
+          -0.35600000619888306,
+          -0.2409999966621399,
+          -0.0
+        ],
+        [
+          0.35600000619888306,
+          0.2409999966621399,
+          0.07500000298023224
+        ]
+      ],
+      "dimensions_xyz_m": [
+        0.7120000123977661,
+        0.4819999933242798,
+        0.07500000298023224
+      ],
+      "sha256": "b7405a867b8624ce38616390138db1e52f6cbe572b06934a5238a3e470866d0f",
+      "file": "frame_landscape.glb",
+      "provenance": "provenance/frame_landscape/reuse_provenance.json",
+      "pivot": "back mounting plane Z=0, centre Y=0",
+      "parts": [
+        {
+          "name": "Picture backing.002",
+          "source_part": "Picture backing",
+          "palette_slot": "linen",
+          "export_group": "Body"
+        },
+        {
+          "name": "Picture vertical frame.004",
+          "source_part": "Picture vertical frame",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Picture vertical frame.005",
+          "source_part": "Picture vertical frame.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Picture horizontal frame.004",
+          "source_part": "Picture horizontal frame",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Picture horizontal frame.005",
+          "source_part": "Picture horizontal frame.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Artwork.001",
+          "source_part": "New Artwork",
+          "palette_slot": "print_landscape",
+          "export_group": "Artwork"
+        }
+      ]
+    },
+    {
+      "name": "display_cabinet",
+      "family": "display",
+      "modules": [
+        "N3 M10"
+      ],
+      "changes": [
+        "Original named cabinet / island base retained, top at 0.66H = 1.1517 m.",
+        "Bakery curved glass profile reused, resized to 0.60 m canopy height.",
+        "Added closed side/rear panes and thin brass canopy edging; Glass is the only transparent surface. No merchandise."
+      ],
+      "sources": [
+        "bakery/pastry_display",
+        "bakery/display_glass"
+      ],
+      "anchors": {},
+      "vertical_scale": 1.4218518476667175,
+      "tabletop_height_m": 1.1517000000000002,
+      "triangles": 1950,
+      "surfaces": 2,
+      "bounds": [
+        [
+          -1.2000000476837158,
+          0.0,
+          -0.5849999785423279
+        ],
+        [
+          1.2000000476837158,
+          1.760699987411499,
+          0.5890000462532043
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.4000000953674316,
+        1.760699987411499,
+        1.1740000247955322
+      ],
+      "sha256": "2c78d031503f0a9c57686fb39ae0b32967c907c029174cc7e7f3721f00fe5cea",
+      "file": "display_cabinet.glb",
+      "provenance": "provenance/display_cabinet/reuse_provenance.json",
+      "pivot": "floor Y=0, horizontal source centre",
+      "parts": [
+        {
+          "name": "Counter carcass.001",
+          "source_part": "Counter carcass",
+          "palette_slot": "sage",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter corner stile.002",
+          "source_part": "Counter corner stile",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter corner stile.003",
+          "source_part": "Counter corner stile.001",
+          "palette_slot": "oak",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.009",
+          "source_part": "Counter tongue groove",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.010",
+          "source_part": "Counter tongue groove.001",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.011",
+          "source_part": "Counter tongue groove.002",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.012",
+          "source_part": "Counter tongue groove.003",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.013",
+          "source_part": "Counter tongue groove.004",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.014",
+          "source_part": "Counter tongue groove.005",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.015",
+          "source_part": "Counter tongue groove.006",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.016",
+          "source_part": "Counter tongue groove.007",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter tongue groove.017",
+          "source_part": "Counter tongue groove.008",
+          "palette_slot": "sage_dark",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter foot rail.001",
+          "source_part": "Counter foot rail",
+          "palette_slot": "oak_edge",
+          "export_group": "Body"
+        },
+        {
+          "name": "Counter thick oak top.001",
+          "source_part": "Counter thick oak top",
+          "palette_slot": "oak_light",
+          "export_group": "Body"
+        },
+        {
+          "name": "Continuous curved display glazing.001",
+          "source_part": "Continuous curved display glazing",
+          "palette_slot": "glass",
+          "export_group": "Glass"
+        },
+        {
+          "name": "Glass side pane",
+          "source_part": "New Glass side pane",
+          "palette_slot": "glass",
+          "export_group": "Glass"
+        },
+        {
+          "name": "Glass side pane.001",
+          "source_part": "New Glass side pane",
+          "palette_slot": "glass",
+          "export_group": "Glass"
+        },
+        {
+          "name": "Glass rear pane",
+          "source_part": "New Glass rear pane",
+          "palette_slot": "glass",
+          "export_group": "Glass"
+        },
+        {
+          "name": "Canopy brass edge",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.001",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.002",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.003",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.004",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.005",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.006",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.007",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.008",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.009",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.010",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.011",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.012",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.013",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.014",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        }
+      ]
+    },
+    {
+      "name": "display_island",
+      "family": "display",
+      "modules": [
+        "N3 M13"
+      ],
+      "changes": [
+        "Original named cabinet / island base retained, top at 0.66H = 1.1517 m.",
+        "Bakery curved glass profile reused, resized to 0.60 m canopy height.",
+        "Added closed side/rear panes and thin brass canopy edging; Glass is the only transparent surface. No merchandise."
+      ],
+      "sources": [
+        "clothing_store_b/round_display_island",
+        "bakery/display_glass"
+      ],
+      "anchors": {},
+      "vertical_scale": 1.1505493968379412,
+      "tabletop_height_m": 1.1517000000000002,
+      "triangles": 1414,
+      "surfaces": 2,
+      "bounds": [
+        [
+          -1.1699999570846558,
+          0.0,
+          -1.1699999570846558
+        ],
+        [
+          1.1699999570846558,
+          1.760699987411499,
+          1.1699999570846558
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.3399999141693115,
+        1.760699987411499,
+        2.3399999141693115
+      ],
+      "sha256": "ce0af3d751975e120245f4e0f886fb5bed5cf356aaa53a1c5242afc047bd2fc6",
+      "file": "display_island.glb",
+      "provenance": "provenance/display_island/reuse_provenance.json",
+      "pivot": "floor Y=0, horizontal source centre",
+      "parts": [
+        {
+          "name": "Island brass plinth.001",
+          "source_part": "Island brass plinth",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Lower ivory display tier.001",
+          "source_part": "Lower ivory display tier",
+          "palette_slot": "porcelain",
+          "export_group": "Body"
+        },
+        {
+          "name": "Upper tier brass edge.001",
+          "source_part": "Upper tier brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Upper ivory display.001",
+          "source_part": "Upper ivory display",
+          "palette_slot": "porcelain",
+          "export_group": "Body"
+        },
+        {
+          "name": "Continuous curved display glazing.002",
+          "source_part": "Continuous curved display glazing",
+          "palette_slot": "glass",
+          "export_group": "Glass"
+        },
+        {
+          "name": "Glass side pane.002",
+          "source_part": "New Glass side pane",
+          "palette_slot": "glass",
+          "export_group": "Glass"
+        },
+        {
+          "name": "Glass side pane.003",
+          "source_part": "New Glass side pane",
+          "palette_slot": "glass",
+          "export_group": "Glass"
+        },
+        {
+          "name": "Glass rear pane.001",
+          "source_part": "New Glass rear pane",
+          "palette_slot": "glass",
+          "export_group": "Glass"
+        },
+        {
+          "name": "Canopy brass edge.015",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.016",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.017",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.018",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.019",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.020",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.021",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.022",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.023",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.024",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.025",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.026",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.027",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.028",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        },
+        {
+          "name": "Canopy brass edge.029",
+          "source_part": "New 9 mm radius canopy brass edge",
+          "palette_slot": "brass",
+          "export_group": "Body"
+        }
+      ]
+    }
+  ],
+  "unique_triangles": 10740,
+  "unique_surfaces": 14,
+  "atlas": "hallkit_palette.png",
+  "materials": "One opaque material; one shared transparent glass material (same atlas).",
+  "character_height_m": 1.745,
+  "seat_height_m": 0.715
+}

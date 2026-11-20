@@ -1,0 +1,103 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-324",
+  "baseline_commit": "fadcaa195f5bb34229fba3995b27c5808ff34089",
+  "asset": {
+    "name": "round_side_table",
+    "family": "table",
+    "modules": [
+      "N1 M16",
+      "N2 M17"
+    ],
+    "changes": [
+      "Coffee Shop 0 selected from three measured candidates: smallest diameter (1.10 m), 240 triangles.",
+      "Grounded at actual lowest vertex; tabletop 0.65H = 1.13425 m; diameter retained."
+    ],
+    "sources": [
+      "coffee_shop_0/round_table"
+    ],
+    "anchors": {},
+    "vertical_scale": 1.1070123041110416,
+    "tabletop_height_m": 1.1342500000000002,
+    "triangles": 240,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.550000011920929,
+        0.0,
+        -0.550000011920929
+      ],
+      [
+        0.550000011920929,
+        1.1342500448226929,
+        0.550000011920929
+      ]
+    ],
+    "dimensions_xyz_m": [
+      1.100000023841858,
+      1.1342500448226929,
+      1.100000023841858
+    ],
+    "sha256": "b029d9e19b0bc08c4466f97d991fdde8dd2aefc6beaf59503e27c1c43a0e675b",
+    "file": "round_side_table.glb",
+    "provenance": "provenance/round_side_table/reuse_provenance.json",
+    "pivot": "floor Y=0, horizontal source centre",
+    "parts": [
+      {
+        "name": "Splayed wood table leg.003",
+        "source_part": "Splayed wood table leg",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Splayed wood table leg.004",
+        "source_part": "Splayed wood table leg.001",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Splayed wood table leg.005",
+        "source_part": "Splayed wood table leg.002",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Ivory cafe tabletop.001",
+        "source_part": "Ivory cafe tabletop",
+        "palette_slot": "porcelain",
+        "export_group": "Body"
+      }
+    ]
+  },
+  "sources": {
+    "coffee_shop_0/round_table": {
+      "glb": "assets/rooms/coffee_shop_0/round_table.glb",
+      "triangles": 240,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.5499999523162842,
+          0.0032453425228595734,
+          -0.550000011920929
+        ],
+        [
+          0.550000011920929,
+          1.0278500318527222,
+          0.5500000715255737
+        ]
+      ],
+      "dimensions_xyz_m": [
+        1.0999999642372131,
+        1.0246046893298626,
+        1.1000000834465027
+      ],
+      "sha256": "335f7304c706ba8b86bb1828d3075cfcc8bcdc5c5172459f655bb64832c82a4a",
+      "blend": "tools/art/source/coffee_shop_0/coffee_shop_0.blend",
+      "blend_sha256": "d3616abcdfb14efb08f4c180403195c2c12981e5ff689136fd7630b1372c21ff",
+      "collection": "KIT_round_table"
+    }
+  },
+  "texture_change": "All runtime UVs remapped to one provisional Basic Room swatch atlas; no source atlas retained.",
+  "source_mesh_rule": "Evaluated named Blender geometry checked against source GLB dimensions and triangle count before editing."
+}

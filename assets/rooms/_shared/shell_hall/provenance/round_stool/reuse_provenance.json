@@ -1,0 +1,108 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-324",
+  "baseline_commit": "fadcaa195f5bb34229fba3995b27c5808ff34089",
+  "asset": {
+    "name": "round_stool",
+    "family": "stool",
+    "modules": [
+      "N3 M16"
+    ],
+    "changes": [
+      "Mine Hut stool geometry retained; source negative foot bound grounded.",
+      "Seat top corrected to 0.715 m; original horizontal dimensions retained."
+    ],
+    "sources": [
+      "mine_hut/round_stool"
+    ],
+    "anchors": {
+      "seat_1": [
+        0,
+        0.715,
+        0
+      ]
+    },
+    "vertical_scale": 1.0726527379220903,
+    "seat_height_m": 0.715,
+    "triangles": 176,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.2800000011920929,
+        4.656612873077393e-10,
+        -0.2800000011920929
+      ],
+      [
+        0.28076016902923584,
+        0.7149999737739563,
+        0.2800000011920929
+      ]
+    ],
+    "dimensions_xyz_m": [
+      0.5607601702213287,
+      0.714999973308295,
+      0.5600000023841858
+    ],
+    "sha256": "ed28942fc59fdb030f76fd0867cee138828fce7cb8f4285e33887e4c07407450",
+    "file": "round_stool.glb",
+    "provenance": "provenance/round_stool/reuse_provenance.json",
+    "pivot": "floor Y=0, horizontal source centre",
+    "parts": [
+      {
+        "name": "Round stool seat.001",
+        "source_part": "Round stool seat",
+        "palette_slot": "oak_light",
+        "export_group": "Body"
+      },
+      {
+        "name": "Splayed stool leg.003",
+        "source_part": "Splayed stool leg",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Splayed stool leg.004",
+        "source_part": "Splayed stool leg.001",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Splayed stool leg.005",
+        "source_part": "Splayed stool leg.002",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      }
+    ]
+  },
+  "sources": {
+    "mine_hut/round_stool": {
+      "glb": "assets/rooms/mine_hut/round_stool.glb",
+      "triangles": 176,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.2799999713897705,
+          -0.005771756172180176,
+          -0.2799999713897705
+        ],
+        [
+          0.2807600498199463,
+          0.6607999801635742,
+          0.2799999713897705
+        ]
+      ],
+      "dimensions_xyz_m": [
+        0.5607600212097168,
+        0.6665717363357544,
+        0.559999942779541
+      ],
+      "sha256": "a64164cb6f8679df3b9defa038f9438252d8d094b8c296a5661f5134cb69f2d8",
+      "blend": "tools/art/source/mine_hut/mine_hut.blend",
+      "blend_sha256": "da501ebc507794dac073afb0f333e53a14579a5be020fa895a6a87231720d9f8",
+      "collection": "KIT_round_stool"
+    }
+  },
+  "texture_change": "All runtime UVs remapped to one provisional Basic Room swatch atlas; no source atlas retained.",
+  "source_mesh_rule": "Evaluated named Blender geometry checked against source GLB dimensions and triangle count before editing."
+}

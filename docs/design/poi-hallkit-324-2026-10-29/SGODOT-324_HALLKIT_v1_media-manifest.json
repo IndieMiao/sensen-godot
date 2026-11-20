@@ -1,0 +1,44 @@
+[
+  {
+    "file": "SGODOT-324_HALLKIT_v1_details.png",
+    "sha256": "81dad084375955581a97f54e7cc09cec814c477bad72a909e50a289047305a3f",
+    "bytes": 579187,
+    "size": [
+      2400,
+      1250
+    ]
+  },
+  {
+    "file": "SGODOT-324_HALLKIT_v1_dimensions.csv",
+    "sha256": "db7323c7ffa172e56ea788c4db64bf70e32f562225061e5e9bab2995c7febc40",
+    "bytes": 1740
+  },
+  {
+    "file": "SGODOT-324_HALLKIT_v1_dimensions.md",
+    "sha256": "d208a3b8b28c2f828acb46812b985bb55eba5bcafd9f11eae979a373f34fbf26",
+    "bytes": 2645
+  },
+  {
+    "file": "SGODOT-324_HALLKIT_v1_dimensions.png",
+    "sha256": "c475b01082538556fbb4788cf4051d351152cd144d6447c23e685c35a9288b5f",
+    "bytes": 288283,
+    "size": [
+      3000,
+      1130
+    ]
+  },
+  {
+    "file": "SGODOT-324_HALLKIT_v1_lineup.png",
+    "sha256": "0bf60b870c1efb454788271a1f9f53a50556b506b2af423358db1116f0fb43de",
+    "bytes": 522595,
+    "size": [
+      3200,
+      1030
+    ]
+  },
+  {
+    "file": "SGODOT-324_HALLKIT_v1_validation.json",
+    "sha256": "e35226cd5a2944fc0100cb8005373c9d5fbb7c6247cfb70e0346c63ca7ab34c4",
+    "bytes": 47084
+  }
+]

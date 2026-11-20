@@ -1,0 +1,1905 @@
+{
+  "author": "黄忠",
+  "task": "SGODOT-324",
+  "geometry": {
+    "checks": [
+      {
+        "check": "one 2048-square atlas",
+        "passed": true
+      },
+      {
+        "check": "no original kit atlases copied",
+        "passed": true
+      },
+      {
+        "check": "atlas configured for VRAM compression and mipmaps",
+        "passed": true
+      },
+      {
+        "check": "oak exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "oak_light exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "oak_edge exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "brass exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "linen exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "sky exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "sage exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "iron exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "porcelain exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "sage_dark exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "linen_green exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "petal exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "print_portrait exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "print_landscape exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "glass exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "stone exact Basic Room swatch",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat actual surface count",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat floor pivot grounded",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat/seat_1 actual seat surface 0.715 m",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat/seat_2 actual seat surface 0.715 m",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat/seat_3 actual seat surface 0.715 m",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat source GLB hash retained: assets/rooms/deluxe_room_10/sofa.glb",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat named source hash retained: tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+        "passed": true
+      },
+      {
+        "check": "armchair only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "armchair texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "armchair/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "armchair/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "armchair/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "armchair/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "armchair/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "armchair actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "armchair actual surface count",
+        "passed": true
+      },
+      {
+        "check": "armchair actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "armchair floor pivot grounded",
+        "passed": true
+      },
+      {
+        "check": "armchair/seat_1 actual seat surface 0.715 m",
+        "passed": true
+      },
+      {
+        "check": "armchair source GLB hash retained: assets/rooms/deluxe_room_10/sofa.glb",
+        "passed": true
+      },
+      {
+        "check": "armchair named source hash retained: tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat actual surface count",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat floor pivot grounded",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat/seat_1 actual seat surface 0.715 m",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat/seat_2 actual seat surface 0.715 m",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat/seat_3 actual seat surface 0.715 m",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat no floating seam or stitch above seat",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat source GLB hash retained: assets/rooms/clothing_store_a/black_tufted_bench.glb",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat named source hash retained: tools/art/source/clothing_store_a/clothing_store_a.blend",
+        "passed": true
+      },
+      {
+        "check": "round_side_table only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "round_side_table texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_side_table/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "round_side_table/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "round_side_table/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "round_side_table/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "round_side_table/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "round_side_table actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "round_side_table actual surface count",
+        "passed": true
+      },
+      {
+        "check": "round_side_table actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "round_side_table floor pivot grounded",
+        "passed": true
+      },
+      {
+        "check": "round_side_table source GLB hash retained: assets/rooms/coffee_shop_0/round_table.glb",
+        "passed": true
+      },
+      {
+        "check": "round_side_table named source hash retained: tools/art/source/coffee_shop_0/coffee_shop_0.blend",
+        "passed": true
+      },
+      {
+        "check": "round_stool only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "round_stool texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_stool/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "round_stool/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "round_stool/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "round_stool/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "round_stool/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "round_stool actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "round_stool actual surface count",
+        "passed": true
+      },
+      {
+        "check": "round_stool actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "round_stool floor pivot grounded",
+        "passed": true
+      },
+      {
+        "check": "round_stool/seat_1 actual seat surface 0.715 m",
+        "passed": true
+      },
+      {
+        "check": "round_stool source GLB hash retained: assets/rooms/mine_hut/round_stool.glb",
+        "passed": true
+      },
+      {
+        "check": "round_stool named source hash retained: tools/art/source/mine_hut/mine_hut.blend",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce actual surface count",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce wall mounting plane Z=0",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce source GLB hash retained: assets/rooms/clothing_store_b/wall_sconce.glb",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce named source hash retained: tools/art/source/clothing_store_b/clothing_store_b.blend",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Artwork identity local transform",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Artwork finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Artwork no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Artwork winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Artwork triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait actual surface count",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait wall mounting plane Z=0",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait independent two-triangle picture face",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait source GLB hash retained: assets/rooms/standard_room_5/botanical_picture.glb",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait named source hash retained: tools/art/source/standard_room_5/standard_room_5.blend",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Artwork identity local transform",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Artwork finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Artwork no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Artwork winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Artwork triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape actual surface count",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape wall mounting plane Z=0",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape independent two-triangle picture face",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape source GLB hash retained: assets/rooms/tavern/landscape_frame.glb",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape named source hash retained: tools/art/source/tavern/tavern.blend",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Glass identity local transform",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Glass finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Glass no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Glass winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet/Glass triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet actual surface count",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet floor pivot grounded",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet closed canopy ray [1, 0, 0]",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet closed canopy ray [-1, 0, 0]",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet closed canopy ray [0, 0, 1]",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet closed canopy ray [0, 0, -1]",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet closed canopy ray [0, 1, 0]",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet transparent two-sided glass",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet source GLB hash retained: assets/rooms/bakery/pastry_display.glb",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet named source hash retained: tools/art/source/bakery/bakery.blend",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet source GLB hash retained: assets/rooms/bakery/display_glass.glb",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet named source hash retained: tools/art/source/bakery/bakery.blend",
+        "passed": true
+      },
+      {
+        "check": "display_island only external shared atlas",
+        "passed": true
+      },
+      {
+        "check": "display_island texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_island/Body identity local transform",
+        "passed": true
+      },
+      {
+        "check": "display_island/Body finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "display_island/Body no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "display_island/Body winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "display_island/Body triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "display_island/Glass identity local transform",
+        "passed": true
+      },
+      {
+        "check": "display_island/Glass finite vertices and UVs",
+        "passed": true
+      },
+      {
+        "check": "display_island/Glass no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "display_island/Glass winding agrees with shading normals",
+        "passed": true
+      },
+      {
+        "check": "display_island/Glass triangles contained in padded swatches",
+        "passed": true
+      },
+      {
+        "check": "display_island actual triangle count and budget",
+        "passed": true
+      },
+      {
+        "check": "display_island actual surface count",
+        "passed": true
+      },
+      {
+        "check": "display_island actual metre bounds",
+        "passed": true
+      },
+      {
+        "check": "display_island floor pivot grounded",
+        "passed": true
+      },
+      {
+        "check": "display_island closed canopy ray [1, 0, 0]",
+        "passed": true
+      },
+      {
+        "check": "display_island closed canopy ray [-1, 0, 0]",
+        "passed": true
+      },
+      {
+        "check": "display_island closed canopy ray [0, 0, 1]",
+        "passed": true
+      },
+      {
+        "check": "display_island closed canopy ray [0, 0, -1]",
+        "passed": true
+      },
+      {
+        "check": "display_island closed canopy ray [0, 1, 0]",
+        "passed": true
+      },
+      {
+        "check": "display_island transparent two-sided glass",
+        "passed": true
+      },
+      {
+        "check": "display_island source GLB hash retained: assets/rooms/clothing_store_b/round_display_island.glb",
+        "passed": true
+      },
+      {
+        "check": "display_island named source hash retained: tools/art/source/clothing_store_b/clothing_store_b.blend",
+        "passed": true
+      },
+      {
+        "check": "display_island source GLB hash retained: assets/rooms/bakery/display_glass.glb",
+        "passed": true
+      },
+      {
+        "check": "display_island named source hash retained: tools/art/source/bakery/bakery.blend",
+        "passed": true
+      },
+      {
+        "check": "unique triangle total",
+        "passed": true
+      },
+      {
+        "check": "exactly eight requested prop families",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "sofa_three_seat": {
+        "triangles": 2340,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.402999997138977,
+            0.0,
+            -0.45000001788139343
+          ],
+          [
+            1.402999997138977,
+            1.3263769149780273,
+            0.4399999976158142
+          ]
+        ],
+        "seat_probes": [
+          {
+            "anchor": "seat_1",
+            "height_m": 0.7150000333786011
+          },
+          {
+            "anchor": "seat_2",
+            "height_m": 0.7150000333786011
+          },
+          {
+            "anchor": "seat_3",
+            "height_m": 0.7150000333786011
+          }
+        ]
+      },
+      "armchair": {
+        "triangles": 1776,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.7500000596046448,
+            0.0,
+            -0.45000001788139343
+          ],
+          [
+            0.7500000596046448,
+            1.3263769149780273,
+            0.4399999976158142
+          ]
+        ],
+        "seat_probes": [
+          {
+            "anchor": "seat_1",
+            "height_m": 0.7150000333786011
+          }
+        ]
+      },
+      "bench_three_seat": {
+        "triangles": 1468,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.1449999809265137,
+            0.0,
+            -0.2750000059604645
+          ],
+          [
+            1.1449999809265137,
+            0.715399980545044,
+            0.2750000059604645
+          ]
+        ],
+        "seat_probes": [
+          {
+            "anchor": "seat_1",
+            "height_m": 0.7150000333786011
+          },
+          {
+            "anchor": "seat_2",
+            "height_m": 0.7150000333786011
+          },
+          {
+            "anchor": "seat_3",
+            "height_m": 0.7150000333786011
+          }
+        ]
+      },
+      "round_side_table": {
+        "triangles": 240,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.550000011920929,
+            0.0,
+            -0.550000011920929
+          ],
+          [
+            0.550000011920929,
+            1.1342500448226929,
+            0.550000011920929
+          ]
+        ],
+        "seat_probes": []
+      },
+      "round_stool": {
+        "triangles": 176,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2800000011920929,
+            4.656612873077393e-10,
+            -0.2800000011920929
+          ],
+          [
+            0.28076016902923584,
+            0.7149999737739563,
+            0.2800000011920929
+          ]
+        ],
+        "seat_probes": [
+          {
+            "anchor": "seat_1",
+            "height_m": 0.7149999737739563
+          }
+        ]
+      },
+      "wall_sconce": {
+        "triangles": 292,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.07000000029802322,
+            -0.2800000011920929,
+            -0.0
+          ],
+          [
+            0.07000000029802322,
+            0.2800000011920929,
+            0.15949998795986176
+          ]
+        ],
+        "seat_probes": []
+      },
+      "frame_portrait": {
+        "triangles": 542,
+        "surfaces": 2,
+        "bounds": [
+          [
+            -0.2409999966621399,
+            -0.3310000002384186,
+            -0.0
+          ],
+          [
+            0.2409999966621399,
+            0.3310000002384186,
+            0.07500000298023224
+          ]
+        ],
+        "seat_probes": []
+      },
+      "frame_landscape": {
+        "triangles": 542,
+        "surfaces": 2,
+        "bounds": [
+          [
+            -0.35600000619888306,
+            -0.2409999966621399,
+            -0.0
+          ],
+          [
+            0.35600000619888306,
+            0.2409999966621399,
+            0.07500000298023224
+          ]
+        ],
+        "seat_probes": []
+      },
+      "display_cabinet": {
+        "triangles": 1950,
+        "surfaces": 2,
+        "bounds": [
+          [
+            -1.2000000476837158,
+            0.0,
+            -0.5849999785423279
+          ],
+          [
+            1.2000000476837158,
+            1.760699987411499,
+            0.5890000462532043
+          ]
+        ],
+        "seat_probes": []
+      },
+      "display_island": {
+        "triangles": 1414,
+        "surfaces": 2,
+        "bounds": [
+          [
+            -1.1699999570846558,
+            0.0,
+            -1.1699999570846558
+          ],
+          [
+            1.1699999570846558,
+            1.760699987411499,
+            1.1699999570846558
+          ]
+        ],
+        "seat_probes": []
+      }
+    },
+    "method": "Decoded GLB vertex/index arrays; independent ray/triangle seat and canopy probes.",
+    "passed": true,
+    "failures": []
+  },
+  "godot": {
+    "assets": {
+      "armchair": {
+        "bounds": [
+          [
+            -0.750000059604645,
+            0.0,
+            -0.450000017881393
+          ],
+          [
+            0.750000059604645,
+            1.32637691497803,
+            0.439999967813492
+          ]
+        ],
+        "placement": [
+          4.20599985122681,
+          0.0,
+          0.0
+        ],
+        "surfaces": 1,
+        "triangles": 1776
+      },
+      "bench_three_seat": {
+        "bounds": [
+          [
+            -1.14499998092651,
+            0.0,
+            -0.275000005960464
+          ],
+          [
+            1.14499998092651,
+            0.715399980545044,
+            0.275000005960464
+          ]
+        ],
+        "placement": [
+          6.75099992752075,
+          0.0,
+          0.0
+        ],
+        "surfaces": 1,
+        "triangles": 1468
+      },
+      "display_cabinet": {
+        "bounds": [
+          [
+            -1.20000004768372,
+            0.0,
+            -0.584999978542328
+          ],
+          [
+            1.20000004768372,
+            1.7606999874115,
+            0.589000046253204
+          ]
+        ],
+        "placement": [
+          15.9907598495483,
+          0.0,
+          0.0
+        ],
+        "surfaces": 2,
+        "triangles": 1950
+      },
+      "display_island": {
+        "bounds": [
+          [
+            -1.16999995708466,
+            0.0,
+            -1.16999995708466
+          ],
+          [
+            1.17000019550323,
+            1.7606999874115,
+            1.16999995708466
+          ]
+        ],
+        "placement": [
+          19.0107612609863,
+          0.0,
+          0.0
+        ],
+        "surfaces": 2,
+        "triangles": 1414
+      },
+      "frame_landscape": {
+        "bounds": [
+          [
+            -0.356000006198883,
+            -0.24099999666214,
+            0.0
+          ],
+          [
+            0.356000006198883,
+            0.24099999666214,
+            0.0750000029802322
+          ]
+        ],
+        "placement": [
+          13.7847604751587,
+          1.5,
+          0.0
+        ],
+        "surfaces": 2,
+        "triangles": 542
+      },
+      "frame_portrait": {
+        "bounds": [
+          [
+            -0.24099999666214,
+            -0.331000000238419,
+            0.0
+          ],
+          [
+            0.24099999666214,
+            0.331000000238419,
+            0.0750000029802322
+          ]
+        ],
+        "placement": [
+          12.5377597808838,
+          1.5,
+          0.0
+        ],
+        "surfaces": 2,
+        "triangles": 542
+      },
+      "round_side_table": {
+        "bounds": [
+          [
+            -0.550000011920929,
+            0.0,
+            -0.550000011920929
+          ],
+          [
+            0.550000011920929,
+            1.13425004482269,
+            0.550000011920929
+          ]
+        ],
+        "placement": [
+          9.0959997177124,
+          0.0,
+          0.0
+        ],
+        "surfaces": 1,
+        "triangles": 240
+      },
+      "round_stool": {
+        "bounds": [
+          [
+            -0.280000001192093,
+            4.65661287307739e-10,
+            -0.280000001192093
+          ],
+          [
+            0.280760139226913,
+            0.714999973773956,
+            0.280000001192093
+          ]
+        ],
+        "placement": [
+          10.576379776001,
+          0.0,
+          0.0
+        ],
+        "surfaces": 1,
+        "triangles": 176
+      },
+      "sofa_three_seat": {
+        "bounds": [
+          [
+            -1.40299999713898,
+            0.0,
+            -0.450000017881393
+          ],
+          [
+            1.40299999713898,
+            1.32637691497803,
+            0.439999967813492
+          ]
+        ],
+        "placement": [
+          1.40299999713898,
+          0.0,
+          0.0
+        ],
+        "surfaces": 1,
+        "triangles": 2340
+      },
+      "wall_sconce": {
+        "bounds": [
+          [
+            -0.0700000002980232,
+            -0.280000001192093,
+            0.0
+          ],
+          [
+            0.0700000002980232,
+            0.280000001192093,
+            0.159499987959862
+          ]
+        ],
+        "placement": [
+          11.5767602920532,
+          1.5,
+          0.0
+        ],
+        "surfaces": 1,
+        "triangles": 292
+      }
+    },
+    "author": "Huang Zhong",
+    "avatar": {
+      "displayed_height_m": 1.745,
+      "fixture": "Basic Room defaults",
+      "floor_offset_m": 6.24171052693955e-07,
+      "source_height_m": 1.71833898495782,
+      "uniform_scale": 1.01551557362986
+    },
+    "captures": [
+      {
+        "draw_calls": 36,
+        "id": "lineup",
+        "pitch": 19.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            759.14599609375,
+            501.800170898438
+          ],
+          "bench_three_seat": [
+            1103.78161621094,
+            501.800170898438
+          ],
+          "display_cabinet": [
+            2354.99951171875,
+            501.800170898438
+          ],
+          "display_island": [
+            2763.95825195312,
+            501.800170898438
+          ],
+          "frame_landscape": [
+            2056.2705078125,
+            310.924987792969
+          ],
+          "frame_portrait": [
+            1887.40563964844,
+            310.924987792969
+          ],
+          "round_side_table": [
+            1421.33374023438,
+            501.800170898438
+          ],
+          "round_stool": [
+            1621.80200195312,
+            501.800170898438
+          ],
+          "sofa_three_seat": [
+            379.572967529297,
+            501.800170898438
+          ],
+          "wall_sconce": [
+            1757.27026367188,
+            310.924987792969
+          ]
+        },
+        "size": [
+          3200,
+          800
+        ],
+        "width_m": 23.6307601928711,
+        "yaw": 0.0
+      },
+      {
+        "draw_calls": 6,
+        "id": "detail_sofa",
+        "pitch": 27.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            897.550720214844,
+            604.702453613281
+          ],
+          "bench_three_seat": [
+            1379.00024414062,
+            665.266174316406
+          ],
+          "display_cabinet": [
+            3126.9287109375,
+            885.146179199219
+          ],
+          "display_island": [
+            3698.23681640625,
+            957.013549804688
+          ],
+          "frame_landscape": [
+            2709.60961914062,
+            573.264404296875
+          ],
+          "frame_portrait": [
+            2473.70874023438,
+            543.589233398438
+          ],
+          "round_side_table": [
+            1822.61474609375,
+            721.070495605469
+          ],
+          "round_stool": [
+            2102.66528320312,
+            756.299255371094
+          ],
+          "sofa_three_seat": [
+            367.294158935547,
+            537.9990234375
+          ],
+          "wall_sconce": [
+            2291.91186523438,
+            520.720275878906
+          ]
+        },
+        "size": [
+          1000,
+          850
+        ],
+        "width_m": 5.10599994659424,
+        "yaw": 15.0
+      },
+      {
+        "draw_calls": 6,
+        "id": "detail_armchair",
+        "pitch": 27.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            404.678497314453,
+            587.275207519531
+          ],
+          "bench_three_seat": [
+            1051.59484863281,
+            668.653747558594
+          ],
+          "display_cabinet": [
+            3400.25854492188,
+            964.103088378906
+          ],
+          "display_island": [
+            4167.916015625,
+            1060.67016601562
+          ],
+          "frame_landscape": [
+            2839.51342773438,
+            545.0322265625
+          ],
+          "frame_portrait": [
+            2522.537109375,
+            505.158325195312
+          ],
+          "round_side_table": [
+            1647.67260742188,
+            743.637145996094
+          ],
+          "round_stool": [
+            2023.97192382812,
+            790.973510742188
+          ],
+          "sofa_three_seat": [
+            -307.818817138672,
+            497.646881103516
+          ],
+          "wall_sconce": [
+            2278.25952148438,
+            474.4296875
+          ]
+        },
+        "size": [
+          1000,
+          850
+        ],
+        "width_m": 3.80000019073486,
+        "yaw": 15.0
+      },
+      {
+        "draw_calls": 6,
+        "id": "detail_bench",
+        "pitch": 27.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            -156.050796508789,
+            486.744903564453
+          ],
+          "bench_three_seat": [
+            379.5224609375,
+            554.117126464844
+          ],
+          "display_cabinet": [
+            2323.94995117188,
+            798.715698242188
+          ],
+          "display_island": [
+            2959.4833984375,
+            878.662292480469
+          ],
+          "frame_landscape": [
+            1859.71655273438,
+            451.772705078125
+          ],
+          "frame_portrait": [
+            1597.29614257812,
+            418.761627197266
+          ],
+          "round_side_table": [
+            873.007446289062,
+            616.194885253906
+          ],
+          "round_stool": [
+            1184.54064941406,
+            655.384033203125
+          ],
+          "sofa_three_seat": [
+            -745.917907714844,
+            412.542816162109
+          ],
+          "wall_sconce": [
+            1395.06213378906,
+            393.321594238281
+          ]
+        },
+        "size": [
+          1000,
+          850
+        ],
+        "width_m": 4.59000015258789,
+        "yaw": 15.0
+      },
+      {
+        "draw_calls": 6,
+        "id": "detail_table",
+        "pitch": 27.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            -967.354309082031,
+            435.182708740234
+          ],
+          "bench_three_seat": [
+            -244.330703735352,
+            526.135192871094
+          ],
+          "display_cabinet": [
+            2380.64672851562,
+            856.343017578125
+          ],
+          "display_island": [
+            3238.61669921875,
+            964.270935058594
+          ],
+          "frame_landscape": [
+            1753.931640625,
+            387.97021484375
+          ],
+          "frame_portrait": [
+            1399.66394042969,
+            343.405303955078
+          ],
+          "round_side_table": [
+            421.874176025391,
+            609.9404296875
+          ],
+          "round_stool": [
+            842.443969726562,
+            662.845825195312
+          ],
+          "sofa_three_seat": [
+            -1763.67517089844,
+            335.010162353516
+          ],
+          "wall_sconce": [
+            1126.64794921875,
+            309.061248779297
+          ]
+        },
+        "size": [
+          1000,
+          850
+        ],
+        "width_m": 3.40000009536743,
+        "yaw": 15.0
+      },
+      {
+        "draw_calls": 6,
+        "id": "detail_stool",
+        "pitch": 27.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            -1349.62573242188,
+            387.095092773438
+          ],
+          "bench_three_seat": [
+            -626.601806640625,
+            478.047576904297
+          ],
+          "display_cabinet": [
+            1998.37548828125,
+            808.25537109375
+          ],
+          "display_island": [
+            2856.34545898438,
+            916.183288574219
+          ],
+          "frame_landscape": [
+            1371.66040039062,
+            339.882598876953
+          ],
+          "frame_portrait": [
+            1017.39270019531,
+            295.317657470703
+          ],
+          "round_side_table": [
+            39.603084564209,
+            561.8525390625
+          ],
+          "round_stool": [
+            460.172882080078,
+            614.758178710938
+          ],
+          "sofa_three_seat": [
+            -2145.94604492188,
+            286.922515869141
+          ],
+          "wall_sconce": [
+            744.376647949219,
+            260.9736328125
+          ]
+        },
+        "size": [
+          1000,
+          850
+        ],
+        "width_m": 3.40000009536743,
+        "yaw": 15.0
+      },
+      {
+        "draw_calls": 6,
+        "id": "detail_sconce",
+        "pitch": 27.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            -1603.94543457031,
+            355.103240966797
+          ],
+          "bench_three_seat": [
+            -880.921508789062,
+            446.055725097656
+          ],
+          "display_cabinet": [
+            1744.05603027344,
+            776.263488769531
+          ],
+          "display_island": [
+            2602.02563476562,
+            884.19140625
+          ],
+          "frame_landscape": [
+            1117.3408203125,
+            307.890472412109
+          ],
+          "frame_portrait": [
+            763.073120117188,
+            263.325531005859
+          ],
+          "round_side_table": [
+            -214.716613769531,
+            529.860412597656
+          ],
+          "round_stool": [
+            205.85319519043,
+            582.765808105469
+          ],
+          "sofa_three_seat": [
+            -2400.265625,
+            254.930404663086
+          ],
+          "wall_sconce": [
+            490.057098388672,
+            228.98176574707
+          ]
+        },
+        "size": [
+          1000,
+          850
+        ],
+        "width_m": 3.40000009536743,
+        "yaw": 15.0
+      },
+      {
+        "draw_calls": 12,
+        "id": "detail_frames",
+        "pitch": 27.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            -1628.87353515625,
+            316.999389648438
+          ],
+          "bench_three_seat": [
+            -1035.65869140625,
+            391.62255859375
+          ],
+          "display_cabinet": [
+            1118.03881835938,
+            662.5458984375
+          ],
+          "display_island": [
+            1821.97155761719,
+            751.096740722656
+          ],
+          "frame_landscape": [
+            603.841857910156,
+            278.263031005859
+          ],
+          "frame_portrait": [
+            313.178375244141,
+            241.699172973633
+          ],
+          "round_side_table": [
+            -489.062316894531,
+            460.381439208984
+          ],
+          "round_stool": [
+            -144.000061035156,
+            503.788360595703
+          ],
+          "sofa_three_seat": [
+            -2282.22509765625,
+            234.811264038086
+          ],
+          "wall_sconce": [
+            89.1788330078125,
+            213.521362304688
+          ]
+        },
+        "size": [
+          1000,
+          850
+        ],
+        "width_m": 4.14400053024292,
+        "yaw": 15.0
+      },
+      {
+        "draw_calls": 10,
+        "id": "detail_display",
+        "pitch": 27.9999980926514,
+        "screen_origins": {
+          "armchair": [
+            -1243.40930175781,
+            291.801849365234
+          ],
+          "bench_three_seat": [
+            -923.736938476562,
+            332.014923095703
+          ],
+          "display_cabinet": [
+            236.851272583008,
+            478.010650634766
+          ],
+          "display_island": [
+            616.187622070312,
+            525.729064941406
+          ],
+          "frame_landscape": [
+            -40.2400512695312,
+            270.927673339844
+          ],
+          "frame_portrait": [
+            -196.873306274414,
+            251.224075317383
+          ],
+          "round_side_table": [
+            -629.18603515625,
+            369.067810058594
+          ],
+          "round_stool": [
+            -443.238433837891,
+            392.458984375
+          ],
+          "sofa_three_seat": [
+            -1595.48828125,
+            247.512313842773
+          ],
+          "wall_sconce": [
+            -317.582489013672,
+            236.039443969727
+          ]
+        },
+        "size": [
+          1000,
+          850
+        ],
+        "width_m": 7.69000148773193,
+        "yaw": 15.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "sofa_three_seat imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "armchair imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "armchair imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "armchair actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "bench_three_seat actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "round_side_table imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "round_side_table imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "round_side_table actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "round_stool imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "round_stool imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "round_stool actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "frame_portrait independently replaceable Artwork node",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "frame_landscape independently replaceable Artwork node",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet independent transparent Glass node",
+        "passed": true
+      },
+      {
+        "check": "display_island imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "display_island imported surfaces match",
+        "passed": true
+      },
+      {
+        "check": "display_island actual imported dimensions match",
+        "passed": true
+      },
+      {
+        "check": "display_island independent transparent Glass node",
+        "passed": true
+      },
+      {
+        "check": "Basic Room fixture avatar assembled",
+        "passed": true
+      },
+      {
+        "check": "actual avatar posed vertices measured",
+        "passed": true
+      },
+      {
+        "check": "saved lineup",
+        "passed": true
+      },
+      {
+        "check": "saved detail_sofa",
+        "passed": true
+      },
+      {
+        "check": "saved detail_armchair",
+        "passed": true
+      },
+      {
+        "check": "saved detail_bench",
+        "passed": true
+      },
+      {
+        "check": "saved detail_table",
+        "passed": true
+      },
+      {
+        "check": "saved detail_stool",
+        "passed": true
+      },
+      {
+        "check": "saved detail_sconce",
+        "passed": true
+      },
+      {
+        "check": "saved detail_frames",
+        "passed": true
+      },
+      {
+        "check": "saved detail_display",
+        "passed": true
+      },
+      {
+        "check": "actual target renderer is Mobile",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "adapter": "NVIDIA GeForce RTX 2060",
+      "api": "1.4.329",
+      "method": "mobile"
+    }
+  },
+  "scope": "Desktop reusable-kit technical verification only; pending N1 atlas and N2 art acceptance."
+}
