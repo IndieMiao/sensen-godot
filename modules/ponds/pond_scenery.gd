@@ -25,7 +25,15 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 	material.set_shader_parameter("grass_detail", preload("res://assets/farm/art/water/bank_grass.png"))
 	material.set_shader_parameter("surface_flow", preload("res://assets/farm/art/water/surface_flow.png"))
 	_wild_ground(material, str(entry.get("template_id", "")))
-	scene._mesh(ground, Vector3(6, -0.025, -8), material).name = "BankGround"
+	var spec := SystemPonds.site(entry)
+	if LOWPOLY:
+		if V2 > 0:
+			scene.add_child(PondGroundV2.build(entry, spec, V2, clear, tree_points(clear)))
+		else:
+			scene.add_child(PondLowpolyGround.build(entry, spec))   # 盘古's 422 sample: the faceted ground instead
+			if SHORE: scene.add_child(PondLowpolyGround.shore(entry, spec))
+	else:
+		scene._mesh(ground, Vector3(6, -0.025, -8), material).name = "BankGround"
 	# The bank's six trees are the wild's single pines and round trees now (SGODOT-422 ⑥: not the Timber grove's clump),
 	# placed with the rest of the wild's pieces (PondWildProps); the draws stay so the turf below keeps its place. Their
 	# trunks block the P0 walk (PondWalk.set_trees), which reaches them since q(297).
@@ -34,7 +42,6 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 		scene._rng.randf_range(0, TAU)
 	var trees := tree_points(clear)
 	var layers := {"grass_clump": []}
-	var spec := SystemPonds.site(entry)
 	for i in 150:
 		var point := Vector3(scene._rng.randf_range(-1.5, 13.5), 0.01, scene._rng.randf_range(-18, .4))
 		if FishingModel.contains(str(entry.id), point, .5, spec) or (point.z > -3 and absf(point.x - 6) < 1.4): continue
@@ -45,8 +52,14 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 		# the old flowers and bushes give way to the wild's own (blue flowers and mint bushes read as resources, 不知火舞)
 		if asset != "grass_clump": continue
 		layers[asset].append(Transform3D(Basis(Vector3.UP, turn).scaled(Vector3.ONE * scale_value), point))
-	for asset in layers: scene.add_child(Art.batch(asset, layers[asset], false))
+	if not LOWPOLY:
+		for asset in layers: scene.add_child(Art.batch(asset, layers[asset], false))
 	scene.add_child(PondWildProps.build(entry, spec, clear, trees))
+	if V2 >= 7:   # 盘古's v5 (and v6): the ground darkens a little under the plants' feet, now that they are placed
+		var painted := scene.find_child("PaintedGround", true, false) as MeshInstance3D
+		if painted:
+			(painted.material_override as ShaderMaterial).set_shader_parameter("contact_points", PondGroundV2.contact_points())
+			(painted.material_override as ShaderMaterial).set_shader_parameter("contact", 0.10)
 	# Small batched tufts give the meadow a soft pile instead of a flat plane.
 	var turf: Array = []
 	for index in 4200:
@@ -54,6 +67,7 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 		if FishingModel.contains(str(entry.id), point, .10, spec): continue
 		var scale_value := scene._rng.randf_range(.09,.18)
 		turf.append(Transform3D(Basis(Vector3.UP, scene._rng.randf_range(0,TAU)).scaled(Vector3(scale_value,scale_value*.65,scale_value)),point))
+	if LOWPOLY: turf.clear()   # the faceted ground carries no soft pile
 	var pile := Art.batch("grass_clump", turf, false)
 	pile.name = "MeadowTurf"
 	var turf_material := ShaderMaterial.new()
@@ -62,7 +76,7 @@ static func build(entry: Dictionary, clear: Array = []) -> PondScenery:
 	scene.add_child(pile)
 	var pebbles := SurfaceTool.new()
 	pebbles.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for i in 36:
+	for i in (0 if V2 > 0 else 36):   # v2: no crumbs on the painted ground
 		var x := scene._rng.randf_range(4.9, 7.2)
 		var z := scene._rng.randf_range(-2.7, -0.4)
 		if FishingModel.contains(str(entry.id), Vector3(x, 0, z), .8, spec): continue   # P0's wider ponds come near the path (SGODOT-374)
@@ -84,6 +98,13 @@ func _mesh(mesh: Mesh, at: Vector3, material: Material) -> MeshInstance3D:
 ## The wild ground (SGODOT-422, 刘备 #791 / #798): the meadow's colour over the bank's dry ground, the pond's shape's
 ## layout (crescent / gourd / meander; another shape: none) and its channel of the shared dry-ground mask.
 const PondWildProps := preload("res://modules/ponds/pond_wild_props.gd")
+const PondLowpolyGround := preload("res://modules/ponds/pond_lowpoly_ground.gd")
+const PondGroundV2 := preload("res://modules/ponds/pond_ground_v2.gd")
+## 盘古's 422 sample (not for farm-dev): P0_WILD_LOWPOLY=1 swaps in the lowpoly flat ground.
+## v2 (after the user's "这更丑了" on v1): P0_WILD_V2=1|2|3 — flat painted ground, rounded outlines, rock groups.
+static var V2 := int(OS.get_environment("P0_WILD_V2")) if OS.get_environment("P0_WILD_V2") in ["1", "2", "3", "4", "5", "6", "7", "8", "9"] else 0
+static var LOWPOLY := OS.get_environment("P0_WILD_LOWPOLY") in ["1", "2"] or V2 > 0
+static var SHORE := V2 > 0 or (LOWPOLY and OS.get_environment("P0_WILD_SHORE") == "1")
 const GROUND_DIR := "res://assets/ponds/ground/"
 const DRY_CHANNEL := {"crescent": Vector3(1, 0, 0), "gourd": Vector3(0, 1, 0), "meander": Vector3(0, 0, 1)}
 static func _wild_ground(material: ShaderMaterial, shape: String) -> void:

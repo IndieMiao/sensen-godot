@@ -37,7 +37,16 @@ func _piece(p: Dictionary) -> Node3D:
 	root.name = "Gather_" + str(p.get("slot", p.id))
 	root.position = Vector3(float(p.get("x", 0)), 0, float(p.get("z", 0)))
 	add_child(root)
-	match str(PIECES.get(str(p.get("kind", "")), "")):
+	var kind := str(PIECES.get(str(p.get("kind", "")), ""))
+	if PondScenery.V2 >= 6 and kind in ["grove", "hardwood_grove"]:   # 盘古's 422 v4 sample: the pack's trees, same reads
+		_v4_piece(root, kind)
+		if PondScenery.V2 >= 7: _feet(root, kind)
+		return root
+	if PondScenery.V2 >= 7 and kind == "rock_pile":
+		_rocks(root)
+		_feet(root, kind)
+		return root
+	match kind:
 		"grove":
 			for t in GROVE_TREES:
 				var tree := Art.instance(str(t[1]), t[0], float(t[2]))
@@ -56,7 +65,64 @@ func _piece(p: Dictionary) -> Node3D:
 				root.add_child(h)
 		var asset:
 			if asset != "": root.add_child(Art.instance(asset))
+	if PondScenery.V2 in [1, 2, 3]:   # 盘古's 422 v2 sample: the painted ground draws a soft round shadow under each point instead
+		for g in root.find_children("*", "GeometryInstance3D", true, false): (g as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return root
+
+## v4 (the user 11-09: "树木换掉素材"; 奕星 / 上官婉儿: keep what reads as the point): Timber still three trees in a clump,
+## Hardwood still a tree, a stump and a stack of logs — the pack's Tree_19 / Tree_15, Log_05, Log_01 / 02, about the old size.
+## Still three in a clump, but opened toward the camera round the stand side (上官婉儿: no crown over the player at the
+## stand — farm-dev's grove hid them whole at Fern's C1, (−0.12, −0.72) off the point): two to the right, one behind left.
+static var GROVE_V6: String = OS.get_environment("P0_WILD_GROVE") if OS.get_environment("P0_WILD_GROVE") in ["A", "B"] else "A"
+const V4_GROVE := [[Vector3(0.85, 0, -0.45), "pg_tree_19_g", 0.44], [Vector3(-0.9, 0, -1.3), "pg_tree_15_g", 0.4], [Vector3(1.15, 0, 0.55), "pg_tree_19_g", 0.42]]   # _g: +10 % saturation
+static func _v4_piece(root: Node3D, kind: String) -> void:
+	if kind == "grove":
+		for t in V4_GROVE:
+			# v6 (the user on v5, 530: "这个树换掉" — Fern's Timber, its Tree_19s by the spawn): A three layered pines (they
+			# read as timber), B Tree_20; about the old 2.1 m (P0_WILD_GROVE, 上官婉儿 picks)
+			var asset := str(t[1])
+			var s := float(t[2])
+			if PondScenery.V2 >= 8:
+				asset = "pg_tree_20_g" if GROVE_V6 == "B" else "pg_pine_01_g"
+				s = s / 0.44 * (0.47 if GROVE_V6 == "B" else 0.58)
+			var at: Vector3 = t[0]
+			if PondScenery.V2 >= 8 and GROVE_V6 == "A" and at.z > 0.0:   # the one nearest the stand: left-back a little, 10 % less (air by the player)
+				at += Vector3(-0.25, 0, -0.2)
+				s *= 0.9
+			var tree := Art.instance(asset, at, s)
+			tree.rotation.y = float(t[0].x) * 2.1
+			root.add_child(tree)
+		return
+	# v6: Hardwood's tree no Tree_19 either (上官婉儿: no D near anywhere) — Tree_20, a broadleaf for the hardwood
+	var tree := Art.instance("pg_tree_20_g" if PondScenery.V2 >= 8 else "pg_tree_19_g", Vector3(0.1, 0, -0.25), 0.52 if PondScenery.V2 >= 8 else 0.5)
+	tree.rotation.y = 0.8
+	root.add_child(tree)
+	var stump := Art.instance("pg_log_05", Vector3(-0.5, 0, 0.3), 0.28)
+	root.add_child(stump)
+	for l in [[Vector3(0.35, 0, 0.42), "pg_log_01", 0.0], [Vector3(0.33, 0.13, 0.4), "pg_log_02", 0.25]]:
+		var log := Art.instance(str(l[1]), l[0], 0.24)
+		log.rotation = Vector3(0, PI * 0.5 + float(l[2]), 0)
+		root.add_child(log)
+
+## v5 (the user: grass where things meet the ground, the stones' and trees' feet most): blades round each trunk and round
+## the stone pile, none on the stand's side within 0.45 m of it.
+static func _feet(root: Node3D, kind: String) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(root.name)
+	var bases: Array = []
+	if kind == "grove":
+		for t in V4_GROVE: bases.append([t[0], 0.35])
+	elif kind == "hardwood_grove": bases = [[Vector3(0.1, 0, -0.25), 0.4], [Vector3(-0.5, 0, 0.3), 0.3], [Vector3(0.35, 0, 0.42), 0.35]]
+	else: bases = [[Vector3.ZERO, 0.6]]
+	var blades := ["pg_foot_leafy"]   # mid green, short, round (上官婉儿 on v5)
+	var by := {}   # one MultiMesh a blade kind, not a node a blade (上官婉儿: draw calls)
+	for b in bases:
+		for k in rng.randi_range(4, 6):
+			var at: Vector3 = b[0] + Vector3.FORWARD.rotated(Vector3.UP, rng.randf() * TAU) * float(b[1]) * rng.randf_range(0.8, 1.25)
+			var kind_b: String = blades[rng.randi() % blades.size()]
+			if not by.has(kind_b): by[kind_b] = []
+			by[kind_b].append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.45, 0.7)), Vector3(at.x, -0.02, at.z)))
+	for kind_b in by: root.add_child(Art.batch(kind_b, by[kind_b], false))
 
 static func _rocks(root: Node3D) -> void:
 	for r in [[Vector3(0, 0, 0), 1.55, 0.0], [Vector3(0.38, 0, 0.22), 1.2, 1.7], [Vector3(-0.32, 0, 0.18), 1.05, 3.1],

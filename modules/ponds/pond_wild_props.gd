@@ -7,6 +7,7 @@ extends RefCounted
 ## in front, PondScenery._in_front). Seeded from the pond: the same pond dresses the same way.
 
 const Art = preload("res://modules/farm/farm_art.gd")
+const PondGroundV2 := preload("res://modules/ponds/pond_ground_v2.gd")
 const TREES := ["wild_tree_pine", "wild_tree_round"]
 const CLUSTER := ["wild_flower_white", "wild_flower_yellow", "wild_flower_lilac", "wild_clover", "wild_pebbles_a",
 	"wild_pebbles_b", "wild_bush_dark", "wild_bush_olive"]
@@ -120,9 +121,10 @@ static func build(entry: Dictionary, spec: Dictionary, clear: Array, trees: Arra
 	var root := Node3D.new()
 	root.name = "WildProps"
 	var l := layout(entry, spec, clear, trees)
+	if PondScenery.V2 > 0: l = PondGroundV2.regroup(l, entry, spec, clear)   # 盘古's 422 v2 sample: crumbs into clumps
 	for asset in l:
 		if not ResourceLoader.exists(Art.ROOT + asset + ".glb"): continue   # #799's pieces not in this build yet
-		var batch := Art.batch(asset, l[asset], asset.begins_with("wild_tree") or asset.begins_with("wild_bush"))
+		var batch := Art.batch(asset, l[asset], PondScenery.V2 not in [1, 2, 3] and (asset.begins_with("pg_") or asset.begins_with("wild_tree") or asset.begins_with("wild_bush")))   # v2: the ground draws their soft shadows
 		batch.name = "Wild_" + asset   # the lower clusters' grass beside PondScenery's own grass_clump batch
 		root.add_child(batch)
 	return root

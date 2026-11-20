@@ -2156,6 +2156,7 @@ func _dev_shot(dt: float) -> void:
 					var m: Marker3D = world.call("anchor", step[1])
 					world.actor.teleport(m.global_position)
 					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
+				else: _call("p0_dev", [step])   # goto:x:z — the pond's own teleport
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|sceneslow|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)

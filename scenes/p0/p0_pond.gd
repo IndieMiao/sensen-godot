@@ -138,6 +138,10 @@ func _ready() -> void:
 	sun.shadow_opacity = 0.82
 	sun.light_angular_distance = 1.0
 	sun.directional_shadow_max_distance = 65
+	if PondScenery.V2 >= 4:   # 盘古's 422 v3 sample: the shadow map spread over less ground — crowns' shapes, soft edges
+		sun.directional_shadow_max_distance = 28
+		sun.shadow_blur = 4.5
+		sun.shadow_opacity = 1.0   # the ground's light() colours what the shadow keeps (grass blue-green, sand violet)
 	add_child(sun)
 	cam = Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -153,6 +157,9 @@ func _ready() -> void:
 	var water := FishingWater.build(str(entry.id), site_spec)
 	water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
 	add_child(water)
+	if PondScenery.SHORE:   # 盘古's 422 sample: the round bank stones give way to faceted slabs (PondLowpolyGround.shore)
+		var bank := water.find_child("NaturalWaterBank", true, false)
+		if bank: bank.visible = false
 	bp = PondWalk.blueprint(entry)   # q(297): the whole meadow but its edges, not the template's 12 × 16 m
 	grid = BlueprintGrid.new(bp)
 	_trees = PondWalk.set_trees(bp, grid, entry, PondScenery.tree_points(_scenery_clear))
@@ -431,7 +438,9 @@ func _follow(_dt: float) -> void:
 ## the decorated meadow (不知火舞 on 231) — flush with its sides, and the band between the HUD's second row and the
 ## quick bar / key on it; along an axis the meadow can't fill the band holds the middle.
 ## `dt` < 0 (a pinch step): the clamp applies at once.
+var _topdown := false   # 盘古's 422 sample: the overhead shot (no repeat check)
 func _update_camera(dt := -1.0) -> void:
+	if _topdown: return
 	var view := get_viewport().get_visible_rect().size
 	cam.size = view_size(view, _zoom)
 	var band := _camera_band(rt.ui if rt != null else null)
@@ -704,6 +713,31 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"zoom":   # zoom:0.8 — a pinch to that zoom, fingers lifted (the whole-pond shot)
 			p0_zoom(_pinch.value / float(step[1]))
 			p0_zoom_end()
+		"overview":   # overview[:size] — the game's own angle (14.5°, its pitch) pulled back over the whole pond, HUD hidden (422 sample)
+			_topdown = true
+			cam.size = float(step[1]) if step.size() > 1 else 24.0
+			place(cam, Vector3(6, 0, -9))
+			if rt != null and rt.ui != null: rt.ui.visible = false
+		"topdown":   # topdown[:size] — the whole meadow from straight above, HUD hidden (422 sample: no tiling repeat)
+			_topdown = true
+			cam.size = float(step[1]) if step.size() > 1 else 26.0
+			cam.global_transform = Transform3D(Basis.from_euler(Vector3(deg_to_rad(-90), 0, 0)), Vector3(6, 40, -8.5))
+			if rt != null and rt.ui != null: rt.ui.visible = false
+		"navhash":   # 盘古's 422 sample: the walk mask as it stands (trees' trunks in), to show a change left it alone
+			print("P0_NAVHASH ", str(bp.masks.walkable).hash(), " ", bp.grid)
+		"rinfo":   # 盘古's 422 sample: this frame's triangles and draw calls
+			print("P0_RINFO ", JSON.stringify({"prims": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
+				"draws": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)}))
+		"edges":   # 盘古's 422 v7: the ground (y 0) under the screen's corners, edge middles and the band's bottom
+			var view := get_viewport().get_visible_rect().size
+			var at := {}
+			for name_px in [["tl", Vector2(0, 0)], ["tr", Vector2(view.x, 0)], ["ml", Vector2(0, view.y * 0.5)], ["mr", Vector2(view.x, view.y * 0.5)],
+					["bl", Vector2(0, view.y)], ["bm", Vector2(view.x * 0.5, view.y)], ["br", Vector2(view.x, view.y)], ["bar", Vector2(view.x * 0.5, view.y - 110)]]:
+				var o := cam.project_ray_origin(name_px[1])
+				var d := cam.project_ray_normal(name_px[1])
+				var g := o + d * (-o.y / d.y)
+				at[name_px[0]] = [snappedf(g.x, 0.1), snappedf(g.z, 0.1)]
+			print("P0_EDGES ", JSON.stringify(at), " walk ", PondWalk.WALK)
 		"nofoam":   # SGODOT-272's before shots: the shore foam off
 			for w in find_children("*", "FishingWater", true, false): w.water_material.set_shader_parameter("has_foam_contact", false)
 		_: return false
