@@ -10,8 +10,14 @@
 | [MapUnderlay.swift](MapUnderlay.swift) | iOS 原生地图桥，含 listener 失败恢复及前台窗口处理 |
 | [AppleSignIn.swift](AppleSignIn.swift) | Sign in with Apple 原生桥（回环 UDP 46465），由 G3Spike.mm 拉起 |
 | [inject_apple_sign_in.py](inject_apple_sign_in.py) | 把 AppleSignIn.swift 编入导出工程并加 `com.apple.developer.applesignin` entitlement；须在 MapUnderlay 注入之后跑，可重复执行 |
+| [inject_voice.py](inject_voice.py) | 在导出工程中快照固定版本的 SensenVoiceApple 本地 Swift package、接入 G3Spike 启动与共享口令、写入麦克风中英说明；`inject_local_notify.py` 自动调用，也可用 `--project <sensen.xcodeproj>` 重复执行 |
 | [JourneyDeviceUITests.swift](../../tests/ios/JourneyDeviceUITests.swift) | 真机截图、基础地图手势和隔离地图恢复回归 |
 
 `setup_ios_g3.sh` 是旧地图 PoC 导出入口；当前应用身份及签名元数据应按上述准备工具和发布流程重新核对。
+
+语音注入保留显式的 `ITSAppUsesNonExemptEncryption` 布尔值，能力开关仍为 false。
+最终候选须核验实际 App 内的语音动态框架、麦克风本地化与加密声明；
+首批不含法国已定，无需 French encryption declaration；最终布尔值待首版内容确定后按全包 App Store Connect 问卷定，见
+[麦克风与加密核对记录](../../docs/qa/ios-voice-export-crypto-2026-11-17.md)。
 
 本次成功交付记录：[iOS 黑屏修复与 TestFlight build 3](../../docs/qa/ios-map-black-2026-09-25.md)。上传回退曾借助本次 `output/` 下的单步 GUI 驱动完成；目前这些工具尚未组成通用无人值守发布器。

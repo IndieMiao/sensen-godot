@@ -66,6 +66,13 @@ def main():
             shutil.copyfile(HERE / name, app_dir / name)
         print(f"{name}: {'up to date' if same else 'copied from the repo'}")
     print(f"LocalNotify injected into {project}")
+    # Every copied iOS pack already runs this entry point. Keep voice's app source/SPM snapshot in that same path
+    # instead of relying on an extra manual step; capabilities remain disabled inside the native package.
+    voice_package = HERE.parents[1] / "native/voice/apple/Package.swift"
+    if voice_package.is_file():
+        from inject_voice import inject
+        result = inject(project)
+        print(f"Voice package injected ({len(result['files'])} files; capabilities disabled)")
 
 
 if __name__ == "__main__":

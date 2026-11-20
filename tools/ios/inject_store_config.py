@@ -9,11 +9,12 @@ says about Info.plist never reaches it (compliance audit A4 / A10 / A12 / A16). 
     NSPrivacyTracking false, no tracking domains.
   - Info.plist: the location purpose string as q(319) (user, bot 783: P0 never asks for location; the key stays only
     because the Mapbox binary references foreground location APIs, without it the upload is refused, ITMS-90683),
-    CFBundleLocalizations en + zh-Hans, ITSAppUsesNonExemptEncryption false.
+    CFBundleLocalizations en + zh-Hans; preserve an explicit ITSAppUsesNonExemptEncryption declaration (the existing
+    non-voice baseline defaults to false). Third-party voice crypto requires the separate A7 submission review.
   - zh-Hans.lproj/InfoPlist.strings with the Chinese purpose string, in the project's InfoPlist.strings variant group,
     and zh-Hans in knownRegions: the system shows the phone's language.
   - TARGETED_DEVICE_FAMILY = 1: iPhone only (audit A10: declaring iPad asks for iPad screenshots and review on iPad).
-The microphone purpose string comes with iOS voice (SGODOT-387), when the app first asks for the microphone.
+The microphone purpose string is added by inject_voice.py (SGODOT-387) and preserved on subsequent store-config runs.
 """
 import argparse
 from pathlib import Path
@@ -76,7 +77,9 @@ def privacy_manifest(path: Path) -> str:
 def info_plist(path: Path) -> str:
     content = plistlib.loads(path.read_bytes())
     want = {"NSLocationWhenInUseUsageDescription": LOCATION_USAGE, "CFBundleLocalizations": ["en", "zh-Hans"],
-            "ITSAppUsesNonExemptEncryption": False}
+            "ITSAppUsesNonExemptEncryption": content.get("ITSAppUsesNonExemptEncryption", False)}
+    if not isinstance(want["ITSAppUsesNonExemptEncryption"], bool):
+        raise SystemExit("ITSAppUsesNonExemptEncryption must be an explicit boolean")
     changed = [k for k, v in want.items() if content.get(k) != v]
     if not changed:
         return "up to date"
@@ -86,13 +89,12 @@ def info_plist(path: Path) -> str:
 
 
 def zh_strings(app_dir: Path) -> str:
+    # Voice and any later system purposes share this file. Never erase their already-approved localization.
+    from inject_voice import set_usage_string
     target = app_dir / "zh-Hans.lproj" / "InfoPlist.strings"
-    text = '/* Localized versions of Info.plist keys (zh-Hans, q(319)) */\n"NSLocationWhenInUseUsageDescription" = "%s";\n' % LOCATION_USAGE_ZH
-    if target.exists() and target.read_text(encoding="utf-8") == text:
-        return "up to date"
-    target.parent.mkdir(exist_ok=True)
-    target.write_text(text, encoding="utf-8")
-    return "written"
+    before = target.read_text(encoding="utf-8") if target.exists() else ""
+    set_usage_string(target, "NSLocationWhenInUseUsageDescription", LOCATION_USAGE_ZH)
+    return "up to date" if target.read_text(encoding="utf-8") == before else "written"
 
 
 ZH_PATH = "zh-Hans.lproj/InfoPlist.strings"
