@@ -2,7 +2,7 @@ extends RefCounted
 ## Mesh assembly from frozen masks; missing cells and holes are never filled.
 const CHUNK := 32
 const Edges = preload("res://modules/dynamic_farm/farm_edges.gd")
-const Fringe = preload("res://modules/dynamic_farm/core_grass_edge.gd")
+const Spill = preload("res://modules/dynamic_farm/core_grass_edge.gd")
 const Bank = preload("res://modules/dynamic_farm/farm_bank.gd")
 const GROUND_SHADER = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 const MEADOW = preload("res://assets/farm/art/meadow.png")
@@ -21,10 +21,10 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 	var exterior := Bank.exterior(data) if soften else {}
 	var seed_phase := Bank.phase(data)
 	var soil_colour := Color(recipe.surface.core_warm_surface_srgb).lerp(Color(recipe.surface.grass_far_srgb),0.35).darkened(0.12)
-	var noise := Fringe.noise_for(data.get("seed_hex", "00000000"))
+	var noise := Spill.noise_for(data.get("seed_hex", "00000000"))
 	var masks := {}
 	for at: Vector2i in data.by_cell:
-		var sides := Fringe.mask(data.by_cell, at)
+		var sides := Spill.mask(data.by_cell, at)
 		if sides: masks[at] = sides
 	var bank_spans: Array=[]
 	for cell: Dictionary in data.cells:
@@ -35,13 +35,12 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 		var center: Vector3 = walk.point(at)
 		var corners := [center + Vector3(-half,0,half), center + Vector3(half,0,half),
 			center + Vector3(half,0,-half), center + Vector3(-half,0,-half)]
-		var sides: int = masks.get(at, 0)
-		if sides:
-			var grass_key := "%d:%d:%d" % [chunk.x, chunk.y, Fringe.GRASS]
-			var grass := _top_tool(tops, grass_key, chunk, Fringe.GRASS)
+		if masks.has(at):
+			var soil_key := "%d:%d:%d" % [chunk.x, chunk.y, Spill.SOIL]
+			var soil := _top_tool(tops, soil_key, chunk, Spill.SOIL)
+			soil.set_color(data.palette.soil)
 			top.set_color(data.palette[cell.kind])
-			grass.set_color(data.palette.grass)
-			Fringe.emit(top, grass, corners, at, sides, data.cell_m, noise)
+			Spill.emit(soil, top, corners, at, masks, noise)
 		else:
 			_quad(top, corners[0],corners[3],corners[2],corners[1],Vector3.UP,data.palette[cell.kind])
 		var directions: Array = Edges.NEIGHBORS
@@ -78,7 +77,8 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 							_triangle(top,a,last,next,Vector3.UP,data.palette[cell.kind])
 							_quad(rim,last,next,next-Vector3.UP*0.7,last-Vector3.UP*0.7,(next-last).cross(Vector3.UP).normalized(),Color("958665"))
 						last=next
-			if cell.zone == "core" and not (sides & (1 << edge)):
+			# The soil outline replaces the rule along a spilled core edge.
+			if cell.zone == "core" and not (int(masks.get(at + directions[edge], 0)) & (1 << ((edge + 2) % 4))):
 				if not grids.has(chunk):
 					var st := SurfaceTool.new()
 					st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -87,16 +87,6 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 				var edge_key := Edges.vertex_key(at+Edges.CORNERS[edge],at+Edges.CORNERS[(edge+1)%4])
 				if not edges.has(edge_key):
 					edges[edge_key] = true
-					# End each grid rule at the soil outline. Clip against both
-					# incident cells so iteration order cannot expose a grass seam.
-					var neighbor := at + Vector2i(directions[edge])
-					var touching: int = sides | int(masks.get(neighbor, 0))
-					if touching:
-						var dir := (b - a).normalized()
-						if touching & (1 << ((edge + 3) % 4)):
-							a += dir * (data.cell_m * Fringe.depth(Vector2(at + Edges.CORNERS[edge]), noise))
-						if touching & (1 << ((edge + 1) % 4)):
-							b -= dir * (data.cell_m * Fringe.depth(Vector2(at + Edges.CORNERS[(edge+1)%4]), noise))
 					var perpendicular := (b-a).cross(Vector3.UP).normalized() * 0.005
 					a.y = 0.008
 					b.y = 0.008
