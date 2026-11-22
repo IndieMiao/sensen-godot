@@ -84,6 +84,13 @@ func _ready() -> void:
 		return
 	_props = art.root
 	add_child(_props)
+	# Separate batches: these appearances never enter extension occupancy or shadow budgets.
+	var core_art := Scenery.build(_plan.core_obstacles, _data.cell_m)
+	if not core_art.ok:
+		_fail(core_art.error)
+		return
+	core_art.root.name = "CoreObstacles"
+	add_child(core_art.root)
 	_setup_world()
 	_shade = Shade.new()
 	add_child(_shade)
@@ -129,6 +136,9 @@ func _ready() -> void:
 		"seed_hex":_data.seed_hex,"generator_version":_data.generator_version,
 		"camera":{"pitch":43.0,"yaw":14.5,"keep_width":true},
 		"source_origin":[_data.origin.x,_data.origin.y]}
+	_summary.core_obstacles = {"roles":_plan.core_obstacles.roles, "instances":core_art.instances,
+		"batches":core_art.batches, "placed_triangles":core_art.placed_triangles,
+		"layout_sha256":_plan.core_obstacles.layout_sha256}
 	_summary.bank = _ground.get_meta("bank_metrics",{})
 	_summary.slope_material={"clearing_linear_gain":_ground.get_meta("slope_material_linear_gain"),
 		"batches":_ground.get_meta("slope_batches")}
