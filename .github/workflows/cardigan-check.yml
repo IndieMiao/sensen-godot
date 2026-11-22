@@ -1,0 +1,105 @@
+name: cardigan-check
+run-name: cardigan/${{ inputs.card }}/${{ inputs.delivery }}/${{ inputs.attempt }}/${{ inputs.kind }}/${{ inputs.sha }}/${{ inputs.tree }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full commit SHA of the candidate
+        required: true
+        type: string
+      tree:
+        description: Candidate tree
+        required: true
+        type: string
+      card:
+        description: Card ID
+        required: true
+        type: string
+      delivery:
+        description: Delivery ID
+        required: true
+        type: string
+      attempt:
+        description: Check attempt ID
+        required: true
+        type: string
+      kind:
+        description: merge_check or precheck
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: farm
+          POSTGRES_PASSWORD: farm
+          POSTGRES_DB: sensen_farm_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U farm" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    env:
+      CI: '1'
+      TEST_DATABASE_URL: postgres://farm:farm@localhost:5432/sensen_farm_test
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ inputs.sha }}
+          persist-credentials: false
+      - name: Verify candidate
+        env:
+          CANDIDATE_SHA: ${{ inputs.sha }}
+          CHECK_KIND: ${{ inputs.kind }}
+        run: |
+          git rev-parse HEAD
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          case "$CHECK_KIND" in merge_check|precheck) ;; *) exit 1 ;; esac
+      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0; packageManager in package.json
+      - name: install
+        id: install
+        run: |
+          (
+            cd "$RUNNER_TEMP"
+            archive=Godot_v4.7.2-stable_linux.x86_64.zip
+            curl --fail --location --retry 3 --output "$archive" \
+              "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/$archive"
+            echo "cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4  $archive" | sha256sum --check --strict
+            unzip -q "$archive"
+            bin="$PWD/${archive%.zip}"
+            "$bin" --version
+            echo "GODOT_BIN=$bin" >> "$GITHUB_ENV"
+          )
+          tools/ci/timed.sh install pnpm install --frozen-lockfile
+          # Both toolchains now share a workspace. Don't import installed npm packages as game assets.
+          find . -type d -name node_modules -prune -exec sh -ec 'for dir do touch "$dir/.gdignore"; done' sh {} +
+      - name: build
+        id: build
+        run: |
+          tools/ci/timed.sh autoload-control tools/ci/test-autoload-gate.sh
+          tools/ci/timed.sh import tools/run_tests.sh --ci-import
+      - name: test
+        run: tools/ci/timed.sh p0 tools/run_tests.sh --ci-headless res://tests/p0
+      - name: lint
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: tools/ci/timed.sh ui_kit tools/run_tests.sh --ci-headless res://tests/ui_kit
+      - name: deps
+        id: deps
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: tools/ci/timed.sh typecheck pnpm -r typecheck
+      - name: e2e
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: tools/ci/timed.sh server-tests pnpm -r test
