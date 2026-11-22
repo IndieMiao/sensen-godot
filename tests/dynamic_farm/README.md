@@ -119,6 +119,16 @@ Diagnostic interpretation:
 These logs cannot reconstruct absent HTTP evidence from the old Q76 APK. They
 also do not change Mapbox SDK MVT/TileJSON retries or prove device Surface behavior.
 
+### Core obstacles (C-18)
+
+Run `--headless --script res://tests/dynamic_farm/test_core_obstacles.gd` in
+an isolated imported preview project. The default fixtures exercise equal
+geometry/seed with different block IDs; append `-- <farm1.json> <farm2.json>
+<farm3.json>` to also check individual r4 payloads (review set: `p-3139010`,
+`p-3139019`, `p-5402049`). The check counts distinct occupied core cells from
+the transformed model bounds, validates all four roles, compares the reopened
+layout and checks the entire remaining walk mask against extension-only blockers.
+
 ## Model-fitted prop contacts
 
 `test_prop_proxies.gd` loads the actual 13 imported meshes (`prop_outline.gd`).
@@ -130,8 +140,9 @@ that does. At the default fit each solid footprint is at least 80% of its outlin
 trunk/root cross-section point (trees) or vertex (shrubs, rocks) is reachable by
 the walker's centre at a translated, rotated and scaled placement; approaches from
 16 directions stop within 3 cm of the model (pine_03 stops up to 7.5 cm short of
-its root hull between roots), and a command 6° into the touched face keeps sliding. Flower/grass profiles are non-blocking even when placed in a
-new layout; player radius is counted once. `tools/dev/dynamic_farm/fit_prop_proxies.gd`
+its root hull between roots), and a command 6° into the touched face keeps
+sliding. Flower/grass profiles are non-blocking even when placed in a new
+layout; player radius is counted once. `tools/dev/dynamic_farm/fit_prop_proxies.gd`
 recomputes the solid profiles from the same meshes.
 
 For review, use the private offline preview project above, an empty output

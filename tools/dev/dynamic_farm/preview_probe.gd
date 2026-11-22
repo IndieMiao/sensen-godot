@@ -37,6 +37,15 @@ func _capture(folder: String, summary: Dictionary) -> void:
 	for i in 5: await process_frame
 	await RenderingServer.frame_post_draw
 	var id: String = scene._data.block_id.replace("*","_star")
+	if OS.get_cmdline_user_args().has("--entry-edge"):
+		if not _approach_entry():
+			push_error("Unable to walk the protected route to the island edge")
+			quit(1)
+			return
+		# Normal camera, UI and zoom. Recenter just as the player can after walking.
+		scene._controls.recenter_requested.emit()
+		for i in 5: await process_frame
+		await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
 	image.save_png(folder.path_join(id+"-normal.png"))
 	scene.set_review_overview(true)
@@ -115,3 +124,28 @@ func _capture(folder: String, summary: Dictionary) -> void:
 	scene.queue_free()
 	await process_frame
 	quit(0)
+
+## Review setup, not touch evidence. No camera override, teleport or data mutation.
+func _approach_entry() -> bool:
+	var data: Dictionary = scene._data
+	var queue: Array[Vector2i] = [data.spawn]
+	var parent := {data.spawn: data.spawn}
+	var i := 0
+	while i < queue.size() and not parent.has(data.entry):
+		var cell := queue[i]
+		i += 1
+		for step: Vector2i in scene._walk.NEIGHBORS:
+			var candidate := cell + step
+			if data.protected.has(candidate) and not parent.has(candidate):
+				parent[candidate] = cell
+				queue.append(candidate)
+	if not parent.has(data.entry): return false
+	var route: Array[Vector2i] = [data.entry]
+	while route[-1] != data.spawn: route.append(parent[route[-1]])
+	route.reverse()
+	for cell in route:
+		var point: Vector3 = scene._walk.point(cell)
+		var reached: Vector3 = scene._walk.move(point - scene._walk.position)
+		if not reached.is_equal_approx(point): return false
+	scene._actor.position = scene._walk.position
+	return true

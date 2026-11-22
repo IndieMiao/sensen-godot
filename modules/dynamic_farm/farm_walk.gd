@@ -26,7 +26,7 @@ func point(cell: Vector2i) -> Vector3:
 func cell_at(p: Vector3) -> Vector2i:
 	return Vector2i(floori(p.x / cell_m + center_grid.x), floori(-p.z / cell_m + center_grid.y))
 
-func _unreserved_cell(cell: Vector2i) -> bool:
+func clear_cell(cell: Vector2i) -> bool:
 	return data.by_cell.has(cell) and not reserved.has(cell)
 
 func clear_position(p: Vector3) -> bool:
@@ -135,7 +135,7 @@ func try_box(box: AABB, solid: bool) -> Array[Vector2i]:
 	return footprint
 
 func connected() -> bool:
-	if not _unreserved_cell(data.spawn) or not _unreserved_cell(data.entry):
+	if not clear_cell(data.spawn) or not clear_cell(data.entry):
 		return false
 	var queue: Array[Vector2i] = [data.spawn]
 	var seen := {data.spawn: true}
@@ -145,7 +145,7 @@ func connected() -> bool:
 		index += 1
 		for offset in NEIGHBORS:
 			var next: Vector2i = at + offset
-			if _unreserved_cell(next) and not seen.has(next):
+			if clear_cell(next) and not seen.has(next):
 				seen[next] = true
 				queue.append(next)
 	return seen.size() == data.by_cell.size() - reserved.size()

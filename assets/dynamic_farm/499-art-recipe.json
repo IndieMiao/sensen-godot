@@ -44,7 +44,18 @@
     "geometry_does_not_fill_core_holes": true,
     "red_blue_reference_lines_in_3d": false
   },
+  "core_obstacles": {
+    "version": "core-obstacles-v1",
+    "coverage": 0.125,
+    "roles": {
+      "weed": {"share": 0.50, "ids": ["wild_pz_grass_24", "wild_pz_foot_leafy"]},
+      "stone": {"share": 0.26, "ids": ["wild_pz_rock_13", "wild_pz_softrock_10"]},
+      "bush": {"share": 0.17, "ids": ["wild_pz_bush_05", "wild_pz_bush_07"]},
+      "sapling": {"ids": ["wild_pz_pine_03"]}
+    }
+  },
   "placement": {
+    "scope": "extension scenery only; non-solid core appearances have their own recipe",
     "blocking_props_in_core": false,
     "blocking_props_require_explicit_decoration_permission": true,
     "missing_decoration_permission": "reject missing or invalid schema4 walk_reserve; never guess a narrower band",
