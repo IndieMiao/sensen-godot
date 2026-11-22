@@ -128,6 +128,11 @@ geometry/seed with different block IDs; append `-- <farm1.json> <farm2.json>
 `p-3139019`, `p-5402049`). The check counts distinct occupied core cells from
 the transformed model bounds, validates all four roles, compares the reopened
 layout and checks the entire remaining walk mask against extension-only blockers.
+With the props built into the walker, stone/bush/sapling centres are blocked,
+weed centres stay walkable, and a 0.2 m lattice flooded from spawn still reaches
+every previously reachable cell except those holding a blocking prop. A pinch
+fixture (two blocks joined by a one-cell neck, five seeds, 20% coverage) checks
+that blocking props never seal an area.
 
 ## Model-fitted prop contacts
 

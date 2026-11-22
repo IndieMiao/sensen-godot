@@ -99,9 +99,7 @@ static func plan(data: Dictionary, walk: RefCounted) -> Dictionary:
 	return {"ok":true,"core_obstacles":core,"layout":layout,"roles":diagnostics,"art_version":recipe.art_version,
 		"eligible_cells":pool.size(),"layout_sha256":"\n".join(signature).sha256_text(),"recipe":recipe}
 
-## `contacts=false` only for the core appearance layer: the recipe keeps blocking
-## props out of authoritative core cells, so those instances never reach the walker.
-static func build(planned: Dictionary, walk: RefCounted, contacts := true) -> Dictionary:
+static func build(planned: Dictionary, walk: RefCounted) -> Dictionary:
 	var root := Node3D.new()
 	root.name = "DynamicScenery"
 	var cell_m: float = walk.cell_m
@@ -134,7 +132,7 @@ static func build(planned: Dictionary, walk: RefCounted, contacts := true) -> Di
 		wire.render_priority = 127
 	var profiles := {}
 	for record: Dictionary in catalog.assets: profiles[record.id] = record.collision_proxy
-	for item: Dictionary in planned.layout if contacts else []:
+	for item: Dictionary in planned.layout:
 		var proxy := Proxy.new(profiles[item.asset], item.transform, catalog.collision_fit_fraction)
 		walk.add_prop(proxy)
 		if wire != null and proxy.solid:

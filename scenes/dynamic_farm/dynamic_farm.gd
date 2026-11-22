@@ -84,8 +84,9 @@ func _ready() -> void:
 		return
 	_props = art.root
 	add_child(_props)
-	# Separate batches: these appearances never enter extension occupancy or shadow budgets.
-	var core_art := Scenery.build(_plan.core_obstacles, _walk, false)
+	# Separate batches outside extension occupancy and shadow budgets; stones, bushes
+	# and saplings still block through the shared model-fitted profiles (Q-16).
+	var core_art := Scenery.build(_plan.core_obstacles, _walk)
 	if not core_art.ok:
 		_fail(core_art.error)
 		return

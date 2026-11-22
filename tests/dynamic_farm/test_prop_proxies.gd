@@ -177,12 +177,6 @@ func _walls_and_corners() -> void:
 	for _i in 60: walk.move(Vector3(sin(deg_to_rad(6.0)),0,-cos(deg_to_rad(6.0)))/60.0)
 	check(absf(walk.position.x-before.x)<0.001 and before.z-walk.position.z>=0.9*cos(deg_to_rad(6.0)),"ground edge: 6° inward command slides")
 	check(walk.clear_position(walk.position),"ground edge: stays on the ground")
-	# Core appearance layer (non-solid by recipe): even solid-profile models stay walkable.
-	walk = Walk.new(data)
-	var bush: Dictionary = profiles.wild_pz_bush_05
-	scene = Scenery.build({"layout":[{"asset":bush.id,"transform":Transform3D.IDENTITY,"shadow":false,"triangles":bush.triangles}]},walk,false)
-	check(scene.ok and walk.clear_position(Vector3.ZERO),"core appearance layer adds no walker contacts")
-	scene.root.free()
 	# Ground edge and a rock together: the slide re-checks both, never leaving the ground.
 	walk = Walk.new(data)
 	var pocket := Transform3D(Basis.IDENTITY,walk.point(Vector2i(19,8))+Vector3(-0.2,0,0))
