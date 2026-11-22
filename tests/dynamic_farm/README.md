@@ -118,3 +118,27 @@ Diagnostic interpretation:
 
 These logs cannot reconstruct absent HTTP evidence from the old Q76 APK. They
 also do not change Mapbox SDK MVT/TileJSON retries or prove device Surface behavior.
+
+## Model-fitted prop contacts
+
+`test_prop_proxies.gd` loads the actual 13 imported meshes. At full fit it checks
+projected triangles (a trunk-height mesh cross-section for trees), then checks the
+production build and walk paths at translated, rotated and scaled placements.
+The sampled contour check is not an AABB comparison. Flower/grass profiles are
+non-blocking even when placed in a new layout; player radius is counted once.
+
+For review, use the private offline preview project above, an empty output
+folder, and read-only farms from the pinned r4 dataset. For example:
+
+```sh
+godot --path "$QA" --debug-collisions --fixed-fps 30 --write-movie "$OUT/tree.avi" \
+  --script res://tools/dev/dynamic_farm/prop_contact_probe.gd -- \
+  "$FARMS/p-5402049.json" "$OUT" tree
+```
+
+Use `p-4591A011*` for rock and flower (quote the path), `p-3139019` for shrub,
+and `p-5402049` for groundcover. The probe starts the real rig beside a matched
+prop, sends scripted movement input, checks contact or passage, saves the
+contact frame and walks past it. This is not a trip from spawn or device input.
+With `--headless` (omit `--write-movie`), it verifies movement only: no pixels
+or recording are generated. All placements keep their ordinary model and pose.

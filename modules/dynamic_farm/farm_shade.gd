@@ -49,7 +49,7 @@ static func enforce_budget(plan: Dictionary, data: Dictionary, walk: RefCounted)
 			var item: Dictionary = plan.layout[i]
 			if not item.shadow or item.box.end.y < GroundShade.MIN_H: continue
 			if item.solid:
-				for cell: Vector2i in item.cells: walk.blocked.erase(cell)
+				for cell: Vector2i in item.cells: walk.reserved.erase(cell)
 			plan.roles[item.role].accepted -= 1
 			plan.roles[item.role].rejected += 1
 			plan.layout.remove_at(i)
