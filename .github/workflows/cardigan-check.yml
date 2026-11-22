@@ -39,6 +39,8 @@ jobs:
           bin="$PWD/${archive%.zip}"
           "$bin" --version
           echo "GODOT_BIN=$bin" >> "$GITHUB_ENV"
+      - name: Check gate rejects broken autoloads
+        run: tools/ci/timed.sh autoload-control tools/ci/test-autoload-gate.sh
       - name: Import Godot project (headless)
         id: import
         run: tools/ci/timed.sh import tools/run_tests.sh --ci-import

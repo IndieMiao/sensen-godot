@@ -11,8 +11,17 @@ if [[ ${1:-} == --ci-import || ${1:-} == --ci-headless ]]; then
   log=$(mktemp)
   trap 'rm -f "$log"' EXIT
 fi
+# Editor import and game startup use different diagnostics for the same broken
+# project singleton. Godot can print either and still return 0.
+check_autoloads() {
+  if grep -E 'ERROR: Failed to (create|instantiate) an autoload' "$log" >&2; then
+    echo "Godot could not start a project autoload ($1)" >&2
+    exit 1
+  fi
+}
 if [[ ${1:-} == --ci-import ]]; then
   "$GODOT_BIN" --headless --path . --import 2>&1 | tee "$log"
+  check_autoloads import
   # Godot 4.7.2 exits 0 even for a corrupt image. Match terminal import/script
   # failures, not every ERROR (legacy FBX optional source textures are absent).
   if grep -E "SCRIPT ERROR:|ERROR: (Error importing|Failed to import)" "$log"; then
@@ -27,6 +36,7 @@ if [[ ${1:-} == --ci-headless ]]; then
   # Keep its noninteractive debugger, and import just once in the caller.
   "$GODOT_BIN" --headless --path . -d --remote-debug tcp://127.0.0.1:0 \
     --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a "$suite" --ignoreHeadlessMode 2>&1 | tee "$log"
+  check_autoloads "$suite"
   # gdUnit can exit 0 with no tests. Require its final (not per-suite) summary.
   # There are no whole-case skips in these two suites' headless inventory.
   if ! LC_ALL=C sed -E $'s/\033\\[[0-9;]*m//g' "$log" | grep -E \
