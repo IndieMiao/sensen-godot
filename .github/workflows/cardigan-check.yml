@@ -1,0 +1,82 @@
+name: cardigan-check
+run-name: cardigan-check ${{ inputs.candidate_sha || github.sha }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Full commit SHA of the merge candidate
+        required: true
+        type: string
+  pull_request:
+    branches: [farm-dev] # github.sha is the synthetic merge, not a moving PR head.
+
+permissions:
+  contents: read
+
+env:
+  CANDIDATE_SHA: ${{ github.event_name == 'pull_request' && github.sha || inputs.candidate_sha }}
+
+jobs:
+  godot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          persist-credentials: false
+      - name: Verify candidate
+        run: git rev-parse HEAD && test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+      - name: Install verified Godot 4.7.2
+        working-directory: ${{ runner.temp }}
+        run: |
+          archive=Godot_v4.7.2-stable_linux.x86_64.zip
+          curl --fail --location --retry 3 --output "$archive" \
+            "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/$archive"
+          echo "cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4  $archive" | sha256sum --check --strict
+          unzip -q "$archive"
+          bin="$PWD/${archive%.zip}"
+          "$bin" --version
+          echo "GODOT_BIN=$bin" >> "$GITHUB_ENV"
+      - name: Import Godot project (headless)
+        id: import
+        run: tools/ci/timed.sh import tools/run_tests.sh --ci-import
+      - name: gdUnit p0
+        run: tools/ci/timed.sh p0 tools/run_tests.sh --ci-headless res://tests/p0
+      - name: gdUnit ui_kit
+        if: ${{ !cancelled() && steps.import.outcome == 'success' }}
+        run: tools/ci/timed.sh ui_kit tools/run_tests.sh --ci-headless res://tests/ui_kit
+
+  server:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: farm
+          POSTGRES_PASSWORD: farm
+          POSTGRES_DB: sensen_farm_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U farm" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    env:
+      CI: '1'
+      TEST_DATABASE_URL: postgres://farm:farm@localhost:5432/sensen_farm_test
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          persist-credentials: false
+      - name: Verify candidate
+        run: git rev-parse HEAD && test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0; packageManager in package.json
+      - run: tools/ci/timed.sh install pnpm install --frozen-lockfile
+      - run: tools/ci/timed.sh typecheck pnpm -r typecheck
+      - run: tools/ci/timed.sh server-tests pnpm -r test

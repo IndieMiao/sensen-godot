@@ -1,9 +1,41 @@
 #!/usr/bin/env bash
-# 用法: tools/run_tests.sh [res://tests/子目录]
-set -e
+# Local: tools/run_tests.sh [res://tests/subdir]
+# CI:    --ci-import once, then --ci-headless res://tests/subdir per suite.
+set -eo pipefail
 cd "$(dirname "$0")/.."
 export GODOT_BIN="${GODOT_BIN:-$(command -v godot)}"
-"$GODOT_BIN" --headless --path . --import > /dev/null 2>&1 || true
 # Historical text assertions use English; localization suites exercise both locales.
 export SENSEN_LANGUAGE=en
+
+if [[ ${1:-} == --ci-import || ${1:-} == --ci-headless ]]; then
+  log=$(mktemp)
+  trap 'rm -f "$log"' EXIT
+fi
+if [[ ${1:-} == --ci-import ]]; then
+  "$GODOT_BIN" --headless --path . --import 2>&1 | tee "$log"
+  # Godot 4.7.2 exits 0 even for a corrupt image. Match terminal import/script
+  # failures, not every ERROR (legacy FBX optional source textures are absent).
+  if grep -E "SCRIPT ERROR:|ERROR: (Error importing|Failed to import)" "$log"; then
+    echo "Godot reported an import or script failure" >&2
+    exit 1
+  fi
+  exit 0
+fi
+if [[ ${1:-} == --ci-headless ]]; then
+  suite=${2:?expected a res://tests suite after --ci-headless}
+  # The stock runtest.sh starts a window even if the editor import was headless.
+  # Keep its noninteractive debugger, and import just once in the caller.
+  "$GODOT_BIN" --headless --path . -d --remote-debug tcp://127.0.0.1:0 \
+    --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a "$suite" --ignoreHeadlessMode 2>&1 | tee "$log"
+  # gdUnit can exit 0 with no tests. Require its final (not per-suite) summary.
+  # There are no whole-case skips in these two suites' headless inventory.
+  if ! LC_ALL=C sed -E $'s/\033\\[[0-9;]*m//g' "$log" | grep -E \
+      '^Overall Summary: [1-9][0-9]* test cases \| 0 errors \| 0 failures \| [0-9]+ flaky \| 0 skipped \| 0 orphans \|$'; then
+    echo "Missing or non-passing gdUnit Overall Summary for $suite" >&2
+    exit 1
+  fi
+  exit 0
+fi
+
+"$GODOT_BIN" --headless --path . --import > /dev/null 2>&1 || true
 exec ./addons/gdUnit4/runtest.sh -a "${1:-res://tests}"
