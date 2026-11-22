@@ -70,7 +70,7 @@ func _build_ui() -> void:
 	bottom.add_child(_label("Explore and walk. Farming actions come later.", 12))
 	var credits := HBoxContainer.new(); bottom.add_child(credits)
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
-		var credit := _button(item[0], OS.shell_open.bind(item[1])); credit.flat = true; credits.add_child(credit)
+		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
 	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0", 10))
 
 func _panel(bottom: bool) -> VBoxContainer:
