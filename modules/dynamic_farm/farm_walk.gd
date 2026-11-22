@@ -4,6 +4,7 @@ const NEIGHBORS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 const BODY_RADIUS := 0.3   # P0Actor.HALF_WIDTH_M; one fixed body clearance, independent of outfit.
 var data: Dictionary
 var blocked := {}
+var _connected_size := -1  # blocked.size() when every clear cell was last proven reachable
 var cell_m := 0.8
 var center_grid := Vector2.ZERO
 var position := Vector3.ZERO
@@ -56,7 +57,9 @@ func move(displacement: Vector3) -> Vector3:
 				position += second
 	return position
 
-func try_box(box: AABB, solid: bool) -> Array[Vector2i]:
+## `shared`: already-blocked cells this prop may overlap (members of one grove or pile).
+## `max_new`: reject a solid prop that would block more than this many new cells (-1: no limit).
+func try_box(box: AABB, solid: bool, shared := {}, max_new := -1) -> Array[Vector2i]:
 	var visual := Rect2(Vector2(box.position.x, box.position.z), Vector2(box.size.x, box.size.z))
 	var area := visual.grow(BODY_RADIUS) if solid else visual
 	var low := cell_at(Vector3(area.position.x, 0, area.end.y - 0.00001))
@@ -65,19 +68,56 @@ func try_box(box: AABB, solid: bool) -> Array[Vector2i]:
 	for y in range(low.y, high.y + 1):
 		for x in range(low.x, high.x + 1):
 			var cell := Vector2i(x,y)
-			if not data.by_cell.has(cell) or data.by_cell[cell].zone != "extension" or data.protected.has(cell) or blocked.has(cell):
+			if not data.by_cell.has(cell) or data.by_cell[cell].zone != "extension" or data.protected.has(cell) or (blocked.has(cell) and not shared.has(cell)):
 				return []
 			footprint.append(cell)
 	if footprint.is_empty():
 		return []
 	if solid:
+		var added: Array[Vector2i] = []
 		for cell in footprint:
+			if not blocked.has(cell): added.append(cell)
+		if max_new >= 0 and added.size() > max_new:
+			return []
+		var was_connected := _connected_size == blocked.size()
+		for cell in added:
 			blocked[cell] = true
-		if not connected() or not clear_position(point(data.spawn)) or not clear_position(point(data.entry)):
-			for cell in footprint:
+		var still := _still_connected(added) if was_connected else connected()
+		if not still or not clear_position(point(data.spawn)) or not clear_position(point(data.entry)):
+			for cell in added:
 				blocked.erase(cell)
 			return []
+		_connected_size = blocked.size()
 	return footprint
+
+## Same answer as connected() when every clear cell was reachable before `added` were
+## blocked: the rest stays connected iff the clear neighbours of `added` reach one another.
+func _still_connected(added: Array[Vector2i]) -> bool:
+	if not clear_cell(data.spawn) or not clear_cell(data.entry):
+		return false
+	var targets := {}
+	for cell in added:
+		for offset in NEIGHBORS:
+			if clear_cell(cell + offset): targets[cell + offset] = true
+	if targets.size() <= 1:
+		return true
+	var start: Vector2i = targets.keys()[0]
+	var queue: Array[Vector2i] = [start]
+	var seen := {start: true}
+	var found := 1
+	var index := 0
+	while index < queue.size():
+		var at := queue[index]
+		index += 1
+		for offset in NEIGHBORS:
+			var next: Vector2i = at + offset
+			if clear_cell(next) and not seen.has(next):
+				seen[next] = true
+				queue.append(next)
+				if targets.has(next):
+					found += 1
+					if found == targets.size(): return true
+	return false
 
 func connected() -> bool:
 	if not clear_cell(data.spawn) or not clear_cell(data.entry):

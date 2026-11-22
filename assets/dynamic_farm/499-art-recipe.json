@@ -10,7 +10,7 @@
     "art_version",
     "role"
   ],
-  "art_version": "499-v2-schema4",
+  "art_version": "499-v3-groves",
   "seed_contract": "SHA256(seed_hex + \"|\" + art_version + \"|\" + role), feed a documented fixed PRNG; stable y,x candidate order; do not turn 64 hex digits into JSON uint64.",
   "required_semantic_inputs": [
     "schema",
@@ -53,6 +53,63 @@
       "bush": {"share": 0.17, "ids": ["wild_pz_bush_05", "wild_pz_bush_07"]},
       "sapling": {"ids": ["wild_pz_pine_03"]}
     }
+  },
+  "outer_groves": {
+    "version": "outer-groves-v1",
+    "scope": "extension scenery appearance: tree groves, shrub thickets, rock piles and flower clumps; no harvesting, permissions or saves",
+    "walk_budget": "solid reservations never exceed the blocked cells of the reference art version's layout on the same parcel; grove and pile members may share their own group's cells",
+    "reference_art_version": "499-v2-schema4",
+    "reference_roles": ["tree", "shrub", "rock"],
+    "targets": {
+      "tree": {"cap": 40, "cells_per": 18},
+      "shrub": {"cap": 36, "cells_per": 20},
+      "rock": {"cap": 30, "cells_per": 24},
+      "flower": {"cap": 80, "cells_per": 9},
+      "groundcover": {"cap": 48, "cells_per": 14}
+    },
+    "budget_shares": {"groves": 0.65, "rock_piles": 0.8},
+    "grove": {
+      "spacing_m": 5.0,
+      "thicket_spacing_m": 3.5,
+      "tree_room_cells": 2,
+      "member_step_m": 1.45,
+      "slot_tries": 6,
+      "trees": [2, 4],
+      "tree_weights": {"wild_pz_tree_20": 0.35, "wild_pz_tree_20_g": 0.3, "wild_pz_pine_01": 0.15, "wild_pz_pine_03": 0.2},
+      "tree_scale": [0.85, 1.0],
+      "young_pine_id": "wild_pz_pine_03",
+      "young_pines": [1, 3],
+      "young_pine_scale": [0.55, 0.75],
+      "grove_shrubs": [0, 2],
+      "thicket_shrubs": [2, 4],
+      "shrub_scale": [0.85, 1.0],
+      "shrub_step_m": 1.0,
+      "foot_groundcover": [1, 3]
+    },
+    "rock_pile": {
+      "cells_per": 70,
+      "cap": 12,
+      "main_ids": ["wild_pz_rock_08", "wild_pz_rock_13"],
+      "companion_ids": ["wild_pz_softrock_10", "wild_pz_rock_13"],
+      "companions": [1, 2],
+      "companion_scale": [0.5, 0.7],
+      "companion_offset_m": [0.55, 0.85],
+      "trunk_clearance_m": 1.6,
+      "flowers": [2, 3],
+      "flower_offset_m": [0.7, 1.1]
+    },
+    "flower_clump": {
+      "cells_per": 40,
+      "cap": 18,
+      "flowers": [3, 5],
+      "groundcover": [0, 2],
+      "radius_m": 0.6,
+      "near_group_m": 4.5,
+      "near_group_share": 0.65,
+      "spacing_m": 2.2,
+      "trunk_clearance_m": 0.6
+    },
+    "max_group_attempts": 512
   },
   "placement": {
     "scope": "extension scenery only; non-solid core appearances have their own recipe",

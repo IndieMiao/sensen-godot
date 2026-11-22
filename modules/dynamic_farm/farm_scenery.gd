@@ -1,5 +1,8 @@
 extends RefCounted
 const CoreObstacles = preload("res://modules/dynamic_farm/farm_core_obstacles.gd")
+const OuterGroves = preload("res://modules/dynamic_farm/farm_outer_groves.gd")
+const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
+const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const RECIPE_PATH := "res://assets/dynamic_farm/499-art-recipe.json"
 const INVENTORY_PATH := "res://assets/dynamic_farm/499-art-inventory.json"
@@ -33,70 +36,76 @@ static func plan(data: Dictionary, walk: RefCounted) -> Dictionary:
 		if cell.zone == "extension" and not data.protected.has(at):
 			pool.append(at)
 	pool.sort_custom(func(a: Vector2i,b: Vector2i): return a.y < b.y or (a.y == b.y and a.x < b.x))
-	var layout: Array = []
-	var seen_visual := {}
-	var diagnostics := {}
-	var anchors: Array[Vector3] = []
-	var signature := PackedStringArray()
-	for role: String in ["tree","shrub","rock","flower","groundcover"]:
-		var spec: Dictionary = recipe.roles[role]
-		var wanted := mini(int(spec.cap_per_farm), pool.size() / int(spec.cells_per_candidate))
-		var rng := FixedRandom.new((data.seed_hex + "|" + str(recipe.art_version) + "|" + role).sha256_text())
-		var accepted := 0
-		var attempts := 0
-		var anchor := Vector2i.ZERO
-		while accepted < wanted and attempts < int(recipe.placement.max_candidate_attempts_per_role) and not pool.is_empty():
-			if attempts % 8 == 0:
-				anchor = pool[rng.next() % pool.size()]
-			var at := anchor + Vector2i(int(rng.next()%7)-3, int(rng.next()%7)-3)
-			attempts += 1
-			if not data.by_cell.has(at) or data.by_cell[at].zone != "extension" or data.protected.has(at):
-				continue
-			var point: Vector3 = walk.point(at)
-			# Place tall pieces in the rear half for the approved 43/14.5 opening composition.
-			if role == "tree" and point.dot(Vector3(0.25,0,0.968)) > 0:
-				continue
-			if role in ["flower","groundcover"] and not anchors.is_empty():
-				var near_cluster := false
-				for cluster in anchors:
-					if point.distance_to(cluster) < 4.5:
-						near_cluster = true
-						break
-				if not near_cluster: continue
-			var ids: Array = spec.ids
-			var pick: int = rng.next() % ids.size()
-			if role == "tree" and rng.unit() < 0.7:
-				pick = rng.next() % 2
-			var asset: String = ids[pick]
-			if not assets.has(asset):
-				return {"ok": false, "error": "The farm scenery palette is incomplete."}
-			var record: Dictionary = assets[asset]
-			var low: Array = record.bounds_godot_m[0]
-			var high: Array = record.bounds_godot_m[1]
-			var box := AABB(Vector3(low[0],low[1],low[2]),Vector3(high[0]-low[0],high[1]-low[1],high[2]-low[2]))
-			var scale_value := lerpf(0.85,1.0,rng.unit())
-			var yaw := rng.unit() * TAU
-			point += Vector3((rng.unit()-0.5)*0.3,0,(rng.unit()-0.5)*0.3)
-			var transform := Transform3D(Basis(Vector3.UP,yaw).scaled(Vector3.ONE*scale_value),point)
-			var world_box: AABB = transform * box
-			var center_cell: Vector2i = walk.cell_at(point)
-			if seen_visual.has(center_cell):
-				continue
-			var footprint: Array[Vector2i] = walk.try_box(world_box, bool(spec.solid_collision))
-			if footprint.is_empty():
-				continue
-			seen_visual[center_cell] = true
-			layout.append({"asset":asset,"role":role,"transform":transform,"box":world_box,
-				"solid":bool(spec.solid_collision),"shadow":bool(spec.cast_shadow_flag),"cells":footprint,
-				"triangles":int(record.triangles)})
-			if role in ["tree","shrub","rock"]: anchors.append(point)
-			signature.append("%s:%.8f,%.8f,%.8f:%.8f:%.8f" % [asset,point.x,point.y,point.z,yaw,scale_value])
-			accepted += 1
-		diagnostics[role] = {"target":wanted,"accepted":accepted,"attempts":attempts,"rejected":attempts-accepted}
+	var outer_spec: Dictionary = recipe.outer_groves
+	var palette: Array = outer_spec.grove.tree_weights.keys() + [outer_spec.grove.young_pine_id] \
+		+ outer_spec.rock_pile.main_ids + outer_spec.rock_pile.companion_ids
+	for role: String in recipe.roles: palette.append_array(recipe.roles[role].ids)
+	for asset: String in palette:
+		if not assets.has(asset):
+			return {"ok": false, "error": "The farm scenery palette is incomplete."}
+	# Walk budget: the groves may move blocked cells around, never add to them.
+	var reference := {"layout":[], "roles":{}}
+	var reference_walk := Walk.new(data)
+	for role: String in outer_spec.reference_roles:
+		_scatter(reference, data, reference_walk, recipe, outer_spec.reference_art_version, role, assets, pool)
+	Shade.enforce_budget(reference, data, reference_walk)
+	var rngs := {}
+	for stream: String in ["grove", "pile", "clump"]:
+		rngs[stream] = FixedRandom.new((data.seed_hex + "|" + str(recipe.art_version) + "|" + stream).sha256_text())
+	var outer := OuterGroves.plan(walk, assets, recipe, pool, reference_walk.blocked.size(), rngs)
 	var core_rng := FixedRandom.new((data.block_id + "|" + str(recipe.core_obstacles.version)).sha256_text())
 	var core := CoreObstacles.plan(data, walk, assets, recipe.core_obstacles, core_rng)
-	return {"ok":true,"core_obstacles":core,"layout":layout,"roles":diagnostics,"art_version":recipe.art_version,
-		"eligible_cells":pool.size(),"layout_sha256":"\n".join(signature).sha256_text(),"recipe":recipe}
+	return {"ok":true,"core_obstacles":core,"layout":outer.layout,"roles":outer.roles,"outer":outer.summary,
+		"art_version":recipe.art_version,"eligible_cells":pool.size(),"layout_sha256":outer.layout_sha256,"recipe":recipe}
+
+## The previous approved per-role scatter (art 499-v2-schema4), kept verbatim as the walk
+## budget reference. Only its solid roles are replayed, onto a separate walker.
+static func _scatter(planned: Dictionary, data: Dictionary, walk: RefCounted, recipe: Dictionary, art_version: String,
+		role: String, assets: Dictionary, pool: Array[Vector2i]) -> void:
+	var spec: Dictionary = recipe.roles[role]
+	var wanted := mini(int(spec.cap_per_farm), pool.size() / int(spec.cells_per_candidate))
+	var rng := FixedRandom.new((data.seed_hex + "|" + art_version + "|" + role).sha256_text())
+	var seen_visual := {}
+	for item: Dictionary in planned.layout: seen_visual[walk.cell_at(item.transform.origin)] = true
+	var accepted := 0
+	var attempts := 0
+	var anchor := Vector2i.ZERO
+	while accepted < wanted and attempts < int(recipe.placement.max_candidate_attempts_per_role) and not pool.is_empty():
+		if attempts % 8 == 0:
+			anchor = pool[rng.next() % pool.size()]
+		var at := anchor + Vector2i(int(rng.next()%7)-3, int(rng.next()%7)-3)
+		attempts += 1
+		if not data.by_cell.has(at) or data.by_cell[at].zone != "extension" or data.protected.has(at):
+			continue
+		var point: Vector3 = walk.point(at)
+		# Place tall pieces in the rear half for the approved 43/14.5 opening composition.
+		if role == "tree" and point.dot(Vector3(0.25,0,0.968)) > 0:
+			continue
+		var ids: Array = spec.ids
+		var pick: int = rng.next() % ids.size()
+		if role == "tree" and rng.unit() < 0.7:
+			pick = rng.next() % 2
+		var asset: String = ids[pick]
+		var record: Dictionary = assets[asset]
+		var low: Array = record.bounds_godot_m[0]
+		var high: Array = record.bounds_godot_m[1]
+		var box := AABB(Vector3(low[0],low[1],low[2]),Vector3(high[0]-low[0],high[1]-low[1],high[2]-low[2]))
+		var scale_value := lerpf(0.85,1.0,rng.unit())
+		var yaw := rng.unit() * TAU
+		point += Vector3((rng.unit()-0.5)*0.3,0,(rng.unit()-0.5)*0.3)
+		var transform := Transform3D(Basis(Vector3.UP,yaw).scaled(Vector3.ONE*scale_value),point)
+		var world_box: AABB = transform * box
+		var center_cell: Vector2i = walk.cell_at(point)
+		if seen_visual.has(center_cell):
+			continue
+		var footprint: Array[Vector2i] = walk.try_box(world_box, bool(spec.solid_collision))
+		if footprint.is_empty():
+			continue
+		seen_visual[center_cell] = true
+		planned.layout.append({"asset":asset,"role":role,"transform":transform,"box":world_box,
+			"solid":bool(spec.solid_collision),"shadow":bool(spec.cast_shadow_flag),"cells":footprint})
+		accepted += 1
+	planned.roles[role] = {"target":wanted,"accepted":accepted,"attempts":attempts,"rejected":attempts-accepted}
 
 static func build(planned: Dictionary, cell_m: float) -> Dictionary:
 	var root := Node3D.new()

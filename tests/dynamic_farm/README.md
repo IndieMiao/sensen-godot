@@ -128,3 +128,16 @@ geometry/seed with different block IDs; append `-- <farm1.json> <farm2.json>
 `p-3139019`, `p-5402049`). The check counts distinct occupied core cells from
 the transformed model bounds, validates all four roles, compares the reopened
 layout and checks the entire remaining walk mask against extension-only blockers.
+
+### Outer groves (C-20)
+
+Run `--headless --script res://tests/dynamic_farm/test_outer_groves.gd -- <farm1.json>
+<farm2.json> <farm3.json>` in the same isolated preview project (review set:
+`p-3139010`, `p-3139019`, `p-5402049`). Without payloads it runs only the walker
+checks. It compares the incremental connectivity check with a full flood fill over 400
+random solid boxes, then per parcel replays the previous approved layout as the
+"before": blocked cells may not grow, reachable cells may not shrink (audited 1539,
+1470, 3962 for the review set), and every core, protected, spawn and entry cell stays
+reachable. It also checks the 13-model palette, extension-only footprints, rear-half
+trees, that only solid footprints block, at least one grove/rock pile/flower clump, and
+an identical layout on reopening.
