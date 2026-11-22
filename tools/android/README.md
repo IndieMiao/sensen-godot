@@ -146,18 +146,20 @@ choose a production signing identity, install an app or authorize publication.
    account's `.android`, Godot settings, Gradle home, keystore or passwords.
 2. Confirm the **exclusive host Godot import/export window** with scheduling
    first (iOS work has priority). In the worker Run, at the committed source
-   revision, choose a new output directory with an existing parent:
+   revision, use an absolute path to a new output directory with an existing parent:
 
    ```sh
    tools/android/build_worker_apk.sh "$TMPDIR/candidate"
    ```
 
    The script stages committed game sources in a disposable project, generates
-   one `package/signed=false` APK preset, prepares the Gradle template + native
+   one non-runnable, `package/signed=false` APK preset, prepares the Gradle template + native
    plugins, then imports and exports **release** serially in a fresh portable
    editor. It fixes ADB to 5137, disables editor ADB shutdown and needs no
    device or emulator. Gradle may need to download build dependencies; there
-   is no artifact upload step in the build script. It refuses signing metadata
+   is no artifact upload step in the build script. Template and APK directory
+   entries are screened for keystores and `export_credentials.cfg` before any
+   member is opened for extraction or CRC checks. It refuses signing metadata
    **before** alignment as well as afterwards. Success produces `unsigned.apk`,
    `unsigned.json` (manifest identity, size, SHA-256) and `source-commit.txt`.
 3. For **C-496 only**, use the configured Card MCP `upload_attachment` large

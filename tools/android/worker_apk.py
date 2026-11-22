@@ -8,6 +8,8 @@ import re
 import subprocess
 import zipfile
 
+from check_export_inputs import check_names
+
 
 def require(condition, message):
     if not condition:
@@ -38,6 +40,8 @@ def worker_preset(text):
     options, count = re.subn(r'^package/signed=(?:true|false)$', 'package/signed=false', options, flags=re.M)
     require(count == 1, 'missing or ambiguous package/signed')
     header = re.sub(r'^\[preset\.\d+\]', '[preset.0]', header)
+    header, count = re.subn(r'^runnable=(?:true|false)$', 'runnable=false', header, flags=re.M)
+    require(count == 1, 'missing or ambiguous runnable flag')
     header = re.sub(r'^export_path=.*$', 'export_path=""', header, flags=re.M)
     return header + '[preset.0.options]' + options, identity
 
@@ -51,18 +55,18 @@ def checked_output(args):
 def inspect_zip(apk, unsigned):
     with apk.open('rb') as f, zipfile.ZipFile(f) as z:
         names = z.namelist()
-        require(len(names) == len(set(names)) and z.testzip() is None, 'duplicate or corrupt ZIP entries')
+        check_names(names)  # Must precede any member I/O, including CRC verification.
+        require(len(names) == len(set(names)), 'duplicate ZIP entries')
         required = {'AndroidManifest.xml', 'classes.dex', 'assets/project.binary', 'assets/mapbox_token.txt',
                     'lib/arm64-v8a/libgodot_android.so', 'lib/arm64-v8a/libmapbox-maps.so',
                     'lib/arm64-v8a/libmapbox-common.so', 'lib/arm64-v8a/liblkjingle_peerconnection_so.so'}
         require(required <= set(names), 'missing Android, Godot or plugin payload')
-        require(not any(n.lower().endswith(('.keystore', '.jks', '.p12', '.pk8', '/export_credentials.cfg'))
-                        for n in names), 'unexpected signing material entry')
         if unsigned:
             require(not any(re.match(r'^META-INF/(?:[^/]+\.(?:SF|RSA|DSA|EC)|SIG-[^/]+)$', n, re.I)
                             for n in names), 'JAR signature metadata present')
             f.seek(z.start_dir - 16)
             require(f.read(16) != b'APK Sig Block 42', 'APK Signing Block present')
+        require(z.testzip() is None, 'corrupt ZIP entry')
 
 
 def inspect(apk, identity, build_tools, signer=None):

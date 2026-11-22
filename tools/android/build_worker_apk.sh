@@ -4,6 +4,7 @@ set -euo pipefail
 umask 077
 fail() { echo "worker APK: $*" >&2; exit 1; }
 [[ $# == 1 ]] || fail 'usage: build_worker_apk.sh NEW_OUTPUT_DIRECTORY'
+[[ $1 == /* ]] || fail 'output directory must be an absolute path'
 root=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$root"
 [[ ! -e "$1" && ! -L "$1" ]] || fail 'output directory must be new'
@@ -16,8 +17,7 @@ templates=${GODOT_TEMPLATES_DIR:-$HOME/Library/Application Support/Godot/export_
 [[ -r "$templates/android_source.zip" ]] || fail 'missing approved 4.7.2.stable android_source.zip'
 templates=$(cd "$templates" && pwd)
 # Inspect names only; never unpack a template carrying local signing credentials.
-entries=$(unzip -Z1 "$templates/android_source.zip") || fail 'invalid template ZIP'
-if grep -Eiq '\.(keystore|jks|p12|pk8)$' <<<"$entries"; then fail 'template contains signing material'; fi
+python3 "$root/tools/android/check_export_inputs.py" template "$templates/android_source.zip"
 [[ -f mapbox_token.txt && ! -L mapbox_token.txt ]] || fail 'missing regular ignored public Mapbox pk file'
 godot=$(command -v "${GODOT_BIN:-godot}") || fail 'Godot required'
 [[ $("$godot" --version) == 4.7.2.stable.* ]] || fail 'Godot 4.7.2 stable required'
@@ -25,8 +25,7 @@ rev=$(git rev-parse HEAD)
 # Use immutable source. Do not copy the checkout, .godot/export_credentials.cfg,
 # android/build, ~/.android, existing editor settings, or Gradle signing properties.
 project_files=(project.godot export_presets.cfg icon.svg icon.svg.import assets modules scenes addons native tools/android)
-entries=$(git ls-tree -r --name-only "$rev" -- "${project_files[@]}")
-if grep -Eiq '\.(keystore|jks|p12|pk8)$|(^|/)(export_credentials.cfg|mapbox_token.txt)$' <<<"$entries"; then fail 'unexpected tracked export input'; fi
+git ls-tree -rz --name-only "$rev" -- "${project_files[@]}" | python3 "$root/tools/android/check_export_inputs.py" tracked
 work=$(mktemp -d "${TMPDIR:?private TMPDIR required}/worker-apk.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 p=$work/project; home=$work/home; editor=$work/editor; data=$editor/editor_data

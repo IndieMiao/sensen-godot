@@ -21,6 +21,7 @@ if [ ! -f "$TEMPLATE_ZIP" ]; then
     exit 1
 fi
 
+python3 "$REPO_ROOT/tools/android/check_export_inputs.py" template "$TEMPLATE_ZIP"
 mkdir -p "$BUILD_DIR"
 touch "$REPO_ROOT/android/.gdignore" # 防止 Godot 导入模板内的 res 资源
 unzip -oq "$TEMPLATE_ZIP" -d "$BUILD_DIR"

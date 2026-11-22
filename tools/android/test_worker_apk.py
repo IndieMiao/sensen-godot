@@ -1,6 +1,7 @@
 import hashlib
 import os
 from pathlib import Path
+import shutil
 import struct
 import subprocess
 import tempfile
@@ -8,6 +9,7 @@ import unittest
 from unittest.mock import patch
 import zipfile
 
+from check_export_inputs import check_template
 from worker_apk import inspect, inspect_zip, worker_preset
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -34,6 +36,7 @@ class WorkerAPK(unittest.TestCase):
         self.assertEqual(self.cfg.count('[preset.0]'), 1)
         self.assertNotIn('[preset.1', self.cfg)
         self.assertIn('package/signed=false\n', self.cfg)
+        self.assertIn('runnable=false\n', self.cfg)
         self.assertNotIn('package/signed=true', self.cfg)
         self.assertEqual(worker_preset(self.cfg), (self.cfg, self.identity))
         self.assertEqual(self.identity['package'], 'com.sensen.journeypreview')
@@ -51,6 +54,60 @@ class WorkerAPK(unittest.TestCase):
             self.fixture(names)
             with self.assertRaises(ValueError):
                 inspect_zip(self.apk, True)
+
+    def test_signing_material_rejected_without_opening_any_apk_entry(self):
+        for name in ('export_credentials.cfg', '.godot/EXPORT_CREDENTIALS.CFG', 'assets/sample.jks',
+                     'sample.keystore', 'sample.p12', 'sample.pk8'):
+            self.fixture(FILES + (name,))  # ordinary placeholder bytes, never a key
+            for unsigned in (True, False):
+                with self.subTest(name=name, unsigned=unsigned), \
+                     patch.object(zipfile.ZipFile, 'open', side_effect=AssertionError('entry opened')) as opened:
+                    with self.assertRaisesRegex(ValueError, 'signing material'):
+                        inspect_zip(self.apk, unsigned)
+                    opened.assert_not_called()
+
+    def test_template_setup_rejects_credentials_before_extraction(self):
+        # Run the real setup entrypoint in a disposable project, not the checkout.
+        tools = self.tmp / 'project/tools/android'
+        tools.mkdir(parents=True)
+        for script in ('setup_android_build.sh', 'check_export_inputs.py'):
+            shutil.copyfile(ROOT / 'tools/android' / script, tools / script)
+        for name in ('export_credentials.cfg', '.godot/EXPORT_CREDENTIALS.CFG', 'nested/sample.keystore'):
+            with self.subTest(name=name):
+                with zipfile.ZipFile(self.tmp / 'android_source.zip', 'w') as z:
+                    z.writestr('first-marker', b'unit-test-only')
+                    z.writestr(name, b'unit-test-only')
+                result = subprocess.run(['bash', tools / 'setup_android_build.sh'], capture_output=True,
+                                        env=dict(os.environ, GODOT_TEMPLATES_DIR=str(self.tmp)))
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(b'signing material', result.stderr)
+                self.assertFalse((self.tmp / 'project/android').exists())
+
+    def test_template_name_check_never_opens_members(self):
+        for name, forbidden in [('src/main/AndroidManifest.xml', False), ('nested/export_credentials.cfg', True)]:
+            self.fixture(('first-marker', name))
+            with self.subTest(name=name), patch.object(zipfile.ZipFile, 'open') as opened:
+                if forbidden:
+                    with self.assertRaisesRegex(ValueError, 'signing material'):
+                        check_template(self.apk)
+                else:
+                    check_template(self.apk)
+                opened.assert_not_called()
+
+    def test_tracked_inputs_use_same_name_guard_but_public_runtime_file_must_be_untracked(self):
+        for name, allowed in [('assets/input.json', True), ('export_credentials.cfg', False),
+                              ('.godot/export_credentials.cfg', False), ('assets/mapbox_token.txt', False)]:
+            with self.subTest(name=name):
+                result = subprocess.run(['python3', ROOT / 'tools/android/check_export_inputs.py', 'tracked'],
+                                        input=b'first-marker\0' + name.encode() + b'\0', capture_output=True)
+                self.assertEqual(result.returncode == 0, allowed)
+
+    def test_worker_rejects_relative_output(self):
+        result = subprocess.run(['bash', ROOT / 'tools/android/build_worker_apk.sh', 'relative-output'],
+                                cwd=self.tmp, capture_output=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(b'absolute path', result.stderr)
+        self.assertFalse((self.tmp / 'relative-output').exists())
 
     def test_reject_signing_block_even_without_jar_entries(self):
         self.fixture()
