@@ -64,7 +64,16 @@ apk_tool=(python3 -B "$p/tools/android/worker_apk.py" --variant "$variant" --pre
 "${apk_tool[@]}" generate "$work/unsigned.cfg"
 mv "$work/unsigned.cfg" "$p/export_presets.cfg"
 # Portable Godot: no access needed to an account's existing editor or signing settings.
-cp "$godot" "$editor/Godot"; touch "$editor/._sc_"
+bin=$(python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$godot")
+if [[ $(uname -s) == Darwin && $bin == *.app/Contents/MacOS/* ]]; then
+    # A detached Mach-O loses the signed Info.plist and macOS kills it (137).
+    bundle=${bin%/Contents/MacOS/*}
+    ditto "$bundle" "$editor/Godot.app"
+    portable="$editor/Godot.app/Contents/MacOS/${bin##*/}"
+else
+    portable="$editor/Godot"; cp "$bin" "$portable"
+fi
+touch "$editor/._sc_"
 ln -s "$templates" "$data/export_templates/4.7.2.stable"
 python3 - "$data/editor_settings-4.7.tres" "$sdk" "$java" <<'PY'
 import json, sys
@@ -74,7 +83,7 @@ Path(sys.argv[1]).write_text('[gd_resource type="EditorSettings" format=3]\n\n[r
     + 'export/android/java_sdk_path = ' + json.dumps(sys.argv[3]) + '\n'
     + 'export/android/shutdown_adb_on_exit = false\n')
 PY
-clean=(env -i "PATH=$java/bin:$PATH" "HOME=$home" "TMPDIR=$work/tmp" LANG=en_US.UTF-8
+clean=(env -i "PATH=$java/bin:$PATH" "HOME=$home" "CFFIXED_USER_HOME=$home" "TMPDIR=$work/tmp" LANG=en_US.UTF-8
     "ANDROID_HOME=$sdk" "ANDROID_SDK_ROOT=$sdk" "JAVA_HOME=$java" "GODOT_TEMPLATES_DIR=$templates"
     "ANDROID_USER_HOME=$home/.android" "GRADLE_USER_HOME=$home/.gradle" 'GRADLE_OPTS=-Dorg.gradle.daemon=false'
     "JAVA_TOOL_OPTIONS=-Duser.home=\"$home\"" ANDROID_ADB_SERVER_PORT=5137 ADB_SERVER_SOCKET=tcp:localhost:5137)
@@ -84,7 +93,7 @@ for plugin in voice webview google_signin notify; do
 done
 # No raw editor / Gradle logs in receipts or the worktree.
 run_editor() {
-    if ! "${clean[@]}" "$editor/Godot" --headless --path "$p" "$@" >"$work/editor.log" 2>&1 ||
+    if ! "${clean[@]}" "$portable" --headless --path "$p" "$@" >"$work/editor.log" 2>&1 ||
        grep -Eq '^SCRIPT ERROR:|^ERROR:' "$work/editor.log"; then
         fail "Godot $1 failed"
     fi
