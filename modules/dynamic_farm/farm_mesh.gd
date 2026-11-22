@@ -2,6 +2,7 @@ extends RefCounted
 ## Mesh assembly from frozen masks; missing cells and holes are never filled.
 const CHUNK := 32
 const Edges = preload("res://modules/dynamic_farm/farm_edges.gd")
+const Spill = preload("res://modules/dynamic_farm/core_grass_edge.gd")
 const Bank = preload("res://modules/dynamic_farm/farm_bank.gd")
 const GROUND_SHADER = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 const MEADOW = preload("res://assets/farm/art/meadow.png")
@@ -20,20 +21,28 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 	var exterior := Bank.exterior(data) if soften else {}
 	var seed_phase := Bank.phase(data)
 	var soil_colour := Color(recipe.surface.core_warm_surface_srgb).lerp(Color(recipe.surface.grass_far_srgb),0.35).darkened(0.12)
+	var noise := Spill.noise_for(data.get("seed_hex", "00000000"))
+	var masks := {}
+	for at: Vector2i in data.by_cell:
+		var sides := Spill.mask(data.by_cell, at)
+		if sides: masks[at] = sides
 	var bank_spans: Array=[]
 	for cell: Dictionary in data.cells:
 		var at := Vector2i(cell.x, cell.y)
 		var chunk := Vector2i(at.x / CHUNK, at.y / CHUNK)
 		var key := "%d:%d:%d" % [chunk.x,chunk.y,cell.surface_id]
-		if not tops.has(key):
-			var st := SurfaceTool.new()
-			st.begin(Mesh.PRIMITIVE_TRIANGLES)
-			tops[key] = {"tool":st,"chunk":chunk,"surface":cell.surface_id}
-		var top: SurfaceTool = tops[key].tool
+		var top := _top_tool(tops, key, chunk, cell.surface_id)
 		var center: Vector3 = walk.point(at)
 		var corners := [center + Vector3(-half,0,half), center + Vector3(half,0,half),
 			center + Vector3(half,0,-half), center + Vector3(-half,0,-half)]
-		_quad(top, corners[0],corners[3],corners[2],corners[1],Vector3.UP,data.palette[cell.kind])
+		if masks.has(at):
+			var soil_key := "%d:%d:%d" % [chunk.x, chunk.y, Spill.SOIL]
+			var soil := _top_tool(tops, soil_key, chunk, Spill.SOIL)
+			soil.set_color(data.palette.soil)
+			top.set_color(data.palette[cell.kind])
+			Spill.emit(soil, top, corners, at, masks, noise)
+		else:
+			_quad(top, corners[0],corners[3],corners[2],corners[1],Vector3.UP,data.palette[cell.kind])
 		var directions: Array = Edges.NEIGHBORS
 		for edge in 4:
 			var a: Vector3 = corners[edge]
@@ -68,7 +77,8 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 							_triangle(top,a,last,next,Vector3.UP,data.palette[cell.kind])
 							_quad(rim,last,next,next-Vector3.UP*0.7,last-Vector3.UP*0.7,(next-last).cross(Vector3.UP).normalized(),Color("958665"))
 						last=next
-			if cell.zone == "core":
+			# The soil outline replaces the rule along a spilled core edge.
+			if cell.zone == "core" and not (int(masks.get(at + directions[edge], 0)) & (1 << ((edge + 2) % 4))):
 				if not grids.has(chunk):
 					var st := SurfaceTool.new()
 					st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -125,6 +135,13 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 	root.set_meta("slope_material_linear_gain",slope_gain)
 	root.set_meta("slope_batches",slopes.size())
 	return root
+
+static func _top_tool(tops: Dictionary, key: String, chunk: Vector2i, surface: int) -> SurfaceTool:
+	if not tops.has(key):
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		tops[key] = {"tool":st, "chunk":chunk, "surface":surface}
+	return tops[key].tool
 
 static func _slope_tool(slopes: Dictionary, key: String, chunk: Vector2i, surface: int, original: SurfaceTool, gain: float) -> SurfaceTool:
 	if is_equal_approx(gain,1.0):return original

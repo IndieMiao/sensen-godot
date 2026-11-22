@@ -1,4 +1,5 @@
 extends RefCounted
+const CoreObstacles = preload("res://modules/dynamic_farm/farm_core_obstacles.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const RECIPE_PATH := "res://assets/dynamic_farm/499-art-recipe.json"
 const INVENTORY_PATH := "res://assets/dynamic_farm/499-art-inventory.json"
@@ -92,7 +93,9 @@ static func plan(data: Dictionary, walk: RefCounted) -> Dictionary:
 			signature.append("%s:%.8f,%.8f,%.8f:%.8f:%.8f" % [asset,point.x,point.y,point.z,yaw,scale_value])
 			accepted += 1
 		diagnostics[role] = {"target":wanted,"accepted":accepted,"attempts":attempts,"rejected":attempts-accepted}
-	return {"ok":true,"layout":layout,"roles":diagnostics,"art_version":recipe.art_version,
+	var core_rng := FixedRandom.new((data.block_id + "|" + str(recipe.core_obstacles.version)).sha256_text())
+	var core := CoreObstacles.plan(data, walk, assets, recipe.core_obstacles, core_rng)
+	return {"ok":true,"core_obstacles":core,"layout":layout,"roles":diagnostics,"art_version":recipe.art_version,
 		"eligible_cells":pool.size(),"layout_sha256":"\n".join(signature).sha256_text(),"recipe":recipe}
 
 static func build(planned: Dictionary, cell_m: float) -> Dictionary:

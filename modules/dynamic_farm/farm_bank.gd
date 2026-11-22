@@ -1,5 +1,6 @@
 extends RefCounted
 ## Render-only rolled turf outside the unchanged walking surface. No new shader or permissions.
+const Cliff = preload("res://modules/dynamic_farm/island_cliff.gd")
 const SEGMENTS := 2
 const Guard = preload("res://modules/dynamic_farm/farm_bank_guard.gd")
 const LOWER_CELLS := 0.75
@@ -184,6 +185,7 @@ static func emit(spans: Array, data: Dictionary, center: Vector2, widen: bool) -
 		if piece.expanded:expanded+=1
 		_emit_profile(span.top,span.soil,piece.pa,piece.pb,
 			span.normal,span.colour)
+		Cliff.append(span.soil, piece.pa, piece.pb, span.normal, span.phase)
 	return {"pieces":pieces.size(),"expanded_pieces":expanded,"rejected_pieces":rejected,
 		"guard_passes":passes,"rollback_centres":rollback_centres.size(),"guard_fallback":guard_fallback,
 		"iterations":iterations,"final_profile_rejected":final_rejected,"final_profile_unsafe":final_unsafe.size(),"budget_fallback":budget_fallback,"gap_m":Guard.GAP_CELLS*data.cell_m,

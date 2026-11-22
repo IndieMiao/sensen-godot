@@ -118,3 +118,13 @@ Diagnostic interpretation:
 
 These logs cannot reconstruct absent HTTP evidence from the old Q76 APK. They
 also do not change Mapbox SDK MVT/TileJSON retries or prove device Surface behavior.
+
+### Core obstacles (C-18)
+
+Run `--headless --script res://tests/dynamic_farm/test_core_obstacles.gd` in
+an isolated imported preview project. The default fixtures exercise equal
+geometry/seed with different block IDs; append `-- <farm1.json> <farm2.json>
+<farm3.json>` to also check individual r4 payloads (review set: `p-3139010`,
+`p-3139019`, `p-5402049`). The check counts distinct occupied core cells from
+the transformed model bounds, validates all four roles, compares the reopened
+layout and checks the entire remaining walk mask against extension-only blockers.

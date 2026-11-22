@@ -11,6 +11,8 @@ const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const EdgeDecor = preload("res://modules/dynamic_farm/farm_edge_decor.gd")
 const CameraRules = preload("res://modules/farm/farm_camera.gd")
+const Cliff = preload("res://modules/dynamic_farm/island_cliff.gd")
+const SKY_SHADER = preload("res://modules/dynamic_farm/island_sky.gdshader")
 const Controls = preload("res://scenes/dynamic_farm/dynamic_controls.gd")
 const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.gd")
 const SPEED := 3.75
@@ -82,6 +84,13 @@ func _ready() -> void:
 		return
 	_props = art.root
 	add_child(_props)
+	# Separate batches: these appearances never enter extension occupancy or shadow budgets.
+	var core_art := Scenery.build(_plan.core_obstacles, _data.cell_m)
+	if not core_art.ok:
+		_fail(core_art.error)
+		return
+	core_art.root.name = "CoreObstacles"
+	add_child(core_art.root)
 	_setup_world()
 	_shade = Shade.new()
 	add_child(_shade)
@@ -123,10 +132,13 @@ func _ready() -> void:
 		"art_version":_plan.art_version,"layout_sha256":_plan.layout_sha256,
 		"roles":_plan.roles,"instances":art.instances,"batches":art.batches,
 		"placed_triangles":art.placed_triangles,"unique_triangles":art.unique_triangles,
-		"shadow_budget_rejected":_plan.shadow_budget_rejected,"shader_changes":false,
+		"shadow_budget_rejected":_plan.shadow_budget_rejected,"island_backdrop":true,
 		"seed_hex":_data.seed_hex,"generator_version":_data.generator_version,
 		"camera":{"pitch":43.0,"yaw":14.5,"keep_width":true},
 		"source_origin":[_data.origin.x,_data.origin.y]}
+	_summary.core_obstacles = {"roles":_plan.core_obstacles.roles, "instances":core_art.instances,
+		"batches":core_art.batches, "placed_triangles":core_art.placed_triangles,
+		"layout_sha256":_plan.core_obstacles.layout_sha256}
 	_summary.bank = _ground.get_meta("bank_metrics",{})
 	_summary.slope_material={"clearing_linear_gain":_ground.get_meta("slope_material_linear_gain"),
 		"batches":_ground.get_meta("slope_batches")}
@@ -137,8 +149,13 @@ func _ready() -> void:
 
 func _setup_world() -> void:
 	var env := Environment.new()
-	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color(0.906,0.941,0.875)
+	var clouds := ShaderMaterial.new()
+	clouds.shader = SKY_SHADER
+	env.sky = Sky.new()
+	env.sky.radiance_size = Sky.RADIANCE_SIZE_32
+	env.sky.sky_material = clouds
+	env.background_mode = Environment.BG_SKY
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(0.79,0.88,0.94)
 	env.ambient_light_energy = 0.42
@@ -213,7 +230,7 @@ func _place_camera() -> void:
 	if _camera == null: return
 	_camera.size = _normal_size * _zoom
 	CameraRules.place(_camera,_focus)
-	CameraRules.fit_ground_depth(_camera, -0.7, 5.0)
+	CameraRules.fit_ground_depth(_camera, Cliff.LOWEST_Y, 5.0)
 
 func set_review_overview(enabled: bool) -> void:
 	# Review-only capture hook. Normal interaction retains the existing player-scale camera.
@@ -224,10 +241,10 @@ func set_review_overview(enabled: bool) -> void:
 		_focus = Vector3.ZERO
 		_place_camera()
 		var extent: Vector2 = Vector2(_data.grid_size)*_data.cell_m
-		var box := AABB(Vector3(-extent.x*0.5,-0.7,-extent.y*0.5),Vector3(extent.x,5.7,extent.y))
+		var box := AABB(Vector3(-extent.x*0.5,Cliff.LOWEST_Y,-extent.y*0.5),Vector3(extent.x,5.0-Cliff.LOWEST_Y,extent.y))
 		var size := get_viewport().get_visible_rect().size
 		CameraRules.fit(_camera,box,Rect2(Vector2(20,112),size-Vector2(40,172)))
-		CameraRules.fit_ground_depth(_camera,-0.7,5.0)
+		CameraRules.fit_ground_depth(_camera,Cliff.LOWEST_Y,5.0)
 	else:
 		_focus = _actor.position
 		_place_camera()
