@@ -93,9 +93,23 @@ for plugin in voice webview google_signin notify; do
 done
 # No raw editor / Gradle logs in receipts or the worktree.
 run_editor() {
-    if ! "${clean[@]}" "$portable" --headless --path "$p" "$@" >"$work/editor.log" 2>&1 ||
-       grep -Eq '^SCRIPT ERROR:|^ERROR:' "$work/editor.log"; then
-        fail "Godot $1 failed"
+    local rc=0 pattern='^SCRIPT ERROR:|^ERROR:'
+    # A cold scan opens the theme before its font has been imported and legacy
+    # FBX assets can report missing optional textures. Use the reviewed CI
+    # import gate for that phase; export still rejects every editor error.
+    if [[ $1 == --import ]]; then
+        pattern='SCRIPT ERROR:|ERROR: (Error importing|Failed to import|Failed to (create|instantiate) an autoload)'
+    fi
+    "${clean[@]}" "$portable" --headless --path "$p" "$@" >"$work/editor.log" 2>&1 || rc=$?
+    if ((rc)) || grep -Eq "$pattern" "$work/editor.log"; then
+        # Never echo Gradle / editor lines: they can contain runtime configuration.
+        for diagnostic in 'Error importing' 'Failed to import' 'Failed to create an autoload' 'SCRIPT ERROR:' \
+            'UnknownHostException' 'SSLHandshakeException' 'ConnectException' 'Could not resolve' \
+            'Could not find' 'Could not download' 'Could not GET' 'Gradle build failed' 'Execution failed for task' \
+            'Unresolved reference' 'Could not install Gradle distribution' 'No space left on device'; do
+            if grep -Fq "$diagnostic" "$work/editor.log"; then echo "worker APK: diagnostic: $diagnostic" >&2; fi
+        done
+        fail "Godot $1 failed (editor exit=$rc)"
     fi
 }
 run_editor --import
