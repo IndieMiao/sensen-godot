@@ -10,6 +10,7 @@ from unittest.mock import patch
 import zipfile
 
 from check_export_inputs import check_template
+import dynamic_farm_export as farm
 from worker_apk import inspect, inspect_zip, worker_preset
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -40,6 +41,42 @@ class WorkerAPK(unittest.TestCase):
         self.assertNotIn('package/signed=true', self.cfg)
         self.assertEqual(worker_preset(self.cfg), (self.cfg, self.identity))
         self.assertEqual(self.identity['package'], 'com.sensen.journeypreview')
+
+    def test_dynamic_variant_is_standalone_and_idempotent(self):
+        preset, identity = worker_preset(PRESETS, True)
+        self.assertEqual(identity, dict(self.identity, package=farm.PACKAGE))
+        self.assertEqual(worker_preset(preset, True), (preset, identity))
+        self.assertIn('package/signed=false', preset)
+        self.assertIn('runnable=false', preset)
+        for path in farm.RAW_FILES:
+            self.assertIn(path, preset)
+        with self.assertRaises(ValueError):
+            worker_preset(PRESETS.replace('mapbox_token.txt', 'absent.txt'), True)
+
+    def test_dynamic_project_prevents_journey_boot(self):
+        from configparser import ConfigParser
+        project = (ROOT / 'project.godot').read_text()
+        staged = farm.staged_project(project)
+        config = ConfigParser(interpolation=None)
+        config.read_string(staged[staged.index('[application]'):])
+        self.assertEqual(config['application']['run/main_scene'], '"' + farm.MAP_SCENE + '"')
+        self.assertTrue(config['application'].getboolean('config/use_custom_user_dir'))
+        self.assertTrue(config['sensen'].getboolean('network/online_qa'))
+        self.assertEqual(config['sensen']['network/mobile_base_url'], '"http://127.0.0.1:9"')
+        self.assertIn('net', config['autoload'])
+        with self.assertRaises(ValueError):
+            farm.staged_project(project.replace('[sensen]', '[sensen]\nnetwork/online_qa=false'))
+
+    def test_dynamic_readback_rejects_missing_map_or_scenery_payload(self):
+        scenes = tuple('assets/scenes/dynamic_farm/' + name + '.tscn.remap'
+                       for name in ('dynamic_farm_map', 'dynamic_farm_host', 'dynamic_farm'))
+        for missing in ('modules/dynamic_farm/map/config.json', 'assets/dynamic_farm/499-art-recipe.json', None):
+            self.fixture(FILES + scenes + tuple('assets/' + path for path in farm.RAW_FILES if path != missing))
+            if missing:
+                with self.assertRaises(ValueError):
+                    inspect_zip(self.apk, True, True)
+            else:
+                inspect_zip(self.apk, True, True)
 
     def test_reject_ambiguous_or_non_apk_or_credentialed_preset(self):
         for bad in [PRESETS + PRESETS, PRESETS.replace('package/signed=true', ''),

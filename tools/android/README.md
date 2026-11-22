@@ -134,7 +134,9 @@ app's `files/voice_match_base_url.txt` via `run-as`. Delete it afterwards.
 
 Use `build_worker_apk.sh` for the tracked **Android** APK preset, not the demo
 publisher or Play AAB scripts. It uses the package, version name and version code
-from the selected commit unchanged. This does not allocate a release version,
+from the selected commit unchanged in the default mode. `--dynamic-farm` instead
+selects the isolated preview package `com.sensen.dynamicfarm.cardigan` (same version).
+This does not allocate a release version,
 choose a production signing identity, install an app or authorize publication.
 
 1. Have the host owner provision and register Godot **4.7.2 stable** export
@@ -142,15 +144,22 @@ choose a production signing identity, install an app or authorize publication.
    `GODOT_TEMPLATES_DIR` for a non-default version directory, `ANDROID_HOME` for
    the SDK, `JAVA_HOME` for the JDK, and optionally `ANDROID_BUILD_TOOLS` for
    the build-tools directory (default `36.1.0`). Provision **only** the approved
-   public runtime `mapbox_token.txt` in the checkout as usual. Never copy an
+   public runtime file via `CARDIGAN_MAPBOX_PUBLIC_FILE`: a worker-readable absolute
+   path outside any repository. Do not put a copy, link or value in the checkout. Never copy an
    account's `.android`, Godot settings, Gradle home, keystore or passwords.
 2. Confirm the **exclusive host Godot import/export window** with scheduling
-   first (iOS work has priority). In the worker Run, at the committed source
+   first. C-14 serializes with C-9: check ACASIS is mounted and at least 1.5 GB
+   free+inactive+speculative memory is available before starting. In the worker Run, at the committed source
    revision, use an absolute path to a new output directory with an existing parent:
 
    ```sh
-   tools/android/build_worker_apk.sh "$TMPDIR/candidate"
+   tools/android/build_worker_apk.sh --dynamic-farm "$TMPDIR/candidate"
    ```
+
+   The preview launches the existing parcel map, sets `online_qa` before autoload
+   startup, isolates the user directory and disables Journey endpoints in staging only.
+   It keeps the committed read-only dataset config and includes the raw map, scenery
+   and avatar JSON needed for 3D preview. Do not change the production project/presets.
 
    The script stages committed game sources in a disposable project, generates
    one non-runnable, `package/signed=false` APK preset, prepares the Gradle template + native
@@ -177,7 +186,7 @@ choose a production signing identity, install an app or authorize publication.
    value inferred from the APK itself):
 
    ```sh
-   python3 tools/android/worker_apk.py --presets export_presets.cfg verify \
+   python3 tools/android/worker_apk.py --variant dynamic-farm --presets export_presets.cfg verify \
      "$SIGNED_APK" --build-tools "$ANDROID_BUILD_TOOLS" --signer-sha256 "$APPROVED_CERT_SHA256"
    ```
 

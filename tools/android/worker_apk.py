@@ -9,6 +9,7 @@ import subprocess
 import zipfile
 
 from check_export_inputs import check_names
+import dynamic_farm_export as farm
 
 
 def require(condition, message):
@@ -16,7 +17,7 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def worker_preset(text):
+def worker_preset(text, dynamic_farm=False):
     # Godot config values aren't INI strings (e.g. PackedStringArray, dictionaries).
     # Preserve their encoding; take only the named non-store preset and its options.
     matches = [b for b in re.split(r'(?m)(?=^\[preset\.\d+\]$)', text)
@@ -35,6 +36,8 @@ def worker_preset(text):
         require(len(values) == 1, 'missing or ambiguous APK identity')
         return values[0]
 
+    if dynamic_farm:
+        header, options = farm.staged_preset(header, options)
     identity = dict(package=value(r'^package/unique_name="([a-zA-Z0-9_.]+)"$'),
                     version_code=value(r'^version/code=(\d+)$'), version_name=value(r'^version/name="([^"\n]+)"$'))
     options, count = re.subn(r'^package/signed=(?:true|false)$', 'package/signed=false', options, flags=re.M)
@@ -52,7 +55,7 @@ def checked_output(args):
     return p.stdout
 
 
-def inspect_zip(apk, unsigned):
+def inspect_zip(apk, unsigned, dynamic_farm=False):
     with apk.open('rb') as f, zipfile.ZipFile(f) as z:
         names = z.namelist()
         check_names(names)  # Must precede any member I/O, including CRC verification.
@@ -60,6 +63,11 @@ def inspect_zip(apk, unsigned):
         required = {'AndroidManifest.xml', 'classes.dex', 'assets/project.binary', 'assets/mapbox_token.txt',
                     'lib/arm64-v8a/libgodot_android.so', 'lib/arm64-v8a/libmapbox-maps.so',
                     'lib/arm64-v8a/libmapbox-common.so', 'lib/arm64-v8a/liblkjingle_peerconnection_so.so'}
+        if dynamic_farm:
+            required.update('assets/' + path for path in farm.RAW_FILES)
+            for scene in ('dynamic_farm_map', 'dynamic_farm_host', 'dynamic_farm'):
+                path = f'assets/scenes/dynamic_farm/{scene}.tscn'
+                require(path in names or path + '.remap' in names, 'missing dynamic farm scene: ' + scene)
         require(required <= set(names), 'missing Android, Godot or plugin payload')
         if unsigned:
             require(not any(re.match(r'^META-INF/(?:[^/]+\.(?:SF|RSA|DSA|EC)|SIG-[^/]+)$', n, re.I)
@@ -70,7 +78,7 @@ def inspect_zip(apk, unsigned):
 
 
 def inspect(apk, identity, build_tools, signer=None):
-    inspect_zip(apk, signer is None)
+    inspect_zip(apk, signer is None, identity['package'] == farm.PACKAGE)
     checked_output([build_tools / 'zipalign', '-c', '-P', '16', '4', apk])
     badging = checked_output([build_tools / 'aapt', 'dump', 'badging', apk])
     found = re.search(r"^package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging, re.M)
@@ -91,6 +99,7 @@ def inspect(apk, identity, build_tools, signer=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--presets', type=Path, required=True, help='preset file from the source revision')
+    parser.add_argument('--variant', choices=['android', 'dynamic-farm'], default='android')
     cmd = parser.add_subparsers(dest='cmd', required=True)
     cmd.add_parser('generate').add_argument('destination', type=Path)
     cmd.add_parser('check-unsigned').add_argument('apk', type=Path)
@@ -99,12 +108,13 @@ def main():
     check.add_argument('--build-tools', type=Path, required=True)
     check.add_argument('--signer-sha256', help='only for the C-500 result; must come from the approved identity')
     a = parser.parse_args()
-    preset, identity = worker_preset(a.presets.read_text())
+    preview = a.variant == 'dynamic-farm'
+    preset, identity = worker_preset(a.presets.read_text(), preview)
     if a.cmd == 'generate':
         with a.destination.open('x') as f:
             f.write(preset)
     elif a.cmd == 'check-unsigned':
-        inspect_zip(a.apk, True)
+        inspect_zip(a.apk, True, preview)
     else:
         print(json.dumps(inspect(a.apk, identity, a.build_tools, a.signer_sha256), sort_keys=True))
 

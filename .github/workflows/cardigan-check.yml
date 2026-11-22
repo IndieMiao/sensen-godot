@@ -9,7 +9,7 @@ on:
         required: true
         type: string
   pull_request:
-    branches: [farm-dev] # github.sha is the synthetic merge, not a moving PR head.
+    branches: [integration/dynamicfarm] # github.sha is the synthetic merge, not a moving PR head.
 
 permissions:
   contents: read
