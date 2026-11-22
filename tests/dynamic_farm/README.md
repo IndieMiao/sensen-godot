@@ -121,11 +121,18 @@ also do not change Mapbox SDK MVT/TileJSON retries or prove device Surface behav
 
 ## Model-fitted prop contacts
 
-`test_prop_proxies.gd` loads the actual 13 imported meshes. At full fit it checks
-projected triangles (a trunk-height mesh cross-section for trees), then checks the
-production build and walk paths at translated, rotated and scaled placements.
-The sampled contour check is not an AABB comparison. Flower/grass profiles are
-non-blocking even when placed in a new layout; player radius is counted once.
+`test_prop_proxies.gd` loads the actual 13 imported meshes (`prop_outline.gd`).
+Every full-fit primitive stays inside the model's top-down projection; tree
+primitives also stay inside the low trunk/root hull, except pine_03, whose three
+splayed roots no inscribed primitive can cover: it gets the smallest cylinder
+that does. At the default fit each solid footprint is at least 80% of its outline
+(area-equivalent size and widths along its axes). Against the real model, no
+trunk/root cross-section point (trees) or vertex (shrubs, rocks) is reachable by
+the walker's centre at a translated, rotated and scaled placement; approaches from
+16 directions stop within 3 cm of the model (pine_03 stops up to 7.5 cm short of
+its root hull between roots), and a command 6° into the touched face keeps sliding. Flower/grass profiles are non-blocking even when placed in a
+new layout; player radius is counted once. `tools/dev/dynamic_farm/fit_prop_proxies.gd`
+recomputes the solid profiles from the same meshes.
 
 For review, use the private offline preview project above, an empty output
 folder, and read-only farms from the pinned r4 dataset. For example:

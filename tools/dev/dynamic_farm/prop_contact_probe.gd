@@ -46,10 +46,10 @@ func _review(folder: String, role: String) -> void:
 		if item.role!=role: continue
 		var proxy := Scenery.Proxy.new(profiles[item.asset],item.transform,catalog.collision_fit_fraction)
 		var center := proxy.pose.origin * Vector3(1,0,1)
-		var normal := proxy.pose.basis.x
-		var tangent := proxy.pose.basis.z
-		var extent := (proxy.shape as CylinderShape3D).radius if proxy.shape is CylinderShape3D else (proxy.shape as BoxShape3D).size.x*0.5
-		var contact := center+normal*(extent+Walk.BODY_RADIUS) if proxy.solid else center
+		# Approach a capsule from its long side, where the model is flattest.
+		var normal := proxy.pose.basis.z if proxy.shape is CapsuleShape3D else proxy.pose.basis.x
+		var tangent := normal.cross(Vector3.UP)
+		var contact := center+normal*(proxy.reach(normal)+Walk.BODY_RADIUS) if proxy.solid else center
 		var start := contact+normal*1.5
 		# Find a clear approach and exit on the genuine layout, never move a prop.
 		if not walk.clear_position(start): continue

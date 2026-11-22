@@ -2,6 +2,8 @@ extends RefCounted
 ## Sparse, local-scene walking. No session, commands, navigation server or terrain generation.
 const NEIGHBORS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 const BODY_RADIUS := 0.3   # P0Actor.HALF_WIDTH_M; one fixed body clearance, independent of outfit.
+const CONTACT_PASSES := 3  # direct leg + up to two slides (e.g. into a corner)
+const SLIDE_CLEARANCE := 0.00001  # keeps a tangent leg from grazing the same face
 var data: Dictionary
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 # Conservative layout/connectivity mask; never a wall for the walker.
@@ -61,28 +63,53 @@ func move(displacement: Vector3) -> Vector3:
 	var step_count := maxi(1, ceili(displacement.length() / (cell_m * 0.18)))
 	var step := displacement / step_count
 	for _i in step_count:
-		if clear_position(position + step):
-			position += step
-		else:
+		var remaining := step
+		for _contact in CONTACT_PASSES:
+			if clear_position(position + remaining):
+				position += remaining
+				break
 			# Advance to contact before trying to slide; a low frame rate
 			# must not leave a full substep of empty ground before a tree.
 			var lo := 0.0
 			var hi := 1.0
-			for _j in 8:
+			for _j in 10:
 				var mid := (lo + hi) * 0.5
-				if clear_position(position + step * mid): lo = mid
+				if clear_position(position + remaining * mid): lo = mid
 				else: hi = mid
-			position += step * lo
-			var remainder := step * (1.0 - lo)
-			var x := Vector3(remainder.x, 0, 0)
-			var z := Vector3(0, 0, remainder.z)
-			var first := x if absf(step.x) >= absf(step.z) else z
-			var second := z if absf(step.x) >= absf(step.z) else x
-			if clear_position(position + first):
-				position += first
-			if clear_position(position + second):
-				position += second
+			var blocked := position + remaining * hi
+			position += remaining * lo
+			var rest := remaining * (1.0 - lo)
+			# Slide along the face actually touched: drop only the inward part.
+			# The next pass re-checks bounds and neighbouring props.
+			var normal := _blocking_normal(blocked, position)
+			var inward := rest.dot(normal)
+			if inward >= 0.0: break
+			remaining = rest - normal * (inward - SLIDE_CLEARANCE)
 	return position
+
+## Outward XZ normal at `from` of the nearest feature that blocks `p`.
+func _blocking_normal(p: Vector3, from: Vector3) -> Vector3:
+	var best := INF
+	var normal := Vector3.ZERO
+	for proxy: Proxy in _proxies_by_cell.get(cell_at(p), []):
+		var gap := proxy.gap(from)
+		if proxy.touches(p, BODY_RADIUS) and gap < best:
+			best = gap
+			normal = proxy.away(from)
+	var at := Vector2(p.x,-p.z) / cell_m + center_grid
+	var origin := Vector2(from.x,-from.z) / cell_m + center_grid
+	var radius := BODY_RADIUS / cell_m
+	for y in range(floori(at.y-radius),floori(at.y+radius)+1):
+		for x in range(floori(at.x-radius),floori(at.x+radius)+1):
+			if data.by_cell.has(Vector2i(x,y)): continue
+			if at.distance_to(Vector2(clampf(at.x,x,x+1),clampf(at.y,y,y+1))) >= radius: continue
+			var closest := Vector2(clampf(origin.x,x,x+1),clampf(origin.y,y,y+1))
+			var d := origin.distance_to(closest) * cell_m  # same measure as Proxy.gap()
+			if d < best and origin != closest:
+				best = d
+				var grid := (origin - closest).normalized()
+				normal = Vector3(grid.x, 0, -grid.y)
+	return normal
 
 func try_box(box: AABB, solid: bool) -> Array[Vector2i]:
 	var visual := Rect2(Vector2(box.position.x, box.position.z), Vector2(box.size.x, box.size.z))
