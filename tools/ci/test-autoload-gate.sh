@@ -62,7 +62,7 @@ EOF
 rc=0
 tools/run_tests.sh --ci-headless res://tests/p0 >gate.log 2>&1 || rc=$?
 if [[ $rc != 100 ]] || ! LC_ALL=C sed -E $'s/\033\\[[0-9;]*m//g' gate.log |
-    grep -Fq 'Overall Summary: 3 test cases | 0 errors | 1 failures |'; then
+    grep -F 'Overall Summary: 3 test cases | 0 errors | 1 failures |' >/dev/null; then
   cat gate.log >&2
   echo "Expected a failing p0 to exit 100 with all 3 cases run; exit=$rc" >&2
   exit 1
