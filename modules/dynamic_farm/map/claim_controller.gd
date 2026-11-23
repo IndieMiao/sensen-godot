@@ -28,8 +28,13 @@ func status(id: String) -> String:
 	if id.is_empty() or not owners.has(id): return "unknown"
 	return owners[id].owner
 
+## The claimer's display name as the server gave it; "" when the account has none.
+func owner_name(id: String) -> String:
+	return owners.get(id, {}).get("nickname", "")
+
+## Map label for a claimed parcel.
 func nickname(id: String) -> String:
-	var name: String = owners.get(id, {}).get("nickname", "")
+	var name := owner_name(id)
 	return name if not name.is_empty() else NO_NAME
 
 func has_home() -> bool:

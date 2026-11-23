@@ -170,7 +170,9 @@ func _render() -> void:
 		var p: Dictionary = _selector.selection
 		_details.text = "%s\n%d core · %d walk-only extension cells" % [p.name, p.core_cell_count, p.extension_cell_count]
 		if state == "mine": _details.text += "\nYour home"
-		elif state == "other": _details.text += "\nClaimed by %s" % _claims.nickname(id)
+		elif state == "other":
+			var owner: String = _claims.owner_name(id)
+			_details.text += ("\nClaimed by %s" % owner) if not owner.is_empty() else "\n" + Claims.NO_NAME
 		elif state == "none" and _claims.has_home(): _details.text += "\nYou already have a home."
 		elif state != "other" and _claims.signed_out: _details.text += "\nSign in to claim a home."
 	if not _claims.message.is_empty(): _details.text += "\n" + _claims.message
