@@ -1,7 +1,9 @@
 /**
  * fetch    --out <snapshot> --sources <label,...> [--bbox minLon,minLat,maxLon,maxLat]
- * build    --snapshot <snapshot> --out <dataset> --dataset-version <v> [--params <json>] [--only p-1,p-2]
+ * build    --snapshot <snapshot> --out <dataset> --dataset-version <v> [--params <json>] [--map-params <json>] [--only p-1,p-2]
  * validate --dataset <dataset> [--core-range current|relaxed]
+ * check-tiles --dataset <dataset> [--report <json>] [--properties <json>]
+ * tilejson --dataset <dataset> --base <https URL the dataset is served from>
  * compare  --dataset <dataset> --out <dir> --ids p-1,p-2 [--before <dir with older farms/*.json>]
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -9,10 +11,12 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { compareSvg } from './compare.js';
 import { resolveParams } from './config.js';
-import { buildDataset, writeDataset } from './dataset.js';
+import { buildDataset, TILEJSON_TEMPLATE, writeDataset } from './dataset.js';
 import type { Polygon } from './geo.js';
+import { resolveMapParams } from './mvt.js';
 import { loadSnapshot } from './snapshot.js';
 import { fetchSnapshot, sha256 } from './sources.js';
+import { checkTiles, deployTileJson, type TileReport } from './tilecheck.js';
 import { checkParcelProperties, CURRENT_CLIENT, decodeFarm, RELAXED } from './validate.js';
 
 function args(argv: string[]): Record<string, string> {
@@ -30,12 +34,12 @@ function need(a: Record<string, string>, key: string): string {
   return a[key];
 }
 
-/** Validates every farm and index feature of a written dataset; returns the number of failures. */
+/** Validates every file hash, farm, index feature and parcel tile of a written dataset; returns the number of failures. */
 export function validateDataset(dir: string, range = RELAXED, log = console.log): number {
   const manifest = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
   let failures = 0;
   for (const [file, hash] of Object.entries(manifest.files as Record<string, string>)) {
-    const body = readFileSync(path.join(dir, file), 'utf8');
+    const body = readFileSync(path.join(dir, file));
     if (sha256(body) !== hash) { log(`HASH ${file}`); failures++; }
   }
   const client = JSON.parse(readFileSync(path.join(dir, 'client-manifest.json'), 'utf8'));
@@ -48,8 +52,20 @@ export function validateDataset(dir: string, range = RELAXED, log = console.log)
     const result = decodeFarm(farm, range);
     if (!result.ok) { log(`FARM ${feature.properties.block_id}: ${result.error}`); failures++; }
   }
+  const tiles = checkTiles(dir).report;
+  logTileReport(tiles, log);
+  failures += tiles.error_count;
   log(`${index.features.length} farms checked, ${failures} failures`);
   return failures;
+}
+
+export function logTileReport(r: TileReport, log = console.log): void {
+  for (const [z, c] of Object.entries(r.zooms)) {
+    log(`z${z}: ${c.tiles} tiles, ${c.unique_parcels}/${r.index_parcels} parcels, ${c.missing_count} missing${c.missing_count ? ` (${c.missing_ids.slice(0, 10).join(', ')}${c.missing_count > 10 ? ', …' : ''})` : ''}, ${c.bytes} bytes, largest ${c.max_tile_bytes}`);
+  }
+  for (const e of r.errors) log(`TILE ${e}`);
+  if (r.error_count > r.errors.length) log(`TILE … ${r.error_count - r.errors.length} more`);
+  log(`tiles ${r.ok ? 'ok' : 'FAILED'}: ${r.tile_count} tiles, ${r.error_count} errors; ${r.tilejson}`);
 }
 
 export async function main(argv: string[]): Promise<number> {
@@ -65,7 +81,8 @@ export async function main(argv: string[]): Promise<number> {
     const params = resolveParams(a.params ? JSON.parse(readFileSync(a.params, 'utf8')) : {});
     const snap = loadSnapshot(need(a, 'snapshot'));
     const only = a.only ? new Set(a.only.split(',')) : undefined;
-    const result = buildDataset(snap, { dataset_version: need(a, 'dataset-version'), params, only }, console.log);
+    const map = resolveMapParams(a['map-params'] ? JSON.parse(readFileSync(a['map-params'], 'utf8')) : {});
+    const result = buildDataset(snap, { dataset_version: need(a, 'dataset-version'), params, map, only }, console.log);
     writeDataset(need(a, 'out'), result);
     console.log(`${result.reports.length} farms, ${result.excluded.length} excluded -> ${a.out}`);
     return 0;
@@ -73,6 +90,23 @@ export async function main(argv: string[]): Promise<number> {
   if (command === 'validate') {
     const range = a['core-range'] === 'current' ? CURRENT_CLIENT : RELAXED;
     return validateDataset(need(a, 'dataset'), range) === 0 ? 0 : 1;
+  }
+  if (command === 'check-tiles') {
+    const { report, properties } = checkTiles(need(a, 'dataset'));
+    logTileReport(report);
+    if (a.report) writeFileSync(a.report, `${JSON.stringify(report, null, 2)}\n`);
+    if (a.properties) writeFileSync(a.properties, `${JSON.stringify([...properties.values()], null, 2)}\n`);
+    return report.ok ? 0 : 1;
+  }
+  if (command === 'tilejson') {
+    const dir = need(a, 'dataset');
+    const manifest = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
+    const text = readFileSync(path.join(dir, TILEJSON_TEMPLATE), 'utf8');
+    if (sha256(text) !== manifest.files[TILEJSON_TEMPLATE]) throw new Error(`${TILEJSON_TEMPLATE} differs from manifest.json`);
+    const out = path.join(dir, 'tilejson.json');
+    writeFileSync(out, `${JSON.stringify(deployTileJson(JSON.parse(text), need(a, 'base')), null, 2)}\n`);
+    console.log(`${out} (not in manifest.json; pin it separately when deploying)`);
+    return 0;
   }
   if (command === 'compare') {
     const dir = need(a, 'dataset');
@@ -91,7 +125,7 @@ export async function main(argv: string[]): Promise<number> {
     }
     return 0;
   }
-  console.log(readFileSync(new URL(import.meta.url), 'utf8').split('\n').slice(1, 5).join('\n'));
+  console.log(readFileSync(new URL(import.meta.url), 'utf8').split('\n').slice(1, 7).join('\n'));
   return command ? 1 : 0;
 }
 

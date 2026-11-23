@@ -1,14 +1,17 @@
 /**
- * Builds a dataset directory from a snapshot: farms/<block_id>.json, the parcel index, the
- * building layer, client-manifest.json and a manifest with every file's SHA-256.
+ * Builds a dataset directory from a snapshot: farms/<block_id>.json, the parcel index, the parcel
+ * vector tiles and their TileJSON template, the building layer, client-manifest.json and a
+ * manifest with every file's SHA-256.
  * Output depends only on (snapshot, parameters, dataset_version): no clock, no randomness.
  */
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { slimPolygons } from './buildings.js';
 import { GENERATOR_VERSION, SCHEMA, type GeneratorParams } from './config.js';
 import { generateFarm } from './farm.js';
 import { bounds, insideRings, polygonArea, rotate, round, toUtm, type Point, type Polygon } from './geo.js';
 import { DIRS, LayoutError, type Dir } from './layout.js';
+import { encodeTiles, MVT_ENCODER, resolveMapParams, type MapLayerParams, type TileFeature, type TileValue } from './mvt.js';
 import { rasterize } from './raster.js';
 import { sha256 } from './sources.js';
 import type { BuildingRecord, ParcelRecord, Snapshot } from './snapshot.js';
@@ -16,6 +19,8 @@ import type { BuildingRecord, ParcelRecord, Snapshot } from './snapshot.js';
 export interface BuildOptions {
   dataset_version: string;
   params: GeneratorParams;
+  /** Map layer (tiles, building layer); defaults from src/mvt.ts. */
+  map?: MapLayerParams;
   /** Restrict the farms written (block ids); the index then lists only these. */
   only?: Set<string>;
 }
@@ -25,6 +30,8 @@ export interface ParcelReport {
   name: string;
   building_count: number;
   building_source: string;
+  /** area_id of each source footprint the farm was built from (in building_source). */
+  building_area_ids: number[];
   building_area_m2: number;
   parcel_area_m2: number;
   cell_m: number;
@@ -39,7 +46,8 @@ export interface ParcelReport {
 }
 
 export interface BuildResult {
-  files: Map<string, string>;
+  /** Relative path → contents; tiles/*.pbf are binary, everything else is UTF-8 text. */
+  files: Map<string, string | Uint8Array>;
   reports: ParcelReport[];
   excluded: { block_id: string; reason: string }[];
 }
@@ -181,6 +189,7 @@ function lonLatCentroid(polys: Polygon[]): Point {
 
 export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string) => void = () => {}): BuildResult {
   const p = opts.params;
+  const mapParams = opts.map ?? resolveMapParams();
   const projected: Projected[] = snap.parcels.map(record => {
     const utm = project(record.polygons);
     return { record, utm, bounds: bounds(utm.flat()) };
@@ -200,11 +209,12 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
     bySource.get(src)!.push(bi);
   });
 
-  const files = new Map<string, string>();
+  const files = new Map<string, string | Uint8Array>();
   const reports: ParcelReport[] = [];
   const excluded: BuildResult['excluded'] = [];
   const indexFeatures: unknown[] = [];
   const buildingFeatures: unknown[] = [];
+  const tileFeatures: TileFeature[] = [];
   const lonLatBounds_ = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
   for (let pi = 0; pi < projected.length; pi++) {
     const parcel = projected[pi];
@@ -252,24 +262,25 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
     lonLatBounds_.minY = Math.min(lonLatBounds_.minY, lb.minY);
     lonLatBounds_.maxX = Math.max(lonLatBounds_.maxX, lb.maxX);
     lonLatBounds_.maxY = Math.max(lonLatBounds_.maxY, lb.maxY);
-    indexFeatures.push({
-      type: 'Feature',
-      id: blockId,
-      properties: {
-        block_id: blockId, parcel_id: parcel.record.parcel_id, selection_unit: 'parcel',
-        name: parcel.record.name, address: parcel.record.address ?? '',
-        center: JSON.stringify(center), bbox: JSON.stringify(bbox), center_lon: center[0], center_lat: center[1],
-        farm_path: farmPath, cell_count: counts.core_cell_count,
-        core_cell_count: counts.core_cell_count, extension_cell_count: counts.extension_cell_count, total_cell_count: counts.total_cell_count,
-        source_area_m2: round(result.area_m2, 2), building_count: records.length, too_small: result.too_small,
-      },
-      geometry: geometryJson(parcel.record.polygons),
-    });
+    const properties: Record<string, TileValue> = {
+      block_id: blockId, parcel_id: parcel.record.parcel_id, selection_unit: 'parcel',
+      name: parcel.record.name, address: parcel.record.address ?? '',
+      center: JSON.stringify(center), bbox: JSON.stringify(bbox), center_lon: center[0], center_lat: center[1],
+      farm_path: farmPath, cell_count: counts.core_cell_count,
+      core_cell_count: counts.core_cell_count, extension_cell_count: counts.extension_cell_count, total_cell_count: counts.total_cell_count,
+      source_area_m2: round(result.area_m2, 2), building_count: records.length, too_small: result.too_small,
+    };
+    const geometry = geometryJson(parcel.record.polygons);
+    indexFeatures.push({ type: 'Feature', id: blockId, properties, geometry });
+    // The tiles carry the same outline and the same properties as the index feature.
+    const outline = (geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates) as Polygon[];
+    tileFeatures.push({ id: blockId, properties, polygons: outline });
     for (const b of records) {
-      buildingFeatures.push({ type: 'Feature', properties: { block_id: blockId, area_id: b.area_id }, geometry: geometryJson(b.polygons) });
+      buildingFeatures.push({ type: 'Feature', properties: { block_id: blockId }, geometry: shape(slimPolygons(b.polygons, mapParams)) });
     }
     reports.push({
       block_id: blockId, name: parcel.record.name, building_count: records.length, building_source: chosen,
+      building_area_ids: records.map(b => b.area_id),
       building_area_m2: round(result.area_m2, 2),
       parcel_area_m2: round(parcel.utm.reduce((s, poly) => s + polygonArea(poly), 0), 2),
       cell_m: result.cell_m, cell_area_m2: round(result.cell_m * result.cell_m, 4), rotation_deg: result.rotation_deg,
@@ -283,6 +294,16 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
   const bboxAll = [lonLatBounds_.minX, lonLatBounds_.minY, lonLatBounds_.maxX, lonLatBounds_.maxY].map(q7);
   files.set('index.geojson', JSON.stringify({ type: 'FeatureCollection', features: indexFeatures }));
   files.set('buildings.geojson', JSON.stringify({ type: 'FeatureCollection', features: buildingFeatures }));
+  const tiles = encodeTiles(tileFeatures, mapParams);
+  for (const [name, body] of tiles) files.set(name, body);
+  const tileStats: Record<string, { tiles: number; bytes: number; max_tile_bytes: number }> = {};
+  for (const [name, body] of tiles) {
+    const z = name.split('/')[1];
+    const s = (tileStats[z] ??= { tiles: 0, bytes: 0, max_tile_bytes: 0 });
+    s.tiles++; s.bytes += body.length; s.max_tile_bytes = Math.max(s.max_tile_bytes, body.length);
+  }
+  const center = [q7((bboxAll[0] + bboxAll[2]) / 2), q7((bboxAll[1] + bboxAll[3]) / 2)];
+  files.set(TILEJSON_TEMPLATE, `${JSON.stringify(tileJsonTemplate(tileFeatures, mapParams, bboxAll, center), null, 2)}\n`);
   const report = {
     dataset_version: opts.dataset_version,
     generator_version: GENERATOR_VERSION,
@@ -303,22 +324,34 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
 
   const fileHashes: Record<string, string> = {};
   for (const name of [...files.keys()].sort()) fileHashes[name] = sha256(files.get(name)!);
+  // r4 map-layer keys (geo_map_config.gd): parcels from vector tiles through tilejson.json, which
+  // the host writes from tilejson.template.json once the public base URL is known (`cli tilejson`).
   const native = {
-    type: 'geojson', parcel_url_path: 'index.geojson', promote_id: 'block_id',
-    minzoom: 16, address_minzoom: 18, bounds: bboxAll,
-    center: [q7((bboxAll[0] + bboxAll[2]) / 2), q7((bboxAll[1] + bboxAll[3]) / 2)],
+    type: 'vector', parcel_url_path: 'tilejson.json', parcel_source_layer: 'parcels', promote_id: 'block_id',
+    source_minzoom: mapParams.tile_minzoom, source_maxzoom: mapParams.tile_maxzoom,
+    minzoom: 16, address_minzoom: 18, bounds: bboxAll, center,
     initial_zoom: 17.5, building_source: 'datasf', buildings_url_path: 'buildings.geojson',
   };
   const manifest = {
     schema: SCHEMA,
     dataset_version: opts.dataset_version,
     selection_unit: 'parcel',
-    map_format: 'geojson',
+    map_format: 'mvt',
     generator_version: GENERATOR_VERSION,
     parcel_count: reports.length,
     block_count: reports.length,
     counts: report.totals,
     generator: { version: GENERATOR_VERSION, parameters: p },
+    map_layer: {
+      tile_encoder: MVT_ENCODER,
+      tippecanoe: 'not used; tiles come from the built-in encoder (src/mvt.ts)',
+      source_layer: 'parcels',
+      tile_format: 'MVT 2.1, uncompressed, XYZ tiles/{z}/{x}/{y}.pbf',
+      tilejson_template: TILEJSON_TEMPLATE,
+      parameters: mapParams,
+      tiles: tileStats,
+      buildings: 'buildings.geojson: one feature per used footprint, block_id only, lon/lat rounded and simplified (parameters)',
+    },
     sources: {
       snapshot_manifest_sha256: snap.manifest_sha256,
       bbox: snap.manifest.bbox,
@@ -350,8 +383,33 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
 }
 
 function geometryJson(polys: Polygon[]) {
-  const coords = polys.map(poly => poly.map(ring => ring.map(([x, y]) => [q7(x), q7(y)])));
+  return shape(polys.map(poly => poly.map(ring => ring.map(([x, y]) => [q7(x), q7(y)]))));
+}
+
+function shape(coords: number[][][][]) {
   return coords.length === 1 ? { type: 'Polygon', coordinates: coords[0] } : { type: 'MultiPolygon', coordinates: coords };
+}
+
+export const TILEJSON_TEMPLATE = 'tilejson.template.json';
+export const PUBLIC_BASE = '{PUBLIC_BASE}';
+
+function tileJsonTemplate(features: TileFeature[], p: MapLayerParams, bbox: number[], center: number[]) {
+  const fields: Record<string, string> = {};
+  for (const f of features) {
+    for (const [key, value] of Object.entries(f.properties)) fields[key] ??= typeof value === 'string' ? 'String' : typeof value === 'number' ? 'Number' : 'Boolean';
+  }
+  return {
+    tilejson: '2.2.0',
+    name: 'Dynamic Farm SF parcels',
+    scheme: 'xyz',
+    tiles: [`${PUBLIC_BASE}/tiles/{z}/{x}/{y}.pbf`],
+    minzoom: p.tile_minzoom,
+    maxzoom: p.tile_maxzoom,
+    bounds: bbox,
+    center: [...center, 17.5],
+    attribution: 'DataSF (PDDL 1.0)',
+    vector_layers: [{ id: 'parcels', minzoom: p.tile_minzoom, maxzoom: p.tile_maxzoom, fields }],
+  };
 }
 
 /** Replaces `dir` only if it is empty or holds an earlier dataset (client-manifest.json). */

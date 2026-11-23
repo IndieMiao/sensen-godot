@@ -63,7 +63,7 @@ export interface SnapshotFile { file: string; sha256: string; count: number }
 export interface SnapshotSource extends SourceDef { metadata: Record<string, unknown>; files: SnapshotFile[]; bbox: number[] | null }
 export interface SnapshotManifest { snapshot_schema: 1; fetched_at: string; bbox: number[] | null; sources: SnapshotSource[] }
 
-export const sha256 = (data: string | Buffer) => createHash('sha256').update(data).digest('hex');
+export const sha256 = (data: string | Uint8Array) => createHash('sha256').update(data).digest('hex');
 
 async function getText(url: string): Promise<string> {
   for (let attempt = 1; ; attempt++) {
