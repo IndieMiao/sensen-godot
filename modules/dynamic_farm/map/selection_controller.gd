@@ -11,6 +11,10 @@ const FarmData := preload("res://modules/dynamic_farm/farm_data.gd")
 const QUERY_RETRY_DELAY_MS := 600 # Default before the single automatic re-query; config query_retry_delay_ms overrides.
 const QUERY_TIMEOUT_S := 8.0
 const QUERY_FAILED := "Parcel details could not load. Tap Retry."
+const MAP_FAILED := "Map details could not load. Tap Retry."
+const FINDING := "Finding parcel…"
+# Definite native answers: retrying cannot change them, so they are not failures.
+const SETTLED := {"building_without_parcel": "No selectable parcel here.", "invalid_point": "No selectable parcel here.", "too_many_candidates": "Zoom in to choose a farm."}
 var api: Node
 var bridge: MapBridge
 var config: Dictionary = {}
@@ -30,13 +34,19 @@ var _retry_left := -1.0
 var _retried := false
 var _point := Vector2.ZERO
 var _query_failed := false
+var _map_retried := false
+var _reload_left := -1.0
+var _resume_tap := false
 var _kind := "parcel"
 var _key := ""
 var _highlighted_parcel := ""
 var _options: Array = []
 var _connected := false
 
-func activate() -> void:
+## auto=true is the single automatic reload after a map load error; it keeps the waiting tap.
+func activate(auto := false) -> void:
+	if not auto: _map_retried = false; _resume_tap = false
+	_reload_left = -1.0
 	_clear_parcel_selection()
 	suspended = false
 	_epoch += 1
@@ -51,7 +61,7 @@ func activate() -> void:
 		bridge.parcel_error.connect(_native_error)
 		_connected = true
 	map_ready = false; busy = true; selection = {}; _options = []; _pending = -1; _retry_left = -1.0; _query_failed = false
-	message = "Loading dynamic farm map…"; changed.emit()
+	message = FINDING if _resume_tap else "Loading dynamic farm map…"; changed.emit()
 	var pin := str(config.get("manifest_sha256", ""))
 	if RegEx.create_from_string("^[0-9a-f]{64}$").search(pin) == null or config.get("dataset_version") != Contract.DATASET:
 		_record_load("client_manifest", "configuration_rejected", epoch, started)
@@ -69,11 +79,12 @@ func activate() -> void:
 	manifest = data
 	if generation > 0: bridge.clear_parcel_layers(generation)
 	generation = MapBridge.next_parcel_generation(); style_generation = -1
-	busy = false; message = "Loading map details…"; changed.emit()
+	busy = false; message = FINDING if _resume_tap else "Loading map details…"; changed.emit()
 	bridge.set_parcel_sources(generation, JSON.stringify(native))
 
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; _retry_left = -1.0; _query_failed = false; map_ready = false; busy = false
+	_reload_left = -1.0; _resume_tap = false
 	selection = {}; _options = []; _key = ""
 	_highlighted_parcel = ""
 	if api != null: api.cancel_all()
@@ -89,17 +100,28 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 		_pending = -1; _retry_left = -1.0; _query_failed = false; selection = {}; _options = []; _key = ""
 	style_generation = style
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
-	if map_ready and _querying(): message = "Finding parcel…" # Native idle readiness arrives while a tap waits.
+	if map_ready and _resume_tap:
+		# The reloaded map answers the tap that its load error interrupted; that was the tap's one retry.
+		_resume_tap = false; message = FINDING; changed.emit(); _send_query(); return
+	if _querying(): message = FINDING # Native idle readiness arrives while a tap waits.
 	else: message = "Tap a building or open ground to preview a farm." if map_ready else "Loading map details…"
 	changed.emit()
 
-func _native_error(gen: int, style: int, _code: String) -> void:
+func _native_error(gen: int, style: int, code: String) -> void:
 	if suspended or gen != generation or style < style_generation: return
+	var tap := _querying()
+	var retry_sent := _retried and _retry_left < 0.0 # A scheduled, unsent re-query is replaced by the reload.
 	map_ready = false; _pending = -1; _retry_left = -1.0; _query_failed = false
-	_fail("Map details could not load. Tap Retry.")
+	# Offline tiles and service failures arrive here, not as query answers. Reload once before telling the player.
+	var retry := not _map_retried and not (tap and retry_sent)
+	print("DYNAMIC_MAP_ERROR ", JSON.stringify({"code":code, "tap":tap, "retry":retry}))
+	if not retry: _fail(MAP_FAILED); return
+	_map_retried = true; _resume_tap = tap; _retried = _retried or tap
+	busy = true; _reload_left = retry_delay()
+	message = FINDING if tap else "Loading map details…"; changed.emit()
 
 func camera_changed() -> void:
-	_pending = -1; _retry_left = -1.0; _query_failed = false; _options = []
+	_pending = -1; _retry_left = -1.0; _query_failed = false; _resume_tap = false; _options = []
 	if map_ready and not busy:
 		message = "Tap a building or open ground to preview a farm."; changed.emit()
 
@@ -120,8 +142,8 @@ func retry() -> void:
 	else: activate()
 
 func _start_query() -> void:
-	message = "Finding parcel…"; changed.emit()
-	_retried = false; _retry_left = -1.0; _query_failed = false
+	message = FINDING; changed.emit()
+	_retried = false; _retry_left = -1.0; _query_failed = false; _map_retried = false
 	_send_query()
 
 func _send_query() -> void:
@@ -129,16 +151,21 @@ func _send_query() -> void:
 	bridge.query_parcel_at(_request, generation, _point)
 
 func _querying() -> bool:
-	return _pending >= 0 or _retry_left >= 0.0
+	return _pending >= 0 or _retry_left >= 0.0 or _resume_tap
 
 func retry_delay() -> float:
-	return clampf(float(config.get("query_retry_delay_ms", QUERY_RETRY_DELAY_MS)), 0.0, 5000.0) / 1000.0
+	var raw = config.get("query_retry_delay_ms", QUERY_RETRY_DELAY_MS)
+	if not (raw is int or raw is float): raw = QUERY_RETRY_DELAY_MS
+	return clampf(float(raw), 0.0, 5000.0) / 1000.0
 
 func _query_result(request: int, gen: int, style: int, payload: String) -> void:
 	if suspended or busy or gen != generation or style != style_generation or request != _pending: return
 	_pending = -1
 	var data := _parse(payload)
 	var code := str(data.get("error", ""))
+	if SETTLED.has(code):
+		_record_query(request, code, false)
+		message = SETTLED[code]; changed.emit(); return
 	if not code.is_empty() or not data.get("parcel_ids") is Array or not data.get("properties") is Array:
 		_query_error(request, "malformed" if code.is_empty() else code); return
 	_kind = str(data.get("kind", "")); _key = str(data.get("building_key", ""))
@@ -213,6 +240,12 @@ func _record_query(request: int, outcome: String, retry: bool) -> void:
 	print("DYNAMIC_QUERY ", JSON.stringify({"request":request, "outcome":outcome, "attempt":2 if _retried else 1, "retry":retry}))
 
 func _process(delta: float) -> void:
+	if _reload_left >= 0.0:
+		_reload_left -= delta
+		if _reload_left < 0.0:
+			_reload_left = -1.0
+			if not suspended: activate(true)
+		return
 	if _retry_left >= 0.0:
 		_retry_left -= delta
 		if _retry_left < 0.0:
@@ -226,7 +259,7 @@ func _process(delta: float) -> void:
 		_pending = -1; _fail("The map did not respond. Tap again or Retry.")
 
 func _fail(text: String) -> void:
-	busy = false; message = text; changed.emit()
+	busy = false; _resume_tap = false; message = text; changed.emit()
 
 static func _parse(text: String) -> Dictionary:
 	var parser := JSON.new()

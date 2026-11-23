@@ -94,6 +94,51 @@ func first_tap_retry() -> void:
 	check(is_equal_approx(controller.retry_delay(), 5.0), "configured retry delay is bounded")
 	controller.config.erase("query_retry_delay_ms")
 	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "missing configuration uses the default delay")
+func map_error(code := "parcels_source_load_failed") -> void:
+	native.parcel_error.emit(controller.generation, controller.style_generation, code)
+func reload() -> void:
+	controller._process(controller.retry_delay() + .01)
+	for i in 4: await process_frame
+func map_error_retry() -> void:
+	# Offline/service failures reach Godot as map load errors, not query answers (W-69 P5/P6).
+	var sent := native.queries.size(); var boots := native.sources.size(); var old_generation: int = controller.generation
+	controller.tap(Vector2(.3, .7), 18); answer("loading"); map_error()
+	check(controller.message == "Finding parcel…" and controller.message != Controller.MAP_FAILED, "map load error during a waiting re-query keeps loading feedback")
+	await reload()
+	check(native.sources.size() == boots + 1 and controller.generation > old_generation, "map load error triggers one automatic map reload")
+	ready_signal()
+	check(native.queries.size() == sent + 2 and native.queries.back()[2] == Vector2(.3, .7) and native.queries.back()[1] == controller.generation, "reloaded map answers the interrupted tap at the same point")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A", "interrupted tap selects after the automatic reload")
+	sent = native.queries.size(); boots = native.sources.size()
+	controller.tap(Vector2(.3, .7), 18); map_error("building_load_failed")
+	await reload(); ready_signal(); answer("query_failed")
+	check(controller.message == Controller.QUERY_FAILED and native.queries.size() == sent + 2, "tap whose one retry was the reload reports after that retry fails")
+	controller._process(5.0)
+	check(native.queries.size() == sent + 2 and native.sources.size() == boots + 1, "no second automatic retry after the reload")
+	controller.tap(Vector2(.3, .7), 18); map_error(); await reload(); map_error()
+	check(controller.message == Controller.MAP_FAILED and not controller.busy, "map error after the automatic reload shows the map failure")
+	boots = native.sources.size(); controller._process(5.0); for i in 4: await process_frame
+	check(native.sources.size() == boots, "map failure is not reloaded again automatically")
+	controller.retry(); for i in 4: await process_frame
+	check(native.sources.size() == boots + 1, "Retry after a map failure reloads the map")
+	ready_signal()
+	controller.tap(Vector2(.3, .7), 18); answer("loading"); controller._process(controller.retry_delay() + .01); map_error()
+	check(controller.message == Controller.MAP_FAILED, "map error after the tap already used its retry reports at once")
+	controller.retry(); for i in 4: await process_frame
+	ready_signal(); map_error(); await reload(); ready_signal()
+	check(controller.map_ready and controller.message.begins_with("Tap a building"), "idle map error reloads once without a tap")
+	sent = native.queries.size()
+	for code in ["building_without_parcel", "invalid_point", "too_many_candidates"]:
+		controller.tap(Vector2(.3, .7), 18); answer(code); controller._process(5.0)
+		check(native.queries.size() == sent + 1 and controller.message == Controller.SETTLED[code], code + " is a definite answer, not retried or reported as a failure")
+		sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18); answer("loading"); controller.tap(Vector2(.6, .2), 18)
+	controller._process(controller.retry_delay() + .01)
+	check(native.queries.size() == sent + 2 and native.queries.back()[2] == Vector2(.6, .2), "new tap during a waiting re-query replaces it")
+	controller.config.query_retry_delay_ms = null
+	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "non-numeric retry delay falls back to the default")
+	controller.config.erase("query_retry_delay_ms")
 func _run() -> void:
 	api = Api.new(); api.transport = transport; root.add_child(api)
 	native = Native.new(); controller = Controller.new(); controller.api = api; controller.bridge = native
@@ -148,6 +193,7 @@ func _run() -> void:
 	controller.tap(Vector2(.5, .5), 18); controller._process(9.0)
 	check(controller._pending == -1 and controller.message.contains("did not respond"), "missing query callback expires with retry feedback")
 	await first_tap_retry()
+	await map_error_retry()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame
