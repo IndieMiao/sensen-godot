@@ -46,6 +46,42 @@ func reply(kind: String, rows: Array, key := "", provider := "mapbox") -> void:
 	native.parcel_query_result.emit(request[0], request[1], controller.style_generation,
 		JSON.stringify({"kind":kind,"parcel_ids":rows.map(func(row: Dictionary): return row.block_id),
 		"properties":rows,"building_key":key,"building_source":provider,"error":""}))
+func answer(error: String, rows: Array = []) -> void:
+	var request: Array = native.queries.back()
+	native.parcel_query_result.emit(request[0], request[1], controller.style_generation,
+		JSON.stringify({"kind":"none" if rows.is_empty() else "parcel","parcel_ids":rows.map(func(row: Dictionary): return row.block_id),
+		"properties":rows,"building_key":"","building_source":"mapbox","error":error}))
+func first_tap_retry() -> void:
+	# C-27: native "loading" on a first tap re-queries once and keeps the loading hint instead of the error.
+	var sent := native.queries.size()
+	controller.tap(Vector2(.4, .4), 18); answer("loading")
+	check(controller.message == "Finding parcel…" and controller.selection.is_empty(), "first transient failure keeps loading feedback, not the error")
+	controller._process(controller.retry_delay() * .5)
+	check(native.queries.size() == sent + 1, "re-query waits for the retry delay")
+	controller._process(controller.retry_delay())
+	check(native.queries.size() == sent + 2 and native.queries.back()[2] == Vector2(.4, .4), "single automatic re-query uses the same tapped point")
+	ready_signal(controller.style_generation)
+	check(controller.message == "Finding parcel…", "native idle readiness during a pending tap keeps loading feedback")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A" and not controller.message.contains("Could not check"), "first tap selects after the automatic re-query")
+	controller.tap(Vector2(.4, .4), 18); answer("query_failed"); controller._process(controller.retry_delay() + .01)
+	answer("building_load_failed")
+	check(controller.message == "Could not check that location. Tap again." and not controller.busy, "persistent failure still reports after exactly one re-query")
+	controller._process(5.0)
+	check(native.queries.size() == sent + 4, "no further automatic queries after the reported failure")
+	controller.tap(Vector2(.4, .4), 18); answer("", [Fixture.metadata("p-B")])
+	check(controller.selection.get("block_id") == "p-B", "manual tap after a reported failure works")
+	controller.tap(Vector2(.4, .4), 18); answer("loading"); controller.camera_changed(); controller._process(5.0)
+	check(native.queries.size() == sent + 6 and controller.message.begins_with("Tap a building"), "camera move cancels a waiting re-query")
+	controller.tap(Vector2(.4, .4), 18); answer("loading"); controller.pause(); controller._process(5.0)
+	check(native.queries.size() == sent + 7, "pause cancels a waiting re-query")
+	await controller.activate(); ready_signal()
+	controller.config.query_retry_delay_ms = 1500
+	check(is_equal_approx(controller.retry_delay(), 1.5), "retry delay is configurable")
+	controller.config.query_retry_delay_ms = 999999
+	check(is_equal_approx(controller.retry_delay(), 5.0), "configured retry delay is bounded")
+	controller.config.erase("query_retry_delay_ms")
+	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "missing configuration uses the default delay")
 func _run() -> void:
 	api = Api.new(); api.transport = transport; root.add_child(api)
 	native = Native.new(); controller = Controller.new(); controller.api = api; controller.bridge = native
@@ -99,6 +135,7 @@ func _run() -> void:
 	check(controller.map_ready, "late readiness from old visit cannot replace current state")
 	controller.tap(Vector2(.5, .5), 18); controller._process(9.0)
 	check(controller._pending == -1 and controller.message.contains("did not respond"), "missing query callback expires with retry feedback")
+	await first_tap_retry()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame
