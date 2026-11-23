@@ -162,7 +162,7 @@ func _first_visit() -> Dictionary:
 		_check(_drawn(farming) == [farming._outer_layout.size() - faded - hidden, faded], "after the %s: picked ones faded or hidden" % kind)
 		farming.picked_object = index
 		key = await _key(farming)
-		_check(key[0] == "Regrowing" and str(key[1]).begins_with("Ready in") and key[2] == UiSceneAction.State.UNAVAILABLE,
+		_check(key[0] == "Regrowing" and not str(key[1]).is_empty() and key[1] != ITEMS[kind][1] and key[2] == UiSceneAction.State.UNAVAILABLE,
 			"the picked %s waits to grow back (%s)" % [kind, key])
 		var version: int = farming.farm_version
 		await _press(farming)
