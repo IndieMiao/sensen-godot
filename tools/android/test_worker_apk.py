@@ -441,6 +441,9 @@ class GradleDistSeed(unittest.TestCase):
         self.seed.mkdir()
         cases = [(TEMPLATE_WRAPPER, 'no gradle-8.11.1-bin.zip in seed'),  # Seed holds another version only.
                  (TEMPLATE_WRAPPER.replace('8.11.1', '8.12'), 'no official sha256'),
+                 # A digest pinned in the template is not trusted in place of the built-in official one.
+                 (TEMPLATE_WRAPPER.replace('8.11.1', '8.12') + 'distributionSha256Sum=' + 'b' * 64 + '\n',
+                  'no official sha256'),
                  (TEMPLATE_WRAPPER + 'distributionSha256Sum=' + 'a' * 64 + '\n', 'differs from the official'),
                  (TEMPLATE_WRAPPER.replace('distributionPath=wrapper/dists', 'distributionPath=x'), 'non-default'),
                  (TEMPLATE_WRAPPER.replace('https', 'http'), 'no https distributionUrl')]
@@ -453,6 +456,16 @@ class GradleDistSeed(unittest.TestCase):
                 self.assertIn('will download', message)
                 self.assertFalse(self.state.exists())
                 self.assertEqual([path for path in self.home.rglob('*') if path.is_file()], [])
+
+    def test_install_failure_after_verification_falls_back_to_download(self):
+        self.put_seed(self.payload)
+        state = self.tmp / 'absent-directory/gradle-seed.json'  # The state file cannot be written.
+        with patch('sys.stderr') as err:
+            self.assertFalse(seeding.seed(self.props, self.home, state, self.seed))
+        message = ''.join(call.args[0] for call in err.write.call_args_list)
+        self.assertIn('cannot install', message)
+        self.assertIn('will download', message)
+        self.assertEqual([path for path in self.home.rglob('*') if path.is_file()], [])
 
     def test_build_script_seeds_after_template_setup_and_checks_after_export(self):
         script = (ROOT / 'tools/android/build_worker_apk.sh').read_text()

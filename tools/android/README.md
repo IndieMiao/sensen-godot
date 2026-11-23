@@ -213,7 +213,11 @@ choose a production signing identity, install an app or authorize publication.
    SHA-256 matches the official value (pinned in `OFFICIAL_SHA256`). A mismatched,
    missing or unverifiable seed is reported on stderr and the wrapper downloads as before;
    with no seed directory nothing changes. After export it reports whether the seeded zip
-   was used. Dependency caches are never shared, and `gradle-wrapper.properties` is unchanged. Template and APK directory
+   was used. Dependency caches are never shared, and `gradle-wrapper.properties` is unchanged.
+   When the Android template moves to another Gradle version, add that version's official
+   digest to `OFFICIAL_SHA256`; until then builds fall back to downloading.
+
+   Template and APK directory
    entries are screened for keystores and `export_credentials.cfg` before any
    member is opened for extraction or CRC checks. It refuses signing metadata
    **before** alignment as well as afterwards. Success produces `unsigned.apk`,

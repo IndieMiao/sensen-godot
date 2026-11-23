@@ -72,13 +72,13 @@ def plan(properties_text):
     name = Path(urlparse(url).path).name
     if not url.startswith('https://') or not name.endswith('.zip'):
         raise ValueError('wrapper has no https distributionUrl to a zip')
+    # Only the built-in official digest is trusted; a value pinned in the template is not a substitute.
     official, pinned = OFFICIAL_SHA256.get(name), props.get('distributionSha256Sum', '').lower() or None
-    if official and pinned and official != pinned:
-        raise ValueError(f'pinned sha256 for {name} differs from the official value')
-    expected = pinned or official
-    if not expected:
+    if not official:
         raise ValueError(f'no official sha256 known for {name}')
-    return name, Path(name[:-len('.zip')]) / url_hash(url), expected
+    if pinned and official != pinned:
+        raise ValueError(f'pinned sha256 for {name} differs from the official value')
+    return name, Path(name[:-len('.zip')]) / url_hash(url), official
 
 
 def seed(properties, gradle_home, state, source_root):
@@ -114,10 +114,16 @@ def seed(properties, gradle_home, state, source_root):
         note(f'not used (sha256 mismatch for {name}: expected {expected}, got {digest.hexdigest()}); '
              'Gradle wrapper will download the distribution')
         return False
-    os.rename(part, target)
-    info = target.stat()
-    state.write_text(json.dumps({'zip': str(target), 'sha256': expected, 'inode': info.st_ino,
-                                 'size': info.st_size, 'mtime_ns': info.st_mtime_ns}) + '\n')
+    try:
+        os.rename(part, target)
+        info = target.stat()
+        state.write_text(json.dumps({'zip': str(target), 'sha256': expected, 'inode': info.st_ino,
+                                     'size': info.st_size, 'mtime_ns': info.st_mtime_ns}) + '\n')
+    except OSError:
+        for leftover in (part, target, state):
+            leftover.unlink(missing_ok=True)
+        note(f'not used (cannot install {name} into the Gradle home); Gradle wrapper will download the distribution')
+        return False
     note(f'{name} sha256 verified and copied; Gradle wrapper download skipped')
     return True
 
