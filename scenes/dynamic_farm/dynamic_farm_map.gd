@@ -1,19 +1,35 @@
 extends Control
-## Separate farm-dev art entry. No account, claim, choose_home or old-farm state writes.
+## Dynamic farm map. Its only server write is the C-32 first-home claim (and, in internal test packages,
+## giving that home up); no choose_home or old-farm state writes.
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
+const Claims := preload("res://modules/dynamic_farm/map/claim_controller.gd")
+const ClaimApi := preload("res://modules/dynamic_farm/map/claim_api.gd")
+const FakeParcelServer := preload("res://modules/dynamic_farm/map/fake_parcel_server.gd")
 const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
+const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 const OCCLUSION_COLOR := "#E7F0DF" # Existing scene BG_COLOR(.906, .941, .875), opaque RGB.
+const AREA_REFRESH_SECONDS := 0.8
+## Development stand-in for the C-31 server, shared by map visits in one run.
+static var _fake_server: RefCounted
 var _selector: Node
+var _claims: Node
 var _camera: Control
 var _bridge: MapBridge
 var _hud: Control
 var _message: Label
 var _details: Label
 var _open: Button
+var _claim: Button
+var _confirm: Control
+var _enter: Button
+var _reselect: Button
+var _sign_in: Button
+var _area_timer: Timer
+var _area_generation := -1
 var _retry: Button
 var _choices: OptionButton
 var _candidate_ids: Array[String] = []
@@ -42,12 +58,35 @@ func _ready() -> void:
 	_selector = Selection.new(); _selector.config = parser.data; _selector.bridge = _bridge
 	var api := Api.new(); add_child(api); _selector.api = api; add_child(_selector)
 	_selector.changed.connect(_render)
+	_claims = Claims.new(); _claims.bridge = _bridge; _claims.api = _claim_api()
+	_claims.reselect = bool(ProjectSettings.get_setting("sensen/dynamic_farm/reselect", false))
+	_claims.changed.connect(_render); add_child(_claims)
 	_selector.candidates_found.connect(_show_candidates)
 	_selector.farm_ready.connect(_open_host)
 	_camera.tapped.connect(func(point: Vector2): _selector.tap(point, _camera.zoom))
 	_camera.camera_changed.connect(_selector.camera_changed)
+	_camera.camera_changed.connect(func(): _area_timer.start(AREA_REFRESH_SECONDS))
 	_camera.setup_map(_bridge, token)
 	_selector.activate()
+	_start_claims()
+
+## Isolated test builds skip Net's boot. Internal packages may reload the saved account token only
+## (`sensen/dynamic_farm/account_restore`); nothing here signs in anonymously.
+func _start_claims() -> void:
+	var net := get_node_or_null("/root/Net")
+	if net != null and not _fake_claims() and bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)):
+		await net.restore_saved_account()
+	if is_inside_tree() and not _suspended: _claims.start()
+
+func _fake_claims() -> bool:
+	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/fake_claims", false))
+
+func _claim_api() -> RefCounted:
+	if _fake_claims():
+		if _fake_server == null: _fake_server = FakeParcelServer.new()
+		return ClaimApi.new(_fake_server.client(str(ProjectSettings.get_setting("sensen/dynamic_farm/fake_player", "fake-a"))))
+	var net := get_node_or_null("/root/Net")
+	return ClaimApi.new(net.client if net != null else null)
 
 func _build_ui() -> void:
 	_hud = Control.new(); _hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -66,7 +105,17 @@ func _build_ui() -> void:
 		if index >= 0 and index < _candidate_ids.size():
 			_selector.choose(_candidate_ids[index]); _choices.hide())
 	bottom.add_child(_choices)
+	_claim = _button("Make this my first home", func(): _confirm.show(); _render()); _claim.hide(); bottom.add_child(_claim)
+	_confirm = VBoxContainer.new(); _confirm.hide(); bottom.add_child(_confirm)
+	_confirm.add_child(_label("Claim this parcel? You can only have one home.", 14))
+	var answer := HBoxContainer.new(); _confirm.add_child(answer)
+	answer.add_child(_button("Claim", _claim_selection))
+	answer.add_child(_button("Cancel", func(): _confirm.hide(); _render()))
+	_enter = _button("Enter my farm", _preview); _enter.hide(); bottom.add_child(_enter)
 	_open = _button("Preview in 3D", _preview); _open.disabled = true; bottom.add_child(_open)
+	_reselect = _button("Give up and choose again", _abandon); _reselect.hide(); bottom.add_child(_reselect)
+	_sign_in = _button("Sign in", _open_sign_in); _sign_in.hide(); bottom.add_child(_sign_in)
+	_area_timer = Timer.new(); _area_timer.one_shot = true; _area_timer.timeout.connect(_refresh_area); add_child(_area_timer)
 	bottom.add_child(_label("Explore and walk. Farming actions come later.", 12))
 	var credits := HBoxContainer.new(); bottom.add_child(credits)
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
@@ -101,12 +150,31 @@ func _render() -> void:
 		_framed = true; _reset_area()
 	_message.text = _selector.message
 	_retry.disabled = _selector.busy or _opening
-	_open.disabled = _selector.busy or not _selector.map_ready or _selector.selection.is_empty() or _opening
-	_camera.input_enabled = not _selector.busy and not _opening
-	if _selector.selection.is_empty(): _details.text = "Choose a parcel to explore in 3D."
+	var id := str(_selector.selection.get("block_id", ""))
+	if _selector.map_ready and _selector.generation > 0:
+		_claims.attach(_selector.generation, id)
+		if _area_generation != _selector.generation:
+			_area_generation = _selector.generation; _area_timer.start(0.1)
+	var state: String = _claims.status(id)
+	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
+	_open.disabled = not idle or id.is_empty()
+	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy
+	if id.is_empty(): _details.text = "Choose a parcel to explore in 3D."
 	else:
 		var p: Dictionary = _selector.selection
 		_details.text = "%s\n%d core · %d walk-only extension cells" % [p.name, p.core_cell_count, p.extension_cell_count]
+		if state == "mine": _details.text += "\nYour home"
+		elif state == "other": _details.text += "\nClaimed by %s" % _claims.nickname(id)
+		elif state == "none" and _claims.has_home(): _details.text += "\nYou already have a home."
+		elif state != "other" and _claims.signed_out: _details.text += "\nSign in to claim a home."
+	if not _claims.message.is_empty(): _details.text += "\n" + _claims.message
+	var claimable: bool = state == "none" and _claims.mine_known and not _claims.has_home()
+	if not claimable or not idle: _confirm.hide()
+	_claim.visible = claimable and not _confirm.visible; _claim.disabled = not idle
+	_enter.visible = state == "mine"; _enter.disabled = not idle
+	_open.visible = state != "mine"
+	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
+	_sign_in.visible = _claims.signed_out and not id.is_empty() and not _fake_claims(); _sign_in.disabled = not idle
 	if _selector._options.is_empty(): _choices.hide()
 
 func _show_candidates(rows: Array) -> void:
@@ -125,6 +193,31 @@ func _retry_map() -> void:
 
 func _preview() -> void:
 	if _selector != null and not _opening: _selector.open_farm()
+
+func _claim_selection() -> void:
+	_confirm.hide()
+	if _selector != null and not _selector.selection.is_empty(): _claims.claim(_selector.selection)
+
+func _open_sign_in() -> void:
+	if _claims == null or find_children("*", "AccountPanel", true, false).size() > 0: return
+	# Loaded at run time: the panel uses the Net autoload, which scripts preloading this scene may not have yet.
+	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in")
+	_camera.input_enabled = false
+	var signed_in: bool = await panel.closed
+	if not is_inside_tree(): return
+	if signed_in: _claims.forget()
+	_render()
+
+func _abandon() -> void:
+	if _claims != null: _claims.abandon()
+
+func _refresh_area() -> void:
+	if _selector == null or _suspended or not _selector.map_ready or _selector.manifest.is_empty(): return
+	if _camera.zoom < float(_selector.manifest.native_map.get("minzoom", 16)): return
+	var corner: PackedFloat64Array = _camera.screen_geo(Vector2.ZERO)
+	var opposite: PackedFloat64Array = _camera.screen_geo(_camera.size)
+	var bbox := [minf(corner[0], opposite[0]), minf(corner[1], opposite[1]), maxf(corner[0], opposite[0]), maxf(corner[1], opposite[1])]
+	if bbox[2] - bbox[0] <= ClaimApi.MAX_BBOX_SPAN and bbox[3] - bbox[1] <= ClaimApi.MAX_BBOX_SPAN: _claims.refresh_area(bbox)
 
 func _open_host(farm: Dictionary) -> void:
 	if _leaving or _suspended or _opening: return
@@ -155,6 +248,7 @@ func _suspend_map(committing_preview: bool) -> void:
 	if committing_preview and _bridge != null:
 		_surface_opaque_requested = _bridge.set_godot_surface_opaque(true)
 	if _selector != null: _selector.pause()
+	if _claims != null: _claims.pause()
 	_hud.hide(); process_mode = Node.PROCESS_MODE_DISABLED
 	_record_presentation("covered", _presentation_epoch)
 
@@ -167,6 +261,7 @@ func resume() -> void:
 		_restore_surface_mode()
 		_bridge.set_map_visible(true); _camera._changed()
 	if _selector != null: _selector.activate()
+	if _claims != null: _claims.start()
 	_record_presentation("map", _presentation_epoch)
 
 func _restore_surface_mode() -> void:
