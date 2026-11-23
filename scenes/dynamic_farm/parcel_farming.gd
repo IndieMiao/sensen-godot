@@ -31,6 +31,7 @@ var unavailable := false
 var _data: Dictionary
 var _walk: RefCounted
 var _core_plan: Dictionary
+var _recipe: Variant
 var _core_root: Node3D
 var _proxies: Array = []
 var _obstacles := {}
@@ -48,11 +49,12 @@ var _ui: Control
 var _redraw_left := 0.0
 var _names := {}
 
-## `core` is the scene's built core obstacle layer: {plan, root, proxies}.
+## `core` is the scene's built core obstacle layer: {plan, root, proxies, recipe?}.
 func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: RefCounted, canvas: CanvasLayer) -> void:
 	_data = data
 	_walk = walk
 	_core_plan = core.plan
+	_recipe = core.get("recipe")
 	_core_root = core.root
 	_proxies = core.proxies
 	store = farm_store
@@ -196,7 +198,7 @@ func _drop_cleared() -> void:
 		if cell != null and _obstacles.has(cell) and not _removed.has(cell): gone[cell] = true
 	if gone.is_empty(): return
 	var remaining := {"layout": _core_plan.layout.filter(func(item): return not _removed.has(item.cell) and not gone.has(item.cell))}
-	var art := Scenery.build(remaining, _walk, false)
+	var art := Scenery.build(remaining, _walk, _recipe, false)
 	if not art.ok: return
 	# Release the walk only once the redrawn art exists, so art and walk never disagree.
 	for cell: Vector2i in gone:

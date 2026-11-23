@@ -87,7 +87,7 @@ func _ready() -> void:
 	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk),
 		1.0 if bool(_args.get("original_slope_material",false)) else 0.65)
 	add_child(_ground)
-	var art := Scenery.build(_plan,_walk)
+	var art := Scenery.build(_plan,_walk,_plan.recipe)
 	if not art.ok:
 		_fail(art.error)
 		return
@@ -95,7 +95,7 @@ func _ready() -> void:
 	add_child(_props)
 	# Separate batches outside extension occupancy and shadow budgets; stones, bushes
 	# and saplings still block through the shared model-fitted profiles (Q-16).
-	var core_art := Scenery.build(_plan.core_obstacles, _walk)
+	var core_art := Scenery.build(_plan.core_obstacles, _walk, _plan.recipe)
 	if not core_art.ok:
 		_fail(core_art.error)
 		return
@@ -111,7 +111,7 @@ func _ready() -> void:
 	_shade.setup(_ground,_props,_plan,_data,_walk)
 	if bool(_args.get("edge_decor_preview",false)):
 		_edge_plan=EdgeDecor.plan(_data,_walk,_plan)
-		var edge_art:=Scenery.build(_edge_plan,_walk)
+		var edge_art:=Scenery.build(_edge_plan,_walk,_plan.recipe)
 		if not edge_art.ok:
 			_fail(edge_art.error)
 			return
@@ -145,7 +145,7 @@ func _ready() -> void:
 			var net := get_tree().root.get_node_or_null("Net")
 			if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): store = LocalFarmStore.new(_data.block_id)
 			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
-		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies}, store, _canvas)
+		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas)
 		_hint.hide()
 		_farming.enter()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
@@ -183,15 +183,15 @@ func _setup_world() -> void:
 	env.background_mode = Environment.BG_SKY
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.79,0.88,0.94)
+	env.ambient_light_color = Color(0.84,0.88,0.90)
 	env.ambient_light_energy = 0.42
 	_environment = WorldEnvironment.new()
 	_environment.environment = env
 	add_child(_environment)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Shade.SUN_DEGREES
-	sun.light_color = Color(1,0.96,0.87)
-	sun.light_energy = 1.1
+	sun.light_color = Color(1,0.95,0.84)
+	sun.light_energy = 1.12
 	sun.shadow_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
 	sun.shadow_opacity = 0.58
 	sun.shadow_bias = 0.1

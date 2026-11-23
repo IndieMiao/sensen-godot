@@ -2,9 +2,9 @@ extends RefCounted
 ## Render-only faces under the final guard-approved exterior lip. No new footprint,
 ## collision shape or draw batch. Holes and point contacts are not bridged.
 const LOWEST_Y := -2.25
-const WARM := Color("d3ad83")
-const SHADE := Color("917e83")
-const BASE := Color("766b79")
+const WARM := Color("dba86f")
+const SHADE := Color("a8805e")
+const BASE := Color("806454")
 
 static func _column(anchor: Vector3, lip: Vector3, phase: float) -> PackedVector3Array:
 	# Adjacent spans (including the corner fans) evaluate the same shared endpoint.
