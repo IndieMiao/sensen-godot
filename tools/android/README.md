@@ -178,7 +178,8 @@ choose a production signing identity, install an app or authorize publication.
    **Internal test package (C-39).** Only when explicitly selected,
    `--dynamic-farm-internal TARGET` builds `com.sensen.dynamicfarm.internal` from the same
    staging, but points both Journey URLs at `TARGET` and sets
-   `sensen/dynamic_farm/reselect` and `sensen/dynamic_farm/account_restore` (C-32). `TARGET`
+   `sensen/dynamic_farm/reselect`, `sensen/dynamic_farm/account_restore` (C-32) and
+   `sensen/dynamic_farm/own_farm` (C-34: "Enter my farm" opens the farmable own parcel). `TARGET`
    must exactly equal an entry of `APPROVED_TARGETS` in `dynamic_farm_export.py`: today only
    the isolated C-38 test service `https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1`
    (tailnet only). Production, devserver, P0 and any other address are refused before staging.

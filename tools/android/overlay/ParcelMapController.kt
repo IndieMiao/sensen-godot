@@ -27,7 +27,7 @@ internal class ParcelMapController(
     private val state = ParcelLayerState()
     private val handler = Handler(Looper.getMainLooper())
     private var config: ParcelSourceConfig? = null
-    private var claims = ParcelPayload.EMPTY_COLLECTION
+    private var claims: Map<String, String> = emptyMap()
     private val sources = linkedMapOf<String, String>()
     private val loaded = mutableSetOf<String>()
     private var query: Cancelable? = null
@@ -48,9 +48,14 @@ internal class ParcelMapController(
         const val HIGHLIGHT_FILL = "gensen-selected-building-fill"
         const val HIGHLIGHT_LINE = "gensen-selected-building-line"
         const val ADDRESSES = "gensen-parcel-addresses"
-        const val CLAIM_DOTS = "gensen-parcel-claim-dots"
         const val CLAIM_NAMES = "gensen-parcel-claim-names"
-        val LAYERS = listOf(FILL, LINE, BUILDING_FILL, BUILDINGS, HIGHLIGHT_FILL, HIGHLIGHT_LINE, ADDRESSES, CLAIM_DOTS, CLAIM_NAMES)
+        val LAYERS = listOf(FILL, LINE, BUILDING_FILL, BUILDINGS, HIGHLIGHT_FILL, HIGHLIGHT_LINE, ADDRESSES, CLAIM_NAMES)
+        // C-32 / q(342): own parcel green, someone else's red. Claimable yellow is the selected building's highlight.
+        const val OWN_COLOR = "#3E9B55"
+        const val TAKEN_COLOR = "#D2493F"
+        private const val OWN = """["boolean",["feature-state","own"],false]"""
+        private const val TAKEN = """["boolean",["feature-state","claimed"],false]"""
+        private const val SELECTED = """["boolean",["feature-state","selected"],false]"""
         /** A tap right after a pan waits this long for map idle before answering "loading". */
         const val IDLE_WAIT_MS = 4000L
     }
@@ -98,7 +103,7 @@ internal class ParcelMapController(
         }
         val oldGeneration = state.generation
         if (state.begin(generation) == null) return
-        if (oldGeneration != generation) claims = ParcelPayload.EMPTY_COLLECTION
+        if (oldGeneration != generation) claims = emptyMap()
         query?.cancel(); query = null; waiting.drop()
         removeLayers(); config = next; mapIdle = false; mapboxLoadFailed = false
         install()
@@ -110,9 +115,9 @@ internal class ParcelMapController(
         val turn = state.epoch
         removeLayers(style)
         val prefix = "gensen-parcels-${state.generation}-$turn"
-        sources.putAll(mapOf("parcels" to prefix, "claims" to "$prefix-claims", "highlight" to "$prefix-highlight"))
+        sources.putAll(mapOf("parcels" to prefix, "highlight" to "$prefix-highlight"))
         if (cfg.buildingSource == "datasf") sources["buildings"] = "$prefix-buildings"
-        val parcel = sources.getValue("parcels"); val points = sources.getValue("claims"); val highlight = sources.getValue("highlight")
+        val parcel = sources.getValue("parcels"); val highlight = sources.getValue("highlight")
         fun geoSource(id: String, data: Value): Boolean = !style.addStyleSource(id, Value(hashMapOf("type" to Value("geojson"), "data" to data))).isError
         fun layer(json: String): Boolean = !style.addStyleLayer(value(json), null).isError
         val parcelSource = hashMapOf("type" to Value(cfg.sourceType), "maxzoom" to Value(cfg.sourceMaxZoom.toLong()))
@@ -125,11 +130,11 @@ internal class ParcelMapController(
             parcelSource["promoteId"] = Value("block_id")
         }
         val sourceLayer = if (cfg.sourceType == "vector") ",\"source-layer\":\"${cfg.sourceLayer}\"" else ""
-        // R4 / decision 1C: no standing parcel frame; ground selection alone gets a yellow outline.
+        // R4 / decision 1C: no standing frame on unclaimed parcels. Claimed ones are filled by owner (C-32).
         // Do not set visibility:none or remove FILL: queryAt still uses its feature index.
-        var ok = !style.addStyleSource(parcel, Value(parcelSource)).isError && geoSource(points, value(claims)) && geoSource(highlight, value(ParcelPayload.EMPTY_COLLECTION)) &&
-            layer("""{"id":"$FILL","type":"fill","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"fill-color":"#3B7757","fill-opacity":0.0}}""") &&
-            layer("""{"id":"$LINE","type":"line","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"line-color":"#ED9F18","line-width":2.5,"line-opacity":["case",["boolean",["feature-state","selected"],false],1.0,0.0]}}""")
+        var ok = !style.addStyleSource(parcel, Value(parcelSource)).isError && geoSource(highlight, value(ParcelPayload.EMPTY_COLLECTION)) &&
+            layer("""{"id":"$FILL","type":"fill","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"fill-color":["case",$OWN,"$OWN_COLOR",$TAKEN,"$TAKEN_COLOR","#3B7757"],"fill-opacity":["case",$OWN,["case",$SELECTED,0.6,0.42],$TAKEN,["case",$SELECTED,0.55,0.36],0.0]}}""") &&
+            layer("""{"id":"$LINE","type":"line","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"line-color":["case",$OWN,"$OWN_COLOR",$TAKEN,"$TAKEN_COLOR","#ED9F18"],"line-width":2.5,"line-opacity":["case",["any",$OWN,$TAKEN,$SELECTED],1.0,0.0]}}""")
         if (ok && cfg.buildingSource == "datasf") {
             val buildings = sources.getValue("buildings")
             ok = geoSource(buildings, Value(cfg.buildingsUrl)) &&
@@ -139,8 +144,7 @@ internal class ParcelMapController(
         ok = ok && layer("""{"id":"$HIGHLIGHT_FILL","type":"fill","source":"$highlight","paint":{"fill-color":"#FFD15C","fill-opacity":0.65}}""") &&
             layer("""{"id":"$HIGHLIGHT_LINE","type":"line","source":"$highlight","paint":{"line-color":"#ED9F18","line-width":2.5}}""") &&
             layer("""{"id":"$ADDRESSES","type":"symbol","source":"$parcel"$sourceLayer,"minzoom":${cfg.addressMinZoom},"layout":{"text-field":["coalesce",["get","address"],""],"text-size":11,"text-max-width":8,"text-allow-overlap":false},"paint":{"text-color":"#37463B","text-halo-color":"#FFFFFF","text-halo-width":1.2}}""") &&
-            layer("""{"id":"$CLAIM_DOTS","type":"circle","source":"$points","paint":{"circle-radius":4,"circle-color":"#496CAD","circle-stroke-width":1,"circle-stroke-color":"#FFFFFF"}}""") &&
-            layer("""{"id":"$CLAIM_NAMES","type":"symbol","source":"$points","layout":{"text-field":["get","nickname"],"text-size":13,"text-offset":[0,1.2],"text-anchor":"top","text-allow-overlap":false},"paint":{"text-color":"#243B30","text-halo-color":"#FFFFFF","text-halo-width":1.5}}""")
+            layer("""{"id":"$CLAIM_NAMES","type":"symbol","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"filter":${ParcelPayload.claimFilter(claims)},"layout":{"text-field":${ParcelPayload.claimLabel(claims)},"text-size":13,"text-max-width":8,"text-allow-overlap":false},"paint":{"text-color":"#7A2620","text-halo-color":"#FFFFFF","text-halo-width":1.5}}""")
         if (!ok) {
             removeLayers(style); state.unavailable()
             error(state.generation, turn, "layer_install_failed"); return
@@ -184,9 +188,10 @@ internal class ParcelMapController(
         }
         if (next == claims) return
         claims = next
-        val id = sources["claims"] ?: return
-        val style = map.style ?: return
-        if (style.styleSourceExists(id) && style.setStyleSourceProperty(id, "data", value(claims)).isError) error(generation, state.epoch, "claims_update_failed")
+        val style = if (map.isValid()) map.style else null
+        if (style == null || !style.styleLayerExists(CLAIM_NAMES)) return // install() applies the latest names.
+        if (style.setStyleLayerProperty(CLAIM_NAMES, "filter", value(ParcelPayload.claimFilter(claims))).isError ||
+            style.setStyleLayerProperty(CLAIM_NAMES, "text-field", value(ParcelPayload.claimLabel(claims))).isError) error(generation, state.epoch, "claims_update_failed")
     }
     private fun buildingLayers(): List<String>? {
         val cfg = config ?: return null
@@ -278,7 +283,7 @@ internal class ParcelMapController(
     }
     fun clear(generation: Long) {
         if (closed || !state.clear(generation)) return
-        query?.cancel(); query = null; waiting.drop(); config = null; claims = ParcelPayload.EMPTY_COLLECTION
+        query?.cancel(); query = null; waiting.drop(); config = null; claims = emptyMap()
         removeLayers()
     }
     private fun removeLayers(style: Style? = if (map.isValid()) map.style else null) {
@@ -293,7 +298,7 @@ internal class ParcelMapController(
         state.clear(state.generation)
         closed = true; query?.cancel(); query = null; waiting.drop()
         subscriptions.forEach { it.cancel() }; subscriptions.clear()
-        handler.removeCallbacksAndMessages(null); config = null; claims = ParcelPayload.EMPTY_COLLECTION
+        handler.removeCallbacksAndMessages(null); config = null; claims = emptyMap()
         removeLayers()
     }
     private fun value(json: String): Value = requireNotNull(Value.fromJson(json).value)
