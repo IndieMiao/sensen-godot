@@ -7,6 +7,7 @@ const Art = preload("res://modules/farm/farm_art.gd")
 const RECIPE_PATH := "res://assets/dynamic_farm/499-art-recipe.json"
 const INVENTORY_PATH := "res://assets/dynamic_farm/499-art-inventory.json"
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
+const Palette = preload("res://modules/dynamic_farm/farm_palette.gd")
 const CHUNK_CELLS := 32
 
 ## xorshift32: fixed integer operations, seeded with the first 32 bits of the recipe SHA256.
@@ -115,22 +116,28 @@ static func build(planned: Dictionary, walk: RefCounted) -> Dictionary:
 	var root := Node3D.new()
 	root.name = "DynamicScenery"
 	var cell_m: float = walk.cell_m
+	var recipe = JSON.parse_string(FileAccess.get_file_as_string(RECIPE_PATH))
+	var palette: Dictionary = recipe.get("prop_palette", {}) if recipe is Dictionary else {}
 	var batches := {}
 	var triangles := 0
 	var unique := {}
 	for item: Dictionary in planned.layout:
 		var p: Vector3 = item.transform.origin
-		var key := "%s:%d:%d" % [item.asset, floori(p.x/(CHUNK_CELLS*cell_m)), floori(p.z/(CHUNK_CELLS*cell_m))]
-		if not batches.has(key): batches[key] = {"asset":item.asset,"shadow":item.shadow,"transforms":[]}
+		var variant := Palette.pick(palette, item.asset, p)
+		var key := "%s#%d:%d:%d" % [item.asset, variant, floori(p.x/(CHUNK_CELLS*cell_m)), floori(p.z/(CHUNK_CELLS*cell_m))]
+		if not batches.has(key): batches[key] = {"asset":item.asset,"variant":variant,"shadow":item.shadow,"transforms":[]}
 		batches[key].transforms.append(item.transform)
 		triangles += item.triangles
 		unique[item.asset] = item.triangles
 	for key: String in batches:
 		var batch: Dictionary = batches[key]
-		if Art.mesh_for(batch.asset) == null:
+		var mesh := Palette.mesh(palette, batch.asset, batch.variant)
+		if mesh == null:
 			root.free()
 			return {"ok":false,"error":"A farm scenery asset could not be loaded."}
-		root.add_child(Art.batch(batch.asset,batch.transforms,batch.shadow))
+		var node := Art.batch(batch.asset,batch.transforms,batch.shadow)
+		node.multimesh.mesh = mesh
+		root.add_child(node)
 	# Bind final rendered instances, after budget pruning. All layers go through
 	# this path; a placement role cannot override the model's collision policy.
 	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(INVENTORY_PATH))

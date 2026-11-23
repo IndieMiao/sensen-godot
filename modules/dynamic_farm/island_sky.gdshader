@@ -13,7 +13,7 @@ vec3 cumulus(vec3 air, vec2 p, float haze) {
 	float d = min(min(l, m), min(r, tip));
 	// Warm crowns, cool undersides and a little bounced light between the lobes.
 	float crown = 1.0 - smoothstep(-0.20, 0.32, p.y + 0.10 * d);
-	vec3 cloud = mix(vec3(0.68, 0.78, 0.89), vec3(0.99, 0.975, 0.93), crown);
+	vec3 cloud = mix(vec3(0.71, 0.77, 0.88), vec3(1.0, 0.97, 0.90), crown);
 	return mix(air, cloud, haze * (1.0 - smoothstep(0.87, 1.06, d)));
 }
 
@@ -22,7 +22,7 @@ void sky() {
 		COLOR = vec3(0.63, 0.78, 0.90);
 	} else {
 		vec2 uv = SCREEN_UV;
-		vec3 air = mix(vec3(0.43, 0.68, 0.87), vec3(0.70, 0.83, 0.93), uv.y);
+		vec3 air = mix(vec3(0.42, 0.67, 0.88), vec3(0.74, 0.84, 0.90), uv.y);
 		air = cumulus(air, (uv - vec2(0.21, 0.18)) / vec2(0.38, 0.16), 0.68);
 		air = cumulus(air, (uv - vec2(0.90, 0.34)) / vec2(0.48, 0.19), 0.66);
 		air = cumulus(air, (uv - vec2(0.01, 0.52)) / vec2(0.57, 0.22), 0.88);

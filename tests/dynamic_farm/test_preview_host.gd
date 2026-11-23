@@ -1,5 +1,6 @@
 extends SceneTree
 const Host:=preload("res://scenes/dynamic_farm/dynamic_farm_host.tscn")
+const RouterFixture:=preload("res://tests/dynamic_farm/app_router_fixture.gd")
 class View extends Node3D:
 	signal preview_ready(summary:Dictionary)
 	signal preview_error(message:String)
@@ -34,7 +35,8 @@ func _factory() -> Node3D:
 func args() -> Dictionary:
 	return {"dataset":"sf-dynamic-farm-20261118-r4","block_id":"p-A","preview_only":true,"farm":{"schema":4,"dataset_version":"sf-dynamic-farm-20261118-r4","selection_unit":"parcel","block_id":"p-A"},"return_context":{"zoom":18.5}}
 func _run() -> void:
-	var router:=Router.new();router.name="AppRouter";root.add_child(router)
+	var router:=Router.new();var real_router:=RouterFixture.install(root,router)
+	verify(root.get_node_or_null("AppRouter")==router,"fixture router is the one the host resolves")
 	var host=Host.instantiate();host.view_factory=_factory;host.setup(args());router.top=host;root.add_child(host)
 	verify(host._state=="ready","synchronous child ready is observed before returning from add_child")
 	verify(host._view.args.preview_only==true,"child is explicitly presentation-only")
@@ -56,6 +58,7 @@ func _run() -> void:
 	verify(bad._state=="error" and not is_instance_valid(bad._view),"gameplay mode is rejected before scene construction")
 	bad_args=args();bad_args.block_id="p-B";bad.setup(bad_args);bad._open_view()
 	verify(bad._state=="error" and not is_instance_valid(bad._view),"mismatched parcel context never constructs a scene")
-	bad.queue_free();router.queue_free();await process_frame
+	bad.queue_free();await process_frame
+	RouterFixture.restore(root,router,real_router)
 	print("PREVIEW HOST ",checked-failed,"/",checked)
 	quit(1 if failed else 0)
