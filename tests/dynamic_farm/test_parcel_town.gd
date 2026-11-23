@@ -129,7 +129,7 @@ func _carpenter() -> void:
 	store.send(3, [{"type": "sell", "item": "crop_carrot", "count": 1}])
 	town = await _open(Town.CARPENTER, store)
 	_check(town.card.line == Town.LINES.scott_give and town.keys.has("take"), "after a sale Scott offers the blueprint")
-	_check(town.keys.take.text == "Take Coop Blueprint", "the key names it")
+	_check(town.keys.take.text == "Take Blueprint", "the key names it")
 	await town.claim_blueprint()
 	_check(town.farm.bag.get("blueprint_coop") == 1, "one coop blueprint in the bag")
 	_check(town.toast.current_text() == "Received Coop Blueprint ×1", "the gift is announced")

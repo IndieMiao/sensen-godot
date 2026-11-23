@@ -26,13 +26,13 @@ const NPCS := {
 	CARPENTER: {"name": "Scott", "role": "Carpenter", "title": "Scott's Workshop", "look": "parcel:scott",
 		"slots": {"hairHat": "hairhat51", "cloth": "cloth42", "shoes": "shoes3"}},
 }
-## Player-visible lines (C-45 / Q-61: final wording is PM's).
+## Player-visible lines, as finalised by PM in C-59#31 (C-45 / Q-61).
 const LINES := {
-	"intro": "Hi, I'm Jasmine! Bring me crops and wild finds and I'll pay you in coins. Coins stay with your farm.",
+	"intro": "Hi, I'm Jasmine! Bring me crops and wild finds, and I'll pay you in coins.",
 	"hello": "Got something to sell?",
 	"thanks": "Thanks! +%d coins",
-	"scott_wait": "Sell something to Jasmine first, then come see me.",
-	"scott_give": "You've made your first sale. Here's a coop blueprint for you.",
+	"scott_wait": "Sell something to Jasmine first.",
+	"scott_give": "Here's a coop blueprint for your first sale.",
 	"scott_done": "Hope the coop plans come in handy.",
 	"scott_none": "Come back later.",
 	"unreachable": "Could not reach your farm.",
@@ -155,7 +155,7 @@ func _greet_carpenter() -> void:
 		card.line = LINES.scott_wait
 	else:
 		card.line = LINES.scott_give
-		var take := UiCommandButton.new("Take %s" % ParcelItems.name_of(str(rule.item)))
+		var take := UiCommandButton.new("Take Blueprint")
 		take.name = "Take"
 		take.sends = true
 		take.activated.connect(claim_blueprint)
