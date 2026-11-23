@@ -142,6 +142,11 @@ export class MemoryStore implements Store {
   }
   async userByEmail(email: string) { const u = [...this.users.values()].find(x => x.email === email); return u ? structuredClone(u) : null; }
   async userById(userId: string) { const u = this.users.get(userId); return u ? structuredClone(u) : null; }
+  /** 玩家对应账号的昵称；游客或没设昵称为 null（动态农场地块归属用，MemoryParcelStore）。 */
+  async displayNameOf(playerId: string) {
+    const userId = this.players.get(playerId)?.user_id;
+    return (userId && this.users.get(userId)?.display_name) || null;
+  }
   async setUserPassword(userId: string, passwordHash: string) { const u = this.users.get(userId); if (u) u.password_hash = passwordHash; }
   async markEmailVerified(userId: string) { const u = this.users.get(userId); if (u) u.email_verified = true; }
   async updateUserProfile(userId: string, profile: { display_name: string | null; gender: string | null; gender_custom: string | null; birth_date: string | null }) {
