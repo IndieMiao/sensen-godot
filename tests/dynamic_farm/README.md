@@ -52,8 +52,16 @@ CI (C-62): the Cardigan check's `dynamic_farm` step runs `tools/ci/dynamic_farm_
 It runs every `test_*.gd` here with `--headless --script` in the imported project, each
 under its own timeout (`DYNAMIC_FARM_TIMEOUT`, default 180 s; a hang is killed and fails),
 and passes the four pinned r4 parcels in `fixtures/r4/` after `--`. A file passes only with
-exit 0, no `SCRIPT ERROR`, and a summary line with a non-zero check count and no failures.
-`test_read_retries_https.gd` gets a loopback TLS fixture with throwaway certificates.
+exit 0, no `SCRIPT ERROR`, and exactly one summary line with a non-zero check count and no
+failures. Only the prefixes listed in the script's `SUMMARY_CHECKS` / `SUMMARY_RATIO` count as
+a summary (C-63), so a new test file must add its prefix there. All files share a total
+budget (`DYNAMIC_FARM_TOTAL_TIMEOUT`, default 1080 s, inside the step's 20 minutes): the last
+file's limit is clipped to what is left, later files are reported as NOT RUN failures, and the
+report table still shows which files timed out.
+`test_read_retries_https.gd` gets a loopback TLS fixture with throwaway certificates; with
+`CI=1` a fixture that cannot start fails that file, locally it is skipped.
+`tools/ci/test-dynamic-farm-gate.sh` (run first in the same step) checks these rules with a
+fake Godot: summary misreads, fixture failure with and without `CI`, and several hangs.
 `test_parcel_farming_server.gd` needs a running C-31 server and an owner token, so the check lists it
 under "Skipped"; run it by hand as its header describes.
 Anything that cannot run is listed under "Skipped" in the job summary, never as passed
