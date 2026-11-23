@@ -60,6 +60,13 @@ func add_prop(proxy: Proxy) -> void:
 			if not _proxies_by_cell.has(cell): _proxies_by_cell[cell] = []
 			_proxies_by_cell[cell].append(proxy)
 
+## Takes a bound prop back out of the walk (a cleared core obstacle).
+func remove_prop(proxy: Proxy) -> void:
+	for cell: Vector2i in _proxies_by_cell.keys():
+		var bucket: Array = _proxies_by_cell[cell]
+		bucket.erase(proxy)
+		if bucket.is_empty(): _proxies_by_cell.erase(cell)
+
 func move(displacement: Vector3) -> Vector3:
 	var step_count := maxi(1, ceili(displacement.length() / (cell_m * 0.18)))
 	var step := displacement / step_count
