@@ -1,5 +1,6 @@
 extends SceneTree
 const Android := preload("res://scenes/map_poc/map_bridge_android.gd")
+const RouterFixture := preload("res://tests/dynamic_farm/app_router_fixture.gd")
 class JavaWrapper extends Node:
 	var supported := true
 	var queries: Array = []
@@ -35,7 +36,8 @@ func verify(value: bool, label: String) -> void:
 func _run() -> void:
 	var wrapper := JavaWrapper.new(); root.add_child(wrapper)
 	var bridge := Android.new(); bridge._plugin = wrapper
-	var router := Router.new(); router.name = "AppRouter"; root.add_child(router)
+	var router := Router.new(); var real_router := RouterFixture.install(root, router)
+	verify(root.get_node_or_null("AppRouter") == router, "fixture router is the one the map resolves")
 	var page := Preview.new(); root.add_child(page); page._bridge = bridge
 	page.is_back_navigation_locked(); page.is_back_navigation_locked(); await process_frame
 	verify(wrapper.queries.count("moveTaskToBack") == 1, "root Back consults Java-wrapper capability once")
@@ -56,6 +58,7 @@ func _run() -> void:
 	page = Preview.new(); root.add_child(page); page._bridge = bridge; router.top = page
 	page._leave(); page._leave(); await process_frame
 	verify(router.pops == 1 and page.quits == 0 and wrapper.calls == 1, "stacked map returns through Router without backgrounding or exiting")
-	page.queue_free(); router.queue_free(); wrapper.queue_free(); await process_frame
+	page.queue_free(); wrapper.queue_free(); await process_frame
+	RouterFixture.restore(root, router, real_router)
 	print("DYNAMIC ROOT BACK ", checked - failed, "/", checked)
 	quit(1 if failed else 0)

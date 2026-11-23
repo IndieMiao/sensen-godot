@@ -1,5 +1,6 @@
 extends SceneTree
 const Host:=preload("res://scenes/dynamic_farm/dynamic_farm_host.tscn")
+const RouterFixture:=preload("res://tests/dynamic_farm/app_router_fixture.gd")
 class View extends Node3D:
 	signal preview_ready(summary:Dictionary)
 	signal preview_error(message:String)
@@ -33,19 +34,8 @@ func _factory() -> Node3D:
 	var v:=View.new();v.fail=_fixture_fail;return v
 func args() -> Dictionary:
 	return {"dataset":"sf-dynamic-farm-20261118-r4","block_id":"p-A","preview_only":true,"farm":{"schema":4,"dataset_version":"sf-dynamic-farm-20261118-r4","selection_unit":"parcel","block_id":"p-A"},"return_context":{"zoom":18.5}}
-## Godot 4 instantiates project autoloads even under --script, so the real AppRouter already
-## owns /root/AppRouter and a second node of that name is renamed. Detach the singleton while the
-## fake is installed (the host resolves the router by that path), then put it back.
-func _install_router(router:Node) -> Node:
-	var real:=root.get_node_or_null("AppRouter")
-	if real:root.remove_child(real)
-	router.name="AppRouter";root.add_child(router)
-	return real
-func _restore_router(router:Node,real:Node) -> void:
-	root.remove_child(router);router.free()
-	if real:root.add_child(real)
 func _run() -> void:
-	var router:=Router.new();var real_router:=_install_router(router)
+	var router:=Router.new();var real_router:=RouterFixture.install(root,router)
 	verify(root.get_node_or_null("AppRouter")==router,"fixture router is the one the host resolves")
 	var host=Host.instantiate();host.view_factory=_factory;host.setup(args());router.top=host;root.add_child(host)
 	verify(host._state=="ready","synchronous child ready is observed before returning from add_child")
@@ -69,6 +59,6 @@ func _run() -> void:
 	bad_args=args();bad_args.block_id="p-B";bad.setup(bad_args);bad._open_view()
 	verify(bad._state=="error" and not is_instance_valid(bad._view),"mismatched parcel context never constructs a scene")
 	bad.queue_free();await process_frame
-	_restore_router(router,real_router)
+	RouterFixture.restore(root,router,real_router)
 	print("PREVIEW HOST ",checked-failed,"/",checked)
 	quit(1 if failed else 0)
