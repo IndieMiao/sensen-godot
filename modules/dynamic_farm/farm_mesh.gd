@@ -6,6 +6,7 @@ const Spill = preload("res://modules/dynamic_farm/core_grass_edge.gd")
 const Bank = preload("res://modules/dynamic_farm/farm_bank.gd")
 const GROUND_SHADER = preload("res://modules/farm/shaders/meadow_woods.gdshader")
 const MEADOW = preload("res://assets/farm/art/meadow.png")
+const EARTH := Color("a8845c") # inner hole walls, warm like the island cliff
 
 static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften := true, widen := false, slope_gain := 0.65) -> Node3D:
 	var root := Node3D.new()
@@ -62,7 +63,7 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 					bank_spans.append({"top":slope_top,"soil":rim,"a":a,"b":b,"oa":outside_a,"ob":outside_b,
 						"normal":normal,"phase":seed_phase,"colour":soil_colour,"segments":Bank.SEGMENTS})
 				else:
-					_quad(rim,outside_a,outside_b,outside_b-Vector3.UP*0.7,outside_a-Vector3.UP*0.7,normal,Color("958665"))
+					_quad(rim,outside_a,outside_b,outside_b-Vector3.UP*0.7,outside_a-Vector3.UP*0.7,normal,EARTH)
 				if soften and Edges.convex(data,at,edge):
 					var pad: float = data.cell_m * Edges.PAD_CELLS
 					var previous := Edges.normal((edge+3)%4)
@@ -75,7 +76,7 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 								"normal":(next-last).cross(Vector3.UP).normalized(),"phase":seed_phase,"colour":soil_colour,"segments":1})
 						else:
 							_triangle(top,a,last,next,Vector3.UP,data.palette[cell.kind])
-							_quad(rim,last,next,next-Vector3.UP*0.7,last-Vector3.UP*0.7,(next-last).cross(Vector3.UP).normalized(),Color("958665"))
+							_quad(rim,last,next,next-Vector3.UP*0.7,last-Vector3.UP*0.7,(next-last).cross(Vector3.UP).normalized(),EARTH)
 						last=next
 			# The soil outline replaces the rule along a spilled core edge.
 			if cell.zone == "core" and not (int(masks.get(at + directions[edge], 0)) & (1 << ((edge + 2) % 4))):
@@ -187,12 +188,12 @@ static func _ground_material(surface: int, data: Dictionary, recipe: Dictionary)
 	material.set_shader_parameter("meadow_texture",MEADOW)
 	var grass := surface == 1
 	var color := Color(recipe.surface.grass_srgb if grass else recipe.surface.core_warm_surface_srgb)
-	if surface == 3: color = Color("bda677")
+	if surface == 3: color = Color(recipe.surface.core_grid_srgb)
 	material.set_shader_parameter("clearing_color",color)
-	material.set_shader_parameter("mottle_warm",color)
+	material.set_shader_parameter("mottle_warm",Color(recipe.surface.grass_warm_srgb) if grass else color)
 	material.set_shader_parameter("mottle_cool",Color(recipe.surface.grass_far_srgb) if grass else color)
-	material.set_shader_parameter("mottle",0.35 if grass else 1.0)
-	material.set_shader_parameter("wander",0.06 if grass else 0.0)
+	material.set_shader_parameter("mottle",float(recipe.surface.grass_mottle) if grass else 1.0)
+	material.set_shader_parameter("wander",float(recipe.surface.grass_wander) if grass else 0.0)
 	material.set_shader_parameter("strokes",0.07 if grass else 0.0)
 	material.set_shader_parameter("woodland_start",100000.0)
 	material.set_shader_parameter("floor_tint",Vector3.ONE)

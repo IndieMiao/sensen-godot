@@ -160,15 +160,15 @@ func _setup_world() -> void:
 	env.background_mode = Environment.BG_SKY
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.79,0.88,0.94)
+	env.ambient_light_color = Color(0.84,0.88,0.90)
 	env.ambient_light_energy = 0.42
 	_environment = WorldEnvironment.new()
 	_environment.environment = env
 	add_child(_environment)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Shade.SUN_DEGREES
-	sun.light_color = Color(1,0.96,0.87)
-	sun.light_energy = 1.1
+	sun.light_color = Color(1,0.95,0.84)
+	sun.light_energy = 1.12
 	sun.shadow_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
 	sun.shadow_opacity = 0.58
 	sun.shadow_bias = 0.1
