@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "communities": [
+    {
+      "id": "sf",
+      "datasets": ["sf-dynamic-farm-20261118-r4"]
+    }
+  ],
+  "starter_bag": {
+    "hoe_starter": 1,
+    "seed_carrot": 5
+  },
+  "till_tool": "hoe_starter",
+  "house": {
+    "model": "cottage",
+    "width": 3,
+    "depth": 3
+  },
+  "crops": {
+    "crop_carrot": {
+      "seed": "seed_carrot",
+      "grow_seconds": 60,
+      "yield": 1
+    }
+  }
+}

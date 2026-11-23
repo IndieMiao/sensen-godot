@@ -65,6 +65,14 @@ curl localhost:3000/v1/healthz
 模拟器人工夹具：在 `server` 目录运行 `pnpm exec tsx tools/prepare_combat_qa.ts materials|full|restore`，
 该工具只操作固定的战斗测试库、要求恰好一个普通农场，并在每次写入前备份完整行。
 
+## 动态农场地块（C-31，0.4.2）
+
+`/v1/parcels` 提供动态农场的地块认领、区域归属查询和地块内农场存档，身份沿用 `/v1/auth`。
+启动迁移新增 `parcel_claims` 表（只新增，不改旧表）：主键保证一块地只有一个主人，
+部分唯一索引保证每人一块免费地。数值在 `assets/farm/data/dynamic_farm.json`。
+“放弃并重选”只在设置 `DYNAMIC_FARM_RESELECT=1` 的内部测试服可用，正式配置不设，调用返回 403。
+接口、表结构和选型理由见 [docs/plans/C-31.md](../docs/plans/C-31.md)。
+
 ## 自由选址（SGODOT-37）
 
 `POST /v1/farms` 接受可选的 `location: {"lat": 31.225, "lng": 121.485}`。
