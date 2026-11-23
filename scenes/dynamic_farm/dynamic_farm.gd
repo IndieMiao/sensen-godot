@@ -18,6 +18,9 @@ const Controls = preload("res://scenes/dynamic_farm/dynamic_controls.gd")
 const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.gd")
 const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
 const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const RemoteFarmStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
+## Development only: keep the own-parcel farm on the device instead of the C-31 server.
+const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const SPEED := 3.75
 
 var _args := {}
@@ -139,7 +142,9 @@ func _ready() -> void:
 	if _farming != null:
 		var store = _args.get("farm_store")
 		if not store is RefCounted or not store.has_method("enter") or not store.has_method("send"):
-			store = LocalFarmStore.new(_data.block_id)
+			var net := get_tree().root.get_node_or_null("Net")
+			if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): store = LocalFarmStore.new(_data.block_id)
+			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
 		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies}, store, _canvas)
 		_hint.hide()
 		_farming.enter()
