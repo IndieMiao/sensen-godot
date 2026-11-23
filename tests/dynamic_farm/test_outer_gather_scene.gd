@@ -140,6 +140,16 @@ func _first_visit() -> Dictionary:
 	scene._on_tapped(screen)
 	_check(farming.picked_object >= 0 and farming.gatherables[farming.picked_object].box.intersects_ray(
 		scene._camera.project_ray_origin(screen), scene._camera.project_ray_normal(screen)) != null, "a tap picks an object under it")
+	# A tap whose ground point is a core cell keeps that cell, even through an object's bounds.
+	var core := Vector2i(-1, -1)
+	for cell: Vector2i in farming._data.by_cell:
+		if farming._data.by_cell[cell].zone == "core":
+			core = cell
+			break
+	var tree_box: AABB = farming.gatherables[far].box
+	farming.pick(core, tree_box.get_center() + Vector3(0, 20, 0), Vector3.DOWN)
+	_check(core.x >= 0 and farming.picked == core and farming.picked_object == -1, "a tap on a core cell keeps the cell")
+	scene._on_tapped(screen)
 	var picked := {}
 	var faded := 0
 	var hidden := 0

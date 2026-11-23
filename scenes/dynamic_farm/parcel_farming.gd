@@ -162,9 +162,11 @@ func update(delta: float, facing_cell: Vector2i, moving: bool, player = null, fa
 	_refresh_key()
 
 ## A tap picks an outer object under the ray (`from`, `dir`), else that ground cell, until the
-## player moves again.
+## player moves again. A tap landing on a core cell keeps that cell even when a tall outer
+## object's bounds stand in front of it on the slanted view (V-127).
 func pick(cell: Vector2i, from := Vector3.ZERO, dir := Vector3.ZERO) -> void:
-	picked_object = _object_on_ray(from, dir) if not dir.is_zero_approx() else -1
+	var on_core: bool = _data.by_cell.has(cell) and _data.by_cell[cell].zone == "core"
+	picked_object = _object_on_ray(from, dir) if not on_core and not dir.is_zero_approx() else -1
 	if picked_object >= 0: picked = null
 	elif _data.by_cell.has(cell): picked = cell
 
