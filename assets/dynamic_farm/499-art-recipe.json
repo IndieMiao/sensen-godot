@@ -49,21 +49,21 @@
     "red_blue_reference_lines_in_3d": false
   },
   "prop_palette": {
-    "version": "warm-c21-v1",
+    "version": "warm-c21-v2",
     "scope": "vertex colours of the 13 existing models only: source sRGB -> albedo sRGB; geometry, pivots, collision, layouts and the shared material unchanged",
     "pick": "weighted variant per placed instance from SHA256(asset|x_cm|z_cm); placement streams untouched",
     "assets": {
       "wild_pz_tree_20": [
-        {"weight": 0.4, "map": {"89a74b": "7dad3f", "8b6842": "7d523d"}},
+        {"weight": 0.35, "map": {"89a74b": "7dad3f", "8b6842": "7d523d"}},
         {"weight": 0.3, "map": {"89a74b": "a8ba3d", "8b6842": "7d523d"}},
         {"weight": 0.15, "map": {"89a74b": "ccae37", "8b6842": "7d523d"}},
-        {"weight": 0.15, "map": {"89a74b": "c5754b", "8b6842": "7d523d"}}
+        {"weight": 0.2, "map": {"89a74b": "c5754b", "8b6842": "7d523d"}}
       ],
       "wild_pz_tree_20_g": [
-        {"weight": 0.45, "map": {"86a742": "7dad3f", "8b6842": "7d523d"}},
+        {"weight": 0.35, "map": {"86a742": "7dad3f", "8b6842": "7d523d"}},
         {"weight": 0.3, "map": {"86a742": "a8ba3d", "8b6842": "7d523d"}},
-        {"weight": 0.1, "map": {"86a742": "ccae37", "8b6842": "7d523d"}},
-        {"weight": 0.15, "map": {"86a742": "bd5f4d", "8b6842": "7d523d"}}
+        {"weight": 0.15, "map": {"86a742": "ccae37", "8b6842": "7d523d"}},
+        {"weight": 0.2, "map": {"86a742": "bd5f4d", "8b6842": "7d523d"}}
       ],
       "wild_pz_pine_01": [
         {"weight": 0.6, "map": {"5f8945": "65943d", "8b6842": "7d523d"}},
@@ -82,13 +82,13 @@
         {"weight": 0.35, "map": {"809f47": "b0bd44"}}
       ],
       "wild_pz_rock_08": [
-        {"weight": 1.0, "map": {"969b9a": "b6afbb", "7f8586": "9d96a4", "9fa29c": "bebbbf", "6e7677": "857d8d", "b2b2aa": "cfcdd0", "6e8d40": "7d9c2e", "7a9a45": "8ead3b"}}
+        {"weight": 1.0, "map": {"969b9a": "bdb0a6", "7f8586": "a3968e", "9fa29c": "c8bcb2", "6e7677": "8a7d7b", "b2b2aa": "d6ccc2", "6e8d40": "7d9c2e", "7a9a45": "8ead3b"}}
       ],
       "wild_pz_rock_13": [
-        {"weight": 1.0, "map": {"969b9a": "b6afbb", "7f8586": "9d96a4", "9fa29c": "bebbbf", "6e7677": "857d8d", "b2b2aa": "cfcdd0", "7a9a45": "8ead3b"}}
+        {"weight": 1.0, "map": {"969b9a": "bdb0a6", "7f8586": "a3968e", "9fa29c": "c8bcb2", "6e7677": "8a7d7b", "b2b2aa": "d6ccc2", "7a9a45": "8ead3b"}}
       ],
       "wild_pz_softrock_10": [
-        {"weight": 1.0, "map": {"919595": "b3acb8", "838989": "a49da9", "a6a7a3": "c3c0c4", "adada6": "cbc7cc", "7d914f": "8ead3b", "8fa05a": "98b83f"}}
+        {"weight": 1.0, "map": {"919595": "b9ada4", "838989": "aa9d95", "a6a7a3": "cbbfb4", "adada6": "d2c7bc", "7d914f": "8ead3b", "8fa05a": "98b83f"}}
       ],
       "wild_pz_flower_20": [
         {"weight": 0.6, "map": {"dbd1a7": "e6d7e9", "c8e465": "e3cb5e", "759b3b": "58852c", "8bba49": "83b53f"}},
