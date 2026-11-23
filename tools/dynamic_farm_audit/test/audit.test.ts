@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -248,10 +249,57 @@ describe('id reconciliation', () => {
     expect(r.reconciliation.discrepancies.map(d => d.check)).toContain('snapshot_manifest_sha256 (dataset was built from a different snapshot)');
   });
 
+  it('counts an id once and keeps it valid when only some of its lots are inactive', () => {
+    const { snapshot } = writeFixture({ ...squareSpec(), parcels: [...squareSpec().parcels, { id: '1000002', rings: [rect(20, 0, 30, 10)], active: 0, lots: ['1000002', '1000002A'] }] });
+    const snap = loadSnapshot(snapshot);
+    expect(snap.invalid_parcels).toEqual([{ id: '1000002', reason: 'inactive' }]);
+    // Same parcel file with one active and one inactive lot under 1000001.
+    const body = readFileSync(path.join(snapshot, 'parcels/p-0000.geojson'), 'utf8');
+    const json = JSON.parse(body);
+    json.features.push({ ...json.features[0], properties: { ...json.features[0].properties, blklot: '1000001B', active: 0 } });
+    const text = JSON.stringify(json);
+    writeFileSync(path.join(snapshot, 'parcels/p-0000.geojson'), text);
+    const manifest = JSON.parse(readFileSync(path.join(snapshot, 'source-manifest.json'), 'utf8'));
+    manifest.sources[0].files[0] = { ...manifest.sources[0].files[0], sha256: sha256(text), count: json.features.length };
+    writeFileSync(path.join(snapshot, 'source-manifest.json'), JSON.stringify(manifest));
+    const again = loadSnapshot(snapshot);
+    expect(again.parcels.get('1000001')!.lots).toEqual(['1000001']);
+    expect(again.invalid_parcels).toEqual([{ id: '1000002', reason: 'inactive' }]);
+  });
+
+  it('fails a farm file whose block_id differs from its file name', () => {
+    const { snapshot, dataset } = writeFixture(squareSpec());
+    const file = path.join(dataset, 'farms/p-1000001.json');
+    writeFileSync(file, readFileSync(file, 'utf8').replace('"block_id":"p-1000001"', '"block_id":"p-1000009"'));
+    const r = auditDataset(loadSnapshot(snapshot), loadDataset(dataset), 'x', DEFAULT_AUDIT_PARAMS);
+    expect(r.farms[0]).toMatchObject({ block_id: 'p-1000001', level: 'fail', issues: ['farm_block_id_differs_from_file'] });
+    expect(r.status).toBe('fail');
+  });
+
   it('leaves inactive parcels out of the valid input set', () => {
     const r = run({ ...squareSpec(), parcels: [...squareSpec().parcels, { id: '1000002', rings: [rect(20, 0, 30, 10)], active: 0 }] });
     expect(r.reconciliation.consistent).toBe(true);
     expect(r.reconciliation.input_invalid_by_reason).toEqual({ inactive: 1 });
+  });
+});
+
+describe('command line', () => {
+  const tsx = path.join(import.meta.dirname, '..', 'node_modules', 'tsx', 'dist', 'cli.mjs');
+  const cli = path.join(import.meta.dirname, '..', 'src', 'cli.ts');
+  const exec = (args: string[]) => spawnSync(process.execPath, [tsx, cli, ...args], { encoding: 'utf8' }).status;
+
+  it('exits 0 on pass, 1 on a failed audit and 2 when it cannot run', () => {
+    const ok = writeFixture(squareSpec());
+    const bad = writeFixture(squareSpec({ core_iou: 0.8 }, [0.25, 0.25]));
+    const out = path.join(path.dirname(ok.dataset), 'out');
+    expect(exec(['--snapshot', ok.snapshot, '--dataset', ok.dataset, '--out', out, '--quiet'])).toBe(0);
+    expect(readFileSync(path.join(out, 'audit-summary.md'), 'utf8')).toMatch(/^# Dynamic farm audit: PASS/);
+    expect(exec(['--snapshot', bad.snapshot, '--dataset', bad.dataset, '--out', out, '--quiet'])).toBe(1);
+    const params = path.join(path.dirname(ok.dataset), 'p.json');
+    writeFileSync(params, '{"iou_warn":2}');
+    expect(exec(['--snapshot', ok.snapshot, '--dataset', ok.dataset, '--out', out, '--params', params, '--quiet'])).toBe(2);
+    expect(exec(['--snapshot', ok.snapshot, '--dataset', path.join(out, 'missing'), '--out', out, '--quiet'])).toBe(2);
+    expect(exec(['--snapshot', ok.snapshot])).toBe(2);
   });
 });
 

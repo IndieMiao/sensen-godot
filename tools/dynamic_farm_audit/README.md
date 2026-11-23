@@ -23,7 +23,8 @@ pnpm cli --snapshot ../dynamic_farm_gen/test/fixtures/sf-test-snapshot --dataset
 ```
 
 Writes `audit-report.json` (everything, one entry per farm) and `audit-summary.md` (also printed).
-Exit code: 0 = `pass` or `warn`, 1 = `fail`, 2 = usage error.
+Exit code: 0 = `pass` or `warn`, 1 = the audit judged the dataset `fail`, 2 = no verdict (bad
+options or parameters, unreadable inputs, write failure).
 
 ## 1. Id reconciliation
 
@@ -40,12 +41,15 @@ these must agree with the files actually present:
 | `farm_file_not_in_manifest` / `manifest_farm_without_file` | `farms/` on disk vs `manifest.json` |
 | `index_without_farm_file` / `farm_file_not_in_index` | `index.geojson` vs `farms/` on disk |
 | `excluded_with_farm_file` | an excluded parcel still has a farm |
+| `farm_block_id_differs_from_file` (per farm, fail) | the `block_id` inside a farm file matches its file name |
 | `dataset_file_integrity` | every file's SHA-256 against `manifest.json` (tiles included); unlisted or missing files. `manifest.json`, `client-manifest.json` and the host-written `tilejson.json` are not listed by design |
 | `snapshot_file_integrity` | raw snapshot files against `source-manifest.json` |
 | `invalid_parcel_not_reported_rejected` / reverse | rejected parcel records agree with the audit's own invalid set |
 | `count_mismatch …` | report totals and `manifest.parcel_count` against the real counts |
 | `snapshot_manifest_sha256` | the dataset was built from this snapshot |
 
+Ids left out of the valid set (inactive, invalid id, no geometry) are counted once per id and
+reason; an id with at least one usable lot is valid even if other lots under it are inactive.
 Exclusions are counted by category (`no_building`, `layout`, …) and by full reason. Lot numbers
 (aliases) are counted separately: all valid lots = lots under farms + lots under excluded parcels,
 and each farm's `parcel_aliases` must equal the snapshot's lots for that parcel.

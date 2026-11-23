@@ -327,7 +327,14 @@ export function auditDataset(snapshot: SourceSnapshot, dataset: Dataset, dataset
   for (const blockId of [...dataset.farm_files].sort()) {
     let a: FarmAudit;
     try {
-      a = auditFarm(dataset.readFarm(blockId), snapshot, dataset, reportRows.get(blockId), p, lookup);
+      const farm = dataset.readFarm(blockId);
+      if (typeof farm.block_id === 'string' && farm.block_id !== blockId) {
+        // Reconciliation keys on the file name; a different id inside would hide the farm's audit.
+        a = unreadable(blockId, `block_id ${JSON.stringify(farm.block_id)} differs from the file name`);
+        a.issues = ['farm_block_id_differs_from_file'];
+      } else {
+        a = auditFarm(farm, snapshot, dataset, reportRows.get(blockId), p, lookup);
+      }
     } catch (error) {
       a = unreadable(blockId, (error as Error).message);
     }

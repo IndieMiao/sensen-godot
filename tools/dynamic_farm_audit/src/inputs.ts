@@ -30,7 +30,7 @@ export interface SourceSnapshot {
   parcel_source: string;
   /** Parcels with a usable id and geometry: the valid input set. */
   parcels: Map<string, SourceParcel>;
-  /** Parcel features left out of the valid input set, by reason. */
+  /** Parcel ids left out of the valid input set, once per id and reason (ids with a usable lot are not listed). */
   invalid_parcels: { id: string; reason: 'inactive' | 'invalid_id' | 'no_geometry' }[];
   /** `${source}|${area_id}` -> records (more than one means the id is ambiguous in that source). */
   buildings: Map<string, SourceBuilding[]>;
@@ -90,9 +90,18 @@ export function loadSnapshot(dir: string): SourceSnapshot {
       buildings.get(key)!.push({ source: src.label, area_id: areaId, polygons: geoJsonPolygons(f.geometry) });
     }
   }
+  // Counted per parcel id: an id with at least one usable lot is valid, and each left-out id is
+  // listed once per reason even when several of its lot features were skipped.
+  const seenInvalid = new Set<string>();
+  const invalidIds = invalid.filter(x => {
+    const key = `${x.reason}|${x.id}`;
+    if (parcels.has(x.id) || seenInvalid.has(key)) return false;
+    seenInvalid.add(key);
+    return true;
+  });
   return {
     manifest_sha256: sha256(raw), file_problems: fileProblems, parcel_source: parcelSources[0].label,
-    parcels, invalid_parcels: invalid, buildings, building_sources: buildingSources.map(s => s.label),
+    parcels, invalid_parcels: invalidIds, buildings, building_sources: buildingSources.map(s => s.label),
   };
 }
 
