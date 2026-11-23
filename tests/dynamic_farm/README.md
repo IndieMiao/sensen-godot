@@ -184,3 +184,16 @@ prop, sends scripted movement input, checks contact or passage, saves the
 contact frame and walks past it. This is not a trip from spawn or device input.
 With `--headless` (omit `--write-movie`), it verifies movement only: no pixels
 or recording are generated. All placements keep their ordinary model and pose.
+
+### First house (C-33)
+
+Run `--headless --script res://tests/dynamic_farm/test_house.gd -- <farm1.json> <farm2.json> <farm3.json>` in the
+isolated preview project (review set: `p-3139010`, `p-3139019`, `p-5402049`; without payloads only the fixtures).
+It checks the cottage's wall box against the model's cross-sections (wall and plinth points within 3 cm, the model
+inside its 3×3), the local save stand-in (the gift once, one house, a blueprint spent, the house back after reopening,
+`NO_BLUEPRINT`, `CELL_OCCUPIED`), a neck fixture that a house would seal, and per parcel every footprint position:
+outside the core, over an obstacle, on the arrival disc and cutting a walk cell off are each refused, and an
+obstacle frees its cell once cleared; tilled cells and crops refuse it. For a dozen accepted spots per parcel it binds
+the real scenery, obstacles and house to the walker and floods a 0.2 m lattice from spawn: no previously reachable
+cell outside the footprint is lost. With the walls alone, approaches from 16 directions stop with the body 0–4 cm from
+the wall outline (never inside), and a push 6° into each face keeps sliding along it.

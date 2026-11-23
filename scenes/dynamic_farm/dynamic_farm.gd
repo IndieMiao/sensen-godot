@@ -15,6 +15,9 @@ const Cliff = preload("res://modules/dynamic_farm/island_cliff.gd")
 const SKY_SHADER = preload("res://modules/dynamic_farm/island_sky.gdshader")
 const Controls = preload("res://scenes/dynamic_farm/dynamic_controls.gd")
 const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.gd")
+const House = preload("res://modules/dynamic_farm/farm_house.gd")
+const Art = preload("res://modules/farm/farm_art.gd")
+const Placement = preload("res://scenes/dynamic_farm/house_placement.gd")
 const SPEED := 3.75
 
 var _args := {}
@@ -48,6 +51,13 @@ var _overview := false
 var _started_ms := 0
 var _clip := ""
 var _summary := {}
+# The owner's parcel farm save (args.parcel: enter / place_house, C-31 shapes); null in the art preview.
+var _parcel: RefCounted
+var _farm := {}
+var _house: Node3D
+var _build: UiCommandButton
+var _placement: Placement
+var _sending := false
 
 func setup(args: Dictionary) -> void:
 	_args = args.duplicate(true)
@@ -149,6 +159,105 @@ func _ready() -> void:
 		"triangles":_edge_plan.get("triangles",0),"batches":_edge_plan.get("batches",0),
 		"layout_sha256":_edge_plan.get("layout_sha256",""),"covered_cells":_edge_plan.get("covered_cells",0),
 		"perimeter_cells":_edge_plan.get("perimeter_cells",0),"clusters":_edge_plan.get("clusters",[]).size()}
+	if _args.get("parcel") is RefCounted:
+		_parcel = _args.parcel
+		_parcel.enter(_on_entered)
+
+## The owner's farm on opening (the welcome gift arrives with the first entry only).
+func _on_entered(reply: Dictionary) -> void:
+	if _failed or not reply.get("ok", false): return
+	_farm = reply.farm
+	if _farm.get("house") is Dictionary and _house == null: _build_house(_farm.house)
+	_refresh_build()
+
+func blueprints() -> int:
+	return int((_farm.get("bag", {}) as Dictionary).get(House.BLUEPRINT, 0))
+
+func house_state() -> Variant:
+	return _farm.get("house")
+
+func _refresh_build() -> void:
+	_build.visible = _parcel != null and _house == null and _placement == null and blueprints() > 0
+
+func begin_house_placement() -> void:
+	if not _build.visible: return
+	_movement = Vector2.ZERO
+	_controls.reset()
+	_controls.process_mode = Node.PROCESS_MODE_DISABLED
+	var solid := {}
+	var taken := House.blocked(_plan.core_obstacles.layout, _farm, solid)
+	var walk_blocked: Dictionary = solid.merged(_walk.reserved)
+	var start = House.nearest(_data, _walk.cell_at(_actor.position), taken, walk_blocked)
+	_placement = Placement.new()
+	add_child(_placement)
+	_placement.setup(_data, _walk, _camera, _canvas, taken, walk_blocked,
+		start if start != null else _walk.cell_at(_actor.position) - Vector2i.ONE)
+	_placement.confirmed.connect(_on_place_confirmed)
+	_placement.cancelled.connect(end_house_placement)
+	_refresh_build()
+	_play("idle")
+	_focus = House.center(_walk, _placement.at)
+	_overview = false
+	_place_camera()
+
+func end_house_placement() -> void:
+	if _placement == null: return
+	_placement.queue_free()
+	_placement = null
+	_sending = false
+	_controls.process_mode = Node.PROCESS_MODE_INHERIT
+	_controls.reset()
+	_refresh_build()
+
+func _on_place_confirmed(at: Vector2i, rotation_steps: int) -> void:
+	if _sending: return
+	_sending = true
+	_parcel.place_house(at.x, at.y, rotation_steps, _on_placed)
+
+func _on_placed(reply: Dictionary) -> void:
+	_sending = false
+	if reply.get("farm") is Dictionary: _farm = reply.farm
+	if reply.get("ok", false) and _farm.get("house") is Dictionary:
+		end_house_placement()
+		_build_house(_farm.house)
+	elif str(reply.get("code", "")) != "CELL_OCCUPIED" or _placement == null:
+		end_house_placement()
+	_refresh_build()
+
+## The built cottage and its wall profile (C-19's model-fitted walking); a player standing on the new walls steps out.
+func _build_house(house: Dictionary) -> void:
+	var at := House.at_of(house)
+	var turns := int(house.get("rotation", 0))
+	_house = Node3D.new()
+	_house.name = "House"
+	_house.transform = House.transform(_walk, at, turns)
+	_house.add_child(Art.instance(House.ASSET))
+	add_child(_house)
+	var proxy := House.proxy(_walk, at, turns)
+	_walk.add_prop(proxy)
+	if get_tree().debug_collisions_hint:
+		var wire := MeshInstance3D.new()
+		wire.mesh = proxy.debug_wire()
+		var material := StandardMaterial3D.new()
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		material.no_depth_test = true
+		material.albedo_color = Color("00e5ff")
+		wire.material_override = material
+		wire.transform = proxy.pose
+		add_child(wire)
+	if _actor != null and not _walk.clear_position(_walk.position):
+		_walk.position = _step_out(_walk.position)
+		_actor.position = _walk.position
+		_focus = _actor.position
+		_place_camera()
+
+## The nearest clear point to `from`, searched in rings of 0.1 m.
+func _step_out(from: Vector3) -> Vector3:
+	for ring in range(1, 40):
+		for k in 32:
+			var p := from + Vector3.FORWARD.rotated(Vector3.UP, TAU * k / 32.0) * ring * 0.1
+			if _walk.clear_position(p): return p
+	return _walk.point(_data.spawn)
 
 func _setup_world() -> void:
 	var env := Environment.new()
@@ -205,7 +314,7 @@ func _process(delta: float) -> void:
 		elif Time.get_ticks_msec() - _started_ms > 15000:
 			_fail("The farm preview could not finish loading.")
 		return
-	if not _focused: return
+	if not _focused or _placement != null: return
 	var dt := clampf(delta,0,0.1)
 	var input := _movement
 	input = input.limit_length(1.0)
@@ -308,6 +417,16 @@ func _build_ui() -> void:
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(hint)
+	_build = UiCommandButton.new("Build Cottage", UiCommandButton.Kind.PRIMARY)
+	_build.theme = UiKit.theme()
+	_build.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_build.offset_left = -90
+	_build.offset_right = 90
+	_build.offset_top = -92
+	_build.offset_bottom = -44
+	_build.visible = false
+	_build.activated.connect(begin_house_placement)
+	_canvas.add_child(_build)
 
 func _label(text: String, size: int) -> Label:
 	var label := Label.new()
@@ -319,6 +438,7 @@ func _label(text: String, size: int) -> Label:
 func _request_back() -> void:
 	if _back_sent: return
 	_back_sent = true
+	end_house_placement()
 	_movement = Vector2.ZERO
 	_controls.reset()
 	back_requested.emit()
@@ -329,6 +449,7 @@ func is_back_navigation_locked() -> bool:
 
 func suspend() -> void:
 	_suspended = true
+	end_house_placement()
 	_movement = Vector2.ZERO
 	_controls.reset()
 	_canvas.visible = false
