@@ -4,16 +4,24 @@ extends RefCounted
 ## nothing here is harvestable yet. Solid members reserve walk cells through the walker;
 ## members of one grove or pile may share their own group's cells, and the total never
 ## exceeds `budget` (the reserved cells of the previous approved layout on this parcel).
+## Per Q-19 walking is also checked on the model-fitted profiles the walker will use
+## (C-19): a cell may only close under a blocking prop's own profile, no open ground may
+## be sealed off, and no more cells close than under the previous layout (`lost_budget`).
+## The walker's centre is sampled on a 0.2 m lattice, four points a side per cell.
+const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
+const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const ROLES := ["tree", "shrub", "rock", "flower", "groundcover"]
+const LATTICE := 4
 const REAR := Vector3(0.25, 0, 0.968)
 const GOLDEN_ANGLE := 2.39996323
 const MAX_ROLE_ATTEMPTS := 512
 
-static func plan(walk: RefCounted, assets: Dictionary, recipe: Dictionary,
-		pool: Array[Vector2i], budget: int, rngs: Dictionary) -> Dictionary:
+static func plan(walk: RefCounted, assets: Dictionary, recipe: Dictionary, pool: Array[Vector2i],
+		budget: int, lost_budget: int, fit: float, rngs: Dictionary) -> Dictionary:
 	var spec: Dictionary = recipe.outer_groves
 	var state := {"walk":walk, "assets":assets, "recipe":recipe, "layout":[], "roles":{},
-		"signature":PackedStringArray(), "trunks":[], "groups":[]}
+		"signature":PackedStringArray(), "trunks":[], "groups":[],
+		"fitted":Walk.new(walk.data), "fit":fit, "open":{}, "lost":{}, "lost_budget":lost_budget}
 	for role: String in ROLES:
 		var target: Dictionary = spec.targets[role]
 		state.roles[role] = {"target":mini(int(target.cap), pool.size() / int(target.cells_per)),
@@ -30,7 +38,29 @@ static func plan(walk: RefCounted, assets: Dictionary, recipe: Dictionary,
 	return {"layout":state.layout, "roles":state.roles,
 		"layout_sha256":"\n".join(state.signature).sha256_text(),
 		"summary":{"version":spec.version, "groves":groves, "thickets":thickets, "rock_piles":piles, "flower_clumps":clumps,
-			"walk_budget_cells":budget, "reserved_cells":walk.reserved.size()}}
+			"walk_budget_cells":budget, "reserved_cells":walk.reserved.size(),
+			"fitted_lost_budget":lost_budget, "fitted_lost_cells":state.lost.size()}}
+
+## Cells among `layout`'s solid reservations that have open lattice points on the bare
+## walker `walk` and none once the layout's fitted profiles are bound.
+static func lost_cells(walk: RefCounted, layout: Array, assets: Dictionary, fit: float) -> int:
+	var fitted := Walk.new(walk.data)
+	var cells := {}
+	for item: Dictionary in layout:
+		var proxy := Proxy.new(assets[item.asset].collision_proxy, item.transform, fit)
+		fitted.add_prop(proxy)
+		if proxy.solid:
+			for cell: Vector2i in item.cells: cells[cell] = true
+	var lost := 0
+	for cell: Vector2i in cells:
+		var before := false
+		var after := false
+		for k in LATTICE * LATTICE:
+			var p := _sample(walk, cell * LATTICE + Vector2i(k % LATTICE, k / LATTICE))
+			before = before or walk.clear_position(p)
+			after = after or fitted.clear_position(p)
+		if before and not after: lost += 1
+	return lost
 
 ## Tree groves (`tree_pass`) use rear-half anchors with room for a full canopy: the approved
 ## 43/14.5 opening keeps tall pieces behind the player. Big trees overlap; young pines fill the
@@ -196,6 +226,12 @@ static func _place(state: Dictionary, role: String, asset: String, at: Vector3, 
 	var limit := maxi(cap_cells - walk.reserved.size(), 0) if solid and cap_cells >= 0 else -1
 	var footprint: Array[Vector2i] = walk.try_box(world_box, solid, shared, limit)
 	if footprint.is_empty(): return {}
+	if solid and not _keeps_walkable(state, Proxy.new(record.collision_proxy, transform, state.fit), footprint):
+		var added: Array[Vector2i] = []
+		for cell in footprint:
+			if not shared.has(cell): added.append(cell)
+		walk.release(added)
+		return {}
 	var item := {"asset":asset, "role":role, "transform":transform, "box":world_box, "solid":solid,
 		"shadow":bool(spec.cast_shadow_flag), "cells":footprint, "triangles":int(record.triangles)}
 	state.layout.append(item)
@@ -203,6 +239,76 @@ static func _place(state: Dictionary, role: String, asset: String, at: Vector3, 
 	state.signature.append("%s:%.8f,%.8f,%.8f:%.8f:%.8f" % [asset, at.x, at.y, at.z, yaw, scale_value])
 	counter.accepted += 1
 	return item
+
+## Binds `proxy` on the fitted walker unless it would close more cells than the budget
+## allows or cut open lattice points off from the open ground. The proxy, grown by the
+## body radius, stays inside its reserved `footprint`, so only those samples change.
+static func _keeps_walkable(state: Dictionary, proxy: Proxy, footprint: Array[Vector2i]) -> bool:
+	var walk: RefCounted = state.walk
+	var fresh := {}
+	var closed: Array[Vector2i] = []
+	var shut: Array[Vector2i] = []
+	for cell in footprint:
+		var open := false
+		var base := false
+		for k in LATTICE * LATTICE:
+			var key := cell * LATTICE + Vector2i(k % LATTICE, k / LATTICE)
+			var was := _open(state, key)
+			var now := was and not proxy.touches(_sample(walk, key), Walk.BODY_RADIUS)
+			fresh[key] = now
+			if was and not now: shut.append(key)
+			open = open or now
+			base = base or walk.clear_position(_sample(walk, key))
+		if base and not open and not state.lost.has(cell): closed.append(cell)
+	if state.lost.size() + closed.size() > int(state.lost_budget): return false
+	if _seals(state, shut, fresh): return false
+	state.fitted.add_prop(proxy)
+	for key: Vector2i in fresh: state.open[key] = fresh[key]
+	for cell in closed: state.lost[cell] = true
+	return true
+
+## True if an open sample next to a newly shut one can no longer reach open ground:
+## any open sample in an unreserved cell, which the reserved-cell connectivity keeps joined.
+static func _seals(state: Dictionary, shut: Array[Vector2i], fresh: Dictionary) -> bool:
+	var walk: RefCounted = state.walk
+	var escaped := {}
+	for key in shut:
+		for offset: Vector2i in Walk.NEIGHBORS:
+			var start: Vector2i = key + offset
+			if escaped.has(start) or not _open_now(state, start, fresh): continue
+			var queue: Array[Vector2i] = [start]
+			var seen := {start: true}
+			var index := 0
+			var out := false
+			while index < queue.size() and not out:
+				var at := queue[index]
+				index += 1
+				var cell := Vector2i(floori(at.x / float(LATTICE)), floori(at.y / float(LATTICE)))
+				if escaped.has(at) or not walk.reserved.has(cell):
+					out = true
+					break
+				for step: Vector2i in Walk.NEIGHBORS:
+					var next: Vector2i = at + step
+					if not seen.has(next) and _open_now(state, next, fresh):
+						seen[next] = true
+						queue.append(next)
+			if not out: return true
+			for at: Vector2i in seen: escaped[at] = true
+	return false
+
+static func _open_now(state: Dictionary, key: Vector2i, fresh: Dictionary) -> bool:
+	return fresh[key] if fresh.has(key) else _open(state, key)
+
+## Cached walker answer for a lattice sample against the profiles bound so far.
+static func _open(state: Dictionary, key: Vector2i) -> bool:
+	if not state.open.has(key):
+		state.open[key] = state.fitted.clear_position(_sample(state.walk, key))
+	return state.open[key]
+
+static func _sample(walk: RefCounted, key: Vector2i) -> Vector3:
+	var cell := Vector2i(floori(key.x / float(LATTICE)), floori(key.y / float(LATTICE)))
+	var sub := Vector2(key - cell * LATTICE) - Vector2.ONE * (LATTICE - 1) * 0.5
+	return walk.point(cell) + Vector3(sub.x, 0, -sub.y) * (walk.cell_m / LATTICE)
 
 static func _full(state: Dictionary, role: String) -> bool:
 	var counter: Dictionary = state.roles[role]

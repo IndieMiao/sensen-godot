@@ -141,11 +141,17 @@ Run `--headless --script res://tests/dynamic_farm/test_outer_groves.gd -- <farm1
 `p-3139010`, `p-3139019`, `p-5402049`). Without payloads it runs only the walker
 checks. It compares the incremental connectivity check with a full flood fill over 400
 random solid boxes, then per parcel replays the previous approved layout as the
-"before": reserved cells may not grow, reachable cells may not shrink (audited 1539,
-1470, 3962 for the review set), and every core, protected, spawn and entry cell stays
-reachable. It also checks the 13-model palette, extension-only footprints, rear-half
-trees, that only solid footprints reserve cells, at least one grove/rock pile/flower clump,
-and an identical layout on reopening.
+"before": reserved cells may not grow, reservation-reachable cells may not shrink
+(audited 1539, 1470, 3962 for the review set), and every core, protected, spawn and
+entry cell stays reachable. Per Q-19 it then binds the model-fitted profiles (C-19) of
+both layouts, core obstacles included, and floods a 0.2 m walker lattice from spawn:
+every cell walkable before and not after must lie under a new blocking prop's own
+profile (`OUTER_LOST` lists each one with its model), no open lattice point is sealed
+off, the walkable total does not shrink, and spawn, entry, core and protected cells stay
+walkable. It also checks the 13-model palette, extension-only footprints, rear-half
+trees, that only solid footprints reserve cells, at least one grove/rock pile/flower
+clump, and an identical layout on reopening. Walker unit checks cover shared group
+cells, the new-cell limit, `release()` and shadow-budget pruning of a group member.
 
 ## Model-fitted prop contacts
 

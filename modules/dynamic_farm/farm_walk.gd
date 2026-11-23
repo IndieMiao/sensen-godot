@@ -145,6 +145,13 @@ func try_box(box: AABB, solid: bool, shared := {}, max_new := -1) -> Array[Vecto
 		_connected_size = reserved.size()
 	return footprint
 
+## Undoes a solid try_box refused afterwards; `added` are the cells it newly reserved.
+## Restores the earlier, connected mask.
+func release(added: Array[Vector2i]) -> void:
+	for cell in added:
+		reserved.erase(cell)
+	_connected_size = reserved.size()
+
 ## Same answer as connected() when every clear cell was reachable before `added` were
 ## reserved: the rest stays connected iff the clear neighbours of `added` reach one another.
 func _still_connected(added: Array[Vector2i]) -> bool:

@@ -40,6 +40,16 @@ static func affected(layout: Array, chunks: Dictionary) -> Dictionary:
 			if chunks[key].intersects(bounds): selected[key] = true
 	return selected
 
+## Frees the cells of solid `layout[index]` that no other solid prop still holds
+## (grove and pile members share their group's cells).
+static func unreserve(layout: Array, index: int, walk: RefCounted) -> void:
+	var kept := {}
+	for j in layout.size():
+		if j != index and layout[j].solid:
+			for cell: Vector2i in layout[j].cells: kept[cell] = true
+	for cell: Vector2i in layout[index].cells:
+		if not kept.has(cell): walk.reserved.erase(cell)
+
 static func enforce_budget(plan: Dictionary, data: Dictionary, walk: RefCounted) -> void:
 	var chunks := _chunks(data,walk)
 	var rejected := 0
@@ -48,8 +58,7 @@ static func enforce_budget(plan: Dictionary, data: Dictionary, walk: RefCounted)
 		for i in range(plan.layout.size()-1,-1,-1):
 			var item: Dictionary = plan.layout[i]
 			if not item.shadow or item.box.end.y < GroundShade.MIN_H: continue
-			if item.solid:
-				for cell: Vector2i in item.cells: walk.reserved.erase(cell)
+			if item.solid: unreserve(plan.layout, i, walk)
 			plan.roles[item.role].accepted -= 1
 			plan.roles[item.role].rejected += 1
 			plan.layout.remove_at(i)

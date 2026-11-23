@@ -55,9 +55,10 @@
     }
   },
   "outer_groves": {
-    "version": "outer-groves-v1",
+    "version": "outer-groves-v2",
     "scope": "extension scenery appearance: tree groves, shrub thickets, rock piles and flower clumps; no harvesting, permissions or saves",
-    "walk_budget": "solid reservations never exceed the blocked cells of the reference art version's layout on the same parcel; grove and pile members may share their own group's cells",
+    "walk_budget": "solid reservations never exceed the reserved cells of the reference art version's layout on the same parcel; grove and pile members may share their own group's cells",
+    "fitted_walk": "Q-19 on the model-fitted profiles (0.2 m walker lattice): a previously walkable cell may only close under a new blocking prop's own profile, no open ground is sealed off, and no more cells close than under the reference layout",
     "reference_art_version": "499-v2-schema4",
     "reference_roles": ["tree", "shrub", "rock"],
     "targets": {

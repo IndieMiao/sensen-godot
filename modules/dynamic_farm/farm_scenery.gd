@@ -44,7 +44,8 @@ static func plan(data: Dictionary, walk: RefCounted) -> Dictionary:
 	for asset: String in palette:
 		if not assets.has(asset):
 			return {"ok": false, "error": "The farm scenery palette is incomplete."}
-	# Walk budget: the groves may move reserved cells around, never add to them.
+	# Walk budget: the groves may move reserved cells, and cells the fitted profiles
+	# close, around the previous approved layout's, never add to them.
 	var reference := {"layout":[], "roles":{}}
 	var reference_walk := Walk.new(data)
 	for role: String in outer_spec.reference_roles:
@@ -53,7 +54,9 @@ static func plan(data: Dictionary, walk: RefCounted) -> Dictionary:
 	var rngs := {}
 	for stream: String in ["grove", "pile", "clump"]:
 		rngs[stream] = FixedRandom.new((data.seed_hex + "|" + str(recipe.art_version) + "|" + stream).sha256_text())
-	var outer := OuterGroves.plan(walk, assets, recipe, pool, reference_walk.reserved.size(), rngs)
+	var fit := float(inventory.collision_fit_fraction)
+	var lost_budget := OuterGroves.lost_cells(reference_walk, reference.layout, assets, fit)
+	var outer := OuterGroves.plan(walk, assets, recipe, pool, reference_walk.reserved.size(), lost_budget, fit, rngs)
 	var core_rng := FixedRandom.new((data.block_id + "|" + str(recipe.core_obstacles.version)).sha256_text())
 	var core := CoreObstacles.plan(data, walk, assets, recipe.core_obstacles, core_rng)
 	return {"ok":true,"core_obstacles":core,"layout":outer.layout,"roles":outer.roles,"outer":outer.summary,
