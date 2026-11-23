@@ -11,7 +11,7 @@ var labels := {
 	"This farm preview could not be opened.": "无法打开",
 	"328 FRIDA KAHLO WAY": "测试地名翻译",
 	"Make this my first home": "设为我的第一个家", "Enter my farm": "进入我的地",
-	"Give up and choose again": "放弃并重选", "Claim": "认领", "Cancel": "取消",
+	"Give up and choose again": "放弃并重选", "Claim": "认领", "Cancel": "取消", "Sign in": "登录",
 	"Claim this parcel? You can only have one home.": "认领确认"
 }
 
@@ -41,7 +41,7 @@ func _run() -> void:
 	verify(String(outside.atr(outside.text)) == "重试", "Chinese automatic translation is active outside preview scenes")
 	var map_page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
 	root.add_child(map_page)
-	for text in ["Retry", "San Francisco", "Back", "Preview in 3D", "Make this my first home", "Enter my farm", "Give up and choose again", "Claim", "Cancel"]:
+	for text in ["Retry", "San Francisco", "Back", "Preview in 3D", "Make this my first home", "Enter my farm", "Give up and choose again", "Claim", "Cancel", "Sign in"]:
 		var nodes := text_nodes(map_page).filter(func(n: Node): return n is Button and n.text == text)
 		verify(nodes.size() == 1 and String(nodes[0].atr(nodes[0].text)) == text, "map button stays English: " + text)
 	var confirm := text_nodes(map_page).filter(func(n: Node): return n is Label and n.text.begins_with("Claim this parcel"))

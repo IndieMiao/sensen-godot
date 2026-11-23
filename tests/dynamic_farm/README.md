@@ -229,6 +229,10 @@ setting, and the real map card's buttons. Fake data proves client logic only; it
 not evidence of a real claim, a save or device rendering.
 
 Settings read by the map: `sensen/dynamic_farm/reselect` (internal test packages only;
-shows "Give up and choose again") and `sensen/dynamic_farm/fake_claims` (+ optional
-`fake_player`, default `fake-a`) for development without the C-31 server. Neither is
-set in `project.godot`, so release builds show no give-up entry and use `Net.client`.
+shows "Give up and choose again"), `sensen/dynamic_farm/account_restore` (internal test
+packages only; reloads the saved account token through `Net.restore_saved_account()`, which
+calls `/users/me` and nothing else) and `sensen/dynamic_farm/fake_claims` (+ optional
+`fake_player`, default `fake-a`) for development without the C-31 server. None is
+set in `project.godot`, so release builds show no give-up entry and keep the normal
+`Net` boot. A signed-out player gets a "Sign in" button that opens the existing
+`AccountPanel`; ownership is re-read for the new identity.

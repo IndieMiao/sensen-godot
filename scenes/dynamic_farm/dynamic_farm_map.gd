@@ -26,6 +26,7 @@ var _claim: Button
 var _confirm: Control
 var _enter: Button
 var _reselect: Button
+var _sign_in: Button
 var _area_timer: Timer
 var _area_generation := -1
 var _retry: Button
@@ -66,10 +67,21 @@ func _ready() -> void:
 	_camera.camera_changed.connect(func(): _area_timer.start(AREA_REFRESH_SECONDS))
 	_camera.setup_map(_bridge, token)
 	_selector.activate()
-	_claims.start()
+	_start_claims()
+
+## Isolated test builds skip Net's boot. Internal packages may reload the saved account token only
+## (`sensen/dynamic_farm/account_restore`); nothing here signs in anonymously.
+func _start_claims() -> void:
+	var net := get_node_or_null("/root/Net")
+	if net != null and not _fake_claims() and bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)):
+		await net.restore_saved_account()
+	if is_inside_tree() and not _suspended: _claims.start()
+
+func _fake_claims() -> bool:
+	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/fake_claims", false))
 
 func _claim_api() -> RefCounted:
-	if bool(ProjectSettings.get_setting("sensen/dynamic_farm/fake_claims", false)):
+	if _fake_claims():
 		if _fake_server == null: _fake_server = FakeParcelServer.new()
 		return ClaimApi.new(_fake_server.client(str(ProjectSettings.get_setting("sensen/dynamic_farm/fake_player", "fake-a"))))
 	var net := get_node_or_null("/root/Net")
@@ -101,6 +113,7 @@ func _build_ui() -> void:
 	_enter = _button("Enter my farm", _preview); _enter.hide(); bottom.add_child(_enter)
 	_open = _button("Preview in 3D", _preview); _open.disabled = true; bottom.add_child(_open)
 	_reselect = _button("Give up and choose again", _abandon); _reselect.hide(); bottom.add_child(_reselect)
+	_sign_in = _button("Sign in", _open_sign_in); _sign_in.hide(); bottom.add_child(_sign_in)
 	_area_timer = Timer.new(); _area_timer.one_shot = true; _area_timer.timeout.connect(_refresh_area); add_child(_area_timer)
 	bottom.add_child(_label("Explore and walk. Farming actions come later.", 12))
 	var credits := HBoxContainer.new(); bottom.add_child(credits)
@@ -160,6 +173,7 @@ func _render() -> void:
 	_enter.visible = state == "mine"; _enter.disabled = not idle
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
+	_sign_in.visible = _claims.signed_out and not id.is_empty() and not _fake_claims(); _sign_in.disabled = not idle
 	if _selector._options.is_empty(): _choices.hide()
 
 func _show_candidates(rows: Array) -> void:
@@ -182,6 +196,15 @@ func _preview() -> void:
 func _claim_selection() -> void:
 	_confirm.hide()
 	if _selector != null and not _selector.selection.is_empty(): _claims.claim(_selector.selection)
+
+func _open_sign_in() -> void:
+	if _claims == null or find_children("*", "AccountPanel", true, false).size() > 0: return
+	var panel := AccountPanel.open(self, "sign_in")
+	_camera.input_enabled = false
+	var signed_in: bool = await panel.closed
+	if not is_inside_tree(): return
+	if signed_in: _claims.forget()
+	_render()
 
 func _abandon() -> void:
 	if _claims != null: _claims.abandon()

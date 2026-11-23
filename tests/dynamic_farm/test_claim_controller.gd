@@ -51,6 +51,7 @@ func _run() -> void:
 	await _server_contract()
 	await _first_home_flow()
 	await _map_card()
+	await _account_restore()
 	print("DYNAMIC CLAIM ", checks - failures, "/", checks)
 	quit(1 if failures else 0)
 
@@ -195,6 +196,12 @@ func _map_card() -> void:
 	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
 	page._render(); await process_frame
 	check(guest.status(ids[1]) == "unknown" and page._details.text.ends_with("Sign in to claim a home.") and not page._claim.visible, "signed-out player sees 'Sign in to claim a home.' even though ownership can't be read")
+	check(page._sign_in.visible, "signed-out player gets a 'Sign in' button")
+	# After signing in, ownership is re-read for the new identity.
+	guest.api.client.token = "fake-b"
+	guest.forget(); await process_frame
+	page._render()
+	check(not guest.signed_out and guest.mine_known and guest.status(ids[1]) == "none" and not page._sign_in.visible and page._claim.visible, "after signing in the card re-reads ownership and offers the claim")
 	page.queue_free(); selector.queue_free(); guest.queue_free()
 	await process_frame
 
@@ -215,3 +222,27 @@ func _taken_id(_server: RefCounted) -> String:
 		var id := "p-%d" % (5402000 + n)
 		if id.hash() % 3 == 0: return id
 	return ""
+
+## Net.restore_saved_account: reloads a saved token only; an invalid token is dropped, nothing signs in anonymously.
+func _account_restore() -> void:
+	var net = root.get_node_or_null("Net")
+	if net == null:
+		check(false, "Net autoload is present"); return
+	var calls: Array = []
+	var valid := {"value": true}
+	var transport := func(method: String, url: String, headers: PackedStringArray, _body: String) -> ApiClient.Response:
+		calls.append([method, url.trim_prefix("https://restore.test/v1"), "authorization: Bearer saved-token" in headers])
+		if url.ends_with("/users/me"):
+			return ApiClient.Response.new(true, 200, {"user_id": "u1", "player_id": "p1", "display_name": "Ash"}) if valid.value else ApiClient.Response.new(true, 401, {"code": "UNAUTHENTICATED"})
+		return ApiClient.Response.new(true, 404, {"code": "NOT_FOUND"})
+	var path := "user://c32_restore_account.json"
+	net.use_transport(transport, "https://restore.test/v1", path)
+	check(not await net.restore_saved_account() and calls.is_empty(), "no saved account: nothing is requested, no anonymous login")
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify({"token": "saved-token", "user_id": "u1", "player_id": "p1"})); f.close()
+	check(await net.restore_saved_account() and net.client.token == "saved-token", "saved account token is restored")
+	check(calls.size() == 1 and calls[0] == ["GET", "/users/me", true], "restore only checks /users/me with the saved token")
+	net.use_transport(transport, "https://restore.test/v1", path)
+	valid.value = false; calls.clear()
+	check(not await net.restore_saved_account() and net.client.token.is_empty() and not FileAccess.file_exists(path), "rejected token is cleared, not replaced by a guest login")
+	check(calls.all(func(c): return c[1] == "/users/me"), "no other endpoint is called on restore")

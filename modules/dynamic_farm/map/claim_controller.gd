@@ -117,6 +117,14 @@ func abandon() -> void:
 	else: message = "Could not give up this home. Try again."
 	_sync(); changed.emit()
 
+## The player signed in (or switched account): "mine"/"other" were relative to the old identity.
+func forget() -> void:
+	_epoch += 1; busy = false; _reading_mine = false
+	owners = {}; mine = {}; mine_known = false; signed_out = false; message = ""
+	_sync(); changed.emit()
+	start()
+	if not _selected.is_empty(): refresh([_selected])
+
 ## Leaving the map retires in-flight answers; native layers are cleared with the selector's generation.
 func pause() -> void:
 	_epoch += 1; busy = false; _reading_mine = false; _generation = -1; _pushed = {}; _selected = ""
