@@ -8,6 +8,7 @@ const Contract := preload("res://modules/dynamic_farm/map/geo_contract.gd")
 const MapConfig := preload("res://modules/dynamic_farm/map/geo_map_config.gd")
 const Metadata := preload("res://modules/dynamic_farm/map/parcel_metadata.gd")
 const FarmData := preload("res://modules/dynamic_farm/farm_data.gd")
+const PROMPT := "Tap a building to preview a farm."
 const QUERY_RETRY_DELAY_MS := 600 # Default before the single automatic re-query; config query_retry_delay_ms overrides.
 const QUERY_TIMEOUT_S := 8.0
 const QUERY_FAILED := "Parcel details could not load. Tap Retry."
@@ -38,9 +39,8 @@ var _map_retried := false
 var _reload_left := -1.0
 var _resume_tap := false
 var _failed_generation := -1 # Map being replaced by the automatic reload; its later signals are the same failure.
-var _kind := "parcel"
+var _kind := ""
 var _key := ""
-var _highlighted_parcel := ""
 var _options: Array = []
 var _connected := false
 
@@ -48,7 +48,6 @@ var _connected := false
 func activate(auto := false) -> void:
 	if not auto: _map_retried = false; _resume_tap = false; _failed_generation = -1
 	_reload_left = -1.0
-	_clear_parcel_selection()
 	suspended = false
 	_epoch += 1
 	var epoch := _epoch
@@ -87,7 +86,6 @@ func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; _retry_left = -1.0; _query_failed = false; map_ready = false; busy = false
 	_reload_left = -1.0; _resume_tap = false; _failed_generation = -1
 	selection = {}; _options = []; _key = ""
-	_highlighted_parcel = ""
 	if api != null: api.cancel_all()
 	if bridge != null:
 		if generation > 0: bridge.clear_parcel_layers(generation)
@@ -97,7 +95,6 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 	if suspended or gen != generation or gen == _failed_generation or style < style_generation: return
 	var data := _parse(payload)
 	if style != style_generation:
-		_clear_parcel_selection()
 		_pending = -1; _retry_left = -1.0; _query_failed = false; selection = {}; _options = []; _key = ""
 	style_generation = style
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
@@ -105,7 +102,7 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 		# The reloaded map answers the tap that its load error interrupted; that was the tap's one retry.
 		_resume_tap = false; message = FINDING; changed.emit(); _send_query(); return
 	if _querying(): message = FINDING # Native idle readiness arrives while a tap waits.
-	else: message = "Tap a building or open ground to preview a farm." if map_ready else "Loading map details…"
+	else: message = PROMPT if map_ready else "Loading map details…"
 	changed.emit()
 
 func _native_error(gen: int, style: int, code: String) -> void:
@@ -125,13 +122,12 @@ func _native_error(gen: int, style: int, code: String) -> void:
 func camera_changed() -> void:
 	_pending = -1; _retry_left = -1.0; _query_failed = false; _resume_tap = false; _options = []
 	if map_ready and not busy:
-		message = "Tap a building or open ground to preview a farm."; changed.emit()
+		message = PROMPT; changed.emit()
 
 func tap(point: Vector2, zoom: float) -> void:
 	if suspended or not map_ready or busy: return
 	if zoom < float(manifest.native_map.get("minzoom", 16)):
 		message = "Zoom in to choose a farm."; changed.emit(); return
-	_clear_parcel_selection()
 	selection = {}; _options = []; _key = ""
 	bridge.set_parcel_building_highlight(generation, "")
 	_point = point
@@ -178,6 +174,9 @@ func _query_result(request: int, gen: int, style: int, payload: String) -> void:
 	if _kind not in ["building", "parcel"] or (_kind == "building" and (_key.is_empty() or _key.length() > 512 or data.get("building_source") != provider)) or (_kind == "parcel" and not _key.is_empty()):
 		_query_error(request, "contract_rejected"); return
 	_record_query(request, "ok", false)
+	# q(336): only a building's filled footprint selects. Open ground (the bare parcel outline) selects nothing.
+	if _kind == "parcel":
+		message = PROMPT; changed.emit(); return
 	_options = []
 	var seen := {}
 	for raw in data.properties:
@@ -194,18 +193,9 @@ func choose(id: String) -> void:
 	if suspended or not map_ready or busy: return
 	for row in _options:
 		if row.block_id != id: continue
-		_clear_parcel_selection()
 		selection = row.duplicate(true)
-		if _kind == "parcel":
-			_highlighted_parcel = id
-			bridge.set_parcel_states(generation, JSON.stringify([{"block_id": id, "selected": true, "claimed": false, "own": false}]))
-		bridge.set_parcel_building_highlight(generation, _key if _kind == "building" else "")
+		bridge.set_parcel_building_highlight(generation, _key)
 		message = "Ready to preview this farm."; changed.emit(); return
-
-func _clear_parcel_selection() -> void:
-	if not _highlighted_parcel.is_empty() and bridge != null and generation > 0:
-		bridge.set_parcel_states(generation, JSON.stringify([{"block_id": _highlighted_parcel, "selected": false, "claimed": false, "own": false}]))
-	_highlighted_parcel = ""
 
 func open_farm() -> void:
 	if suspended or not map_ready or busy or selection.is_empty(): return
