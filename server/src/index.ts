@@ -16,6 +16,9 @@ import { appleJwksFetcher } from './accounts/apple_token.js';
 import { appleRevokerFromEnv } from './accounts/apple_revoke.js';
 import { googleIdJwksFetcher } from './accounts/google_token.js';
 import { CachedJwks } from './accounts/firebase_token.js';
+import { PgParcelStore } from './parcels/pg_store.js';
+import { loadParcelRules } from './parcels/rules.js';
+import { parcelReselectFromEnv } from './parcels/routes.js';
 
 const need = (k: string): string => {
   const v = process.env[k];
@@ -106,6 +109,9 @@ const app = await buildApp({
   google: googleConfig(),
   // Only a development server may let guests write; production keeps guests read-only.
   guestWrites: process.env.GUEST_WRITES === '1',
+  // Dynamic farm parcels (C-31). "Abandon and pick again" is for the internal test server only: it stays off unless
+  // DYNAMIC_FARM_RESELECT=1 is set there; production never sets it.
+  parcels: { store: new PgParcelStore(pool), rules: loadParcelRules(CONTENT_DIR), reselect: parcelReselectFromEnv(process.env) },
 });
 
 // Only one room writer may serve this database. HTTP-only replicas set REALTIME_ENABLED=0.
@@ -126,4 +132,4 @@ if (process.env.REALTIME_ENABLED !== '0') {
 
 const port = Number(process.env.PORT ?? 3000);
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'}`);
+console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)}`);
