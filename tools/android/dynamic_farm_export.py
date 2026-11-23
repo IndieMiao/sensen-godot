@@ -19,8 +19,8 @@ DISABLED = 'http://127.0.0.1:9'
 # The isolated Journey test service confirmed in C-38#46 (tailnet only). Anything else is refused:
 # production, devserver, P0 and every other address.
 APPROVED_TARGETS = ('https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1',)
-# Read by the map (C-32); only the internal package may set them.
-INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore')
+# Read by the map (C-32; own_farm: C-34 Q-72); only the internal package may set them.
+INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'dynamic_farm/own_farm')
 URL_KEYS = ('network/base_url', 'network/mobile_base_url')
 VARIANTS = ('android', *PACKAGES)
 # A feature-tag override (e.g. `network/base_url.mobile=`) would win at run time over the staged value.

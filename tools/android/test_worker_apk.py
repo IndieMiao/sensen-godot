@@ -132,7 +132,7 @@ class WorkerAPK(unittest.TestCase):
         self.assertIs(internal['sensen/network/online_qa'], True)  # Net never boots or signs in anonymously.
         self.assertIs(isolated['sensen/network/online_qa'], True)
         self.assertNotIn('sensen/network/online_qa', release)
-        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/account_restore'):
+        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/account_restore', 'sensen/dynamic_farm/own_farm'):
             self.assertIs(internal[key], True)
             self.assertNotIn(key, isolated)
             self.assertNotIn(key, release)
@@ -164,7 +164,7 @@ class WorkerAPK(unittest.TestCase):
                 config = inspect_zip(self.apk, True, variant)
                 self.assertEqual(config['variant'], variant)
                 internal = variant == 'dynamic-farm-internal'
-                self.assertEqual((config['reselect'], config['account_restore']), (internal, internal))
+                self.assertEqual((config['reselect'], config['account_restore'], config['own_farm']), (internal,) * 3)
                 self.assertEqual(config['journey_mobile_base_url'] == TARGET, internal)
         internal = exported_settings('dynamic-farm-internal')
         bad = [('dynamic-farm', internal), ('android', internal),
@@ -178,6 +178,9 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/base_url': 'https://farm.sensenjoy.cn/v1'})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/account_restore': False})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/own_farm': False})),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/dynamic_farm/own_farm': True})),
+               ('android', dict(exported_settings('android'), **{'sensen/dynamic_farm/own_farm': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/fake_claims': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/reselect.mobile': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa.mobile': False})),

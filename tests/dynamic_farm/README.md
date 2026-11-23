@@ -231,7 +231,9 @@ setting, and the real map card's buttons. Fake data proves client logic only; it
 not evidence of a real claim, a save or device rendering.
 
 Settings read by the map: `sensen/dynamic_farm/reselect` (internal test packages only;
-shows "Give up and choose again"), `sensen/dynamic_farm/account_restore` (internal test
+shows "Give up and choose again"), `sensen/dynamic_farm/own_farm` (internal test packages only;
+"Enter my farm" opens the own parcel with `own_parcel=true` for farming, C-34 Q-72; otherwise it
+opens the read-only preview), `sensen/dynamic_farm/account_restore` (internal test
 packages only; reloads the saved account token through `Net.restore_saved_account()`, which
 calls `/users/me` and nothing else) and `sensen/dynamic_farm/fake_claims` (+ optional
 `fake_player`, default `fake-a`) for development without the C-31 server. None is

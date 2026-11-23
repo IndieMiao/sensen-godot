@@ -176,7 +176,9 @@ func _map_card() -> void:
 	check(not page._reselect.visible, "release package shows no give-up entry")
 	check(native.states[ids[0]].own, "claimed parcel turns green on the map")
 	page._enter.pressed.emit()
-	check(selector.opened == 1, "'Enter my farm' opens the parcel")
+	check(selector.opened == 1 and page._entering == ids[0], "'Enter my farm' opens the parcel as an entry to that home")
+	page._preview()
+	check(selector.opened == 2 and page._entering.is_empty(), "'Preview in 3D' opens a read-only preview")
 	page._claims.reselect = true; page._render()
 	check(page._reselect.visible, "internal package shows 'Give up and choose again'")
 	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
