@@ -4,6 +4,10 @@ extends Control
 signal movement_changed(value: Vector2)
 signal zoom_changed(factor: float)
 signal recenter_requested
+## A short press that never left the dead zone: a tap on the world at that point.
+signal tapped(position: Vector2)
+
+const TAP_MS := 300
 
 var finger := -1
 var origin := Vector2.ZERO
@@ -11,6 +15,7 @@ var value := Vector2.ZERO
 var touches: Dictionary = {}
 var last_press_ms := 0
 var last_press_position := Vector2(-1000, -1000)
+var _steered := false
 var pinch_distance := 0.0
 var top_exclusion_y := 70.0
 var pinch_updates := 0
@@ -42,7 +47,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_press(event.index, event.position)
 		else:
 			touches.erase(event.index)
-			if finger == event.index: _cancel()
+			if finger == event.index: _lift()
 			if touches.size() < 2:
 				pinch_distance = 0.0
 				pinch_source = ""
@@ -73,7 +78,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed: zoom_changed.emit(1.08)
 		elif event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed and event.position.y > top_exclusion_y: _press(999, event.position)
-			elif not event.pressed and finger == 999: _cancel()
+			elif not event.pressed and finger == 999: _lift()
 	elif event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION and finger == 999:
 		_drag(event.position)
 
@@ -90,13 +95,21 @@ func _press(id: int, p: Vector2) -> void:
 	finger = id
 	origin = p
 	value = Vector2.ZERO
+	_steered = false
 	queue_redraw()
 
 func _drag(p: Vector2) -> void:
 	var raw := ((p - origin) / _radius()).limit_length(1.0)
 	value = Vector2.ZERO if raw.length() < 0.14 else raw
+	_steered = _steered or not value.is_zero_approx()
 	movement_changed.emit(value)
 	queue_redraw()
+
+func _lift() -> void:
+	var tap := not _steered and Time.get_ticks_msec() - last_press_ms <= TAP_MS
+	var at := origin
+	_cancel()
+	if tap: tapped.emit(at)
 
 func _cancel() -> void:
 	finger = -1
@@ -125,7 +138,7 @@ func _input(event: InputEvent) -> void:
 	# A gesture that started on the world must still end over a UI button or outside it.
 	if event is InputEventScreenTouch and not event.pressed and touches.has(event.index):
 		touches.erase(event.index)
-		if finger == event.index: _cancel()
+		if finger == event.index: _lift()
 		if touches.size() < 2:
 			pinch_distance = 0.0
 			pinch_source = ""
@@ -133,7 +146,7 @@ func _input(event: InputEvent) -> void:
 		_unhandled_input(event)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and finger == 999:
-		_cancel()
+		_lift()
 	elif event is InputEventMouseMotion and finger == 999 and event.device != InputEvent.DEVICE_ID_EMULATION:
 		_unhandled_input(event)
 		get_viewport().set_input_as_handled()
