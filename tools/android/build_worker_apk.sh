@@ -100,6 +100,9 @@ clean=(env -i "PATH=$java/bin:$PATH" "HOME=$home" "CFFIXED_USER_HOME=$home" "TMP
 for plugin in voice webview google_signin notify; do
     "${clean[@]}" python3 "$p/tools/android/prepare_${plugin}_plugin.py"
 done
+# Reuse a host-provided, sha256-verified Gradle wrapper distribution (C-64); otherwise download as before.
+seed_tool=(python3 -B "$p/tools/android/gradle_dist_seed.py")
+"${seed_tool[@]}" seed "$p/android/build/gradle/wrapper/gradle-wrapper.properties" "$home/.gradle" "$work/gradle-seed.json"
 # No raw editor / Gradle logs in receipts or the worktree.
 run_editor() {
     local rc=0 pattern='^SCRIPT ERROR:|^ERROR:'
@@ -123,6 +126,7 @@ run_editor() {
 }
 run_editor --import
 run_editor --export-release Android "$work/unaligned.apk"
+"${seed_tool[@]}" check "$work/gradle-seed.json"
 "${clean[@]}" "${apk_tool[@]}" check-unsigned "$work/unaligned.apk"
 "$bt/zipalign" -P 16 4 "$work/unaligned.apk" "$work/unsigned.apk"
 "${clean[@]}" "${apk_tool[@]}" verify \
