@@ -18,7 +18,7 @@ static func decode(raw:Variant) -> Dictionary:
 	if raw.has("bbox") and not Geo.valid_bbox(raw.bbox):return {}
 	for key in ["core_cell_count","extension_cell_count","total_cell_count"]:
 		if not (raw.get(key) is int or raw.get(key) is float) or not is_finite(float(raw[key])) or float(raw[key])!=floorf(float(raw[key])) or raw[key]<0:return {}
-	if raw.core_cell_count<760 or raw.core_cell_count>840 or raw.extension_cell_count<=0 or raw.total_cell_count!=raw.core_cell_count+raw.extension_cell_count or raw.total_cell_count>8192:return {}
+	if raw.core_cell_count<1 or raw.extension_cell_count<=0 or raw.total_cell_count!=raw.core_cell_count+raw.extension_cell_count or raw.total_cell_count>8192:return {}
 	if raw.has("cell_count") and raw.cell_count!=raw.core_cell_count:return {}
 	raw["cell_count"]=raw.core_cell_count
 	for key in ["source_area_m2","inset_area_m2"]:

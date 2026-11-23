@@ -95,6 +95,23 @@ allowance resets on the next tap or Retry. `DYNAMIC_MAP_ERROR` logs the native
 code and whether a tap was waiting. `DYNAMIC_QUERY` logs the local request number, native
 outcome code, attempt and retry decision only, never the point or parcel.
 
+### Core size and too-small parcels (C-43)
+
+The client no longer requires 760–840 core cells. Farm data and parcel
+metadata accept any non-empty core within the 8192-cell total budget; shape and
+count come from the dataset (r5 rasterizes DataSF building footprints, C-48).
+Choosing a parcel whose `core_cell_count` is below `min_core_cells` in
+`config.json` (default 400, clamped 1–8192) keeps the building highlighted,
+leaves Preview disabled and shows "This parcel is too small to be your main
+farm. Please choose a larger one." (Q-56). The fetched farm is checked again
+before opening.
+
+`dataset_version` in `config.json` selects the release; any
+`sf-dynamic-farm-YYYYMMDD-rN` name is accepted, and the manifest, farms and
+preview host must all carry that same version. Switching to r5 means updating
+`base_url`, `dataset_version` and `manifest_sha256` together.
+test_core_size.gd covers L-shaped, courtyard and threshold-edge fixtures.
+
 ## 1904 read retries
 
 The demo read API allows three total attempts (including the first) for

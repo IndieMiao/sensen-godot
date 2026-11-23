@@ -2,5 +2,6 @@
   "base_url": "https://lonely-window-barely-sheriff.trycloudflare.com",
   "dataset_version": "sf-dynamic-farm-20261118-r4",
   "manifest_sha256": "645df3530b5617bb7e5a8cfb0d070e0e82b74337db47f83a542df1e90c3ae1cf",
-  "building_source": "mapbox"
+  "building_source": "mapbox",
+  "min_core_cells": 400
 }

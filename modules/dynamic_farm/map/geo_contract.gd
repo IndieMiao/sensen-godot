@@ -2,8 +2,9 @@ extends RefCounted
 ## Wire identity is block_id for compatibility; parcel_id is the public canonical parcel number.
 const SCHEMA := 4
 const FARM_SCHEMA := 4
-const DATASET := "sf-dynamic-farm-20261118-r4"
+const DATASET := "sf-dynamic-farm-20261118-r4" # Reviewed r4; config.json dataset_version + manifest_sha256 select the active release.
 const UNIT := "parcel"
+const DATASET_PATTERN := "^sf-dynamic-farm-[0-9]{8}-r[0-9]{1,3}$"
 
 static func valid_id(value:Variant) -> bool:
 	if not value is String or not value.begins_with("p-") or value.length()<3 or value.length()>100:
@@ -13,7 +14,7 @@ static func valid_id(value:Variant) -> bool:
 	return true
 
 static func valid_dataset(value:Variant) -> bool:
-	return value==DATASET
+	return value is String and RegEx.create_from_string(DATASET_PATTERN).search(value)!=null
 
 static func identity_path(version:String) -> String:
 	return "user://geo_farm_identity_"+version+".json" if valid_dataset(version) else ""

@@ -14,6 +14,8 @@ const QUERY_TIMEOUT_S := 8.0
 const QUERY_FAILED := "Parcel details could not load. Tap Retry."
 const MAP_FAILED := "Map details could not load. Tap Retry."
 const FINDING := "Finding parcel…"
+const TOO_SMALL := "This parcel is too small to be your main farm. Please choose a larger one." # Q-56
+const MIN_CORE_CELLS := 400 # C-43 default; config min_core_cells overrides (clamped 1–8192).
 # Definite native answers: retrying cannot change them, so they are not failures.
 const SETTLED := {"building_without_parcel": "No selectable parcel here.", "invalid_point": "No selectable parcel here.", "too_many_candidates": "Zoom in to choose a farm."}
 var api: Node
@@ -63,7 +65,7 @@ func activate(auto := false) -> void:
 	map_ready = false; busy = true; selection = {}; _options = []; _pending = -1; _retry_left = -1.0; _query_failed = false
 	message = FINDING if _resume_tap else "Loading dynamic farm map…"; changed.emit()
 	var pin := str(config.get("manifest_sha256", ""))
-	if RegEx.create_from_string("^[0-9a-f]{64}$").search(pin) == null or config.get("dataset_version") != Contract.DATASET:
+	if RegEx.create_from_string("^[0-9a-f]{64}$").search(pin) == null or not Contract.valid_dataset(config.get("dataset_version")):
 		_record_load("client_manifest", "configuration_rejected", epoch, started)
 		_fail("This preview service is not configured."); return
 	api.base_url = str(config.get("base_url", ""))
@@ -72,7 +74,7 @@ func activate(auto := false) -> void:
 	if epoch != _epoch or suspended:
 		_record_load("client_manifest", "superseded", epoch, started); return
 	var native := MapConfig.build(data, api.base_url, config)
-	if not Contract.envelope(data) or native.is_empty():
+	if not Contract.envelope(data, str(config.dataset_version)) or native.is_empty():
 		_record_load("client_manifest", "validation_rejected", epoch, started)
 		_fail("Could not load this farm map. Tap Retry."); return
 	_record_load("client_manifest", "validation_accepted", epoch, started)
@@ -193,9 +195,16 @@ func choose(id: String) -> void:
 	if suspended or not map_ready or busy: return
 	for row in _options:
 		if row.block_id != id: continue
-		selection = row.duplicate(true)
 		bridge.set_parcel_building_highlight(generation, _key)
+		if int(row.core_cell_count) < min_core_cells():
+			selection = {}; message = TOO_SMALL; changed.emit(); return
+		selection = row.duplicate(true)
 		message = "Ready to preview this farm."; changed.emit(); return
+
+func min_core_cells() -> int:
+	var raw = config.get("min_core_cells", MIN_CORE_CELLS)
+	if not (raw is int or raw is float) or not is_finite(float(raw)): raw = MIN_CORE_CELLS
+	return clampi(int(raw), 1, FarmData.MAX_CELLS)
 
 func open_farm() -> void:
 	if suspended or not map_ready or busy or selection.is_empty(): return
@@ -208,9 +217,13 @@ func open_farm() -> void:
 	if epoch != _epoch or suspended:
 		_record_load("farm", "superseded", epoch, started); return
 	busy = false
-	if not Contract.farm_matches(farm, id) or FarmData.decode(farm).get("ok") != true:
+	var decoded := FarmData.decode(farm) if Contract.farm_matches(farm, id, str(manifest.dataset_version)) else {}
+	if decoded.get("ok") != true:
 		_record_load("farm", "validation_rejected", epoch, started)
 		_fail("This farm could not load. Please try again."); return
+	if decoded.counts.core < min_core_cells():
+		_record_load("farm", "too_small", epoch, started)
+		selection = {}; _fail(TOO_SMALL); return
 	_record_load("farm", "validation_accepted", epoch, started)
 	farm_ready.emit(farm)
 
