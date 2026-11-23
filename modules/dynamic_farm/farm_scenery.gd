@@ -112,11 +112,20 @@ static func _scatter(planned: Dictionary, data: Dictionary, walk: RefCounted, re
 		accepted += 1
 	planned.roles[role] = {"target":wanted,"accepted":accepted,"attempts":attempts,"rejected":attempts-accepted}
 
-static func build(planned: Dictionary, walk: RefCounted) -> Dictionary:
+## The batch an instance is drawn in: its model's colour variant within a 32-cell
+## chunk. EdgeDecor budgets its new batches with the same key.
+static func batch_key(palette: Dictionary, asset: String, origin: Vector3, cell_m: float) -> String:
+	return "%s#%d:%d:%d" % [asset, Palette.pick(palette, asset, origin),
+		floori(origin.x/(CHUNK_CELLS*cell_m)), floori(origin.z/(CHUNK_CELLS*cell_m))]
+
+## `recipe` is the plan's (`plan().recipe`), so a load reads the recipe file once;
+## only a caller without it falls back to reading the file.
+static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null) -> Dictionary:
 	var root := Node3D.new()
 	root.name = "DynamicScenery"
 	var cell_m: float = walk.cell_m
-	var recipe = JSON.parse_string(FileAccess.get_file_as_string(RECIPE_PATH))
+	if not recipe is Dictionary: recipe = planned.get("recipe")
+	if not recipe is Dictionary: recipe = JSON.parse_string(FileAccess.get_file_as_string(RECIPE_PATH))
 	var palette: Dictionary = recipe.get("prop_palette", {}) if recipe is Dictionary else {}
 	var batches := {}
 	var triangles := 0
@@ -124,7 +133,7 @@ static func build(planned: Dictionary, walk: RefCounted) -> Dictionary:
 	for item: Dictionary in planned.layout:
 		var p: Vector3 = item.transform.origin
 		var variant := Palette.pick(palette, item.asset, p)
-		var key := "%s#%d:%d:%d" % [item.asset, variant, floori(p.x/(CHUNK_CELLS*cell_m)), floori(p.z/(CHUNK_CELLS*cell_m))]
+		var key := batch_key(palette, item.asset, p, cell_m)
 		if not batches.has(key): batches[key] = {"asset":item.asset,"variant":variant,"shadow":item.shadow,"transforms":[]}
 		batches[key].transforms.append(item.transform)
 		triangles += item.triangles

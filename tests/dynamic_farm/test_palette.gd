@@ -1,13 +1,15 @@
 extends SceneTree
 ## C-21 warm palette: only vertex colours of the 13 existing models change. Geometry,
 ## layouts, collision and walking stay identical; every model colour is mapped; no
-## blue (water-like) colour is introduced. Optional real parcels: -- <farm.json>...
+## blue (water-like) colour is introduced. Always runs the synthetic fixture parcel
+## (core obstacles only, no outer props); optional real parcels: -- <farm.json>...
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const Palette = preload("res://modules/dynamic_farm/farm_palette.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
+const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 var failures := 0
 var checks := 0
 
@@ -77,17 +79,20 @@ func _run() -> void:
 	_check(Palette.pick({}, "wild_pz_tree_20", Vector3.ZERO) == -1 and Palette.mesh({}, "wild_pz_tree_20", -1) == Art.mesh_for("wild_pz_tree_20"), "no palette keeps the original model")
 	for key in ["grass_srgb", "grass_warm_srgb", "grass_far_srgb", "core_warm_surface_srgb", "core_grid_srgb"]:
 		_check(not _blue(Color(recipe.surface[key])), "ground %s is not water-blue" % key)
+	var parcels: Array = [["fixture p-A", Fixture.farm("p-A")]]
 	for file in OS.get_cmdline_user_args():
-		var data := Data.decode(JSON.parse_string(FileAccess.get_file_as_string(file)))
-		_check(data.ok, "invalid parcel: " + file)
+		parcels.append([file, JSON.parse_string(FileAccess.get_file_as_string(file))])
+	for parcel: Array in parcels:
+		var data := Data.decode(parcel[1])
+		_check(data.ok, "invalid parcel: " + parcel[0])
 		if not data.ok: continue
 		var walk := Walk.new(data)
 		var plan := Scenery.plan(data, walk)
 		Shade.enforce_budget(plan, data, walk)
 		var layout := str(plan.layout) + str(plan.core_obstacles.layout)
 		var reserved := walk.reserved.duplicate()
-		var art := Scenery.build(plan, walk)
-		var core := Scenery.build(plan.core_obstacles, walk)
+		var art := Scenery.build(plan, walk, plan.recipe)
+		var core := Scenery.build(plan.core_obstacles, walk, plan.recipe)
 		_check(art.ok and core.ok, "scenery builds")
 		_check(str(plan.layout) + str(plan.core_obstacles.layout) == layout and walk.reserved == reserved, "recolouring changed a layout or reservation")
 		var instances := 0
@@ -100,10 +105,23 @@ func _run() -> void:
 		var again_walk := Walk.new(data)
 		var again := Scenery.plan(data, again_walk)
 		Shade.enforce_budget(again, data, again_walk)
-		var repeat := Scenery.build(again, again_walk)
-		_check(_signature(repeat.root) == _signature(art.root), "reopening gives the same colours in the same places")
-		print("PALETTE_PARCEL ", data.block_id, " instances=", instances, " batches=", art.batches + core.batches, " signature=", _signature(art.root).sha256_text())
-		for root: Node in [art.root, core.root, repeat.root]: root.free()
+		var repeat := Scenery.build(again, again_walk, again.recipe)
+		var repeat_core := Scenery.build(again.core_obstacles, again_walk, again.recipe)
+		# Outer and core props together, so a parcel without outer props is still compared.
+		var rows := _signature([art.root, core.root])
+		_check(rows.size() == instances and instances > 0, "%s: reopen signature covers every drawn instance (%d rows)" % [parcel[0], rows.size()])
+		_check(_signature([repeat.root, repeat_core.root]) == rows, "%s: reopening gives the same colours in the same places" % parcel[0])
+		# build() colours from the recipe it is given (plan().recipe), not a fresh file read.
+		var plain_recipe: Dictionary = plan.recipe.duplicate()
+		plain_recipe.prop_palette = {}
+		var plain := Scenery.build(plan.core_obstacles, Walk.new(data), plain_recipe)
+		var source_meshes: Array = ids.map(func(id): return Art.mesh_for(id))
+		var plain_meshes: Array = plain.root.find_children("*", "MultiMeshInstance3D", true, false).map(func(node): return node.multimesh.mesh)
+		var core_meshes: Array = core.root.find_children("*", "MultiMeshInstance3D", true, false).map(func(node): return node.multimesh.mesh)
+		_check(not plain_meshes.is_empty() and plain_meshes.all(func(mesh): return source_meshes.has(mesh))
+			and not core_meshes.any(func(mesh): return source_meshes.has(mesh)), "%s: build() colours from the recipe it is passed" % parcel[0])
+		print("PALETTE_PARCEL ", data.block_id, " instances=", instances, " batches=", art.batches + core.batches, " signature=", "\n".join(rows).sha256_text())
+		for root: Node in [art.root, core.root, repeat.root, repeat_core.root, plain.root]: root.free()
 	print("DYNAMIC_PALETTE_TESTS checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -118,11 +136,13 @@ func _floats(values: Variant) -> PackedFloat32Array:
 		return out
 	return PackedFloat32Array(values)
 
-func _signature(root: Node) -> String:
+## One row per drawn instance: position and its model's vertex colours.
+func _signature(roots: Array) -> Array[String]:
 	var rows: Array[String] = []
-	for node: MultiMeshInstance3D in root.find_children("*", "MultiMeshInstance3D", true, false):
-		var colours := str(node.multimesh.mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]).sha256_text()
-		for i in node.multimesh.instance_count:
-			rows.append("%s %s" % [node.multimesh.get_instance_transform(i).origin, colours])
+	for root: Node in roots:
+		for node: MultiMeshInstance3D in root.find_children("*", "MultiMeshInstance3D", true, false):
+			var colours := str(node.multimesh.mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]).sha256_text()
+			for i in node.multimesh.instance_count:
+				rows.append("%s %s" % [node.multimesh.get_instance_transform(i).origin, colours])
 	rows.sort()
-	return "\n".join(rows)
+	return rows
