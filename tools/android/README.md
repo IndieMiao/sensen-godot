@@ -143,3 +143,73 @@ values, so GDScript must swallow the back press that closed the page
 Debug builds can point the page at a local dev server:
 `adb reverse tcp:5173 tcp:5173`, then write `http://localhost:5173/` into the
 app's `files/voice_match_base_url.txt` via `run-as`. Delete it afterwards.
+
+## Cardigan worker: unsigned standalone APK (not Play)
+
+Use `build_worker_apk.sh` for the tracked **Android** APK preset, not the demo
+publisher or Play AAB scripts. It uses the package, version name and version code
+from the selected commit unchanged in the default mode. `--dynamic-farm` instead
+selects the isolated preview package `com.sensen.dynamicfarm.cardigan` (same version).
+This does not allocate a release version,
+choose a production signing identity, install an app or authorize publication.
+
+1. Have the host owner provision and register Godot **4.7.2 stable** export
+   templates (including `android_source.zip`) and a shared Android SDK. Use
+   `GODOT_TEMPLATES_DIR` for a non-default version directory, `ANDROID_HOME` for
+   the SDK, `JAVA_HOME` for the JDK, and optionally `ANDROID_BUILD_TOOLS` for
+   the build-tools directory (default `36.1.0`). Provision **only** the approved
+   public runtime file via `CARDIGAN_MAPBOX_PUBLIC_FILE`: a worker-readable absolute
+   path outside any repository. Do not put a copy, link or value in the checkout. Never copy an
+   account's `.android`, Godot settings, Gradle home, keystore or passwords.
+2. Confirm the **exclusive host Godot import/export window** with scheduling
+   first. C-14 serializes with C-9: check ACASIS is mounted and at least 1.5 GB
+   free+inactive+speculative memory is available before starting. In the worker Run, at the committed source
+   revision, use an absolute path to a new output directory with an existing parent:
+
+   ```sh
+   tools/android/build_worker_apk.sh --dynamic-farm "$TMPDIR/candidate"
+   ```
+
+   The preview launches the existing parcel map, sets `online_qa` before autoload
+   startup, isolates the user directory and disables Journey endpoints in staging only.
+   It keeps the committed read-only dataset config and includes the raw map, scenery
+   and avatar JSON needed for 3D preview. Do not change the production project/presets.
+
+   The script stages committed game sources in a disposable project, generates
+   one non-runnable, `package/signed=false` APK preset, prepares the Gradle template + native
+   plugins, then imports and exports **release** serially in a fresh portable
+   editor. It fixes ADB to 5137, disables editor ADB shutdown and needs no
+   device or emulator. Gradle may need to download build dependencies; there
+   is no artifact upload step in the build script. Template and APK directory
+   entries are screened for keystores and `export_credentials.cfg` before any
+   member is opened for extraction or CRC checks. It refuses signing metadata
+   **before** alignment as well as afterwards. Success produces `unsigned.apk`,
+   `unsigned.json` (manifest identity, size, SHA-256) and `source-commit.txt`.
+3. For **C-496 only**, use the configured Card MCP `upload_attachment` large
+   artifact flow (`artifact_size`, `sha256`, `kind=artifact`, no inline `file`).
+   Stream only the verified APK to the one-use **internal** destination on the
+   configured MCP endpoint. Do not log the ticket or follow off-origin redirects.
+   Verify stored size/digest or download and re-hash. Record the attachment ID,
+   unsigned SHA-256, source commit, card and Run. A locally computed hash or an
+   issued upload ticket is **not** proof of storage.
+4. Sign only when the **Android C-500** route and approved package/certificate
+   identity are confirmed. Submit the stored unsigned artifact by ID/digest;
+   never use local signing as a fallback. Obtain the signed artifact and audit
+   receipt. Read back its manifest against the **original source revision** and
+   verify it against the approved **public certificate** fingerprint (not a
+   value inferred from the APK itself):
+
+   ```sh
+   python3 tools/android/worker_apk.py --variant dynamic-farm --presets export_presets.cfg verify \
+     "$SIGNED_APK" --build-tools "$ANDROID_BUILD_TOOLS" --signer-sha256 "$APPROVED_CERT_SHA256"
+   ```
+
+   Match the unsigned input SHA-256, signed output SHA-256, signer, card, Run
+   and audit ID to the service receipt before recording success. Do not realign
+   or otherwise rewrite the signed APK. If provisioning, internal storage or
+   signing is unavailable, report the missing step; no external mirrors, manual
+   signing, installation or distribution.
+
+Local checks: `python3 -m unittest discover -s tools/android -p test_worker_apk.py -v`.
+With SDK platform 36 and its build-tools/JDK configured, the fixture test uses
+real `aapt`, `zipalign` and `apksigner`. Fixture bytes are **not** a game export.
