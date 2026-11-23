@@ -199,6 +199,41 @@ describe('parcel tiles and building layer (test range)', () => {
     expect(validateDataset(dir, RELAXED, () => {})).toBeGreaterThan(0);
   });
 
+  /** The written sample without its map layer, as a dataset from before r5's parcel tiles (C-49 r5, r4) looks. */
+  const withoutMapLayer = (dropTiles: boolean) => {
+    const dir = written();
+    const manifest = manifestOf(dir);
+    delete manifest.map_layer;
+    if (dropTiles) {
+      for (const name of Object.keys(manifest.files).filter(k => k.startsWith('tiles/') || k === 'tilejson.template.json')) delete manifest.files[name];
+      rmSync(path.join(dir, 'tiles'), { recursive: true });
+      rmSync(path.join(dir, 'tilejson.template.json'));
+    }
+    const text = JSON.stringify(manifest);
+    writeFileSync(path.join(dir, 'manifest.json'), text);
+    const client = JSON.parse(readFileSync(path.join(dir, 'client-manifest.json'), 'utf8'));
+    writeFileSync(path.join(dir, 'client-manifest.json'), JSON.stringify({ ...client, source_manifest_sha256: sha256(text) }));
+    return dir;
+  };
+
+  it('validates a dataset from before the map layer, skipping and reporting the tile check', () => {
+    const lines: string[] = [];
+    expect(validateDataset(withoutMapLayer(true), RELAXED, l => lines.push(l))).toBe(0);
+    expect(lines).toContain('tiles skipped: manifest.json has no map_layer (dataset predates the parcel map layer)');
+    expect(lines.at(-1)).toBe('88 farms checked, 0 failures');
+  });
+
+  it('fails without throwing when tiles are present but map_layer is missing, or client-manifest.json is absent', () => {
+    const lines: string[] = [];
+    expect(validateDataset(withoutMapLayer(false), RELAXED, l => lines.push(l))).toBe(1);
+    expect(lines).toContain('TILE manifest.json has parcel tiles but no map_layer');
+    const dir = withoutMapLayer(true);
+    rmSync(path.join(dir, 'client-manifest.json'));
+    lines.length = 0;
+    expect(validateDataset(dir, RELAXED, l => lines.push(l))).toBe(1);
+    expect(lines).toContain('MISSING client-manifest.json');
+  });
+
   it('writes tilejson.json for a host base URL and checks it', async () => {
     const dir = written();
     expect(await main(['tilejson', '--dataset', dir, '--base', 'https://oss.example/sensen/r5-abc'])).toBe(0);

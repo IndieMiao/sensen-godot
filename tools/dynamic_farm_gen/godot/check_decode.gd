@@ -8,7 +8,7 @@ extends SceneTree
 ## every farm and every parcel decodes.
 
 ## ParcelPayload.publicProperties (tools/android/overlay/ParcelPayload.kt): the only feature
-## properties the native map hands to GDScript after a tap.
+## properties the native map hands to GDScript after a tap. check_public_keys.sh asserts the two lists match.
 const PUBLIC_KEYS := ["block_id", "parcel_id", "selection_unit", "name", "address", "address_count", "center", "center_lon", "center_lat", "bbox", "cell_count", "core_cell_count", "extension_cell_count", "total_cell_count", "farm_path", "source_area_m2", "inset_area_m2", "building_count"]
 
 static func public_properties(raw: Dictionary) -> Dictionary:
