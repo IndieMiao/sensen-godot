@@ -74,6 +74,12 @@ start_https_fixture() {
 
 run_one() {
   local name=$1 log=$work/$1.log args=() start rc summary checks failures note=
+  if [[ $name == test_parcel_farming_server ]]; then
+    # Its arguments are a running C-31 server and the parcel owner's token (file header).
+    skipped+=("| $name.gd | needs a running C-31 server and the parcel owner's token; run by hand |")
+    rows+=("| $name.gd | SKIPPED | – | – | see Skipped |")
+    return
+  fi
   if [[ $name == test_read_retries_https ]]; then
     # Not in a subshell: the fixture's PID must stay in fixture_pid for cleanup.
     if ! start_https_fixture >"$work/https_args"; then

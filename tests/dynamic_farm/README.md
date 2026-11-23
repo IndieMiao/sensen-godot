@@ -54,6 +54,8 @@ under its own timeout (`DYNAMIC_FARM_TIMEOUT`, default 180 s; a hang is killed a
 and passes the four pinned r4 parcels in `fixtures/r4/` after `--`. A file passes only with
 exit 0, no `SCRIPT ERROR`, and a summary line with a non-zero check count and no failures.
 `test_read_retries_https.gd` gets a loopback TLS fixture with throwaway certificates.
+`test_parcel_farming_server.gd` needs a running C-31 server and an owner token, so the check lists it
+under "Skipped"; run it by hand as its header describes.
 Anything that cannot run is listed under "Skipped" in the job summary, never as passed
 (currently `test_mesh_edges.gd --legacy`, whose old mesh script is not in the repository).
 Locally: `tools/run_tests.sh --ci-import` once, then `tools/ci/dynamic_farm_tests.sh [test_name…]`.
