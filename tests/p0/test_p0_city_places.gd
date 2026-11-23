@@ -4,6 +4,7 @@ extends GdUnitTestSuite
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
+const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")
 const P0Outposts := preload("res://modules/p0/p0_outposts.gd")
 const P0Ponds := preload("res://modules/p0/p0_ponds.gd")
 const PondCard := preload("res://modules/p0/p0_pond_card.gd")
@@ -37,6 +38,7 @@ func before_test() -> void:
 
 func after_test() -> void:
 	P0CityPlaces.clear()
+	P0WildSites.clear()
 	for key in WaterShore._pending.keys(): WorkerThreadPool.wait_for_task_completion(WaterShore._pending[key])
 	WaterShore._pending.clear()
 
@@ -336,3 +338,29 @@ func test_a_church_outpost_wears_the_church_icon() -> void:
 	assert_object(CityMapData.art_texture(P0Outposts.place_entry(o))).is_not_null()   # the card draws it
 	assert_str(str(P0Outposts.place_entry({"id": "x", "role": "tackle", "name": "T", "category": "", "lat": 0.0, "lng": 0.0}).art_path)) \
 		.is_equal(P0Outposts.PIN_ART.tackle)
+
+## C-47: the runtime leaving (the app ending) gives up the city and wild-box reads still out on its session, nobody
+## told: their callbacks (the map's lambdas) go before the engine's script teardown, where one outliving its script
+## aborted the app (exit 134). What was read stays.
+func test_the_runtime_leaving_drops_the_reads_still_out_and_keeps_what_was_read() -> void:
+	P0CityPlaces.accept(TOKYO, CITY)
+	var rt := P0Runtime.ensure()
+	await get_tree().process_frame
+	assert_bool(rt.is_inside_tree()).is_true()
+	var asked: Array = []
+	rt.session.transport = func(_m: int, _p: String, _b: Dictionary, cmd: Dictionary) -> void: asked.append(cmd)   # never answers
+	var told: Array = []
+	P0CityPlaces.fetch(rt.session, SF, func(_c): told.append("city"), func(): told.append("city failed"))
+	P0WildSites.fetch(rt.session, [37.0, -123.5, 38.5, -121.5], 9.0, func(_s): told.append("wild"), func(): told.append("wild failed"))
+	assert_int(asked.size()).is_equal(2)
+	assert_bool(P0CityPlaces._pending.has(SF)).is_true()
+	assert_int(P0WildSites._pending.size()).is_equal(1)
+	P0Runtime.free_instance_for_tests()
+	await get_tree().process_frame
+	assert_bool(is_instance_valid(rt)).is_false()
+	assert_dict(P0CityPlaces._pending).is_empty()
+	assert_dict(P0CityPlaces._failing).is_empty()
+	assert_dict(P0WildSites._pending).is_empty()
+	assert_dict(P0WildSites._failing).is_empty()
+	assert_array(told).is_empty()
+	assert_bool(P0CityPlaces.has_city(TOKYO)).is_true()

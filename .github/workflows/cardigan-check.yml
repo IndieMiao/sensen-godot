@@ -96,6 +96,18 @@ jobs:
       - name: lint
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: tools/ci/timed.sh ui_kit tools/run_tests.sh --ci-headless res://tests/ui_kit
+      # Headless --script tests with per-file timeouts and repository r4 fixtures; own step so
+      # its result stays separate from p0 / ui_kit. Report: job summary "dynamic_farm tests".
+      # The script's 18-minute total budget ends before the 20-minute step limit, so the
+      # report (with the files that timed out or did not run) is always written.
+      - name: dynamic_farm
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        timeout-minutes: 20
+        env:
+          DYNAMIC_FARM_TOTAL_TIMEOUT: '1080'
+        run: |
+          tools/ci/timed.sh dynamic_farm-control tools/ci/test-dynamic-farm-gate.sh
+          tools/ci/timed.sh dynamic_farm tools/ci/dynamic_farm_tests.sh
       - name: deps
         id: deps
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}

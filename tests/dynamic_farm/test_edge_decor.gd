@@ -63,6 +63,10 @@ func _run() -> void:
 				for shift:float in [-rings[a.ring].length,0.0,rings[a.ring].length]:
 					if a.interval.x<b.interval.y+shift+6-0.000001 and a.interval.y>b.interval.x+shift-6+0.000001:gaps_ok=false
 		_check(gaps_ok,"entire cluster intervals retain six cells of bare arc")
+		# The batch budget counts what build() draws: one batch per colour variant and chunk.
+		var drawn:=Scenery.build(added,Walk.new(data),original.recipe)
+		_check(drawn.ok and drawn.batches==added.batches and drawn.instances==added.layout.size(),"planned batches match built batches (%d vs %d)" % [added.batches,drawn.batches])
+		drawn.root.free()
 		print("EDGE_DECOR_SAMPLE ",data.block_id," instances=",added.layout.size()," clusters=",added.clusters.size()," triangles=",added.triangles," batches=",added.batches," covered=",added.covered_cells," perimeter=",added.perimeter_cells)
 	print("DYNAMIC_EDGE_DECOR_TESTS checks=%d failures=%d" % [checks,failures])
 	quit(1 if failures else 0)
