@@ -1,5 +1,6 @@
 extends Node3D
-## Art-only scene. The host owns selection, network, identity, claims and return routing.
+## Art scene; with `own_parcel` it also farms the owner's parcel (ParcelFarming, C-34).
+## The host owns selection, network, identity, claims and return routing.
 signal preview_ready(summary: Dictionary)
 signal preview_error(message: String)
 signal back_requested
@@ -18,6 +19,11 @@ const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.
 const House = preload("res://modules/dynamic_farm/farm_house.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const Placement = preload("res://scenes/dynamic_farm/house_placement.gd")
+const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
+const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const RemoteFarmStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
+## Development only: keep the own-parcel farm on the device instead of the C-31 server.
+const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const SPEED := 3.75
 
 var _args := {}
@@ -51,9 +57,10 @@ var _overview := false
 var _started_ms := 0
 var _clip := ""
 var _summary := {}
-# The owner's parcel farm save (args.parcel: enter / place_house, C-31 shapes); null in the art preview.
-var _parcel: RefCounted
-var _farm := {}
+var _hint: Label
+var _farming: Node3D
+var _facing := Vector3.BACK
+# The first house (C-33) on the owner's parcel, through ParcelFarming's save; none in the art preview.
 var _house: Node3D
 var _build: UiCommandButton
 var _placement: Placement
@@ -66,7 +73,7 @@ func _ready() -> void:
 	_started_ms = Time.get_ticks_msec()
 	_build_ui()
 	get_viewport().size_changed.connect(_on_viewport_resized)
-	if _args.get("preview_only") != true or not _args.get("farm") is Dictionary:
+	if (_args.get("preview_only") != true and _args.get("own_parcel") != true) or not _args.get("farm") is Dictionary:
 		_fail("This farm preview could not be opened.")
 		return
 	_data = Data.decode(_args.farm)
@@ -102,6 +109,10 @@ func _ready() -> void:
 		return
 	core_art.root.name = "CoreObstacles"
 	add_child(core_art.root)
+	if _args.get("own_parcel") == true:
+		_farming = Farming.new()
+		_farming.name = "ParcelFarming"
+		add_child(_farming)
 	_setup_world()
 	_shade = Shade.new()
 	add_child(_shade)
@@ -135,6 +146,17 @@ func _ready() -> void:
 	avatar.follow_saved_outfit(_rig)
 	_focus = _actor.position
 	_place_camera()
+	_facing = Vector3(_camera.global_basis.z.x, 0, _camera.global_basis.z.z).normalized()
+	if _farming != null:
+		var store = _args.get("farm_store")
+		if not store is RefCounted or not store.has_method("enter") or not store.has_method("send"):
+			var net := get_tree().root.get_node_or_null("Net")
+			if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): store = LocalFarmStore.new(_data.block_id)
+			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
+		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies}, store, _canvas)
+		_hint.hide()
+		_farming.state_changed.connect(_on_farm_changed)
+		_farming.enter()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -159,38 +181,37 @@ func _ready() -> void:
 		"triangles":_edge_plan.get("triangles",0),"batches":_edge_plan.get("batches",0),
 		"layout_sha256":_edge_plan.get("layout_sha256",""),"covered_cells":_edge_plan.get("covered_cells",0),
 		"perimeter_cells":_edge_plan.get("perimeter_cells",0),"clusters":_edge_plan.get("clusters",[]).size()}
-	if _args.get("parcel") is RefCounted:
-		_parcel = _args.parcel
-		_parcel.enter(_on_entered)
 
-## The owner's farm on opening (the welcome gift arrives with the first entry only).
-func _on_entered(reply: Dictionary) -> void:
-	if _failed or not reply.get("ok", false): return
-	_farm = reply.farm
-	if _farm.get("house") is Dictionary and _house == null: _build_house(_farm.house)
+## Every save reply (ParcelFarming): the house once it stands, the Build key while a blueprint waits.
+func _on_farm_changed(farm: Dictionary) -> void:
+	if _failed: return
+	if farm.get("house") is Dictionary and _house == null: _build_house(farm.house)
 	_refresh_build()
 
 func blueprints() -> int:
-	return int((_farm.get("bag", {}) as Dictionary).get(House.BLUEPRINT, 0))
+	if _farming == null: return 0
+	return int((_farming.farm.get("bag", {}) as Dictionary).get(House.BLUEPRINT, 0))
 
 func house_state() -> Variant:
-	return _farm.get("house")
+	return _farming.farm.get("house") if _farming != null else null
 
 func _refresh_build() -> void:
-	_build.visible = _parcel != null and _house == null and _placement == null and blueprints() > 0
+	_build.visible = _farming != null and _house == null and _placement == null and blueprints() > 0
 
 func begin_house_placement() -> void:
 	if not _build.visible: return
 	_movement = Vector2.ZERO
 	_controls.reset()
 	_controls.process_mode = Node.PROCESS_MODE_DISABLED
-	var solid := {}
-	var taken := House.blocked(_plan.core_obstacles.layout, _farm, solid)
-	var walk_blocked: Dictionary = solid.merged(_walk.reserved)
-	var start = House.nearest(_data, _walk.cell_at(_actor.position), taken, walk_blocked)
+	_farming.held = true
+	var obstacles: Dictionary = _farming.obstacle_cells()
+	var taken := House.blocked(obstacles, _farming.farm)
+	var walk_blocked: Dictionary = House.solid(_plan.core_obstacles.layout, obstacles).merged(_walk.reserved)
+	var path: Dictionary = _farming.protected_path()
+	var start = House.nearest(_data, _walk.cell_at(_actor.position), taken, path, walk_blocked)
 	_placement = Placement.new()
 	add_child(_placement)
-	_placement.setup(_data, _walk, _camera, _canvas, taken, walk_blocked,
+	_placement.setup(_data, _walk, _camera, _canvas, taken, path, walk_blocked,
 		start if start != null else _walk.cell_at(_actor.position) - Vector2i.ONE)
 	_placement.confirmed.connect(_on_place_confirmed)
 	_placement.cancelled.connect(end_house_placement)
@@ -205,24 +226,23 @@ func end_house_placement() -> void:
 	_placement.queue_free()
 	_placement = null
 	_sending = false
+	_farming.held = false
 	_controls.process_mode = Node.PROCESS_MODE_INHERIT
 	_controls.reset()
 	_refresh_build()
 
+## Build: the place_house command through ParcelFarming's save (Q-44); the reply builds the house (state_changed).
 func _on_place_confirmed(at: Vector2i, rotation_steps: int) -> void:
-	if _sending: return
+	if _sending or _farming.busy: return
 	_sending = true
-	_parcel.place_house(at.x, at.y, rotation_steps, _on_placed)
-
-func _on_placed(reply: Dictionary) -> void:
+	var reply: Dictionary = await _farming.send({"type":"place_house", "x":at.x, "y":at.y, "rotation":rotation_steps})
 	_sending = false
-	if reply.get("farm") is Dictionary: _farm = reply.farm
-	if reply.get("ok", false) and _farm.get("house") is Dictionary:
+	if not is_inside_tree() or _placement == null: return
+	# A refused spot keeps the preview, judged again on the farm the reply brought; anything else ends it.
+	if reply.get("ok", false) or str(reply.get("code", "")) != "CELL_OCCUPIED":
 		end_house_placement()
-		_build_house(_farm.house)
-	elif str(reply.get("code", "")) != "CELL_OCCUPIED" or _placement == null:
-		end_house_placement()
-	_refresh_build()
+	else:
+		_placement.retake(House.blocked(_farming.obstacle_cells(), _farming.farm))
 
 ## The built cottage and its wall profile (C-19's model-fitted walking); a player standing on the new walls steps out.
 func _build_house(house: Dictionary) -> void:
@@ -326,11 +346,16 @@ func _process(delta: float) -> void:
 	var previous: Vector3 = _walk.position
 	_walk.move(direction*SPEED*dt)
 	_actor.position = _walk.position
-	if _actor.position.distance_to(previous) > 0.0001:
+	var moving := _actor.position.distance_to(previous) > 0.0001
+	# Turn toward the stick even when blocked, so the key can target what the player pushes against.
+	if not direction.is_zero_approx(): _facing = direction.normalized()
+	if moving:
 		_actor.look_at(_actor.position+direction,Vector3.UP)
 		_play("run")
 	else:
 		_play("idle")
+	if _farming != null:
+		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), moving or not input.is_zero_approx())
 	if not _overview:
 		var size := get_viewport().get_visible_rect().size
 		var safe := Rect2(size*Vector2(0.23,0.26),size*Vector2(0.54,0.48))
@@ -378,6 +403,7 @@ func _build_ui() -> void:
 		_zoom = clampf(_zoom*factor,0.8,1.4)
 		_overview = false
 		_place_camera())
+	_controls.tapped.connect(_on_tapped)
 	_controls.recenter_requested.connect(func():
 		if _actor != null:
 			_focus = _actor.position
@@ -410,13 +436,13 @@ func _build_ui() -> void:
 	back.custom_minimum_size = Vector2(64,44)
 	back.pressed.connect(_request_back)
 	row.add_child(back)
-	var hint := _label("Art preview · Walk and explore",12)
-	hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	hint.offset_bottom = -12
-	hint.offset_top = -34
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_canvas.add_child(hint)
+	_hint = _label("Art preview · Walk and explore",12)
+	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_hint.offset_bottom = -12
+	_hint.offset_top = -34
+	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_canvas.add_child(_hint)
 	_build = UiCommandButton.new("Build Cottage", UiCommandButton.Kind.PRIMARY)
 	_build.theme = UiKit.theme()
 	_build.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
@@ -427,6 +453,12 @@ func _build_ui() -> void:
 	_build.visible = false
 	_build.activated.connect(begin_house_placement)
 	_canvas.add_child(_build)
+
+## A tap on the ground picks that cell for the main key.
+func _on_tapped(at: Vector2) -> void:
+	if _farming == null or not _ready_sent or _camera == null: return
+	var hit = Plane(Vector3.UP, 0.0).intersects_ray(_camera.project_ray_origin(at), _camera.project_ray_normal(at))
+	if hit is Vector3: _farming.pick(_walk.cell_at(hit))
 
 func _label(text: String, size: int) -> Label:
 	var label := Label.new()

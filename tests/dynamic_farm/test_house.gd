@@ -1,5 +1,5 @@
 extends SceneTree
-## First house (Q-40, C-33): placement rules, the model-fitted wall profile and the local save stand-in.
+## First house (Q-40, C-33): placement rules, the model-fitted wall profile and place_house on C-34's local save.
 ##   godot --headless --path "$QA" --script res://tests/dynamic_farm/test_house.gd -- <farm1.json> <farm2.json> …
 ## Without payloads it runs the synthetic fixtures only.
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
@@ -7,7 +7,9 @@ const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const House = preload("res://modules/dynamic_farm/farm_house.gd")
-const Local = preload("res://modules/dynamic_farm/parcel_farm_local.gd")
+const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
+const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Outline = preload("res://tests/dynamic_farm/prop_outline.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
@@ -63,33 +65,37 @@ func _footprint() -> void:
 	var walk := Walk.new(Data.decode(Fixture.farm("p-A")))
 	_check(House.center(walk, Vector2i(5, 7)).is_equal_approx(walk.point(Vector2i(6, 8))), "model on the middle cell")
 
-## Same answers as the server (C-31): the gift once, one house, a blueprint spent, the house back after reopening.
+## The house through C-34's save (Q-44), same answers as the server (C-31): the gift once, one house, a blueprint
+## spent, the house back after reopening; the house's size and model as the shared rules file says.
 func _local_save() -> void:
+	var rules := ParcelFarm.rules()
+	_check(rules.house.model == House.MODEL and rules.house.blueprint == House.BLUEPRINT
+		and Vector2i(rules.house.width, rules.house.depth) == House.SIZE, "house matches dynamic_farm.json")
+	_check(int(rules.welcome_gift.get(House.BLUEPRINT, 0)) == 1, "the welcome gift holds one blueprint")
 	var dir := "user://test_house_%d" % Time.get_ticks_usec()
-	var save := Local.new("p-A", dir)
-	var replies: Array = []
-	save.enter(func(r): replies.append(r))
-	_check(replies[0].granted and replies[0].farm.bag == {"hoe_starter":1, "seed_carrot":3, "blueprint_cottage":1}, "first entry gives the gift")
-	save.enter(func(r): replies.append(r))
-	_check(not replies[1].granted and replies[1].farm.bag.blueprint_cottage == 1, "a second entry gives nothing")
-	save.place_house(4, 4, 0, func(r): replies.append(r))
-	_check(replies[2].ok and replies[2].farm.house.x == 4 and replies[2].farm.house.y == 4 and not replies[2].farm.bag.has("blueprint_cottage"),
+	var save := LocalStore.new("p-A", dir)
+	var first: Dictionary = save.enter()
+	_check(first.granted and int(first.farm.bag.get(House.BLUEPRINT, 0)) == 1, "first entry gives the blueprint")
+	var second: Dictionary = save.enter()
+	_check(not second.granted and int(second.farm.bag.get(House.BLUEPRINT, 0)) == 1, "a second entry gives nothing")
+	var placed: Dictionary = save.send(second.farm_version, [{"type":"place_house", "x":4, "y":4, "rotation":0}])
+	_check(placed.ok and placed.farm.house.x == 4 and placed.farm.house.y == 4 and not placed.farm.bag.has(House.BLUEPRINT),
 		"placing spends the blueprint and builds at once")
-	_check(replies[2].farm.house.model == "cottage" and replies[2].farm.house.width == 3 and replies[2].farm.house.built_at > 0, "cottage 3×3 built now")
-	save.place_house(10, 4, 0, func(r): replies.append(r))
-	_check(not replies[3].ok and replies[3].code == "HOUSE_PLACED", "only one house")
-	var reopened := Local.new("p-A", dir)
-	reopened.enter(func(r): replies.append(r))
-	_check(not replies[4].granted and int(replies[4].farm.house.x) == 4 and int(replies[4].farm.house.y) == 4, "reopened: the house in place, no new gift")
-	_check(int(replies[4].farm.bag.get("blueprint_cottage", 0)) == 0, "reopened: no second blueprint")
-	var other := Local.new("p-B", dir)
-	other.farm.welcomed_at = 1
-	other.place_house(1, 1, 0, func(r): replies.append(r))
-	_check(replies[5].code == "NO_BLUEPRINT", "no blueprint, no house")
-	other.farm.bag = {"blueprint_cottage":1}
-	other.farm.tilled = ["2,2"]
-	other.place_house(1, 1, 0, func(r): replies.append(r))
-	_check(replies[6].code == "CELL_OCCUPIED", "not over a tilled cell")
+	_check(placed.farm.house.model == House.MODEL and placed.farm.house.width == 3 and placed.farm.house.built_at > 0, "cottage 3×3 built now")
+	_check(ParcelFarm.house_cells(placed.farm).keys().all(func(c): return House.cells(Vector2i(4, 4)).has(c)), "one footprint for save and scene")
+	var again: Dictionary = save.send(placed.farm_version, [{"type":"place_house", "x":10, "y":4, "rotation":0}])
+	_check(not again.ok and again.code == "HOUSE_PLACED", "only one house")
+	var reopened: Dictionary = LocalStore.new("p-A", dir).enter()
+	_check(not reopened.granted and int(reopened.farm.house.x) == 4 and int(reopened.farm.house.y) == 4, "reopened: the house in place, no new gift")
+	_check(int(reopened.farm.bag.get(House.BLUEPRINT, 0)) == 0, "reopened: no second blueprint")
+	var other := LocalStore.new("p-B", dir)
+	var entered: Dictionary = other.enter()
+	var tilled: Dictionary = other.send(entered.farm_version, [{"type":"till", "cell":"2,2"}])
+	var over: Dictionary = other.send(tilled.farm_version, [{"type":"place_house", "x":1, "y":1, "rotation":0}])
+	_check(over.code == "CELL_OCCUPIED", "not over a tilled cell")
+	var built: Dictionary = other.send(tilled.farm_version, [{"type":"place_house", "x":5, "y":5, "rotation":0}])
+	var none: Dictionary = other.send(built.farm_version, [{"type":"place_house", "x":10, "y":10, "rotation":0}])
+	_check(built.ok and none.code == "HOUSE_PLACED", "the blueprint builds once")
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 
@@ -104,9 +110,15 @@ func _pinch() -> void:
 			var cell := {"x":x, "y":y, "zone":"core"}
 			data.cells.append(cell)
 			data.by_cell[Vector2i(x,y)] = cell
-	_check(House.reason(data, Vector2i(13,4), 0, {}, {}) == House.PATH, "a house cannot seal the neck")
-	_check(House.reason(data, Vector2i(20,4), 0, {}, {}) == "", "the open side takes it")
-	_check(House.reason(data, Vector2i(2,4), 0, {}, {}) == House.PATH, "not on the arrival cells")
+	# Connection alone (no protected path given).
+	_check(House.reason(data, Vector2i(13,4), 0, {}, {}, {}) == House.PATH, "a house cannot seal the neck")
+	_check(House.reason(data, Vector2i(20,4), 0, {}, {}, {}) == "", "the open side takes it")
+	# The protected path tilling keeps clear (C-34): the entry–spawn route ±1 cell and the ring round spawn.
+	var path := Space.protected_path(data)
+	_check(House.reason(data, Vector2i(20,4), 0, {}, path, {}) == House.PATH, "not on the protected path")
+	_check(House.reason(data, Vector2i(20,0), 0, {}, path, {}) == "", "beside the path is fine")
+	_check(House.reason(data, Vector2i(0,1), 0, {}, path, {}) == "" and House.reason(data, Vector2i(1,2), 0, {}, path, {}) == House.PATH,
+		"the spawn's ring is kept")
 
 func _parcel(raw: Dictionary) -> void:
 	var data := Data.decode(raw)
@@ -115,51 +127,54 @@ func _parcel(raw: Dictionary) -> void:
 	var walk := Walk.new(data)
 	var planned := Scenery.plan(data, walk)
 	Shade.enforce_budget(planned, data, walk)
-	var obstacles: Array = planned.core_obstacles.layout
-	var solid := {}
-	var taken := House.blocked(obstacles, {}, solid)
-	var walk_blocked: Dictionary = solid.merged(walk.reserved)
-	# Every footprint position over the grid: outside, obstacle, arrival and sealing are each refused.
+	var layout: Array = planned.core_obstacles.layout
+	var obstacles := {}
+	for item: Dictionary in layout: obstacles[item.cell] = true
+	var taken := House.blocked(obstacles, {})
+	var walk_blocked: Dictionary = House.solid(layout, obstacles).merged(walk.reserved)
+	var path := Space.protected_path(data)
+	_check(not path.is_empty(), "%s: a protected path" % data.block_id)
+	# Every footprint position over the grid: outside, obstacle, protected path and sealing are each refused.
 	var accepted: Array[Vector2i] = []
 	var exact := true
 	for y in range(-2, data.grid_size.y):
 		for x in range(-2, data.grid_size.x):
 			var at := Vector2i(x, y)
-			var why := House.reason(data, at, 0, taken, walk_blocked)
+			var why := House.reason(data, at, 0, taken, path, walk_blocked)
 			var footprint := House.cells(at)
 			var outside := footprint.any(func(c): return not data.by_cell.has(c) or data.by_cell[c].zone != "core")
 			var covered := footprint.any(func(c): return taken.has(c))
-			var arrival := footprint.any(func(c): return (c - data.spawn).length_squared() <= House.ARRIVAL_R2)
+			var on_path := footprint.any(func(c): return path.has(c))
 			if outside: exact = exact and why == House.OUTSIDE
 			elif covered: exact = exact and why == House.TAKEN
-			elif arrival: exact = exact and why == House.PATH
+			elif on_path: exact = exact and why == House.PATH
 			else:
 				exact = exact and (why == "") == House.keeps_open(data, footprint, walk_blocked)
 				if why == "": accepted.append(at)
-	_check(exact, "%s: every spot judged by core, obstacles, arrival and connection" % data.block_id)
+	_check(exact, "%s: every spot judged by core, obstacles, protected path and connection" % data.block_id)
 	_check(accepted.size() >= 3, "%s: room for the house (%d spots)" % [data.block_id, accepted.size()])
-	# Clearing an obstacle (C-34) frees its cells; tilled cells and crops take them.
+	# Every obstacle refuses a house over it; once cleared (gone from obstacle_cells()) it frees its cell and its
+	# walk block. Tilled cells and crops take cells.
 	var held := 0
+	var eligible := 0
 	var freed := true
-	for item: Dictionary in obstacles:
+	for item: Dictionary in layout:
 		var spot: Vector2i = item.cell - Vector2i.ONE
-		var footprint := House.cells(spot)
-		if footprint.any(func(c): return data.by_cell.get(c, {}).get("zone") != "core" or (c - data.spawn).length_squared() <= House.ARRIVAL_R2):
-			continue
-		held += 1 if House.reason(data, spot, 0, taken, walk_blocked) == House.TAKEN else 0
-		var cleared := House.blocked(obstacles, {"cleared":["%d,%d" % [item.cell.x, item.cell.y]]})
-		freed = freed and not cleared.has(item.cell) and cleared.size() == taken.size() - 1
-	_check(held > 0 and held == obstacles.filter(func(o): return House.cells(o.cell - Vector2i.ONE).all(
-		func(c): return data.by_cell.get(c, {}).get("zone") == "core" and (c - data.spawn).length_squared() > House.ARRIVAL_R2)).size(),
-		"%s: every obstacle (weeds too) refuses a house over it (%d)" % [data.block_id, held])
+		if House.cells(spot).all(func(c): return data.by_cell.get(c, {}).get("zone") == "core" and not path.has(c)):
+			eligible += 1
+			held += 1 if House.reason(data, spot, 0, taken, path, walk_blocked) == House.TAKEN else 0
+		var left := obstacles.duplicate()
+		left.erase(item.cell)
+		freed = freed and not House.blocked(left, {}).has(item.cell) and not House.solid(layout, left).has(item.cell)
+	_check(held > 0 and held == eligible, "%s: every obstacle (weeds too) refuses a house over it (%d)" % [data.block_id, held])
 	_check(freed, "%s: a cleared obstacle frees its cell" % data.block_id)
 	var first: Vector2i = accepted[0]
 	var tilled := House.blocked(obstacles, {"tilled":["%d,%d" % [first.x + 1, first.y + 2]]})
 	var crops := House.blocked(obstacles, {"crops":{"%d,%d" % [first.x, first.y]: {}}})
-	_check(House.reason(data, first, 0, tilled, walk_blocked) == House.TAKEN and House.reason(data, first, 0, crops, walk_blocked) == House.TAKEN,
+	_check(House.reason(data, first, 0, tilled, path, walk_blocked) == House.TAKEN and House.reason(data, first, 0, crops, path, walk_blocked) == House.TAKEN,
 		"%s: tilled cells and crops refuse the house" % data.block_id)
-	var near = House.nearest(data, data.spawn, taken, walk_blocked)
-	_check(near != null and House.reason(data, near, 0, taken, walk_blocked) == "", "%s: a valid starting spot near spawn" % data.block_id)
+	var near = House.nearest(data, data.spawn, taken, path, walk_blocked)
+	_check(near != null and House.reason(data, near, 0, taken, path, walk_blocked) == "", "%s: a valid starting spot near spawn" % data.block_id)
 	# Against the real walker: an accepted house cuts no reachable walk point off; the player walks along its walls
 	# and stops at them.
 	var art := Scenery.build(planned, walk)

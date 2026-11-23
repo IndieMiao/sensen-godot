@@ -74,4 +74,15 @@ class ParcelLayerStateTest {
         assertNull(state.query(10))
         state.setInteractive(true); assertNotNull(state.query(10))
     }
+    @Test fun idleWaitAnswersTheTapOnceTheMapSettles() {
+        val wait = ParcelIdleWait<String>(); wait.park("tap")
+        assertNull(wait.resume(false)); assertEquals("tap", wait.resume(true))
+        assertNull(wait.resume(true)); assertFalse(wait.expire("tap"))
+    }
+    @Test fun idleWaitTimeoutOnlyExpiresTheCurrentTap() {
+        val wait = ParcelIdleWait<String>(); wait.park("first"); wait.park("second")
+        assertFalse(wait.expire("first")); assertEquals("second", wait.pending)
+        assertTrue(wait.expire("second")); assertNull(wait.resume(true))
+        wait.park("third"); wait.drop(); assertNull(wait.resume(true)); assertFalse(wait.expire("third"))
+    }
 }

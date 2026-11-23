@@ -1,13 +1,13 @@
 extends SceneTree
-## First house review captures (C-33) with the local save stand-in, not the server: the gift on first entry,
+## First house review captures (C-33) on C-34's local save, not the server: the gift on first entry,
 ## the placement preview on a valid spot and on each refused kind (outside the core, over an obstacle, on the
-## arrival path), the built cottage, the player against its wall, then a reopened scene with the house in place.
+## protected path), the built cottage, the player against its wall, then a reopened scene with the house in place.
 ##   godot --path "$QA" [--debug-collisions] --script res://tools/dev/dynamic_farm/house_probe.gd -- <farm.json> <out>
 ## Scripted input; not touch or device evidence. The save lives in <out>/save and is removed first.
 ## With --headless it checks the same states without images.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const House = preload("res://modules/dynamic_farm/farm_house.gd")
-const Local = preload("res://modules/dynamic_farm/parcel_farm_local.gd")
+const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 var scene
 var raw: Dictionary
 var out := ""
@@ -34,7 +34,7 @@ func _run() -> void:
 	await _shot(id + "-1-entered")
 	scene.begin_house_placement()
 	var p = scene._placement
-	report.start = {"at":[p.at.x, p.at.y], "reason":p.reason}
+	report.start = {"at":[p.at.x, p.at.y], "reason":p.reason, "farming_key_held":not scene._farming._key.visible}
 	await _shot(id + "-2-valid")
 	var kinds := _refused_spots()
 	for kind: String in kinds:
@@ -66,15 +66,15 @@ func _run() -> void:
 
 func _open(save_dir: String) -> void:
 	scene = (load(SCENE_PATH) as PackedScene).instantiate()
-	scene.setup({"farm":raw, "dataset":raw.dataset_version, "block_id":raw.block_id, "preview_only":true,
-		"parcel":Local.new(raw.block_id, save_dir)})
+	scene.setup({"farm":raw, "dataset":raw.dataset_version, "block_id":raw.block_id, "own_parcel":true,
+		"farm_store":LocalStore.new(raw.block_id, save_dir)})
 	var ready := [false]
 	scene.preview_ready.connect(func(_summary): ready[0] = true)
 	scene.preview_error.connect(func(message):
 		push_error(message)
 		quit(1))
 	root.add_child(scene)
-	while not ready[0]: await process_frame
+	while not ready[0] or scene._farming.farm.is_empty(): await process_frame
 
 func _shot(name: String) -> void:
 	for i in 4: await process_frame
@@ -93,7 +93,7 @@ func _refused_spots() -> Dictionary:
 			for dx in range(-r, r + 1):
 				if maxi(absi(dx), absi(dy)) != r: continue
 				var at: Vector2i = start + Vector2i(dx, dy)
-				var why := House.reason(scene._data, at, 0, p._taken, p._walk_blocked)
+				var why := House.reason(scene._data, at, 0, p._taken, p._path, p._walk_blocked)
 				if wanted.has(why) and not found.has(wanted[why]): found[wanted[why]] = at
 		if found.size() == wanted.size(): break
 	return found

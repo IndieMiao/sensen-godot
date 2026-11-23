@@ -1,6 +1,6 @@
 # Dynamic farm 3D art preview
 
-This scene consumes one verified schema4 payload. It does not fetch data, claim a parcel, call P0Runtime, send farming commands or write a farm save. The host owns map visibility, dataset/identity checks, loading/error panels and navigation.
+This scene consumes one verified schema4 payload. It does not fetch data, claim a parcel or call P0Runtime. Only with `own_parcel` (below) does it farm and save. The host owns map visibility, dataset/identity checks, loading/error panels and navigation.
 
 Instantiate `dynamic_farm.tscn`, call `setup({farm, dataset, block_id, preview_only:true, return_context})`, connect `preview_ready(summary)`, `preview_error(message)` and `back_requested`, then add it to the tree. The ready summary uses `dataset` and `block_id`; it is emitted only after the player mesh and scenery/shadow preparation are ready. The scene has its own ready-state Back button. Back emits once; the host pops its wrapper. `suspend()` / `resume()` yield and restore this scene's input, canvas, camera and environment.
 
@@ -18,26 +18,36 @@ Checks/tools: `tests/dynamic_farm/test_walk.gd`, `preview_probe.gd`, `lifecycle_
 
 The first review package contains ordinary 328/424 scenes in Mobile and Compatibility, repeatability/permission/placement checks over seven real plus two labelled synthetic samples, a concave-corner negative control, lifecycle checks and a protected-route walk. Complex-parcel rendered captures, Android host/map integration and device acceptance remain separate review gates. Technical art review: Shangguan; visual review: Huowu. No merge to PR-A or the pre-Nov-25 submission candidate is authorized by this scene.
 
+## Own parcel farming (C-34)
+
+`setup({..., own_parcel:true, farm_store?})` opens the owner's parcel for farming instead of a preview (the host passes both keys through; `preview_only` is then not required). `ParcelFarming` (`parcel_farming.gd`) adds the main key, the bag row, toasts, tilled soil and carrots (main-farm `CropField`, read-only) and a target-cell marker. The target is the cell in front of the player; a short tap on the ground picks a cell until the player moves. One press clears a core obstacle, tills, sows or harvests (owner decision Q-39, C-34#14): no Energy or coins; carrots ripen 60 s after sowing by the store's clock; the first entry grants 1 Starter Hoe and 3 Carrot Seeds once. A cleared obstacle leaves the walker and is redrawn out of the core layer (`Scenery.build(..., bind=false)`, `Walk.remove_prop`).
+
+Rules and numbers: `assets/farm/data/dynamic_farm.json` (shared with the C-31 server; separate from the main farm) is read by `modules/dynamic_farm/parcel_farm.gd`, a copy of the server's farm state v1 and its commands. The server holds no parcel geometry, so `parcel_space.gd` keeps the spatial rules on the client: tilling only on core cells, refused outside the core (`Not farmland`), under the house (`House here`) and on the protected path (`On the path`). Schema 4 marks every core cell as reserved, so the protected path inside the core is derived: the shortest walk from the entry to the spawn widened by `PATH_HALF_WIDTH` (1) cell, plus the spawn's `SPAWN_CLEARANCE` (1) ring.
+
+`farm_store` answers `enter()` and `send(base_version, commands)` with the farm, its version and `server_time`. By default the scene uses `parcel_farm_remote_store.gd`: C-31 `POST /parcels/mine/enter` and `/parcels/mine/commands` through `Net.client` (it needs a signed-in client; a reply about another parcel is refused). `parcel_farm_local_store.gd` keeps the save in `user://dynamic_farm_local/` with the device clock; it is used only by tests or with the development setting `sensen/dynamic_farm/local_farm_save`, and is not save or server-time evidence.
+
+Packaging must also include `assets/farm/data/dynamic_farm.json` and the P0 content table (`assets/p0/p0_content.json`, item names) with the P0 item icons; JSON is not found by static scene dependencies.
+
+Tests: `tests/dynamic_farm/test_parcel_farming.gd` (rules, commands, spatial rules, local save) and `test_parcel_farming_scene.gd` (the real scene; optional `-- <farm.json>`), both headless in the private preview project. `test_parcel_farming_server.gd -- <base …/v1> <owner token> <farm.json>` runs the scene against a running C-31 server on its real clock (~70 s; the owner has claimed that parcel and not entered it yet).
+
 ## First house (C-33, Q-40)
 
-With `args.parcel` (the owner's parcel farm save: `enter(done)` and `place_house(x, y, rotation, done)`, replies in
-C-31's `farm_state` v1 shape) the scene calls `enter` once on opening; the first entry brings the gift, a reopen does
-not. While the bag holds `blueprint_cottage` and no house stands, `Build Cottage` opens placement: a press or drag
-moves the see-through `house_cottage` (its middle cell under the finger); its 3×3 cells fill green or red, grid lines
-fade over three core cells round it, and the spawn's arrival cells in reach show sand. The bottom is the shared
-`UiPlaceBar` (`Cancel · Build`); the main key shows why a spot is refused. The preview starts on the valid spot
-nearest the player. Build sends `place_house`; the cottage stands at once (no construction time).
+Built on the own-parcel farm above (Q-44: one entry, save and protected path for both). The welcome gift's
+`blueprint_cottage` comes with the first entry only. While the bag holds it and no house stands, `Build Cottage` opens
+placement (the farming key is held meanwhile): a press or drag moves the see-through `house_cottage` (its middle cell
+under the finger); its 3×3 cells fill green or red, grid lines fade over three core cells round it, and the protected
+path's cells in reach show sand. The bottom is the shared `UiPlaceBar` (`Cancel · Build`); the main key shows why a
+spot is refused. The preview starts on the valid spot nearest the player. Build sends `place_house` through
+`ParcelFarming.send`; the cottage stands at once (no construction time). A refused Build (`CELL_OCCUPIED`) keeps the
+preview, judged again on the farm the reply brought.
 
 Rules (`modules/dynamic_farm/farm_house.gd`, the save's `house.x/y` is the footprint's lowest cell): every cell
-core (`Outside your yard`); none under an uncleared core obstacle (every role, weeds too), a tilled cell or a crop
-(`Space taken`); none on the arrival disc round spawn (dx²+dy² <= 4, the protected disc of the data contract), and
-every other walk cell still reaching spawn (`Keep the path clear`). Schema 4 lists the whole core as walking reserve,
-so on the core those two are the protected ways; the protected ring and entry path lie outside the core anyway.
-The walls block through a model-fitted box (walls and plinth below the eaves; C-19's walker), so the player walks
-along them and stops at contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the
-walls go steps out to the nearest clear point. Without `args.parcel` (the art preview) nothing of this shows.
+core (`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
+too), a tilled cell or a crop (`Space taken`); none on `ParcelFarming.protected_path()` (the same path tilling keeps
+clear), and every other walk cell still reaching spawn (`Keep the path clear`). The walls block through a
+model-fitted box (walls and plinth below the eaves; C-19's walker), so the player walks along them and stops at
+contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the walls go steps out to the
+nearest clear point. Without `own_parcel` (the art preview) nothing of this shows.
 
-`modules/dynamic_farm/parcel_farm_local.gd` stands in for the server save until C-31 is wired (same answers: the gift
-once, one house, a blueprint spent, `CELL_OCCUPIED` over tilled cells or crops), kept in `user://dynamic_farm`.
-`tools/dev/dynamic_farm/house_probe.gd` drives it through the real scene: entry, a valid and each refused spot,
+`tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
 Build, the wall, reopen (`--headless`: states only).

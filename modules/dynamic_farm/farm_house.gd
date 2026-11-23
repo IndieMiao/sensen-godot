@@ -1,8 +1,7 @@
 extends RefCounted
 ## The first house (Q-40, C-33#14): the existing 3×3 cottage, built the moment it is placed. Every footprint cell
-## must be core, clear of the parcel's obstacles (C-18, until cleared), tilled cells and crops, and of the protected
-## ways: schema 4 marks the whole core as reserve, so on the core the protected ways are the spawn's arrival disc
-## (the same dx²+dy² <= 4 the data contract keeps protected) and the walking connection itself — no remaining walk
+## must be core, clear of the parcel's uncleared obstacles, tilled cells and crops, and off the protected path that
+## tilling also keeps clear (ParcelFarming.protected_path(), C-34, one rule for both per Q-44); and no remaining walk
 ## cell may lose its way to spawn. Outside the core (the ring round it and the entry path) nothing can be placed.
 ## `at` is the footprint's lowest-x, lowest-y cell, as the parcel save (C-31 farm_state.house) stores it.
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
@@ -14,7 +13,6 @@ const SIZE := Vector2i(3, 3)
 ## (x ±0.875, z −0.84…0.885; the low step, the side woodpile and the bench stay walkable, under the body only).
 ## The eaves are overhead; the whole model stays within the 3×3 footprint (2.4 m).
 const PROFILE := {"solid":true, "shape":"box", "center_xz_m":[0.0, 0.0225], "size_xz_m":[1.75, 1.725], "height_m":1.1}
-const ARRIVAL_R2 := 4
 const OUTSIDE := "Outside your yard"
 const TAKEN := "Space taken"
 const PATH := "Keep the path clear"
@@ -30,32 +28,34 @@ static func cells(at: Vector2i, rotation := 0) -> Array[Vector2i]:
 		for dx in s.x: out.append(at + Vector2i(dx, dy))
 	return out
 
-## Cells nothing may cover: uncleared core obstacles (every role, weeds too), tilled cells and crops of the save.
-## `solid` gets the obstacles that also block walking (stones, bushes, saplings).
-static func blocked(obstacles: Array, farm: Dictionary, solid := {}) -> Dictionary:
-	var cleared := {}
-	for key in farm.get("cleared", []): cleared[_cell(str(key))] = true
-	var out := {}
-	for item: Dictionary in obstacles:
-		var at: Vector2i = item.cell
-		if cleared.has(at): continue
-		out[at] = true
-		if bool(item.solid): solid[at] = true
+## Cells nothing may cover: uncleared core obstacles (ParcelFarming.obstacle_cells(), every role, weeds too),
+## tilled cells and crops of the save.
+static func blocked(obstacles: Dictionary, farm: Dictionary) -> Dictionary:
+	var out := obstacles.duplicate()
 	for key in farm.get("tilled", []): out[_cell(str(key))] = true
 	for key in (farm.get("crops", {}) as Dictionary): out[_cell(str(key))] = true
 	return out
 
+## The cells of `layout` (core obstacle plan) still standing in `obstacles` that also block walking (stones,
+## bushes, saplings).
+static func solid(layout: Array, obstacles: Dictionary) -> Dictionary:
+	var out := {}
+	for item: Dictionary in layout:
+		if bool(item.solid) and obstacles.has(item.cell): out[item.cell] = true
+	return out
+
 ## "" when the house may stand at `at`, else the reason shown on the main key.
-## `walk_blocked`: cells walking cannot use besides the footprint (solid obstacles, reserved extension cells).
-static func reason(data: Dictionary, at: Vector2i, rotation: int, taken: Dictionary, walk_blocked: Dictionary) -> String:
+## `path`: the protected path; `walk_blocked`: cells walking cannot use besides the footprint (solid obstacles,
+## reserved extension cells).
+static func reason(data: Dictionary, at: Vector2i, rotation: int, taken: Dictionary, path: Dictionary,
+		walk_blocked: Dictionary) -> String:
 	var footprint := cells(at, rotation)
 	for cell in footprint:
 		if not data.by_cell.has(cell) or data.by_cell[cell].zone != "core": return OUTSIDE
 	for cell in footprint:
 		if taken.has(cell): return TAKEN
 	for cell in footprint:
-		var d: Vector2i = cell - data.spawn
-		if d.x * d.x + d.y * d.y <= ARRIVAL_R2: return PATH
+		if path.has(cell): return PATH
 	return "" if keeps_open(data, footprint, walk_blocked) else PATH
 
 ## Every walk cell outside the footprint and `walk_blocked` still reaches spawn.
@@ -80,7 +80,8 @@ static func keeps_open(data: Dictionary, footprint: Array[Vector2i], walk_blocke
 	return seen.size() == open
 
 ## The valid spot whose footprint centre is nearest `near` (a cell), or null.
-static func nearest(data: Dictionary, near: Vector2i, taken: Dictionary, walk_blocked: Dictionary, rotation := 0) -> Variant:
+static func nearest(data: Dictionary, near: Vector2i, taken: Dictionary, path: Dictionary, walk_blocked: Dictionary,
+		rotation := 0) -> Variant:
 	var s := size(rotation)
 	var offset := Vector2i(s.x / 2, s.y / 2)
 	var candidates: Array[Vector2i] = []
@@ -91,7 +92,7 @@ static func nearest(data: Dictionary, near: Vector2i, taken: Dictionary, walk_bl
 		var db := (b - near + offset).length_squared()
 		return da < db or (da == db and (a.y < b.y or (a.y == b.y and a.x < b.x))))
 	for at in candidates:
-		if reason(data, at, rotation, taken, walk_blocked) == "": return at
+		if reason(data, at, rotation, taken, path, walk_blocked) == "": return at
 	return null
 
 ## The footprint's middle on the ground, in scene space.

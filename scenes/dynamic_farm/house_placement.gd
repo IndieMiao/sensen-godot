@@ -1,7 +1,7 @@
 extends Node3D
 ## Placing the first house (Q-40): the main farm's placement look on the parcel. A press or drag on the scene moves
 ## the see-through cottage (its middle under the finger); its cells fill green or red with their edge, grid lines
-## fade out over HALO_R core cells round it and the spawn's protected arrival cells in reach show sand. The bottom is
+## fade out over HALO_R core cells round it and the protected path's cells in reach show sand. The bottom is
 ## the shared UiPlaceBar, `Cancel · Build`, the main key showing why a spot is not valid. The caller sends the
 ## command and ends the mode.
 signal confirmed(at: Vector2i, rotation: int)
@@ -26,6 +26,7 @@ var _data: Dictionary
 var _walk: RefCounted
 var _camera: Camera3D
 var _taken := {}
+var _path := {}
 var _walk_blocked := {}
 var _ghost: Node3D
 var _bar: UiPlaceBar
@@ -36,13 +37,14 @@ var _sand: Array = []
 var _finger := -1
 static var _outline: ImageTexture
 
-## `taken` / `walk_blocked` as House.reason takes them; `canvas` holds the bar.
+## `taken` / `path` / `walk_blocked` as House.reason takes them; `canvas` holds the bar.
 func setup(data: Dictionary, walk: RefCounted, camera: Camera3D, canvas: CanvasLayer, taken: Dictionary,
-		walk_blocked: Dictionary, start: Vector2i) -> void:
+		path: Dictionary, walk_blocked: Dictionary, start: Vector2i) -> void:
 	_data = data
 	_walk = walk
 	_camera = camera
 	_taken = taken
+	_path = path
 	_walk_blocked = walk_blocked
 	name = "HousePlacement"
 	_ghost = Node3D.new()
@@ -67,10 +69,15 @@ func setup(data: Dictionary, walk: RefCounted, camera: Camera3D, canvas: CanvasL
 
 func move_to(cell: Vector2i) -> void:
 	at = cell
-	reason = House.reason(_data, at, rotation_steps, _taken, _walk_blocked)
+	reason = House.reason(_data, at, rotation_steps, _taken, _path, _walk_blocked)
 	_ghost.transform = House.transform(_walk, at, rotation_steps)
 	_bar.reason = reason
 	_paint()
+
+## The save changed under the preview (a refused Build brings the current farm): judge the spot again.
+func retake(taken: Dictionary) -> void:
+	_taken = taken
+	move_to(at)
 
 ## Scene point under a screen position, on the ground.
 func ground_at(screen: Vector2) -> Variant:
@@ -121,7 +128,7 @@ func _safe_bottom() -> float:
 		get_viewport().get_visible_rect().size, 0.0).w
 
 ## The footprint filled green or red with its edge; white grid lines on core cells within HALO_R, fading; the
-## arrival cells in reach in sand (Keep the path clear).
+## protected path's cells in reach in sand (Keep the path clear).
 func _paint() -> void:
 	var footprint := House.cells(at, rotation_steps)
 	var fill := BAD_FILL if reason != "" else OK_FILL
@@ -140,8 +147,7 @@ func _paint() -> void:
 		if not _data.by_cell.has(n) or _data.by_cell[n].zone != "core": continue
 		var d: int = near[n]
 		lines.append([n, Color(1, 1, 1, HALO_A * (1.0 - float(d - 1) / float(r)))])
-		var o: Vector2i = n - _data.spawn
-		if o.x * o.x + o.y * o.y <= House.ARRIVAL_R2: sand.append([n, SAND])
+		if _path.has(n): sand.append([n, SAND])
 	_squares(_fills, footprint.map(func(c): return [c, fill]), false, FILL_LIFT)
 	_squares(_edges, footprint.map(func(c): return [c, Color(fill, 1.0)]), true, EDGE_LIFT)
 	_squares(_halo, lines, true, GRID_LIFT)
