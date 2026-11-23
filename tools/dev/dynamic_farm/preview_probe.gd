@@ -97,11 +97,11 @@ func _capture(folder: String, summary: Dictionary) -> void:
 	var protected: Array = []
 	for cell: Vector2i in scene._data.protected: protected.append([cell.x,cell.y])
 	var blocked: Array = []
-	for cell: Vector2i in scene._walk.blocked: blocked.append([cell.x,cell.y])
+	for cell: Vector2i in scene._walk.reserved: blocked.append([cell.x,cell.y])
 	var audit := FileAccess.open(folder.path_join(id+"-layout.json"),FileAccess.WRITE)
 	audit.store_string(JSON.stringify({"dataset":scene._data.dataset_version,"block_id":id,
 		"seed_hex":scene._data.seed_hex,"art_version":scene._plan.art_version,
-		"layout_sha256":scene._plan.layout_sha256,"protected":protected,"blocked":blocked,"instances":records},"\t"))
+		"layout_sha256":scene._plan.layout_sha256,"protected":protected,"placement_reservations":blocked,"instances":records},"\t"))
 	if not scene._edge_plan.is_empty():
 		var extra:Array=[]
 		for item:Dictionary in scene._edge_plan.layout:

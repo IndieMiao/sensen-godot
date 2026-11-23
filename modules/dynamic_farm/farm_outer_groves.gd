@@ -3,7 +3,7 @@ extends RefCounted
 ## Presentation only: schema-4 masks, farming permissions and saves are untouched, and
 ## nothing here is harvestable yet. Solid members reserve walk cells through the walker;
 ## members of one grove or pile may share their own group's cells, and the total never
-## exceeds `budget` (the blocked cells of the previous approved layout on this parcel).
+## exceeds `budget` (the reserved cells of the previous approved layout on this parcel).
 const ROLES := ["tree", "shrub", "rock", "flower", "groundcover"]
 const REAR := Vector3(0.25, 0, 0.968)
 const GOLDEN_ANGLE := 2.39996323
@@ -30,7 +30,7 @@ static func plan(walk: RefCounted, assets: Dictionary, recipe: Dictionary,
 	return {"layout":state.layout, "roles":state.roles,
 		"layout_sha256":"\n".join(state.signature).sha256_text(),
 		"summary":{"version":spec.version, "groves":groves, "thickets":thickets, "rock_piles":piles, "flower_clumps":clumps,
-			"walk_budget_cells":budget, "blocked_cells":walk.blocked.size()}}
+			"walk_budget_cells":budget, "reserved_cells":walk.reserved.size()}}
 
 ## Tree groves (`tree_pass`) use rear-half anchors with room for a full canopy: the approved
 ## 43/14.5 opening keeps tall pieces behind the player. Big trees overlap; young pines fill the
@@ -41,12 +41,12 @@ static func _groves(state: Dictionary, order: Array[Vector2i], room: Dictionary,
 	var count := 0
 	var attempts := 0
 	for anchor: Vector2i in order:
-		if attempts >= int(state.recipe.outer_groves.max_group_attempts) or walk.blocked.size() >= cap_cells: break
+		if attempts >= int(state.recipe.outer_groves.max_group_attempts) or walk.reserved.size() >= cap_cells: break
 		if _full(state, "tree" if tree_pass else "shrub"): break
 		var center: Vector3 = walk.point(anchor)
 		if tree_pass and (center.dot(REAR) > 0.0 or int(room[anchor]) < int(spec.tree_room_cells)): continue
 		attempts += 1
-		if walk.blocked.has(anchor) or _near(center, state.groups, float(spec.spacing_m if tree_pass else spec.thicket_spacing_m)): continue
+		if walk.reserved.has(anchor) or _near(center, state.groups, float(spec.spacing_m if tree_pass else spec.thicket_spacing_m)): continue
 		var shared := {}
 		var placed := 0
 		var turn := _unit(rng) * TAU
@@ -74,7 +74,7 @@ static func _groves(state: Dictionary, order: Array[Vector2i], room: Dictionary,
 		for k in _range(rng, spec.foot_groundcover):
 			var angle := _unit(rng) * TAU
 			var at := center + Vector3(cos(angle), 0, sin(angle)) * (ring + 0.6 + _unit(rng) * 0.8)
-			_place(state, "groundcover", cover[_next(rng) % cover.size()], at, lerpf(0.85, 1.0, _unit(rng)), _unit(rng) * TAU, walk.blocked, -1)
+			_place(state, "groundcover", cover[_next(rng) % cover.size()], at, lerpf(0.85, 1.0, _unit(rng)), _unit(rng) * TAU, walk.reserved, -1)
 	return count
 
 ## One grove member: a few deterministic positions around its golden-angle slot.
@@ -125,7 +125,7 @@ static func _rock_piles(state: Dictionary, pool: Array[Vector2i], budget: int, r
 	for anchor: Vector2i in _shuffled(pool, rng):
 		if piles >= target or attempts >= int(state.recipe.outer_groves.max_group_attempts) or _full(state, "rock"): break
 		attempts += 1
-		if walk.blocked.has(anchor): continue
+		if walk.reserved.has(anchor): continue
 		var center: Vector3 = walk.point(anchor) + Vector3(_unit(rng) - 0.5, 0, _unit(rng) - 0.5) * 0.3
 		if _near(center, state.trunks, float(spec.trunk_clearance_m)): continue
 		var main := _place(state, "rock", spec.main_ids[_next(rng) % spec.main_ids.size()], center,
@@ -143,7 +143,7 @@ static func _rock_piles(state: Dictionary, pool: Array[Vector2i], budget: int, r
 		for k in _range(rng, spec.flowers):
 			var angle := turn + PI + k * 1.3
 			var at := center + Vector3(cos(angle), 0, sin(angle)) * _lerp(rng, spec.flower_offset_m)
-			_place(state, "flower", flowers[_next(rng) % flowers.size()], at, lerpf(0.85, 1.0, _unit(rng)), _unit(rng) * TAU, walk.blocked, -1)
+			_place(state, "flower", flowers[_next(rng) % flowers.size()], at, lerpf(0.85, 1.0, _unit(rng)), _unit(rng) * TAU, walk.reserved, -1)
 		piles += 1
 		state.groups.append(center)
 	return piles
@@ -167,12 +167,12 @@ static func _flower_clumps(state: Dictionary, pool: Array[Vector2i], rng: RefCou
 		for k in _range(rng, spec.flowers):
 			var angle := _unit(rng) * TAU
 			var at := center + Vector3(cos(angle), 0, sin(angle)) * float(spec.radius_m) * sqrt(_unit(rng))
-			if not _place(state, "flower", flowers[_next(rng) % flowers.size()], at, lerpf(0.85, 1.0, _unit(rng)), _unit(rng) * TAU, walk.blocked, -1).is_empty():
+			if not _place(state, "flower", flowers[_next(rng) % flowers.size()], at, lerpf(0.85, 1.0, _unit(rng)), _unit(rng) * TAU, walk.reserved, -1).is_empty():
 				placed += 1
 		for k in _range(rng, spec.groundcover):
 			var angle := _unit(rng) * TAU
 			var at := center + Vector3(cos(angle), 0, sin(angle)) * (float(spec.radius_m) + 0.3)
-			_place(state, "groundcover", cover[_next(rng) % cover.size()], at, lerpf(0.85, 1.0, _unit(rng)), _unit(rng) * TAU, walk.blocked, -1)
+			_place(state, "groundcover", cover[_next(rng) % cover.size()], at, lerpf(0.85, 1.0, _unit(rng)), _unit(rng) * TAU, walk.reserved, -1)
 		if placed > 0: centers.append(center)
 	return centers.size()
 
@@ -188,12 +188,12 @@ static func _place(state: Dictionary, role: String, asset: String, at: Vector3, 
 	var low: Array = record.bounds_godot_m[0]
 	var high: Array = record.bounds_godot_m[1]
 	var box := AABB(Vector3(low[0],low[1],low[2]), Vector3(high[0]-low[0],high[1]-low[1],high[2]-low[2]))
-	var solid := bool(spec.solid_collision)
+	var solid := bool(record.collision_proxy.solid)
 	# Quarter turns keep a solid prop's axis-aligned reservation as tight as its model.
 	if solid: yaw = snappedf(yaw, PI * 0.5)
 	var transform := Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale_value), at)
 	var world_box: AABB = transform * box
-	var limit := maxi(cap_cells - walk.blocked.size(), 0) if solid and cap_cells >= 0 else -1
+	var limit := maxi(cap_cells - walk.reserved.size(), 0) if solid and cap_cells >= 0 else -1
 	var footprint: Array[Vector2i] = walk.try_box(world_box, solid, shared, limit)
 	if footprint.is_empty(): return {}
 	var item := {"asset":asset, "role":role, "transform":transform, "box":world_box, "solid":solid,

@@ -6,6 +6,7 @@ const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const RECIPE_PATH := "res://assets/dynamic_farm/499-art-recipe.json"
 const INVENTORY_PATH := "res://assets/dynamic_farm/499-art-inventory.json"
+const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const CHUNK_CELLS := 32
 
 ## xorshift32: fixed integer operations, seeded with the first 32 bits of the recipe SHA256.
@@ -43,7 +44,7 @@ static func plan(data: Dictionary, walk: RefCounted) -> Dictionary:
 	for asset: String in palette:
 		if not assets.has(asset):
 			return {"ok": false, "error": "The farm scenery palette is incomplete."}
-	# Walk budget: the groves may move blocked cells around, never add to them.
+	# Walk budget: the groves may move reserved cells around, never add to them.
 	var reference := {"layout":[], "roles":{}}
 	var reference_walk := Walk.new(data)
 	for role: String in outer_spec.reference_roles:
@@ -52,7 +53,7 @@ static func plan(data: Dictionary, walk: RefCounted) -> Dictionary:
 	var rngs := {}
 	for stream: String in ["grove", "pile", "clump"]:
 		rngs[stream] = FixedRandom.new((data.seed_hex + "|" + str(recipe.art_version) + "|" + stream).sha256_text())
-	var outer := OuterGroves.plan(walk, assets, recipe, pool, reference_walk.blocked.size(), rngs)
+	var outer := OuterGroves.plan(walk, assets, recipe, pool, reference_walk.reserved.size(), rngs)
 	var core_rng := FixedRandom.new((data.block_id + "|" + str(recipe.core_obstacles.version)).sha256_text())
 	var core := CoreObstacles.plan(data, walk, assets, recipe.core_obstacles, core_rng)
 	return {"ok":true,"core_obstacles":core,"layout":outer.layout,"roles":outer.roles,"outer":outer.summary,
@@ -98,18 +99,19 @@ static func _scatter(planned: Dictionary, data: Dictionary, walk: RefCounted, re
 		var center_cell: Vector2i = walk.cell_at(point)
 		if seen_visual.has(center_cell):
 			continue
-		var footprint: Array[Vector2i] = walk.try_box(world_box, bool(spec.solid_collision))
+		var footprint: Array[Vector2i] = walk.try_box(world_box, bool(record.collision_proxy.solid))
 		if footprint.is_empty():
 			continue
 		seen_visual[center_cell] = true
 		planned.layout.append({"asset":asset,"role":role,"transform":transform,"box":world_box,
-			"solid":bool(spec.solid_collision),"shadow":bool(spec.cast_shadow_flag),"cells":footprint})
+			"solid":bool(record.collision_proxy.solid),"shadow":bool(spec.cast_shadow_flag),"cells":footprint})
 		accepted += 1
 	planned.roles[role] = {"target":wanted,"accepted":accepted,"attempts":attempts,"rejected":attempts-accepted}
 
-static func build(planned: Dictionary, cell_m: float) -> Dictionary:
+static func build(planned: Dictionary, walk: RefCounted) -> Dictionary:
 	var root := Node3D.new()
 	root.name = "DynamicScenery"
+	var cell_m: float = walk.cell_m
 	var batches := {}
 	var triangles := 0
 	var unique := {}
@@ -126,6 +128,29 @@ static func build(planned: Dictionary, cell_m: float) -> Dictionary:
 			root.free()
 			return {"ok":false,"error":"A farm scenery asset could not be loaded."}
 		root.add_child(Art.batch(batch.asset,batch.transforms,batch.shadow))
+	# Bind final rendered instances, after budget pruning. All layers go through
+	# this path; a placement role cannot override the model's collision policy.
+	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(INVENTORY_PATH))
+	var wire: StandardMaterial3D
+	if Engine.get_main_loop().debug_collisions_hint:
+		wire = StandardMaterial3D.new()
+		wire.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		wire.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		wire.no_depth_test = true # Precisely fitted shapes would otherwise be hidden inside the art.
+		wire.albedo_color = Color("00e5ff")
+		wire.render_priority = 127
+	var profiles := {}
+	for record: Dictionary in catalog.assets: profiles[record.id] = record.collision_proxy
+	for item: Dictionary in planned.layout:
+		var proxy := Proxy.new(profiles[item.asset], item.transform, catalog.collision_fit_fraction)
+		walk.add_prop(proxy)
+		if wire != null and proxy.solid:
+			var outline := MeshInstance3D.new()
+			outline.mesh = proxy.debug_wire()
+			outline.material_override = wire
+			outline.transform = proxy.pose
+			outline.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			root.add_child(outline)
 	var unique_triangles := 0
 	for count: int in unique.values(): unique_triangles += count
 	return {"ok":true,"root":root,"instances":planned.layout.size(),"batches":batches.size(),

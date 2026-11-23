@@ -78,14 +78,15 @@ func _ready() -> void:
 	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk),
 		1.0 if bool(_args.get("original_slope_material",false)) else 0.65)
 	add_child(_ground)
-	var art := Scenery.build(_plan,_data.cell_m)
+	var art := Scenery.build(_plan,_walk)
 	if not art.ok:
 		_fail(art.error)
 		return
 	_props = art.root
 	add_child(_props)
-	# Separate batches: these appearances never enter extension occupancy or shadow budgets.
-	var core_art := Scenery.build(_plan.core_obstacles, _data.cell_m)
+	# Separate batches outside extension occupancy and shadow budgets; stones, bushes
+	# and saplings still block through the shared model-fitted profiles (Q-16).
+	var core_art := Scenery.build(_plan.core_obstacles, _walk)
 	if not core_art.ok:
 		_fail(core_art.error)
 		return
@@ -97,7 +98,7 @@ func _ready() -> void:
 	_shade.setup(_ground,_props,_plan,_data,_walk)
 	if bool(_args.get("edge_decor_preview",false)):
 		_edge_plan=EdgeDecor.plan(_data,_walk,_plan)
-		var edge_art:=Scenery.build(_edge_plan,_data.cell_m)
+		var edge_art:=Scenery.build(_edge_plan,_walk)
 		if not edge_art.ok:
 			_fail(edge_art.error)
 			return
@@ -128,7 +129,7 @@ func _ready() -> void:
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
 		"core_cells":_data.counts.core,"extension_cells":_data.counts.extension,
-		"protected_cells":_data.protected.size(),"blocked_cells":_walk.blocked.size(),
+		"protected_cells":_data.protected.size(),"reserved_placement_cells":_walk.reserved.size(),
 		"art_version":_plan.art_version,"layout_sha256":_plan.layout_sha256,
 		"roles":_plan.roles,"instances":art.instances,"batches":art.batches,
 		"placed_triangles":art.placed_triangles,"unique_triangles":art.unique_triangles,
@@ -140,7 +141,7 @@ func _ready() -> void:
 		"batches":core_art.batches, "placed_triangles":core_art.placed_triangles,
 		"layout_sha256":_plan.core_obstacles.layout_sha256}
 	_summary.outer = _plan.outer.duplicate()
-	_summary.outer.blocked_cells = _walk.blocked.size()
+	_summary.outer.reserved_cells = _walk.reserved.size()
 	_summary.bank = _ground.get_meta("bank_metrics",{})
 	_summary.slope_material={"clearing_linear_gain":_ground.get_meta("slope_material_linear_gain"),
 		"batches":_ground.get_meta("slope_batches")}

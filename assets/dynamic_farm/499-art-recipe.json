@@ -120,7 +120,7 @@
     "core_visual_clearance_cells": 2.0,
     "spawn_visual_clearance_cells": 2.0,
     "clearance_measure": "transformed full vertex bounds/radial extent plus clearance; never use average AABB radius as containment proof",
-    "collision_measure": "v2 conservative full-mesh XZ AABB for trees/shrubs/rocks, rotated/scaled with the prop; rasterize touched cells and include avatar clearance; this is not a measured trunk-only collider",
+    "collision_measure": "Use the inventory primitive at the model transform. Full visual boxes and body clearance reserve placement only, never walking.",
     "validity": "Full transformed visual footprint and solid occupancy stay in extension minus protected; post-placement flood fill with actual avatar clearance retains spawn, entry, all core and all protected cells reachable; reject offending prop, never repair by editing zone masks",
     "geographic_road_neighbor_clip": false,
     "narrow_space_fallback": "drop_the_prop_keep_the_ground_and_connectivity",
@@ -147,7 +147,6 @@
       "placement": "outer permitted edge, broadleaf primary, sparse pine accents; groups of 2-3 only if bounds fit",
       "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
       "cells_per_candidate": 48,
-      "solid_collision": true,
       "cast_shadow_flag": true,
       "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
     },
@@ -160,7 +159,6 @@
       "placement": "between tree clusters, not a continuous blocking hedge",
       "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
       "cells_per_candidate": 32,
-      "solid_collision": true,
       "cast_shadow_flag": true,
       "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
     },
@@ -174,7 +172,6 @@
       "placement": "one main rock with at most two lower companions in permitted pockets",
       "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
       "cells_per_candidate": 64,
-      "solid_collision": true,
       "cast_shadow_flag": true,
       "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
     },
@@ -187,7 +184,6 @@
       "placement": "small clusters beside tree/rock groups; leave core and reserved corridors clear",
       "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
       "cells_per_candidate": 16,
-      "solid_collision": false,
       "cast_shadow_flag": false,
       "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
     },
@@ -200,7 +196,6 @@
       "placement": "sparse cluster foot cover; no full-field random noise",
       "target_formula": "min(cap_per_farm, floor(eligible_extension_cell_count / cells_per_candidate))",
       "cells_per_candidate": 12,
-      "solid_collision": false,
       "cast_shadow_flag": false,
       "source_pivot": "identity GLB node; minimum Y=0; place local origin at ground height, keep XZ offset, no recenter"
     }
