@@ -114,19 +114,28 @@ func _first_visit() -> void:
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
 	_check(farming._bag.get_child_count() == 2, "bag shows hoe and seeds")
 	var walk = scene._walk
-	# Clear a blocking obstacle with one press.
-	var obstacle := Vector2i(-1, -1)
+	# Clear a tree (a 2×2 block) with one press on a cell other than its anchor.
+	var tree := {}
 	for item: Dictionary in farming._core_plan.layout:
-		if item.solid:
-			obstacle = item.cell
+		if item.solid and item.get("cells", []).size() > 1:
+			tree = item
 			break
+	_check(not tree.is_empty(), "the fixture has a tree")
+	var obstacle: Vector2i = tree.get("cell", Vector2i(-1, -1))
+	var block: Array = tree.get("cells", [])
 	_check(not walk.clear_position(walk.point(obstacle)), "the obstacle blocks the walk")
 	var before := _obstacle_instances(farming)
-	var key := await _key(farming, obstacle)
-	_check(key == ["Clear", "Free", UiSceneAction.State.DEFAULT], "an obstacle offers Clear")
-	await _press(farming, obstacle)
-	_check(ParcelFarm.key(obstacle) in farming.farm.cleared and _obstacle_instances(farming) == before - 1, "one press clears it")
-	_check(walk.clear_position(walk.point(obstacle)), "and frees the walk")
+	var key: Array
+	var all_clear := block.size() == 4
+	for at: Vector2i in block:
+		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Clear", "Free", UiSceneAction.State.DEFAULT]
+	_check(all_clear, "every cell under the tree offers Clear, none Till")
+	await _press(farming, block.back())
+	_check(farming.farm.cleared == [ParcelFarm.key(obstacle)] and _obstacle_instances(farming) == before - 1, "one press clears it, named by its anchor")
+	var freed := true
+	for at: Vector2i in block:
+		freed = freed and not farming.obstacle_cells().has(at) and (await _key(farming, at))[0] != "Clear"
+	_check(freed and walk.clear_position(walk.point(obstacle)), "and frees the whole block and the walk")
 	_check(farming.farm.bag.get("hoe_starter") == 1, "clearing costs nothing")
 	# Till, sow, wait, harvest.
 	var cell := _free_cell(data, farming)
@@ -198,9 +207,10 @@ func _free_block(data: Dictionary) -> Vector2i:
 
 func _free_cell(data: Dictionary, farming: Node) -> Vector2i:
 	var house := ParcelFarm.house_cells(farming.farm)
+	var obstacles: Dictionary = farming.obstacle_cells()
 	for cell: Dictionary in data.cells:
 		var at := Vector2i(cell.x, cell.y)
-		if cell.zone == "core" and not farming._path.has(at) and not farming._obstacles.has(at) and not house.has(at): return at
+		if cell.zone == "core" and not farming._path.has(at) and not obstacles.has(at) and not house.has(at): return at
 	return Vector2i(-1, -1)
 
 func _outside_cell(data: Dictionary) -> Vector2i:

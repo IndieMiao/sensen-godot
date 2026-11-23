@@ -34,7 +34,10 @@ var _core_plan: Dictionary
 var _recipe: Variant
 var _core_root: Node3D
 var _proxies: Array = []
+## Every cell an uncleared core obstacle covers -> its anchor cell (a tree covers a block).
 var _obstacles := {}
+## Anchor cell -> index in the core layout; anchors name obstacles in `cleared`.
+var _anchors := {}
 var _removed := {}
 var _path := {}
 var _clock_offset_ms := 0
@@ -60,7 +63,9 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 	store = farm_store
 	rules = ParcelFarm.rules()
 	for index in _core_plan.layout.size():
-		_obstacles[_core_plan.layout[index].cell] = index
+		var item: Dictionary = _core_plan.layout[index]
+		_anchors[item.cell] = index
+		for cell: Vector2i in item.get("cells", [item.cell]): _obstacles[cell] = item.cell
 	_path = Space.protected_path(data)
 	_names = _item_names()
 	var bp := FarmBlueprint.new()
@@ -197,14 +202,14 @@ func _drop_cleared() -> void:
 	var gone := {}
 	for key: String in farm.cleared:
 		var cell = ParcelFarm.parse_key(key)
-		if cell != null and _obstacles.has(cell) and not _removed.has(cell): gone[cell] = true
+		if cell != null and _anchors.has(cell) and not _removed.has(cell): gone[cell] = true
 	if gone.is_empty(): return
 	var remaining := {"layout": _core_plan.layout.filter(func(item): return not _removed.has(item.cell) and not gone.has(item.cell))}
 	var art := Scenery.build(remaining, _walk, _recipe, false)
 	if not art.ok: return
 	# Release the walk only once the redrawn art exists, so art and walk never disagree.
 	for cell: Vector2i in gone:
-		var proxy = _proxies[_obstacles[cell]]
+		var proxy = _proxies[_anchors[cell]]
 		if proxy != null: _walk.remove_prop(proxy)
 		_removed[cell] = true
 	art.root.name = _core_root.name
@@ -215,7 +220,8 @@ func _drop_cleared() -> void:
 	parent.add_child(art.root)
 	parent.move_child(art.root, index)
 	_core_root = art.root
-	for cell: Vector2i in _removed: _obstacles.erase(cell)
+	for cell: Vector2i in _obstacles.keys():
+		if _removed.has(_obstacles[cell]): _obstacles.erase(cell)
 
 func _draw_crops() -> void:
 	if farm.is_empty(): return

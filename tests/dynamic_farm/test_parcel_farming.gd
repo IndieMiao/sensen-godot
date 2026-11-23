@@ -102,12 +102,20 @@ func _space() -> void:
 	_check(Space.till_refusal(data, path, state, Vector2i(1, 10)) == Space.OUTSIDE, "the walk-only outer ring refuses")
 	_check(Space.till_refusal(data, path, state, Vector2i(24, 9)) == Space.PATH, "the protected path refuses")
 	_check(Space.till_refusal(data, path, state, Vector2i(9, 7)) == Space.HOUSE, "the house footprint refuses")
-	var obstacles := {Vector2i(30, 18): 0}
+	var obstacles := {Vector2i(30, 18): Vector2i(30, 18)}
+	for cell: Vector2i in [Vector2i(32, 18), Vector2i(33, 18), Vector2i(32, 19), Vector2i(33, 19)]:
+		obstacles[cell] = Vector2i(32, 18)
 	var clear := Space.action(rules, data, path, obstacles, state, Vector2i(30, 18), T0)
 	_check(clear.verb == "clear" and clear.command == {"type": "clear_obstacle", "cell": "30,18"}, "an obstacle offers Clear first")
+	var block_clear := true
+	for cell: Vector2i in [Vector2i(32, 18), Vector2i(33, 18), Vector2i(32, 19), Vector2i(33, 19)]:
+		block_clear = block_clear and Space.action(rules, data, path, obstacles, state, cell, T0).command == {"type": "clear_obstacle", "cell": "32,18"}
+	_check(block_clear, "every cell of a tree offers Clear, named by its anchor")
 	var cleared := state.duplicate(true)
 	cleared.cleared.append("30,18")
+	cleared.cleared.append("32,18")
 	_check(Space.action(rules, data, path, obstacles, cleared, Vector2i(30, 18), T0).command.type == "till", "a cleared cell can be tilled")
+	_check(Space.action(rules, data, path, obstacles, cleared, Vector2i(33, 19), T0).command.type == "till", "a cleared tree frees its whole block")
 	var till := Space.action(rules, data, path, obstacles, state, free_cell, T0)
 	_check(till.command == {"type": "till", "cell": "36,18"}, "a free cell offers Till")
 	var no_hoe := state.duplicate(true)
