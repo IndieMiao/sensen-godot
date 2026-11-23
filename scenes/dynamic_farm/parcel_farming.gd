@@ -25,7 +25,7 @@ var target := Vector2i(-1, -1)
 var current := {}
 var picked = null
 var busy := false
-## The farm could not be opened; the key stays hidden.
+## The farm could not be opened; the key offers Retry.
 var unavailable := false
 
 var _data: Dictionary
@@ -87,8 +87,8 @@ func enter() -> void:
 	busy = false
 	if not is_inside_tree(): return
 	_adopt(result)
+	unavailable = farm.is_empty()
 	if not result.get("ok", false):
-		unavailable = farm.is_empty()
 		_toast.show_toast("Could not open your farm.", ToastLayer.Severity.ERROR)
 	elif result.get("granted", false):
 		var gifts := PackedStringArray()
@@ -116,7 +116,12 @@ func pick(cell: Vector2i) -> void:
 func _refresh_key() -> void:
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
 	_marker.visible = not current.is_empty()
-	_key.visible = not unavailable and (_marker.visible or farm.is_empty())
+	_key.visible = _marker.visible or farm.is_empty()
+	if unavailable and not busy:
+		_key.verb = "Retry"
+		_key.cost = ""
+		_key.state = UiSceneAction.State.DEFAULT
+		return
 	if farm.is_empty() or busy:
 		_key.state = UiSceneAction.State.PENDING
 		return
@@ -133,6 +138,9 @@ func _refresh_key() -> void:
 	_key.state = UiSceneAction.State.UNAVAILABLE if refused else UiSceneAction.State.DEFAULT
 
 func _on_key() -> void:
+	if unavailable and not busy:
+		await enter()
+		return
 	if busy or current.is_empty(): return
 	if not str(current.refusal).is_empty():
 		_toast.show_toast(_key.cost if current.refusal != Space.NOT_RIPE else "Not ripe yet", ToastLayer.Severity.REFUSED)
@@ -172,18 +180,19 @@ func _adopt(result: Dictionary) -> void:
 
 ## Cleared obstacles leave the walk and the art (the layer is redrawn without them).
 func _drop_cleared() -> void:
-	var changed := false
+	var gone := {}
 	for key: String in farm.cleared:
 		var cell = ParcelFarm.parse_key(key)
-		if cell == null or not _obstacles.has(cell) or _removed.has(cell): continue
+		if cell != null and _obstacles.has(cell) and not _removed.has(cell): gone[cell] = true
+	if gone.is_empty(): return
+	var remaining := {"layout": _core_plan.layout.filter(func(item): return not _removed.has(item.cell) and not gone.has(item.cell))}
+	var art := Scenery.build(remaining, _walk, false)
+	if not art.ok: return
+	# Release the walk only once the redrawn art exists, so art and walk never disagree.
+	for cell: Vector2i in gone:
 		var proxy = _proxies[_obstacles[cell]]
 		if proxy != null: _walk.remove_prop(proxy)
 		_removed[cell] = true
-		changed = true
-	if not changed: return
-	var remaining := {"layout": _core_plan.layout.filter(func(item): return not _removed.has(item.cell))}
-	var art := Scenery.build(remaining, _walk, false)
-	if not art.ok: return
 	art.root.name = _core_root.name
 	var parent := _core_root.get_parent()
 	var index := _core_root.get_index()
@@ -207,7 +216,9 @@ func _draw_crops() -> void:
 	_crops.sync(crops, server_now())
 
 func _draw_bag() -> void:
-	for child in _bag.get_children(): child.queue_free()
+	for child in _bag.get_children():
+		_bag.remove_child(child)
+		child.queue_free()
 	var ids: Array = BAG_ORDER.filter(func(id): return farm.bag.has(id))
 	for id: String in farm.bag:
 		if id not in ids and _names.has(id): ids.append(id)

@@ -241,9 +241,10 @@ func _process(delta: float) -> void:
 	_walk.move(direction*SPEED*dt)
 	_actor.position = _walk.position
 	var moving := _actor.position.distance_to(previous) > 0.0001
+	# Turn toward the stick even when blocked, so the key can target what the player pushes against.
+	if not direction.is_zero_approx(): _facing = direction.normalized()
 	if moving:
 		_actor.look_at(_actor.position+direction,Vector3.UP)
-		_facing = direction.normalized()
 		_play("run")
 	else:
 		_play("idle")

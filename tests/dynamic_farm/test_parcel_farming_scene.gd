@@ -14,6 +14,18 @@ var dir := ""
 var shift := [0]
 var scene
 
+## Fails the first entry like a dropped connection, then answers from the local save.
+class FlakyStore extends RefCounted:
+	var inner: RefCounted
+	var failures := 1
+	func _init(p_inner: RefCounted) -> void: inner = p_inner
+	func enter() -> Dictionary:
+		if failures > 0:
+			failures -= 1
+			return {"ok": false, "code": "NETWORK", "index": 0}
+		return inner.enter()
+	func send(base_version: int, commands: Array) -> Dictionary: return inner.send(base_version, commands)
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -39,9 +51,9 @@ func _store() -> RefCounted:
 	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
 	return store
 
-func _open() -> Node:
+func _open(store: RefCounted = null) -> Node:
 	scene = (load(SCENE_PATH) as PackedScene).instantiate()
-	scene.setup({"farm": raw, "dataset": raw.dataset_version, "block_id": raw.block_id, "own_parcel": true, "farm_store": _store()})
+	scene.setup({"farm": raw, "dataset": raw.dataset_version, "block_id": raw.block_id, "own_parcel": true, "farm_store": store if store != null else _store()})
 	var state := {"ready": false}
 	scene.preview_ready.connect(func(_summary): state.ready = true)
 	scene.preview_error.connect(func(message): push_error(message))
@@ -82,11 +94,15 @@ func _first_visit() -> void:
 	var file := FileAccess.open(dir.path_join(raw.block_id.validate_filename() + ".json"), FileAccess.WRITE)
 	file.store_string(JSON.stringify({"block_id": raw.block_id, "farm_version": 0, "farm": seeded}))
 	file.close()
-	var farming := await _open()
+	var farming := await _open(FlakyStore.new(_store()))
+	_check(farming.farm.is_empty() and farming._key.visible and farming._key.verb == "Retry", "a failed entry offers Retry")
+	farming._key.pressed_down.emit()
+	await process_frame
+	await process_frame
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("seed_carrot") == 3, "first entry: 1 hoe, 3 carrot seeds")
 	_check(farming._toast.current_text().begins_with("Received Starter Hoe ×1, Carrot Seeds ×3"), "the gift is announced")
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
-	_check(farming._bag.get_child_count() >= 2, "bag shows hoe and seeds")
+	_check(farming._bag.get_child_count() == 2, "bag shows hoe and seeds")
 	var walk = scene._walk
 	# Clear a blocking obstacle with one press.
 	var obstacle := Vector2i(-1, -1)
