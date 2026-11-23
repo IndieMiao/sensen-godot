@@ -1,5 +1,6 @@
 extends SceneTree
 const Android := preload("res://scenes/map_poc/map_bridge_android.gd")
+const RouterFixture := preload("res://tests/dynamic_farm/app_router_fixture.gd")
 class Plugin extends Node:
 	var supported := true
 	var surface_supported := true
@@ -56,7 +57,8 @@ func _run() -> void:
 	var selector := Selector.new(); selector.bridge = bridge
 	var page := MapPage.new(); root.add_child(page); page.add_child(selector)
 	page._bridge = bridge; page._selector = selector
-	var router := Router.new(); router.name = "AppRouter"; root.add_child(router)
+	var router := Router.new(); var real_router := RouterFixture.install(root, router)
+	verify(root.get_node_or_null("AppRouter") == router, "fixture router is the one the map resolves")
 	var farm := {"dataset_version":"sf-dynamic-farm-20261118-r4", "block_id":"p-A"}
 	await page._open_host(farm)
 	verify(plugin.calls == [["color", "#E7F0DF"]] and router.opened == 1, "opaque scene color is supplied before Router may suspend the map")
@@ -122,7 +124,8 @@ func _run() -> void:
 	var actual: Dictionary = host.presentation_state()
 	verify(actual.environment_mode == Environment.BG_COLOR and actual.background_rgba == "e7f0dfff", "host diagnostics reads actual environment mode and opaque scene color")
 	verify(not actual.viewport_transparent, "host readiness enforces opaque viewport")
-	host.queue_free(); page.queue_free(); router.queue_free(); plugin.queue_free()
+	host.queue_free(); page.queue_free(); plugin.queue_free()
 	await process_frame
+	RouterFixture.restore(root, router, real_router)
 	print("DYNAMIC MAP OCCLUSION ", checks - failures, "/", checks)
 	quit(1 if failures else 0)
