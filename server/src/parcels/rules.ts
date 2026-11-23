@@ -1,12 +1,32 @@
 /**
- * 动态农场（C-31）的可调数值：社区与数据集、首次进入自家地块的赠品、房屋占地与蓝图、作物成熟时间。
- * 默认值按所有者拍板 Q-39（C-34#14）与 Q-40（C-33#14）。
+ * 动态农场（C-31）的可调数值：社区与数据集、首次进入自家地块的赠品、房屋占地与蓝图、作物成熟时间；
+ * 以及地块经济（C-58）：出售价格、外围采集与刷新时间、领蓝图条件。
+ * 默认值按所有者拍板 Q-39（C-34#14）与 Q-40（C-33#14），经济按 C-30#29 第 3–5 题（C-30#30 写入的推荐）。
  * 来源是 assets/farm/data/dynamic_farm.json；它不在 content_version 的指纹里，改它不影响旧农场存档。
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 export interface CropRule { seed: string; grow_seconds: number; yield: number }
+/**
+ * 外围一类物件（树、花丛、石堆）：采一次得 amount 个 item；models 是美术配方里该类的模型名；
+ * max_objects 是一块地上该类最多摆多少个（等于配方 outer_groves.targets.<类>.cap），刷新期内最多采这么多个不同物件。
+ */
+export interface GatherSource { item: string; amount: number; max_objects: number; models: string[] }
+/** 一次性领取的蓝图：卖成功过至少 min_sales 次后可领，只发一次。 */
+export interface BlueprintRule { item: string; amount: number; min_sales: number }
+export interface EconomyRules {
+  /** 能卖的物品与单价（金币）；不在表里的不能卖。 */
+  sell_prices: Record<string, number>;
+  gather: {
+    /** 锁定的外围美术配方版本（499-art-recipe.json 的 outer_groves.version）；编号里的版本不同就拒收。 */
+    recipe_version: string;
+    /** 采过后按服务端时间多少秒重新可采。 */
+    respawn_seconds: number;
+    sources: Record<string, GatherSource>;
+  };
+  blueprints: Record<string, BlueprintRule>;
+}
 export interface ParcelRules {
   version: 1;
   /** 地块数据集归哪个社区：社区编号由服务端按数据集推出，客户端不能自报。 */
@@ -17,6 +37,7 @@ export interface ParcelRules {
   /** 放首栋住宅消耗一张 blueprint，放下即建成。 */
   house: { model: string; blueprint: string; width: number; depth: number };
   crops: Record<string, CropRule>;
+  economy: EconomyRules;
 }
 
 export const RULES_FILE = 'dynamic_farm.json';
@@ -46,7 +67,38 @@ export function parseParcelRules(raw: unknown): ParcelRules {
   if (!r.crops || !Object.keys(r.crops).length) fail('crops 不能为空');
   for (const [id, c] of Object.entries(r.crops))
     if (!isId(id) || !isId(c?.seed) || !count(c.grow_seconds, 1, 30 * 24 * 3600) || !count(c.yield, 1, 99)) fail(`crops.${id} 不对`);
+  parseEconomy(r.economy, fail);
   return r;
+}
+
+/** 价格、采集、蓝图条件的边界：单价 1–100000，刷新 1 秒–30 天，每次 1–99 个，模型名不跨类重复。 */
+function parseEconomy(e: EconomyRules | undefined, fail: (what: string) => never): void {
+  if (!e || typeof e !== 'object') fail('economy 缺失');
+  const isMap = (v: unknown): v is Record<string, unknown> => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
+  if (!isMap(e!.sell_prices) || !Object.keys(e!.sell_prices).length) fail('economy.sell_prices 不能为空');
+  for (const [id, price] of Object.entries(e!.sell_prices)) if (!isId(id) || !count(price, 1, 100_000)) fail(`economy.sell_prices.${id} 不对`);
+  const g = e!.gather;
+  if (!isMap(g) || !isId(g.recipe_version) || !count(g.respawn_seconds, 1, 30 * 24 * 3600) || !isMap(g.sources) || !Object.keys(g.sources).length)
+    fail('economy.gather 不对');
+  const models = new Set<string>();
+  for (const [kind, src] of Object.entries(g.sources)) {
+    if (!isId(kind) || !isMap(src) || !isId(src.item) || !count(src.amount, 1, 99) || !count(src.max_objects, 1, 1000)
+      || !Array.isArray(src.models) || !src.models.length)
+      fail(`economy.gather.sources.${kind} 不对`);
+    for (const m of src.models) {
+      if (!isId(m) || models.has(m)) fail(`economy.gather 模型 ${m} 格式不对或重复`);
+      models.add(m);
+    }
+  }
+  if (!isMap(e!.blueprints)) fail('economy.blueprints 缺失');
+  for (const [id, b] of Object.entries(e!.blueprints))
+    if (!isId(id) || !isMap(b) || !isId(b.item) || !count(b.amount, 1, 99) || !count(b.min_sales, 0, 1000)) fail(`economy.blueprints.${id} 不对`);
+}
+
+/** 模型名对应的外围物件类别（tree / flower / rock）；不可采的模型返回 null。 */
+export function gatherSourceOf(rules: ParcelRules, model: string): GatherSource | null {
+  for (const src of Object.values(rules.economy.gather.sources)) if (src.models.includes(model)) return src;
+  return null;
 }
 
 export function loadParcelRules(contentDir: string): ParcelRules {

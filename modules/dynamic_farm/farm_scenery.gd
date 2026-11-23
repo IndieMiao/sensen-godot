@@ -120,7 +120,9 @@ static func batch_key(palette: Dictionary, asset: String, origin: Vector3, cell_
 
 ## `recipe` is the plan's (`plan().recipe`), so a load reads the recipe file once;
 ## only a caller without it falls back to reading the file.
-static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null) -> Dictionary:
+## `bind`: false draws the art without adding walk profiles (a redraw of props already bound).
+## `proxies` lines up with planned.layout (null where unbound), so a cleared prop can be released.
+static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null, bind := true) -> Dictionary:
 	var root := Node3D.new()
 	root.name = "DynamicScenery"
 	var cell_m: float = walk.cell_m
@@ -160,8 +162,12 @@ static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null)
 		wire.render_priority = 127
 	var profiles := {}
 	for record: Dictionary in catalog.assets: profiles[record.id] = record.collision_proxy
+	var proxies := []
 	for item: Dictionary in planned.layout:
+		proxies.append(null)
+		if not bind: continue
 		var proxy := Proxy.new(profiles[item.asset], item.transform, catalog.collision_fit_fraction)
+		proxies[-1] = proxy
 		walk.add_prop(proxy)
 		if wire != null and proxy.solid:
 			var outline := MeshInstance3D.new()
@@ -173,4 +179,4 @@ static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null)
 	var unique_triangles := 0
 	for count: int in unique.values(): unique_triangles += count
 	return {"ok":true,"root":root,"instances":planned.layout.size(),"batches":batches.size(),
-		"placed_triangles":triangles,"unique_triangles":unique_triangles}
+		"placed_triangles":triangles,"unique_triangles":unique_triangles,"proxies":proxies}
