@@ -71,11 +71,12 @@ keeps that one tap (same pixel and camera revision) and runs it at the next map
 idle; after `IDLE_WAIT_MS` (4 s) without idle it still answers `loading`. A
 newer tap, camera move, style reload, hide or clear drops the waiting tap.
 
-Any native error answer gets one automatic re-query of the same point while
-"Finding parcel…" stays visible. Only a second error shows the message. The
-delay is `query_retry_delay_ms` in `config.json` (default 600, clamped 0–5000);
-a camera move or pause cancels it. Contract rejections and the 8 s no-answer
-timeout are not retried. `DYNAMIC_QUERY` logs the local request number, native
+Any native error or contract-rejected answer gets one automatic re-query of the
+same point while "Finding parcel…" stays visible (Q-29 A). Only a second failure
+shows "Parcel details could not load. Tap Retry."; Retry then re-queries that
+tap without reloading the map. The delay is `query_retry_delay_ms` in
+`config.json` (default 600, clamped 0–5000); a camera move or pause cancels it.
+The 8 s no-answer timeout is not retried and its Retry still reloads the map. `DYNAMIC_QUERY` logs the local request number, native
 outcome code, attempt and retry decision only, never the point or parcel.
 
 ## 1904 read retries
