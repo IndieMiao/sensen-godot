@@ -78,7 +78,7 @@ func _ready() -> void:
 	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk),
 		1.0 if bool(_args.get("original_slope_material",false)) else 0.65)
 	add_child(_ground)
-	var art := Scenery.build(_plan,_walk)
+	var art := Scenery.build(_plan,_walk,_plan.recipe)
 	if not art.ok:
 		_fail(art.error)
 		return
@@ -86,7 +86,7 @@ func _ready() -> void:
 	add_child(_props)
 	# Separate batches outside extension occupancy and shadow budgets; stones, bushes
 	# and saplings still block through the shared model-fitted profiles (Q-16).
-	var core_art := Scenery.build(_plan.core_obstacles, _walk)
+	var core_art := Scenery.build(_plan.core_obstacles, _walk, _plan.recipe)
 	if not core_art.ok:
 		_fail(core_art.error)
 		return
@@ -98,7 +98,7 @@ func _ready() -> void:
 	_shade.setup(_ground,_props,_plan,_data,_walk)
 	if bool(_args.get("edge_decor_preview",false)):
 		_edge_plan=EdgeDecor.plan(_data,_walk,_plan)
-		var edge_art:=Scenery.build(_edge_plan,_walk)
+		var edge_art:=Scenery.build(_edge_plan,_walk,_plan.recipe)
 		if not edge_art.ok:
 			_fail(edge_art.error)
 			return
