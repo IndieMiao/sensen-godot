@@ -138,7 +138,8 @@ class WorkerAPK(unittest.TestCase):
             self.assertNotIn(key, release)
         self.assertNotIn('sensen/dynamic_farm/fake_claims', internal)
         self.assertEqual(internal['application/config/custom_user_dir_name'], 'DynamicFarmInternal')
-        for setting in ('dynamic_farm/reselect=false', 'dynamic_farm/fake_claims=true'):
+        for setting in ('dynamic_farm/reselect=false', 'dynamic_farm/fake_claims=true', 'dynamic_farm/reselect.mobile=true',
+                        'network/base_url.android="https://farm.sensenjoy.cn/v1"', 'network/online_qa.mobile=false'):
             source = PROJECT.replace('[sensen]', '[sensen]\n' + setting)
             for target in (None, TARGET):
                 with self.subTest(setting=setting, target=target), self.assertRaisesRegex(ValueError, 'pre-existing'):
@@ -152,6 +153,9 @@ class WorkerAPK(unittest.TestCase):
         self.assertIn('package/signed=false', preset)
         self.assertIn('runnable=false', preset)
         self.assertNotEqual(farm.INTERNAL_PACKAGE, farm.PACKAGE)
+        for variant in (True, 'android-internal'):  # A bool is an old caller's signature.
+            with self.subTest(variant=variant), self.assertRaisesRegex(ValueError, 'unknown package variant'):
+                worker_preset(PRESETS, variant)
 
     def test_readback_checks_each_variants_exported_configuration(self):
         for variant, files in [('android', FILES), ('dynamic-farm', FARM_FILES), ('dynamic-farm-internal', FARM_FILES)]:
@@ -174,7 +178,13 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/base_url': 'https://farm.sensenjoy.cn/v1'})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/account_restore': False})),
-               ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/fake_claims': True}))]
+               ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/fake_claims': True})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/reselect.mobile': False})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa.mobile': False})),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'),
+                                     **{'sensen/network/mobile_base_url.android': 'https://farm.sensenjoy.cn/v1'})),
+               ('android', dict(exported_settings('android'), **{'sensen/network/base_url.mobile': TARGET})),
+               (True, exported_settings('dynamic-farm')), ('android-internal', internal)]
         for variant, settings in bad:
             self.fixture(FILES if variant == 'android' else FARM_FILES, settings)
             with self.subTest(variant=variant, settings=settings), self.assertRaises(ValueError):
@@ -184,7 +194,9 @@ class WorkerAPK(unittest.TestCase):
         good = encode_settings({'sensen/network/online_qa': True, 'sensen/network/base_url': TARGET})
         self.assertEqual(farm.project_settings(good), {'sensen/network/online_qa': True, 'sensen/network/base_url': TARGET})
         twice = encode_settings({'a': True})[8:]
-        for blob in [b'', b'fixture', good[:-1], good + b'\0', b'ECFG' + struct.pack('<I', 2) + twice + twice]:
+        long_string = b'ECFG' + struct.pack('<IIsII', 1, 1, b'k', 12, 4) + struct.pack('<I', 9) + b'abcd'
+        for blob in [b'', b'fixture', good[:-1], good + b'\0', b'ECFG' + struct.pack('<I', 2) + twice + twice,
+                     long_string]:
             with self.subTest(blob=blob), self.assertRaises(ValueError):
                 farm.project_settings(blob)
 
@@ -205,7 +217,7 @@ class WorkerAPK(unittest.TestCase):
 
     def test_cli_generates_the_internal_preset(self):
         out = self.tmp / 'internal.cfg'
-        subprocess.run(['python3', ROOT / 'tools/android/worker_apk.py', '--variant', 'dynamic-farm-internal',
+        subprocess.run(['python3', '-B', ROOT / 'tools/android/worker_apk.py', '--variant', 'dynamic-farm-internal',
                         '--presets', ROOT / 'export_presets.cfg', 'generate', out], check=True)
         self.assertEqual(worker_preset(out.read_text(), 'dynamic-farm-internal')[1]['package'], farm.INTERNAL_PACKAGE)
 

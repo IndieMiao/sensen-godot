@@ -22,6 +22,9 @@ APPROVED_TARGETS = ('https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1',)
 # Read by the map (C-32); only the internal package may set them.
 INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore')
 URL_KEYS = ('network/base_url', 'network/mobile_base_url')
+VARIANTS = ('android', *PACKAGES)
+# A feature-tag override (e.g. `network/base_url.mobile=`) would win at run time over the staged value.
+OVERRIDDEN = re.compile(r'^(?:sensen/)?network/(?:online_qa|base_url|mobile_base_url)\.')
 
 
 def replace_one(text, pattern, replacement):
@@ -41,8 +44,8 @@ def internal_target(url):
 def staged_project(text, target=None):
     # Net reads online_qa before the map scene starts, so it never boots or signs in anonymously.
     # Retain the real autoloads.
-    if re.search(r'^(?:network/online_qa|config/(?:use_custom_user_dir|custom_user_dir_name)|dynamic_farm/\w+)=',
-                 text, re.M):
+    if re.search(r'^(?:network/online_qa|config/(?:use_custom_user_dir|custom_user_dir_name)|dynamic_farm/\w+)[=.]',
+                 text, re.M) or any(OVERRIDDEN.match(line) for line in text.splitlines()):
         raise ValueError('unexpected pre-existing QA overrides')
     url, user_dir, extra = DISABLED, 'DynamicFarmCardigan', ''
     if target is not None:
@@ -99,6 +102,8 @@ def project_settings(blob):
             settings[key] = struct.unpack('<q' if flags & 1 else '<i', value[4:])[0]
         elif kind == 4 and len(value) >= 8:
             size = struct.unpack('<I', value[4:8])[0]
+            if len(value) != 8 + size + -size % 4:
+                raise ValueError('malformed project.binary string')
             settings[key] = value[8:8 + size].decode()
         else:
             settings[key] = None
@@ -109,6 +114,10 @@ def project_settings(blob):
 
 def exported_config(settings, variant):
     """Check the exported Journey settings for a variant and return them for the build record."""
+    if variant not in VARIANTS:
+        raise ValueError('unknown package variant')
+    if any(OVERRIDDEN.match(key) for key in settings):
+        raise ValueError('feature-tag override of a Journey setting in export')
     s = {key[len('sensen/'):]: value for key, value in settings.items() if key.startswith('sensen/')}
     unknown = {key for key in s if key.startswith('dynamic_farm/')} - set(INTERNAL_SETTINGS)
     urls = [s.get(key) for key in URL_KEYS]

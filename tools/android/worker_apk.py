@@ -20,6 +20,7 @@ def require(condition, message):
 def worker_preset(text, variant='android'):
     # Godot config values aren't INI strings (e.g. PackedStringArray, dictionaries).
     # Preserve their encoding; take only the named non-store preset and its options.
+    require(variant in farm.VARIANTS, 'unknown package variant')
     matches = [b for b in re.split(r'(?m)(?=^\[preset\.\d+\]$)', text)
                if 'name="Android"' in b.splitlines()]
     require(len(matches) == 1, 'expected one Android preset')
@@ -100,7 +101,7 @@ def inspect(apk, identity, build_tools, signer=None, variant='android'):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--presets', type=Path, required=True, help='preset file from the source revision')
-    parser.add_argument('--variant', choices=['android', *farm.PACKAGES], default='android')
+    parser.add_argument('--variant', choices=farm.VARIANTS, default='android')
     cmd = parser.add_subparsers(dest='cmd', required=True)
     cmd.add_parser('generate').add_argument('destination', type=Path)
     cmd.add_parser('check-unsigned').add_argument('apk', type=Path)
