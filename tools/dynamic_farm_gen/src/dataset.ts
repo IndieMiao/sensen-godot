@@ -272,7 +272,7 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
       block_id: blockId, name: parcel.record.name, building_count: records.length, building_source: chosen,
       building_area_m2: round(result.area_m2, 2),
       parcel_area_m2: round(parcel.utm.reduce((s, poly) => s + polygonArea(poly), 0), 2),
-      cell_m: result.cell_m, cell_area_m2: round(result.cell_m ** 2, 4), rotation_deg: result.rotation_deg,
+      cell_m: result.cell_m, cell_area_m2: round(result.cell_m * result.cell_m, 4), rotation_deg: result.rotation_deg,
       core_cell_count: counts.core_cell_count, extension_cell_count: counts.extension_cell_count, total_cell_count: counts.total_cell_count,
       core_iou: round(result.core.iou, 4), too_small: result.too_small, flags: result.flags,
     });

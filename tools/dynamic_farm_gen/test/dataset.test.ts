@@ -43,6 +43,8 @@ describe('sample build (test range)', () => {
     expect(f.counts.total_cell_count).toBeLessThanOrEqual(8192);
     expect(f.source_cell_m).toBeGreaterThan(0.5);
     expect(f.stats.recovery_flags).toContain('cell_scaled_for_core_cap');
+    expect(f.source_cell_m).toBe(0.6901);
+    expect(f.source_area_m2).toBe(1874.7);
     expect(f.boundaries.core[0].holes.length).toBeGreaterThanOrEqual(2);
     expect(f.stats.core_iou).toBeGreaterThan(0.95);
   });
@@ -80,6 +82,19 @@ describe('sample build (test range)', () => {
     expect(sha256(result.files.get('manifest.json')!)).toBe(GOLDEN_MANIFEST_SHA256);
   });
 
+  it('never calls the engine\'s libm on the build path (its last bit differs between platforms)', () => {
+    const names = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'atan2', 'exp', 'expm1', 'log', 'log1p', 'log2', 'log10',
+      'sinh', 'cosh', 'tanh', 'asinh', 'acosh', 'atanh', 'hypot', 'pow', 'cbrt'] as const;
+    const saved = names.map(n => Math[n]);
+    try {
+      for (const n of names) (Math as unknown as Record<string, unknown>)[n] = () => { throw new Error(`Math.${n} called`); };
+      const again = buildDataset(loadSnapshot(SNAPSHOT), { dataset_version: VERSION, params: resolveParams() });
+      expect(again.files.get('manifest.json')).toBe(result.files.get('manifest.json'));
+    } finally {
+      names.forEach((n, i) => { (Math as unknown as Record<string, unknown>)[n] = saved[i]; });
+    }
+  });
+
   it('writes to disk and validates from disk; refuses to replace unrelated folders', () => {
     const tmp = mkdtempSync(path.join(os.tmpdir(), 'farm-gen-'));
     const out = path.join(tmp, 'r5');
@@ -106,4 +121,4 @@ describe('sample build (test range)', () => {
   });
 });
 
-const GOLDEN_MANIFEST_SHA256 = 'fbb08f32b4f762d12621d72709bb149fe057aedefc0ce8a9b6b811ff3f423dce';
+const GOLDEN_MANIFEST_SHA256 = 'fe8d03428ebb60e9b5f39d129c3ef24b39fe174483556cae7f7ad3b024f8ff05';

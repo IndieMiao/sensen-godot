@@ -56,8 +56,8 @@ licence/edit metadata (`source-manifest.json`); `build` reads only a snapshot. T
    5-wide entry corridor with a centre path.
 6. **Entry.** Toward the street: 3 m outside each parcel side is probed; the side whose probes hit no
    other parcel (right-of-way) wins, then the smaller building setback, then S, W, E, N. The
-   corridor leaves from the most protruding core column, the entry is its last cell and the spawn
-   is the most interior core cell nearest that column.
+   corridor leaves from the main (largest) building's most protruding column, the entry is its last
+   cell and the spawn is that building's most interior cell nearest the column.
 7. **Extension.** Grass within `extension_cells ± extension_jitter` (5 ± 2) of the walking area,
    smooth value noise from the parcel seed. Only ground connected to the core is kept.
 8. **Output.** The r4 schema-4 fields unchanged (`zones`, `capabilities`, `counts`, `boundaries`,
@@ -67,16 +67,20 @@ licence/edit metadata (`source-manifest.json`); `build` reads only a snapshot. T
 `seed_hex` = SHA-256 of `sensen-dynamic-farm|<block_id>|<source_geometry_hash>`: decor stays the
 same across dataset versions while the geometry is unchanged.
 
-Determinism: no clock or randomness in `build`; floats are rounded before output. The same snapshot,
-parameters and `--dataset-version` give byte-identical files (`test/dataset.test.ts` pins the
-manifest hash of the test range).
+Determinism: no clock or randomness in `build`; floats are rounded before output. The engine's
+`Math.sin/atan/exp/…` and `**` differ in the last bit between platforms (e.g. arm64 Mac vs x86-64
+Linux), so the build path uses `src/detmath.ts` (fdlibm ports using only IEEE-exact + − × ÷ and
+`Math.sqrt`); areas are summed relative to each ring's first vertex. The same snapshot, parameters
+and `--dataset-version` give byte-identical files on any machine: `test/dataset.test.ts` pins the
+manifest hash of the test range and fails if the build calls a libm function, and
+`test/detmath.test.ts` pins one UTM projection bit for bit.
 
 ## Parameters (defaults, `src/config.ts`; override with `--params file.json`)
 
 | Name | Default | Why |
 | --- | --- | --- |
 | `cell_m` | 0.5 (0.25 m²) | A typical St. Francis Wood house (150–250 m²) gets 600–1000 cells, close to r4's ~800 |
-| `core_cell_cap` | 4096 | Half of the 8192 client budget; the extension needs the rest (175 JUNIPERO SERRA: 3978 + 2688) |
+| `core_cell_cap` | 4096 | Half of the 8192 client budget; the extension needs the rest (175 JUNIPERO SERRA: 3972 + 2694) |
 | `total_cell_cap` | 8192 | Client `MAX_CELLS`; cannot be raised |
 | `min_core_cells` | 400 | Owner's example in C-43#6 (= 100 m² at 0.25 m²); below it the farm is still written but flagged `too_small` (farm `stats` and index) |
 | `coverage_threshold` | 0.5 | Half-covered cells count; keeps the raster area equal to the footprint area |

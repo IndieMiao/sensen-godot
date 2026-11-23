@@ -50,7 +50,7 @@ function panel(farm: Farm, x0: number, y0: number, size: number, footprints: Pol
   const lines = [
     title,
     `core ${c.core_cell_count} · extension ${c.extension_cell_count} · total ${c.total_cell_count}`,
-    `cell ${Number(farm.source_cell_m).toFixed(3)} m (${(farm.source_cell_m ** 2).toFixed(3)} m²) · area ${Number(farm.source_area_m2).toFixed(1)} m²`,
+    `cell ${Number(farm.source_cell_m).toFixed(3)} m (${(farm.source_cell_m * farm.source_cell_m).toFixed(3)} m²) · area ${Number(farm.source_area_m2).toFixed(1)} m²`,
   ];
   lines.forEach((line, i) => parts.push(`<text x="${x0}" y="${y0 - 34 + i * 14}" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#222">${escape(line)}</text>`));
   return parts.join('\n');

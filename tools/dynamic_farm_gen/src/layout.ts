@@ -277,7 +277,7 @@ export function buildLayout(core: Uint8Array, w: number, h: number, front: Dir, 
       if (!ok) break;
       clear = r;
     }
-    const d2 = (x - laneStart.x) ** 2 + (y - laneStart.y) ** 2;
+    const d2 = (x - laneStart.x) * (x - laneStart.x) + (y - laneStart.y) * (y - laneStart.y);
     if (clear > spawnScore[0] || (clear === spawnScore[0] && d2 < spawnScore[1])) { spawn = i; spawnScore = [clear, d2]; }
   }
 
