@@ -25,6 +25,7 @@ var paths: Array = []
 var farms: Array = []
 var options: Array = []
 var hold := false
+var hold_manifest := false
 var wrong_farm := false
 signal release
 func _initialize() -> void: _run.call_deferred()
@@ -34,7 +35,9 @@ func check(value: bool, text: String) -> void:
 	print("PASS " if value else "FAIL ", text)
 func transport(path: String) -> Dictionary:
 	paths.append(path)
-	if path == "/client-manifest.json": return Fixture.manifest()
+	if path == "/client-manifest.json":
+		if hold_manifest: await release
+		return Fixture.manifest()
 	var data: Dictionary = Fixture.farm("p-B" if wrong_farm else path.get_file().get_basename())
 	if hold: await release
 	return data
@@ -136,9 +139,36 @@ func map_error_retry() -> void:
 	controller.tap(Vector2(.3, .7), 18); answer("loading"); controller.tap(Vector2(.6, .2), 18)
 	controller._process(controller.retry_delay() + .01)
 	check(native.queries.size() == sent + 2 and native.queries.back()[2] == Vector2(.6, .2), "new tap during a waiting re-query replaces it")
+	await burst_errors()
 	controller.config.query_retry_delay_ms = null
 	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "non-numeric retry delay falls back to the default")
 	controller.config.erase("query_retry_delay_ms")
+func burst_errors() -> void:
+	# V-47: one outage reports several map errors, and the failing map can still report ready.
+	ready_signal()
+	var sent := native.queries.size(); var boots := native.sources.size()
+	controller.tap(Vector2(.3, .7), 18); map_error("building_load_failed"); map_error()
+	check(controller.message == "Finding parcel…" and controller.busy and controller._reload_left > 0.0, "second error of the same outage does not report before the automatic reload")
+	ready_signal(controller.style_generation)
+	check(native.queries.size() == sent + 1, "failing map's late ready does not resume the tap on the old map")
+	hold_manifest = true; var old_generation: int = controller.generation
+	controller._process(controller.retry_delay() + .01); await process_frame
+	check(controller.generation == old_generation and controller.busy, "reload is still fetching the manifest")
+	map_error(); ready_signal(controller.style_generation)
+	check(controller.message == "Finding parcel…" and native.queries.size() == sent + 1, "old map signals during the reload are ignored")
+	hold_manifest = false; release.emit()
+	for i in 4: await process_frame
+	check(native.sources.size() == boots + 1, "burst of errors reloads the map exactly once")
+	ready_signal()
+	check(native.queries.size() == sent + 2 and native.queries.back()[1] == controller.generation and native.queries.back()[2] == Vector2(.3, .7), "tap resumes only on the reloaded map")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A", "tap interrupted by a burst of errors selects after the reload")
+	controller.tap(Vector2(.3, .7), 18); map_error(); await reload(); map_error(); map_error()
+	check(controller.message == Controller.MAP_FAILED and controller._reload_left < 0.0, "failure after the reload cancels any pending reload")
+	boots = native.sources.size(); controller._process(5.0); for i in 4: await process_frame
+	check(native.sources.size() == boots and controller.message == Controller.MAP_FAILED, "reported map failure stays until the player retries")
+	controller.retry(); for i in 4: await process_frame
+	ready_signal()
 func _run() -> void:
 	api = Api.new(); api.transport = transport; root.add_child(api)
 	native = Native.new(); controller = Controller.new(); controller.api = api; controller.bridge = native

@@ -37,6 +37,7 @@ var _query_failed := false
 var _map_retried := false
 var _reload_left := -1.0
 var _resume_tap := false
+var _failed_generation := -1 # Map being replaced by the automatic reload; its later signals are the same failure.
 var _kind := "parcel"
 var _key := ""
 var _highlighted_parcel := ""
@@ -45,7 +46,7 @@ var _connected := false
 
 ## auto=true is the single automatic reload after a map load error; it keeps the waiting tap.
 func activate(auto := false) -> void:
-	if not auto: _map_retried = false; _resume_tap = false
+	if not auto: _map_retried = false; _resume_tap = false; _failed_generation = -1
 	_reload_left = -1.0
 	_clear_parcel_selection()
 	suspended = false
@@ -84,7 +85,7 @@ func activate(auto := false) -> void:
 
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; _retry_left = -1.0; _query_failed = false; map_ready = false; busy = false
-	_reload_left = -1.0; _resume_tap = false
+	_reload_left = -1.0; _resume_tap = false; _failed_generation = -1
 	selection = {}; _options = []; _key = ""
 	_highlighted_parcel = ""
 	if api != null: api.cancel_all()
@@ -93,7 +94,7 @@ func pause() -> void:
 		bridge.set_map_visible(false)
 
 func _native_ready(gen: int, style: int, payload: String) -> void:
-	if suspended or gen != generation or style < style_generation: return
+	if suspended or gen != generation or gen == _failed_generation or style < style_generation: return
 	var data := _parse(payload)
 	if style != style_generation:
 		_clear_parcel_selection()
@@ -109,6 +110,7 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 
 func _native_error(gen: int, style: int, code: String) -> void:
 	if suspended or gen != generation or style < style_generation: return
+	if gen == _failed_generation: return # One outage reports per tile/source; the reload already answers it.
 	var tap := _querying()
 	var retry_sent := _retried and _retry_left < 0.0 # A scheduled, unsent re-query is replaced by the reload.
 	map_ready = false; _pending = -1; _retry_left = -1.0; _query_failed = false
@@ -116,7 +118,7 @@ func _native_error(gen: int, style: int, code: String) -> void:
 	var retry := not _map_retried and not (tap and retry_sent)
 	print("DYNAMIC_MAP_ERROR ", JSON.stringify({"code":code, "tap":tap, "retry":retry}))
 	if not retry: _fail(MAP_FAILED); return
-	_map_retried = true; _resume_tap = tap; _retried = _retried or tap
+	_map_retried = true; _resume_tap = tap; _retried = _retried or tap; _failed_generation = gen
 	busy = true; _reload_left = retry_delay()
 	message = FINDING if tap else "Loading map details…"; changed.emit()
 
@@ -259,7 +261,7 @@ func _process(delta: float) -> void:
 		_pending = -1; _fail("The map did not respond. Tap again or Retry.")
 
 func _fail(text: String) -> void:
-	busy = false; _resume_tap = false; message = text; changed.emit()
+	busy = false; _resume_tap = false; _reload_left = -1.0; message = text; changed.emit()
 
 static func _parse(text: String) -> Dictionary:
 	var parser := JSON.new()

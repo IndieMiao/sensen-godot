@@ -86,7 +86,9 @@ error), not as query answers. The first one reloads the map automatically after
 the same delay; a tap that was in flight or waiting for its re-query keeps
 "Finding parcel…" and is queried again once the reloaded map is ready, which
 counts as its one retry. Only a further map error (or one after the tap's retry
-was already sent) shows "Map details could not load. Tap Retry.". The reload
+was already sent) shows "Map details could not load. Tap Retry.". One outage reports once per failed tile or
+source: further errors and late ready signals from the map being replaced are
+ignored, so the tap resumes only on the reloaded map. The reload
 allowance resets on the next tap or Retry. `DYNAMIC_MAP_ERROR` logs the native
 code and whether a tap was waiting. `DYNAMIC_QUERY` logs the local request number, native
 outcome code, attempt and retry decision only, never the point or parcel.
