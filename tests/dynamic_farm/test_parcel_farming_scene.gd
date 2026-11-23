@@ -102,7 +102,9 @@ func _first_visit() -> void:
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("seed_carrot") == 3, "first entry: 1 hoe, 3 carrot seeds")
 	_check(farming._toast.current_text().begins_with("Received Starter Hoe ×1, Carrot Seeds ×3"), "the gift is announced")
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
-	_check(farming._bag.get_child_count() == 2, "bag shows hoe and seeds")
+	var chips: Array = farming._bag.get_children().map(func(c): return str(c.name))
+	_check(chips == ["coins", "hoe_starter", "seed_carrot", "blueprint_cottage"], "bag row: coins, hoe, seeds and the cottage blueprint (C-59)")
+	_check(farming._bag.get_child(0).get_child(1).text == "0", "a new parcel starts with 0 coins (C-59)")
 	var walk = scene._walk
 	# Clear a blocking obstacle with one press.
 	var obstacle := Vector2i(-1, -1)

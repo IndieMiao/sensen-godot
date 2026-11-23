@@ -18,6 +18,12 @@ func _init(p_client: ApiClient, parcel_block_id: String, dataset_version: String
 func enter() -> Dictionary:
 	return _result(await _call("/parcels/mine/enter", {}), true)
 
+## The farm without entering it (C-31 `GET /parcels/mine`): no welcome gift. The market and the
+## carpenter on the map read it this way (C-59).
+func read() -> Dictionary:
+	if client == null: return _result(ApiClient.Response.new(false, 0, {}, "offline"), false)
+	return _result(await client.request("GET", "/parcels/mine"), false)
+
 func send(base_version: int, commands: Array) -> Dictionary:
 	return _result(await _call("/parcels/mine/commands", {"base_version": base_version, "commands": commands}), false)
 

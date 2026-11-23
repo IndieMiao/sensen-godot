@@ -64,7 +64,14 @@ static func kept(card: bool) -> int:
 ## A look `npc:<id>` is a written keeper's outfit in outpost_npcs.json, used only when no painted art is available.
 const NPC := "npc:"
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
+## Looks another game mode registers by id (the dynamic farm's market and carpenter, C-59): {look: slots}.
+## Checked first; the P0 looks above are unchanged.
+static var registered := {}
+static func register_look(look: String, slots: Dictionary) -> void:
+	registered[look] = slots.duplicate()
+
 static func _slots(look: String) -> Dictionary:
+	if registered.has(look): return registered[look]
 	if look.begins_with(NPC):
 		var npcs: Dictionary = P0RoomAnchors.read_json(NPCS_PATH).get("npcs", {})
 		return npcs.get(look.trim_prefix(NPC), {}).get("slots", {})

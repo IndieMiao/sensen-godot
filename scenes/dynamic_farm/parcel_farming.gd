@@ -9,6 +9,7 @@ signal state_changed(farm: Dictionary)
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
+const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const CROP_CODES := {"crop_carrot": "C"}
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
 const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest"}
@@ -231,26 +232,31 @@ func _draw_bag() -> void:
 	for child in _bag.get_children():
 		_bag.remove_child(child)
 		child.queue_free()
+	# The parcel's own coins first (C-59, separate from the main farm's), then the bag.
+	_bag.add_child(_chip("coins", P0Logic.icon("coin"), str(int(farm.get("coins", 0))), "Coins"))
 	var ids: Array = BAG_ORDER.filter(func(id): return farm.bag.has(id))
 	for id: String in farm.bag:
-		if id not in ids and _names.has(id): ids.append(id)
+		if id not in ids and (_names.has(id) or not ParcelItems.name_of(id).is_empty()): ids.append(id)
 	for id: String in ids:
-		var chip := HBoxContainer.new()
-		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		chip.tooltip_text = _names.get(id, id)
-		var icon := TextureRect.new()
-		icon.texture = P0Logic.icon(id)
-		icon.custom_minimum_size = Vector2(22, 22)
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		chip.add_child(icon)
-		var count := Label.new()
-		count.text = "×%d" % int(farm.bag[id])
-		count.add_theme_font_size_override("font_size", 13)
-		count.add_theme_color_override("font_color", Color("314637"))
-		chip.add_child(count)
-		chip.name = id
-		_bag.add_child(chip)
+		_bag.add_child(_chip(id, ParcelItems.icon_of(id), "×%d" % int(farm.bag[id]), _names.get(id, ParcelItems.name_of(id))))
+
+func _chip(id: String, texture: Texture2D, text: String, tip: String) -> HBoxContainer:
+	var chip := HBoxContainer.new()
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.tooltip_text = tip
+	var icon := TextureRect.new()
+	icon.texture = texture
+	icon.custom_minimum_size = Vector2(22, 22)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	chip.add_child(icon)
+	var count := Label.new()
+	count.text = text
+	count.add_theme_font_size_override("font_size", 13)
+	count.add_theme_color_override("font_color", Color("314637"))
+	chip.add_child(count)
+	chip.name = id
+	return chip
 
 func _item_names() -> Dictionary:
 	var content := P0Logic.content()
