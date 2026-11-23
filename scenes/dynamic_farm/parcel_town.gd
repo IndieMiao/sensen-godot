@@ -82,8 +82,8 @@ func _ready() -> void:
 	add_child(stack)
 	toast = ToastLayer.new()
 	add_child(toast)
-	_greet()
 	busy = true
+	_greet()
 	var result: Dictionary = await store.read()
 	busy = false
 	if not is_inside_tree(): return
