@@ -29,6 +29,8 @@ func _run() -> void:
 	_commands()
 	await _market()
 	await _carpenter()
+	await _failures()
+	await _entries()
 	_portraits()
 	_clean()
 	print("PARCEL_TOWN checks=%d failures=%d" % [checks, failures])
@@ -140,6 +142,51 @@ func _carpenter() -> void:
 	_check(town.card.line == Town.LINES.scott_done and store.read().farm.bag.blueprint_coop == 1, "kept after reopening")
 	town.close()
 	await process_frame
+
+## A read that fails offers Retry; Scott without a coop rule does not wait on "…" (V-122, C-59#29).
+class FlakyStore extends RefCounted:
+	var inner: RefCounted
+	var fail := true
+	func _init(p_inner: RefCounted) -> void: inner = p_inner
+	func read() -> Dictionary:
+		if fail: return {"ok": false, "code": "NETWORK", "index": 0}
+		return inner.read()
+	func send(base_version: int, commands: Array) -> Dictionary: return inner.send(base_version, commands)
+
+func _failures() -> void:
+	_clean()
+	var flaky := FlakyStore.new(_store_with({"crop_carrot": 1}))
+	var town := await _open(Town.MARKET, flaky)
+	_check(town.card.line == Town.LINES.unreachable and town.keys.has("retry") and not town.keys.has("sell"), "a failed read says so and offers Retry")
+	flaky.fail = false
+	town.keys.retry.activated.emit()
+	for i in 3: await process_frame
+	_check(town.keys.has("sell") and not town.keys.has("retry") and town.farm.bag.crop_carrot == 1, "Retry reads the farm")
+	town.close()
+	await process_frame
+	var blueprints: Dictionary = ParcelFarm.rules().economy.blueprints
+	var coop = blueprints.coop
+	blueprints.erase("coop")
+	town = await _open(Town.CARPENTER, _store_with({}))
+	_check(town.card.line == Town.LINES.scott_none and not town.keys.has("take"), "no coop rule: Scott says a line, no key")
+	blueprints.coop = coop
+	town.close()
+	await process_frame
+
+## The map's Market / Carpenter entries are only in internal packages (own_farm), like "Enter my farm" (C-59#29).
+func _entries() -> void:
+	for own in [false, true]:
+		ProjectSettings.set_setting("sensen/dynamic_farm/own_farm", own)
+		var map: Control = (load("res://scenes/dynamic_farm/dynamic_farm_map.tscn") as PackedScene).instantiate()
+		root.add_child(map)
+		await process_frame
+		_check(map._market.is_visible_in_tree() == own and map._carpenter.is_visible_in_tree() == own,
+			"map entries %s with own_farm=%s" % ["shown" if own else "hidden", own])
+		map._open_town("market")
+		_check(map._town == null, "no town without a home")
+		map.queue_free()
+		await process_frame
+	ProjectSettings.set_setting("sensen/dynamic_farm/own_farm", null)
 
 func _portraits() -> void:
 	Town.npc(Town.MARKET)

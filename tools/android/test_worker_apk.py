@@ -137,8 +137,12 @@ class WorkerAPK(unittest.TestCase):
             self.assertNotIn(key, isolated)
             self.assertNotIn(key, release)
         self.assertNotIn('sensen/dynamic_farm/fake_claims', internal)
+        # The device stand-in save (C-34; the market and carpenter use it too, C-59) never ships in any package.
+        for settings in (internal, isolated, release):
+            self.assertNotIn('sensen/dynamic_farm/local_farm_save', settings)
         self.assertEqual(internal['application/config/custom_user_dir_name'], 'DynamicFarmInternal')
-        for setting in ('dynamic_farm/reselect=false', 'dynamic_farm/fake_claims=true', 'dynamic_farm/reselect.mobile=true',
+        for setting in ('dynamic_farm/reselect=false', 'dynamic_farm/fake_claims=true', 'dynamic_farm/local_farm_save=true',
+                        'dynamic_farm/reselect.mobile=true',
                         'network/base_url.android="https://farm.sensenjoy.cn/v1"', 'network/online_qa.mobile=false'):
             source = PROJECT.replace('[sensen]', '[sensen]\n' + setting)
             for target in (None, TARGET):
@@ -182,6 +186,9 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/dynamic_farm/own_farm': True})),
                ('android', dict(exported_settings('android'), **{'sensen/dynamic_farm/own_farm': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/fake_claims': True})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/local_farm_save': True})),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/dynamic_farm/local_farm_save': True})),
+               ('android', dict(exported_settings('android'), **{'sensen/dynamic_farm/local_farm_save': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/reselect.mobile': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa.mobile': False})),
                ('dynamic-farm', dict(exported_settings('dynamic-farm'),

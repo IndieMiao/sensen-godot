@@ -4,7 +4,8 @@ extends Control
 ## player's own parcel for farming from "Enter my farm" (`sensen/dynamic_farm/own_farm`, C-34 Q-72);
 ## everywhere else that button opens the same read-only 3D preview.
 ## Two fixed entries, Market (Jasmine) and Carpenter (Scott), open over the map for a player with a home
-## (C-59, C-30#29 question 1); they trade through that home's parcel save (parcel_town.gd).
+## (C-59, C-30#29 question 1); they trade through that home's parcel save (parcel_town.gd). Like "Enter my farm"
+## they are only in internal test packages (`own_farm`, C-59#29) until the release flow opens them (C-35 / C-61).
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -113,7 +114,7 @@ func _build_ui() -> void:
 	_retry = _button("Retry", _retry_map); _retry.disabled = true; row.add_child(_retry)
 	row.add_child(_button("San Francisco", _reset_area))
 	row.add_child(_button("Back", _leave))
-	var places := HBoxContainer.new(); top.add_child(places)
+	var places := HBoxContainer.new(); places.visible = _own_farm_entry(); top.add_child(places)
 	_market = _button("Market", _open_town.bind("market")); _market.disabled = true; places.add_child(_market)
 	_carpenter = _button("Carpenter", _open_town.bind("carpenter")); _carpenter.disabled = true; places.add_child(_carpenter)
 	var bottom := _panel(true)
@@ -237,7 +238,7 @@ func _open_sign_in() -> void:
 
 ## The market or the carpenter over the map, trading through the player's own parcel save.
 func _open_town(who: String) -> void:
-	if _claims == null or not _claims.has_home() or _town != null or _opening: return
+	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _town != null or _opening: return
 	var home: Dictionary = _claims.mine
 	_town = load(TOWN).open(self, who, _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))), str(home.parcel_id))
 	_town.closed.connect(_town_closed)

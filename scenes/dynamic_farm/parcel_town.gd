@@ -34,6 +34,8 @@ const LINES := {
 	"scott_wait": "Sell something to Jasmine first, then come see me.",
 	"scott_give": "You've made your first sale. Here's a coop blueprint for you.",
 	"scott_done": "Hope the coop plans come in handy.",
+	"scott_none": "Come back later.",
+	"unreachable": "Could not reach your farm.",
 }
 const MET_PATH := "user://dynamic_farm_local/town.json"
 
@@ -82,13 +84,22 @@ func _ready() -> void:
 	add_child(stack)
 	toast = ToastLayer.new()
 	add_child(toast)
+	await reload()
+
+## Reads the parcel save and greets again; a failed read says so and offers Retry.
+func reload() -> void:
 	busy = true
 	_greet()
 	var result: Dictionary = await store.read()
 	busy = false
 	if not is_inside_tree(): return
-	if not _adopt(result):
-		card.line = "Could not reach your farm. Try again."
+	if not _adopt(result) and farm.is_empty():
+		card.line = LINES.unreachable
+		var retry := UiCommandButton.new("Retry", UiCommandButton.Kind.SECONDARY)
+		retry.name = "Retry"
+		retry.activated.connect(reload)
+		card.content.add_child(retry)
+		keys.retry = retry
 		return
 	_greet()
 
@@ -137,8 +148,8 @@ func _greet_market() -> void:
 
 func _greet_carpenter() -> void:
 	var rule: Dictionary = ParcelFarm.rules().get("economy", {}).get("blueprints", {}).get(BLUEPRINT, {})
-	if rule.is_empty(): return
-	if farm.blueprints_claimed.has(BLUEPRINT):
+	if rule.is_empty(): card.line = LINES.scott_none
+	elif farm.blueprints_claimed.has(BLUEPRINT):
 		card.line = LINES.scott_done
 	elif int(farm.sales) < int(rule.min_sales):
 		card.line = LINES.scott_wait
