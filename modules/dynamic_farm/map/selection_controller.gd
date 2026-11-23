@@ -8,6 +8,7 @@ const Contract := preload("res://modules/dynamic_farm/map/geo_contract.gd")
 const MapConfig := preload("res://modules/dynamic_farm/map/geo_map_config.gd")
 const Metadata := preload("res://modules/dynamic_farm/map/parcel_metadata.gd")
 const FarmData := preload("res://modules/dynamic_farm/farm_data.gd")
+const PROMPT := "Tap a building to preview a farm."
 var api: Node
 var bridge: MapBridge
 var config: Dictionary = {}
@@ -23,14 +24,12 @@ var _epoch := 0
 var _request := 0
 var _pending := -1
 var _query_left := 0.0
-var _kind := "parcel"
+var _kind := ""
 var _key := ""
-var _highlighted_parcel := ""
 var _options: Array = []
 var _connected := false
 
 func activate() -> void:
-	_clear_parcel_selection()
 	suspended = false
 	_epoch += 1
 	var epoch := _epoch
@@ -68,7 +67,6 @@ func activate() -> void:
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; map_ready = false; busy = false
 	selection = {}; _options = []; _key = ""
-	_highlighted_parcel = ""
 	if api != null: api.cancel_all()
 	if bridge != null:
 		if generation > 0: bridge.clear_parcel_layers(generation)
@@ -78,11 +76,10 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 	if suspended or gen != generation or style < style_generation: return
 	var data := _parse(payload)
 	if style != style_generation:
-		_clear_parcel_selection()
 		_pending = -1; selection = {}; _options = []; _key = ""
 	style_generation = style
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
-	message = "Tap a building or open ground to preview a farm." if map_ready else "Loading map details…"
+	message = PROMPT if map_ready else "Loading map details…"
 	changed.emit()
 
 func _native_error(gen: int, style: int, _code: String) -> void:
@@ -93,14 +90,13 @@ func _native_error(gen: int, style: int, _code: String) -> void:
 func camera_changed() -> void:
 	_pending = -1; _options = []
 	if map_ready and not busy:
-		message = "Tap a building or open ground to preview a farm."; changed.emit()
+		message = PROMPT; changed.emit()
 
 func tap(point: Vector2, zoom: float) -> void:
 	if suspended or not map_ready or busy: return
 	if zoom < float(manifest.native_map.get("minzoom", 16)):
 		message = "Zoom in to choose a farm."; changed.emit(); return
 	_request += 1; _pending = _request; _query_left = 8.0
-	_clear_parcel_selection()
 	selection = {}; _options = []; _key = ""
 	bridge.set_parcel_building_highlight(generation, "")
 	message = "Finding parcel…"; changed.emit()
@@ -118,6 +114,9 @@ func _query_result(request: int, gen: int, style: int, payload: String) -> void:
 	var provider := str(config.get("building_source", "mapbox"))
 	if _kind not in ["building", "parcel"] or (_kind == "building" and (_key.is_empty() or _key.length() > 512 or data.get("building_source") != provider)) or (_kind == "parcel" and not _key.is_empty()):
 		_fail("Could not check that location. Tap again."); return
+	# q(336): only a building's filled footprint selects. Open ground (the bare parcel outline) selects nothing.
+	if _kind == "parcel":
+		message = PROMPT; changed.emit(); return
 	_options = []
 	var seen := {}
 	for raw in data.properties:
@@ -134,18 +133,9 @@ func choose(id: String) -> void:
 	if suspended or not map_ready or busy: return
 	for row in _options:
 		if row.block_id != id: continue
-		_clear_parcel_selection()
 		selection = row.duplicate(true)
-		if _kind == "parcel":
-			_highlighted_parcel = id
-			bridge.set_parcel_states(generation, JSON.stringify([{"block_id": id, "selected": true, "claimed": false, "own": false}]))
-		bridge.set_parcel_building_highlight(generation, _key if _kind == "building" else "")
+		bridge.set_parcel_building_highlight(generation, _key)
 		message = "Ready to preview this farm."; changed.emit(); return
-
-func _clear_parcel_selection() -> void:
-	if not _highlighted_parcel.is_empty() and bridge != null and generation > 0:
-		bridge.set_parcel_states(generation, JSON.stringify([{"block_id": _highlighted_parcel, "selected": false, "claimed": false, "own": false}]))
-	_highlighted_parcel = ""
 
 func open_farm() -> void:
 	if suspended or not map_ready or busy or selection.is_empty(): return

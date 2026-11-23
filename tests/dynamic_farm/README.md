@@ -9,12 +9,12 @@ installation credential.
 
 The map reads only a pinned client-manifest and the selected schema4 farm. It
 uses the shared MapBridge JSON-string API and global generation allocator.
-A building hit selects the parcel returned from the same native query; open
-ground falls back to parcel. Metadata is whitelisted, counts are separate, and
+A building hit selects the parcel returned from the same native query and shows
+the filled building highlight. Metadata is whitelisted, counts are separate, and
 opaque building keys never enter the farm payload. Multi-hit selection is explicit.
-Decision 1C hides standing parcel frames but shows a yellow outline for the
-selected open-ground parcel. Building selection keeps only its building highlight.
-The controller clears an old parcel selection before another tap or style reload.
+Decision 1C hides standing parcel frames. q(336) (C-28, the owner 11-23) removes
+the open-ground fallback: a hit on a parcel without a building selects nothing,
+draws no rectangular parcel outline and keeps the "Tap a building" prompt.
 
 Pause/Back retires HTTP and query epochs, clears this generation's native layers
 and hides the map. Return gets a new global generation and restores the camera.
@@ -57,6 +57,8 @@ deadline cleanup. The tests use a fake scene or fake native/transport API:
   pause/resume and rejecting gameplay/wrong-parcel inputs (12 checks passed Q44).
 - test_selection_controller.gd: same-point IDs, count-preserving farm decode,
   callback invalidation, style changes, cancellation, timeout and read-only paths.
+  C-28: open-ground hits select nothing and never set a parcel frame; building
+  hits keep their filled highlight (28/28).
   21/21 passed Q47; fake callbacks do not prove SDK hit testing.
 
 Real r4 HTTPS, transparent Mapbox picking, UI/3D screenshot review, navigation,
