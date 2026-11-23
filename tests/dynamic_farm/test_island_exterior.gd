@@ -6,12 +6,14 @@ const Ground = preload("res://modules/dynamic_farm/farm_mesh.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const Cliff = preload("res://modules/dynamic_farm/island_cliff.gd")
+var checks := 0
 var failures := 0
 
 func _initialize() -> void:
 	_run.call_deferred()
 
 func _check(ok: bool, reason: String) -> void:
+	checks += 1
 	if not ok:
 		failures += 1
 		push_error(reason)
@@ -52,5 +54,5 @@ func _run() -> void:
 		_check(not before.is_empty() and _approach_edges(walk, data) == before, "boundary stops changed")
 		print("ISLAND_EDGE ", data.block_id, " cells=", data.counts, " edge_stops=", before.size(), " stops_sha256=", before.to_byte_array().hex_encode().sha256_text())
 		ground.free()
-	print("ISLAND_EXTERIOR failures=", failures)
+	print("ISLAND_EXTERIOR checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
