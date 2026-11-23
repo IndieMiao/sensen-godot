@@ -22,9 +22,9 @@ const BLUEPRINT := "coop"
 ## Looks from catalogue parts (no NPC-only part of another keeper, no hairHat + cloth pair another NPC wears).
 const NPCS := {
 	MARKET: {"name": "Jasmine", "role": "Market", "title": "Jasmine's Market", "look": "parcel:jasmine",
-		"slots": {"hairHat": "hairhat70", "cloth": "cloth11", "shoes": "shoes2"}},
+		"slots": {"hairHat": "hairhat41", "cloth": "cloth11", "shoes": "shoes2"}},
 	CARPENTER: {"name": "Scott", "role": "Carpenter", "title": "Scott's Workshop", "look": "parcel:scott",
-		"slots": {"hairHat": "hairhat41", "cloth": "cloth1_1", "shoes": "shoes4", "messengerBag": "messengerbag1"}},
+		"slots": {"hairHat": "hairhat51", "cloth": "cloth42", "shoes": "shoes3"}},
 }
 ## Player-visible lines (C-45 / Q-61: final wording is PM's).
 const LINES := {
@@ -114,6 +114,7 @@ func _greet() -> void:
 		card.grow_vertical = Control.GROW_DIRECTION_BEGIN
 		stack.open_card(card)
 		_close_above(card)
+		toast.anchor_above(card)
 	for c in card.content.get_children():
 		c.hide()
 		c.queue_free()
@@ -160,6 +161,7 @@ func open_counter() -> void:
 	_switching = true
 	stack.open_drawer(counter, {"scrim": UiTokens.OPACITY_SCRIM_COUNTER})
 	_switching = false
+	toast.anchor_above(counter)
 
 func sell(item: String, count: int) -> Dictionary:
 	if busy or count <= 0: return {}
