@@ -145,7 +145,8 @@ func _ready() -> void:
 			var net := get_tree().root.get_node_or_null("Net")
 			if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): store = LocalFarmStore.new(_data.block_id)
 			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
-		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas)
+		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas,
+			{"layout": _plan.layout, "root": _props, "recipe": _plan.recipe})
 		_hint.hide()
 		_farming.enter()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
@@ -249,7 +250,8 @@ func _process(delta: float) -> void:
 	else:
 		_play("idle")
 	if _farming != null:
-		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), moving or not input.is_zero_approx())
+		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), moving or not input.is_zero_approx(),
+			_actor.position, _facing)
 	if not _overview:
 		var size := get_viewport().get_visible_rect().size
 		var safe := Rect2(size*Vector2(0.23,0.26),size*Vector2(0.54,0.48))
@@ -338,11 +340,13 @@ func _build_ui() -> void:
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_hint)
 
-## A tap on the ground picks that cell for the main key.
+## A tap picks an outer object under it (C-60), else the ground cell, for the main key.
 func _on_tapped(at: Vector2) -> void:
 	if _farming == null or not _ready_sent or _camera == null: return
-	var hit = Plane(Vector3.UP, 0.0).intersects_ray(_camera.project_ray_origin(at), _camera.project_ray_normal(at))
-	if hit is Vector3: _farming.pick(_walk.cell_at(hit))
+	var from := _camera.project_ray_origin(at)
+	var dir := _camera.project_ray_normal(at)
+	var hit = Plane(Vector3.UP, 0.0).intersects_ray(from, dir)
+	_farming.pick(_walk.cell_at(hit) if hit is Vector3 else Vector2i(-1, -1), from, dir)
 
 func _label(text: String, size: int) -> Label:
 	var label := Label.new()

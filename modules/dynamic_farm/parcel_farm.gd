@@ -2,13 +2,17 @@ extends RefCounted
 ## Client copy of the parcel farm state (v1, C-31 server/src/parcels/farm.ts) and its
 ## commands. The server is authoritative; the local fake store replays the same rules.
 ## Numbers come from assets/farm/data/dynamic_farm.json (owner decision Q-39, C-34#14),
-## shared with the server and separate from the main farm.
+## shared with the server and separate from the main farm. C-58 added the parcel's own
+## coins and economy fields; the `gather` command (outer gathering, C-60) is ParcelGather's.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
-const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest"]
+const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest", "gather"]
+## Server limit (C-58 farm.ts): the coin cap.
+const MAX_COINS := 1000000000
+const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 
 static var _rules := {}
 
@@ -43,7 +47,8 @@ static func parse_rules(raw: Variant) -> Dictionary:
 	return parsed
 
 static func empty_state() -> Dictionary:
-	return {"v": STATE_VERSION, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null}
+	return {"v": STATE_VERSION, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
+		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}}
 
 ## A state as returned by the server, with JSON floats turned back into integers.
 ## Returns {} for anything that is not a v1 farm.
@@ -77,6 +82,17 @@ static func normalize(raw: Variant) -> Dictionary:
 	var welcomed = raw.get("welcomed_at")
 	if welcomed != null and not _number(welcomed): return {}
 	state.welcomed_at = int(welcomed) if welcomed != null else null
+	# C-58 economy: a save from before it has none and reads as 0 coins, nothing sold, gathered or claimed.
+	for field in ["coins", "sales"]:
+		if raw.has(field):
+			if not whole_in(raw[field], 0, MAX_COINS): return {}
+			state[field] = int(raw[field])
+	for field in ["gathered", "blueprints_claimed"]:
+		if raw.get(field) == null: continue
+		if not raw[field] is Dictionary: return {}
+		for id in raw[field]:
+			if not id is String or not _number(raw[field][id]): return {}
+			state[field][id] = int(raw[field][id])
 	return state
 
 static func key(cell: Vector2i) -> String:
@@ -111,15 +127,22 @@ static func house_cells(state: Dictionary) -> Dictionary:
 	return cells
 
 ## All commands succeed or none do, like the server: {ok, state} or {ok:false, index, code, detail}.
-static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now: int) -> Dictionary:
+## `parcel_id` is the owner's parcel (block id), which `gather` ids must name.
+static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now: int, parcel_id := "") -> Dictionary:
 	if commands.is_empty() or commands.size() > MAX_BATCH:
 		return {"ok": false, "index": 0, "code": "SCHEMA"}
 	var next := state.duplicate(true)
+	var blank := empty_state()
+	for field in ["coins", "sales", "gathered", "blueprints_claimed"]:
+		if not next.has(field): next[field] = blank[field]
 	for index in commands.size():
 		var command = commands[index]
 		if not command is Dictionary or command.get("type") not in COMMANDS:
 			return {"ok": false, "index": index, "code": "SCHEMA"}
-		if command.type == "place_house":
+		if command.type == "gather":
+			if not command.get("object") is String or str(command.object).length() > Gather.MAX_OBJECT_LENGTH:
+				return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif command.type == "place_house":
 			if not whole_in(command.get("x"), 0, MAX_COORD - 1) or not whole_in(command.get("y"), 0, MAX_COORD - 1) \
 					or (command.has("rotation") and not whole_in(command.rotation, 0, 3)):
 				return {"ok": false, "index": index, "code": "SCHEMA"}
@@ -189,6 +212,15 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 					next.crops.erase(cell)
 					var amount := int(rule_set.crops[planted.crop]["yield"]) if rule_set.crops.has(planted.crop) else 1
 					next.bag[planted.crop] = int(next.bag.get(planted.crop, 0)) + amount
+			"gather":
+				# The server knows the core cells under the house, tilled, sown or cleared: not outer.
+				var o = Gather.parse_id(command.object)
+				var at = parse_key(o.cell) if o != null else null
+				var in_core: bool = o != null and (house_cells(next).has(at) or o.cell in next.tilled \
+					or next.crops.has(o.cell) or o.cell in next.cleared)
+				var outcome := Gather.take(Gather.rules(), next, command.object, parcel_id, in_core, now)
+				failure = outcome.code
+				detail = outcome.detail
 		if not failure.is_empty():
 			var result := {"ok": false, "index": index, "code": failure}
 			if not detail.is_empty(): result.detail = detail

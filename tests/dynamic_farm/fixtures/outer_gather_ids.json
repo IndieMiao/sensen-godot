@@ -1,0 +1,58 @@
+{
+  "p-3139010": {
+    "count": 130,
+    "first": {
+      "flower": "p-3139010:outer-groves-v2:wild_pz_flower_23:31,19:0",
+      "rock": "p-3139010:outer-groves-v2:wild_pz_rock_08:31,20:0",
+      "tree": "p-3139010:outer-groves-v2:wild_pz_tree_20:27,47:0"
+    },
+    "kinds": {
+      "flower": 80,
+      "rock": 29,
+      "tree": 21
+    },
+    "sha256": "5d793054b06e8884c40b7721cb1cea111dcc7ab90990fa79a17176e4218bd174"
+  },
+  "p-3139019": {
+    "count": 109,
+    "first": {
+      "flower": "p-3139019:outer-groves-v2:wild_pz_flower_20:52,6:0",
+      "rock": "p-3139019:outer-groves-v2:wild_pz_rock_08:51,6:0",
+      "tree": "p-3139019:outer-groves-v2:wild_pz_tree_20:18,30:0"
+    },
+    "kinds": {
+      "flower": 80,
+      "rock": 12,
+      "tree": 17
+    },
+    "sha256": "4b6f331d2a9849a5ecc66d3635009a09920fdb3a77ca33d81a3f4b08c15024b9"
+  },
+  "p-4591A011*": {
+    "count": 110,
+    "first": {
+      "flower": "p-4591A011*:outer-groves-v2:wild_pz_flower_20:63,31:0",
+      "rock": "p-4591A011*:outer-groves-v2:wild_pz_rock_13:63,32:0",
+      "tree": "p-4591A011*:outer-groves-v2:wild_pz_pine_01:11,33:0"
+    },
+    "kinds": {
+      "flower": 79,
+      "rock": 17,
+      "tree": 14
+    },
+    "sha256": "173bbadcb31eec8a22ad2b49aea53a3ea303c87c2be0b4753b4f8d6e582334a3"
+  },
+  "p-5402049": {
+    "count": 147,
+    "first": {
+      "flower": "p-5402049:outer-groves-v2:wild_pz_flower_23:228,17:0",
+      "rock": "p-5402049:outer-groves-v2:wild_pz_rock_13:228,16:0",
+      "tree": "p-5402049:outer-groves-v2:wild_pz_pine_03:157,17:0"
+    },
+    "kinds": {
+      "flower": 80,
+      "rock": 27,
+      "tree": 40
+    },
+    "sha256": "5c44fbfb446e0a7d6ce0f26f17fd37d241078049276f6e95e0368d5f5d4a1c50"
+  }
+}
