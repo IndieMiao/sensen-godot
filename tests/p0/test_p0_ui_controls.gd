@@ -30,6 +30,9 @@ func before_test() -> void:
 
 func after_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
+	# The home pick test leaves its cities read unanswered: P0HomePick would keep the flow's lambdas past p0_home_flow.gd
+	# itself, and the engine frees them after that script as it exits (exit 134 on Linux, C-41)
+	preload("res://modules/p0/p0_home_pick.gd").clear()
 
 ## Desktop test runs read the mouse (UiSceneAction reads touches only on touchscreens).
 func _touch(at: Vector2, down: bool) -> void:

@@ -5,9 +5,11 @@ const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
 const Edges = preload("res://modules/dynamic_farm/farm_edges.gd")
 const UNIT := [Vector3.ZERO, Vector3.RIGHT, Vector3.RIGHT + Vector3.FORWARD, Vector3.FORWARD]
+var checks := 0
 var failures := 0
 
 func check(ok: bool, label: String) -> void:
+	checks += 1
 	if not ok:
 		failures += 1
 		push_error(label)
@@ -141,5 +143,5 @@ func _run() -> void:
 		ground.free()
 		repeat.free()
 	if parcels == 0: print("CORE_SOIL_SPILL SKIP real parcels: none passed after --")
-	print("DYNAMIC_CORE_GRASS_EDGE parcels=%d failures=%d" % [parcels, failures])
+	print("DYNAMIC_CORE_GRASS_EDGE parcels=%d checks=%d failures=%d" % [parcels, checks, failures])
 	quit(1 if failures else 0)
