@@ -197,6 +197,18 @@ trees, that only solid footprints reserve cells, at least one grove/rock pile/fl
 clump, and an identical layout on reopening. Walker unit checks cover shared group
 cells, the new-cell limit, `release()` and shadow-budget pruning of a group member.
 
+### Outer gathering (C-60)
+
+`test_outer_gather.gd [-- <farm.json> ...]` checks the gather rules against the server's
+config and the art recipe, the C-58 object id shape, the local stand-in's `gather` command
+(refusals included) and, per parcel, that two openings give the same ids at the same places,
+all in the extension and within each kind's cap. Real parcels are compared with the pins in
+`fixtures/outer_gather_ids.json` (rewrite with `OUTER_GATHER_WRITE_PINS=1` only when the
+outer recipe version changes). `test_outer_gather_scene.gd [-- <farm.json>]` (default
+`p-3139010`) gathers a tree, a flower and a rock in the real scene on the local save and
+checks the key, the bag, the faded/hidden art, the refusal before 24 h, reopening, regrowth,
+and that the walk (reserved cells, bound profiles, walkable 0.2 m lattice) never changes.
+
 ## Model-fitted prop contacts
 
 `test_prop_proxies.gd` loads the actual 13 imported meshes (`prop_outline.gd`).

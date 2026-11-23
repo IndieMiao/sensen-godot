@@ -22,7 +22,7 @@ const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Spa
 ## Crop stages follow server time; redraw them this often.
 const REDRAW_S := 0.25
 ## How close (m, ground plane) the player must be to an outer object's bounds to gather it.
-const GATHER_REACH_M := 0.6
+const GATHER_REACH_M := 1.2
 ## Gather refusals: grows back later, or tapped from too far away.
 const REGROWING := "regrowing"
 const TOO_FAR := "too_far"
