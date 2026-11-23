@@ -18,7 +18,7 @@ import { loadParcelRules } from '../../src/parcels/rules.js';
 import { MemoryParcelStore, type ParcelStore } from '../../src/parcels/store.js';
 import { PgParcelStore } from '../../src/parcels/pg_store.js';
 import { parcelReselectFromEnv } from '../../src/parcels/routes.js';
-import { starterFarm } from '../../src/parcels/farm.js';
+import { emptyFarm } from '../../src/parcels/farm.js';
 
 const DSN = process.env.TEST_DATABASE_URL;
 if (process.env.CI === '1' && !DSN) throw new Error('CI 下必须设置 TEST_DATABASE_URL');
@@ -74,6 +74,9 @@ const claim = (app: FastifyInstance, token: string, parcel: { parcel_id: string;
   app.inject({ method: 'POST', url: '/v1/parcels/claim', headers: bearer(token), payload: { dataset_version: dataset, ...parcel } });
 const mine = async (app: FastifyInstance, token: string) =>
   (await app.inject({ method: 'GET', url: '/v1/parcels/mine', headers: bearer(token) })).json().parcel;
+const enter = (app: FastifyInstance, token: string) =>
+  app.inject({ method: 'POST', url: '/v1/parcels/mine/enter', headers: bearer(token) });
+const GIFT = { hoe_starter: 1, seed_carrot: 3, blueprint_cottage: 1 };
 const command = (app: FastifyInstance, token: string, base_version: number, commands: object[]) =>
   app.inject({ method: 'POST', url: '/v1/parcels/mine/commands', headers: bearer(token), payload: { base_version, commands } });
 const owners = (app: FastifyInstance, token: string, query: string) =>
@@ -91,13 +94,13 @@ for (const [name, enabled, makeStores] of makers) {
     });
     afterEach(async () => { await app.close(); });
 
-    it('claims one free parcel with the starter farm; a retry of the same claim answers the same parcel', async () => {
+    it('claims one free parcel with an empty farm; a retry of the same claim answers the same parcel', async () => {
       const ada = await account(app, 'Ada');
       expect(await mine(app, ada)).toBeNull();
       const res = await claim(app, ada, A);
       expect(res.statusCode).toBe(201);
       expect(res.json().parcel).toEqual({ community_id: 'sf', layer: 0, parcel_id: A.parcel_id, dataset_version: DATASET,
-        center: A.center, claimed_at: T0, farm_version: 0, farm: starterFarm(rules) });
+        center: A.center, claimed_at: T0, farm_version: 0, farm: emptyFarm() });
       const again = await claim(app, ada, A);
       expect(again.statusCode).toBe(200);
       expect(again.json().parcel).toEqual(res.json().parcel);
@@ -179,28 +182,83 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await app.inject({ method: 'GET', url: `/v1/parcels?dataset_version=${DATASET}&ids=${A.parcel_id}` })).statusCode).toBe(401);
     });
 
+    it('first entry gives 1 hoe, 3 carrot seeds and 1 house blueprint once; re-entry and retries give nothing', async () => {
+      const ada = await account(app, 'Ada');
+      expect((await enter(app, ada)).json().code).toBe('NO_PARCEL');
+      await claim(app, ada, A);
+      expect((await mine(app, ada)).farm.bag).toEqual({});
+      const first = await enter(app, ada);
+      expect(first.statusCode).toBe(200);
+      expect(first.json()).toMatchObject({ granted: true, parcel: { farm_version: 1, farm: { bag: GIFT, welcomed_at: T0 } } });
+      clock = T0 + 1000;
+      const again = await enter(app, ada);
+      expect(again.json()).toMatchObject({ granted: false, parcel: { farm_version: 1, farm: { bag: GIFT, welcomed_at: T0 } } });
+      // A lost response retried many times at once still grants nothing more.
+      const retries = await Promise.all(Array.from({ length: 5 }, () => enter(app, ada)));
+      expect(retries.map(r => r.json().granted)).toEqual(Array(5).fill(false));
+      // Spending the gift and entering again does not refill it.
+      await command(app, ada, 1, [{ type: 'place_house', x: 9, y: 9 }, { type: 'till', cell: '1,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }]);
+      expect((await enter(app, ada)).json()).toMatchObject({ granted: false, parcel: { farm_version: 2, farm: { bag: { hoe_starter: 1, seed_carrot: 2 } } } });
+      // Re-claiming the same parcel (a retry) does not reset the farm either.
+      expect((await claim(app, ada, A)).json().parcel.farm.bag).toEqual({ hoe_starter: 1, seed_carrot: 2 });
+    });
+
+    it('simultaneous first entries grant the gift exactly once', async () => {
+      const ada = await account(app, 'Ada');
+      await claim(app, ada, A);
+      const results = await Promise.all(Array.from({ length: 6 }, () => enter(app, ada)));
+      expect(results.filter(r => r.json().granted)).toHaveLength(1);
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 1, farm: { bag: GIFT } });
+    });
+
+    it('a player only reads and writes their own parcel farm', async () => {
+      const ada = await account(app, 'Ada'), bob = await account(app, 'Bob');
+      await claim(app, ada, A);
+      await enter(app, ada);
+      await command(app, ada, 1, [{ type: 'till', cell: '1,1' }]);
+      const before = await mine(app, ada);
+      // Bob has no parcel: his reads show nothing of Ada's farm, his writes reach nothing.
+      expect(await mine(app, bob)).toBeNull();
+      expect((await enter(app, bob)).json().code).toBe('NO_PARCEL');
+      expect((await command(app, bob, before.farm_version, [{ type: 'till', cell: '2,2' }])).json().code).toBe('NO_PARCEL');
+      const seen = (await owners(app, bob, `ids=${A.parcel_id}`)).json().parcels[0];
+      expect(Object.keys(seen).sort()).toEqual(['nickname', 'owner', 'parcel_id']);
+      // With his own parcel, Bob's commands change only his.
+      await claim(app, bob, B);
+      await enter(app, bob);
+      expect((await command(app, bob, 1, [{ type: 'till', cell: '2,2' }])).statusCode).toBe(200);
+      expect(await mine(app, ada)).toEqual(before);
+      expect((await mine(app, bob)).farm.tilled).toEqual(['2,2']);
+      expect((await command(app, 'not-a-token', 0, [{ type: 'till', cell: '3,3' }])).statusCode).toBe(401);
+      expect((await app.inject({ method: 'GET', url: '/v1/parcels/mine' })).statusCode).toBe(401);
+    });
+
     it('saves house, cleared obstacles, tilled cells, crops with server ripening and the bag', async () => {
       const ada = await account(app, 'Ada');
       await claim(app, ada, A);
-      expect((await command(app, ada, 0, [{ type: 'till', cell: '1,1' }])).statusCode).toBe(200);
-      const stale = await command(app, ada, 0, [{ type: 'till', cell: '2,1' }]);
+      expect((await command(app, ada, 0, [{ type: 'till', cell: '1,1' }])).json()).toMatchObject({ code: 'NO_TOOL' });
+      await enter(app, ada);
+      expect((await command(app, ada, 1, [{ type: 'till', cell: '1,1' }])).statusCode).toBe(200);
+      const stale = await command(app, ada, 1, [{ type: 'till', cell: '2,1' }]);
       expect(stale.statusCode).toBe(409);
-      expect(stale.json()).toMatchObject({ code: 'VERSION_CONFLICT', parcel: { farm_version: 1, farm: { tilled: ['1,1'] } } });
-      const res = await command(app, ada, 1, [{ type: 'place_house', x: 10, y: 4, rotation: 1 }, { type: 'clear_obstacle', cell: '2,2' },
+      expect(stale.json()).toMatchObject({ code: 'VERSION_CONFLICT', parcel: { farm_version: 2, farm: { tilled: ['1,1'] } } });
+      const res = await command(app, ada, 2, [{ type: 'place_house', x: 10, y: 4, rotation: 1 }, { type: 'clear_obstacle', cell: '2,2' },
         { type: 'till', cell: '2,2' }, { type: 'sow', cell: '2,2', crop: 'crop_carrot' }]);
       expect(res.statusCode).toBe(200);
-      expect(res.json().parcel.farm_version).toBe(2);
-      const refused = await command(app, ada, 2, [{ type: 'harvest', cell: '2,2' }]);
+      expect(res.json().parcel.farm_version).toBe(3);
+      const refused = await command(app, ada, 3, [{ type: 'harvest', cell: '2,2' }]);
       expect(refused.statusCode).toBe(422);
-      expect(refused.json()).toMatchObject({ code: 'NOT_RIPE', index: 0, detail: { ripe_at: T0 + 60_000 }, parcel: { farm_version: 2 } });
+      expect(refused.json()).toMatchObject({ code: 'NOT_RIPE', index: 0, detail: { ripe_at: T0 + 60_000 }, parcel: { farm_version: 3 } });
+      clock = T0 + 59_999;
+      expect((await command(app, ada, 3, [{ type: 'harvest', cell: '2,2' }])).json().code).toBe('NOT_RIPE');
       clock = T0 + 60_000;
-      const harvested = await command(app, ada, 2, [{ type: 'harvest', cell: '2,2' }]);
+      const harvested = await command(app, ada, 3, [{ type: 'harvest', cell: '2,2' }]);
       expect(harvested.statusCode).toBe(200);
-      expect(await mine(app, ada)).toMatchObject({ farm_version: 3, farm: {
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 4, farm: {
         house: { model: 'cottage', x: 10, y: 4, width: 3, depth: 3, rotation: 1, built_at: T0 },
-        cleared: ['2,2'], tilled: ['1,1', '2,2'], crops: {}, bag: { hoe_starter: 1, seed_carrot: 4, crop_carrot: 1 },
+        cleared: ['2,2'], tilled: ['1,1', '2,2'], crops: {}, bag: { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1 },
       } });
-      expect((await command(app, ada, 3, [{ type: 'teleport' }])).statusCode).toBe(400);
+      expect((await command(app, ada, 4, [{ type: 'teleport' }])).statusCode).toBe(400);
       expect((await command(app, await account(app, 'Bob'), 0, [{ type: 'till', cell: '1,1' }])).json().code).toBe('NO_PARCEL');
     });
 
@@ -223,7 +281,8 @@ for (const [name, enabled, makeStores] of makers) {
       try {
         const ada = await account(test, 'Ada');
         await claim(test, ada, A);
-        await command(test, ada, 0, [{ type: 'till', cell: '1,1' }]);
+        await enter(test, ada);
+        await command(test, ada, 1, [{ type: 'till', cell: '1,1' }]);
         const res = await test.inject({ method: 'POST', url: '/v1/parcels/mine/abandon', headers: bearer(ada) });
         expect(res.statusCode).toBe(200);
         expect(res.json().abandoned).toEqual({ community_id: 'sf', layer: 0, parcel_id: A.parcel_id });
@@ -232,7 +291,7 @@ for (const [name, enabled, makeStores] of makers) {
         expect((await claim(test, await account(test, 'Bob'), A)).statusCode).toBe(201);
         const again = await claim(test, ada, B);
         expect(again.statusCode).toBe(201);
-        expect(again.json().parcel.farm).toEqual(starterFarm(rules));
+        expect(again.json().parcel.farm).toEqual(emptyFarm());
       } finally { await test.close(); }
     });
   });
@@ -278,7 +337,8 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
     const app = await appFor(pgStores(before));
     const ada = await account(app, 'Ada');
     await claim(app, ada, A);
-    await command(app, ada, 0, [{ type: 'place_house', x: 6, y: 6 }, { type: 'clear_obstacle', cell: '1,2' }, { type: 'till', cell: '1,2' },
+    await enter(app, ada);
+    await command(app, ada, 1, [{ type: 'place_house', x: 6, y: 6 }, { type: 'clear_obstacle', cell: '1,2' }, { type: 'till', cell: '1,2' },
       { type: 'sow', cell: '1,2', crop: 'crop_carrot' }]);
     const saved = await mine(app, ada);
     await app.close();
@@ -293,7 +353,9 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       const read = await mine(restarted, ada);
       expect(read).toEqual(saved);
       expect(read.farm).toMatchObject({ house: { x: 6, y: 6 }, cleared: ['1,2'], tilled: ['1,2'],
-        crops: { '1,2': { crop: 'crop_carrot', planted_at: T0, ripe_at: T0 + 60_000 } }, bag: { hoe_starter: 1, seed_carrot: 4 } });
+        crops: { '1,2': { crop: 'crop_carrot', planted_at: T0, ripe_at: T0 + 60_000 } }, bag: { hoe_starter: 1, seed_carrot: 2 }, welcomed_at: T0 });
+      // Reopening after the restart does not give the first-entry gift again.
+      expect((await enter(restarted, ada)).json()).toMatchObject({ granted: false, parcel: { farm_version: read.farm_version, farm: { bag: { hoe_starter: 1, seed_carrot: 2 } } } });
       const harvested = await command(restarted, ada, read.farm_version, [{ type: 'harvest', cell: '1,2' }]);
       expect(harvested.json().parcel.farm.bag.crop_carrot).toBe(1);
     } finally { await restarted.close(); await after.end(); }

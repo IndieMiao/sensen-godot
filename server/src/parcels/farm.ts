@@ -1,7 +1,8 @@
 /**
- * 玩家地块内的农场状态（C-31）与它的命令。服务端不持有地块几何（障碍、保护通道、核心区来自
- * 地块数据集，由客户端判断），这里只管格子之间的一致性、背包与成熟时间：
- * 房子不压开垦格，只能在开垦格上播种，扣种子，按服务端时间判成熟，收获入包。
+ * 玩家地块内的农场状态（C-31）与它的命令。服务端不持有地块几何（障碍位置、保护通道、核心区与外围来自
+ * 地块数据集，由客户端 C-33/C-34 判断），这里只管服务端能核实的部分：首次进入发一次赠品（Q-39、Q-40），
+ * 放房子要扣蓝图且不压开垦格和作物，开垦要有锄头且不在房子占地内，只能在开垦格上播种并扣种子，
+ * 按服务端时间判成熟，收获入包。
  */
 import type { ParcelRules } from './rules.js';
 
@@ -22,6 +23,8 @@ export interface ParcelFarmState {
   tilled: string[];
   crops: Record<string, CropState>;
   bag: Record<string, number>;
+  /** 首次进入自家地块的赠品发放时间；null 表示还没进过。发过就不再发。 */
+  welcomed_at: number | null;
 }
 
 export type FarmCommand =
@@ -35,8 +38,18 @@ export type FarmOutcome =
   | { ok: true; state: ParcelFarmState }
   | { ok: false; index: number; code: string; detail?: Record<string, unknown> };
 
-export function starterFarm(rules: ParcelRules): ParcelFarmState {
-  return { v: FARM_STATE_VERSION, house: null, cleared: [], tilled: [], crops: {}, bag: { ...rules.starter_bag } };
+/** 认领时的空农场：背包为空，赠品等首次进入时再发（认领和进入不是同一个动作）。 */
+export function emptyFarm(): ParcelFarmState {
+  return { v: FARM_STATE_VERSION, house: null, cleared: [], tilled: [], crops: {}, bag: {}, welcomed_at: null };
+}
+
+/** 首次进入自家地块：发一次 welcome_gift。已经发过返回 null（重开、重试都不重发）。 */
+export function welcome(rules: ParcelRules, state: ParcelFarmState, now: number): ParcelFarmState | null {
+  if (state.welcomed_at !== null) return null;
+  const s = structuredClone(state);
+  for (const [id, n] of Object.entries(rules.welcome_gift)) s.bag[id] = (s.bag[id] ?? 0) + n;
+  s.welcomed_at = now;
+  return s;
 }
 
 const coord = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0 && (v as number) < MAX_COORD;
@@ -96,6 +109,7 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
     switch (c.type) {
       case 'place_house': {
         if (s.house) return fail('HOUSE_PLACED');
+        if (!(s.bag[rules.house.blueprint] > 0)) return fail('NO_BLUEPRINT', { item: rules.house.blueprint });
         const house = { model: rules.house.model, x: c.x, y: c.y, width: rules.house.width, depth: rules.house.depth, rotation: c.rotation ?? 0, built_at: now };
         const f = footprint(house);
         if (f.x1 >= MAX_COORD || f.y1 >= MAX_COORD) return fail('OUT_OF_BOUNDS');
@@ -104,6 +118,7 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
           return x >= f.x0 && x <= f.x1 && y >= f.y0 && y <= f.y1;
         });
         if (covered.length) return fail('CELL_OCCUPIED', { cells: [...new Set(covered)].sort() });
+        take(s.bag, rules.house.blueprint, 1);
         s.house = house;
         break;
       }

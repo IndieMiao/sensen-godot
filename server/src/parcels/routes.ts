@@ -5,7 +5,7 @@
  */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
-import { applyFarmCommands, parseFarmCommands, starterFarm } from './farm.js';
+import { applyFarmCommands, emptyFarm, parseFarmCommands, welcome } from './farm.js';
 import { communityOf, type ParcelRules } from './rules.js';
 import { DEFAULT_LAYER, type OwnedParcel, type ParcelStore } from './store.js';
 
@@ -62,7 +62,8 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     return reply.send({ parcel: mine ? parcelView(mine) : null, server_time: now() });
   });
 
-  /** 认领：每人一块免费地，只能认领无主地块，认领后永久归属。重复认领自己那块返回 200。 */
+  /** 认领：每人一块免费地，只能认领无主地块，认领后永久归属。重复认领自己那块返回 200。
+   * 认领只建空农场；赠品在首次进入（/mine/enter）时发。 */
   app.post('/v1/parcels/claim', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req, reply) => {
     const p = await writer(req, reply);
     if (!p) return;
@@ -75,7 +76,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     const at = now();
     const out = await deps.store.claim(p.id, {
       community_id: community, layer: DEFAULT_LAYER, parcel_id: b.parcel_id, dataset_version: b.dataset_version, center,
-    }, starterFarm(deps.rules), at);
+    }, emptyFarm(), at);
     switch (out.kind) {
       case 'claimed': return reply.code(201).send({ parcel: parcelView(out.parcel), server_time: at });
       case 'already_mine': return reply.send({ parcel: parcelView(out.parcel), server_time: at });
@@ -112,6 +113,19 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     const rows = await deps.store.owners(community, DEFAULT_LAYER, { bbox, limit: BBOX_LIMIT + 1 });
     return reply.send({ ...base, parcels: rows.slice(0, BBOX_LIMIT).map(o => ({ parcel_id: o.parcel_id, owner: ownerOf(o.player_id), nickname: o.nickname })),
       truncated: rows.length > BBOX_LIMIT, server_time: now() });
+  });
+
+  /**
+   * 进入自家地块（客户端每次打开自己的地块都调用）：第一次发 welcome_gift（Q-39 锄头与萝卜种子、Q-40 首栋住宅蓝图），
+   * granted=true；之后重开、重试都只返回当前状态，granted=false，不重发。
+   */
+  app.post('/v1/parcels/mine/enter', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req, reply) => {
+    const p = await writer(req, reply);
+    if (!p) return;
+    const at = now();
+    const out = await deps.store.enter(p.id, farm => welcome(deps.rules, farm, at), at);
+    if (out.kind === 'no_parcel') return reply.code(404).send({ code: 'NO_PARCEL', server_time: at });
+    return reply.send({ granted: out.granted, parcel: parcelView(out.parcel), server_time: at });
   });
 
   /** 地块内命令：{base_version, commands:[...]}，整批成功才写入，版本不符返回当前状态。 */

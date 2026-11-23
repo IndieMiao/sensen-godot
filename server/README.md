@@ -69,7 +69,8 @@ curl localhost:3000/v1/healthz
 
 `/v1/parcels` 提供动态农场的地块认领、区域归属查询和地块内农场存档，身份沿用 `/v1/auth`。
 启动迁移新增 `parcel_claims` 表（只新增，不改旧表）：主键保证一块地只有一个主人，
-部分唯一索引保证每人一块免费地。数值在 `assets/farm/data/dynamic_farm.json`。
+部分唯一索引保证每人一块免费地。首次进入自家地块（`/v1/parcels/mine/enter`）只发一次赠品；
+数值在 `assets/farm/data/dynamic_farm.json`（所有者拍板 Q-39、Q-40）。
 “放弃并重选”只在设置 `DYNAMIC_FARM_RESELECT=1` 的内部测试服可用，正式配置不设，调用返回 403。
 接口、表结构和选型理由见 [docs/plans/C-31.md](../docs/plans/C-31.md)。
 

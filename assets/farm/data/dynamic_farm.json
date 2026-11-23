@@ -6,13 +6,15 @@
       "datasets": ["sf-dynamic-farm-20261118-r4"]
     }
   ],
-  "starter_bag": {
+  "welcome_gift": {
     "hoe_starter": 1,
-    "seed_carrot": 5
+    "seed_carrot": 3,
+    "blueprint_cottage": 1
   },
   "till_tool": "hoe_starter",
   "house": {
     "model": "cottage",
+    "blueprint": "blueprint_cottage",
     "width": 3,
     "depth": 3
   },
