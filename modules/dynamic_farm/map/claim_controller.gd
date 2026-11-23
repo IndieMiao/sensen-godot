@@ -6,6 +6,8 @@ extends Node
 signal changed
 const NO_NAME := "Claimed"
 const SIGNED_OUT := ["LOGIN_REQUIRED", "UNAUTHENTICATED", "OFFLINE"]
+## Area reads only add rows. Keep the map well under the native 3000-row state/name limits.
+const MAX_OWNERS := 1000
 var api # claim_api.gd
 var bridge: MapBridge
 ## Internal test packages set `sensen/dynamic_farm/reselect`; release has no reselect entry (and the server refuses).
@@ -20,6 +22,7 @@ var _generation := -1
 var _selected := ""
 var _pushed := {} # parcel_id -> [selected, claimed, own] last sent for _generation
 var _epoch := 0
+var _reading_mine := false
 
 func status(id: String) -> String:
 	if id.is_empty() or not owners.has(id): return "unknown"
@@ -35,8 +38,10 @@ func has_home() -> bool:
 ## Reads the player's own parcel; call on map entry and again after returning from a preview.
 func start() -> void:
 	var epoch := _epoch
+	_reading_mine = true
 	var r: Dictionary = await api.mine()
 	if epoch != _epoch: return
+	_reading_mine = false
 	signed_out = r.code in SIGNED_OUT
 	if r.ok:
 		mine = r.parcel; mine_known = true
@@ -51,13 +56,18 @@ func attach(generation: int, selected_id: String) -> void:
 	if reselected and not busy: message = ""
 	_selected = selected_id
 	_sync()
-	if reselected and not selected_id.is_empty(): refresh([selected_id])
+	if not reselected or selected_id.is_empty(): return
+	# A failed first read (network/5xx) is retried when the player picks a parcel.
+	if not mine_known and not _reading_mine: start()
+	refresh([selected_id])
 
 func refresh(ids: Array) -> void:
 	var epoch := _epoch
 	var r: Dictionary = await api.owners(ids)
-	if epoch != _epoch or not r.ok: return
-	owners.merge(r.owners, true)
+	if epoch != _epoch: return
+	signed_out = signed_out or r.code in SIGNED_OUT
+	if not r.ok: changed.emit(); return
+	_merge(r.owners)
 	_sync(); changed.emit()
 
 func refresh_area(bbox: Array) -> void:
@@ -66,7 +76,7 @@ func refresh_area(bbox: Array) -> void:
 	if epoch != _epoch or not r.ok: return
 	# Area answers list claimed parcels only and carry no geometry, so absent rows are not cleared here;
 	# claims are permanent, and a selected parcel is always re-read by id.
-	owners.merge(r.owners, true)
+	_merge(r.owners)
 	_sync(); changed.emit()
 
 func claim(selection: Dictionary) -> void:
@@ -109,7 +119,16 @@ func abandon() -> void:
 
 ## Leaving the map retires in-flight answers; native layers are cleared with the selector's generation.
 func pause() -> void:
-	_epoch += 1; busy = false; _generation = -1; _pushed = {}; _selected = ""
+	_epoch += 1; busy = false; _reading_mine = false; _generation = -1; _pushed = {}; _selected = ""
+
+func _merge(rows: Dictionary) -> void:
+	for id in rows:
+		owners.erase(id) # Re-insert so the newest answers sit last.
+		owners[id] = rows[id]
+	var keep := [str(mine.get("parcel_id", "")), _selected]
+	for id in owners.keys():
+		if owners.size() <= MAX_OWNERS: break
+		if not id in keep: owners.erase(id)
 
 func _sync() -> void:
 	if bridge == null or _generation <= 0: return

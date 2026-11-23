@@ -134,7 +134,23 @@ func _first_home_flow() -> void:
 	var guest := controller(server, "nobody", Native.new())
 	await guest.start()
 	check(guest.signed_out and not guest.mine_known, "signed-out player is told to sign in, not offered a claim")
-	again.queue_free(); b.queue_free(); guest.queue_free()
+	# A failed first read is retried when the player picks a parcel.
+	var flaky := controller(server, "fake-b", Native.new())
+	flaky.api.client.token = "nobody"
+	await flaky.start()
+	check(not flaky.mine_known, "first read can fail")
+	flaky.api.client.token = "fake-b"
+	flaky.attach(4, ids[1])
+	await process_frame
+	check(flaky.mine_known and not flaky.signed_out and flaky.status(ids[1]) == "none", "selecting a parcel retries the player's own parcel")
+	# Area reads keep adding rows; the list stays bounded and keeps the home and the selection.
+	var many := {}
+	for i in Claims.MAX_OWNERS + 50: many["p-9%05d" % i] = {"owner": "other", "nickname": "N"}
+	again.mine = {"parcel_id": "p-home"}; again.owners["p-home"] = {"owner": "mine", "nickname": ""}
+	again.attach(9, "p-sel"); again.owners["p-sel"] = {"owner": "other", "nickname": "S"}
+	again._merge(many)
+	check(again.owners.size() == Claims.MAX_OWNERS and again.owners.has("p-home") and again.owners.has("p-sel") and again.owners.has("p-9%05d" % (Claims.MAX_OWNERS + 49)), "owner list is capped below the native limit, keeping home, selection and newest rows")
+	again.queue_free(); b.queue_free(); guest.queue_free(); flaky.queue_free()
 
 func _map_card() -> void:
 	var server := FakeServer.new()
@@ -173,7 +189,13 @@ func _map_card() -> void:
 	page._render(); await process_frame
 	page._reselect.pressed.emit(); await process_frame
 	check(not page._claims.has_home() and page._claim.visible, "giving up lets the player choose again")
-	page.queue_free(); selector.queue_free()
+	var guest := controller(server, "nobody", Native.new())
+	await guest.start()
+	page._claims = guest; guest.changed.connect(page._render)
+	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
+	page._render(); await process_frame
+	check(guest.status(ids[1]) == "unknown" and page._details.text.ends_with("Sign in to claim a home.") and not page._claim.visible, "signed-out player sees 'Sign in to claim a home.' even though ownership can't be read")
+	page.queue_free(); selector.queue_free(); guest.queue_free()
 	await process_frame
 
 ## Parcel ids the fake neighbour does not own.

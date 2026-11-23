@@ -152,7 +152,7 @@ func _render() -> void:
 		if state == "mine": _details.text += "\nYour home"
 		elif state == "other": _details.text += "\nClaimed by %s" % _claims.nickname(id)
 		elif state == "none" and _claims.has_home(): _details.text += "\nYou already have a home."
-		elif state == "none" and _claims.signed_out: _details.text += "\nSign in to claim a home."
+		elif state != "other" and _claims.signed_out: _details.text += "\nSign in to claim a home."
 	if not _claims.message.is_empty(): _details.text += "\n" + _claims.message
 	var claimable: bool = state == "none" and _claims.mine_known and not _claims.has_home()
 	if not claimable or not idle: _confirm.hide()
