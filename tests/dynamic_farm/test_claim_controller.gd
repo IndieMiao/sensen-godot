@@ -185,6 +185,10 @@ func _map_card() -> void:
 	selector.selection = Fixture.metadata(taken); selector.selection.block_id = taken
 	page._render(); await process_frame
 	check(not page._claim.visible and page._open.visible and page._details.text.ends_with("Claimed by " + FakeServer.NEIGHBOUR), "someone else's parcel is view-only with the claimer's name")
+	page._claims.owners[taken].nickname = "" # An owner without a display name, or a PARCEL_TAKEN race before the re-read.
+	page._render()
+	check(page._details.text.ends_with("\nClaimed") and native.names.any(func(row): return row.block_id == taken and row.nickname == "Claimed"), "an owner without a name reads 'Claimed' on the card and on the map")
+	page._claims.owners[taken].nickname = FakeServer.NEIGHBOUR
 	page._claims.reselect = true
 	selector.selection = Fixture.metadata(ids[0]); selector.selection.block_id = ids[0]
 	page._render(); await process_frame
