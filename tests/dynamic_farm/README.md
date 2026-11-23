@@ -236,3 +236,24 @@ prop, sends scripted movement input, checks contact or passage, saves the
 contact frame and walks past it. This is not a trip from spawn or device input.
 With `--headless` (omit `--write-movie`), it verifies movement only: no pixels
 or recording are generated. All placements keep their ordinary model and pose.
+
+## First-home claim (C-32)
+
+`test_claim_controller.gd` runs the claim flow against `fake_parcel_server.gd`, an
+in-memory stand-in with the C-31 status codes (201 / 200 retry / 409
+`ALREADY_CLAIMED` / 409 `PARCEL_TAKEN` / 403 `RESELECT_DISABLED` / 401), and a fake
+native bridge that keeps parcel states the way `ParcelLayerState` does. It checks the
+own (green) / claimed (red) / selected bits, the claimer-name rows, that a claimable
+selection keeps C-28's yellow building fill while an owned one drops it, reopening on
+a new generation, a second account, the one-home rule, give-up only with the internal
+setting, and the real map card's buttons. Fake data proves client logic only; it is
+not evidence of a real claim, a save or device rendering.
+
+Settings read by the map: `sensen/dynamic_farm/reselect` (internal test packages only;
+shows "Give up and choose again"), `sensen/dynamic_farm/account_restore` (internal test
+packages only; reloads the saved account token through `Net.restore_saved_account()`, which
+calls `/users/me` and nothing else) and `sensen/dynamic_farm/fake_claims` (+ optional
+`fake_player`, default `fake-a`) for development without the C-31 server. None is
+set in `project.godot`, so release builds show no give-up entry and keep the normal
+`Net` boot. A signed-out player gets a "Sign in" button that opens the existing
+`AccountPanel`; ownership is re-read for the new identity.
