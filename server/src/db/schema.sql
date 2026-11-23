@@ -173,3 +173,24 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date text;
 -- Sign in with Apple：换码得到的 refresh token 与其 client_id，删号时用来撤销授权。
 ALTER TABLE user_identities ADD COLUMN IF NOT EXISTS refresh_token text;
 ALTER TABLE user_identities ADD COLUMN IF NOT EXISTS client_id text;
+
+-- 动态农场地块认领与地块内农场状态（C-31）。主键保证同一社区同一层的一块地只有一个主人，
+-- 并发认领只有一条 INSERT 成功；部分唯一索引保证每个玩家只有一块免费地。layer 本版恒为 0，
+-- 分层时不改结构。kind 为以后购买、扩张预留（本版只有 'free'）。删号随 players 级联删除。
+CREATE TABLE IF NOT EXISTS parcel_claims (
+  community_id     text NOT NULL,
+  layer            int  NOT NULL DEFAULT 0,
+  parcel_id        text NOT NULL CHECK (parcel_id ~ '^p-[A-Za-z0-9_*-]{1,98}$'),
+  player_id        uuid NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  kind             text NOT NULL DEFAULT 'free',
+  dataset_version  text NOT NULL,
+  center_lat       double precision NOT NULL CHECK (center_lat BETWEEN -85 AND 85),
+  center_lng       double precision NOT NULL CHECK (center_lng BETWEEN -180 AND 180),
+  claimed_at       bigint NOT NULL,
+  farm_version     int  NOT NULL DEFAULT 0,
+  farm_state       jsonb NOT NULL CHECK (jsonb_typeof(farm_state) = 'object'),
+  updated_at       bigint NOT NULL,
+  PRIMARY KEY (community_id, layer, parcel_id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS parcel_claims_one_free ON parcel_claims(player_id) WHERE kind = 'free';
+CREATE INDEX IF NOT EXISTS parcel_claims_center ON parcel_claims(community_id, layer, center_lat, center_lng);

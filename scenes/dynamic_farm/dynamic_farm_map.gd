@@ -174,7 +174,7 @@ func _reset_area() -> void:
 	_camera.frame_center(float(native.center[0]), float(native.center[1]), clampf(float(native.get("initial_zoom", 17.5)), 13, 21))
 
 func _retry_map() -> void:
-	if _selector != null and not _selector.busy and not _opening: _selector.activate()
+	if _selector != null and not _selector.busy and not _opening: _selector.retry()
 
 func _preview() -> void:
 	if _selector != null and not _opening: _selector.open_farm()

@@ -35,6 +35,7 @@ import type { IpLocator } from '../geography/ip_locator.js';
 import { registerAccounts, type AccountRouteDeps } from '../accounts/routes.js';
 import { createLogMailer, type Mailer } from '../accounts/mailer.js';
 import type { PlayerRow } from './store.js';
+import { registerParcelRoutes, type ParcelRouteDeps } from '../parcels/routes.js';
 
 export interface AppDeps {
   store: Store;
@@ -76,6 +77,8 @@ export interface AppDeps {
   apple?: AccountRouteDeps['apple'];
   appleRevoker?: AccountRouteDeps['appleRevoker'];
   google?: AccountRouteDeps['google'];
+  /** Dynamic farm parcel claims and parcel farms (C-31); absent leaves the /v1/parcels routes out. */
+  parcels?: Omit<ParcelRouteDeps, 'now'>;
 }
 
 interface Regions {
@@ -365,6 +368,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       snapshot_revision: snap.revision, snapshot_taken_at: snap.taken_at, server_time: real,
     });
   });
+
+  if (deps.parcels) registerParcelRoutes(app, { ...deps.parcels, now: deps.now }, { auth, writer });
 
   registerAccounts(app, {
     store: deps.store, pepper: deps.pepper, now: deps.now, mailer: deps.mailer ?? createLogMailer(),

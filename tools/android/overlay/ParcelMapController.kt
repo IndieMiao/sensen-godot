@@ -31,6 +31,7 @@ internal class ParcelMapController(
     private val sources = linkedMapOf<String, String>()
     private val loaded = mutableSetOf<String>()
     private var query: Cancelable? = null
+    private val waiting = ParcelIdleWait<WaitingQuery>()
     private val buildingSelection = ParcelBuildingSelection()
     private var cameraRevision = 0L
     private var mapIdle = false
@@ -55,18 +56,21 @@ internal class ParcelMapController(
         private const val OWN = """["boolean",["feature-state","own"],false]"""
         private const val TAKEN = """["boolean",["feature-state","claimed"],false]"""
         private const val SELECTED = """["boolean",["feature-state","selected"],false]"""
+        /** A tap right after a pan waits this long for map idle before answering "loading". */
+        const val IDLE_WAIT_MS = 4000L
     }
+    private class WaitingQuery(val requestId: Long, val generation: Long, val x: Double, val y: Double, val ticket: ParcelTicket, val revision: Long)
     init {
         subscriptions += map.subscribeStyleLoaded {
             if (!closed && state.active) {
-                query?.cancel(); query = null
+                query?.cancel(); query = null; waiting.drop()
                 state.reloading(); mapIdle = false; mapboxLoadFailed = false; buildingSelection.clear(); sources.clear(); loaded.clear()
                 install()
             }
         }
         subscriptions += map.subscribeCameraChanged { cameraRevision++; mapIdle = false }
         subscriptions += map.subscribeMapIdle {
-            if (!closed) { mapIdle = true; if (state.active) emitReady() }
+            if (!closed) { mapIdle = true; if (state.active) emitReady(); resumeWaiting() }
         }
         subscriptions += map.subscribeSourceDataLoaded { event ->
             if (!closed && event.sourceId == "composite" && event.loaded == true) mapboxLoadFailed = false
@@ -75,6 +79,7 @@ internal class ParcelMapController(
                 val becameReady = !state.ready && sources["parcels"] in loaded && state.loaded(state.epoch)
                 if (becameReady) applyStates(state.replay())
                 if (changed || becameReady) emitReady()
+                resumeWaiting()
             }
         }
         subscriptions += map.subscribeMapLoadingError { event ->
@@ -99,7 +104,7 @@ internal class ParcelMapController(
         val oldGeneration = state.generation
         if (state.begin(generation) == null) return
         if (oldGeneration != generation) claims = emptyMap()
-        query?.cancel(); query = null
+        query?.cancel(); query = null; waiting.drop()
         removeLayers(); config = next; mapIdle = false; mapboxLoadFailed = false
         install()
     }
@@ -208,18 +213,39 @@ internal class ParcelMapController(
     fun queryAt(requestId: Long, generation: Long, x: Double, y: Double) {
         if (closed || !state.active || generation != state.generation) return
         val cfg = config ?: return
-        fun fail(code: String) = result(requestId, generation, state.epoch, "{\"parcel_ids\":[],\"properties\":[],\"kind\":\"none\",\"building_key\":\"\",\"building_source\":\"${cfg.buildingSource}\",\"error\":\"$code\"}")
-        query?.cancel(); query = null; state.invalidateQueries()
+        query?.cancel(); query = null; waiting.drop(); state.invalidateQueries()
         setBuildingHighlight(generation, "")
-        if (!x.isFinite() || !y.isFinite() || x !in 0.0..1.0 || y !in 0.0..1.0 || view.width <= 0 || view.height <= 0) { fail("invalid_point"); return }
-        val ticket = state.query(generation) ?: run { fail("loading"); return }
-        if (!mapIdle || (cfg.buildingSource == "datasf" && sources["buildings"] !in loaded)) { fail("loading"); return }
+        if (!x.isFinite() || !y.isFinite() || x !in 0.0..1.0 || y !in 0.0..1.0 || view.width <= 0 || view.height <= 0) { failQuery(requestId, generation, "invalid_point"); return }
+        val ticket = state.query(generation) ?: run { failQuery(requestId, generation, "loading"); return }
+        val tap = WaitingQuery(requestId, generation, x, y, ticket, cameraRevision)
+        if (queryReady(cfg)) { runQuery(tap); return }
+        // C-27: tiles of a just-panned view are still settling. Answer once the map is idle instead of failing the tap.
+        waiting.park(tap)
+        handler.postDelayed({
+            if (waiting.expire(tap) && !closed && state.current(ticket)) failQuery(requestId, generation, "loading")
+        }, IDLE_WAIT_MS)
+    }
+    private fun queryReady(cfg: ParcelSourceConfig): Boolean = mapIdle && (cfg.buildingSource != "datasf" || sources["buildings"] in loaded)
+    private fun resumeWaiting() {
+        val cfg = config ?: return
+        val tap = waiting.resume(queryReady(cfg)) ?: return
+        if (!closed && state.current(tap.ticket)) runQuery(tap)
+    }
+    private fun failQuery(requestId: Long, generation: Long, code: String) {
+        val source = config?.buildingSource.orEmpty()
+        result(requestId, generation, state.epoch, "{\"parcel_ids\":[],\"properties\":[],\"kind\":\"none\",\"building_key\":\"\",\"building_source\":\"$source\",\"error\":\"$code\"}")
+    }
+    private fun runQuery(tap: WaitingQuery) {
+        val cfg = config ?: return
+        val requestId = tap.requestId; val generation = tap.generation; val ticket = tap.ticket
+        fun fail(code: String) = failQuery(requestId, generation, code)
+        if (tap.revision != cameraRevision) { fail("camera_changed"); return }
         if (cfg.buildingSource == "mapbox" && mapboxLoadFailed) { fail("building_load_failed"); return }
         val buildingIds = buildingLayers() ?: run { fail("building_layer_unavailable"); return }
-        val revision = cameraRevision
+        val revision = tap.revision
         val source = sources["parcels"] ?: return
         // One rendered-query snapshot: same pixel/camera for building priority and its game parcel candidates.
-        query = map.queryRenderedFeatures(RenderedQueryGeometry(ScreenCoordinate(x * view.width, y * view.height)), RenderedQueryOptions(listOf(FILL) + buildingIds, null)) { response ->
+        query = map.queryRenderedFeatures(RenderedQueryGeometry(ScreenCoordinate(tap.x * view.width, tap.y * view.height)), RenderedQueryOptions(listOf(FILL) + buildingIds, null)) { response ->
             if (closed || !state.current(ticket) || sources["parcels"] != source) return@queryRenderedFeatures
             if (revision != cameraRevision) { fail("camera_changed"); return@queryRenderedFeatures }
             if (response.isError) { fail("query_failed"); return@queryRenderedFeatures }
@@ -251,13 +277,13 @@ internal class ParcelMapController(
     fun setInteractive(value: Boolean) {
         state.setInteractive(value)
         if (!value) {
-            query?.cancel(); query = null
+            query?.cancel(); query = null; waiting.drop()
             if (state.active) setBuildingHighlight(state.generation, "")
         }
     }
     fun clear(generation: Long) {
         if (closed || !state.clear(generation)) return
-        query?.cancel(); query = null; config = null; claims = emptyMap()
+        query?.cancel(); query = null; waiting.drop(); config = null; claims = emptyMap()
         removeLayers()
     }
     private fun removeLayers(style: Style? = if (map.isValid()) map.style else null) {
@@ -270,7 +296,7 @@ internal class ParcelMapController(
     fun close() {
         if (closed) return
         state.clear(state.generation)
-        closed = true; query?.cancel(); query = null
+        closed = true; query?.cancel(); query = null; waiting.drop()
         subscriptions.forEach { it.cancel() }; subscriptions.clear()
         handler.removeCallbacksAndMessages(null); config = null; claims = emptyMap()
         removeLayers()
