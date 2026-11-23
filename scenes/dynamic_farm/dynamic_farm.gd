@@ -140,6 +140,8 @@ func _ready() -> void:
 	_summary.core_obstacles = {"roles":_plan.core_obstacles.roles, "instances":core_art.instances,
 		"batches":core_art.batches, "placed_triangles":core_art.placed_triangles,
 		"layout_sha256":_plan.core_obstacles.layout_sha256}
+	_summary.outer = _plan.outer.duplicate()
+	_summary.outer.reserved_cells = _walk.reserved.size()
 	_summary.bank = _ground.get_meta("bank_metrics",{})
 	_summary.slope_material={"clearing_linear_gain":_ground.get_meta("slope_material_linear_gain"),
 		"batches":_ground.get_meta("slope_batches")}
