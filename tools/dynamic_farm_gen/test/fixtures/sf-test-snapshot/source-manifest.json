@@ -1,0 +1,124 @@
+{
+  "snapshot_schema": 1,
+  "fetched_at": "2026-11-23T12:05:54.569Z",
+  "bbox": [
+    -122.4718,
+    37.7316,
+    -122.4692,
+    37.735
+  ],
+  "sources": [
+    {
+      "label": "sfgis-parcels",
+      "role": "parcels",
+      "kind": "arcgis",
+      "title": "Active Parcels (from DataSF, pulled daily)",
+      "datasf_dataset": "acdm-wktn",
+      "license": "Open Data Commons Public Domain Dedication and License (PDDL) 1.0",
+      "url": "https://services.arcgis.com/Zs2aNLFN00jrS4gG/arcgis/rest/services/Active_Parcels_from_DataSF_pulled_daily_/FeatureServer/0",
+      "arcgis_item": "f81b5f0adb8c4d6a95282bec1ce10378",
+      "fields": [
+        "mapblklot",
+        "blklot",
+        "from_address_num",
+        "to_address_num",
+        "street_name",
+        "street_type",
+        "active",
+        "data_as_of"
+      ],
+      "note": "City and County of San Francisco ArcGIS Online copy of DataSF acdm-wktn, active parcels only.",
+      "metadata": {
+        "layer_name": "Active_Parcels_from_DataSF_pulled_daily__polygons",
+        "data_last_edit_ms": 1795353968399,
+        "item_owner": "vll_sfgis",
+        "item_modified_ms": 1795354003000,
+        "item_license": "Open Data Commons Public Domain Dedication and License: http://opendatacommons.org/licenses/pddl/1.0/"
+      },
+      "files": [
+        {
+          "file": "parcels/sfgis-parcels-0000.geojson",
+          "sha256": "0e0793e4774925ae72700dcaaa9faff60364f4d3d7882a7f612d7345fe5059be",
+          "count": 97
+        }
+      ],
+      "bbox": [
+        -122.4718,
+        37.7316,
+        -122.4692,
+        37.735
+      ]
+    },
+    {
+      "label": "sfgis-buildings",
+      "role": "buildings",
+      "kind": "arcgis",
+      "title": "Building Footprints (from DataSF, pulled weekly)",
+      "datasf_dataset": "ynuv-fyni",
+      "license": "Open Data Commons Public Domain Dedication and License (PDDL) 1.0",
+      "url": "https://services.arcgis.com/Zs2aNLFN00jrS4gG/arcgis/rest/services/Building_Footprints_from_DataSF_pulled_weekly_/FeatureServer/0",
+      "arcgis_item": "40f39da4e8be419284c3a82a62dbb4e1",
+      "fields": [
+        "area_id",
+        "mblr",
+        "data_as_of"
+      ],
+      "note": "City and County of San Francisco ArcGIS Online copy of DataSF ynuv-fyni. Incomplete as of 2026-11-22: 82,000 of 177,023 rows (area_id 21567–143982).",
+      "metadata": {
+        "layer_name": "Building_Footprints_from_DataSF_pulled_weekly__polygons",
+        "data_last_edit_ms": 1795351028255,
+        "item_owner": "vll_sfgis",
+        "item_modified_ms": 1795351112000,
+        "item_license": "Open Data Commons Public Domain Dedication and License: http://opendatacommons.org/licenses/pddl/1.0/"
+      },
+      "files": [
+        {
+          "file": "buildings/sfgis-buildings-0000.geojson",
+          "sha256": "2109e80fbb8c2e1cf30f8effc26e6b1185ff175b6adc429471d4124094da35b7",
+          "count": 52
+        }
+      ],
+      "bbox": [
+        -122.4718,
+        37.7316,
+        -122.4692,
+        37.735
+      ]
+    },
+    {
+      "label": "sfenv-buildings",
+      "role": "buildings",
+      "kind": "arcgis",
+      "title": "Buildings_filtered (SF Environment copy of DataSF building footprints)",
+      "datasf_dataset": "ynuv-fyni",
+      "license": "Open Data Commons Public Domain Dedication and License (PDDL) 1.0 (inherited from DataSF ynuv-fyni; the copy itself states none)",
+      "url": "https://services.arcgis.com/Zs2aNLFN00jrS4gG/arcgis/rest/services/Buildings_filtered/FeatureServer/0",
+      "arcgis_item": "12571fc538e5487598af2b76f2a1febe",
+      "fields": [
+        "area_id",
+        "mblr"
+      ],
+      "note": "City org copy (2025-02) of the same DataSF records, 127,010 rows; coordinates sit about 1.3 m west-northwest of the sfgis copy. Local fallback only.",
+      "metadata": {
+        "layer_name": "Buildings_filtered",
+        "data_last_edit_ms": 1740432035942,
+        "item_owner": "jesus.lozano_sfenv",
+        "item_modified_ms": 1740432117000,
+        "item_license": null
+      },
+      "files": [
+        {
+          "file": "buildings/sfenv-buildings-0000.geojson",
+          "sha256": "3efefe975bb5494dfdf45d59975ba18f6fb848e0520ead68ed65ec45d801e645",
+          "count": 123
+        }
+      ],
+      "bbox": [
+        -122.4718,
+        37.7316,
+        -122.4692,
+        37.735
+      ]
+    }
+  ]
+}

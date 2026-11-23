@@ -9,12 +9,12 @@ installation credential.
 
 The map reads only a pinned client-manifest and the selected schema4 farm. It
 uses the shared MapBridge JSON-string API and global generation allocator.
-A building hit selects the parcel returned from the same native query; open
-ground falls back to parcel. Metadata is whitelisted, counts are separate, and
+A building hit selects the parcel returned from the same native query and shows
+the filled building highlight. Metadata is whitelisted, counts are separate, and
 opaque building keys never enter the farm payload. Multi-hit selection is explicit.
-Decision 1C hides standing parcel frames but shows a yellow outline for the
-selected open-ground parcel. Building selection keeps only its building highlight.
-The controller clears an old parcel selection before another tap or style reload.
+Decision 1C hides standing parcel frames. q(336) (C-28, the owner 11-23) removes
+the open-ground fallback: a hit on a parcel without a building selects nothing,
+draws no rectangular parcel outline and keeps the "Tap a building" prompt.
 
 Pause/Back retires HTTP and query epochs, clears this generation's native layers
 and hides the map. Return gets a new global generation and restores the camera.
@@ -48,6 +48,25 @@ Android first; unsupported platforms show a clear message, without a fake map.
 
 ## Tests
 
+CI (C-62): the Cardigan check's `dynamic_farm` step runs `tools/ci/dynamic_farm_tests.sh`.
+It runs every `test_*.gd` here with `--headless --script` in the imported project, each
+under its own timeout (`DYNAMIC_FARM_TIMEOUT`, default 180 s; a hang is killed and fails),
+and passes the four pinned r4 parcels in `fixtures/r4/` after `--`. A file passes only with
+exit 0, no `SCRIPT ERROR`, and exactly one summary line with a non-zero check count and no
+failures. Only the prefixes listed in the script's `SUMMARY_CHECKS` / `SUMMARY_RATIO` count as
+a summary (C-63), so a new test file must add its prefix there. All files share a total
+budget (`DYNAMIC_FARM_TOTAL_TIMEOUT`, default 1080 s, inside the step's 20 minutes): the last
+file's limit is clipped to what is left, later files are reported as NOT RUN failures, and the
+report table still shows which files timed out.
+`test_read_retries_https.gd` gets a loopback TLS fixture with throwaway certificates; with
+`CI=1` a fixture that cannot start fails that file, locally it is skipped.
+`tools/ci/test-dynamic-farm-gate.sh` (run first in the same step) checks these rules with a
+fake Godot: summary misreads, fixture failure with and without `CI`, and several hangs.
+Anything that cannot run is listed under "Skipped" in the job summary, never as passed
+(currently `test_mesh_edges.gd --legacy`, whose old mesh script is not in the repository).
+Locally: `tools/run_tests.sh --ci-import` once, then `tools/ci/dynamic_farm_tests.sh [test_name…]`.
+
+
 Run prepare_isolated.py with a fresh external target. It copies exact scripts and
 writes SHA256 records, without autoloads, service config, credentials or tokens.
 Any Godot/device/build run needs a new explicit resource window and absolute
@@ -57,6 +76,8 @@ deadline cleanup. The tests use a fake scene or fake native/transport API:
   pause/resume and rejecting gameplay/wrong-parcel inputs (12 checks passed Q44).
 - test_selection_controller.gd: same-point IDs, count-preserving farm decode,
   callback invalidation, style changes, cancellation, timeout and read-only paths.
+  C-28: open-ground hits select nothing and never set a parcel frame; building
+  hits keep their filled highlight (28/28).
   21/21 passed Q47; fake callbacks do not prove SDK hit testing.
 
 Real r4 HTTPS, transparent Mapbox picking, UI/3D screenshot review, navigation,

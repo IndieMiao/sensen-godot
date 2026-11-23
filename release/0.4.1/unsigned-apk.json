@@ -1,0 +1,34 @@
+{
+  "card": "C-36",
+  "work_item": "W-95",
+  "artifact": {
+    "kind": "unsigned_apk",
+    "filename": "sensen-dynamicfarm-0.4.1-2026112301-084a1635-unsigned.apk",
+    "sha256": "234f1908a49047bb63f4199637118bc90c6962048170335013128694afeb6be2",
+    "bytes": 333907651,
+    "attachment_id": "attachment-187",
+    "artifact_delivery_id": "D-69",
+    "signed": false
+  },
+  "android": {
+    "package": "com.sensen.dynamicfarm.cardigan",
+    "version_name": "0.4.1",
+    "version_code": 2026112301,
+    "target_sdk": 36,
+    "abi": "arm64-v8a"
+  },
+  "source": {
+    "branch": "integration/dynamicfarm",
+    "commit": "084a1635afdf217178dcc9bf34b024c8f22cb54a",
+    "includes": ["C-19", "C-20", "C-27", "C-28", "C-29"],
+    "scope_note": "Baseline also contains C-31 (approved in Q-49): only server/**, docs and unreferenced assets/farm/data/dynamic_farm.json."
+  },
+  "build": {
+    "godot": "4.7.2.stable.official.ed1daf0bf",
+    "android_build_tools": "36.1.0",
+    "tooling": "C-14 build_worker_apk.sh --dynamic-farm from agent/C-14/W-26 41a68af50e3a78b3d76a1b2897a0345d3ebcf8ff, applied outside the repo; tools/* not in APK",
+    "command": "env CARDIGAN_MAPBOX_PUBLIC_FILE=<host file> C36_SOURCE_ROOT=<worktree> C36_TOOLS_REV=41a68af5 bash build_worker_apk.sh --dynamic-farm out-084a1635",
+    "run": "R-939",
+    "evidence_attachment_id": "attachment-186"
+  }
+}

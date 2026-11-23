@@ -49,11 +49,12 @@ func reply(kind: String, rows: Array, key := "", provider := "mapbox") -> void:
 	native.parcel_query_result.emit(request[0], request[1], controller.style_generation,
 		JSON.stringify({"kind":kind,"parcel_ids":rows.map(func(row: Dictionary): return row.block_id),
 		"properties":rows,"building_key":key,"building_source":provider,"error":""}))
+## Rows answer as a tapped building: since q(336) only a building's footprint selects (C-28).
 func answer(error: String, rows: Array = []) -> void:
 	var request: Array = native.queries.back()
 	native.parcel_query_result.emit(request[0], request[1], controller.style_generation,
-		JSON.stringify({"kind":"none" if rows.is_empty() else "parcel","parcel_ids":rows.map(func(row: Dictionary): return row.block_id),
-		"properties":rows,"building_key":"","building_source":"mapbox","error":error}))
+		JSON.stringify({"kind":"none" if rows.is_empty() else "building","parcel_ids":rows.map(func(row: Dictionary): return row.block_id),
+		"properties":rows,"building_key":"" if rows.is_empty() else "building-1","building_source":"mapbox","error":error}))
 func first_tap_retry() -> void:
 	# C-27: native "loading" on a first tap re-queries once and keeps the loading hint instead of the error.
 	var sent := native.queries.size()
@@ -198,20 +199,25 @@ func _run() -> void:
 	wrong_farm = true; await controller.open_farm()
 	check(farms.size() == 1, "mismatched server parcel cannot open a preview")
 	wrong_farm = false
+	var fetched := paths.size()
 	reply("parcel", [Fixture.metadata()])
-	check(native.highlights.back()[1] == "", "open-ground fallback clears the building highlight")
-	check(native.states.back()[1][0].block_id == "p-A" and native.states.back()[1][0].selected, "1C open ground enables only its selected parcel frame")
+	check(controller.selection.is_empty() and native.highlights.back()[1] == "", "q(336) open ground clears the previous building selection and selects nothing")
+	check(native.states.is_empty(), "q(336) open ground never enables a rectangular parcel frame")
+	check(controller.message == controller.PROMPT and not controller.busy, "open ground keeps the choose-a-building prompt")
+	await controller.open_farm(); check(paths.size() == fetched and farms.size() == 1, "nothing to preview after an open-ground tap")
+	options = []
+	reply("parcel", [Fixture.metadata(), Fixture.metadata("p-B")])
+	check(controller.selection.is_empty() and options.is_empty(), "open ground with several parcels offers no candidates")
+	controller.choose("p-A"); check(controller.selection.is_empty() and native.states.is_empty(), "open-ground parcel IDs cannot be chosen afterwards")
 	reply("building", [Fixture.metadata()], "foreign", "datasf")
 	check(controller.selection.is_empty(), "unexpected building provider cannot select")
-	check(not native.states.back()[1][0].selected, "new tap clears previous ground frame even when next hit is rejected")
-	reply("parcel", [Fixture.metadata(), Fixture.metadata("p-B")])
+	reply("building", [Fixture.metadata(), Fixture.metadata("p-B")], "shared")
 	check(controller.selection.is_empty() and options.size() == 2, "multiple candidates await explicit user choice")
 	controller.choose("p-B"); check(controller.selection.block_id == "p-B", "explicit choice picks one canonical parcel")
-	check(native.states.back()[1][0].block_id == "p-B" and native.states.back()[1][0].selected, "explicit ground candidate receives the parcel frame")
+	check(native.highlights.back()[1] == "shared" and native.states.is_empty(), "explicit candidate keeps the filled building highlight only")
 	controller.choose("p-forged"); check(controller.selection.block_id == "p-B", "choice outside current result cannot replace selection")
 	ready_signal(2); check(controller.selection.is_empty(), "style reload invalidates selection and opaque keys")
-	check(not native.states.back()[1][0].selected, "style reload clears the invalidated ground frame state")
-	reply("parcel", [Fixture.metadata()])
+	reply("building", [Fixture.metadata()], "opaque")
 	hold = true; controller.open_farm(); await process_frame
 	var generation: int = controller.generation
 	controller.pause(); release.emit(); await process_frame
