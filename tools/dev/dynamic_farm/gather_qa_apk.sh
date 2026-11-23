@@ -15,7 +15,7 @@ fail() { echo "gather QA APK: $*" >&2; exit 1; }
 (($# >= 1)) || fail 'usage: gather_qa_apk.sh NEW_OUTPUT_DIR [PARCEL] [IMPORTED_CHECKOUT]'
 out=$1 parcel=${2:-p-3139010} cache=${3:-}
 [[ $out == /* && ! -e $out ]] || fail 'output directory must be a new absolute path'
-[[ $parcel =~ ^p-[A-Za-z0-9*]+$ ]] || fail 'parcel must be an r4 fixture name'
+[[ $parcel =~ ^p-[A-Za-z0-9*-]+$ ]] || fail 'parcel must be an r4 fixture name'
 root=$(cd "$(dirname "$0")/../../.." && pwd)
 cd "$root"
 [[ -f tests/dynamic_farm/fixtures/r4/$parcel.json ]] || fail "no fixture $parcel"
