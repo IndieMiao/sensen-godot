@@ -59,3 +59,11 @@ internal class ParcelLayerState {
         return true
     }
 }
+/** C-27: the one tap waiting for map idle. Mapbox-free so JVM tests drive it; newer taps replace older ones. */
+internal class ParcelIdleWait<T : Any> {
+    var pending: T? = null; private set
+    fun park(value: T) { pending = value }
+    fun resume(ready: Boolean): T? = if (ready) pending.also { pending = null } else null
+    fun expire(value: T): Boolean = (pending === value).also { if (it) pending = null }
+    fun drop() { pending = null }
+}

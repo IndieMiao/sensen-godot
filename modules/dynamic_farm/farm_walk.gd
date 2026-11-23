@@ -8,6 +8,7 @@ var data: Dictionary
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 # Conservative layout/connectivity mask; never a wall for the walker.
 var reserved := {}
+var _connected_size := -1  # reserved.size() when every clear cell was last proven reachable
 var _proxies_by_cell := {}
 var cell_m := 0.8
 var center_grid := Vector2.ZERO
@@ -111,7 +112,9 @@ func _blocking_normal(p: Vector3, from: Vector3) -> Vector3:
 				normal = Vector3(grid.x, 0, -grid.y)
 	return normal
 
-func try_box(box: AABB, solid: bool) -> Array[Vector2i]:
+## `shared`: already-reserved cells this prop may overlap (members of one grove or pile).
+## `max_new`: reject a solid prop that would reserve more than this many new cells (-1: no limit).
+func try_box(box: AABB, solid: bool, shared := {}, max_new := -1) -> Array[Vector2i]:
 	var visual := Rect2(Vector2(box.position.x, box.position.z), Vector2(box.size.x, box.size.z))
 	var area := visual.grow(BODY_RADIUS) if solid else visual
 	var low := cell_at(Vector3(area.position.x, 0, area.end.y - 0.00001))
@@ -120,19 +123,63 @@ func try_box(box: AABB, solid: bool) -> Array[Vector2i]:
 	for y in range(low.y, high.y + 1):
 		for x in range(low.x, high.x + 1):
 			var cell := Vector2i(x,y)
-			if not data.by_cell.has(cell) or data.by_cell[cell].zone != "extension" or data.protected.has(cell) or reserved.has(cell):
+			if not data.by_cell.has(cell) or data.by_cell[cell].zone != "extension" or data.protected.has(cell) or (reserved.has(cell) and not shared.has(cell)):
 				return []
 			footprint.append(cell)
 	if footprint.is_empty():
 		return []
 	if solid:
+		var added: Array[Vector2i] = []
 		for cell in footprint:
+			if not reserved.has(cell): added.append(cell)
+		if max_new >= 0 and added.size() > max_new:
+			return []
+		var was_connected := _connected_size == reserved.size()
+		for cell in added:
 			reserved[cell] = true
-		if not connected() or not clear_position(point(data.spawn)) or not clear_position(point(data.entry)):
-			for cell in footprint:
+		var still := _still_connected(added) if was_connected else connected()
+		if not still or not clear_position(point(data.spawn)) or not clear_position(point(data.entry)):
+			for cell in added:
 				reserved.erase(cell)
 			return []
+		_connected_size = reserved.size()
 	return footprint
+
+## Undoes a solid try_box refused afterwards; `added` are the cells it newly reserved.
+## Restores the earlier, connected mask.
+func release(added: Array[Vector2i]) -> void:
+	for cell in added:
+		reserved.erase(cell)
+	_connected_size = reserved.size()
+
+## Same answer as connected() when every clear cell was reachable before `added` were
+## reserved: the rest stays connected iff the clear neighbours of `added` reach one another.
+func _still_connected(added: Array[Vector2i]) -> bool:
+	if not clear_cell(data.spawn) or not clear_cell(data.entry):
+		return false
+	var targets := {}
+	for cell in added:
+		for offset in NEIGHBORS:
+			if clear_cell(cell + offset): targets[cell + offset] = true
+	if targets.size() <= 1:
+		return true
+	var start: Vector2i = targets.keys()[0]
+	var queue: Array[Vector2i] = [start]
+	var seen := {start: true}
+	var found := 1
+	var index := 0
+	while index < queue.size():
+		var at := queue[index]
+		index += 1
+		for offset in NEIGHBORS:
+			var next: Vector2i = at + offset
+			if clear_cell(next) and not seen.has(next):
+				seen[next] = true
+				queue.append(next)
+				if targets.has(next):
+					found += 1
+					if found == targets.size(): return true
+	return false
 
 func connected() -> bool:
 	if not clear_cell(data.spawn) or not clear_cell(data.entry):

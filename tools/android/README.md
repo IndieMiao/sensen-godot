@@ -34,6 +34,20 @@ Verify runner behavior with `node --test tools/android/run_test.test.mjs`.
 Background CPU measurements and limitations are recorded in
 [`docs/qa/android-background-cpu-2026-09-15.md`](../../docs/qa/android-background-cpu-2026-09-15.md).
 
+## Test build version
+
+Android test builds take `version/name` and `version/code` from the `Android`
+preset (`com.sensen.journeypreview`) in `export_presets.cfg`; Cardigan's
+test-build tooling swaps only the package and display name. Keep the name in
+the 0.4.x series (started at 0.4.1 on 2026-11-23, q(337)); moving to 0.5.x
+waits for the owner to ask. The previous 0.16.x line was this preset's own Journey numbering,
+which had grown from the 0.4.0 local device builds of 2026-09-14.
+
+`version/code` is `YYYYMMDDNN`: the date the version changes, `NN` from 01 and
++1 for another build that day. It must stay above 2026092405 (the 0.16.37
+test build) so installed phones can upgrade in place.
+`tests/journey/test_journey_export_preset.gd` checks both rules.
+
 ## Tailscale remote ADB
 
 The user requested a stable remote connection on 2026-09-25. V2509A was verified

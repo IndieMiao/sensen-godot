@@ -25,6 +25,7 @@ var paths: Array = []
 var farms: Array = []
 var options: Array = []
 var hold := false
+var hold_manifest := false
 var wrong_farm := false
 signal release
 func _initialize() -> void: _run.call_deferred()
@@ -34,7 +35,9 @@ func check(value: bool, text: String) -> void:
 	print("PASS " if value else "FAIL ", text)
 func transport(path: String) -> Dictionary:
 	paths.append(path)
-	if path == "/client-manifest.json": return Fixture.manifest()
+	if path == "/client-manifest.json":
+		if hold_manifest: await release
+		return Fixture.manifest()
 	var data: Dictionary = Fixture.farm("p-B" if wrong_farm else path.get_file().get_basename())
 	if hold: await release
 	return data
@@ -46,6 +49,127 @@ func reply(kind: String, rows: Array, key := "", provider := "mapbox") -> void:
 	native.parcel_query_result.emit(request[0], request[1], controller.style_generation,
 		JSON.stringify({"kind":kind,"parcel_ids":rows.map(func(row: Dictionary): return row.block_id),
 		"properties":rows,"building_key":key,"building_source":provider,"error":""}))
+## Rows answer as a tapped building: since q(336) only a building's footprint selects (C-28).
+func answer(error: String, rows: Array = []) -> void:
+	var request: Array = native.queries.back()
+	native.parcel_query_result.emit(request[0], request[1], controller.style_generation,
+		JSON.stringify({"kind":"none" if rows.is_empty() else "building","parcel_ids":rows.map(func(row: Dictionary): return row.block_id),
+		"properties":rows,"building_key":"" if rows.is_empty() else "building-1","building_source":"mapbox","error":error}))
+func first_tap_retry() -> void:
+	# C-27: native "loading" on a first tap re-queries once and keeps the loading hint instead of the error.
+	var sent := native.queries.size()
+	controller.tap(Vector2(.4, .4), 18); answer("loading")
+	check(controller.message == "Finding parcel…" and controller.selection.is_empty(), "first transient failure keeps loading feedback, not the error")
+	controller._process(controller.retry_delay() * .5)
+	check(native.queries.size() == sent + 1, "re-query waits for the retry delay")
+	controller._process(controller.retry_delay())
+	check(native.queries.size() == sent + 2 and native.queries.back()[2] == Vector2(.4, .4), "single automatic re-query uses the same tapped point")
+	ready_signal(controller.style_generation)
+	check(controller.message == "Finding parcel…", "native idle readiness during a pending tap keeps loading feedback")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A" and not controller.message.contains("Could not check"), "first tap selects after the automatic re-query")
+	controller.tap(Vector2(.4, .4), 18); answer("query_failed"); controller._process(controller.retry_delay() + .01)
+	answer("building_load_failed")
+	check(controller.message == Controller.QUERY_FAILED and not controller.busy, "persistent failure still reports after exactly one re-query")
+	check(not controller.message.contains("Could not check"), "failure no longer uses the old could-not-check copy")
+	controller._process(5.0)
+	check(native.queries.size() == sent + 4, "no further automatic queries after the reported failure")
+	var bootstraps := native.sources.size()
+	controller.retry()
+	check(native.queries.size() == sent + 5 and native.queries.back()[2] == Vector2(.4, .4) and native.sources.size() == bootstraps, "Retry re-queries the failed tap without reloading the map")
+	check(controller.message == "Finding parcel…", "Retry shows loading feedback again")
+	answer("", [Fixture.metadata("p-B")])
+	check(controller.selection.get("block_id") == "p-B", "Retry after a reported failure selects the parcel")
+	controller.tap(Vector2(.4, .4), 18); answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A", "manual tap after a reported failure works")
+	controller.tap(Vector2(.4, .4), 18); native.parcel_query_result.emit(native.queries.back()[0], controller.generation, controller.style_generation,
+		JSON.stringify({"kind":"building","parcel_ids":["p-A"],"properties":[Fixture.metadata()],"building_key":"","building_source":"mapbox","error":""}))
+	check(controller.message == "Finding parcel…" and native.queries.size() == sent + 7, "contract-rejected answer also waits for the one re-query")
+	controller._process(controller.retry_delay() + .01)
+	check(native.queries.size() == sent + 8, "contract-rejected answer re-queries once")
+	controller.tap(Vector2(.4, .4), 18); answer("loading"); controller.camera_changed(); controller._process(5.0)
+	check(native.queries.size() == sent + 9 and controller.message.begins_with("Tap a building"), "camera move cancels a waiting re-query")
+	controller.tap(Vector2(.4, .4), 18); answer("loading"); controller.pause(); controller._process(5.0)
+	check(native.queries.size() == sent + 10, "pause cancels a waiting re-query")
+	await controller.activate(); ready_signal()
+	controller.config.query_retry_delay_ms = 1500
+	check(is_equal_approx(controller.retry_delay(), 1.5), "retry delay is configurable")
+	controller.config.query_retry_delay_ms = 999999
+	check(is_equal_approx(controller.retry_delay(), 5.0), "configured retry delay is bounded")
+	controller.config.erase("query_retry_delay_ms")
+	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "missing configuration uses the default delay")
+func map_error(code := "parcels_source_load_failed") -> void:
+	native.parcel_error.emit(controller.generation, controller.style_generation, code)
+func reload() -> void:
+	controller._process(controller.retry_delay() + .01)
+	for i in 4: await process_frame
+func map_error_retry() -> void:
+	# Offline/service failures reach Godot as map load errors, not query answers (W-69 P5/P6).
+	var sent := native.queries.size(); var boots := native.sources.size(); var old_generation: int = controller.generation
+	controller.tap(Vector2(.3, .7), 18); answer("loading"); map_error()
+	check(controller.message == "Finding parcel…" and controller.message != Controller.MAP_FAILED, "map load error during a waiting re-query keeps loading feedback")
+	await reload()
+	check(native.sources.size() == boots + 1 and controller.generation > old_generation, "map load error triggers one automatic map reload")
+	ready_signal()
+	check(native.queries.size() == sent + 2 and native.queries.back()[2] == Vector2(.3, .7) and native.queries.back()[1] == controller.generation, "reloaded map answers the interrupted tap at the same point")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A", "interrupted tap selects after the automatic reload")
+	sent = native.queries.size(); boots = native.sources.size()
+	controller.tap(Vector2(.3, .7), 18); map_error("building_load_failed")
+	await reload(); ready_signal(); answer("query_failed")
+	check(controller.message == Controller.QUERY_FAILED and native.queries.size() == sent + 2, "tap whose one retry was the reload reports after that retry fails")
+	controller._process(5.0)
+	check(native.queries.size() == sent + 2 and native.sources.size() == boots + 1, "no second automatic retry after the reload")
+	controller.tap(Vector2(.3, .7), 18); map_error(); await reload(); map_error()
+	check(controller.message == Controller.MAP_FAILED and not controller.busy, "map error after the automatic reload shows the map failure")
+	boots = native.sources.size(); controller._process(5.0); for i in 4: await process_frame
+	check(native.sources.size() == boots, "map failure is not reloaded again automatically")
+	controller.retry(); for i in 4: await process_frame
+	check(native.sources.size() == boots + 1, "Retry after a map failure reloads the map")
+	ready_signal()
+	controller.tap(Vector2(.3, .7), 18); answer("loading"); controller._process(controller.retry_delay() + .01); map_error()
+	check(controller.message == Controller.MAP_FAILED, "map error after the tap already used its retry reports at once")
+	controller.retry(); for i in 4: await process_frame
+	ready_signal(); map_error(); await reload(); ready_signal()
+	check(controller.map_ready and controller.message.begins_with("Tap a building"), "idle map error reloads once without a tap")
+	sent = native.queries.size()
+	for code in ["building_without_parcel", "invalid_point", "too_many_candidates"]:
+		controller.tap(Vector2(.3, .7), 18); answer(code); controller._process(5.0)
+		check(native.queries.size() == sent + 1 and controller.message == Controller.SETTLED[code], code + " is a definite answer, not retried or reported as a failure")
+		sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18); answer("loading"); controller.tap(Vector2(.6, .2), 18)
+	controller._process(controller.retry_delay() + .01)
+	check(native.queries.size() == sent + 2 and native.queries.back()[2] == Vector2(.6, .2), "new tap during a waiting re-query replaces it")
+	await burst_errors()
+	controller.config.query_retry_delay_ms = null
+	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "non-numeric retry delay falls back to the default")
+	controller.config.erase("query_retry_delay_ms")
+func burst_errors() -> void:
+	# V-47: one outage reports several map errors, and the failing map can still report ready.
+	ready_signal()
+	var sent := native.queries.size(); var boots := native.sources.size()
+	controller.tap(Vector2(.3, .7), 18); map_error("building_load_failed"); map_error()
+	check(controller.message == "Finding parcel…" and controller.busy and controller._reload_left > 0.0, "second error of the same outage does not report before the automatic reload")
+	ready_signal(controller.style_generation)
+	check(native.queries.size() == sent + 1, "failing map's late ready does not resume the tap on the old map")
+	hold_manifest = true; var old_generation: int = controller.generation
+	controller._process(controller.retry_delay() + .01); await process_frame
+	check(controller.generation == old_generation and controller.busy, "reload is still fetching the manifest")
+	map_error(); ready_signal(controller.style_generation)
+	check(controller.message == "Finding parcel…" and native.queries.size() == sent + 1, "old map signals during the reload are ignored")
+	hold_manifest = false; release.emit()
+	for i in 4: await process_frame
+	check(native.sources.size() == boots + 1, "burst of errors reloads the map exactly once")
+	ready_signal()
+	check(native.queries.size() == sent + 2 and native.queries.back()[1] == controller.generation and native.queries.back()[2] == Vector2(.3, .7), "tap resumes only on the reloaded map")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A", "tap interrupted by a burst of errors selects after the reload")
+	controller.tap(Vector2(.3, .7), 18); map_error(); await reload(); map_error(); map_error()
+	check(controller.message == Controller.MAP_FAILED and controller._reload_left < 0.0, "failure after the reload cancels any pending reload")
+	boots = native.sources.size(); controller._process(5.0); for i in 4: await process_frame
+	check(native.sources.size() == boots and controller.message == Controller.MAP_FAILED, "reported map failure stays until the player retries")
+	controller.retry(); for i in 4: await process_frame
+	ready_signal()
 func _run() -> void:
 	api = Api.new(); api.transport = transport; root.add_child(api)
 	native = Native.new(); controller = Controller.new(); controller.api = api; controller.bridge = native
@@ -104,6 +228,8 @@ func _run() -> void:
 	check(controller.map_ready, "late readiness from old visit cannot replace current state")
 	controller.tap(Vector2(.5, .5), 18); controller._process(9.0)
 	check(controller._pending == -1 and controller.message.contains("did not respond"), "missing query callback expires with retry feedback")
+	await first_tap_retry()
+	await map_error_retry()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame

@@ -64,6 +64,37 @@ deadline cleanup. The tests use a fake scene or fake native/transport API:
 Real r4 HTTPS, transparent Mapbox picking, UI/3D screenshot review, navigation,
 performance and phone input remain distinct verification steps.
 
+### First-tap queries (C-27)
+
+The native query used to answer `loading` whenever Mapbox had not reported map
+idle since the last camera change, so the first tap after a pan or zoom often
+showed "Could not check that location. Tap again." `ParcelMapController` now
+keeps that one tap (same pixel and camera revision) and runs it at the next map
+idle; after `IDLE_WAIT_MS` (4 s) without idle it still answers `loading`. A
+newer tap, camera move, style reload, hide or clear drops the waiting tap.
+
+Any native error or contract-rejected answer gets one automatic re-query of the
+same point while "Finding parcel…" stays visible (Q-29 A). Only a second failure
+shows "Parcel details could not load. Tap Retry."; Retry then re-queries that
+tap without reloading the map. The delay is `query_retry_delay_ms` in
+`config.json` (default 600, clamped 0–5000); a camera move or pause cancels it.
+The 8 s no-answer timeout is not retried and its Retry still reloads the map.
+`building_without_parcel`, `invalid_point` and `too_many_candidates` are definite
+answers: no re-query, and the existing "No selectable parcel here." / "Zoom in to
+choose a farm." hints instead of a failure.
+
+Offline tiles and service failures reach Godot as `parcel_error` (map load
+error), not as query answers. The first one reloads the map automatically after
+the same delay; a tap that was in flight or waiting for its re-query keeps
+"Finding parcel…" and is queried again once the reloaded map is ready, which
+counts as its one retry. Only a further map error (or one after the tap's retry
+was already sent) shows "Map details could not load. Tap Retry.". One outage reports once per failed tile or
+source: further errors and late ready signals from the map being replaced are
+ignored, so the tap resumes only on the reloaded map. The reload
+allowance resets on the next tap or Retry. `DYNAMIC_MAP_ERROR` logs the native
+code and whether a tap was waiting. `DYNAMIC_QUERY` logs the local request number, native
+outcome code, attempt and retry decision only, never the point or parcel.
+
 ## 1904 read retries
 
 The demo read API allows three total attempts (including the first) for
@@ -135,6 +166,25 @@ weed centres stay walkable, and a 0.2 m lattice flooded from spawn still reaches
 every previously reachable cell except those holding a blocking prop. A pinch
 fixture (two blocks joined by a one-cell neck, five seeds, 20% coverage) checks
 that blocking props never seal an area.
+
+### Outer groves (C-20)
+
+Run `--headless --script res://tests/dynamic_farm/test_outer_groves.gd -- <farm1.json>
+<farm2.json> <farm3.json>` in the same isolated preview project (review set:
+`p-3139010`, `p-3139019`, `p-5402049`). Without payloads it runs only the walker
+checks. It compares the incremental connectivity check with a full flood fill over 400
+random solid boxes, then per parcel replays the previous approved layout as the
+"before": reserved cells may not grow, reservation-reachable cells may not shrink
+(audited 1539, 1470, 3962 for the review set), and every core, protected, spawn and
+entry cell stays reachable. Per Q-19 it then binds the model-fitted profiles (C-19) of
+both layouts, core obstacles included, and floods a 0.2 m walker lattice from spawn:
+every cell walkable before and not after must lie under a new blocking prop's own
+profile (`OUTER_LOST` lists each one with its model), no open lattice point is sealed
+off, the walkable total does not shrink, and spawn, entry, core and protected cells stay
+walkable. It also checks the 13-model palette, extension-only footprints, rear-half
+trees, that only solid footprints reserve cells, at least one grove/rock pile/flower
+clump, and an identical layout on reopening. Walker unit checks cover shared group
+cells, the new-cell limit, `release()` and shadow-budget pruning of a group member.
 
 ## Model-fitted prop contacts
 
