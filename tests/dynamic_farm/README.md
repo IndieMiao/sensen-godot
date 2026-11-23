@@ -62,6 +62,37 @@ deadline cleanup. The tests use a fake scene or fake native/transport API:
 Real r4 HTTPS, transparent Mapbox picking, UI/3D screenshot review, navigation,
 performance and phone input remain distinct verification steps.
 
+### First-tap queries (C-27)
+
+The native query used to answer `loading` whenever Mapbox had not reported map
+idle since the last camera change, so the first tap after a pan or zoom often
+showed "Could not check that location. Tap again." `ParcelMapController` now
+keeps that one tap (same pixel and camera revision) and runs it at the next map
+idle; after `IDLE_WAIT_MS` (4 s) without idle it still answers `loading`. A
+newer tap, camera move, style reload, hide or clear drops the waiting tap.
+
+Any native error or contract-rejected answer gets one automatic re-query of the
+same point while "Finding parcel…" stays visible (Q-29 A). Only a second failure
+shows "Parcel details could not load. Tap Retry."; Retry then re-queries that
+tap without reloading the map. The delay is `query_retry_delay_ms` in
+`config.json` (default 600, clamped 0–5000); a camera move or pause cancels it.
+The 8 s no-answer timeout is not retried and its Retry still reloads the map.
+`building_without_parcel`, `invalid_point` and `too_many_candidates` are definite
+answers: no re-query, and the existing "No selectable parcel here." / "Zoom in to
+choose a farm." hints instead of a failure.
+
+Offline tiles and service failures reach Godot as `parcel_error` (map load
+error), not as query answers. The first one reloads the map automatically after
+the same delay; a tap that was in flight or waiting for its re-query keeps
+"Finding parcel…" and is queried again once the reloaded map is ready, which
+counts as its one retry. Only a further map error (or one after the tap's retry
+was already sent) shows "Map details could not load. Tap Retry.". One outage reports once per failed tile or
+source: further errors and late ready signals from the map being replaced are
+ignored, so the tap resumes only on the reloaded map. The reload
+allowance resets on the next tap or Retry. `DYNAMIC_MAP_ERROR` logs the native
+code and whether a tap was waiting. `DYNAMIC_QUERY` logs the local request number, native
+outcome code, attempt and retry decision only, never the point or parcel.
+
 ## 1904 read retries
 
 The demo read API allows three total attempts (including the first) for
