@@ -17,9 +17,10 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def worker_preset(text, dynamic_farm=False):
+def worker_preset(text, variant='android'):
     # Godot config values aren't INI strings (e.g. PackedStringArray, dictionaries).
     # Preserve their encoding; take only the named non-store preset and its options.
+    require(variant in farm.VARIANTS, 'unknown package variant')
     matches = [b for b in re.split(r'(?m)(?=^\[preset\.\d+\]$)', text)
                if 'name="Android"' in b.splitlines()]
     require(len(matches) == 1, 'expected one Android preset')
@@ -36,8 +37,8 @@ def worker_preset(text, dynamic_farm=False):
         require(len(values) == 1, 'missing or ambiguous APK identity')
         return values[0]
 
-    if dynamic_farm:
-        header, options = farm.staged_preset(header, options)
+    if variant != 'android':
+        header, options = farm.staged_preset(header, options, variant == 'dynamic-farm-internal')
     identity = dict(package=value(r'^package/unique_name="([a-zA-Z0-9_.]+)"$'),
                     version_code=value(r'^version/code=(\d+)$'), version_name=value(r'^version/name="([^"\n]+)"$'))
     options, count = re.subn(r'^package/signed=(?:true|false)$', 'package/signed=false', options, flags=re.M)
@@ -55,7 +56,7 @@ def checked_output(args):
     return p.stdout
 
 
-def inspect_zip(apk, unsigned, dynamic_farm=False):
+def inspect_zip(apk, unsigned, variant='android'):
     with apk.open('rb') as f, zipfile.ZipFile(f) as z:
         names = z.namelist()
         check_names(names)  # Must precede any member I/O, including CRC verification.
@@ -63,7 +64,7 @@ def inspect_zip(apk, unsigned, dynamic_farm=False):
         required = {'AndroidManifest.xml', 'classes.dex', 'assets/project.binary', 'assets/mapbox_token.txt',
                     'lib/arm64-v8a/libgodot_android.so', 'lib/arm64-v8a/libmapbox-maps.so',
                     'lib/arm64-v8a/libmapbox-common.so', 'lib/arm64-v8a/liblkjingle_peerconnection_so.so'}
-        if dynamic_farm:
+        if variant != 'android':
             required.update('assets/' + path for path in farm.RAW_FILES)
             for scene in ('dynamic_farm_map', 'dynamic_farm_host', 'dynamic_farm'):
                 path = f'assets/scenes/dynamic_farm/{scene}.tscn'
@@ -75,10 +76,11 @@ def inspect_zip(apk, unsigned, dynamic_farm=False):
             f.seek(z.start_dir - 16)
             require(f.read(16) != b'APK Sig Block 42', 'APK Signing Block present')
         require(z.testzip() is None, 'corrupt ZIP entry')
+        return farm.exported_config(farm.project_settings(z.read('assets/project.binary')), variant)
 
 
-def inspect(apk, identity, build_tools, signer=None):
-    inspect_zip(apk, signer is None, identity['package'] == farm.PACKAGE)
+def inspect(apk, identity, build_tools, signer=None, variant='android'):
+    config = inspect_zip(apk, signer is None, variant)
     checked_output([build_tools / 'zipalign', '-c', '-P', '16', '4', apk])
     badging = checked_output([build_tools / 'aapt', 'dump', 'badging', apk])
     found = re.search(r"^package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging, re.M)
@@ -93,13 +95,13 @@ def inspect(apk, identity, build_tools, signer=None):
     with apk.open('rb') as f:
         for block in iter(lambda: f.read(1024 * 1024), b''):
             h.update(block)
-    return dict(identity, bytes=apk.stat().st_size, sha256=h.hexdigest(), signer_sha256=signer)
+    return dict(identity, bytes=apk.stat().st_size, sha256=h.hexdigest(), signer_sha256=signer, config=config)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--presets', type=Path, required=True, help='preset file from the source revision')
-    parser.add_argument('--variant', choices=['android', 'dynamic-farm'], default='android')
+    parser.add_argument('--variant', choices=farm.VARIANTS, default='android')
     cmd = parser.add_subparsers(dest='cmd', required=True)
     cmd.add_parser('generate').add_argument('destination', type=Path)
     cmd.add_parser('check-unsigned').add_argument('apk', type=Path)
@@ -108,15 +110,14 @@ def main():
     check.add_argument('--build-tools', type=Path, required=True)
     check.add_argument('--signer-sha256', help='only for the C-500 result; must come from the approved identity')
     a = parser.parse_args()
-    preview = a.variant == 'dynamic-farm'
-    preset, identity = worker_preset(a.presets.read_text(), preview)
+    preset, identity = worker_preset(a.presets.read_text(), a.variant)
     if a.cmd == 'generate':
         with a.destination.open('x') as f:
             f.write(preset)
     elif a.cmd == 'check-unsigned':
-        inspect_zip(a.apk, True, preview)
+        inspect_zip(a.apk, True, a.variant)
     else:
-        print(json.dumps(inspect(a.apk, identity, a.build_tools, a.signer_sha256), sort_keys=True))
+        print(json.dumps(inspect(a.apk, identity, a.build_tools, a.signer_sha256, a.variant), sort_keys=True))
 
 
 if __name__ == '__main__':

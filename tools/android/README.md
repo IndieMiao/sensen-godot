@@ -175,6 +175,28 @@ choose a production signing identity, install an app or authorize publication.
    It keeps the committed read-only dataset config and includes the raw map, scenery
    and avatar JSON needed for 3D preview. Do not change the production project/presets.
 
+   **Internal test package (C-39).** Only when explicitly selected,
+   `--dynamic-farm-internal TARGET` builds `com.sensen.dynamicfarm.internal` from the same
+   staging, but points both Journey URLs at `TARGET` and sets
+   `sensen/dynamic_farm/reselect` and `sensen/dynamic_farm/account_restore` (C-32). `TARGET`
+   must exactly equal an entry of `APPROVED_TARGETS` in `dynamic_farm_export.py`: today only
+   the isolated C-38 test service `https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1`
+   (tailnet only). Production, devserver, P0 and any other address are refused before staging.
+   `online_qa` stays on, so `Net` never boots or signs in anonymously; the map only reloads a
+   token the tester saved by signing in on the device. No account or credential goes into
+   the package. Use it for internal testing only: no signing or distribution.
+
+   ```sh
+   tools/android/build_worker_apk.sh --dynamic-farm-internal \
+     https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1 "$TMPDIR/internal"
+   ```
+
+   Readback (`verify`, `check-unsigned`) parses the exported `assets/project.binary` and
+   rejects a package whose Journey settings do not match its variant: internal settings or
+   the internal target in any other package, a reachable Journey in the isolated preview, or
+   QA isolation in the release-configuration (default) package. `unsigned.json` records the
+   result under `config`.
+
    The script stages committed game sources in a disposable project, generates
    one non-runnable, `package/signed=false` APK preset, prepares the Gradle template + native
    plugins, then imports and exports **release** serially in a fresh portable
