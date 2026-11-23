@@ -197,6 +197,10 @@ func _map_card() -> void:
 	page._render(); await process_frame
 	check(guest.status(ids[1]) == "unknown" and page._details.text.ends_with("Sign in to claim a home.") and not page._claim.visible, "signed-out player sees 'Sign in to claim a home.' even though ownership can't be read")
 	check(page._sign_in.visible, "signed-out player gets a 'Sign in' button")
+	page._sign_in.pressed.emit(); await process_frame
+	var panels: Array = page.find_children("*", "AccountPanel", true, false)
+	check(panels.size() == 1 and panels[0].mode == "sign_in", "'Sign in' opens the existing account panel")
+	for panel in panels: panel.free()
 	# After signing in, ownership is re-read for the new identity.
 	guest.api.client.token = "fake-b"
 	guest.forget(); await process_frame

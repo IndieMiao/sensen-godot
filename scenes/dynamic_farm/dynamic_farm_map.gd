@@ -10,6 +10,7 @@ const FakeParcelServer := preload("res://modules/dynamic_farm/map/fake_parcel_se
 const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
+const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 const OCCLUSION_COLOR := "#E7F0DF" # Existing scene BG_COLOR(.906, .941, .875), opaque RGB.
 const AREA_REFRESH_SECONDS := 0.8
 ## Development stand-in for the C-31 server, shared by map visits in one run.
@@ -199,7 +200,8 @@ func _claim_selection() -> void:
 
 func _open_sign_in() -> void:
 	if _claims == null or find_children("*", "AccountPanel", true, false).size() > 0: return
-	var panel := AccountPanel.open(self, "sign_in")
+	# Loaded at run time: the panel uses the Net autoload, which scripts preloading this scene may not have yet.
+	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in")
 	_camera.input_enabled = false
 	var signed_in: bool = await panel.closed
 	if not is_inside_tree(): return
