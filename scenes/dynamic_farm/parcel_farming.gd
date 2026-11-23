@@ -96,6 +96,16 @@ func enter() -> void:
 			if _names.has(id): gifts.append("%s ×%d" % [_names[id], int(rules.welcome_gift[id])])
 		if not gifts.is_empty(): _toast.show_toast("Received " + ", ".join(gifts), ToastLayer.Severity.SUCCESS)
 
+## Core cells of the protected path (Space.protected_path), shared with house placement (C-33).
+func protected_path() -> Dictionary:
+	return _path
+
+## Cells still holding a core obstacle; cleared ones are gone from the walk and the art.
+func obstacle_cells() -> Dictionary:
+	var cells := {}
+	for cell: Vector2i in _obstacles: cells[cell] = true
+	return cells
+
 func server_now() -> int:
 	return int(Time.get_unix_time_from_system() * 1000.0) + _clock_offset_ms
 

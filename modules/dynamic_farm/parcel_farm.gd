@@ -8,7 +8,7 @@ const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
-const COMMANDS := ["clear_obstacle", "till", "sow", "harvest"]
+const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest"]
 
 static var _rules := {}
 
@@ -23,7 +23,8 @@ static func parse_rules(raw: Variant) -> Dictionary:
 		return {}
 	if not raw.get("welcome_gift") is Dictionary or not raw.get("till_tool") is String or not raw.get("crops") is Dictionary:
 		return {}
-	if not raw.get("house") is Dictionary or not whole_in(raw.house.get("width"), 1, 16) or not whole_in(raw.house.get("depth"), 1, 16):
+	if not raw.get("house") is Dictionary or not raw.house.get("model") is String or not raw.house.get("blueprint") is String \
+			or not whole_in(raw.house.get("width"), 1, 16) or not whole_in(raw.house.get("depth"), 1, 16):
 		return {}
 	for id in raw.welcome_gift:
 		if not id is String or not whole_in(raw.welcome_gift[id], 1, 999): return {}
@@ -116,12 +117,40 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 	var next := state.duplicate(true)
 	for index in commands.size():
 		var command = commands[index]
-		if not command is Dictionary or command.get("type") not in COMMANDS or parse_key(command.get("cell")) == null:
+		if not command is Dictionary or command.get("type") not in COMMANDS:
 			return {"ok": false, "index": index, "code": "SCHEMA"}
-		var cell: String = command.cell
+		if command.type == "place_house":
+			if not whole_in(command.get("x"), 0, MAX_COORD - 1) or not whole_in(command.get("y"), 0, MAX_COORD - 1) \
+					or (command.has("rotation") and not whole_in(command.rotation, 0, 3)):
+				return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif parse_key(command.get("cell")) == null:
+			return {"ok": false, "index": index, "code": "SCHEMA"}
+		var cell: String = command.get("cell", "")
 		var failure := ""
 		var detail := {}
 		match command.type:
+			"place_house":
+				var house := {"model": rule_set.house.model, "x": int(command.x), "y": int(command.y),
+					"width": int(rule_set.house.width), "depth": int(rule_set.house.depth),
+					"rotation": int(command.get("rotation", 0)), "built_at": now}
+				var footprint := house_cells({"house": house})
+				var covered: Array = []
+				for key: String in next.tilled + next.crops.keys():
+					if footprint.has(parse_key(key)) and key not in covered: covered.append(key)
+				covered.sort()
+				var far := false
+				for at: Vector2i in footprint: far = far or at.x >= MAX_COORD or at.y >= MAX_COORD
+				if next.house != null: failure = "HOUSE_PLACED"
+				elif int(next.bag.get(rule_set.house.blueprint, 0)) <= 0:
+					failure = "NO_BLUEPRINT"
+					detail = {"item": rule_set.house.blueprint}
+				elif far: failure = "OUT_OF_BOUNDS"
+				elif not covered.is_empty():
+					failure = "CELL_OCCUPIED"
+					detail = {"cells": covered}
+				else:
+					_take(next.bag, rule_set.house.blueprint)
+					next.house = house
 			"clear_obstacle":
 				if cell in next.cleared: failure = "ALREADY_CLEARED"
 				elif next.cleared.size() >= MAX_CELLS: failure = "TOO_MANY_CELLS"
