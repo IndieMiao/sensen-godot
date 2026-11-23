@@ -48,7 +48,7 @@ func _run() -> void:
 		var again := Scenery.plan(data,again_walk)
 		Shade.enforce_budget(again,data,again_walk)
 		_check(planned.layout_sha256==again.layout_sha256,"same seed same layout")
-		_check(walk.blocked==again_walk.blocked,"same seed same blockers")
+		_check(walk.reserved==again_walk.reserved,"same seed same blockers")
 		for dir in [Vector3.LEFT,Vector3.RIGHT,Vector3.FORWARD,Vector3.BACK]:
 			walk.position=walk.point(data.spawn)
 			for i in 100: walk.move(dir*0.2)

@@ -128,3 +128,40 @@ geometry/seed with different block IDs; append `-- <farm1.json> <farm2.json>
 `p-3139019`, `p-5402049`). The check counts distinct occupied core cells from
 the transformed model bounds, validates all four roles, compares the reopened
 layout and checks the entire remaining walk mask against extension-only blockers.
+With the props built into the walker, stone/bush/sapling centres are blocked,
+weed centres stay walkable, and a 0.2 m lattice flooded from spawn still reaches
+every previously reachable cell except those holding a blocking prop. A pinch
+fixture (two blocks joined by a one-cell neck, five seeds, 20% coverage) checks
+that blocking props never seal an area.
+
+## Model-fitted prop contacts
+
+`test_prop_proxies.gd` loads the actual 13 imported meshes (`prop_outline.gd`).
+Every full-fit primitive stays inside the model's top-down projection; tree
+primitives also stay inside the low trunk/root hull, except pine_03, whose three
+splayed roots no inscribed primitive can cover: it gets the smallest cylinder
+that does. At the default fit each solid footprint is at least 80% of its outline
+(area-equivalent size and widths along its axes). Against the real model, no
+trunk/root cross-section point (trees) or vertex (shrubs, rocks) is reachable by
+the walker's centre at a translated, rotated and scaled placement; approaches from
+16 directions stop within 3 cm of the model (pine_03 stops up to 7.5 cm short of
+its root hull between roots), and a command 6° into the touched face keeps
+sliding. Flower/grass profiles are non-blocking even when placed in a new
+layout; player radius is counted once. `tools/dev/dynamic_farm/fit_prop_proxies.gd`
+recomputes the solid profiles from the same meshes.
+
+For review, use the private offline preview project above, an empty output
+folder, and read-only farms from the pinned r4 dataset. For example:
+
+```sh
+godot --path "$QA" --debug-collisions --fixed-fps 30 --write-movie "$OUT/tree.avi" \
+  --script res://tools/dev/dynamic_farm/prop_contact_probe.gd -- \
+  "$FARMS/p-5402049.json" "$OUT" tree
+```
+
+Use `p-4591A011*` for rock and flower (quote the path), `p-3139019` for shrub,
+and `p-5402049` for groundcover. The probe starts the real rig beside a matched
+prop, sends scripted movement input, checks contact or passage, saves the
+contact frame and walks past it. This is not a trip from spawn or device input.
+With `--headless` (omit `--write-movie`), it verifies movement only: no pixels
+or recording are generated. All placements keep their ordinary model and pose.
