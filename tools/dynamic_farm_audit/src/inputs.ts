@@ -110,7 +110,18 @@ export interface Farm {
   stats: { core_iou: number; core_components: number; building_source: string; too_small: boolean; recovery_flags: string[] };
 }
 
-export interface GenerationReportParcel { block_id: string; core_iou: number; too_small: boolean; flags: string[]; building_count: number }
+export interface GenerationReportParcel {
+  block_id: string;
+  core_iou: number;
+  too_small: boolean;
+  flags: string[];
+  building_count: number;
+  /** Source area_ids of the farm's footprints (datasets from C-55 on; older ones have them in buildings.geojson). */
+  building_area_ids?: (number | string)[];
+}
+
+/** Files that are written next to a dataset by the host and are not listed in manifest.json. */
+export const UNLISTED_FILES = new Set(['manifest.json', 'client-manifest.json', 'tilejson.json']);
 
 export interface Dataset {
   dir: string;
@@ -120,8 +131,12 @@ export interface Dataset {
   /** Files in the dataset whose bytes differ from manifest.json, or that are missing / unlisted. */
   file_problems: string[];
   index_ids: string[];
-  /** block_id -> area_ids listed in buildings.geojson, with their coordinates. */
-  buildings: Map<string, { area_id: string; polygons: Polygon[] }[]>;
+  /**
+   * block_id -> the map layer's footprints in buildings.geojson. Older datasets carry each
+   * footprint's area_id at full precision; from C-55 on there is no area_id (null) and the
+   * geometry is rounded and simplified for the map.
+   */
+  buildings: Map<string, { area_id: string | null; polygons: Polygon[] }[]>;
   report: {
     totals: Record<string, number>;
     parcels: GenerationReportParcel[];
@@ -141,7 +156,7 @@ function listFiles(dir: string, base = ''): string[] {
 export function loadDataset(dir: string): Dataset {
   const manifest = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8')) as Dataset['manifest'];
   const problems: string[] = [];
-  const present = listFiles(dir).filter(f => f !== 'manifest.json' && f !== 'client-manifest.json').sort();
+  const present = listFiles(dir).filter(f => !UNLISTED_FILES.has(f)).sort();
   for (const f of present) {
     const want = manifest.files[f];
     if (want === undefined) problems.push(`not in manifest: ${f}`);
@@ -154,11 +169,11 @@ export function loadDataset(dir: string): Dataset {
     .map(f => f.slice('farms/'.length, -'.json'.length));
   const index = JSON.parse(readFileSync(path.join(dir, 'index.geojson'), 'utf8')) as { features: { id?: string; properties?: { block_id?: string } }[] };
   const buildingsJson = JSON.parse(readFileSync(path.join(dir, 'buildings.geojson'), 'utf8')) as { features: Feature[] };
-  const buildings = new Map<string, { area_id: string; polygons: Polygon[] }[]>();
+  const buildings = new Map<string, { area_id: string | null; polygons: Polygon[] }[]>();
   for (const f of buildingsJson.features) {
     const blockId = text(f.properties?.block_id);
     if (!buildings.has(blockId)) buildings.set(blockId, []);
-    buildings.get(blockId)!.push({ area_id: text(f.properties?.area_id), polygons: geoJsonPolygons(f.geometry) });
+    buildings.get(blockId)!.push({ area_id: text(f.properties?.area_id) || null, polygons: geoJsonPolygons(f.geometry) });
   }
   const report = JSON.parse(readFileSync(path.join(dir, 'reports/generation-report.json'), 'utf8')) as Dataset['report'];
   return {

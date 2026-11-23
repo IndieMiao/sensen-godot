@@ -51,6 +51,13 @@ export interface FixtureSpec {
   buildings: BuildingSpec[];
   farms: FarmSpec[];
   excluded?: { block_id: string; reason: string }[];
+  /**
+   * 'c55': building ids in the generation report, buildings.geojson without area_id and with
+   * coordinates rounded to 6 decimals (the lighter map layer). Default: the original layout.
+   */
+  format?: 'original' | 'c55';
+  /** Replace a building's map-layer rings (UTM metres relative to BASE), by area_id. */
+  layerRings?: Record<number, Pt[][]>;
   /** Mutations applied after the dataset is written: extra files, dropped files, report edits. */
   mutate?: (ctx: { dataset: string; report: Record<string, any>; manifest: Record<string, any>; index: any[] }) => void;
 }
@@ -106,11 +113,20 @@ export function writeFixture(spec: FixtureSpec): { snapshot: string; dataset: st
       },
     };
     files.set(`farms/${blockId}.json`, JSON.stringify(farm));
-    reportRows.push({ block_id: blockId, core_iou: farm.stats.core_iou, too_small: farm.stats.too_small, flags, building_count: f.buildings.length });
+    reportRows.push({
+      block_id: blockId, core_iou: farm.stats.core_iou, too_small: farm.stats.too_small, flags, building_count: f.buildings.length,
+      ...(spec.format === 'c55' ? { building_area_ids: f.buildings } : {}),
+    });
     index.push({ type: 'Feature', id: blockId, properties: { block_id: blockId }, geometry: null });
     for (const id of f.buildings) {
       const b = spec.buildings.find(x => x.area_id === id)!;
-      bFeatures.push({ type: 'Feature', properties: { block_id: blockId, area_id: id }, geometry: { type: 'Polygon', coordinates: lonLat(b.rings) } });
+      const rings = lonLat(spec.layerRings?.[id] ?? b.rings);
+      if (spec.format === 'c55') {
+        const r6 = (v: number) => Math.round(v * 1e6) / 1e6;
+        bFeatures.push({ type: 'Feature', properties: { block_id: blockId }, geometry: { type: 'Polygon', coordinates: rings.map(ring => ring.map(([x, y]) => [r6(x), r6(y)])) } });
+      } else {
+        bFeatures.push({ type: 'Feature', properties: { block_id: blockId, area_id: id }, geometry: { type: 'Polygon', coordinates: rings } });
+      }
     }
   }
   const report: Record<string, any> = {

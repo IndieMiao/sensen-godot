@@ -40,7 +40,7 @@ these must agree with the files actually present:
 | `farm_file_not_in_manifest` / `manifest_farm_without_file` | `farms/` on disk vs `manifest.json` |
 | `index_without_farm_file` / `farm_file_not_in_index` | `index.geojson` vs `farms/` on disk |
 | `excluded_with_farm_file` | an excluded parcel still has a farm |
-| `dataset_file_integrity` | every file's SHA-256 against `manifest.json`; unlisted or missing files |
+| `dataset_file_integrity` | every file's SHA-256 against `manifest.json` (tiles included); unlisted or missing files. `manifest.json`, `client-manifest.json` and the host-written `tilejson.json` are not listed by design |
 | `snapshot_file_integrity` | raw snapshot files against `source-manifest.json` |
 | `invalid_parcel_not_reported_rejected` / reverse | rejected parcel records agree with the audit's own invalid set |
 | `count_mismatch …` | report totals and `manifest.parcel_count` against the real counts |
@@ -52,9 +52,15 @@ and each farm's `parcel_aliases` must equal the snapshot's lots for that parcel.
 
 ## 2. Source-geometry audit (per farm)
 
-1. The farm's buildings are the `(stats.building_source, area_id)` pairs listed for it in
-   `buildings.geojson`; their **geometry is taken from the snapshot**, not from the dataset. The
-   dataset's copy must match the snapshot within `coordinate_tolerance_deg`.
+1. The farm's buildings are `(stats.building_source, area_id)` pairs; their **geometry is always
+   taken from the snapshot**, never from the dataset. Two dataset layouts are accepted:
+   - from C-55 on, the ids are `building_area_ids` in `reports/generation-report.json`, and
+     `buildings.geojson` is a lighter map layer (no `area_id`, 6 decimals, 0.1 m simplification);
+   - before that, the ids are the `area_id`s of the farm's features in `buildings.geojson`, whose
+     coordinates must then match the snapshot within `coordinate_tolerance_deg`.
+   When both carry ids they must agree. In both layouts the farm's map-layer footprints are
+   compared with the snapshot footprints by area (IoU ≥ `layer_iou_min`), so rounding and
+   simplification are tolerated while a wrong or missing building in the map is listed.
 2. Footprints are projected to UTM 10N with **proj4** (not the generator's projection), then moved
    into the farm grid: subtract `source_transform.origin_m`, rotate by `-rotation_deg` (the schema's
    convention), divide by `source_cell_m`. Cell `(x, y)` is then the unit square `[x, x+1] × [y, y+1]`.
@@ -77,7 +83,8 @@ and each farm's `parcel_aliases` must equal the snapshot's lots for that parcel.
 | `iou_delta_warn` | 0.01 | \|audited − generator IoU\| above it is listed (`iou_differs_from_generator`) |
 | `attribution_min_fraction` | 0.5 | a footprint with less of its area in its own parcel is listed |
 | `area_rel_warn` | 0.001 | union area vs the farm's `source_area_m2` differing by more is listed |
-| `coordinate_tolerance_deg` | 1e-7 | dataset building coordinates (rounded to 7 decimals) vs the snapshot |
+| `coordinate_tolerance_deg` | 1e-7 | original layout only: `buildings.geojson` coordinates (7 decimals) vs the snapshot |
+| `layer_iou_min` | 0.90 | map-layer footprints vs snapshot footprints, per farm; C-49 sample: ≥ 0.9986, C-55 layer: ≥ 0.985 |
 
 Failures: reconciliation discrepancies, IoU below `iou_exclude`, buildings or parcels missing from
 the snapshot, core runs that overlap / leave the grid / disagree with `counts.core_cell_count`, and

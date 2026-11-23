@@ -11,8 +11,10 @@ export interface AuditParams {
   attribution_min_fraction: number;
   /** Relative difference between the audited source area and the farm's source_area_m2 that is listed. */
   area_rel_warn: number;
-  /** Tolerance (degrees) when comparing buildings.geojson coordinates with the snapshot. */
+  /** Older datasets (area_id in buildings.geojson): tolerance (degrees) per coordinate against the snapshot. */
   coordinate_tolerance_deg: number;
+  /** Every dataset: IoU between a farm's map-layer footprints and its snapshot footprints below this is listed. */
+  layer_iou_min: number;
 }
 
 export const DEFAULT_AUDIT_PARAMS: AuditParams = {
@@ -22,6 +24,7 @@ export const DEFAULT_AUDIT_PARAMS: AuditParams = {
   attribution_min_fraction: 0.5,
   area_rel_warn: 0.001,
   coordinate_tolerance_deg: 1e-7,
+  layer_iou_min: 0.9,
 };
 
 export function resolveAuditParams(overrides: Record<string, unknown> = {}): AuditParams {
@@ -31,7 +34,7 @@ export function resolveAuditParams(overrides: Record<string, unknown> = {}): Aud
     if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error(`audit parameter ${key} must be a finite number`);
     (p as unknown as Record<string, number>)[key] = value;
   }
-  for (const key of ['iou_warn', 'iou_exclude', 'attribution_min_fraction'] as const) {
+  for (const key of ['iou_warn', 'iou_exclude', 'attribution_min_fraction', 'layer_iou_min'] as const) {
     if (!(p[key] >= 0 && p[key] <= 1)) throw new Error(`audit parameter ${key} must be in [0, 1]`);
   }
   if (p.iou_exclude > p.iou_warn) throw new Error('iou_exclude must not exceed iou_warn');

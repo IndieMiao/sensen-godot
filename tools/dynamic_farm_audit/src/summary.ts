@@ -8,7 +8,7 @@ export function summaryMarkdown(report: AuditReport): string {
   const lines: string[] = [];
   lines.push(`# Dynamic farm audit: ${report.status.toUpperCase()}`, '');
   lines.push(`- audit ${report.audit_version}; snapshot manifest ${report.inputs.snapshot_manifest_sha256}; dataset manifest ${report.inputs.dataset_manifest_sha256}`);
-  lines.push(`- thresholds: IoU warning < ${p.iou_warn}, exclusion < ${p.iou_exclude}, generator IoU difference > ${p.iou_delta_warn}, building inside its parcel < ${p.attribution_min_fraction}, source area difference > ${p.area_rel_warn * 100}%`, '');
+  lines.push(`- thresholds: IoU warning < ${p.iou_warn}, exclusion < ${p.iou_exclude}, generator IoU difference > ${p.iou_delta_warn}, building inside its parcel < ${p.attribution_min_fraction}, source area difference > ${p.area_rel_warn * 100}%, map building layer vs snapshot IoU < ${p.layer_iou_min}`, '');
   lines.push('## Id reconciliation', '');
   const c = rec.counts;
   lines.push(`- valid input parcels ${c.input_valid} = generated ${c.generated} + excluded ${c.excluded}: ${c.input_valid === c.generated + c.excluded ? 'yes' : 'NO'}`);
@@ -26,6 +26,8 @@ export function summaryMarkdown(report: AuditReport): string {
   lines.push(`- below warning line: ${list(s.below_warning.map(f => `${f.block_id} ${f.iou.toFixed(4)}`))}`);
   lines.push(`- IoU differs from generator: ${list(s.iou_differs_from_generator.map(f => `${f.block_id} ${f.iou.toFixed(4)} vs ${f.reported_iou}`))}`);
   lines.push(`- components/holes differ (source vs core): ${list(s.topology_differs.map(f => `${f.block_id} ${f.source.join('/')} vs ${f.core.join('/')}`))}`);
+  const bl = s.building_layer;
+  lines.push(`- building list from: ${Object.entries(bl.ids_from).map(([k, v]) => `${k} ${v}`).join(', ')}; map building layer vs snapshot IoU min ${bl.min_layer_iou ?? 'n/a'}, below threshold: ${list(bl.below_threshold.map(f => `${f.block_id} ${f.layer_iou.toFixed(4)}`))}`);
   lines.push(`- buildings outside / mostly in another parcel: ${list(s.attribution_findings.map(b => `${b.block_id} #${b.area_id} own ${b.share_in_parcel}, ${b.best_other_parcel ?? '-'} ${b.best_other_share}, none ${b.share_outside_parcels}`))}`);
   lines.push(`- issues: ${Object.entries(s.issues).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}`);
   lines.push('', '## Flags', '');

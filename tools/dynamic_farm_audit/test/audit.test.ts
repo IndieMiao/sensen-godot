@@ -118,6 +118,48 @@ describe('IoU recomputed from source polygons and output cells', () => {
   });
 });
 
+describe('dataset formats', () => {
+  it('reads building ids from the generation report and accepts the rounded map layer (C-55)', () => {
+    const r = run({ ...squareSpec(), format: 'c55' });
+    expect(r.status).toBe('pass');
+    expect(r.farms[0]).toMatchObject({ building_ids_from: 'generation_report', building_area_ids: ['11'], issues: [] });
+    expect(r.farms[0].iou).toBeCloseTo(1, 6);
+    expect(r.farms[0].layer_iou!).toBeGreaterThan(0.95);
+    expect(r.summary.building_layer.ids_from).toEqual({ generation_report: 1 });
+  });
+
+  it('takes the ids from buildings.geojson in the original layout and checks exact coordinates', () => {
+    const r = run(squareSpec());
+    expect(r.farms[0]).toMatchObject({ building_ids_from: 'buildings_layer', building_area_ids: ['11'] });
+    expect(r.farms[0].layer_iou).toBeCloseTo(1, 6);
+    const moved = run({ ...squareSpec(), layerRings: { 11: [rect(1, 1, 6, 6.05)] } });
+    expect(moved.farms[0].issues).toEqual(['building_geometry_differs']);
+  });
+
+  it('computes IoU from the snapshot, not from the map layer', () => {
+    // The layer shows the building 3 m away; the core still matches the snapshot footprint.
+    const r = run({ ...squareSpec(), format: 'c55', layerRings: { 11: [rect(4, 1, 9, 6)] } });
+    expect(r.farms[0].iou).toBeCloseTo(1, 6);
+    expect(r.farms[0].layer_iou).toBeCloseTo(10 / 40, 2); // 6-decimal rounding moves it slightly
+    expect(r.farms[0].issues).toEqual(['building_layer_differs']);
+    expect(r.summary.building_layer.below_threshold.map(f => f.block_id)).toEqual(['p-1000001']);
+  });
+
+  it('lists report ids that disagree with the layer ids', () => {
+    const r = run({ ...squareSpec(), mutate: ({ report }) => { report.parcels[0].building_area_ids = [12]; } });
+    expect(r.farms[0].building_ids_from).toBe('generation_report');
+    expect(r.farms[0].issues).toEqual(expect.arrayContaining(['building_ids_differ_report_vs_layer', 'building_missing_in_snapshot']));
+    expect(r.status).toBe('fail');
+  });
+
+  it('does not treat the host-written tilejson.json as an unlisted file', () => {
+    const { snapshot, dataset } = writeFixture({ ...squareSpec(), format: 'c55' });
+    writeFileSync(path.join(dataset, 'tilejson.json'), '{}');
+    const r = auditDataset(loadSnapshot(snapshot), loadDataset(dataset), 'x', DEFAULT_AUDIT_PARAMS);
+    expect(r.reconciliation.consistent).toBe(true);
+  });
+});
+
 describe('flags', () => {
   it('counts farms carrying both cell_scaled_for_total_cap and too_small separately', () => {
     const base = squareSpec();

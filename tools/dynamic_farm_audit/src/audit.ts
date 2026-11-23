@@ -9,7 +9,7 @@ import {
   gridTransform, intersectionArea, lonLatToUtm, mapPolygons, maskTopology, multiArea,
   runsIntersectionArea, topology, unionAll, type Pair, type Polygon,
 } from './geometry.js';
-import { buildingKey, type Dataset, type Farm, type SourceSnapshot } from './inputs.js';
+import { buildingKey, type Dataset, type Farm, type GenerationReportParcel, type SourceSnapshot } from './inputs.js';
 import { reconcile, type Reconciliation } from './reconcile.js';
 
 export const AUDIT_VERSION = 'dynamic-farm-audit-1';
@@ -22,6 +22,10 @@ export interface FarmAudit {
   issues: string[];
   building_source: string;
   building_area_ids: string[];
+  /** Where the building list came from. */
+  building_ids_from: 'generation_report' | 'buildings_layer' | 'none';
+  /** IoU between the farm's footprints in buildings.geojson and the snapshot footprints (null without layer features). */
+  layer_iou: number | null;
   cell_m: number;
   rotation_deg: number;
   /** Area of the union of the source footprints (m²). */
@@ -157,25 +161,38 @@ export function coreMask(farm: Farm): { mask: Uint8Array; cells: number; bad_run
 }
 
 export function auditFarm(farm: Farm, snapshot: SourceSnapshot, dataset: Pick<Dataset, 'buildings'>,
-  reportRow: { core_iou: number } | undefined, p: AuditParams, lookup?: ParcelLookup): FarmAudit {
+  reportRow: Pick<GenerationReportParcel, 'core_iou' | 'building_area_ids'> | undefined, p: AuditParams, lookup?: ParcelLookup): FarmAudit {
   const issues: string[] = [];
   const fail = new Set<string>();
   const add = (code: string, isFail = false) => { if (!issues.includes(code)) issues.push(code); if (isFail) fail.add(code); };
   const source = farm.stats.building_source;
-  const listed = dataset.buildings.get(farm.block_id) ?? [];
-  if (listed.length === 0) add('no_buildings_listed', true);
+  const layer = dataset.buildings.get(farm.block_id) ?? [];
+  const layerIds = layer.every(b => b.area_id !== null) ? layer.map(b => b.area_id as string) : null;
+  const reportIds = reportRow?.building_area_ids?.map(String) ?? null;
+  // Which source footprints the farm used: the generation report (C-55 on), else the layer's area_ids.
+  const ids = reportIds ?? layerIds ?? [];
+  const idsFrom: FarmAudit['building_ids_from'] = reportIds ? 'generation_report' : layerIds && layer.length ? 'buildings_layer' : 'none';
+  if (ids.length === 0) add('no_buildings_listed', true);
+  if (reportIds && layerIds && layer.length && [...reportIds].sort().join() !== [...layerIds].sort().join()) add('building_ids_differ_report_vs_layer');
+  if (layer.length !== ids.length) add('building_layer_count_differs');
   const hint = farm.geo_hints?.source_building_count;
-  if (hint !== undefined && hint !== listed.length) add('building_count_differs');
+  if (hint !== undefined && hint !== ids.length) add('building_count_differs');
 
   const footprints: Polygon[][] = [];
   const footprintIds: string[] = [];
-  for (const b of listed) {
-    const found = snapshot.buildings.get(buildingKey(source, b.area_id)) ?? [];
+  for (const id of ids) {
+    const found = snapshot.buildings.get(buildingKey(source, id)) ?? [];
     if (found.length === 0) { add('building_missing_in_snapshot', true); continue; }
     if (found.length > 1) add('building_ambiguous_in_snapshot', true);
-    if (!sameCoordinates(found[0].polygons, b.polygons, p.coordinate_tolerance_deg)) add('building_geometry_differs');
     footprints.push(found[0].polygons);
-    footprintIds.push(b.area_id);
+    footprintIds.push(id);
+  }
+  // Older layers keep each footprint at full precision, so its coordinates must match the snapshot.
+  if (layerIds) {
+    for (const b of layer) {
+      const found = snapshot.buildings.get(buildingKey(source, b.area_id as string)) ?? [];
+      if (found.length > 0 && !sameCoordinates(found[0].polygons, b.polygons, p.coordinate_tolerance_deg)) add('building_geometry_differs');
+    }
   }
 
   const cell = farm.source_cell_m;
@@ -186,6 +203,15 @@ export function auditFarm(farm: Farm, snapshot: SourceSnapshot, dataset: Pick<Da
   const cellArea = cell * cell;
   const sourceArea = multiArea(shape);
   const sourceTopo = topology(shape);
+  // The map layer (rounded / simplified from C-55 on) must still show these footprints.
+  let layerIou: number | null = null;
+  if (layer.length > 0) {
+    const layerShape = unionAll(layer.flatMap(b => project(b.polygons)));
+    const li = intersectionArea(shape, layerShape);
+    const lu = sourceArea + multiArea(layerShape) - li;
+    layerIou = lu > 0 ? li / lu : 0;
+    if (layerIou < p.layer_iou_min) add('building_layer_differs');
+  }
 
   const core = coreMask(farm);
   if (core.bad_runs > 0 || core.cells !== farm.counts.core_cell_count) add('core_runs_count_mismatch', true);
@@ -219,7 +245,9 @@ export function auditFarm(farm: Farm, snapshot: SourceSnapshot, dataset: Pick<Da
     level: fail.size > 0 ? 'fail' : issues.length > 0 ? 'warn' : 'ok',
     issues,
     building_source: source,
-    building_area_ids: listed.map(b => b.area_id),
+    building_area_ids: ids,
+    building_ids_from: idsFrom,
+    layer_iou: layerIou === null ? null : r(layerIou),
     cell_m: cell,
     rotation_deg: farm.source_transform.rotation_deg,
     source_area_m2: r(sourceAreaM2, 2),
@@ -244,6 +272,7 @@ export function auditFarm(farm: Farm, snapshot: SourceSnapshot, dataset: Pick<Da
 function unreadable(blockId: string, message: string): FarmAudit {
   return {
     block_id: blockId, level: 'fail', issues: [`farm_unreadable: ${message}`], building_source: '', building_area_ids: [],
+    building_ids_from: 'none', layer_iou: null,
     cell_m: 0, rotation_deg: 0, source_area_m2: 0, reported_source_area_m2: 0, source_components: 0, source_holes: 0,
     core_cells: 0, core_components: 0, core_holes: 0, reported_core_components: 0, iou: 0, reported_iou: 0,
     report_iou: null, iou_delta: 0, buildings: [], too_small: false, flags: [],
@@ -266,6 +295,11 @@ export interface AuditReport {
     below_exclusion: { block_id: string; iou: number }[];
     iou_differs_from_generator: { block_id: string; iou: number; reported_iou: number; delta: number }[];
     topology_differs: { block_id: string; source: [number, number]; core: [number, number] }[];
+    building_layer: {
+      ids_from: Record<string, number>;
+      min_layer_iou: number | null;
+      below_threshold: { block_id: string; layer_iou: number }[];
+    };
     attribution_findings: { block_id: string; area_id: string; share_in_parcel: number; best_other_parcel: string | null; best_other_share: number; share_outside_parcels: number }[];
     flags: Record<string, number>;
     too_small: number;
@@ -301,6 +335,7 @@ export function auditDataset(snapshot: SourceSnapshot, dataset: Dataset, dataset
     log(`${blockId}: iou ${a.iou.toFixed(4)} (generator ${a.reported_iou}) ${a.level}${a.issues.length ? ` ${a.issues.join(',')}` : ''}`);
   }
   const ious = farms.map(f => f.iou);
+  const layerIous = farms.flatMap(f => (f.layer_iou === null ? [] : [f.layer_iou]));
   const deltas = farms.map(f => f.iou_delta);
   const levels: Record<Level, number> = { ok: 0, warn: 0, fail: 0 };
   const issues: Record<string, number> = {};
@@ -336,6 +371,11 @@ export function auditDataset(snapshot: SourceSnapshot, dataset: Dataset, dataset
         .map(f => ({ block_id: f.block_id, iou: f.iou, reported_iou: f.reported_iou, delta: f.iou_delta })),
       topology_differs: farms.filter(f => f.source_components !== f.core_components || f.source_holes !== f.core_holes)
         .map(f => ({ block_id: f.block_id, source: [f.source_components, f.source_holes] as [number, number], core: [f.core_components, f.core_holes] as [number, number] })),
+      building_layer: {
+        ids_from: sortKeys(farms.reduce((o, f) => ({ ...o, [f.building_ids_from]: (o[f.building_ids_from] ?? 0) + 1 }), {} as Record<string, number>)),
+        min_layer_iou: layerIous.length ? r(Math.min(...layerIous)) : null,
+        below_threshold: farms.filter(f => f.issues.includes('building_layer_differs')).map(f => ({ block_id: f.block_id, layer_iou: f.layer_iou ?? 0 })),
+      },
       attribution_findings: farms.flatMap(f => f.buildings
         .filter(b => b.share_in_parcel < p.attribution_min_fraction || (b.best_other_parcel !== null && b.best_other_share > b.share_in_parcel + 1e-3))
         .map(b => ({ block_id: f.block_id, area_id: b.area_id, share_in_parcel: b.share_in_parcel, best_other_parcel: b.best_other_parcel, best_other_share: b.best_other_share, share_outside_parcels: b.share_outside_parcels }))),
