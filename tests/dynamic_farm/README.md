@@ -48,6 +48,17 @@ Android first; unsupported platforms show a clear message, without a fake map.
 
 ## Tests
 
+CI (C-62): the Cardigan check's `dynamic_farm` step runs `tools/ci/dynamic_farm_tests.sh`.
+It runs every `test_*.gd` here with `--headless --script` in the imported project, each
+under its own timeout (`DYNAMIC_FARM_TIMEOUT`, default 180 s; a hang is killed and fails),
+and passes the four pinned r4 parcels in `fixtures/r4/` after `--`. A file passes only with
+exit 0, no `SCRIPT ERROR`, and a summary line with a non-zero check count and no failures.
+`test_read_retries_https.gd` gets a loopback TLS fixture with throwaway certificates.
+Anything that cannot run is listed under "Skipped" in the job summary, never as passed
+(currently `test_mesh_edges.gd --legacy`, whose old mesh script is not in the repository).
+Locally: `tools/run_tests.sh --ci-import` once, then `tools/ci/dynamic_farm_tests.sh [test_name…]`.
+
+
 Run prepare_isolated.py with a fresh external target. It copies exact scripts and
 writes SHA256 records, without autoloads, service config, credentials or tokens.
 Any Godot/device/build run needs a new explicit resource window and absolute
