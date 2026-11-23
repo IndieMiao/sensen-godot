@@ -147,7 +147,6 @@ func _ready() -> void:
 			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
 		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas)
 		_hint.hide()
-		_farming.enter()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -225,6 +224,9 @@ func _process(delta: float) -> void:
 			_summary.shadows = _shade.metrics.duplicate(true)
 			_summary.ready_ms = Time.get_ticks_msec() - _started_ms
 			preview_ready.emit(_summary.duplicate(true))
+			# Only once the scene is up: building it stalls the main thread for seconds, and an
+			# HTTP request started during that stall times out (V-123).
+			if _farming != null: _farming.enter()
 		elif Time.get_ticks_msec() - _started_ms > 15000:
 			_fail("The farm preview could not finish loading.")
 		return

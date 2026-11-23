@@ -14,12 +14,19 @@ var dir := ""
 var shift := [0]
 var scene
 
-## Fails the first entry like a dropped connection, then answers from the local save.
+## Fails the first `failures` entries like a dropped connection, then answers from the local save.
 class FlakyStore extends RefCounted:
 	var inner: RefCounted
-	var failures := 1
-	func _init(p_inner: RefCounted) -> void: inner = p_inner
+	var failures := 0
+	var calls := 0
+	var first_call_ready := false
+	var scene: Node
+	func _init(p_inner: RefCounted, p_failures: int) -> void:
+		inner = p_inner
+		failures = p_failures
 	func enter() -> Dictionary:
+		if calls == 0 and scene != null: first_call_ready = scene._ready_sent
+		calls += 1
 		if failures > 0:
 			failures -= 1
 			return {"ok": false, "code": "NETWORK", "index": 0}
@@ -54,6 +61,7 @@ func _store() -> RefCounted:
 func _open(store: RefCounted = null) -> Node:
 	scene = (load(SCENE_PATH) as PackedScene).instantiate()
 	scene.setup({"farm": raw, "dataset": raw.dataset_version, "block_id": raw.block_id, "own_parcel": true, "farm_store": store if store != null else _store()})
+	if store is FlakyStore: store.scene = scene
 	var state := {"ready": false}
 	scene.preview_ready.connect(func(_summary): state.ready = true)
 	scene.preview_error.connect(func(message): push_error(message))
@@ -94,7 +102,9 @@ func _first_visit() -> void:
 	var file := FileAccess.open(dir.path_join(raw.block_id.validate_filename() + ".json"), FileAccess.WRITE)
 	file.store_string(JSON.stringify({"block_id": raw.block_id, "farm_version": 0, "farm": seeded}))
 	file.close()
-	var farming := await _open(FlakyStore.new(_store()))
+	var flaky := FlakyStore.new(_store(), 2)
+	var farming := await _open(flaky)
+	_check(flaky.calls == 2 and flaky.first_call_ready, "entry starts once the scene is up and retries a lost request once")
 	_check(farming.farm.is_empty() and farming._key.visible and farming._key.verb == "Retry", "a failed entry offers Retry")
 	farming._key.pressed_down.emit()
 	await process_frame
@@ -155,7 +165,9 @@ func _first_visit() -> void:
 
 func _reopen() -> void:
 	shift[0] += 20000
-	var farming := await _open()
+	var flaky := FlakyStore.new(_store(), 1)
+	var farming := await _open(flaky)
+	_check(flaky.calls == 2 and not farming.unavailable and farming._key.verb != "Retry", "one lost entry request is retried without Retry")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
 	_check(not farming._toast.current_text().begins_with("Received"), "no second gift toast")
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")

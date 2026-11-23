@@ -86,6 +86,8 @@ func enter() -> void:
 		return
 	busy = true
 	var result: Dictionary = await store.enter()
+	# Entering twice is safe (the gift is granted once); a lost request is retried once before Retry shows.
+	if result.get("code") == "NETWORK" and is_inside_tree(): result = await store.enter()
 	busy = false
 	if not is_inside_tree(): return
 	_adopt(result)
