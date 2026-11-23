@@ -17,10 +17,11 @@ BUILD_DIR="$REPO_ROOT/android/build"
 OVERLAY="$REPO_ROOT/tools/android/overlay"
 
 if [ ! -f "$TEMPLATE_ZIP" ]; then
-    echo "找不到 $TEMPLATE_ZIP（先在 Godot 里安装 4.7.2 导出模板）" >&2
+    echo "找不到 ${TEMPLATE_ZIP}（先在 Godot 里安装 4.7.2 导出模板）" >&2
     exit 1
 fi
 
+python3 "$REPO_ROOT/tools/android/check_export_inputs.py" template "$TEMPLATE_ZIP"
 mkdir -p "$BUILD_DIR"
 touch "$REPO_ROOT/android/.gdignore" # 防止 Godot 导入模板内的 res 资源
 unzip -oq "$TEMPLATE_ZIP" -d "$BUILD_DIR"
