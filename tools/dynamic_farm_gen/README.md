@@ -126,6 +126,11 @@ A full city cannot ship as one index.geojson, so the dataset uses the r4 map for
   polygon inside the parcel's bounds, lists coverage and missing parcels per zoom and **fails if
   any parcel is missing at the maximum zoom**. `--report` writes the JSON report (decoder and Node
   versions included), `--properties` the decoded maximum-zoom properties for the Godot check.
+  `cli validate` on a dataset without `manifest.map_layer` and without tiles (r4, the GeoJSON-only
+  r5 of C-49) skips this check and says so; tiles without `map_layer` count as a failure.
+- **Client whitelist** (`godot/check_public_keys.sh`, run first by `check_client_decode.sh`):
+  `check_decode.gd`'s `PUBLIC_KEYS` must list exactly `ParcelPayload.propertyKeys`
+  (`tools/android/overlay/ParcelPayload.kt`), the properties the native map hands to GDScript.
 - **Building layer** (`src/buildings.ts`): stays GeoJSON (the only building format the client
   reads), one feature per used footprint so a tap still highlights that building, `block_id` only
   (the source `area_id`s are in the generation report), lon/lat rounded to 6 decimals (~0.1 m) and

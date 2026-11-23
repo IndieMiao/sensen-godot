@@ -14,6 +14,8 @@ range='if counts.core < 760 or counts.core > 840:'
 meta_range='raw.core_cell_count<760 or raw.core_cell_count>840 or '
 grep -qF "$range" "$src" || { echo "core range check not found in farm_data.gd" >&2; exit 2; }
 grep -qF "$meta_range" "$root/modules/dynamic_farm/map/parcel_metadata.gd" || { echo "core range check not found in parcel_metadata.gd" >&2; exit 2; }
+# check_decode.gd copies the native map's property whitelist; fail as soon as the client's list changes.
+"$(dirname "$0")/check_public_keys.sh" "$root/tools/android/overlay/ParcelPayload.kt" "$(dirname "$0")/check_decode.gd"
 
 # GDScript cannot decode MVT: decode every parcel tile here (independent decoder, cli check-tiles)
 # and hand the maximum-zoom feature properties to the client's parser below.

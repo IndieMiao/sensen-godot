@@ -34,7 +34,10 @@ function need(a: Record<string, string>, key: string): string {
   return a[key];
 }
 
-/** Validates every file hash, farm, index feature and parcel tile of a written dataset; returns the number of failures. */
+/**
+ * Validates every file hash, farm, index feature and parcel tile of a written dataset; returns the number of failures.
+ * A dataset without manifest.map_layer and without tiles predates the map layer: its tile check is skipped and logged.
+ */
 export function validateDataset(dir: string, range = RELAXED, log = console.log): number {
   const manifest = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
   let failures = 0;
@@ -42,8 +45,11 @@ export function validateDataset(dir: string, range = RELAXED, log = console.log)
     const body = readFileSync(path.join(dir, file));
     if (sha256(body) !== hash) { log(`HASH ${file}`); failures++; }
   }
-  const client = JSON.parse(readFileSync(path.join(dir, 'client-manifest.json'), 'utf8'));
-  if (client.source_manifest_sha256 !== sha256(readFileSync(path.join(dir, 'manifest.json'), 'utf8'))) { log('HASH manifest.json'); failures++; }
+  const clientFile = path.join(dir, 'client-manifest.json');
+  if (!existsSync(clientFile)) { log('MISSING client-manifest.json'); failures++; } else {
+    const client = JSON.parse(readFileSync(clientFile, 'utf8'));
+    if (client.source_manifest_sha256 !== sha256(readFileSync(path.join(dir, 'manifest.json'), 'utf8'))) { log('HASH manifest.json'); failures++; }
+  }
   const index = JSON.parse(readFileSync(path.join(dir, 'index.geojson'), 'utf8'));
   for (const feature of index.features) {
     const error = checkParcelProperties(feature.properties, range);
@@ -52,9 +58,16 @@ export function validateDataset(dir: string, range = RELAXED, log = console.log)
     const result = decodeFarm(farm, range);
     if (!result.ok) { log(`FARM ${feature.properties.block_id}: ${result.error}`); failures++; }
   }
-  const tiles = checkTiles(dir).report;
-  logTileReport(tiles, log);
-  failures += tiles.error_count;
+  if (manifest.map_layer?.parameters) {
+    const tiles = checkTiles(dir).report;
+    logTileReport(tiles, log);
+    failures += tiles.error_count;
+  } else if (Object.keys(manifest.files).some(name => name.startsWith('tiles/')) || existsSync(path.join(dir, 'tiles'))) {
+    log('TILE manifest.json has parcel tiles but no map_layer'); failures++;
+  } else {
+    // Datasets from before the r5 map layer (r4, C-49's GeoJSON-only r5) have no tiles to check.
+    log('tiles skipped: manifest.json has no map_layer (dataset predates the parcel map layer)');
+  }
   log(`${index.features.length} farms checked, ${failures} failures`);
   return failures;
 }
