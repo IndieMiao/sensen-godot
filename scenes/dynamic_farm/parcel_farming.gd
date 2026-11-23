@@ -32,7 +32,7 @@ var unavailable := false
 var _data: Dictionary
 var _walk: RefCounted
 var _core_plan: Dictionary
-var _recipe = null
+var _recipe: Variant
 var _core_root: Node3D
 var _proxies: Array = []
 var _obstacles := {}
@@ -50,7 +50,7 @@ var _ui: Control
 var _redraw_left := 0.0
 var _names := {}
 
-## `core` is the scene's built core obstacle layer: {plan, root, proxies, recipe}.
+## `core` is the scene's built core obstacle layer: {plan, root, proxies, recipe?}.
 func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: RefCounted, canvas: CanvasLayer) -> void:
 	_data = data
 	_walk = walk
@@ -87,6 +87,8 @@ func enter() -> void:
 		return
 	busy = true
 	var result: Dictionary = await store.enter()
+	# Entering twice is safe (the gift is granted once); a lost request is retried once before Retry shows.
+	if result.get("code") == "NETWORK" and is_inside_tree(): result = await store.enter()
 	busy = false
 	if not is_inside_tree(): return
 	_adopt(result)
