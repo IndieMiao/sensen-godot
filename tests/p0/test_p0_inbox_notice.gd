@@ -22,9 +22,13 @@ func _ui() -> P0Ui:
 
 func test_the_card_hangs_under_the_bell_for_two_seconds() -> void:
 	var ui: P0Ui = await _ui()
+	# C-50: frames are stepped by hand below. Real frames spent the 2 s too: a slow setup frame (≥ 0.1 s, as on a
+	# loaded Linux runner) hid the card before the check at 1.9 s.
+	ui.set_process(false)
 	ui.inbox_notice_when_clear(SPEC)
 	await await_idle_frame()
 	await await_idle_frame()
+	ui._process(0.0)   # the per-frame placement, after the HUD has laid out
 	assert_dict(ui.inbox_notice_shown()).is_equal(SPEC)
 	var card := ui.inbox_notice_card()
 	# BAG-5-2: x 68 y 110 of 360 × 800 — the right edge on the bell's, 12 under the HUD's two rows.

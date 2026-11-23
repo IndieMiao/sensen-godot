@@ -48,3 +48,23 @@ tools/run_tests.sh --ci-import
 for suite in p0 ui_kit; do
   tools/run_tests.sh --ci-headless "res://tests/$suite"
 done
+
+# C-50: a failing case fails the step with Godot's own status, and the rest of its suite still runs and counts.
+cat > tests/p0/test_fails.gd <<'EOF'
+extends GdUnitTestSuite
+
+func test_a_fails() -> void:
+    assert_bool(false).is_true()
+
+func test_b_still_runs() -> void:
+    assert_bool(true).is_true()
+EOF
+rc=0
+tools/run_tests.sh --ci-headless res://tests/p0 >gate.log 2>&1 || rc=$?
+if [[ $rc != 100 ]] || ! LC_ALL=C sed -E $'s/\033\\[[0-9;]*m//g' gate.log |
+    grep -Fq 'Overall Summary: 3 test cases | 0 errors | 1 failures |'; then
+  cat gate.log >&2
+  echo "Expected a failing p0 to exit 100 with all 3 cases run; exit=$rc" >&2
+  exit 1
+fi
+echo "Confirmed failure (exit $rc): 3 test cases, 1 failure"
