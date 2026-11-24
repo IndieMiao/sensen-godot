@@ -1,7 +1,8 @@
 /**
  * 动态农场地块接口（C-31）。身份沿用 /v1/auth 的 Bearer token：读接口游客也能用，
  * 认领、地块内命令和放弃需要账号（开发服 GUEST_WRITES=1 时游客也可写），与 /v1/farms 一致。
- * 接口与表结构说明见 docs/plans/C-31.md。
+ * 装上即建号（C-100，PARCEL_GUEST_WRITES=1）只放开认领、进入（发赠品）和地块内命令（存档、市场、木匠）给游客；
+ * 放弃重选和 Journey 其它写接口不变。接口与表结构说明见 docs/plans/C-31.md、docs/plans/C-100.md。
  */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
@@ -15,6 +16,8 @@ export interface ParcelRouteDeps {
   now: () => number;
   /** “放弃并重选”只在内部测试服打开（DYNAMIC_FARM_RESELECT=1）；正式配置不设，调用被拒。 */
   reselect: boolean;
+  /** 装上即建号（C-100，PARCEL_GUEST_WRITES=1）：游客也能认领、进入和存档；默认关，对外开放由所有者另定。 */
+  guestWrites?: boolean;
 }
 
 interface Auth {
@@ -24,6 +27,12 @@ interface Auth {
 
 /** 只有显式 DYNAMIC_FARM_RESELECT=1 才打开“放弃并重选”；没设、设成别的值都按正式配置关闭。 */
 export const parcelReselectFromEnv = (env: Record<string, string | undefined>): boolean => env.DYNAMIC_FARM_RESELECT === '1';
+
+/** PARCEL_GUEST_WRITES：不设、空或 0 为关，1 为开；其它值返回 null，进程拒绝启动，免得拼错后悄悄开放。 */
+export function parcelGuestWritesFromEnv(env: Record<string, string | undefined>): boolean | null {
+  const raw = env.PARCEL_GUEST_WRITES ?? '';
+  return raw === '1' ? true : raw === '' || raw === '0' ? false : null;
+}
 
 export const PARCEL_ID_RE = /^p-[A-Za-z0-9_*-]{1,98}$/;
 export const MAX_IDS = 200;
@@ -54,6 +63,12 @@ const parcelView = (p: OwnedParcel) => ({
 
 export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps, { auth, writer }: Auth): void {
   const now = deps.now;
+  /** 认领、进入、地块内命令用它：装上即建号打开时游客也能写自己的地块；关着时与其它写接口一样要账号。 */
+  const parcelWriter: Auth['writer'] = !deps.guestWrites ? writer : async (req, reply) => {
+    const p = await auth(req);
+    if (!p) { reply.code(401).send({ code: 'UNAUTHENTICATED' }); return null; }
+    return p;
+  };
 
   app.get('/v1/parcels/mine', async (req, reply) => {
     const p = await auth(req);
@@ -65,7 +80,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
   /** 认领：每人一块免费地，只能认领无主地块，认领后永久归属。重复认领自己那块返回 200。
    * 认领只建空农场；赠品在首次进入（/mine/enter）时发。 */
   app.post('/v1/parcels/claim', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req, reply) => {
-    const p = await writer(req, reply);
+    const p = await parcelWriter(req, reply);
     if (!p) return;
     const b = req.body as { dataset_version?: unknown; parcel_id?: unknown; center?: unknown } | undefined;
     const center = parseCenter(b?.center);
@@ -120,7 +135,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
    * granted=true；之后重开、重试都只返回当前状态，granted=false，不重发。
    */
   app.post('/v1/parcels/mine/enter', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req, reply) => {
-    const p = await writer(req, reply);
+    const p = await parcelWriter(req, reply);
     if (!p) return;
     const at = now();
     const out = await deps.store.enter(p.id, farm => welcome(deps.rules, farm, at), at);
@@ -134,7 +149,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
    * 采集的“是否自家地块”按行锁内那一行的 parcel_id 判断，不看请求体。
    */
   app.post('/v1/parcels/mine/commands', { config: { rateLimit: { max: 240, timeWindow: '1 minute' } } }, async (req, reply) => {
-    const p = await writer(req, reply);
+    const p = await parcelWriter(req, reply);
     if (!p) return;
     const b = req.body as { base_version?: unknown; commands?: unknown } | undefined;
     const commands = parseFarmCommands(b?.commands);

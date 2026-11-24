@@ -130,10 +130,11 @@ class WorkerAPK(unittest.TestCase):
             self.assertEqual(internal[key], TARGET)
             self.assertEqual(isolated[key], farm.DISABLED)
             self.assertNotIn(release[key], (TARGET, farm.DISABLED))
-        self.assertIs(internal['sensen/network/online_qa'], True)  # Net never boots or signs in anonymously.
+        self.assertIs(internal['sensen/network/online_qa'], True)  # Net never boots; only the map's guest_play signs in.
         self.assertIs(isolated['sensen/network/online_qa'], True)
         self.assertNotIn('sensen/network/online_qa', release)
-        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/account_restore', 'sensen/dynamic_farm/own_farm'):
+        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/account_restore', 'sensen/dynamic_farm/own_farm',
+                    'sensen/dynamic_farm/guest_play'):
             self.assertIs(internal[key], True)
             self.assertNotIn(key, isolated)
             self.assertNotIn(key, release)
@@ -159,7 +160,9 @@ class WorkerAPK(unittest.TestCase):
         self.assertIs(release['sensen/network/online_qa'], True)
         for key in ('sensen/dynamic_farm/own_farm', 'sensen/dynamic_farm/account_restore', 'sensen/account/invite_only'):
             self.assertIs(release[key], True)
-        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/fake_claims', 'sensen/dynamic_farm/local_farm_save'):
+        # Install-and-play (C-100) stays out until the owner decides to open it.
+        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/fake_claims', 'sensen/dynamic_farm/local_farm_save',
+                    'sensen/dynamic_farm/guest_play'):
             self.assertNotIn(key, release)
         # The 0.4.1 preview's user directory, which this package replaces in place.
         self.assertEqual(release['application/config/custom_user_dir_name'],
@@ -210,6 +213,7 @@ class WorkerAPK(unittest.TestCase):
                 self.assertEqual(config['variant'], variant)
                 internal, release = variant == 'dynamic-farm-internal', variant == 'dynamic-farm-release'
                 self.assertEqual(config['reselect'], internal)
+                self.assertEqual(config['guest_play'], internal)
                 self.assertEqual((config['account_restore'], config['own_farm']), (internal or release,) * 2)
                 self.assertEqual(config['invite_only'], release)
                 self.assertEqual(config['journey_mobile_base_url'] == TARGET, internal)
@@ -228,6 +232,9 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/account_restore': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/own_farm': False})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/guest_play': False})),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/dynamic_farm/guest_play': True})),
+               ('android', dict(exported_settings('android'), **{'sensen/dynamic_farm/guest_play': True})),
                ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/dynamic_farm/own_farm': True})),
                ('android', dict(exported_settings('android'), **{'sensen/dynamic_farm/own_farm': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/fake_claims': True})),
@@ -245,6 +252,8 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm-internal', release), ('android', release),
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/reselect': False})),
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/reselect': True})),
+               ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/guest_play': True})),
+               ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/guest_play': False})),
                ('dynamic-farm-release', dict(release, **{'sensen/account/invite_only': False})),
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/own_farm': False})),
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/account_restore': False})),

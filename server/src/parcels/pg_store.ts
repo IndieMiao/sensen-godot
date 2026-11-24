@@ -6,7 +6,7 @@
  */
 import type pg from 'pg';
 import type { FarmOutcome, ParcelFarmState } from './farm.js';
-import { sameParcel, type ClaimOutcome, type EnterOutcome, type FarmUpdateOutcome, type OwnedParcel, type OwnerQuery, type ParcelClaim, type ParcelStore } from './store.js';
+import { sameParcel, type ClaimOutcome, type EnterOutcome, type FarmUpdateOutcome, type OwnedParcel, type OwnerQuery, type ParcelClaim, type ParcelStore, type ReclaimedParcel } from './store.js';
 
 const rowToParcel = (r: Record<string, unknown>): OwnedParcel => ({
   community_id: r.community_id as string,
@@ -109,5 +109,35 @@ export class PgParcelStore implements ParcelStore {
   async abandon(playerId: string) {
     const r = await this.pool.query("DELETE FROM parcel_claims WHERE player_id = $1 AND kind = 'free' RETURNING *", [playerId]);
     return r.rows[0] ? rowToParcel(r.rows[0]) : null;
+  }
+
+  /**
+   * 一条语句完成挑选、删除和存档：挑选时锁住地块行（SKIP LOCKED，正在写的跳过），删除和写入 parcel_reclaims 同在这一条语句里，
+   * 要么都成，要么都不成。最后活动时间 = GREATEST(players.last_seen_at, 该玩家 token 的最大 last_used_at)；
+   * 两者都早于 cutoff 才算闲置，tokens 有 (player_id, last_used_at) 索引。
+   */
+  async reclaimIdle(cutoff: number, now: number, limit: number): Promise<ReclaimedParcel[]> {
+    const r = await this.pool.query(
+      `WITH idle AS (
+         SELECT c.community_id, c.layer, c.parcel_id,
+                GREATEST(p.last_seen_at, COALESCE((SELECT max(t.last_used_at) FROM tokens t WHERE t.player_id = p.id), 0)) AS last_active_at
+           FROM parcel_claims c JOIN players p ON p.id = c.player_id
+          WHERE p.user_id IS NULL AND p.last_seen_at < $1
+            AND NOT EXISTS (SELECT 1 FROM tokens t WHERE t.player_id = p.id AND t.last_used_at >= $1)
+          ORDER BY c.updated_at, c.parcel_id
+          LIMIT $3
+          FOR UPDATE OF c SKIP LOCKED
+       ), gone AS (
+         DELETE FROM parcel_claims c USING idle i
+          WHERE c.community_id = i.community_id AND c.layer = i.layer AND c.parcel_id = i.parcel_id
+         RETURNING c.*, i.last_active_at
+       )
+       INSERT INTO parcel_reclaims (community_id, layer, parcel_id, player_id, kind, dataset_version, center_lat, center_lng,
+         claimed_at, farm_version, farm_state, updated_at, last_active_at, reclaimed_at)
+       SELECT community_id, layer, parcel_id, player_id, kind, dataset_version, center_lat, center_lng,
+         claimed_at, farm_version, farm_state, updated_at, last_active_at, $2 FROM gone
+       RETURNING *`,
+      [cutoff, now, limit]);
+    return r.rows.map(row => ({ ...rowToParcel(row), last_active_at: Number(row.last_active_at), reclaimed_at: Number(row.reclaimed_at) }));
   }
 }

@@ -87,12 +87,15 @@ func _ready() -> void:
 	_selector.activate()
 	_start_claims()
 
-## Isolated test builds skip Net's boot. Internal and release packages may reload the saved account token only
-## (`sensen/dynamic_farm/account_restore`); nothing here signs in anonymously.
+## Isolated test builds skip Net's boot. Internal and release packages may reload the saved account token
+## (`sensen/dynamic_farm/account_restore`). Only a package with `sensen/dynamic_farm/guest_play` (install-and-play,
+## C-100) then signs in anonymously with this installation's key when no account was restored; the server decides
+## whether that guest may claim and farm (PARCEL_GUEST_WRITES), otherwise the map asks the player to sign in.
 func _start_claims() -> void:
 	var net := get_node_or_null("/root/Net")
-	if net != null and not _fake_claims() and bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)):
-		await net.restore_saved_account()
+	if net != null and not _fake_claims():
+		await net.dynamic_farm_sign_in(bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)),
+			bool(ProjectSettings.get_setting("sensen/dynamic_farm/guest_play", false)))
 	if is_inside_tree() and not _suspended: _claims.start()
 
 func _own_farm_entry() -> bool:
@@ -325,7 +328,8 @@ func resume() -> void:
 		_restore_surface_mode()
 		_bridge.set_map_visible(true); _camera._changed()
 	if _selector != null: _selector.activate()
-	if _claims != null: _claims.start()
+	# Re-reads the player's parcel; a guest sign-in that failed earlier (offline, rate limited) is retried here.
+	if _claims != null: _start_claims()
 	_record_presentation("map", _presentation_epoch)
 
 func _restore_surface_mode() -> void:

@@ -84,7 +84,26 @@ export class MemoryStore implements Store {
       player = { id: randomUUID(), install_key_hmac: hmac, user_id: null };
       this.players.set(player.id, player);
     }
+    this.seen.set(player.id, this.deps.now());
     return { player, token: this.issue(player.id) };
+  }
+
+  async installationKnown(hmac: string) {
+    return [...this.players.values()].some(p => p.install_key_hmac === hmac);
+  }
+
+  /** players.last_seen_at（登录时刷新）。PgStore 存在 players 表里，这里单独记。 */
+  private seen = new Map<string, number>();
+
+  /**
+   * 闲置地块回收用（C-100，MemoryParcelStore）：是否游客，以及最后一次登录或用 token 的时间。
+   * 与 PgParcelStore 的判定同一口径：GREATEST(players.last_seen_at, 该玩家 token 的最大 last_used_at)。
+   */
+  async playerActivity(playerId: string): Promise<{ guest: boolean; last_active_at: number } | null> {
+    const player = this.players.get(playerId);
+    if (!player) return null;
+    const used = this.tokens.filter(t => t.player_id === playerId).map(t => t.last_used_at);
+    return { guest: !player.user_id, last_active_at: Math.max(this.seen.get(playerId) ?? 0, ...used) };
   }
 
   private issue(playerId: string): string {
@@ -161,6 +180,7 @@ export class MemoryStore implements Store {
       player = { id: randomUUID(), install_key_hmac: 'account:' + userId, user_id: userId };
       this.players.set(player.id, player);
     }
+    this.seen.set(player.id, now);
     return { player: structuredClone(player), token: this.issue(player.id) };
   }
   async revokeUserTokens(userId: string) {
@@ -193,7 +213,7 @@ export class MemoryStore implements Store {
       }
       this.creations.delete(player.id);
       this.tokens = this.tokens.filter(t => t.player_id !== player.id);
-      this.players.delete(player.id);
+      this.players.delete(player.id); this.seen.delete(player.id);
     }
     for (const key of [...this.emailCodes.keys()]) if (key.endsWith(':' + user.email)) this.emailCodes.delete(key);
     for (const [key, row] of [...this.identities]) if (row.user_id === userId) this.identities.delete(key);

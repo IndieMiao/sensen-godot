@@ -362,6 +362,11 @@ export class PgStore implements Store {
     return r.rowCount ? (r.rows[0].install_key_hmac as string) : null;
   }
 
+  async installationKnown(hmac: string) {
+    const r = await this.d.pool.query('SELECT 1 FROM players WHERE install_key_hmac = $1', [hmac]);
+    return Boolean(r.rowCount);
+  }
+
   async playerByToken(hash: string, now: number): Promise<PlayerRow | null> {
     const r = await this.d.pool.query(
       `SELECT t.player_id, t.last_used_at, p.install_key_hmac, p.user_id
