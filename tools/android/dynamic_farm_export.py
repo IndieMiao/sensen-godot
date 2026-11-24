@@ -2,7 +2,9 @@
 
 `dynamic-farm` is the isolated preview: Journey endpoints are disabled. `dynamic-farm-internal` is the
 internal test package (C-39): Journey points only at an approved isolated test service, and the map's
-internal-only settings (C-32) are on. Neither carries an account or credential.
+internal-only settings (C-32) are on. `dynamic-farm-release` is the invite-only release package (C-98): the
+preview's package (it upgrades 0.4.1 in place), Journey fixed to the US West dynamic farm production service,
+one's own farm and the saved sign-in on, reselect off. None carries an account or credential.
 """
 import re
 import struct
@@ -10,7 +12,9 @@ import sys
 
 PACKAGE = 'com.sensen.dynamicfarm.cardigan'
 INTERNAL_PACKAGE = 'com.sensen.dynamicfarm.internal'
-PACKAGES = {'dynamic-farm': PACKAGE, 'dynamic-farm-internal': INTERNAL_PACKAGE}
+PACKAGES = {'dynamic-farm': PACKAGE, 'dynamic-farm-internal': INTERNAL_PACKAGE, 'dynamic-farm-release': PACKAGE}
+NAMES = {'dynamic-farm': 'Dynamic Farm Preview', 'dynamic-farm-internal': 'Dynamic Farm Internal',
+         'dynamic-farm-release': 'Dynamic Farm'}
 MAP_SCENE = 'res://scenes/dynamic_farm/dynamic_farm_map.tscn'
 RAW_FILES = ('modules/dynamic_farm/map/config.json', 'assets/dynamic_farm/499-art-inventory.json',
              'assets/dynamic_farm/499-art-recipe.json', 'assets/dynamic_farm/499-edge-decor-v2.json',
@@ -19,8 +23,15 @@ DISABLED = 'http://127.0.0.1:9'
 # The isolated Journey test service confirmed in C-38#46 (tailnet only). Anything else is refused:
 # production, devserver, P0 and every other address.
 APPROVED_TARGETS = ('https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1',)
-# Read by the map (C-32; own_farm: C-34 Q-72); only the internal package may set them.
+# The dynamic farm production service in US West (C-96 materials, C-97 entry). The release package uses
+# exactly this address; it is not a build argument.
+RELEASE_TARGET = 'https://farm.sensenjoy.cn/dynamicfarm/v1'
+# Read by the map (C-32; own_farm: C-34 Q-72); only the internal package may set all of them.
 INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'dynamic_farm/own_farm')
+# The release package: one's own farm and the saved sign-in, never reselect; the account panel only signs in
+# with an invite account (C-98, server ACCOUNT_SIGNUP=closed). Only the release package may set invite_only.
+INVITE_ONLY = 'account/invite_only'
+RELEASE_SETTINGS = ('dynamic_farm/account_restore', 'dynamic_farm/own_farm', INVITE_ONLY)
 URL_KEYS = ('network/base_url', 'network/mobile_base_url')
 VARIANTS = ('android', *PACKAGES)
 # A feature-tag override (e.g. `network/base_url.mobile=`) would win at run time over the staged value.
@@ -41,14 +52,19 @@ def internal_target(url):
     return url
 
 
-def staged_project(text, target=None):
+def staged_project(text, target=None, release=False):
     # Net reads online_qa before the map scene starts, so it never boots or signs in anonymously.
     # Retain the real autoloads.
-    if re.search(r'^(?:network/online_qa|config/(?:use_custom_user_dir|custom_user_dir_name)|dynamic_farm/\w+)[=.]',
-                 text, re.M) or any(OVERRIDDEN.match(line) for line in text.splitlines()):
+    if re.search(r'^(?:network/online_qa|config/(?:use_custom_user_dir|custom_user_dir_name)|dynamic_farm/\w+|'
+                 r'account/invite_only)[=.]', text, re.M) or any(OVERRIDDEN.match(line) for line in text.splitlines()):
         raise ValueError('unexpected pre-existing QA overrides')
     url, user_dir, extra = DISABLED, 'DynamicFarmCardigan', ''
-    if target is not None:
+    if release:
+        # Same package and user directory as the preview it replaces; no target can be chosen.
+        if target is not None:
+            raise ValueError('the release package has a fixed target')
+        url, extra = RELEASE_TARGET, ''.join(f'\n{key}=true' for key in RELEASE_SETTINGS)
+    elif target is not None:
         url, user_dir = internal_target(target), 'DynamicFarmInternal'
         extra = ''.join(f'\n{key}=true' for key in INTERNAL_SETTINGS)
     text = replace_one(text, r'^run/main_scene="[^"]+"$', f'run/main_scene="{MAP_SCENE}"')
@@ -60,7 +76,7 @@ def staged_project(text, target=None):
     return text
 
 
-def staged_preset(header, options, internal=False):
+def staged_preset(header, options, variant):
     if 'export_filter="all_resources"' not in header.splitlines():
         raise ValueError('dynamic inventory needs all imported resources')
 
@@ -70,7 +86,9 @@ def staged_preset(header, options, internal=False):
             raise ValueError('missing mapbox_token.txt in Android include_filter')
         return 'include_filter="' + ','.join(dict.fromkeys([*items, *RAW_FILES])) + '"'
 
-    package, name = (INTERNAL_PACKAGE, 'Dynamic Farm Internal') if internal else (PACKAGE, 'Dynamic Farm Preview')
+    if variant not in PACKAGES:
+        raise ValueError('unknown package variant')
+    package, name = PACKAGES[variant], NAMES[variant]
     header = replace_one(header, r'^include_filter="([^"\n]*)"$', add_files)
     options = replace_one(options, r'^package/unique_name="[^"\n]+"$', f'package/unique_name="{package}"')
     options = replace_one(options, r'^package/name="[^"\n]*"$', f'package/name="{name}"')
@@ -119,12 +137,26 @@ def exported_config(settings, variant):
     if any(OVERRIDDEN.match(key) for key in settings):
         raise ValueError('feature-tag override of a Journey setting in export')
     s = {key[len('sensen/'):]: value for key, value in settings.items() if key.startswith('sensen/')}
-    unknown = {key for key in s if key.startswith('dynamic_farm/')} - set(INTERNAL_SETTINGS)
+    unknown = ({key for key in s if key.startswith('dynamic_farm/')} - set(INTERNAL_SETTINGS) |
+               {key for key in s if key.startswith('account/')} - {INVITE_ONLY})
     urls = [s.get(key) for key in URL_KEYS]
     config = dict(variant=variant, online_qa=s.get('network/online_qa', False), journey_base_url=urls[0],
-                  journey_mobile_base_url=urls[1], **{key.split('/')[1]: s.get(key, False) for key in INTERNAL_SETTINGS})
+                  journey_mobile_base_url=urls[1], invite_only=s.get(INVITE_ONLY, False),
+                  **{key.split('/')[1]: s.get(key, False) for key in INTERNAL_SETTINGS})
     if unknown:
         raise ValueError('unexpected dynamic farm setting in export')
+    if variant == 'dynamic-farm-release':
+        if config['online_qa'] is not True or any(s.get(key) is not True for key in RELEASE_SETTINGS):
+            raise ValueError('release package must keep Net from signing in anonymously and enable its settings')
+        if 'dynamic_farm/reselect' in s:
+            raise ValueError('reselect in the release package')
+        if urls != [RELEASE_TARGET, RELEASE_TARGET]:
+            raise ValueError('release package must point only at the production service')
+        return config
+    if INVITE_ONLY in s:
+        raise ValueError('invite-only sign-in outside the release package')
+    if RELEASE_TARGET in urls:
+        raise ValueError('production dynamic farm service outside the release package')
     internal = variant == 'dynamic-farm-internal'
     if internal:
         if config['online_qa'] is not True or any(s.get(key) is not True for key in INTERNAL_SETTINGS):
