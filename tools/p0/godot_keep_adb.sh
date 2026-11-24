@@ -2,9 +2,9 @@
 # defaults to true: an editor run that sees a runnable Android preset (an import or an export) ends with
 # `adb kill-server`, and on a shared adb port (5137 on the Cardigan workers) that drops other sessions' emulators.
 # As tools/android/build_worker_apk.sh does, run a self-contained copy of Godot whose own editor settings say false,
-# so the export neither depends on nor writes this account's settings. Nothing else changes: the copy starts from the
-# account's editor settings (SDK, JDK, debug keystore) and uses its export templates and debug keystore directory,
-# so the APK is built and signed as before.
+# so the export neither depends on nor writes this account's settings. Otherwise the copy starts from the account's
+# editor settings (SDK, JDK, debug keystore) and uses its export templates and debug keystore directory, so the APK
+# is built and signed as before.
 #   p0_godot_keep_adb GODOT NEW_DIRECTORY   sets P0_GODOT to the copy to run; remove NEW_DIRECTORY afterwards.
 p0_godot_keep_adb() {
   local bin dir="$2" exe version major minor config data
@@ -39,16 +39,25 @@ p0_godot_keep_adb() {
   [[ -d "$data/export_templates" ]] && ln -s "$data/export_templates" "$dir/editor_data/export_templates"
   # A debug keystore Godot generates on a first export lands where the account's Godot would put it, not in the copy.
   ln -s "$data/keystores" "$dir/editor_data/keystores"
-  python3 - "$config/editor_settings-$major.$minor.tres" "$dir/editor_data/editor_settings-$major.$minor.tres" <<'PY'
-import sys
+  # The account's JDK setting wins; only an empty one takes the JAVA_HOME the caller exports (as build_demo_apk.sh
+  # does: the JDK it signs with), where Godot would otherwise refuse to export.
+  python3 - "$config/editor_settings-$major.$minor.tres" "$dir/editor_data/editor_settings-$major.$minor.tres" \
+    "${JAVA_HOME:-}" <<'PY'
+import json, sys
 from pathlib import Path
-source, target = Path(sys.argv[1]), Path(sys.argv[2])
-KEY = "export/android/shutdown_adb_on_exit"
+source, target, java = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+KEY, JAVA = "export/android/shutdown_adb_on_exit", "export/android/java_sdk_path"
 text = source.read_text() if source.is_file() else '[gd_resource type="EditorSettings" format=3]\n\n[resource]\n'
-lines = [l for l in text.splitlines() if l.split("=", 1)[0].strip() != KEY]
+lines = text.splitlines()
 if "[resource]" not in lines:
     sys.exit(f"no [resource] section in {source}")
-lines.insert(lines.index("[resource]") + 1, f"{KEY} = false")
-target.write_text("\n".join(lines) + "\n")
+key = lambda l: l.split("=", 1)[0].strip()
+added = [f"{KEY} = false"]
+if java and not any(key(l) == JAVA and l.split("=", 1)[1].strip() not in ('""', "") for l in lines):
+    lines = [l for l in lines if key(l) != JAVA]
+    added.append(f"{JAVA} = {json.dumps(java)}")
+lines = [l for l in lines if key(l) != KEY]
+at = lines.index("[resource]") + 1
+target.write_text("\n".join(lines[:at] + added + lines[at:]) + "\n")
 PY
 }

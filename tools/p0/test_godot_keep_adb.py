@@ -31,11 +31,13 @@ class GodotKeepAdbTest(unittest.TestCase):
         (self.data / 'export_templates/4.7.2.stable').mkdir(parents=True)
         self.config.mkdir(parents=True, exist_ok=True)
 
-    def run_helper(self):
+    def run_helper(self, java_home=None):
         out = self.tmp / 'copy'
         out.mkdir()
-        env = {k: v for k, v in os.environ.items() if not k.startswith('XDG_')}
+        env = {k: v for k, v in os.environ.items() if not k.startswith('XDG_') and k != 'JAVA_HOME'}
         env['HOME'] = str(self.home)
+        if java_home:
+            env['JAVA_HOME'] = java_home
         result = subprocess.run(['bash', '-c', 'set -euo pipefail; source "$0"; p0_godot_keep_adb "$1" "$2"; echo "$P0_GODOT"',
                                  str(HELPER), str(self.godot), str(out)],
                                 env=env, check=True, capture_output=True, text=True)
@@ -62,6 +64,20 @@ class GodotKeepAdbTest(unittest.TestCase):
         out, _ = self.run_helper()
         self.assertEqual((out / 'editor_data/editor_settings-4.7.tres').read_text(),
                          f'[gd_resource type="EditorSettings" format=3]\n\n[resource]\n{KEY} = false\n')
+
+    def test_an_empty_jdk_setting_takes_the_callers_java_home_but_a_set_one_is_kept(self):
+        settings = self.config / 'editor_settings-4.7.tres'
+        settings.write_text(SETTINGS + 'export/android/java_sdk_path = ""\n')
+        out, _ = self.run_helper('/jdk home')
+        text = (out / 'editor_data/editor_settings-4.7.tres').read_text()
+        self.assertEqual(re.findall('^export/android/java_sdk_path = .*$', text, re.M),
+                         ['export/android/java_sdk_path = "/jdk home"'])
+        subprocess.run(['rm', '-rf', str(out)], check=True)
+        settings.write_text(SETTINGS + 'export/android/java_sdk_path = "/own/jdk"\n')
+        out, _ = self.run_helper('/jdk home')
+        text = (out / 'editor_data/editor_settings-4.7.tres').read_text()
+        self.assertEqual(re.findall('^export/android/java_sdk_path = .*$', text, re.M),
+                         ['export/android/java_sdk_path = "/own/jdk"'])
 
     def test_p0_scripts_run_godot_only_through_the_copy(self):
         for name in ('build_demo_apk.sh', 'android_p0.sh'):
