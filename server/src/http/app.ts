@@ -77,6 +77,8 @@ export interface AppDeps {
   apple?: AccountRouteDeps['apple'];
   appleRevoker?: AccountRouteDeps['appleRevoker'];
   google?: AccountRouteDeps['google'];
+  /** Invite-only accounts (C-96): no self sign-up by email, Apple or Google; existing accounts still sign in. */
+  signupClosed?: boolean;
   /** Dynamic farm parcel claims and parcel farms (C-31); absent leaves the /v1/parcels routes out. */
   parcels?: Omit<ParcelRouteDeps, 'now'>;
 }
@@ -374,6 +376,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   registerAccounts(app, {
     store: deps.store, pepper: deps.pepper, now: deps.now, mailer: deps.mailer ?? createLogMailer(),
     qaEmailDomain: deps.qaEmailDomain, qaEmailCode: deps.qaEmailCode, apple: deps.apple, appleRevoker: deps.appleRevoker, google: deps.google,
+    signupClosed: deps.signupClosed,
     closeSessions: async playerId => { online?.closePlayer(playerId); },
     beforeDelete: async playerId => { await online?.forgetPlayer(playerId); },
   }, auth);
