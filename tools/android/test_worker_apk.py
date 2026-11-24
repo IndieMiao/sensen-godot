@@ -44,7 +44,7 @@ def exported_settings(variant):
     # What an export of the staged project carries, from the same staging code the build script runs.
     from configparser import ConfigParser
     text = PROJECT if variant == 'android' else farm.staged_project(
-        PROJECT, TARGET if variant == 'dynamic-farm-internal' else None)
+        PROJECT, TARGET if variant == 'dynamic-farm-internal' else None, variant == 'dynamic-farm-release')
     config = ConfigParser(interpolation=None)
     config.optionxform = str
     config.read_string(text[text.index('[application]'):])
@@ -146,9 +146,48 @@ class WorkerAPK(unittest.TestCase):
                         'dynamic_farm/reselect.mobile=true',
                         'network/base_url.android="https://farm.sensenjoy.cn/v1"', 'network/online_qa.mobile=false'):
             source = PROJECT.replace('[sensen]', '[sensen]\n' + setting)
-            for target in (None, TARGET):
+            for target, release in ((None, False), (TARGET, False), (None, True)):
                 with self.subTest(setting=setting, target=target), self.assertRaisesRegex(ValueError, 'pre-existing'):
-                    farm.staged_project(source, target)
+                    farm.staged_project(source, target, release)
+
+    def test_release_project_is_fixed_to_production_with_own_farm_and_invite_sign_in(self):
+        release = exported_settings('dynamic-farm-release')
+        self.assertEqual(farm.RELEASE_TARGET, 'https://farm.sensenjoy.cn/dynamicfarm/v1')
+        for key in ('sensen/network/base_url', 'sensen/network/mobile_base_url'):
+            self.assertEqual(release[key], farm.RELEASE_TARGET)
+        # Net never boots, so nothing signs in anonymously; the map reloads only a saved invite sign-in.
+        self.assertIs(release['sensen/network/online_qa'], True)
+        for key in ('sensen/dynamic_farm/own_farm', 'sensen/dynamic_farm/account_restore', 'sensen/account/invite_only'):
+            self.assertIs(release[key], True)
+        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/fake_claims', 'sensen/dynamic_farm/local_farm_save'):
+            self.assertNotIn(key, release)
+        # The 0.4.1 preview's user directory, which this package replaces in place.
+        self.assertEqual(release['application/config/custom_user_dir_name'],
+                         exported_settings('dynamic-farm')['application/config/custom_user_dir_name'])
+        for variant in ('dynamic-farm', 'dynamic-farm-internal', 'android'):
+            settings = exported_settings(variant)
+            self.assertNotIn('sensen/account/invite_only', settings)
+            self.assertNotIn(farm.RELEASE_TARGET, settings.values())
+        # No target can be chosen for it, approved or not.
+        for target in (TARGET, farm.RELEASE_TARGET, 'https://farm.sensenjoy.cn/preview/p0/v1'):
+            with self.subTest(target=target), self.assertRaises(ValueError):
+                farm.staged_project(PROJECT, target, True)
+        with self.assertRaisesRegex(ValueError, 'pre-existing'):
+            farm.staged_project(PROJECT.replace('[sensen]', '[sensen]\naccount/invite_only=true'))
+
+    def test_release_preset_upgrades_the_preview_package_with_the_same_version(self):
+        preset, identity = worker_preset(PRESETS, 'dynamic-farm-release')
+        self.assertEqual(identity, dict(self.identity, package=farm.PACKAGE))
+        self.assertEqual(identity['package'], 'com.sensen.dynamicfarm.cardigan')
+        self.assertEqual(worker_preset(preset, 'dynamic-farm-release'), (preset, identity))
+        self.assertIn('package/name="Dynamic Farm"', preset)
+        self.assertIn('package/signed=false', preset)
+        self.assertIn('runnable=false', preset)
+        # Only the package name and the display name differ from the preview's preset.
+        preview, _ = worker_preset(PRESETS, 'dynamic-farm')
+        self.assertEqual(preset.replace('package/name="Dynamic Farm"', 'package/name="Dynamic Farm Preview"'), preview)
+        for path in farm.RAW_FILES:
+            self.assertIn(path, preset)
 
     def test_internal_preset_is_a_separate_unsigned_package_with_the_same_version(self):
         preset, identity = worker_preset(PRESETS, 'dynamic-farm-internal')
@@ -163,15 +202,20 @@ class WorkerAPK(unittest.TestCase):
                 worker_preset(PRESETS, variant)
 
     def test_readback_checks_each_variants_exported_configuration(self):
-        for variant, files in [('android', FILES), ('dynamic-farm', FARM_FILES), ('dynamic-farm-internal', FARM_FILES)]:
+        for variant, files in [('android', FILES), ('dynamic-farm', FARM_FILES), ('dynamic-farm-internal', FARM_FILES),
+                               ('dynamic-farm-release', FARM_FILES)]:
             self.fixture(files, exported_settings(variant))
             with self.subTest(variant=variant):
                 config = inspect_zip(self.apk, True, variant)
                 self.assertEqual(config['variant'], variant)
-                internal = variant == 'dynamic-farm-internal'
-                self.assertEqual((config['reselect'], config['account_restore'], config['own_farm']), (internal,) * 3)
+                internal, release = variant == 'dynamic-farm-internal', variant == 'dynamic-farm-release'
+                self.assertEqual(config['reselect'], internal)
+                self.assertEqual((config['account_restore'], config['own_farm']), (internal or release,) * 2)
+                self.assertEqual(config['invite_only'], release)
                 self.assertEqual(config['journey_mobile_base_url'] == TARGET, internal)
+                self.assertEqual(config['journey_mobile_base_url'] == farm.RELEASE_TARGET, release)
         internal = exported_settings('dynamic-farm-internal')
+        release = exported_settings('dynamic-farm-release')
         bad = [('dynamic-farm', internal), ('android', internal),
                ('dynamic-farm-internal', exported_settings('dynamic-farm')),
                ('dynamic-farm-internal', exported_settings('android')),
@@ -195,7 +239,30 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm', dict(exported_settings('dynamic-farm'),
                                      **{'sensen/network/mobile_base_url.android': 'https://farm.sensenjoy.cn/v1'})),
                ('android', dict(exported_settings('android'), **{'sensen/network/base_url.mobile': TARGET})),
-               (True, exported_settings('dynamic-farm')), ('android-internal', internal)]
+               (True, exported_settings('dynamic-farm')), ('android-internal', internal),
+               ('dynamic-farm-release', internal), ('dynamic-farm-release', exported_settings('dynamic-farm')),
+               ('dynamic-farm-release', exported_settings('android')), ('dynamic-farm', release),
+               ('dynamic-farm-internal', release), ('android', release),
+               ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/reselect': False})),
+               ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/reselect': True})),
+               ('dynamic-farm-release', dict(release, **{'sensen/account/invite_only': False})),
+               ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/own_farm': False})),
+               ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/account_restore': False})),
+               ('dynamic-farm-release', dict(release, **{'sensen/network/online_qa': False})),
+               ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/fake_claims': True})),
+               ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/local_farm_save': True})),
+               ('dynamic-farm-release', dict(release, **{'sensen/account/other': True})),
+               ('dynamic-farm-release', dict(release, **{'sensen/network/base_url': TARGET})),
+               ('dynamic-farm-release', dict(release, **{'sensen/network/mobile_base_url': 'https://farm.sensenjoy.cn/v1'})),
+               ('dynamic-farm-release', dict(release, **{'sensen/network/mobile_base_url': farm.RELEASE_TARGET + '/'})),
+               ('dynamic-farm-release', dict(release, **{'sensen/network/mobile_base_url':
+                                                          'https://farm.sensenjoy.cn/preview/p0/v1'})),
+               ('dynamic-farm-release', dict(release, **{'sensen/network/mobile_base_url.android': TARGET})),
+               ('dynamic-farm-release', dict(release, **{'sensen/account/invite_only.mobile': False})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/account/invite_only': True})),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/account/invite_only': True})),
+               ('android', dict(exported_settings('android'), **{'sensen/account/invite_only': True})),
+               ('android', dict(exported_settings('android'), **{'sensen/network/mobile_base_url': farm.RELEASE_TARGET}))]
         for variant, settings in bad:
             self.fixture(FILES if variant == 'android' else FARM_FILES, settings)
             with self.subTest(variant=variant, settings=settings), self.assertRaises(ValueError):
@@ -221,6 +288,19 @@ class WorkerAPK(unittest.TestCase):
                               ([TARGET, out], b'shared Android SDK required')]:  # Approved: passes to the next check.
             with self.subTest(args=args):
                 result = subprocess.run(['bash', script, '--dynamic-farm-internal', *args],
+                                        cwd=self.tmp, capture_output=True, env=env)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stderr)
+                self.assertFalse(out.exists())
+
+    def test_build_script_release_takes_no_target(self):
+        env = {k: v for k, v in os.environ.items() if k not in ('ANDROID_HOME', 'ANDROID_ADB_SERVER_PORT')}
+        script = ROOT / 'tools/android/build_worker_apk.sh'
+        out = self.tmp / 'candidate'
+        for args, message in [([TARGET, out], b'usage'), ([farm.RELEASE_TARGET, out], b'usage'), ([], b'usage'),
+                              ([out], b'shared Android SDK required')]:  # Valid: passes to the next check.
+            with self.subTest(args=args):
+                result = subprocess.run(['bash', script, '--dynamic-farm-release', *args],
                                         cwd=self.tmp, capture_output=True, env=env)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn(message, result.stderr)
