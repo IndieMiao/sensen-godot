@@ -266,4 +266,6 @@ describe('parcel tiles and building layer (test range)', () => {
 
 // C-55: + parcel tiles, tilejson template, map_layer, lighter buildings.geojson, building_area_ids in
 // the report; farms and index.geojson unchanged from C-49's fe8d03428ebb60e9b5f39d129c3ef24b39fe174483556cae7f7ad3b024f8ff05.
-const GOLDEN_MANIFEST_SHA256 = '654b2cfa15f7a80e6310aeb5151ddc9530bb42c2049056916d49846c3137d8ce';
+// C-92: building-raster-2 (exact coverage, exact core IoU, origin at 0.1 mm, extension used in stats):
+// 69 of 88 core counts change (mean core/footprint area 1.0125 → 1.0014); was 654b2cfa…37d8ce.
+const GOLDEN_MANIFEST_SHA256 = '96ced3f7a74321e6824bc644b91061d4cf53a51938d09676f97489159b3882e1';
