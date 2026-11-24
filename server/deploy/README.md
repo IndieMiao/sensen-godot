@@ -1,6 +1,6 @@
 # 旧 farm 服务端部署（香港 ECS，根路径 `/v1`）
 
-`deploy.sh` 部署旧 farm（app + postgres + backup + caddy，compose 项目 `farm`，目录 `/opt/farm`）。P0 演示服务端另有一套，见 [p0/README.md](p0/README.md)。
+`deploy.sh` 部署旧 farm（app + postgres + backup + caddy，compose 项目 `farm`，目录 `/opt/farm`）。P0 演示服务端另有一套，见 [p0/README.md](p0/README.md)。动态农场正式服（C-96）是独立的一套，见 [dynamicfarm/README.md](dynamicfarm/README.md)。
 
 ## 线上文件以服务器为准
 

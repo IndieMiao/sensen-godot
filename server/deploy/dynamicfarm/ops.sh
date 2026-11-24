@@ -98,7 +98,7 @@ do_init_db() {
   db_exists || die "库 $DB 不存在（postgres 容器首次启动时按 POSTGRES_DB 建；被删了就用 restore）"
   say "建表前 public 下有 $(user_tables) 张表"
   # 用即将运行的镜像里的 schema.sql：全是 IF NOT EXISTS / ADD COLUMN IF NOT EXISTS，可重复执行；app 启动时也会再执行一遍。
-  dc run --rm --no-deps -T --entrypoint cat app src/db/schema.sql | psql_in "$DB"
+  { echo "SET client_min_messages = warning;"; dc run --rm --no-deps -T --entrypoint cat app src/db/schema.sql; } | psql_in "$DB"
   local t
   for t in players tokens users user_identities parcel_claims; do
     [ "$(q "SELECT to_regclass('public.$t') IS NOT NULL")" = t ] || die "建表后缺少 $t"
