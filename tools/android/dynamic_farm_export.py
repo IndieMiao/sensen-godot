@@ -33,6 +33,10 @@ INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'd
 INVITE_ONLY = 'account/invite_only'
 RELEASE_SETTINGS = ('dynamic_farm/account_restore', 'dynamic_farm/own_farm', INVITE_ONLY)
 URL_KEYS = ('network/base_url', 'network/mobile_base_url')
+# The 0.4.1 preview's user directory. The release package installs over it in place, so it must keep this
+# directory, or the player's local data and saved sign-in would be left behind (C-116).
+PREVIEW_USER_DIR = 'DynamicFarmCardigan'
+USER_DIR_KEYS = ('application/config/use_custom_user_dir', 'application/config/custom_user_dir_name')
 VARIANTS = ('android', *PACKAGES)
 # A feature-tag override (e.g. `network/base_url.mobile=`) would win at run time over the staged value.
 OVERRIDDEN = re.compile(r'^(?:sensen/)?network/(?:online_qa|base_url|mobile_base_url)\.')
@@ -58,7 +62,7 @@ def staged_project(text, target=None, release=False):
     if re.search(r'^(?:network/online_qa|config/(?:use_custom_user_dir|custom_user_dir_name)|dynamic_farm/\w+|'
                  r'account/invite_only)[=.]', text, re.M) or any(OVERRIDDEN.match(line) for line in text.splitlines()):
         raise ValueError('unexpected pre-existing QA overrides')
-    url, user_dir, extra = DISABLED, 'DynamicFarmCardigan', ''
+    url, user_dir, extra = DISABLED, PREVIEW_USER_DIR, ''
     if release:
         # Same package and user directory as the preview it replaces; no target can be chosen.
         if target is not None:
@@ -152,6 +156,8 @@ def exported_config(settings, variant):
             raise ValueError('reselect in the release package')
         if urls != [RELEASE_TARGET, RELEASE_TARGET]:
             raise ValueError('release package must point only at the production service')
+        if [settings.get(key) for key in USER_DIR_KEYS] != [True, PREVIEW_USER_DIR]:
+            raise ValueError('release package must keep the preview user directory')
         return config
     if INVITE_ONLY in s:
         raise ValueError('invite-only sign-in outside the release package')
