@@ -204,11 +204,11 @@ func set_parcel_claims(generation: int, claims_json: String) -> void:
 	elif _parcel_active and generation == _parcel_generation:
 		_plugin.setParcelClaims(generation, claims_json)
 
-func set_parcel_building_highlight(generation: int, key: String) -> void:
+func set_parcel_building_highlight(generation: int, key: String, parcel_id := "") -> void:
 	if not supports_parcels():
-		super.set_parcel_building_highlight(generation, key)
+		super.set_parcel_building_highlight(generation, key, parcel_id)
 	elif _parcel_active and generation == _parcel_generation:
-		_plugin.setParcelBuildingHighlight(generation, key)
+		_plugin.setParcelBuildingHighlight(generation, key, parcel_id)
 
 func clear_parcel_layers(generation: int) -> void:
 	if not _parcel_active or generation != _parcel_generation: return

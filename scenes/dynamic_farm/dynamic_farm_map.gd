@@ -67,7 +67,7 @@ func _ready() -> void:
 	_selector.candidates_found.connect(_show_candidates)
 	_selector.farm_ready.connect(_open_host)
 	_camera.tapped.connect(func(point: Vector2): _selector.tap(point, _camera.zoom))
-	_camera.camera_changed.connect(_selector.camera_changed)
+	_camera.camera_changed.connect(func(): _selector.camera_changed(_camera.zoom))
 	_camera.camera_changed.connect(func(): _area_timer.start(AREA_REFRESH_SECONDS))
 	_camera.setup_map(_bridge, token)
 	_selector.activate()

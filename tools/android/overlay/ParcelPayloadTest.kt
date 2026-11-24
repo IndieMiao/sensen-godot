@@ -58,6 +58,12 @@ class ParcelPayloadTest {
         assertFails { ParcelPayload.claims("""[{"block_id":"3139010","nickname":"a"}]""") }
         assertFails { ParcelPayload.claims("""[{"block_id":"p-a","nickname":"a"},{"block_id":"p-a","nickname":"b"}]""") }
     }
+    @Test fun datasfHighlightFilterMatchesOneParcelsFootprintsAndNothingForBadIds() {
+        assertEquals("""["==",["get","block_id"],"p-3250003"]""", ParcelPayload.buildingFilter("p-3250003"))
+        assertEquals("""["==",["get","block_id"],""]""", ParcelPayload.buildingFilter(""))
+        assertEquals("""["==",["get","block_id"],""]""", ParcelPayload.buildingFilter("3250003"))
+        assertEquals("""["==",["get","block_id"],""]""", ParcelPayload.buildingFilter("p-a\"]"))
+    }
     @Test fun onlyWhitelistedOwnSourcePropertiesAreReturned() {
         val input = JsonParser.parseString("""{"block_id":"p-3139010","parcel_id":"3139010","address":null,"center":[-122,37],"geometry":{"type":"Polygon"},"device_id":"secret","other":"omit"}""").asJsonObject
         val output = ParcelPayload.publicProperties(input)!!

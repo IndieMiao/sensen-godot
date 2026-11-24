@@ -14,7 +14,7 @@ class Native extends MapBridge:
 	func supports_parcels() -> bool: return true
 	func set_parcel_sources(_gen: int, _config: String) -> void: pass
 	func query_parcel_at(id: int, gen: int, point: Vector2) -> void: queries.append([id, gen, point])
-	func set_parcel_building_highlight(gen: int, key: String) -> void: highlights.append([gen, key])
+	func set_parcel_building_highlight(gen: int, key: String, parcel := "") -> void: highlights.append([gen, key, parcel])
 	func clear_parcel_layers(_gen: int) -> void: pass
 	func set_map_visible(_value: bool) -> void: pass
 var checks := 0
@@ -104,12 +104,17 @@ func _run() -> void:
 	check(controller.selection.is_empty() and controller.message == Controller.TOO_SMALL, "300-cell parcel shows the too-small prompt on selection")
 	check(controller.message == "This parcel is too small to be your main farm. Please choose a larger one.", "too-small prompt uses the Q-56 copy")
 	check(native.highlights.back()[1] == "b-p-L300", "too-small building stays highlighted so the player sees which one")
+	# C-43 V-199: the highlight makes the native map go idle and report ready again; the prompt must survive it.
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":true,"error":""}')
+	check(controller.message == Controller.TOO_SMALL and controller.map_ready, "too-small prompt survives the idle readiness after the highlight")
 	await controller.open_farm()
 	check(opened.is_empty(), "too-small parcel cannot be previewed")
 	pick(meta("p-SQ399", 399, 129))
 	check(controller.message == Controller.TOO_SMALL, "399 cells is below the threshold")
 	pick(meta("p-SQ400", 400, 128))
 	check(controller.selection.get("block_id") == "p-SQ400" and controller.message == "Ready to preview this farm.", "exactly 400 cells can be selected")
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":true,"error":""}')
+	check(controller.message == "Ready to preview this farm.", "ready-to-preview prompt survives the idle readiness after the highlight")
 	pick(meta("p-L1200", 1200, 528))
 	check(controller.selection.get("block_id") == "p-L1200", "1200-cell L-shaped parcel is selected")
 	await controller.open_farm()

@@ -18,7 +18,7 @@ class Native extends MapBridge:
 			if row.selected or row.claimed or row.own: states[row.block_id] = row
 			else: states.erase(row.block_id)
 	func set_parcel_claims(_gen: int, claims: String) -> void: names = JSON.parse_string(claims)
-	func set_parcel_building_highlight(gen: int, key: String) -> void: highlights.append([gen, key])
+	func set_parcel_building_highlight(gen: int, key: String, parcel := "") -> void: highlights.append([gen, key, parcel])
 class Selector extends Node:
 	signal changed
 	var selection := {}
@@ -108,7 +108,7 @@ func _first_home_flow() -> void:
 	await a.claim({"block_id": ids[0], "center": [-122.45, 37.73]})
 	check(a.has_home() and a.status(ids[0]) == "mine", "claim makes the parcel the player's home")
 	check(native.states[ids[0]].own and native.states[ids[0]].selected and not native.states[ids[0]].claimed, "own parcel is sent as own (green) and selected")
-	check(native.highlights.back() == [4, ""], "owned selection drops the yellow highlight so green shows")
+	check(native.highlights.back() == [4, "", ""], "owned selection drops the yellow highlight so green shows")
 	a.attach(4, ids[1])
 	await process_frame
 	check(a.status(ids[1]) == "none" and a.has_home(), "another free parcel stays unclaimable for a player with a home")
