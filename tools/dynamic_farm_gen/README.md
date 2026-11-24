@@ -15,6 +15,7 @@ farms decode completely (`godot/check_client_decode.sh`; on an older checkout it
 | --- | --- | --- |
 | Parcels | Parcels – Active and Retired, `acdm-wktn` (active parcels) | ODC PDDL 1.0 |
 | Buildings | Building Footprints, `ynuv-fyni` | ODC PDDL 1.0 |
+| Buildings (fallback, C-113) | OpenStreetMap buildings, not DataSF | ODC ODbL 1.0, © OpenStreetMap contributors |
 
 Source labels (`src/sources.ts`):
 
@@ -33,9 +34,27 @@ Source labels (`src/sources.ts`):
 - `sfenv-buildings` – `Buildings_filtered` in the same City organisation (SF Environment,
   2025-02): the same DataSF records, 127,010 rows, about 1.3 m west-north-west of the sfgis copy.
   No licence is stated on the copy; the records are DataSF's PDDL data. Local fallback only.
+  Together the two copies hold 144,892 distinct area_ids, about 32,000 fewer than DataSF.
+- `osm-buildings` (C-113) – OpenStreetMap buildings from BBBike's weekly San Francisco extract
+  (`SanFrancisco.osm.pbf`, about 33 MB, no account, reachable from cardigan-ci and the Macs; one
+  connection runs at ~15 KB/s, so it is fetched in parallel 1 MiB ranges and checked against
+  BBBike's `CHECKSUM.txt`). The snapshot keeps the file in `raw/` with its SHA-256 and the OSM
+  replication timestamp; `--extract <file>` takes an already downloaded copy so a rebuild elsewhere
+  reads the same OSM data. Closed `building=*` ways and building multipolygon relations inside the
+  bbox (the whole city when `fetch` has no `--bbox`); `area_id` is the way id or the negated
+  relation id. This is a **fallback** source (`fallback: true`): it only gives a parcel buildings
+  when no DataSF copy has a footprint there, so farms that DataSF covers do not change.
+  Licence: ODbL 1.0. A dataset with OSM buildings is a derivative database: its `manifest.json`
+  carries a `licence` block (ODbL, the credit "© OpenStreetMap contributors", farms per source),
+  each OSM farm's `attribution` says so, and the map must show the credit. Mapbox data is never used.
 
 A parcel never mixes building copies: it uses the copy with the most footprint area for that parcel
-(earlier sources win ties), and its farm records which one in `stats.building_source`.
+(earlier sources win ties; fallback sources only when no other copy has a footprint), and its farm
+records which one in `stats.building_source`.
+
+To add OSM buildings to the snapshot an earlier dataset was built from (same parcels):
+`pnpm cli fetch --append <snapshot> --sources osm-buildings [--extract SanFrancisco.osm.pbf]`
+(the snapshot's other files stay as they are; the new source records its own `fetched_at`).
 
 The snapshot (`fetch`) keeps every response byte-for-byte with its SHA-256 and the source's
 licence/edit metadata (`source-manifest.json`); `build` reads only a snapshot. The dataset
@@ -209,3 +228,7 @@ pnpm cli build --snapshot snap-full --out r5 --dataset-version sf-dynamic-farm-<
 - z15 tiles of dense blocks can be large (all properties, no size limit, as r4); the parcel layer
   is shown from zoom 16, and `check-tiles` reports the largest tile per zoom.
 - DataSF footprints date from 2010–2017 edits; newer buildings may be missing or differ from Mapbox.
+- OSM fills a parcel only when DataSF has no footprint there. A parcel whose DataSF copy holds only
+  part of it (e.g. a garage without the house, `too_small`) keeps the DataSF part. An OSM building
+  over several lots goes to the lot holding most of it, like a DataSF footprint, so its neighbours
+  stay `no_building`.
