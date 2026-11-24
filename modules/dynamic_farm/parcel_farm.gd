@@ -4,16 +4,17 @@ extends RefCounted
 ## Numbers come from assets/farm/data/dynamic_farm.json (owner decision Q-39, C-34#14),
 ## shared with the server and separate from the main farm. C-58 added the parcel's own
 ## coins and the `sell` / `claim_blueprint` commands (mirrored here for the local store, C-59);
-## `gather` is the outer-groves card's (C-60).
+## the `gather` command (outer gathering, C-60) is ParcelGather's.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
-const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest", "sell", "claim_blueprint"]
+const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest", "sell", "claim_blueprint", "gather"]
 ## Server limits (C-58 farm.ts): the coin cap and the most one sell command may sell.
 const MAX_COINS := 1000000000
 const MAX_SELL_COUNT := 999
+const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 
 static var _rules := {}
 
@@ -144,7 +145,8 @@ static func house_cells(state: Dictionary) -> Dictionary:
 	return cells
 
 ## All commands succeed or none do, like the server: {ok, state} or {ok:false, index, code, detail}.
-static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now: int) -> Dictionary:
+## `parcel_id` is the owner's parcel (block id), which `gather` ids must name.
+static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now: int, parcel_id := "") -> Dictionary:
 	if commands.is_empty() or commands.size() > MAX_BATCH:
 		return {"ok": false, "index": 0, "code": "SCHEMA"}
 	var next := state.duplicate(true)
@@ -160,6 +162,9 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "claim_blueprint":
 			if not command.get("blueprint") is String or str(command.blueprint).length() > 64:
+				return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif command.type == "gather":
+			if not command.get("object") is String or str(command.object).length() > Gather.MAX_OBJECT_LENGTH:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "place_house":
 			if not whole_in(command.get("x"), 0, MAX_COORD - 1) or not whole_in(command.get("y"), 0, MAX_COORD - 1) \
@@ -261,6 +266,15 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				else:
 					next.blueprints_claimed[blueprint] = now
 					next.bag[rule.item] = int(next.bag.get(rule.item, 0)) + int(rule.amount)
+			"gather":
+				# The server knows the core cells under the house, tilled, sown or cleared: not outer.
+				var o = Gather.parse_id(command.object)
+				var at = parse_key(o.cell) if o != null else null
+				var in_core: bool = o != null and (house_cells(next).has(at) or o.cell in next.tilled \
+					or next.crops.has(o.cell) or o.cell in next.cleared)
+				var outcome := Gather.take(Gather.rules(), next, command.object, parcel_id, in_core, now)
+				failure = outcome.code
+				detail = outcome.detail
 		if not failure.is_empty():
 			var result := {"ok": false, "index": index, "code": failure}
 			if not detail.is_empty(): result.detail = detail

@@ -39,7 +39,7 @@ func send(base_version: int, commands: Array) -> Dictionary:
 	var now: int = now_ms.call()
 	if base_version != saved.version:
 		return _failure("VERSION_CONFLICT", 0, {}, saved.farm, saved.version)
-	var outcome := ParcelFarm.apply(ParcelFarm.rules(), saved.farm, commands, now)
+	var outcome := ParcelFarm.apply(ParcelFarm.rules(), saved.farm, commands, now, block_id)
 	if not outcome.ok:
 		return _failure(outcome.code, outcome.index, outcome.get("detail", {}), saved.farm, saved.version)
 	if not _save(outcome.state, saved.version + 1): return _failure("SAVE", 0, {}, saved.farm, saved.version)
