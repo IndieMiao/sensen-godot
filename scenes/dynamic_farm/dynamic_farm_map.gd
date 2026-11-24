@@ -511,9 +511,19 @@ func _town_ready() -> void:
 	if _town_script == null: _town_script = load(TOWN)
 
 ## The town's script and what it preloads load on a thread once the player has a home, so the first tap opens sooner.
+## Not under Compatibility, where threaded loads never finished (AppRouter.sync_loads): the tap loads it there.
 func _prepare_town() -> void:
+	var router := get_node_or_null("/root/AppRouter")
+	if router != null and router.sync_loads: return
 	if not _town_prepared and _town_script == null:
 		_town_prepared = ResourceLoader.load_threaded_request(TOWN) == OK
+
+## A map freed with that load still running waits for it and takes it: a load left on its thread kept a quitting
+## Godot from exiting (C-61, the merge check's test_claim_controller ran into its time limit after passing).
+func _finish_town_load() -> void:
+	if not _town_prepared: return
+	_town_prepared = false
+	ResourceLoader.load_threaded_get(TOWN)
 
 func _town_closed(town: Control, parcel: String) -> void:
 	_town = null
@@ -640,6 +650,7 @@ func is_back_navigation_locked() -> bool:
 	_leave(); return true
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE: _finish_town_load()
 	if not is_node_ready() or _selector == null: return
 	if what == NOTIFICATION_APPLICATION_PAUSED and not _suspended: _suspend_map(false)
 	elif what == NOTIFICATION_APPLICATION_RESUMED and _suspended:

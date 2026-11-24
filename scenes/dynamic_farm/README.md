@@ -92,5 +92,6 @@ the save the Market or Carpenter last saw, and its bottom card names the step do
 your carrot.` …), with nothing selected or added under `Your home`. A tap on Market or Carpenter reads `Loading…` on
 that entry and is drawn (`RenderingServer.frame_post_draw`) before the town loads; the town's script (and the P0
 keeper-portrait code it pulls in, ~1.3 s to compile on a desktop) loads on a thread once the player has a home, and a
-tap before it is done waits for it frame by frame with `Loading…` showing. The map prints `DYNAMIC_TOWN_OPEN` with the
+tap before it is done waits for it frame by frame with `Loading…` showing (not under Compatibility, `AppRouter.sync_loads`;
+a map freed with the load still running waits for it and takes it, so a quitting Godot has none left on its thread). The map prints `DYNAMIC_TOWN_OPEN` with the
 times from the tap to `Loading…` drawn, the script ready, the town opened and the town on screen. Copy and screenshots: `docs/plans/C-61.md`.

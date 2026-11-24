@@ -51,6 +51,7 @@ func controller(server: RefCounted, token: String, native: Native) -> Node:
 	return c
 
 func _run() -> void:
+	_town_load_on_free()
 	await _server_contract()
 	await _first_home_flow()
 	await _map_card()
@@ -249,6 +250,8 @@ func _map_card() -> void:
 	check(not guest.signed_out and guest.mine_known and guest.status(ids[1]) == "none" and page._claim.visible, "after signing in the card re-reads ownership and offers the claim")
 	page.queue_free(); selector.queue_free(); guest.queue_free()
 	await process_frame
+	check(ResourceLoader.load_threaded_get_status("res://scenes/dynamic_farm/parcel_town.gd") == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
+		"with the map gone no load of the town is left running")
 
 ## C-61: the card names the next step done off the parcel (the home's save), and Market / Carpenter answer a tap at
 ## once with Loading… before the town loads.
@@ -306,6 +309,19 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	ProjectSettings.set_setting(LOCAL_SAVE, null)
 	page.home_farm = {}; page._farm_parcel = ""
 	page._render()
+
+## C-61: a map freed while the town's script still loads on a thread takes that load, so a quitting Godot has none
+## left running (the merge check's run of this file passed, then hit its time limit on exit).
+func _town_load_on_free() -> void:
+	var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+	root.add_child(page)
+	var town: String = page.TOWN
+	page._prepare_town()
+	check(page._town_prepared and ResourceLoader.load_threaded_get_status(town) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
+		"the town's script loads on a thread before any tap")
+	page.free()
+	check(ResourceLoader.load_threaded_get_status(town) == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
+		"a map freed meanwhile leaves no load of it running")
 
 ## Parcel ids the fake neighbour does not own.
 func _free_ids(server: RefCounted, count: int) -> Array:
