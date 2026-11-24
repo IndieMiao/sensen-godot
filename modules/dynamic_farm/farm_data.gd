@@ -78,6 +78,8 @@ static func decode(data: Dictionary) -> Dictionary:
 			last_y = y
 			last_end = x + length
 	# C-43: core size follows the dataset's building area; MAX_CELLS is the only bound. Too-small is a selection hint.
+	if counts.core < 1:
+		return invalid("Dynamic farm core is empty.")
 	var declared = data.get("counts")
 	if not declared is Dictionary:
 		return invalid("Dynamic farm counts are missing.")

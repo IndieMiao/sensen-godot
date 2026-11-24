@@ -1,7 +1,7 @@
 {
-  "base_url": "https://lonely-window-barely-sheriff.trycloudflare.com",
-  "dataset_version": "sf-dynamic-farm-20261118-r4",
-  "manifest_sha256": "645df3530b5617bb7e5a8cfb0d070e0e82b74337db47f83a542df1e90c3ae1cf",
-  "building_source": "mapbox",
+  "base_url": "https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r5-c697144dd7c5/",
+  "dataset_version": "sf-dynamic-farm-20261124-r5",
+  "manifest_sha256": "1069a55876f36db56d28e0e60e24993153f583587d11168f2c96a919867bb295",
+  "building_source": "datasf",
   "min_core_cells": 400
 }

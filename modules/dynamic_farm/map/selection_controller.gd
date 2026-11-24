@@ -204,7 +204,7 @@ func choose(id: String) -> void:
 func min_core_cells() -> int:
 	var raw = config.get("min_core_cells", MIN_CORE_CELLS)
 	if not (raw is int or raw is float) or not is_finite(float(raw)): raw = MIN_CORE_CELLS
-	return clampi(int(raw), 1, FarmData.MAX_CELLS)
+	return int(clampf(float(raw), 1, FarmData.MAX_CELLS)) # Clamp before int(): 1e30 must not wrap.
 
 func open_farm() -> void:
 	if suspended or not map_ready or busy or selection.is_empty(): return

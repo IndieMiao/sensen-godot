@@ -6,9 +6,8 @@ Generates the schema-4 dynamic farm dataset the client reads (`modules/dynamic_f
 (C-48#3). Decisions: Q-59 (the farm follows the building outline), Q-58 (regenerate the dataset,
 DataSF geometry only, never Mapbox geometry, never on devserver).
 
-The client is not changed here (C-43). The current client still accepts only 760–840 core cells;
-r5 farms pass every other check and pass completely once C-43 lifts that one rule
-(`godot/check_client_decode.sh` shows both).
+The client is not changed here (C-43). C-43 lifted the client's old 760–840 core-cell rule, so r5
+farms decode completely (`godot/check_client_decode.sh`; on an older checkout it shows both).
 
 ## Data sources and licence
 

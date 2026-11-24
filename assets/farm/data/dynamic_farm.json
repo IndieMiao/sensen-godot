@@ -3,7 +3,7 @@
   "communities": [
     {
       "id": "sf",
-      "datasets": ["sf-dynamic-farm-20261118-r4"]
+      "datasets": ["sf-dynamic-farm-20261118-r4", "sf-dynamic-farm-20261124-r5"]
     }
   ],
   "welcome_gift": {

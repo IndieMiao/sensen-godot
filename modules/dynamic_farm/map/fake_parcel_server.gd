@@ -7,6 +7,7 @@ const Contract := preload("res://modules/dynamic_farm/map/geo_contract.gd")
 const NEIGHBOUR := "Maple"
 var nicknames := {"fake-a": "Ash", "fake-b": "Birch"}
 var reselect := true
+var dataset := Contract.DATASET # The only release this stand-in answers for.
 var claims := {} # parcel_id -> {player, center}
 var _seeded := {}
 
@@ -42,7 +43,7 @@ func handle(method: String, url: String, headers: PackedStringArray, body: Strin
 
 func _claim(player: String, data: Dictionary) -> ApiClient.Response:
 	var id = data.get("parcel_id")
-	if data.get("dataset_version") != Contract.DATASET or not Contract.valid_id(id) or not data.get("center") is Array:
+	if data.get("dataset_version") != dataset or not Contract.valid_id(id) or not data.get("center") is Array:
 		return _reply(400, {"code": "SCHEMA"})
 	_seed(id)
 	var mine := _mine(player)
@@ -53,7 +54,7 @@ func _claim(player: String, data: Dictionary) -> ApiClient.Response:
 	return _reply(201, {"parcel": _parcel(id)})
 
 func _owners(player: String, query: Dictionary) -> ApiClient.Response:
-	if query.get("dataset_version") != Contract.DATASET: return _reply(422, {"code": "UNKNOWN_DATASET"})
+	if query.get("dataset_version") != dataset: return _reply(422, {"code": "UNKNOWN_DATASET"})
 	var rows: Array = []
 	if query.has("ids"):
 		for id in str(query.ids).split(","):
@@ -80,7 +81,7 @@ func _mine(player: String) -> String:
 
 func _parcel(id: String) -> Variant:
 	if id.is_empty(): return null
-	return {"community_id": "sf", "layer": 0, "parcel_id": id, "dataset_version": Contract.DATASET,
+	return {"community_id": "sf", "layer": 0, "parcel_id": id, "dataset_version": dataset,
 		"center": claims[id].center, "claimed_at": 0, "farm_version": 0, "farm": {"v": 1}}
 
 static func _reply(status: int, json: Dictionary) -> ApiClient.Response:

@@ -81,12 +81,15 @@ func _start_claims() -> void:
 func _fake_claims() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/fake_claims", false))
 
+## Claims carry the configured release (config.json dataset_version), the same one the map and farms use.
 func _claim_api() -> RefCounted:
+	var dataset := str(_selector.config.get("dataset_version", ""))
 	if _fake_claims():
 		if _fake_server == null: _fake_server = FakeParcelServer.new()
-		return ClaimApi.new(_fake_server.client(str(ProjectSettings.get_setting("sensen/dynamic_farm/fake_player", "fake-a"))))
+		_fake_server.dataset = dataset
+		return ClaimApi.new(_fake_server.client(str(ProjectSettings.get_setting("sensen/dynamic_farm/fake_player", "fake-a"))), dataset)
 	var net := get_node_or_null("/root/Net")
-	return ClaimApi.new(net.client if net != null else null)
+	return ClaimApi.new(net.client if net != null else null, dataset)
 
 func _build_ui() -> void:
 	_hud = Control.new(); _hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

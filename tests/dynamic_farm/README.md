@@ -36,10 +36,14 @@ needed Avatar/AppRouter symbols, and use an isolated package/userdir. The scene'
 setting check is only an additional guard, not a replacement for build isolation.
 No stage-two APK or 3D-scene acceptance is claimed here.
 
-`modules/dynamic_farm/map/config.json` pins the reviewed r4 read-only dataset:
-`https://lonely-window-barely-sheriff.trycloudflare.com`,
-`sf-dynamic-farm-20261118-r4`, client SHA
-`645df3530b5617bb7e5a8cfb0d070e0e82b74337db47f83a542df1e90c3ae1cf`.
+`modules/dynamic_farm/map/config.json` pins the hosted r5 read-only dataset (C-48#42):
+`https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r5-c697144dd7c5/`,
+`sf-dynamic-farm-20261124-r5`, client SHA (of `client-manifest.json`)
+`1069a55876f36db56d28e0e60e24993153f583587d11168f2c96a919867bb295`; that
+client-manifest names the full `manifest.json` SHA `c697144d…63de`. The map uses
+the dataset's DataSF buildings (`building_source: datasf`), the same footprints
+the farm cores are rasterized from. Claims send the same `dataset_version`, which
+`assets/farm/data/dynamic_farm.json` registers on the server.
 The service is ready; the complete 3D candidate still requires its own reviewed
 scene integration and actual package verification. The packager must take exact source config, not
 silently replace URL/hash. Include five native runtime Kotlin files (no *Test),

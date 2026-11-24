@@ -84,6 +84,14 @@ func _server_contract() -> void:
 	server.reselect = true
 	check((await a.abandon()).ok and (await a.mine()).parcel.is_empty(), "internal server lets the player give up and choose again")
 	check((await ClaimApi.new(server.client("nobody")).claim(free_id[1], center)).code == "UNAUTHENTICATED", "unknown token cannot claim")
+	# C-43: claims carry the configured release; a client still on another release is refused.
+	var r5 := FakeServer.new(); r5.dataset = "sf-dynamic-farm-20261124-r5"
+	var r5_id: String = _free_ids(r5, 1)[0]
+	var stale: Dictionary = await ClaimApi.new(r5.client("fake-a")).claim(r5_id, center)
+	check(not stale.ok and stale.code == "SCHEMA", "claim for another dataset release is refused")
+	var current: Dictionary = await ClaimApi.new(r5.client("fake-a"), r5.dataset).claim(r5_id, center)
+	check(current.ok and current.parcel.dataset_version == r5.dataset, "claim on the configured release records that release")
+	check((await ClaimApi.new(r5.client("fake-a"), r5.dataset).owners([r5_id])).owners[r5_id].owner == "mine", "owner query uses the configured release")
 
 func _first_home_flow() -> void:
 	var server := FakeServer.new()
