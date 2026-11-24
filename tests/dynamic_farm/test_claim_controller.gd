@@ -468,7 +468,15 @@ func _home_framing() -> void:
 	page._render()
 	check(near.call(page._camera, [-122.43, 37.76], 16.0), "later renders do not pull a moved camera back")
 	page._home.pressed.emit()
+	check(page._camera.flying(), "'My home' flies (C-112)")
+	await create_timer(page._camera.FLIGHT_MAX_S + 0.3).timeout
 	check(near.call(page._camera, home_center, page.HOME_ZOOM), "'My home' brings the camera back to the home")
+	# C-112: farm-dev's locate key flies back to the player's home too.
+	page._camera.frame_center(-122.43, 37.76, 16.0); page._camera.user_moved.emit()
+	check(page._locate.visible and not page._locate.disabled and page._locate.icon != null, "the locate key is shown and enabled")
+	page._locate.pressed.emit()
+	await create_timer(page._camera.FLIGHT_MAX_S + 0.3).timeout
+	check(near.call(page._camera, home_center, page.HOME_ZOOM), "the locate key brings the camera back to the home")
 	# Back from the parcel: the same map page keeps the player's view.
 	page._camera.frame_center(-122.42, 37.77, 17.0); page._camera.user_moved.emit()
 	await page._claims.start(); page._render()
@@ -479,6 +487,10 @@ func _home_framing() -> void:
 	page = pair[0]
 	await page._claims.start()
 	check(page._framed and near.call(page._camera, area, 16.5) and not page._home.visible, "without a home, the map opens on the dataset's area and has no 'My home'")
+	page._camera.frame_center(-122.43, 37.76, 18.0); page._camera.user_moved.emit()
+	page._locate.pressed.emit()
+	await create_timer(page._camera.FLIGHT_MAX_S + 0.3).timeout
+	check(not page._locate.disabled and near.call(page._camera, area, 16.5), "without a home, the locate key goes back to the dataset's area")
 	page.queue_free(); pair[1].queue_free()
 	# The player moved before the home was known: their view is kept.
 	pair = make.call("fake-a")
