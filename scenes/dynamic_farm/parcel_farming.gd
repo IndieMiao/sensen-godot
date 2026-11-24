@@ -571,11 +571,14 @@ func open_bag(focus := "") -> void:
 	_scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_scrim.color = UiKit.alpha(UiTokens.COLOR_SCRIM, UiTokens.OPACITY_SCRIM_DRAWER)
 	_scrim.mouse_filter = Control.MOUSE_FILTER_STOP
-	_scrim.gui_input.connect(func(e: InputEvent):
+	# C-111: accept on this scrim before closing. close_bag() clears _scrim, and a method call on null is a
+	# native crash in release exports (no null check there): the 0.4.2 crash on the owner's phone.
+	var scrim := _scrim
+	scrim.gui_input.connect(func(e: InputEvent):
 		if (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed) \
 			or (e is InputEventScreenTouch and not e.pressed and not DisplayServer.is_touchscreen_available()):
-			close_bag()
-			_scrim.accept_event())
+			scrim.accept_event()
+			close_bag())
 	_ui.add_child(_scrim)
 	_drawer = UiDrawer.new(DRAWER_HEIGHT)
 	_drawer.name = "BagDrawer"

@@ -59,31 +59,6 @@ internal class ParcelLayerState {
         return true
     }
 }
-/**
- * C-111: the DataSF building GeoJSON (r6: 60 MB, ~144k footprints) is one Mapbox source kept per style and URL.
- * Parcel layers are rebuilt for every generation; re-adding this source with them re-downloaded and re-parsed it on
- * every return to the map, foreground or reload, and a removed parse could still be running beside the new one
- * (owner's phone: native crash at 2.5 GB RSS, C-111#20). Mapbox-free so JVM tests drive it.
- */
-internal class ParcelBuildingsSource {
-    enum class Plan { REUSE, ADD, REPLACE }
-    var url: String? = null; private set
-    var loaded = false; private set
-    private var failed = false
-
-    /** [exists]: the current style still has the source; a style reload drops it with every other source. */
-    fun plan(next: String, exists: Boolean): Plan = when {
-        !exists -> Plan.ADD
-        url == null || next != url || failed -> Plan.REPLACE
-        else -> Plan.REUSE
-    }
-    fun added(next: String) { url = next; loaded = false; failed = false }
-    /** Load events count while the parcel layers are cleared too: the map may finish a parse behind the 3D farm. */
-    fun markLoaded() { if (url != null && !failed) loaded = true }
-    /** A failed load is replaced, not reused, so the next setup fetches it again. */
-    fun markFailed() { if (url != null) { loaded = false; failed = true } }
-    fun dropped() { url = null; loaded = false; failed = false }
-}
 /** C-27: the one tap waiting for map idle. Mapbox-free so JVM tests drive it; newer taps replace older ones. */
 internal class ParcelIdleWait<T : Any> {
     var pending: T? = null; private set

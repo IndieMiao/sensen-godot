@@ -102,12 +102,8 @@ a shell dumpsys activity exit-info "$package" > "$out/exit-info-after.txt" || tr
   printf 'package %s serial %s rounds %s screen %sx%s\n' "$package" "$serial" "$rounds" "$W" "$H"
   printf 'first pid %s, last pid %s\n' "$first_pid" "$(app_pid)"
   awk -F, 'NR > 1 && $3 != "" { if ($3 > m) { m = $3; t = $1 } } END { printf "peak TOTAL PSS %d KiB (%.0f MiB) at %s\n", m, m / 1024, t }' "$out/meminfo.csv"
-  # Map setups: each accepted manifest sets up the parcel sources again (selection_controller.activate). Up to 0.4.2
-  # every setup also added a fresh buildings.geojson source; since C-111 native logs whether it fetched or reused it.
-  printf 'map source setups: %s\n' "$(grep -c 'DYNAMIC_LOAD.*client_manifest.*validation_accepted' "$out/logcat.txt" || true)"
-  printf 'building file fetches (ADD/REPLACE): %s, reuses: %s\n' \
-    "$(grep -cE 'DYNAMIC_BUILDINGS_SOURCE (ADD|REPLACE)' "$out/logcat.txt" || true)" \
-    "$(grep -c 'DYNAMIC_BUILDINGS_SOURCE REUSE' "$out/logcat.txt" || true)"
+  # Each accepted manifest is followed by a fresh buildings.geojson source in Mapbox (selection_controller.activate).
+  printf 'building source installs: %s\n' "$(grep -c 'DYNAMIC_LOAD.*client_manifest.*validation_accepted' "$out/logcat.txt" || true)"
   printf -- '--- crash / kill lines\n'
   grep -E 'Fatal signal|FATAL EXCEPTION|lowmemorykiller|lmkd|Low on memory|ANR in|Process .*'"$package"'.* has died|vkAcquireNextImage|VK_ERROR' "$out/logcat.txt" | head -40 || true
 } > "$out/summary.txt"
