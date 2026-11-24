@@ -15,6 +15,11 @@ opaque building keys never enter the farm payload. Multi-hit selection is explic
 Decision 1C hides standing parcel frames. q(336) (C-28, the owner 11-23) removes
 the open-ground fallback: a hit on a parcel without a building selects nothing,
 draws no rectangular parcel outline and keeps the "Tap a building" prompt.
+C-112 (C-103#18) draws no parcel colour or outline and no dark building frames at
+all: only buildings are filled (own green, someone else's red, claimable yellow when
+selected), and Mapbox's own place icons are hidden. The map camera takes farm-dev's
+inertia, double tap, two-finger tilt and flights (`test_map_camera.gd`); details in
+`docs/plans/C-112.md`.
 
 Pause/Back retires HTTP and query epochs, clears this generation's native layers
 and hides the map. Return gets a new global generation and restores the camera.

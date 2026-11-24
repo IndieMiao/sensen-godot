@@ -64,6 +64,21 @@ class ParcelPayloadTest {
         assertEquals("""["==",["get","block_id"],""]""", ParcelPayload.buildingFilter("3250003"))
         assertEquals("""["==",["get","block_id"],""]""", ParcelPayload.buildingFilter("p-a\"]"))
     }
+    @Test fun buildingPaintColoursOnlyOwnedParcelsBuildings() {
+        val states = mapOf("p-own" to ParcelVisualState(own = true), "p-taken" to ParcelVisualState(claimed = true),
+            "p-chosen" to ParcelVisualState(selected = true, claimed = true))
+        assertEquals("""["match",["get","block_id"],["p-own"],"#3E9B55","#D2493F"]""", ParcelPayload.buildingColor(states))
+        // Own 0.55, someone else's 0.5, deeper while selected; every other building is not drawn.
+        assertEquals("""["match",["get","block_id"],["p-own"],0.55,["p-taken"],0.5,["p-chosen"],0.7,0.0]""", ParcelPayload.buildingOpacity(states))
+        val mine = mapOf("p-own" to ParcelVisualState(own = true, selected = true))
+        assertEquals("""["match",["get","block_id"],["p-own"],0.75,0.0]""", ParcelPayload.buildingOpacity(mine))
+    }
+    @Test fun buildingPaintWithoutStatesStaysAValidFeatureDependentMatch() {
+        // A constant 0 could drop the layer from Mapbox's hit index, and match needs at least one label.
+        assertEquals("""["match",["get","block_id"],"","#3E9B55","#D2493F"]""", ParcelPayload.buildingColor(emptyMap()))
+        assertEquals("""["match",["get","block_id"],"",0.0,0.0]""", ParcelPayload.buildingOpacity(emptyMap()))
+        assertEquals("""["match",["get","block_id"],"",0.0,0.0]""", ParcelPayload.buildingOpacity(mapOf("p-a" to ParcelVisualState(selected = true))))
+    }
     @Test fun onlyWhitelistedOwnSourcePropertiesAreReturned() {
         val input = JsonParser.parseString("""{"block_id":"p-3139010","parcel_id":"3139010","address":null,"center":[-122,37],"geometry":{"type":"Polygon"},"device_id":"secret","other":"omit"}""").asJsonObject
         val output = ParcelPayload.publicProperties(input)!!

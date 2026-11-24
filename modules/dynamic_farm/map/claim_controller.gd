@@ -1,8 +1,8 @@
 extends Node
 ## C-32 first-home claim on the dynamic farm map. Ownership is the server's answer (C-31); this node only
 ## mirrors it into the native own/claimed state channel and claimer-name layer, and never decides a claim.
-## Colours (q(342)): own green, someone else's red with their name, a claimable selection keeps C-28's
-## yellow building fill. Selection itself stays with selection_controller.gd.
+## Colours (q(342); since C-112 on the parcel's buildings only, C-103#18): own green, someone else's red with their
+## name, a claimable selection keeps C-28's yellow building fill. Selection itself stays with selection_controller.gd.
 signal changed
 const NO_NAME := "Claimed"
 const SIGNED_OUT := ["LOGIN_REQUIRED", "UNAUTHENTICATED", "OFFLINE"]
