@@ -1,12 +1,16 @@
 extends SceneTree
 ## C-34 in the real scene, on the local save: one press each clears, tills and sows; the
 ## carrot waits 60 s; harvest fills the bag; the three refusals show on the key; reopening
-## keeps everything and grants nothing. Run in the private preview project (README), optionally
+## keeps everything and grants nothing. C-73: a press first walks the player beside the cell,
+## faces it and plays the labour clip; the result shows as the clip ends; a cell with nowhere to
+## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
+## save is applied. Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
+const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 var checks := 0
 var failures := 0
 var raw: Dictionary
@@ -20,12 +24,15 @@ class FlakyStore extends RefCounted:
 	var failures := 0
 	var calls := 0
 	var first_call_ready := false
+	var covered_at_call := false
 	var scene: Node
 	func _init(p_inner: RefCounted, p_failures: int) -> void:
 		inner = p_inner
 		failures = p_failures
 	func enter() -> Dictionary:
-		if calls == 0 and scene != null: first_call_ready = scene._ready_sent
+		if calls == 0 and scene != null:
+			first_call_ready = scene._ready_sent
+			covered_at_call = scene.get_node("ParcelFarming")._cover.visible
 		calls += 1
 		if failures > 0:
 			failures -= 1
@@ -72,13 +79,41 @@ func _open(store: RefCounted = null) -> Node:
 	await process_frame
 	return scene.get_node("ParcelFarming")
 
-func _press(farming: Node, cell: Vector2i) -> void:
+## Presses the key on `cell` and waits for the press to finish (walk, labour clip, result).
+## Returns what was seen: {clips, moved, early}: the rig's animations while busy, the distance
+## from the start, and whether the farm changed while the labour clip was still playing.
+func _press(farming: Node, cell: Vector2i) -> Dictionary:
 	farming.pick(cell)
 	await process_frame
 	await process_frame
+	var seen := {"clips": {}, "moved": 0.0, "early": false}
+	var start: Vector3 = scene._walk.position
+	var version: int = farming.farm_version
+	var player := scene._rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	farming._key.pressed_down.emit()
+	var deadline := Time.get_ticks_msec() + 30000
+	while farming.busy and Time.get_ticks_msec() < deadline:
+		if player != null: seen.clips[player.current_animation] = true
+		if scene._labour_left > 0.0 and farming.farm_version != version: seen.early = true
+		await process_frame
+	_check(not farming.busy, "a press finishes")
 	await process_frame
-	await process_frame
+	seen.moved = start.distance_to(scene._walk.position)
+	return seen
+
+## The player stands beside `cells` (not on them) and faces them.
+func _beside(cells: Array) -> bool:
+	var here: Vector2i = scene._walk.cell_at(scene._walk.position)
+	if here in cells: return false
+	var centre := Vector3.ZERO
+	for cell: Vector2i in cells: centre += scene._walk.point(cell)
+	var to: Vector3 = centre / cells.size() - scene._walk.position
+	to.y = 0
+	var near := false
+	for cell: Vector2i in cells:
+		var d: Vector2i = cell - here
+		near = near or (absi(d.x) <= 1 and absi(d.y) <= 1)
+	return near and scene._facing.dot(to.normalized()) > 0.9
 
 func _key(farming: Node, cell: Vector2i) -> Array:
 	farming.pick(cell)
@@ -105,10 +140,18 @@ func _first_visit() -> void:
 	var flaky := FlakyStore.new(_store(), 2)
 	var farming := await _open(flaky)
 	_check(flaky.calls == 2 and flaky.first_call_ready, "entry starts once the scene is up and retries a lost request once")
+	_check(flaky.covered_at_call, "the parcel is covered until the save is applied")
 	_check(farming.farm.is_empty() and farming._key.visible and farming._key.verb == "Retry", "a failed entry offers Retry")
+	_check(farming._cover.visible and farming._cover_label.text == farming.get_script().OPEN_FAILED, "a failed entry stays covered and says so")
+	var spawn_at: Vector3 = scene._walk.position
+	scene._movement = Vector2(1, 0)
+	for _i in 5: await process_frame
+	scene._movement = Vector2.ZERO
+	_check(scene._walk.position == spawn_at, "no walking before the save is applied")
 	farming._key.pressed_down.emit()
 	await process_frame
 	await process_frame
+	_check(not farming._cover.visible, "the cover lifts once the save is applied")
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("seed_carrot") == 3, "first entry: 1 hoe, 3 carrot seeds")
 	_check(farming._toast.current_text().begins_with("Received Starter Hoe ×1, Carrot Seeds ×3"), "the gift is announced")
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
@@ -130,7 +173,22 @@ func _first_visit() -> void:
 	for at: Vector2i in block:
 		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Clear", "Free", UiSceneAction.State.DEFAULT]
 	_check(all_clear, "every cell under the tree offers Clear, none Till")
-	await _press(farming, block.back())
+	_check(not _beside(block), "the tree starts out of reach")
+	# The stick cancels the walk: nothing is sent.
+	farming.pick(block.back())
+	await process_frame
+	var version: int = farming.farm_version
+	farming._key.pressed_down.emit()
+	for _i in 3: await process_frame
+	var walking: bool = not scene._route.is_empty() and farming.busy and farming.target == block.back()
+	scene._movement = Vector2(0, 1)
+	await process_frame
+	scene._movement = Vector2.ZERO
+	await process_frame
+	_check(walking and scene._route.is_empty() and not farming.busy and farming.farm_version == version and farming.farm.cleared.is_empty(), "the stick cancels a walk, nothing sent")
+	var seen := await _press(farming, block.back())
+	_check(seen.moved > data.cell_m and _beside(block), "the player walks beside the tree and faces it")
+	_check(seen.clips.has("labour_clear") and not seen.early, "the clear clip plays, the tree goes as it ends")
 	_check(farming.farm.cleared == [ParcelFarm.key(obstacle)] and _obstacle_instances(farming) == before - 1, "one press clears it, named by its anchor")
 	var freed := true
 	for at: Vector2i in block:
@@ -140,10 +198,12 @@ func _first_visit() -> void:
 	# Till, sow, wait, harvest.
 	var cell := _free_cell(data, farming)
 	_check(await _key(farming, cell) == ["Till", "Free", UiSceneAction.State.DEFAULT], "a free core cell offers Till")
-	await _press(farming, cell)
+	seen = await _press(farming, cell)
+	_check(_beside([cell]) and seen.clips.has("labour_till") and not seen.early, "till: beside the cell, facing it, the till clip")
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._soil.counts().get("soil", 0) == 1, "one press tills, soil drawn")
 	_check(await _key(farming, cell) == ["Sow", "Carrot", UiSceneAction.State.DEFAULT], "tilled soil offers Sow")
-	await _press(farming, cell)
+	seen = await _press(farming, cell)
+	_check(seen.moved < 0.01 and seen.clips.has("labour_sow"), "already beside it: no walk, the sow clip")
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(crop.get("ripe_at", 0) - crop.get("planted_at", 0) == 60000 and farming.farm.bag.seed_carrot == 2, "sown: 60 s to ripen, one seed used")
 	key = await _key(farming, cell)
@@ -157,13 +217,29 @@ func _first_visit() -> void:
 	for at: Vector2i in ParcelFarm.house_cells(farming.farm):
 		if not farming._obstacles.has(at): under_house = at
 	_check(await _key(farming, under_house) == ["Till", "House here", UiSceneAction.State.UNAVAILABLE], "the house refuses")
-	var version: int = farming.farm_version
+	version = farming.farm_version
 	await _press(farming, data.spawn)
 	_check(farming.farm_version == version and farming._toast.current_text() == "On the path", "a refused press sends nothing")
+	# A free cell with nowhere to stand: fence its eight neighbours off the walk.
+	var fenced := _free_cell(data, farming, [cell])
+	var fence: Array = []
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			if dx == 0 and dy == 0: continue
+			var post := Proxy.new({"shape": "cylinder", "radius_m": 0.4, "height_m": 1.0, "center_xz_m": [0, 0], "solid": true},
+				Transform3D(Basis(), walk.point(fenced + Vector2i(dx, dy))), 1.0)
+			walk.add_prop(post)
+			fence.append(post)
+	var at_start: Vector3 = walk.position
+	seen = await _press(farming, fenced)
+	_check(farming._toast.current_text() == farming.get_script().UNREACHABLE and farming.farm_version == version and seen.moved < 0.01, "nowhere to stand: says so, sends nothing")
+	for post in fence: walk.remove_prop(post)
+	_check(walk.position == at_start, "and the player stays put")
 	shift[0] += 60000
 	farming._clock_offset_ms += 60000
 	_check(await _key(farming, cell) == ["Harvest", "Free", UiSceneAction.State.DEFAULT], "ripe after 60 s")
-	await _press(farming, cell)
+	seen = await _press(farming, cell)
+	_check(_beside([cell]) and seen.clips.has("labour_harvest") and not seen.early, "harvest: beside the cell, the harvest clip")
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming._toast.current_text() == "+1 Carrot", "harvest goes to the bag")
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crops.counts().get("C", 0) == 0, "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
@@ -177,6 +253,7 @@ func _reopen() -> void:
 	var flaky := FlakyStore.new(_store(), 1)
 	var farming := await _open(flaky)
 	_check(flaky.calls == 2 and not farming.unavailable and farming._key.verb != "Retry", "one lost entry request is retried without Retry")
+	_check(flaky.covered_at_call and not farming._cover.visible, "covered while entering, uncovered with the save applied")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
 	_check(not farming._toast.current_text().begins_with("Received"), "no second gift toast")
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
@@ -205,12 +282,15 @@ func _free_block(data: Dictionary) -> Vector2i:
 		if ok and (at - data.spawn).length() > 6: return at
 	return Vector2i(-1, -1)
 
-func _free_cell(data: Dictionary, farming: Node) -> Vector2i:
+func _free_cell(data: Dictionary, farming: Node, except: Array = []) -> Vector2i:
 	var house := ParcelFarm.house_cells(farming.farm)
 	var obstacles: Dictionary = farming.obstacle_cells()
 	for cell: Dictionary in data.cells:
 		var at := Vector2i(cell.x, cell.y)
-		if cell.zone == "core" and not farming._path.has(at) and not obstacles.has(at) and not house.has(at): return at
+		if cell.zone == "core" and not farming._path.has(at) and not obstacles.has(at) and not house.has(at) and not ParcelFarm.key(at) in farming.farm.tilled:
+			var apart := true
+			for other: Vector2i in except: apart = apart and (absi(other.x - at.x) > 2 or absi(other.y - at.y) > 2)
+			if apart: return at
 	return Vector2i(-1, -1)
 
 func _outside_cell(data: Dictionary) -> Vector2i:
