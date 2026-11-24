@@ -17,6 +17,11 @@ class ParcelPayloadTest {
         assertEquals(17.0, c.minZoom); assertEquals(18.0, c.addressMinZoom)
         assertFails { ParcelPayload.config(config.replace("block_id", "parcel_id")) }
     }
+    @Test fun refetchBuildingsIsAnOptionalBoolean() {
+        assertFalse(ParcelPayload.config(config).refetchBuildings)
+        assertTrue(ParcelPayload.config(config.replace("}", ",\"refetch_buildings\":true}")).refetchBuildings)
+        assertFails { ParcelPayload.config(config.replace("}", ",\"refetch_buildings\":\"true\"}")) }
+    }
     @Test fun rejectsLocalFileCleartextCredentialAndInvalidZoomSources() {
         for (url in listOf("file:///tmp/index.geojson", "http://demo.example/index.geojson", "https://name:secret@demo.example/index.geojson")) {
             assertFails { ParcelPayload.config(config.replace("https://demo.example/r2/index.geojson", url)) }

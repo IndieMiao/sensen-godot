@@ -98,6 +98,9 @@ func first_tap_retry() -> void:
 	check(is_equal_approx(controller.retry_delay(), 5.0), "configured retry delay is bounded")
 	controller.config.erase("query_retry_delay_ms")
 	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "missing configuration uses the default delay")
+## C-124: the last map setup asked native to replace a DataSF building copy that is still loading.
+func refetch() -> bool:
+	return JSON.parse_string(native.sources.back()[1]).get("refetch_buildings", false) == true
 func map_error(code := "parcels_source_load_failed") -> void:
 	native.parcel_error.emit(controller.generation, controller.style_generation, code)
 func reload() -> void:
@@ -149,6 +152,7 @@ func buildings_layer_timeout() -> void:
 	controller.config.building_source = "datasf"; controller.config.buildings_url = "https://demo.invalid/buildings.geojson"
 	await controller.activate(); ready_signal()
 	check(JSON.parse_string(native.sources.back()[1]).get("building_source") == "datasf", "DataSF building layer is configured")
+	check(not refetch(), "a normal map setup reuses the building copy (C-118)")
 	var boots := native.sources.size()
 	controller._process(controller.buildings_load_timeout() - 1.0)
 	check(controller.map_ready and native.sources.size() == boots, "a building layer still within its load time is not a failure")
@@ -161,17 +165,27 @@ func buildings_layer_timeout() -> void:
 	check(controller.message == "Finding parcel…" and controller.busy and not controller.map_ready, "a building layer that never loads counts as a map load error and reloads once, keeping the tap")
 	await reload(); ready_signal()
 	check(native.sources.size() == boots + 1 and native.queries.size() == sent, "the automatic reload sets the sources again and the tap still waits for buildings")
+	check(refetch(), "C-124: the reload after the building timeout fetches a copy still loading again")
 	controller._process(controller.buildings_load_timeout() + .1)
 	check(controller.message == Controller.MAP_FAILED and not controller.busy, "still missing after the reload: the map failure with Retry, not endless loading")
 	controller._process(controller.buildings_load_timeout() + .1); for i in 4: await process_frame
 	check(native.sources.size() == boots + 1, "the reported failure is not reloaded again automatically")
 	controller.retry(); for i in 4: await process_frame
 	check(native.sources.size() == boots + 2, "Retry after the building layer failure reloads the map")
+	check(refetch(), "C-124: Retry fetches a building copy still loading again")
+	var waits: Array = []
+	var on_load := func(row: Dictionary): if row.resource == "buildings": waits.append(row)
+	controller.load_diagnostic.connect(on_load)
 	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	controller.load_diagnostic.disconnect(on_load)
+	# C-118: the wait for the building layer is logged once per map setup, so a reused one shows as a short wait.
+	check(waits.size() == 1 and waits[0].stage == "ready" and waits[0].elapsed_ms >= 0, "the building layer's wait is logged once when it loads")
 	controller._process(controller.buildings_load_timeout() + .1)
 	check(controller.map_ready and controller.message == Controller.PROMPT and native.sources.size() == boots + 2, "a loaded building layer stops the countdown")
 	# C-43 V-199: a tap waiting for the building layer is answered when it loads; the highlight is the chosen parcel's.
 	await controller.activate(); ready_signal(); sent = native.queries.size()
+	check(not refetch(), "the next pause and resume reuses the building copy again")
 	controller.tap(Vector2(.2, .8), 17.5)
 	check(native.queries.size() == sent, "a tap at the default zoom waits for the DataSF building layer")
 	native.parcel_ready.emit(controller.generation, controller.style_generation, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
@@ -193,6 +207,12 @@ func buildings_layer_timeout() -> void:
 	check(controller.map_ready, "back at the selectable zoom the countdown starts from where it paused")
 	controller._process(1.5)
 	check(not controller.map_ready and controller.busy, "a building layer still not loaded at the selectable zoom times out")
+	controller.pause(); await controller.activate()
+	check(refetch(), "C-124: a building timeout followed by a pause still fetches the stuck copy again on return")
+	await controller.activate()
+	check(not refetch(), "only the one setup after the timeout asks for a new copy")
+	map_error(); await reload()
+	check(not refetch(), "other map errors reload without fetching the building copy again")
 	controller.config.buildings_load_timeout_ms = 1
 	check(is_equal_approx(controller.buildings_load_timeout(), 5.0), "building load time has a lower bound")
 	controller.config.buildings_load_timeout_ms = 1e30
