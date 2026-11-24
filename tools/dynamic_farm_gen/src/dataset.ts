@@ -276,7 +276,8 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
     const outline = (geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates) as Polygon[];
     tileFeatures.push({ id: blockId, properties, polygons: outline });
     for (const b of records) {
-      buildingFeatures.push({ type: 'Feature', properties: { block_id: blockId }, geometry: shape(slimPolygons(b.polygons, mapParams)) });
+      const slim = slimPolygons(b.polygons, mapParams);
+      if (slim.length > 0) buildingFeatures.push({ type: 'Feature', properties: { block_id: blockId }, geometry: shape(slim) });
     }
     reports.push({
       block_id: blockId, name: parcel.record.name, building_count: records.length, building_source: chosen,

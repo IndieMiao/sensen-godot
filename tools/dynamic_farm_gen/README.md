@@ -134,8 +134,12 @@ A full city cannot ship as one index.geojson, so the dataset uses the r4 map for
   reads), one feature per used footprint so a tap still highlights that building, `block_id` only
   (the source `area_id`s are in the generation report), lon/lat rounded to 6 decimals (~0.1 m) and
   vertices within 0.1 m of the outline dropped (Douglas–Peucker); a ring that would degenerate
-  keeps its unsimplified shape, a footprint is never dropped. Test range: 77,147 → 51,817 bytes,
-  2,413 → 1,634 vertices.
+  keeps its unsimplified shape at 7 decimals. A part with no area even then (a sliver of a
+  MultiPolygon) is dropped: the native map rejects the **whole** file when one ring has fewer than
+  4 positions, and then no building can be tapped (C-43 V-167, two such parts in the first hosted
+  r5). Test range: 77,147 → 51,817 bytes, 2,413 → 1,634 vertices.
+- **Map-layer geometry** (`checkMapGeometry` in `src/validate.ts`, part of `cli validate`): every
+  ring of buildings.geojson and index.geojson has at least 4 finite positions and is closed.
 
 Map parameters (`src/mvt.ts`, override with `build --map-params file.json`):
 
