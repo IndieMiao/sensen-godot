@@ -64,6 +64,16 @@ func _footprint() -> void:
 	_check(cells.size() == 9 and cells[0] == Vector2i(5, 7) and cells[-1] == Vector2i(7, 9), "3×3 from its lowest cell")
 	var walk := Walk.new(Data.decode(Fixture.farm("p-A")))
 	_check(House.center(walk, Vector2i(5, 7)).is_equal_approx(walk.point(Vector2i(6, 8))), "model on the middle cell")
+	# C-114: the build's dust at the footprint's corners and edge middles (1.2 m out at 0.8 m cells), on the ground.
+	var middle := House.center(walk, Vector2i(5, 7))
+	var rim := House.rim(walk, Vector2i(5, 7))
+	var half := 1.5 * walk.cell_m
+	var wanted: Array[Vector3] = []
+	for dz in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx != 0 or dz != 0: wanted.append(middle + Vector3(dx, 0, dz) * half)
+	_check(rim.size() == 8 and range(8).all(func(i): return rim[i].is_equal_approx(wanted[i])),
+		"dust round the footprint's rim")
 
 ## The house through C-34's save (Q-44), same answers as the server (C-31): the gift once, one house, a blueprint
 ## spent, the house back after reopening; the house's size and model as the shared rules file says.

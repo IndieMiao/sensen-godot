@@ -68,18 +68,40 @@ func load_saved(path := PATH) -> bool:
 	return signed_in()
 
 func save(path := PATH) -> bool:
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f == null: return false
-	f.store_string(JSON.stringify({"token": token, "user_id": user_id, "player_id": player_id,
+	return write_atomic(path, JSON.stringify({"token": token, "user_id": user_id, "player_id": player_id,
 		"email": email, "email_verified": email_verified, "has_password": has_password, "display_name": display_name, "gender": gender,
 		"gender_custom": gender_custom, "birth_date": birth_date, "age": age}))
+
+## 账号文件一次写完（C-110）：先完整写进同目录的临时文件，再改名替换。改名是原子的，闪退或写到一半
+## 被杀时，磁盘上要么是旧文件，要么是新文件，不会留下半个 JSON。没写完的临时文件读档时不看。
+static func write_atomic(path: String, text: String) -> bool:
+	var temp := path + ".tmp"
+	if not write_temp(temp, text):
+		_remove(temp)
+		return false
+	return commit_temp(temp, path)
+
+static func write_temp(temp: String, text: String) -> bool:
+	var f := FileAccess.open(temp, FileAccess.WRITE)
+	if f == null: return false
+	var ok := f.store_string(text)
+	f.flush()
+	ok = ok and f.get_error() == OK
 	f.close()
-	return true
+	return ok
+
+static func commit_temp(temp: String, path: String) -> bool:
+	if DirAccess.rename_absolute(ProjectSettings.globalize_path(temp), ProjectSettings.globalize_path(path)) == OK: return true
+	_remove(temp)
+	return false
+
+static func _remove(path: String) -> void:
+	if FileAccess.file_exists(path): DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 func clear(path := PATH) -> void:
 	_reset_fields()
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	_remove(path)
+	_remove(path + ".tmp")
 
 ## 接收服务端账号回包（注册 / 登录 / 重置 / users/me）。token 缺省时保留原 token。
 func adopt(body: Dictionary, path := PATH) -> void:

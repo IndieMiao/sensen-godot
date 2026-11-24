@@ -57,7 +57,10 @@ under the finger); its 3×3 cells fill green or red, grid lines fade over three 
 path's cells in reach show sand. The bottom is the shared `UiPlaceBar` (`Cancel · Build`); the main key shows why a
 spot is refused. The preview starts on the valid spot nearest the player. Build sends `place_house` through
 `ParcelFarming.send`; the cottage stands at once (no construction time). A refused Build (`CELL_OCCUPIED`) keeps the
-preview, judged again on the farm the reply brought.
+preview, judged again on the farm the reply brought. A successful Build (C-114) pops the cottage in and puffs dust with
+the main farm's look-swap effect (`P0Fence.pop_in` / `P0Fence.dust`, read-only): one puff at the middle and one at each
+corner and edge middle of the footprint (`House.rim`), each `HOUSE_DUST_SCALE` (4) times the main farm's size. A house
+that comes with the save (reopening, a refused Build) just stands there.
 
 Rules (`modules/dynamic_farm/farm_house.gd`, the save's `house.x/y` is the footprint's lowest cell): every cell
 core (`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
@@ -68,7 +71,7 @@ contact; the eaves, bench, woodpile and doorstep are not walls. A player standin
 nearest clear point. Without `own_parcel` (the art preview) nothing of this shows.
 
 `tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
-Build, the wall, reopen (`--headless`: states only).
+Build (three pop frames), the wall, reopen (`--headless`: states only).
 
 ## First-visit guide (C-35, 0.4.2; C-61, 0.4.3)
 

@@ -15,6 +15,8 @@ const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
 const MOBILE_BASE := "https://farm.sensenjoy.cn/preview/journey/v1"
 ## 放一行 URL 就能把客户端指到别的服务器（局域网调试用），不用改代码重打包。
 const SERVER_OVERRIDE := "user://server.txt"
+## 动态农场正式包（C-98）才打开；它只连包里写死的正式地址，忽略 SERVER_OVERRIDE（C-116）。
+const INVITE_ONLY_SETTING := "sensen/account/invite_only"
 
 var client: ApiClient
 var session: FarmSession
@@ -24,6 +26,9 @@ var account_path := AccountSession.PATH
 var booting := false
 var booted_once := false
 var online_available := false
+## 上次恢复账号时没能向服务器核实、按原样保留了本机账号的原因（C-110）："TRANSPORT"、"RATE_LIMITED"、
+## "HTTP_503" 这类；核实通过、没有已存账号或账号被清掉时为空。
+var restore_error := ""
 
 func _ready() -> void:
 	client = ApiClient.new(base_url(), ApiClient.make_http_transport(self))
@@ -46,7 +51,8 @@ static func is_test_process() -> bool:
 	return false
 
 static func base_url() -> String:
-	if FileAccess.file_exists(SERVER_OVERRIDE):
+	var invite_only := bool(ProjectSettings.get_setting(INVITE_ONLY_SETTING, false))
+	if not invite_only and FileAccess.file_exists(SERVER_OVERRIDE):
 		var s := FileAccess.get_file_as_string(SERVER_OVERRIDE).strip_edges()
 		if s.begins_with("http"):
 			return s.trim_suffix("/")
@@ -63,6 +69,7 @@ func use_transport(t: Callable, p_base := "https://example.test/v1", p_account_p
 	account = AccountSession.new()
 	account_path = p_account_path
 	booted_once = false
+	restore_error = ""
 
 ## 登录 + 取回已有农场（404 是正常的：新玩家还没建场）。返回是否登录成功。
 func boot() -> bool:
@@ -94,15 +101,19 @@ func logged_in() -> bool:
 func is_guest() -> bool:
 	return not account.signed_in()
 
-## 启动时恢复已保存的账号会话。token 失效就清掉回游客；断网则先按账号离线进入。
+## 启动时恢复已保存的账号会话。只有服务器明确回 401（token 失效）才清掉回游客；断网、限流、服务器
+## 出错都保留本机账号先按账号进入，原因记在 restore_error 供界面提示（C-110）。
 func _resume_account() -> bool:
 	await session.adopt_account(account.token, account.player_id, account.user_id)
 	var me := await AccountSession.me(client)
 	if me.ok:
+		restore_error = ""
 		account.adopt(me.body, account_path)
 		return true
-	if me.code == "TRANSPORT":
+	if int(me.status) != 401:
+		restore_error = str(me.code) if not str(me.code).is_empty() else "HTTP_%d" % int(me.status)
 		return true
+	restore_error = ""
 	account.clear(account_path)
 	await session.forget_identity()
 	return false
@@ -110,7 +121,10 @@ func _resume_account() -> bool:
 ## 只读回本机已保存的账号 token（C-32）：给跳过 boot() 的隔离测试包用，不做匿名登录、不取农场、
 ## 不探测联机。调用方自己判断是否允许（动态农场内部测试包的 `sensen/dynamic_farm/account_restore`）。
 func restore_saved_account() -> bool:
-	if account.signed_in() and not client.token.is_empty(): return true
+	if account.signed_in() and not client.token.is_empty():
+		if restore_error.is_empty(): return true
+		return await _resume_account() # The last check could not reach the server: ask again.
+	restore_error = ""
 	if not account.load_saved(account_path): return false
 	return await _resume_account()
 
@@ -133,6 +147,7 @@ func ensure_city(city_id: String) -> Dictionary:
 func sign_in_with(body: Dictionary) -> bool:
 	if str(body.get("token", "")).is_empty() or str(body.get("user_id", "")).is_empty(): return false
 	account.adopt(body, account_path)
+	restore_error = ""
 	await session.adopt_account(account.token, account.player_id, account.user_id)
 	await session.refresh()
 	if session.has_farm(): await ensure_city(session.region_id)
@@ -140,13 +155,14 @@ func sign_in_with(body: Dictionary) -> bool:
 	account_changed.emit(true)
 	return true
 
-## 登出：撤销本设备 token，回到游客身份。
-func sign_out() -> void:
+## 登出：撤销本设备 token，回到游客身份。guest_login=false 时不做匿名登录（动态农场包不用游客身份）。
+func sign_out(guest_login := true) -> void:
 	if account.signed_in():
 		await client.request("DELETE", "/auth/token")
 	account.clear(account_path)
+	restore_error = ""
 	await session.forget_identity()
-	await session.login()
+	if guest_login: await session.login()
 	online_available = false
 	account_changed.emit(false)
 

@@ -3,12 +3,14 @@
 set -euo pipefail
 umask 077
 fail() { echo "worker APK: $*" >&2; exit 1; }
-usage='usage: build_worker_apk.sh [--dynamic-farm | --dynamic-farm-internal APPROVED_TARGET] NEW_OUTPUT_DIRECTORY'
+usage='usage: build_worker_apk.sh [--dynamic-farm | --dynamic-farm-internal APPROVED_TARGET | --dynamic-farm-release] NEW_OUTPUT_DIRECTORY'
 variant=android target=
 case ${1:-} in
     --dynamic-farm) variant=dynamic-farm; shift ;;
     # Internal test package only: Journey at an approved isolated test service (C-39).
     --dynamic-farm-internal) (($# >= 2)) || fail "$usage"; variant=dynamic-farm-internal target=$2; shift 2 ;;
+    # Invite-only release package (C-98): the preview's package, Journey fixed to the production service.
+    --dynamic-farm-release) variant=dynamic-farm-release; shift ;;
 esac
 [[ $# == 1 ]] || fail "$usage"
 [[ $1 == /* ]] || fail 'output directory must be an absolute path'
@@ -61,11 +63,12 @@ if not re.fullmatch(rb'pk\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+', pk):
 Path(sys.argv[2]).write_bytes(pk + b'\n')
 PY
 if [[ $variant == dynamic-farm* ]]; then
-    (cd "$p/tools/android" && python3 -B - "$p/project.godot" "$target" <<'PYPROJECT'
+    (cd "$p/tools/android" && python3 -B - "$p/project.godot" "$target" "$variant" <<'PYPROJECT'
 from pathlib import Path
 import sys
 from dynamic_farm_export import staged_project
-p = Path(sys.argv[1]); p.write_text(staged_project(p.read_text(), sys.argv[2] or None))
+p = Path(sys.argv[1])
+p.write_text(staged_project(p.read_text(), sys.argv[2] or None, sys.argv[3] == 'dynamic-farm-release'))
 PYPROJECT
     )
 fi

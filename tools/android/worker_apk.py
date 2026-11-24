@@ -38,7 +38,7 @@ def worker_preset(text, variant='android'):
         return values[0]
 
     if variant != 'android':
-        header, options = farm.staged_preset(header, options, variant == 'dynamic-farm-internal')
+        header, options = farm.staged_preset(header, options, variant)
     identity = dict(package=value(r'^package/unique_name="([a-zA-Z0-9_.]+)"$'),
                     version_code=value(r'^version/code=(\d+)$'), version_name=value(r'^version/name="([^"\n]+)"$'))
     options, count = re.subn(r'^package/signed=(?:true|false)$', 'package/signed=false', options, flags=re.M)
