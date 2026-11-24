@@ -59,7 +59,7 @@ export class PgParcelStore implements ParcelStore {
     return r.rows.map(row => ({ parcel_id: row.parcel_id as string, player_id: row.player_id as string, nickname: (row.display_name ?? null) as string | null }));
   }
 
-  async updateFarm(playerId: string, baseVersion: number, apply: (farm: ParcelFarmState) => FarmOutcome, now: number): Promise<FarmUpdateOutcome> {
+  async updateFarm(playerId: string, baseVersion: number, apply: (farm: ParcelFarmState, parcel: OwnedParcel) => FarmOutcome, now: number): Promise<FarmUpdateOutcome> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
@@ -67,7 +67,7 @@ export class PgParcelStore implements ParcelStore {
       if (!r.rows[0]) { await client.query('ROLLBACK'); return { kind: 'no_parcel' }; }
       const row = rowToParcel(r.rows[0]);
       if (row.farm_version !== baseVersion) { await client.query('ROLLBACK'); return { kind: 'version_conflict', parcel: row }; }
-      const out = apply(structuredClone(row.farm));
+      const out = apply(structuredClone(row.farm), row);
       if (!out.ok) { await client.query('ROLLBACK'); return { kind: 'rejected', index: out.index, code: out.code, detail: out.detail, parcel: row }; }
       const updated = await client.query(
         `UPDATE parcel_claims SET farm_state = $4, farm_version = farm_version + 1, updated_at = $5
