@@ -19,8 +19,14 @@ r5 farms pass every other check and pass completely once C-43 lifts that one rul
 
 Source labels (`src/sources.ts`):
 
-- `datasf-parcels`, `datasf-buildings` – the DataSF (Socrata) API itself. Use these for the real
-  build. The local Mac's network gets HTTP 403 from every Socrata domain, so they are untested here.
+- `datasf-parcels`, `datasf-buildings` – the DataSF (Socrata) API itself, `data.sf.gov` (the old
+  `data.sfgov.org` now 301-redirects there). Use these for the real build. From a mainland-China
+  egress (cardigan-ci, the control host, the local Mac) the Socrata edge answers **every** request
+  with a bare nginx 403 – homepage, metadata and data alike, on every Socrata portal (SF, NYC,
+  Seattle, LA), with or without an app token – so this is a regional block, not a rate limit, a
+  missing token or a moved endpoint (C-75). The fetch fails at once with a message saying so.
+  To use these sources, fetch from an egress outside mainland China, e.g. through a proxy:
+  `NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://<proxy> pnpm cli fetch …` (Node 24's `fetch` honours it).
 - `sfgis-parcels`, `sfgis-buildings` – the City and County of San Francisco's ArcGIS Online copies
   ("from DataSF, pulled daily/weekly", owner `vll_sfgis`, licence stated as PDDL 1.0). The building
   copy is **incomplete**: 82,000 of 177,023 rows (area_id 21567–143982; the largest and the
@@ -162,8 +168,8 @@ pnpm cli check-tiles --dataset "$TMPDIR/r5" --report "$TMPDIR/mvt-validation.jso
 godot/check_client_decode.sh "$TMPDIR/r5"                    # the client's own GDScript parsers (also decodes the tiles)
 pnpm cli tilejson --dataset "$TMPDIR/r5" --base https://<host>/<prefix>   # on the host, after upload path is known
 
-# Full city (planned on cardigan-ci): official DataSF sources, no --bbox.
-pnpm cli fetch --out snap-full --sources datasf-parcels,datasf-buildings
+# Full city: official DataSF sources, no --bbox. Needs an egress outside mainland China (see above).
+NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://<proxy> pnpm cli fetch --out snap-full --sources datasf-parcels,datasf-buildings
 pnpm cli build --snapshot snap-full --out r5 --dataset-version sf-dynamic-farm-<YYYYMMDD>-r5
 ```
 

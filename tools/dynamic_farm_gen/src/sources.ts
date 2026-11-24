@@ -30,12 +30,12 @@ const PDDL = 'Open Data Commons Public Domain Dedication and License (PDDL) 1.0'
 export const SOURCES: Record<string, SourceDef> = {
   'datasf-parcels': {
     label: 'datasf-parcels', role: 'parcels', kind: 'socrata', title: 'Parcels – Active and Retired',
-    datasf_dataset: 'acdm-wktn', license: PDDL, url: 'https://data.sfgov.org/resource/acdm-wktn.geojson', geometry_field: 'shape',
+    datasf_dataset: 'acdm-wktn', license: PDDL, url: 'https://data.sf.gov/resource/acdm-wktn.geojson', geometry_field: 'shape',
     fields: ['mapblklot', 'blklot', 'from_address_num', 'to_address_num', 'street_name', 'street_type', 'active', 'data_as_of'],
   },
   'datasf-buildings': {
     label: 'datasf-buildings', role: 'buildings', kind: 'socrata', title: 'Building Footprints',
-    datasf_dataset: 'ynuv-fyni', license: PDDL, url: 'https://data.sfgov.org/resource/ynuv-fyni.geojson', geometry_field: 'shape',
+    datasf_dataset: 'ynuv-fyni', license: PDDL, url: 'https://data.sf.gov/resource/ynuv-fyni.geojson', geometry_field: 'shape',
     fields: ['area_id', 'mblr', 'sf16_bldgid', 'data_as_of'],
   },
   'sfgis-parcels': {
@@ -65,15 +65,41 @@ export interface SnapshotManifest { snapshot_schema: 1; fetched_at: string; bbox
 
 export const sha256 = (data: string | Uint8Array) => createHash('sha256').update(data).digest('hex');
 
+/**
+ * C-75: data.sfgov.org now 301-redirects to data.sf.gov, and the Socrata edge answers every request
+ * from a mainland-China egress (cardigan-ci, the control host) with a bare nginx 403, homepage and
+ * metadata included, with or without an app token. Such a 403 is not retried and names the way out.
+ */
+export function httpFailure(status: number, url: string, socrata: boolean): { message: string; retry: boolean } {
+  const base = `HTTP ${status} for ${url}`;
+  const retry = status >= 500 || status === 408 || status === 429;
+  if (status === 403 && socrata) {
+    return {
+      retry,
+      message: `${base}: the Socrata edge refused this network (regional block, not a missing app token). `
+        + 'Use the sfgis-* ArcGIS sources, or fetch through an egress outside mainland China '
+        + '(NODE_USE_ENV_PROXY=1 HTTPS_PROXY=<proxy> on Node 24).',
+    };
+  }
+  return { message: base, retry };
+}
+
+class HttpError extends Error {
+  constructor(message: string, readonly retry: boolean) { super(message); }
+}
+
 async function getText(url: string): Promise<string> {
   for (let attempt = 1; ; attempt++) {
     try {
       const res = await fetch(url, { headers: { Accept: 'application/json', 'User-Agent': 'sensen-dynamic-farm-gen/1' } });
       const body = await res.text();
-      if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      if (!res.ok) {
+        const f = httpFailure(res.status, url, res.headers.has('x-socrata-requestid'));
+        throw new HttpError(f.message, f.retry);
+      }
       return body;
     } catch (error) {
-      if (attempt >= 4) throw error;
+      if (attempt >= 4 || (error instanceof HttpError && !error.retry)) throw error;
       await new Promise(r => setTimeout(r, 1000 * 2 ** attempt));
     }
   }
