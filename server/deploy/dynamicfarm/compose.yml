@@ -1,0 +1,63 @@
+# 动态农场正式服（C-96）：Journey 服务端（地块认领、地块存档、市场和木匠）加它自己的 PostgreSQL。
+# 独立的 compose 项目 dynamicfarm：自己的网络和数据卷，不加入 P0 或旧 farm 的网络，不挂它们的卷，不连 P0 的数据。
+# 只有 app 在主机回环地址上发布一个端口给入口反向代理；数据库不发布端口。
+# 由同目录的 ops.sh 操作（它核对镜像 ID 后才启动 app），不要直接 docker compose up。说明见 README.md。
+name: dynamicfarm
+
+services:
+  app:
+    image: ${APP_IMAGE:?需要 APP_IMAGE，如 dynamicfarm-server:<完整提交号>}
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgres://dynamicfarm:${POSTGRES_PASSWORD:?需要 POSTGRES_PASSWORD}@postgres:5432/sensen_dynamicfarm
+      GIT_SHA: ${GIT_SHA:?需要 GIT_SHA}
+      # 正式配置写死在这里：compose 的 environment 优先于 env_file，.env 里写了同名项也不生效。
+      # 只用邀请账号（邮箱注册、Apple / Google 首登建号都关）；游客只读；不开放“放弃并重选”；不用 QA 固定验证码。
+      ACCOUNT_SIGNUP: closed
+      GUEST_WRITES: "0"
+      DYNAMIC_FARM_RESELECT: "0"
+      GOOGLE_CLIENT_IDS: ""
+      APPLE_BUNDLE_IDS: ""
+      QA_EMAIL_DOMAIN: ""
+      QA_EMAIL_CODE: ""
+      EMAIL_LOG_CODES: "0"
+      NODE_OPTIONS: --network-family-autoselection-attempt-timeout=1500
+    depends_on:
+      postgres: { condition: service_healthy }
+    # 只给入口反向代理用；不要改成 0.0.0.0。
+    ports: ["127.0.0.1:${DF_HOST_PORT:-3160}:3000"]
+    mem_limit: 768m
+    cpus: 1.0
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  postgres:
+    image: ${PG_IMAGE:?需要按 digest 引用的 postgres 16 镜像，如 postgres@sha256:...}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dynamicfarm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: sensen_dynamicfarm
+    volumes: [pgdata:/var/lib/postgresql/data]
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dynamicfarm -d sensen_dynamicfarm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+networks:
+  default:
+    # 固定网段：入口代理经发布端口进来时，app 看到的来源是这个网段的网关（默认 172.30.96.1），TRUSTED_PROXIES 填它。
+    # 和主机上已有的 docker 网段冲突时改 DF_SUBNET，TRUSTED_PROXIES 跟着改。
+    ipam:
+      config:
+        - subnet: ${DF_SUBNET:-172.30.96.0/24}
+
+volumes:
+  pgdata:

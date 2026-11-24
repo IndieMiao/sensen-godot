@@ -40,6 +40,21 @@ export interface AccountRouteDeps {
   appleRevoker?: AppleRevoker;
   /** Sign in with Google；不配则 /v1/auth/google 回 503。 */
   google?: Omit<GoogleVerifyOptions, 'now'>;
+  /**
+   * 只用邀请账号（C-96 动态农场正式服）：邮箱注册和 Apple / Google 首登建号都回 403 SIGNUP_CLOSED；
+   * 已有账号照常登录。账号由 tools/invite_accounts.ts 直接写库。
+   */
+  signupClosed?: boolean;
+}
+
+/**
+ * ACCOUNT_SIGNUP：不设或 open 照旧开放注册；closed 只用邀请账号（C-96）。
+ * 其它值返回 null，由进程入口拒绝启动，免得拼错时悄悄开放注册。
+ */
+export function signupClosedFromEnv(env: Record<string, string | undefined>): boolean | null {
+  const v = env.ACCOUNT_SIGNUP;
+  if (v === undefined || v === '' || v === 'open') return false;
+  return v === 'closed' ? true : null;
 }
 
 export function userView(u: UserRow, player?: PlayerRow, now = Date.now()) {
@@ -107,6 +122,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
   };
 
   app.post('/v1/auth/email/register', { config: { rateLimit: { max: 20, timeWindow: '1 hour' } } }, async (req, reply) => {
+    if (deps.signupClosed) return reply.code(403).send({ code: 'SIGNUP_CLOSED', server_time: deps.now() });
     const body = req.body as { email?: unknown; password?: unknown } | undefined;
     const email = normalizeEmail(body?.email);
     if (!email) return reply.code(400).send({ code: 'INVALID_EMAIL', server_time: deps.now() });
@@ -140,10 +156,10 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
   /**
    * 第三方身份登录的共用落号：先按 (provider, sub) 找号；没有就按提供方验证过的邮箱挂到**已验证**的邮箱账号上；
    * 再没有就建无密码账号。邮箱被未验证账号占着返回 null（EMAIL_IN_USE，防抢注劫持）。
-   * 提供方给的名字只在账号还没有昵称时用作默认昵称。
+   * 提供方给的名字只在账号还没有昵称时用作默认昵称。只用邀请账号时不建号，返回 'closed'。
    */
   const resolveIdentityUser = async (provider: string, sub: string, verifiedEmail: string | undefined, givenName: string | undefined):
-    Promise<{ user: UserRow; created: boolean } | null> => {
+    Promise<{ user: UserRow; created: boolean } | 'closed' | null> => {
     const email = verifiedEmail ? normalizeEmail(verifiedEmail) : null;
     let user = await deps.store.userByIdentity(provider, sub);
     let created = false;
@@ -155,6 +171,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
         user = await deps.store.userByIdentity(provider, sub);
       }
     }
+    if (!user && deps.signupClosed) return 'closed';
     if (!user) {
       const made = await deps.store.createIdentityUser(provider, sub, email, deps.now());
       if (made.kind === 'created') { user = made.user; created = true; }
@@ -185,6 +202,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
       return reply.code(503).send({ code: 'GOOGLE_UNAVAILABLE', server_time: deps.now() });
     }
     const resolved = await resolveIdentityUser('google', identity.sub, identity.emailVerified ? identity.email : undefined, identity.givenName);
+    if (resolved === 'closed') return reply.code(403).send({ code: 'SIGNUP_CLOSED', server_time: deps.now() });
     if (!resolved) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
     const session = await deps.store.authUser(resolved.user.id, deps.now());
     return reply.code(resolved.created ? 201 : 200).send({ token: session.token, ...userView(resolved.user, session.player, deps.now()),
@@ -208,6 +226,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     }
     const resolved = await resolveIdentityUser('apple', identity.sub, identity.emailVerified ? identity.email : undefined,
       typeof body?.given_name === 'string' ? body.given_name : undefined);
+    if (resolved === 'closed') return reply.code(403).send({ code: 'SIGNUP_CLOSED', server_time: deps.now() });
     if (!resolved) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
     const { user, created } = resolved;
     // A fresh authorization code yields a refresh token for revocation on deletion; failures never block sign-in.
