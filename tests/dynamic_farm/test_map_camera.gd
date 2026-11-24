@@ -26,6 +26,7 @@ func _run() -> void:
 	_pinch()
 	_tilt()
 	_disabled_mid_gesture()
+	_mouse_copies()
 	await _double_tap()
 	await _flight()
 	_area()
@@ -187,6 +188,40 @@ func _disabled_mid_gesture() -> void:
 	for i in range(1, 11): c._gui_input(drag(0, from.lerp(to, i / 10.0)))
 	check(not c._pinch and near(c.screen_geo(to), grabbed, 2e-7), "after a gesture cut short, a drag pans from where it presses")
 	c._gui_input(touch(0, to, false)); c.queue_free()
+
+func mouse(at: Vector2, pressed: bool, device := InputEvent.DEVICE_ID_EMULATION) -> InputEventMouseButton:
+	var e := InputEventMouseButton.new(); e.button_index = MOUSE_BUTTON_LEFT; e.position = at; e.pressed = pressed; e.device = device
+	return e
+
+## V-279: with emulate_mouse_from_touch Godot's Input dispatches a finger's emulated mouse press (device
+## DEVICE_ID_EMULATION) before its touch. It must not become a second pointer, marked as emulated or not (the
+## tester's repro sends it as device 0). Headless Input.parse_input_event does not reach the GUI, so the order is fed here.
+func _mouse_copies() -> void:
+	for device in [InputEvent.DEVICE_ID_EMULATION, 0]:
+		var c := camera(18.0)
+		var tapped := [0]
+		c.tapped.connect(func(_p): tapped[0] += 1)
+		c._last_touch_ms = Time.get_ticks_msec() - 1000 # The last finger lifted a second ago.
+		var at := Vector2(150, 675)
+		c._gui_input(mouse(at, true, device)); c._gui_input(touch(0, at, true)); c._gui_input(mouse(at, false, device)); c._gui_input(touch(0, at, false))
+		check(tapped[0] == 1 and c._touches.is_empty() and not c._pinch, "device %d: a tap with its mouse copy picks once and leaves no pointer" % device)
+		c._last_touch_ms = Time.get_ticks_msec() - 1000
+		var from := Vector2(200, 600); var to := Vector2(200, 400)
+		var grabbed: PackedFloat64Array = c.screen_geo(from)
+		c._gui_input(mouse(from, true, device)); c._gui_input(touch(0, from, true))
+		for i in range(1, 11): c._gui_input(drag(0, from.lerp(to, i / 10.0)))
+		c._gui_input(mouse(to, false, device)); c._gui_input(touch(0, to, false))
+		check(c.zoom == 18.0 and c.pitch == 0.0 and near(c.screen_geo(to), grabbed, 2e-7) and c._touches.is_empty(), "device %d: a one-finger drag with its mouse copy only pans (zoom %.2f, pitch %.1f)" % [device, c.zoom, c.pitch])
+		c.queue_free()
+	# A real mouse still drags the map on the desktop.
+	var m := camera(18.0)
+	m._last_touch_ms = Time.get_ticks_msec() - 1000
+	var start: PackedFloat64Array = m.center.duplicate()
+	m._gui_input(mouse(Vector2(200, 400), true, 0))
+	var motion := InputEventMouseMotion.new(); motion.position = Vector2(260, 400); motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+	m._gui_input(motion); m._gui_input(mouse(Vector2(260, 400), false, 0))
+	check(m.center[0] < start[0] and m._touches.is_empty(), "a real mouse drag still pans")
+	m.queue_free()
 
 func _double_tap() -> void:
 	var c := camera(17.0); c.set_process(true)

@@ -115,8 +115,8 @@ internal object ParcelPayload {
     const val TAKEN_SELECTED_OPACITY = 0.7
     /**
      * `["match", ["get","block_id"], [ids…], value, …, fallback]`: a hash lookup per building however many parcels are
-     * owned. Empty groups are left out; with none left a never-matching "" keeps it a valid, feature-dependent
-     * expression, so the layer stays hit-tested when nothing is owned.
+     * owned. Empty groups are left out; with none left a never-matching "" (given the fallback) keeps it a valid,
+     * feature-dependent expression, so the layer stays hit-tested when nothing is owned.
      */
     private fun byParcel(groups: List<Pair<Collection<String>, Any>>, fallback: Any): String = JsonArray().apply {
         fun put(value: Any) = if (value is Number) add(value) else add(value.toString())

@@ -74,8 +74,9 @@ class ParcelPayloadTest {
         assertEquals("""["match",["get","block_id"],["p-own"],0.75,0.0]""", ParcelPayload.buildingOpacity(mine))
     }
     @Test fun buildingPaintWithoutStatesStaysAValidFeatureDependentMatch() {
-        // A constant 0 could drop the layer from Mapbox's hit index, and match needs at least one label.
-        assertEquals("""["match",["get","block_id"],"","#3E9B55","#D2493F"]""", ParcelPayload.buildingColor(emptyMap()))
+        // A constant 0 could drop the layer from Mapbox's hit index, and match needs at least one label: a
+        // never-matching "" that takes the fallback value.
+        assertEquals("""["match",["get","block_id"],"","#D2493F","#D2493F"]""", ParcelPayload.buildingColor(emptyMap()))
         assertEquals("""["match",["get","block_id"],"",0.0,0.0]""", ParcelPayload.buildingOpacity(emptyMap()))
         assertEquals("""["match",["get","block_id"],"",0.0,0.0]""", ParcelPayload.buildingOpacity(mapOf("p-a" to ParcelVisualState(selected = true))))
     }

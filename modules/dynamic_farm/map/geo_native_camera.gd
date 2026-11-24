@@ -185,9 +185,12 @@ func _move(index:int,pos:Vector2) -> void:
 	user_moved.emit()
 func _gui_input(event:InputEvent) -> void:
 	if not input_enabled:return
+	# A finger also arrives as an emulated left mouse button (emulate_mouse_from_touch, on in this project), dispatched
+	# before its touch: that copy is never a second pointer (V-279). Only a real mouse drives the MOUSE pointer.
+	if (event is InputEventMouseButton or event is InputEventMouseMotion) and event.device==InputEvent.DEVICE_ID_EMULATION:return
 	if event is InputEventScreenTouch:
 		_last_touch_ms=Time.get_ticks_msec()
-		if event.pressed:_press(event.index,event.position)
+		if event.pressed:_touches.erase(MOUSE);_press(event.index,event.position) # A touch takes over from the mouse.
 		else:_release(event.index,event.position,event.canceled)
 		accept_event()
 	elif event is InputEventScreenDrag:
