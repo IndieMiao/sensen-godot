@@ -2,6 +2,8 @@ extends Control
 ## Input/camera only: parcel geometry and picking belong to the native Mapbox source/layers.
 signal tapped(point:Vector2)
 signal camera_changed
+## The player dragged, pinched or scrolled the map (not frame_center from code).
+signal user_moved
 const Geo:=preload("res://modules/dynamic_farm/map/geo_math.gd")
 var bridge:MapBridge
 var center:=PackedFloat64Array([-122.45190271843384,37.729419227])
@@ -71,18 +73,18 @@ func _gui_input(event:InputEvent) -> void:
 		_last_touch_ms=Time.get_ticks_msec()
 		if _touches.size()==1:
 			if event.position.distance_to(_pressed)>8:_dragged=true
-			if _dragged:_pan(event.position-_touches[event.index])
+			if _dragged:_pan(event.position-_touches[event.index]);user_moved.emit()
 			_touches[event.index]=event.position
 		else:
 			var old:Array=_touches.values();var distance:float=old[0].distance_to(old[1])
 			_touches[event.index]=event.position
 			var now:Array=_touches.values();var next:float=now[0].distance_to(now[1])
-			if distance>5 and next>5:change_zoom(log(next/distance)/log(2.0),(now[0]+now[1])*0.5)
+			if distance>5 and next>5:change_zoom(log(next/distance)/log(2.0),(now[0]+now[1])*0.5);user_moved.emit()
 		accept_event()
 	elif Time.get_ticks_msec()-_last_touch_ms>500:
 		if event is InputEventMouseButton:
-			if event.button_index==MOUSE_BUTTON_WHEEL_UP and event.pressed:change_zoom(.3,event.position)
-			elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN and event.pressed:change_zoom(-.3,event.position)
+			if event.button_index==MOUSE_BUTTON_WHEEL_UP and event.pressed:change_zoom(.3,event.position);user_moved.emit()
+			elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN and event.pressed:change_zoom(-.3,event.position);user_moved.emit()
 			elif event.button_index==MOUSE_BUTTON_LEFT:
 				if event.pressed:_mouse_down=true;_pressed=event.position;_last=event.position;_dragged=false
 				else:
@@ -91,6 +93,6 @@ func _gui_input(event:InputEvent) -> void:
 			accept_event()
 		elif event is InputEventMouseMotion and _mouse_down:
 			if event.position.distance_to(_pressed)>8:_dragged=true
-			if _dragged:_pan(event.position-_last)
+			if _dragged:_pan(event.position-_last);user_moved.emit()
 			_last=event.position
 			accept_event()
