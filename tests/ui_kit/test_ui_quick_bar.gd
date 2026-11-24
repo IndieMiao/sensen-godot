@@ -464,3 +464,35 @@ func test_every_item_name_fits_a_slot_at_c9() -> void:
 		for word in str(n).replace("-", "- ").split(" ", false):
 			assert_float(font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x).override_failure_message(str(n)) \
 				.is_less_equal(float(UiTokens.SIZE_QUICK_SLOT_W))
+
+
+## C-77 (Q-109): a slot's name follows the cell's own auto-translation, not the global locale alone. A UI that switches
+## translation off (the dynamic farm's parcel) keeps the English title without changing the locale; a translating UI
+## (the main farm's P0Ui) shows 中文 as before and re-reads it when the locale or the mode changes.
+func test_a_slot_name_follows_the_cells_auto_translation() -> void:
+	var kept := TranslationServer.get_locale()
+	var t := Translation.new()
+	t.locale = "zh_CN"
+	t.add_message("Carrot Seeds", "胡萝卜种子")
+	TranslationServer.add_translation(t)
+	TranslationServer.set_locale("zh_CN")
+	await await_idle_frame()
+	var name_of := func(b: UiQuickBar) -> String: return str((b.cells()[1]._name as Label).text).replace("\n", "")
+	assert_str(name_of.call(bar)).is_equal("胡萝卜种子")   # translating: 中文, refreshed on the locale change
+	var english := Control.new()
+	english.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	var other := UiQuickBar.new()
+	other.slots = _slots()   # filled before it joins the tree
+	english.add_child(other)
+	add_child(auto_free(english))
+	await await_idle_frame()
+	assert_str(name_of.call(other)).is_equal("Carrot Seeds")
+	assert_str(TranslationServer.get_locale()).is_equal("zh_CN")   # the locale is left alone
+	assert_str(name_of.call(bar)).is_equal("胡萝卜种子")
+	english.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_INHERIT
+	await await_idle_frame()
+	assert_str(name_of.call(other)).is_equal("胡萝卜种子")
+	TranslationServer.set_locale(kept)
+	TranslationServer.remove_translation(t)
+	await await_idle_frame()
+	assert_str(name_of.call(bar)).is_equal("Carrot Seeds")
