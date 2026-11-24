@@ -104,6 +104,10 @@ internal object ParcelPayload {
         add("in"); add(JsonArray().apply { add("get"); add("block_id") })
         add(JsonArray().apply { add("literal"); add(JsonArray().apply { names.keys.forEach { add(it) } }) })
     }.toString()
+    /** DataSF highlight: every footprint of one parcel, since its farm core is all of them (C-43 V-199). "" matches none. */
+    fun buildingFilter(parcelId: String): String = JsonArray().apply {
+        add("=="); add(JsonArray().apply { add("get"); add("block_id") }); add(if (validId(parcelId)) parcelId else "")
+    }.toString()
     /** Copy only our public selection metadata; never geometry, device identity or arbitrary properties. */
     fun publicProperties(properties: JsonObject): JsonObject? {
         val id = properties.get("block_id") ?: return null

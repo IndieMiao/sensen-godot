@@ -12,7 +12,7 @@ class Native extends MapBridge:
 	func supports_parcels() -> bool: return true
 	func set_parcel_sources(gen: int, config: String) -> void: sources.append([gen, config])
 	func query_parcel_at(id: int, gen: int, point: Vector2) -> void: queries.append([id, gen, point])
-	func set_parcel_building_highlight(gen: int, key: String) -> void: highlights.append([gen, key])
+	func set_parcel_building_highlight(gen: int, key: String, parcel := "") -> void: highlights.append([gen, key, parcel])
 	func set_parcel_states(gen: int, batch: String) -> void: states.append([gen, JSON.parse_string(batch)])
 	func clear_parcel_layers(gen: int) -> void: cleared.append(gen)
 	func set_map_visible(value: bool) -> void: visible = value
@@ -144,6 +144,65 @@ func map_error_retry() -> void:
 	controller.config.query_retry_delay_ms = null
 	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "non-numeric retry delay falls back to the default")
 	controller.config.erase("query_retry_delay_ms")
+func buildings_layer_timeout() -> void:
+	# C-43 V-167: Mapbox drops a DataSF building GeoJSON it cannot parse without any source error.
+	controller.config.building_source = "datasf"; controller.config.buildings_url = "https://demo.invalid/buildings.geojson"
+	await controller.activate(); ready_signal()
+	check(JSON.parse_string(native.sources.back()[1]).get("building_source") == "datasf", "DataSF building layer is configured")
+	var boots := native.sources.size()
+	controller._process(controller.buildings_load_timeout() - 1.0)
+	check(controller.map_ready and native.sources.size() == boots, "a building layer still within its load time is not a failure")
+	var sent := native.queries.size()
+	controller.tap(Vector2(.3, .7), 18)
+	check(native.queries.size() == sent and controller.message == "Finding parcel…", "a tap before the building layer loads waits for it instead of querying a map without buildings")
+	ready_signal()
+	check(native.queries.size() == sent and controller.message == "Finding parcel…", "idle readiness without the building layer keeps the tap waiting")
+	controller._process(1.1)
+	check(controller.message == "Finding parcel…" and controller.busy and not controller.map_ready, "a building layer that never loads counts as a map load error and reloads once, keeping the tap")
+	await reload(); ready_signal()
+	check(native.sources.size() == boots + 1 and native.queries.size() == sent, "the automatic reload sets the sources again and the tap still waits for buildings")
+	controller._process(controller.buildings_load_timeout() + .1)
+	check(controller.message == Controller.MAP_FAILED and not controller.busy, "still missing after the reload: the map failure with Retry, not endless loading")
+	controller._process(controller.buildings_load_timeout() + .1); for i in 4: await process_frame
+	check(native.sources.size() == boots + 1, "the reported failure is not reloaded again automatically")
+	controller.retry(); for i in 4: await process_frame
+	check(native.sources.size() == boots + 2, "Retry after the building layer failure reloads the map")
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	controller._process(controller.buildings_load_timeout() + .1)
+	check(controller.map_ready and controller.message == Controller.PROMPT and native.sources.size() == boots + 2, "a loaded building layer stops the countdown")
+	# C-43 V-199: a tap waiting for the building layer is answered when it loads; the highlight is the chosen parcel's.
+	await controller.activate(); ready_signal(); sent = native.queries.size()
+	controller.tap(Vector2(.2, .8), 17.5)
+	check(native.queries.size() == sent, "a tap at the default zoom waits for the DataSF building layer")
+	native.parcel_ready.emit(controller.generation, controller.style_generation, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	check(native.queries.size() == sent + 1 and native.queries.back()[2] == Vector2(.2, .8), "the waiting tap is sent as soon as the building layer loads")
+	native.parcel_query_result.emit(native.queries.back()[0], controller.generation, controller.style_generation,
+		JSON.stringify({"kind":"building","parcel_ids":["p-A"],"properties":[Fixture.metadata()],"building_key":"building-1","building_source":"datasf","error":""}))
+	check(controller.selection.get("block_id") == "p-A" and native.highlights.back() == [controller.generation, "building-1", "p-A"], "first tap selects; the highlight names the parcel whose buildings form its core")
+	ready_signal(controller.style_generation)
+	check(controller.message == "Ready to preview this farm.", "idle readiness after the highlight keeps the ready prompt")
+	controller.tap(Vector2(.2, .8), 17.5)
+	check(native.queries.size() == sent + 2, "once loaded, later taps query at once")
+	# Below the selectable zoom the building layer is not drawn, so it cannot load; that is not a failure.
+	await controller.activate(); ready_signal(); boots = native.sources.size()
+	controller.camera_changed(15.0)
+	controller._process(controller.buildings_load_timeout() + 1.0)
+	check(controller.map_ready and native.sources.size() == boots, "the building countdown waits while the camera is below the selectable zoom")
+	controller.camera_changed(16.0)
+	controller._process(controller.buildings_load_timeout() - 1.0)
+	check(controller.map_ready, "back at the selectable zoom the countdown starts from where it paused")
+	controller._process(1.5)
+	check(not controller.map_ready and controller.busy, "a building layer still not loaded at the selectable zoom times out")
+	controller.config.buildings_load_timeout_ms = 1
+	check(is_equal_approx(controller.buildings_load_timeout(), 5.0), "building load time has a lower bound")
+	controller.config.buildings_load_timeout_ms = 1e30
+	check(is_equal_approx(controller.buildings_load_timeout(), 300.0), "building load time has an upper bound")
+	controller.config.buildings_load_timeout_ms = "x"
+	check(is_equal_approx(controller.buildings_load_timeout(), Controller.BUILDINGS_LOAD_TIMEOUT_MS / 1000.0), "non-numeric building load time falls back to the default")
+	controller.config.building_source = "mapbox"; controller.config.erase("buildings_url"); controller.config.erase("buildings_load_timeout_ms")
+	await controller.activate(); ready_signal(); boots = native.sources.size()
+	controller._process(Controller.BUILDINGS_LOAD_TIMEOUT_MS / 1000.0 + 1.0)
+	check(controller.map_ready and native.sources.size() == boots, "Mapbox buildings have no DataSF load countdown")
 func burst_errors() -> void:
 	# V-47: one outage reports several map errors, and the failing map can still report ready.
 	ready_signal()
@@ -190,7 +249,7 @@ func _run() -> void:
 	native.parcel_query_result.emit(old[0], old[1], 1, JSON.stringify({"kind":"parcel","parcel_ids":["p-A"],"properties":[Fixture.metadata()],"building_key":""}))
 	check(controller.selection.is_empty(), "camera change invalidates old hit")
 	reply("building", [Fixture.metadata()], "opaque")
-	check(controller.selection.block_id == "p-A" and native.highlights.back()[1] == "opaque", "building highlights opaque key and selects its same-point parcel")
+	check(controller.selection.block_id == "p-A" and native.highlights.back()[1] == "opaque" and native.highlights.back()[2] == "p-A", "building highlights opaque key and selects its same-point parcel")
 	check(native.states.is_empty(), "building selection does not enable a parcel frame")
 	check(not controller.selection.has("building_key") and not controller.selection.has("geometry"), "selection metadata stores no native building key or geometry")
 	check(controller.message != "Finding parcel…", "successful hit clears pending hint")
@@ -214,7 +273,7 @@ func _run() -> void:
 	reply("building", [Fixture.metadata(), Fixture.metadata("p-B")], "shared")
 	check(controller.selection.is_empty() and options.size() == 2, "multiple candidates await explicit user choice")
 	controller.choose("p-B"); check(controller.selection.block_id == "p-B", "explicit choice picks one canonical parcel")
-	check(native.highlights.back()[1] == "shared" and native.states.is_empty(), "explicit candidate keeps the filled building highlight only")
+	check(native.highlights.back() == [controller.generation, "shared", "p-B"] and native.states.is_empty(), "explicit candidate keeps the filled building highlight only, for the chosen parcel")
 	controller.choose("p-forged"); check(controller.selection.block_id == "p-B", "choice outside current result cannot replace selection")
 	ready_signal(2); check(controller.selection.is_empty(), "style reload invalidates selection and opaque keys")
 	reply("building", [Fixture.metadata()], "opaque")
@@ -230,6 +289,7 @@ func _run() -> void:
 	check(controller._pending == -1 and controller.message.contains("did not respond"), "missing query callback expires with retry feedback")
 	await first_tap_retry()
 	await map_error_retry()
+	await buildings_layer_timeout()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame

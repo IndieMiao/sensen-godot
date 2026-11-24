@@ -14,7 +14,7 @@ class ParcelPlugin extends Node:
 	func queryParcelAt(r: int, g: int, x: float, y: float) -> void: calls.append(["query", r, g, x, y])
 	func setParcelStates(g: int, batch: String) -> void: calls.append(["states", g, batch])
 	func setParcelClaims(g: int, claims: String) -> void: calls.append(["claims", g, claims])
-	func setParcelBuildingHighlight(g: int, key: String) -> void: calls.append(["highlight", g, key])
+	func setParcelBuildingHighlight(g: int, key: String, parcel: String) -> void: calls.append(["highlight", g, key, parcel])
 	func clearParcelLayers(g: int) -> void: calls.append(["clear", g])
 	func setMapVisible(visible: bool) -> void: calls.append(["visible", visible])
 
@@ -75,11 +75,11 @@ func test_coordinates_and_opaque_key_forward_without_density_or_geometry() -> vo
 	assert_bool(bridge.supports_parcels()).is_true()
 	bridge.set_parcel_sources(10, "config")
 	bridge.query_parcel_at(1, 10, Vector2(0.125, 0.875))
-	bridge.set_parcel_building_highlight(10, "opaque-1")
+	bridge.set_parcel_building_highlight(10, "opaque-1", "p-1")
 	bridge.set_parcel_states(10, "[]")
 	bridge.set_parcel_claims(10, "[]")
 	assert_that(plugin.calls).is_equal([["sources", 10, "config"], ["query", 1, 10, 0.125, 0.875],
-		["highlight", 10, "opaque-1"], ["states", 10, "[]"], ["claims", 10, "[]"]])
+		["highlight", 10, "opaque-1", "p-1"], ["states", 10, "[]"], ["claims", 10, "[]"]])
 
 func test_old_owner_cannot_clear_or_update_new_dataset() -> void:
 	bridge.set_parcel_sources(10, "old")

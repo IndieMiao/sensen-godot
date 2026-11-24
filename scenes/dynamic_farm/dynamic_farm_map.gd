@@ -77,7 +77,7 @@ func _ready() -> void:
 	_selector.candidates_found.connect(_show_candidates)
 	_selector.farm_ready.connect(_open_host)
 	_camera.tapped.connect(func(point: Vector2): _selector.tap(point, _camera.zoom))
-	_camera.camera_changed.connect(_selector.camera_changed)
+	_camera.camera_changed.connect(func(): _selector.camera_changed(_camera.zoom))
 	_camera.camera_changed.connect(func(): _area_timer.start(AREA_REFRESH_SECONDS))
 	_camera.setup_map(_bridge, token)
 	_selector.activate()
@@ -97,12 +97,15 @@ func _own_farm_entry() -> bool:
 func _fake_claims() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/fake_claims", false))
 
+## Claims carry the configured release (config.json dataset_version), the same one the map and farms use.
 func _claim_api() -> RefCounted:
+	var dataset := str(_selector.config.get("dataset_version", ""))
 	if _fake_claims():
 		if _fake_server == null: _fake_server = FakeParcelServer.new()
-		return ClaimApi.new(_fake_server.client(str(ProjectSettings.get_setting("sensen/dynamic_farm/fake_player", "fake-a"))))
+		_fake_server.dataset = dataset
+		return ClaimApi.new(_fake_server.client(str(ProjectSettings.get_setting("sensen/dynamic_farm/fake_player", "fake-a"))), dataset)
 	var net := get_node_or_null("/root/Net")
-	return ClaimApi.new(net.client if net != null else null)
+	return ClaimApi.new(net.client if net != null else null, dataset)
 
 func _build_ui() -> void:
 	_hud = Control.new(); _hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

@@ -4,7 +4,8 @@
  * one `block_id` property per footprint, coordinates rounded to `building_decimals`, and vertices
  * within `building_simplify_m` of the outline dropped (Douglas–Peucker in local metres). Nothing
  * else changes: every used footprint stays a separate feature, so tapping a building still
- * highlights that building. A ring that would degenerate keeps its unsimplified rounded shape.
+ * highlights that building. A ring that would degenerate keeps its unsimplified rounded shape;
+ * a part with no area left at 7 decimals is dropped, and a footprint with no part left has no feature.
  * Which source footprints each farm used stays traceable through the generation report.
  */
 import { cos } from './detmath.js';
@@ -18,12 +19,17 @@ export function slimPolygons(polys: Polygon[], p: MapLayerParams): number[][][][
   const kx = M_PER_DEG_LAT * cos((lat0 * Math.PI) / 180);
   const out: number[][][][] = [];
   for (const poly of polys) {
-    const rings: number[][][] = [];
-    poly.forEach((ring, ri) => {
-      const slim = slimRing(ring, p, kx);
+    // Never lose a footprint to rounding: fall back to 7 decimals. An outer ring that has no area
+    // even then (a sliver part of a MultiPolygon) is dropped with its holes: the native map rejects
+    // the whole layer when one ring has fewer than 4 positions (C-43 V-167).
+    const fine = roundRing(poly[0], 7);
+    const outer = slimRing(poly[0], p, kx) ?? (valid(fine) ? fine : null);
+    if (!outer) continue;
+    const rings = [outer];
+    for (const hole of poly.slice(1)) {
+      const slim = slimRing(hole, p, kx);
       if (slim) rings.push(slim);
-      else if (ri === 0) rings.push(roundRing(ring, 7)); // never lose a footprint
-    });
+    }
     out.push(rings);
   }
   return out;
@@ -42,9 +48,11 @@ function roundRing(ring: Ring, digits: number): number[][] {
 
 const valid = (ring: number[][]) => ring.length >= 4 && area2(ring) !== 0;
 
+/** Relative to the first point: products of raw lon/lat cancel out for a footprint a few cm across. */
 function area2(ring: number[][]): number {
+  const [ox, oy] = ring[0];
   let sum = 0;
-  for (let i = 0; i + 1 < ring.length; i++) sum += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
+  for (let i = 0; i + 1 < ring.length; i++) sum += (ring[i][0] - ox) * (ring[i + 1][1] - oy) - (ring[i + 1][0] - ox) * (ring[i][1] - oy);
   return sum;
 }
 

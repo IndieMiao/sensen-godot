@@ -18,7 +18,7 @@ class Native extends MapBridge:
 			if row.selected or row.claimed or row.own: states[row.block_id] = row
 			else: states.erase(row.block_id)
 	func set_parcel_claims(_gen: int, claims: String) -> void: names = JSON.parse_string(claims)
-	func set_parcel_building_highlight(gen: int, key: String) -> void: highlights.append([gen, key])
+	func set_parcel_building_highlight(gen: int, key: String, parcel := "") -> void: highlights.append([gen, key, parcel])
 class Selector extends Node:
 	signal changed
 	var selection := {}
@@ -84,6 +84,14 @@ func _server_contract() -> void:
 	server.reselect = true
 	check((await a.abandon()).ok and (await a.mine()).parcel.is_empty(), "internal server lets the player give up and choose again")
 	check((await ClaimApi.new(server.client("nobody")).claim(free_id[1], center)).code == "UNAUTHENTICATED", "unknown token cannot claim")
+	# C-43: claims carry the configured release; a client still on another release is refused.
+	var r5 := FakeServer.new(); r5.dataset = "sf-dynamic-farm-20261124-r5"
+	var r5_id: String = _free_ids(r5, 1)[0]
+	var stale: Dictionary = await ClaimApi.new(r5.client("fake-a")).claim(r5_id, center)
+	check(not stale.ok and stale.code == "SCHEMA", "claim for another dataset release is refused")
+	var current: Dictionary = await ClaimApi.new(r5.client("fake-a"), r5.dataset).claim(r5_id, center)
+	check(current.ok and current.parcel.dataset_version == r5.dataset, "claim on the configured release records that release")
+	check((await ClaimApi.new(r5.client("fake-a"), r5.dataset).owners([r5_id])).owners[r5_id].owner == "mine", "owner query uses the configured release")
 
 func _first_home_flow() -> void:
 	var server := FakeServer.new()
@@ -100,7 +108,7 @@ func _first_home_flow() -> void:
 	await a.claim({"block_id": ids[0], "center": [-122.45, 37.73]})
 	check(a.has_home() and a.status(ids[0]) == "mine", "claim makes the parcel the player's home")
 	check(native.states[ids[0]].own and native.states[ids[0]].selected and not native.states[ids[0]].claimed, "own parcel is sent as own (green) and selected")
-	check(native.highlights.back() == [4, ""], "owned selection drops the yellow highlight so green shows")
+	check(native.highlights.back() == [4, "", ""], "owned selection drops the yellow highlight so green shows")
 	a.attach(4, ids[1])
 	await process_frame
 	check(a.status(ids[1]) == "none" and a.has_home(), "another free parcel stays unclaimable for a player with a home")
