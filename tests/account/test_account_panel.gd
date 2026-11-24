@@ -384,3 +384,105 @@ func test_cancelled_google_picker_is_silent() -> void:
 	p.queue_free()
 	GoogleSignIn.force_available = false
 	_restore_net()
+
+## Every step the panel has, with the most buttons each can show (both sign-in providers, every account action,
+## the self-describe gender field), so the tallest layout of each is checked.
+func _tallest_steps() -> Array:
+	return [["sign_in", false], ["sign_up", false], ["forgot", false], ["forgot", true], ["verify", false],
+		["profile", false], ["password", false], ["account", false], ["delete", false]]
+
+func _open_step(step: Array) -> AccountPanel:
+	if step[0] in ["verify", "profile", "password", "account", "delete"]:
+		_sign_in_locally("Ada")
+		Net.account.email_verified = false
+		Net.account.has_password = true
+		Net.account.gender = "self_describe"
+		Net.account.gender_custom = "Ada"
+	var p := _panel(step[0])
+	if step[1]:
+		p._reset_code_sent = true
+		p.set_mode(step[0])
+	return p
+
+func _action_buttons(p: AccountPanel) -> Array:
+	return p.find_child("Actions", true, false).find_children("*", "Button", true, false).filter(func(b): return b.is_visible_in_tree())
+
+func _settle() -> void:
+	for i in 3: await get_tree().process_frame
+
+## Puts the finger down on the button's centre and lifts it away from every button, so nothing is triggered;
+## true when the press reached that button, i.e. it is on screen and nothing covers it.
+func _press_reaches(b: Button) -> bool:
+	var hits := [0]
+	var count := func(): hits[0] += 1
+	b.button_down.connect(count)
+	var down := InputEventMouseButton.new()
+	down.button_index = MOUSE_BUTTON_LEFT
+	down.pressed = true
+	down.position = b.get_global_rect().get_center()
+	down.global_position = down.position
+	get_viewport().push_input(down, true)
+	# Slide off first: a button decides on release from where the finger last moved, not where it lifts.
+	var away := InputEventMouseMotion.new()
+	away.button_mask = MOUSE_BUTTON_MASK_LEFT
+	away.position = Vector2(2, 2)
+	away.global_position = away.position
+	get_viewport().push_input(away, true)
+	var up := down.duplicate() as InputEventMouseButton
+	up.pressed = false
+	up.position = Vector2(2, 2)
+	up.global_position = up.position
+	get_viewport().push_input(up, true)
+	b.button_down.disconnect(count)
+	return hits[0] == 1
+
+## C-81: on a 16:9 screen (360x640 logical, the project's base size) the reset-code step ran ~100 px past the
+## bottom edge with no way to scroll. Every button of every step must scroll into view and take a tap, in
+## both languages, and a message appearing at the scrolled end must not move them (C-78).
+func test_every_button_can_be_scrolled_to_and_pressed_on_a_16_9_screen() -> void:
+	# The headless window is square; give it the shape of a 720x1280 phone, which the project's
+	# 360x640 base size and expand stretch turn into a 360x640 logical screen.
+	var window := get_window()
+	var window_size := window.size
+	window.size = Vector2i(720, 1280)
+	await _settle()
+	var view := get_viewport().get_visible_rect()
+	assert_vector(view.size).is_equal(Vector2(360, 640))
+	var locale := TranslationServer.get_locale()
+	AppleSignIn.force_available = true
+	GoogleSignIn.force_available = true
+	var overflowing := []
+	for language in ["en", "zh_CN"]:
+		TranslationServer.set_locale(language)
+		for step in _tallest_steps():
+			var p := _open_step(step)
+			await _settle()
+			var where := "%s%s (%s)" % [step[0], " after the code was sent" if step[1] else "", language]
+			var scroll := p.find_child("Scroll", true, false) as ScrollContainer
+			var lowest := 0.0
+			for b in _action_buttons(p): lowest = maxf(lowest, b.get_global_rect().end.y)
+			if lowest > view.end.y: overflowing.append(where)
+			for b in _action_buttons(p):
+				scroll.ensure_control_visible(b)
+				await _settle()
+				var rect: Rect2 = b.get_global_rect()
+				assert_bool(view.encloses(rect)).override_failure_message("%s is off screen in %s: %s" % [b.name, where, rect]).is_true()
+				assert_bool(_press_reaches(b)).override_failure_message("a tap on %s missed it in %s" % [b.name, where]).is_true()
+			# At the scrolled end a message still leaves the buttons where they are.
+			var buttons := _action_buttons(p)
+			var before := buttons.map(func(b): return b.get_global_rect())
+			p._say(AccountSession.describe("TRANSPORT"))
+			await _settle()
+			assert_array(buttons.map(func(b): return b.get_global_rect())).override_failure_message("a message moved the buttons in %s" % where).is_equal(before)
+			# A new step starts at its top again.
+			p.set_mode(step[0])
+			await _settle()
+			assert_int(scroll.scroll_vertical).is_equal(0)
+			p.queue_free()
+			Net.account._reset_fields()
+	# The check above is only meaningful if some steps really are taller than the screen.
+	assert_array(overflowing).contains(["forgot after the code was sent (en)", "forgot after the code was sent (zh_CN)"])
+	TranslationServer.set_locale(locale)
+	AppleSignIn.force_available = false
+	GoogleSignIn.force_available = false
+	window.size = window_size
