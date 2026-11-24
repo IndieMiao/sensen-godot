@@ -12,7 +12,9 @@ var labels := {
 	"328 FRIDA KAHLO WAY": "测试地名翻译",
 	"Make this my first home": "设为我的第一个家", "Enter my farm": "进入我的地",
 	"Give up and choose again": "放弃并重选", "Claim": "认领", "Cancel": "取消", "Sign in": "登录",
-	"Claim this parcel? You can only have one home.": "认领确认"
+	"Claim this parcel? You can only have one home.": "认领确认",
+	"My home": "我的家园", "Sign out": "退出登录", "Not signed in": "未登录", "Sign out on this phone?": "退出确认",
+	"Can't reach the server. You're still signed in.": "账号保留提示"
 }
 
 func _initialize() -> void:
@@ -41,11 +43,12 @@ func _run() -> void:
 	verify(String(outside.atr(outside.text)) == "重试", "Chinese automatic translation is active outside preview scenes")
 	var map_page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
 	root.add_child(map_page)
-	for text in ["Retry", "San Francisco", "Back", "Preview in 3D", "Make this my first home", "Enter my farm", "Give up and choose again", "Claim", "Cancel", "Sign in"]:
+	for text in ["Retry", "San Francisco", "Back", "Preview in 3D", "Make this my first home", "Enter my farm", "Give up and choose again", "Claim", "Cancel", "Sign in", "My home", "Sign out"]:
 		var nodes := text_nodes(map_page).filter(func(n: Node): return n is Button and n.text == text)
-		verify(nodes.size() == 1 and String(nodes[0].atr(nodes[0].text)) == text, "map button stays English: " + text)
-	var confirm := text_nodes(map_page).filter(func(n: Node): return n is Label and n.text.begins_with("Claim this parcel"))
-	verify(confirm.size() == 1 and String(confirm[0].atr(confirm[0].text)) == confirm[0].text, "claim confirmation stays English")
+		verify(nodes.size() >= 1 and nodes.all(func(n: Node): return String(n.atr(n.text)) == text), "map button stays English: " + text)
+	for prefix in ["Claim this parcel", "Not signed in", "Sign out on this phone?", "Can't reach the server."]:
+		var lines := text_nodes(map_page).filter(func(n: Node): return n is Label and n.text.begins_with(prefix))
+		verify(lines.size() == 1 and String(lines[0].atr(lines[0].text)) == lines[0].text, "map line stays English: " + prefix)
 	map_page._choices.add_item("328 FRIDA KAHLO WAY")
 	map_page._choices.select(0)
 	var popup: PopupMenu = map_page._choices.get_popup()

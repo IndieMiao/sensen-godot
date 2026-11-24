@@ -53,6 +53,9 @@ func _run() -> void:
 	await _first_home_flow()
 	await _map_card()
 	await _account_restore()
+	await _account_kept_on_server_errors()
+	await _account_row()
+	await _home_framing()
 	print("DYNAMIC CLAIM ", checks - failures, "/", checks)
 	quit(1 if failures else 0)
 
@@ -231,8 +234,8 @@ func _map_card() -> void:
 	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
 	page._render(); await process_frame
 	check(guest.status(ids[1]) == "unknown" and page._details.text.ends_with("Sign in to claim a home.") and not page._claim.visible, "signed-out player sees 'Sign in to claim a home.' even though ownership can't be read")
-	check(page._sign_in.visible, "signed-out player gets a 'Sign in' button")
-	page._sign_in.pressed.emit(); await process_frame
+	check(page._account_button.visible and page._account_button.text == "Sign in", "signed-out player gets a 'Sign in' button")
+	page._account_button.pressed.emit(); await process_frame
 	var panels: Array = page.find_children("*", "AccountPanel", true, false)
 	check(panels.size() == 1 and panels[0].mode == "sign_in", "'Sign in' opens the existing account panel")
 	for panel in panels: panel.free()
@@ -240,7 +243,7 @@ func _map_card() -> void:
 	guest.api.client.token = "fake-b"
 	guest.forget(); await process_frame
 	page._render()
-	check(not guest.signed_out and guest.mine_known and guest.status(ids[1]) == "none" and not page._sign_in.visible and page._claim.visible, "after signing in the card re-reads ownership and offers the claim")
+	check(not guest.signed_out and guest.mine_known and guest.status(ids[1]) == "none" and page._claim.visible, "after signing in the card re-reads ownership and offers the claim")
 	page.queue_free(); selector.queue_free(); guest.queue_free()
 	await process_frame
 
@@ -285,3 +288,156 @@ func _account_restore() -> void:
 	valid.value = false; calls.clear()
 	check(not await net.restore_saved_account() and net.client.token.is_empty() and not FileAccess.file_exists(path), "rejected token is cleared, not replaced by a guest login")
 	check(calls.all(func(c): return c[1] == "/users/me"), "no other endpoint is called on restore")
+
+## C-110: only an explicit 401 drops the saved account. Server errors, rate limits and a lost network keep it
+## (and its file), record why for the map's notice, and a later check that reaches the server clears the notice.
+func _account_kept_on_server_errors() -> void:
+	var net = root.get_node_or_null("Net")
+	if net == null:
+		check(false, "Net autoload is present"); return
+	var path := "user://c110_restore_account.json"
+	var saved := {"token": "saved-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}
+	var cases := [
+		["503 server error", ApiClient.Response.new(true, 503, {}), "HTTP_503"],
+		["500 with a code", ApiClient.Response.new(true, 500, {"code": "INTERNAL"}), "INTERNAL"],
+		["429 rate limit", ApiClient.Response.new(true, 429, {"code": "RATE_LIMITED"}), "RATE_LIMITED"],
+		["no network", ApiClient.Response.new(false, 0, {}, "offline"), "TRANSPORT"],
+	]
+	for row in cases:
+		var answer: ApiClient.Response = row[1]
+		var transport := func(_m: String, _u: String, _h: PackedStringArray, _b: String) -> ApiClient.Response: return answer
+		net.use_transport(transport, "https://restore.test/v1", path)
+		_write(path, JSON.stringify(saved))
+		var kept: bool = await net.restore_saved_account()
+		check(kept and net.account.signed_in() and net.client.token == "saved-token", "%s: saved account is kept" % row[0])
+		check(str(net.get("restore_error")) == row[2], "%s: the reason is kept for the map's notice (%s)" % [row[0], row[2]])
+		var reread := AccountSession.new()
+		check(reread.load_saved(path) and reread.token == "saved-token" and reread.display_name == "Ash", "%s: account file is left intact" % row[0])
+	# The next check reaches the server: the notice goes away and the account is refreshed.
+	var calls: Array = []
+	var ok_transport := func(_m: String, u: String, _h: PackedStringArray, _b: String) -> ApiClient.Response:
+		calls.append(u); return ApiClient.Response.new(true, 200, {"user_id": "u1", "player_id": "p1", "display_name": "Ash B"})
+	net.client.transport = ok_transport
+	check(await net.restore_saved_account() and str(net.get("restore_error")).is_empty() and calls.size() == 1 and net.account.display_name == "Ash B", "a kept account is checked again and the notice clears once the server answers")
+	# Only 401 clears it.
+	var gone := func(_m: String, _u: String, _h: PackedStringArray, _b: String) -> ApiClient.Response: return ApiClient.Response.new(true, 401, {"code": "UNAUTHENTICATED"})
+	net.use_transport(gone, "https://restore.test/v1", path)
+	_write(path, JSON.stringify(saved))
+	check(not await net.restore_saved_account() and not net.account.signed_in() and net.client.token.is_empty() and not FileAccess.file_exists(path) and str(net.get("restore_error")).is_empty(), "401: saved account and its file are cleared")
+	net.use_transport(gone, "https://restore.test/v1", "user://test_account.json")
+
+## C-110: the top panel always shows who is signed in with Sign in / Sign out, selected parcel or not.
+func _account_row() -> void:
+	var net = root.get_node_or_null("Net")
+	if net == null:
+		check(false, "Net autoload is present"); return
+	var path := "user://c110_row_account.json"
+	var calls: Array = []
+	var transport := func(method: String, url: String, headers: PackedStringArray, _b: String) -> ApiClient.Response:
+		calls.append([method, url.trim_prefix("https://row.test/v1"), "authorization: Bearer row-token" in headers])
+		if url.ends_with("/auth/token"): return ApiClient.Response.new(true, 200, {"ok": true})
+		return ApiClient.Response.new(true, 401, {"code": "UNAUTHENTICATED"})
+	net.use_transport(transport, "https://row.test/v1", path)
+	var server := FakeServer.new()
+	var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+	root.add_child(page)
+	var selector := Selector.new(); root.add_child(selector)
+	page._selector = selector; page._camera = CameraInput.new(); page.add_child(page._camera)
+	page._framed = true; page._area_generation = selector.generation
+	page._claims = controller(server, "nobody", Native.new()); page._claims.changed.connect(page._render)
+	await page._claims.start()
+	page._render()
+	check(page._account_line.visible and page._account_line.text == page.NOT_SIGNED_IN and page._account_button.visible and page._account_button.text == "Sign in", "signed out, nothing selected: 'Not signed in' with 'Sign in'")
+	page._restoring = true; page._render()
+	check(page._account_line.text == page.CHECKING and not page._account_button.visible, "while the saved account is checked: 'Checking your account…' and no button")
+	page._restoring = false
+	net.account.adopt({"token": "row-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
+	net.client.token = "row-token"
+	page._render()
+	check(page._account_line.text == "Signed in as Ash" and page._account_button.text == "Sign out" and not page._account_note.visible, "signed in: 'Signed in as Ash' with 'Sign out'")
+	selector.selection = Fixture.metadata(_free_ids(server, 1)[0]); selector.selection.block_id = _free_ids(server, 1)[0]
+	page._render()
+	check(page._account_line.visible and page._account_button.visible and page._account_button.text == "Sign out", "the account entry stays while a parcel is selected")
+	net.restore_error = "HTTP_503"; page._render()
+	check(page._account_note.visible and page._account_note.text == page.ACCOUNT_KEPT and page._account_button.text == "Sign out", "an account kept through a server error says so and can still sign out")
+	net.restore_error = ""
+	page._account_button.pressed.emit(); await process_frame
+	check(page._sign_out_confirm.visible and not page._account_button.visible and net.account.signed_in(), "'Sign out' asks first; nothing is cleared yet")
+	page._sign_out_confirm.get_child(1).get_child(1).pressed.emit(); await process_frame
+	check(not page._sign_out_confirm.visible and page._account_button.visible and net.account.signed_in(), "'Cancel' keeps the account")
+	page._account_button.pressed.emit(); await process_frame
+	calls.clear()
+	await page._sign_out()
+	check(not net.account.signed_in() and not FileAccess.file_exists(path) and net.client.token.is_empty(), "'Sign out' clears this phone's account and its file")
+	check(calls.size() >= 1 and calls[0] == ["DELETE", "/auth/token", true] and not calls.any(func(c): return c[1] == "/auth/anonymous"), "sign-out revokes this phone's token and does not sign in as a guest")
+	check(page._account_line.text == page.NOT_SIGNED_IN and page._account_button.text == "Sign in", "after signing out the panel offers 'Sign in' again")
+	page.queue_free(); selector.queue_free()
+	await process_frame
+	net.use_transport(transport, "https://row.test/v1", "user://test_account.json")
+
+## C-110: the map opens on the player's home, waits for the account and home before the first framing, never moves
+## a camera the player moved, and "My home" brings the camera back.
+func _home_framing() -> void:
+	var server := FakeServer.new()
+	var home_id: String = _free_ids(server, 1)[0]
+	var home_center := [-122.4101, 37.7801]
+	await ClaimApi.new(server.client("fake-a")).claim(home_id, home_center)
+	var area := [-122.4519, 37.7294]
+	var make := func(token: String) -> Array:
+		var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+		root.add_child(page)
+		var selector := Selector.new(); root.add_child(selector)
+		selector.manifest = {"native_map": {"minzoom": 16, "center": area, "initial_zoom": 16.5}}
+		page._selector = selector; page._camera = CameraInput.new(); page.add_child(page._camera)
+		page._camera.user_moved.connect(func(): page._player_moved = true)
+		page._area_generation = selector.generation
+		page._claims = controller(server, token, Native.new()); page._claims.changed.connect(page._render)
+		page._camera.frame_center(-122.50, 37.80, 15.0) # Wherever the native map happened to start.
+		return [page, selector]
+	var near := func(camera: Control, point: Array, zoom: float) -> bool:
+		return absf(camera.center[0] - point[0]) < 1e-6 and absf(camera.center[1] - point[1]) < 1e-6 and is_equal_approx(camera.zoom, zoom)
+	var pair: Array = make.call("fake-a")
+	var page = pair[0]
+	page._restoring = true; page._render()
+	check(not page._framed and near.call(page._camera, [-122.50, 37.80], 15.0), "the first framing waits while the saved account is checked")
+	page._restoring = false
+	await page._claims.start()
+	check(page._framed and near.call(page._camera, home_center, page.HOME_ZOOM), "with a home, the map opens on the home")
+	check(page._home.visible and not page._home.disabled and page._places.visible, "'My home' is shown for a player with a home")
+	page._camera.frame_center(-122.43, 37.76, 16.0); page._camera.user_moved.emit()
+	page._render()
+	check(near.call(page._camera, [-122.43, 37.76], 16.0), "later renders do not pull a moved camera back")
+	page._home.pressed.emit()
+	check(near.call(page._camera, home_center, page.HOME_ZOOM), "'My home' brings the camera back to the home")
+	# Back from the parcel: the same map page keeps the player's view.
+	page._camera.frame_center(-122.42, 37.77, 17.0); page._camera.user_moved.emit()
+	await page._claims.start(); page._render()
+	check(near.call(page._camera, [-122.42, 37.77], 17.0), "re-reading the home after a return does not reframe")
+	page.queue_free(); pair[1].queue_free()
+	# No home: the dataset's area.
+	pair = make.call("fake-b")
+	page = pair[0]
+	await page._claims.start()
+	check(page._framed and near.call(page._camera, area, 16.5) and not page._home.visible, "without a home, the map opens on the dataset's area and has no 'My home'")
+	page.queue_free(); pair[1].queue_free()
+	# The player moved before the home was known: their view is kept.
+	pair = make.call("fake-a")
+	page = pair[0]
+	page._camera.frame_center(-122.44, 37.75, 17.0); page._camera.user_moved.emit()
+	await page._claims.start()
+	check(near.call(page._camera, [-122.44, 37.75], 17.0) and page._home.visible, "a camera the player already moved is not taken over; 'My home' is still offered")
+	page.queue_free(); pair[1].queue_free()
+	# A home that becomes known after the first framing (sign-in, retried read) is framed once.
+	pair = make.call("nobody")
+	page = pair[0]
+	await page._claims.start()
+	check(page._framed and near.call(page._camera, area, 16.5), "signed out: the dataset's area")
+	page._claims.api.client.token = "fake-a"
+	page._account_changed(); await process_frame; await process_frame
+	check(near.call(page._camera, home_center, page.HOME_ZOOM), "after signing in the map moves to the new account's home")
+	page.queue_free(); pair[1].queue_free()
+	await process_frame
+
+func _write(path: String, text: String) -> void:
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(text); f.close()
