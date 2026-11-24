@@ -36,10 +36,15 @@ needed Avatar/AppRouter symbols, and use an isolated package/userdir. The scene'
 setting check is only an additional guard, not a replacement for build isolation.
 No stage-two APK or 3D-scene acceptance is claimed here.
 
-`modules/dynamic_farm/map/config.json` pins the reviewed r4 read-only dataset:
-`https://lonely-window-barely-sheriff.trycloudflare.com`,
-`sf-dynamic-farm-20261118-r4`, client SHA
-`645df3530b5617bb7e5a8cfb0d070e0e82b74337db47f83a542df1e90c3ae1cf`.
+`modules/dynamic_farm/map/config.json` pins the hosted r6 read-only dataset (C-43#152):
+`https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r6-6c3733e3b025/`,
+`sf-dynamic-farm-20261124-r6`, client SHA (of `client-manifest.json`)
+`727ff59ae8a94c6af4620dd5ecdf605233f2c5f86ddcc11a98d93f908b9d0cb5`; that
+client-manifest names the full `manifest.json` SHA `6c3733e3…9376`. r6 is r5
+without its degenerate building rings (V-167); r5 was never shipped. The map uses
+the dataset's DataSF buildings (`building_source: datasf`), the same footprints
+the farm cores are rasterized from. Claims send the same `dataset_version`, which
+`assets/farm/data/dynamic_farm.json` registers on the server.
 The service is ready; the complete 3D candidate still requires its own reviewed
 scene integration and actual package verification. The packager must take exact source config, not
 silently replace URL/hash. Include five native runtime Kotlin files (no *Test),
@@ -115,6 +120,31 @@ ignored, so the tap resumes only on the reloaded map. The reload
 allowance resets on the next tap or Retry. `DYNAMIC_MAP_ERROR` logs the native
 code and whether a tap was waiting. `DYNAMIC_QUERY` logs the local request number, native
 outcome code, attempt and retry decision only, never the point or parcel.
+
+A DataSF building layer (`building_source=datasf`) that Mapbox cannot parse is
+dropped without any source error, so the layer never loads and taps answer
+`loading` (C-43 V-167). The controller counts it as a map load error
+(`buildings_source_timeout`, same reload-once-then-"Map details could not load.
+Tap Retry." path) when the native ready signal has not reported
+`buildings_source_ready` within `buildings_load_timeout_ms` of setting the
+sources (`config.json`, default 45000, clamped 5000–300000).
+
+### Core size and too-small parcels (C-43)
+
+The client no longer requires 760–840 core cells. Farm data and parcel
+metadata accept any non-empty core within the 8192-cell total budget; shape and
+count come from the dataset (r5 rasterizes DataSF building footprints, C-48).
+Choosing a parcel whose `core_cell_count` is below `min_core_cells` in
+`config.json` (default 400, clamped 1–8192) keeps the building highlighted,
+leaves Preview disabled and shows "This parcel is too small to be your main
+farm. Please choose a larger one." (Q-56). The fetched farm is checked again
+before opening.
+
+`dataset_version` in `config.json` selects the release; any
+`sf-dynamic-farm-YYYYMMDD-rN` name is accepted, and the manifest, farms and
+preview host must all carry that same version. Switching to r5 means updating
+`base_url`, `dataset_version` and `manifest_sha256` together.
+test_core_size.gd covers L-shaped, courtyard and threshold-edge fixtures.
 
 ## 1904 read retries
 

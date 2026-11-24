@@ -21,3 +21,33 @@ static func farm(id:="p-A") -> Dictionary:
 		"boundaries":{"core":[{"outer":[[4,4],[44,4],[44,24],[4,24],[4,4]],"holes":[]}],"outer":[{"outer":[[0,0],[48,0],[48,28],[0,28],[0,0]],"holes":[]}]},
 		"walk_reserve":{"no_solid_decor_runs":reserved,"spawn_cell":[24,14],"entry_cell":[24,1]},
 		"geo_hints":{"water_fraction":0.0,"landuse":"residential","source_building_count":2},"stats":{"core_iou":1.0,"width_min_cells":4,"width_max_cells":4,"core_components":1,"walk_components":1,"recovery_flags":[]},"attribution":"Synthetic test fixture only"}
+## C-43: a farm whose core is any cell set (non-rectangular, any size). Every other grid cell is walk-only
+## extension, row 0 holds the entry, and the whole grid is walking reserve so the core contract always holds.
+static func shaped_farm(id:String, core_cells:Dictionary, width:int, height:int, version:=C.DATASET) -> Dictionary:
+	var core:Array=[];var extension:Array=[];var reserved:Array=[]
+	var spawn:Vector2i=core_cells.keys()[core_cells.size() >> 1]
+	for y in height:
+		reserved.append([y,0,width])
+		var x:=0
+		while x<width:
+			var inside:=core_cells.has(Vector2i(x,y));var start:=x
+			while x<width and core_cells.has(Vector2i(x,y))==inside:x+=1
+			(core if inside else extension).append([y,start,x-start,0 if inside else 1])
+	var data:=farm(id)
+	data.dataset_version=version
+	data.grid={"width":width,"height":height,"origin_cell":[-(width >> 1),-(height >> 1)]}
+	data.zones={"core":{"runs":core},"extension":{"runs":extension}}
+	data.counts={"core_cell_count":core_cells.size(),"extension_cell_count":width*height-core_cells.size(),"total_cell_count":width*height}
+	data.boundaries={"core":[{"outer":[[1,1],[width-1,1],[width-1,height-1],[1,height-1],[1,1]],"holes":[]}],"outer":[{"outer":[[0,0],[width,0],[width,height],[0,height],[0,0]],"holes":[]}]}
+	data.walk_reserve={"no_solid_decor_runs":reserved,"spawn_cell":[spawn.x,spawn.y],"entry_cell":[0,0]}
+	return data
+## Cells of axis-aligned rectangles [x, y, w, h], minus optional holes of the same form.
+static func cells(rects:Array, holes:Array=[]) -> Dictionary:
+	var result:={}
+	for r in rects:
+		for y in range(r[1],r[1]+r[3]):
+			for x in range(r[0],r[0]+r[2]):result[Vector2i(x,y)]=true
+	for r in holes:
+		for y in range(r[1],r[1]+r[3]):
+			for x in range(r[0],r[0]+r[2]):result.erase(Vector2i(x,y))
+	return result

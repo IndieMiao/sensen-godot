@@ -9,7 +9,7 @@ import { encodeTiles, resolveMapParams, type TileFeature } from '../src/mvt.js';
 import { loadSnapshot } from '../src/snapshot.js';
 import { sha256 } from '../src/sources.js';
 import { checkTiles } from '../src/tilecheck.js';
-import { checkParcelProperties, decodeFarm, RELAXED } from '../src/validate.js';
+import { checkMapGeometry, checkParcelProperties, decodeFarm, RELAXED } from '../src/validate.js';
 
 // Test range around 130 SAN RAFAEL WAY / 175 JUNIPERO SERRA BLVD (see README.md).
 const SNAPSHOT = path.join(import.meta.dirname, 'fixtures', 'sf-test-snapshot');
@@ -234,6 +234,26 @@ describe('parcel tiles and building layer (test range)', () => {
     expect(lines).toContain('MISSING client-manifest.json');
   });
 
+  it('fails on a map-layer ring the native map would reject (C-43 V-167: one 3-position ring drops the whole layer)', () => {
+    const dir = written();
+    const file = path.join(dir, 'buildings.geojson');
+    const layer = JSON.parse(readFileSync(file, 'utf8'));
+    const f = layer.features[3];
+    const [a, b] = (f.geometry.type === 'Polygon' ? f.geometry.coordinates : f.geometry.coordinates[0])[0];
+    f.geometry = { type: 'MultiPolygon', coordinates: [f.geometry.type === 'Polygon' ? f.geometry.coordinates : f.geometry.coordinates[0], [[a, b, a]]] };
+    const body = JSON.stringify(layer);
+    writeFileSync(file, body);
+    const manifest = manifestOf(dir);
+    manifest.files['buildings.geojson'] = sha256(body);
+    const manifestText = JSON.stringify(manifest);
+    writeFileSync(path.join(dir, 'manifest.json'), manifestText);
+    const client = JSON.parse(readFileSync(path.join(dir, 'client-manifest.json'), 'utf8'));
+    writeFileSync(path.join(dir, 'client-manifest.json'), JSON.stringify({ ...client, source_manifest_sha256: sha256(manifestText) }));
+    const lines: string[] = [];
+    expect(validateDataset(dir, RELAXED, l => lines.push(l))).toBe(1);
+    expect(lines).toContain(`MAP buildings.geojson feature 3 (${f.properties.block_id}): polygon 1 ring 0: 3 positions`);
+  });
+
   it('writes tilejson.json for a host base URL and checks it', async () => {
     const dir = written();
     expect(await main(['tilejson', '--dataset', dir, '--base', 'https://oss.example/sensen/r5-abc'])).toBe(0);
@@ -259,6 +279,9 @@ describe('parcel tiles and building layer (test range)', () => {
       for (const [x, y] of coords) expect([Math.round(x * 1e6) / 1e6, Math.round(y * 1e6) / 1e6]).toEqual([x, y]);
     }
     for (const r of report.parcels) expect(r.building_area_ids.length).toBe(r.building_count);
+    for (const file of ['buildings.geojson', 'index.geojson']) {
+      for (const f of JSON.parse(text(file)).features) expect(checkMapGeometry(f.geometry)).toBeNull();
+    }
     // C-49 wrote 77,147 bytes for the same 123 footprints.
     expect(text('buildings.geojson').length).toBeLessThan(77147 * 0.7);
   });

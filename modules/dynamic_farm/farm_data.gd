@@ -77,8 +77,9 @@ static func decode(data: Dictionary) -> Dictionary:
 			counts[zone] += length
 			last_y = y
 			last_end = x + length
-	if counts.core < 760 or counts.core > 840:
-		return invalid("Dynamic farm core cell count is invalid.")
+	# C-43: core size follows the dataset's building area; MAX_CELLS is the only bound. Too-small is a selection hint.
+	if counts.core < 1:
+		return invalid("Dynamic farm core is empty.")
 	var declared = data.get("counts")
 	if not declared is Dictionary:
 		return invalid("Dynamic farm counts are missing.")

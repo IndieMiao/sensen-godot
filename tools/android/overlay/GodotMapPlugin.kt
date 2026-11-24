@@ -301,8 +301,8 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     @UsedByGodot
-    fun setParcelBuildingHighlight(generation: Long, key: String) {
-        runOnUiThread { parcelController?.setBuildingHighlight(generation, key) }
+    fun setParcelBuildingHighlight(generation: Long, key: String, parcelId: String) {
+        runOnUiThread { parcelController?.setBuildingHighlight(generation, key, parcelId) }
     }
 
     @UsedByGodot

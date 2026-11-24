@@ -13,7 +13,7 @@ static func build(manifest:Dictionary,base:String,options:Dictionary={}) -> Dict
 	var source_type:=str(n.get("type",""))
 	if source_type=="mvt":source_type="vector"
 	if source_type not in ["vector","geojson"] or n.get("promote_id")!="block_id":return {}
-	if manifest.get("dataset_version")==Contract.DATASET and source_type!="vector":return {}
+	if Contract.valid_dataset(manifest.get("dataset_version")) and source_type!="vector":return {}
 	if not Geo.valid_point(n.get("center")):return {}
 	var provider:=str(options.get("building_source",n.get("building_source","mapbox")))
 	if provider not in ["mapbox","datasf"]:return {}

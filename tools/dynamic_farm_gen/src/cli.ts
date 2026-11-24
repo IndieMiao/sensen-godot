@@ -17,7 +17,7 @@ import { resolveMapParams } from './mvt.js';
 import { loadSnapshot } from './snapshot.js';
 import { fetchSnapshot, sha256 } from './sources.js';
 import { checkTiles, deployTileJson, type TileReport } from './tilecheck.js';
-import { checkParcelProperties, CURRENT_CLIENT, decodeFarm, RELAXED } from './validate.js';
+import { checkMapGeometry, checkParcelProperties, CURRENT_CLIENT, decodeFarm, RELAXED } from './validate.js';
 
 function args(argv: string[]): Record<string, string> {
   const out: Record<string, string> = {};
@@ -35,7 +35,7 @@ function need(a: Record<string, string>, key: string): string {
 }
 
 /**
- * Validates every file hash, farm, index feature and parcel tile of a written dataset; returns the number of failures.
+ * Validates every file hash, farm, index feature, map-layer geometry and parcel tile of a written dataset; returns the number of failures.
  * A dataset without manifest.map_layer and without tiles predates the map layer: its tile check is skipped and logged.
  */
 export function validateDataset(dir: string, range = RELAXED, log = console.log): number {
@@ -57,6 +57,14 @@ export function validateDataset(dir: string, range = RELAXED, log = console.log)
     const farm = JSON.parse(readFileSync(path.join(dir, feature.properties.farm_path), 'utf8'));
     const result = decodeFarm(farm, range);
     if (!result.ok) { log(`FARM ${feature.properties.block_id}: ${result.error}`); failures++; }
+  }
+  for (const file of ['index.geojson', 'buildings.geojson']) {
+    if (!existsSync(path.join(dir, file))) continue;
+    const features = file === 'index.geojson' ? index.features : JSON.parse(readFileSync(path.join(dir, file), 'utf8')).features;
+    for (const [i, feature] of features.entries()) {
+      const error = checkMapGeometry(feature.geometry);
+      if (error) { log(`MAP ${file} feature ${i} (${feature.properties?.block_id}): ${error}`); failures++; }
+    }
   }
   if (manifest.map_layer?.parameters) {
     const tiles = checkTiles(dir).report;

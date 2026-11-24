@@ -4,7 +4,7 @@ signal preview_ready(summary:Dictionary)
 signal preview_error(message:String)
 signal closed(return_context:Dictionary)
 const VIEW_SCENE:="res://scenes/dynamic_farm/dynamic_farm.tscn"
-const DATASET:="sf-dynamic-farm-20261118-r4"
+const Contract:=preload("res://modules/dynamic_farm/map/geo_contract.gd")
 var view_factory:=Callable() # isolated lifecycle fixture; production loads the fixed scene above
 var _args:Dictionary={}
 var _view:Node3D
@@ -39,7 +39,7 @@ func _build_hud() -> void:
 func _valid_context() -> bool:
 	var farm=_args.get("farm")
 	# own_parcel: the owner's claimed parcel, farmed through ParcelFarming (C-34); otherwise a read-only preview.
-	return (_args.get("preview_only")==true or _args.get("own_parcel")==true) and _args.get("dataset")==DATASET and farm is Dictionary and farm.get("schema")==4 and farm.get("dataset_version")==DATASET and farm.get("selection_unit")=="parcel" and _args.get("block_id") is String and _args.block_id.begins_with("p-") and _args.block_id.length()>2 and _args.block_id==farm.get("block_id")
+	return (_args.get("preview_only")==true or _args.get("own_parcel")==true) and Contract.valid_dataset(_args.get("dataset")) and farm is Dictionary and farm.get("schema")==4 and farm.get("dataset_version")==_args.dataset and farm.get("selection_unit")=="parcel" and _args.get("block_id") is String and _args.block_id.begins_with("p-") and _args.block_id.length()>2 and _args.block_id==farm.get("block_id")
 func _open_view() -> void:
 	if _leaving:return
 	_epoch+=1;var epoch:=_epoch

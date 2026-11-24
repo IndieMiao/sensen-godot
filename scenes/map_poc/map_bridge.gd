@@ -93,7 +93,7 @@ func set_parcel_states(generation: int, _batch_json: String) -> void:
 func set_parcel_claims(generation: int, _claims_json: String) -> void:
 	parcel_error.emit(generation, 0, "unsupported")
 
-func set_parcel_building_highlight(generation: int, _key: String) -> void:
+func set_parcel_building_highlight(generation: int, _key: String, _parcel_id := "") -> void:
 	parcel_error.emit(generation, 0, "unsupported")
 
 func clear_parcel_layers(_generation: int) -> void:

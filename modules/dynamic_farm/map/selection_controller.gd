@@ -11,9 +11,15 @@ const FarmData := preload("res://modules/dynamic_farm/farm_data.gd")
 const PROMPT := "Tap a building to preview a farm."
 const QUERY_RETRY_DELAY_MS := 600 # Default before the single automatic re-query; config query_retry_delay_ms overrides.
 const QUERY_TIMEOUT_S := 8.0
+# A DataSF building layer Mapbox cannot parse never loads and reports no source error (C-43 V-167): taps answer
+# "loading" forever. Not ready this long after the sources are set counts as a map load error. Config
+# buildings_load_timeout_ms overrides (clamped 5–300 s).
+const BUILDINGS_LOAD_TIMEOUT_MS := 45000
 const QUERY_FAILED := "Parcel details could not load. Tap Retry."
 const MAP_FAILED := "Map details could not load. Tap Retry."
 const FINDING := "Finding parcel…"
+const TOO_SMALL := "This parcel is too small to be your main farm. Please choose a larger one." # Q-56
+const MIN_CORE_CELLS := 400 # C-43 default; config min_core_cells overrides (clamped 1–8192).
 # Definite native answers: retrying cannot change them, so they are not failures.
 const SETTLED := {"building_without_parcel": "No selectable parcel here.", "invalid_point": "No selectable parcel here.", "too_many_candidates": "Zoom in to choose a farm."}
 var api: Node
@@ -39,6 +45,9 @@ var _map_retried := false
 var _reload_left := -1.0
 var _resume_tap := false
 var _failed_generation := -1 # Map being replaced by the automatic reload; its later signals are the same failure.
+var _buildings_left := -1.0 # Countdown for the DataSF building layer of the current map; -1 when not waiting.
+var _buildings_wait := false # The current DataSF map has not reported its building layer loaded; taps wait for it.
+var _view_zoom := -1.0 # Last camera zoom reported to camera_changed or tap; -1 until known.
 var _kind := ""
 var _key := ""
 var _options: Array = []
@@ -47,7 +56,7 @@ var _connected := false
 ## auto=true is the single automatic reload after a map load error; it keeps the waiting tap.
 func activate(auto := false) -> void:
 	if not auto: _map_retried = false; _resume_tap = false; _failed_generation = -1
-	_reload_left = -1.0
+	_reload_left = -1.0; _buildings_left = -1.0; _buildings_wait = false
 	suspended = false
 	_epoch += 1
 	var epoch := _epoch
@@ -63,7 +72,7 @@ func activate(auto := false) -> void:
 	map_ready = false; busy = true; selection = {}; _options = []; _pending = -1; _retry_left = -1.0; _query_failed = false
 	message = FINDING if _resume_tap else "Loading dynamic farm map…"; changed.emit()
 	var pin := str(config.get("manifest_sha256", ""))
-	if RegEx.create_from_string("^[0-9a-f]{64}$").search(pin) == null or config.get("dataset_version") != Contract.DATASET:
+	if RegEx.create_from_string("^[0-9a-f]{64}$").search(pin) == null or not Contract.valid_dataset(config.get("dataset_version")):
 		_record_load("client_manifest", "configuration_rejected", epoch, started)
 		_fail("This preview service is not configured."); return
 	api.base_url = str(config.get("base_url", ""))
@@ -72,7 +81,7 @@ func activate(auto := false) -> void:
 	if epoch != _epoch or suspended:
 		_record_load("client_manifest", "superseded", epoch, started); return
 	var native := MapConfig.build(data, api.base_url, config)
-	if not Contract.envelope(data) or native.is_empty():
+	if not Contract.envelope(data, str(config.dataset_version)) or native.is_empty():
 		_record_load("client_manifest", "validation_rejected", epoch, started)
 		_fail("Could not load this farm map. Tap Retry."); return
 	_record_load("client_manifest", "validation_accepted", epoch, started)
@@ -81,10 +90,11 @@ func activate(auto := false) -> void:
 	generation = MapBridge.next_parcel_generation(); style_generation = -1
 	busy = false; message = FINDING if _resume_tap else "Loading map details…"; changed.emit()
 	bridge.set_parcel_sources(generation, JSON.stringify(native))
+	if native.building_source == "datasf": _buildings_wait = true; _buildings_left = buildings_load_timeout()
 
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; _retry_left = -1.0; _query_failed = false; map_ready = false; busy = false
-	_reload_left = -1.0; _resume_tap = false; _failed_generation = -1
+	_reload_left = -1.0; _resume_tap = false; _failed_generation = -1; _buildings_left = -1.0; _buildings_wait = false
 	selection = {}; _options = []; _key = ""
 	if api != null: api.cancel_all()
 	if bridge != null:
@@ -94,15 +104,20 @@ func pause() -> void:
 func _native_ready(gen: int, style: int, payload: String) -> void:
 	if suspended or gen != generation or gen == _failed_generation or style < style_generation: return
 	var data := _parse(payload)
-	if style != style_generation:
+	var reset := style != style_generation
+	if reset:
 		_pending = -1; _retry_left = -1.0; _query_failed = false; selection = {}; _options = []; _key = ""
 	style_generation = style
+	if data.get("buildings_source_ready") == true: _buildings_left = -1.0; _buildings_wait = false
+	var was_ready := map_ready
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
-	if map_ready and _resume_tap:
-		# The reloaded map answers the tap that its load error interrupted; that was the tap's one retry.
+	if map_ready and _resume_tap and not _buildings_wait:
+		# The reloaded map (or its building layer) answers the waiting tap; a reload was that tap's one retry.
 		_resume_tap = false; message = FINDING; changed.emit(); _send_query(); return
 	if _querying(): message = FINDING # Native idle readiness arrives while a tap waits.
-	else: message = PROMPT if map_ready else "Loading map details…"
+	elif not map_ready: message = "Loading map details…"
+	# Idle readiness also follows every highlight change: it must not replace the chosen parcel's message (C-43 V-199).
+	elif reset or not was_ready: message = PROMPT
 	changed.emit()
 
 func _native_error(gen: int, style: int, code: String) -> void:
@@ -110,7 +125,7 @@ func _native_error(gen: int, style: int, code: String) -> void:
 	if gen == _failed_generation: return # One outage reports per tile/source; the reload already answers it.
 	var tap := _querying()
 	var retry_sent := _retried and _retry_left < 0.0 # A scheduled, unsent re-query is replaced by the reload.
-	map_ready = false; _pending = -1; _retry_left = -1.0; _query_failed = false
+	map_ready = false; _pending = -1; _retry_left = -1.0; _query_failed = false; _buildings_left = -1.0
 	# Offline tiles and service failures arrive here, not as query answers. Reload once before telling the player.
 	var retry := not _map_retried and not (tap and retry_sent)
 	print("DYNAMIC_MAP_ERROR ", JSON.stringify({"code":code, "tap":tap, "retry":retry}))
@@ -119,13 +134,15 @@ func _native_error(gen: int, style: int, code: String) -> void:
 	busy = true; _reload_left = retry_delay()
 	message = FINDING if tap else "Loading map details…"; changed.emit()
 
-func camera_changed() -> void:
+func camera_changed(zoom := -1.0) -> void:
+	if zoom >= 0.0: _view_zoom = zoom
 	_pending = -1; _retry_left = -1.0; _query_failed = false; _resume_tap = false; _options = []
 	if map_ready and not busy:
 		message = PROMPT; changed.emit()
 
 func tap(point: Vector2, zoom: float) -> void:
 	if suspended or not map_ready or busy: return
+	_view_zoom = zoom
 	if zoom < float(manifest.native_map.get("minzoom", 16)):
 		message = "Zoom in to choose a farm."; changed.emit(); return
 	selection = {}; _options = []; _key = ""
@@ -142,6 +159,7 @@ func retry() -> void:
 func _start_query() -> void:
 	message = FINDING; changed.emit()
 	_retried = false; _retry_left = -1.0; _query_failed = false; _map_retried = false
+	if _buildings_wait: _resume_tap = true; return # Sent once the DataSF building layer loads (C-43 V-199).
 	_send_query()
 
 func _send_query() -> void:
@@ -155,6 +173,11 @@ func retry_delay() -> float:
 	var raw = config.get("query_retry_delay_ms", QUERY_RETRY_DELAY_MS)
 	if not (raw is int or raw is float): raw = QUERY_RETRY_DELAY_MS
 	return clampf(float(raw), 0.0, 5000.0) / 1000.0
+
+func buildings_load_timeout() -> float:
+	var raw = config.get("buildings_load_timeout_ms", BUILDINGS_LOAD_TIMEOUT_MS)
+	if not (raw is int or raw is float) or not is_finite(float(raw)): raw = BUILDINGS_LOAD_TIMEOUT_MS
+	return clampf(float(raw), 5000.0, 300000.0) / 1000.0
 
 func _query_result(request: int, gen: int, style: int, payload: String) -> void:
 	if suspended or busy or gen != generation or style != style_generation or request != _pending: return
@@ -193,9 +216,16 @@ func choose(id: String) -> void:
 	if suspended or not map_ready or busy: return
 	for row in _options:
 		if row.block_id != id: continue
+		bridge.set_parcel_building_highlight(generation, _key, id)
+		if int(row.core_cell_count) < min_core_cells():
+			selection = {}; message = TOO_SMALL; changed.emit(); return
 		selection = row.duplicate(true)
-		bridge.set_parcel_building_highlight(generation, _key)
 		message = "Ready to preview this farm."; changed.emit(); return
+
+func min_core_cells() -> int:
+	var raw = config.get("min_core_cells", MIN_CORE_CELLS)
+	if not (raw is int or raw is float) or not is_finite(float(raw)): raw = MIN_CORE_CELLS
+	return int(clampf(float(raw), 1, FarmData.MAX_CELLS)) # Clamp before int(): 1e30 must not wrap.
 
 func open_farm() -> void:
 	if suspended or not map_ready or busy or selection.is_empty(): return
@@ -208,9 +238,13 @@ func open_farm() -> void:
 	if epoch != _epoch or suspended:
 		_record_load("farm", "superseded", epoch, started); return
 	busy = false
-	if not Contract.farm_matches(farm, id) or FarmData.decode(farm).get("ok") != true:
+	var decoded := FarmData.decode(farm) if Contract.farm_matches(farm, id, str(manifest.dataset_version)) else {}
+	if decoded.get("ok") != true:
 		_record_load("farm", "validation_rejected", epoch, started)
 		_fail("This farm could not load. Please try again."); return
+	if decoded.counts.core < min_core_cells():
+		_record_load("farm", "too_small", epoch, started)
+		selection = {}; _fail(TOO_SMALL); return
 	_record_load("farm", "validation_accepted", epoch, started)
 	farm_ready.emit(farm)
 
@@ -231,7 +265,15 @@ func _record_query(request: int, outcome: String, retry: bool) -> void:
 	# Native outcome code only: no point, parcel, building key or coordinates.
 	print("DYNAMIC_QUERY ", JSON.stringify({"request":request, "outcome":outcome, "attempt":2 if _retried else 1, "retry":retry}))
 
+## The DataSF building layer is drawn, so loads, only from the selectable zoom; below it the countdown waits.
+func _buildings_drawn() -> bool:
+	return _view_zoom < 0.0 or manifest.is_empty() or _view_zoom >= float(manifest.native_map.get("minzoom", 16))
+
 func _process(delta: float) -> void:
+	if _buildings_left >= 0.0 and not suspended and _buildings_drawn():
+		_buildings_left -= delta
+		if _buildings_left < 0.0:
+			_buildings_left = -1.0; _native_error(generation, style_generation, "buildings_source_timeout"); return
 	if _reload_left >= 0.0:
 		_reload_left -= delta
 		if _reload_left < 0.0:

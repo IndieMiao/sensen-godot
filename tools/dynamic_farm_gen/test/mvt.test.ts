@@ -2,6 +2,7 @@ import { classifyRings, VectorTile } from '@mapbox/vector-tile';
 import { PbfReader } from 'pbf';
 import { describe, expect, it } from 'vitest';
 import { douglasPeucker, slimPolygons } from '../src/buildings.js';
+import { checkMapGeometry } from '../src/validate.js';
 import type { Point, Polygon } from '../src/geo.js';
 import { clipRing, DEFAULT_MAP_PARAMS, encodeTiles, mercator, resolveMapParams, ringArea2, tilePath } from '../src/mvt.js';
 
@@ -131,5 +132,20 @@ describe('building map layer', () => {
     }
     const tiny: Polygon = [[[lon, lat], [lon + 2e-7, lat], [lon + 2e-7, lat + 2e-7], [lon, lat]]];
     expect(slimPolygons([tiny], p)[0][0].length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('drops a part with no area left at 7 decimals instead of writing a ring the map rejects (C-43 V-167)', () => {
+    // p-0274020's second part in the hosted r5: a there-and-back sliver, 3 positions after rounding.
+    const sliver: Polygon = [[[-122.41151981, 37.79044731], [-122.41151669, 37.79043029], [-122.41151979, 37.79044729], [-122.41151981, 37.79044731]]];
+    const lon = -122.4701234567;
+    const lat = 37.7301234567;
+    const house: Polygon = [[[lon, lat], [lon + 1e-4, lat], [lon + 1e-4, lat + 1e-4], [lon, lat + 1e-4], [lon, lat]]];
+    const slim = slimPolygons([house, sliver], p);
+    expect(slim).toHaveLength(1);
+    expect(slim[0][0]).toHaveLength(5);
+    expect(slimPolygons([sliver], p)).toEqual([]);
+    for (const poly of slimPolygons([house, sliver, [house[0], sliver[0]]], p)) {
+      expect(checkMapGeometry({ type: 'Polygon', coordinates: poly })).toBeNull();
+    }
   });
 });

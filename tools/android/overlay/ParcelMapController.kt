@@ -135,14 +135,20 @@ internal class ParcelMapController(
         var ok = !style.addStyleSource(parcel, Value(parcelSource)).isError && geoSource(highlight, value(ParcelPayload.EMPTY_COLLECTION)) &&
             layer("""{"id":"$FILL","type":"fill","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"fill-color":["case",$OWN,"$OWN_COLOR",$TAKEN,"$TAKEN_COLOR","#3B7757"],"fill-opacity":["case",$OWN,["case",$SELECTED,0.6,0.42],$TAKEN,["case",$SELECTED,0.55,0.36],0.0]}}""") &&
             layer("""{"id":"$LINE","type":"line","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"line-color":["case",$OWN,"$OWN_COLOR",$TAKEN,"$TAKEN_COLOR","#ED9F18"],"line-width":2.5,"line-opacity":["case",["any",$OWN,$TAKEN,$SELECTED],1.0,0.0]}}""")
+        // DataSF: the yellow highlight filters the building source to the chosen parcel's footprints (C-43 V-199).
+        var highlightSource = "\"source\":\"$highlight\""
         if (ok && cfg.buildingSource == "datasf") {
             val buildings = sources.getValue("buildings")
+            // C-43 V-199: drawn from the selectable zoom. A source no layer draws never reports loaded, so taps below
+            // the address zoom waited for it forever.
+            val drawn = "\"source\":\"$buildings\",\"minzoom\":${cfg.minZoom}"
+            highlightSource = "$drawn,\"filter\":${ParcelPayload.buildingFilter("")}"
             ok = geoSource(buildings, Value(cfg.buildingsUrl)) &&
-                layer("""{"id":"$BUILDING_FILL","type":"fill","source":"$buildings","minzoom":${cfg.addressMinZoom},"paint":{"fill-color":"#716556","fill-opacity":0.16}}""") &&
-                layer("""{"id":"$BUILDINGS","type":"line","source":"$buildings","minzoom":${cfg.addressMinZoom},"paint":{"line-color":"#716556","line-width":1.3}}""")
+                layer("""{"id":"$BUILDING_FILL","type":"fill",$drawn,"paint":{"fill-color":"#716556","fill-opacity":0.16}}""") &&
+                layer("""{"id":"$BUILDINGS","type":"line",$drawn,"paint":{"line-color":"#716556","line-width":1.3}}""")
         }
-        ok = ok && layer("""{"id":"$HIGHLIGHT_FILL","type":"fill","source":"$highlight","paint":{"fill-color":"#FFD15C","fill-opacity":0.65}}""") &&
-            layer("""{"id":"$HIGHLIGHT_LINE","type":"line","source":"$highlight","paint":{"line-color":"#ED9F18","line-width":2.5}}""") &&
+        ok = ok && layer("""{"id":"$HIGHLIGHT_FILL","type":"fill",$highlightSource,"paint":{"fill-color":"#FFD15C","fill-opacity":0.65}}""") &&
+            layer("""{"id":"$HIGHLIGHT_LINE","type":"line",$highlightSource,"paint":{"line-color":"#ED9F18","line-width":2.5}}""") &&
             layer("""{"id":"$ADDRESSES","type":"symbol","source":"$parcel"$sourceLayer,"minzoom":${cfg.addressMinZoom},"layout":{"text-field":["coalesce",["get","address"],""],"text-size":11,"text-max-width":8,"text-allow-overlap":false},"paint":{"text-color":"#37463B","text-halo-color":"#FFFFFF","text-halo-width":1.2}}""") &&
             layer("""{"id":"$CLAIM_NAMES","type":"symbol","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"filter":${ParcelPayload.claimFilter(claims)},"layout":{"text-field":${ParcelPayload.claimLabel(claims)},"text-size":13,"text-max-width":8,"text-allow-overlap":false},"paint":{"text-color":"#7A2620","text-halo-color":"#FFFFFF","text-halo-width":1.5}}""")
         if (!ok) {
@@ -200,14 +206,20 @@ internal class ParcelMapController(
         val ids = if (cfg.buildingSource == "mapbox") cfg.mapboxBuildingLayers else listOf(BUILDING_FILL)
         return ids.takeIf { list -> list.all { id -> style.styleLayers.any { it.id == id && it.type in listOf("fill", "fill-extrusion") } } }
     }
-    fun setBuildingHighlight(generation: Long, key: String) {
+    fun setBuildingHighlight(generation: Long, key: String, parcelId: String = "") {
         if (closed || !state.active || generation != state.generation || !map.isValid()) return
         val geometry = if (key.isEmpty()) null else buildingSelection.lookup(generation, state.epoch, key)
         if (key.isNotEmpty() && geometry == null) { error(generation, state.epoch, "stale_building_key"); return }
         val id = sources["highlight"] ?: return
         val style = map.style ?: return
-        val data = if (geometry == null) ParcelPayload.EMPTY_COLLECTION else FeatureCollection.fromFeature(Feature.fromGeometry(geometry)).toJson()
-        if (style.setStyleSourceProperty(id, "data", value(data)).isError) error(generation, state.epoch, "highlight_failed")
+        val failed = if (config?.buildingSource == "datasf") {
+            val filter = value(ParcelPayload.buildingFilter(if (geometry == null) "" else parcelId))
+            style.setStyleLayerProperty(HIGHLIGHT_FILL, "filter", filter).isError || style.setStyleLayerProperty(HIGHLIGHT_LINE, "filter", filter).isError
+        } else {
+            val data = if (geometry == null) ParcelPayload.EMPTY_COLLECTION else FeatureCollection.fromFeature(Feature.fromGeometry(geometry)).toJson()
+            style.setStyleSourceProperty(id, "data", value(data)).isError
+        }
+        if (failed) error(generation, state.epoch, "highlight_failed")
         if (key.isEmpty()) buildingSelection.clear()
     }
     fun queryAt(requestId: Long, generation: Long, x: Double, y: Double) {

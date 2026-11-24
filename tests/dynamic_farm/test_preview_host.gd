@@ -58,7 +58,16 @@ func _run() -> void:
 	verify(bad._state=="error" and not is_instance_valid(bad._view),"gameplay mode is rejected before scene construction")
 	bad_args=args();bad_args.block_id="p-B";bad.setup(bad_args);bad._open_view()
 	verify(bad._state=="error" and not is_instance_valid(bad._view),"mismatched parcel context never constructs a scene")
-	bad.queue_free();await process_frame
+	bad_args=args();bad_args.farm.dataset_version="sf-dynamic-farm-20261124-r5";bad.setup(bad_args);bad._open_view()
+	verify(bad._state=="error" and not is_instance_valid(bad._view),"farm from another dataset release never constructs a scene")
+	bad_args=args();bad_args.dataset="latest";bad_args.farm.dataset_version="latest";bad.setup(bad_args);bad._open_view()
+	verify(bad._state=="error" and not is_instance_valid(bad._view),"malformed dataset version never constructs a scene")
+	bad.queue_free()
+	var next=Host.instantiate();next.view_factory=_factory
+	var next_args:=args();next_args.dataset="sf-dynamic-farm-20261124-r5";next_args.farm.dataset_version="sf-dynamic-farm-20261124-r5"
+	next.setup(next_args);root.add_child(next)
+	verify(next._state=="ready","C-43: configured next dataset release opens the preview")
+	next.queue_free();await process_frame
 	RouterFixture.restore(root,router,real_router)
 	print("PREVIEW HOST ",checked-failed,"/",checked)
 	quit(1 if failed else 0)

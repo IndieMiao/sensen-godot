@@ -190,6 +190,26 @@ function connected(cells: Set<string>): boolean {
   return seen.size === cells.size;
 }
 
+/**
+ * A GeoJSON layer the native map loads as one source (buildings.geojson, index.geojson): one ring
+ * with fewer than 4 positions makes the map reject the whole file (C-43 V-167). Returns an error or null.
+ */
+export function checkMapGeometry(geometry: Json): string | null {
+  if (!isObj(geometry) || !Array.isArray(geometry.coordinates)) return 'geometry';
+  const polygons = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.type === 'MultiPolygon' ? geometry.coordinates : null;
+  if (!polygons || polygons.length === 0) return 'geometry type';
+  for (const [pi, poly] of polygons.entries()) {
+    if (!Array.isArray(poly) || poly.length === 0) return `polygon ${pi}: no rings`;
+    for (const [ri, ring] of poly.entries()) {
+      if (!Array.isArray(ring) || ring.length < 4) return `polygon ${pi} ring ${ri}: ${Array.isArray(ring) ? ring.length : 0} positions`;
+      if (!ring.every(p => Array.isArray(p) && p.length === 2 && isNum(p[0]) && isNum(p[1]))) return `polygon ${pi} ring ${ri}: position`;
+      const [first, last] = [ring[0], ring[ring.length - 1]];
+      if (first[0] !== last[0] || first[1] !== last[1]) return `polygon ${pi} ring ${ri}: not closed`;
+    }
+  }
+  return null;
+}
+
 /** Port of parcel_metadata.gd decode for one map feature's properties; returns an error or null. */
 export function checkParcelProperties(raw: Record<string, Json>, coreRange: CoreRange = CURRENT_CLIENT): string | null {
   const id = raw.block_id;

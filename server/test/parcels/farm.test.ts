@@ -27,6 +27,8 @@ describe('dynamic_farm.json', () => {
     expect(rules.crops).toEqual({ crop_carrot: { seed: 'seed_carrot', grow_seconds: 60, yield: 1 } });
     expect(rules.till_tool).toBe('hoe_starter');
     expect(communityOf(rules, 'sf-dynamic-farm-20261118-r4')).toBe('sf');
+    expect(communityOf(rules, 'sf-dynamic-farm-20261124-r6')).toBe('sf'); // C-43: r6, r5 without its broken building rings (V-167)
+    expect(communityOf(rules, 'sf-dynamic-farm-20261124-r5')).toBeNull(); // never shipped
     expect(communityOf(rules, 'nope')).toBeNull();
   });
 
