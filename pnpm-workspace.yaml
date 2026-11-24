@@ -1,6 +1,8 @@
 packages:
   - 'packages/*'
   - 'tools/geo_blueprint'
+  - 'tools/dynamic_farm_gen'
+  - 'tools/dynamic_farm_audit'
   - 'server'
 
 # 原本在 tools/geo_blueprint/pnpm-workspace.yaml 里；根 workspace 建立后，

@@ -34,8 +34,10 @@ if [[ ${1:-} == --ci-headless ]]; then
   suite=${2:?expected a res://tests suite after --ci-headless}
   # The stock runtest.sh starts a window even if the editor import was headless.
   # Keep its noninteractive debugger, and import just once in the caller.
+  # -c: the CI runner otherwise skips a suite's remaining cases after its first failure, which hides them and
+  # shrinks the case count (C-50: 2238 instead of 2242).
   "$GODOT_BIN" --headless --path . -d --remote-debug tcp://127.0.0.1:0 \
-    --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a "$suite" --ignoreHeadlessMode 2>&1 | tee "$log"
+    --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a "$suite" -c --ignoreHeadlessMode 2>&1 | tee "$log"
   check_autoloads "$suite"
   # gdUnit can exit 0 with no tests. Require its final (not per-suite) summary.
   # There are no whole-case skips in these two suites' headless inventory.

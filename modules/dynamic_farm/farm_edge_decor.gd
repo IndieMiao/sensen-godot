@@ -120,6 +120,8 @@ static func plan(data: Dictionary, walk: RefCounted, original: Dictionary) -> Di
 		candidate.priority=p.distance_to(Vector2(data.spawn)+Vector2.ONE*0.5)*0.65+p.distance_to(Vector2(data.entry)+Vector2.ONE*0.5)*0.35+rng.unit()*2.0
 	candidates.sort_custom(func(a:Dictionary,b:Dictionary):return a.priority<b.priority)
 	var outside:=Bank.exterior(data)
+	# Budget batches exactly as Scenery.build splits them (model colour variant per chunk).
+	var palette:Dictionary=original.recipe.get("prop_palette",{})
 	var batches:Dictionary={}
 	var used_boxes:Array=[]
 	for candidate:Dictionary in candidates:
@@ -156,7 +158,7 @@ static func plan(data: Dictionary, walk: RefCounted, original: Dictionary) -> Di
 		var added_triangles:=0
 		for item:Dictionary in cluster:
 			var p:Vector3=item.transform.origin
-			next_batches["%s:%d:%d" % [item.asset,floori(p.x/(32*data.cell_m)),floori(p.z/(32*data.cell_m))]]=true
+			next_batches[Scenery.batch_key(palette,item.asset,p,data.cell_m)]=true
 			added_triangles+=item.triangles
 		if next_batches.size()>4 or result.triangles+added_triangles>int(caps.triangles) or result.layout.size()+cluster.size()>int(caps.instances):valid=false
 		if not valid:

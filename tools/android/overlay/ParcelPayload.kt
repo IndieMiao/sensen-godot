@@ -3,6 +3,7 @@ package com.sensen.map
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.google.gson.JsonPrimitive
 import java.net.URI
 
 internal data class ParcelSourceConfig(
@@ -75,26 +76,34 @@ internal object ParcelPayload {
         }
         return result
     }
-    fun claims(raw: String): String {
+    /** Claimer names keyed by parcel. Nicknames stay plain strings: they become string literals, never expressions. */
+    fun claims(raw: String): Map<String, String> {
         require(raw.length <= 1024 * 1024)
         val input = JsonParser.parseString(raw).asJsonArray
         require(input.size() <= 3000)
-        val ids = hashSetOf<String>(); val features = JsonArray()
+        val names = linkedMapOf<String, String>()
         for (entry in input) {
             val item = entry.asJsonObject
-            val id = item.get("block_id").asString; require(validId(id) && ids.add(id))
+            val id = item.get("block_id").asString; require(validId(id) && !names.containsKey(id))
             val nickname = item.get("nickname").asString; require(nickname.length in 1..80)
-            val xy = item.getAsJsonArray("center"); require(xy.size() == 2)
-            val lng = xy[0].asDouble; val lat = xy[1].asDouble
-            require(lng.isFinite() && lat.isFinite() && lng in -180.0..180.0 && lat in -90.0..90.0)
-            features.add(JsonObject().apply {
-                addProperty("type", "Feature"); addProperty("id", id)
-                add("geometry", JsonObject().apply { addProperty("type", "Point"); add("coordinates", xy) })
-                add("properties", JsonObject().apply { addProperty("block_id", id); addProperty("nickname", nickname) })
-            })
+            names[id] = nickname
         }
-        return JsonObject().apply { addProperty("type", "FeatureCollection"); add("features", features) }.toString()
+        return names
     }
+    /** text-field for the parcel source: each claimed block_id maps to its claimer's name, everything else to "". */
+    fun claimLabel(names: Map<String, String>): String {
+        if (names.isEmpty()) return JsonPrimitive("").toString()
+        return JsonArray().apply {
+            add("match"); add(JsonArray().apply { add("get"); add("block_id") })
+            for ((id, nickname) in names) { add(id); add(nickname) }
+            add("")
+        }.toString()
+    }
+    /** Only claimed parcels are labelled; an empty filter list still parses as a valid expression. */
+    fun claimFilter(names: Map<String, String>): String = JsonArray().apply {
+        add("in"); add(JsonArray().apply { add("get"); add("block_id") })
+        add(JsonArray().apply { add("literal"); add(JsonArray().apply { names.keys.forEach { add(it) } }) })
+    }.toString()
     /** Copy only our public selection metadata; never geometry, device identity or arbitrary properties. */
     fun publicProperties(properties: JsonObject): JsonObject? {
         val id = properties.get("block_id") ?: return null

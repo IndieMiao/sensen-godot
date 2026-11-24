@@ -19,6 +19,9 @@ const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
 const MINE_SCENE := "res://scenes/p0/p0_mine.tscn"
+## The modules whose reads wait in static tables (_exit_tree); by path, as the runtime loads them (no preload).
+const CITY_PLACES := "res://modules/p0/p0_city_places.gd"
+const WILD_SITES := "res://modules/p0/p0_wild_sites.gd"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
@@ -418,6 +421,9 @@ func _exit_tree() -> void:
 	if AppRouter.loading_overlay_factory == Callable(self, &"_scene_overlay"): AppRouter.loading_overlay_factory = Callable()
 	OS.remove_logger(errors)
 	WaterShore.finish_all()   # the app ending: no pond bank's task left to the pool past the scripts (WaterShore.prewarm)
+	# nor a city's or a wild box's read still out: its callbacks (the map's lambdas) go before the scripts (C-47)
+	for path in [CITY_PLACES, WILD_SITES]:
+		if ResourceLoader.has_cached(path): load(path).drop_waiting()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_RESUMED:

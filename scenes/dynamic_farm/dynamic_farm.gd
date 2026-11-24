@@ -25,6 +25,9 @@ const RemoteFarmStore = preload("res://modules/dynamic_farm/parcel_farm_remote_s
 ## Development only: keep the own-parcel farm on the device instead of the C-31 server.
 const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const SPEED := 3.75
+## Background cloud drift in screen widths per second; negative drifts left. A group
+## crosses a 1080-pixel-wide screen in about 100 s.
+const CLOUD_DRIFT := 0.01
 
 var _args := {}
 var _data := {}
@@ -38,6 +41,8 @@ var _actor: Node3D
 var _rig: Node3D
 var _camera: Camera3D
 var _environment: WorldEnvironment
+var _clouds: ShaderMaterial
+var _cloud_drift := 0.0
 var _saved_environment: Environment
 var _canvas: CanvasLayer
 var _controls: Control
@@ -95,15 +100,15 @@ func _ready() -> void:
 	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk),
 		1.0 if bool(_args.get("original_slope_material",false)) else 0.65)
 	add_child(_ground)
-	var art := Scenery.build(_plan,_walk)
+	var art := Scenery.build(_plan,_walk,_plan.recipe)
 	if not art.ok:
 		_fail(art.error)
 		return
 	_props = art.root
 	add_child(_props)
 	# Separate batches outside extension occupancy and shadow budgets; stones, bushes
-	# and saplings still block through the shared model-fitted profiles (Q-16).
-	var core_art := Scenery.build(_plan.core_obstacles, _walk)
+	# and trees still block through the shared model-fitted profiles (Q-16).
+	var core_art := Scenery.build(_plan.core_obstacles, _walk, _plan.recipe)
 	if not core_art.ok:
 		_fail(core_art.error)
 		return
@@ -119,7 +124,7 @@ func _ready() -> void:
 	_shade.setup(_ground,_props,_plan,_data,_walk)
 	if bool(_args.get("edge_decor_preview",false)):
 		_edge_plan=EdgeDecor.plan(_data,_walk,_plan)
-		var edge_art:=Scenery.build(_edge_plan,_walk)
+		var edge_art:=Scenery.build(_edge_plan,_walk,_plan.recipe)
 		if not edge_art.ok:
 			_fail(edge_art.error)
 			return
@@ -153,10 +158,9 @@ func _ready() -> void:
 			var net := get_tree().root.get_node_or_null("Net")
 			if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): store = LocalFarmStore.new(_data.block_id)
 			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
-		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies}, store, _canvas)
+		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas)
 		_hint.hide()
 		_farming.state_changed.connect(_on_farm_changed)
-		_farming.enter()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -281,23 +285,23 @@ func _step_out(from: Vector3) -> Vector3:
 
 func _setup_world() -> void:
 	var env := Environment.new()
-	var clouds := ShaderMaterial.new()
-	clouds.shader = SKY_SHADER
+	_clouds = ShaderMaterial.new()
+	_clouds.shader = SKY_SHADER
 	env.sky = Sky.new()
 	env.sky.radiance_size = Sky.RADIANCE_SIZE_32
-	env.sky.sky_material = clouds
+	env.sky.sky_material = _clouds
 	env.background_mode = Environment.BG_SKY
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.79,0.88,0.94)
+	env.ambient_light_color = Color(0.84,0.88,0.90)
 	env.ambient_light_energy = 0.42
 	_environment = WorldEnvironment.new()
 	_environment.environment = env
 	add_child(_environment)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Shade.SUN_DEGREES
-	sun.light_color = Color(1,0.96,0.87)
-	sun.light_energy = 1.1
+	sun.light_color = Color(1,0.95,0.84)
+	sun.light_energy = 1.12
 	sun.shadow_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
 	sun.shadow_opacity = 0.58
 	sun.shadow_bias = 0.1
@@ -325,12 +329,18 @@ func _on_avatar_ready(_config) -> void:
 
 func _process(delta: float) -> void:
 	if _failed or _suspended or _walk == null: return
+	if _clouds != null:
+		_cloud_drift += CLOUD_DRIFT * delta
+		_clouds.set_shader_parameter("drift", _cloud_drift)
 	if not _ready_sent:
 		if _avatar_loaded and _shade.complete:
 			_ready_sent = true
 			_summary.shadows = _shade.metrics.duplicate(true)
 			_summary.ready_ms = Time.get_ticks_msec() - _started_ms
 			preview_ready.emit(_summary.duplicate(true))
+			# Only once the scene is up: building it stalls the main thread for seconds, and an
+			# HTTP request started during that stall times out (V-123).
+			if _farming != null: _farming.enter()
 		elif Time.get_ticks_msec() - _started_ms > 15000:
 			_fail("The farm preview could not finish loading.")
 		return
