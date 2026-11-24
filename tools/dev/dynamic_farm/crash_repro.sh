@@ -8,6 +8,7 @@
 # Paths (each round): pan and double-tap zoom over the map while buildings load; open the selected parcel in 3D and
 # go Back; Home then relaunch (background/foreground); screen off/on. Godot draws its own buttons, so taps use screen
 # fractions: override BUILDING_AT / PREVIEW_AT / RESET_AT ("x,y" in 0..1) after checking a screenshot.
+# PAN_PASSES (default 3) pan/zoom passes per round; 0 keeps the view on BUILDING_AT so every round enters 3D.
 # Output in DIR: meminfo.csv (TOTAL PSS / RSS in KiB every SAMPLE_SECONDS), logcat.txt, exit-info-{before,after}.txt,
 # pids.txt (one line per sample: the app pid; a change means the process died), events.txt and summary.txt.
 set -euo pipefail
@@ -32,6 +33,7 @@ SAMPLE_SECONDS=${SAMPLE_SECONDS:-2}
 BUILDING_AT=${BUILDING_AT:-0.5,0.45}
 PREVIEW_AT=${PREVIEW_AT:-0.5,0.88}
 RESET_AT=${RESET_AT:-0.5,0.12}
+PAN_PASSES=${PAN_PASSES:-3}
 mkdir -p "$out"
 a() { "$ADB" -P "$port" -s "$serial" "$@"; }
 log() { printf '%s %s\n' "$(date -u +%H:%M:%S)" "$*" | tee -a "$out/events.txt"; }
@@ -77,7 +79,7 @@ first_pid=$(app_pid); log "pid $first_pid"
 
 for ((i = 1; i <= rounds; i++)); do
   log "round $i: pan and zoom while buildings load"
-  for _ in 1 2 3; do
+  for ((pass = 0; pass < PAN_PASSES; pass++)); do
     drag 0.3,0.5 0.7,0.4; drag 0.7,0.6 0.3,0.5; double_tap 0.5,0.5; sleep 1
   done
   tap "$RESET_AT"; sleep 3
@@ -111,7 +113,7 @@ a shell dumpsys activity exit-info "$package" > "$out/exit-info-after.txt" || tr
     "$(grep -c 'DYNAMIC_BUILDINGS_SOURCE LOADED' "$out/logcat.txt" || true)"
   # From setting the map's sources to its building layer loading: the wait before a building can be tapped.
   printf 'building layer waits (ms): %s\n' \
-    "$(grep -o 'DYNAMIC_LOAD {"resource":"buildings","stage":"ready"[^}]*"elapsed_ms":[0-9]*' "$out/logcat.txt" | sed 's/.*://' | tr '\n' ' ' || true)"
+    "$(grep 'DYNAMIC_LOAD.*"resource":"buildings","stage":"ready"' "$out/logcat.txt" | grep -o '"elapsed_ms":[0-9]*' | sed 's/.*://' | tr '\n' ' ' || true)"
   printf -- '--- crash / kill lines\n'
   grep -E 'Fatal signal|FATAL EXCEPTION|lowmemorykiller|lmkd|Low on memory|ANR in|Process .*'"$package"'.* has died|vkAcquireNextImage|VK_ERROR' "$out/logcat.txt" | head -40 || true
 } > "$out/summary.txt"
