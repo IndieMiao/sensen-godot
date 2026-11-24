@@ -340,6 +340,16 @@ func _bag_drawer(farming: Node) -> void:
 	var ui_rect: Rect2 = farming._ui.get_global_rect()
 	_check(is_equal_approx(bar_rect.end.y, ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM) and is_equal_approx(bar_rect.position.x, UiTokens.SIZE_QUICK_BAR_X),
 		"…at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
+	# No long-press drag on this bar (no swap, Pin or Remove, C-74#39); a swipe up still opens the bag.
+	var cell: UiItemCell = farming._bar.cells()[0]
+	cell.gesture.emit({"kind": &"lift", "pos": cell.get_global_rect().get_center()})
+	await process_frame
+	_check(not farming._bar.is_lifted() and not farming._bar.is_dragging(), "a long press does not lift a slot")
+	cell.gesture.emit({"kind": &"swipe_up", "pos": cell.get_global_rect().get_center()})
+	await process_frame
+	_check(farming.bag_open(), "a swipe up on a slot opens the bag")
+	farming.close_bag()
+	await process_frame
 	farming._bar.slot_tapped.emit("seed_carrot")
 	await process_frame
 	_check(farming.bag_open() and farming._grid.selected_id == "seed_carrot", "a slot opens the drawer on its item")

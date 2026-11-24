@@ -83,9 +83,6 @@ var _drawer: UiDrawer
 var _scrim: ColorRect
 var _grid: UiInventoryGrid
 var _picked_name: Label
-## Quick bar pins and removed slots for this visit (the parcel save keeps no bar layout).
-var _pins := {}
-var _hidden := {}
 ## Items announced by the last gain (floats and flights): id -> count.
 var last_gains := {}
 ## The locale before this UI held it at English (see hold_english); "" while not held.
@@ -341,11 +338,8 @@ func _draw_bag() -> void:
 	var ids := bag_ids()
 	var slots := []
 	for id: String in ids:
-		if _hidden.has(id) or slots.size() >= UiQuickBar.SLOTS: continue
-		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id]), "pinned": _pins.has(id)})
-	for id: String in _pins:
-		if id not in ids and slots.size() < UiQuickBar.SLOTS:
-			slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": 0, "pinned": true})
+		if slots.size() >= UiQuickBar.SLOTS: break
+		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
 	_bar.slots = slots
 	_bar.visible = not farm.is_empty() and not held
 	_keys.tool_icon = P0Logic.icon("hoe") if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
@@ -378,7 +372,6 @@ func announce_gains(gains: Dictionary, from: Vector2) -> void:
 		var bag := _bar.bag_end()
 		UiItemFly.launch(_ui, from, bag, icon, count, lines * UiItemFly.DELAY_STEP_S, func(): UiItemFly.bump(bag))
 		lines += 1
-		_hidden.erase(id)
 	if lines > 0: _draw_bag()
 
 func _player_screen() -> Vector2:
@@ -544,15 +537,13 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_bar.ghost_tapped.connect(func(_i: int): open_bag())
 	_bar.bag_requested.connect(func(): open_bag())
 	_bar.close_requested.connect(close_bag)
-	_bar.pin_toggled.connect(func(id: String, pinned: bool):
-		if pinned: _pins[id] = true
-		else: _pins.erase(id)
-		_draw_bag())
-	_bar.slot_removed.connect(func(id: String):
-		_pins.erase(id)
-		_hidden[id] = true
-		_draw_bag())
-	_bar.slots_swapped.connect(func(_a: int, _b: int): _draw_bag())
+	# The bar follows the bag's order and the parcel save keeps no bar layout, so the main farm's long-press drag
+	# (swap, Pin, Remove) has nothing to change here: the cells' drag gestures are not passed to the bar (C-74#39).
+	# Taps still select, and a swipe up still opens the bag.
+	for cell: UiItemCell in _bar.cells():
+		for connection: Dictionary in cell.get_signal_connection_list(&"gesture"):
+			if (connection.callable as Callable).get_object() == _bar: cell.gesture.disconnect(connection.callable)
+		cell.gesture.connect(func(outcome: Dictionary): if outcome.get("kind") == &"swipe_up": open_bag())
 	_ui.add_child(_bar)
 	_keys = UiActionKey.new()
 	_keys.name = "ActionKey"
