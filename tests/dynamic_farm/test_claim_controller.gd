@@ -283,11 +283,17 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	check(page._market.text == "Market", "the other entry waits meanwhile")
 	await process_frame
 	check(page._town == null and page._carpenter.text == page.TOWN_LOADING, "Loading… stays for the frame that draws it")
-	var frames := 0
-	while page._town == null and frames < 600: await process_frame; frames += 1
+	# The town's script compiles on a worker thread, so wait on the clock, not a frame count.
+	var started := Time.get_ticks_msec()
+	var deadline := started + 30000
+	while page._town == null and Time.get_ticks_msec() < deadline: await process_frame
 	check(page._town != null and page._town.who == "carpenter" and not page._hud.visible and page._town_script != null,
-		"once its script is loaded the carpenter opens over the map (%d frames)" % frames)
-	while page._town != null and page._town.busy: await process_frame
+		"once its script is loaded the carpenter opens over the map (%d ms)" % (Time.get_ticks_msec() - started))
+	if page._town == null:
+		ProjectSettings.set_setting(LOCAL_SAVE, null)
+		return
+	deadline = Time.get_ticks_msec() + 10000
+	while page._town.busy and Time.get_ticks_msec() < deadline: await process_frame
 	var seen: Dictionary = page._town.farm.duplicate(true)
 	page._town.close(); await process_frame
 	check(page._town == null and page._hud.visible and page._carpenter.text == "Carpenter" and not page._carpenter.disabled,
