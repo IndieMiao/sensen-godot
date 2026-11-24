@@ -152,11 +152,56 @@ func test_filled_fields_keep_a_caption() -> void:
 	var p := _panel("password")
 	var current := p.find_child("Password", true, false) as LineEdit
 	var caption := p.find_child("PasswordCaption", true, false) as Label
-	assert_bool(caption.visible).is_false()
+	# Empty field: the caption's line is kept but transparent (C-66).
+	assert_bool(caption.visible).is_true()
+	assert_float(caption.modulate.a).is_equal(0.0)
 	current.text = "correct horse"
 	current.text_changed.emit(current.text)
 	assert_bool(caption.visible).is_true()
+	assert_float(caption.modulate.a).is_equal(1.0)
 	assert_str(caption.text).is_equal("Current password")
+	p.queue_free()
+
+func _rects(p: AccountPanel, names: Array) -> Dictionary:
+	var out := {}
+	for name in names: out[name] = (p.find_child(name, true, false) as Control).get_global_rect()
+	return out
+
+func _type(edit: LineEdit, text: String) -> void:
+	edit.text = text
+	edit.text_changed.emit(text)
+
+## C-66: typing must not move the fields or buttons (two evidence runs tapped "Show passwords" or the
+## wrong field after the panel reflowed under the finger).
+func test_typing_keeps_fields_and_buttons_in_place() -> void:
+	for mode in ["sign_in", "sign_up"]:
+		var p := _panel(mode)
+		var names := ["Email", "Password", "ShowPasswords", "sign_in" if mode == "sign_in" else "sign_up"]
+		if mode == "sign_up": names.append("ConfirmPassword")
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var before := _rects(p, names)
+		for step in [["Email", "q"], ["Email", "qa@example.com"], ["Password", "a"], ["Password", "abcdefgh"], ["ConfirmPassword", "abcdefgh"]]:
+			if step[0] == "ConfirmPassword" and mode != "sign_up": continue
+			_type(p.find_child(step[0], true, false) as LineEdit, step[1])
+			await get_tree().process_frame
+			await get_tree().process_frame
+			assert_dict(_rects(p, names)).is_equal(before)
+		assert_float((p.find_child("EmailCaption", true, false) as Label).modulate.a).is_equal(1.0)
+		p.queue_free()
+
+func test_hidden_fields_reserve_no_caption_line() -> void:
+	_sign_in_locally("Ada")
+	var p := _panel("profile")
+	# The self-describe field is hidden until picked; its caption line must not leave a gap.
+	assert_bool((p.find_child("GenderCustomCaption", true, false) as Control).visible).is_false()
+	assert_bool((p.find_child("EmailCaption", true, false) as Control).visible).is_false()
+	# A nickname filled in from the account is labelled like a typed one.
+	assert_float((p.find_child("NicknameCaption", true, false) as Label).modulate.a).is_equal(1.0)
+	var gender := p.find_child("Gender", true, false) as OptionButton
+	gender.select(4)
+	gender.item_selected.emit(4)
+	assert_bool((p.find_child("GenderCustomCaption", true, false) as Control).visible).is_true()
 	p.queue_free()
 
 const APPLE_ACCOUNT := "user://test_account_panel_apple.json"
