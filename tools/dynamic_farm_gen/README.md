@@ -69,7 +69,7 @@ licence/edit metadata (`source-manifest.json`); `build` reads only a snapshot. T
    the budget on their rings, joining paths and grass; growing the cell for them alone gave r6 cells
    of 2–8 m and outlines that no longer matched (C-92).
 4a. **Fidelity floor.** A farm whose exact core IoU is below `min_core_iou` (0.8505, just above the
-   audit's 0.85 exclusion line) is not written: `excluded`, reason `low_iou: core IoU … at cell … m`.
+   audit's 0.85 exclusion line) is not written: `excluded`, reason `low_iou` with its `core_iou` and `cell_m`.
    This catches footprints thinner than about two cells (walls, ring buildings, 2–5 m² sheds) and
    scattered buildings that still need coarse cells. While the cell is growing for the total budget
    the check runs on the raster before each further step, since a larger cell only coarsens it.

@@ -49,7 +49,8 @@ export interface BuildResult {
   /** Relative path → contents; tiles/*.pbf are binary, everything else is UTF-8 text. */
   files: Map<string, string | Uint8Array>;
   reports: ParcelReport[];
-  excluded: { block_id: string; reason: string }[];
+  /** `low_iou` rows also carry the core IoU and cell size that failed `min_core_iou`. */
+  excluded: { block_id: string; reason: string; core_iou?: number; cell_m?: number }[];
 }
 
 interface Projected { record: ParcelRecord; utm: Polygon[]; bounds: ReturnType<typeof bounds> }
@@ -249,7 +250,9 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
       }, p);
     } catch (error) {
       if (!(error instanceof LayoutError)) throw error;
-      excluded.push({ block_id: blockId, reason: `${error instanceof LowIouError ? 'low_iou' : 'layout'}: ${error.message}` });
+      excluded.push(error instanceof LowIouError
+        ? { block_id: blockId, reason: 'low_iou', core_iou: round(error.iou, 4), cell_m: error.cell_m }
+        : { block_id: blockId, reason: `layout: ${error.message}` });
       continue;
     }
     const farmPath = `farms/${blockId}.json`;

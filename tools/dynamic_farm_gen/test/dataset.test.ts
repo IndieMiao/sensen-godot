@@ -28,6 +28,19 @@ describe('sample build (test range)', () => {
     expect(result.excluded.every(e => e.reason === 'no_building')).toBe(true);
   });
 
+  it('excludes farms under min_core_iou as low_iou, with their IoU, and writes no file for them', () => {
+    const strict = buildDataset(loadSnapshot(SNAPSHOT), { dataset_version: VERSION, params: resolveParams({ min_core_iou: 0.97 }) });
+    const low = strict.excluded.filter(e => e.reason === 'low_iou');
+    expect(low.length).toBeGreaterThan(0);
+    expect(strict.reports.length + low.length).toBe(88);
+    for (const e of low) {
+      expect(e.core_iou).toBeLessThan(0.97);
+      expect(e.cell_m).toBeGreaterThanOrEqual(0.5);
+      expect(strict.files.has(`farms/${e.block_id}.json`)).toBe(false);
+    }
+    for (const r of strict.reports) expect(r.core_iou).toBeGreaterThanOrEqual(0.97);
+  });
+
   it('130 SAN RAFAEL WAY follows its L-shaped house and garage', () => {
     const f = farm('p-3250003');
     expect(f.name).toBe('130 SAN RAFAEL WAY');
