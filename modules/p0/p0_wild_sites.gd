@@ -106,6 +106,11 @@ static func fail(key: String) -> void:
 	_failing.erase(key)
 	for f in told: if _alive(f): (f as Callable).call()
 
+## The reads still out given up, nobody told (P0Runtime._exit_tree; as P0CityPlaces.drop_waiting); the sites read stay.
+static func drop_waiting() -> void:
+	_pending.clear()
+	_failing.clear()
+
 ## The player's fields as the view has them for the site they are at (view.wild.here) win over a box read's.
 static func remember(view: Dictionary) -> void:
 	var here = view.get("wild", {}).get("here", null) if view.get("wild", null) is Dictionary else null

@@ -8,6 +8,7 @@ const CoreObstacles = preload("res://modules/dynamic_farm/farm_core_obstacles.gd
 var checks := 0
 var failures := 0
 var boxes := {}
+var recipe: Dictionary
 var solid := {}
 
 func _initialize() -> void:
@@ -29,23 +30,41 @@ func _test(raw: Dictionary) -> String:
 	Shade.enforce_budget(planned, data, walk)
 	var core: Dictionary = planned.core_obstacles
 	var occupied := {}
-	var counts := {"weed":0, "stone":0, "bush":0, "sapling":0}
+	var counts := {"weed":0, "stone":0, "bush":0, "tree":0}
 	var valid := true
+	var trees_ok := true
+	var footprints := []
 	for item: Dictionary in core.layout:
 		var at: Vector2i = item.cell
 		var tr: Transform3D = item.transform
 		var box: AABB = tr * boxes[item.asset]
-		valid = valid and item.solid == solid[item.asset] and walk.cell_at(box.position) == at and walk.cell_at(box.end) == at
-		valid = valid and data.by_cell[at].zone == "core" and not occupied.has(at) and tr.origin == walk.point(at)
-		for arrival: Vector2i in [data.spawn, data.entry]:
-			var delta := (at - arrival).abs()
-			valid = valid and maxi(delta.x,delta.y) > 1
-		occupied[at] = true
+		var cells: Array = item.cells
+		valid = valid and item.solid == solid[item.asset] and cells[0] == at
+		for cell: Vector2i in cells:
+			valid = valid and data.by_cell[cell].zone == "core" and not occupied.has(cell)
+			for arrival: Vector2i in [data.spawn, data.entry]:
+				var delta := (cell - arrival).abs()
+				valid = valid and maxi(delta.x,delta.y) > 1
+			occupied[cell] = true
+		if item.role == "tree":
+			trees_ok = trees_ok and _tree_ok(item, box, data, walk, core.layout)
+		else:
+			valid = valid and cells.size() == 1 and walk.cell_at(box.position) == at and walk.cell_at(box.end) == at and tr.origin == walk.point(at)
+		footprints.append(Rect2(box.position.x, box.position.z, box.size.x, box.size.z))
 		counts[item.role] += 1
-	_check(valid,"unique single-cell appearances inside core, clear of arrival")
-	_check(counts == core.roles and counts.weed > counts.stone and counts.stone > counts.bush and counts.bush > counts.sapling and counts.sapling > 0,"four ordered roles")
-	var ratio := float(occupied.size()) / int(data.counts.core)
-	_check(ratio >= 0.10 and ratio <= 0.15,"actual occupied cells / entire core within approved bounds")
+	_check(valid,"distinct appearances inside core, clear of arrival; small props fill one cell")
+	_check(trees_ok,"trees: 2x2 core block at the outer grove tree scale, crown inside the block and its open core ring")
+	var overlaps := 0
+	for i in footprints.size():
+		for j in range(i+1, footprints.size()):
+			if footprints[i].intersects(footprints[j]): overlaps += 1
+	_check(overlaps == 0,"no model reaches over another (%d overlaps)" % overlaps)
+	# A 2x2 tree and its ring need a 4x4 core square; a three-cell strip gets none.
+	_check(counts == core.roles and counts.weed > counts.stone and counts.stone > counts.bush and counts.bush > counts.tree \
+		and (counts.tree > 0) == _tree_room(data),"four ordered roles, trees wherever a 4x4 core square allows")
+	var ratio := float(core.layout.size()) / int(data.counts.core)
+	_check(ratio >= 0.10 and ratio <= 0.15,"placed props / entire core within approved bounds")
+	_check(occupied.size() == core.layout.size() + 3 * counts.tree,"each tree holds four cells, every other prop one")
 	# Baseline walk blockers are solely the surviving solid EXTENSION props. Compare
 	# the full mask, not just connected(): removing a dead end can leave a connected map.
 	var baseline := {}
@@ -53,7 +72,7 @@ func _test(raw: Dictionary) -> String:
 		if item.solid:
 			for cell: Vector2i in item.cells: baseline[cell] = true
 	_check(walk.reserved == baseline and walk.connected(),"same clear cells and every remaining core/extension cell reachable")
-	# Q-16: stones, bushes and saplings block with their fitted profiles; weeds do not,
+	# Q-16: stones, bushes and trees block with their fitted profiles; weeds do not,
 	# and no other cell loses its connection to spawn.
 	var art := Scenery.build(planned, walk)
 	var before := _reachable(walk, data)
@@ -62,12 +81,17 @@ func _test(raw: Dictionary) -> String:
 	var props_ok := true
 	var lost := 0
 	for item: Dictionary in core.layout:
-		props_ok = props_ok and walk.clear_position(walk.point(item.cell)) != item.solid
+		for cell: Vector2i in item.cells:
+			props_ok = props_ok and walk.clear_position(walk.point(cell)) != item.solid
+		if item.role == "tree":
+			# The fitted trunk profile blocks the block, not the open ring around it.
+			for cell: Vector2i in CoreObstacles._ring(item.cells):
+				props_ok = props_ok and walk.clear_position(walk.point(cell))
 	for cell: Vector2i in before:
 		var taken := false
-		for item: Dictionary in core.layout: taken = taken or (item.solid and item.cell == cell)
+		for item: Dictionary in core.layout: taken = taken or (item.solid and item.cells.has(cell))
 		if not taken and not after.has(cell): lost += 1
-	_check(props_ok,"stone/bush/sapling centres blocked, weed centres walkable")
+	_check(props_ok,"stone/bush/tree cell centres blocked, weed centres and tree rings walkable")
 	_check(lost == 0 and walk.clear_position(walk.point(data.spawn)) and walk.clear_position(walk.point(data.entry)),
 		"no previously reachable cell cut off (%d lost)" % lost)
 	art.root.free()
@@ -75,8 +99,43 @@ func _test(raw: Dictionary) -> String:
 	_check(data == original,"decoded masks, permissions, spawn and entry unchanged")
 	var reopened := Scenery.plan(original, Walk.new(original))
 	_check(reopened.core_obstacles == core,"reopening reproduces every cell, kind, asset and transform")
-	print("CORE_OBSTACLES parcel=%s core=%d occupied=%d ratio=%.5f counts=%s reachable=%d/%d walk_cells=%d->%d sha=%s" % [data.block_id,data.counts.core,occupied.size(),ratio,counts,data.cells.size()-walk.reserved.size(),data.cells.size()-baseline.size(),before.size(),after.size(),core.layout_sha256])
+	print("CORE_OBSTACLES parcel=%s core=%d occupied=%d instances/core=%.5f counts=%s reachable=%d/%d walk_cells=%d->%d sha=%s" % [data.block_id,data.counts.core,occupied.size(),ratio,counts,data.cells.size()-walk.reserved.size(),data.cells.size()-baseline.size(),before.size(),after.size(),core.layout_sha256])
 	return core.layout_sha256
+
+## A tree fills the 2x2 block from its cell, centred, at the outer grove tree scale;
+## its crown stays over the block and the ring around it, which is open core ground
+## holding no other prop.
+func _tree_ok(item: Dictionary, box: AABB, data: Dictionary, walk: RefCounted, layout: Array) -> bool:
+	var spec: Dictionary = recipe.core_obstacles.roles.tree
+	var at: Vector2i = item.cell
+	var block: Array[Vector2i] = [at, at+Vector2i(1,0), at+Vector2i(0,1), at+Vector2i(1,1)]
+	var ok: bool = spec.scale == recipe.outer_groves.grove.tree_scale and int(spec.cells) == 2
+	ok = ok and item.cells == block and item.solid
+	var scale_value: float = item.transform.basis.get_scale().x
+	ok = ok and scale_value >= spec.scale[0] - 0.000001 and scale_value <= spec.scale[1] + 0.000001
+	ok = ok and item.transform.origin.is_equal_approx((walk.point(at) + walk.point(at+Vector2i.ONE)) * 0.5)
+	var low: Vector2i = walk.cell_at(Vector3(box.position.x, 0, box.end.z))
+	var high: Vector2i = walk.cell_at(Vector3(box.end.x, 0, box.position.z))
+	ok = ok and low.x >= at.x-1 and low.y >= at.y-1 and high.x <= at.x+2 and high.y <= at.y+2
+	for cell: Vector2i in CoreObstacles._ring(block):
+		ok = ok and data.by_cell.has(cell) and data.by_cell[cell].zone == "core"
+		for other: Dictionary in layout:
+			ok = ok and (other == item or not other.cells.has(cell))
+	return ok
+
+func _tree_room(data: Dictionary) -> bool:
+	for cell: Vector2i in data.by_cell:
+		var room := true
+		for y in range(-1, 3):
+			for x in range(-1, 3):
+				var next := cell + Vector2i(x, y)
+				room = room and data.by_cell.has(next) and data.by_cell[next].zone == "core"
+				if x >= 0 and x < 2 and y >= 0 and y < 2:
+					for arrival: Vector2i in [data.spawn, data.entry]:
+						var delta := (next - arrival).abs()
+						room = room and maxi(delta.x, delta.y) > 1
+		if room: return true
+	return false
 
 ## Cells holding a walker-reachable point of a 0.2 m lattice, flooded from spawn.
 func _reachable(walk: RefCounted, data: Dictionary) -> Dictionary:
@@ -116,13 +175,13 @@ func _pinch(inventory: Dictionary) -> void:
 			data.cells.append(cell)
 			data.by_cell[Vector2i(x,y)] = cell
 	data.counts.core = data.cells.size()
-	var recipe := {"coverage":0.2,"roles":{"weed":{"share":0.1,"ids":["wild_pz_grass_24"]},
+	var pinch := {"coverage":0.2,"roles":{"weed":{"share":0.1,"ids":["wild_pz_grass_24"]},
 		"stone":{"share":0.4,"ids":["wild_pz_rock_13","wild_pz_softrock_10"]},
-		"bush":{"share":0.3,"ids":["wild_pz_bush_05","wild_pz_bush_07"]},"sapling":{"ids":["wild_pz_pine_03"]}}}
+		"bush":{"share":0.3,"ids":["wild_pz_bush_05","wild_pz_bush_07"]},"tree":{"ids":["wild_pz_pine_03"],"cells":2,"scale":[0.85,1.0]}}}
 	for seed_text in ["pinch-a","pinch-b","pinch-c","pinch-d","pinch-e"]:
 		var walk := Walk.new(data)
 		var before := _reachable(walk, data)
-		var core := CoreObstacles.plan(data, walk, inventory, recipe, Scenery.FixedRandom.new(seed_text.sha256_text()))
+		var core := CoreObstacles.plan(data, walk, inventory, pinch, Scenery.FixedRandom.new(seed_text.sha256_text()))
 		var art := Scenery.build(core, walk)
 		var after := _reachable(walk, data)
 		var lost := 0
@@ -131,14 +190,15 @@ func _pinch(inventory: Dictionary) -> void:
 			if item.solid: solids += 1
 		for cell: Vector2i in before:
 			var taken := false
-			for item: Dictionary in core.layout: taken = taken or (item.solid and item.cell == cell)
+			for item: Dictionary in core.layout: taken = taken or (item.solid and item.cells.has(cell))
 			if not taken and not after.has(cell): lost += 1
 		_check(solids > 40 and lost == 0,"pinch %s: %d blocking props, %d cells cut off" % [seed_text,solids,lost])
-		print("CORE_PINCH ", seed_text, " blocking=", solids, " lost=", lost)
+		print("CORE_PINCH ", seed_text, " blocking=", solids, " trees=", core.roles.tree, " lost=", lost)
 		art.root.free()
 
 func _run() -> void:
 	var inventory = JSON.parse_string(FileAccess.get_file_as_string(Scenery.INVENTORY_PATH))
+	recipe = JSON.parse_string(FileAccess.get_file_as_string(Scenery.RECIPE_PATH))
 	for record: Dictionary in inventory.assets:
 		var low: Array = record.bounds_godot_m[0]
 		var high: Array = record.bounds_godot_m[1]

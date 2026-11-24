@@ -11,6 +11,7 @@ import zipfile
 
 from check_export_inputs import check_template
 import dynamic_farm_export as farm
+import gradle_dist_seed as seeding
 from worker_apk import inspect, inspect_zip, worker_preset
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -132,7 +133,7 @@ class WorkerAPK(unittest.TestCase):
         self.assertIs(internal['sensen/network/online_qa'], True)  # Net never boots or signs in anonymously.
         self.assertIs(isolated['sensen/network/online_qa'], True)
         self.assertNotIn('sensen/network/online_qa', release)
-        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/account_restore'):
+        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/account_restore', 'sensen/dynamic_farm/own_farm'):
             self.assertIs(internal[key], True)
             self.assertNotIn(key, isolated)
             self.assertNotIn(key, release)
@@ -164,7 +165,7 @@ class WorkerAPK(unittest.TestCase):
                 config = inspect_zip(self.apk, True, variant)
                 self.assertEqual(config['variant'], variant)
                 internal = variant == 'dynamic-farm-internal'
-                self.assertEqual((config['reselect'], config['account_restore']), (internal, internal))
+                self.assertEqual((config['reselect'], config['account_restore'], config['own_farm']), (internal,) * 3)
                 self.assertEqual(config['journey_mobile_base_url'] == TARGET, internal)
         internal = exported_settings('dynamic-farm-internal')
         bad = [('dynamic-farm', internal), ('android', internal),
@@ -178,6 +179,9 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/base_url': 'https://farm.sensenjoy.cn/v1'})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/account_restore': False})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/own_farm': False})),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/dynamic_farm/own_farm': True})),
+               ('android', dict(exported_settings('android'), **{'sensen/dynamic_farm/own_farm': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/fake_claims': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/reselect.mobile': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa.mobile': False})),
@@ -332,6 +336,147 @@ class WorkerAPK(unittest.TestCase):
         subprocess.run([bt / 'apksigner', 'version'], check=True, stdout=subprocess.DEVNULL)
         with self.assertRaisesRegex(ValueError, 'apksigner failed'):
             inspect(aligned, self.identity, bt, 'a'*64)
+
+
+TEMPLATE_WRAPPER = ('#Wed Jan 17 12:08:26 PST 2024\ndistributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\n'
+                    'distributionUrl=https\\://services.gradle.org/distributions/gradle-8.11.1-bin.zip\n'
+                    'zipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n')
+WRAPPER_DIR = 'gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c'
+OFFICIAL_GRADLE_SHA256 = dict(seeding.OFFICIAL_SHA256)  # Before any test patches the table.
+
+
+class GradleDistSeed(unittest.TestCase):
+    """C-64: the disposable Gradle home reuses only a verified wrapper distribution zip."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.tmp = Path(tmp.name)
+        self.props = self.tmp / 'gradle-wrapper.properties'
+        self.home = self.tmp / 'home/.gradle'
+        self.home.mkdir(parents=True)
+        self.state = self.tmp / 'gradle-seed.json'
+        self.seed = self.tmp / 'seed'
+        self.payload = b'fixture distribution bytes'
+        # A fixture zip cannot match the official digest; pin the fixture's own digest via the
+        # official table entry instead, so the real table is exercised separately below.
+        patcher = patch.dict(seeding.OFFICIAL_SHA256,
+                             {'gradle-8.11.1-bin.zip': hashlib.sha256(self.payload).hexdigest()})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.props.write_text(TEMPLATE_WRAPPER)
+
+    def put_seed(self, data):
+        (self.seed / WRAPPER_DIR).mkdir(parents=True, exist_ok=True)
+        (self.seed / WRAPPER_DIR / 'gradle-8.11.1-bin.zip').write_bytes(data)
+
+    def run_cli(self, *args, env=None):
+        return subprocess.run(['python3', '-B', ROOT / 'tools/android/gradle_dist_seed.py', *args],
+                              capture_output=True, env=env)
+
+    def gradle_home_files(self):
+        return sorted(str(path.relative_to(self.home)) for path in self.home.rglob('*'))
+
+    def test_official_digest_and_wrapper_layout_of_the_template(self):
+        self.assertEqual(OFFICIAL_GRADLE_SHA256['gradle-8.11.1-bin.zip'],
+                         'f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6')
+        self.assertEqual(seeding.url_hash('https://services.gradle.org/distributions/gradle-8.11.1-bin.zip'),
+                         'bpt9gzteqjrbo1mjrsomdt32c')
+        name, relative, _ = seeding.plan(TEMPLATE_WRAPPER)
+        self.assertEqual((name, str(relative)), ('gradle-8.11.1-bin.zip', WRAPPER_DIR))
+
+    def test_no_seed_directory_leaves_the_build_unchanged(self):
+        self.assertFalse(seeding.seed(self.props, self.home, self.state, self.seed))
+        self.assertEqual(self.gradle_home_files(), [])
+        self.assertFalse(self.state.exists())
+        self.assertIsNone(seeding.check(self.state))
+        # Through the CLI and the default path under $HOME: silent, nothing written.
+        env = {'PATH': os.environ['PATH'], 'HOME': str(self.tmp / 'empty-home')}
+        result = self.run_cli('seed', self.props, self.home, self.state, env=env)
+        self.assertEqual((result.returncode, result.stdout, result.stderr), (0, b'', b''))
+        result = self.run_cli('check', self.state, env=env)
+        self.assertEqual((result.returncode, result.stdout, result.stderr), (0, b'', b''))
+        self.assertEqual(self.gradle_home_files(), [])
+
+    def test_verified_seed_is_copied_where_the_wrapper_looks(self):
+        self.put_seed(self.payload)
+        with patch('sys.stderr') as err:
+            self.assertTrue(seeding.seed(self.props, self.home, self.state, self.seed))
+        self.assertIn('sha256 verified', ''.join(call.args[0] for call in err.write.call_args_list))
+        target = self.home / 'wrapper/dists' / WRAPPER_DIR / 'gradle-8.11.1-bin.zip'
+        self.assertEqual(target.read_bytes(), self.payload)
+        self.assertEqual(self.gradle_home_files(), ['wrapper', 'wrapper/dists', 'wrapper/dists/gradle-8.11.1-bin',
+                                                    'wrapper/dists/' + WRAPPER_DIR, 'wrapper/dists/' + WRAPPER_DIR +
+                                                    '/gradle-8.11.1-bin.zip'])
+        with patch('sys.stderr'):
+            self.assertFalse(seeding.check(self.state))  # The wrapper has not unpacked it yet.
+            target.with_name(target.name + '.ok').touch()  # Wrapper marks the unpacked seed.
+            self.assertTrue(seeding.check(self.state))
+            target.unlink()
+            target.write_bytes(self.payload)  # A downloaded replacement is a new file.
+            self.assertFalse(seeding.check(self.state))
+
+    def test_seed_path_override_through_the_environment(self):
+        self.put_seed(self.payload)
+        env = {'PATH': os.environ['PATH'], 'HOME': str(self.tmp / 'empty-home'),
+               seeding.SEED_ENV: str(self.seed)}
+        self.assertEqual(seeding.seed_dir(env), self.seed)
+        self.assertEqual(seeding.seed_dir({'HOME': '/h'}), Path('/h/.local/share/sensen-godot/gradle-wrapper-dists'))
+        self.assertEqual(seeding.seed_dir({'HOME': '/h', seeding.SEED_ENV: ''}),
+                         Path('/h/.local/share/sensen-godot/gradle-wrapper-dists'))
+        # The CLI uses the real official digest: the fixture is rejected, proving the override was read.
+        result = self.run_cli('seed', self.props, self.home, self.state, env=env)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn(b'sha256 mismatch', result.stderr)
+
+    def test_wrong_digest_is_not_used_and_falls_back_to_download(self):
+        self.put_seed(self.payload + b'tampered')
+        with patch('sys.stderr') as err:
+            self.assertFalse(seeding.seed(self.props, self.home, self.state, self.seed))
+        message = ''.join(call.args[0] for call in err.write.call_args_list)
+        self.assertIn('sha256 mismatch', message)
+        self.assertIn('will download', message)
+        self.assertFalse(self.state.exists())
+        self.assertEqual(self.gradle_home_files(), ['wrapper', 'wrapper/dists', 'wrapper/dists/gradle-8.11.1-bin',
+                                                    'wrapper/dists/' + WRAPPER_DIR])  # Empty: wrapper downloads.
+
+    def test_unverifiable_or_incomplete_seed_falls_back_to_download(self):
+        self.seed.mkdir()
+        cases = [(TEMPLATE_WRAPPER, 'no gradle-8.11.1-bin.zip in seed'),  # Seed holds another version only.
+                 (TEMPLATE_WRAPPER.replace('8.11.1', '8.12'), 'no official sha256'),
+                 # A digest pinned in the template is not trusted in place of the built-in official one.
+                 (TEMPLATE_WRAPPER.replace('8.11.1', '8.12') + 'distributionSha256Sum=' + 'b' * 64 + '\n',
+                  'no official sha256'),
+                 (TEMPLATE_WRAPPER + 'distributionSha256Sum=' + 'a' * 64 + '\n', 'differs from the official'),
+                 (TEMPLATE_WRAPPER.replace('distributionPath=wrapper/dists', 'distributionPath=x'), 'non-default'),
+                 (TEMPLATE_WRAPPER.replace('https', 'http'), 'no https distributionUrl')]
+        for text, reason in cases:
+            self.props.write_text(text)
+            with self.subTest(reason=reason), patch('sys.stderr') as err:
+                self.assertFalse(seeding.seed(self.props, self.home, self.state, self.seed))
+                message = ''.join(call.args[0] for call in err.write.call_args_list)
+                self.assertIn(reason, message)
+                self.assertIn('will download', message)
+                self.assertFalse(self.state.exists())
+                self.assertEqual([path for path in self.home.rglob('*') if path.is_file()], [])
+
+    def test_install_failure_after_verification_falls_back_to_download(self):
+        self.put_seed(self.payload)
+        state = self.tmp / 'absent-directory/gradle-seed.json'  # The state file cannot be written.
+        with patch('sys.stderr') as err:
+            self.assertFalse(seeding.seed(self.props, self.home, state, self.seed))
+        message = ''.join(call.args[0] for call in err.write.call_args_list)
+        self.assertIn('cannot install', message)
+        self.assertIn('will download', message)
+        self.assertEqual([path for path in self.home.rglob('*') if path.is_file()], [])
+
+    def test_build_script_seeds_after_template_setup_and_checks_after_export(self):
+        script = (ROOT / 'tools/android/build_worker_apk.sh').read_text()
+        order = [script.index(marker) for marker in (
+            'setup_android_build.sh"', '"${seed_tool[@]}" seed "$p/android/build/gradle/wrapper/gradle-wrapper.properties" '
+            '"$home/.gradle"', 'run_editor --export-release', '"${seed_tool[@]}" check')]
+        self.assertEqual(order, sorted(order))
+        self.assertIn('"GRADLE_USER_HOME=$home/.gradle"', script)
 
 
 if __name__ == '__main__':

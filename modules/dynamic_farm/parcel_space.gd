@@ -61,14 +61,17 @@ static func till_refusal(data: Dictionary, path: Dictionary, state: Dictionary, 
 	return ""
 
 ## The main key for one cell: {verb, refusal, command, ripe_in_ms}. `command` is {} when the key
-## does nothing; `refusal` names why. `obstacles` holds the cells of uncleared core obstacles.
-## Returns {} for a cell off the parcel.
+## does nothing; `refusal` names why. `obstacles` maps every cell an uncleared core obstacle covers
+## to its anchor cell, which names the obstacle in `clear_obstacle` and `cleared` (a tree covers
+## a block of cells). Returns {} for a cell off the parcel.
 static func action(rules: Dictionary, data: Dictionary, path: Dictionary, obstacles: Dictionary,
 		state: Dictionary, cell: Vector2i, now: int) -> Dictionary:
 	if not data.by_cell.has(cell): return {}
 	var key := ParcelFarm.key(cell)
-	if obstacles.has(cell) and key not in state.cleared:
-		return {"verb": "clear", "refusal": "", "command": {"type": "clear_obstacle", "cell": key}}
+	if obstacles.has(cell):
+		var anchor := ParcelFarm.key(obstacles[cell])
+		if anchor not in state.cleared:
+			return {"verb": "clear", "refusal": "", "command": {"type": "clear_obstacle", "cell": anchor}}
 	var crop = state.crops.get(key)
 	if crop is Dictionary:
 		var left := int(crop.ripe_at) - now

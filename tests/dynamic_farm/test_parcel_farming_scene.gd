@@ -14,12 +14,19 @@ var dir := ""
 var shift := [0]
 var scene
 
-## Fails the first entry like a dropped connection, then answers from the local save.
+## Fails the first `failures` entries like a dropped connection, then answers from the local save.
 class FlakyStore extends RefCounted:
 	var inner: RefCounted
-	var failures := 1
-	func _init(p_inner: RefCounted) -> void: inner = p_inner
+	var failures := 0
+	var calls := 0
+	var first_call_ready := false
+	var scene: Node
+	func _init(p_inner: RefCounted, p_failures: int) -> void:
+		inner = p_inner
+		failures = p_failures
 	func enter() -> Dictionary:
+		if calls == 0 and scene != null: first_call_ready = scene._ready_sent
+		calls += 1
 		if failures > 0:
 			failures -= 1
 			return {"ok": false, "code": "NETWORK", "index": 0}
@@ -54,6 +61,7 @@ func _store() -> RefCounted:
 func _open(store: RefCounted = null) -> Node:
 	scene = (load(SCENE_PATH) as PackedScene).instantiate()
 	scene.setup({"farm": raw, "dataset": raw.dataset_version, "block_id": raw.block_id, "own_parcel": true, "farm_store": store if store != null else _store()})
+	if store is FlakyStore: store.scene = scene
 	var state := {"ready": false}
 	scene.preview_ready.connect(func(_summary): state.ready = true)
 	scene.preview_error.connect(func(message): push_error(message))
@@ -94,7 +102,9 @@ func _first_visit() -> void:
 	var file := FileAccess.open(dir.path_join(raw.block_id.validate_filename() + ".json"), FileAccess.WRITE)
 	file.store_string(JSON.stringify({"block_id": raw.block_id, "farm_version": 0, "farm": seeded}))
 	file.close()
-	var farming := await _open(FlakyStore.new(_store()))
+	var flaky := FlakyStore.new(_store(), 2)
+	var farming := await _open(flaky)
+	_check(flaky.calls == 2 and flaky.first_call_ready, "entry starts once the scene is up and retries a lost request once")
 	_check(farming.farm.is_empty() and farming._key.visible and farming._key.verb == "Retry", "a failed entry offers Retry")
 	farming._key.pressed_down.emit()
 	await process_frame
@@ -104,19 +114,28 @@ func _first_visit() -> void:
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
 	_check(farming._bag.get_child_count() == 2, "bag shows hoe and seeds")
 	var walk = scene._walk
-	# Clear a blocking obstacle with one press.
-	var obstacle := Vector2i(-1, -1)
+	# Clear a tree (a 2×2 block) with one press on a cell other than its anchor.
+	var tree := {}
 	for item: Dictionary in farming._core_plan.layout:
-		if item.solid:
-			obstacle = item.cell
+		if item.solid and item.get("cells", []).size() > 1:
+			tree = item
 			break
+	_check(not tree.is_empty(), "the fixture has a tree")
+	var obstacle: Vector2i = tree.get("cell", Vector2i(-1, -1))
+	var block: Array = tree.get("cells", [])
 	_check(not walk.clear_position(walk.point(obstacle)), "the obstacle blocks the walk")
 	var before := _obstacle_instances(farming)
-	var key := await _key(farming, obstacle)
-	_check(key == ["Clear", "Free", UiSceneAction.State.DEFAULT], "an obstacle offers Clear")
-	await _press(farming, obstacle)
-	_check(ParcelFarm.key(obstacle) in farming.farm.cleared and _obstacle_instances(farming) == before - 1, "one press clears it")
-	_check(walk.clear_position(walk.point(obstacle)), "and frees the walk")
+	var key: Array
+	var all_clear := block.size() == 4
+	for at: Vector2i in block:
+		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Clear", "Free", UiSceneAction.State.DEFAULT]
+	_check(all_clear, "every cell under the tree offers Clear, none Till")
+	await _press(farming, block.back())
+	_check(farming.farm.cleared == [ParcelFarm.key(obstacle)] and _obstacle_instances(farming) == before - 1, "one press clears it, named by its anchor")
+	var freed := true
+	for at: Vector2i in block:
+		freed = freed and not farming.obstacle_cells().has(at) and (await _key(farming, at))[0] != "Clear"
+	_check(freed and walk.clear_position(walk.point(obstacle)), "and frees the whole block and the walk")
 	_check(farming.farm.bag.get("hoe_starter") == 1, "clearing costs nothing")
 	# Till, sow, wait, harvest.
 	var cell := _free_cell(data, farming)
@@ -155,7 +174,9 @@ func _first_visit() -> void:
 
 func _reopen() -> void:
 	shift[0] += 20000
-	var farming := await _open()
+	var flaky := FlakyStore.new(_store(), 1)
+	var farming := await _open(flaky)
+	_check(flaky.calls == 2 and not farming.unavailable and farming._key.verb != "Retry", "one lost entry request is retried without Retry")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
 	_check(not farming._toast.current_text().begins_with("Received"), "no second gift toast")
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
@@ -186,9 +207,10 @@ func _free_block(data: Dictionary) -> Vector2i:
 
 func _free_cell(data: Dictionary, farming: Node) -> Vector2i:
 	var house := ParcelFarm.house_cells(farming.farm)
+	var obstacles: Dictionary = farming.obstacle_cells()
 	for cell: Dictionary in data.cells:
 		var at := Vector2i(cell.x, cell.y)
-		if cell.zone == "core" and not farming._path.has(at) and not farming._obstacles.has(at) and not house.has(at): return at
+		if cell.zone == "core" and not farming._path.has(at) and not obstacles.has(at) and not house.has(at): return at
 	return Vector2i(-1, -1)
 
 func _outside_cell(data: Dictionary) -> Vector2i:
