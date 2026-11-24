@@ -133,6 +133,11 @@ dropped without any source error, so the layer never loads and taps answer
 Tap Retry." path) when the native ready signal has not reported
 `buildings_source_ready` within `buildings_load_timeout_ms` of setting the
 sources (`config.json`, default 45000, clamped 5000–300000).
+The building source is kept and reused while it loads (C-118). After that timeout,
+and after the player's Retry, the next map setup sends `refetch_buildings: true`:
+native then replaces a copy that is still loading instead of waiting for it again;
+a loaded copy is still reused. Each copy has its own Mapbox source id, so a replaced
+copy's late load or error events cannot change the new one (C-124).
 
 ### Core size and too-small parcels (C-43)
 

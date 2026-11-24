@@ -87,27 +87,55 @@ class ParcelLayerStateTest {
     }
     // C-118: returning to the map, the foreground or a reload must not fetch and parse the 60 MB building file again.
     private val buildingsUrl = "https://example.test/r6/buildings.geojson"
+    private fun buildings() = ParcelBuildingsSource("gensen-buildings-datasf")
     @Test fun buildingSourceIsAddedOnceAndReusedWhileLoadingOrLoaded() {
-        val source = ParcelBuildingsSource()
-        assertEquals(ParcelBuildingsSource.Plan.ADD, source.plan(buildingsUrl, exists = false)); source.added(buildingsUrl)
+        val source = buildings()
+        assertEquals(ParcelBuildingsSource.Plan.ADD, source.plan(buildingsUrl, exists = false))
+        val id = source.added(buildingsUrl); assertEquals(id, source.id)
         assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true)); assertFalse(source.loaded)
-        assertTrue(source.markLoaded()); assertFalse(source.markLoaded()) // Later tile events are not a second load.
+        assertTrue(source.markLoaded(id)); assertFalse(source.markLoaded(id)) // Later tile events are not a second load.
         assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true)); assertTrue(source.loaded)
+        assertEquals(id, source.id)
     }
     @Test fun buildingSourceIsFetchedAgainForANewUrlAFailureOrANewStyle() {
-        val source = ParcelBuildingsSource().apply { added(buildingsUrl); markLoaded() }
+        val source = buildings(); val first = source.added(buildingsUrl); source.markLoaded(first)
         assertEquals(ParcelBuildingsSource.Plan.REPLACE, source.plan("https://example.test/r7/buildings.geojson", exists = true))
-        source.markFailed(); assertFalse(source.loaded)
+        assertTrue(source.markFailed(first)); assertFalse(source.loaded)
         assertEquals(ParcelBuildingsSource.Plan.REPLACE, source.plan(buildingsUrl, exists = true))
-        assertFalse(source.markLoaded()); assertFalse(source.loaded) // A late event cannot revive the failed load.
-        source.added(buildingsUrl); assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true))
+        assertFalse(source.markLoaded(first)); assertFalse(source.loaded) // A late event cannot revive the failed load.
+        val second = source.added(buildingsUrl); assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true))
         // A style reload drops every source: added again, never reported loaded from the old style.
-        source.markLoaded(); source.dropped()
+        source.markLoaded(second); source.dropped()
         assertEquals(ParcelBuildingsSource.Plan.ADD, source.plan(buildingsUrl, exists = false)); assertFalse(source.loaded)
+        assertFalse(source.markLoaded(second)); assertTrue(source.stale(second))
     }
-    @Test fun anUntrackedSourceWithTheSameIdIsReplacedNotReused() {
-        val source = ParcelBuildingsSource()
-        assertEquals(ParcelBuildingsSource.Plan.REPLACE, source.plan(buildingsUrl, exists = true))
-        assertFalse(source.markLoaded()); assertFalse(source.loaded)
+    @Test fun anUntrackedSourceIsNeverReused() {
+        val source = buildings()
+        assertEquals(ParcelBuildingsSource.Plan.ADD, source.plan(buildingsUrl, exists = true))
+        assertFalse(source.markLoaded("gensen-buildings-datasf")); assertFalse(source.loaded)
+    }
+    // C-124: a copy Mapbox never finishes nor fails is not waited for again after a Retry or the load timeout.
+    @Test fun refetchReplacesACopyStillLoadingButKeepsALoadedOne() {
+        val source = buildings(); val stuck = source.added(buildingsUrl)
+        assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true)) // Pause and resume.
+        assertEquals(ParcelBuildingsSource.Plan.REPLACE, source.plan(buildingsUrl, exists = true, refetch = true))
+        val fresh = source.added(buildingsUrl); assertTrue(fresh != stuck)
+        assertTrue(source.markLoaded(fresh))
+        assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true, refetch = true))
+        assertEquals(ParcelBuildingsSource.Plan.ADD, source.plan(buildingsUrl, exists = false, refetch = true))
+    }
+    // C-124: the copy before a replacement may still report; its events must not touch the new copy.
+    @Test fun aReplacedCopysLateEventsDoNotChangeTheNewCopy() {
+        val source = buildings(); val old = source.added(buildingsUrl)
+        val next = source.added("https://example.test/r7/buildings.geojson")
+        assertTrue(source.stale(old)); assertFalse(source.stale(next)); assertFalse(source.stale("composite"))
+        assertFalse(source.markLoaded(old)); assertFalse(source.loaded) // Not marked loaded early.
+        assertFalse(source.markFailed(old)) // Not fetched again for the old copy's error.
+        assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan("https://example.test/r7/buildings.geojson", exists = true))
+        assertTrue(source.markLoaded(next)); assertFalse(source.markFailed(old)); assertTrue(source.loaded)
+        assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan("https://example.test/r7/buildings.geojson", exists = true))
+        // The same for a copy replaced at the same URL after a failure.
+        source.markFailed(next); val third = source.added("https://example.test/r7/buildings.geojson")
+        assertFalse(source.markLoaded(next)); assertFalse(source.markFailed(next)); assertTrue(source.markLoaded(third))
     }
 }

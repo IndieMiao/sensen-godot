@@ -11,6 +11,8 @@ internal data class ParcelSourceConfig(
     val sourceType: String = "geojson", val tiles: List<String> = emptyList(), val sourceLayer: String? = null,
     val sourceMinZoom: Int = 0, val sourceMaxZoom: Int = 22,
     val buildingSource: String = "datasf", val mapboxBuildingLayers: List<String> = listOf("building"),
+    /** C-124: set by the player's Retry or the building load timeout; a building copy still loading is fetched again. */
+    val refetchBuildings: Boolean = false,
 )
 internal object ParcelPayload {
     const val EMPTY_COLLECTION = "{\"type\":\"FeatureCollection\",\"features\":[]}"
@@ -54,7 +56,8 @@ internal object ParcelPayload {
         require(layers.size in 1..8 && layers.distinct().size == layers.size && layers.all { Regex("[A-Za-z0-9_-]{1,80}").matches(it) })
         val min = input.get("min_zoom").asDouble; val address = input.get("address_min_zoom").asDouble
         require(min.isFinite() && address.isFinite() && min in 0.0..22.0 && address in min..22.0)
-        return ParcelSourceConfig(parcelUrl, buildingsUrl, min, address, type, tiles, layer, sourceMin, sourceMax, building, layers)
+        val refetch = input.get("refetch_buildings")?.let { require(it.isJsonPrimitive && it.asJsonPrimitive.isBoolean); it.asBoolean } ?: false
+        return ParcelSourceConfig(parcelUrl, buildingsUrl, min, address, type, tiles, layer, sourceMin, sourceMax, building, layers, refetch)
     }
     fun states(raw: String): Map<String, ParcelVisualState> {
         require(raw.length <= 1024 * 1024)

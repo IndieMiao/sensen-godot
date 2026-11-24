@@ -48,6 +48,7 @@ var _failed_generation := -1 # Map being replaced by the automatic reload; its l
 var _buildings_left := -1.0 # Countdown for the DataSF building layer of the current map; -1 when not waiting.
 var _buildings_wait := false # The current DataSF map has not reported its building layer loaded; taps wait for it.
 var _buildings_started := 0 # When the current map's sources were set; the wait for its building layer is logged (C-118).
+var _refetch_buildings := false # C-124: after Retry or the building timeout the next setup fetches a still-loading copy again.
 var _view_zoom := -1.0 # Last camera zoom reported to camera_changed or tap; -1 until known.
 var _kind := ""
 var _key := ""
@@ -90,6 +91,7 @@ func activate(auto := false) -> void:
 	if generation > 0: bridge.clear_parcel_layers(generation)
 	generation = MapBridge.next_parcel_generation(); style_generation = -1
 	busy = false; message = FINDING if _resume_tap else "Loading map details…"; changed.emit()
+	if _refetch_buildings: native["refetch_buildings"] = true; _refetch_buildings = false
 	bridge.set_parcel_sources(generation, JSON.stringify(native))
 	if native.building_source == "datasf":
 		_buildings_wait = true; _buildings_left = buildings_load_timeout(); _buildings_started = Time.get_ticks_msec()
@@ -130,6 +132,8 @@ func _native_error(gen: int, style: int, code: String) -> void:
 	var tap := _querying()
 	var retry_sent := _retried and _retry_left < 0.0 # A scheduled, unsent re-query is replaced by the reload.
 	map_ready = false; _pending = -1; _retry_left = -1.0; _query_failed = false; _buildings_left = -1.0
+	# Native reuses a building copy still loading (C-118); one that timed out is not waited for again (C-124).
+	if code == "buildings_source_timeout": _refetch_buildings = true
 	# Offline tiles and service failures arrive here, not as query answers. Reload once before telling the player.
 	var retry := not _map_retried and not (tap and retry_sent)
 	print("DYNAMIC_MAP_ERROR ", JSON.stringify({"code":code, "tap":tap, "retry":retry}))
@@ -154,11 +158,11 @@ func tap(point: Vector2, zoom: float) -> void:
 	_point = point
 	_start_query()
 
-## Retry button: re-query the failed tap in place; otherwise reload the map.
+## Retry button: re-query the failed tap in place; otherwise reload the map and any building copy still loading.
 func retry() -> void:
 	if suspended or busy: return
 	if _query_failed and map_ready: _start_query()
-	else: activate()
+	else: _refetch_buildings = true; activate()
 
 func _start_query() -> void:
 	message = FINDING; changed.emit()
