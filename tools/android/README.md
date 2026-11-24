@@ -203,7 +203,22 @@ choose a production signing identity, install an app or authorize publication.
    plugins, then imports and exports **release** serially in a fresh portable
    editor. It fixes ADB to 5137, disables editor ADB shutdown and needs no
    device or emulator. Gradle may need to download build dependencies; there
-   is no artifact upload step in the build script. Template and APK directory
+   is no artifact upload step in the build script.
+
+   **Gradle distribution seed (C-64).** The Gradle home is disposable, so the wrapper
+   would download its distribution on every build. If the host keeps the official zip in
+   `$HOME/.local/share/sensen-godot/gradle-wrapper-dists` (override with
+   `CARDIGAN_GRADLE_DIST_SEED`; layout as `~/.gradle/wrapper/dists`, e.g.
+   `gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1-bin.zip`),
+   `gradle_dist_seed.py` copies only that zip into the temporary Gradle home after its
+   SHA-256 matches the official value (pinned in `OFFICIAL_SHA256`). A mismatched,
+   missing or unverifiable seed is reported on stderr and the wrapper downloads as before;
+   with no seed directory nothing changes. After export it reports whether the seeded zip
+   was used. Dependency caches are never shared, and `gradle-wrapper.properties` is unchanged.
+   When the Android template moves to another Gradle version, add that version's official
+   digest to `OFFICIAL_SHA256`; until then builds fall back to downloading.
+
+   Template and APK directory
    entries are screened for keystores and `export_credentials.cfg` before any
    member is opened for extraction or CRC checks. It refuses signing metadata
    **before** alignment as well as afterwards. Success produces `unsigned.apk`,

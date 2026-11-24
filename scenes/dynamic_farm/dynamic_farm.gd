@@ -22,6 +22,9 @@ const RemoteFarmStore = preload("res://modules/dynamic_farm/parcel_farm_remote_s
 ## Development only: keep the own-parcel farm on the device instead of the C-31 server.
 const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const SPEED := 3.75
+## Background cloud drift in screen widths per second; negative drifts left. A group
+## crosses a 1080-pixel-wide screen in about 100 s.
+const CLOUD_DRIFT := 0.01
 
 var _args := {}
 var _data := {}
@@ -35,6 +38,8 @@ var _actor: Node3D
 var _rig: Node3D
 var _camera: Camera3D
 var _environment: WorldEnvironment
+var _clouds: ShaderMaterial
+var _cloud_drift := 0.0
 var _saved_environment: Environment
 var _canvas: CanvasLayer
 var _controls: Control
@@ -94,7 +99,7 @@ func _ready() -> void:
 	_props = art.root
 	add_child(_props)
 	# Separate batches outside extension occupancy and shadow budgets; stones, bushes
-	# and saplings still block through the shared model-fitted profiles (Q-16).
+	# and trees still block through the shared model-fitted profiles (Q-16).
 	var core_art := Scenery.build(_plan.core_obstacles, _walk, _plan.recipe)
 	if not core_art.ok:
 		_fail(core_art.error)
@@ -174,11 +179,11 @@ func _ready() -> void:
 
 func _setup_world() -> void:
 	var env := Environment.new()
-	var clouds := ShaderMaterial.new()
-	clouds.shader = SKY_SHADER
+	_clouds = ShaderMaterial.new()
+	_clouds.shader = SKY_SHADER
 	env.sky = Sky.new()
 	env.sky.radiance_size = Sky.RADIANCE_SIZE_32
-	env.sky.sky_material = clouds
+	env.sky.sky_material = _clouds
 	env.background_mode = Environment.BG_SKY
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
@@ -218,6 +223,9 @@ func _on_avatar_ready(_config) -> void:
 
 func _process(delta: float) -> void:
 	if _failed or _suspended or _walk == null: return
+	if _clouds != null:
+		_cloud_drift += CLOUD_DRIFT * delta
+		_clouds.set_shader_parameter("drift", _cloud_drift)
 	if not _ready_sent:
 		if _avatar_loaded and _shade.complete:
 			_ready_sent = true
