@@ -50,6 +50,8 @@ var _show_passwords: CheckBox
 var _status: Label
 var _actions: VBoxContainer
 var _close: Button
+var _scroll: ScrollContainer
+var _step := ""
 var _fields: VBoxContainer
 var _field_list: Array[Control] = []
 
@@ -81,18 +83,27 @@ func _ready() -> void:
 		scenery.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		scenery.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		scrim.add_child(scenery)
+	# On a short 16:9 screen (360x640) the longest steps, such as entering the reset code, run past the
+	# bottom edge; the whole screen scrolls so every button can be reached (C-81). The margins sit inside
+	# the scroll so content scrolls up to the screen edge and the last button keeps its gap at the end.
+	_scroll = TouchScrollContainer.new()
+	_scroll.name = "Scroll"
+	_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scrim.add_child(_scroll)
 	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	margin.add_theme_constant_override("margin_left", 20)
 	margin.add_theme_constant_override("margin_right", 20)
 	margin.add_theme_constant_override("margin_top", 72)
 	margin.add_theme_constant_override("margin_bottom", 24)
-	scrim.add_child(margin)
+	_scroll.add_child(margin)
 	var holder := VBoxContainer.new()
 	holder.alignment = BoxContainer.ALIGNMENT_BEGIN
 	margin.add_child(holder)
-	# The focused field and the button right below it stay above the soft keyboard.
-	KeyboardAvoider.attach(margin, 64.0)
+	# The focused field and the button right below it stay above the soft keyboard. The scroll is shifted,
+	# not the margin inside it: the scroll lays out its own content and would undo the shift.
+	KeyboardAvoider.attach(_scroll, 64.0)
 	var panel := PanelContainer.new()
 	panel.name = "Card"
 	panel.add_theme_stylebox_override("panel", GameUi.panel_style(18))
@@ -223,6 +234,12 @@ func _option(node_name: String, labels: Array, parent: Control = null) -> Option
 ## 状态切换：显示哪些输入框、标题文案、按钮列表。
 func set_mode(next: String) -> void:
 	mode = next
+	# A new step starts at its title, not wherever the previous step was scrolled to. Refreshing the same
+	# step ("Send a new code" re-enters it) keeps the scroll, so the buttons stay under the finger.
+	var step := mode + ("+code" if mode == "forgot" and _reset_code_sent else "")
+	if step != _step:
+		_step = step
+		_scroll.scroll_vertical = 0
 	_status.text = ""
 	_status.add_theme_color_override("font_color", GameUi.CORAL)
 	_email.editable = mode in ["sign_in", "sign_up", "forgot"]
