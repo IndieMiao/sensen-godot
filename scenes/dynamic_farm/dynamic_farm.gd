@@ -16,6 +16,9 @@ const SKY_SHADER = preload("res://modules/dynamic_farm/island_sky.gdshader")
 const Controls = preload("res://scenes/dynamic_farm/dynamic_controls.gd")
 const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.gd")
 const SPEED := 3.75
+## Background cloud drift in screen widths per second; negative drifts left. A group
+## crosses a 1080-pixel-wide screen in about 100 s.
+const CLOUD_DRIFT := 0.01
 
 var _args := {}
 var _data := {}
@@ -29,6 +32,8 @@ var _actor: Node3D
 var _rig: Node3D
 var _camera: Camera3D
 var _environment: WorldEnvironment
+var _clouds: ShaderMaterial
+var _cloud_drift := 0.0
 var _saved_environment: Environment
 var _canvas: CanvasLayer
 var _controls: Control
@@ -78,15 +83,15 @@ func _ready() -> void:
 	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk),
 		1.0 if bool(_args.get("original_slope_material",false)) else 0.65)
 	add_child(_ground)
-	var art := Scenery.build(_plan,_walk)
+	var art := Scenery.build(_plan,_walk,_plan.recipe)
 	if not art.ok:
 		_fail(art.error)
 		return
 	_props = art.root
 	add_child(_props)
 	# Separate batches outside extension occupancy and shadow budgets; stones, bushes
-	# and saplings still block through the shared model-fitted profiles (Q-16).
-	var core_art := Scenery.build(_plan.core_obstacles, _walk)
+	# and trees still block through the shared model-fitted profiles (Q-16).
+	var core_art := Scenery.build(_plan.core_obstacles, _walk, _plan.recipe)
 	if not core_art.ok:
 		_fail(core_art.error)
 		return
@@ -98,7 +103,7 @@ func _ready() -> void:
 	_shade.setup(_ground,_props,_plan,_data,_walk)
 	if bool(_args.get("edge_decor_preview",false)):
 		_edge_plan=EdgeDecor.plan(_data,_walk,_plan)
-		var edge_art:=Scenery.build(_edge_plan,_walk)
+		var edge_art:=Scenery.build(_edge_plan,_walk,_plan.recipe)
 		if not edge_art.ok:
 			_fail(edge_art.error)
 			return
@@ -152,23 +157,23 @@ func _ready() -> void:
 
 func _setup_world() -> void:
 	var env := Environment.new()
-	var clouds := ShaderMaterial.new()
-	clouds.shader = SKY_SHADER
+	_clouds = ShaderMaterial.new()
+	_clouds.shader = SKY_SHADER
 	env.sky = Sky.new()
 	env.sky.radiance_size = Sky.RADIANCE_SIZE_32
-	env.sky.sky_material = clouds
+	env.sky.sky_material = _clouds
 	env.background_mode = Environment.BG_SKY
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.79,0.88,0.94)
+	env.ambient_light_color = Color(0.84,0.88,0.90)
 	env.ambient_light_energy = 0.42
 	_environment = WorldEnvironment.new()
 	_environment.environment = env
 	add_child(_environment)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Shade.SUN_DEGREES
-	sun.light_color = Color(1,0.96,0.87)
-	sun.light_energy = 1.1
+	sun.light_color = Color(1,0.95,0.84)
+	sun.light_energy = 1.12
 	sun.shadow_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
 	sun.shadow_opacity = 0.58
 	sun.shadow_bias = 0.1
@@ -196,6 +201,9 @@ func _on_avatar_ready(_config) -> void:
 
 func _process(delta: float) -> void:
 	if _failed or _suspended or _walk == null: return
+	if _clouds != null:
+		_cloud_drift += CLOUD_DRIFT * delta
+		_clouds.set_shader_parameter("drift", _cloud_drift)
 	if not _ready_sent:
 		if _avatar_loaded and _shade.complete:
 			_ready_sent = true

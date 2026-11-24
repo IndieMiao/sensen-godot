@@ -37,16 +37,26 @@ class ParcelPayloadTest {
         assertTrue(ParcelPayload.states("[$row]").values.single().empty)
     }
     @Test fun claimNicknameIsDataNotAnExpressionAndNoDeviceIdentityIsForwarded() {
-        val raw = """[{"block_id":"p-3139010","nickname":"[get,secret] 小猫","center":[-122.45,37.73],"device_id":"never-export"}]"""
-        val json = ParcelPayload.claims(raw)
-        assertFalse(json.contains("never-export")); assertFalse(json.contains("device_id"))
-        val f = JsonParser.parseString(json).asJsonObject.getAsJsonArray("features")[0].asJsonObject
-        assertEquals("Point", f.getAsJsonObject("geometry").get("type").asString)
-        assertEquals("[get,secret] 小猫", f.getAsJsonObject("properties").get("nickname").asString)
+        val raw = """[{"block_id":"p-3139010","nickname":"[\"get\",\"secret\"] 小猫","center":[-122.45,37.73],"device_id":"never-export"}]"""
+        val names = ParcelPayload.claims(raw)
+        assertEquals(mapOf("p-3139010" to "[\"get\",\"secret\"] 小猫"), names)
+        val label = JsonParser.parseString(ParcelPayload.claimLabel(names)).asJsonArray
+        assertEquals("match", label[0].asString)
+        assertEquals("p-3139010", label[2].asString)
+        assertTrue(label[3].isJsonPrimitive && label[3].asJsonPrimitive.isString) // never an array/expression
+        assertEquals("[\"get\",\"secret\"] 小猫", label[3].asString)
+        assertEquals("", label[4].asString)
+        assertFalse(ParcelPayload.claimLabel(names).contains("never-export"))
     }
-    @Test fun emptyClaimsClearsSourceAndInvalidCoordinatesAreRefused() {
-        assertEquals(ParcelPayload.EMPTY_COLLECTION, ParcelPayload.claims("[]"))
-        assertFails { ParcelPayload.claims("""[{"block_id":"p-a","nickname":"a","center":[200,37]}]""") }
+    @Test fun emptyClaimsClearLabelsAndBadRowsAreRefused() {
+        assertTrue(ParcelPayload.claims("[]").isEmpty())
+        assertEquals("\"\"", ParcelPayload.claimLabel(emptyMap()))
+        val filter = JsonParser.parseString(ParcelPayload.claimFilter(emptyMap())).asJsonArray
+        assertEquals("in", filter[0].asString); assertEquals(0, filter[2].asJsonArray[1].asJsonArray.size())
+        assertEquals("p-a", JsonParser.parseString(ParcelPayload.claimFilter(mapOf("p-a" to "A"))).asJsonArray[2].asJsonArray[1].asJsonArray[0].asString)
+        assertFails { ParcelPayload.claims("""[{"block_id":"p-a","nickname":""}]""") }
+        assertFails { ParcelPayload.claims("""[{"block_id":"3139010","nickname":"a"}]""") }
+        assertFails { ParcelPayload.claims("""[{"block_id":"p-a","nickname":"a"},{"block_id":"p-a","nickname":"b"}]""") }
     }
     @Test fun onlyWhitelistedOwnSourcePropertiesAreReturned() {
         val input = JsonParser.parseString("""{"block_id":"p-3139010","parcel_id":"3139010","address":null,"center":[-122,37],"geometry":{"type":"Polygon"},"device_id":"secret","other":"omit"}""").asJsonObject

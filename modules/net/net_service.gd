@@ -107,6 +107,13 @@ func _resume_account() -> bool:
 	await session.forget_identity()
 	return false
 
+## 只读回本机已保存的账号 token（C-32）：给跳过 boot() 的隔离测试包用，不做匿名登录、不取农场、
+## 不探测联机。调用方自己判断是否允许（动态农场内部测试包的 `sensen/dynamic_farm/account_restore`）。
+func restore_saved_account() -> bool:
+	if account.signed_in() and not client.token.is_empty(): return true
+	if not account.load_saved(account_path): return false
+	return await _resume_account()
+
 ## 联机只对账号开放：游客探测得到 401，online_available 保持 false。
 func _probe_online() -> void:
 	var capabilities := await client.request("GET", "/online/status")
