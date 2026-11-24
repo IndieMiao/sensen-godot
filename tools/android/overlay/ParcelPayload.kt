@@ -104,6 +104,36 @@ internal object ParcelPayload {
         add("in"); add(JsonArray().apply { add("get"); add("block_id") })
         add(JsonArray().apply { add("literal"); add(JsonArray().apply { names.keys.forEach { add(it) } }) })
     }.toString()
+    // C-112 (C-103#18): the buildings of one's own parcel green, of someone else's red, deeper while selected; others
+    // are not drawn. Claimable yellow is the selected building's highlight (C-28).
+    const val OWN_COLOR = "#3E9B55"
+    const val TAKEN_COLOR = "#D2493F"
+    const val CLAIMABLE_COLOR = "#FFD15C"
+    const val OWN_OPACITY = 0.55
+    const val OWN_SELECTED_OPACITY = 0.75
+    const val TAKEN_OPACITY = 0.5
+    const val TAKEN_SELECTED_OPACITY = 0.7
+    /**
+     * `["match", ["get","block_id"], [ids…], value, …, fallback]`: a hash lookup per building however many parcels are
+     * owned. Empty groups are left out; with none left a never-matching "" (given the fallback) keeps it a valid,
+     * feature-dependent expression, so the layer stays hit-tested when nothing is owned.
+     */
+    private fun byParcel(groups: List<Pair<Collection<String>, Any>>, fallback: Any): String = JsonArray().apply {
+        fun put(value: Any) = if (value is Number) add(value) else add(value.toString())
+        add("match"); add(JsonArray().apply { add("get"); add("block_id") })
+        val used = groups.filter { it.first.isNotEmpty() }
+        if (used.isEmpty()) { add(""); put(fallback) }
+        for ((ids, value) in used) { add(JsonArray().apply { ids.forEach { add(it) } }); put(value) }
+        put(fallback)
+    }.toString()
+    private fun ids(states: Map<String, ParcelVisualState>, test: (ParcelVisualState) -> Boolean) = states.filterValues(test).keys
+    /** fill-color of the DataSF building layer. */
+    fun buildingColor(states: Map<String, ParcelVisualState>): String = byParcel(listOf(ids(states) { it.own } to OWN_COLOR), TAKEN_COLOR)
+    /** fill-opacity of the DataSF building layer: 0 for every building whose parcel is neither own nor someone else's. */
+    fun buildingOpacity(states: Map<String, ParcelVisualState>): String = byParcel(listOf(
+        ids(states) { it.own && !it.selected } to OWN_OPACITY, ids(states) { it.own && it.selected } to OWN_SELECTED_OPACITY,
+        ids(states) { it.claimed && !it.own && !it.selected } to TAKEN_OPACITY, ids(states) { it.claimed && !it.own && it.selected } to TAKEN_SELECTED_OPACITY,
+    ), 0.0)
     /** DataSF highlight: every footprint of one parcel, since its farm core is all of them (C-43 V-199). "" matches none. */
     fun buildingFilter(parcelId: String): String = JsonArray().apply {
         add("=="); add(JsonArray().apply { add("get"); add("block_id") }); add(if (validId(parcelId)) parcelId else "")

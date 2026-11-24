@@ -30,7 +30,9 @@ class TestCamera extends Control:
 	var center := [-122.45, 37.73]
 	var zoom := 17.5
 	var updates := 0
+	var stops := 0
 	func _changed() -> void: updates += 1
+	func stop() -> void: stops += 1
 class MapPage extends "res://scenes/dynamic_farm/dynamic_farm_map.gd":
 	func _ready() -> void:
 		_hud = Control.new(); add_child(_hud)
@@ -99,6 +101,7 @@ func _run() -> void:
 	page.suspend()
 	page._opening = false
 	verify(plugin.calls == [["color", "#E7F0DF"], ["surface", true], ["visible", false]], "3D suspension sets scene color and opaque Surface before native hide")
+	verify(page._camera.stops > 0, "leaving the map ends its inertia, zoom and flight (C-112)")
 	verify(not root.transparent_bg and page._suspended, "Godot viewport becomes opaque while map is covered")
 	verify(plugin.opaque and page._surface_opaque_requested, "3D transition explicitly requests the no-alpha Surface mode")
 	verify(not plugin.shown, "native hide request reaches the existing visibility API")

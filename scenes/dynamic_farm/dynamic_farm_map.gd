@@ -8,6 +8,8 @@ extends Control
 ## they are only in packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
 ## C-110: the map frames the player's home on entry and has a "My home" button; the account state and its
 ## Sign in / Sign out entry stay on the top panel whether or not a parcel is selected.
+## C-112: farm-dev's camera feel (geo_native_camera.gd) and its round locate key, over the bottom card at the right;
+## My home, San Francisco and the locate key fly there. Only buildings are coloured (ParcelMapController.kt).
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -32,6 +34,10 @@ const PICK_HOME := "Tap your green parcel, then Enter my farm."
 ## Camera zoom when the map moves to the player's home (C-110); the parcel and its address labels show from 18.
 const HOME_ZOOM := 18.0
 const MY_HOME := "My home"
+## The locate key: farm-dev's MapLocateButton (scenes/p0/p0_map.gd _style_locate, LOCK-24) as it is, in its place
+## over the bottom card. It flies back to the player's home, or to the dataset's area without one.
+const LOCATE_ICON := "res://assets/p0/icons/locate.svg"
+const LOCATE_GAP := 12.0
 const CHECKING := "Checking your account…"
 const SIGNED_IN := "Signed in as %s"
 const SIGNED_IN_NO_NAME := "Signed in"
@@ -59,6 +65,8 @@ var _sign_out_confirm: Control
 var _account_note: Label
 var _places: Control
 var _home: Button
+var _locate: Button
+var _bottom: Control
 var _market: Button
 var _carpenter: Button
 var _town: Control
@@ -160,13 +168,14 @@ func _build_ui() -> void:
 	_message = _label("Loading dynamic farm map…", 14); top.add_child(_message)
 	var row := HBoxContainer.new(); top.add_child(row)
 	_retry = _button("Retry", _retry_map); _retry.disabled = true; row.add_child(_retry)
-	row.add_child(_button("San Francisco", _reset_area))
+	row.add_child(_button("San Francisco", _reset_area.bind(true)))
 	row.add_child(_button("Back", _leave))
 	_places = HBoxContainer.new(); _places.visible = _own_farm_entry(); top.add_child(_places)
 	_home = _button(MY_HOME, _go_home); _home.hide(); _places.add_child(_home)
 	_market = _button("Market", _open_town.bind("market")); _market.disabled = true; _market.visible = _own_farm_entry(); _places.add_child(_market)
 	_carpenter = _button("Carpenter", _open_town.bind("carpenter")); _carpenter.disabled = true; _carpenter.visible = _own_farm_entry(); _places.add_child(_carpenter)
 	var bottom := _panel(true)
+	_bottom = bottom.get_parent()
 	_details = _label(PICK_PREVIEW, 16); bottom.add_child(_details)
 	_choices = OptionButton.new(); _choices.custom_minimum_size.y = 44; _choices.hide()
 	_choices.item_selected.connect(func(index: int):
@@ -189,7 +198,31 @@ func _build_ui() -> void:
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
 		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
 	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0", 10))
+	_locate = _locate_key(); _hud.add_child(_locate)
+	_bottom.item_rect_changed.connect(_place_locate); _hud.resized.connect(_place_locate)
 	_render_account()
+
+## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the locate glyph).
+func _locate_key() -> Button:
+	var b := Button.new(); b.name = "MapLocate"; b.focus_mode = Control.FOCUS_NONE
+	b.theme = UiKit.theme(); b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
+	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
+		var sb := b.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+		if sb != null:
+			sb.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
+			sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
+			b.add_theme_stylebox_override(state, sb)
+		b.add_theme_color_override(StringName("icon_%s_color" % state), Color.WHITE)
+	b.icon = load(LOCATE_ICON); b.expand_icon = true; b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.add_theme_constant_override(&"icon_max_width", 22)
+	b.custom_minimum_size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE); b.size = b.custom_minimum_size
+	b.disabled = true; b.pressed.connect(_locate_player)
+	return b
+
+func _place_locate() -> void:
+	if _locate == null or _bottom == null: return
+	_locate.position = Vector2(_hud.size.x - _locate.size.x - LOCATE_GAP, _bottom.position.y - _locate.size.y - LOCATE_GAP)
 
 func _panel(bottom: bool) -> VBoxContainer:
 	var panel := PanelContainer.new(); _hud.add_child(panel)
@@ -249,6 +282,7 @@ func _render() -> void:
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
 	_home.visible = _claims.has_home()
 	_home.disabled = _selector.manifest.is_empty() or _opening or _town != null
+	_locate.disabled = _home.disabled
 	_places.visible = _own_farm_entry() or _home.visible
 	if _selector._options.is_empty(): _choices.hide()
 
@@ -265,18 +299,24 @@ func _frame_on_entry() -> void:
 	elif _framed_home.is_empty() and not _player_moved and _claims.has_home():
 		_frame_home()
 
-## Moves the camera to the player's home (the centre the server stored at claim time).
-func _frame_home() -> bool:
+## Moves the camera to the player's home (the centre the server stored at claim time); `fly` for the buttons.
+func _frame_home(fly := false) -> bool:
 	if _camera == null or _claims == null or not _claims.has_home() or _opening: return false
 	var center = _claims.mine.get("center")
 	if not Geo.valid_point(center): return false
 	_framed_home = str(_claims.mine.get("parcel_id", ""))
-	_camera.frame_center(float(center[0]), float(center[1]), HOME_ZOOM)
+	if fly: _camera.fly_to(float(center[0]), float(center[1]), HOME_ZOOM)
+	else: _camera.frame_center(float(center[0]), float(center[1]), HOME_ZOOM)
 	return true
 
 func _go_home() -> void:
 	if _selector == null or _selector.manifest.is_empty() or _town != null: return
-	_frame_home()
+	_frame_home(true)
+
+## The locate key: back to the player, who lives at their home; without a home, back to the dataset's area.
+func _locate_player() -> void:
+	if _selector == null or _selector.manifest.is_empty() or _town != null or _opening: return
+	if not _frame_home(true): _reset_area(true)
 
 ## Top panel: who is signed in on this phone, with Sign in / Sign out, shown whether or not a parcel is selected.
 ## Development builds on the in-memory claim stand-in have no account and hide it.
@@ -336,10 +376,12 @@ func _show_candidates(rows: Array) -> void:
 		_candidate_ids.append(row.block_id); _choices.add_item(row.name)
 	_choices.select(-1); _choices.show()
 
-func _reset_area() -> void:
+func _reset_area(fly := false) -> void:
 	if _selector == null or _selector.busy or _selector.manifest.is_empty() or _opening: return
 	var native: Dictionary = _selector.manifest.native_map
-	_camera.frame_center(float(native.center[0]), float(native.center[1]), clampf(float(native.get("initial_zoom", 17.5)), 13, 21))
+	var level := clampf(float(native.get("initial_zoom", 17.5)), 13, 21)
+	if fly: _camera.fly_to(float(native.center[0]), float(native.center[1]), level)
+	else: _camera.frame_center(float(native.center[0]), float(native.center[1]), level)
 
 func _retry_map() -> void:
 	if _selector != null and not _selector.busy and not _opening: _selector.retry()
@@ -398,10 +440,17 @@ func _abandon() -> void:
 func _refresh_area() -> void:
 	if _selector == null or _suspended or not _selector.map_ready or _selector.manifest.is_empty(): return
 	if _camera.zoom < float(_selector.manifest.native_map.get("minzoom", 16)): return
-	var corner: PackedFloat64Array = _camera.screen_geo(Vector2.ZERO)
-	var opposite: PackedFloat64Array = _camera.screen_geo(_camera.size)
-	var bbox := [minf(corner[0], opposite[0]), minf(corner[1], opposite[1]), maxf(corner[0], opposite[0]), maxf(corner[1], opposite[1])]
-	if bbox[2] - bbox[0] <= ClaimApi.MAX_BBOX_SPAN and bbox[3] - bbox[1] <= ClaimApi.MAX_BBOX_SPAN: _claims.refresh_area(bbox)
+	_claims.refresh_area(area_bbox(_camera))
+
+## The ground the camera sees as [west, south, east, north]. Tilted, the far edge reaches towards the horizon, so the
+## box is held to the claim API's span around the centre (the near parcels, where the buildings are drawn).
+static func area_bbox(camera: Control) -> Array:
+	var west := INF; var south := INF; var east := -INF; var north := -INF
+	for corner in [Vector2.ZERO, Vector2(camera.size.x, 0), Vector2(0, camera.size.y), camera.size]:
+		var point: PackedFloat64Array = camera.screen_geo(corner)
+		west = minf(west, point[0]); east = maxf(east, point[0]); south = minf(south, point[1]); north = maxf(north, point[1])
+	var half := ClaimApi.MAX_BBOX_SPAN * 0.49 # Under the span after rounding.
+	return [maxf(west, camera.center[0] - half), maxf(south, camera.center[1] - half), minf(east, camera.center[0] + half), minf(north, camera.center[1] + half)]
 
 func _open_host(farm: Dictionary) -> void:
 	if _leaving or _suspended or _opening: return
@@ -430,6 +479,7 @@ func suspend() -> void:
 func _suspend_map(committing_preview: bool) -> void:
 	_suspended = true
 	_presentation_epoch += 1
+	if _camera != null: _camera.stop()
 	get_viewport().transparent_bg = false
 	if _bridge != null: _bridge.set_map_occlusion_color(OCCLUSION_COLOR)
 	if committing_preview and _bridge != null:
