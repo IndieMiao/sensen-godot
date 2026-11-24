@@ -167,7 +167,14 @@ func buildings_layer_timeout() -> void:
 	check(native.sources.size() == boots + 1, "the reported failure is not reloaded again automatically")
 	controller.retry(); for i in 4: await process_frame
 	check(native.sources.size() == boots + 2, "Retry after the building layer failure reloads the map")
+	var waits: Array = []
+	var on_load := func(row: Dictionary): if row.resource == "buildings": waits.append(row)
+	controller.load_diagnostic.connect(on_load)
 	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	controller.load_diagnostic.disconnect(on_load)
+	# C-118: the wait for the building layer is logged once per map setup, so a reused one shows as a short wait.
+	check(waits.size() == 1 and waits[0].stage == "ready" and waits[0].elapsed_ms >= 0, "the building layer's wait is logged once when it loads")
 	controller._process(controller.buildings_load_timeout() + .1)
 	check(controller.map_ready and controller.message == Controller.PROMPT and native.sources.size() == boots + 2, "a loaded building layer stops the countdown")
 	# C-43 V-199: a tap waiting for the building layer is answered when it loads; the highlight is the chosen parcel's.
