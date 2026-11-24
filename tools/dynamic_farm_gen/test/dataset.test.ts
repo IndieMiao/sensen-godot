@@ -28,6 +28,19 @@ describe('sample build (test range)', () => {
     expect(result.excluded.every(e => e.reason === 'no_building')).toBe(true);
   });
 
+  it('excludes farms under min_core_iou as low_iou, with their IoU, and writes no file for them', () => {
+    const strict = buildDataset(loadSnapshot(SNAPSHOT), { dataset_version: VERSION, params: resolveParams({ min_core_iou: 0.97 }) });
+    const low = strict.excluded.filter(e => e.reason === 'low_iou');
+    expect(low.length).toBeGreaterThan(0);
+    expect(strict.reports.length + low.length).toBe(88);
+    for (const e of low) {
+      expect(e.core_iou).toBeLessThan(0.97);
+      expect(e.cell_m).toBeGreaterThanOrEqual(0.5);
+      expect(strict.files.has(`farms/${e.block_id}.json`)).toBe(false);
+    }
+    for (const r of strict.reports) expect(r.core_iou).toBeGreaterThanOrEqual(0.97);
+  });
+
   it('130 SAN RAFAEL WAY follows its L-shaped house and garage', () => {
     const f = farm('p-3250003');
     expect(f.name).toBe('130 SAN RAFAEL WAY');
@@ -289,4 +302,6 @@ describe('parcel tiles and building layer (test range)', () => {
 
 // C-55: + parcel tiles, tilejson template, map_layer, lighter buildings.geojson, building_area_ids in
 // the report; farms and index.geojson unchanged from C-49's fe8d03428ebb60e9b5f39d129c3ef24b39fe174483556cae7f7ad3b024f8ff05.
-const GOLDEN_MANIFEST_SHA256 = '654b2cfa15f7a80e6310aeb5151ddc9530bb42c2049056916d49846c3137d8ce';
+// C-92: building-raster-2 (exact coverage, exact core IoU, origin at 0.1 mm, extension used in stats):
+// 69 of 88 core counts change (mean core/footprint area 1.0125 → 1.0014); was 654b2cfa…37d8ce.
+const GOLDEN_MANIFEST_SHA256 = '96ced3f7a74321e6824bc644b91061d4cf53a51938d09676f97489159b3882e1';

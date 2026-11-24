@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:
 import path from 'node:path';
 import { slimPolygons } from './buildings.js';
 import { GENERATOR_VERSION, SCHEMA, type GeneratorParams } from './config.js';
-import { generateFarm } from './farm.js';
+import { generateFarm, LowIouError } from './farm.js';
 import { bounds, insideRings, polygonArea, rotate, round, toUtm, type Point, type Polygon } from './geo.js';
 import { DIRS, LayoutError, type Dir } from './layout.js';
 import { encodeTiles, MVT_ENCODER, resolveMapParams, type MapLayerParams, type TileFeature, type TileValue } from './mvt.js';
@@ -49,7 +49,8 @@ export interface BuildResult {
   /** Relative path → contents; tiles/*.pbf are binary, everything else is UTF-8 text. */
   files: Map<string, string | Uint8Array>;
   reports: ParcelReport[];
-  excluded: { block_id: string; reason: string }[];
+  /** `low_iou` rows also carry the core IoU and cell size that failed `min_core_iou`. */
+  excluded: { block_id: string; reason: string; core_iou?: number; cell_m?: number }[];
 }
 
 interface Projected { record: ParcelRecord; utm: Polygon[]; bounds: ReturnType<typeof bounds> }
@@ -249,7 +250,9 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
       }, p);
     } catch (error) {
       if (!(error instanceof LayoutError)) throw error;
-      excluded.push({ block_id: blockId, reason: `layout: ${error.message}` });
+      excluded.push(error instanceof LowIouError
+        ? { block_id: blockId, reason: 'low_iou', core_iou: round(error.iou, 4), cell_m: error.cell_m }
+        : { block_id: blockId, reason: `layout: ${error.message}` });
       continue;
     }
     const farmPath = `farms/${blockId}.json`;
@@ -286,9 +289,9 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
       parcel_area_m2: round(parcel.utm.reduce((s, poly) => s + polygonArea(poly), 0), 2),
       cell_m: result.cell_m, cell_area_m2: round(result.cell_m * result.cell_m, 4), rotation_deg: result.rotation_deg,
       core_cell_count: counts.core_cell_count, extension_cell_count: counts.extension_cell_count, total_cell_count: counts.total_cell_count,
-      core_iou: round(result.core.iou, 4), too_small: result.too_small, flags: result.flags,
+      core_iou: round(result.iou, 4), too_small: result.too_small, flags: result.flags,
     });
-    log(`${blockId} ${parcel.record.name}: ${counts.core_cell_count} core / ${counts.total_cell_count} total, cell ${result.cell_m} m, iou ${round(result.core.iou, 3)}`);
+    log(`${blockId} ${parcel.record.name}: ${counts.core_cell_count} core / ${counts.total_cell_count} total, cell ${result.cell_m} m, iou ${round(result.iou, 3)}`);
   }
   if (reports.length === 0) throw new Error('no farm could be generated');
 
