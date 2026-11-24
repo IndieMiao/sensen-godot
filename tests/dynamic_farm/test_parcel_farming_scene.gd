@@ -266,12 +266,19 @@ func _first_visit() -> void:
 
 func _reopen() -> void:
 	shift[0] += 20000
-	# The standalone package keeps Journey's zh_CN locale (P0's language setup never runs); the parcel stays English.
+	# The standalone package keeps Journey's zh_CN locale (P0's language setup never runs); the parcel stays English
+	# without touching the global locale, so Journey's own UI over it keeps the player's language (C-77).
 	var outside := TranslationServer.get_locale()
 	TranslationServer.set_locale("zh_CN")
 	var flaky := FlakyStore.new(_store(), 1)
 	var farming := await _open(flaky)
-	_check(TranslationServer.get_locale() == "en", "the parcel holds the locale at English while it is on screen")
+	_check(TranslationServer.get_locale() == "zh_CN", "the parcel leaves the global locale alone while it is on screen")
+	var overlay := Label.new()   # a global UI over the parcel, outside its non-translating tree
+	overlay.text = "Carrot"
+	root.add_child(overlay)
+	await process_frame
+	_check(overlay.can_auto_translate() and overlay.tr("Carrot") == "胡萝卜", "a global UI over the parcel still shows 中文")
+	overlay.queue_free()
 	_check(flaky.calls == 2 and not farming.unavailable and farming._key.verb != "Retry", "one lost entry request is retried without Retry")
 	_check(flaky.covered_at_call and not farming._cover.visible, "covered while entering, uncovered with the save applied")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
@@ -280,9 +287,12 @@ func _reopen() -> void:
 	var names: Array = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
 	_check(names == ["Starter Hoe", "Carrot Seeds", "Carrot"], "quick bar names stay English: %s" % [names])
 	scene.suspend()
-	_check(TranslationServer.get_locale() == "zh_CN", "suspended, the previous locale is back")
+	_check(TranslationServer.get_locale() == "zh_CN", "suspended, the locale is unchanged")
 	scene.resume()
-	_check(TranslationServer.get_locale() == "en", "resumed, English again")
+	await process_frame
+	_check(TranslationServer.get_locale() == "zh_CN", "resumed, the locale is still unchanged")
+	names = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
+	_check(names == ["Starter Hoe", "Carrot Seeds", "Carrot"], "resumed, quick bar names stay English: %s" % [names])
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
 	_check(farming._soil.counts().get("soil", 0) == 1, "tilled soil is still drawn")
 	var key: Array
@@ -292,7 +302,7 @@ func _reopen() -> void:
 	_check(key.size() == 3 and key[0] == "Growing", "still growing after reopening")
 	scene.queue_free()
 	await process_frame
-	_check(TranslationServer.get_locale() == "zh_CN", "leaving the parcel gives the previous locale back")
+	_check(TranslationServer.get_locale() == "zh_CN", "leaving the parcel leaves the locale unchanged")
 	TranslationServer.set_locale(outside)
 
 ## Texts of the gain floats on screen.

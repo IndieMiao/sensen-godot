@@ -100,8 +100,6 @@ var _grid: UiInventoryGrid
 var _picked_name: Label
 ## Items announced by the last gain (floats and flights): id -> count.
 var last_gains := {}
-## The locale before this UI held it at English (see hold_english); "" while not held.
-var _held_locale := ""
 var _side_button: Control
 var _redraw_left := 0.0
 var _names := {}
@@ -622,24 +620,6 @@ func close_bag() -> bool:
 	return true
 
 func bag_open() -> bool: return _drawer != null
-
-## The parcel's UI is English only (the scene does not auto-translate). The UI kit's quick bar names items through
-## TranslationServer itself (UiItemCell.quick_name, for the main farm's 中文), and this package never runs P0's
-## language setup, so the global locale may still be Journey's zh_CN: hold it at English while this UI is on screen
-## (the scene calls this as it suspends and resumes) and give the previous locale back when it is not.
-func hold_english(on: bool) -> void:
-	if on and _held_locale == "":
-		_held_locale = TranslationServer.get_locale()
-		if _held_locale != "en": TranslationServer.set_locale("en")
-	elif not on and _held_locale != "":
-		if TranslationServer.get_locale() == "en" and _held_locale != "en": TranslationServer.set_locale(_held_locale)
-		_held_locale = ""
-
-func _enter_tree() -> void:
-	hold_english(true)
-
-func _exit_tree() -> void:
-	hold_english(false)
 
 func _spacer(h: float) -> Control:
 	var c := Control.new()
