@@ -21,6 +21,7 @@ import zipfile
 from check_play_aab import CheckError, UPLOAD_CERT, verify, sha256, production_clean_source
 
 ROOT = Path(__file__).resolve().parents[2]
+KEEP_ADB = ROOT / 'tools/p0/godot_keep_adb.sh'
 FIRST_PLAY_CODE = 2026111401
 PRESET = 'Android Play'
 
@@ -157,6 +158,14 @@ def no_phone_and_free_adb(port):
         finally:
             sock.close()
 
+def godot_keep_adb(godot, directory, java_home):
+    """A copy of Godot whose own editor settings keep the adb server up after the export (godot_keep_adb.sh)."""
+    r = subprocess.run(['bash', '-c', 'set -euo pipefail; source "$0"; p0_godot_keep_adb "$1" "$2"; printf %s "$P0_GODOT"',
+                        str(KEEP_ADB), godot, str(directory)], env=dict(os.environ, JAVA_HOME=str(java_home)),
+                       stdout=subprocess.PIPE, text=True)
+    require(r.returncode == 0 and bool(r.stdout), 'Godot copy unavailable; see the message above')
+    return r.stdout
+
 def run_logged(argv, log, env, secrets_to_hide):
     """Only own recorded process group is stopped on interruption; no name-based process kills."""
     process = None
@@ -287,8 +296,11 @@ def main(argv=None):
     except FileExistsError as e:
         raise CheckError('another Play build or stale .build-lock exists; verify its recorded PID before removing') from e
     started_godot = False
+    copy_dir = None
     try:
         write_json(lock / 'owner.json', {'pid': os.getpid(), 'source_commit': source})
+        copy_dir = Path(tempfile.mkdtemp(prefix='p0play_godot.'))
+        godot = godot_keep_adb(godot, copy_dir, a.java_home.resolve())
         ledger = work / 'versions.json'
         history = json.loads(ledger.read_text()) if ledger.exists() else []
         check_next_code(history, code)
@@ -337,6 +349,8 @@ def main(argv=None):
             if started_godot:
                 subprocess.run([str(adb), '-P', str(a.adb_port), 'kill-server'], capture_output=True, timeout=10)
         finally:
+            if copy_dir is not None:
+                shutil.rmtree(copy_dir, ignore_errors=True)
             shutil.rmtree(lock)
 
 if __name__ == '__main__':
