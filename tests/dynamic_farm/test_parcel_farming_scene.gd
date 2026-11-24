@@ -141,7 +141,8 @@ func _first_visit() -> void:
 	var farming := await _open(flaky)
 	_check(flaky.calls == 2 and flaky.first_call_ready, "entry starts once the scene is up and retries a lost request once")
 	_check(flaky.covered_at_call, "the parcel is covered until the save is applied")
-	_check(farming.farm.is_empty() and farming._key.visible and farming._key.verb == "Retry", "a failed entry offers Retry")
+	_check(farming.farm.is_empty() and farming._keys.visible and farming._key.verb == "Retry", "a failed entry offers Retry")
+	_check(not farming._bar.visible, "no quick bar before the save is applied")
 	_check(farming._cover.visible and farming._cover_label.text == farming.get_script().OPEN_FAILED, "a failed entry stays covered and says so")
 	var spawn_at: Vector3 = scene._walk.position
 	scene._movement = Vector2(1, 0)
@@ -153,9 +154,14 @@ func _first_visit() -> void:
 	await process_frame
 	_check(not farming._cover.visible, "the cover lifts once the save is applied")
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("seed_carrot") == 3, "first entry: 1 hoe, 3 carrot seeds")
-	_check(farming._toast.current_text().begins_with("Received Starter Hoe ×1, Carrot Seeds ×3"), "the gift is announced")
+	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3}, "the gift is announced item by item")
+	_check(_floats(farming) == ["+1 Starter Hoe", "+3 Carrot Seeds"], "one float per gift item")
+	_check(_flights(farming) == 2, "each gift item flies into the bag")
+	_check(not farming._toast.current_text().begins_with("Received"), "no gift toast")
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
-	_check(farming._bag.get_child_count() == 2, "bag shows hoe and seeds")
+	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 3}, "quick bar shows hoe and seeds")
+	_check(farming._keys.tool_icon != null and not farming._keys.switch_visible, "the action key shows the hoe, no switch")
+	await _bag_drawer(farming)
 	var walk = scene._walk
 	# Clear a tree (a 2×2 block) with one press on a cell other than its anchor.
 	var tree := {}
@@ -206,6 +212,7 @@ func _first_visit() -> void:
 	_check(seen.moved < 0.01 and seen.clips.has("labour_sow"), "already beside it: no walk, the sow clip")
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(crop.get("ripe_at", 0) - crop.get("planted_at", 0) == 60000 and farming.farm.bag.seed_carrot == 2, "sown: 60 s to ripen, one seed used")
+	_check(_bar_counts(farming).get("seed_carrot") == 2, "the quick bar's seed count follows at once")
 	key = await _key(farming, cell)
 	_check(key[0] == "Growing" and key[1] in ["Ready in 1:00", "Ready in 0:59", "Ready in 0:58"] and key[2] == UiSceneAction.State.UNAVAILABLE, "growing counts down")
 	await _press(farming, cell)
@@ -240,7 +247,9 @@ func _first_visit() -> void:
 	_check(await _key(farming, cell) == ["Harvest", "Free", UiSceneAction.State.DEFAULT], "ripe after 60 s")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_harvest") and not seen.early, "harvest: beside the cell, the harvest clip")
-	_check(farming.farm.bag.get("crop_carrot") == 1 and farming._toast.current_text() == "+1 Carrot", "harvest goes to the bag")
+	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
+	_check("+1 Carrot" in _floats(farming) and _flights(farming) >= 1, "the harvest floats up and flies into the bag")
+	_check(_bar_counts(farming).get("crop_carrot") == 1, "the quick bar shows the carrot")
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crops.counts().get("C", 0) == 0, "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
 	await _press(farming, cell)
@@ -255,7 +264,8 @@ func _reopen() -> void:
 	_check(flaky.calls == 2 and not farming.unavailable and farming._key.verb != "Retry", "one lost entry request is retried without Retry")
 	_check(flaky.covered_at_call and not farming._cover.visible, "covered while entering, uncovered with the save applied")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
-	_check(not farming._toast.current_text().begins_with("Received"), "no second gift toast")
+	_check(farming.last_gains.is_empty() and _floats(farming).is_empty(), "no second gift announced")
+	_check(_bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 1, "crop_carrot": 1}, "the quick bar matches the save")
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
 	_check(farming._soil.counts().get("soil", 0) == 1, "tilled soil is still drawn")
 	var key: Array
@@ -264,6 +274,39 @@ func _reopen() -> void:
 		_check(farming.farm.crops[crop_key].ripe_at - farming.server_now() <= 40000, "the original ripening time is kept")
 	_check(key.size() == 3 and key[0] == "Growing", "still growing after reopening")
 	scene.queue_free()
+	await process_frame
+
+## Texts of the gain floats on screen.
+func _floats(farming: Node) -> Array:
+	return farming._ui.get_children().filter(func(n): return n is UiFloatText).map(func(n): return n.text)
+
+func _flights(farming: Node) -> int:
+	return farming._ui.get_children().filter(func(n): return n is UiItemFly).size()
+
+## id -> quantity on the quick bar.
+func _bar_counts(farming: Node) -> Dictionary:
+	var counts := {}
+	for slot in farming._bar.slots:
+		if slot is Dictionary and slot.has("id"): counts[slot.id] = slot.quantity
+	return counts
+
+## The Bag end opens the compact drawer with the bar docked in it; a cell shows its name; Close and Back close it.
+func _bag_drawer(farming: Node) -> void:
+	var home: Node = farming._bar.get_parent()
+	farming._bar.bag_requested.emit()
+	await process_frame
+	_check(farming.bag_open() and farming._bar.get_parent().get_parent() == farming._drawer.body and farming._bar.bag_open, "Bag opens the drawer, the quick bar docked on top")
+	var ids: Array = farming._grid.shown_items().map(func(it): return it.id)
+	_check(ids == ["hoe_starter", "seed_carrot"] and farming._grid.shown_items()[1].qty == 3, "the drawer lists the bag")
+	farming._grid.select("seed_carrot")
+	_check(farming._picked_name.text == "Carrot Seeds ×3", "a tapped cell shows its name")
+	farming._bar.close_requested.emit()
+	await process_frame
+	_check(not farming.bag_open() and farming._bar.get_parent() == home and not farming._bar.bag_open, "Close puts the bar back")
+	farming._bar.slot_tapped.emit("seed_carrot")
+	await process_frame
+	_check(farming.bag_open() and farming._grid.selected_id == "seed_carrot", "a slot opens the drawer on its item")
+	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the drawer first, the farm stays")
 	await process_frame
 
 func scene_data() -> Dictionary:

@@ -66,7 +66,7 @@ func _press(farming: Node, cell: Vector2i) -> void:
 func _first_visit() -> Vector2i:
 	var farming := await _open()
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("seed_carrot") == 3, "the server grants 1 hoe, 3 carrot seeds")
-	_check(farming._toast.current_text().begins_with("Received Starter Hoe ×1, Carrot Seeds ×3"), "the gift is announced")
+	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3}, "the gift is announced")
 	_check(absi(farming.server_now() - int(Time.get_unix_time_from_system() * 1000.0)) < 5000, "the clock follows server_time")
 	var obstacle := Vector2i(-1, -1)
 	for item: Dictionary in farming._core_plan.layout:
@@ -97,7 +97,7 @@ func _first_visit() -> Vector2i:
 func _reopen(cell: Vector2i) -> void:
 	var farming := await _open()
 	_check(farming.farm.bag.get("seed_carrot") == 2 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
-	_check(not farming._toast.current_text().begins_with("Received"), "no second gift toast")
+	_check(farming.last_gains.is_empty(), "no second gift announced")
 	_check(farming.farm.cleared.size() == 1 and ParcelFarm.key(cell) in farming.farm.tilled, "cleared and tilled cells come back")
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(crop.get("ripe_at", 0) > farming.server_now(), "the carrot is still growing")
@@ -107,7 +107,7 @@ func _reopen(cell: Vector2i) -> void:
 	await process_frame
 	_check(farming._key.verb == "Harvest", "ripe on the server clock")
 	await _press(farming, cell)
-	_check(farming.farm.bag.get("crop_carrot") == 1 and farming._toast.current_text() == "+1 Carrot", "the harvest is in the bag")
+	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "the harvest is in the bag")
 	var mine: ApiClient.Response = await client.request("GET", "/parcels/mine")
 	_check(mine.json.get("parcel", {}).get("farm", {}).get("bag", {}).get("crop_carrot") == 1.0, "and in the server save")
 	scene.queue_free()

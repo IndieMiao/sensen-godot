@@ -52,6 +52,7 @@ var _cloud_drift := 0.0
 var _saved_environment: Environment
 var _canvas: CanvasLayer
 var _controls: Control
+var _header: HBoxContainer
 var _title: Label
 var _status: Label
 var _movement := Vector2.ZERO
@@ -417,7 +418,6 @@ func _build_ui() -> void:
 	add_child(_canvas)
 	_controls = Controls.new()
 	_canvas.add_child(_controls)
-	_controls.top_exclusion_y = 102
 	_controls.movement_changed.connect(func(value: Vector2): _movement = value)
 	_controls.zoom_changed.connect(func(factor: float):
 		_zoom = clampf(_zoom*factor,0.8,1.4)
@@ -429,34 +429,45 @@ func _build_ui() -> void:
 			_focus = _actor.position
 			_overview = false
 			_place_camera())
-	var header := PanelContainer.new()
-	header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	header.offset_left = 12
-	header.offset_right = -12
-	header.offset_top = 12
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.96,0.97,0.93,0.94)
-	style.set_corner_radius_all(10)
-	style.set_content_margin_all(10)
-	header.add_theme_stylebox_override("panel",style)
-	_canvas.add_child(header)
-	var row := HBoxContainer.new()
-	header.add_child(row)
+	# Top bar in the main farm's UI kit (C-74): the 44 round back of ProfileTopBar / PageHeader (LOCK-22) and a
+	# surface chip with the parcel's name over its status line, at the HUD's place (x 10, y 16 + safe top).
+	_header = HBoxContainer.new()
+	_header.name = "TopBar"
+	_header.theme = UiKit.theme()
+	_header.add_theme_constant_override(&"separation", UiTokens.SPACE_WITHIN)
+	_header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_header.offset_left = UiTokens.SIZE_TODAY_PANEL_X
+	_header.offset_right = -UiTokens.SIZE_TODAY_PANEL_X
+	_header.offset_top = UiTokens.SIZE_HUD_TOP + _safe_top()
+	_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_canvas.add_child(_header)
+	var back := UiProfileTopBar._Round.new(UiProfileTopBar._Round.Glyph.BACK)
+	back.name = "Back"
+	back.tooltip_text = "Back"
+	back.pressed.connect(_request_back)
+	_header.add_child(back)
+	var chip := PanelContainer.new()
+	chip.name = "Place"
+	chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CHIP,
+		UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(12, 5, 12, 6))
+	_header.add_child(chip)
 	var labels := VBoxContainer.new()
-	labels.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(labels)
-	_title = _label("Dynamic farm",16)
+	labels.add_theme_constant_override(&"separation", 0)
+	labels.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_child(labels)
+	_title = UiKit.label("Dynamic farm", UiTokens.STYLE_C14_XB)
 	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_title.custom_minimum_size.x = 120
 	labels.add_child(_title)
-	_status = _label("Loading preview…",12)
+	_status = UiKit.label("Loading preview…", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	labels.add_child(_status)
-	var back := Button.new()
-	back.text = "Back"
-	back.custom_minimum_size = Vector2(64,44)
-	back.pressed.connect(_request_back)
-	row.add_child(back)
-	_hint = _label("Art preview · Walk and explore",12)
+	_controls.top_exclusion_y = UiTokens.SIZE_HUD_TOP + _safe_top() + UiTokens.SIZE_CLOSE + UiTokens.SPACE_PAGE
+	_hint = UiKit.label("Art preview · Walk and explore", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	_hint.theme = UiKit.theme()
 	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	_hint.offset_bottom = -12
 	_hint.offset_top = -34
@@ -464,18 +475,25 @@ func _build_ui() -> void:
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_hint)
 
+## Top system inset (status bar, notch) in UI units; 0 on desktop (as P0Ui.safe_top).
+func _safe_top() -> float:
+	if not is_inside_tree() or not (OS.has_feature("android") or OS.has_feature("ios")): return 0.0
+	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
+		get_viewport().get_visible_rect().size, 0.0).y
+
+## Screen point (canvas units) of `world` raised by `lift` metres: where a float or an item flight starts.
+func screen_point(world: Vector3, lift := 0.0) -> Vector2:
+	if _camera == null: return get_viewport().get_visible_rect().size * Vector2(0.5, 0.42)
+	return _camera.unproject_position(world + Vector3(0, lift, 0))
+
+func player_position() -> Vector3:
+	return _actor.position if _actor != null else Vector3.ZERO
+
 ## A tap on the ground picks that cell for the main key.
 func _on_tapped(at: Vector2) -> void:
 	if _farming == null or not _ready_sent or _camera == null or not _farming.loaded(): return
 	var hit = Plane(Vector3.UP, 0.0).intersects_ray(_camera.project_ray_origin(at), _camera.project_ray_normal(at))
 	if hit is Vector3: _farming.pick(_walk.cell_at(hit))
-
-func _label(text: String, size: int) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.add_theme_font_size_override("font_size",size)
-	label.add_theme_color_override("font_color",Color("314637"))
-	return label
 
 func _request_back() -> void:
 	if _back_sent: return
@@ -485,8 +503,13 @@ func _request_back() -> void:
 	back_requested.emit()
 
 func is_back_navigation_locked() -> bool:
+	if close_modal(): return true
 	_request_back()
 	return true
+
+## Closes the farming UI's open drawer (the bag); false when none was open.
+func close_modal() -> bool:
+	return _farming != null and _farming.close_bag()
 
 func suspend() -> void:
 	_suspended = true
