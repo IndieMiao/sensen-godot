@@ -4,6 +4,8 @@ extends Node3D
 ## free of Energy and coins. The store (server or local stand-in) is authoritative; this node
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
 ## Main-farm pieces are reused read-only: CropField for soil and carrots, P0 names and icons.
+## With a body (the scene, C-73) a press first walks the player beside the cell and plays the
+## main farm's labour clip; the command goes out with the clip and its result lands as it ends.
 signal state_changed(farm: Dictionary)
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -16,6 +18,11 @@ const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Spa
 	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds"}
 ## Crop stages follow server time; redraw them this often.
 const REDRAW_S := 0.25
+## How long one press's labour clip plays; the command's result is shown when it ends.
+const LABOUR_S := 1.2
+const UNREACHABLE := "Can't reach it"
+const LOADING := "Loading your farm…"
+const OPEN_FAILED := "Could not open your farm."
 
 var store: RefCounted
 var rules := {}
@@ -27,6 +34,8 @@ var picked = null
 var busy := false
 ## The farm could not be opened; the key offers Retry.
 var unavailable := false
+## The cell a press is walking to or working; the key keeps it while the press runs.
+var job = null
 
 var _data: Dictionary
 var _walk: RefCounted
@@ -51,10 +60,16 @@ var _toast: ToastLayer
 var _ui: Control
 var _redraw_left := 0.0
 var _names := {}
+## The scene: approach(cells) -> "ok" | "unreachable" | "cancelled", labour(verb, cells, seconds).
+var _body: Node
+## Hides the parcel until the save is applied: before it, cleared obstacles would still show.
+var _cover: ColorRect
+var _cover_label: Label
 
 ## `core` is the scene's built core obstacle layer: {plan, root, proxies, recipe?}.
-func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: RefCounted, canvas: CanvasLayer) -> void:
+func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: RefCounted, canvas: CanvasLayer, body: Node = null) -> void:
 	_data = data
+	_body = body
 	_walk = walk
 	_core_plan = core.plan
 	_recipe = core.get("recipe")
@@ -87,9 +102,11 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 func enter() -> void:
 	if rules.is_empty():
 		unavailable = true
-		_toast.show_toast("Could not open your farm.", ToastLayer.Severity.ERROR)
+		_cover_label.text = OPEN_FAILED
+		_toast.show_toast(OPEN_FAILED, ToastLayer.Severity.ERROR)
 		return
 	busy = true
+	_cover_label.text = LOADING
 	var result: Dictionary = await store.enter()
 	# Entering twice is safe (the gift is granted once); a lost request is retried once before Retry shows.
 	if result.get("code") == "NETWORK" and is_inside_tree(): result = await store.enter()
@@ -97,8 +114,10 @@ func enter() -> void:
 	if not is_inside_tree(): return
 	_adopt(result)
 	unavailable = farm.is_empty()
+	_cover.visible = unavailable
+	if unavailable: _cover_label.text = OPEN_FAILED
 	if not result.get("ok", false):
-		_toast.show_toast("Could not open your farm.", ToastLayer.Severity.ERROR)
+		_toast.show_toast(OPEN_FAILED, ToastLayer.Severity.ERROR)
 	elif result.get("granted", false):
 		var gifts := PackedStringArray()
 		for id: String in rules.welcome_gift:
@@ -118,10 +137,14 @@ func obstacle_cells() -> Dictionary:
 func server_now() -> int:
 	return int(Time.get_unix_time_from_system() * 1000.0) + _clock_offset_ms
 
-## Called by the scene every frame with the player's cell in front.
-func update(delta: float, facing_cell: Vector2i, moving: bool) -> void:
-	if moving: picked = null
-	target = picked if picked != null else facing_cell
+## The save is applied; until then the parcel stays covered and the player does not move.
+func loaded() -> bool:
+	return not farm.is_empty()
+
+## Called by the scene every frame with the player's cell in front; `steering`: the stick is in use.
+func update(delta: float, facing_cell: Vector2i, steering: bool) -> void:
+	if steering: picked = null
+	target = job if job != null else (picked if picked != null else facing_cell)
 	_redraw_left -= delta
 	if _redraw_left <= 0.0:
 		_redraw_left = REDRAW_S
@@ -164,13 +187,45 @@ func _on_key() -> void:
 	if not str(current.refusal).is_empty():
 		_toast.show_toast(_key.cost if current.refusal != Space.NOT_RIPE else "Not ripe yet", ToastLayer.Severity.REFUSED)
 		return
-	await send(current.command)
+	await work(target, current)
 
-## Sends one command; the store's reply replaces the local farm either way.
-func send(command: Dictionary) -> Dictionary:
+## One press on `cell` (C-73): walk beside it, face it, play the labour clip and send the command
+## with it. Nothing is sent when the player cannot get there or steers away first.
+func work(cell: Vector2i, action: Dictionary) -> Dictionary:
+	if _body == null: return await send(action.command)
 	busy = true
+	job = cell
+	var cells := work_cells(cell, action)
+	var reached: String = await _body.approach(cells)
+	if not is_inside_tree(): return {"ok": false, "code": "LEFT"}
+	if reached != "ok":
+		busy = false
+		job = null
+		if reached == "unreachable": _toast.show_toast(UNREACHABLE, ToastLayer.Severity.REFUSED)
+		return {"ok": false, "code": reached.to_upper()}
+	_body.labour(action.verb, cells, LABOUR_S)
+	var result := await send(action.command, LABOUR_S)
+	job = null
+	return result
+
+## The cells one press works: the whole block of an obstacle (a tree covers four), else the cell.
+func work_cells(cell: Vector2i, action: Dictionary) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	if action.get("verb") == "clear" and _obstacles.has(cell):
+		for at: Vector2i in _obstacles:
+			if _obstacles[at] == _obstacles[cell]: cells.append(at)
+	if cells.is_empty(): cells.append(cell)
+	return cells
+
+## Sends one command; the store's reply replaces the local farm either way. `hold_s`: the reply is
+## shown no sooner than this after sending (the labour clip's length).
+func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
+	busy = true
+	var shown_at := Time.get_ticks_msec() + int(hold_s * 1000.0)
 	var before: Dictionary = farm.get("bag", {}).duplicate()
 	var result: Dictionary = await store.send(farm_version, [command])
+	if is_inside_tree() and Time.get_ticks_msec() < shown_at:
+		await get_tree().create_timer((shown_at - Time.get_ticks_msec()) / 1000.0).timeout
 	busy = false
 	if not is_inside_tree(): return result
 	_adopt(result)
@@ -287,6 +342,22 @@ func _build_marker() -> void:
 	add_child(_marker)
 
 func _build_ui(canvas: CanvasLayer) -> void:
+	# Over the world and the stick, under the scene's header (Back) and the farming UI.
+	_cover = ColorRect.new()
+	_cover.name = "LoadingCover"
+	_cover.color = UiTokens.COLOR_SURFACE
+	_cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_cover.mouse_filter = Control.MOUSE_FILTER_STOP
+	canvas.add_child(_cover)
+	canvas.move_child(_cover, mini(1, canvas.get_child_count() - 1))
+	_cover_label = Label.new()
+	_cover_label.text = LOADING
+	_cover_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_cover_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_cover_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_cover_label.add_theme_font_size_override("font_size", 16)
+	_cover_label.add_theme_color_override("font_color", UiTokens.COLOR_TEXT)
+	_cover.add_child(_cover_label)
 	_ui = Control.new()
 	_ui.name = "FarmingUi"
 	_ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
