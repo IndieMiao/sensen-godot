@@ -2,6 +2,8 @@ package com.sensen.map
 
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.mapbox.bindgen.Value
@@ -33,6 +35,8 @@ internal class ParcelMapController(
     private var query: Cancelable? = null
     private val waiting = ParcelIdleWait<WaitingQuery>()
     private val buildingSelection = ParcelBuildingSelection()
+    private val buildingSource = ParcelBuildingsSource()
+    private var buildingSourceAddedAt = 0L
     private var cameraRevision = 0L
     private var mapIdle = false
     private var mapboxLoadFailed = false
@@ -44,6 +48,8 @@ internal class ParcelMapController(
     companion object {
         const val FILL = "gensen-parcel-fill"
         const val BUILDING_FILL = "gensen-parcel-building-fill"
+        /** C-118: one id for the life of the map, unlike the per-generation parcel sources (see ParcelBuildingsSource). */
+        const val BUILDINGS_SOURCE = "gensen-buildings-datasf"
         const val HIGHLIGHT_FILL = "gensen-selected-building-fill"
         const val ADDRESSES = "gensen-parcel-addresses"
         const val CLAIM_NAMES = "gensen-parcel-claim-names"
@@ -64,6 +70,7 @@ internal class ParcelMapController(
             if (!closed && state.active) {
                 query?.cancel(); query = null; waiting.drop(); hiddenPlaces.clear() // A new style has its own icons.
                 state.reloading(); mapIdle = false; mapboxLoadFailed = false; buildingSelection.clear(); sources.clear(); loaded.clear()
+                buildingSource.dropped() // The new style has none of our sources.
                 install()
             }
         }
@@ -73,6 +80,9 @@ internal class ParcelMapController(
         }
         subscriptions += map.subscribeSourceDataLoaded { event ->
             if (!closed && event.sourceId == "composite" && event.loaded == true) mapboxLoadFailed = false
+            if (!closed && event.sourceId == BUILDINGS_SOURCE && event.loaded == true && buildingSource.markLoaded()) {
+                buildingsLog("LOADED ms=${SystemClock.uptimeMillis() - buildingSourceAddedAt}")
+            }
             if (!closed && state.active && sources.containsValue(event.sourceId) && event.loaded == true) {
                 val changed = loaded.add(event.sourceId)
                 val becameReady = !state.ready && sources["parcels"] in loaded && state.loaded(state.epoch)
@@ -81,6 +91,7 @@ internal class ParcelMapController(
             }
         }
         subscriptions += map.subscribeMapLoadingError { event ->
+            if (!closed && event.sourceId == BUILDINGS_SOURCE) { buildingSource.markFailed(); buildingsLog("FAILED") }
             if (!closed && config?.buildingSource == "mapbox" && event.sourceId == "composite") {
                 mapboxLoadFailed = true
                 if (state.active) { emitReady(); error(state.generation, state.epoch, "building_load_failed") }
@@ -114,7 +125,7 @@ internal class ParcelMapController(
         removeLayers(style)
         val prefix = "gensen-parcels-${state.generation}-$turn"
         sources.putAll(mapOf("parcels" to prefix, "highlight" to "$prefix-highlight"))
-        if (cfg.buildingSource == "datasf") sources["buildings"] = "$prefix-buildings"
+        if (cfg.buildingSource == "datasf") sources["buildings"] = BUILDINGS_SOURCE else dropBuildings(style)
         val parcel = sources.getValue("parcels"); val highlight = sources.getValue("highlight")
         fun geoSource(id: String, data: Value): Boolean = !style.addStyleSource(id, Value(hashMapOf("type" to Value("geojson"), "data" to data))).isError
         fun layer(json: String): Boolean = !style.addStyleLayer(value(json), null).isError
@@ -142,7 +153,7 @@ internal class ParcelMapController(
             highlightSource = "$drawn,\"filter\":${ParcelPayload.buildingFilter("")}"
             // C-112: the buildings are hit-tested and coloured here only by their parcel's state (own, someone else's).
             val states = state.replay()
-            ok = geoSource(buildings, Value(cfg.buildingsUrl)) &&
+            ok = installBuildings(style, cfg.buildingsUrl) &&
                 layer("""{"id":"$BUILDING_FILL","type":"fill",$drawn,"paint":{"fill-color":${ParcelPayload.buildingColor(states)},"fill-opacity":${ParcelPayload.buildingOpacity(states)}}}""")
         }
         ok = ok && layer("""{"id":"$HIGHLIGHT_FILL","type":"fill",$highlightSource,"paint":{"fill-color":"${ParcelPayload.CLAIMABLE_COLOR}","fill-opacity":0.65}}""") &&
@@ -158,6 +169,24 @@ internal class ParcelMapController(
             if (!closed && state.accepts(turn) && !state.ready) error(state.generation, turn, "source_timeout")
         }, 20000)
     }
+    /** C-118: reuse the loaded or still-loading building source; fetch again only for a new URL, a failure or a new style. */
+    private fun installBuildings(style: Style, url: String): Boolean {
+        val plan = buildingSource.plan(url, style.styleSourceExists(BUILDINGS_SOURCE))
+        buildingsLog("$plan loaded=${buildingSource.loaded}")
+        when (plan) {
+            ParcelBuildingsSource.Plan.REUSE -> { if (buildingSource.loaded) loaded.add(BUILDINGS_SOURCE); return true }
+            ParcelBuildingsSource.Plan.REPLACE -> style.removeStyleSource(BUILDINGS_SOURCE) // Its layer went in removeLayers.
+            ParcelBuildingsSource.Plan.ADD -> Unit
+        }
+        buildingSource.added(url); buildingSourceAddedAt = SystemClock.uptimeMillis()
+        return !style.addStyleSource(BUILDINGS_SOURCE, Value(hashMapOf("type" to Value("geojson"), "data" to Value(url)))).isError
+    }
+    private fun dropBuildings(style: Style? = if (map.isValid()) map.style else null) {
+        if (style != null && style.styleSourceExists(BUILDINGS_SOURCE)) style.removeStyleSource(BUILDINGS_SOURCE)
+        buildingSource.dropped()
+    }
+    /** Counted by tools/dev/dynamic_farm/crash_repro.sh: one ADD per run, then only REUSE. */
+    private fun buildingsLog(text: String) = Log.i("GodotMapPlugin", "DYNAMIC_BUILDINGS_SOURCE $text")
     private fun emitReady() = ready(state.generation, state.epoch, JsonObject().apply {
         addProperty("source_ready", state.ready)
         addProperty("parcel_source_ready", sources["parcels"] in loaded)
@@ -307,7 +336,8 @@ internal class ParcelMapController(
     private fun removeLayers(style: Style? = if (map.isValid()) map.style else null) {
         if (style != null) {
             for (layer in LAYERS.reversed()) if (style.styleLayerExists(layer)) style.removeStyleLayer(layer)
-            for (id in sources.values) if (style.styleSourceExists(id)) style.removeStyleSource(id)
+            // The building source outlives its layer (C-118); only close() or a new URL/style drops it.
+            for (id in sources.values) if (id != BUILDINGS_SOURCE && style.styleSourceExists(id)) style.removeStyleSource(id)
         }
         restorePlaceIcons(style)
         sources.clear(); loaded.clear(); buildingSelection.clear()
@@ -318,7 +348,7 @@ internal class ParcelMapController(
         closed = true; query?.cancel(); query = null; waiting.drop()
         subscriptions.forEach { it.cancel() }; subscriptions.clear()
         handler.removeCallbacksAndMessages(null); config = null; claims = emptyMap()
-        removeLayers()
+        removeLayers(); dropBuildings()
     }
     private fun value(json: String): Value = requireNotNull(Value.fromJson(json).value)
 }

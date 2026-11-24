@@ -47,6 +47,7 @@ var _resume_tap := false
 var _failed_generation := -1 # Map being replaced by the automatic reload; its later signals are the same failure.
 var _buildings_left := -1.0 # Countdown for the DataSF building layer of the current map; -1 when not waiting.
 var _buildings_wait := false # The current DataSF map has not reported its building layer loaded; taps wait for it.
+var _buildings_started := 0 # When the current map's sources were set; the wait for its building layer is logged (C-118).
 var _view_zoom := -1.0 # Last camera zoom reported to camera_changed or tap; -1 until known.
 var _kind := ""
 var _key := ""
@@ -90,7 +91,8 @@ func activate(auto := false) -> void:
 	generation = MapBridge.next_parcel_generation(); style_generation = -1
 	busy = false; message = FINDING if _resume_tap else "Loading map details…"; changed.emit()
 	bridge.set_parcel_sources(generation, JSON.stringify(native))
-	if native.building_source == "datasf": _buildings_wait = true; _buildings_left = buildings_load_timeout()
+	if native.building_source == "datasf":
+		_buildings_wait = true; _buildings_left = buildings_load_timeout(); _buildings_started = Time.get_ticks_msec()
 
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; _retry_left = -1.0; _query_failed = false; map_ready = false; busy = false
@@ -108,7 +110,9 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 	if reset:
 		_pending = -1; _retry_left = -1.0; _query_failed = false; selection = {}; _options = []; _key = ""
 	style_generation = style
-	if data.get("buildings_source_ready") == true: _buildings_left = -1.0; _buildings_wait = false
+	if data.get("buildings_source_ready") == true:
+		if _buildings_wait: _record_load("buildings", "ready", _epoch, _buildings_started)
+		_buildings_left = -1.0; _buildings_wait = false
 	var was_ready := map_ready
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
 	if map_ready and _resume_tap and not _buildings_wait:
