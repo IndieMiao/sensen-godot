@@ -4,6 +4,9 @@ extends Node3D
 ## free of Energy and coins. The store (server or local stand-in) is authoritative; this node
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
 ## Main-farm pieces are reused read-only: CropField for soil and carrots, P0 names and icons.
+## Outer gathering (C-60, ParcelGather): near a tree, flower or rock of the extension the key
+## picks it by hand; a picked one stays faded (trees, rocks) or hidden (flowers, which never
+## block) until it grows back. Gathering never touches the walk, the layout or collision.
 ## With a body (the scene, C-73) a press first walks the player beside the cell and plays the
 ## main farm's labour clip; the command goes out with the clip and its result lands as it ends.
 signal state_changed(farm: Dictionary)
@@ -11,6 +14,8 @@ signal state_changed(farm: Dictionary)
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
+const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
+const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
 const CROP_CODES := {"crop_carrot": "C"}
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
 const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest"}
@@ -18,6 +23,11 @@ const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Spa
 	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds"}
 ## Crop stages follow server time; redraw them this often.
 const REDRAW_S := 0.25
+## How close (m, ground plane) the player must be to an outer object's bounds to gather it.
+const GATHER_REACH_M := 1.2
+## Gather refusals: grows back later, or tapped from too far away.
+const REGROWING := "regrowing"
+const TOO_FAR := "too_far"
 ## How long one press's labour clip plays; the command's result is shown when it ends.
 const LABOUR_S := 1.2
 const UNREACHABLE := "Can't reach it"
@@ -31,6 +41,10 @@ var farm_version := -1
 var target := Vector2i(-1, -1)
 var current := {}
 var picked = null
+## Index into `gatherables` of a tapped outer object, -1 when none (cleared when the player moves).
+var picked_object := -1
+## The parcel's gatherable outer objects (ParcelGather.objects), fixed for the visit.
+var gatherables: Array = []
 var busy := false
 ## The farm could not be opened; the key offers Retry.
 var unavailable := false
@@ -65,14 +79,27 @@ var _toast: ToastLayer
 var _ui: Control
 var _redraw_left := 0.0
 var _names := {}
+var _gather := {}
+var _outer_layout: Array = []
+var _outer_root: Node3D
+var _player := Vector3.ZERO
+var _facing := Vector3.ZERO
+var _placed := false
+## Layout indices drawn as gathered: index -> true.
+var _spent := {}
+var _spent_material: ShaderMaterial
+
 ## The scene: approach(cells) -> "ok" | "unreachable" | "cancelled", labour(verb, cells, seconds).
 var _body: Node
 ## Hides the parcel until the save is applied: before it, cleared obstacles would still show.
 var _cover: ColorRect
 var _cover_label: Label
 
-## `core` is the scene's built core obstacle layer: {plan, root, proxies, recipe?}.
-func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: RefCounted, canvas: CanvasLayer, body: Node = null) -> void:
+## `core` is the scene's built core obstacle layer: {plan, root, proxies, recipe}. `body` is the
+## scene (C-73), `outer` the drawn outer layer, {layout, root, recipe} (its walk profiles are
+## already bound).
+func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: RefCounted, canvas: CanvasLayer,
+		body: Node = null, outer := {}) -> void:
 	_data = data
 	_body = body
 	_walk = walk
@@ -87,6 +114,13 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 		_anchors[item.cell] = index
 		for cell: Vector2i in item.get("cells", [item.cell]): _obstacles[cell] = item.cell
 	_path = Space.protected_path(data)
+	_gather = Gather.rules()
+	if outer.get("root") is Node3D and outer.get("layout") is Array:
+		_outer_layout = outer.layout
+		_outer_root = outer.root
+		var recipe = outer.get("recipe")
+		var version := str(recipe.get("outer_groves", {}).get("version", "")) if recipe is Dictionary else ""
+		gatherables = Gather.objects(_outer_layout, walk, data.block_id, _gather, version)
 	_names = _item_names()
 	var bp := FarmBlueprint.new()
 	bp.cell_m = data.cell_m
@@ -146,19 +180,80 @@ func server_now() -> int:
 func loaded() -> bool:
 	return not farm.is_empty()
 
-## Called by the scene every frame with the player's cell in front; `steering`: the stick is in use.
-func update(delta: float, facing_cell: Vector2i, steering: bool) -> void:
-	if steering: picked = null
+## Called by the scene every frame with the player's cell in front; `steering`: the stick is in
+## use. For gathering, also the player's position and facing direction.
+func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, facing := Vector3.ZERO) -> void:
+	if steering:
+		picked = null
+		picked_object = -1
 	target = job if job != null else (picked if picked != null else facing_cell)
+	_placed = player is Vector3
+	if _placed:
+		_player = player
+		_facing = facing
 	_redraw_left -= delta
 	if _redraw_left <= 0.0:
 		_redraw_left = REDRAW_S
 		_draw_crops()
+		_draw_gathered()
 	_refresh_key()
 
-## A tap on the ground picks that cell until the player moves again.
-func pick(cell: Vector2i) -> void:
-	if _data.by_cell.has(cell): picked = cell
+## A tap picks an outer object under the ray (`from`, `dir`), else that ground cell, until the
+## player moves again. A tap landing on a core cell keeps that cell even when a tall outer
+## object's bounds stand in front of it on the slanted view (V-127).
+func pick(cell: Vector2i, from := Vector3.ZERO, dir := Vector3.ZERO) -> void:
+	var on_core: bool = _data.by_cell.has(cell) and _data.by_cell[cell].zone == "core"
+	picked_object = _object_on_ray(from, dir) if not on_core and not dir.is_zero_approx() else -1
+	if picked_object >= 0: picked = null
+	elif _data.by_cell.has(cell): picked = cell
+
+## The gatherable whose bounds the ray meets first, or -1.
+func _object_on_ray(from: Vector3, dir: Vector3) -> int:
+	var best := -1
+	var nearest := INF
+	for i in gatherables.size():
+		var hit = (gatherables[i].box as AABB).intersects_ray(from, dir)
+		if hit is Vector3 and from.distance_to(hit) < nearest:
+			nearest = from.distance_to(hit)
+			best = i
+	return best
+
+## Ground-plane distance from the player to an object's bounds.
+func gap(index: int) -> float:
+	var box: AABB = gatherables[index].box
+	var dx := maxf(maxf(box.position.x - _player.x, _player.x - box.end.x), 0.0)
+	var dz := maxf(maxf(box.position.z - _player.z, _player.z - box.end.z), 0.0)
+	return Vector2(dx, dz).length()
+
+## The tapped object, else the one in reach the player faces most; ready ones before regrowing ones.
+func gather_target() -> int:
+	if picked_object >= 0: return picked_object
+	if not _placed: return -1
+	var best := -1
+	var best_score := INF
+	var now := server_now()
+	for i in gatherables.size():
+		var distance := gap(i)
+		if distance > GATHER_REACH_M: continue
+		var to: Vector3 = gatherables[i].origin - _player
+		to.y = 0.0
+		var score := distance - (0.35 * _facing.dot(to.normalized()) if to.length() > 0.001 else 0.35)
+		if Gather.ready_at(_gather, farm, gatherables[i].id, now) > 0: score += 100.0
+		if score < best_score:
+			best_score = score
+			best = i
+	return best
+
+## The key for gathering object `index`: {verb, refusal, command, object, ready_in_ms?}.
+func _gather_action(index: int) -> Dictionary:
+	var object: Dictionary = gatherables[index]
+	var now := server_now()
+	var ready := Gather.ready_at(_gather, farm, object.id, now)
+	if ready > 0:
+		return {"verb": "gather", "refusal": REGROWING, "command": {}, "object": index, "ready_in_ms": ready - now}
+	if gap(index) > GATHER_REACH_M:
+		return {"verb": "gather", "refusal": TOO_FAR, "command": {}, "object": index}
+	return {"verb": "gather", "refusal": "", "command": {"type": "gather", "object": object.id}, "object": index}
 
 func _refresh_key() -> void:
 	if held:
@@ -166,6 +261,10 @@ func _refresh_key() -> void:
 		_key.visible = false
 		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
+	# A tapped object wins; a nearby one only when no cell was tapped and the cell in front has no step to do.
+	var object := -1 if farm.is_empty() else gather_target()
+	if object >= 0 and (picked_object >= 0 or (picked == null and (current.is_empty() or not str(current.refusal).is_empty()))):
+		current = _gather_action(object)
 	_marker.visible = not current.is_empty()
 	_key.visible = _marker.visible or farm.is_empty()
 	if unavailable and not busy:
@@ -177,12 +276,19 @@ func _refresh_key() -> void:
 		_key.state = UiSceneAction.State.PENDING
 		return
 	if current.is_empty(): return
-	_marker.position = _walk.point(target) + Vector3(0, 0.045, 0)
+	var spot: Vector3 = _walk.point(target)
+	if current.has("object"): spot = _walk.point(_walk.cell_at(gatherables[current.object].origin))
+	_marker.position = spot + Vector3(0, 0.045, 0)
 	var refused := not str(current.refusal).is_empty()
 	_marker_material.albedo_color = Color(0.86, 0.32, 0.25, 0.42) if refused else Color(1, 0.98, 0.86, 0.42)
 	if current.refusal == Space.NOT_RIPE:
 		_key.verb = "Growing"
 		_key.cost = P0Logic.key_ready(float(current.ripe_in_ms))
+	elif current.verb == "gather":
+		var item: String = gatherables[current.object].item
+		_key.verb = "Regrowing" if current.refusal == REGROWING else "Gather"
+		_key.cost = P0Logic.key_ready(float(current.ready_in_ms)) if current.refusal == REGROWING \
+			else "Move closer" if current.refusal == TOO_FAR else _names.get(item, item)
 	else:
 		_key.verb = VERBS[current.verb]
 		_key.cost = REFUSALS.get(current.refusal, _names.get(current.command.get("crop", ""), "Free"))
@@ -195,9 +301,18 @@ func _on_key() -> void:
 		return
 	if busy or current.is_empty(): return
 	if not str(current.refusal).is_empty():
-		_toast.show_toast(_key.cost if current.refusal != Space.NOT_RIPE else "Not ripe yet", ToastLayer.Severity.REFUSED)
+		var refusal := "Not ripe yet" if current.refusal == Space.NOT_RIPE else "Not ready yet" if current.refusal == REGROWING else _key.cost
+		_toast.show_toast(refusal, ToastLayer.Severity.REFUSED)
 		return
-	await work(target, current)
+	if current.verb == "gather": await gather(current)
+	else: await work(target, current)
+
+## One gather press (C-60): the object is already in reach, so the player only faces it and plays
+## the hand-picking (harvest) labour clip while the command goes out (C-73's beat, no walk).
+func gather(action: Dictionary) -> Dictionary:
+	if _body == null: return await send(action.command)
+	_body.labour("harvest", [_walk.cell_at(gatherables[action.object].origin)], LABOUR_S)
+	return await send(action.command, LABOUR_S)
 
 ## One press on `cell` (C-73): walk beside it, face it, play the labour clip and send the command
 ## with it. Nothing is sent when the player cannot get there or steers away first.
@@ -240,12 +355,14 @@ func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
 	if not is_inside_tree(): return result
 	_adopt(result)
 	if result.get("ok", false):
-		if command.type == "harvest":
-			for id: String in CROP_CODES:
+		if command.type in ["harvest", "gather"]:
+			for id: String in farm.bag:
 				var gained := int(farm.bag.get(id, 0)) - int(before.get(id, 0))
 				if gained > 0: _toast.show_toast("+%d %s" % [gained, _names.get(id, id)], ToastLayer.Severity.SUCCESS)
 	elif result.get("code") == "VERSION_CONFLICT":
 		_toast.show_toast("Your farm was updated. Try again.", ToastLayer.Severity.INFO)
+	elif result.get("code") == "NOT_RESPAWNED":
+		_toast.show_toast("Not ready yet", ToastLayer.Severity.REFUSED)
 	else:
 		_toast.show_toast("That didn't work.", ToastLayer.Severity.REFUSED)
 	return result
@@ -259,6 +376,7 @@ func _adopt(result: Dictionary) -> void:
 	farm_version = int(result.get("farm_version", farm_version))
 	_drop_cleared()
 	_draw_crops()
+	_draw_gathered()
 	_draw_bag()
 	state_changed.emit(farm.duplicate(true))
 
@@ -287,6 +405,45 @@ func _drop_cleared() -> void:
 	_core_root = art.root
 	for cell: Vector2i in _obstacles.keys():
 		if _removed.has(_obstacles[cell]): _obstacles.erase(cell)
+
+## Redraws the outer layer when the set of gathered objects changes: picked trees and rocks
+## fade, picked flowers (non-blocking) are hidden, all come back once grown. Art only: the walk
+## keeps every profile bound at load, so reach and collision never change.
+func _draw_gathered() -> void:
+	if _outer_root == null or farm.is_empty(): return
+	var now := server_now()
+	var spent := {}
+	for object: Dictionary in gatherables:
+		if Gather.ready_at(_gather, farm, object.id, now) > 0: spent[object.index] = true
+	if spent == _spent: return
+	var fresh := []
+	var faded := []
+	for i in _outer_layout.size():
+		if not spent.has(i): fresh.append(_outer_layout[i])
+		elif _outer_layout[i].solid: faded.append(_outer_layout[i])
+	var art := Scenery.build({"layout": fresh}, _walk, _recipe, false)
+	var picked_art := Scenery.build({"layout": faded}, _walk, _recipe, false)
+	if not art.ok or not picked_art.ok:
+		for built: Dictionary in [art, picked_art]:
+			if built.ok: built.root.free()
+		return
+	_spent = spent
+	for child in _outer_root.get_children():
+		_outer_root.remove_child(child)
+		child.queue_free()
+	for child in art.root.get_children():
+		art.root.remove_child(child)
+		_outer_root.add_child(child)
+	if _spent_material == null:
+		_spent_material = ShaderMaterial.new()
+		_spent_material.shader = GATHERED_SHADER
+	for child in picked_art.root.get_children():
+		picked_art.root.remove_child(child)
+		child.name = "Gathered" + child.name
+		(child as GeometryInstance3D).material_override = _spent_material
+		_outer_root.add_child(child)
+	art.root.free()
+	picked_art.root.free()
 
 func _draw_crops() -> void:
 	if farm.is_empty(): return
@@ -332,8 +489,12 @@ func _item_names() -> Dictionary:
 		names[str(crop.get("id", ""))] = str(crop.get("name", ""))
 		names[str(crop.get("seed", ""))] = str(crop.get("seed_name", ""))
 	names.merge(content.get("tools", {}).get("names", {}))
+	for id: String in content.get("materials", {}):
+		names[id] = str(content.materials[id].get("name", ""))
 	var wanted := {}
-	for id: String in BAG_ORDER + rules.get("welcome_gift", {}).keys():
+	var gathered_items := []
+	for source: Dictionary in _gather.get("sources", {}).values(): gathered_items.append(source.item)
+	for id: String in BAG_ORDER + rules.get("welcome_gift", {}).keys() + gathered_items:
 		if names.has(id) and not str(names[id]).is_empty(): wanted[id] = names[id]
 	return wanted
 

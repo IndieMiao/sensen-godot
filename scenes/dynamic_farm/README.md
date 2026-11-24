@@ -34,6 +34,14 @@ Packaging must also include `assets/farm/data/dynamic_farm.json` and the P0 cont
 
 Tests: `tests/dynamic_farm/test_parcel_farming.gd` (rules, commands, spatial rules, local save) and `test_parcel_farming_scene.gd` (the real scene; optional `-- <farm.json>`), both headless in the private preview project. `test_parcel_farming_server.gd -- <base …/v1> <owner token> <farm.json>` runs the scene against a running C-31 server on its real clock (~70 s; the owner has claimed that parcel and not entered it yet).
 
+## Outer gathering (C-60)
+
+The outer trees, flowers and rocks of one's own parcel (the C-20 outer groves) can be picked by hand, as the owner answered C-30#29 question 4 (recorded C-30#36): no tool, one Timber (`wood`) per tree, one Wild Herb (`wild_herb`) per flower and one Stone (`stone`) per rock, back after 24 h of server time. Items, amounts, the respawn time and each kind's cap are `economy.gather` in `assets/farm/data/dynamic_farm.json`, which the C-58 server validates; `modules/dynamic_farm/parcel_gather.gd` reads the same block. Names and icons are the main farm's existing materials (`Timber`, `Wild Herb`, `Stone`); no item is new.
+
+When the cell in front has no step to do and no cell was tapped, the main key turns to the outer object nearest the player (within `GATHER_REACH_M`, 1.2 m of its bounds on the ground, about a cell and a half) that the player faces most; a tap whose ray meets an object's bounds picks that object. The key reads `Gather` and the item name, `Gather · Move closer` for a tapped object out of reach, or `Regrowing · Ready in …` until it grows back. A press sends `{type:"gather", object}` without walking (the object is already in reach): with C-73's body the player faces it and plays the main farm's `harvest` labour clip, and the gain (`+1 Timber`) shows as the clip ends. Picked trees and rocks are redrawn faded (same model and pose, `gathered_prop.gdshader` washes out the vertex colours) and picked flowers, which never block, are hidden; the outer layer is redrawn when the picked set changes (`Scenery.build(..., bind=false)`), so the walk, the layout and collision stay exactly as loaded.
+
+Object ids follow C-58's contract (`docs/plans/C-58.md`): `<block id>:<outer_groves.version>:<model>:<x>,<y>:<ordinal>`, the origin's grid cell and the same model's ordinal in that cell in the drawn layout order. The ids lock the recipe's `outer_groves.version` (`outer-groves-v2`); a recipe whose version differs from `economy.gather.recipe_version` offers nothing to gather. `tools/dev/dynamic_farm/gather_qa_apk.sh` builds an x86_64 emulator QA package that opens one r4 parcel straight into one's own farm on the device save (`own_parcel_qa.tscn`); it is never a delivered package.
+
 ## First house (C-33, Q-40)
 
 Built on the own-parcel farm above (Q-44: one entry, save and protected path for both). The welcome gift's
