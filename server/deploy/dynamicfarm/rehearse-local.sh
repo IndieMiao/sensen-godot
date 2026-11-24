@@ -140,9 +140,9 @@ ops invites create --count 3 --batch rehearsal > "$R/secrets/invites.csv"
 ok "3 个账号写进受控文件（日志不打密码）"
 ops invites list
 # 用 script 给 ops.sh 一个终端做标准输出：应在连库之前就拒绝（输出整个丢弃，万一没拒绝也不留密码）。
-script -q /dev/null "$DEPLOY/ops.sh" invites create --count 1 --batch rehearsal > "$R/tty.out" 2>&1 || true
-# 终端会把多字节字符拆开，只核对 ASCII：拒绝信息里有 "invites create"，且没有输出 CSV 表头。
-grep -q 'invites create' "$R/tty.out" && ! grep -q 'email,password' "$R/tty.out" || fail "标准输出是终端时应拒绝"
+# 只看退出码（script 带回 ops.sh 的退出码）和有没有输出 CSV 表头：终端输出的时序和多字节字符都不可靠。
+rc=0; script -q /dev/null "$DEPLOY/ops.sh" invites create --count 1 --batch rehearsal > "$R/tty.out" 2>&1 || rc=$?
+[ "$rc" != 0 ] && ! grep -q 'email,password' "$R/tty.out" || fail "标准输出是终端时应拒绝"
 rm -f "$R/tty.out"
 [ "$(sql "SELECT count(*) FROM users")" = 3 ] || fail "被拒绝时不应建账号"
 ok "标准输出是终端时，create 在连库前被 ops.sh 拒绝，没有多建账号"
