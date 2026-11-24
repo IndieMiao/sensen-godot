@@ -7,6 +7,8 @@ const FakeServer := preload("res://modules/dynamic_farm/map/fake_parcel_server.g
 const Fixture := preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
 const OWN_FARM := "sensen/dynamic_farm/own_farm"
+const LOCAL_SAVE := "sensen/dynamic_farm/local_farm_save"
+const Farm := preload("res://modules/dynamic_farm/parcel_farm.gd")
 class Native extends MapBridge:
 	var states := {} # block_id -> {selected, claimed, own}, as native ParcelLayerState keeps them
 	var batches: Array = []
@@ -199,6 +201,7 @@ func _map_card() -> void:
 	selector.selection = {}
 	page._render()
 	check(page._details.text == page.PICK_HOME, "with a home, nothing selected: 'Tap your green parcel, then Enter my farm.'")
+	await _map_guide(page, selector, picked)
 	ProjectSettings.set_setting(OWN_FARM, false)
 	selector.selection = picked
 	page._render()
@@ -243,6 +246,52 @@ func _map_card() -> void:
 	check(not guest.signed_out and guest.mine_known and guest.status(ids[1]) == "none" and not page._sign_in.visible and page._claim.visible, "after signing in the card re-reads ownership and offers the claim")
 	page.queue_free(); selector.queue_free(); guest.queue_free()
 	await process_frame
+
+## C-61: the card names the next step done off the parcel (the home's save), and Market / Carpenter answer a tap at
+## once with Loading… before the town loads.
+func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
+	var home := str(page._claims.mine.parcel_id)
+	var carrot := {"v": 1, "house": {"x": 4, "y": 4, "width": 3, "depth": 3, "rotation": 0}, "cleared": [], "tilled": [],
+		"crops": {}, "bag": {"crop_carrot": 1}, "welcomed_at": 0}
+	page.home_farm = Farm.normalize(carrot); page._farm_parcel = "p-elsewhere"
+	page._render()
+	check(page._details.text == page.PICK_HOME, "a save of another parcel says nothing about this home")
+	page._farm_parcel = home
+	var lines := [[{}, "Tap Market to sell your carrot."],
+		[{"sales": 1, "bag": {}}, "Enter my farm and gather from trees, flowers and rocks."],
+		[{"sales": 1, "bag": {"wood": 2}, "gathered": {"x": 1}}, "Tap Market to sell what you gathered."],
+		[{"sales": 2, "bag": {}, "gathered": {"x": 1}}, "Tap Carpenter to get your coop blueprint."],
+		[{"sales": 2, "bag": {}, "gathered": {"x": 1}, "blueprints_claimed": {"coop": 1}}, page.PICK_HOME]]
+	for row: Array in lines:
+		var save: Dictionary = carrot.duplicate(true)
+		save.merge(row[0], true)
+		page.home_farm = Farm.normalize(save)
+		page._render()
+		check(page._details.text == row[1], "nothing selected, %s: '%s' (got '%s')" % [row[0], row[1], page._details.text])
+	page.home_farm = Farm.normalize(carrot)
+	selector.selection = home_pick
+	page._render()
+	check(page._details.text.ends_with("\nYour home\nTap Market to sell your carrot."), "the home selected: its card adds the next step")
+	selector.selection = {}
+	ProjectSettings.set_setting(LOCAL_SAVE, true) # the town reads the device save, not a server
+	page._render(); await process_frame
+	check(not page._carpenter.disabled and page._carpenter.text == "Carpenter", "with a home, Carpenter can be tapped")
+	page._carpenter.pressed.emit()
+	check(page._carpenter.text == page.TOWN_LOADING and page._carpenter.disabled and page._market.disabled and page._town == null,
+		"a tap shows Loading… on the entry at once, before the town loads")
+	page._market.pressed.emit()
+	check(page._market.text == "Market", "the other entry waits meanwhile")
+	await process_frame; await process_frame
+	check(page._town != null and page._town.who == "carpenter" and not page._hud.visible, "the next frame opens the carpenter over the map")
+	while page._town != null and page._town.busy: await process_frame
+	var seen: Dictionary = page._town.farm.duplicate(true)
+	page._town.close(); await process_frame
+	check(page._town == null and page._hud.visible and page._carpenter.text == "Carpenter" and not page._carpenter.disabled,
+		"closing the town brings the map's entries back")
+	check(page._farm_parcel == home and not seen.is_empty() and page.home_farm == seen, "the map keeps the save the town read for its line")
+	ProjectSettings.set_setting(LOCAL_SAVE, null)
+	page.home_farm = {}; page._farm_parcel = ""
+	page._render()
 
 ## Parcel ids the fake neighbour does not own.
 func _free_ids(server: RefCounted, count: int) -> Array:

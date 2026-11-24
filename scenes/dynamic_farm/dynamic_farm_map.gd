@@ -6,6 +6,7 @@ extends Control
 ## Two fixed entries, Market (Jasmine) and Carpenter (Scott), open over the map for a player with a home
 ## (C-59, C-30#29 question 1); they trade through that home's parcel save (parcel_town.gd). Like "Enter my farm"
 ## they are only in internal test packages (`own_farm`, C-59#29) until the release flow opens them (C-35 / C-61).
+## The guide (C-35, C-61) says on the bottom card where the next step is, from the home's parcel save (ParcelGuide).
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -19,6 +20,8 @@ const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 const TOWN := "res://scenes/dynamic_farm/parcel_town.gd"
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
+const ParcelFarm := preload("res://modules/dynamic_farm/parcel_farm.gd")
+const Guide := preload("res://modules/dynamic_farm/parcel_guide.gd")
 const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const OCCLUSION_COLOR := "#E7F0DF" # Existing scene BG_COLOR(.906, .941, .875), opaque RGB.
 const AREA_REFRESH_SECONDS := 0.8
@@ -26,6 +29,9 @@ const AREA_REFRESH_SECONDS := 0.8
 const PICK_PREVIEW := "Choose a parcel to explore in 3D."
 const PICK_FIRST := "Tap a building to choose your first home."
 const PICK_HOME := "Tap your green parcel, then Enter my farm."
+## A Market / Carpenter entry while its town loads (C-61, C-59#135: a cold start's first open took ~10 s).
+const TOWN_LOADING := "Loading…"
+const TOWN_NAMES := {"market": "Market", "carpenter": "Carpenter"}
 ## Development stand-in for the C-31 server, shared by map visits in one run.
 static var _fake_server: RefCounted
 var _selector: Node
@@ -44,6 +50,16 @@ var _sign_in: Button
 var _market: Button
 var _carpenter: Button
 var _town: Control
+## The town that is loading after a tap on Market / Carpenter (C-61: the tap shows Loading… at once), else "".
+var _town_loading := ""
+## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
+## a visit to the parcel.
+var home_farm := {}
+var _farm_parcel := ""
+var _farm_fresh := false
+var _farm_reading := false
+var _town_prepared := false
+var _town_script: GDScript
 var _area_timer: Timer
 var _area_generation := -1
 var _retry: Button
@@ -122,8 +138,8 @@ func _build_ui() -> void:
 	row.add_child(_button("San Francisco", _reset_area))
 	row.add_child(_button("Back", _leave))
 	var places := HBoxContainer.new(); places.visible = _own_farm_entry(); top.add_child(places)
-	_market = _button("Market", _open_town.bind("market")); _market.disabled = true; places.add_child(_market)
-	_carpenter = _button("Carpenter", _open_town.bind("carpenter")); _carpenter.disabled = true; places.add_child(_carpenter)
+	_market = _button(TOWN_NAMES.market, _open_town.bind("market")); _market.disabled = true; places.add_child(_market)
+	_carpenter = _button(TOWN_NAMES.carpenter, _open_town.bind("carpenter")); _carpenter.disabled = true; places.add_child(_carpenter)
 	var bottom := _panel(true)
 	_details = _label(PICK_PREVIEW, 16); bottom.add_child(_details)
 	_choices = OptionButton.new(); _choices.custom_minimum_size.y = 44; _choices.hide()
@@ -190,7 +206,9 @@ func _render() -> void:
 	else:
 		var p: Dictionary = _selector.selection
 		_details.text = "%s\n%d core · %d walk-only extension cells" % [p.name, p.core_cell_count, p.extension_cell_count]
-		if state == "mine": _details.text += "\nYour home"
+		if state == "mine":
+			_details.text += "\nYour home"
+			if not guide_line().is_empty(): _details.text += "\n" + guide_line()
 		elif state == "other":
 			var owner: String = _claims.owner_name(id)
 			_details.text += ("\nClaimed by %s" % owner) if not owner.is_empty() else "\n" + Claims.NO_NAME
@@ -204,15 +222,43 @@ func _render() -> void:
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
 	_sign_in.visible = _claims.signed_out and not id.is_empty() and not _fake_claims(); _sign_in.disabled = not idle
-	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null
+	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null and _town_loading.is_empty()
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
+	_market.text = TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market
+	_carpenter.text = TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter
+	if _own_farm_entry() and _claims.has_home():
+		_prepare_town()
+		_read_farm()
 	if _selector._options.is_empty(): _choices.hide()
 
 ## With nothing selected: where to go next (C-35) in a package that enters one's own farm, once the player's own
 ## parcel is known; otherwise the preview's line.
 func _no_selection() -> String:
 	if not _own_farm_entry() or not _claims.mine_known: return PICK_PREVIEW
-	return PICK_HOME if _claims.has_home() else PICK_FIRST
+	if not _claims.has_home(): return PICK_FIRST
+	return PICK_HOME if guide_line().is_empty() else guide_line()
+
+## The guide's step done off the parcel (C-61: Market, Carpenter, back to gather) for the home's save, or "".
+func guide_line() -> String:
+	if not _own_farm_entry() or _claims == null or not _claims.has_home(): return ""
+	if str(_claims.mine.get("parcel_id", "")) != _farm_parcel: return ""
+	return Guide.map_text(Guide.step(home_farm, int(Time.get_unix_time_from_system() * 1000.0)))
+
+## Reads the home's parcel save for the guide's line (no welcome gift), once per return to the map. Only with the
+## native map running (tests set `home_farm` themselves).
+func _read_farm() -> void:
+	if _farm_reading or _bridge == null or not _own_farm_entry() or _claims == null or not _claims.has_home(): return
+	var parcel := str(_claims.mine.parcel_id)
+	if _farm_fresh and parcel == _farm_parcel: return
+	_farm_reading = true
+	var result: Dictionary = await _farm_store(parcel, str(_claims.mine.get("dataset_version", ""))).read()
+	_farm_reading = false
+	if not is_inside_tree() or not _claims.has_home() or str(_claims.mine.parcel_id) != parcel: return
+	_farm_fresh = true # A failed read keeps the line it had; the next return to the map reads again.
+	var read := ParcelFarm.normalize(result.get("farm"))
+	if read.is_empty(): return
+	home_farm = read; _farm_parcel = parcel
+	_render()
 
 func _show_candidates(rows: Array) -> void:
 	_choices.clear(); _candidate_ids.clear()
@@ -250,16 +296,36 @@ func _open_sign_in() -> void:
 	if signed_in: _claims.forget()
 	_render()
 
-## The market or the carpenter over the map, trading through the player's own parcel save.
+## The market or the carpenter over the map, trading through the player's own parcel save. The tapped entry reads
+## Loading… and is drawn before anything loads: on a cold start the town's first open took seconds with no sign of
+## the tap (C-59#135).
 func _open_town(who: String) -> void:
-	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _town != null or _opening: return
+	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _town != null or _opening or not _town_loading.is_empty(): return
+	var tapped := Time.get_ticks_msec()
+	_town_loading = who
+	_render()
+	await get_tree().process_frame # the frame showing Loading… is drawn before this one starts
+	if not is_inside_tree() or _suspended or _leaving or _opening or not _claims.has_home():
+		_town_loading = ""; _render(); return
 	var home: Dictionary = _claims.mine
-	_town = load(TOWN).open(self, who, _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))), str(home.parcel_id))
-	_town.closed.connect(_town_closed)
+	if _town_script == null and _town_prepared: _town_script = ResourceLoader.load_threaded_get(TOWN)
+	if _town_script == null: _town_script = load(TOWN)
+	_town = _town_script.open(self, who, _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))), str(home.parcel_id))
+	_town_loading = ""
+	_town.closed.connect(_town_closed.bind(_town, str(home.parcel_id)))
 	_hud.hide(); _camera.input_enabled = false
+	await get_tree().process_frame
+	print("DYNAMIC_TOWN_OPEN ", JSON.stringify({"who": who, "shown_ms": Time.get_ticks_msec() - tapped}))
 
-func _town_closed() -> void:
+## The town's script and what it preloads load on a thread once the player has a home, so the first tap opens sooner.
+func _prepare_town() -> void:
+	if not _town_prepared and _town_script == null:
+		_town_prepared = ResourceLoader.load_threaded_request(TOWN) == OK
+
+func _town_closed(town: Control, parcel: String) -> void:
 	_town = null
+	if not town.farm.is_empty() and _claims != null and _claims.has_home() and str(_claims.mine.parcel_id) == parcel:
+		home_farm = town.farm; _farm_parcel = parcel; _farm_fresh = true
 	if _suspended or _leaving: return
 	_hud.show(); _render()
 
@@ -319,6 +385,7 @@ func _suspend_map(committing_preview: bool) -> void:
 func resume() -> void:
 	if _leaving: return
 	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT; _hud.show()
+	_farm_fresh = false # Back from the parcel: its save has moved on.
 	_presentation_epoch += 1
 	if _bridge != null:
 		get_viewport().transparent_bg = true

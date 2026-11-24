@@ -70,7 +70,7 @@ nearest clear point. Without `own_parcel` (the art preview) nothing of this show
 `tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
 Build, the wall, reopen (`--headless`: states only).
 
-## First-visit guide (C-35, 0.4.2)
+## First-visit guide (C-35, 0.4.2; C-61, 0.4.3)
 
 `modules/dynamic_farm/parcel_guide.gd` reads the next step of the first ten minutes from the save alone, so a parcel
 reopened halfway picks up at the same step: a Cottage Blueprint and no house -> `build`, a house and seeds ->
@@ -80,3 +80,13 @@ nothing once a carrot is in the bag or one has been sold. `ParcelFarming` shows 
 until the next step. On the map, a package that enters one's own farm (`own_farm`) says where to go with nothing
 selected (`Tap a building to choose your first home.` / `Tap your green parcel, then Enter my farm.`) and no longer
 shows the preview's `Explore and walk. Farming actions come later.` Copy and screenshots: `docs/plans/C-35.md`.
+
+0.4.3 (C-61) goes on from the first carrot, still from the save alone: a carrot in the bag and nothing sold yet ->
+`sell` (at the Market); sold once and nothing gathered -> `gather`; something gathered in the bag that the Market buys
+-> `sell_gathered`; gathered and sold -> `blueprint` (the Carpenter's coop blueprint); nothing once it is claimed. The
+parcel's card says where to go; the map reads the home's save (`GET /parcels/mine`, no gift) on each return and keeps
+the save the Market or Carpenter last saw, and its bottom card names the step done off the parcel (`Tap Market to sell
+your carrot.` …), with nothing selected or added under `Your home`. A tap on Market or Carpenter reads `Loading…` on
+that entry and is drawn before the town loads; the town's script (and the P0 keeper-portrait code it pulls in, ~1.3 s
+to compile on a desktop) loads on a thread once the player has a home. The map prints `DYNAMIC_TOWN_OPEN` with the
+time from the tap to the town on screen. Copy and screenshots: `docs/plans/C-61.md`.
