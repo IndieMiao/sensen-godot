@@ -79,6 +79,17 @@ const enter = (app: FastifyInstance, token: string) =>
 const GIFT = { hoe_starter: 1, seed_carrot: 3, blueprint_cottage: 1 };
 const command = (app: FastifyInstance, token: string, base_version: number, commands: object[]) =>
   app.inject({ method: 'POST', url: '/v1/parcels/mine/commands', headers: bearer(token), payload: { base_version, commands } });
+/** 认领、进入、种两颗萝卜并在 60 秒后收获；返回此时的 farm_version，时钟停在 T0 + 60 s。 */
+async function withCarrots(app: FastifyInstance, token: string, parcel: { parcel_id: string; center: number[] }): Promise<number> {
+  await claim(app, token, parcel);
+  await enter(app, token);
+  expect((await command(app, token, 1, [{ type: 'till', cell: '1,1' }, { type: 'till', cell: '2,1' },
+    { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, { type: 'sow', cell: '2,1', crop: 'crop_carrot' }])).statusCode).toBe(200);
+  clock = T0 + 60_000;
+  const res = await command(app, token, 2, [{ type: 'harvest', cell: '1,1' }, { type: 'harvest', cell: '2,1' }]);
+  expect(res.json().parcel.farm.bag.crop_carrot).toBe(2);
+  return 3;
+}
 const owners = (app: FastifyInstance, token: string, query: string) =>
   app.inject({ method: 'GET', url: `/v1/parcels?dataset_version=${DATASET}&${query}`, headers: bearer(token) });
 
@@ -262,6 +273,74 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await command(app, await account(app, 'Bob'), 0, [{ type: 'till', cell: '1,1' }])).json().code).toBe('NO_PARCEL');
     });
 
+    it('C-58 sell: too few is refused; a sale takes from the bag and pays the configured price, server-side only', async () => {
+      const ada = await account(app, 'Ada');
+      const v = await withCarrots(app, ada, A);
+      const short = await command(app, ada, v, [{ type: 'sell', item: 'crop_carrot', count: 3 }]);
+      expect(short.statusCode).toBe(422);
+      expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'crop_carrot', have: 2, need: 3 }, parcel: { farm_version: v, farm: { coins: 0 } } });
+      // A price in the request is ignored; the configured 12 applies.
+      const sold = await command(app, ada, v, [{ type: 'sell', item: 'crop_carrot', count: 2, price: 5000 }]);
+      expect(sold.statusCode).toBe(200);
+      expect(sold.json().parcel).toMatchObject({ farm_version: v + 1, farm: { coins: 24, sales: 1 } });
+      expect(sold.json().parcel.farm.bag.crop_carrot).toBeUndefined();
+      expect((await mine(app, ada)).farm).toMatchObject({ coins: 24, sales: 1 });
+      expect((await command(app, ada, v + 1, [{ type: 'sell', item: 'hoe_starter', count: 1 }])).json().code).toBe('NOT_SELLABLE');
+    });
+
+    it('C-58 the same request resent or sent many times at once pays, gathers and grants only once', async () => {
+      const ada = await account(app, 'Ada');
+      const v = await withCarrots(app, ada, A);
+      const sale = [{ type: 'sell', item: 'crop_carrot', count: 1 }];
+      // A lost response retried: the second copy carries the old base version and is refused.
+      expect((await command(app, ada, v, sale)).statusCode).toBe(200);
+      const retry = await command(app, ada, v, sale);
+      expect(retry.statusCode).toBe(409);
+      expect(retry.json()).toMatchObject({ code: 'VERSION_CONFLICT', parcel: { farm_version: v + 1, farm: { coins: 12, sales: 1 } } });
+      // Six identical copies at once: one lands.
+      const sales = await Promise.all(Array.from({ length: 6 }, () => command(app, ada, v + 1, sale)));
+      expect(sales.filter(r => r.statusCode === 200)).toHaveLength(1);
+      expect(sales.filter(r => r.statusCode === 409)).toHaveLength(5);
+      expect((await mine(app, ada)).farm).toMatchObject({ coins: 24, sales: 2 });
+      const tree = `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:41,7:0`;
+      const gathers = await Promise.all(Array.from({ length: 6 }, () => command(app, ada, v + 2, [{ type: 'gather', object: tree }])));
+      expect(gathers.filter(r => r.statusCode === 200)).toHaveLength(1);
+      const blueprints = await Promise.all(Array.from({ length: 6 }, () => command(app, ada, v + 3, [{ type: 'claim_blueprint', blueprint: 'coop' }])));
+      expect(blueprints.filter(r => r.statusCode === 200)).toHaveLength(1);
+      const after = await mine(app, ada);
+      expect(after).toMatchObject({ farm_version: v + 4, farm: { coins: 24, sales: 2, blueprints_claimed: { coop: T0 + 60_000 } } });
+      expect(after.farm.bag).toMatchObject({ wood: 1, blueprint_coop: 1 });
+      // Even with a fresh base version, a second gather or claim is refused.
+      expect((await command(app, ada, v + 4, [{ type: 'gather', object: tree }])).json().code).toBe('NOT_RESPAWNED');
+      expect((await command(app, ada, v + 4, [{ type: 'claim_blueprint', blueprint: 'coop' }])).json().code).toBe('BLUEPRINT_CLAIMED');
+    });
+
+    it('C-58 gather: only one\'s own parcel; respawn follows server time; the coop blueprint needs a sale first', async () => {
+      const ada = await account(app, 'Ada'), bob = await account(app, 'Bob');
+      await claim(app, ada, A);
+      await enter(app, ada);
+      await claim(app, bob, B);
+      await enter(app, bob);
+      const adaTree = `${A.parcel_id}:outer-groves-v2:wild_pz_pine_01:30,2:0`;
+      // Bob names Ada's tree: refused; Ada's farm is untouched.
+      const before = await mine(app, ada);
+      const theft = await command(app, bob, 1, [{ type: 'gather', object: adaTree }]);
+      expect(theft.statusCode).toBe(422);
+      expect(theft.json()).toMatchObject({ code: 'NOT_YOUR_PARCEL', parcel: { parcel_id: B.parcel_id } });
+      expect(await mine(app, ada)).toEqual(before);
+      expect((await command(app, ada, 1, [{ type: 'gather', object: 'p-3512001:outer-groves-v2:wild_pz_pine_01' }])).json().code).toBe('UNKNOWN_OBJECT');
+      expect((await command(app, ada, 1, [{ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_bush_05:30,2:0` }])).json().code).toBe('UNKNOWN_OBJECT');
+      expect((await command(app, ada, 1, [{ type: 'claim_blueprint', blueprint: 'coop' }])).json()).toMatchObject({ code: 'CONDITION_NOT_MET' });
+      expect((await command(app, ada, 1, [{ type: 'gather', object: adaTree }])).statusCode).toBe(200);
+      clock = T0 + 24 * 3600_000 - 1;
+      expect((await command(app, ada, 2, [{ type: 'gather', object: adaTree }])).json()).toMatchObject({ code: 'NOT_RESPAWNED', detail: { ready_at: T0 + 24 * 3600_000 } });
+      clock = T0 + 24 * 3600_000;
+      const again = await command(app, ada, 2, [{ type: 'gather', object: adaTree }, { type: 'sell', item: 'wood', count: 2 }, { type: 'claim_blueprint', blueprint: 'coop' }]);
+      expect(again.statusCode).toBe(200);
+      expect(again.json().parcel.farm).toMatchObject({ coins: 4, sales: 1, bag: { blueprint_coop: 1 } });
+      expect(again.json().parcel.farm.bag.wood).toBeUndefined();
+    });
+
     it('“abandon and pick again” is refused under the production configuration and leaves the parcel', async () => {
       expect(parcelReselectFromEnv({})).toBe(false);
       expect(parcelReselectFromEnv({ DYNAMIC_FARM_RESELECT: '0' })).toBe(false);
@@ -359,6 +438,64 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       const harvested = await command(restarted, ada, read.farm_version, [{ type: 'harvest', cell: '1,2' }]);
       expect(harvested.json().parcel.farm.bag.crop_carrot).toBe(1);
     } finally { await restarted.close(); await after.end(); }
+  });
+
+  it('C-58 coins and gather records written before a restart read back after it', async () => {
+    const before = new pg.Pool({ connectionString: DSN, max: 5 });
+    const app = await appFor(pgStores(before));
+    const ada = await account(app, 'Ada');
+    const v = await withCarrots(app, ada, A);
+    const tree = `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:41,7:0`;
+    expect((await command(app, ada, v, [{ type: 'sell', item: 'crop_carrot', count: 2 }, { type: 'gather', object: tree },
+      { type: 'claim_blueprint', blueprint: 'coop' }])).statusCode).toBe(200);
+    const saved = await mine(app, ada);
+    await app.close();
+    await before.end();
+
+    const after = new pg.Pool({ connectionString: DSN, max: 5 });
+    await migrate(after);
+    const restarted = await appFor(pgStores(after));
+    try {
+      const read = await mine(restarted, ada);
+      expect(read).toEqual(saved);
+      expect(read.farm).toMatchObject({ coins: 24, sales: 1, gathered: { [tree]: T0 + 60_000 }, blueprints_claimed: { coop: T0 + 60_000 },
+        bag: { wood: 1, blueprint_coop: 1 } });
+      expect((await command(restarted, ada, read.farm_version, [{ type: 'gather', object: tree }])).json().code).toBe('NOT_RESPAWNED');
+      expect((await command(restarted, ada, read.farm_version, [{ type: 'claim_blueprint', blueprint: 'coop' }])).json().code).toBe('BLUEPRINT_CLAIMED');
+    } finally { await restarted.close(); await after.end(); }
+  });
+
+  it('C-58 two server processes selling the same request at once: coins are paid once', async () => {
+    const other = new pg.Pool({ connectionString: DSN, max: 20 });
+    const one = await appFor(pgStores(pool!)), two = await appFor(pgStores(other));
+    try {
+      const ada = await account(one, 'Ada');
+      const v = await withCarrots(one, ada, A);
+      const results = await Promise.all(Array.from({ length: 10 }, (_, i) => command(i % 2 ? two : one, ada, v, [{ type: 'sell', item: 'crop_carrot', count: 1 }])));
+      expect(results.filter(r => r.statusCode === 200)).toHaveLength(1);
+      expect(results.filter(r => r.statusCode === 409)).toHaveLength(9);
+      const row = await pool!.query('SELECT farm_state, farm_version FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id]);
+      expect(row.rows[0]).toMatchObject({ farm_version: v + 1, farm_state: { coins: 12, sales: 1, bag: { crop_carrot: 1 } } });
+    } finally { await one.close(); await two.close(); await other.end(); }
+  });
+
+  it('C-58 a C-31 era save without coins reads as 0 coins and keeps everything else; the first sale writes the new fields', async () => {
+    const app = await appFor(pgStores(pool!));
+    try {
+      const ada = await account(app, 'Ada');
+      await claim(app, ada, A);
+      const legacy = { v: 1, house: { model: 'cottage', x: 6, y: 6, width: 3, depth: 3, rotation: 0, built_at: T0 }, cleared: ['1,2'], tilled: ['1,2'],
+        crops: {}, bag: { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1 }, welcomed_at: T0 };
+      await pool!.query('UPDATE parcel_claims SET farm_state = $1, farm_version = 4 WHERE parcel_id = $2', [JSON.stringify(legacy), A.parcel_id]);
+      expect((await mine(app, ada)).farm).toEqual({ ...legacy, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
+      // Re-entering an old save still gives no gift and does not rewrite it.
+      expect((await enter(app, ada)).json()).toMatchObject({ granted: false, parcel: { farm_version: 4 } });
+      expect((await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state).toEqual(legacy);
+      const sold = await command(app, ada, 4, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
+      expect(sold.statusCode).toBe(200);
+      const stored = (await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state;
+      expect(stored).toEqual({ ...legacy, bag: { hoe_starter: 1, seed_carrot: 2 }, coins: 12, sales: 1, gathered: {}, blueprints_claimed: {} });
+    } finally { await app.close(); }
   });
 
   it('deleting the account frees the parcel', async () => {

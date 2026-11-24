@@ -4,6 +4,8 @@ extends Node3D
 signal preview_ready(summary: Dictionary)
 signal preview_error(message: String)
 signal back_requested
+## An approach (C-73) ended: "ok", "unreachable" or "cancelled".
+signal approach_finished(result: String)
 
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
@@ -20,6 +22,7 @@ const House = preload("res://modules/dynamic_farm/farm_house.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const Placement = preload("res://scenes/dynamic_farm/house_placement.gd")
 const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
+const FarmPath = preload("res://modules/dynamic_farm/farm_path.gd")
 const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 ## Development only: keep the own-parcel farm on the device instead of the C-31 server.
@@ -28,6 +31,12 @@ const SPEED := 3.75
 ## Background cloud drift in screen widths per second; negative drifts left. A group
 ## crosses a 1080-pixel-wide screen in about 100 s.
 const CLOUD_DRIFT := 0.01
+## A route is given up when the player gains less than this share of the walking speed for
+## ROUTE_STUCK_S (something the route did not expect is in the way).
+const ROUTE_STUCK_RATIO := 0.2
+const ROUTE_STUCK_S := 0.5
+## Standing this close to a cell (centre to centre, in cells) is close enough to work it.
+const REACH_CELLS := 1.5
 
 var _args := {}
 var _data := {}
@@ -70,6 +79,12 @@ var _house: Node3D
 var _build: UiCommandButton
 var _placement: Placement
 var _sending := false
+var _paths: RefCounted
+## Waypoints of the current approach; the stick cancels it.
+var _route: Array[Vector3] = []
+var _route_stuck_s := 0.0
+## A labour clip is playing; the player holds still until it ends.
+var _labour_left := 0.0
 
 func setup(args: Dictionary) -> void:
 	_args = args.duplicate(true)
@@ -158,7 +173,8 @@ func _ready() -> void:
 			var net := get_tree().root.get_node_or_null("Net")
 			if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): store = LocalFarmStore.new(_data.block_id)
 			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
-		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas)
+		_paths = FarmPath.new(_walk)
+		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas, self)
 		_hint.hide()
 		_farming.state_changed.connect(_on_farm_changed)
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
@@ -204,6 +220,8 @@ func _refresh_build() -> void:
 
 func begin_house_placement() -> void:
 	if not _build.visible: return
+	# A press still walking to its cell is given up; one already working finishes under the preview.
+	if not _route.is_empty(): _end_route("cancelled")
 	_movement = Vector2.ZERO
 	_controls.reset()
 	_controls.process_mode = Node.PROCESS_MODE_DISABLED
@@ -348,30 +366,130 @@ func _process(delta: float) -> void:
 	var dt := clampf(delta,0,0.1)
 	var input := _movement
 	input = input.limit_length(1.0)
-	var right := _camera.global_basis.x
-	right.y = 0
-	var forward := -_camera.global_basis.z
-	forward.y = 0
-	var direction := right.normalized()*input.x-forward.normalized()*input.y
-	var previous: Vector3 = _walk.position
-	_walk.move(direction*SPEED*dt)
-	_actor.position = _walk.position
-	var moving := _actor.position.distance_to(previous) > 0.0001
-	# Turn toward the stick even when blocked, so the key can target what the player pushes against.
-	if not direction.is_zero_approx(): _facing = direction.normalized()
-	if moving:
-		_actor.look_at(_actor.position+direction,Vector3.UP)
-		_play("run")
+	# Until the save is applied the parcel is covered; the player waits at the arrival point.
+	if _farming != null and not _farming.loaded(): input = Vector2.ZERO
+	var steering := not input.is_zero_approx()
+	var moving := false
+	if _labour_left > 0.0:
+		# The labour clip holds the player still, stick or not (the main farm's labour beat).
+		_labour_left -= dt
+		if _labour_left <= 0.0: _play("idle")
 	else:
-		_play("idle")
+		if steering and not _route.is_empty(): _end_route("cancelled")
+		if not _route.is_empty():
+			moving = _follow_route(dt)
+		else:
+			var right := _camera.global_basis.x
+			right.y = 0
+			var forward := -_camera.global_basis.z
+			forward.y = 0
+			var direction := right.normalized()*input.x-forward.normalized()*input.y
+			var previous: Vector3 = _walk.position
+			_walk.move(direction*SPEED*dt)
+			_actor.position = _walk.position
+			moving = _actor.position.distance_to(previous) > 0.0001
+			# Turn toward the stick even when blocked, so the key can target what the player pushes against.
+			if not direction.is_zero_approx(): _facing = direction.normalized()
+			if moving:
+				_actor.look_at(_actor.position+direction,Vector3.UP)
+				_play("run")
+			else:
+				_play("idle")
 	if _farming != null:
-		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), moving or not input.is_zero_approx())
+		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), steering)
 	if not _overview:
 		var size := get_viewport().get_visible_rect().size
 		var safe := Rect2(size*Vector2(0.23,0.26),size*Vector2(0.54,0.48))
 		_focus += CameraRules.follow_shift(_camera,_actor.position,safe)
-		if input.is_zero_approx(): _focus = _focus.lerp(_actor.position,minf(dt*2.8,1.0))
+		if input.is_zero_approx() and _route.is_empty(): _focus = _focus.lerp(_actor.position,minf(dt*2.8,1.0))
 		_place_camera()
+
+## Walks the player beside `cells` (8 neighbours, sides preferred) and turns them to face the
+## cells, along a route around everything the walker collides with (C-73). Returns "ok" there,
+## "unreachable" when no route exists or the walk stalls, "cancelled" when the stick or a pause
+## ends it first. Already within reach, it only turns.
+func approach(cells: Array) -> String:
+	if _walk == null or cells.is_empty(): return "unreachable"
+	if not _route.is_empty(): _end_route("cancelled")
+	_paths.forget()
+	var goals: Dictionary = _paths.stand_cells(cells)
+	if goals.has(_walk.cell_at(_walk.position)) or _within_reach(cells):
+		_face_cells(cells)
+		return "ok"
+	var route: Array[Vector3] = _paths.route(_walk.position, goals)
+	if route.is_empty(): return "unreachable"
+	_route = route
+	_route_stuck_s = 0.0
+	var result: String = await approach_finished
+	if result == "ok": _face_cells(cells)
+	return result
+
+## Plays the main farm's labour clip for `verb` (AnimPlaceholders.clip_for) facing `cells`,
+## holding the player still for `seconds`. Presentation only: commands are the caller's.
+func labour(verb: String, cells: Array, seconds: float) -> void:
+	_face_cells(cells)
+	_labour_left = seconds
+	_play(AnimPlaceholders.clip_for(verb))
+	if AnimPlaceholders.is_placeholder(verb) and _rig != null: AnimPlaceholders.play_fallback(_rig, seconds)
+
+## Standing on a cell beside `cells`, not on one of them, near enough to reach.
+func _within_reach(cells: Array) -> bool:
+	var here: Vector2i = _walk.cell_at(_walk.position)
+	if here in cells: return false
+	for cell: Vector2i in cells:
+		var d: Vector2i = cell - here
+		if absi(d.x) <= 1 and absi(d.y) <= 1 and _walk.position.distance_to(_walk.point(cell)) <= REACH_CELLS * _walk.cell_m:
+			return true
+	return false
+
+func _face_cells(cells: Array) -> void:
+	var centre := Vector3.ZERO
+	for cell: Vector2i in cells: centre += _walk.point(cell)
+	var to: Vector3 = centre / cells.size() - _walk.position
+	to.y = 0
+	if to.length() < 0.01: return
+	_facing = to.normalized()
+	_actor.look_at(_actor.position + _facing, Vector3.UP)
+
+## One frame along the route at walking speed; true when the player moved.
+func _follow_route(dt: float) -> bool:
+	var previous: Vector3 = _walk.position
+	var budget := SPEED * dt
+	while budget > 0.00001 and not _route.is_empty():
+		var to: Vector3 = _route[0] - _walk.position
+		to.y = 0
+		var length := to.length()
+		if length <= budget:
+			_walk.move(to)
+			budget -= length
+			if _walk.position.distance_to(_route[0]) > 0.02: break
+			_route.pop_front()
+		else:
+			_walk.move(to / length * budget)
+			budget = 0.0
+	_actor.position = _walk.position
+	var step: Vector3 = _walk.position - previous
+	step.y = 0
+	if step.length() > 0.0001:
+		_facing = step.normalized()
+		_actor.look_at(_actor.position + _facing, Vector3.UP)
+		_play("run")
+	if _route.is_empty():
+		_play("idle")
+		_end_route("ok")
+	elif step.length() < SPEED * dt * ROUTE_STUCK_RATIO:
+		_route_stuck_s += dt
+		if _route_stuck_s >= ROUTE_STUCK_S:
+			_play("idle")
+			_end_route("unreachable")
+	else:
+		_route_stuck_s = 0.0
+	return step.length() > 0.0001
+
+func _end_route(result: String) -> void:
+	_route.clear()
+	_route_stuck_s = 0.0
+	approach_finished.emit(result)
 
 func _place_camera() -> void:
 	if _camera == null: return
@@ -466,7 +584,7 @@ func _build_ui() -> void:
 
 ## A tap on the ground picks that cell for the main key.
 func _on_tapped(at: Vector2) -> void:
-	if _farming == null or not _ready_sent or _camera == null: return
+	if _farming == null or not _ready_sent or _camera == null or not _farming.loaded(): return
 	var hit = Plane(Vector3.UP, 0.0).intersects_ray(_camera.project_ray_origin(at), _camera.project_ray_normal(at))
 	if hit is Vector3: _farming.pick(_walk.cell_at(hit))
 
@@ -492,6 +610,8 @@ func is_back_navigation_locked() -> bool:
 func suspend() -> void:
 	_suspended = true
 	end_house_placement()
+	if not _route.is_empty(): _end_route("cancelled")
+	_labour_left = 0.0
 	_movement = Vector2.ZERO
 	_controls.reset()
 	_canvas.visible = false
