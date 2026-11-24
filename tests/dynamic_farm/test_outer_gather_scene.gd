@@ -111,9 +111,26 @@ func _key(farming: Node) -> Array:
 	await process_frame
 	return [farming._key.verb, farming._key.cost, farming._key.state]
 
-func _press(farming: Node) -> void:
+## Presses the key and waits for the press to finish (C-73: a gather plays the harvest labour
+## clip and its result lands as the clip ends). Returns {clips, moved, early} as in
+## test_parcel_farming_scene: the rig's animations while busy, the distance walked and whether
+## the farm changed while the clip was still playing.
+func _press(farming: Node) -> Dictionary:
+	var seen := {"clips": {}, "moved": 0.0, "early": false}
+	var start: Vector3 = scene._walk.position
+	var version: int = farming.farm_version
+	var player := scene._rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	farming._key.pressed_down.emit()
-	for i in 4: await process_frame
+	await process_frame
+	var deadline := Time.get_ticks_msec() + 30000
+	while farming.busy and Time.get_ticks_msec() < deadline:
+		if player != null: seen.clips[player.current_animation] = true
+		if scene._labour_left > 0.0 and farming.farm_version != version: seen.early = true
+		await process_frame
+	_check(not farming.busy, "a press finishes")
+	for i in 2: await process_frame
+	seen.moved = start.distance_to(scene._walk.position)
+	return seen
 
 ## Picks the first standable object of each kind and gathers it. Returns {kind: id}.
 func _first_visit() -> Dictionary:
@@ -160,7 +177,9 @@ func _first_visit() -> Dictionary:
 		var key := await _key(farming)
 		_check(key == ["Gather", ITEMS[kind][1], UiSceneAction.State.DEFAULT], "beside a %s the key reads Gather %s" % [kind, ITEMS[kind][1]])
 		var had := int(farming.farm.bag.get(ITEMS[kind][0], 0))
-		await _press(farming)
+		var seen := await _press(farming)
+		_check(seen.clips.has("labour_harvest") and not seen.early and seen.moved < 0.01,
+			"gathering a %s: no walk, the harvest clip, the result as it ends (%s)" % [kind, seen])
 		_check(int(farming.farm.bag.get(ITEMS[kind][0], 0)) == had + 1, "one %s in the bag" % ITEMS[kind][0])
 		_check(farming._toast.current_text() == "+1 " + ITEMS[kind][1], "the gain is announced (%s)" % kind)
 		_check(farming._bag.has_node(ITEMS[kind][0]), "%s shows in the bag row" % ITEMS[kind][0])
