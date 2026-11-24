@@ -13,7 +13,7 @@ services:
       DATABASE_URL: postgres://dynamicfarm:${POSTGRES_PASSWORD:?需要 POSTGRES_PASSWORD}@postgres:5432/sensen_dynamicfarm
       GIT_SHA: ${GIT_SHA:?需要 GIT_SHA}
       # 正式配置写死在这里：compose 的 environment 优先于 env_file，.env 里写了同名项也不生效。
-      # 只用邀请账号（邮箱注册、Apple / Google 首登建号都关）；游客只读；不开放“放弃并重选”；不用 QA 固定验证码。
+      # 只用邀请账号（邮箱注册关；Apple / Google 登录整个关）；游客只读；不开放“放弃并重选”；不用 QA 固定验证码和 QA 玩家。
       ACCOUNT_SIGNUP: closed
       GUEST_WRITES: "0"
       DYNAMIC_FARM_RESELECT: "0"
@@ -21,6 +21,7 @@ services:
       APPLE_BUNDLE_IDS: ""
       QA_EMAIL_DOMAIN: ""
       QA_EMAIL_CODE: ""
+      QA_PLAYER_IDS: ""
       EMAIL_LOG_CODES: "0"
       NODE_OPTIONS: --network-family-autoselection-attempt-timeout=1500
     depends_on:

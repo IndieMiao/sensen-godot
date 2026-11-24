@@ -98,7 +98,10 @@ case "$sub" in
   exec)
     [ "$1" = -T ] && shift
     svc="$1"; shift
-    if [ "$svc" = postgres ]; then env "${pgenv[@]}" PATH="$PGBIN:$PATH" "$@"
+    # 容器里的 -h 127.0.0.1（走 TCP）换成本机临时库的套接字。
+    if [ "$svc" = postgres ]; then
+      args=(); while [ $# -gt 0 ]; do if [ "$1" = -h ]; then shift 2; else args+=("$1"); shift; fi; done
+      env "${pgenv[@]}" PATH="$PGBIN:$PATH" "${args[@]}"
     else d=$(appdir); cd "$d" && runapp "$@"; fi ;;
   *) echo "docker 替身不支持 compose $sub" >&2; exit 2 ;;
 esac
@@ -128,7 +131,7 @@ ops deploy "$HEAD_SHA" "$(image_id "$HEAD_SHA")"
 ok "建表后 public 下 $(sql "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'") 张表；服务日志：$(grep -o 'farm-server listening.*' "$R/app.log" | tail -n1 | sed 's/content=[^ ]* //')"
 
 step "只读冒烟（没有账号）：健康检查、自助注册被拒、游客能读不能认领"
-ops smoke "http://127.0.0.1:$APP_PORT/v1" < /dev/null
+ops smoke "http://127.0.0.1:$APP_PORT/v1"
 
 step "邀请账号：ops.sh invites create，输出重定向到受控文件（0600）"
 ops invites create --count 3 --batch rehearsal > "$R/secrets/invites.csv"
@@ -154,7 +157,7 @@ ok "存档：$(sql "SELECT string_agg(parcel_id || ' v' || farm_version, ', ' OR
 step "备份：ops.sh backup（pg_dump → 临时库试恢复并记行数和指纹 → age 加密）"
 BACKUP=$(ops backup rehearsal)
 ok "$(basename "$BACKUP")；记下：$(tr '\n' ' ' < "${BACKUP%.dump*}.counts")"
-[ -z "$(ls "$(dirname "$BACKUP")"/*.dump 2>/dev/null)" ] || fail "加密后不应留下明文 dump"
+[ -z "$(ls "$(dirname "$BACKUP")"/*.dump* 2>/dev/null | grep -v "\.dump\.age$")" ] || fail "加密后不应留下明文 dump"
 
 step "删库：停 app，DROP DATABASE sensen_dynamicfarm"
 docker compose stop app

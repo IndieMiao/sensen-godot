@@ -70,7 +70,7 @@ describe('dynamic farm deploy files', () => {
   const ops = readFileSync(path.join(DEPLOY, 'ops.sh'), 'utf8');
   const FORCED: Record<string, string> = {
     ACCOUNT_SIGNUP: 'closed', GUEST_WRITES: '"0"', DYNAMIC_FARM_RESELECT: '"0"', GOOGLE_CLIENT_IDS: '""', APPLE_BUNDLE_IDS: '""',
-    QA_EMAIL_DOMAIN: '""', QA_EMAIL_CODE: '""', EMAIL_LOG_CODES: '"0"',
+    QA_EMAIL_DOMAIN: '""', QA_EMAIL_CODE: '""', QA_PLAYER_IDS: '""', EMAIL_LOG_CODES: '"0"',
   };
 
   it('pins the production switches in compose and keeps them out of the .env template', () => {

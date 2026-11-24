@@ -10,11 +10,11 @@
   - 不加入 P0 或旧 farm 的网络，不挂它们的卷，不连 P0 演示服的数据。
   - 只有 app 在主机回环地址 `127.0.0.1:3160` 发布端口；数据库不发布端口。
 - **正式配置**：以下设置写死在 `compose.yml`，`.env` 里写同名项不生效。`ops.sh check` 发现 `.env` 里有这些项会拒绝。
-  - 只用邀请账号（`ACCOUNT_SIGNUP=closed`）：邮箱自助注册，以及 Apple、Google 首次登录建号，都返回 403 `SIGNUP_CLOSED`。
+  - 只用邀请账号（`ACCOUNT_SIGNUP=closed`）：邮箱自助注册返回 403 `SIGNUP_CLOSED`。
+  - Google 和 Apple 登录整个关闭，返回 503 `GOOGLE_UNAVAILABLE` / `APPLE_UNAVAILABLE`。以后如果打开它们，`ACCOUNT_SIGNUP=closed` 仍然不让首次登录建号（403 `SIGNUP_CLOSED`），已有账号照常登录。
   - 游客只读：认领和存档返回 401 `LOGIN_REQUIRED`。
   - “放弃并重选”关闭：返回 403 `RESELECT_DISABLED`。
-  - Google 和 Apple 登录关闭。
-  - 不用 QA 固定验证码，验证码不写进日志。
+  - 不用 QA 固定验证码和 QA 玩家，验证码不写进日志。
 - **数据**：从空库开始，不搬内网测试服的数据（C-95#5）。
 
 ## 入口路径
@@ -42,10 +42,10 @@ handle_path /dynamicfarm/* {
 
 | 类别 | 名字 |
 |---|---|
-| `.env` 必填 | `POSTGRES_PASSWORD`、`TOKEN_PEPPER`、`TRUSTED_PROXIES`、`INVITE_EMAIL_DOMAIN`、`PG_IMAGE` |
+| `.env` 必填 | `POSTGRES_PASSWORD`、`TOKEN_PEPPER`、`TRUSTED_PROXIES`、`INVITE_EMAIL_DOMAIN`、`PG_IMAGE`、`AGE_RECIPIENT` |
 | `ops.sh deploy` / `rollback` 写入，不要手改 | `APP_IMAGE`、`APP_IMAGE_ID`、`GIT_SHA` |
-| `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`AGE_RECIPIENT`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`SMTP_URL`、`MAIL_FROM` |
-| `compose.yml` 写死 | `ACCOUNT_SIGNUP`、`GUEST_WRITES`、`DYNAMIC_FARM_RESELECT`、`GOOGLE_CLIENT_IDS`、`APPLE_BUNDLE_IDS`、`QA_EMAIL_DOMAIN`、`QA_EMAIL_CODE`、`EMAIL_LOG_CODES`、`NODE_OPTIONS`、`DATABASE_URL` |
+| `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`SMTP_URL`、`MAIL_FROM` |
+| `compose.yml` 写死 | `ACCOUNT_SIGNUP`、`GUEST_WRITES`、`DYNAMIC_FARM_RESELECT`、`GOOGLE_CLIENT_IDS`、`APPLE_BUNDLE_IDS`、`QA_EMAIL_DOMAIN`、`QA_EMAIL_CODE`、`QA_PLAYER_IDS`、`EMAIL_LOG_CODES`、`NODE_OPTIONS`、`DATABASE_URL` |
 | 只在操作员一侧，恢复加密备份时用 | `AGE_IDENTITY`（age 私钥文件的路径；私钥不放在服务器上） |
 
 ## 主机资源需求
@@ -58,7 +58,7 @@ handle_path /dynamicfarm/* {
 | CPU | app 上限 1 核；平时空闲，认领和存档都是单条 SQL 事务 |
 | 磁盘 | 每个版本的镜像约 0.5 GB，保留当前版和上一版 → 约 1 GB；库（演练 8.4 MB，每块地的存档只有几 KB）；本机备份 14 份（演练每份加密后约 36 KB）。合计预留 5 GB 足够 |
 | 端口 | 只占 `127.0.0.1:3160`（`DF_HOST_PORT` 可改） |
-| 软件 | Docker 和 compose v2、curl、`sha256sum`；备份要加密时还要 age |
+| 软件 | Docker 和 compose v2、curl、`sha256sum`、age |
 
 P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `free -m`、`df -h`、`docker stats --no-stream` 和 `uname -m`（镜像要按主机架构构建）。不够时，加主机的费用先请所有者批。
 
@@ -85,7 +85,7 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 7. **建邀请账号**：见下文“邀请账号”。
 8. **定时备份**：在主机 crontab 加一行 `30 3 * * * /opt/dynamicfarm/ops.sh backup >> /opt/dynamicfarm/backup.log 2>&1`。异地副本交给主机现有的备份方案（美西的备份归迁移方），复制的是 `backups/` 下的 `*.dump.age` 和同名的 `*.counts`。
 
-`ops.sh` 的每一步都单独运行，出错就停下，不会自动回滚。
+`ops.sh` 的每一步都单独运行，出错就停下，不会自动回滚。会改东西的步骤（`load`、`deploy`、`init-db`、`rollback`、`backup`、`restore`）互斥：同时只能跑一个，另一个直接报错退出（例如定时备份撞上手工部署）。步骤被强行杀掉留下的锁目录 `.ops.lock`，确认没有 `ops.sh` 在跑后手工删掉。
 
 ## 升级
 
@@ -93,7 +93,7 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 
 ## 回滚
 
-- **只换回镜像**：`./ops.sh rollback`，回到发布记录（`releases.log`）里最近一个和当前不同的版本；也可以写明 `./ops.sh rollback <提交号>`。新版加的表和列会留着，旧版不读它们，照常工作。
+- **只换回镜像**：`./ops.sh rollback`，回到当前版本部署之前的那一版（按 `releases.log` 里的 deploy 记录）；也可以写明 `./ops.sh rollback <提交号>`。已经回滚过一次时（最后一条记录是回滚），必须写明提交号，脚本不猜。新版加的表和列会留着，旧版不读它们，照常工作。
 - **连数据一起回到升级前**：
   ```
   AGE_IDENTITY=<私钥文件> ./ops.sh rollback <旧提交号> --restore backups/dynamicfarm-<时间>-pre-<新版前12位>.dump.age
@@ -107,15 +107,15 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 
 1. `pg_dump -Fc`。
 2. 在同一个数据库实例里建临时库 `sensen_dynamicfarm_verify`，真恢复一遍，从恢复出来的库算行数和指纹，写进同名的 `.counts`，然后删掉临时库。指纹包括账号、玩家、认领的条数，以及账号和地块存档的 md5。
-3. 配了 `AGE_RECIPIENT` 就加密成 `.dump.age`，删掉明文。
+3. 用 `AGE_RECIPIENT` 加密成 `.dump.age`，删掉明文（备份里有邮箱和密码哈希，一律加密）。中途失败时，写了一半的文件在退出时删掉。
 4. 本机保留最近 `DF_BACKUP_KEEP` 份（默认 14）。
 
 所有文件都是 0600，目录是 0700。
 
 `AGE_IDENTITY=<私钥文件> ./ops.sh restore <备份> --confirm-drop` 依次做这几件事：
 
-1. 停 app。
-2. 先把当前的库备份一份（标签 `pre-restore`）。
+1. 读出 `.counts`，把备份解密到备份目录里的临时文件；停 app。
+2. 先把当前的库备份一份（标签 `pre-restore`）。这一份不做轮换，不会删掉正要恢复的备份。
 3. 删库、重建。
 4. `pg_restore`。
 5. 核对行数和指纹，必须和 `.counts` 完全一致，不一致就让 app 保持停止。
@@ -131,8 +131,10 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 |---|---|
 | 建一批 | `ssh <主机> '/opt/dynamicfarm/ops.sh invites create --count 20 --batch wave-1' > <受控目录>/dynamicfarm-wave-1.csv` |
 | 列出（不含密码） | `ssh <主机> '/opt/dynamicfarm/ops.sh invites list [--batch wave-1]'` |
-| 忘了密码，重置 | `ssh <主机> '/opt/dynamicfarm/ops.sh invites reset --email <邮箱>' > <受控目录>/reset.csv`（同时撤销这个账号的所有会话） |
-| 停用 | `ssh <主机> '/opt/dynamicfarm/ops.sh invites disable --email <邮箱>'`（不能再登录；地块和存档保留） |
+| 忘了密码，重置 | `ssh <主机> '/opt/dynamicfarm/ops.sh invites reset --email <邮箱>' > <受控目录>/reset.csv`（同时作废这个账号的全部登录令牌） |
+| 停用 | `ssh <主机> '/opt/dynamicfarm/ops.sh invites disable --email <邮箱>'`（不能再登录，登录令牌作废；地块和存档保留） |
+
+重置和停用之后，旧令牌发出的 HTTP 请求立即被拒。工具在 app 进程外运行，关不掉已经连着的联机（WebSocket）连接：它会保持到对方断线重连；要立刻断开，就重启 app（`docker compose -f compose.yml --env-file .env restart app`）。
 
 - **输出位置**：`create` 和 `reset` 输出的 CSV（`email,password,batch`）含密码，只写到重定向的地方。标准输出是终端时，`ops.sh` 在连库之前就拒绝。不要在服务器上落文件，不要贴进卡片、仓库或聊天。
 - **受控存储**：所有者指定的密码库或加密目录。导入之后删掉本地的 CSV。
@@ -141,13 +143,13 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 
 ## 冒烟
 
-`./ops.sh smoke [<入口地址>]` 默认在 app 容器里打它自己的端口。逐项检查：
+`./ops.sh smoke [--invite] [<入口地址>]` 默认在 app 容器里打它自己的端口。逐项检查：
 
 - 健康检查通过，运行的是 `.env` 里写的提交号；
 - 自助注册被拒；
 - 游客能读，但认领和存档都被拒。
 
-标准输入给一行 `email,password` 时，再加两项：邀请账号能登录，“放弃并重选”被拒。例如 `ssh <主机> '/opt/dynamicfarm/ops.sh smoke' < 冒烟账号.csv`。
+带 `--invite` 并从标准输入给一行 `email,password` 时，再加两项：邀请账号能登录，“放弃并重选”被拒。例如 `ssh <主机> '/opt/dynamicfarm/ops.sh smoke --invite' < 冒烟账号.csv`。
 
 正式服上的冒烟不认领地块，因为认领会永久占用一块地。认领和存档只在隔离环境里验证，见下文“隔离演练”。
 
