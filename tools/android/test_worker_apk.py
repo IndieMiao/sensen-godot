@@ -268,6 +268,31 @@ class WorkerAPK(unittest.TestCase):
             with self.subTest(variant=variant, settings=settings), self.assertRaises(ValueError):
                 inspect_zip(self.apk, True, variant)
 
+    def test_release_readback_requires_the_preview_user_directory(self):
+        # It installs over 0.4.1 in place: another user directory would leave the local data and sign-in behind.
+        release = exported_settings('dynamic-farm-release')
+        self.assertEqual(farm.PREVIEW_USER_DIR, 'DynamicFarmCardigan')
+        self.assertEqual(exported_settings('dynamic-farm')['application/config/custom_user_dir_name'],
+                         farm.PREVIEW_USER_DIR)
+        self.fixture(FARM_FILES, release)
+        self.assertEqual(inspect_zip(self.apk, True, 'dynamic-farm-release')['variant'], 'dynamic-farm-release')
+        name, enabled = 'application/config/custom_user_dir_name', 'application/config/use_custom_user_dir'
+        without = {key: value for key, value in release.items() if key != name}
+        unenabled = {key: value for key, value in release.items() if key != enabled}
+        for settings in (dict(release, **{name: 'DynamicFarmInternal'}), dict(release, **{name: 'DynamicFarm'}),
+                         dict(release, **{name: 'dynamicfarmcardigan'}), dict(release, **{name: ''}),
+                         dict(release, **{name: farm.PREVIEW_USER_DIR + ' '}), dict(release, **{enabled: False}),
+                         without, unenabled):
+            self.fixture(FARM_FILES, settings)
+            with self.subTest(settings={k: settings.get(k) for k in (name, enabled)}), \
+                    self.assertRaisesRegex(ValueError, 'preview user directory'):
+                inspect_zip(self.apk, True, 'dynamic-farm-release')
+        # The preview and internal readbacks are unchanged: they do not check the user directory.
+        for variant in ('dynamic-farm', 'dynamic-farm-internal'):
+            self.fixture(FARM_FILES, dict(exported_settings(variant), **{name: 'Elsewhere'}))
+            with self.subTest(variant=variant):
+                self.assertEqual(inspect_zip(self.apk, True, variant)['variant'], variant)
+
     def test_project_binary_reader_rejects_malformed_input(self):
         good = encode_settings({'sensen/network/online_qa': True, 'sensen/network/base_url': TARGET})
         self.assertEqual(farm.project_settings(good), {'sensen/network/online_qa': True, 'sensen/network/base_url': TARGET})

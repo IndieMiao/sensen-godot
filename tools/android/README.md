@@ -202,6 +202,8 @@ choose a production signing identity, install an app or authorize publication.
    `sensen/account/invite_only`: the account panel then only signs in (no sign-up, password reset,
    Apple or Google; the server also refuses them with `ACCOUNT_SIGNUP=closed`). `online_qa` stays on,
    so `Net` never signs in anonymously; without an invite account the player can only look at the map.
+   `invite_only` also makes `Net` ignore `user://server.txt` (C-116): the release only ever connects to
+   the address it was built with. Every other package still reads the override.
    Building it does not sign or publish it: signing with the 0.4.1 certificate and distribution are C-99.
 
    ```sh
@@ -212,8 +214,10 @@ choose a production signing identity, install an app or authorize publication.
    rejects a package whose Journey settings do not match its variant: internal settings or
    the internal target in any other package, a reachable Journey in the isolated preview,
    QA isolation in the release-configuration (default) package, or a dynamic farm release that
-   is not exactly the production target with its three settings and no reselect (and invite-only
-   sign-in or the production target anywhere else). `unsigned.json` records the
+   is not exactly the production target with its three settings and no reselect, or whose user
+   directory is no longer `DynamicFarmCardigan` (an in-place upgrade of 0.4.1 would leave its local
+   data and sign-in behind; C-116), and invite-only sign-in or the production target anywhere
+   else. `unsigned.json` records the
    result under `config`.
 
    The script stages committed game sources in a disposable project, generates
