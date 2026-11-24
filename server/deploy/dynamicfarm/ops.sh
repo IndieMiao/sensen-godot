@@ -14,6 +14,8 @@
 #   ops.sh status                             容器、健康检查、最近的发布和备份
 set -euo pipefail
 umask 077
+# cron 的 PATH 只有 /usr/bin:/bin，docker 和 age 常装在 /usr/local/bin 或 /snap/bin：补上常见路径，调用方原有的排在前面。
+PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"; export PATH
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="$DIR/.env"

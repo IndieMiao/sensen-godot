@@ -4,7 +4,9 @@
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { buildApp, plotFor } from '../../src/http/app.js';
 import { MemoryStore } from '../../src/http/memory_store.js';
@@ -94,5 +96,88 @@ describe('dynamic farm deploy files', () => {
     const required = /for k in (POSTGRES_PASSWORD[^;]*); do/.exec(ops)?.[1].split(' ') ?? [];
     expect(required.length).toBeGreaterThan(0);
     for (const key of [...required, 'APP_IMAGE', 'APP_IMAGE_ID', 'GIT_SHA']) expect(envExample).toMatch(new RegExp(`^${key}=$`, 'm'));
+  });
+});
+
+/**
+ * C-104：cron 的 PATH 只有 /usr/bin:/bin，docker 和 age 在 /usr/local/bin 时 ops.sh 要自己找得到。
+ * 测试不能往系统目录放替身，所以把 ops.sh 补的每个目录挪到临时根目录下（只改这一行），替身放进 <根>/usr/local/bin。
+ */
+describe('dynamic farm ops.sh under a cron PATH', () => {
+  const ops = readFileSync(path.join(DEPLOY, 'ops.sh'), 'utf8');
+  const PATH_LINE = /^PATH="\$\{PATH:\+\$PATH:\}([^"]+)"; export PATH$/m;
+  // 系统目录里有真的 docker 或 age 时，会先于替身被找到，不能在这台机器上跑。
+  const realTools = ['/usr/bin/docker', '/bin/docker', '/usr/bin/age', '/bin/age'].some(p => existsSync(p));
+  let tmp: string | undefined;
+  afterEach(() => { if (tmp) rmSync(tmp, { recursive: true, force: true }); tmp = undefined; });
+
+  it('appends the usual tool directories after the caller PATH', () => {
+    const dirs = PATH_LINE.exec(ops)?.[1].split(':') ?? [];
+    expect(dirs).toEqual(expect.arrayContaining(['/usr/local/bin', '/usr/local/sbin', '/usr/sbin', '/sbin', '/snap/bin']));
+    // 放在 set -euo pipefail 之后、第一次调用外部命令之前。
+    expect(ops.indexOf('set -euo pipefail')).toBeLessThan(ops.search(PATH_LINE));
+    expect(ops.search(PATH_LINE)).toBeLessThan(ops.indexOf('DIR="$(cd'));
+  });
+
+  /** 在临时目录摆好部署目录和替身，用 env -i PATH=/usr/bin:/bin 跑 ops.sh backup；script 拿到临时根目录，返回要运行的脚本。 */
+  function stage(script: (root: string) => string) {
+    tmp = mkdtempSync(path.join(os.tmpdir(), 'df-cron-'));
+    const root = path.join(tmp, 'root');
+    const deploy = path.join(tmp, 'opt', 'dynamicfarm');
+    const bin = path.join(root, 'usr', 'local', 'bin');
+    mkdirSync(deploy, { recursive: true }); mkdirSync(bin, { recursive: true });
+    writeFileSync(path.join(deploy, 'ops.sh'), script(root), { mode: 0o755 });
+    writeFileSync(path.join(deploy, '.env'), [
+      `POSTGRES_PASSWORD=${'a'.repeat(24)}`, `TOKEN_PEPPER=${'p'.repeat(32)}`, 'TRUSTED_PROXIES=172.30.96.1',
+      'INVITE_EMAIL_DOMAIN=invite.example.org', `PG_IMAGE=postgres:16@sha256:${'0'.repeat(64)}`, 'AGE_RECIPIENT=age1stub', '',
+    ].join('\n'), { mode: 0o600 });
+    // docker 替身只认 ops.sh backup 用到的 compose 调用，每次调用记进 calls.log。
+    writeFileSync(path.join(bin, 'docker'), `#!/bin/bash
+echo "docker $*" >> "$(dirname "$0")/calls.log"
+[ "$1" = compose ] || exit 2; shift
+while [ $# -gt 0 ]; do case "$1" in -f|--env-file) shift 2 ;; *) break ;; esac; done
+sub=$1; shift
+case "$sub" in
+  up) ;;
+  exec) [ "$1" = -T ] && shift; shift
+    case "$1" in
+      pg_isready) ;;
+      pg_dump) printf 'PGDMP-stub' ;;
+      pg_restore) cat > /dev/null ;;
+      psql) case "$*" in *parcel_claims_md5*) printf 'users 0\\nplayers 0\\n' ;; esac ;;
+      *) exit 2 ;;
+    esac ;;
+  *) exit 2 ;;
+esac
+`, { mode: 0o755 });
+    writeFileSync(path.join(bin, 'age'), `#!/bin/bash
+echo "age $*" >> "$(dirname "$0")/calls.log"
+while [ $# -gt 1 ]; do case "$1" in -o) out=$2; shift 2 ;; *) shift ;; esac; done
+cp "$1" "$out"
+`, { mode: 0o755 });
+    const run = spawnSync('/usr/bin/env', ['-i', 'PATH=/usr/bin:/bin', path.join(deploy, 'ops.sh'), 'backup'], { encoding: 'utf8' });
+    const calls = existsSync(path.join(bin, 'calls.log')) ? readFileSync(path.join(bin, 'calls.log'), 'utf8') : '';
+    return { run, calls, deploy };
+  }
+
+  it.skipIf(realTools)('backs up with only /usr/bin:/bin when docker and age live in /usr/local/bin', () => {
+    const m = PATH_LINE.exec(ops);
+    if (!m) throw new Error('ops.sh has no PATH line');
+    const { run, calls, deploy } = stage(root =>
+      ops.replace(m[0], () => `PATH="\${PATH:+$PATH:}${m[1].split(':').map(d => root + d).join(':')}"; export PATH`));
+    expect(run.stderr).not.toContain('not found');
+    expect(run.status, run.stderr).toBe(0);
+    expect(run.stdout.trim()).toMatch(/\/backups\/dynamicfarm-\d{8}T\d{6}Z\.dump\.age$/);
+    expect(existsSync(run.stdout.trim())).toBe(true);
+    expect(readdirSync(path.join(deploy, 'backups')).sort()).toHaveLength(2);
+    expect(calls).toMatch(/^docker compose .* exec -T postgres pg_dump /m);
+    expect(calls).toMatch(/^age -r age1stub -o /m);
+  });
+
+  it.skipIf(realTools)('fails to find docker without the PATH line (the cron failure this guards against)', () => {
+    const { run, calls } = stage(() => ops.replace(PATH_LINE, ''));
+    expect(run.status).not.toBe(0);
+    expect(run.stderr).toMatch(/docker: (command )?not found/);
+    expect(calls).toBe('');
   });
 });
