@@ -83,7 +83,7 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
    - 起 app，等健康检查报出这个提交号。
 6. **接入口**：按上面的“入口路径”接好，然后走正式入口跑一遍冒烟：`./ops.sh smoke https://farm.sensenjoy.cn/dynamicfarm/v1`。
 7. **建邀请账号**：见下文“邀请账号”。
-8. **定时备份**：在主机 crontab 加一行 `30 3 * * * /opt/dynamicfarm/ops.sh backup >> /opt/dynamicfarm/backup.log 2>&1`。异地副本交给主机现有的备份方案（美西的备份归迁移方），复制的是 `backups/` 下的 `*.dump.age` 和同名的 `*.counts`。
+8. **定时备份**：在主机 crontab 加一行 `30 3 * * * /opt/dynamicfarm/ops.sh backup >> /opt/dynamicfarm/backup.log 2>&1`，照抄即可。cron 的 PATH 只有 `/usr/bin:/bin`，`ops.sh` 开头会自己补上 `/usr/local/sbin`、`/usr/local/bin`、`/usr/sbin`、`/sbin`、`/snap/bin`，装在这些地方的 docker（compose 是它的插件）和 age 都找得到。装在别处时，在 crontab 里这一行上面加一行 `PATH=<docker 和 age 所在目录>:/usr/bin:/bin`。异地副本交给主机现有的备份方案（美西的备份归迁移方），复制的是 `backups/` 下的 `*.dump.age` 和同名的 `*.counts`。
 
 `ops.sh` 的每一步都单独运行，出错就停下，不会自动回滚。会改东西的步骤（`load`、`deploy`、`init-db`、`rollback`、`backup`、`restore`）互斥：同时只能跑一个，另一个直接报错退出（例如定时备份撞上手工部署）。步骤被强行杀掉留下的锁目录 `.ops.lock`，确认没有 `ops.sh` 在跑后手工删掉。
 
