@@ -85,4 +85,29 @@ class ParcelLayerStateTest {
         assertTrue(wait.expire("second")); assertNull(wait.resume(true))
         wait.park("third"); wait.drop(); assertNull(wait.resume(true)); assertFalse(wait.expire("third"))
     }
+    // C-111: returning to the map, the foreground or a reload must not fetch and parse the 60 MB building file again.
+    private val buildingsUrl = "https://example.test/r6/buildings.geojson"
+    @Test fun buildingSourceIsAddedOnceAndReusedWhileLoadingOrLoaded() {
+        val source = ParcelBuildingsSource()
+        assertEquals(ParcelBuildingsSource.Plan.ADD, source.plan(buildingsUrl, exists = false)); source.added(buildingsUrl)
+        assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true)); assertFalse(source.loaded)
+        source.markLoaded()
+        assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true)); assertTrue(source.loaded)
+    }
+    @Test fun buildingSourceIsFetchedAgainForANewUrlAFailureOrANewStyle() {
+        val source = ParcelBuildingsSource().apply { added(buildingsUrl); markLoaded() }
+        assertEquals(ParcelBuildingsSource.Plan.REPLACE, source.plan("https://example.test/r7/buildings.geojson", exists = true))
+        source.markFailed(); assertFalse(source.loaded)
+        assertEquals(ParcelBuildingsSource.Plan.REPLACE, source.plan(buildingsUrl, exists = true))
+        source.markLoaded(); assertFalse(source.loaded) // A late event cannot revive the failed load.
+        source.added(buildingsUrl); assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true))
+        // A style reload drops every source: added again, never reported loaded from the old style.
+        source.markLoaded(); source.dropped()
+        assertEquals(ParcelBuildingsSource.Plan.ADD, source.plan(buildingsUrl, exists = false)); assertFalse(source.loaded)
+    }
+    @Test fun anUntrackedSourceWithTheSameIdIsReplacedNotReused() {
+        val source = ParcelBuildingsSource()
+        assertEquals(ParcelBuildingsSource.Plan.REPLACE, source.plan(buildingsUrl, exists = true))
+        source.markLoaded(); assertFalse(source.loaded)
+    }
 }
