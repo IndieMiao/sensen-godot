@@ -186,6 +186,7 @@ func _line(node_name: String, placeholder: String, secret := false, keyboard := 
 	edit.custom_minimum_size = Vector2(260, 44)
 	edit.text_submitted.connect(func(_t): _submit_primary())
 	edit.text_changed.connect(func(_t): _sync_caption(edit))
+	edit.visibility_changed.connect(func(): _sync_caption(edit))
 	edit.set_meta("caption", caption)
 	_fields.add_child(edit)
 	_field_list.append(edit)
@@ -194,7 +195,11 @@ func _line(node_name: String, placeholder: String, secret := false, keyboard := 
 func _sync_caption(edit: LineEdit) -> void:
 	var caption: Label = edit.get_meta("caption")
 	caption.text = edit.placeholder_text
-	caption.visible = edit.visible and not edit.text.is_empty()
+	# The caption's line is reserved whenever its field is shown and only fades in once there is text.
+	# Showing it on the first keystroke used to push every field and button below it down, so taps
+	# meant for "Sign in" landed on "Show passwords" (C-66).
+	caption.visible = edit.visible
+	caption.modulate.a = 0.0 if edit.text.is_empty() else 1.0
 
 func _option(node_name: String, labels: Array, parent: Control = null) -> OptionButton:
 	var o := OptionButton.new()
@@ -276,6 +281,9 @@ func set_mode(next: String) -> void:
 				_show([])
 				_texts("Delete account?", "This permanently deletes your account and your farm. This can't be undone.")
 			_set_actions([["delete_now", "Delete permanently", "danger"], ["to_account", "Keep my account"]])
+	# Fields filled in code (profile, prefilled email) show their caption too.
+	for f in _field_list:
+		if f is LineEdit: _sync_caption(f)
 
 func _account_summary(account: AccountSession) -> String:
 	var lines := []
