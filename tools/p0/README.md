@@ -20,6 +20,11 @@ See the release checklist for the actual approved source and deployment evidence
   The script additionally checks USB for vivo/V2509/Android before starting Godot,
   requires its private ADB port to be free, uses port 5071 by default with
   `ADB_LOCAL_TRANSPORT_MAX_PORT=5553`, and stops that private ADB server afterwards.
+  Godot runs from a temporary copy (`godot_keep_adb.sh`) whose editor settings come
+  from this account's but never stop an adb server on exit, so a shared adb port is
+  left alone whatever the account's own setting says. The account needs Godot editor
+  settings for this or an earlier 4.x version (Android SDK, JDK); without any the
+  build stops before reserving a version code.
 - Use a committed, clean source tree. Untracked export inputs other than generated
   `.uid` files are refused; the Play preset's exclusion filters apply. Do not use a
   QA bootstrap, `qa_accounts/` or `qa-review/` directory, or QA-marked project/export configuration.

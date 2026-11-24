@@ -3,8 +3,10 @@ from pathlib import Path
 import platform
 import re
 import subprocess
+import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 HELPER = ROOT / 'tools/p0/godot_keep_adb.sh'
@@ -31,7 +33,7 @@ class GodotKeepAdbTest(unittest.TestCase):
         (self.data / 'export_templates/4.7.2.stable').mkdir(parents=True)
         self.config.mkdir(parents=True, exist_ok=True)
 
-    def run_helper(self, java_home=None):
+    def run_helper(self, java_home=None, check=True):
         out = self.tmp / 'copy'
         out.mkdir()
         env = {k: v for k, v in os.environ.items() if not k.startswith('XDG_') and k != 'JAVA_HOME'}
@@ -40,7 +42,8 @@ class GodotKeepAdbTest(unittest.TestCase):
             env['JAVA_HOME'] = java_home
         result = subprocess.run(['bash', '-c', 'set -euo pipefail; source "$0"; p0_godot_keep_adb "$1" "$2"; echo "$P0_GODOT"',
                                  str(HELPER), str(self.godot), str(out)],
-                                env=env, check=True, capture_output=True, text=True)
+                                env=env, check=check, capture_output=True, text=True)
+        self.result = result
         return out, Path(result.stdout.strip())
 
     def test_copy_keeps_the_accounts_settings_but_never_shuts_adb_down(self):
@@ -60,10 +63,35 @@ class GodotKeepAdbTest(unittest.TestCase):
         # The account's own settings are left alone.
         self.assertEqual((self.config / 'editor_settings-4.7.tres').read_text(), SETTINGS)
 
-    def test_without_account_settings_only_the_adb_setting_is_written(self):
+    def test_without_this_versions_settings_the_newest_earlier_ones_are_copied(self):
+        (self.config / 'editor_settings-4.5.tres').write_text(SETTINGS.replace('/opt/android-sdk', '/old/sdk'))
+        (self.config / 'editor_settings-4.6.tres').write_text(SETTINGS)
+        (self.config / 'editor_settings-4.10.tres').write_text(SETTINGS.replace('/opt/android-sdk', '/newer/sdk'))
+        (self.config / 'editor_settings-3.tres').write_text(SETTINGS.replace('/opt/android-sdk', '/godot3/sdk'))
         out, _ = self.run_helper()
-        self.assertEqual((out / 'editor_data/editor_settings-4.7.tres').read_text(),
-                         f'[gd_resource type="EditorSettings" format=3]\n\n[resource]\n{KEY} = false\n')
+        text = (out / 'editor_data/editor_settings-4.7.tres').read_text()
+        self.assertEqual(text.replace(f'{KEY} = false\n', ''), SETTINGS.replace(f'{KEY} = true\n', ''))
+        self.assertIn('editor_settings-4.6.tres', self.result.stderr)
+        self.assertFalse((self.config / 'editor_settings-4.7.tres').exists())
+
+    def test_without_any_settings_it_stops_and_says_why(self):
+        (self.config / 'editor_settings-4.8.tres').write_text(SETTINGS)
+        out, _ = self.run_helper(check=False)
+        self.assertNotEqual(self.result.returncode, 0)
+        self.assertIn('no editor settings for Godot 4.7', self.result.stderr)
+        self.assertIn('Android SDK and JDK', self.result.stderr)
+        self.assertFalse((out / 'editor_data/editor_settings-4.7.tres').exists())
+
+    def test_an_unwritable_data_directory_without_keystores_is_skipped_with_a_note(self):
+        (self.config / 'editor_settings-4.7.tres').write_text(SETTINGS)
+        self.data.chmod(0o555)
+        self.addCleanup(self.data.chmod, 0o755)
+        out, _ = self.run_helper()
+        self.assertFalse((self.data / 'keystores').exists())
+        self.assertFalse(os.path.lexists(out / 'editor_data/keystores'))
+        self.assertIn('keystores', self.result.stderr)
+        self.assertEqual((out / 'editor_data/export_templates').resolve(), (self.data / 'export_templates').resolve())
+        self.assertIn(f'{KEY} = false', (out / 'editor_data/editor_settings-4.7.tres').read_text())
 
     def test_an_empty_jdk_setting_takes_the_callers_java_home_but_a_set_one_is_kept(self):
         settings = self.config / 'editor_settings-4.7.tres'
@@ -85,6 +113,34 @@ class GodotKeepAdbTest(unittest.TestCase):
             self.assertIn('p0_godot_keep_adb ', text, name)
             runs = re.findall(r'^\s*(\S+) --headless', text, re.M)
             self.assertEqual(set(runs), {'"$P0_GODOT"'}, name)
+        # play_aab.py (build_play_aab.sh) swaps its Godot for the copy before any run.
+        text = (ROOT / 'tools/p0/play_aab.py').read_text()
+        self.assertEqual(len(re.findall(r'^\s*godot = godot_keep_adb\(godot, ', text, re.M)), 1)
+        runs = re.findall(r"run_logged\(\[(\w+), '--headless'", text)
+        self.assertEqual(set(runs), {'godot'})
+        self.assertLess(text.index('godot = godot_keep_adb('), text.index("run_logged([godot, '--headless'"))
+
+    def test_play_build_gets_the_copy_with_its_jdk(self):
+        sys.path.insert(0, str(ROOT / 'tools/p0'))
+        self.addCleanup(sys.path.remove, str(ROOT / 'tools/p0'))
+        import play_aab
+        (self.config / 'editor_settings-4.7.tres').write_text(SETTINGS + 'export/android/java_sdk_path = ""\n')
+        env = {k: v for k, v in os.environ.items() if not k.startswith('XDG_')}
+        env['HOME'] = str(self.home)
+        out = self.tmp / 'copy'
+        out.mkdir()
+        with patch.dict(os.environ, env, clear=True):
+            godot = play_aab.godot_keep_adb(str(self.godot), out, Path('/jdk home'))
+        self.assertEqual(Path(godot), out / 'godot')
+        text = (out / 'editor_data/editor_settings-4.7.tres').read_text()
+        self.assertIn(f'{KEY} = false', text)
+        self.assertIn('export/android/java_sdk_path = "/jdk home"', text)
+        # Without settings the build stops with the helper's reason (on stderr), not a traceback.
+        (self.config / 'editor_settings-4.7.tres').unlink()
+        other = self.tmp / 'other'
+        other.mkdir()
+        with patch.dict(os.environ, env, clear=True), self.assertRaises(play_aab.CheckError):
+            play_aab.godot_keep_adb(str(self.godot), other, Path('/jdk'))
 
 
 if __name__ == '__main__':

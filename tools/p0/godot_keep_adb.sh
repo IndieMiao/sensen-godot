@@ -1,10 +1,12 @@
-# Sourced by build_demo_apk.sh and android_p0.sh (C-79). Godot's editor setting export/android/shutdown_adb_on_exit
-# defaults to true: an editor run that sees a runnable Android preset (an import or an export) ends with
-# `adb kill-server`, and on a shared adb port (5137 on the Cardigan workers) that drops other sessions' emulators.
-# As tools/android/build_worker_apk.sh does, run a self-contained copy of Godot whose own editor settings say false,
-# so the export neither depends on nor writes this account's settings. Otherwise the copy starts from the account's
-# editor settings (SDK, JDK, debug keystore) and uses its export templates and debug keystore directory, so the APK
-# is built and signed as before.
+# Sourced by build_demo_apk.sh and android_p0.sh (C-79), and run by play_aab.py (C-80). Godot's editor setting
+# export/android/shutdown_adb_on_exit defaults to true: an editor run that sees a runnable Android preset (an import
+# or an export) ends with `adb kill-server`, and on a shared adb port (5137 on the Cardigan workers) that drops other
+# sessions' emulators. As tools/android/build_worker_apk.sh does, run a self-contained copy of Godot whose own editor
+# settings say false, so the export neither depends on nor writes this account's settings. Otherwise the copy starts
+# from the account's editor settings (SDK, JDK, debug keystore) and uses its export templates and debug keystore
+# directory, so the APK or AAB is built and signed as before. Without settings for this Godot version the copy starts
+# from the newest earlier version's (as Godot itself would migrate them); without any, it stops rather than export
+# with none of them.
 #   p0_godot_keep_adb GODOT NEW_DIRECTORY   sets P0_GODOT to the copy to run; remove NEW_DIRECTORY afterwards.
 p0_godot_keep_adb() {
   local bin dir="$2" exe version major minor config data
@@ -35,20 +37,31 @@ p0_godot_keep_adb() {
     P0_GODOT="$dir/godot"
   fi
   touch "$dir/._sc_"
-  mkdir -p "$dir/editor_data" "$data/keystores"
+  mkdir -p "$dir/editor_data"
   [[ -d "$data/export_templates" ]] && ln -s "$data/export_templates" "$dir/editor_data/export_templates"
   # A debug keystore Godot generates on a first export lands where the account's Godot would put it, not in the copy.
-  ln -s "$data/keystores" "$dir/editor_data/keystores"
+  if mkdir -p "$data/keystores" 2>/dev/null; then
+    ln -s "$data/keystores" "$dir/editor_data/keystores"
+  else
+    echo "note: cannot create $data/keystores; a debug keystore Godot generates in this run is not kept" >&2
+  fi
   # The account's JDK setting wins; only an empty one takes the JAVA_HOME the caller exports (as build_demo_apk.sh
   # does: the JDK it signs with), where Godot would otherwise refuse to export.
-  python3 - "$config/editor_settings-$major.$minor.tres" "$dir/editor_data/editor_settings-$major.$minor.tres" \
-    "${JAVA_HOME:-}" <<'PY'
-import json, sys
+  python3 - "$config" "$major" "$minor" "$dir/editor_data/editor_settings-$major.$minor.tres" "${JAVA_HOME:-}" <<'PY'
+import json, re, sys
 from pathlib import Path
-source, target, java = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+config, major, minor, target, java = Path(sys.argv[1]), sys.argv[2], int(sys.argv[3]), Path(sys.argv[4]), sys.argv[5]
 KEY, JAVA = "export/android/shutdown_adb_on_exit", "export/android/java_sdk_path"
-text = source.read_text() if source.is_file() else '[gd_resource type="EditorSettings" format=3]\n\n[resource]\n'
-lines = text.splitlines()
+source = config / target.name
+if not source.is_file():
+    earlier = sorted((int(m[1]), p) for p in config.glob(f"editor_settings-{major}.*.tres")
+                     if (m := re.fullmatch(rf"editor_settings-{major}\.(\d+)\.tres", p.name)) and int(m[1]) < minor)
+    if not earlier:
+        sys.exit(f"no editor settings for Godot {major}.{minor} or an earlier {major}.x in {config}: open this Godot's "
+                 "editor once and set the Android SDK and JDK there; a copy without them cannot export")
+    source = earlier[-1][1]
+    print(f"note: no {target.name} in {config}; the copy starts from {source.name}", file=sys.stderr)
+lines = source.read_text().splitlines()
 if "[resource]" not in lines:
     sys.exit(f"no [resource] section in {source}")
 key = lambda l: l.split("=", 1)[0].strip()
