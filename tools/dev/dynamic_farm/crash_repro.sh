@@ -111,6 +111,11 @@ a shell dumpsys activity exit-info "$package" > "$out/exit-info-after.txt" || tr
     "$(grep -cE 'DYNAMIC_BUILDINGS_SOURCE (ADD|REPLACE)' "$out/logcat.txt" || true)" \
     "$(grep -c 'DYNAMIC_BUILDINGS_SOURCE REUSE' "$out/logcat.txt" || true)" \
     "$(grep -c 'DYNAMIC_BUILDINGS_SOURCE LOADED' "$out/logcat.txt" || true)"
+  # C-124: Retry or the building load timeout replaces a copy still loading (refetch=true); a replaced copy's late
+  # events are logged STALE and change nothing.
+  printf 'building refetches: %s, stale events ignored: %s\n' \
+    "$(grep -c 'DYNAMIC_BUILDINGS_SOURCE REPLACE.*refetch=true' "$out/logcat.txt" || true)" \
+    "$(grep -c 'DYNAMIC_BUILDINGS_SOURCE STALE' "$out/logcat.txt" || true)"
   # From setting the map's sources to its building layer loading: the wait before a building can be tapped.
   printf 'building layer waits (ms): %s\n' \
     "$(grep 'DYNAMIC_LOAD.*"resource":"buildings","stage":"ready"' "$out/logcat.txt" | grep -o '"elapsed_ms":[0-9]*' | sed 's/.*://' | tr '\n' ' ' || true)"
