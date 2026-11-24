@@ -143,11 +143,13 @@ do_backup() {
   mv "$BACKUP_PART.age" "$base.dump.age"; rm -f "$BACKUP_PART"; BACKUP_PART=""
   local out="$base.dump.age"
   chmod 600 "$out" "$base.counts"
-  # 本机保留最近 DF_BACKUP_KEEP 份（默认 14）；异地副本由主机的备份方案负责，见 README。
-  # 恢复前的那份（NO_PRUNE=1）不轮换，免得删掉正要恢复的备份。
+  # 不带标签的（定时备份）本机保留最近 DF_BACKUP_KEEP 份（默认 14）；异地副本由主机的备份方案负责，见 README。
+  # 带标签的（部署前 pre-<提交号>、恢复前 pre-restore、手工标签）不轮换，回滚要用，确认不再需要后手工删。
+  # 恢复时（NO_PRUNE=1）整个不轮换，免得删掉正要恢复的备份。
   if [ "${NO_PRUNE:-}" != 1 ]; then
     local keep; keep=$(envget DF_BACKUP_KEEP); keep=${keep:-14}
-    { ls -1t "$dir"/dynamicfarm-*.dump.age 2>/dev/null || true; } | tail -n +"$((keep + 1))" | while read -r old; do
+    { ls -1t "$dir"/dynamicfarm-*.dump.age 2>/dev/null || true; } | { grep -E '/dynamicfarm-[0-9]{8}T[0-9]{6}Z\.dump\.age$' || true; } \
+      | tail -n +"$((keep + 1))" | while read -r old; do
       rm -f "$old" "${old%.dump.age}.counts"
     done
   fi
@@ -218,9 +220,12 @@ do_rollback() {
   [ -f "$RELEASES" ] || die "没有 releases.log，不知道上一版是什么"
   local current line; current=$(envget GIT_SHA)
   if [ -z "$target" ]; then
-    # 上一版 = 当前版本这次 deploy 之前最后一次 deploy 的另一个版本。最后一条已是回滚时不猜，要写明版本。
+    # 上一版 = 部署当前版本那一刻正在跑的版本：发布记录里每条记的是“从此开始跑的版本”（deploy 和 rollback 都算），
+    # 所以取当前版本最后一次 deploy 之前、最近一条不是当前版本的记录。最后一条已是回滚时不猜，要写明版本。
     [ "$(tail -n1 "$RELEASES" | cut -f2,3)" = "deploy	$current" ] || die "最后一条发布记录不是当前版本的 deploy（之前回滚过）：请写明要回到的提交号"
-    target=$(awk -F '\t' -v cur="$current" '$2 == "deploy" && $3 != cur { t = $3 } END { print t }' "$RELEASES")
+    target=$(awk -F '\t' -v cur="$current" '{ a[NR] = $2; s[NR] = $3 } END {
+      n = 0; for (i = NR; i >= 1; i--) if (a[i] == "deploy" && s[i] == cur) { n = i; break }
+      for (i = n - 1; i >= 1; i--) if (s[i] != cur) { print s[i]; exit } }' "$RELEASES")
     [ -n "$target" ] || die "发布记录里没有比当前更早的其它版本"
   fi
   line=$(awk -F '\t' -v t="$target" '$3 == t { l = $0 } END { print l }' "$RELEASES")

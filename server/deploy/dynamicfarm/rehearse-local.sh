@@ -5,7 +5,8 @@
 # - docker → 一个只认 ops.sh 用到的那几种调用的替身（bin/docker），compose 的 environment 写死项从 compose.yml 读。
 # 走一遍：空库部署 → 只读冒烟 → 建邀请账号 → 两个账号认领并存档 → 备份 → 删库 → 恢复并核对 →
 #         部署下一版（加一列的模拟迁移）→ 回滚 → 再部署下一版 → 带恢复的回滚。
-# 当前版本取 HEAD（工作区要干净）；“下一版”是 HEAD 的副本，schema.sql 多一行加列，提交号是演练用的假值。
+# 当前版本取 HEAD（工作区要干净）；“下一版”是 HEAD 的副本，schema.sql 多一行加列；“修复版”是 HEAD 的另一个副本。
+# 后两个的提交号是演练用的假值。
 # 依赖：PostgreSQL 16 命令行（PGBIN，默认 /opt/homebrew/opt/postgresql@16/bin）、age、node、已 pnpm install 的仓库。
 # 日志里没有密码；密钥、邀请账号和数据库都在临时目录里，结束时（含失败）删掉。
 set -euo pipefail
@@ -17,6 +18,7 @@ PGBIN="${PGBIN:-/opt/homebrew/opt/postgresql@16/bin}"
 [ -z "$(git -C "$REPO" status --porcelain)" ] || { echo "工作区不干净：演练用的是 HEAD 的提交内容" >&2; exit 1; }
 HEAD_SHA=$(git -C "$REPO" rev-parse HEAD)
 NEXT_SHA=$(printf 'rehearsal-next-%s' "$HEAD_SHA" | shasum | cut -d' ' -f1)
+FIX_SHA=$(printf 'rehearsal-fix-%s' "$HEAD_SHA" | shasum | cut -d' ' -f1)
 R=$(mktemp -d "${TMPDIR:-/tmp}/dfr.XXXXXX")
 PGPORT_LOCAL=5498
 APP_PORT=$(node -e "const s=require('net').createServer();s.listen(0,'127.0.0.1',()=>{console.log(s.address().port);s.close()})")
@@ -52,6 +54,7 @@ mkdir -p "$R/bin" "$R/secrets" "$DEPLOY"
 step "准备：当前版本 ${HEAD_SHA}，下一版（模拟）$NEXT_SHA"
 image "$HEAD_SHA"
 image "$NEXT_SHA"
+image "$FIX_SHA"
 printf '\n-- rehearsal: the next release adds a column\nALTER TABLE parcel_claims ADD COLUMN IF NOT EXISTS rehearsal_probe text;\n' \
   >> "$R/images/$NEXT_SHA/server/src/db/schema.sql"
 ok "两个镜像快照就绪"
@@ -190,6 +193,19 @@ mkdir "$DEPLOY/.ops.lock"
 if ops backup 2>/dev/null; then fail "有锁时 backup 应拒绝"; fi
 rmdir "$DEPLOY/.ops.lock"
 ok "另一个步骤在跑（有锁）时，backup 直接退出"
+
+step "回滚后再部署修复版，修复版也出问题时 ops.sh rollback 回到部署修复版之前在跑的版本，而不是之前坏的那版"
+ops deploy "$FIX_SHA" "$(image_id "$FIX_SHA")"
+ops rollback
+[ "$(grep -E '^GIT_SHA=' "$DEPLOY/.env" | cut -d= -f2)" = "$HEAD_SHA" ] || fail "应回到 ${HEAD_SHA}，不应回到下一版"
+ok "当前 → 下一版 → 回滚到当前 → 修复版 → rollback：回到 ${HEAD_SHA}"
+
+step "备份轮换：定时备份（不带标签）只留 DF_BACKUP_KEEP 份，带标签的部署前备份不轮换"
+sed -i.bak 's/^DF_BACKUP_KEEP=.*/DF_BACKUP_KEEP=1/' "$DEPLOY/.env"; rm -f "$DEPLOY/.env.bak"; chmod 600 "$DEPLOY/.env"
+ops backup >/dev/null; sleep 1; ops backup >/dev/null
+[ "$(ls "$DEPLOY/backups/" | grep -cE '^dynamicfarm-[0-9]{8}T[0-9]{6}Z\.dump\.age$')" = 1 ] || fail "不带标签的应只剩 1 份"
+[ -f "$PRE_NEXT" ] || fail "部署前备份不应被轮换"
+ok "不带标签的只剩 1 份；部署前备份 $(basename "$PRE_NEXT") 还在"
 
 step "再部署下一版，然后带恢复的回滚：ops.sh rollback <当前版本> --restore <部署前备份>"
 ops deploy "$NEXT_SHA" "$(image_id "$NEXT_SHA")"
