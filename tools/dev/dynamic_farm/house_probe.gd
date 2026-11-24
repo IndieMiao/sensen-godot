@@ -1,7 +1,8 @@
 extends SceneTree
 ## First house review captures (C-33) on C-34's local save, not the server: the gift on first entry,
 ## the placement preview on a valid spot and on each refused kind (outside the core, over an obstacle, on the
-## protected path), the built cottage, the player against its wall, then a reopened scene with the house in place.
+## protected path), the built cottage popping in with dust (C-114, three frames 0.1 s apart) and settled, the player
+## against its wall, then a reopened scene with the house in place (no pop, no dust).
 ##   godot --path "$QA" [--debug-collisions] --script res://tools/dev/dynamic_farm/house_probe.gd -- <farm.json> <out>
 ## Scripted input; not touch or device evidence. The save lives in <out>/save and is removed first.
 ## With --headless it checks the same states without images.
@@ -43,7 +44,14 @@ func _run() -> void:
 		await _shot(id + "-3-" + kind)
 	p.move_to(Vector2i(report.start.at[0], report.start.at[1]))
 	p._bar.confirmed.emit()
-	for i in 3: await process_frame
+	scene._focus = House.center(scene._walk, House.at_of(scene.house_state()))
+	scene._place_camera()
+	report.pop = []
+	for i in 3:
+		await create_timer(0.1).timeout
+		report.pop.append({"scale":scene._house.scale.x, "dust":_dust()})
+		await _shot(id + "-4-pop-%d" % i, false)
+	await create_timer(1.0).timeout
 	report.built = {"house":scene.house_state(), "blueprints":scene.blueprints(), "build_visible":scene._build.visible}
 	scene._focus = scene._actor.position
 	await _shot(id + "-4-built")
@@ -55,7 +63,7 @@ func _run() -> void:
 	await process_frame
 	await _open(save_dir)
 	report.reopened = {"house":scene.house_state(), "blueprints":scene.blueprints(), "build_visible":scene._build.visible,
-		"house_node":is_instance_valid(scene._house)}
+		"house_node":is_instance_valid(scene._house), "scale":scene._house.scale.x, "dust":_dust()}
 	scene._focus = House.center(scene._walk, House.at_of(scene.house_state()))
 	scene._place_camera()
 	await _shot(id + "-6-reopened")
@@ -76,11 +84,14 @@ func _open(save_dir: String) -> void:
 	root.add_child(scene)
 	while not ready[0] or scene._farming.farm.is_empty(): await process_frame
 
-func _shot(name: String) -> void:
-	for i in 4: await process_frame
+func _shot(name: String, settle := true) -> void:
+	if settle: for i in 4: await process_frame
 	if DisplayServer.get_name() == "headless": return   # states only
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out.path_join(name + ".png"))
+
+func _dust() -> int:
+	return scene.get_children().filter(func(n): return n is CPUParticles3D).size()
 
 ## One spot of each refused kind near the start, judged by the same rules the preview uses.
 func _refused_spots() -> Dictionary:

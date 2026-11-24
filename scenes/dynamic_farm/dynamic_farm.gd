@@ -21,6 +21,9 @@ const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.
 const House = preload("res://modules/dynamic_farm/farm_house.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const Placement = preload("res://scenes/dynamic_farm/house_placement.gd")
+## The main farm's pop and dust (a Homestead look swapped in), reused for the house just built (C-114).
+const Fence = preload("res://scenes/p0/p0_fence.gd")
+const HOUSE_DUST_SCALE := 4.0
 const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
 const FarmPath = preload("res://modules/dynamic_farm/farm_path.gd")
 const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -266,12 +269,29 @@ func _on_place_confirmed(at: Vector2i, rotation_steps: int) -> void:
 	_sending = true
 	var reply: Dictionary = await _farming.send({"type":"place_house", "x":at.x, "y":at.y, "rotation":rotation_steps})
 	_sending = false
+	if reply.get("ok", false) and is_inside_tree(): _pop_house()
 	if not is_inside_tree() or _placement == null: return
 	# A refused spot keeps the preview, judged again on the farm the reply brought; anything else ends it.
 	if reply.get("ok", false) or str(reply.get("code", "")) != "CELL_OCCUPIED":
 		end_house_placement()
 	else:
 		_placement.retake(House.blocked(_farming.obstacle_cells(), _farming.farm))
+
+## Build succeeded (C-114): the cottage the reply just built grows in with the main farm's overshoot and puffs dust
+## round its footprint. A house that comes with the save (reopening, a refused Build) only stands there.
+## The main farm's puffs are sized for a fence post; round the 2.4 m cottage each one is HOUSE_DUST_SCALE times
+## larger, so they read as the clouds of the owner's reference (C-103 screenshot 704).
+func _pop_house() -> void:
+	var house = house_state()
+	if _house == null or not house is Dictionary: return
+	var before := get_child_count()
+	Fence.pop_in(self, [_house])
+	for point in House.rim(_walk, House.at_of(house), int(house.get("rotation", 0))): Fence.dust(self, point)
+	for i in range(before, get_child_count()):
+		var puff := get_child(i) as CPUParticles3D
+		if puff == null: continue
+		puff.scale_amount_min *= HOUSE_DUST_SCALE
+		puff.scale_amount_max *= HOUSE_DUST_SCALE
 
 ## The built cottage and its wall profile (C-19's model-fitted walking); a player standing on the new walls steps out.
 func _build_house(house: Dictionary) -> void:
