@@ -25,6 +25,7 @@ func _run() -> void:
 	_inertia()
 	_pinch()
 	_tilt()
+	_disabled_mid_gesture()
 	await _double_tap()
 	await _flight()
 	_area()
@@ -158,6 +159,34 @@ func _tilt() -> void:
 	for i in range(1, 6): c._gui_input(drag(0, Vector2(150, 500 - 10 * i))); c._gui_input(drag(1, Vector2(250, 500 + 10 * i)))
 	check(is_equal_approx(c.pitch, 10.0), "a vertical pinch (one finger up, one down) does not tilt")
 	c.queue_free()
+
+## V-272: the map turns its input off (a map error makes the selector busy) while a finger is down, so the lift is
+## never seen. The next tap must still pick and the next drag must not jump.
+func _disabled_mid_gesture() -> void:
+	var c := camera()
+	var tapped: Array = []
+	c.tapped.connect(func(p): tapped.append(p))
+	c._gui_input(touch(0, Vector2(100, 100), true))
+	c.input_enabled = false
+	c._gui_input(touch(0, Vector2(100, 100), false)) # Not handled while disabled.
+	c.input_enabled = true
+	check(c._touches.is_empty(), "turning input off drops the finger that was down")
+	c._gui_input(touch(0, Vector2(200, 400), true)); c._gui_input(touch(0, Vector2(200, 400), false))
+	check(tapped.size() == 1 and tapped[0] == Vector2(0.5, 0.5), "the first tap after input comes back still picks")
+	# The review's steps (V-272): a drag cut short by input going off, then a tap elsewhere.
+	c._gui_input(touch(0, Vector2(200, 400), true)); c._gui_input(drag(0, Vector2(200, 300)))
+	c.input_enabled = false; c._gui_input(touch(0, Vector2(200, 300), false)); c.input_enabled = true
+	c._gui_input(touch(0, Vector2(100, 700), true)); c._gui_input(touch(0, Vector2(100, 700), false))
+	check(tapped.size() == 2 and tapped[1] == Vector2(0.25, 0.875), "after a drag cut short, the next tap still picks (V-272)")
+	# Two fingers down when input goes off: the next one-finger drag pans from where it presses, with no jump.
+	c._gui_input(touch(0, Vector2(150, 500), true)); c._gui_input(touch(1, Vector2(250, 500), true))
+	c.input_enabled = false; c.input_enabled = true
+	var from := Vector2(150, 500); var to := Vector2(260, 380)
+	var grabbed: PackedFloat64Array = c.screen_geo(from)
+	c._gui_input(touch(0, from, true))
+	for i in range(1, 11): c._gui_input(drag(0, from.lerp(to, i / 10.0)))
+	check(not c._pinch and near(c.screen_geo(to), grabbed, 2e-7), "after a gesture cut short, a drag pans from where it presses")
+	c._gui_input(touch(0, to, false)); c.queue_free()
 
 func _double_tap() -> void:
 	var c := camera(17.0); c.set_process(true)

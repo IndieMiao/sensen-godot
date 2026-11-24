@@ -37,7 +37,12 @@ var center:=PackedFloat64Array([-122.45190271843384,37.729419227])
 var zoom:=17.5
 var pitch:=0.0
 var density:=1.0
-var input_enabled:=true
+## Turned off while the map is busy. A finger still down then lifts unseen, so the gesture is dropped here (V-272):
+## otherwise its stale touch would swallow the next tap or make the next drag jump.
+var input_enabled:=true:
+	set(value):
+		input_enabled=value
+		if not value:_touches.clear();_pinch=false;_dragged=false;_last_tap_ms=0
 var _desktop:=true
 var _dirty:=true
 var _touches:Dictionary={}
