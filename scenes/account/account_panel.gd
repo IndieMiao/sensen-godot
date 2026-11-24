@@ -16,6 +16,8 @@ signal closed(signed_in: bool)
 const MODES := ["sign_in", "sign_up", "forgot", "verify", "profile", "password", "account", "delete"]
 const MONTHS := ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const MIN_AGE := 13
+## Lines kept free for the status message; the longest current message wraps to two at the narrowest width.
+const STATUS_LINES := 2
 
 var mode := "sign_in"
 var reason := ""
@@ -162,8 +164,10 @@ func _ready() -> void:
 	_status = GameUi.label("", 13, GameUi.CORAL)
 	_status.name = "Status"
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status.custom_minimum_size.x = 260
+	# Always laid out with room for STATUS_LINES lines, blank until there is a message: a message appearing
+	# after a tap used to push "Sign in" and every button below it down a line (C-78).
 	column.add_child(_status)
+	_status.custom_minimum_size = Vector2(260, STATUS_LINES * _status.get_line_height())
 	_actions = VBoxContainer.new()
 	_actions.name = "Actions"
 	_actions.add_theme_constant_override("separation", 10)
@@ -194,12 +198,12 @@ func _line(node_name: String, placeholder: String, secret := false, keyboard := 
 
 func _sync_caption(edit: LineEdit) -> void:
 	var caption: Label = edit.get_meta("caption")
-	caption.text = edit.placeholder_text
-	# The caption's line is reserved whenever its field is shown and only fades in once there is text.
+	# The caption's line is reserved whenever its field is shown and only gets its words once there is text.
 	# Showing it on the first keystroke used to push every field and button below it down, so taps
-	# meant for "Sign in" landed on "Show passwords" (C-66).
+	# meant for "Sign in" landed on "Show passwords" (C-66). An empty label keeps its one-line height, and
+	# a screen reader has nothing to read twice next to the field's placeholder (C-78).
 	caption.visible = edit.visible
-	caption.modulate.a = 0.0 if edit.text.is_empty() else 1.0
+	caption.text = "" if edit.text.is_empty() else edit.placeholder_text
 
 func _option(node_name: String, labels: Array, parent: Control = null) -> OptionButton:
 	var o := OptionButton.new()
@@ -220,7 +224,6 @@ func _option(node_name: String, labels: Array, parent: Control = null) -> Option
 func set_mode(next: String) -> void:
 	mode = next
 	_status.text = ""
-	_status.visible = false
 	_status.add_theme_color_override("font_color", GameUi.CORAL)
 	_email.editable = mode in ["sign_in", "sign_up", "forgot"]
 	_password.placeholder_text = L10n.text("Password (8+ characters)" if mode == "sign_up" else "Current password" if mode == "password" else "Password")
@@ -418,7 +421,6 @@ func _submit_primary() -> void:
 
 func _say(message: String, ok := false) -> void:
 	_status.text = L10n.text(message)
-	_status.visible = not message.is_empty()
 	_status.add_theme_color_override("font_color", GameUi.GREEN if ok else GameUi.CORAL)
 
 func _set_busy(value: bool) -> void:

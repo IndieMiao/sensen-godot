@@ -152,14 +152,17 @@ func test_filled_fields_keep_a_caption() -> void:
 	var p := _panel("password")
 	var current := p.find_child("Password", true, false) as LineEdit
 	var caption := p.find_child("PasswordCaption", true, false) as Label
-	# Empty field: the caption's line is kept but transparent (C-66).
+	# Empty field: the caption's line is kept (C-66) but has no words, so a screen reader reads only the
+	# field's placeholder, not the same words twice (C-78).
 	assert_bool(caption.visible).is_true()
-	assert_float(caption.modulate.a).is_equal(0.0)
+	assert_str(caption.text).is_empty()
 	current.text = "correct horse"
 	current.text_changed.emit(current.text)
 	assert_bool(caption.visible).is_true()
-	assert_float(caption.modulate.a).is_equal(1.0)
 	assert_str(caption.text).is_equal("Current password")
+	current.text = ""
+	current.text_changed.emit(current.text)
+	assert_str(caption.text).is_empty()
 	p.queue_free()
 
 func _rects(p: AccountPanel, names: Array) -> Dictionary:
@@ -187,8 +190,59 @@ func test_typing_keeps_fields_and_buttons_in_place() -> void:
 			await get_tree().process_frame
 			await get_tree().process_frame
 			assert_dict(_rects(p, names)).is_equal(before)
-		assert_float((p.find_child("EmailCaption", true, false) as Label).modulate.a).is_equal(1.0)
+		assert_str((p.find_child("EmailCaption", true, false) as Label).text).is_equal("Email")
 		p.queue_free()
+
+## Every message the panel can show under its fields: local checks, progress and each server answer.
+func _status_messages() -> Array:
+	var out := ["Signing in…", "Enter your password.", "Enter a valid email address.", "Use at least 8 characters for your password.",
+		"Enter the 6-digit code.", "A new code is on its way.", "If this email has an account, a code is on its way.",
+		"Pick month, day and year, or leave the birthday empty.", "Profile saved.", "Password changed."]
+	for code in ["INVALID_EMAIL", "WEAK_PASSWORD", "EMAIL_TAKEN", "INVALID_CREDENTIALS", "CODE_INVALID", "CODE_EXPIRED",
+			"CODE_LOCKED", "CODE_COOLDOWN", "RATE_LIMITED", "LOGIN_REQUIRED", "INVALID_NAME", "INVALID_GENDER",
+			"INVALID_BIRTH_DATE", "UNDER_AGE", "SAME_PASSWORD", "PASSWORD_MISMATCH", "TRANSPORT", "EMAIL_IN_USE",
+			"GOOGLE_NO_ACCOUNT", "GOOGLE_UNAVAILABLE", "APPLE_UNAVAILABLE", "APPLE_FAILED", "GOOGLE_FAILED", "UNKNOWN"]:
+		out.append(AccountSession.describe(code))
+	return out
+
+## C-78: a message appearing after a tap ("Signing in…", "Can't reach the server…") must not push the
+## primary button or anything below it; neither may it clearing again.
+func test_status_messages_keep_the_buttons_in_place() -> void:
+	for mode in ["sign_in", "sign_up"]:
+		var p := _panel(mode)
+		var names := ["Email", "Password", "ShowPasswords", mode, "to_sign_in" if mode == "sign_up" else "to_sign_up"]
+		if mode == "sign_in": names.append("to_forgot")
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var before := _rects(p, names)
+		var status := p.find_child("Status", true, false) as Label
+		for message in _status_messages() + [""]:
+			p._say(message)
+			await get_tree().process_frame
+			await get_tree().process_frame
+			assert_bool(status.visible).is_true()
+			assert_int(status.get_line_count()).is_less_equal(AccountPanel.STATUS_LINES)
+			assert_dict(_rects(p, names)).override_failure_message("%s moved the buttons in %s" % [message, mode]).is_equal(before)
+		p.queue_free()
+
+func test_local_validation_message_keeps_sign_in_in_place() -> void:
+	var p := _panel()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var sign_in := p.find_child("sign_in", true, false) as Control
+	var before := sign_in.get_global_rect()
+	await p._submit_login(false)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_str(_status(p)).is_equal("Enter a valid email address.")
+	assert_object(sign_in.get_global_rect()).is_equal(before)
+	p.set_mode("sign_in")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_str(_status(p)).is_empty()
+	# The buttons are rebuilt for the mode; the new "Sign in" sits where the old one did.
+	assert_object((p.find_child("sign_in", true, false) as Control).get_global_rect()).is_equal(before)
+	p.queue_free()
 
 func test_hidden_fields_reserve_no_caption_line() -> void:
 	_sign_in_locally("Ada")
@@ -197,7 +251,7 @@ func test_hidden_fields_reserve_no_caption_line() -> void:
 	assert_bool((p.find_child("GenderCustomCaption", true, false) as Control).visible).is_false()
 	assert_bool((p.find_child("EmailCaption", true, false) as Control).visible).is_false()
 	# A nickname filled in from the account is labelled like a typed one.
-	assert_float((p.find_child("NicknameCaption", true, false) as Label).modulate.a).is_equal(1.0)
+	assert_str((p.find_child("NicknameCaption", true, false) as Label).text).is_equal("Nickname (2–24 characters)")
 	var gender := p.find_child("Gender", true, false) as OptionButton
 	gender.select(4)
 	gender.item_selected.emit(4)
