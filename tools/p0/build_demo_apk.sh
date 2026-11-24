@@ -9,7 +9,8 @@
 # day + 01. A second build the same day passes --code …02; …00 is for dry runs, which publish_demo_apk.mjs refuses.
 # The server URL (and demo key) go into assets/p0/demo_server.json for this export only and are removed afterwards;
 # export_presets.cfg is restored too. Godot's Android exporter stops "its" adb server when it exits, so this script
-# points it at a private port (P0_ADB_PORT, default 5071) and never touches another session's adb (5037 and others).
+# runs a copy of Godot whose own editor settings turn that off (godot_keep_adb.sh, C-79) and points it at a private
+# port (P0_ADB_PORT, default 5071): it never touches another session's adb (5037, 5137 and others).
 # Internal demo only: giving this APK to anyone outside needs the user's approval (AGENTS.md: only Journey goes out).
 # P0_DEV_CLEARTEXT=<host> (an internal voice test only, 11-02): LiveKit's Android SDK talks to its server through
 # Java, which targetSdk 36 keeps off plain ws:// — the devserver's LiveKit is ws://192.168.124.53:7880. With it set,
@@ -18,6 +19,7 @@
 # APK must carry no networkSecurityConfig at all (checked below).
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+source tools/p0/godot_keep_adb.sh
 SERVER="" KEY="" CODE="" NAME="" OUT="build/p0-demo.apk" PRESET="Android P0"
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -111,9 +113,11 @@ cp "$MANIFEST" "$MANIFEST_BACKUP"
 restore() {
   cp "$BACKUP" export_presets.cfg; rm -f "$BACKUP" "$CFG"
   cp "$MANIFEST_BACKUP" "$MANIFEST"; rm -f "$MANIFEST_BACKUP"; [[ -n "${WROTE_NSC:-}" ]] && rm -f "$NSC"
-  [[ -n "${MADE_XML_DIR:-}" ]] && rmdir "$(dirname "$NSC")" 2>/dev/null; return 0
+  [[ -n "${MADE_XML_DIR:-}" ]] && rmdir "$(dirname "$NSC")" 2>/dev/null; rm -rf "$GODOT_DIR"; return 0
 }
+GODOT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/p0demo_godot.XXXXXX")"
 trap restore EXIT
+p0_godot_keep_adb "$GODOT" "$GODOT_DIR"
 if [[ -n "$DEV_CLEARTEXT" ]]; then
   [[ -e "$NSC" ]] && { echo "$NSC is already there: not writing over it" >&2; exit 2; }
   [[ -d "$(dirname "$NSC")" ]] || MADE_XML_DIR=1   # an empty res/xml this script made goes too (后裔 on #651)
@@ -158,8 +162,8 @@ version_name = named.group(1)
 json.dump({"url": url.rstrip("/"), "key": key, "version": version, "name": version_name}, open("assets/p0/demo_server.json", "w"))
 PY
 
-"$GODOT" --headless --path . --import > "$LOGS/import.log" 2>&1 || true
-"$GODOT" --headless --path . --export-debug "$PRESET" "$OUT" > "$LOGS/export.log" 2>&1 \
+"$P0_GODOT" --headless --path . --import > "$LOGS/import.log" 2>&1 || true
+"$P0_GODOT" --headless --path . --export-debug "$PRESET" "$OUT" > "$LOGS/export.log" 2>&1 \
   || { echo "export failed, see $LOGS/export.log" >&2; exit 1; }
 
 # Read back what was built: package, version, signer, the baked server (never print the key), checksum.
