@@ -11,6 +11,10 @@ const FarmData := preload("res://modules/dynamic_farm/farm_data.gd")
 const PROMPT := "Tap a building to preview a farm."
 const QUERY_RETRY_DELAY_MS := 600 # Default before the single automatic re-query; config query_retry_delay_ms overrides.
 const QUERY_TIMEOUT_S := 8.0
+# A DataSF building layer Mapbox cannot parse never loads and reports no source error (C-43 V-167): taps answer
+# "loading" forever. Not ready this long after the sources are set counts as a map load error. Config
+# buildings_load_timeout_ms overrides (clamped 5–300 s).
+const BUILDINGS_LOAD_TIMEOUT_MS := 45000
 const QUERY_FAILED := "Parcel details could not load. Tap Retry."
 const MAP_FAILED := "Map details could not load. Tap Retry."
 const FINDING := "Finding parcel…"
@@ -41,6 +45,7 @@ var _map_retried := false
 var _reload_left := -1.0
 var _resume_tap := false
 var _failed_generation := -1 # Map being replaced by the automatic reload; its later signals are the same failure.
+var _buildings_left := -1.0 # Countdown for the DataSF building layer of the current map; -1 when not waiting.
 var _kind := ""
 var _key := ""
 var _options: Array = []
@@ -49,7 +54,7 @@ var _connected := false
 ## auto=true is the single automatic reload after a map load error; it keeps the waiting tap.
 func activate(auto := false) -> void:
 	if not auto: _map_retried = false; _resume_tap = false; _failed_generation = -1
-	_reload_left = -1.0
+	_reload_left = -1.0; _buildings_left = -1.0
 	suspended = false
 	_epoch += 1
 	var epoch := _epoch
@@ -83,10 +88,11 @@ func activate(auto := false) -> void:
 	generation = MapBridge.next_parcel_generation(); style_generation = -1
 	busy = false; message = FINDING if _resume_tap else "Loading map details…"; changed.emit()
 	bridge.set_parcel_sources(generation, JSON.stringify(native))
+	if native.building_source == "datasf": _buildings_left = buildings_load_timeout()
 
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; _retry_left = -1.0; _query_failed = false; map_ready = false; busy = false
-	_reload_left = -1.0; _resume_tap = false; _failed_generation = -1
+	_reload_left = -1.0; _resume_tap = false; _failed_generation = -1; _buildings_left = -1.0
 	selection = {}; _options = []; _key = ""
 	if api != null: api.cancel_all()
 	if bridge != null:
@@ -99,6 +105,7 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 	if style != style_generation:
 		_pending = -1; _retry_left = -1.0; _query_failed = false; selection = {}; _options = []; _key = ""
 	style_generation = style
+	if data.get("buildings_source_ready") == true: _buildings_left = -1.0
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
 	if map_ready and _resume_tap:
 		# The reloaded map answers the tap that its load error interrupted; that was the tap's one retry.
@@ -112,7 +119,7 @@ func _native_error(gen: int, style: int, code: String) -> void:
 	if gen == _failed_generation: return # One outage reports per tile/source; the reload already answers it.
 	var tap := _querying()
 	var retry_sent := _retried and _retry_left < 0.0 # A scheduled, unsent re-query is replaced by the reload.
-	map_ready = false; _pending = -1; _retry_left = -1.0; _query_failed = false
+	map_ready = false; _pending = -1; _retry_left = -1.0; _query_failed = false; _buildings_left = -1.0
 	# Offline tiles and service failures arrive here, not as query answers. Reload once before telling the player.
 	var retry := not _map_retried and not (tap and retry_sent)
 	print("DYNAMIC_MAP_ERROR ", JSON.stringify({"code":code, "tap":tap, "retry":retry}))
@@ -157,6 +164,11 @@ func retry_delay() -> float:
 	var raw = config.get("query_retry_delay_ms", QUERY_RETRY_DELAY_MS)
 	if not (raw is int or raw is float): raw = QUERY_RETRY_DELAY_MS
 	return clampf(float(raw), 0.0, 5000.0) / 1000.0
+
+func buildings_load_timeout() -> float:
+	var raw = config.get("buildings_load_timeout_ms", BUILDINGS_LOAD_TIMEOUT_MS)
+	if not (raw is int or raw is float) or not is_finite(float(raw)): raw = BUILDINGS_LOAD_TIMEOUT_MS
+	return clampf(float(raw), 5000.0, 300000.0) / 1000.0
 
 func _query_result(request: int, gen: int, style: int, payload: String) -> void:
 	if suspended or busy or gen != generation or style != style_generation or request != _pending: return
@@ -245,6 +257,10 @@ func _record_query(request: int, outcome: String, retry: bool) -> void:
 	print("DYNAMIC_QUERY ", JSON.stringify({"request":request, "outcome":outcome, "attempt":2 if _retried else 1, "retry":retry}))
 
 func _process(delta: float) -> void:
+	if _buildings_left >= 0.0 and not suspended:
+		_buildings_left -= delta
+		if _buildings_left < 0.0:
+			_buildings_left = -1.0; _native_error(generation, style_generation, "buildings_source_timeout"); return
 	if _reload_left >= 0.0:
 		_reload_left -= delta
 		if _reload_left < 0.0:

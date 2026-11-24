@@ -120,6 +120,14 @@ allowance resets on the next tap or Retry. `DYNAMIC_MAP_ERROR` logs the native
 code and whether a tap was waiting. `DYNAMIC_QUERY` logs the local request number, native
 outcome code, attempt and retry decision only, never the point or parcel.
 
+A DataSF building layer (`building_source=datasf`) that Mapbox cannot parse is
+dropped without any source error, so the layer never loads and taps answer
+`loading` (C-43 V-167). The controller counts it as a map load error
+(`buildings_source_timeout`, same reload-once-then-"Map details could not load.
+Tap Retry." path) when the native ready signal has not reported
+`buildings_source_ready` within `buildings_load_timeout_ms` of setting the
+sources (`config.json`, default 45000, clamped 5000–300000).
+
 ### Core size and too-small parcels (C-43)
 
 The client no longer requires 760–840 core cells. Farm data and parcel

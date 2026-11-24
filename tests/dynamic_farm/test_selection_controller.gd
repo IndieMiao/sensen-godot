@@ -144,6 +144,39 @@ func map_error_retry() -> void:
 	controller.config.query_retry_delay_ms = null
 	check(is_equal_approx(controller.retry_delay(), Controller.QUERY_RETRY_DELAY_MS / 1000.0), "non-numeric retry delay falls back to the default")
 	controller.config.erase("query_retry_delay_ms")
+func buildings_layer_timeout() -> void:
+	# C-43 V-167: Mapbox drops a DataSF building GeoJSON it cannot parse without any source error.
+	controller.config.building_source = "datasf"; controller.config.buildings_url = "https://demo.invalid/buildings.geojson"
+	await controller.activate(); ready_signal()
+	check(JSON.parse_string(native.sources.back()[1]).get("building_source") == "datasf", "DataSF building layer is configured")
+	var boots := native.sources.size()
+	controller._process(controller.buildings_load_timeout() - 1.0)
+	check(controller.map_ready and native.sources.size() == boots, "a building layer still within its load time is not a failure")
+	controller.tap(Vector2(.3, .7), 18); answer("loading"); controller._process(controller.retry_delay() + .01); answer("loading")
+	check(controller.message == Controller.QUERY_FAILED and not controller.busy, "taps on a map without its building layer report the query failure, not loading")
+	controller._process(1.0)
+	check(controller.message == "Loading map details…" and controller.busy and not controller.map_ready, "a building layer that never loads counts as a map load error and reloads once")
+	await reload(); ready_signal()
+	check(native.sources.size() == boots + 1, "the automatic reload sets the sources again")
+	controller._process(controller.buildings_load_timeout() + .1)
+	check(controller.message == Controller.MAP_FAILED and not controller.busy, "still missing after the reload: the map failure with Retry, not endless loading")
+	controller._process(controller.buildings_load_timeout() + .1); for i in 4: await process_frame
+	check(native.sources.size() == boots + 1, "the reported failure is not reloaded again automatically")
+	controller.retry(); for i in 4: await process_frame
+	check(native.sources.size() == boots + 2, "Retry after the building layer failure reloads the map")
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	controller._process(controller.buildings_load_timeout() + .1)
+	check(controller.map_ready and controller.message == Controller.PROMPT and native.sources.size() == boots + 2, "a loaded building layer stops the countdown")
+	controller.config.buildings_load_timeout_ms = 1
+	check(is_equal_approx(controller.buildings_load_timeout(), 5.0), "building load time has a lower bound")
+	controller.config.buildings_load_timeout_ms = 1e30
+	check(is_equal_approx(controller.buildings_load_timeout(), 300.0), "building load time has an upper bound")
+	controller.config.buildings_load_timeout_ms = "x"
+	check(is_equal_approx(controller.buildings_load_timeout(), Controller.BUILDINGS_LOAD_TIMEOUT_MS / 1000.0), "non-numeric building load time falls back to the default")
+	controller.config.building_source = "mapbox"; controller.config.erase("buildings_url"); controller.config.erase("buildings_load_timeout_ms")
+	await controller.activate(); ready_signal(); boots = native.sources.size()
+	controller._process(Controller.BUILDINGS_LOAD_TIMEOUT_MS / 1000.0 + 1.0)
+	check(controller.map_ready and native.sources.size() == boots, "Mapbox buildings have no DataSF load countdown")
 func burst_errors() -> void:
 	# V-47: one outage reports several map errors, and the failing map can still report ready.
 	ready_signal()
@@ -230,6 +263,7 @@ func _run() -> void:
 	check(controller._pending == -1 and controller.message.contains("did not respond"), "missing query callback expires with retry feedback")
 	await first_tap_retry()
 	await map_error_retry()
+	await buildings_layer_timeout()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame
