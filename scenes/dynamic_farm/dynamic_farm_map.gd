@@ -1,11 +1,11 @@
 extends Control
 ## Dynamic farm map. Its only server write is the C-32 first-home claim (and, in internal test packages,
-## giving that home up); no choose_home or old-farm state writes. Internal test packages also open the
-## player's own parcel for farming from "Enter my farm" (`sensen/dynamic_farm/own_farm`, C-34 Q-72);
-## everywhere else that button opens the same read-only 3D preview.
+## giving that home up); no choose_home or old-farm state writes. Internal test packages and the invite-only
+## release package (C-98) also open the player's own parcel for farming from "Enter my farm"
+## (`sensen/dynamic_farm/own_farm`, C-34 Q-72); everywhere else that button opens the same read-only 3D preview.
 ## Two fixed entries, Market (Jasmine) and Carpenter (Scott), open over the map for a player with a home
 ## (C-59, C-30#29 question 1); they trade through that home's parcel save (parcel_town.gd). Like "Enter my farm"
-## they are only in internal test packages (`own_farm`, C-59#29) until the release flow opens them (C-35 / C-61).
+## they are only in packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
 ## C-110: the map frames the player's home on entry and has a "My home" button; the account state and its
 ## Sign in / Sign out entry stay on the top panel whether or not a parcel is selected.
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
@@ -110,7 +110,7 @@ func _ready() -> void:
 	_selector.activate()
 	_start_claims()
 
-## Isolated test builds skip Net's boot. Internal packages may reload the saved account token only
+## Isolated test builds skip Net's boot. Internal and release packages may reload the saved account token only
 ## (`sensen/dynamic_farm/account_restore`); nothing here signs in anonymously.
 ## Only an explicit 401 drops the saved account (Net._resume_account); a server error, rate limit or lost network
 ## keeps it and the top panel says so (C-110).
@@ -405,7 +405,7 @@ func _refresh_area() -> void:
 
 func _open_host(farm: Dictionary) -> void:
 	if _leaving or _suspended or _opening: return
-	# Only the player's own parcel, opened from "Enter my farm", in an internal package is farmable.
+	# Only the player's own parcel, opened from "Enter my farm", in a package with `own_farm` is farmable.
 	var own: bool = _own_farm_entry() and _entering == str(farm.block_id) and _claims != null and _claims.status(_entering) == "mine"
 	_entering = ""
 	if _bridge == null or not _bridge.supports_surface_opacity() or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):

@@ -355,6 +355,37 @@ func test_google_button_follows_apple_or_the_primary_action() -> void:
 	GoogleSignIn.force_available = false
 	_restore_net()
 
+## The invite-only release package (C-98): sign in only, with its own line; every other package is unchanged.
+func test_invite_only_package_signs_in_with_an_invite_account_only() -> void:
+	AppleSignIn.force_available = true
+	GoogleSignIn.force_available = true
+	ProjectSettings.set_setting(AccountPanel.INVITE_ONLY_SETTING, true)
+	var p := _panel()
+	assert_array(_visible_fields(p)).contains_exactly(["Email", "Password"])
+	assert_array(_actions(p)).contains_exactly(["sign_in"])
+	assert_str(p._subtitle.text).is_equal("Sign in with your invite account.")
+	# No way into sign-up or reset, whoever asks.
+	for step in ["sign_up", "forgot"]:
+		p.set_mode(step)
+		assert_str(p.mode).is_equal("sign_in")
+		assert_array(_actions(p)).contains_exactly(["sign_in"])
+	p.queue_free()
+	var opened := _panel("sign_up")
+	assert_str(opened.mode).is_equal("sign_in")
+	opened.queue_free()
+	var walled := _panel("sign_in", "Sign in to create your farm.")
+	assert_str(walled._subtitle.text).is_equal("Sign in to create your farm.")
+	walled.queue_free()
+	ProjectSettings.set_setting(AccountPanel.INVITE_ONLY_SETTING, null)
+	var normal := _panel()
+	assert_array(_actions(normal)).contains_exactly(["sign_in", "Providers", "to_sign_up", "to_forgot"])
+	assert_str(normal._subtitle.text).is_equal("Sign in with your email to keep your farm on every device.")
+	await get_tree().process_frame
+	normal.queue_free()
+	AppleSignIn.force_available = false
+	GoogleSignIn.force_available = false
+	_restore_net()
+
 func test_google_sign_in_sends_the_raw_nonce_and_adopts_the_account() -> void:
 	GoogleSignIn.force_available = true
 	var t := _apple_net([{"status": 201, "json": {"token": "g-token", "user_id": "u-google", "player_id": "p-google",
