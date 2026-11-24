@@ -51,6 +51,7 @@ var _status: Label
 var _actions: VBoxContainer
 var _close: Button
 var _scroll: ScrollContainer
+var _step := ""
 var _fields: VBoxContainer
 var _field_list: Array[Control] = []
 
@@ -233,8 +234,12 @@ func _option(node_name: String, labels: Array, parent: Control = null) -> Option
 ## 状态切换：显示哪些输入框、标题文案、按钮列表。
 func set_mode(next: String) -> void:
 	mode = next
-	# Each step starts at its title, not wherever the previous step was scrolled to.
-	_scroll.scroll_vertical = 0
+	# A new step starts at its title, not wherever the previous step was scrolled to. Refreshing the same
+	# step ("Send a new code" re-enters it) keeps the scroll, so the buttons stay under the finger.
+	var step := mode + ("+code" if mode == "forgot" and _reset_code_sent else "")
+	if step != _step:
+		_step = step
+		_scroll.scroll_vertical = 0
 	_status.text = ""
 	_status.add_theme_color_override("font_color", GameUi.CORAL)
 	_email.editable = mode in ["sign_in", "sign_up", "forgot"]

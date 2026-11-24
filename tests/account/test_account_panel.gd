@@ -474,8 +474,12 @@ func test_every_button_can_be_scrolled_to_and_pressed_on_a_16_9_screen() -> void
 			p._say(AccountSession.describe("TRANSPORT"))
 			await _settle()
 			assert_array(buttons.map(func(b): return b.get_global_rect())).override_failure_message("a message moved the buttons in %s" % where).is_equal(before)
-			# A new step starts at its top again.
+			# Refreshing the same step (as "Send a new code" does) keeps the scroll; a new step starts at its top.
+			var scrolled := scroll.scroll_vertical
 			p.set_mode(step[0])
+			await _settle()
+			assert_int(scroll.scroll_vertical).override_failure_message("refreshing %s scrolled" % where).is_equal(scrolled)
+			p.set_mode("verify" if step[0] != "verify" else "sign_in")
 			await _settle()
 			assert_int(scroll.scroll_vertical).is_equal(0)
 			p.queue_free()
