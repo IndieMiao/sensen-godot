@@ -38,7 +38,28 @@ Tests: `tests/dynamic_farm/test_parcel_farming.gd` (rules, commands, spatial rul
 
 The outer trees, flowers and rocks of one's own parcel (the C-20 outer groves) can be picked by hand, as the owner answered C-30#29 question 4 (recorded C-30#36): no tool, one Timber (`wood`) per tree, one Wild Herb (`wild_herb`) per flower and one Stone (`stone`) per rock, back after 24 h of server time. Items, amounts, the respawn time and each kind's cap are `economy.gather` in `assets/farm/data/dynamic_farm.json`, which the C-58 server validates; `modules/dynamic_farm/parcel_gather.gd` reads the same block. Names and icons are the main farm's existing materials (`Timber`, `Wild Herb`, `Stone`); no item is new.
 
-When the cell in front has no step to do and no cell was tapped, the main key turns to the outer object nearest the player (within `GATHER_REACH_M`, 1.2 m of its bounds on the ground, about a cell and a half) that the player faces most; a tap whose ray meets an object's bounds picks that object. The key reads `Gather` and the item name, `Gather · Move closer` for a tapped object out of reach, or `Regrowing · Ready in …` until it grows back. A press sends `{type:"gather", object}`; the gain shows as `+1 Timber`. Picked trees and rocks are redrawn faded (same model and pose, `gathered_prop.gdshader` washes out the vertex colours) and picked flowers, which never block, are hidden; the outer layer is redrawn when the picked set changes (`Scenery.build(..., bind=false)`), so the walk, the layout and collision stay exactly as loaded.
+When the cell in front has no step to do and no cell was tapped, the main key turns to the outer object nearest the player (within `GATHER_REACH_M`, 1.2 m of its bounds on the ground, about a cell and a half) that the player faces most; a tap whose ray meets an object's bounds picks that object. The key reads `Gather` and the item name, `Gather · Move closer` for a tapped object out of reach, or `Regrowing · Ready in …` until it grows back. A press sends `{type:"gather", object}` without walking (the object is already in reach): with C-73's body the player faces it and plays the main farm's `harvest` labour clip, and the gain (`+1 Timber`) shows as the clip ends. Picked trees and rocks are redrawn faded (same model and pose, `gathered_prop.gdshader` washes out the vertex colours) and picked flowers, which never block, are hidden; the outer layer is redrawn when the picked set changes (`Scenery.build(..., bind=false)`), so the walk, the layout and collision stay exactly as loaded.
 
 Object ids follow C-58's contract (`docs/plans/C-58.md`): `<block id>:<outer_groves.version>:<model>:<x>,<y>:<ordinal>`, the origin's grid cell and the same model's ordinal in that cell in the drawn layout order. The ids lock the recipe's `outer_groves.version` (`outer-groves-v2`); a recipe whose version differs from `economy.gather.recipe_version` offers nothing to gather. `tools/dev/dynamic_farm/gather_qa_apk.sh` builds an x86_64 emulator QA package that opens one r4 parcel straight into one's own farm on the device save (`own_parcel_qa.tscn`); it is never a delivered package.
 
+## First house (C-33, Q-40)
+
+Built on the own-parcel farm above (Q-44: one entry, save and protected path for both). The welcome gift's
+`blueprint_cottage` comes with the first entry only. While the bag holds it and no house stands, `Build Cottage` opens
+placement (the farming key is held meanwhile): a press or drag moves the see-through `house_cottage` (its middle cell
+under the finger); its 3×3 cells fill green or red, grid lines fade over three core cells round it, and the protected
+path's cells in reach show sand. The bottom is the shared `UiPlaceBar` (`Cancel · Build`); the main key shows why a
+spot is refused. The preview starts on the valid spot nearest the player. Build sends `place_house` through
+`ParcelFarming.send`; the cottage stands at once (no construction time). A refused Build (`CELL_OCCUPIED`) keeps the
+preview, judged again on the farm the reply brought.
+
+Rules (`modules/dynamic_farm/farm_house.gd`, the save's `house.x/y` is the footprint's lowest cell): every cell
+core (`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
+too), a tilled cell or a crop (`Space taken`); none on `ParcelFarming.protected_path()` (the same path tilling keeps
+clear), and every other walk cell still reaching spawn (`Keep the path clear`). The walls block through a
+model-fitted box (walls and plinth below the eaves; C-19's walker), so the player walks along them and stops at
+contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the walls go steps out to the
+nearest clear point. Without `own_parcel` (the art preview) nothing of this shows.
+
+`tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
+Build, the wall, reopen (`--headless`: states only).

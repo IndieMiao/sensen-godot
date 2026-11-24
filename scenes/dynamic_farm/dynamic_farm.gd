@@ -18,6 +18,9 @@ const Cliff = preload("res://modules/dynamic_farm/island_cliff.gd")
 const SKY_SHADER = preload("res://modules/dynamic_farm/island_sky.gdshader")
 const Controls = preload("res://scenes/dynamic_farm/dynamic_controls.gd")
 const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.gd")
+const House = preload("res://modules/dynamic_farm/farm_house.gd")
+const Art = preload("res://modules/farm/farm_art.gd")
+const Placement = preload("res://scenes/dynamic_farm/house_placement.gd")
 const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
 const FarmPath = preload("res://modules/dynamic_farm/farm_path.gd")
 const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -71,6 +74,11 @@ var _summary := {}
 var _hint: Label
 var _farming: Node3D
 var _facing := Vector3.BACK
+# The first house (C-33) on the owner's parcel, through ParcelFarming's save; none in the art preview.
+var _house: Node3D
+var _build: UiCommandButton
+var _placement: Placement
+var _sending := false
 var _paths: RefCounted
 ## Waypoints of the current approach; the stick cancels it.
 var _route: Array[Vector3] = []
@@ -169,6 +177,7 @@ func _ready() -> void:
 		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas,
 			self, {"layout": _plan.layout, "root": _props, "recipe": _plan.recipe})
 		_hint.hide()
+		_farming.state_changed.connect(_on_farm_changed)
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -193,6 +202,105 @@ func _ready() -> void:
 		"triangles":_edge_plan.get("triangles",0),"batches":_edge_plan.get("batches",0),
 		"layout_sha256":_edge_plan.get("layout_sha256",""),"covered_cells":_edge_plan.get("covered_cells",0),
 		"perimeter_cells":_edge_plan.get("perimeter_cells",0),"clusters":_edge_plan.get("clusters",[]).size()}
+
+## Every save reply (ParcelFarming): the house once it stands, the Build key while a blueprint waits.
+func _on_farm_changed(farm: Dictionary) -> void:
+	if _failed: return
+	if farm.get("house") is Dictionary and _house == null: _build_house(farm.house)
+	_refresh_build()
+
+func blueprints() -> int:
+	if _farming == null: return 0
+	return int((_farming.farm.get("bag", {}) as Dictionary).get(House.BLUEPRINT, 0))
+
+func house_state() -> Variant:
+	return _farming.farm.get("house") if _farming != null else null
+
+func _refresh_build() -> void:
+	_build.visible = _farming != null and _house == null and _placement == null and blueprints() > 0
+
+func begin_house_placement() -> void:
+	if not _build.visible: return
+	# A press still walking to its cell is given up; one already working finishes under the preview.
+	if not _route.is_empty(): _end_route("cancelled")
+	_movement = Vector2.ZERO
+	_controls.reset()
+	_controls.process_mode = Node.PROCESS_MODE_DISABLED
+	_farming.held = true
+	var obstacles: Dictionary = _farming.obstacle_cells()
+	var taken := House.blocked(obstacles, _farming.farm)
+	var walk_blocked: Dictionary = House.solid(_plan.core_obstacles.layout, obstacles).merged(_walk.reserved)
+	var path: Dictionary = _farming.protected_path()
+	var start = House.nearest(_data, _walk.cell_at(_actor.position), taken, path, walk_blocked)
+	_placement = Placement.new()
+	add_child(_placement)
+	_placement.setup(_data, _walk, _camera, _canvas, taken, path, walk_blocked,
+		start if start != null else _walk.cell_at(_actor.position) - Vector2i.ONE)
+	_placement.confirmed.connect(_on_place_confirmed)
+	_placement.cancelled.connect(end_house_placement)
+	_refresh_build()
+	_play("idle")
+	_focus = House.center(_walk, _placement.at)
+	_overview = false
+	_place_camera()
+
+func end_house_placement() -> void:
+	if _placement == null: return
+	_placement.queue_free()
+	_placement = null
+	_sending = false
+	_farming.held = false
+	_controls.process_mode = Node.PROCESS_MODE_INHERIT
+	_controls.reset()
+	_refresh_build()
+
+## Build: the place_house command through ParcelFarming's save (Q-44); the reply builds the house (state_changed).
+func _on_place_confirmed(at: Vector2i, rotation_steps: int) -> void:
+	if _sending or _farming.busy: return
+	_sending = true
+	var reply: Dictionary = await _farming.send({"type":"place_house", "x":at.x, "y":at.y, "rotation":rotation_steps})
+	_sending = false
+	if not is_inside_tree() or _placement == null: return
+	# A refused spot keeps the preview, judged again on the farm the reply brought; anything else ends it.
+	if reply.get("ok", false) or str(reply.get("code", "")) != "CELL_OCCUPIED":
+		end_house_placement()
+	else:
+		_placement.retake(House.blocked(_farming.obstacle_cells(), _farming.farm))
+
+## The built cottage and its wall profile (C-19's model-fitted walking); a player standing on the new walls steps out.
+func _build_house(house: Dictionary) -> void:
+	var at := House.at_of(house)
+	var turns := int(house.get("rotation", 0))
+	_house = Node3D.new()
+	_house.name = "House"
+	_house.transform = House.transform(_walk, at, turns)
+	_house.add_child(Art.instance(House.ASSET))
+	add_child(_house)
+	var proxy := House.proxy(_walk, at, turns)
+	_walk.add_prop(proxy)
+	if get_tree().debug_collisions_hint:
+		var wire := MeshInstance3D.new()
+		wire.mesh = proxy.debug_wire()
+		var material := StandardMaterial3D.new()
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		material.no_depth_test = true
+		material.albedo_color = Color("00e5ff")
+		wire.material_override = material
+		wire.transform = proxy.pose
+		add_child(wire)
+	if _actor != null and not _walk.clear_position(_walk.position):
+		_walk.position = _step_out(_walk.position)
+		_actor.position = _walk.position
+		_focus = _actor.position
+		_place_camera()
+
+## The nearest clear point to `from`, searched in rings of 0.1 m.
+func _step_out(from: Vector3) -> Vector3:
+	for ring in range(1, 40):
+		for k in 32:
+			var p := from + Vector3.FORWARD.rotated(Vector3.UP, TAU * k / 32.0) * ring * 0.1
+			if _walk.clear_position(p): return p
+	return _walk.point(_data.spawn)
 
 func _setup_world() -> void:
 	var env := Environment.new()
@@ -255,7 +363,7 @@ func _process(delta: float) -> void:
 		elif Time.get_ticks_msec() - _started_ms > 15000:
 			_fail("The farm preview could not finish loading.")
 		return
-	if not _focused: return
+	if not _focused or _placement != null: return
 	var dt := clampf(delta,0,0.1)
 	var input := _movement
 	input = input.limit_length(1.0)
@@ -465,6 +573,16 @@ func _build_ui() -> void:
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_hint)
+	_build = UiCommandButton.new("Build Cottage", UiCommandButton.Kind.PRIMARY)
+	_build.theme = UiKit.theme()
+	_build.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_build.offset_left = -90
+	_build.offset_right = 90
+	_build.offset_top = -92
+	_build.offset_bottom = -44
+	_build.visible = false
+	_build.activated.connect(begin_house_placement)
+	_canvas.add_child(_build)
 
 ## A tap picks an outer object under it (C-60), else the ground cell, for the main key.
 func _on_tapped(at: Vector2) -> void:
@@ -484,6 +602,7 @@ func _label(text: String, size: int) -> Label:
 func _request_back() -> void:
 	if _back_sent: return
 	_back_sent = true
+	end_house_placement()
 	_movement = Vector2.ZERO
 	_controls.reset()
 	back_requested.emit()
@@ -494,6 +613,7 @@ func is_back_navigation_locked() -> bool:
 
 func suspend() -> void:
 	_suspended = true
+	end_house_placement()
 	if not _route.is_empty(): _end_route("cancelled")
 	_labour_left = 0.0
 	_movement = Vector2.ZERO
