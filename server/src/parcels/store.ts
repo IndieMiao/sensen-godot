@@ -49,8 +49,8 @@ export interface ParcelStore {
   claim(playerId: string, claim: ParcelClaim, farm: ParcelFarmState, now: number): Promise<ClaimOutcome>;
   /** 已被认领的地块及认领者昵称；没出现在结果里的就是无人认领。 */
   owners(communityId: string, layer: number, query: OwnerQuery): Promise<ParcelOwner[]>;
-  /** 行锁内：版本门控 → apply → 写回并加一。apply 失败整批不写。 */
-  updateFarm(playerId: string, baseVersion: number, apply: (farm: ParcelFarmState) => FarmOutcome, now: number): Promise<FarmUpdateOutcome>;
+  /** 行锁内：版本门控 → apply → 写回并加一。apply 失败整批不写。apply 拿到的 parcel 是锁住的那一行（本人地块编号由此而来）。 */
+  updateFarm(playerId: string, baseVersion: number, apply: (farm: ParcelFarmState, parcel: OwnedParcel) => FarmOutcome, now: number): Promise<FarmUpdateOutcome>;
   /** 进入自家地块：行锁内调用 grant，返回新状态就写回并加版本，返回 null（已发过）就不写。 */
   enter(playerId: string, grant: (farm: ParcelFarmState) => ParcelFarmState | null, now: number): Promise<EnterOutcome>;
   /** 放弃免费地块（仅测试配置开放），地块内状态一并删除。 */
@@ -97,11 +97,11 @@ export class MemoryParcelStore implements ParcelStore {
     return Promise.all(rows.map(async r => ({ parcel_id: r.parcel_id, player_id: r.player_id, nickname: await this.nickname(r.player_id) })));
   }
 
-  async updateFarm(playerId: string, baseVersion: number, apply: (farm: ParcelFarmState) => FarmOutcome, now: number): Promise<FarmUpdateOutcome> {
+  async updateFarm(playerId: string, baseVersion: number, apply: (farm: ParcelFarmState, parcel: OwnedParcel) => FarmOutcome, now: number): Promise<FarmUpdateOutcome> {
     const row = this.byPlayer(playerId);
     if (!row) return { kind: 'no_parcel' };
     if (row.farm_version !== baseVersion) return { kind: 'version_conflict', parcel: structuredClone(row) };
-    const out = apply(structuredClone(row.farm));
+    const out = apply(structuredClone(row.farm), structuredClone(row));
     if (!out.ok) return { kind: 'rejected', index: out.index, code: out.code, detail: out.detail, parcel: structuredClone(row) };
     row.farm = out.state; row.farm_version += 1; row.updated_at = now;
     return { kind: 'applied', parcel: structuredClone(row) };

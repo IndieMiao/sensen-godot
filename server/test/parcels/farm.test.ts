@@ -1,7 +1,10 @@
 /** 动态农场地块内命令（C-31）：首次进入的赠品、格子一致性、背包、按服务端时间成熟。 */
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
-import { applyFarmCommands, emptyFarm, MAX_BATCH, parseCell, parseFarmCommands, welcome, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
+import { applyFarmCommands, emptyFarm, MAX_BATCH, MAX_COINS, MAX_SELL_COUNT, parseCell, parseFarmCommands, welcome, withEconomy,
+  type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
 import { communityOf, loadParcelRules, parseParcelRules } from '../../src/parcels/rules.js';
 
 const rules = loadParcelRules(DEFAULT_CONTENT_DIR);
@@ -110,5 +113,187 @@ describe('parcel farm commands', () => {
     expect(applyFarmCommands(rules, sown, [{ type: 'harvest', cell: '9,9' }], T0)).toMatchObject({ ok: false, code: 'NO_CROP' });
     expect(applyFarmCommands(rules, run(s, [{ type: 'clear_obstacle', cell: '2,2' }]), [{ type: 'clear_obstacle', cell: '2,2' }], T0))
       .toMatchObject({ ok: false, code: 'ALREADY_CLEARED' });
+  });
+});
+
+/** C-58（0.4.3）：地块金币、出售、外围采集、鸡舍蓝图。数值出处 C-30#29 第 3–5 题（C-30#30 按推荐写入）。 */
+describe('parcel economy (C-58)', () => {
+  const ME = { parcel_id: 'p-3512001' };
+  const RECIPE = 'outer-groves-v2';
+  const obj = (model: string, cell: string, parcel = ME.parcel_id, recipe = RECIPE, n = 0) => `${parcel}:${recipe}:${model}:${cell}:${n}`;
+  const DAY = 24 * 3600 * 1000;
+  const runAt = (state: ParcelFarmState, commands: FarmCommand[], now = T0) => {
+    const out = applyFarmCommands(rules, state, commands, now, ME);
+    if (!out.ok) throw new Error(`${out.code} @${out.index}`);
+    return out.state;
+  };
+  /** ctx=null: no server-verified parcel at all. */
+  const tryAt = (state: ParcelFarmState, commands: FarmCommand[], now = T0, ctx: { parcel_id: string } | null = ME) =>
+    applyFarmCommands(rules, state, commands, now, ctx ?? undefined);
+  /** 背包里有 n 个萝卜的农场（经种收得来，不直接改背包）。 */
+  const withCarrots = (): ParcelFarmState => {
+    let s = run(welcomed(), [{ type: 'till', cell: '1,1' }, { type: 'till', cell: '2,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' },
+      { type: 'sow', cell: '2,1', crop: 'crop_carrot' }]);
+    s = run(s, [{ type: 'harvest', cell: '1,1' }, { type: 'harvest', cell: '2,1' }], T0 + 60_000);
+    expect(s.bag.crop_carrot).toBe(2);
+    return s;
+  };
+
+  it('ships the C-30#29 numbers: carrot 12, timber 2, wild herb 1, stone 2; 24 h respawn; coop blueprint after the first sale', () => {
+    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, wood: 2, wild_herb: 1, stone: 2 });
+    expect(rules.economy.gather.respawn_seconds).toBe(24 * 3600);
+    expect(Object.fromEntries(Object.entries(rules.economy.gather.sources).map(([k, v]) => [k, [v.item, v.amount]])))
+      .toEqual({ tree: ['wood', 1], flower: ['wild_herb', 1], rock: ['stone', 1] });
+    expect(rules.economy.blueprints).toEqual({ coop: { item: 'blueprint_coop', amount: 1, min_sales: 1 } });
+    // Coins start at 0, separate from the main farm.
+    expect(emptyFarm()).toMatchObject({ coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
+  });
+
+  it('locks the outer-object ids to the art recipe the client places (version and model names)', () => {
+    const recipe = JSON.parse(readFileSync(path.resolve(DEFAULT_CONTENT_DIR, '..', '..', 'dynamic_farm', '499-art-recipe.json'), 'utf8'));
+    expect(rules.economy.gather.recipe_version).toBe(recipe.outer_groves.version);
+    for (const [role, src] of Object.entries(rules.economy.gather.sources)) {
+      for (const m of src.models) expect(recipe.roles[role].ids).toContain(m);
+      // A parcel never holds more of one kind than the recipe's cap, so neither can one day's gathering.
+      expect(src.max_objects).toBe(recipe.outer_groves.targets[role].cap);
+    }
+    // Main-farm prices the defaults follow (C-30#29 Q3): carrot 12, timber 2, wild herb 1; stone has none there.
+    const p0 = JSON.parse(readFileSync(path.resolve(DEFAULT_CONTENT_DIR, '..', '..', 'p0', 'p0_content.json'), 'utf8'));
+    expect(p0.crops.find((c: { id: string }) => c.id === 'crop_carrot').price).toBe(rules.economy.sell_prices.crop_carrot);
+    expect(p0.materials.wood.price).toBe(rules.economy.sell_prices.wood);
+    expect(p0.materials.wild_herb.price).toBe(rules.economy.sell_prices.wild_herb);
+    expect(p0.materials.stone.price).toBeNull();
+  });
+
+  it('refuses out-of-bounds economy numbers at load time', () => {
+    const eco = rules.economy;
+    const bad = (economy: unknown) => () => parseParcelRules({ ...rules, economy });
+    expect(bad(undefined)).toThrow();
+    expect(bad({ ...eco, sell_prices: {} })).toThrow();
+    expect(bad({ ...eco, sell_prices: { crop_carrot: 0 } })).toThrow();
+    expect(bad({ ...eco, sell_prices: { crop_carrot: 1.5 } })).toThrow();
+    expect(bad({ ...eco, sell_prices: { crop_carrot: 100_001 } })).toThrow();
+    expect(bad({ ...eco, gather: { ...eco.gather, respawn_seconds: 0 } })).toThrow();
+    expect(bad({ ...eco, gather: { ...eco.gather, respawn_seconds: 31 * 24 * 3600 } })).toThrow();
+    expect(bad({ ...eco, gather: { ...eco.gather, recipe_version: 'Bad Version' } })).toThrow();
+    expect(bad({ ...eco, gather: { ...eco.gather, sources: { tree: { item: 'wood', amount: 0, max_objects: 1, models: ['a'] } } } })).toThrow();
+    expect(bad({ ...eco, gather: { ...eco.gather, sources: { tree: { item: 'wood', amount: 1, max_objects: 1, models: [] } } } })).toThrow();
+    expect(bad({ ...eco, gather: { ...eco.gather, sources: { tree: { item: 'wood', amount: 1, models: ['a'] } } } })).toThrow();
+    expect(bad({ ...eco, gather: { ...eco.gather, sources: { tree: { item: 'wood', amount: 1, max_objects: 0, models: ['a'] } } } })).toThrow();
+    expect(bad({ ...eco, gather: { ...eco.gather, sources: { a: { item: 'wood', amount: 1, max_objects: 1, models: ['m'] },
+      b: { item: 'stone', amount: 1, max_objects: 1, models: ['m'] } } } })).toThrow();
+    // The shipped file itself parses.
+    expect(() => parseParcelRules(structuredClone(rules))).not.toThrow();
+    expect(bad({ ...eco, blueprints: { coop: { item: 'blueprint_coop', amount: 1, min_sales: -1 } } })).toThrow();
+    expect(bad({ ...eco, blueprints: { coop: { item: 'blueprint_coop', amount: 100, min_sales: 1 } } })).toThrow();
+    expect(bad({ ...eco, blueprints: undefined })).toThrow();
+  });
+
+  it('an old C-31 save without economy fields reads as 0 coins, nothing sold, gathered or claimed; existing fields untouched', () => {
+    const legacy = { v: 1, house: null, cleared: ['2,2'], tilled: ['1,1'], crops: {}, bag: { hoe_starter: 1, crop_carrot: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
+    const frozen = structuredClone(legacy);
+    expect(withEconomy(legacy)).toEqual({ ...frozen, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
+    expect(legacy).toEqual(frozen);
+    expect(withEconomy({ ...legacy, coins: 30, sales: 2 } as ParcelFarmState)).toMatchObject({ coins: 30, sales: 2 });
+    // And it can sell straight away.
+    expect(runAt(legacy, [{ type: 'sell', item: 'crop_carrot', count: 1 }])).toMatchObject({ coins: 12, sales: 1, bag: { hoe_starter: 1 } });
+  });
+
+  it('sell: refuses too few or unpriced items; on success the bag shrinks and coins grow by the configured price', () => {
+    const s = withCarrots();
+    expect(tryAt(s, [{ type: 'sell', item: 'crop_carrot', count: 3 }])).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'crop_carrot', have: 2, need: 3 } });
+    expect(tryAt(s, [{ type: 'sell', item: 'wood', count: 1 }])).toMatchObject({ ok: false, code: 'NOT_ENOUGH', detail: { have: 0 } });
+    expect(tryAt(s, [{ type: 'sell', item: 'hoe_starter', count: 1 }])).toMatchObject({ ok: false, code: 'NOT_SELLABLE' });
+    expect(tryAt(s, [{ type: 'sell', item: 'blueprint_cottage', count: 1 }])).toMatchObject({ ok: false, code: 'NOT_SELLABLE' });
+    expect(tryAt(s, [{ type: 'sell', item: 'constructor', count: 1 }])).toMatchObject({ ok: false, code: 'NOT_SELLABLE' });
+    const one = runAt(s, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
+    expect(one).toMatchObject({ coins: 12, sales: 1 });
+    expect(one.bag.crop_carrot).toBe(1);
+    const two = runAt(one, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
+    expect(two).toMatchObject({ coins: 24, sales: 2 });
+    expect(two.bag.crop_carrot).toBeUndefined();
+    // A refused batch leaves coins and bag as they were.
+    expect(tryAt(s, [{ type: 'sell', item: 'crop_carrot', count: 2 }, { type: 'sell', item: 'crop_carrot', count: 1 }])).toMatchObject({ ok: false, index: 1, code: 'NOT_ENOUGH' });
+    expect(s.coins).toBe(0);
+    expect(s.bag.crop_carrot).toBe(2);
+    // Coins are capped.
+    expect(tryAt({ ...s, coins: MAX_COINS - 23 }, [{ type: 'sell', item: 'crop_carrot', count: 2 }])).toMatchObject({ ok: false, code: 'COINS_CAP' });
+  });
+
+  it('sell: the request carries no price; counts must be whole and bounded', () => {
+    expect(parseFarmCommands([{ type: 'sell', item: 'crop_carrot', count: 2, price: 9999 }])).toEqual([{ type: 'sell', item: 'crop_carrot', count: 2 }]);
+    for (const count of [0, -1, 1.5, MAX_SELL_COUNT + 1, '2', undefined]) expect(parseFarmCommands([{ type: 'sell', item: 'crop_carrot', count }])).toBeNull();
+    expect(parseFarmCommands([{ type: 'sell', item: 7, count: 1 }])).toBeNull();
+  });
+
+  it('gather: gives one of the configured item; again within 24 h of server time is refused, after that it is back', () => {
+    const s = welcomed();
+    const tree = obj('wild_pz_tree_20', '41,7');
+    const a = runAt(s, [{ type: 'gather', object: tree }, { type: 'gather', object: obj('wild_pz_flower_23', '40,9') },
+      { type: 'gather', object: obj('wild_pz_rock_13', '3,30') }]);
+    expect(a.bag).toMatchObject({ wood: 1, wild_herb: 1, stone: 1 });
+    expect(a.gathered[tree]).toBe(T0);
+    expect(tryAt(a, [{ type: 'gather', object: tree }], T0 + DAY - 1)).toEqual({ ok: false, index: 0, code: 'NOT_RESPAWNED', detail: { ready_at: T0 + DAY } });
+    // Two objects of one model in one cell are told apart by their ordinal.
+    expect(runAt(a, [{ type: 'gather', object: obj('wild_pz_tree_20', '41,7', ME.parcel_id, RECIPE, 1) }]).bag.wood).toBe(2);
+    // The same object twice in one batch: the second is refused and nothing lands.
+    expect(tryAt(s, [{ type: 'gather', object: tree }, { type: 'gather', object: tree }])).toMatchObject({ ok: false, index: 1, code: 'NOT_RESPAWNED' });
+    const b = runAt(a, [{ type: 'gather', object: tree }], T0 + DAY);
+    expect(b.bag.wood).toBe(2);
+    // Respawned records are dropped when the next gather lands; only live ones are kept.
+    expect(b.gathered).toEqual({ [tree]: T0 + DAY });
+  });
+
+  it('gather: refuses ids that do not exist, belong to another parcel, an old recipe, or a core cell', () => {
+    const s = run(welcomed(), [{ type: 'place_house', x: 10, y: 10 }, { type: 'clear_obstacle', cell: '5,5' }, { type: 'till', cell: '6,6' }]);
+    const code = (object: string, ctx: { parcel_id: string } | null = ME) => {
+      const out = tryAt(s, [{ type: 'gather', object }], T0, ctx);
+      return out.ok ? 'OK' : out.code;
+    };
+    for (const bad of ['', 'wild_pz_tree_20', `${ME.parcel_id}:${RECIPE}:wild_pz_tree_20:41,7`, `${ME.parcel_id}:${RECIPE}:wild_pz_tree_20:041,7:0`,
+      `${ME.parcel_id}:${RECIPE}:wild_pz_tree_20:1024,7:0`, `${ME.parcel_id}:${RECIPE}:wild_pz_tree_20:41,7:100`, `3512001:${RECIPE}:wild_pz_tree_20:41,7:0`])
+      expect(code(bad)).toBe('UNKNOWN_OBJECT');
+    // Not gatherable: shrubs, groundcover, core obstacles, the house, made-up models.
+    for (const model of ['wild_pz_bush_05', 'wild_pz_grass_24', 'cottage', 'gold_tree']) expect(code(obj(model, '41,7'))).toBe('UNKNOWN_OBJECT');
+    expect(code(obj('wild_pz_tree_20', '41,7', 'p-3512002'))).toBe('NOT_YOUR_PARCEL');
+    expect(code(obj('wild_pz_tree_20', '41,7'), null)).toBe('NOT_YOUR_PARCEL');
+    expect(code(obj('wild_pz_tree_20', '41,7', ME.parcel_id, 'outer-groves-v1'))).toBe('STALE_RECIPE');
+    // Cells the server knows are core: under the house, cleared obstacles, tilled ground.
+    for (const cell of ['11,11', '5,5', '6,6']) expect(code(obj('wild_pz_tree_20', cell))).toBe('NOT_OUTER');
+    expect(code(obj('wild_pz_tree_20', '41,7'))).toBe('OK');
+    expect(parseFarmCommands([{ type: 'gather', object: 'x'.repeat(257) }])).toBeNull();
+  });
+
+  it('gather: within one respawn window no more objects of a kind than the recipe can place (made-up ids gain nothing more)', () => {
+    const cap = rules.economy.gather.sources.rock.max_objects;
+    const rocks = Array.from({ length: cap }, (_, i) => ({ type: 'gather', object: obj('wild_pz_rock_08', `${i},40`) }) as FarmCommand);
+    let s = welcomed();
+    for (let i = 0; i < rocks.length; i += MAX_BATCH) s = runAt(s, rocks.slice(i, i + MAX_BATCH));
+    expect(s.bag.stone).toBe(cap);
+    expect(tryAt(s, [{ type: 'gather', object: obj('wild_pz_rock_13', '200,40') }])).toEqual({ ok: false, index: 0, code: 'TOO_MANY_OBJECTS', detail: { max: cap } });
+    // Other kinds are counted separately; after the respawn the rocks are available again.
+    expect(runAt(s, [{ type: 'gather', object: obj('wild_pz_tree_20', '200,40') }]).bag.wood).toBe(1);
+    expect(runAt(s, [{ type: 'gather', object: obj('wild_pz_rock_13', '200,40') }], T0 + DAY).bag.stone).toBe(cap + 1);
+    expect(parseFarmCommands([{ type: 'gather' }])).toBeNull();
+  });
+
+  it('coop blueprint: refused before the first sale, given once after it, never again', () => {
+    const s = withCarrots();
+    expect(tryAt(s, [{ type: 'claim_blueprint', blueprint: 'coop' }])).toEqual({ ok: false, index: 0, code: 'CONDITION_NOT_MET', detail: { sales: 0, min_sales: 1 } });
+    // Gathering is not selling.
+    expect(tryAt(runAt(s, [{ type: 'gather', object: obj('wild_pz_tree_20', '41,7') }]), [{ type: 'claim_blueprint', blueprint: 'coop' }]))
+      .toMatchObject({ ok: false, code: 'CONDITION_NOT_MET' });
+    const sold = runAt(s, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
+    const got = runAt(sold, [{ type: 'claim_blueprint', blueprint: 'coop' }], T0 + 5);
+    expect(got.bag.blueprint_coop).toBe(1);
+    expect(got.blueprints_claimed).toEqual({ coop: T0 + 5 });
+    expect(tryAt(got, [{ type: 'claim_blueprint', blueprint: 'coop' }])).toMatchObject({ ok: false, code: 'BLUEPRINT_CLAIMED' });
+    // Spending or selling more does not re-open it.
+    const more = runAt(got, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
+    expect(tryAt(more, [{ type: 'claim_blueprint', blueprint: 'coop' }])).toMatchObject({ ok: false, code: 'BLUEPRINT_CLAIMED' });
+    expect(tryAt(sold, [{ type: 'claim_blueprint', blueprint: 'castle' }])).toMatchObject({ ok: false, code: 'UNKNOWN_BLUEPRINT' });
+    expect(tryAt(sold, [{ type: 'claim_blueprint', blueprint: '__proto__' }])).toMatchObject({ ok: false, code: 'UNKNOWN_BLUEPRINT' });
+    // Selling and claiming in one batch works (the sale counts at once).
+    expect(runAt(s, [{ type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' }]).bag.blueprint_coop).toBe(1);
   });
 });

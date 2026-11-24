@@ -5,7 +5,7 @@
  */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
-import { applyFarmCommands, emptyFarm, parseFarmCommands, welcome } from './farm.js';
+import { applyFarmCommands, emptyFarm, parseFarmCommands, welcome, withEconomy } from './farm.js';
 import { communityOf, type ParcelRules } from './rules.js';
 import { DEFAULT_LAYER, type OwnedParcel, type ParcelStore } from './store.js';
 
@@ -49,7 +49,7 @@ function parseBbox(raw: unknown): [number, number, number, number] | null {
 
 const parcelView = (p: OwnedParcel) => ({
   community_id: p.community_id, layer: p.layer, parcel_id: p.parcel_id, dataset_version: p.dataset_version,
-  center: [p.center.lng, p.center.lat], claimed_at: p.claimed_at, farm_version: p.farm_version, farm: p.farm,
+  center: [p.center.lng, p.center.lat], claimed_at: p.claimed_at, farm_version: p.farm_version, farm: withEconomy(p.farm),
 });
 
 export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps, { auth, writer }: Auth): void {
@@ -128,7 +128,11 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     return reply.send({ granted: out.granted, parcel: parcelView(out.parcel), server_time: at });
   });
 
-  /** 地块内命令：{base_version, commands:[...]}，整批成功才写入，版本不符返回当前状态。 */
+  /**
+   * 地块内命令：{base_version, commands:[...]}，整批成功才写入，版本不符返回当前状态。
+   * 同一请求重发（或同时发多次）时只有第一次的 base_version 对得上，其余 409，不会重复加钱或重复发放（C-58）。
+   * 采集的“是否自家地块”按行锁内那一行的 parcel_id 判断，不看请求体。
+   */
   app.post('/v1/parcels/mine/commands', { config: { rateLimit: { max: 240, timeWindow: '1 minute' } } }, async (req, reply) => {
     const p = await writer(req, reply);
     if (!p) return;
@@ -136,7 +140,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     const commands = parseFarmCommands(b?.commands);
     if (!Number.isInteger(b?.base_version) || !commands) return reply.code(400).send({ code: 'SCHEMA', server_time: now() });
     const at = now();
-    const out = await deps.store.updateFarm(p.id, b!.base_version as number, farm => applyFarmCommands(deps.rules, farm, commands, at), at);
+    const out = await deps.store.updateFarm(p.id, b!.base_version as number, (farm, parcel) => applyFarmCommands(deps.rules, farm, commands, at, { parcel_id: parcel.parcel_id }), at);
     switch (out.kind) {
       case 'applied': return reply.send({ parcel: parcelView(out.parcel), server_time: at });
       case 'rejected': return reply.code(422).send({ code: out.code, index: out.index, ...(out.detail ? { detail: out.detail } : {}),

@@ -24,5 +24,44 @@
       "grow_seconds": 60,
       "yield": 1
     }
+  },
+  "economy": {
+    "sell_prices": {
+      "crop_carrot": 12,
+      "wood": 2,
+      "wild_herb": 1,
+      "stone": 2
+    },
+    "gather": {
+      "recipe_version": "outer-groves-v2",
+      "respawn_seconds": 86400,
+      "sources": {
+        "tree": {
+          "item": "wood",
+          "amount": 1,
+          "max_objects": 40,
+          "models": ["wild_pz_tree_20", "wild_pz_tree_20_g", "wild_pz_pine_01", "wild_pz_pine_03"]
+        },
+        "flower": {
+          "item": "wild_herb",
+          "amount": 1,
+          "max_objects": 80,
+          "models": ["wild_pz_flower_20", "wild_pz_flower_23"]
+        },
+        "rock": {
+          "item": "stone",
+          "amount": 1,
+          "max_objects": 30,
+          "models": ["wild_pz_rock_08", "wild_pz_rock_13", "wild_pz_softrock_10"]
+        }
+      }
+    },
+    "blueprints": {
+      "coop": {
+        "item": "blueprint_coop",
+        "amount": 1,
+        "min_sales": 1
+      }
+    }
   }
 }

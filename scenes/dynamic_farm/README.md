@@ -28,6 +28,30 @@ Rules and numbers: `assets/farm/data/dynamic_farm.json` (shared with the C-31 se
 
 `farm_store` answers `enter()` and `send(base_version, commands)` with the farm, its version and `server_time`. By default the scene uses `parcel_farm_remote_store.gd`: C-31 `POST /parcels/mine/enter` and `/parcels/mine/commands` through `Net.client` (it needs a signed-in client; a reply about another parcel is refused). `parcel_farm_local_store.gd` keeps the save in `user://dynamic_farm_local/` with the device clock; it is used only by tests or with the development setting `sensen/dynamic_farm/local_farm_save`, and is not save or server-time evidence.
 
+Walking up and labour (C-73): a press walks the player beside the target before anything is sent. `modules/dynamic_farm/farm_path.gd` routes on the walker's own grid: a cell is open when the body fits at its centre (`Walk.clear_position`, the same parcel outline and fitted prop profiles the stick collides with) and a step between neighbouring centres, diagonals included, is taken only if the body fits all along it; legs are straightened where it still fits. The player stands on one of the 8 neighbours (sides preferred; for a tree, around its whole 2×2 block), faces the target and plays the main farm's labour clip for the verb (`AnimPlaceholders.clip_for`: `labour_clear`, `labour_till`, `labour_sow`, `labour_harvest`) for `ParcelFarming.LABOUR_S` (1.2 s), holding still. The command is sent as the clip starts and its result is shown as it ends. No route, or a walk that stalls, toasts `Can't reach it` and sends nothing; the stick cancels a walk. The parcel stays under a loading cover (`Loading your farm…`, or `Could not open your farm.` with Retry) until the save is applied, so cleared obstacles never show first. `tests/dynamic_farm/test_farm_path.gd` covers routes on a synthetic grid and on the r4 parcels.
+
 Packaging must also include `assets/farm/data/dynamic_farm.json` and the P0 content table (`assets/p0/p0_content.json`, item names) with the P0 item icons; JSON is not found by static scene dependencies.
 
 Tests: `tests/dynamic_farm/test_parcel_farming.gd` (rules, commands, spatial rules, local save) and `test_parcel_farming_scene.gd` (the real scene; optional `-- <farm.json>`), both headless in the private preview project. `test_parcel_farming_server.gd -- <base …/v1> <owner token> <farm.json>` runs the scene against a running C-31 server on its real clock (~70 s; the owner has claimed that parcel and not entered it yet).
+
+## First house (C-33, Q-40)
+
+Built on the own-parcel farm above (Q-44: one entry, save and protected path for both). The welcome gift's
+`blueprint_cottage` comes with the first entry only. While the bag holds it and no house stands, `Build Cottage` opens
+placement (the farming key is held meanwhile): a press or drag moves the see-through `house_cottage` (its middle cell
+under the finger); its 3×3 cells fill green or red, grid lines fade over three core cells round it, and the protected
+path's cells in reach show sand. The bottom is the shared `UiPlaceBar` (`Cancel · Build`); the main key shows why a
+spot is refused. The preview starts on the valid spot nearest the player. Build sends `place_house` through
+`ParcelFarming.send`; the cottage stands at once (no construction time). A refused Build (`CELL_OCCUPIED`) keeps the
+preview, judged again on the farm the reply brought.
+
+Rules (`modules/dynamic_farm/farm_house.gd`, the save's `house.x/y` is the footprint's lowest cell): every cell
+core (`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
+too), a tilled cell or a crop (`Space taken`); none on `ParcelFarming.protected_path()` (the same path tilling keeps
+clear), and every other walk cell still reaching spawn (`Keep the path clear`). The walls block through a
+model-fitted box (walls and plinth below the eaves; C-19's walker), so the player walks along them and stops at
+contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the walls go steps out to the
+nearest clear point. Without `own_parcel` (the art preview) nothing of this shows.
+
+`tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
+Build, the wall, reopen (`--headless`: states only).
