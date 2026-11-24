@@ -1,6 +1,8 @@
 extends Control
 ## Dynamic farm map. Its only server write is the C-32 first-home claim (and, in internal test packages,
-## giving that home up); no choose_home or old-farm state writes.
+## giving that home up); no choose_home or old-farm state writes. Internal test packages also open the
+## player's own parcel for farming from "Enter my farm" (`sensen/dynamic_farm/own_farm`, C-34 Q-72);
+## everywhere else that button opens the same read-only 3D preview.
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -33,6 +35,7 @@ var _area_generation := -1
 var _retry: Button
 var _choices: OptionButton
 var _candidate_ids: Array[String] = []
+var _entering := "" # Parcel whose load was started from "Enter my farm".
 var _framed := false
 var _leaving := false
 var _opening := false
@@ -78,6 +81,9 @@ func _start_claims() -> void:
 		await net.restore_saved_account()
 	if is_inside_tree() and not _suspended: _claims.start()
 
+func _own_farm_entry() -> bool:
+	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/own_farm", false))
+
 func _fake_claims() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/fake_claims", false))
 
@@ -111,7 +117,7 @@ func _build_ui() -> void:
 	var answer := HBoxContainer.new(); _confirm.add_child(answer)
 	answer.add_child(_button("Claim", _claim_selection))
 	answer.add_child(_button("Cancel", func(): _confirm.hide(); _render()))
-	_enter = _button("Enter my farm", _preview); _enter.hide(); bottom.add_child(_enter)
+	_enter = _button("Enter my farm", _enter_farm); _enter.hide(); bottom.add_child(_enter)
 	_open = _button("Preview in 3D", _preview); _open.disabled = true; bottom.add_child(_open)
 	_reselect = _button("Give up and choose again", _abandon); _reselect.hide(); bottom.add_child(_reselect)
 	_sign_in = _button("Sign in", _open_sign_in); _sign_in.hide(); bottom.add_child(_sign_in)
@@ -194,7 +200,12 @@ func _retry_map() -> void:
 	if _selector != null and not _selector.busy and not _opening: _selector.retry()
 
 func _preview() -> void:
-	if _selector != null and not _opening: _selector.open_farm()
+	if _selector != null and not _opening:
+		_entering = ""; _selector.open_farm()
+
+func _enter_farm() -> void:
+	if _selector != null and not _opening:
+		_entering = str(_selector.selection.get("block_id", "")); _selector.open_farm()
 
 func _claim_selection() -> void:
 	_confirm.hide()
@@ -223,6 +234,9 @@ func _refresh_area() -> void:
 
 func _open_host(farm: Dictionary) -> void:
 	if _leaving or _suspended or _opening: return
+	# Only the player's own parcel, opened from "Enter my farm", in an internal package is farmable.
+	var own: bool = _own_farm_entry() and _entering == str(farm.block_id) and _claims != null and _claims.status(_entering) == "mine"
+	_entering = ""
 	if _bridge == null or not _bridge.supports_surface_opacity() or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):
 		_render()
 		_message.text = "Use the latest Dynamic Farm preview build."; return
@@ -231,7 +245,7 @@ func _open_host(farm: Dictionary) -> void:
 		_message.text = "This preview is missing its scene router."; return
 	_opening = true; _render()
 	await router.open_instance(HOST, {"farm": farm, "dataset": farm.dataset_version, "block_id": farm.block_id,
-		"preview_only": true, "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
+		"own_parcel" if own else "preview_only": true, "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
 	_opening = false
 	if not _suspended:
 		# Loading cancelled/failed before a host became top, or Back already returned here.
