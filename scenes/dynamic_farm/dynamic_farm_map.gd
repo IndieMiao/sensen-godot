@@ -6,12 +6,15 @@ extends Control
 ## Two fixed entries, Market (Jasmine) and Carpenter (Scott), open over the map for a player with a home
 ## (C-59, C-30#29 question 1); they trade through that home's parcel save (parcel_town.gd). Like "Enter my farm"
 ## they are only in packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
+## C-110: the map frames the player's home on entry and has a "My home" button; the account state and its
+## Sign in / Sign out entry stay on the top panel whether or not a parcel is selected.
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
 const Claims := preload("res://modules/dynamic_farm/map/claim_controller.gd")
 const ClaimApi := preload("res://modules/dynamic_farm/map/claim_api.gd")
 const FakeParcelServer := preload("res://modules/dynamic_farm/map/fake_parcel_server.gd")
+const Geo := preload("res://modules/dynamic_farm/map/geo_math.gd")
 const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
@@ -26,6 +29,16 @@ const AREA_REFRESH_SECONDS := 0.8
 const PICK_PREVIEW := "Choose a parcel to explore in 3D."
 const PICK_FIRST := "Tap a building to choose your first home."
 const PICK_HOME := "Tap your green parcel, then Enter my farm."
+## Camera zoom when the map moves to the player's home (C-110); the parcel and its address labels show from 18.
+const HOME_ZOOM := 18.0
+const MY_HOME := "My home"
+const CHECKING := "Checking your account…"
+const SIGNED_IN := "Signed in as %s"
+const SIGNED_IN_NO_NAME := "Signed in"
+const NOT_SIGNED_IN := "Not signed in"
+const SIGN_OUT_ASK := "Sign out on this phone?"
+## The saved account was kept because the server could not confirm it (5xx, rate limit or no network).
+const ACCOUNT_KEPT := "Can't reach the server. You're still signed in."
 ## Development stand-in for the C-31 server, shared by map visits in one run.
 static var _fake_server: RefCounted
 var _selector: Node
@@ -40,7 +53,12 @@ var _claim: Button
 var _confirm: Control
 var _enter: Button
 var _reselect: Button
-var _sign_in: Button
+var _account_line: Label
+var _account_button: Button # "Sign in" or "Sign out"
+var _sign_out_confirm: Control
+var _account_note: Label
+var _places: Control
+var _home: Button
 var _market: Button
 var _carpenter: Button
 var _town: Control
@@ -56,6 +74,10 @@ var _opening := false
 var _suspended := false
 var _presentation_epoch := 0
 var _surface_opaque_requested := false
+var _restoring := false # Reloading the saved account before the first ownership read.
+var _signing_out := false
+var _framed_home := "" # Parcel the camera was moved to automatically; "" until the home is framed.
+var _player_moved := false # The player moved the camera since the last account change.
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -72,6 +94,7 @@ func _ready() -> void:
 	_bridge = AndroidBridge.new()
 	_bridge.set_godot_surface_opaque(false) # A fresh map scene always requests the transparent mode.
 	_camera = CameraInput.new(); add_child(_camera); move_child(_camera, 0)
+	_camera.user_moved.connect(func(): _player_moved = true)
 	_selector = Selection.new(); _selector.config = parser.data; _selector.bridge = _bridge
 	var api := Api.new(); add_child(api); _selector.api = api; add_child(_selector)
 	_selector.changed.connect(_render)
@@ -89,11 +112,17 @@ func _ready() -> void:
 
 ## Isolated test builds skip Net's boot. Internal and release packages may reload the saved account token only
 ## (`sensen/dynamic_farm/account_restore`); nothing here signs in anonymously.
+## Only an explicit 401 drops the saved account (Net._resume_account); a server error, rate limit or lost network
+## keeps it and the top panel says so (C-110).
 func _start_claims() -> void:
+	if _restoring: return
 	var net := get_node_or_null("/root/Net")
 	if net != null and not _fake_claims() and bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)):
+		_restoring = true; _render()
 		await net.restore_saved_account()
+		_restoring = false
 	if is_inside_tree() and not _suspended: _claims.start()
+	if is_inside_tree(): _render()
 
 func _own_farm_entry() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/own_farm", false))
@@ -115,15 +144,28 @@ func _build_ui() -> void:
 	_hud = Control.new(); _hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(_hud)
 	var top := _panel(false)
-	top.add_child(_label("Dynamic Farm", 20))
+	var heading := HBoxContainer.new(); top.add_child(heading)
+	var titles := VBoxContainer.new(); titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	titles.add_theme_constant_override("separation", 0); heading.add_child(titles)
+	titles.add_child(_label("Dynamic Farm", 20))
+	_account_line = _label("", 12); titles.add_child(_account_line)
+	_account_button = _button("Sign in", _account_action); _account_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_account_button.custom_minimum_size.x = 96; heading.add_child(_account_button)
+	_sign_out_confirm = VBoxContainer.new(); _sign_out_confirm.hide(); top.add_child(_sign_out_confirm)
+	_sign_out_confirm.add_child(_label(SIGN_OUT_ASK, 14))
+	var sign_out_answer := HBoxContainer.new(); _sign_out_confirm.add_child(sign_out_answer)
+	sign_out_answer.add_child(_button("Sign out", _sign_out))
+	sign_out_answer.add_child(_button("Cancel", func(): _sign_out_confirm.hide(); _render()))
+	_account_note = _label(ACCOUNT_KEPT, 12); _account_note.hide(); top.add_child(_account_note)
 	_message = _label("Loading dynamic farm map…", 14); top.add_child(_message)
 	var row := HBoxContainer.new(); top.add_child(row)
 	_retry = _button("Retry", _retry_map); _retry.disabled = true; row.add_child(_retry)
 	row.add_child(_button("San Francisco", _reset_area))
 	row.add_child(_button("Back", _leave))
-	var places := HBoxContainer.new(); places.visible = _own_farm_entry(); top.add_child(places)
-	_market = _button("Market", _open_town.bind("market")); _market.disabled = true; places.add_child(_market)
-	_carpenter = _button("Carpenter", _open_town.bind("carpenter")); _carpenter.disabled = true; places.add_child(_carpenter)
+	_places = HBoxContainer.new(); _places.visible = _own_farm_entry(); top.add_child(_places)
+	_home = _button(MY_HOME, _go_home); _home.hide(); _places.add_child(_home)
+	_market = _button("Market", _open_town.bind("market")); _market.disabled = true; _market.visible = _own_farm_entry(); _places.add_child(_market)
+	_carpenter = _button("Carpenter", _open_town.bind("carpenter")); _carpenter.disabled = true; _carpenter.visible = _own_farm_entry(); _places.add_child(_carpenter)
 	var bottom := _panel(true)
 	_details = _label(PICK_PREVIEW, 16); bottom.add_child(_details)
 	_choices = OptionButton.new(); _choices.custom_minimum_size.y = 44; _choices.hide()
@@ -140,7 +182,6 @@ func _build_ui() -> void:
 	_enter = _button("Enter my farm", _enter_farm); _enter.hide(); bottom.add_child(_enter)
 	_open = _button("Preview in 3D", _preview); _open.disabled = true; bottom.add_child(_open)
 	_reselect = _button("Give up and choose again", _abandon); _reselect.hide(); bottom.add_child(_reselect)
-	_sign_in = _button("Sign in", _open_sign_in); _sign_in.hide(); bottom.add_child(_sign_in)
 	_area_timer = Timer.new(); _area_timer.one_shot = true; _area_timer.timeout.connect(_refresh_area); add_child(_area_timer)
 	# Only the preview package still cannot farm; one that enters one's own farm drops the line (C-35).
 	if not _own_farm_entry(): bottom.add_child(_label("Explore and walk. Farming actions come later.", 12))
@@ -148,6 +189,7 @@ func _build_ui() -> void:
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
 		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
 	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0", 10))
+	_render_account()
 
 func _panel(bottom: bool) -> VBoxContainer:
 	var panel := PanelContainer.new(); _hud.add_child(panel)
@@ -172,9 +214,9 @@ func _button(text: String, action: Callable) -> Button:
 	return button
 
 func _render() -> void:
+	_render_account()
 	if _selector == null or _suspended or _leaving: return
-	if not _framed and not _selector.manifest.is_empty():
-		_framed = true; _reset_area()
+	_frame_on_entry()
 	_message.text = _selector.message
 	_retry.disabled = _selector.busy or _opening
 	var id := str(_selector.selection.get("block_id", ""))
@@ -203,10 +245,84 @@ func _render() -> void:
 	_enter.visible = state == "mine"; _enter.disabled = not idle
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
-	_sign_in.visible = _claims.signed_out and not id.is_empty() and not _fake_claims(); _sign_in.disabled = not idle
 	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
+	_home.visible = _claims.has_home()
+	_home.disabled = _selector.manifest.is_empty() or _opening or _town != null
+	_places.visible = _own_farm_entry() or _home.visible
 	if _selector._options.is_empty(): _choices.hide()
+
+## First framing after the map loads: the player's home if they have one, else the dataset's area. It waits while the
+## saved account and the home are still being read, and never moves a camera the player has already moved. A home
+## that only becomes known later (sign-in, a retried read) is framed once, the same way.
+func _frame_on_entry() -> void:
+	if _selector.manifest.is_empty() or _claims == null: return
+	if not _framed:
+		if _restoring or _claims._reading_mine or _selector.busy: return
+		_framed = true
+		if _player_moved: return
+		if not _frame_home(): _reset_area()
+	elif _framed_home.is_empty() and not _player_moved and _claims.has_home():
+		_frame_home()
+
+## Moves the camera to the player's home (the centre the server stored at claim time).
+func _frame_home() -> bool:
+	if _camera == null or _claims == null or not _claims.has_home() or _opening: return false
+	var center = _claims.mine.get("center")
+	if not Geo.valid_point(center): return false
+	_framed_home = str(_claims.mine.get("parcel_id", ""))
+	_camera.frame_center(float(center[0]), float(center[1]), HOME_ZOOM)
+	return true
+
+func _go_home() -> void:
+	if _selector == null or _selector.manifest.is_empty() or _town != null: return
+	_frame_home()
+
+## Top panel: who is signed in on this phone, with Sign in / Sign out, shown whether or not a parcel is selected.
+## Development builds on the in-memory claim stand-in have no account and hide it.
+func _render_account() -> void:
+	if _account_line == null: return
+	var net := get_node_or_null("/root/Net")
+	var shown := net != null and not _fake_claims()
+	_account_line.visible = shown
+	if not shown:
+		_account_button.hide(); _sign_out_confirm.hide(); _account_note.hide(); return
+	var signed_in: bool = net.account.signed_in()
+	if _restoring: _account_line.text = CHECKING
+	elif signed_in: _account_line.text = _account_name(net.account)
+	else: _account_line.text = NOT_SIGNED_IN
+	_account_button.text = "Sign out" if signed_in else "Sign in"
+	_account_button.disabled = _opening or _town != null or (_claims != null and _claims.busy)
+	if not signed_in or _restoring or _signing_out: _sign_out_confirm.hide()
+	_account_button.visible = not _restoring and not _signing_out and not _sign_out_confirm.visible
+	_account_note.visible = signed_in and not _restoring and not str(net.restore_error).is_empty()
+
+static func _account_name(account: AccountSession) -> String:
+	var name := account.display_name if not account.display_name.is_empty() else account.email
+	return SIGNED_IN % name.left(40) if not name.is_empty() else SIGNED_IN_NO_NAME
+
+func _account_action() -> void:
+	var net := get_node_or_null("/root/Net")
+	if net == null or _restoring or _signing_out: return
+	if net.account.signed_in(): _sign_out_confirm.show(); _render()
+	else: _open_sign_in()
+
+## Revokes this phone's token and clears the saved account; no anonymous guest sign-in follows.
+func _sign_out() -> void:
+	_sign_out_confirm.hide()
+	var net := get_node_or_null("/root/Net")
+	if net == null or _signing_out or _restoring: return
+	_signing_out = true; _render()
+	await net.sign_out(false)
+	_signing_out = false
+	if not is_inside_tree(): return
+	_account_changed()
+
+## Ownership and the framed home were relative to the previous account.
+func _account_changed() -> void:
+	_framed_home = ""; _player_moved = false
+	if _claims != null: _claims.forget()
+	_render()
 
 ## With nothing selected: where to go next (C-35) in a package that enters one's own farm, once the player's own
 ## parcel is known; otherwise the preview's line.
@@ -227,6 +343,11 @@ func _reset_area() -> void:
 
 func _retry_map() -> void:
 	if _selector != null and not _selector.busy and not _opening: _selector.retry()
+	# The saved account could not be confirmed, or the home could not be read: ask the server again.
+	var net := get_node_or_null("/root/Net")
+	if _claims == null or _restoring or _signing_out: return
+	if net != null and not _fake_claims() and net.account.signed_in() and not str(net.restore_error).is_empty(): _start_claims()
+	elif not _claims.mine_known and not _claims.signed_out and not _claims._reading_mine: _claims.start()
 
 func _preview() -> void:
 	if _selector != null and not _opening:
@@ -238,7 +359,9 @@ func _enter_farm() -> void:
 
 func _claim_selection() -> void:
 	_confirm.hide()
-	if _selector != null and not _selector.selection.is_empty(): _claims.claim(_selector.selection)
+	if _selector != null and not _selector.selection.is_empty():
+		_framed_home = str(_selector.selection.block_id) # The player is already looking at the parcel they claim.
+		_claims.claim(_selector.selection)
 
 func _open_sign_in() -> void:
 	if _claims == null or find_children("*", "AccountPanel", true, false).size() > 0: return
@@ -247,8 +370,8 @@ func _open_sign_in() -> void:
 	_camera.input_enabled = false
 	var signed_in: bool = await panel.closed
 	if not is_inside_tree(): return
-	if signed_in: _claims.forget()
-	_render()
+	if signed_in: _account_changed()
+	else: _render()
 
 ## The market or the carpenter over the map, trading through the player's own parcel save.
 func _open_town(who: String) -> void:

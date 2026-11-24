@@ -97,6 +97,63 @@ func test_offline_boot_keeps_the_saved_account() -> void:
 	assert_str(n.client.token).is_equal("acct-token")
 	assert_bool(AccountSession.new().load_saved(ACCOUNT)).is_true()
 
+## C-110: 5xx and 429 from /users/me keep the saved account too; only 401 clears it (above).
+func test_server_error_on_boot_keeps_the_saved_account() -> void:
+	var saved := AccountSession.new()
+	saved.adopt({"token": "acct-token", "user_id": "u1", "player_id": "p1", "email": "ada@example.com"}, ACCOUNT)
+	for answer in [{"status": 503, "json": {}}, {"status": 429, "json": {"code": "RATE_LIMITED"}}]:
+		var pair := _net([answer, {"error": "offline"}, {"error": "offline"}])
+		var n = pair[0]
+		await n.boot()
+		assert_bool(n.is_guest()).is_false()
+		assert_str(n.client.token).is_equal("acct-token")
+		assert_str(n.restore_error).is_not_empty()
+		for r in pair[1].requests: assert_str(r.url).not_contains("/auth/anonymous")
+		assert_bool(AccountSession.new().load_saved(ACCOUNT)).is_true()
+
+## C-110: the account file is written to a temporary file and then renamed over the old one.
+func test_account_file_is_replaced_whole() -> void:
+	var a := AccountSession.new()
+	a.adopt({"token": "token-a", "user_id": "u1", "player_id": "p1", "email": "ada@example.com"}, ACCOUNT)
+	assert_bool(FileAccess.file_exists(ACCOUNT + ".tmp")).is_false()
+	assert_bool(JSON.parse_string(FileAccess.get_file_as_string(ACCOUNT)) is Dictionary).is_true()
+	a.adopt({"token": "token-b", "display_name": "Ada"}, ACCOUNT)
+	var again := AccountSession.new()
+	assert_bool(again.load_saved(ACCOUNT)).is_true()
+	assert_str(again.token).is_equal("token-b")
+	assert_str(again.display_name).is_equal("Ada")
+	assert_bool(FileAccess.file_exists(ACCOUNT + ".tmp")).is_false()
+
+## A write cut off part-way (the app is killed before the rename) leaves the previous account readable; the
+## half-written temporary file is never read and the next save replaces it.
+func test_interrupted_account_write_keeps_the_previous_file() -> void:
+	var a := AccountSession.new()
+	a.adopt({"token": "token-a", "user_id": "u1", "player_id": "p1", "email": "ada@example.com"}, ACCOUNT)
+	var before := FileAccess.get_file_as_bytes(ACCOUNT)
+	var full := JSON.stringify({"token": "token-b", "user_id": "u1", "player_id": "p1"})
+	assert_bool(AccountSession.write_temp(ACCOUNT + ".tmp", full.left(full.length() / 2))).is_true()
+	assert_array(Array(FileAccess.get_file_as_bytes(ACCOUNT))).is_equal(Array(before))
+	var reread := AccountSession.new()
+	assert_bool(reread.load_saved(ACCOUNT)).is_true()
+	assert_str(reread.token).is_equal("token-a")
+	reread.adopt({"token": "token-c"}, ACCOUNT)
+	var last := AccountSession.new()
+	assert_bool(last.load_saved(ACCOUNT)).is_true()
+	assert_str(last.token).is_equal("token-c")
+	assert_bool(FileAccess.file_exists(ACCOUNT + ".tmp")).is_false()
+	# clear() also drops a leftover temporary file.
+	AccountSession.write_temp(ACCOUNT + ".tmp", "{")
+	last.clear(ACCOUNT)
+	assert_bool(FileAccess.file_exists(ACCOUNT)).is_false()
+	assert_bool(FileAccess.file_exists(ACCOUNT + ".tmp")).is_false()
+
+## A write that cannot complete reports failure and leaves nothing behind.
+func test_failed_account_write_leaves_no_file() -> void:
+	var path := "user://c110_missing_dir/account.json"
+	assert_bool(AccountSession.write_atomic(path, "{}")).is_false()
+	assert_bool(FileAccess.file_exists(path)).is_false()
+	assert_bool(FileAccess.file_exists(path + ".tmp")).is_false()
+
 func test_sign_out_revokes_this_device_and_returns_to_guest() -> void:
 	var pair := _net([
 		{"status": 200, "json": {"player_id": "guest", "token": "guest-token"}},
