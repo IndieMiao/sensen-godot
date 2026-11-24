@@ -388,6 +388,19 @@ func _bag_drawer(farming: Node) -> void:
 	_check(farming.bag_open() and farming._grid.selected_id == "seed_carrot", "a slot opens the drawer on its item")
 	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the drawer first, the farm stays")
 	await process_frame
+	# C-111: a tap on the dimmed area closes the drawer. 0.4.2 used the scrim after close_bag() had cleared it: a
+	# SCRIPT ERROR here, a native crash (SIGSEGV in Control::accept_event) in the release package.
+	farming._bar.bag_requested.emit()
+	await process_frame
+	var scrim: Control = farming._scrim
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	release.position = scrim.get_global_rect().position + Vector2(40, 40)
+	scrim.gui_input.emit(release)
+	_check(not farming.bag_open() and farming._scrim == null and farming._bar.get_parent() == home, "a tap on the dimmed area closes the drawer")
+	await process_frame
+	_check(not is_instance_valid(scrim), "…and frees its scrim")
 
 ## C-33 on a fresh save (the welcome blueprint, no house): Build Cottage while a press is still
 ## walking to its cell ends the walk and sends nothing; the player holds still under the preview.
