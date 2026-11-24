@@ -91,6 +91,8 @@ func _finish_leave() -> void:
 		router.pop_instance()
 	else:closed.emit(_args.get("return_context",{}).duplicate(true))
 func is_back_navigation_locked() -> bool:
+	# Android Back closes the farm's open drawer (the bag, C-74) before it leaves the farm.
+	if is_instance_valid(_view) and _view.has_method("close_modal") and _view.close_modal():return true
 	_leave();return true
 func suspend() -> void:
 	process_mode=Node.PROCESS_MODE_DISABLED

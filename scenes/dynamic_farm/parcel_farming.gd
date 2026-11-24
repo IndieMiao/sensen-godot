@@ -3,7 +3,10 @@ extends Node3D
 ## till, sow a carrot and harvest it into the bag. One press of the main key does one step,
 ## free of Energy and coins. The store (server or local stand-in) is authoritative; this node
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
-## Main-farm pieces are reused read-only: CropField for soil and carrots, P0 names and icons.
+## Main-farm pieces are reused read-only: CropField for soil and carrots, P0 names and icons, and the
+## main farm's UI kit (C-74): the quick bar with a compact bag drawer, the action key, floats and
+## item flights into the bag. Nothing of P0Ui / P0Runtime or Energy; the parcel's own coins (C-59) show in the
+## scene's top bar as the main HUD's coins capsule.
 ## Outer gathering (C-60, ParcelGather): near a tree, flower or rock of the extension the key
 ## picks it by hand; a picked one stays faded (trees, rocks) or hidden (flowers, which never
 ## block) until it grows back. Gathering never touches the walk, the layout or collision.
@@ -19,6 +22,8 @@ const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
 const CROP_CODES := {"crop_carrot": "C"}
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
+## Parcel items the main farm's content table does not name (C-74#33, copy per C-45). The icon is a placeholder from
+## the existing set (the HUD's home), no new art.
 const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest"}
 const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Space.HOUSE: "House here",
 	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds"}
@@ -32,6 +37,13 @@ const TOO_FAR := "too_far"
 ## How long one press's labour clip plays; the command's result is shown when it ends.
 const LABOUR_S := 1.2
 const UNREACHABLE := "Can't reach it"
+## The compact bag drawer's height (360-wide logical px; the main farm's full drawer is 546).
+const DRAWER_HEIGHT := 300.0
+const DRAWER_GAP := 8.0
+## Floats start this far above what they rise from (UiFloatText: the caller puts them 40 above the object).
+const FLOAT_ABOVE := 40.0
+## The action key's bottom sits this far above the quick bar (P0Ui._KEY_ABOVE_BAR, BAR-1).
+const KEY_ABOVE_BAR := 40.0
 const LOADING := "Loading your farm…"
 const OPEN_FAILED := "Could not open your farm."
 
@@ -53,7 +65,9 @@ var unavailable := false
 var held := false:
 	set(value):
 		held = value
+		if value: close_bag()
 		if _key != null: _refresh_key()
+		if not value and _bar != null: _draw_bag()
 ## The cell a press is walking to or working; the key keeps it while the press runs.
 var job = null
 
@@ -74,10 +88,21 @@ var _soil: CropField
 var _crops: CropField
 var _marker: MeshInstance3D
 var _marker_material: StandardMaterial3D
+var _keys: UiActionKey
 var _key: UiSceneAction
-var _bag: HBoxContainer
+var _bar: UiQuickBar
 var _toast: ToastLayer
 var _ui: Control
+## The open bag drawer and its scrim (null when closed); the quick bar is docked as its first row.
+var _drawer: UiDrawer
+var _scrim: ColorRect
+var _grid: UiInventoryGrid
+var _picked_name: Label
+## Items announced by the last gain (floats and flights): id -> count.
+var last_gains := {}
+## The locale before this UI held it at English (see hold_english); "" while not held.
+var _held_locale := ""
+var _side_button: Control
 var _redraw_left := 0.0
 var _names := {}
 var _gather := {}
@@ -159,10 +184,7 @@ func enter() -> void:
 	if not result.get("ok", false):
 		_toast.show_toast(OPEN_FAILED, ToastLayer.Severity.ERROR)
 	elif result.get("granted", false):
-		var gifts := PackedStringArray()
-		for id: String in rules.welcome_gift:
-			if _names.has(id): gifts.append("%s ×%d" % [_names[id], int(rules.welcome_gift[id])])
-		if not gifts.is_empty(): _toast.show_toast("Received " + ", ".join(gifts), ToastLayer.Severity.SUCCESS)
+		announce_gains(rules.welcome_gift, _player_screen())
 
 ## Core cells of the protected path (Space.protected_path), shared with house placement (C-33).
 func protected_path() -> Dictionary:
@@ -259,7 +281,8 @@ func _gather_action(index: int) -> Dictionary:
 func _refresh_key() -> void:
 	if held:
 		_marker.visible = false
-		_key.visible = false
+		_keys.visible = false
+		_bar.visible = false
 		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
 	# A tapped object wins; a nearby one only when no cell was tapped and the cell in front has no step to do.
@@ -267,7 +290,7 @@ func _refresh_key() -> void:
 	if object >= 0 and (picked_object >= 0 or (picked == null and (current.is_empty() or not str(current.refusal).is_empty()))):
 		current = _gather_action(object)
 	_marker.visible = not current.is_empty()
-	_key.visible = _marker.visible or farm.is_empty()
+	_keys.visible = _marker.visible or farm.is_empty()
 	if unavailable and not busy:
 		_key.verb = "Retry"
 		_key.cost = ""
@@ -357,9 +380,11 @@ func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
 	_adopt(result)
 	if result.get("ok", false):
 		if command.type in ["harvest", "gather"]:
+			var gains := {}
 			for id: String in farm.bag:
 				var gained := int(farm.bag.get(id, 0)) - int(before.get(id, 0))
-				if gained > 0: _toast.show_toast("+%d %s" % [gained, _names.get(id, id)], ToastLayer.Severity.SUCCESS)
+				if gained > 0: gains[id] = gained
+			announce_gains(gains, _gain_screen(command))
 	elif result.get("code") == "VERSION_CONFLICT":
 		_toast.show_toast("Your farm was updated. Try again.", ToastLayer.Severity.INFO)
 	elif result.get("code") == "NOT_RESPAWNED":
@@ -458,35 +483,169 @@ func _draw_crops() -> void:
 			"watered_at": crop.planted_at, "ready_at": crop.ripe_at}
 	_crops.sync(crops, server_now())
 
-func _draw_bag() -> void:
-	for child in _bag.get_children():
-		_bag.remove_child(child)
-		child.queue_free()
-	# The parcel's own coins first (C-59, separate from the main farm's), then the bag.
-	_bag.add_child(_chip("coins", P0Logic.icon("coin"), str(int(farm.get("coins", 0))), "Coins"))
-	var ids: Array = BAG_ORDER.filter(func(id): return farm.bag.has(id))
-	for id: String in farm.bag:
-		if id not in ids and (_names.has(id) or not ParcelItems.name_of(id).is_empty()): ids.append(id)
-	for id: String in ids:
-		_bag.add_child(_chip(id, ParcelItems.icon_of(id), "×%d" % int(farm.bag[id]), _names.get(id, ParcelItems.name_of(id))))
+## The bag's items in bar order: the farming items first, then anything else with a name.
+func bag_ids() -> Array:
+	var ids: Array = BAG_ORDER.filter(func(id): return int(farm.get("bag", {}).get(id, 0)) > 0)
+	for id: String in farm.get("bag", {}):
+		if id not in ids and _names.has(id) and int(farm.bag[id]) > 0: ids.append(id)
+	return ids
 
-func _chip(id: String, texture: Texture2D, text: String, tip: String) -> HBoxContainer:
-	var chip := HBoxContainer.new()
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.tooltip_text = tip
-	var icon := TextureRect.new()
-	icon.texture = texture
-	icon.custom_minimum_size = Vector2(22, 22)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	chip.add_child(icon)
-	var count := Label.new()
-	count.text = text
-	count.add_theme_font_size_override("font_size", 13)
-	count.add_theme_color_override("font_color", Color("314637"))
-	chip.add_child(count)
-	chip.name = id
-	return chip
+## Quick bar and bag drawer follow the save: counts change as each reply lands.
+func _draw_bag() -> void:
+	var ids := bag_ids()
+	var slots := []
+	for id: String in ids:
+		if slots.size() >= UiQuickBar.SLOTS: break
+		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
+	_bar.slots = slots
+	_bar.visible = not farm.is_empty() and not held
+	_keys.tool_icon = P0Logic.icon("hoe") if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
+	if _grid != null: _grid.items = _grid_items(ids)
+
+func _grid_items(ids: Array) -> Array:
+	return ids.map(func(id: String) -> Dictionary: return {"id": id, "icon": item_icon(id), "qty": int(farm.bag[id]), "rarity": 0})
+
+## An item's icon: the parcel's adapter (ParcelItems, C-59: blueprints show the recipe card), else the main farm's.
+func item_icon(id: String) -> Texture2D:
+	return ParcelItems.icon_of(id)
+
+## A gain (the welcome gift, a harvest; C-33's blueprints and C-59 / C-60 later): one float line per item rising from
+## `from` (screen point of what gave it) and the item flying into the quick bar's Bag, which bumps as it lands.
+## Items without a name or icon in the content table are skipped.
+func announce_gains(gains: Dictionary, from: Vector2) -> void:
+	last_gains = {}
+	var lines := 0
+	for id: String in gains:
+		var count := int(gains[id])
+		if count <= 0 or not _names.has(id): continue
+		last_gains[id] = count
+		var icon := item_icon(id)
+		var line := UiFloatText.new("+%d %s" % [count, _names[id]], UiFloatText.Tone.ITEM, icon)
+		line.name = "Gain_" + id
+		line.theme = UiKit.theme()
+		line.bounds = Vector2(UiTokens.SPACE_PAGE, maxf(UiTokens.SPACE_PAGE * 2.0, _ui.size.x - UiTokens.SPACE_PAGE))
+		_ui.add_child(line)
+		line.play(from - Vector2(0, FLOAT_ABOVE), lines)
+		var bag := _bar.bag_end()
+		UiItemFly.launch(_ui, from, bag, icon, count, lines * UiItemFly.DELAY_STEP_S, func(): UiItemFly.bump(bag))
+		lines += 1
+	if lines > 0: _draw_bag()
+
+func _player_screen() -> Vector2:
+	if _body != null and _body.has_method("screen_point"): return _body.screen_point(_body.player_position(), 1.9)
+	return _ui.size * Vector2(0.5, 0.42)
+
+## Where a command's gain rises from: the harvested cell, the gathered object (C-60), else the player.
+func _gain_screen(command: Dictionary) -> Vector2:
+	if command.has("cell"):
+		var cell = ParcelFarm.parse_key(str(command.cell))
+		if cell != null: return _cell_screen(cell)
+	if command.has("object") and _body != null and _body.has_method("screen_point"):
+		for object: Dictionary in gatherables:
+			if object.id == command.object: return _body.screen_point(object.origin, 0.6)
+	return _player_screen()
+
+func _cell_screen(cell: Vector2i) -> Vector2:
+	if _body != null and _body.has_method("screen_point"): return _body.screen_point(_walk.point(cell), 0.3)
+	return _player_screen()
+
+## Opens the compact bag drawer: the quick bar docked as its first row (its end reads Close), then the bag's items
+## in the main farm's five-column grid. A tap on a cell shows its name.
+func open_bag(focus := "") -> void:
+	if _drawer != null or farm.is_empty(): return
+	_bar.cancel_drag()
+	_scrim = ColorRect.new()
+	_scrim.name = "BagScrim"
+	_scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_scrim.color = UiKit.alpha(UiTokens.COLOR_SCRIM, UiTokens.OPACITY_SCRIM_DRAWER)
+	_scrim.mouse_filter = Control.MOUSE_FILTER_STOP
+	_scrim.gui_input.connect(func(e: InputEvent):
+		if (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed) \
+			or (e is InputEventScreenTouch and not e.pressed and not DisplayServer.is_touchscreen_available()):
+			close_bag()
+			_scrim.accept_event())
+	_ui.add_child(_scrim)
+	_drawer = UiDrawer.new(DRAWER_HEIGHT)
+	_drawer.name = "BagDrawer"
+	_drawer.theme = UiKit.theme()
+	_drawer.safe_bottom = _safe_bottom()
+	_drawer.scrim = _scrim
+	_drawer.close_requested.connect(close_bag)
+	var row := MarginContainer.new()
+	row.name = "QuickRow"
+	row.set_meta(UiDrawer.KEEP_INPUT, true)
+	_drawer.body.add_child(row)
+	_drawer.body.add_child(_spacer(DRAWER_GAP))
+	var title := HBoxContainer.new()
+	title.add_theme_constant_override(&"separation", 8)
+	title.add_child(UiKit.label("Bag", UiTokens.STYLE_C14_XB))
+	_picked_name = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	_picked_name.name = "PickedName"
+	_picked_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	title.add_child(_picked_name)
+	_drawer.body.add_child(title)
+	_drawer.body.add_child(_spacer(DRAWER_GAP))
+	_grid = UiInventoryGrid.new()
+	_grid.name = "BagGrid"
+	_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_grid.capacity = UiInventoryGrid.COLUMNS * 2
+	_grid.on_select = func(it: Dictionary): _picked_name.text = "%s ×%d" % [_names.get(str(it.id), str(it.id)), int(it.qty)]
+	_grid.selection_cleared.connect(func(): _picked_name.text = "")
+	_drawer.body.add_child(_grid)
+	_ui.add_child(_drawer)
+	_bar.get_parent().remove_child(_bar)
+	row.add_child(_bar)
+	_bar.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_bar.custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_BAR_W, UiTokens.SIZE_QUICK_BAR_H)
+	_bar.zones_below = true
+	_bar.bag_open = true
+	_draw_bag()
+	if focus != "" and int(farm.bag.get(focus, 0)) > 0: _grid.select(focus)
+
+## Closes the bag drawer; the quick bar goes back to the bottom of the screen.
+func close_bag() -> bool:
+	if _drawer == null: return false
+	_bar.cancel_drag()
+	_bar.get_parent().remove_child(_bar)
+	_ui.add_child(_bar)
+	_ui.move_child(_bar, _keys.get_index())
+	_bar.custom_minimum_size = Vector2.ZERO
+	_bar.zones_below = false
+	_bar.bag_open = false
+	_drawer.queue_free()
+	_scrim.queue_free()
+	_drawer = null
+	_scrim = null
+	_grid = null
+	_picked_name = null
+	_place_bar()
+	return true
+
+func bag_open() -> bool: return _drawer != null
+
+## The parcel's UI is English only (the scene does not auto-translate). The UI kit's quick bar names items through
+## TranslationServer itself (UiItemCell.quick_name, for the main farm's 中文), and this package never runs P0's
+## language setup, so the global locale may still be Journey's zh_CN: hold it at English while this UI is on screen
+## (the scene calls this as it suspends and resumes) and give the previous locale back when it is not.
+func hold_english(on: bool) -> void:
+	if on and _held_locale == "":
+		_held_locale = TranslationServer.get_locale()
+		if _held_locale != "en": TranslationServer.set_locale("en")
+	elif not on and _held_locale != "":
+		if TranslationServer.get_locale() == "en" and _held_locale != "en": TranslationServer.set_locale(_held_locale)
+		_held_locale = ""
+
+func _enter_tree() -> void:
+	hold_english(true)
+
+func _exit_tree() -> void:
+	hold_english(false)
+
+func _spacer(h: float) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size.y = h
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return c
 
 func _item_names() -> Dictionary:
 	var content := P0Logic.content()
@@ -502,6 +661,7 @@ func _item_names() -> Dictionary:
 	for source: Dictionary in _gather.get("sources", {}).values(): gathered_items.append(source.item)
 	for id: String in BAG_ORDER + rules.get("welcome_gift", {}).keys() + gathered_items:
 		if names.has(id) and not str(names[id]).is_empty(): wanted[id] = names[id]
+	for id: String in ParcelItems.NAMES: wanted[id] = ParcelItems.NAMES[id]
 	return wanted
 
 func _build_marker() -> void:
@@ -522,40 +682,87 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	# Over the world and the stick, under the scene's header (Back) and the farming UI.
 	_cover = ColorRect.new()
 	_cover.name = "LoadingCover"
+	_cover.theme = UiKit.theme()
 	_cover.color = UiTokens.COLOR_SURFACE
 	_cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_cover.mouse_filter = Control.MOUSE_FILTER_STOP
 	canvas.add_child(_cover)
 	canvas.move_child(_cover, mini(1, canvas.get_child_count() - 1))
-	_cover_label = Label.new()
-	_cover_label.text = LOADING
+	_cover_label = UiKit.label(LOADING, UiTokens.STYLE_BODY_B14)
 	_cover_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_cover_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_cover_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_cover_label.add_theme_font_size_override("font_size", 16)
-	_cover_label.add_theme_color_override("font_color", UiTokens.COLOR_TEXT)
 	_cover.add_child(_cover_label)
+	# The main farm's world controls (P0Ui._build_bar / _build_fab), on the UI kit theme.
 	_ui = Control.new()
 	_ui.name = "FarmingUi"
+	_ui.theme = UiKit.theme()
 	_ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(_ui)
-	_bag = HBoxContainer.new()
-	_bag.name = "Bag"
-	_bag.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bag.add_theme_constant_override("separation", 12)
-	_bag.position = Vector2(UiTokens.SPACE_PAGE, 108)
-	_ui.add_child(_bag)
-	_key = UiSceneAction.new()
+	_bar = UiQuickBar.new()
+	_bar.name = "QuickBar"
+	_bar.haptics = OS.has_feature("mobile")
+	_bar.visible = false
+	_bar.slot_tapped.connect(func(id: String): open_bag(id))
+	_bar.ghost_tapped.connect(func(_i: int): open_bag())
+	_bar.bag_requested.connect(func(): open_bag())
+	_bar.close_requested.connect(close_bag)
+	# The bar follows the bag's order and the parcel save keeps no bar layout, so the main farm's long-press drag
+	# (swap, Pin, Remove) has nothing to change here: the cells' drag gestures are not passed to the bar (C-74#39).
+	# Taps still select, and a swipe up still opens the bag.
+	for cell: UiItemCell in _bar.cells():
+		for connection: Dictionary in cell.get_signal_connection_list(&"gesture"):
+			if (connection.callable as Callable).get_object() == _bar: cell.gesture.disconnect(connection.callable)
+		cell.gesture.connect(func(outcome: Dictionary): if outcome.get("kind") == &"swipe_up": open_bag())
+	_ui.add_child(_bar)
+	_keys = UiActionKey.new()
+	_keys.name = "ActionKey"
+	_keys.switch_visible = false   # one action here: no switch key, no radial
+	_keys.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_ui.add_child(_keys)
+	_key = _keys.key()
 	_key.name = "MainKey"
-	_key.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_KEEP_SIZE, 24)
 	_key.pressed_down.connect(_on_key)
-	_ui.add_child(_key)
 	_toast = ToastLayer.new()
 	_toast.name = "Toast"
 	_ui.add_child(_toast)
-	_ui.resized.connect(_place_toast)
-	_place_toast.call_deferred()
+	_toast.anchor_above(_bar)
+	_ui.resized.connect(_place_bar)
+	_place_bar.call_deferred()
 
-func _place_toast() -> void:
-	_toast.anchor_bottom(_ui.size.y - 24 - UiTokens.SIZE_SCENE_ACTION - UiTokens.SPACE_PAGE)
+## Bottom controls as the main farm's (BAR-1, P0Ui._place_controls): the bar at x 12, 24 above the safe bottom; the
+## action key 16 from the right, 40 above the bar.
+func _place_bar() -> void:
+	if not is_inside_tree(): return
+	var bottom := UiTokens.SIZE_QUICK_BAR_BOTTOM + _safe_bottom()
+	if _drawer == null:
+		_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		_bar.offset_left = UiTokens.SIZE_QUICK_BAR_X
+		_bar.offset_right = UiTokens.SIZE_QUICK_BAR_X + UiTokens.SIZE_QUICK_BAR_W
+		_bar.offset_bottom = -bottom
+		_bar.offset_top = -bottom - UiTokens.SIZE_QUICK_BAR_H
+	var key_bottom := bottom + UiTokens.SIZE_QUICK_BAR_H + KEY_ABOVE_BAR
+	if is_instance_valid(_side_button):
+		# Left of the action key on its baseline: clear of the quick bar under it and of the key (C-74#17).
+		_side_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		_side_button.offset_left = UiTokens.SIZE_QUICK_BAR_X
+		_side_button.offset_right = UiTokens.SIZE_QUICK_BAR_X + _side_button.custom_minimum_size.x
+		_side_button.offset_bottom = -key_bottom
+		_side_button.offset_top = -key_bottom - _side_button.custom_minimum_size.y
+	_keys.offset_right = -UiTokens.SPACE_PAGE
+	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
+	_keys.offset_bottom = -key_bottom
+	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
+
+## Places a scene button (the house's Build Cottage, C-33) at the left on the action key's baseline, so it never
+## covers the quick bar or the key; it keeps its own `custom_minimum_size`.
+func place_side_button(button: Control) -> void:
+	_side_button = button
+	_place_bar()
+
+## Bottom system inset (gesture bar) in UI units; 0 on desktop (as P0Ui.safe_bottom).
+func _safe_bottom() -> float:
+	if not is_inside_tree() or not (OS.has_feature("android") or OS.has_feature("ios")): return 0.0
+	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
+		get_viewport().get_visible_rect().size, 0.0).w

@@ -181,8 +181,10 @@ func _first_visit() -> Dictionary:
 		_check(seen.clips.has("labour_harvest") and not seen.early and seen.moved < 0.01,
 			"gathering a %s: no walk, the harvest clip, the result as it ends (%s)" % [kind, seen])
 		_check(int(farming.farm.bag.get(ITEMS[kind][0], 0)) == had + 1, "one %s in the bag" % ITEMS[kind][0])
-		_check(farming._toast.current_text() == "+1 " + ITEMS[kind][1], "the gain is announced (%s)" % kind)
-		_check(farming._bag.has_node(ITEMS[kind][0]), "%s shows in the bag row" % ITEMS[kind][0])
+		_check(farming.last_gains == {ITEMS[kind][0]: 1} and ("+1 " + ITEMS[kind][1]) in _floats(farming),
+			"the gain floats up and flies into the bag (%s)" % kind)
+		_check(ITEMS[kind][0] in farming._grid_items(farming.bag_ids()).map(func(it): return it.id),
+			"%s shows in the bag" % ITEMS[kind][0])
 		var id: String = farming.gatherables[index].id
 		_check(farming.farm.gathered.has(id), "%s is recorded" % id)
 		picked[kind] = id
@@ -244,3 +246,7 @@ func _grown_back(picked: Dictionary) -> void:
 	_check(farming.farm.bag.get("wood") == 2, "a second Timber after 24 h")
 	scene.queue_free()
 	await process_frame
+
+## The texts of the gain floats on screen (C-74).
+func _floats(farming: Node) -> Array:
+	return farming._ui.get_children().filter(func(n): return n is UiFloatText).map(func(n): return n.text)
