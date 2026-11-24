@@ -85,4 +85,26 @@ class ParcelLayerStateTest {
         assertTrue(wait.expire("second")); assertNull(wait.resume(true))
         wait.park("third"); wait.drop(); assertNull(wait.resume(true)); assertFalse(wait.expire("third"))
     }
+    @Test fun querySettlesAfterItsSourcesLoadAndOneFrameRenders() {
+        val settle = ParcelQuerySettle(); settle.reset(setOf("parcels", "buildings"))
+        assertFalse(settle.frameRendered())
+        settle.tileLoaded("parcels", true); assertFalse(settle.frameRendered())
+        settle.tileLoaded("composite", false); settle.tileLoaded("buildings", null); assertFalse(settle.frameRendered())
+        settle.tileLoaded("buildings", true); assertFalse(settle.settled)
+        assertTrue(settle.frameRendered()); assertTrue(settle.settled)
+        assertFalse(settle.frameRendered()); assertTrue(settle.settled) // Reported once; later frames keep it.
+        settle.tileLoaded("parcels", true); assertFalse(settle.frameRendered()); assertTrue(settle.settled)
+    }
+    @Test fun querySettleRestartsOnCameraChangeIncompleteTilesAndNewSources() {
+        val settle = ParcelQuerySettle(); settle.reset(setOf("parcels", "buildings"))
+        settle.tileLoaded("parcels", true); settle.tileLoaded("buildings", true); settle.cameraChanged()
+        assertFalse(settle.frameRendered()); assertFalse(settle.settled) // Loaded before the pan: the new view is unknown.
+        settle.tileLoaded("parcels", true); settle.tileLoaded("buildings", true); assertTrue(settle.frameRendered())
+        settle.tileLoaded("buildings", false); assertFalse(settle.settled); assertFalse(settle.frameRendered())
+        settle.tileLoaded("buildings", true); assertTrue(settle.frameRendered())
+        settle.reset(setOf("parcels-2")); assertFalse(settle.settled)
+        settle.tileLoaded("parcels", true); assertFalse(settle.frameRendered())
+        settle.tileLoaded("parcels-2", true); assertTrue(settle.frameRendered())
+        settle.reset(emptySet()); settle.tileLoaded("parcels-2", true); assertFalse(settle.frameRendered()); assertFalse(settle.settled)
+    }
 }

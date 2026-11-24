@@ -15,6 +15,7 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.RenderedQueryGeometry
 import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.ScreenCoordinate
+import com.mapbox.maps.SourceDataLoadedType
 import com.mapbox.maps.Style
 
 /** Optional dynamic-farm native overlay. Mapbox owns URL loading, geometry projection, rendering and hit testing. */
@@ -32,6 +33,7 @@ internal class ParcelMapController(
     private val loaded = mutableSetOf<String>()
     private var query: Cancelable? = null
     private val waiting = ParcelIdleWait<WaitingQuery>()
+    private val settle = ParcelQuerySettle()
     private val buildingSelection = ParcelBuildingSelection()
     private var cameraRevision = 0L
     private var mapIdle = false
@@ -65,14 +67,20 @@ internal class ParcelMapController(
             if (!closed && state.active) {
                 query?.cancel(); query = null; waiting.drop()
                 state.reloading(); mapIdle = false; mapboxLoadFailed = false; buildingSelection.clear(); sources.clear(); loaded.clear()
+                settle.reset(emptySet())
                 install()
             }
         }
-        subscriptions += map.subscribeCameraChanged { cameraRevision++; mapIdle = false }
+        subscriptions += map.subscribeCameraChanged { cameraRevision++; mapIdle = false; settle.cameraChanged() }
         subscriptions += map.subscribeMapIdle {
             if (!closed) { mapIdle = true; if (state.active) emitReady(); resumeWaiting() }
         }
+        // C-83: our own sources can be ready for this camera while map-wide idle still waits on unrelated requests.
+        subscriptions += map.subscribeRenderFrameFinished {
+            if (!closed && settle.frameRendered()) { if (state.active) emitReady(); resumeWaiting() }
+        }
         subscriptions += map.subscribeSourceDataLoaded { event ->
+            if (!closed && event.type == SourceDataLoadedType.TILE) settle.tileLoaded(event.sourceId, event.loaded)
             if (!closed && event.sourceId == "composite" && event.loaded == true) mapboxLoadFailed = false
             if (!closed && state.active && sources.containsValue(event.sourceId) && event.loaded == true) {
                 val changed = loaded.add(event.sourceId)
@@ -105,7 +113,7 @@ internal class ParcelMapController(
         if (state.begin(generation) == null) return
         if (oldGeneration != generation) claims = emptyMap()
         query?.cancel(); query = null; waiting.drop()
-        removeLayers(); config = next; mapIdle = false; mapboxLoadFailed = false
+        removeLayers(); config = next; mapIdle = false; mapboxLoadFailed = false; settle.reset(emptySet())
         install()
     }
     private fun install() {
@@ -117,6 +125,8 @@ internal class ParcelMapController(
         val prefix = "gensen-parcels-${state.generation}-$turn"
         sources.putAll(mapOf("parcels" to prefix, "highlight" to "$prefix-highlight"))
         if (cfg.buildingSource == "datasf") sources["buildings"] = "$prefix-buildings"
+        // The sources a tap queries: parcels plus DataSF buildings, or the style's composite for Mapbox buildings.
+        settle.reset(setOf(sources.getValue("parcels"), sources["buildings"] ?: "composite"))
         val parcel = sources.getValue("parcels"); val highlight = sources.getValue("highlight")
         fun geoSource(id: String, data: Value): Boolean = !style.addStyleSource(id, Value(hashMapOf("type" to Value("geojson"), "data" to data))).isError
         fun layer(json: String): Boolean = !style.addStyleLayer(value(json), null).isError
@@ -164,7 +174,7 @@ internal class ParcelMapController(
         addProperty("source_ready", state.ready)
         addProperty("parcel_source_ready", sources["parcels"] in loaded)
         addProperty("buildings_source_ready", sources["buildings"] in loaded)
-        addProperty("building_query_ready", mapIdle && !mapboxLoadFailed && buildingLayers()?.isNotEmpty() == true)
+        addProperty("building_query_ready", settled() && !mapboxLoadFailed && buildingLayers()?.isNotEmpty() == true)
     }.toString())
 
     fun setStates(generation: Long, raw: String) {
@@ -237,7 +247,8 @@ internal class ParcelMapController(
             if (waiting.expire(tap) && !closed && state.current(ticket)) failQuery(requestId, generation, "loading")
         }, IDLE_WAIT_MS)
     }
-    private fun queryReady(cfg: ParcelSourceConfig): Boolean = mapIdle && (cfg.buildingSource != "datasf" || sources["buildings"] in loaded)
+    private fun settled(): Boolean = mapIdle || settle.settled
+    private fun queryReady(cfg: ParcelSourceConfig): Boolean = settled() && (cfg.buildingSource != "datasf" || sources["buildings"] in loaded)
     private fun resumeWaiting() {
         val cfg = config ?: return
         val tap = waiting.resume(queryReady(cfg)) ?: return
@@ -303,7 +314,7 @@ internal class ParcelMapController(
             for (layer in LAYERS.reversed()) if (style.styleLayerExists(layer)) style.removeStyleLayer(layer)
             for (id in sources.values) if (style.styleSourceExists(id)) style.removeStyleSource(id)
         }
-        sources.clear(); loaded.clear(); buildingSelection.clear()
+        sources.clear(); loaded.clear(); buildingSelection.clear(); settle.reset(emptySet())
     }
     fun close() {
         if (closed) return

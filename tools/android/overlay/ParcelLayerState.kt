@@ -67,3 +67,29 @@ internal class ParcelIdleWait<T : Any> {
     fun expire(value: T): Boolean = (pending === value).also { if (it) pending = null }
     fun drop() { pending = null }
 }
+/**
+ * C-83: Mapbox's map-wide idle waits for every request, including ones still backing off after a network outage, so
+ * after a Retry it can lag long past our own layers. A tap only needs the sources it queries loaded for the current
+ * camera and one frame rendered with them. Only tile events count: a GeoJSON metadata event can report loaded before
+ * its tiles exist. Mapbox-free so JVM tests drive it.
+ */
+internal class ParcelQuerySettle {
+    private var required: Set<String> = emptySet()
+    private val loaded = mutableSetOf<String>()
+    private var frameDue = false
+    var settled = false; private set
+    fun reset(sources: Set<String>) { required = sources; unsettle() }
+    fun cameraChanged() = unsettle()
+    fun tileLoaded(source: String, complete: Boolean?) {
+        if (source !in required || complete == null) return
+        if (!complete) { loaded.remove(source); frameDue = false; settled = false; return }
+        if (loaded.add(source) && !settled && loaded.containsAll(required)) frameDue = true
+    }
+    /** True when this frame is the first rendered with every required source loaded. */
+    fun frameRendered(): Boolean {
+        if (!frameDue) return false
+        frameDue = false; settled = true
+        return true
+    }
+    private fun unsettle() { loaded.clear(); frameDue = false; settled = false }
+}
