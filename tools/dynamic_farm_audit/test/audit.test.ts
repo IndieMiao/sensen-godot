@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { auditDataset, type AuditReport } from '../src/audit.js';
+import { auditDataset, summarizeFarms, type AuditReport, type FarmAudit } from '../src/audit.js';
 import { DEFAULT_AUDIT_PARAMS, resolveAuditParams } from '../src/config.js';
 import { loadDataset, loadSnapshot, sha256 } from '../src/inputs.js';
 import { rect, rotatedRect, squareSpec, writeFixture, type FixtureSpec } from './fixture.js';
@@ -314,5 +314,31 @@ describe('independence', () => {
         if (spec.startsWith('.')) expect(spec, `${file} imports ${spec}`).toMatch(/^\.\/[a-z]+\.js$/);
       }
     }
+  });
+});
+
+describe('corpus summary at full-city scale (C-75)', () => {
+  it('summarises 200,000 farms without spreading them as call arguments', () => {
+    const n = 200_000;
+    const farms: FarmAudit[] = Array.from({ length: n }, (_, i) => ({
+      block_id: `p-${String(i).padStart(7, '0')}`, level: i === 7 ? 'fail' : i % 1000 === 0 ? 'warn' : 'ok',
+      issues: i === 7 ? ['iou_below_exclusion'] : [], building_source: 'datasf', building_area_ids: [],
+      building_ids_from: i % 2 ? 'generation_report' : 'buildings_layer', layer_iou: i % 2 ? null : 0.9 + (i % 100) / 1000,
+      cell_m: 0.5, rotation_deg: 0, source_area_m2: 25, reported_source_area_m2: 25, source_components: 1, source_holes: 0,
+      core_cells: 100, core_components: 1, core_holes: 0, reported_core_components: 1,
+      iou: i === 7 ? 0.25 : i === 199_999 ? 1 : 0.95, reported_iou: 0.95, report_iou: 0.95,
+      iou_delta: i === 7 ? -0.7 : i === 123_456 ? 0.002 : 0, buildings: [], too_small: false, flags: [],
+    }));
+    // The pre-fix spread itself overflows at this size, so the test is meaningful on this runtime.
+    expect(() => Math.min(...farms.map(f => f.iou))).toThrow(RangeError);
+    const s = summarizeFarms(farms, DEFAULT_AUDIT_PARAMS);
+    expect(s.farms_audited).toBe(n);
+    expect(s.levels).toEqual({ ok: n - 201, warn: 200, fail: 1 });
+    expect(s.iou).toMatchObject({ min: 0.25, median: 0.95, max: 1 });
+    expect(s.iou_delta.max_abs).toBe(0.7);
+    expect(s.building_layer.ids_from).toEqual({ buildings_layer: n / 2, generation_report: n / 2 });
+    expect(s.building_layer.min_layer_iou).toBe(0.9);
+    expect(s.below_exclusion).toEqual([{ block_id: 'p-0000007', iou: 0.25 }]);
+    expect(JSON.stringify(s).length).toBeGreaterThan(0);
   });
 });

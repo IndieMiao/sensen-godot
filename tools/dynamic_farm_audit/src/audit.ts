@@ -317,6 +317,9 @@ const median = (xs: number[]) => {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+/** Loop-based extremes: `Math.min(...xs)` overflows the call stack past ~100k elements. */
+const minOf = (xs: number[]) => xs.reduce((a, b) => (b < a ? b : a), Infinity);
+const maxOf = (xs: number[]) => xs.reduce((a, b) => (b > a ? b : a), -Infinity);
 
 export function auditDataset(snapshot: SourceSnapshot, dataset: Dataset, datasetManifestSha: string, p: AuditParams,
   log: (s: string) => void = () => {}): AuditReport {
@@ -341,19 +344,8 @@ export function auditDataset(snapshot: SourceSnapshot, dataset: Dataset, dataset
     farms.push(a);
     log(`${blockId}: iou ${a.iou.toFixed(4)} (generator ${a.reported_iou}) ${a.level}${a.issues.length ? ` ${a.issues.join(',')}` : ''}`);
   }
-  const ious = farms.map(f => f.iou);
-  const layerIous = farms.flatMap(f => (f.layer_iou === null ? [] : [f.layer_iou]));
-  const deltas = farms.map(f => f.iou_delta);
-  const levels: Record<Level, number> = { ok: 0, warn: 0, fail: 0 };
-  const issues: Record<string, number> = {};
-  const flags: Record<string, number> = {};
-  for (const f of farms) {
-    levels[f.level]++;
-    for (const i of f.issues) issues[i] = (issues[i] ?? 0) + 1;
-    for (const fl of f.flags) flags[fl] = (flags[fl] ?? 0) + 1;
-  }
-  const sortKeys = (o: Record<string, number>) => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : 1)));
-  const both = farms.filter(f => f.too_small && f.flags.includes('cell_scaled_for_total_cap')).map(f => f.block_id);
+  const summary = summarizeFarms(farms, p);
+  const { levels } = summary;
   const status = !reconciliation.consistent || levels.fail > 0 || farms.length === 0 ? 'fail' : levels.warn > 0 ? 'warn' : 'pass';
   return {
     audit_version: AUDIT_VERSION,
@@ -361,37 +353,59 @@ export function auditDataset(snapshot: SourceSnapshot, dataset: Dataset, dataset
     parameters: p,
     inputs: { snapshot_manifest_sha256: snapshot.manifest_sha256, dataset_manifest_sha256: datasetManifestSha },
     reconciliation,
-    summary: {
-      farms_audited: farms.length,
-      levels,
-      issues: sortKeys(issues),
-      iou: farms.length
-        ? { min: r(Math.min(...ious)), median: r(median(ious)), mean: r(mean(ious)), max: r(Math.max(...ious)) }
-        : { min: 0, median: 0, mean: 0, max: 0 },
-      iou_delta: {
-        max_abs: r(Math.max(0, ...deltas.map(Math.abs))), mean_abs: r(mean(deltas.map(Math.abs))), mean: r(mean(deltas)),
-        over_threshold: farms.filter(f => f.issues.includes('iou_differs_from_generator')).length,
-      },
-      below_warning: farms.filter(f => f.issues.includes('iou_below_warning')).map(f => ({ block_id: f.block_id, iou: f.iou })),
-      below_exclusion: farms.filter(f => f.issues.includes('iou_below_exclusion')).map(f => ({ block_id: f.block_id, iou: f.iou })),
-      iou_differs_from_generator: farms.filter(f => f.issues.includes('iou_differs_from_generator'))
-        .map(f => ({ block_id: f.block_id, iou: f.iou, reported_iou: f.reported_iou, delta: f.iou_delta })),
-      topology_differs: farms.filter(f => f.source_components !== f.core_components || f.source_holes !== f.core_holes)
-        .map(f => ({ block_id: f.block_id, source: [f.source_components, f.source_holes] as [number, number], core: [f.core_components, f.core_holes] as [number, number] })),
-      building_layer: {
-        ids_from: sortKeys(farms.reduce((o, f) => ({ ...o, [f.building_ids_from]: (o[f.building_ids_from] ?? 0) + 1 }), {} as Record<string, number>)),
-        min_layer_iou: layerIous.length ? r(Math.min(...layerIous)) : null,
-        below_threshold: farms.filter(f => f.issues.includes('building_layer_differs')).map(f => ({ block_id: f.block_id, layer_iou: f.layer_iou ?? 0 })),
-      },
-      attribution_findings: farms.flatMap(f => f.buildings
-        .filter(b => b.share_in_parcel < p.attribution_min_fraction || (b.best_other_parcel !== null && b.best_other_share > b.share_in_parcel + 1e-3))
-        .map(b => ({ block_id: f.block_id, area_id: b.area_id, share_in_parcel: b.share_in_parcel, best_other_parcel: b.best_other_parcel, best_other_share: b.best_other_share, share_outside_parcels: b.share_outside_parcels }))),
-      flags: sortKeys(flags),
-      too_small: farms.filter(f => f.too_small).length,
-      cell_scaled_for_total_cap: farms.filter(f => f.flags.includes('cell_scaled_for_total_cap')).length,
-      total_cap_and_too_small: { count: both.length, block_ids: both },
-    },
+    summary,
     farms,
   };
 }
 
+/**
+ * Corpus-wide summary. Must not pass per-farm arrays as call arguments (`Math.min(...xs)`):
+ * the full city has >100k farms, past V8's argument limit (C-75).
+ */
+export function summarizeFarms(farms: FarmAudit[], p: AuditParams): AuditReport['summary'] {
+  const ious = farms.map(f => f.iou);
+  const layerIous = farms.flatMap(f => (f.layer_iou === null ? [] : [f.layer_iou]));
+  const deltas = farms.map(f => f.iou_delta);
+  const levels: Record<Level, number> = { ok: 0, warn: 0, fail: 0 };
+  const issues: Record<string, number> = {};
+  const flags: Record<string, number> = {};
+  const idsFrom: Record<string, number> = {};
+  for (const f of farms) {
+    levels[f.level]++;
+    idsFrom[f.building_ids_from] = (idsFrom[f.building_ids_from] ?? 0) + 1;
+    for (const i of f.issues) issues[i] = (issues[i] ?? 0) + 1;
+    for (const fl of f.flags) flags[fl] = (flags[fl] ?? 0) + 1;
+  }
+  const sortKeys = (o: Record<string, number>) => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : 1)));
+  const both = farms.filter(f => f.too_small && f.flags.includes('cell_scaled_for_total_cap')).map(f => f.block_id);
+  return {
+    farms_audited: farms.length,
+    levels,
+    issues: sortKeys(issues),
+    iou: farms.length
+      ? { min: r(minOf(ious)), median: r(median(ious)), mean: r(mean(ious)), max: r(maxOf(ious)) }
+      : { min: 0, median: 0, mean: 0, max: 0 },
+    iou_delta: {
+      max_abs: r(Math.max(0, maxOf(deltas.map(Math.abs)))), mean_abs: r(mean(deltas.map(Math.abs))), mean: r(mean(deltas)),
+      over_threshold: farms.filter(f => f.issues.includes('iou_differs_from_generator')).length,
+    },
+    below_warning: farms.filter(f => f.issues.includes('iou_below_warning')).map(f => ({ block_id: f.block_id, iou: f.iou })),
+    below_exclusion: farms.filter(f => f.issues.includes('iou_below_exclusion')).map(f => ({ block_id: f.block_id, iou: f.iou })),
+    iou_differs_from_generator: farms.filter(f => f.issues.includes('iou_differs_from_generator'))
+      .map(f => ({ block_id: f.block_id, iou: f.iou, reported_iou: f.reported_iou, delta: f.iou_delta })),
+    topology_differs: farms.filter(f => f.source_components !== f.core_components || f.source_holes !== f.core_holes)
+      .map(f => ({ block_id: f.block_id, source: [f.source_components, f.source_holes] as [number, number], core: [f.core_components, f.core_holes] as [number, number] })),
+    building_layer: {
+      ids_from: sortKeys(idsFrom),
+      min_layer_iou: layerIous.length ? r(minOf(layerIous)) : null,
+      below_threshold: farms.filter(f => f.issues.includes('building_layer_differs')).map(f => ({ block_id: f.block_id, layer_iou: f.layer_iou ?? 0 })),
+    },
+    attribution_findings: farms.flatMap(f => f.buildings
+      .filter(b => b.share_in_parcel < p.attribution_min_fraction || (b.best_other_parcel !== null && b.best_other_share > b.share_in_parcel + 1e-3))
+      .map(b => ({ block_id: f.block_id, area_id: b.area_id, share_in_parcel: b.share_in_parcel, best_other_parcel: b.best_other_parcel, best_other_share: b.best_other_share, share_outside_parcels: b.share_outside_parcels }))),
+    flags: sortKeys(flags),
+    too_small: farms.filter(f => f.too_small).length,
+    cell_scaled_for_total_cap: farms.filter(f => f.flags.includes('cell_scaled_for_total_cap')).length,
+    total_cap_and_too_small: { count: both.length, block_ids: both },
+  };
+}

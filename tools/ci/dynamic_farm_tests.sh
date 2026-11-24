@@ -40,7 +40,7 @@ export SENSEN_LANGUAGE=en SENSEN_OFFLINE=1
 SUMMARY_CHECKS=(DYNAMIC_BANK_TESTS DYNAMIC_LOWER_BANK_TESTS DYNAMIC_CORE_GRASS_EDGE
   DYNAMIC_CORE_OBSTACLE_TESTS DYNAMIC_EDGE_DECOR_TESTS DYNAMIC_EDGE_TESTS ISLAND_EXTERIOR
   DYNAMIC_OUTER_GROVE_TESTS DYNAMIC_PALETTE_TESTS DYNAMIC_PROP_PROXY_TESTS
-  DYNAMIC_SLOPE_MATERIAL_TESTS DYNAMIC_WALK_TESTS)
+  DYNAMIC_SLOPE_MATERIAL_TESTS DYNAMIC_WALK_TESTS PARCEL_FARMING PARCEL_FARMING_SCENE)
 #   "<PREFIX> passed/total"
 SUMMARY_RATIO=("DYNAMIC ENGLISH UI" "DYNAMIC MAP OCCLUSION" "DYNAMIC ROOT BACK" "PREVIEW HOST"
   "DYNAMIC READ RETRIES" "DYNAMIC HTTPS RETRIES" "DYNAMIC RETRY CANCEL REENTRY"
@@ -103,6 +103,12 @@ stop_https_fixture() {
 
 run_one() {
   local name=$1 log=$work/$1.log args=() start rc summary checks failures note= file_limit
+  if [[ $name == test_parcel_farming_server ]]; then
+    # Its arguments are a running C-31 server and the parcel owner's token (file header).
+    skipped+=("| $name.gd | needs a running C-31 server and the parcel owner's token; run by hand |")
+    rows+=("| $name.gd | SKIPPED | – | – | see Skipped |")
+    return
+  fi
   local remaining=$((total_limit - (SECONDS - run_start)))
   if ((remaining < 1)); then
     rows+=("| $name.gd | NOT RUN | – | – | total budget ${total_limit}s used up |")

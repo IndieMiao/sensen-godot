@@ -66,6 +66,8 @@ report table still shows which files timed out.
 `CI=1` a fixture that cannot start fails that file, locally it is skipped.
 `tools/ci/test-dynamic-farm-gate.sh` (run first in the same step) checks these rules with a
 fake Godot: summary misreads, fixture failure with and without `CI`, and several hangs.
+`test_parcel_farming_server.gd` needs a running C-31 server and an owner token, so the check lists it
+under "Skipped"; run it by hand as its header describes.
 Anything that cannot run is listed under "Skipped" in the job summary, never as passed
 (currently `test_mesh_edges.gd --legacy`, whose old mesh script is not in the repository).
 Locally: `tools/run_tests.sh --ci-import` once, then `tools/ci/dynamic_farm_tests.sh [test_name…]`.
@@ -271,7 +273,9 @@ setting, and the real map card's buttons. Fake data proves client logic only; it
 not evidence of a real claim, a save or device rendering.
 
 Settings read by the map: `sensen/dynamic_farm/reselect` (internal test packages only;
-shows "Give up and choose again"), `sensen/dynamic_farm/account_restore` (internal test
+shows "Give up and choose again"), `sensen/dynamic_farm/own_farm` (internal test packages only;
+"Enter my farm" opens the own parcel with `own_parcel=true` for farming, C-34 Q-72; otherwise it
+opens the read-only preview), `sensen/dynamic_farm/account_restore` (internal test
 packages only; reloads the saved account token through `Net.restore_saved_account()`, which
 calls `/users/me` and nothing else) and `sensen/dynamic_farm/fake_claims` (+ optional
 `fake_player`, default `fake-a`) for development without the C-31 server. None is

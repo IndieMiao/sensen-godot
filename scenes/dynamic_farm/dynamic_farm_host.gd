@@ -18,7 +18,7 @@ var _retry:Button
 
 func setup(args:Dictionary) -> void:
 	_args={}
-	for key in ["farm","dataset","block_id","preview_only"]:
+	for key in ["farm","dataset","block_id","preview_only","own_parcel","farm_store"]:
 		if args.has(key):_args[key]=args[key].duplicate(true) if args[key] is Dictionary or args[key] is Array else args[key]
 	_args["return_context"]=args.return_context.duplicate(true) if args.get("return_context") is Dictionary else {}
 func _ready() -> void:
@@ -38,7 +38,8 @@ func _build_hud() -> void:
 
 func _valid_context() -> bool:
 	var farm=_args.get("farm")
-	return _args.get("preview_only")==true and Contract.valid_dataset(_args.get("dataset")) and farm is Dictionary and farm.get("schema")==4 and farm.get("dataset_version")==_args.dataset and farm.get("selection_unit")=="parcel" and _args.get("block_id") is String and _args.block_id.begins_with("p-") and _args.block_id.length()>2 and _args.block_id==farm.get("block_id")
+	# own_parcel: the owner's claimed parcel, farmed through ParcelFarming (C-34); otherwise a read-only preview.
+	return (_args.get("preview_only")==true or _args.get("own_parcel")==true) and Contract.valid_dataset(_args.get("dataset")) and farm is Dictionary and farm.get("schema")==4 and farm.get("dataset_version")==_args.dataset and farm.get("selection_unit")=="parcel" and _args.get("block_id") is String and _args.block_id.begins_with("p-") and _args.block_id.length()>2 and _args.block_id==farm.get("block_id")
 func _open_view() -> void:
 	if _leaving:return
 	_epoch+=1;var epoch:=_epoch

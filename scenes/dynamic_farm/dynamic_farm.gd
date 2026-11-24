@@ -1,5 +1,6 @@
 extends Node3D
-## Art-only scene. The host owns selection, network, identity, claims and return routing.
+## Art scene; with `own_parcel` it also farms the owner's parcel (ParcelFarming, C-34).
+## The host owns selection, network, identity, claims and return routing.
 signal preview_ready(summary: Dictionary)
 signal preview_error(message: String)
 signal back_requested
@@ -15,6 +16,11 @@ const Cliff = preload("res://modules/dynamic_farm/island_cliff.gd")
 const SKY_SHADER = preload("res://modules/dynamic_farm/island_sky.gdshader")
 const Controls = preload("res://scenes/dynamic_farm/dynamic_controls.gd")
 const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.gd")
+const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
+const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const RemoteFarmStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
+## Development only: keep the own-parcel farm on the device instead of the C-31 server.
+const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const SPEED := 3.75
 ## Background cloud drift in screen widths per second; negative drifts left. A group
 ## crosses a 1080-pixel-wide screen in about 100 s.
@@ -53,6 +59,9 @@ var _overview := false
 var _started_ms := 0
 var _clip := ""
 var _summary := {}
+var _hint: Label
+var _farming: Node3D
+var _facing := Vector3.BACK
 
 func setup(args: Dictionary) -> void:
 	_args = args.duplicate(true)
@@ -61,7 +70,7 @@ func _ready() -> void:
 	_started_ms = Time.get_ticks_msec()
 	_build_ui()
 	get_viewport().size_changed.connect(_on_viewport_resized)
-	if _args.get("preview_only") != true or not _args.get("farm") is Dictionary:
+	if (_args.get("preview_only") != true and _args.get("own_parcel") != true) or not _args.get("farm") is Dictionary:
 		_fail("This farm preview could not be opened.")
 		return
 	_data = Data.decode(_args.farm)
@@ -97,6 +106,10 @@ func _ready() -> void:
 		return
 	core_art.root.name = "CoreObstacles"
 	add_child(core_art.root)
+	if _args.get("own_parcel") == true:
+		_farming = Farming.new()
+		_farming.name = "ParcelFarming"
+		add_child(_farming)
 	_setup_world()
 	_shade = Shade.new()
 	add_child(_shade)
@@ -130,6 +143,15 @@ func _ready() -> void:
 	avatar.follow_saved_outfit(_rig)
 	_focus = _actor.position
 	_place_camera()
+	_facing = Vector3(_camera.global_basis.z.x, 0, _camera.global_basis.z.z).normalized()
+	if _farming != null:
+		var store = _args.get("farm_store")
+		if not store is RefCounted or not store.has_method("enter") or not store.has_method("send"):
+			var net := get_tree().root.get_node_or_null("Net")
+			if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): store = LocalFarmStore.new(_data.block_id)
+			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
+		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas)
+		_hint.hide()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -210,6 +232,9 @@ func _process(delta: float) -> void:
 			_summary.shadows = _shade.metrics.duplicate(true)
 			_summary.ready_ms = Time.get_ticks_msec() - _started_ms
 			preview_ready.emit(_summary.duplicate(true))
+			# Only once the scene is up: building it stalls the main thread for seconds, and an
+			# HTTP request started during that stall times out (V-123).
+			if _farming != null: _farming.enter()
 		elif Time.get_ticks_msec() - _started_ms > 15000:
 			_fail("The farm preview could not finish loading.")
 		return
@@ -225,11 +250,16 @@ func _process(delta: float) -> void:
 	var previous: Vector3 = _walk.position
 	_walk.move(direction*SPEED*dt)
 	_actor.position = _walk.position
-	if _actor.position.distance_to(previous) > 0.0001:
+	var moving := _actor.position.distance_to(previous) > 0.0001
+	# Turn toward the stick even when blocked, so the key can target what the player pushes against.
+	if not direction.is_zero_approx(): _facing = direction.normalized()
+	if moving:
 		_actor.look_at(_actor.position+direction,Vector3.UP)
 		_play("run")
 	else:
 		_play("idle")
+	if _farming != null:
+		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), moving or not input.is_zero_approx())
 	if not _overview:
 		var size := get_viewport().get_visible_rect().size
 		var safe := Rect2(size*Vector2(0.23,0.26),size*Vector2(0.54,0.48))
@@ -277,6 +307,7 @@ func _build_ui() -> void:
 		_zoom = clampf(_zoom*factor,0.8,1.4)
 		_overview = false
 		_place_camera())
+	_controls.tapped.connect(_on_tapped)
 	_controls.recenter_requested.connect(func():
 		if _actor != null:
 			_focus = _actor.position
@@ -309,13 +340,19 @@ func _build_ui() -> void:
 	back.custom_minimum_size = Vector2(64,44)
 	back.pressed.connect(_request_back)
 	row.add_child(back)
-	var hint := _label("Art preview · Walk and explore",12)
-	hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	hint.offset_bottom = -12
-	hint.offset_top = -34
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_canvas.add_child(hint)
+	_hint = _label("Art preview · Walk and explore",12)
+	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_hint.offset_bottom = -12
+	_hint.offset_top = -34
+	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_canvas.add_child(_hint)
+
+## A tap on the ground picks that cell for the main key.
+func _on_tapped(at: Vector2) -> void:
+	if _farming == null or not _ready_sent or _camera == null: return
+	var hit = Plane(Vector3.UP, 0.0).intersects_ray(_camera.project_ray_origin(at), _camera.project_ray_normal(at))
+	if hit is Vector3: _farming.pick(_walk.cell_at(hit))
 
 func _label(text: String, size: int) -> Label:
 	var label := Label.new()
