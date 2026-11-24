@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 # Emulator QA package for one's own parcel on the device save (C-60 outer gathering).
-# x86_64 only, signed with a throwaway debug key made here, package com.sensen.dynamicfarm.gatherqa,
+# One ABI, signed with a throwaway debug key made here, package com.sensen.dynamicfarm.gatherqa,
 # main scene tools/dev/dynamic_farm/own_parcel_qa.tscn. No map, Mapbox, plugin, account or server:
 # Net stays off (online_qa) and both Journey URLs point at a closed local port. Never deliver it.
 #
-#   tools/dev/dynamic_farm/gather_qa_apk.sh NEW_OUTPUT_DIR [PARCEL] [IMPORTED_CHECKOUT]
+#   [GATHER_QA_ABI=x86_64|arm64-v8a] tools/dev/dynamic_farm/gather_qa_apk.sh NEW_OUTPUT_DIR [PARCEL] [IMPORTED_CHECKOUT]
 #
 # PARCEL is an r4 fixture name (default p-3139010). IMPORTED_CHECKOUT, a checkout of the same
 # commit already imported headless, lends its .godot cache so the import only checks changes.
+# GATHER_QA_ABI follows the emulator image; by default it is the host's own architecture
+# (x86_64 on x86_64 hosts such as cardigan-ci, arm64-v8a on Apple silicon such as mac-mini).
+# On macOS the copied editor is re-signed ad hoc (the copy's signature is otherwise invalid and
+# the system kills it) and templates default to ~/Library/Application Support/Godot.
 # Staging is a disposable copy under $TMPDIR (committed sources at HEAD); nothing in the
 # checkout, the editor settings or ~/.android is touched.
 set -euo pipefail
@@ -19,11 +23,23 @@ out=$1 parcel=${2:-p-3139010} cache=${3:-}
 root=$(cd "$(dirname "$0")/../../.." && pwd)
 cd "$root"
 [[ -f tests/dynamic_farm/fixtures/r4/$parcel.json ]] || fail "no fixture $parcel"
+os=$(uname -s)
+case $(uname -m) in arm64 | aarch64) host_abi=arm64-v8a ;; *) host_abi=x86_64 ;; esac
+abi=${GATHER_QA_ABI:-$host_abi}
+case $abi in
+x86_64) x86_64=true arm64=false ;;
+arm64-v8a) x86_64=false arm64=true ;;
+*) fail 'GATHER_QA_ABI must be x86_64 or arm64-v8a' ;;
+esac
 godot=$(command -v "${GODOT_BIN:-godot}") || fail 'Godot required'
 [[ $("$godot" --version) == 4.7.2.stable.* ]] || fail 'Godot 4.7.2 stable required'
 sdk=${ANDROID_HOME:?Android SDK required}
 java=${JAVA_HOME:?JDK required}
-templates=${GODOT_TEMPLATES_DIR:-$HOME/.local/share/godot/export_templates/4.7.2.stable}
+if [[ $os == Darwin ]]; then
+    templates=${GODOT_TEMPLATES_DIR:-$HOME/Library/Application Support/Godot/export_templates/4.7.2.stable}
+else
+    templates=${GODOT_TEMPLATES_DIR:-$HOME/.local/share/godot/export_templates/4.7.2.stable}
+fi
 [[ -r $templates/android_debug.apk ]] || fail 'missing 4.7.2.stable android_debug.apk template'
 rev=$(git rev-parse HEAD)
 work=$(mktemp -d "${TMPDIR:?private TMPDIR required}/gather-qa.XXXXXX")
@@ -54,7 +70,7 @@ for key in ('network/base_url', 'network/mobile_base_url'):
     one(rf'^{key}="[^"]+"$', f'{key}="http://127.0.0.1:9"')
 path.write_text(text)
 PY
-cat > "$p/export_presets.cfg" <<'CFG'
+cat > "$p/export_presets.cfg" <<CFG
 [preset.0]
 
 name="Android QA"
@@ -81,9 +97,9 @@ custom_template/debug=""
 custom_template/release=""
 gradle_build/use_gradle_build=false
 architectures/armeabi-v7a=false
-architectures/arm64-v8a=false
+architectures/arm64-v8a=$arm64
 architectures/x86=false
-architectures/x86_64=true
+architectures/x86_64=$x86_64
 version/code=1
 version/name="gather-qa"
 package/unique_name="com.sensen.dynamicfarm.gatherqa"
@@ -93,10 +109,11 @@ package/retain_data_on_uninstall=false
 screen/immersive_mode=true
 permissions/internet=false
 CFG
-keytool -genkeypair -keystore "$work/qa.keystore" -alias gatherqa -storepass android -keypass android \
+PATH="$java/bin:$PATH" keytool -genkeypair -keystore "$work/qa.keystore" -alias gatherqa -storepass android -keypass android \
     -dname CN=GatherQA -keyalg RSA -keysize 2048 -validity 30 >/dev/null 2>&1 || fail 'keytool failed'
 # Portable editor: its own settings, never the account's.
 cp "$(python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$godot")" "$editor/Godot"
+[[ $os != Darwin ]] || codesign --force --sign - "$editor/Godot" >/dev/null 2>&1 || fail 'codesign of the editor copy failed'
 touch "$editor/._sc_"
 ln -s "$templates" "$editor/editor_data/export_templates/4.7.2.stable"
 cat > "$editor/editor_data/editor_settings-4.7.tres" <<TRES
@@ -119,5 +136,7 @@ grep -q 'SCRIPT ERROR' "$work/editor.log" && { grep 'SCRIPT ERROR' -A2 "$work/ed
 mkdir "$out"
 mv "$work/gather-qa.apk" "$out/"
 printf '%s\n' "$rev" > "$out/source-commit.txt"
-(cd "$out" && sha256sum gather-qa.apk > gather-qa.apk.sha256)
+if command -v sha256sum >/dev/null; then sha=(sha256sum); else sha=(shasum -a 256); fi
+(cd "$out" && "${sha[@]}" gather-qa.apk > gather-qa.apk.sha256)
+echo "gather QA APK: ABI $abi" >&2
 cat "$out/gather-qa.apk.sha256"
