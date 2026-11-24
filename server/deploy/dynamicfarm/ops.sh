@@ -45,7 +45,7 @@ db_exists() { [ "$(psql_in postgres -tA -c "SELECT count(*) FROM pg_database WHE
 user_tables() { q "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"; }
 
 check_env() {
-  [ -f "$ENV_FILE" ] || die "缺少 $ENV_FILE（照 env.example 建，chmod 600）"
+  [ -f "$ENV_FILE" ] || die "缺少 ${ENV_FILE}（照 env.example 建，chmod 600）"
   [ -n "$(find "$ENV_FILE" -maxdepth 0 -perm 600)" ] || die ".env 权限必须是 600"
   local k
   for k in POSTGRES_PASSWORD TOKEN_PEPPER TRUSTED_PROXIES INVITE_EMAIL_DOMAIN PG_IMAGE; do
@@ -57,14 +57,14 @@ check_env() {
   [[ "$(envget TRUSTED_PROXIES)" != *0.0.0.0* ]] || die "TRUSTED_PROXIES 不能是 0.0.0.0/0"
   # 这些开关由 compose.yml 写死；.env 里出现说明有人想改正式配置，先停下来问。
   for k in ACCOUNT_SIGNUP GUEST_WRITES DYNAMIC_FARM_RESELECT QA_EMAIL_DOMAIN QA_EMAIL_CODE GOOGLE_CLIENT_IDS APPLE_BUNDLE_IDS; do
-    ! grep -qE "^$k=" "$ENV_FILE" || die ".env 里不要写 $k：正式配置写死在 compose.yml"
+    ! grep -qE "^$k=" "$ENV_FILE" || die ".env 里不要写 ${k}：正式配置写死在 compose.yml"
   done
 }
 check_release_env() {
   [[ "$(envget GIT_SHA)" =~ ^[0-9a-f]{40}$ ]] || die ".env 的 GIT_SHA 不是完整提交号"
   [ "$(envget APP_IMAGE)" = "$IMAGE_REPO:$(envget GIT_SHA)" ] || die "APP_IMAGE 要是 $IMAGE_REPO:<GIT_SHA>"
   local id; id=$(docker image inspect --format '{{.Id}}' "$(envget APP_IMAGE)" 2>/dev/null) || die "主机上没有镜像 $(envget APP_IMAGE)"
-  [ "$id" = "$(envget APP_IMAGE_ID)" ] || die "镜像 ID 不符：主机上是 $id，.env 记的是 $(envget APP_IMAGE_ID)"
+  [ "$id" = "$(envget APP_IMAGE_ID)" ] || die "镜像 ID 不符：主机上是 ${id}，.env 记的是 $(envget APP_IMAGE_ID)"
 }
 
 wait_pg() {
@@ -80,7 +80,7 @@ health() {
     if [[ "$body" == *'"ok":true'* && "$body" == *"\"git_sha\":\"$want\""* ]]; then say "健康检查通过：$want"; return 0; fi
     sleep 2
   done
-  die "健康检查 90 秒内没有通过（期望 git_sha=$want）。看日志：docker compose -f $DIR/compose.yml logs --tail 100 app"
+  die "健康检查 90 秒内没有通过（期望 git_sha=${want}）。看日志：docker compose -f $DIR/compose.yml logs --tail 100 app"
 }
 
 # 当前库的行数和指纹；备份和恢复都用它核对。
@@ -135,7 +135,7 @@ do_backup() {
   { ls -1t "$dir"/dynamicfarm-*.dump "$dir"/dynamicfarm-*.dump.age 2>/dev/null || true; } | tail -n +"$((keep + 1))" | while read -r old; do
     rm -f "$old" "${old%.dump*}.counts"
   done
-  say "备份完成：$out（$(wc -c < "$out" | tr -d ' ') 字节）；$(tr '\n' ' ' < "$base.counts")"
+  say "备份完成：${out}（$(wc -c < "$out" | tr -d ' ') 字节）；$(tr '\n' ' ' < "$base.counts")"
   printf '%s\n' "$out"
 }
 
@@ -145,7 +145,7 @@ do_restore() {
   [ "$confirm" = --confirm-drop ] || die "恢复会删掉现在的 $DB 再重建；确认后加 --confirm-drop"
   check_env; wait_pg
   local counts="${file%.dump*}.counts"
-  [ -f "$counts" ] || die "缺少 $counts（备份时记下的行数和指纹），不知道恢复得对不对"
+  [ -f "$counts" ] || die "缺少 ${counts}（备份时记下的行数和指纹），不知道恢复得对不对"
   local plain="$file"
   if [[ "$file" == *.age ]]; then
     [ -n "${AGE_IDENTITY:-}" ] && [ -f "$AGE_IDENTITY" ] || die "加密备份要用 AGE_IDENTITY=<私钥文件> 解密（私钥不放在服务器上，用完即删）"
@@ -178,8 +178,8 @@ do_deploy() {
   [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || die "用法：ops.sh deploy <完整提交号> <镜像ID sha256:...>"
   [[ "$id" =~ ^sha256:[0-9a-f]{64}$ ]] || die "镜像 ID 要写完整的 sha256:<64 位>"
   check_env
-  local got; got=$(docker image inspect --format '{{.Id}}' "$IMAGE_REPO:$sha" 2>/dev/null) || die "主机上没有 $IMAGE_REPO:$sha（先 ops.sh load）"
-  [ "$got" = "$id" ] || die "镜像 ID 不符：主机上是 $got，要部署的是 $id"
+  local got; got=$(docker image inspect --format '{{.Id}}' "$IMAGE_REPO:$sha" 2>/dev/null) || die "主机上没有 $IMAGE_REPO:${sha}（先 ops.sh load）"
+  [ "$got" = "$id" ] || die "镜像 ID 不符：主机上是 ${got}，要部署的是 $id"
   wait_pg
   if db_exists && [ "$(user_tables)" != 0 ]; then
     say "库里已有数据，部署前先备份（标签 pre-${sha:0:12}）"
@@ -211,7 +211,7 @@ do_rollback() {
   [ -n "$line" ] || die "发布记录里没有 $target"
   local id; id=$(printf '%s' "$line" | cut -f4)
   local got; got=$(docker image inspect --format '{{.Id}}' "$IMAGE_REPO:$target" 2>/dev/null) || die "主机上已经没有 $IMAGE_REPO:$target"
-  [ "$got" = "$id" ] || die "镜像 ID 不符：主机上是 $got，记录的是 $id"
+  [ "$got" = "$id" ] || die "镜像 ID 不符：主机上是 ${got}，记录的是 $id"
   say "回滚：$current → $target"
   [ -z "$restore" ] || do_restore "$restore" --confirm-drop
   envset APP_IMAGE "$IMAGE_REPO:$target"; envset APP_IMAGE_ID "$id"; envset GIT_SHA "$target"

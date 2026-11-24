@@ -49,7 +49,7 @@ image() {
 image_id() { printf 'sha256:%s' "$(printf '%s' "dynamicfarm-server:$1" | shasum -a 256 | cut -d' ' -f1)"; }
 
 mkdir -p "$R/bin" "$R/secrets" "$DEPLOY"
-step "准备：当前版本 $HEAD_SHA，下一版（模拟）$NEXT_SHA"
+step "准备：当前版本 ${HEAD_SHA}，下一版（模拟）$NEXT_SHA"
 image "$HEAD_SHA"
 image "$NEXT_SHA"
 printf '\n-- rehearsal: the next release adds a column\nALTER TABLE parcel_claims ADD COLUMN IF NOT EXISTS rehearsal_probe text;\n' \
@@ -179,7 +179,7 @@ step "回滚（只换镜像）：ops.sh rollback"
 ops rollback
 farm 2 p-9100001 "$R/farm-a.rb.json"
 cmp -s "$R/farm-a.json" "$R/farm-a.rb.json" || fail "回滚后读回的存档不同"
-ok "回到 $HEAD_SHA；新加的列还在（只加不改，旧版照常读写），存档不变"
+ok "回到 ${HEAD_SHA}；新加的列还在（只加不改，旧版照常读写），存档不变"
 
 step "再部署下一版，然后带恢复的回滚：ops.sh rollback <当前版本> --restore <部署前备份>"
 ops deploy "$NEXT_SHA" "$(image_id "$NEXT_SHA")"
