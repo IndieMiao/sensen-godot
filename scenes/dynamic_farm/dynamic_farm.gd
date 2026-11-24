@@ -657,7 +657,6 @@ func suspend() -> void:
 	_labour_left = 0.0
 	_movement = Vector2.ZERO
 	_controls.reset()
-	if _farming != null: _farming.hold_english(false)
 	_canvas.visible = false
 	visible = false
 	if _environment != null:
@@ -669,7 +668,6 @@ func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 	_suspended = false
 	_back_sent = false
-	if _farming != null: _farming.hold_english(true)
 	visible = true
 	_canvas.visible = true
 	if _environment != null: _environment.environment = _saved_environment
