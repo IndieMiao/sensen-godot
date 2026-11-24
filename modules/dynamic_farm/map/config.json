@@ -1,7 +1,7 @@
 {
-  "base_url": "https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r5-c697144dd7c5/",
-  "dataset_version": "sf-dynamic-farm-20261124-r5",
-  "manifest_sha256": "1069a55876f36db56d28e0e60e24993153f583587d11168f2c96a919867bb295",
+  "base_url": "https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r6-6c3733e3b025/",
+  "dataset_version": "sf-dynamic-farm-20261124-r6",
+  "manifest_sha256": "727ff59ae8a94c6af4620dd5ecdf605233f2c5f86ddcc11a98d93f908b9d0cb5",
   "building_source": "datasf",
   "min_core_cells": 400
 }

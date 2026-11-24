@@ -1,6 +1,6 @@
 extends SceneTree
 ## C-43: core size and shape follow the dataset; the client only keeps its 8192-cell budget
-## and a configurable too-small threshold. Local fixtures; config.json points at the hosted r5 (C-48#42).
+## and a configurable too-small threshold. Local fixtures; config.json points at the hosted r6 (C-43#152).
 const Controller := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const FarmData := preload("res://modules/dynamic_farm/farm_data.gd")
@@ -84,11 +84,11 @@ func _run() -> void:
 	for bad in ["sf-dynamic-farm-r5", "sf-dynamic-farm-20261124-r5/../x", "other-20261124-r5", 5, null]:
 		check(not Contract.valid_dataset(bad), "rejects dataset version %s" % str(bad))
 	check(Contract.farm_matches(farms_by_id["p-L300"], "p-L300", R5) and not Contract.farm_matches(farms_by_id["p-L300"], "p-L300", Contract.DATASET), "farm must match the configured dataset version")
-	# Shipped config: hosted r5 (C-48#42), client-manifest pin, DataSF buildings, and the server knows the release.
+	# Shipped config: hosted r6 (C-43#152), client-manifest pin, DataSF buildings, and the server knows the release.
 	var shipped: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://modules/dynamic_farm/map/config.json"))
 	var rules: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/farm/data/dynamic_farm.json"))
-	check(shipped.dataset_version == R5 and shipped.manifest_sha256 == "1069a55876f36db56d28e0e60e24993153f583587d11168f2c96a919867bb295", "config.json pins the hosted r5 client-manifest")
-	check(Api.valid_base(str(shipped.base_url).trim_suffix("/")) and shipped.building_source == "datasf", "config.json reads r5 over https with the DataSF buildings it was rasterized from")
+	check(shipped.dataset_version == "sf-dynamic-farm-20261124-r6" and shipped.manifest_sha256 == "727ff59ae8a94c6af4620dd5ecdf605233f2c5f86ddcc11a98d93f908b9d0cb5", "config.json pins the hosted r6 client-manifest")
+	check(Api.valid_base(str(shipped.base_url).trim_suffix("/")) and shipped.building_source == "datasf", "config.json reads r6 over https with the DataSF buildings it was rasterized from")
 	check(rules.communities.any(func(c): return shipped.dataset_version in c.datasets), "server rules register the configured dataset release")
 	# Selection: threshold prompt, configurable threshold.
 	var api := Api.new(); api.transport = transport; root.add_child(api)

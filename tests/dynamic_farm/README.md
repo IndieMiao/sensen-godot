@@ -36,11 +36,12 @@ needed Avatar/AppRouter symbols, and use an isolated package/userdir. The scene'
 setting check is only an additional guard, not a replacement for build isolation.
 No stage-two APK or 3D-scene acceptance is claimed here.
 
-`modules/dynamic_farm/map/config.json` pins the hosted r5 read-only dataset (C-48#42):
-`https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r5-c697144dd7c5/`,
-`sf-dynamic-farm-20261124-r5`, client SHA (of `client-manifest.json`)
-`1069a55876f36db56d28e0e60e24993153f583587d11168f2c96a919867bb295`; that
-client-manifest names the full `manifest.json` SHA `c697144d…63de`. The map uses
+`modules/dynamic_farm/map/config.json` pins the hosted r6 read-only dataset (C-43#152):
+`https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r6-6c3733e3b025/`,
+`sf-dynamic-farm-20261124-r6`, client SHA (of `client-manifest.json`)
+`727ff59ae8a94c6af4620dd5ecdf605233f2c5f86ddcc11a98d93f908b9d0cb5`; that
+client-manifest names the full `manifest.json` SHA `6c3733e3…9376`. r6 is r5
+without its degenerate building rings (V-167); r5 was never shipped. The map uses
 the dataset's DataSF buildings (`building_source: datasf`), the same footprints
 the farm cores are rasterized from. Claims send the same `dataset_version`, which
 `assets/farm/data/dynamic_farm.json` registers on the server.
