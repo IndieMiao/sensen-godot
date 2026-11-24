@@ -206,24 +206,29 @@ func _status_messages() -> Array:
 	return out
 
 ## C-78: a message appearing after a tap ("Signing in…", "Can't reach the server…") must not push the
-## primary button or anything below it; neither may it clearing again.
+## primary button or anything below it; neither may it clearing again. Chinese is the game's default
+## language and English wraps the longest, so both are checked.
 func test_status_messages_keep_the_buttons_in_place() -> void:
-	for mode in ["sign_in", "sign_up"]:
-		var p := _panel(mode)
-		var names := ["Email", "Password", "ShowPasswords", mode, "to_sign_in" if mode == "sign_up" else "to_sign_up"]
-		if mode == "sign_in": names.append("to_forgot")
-		await get_tree().process_frame
-		await get_tree().process_frame
-		var before := _rects(p, names)
-		var status := p.find_child("Status", true, false) as Label
-		for message in _status_messages() + [""]:
-			p._say(message)
+	var locale := TranslationServer.get_locale()
+	for language in ["en", "zh_CN"]:
+		TranslationServer.set_locale(language)
+		for mode in ["sign_in", "sign_up"]:
+			var p := _panel(mode)
+			var names := ["Email", "Password", "ShowPasswords", mode, "to_sign_in" if mode == "sign_up" else "to_sign_up"]
+			if mode == "sign_in": names.append("to_forgot")
 			await get_tree().process_frame
 			await get_tree().process_frame
-			assert_bool(status.visible).is_true()
-			assert_int(status.get_line_count()).is_less_equal(AccountPanel.STATUS_LINES)
-			assert_dict(_rects(p, names)).override_failure_message("%s moved the buttons in %s" % [message, mode]).is_equal(before)
-		p.queue_free()
+			var before := _rects(p, names)
+			var status := p.find_child("Status", true, false) as Label
+			for message in _status_messages() + [""]:
+				p._say(message)
+				await get_tree().process_frame
+				await get_tree().process_frame
+				assert_bool(status.visible).is_true()
+				assert_int(status.get_line_count()).is_less_equal(AccountPanel.STATUS_LINES)
+				assert_dict(_rects(p, names)).override_failure_message("%s moved the buttons in %s (%s)" % [status.text, mode, language]).is_equal(before)
+			p.queue_free()
+	TranslationServer.set_locale(locale)
 
 func test_local_validation_message_keeps_sign_in_in_place() -> void:
 	var p := _panel()
