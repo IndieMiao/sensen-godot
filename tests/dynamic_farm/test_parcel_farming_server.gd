@@ -52,7 +52,7 @@ func _open() -> Node:
 
 func _settle(farming: Node) -> void:
 	await process_frame
-	var deadline := Time.get_ticks_msec() + 10000
+	var deadline := Time.get_ticks_msec() + 30000  # a press walks there first (C-73)
 	while farming.busy and Time.get_ticks_msec() < deadline: await process_frame
 	await process_frame
 
