@@ -100,6 +100,16 @@ static func center(walk: RefCounted, at: Vector2i, rotation := 0) -> Vector3:
 	var s := size(rotation)
 	return (walk.point(at) + walk.point(at + s - Vector2i.ONE)) * 0.5
 
+## Where the build's dust puffs (C-114): the footprint's four corners and four edge middles, on the ground.
+static func rim(walk: RefCounted, at: Vector2i, rotation := 0) -> Array[Vector3]:
+	var half := Vector2(size(rotation)) * float(walk.cell_m) * 0.5
+	var middle := center(walk, at, rotation)
+	var out: Array[Vector3] = []
+	for dz in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx != 0 or dz != 0: out.append(middle + Vector3(dx * half.x, 0, dz * half.y))
+	return out
+
 ## The model's transform: its own pivot on the footprint's middle, +Z (the door) toward the camera, a quarter turn
 ## per rotation step.
 static func transform(walk: RefCounted, at: Vector2i, rotation := 0) -> Transform3D:

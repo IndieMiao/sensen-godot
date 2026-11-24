@@ -46,7 +46,7 @@ The outer trees, flowers and rocks of one's own parcel (the C-20 outer groves) c
 
 When the cell in front has no step to do and no cell was tapped, the main key turns to the outer object nearest the player (within `GATHER_REACH_M`, 1.2 m of its bounds on the ground, about a cell and a half) that the player faces most; a tap whose ray meets an object's bounds picks that object. The key reads `Gather` and the item name, `Gather · Move closer` for a tapped object out of reach, or `Regrowing · Ready in …` until it grows back. A press sends `{type:"gather", object}` without walking (the object is already in reach): with C-73's body the player faces it and plays the main farm's `harvest` labour clip, and the gain (`+1 Timber`) shows as the clip ends. Picked trees and rocks are redrawn faded (same model and pose, `gathered_prop.gdshader` washes out the vertex colours) and picked flowers, which never block, are hidden; the outer layer is redrawn when the picked set changes (`Scenery.build(..., bind=false)`), so the walk, the layout and collision stay exactly as loaded.
 
-Object ids follow C-58's contract (`docs/plans/C-58.md`): `<block id>:<outer_groves.version>:<model>:<x>,<y>:<ordinal>`, the origin's grid cell and the same model's ordinal in that cell in the drawn layout order. The ids lock the recipe's `outer_groves.version` (`outer-groves-v2`); a recipe whose version differs from `economy.gather.recipe_version` offers nothing to gather. `tools/dev/dynamic_farm/gather_qa_apk.sh` builds an x86_64 emulator QA package that opens one r4 parcel straight into one's own farm on the device save (`own_parcel_qa.tscn`); it is never a delivered package.
+Object ids follow C-58's contract (`docs/plans/C-58.md`): `<block id>:<outer_groves.version>:<model>:<x>,<y>:<ordinal>`, the origin's grid cell and the same model's ordinal in that cell in the drawn layout order. The ids lock the recipe's `outer_groves.version` (`outer-groves-v2`); a recipe whose version differs from `economy.gather.recipe_version` offers nothing to gather. `tools/dev/dynamic_farm/gather_qa_apk.sh` builds an emulator QA package (x86_64 or arm64-v8a, default the host architecture, `GATHER_QA_ABI` overrides; also runs on macOS) that opens one r4 parcel straight into one's own farm on the device save (`own_parcel_qa.tscn`); it is never a delivered package.
 
 ## First house (C-33, Q-40)
 
@@ -57,7 +57,10 @@ under the finger); its 3×3 cells fill green or red, grid lines fade over three 
 path's cells in reach show sand. The bottom is the shared `UiPlaceBar` (`Cancel · Build`); the main key shows why a
 spot is refused. The preview starts on the valid spot nearest the player. Build sends `place_house` through
 `ParcelFarming.send`; the cottage stands at once (no construction time). A refused Build (`CELL_OCCUPIED`) keeps the
-preview, judged again on the farm the reply brought.
+preview, judged again on the farm the reply brought. A successful Build (C-114) pops the cottage in and puffs dust with
+the main farm's look-swap effect (`P0Fence.pop_in` / `P0Fence.dust`, read-only): one puff at the middle and one at each
+corner and edge middle of the footprint (`House.rim`), each `HOUSE_DUST_SCALE` (4) times the main farm's size. A house
+that comes with the save (reopening, a refused Build) just stands there.
 
 Rules (`modules/dynamic_farm/farm_house.gd`, the save's `house.x/y` is the footprint's lowest cell): every cell
 core (`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
@@ -68,7 +71,7 @@ contact; the eaves, bench, woodpile and doorstep are not walls. A player standin
 nearest clear point. Without `own_parcel` (the art preview) nothing of this shows.
 
 `tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
-Build, the wall, reopen (`--headless`: states only).
+Build (three pop frames), the wall, reopen (`--headless`: states only).
 
 ## First-visit guide (C-35, 0.4.2)
 
