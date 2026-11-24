@@ -141,7 +141,8 @@ ok "3 个账号写进受控文件（日志不打密码）"
 ops invites list
 # 用 script 给 ops.sh 一个终端做标准输出：应在连库之前就拒绝（输出整个丢弃，万一没拒绝也不留密码）。
 script -q /dev/null "$DEPLOY/ops.sh" invites create --count 1 --batch rehearsal > "$R/tty.out" 2>&1 || true
-grep -q '输出含密码' "$R/tty.out" || fail "标准输出是终端时应拒绝"
+# 终端会把多字节字符拆开，只核对 ASCII：拒绝信息里有 "invites create"，且没有输出 CSV 表头。
+grep -q 'invites create' "$R/tty.out" && ! grep -q 'email,password' "$R/tty.out" || fail "标准输出是终端时应拒绝"
 rm -f "$R/tty.out"
 [ "$(sql "SELECT count(*) FROM users")" = 3 ] || fail "被拒绝时不应建账号"
 ok "标准输出是终端时，create 在连库前被 ops.sh 拒绝，没有多建账号"
@@ -183,6 +184,12 @@ ops rollback
 farm 2 p-9100001 "$R/farm-a.rb.json"
 cmp -s "$R/farm-a.json" "$R/farm-a.rb.json" || fail "回滚后读回的存档不同"
 ok "回到 ${HEAD_SHA}；新加的列还在（只加不改，旧版照常读写），存档不变"
+if ops rollback 2>/dev/null; then fail "上一条是回滚时，不写版本的 rollback 应拒绝"; fi
+ok "已经回滚过时，不写版本的 rollback 被拒绝（不会又滚回坏的那版）"
+mkdir "$DEPLOY/.ops.lock"
+if ops backup 2>/dev/null; then fail "有锁时 backup 应拒绝"; fi
+rmdir "$DEPLOY/.ops.lock"
+ok "另一个步骤在跑（有锁）时，backup 直接退出"
 
 step "再部署下一版，然后带恢复的回滚：ops.sh rollback <当前版本> --restore <部署前备份>"
 ops deploy "$NEXT_SHA" "$(image_id "$NEXT_SHA")"
