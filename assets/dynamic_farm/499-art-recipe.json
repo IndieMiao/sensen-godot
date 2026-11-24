@@ -107,13 +107,13 @@
     }
   },
   "core_obstacles": {
-    "version": "core-obstacles-v1",
+    "version": "core-obstacles-v2",
     "coverage": 0.125,
     "roles": {
       "weed": {"share": 0.50, "ids": ["wild_pz_grass_24", "wild_pz_foot_leafy"]},
       "stone": {"share": 0.26, "ids": ["wild_pz_rock_13", "wild_pz_softrock_10"]},
       "bush": {"share": 0.17, "ids": ["wild_pz_bush_05", "wild_pz_bush_07"]},
-      "sapling": {"ids": ["wild_pz_pine_03"]}
+      "tree": {"ids": ["wild_pz_pine_03"], "cells": 2, "scale": [0.85, 1.0]}
     }
   },
   "outer_groves": {

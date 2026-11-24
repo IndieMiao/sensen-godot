@@ -45,10 +45,13 @@ var unavailable := false
 var _data: Dictionary
 var _walk: RefCounted
 var _core_plan: Dictionary
+var _recipe: Variant
 var _core_root: Node3D
-var _recipe = null
 var _proxies: Array = []
+## Every cell an uncleared core obstacle covers -> its anchor cell (a tree covers a block).
 var _obstacles := {}
+## Anchor cell -> index in the core layout; anchors name obstacles in `cleared`.
+var _anchors := {}
 var _removed := {}
 var _path := {}
 var _clock_offset_ms := 0
@@ -79,13 +82,15 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 	_data = data
 	_walk = walk
 	_core_plan = core.plan
+	_recipe = core.get("recipe")
 	_core_root = core.root
 	_proxies = core.proxies
-	_recipe = core.get("recipe")
 	store = farm_store
 	rules = ParcelFarm.rules()
 	for index in _core_plan.layout.size():
-		_obstacles[_core_plan.layout[index].cell] = index
+		var item: Dictionary = _core_plan.layout[index]
+		_anchors[item.cell] = index
+		for cell: Vector2i in item.get("cells", [item.cell]): _obstacles[cell] = item.cell
 	_path = Space.protected_path(data)
 	_gather = Gather.rules()
 	if outer.get("root") is Node3D and outer.get("layout") is Array:
@@ -118,6 +123,8 @@ func enter() -> void:
 		return
 	busy = true
 	var result: Dictionary = await store.enter()
+	# Entering twice is safe (the gift is granted once); a lost request is retried once before Retry shows.
+	if result.get("code") == "NETWORK" and is_inside_tree(): result = await store.enter()
 	busy = false
 	if not is_inside_tree(): return
 	_adopt(result)
@@ -303,14 +310,14 @@ func _drop_cleared() -> void:
 	var gone := {}
 	for key: String in farm.cleared:
 		var cell = ParcelFarm.parse_key(key)
-		if cell != null and _obstacles.has(cell) and not _removed.has(cell): gone[cell] = true
+		if cell != null and _anchors.has(cell) and not _removed.has(cell): gone[cell] = true
 	if gone.is_empty(): return
 	var remaining := {"layout": _core_plan.layout.filter(func(item): return not _removed.has(item.cell) and not gone.has(item.cell))}
 	var art := Scenery.build(remaining, _walk, _recipe, false)
 	if not art.ok: return
 	# Release the walk only once the redrawn art exists, so art and walk never disagree.
 	for cell: Vector2i in gone:
-		var proxy = _proxies[_obstacles[cell]]
+		var proxy = _proxies[_anchors[cell]]
 		if proxy != null: _walk.remove_prop(proxy)
 		_removed[cell] = true
 	art.root.name = _core_root.name
@@ -321,7 +328,8 @@ func _drop_cleared() -> void:
 	parent.add_child(art.root)
 	parent.move_child(art.root, index)
 	_core_root = art.root
-	for cell: Vector2i in _removed: _obstacles.erase(cell)
+	for cell: Vector2i in _obstacles.keys():
+		if _removed.has(_obstacles[cell]): _obstacles.erase(cell)
 
 ## Redraws the outer layer when the set of gathered objects changes: picked trees and rocks
 ## fade, picked flowers (non-blocking) are hidden, all come back once grown. Art only: the walk

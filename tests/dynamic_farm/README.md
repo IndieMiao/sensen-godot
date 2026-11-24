@@ -52,8 +52,18 @@ CI (C-62): the Cardigan check's `dynamic_farm` step runs `tools/ci/dynamic_farm_
 It runs every `test_*.gd` here with `--headless --script` in the imported project, each
 under its own timeout (`DYNAMIC_FARM_TIMEOUT`, default 180 s; a hang is killed and fails),
 and passes the four pinned r4 parcels in `fixtures/r4/` after `--`. A file passes only with
-exit 0, no `SCRIPT ERROR`, and a summary line with a non-zero check count and no failures.
-`test_read_retries_https.gd` gets a loopback TLS fixture with throwaway certificates.
+exit 0, no `SCRIPT ERROR`, and exactly one summary line with a non-zero check count and no
+failures. Only the prefixes listed in the script's `SUMMARY_CHECKS` / `SUMMARY_RATIO` count as
+a summary (C-63), so a new test file must add its prefix there. All files share a total
+budget (`DYNAMIC_FARM_TOTAL_TIMEOUT`, default 1080 s, inside the step's 20 minutes): the last
+file's limit is clipped to what is left, later files are reported as NOT RUN failures, and the
+report table still shows which files timed out.
+`test_read_retries_https.gd` gets a loopback TLS fixture with throwaway certificates; with
+`CI=1` a fixture that cannot start fails that file, locally it is skipped.
+`tools/ci/test-dynamic-farm-gate.sh` (run first in the same step) checks these rules with a
+fake Godot: summary misreads, fixture failure with and without `CI`, and several hangs.
+`test_parcel_farming_server.gd` needs a running C-31 server and an owner token, so the check lists it
+under "Skipped"; run it by hand as its header describes.
 Anything that cannot run is listed under "Skipped" in the job summary, never as passed
 (currently `test_mesh_edges.gd --legacy`, whose old mesh script is not in the repository).
 Locally: `tools/run_tests.sh --ci-import` once, then `tools/ci/dynamic_farm_tests.sh [test_name…]`.
@@ -240,3 +250,26 @@ prop, sends scripted movement input, checks contact or passage, saves the
 contact frame and walks past it. This is not a trip from spawn or device input.
 With `--headless` (omit `--write-movie`), it verifies movement only: no pixels
 or recording are generated. All placements keep their ordinary model and pose.
+
+## First-home claim (C-32)
+
+`test_claim_controller.gd` runs the claim flow against `fake_parcel_server.gd`, an
+in-memory stand-in with the C-31 status codes (201 / 200 retry / 409
+`ALREADY_CLAIMED` / 409 `PARCEL_TAKEN` / 403 `RESELECT_DISABLED` / 401), and a fake
+native bridge that keeps parcel states the way `ParcelLayerState` does. It checks the
+own (green) / claimed (red) / selected bits, the claimer-name rows, that a claimable
+selection keeps C-28's yellow building fill while an owned one drops it, reopening on
+a new generation, a second account, the one-home rule, give-up only with the internal
+setting, and the real map card's buttons. Fake data proves client logic only; it is
+not evidence of a real claim, a save or device rendering.
+
+Settings read by the map: `sensen/dynamic_farm/reselect` (internal test packages only;
+shows "Give up and choose again"), `sensen/dynamic_farm/own_farm` (internal test packages only;
+"Enter my farm" opens the own parcel with `own_parcel=true` for farming, C-34 Q-72; otherwise it
+opens the read-only preview), `sensen/dynamic_farm/account_restore` (internal test
+packages only; reloads the saved account token through `Net.restore_saved_account()`, which
+calls `/users/me` and nothing else) and `sensen/dynamic_farm/fake_claims` (+ optional
+`fake_player`, default `fake-a`) for development without the C-31 server. None is
+set in `project.godot`, so release builds show no give-up entry and keep the normal
+`Net` boot. A signed-out player gets a "Sign in" button that opens the existing
+`AccountPanel`; ownership is re-read for the new identity.

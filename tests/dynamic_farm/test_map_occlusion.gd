@@ -1,6 +1,7 @@
 extends SceneTree
 const Android := preload("res://scenes/map_poc/map_bridge_android.gd")
 const RouterFixture := preload("res://tests/dynamic_farm/app_router_fixture.gd")
+const OWN_FARM := "sensen/dynamic_farm/own_farm"
 class Plugin extends Node:
 	var supported := true
 	var surface_supported := true
@@ -22,6 +23,9 @@ class Selector extends Node:
 	var activations := 0
 	func pause() -> void: bridge.set_map_visible(false)
 	func activate() -> void: activations += 1
+class Claims extends Node:
+	var state := "none"
+	func status(_id: String) -> String: return state
 class TestCamera extends Control:
 	var center := [-122.45, 37.73]
 	var zoom := 17.5
@@ -64,6 +68,18 @@ func _run() -> void:
 	verify(plugin.calls == [["color", "#E7F0DF"]] and router.opened == 1, "opaque scene color is supplied before Router may suspend the map")
 	verify(router.received.preview_only and router.received.farm == farm, "preview payload keeps identity and presentation-only semantics")
 	verify(not plugin.opaque, "cancelled loading before Router suspension never makes the still-visible map opaque")
+	# C-34 Q-72: only an internal package opens the player's own parcel for farming, and only from "Enter my farm".
+	var claims := Claims.new(); page._claims = claims
+	for case in [[false, "p-A", "mine", false, "release package: 'Enter my farm' still opens the read-only preview"],
+			[true, "p-A", "mine", true, "internal package: 'Enter my farm' opens the own parcel for farming"],
+			[true, "", "mine", false, "internal package: 'Preview in 3D' stays read-only"],
+			[true, "p-A", "other", false, "internal package: a parcel that is not the player's stays read-only"],
+			[true, "p-B", "mine", false, "internal package: an entry started for another parcel stays read-only"]]:
+		ProjectSettings.set_setting(OWN_FARM, case[0]); claims.state = case[2]; page._entering = case[1]
+		await page._open_host(farm)
+		var own: bool = router.received.get("own_parcel", false) == true
+		verify(own == case[3] and router.received.get("preview_only", false) != case[3] and page._entering.is_empty(), case[4])
+	ProjectSettings.set_setting(OWN_FARM, null); page._claims = null; claims.free()
 	plugin.calls.clear()
 	router.hold_loading = true
 	page._open_host(farm)
