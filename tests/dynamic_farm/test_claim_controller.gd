@@ -281,8 +281,12 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 		"a tap shows Loading… on the entry at once, before the town loads")
 	page._market.pressed.emit()
 	check(page._market.text == "Market", "the other entry waits meanwhile")
-	await process_frame; await process_frame
-	check(page._town != null and page._town.who == "carpenter" and not page._hud.visible, "the next frame opens the carpenter over the map")
+	await process_frame
+	check(page._town == null and page._carpenter.text == page.TOWN_LOADING, "Loading… stays for the frame that draws it")
+	var frames := 0
+	while page._town == null and frames < 600: await process_frame; frames += 1
+	check(page._town != null and page._town.who == "carpenter" and not page._hud.visible and page._town_script != null,
+		"once its script is loaded the carpenter opens over the map (%d frames)" % frames)
 	while page._town != null and page._town.busy: await process_frame
 	var seen: Dictionary = page._town.farm.duplicate(true)
 	page._town.close(); await process_frame

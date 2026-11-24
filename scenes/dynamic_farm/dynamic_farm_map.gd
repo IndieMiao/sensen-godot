@@ -297,25 +297,53 @@ func _open_sign_in() -> void:
 	_render()
 
 ## The market or the carpenter over the map, trading through the player's own parcel save. The tapped entry reads
-## Loading… and is drawn before anything loads: on a cold start the town's first open took seconds with no sign of
-## the tap (C-59#135).
+## Loading… and is on screen before anything loads: on a cold start the town's first open took seconds with no sign
+## of the tap (C-59#135). A tap is handled before the frame's process step, so waiting for process_frame alone opened
+## the town before Loading… was ever drawn (C-61 V-243 on the emulator).
 func _open_town(who: String) -> void:
 	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _town != null or _opening or not _town_loading.is_empty(): return
 	var tapped := Time.get_ticks_msec()
 	_town_loading = who
 	_render()
-	await get_tree().process_frame # the frame showing Loading… is drawn before this one starts
-	if not is_inside_tree() or _suspended or _leaving or _opening or not _claims.has_home():
-		_town_loading = ""; _render(); return
+	await _on_screen()
+	var drawn := Time.get_ticks_msec()
+	if _town_cancelled(): return
+	await _town_ready()
+	var loaded := Time.get_ticks_msec()
+	if _town_cancelled(): return
 	var home: Dictionary = _claims.mine
-	if _town_script == null and _town_prepared: _town_script = ResourceLoader.load_threaded_get(TOWN)
-	if _town_script == null: _town_script = load(TOWN)
 	_town = _town_script.open(self, who, _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))), str(home.parcel_id))
 	_town_loading = ""
 	_town.closed.connect(_town_closed.bind(_town, str(home.parcel_id)))
 	_hud.hide(); _camera.input_enabled = false
-	await get_tree().process_frame
-	print("DYNAMIC_TOWN_OPEN ", JSON.stringify({"who": who, "shown_ms": Time.get_ticks_msec() - tapped}))
+	var opened := Time.get_ticks_msec()
+	await _on_screen()
+	print("DYNAMIC_TOWN_OPEN ", JSON.stringify({"who": who, "loading_ms": drawn - tapped, "ready_ms": loaded - tapped,
+		"open_ms": opened - tapped, "shown_ms": Time.get_ticks_msec() - tapped}))
+
+## Waits until what the map shows now has been drawn, then for the next frame (headless draws nothing: a frame).
+func _on_screen() -> void:
+	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
+	else: await get_tree().process_frame
+	if is_inside_tree(): await get_tree().process_frame
+
+## A tap given up while its town loads (the map left, went to the parcel, or lost its home); the entries come back.
+func _town_cancelled() -> bool:
+	if is_inside_tree() and not _suspended and not _leaving and not _opening and _claims.has_home(): return false
+	_town_loading = ""
+	if is_inside_tree(): _render()
+	return true
+
+## The town's script: the thread's preload, waited for frame by frame so Loading… stays drawn, else loaded here.
+func _town_ready() -> void:
+	if _town_script != null: return
+	if _town_prepared:
+		while is_inside_tree() and ResourceLoader.load_threaded_get_status(TOWN) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			await get_tree().process_frame
+		if not is_inside_tree(): return
+		_town_prepared = false
+		_town_script = ResourceLoader.load_threaded_get(TOWN)
+	if _town_script == null: _town_script = load(TOWN)
 
 ## The town's script and what it preloads load on a thread once the player has a home, so the first tap opens sooner.
 func _prepare_town() -> void:

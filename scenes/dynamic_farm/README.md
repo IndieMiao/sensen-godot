@@ -87,6 +87,7 @@ shows the preview's `Explore and walk. Farming actions come later.` Copy and scr
 parcel's card says where to go; the map reads the home's save (`GET /parcels/mine`, no gift) on each return and keeps
 the save the Market or Carpenter last saw, and its bottom card names the step done off the parcel (`Tap Market to sell
 your carrot.` …), with nothing selected or added under `Your home`. A tap on Market or Carpenter reads `Loading…` on
-that entry and is drawn before the town loads; the town's script (and the P0 keeper-portrait code it pulls in, ~1.3 s
-to compile on a desktop) loads on a thread once the player has a home. The map prints `DYNAMIC_TOWN_OPEN` with the
-time from the tap to the town on screen. Copy and screenshots: `docs/plans/C-61.md`.
+that entry and is drawn (`RenderingServer.frame_post_draw`) before the town loads; the town's script (and the P0
+keeper-portrait code it pulls in, ~1.3 s to compile on a desktop) loads on a thread once the player has a home, and a
+tap before it is done waits for it frame by frame with `Loading…` showing. The map prints `DYNAMIC_TOWN_OPEN` with the
+times from the tap to `Loading…` drawn, the script ready, the town opened and the town on screen. Copy and screenshots: `docs/plans/C-61.md`.
