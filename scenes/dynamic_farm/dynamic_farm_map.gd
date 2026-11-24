@@ -22,6 +22,10 @@ const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_
 const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const OCCLUSION_COLOR := "#E7F0DF" # Existing scene BG_COLOR(.906, .941, .875), opaque RGB.
 const AREA_REFRESH_SECONDS := 0.8
+## The bottom card's line with nothing selected (C-35: the next step in a package that enters one's own farm).
+const PICK_PREVIEW := "Choose a parcel to explore in 3D."
+const PICK_FIRST := "Tap a building to choose your first home."
+const PICK_HOME := "Tap your green parcel, then Enter my farm."
 ## Development stand-in for the C-31 server, shared by map visits in one run.
 static var _fake_server: RefCounted
 var _selector: Node
@@ -121,7 +125,7 @@ func _build_ui() -> void:
 	_market = _button("Market", _open_town.bind("market")); _market.disabled = true; places.add_child(_market)
 	_carpenter = _button("Carpenter", _open_town.bind("carpenter")); _carpenter.disabled = true; places.add_child(_carpenter)
 	var bottom := _panel(true)
-	_details = _label("Choose a parcel to explore in 3D.", 16); bottom.add_child(_details)
+	_details = _label(PICK_PREVIEW, 16); bottom.add_child(_details)
 	_choices = OptionButton.new(); _choices.custom_minimum_size.y = 44; _choices.hide()
 	_choices.item_selected.connect(func(index: int):
 		if index >= 0 and index < _candidate_ids.size():
@@ -138,7 +142,8 @@ func _build_ui() -> void:
 	_reselect = _button("Give up and choose again", _abandon); _reselect.hide(); bottom.add_child(_reselect)
 	_sign_in = _button("Sign in", _open_sign_in); _sign_in.hide(); bottom.add_child(_sign_in)
 	_area_timer = Timer.new(); _area_timer.one_shot = true; _area_timer.timeout.connect(_refresh_area); add_child(_area_timer)
-	bottom.add_child(_label("Explore and walk. Farming actions come later.", 12))
+	# Only the preview package still cannot farm; one that enters one's own farm drops the line (C-35).
+	if not _own_farm_entry(): bottom.add_child(_label("Explore and walk. Farming actions come later.", 12))
 	var credits := HBoxContainer.new(); bottom.add_child(credits)
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
 		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
@@ -181,7 +186,7 @@ func _render() -> void:
 	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
 	_open.disabled = not idle or id.is_empty()
 	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _town == null
-	if id.is_empty(): _details.text = "Choose a parcel to explore in 3D."
+	if id.is_empty(): _details.text = _no_selection()
 	else:
 		var p: Dictionary = _selector.selection
 		_details.text = "%s\n%d core · %d walk-only extension cells" % [p.name, p.core_cell_count, p.extension_cell_count]
@@ -202,6 +207,12 @@ func _render() -> void:
 	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
 	if _selector._options.is_empty(): _choices.hide()
+
+## With nothing selected: where to go next (C-35) in a package that enters one's own farm, once the player's own
+## parcel is known; otherwise the preview's line.
+func _no_selection() -> String:
+	if not _own_farm_entry() or not _claims.mine_known: return PICK_PREVIEW
+	return PICK_HOME if _claims.has_home() else PICK_FIRST
 
 func _show_candidates(rows: Array) -> void:
 	_choices.clear(); _candidate_ids.clear()

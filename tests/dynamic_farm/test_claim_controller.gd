@@ -6,6 +6,7 @@ const ClaimApi := preload("res://modules/dynamic_farm/map/claim_api.gd")
 const FakeServer := preload("res://modules/dynamic_farm/map/fake_parcel_server.gd")
 const Fixture := preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
+const OWN_FARM := "sensen/dynamic_farm/own_farm"
 class Native extends MapBridge:
 	var states := {} # block_id -> {selected, claimed, own}, as native ParcelLayerState keeps them
 	var batches: Array = []
@@ -174,6 +175,19 @@ func _map_card() -> void:
 	page._claims = controller(server, "fake-a", native); page._claims.changed.connect(page._render)
 	await page._claims.start()
 	page._claims.reselect = false
+	# C-35: with nothing selected the card says where to go next, only in a package that enters one's own farm.
+	selector.selection = {}
+	page._render()
+	check(page._details.text == page.PICK_PREVIEW, "preview package, nothing selected: 'Choose a parcel to explore in 3D.'")
+	ProjectSettings.set_setting(OWN_FARM, true)
+	page._render()
+	check(page._details.text == page.PICK_FIRST, "no home yet, nothing selected: 'Tap a building to choose your first home.'")
+	var farming_page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+	root.add_child(farming_page)
+	check(page.find_children("*", "Label", true, false).any(func(l): return l.text.begins_with("Explore and walk.")) \
+		and not farming_page.find_children("*", "Label", true, false).any(func(l): return l.text.begins_with("Explore and walk.")),
+		"only the preview package still says farming comes later")
+	farming_page.queue_free()
 	selector.selection = Fixture.metadata(ids[0]); selector.selection.block_id = ids[0]
 	page._render(); await process_frame
 	check(page._claim.visible and not page._claim.disabled and not page._enter.visible and page._open.visible, "free parcel shows 'Make this my first home'")
@@ -181,6 +195,13 @@ func _map_card() -> void:
 	check(page._confirm.visible and not page._claim.visible, "claim asks for confirmation first")
 	page._claim_selection(); await process_frame
 	check(page._enter.visible and not page._claim.visible and not page._open.visible, "after claiming the card offers 'Enter my farm'")
+	var picked: Dictionary = selector.selection
+	selector.selection = {}
+	page._render()
+	check(page._details.text == page.PICK_HOME, "with a home, nothing selected: 'Tap your green parcel, then Enter my farm.'")
+	ProjectSettings.set_setting(OWN_FARM, false)
+	selector.selection = picked
+	page._render()
 	check(not page._reselect.visible, "release package shows no give-up entry")
 	check(native.states[ids[0]].own, "claimed parcel turns green on the map")
 	page._enter.pressed.emit()
