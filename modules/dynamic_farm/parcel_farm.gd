@@ -3,15 +3,17 @@ extends RefCounted
 ## commands. The server is authoritative; the local fake store replays the same rules.
 ## Numbers come from assets/farm/data/dynamic_farm.json (owner decision Q-39, C-34#14),
 ## shared with the server and separate from the main farm. C-58 added the parcel's own
-## coins and economy fields; the `gather` command (outer gathering, C-60) is ParcelGather's.
+## coins and the `sell` / `claim_blueprint` commands (mirrored here for the local store, C-59);
+## the `gather` command (outer gathering, C-60) is ParcelGather's.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
-const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest", "gather"]
-## Server limit (C-58 farm.ts): the coin cap.
+const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest", "sell", "claim_blueprint", "gather"]
+## Server limits (C-58 farm.ts): the coin cap and the most one sell command may sell.
 const MAX_COINS := 1000000000
+const MAX_SELL_COUNT := 999
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 
 static var _rules := {}
@@ -44,7 +46,23 @@ static func parse_rules(raw: Variant) -> Dictionary:
 		parsed.crops[id]["yield"] = int(parsed.crops[id]["yield"])
 	parsed.house.width = int(parsed.house.width)
 	parsed.house.depth = int(parsed.house.depth)
+	parsed["economy"] = _parse_economy(raw.get("economy"))
 	return parsed
+
+## C-58 `economy`: sell prices and one-off blueprints; {sell_prices:{}, blueprints:{}} when absent.
+static func _parse_economy(raw: Variant) -> Dictionary:
+	var out := {"sell_prices": {}, "blueprints": {}}
+	if not raw is Dictionary: return out
+	if raw.get("sell_prices") is Dictionary:
+		for id in raw.sell_prices:
+			if id is String and whole_in(raw.sell_prices[id], 1, 100000): out.sell_prices[id] = int(raw.sell_prices[id])
+	if raw.get("blueprints") is Dictionary:
+		for id in raw.blueprints:
+			var rule = raw.blueprints[id]
+			if id is String and rule is Dictionary and rule.get("item") is String and whole_in(rule.get("amount"), 1, 99) \
+					and whole_in(rule.get("min_sales"), 0, 1000):
+				out.blueprints[id] = {"item": rule.item, "amount": int(rule.amount), "min_sales": int(rule.min_sales)}
+	return out
 
 static func empty_state() -> Dictionary:
 	return {"v": STATE_VERSION, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
@@ -139,7 +157,13 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		var command = commands[index]
 		if not command is Dictionary or command.get("type") not in COMMANDS:
 			return {"ok": false, "index": index, "code": "SCHEMA"}
-		if command.type == "gather":
+		if command.type == "sell":
+			if not command.get("item") is String or str(command.item).length() > 64 or not whole_in(command.get("count"), 1, MAX_SELL_COUNT):
+				return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif command.type == "claim_blueprint":
+			if not command.get("blueprint") is String or str(command.blueprint).length() > 64:
+				return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif command.type == "gather":
 			if not command.get("object") is String or str(command.object).length() > Gather.MAX_OBJECT_LENGTH:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "place_house":
@@ -212,6 +236,36 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 					next.crops.erase(cell)
 					var amount := int(rule_set.crops[planted.crop]["yield"]) if rule_set.crops.has(planted.crop) else 1
 					next.bag[planted.crop] = int(next.bag.get(planted.crop, 0)) + amount
+			"sell":
+				# The price is the rules' only (the server ignores any price in a request).
+				var item: String = command.item
+				var count := int(command.count)
+				var prices: Dictionary = rule_set.get("economy", {}).get("sell_prices", {})
+				var have := int(next.bag.get(item, 0))
+				if not prices.has(item):
+					failure = "NOT_SELLABLE"
+					detail = {"item": item}
+				elif have < count:
+					failure = "NOT_ENOUGH"
+					detail = {"item": item, "have": have, "need": count}
+				elif int(next.coins) + int(prices[item]) * count > MAX_COINS:
+					failure = "COINS_CAP"
+					detail = {"coins": next.coins, "max": MAX_COINS}
+				else:
+					_take(next.bag, item, count)
+					next.coins = int(next.coins) + int(prices[item]) * count
+					next.sales = int(next.sales) + 1
+			"claim_blueprint":
+				var blueprint: String = command.blueprint
+				var rule = rule_set.get("economy", {}).get("blueprints", {}).get(blueprint)
+				if rule == null: failure = "UNKNOWN_BLUEPRINT"
+				elif next.blueprints_claimed.has(blueprint): failure = "BLUEPRINT_CLAIMED"
+				elif int(next.sales) < int(rule.min_sales):
+					failure = "CONDITION_NOT_MET"
+					detail = {"sales": next.sales, "min_sales": rule.min_sales}
+				else:
+					next.blueprints_claimed[blueprint] = now
+					next.bag[rule.item] = int(next.bag.get(rule.item, 0)) + int(rule.amount)
 			"gather":
 				# The server knows the core cells under the house, tilled, sown or cleared: not outer.
 				var o = Gather.parse_id(command.object)
@@ -227,8 +281,8 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 			return result
 	return {"ok": true, "state": next}
 
-static func _take(bag: Dictionary, id: String) -> void:
-	bag[id] = int(bag[id]) - 1
+static func _take(bag: Dictionary, id: String, count := 1) -> void:
+	bag[id] = int(bag[id]) - count
 	if bag[id] <= 0: bag.erase(id)
 
 static func _number(value: Variant) -> bool:

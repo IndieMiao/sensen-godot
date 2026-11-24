@@ -28,6 +28,12 @@ func enter() -> Dictionary:
 	if not _save(welcomed, saved.version + 1): return _failure("SAVE", 0, {}, saved.farm, saved.version)
 	return {"ok": true, "granted": true, "farm": welcomed, "farm_version": saved.version + 1, "server_time": now}
 
+## The farm as saved, without entering it (no welcome gift), like the server's `GET /parcels/mine`.
+func read() -> Dictionary:
+	if ParcelFarm.rules().is_empty(): return _failure("RULES", 0, {}, ParcelFarm.empty_state(), 0)
+	var saved := _load()
+	return {"ok": true, "farm": saved.farm, "farm_version": saved.version, "server_time": now_ms.call()}
+
 func send(base_version: int, commands: Array) -> Dictionary:
 	var saved := _load()
 	var now: int = now_ms.call()
