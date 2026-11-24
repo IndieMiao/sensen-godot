@@ -66,7 +66,7 @@ func _press(farming: Node, cell: Vector2i) -> void:
 func _first_visit() -> Vector2i:
 	var farming := await _open()
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("seed_carrot") == 3, "the server grants 1 hoe, 3 carrot seeds")
-	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3}, "the gift is announced")
+	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "the gift is announced")
 	_check(absi(farming.server_now() - int(Time.get_unix_time_from_system() * 1000.0)) < 5000, "the clock follows server_time")
 	var obstacle := Vector2i(-1, -1)
 	for item: Dictionary in farming._core_plan.layout:

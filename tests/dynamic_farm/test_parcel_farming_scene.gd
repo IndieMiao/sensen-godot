@@ -155,12 +155,14 @@ func _first_visit() -> void:
 	await process_frame
 	_check(not farming._cover.visible, "the cover lifts once the save is applied")
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("seed_carrot") == 3, "first entry: 1 hoe, 3 carrot seeds")
-	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3}, "the gift is announced item by item")
-	_check(_floats(farming) == ["+1 Starter Hoe", "+3 Carrot Seeds"], "one float per gift item")
-	_check(_flights(farming) == 2, "each gift item flies into the bag")
+	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "the gift is announced item by item, the blueprint too")
+	_check(_floats(farming) == ["+1 Starter Hoe", "+3 Carrot Seeds", "+1 Cottage Blueprint"], "one float per gift item")
+	_check(_flights(farming) == 3, "each gift item flies into the bag")
 	_check(not farming._toast.current_text().begins_with("Received"), "no gift toast")
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
-	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 3}, "quick bar shows hoe and seeds")
+	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "quick bar shows hoe, seeds and the blueprint")
+	_check(farming._bar.slots[2].icon == load("res://assets/p0/icons/home.svg"), "the blueprint has the placeholder icon")
+	await _held(farming)
 	_check(farming._keys.tool_icon != null and not farming._keys.switch_visible, "the action key shows the hoe, no switch")
 	await _bag_drawer(farming)
 	var walk = scene._walk
@@ -270,7 +272,7 @@ func _reopen() -> void:
 	_check(flaky.covered_at_call and not farming._cover.visible, "covered while entering, uncovered with the save applied")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
 	_check(farming.last_gains.is_empty() and _floats(farming).is_empty(), "no second gift announced")
-	_check(_bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 1, "crop_carrot": 1}, "the quick bar matches the save")
+	_check(_bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 1, "crop_carrot": 1, "blueprint_cottage": 1}, "the quick bar matches the save")
 	var names: Array = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
 	_check(names == ["Starter Hoe", "Carrot Seeds", "Carrot"], "quick bar names stay English: %s" % [names])
 	scene.suspend()
@@ -303,6 +305,24 @@ func _bar_counts(farming: Node) -> Dictionary:
 		if slot is Dictionary and slot.has("id"): counts[slot.id] = slot.quantity
 	return counts
 
+## House placement (C-33) holds the farming UI: no key, no quick bar, the drawer closed; Build Cottage sits beside the
+## key, clear of it and of the bar (C-74#17).
+func _held(farming: Node) -> void:
+	var build: Control = scene._build
+	var key: Rect2 = farming._key.get_global_rect()
+	var bar: Rect2 = farming._bar.get_global_rect()
+	var at: Rect2 = build.get_global_rect()
+	_check(at.size.x >= 180 and not at.intersects(key) and not at.intersects(bar) and is_equal_approx(at.end.y, key.end.y),
+		"Build Cottage sits on the key's baseline, clear of the key and the bar: %s / %s / %s" % [at, key, bar])
+	farming._bar.bag_requested.emit()
+	await process_frame
+	farming.held = true
+	await process_frame
+	_check(not farming.bag_open() and not farming._keys.visible and not farming._bar.visible, "held: no key, no quick bar, drawer closed")
+	farming.held = false
+	await process_frame
+	_check(farming._keys.visible and farming._bar.visible, "released: key and quick bar back")
+
 ## The Bag end opens the compact drawer with the bar docked in it; a cell shows its name; Close and Back close it.
 func _bag_drawer(farming: Node) -> void:
 	var home: Node = farming._bar.get_parent()
@@ -310,7 +330,7 @@ func _bag_drawer(farming: Node) -> void:
 	await process_frame
 	_check(farming.bag_open() and farming._bar.get_parent().get_parent() == farming._drawer.body and farming._bar.bag_open, "Bag opens the drawer, the quick bar docked on top")
 	var ids: Array = farming._grid.shown_items().map(func(it): return it.id)
-	_check(ids == ["hoe_starter", "seed_carrot"] and farming._grid.shown_items()[1].qty == 3, "the drawer lists the bag")
+	_check(ids == ["hoe_starter", "seed_carrot", "blueprint_cottage"] and farming._grid.shown_items()[1].qty == 3, "the drawer lists the bag")
 	farming._grid.select("seed_carrot")
 	_check(farming._picked_name.text == "Carrot Seeds ×3", "a tapped cell shows its name")
 	farming._bar.close_requested.emit()

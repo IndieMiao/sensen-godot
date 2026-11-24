@@ -15,6 +15,9 @@ const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const CROP_CODES := {"crop_carrot": "C"}
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
+## Parcel items the main farm's content table does not name (C-74#33, copy per C-45). The icon is a placeholder from
+## the existing set (the HUD's home), no new art.
+const OWN_ITEMS := {"blueprint_cottage": {"name": "Cottage Blueprint", "icon": "res://assets/p0/icons/home.svg"}}
 const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest"}
 const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Space.HOUSE: "House here",
 	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds"}
@@ -47,7 +50,9 @@ var unavailable := false
 var held := false:
 	set(value):
 		held = value
+		if value: close_bag()
 		if _key != null: _refresh_key()
+		if not value and _bar != null: _draw_bag()
 ## The cell a press is walking to or working; the key keeps it while the press runs.
 var job = null
 
@@ -85,6 +90,7 @@ var _hidden := {}
 var last_gains := {}
 ## The locale before this UI held it at English (see hold_english); "" while not held.
 var _held_locale := ""
+var _side_button: Control
 var _redraw_left := 0.0
 var _names := {}
 ## The scene: approach(cells) -> "ok" | "unreachable" | "cancelled", labour(verb, cells, seconds).
@@ -182,7 +188,8 @@ func pick(cell: Vector2i) -> void:
 func _refresh_key() -> void:
 	if held:
 		_marker.visible = false
-		_key.visible = false
+		_keys.visible = false
+		_bar.visible = false
 		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
 	_marker.visible = not current.is_empty()
@@ -335,17 +342,21 @@ func _draw_bag() -> void:
 	var slots := []
 	for id: String in ids:
 		if _hidden.has(id) or slots.size() >= UiQuickBar.SLOTS: continue
-		slots.append({"id": id, "icon": P0Logic.icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id]), "pinned": _pins.has(id)})
+		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id]), "pinned": _pins.has(id)})
 	for id: String in _pins:
 		if id not in ids and slots.size() < UiQuickBar.SLOTS:
-			slots.append({"id": id, "icon": P0Logic.icon(id), "title": _names.get(id, id), "quantity": 0, "pinned": true})
+			slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": 0, "pinned": true})
 	_bar.slots = slots
-	_bar.visible = not farm.is_empty()
+	_bar.visible = not farm.is_empty() and not held
 	_keys.tool_icon = P0Logic.icon("hoe") if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
 	if _grid != null: _grid.items = _grid_items(ids)
 
 func _grid_items(ids: Array) -> Array:
-	return ids.map(func(id: String) -> Dictionary: return {"id": id, "icon": P0Logic.icon(id), "qty": int(farm.bag[id]), "rarity": 0})
+	return ids.map(func(id: String) -> Dictionary: return {"id": id, "icon": item_icon(id), "qty": int(farm.bag[id]), "rarity": 0})
+
+## An item's icon: the parcel's own placeholder (OWN_ITEMS), else the main farm's (P0Logic.icon).
+func item_icon(id: String) -> Texture2D:
+	return load(OWN_ITEMS[id].icon) if OWN_ITEMS.has(id) else P0Logic.icon(id)
 
 ## A gain (the welcome gift, a harvest; C-33's blueprints and C-59 / C-60 later): one float line per item rising from
 ## `from` (screen point of what gave it) and the item flying into the quick bar's Bag, which bumps as it lands.
@@ -357,7 +368,7 @@ func announce_gains(gains: Dictionary, from: Vector2) -> void:
 		var count := int(gains[id])
 		if count <= 0 or not _names.has(id): continue
 		last_gains[id] = count
-		var icon := P0Logic.icon(id)
+		var icon := item_icon(id)
 		var line := UiFloatText.new("+%d %s" % [count, _names[id]], UiFloatText.Tone.ITEM, icon)
 		line.name = "Gain_" + id
 		line.theme = UiKit.theme()
@@ -486,6 +497,7 @@ func _item_names() -> Dictionary:
 	var wanted := {}
 	for id: String in BAG_ORDER + rules.get("welcome_gift", {}).keys():
 		if names.has(id) and not str(names[id]).is_empty(): wanted[id] = names[id]
+	for id: String in OWN_ITEMS: wanted[id] = OWN_ITEMS[id].name
 	return wanted
 
 func _build_marker() -> void:
@@ -569,10 +581,23 @@ func _place_bar() -> void:
 		_bar.offset_bottom = -bottom
 		_bar.offset_top = -bottom - UiTokens.SIZE_QUICK_BAR_H
 	var key_bottom := bottom + UiTokens.SIZE_QUICK_BAR_H + KEY_ABOVE_BAR
+	if is_instance_valid(_side_button):
+		# Left of the action key on its baseline: clear of the quick bar under it and of the key (C-74#17).
+		_side_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		_side_button.offset_left = UiTokens.SIZE_QUICK_BAR_X
+		_side_button.offset_right = UiTokens.SIZE_QUICK_BAR_X + _side_button.custom_minimum_size.x
+		_side_button.offset_bottom = -key_bottom
+		_side_button.offset_top = -key_bottom - _side_button.custom_minimum_size.y
 	_keys.offset_right = -UiTokens.SPACE_PAGE
 	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
 	_keys.offset_bottom = -key_bottom
 	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
+
+## Places a scene button (the house's Build Cottage, C-33) at the left on the action key's baseline, so it never
+## covers the quick bar or the key; it keeps its own `custom_minimum_size`.
+func place_side_button(button: Control) -> void:
+	_side_button = button
+	_place_bar()
 
 ## Bottom system inset (gesture bar) in UI units; 0 on desktop (as P0Ui.safe_bottom).
 func _safe_bottom() -> float:

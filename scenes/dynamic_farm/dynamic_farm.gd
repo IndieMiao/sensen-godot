@@ -178,6 +178,7 @@ func _ready() -> void:
 		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas, self)
 		_hint.hide()
 		_farming.state_changed.connect(_on_farm_changed)
+		_farming.place_side_button(_build)
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -583,12 +584,10 @@ func _build_ui() -> void:
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_hint)
 	_build = UiCommandButton.new("Build Cottage", UiCommandButton.Kind.PRIMARY)
+	_build.name = "BuildCottage"
 	_build.theme = UiKit.theme()
-	_build.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_build.offset_left = -90
-	_build.offset_right = 90
-	_build.offset_top = -92
-	_build.offset_bottom = -44
+	# 180 × 48; ParcelFarming places it beside the action key (place_side_button), clear of the key and quick bar.
+	_build.custom_minimum_size = Vector2(180, 48)
 	_build.visible = false
 	_build.activated.connect(begin_house_placement)
 	_canvas.add_child(_build)
