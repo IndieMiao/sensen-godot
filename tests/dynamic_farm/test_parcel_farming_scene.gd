@@ -160,6 +160,13 @@ func _first_visit() -> void:
 	_check(_flights(farming) == 3, "each gift item flies into the bag")
 	_check(not farming._toast.current_text().begins_with("Received"), "no gift toast")
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
+	_check(_tip(farming) == "Pick a spot in your yard and press Till.", "the guide's card teaches tilling once the house stands (C-35): " + _tip(farming))
+	await process_frame
+	var tip_rect: Rect2 = farming._tip.get_global_rect()
+	_check(tip_rect.position.y >= scene._header.get_global_rect().end.y and tip_rect.end.y < farming._bar.get_global_rect().position.y,
+		"the card sits under the top bar, above the quick bar: %s / %s / %s" % [tip_rect, scene._header.get_global_rect(), farming._bar.get_global_rect()])
+	farming._tip.tapped.emit()
+	_check(_tip(farming) == "", "a tap closes the card")
 	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "quick bar shows hoe, seeds and the blueprint")
 	_check(farming._bar.slots[2].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("blueprint_cottage"), "the blueprint has the parcel adapter's placeholder icon (C-59)")
 	_check(scene._coins_capsule.visible and scene._coins.text == "0", "the top bar shows the parcel's coins, 0 on a new parcel (C-59)")
@@ -214,12 +221,14 @@ func _first_visit() -> void:
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_till") and not seen.early, "till: beside the cell, facing it, the till clip")
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._soil.counts().get("soil", 0) == 1, "one press tills, soil drawn")
+	_check(_tip(farming) == "Press Sow to plant Carrot Seeds in your soil.", "the next step's card comes back after tilling: " + _tip(farming))
 	_check(await _key(farming, cell) == ["Sow", "Carrot", UiSceneAction.State.DEFAULT], "tilled soil offers Sow")
 	seen = await _press(farming, cell)
 	_check(seen.moved < 0.01 and seen.clips.has("labour_sow"), "already beside it: no walk, the sow clip")
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(crop.get("ripe_at", 0) - crop.get("planted_at", 0) == 60000 and farming.farm.bag.seed_carrot == 2, "sown: 60 s to ripen, one seed used")
 	_check(_bar_counts(farming).get("seed_carrot") == 2, "the quick bar's seed count follows at once")
+	_check(_tip(farming) == "", "no card while the carrot grows")
 	key = await _key(farming, cell)
 	_check(key[0] == "Growing" and key[1] in ["Ready in 1:00", "Ready in 0:59", "Ready in 0:58"] and key[2] == UiSceneAction.State.UNAVAILABLE, "growing counts down")
 	await _press(farming, cell)
@@ -252,11 +261,14 @@ func _first_visit() -> void:
 	shift[0] += 60000
 	farming._clock_offset_ms += 60000
 	_check(await _key(farming, cell) == ["Harvest", "Free", UiSceneAction.State.DEFAULT], "ripe after 60 s")
+	await create_timer(farming.get_script().REDRAW_S * 2).timeout
+	_check(_tip(farming) == "Your carrot is ripe. Press Harvest!", "a ripe carrot brings the harvest card: " + _tip(farming))
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_harvest") and not seen.early, "harvest: beside the cell, the harvest clip")
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
 	_check("+1 Carrot" in _floats(farming) and _flights(farming) >= 1, "the harvest floats up and flies into the bag")
 	_check(_bar_counts(farming).get("crop_carrot") == 1, "the quick bar shows the carrot")
+	_check(_tip(farming) == "", "the guide is done after the first harvest")
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crops.counts().get("C", 0) == 0, "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
 	await _press(farming, cell)
@@ -294,6 +306,10 @@ func _reopen() -> void:
 	await process_frame
 	_check(TranslationServer.get_locale() == "zh_CN", "leaving the parcel gives the previous locale back")
 	TranslationServer.set_locale(outside)
+
+## The guide's card text on screen (C-35), "" when it is hidden.
+func _tip(farming: Node) -> String:
+	return farming._tip.tip if farming._tip.visible else ""
 
 ## Texts of the gain floats on screen.
 func _floats(farming: Node) -> Array:
@@ -366,6 +382,7 @@ func _placement_takes_over() -> void:
 	var house_dir := dir + "_house"
 	var farming := await _open(LocalStore.new(raw.block_id, house_dir))
 	_check(scene._build.visible, "a fresh save offers Build Cottage")
+	_check(_tip(farming) == "Tap Build Cottage to place your first home.", "the guide's first card points at Build Cottage")
 	var far := _free_cell(scene_data(), farming, [scene._walk.cell_at(scene._walk.position)])
 	farming.pick(far)
 	await process_frame
@@ -379,6 +396,7 @@ func _placement_takes_over() -> void:
 	for _i in 5: await process_frame
 	_check(walking and scene._placement != null and scene._route.is_empty() and not farming.busy,
 		"opening the placement gives up the walk")
+	_check(_tip(farming) == "", "no card while the house is being placed")
 	_check(scene._walk.position == at and farming.farm_version == version and farming.farm.tilled.is_empty(),
 		"the player holds still and nothing was sent")
 	scene.end_house_placement()

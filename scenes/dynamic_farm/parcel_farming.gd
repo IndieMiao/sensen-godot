@@ -19,6 +19,7 @@ const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
+const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
 const CROP_CODES := {"crop_carrot": "C"}
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
@@ -44,6 +45,8 @@ const DRAWER_GAP := 8.0
 const FLOAT_ABOVE := 40.0
 ## The action key's bottom sits this far above the quick bar (P0Ui._KEY_ABOVE_BAR, BAR-1).
 const KEY_ABOVE_BAR := 40.0
+## The guide's card top under the scene's top bar (its 44 row at SIZE_HUD_TOP) and a page gap.
+const TIP_TOP := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_CLOSE + UiTokens.SPACE_PAGE
 const LOADING := "Loading your farm…"
 const OPEN_FAILED := "Could not open your farm."
 
@@ -67,6 +70,7 @@ var held := false:
 		held = value
 		if value: close_bag()
 		if _key != null: _refresh_key()
+		_refresh_tip()
 		if not value and _bar != null: _draw_bag()
 ## The cell a press is walking to or working; the key keeps it while the press runs.
 var job = null
@@ -114,6 +118,13 @@ var _placed := false
 ## Layout indices drawn as gathered: index -> true.
 var _spent := {}
 var _spent_material: ShaderMaterial
+
+## The first visit's next step (C-35, ParcelGuide) as the main farm's TipCard, under the top bar.
+var _tip: UiTipCard
+var _tip_box: CenterContainer
+## The step on the card, and the step the player closed with a tap (it comes back only at another step).
+var tip_step := ""
+var _tip_closed := ""
 
 ## The scene: approach(cells) -> "ok" | "unreachable" | "cancelled", labour(verb, cells, seconds).
 var _body: Node
@@ -181,6 +192,7 @@ func enter() -> void:
 	unavailable = farm.is_empty()
 	_cover.visible = unavailable
 	if unavailable: _cover_label.text = OPEN_FAILED
+	_refresh_tip()
 	if not result.get("ok", false):
 		_toast.show_toast(OPEN_FAILED, ToastLayer.Severity.ERROR)
 	elif result.get("granted", false):
@@ -219,6 +231,7 @@ func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, 
 		_redraw_left = REDRAW_S
 		_draw_crops()
 		_draw_gathered()
+		_refresh_tip()
 	_refresh_key()
 
 ## A tap picks an outer object under the ray (`from`, `dir`), else that ground cell, until the
@@ -404,6 +417,7 @@ func _adopt(result: Dictionary) -> void:
 	_draw_crops()
 	_draw_gathered()
 	_draw_bag()
+	_refresh_tip()
 	state_changed.emit(farm.duplicate(true))
 
 ## Cleared obstacles leave the walk and the art (the layer is redrawn without them).
@@ -601,6 +615,7 @@ func open_bag(focus := "") -> void:
 	_bar.bag_open = true
 	_draw_bag()
 	if focus != "" and int(farm.bag.get(focus, 0)) > 0: _grid.select(focus)
+	_refresh_tip()
 
 ## Closes the bag drawer; the quick bar goes back to the bottom of the screen.
 func close_bag() -> bool:
@@ -619,6 +634,7 @@ func close_bag() -> bool:
 	_grid = null
 	_picked_name = null
 	_place_bar()
+	_refresh_tip()
 	return true
 
 func bag_open() -> bool: return _drawer != null
@@ -728,6 +744,21 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_toast.name = "Toast"
 	_ui.add_child(_toast)
 	_toast.anchor_above(_bar)
+	# Centred under the top bar in a container, which lays the wrapping sentence out at the card's width.
+	_tip_box = CenterContainer.new()
+	_tip_box.name = "TipRow"
+	_tip_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip_box.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_ui.add_child(_tip_box)
+	_tip = UiTipCard.new()
+	_tip.name = "Tip"
+	_tip.visible = false
+	_tip.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_tip.tapped.connect(func():
+		_tip_closed = tip_step
+		_refresh_tip())
+	_tip_box.add_child(_tip)
+	_ui.move_child(_toast, -1)
 	_ui.resized.connect(_place_bar)
 	_place_bar.call_deferred()
 
@@ -755,11 +786,30 @@ func _place_bar() -> void:
 	_keys.offset_bottom = -key_bottom
 	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
 
+## The guide's card (C-35): the current step's sentence while nothing else holds the screen. A tap closes it until
+## the next step; finishing the step moves it on.
+func _refresh_tip() -> void:
+	if _tip == null: return
+	var step := "" if unavailable else Guide.step(farm, server_now())
+	if step != tip_step:
+		tip_step = step
+		if step != _tip_closed: _tip_closed = ""
+		if not step.is_empty(): _tip.show_tip(Guide.text(step))
+	_tip.visible = not tip_step.is_empty() and tip_step != _tip_closed and not held and _drawer == null
+	# Under the top bar (the main farm puts its TipCard under the HUD, clear of the key and the bar).
+	if _tip.visible: _tip_box.offset_top = TIP_TOP + _safe_top()
+
 ## Places a scene button (the house's Build Cottage, C-33) at the left on the action key's baseline, so it never
 ## covers the quick bar or the key; it keeps its own `custom_minimum_size`.
 func place_side_button(button: Control) -> void:
 	_side_button = button
 	_place_bar()
+
+## Top system inset (status bar, notch) in UI units; 0 on desktop (as P0Ui.safe_top).
+func _safe_top() -> float:
+	if not is_inside_tree() or not (OS.has_feature("android") or OS.has_feature("ios")): return 0.0
+	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
+		get_viewport().get_visible_rect().size, 0.0).y
 
 ## Bottom system inset (gesture bar) in UI units; 0 on desktop (as P0Ui.safe_bottom).
 func _safe_bottom() -> float:

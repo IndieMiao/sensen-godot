@@ -69,3 +69,14 @@ nearest clear point. Without `own_parcel` (the art preview) nothing of this show
 
 `tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
 Build, the wall, reopen (`--headless`: states only).
+
+## First-visit guide (C-35, 0.4.2)
+
+`modules/dynamic_farm/parcel_guide.gd` reads the next step of the first ten minutes from the save alone, so a parcel
+reopened halfway picks up at the same step: a Cottage Blueprint and no house -> `build`, a house and seeds ->
+`till`, tilled soil with nothing on it -> `sow`, a ripe carrot -> `harvest`; nothing while the carrot grows and
+nothing once a carrot is in the bag or one has been sold. `ParcelFarming` shows it as the main farm's TipCard
+(`UiTipCard`), centred under the top bar; it hides while the house is placed or the bag is open, and a tap closes it
+until the next step. On the map, a package that enters one's own farm (`own_farm`) says where to go with nothing
+selected (`Tap a building to choose your first home.` / `Tap your green parcel, then Enter my farm.`) and no longer
+shows the preview's `Explore and walk. Farming actions come later.` Copy and screenshots: `docs/plans/C-35.md`.
