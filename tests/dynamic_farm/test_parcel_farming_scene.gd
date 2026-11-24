@@ -259,13 +259,23 @@ func _first_visit() -> void:
 
 func _reopen() -> void:
 	shift[0] += 20000
+	# The standalone package keeps Journey's zh_CN locale (P0's language setup never runs); the parcel stays English.
+	var outside := TranslationServer.get_locale()
+	TranslationServer.set_locale("zh_CN")
 	var flaky := FlakyStore.new(_store(), 1)
 	var farming := await _open(flaky)
+	_check(TranslationServer.get_locale() == "en", "the parcel holds the locale at English while it is on screen")
 	_check(flaky.calls == 2 and not farming.unavailable and farming._key.verb != "Retry", "one lost entry request is retried without Retry")
 	_check(flaky.covered_at_call and not farming._cover.visible, "covered while entering, uncovered with the save applied")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
 	_check(farming.last_gains.is_empty() and _floats(farming).is_empty(), "no second gift announced")
 	_check(_bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 1, "crop_carrot": 1}, "the quick bar matches the save")
+	var names: Array = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
+	_check(names == ["Starter Hoe", "Carrot Seeds", "Carrot"], "quick bar names stay English: %s" % [names])
+	scene.suspend()
+	_check(TranslationServer.get_locale() == "zh_CN", "suspended, the previous locale is back")
+	scene.resume()
+	_check(TranslationServer.get_locale() == "en", "resumed, English again")
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
 	_check(farming._soil.counts().get("soil", 0) == 1, "tilled soil is still drawn")
 	var key: Array
@@ -275,6 +285,8 @@ func _reopen() -> void:
 	_check(key.size() == 3 and key[0] == "Growing", "still growing after reopening")
 	scene.queue_free()
 	await process_frame
+	_check(TranslationServer.get_locale() == "zh_CN", "leaving the parcel gives the previous locale back")
+	TranslationServer.set_locale(outside)
 
 ## Texts of the gain floats on screen.
 func _floats(farming: Node) -> Array:
@@ -303,6 +315,10 @@ func _bag_drawer(farming: Node) -> void:
 	farming._bar.close_requested.emit()
 	await process_frame
 	_check(not farming.bag_open() and farming._bar.get_parent() == home and not farming._bar.bag_open, "Close puts the bar back")
+	var bar_rect: Rect2 = farming._bar.get_global_rect()
+	var ui_rect: Rect2 = farming._ui.get_global_rect()
+	_check(is_equal_approx(bar_rect.end.y, ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM) and is_equal_approx(bar_rect.position.x, UiTokens.SIZE_QUICK_BAR_X),
+		"…at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
 	farming._bar.slot_tapped.emit("seed_carrot")
 	await process_frame
 	_check(farming.bag_open() and farming._grid.selected_id == "seed_carrot", "a slot opens the drawer on its item")
