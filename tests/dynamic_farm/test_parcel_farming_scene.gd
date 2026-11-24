@@ -4,13 +4,15 @@ extends SceneTree
 ## keeps everything and grants nothing. C-73: a press first walks the player beside the cell,
 ## faces it and plays the labour clip; the result shows as the clip ends; a cell with nowhere to
 ## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
-## save is applied. C-33: opening the house placement gives up a press still walking. Run in the private preview project (README), optionally
+## save is applied. C-33: opening the house placement gives up a press still walking. C-114: Build pops the
+## cottage in with dust round it; reopening shows it still, without dust. Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
+const House = preload("res://modules/dynamic_farm/farm_house.gd")
 var checks := 0
 var failures := 0
 var raw: Dictionary
@@ -56,6 +58,7 @@ func _run() -> void:
 	await _first_visit()
 	await _reopen()
 	await _placement_takes_over()
+	await _house_pops_once()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 	print("PARCEL_FARMING_SCENE checks=%d failures=%d" % [checks, failures])
@@ -414,6 +417,49 @@ func _placement_takes_over() -> void:
 	await process_frame
 	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
 	DirAccess.remove_absolute(house_dir)
+
+## C-114: a successful Build grows the cottage in (P0Fence.pop_in) with a puff (P0Fence.dust, enlarged) at the middle
+## and at each of the footprint's eight rim points; it settles at full size and the dust is gone in a second. Reopening the save
+## builds the same house at full size with no dust.
+func _house_pops_once() -> void:
+	var house_dir := dir + "_pop"
+	await _open(LocalStore.new(raw.block_id, house_dir))
+	scene._build.activated.emit()
+	await process_frame
+	scene._placement._bar.confirmed.emit()
+	var built = scene.house_state()
+	var house: Node3D = scene._house
+	_check(built is Dictionary and house != null and house.scale.x < 0.1, "Build starts the cottage small")
+	var dust: Array = _dust()
+	_check(dust.size() == 9, "Build puffs dust at the middle and round the footprint (%d)" % dust.size())
+	_check(dust.all(func(d): return d.scale_amount_min >= 0.2 and d.emitting),
+		"the puffs are sized for the cottage and emitting")
+	if built is Dictionary:
+		var rim := House.rim(scene._walk, House.at_of(built), int(built.rotation))
+		var far := 0.0
+		for p: Vector3 in rim:
+			var near := INF
+			for d: Node3D in dust: near = minf(near, (d.position - Vector3(0, 0.05, 0)).distance_to(p))
+			far = maxf(far, near)
+		_check(rim.size() == 8 and far < 0.001, "a puff at every rim point")
+	await create_timer(0.5).timeout
+	_check(is_instance_valid(house) and house.scale.is_equal_approx(Vector3.ONE), "the cottage settles at full size")
+	await create_timer(0.8).timeout
+	_check(_dust().is_empty(), "the dust is gone")
+	scene.queue_free()
+	await process_frame
+	await _open(LocalStore.new(raw.block_id, house_dir))
+	_check(scene._house != null and scene._house.scale == Vector3.ONE, "reopening shows the cottage at full size")
+	_check(_dust().is_empty(), "reopening puffs no dust")
+	await create_timer(0.1).timeout
+	_check(scene._house.scale == Vector3.ONE and _dust().is_empty(), "nothing pops after reopening")
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
+	DirAccess.remove_absolute(house_dir)
+
+func _dust() -> Array:
+	return scene.get_children().filter(func(n): return n is CPUParticles3D)
 
 func scene_data() -> Dictionary:
 	return preload("res://modules/dynamic_farm/farm_data.gd").decode(raw)
