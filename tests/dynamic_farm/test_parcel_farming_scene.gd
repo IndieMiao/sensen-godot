@@ -4,7 +4,7 @@ extends SceneTree
 ## keeps everything and grants nothing. C-73: a press first walks the player beside the cell,
 ## faces it and plays the labour clip; the result shows as the clip ends; a cell with nowhere to
 ## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
-## save is applied. Run in the private preview project (README), optionally
+## save is applied. C-33: opening the house placement gives up a press still walking. Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -55,6 +55,7 @@ func _run() -> void:
 	dir = "user://test_parcel_farming_scene_%d" % Time.get_ticks_usec()
 	await _first_visit()
 	await _reopen()
+	await _placement_takes_over()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 	print("PARCEL_FARMING_SCENE checks=%d failures=%d" % [checks, failures])
@@ -324,6 +325,33 @@ func _bag_drawer(farming: Node) -> void:
 	_check(farming.bag_open() and farming._grid.selected_id == "seed_carrot", "a slot opens the drawer on its item")
 	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the drawer first, the farm stays")
 	await process_frame
+
+## C-33 on a fresh save (the welcome blueprint, no house): Build Cottage while a press is still
+## walking to its cell ends the walk and sends nothing; the player holds still under the preview.
+func _placement_takes_over() -> void:
+	var house_dir := dir + "_house"
+	var farming := await _open(LocalStore.new(raw.block_id, house_dir))
+	_check(scene._build.visible, "a fresh save offers Build Cottage")
+	var far := _free_cell(scene_data(), farming, [scene._walk.cell_at(scene._walk.position)])
+	farming.pick(far)
+	await process_frame
+	var version: int = farming.farm_version
+	farming._key.pressed_down.emit()
+	for _i in 3: await process_frame
+	var walking: bool = not scene._route.is_empty() and farming.busy
+	scene._build.activated.emit()
+	await process_frame
+	var at: Vector3 = scene._walk.position
+	for _i in 5: await process_frame
+	_check(walking and scene._placement != null and scene._route.is_empty() and not farming.busy,
+		"opening the placement gives up the walk")
+	_check(scene._walk.position == at and farming.farm_version == version and farming.farm.tilled.is_empty(),
+		"the player holds still and nothing was sent")
+	scene.end_house_placement()
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
+	DirAccess.remove_absolute(house_dir)
 
 func scene_data() -> Dictionary:
 	return preload("res://modules/dynamic_farm/farm_data.gd").decode(raw)

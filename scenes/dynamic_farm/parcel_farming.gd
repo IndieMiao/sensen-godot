@@ -43,6 +43,11 @@ var picked = null
 var busy := false
 ## The farm could not be opened; the key offers Retry.
 var unavailable := false
+## Another mode owns the screen (house placement, C-33): no key, no target.
+var held := false:
+	set(value):
+		held = value
+		if _key != null: _refresh_key()
 ## The cell a press is walking to or working; the key keeps it while the press runs.
 var job = null
 
@@ -175,6 +180,10 @@ func pick(cell: Vector2i) -> void:
 	if _data.by_cell.has(cell): picked = cell
 
 func _refresh_key() -> void:
+	if held:
+		_marker.visible = false
+		_key.visible = false
+		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
 	_marker.visible = not current.is_empty()
 	_keys.visible = _marker.visible or farm.is_empty()
@@ -199,6 +208,7 @@ func _refresh_key() -> void:
 	_key.state = UiSceneAction.State.UNAVAILABLE if refused else UiSceneAction.State.DEFAULT
 
 func _on_key() -> void:
+	if held: return
 	if unavailable and not busy:
 		await enter()
 		return

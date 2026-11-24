@@ -35,3 +35,25 @@ Farming UI (C-74) reuses the main farm's UI kit read-only, without P0Ui, P0Runti
 Packaging must also include `assets/farm/data/dynamic_farm.json` and the P0 content table (`assets/p0/p0_content.json`, item names) with the P0 item icons; JSON is not found by static scene dependencies.
 
 Tests: `tests/dynamic_farm/test_parcel_farming.gd` (rules, commands, spatial rules, local save) and `test_parcel_farming_scene.gd` (the real scene; optional `-- <farm.json>`), both headless in the private preview project. `test_parcel_farming_server.gd -- <base …/v1> <owner token> <farm.json>` runs the scene against a running C-31 server on its real clock (~70 s; the owner has claimed that parcel and not entered it yet).
+
+## First house (C-33, Q-40)
+
+Built on the own-parcel farm above (Q-44: one entry, save and protected path for both). The welcome gift's
+`blueprint_cottage` comes with the first entry only. While the bag holds it and no house stands, `Build Cottage` opens
+placement (the farming key is held meanwhile): a press or drag moves the see-through `house_cottage` (its middle cell
+under the finger); its 3×3 cells fill green or red, grid lines fade over three core cells round it, and the protected
+path's cells in reach show sand. The bottom is the shared `UiPlaceBar` (`Cancel · Build`); the main key shows why a
+spot is refused. The preview starts on the valid spot nearest the player. Build sends `place_house` through
+`ParcelFarming.send`; the cottage stands at once (no construction time). A refused Build (`CELL_OCCUPIED`) keeps the
+preview, judged again on the farm the reply brought.
+
+Rules (`modules/dynamic_farm/farm_house.gd`, the save's `house.x/y` is the footprint's lowest cell): every cell
+core (`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
+too), a tilled cell or a crop (`Space taken`); none on `ParcelFarming.protected_path()` (the same path tilling keeps
+clear), and every other walk cell still reaching spawn (`Keep the path clear`). The walls block through a
+model-fitted box (walls and plinth below the eaves; C-19's walker), so the player walks along them and stops at
+contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the walls go steps out to the
+nearest clear point. Without `own_parcel` (the art preview) nothing of this shows.
+
+`tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
+Build, the wall, reopen (`--headless`: states only).
