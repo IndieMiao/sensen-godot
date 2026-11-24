@@ -3,6 +3,9 @@ extends Control
 ## giving that home up); no choose_home or old-farm state writes. Internal test packages also open the
 ## player's own parcel for farming from "Enter my farm" (`sensen/dynamic_farm/own_farm`, C-34 Q-72);
 ## everywhere else that button opens the same read-only 3D preview.
+## Two fixed entries, Market (Jasmine) and Carpenter (Scott), open over the map for a player with a home
+## (C-59, C-30#29 question 1); they trade through that home's parcel save (parcel_town.gd). Like "Enter my farm"
+## they are only in internal test packages (`own_farm`, C-59#29) until the release flow opens them (C-35 / C-61).
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -13,6 +16,10 @@ const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
+const TOWN := "res://scenes/dynamic_farm/parcel_town.gd"
+const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
+const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const OCCLUSION_COLOR := "#E7F0DF" # Existing scene BG_COLOR(.906, .941, .875), opaque RGB.
 const AREA_REFRESH_SECONDS := 0.8
 ## Development stand-in for the C-31 server, shared by map visits in one run.
@@ -30,6 +37,9 @@ var _confirm: Control
 var _enter: Button
 var _reselect: Button
 var _sign_in: Button
+var _market: Button
+var _carpenter: Button
+var _town: Control
 var _area_timer: Timer
 var _area_generation := -1
 var _retry: Button
@@ -104,6 +114,9 @@ func _build_ui() -> void:
 	_retry = _button("Retry", _retry_map); _retry.disabled = true; row.add_child(_retry)
 	row.add_child(_button("San Francisco", _reset_area))
 	row.add_child(_button("Back", _leave))
+	var places := HBoxContainer.new(); places.visible = _own_farm_entry(); top.add_child(places)
+	_market = _button("Market", _open_town.bind("market")); _market.disabled = true; places.add_child(_market)
+	_carpenter = _button("Carpenter", _open_town.bind("carpenter")); _carpenter.disabled = true; places.add_child(_carpenter)
 	var bottom := _panel(true)
 	_details = _label("Choose a parcel to explore in 3D.", 16); bottom.add_child(_details)
 	_choices = OptionButton.new(); _choices.custom_minimum_size.y = 44; _choices.hide()
@@ -164,7 +177,7 @@ func _render() -> void:
 	var state: String = _claims.status(id)
 	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
 	_open.disabled = not idle or id.is_empty()
-	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy
+	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _town == null
 	if id.is_empty(): _details.text = "Choose a parcel to explore in 3D."
 	else:
 		var p: Dictionary = _selector.selection
@@ -183,6 +196,8 @@ func _render() -> void:
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
 	_sign_in.visible = _claims.signed_out and not id.is_empty() and not _fake_claims(); _sign_in.disabled = not idle
+	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null
+	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
 	if _selector._options.is_empty(): _choices.hide()
 
 func _show_candidates(rows: Array) -> void:
@@ -220,6 +235,25 @@ func _open_sign_in() -> void:
 	if not is_inside_tree(): return
 	if signed_in: _claims.forget()
 	_render()
+
+## The market or the carpenter over the map, trading through the player's own parcel save.
+func _open_town(who: String) -> void:
+	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _town != null or _opening: return
+	var home: Dictionary = _claims.mine
+	_town = load(TOWN).open(self, who, _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))), str(home.parcel_id))
+	_town.closed.connect(_town_closed)
+	_hud.hide(); _camera.input_enabled = false
+
+func _town_closed() -> void:
+	_town = null
+	if _suspended or _leaving: return
+	_hud.show(); _render()
+
+## The same save the parcel scene uses: the server, or the device stand-in with the development setting.
+func _farm_store(block_id: String, dataset: String) -> RefCounted:
+	if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): return LocalFarmStore.new(block_id)
+	var net := get_node_or_null("/root/Net")
+	return RemoteFarmStore.new(net.client if net != null else null, block_id, dataset)
 
 func _abandon() -> void:
 	if _claims != null: _claims.abandon()
@@ -318,6 +352,9 @@ func _quit_preview() -> void:
 	get_tree().quit()
 
 func is_back_navigation_locked() -> bool:
+	if is_instance_valid(_town):
+		if not _town.stack.back(): _town.close()
+		return true
 	_leave(); return true
 
 func _notification(what: int) -> void:

@@ -58,6 +58,8 @@ var _controls: Control
 var _header: HBoxContainer
 var _title: Label
 var _status: Label
+var _coins_capsule: PanelContainer
+var _coins: Label
 var _movement := Vector2.ZERO
 var _focus := Vector3.ZERO
 var _zoom := 1.0
@@ -208,6 +210,8 @@ func _ready() -> void:
 ## Every save reply (ParcelFarming): the house once it stands, the Build key while a blueprint waits.
 func _on_farm_changed(farm: Dictionary) -> void:
 	if _failed: return
+	_coins.text = str(int(farm.get("coins", 0)))
+	_coins_capsule.visible = true
 	if farm.get("house") is Dictionary and _house == null: _build_house(farm.house)
 	_refresh_build()
 
@@ -576,6 +580,19 @@ func _build_ui() -> void:
 	_status = UiKit.label("Loading preview…", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 	_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	labels.add_child(_status)
+	# One's own parcel: its coins (C-59, apart from the main farm's) in the main HUD's coins capsule, at the right.
+	_coins_capsule = UiHud._capsule()
+	_coins_capsule.name = "Coins"
+	_coins_capsule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_coins_capsule.visible = false
+	var coins_row := _coins_capsule.get_child(0) as HBoxContainer
+	_coins = UiKit.label("0", UiTokens.STYLE_C11_XB)
+	_coins.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	coins_row.add_child(_coins)
+	var coin := UiKit.icon(UiHud.ICON_COIN, UiHud._ICON_COIN)
+	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	coins_row.add_child(coin)
+	_header.add_child(_coins_capsule)
 	_controls.top_exclusion_y = UiTokens.SIZE_HUD_TOP + _safe_top() + UiTokens.SIZE_CLOSE + UiTokens.SPACE_PAGE
 	_hint = UiKit.label("Art preview · Walk and explore", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 	_hint.theme = UiKit.theme()

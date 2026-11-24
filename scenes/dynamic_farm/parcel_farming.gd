@@ -5,7 +5,8 @@ extends Node3D
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
 ## Main-farm pieces are reused read-only: CropField for soil and carrots, P0 names and icons, and the
 ## main farm's UI kit (C-74): the quick bar with a compact bag drawer, the action key, floats and
-## item flights into the bag. Nothing of P0Ui / P0Runtime, Energy or coins.
+## item flights into the bag. Nothing of P0Ui / P0Runtime or Energy; the parcel's own coins (C-59) show in the
+## scene's top bar as the main HUD's coins capsule.
 ## Outer gathering (C-60, ParcelGather): near a tree, flower or rock of the extension the key
 ## picks it by hand; a picked one stays faded (trees, rocks) or hidden (flowers, which never
 ## block) until it grows back. Gathering never touches the walk, the layout or collision.
@@ -16,13 +17,13 @@ signal state_changed(farm: Dictionary)
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
+const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
 const CROP_CODES := {"crop_carrot": "C"}
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
 ## Parcel items the main farm's content table does not name (C-74#33, copy per C-45). The icon is a placeholder from
 ## the existing set (the HUD's home), no new art.
-const OWN_ITEMS := {"blueprint_cottage": {"name": "Cottage Blueprint", "icon": "res://assets/p0/icons/home.svg"}}
 const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest"}
 const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Space.HOUSE: "House here",
 	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds"}
@@ -504,9 +505,9 @@ func _draw_bag() -> void:
 func _grid_items(ids: Array) -> Array:
 	return ids.map(func(id: String) -> Dictionary: return {"id": id, "icon": item_icon(id), "qty": int(farm.bag[id]), "rarity": 0})
 
-## An item's icon: the parcel's own placeholder (OWN_ITEMS), else the main farm's (P0Logic.icon).
+## An item's icon: the parcel's adapter (ParcelItems, C-59: blueprints show the recipe card), else the main farm's.
 func item_icon(id: String) -> Texture2D:
-	return load(OWN_ITEMS[id].icon) if OWN_ITEMS.has(id) else P0Logic.icon(id)
+	return ParcelItems.icon_of(id)
 
 ## A gain (the welcome gift, a harvest; C-33's blueprints and C-59 / C-60 later): one float line per item rising from
 ## `from` (screen point of what gave it) and the item flying into the quick bar's Bag, which bumps as it lands.
@@ -660,7 +661,7 @@ func _item_names() -> Dictionary:
 	for source: Dictionary in _gather.get("sources", {}).values(): gathered_items.append(source.item)
 	for id: String in BAG_ORDER + rules.get("welcome_gift", {}).keys() + gathered_items:
 		if names.has(id) and not str(names[id]).is_empty(): wanted[id] = names[id]
-	for id: String in OWN_ITEMS: wanted[id] = OWN_ITEMS[id].name
+	for id: String in ParcelItems.NAMES: wanted[id] = ParcelItems.NAMES[id]
 	return wanted
 
 func _build_marker() -> void:
