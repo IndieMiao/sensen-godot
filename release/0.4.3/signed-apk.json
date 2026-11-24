@@ -1,0 +1,42 @@
+{
+  "card": "C-61",
+  "work_item": "W-373",
+  "artifact": {
+    "kind": "signed_apk",
+    "filename": "sensen-dynamicfarm-internal-0.4.3-2026112402-4cf2c1aa-signed-v3-test.apk",
+    "sha256": "787a405662d6dd974aab055c9f19b2cb3c5d1d45b03a7dba021325629b5c672f",
+    "bytes": 334676509,
+    "attachment_id": "attachment-879",
+    "signed": true,
+    "storage_basis": "Q-112",
+    "distribution": "internal only (owner's LAN phone self-test); no external upload or public link"
+  },
+  "signing_input": {
+    "attachment_id": "attachment-847",
+    "filename": "C61-0.4.3-2026112402-internal-unsigned-4cf2c1aa.apk",
+    "sha256": "1d82f39921f57b965ad52e3ff0e559c47f93547147051813f8404ddfa1a3a755",
+    "bytes": 334031282
+  },
+  "signing": {
+    "route": "managed mobile signature (request_mobile_signature, android)",
+    "route_version": "2026-11-24-android-internal-test-v1",
+    "request_id": "569b63a74c7d3762d80374273639ffdf",
+    "run": "R-2419",
+    "schemes": ["v3"],
+    "certificate_dn": "CN=Sensen Internal Test, O=Sensen, C=CN",
+    "certificate_sha256": "298a6ad8ec805eb2a4c92015ad20c437c52984b35ce554694ad5958655fa4034",
+    "added_entries": ["META-INF/MANIFEST.MF", "META-INF/SENSEN-I.SF", "META-INF/SENSEN-I.RSA"]
+  },
+  "android": {
+    "package": "com.sensen.dynamicfarm.internal",
+    "version_name": "0.4.3",
+    "version_code": 2026112402,
+    "target_sdk": 36,
+    "abi": "arm64-v8a"
+  },
+  "source": {
+    "branch": "integration/dynamicfarm",
+    "commit": "4cf2c1aa6c1a4a72bfcad5fe36dabbcdc693ae0d",
+    "delivery": "D-208"
+  }
+}
