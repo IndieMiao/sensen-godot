@@ -1,6 +1,6 @@
 /** Generator parameters. Every value is a configurable default; see README.md for the rationale. */
 
-export const GENERATOR_VERSION = 'building-raster-1';
+export const GENERATOR_VERSION = 'building-raster-2';
 export const SCHEMA = 4;
 export const GAME_CELL_M = 0.8;
 /** Client hard limits (modules/dynamic_farm/farm_data.gd). */
@@ -24,10 +24,12 @@ export interface GeneratorParams {
   extension_cells: number;
   extension_jitter: number;
   extension_noise_period: number;
+  /** Narrowest extension tried (jitter capped below it) before the cell grows for the total budget. */
+  min_extension_cells: number;
   /** Snap the grid to the buildings' dominant wall direction (rotation within ±45°). */
   align_to_building: boolean;
-  /** Supersampling per axis for coverage and IoU. */
-  samples: number;
+  /** Farms whose exact core IoU stays below this are excluded (`low_iou`); just above the audit's 0.85 exclusion line. */
+  min_core_iou: number;
 }
 
 export const DEFAULT_PARAMS: GeneratorParams = {
@@ -40,8 +42,9 @@ export const DEFAULT_PARAMS: GeneratorParams = {
   extension_cells: 5,
   extension_jitter: 2,
   extension_noise_period: 8,
+  min_extension_cells: 2,
   align_to_building: true,
-  samples: 4,
+  min_core_iou: 0.8505,
 };
 
 export function resolveParams(overrides: Partial<GeneratorParams> = {}): GeneratorParams {
@@ -51,15 +54,19 @@ export function resolveParams(overrides: Partial<GeneratorParams> = {}): Generat
     if (typeof value !== typeof DEFAULT_PARAMS[key as keyof GeneratorParams]) throw new Error(`parameter ${key} has the wrong type`);
     (p as unknown as Record<string, unknown>)[key] = value;
   }
-  const positive: (keyof GeneratorParams)[] = ['cell_m', 'core_cell_cap', 'total_cell_cap', 'extension_noise_period', 'samples'];
+  const positive: (keyof GeneratorParams)[] = ['cell_m', 'core_cell_cap', 'total_cell_cap', 'extension_noise_period'];
   for (const key of positive) if (!(Number(p[key]) > 0)) throw new Error(`parameter ${key} must be positive`);
   if (p.total_cell_cap > CLIENT_MAX_CELLS) throw new Error(`total_cell_cap cannot exceed ${CLIENT_MAX_CELLS}`);
   if (p.core_cell_cap >= p.total_cell_cap) throw new Error('core_cell_cap must leave room for the extension');
   if (p.min_core_cells < 0 || p.min_core_cells > p.core_cell_cap) throw new Error('min_core_cells must be within [0, core_cell_cap]');
   if (!(p.coverage_threshold > 0 && p.coverage_threshold <= 1)) throw new Error('coverage_threshold must be in (0, 1]');
   if (p.extension_jitter < 0 || p.extension_jitter >= p.extension_cells) throw new Error('extension_jitter must be below extension_cells');
-  if (!Number.isInteger(p.samples) || !Number.isInteger(p.extension_cells) || !Number.isInteger(p.extension_jitter)) {
-    throw new Error('samples and extension sizes must be integers');
+  if (!Number.isInteger(p.min_extension_cells) || p.min_extension_cells < 1 || p.min_extension_cells > p.extension_cells) {
+    throw new Error('min_extension_cells must be an integer in [1, extension_cells]');
+  }
+  if (!(p.min_core_iou >= 0 && p.min_core_iou < 1)) throw new Error('min_core_iou must be in [0, 1)');
+  if (!Number.isInteger(p.extension_cells) || !Number.isInteger(p.extension_jitter)) {
+    throw new Error('extension sizes must be integers');
   }
   return p;
 }

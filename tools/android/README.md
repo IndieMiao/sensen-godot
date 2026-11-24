@@ -192,10 +192,32 @@ choose a production signing identity, install an app or authorize publication.
      https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1 "$TMPDIR/internal"
    ```
 
+   **Release package (C-98).** `--dynamic-farm-release` builds the invite-only release of the
+   dynamic farm from the same staging. It keeps the preview's package `com.sensen.dynamicfarm.cardigan`,
+   its user directory and the `Android` preset's version, so it installs over 0.4.1 in place; only the
+   display name becomes `Dynamic Farm`. It takes no target: both Journey URLs are always
+   `RELEASE_TARGET` in `dynamic_farm_export.py`, the US West dynamic farm production service
+   `https://farm.sensenjoy.cn/dynamicfarm/v1` (C-96 materials, C-97 entry). It sets
+   `sensen/dynamic_farm/own_farm` and `sensen/dynamic_farm/account_restore`, never `reselect`, and adds
+   `sensen/account/invite_only`: the account panel then only signs in (no sign-up, password reset,
+   Apple or Google; the server also refuses them with `ACCOUNT_SIGNUP=closed`). `online_qa` stays on,
+   so `Net` never signs in anonymously; without an invite account the player can only look at the map.
+   `invite_only` also makes `Net` ignore `user://server.txt` (C-116): the release only ever connects to
+   the address it was built with. Every other package still reads the override.
+   Building it does not sign or publish it: signing with the 0.4.1 certificate and distribution are C-99.
+
+   ```sh
+   tools/android/build_worker_apk.sh --dynamic-farm-release "$TMPDIR/release"
+   ```
+
    Readback (`verify`, `check-unsigned`) parses the exported `assets/project.binary` and
    rejects a package whose Journey settings do not match its variant: internal settings or
-   the internal target in any other package, a reachable Journey in the isolated preview, or
-   QA isolation in the release-configuration (default) package. `unsigned.json` records the
+   the internal target in any other package, a reachable Journey in the isolated preview,
+   QA isolation in the release-configuration (default) package, or a dynamic farm release that
+   is not exactly the production target with its three settings and no reselect, or whose user
+   directory is no longer `DynamicFarmCardigan` (an in-place upgrade of 0.4.1 would leave its local
+   data and sign-in behind; C-116), and invite-only sign-in or the production target anywhere
+   else. `unsigned.json` records the
    result under `config`.
 
    The script stages committed game sources in a disposable project, generates

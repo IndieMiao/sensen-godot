@@ -428,5 +428,28 @@ for (const [name, enabled, makeStore] of makers) {
       expect((await google(googleToken('g-3', { aud: 'other' }))).json().code).toBe('GOOGLE_TOKEN_BAD_AUDIENCE');
       expect((await google('x.y.z')).json().code).toBe('GOOGLE_TOKEN_MALFORMED');
     });
+
+    it('invite-only (C-96): no self sign-up by email or Google, existing accounts still sign in', async () => {
+      const ada = (await register('ada@example.com')).json();
+      const grace = (await google(googleToken('g-1', { email: 'grace@gmail.com' }))).json();
+      const closed = await buildApp({ store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
+        regionsFile: REGIONS, pepper: 'test-pepper', now: () => clock, mailer, signupClosed: true,
+        google: { audiences: [GOOGLE_AUD], keys: GOOGLE_KEYS.keys } });
+      try {
+        const signup = await closed.inject({ method: 'POST', url: '/v1/auth/email/register', payload: { email: 'eve@example.com', password: 'correct horse' } });
+        expect(signup.statusCode).toBe(403);
+        expect(signup.json().code).toBe('SIGNUP_CLOSED');
+        expect(await store.userByEmail('eve@example.com')).toBeNull();
+        expect(mail.filter(m => m.email === 'eve@example.com')).toEqual([]);
+        const login = await closed.inject({ method: 'POST', url: '/v1/auth/email/login', payload: { email: 'ada@example.com', password: 'correct horse' } });
+        expect(login.json()).toMatchObject({ user_id: ada.user_id, player_id: ada.player_id });
+        const viaGoogle = (token: string) => closed.inject({ method: 'POST', url: '/v1/auth/google', payload: { id_token: token, nonce: APPLE_NONCE } });
+        expect((await viaGoogle(googleToken('g-1', { email: 'grace@gmail.com' }))).json()).toMatchObject({ created: false, user_id: grace.user_id });
+        const stranger = await viaGoogle(googleToken('g-9', { email: 'mallory@gmail.com' }));
+        expect(stranger.statusCode).toBe(403);
+        expect(stranger.json().code).toBe('SIGNUP_CLOSED');
+        expect(await store.userByIdentity('google', 'g-9')).toBeNull();
+      } finally { await closed.close(); }
+    });
   });
 }

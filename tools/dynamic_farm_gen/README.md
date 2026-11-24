@@ -1,4 +1,4 @@
-# Dynamic farm dataset generator (r5, `building-raster-1`)
+# Dynamic farm dataset generator (r7, `building-raster-2`)
 
 Generates the schema-4 dynamic farm dataset the client reads (`modules/dynamic_farm/farm_data.gd`,
 `map/parcel_metadata.gd`, `map/geo_map_config.gd`) from DataSF **building footprints** and
@@ -46,16 +46,33 @@ licence/edit metadata (`source-manifest.json`); `build` reads only a snapshot. T
 1. **Buildings → parcel.** Every footprint goes to the parcel holding most of its 1 m sample points;
    its `mblr` (a centroid join from a draft basemap) only breaks ties or covers misses. Condominium
    lots share one parcel (`mapblklot`); the other lot numbers are `parcel_aliases`. Parcels with no
-   footprint get no farm (`excluded`, reason `no_building`). All of a parcel's buildings form its core.
+   footprint get no farm (`excluded`, reason `no_building`; see 4a for `low_iou`). All of a
+   parcel's buildings form its core.
 2. **Grid.** UTM 10N metres (EPSG:32610, own Krüger implementation, matches proj4 to 0.1 mm).
    The grid turns to the buildings' dominant wall direction (always within ±45°, recorded as
-   `source_transform.rotation_deg`) and picks the best of 16 sub-cell offsets by IoU.
-3. **Core.** A cell is core when ≥ 50% of it lies inside a footprint (4×4 supersampling).
-   Islands under 4 cells are dropped. `stats.core_iou` is raster/footprint intersection-over-union.
+   `source_transform.rotation_deg`).
+3. **Core.** A cell is core when ≥ 50% of it lies inside a footprint. Coverage is exact: every ring
+   is clipped to each grid row and column line (`exactCoverage`, only + − × ÷); a polygon's holes
+   subtract, separate footprints add and a cell is clamped to 1 (exact unless two footprints overlap
+   in it). Of 16 sub-cell grid offsets the one with the highest exact IoU wins. Islands under 4 cells
+   are dropped. `stats.core_iou` is the exact intersection-over-union of the **written** core cells
+   (after dropping islands) and the footprints, the quantity `tools/dynamic_farm_audit` recomputes;
+   on the r6 failures and the acceptance farms they agree to < 0.0001 (C-92). Until r6 it came from
+   4×4 samples before islands were dropped, and choosing the best of 16 offsets by that noisy
+   estimate overstated it (9,465 r6 farms off by > 0.01) and overcounted the core area by ~1.3%.
 4. **Cell size.** Fixed `cell_m` (0.5 m, i.e. **0.25 m² per cell**), so cells grow with area. If a
    building would exceed `core_cell_cap`, the cell grows instead (same shape, flag
-   `cell_scaled_for_core_cap`); if core + extension would exceed `total_cell_cap` (8192) or a grid
-   axis 544, it grows further (`cell_scaled_for_total_cap`).
+   `cell_scaled_for_core_cap`). If core + extension would exceed `total_cell_cap` (8192) or a grid
+   axis 544, the grass extension narrows first, one cell at a time down to `min_extension_cells`
+   (5 ± 2 → 4 ± 2 → 3 ± 2 → 2 ± 1, flag `extension_narrowed`, used band in `stats.extension_cells`),
+   and only then does the cell grow (`cell_scaled_for_total_cap`). Scattered buildings spend most of
+   the budget on their rings, joining paths and grass; growing the cell for them alone gave r6 cells
+   of 2–8 m and outlines that no longer matched (C-92).
+4a. **Fidelity floor.** A farm whose exact core IoU is below `min_core_iou` (0.8505, just above the
+   audit's 0.85 exclusion line) is not written: `excluded`, reason `low_iou` with its `core_iou` and `cell_m`.
+   This catches footprints thinner than about two cells (walls, ring buildings, 2–5 m² sheds) and
+   scattered buildings that still need coarse cells. While the cell is growing for the total budget
+   the check runs on the raster before each further step, since a larger cell only coarsens it.
 5. **Walking reserve** (`walk_reserve.no_solid_decor_runs`): the core, the client's 2-cell rounded
    ring around it, 3-wide paths that join separate buildings (`buildings_joined_by_path`) and a
    5-wide entry corridor with a centre path.
@@ -67,7 +84,8 @@ licence/edit metadata (`source-manifest.json`); `build` reads only a snapshot. T
    smooth value noise from the parcel seed. Only ground connected to the core is kept.
 8. **Output.** The r4 schema-4 fields unchanged (`zones`, `capabilities`, `counts`, `boundaries`,
    `walk_reserve`, `surface_palette`, `game_cell_m` 0.8, `seed_hex`, …). `source_area_m2` is now the
-   footprint area; `source_transform.origin_m` is the UTM position of grid point (0, 0).
+   footprint area; `source_transform.origin_m` is the UTM position of grid point (0, 0), to 0.1 mm
+   (1 mm until r6: enough to move a 2 m² footprint's recomputed IoU by 0.001).
 
 `seed_hex` = SHA-256 of `sensen-dynamic-farm|<block_id>|<source_geometry_hash>`: decor stays the
 same across dataset versions while the geometry is unchanged.
@@ -92,7 +110,8 @@ manifest hash of the test range and fails if the build calls a libm function, an
 | `min_component_cells` | 4 | Drops slivers from footprint noise |
 | `extension_cells` / `extension_jitter` / `extension_noise_period` | 5 / 2 / 8 | Similar to r4's 3–7 cell grass band |
 | `align_to_building` | true | Straight edges instead of staircases |
-| `samples` | 4 | 16 samples per cell |
+| `min_extension_cells` | 2 | Narrowest grass band (jitter capped below it) before the cell grows for the total budget |
+| `min_core_iou` | 0.8505 | Exclude farms whose core follows the footprints worse than the audit's 0.85 exclusion line (C-92) |
 
 ## Output layout
 

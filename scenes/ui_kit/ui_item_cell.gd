@@ -243,6 +243,9 @@ func _notification(what: int) -> void:
 		_arbiter.reset()
 		set_process(false)
 		gesture.emit({kind = &"cancel"})
+	# A quick slot's name follows the cell's own auto-translation (C-77, Q-109): entering a tree, a changed locale or
+	# auto_translate_mode re-reads it. The main farm's P0Ui translates; a UI that switches it off keeps the English.
+	if what == NOTIFICATION_TRANSLATION_CHANGED and density == Density.QUICK: _refresh()
 
 func _emit(outcomes: Array) -> void:
 	for o: Dictionary in outcomes:
@@ -325,8 +328,9 @@ static func quick_name_style(title: String) -> StringName:
 ## Under 中文 (#649 第二批 ⑤, zh-01 「小萝卜种子」 past the slot) the name is the translation, broken by the character
 ## within the slot's padding (as the icon and the count): on two lines a last 「种子」 takes the second whole (「小萝卜」 /
 ## 「种子」, no 「子」 alone), past two it goes the same way as ` Seeds` (「小萝卜」).
-static func quick_name(title: String) -> String:
-	var shown := String(TranslationServer.translate(title))
+## translate false (a cell whose UI does not auto-translate, C-77) keeps the English title.
+static func quick_name(title: String, translate := true) -> String:
+	var shown := String(TranslationServer.translate(title)) if translate else title
 	if _cjk(shown):
 		var lines := quick_lines(shown)
 		if lines <= 1 or not shown.ends_with(SEED_ZH): return shown
@@ -726,7 +730,7 @@ func _refresh_quick(s: State) -> void:
 	_name.offset_bottom = name_top + _QUICK_NAME_H
 	_qty.offset_top = name_top + _QUICK_NAME_H
 	_qty.offset_bottom = name_top + _QUICK_NAME_H + _QUICK_QTY_H
-	_name.text = quick_name(title)
+	_name.text = quick_name(title, can_auto_translate())
 	_name.theme_type_variation = quick_name_style(_name.text)
 	var cjk := _cjk(_name.text)
 	_name.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if cjk else TextServer.AUTOWRAP_WORD

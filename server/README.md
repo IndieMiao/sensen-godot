@@ -73,6 +73,8 @@ curl localhost:3000/v1/healthz
 数值在 `assets/farm/data/dynamic_farm.json`（所有者拍板 Q-39、Q-40）。
 “放弃并重选”只在设置 `DYNAMIC_FARM_RESELECT=1` 的内部测试服可用，正式配置不设，调用返回 403。
 接口、表结构和选型理由见 [docs/plans/C-31.md](../docs/plans/C-31.md)。
+正式服（C-96）只用邀请账号：`ACCOUNT_SIGNUP=closed` 时邮箱注册和 Apple / Google 首登建号都回 403 `SIGNUP_CLOSED`，
+账号由 `tools/invite_accounts.ts` 直接写库。部署包、建库、备份恢复和回滚见 [deploy/dynamicfarm/README.md](deploy/dynamicfarm/README.md)。
 
 ## 自由选址（SGODOT-37）
 

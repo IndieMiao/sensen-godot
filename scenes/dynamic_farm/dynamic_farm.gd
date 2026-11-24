@@ -21,6 +21,9 @@ const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.
 const House = preload("res://modules/dynamic_farm/farm_house.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const Placement = preload("res://scenes/dynamic_farm/house_placement.gd")
+## The main farm's pop and dust (a Homestead look swapped in), reused for the house just built (C-114).
+const Fence = preload("res://scenes/p0/p0_fence.gd")
+const HOUSE_DUST_SCALE := 4.0
 const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
 const FarmPath = preload("res://modules/dynamic_farm/farm_path.gd")
 const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -55,8 +58,11 @@ var _cloud_drift := 0.0
 var _saved_environment: Environment
 var _canvas: CanvasLayer
 var _controls: Control
+var _header: HBoxContainer
 var _title: Label
 var _status: Label
+var _coins_capsule: PanelContainer
+var _coins: Label
 var _movement := Vector2.ZERO
 var _focus := Vector3.ZERO
 var _zoom := 1.0
@@ -178,6 +184,7 @@ func _ready() -> void:
 			self, {"layout": _plan.layout, "root": _props, "recipe": _plan.recipe})
 		_hint.hide()
 		_farming.state_changed.connect(_on_farm_changed)
+		_farming.place_side_button(_build)
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -206,6 +213,8 @@ func _ready() -> void:
 ## Every save reply (ParcelFarming): the house once it stands, the Build key while a blueprint waits.
 func _on_farm_changed(farm: Dictionary) -> void:
 	if _failed: return
+	_coins.text = str(int(farm.get("coins", 0)))
+	_coins_capsule.visible = true
 	if farm.get("house") is Dictionary and _house == null: _build_house(farm.house)
 	_refresh_build()
 
@@ -260,12 +269,29 @@ func _on_place_confirmed(at: Vector2i, rotation_steps: int) -> void:
 	_sending = true
 	var reply: Dictionary = await _farming.send({"type":"place_house", "x":at.x, "y":at.y, "rotation":rotation_steps})
 	_sending = false
+	if reply.get("ok", false) and is_inside_tree(): _pop_house()
 	if not is_inside_tree() or _placement == null: return
 	# A refused spot keeps the preview, judged again on the farm the reply brought; anything else ends it.
 	if reply.get("ok", false) or str(reply.get("code", "")) != "CELL_OCCUPIED":
 		end_house_placement()
 	else:
 		_placement.retake(House.blocked(_farming.obstacle_cells(), _farming.farm))
+
+## Build succeeded (C-114): the cottage the reply just built grows in with the main farm's overshoot and puffs dust
+## round its footprint. A house that comes with the save (reopening, a refused Build) only stands there.
+## The main farm's puffs are sized for a fence post; round the 2.4 m cottage each one is HOUSE_DUST_SCALE times
+## larger, so they read as the clouds of the owner's reference (C-103 screenshot 704).
+func _pop_house() -> void:
+	var house = house_state()
+	if _house == null or not house is Dictionary: return
+	var before := get_child_count()
+	Fence.pop_in(self, [_house])
+	for point in House.rim(_walk, House.at_of(house), int(house.get("rotation", 0))): Fence.dust(self, point)
+	for i in range(before, get_child_count()):
+		var puff := get_child(i) as CPUParticles3D
+		if puff == null: continue
+		puff.scale_amount_min *= HOUSE_DUST_SCALE
+		puff.scale_amount_max *= HOUSE_DUST_SCALE
 
 ## The built cottage and its wall profile (C-19's model-fitted walking); a player standing on the new walls steps out.
 func _build_house(house: Dictionary) -> void:
@@ -527,7 +553,6 @@ func _build_ui() -> void:
 	add_child(_canvas)
 	_controls = Controls.new()
 	_canvas.add_child(_controls)
-	_controls.top_exclusion_y = 102
 	_controls.movement_changed.connect(func(value: Vector2): _movement = value)
 	_controls.zoom_changed.connect(func(factor: float):
 		_zoom = clampf(_zoom*factor,0.8,1.4)
@@ -539,34 +564,58 @@ func _build_ui() -> void:
 			_focus = _actor.position
 			_overview = false
 			_place_camera())
-	var header := PanelContainer.new()
-	header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	header.offset_left = 12
-	header.offset_right = -12
-	header.offset_top = 12
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.96,0.97,0.93,0.94)
-	style.set_corner_radius_all(10)
-	style.set_content_margin_all(10)
-	header.add_theme_stylebox_override("panel",style)
-	_canvas.add_child(header)
-	var row := HBoxContainer.new()
-	header.add_child(row)
+	# Top bar in the main farm's UI kit (C-74): the 44 round back of ProfileTopBar / PageHeader (LOCK-22) and a
+	# surface chip with the parcel's name over its status line, at the HUD's place (x 10, y 16 + safe top).
+	_header = HBoxContainer.new()
+	_header.name = "TopBar"
+	_header.theme = UiKit.theme()
+	_header.add_theme_constant_override(&"separation", UiTokens.SPACE_WITHIN)
+	_header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_header.offset_left = UiTokens.SIZE_TODAY_PANEL_X
+	_header.offset_right = -UiTokens.SIZE_TODAY_PANEL_X
+	_header.offset_top = UiTokens.SIZE_HUD_TOP + _safe_top()
+	_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_canvas.add_child(_header)
+	var back := UiProfileTopBar._Round.new(UiProfileTopBar._Round.Glyph.BACK)
+	back.name = "Back"
+	back.tooltip_text = "Back"
+	back.pressed.connect(_request_back)
+	_header.add_child(back)
+	var chip := PanelContainer.new()
+	chip.name = "Place"
+	chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CHIP,
+		UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(12, 5, 12, 6))
+	_header.add_child(chip)
 	var labels := VBoxContainer.new()
-	labels.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(labels)
-	_title = _label("Dynamic farm",16)
+	labels.add_theme_constant_override(&"separation", 0)
+	labels.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_child(labels)
+	_title = UiKit.label("Dynamic farm", UiTokens.STYLE_C14_XB)
 	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_title.custom_minimum_size.x = 120
 	labels.add_child(_title)
-	_status = _label("Loading preview…",12)
+	_status = UiKit.label("Loading preview…", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	labels.add_child(_status)
-	var back := Button.new()
-	back.text = "Back"
-	back.custom_minimum_size = Vector2(64,44)
-	back.pressed.connect(_request_back)
-	row.add_child(back)
-	_hint = _label("Art preview · Walk and explore",12)
+	# One's own parcel: its coins (C-59, apart from the main farm's) in the main HUD's coins capsule, at the right.
+	_coins_capsule = UiHud._capsule()
+	_coins_capsule.name = "Coins"
+	_coins_capsule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_coins_capsule.visible = false
+	var coins_row := _coins_capsule.get_child(0) as HBoxContainer
+	_coins = UiKit.label("0", UiTokens.STYLE_C11_XB)
+	_coins.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	coins_row.add_child(_coins)
+	var coin := UiKit.icon(UiHud.ICON_COIN, UiHud._ICON_COIN)
+	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	coins_row.add_child(coin)
+	_header.add_child(_coins_capsule)
+	_controls.top_exclusion_y = UiTokens.SIZE_HUD_TOP + _safe_top() + UiTokens.SIZE_CLOSE + UiTokens.SPACE_PAGE
+	_hint = UiKit.label("Art preview · Walk and explore", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	_hint.theme = UiKit.theme()
 	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	_hint.offset_bottom = -12
 	_hint.offset_top = -34
@@ -574,15 +623,27 @@ func _build_ui() -> void:
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_hint)
 	_build = UiCommandButton.new("Build Cottage", UiCommandButton.Kind.PRIMARY)
+	_build.name = "BuildCottage"
 	_build.theme = UiKit.theme()
-	_build.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_build.offset_left = -90
-	_build.offset_right = 90
-	_build.offset_top = -92
-	_build.offset_bottom = -44
+	# 180 × 48; ParcelFarming places it beside the action key (place_side_button), clear of the key and quick bar.
+	_build.custom_minimum_size = Vector2(180, 48)
 	_build.visible = false
 	_build.activated.connect(begin_house_placement)
 	_canvas.add_child(_build)
+
+## Top system inset (status bar, notch) in UI units; 0 on desktop (as P0Ui.safe_top).
+func _safe_top() -> float:
+	if not is_inside_tree() or not (OS.has_feature("android") or OS.has_feature("ios")): return 0.0
+	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
+		get_viewport().get_visible_rect().size, 0.0).y
+
+## Screen point (canvas units) of `world` raised by `lift` metres: where a float or an item flight starts.
+func screen_point(world: Vector3, lift := 0.0) -> Vector2:
+	if _camera == null: return get_viewport().get_visible_rect().size * Vector2(0.5, 0.42)
+	return _camera.unproject_position(world + Vector3(0, lift, 0))
+
+func player_position() -> Vector3:
+	return _actor.position if _actor != null else Vector3.ZERO
 
 ## A tap picks an outer object under it (C-60), else the ground cell, for the main key.
 func _on_tapped(at: Vector2) -> void:
@@ -591,13 +652,6 @@ func _on_tapped(at: Vector2) -> void:
 	var dir := _camera.project_ray_normal(at)
 	var hit = Plane(Vector3.UP, 0.0).intersects_ray(from, dir)
 	_farming.pick(_walk.cell_at(hit) if hit is Vector3 else Vector2i(-1, -1), from, dir)
-
-func _label(text: String, size: int) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.add_theme_font_size_override("font_size",size)
-	label.add_theme_color_override("font_color",Color("314637"))
-	return label
 
 func _request_back() -> void:
 	if _back_sent: return
@@ -608,8 +662,13 @@ func _request_back() -> void:
 	back_requested.emit()
 
 func is_back_navigation_locked() -> bool:
+	if close_modal(): return true
 	_request_back()
 	return true
+
+## Closes the farming UI's open drawer (the bag); false when none was open.
+func close_modal() -> bool:
+	return _farming != null and _farming.close_bag()
 
 func suspend() -> void:
 	_suspended = true

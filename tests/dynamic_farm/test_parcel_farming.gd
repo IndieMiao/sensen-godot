@@ -6,6 +6,7 @@ const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
+const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 const T0 := 1795392000000
 var checks := 0
 var failures := 0
@@ -24,6 +25,7 @@ func _run() -> void:
 	_commands()
 	_space()
 	_store()
+	_guide()
 	print("PARCEL_FARMING checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -156,3 +158,33 @@ func _store() -> void:
 	_check(LocalStore.new("p-B", dir).enter().granted, "another parcel has its own save")
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
+
+## C-35: the guide's step follows the save alone: cottage, till, sow, harvest, then nothing.
+func _guide() -> void:
+	var rules := ParcelFarm.rules()
+	_check(Guide.step({}, T0) == "", "guide: nothing before the save is read")
+	var state: Dictionary = ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0)
+	_check(Guide.step(state, T0) == "build", "guide: a blueprint and no house -> Build Cottage")
+	var bare: Dictionary = state.duplicate(true)
+	bare.bag.erase("blueprint_cottage")
+	_check(Guide.step(bare, T0) == "", "guide: no house and no blueprint -> nothing")
+	var steps := [[{"type": "place_house", "x": 4, "y": 4, "rotation": 0}, "till"],
+		[{"type": "clear_obstacle", "cell": "9,10"}, "till"],
+		[{"type": "till", "cell": "10,10"}, "sow"],
+		[{"type": "sow", "cell": "10,10", "crop": "crop_carrot"}, ""]]
+	for pair: Array in steps:
+		var result := ParcelFarm.apply(rules, state, [pair[0]], T0)
+		_check(result.ok, "guide: " + str(pair[0].type) + " applies")
+		if not result.ok: return
+		state = result.state
+		_check(Guide.step(state, T0) == pair[1], "guide: after %s -> '%s' (got '%s')" % [pair[0].type, pair[1], Guide.step(state, T0)])
+	_check(Guide.step(state, T0 + 59999) == "", "guide: quiet while the carrot grows")
+	_check(Guide.step(state, T0 + 60000) == "harvest", "guide: a ripe carrot -> Harvest")
+	var harvested := ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 60000)
+	_check(harvested.ok and Guide.step(harvested.state, T0 + 60000) == "", "guide: done once a carrot is in the bag")
+	var sold: Dictionary = harvested.state.duplicate(true)
+	sold.bag.erase("crop_carrot")
+	sold.sales = 1
+	_check(Guide.step(sold, T0 + 60000) == "", "guide: stays done after selling it (0.4.3)")
+	for key: String in ["build", "till", "sow", "harvest"]:
+		_check(not Guide.text(key).is_empty(), "guide: copy for " + key)

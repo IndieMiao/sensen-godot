@@ -40,24 +40,23 @@ internal class ParcelMapController(
     private var mapboxLoadFailed = false
     private var closed = false
     private val subscriptions = mutableListOf<Cancelable>()
+    private val hiddenPlaces = linkedMapOf<String, Value>() // Place icon layer -> its visibility before we hid it.
     private val map get() = view.mapboxMap
 
     companion object {
         const val FILL = "gensen-parcel-fill"
-        const val LINE = "gensen-parcel-line"
-        const val BUILDINGS = "gensen-parcel-buildings"
         const val BUILDING_FILL = "gensen-parcel-building-fill"
         const val HIGHLIGHT_FILL = "gensen-selected-building-fill"
-        const val HIGHLIGHT_LINE = "gensen-selected-building-line"
         const val ADDRESSES = "gensen-parcel-addresses"
         const val CLAIM_NAMES = "gensen-parcel-claim-names"
-        val LAYERS = listOf(FILL, LINE, BUILDING_FILL, BUILDINGS, HIGHLIGHT_FILL, HIGHLIGHT_LINE, ADDRESSES, CLAIM_NAMES)
-        // C-32 / q(342): own parcel green, someone else's red. Claimable yellow is the selected building's highlight.
-        const val OWN_COLOR = "#3E9B55"
-        const val TAKEN_COLOR = "#D2493F"
-        private const val OWN = """["boolean",["feature-state","own"],false]"""
-        private const val TAKEN = """["boolean",["feature-state","claimed"],false]"""
-        private const val SELECTED = """["boolean",["feature-state","selected"],false]"""
+        // C-112 (C-103#18): no parcel fill or outline and no dark building frames. Only buildings are coloured
+        // (own green, someone else's red, claimable yellow when selected), and only by fills, so no colour leaves them.
+        val LAYERS = listOf(FILL, BUILDING_FILL, HIGHLIGHT_FILL, ADDRESSES, CLAIM_NAMES)
+        /** Never drawn, still hit-tested: a feature-dependent 0, as the parcel fill's unclaimed case always was
+         *  (C-28/C-32 picked parcels through it). A constant 0 may let Mapbox leave the layer out of its hit index. */
+        private const val HIT_ONLY = """["case",["boolean",["feature-state","selected"],false],0.0,0.0]"""
+        /** C-112 (C-103#17): Mapbox's own place icons (shops, schools, stations, airports, peaks) while parcels show. */
+        val PLACE_ICON_LAYERS = listOf("poi-label", "transit-label", "airport-label", "natural-point-label")
         /** A tap right after a pan waits this long for map idle before answering "loading". */
         const val IDLE_WAIT_MS = 4000L
     }
@@ -65,7 +64,7 @@ internal class ParcelMapController(
     init {
         subscriptions += map.subscribeStyleLoaded {
             if (!closed && state.active) {
-                query?.cancel(); query = null; waiting.drop()
+                query?.cancel(); query = null; waiting.drop(); hiddenPlaces.clear() // A new style has its own icons.
                 state.reloading(); mapIdle = false; mapboxLoadFailed = false; buildingSelection.clear(); sources.clear(); loaded.clear()
                 settle.reset(emptySet())
                 install()
@@ -85,7 +84,6 @@ internal class ParcelMapController(
             if (!closed && state.active && sources.containsValue(event.sourceId) && event.loaded == true) {
                 val changed = loaded.add(event.sourceId)
                 val becameReady = !state.ready && sources["parcels"] in loaded && state.loaded(state.epoch)
-                if (becameReady) applyStates(state.replay())
                 if (changed || becameReady) emitReady()
                 resumeWaiting()
             }
@@ -140,11 +138,10 @@ internal class ParcelMapController(
             parcelSource["promoteId"] = Value("block_id")
         }
         val sourceLayer = if (cfg.sourceType == "vector") ",\"source-layer\":\"${cfg.sourceLayer}\"" else ""
-        // R4 / decision 1C: no standing frame on unclaimed parcels. Claimed ones are filled by owner (C-32).
+        // C-112: the parcel layer is never drawn, owned or not (C-103#18 replaces C-32's parcel colours).
         // Do not set visibility:none or remove FILL: queryAt still uses its feature index.
         var ok = !style.addStyleSource(parcel, Value(parcelSource)).isError && geoSource(highlight, value(ParcelPayload.EMPTY_COLLECTION)) &&
-            layer("""{"id":"$FILL","type":"fill","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"fill-color":["case",$OWN,"$OWN_COLOR",$TAKEN,"$TAKEN_COLOR","#3B7757"],"fill-opacity":["case",$OWN,["case",$SELECTED,0.6,0.42],$TAKEN,["case",$SELECTED,0.55,0.36],0.0]}}""") &&
-            layer("""{"id":"$LINE","type":"line","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"line-color":["case",$OWN,"$OWN_COLOR",$TAKEN,"$TAKEN_COLOR","#ED9F18"],"line-width":2.5,"line-opacity":["case",["any",$OWN,$TAKEN,$SELECTED],1.0,0.0]}}""")
+            layer("""{"id":"$FILL","type":"fill","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"paint":{"fill-color":"#3B7757","fill-opacity":$HIT_ONLY}}""")
         // DataSF: the yellow highlight filters the building source to the chosen parcel's footprints (C-43 V-199).
         var highlightSource = "\"source\":\"$highlight\""
         if (ok && cfg.buildingSource == "datasf") {
@@ -153,18 +150,19 @@ internal class ParcelMapController(
             // the address zoom waited for it forever.
             val drawn = "\"source\":\"$buildings\",\"minzoom\":${cfg.minZoom}"
             highlightSource = "$drawn,\"filter\":${ParcelPayload.buildingFilter("")}"
+            // C-112: the buildings are hit-tested and coloured here only by their parcel's state (own, someone else's).
+            val states = state.replay()
             ok = geoSource(buildings, Value(cfg.buildingsUrl)) &&
-                layer("""{"id":"$BUILDING_FILL","type":"fill",$drawn,"paint":{"fill-color":"#716556","fill-opacity":0.16}}""") &&
-                layer("""{"id":"$BUILDINGS","type":"line",$drawn,"paint":{"line-color":"#716556","line-width":1.3}}""")
+                layer("""{"id":"$BUILDING_FILL","type":"fill",$drawn,"paint":{"fill-color":${ParcelPayload.buildingColor(states)},"fill-opacity":${ParcelPayload.buildingOpacity(states)}}}""")
         }
-        ok = ok && layer("""{"id":"$HIGHLIGHT_FILL","type":"fill",$highlightSource,"paint":{"fill-color":"#FFD15C","fill-opacity":0.65}}""") &&
-            layer("""{"id":"$HIGHLIGHT_LINE","type":"line",$highlightSource,"paint":{"line-color":"#ED9F18","line-width":2.5}}""") &&
+        ok = ok && layer("""{"id":"$HIGHLIGHT_FILL","type":"fill",$highlightSource,"paint":{"fill-color":"${ParcelPayload.CLAIMABLE_COLOR}","fill-opacity":0.65}}""") &&
             layer("""{"id":"$ADDRESSES","type":"symbol","source":"$parcel"$sourceLayer,"minzoom":${cfg.addressMinZoom},"layout":{"text-field":["coalesce",["get","address"],""],"text-size":11,"text-max-width":8,"text-allow-overlap":false},"paint":{"text-color":"#37463B","text-halo-color":"#FFFFFF","text-halo-width":1.2}}""") &&
             layer("""{"id":"$CLAIM_NAMES","type":"symbol","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"filter":${ParcelPayload.claimFilter(claims)},"layout":{"text-field":${ParcelPayload.claimLabel(claims)},"text-size":13,"text-max-width":8,"text-allow-overlap":false},"paint":{"text-color":"#7A2620","text-halo-color":"#FFFFFF","text-halo-width":1.5}}""")
         if (!ok) {
             removeLayers(style); state.unavailable()
             error(state.generation, turn, "layer_install_failed"); return
         }
+        hidePlaceIcons(style)
         emitReady() // source_ready gates picking on parcel data; hidden building layers must not block z17 selection.
         handler.postDelayed({
             if (!closed && state.accepts(turn) && !state.ready) error(state.generation, turn, "source_timeout")
@@ -185,17 +183,26 @@ internal class ParcelMapController(
         val changed = runCatching { state.update(generation, batch) }.getOrElse {
             error(generation, state.epoch, "state_limit"); return
         }
-        if (state.ready) applyStates(changed)
+        if (changed.isNotEmpty()) applyStates()
     }
-    private fun applyStates(batch: Map<String, ParcelVisualState>) {
-        val source = sources["parcels"] ?: return
-        val turn = state.epoch
-        for ((parcel, visual) in batch) {
-            val bits = Value(hashMapOf("selected" to Value(visual.selected), "claimed" to Value(visual.claimed), "own" to Value(visual.own)))
-            map.setFeatureState(source, config?.takeIf { it.sourceType == "vector" }?.sourceLayer, parcel, bits) { response ->
-                if (!closed && state.accepts(turn) && source == sources["parcels"] && response.isError) error(state.generation, turn, "feature_state_failed")
-            }
+    /** Repaints the building fill from every parcel's state; install() paints the latest states itself. */
+    private fun applyStates() {
+        val style = if (map.isValid()) map.style else null
+        if (style == null || !style.styleLayerExists(BUILDING_FILL)) return
+        val states = state.replay()
+        if (style.setStyleLayerProperty(BUILDING_FILL, "fill-color", value(ParcelPayload.buildingColor(states))).isError ||
+            style.setStyleLayerProperty(BUILDING_FILL, "fill-opacity", value(ParcelPayload.buildingOpacity(states))).isError) error(state.generation, state.epoch, "states_update_failed")
+    }
+    private fun hidePlaceIcons(style: Style) {
+        for (id in PLACE_ICON_LAYERS) {
+            if (hiddenPlaces.containsKey(id) || !style.styleLayerExists(id)) continue
+            hiddenPlaces[id] = style.getStyleLayerProperty(id, "visibility").value
+            style.setStyleLayerProperty(id, "visibility", Value("none"))
         }
+    }
+    private fun restorePlaceIcons(style: Style?) {
+        if (style != null) for ((id, visibility) in hiddenPlaces) if (style.styleLayerExists(id)) style.setStyleLayerProperty(id, "visibility", visibility)
+        hiddenPlaces.clear()
     }
     fun setClaims(generation: Long, raw: String) {
         if (closed || !state.active || generation != state.generation) return
@@ -223,8 +230,7 @@ internal class ParcelMapController(
         val id = sources["highlight"] ?: return
         val style = map.style ?: return
         val failed = if (config?.buildingSource == "datasf") {
-            val filter = value(ParcelPayload.buildingFilter(if (geometry == null) "" else parcelId))
-            style.setStyleLayerProperty(HIGHLIGHT_FILL, "filter", filter).isError || style.setStyleLayerProperty(HIGHLIGHT_LINE, "filter", filter).isError
+            style.setStyleLayerProperty(HIGHLIGHT_FILL, "filter", value(ParcelPayload.buildingFilter(if (geometry == null) "" else parcelId))).isError
         } else {
             val data = if (geometry == null) ParcelPayload.EMPTY_COLLECTION else FeatureCollection.fromFeature(Feature.fromGeometry(geometry)).toJson()
             style.setStyleSourceProperty(id, "data", value(data)).isError
@@ -314,6 +320,7 @@ internal class ParcelMapController(
             for (layer in LAYERS.reversed()) if (style.styleLayerExists(layer)) style.removeStyleLayer(layer)
             for (id in sources.values) if (style.styleSourceExists(id)) style.removeStyleSource(id)
         }
+        restorePlaceIcons(style)
         sources.clear(); loaded.clear(); buildingSelection.clear(); settle.reset(emptySet())
     }
     fun close() {

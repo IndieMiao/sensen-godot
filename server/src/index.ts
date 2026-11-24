@@ -19,12 +19,16 @@ import { CachedJwks } from './accounts/firebase_token.js';
 import { PgParcelStore } from './parcels/pg_store.js';
 import { loadParcelRules } from './parcels/rules.js';
 import { parcelReselectFromEnv } from './parcels/routes.js';
+import { signupClosedFromEnv } from './accounts/routes.js';
 
 const need = (k: string): string => {
   const v = process.env[k];
   if (!v) { console.error(`缺少环境变量 ${k}`); process.exit(1); }
   return v;
 };
+
+const signupClosed = signupClosedFromEnv(process.env);
+if (signupClosed === null) { console.error('ACCOUNT_SIGNUP 只能是 open 或 closed'); process.exit(1); }
 
 const ROOT = process.env.ASSET_ROOT ?? path.resolve(process.cwd(), '..');
 const CONTENT_DIR = path.join(ROOT, 'assets', 'farm', 'data');
@@ -107,6 +111,8 @@ const app = await buildApp({
   apple: appleConfig(),
   appleRevoker: appleRevokerFromEnv(process.env, () => Date.now()),
   google: googleConfig(),
+  // Dynamic farm production (C-96) sets ACCOUNT_SIGNUP=closed: invite accounts only, no self sign-up.
+  signupClosed,
   // Only a development server may let guests write; production keeps guests read-only.
   guestWrites: process.env.GUEST_WRITES === '1',
   // Dynamic farm parcels (C-31). "Abandon and pick again" is for the internal test server only: it stays off unless
@@ -132,4 +138,4 @@ if (process.env.REALTIME_ENABLED !== '0') {
 
 const port = Number(process.env.PORT ?? 3000);
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)}`);
+console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} signup=${signupClosed ? 'closed' : 'open'}`);

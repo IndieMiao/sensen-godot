@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolveParams, CLIENT_MAX_AXIS, CLIENT_MAX_CELLS } from '../src/config.js';
-import { encodeRuns, generateFarm, type FarmInput } from '../src/farm.js';
+import { encodeRuns, extensionLevels, generateFarm, LowIouError, type FarmInput } from '../src/farm.js';
 import { insideRings, signedArea, unrotate, type Polygon } from '../src/geo.js';
 import { DIRS, RING_OFFSETS } from '../src/layout.js';
 import { CURRENT_CLIENT, decodeFarm, RELAXED } from '../src/validate.js';
@@ -28,7 +28,8 @@ describe('generateFarm', () => {
     const d = decoded(r.farm);
     expect(r.cell_m).toBe(0.5);
     expect(d.counts.core).toBe(132 / 0.25);
-    expect(r.core.iou).toBeGreaterThan(0.999);
+    expect(r.iou).toBeGreaterThan(0.999);
+    expect((r.farm.stats as any).core_iou).toBe(1);
     // The notch stays out of the core: the bounding box (16 × 12 m) would be 768 cells.
     expect(d.counts.core).toBeLessThan(768);
     expect((r.farm.boundaries as any).core[0].outer).toHaveLength(7);
@@ -141,6 +142,62 @@ describe('generateFarm', () => {
   });
 });
 
+describe('fidelity and budget', () => {
+  it('reports the exact IoU of the written core, which an independent recount reproduces', () => {
+    // 7.3 × 5.1 m turned 12° against an unrotated grid: no sub-cell offset lines its edges up.
+    const poly: Polygon = [rect(500000, 4180000, 7.3, 5.1)[0].map(p => unrotate(p as [number, number], 12))];
+    const r = generateFarm(input([poly], {}), resolveParams({ align_to_building: false }));
+    expect(r.iou).toBeLessThan(0.99);
+    // Recount by 64 × 64 centre samples per cell (no clipping), grid unrotated so u, v are metres.
+    const f = r.core.frame;
+    const n = 64;
+    let inter = 0;
+    let area = 0;
+    for (let y = 0; y < f.height * n; y++) for (let x = 0; x < f.width * n; x++) {
+      const u = f.u0 + ((x + 0.5) / n) * f.cell_m;
+      const v = f.v0 + ((y + 0.5) / n) * f.cell_m;
+      if (!insideRings(poly, u, v)) continue;
+      area++;
+      const gx = Math.floor(x / n) - r.layout.offset[0];
+      const gy = Math.floor(y / n) - r.layout.offset[1];
+      if (gx >= 0 && gy >= 0 && gx < r.layout.width && gy < r.layout.height && r.layout.zone[gy * r.layout.width + gx] === 1) inter++;
+    }
+    const cells = r.layout.counts.core * n * n;
+    expect(inter / (cells + area - inter)).toBeCloseTo(r.iou, 3);
+  });
+
+  it('excludes a footprint too thin for the cell (low_iou) instead of writing a misleading farm', () => {
+    // A 0.6 m wide wall ring around a 20 m courtyard at 0.5 m cells.
+    const ring: Polygon = [rect(0, 0, 21.2, 21.2)[0], rect(0.6, 0.6, 20, 20)[0]];
+    expect(() => generateFarm(input([ring]), params)).toThrow(LowIouError);
+    // A lower line keeps it.
+    expect(generateFarm(input([ring]), resolveParams({ min_core_iou: 0.3 })).iou).toBeLessThan(params.min_core_iou);
+  });
+
+  it('narrows the extension before growing the cell for scattered buildings', () => {
+    const scattered = [0, 1, 2, 3, 4].flatMap(i => [0, 1].map(j => rect(i * 30, j * 30, 8, 6)));
+    const r = generateFarm(input(scattered), params);
+    decoded(r.farm);
+    expect(r.flags).toContain('extension_narrowed');
+    expect(r.flags).not.toContain('cell_scaled_for_total_cap');
+    expect(r.cell_m).toBe(0.5);
+    expect((r.farm.stats as any).extension_cells[0]).toBeLessThan(params.extension_cells);
+    expect(r.layout.counts.total).toBeLessThanOrEqual(params.total_cell_cap);
+    // Without narrowing the same farm needs bigger cells.
+    const wide = generateFarm(input(scattered), resolveParams({ min_extension_cells: params.extension_cells }));
+    expect(wide.flags).toContain('cell_scaled_for_total_cap');
+    expect(wide.cell_m).toBeGreaterThan(0.5);
+    expect(wide.iou).toBeLessThan(r.iou);
+  });
+
+  it('a farm that fits keeps the configured extension', () => {
+    const r = generateFarm(input([rect(0, 0, 12, 10)]), params);
+    expect((r.farm.stats as any).extension_cells).toEqual([params.extension_cells, params.extension_jitter]);
+    expect(r.flags).not.toContain('extension_narrowed');
+    expect(extensionLevels(params).map(l => [l.extension_cells, l.extension_jitter])).toEqual([[5, 2], [4, 2], [3, 2], [2, 1]]);
+  });
+});
+
 describe('encodeRuns', () => {
   it('splits rows by value', () => {
     const v = [0, 1, 1, 2, null, 2, 2, null];
@@ -155,5 +212,8 @@ describe('resolveParams', () => {
     expect(() => resolveParams({ core_cell_cap: 8192 })).toThrow();
     expect(() => resolveParams({ cell_m: 0 })).toThrow();
     expect(() => resolveParams({ nope: 1 } as never)).toThrow();
+    expect(() => resolveParams({ min_core_iou: 1 })).toThrow();
+    expect(() => resolveParams({ min_extension_cells: 0 })).toThrow();
+    expect(() => resolveParams({ min_extension_cells: 6 })).toThrow();
   });
 });

@@ -71,3 +71,27 @@ func test_base_url_override_file() -> void:
 	assert_str(Net.base_url()).is_equal("http://192.168.124.53:3000/v1")
 	DirAccess.remove_absolute(Net.SERVER_OVERRIDE)
 	assert_str(Net.base_url()).is_equal(configured_base)
+
+## The dynamic farm release package (invite_only, C-98) only connects to the address it was built with:
+## server.txt cannot redirect it (C-116). Every other package still reads the override.
+func test_invite_only_package_ignores_the_override_file() -> void:
+	var keys := [Net.INVITE_ONLY_SETTING, "sensen/network/base_url"]
+	var saved := {}
+	for key in keys:
+		saved[key] = ProjectSettings.get_setting(key) if ProjectSettings.has_setting(key) else null
+	ProjectSettings.set_setting("sensen/network/base_url", "https://farm.sensenjoy.cn/dynamicfarm/v1")
+	var f := FileAccess.open(Net.SERVER_OVERRIDE, FileAccess.WRITE)
+	f.store_string("http://192.168.124.53:3000/v1\n")
+	f.close()
+	ProjectSettings.set_setting(Net.INVITE_ONLY_SETTING, true)
+	var release := Net.base_url()
+	ProjectSettings.set_setting(Net.INVITE_ONLY_SETTING, false)
+	var other := Net.base_url()
+	ProjectSettings.set_setting(Net.INVITE_ONLY_SETTING, null)
+	var unset := Net.base_url()
+	DirAccess.remove_absolute(Net.SERVER_OVERRIDE)
+	for key in keys:
+		ProjectSettings.set_setting(key, saved[key])
+	assert_str(release).is_equal("https://farm.sensenjoy.cn/dynamicfarm/v1")
+	assert_str(other).is_equal("http://192.168.124.53:3000/v1")
+	assert_str(unset).is_equal("http://192.168.124.53:3000/v1")
