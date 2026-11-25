@@ -144,6 +144,9 @@ var _spent_material: ShaderMaterial
 ## The first visit's next step (C-35, ParcelGuide) as the main farm's TipCard, under the top bar.
 var _tip: UiTipCard
 var _tip_box: CenterContainer
+## Where the guide's card starts, in canvas units (the safe top included); the scene sets it under its own top bar
+## (two rows since C-108). Negative: TIP_TOP under the status bar.
+var tip_top := -1.0
 ## The step on the card, and the step the player closed with a tap (it comes back only at another step).
 var tip_step := ""
 var _tip_closed := ""
@@ -968,7 +971,7 @@ func _refresh_tip() -> void:
 		if not step.is_empty(): _tip.show_tip(Guide.text(step))
 	_tip.visible = not tip_step.is_empty() and tip_step != _tip_closed and not held and _bag == null
 	# Under the top bar (the main farm puts its TipCard under the HUD, clear of the key and the bar).
-	if _tip.visible: _tip_box.offset_top = TIP_TOP + _safe_top()
+	if _tip.visible: _tip_box.offset_top = tip_top if tip_top >= 0.0 else TIP_TOP + _safe_top()
 
 ## Places a scene button (the house's Build Cottage, C-33) at the left on the action key's baseline, so it never
 ## covers the quick bar or the key; it keeps its own `custom_minimum_size`.

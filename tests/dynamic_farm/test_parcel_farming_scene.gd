@@ -216,8 +216,9 @@ func _first_visit() -> void:
 	_check(_tip(farming) == "Pick a spot in your yard and press Till.", "the guide's card teaches tilling once the house stands (C-35): " + _tip(farming))
 	await process_frame
 	var tip_rect: Rect2 = farming._tip.get_global_rect()
-	_check(tip_rect.position.y >= scene._header.get_global_rect().end.y and tip_rect.end.y < farming._bar.get_global_rect().position.y,
-		"the card sits under the top bar, above the quick bar: %s / %s / %s" % [tip_rect, scene._header.get_global_rect(), farming._bar.get_global_rect()])
+	_check(tip_rect.position.y >= scene._place_chip.get_global_rect().end.y and tip_rect.end.y < farming._bar.get_global_rect().position.y,
+		"the card sits under the top bar's two rows, above the quick bar: %s / %s / %s" % [tip_rect, scene._place_chip.get_global_rect(), farming._bar.get_global_rect()])
+	await _profile_from_avatar(farming)
 	farming._tip.tapped.emit()
 	_check(_tip(farming) == "", "a tap closes the card")
 	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "pail": 1, "seed_carrot": 3, "blueprint_cottage": 1, "blueprint_well": 1},
@@ -414,6 +415,40 @@ func _reopen() -> void:
 
 ## C-61 (C-59#242): seven and more kinds of items with coins stay on screen. The bar shows the first five, the Bag
 ## the rest; the coins sit in the top bar, which keeps inside the screen.
+## C-108 (C-85 ①: the HUD avatar opens the profile): row 1 of the top bar is ‹, the C-H1 avatar, Energy and coins; the
+## place capsule is row 2 under it. The avatar opens the profile over the parcel (its HUD hides, its touches stop), with
+## the parcel as My farm; the card and Android Back close it.
+func _profile_from_avatar(farming: Node) -> void:
+	var avatar: Button = scene._header.get_node_or_null("Avatar")
+	_check(avatar != null and avatar.get_script() == load("res://scenes/ui_kit/ui_hud_avatar.gd") and avatar.get_index() == 1 and avatar.size == Vector2(52, 52), "the top bar's avatar: Ø52, after Back")
+	var head: Rect2 = scene._header.get_global_rect()
+	var place: Rect2 = scene._place_chip.get_global_rect()
+	_check(is_equal_approx(place.position.x, 12.0) and place.position.y >= head.end.y and place.end.x <= farming._ui.get_global_rect().end.x - 12.0,
+		"the place capsule is row 2, 12 in: %s under %s" % [place, head])
+	_check(scene._title.custom_minimum_size.x > 0.0 and place.size.x < farming._ui.size.x - 24.0, "as wide as its lines: %s" % place)
+	avatar.pressed.emit()
+	await process_frame
+	_check(scene.profile_open() and not scene._canvas.visible and scene._controls.process_mode == Node.PROCESS_MODE_DISABLED,
+		"the avatar opens the profile; the parcel's HUD hides and its touches stop")
+	var page: Control = scene._profile.top()
+	_check(page.get_script() == load("res://scenes/dynamic_farm/parcel_profile_page.gd") and page.farm_card != null, "the profile shows My farm")
+	var expected: String = scene._data.address if not str(scene._data.get("address", "")).is_empty() else str(scene._data.get("name", ""))
+	_check(page.farm_card.find_child("FarmName", true, false).text == expected, "its card is this parcel: %s" % expected)
+	_check(scene.close_modal() and not scene.profile_open(), "Android Back closes the profile")
+	await process_frame
+	_check(scene._canvas.visible and scene._controls.process_mode == Node.PROCESS_MODE_INHERIT, "the HUD and touches come back")
+	avatar.pressed.emit()
+	await process_frame
+	scene._profile.top().farm_pressed.emit()
+	await process_frame
+	_check(not scene.profile_open() and scene._canvas.visible, "the farm card closes it too: home is here")
+	var now := 1_000_000
+	var farm := {"crops": {"1,1": {"crop": "crop_carrot", "ripe_at": now + 3 * 3600000 + 32 * 60000}}}
+	_check(scene.home_status(farm, now).text == "Carrots ready in 3h 32m", "status: %s" % scene.home_status(farm, now))
+	farm.crops["2,2"] = {"crop": "crop_carrot", "ripe_at": now - 1}
+	_check(scene.home_status(farm, now) == {"text": "Carrots ready to harvest", "ready": true}, "ready: the main farm's line, deep green")
+	_check(scene.home_status({}, now).text == "", "nothing sown: no status line")
+
 func _full_bag(farming: Node) -> void:
 	var save: Dictionary = farming.farm.duplicate(true)
 	save.coins = 1234
