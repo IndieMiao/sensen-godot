@@ -114,7 +114,7 @@ export class PgParcelStore implements ParcelStore {
   /**
    * 一条语句完成挑选、删除和存档：挑选时锁住地块行（SKIP LOCKED，正在写的跳过），删除和写入 parcel_reclaims 同在这一条语句里，
    * 要么都成，要么都不成。最后活动时间 = GREATEST(players.last_seen_at, 该玩家 token 的最大 last_used_at)；
-   * 两者都早于 cutoff 才算闲置，tokens 有 (player_id, last_used_at) 索引。
+   * 两者都早于 cutoff 才算闲置，tokens 有 (player_id, last_used_at) 索引。删掉的 token 的使用时间已记在 last_seen_at 上（deleteTokensSql）。
    */
   async reclaimIdle(cutoff: number, now: number, limit: number): Promise<ReclaimedParcel[]> {
     const r = await this.pool.query(

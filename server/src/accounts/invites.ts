@@ -8,6 +8,7 @@ import { randomInt, randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { normalizeEmail } from './email.js';
 import { hashPassword } from './password.js';
+import { deleteTokensSql } from '../db/pg_store.js';
 
 /** 去掉 0/o、1/l/i 这些容易看错的字符，玩家要在手机上手输。 */
 const ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -100,7 +101,7 @@ async function setInvitePassword(pool: pg.Pool, email: string, password: string 
     const user = await inviteUser(client, normalized);
     if (!user) { await client.query('ROLLBACK'); return null; }
     await client.query('UPDATE users SET password_hash = $2 WHERE id = $1', [user.id, password === null ? null : await hashPassword(password)]);
-    await client.query('DELETE FROM tokens WHERE player_id IN (SELECT id FROM players WHERE user_id = $1)', [user.id]);
+    await client.query(deleteTokensSql('player_id IN (SELECT id FROM players WHERE user_id = $1)'), [user.id]);
     await client.query('COMMIT');
     return { batch: user.batch };
   } catch (error) {

@@ -20,7 +20,8 @@ import { effectiveNow as qaNow } from '../domain/qa.js';
 import type { Ctx } from '../domain/reducer.js';
 import { DOMAIN_VERSION } from '../domain/version.js';
 import { installKeyHmac, isValidInstallKey, safeEqualHex, tokenHash } from './auth.js';
-import { networkKey } from './network.js';
+import { blockKey, networkKey } from './network.js';
+import { DEFAULT_ANONYMOUS_SIGNUP_LIMITS, type AnonymousSignupLimits } from './signup_limits.js';
 import { currentOwnerFarmView, nearbyEntry, snapshotSlot, visitorSnapshot, type FarmRow } from './dto.js';
 import { avatarRef } from './avatar_ref.js';
 import { initialFarmState } from '../domain/farm_factory.js';
@@ -80,8 +81,8 @@ export interface AppDeps {
   google?: AccountRouteDeps['google'];
   /** Invite-only accounts (C-96): no self sign-up by email, Apple or Google; existing accounts still sign in. */
   signupClosed?: boolean;
-  /** New anonymous players per network per hour (C-100); defaults to ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR. */
-  anonymousSignupsPerNetworkHour?: number;
+  /** New anonymous players per hour by network, address block and in total (C-100, C-120); see signup_limits.ts. */
+  anonymousSignupLimits?: Partial<AnonymousSignupLimits>;
   /** Dynamic farm parcel claims and parcel farms (C-31); absent leaves the /v1/parcels routes out. */
   parcels?: Omit<ParcelRouteDeps, 'now'>;
 }
@@ -90,12 +91,6 @@ interface Regions {
   regions: { id: string; timezone: string; placement_bounds?: PlacementBounds;
     candidates: { layout_patch_id: string; revision: number }[] }[];
 }
-
-/**
- * 匿名建号（新安装第一次 /v1/auth/anonymous）每个网络每小时的上限（C-95#2、C-100）。已有玩家再次登录不占这个额度，
- * 只受每个安装每小时 10 次的登录限制。网络的口径见 network.ts：IPv4 按地址，IPv6 按 /64。
- */
-export const ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR = 10;
 
 /** Nearby 列表上限：横向列表放不下更多，且越长越像在暴露整个城市的用户名单。 */
 export const NEARBY_LIMIT = 20;
@@ -164,10 +159,14 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return isValidInstallKey(key) ? 'installation:' + installKeyHmac(key, deps.pepper) : 'invalid:' + req.ip;
   } });
 
-  // Counted before the player exists, so concurrent first sign-ins from one network each use a unit:
-  // at most the limit of new players can be created per window, never more.
-  const anonymousSignupLimit = app.createRateLimit({ max: deps.anonymousSignupsPerNetworkHour ?? ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR,
-    timeWindow: '1 hour', keyGenerator: req => 'network:' + networkKey(req.ip) });
+  // Counted before the player exists, so concurrent first sign-ins each use a unit: at most the limit of new players
+  // can be created per window, never more. Narrowest first: a network over its own quota uses none of the wider ones.
+  const signupLimits = { ...DEFAULT_ANONYMOUS_SIGNUP_LIMITS, ...deps.anonymousSignupLimits };
+  const anonymousSignupLimits = [
+    app.createRateLimit({ max: signupLimits.perNetwork, timeWindow: '1 hour', keyGenerator: req => 'network:' + networkKey(req.ip) }),
+    app.createRateLimit({ max: signupLimits.perBlock, timeWindow: '1 hour', keyGenerator: req => 'block:' + blockKey(req.ip) }),
+    app.createRateLimit({ max: signupLimits.total, timeWindow: '1 hour', keyGenerator: () => 'all' }),
+  ];
 
   app.post('/v1/auth/anonymous', {
     // A shared NAT must not prevent 300 returning players from signing in together; new players per network are
@@ -181,9 +180,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       return reply.code(400).send({ code: 'SCHEMA', message: 'install_key 需为 32 位十六进制' });
     const hmac = installKeyHmac(body.install_key, deps.pepper);
     if (!await deps.store.installationKnown(hmac)) {
-      const signups = await anonymousSignupLimit(req);
-      if (!signups.isAllowed && signups.isExceeded)
-        return reply.code(429).header('retry-after', signups.ttlInSeconds).send({ code: 'RATE_LIMITED' });
+      for (const limit of anonymousSignupLimits) {
+        const signups = await limit(req);
+        if (!signups.isAllowed && signups.isExceeded)
+          return reply.code(429).header('retry-after', signups.ttlInSeconds).send({ code: 'RATE_LIMITED' });
+      }
     }
     const { player, token } = await deps.store.authAnonymous(hmac);
     return reply.send({ player_id: player.id, token, server_time: deps.now() });
