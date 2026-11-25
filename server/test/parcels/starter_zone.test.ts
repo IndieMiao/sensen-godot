@@ -77,7 +77,7 @@ describe('shipped San Francisco starter zone', () => {
   it('is on, belongs to the San Francisco community and names a registered dataset', () => {
     expect(shipped.enabled).toBe(true);
     expect(shipped.zones).toHaveLength(1);
-    expect(sf).toMatchObject({ id: 'sf-starter', community_id: 'sf', zoom: 16.4 });
+    expect(sf).toMatchObject({ id: 'sf-starter', community_id: 'sf', zoom: 14.6 });
     expect(communityOf(loadParcelRules(DEFAULT_CONTENT_DIR), sf.dataset_version)).toBe('sf');
     expect(raw.zones[0].dataset_version).toBe('sf-dynamic-farm-20261124-r6');
   });
