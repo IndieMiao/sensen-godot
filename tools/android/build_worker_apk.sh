@@ -47,7 +47,9 @@ godot=$(command -v "${GODOT_BIN:-godot}") || fail 'Godot required'
 rev=$(git rev-parse HEAD)
 # Use immutable source. Do not copy the checkout, .godot/export_credentials.cfg,
 # android/build, ~/.android, existing editor settings, or Gradle signing properties.
-project_files=(project.godot export_presets.cfg icon.svg icon.svg.import assets modules scenes addons native tools/android)
+# tools/app_icon/android: farm-dev's P0 launcher icon, used by the dynamic farm packages (C-142).
+project_files=(project.godot export_presets.cfg icon.svg icon.svg.import assets modules scenes addons native tools/android
+    tools/app_icon/android)
 git ls-tree -rz --name-only "$rev" -- "${project_files[@]}" | python3 "$root/tools/android/check_export_inputs.py" tracked
 work=$(mktemp -d "${TMPDIR:?private TMPDIR required}/worker-apk.XXXXXX")
 trap 'rm -rf "$work"' EXIT
@@ -132,7 +134,7 @@ run_editor --export-release Android "$work/unaligned.apk"
 "${seed_tool[@]}" check "$work/gradle-seed.json"
 "${clean[@]}" "${apk_tool[@]}" check-unsigned "$work/unaligned.apk"
 "$bt/zipalign" -P 16 4 "$work/unaligned.apk" "$work/unsigned.apk"
-"${clean[@]}" "${apk_tool[@]}" verify \
+"${clean[@]}" "${apk_tool[@]}" verify --source-commit "$rev" \
     --build-tools "$bt" "$work/unsigned.apk" > "$work/unsigned.json"
 mkdir "$1" # Never replace an earlier candidate or receipt.
 mv "$work/unsigned.apk" "$work/unsigned.json" "$1/"

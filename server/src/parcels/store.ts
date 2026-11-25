@@ -45,6 +45,8 @@ export interface ReclaimedParcel extends OwnedParcel { last_active_at: number; r
 export interface PlayerActivity { guest: boolean; last_active_at: number }
 
 export type EnterOutcome = { kind: 'entered'; granted: boolean; parcel: OwnedParcel } | { kind: 'no_parcel' };
+/** 进入时要写回的内容：新的农场状态、数据集（C-136 换数据集时变，否则原样）和这次是否发了赠品。 */
+export interface EnterChange { farm: ParcelFarmState; dataset_version: string; granted: boolean }
 
 /** bbox 与客户端 GeoJSON 一致：[west, south, east, north]。 */
 export type OwnerQuery = { ids: string[] } | { bbox: [number, number, number, number]; limit: number };
@@ -57,8 +59,11 @@ export interface ParcelStore {
   owners(communityId: string, layer: number, query: OwnerQuery): Promise<ParcelOwner[]>;
   /** 行锁内：版本门控 → apply → 写回并加一。apply 失败整批不写。apply 拿到的 parcel 是锁住的那一行（本人地块编号由此而来）。 */
   updateFarm(playerId: string, baseVersion: number, apply: (farm: ParcelFarmState, parcel: OwnedParcel) => FarmOutcome, now: number): Promise<FarmUpdateOutcome>;
-  /** 进入自家地块：行锁内调用 grant，返回新状态就写回并加版本，返回 null（已发过）就不写。 */
-  enter(playerId: string, grant: (farm: ParcelFarmState) => ParcelFarmState | null, now: number): Promise<EnterOutcome>;
+  /**
+   * 进入自家地块：行锁内调用 change（拿到的是锁住的那一行），返回内容就把农场和数据集写回并加版本，
+   * 返回 null（赠品已发过、也不换数据集）就不写。
+   */
+  enter(playerId: string, change: (parcel: OwnedParcel) => EnterChange | null, now: number): Promise<EnterOutcome>;
   /** 放弃免费地块（仅测试配置开放），地块内状态一并删除。 */
   abandon(playerId: string): Promise<OwnedParcel | null>;
   /**
@@ -122,12 +127,12 @@ export class MemoryParcelStore implements ParcelStore {
     return { kind: 'applied', parcel: structuredClone(row) };
   }
 
-  async enter(playerId: string, grant: (farm: ParcelFarmState) => ParcelFarmState | null, now: number): Promise<EnterOutcome> {
+  async enter(playerId: string, change: (parcel: OwnedParcel) => EnterChange | null, now: number): Promise<EnterOutcome> {
     const row = this.byPlayer(playerId);
     if (!row) return { kind: 'no_parcel' };
-    const next = grant(structuredClone(row.farm));
-    if (next) { row.farm = next; row.farm_version += 1; row.updated_at = now; }
-    return { kind: 'entered', granted: Boolean(next), parcel: structuredClone(row) };
+    const next = change(structuredClone(row));
+    if (next) { row.farm = next.farm; row.dataset_version = next.dataset_version; row.farm_version += 1; row.updated_at = now; }
+    return { kind: 'entered', granted: Boolean(next?.granted), parcel: structuredClone(row) };
   }
 
   async abandon(playerId: string) {

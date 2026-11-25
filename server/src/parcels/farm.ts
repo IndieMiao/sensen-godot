@@ -93,6 +93,27 @@ export function welcome(rules: ParcelRules, state: ParcelFarmState, now: number)
   return s;
 }
 
+/**
+ * 换到新数据集（C-136，Q-168 rebase）：新数据集里同一块地是另一套格子，按格子记的进度放不上去，清空；
+ * 和格子无关的保留。清空的是房子、已清障碍、已开垦、作物和采集记录（采集冷却）；在地里的作物（不论熟没熟）
+ * 每棵退一颗它的种子，房子退一张住宅蓝图，可以重新盖。背包其余物品、金币、卖出次数、已领蓝图和赠品记录不动。
+ * 规则里已没有的作物不知道种子是什么，不退。返回新对象，不改入参。
+ */
+export function rebaseFarm(rules: ParcelRules, state: ParcelFarmState): ParcelFarmState {
+  const s = withEconomy(state);
+  for (const crop of Object.values(s.crops)) {
+    const seed = rules.crops[crop.crop]?.seed;
+    if (seed) s.bag[seed] = (s.bag[seed] ?? 0) + 1;
+  }
+  if (s.house) s.bag[rules.house.blueprint] = (s.bag[rules.house.blueprint] ?? 0) + 1;
+  s.house = null;
+  s.cleared = [];
+  s.tilled = [];
+  s.crops = {};
+  s.gathered = {};
+  return s;
+}
+
 const coord = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0 && (v as number) < MAX_COORD;
 
 /** "x,y" 的规范写法（无前导零、无空格）才收，避免同一格两种写法各占一行。 */

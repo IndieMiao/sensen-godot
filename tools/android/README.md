@@ -149,7 +149,7 @@ app's `files/voice_match_base_url.txt` via `run-as`. Delete it afterwards.
 Use `build_worker_apk.sh` for the tracked **Android** APK preset, not the demo
 publisher or Play AAB scripts. It uses the package, version name and version code
 from the selected commit unchanged in the default mode. `--dynamic-farm` instead
-selects the isolated preview package `com.sensen.dynamicfarm.cardigan` (same version).
+selects the isolated preview package `com.gensen.mapfarm` (same version).
 This does not allocate a release version,
 choose a production signing identity, install an app or authorize publication.
 
@@ -176,7 +176,7 @@ choose a production signing identity, install an app or authorize publication.
    and avatar JSON needed for 3D preview. Do not change the production project/presets.
 
    **Internal test package (C-39).** Only when explicitly selected,
-   `--dynamic-farm-internal TARGET` builds `com.sensen.dynamicfarm.internal` from the same
+   `--dynamic-farm-internal TARGET` builds `com.gensen.mapfarm.internal` from the same
    staging, but points both Journey URLs at `TARGET` and sets
    `sensen/dynamic_farm/reselect`, `sensen/dynamic_farm/account_restore` (C-32),
    `sensen/dynamic_farm/own_farm` (C-34: "Enter my farm" opens the farmable own parcel) and
@@ -196,9 +196,8 @@ choose a production signing identity, install an app or authorize publication.
    ```
 
    **Release package (C-98).** `--dynamic-farm-release` builds the invite-only release of the
-   dynamic farm from the same staging. It keeps the preview's package `com.sensen.dynamicfarm.cardigan`,
-   its user directory and the `Android` preset's version, so it installs over 0.4.1 in place; only the
-   display name becomes `Dynamic Farm`. It takes no target: both Journey URLs are always
+   dynamic farm from the same staging. It keeps the preview's package `com.gensen.mapfarm`,
+   its user directory and the `Android` preset's version; only the display name becomes `Dynamic Farm`. It takes no target: both Journey URLs are always
    `RELEASE_TARGET` in `dynamic_farm_export.py`, the US West dynamic farm production service
    `https://farm.sensenjoy.cn/dynamicfarm/v1` (C-96 materials, C-97 entry). It sets
    `sensen/dynamic_farm/own_farm` and `sensen/dynamic_farm/account_restore`, never `reselect`, and adds
@@ -212,6 +211,19 @@ choose a production signing identity, install an app or authorize publication.
    ```sh
    tools/android/build_worker_apk.sh --dynamic-farm-release "$TMPDIR/release"
    ```
+
+   **No "sensen" for players (C-142).** The owner's rule (C-101#91) is that nothing players see carries
+   "sensen". All dynamic farm packages therefore use the owner's package name `com.gensen.mapfarm`
+   (`.internal` for the internal package; C-142#7, Q-171), which replaced `com.sensen.dynamicfarm.cardigan` /
+   `com.sensen.dynamicfarm.internal`: a phone with a 0.4.x package must uninstall it once, its saved sign-in
+   and local data do not carry over (accounts and farms on the server are unaffected), and the Google
+   sign-in Android client must be registered for the new package. The staging also renames the project
+   (`config/name`, otherwise `SensenAvatar`) to the display name and sets the launcher icon to farm-dev's
+   P0 icon in `tools/app_icon/android` (from bcefa351, the Android P0 / Play presets' files). Deliver the
+   APK under the name in `unsigned.json`'s `filename`
+   (`mapfarm[-internal|-preview]-<version>-<code>-<commit 8>-unsigned.apk`; a signed copy ends
+   `-signed.apk`). The domains, the `[sensen]` setting section and code identifiers (Kotlin packages
+   `com.sensen.*` of the plugins) are internal and unchanged.
 
    Readback (`verify`, `check-unsigned`) parses the exported `assets/project.binary` and
    rejects a package whose Journey settings do not match its variant: internal settings or
@@ -247,7 +259,8 @@ choose a production signing identity, install an app or authorize publication.
    entries are screened for keystores and `export_credentials.cfg` before any
    member is opened for extraction or CRC checks. It refuses signing metadata
    **before** alignment as well as afterwards. Success produces `unsigned.apk`,
-   `unsigned.json` (manifest identity, size, SHA-256) and `source-commit.txt`.
+   `unsigned.json` (manifest identity, size, SHA-256; for a dynamic farm package also the delivered
+   `filename`) and `source-commit.txt`.
 3. For **C-496 only**, use the configured Card MCP `upload_attachment` large
    artifact flow (`artifact_size`, `sha256`, `kind=artifact`, no inline `file`).
    Stream only the verified APK to the one-use **internal** destination on the

@@ -3,17 +3,18 @@ extends Control
 ## giving that home up); no choose_home or old-farm state writes. Internal test packages and the invite-only
 ## release package (C-98) also open the player's own parcel for farming from "Enter my farm"
 ## (`sensen/dynamic_farm/own_farm`, C-34 Q-72); everywhere else that button opens the same read-only 3D preview.
-## Two fixed entries, Market (Jasmine) and Carpenter (Scott), open over the map for a player with a home
-## (C-59, C-30#29 question 1); they trade through that home's parcel save (parcel_town.gd). Like "Enter my farm"
-## they are only in packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
+## C-115 (C-103#17, replacing C-59's Market and Carpenter buttons): one fixed place pin in San Francisco, farm-dev's
+## Washington Square Travel Post (town_entry.gd), opens its place card; Go opens the 3D room (parcel_outpost.tscn) where
+## Jasmine (Market) and Scott (Carpenter) trade through the home's parcel save. Like "Enter my farm" it is only in
+## packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
 ## C-110: the map frames the player's home on entry and has a "My home" key; the account chip (Sign in, or the name
 ## with Sign out behind it) stays at the top right whether or not a parcel is selected.
 ## The guide (C-35, C-61) gives the next step: in the hint under the top row with nothing selected, on the home's card.
-## C-112: farm-dev's camera feel (geo_native_camera.gd) and its locate key, over the bottom card at the right;
+## C-112: farm-dev's camera feel (geo_native_camera.gd) and its round locate key, over the bottom card at the right;
 ## My home, San Francisco and the locate key fly there. Only buildings are coloured (ParcelMapController.kt).
 ## C-130: with the server's starter zone on, the map lands there for a player without a home (San Francisco and the
 ## locate key go there too), marks it with its own native layer and offers claiming only inside it.
-## C-128 (0.4.4): a profile key at the left, level with the locate key, opens the main farm's profile over the
+## C-128 (0.4.4): a round profile key at the left, level with the locate key, opens the main farm's profile over the
 ## map, and from it Settings and the dressing room (parcel_profile.gd).
 ## C-106: the UI v3 look of the owner-approved C-85 page ⑤ (map_ui.gd); states, actions and lines are unchanged.
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
@@ -27,7 +28,9 @@ const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
-const TOWN := "res://scenes/dynamic_farm/parcel_town.gd"
+## The 3D space the Washington Square pin opens (C-115).
+const ROOM := "res://scenes/dynamic_farm/parcel_outpost.tscn"
+const TownEntry := preload("res://scenes/dynamic_farm/town_entry.gd")
 const PROFILE := "res://scenes/dynamic_farm/parcel_profile.gd"
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
@@ -40,16 +43,16 @@ const AREA_REFRESH_SECONDS := 0.8
 const PICK_PREVIEW := "Choose a parcel to explore in 3D."
 const PICK_FIRST := "Tap a building to choose your first home."
 const PICK_HOME := "Tap your green parcel, then Enter my farm."
-## A Market / Carpenter entry while its town loads (C-61, C-59#135: a cold start's first open took ~10 s).
-const TOWN_LOADING := "Loading…"
-const TOWN_NAMES := {"market": "Market", "carpenter": "Carpenter"}
 ## Camera zoom when the map moves to the player's home (C-110); the parcel and its address labels show from 18.
 const HOME_ZOOM := 18.0
 const MY_HOME := "My home"
-## The locate key (C-112) flies back to the player's home, or to the dataset's area without one; it sits LOCATE_GAP over the
-## bottom card. UI v3 (C-106): a glass key with the C-86 locate art, as the other side keys.
+## The Washington Square pin stays above this fraction of the screen's height while its card is open (C-115).
+const PIN_CLEAR_OF_CARD := 0.55
+## The locate key: farm-dev's MapLocateButton (scenes/p0/p0_map.gd _style_locate, LOCK-24) as it is, in its place
+## over the bottom card. It flies back to the player's home, or to the dataset's area without one.
+const LOCATE_ICON := "res://assets/p0/icons/locate.svg"
 const LOCATE_GAP := 12.0
-## The profile key (C-128): the same glass key at the left, with the account glyph; it opens the profile.
+## The profile key (C-128): the same round key at the left, with the account glyph; it opens the profile.
 const PROFILE_ICON := "res://assets/ui/icons/lucide/user-round.svg"
 ## How long a profile tap waits for the saved outfit's parts at most (C-135), in seconds; then the profile opens all the
 ## same and its figure may show late or stay blank. 5 s: a cold start's load took ~3 s on the phone (C-133), and a
@@ -123,9 +126,7 @@ var _account_note: Label
 var _home: Button
 var _locate: Button
 var _bottom: VBoxContainer
-var _market: Button
-var _carpenter: Button
-var _town: Control
+var _entry: Control # The Washington Square pin and its place card (TownEntry).
 var _profile_button: Button
 ## The profile and the pages opened from it, over the map (parcel_profile.gd), else null.
 var _profile: Control
@@ -133,17 +134,12 @@ var _profile: Control
 var _profile_waiting := false
 ## The most a profile tap waits for the outfit (PROFILE_WAIT_SECONDS).
 var profile_wait_seconds := float(ProjectSettings.get_setting(PROFILE_WAIT_SETTING, PROFILE_WAIT_SECONDS))
-## The town that is loading after a tap on Market / Carpenter (C-61: the tap shows Loading… at once), else "".
-var _town_loading := ""
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
 ## a visit to the parcel.
 var home_farm := {}
 var _farm_parcel := ""
 var _farm_fresh := false
 var _farm_reading := false
-var _town_prepared := false
-var _town_router: Node   # AppRouter when the preload was requested: it takes a preload the map leaves behind
-var _town_script: GDScript
 var _area_timer: Timer
 var _area_generation := -1
 var _retry: Button
@@ -186,7 +182,7 @@ func _ready() -> void:
 	_claims.changed.connect(_render); add_child(_claims)
 	_selector.candidates_found.connect(_show_candidates)
 	_selector.farm_ready.connect(_open_host)
-	_camera.tapped.connect(func(point: Vector2): _selector.tap(point, _camera.zoom))
+	_camera.tapped.connect(_on_map_tap)
 	_camera.camera_changed.connect(func(): _selector.camera_changed(_camera.zoom))
 	_camera.camera_changed.connect(func(): _area_timer.start(AREA_REFRESH_SECONDS))
 	_camera.setup_map(_bridge, token)
@@ -237,8 +233,9 @@ func _claim_api() -> RefCounted:
 	return ClaimApi.new(net.client if net != null else null, dataset)
 
 ## The v3 map UI (C-106, after the owner-approved C-85 page ⑤, D-201 / Q-124): a top row of glass keys (Back, the city
-## chip, the account chip), one hint capsule under it, the parcel card at the bottom and glass keys on the sides. The
-## states, actions and lines are the ones the map had; only where they are drawn changed (map_ui.gd).
+## chip, the account chip), one hint capsule under it, the parcel card at the bottom and keys on the sides (farm-dev's
+## round locate and profile keys, a glass My home). The states, actions and lines are the ones the map had; only where
+## they are drawn changed (map_ui.gd).
 func _build_ui() -> void:
 	_hud = Control.new(); _hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; _hud.theme = MapUi.theme(); add_child(_hud)
@@ -314,18 +311,18 @@ func _build_ui() -> void:
 		credit.pressed.connect(ExternalLink.open.bind(item[1])); credits.add_child(credit)
 	var data := MapUi.label("Parcels: DataSF · PDDL / CC0", UiTokens.STYLE_TYPE_MICRO, UiTokens.COLOR_TEXT_SECONDARY)
 	data.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; data.custom_minimum_size.y = CREDIT_H; credits.add_child(data)
-	# Side keys over the card: locate (C-112) at the right with My home (C-110) above it, Market and Carpenter above
-	# those (C-59; C-115 takes them off the map); the profile key (C-128) at the left, level with locate.
-	_locate = UiGlassButton.new(UiArt.sys("locate")); _locate.name = "MapLocate"; _locate.tooltip_text = "Locate"
+	# Side keys over the card: farm-dev's round locate key (C-112, LOCK-24) at the right with My home (C-110) above it;
+	# the same round profile key (C-128) at the left, level with locate. Market and Carpenter are in the Washington
+	# Square room now (C-115).
+	_locate = _round_key(LOCATE_ICON); _locate.name = "MapLocate"; _locate.tooltip_text = "Locate"
 	_locate.disabled = true; _locate.pressed.connect(_locate_player); _hud.add_child(_locate)
 	_home = UiGlassButton.new(UiArt.sys("home")); _home.name = "MyHome"; _home.tooltip_text = MY_HOME
 	_home.hide(); _home.pressed.connect(_go_home); _hud.add_child(_home)
-	_market = MapUi.glass_pill(TOWN_NAMES.market); _market.name = "Market"; _market.disabled = true
-	_market.visible = _own_farm_entry(); _market.pressed.connect(_open_town.bind("market")); _hud.add_child(_market)
-	_carpenter = MapUi.glass_pill(TOWN_NAMES.carpenter); _carpenter.name = "Carpenter"; _carpenter.disabled = true
-	_carpenter.visible = _own_farm_entry(); _carpenter.pressed.connect(_open_town.bind("carpenter")); _hud.add_child(_carpenter)
-	_profile_button = UiGlassButton.new(load(PROFILE_ICON)); _profile_button.name = "MapProfile"; _profile_button.tooltip_text = "Profile"
+	_profile_button = _round_key(PROFILE_ICON, UiTokens.COLOR_TEXT); _profile_button.name = "MapProfile"; _profile_button.tooltip_text = "Profile"
 	_profile_button.pressed.connect(_open_profile); _hud.add_child(_profile_button)
+	_entry = TownEntry.new(); _entry.visible = false; _hud.add_child(_entry); _hud.move_child(_entry, 0)
+	_entry.go_requested.connect(_open_town)
+	_entry.card_changed.connect(_on_entry_card)
 	_confirm = _dialog("ClaimConfirm", CLAIM_ASK, CLAIM_NOTE, UiArt.hero("parcel"),
 		[["Claim", UiTokens.BUTTON_CMD_PRIMARY, _claim_selection], ["Cancel", UiTokens.BUTTON_CMD_SECONDARY, _cancel_claim]], _cancel_claim)
 	_sign_out_confirm = _dialog("SignOutConfirm", SIGN_OUT_ASK, "", null,
@@ -333,7 +330,7 @@ func _build_ui() -> void:
 	_area_timer = Timer.new(); _area_timer.one_shot = true; _area_timer.timeout.connect(_refresh_area); add_child(_area_timer)
 	for node in [_bottom, _hud]: node.item_rect_changed.connect(_place_locate)
 	_hud.resized.connect(_place_locate)
-	for key in [_home, _market, _carpenter]: key.visibility_changed.connect(_place_locate)
+	_home.visibility_changed.connect(_place_locate)
 	_render_account()
 
 ## The parcel card (C-85 ⑤ A / C): the band with the hero and its tag, the address, the cell counts, whose it is, the
@@ -429,41 +426,35 @@ func _safe_margins() -> Vector4:
 		get_viewport().get_visible_rect().size, 0.0)
 
 ## Side keys sit LOCATE_GAP over whatever the bottom column shows (the card, a toast, the credits): locate at the right
-## with My home, Market and Carpenter stacked above it, the profile key at the left level with locate.
+## with My home above it, the profile key at the left level with locate. The round keys (locate, profile) fill their
+## 44 px; the glass My home key draws a smaller disc in its 44 px, so its disc's outer edge lines up with locate's.
 func _place_locate() -> void:
 	if _locate == null or _bottom == null: return
 	var nudge := (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5 # the glass disc's edge on the margin
-	var right := _hud.size.x - UiTokens.SIZE_SCREEN_EDGE + nudge
+	var right := _hud.size.x - UiTokens.SIZE_SCREEN_EDGE
 	var y := _bottom.position.y - LOCATE_GAP - _locate.size.y
 	_locate.position = Vector2(right - _locate.size.x, y)
-	_profile_button.position = Vector2(UiTokens.SIZE_SCREEN_EDGE - nudge, y)
-	for key in [_home, _carpenter, _market]:
-		if not key.visible: continue
-		y -= key.size.y + UiTokens.SPACE_S2
-		key.position = Vector2(right - key.size.x - (0.0 if key is UiGlassButton else nudge), y)
+	_profile_button.position = Vector2(UiTokens.SIZE_SCREEN_EDGE, y)
+	if _home.visible: _home.position = Vector2(right + nudge - _home.size.x, y - _home.size.y - UiTokens.SPACE_S2)
 
-## A disabled side button that reads another text for a while (Loading…) keeps the width its `usual` text gives it,
-## with no side margins and the text centred; `text == usual` puts it back, with the button's own disabled look.
-## A longer text first widened the top panel past the screen (C-123, C-61#195); on the v3 map the glass pills are
-## placed by their right edge only when the side keys show or hide, so a wider pill would run off the right edge.
-func _text_in_place(button: Button, text: String, usual: String) -> void:
-	if button.text == text: return
-	if text == usual:
-		button.text = usual
-		var own: Variant = button.get_meta(&"usual_disabled", null)
-		if own is StyleBox: button.add_theme_stylebox_override("disabled", own)
-		else: button.remove_theme_stylebox_override("disabled")
-		button.remove_meta(&"usual_disabled"); button.clip_text = false; button.custom_minimum_size.x = 0
-		return
-	if button.text == usual:
-		button.custom_minimum_size.x = button.get_combined_minimum_size().x
-		button.clip_text = true
-		if button.has_theme_stylebox_override("disabled"):
-			button.set_meta(&"usual_disabled", button.get_theme_stylebox("disabled"))
-		var style := button.get_theme_stylebox("disabled").duplicate() as StyleBox
-		style.content_margin_left = 0; style.content_margin_right = 0
-		button.add_theme_stylebox_override("disabled", style)
-	button.text = text
+## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the glyph as drawn): LOCK-24's
+## MapLocateButton as it is, kept on the v3 map (C-106); the profile key is the same key (C-128). `tint` colours a white
+## glyph (lucide's) the text colour the locate glyph is drawn in.
+func _round_key(glyph: String, tint := Color.WHITE) -> Button:
+	var b := Button.new(); b.focus_mode = Control.FOCUS_NONE
+	b.theme = UiKit.theme(); b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
+	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
+		var sb := b.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+		if sb != null:
+			sb.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
+			sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
+			b.add_theme_stylebox_override(state, sb)
+		b.add_theme_color_override(StringName("icon_%s_color" % state), tint)
+	b.icon = load(glyph); b.expand_icon = true; b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.add_theme_constant_override(&"icon_max_width", 22)
+	b.custom_minimum_size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE); b.size = b.custom_minimum_size
+	return b
 
 func _render() -> void:
 	_render_account()
@@ -479,7 +470,7 @@ func _render() -> void:
 	var state: String = _claims.status(id)
 	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
 	_open.disabled = not idle or id.is_empty()
-	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _town == null
+	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _profile == null
 	_render_card(id, state)
 	var claimable: bool = state == "none" and _claims.mine_known and not _claims.has_home() and _claims.in_zone(id)
 	if not claimable or not idle: _confirm.hide()
@@ -487,17 +478,11 @@ func _render() -> void:
 	_enter.visible = state == "mine"; _enter.disabled = not idle
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
-	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null and _town_loading.is_empty()
-	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
-	_text_in_place(_market, TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market, TOWN_NAMES.market)
-	_text_in_place(_carpenter, TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter, TOWN_NAMES.carpenter)
-	_market.visible = _own_farm_entry(); _carpenter.visible = _own_farm_entry()
-	_home.visible = _claims.has_home()
-	_home.disabled = _selector.manifest.is_empty() or _opening or _town != null
+	_home.visible = _claims.has_home() and not (_entry != null and _entry.is_open())
+	_home.disabled = _selector.manifest.is_empty() or _opening
 	_locate.disabled = _home.disabled
-	if _own_farm_entry() and _claims.has_home():
-		_prepare_town()
-		_read_farm()
+	_render_entry()
+	if _own_farm_entry() and _claims.has_home(): _read_farm()
 	if _selector._options.is_empty(): _choices.hide()
 	_render_feedback(id)
 	_place_locate.call_deferred()
@@ -608,13 +593,13 @@ func _frame_home(fly := false) -> bool:
 	return true
 
 func _go_home() -> void:
-	if _selector == null or _selector.manifest.is_empty() or _town != null: return
+	if _selector == null or _selector.manifest.is_empty() or _opening: return
 	_frame_home(true)
 
 ## The locate key: back to the player, who lives at their home; without a home, back to the starter zone (C-130) or the
 ## dataset's area.
 func _locate_player() -> void:
-	if _selector == null or _selector.manifest.is_empty() or _town != null or _opening: return
+	if _selector == null or _selector.manifest.is_empty() or _opening: return
 	if not _frame_home(true): _reset_area(true)
 
 ## The account chip at the top right (C-110, C-85 ⑤ D): signed in, the avatar and the name (a tap asks to sign out);
@@ -632,7 +617,7 @@ func _render_account() -> void:
 	var waiting := _restoring or _signing_out
 	var text := BUSY_DOTS if waiting else _account_name(net.account) if signed_in else "Sign in"
 	_style_account(signed_in or waiting, text)
-	_account_button.disabled = waiting or _opening or _town != null or not _town_loading.is_empty() or (_claims != null and _claims.busy)
+	_account_button.disabled = waiting or _opening or (_claims != null and _claims.busy)
 	if not signed_in or waiting: _sign_out_confirm.hide()
 	_account_toast.visible = signed_in and not _restoring and not str(net.restore_error).is_empty()
 
@@ -768,79 +753,43 @@ func _open_sign_in() -> void:
 	if signed_in: _account_changed()
 	else: _render()
 
-## The market or the carpenter over the map, trading through the player's own parcel save. The tapped entry reads
-## Loading… and is on screen before anything loads: on a cold start the town's first open took seconds with no sign
-## of the tap (C-59#135). A tap is handled before the frame's process step, so waiting for process_frame alone opened
-## the town before Loading… was ever drawn (C-61 V-243 on the emulator).
-func _open_town(who: String) -> void:
-	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _town != null or _opening or not _town_loading.is_empty(): return
-	var tapped := Time.get_ticks_msec()
-	_town_loading = who
-	_render()
-	await _on_screen()
-	var drawn := Time.get_ticks_msec()
-	if _town_cancelled(): return
-	await _town_ready()
-	var loaded := Time.get_ticks_msec()
-	if _town_cancelled(): return
+## The Washington Square pin (C-115): in packages that enter one's own farm, once the map shows; the card's Distance and Go
+## need the home. Its card stands over the map's panels while it is open.
+func _render_entry() -> void:
+	if _entry == null: return
+	_entry.camera = _camera
+	_entry.visible = _own_farm_entry() and not _selector.manifest.is_empty() and not _suspended and not _leaving
+	var center = _claims.mine.get("center") if _claims != null and _claims.has_home() else null
+	_entry.home_center = center if Geo.valid_point(center) else []
+	if not _entry.visible: _entry.close_card()
+
+## A tap on the map: the Washington Square pin first (farm-dev's city map takes a pin's tap before the ground), else the
+## building under it.
+func _on_map_tap(point: Vector2) -> void:
+	if _entry != null and _entry.visible and not _opening and _entry.hit(point * _camera.size):
+		_entry.open_card(); return
+	_selector.tap(point, _camera.zoom)
+
+## While the card is open it stands over the map's panels and side keys; a pin low on the screen, where the card would
+## cover it, flies to the middle first.
+func _on_entry_card(open: bool) -> void:
+	_hud.move_child(_entry, -1 if open else 0)
+	_bottom.visible = not open; _locate.visible = not open; _profile_button.visible = not open
+	_home.visible = not open and _claims != null and _claims.has_home()
+	if not open: return
+	_camera.stop()
+	var at: Vector2 = _entry.screen_point()
+	if at == Vector2.INF or at.y > _camera.size.y * PIN_CLEAR_OF_CARD:
+		_camera.fly_to(TownEntry.LON, TownEntry.LAT, _camera.zoom)
+
+## Go on the Washington Square card: the 3D room above the map (AppRouter, as "Enter my farm"), trading through the home's
+## parcel save. Back or the room's door returns here; the map then reads the save again for the guide's line.
+func _open_town() -> void:
+	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _opening or _profile != null: return
 	var home: Dictionary = _claims.mine
-	_town = _town_script.open(self, who, _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))), str(home.parcel_id))
-	_town_loading = ""
-	_town.closed.connect(_town_closed.bind(_town, str(home.parcel_id)))
-	_hud.hide(); _camera.input_enabled = false
-	var opened := Time.get_ticks_msec()
-	await _on_screen()
-	print("DYNAMIC_TOWN_OPEN ", JSON.stringify({"who": who, "loading_ms": drawn - tapped, "ready_ms": loaded - tapped,
-		"open_ms": opened - tapped, "shown_ms": Time.get_ticks_msec() - tapped}))
-
-## Waits until what the map shows now has been drawn, then for the next frame (headless draws nothing: a frame).
-func _on_screen() -> void:
-	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
-	else: await get_tree().process_frame
-	if is_inside_tree(): await get_tree().process_frame
-
-## A tap given up while its town loads (the map left, went to the parcel, or lost its home); the entries come back.
-func _town_cancelled() -> bool:
-	if is_inside_tree() and not _suspended and not _leaving and not _opening and _claims.has_home(): return false
-	_town_loading = ""
-	if is_inside_tree(): _render()
-	return true
-
-## The town's script: the thread's preload, waited for frame by frame so Loading… stays drawn, else loaded here.
-func _town_ready() -> void:
-	if _town_script != null: return
-	if _town_prepared:
-		while is_inside_tree() and ResourceLoader.load_threaded_get_status(TOWN) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-			await get_tree().process_frame
-		if not is_inside_tree(): return
-		_town_prepared = false
-		_town_script = ResourceLoader.load_threaded_get(TOWN)
-	if _town_script == null: _town_script = load(TOWN)
-
-## The town's script and what it preloads load on a thread once the player has a home, so the first tap opens sooner.
-## Not under Compatibility, where threaded loads never finished (AppRouter.sync_loads): the tap loads it there.
-func _prepare_town() -> void:
-	var router := get_node_or_null("/root/AppRouter")
-	if router != null and router.sync_loads: return
-	if not _town_prepared and _town_script == null:
-		_town_prepared = ResourceLoader.load_threaded_request(TOWN) == OK
-		if _town_prepared: _town_router = router
-
-## A map freed with that load still running hands it to AppRouter, which takes it once done (and waits for it only
-## when Godot quits): a load left on its thread kept a quitting Godot from exiting (C-61, Q-139), and waiting here
-## held Back on the main thread until the town had loaded (C-125). Without AppRouter the map still waits for it.
-func _finish_town_load() -> void:
-	if not _town_prepared: return
-	_town_prepared = false
-	if is_instance_valid(_town_router): _town_router.adopt_threaded_load(TOWN)
-	else: ResourceLoader.load_threaded_get(TOWN)
-
-func _town_closed(town: Control, parcel: String) -> void:
-	_town = null
-	if not town.farm.is_empty() and _claims != null and _claims.has_home() and str(_claims.mine.parcel_id) == parcel:
-		home_farm = town.farm; _farm_parcel = parcel; _farm_fresh = true
-	if _suspended or _leaving: return
-	_hud.show(); _render()
+	_entry.close_card()
+	await _open_scene(ROOM, {"store": _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))),
+		"parcel_id": str(home.parcel_id), "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
 
 ## The map has no player of its own, so after a cold start nothing had loaded the saved outfit and the profile's figure
 ## stayed blank ~3 s on its first open (C-133): its parts start loading on the loader's threads as the map opens.
@@ -848,7 +797,7 @@ func _warm_outfit() -> void:
 	var avatar := get_node_or_null("/root/Avatar")
 	if avatar != null: avatar.warm_saved_outfit()
 
-## The profile over the map (C-128), as the town is: the map's panels hide and its camera holds still until it closes.
+## The profile over the map (C-128): the map's panels hide and its camera holds still until it closes.
 ## A tap while the saved outfit is still loading (just after a cold start) holds the key until it has loaded, frame
 ## by frame, so the profile opens with its figure, never with an empty frame for it (C-133). It waits
 ## profile_wait_seconds at most: a load that never ends opens the profile all the same (C-135).
@@ -907,6 +856,12 @@ func _open_host(farm: Dictionary) -> void:
 	# Only the player's own parcel, opened from "Enter my farm", in a package with `own_farm` is farmable.
 	var own: bool = _own_farm_entry() and _entering == str(farm.block_id) and _claims != null and _claims.status(_entering) == "mine"
 	_entering = ""
+	await _open_scene(HOST, {"farm": farm, "dataset": farm.dataset_version, "block_id": farm.block_id,
+		"own_parcel" if own else "preview_only": true, "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
+
+## Opens a 3D scene above the map through AppRouter: the parcel (dynamic_farm_host) or the Washington Square room. The map's
+## occlusion colour is set first; the map goes opaque only once the router really pushes the scene (suspend).
+func _open_scene(path: String, args: Dictionary) -> void:
 	if _bridge == null or not _bridge.supports_surface_opacity() or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):
 		_render()
 		_set_hint("Use the latest Dynamic Farm preview build."); return
@@ -914,8 +869,7 @@ func _open_host(farm: Dictionary) -> void:
 	if router == null or not router.has_method("open_instance"):
 		_set_hint("This preview is missing its scene router."); return
 	_opening = true; _render()
-	await router.open_instance(HOST, {"farm": farm, "dataset": farm.dataset_version, "block_id": farm.block_id,
-		"own_parcel" if own else "preview_only": true, "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
+	await router.open_instance(path, args)
 	_opening = false
 	if not _suspended:
 		# Loading cancelled/failed before a host became top, or Back already returned here.
@@ -995,13 +949,11 @@ func is_back_navigation_locked() -> bool:
 	if is_instance_valid(_profile):
 		_profile.back()
 		return true
-	if is_instance_valid(_town):
-		if not _town.stack.back(): _town.close()
-		return true
+	if _entry != null and _entry.is_open():
+		_entry.close_card(); return true
 	_leave(); return true
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_PREDELETE: _finish_town_load()
 	if not is_node_ready() or _selector == null: return
 	if what == NOTIFICATION_APPLICATION_PAUSED and not _suspended: _suspend_map(false)
 	elif what == NOTIFICATION_APPLICATION_RESUMED and _suspended:

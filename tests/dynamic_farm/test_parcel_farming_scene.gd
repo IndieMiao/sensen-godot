@@ -6,14 +6,21 @@ extends SceneTree
 ## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
 ## save is applied. C-33: opening the house placement gives up a press still walking. C-114: Build pops the
 ## cottage in with dust round it; reopening shows it still, without dust. C-138: the carrot's stage and the dry soil block
-## are drawn; the development switch draws the soil wet. Run in the private preview project (README), optionally
+## are drawn; the development switch draws the soil wet. C-136: a claim made on an older dataset opens on the
+## server save once the enter request names the opened farm's dataset (Q-168), the lost first try included. Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const RemoteStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const House = preload("res://modules/dynamic_farm/farm_house.gd")
+## Pixels the quick bar's global rect may sit off its rest after M-16's slide back (C-147). Control only refreshes its
+## cached global transform when the position moves by more than is_equal_approx (relative 1e-5, about 0.006 px at
+## y 600), so a tween's last sub-0.006 px step leaves get_global_rect() one frame behind, for good. Far below the
+## 24 px slide (UiMotion.BAR_HIDE_Y) the assertion has to catch.
+const BAR_REST_TOLERANCE_PX := 0.1
 var checks := 0
 var failures := 0
 var raw: Dictionary
@@ -43,6 +50,26 @@ class FlakyStore extends RefCounted:
 		return inner.enter()
 	func send(base_version: int, commands: Array) -> Dictionary: return inner.send(base_version, commands)
 
+## C-136 stand-in for the server's /parcels/mine endpoints holding the player's claim on an older dataset: an enter
+## naming a dataset moves the claim to it (Q-168 rebase; the cell progress is gone, the bag kept); anything else answers
+## the claim as it is. The first `drop` requests are lost like a dropped connection.
+class OldClaimServer extends RefCounted:
+	var block_id: String
+	var dataset: String
+	var farm: Dictionary
+	var drop := 0
+	var enters: Array = [] # Bodies of the enter requests that reached the server, lost ones included.
+	func handle(method: String, url: String, _headers: PackedStringArray, body: String) -> ApiClient.Response:
+		var data = JSON.parse_string(body) if not body.is_empty() else {}
+		if method == "POST" and url.ends_with("/parcels/mine/enter"):
+			enters.append(data)
+			if data is Dictionary and data.get("dataset_version") is String: dataset = data.dataset_version
+		if drop > 0:
+			drop -= 1
+			return ApiClient.Response.new(false, 0, {}, "transport error")
+		return ApiClient.Response.new(true, 200, {"granted": false, "server_time": int(Time.get_unix_time_from_system() * 1000.0),
+			"parcel": {"parcel_id": block_id, "dataset_version": dataset, "farm_version": 5, "farm": farm}})
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -60,6 +87,7 @@ func _run() -> void:
 	await _reopen()
 	await _placement_takes_over()
 	await _house_pops_once()
+	await _older_dataset_claim()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 	print("PARCEL_FARMING_SCENE checks=%d failures=%d" % [checks, failures])
@@ -284,7 +312,7 @@ func _first_visit() -> void:
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
 	_check("+1 Carrot" in _floats(farming) and _flights(farming) >= 1, "the harvest floats up and flies into the bag")
 	_check(_bar_counts(farming).get("crop_carrot") == 1, "the quick bar shows the carrot")
-	_check(_tip(farming) == "Head back to the map and tap Market to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61): " + _tip(farming))
+	_check(_tip(farming) == "Head back to the map and tap Washington Square to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61, C-115: at Washington Square): " + _tip(farming))
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crop_art.counts().stages == [1, 0, 0, 0, 0, 0, 0], "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
 	await _press(farming, cell)
@@ -412,8 +440,8 @@ func _bag_drawer(farming: Node) -> void:
 	var bar_rect: Rect2 = farming._bar.get_global_rect()
 	var ui_rect: Rect2 = farming._ui.get_global_rect()
 	_check(farming._bar.visible and is_equal_approx(farming._bar.modulate.a, 1.0)
-		and is_equal_approx(bar_rect.end.y, ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM)
-		and is_equal_approx(bar_rect.position.x, UiTokens.SIZE_QUICK_BAR_X),
+		and absf(bar_rect.end.y - (ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM)) <= BAR_REST_TOLERANCE_PX
+		and absf(bar_rect.position.x - UiTokens.SIZE_QUICK_BAR_X) <= BAR_REST_TOLERANCE_PX,
 		"the quick bar comes back at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
 	# No long-press drag on this bar (no swap, Pin or Remove, C-74#39); a swipe up still opens the bag.
 	var cell: UiItemCell = farming._bar.cells()[0]
@@ -513,6 +541,45 @@ func _house_pops_once() -> void:
 	await process_frame
 	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
 	DirAccess.remove_absolute(house_dir)
+
+func _older_dataset_claim() -> void:
+	var server := OldClaimServer.new()
+	server.block_id = raw.block_id
+	server.dataset = "sf-dynamic-farm-older"
+	var bag := {"hoe_starter": 1, "seed_carrot": 2, "blueprint_cottage": 1, "blueprint_coop": 1}
+	server.farm = ParcelFarm.empty_state()
+	server.farm.bag = bag; server.farm.welcomed_at = 0; server.farm.coins = 12; server.farm.sales = 1
+	var client := ApiClient.new("https://fake.invalid/v1", server.handle)
+	client.token = "player"
+	# Before C-136 nothing named the dataset: the reply is about the claim's older dataset and is refused.
+	var old: Dictionary = await RemoteStore.new(client, raw.block_id, raw.dataset_version).read()
+	_check(not old.ok and old.code == "OTHER_PARCEL", "a reply on the claim's older dataset is still refused")
+	server.drop = 1
+	var farming := await _open(RemoteStore.new(client, raw.block_id, raw.dataset_version))
+	var deadline := Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(server.enters.size() == 2 and server.enters.all(func(b): return b is Dictionary and b.get("dataset_version") == raw.dataset_version),
+		"each enter, the lost one and its retry, names the opened farm's dataset")
+	_check(farming.loaded() and not farming.unavailable and not farming._cover.visible, "the moved claim opens: no Could not open your farm")
+	_check(farming.farm.get("bag") == bag and farming.farm.get("coins") == 12 and farming.farm.get("house", 0) == null and farming.farm.get("tilled") == [],
+		"the moved save shows the kept bag and coins on fresh cells")
+	scene.queue_free()
+	await process_frame
+	# Retry from the cover goes the same way: both tries lost, then the key's Retry opens it.
+	server.drop = 2
+	server.enters.clear()
+	server.dataset = "sf-dynamic-farm-older"
+	farming = await _open(RemoteStore.new(client, raw.block_id, raw.dataset_version))
+	deadline = Time.get_ticks_msec() + 30000
+	while farming.busy and Time.get_ticks_msec() < deadline: await process_frame
+	_check(farming.unavailable and farming._cover.visible and farming._cover_label.text == "Could not open your farm.", "two lost tries leave the cover up")
+	farming._on_key()
+	deadline = Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(server.enters.size() == 3 and server.enters[2].get("dataset_version") == raw.dataset_version and farming.loaded() and not farming.unavailable,
+		"Retry names the dataset and opens the moved claim")
+	scene.queue_free()
+	await process_frame
 
 func _dust() -> Array:
 	return scene.get_children().filter(func(n): return n is CPUParticles3D)

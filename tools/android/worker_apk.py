@@ -79,7 +79,7 @@ def inspect_zip(apk, unsigned, variant='android'):
         return farm.exported_config(farm.project_settings(z.read('assets/project.binary')), variant)
 
 
-def inspect(apk, identity, build_tools, signer=None, variant='android'):
+def inspect(apk, identity, build_tools, signer=None, variant='android', commit=None):
     config = inspect_zip(apk, signer is None, variant)
     checked_output([build_tools / 'zipalign', '-c', '-P', '16', '4', apk])
     badging = checked_output([build_tools / 'aapt', 'dump', 'badging', apk])
@@ -95,7 +95,12 @@ def inspect(apk, identity, build_tools, signer=None, variant='android'):
     with apk.open('rb') as f:
         for block in iter(lambda: f.read(1024 * 1024), b''):
             h.update(block)
-    return dict(identity, bytes=apk.stat().st_size, sha256=h.hexdigest(), signer_sha256=signer, config=config)
+    result = dict(identity, bytes=apk.stat().st_size, sha256=h.hexdigest(), signer_sha256=signer, config=config)
+    if commit is not None and variant in farm.FILE_PREFIXES:
+        # The name to deliver this APK under (C-142: no "sensen" in what players download).
+        result['filename'] = farm.apk_filename(variant, identity['version_name'], identity['version_code'], commit,
+                                               signer is not None)
+    return result
 
 
 def main():
@@ -109,6 +114,7 @@ def main():
     check.add_argument('apk', type=Path)
     check.add_argument('--build-tools', type=Path, required=True)
     check.add_argument('--signer-sha256', help='only for the C-500 result; must come from the approved identity')
+    check.add_argument('--source-commit', help='source commit; adds the delivered file name of a dynamic farm APK')
     a = parser.parse_args()
     preset, identity = worker_preset(a.presets.read_text(), a.variant)
     if a.cmd == 'generate':
@@ -117,7 +123,7 @@ def main():
     elif a.cmd == 'check-unsigned':
         inspect_zip(a.apk, True, a.variant)
     else:
-        print(json.dumps(inspect(a.apk, identity, a.build_tools, a.signer_sha256, a.variant), sort_keys=True))
+        print(json.dumps(inspect(a.apk, identity, a.build_tools, a.signer_sha256, a.variant, a.source_commit), sort_keys=True))
 
 
 if __name__ == '__main__':
